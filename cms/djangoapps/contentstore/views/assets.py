@@ -35,6 +35,35 @@ from .access import get_location_and_verify_access
 __all__ = ['asset_index', 'upload_asset', 'import_course', 'generate_export_course', 'export_course']
 
 
+def assets_to_json_dict(assets):
+    ret = []
+    for asset in assets:
+        obj = {
+            "name": asset.get("displayname", ""),
+            "chunkSize": asset.get("chunkSize", 0),
+            "path": asset.get("filename", ""),
+            "length": asset.get("length", 0),
+        }
+        uploaded = asset.get("uploadDate")
+        if uploaded:
+            obj["uploaded"] = uploaded.isoformat()
+        thumbnail = asset.get("thumbnail_location")
+        if thumbnail:
+            obj["thumbnail"] = thumbnail
+        idInfo = asset.get("_id")
+        if idInfo:
+            obj["id"] = "/{tag}/{org}/{course}/{revision}/{category}/{name}".format(
+                org=idInfo.get("org", ""),
+                course=idInfo.get("course", ""),
+                revision=idInfo.get("revision", ""),
+                tag=idInfo.get("tag", ""),
+                category=idInfo.get("category", ""),
+                name=idInfo.get("name", ""),
+            )
+        ret.append(obj)
+    return ret
+
+
 @login_required
 @ensure_csrf_cookie
 def asset_index(request, org, course, name):
@@ -58,6 +87,9 @@ def asset_index(request, org, course, name):
 
     # sort in reverse upload date order
     assets = sorted(assets, key=lambda asset: asset['uploadDate'], reverse=True)
+
+    if request.META.get('HTTP_ACCEPT', "").startswith("application/json"):
+        return HttpResponse(json.dumps(assets_to_json_dict(assets)), content_type="application/json")
 
     asset_display = []
     for asset in assets:

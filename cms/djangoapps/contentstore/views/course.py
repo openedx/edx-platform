@@ -16,6 +16,9 @@ from xmodule.modulestore.exceptions import (
     ItemNotFoundError, InvalidLocationError)
 from xmodule.modulestore import Location
 
+from xmodule.contentstore.django import contentstore
+from xmodule.contentstore.content import StaticContent
+
 from contentstore.course_info_model import (
     get_course_updates, update_course_updates, delete_course_update)
 from contentstore.utils import (
@@ -29,6 +32,7 @@ from auth.authz import create_all_course_groups, is_user_in_creator_group
 from util.json_request import expect_json
 
 from .access import has_access, get_location_and_verify_access
+from .assets import assets_to_json_dict
 from .requests import get_request_method
 from .tabs import initialize_course_tabs
 from .component import (
@@ -424,13 +428,23 @@ def textbook_index(request, org, course, name):
     upload_asset_callback_url = reverse('upload_asset', kwargs={
         'org': org,
         'course': course,
-        'coursename': name
+        'coursename': name,
+    })
+    asset_index_url = reverse('asset_index', kwargs={
+        'org': org,
+        'course': course,
+        'name': name,
     })
 
+    course_reference = StaticContent.compute_location(org, course, name)
+    assets_db_objs = contentstore().get_all_content_for_course(course_reference)
+    assets_json_objs = assets_to_json_dict(assets_db_objs)
     location = get_location_and_verify_access(request, org, course, name)
-    course = modulestore().get_item(location, depth=3)
+    course_obj = modulestore().get_item(location, depth=3)
     return render_to_response('textbooks.html', {
-        'context_course': course,
-        'course': course,
+        'context_course': course_obj,
+        'course': course_obj,
+        'assets': assets_json_objs,
         'upload_asset_callback_url': upload_asset_callback_url,
+        'asset_index_url': asset_index_url,
     })
