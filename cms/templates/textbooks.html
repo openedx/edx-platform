@@ -120,6 +120,7 @@ CMS.Views.TextbookEdit = Backbone.View.extend({
         return this;
     },
     events: {
+        "change input[name=textbook-name]": "setName",
         "submit": "setAndClose",
         "click .action-cancel": "cancel",
         "click .action-add-chapter": "createChapter"
@@ -137,12 +138,15 @@ CMS.Views.TextbookEdit = Backbone.View.extend({
         this.setValues();
         this.model.get('chapters').add([{}]);
     },
+    setName: function(e) {
+        if(e && e.preventDefault) { e.preventDefault(); }
+        this.model.set("name", this.$("#textbook-name-input").val(), {silent: true});
+    },
     setValues: function() {
-        var name = this.$("#textbook-name-input").val();
-        var textbook = this.model;
-        textbook.set("name", name);
+        this.setName();
+        var that = this;
         _.each(this.$("li"), function(li, i) {
-            var chapter = textbook.get('chapters').at(i);
+            var chapter = that.model.get('chapters').at(i);
             chapter.set({
                 "name": $(".chapter-name", li).val(),
                 "asset_path": $(".chapter-asset-path", li).val()
