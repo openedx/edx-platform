@@ -10,13 +10,13 @@
   <script type="text/javascript" src="${static.url('js/vendor/jquery-jvectormap-1.1.1/jquery-jvectormap-world-mill-en.js')}"></script>
   <script type="text/javascript" src="${static.url('js/course_groups/cohorts.js')}"></script>
  
-%if course_tasks is not None:
+%if instructor_tasks is not None:
   <script type="text/javascript">
-// Define a CourseTaskProgress object for updating a table on the instructor
+// Define an InstructorTaskProgress object for updating a table on the instructor
 // dashboard that shows the current background tasks that are currently running
 // for the instructor's course.  Any tasks that were running when the page is 
-// first displayed are passed in as course_tasks, and populate the "Pending Course
-// Task" table. The CourseTaskProgress is bound to this table, and periodically
+// first displayed are passed in as instructor_tasks, and populate the "Pending Instructor
+// Task" table. The InstructorTaskProgress is bound to this table, and periodically
 // polls the LMS to see if any of the tasks has completed.  Once a task is complete,
 // it is not included in any further polling.
 
@@ -24,7 +24,7 @@
 
     var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
-    this.CourseTaskProgress = (function() {
+    this.InstructorTaskProgress = (function() {
 
         // Hardcode the refresh interval to be every five seconds.
         // TODO: allow the refresh interval to be set.  (And if it is disabled,
@@ -34,7 +34,7 @@
         // Hardcode the initial delay before the first refresh to two seconds:
         var initial_refresh_delay = 2000;
 
-        function CourseTaskProgress(element) {
+        function InstructorTaskProgress(element) {
             this.update_progress = __bind(this.update_progress, this);
             this.get_status = __bind(this.get_status, this);
             this.element = element;
@@ -42,14 +42,14 @@
             if (window.queuePollerID) {
                 window.clearTimeout(window.queuePollerID);
             }
-            return window.queuePollerID = window.setTimeout(this.get_status, this.initial_refresh_delay);
+            window.queuePollerID = window.setTimeout(this.get_status, this.initial_refresh_delay);
         }
 
-        CourseTaskProgress.prototype.$ = function(selector) {
+        InstructorTaskProgress.prototype.$ = function(selector) {
             return $(selector, this.element);
         };
 
-        CourseTaskProgress.prototype.update_progress = function(response) {
+        InstructorTaskProgress.prototype.update_progress = function(response) {
             var _this = this;
             // Response should be a dict with an entry for each requested task_id,
             // with a "task-state" and "in_progress" key and optionally a "message"
@@ -75,13 +75,13 @@
             
             // if some entries are still incomplete, then repoll:
             if (something_in_progress) {
-                return window.queuePollerID = window.setTimeout(_this.get_status, _this.refresh_interval);
+                window.queuePollerID = window.setTimeout(_this.get_status, _this.refresh_interval);
             } else {
                 delete window.queuePollerID;
             }
         }
 
-        CourseTaskProgress.prototype.get_status = function() {
+        InstructorTaskProgress.prototype.get_status = function() {
             var _this = this;
             var task_ids = [];
 
@@ -99,20 +99,20 @@
             // Note that the keyname here ends up with "[]" being appended
             // in the POST parameter that shows up on the Django server.
             // TODO: add error handler.
-            var ajax_url = '/course_task_log_status/';
+            var ajax_url = '/instructor_task_status/';
             var data = {'task_ids': task_ids };
             $.post(ajax_url, data).done(this.update_progress);
         };
 
-        return CourseTaskProgress;
+        return InstructorTaskProgress;
     })();
 
 }).call(this);
 
 // once the page is rendered, create the progress object
-var courseTaskProgress;
+var instructorTaskProgress;
 $(document).ready(function() {
-    courseTaskProgress = new CourseTaskProgress($('#task-progress-wrapper'));
+    instructorTaskProgress = new InstructorTaskProgress($('#task-progress-wrapper'));
 });
 
   </script>
@@ -302,7 +302,7 @@ function goto( mode)
     <hr width="40%" style="align:left">
 
   %endif
-  %if settings.MITX_FEATURES.get('ENABLE_COURSE_BACKGROUND_TASKS'):
+  %if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
     <H2>Course-specific grade adjustment</h2>
 
     <p>
@@ -713,13 +713,13 @@ function goto( mode)
       <table class="stat_table">
         <tr>
 	%for hname in datatable['header']:
-	  <th>${hname}</th>
+	  <th>${hname | h}</th>
 	%endfor
 	</tr>
         %for row in datatable['data']:
           <tr>
 	    %for value in row:
-	      <td>${value}</td>
+	      <td>${value | h}</td>
 	    %endfor
 	  </tr>
         %endfor
@@ -729,9 +729,9 @@ function goto( mode)
 
 ## Output tasks in progress
 
-%if course_tasks is not None and len(course_tasks) > 0:
+%if instructor_tasks is not None and len(instructor_tasks) > 0:
     <hr width="100%">
-    <h2>Pending Course Tasks</h2>
+    <h2>Pending Instructor Tasks</h2>
     <div id="task-progress-wrapper">
       <table class="stat_table">
         <tr>
@@ -744,16 +744,16 @@ function goto( mode)
           <th>Duration (ms)</th>
           <th>Task Progress</th>
         </tr>
-      %for tasknum, course_task in enumerate(course_tasks):
+      %for tasknum, instructor_task in enumerate(instructor_tasks):
         <tr id="task-progress-entry-${tasknum}" class="task-progress-entry"
-	    data-task-id="${course_task.task_id}"
+	    data-task-id="${instructor_task.task_id}"
 	    data-in-progress="true">
-          <td>${course_task.task_type}</td>
-          <td>${course_task.task_input}</td>
-          <td class="task-id">${course_task.task_id}</td>
-          <td>${course_task.requester}</td>
-          <td>${course_task.created}</td>
-          <td class="task-state">${course_task.task_state}</td>
+          <td>${instructor_task.task_type}</td>
+          <td>${instructor_task.task_input}</td>
+          <td class="task-id">${instructor_task.task_id}</td>
+          <td>${instructor_task.requester}</td>
+          <td>${instructor_task.created}</td>
+          <td class="task-state">${instructor_task.task_state}</td>
           <td class="task-duration">unknown</td>
           <td class="task-progress">unknown</td>
         </tr>
@@ -772,11 +772,11 @@ function goto( mode)
     <br/>
     <p>
       <hr width="100%">
-      <h2>${course_stats['title']}</h2>
+      <h2>${course_stats['title'] | h}</h2>
       <table class="stat_table">
         <tr>
 	%for hname in course_stats['header']:
-	  <th>${hname}</th>
+	  <th>${hname | h}</th>
 	%endfor
 	</tr>
         %for row in course_stats['data']:

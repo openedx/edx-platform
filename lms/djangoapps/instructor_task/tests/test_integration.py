@@ -1,5 +1,9 @@
 """
-Test for LMS courseware background tasks
+Integration Test for LMS instructor-initiated background tasks
+
+Runs tasks on answers to course problems to validate that code
+paths actually work. 
+
 """
 import logging
 import json
@@ -197,22 +201,8 @@ class TestRescoringBase(LoginEnrollmentTestCase, ModuleStoreTestCase):
                                                   TestRescoringBase.problem_location(problem_url_name),
                                                   student)
 
-    def _create_course_task(self, task_state="QUEUED", task_input=None, student=None):
-        """Creates a InstructorTask entry for testing."""
-        task_id = str(uuid4())
-        task_key = "dummy value"
-        course_task = InstructorTaskFactory.create(requester=self.instructor,
-                                                      task_input=json.dumps(task_input),
-                                                      task_key=task_key,
-                                                      task_id=task_id,
-                                                      task_state=task_state)
-        return course_task
-
     def rescore_all_student_answers(self, instructor, problem_url_name):
         """Runs the task to rescore the current problem"""
-#TODO: fix this...
-#        task_input = {'problem_url': TestRescoringBase.problem_location(problem_url_name)}
-#       rescore_problem(entry_id, self.course_id, task_input, xmodule_instance_args)
         return submit_rescore_problem_for_all_students(self.create_task_request(instructor), self.course.id,
                                                        TestRescoringBase.problem_location(problem_url_name))
 
@@ -243,6 +233,13 @@ class TestRescoringBase(LoginEnrollmentTestCase, ModuleStoreTestCase):
             self.assertTrue('student_answers' in state)
             self.assertGreater(len(state['correct_map']), 0)
             self.assertGreater(len(state['student_answers']), 0)
+
+    def get_task_status(self, task_id):
+        mock_request = Mock()
+        mock_request.REQUEST = {'task_id': task_id}
+        response = instructor_task_status(mock_request)
+        status = json.loads(response.content)
+        return status
 
 
 class TestRescoring(TestRescoringBase):
@@ -306,24 +303,21 @@ class TestRescoring(TestRescoringBase):
         expected_message = "bad things happened"
         with patch('capa.capa_problem.LoncapaProblem.rescore_existing_answers') as mock_rescore:
             mock_rescore.side_effect = ZeroDivisionError(expected_message)
-            course_task = self.submit_rescore_all_student_answers('instructor', problem_url_name)
+            instructor_task = self.submit_rescore_all_student_answers('instructor', problem_url_name)
 
-        # check task_log returned
-        self.assertEqual(course_task.task_state, 'FAILURE')
-        self.assertEqual(course_task.requester.username, 'instructor')
-        self.assertEqual(course_task.task_type, 'rescore_problem')
-        task_input = json.loads(course_task.task_input)
+        # check instructor_task returned
+        self.assertEqual(instructor_task.task_state, 'FAILURE')
+        self.assertEqual(instructor_task.requester.username, 'instructor')
+        self.assertEqual(instructor_task.task_type, 'rescore_problem')
+        task_input = json.loads(instructor_task.task_input)
         self.assertFalse('student' in task_input)
         self.assertEqual(task_input['problem_url'], TestRescoring.problem_location(problem_url_name))
-        status = json.loads(course_task.task_output)
+        status = json.loads(instructor_task.task_output)
         self.assertEqual(status['exception'], 'ZeroDivisionError')
         self.assertEqual(status['message'], expected_message)
 
         # check status returned:
-        mock_request = Mock()
-        mock_request.REQUEST = {'task_id': course_task.task_id}
-        response = instructor_task_status(mock_request)
-        status = json.loads(response.content)
+        status = self.get_task_status(instructor_task.task_id)
         self.assertEqual(status['message'], expected_message)
 
     def test_rescoring_non_problem(self):
@@ -364,16 +358,13 @@ class TestRescoring(TestRescoringBase):
             mock_send_to_queue.return_value = (0, "Successfully queued")
             self.submit_student_answer('u1', problem_url_name, ["answer1", "answer2"])
 
-        course_task = self.submit_rescore_all_student_answers('instructor', problem_url_name)
-        self.assertEqual(course_task.task_state, FAILURE)
-        status = json.loads(course_task.task_output)
+        instructor_task = self.submit_rescore_all_student_answers('instructor', problem_url_name)
+        self.assertEqual(instructor_task.task_state, FAILURE)
+        status = json.loads(instructor_task.task_output)
         self.assertEqual(status['exception'], 'NotImplementedError')
         self.assertEqual(status['message'], "Problem's definition does not support rescoring")
 
-        mock_request = Mock()
-        mock_request.REQUEST = {'task_id': course_task.task_id}
-        response = instructor_task_status(mock_request)
-        status = json.loads(response.content)
+        status = self.get_task_status(instructor_task.task_id)
         self.assertEqual(status['message'], "Problem's definition does not support rescoring")
 
     def define_randomized_custom_response_problem(self, problem_url_name, redefine=False):
@@ -517,31 +508,28 @@ class TestResetAttempts(TestRescoringBase):
         expected_message = "bad things happened"
         with patch('courseware.models.StudentModule.save') as mock_save:
             mock_save.side_effect = ZeroDivisionError(expected_message)
-            course_task = self.reset_problem_attempts('instructor', problem_url_name)
+            instructor_task = self.reset_problem_attempts('instructor', problem_url_name)
 
-        # check task_log returned
-        self.assertEqual(course_task.task_state, FAILURE)
-        self.assertEqual(course_task.requester.username, 'instructor')
-        self.assertEqual(course_task.task_type, 'reset_problem_attempts')
-        task_input = json.loads(course_task.task_input)
+        # check instructor_task returned
+        self.assertEqual(instructor_task.task_state, FAILURE)
+        self.assertEqual(instructor_task.requester.username, 'instructor')
+        self.assertEqual(instructor_task.task_type, 'reset_problem_attempts')
+        task_input = json.loads(instructor_task.task_input)
         self.assertFalse('student' in task_input)
         self.assertEqual(task_input['problem_url'], TestRescoring.problem_location(problem_url_name))
-        status = json.loads(course_task.task_output)
+        status = json.loads(instructor_task.task_output)
         self.assertEqual(status['exception'], 'ZeroDivisionError')
         self.assertEqual(status['message'], expected_message)
 
         # check status returned:
-        mock_request = Mock()
-        mock_request.REQUEST = {'task_id': course_task.task_id}
-        response = instructor_task_status(mock_request)
-        status = json.loads(response.content)
+        status = self.get_task_status(instructor_task.task_id)
         self.assertEqual(status['message'], expected_message)
 
     def test_reset_non_problem(self):
         """confirm that a non-problem can still be successfully reset"""
         problem_url_name = self.problem_section.location.url()
-        course_task = self.reset_problem_attempts('instructor', problem_url_name)
-        self.assertEqual(course_task.task_state, SUCCESS)
+        instructor_task = self.reset_problem_attempts('instructor', problem_url_name)
+        self.assertEqual(instructor_task.task_state, SUCCESS)
 
     def test_reset_nonexistent_problem(self):
         """confirm that a non-existent problem will not submit"""
@@ -595,31 +583,28 @@ class TestDeleteProblem(TestRescoringBase):
         expected_message = "bad things happened"
         with patch('courseware.models.StudentModule.delete') as mock_delete:
             mock_delete.side_effect = ZeroDivisionError(expected_message)
-            course_task = self.delete_problem_state('instructor', problem_url_name)
+            instructor_task = self.delete_problem_state('instructor', problem_url_name)
 
-        # check task_log returned
-        self.assertEqual(course_task.task_state, FAILURE)
-        self.assertEqual(course_task.requester.username, 'instructor')
-        self.assertEqual(course_task.task_type, 'delete_problem_state')
-        task_input = json.loads(course_task.task_input)
+        # check instructor_task returned
+        self.assertEqual(instructor_task.task_state, FAILURE)
+        self.assertEqual(instructor_task.requester.username, 'instructor')
+        self.assertEqual(instructor_task.task_type, 'delete_problem_state')
+        task_input = json.loads(instructor_task.task_input)
         self.assertFalse('student' in task_input)
         self.assertEqual(task_input['problem_url'], TestRescoring.problem_location(problem_url_name))
-        status = json.loads(course_task.task_output)
+        status = json.loads(instructor_task.task_output)
         self.assertEqual(status['exception'], 'ZeroDivisionError')
         self.assertEqual(status['message'], expected_message)
 
         # check status returned:
-        mock_request = Mock()
-        mock_request.REQUEST = {'task_id': course_task.task_id}
-        response = instructor_task_status(mock_request)
-        status = json.loads(response.content)
+        status = self.get_task_status(instructor_task.task_id)
         self.assertEqual(status['message'], expected_message)
 
     def test_delete_non_problem(self):
         """confirm that a non-problem can still be successfully deleted"""
         problem_url_name = self.problem_section.location.url()
-        course_task = self.delete_problem_state('instructor', problem_url_name)
-        self.assertEqual(course_task.task_state, SUCCESS)
+        instructor_task = self.delete_problem_state('instructor', problem_url_name)
+        self.assertEqual(instructor_task.task_state, SUCCESS)
 
     def test_delete_nonexistent_module(self):
         """confirm that a non-existent module will not submit"""

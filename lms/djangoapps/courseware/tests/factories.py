@@ -10,8 +10,6 @@ from student.tests.factories import CourseEnrollmentAllowedFactory as StudentCou
 from student.tests.factories import RegistrationFactory as StudentRegistrationFactory
 from courseware.models import StudentModule, XModuleContentField, XModuleSettingsField
 from courseware.models import XModuleStudentInfoField, XModuleStudentPrefsField
-from courseware.models import CourseTask
-from celery.states import PENDING
 
 from xmodule.modulestore import Location
 from pytz import UTC
@@ -86,16 +84,3 @@ class StudentInfoFactory(DjangoModelFactory):
     field_name = 'existing_field'
     value = json.dumps('old_value')
     student = SubFactory(UserFactory)
-
-
-class CourseTaskFactory(DjangoModelFactory):
-    FACTORY_FOR = CourseTask
-
-    task_type = 'rescore_problem'
-    course_id = "MITx/999/Robot_Super_Course"
-    task_input = json.dumps({})
-    task_key = None
-    task_id = None
-    task_state = PENDING
-    task_output = None
-    requester = SubFactory(UserFactory)

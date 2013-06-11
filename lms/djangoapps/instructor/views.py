@@ -25,7 +25,6 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from courseware import grades
-from instructor_task import api as task_api
 from courseware.access import (has_access, get_access_group_name,
                                course_beta_test_group_name)
 from courseware.courses import get_course_with_access
@@ -36,6 +35,13 @@ from django_comment_common.models import (Role,
                                           FORUM_ROLE_COMMUNITY_TA)
 from django_comment_client.utils import has_forum_access
 from instructor.offline_gradecalc import student_grades, offline_grades_available
+from instructor_task.api import (get_running_instructor_tasks,
+                                 get_instructor_task_history,
+                                 submit_rescore_problem_for_all_students,
+                                 submit_rescore_problem_for_student,
+                                 submit_reset_problem_attempts_for_all_students,
+                                 submit_delete_problem_state_for_all_students)
+from instructor_task.views import get_task_completion_info
 from mitxmako.shortcuts import render_to_response
 from psychometrics import psychoanalyze
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
@@ -69,7 +75,7 @@ def instructor_dashboard(request, course_id):
     msg = ''
     problems = []
     plots = []
-    datatable = None
+    datatable = {}
 
     # the instructor dashboard page is modal: grades, psychometrics, admin
     # keep that state in request.session (defaults to grades mode)
@@ -250,8 +256,8 @@ def instructor_dashboard(request, course_id):
         problem_urlname = request.POST.get('problem_for_all_students', '')
         problem_url = get_module_url(problem_urlname)
         try:
-            course_task = task_api.submit_rescore_problem_for_all_students(request, course_id, problem_url)
-            if course_task is None:
+            instructor_task = submit_rescore_problem_for_all_students(request, course_id, problem_url)
+            if instructor_task is None:
                 msg += '<font color="red">Failed to create a background task for rescoring "{0}".</font>'.format(problem_url)
             else:
                 track_msg = 'rescore problem {problem} for all students in {course}'.format(problem=problem_url, course=course_id)
@@ -266,8 +272,8 @@ def instructor_dashboard(request, course_id):
         problem_urlname = request.POST.get('problem_for_all_students', '')
         problem_url = get_module_url(problem_urlname)
         try:
-            course_task = task_api.submit_reset_problem_attempts_for_all_students(request, course_id, problem_url)
-            if course_task is None:
+            instructor_task = submit_reset_problem_attempts_for_all_students(request, course_id, problem_url)
+            if instructor_task is None:
                 msg += '<font color="red">Failed to create a background task for resetting "{0}".</font>'.format(problem_url)
             else:
                 track_msg = 'reset problem {problem} for all students in {course}'.format(problem=problem_url, course=course_id)
@@ -288,18 +294,14 @@ def instructor_dashboard(request, course_id):
         else:
             problem_urlname = request.POST.get('problem_for_student', '')
             problem_url = get_module_url(problem_urlname)
-            message, task_datatable = get_background_task_table(course_id, problem_url, student)
+            message, datatable = get_background_task_table(course_id, problem_url, student)
             msg += message
-            if task_datatable is not None:
-                datatable = task_datatable
 
     elif "Show Background Task History" in action:
         problem_urlname = request.POST.get('problem_for_all_students', '')
         problem_url = get_module_url(problem_urlname)
-        message, task_datatable = get_background_task_table(course_id, problem_url)
+        message, datatable = get_background_task_table(course_id, problem_url)
         msg += message
-        if task_datatable is not None:
-            datatable = task_datatable
 
     elif ("Reset student's attempts" in action or
           "Delete student state for module" in action or
@@ -357,8 +359,8 @@ def instructor_dashboard(request, course_id):
             else:
                 # "Rescore student's problem submission" case
                 try:
-                    course_task = task_api.submit_rescore_problem_for_student(request, course_id, module_state_key, student)
-                    if course_task is None:
+                    instructor_task = submit_rescore_problem_for_student(request, course_id, module_state_key, student)
+                    if instructor_task is None:
                         msg += '<font color="red">Failed to create a background task for rescoring "{0}" for student {1}.</font>'.format(module_state_key, unique_student_identifier)
                     else:
                         track_msg = 'rescore problem {problem} for student {student} in {course}'.format(problem=module_state_key, student=unique_student_identifier, course=course_id)
@@ -721,13 +723,14 @@ def instructor_dashboard(request, course_id):
         msg += "<br/><font color='orange'>Grades from %s</font>" % offline_grades_available(course_id)
 
     # generate list of pending background tasks
-    if settings.MITX_FEATURES.get('ENABLE_COURSE_BACKGROUND_TASKS'):
-        course_tasks = task_api.get_running_course_tasks(course_id)
+    if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
+        instructor_tasks = get_running_instructor_tasks(course_id)
     else:
-        course_tasks = None
+        instructor_tasks = None
 
+    # display course stats only if there is no other table to display:
     course_stats = None
-    if datatable is None:
+    if not datatable:
         course_stats = get_course_stats_table()
     #----------------------------------------
     # context for rendering
@@ -744,7 +747,7 @@ def instructor_dashboard(request, course_id):
                'problems': problems,		# psychometrics
                'plots': plots,			# psychometrics
                'course_errors': modulestore().get_item_errors(course.location),
-               'course_tasks': course_tasks,
+               'instructor_tasks': instructor_tasks,
                'djangopid': os.getpid(),
                'mitx_version': getattr(settings, 'MITX_VERSION_STRING', ''),
                'offline_grade_log': offline_grades_available(course_id),
@@ -1299,8 +1302,8 @@ def get_background_task_table(course_id, problem_url, student=None):
     Returns a tuple of (msg, datatable), where the msg is a possible error message,
     and the datatable is the datatable to be used for display.
     """
-    history_entries = task_api.get_instructor_task_history(course_id, problem_url, student)
-    datatable = None
+    history_entries = get_instructor_task_history(course_id, problem_url, student)
+    datatable = {}
     msg = ""
     # first check to see if there is any history at all
     # (note that we don't have to check that the arguments are valid; it
@@ -1312,7 +1315,6 @@ def get_background_task_table(course_id, problem_url, student=None):
         else:
             msg += '<font color="red">Failed to find any background tasks for course "{course}" and module "{problem}".</font>'.format(course=course_id, problem=problem_url)
     else:
-        datatable = {}
         datatable['header'] = ["Task Type",
                                "Task Id",
                                "Requester",
@@ -1323,23 +1325,23 @@ def get_background_task_table(course_id, problem_url, student=None):
                                "Task Output"]
 
         datatable['data'] = []
-        for course_task in history_entries:
+        for instructor_task in history_entries:
             # get duration info, if known:
             duration_ms = 'unknown'
-            if hasattr(course_task, 'task_output'):
-                task_output = json.loads(course_task.task_output)
+            if hasattr(instructor_task, 'task_output'):
+                task_output = json.loads(instructor_task.task_output)
                 if 'duration_ms' in task_output:
                     duration_ms = task_output['duration_ms']
             # get progress status message:
-            success, task_message = task_submit.get_task_completion_info(course_task)
+            success, task_message = get_task_completion_info(instructor_task)
             status = "Complete" if success else "Incomplete"
             # generate row for this task:
-            row = [str(course_task.task_type),
-                   str(course_task.task_id),
-                   str(course_task.requester),
-                   course_task.created.isoformat(' '),
+            row = [str(instructor_task.task_type),
+                   str(instructor_task.task_id),
+                   str(instructor_task.requester),
+                   instructor_task.created.isoformat(' '),
                    duration_ms,
-                   str(course_task.task_state),
+                   str(instructor_task.task_state),
                    status,
                    task_message]
             datatable['data'].append(row)
