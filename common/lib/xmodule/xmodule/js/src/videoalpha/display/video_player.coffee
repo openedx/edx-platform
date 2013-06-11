@@ -135,8 +135,6 @@ class @VideoPlayerAlpha extends SubviewAlpha
           # NOTE: It is my strong belief that in the future YouTube Flash player will
           # not get speed changes. This is a dying technology. So we can safely use
           # this indirect method to determine player mode.
-
-
           availableSpeeds = @player.getAvailablePlaybackRates()
           prev_player_type = $.cookie('prev_player_type')
           if availableSpeeds.length > 1

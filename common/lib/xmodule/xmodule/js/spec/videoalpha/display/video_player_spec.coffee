@@ -432,8 +432,13 @@ describe 'VideoPlayerAlpha', ->
 
     describe 'when the video player is not full screen', ->
       beforeEach ->
+        spyOn @video, 'log'
         @player.el.removeClass 'fullscreen'
         @player.toggleFullScreen(jQuery.Event("click"))
+
+      it 'log the fullscreen event', ->
+        expect(@video.log).toHaveBeenCalledWith 'fullscreen',
+        currentTime: @player.currentTime
 
       it 'replace the full screen button tooltip', ->
         expect($('.add-fullscreen')).toHaveAttr 'title', 'Exit fill browser'
@@ -446,8 +451,13 @@ describe 'VideoPlayerAlpha', ->
 
     describe 'when the video player already full screen', ->
       beforeEach ->
+        spyOn @video, 'log'
         @player.el.addClass 'fullscreen'
         @player.toggleFullScreen(jQuery.Event("click"))
+
+      it 'log the not_fullscreen event', ->
+        expect(@video.log).toHaveBeenCalledWith 'not_fullscreen',
+        currentTime: @player.currentTime
 
       it 'replace the full screen button tooltip', ->
         expect($('.add-fullscreen')).toHaveAttr 'title', 'Fill browser'

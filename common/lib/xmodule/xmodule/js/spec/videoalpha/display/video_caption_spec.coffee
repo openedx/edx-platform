@@ -337,6 +337,7 @@ describe 'VideoCaptionAlpha', ->
   describe 'toggle', ->
     beforeEach ->
       @player = jasmine.stubVideoPlayerAlpha @
+      spyOn @video, 'log'
       @caption = @player.caption
       $('.subtitles li[data-index=1]').addClass 'current'
 
@@ -345,6 +346,10 @@ describe 'VideoCaptionAlpha', ->
         @caption.el.removeClass 'closed'
         @caption.toggle jQuery.Event('click')
 
+      it 'log the hide_transcript event', ->
+        expect(@video.log).toHaveBeenCalledWith 'hide_transcript',
+        currentTime: @player.currentTime
+
       it 'hide the caption', ->
         expect(@caption.el).toHaveClass 'closed'
 
@@ -352,6 +357,10 @@ describe 'VideoCaptionAlpha', ->
       beforeEach ->
         @caption.el.addClass 'closed'
         @caption.toggle jQuery.Event('click')
+
+      it 'log the show_transcript event', ->
+        expect(@video.log).toHaveBeenCalledWith 'show_transcript',
+        currentTime: @player.currentTime
 
       it 'show the caption', ->
         expect(@caption.el).not.toHaveClass 'closed'
