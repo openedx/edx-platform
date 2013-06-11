@@ -24,21 +24,27 @@
 </%block>
 
 <%block name="jsextra">
+<script type="text/javascript" src="${static.url('js/vendor/backbone-associations-min.js')}"></script>
 <script type="text/javascript">
 window.UPLOAD_ASSET_CALLBACK_URL = "${upload_asset_callback_url}"
 window.ASSET_INDEX_URL = "${asset_index_url}"
 
-CMS.Models.Textbook = Backbone.Model.extend({
-    defaults: {
-        name: "",
-        showChapters: false
+CMS.Models.Textbook = Backbone.AssociatedModel.extend({
+    defaults: function() {
+        return {
+            name: "",
+            chapters: new CMS.Collections.ChapterSet([{}]),
+            showChapters: false
+        };
     },
-    initialize: function() {
-        this.chapters = new CMS.Collections.ChapterSet;
-        this.chapters.add([{}]);
-    },
+    relations: [{
+        type: Backbone.Many,
+        key: "chapters",
+        relatedModel: "CMS.Models.Chapter",
+        collectionType: "CMS.Collections.ChapterSet"
+    }],
     isEmpty: function() {
-        return !this.get('name');
+        return !this.get('name') && this.get('chapters').isEmpty();
     }
 })
 CMS.Views.TextbookShow = Backbone.View.extend({
@@ -138,8 +144,7 @@ CMS.Views.TextbookEdit = Backbone.View.extend({
         delete textbooks.editing;
         this.remove();
         // if the textbook has no content, remove it from the collection
-        var chapterIsEmpty = function(chapter) { return chapter.isEmpty(); }
-        if(this.model.isEmpty() && this.model.chapters.every(chapterIsEmpty)) {
+        if(this.model.isEmpty()) {
             textbooks.remove(this.model);
         }
         textbooks.trigger('render');
@@ -192,7 +197,7 @@ CMS.Views.ListTextbooks = Backbone.View.extend({
         this.collection.trigger("editOne", m);
     }
 })
-CMS.Models.Chapter = Backbone.Model.extend({
+CMS.Models.Chapter = Backbone.AssociatedModel.extend({
     defaults: function() {
         return {
             name: "",
@@ -210,6 +215,9 @@ CMS.Collections.ChapterSet = Backbone.Collection.extend({
     nextOrder: function() {
         if(!this.length) return 1;
         return this.last().get('order') + 1;
+    },
+    isEmpty: function() {
+        return this.length === 0 || this.every(function(m) { return m.isEmpty(); });
     }
 })
 CMS.Views.ChapterEdit = Backbone.View.extend({
