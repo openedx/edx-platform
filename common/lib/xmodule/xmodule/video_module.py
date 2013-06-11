@@ -97,6 +97,13 @@ class VideoDescriptor(VideoFields,
     stores_state = True
     template_dir_name = "video"
 
+    metadata_attributes = RawDescriptor.metadata_attributes + ('youtube_id_1_0',
+                                                               'youtube_id_0_75',
+                                                               'youtube_id_1_25',
+                                                               'youtube_id_1_5')
+
+    metadata_to_strip = RawDescriptor.metadata_to_strip + ('show_captions',)
+
     @property
     def non_editable_metadata_fields(self):
         non_editable_fields = super(MetadataOnlyEditingDescriptor, self).non_editable_metadata_fields
@@ -116,9 +123,11 @@ class VideoDescriptor(VideoFields,
         org and course are optional strings that will be used in the generated modules
             url identifiers
         """
-        video = super(RawDescriptor, cls).from_xml(xml_data, system, org, course)
+        video = super(VideoDescriptor, cls).from_xml(xml_data, system, org, course)
         xml = etree.fromstring(xml_data)
-        video.display_name = xml.get('display_name')
+        display_name = xml.get('display_name')
+        if display_name:
+            video.display_name = display_name
         youtube = xml.get('youtube')
         if youtube:
             speeds = _parse_youtube(youtube)
@@ -160,9 +169,11 @@ def _get_first_external(xmltree, tag):
 
 def _parse_youtube(data):
     '''
-    Parses a string of Youtube IDs into a dictionary.
+    Parses a string of Youtube IDs such as "1.0:AXdE34_U,1.5:VO3SxfeD"
+    into a dictionary. Necessary for backwards compatibility with
+    XML-based courses.
     '''
-    ret = {'0.75': None, '1.00': None, '1.25': None, '1.50': None}
+    ret = {'0.75': '', '1.00': '', '1.25': '', '1.50': ''}
     videos = data.split(',')
     for video in videos:
         pieces = video.split(':')
