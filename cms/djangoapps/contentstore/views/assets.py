@@ -103,6 +103,9 @@ def upload_asset(request, org, course, coursename):
         logging.error('Could not find course' + location)
         return HttpResponseBadRequest()
 
+    if 'file' not in request.FILES:
+        return HttpResponseBadRequest()
+
     # compute a 'filename' which is similar to the location formatting, we're using the 'filename'
     # nomenclature since we're using a FileSystem paradigm here. We're just imposing
     # the Location string formatting expectations to keep things a bit more consistent
