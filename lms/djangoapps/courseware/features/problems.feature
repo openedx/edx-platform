@@ -113,9 +113,9 @@ Feature: Answer problems
     Scenario: I can view and hide the answer if the problem has it:
         Given I am viewing a "numerical" that shows the answer "always"
         When I press the button with the label "Show Answer(s)"
-        Then The "Hide Answer(s)" button does appear
-        And The "Show Answer(s)" button does not appear
+        Then the button with the label "Hide Answer(s)" does appear
+        And the button with the label "Show Answer(s)" does not appear
         And I should see "4.14159" somewhere in the page
         When I press the button with the label "Hide Answer(s)"
-        Then The "Show Answer(s)" button does appear
+        Then the button with the label "Show Answer(s)" does appear
         And I should not see "4.14159" anywhere on the page
