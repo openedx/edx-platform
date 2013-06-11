@@ -19,10 +19,17 @@ def video_takes_a_single_click(step):
 
 
 @step('I have hidden captions')
-def set_show_captions_false(step):
+def hide_captions(step):
     world.css_click('a.hide-subtitles')
 
 
 @step('when I view the video it does not show the captions')
 def does_not_show_captions(step):
     assert world.css_find('.video')[0].has_class('closed')
+
+
+@step('I have set "show captions" to false')
+def set_show_captions_false(step):
+    world.css_click('a.edit-button')
+    world.browser.select('Show Captions', 'False')
+    world.css_click('a.save-button')

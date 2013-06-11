@@ -13,3 +13,8 @@ Feature: Video Component
     Given I have created a Video component
     And I have hidden captions
     Then when I view the video it does not show the captions
+
+  Scenario: something
+    Given I have created a Video component
+    And I have set "show captions" to false
+    Then when I view the video it does not show the captions
