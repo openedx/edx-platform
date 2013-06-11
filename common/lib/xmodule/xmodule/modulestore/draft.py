@@ -5,8 +5,9 @@ from .exceptions import ItemNotFoundError
 from .inheritance import own_metadata
 from xmodule.modulestore.mongo import location_to_query, get_course_id_no_run, MongoModuleStore
 import pymongo
-from xmodule.modulestore.exceptions import DuplicateItemError, InvalidVersionError
+from xmodule.modulestore.exceptions import DuplicateItemError
 from pytz import UTC
+from xmodule.exceptions import InvalidVersionError
 
 DRAFT = 'draft'
 # Things w/ these categories should never be marked as version='draft'
@@ -94,7 +95,10 @@ class DraftModuleStore(MongoModuleStore):
         :param metadata: can be empty, the initial metadata for the kvs
         :param system: if you already have an xmodule from the course, the xmodule.system value
         """
-        return super(DraftModuleStore, self).create_xmodule(as_draft(location), definition_data, metadata, system)
+        draft_loc = as_draft(location)
+        if draft_loc.category in DIRECT_ONLY_CATEGORIES:
+            raise InvalidVersionError(location)
+        return super(DraftModuleStore, self).create_xmodule(draft_loc, definition_data, metadata, system)
 
 
     def get_items(self, location, course_id=None, depth=0):
@@ -131,9 +135,9 @@ class DraftModuleStore(MongoModuleStore):
         :param source: the location of the source (its revision must be None)
         """
         original = self.collection.find_one(location_to_query(source_location))
-        if original.location.category in DIRECT_ONLY_CATEGORIES:
-            raise InvalidVersionError(source_location)
         draft_location = as_draft(source_location)
+        if draft_location.category in DIRECT_ONLY_CATEGORIES:
+            raise InvalidVersionError(source_location)
         original['_id'] = draft_location.dict()
         try:
             self.collection.insert(original)
@@ -235,7 +239,7 @@ class DraftModuleStore(MongoModuleStore):
         """
         Turn the published version into a draft, removing the published version
         """
-        super(DraftModuleStore, self).convert_to_draft(location)
+        self.convert_to_draft(location)
         super(DraftModuleStore, self).delete_item(location)
 
     def _query_children_for_cache_children(self, items):

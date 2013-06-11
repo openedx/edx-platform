@@ -58,7 +58,7 @@
                   % if type == 'advanced' or len(templates) > 1:
                     <a href="#" class="multiple-templates" data-type="${type}">
                   % else:
-                    % for _, category, _ in templates:
+                    % for _, category, _, _, _ in templates:
                     <a href="#" class="single-template" data-type="${type}" data-category="${category}">
                     % endfor
                   % endif
