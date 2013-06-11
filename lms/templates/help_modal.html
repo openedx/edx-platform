@@ -64,7 +64,10 @@ discussion_link = get_discussion_link(course) if course else None
       <label data-field="details">Tell us the details*
 <span class="tip">Include error messages, steps which lead to the issue, etc</span></label>
       <textarea name="details"></textarea>
-      <input name="tag" type="hidden">
+      <input name="issue_type" type="hidden">
+% if course:
+      <input name="course_id" type="hidden" value="${course.id | h}">
+% endif
       <div class="submit">
         <input name="submit" type="submit" value="Submit">
       </div>
@@ -114,21 +117,41 @@ discussion_link = get_discussion_link(course) if course else None
         $("#feedback_success_wrapper").css("display", "none");
         $("#help_wrapper").css("display", "block");
     });
-    showFeedback = function(e, tag, title) {
+    showFeedback = function(event, issue_type, title, subject_label, details_label) {
         $("#help_wrapper").css("display", "none");
-        $("#feedback_form input[name='tag']").val(tag);
+        $("#feedback_form input[name='issue_type']").val(issue_type);
         $("#feedback_form_wrapper").css("display", "block");
         $("#feedback_form_wrapper header").html("<h2>" + title + "</h2><hr>");
-        e.preventDefault();
+        $("#feedback_form_wrapper label[data-field='subject']").html(subject_label);
+        $("#feedback_form_wrapper label[data-field='details']").html(details_label);
+        event.preventDefault();
     };
-    $("#feedback_link_problem").click(function(e) {
-        showFeedback(e, "problem", "Report a Problem");
+    $("#feedback_link_problem").click(function(event) {
+        showFeedback(
+            event,
+            "problem",
+            "Report a Problem",
+            "Brief description of the problem*",
+            "Details of the problem you are encountering* <span class='tip'>Include error messages, steps which lead to the issue, etc.</span>"
+        );
     });
-    $("#feedback_link_suggestion").click(function(e) {
-        showFeedback(e, "suggestion", "Make a Suggestion");
+    $("#feedback_link_suggestion").click(function(event) {
+        showFeedback(
+            event,
+            "suggestion",
+            "Make a Suggestion",
+            "Brief description of your suggestion*",
+            "Details*"
+        );
     });
-    $("#feedback_link_question").click(function(e) {
-        showFeedback(e, "question", "Ask a Question");
+    $("#feedback_link_question").click(function(event) {
+        showFeedback(
+            event,
+            "question",
+            "Ask a Question",
+            "Brief summary of your question*",
+            "Details*"
+        );
     });
     $("#feedback_form").submit(function() {
         $("input[type='submit']", this).attr("disabled", "disabled");
