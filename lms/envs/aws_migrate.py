@@ -1,3 +1,10 @@
+"""
+A Django settings file for use on AWS while running 
+database migrations, since we don't want to normally run the 
+LMS with enough privileges to modify the database schema.
+"""
+
+# Import everything from .aws so that our settings are based on those.
 from .aws import *
 import os
 
