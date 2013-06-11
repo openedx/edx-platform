@@ -34,6 +34,8 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError, NoPathToItem
 from xmodule.modulestore.search import path_to_location
 
+from jabber.models import JabberUser
+
 import comment_client
 
 log = logging.getLogger("mitx.courseware")
@@ -242,6 +244,13 @@ def chat_settings(course, user):
     if domain is None:
         raise ImproperlyConfigured("Missing JABBER_DOMAIN in the settings")
 
+    # username/password from somewhere
+    jabber_user, created = JabberUser.objects.get_or_create(username=user.username,
+                                                            defaults={'password' : 'bobobo'})
+
+    if created:
+        log.info("CREATED PASSWORD FOR USER %s\n" % user.username)
+
     return {
         'domain': domain,
 
@@ -249,15 +258,10 @@ def chat_settings(course, user):
         'room': "{ID}_class".format(ID=course.id.replace('/', '-')),
 
         'username': "{USER}@{DOMAIN}".format(
-            USER=user.username, DOMAIN=domain
+            USER=jabber_user.username, DOMAIN=domain
         ),
 
-        # TODO: clearly this needs to be something other than the username
-        #       should also be something that's not necessarily tied to a
-        #       particular course
-        'password': "{USER}@{DOMAIN}".format(
-            USER=user.username, DOMAIN=domain
-        ),
+        'password': jabber_user.password
     }
 
 
