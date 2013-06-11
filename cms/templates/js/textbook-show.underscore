@@ -3,7 +3,7 @@
     <% if(chapters.length > 1) {%>
         <%= chapters.length %> PDF Chapters
     <% } else if(chapters.length === 1) { %>
-        <%= chapters.at(0).asset_path %>
+        <%= chapters.at(0).get("asset_path") %>
     <% } %>
     <a href="#" class="view"><%= gettext("view in course") %></a>
     <button class="edit"><%= gettext("Edit") %></button>
