@@ -5,10 +5,12 @@ from .exceptions import ItemNotFoundError
 from .inheritance import own_metadata
 from xmodule.modulestore.mongo import location_to_query, get_course_id_no_run, MongoModuleStore
 import pymongo
-from xmodule.modulestore.exceptions import DuplicateItemError
+from xmodule.modulestore.exceptions import DuplicateItemError, InvalidVersionError
 from pytz import UTC
 
 DRAFT = 'draft'
+# Things w/ these categories should never be marked as version='draft'
+DIRECT_ONLY_CATEGORIES = ['course', 'chapter', 'sequential', 'about', 'static_tab', 'course_info']
 
 
 def as_draft(location):
@@ -129,6 +131,8 @@ class DraftModuleStore(MongoModuleStore):
         :param source: the location of the source (its revision must be None)
         """
         original = self.collection.find_one(location_to_query(source_location))
+        if original.location.category in DIRECT_ONLY_CATEGORIES:
+            raise InvalidVersionError(source_location)
         draft_location = as_draft(source_location)
         original['_id'] = draft_location.dict()
         try:

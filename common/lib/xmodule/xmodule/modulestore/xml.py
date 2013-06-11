@@ -108,7 +108,8 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                         orig_name = orig_name[len(tag) + 1:-12]
                     # append the hash of the content--the first 12 bytes should be plenty.
                     orig_name = "_" + orig_name if orig_name not in (None, "") else ""
-                    return tag + orig_name + "_" + hashlib.sha1(xml).hexdigest()[:12]
+                    xml_bytes = xml.encode('utf8')
+                    return tag + orig_name + "_" + hashlib.sha1(xml_bytes).hexdigest()[:12]
 
                 # Fallback if there was nothing we could use:
                 if url_name is None or url_name == "":
@@ -322,7 +323,7 @@ class XMLModuleStore(ModuleStoreBase):
         '''
         String representation - for debugging
         '''
-        return '<XMLModuleStore>data_dir=%s, %d courses, %d modules' % (
+        return '<XMLModuleStore data_dir=%r, %d courses, %d modules>' % (
             self.data_dir, len(self.courses), len(self.modules))
 
     def load_policy(self, policy_path, tracker):

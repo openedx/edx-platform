@@ -70,7 +70,7 @@ class CapaFields(object):
     max_attempts = StringyInteger(
         display_name="Maximum Attempts",
         help="Defines the number of times a student can try to answer this problem. If the value is not set, infinite attempts are allowed.",
-        values={"min": 1}, scope=Scope.settings
+        values={"min": 0}, scope=Scope.settings
     )
     due = Date(help="Date that this problem is due by", scope=Scope.settings)
     graceperiod = Timedelta(help="Amount of time after the due date that submissions will be accepted",
@@ -752,7 +752,7 @@ class CapaModule(CapaFields, XModule):
 
         # Problem queued. Students must wait a specified waittime before they are allowed to submit
         if self.lcp.is_queued():
-            current_time = datetime.datetime.now()
+            current_time = datetime.datetime.now(UTC())
             prev_submit_time = self.lcp.get_recentmost_queuetime()
             waittime_between_requests = self.system.xqueue['waittime']
             if (current_time - prev_submit_time).total_seconds() < waittime_between_requests:

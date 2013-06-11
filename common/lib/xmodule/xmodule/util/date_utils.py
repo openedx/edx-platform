@@ -9,13 +9,15 @@ def get_default_time_display(dt, show_timezone=True):
     If None is passed in for dt, an empty string will be returned.
     The default value of show_timezone is True.
     """
+    if dt is None:
+        return ""
     timezone = ""
-    if dt is not None and show_timezone:
+    if show_timezone:
         if dt.tzinfo is not None:
             try:
                 timezone = " " + dt.tzinfo.tzname(dt)
             except NotImplementedError:
-                timezone = " UTC"
+                timezone = dt.strftime('%z')
         else:
             timezone = " UTC"
     return dt.strftime("%b %d, %Y at %H:%M") + timezone

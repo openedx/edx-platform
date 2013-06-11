@@ -1,3 +1,4 @@
+import logging
 from cStringIO import StringIO
 from math import exp
 from lxml import etree
@@ -16,7 +17,6 @@ import json
 
 from xblock.core import Scope, List, String, Object, Boolean
 from .fields import Date
-import logging
 from xmodule.modulestore.locator import CourseLocator
 from django.utils.timezone import UTC
 from xmodule.util import date_utils
@@ -94,7 +94,7 @@ class Textbook(object):
             # see if we already fetched this
             if toc_url in _cached_toc:
                 (table_of_contents, timestamp) = _cached_toc[toc_url]
-                age = datetime.now() - timestamp
+                age = datetime.now(UTC) - timestamp
                 # expire every 10 minutes
                 if age.seconds < 600:
                     return table_of_contents
@@ -518,7 +518,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
     def definition_from_xml(cls, xml_object, system):
         textbooks = []
         for textbook in xml_object.findall("textbook"):
-            textbooks.append([textbook.get('title'), textbook.get('book_url')])
+            textbooks.append((textbook.get('title'), textbook.get('book_url')))
             xml_object.remove(textbook)
 
         # Load the wiki tag if it exists

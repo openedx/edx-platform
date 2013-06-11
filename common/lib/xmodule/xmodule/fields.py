@@ -37,8 +37,6 @@ class Date(ModelType):
             return datetime.datetime.fromtimestamp(time.mktime(field), UTC())
         elif isinstance(field, datetime.datetime):
             return field
-        elif isinstance(field, datetime.datetime):
-            return field.utctimetuple()
         else:
             msg = "Field {0} has bad value '{1}'".format(
                 self._name, field)
@@ -75,7 +73,7 @@ class Timedelta(ModelType):
         Returns a datetime.timedelta parsed from the string
         """
         if time_str is None:
-            return time_str
+            return None
         parts = TIMEDELTA_REGEX.match(time_str)
         if not parts:
             return

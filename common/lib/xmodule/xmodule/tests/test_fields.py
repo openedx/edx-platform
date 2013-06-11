@@ -1,8 +1,8 @@
 """Tests for classes defined in fields.py."""
 import datetime
 import unittest
-from django.utils.timezone import UTC
 from xmodule.fields import Date, StringyFloat, StringyInteger, StringyBoolean
+from django.utils.timezone import UTC
 
 class DateTest(unittest.TestCase):
     date = Date()
