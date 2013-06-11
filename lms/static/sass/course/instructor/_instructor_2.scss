@@ -103,6 +103,13 @@
   .distribution-display {
     margin-top: 1.2em;
 
+    .distribution-display-graph {
+      .year-of-birth {
+        width: 500px;
+        height: 200px;
+      }
+    }
+
     .distribution-display-table {
       .slickgrid {
         height: 400px;

@@ -116,6 +116,7 @@ setup_section_analytics = (section) ->
 
   reset_display = ->
     display_text.empty()
+    display_graph.empty()
     display_table.empty()
 
   distribution_select = section.find('select#distributions')
@@ -175,8 +176,16 @@ setup_section_analytics = (section) ->
               display_table.append table_placeholder
               grid = new Slick.Grid(table_placeholder, grid_data, columns, options)
               grid.autosizeColumns()
+            else if feature is 'year_of_birth'
+              graph_placeholder = $ '<div/>', class: 'year-of-birth'
+              display_graph.append graph_placeholder
+
+              graph_data = _.map feature_res.data, (value, key) -> [parseInt(key), value]
+              log graph_data
+
+              $.plot graph_placeholder, [
+                data: graph_data
+              ]
             else
               console.warn("don't know how to show #{feature_res.type}")
-              # display_text.text 'Unavailable Metric\n' + JSON.stringify(feature_res)
-
-              $.plot display_graph
+              display_text.text 'Unavailable Metric\n' + JSON.stringify(feature_res)
