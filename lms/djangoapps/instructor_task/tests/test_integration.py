@@ -9,7 +9,6 @@ import logging
 import json
 from mock import Mock, patch
 import textwrap
-from uuid import uuid4
 
 from celery.states import SUCCESS, FAILURE
 from django.contrib.auth.models import User
@@ -23,17 +22,18 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from student.tests.factories import CourseEnrollmentFactory, UserFactory, AdminFactory
 
+from student.tests.factories import CourseEnrollmentFactory, UserFactory, AdminFactory
 from courseware.model_data import StudentModule
+from courseware.tests.tests import LoginEnrollmentTestCase, TEST_DATA_MONGO_MODULESTORE
+
 from instructor_task.api import (submit_rescore_problem_for_all_students,
                                  submit_rescore_problem_for_student,
                                  submit_reset_problem_attempts_for_all_students,
                                  submit_delete_problem_state_for_all_students)
-from instructor_task.views import instructor_task_status
-
-from courseware.tests.tests import LoginEnrollmentTestCase, TEST_DATA_MONGO_MODULESTORE
+from instructor_task.models import InstructorTask
 from instructor_task.tests.factories import InstructorTaskFactory
+from instructor_task.views import instructor_task_status
 
 
 log = logging.getLogger(__name__)
@@ -306,6 +306,7 @@ class TestRescoring(TestRescoringBase):
             instructor_task = self.submit_rescore_all_student_answers('instructor', problem_url_name)
 
         # check instructor_task returned
+        instructor_task = InstructorTask.objects.get(id=instructor_task.id)
         self.assertEqual(instructor_task.task_state, 'FAILURE')
         self.assertEqual(instructor_task.requester.username, 'instructor')
         self.assertEqual(instructor_task.task_type, 'rescore_problem')
@@ -359,6 +360,8 @@ class TestRescoring(TestRescoringBase):
             self.submit_student_answer('u1', problem_url_name, ["answer1", "answer2"])
 
         instructor_task = self.submit_rescore_all_student_answers('instructor', problem_url_name)
+
+        instructor_task = InstructorTask.objects.get(id=instructor_task.id)
         self.assertEqual(instructor_task.task_state, FAILURE)
         status = json.loads(instructor_task.task_output)
         self.assertEqual(status['exception'], 'NotImplementedError')
@@ -510,7 +513,8 @@ class TestResetAttempts(TestRescoringBase):
             mock_save.side_effect = ZeroDivisionError(expected_message)
             instructor_task = self.reset_problem_attempts('instructor', problem_url_name)
 
-        # check instructor_task returned
+        # check instructor_task
+        instructor_task = InstructorTask.objects.get(id=instructor_task.id)
         self.assertEqual(instructor_task.task_state, FAILURE)
         self.assertEqual(instructor_task.requester.username, 'instructor')
         self.assertEqual(instructor_task.task_type, 'reset_problem_attempts')
@@ -529,6 +533,7 @@ class TestResetAttempts(TestRescoringBase):
         """confirm that a non-problem can still be successfully reset"""
         problem_url_name = self.problem_section.location.url()
         instructor_task = self.reset_problem_attempts('instructor', problem_url_name)
+        instructor_task = InstructorTask.objects.get(id=instructor_task.id)
         self.assertEqual(instructor_task.task_state, SUCCESS)
 
     def test_reset_nonexistent_problem(self):
@@ -586,6 +591,7 @@ class TestDeleteProblem(TestRescoringBase):
             instructor_task = self.delete_problem_state('instructor', problem_url_name)
 
         # check instructor_task returned
+        instructor_task = InstructorTask.objects.get(id=instructor_task.id)
         self.assertEqual(instructor_task.task_state, FAILURE)
         self.assertEqual(instructor_task.requester.username, 'instructor')
         self.assertEqual(instructor_task.task_type, 'delete_problem_state')
@@ -604,6 +610,7 @@ class TestDeleteProblem(TestRescoringBase):
         """confirm that a non-problem can still be successfully deleted"""
         problem_url_name = self.problem_section.location.url()
         instructor_task = self.delete_problem_state('instructor', problem_url_name)
+        instructor_task = InstructorTask.objects.get(id=instructor_task.id)
         self.assertEqual(instructor_task.task_state, SUCCESS)
 
     def test_delete_nonexistent_module(self):

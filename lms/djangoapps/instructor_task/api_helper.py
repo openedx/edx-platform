@@ -1,7 +1,8 @@
 import hashlib
 import json
 import logging
-# from django.http import HttpResponse
+from uuid import uuid4
+
 from django.db import transaction
 
 from celery.result import AsyncResult
@@ -11,7 +12,6 @@ from courseware.module_render import get_xqueue_callback_url_prefix
 
 from xmodule.modulestore.django import modulestore
 from instructor_task.models import InstructorTask
-# from instructor_task.views import get_task_completion_info
 from instructor_task.tasks_helper import PROGRESS
 
 
@@ -40,16 +40,27 @@ def _reserve_task(course_id, task_type, task_key, task_input, requester):
     Creates a database entry to indicate that a task is in progress.
 
     Throws AlreadyRunningError if the task is already in progress.
+    Includes the creation of an arbitrary value for task_id, to be
+    submitted with the task call to celery.
 
     Autocommit annotation makes sure the database entry is committed.
+    When called from any view that is wrapped by TransactionMiddleware,
+    and thus in a "commit-on-success" transaction, this autocommit here
+    will cause any pending transaction to be committed by a successful
+    save here.  Any future database operations will take place in a
+    separate transaction.
     """
 
     if _task_is_running(course_id, task_type, task_key):
         raise AlreadyRunningError("requested task is already running")
 
-    # Create log entry now, so that future requests won't:  no task_id yet....
+    # create the task_id here, and pass it into celery:
+    task_id = str(uuid4())
+
+    # Create log entry now, so that future requests won't
     tasklog_args = {'course_id': course_id,
                     'task_type': task_type,
+                    'task_id': task_id,
                     'task_key': task_key,
                     'task_input': json.dumps(task_input),
                     'task_state': 'QUEUING',
@@ -57,21 +68,6 @@ def _reserve_task(course_id, task_type, task_key, task_input, requester):
 
     instructor_task = InstructorTask.objects.create(**tasklog_args)
     return instructor_task
-
-
-@transaction.autocommit
-def _update_task(instructor_task, task_result):
-    """
-    Updates a database entry with information about the submitted task.
-
-    Autocommit annotation makes sure the database entry is committed.
-    """
-    # we at least update the entry with the task_id, and for ALWAYS_EAGER mode,
-    # we update other status as well.  (For non-ALWAYS_EAGER modes, the entry
-    # should not have changed except for setting PENDING state and the
-    # addition of the task_id.)
-    _update_instructor_task(instructor_task, task_result)
-    instructor_task.save()
 
 
 def _get_xmodule_instance_args(request):
@@ -98,8 +94,7 @@ def _update_instructor_task(instructor_task, task_result):
     """
     Updates and possibly saves a InstructorTask entry based on a task Result.
 
-    Used when a task initially returns, as well as when updated status is
-    requested.
+    Used when updated status is requested.
 
     The `instructor_task` that is passed in is updated in-place, but
     is usually not saved.  In general, tasks that have finished (either with
@@ -110,25 +105,11 @@ def _update_instructor_task(instructor_task, task_result):
     opportunity to update the InstructorTask entry.
 
     Calculates json to store in "task_output" field of the `instructor_task`,
-    as well as updating the task_state and task_id (which may not yet be set
-    if this is the first call after the task is submitted).
+    as well as updating the task_state.
 
-TODO: Update -- no longer return anything, or maybe the resulting instructor_task.
-
-    Returns a dict, with the following keys:
-      'message': status message reporting on progress, or providing exception message if failed.
-      'task_progress': dict containing progress information.  This includes:
-          'attempted': number of attempts made
-          'updated': number of attempts that "succeeded"
-          'total': number of possible subtasks to attempt
-          'action_name': user-visible verb to use in status messages.  Should be past-tense.
-          'duration_ms': how long the task has (or had) been running.
-      'task_traceback': optional, returned if task failed and produced a traceback.
-      'succeeded': on complete tasks, indicates if the task outcome was successful:
-          did it achieve what it set out to do.
-          This is in contrast with a successful task_state, which indicates that the
-          task merely completed.
-
+    For a successful task, the json contains the output of the task result.
+    For a failed task, the json contains "exception", "message", and "traceback"
+    keys.   A revoked task just has a "message" stating it was revoked.
     """
     # Pull values out of the result object as close to each other as possible.
     # If we wait and check the values later, the values for the state and result
@@ -141,59 +122,49 @@ TODO: Update -- no longer return anything, or maybe the resulting instructor_tas
 
     # Assume we don't always update the InstructorTask entry if we don't have to:
     entry_needs_saving = False
-    output = {}
+    task_progress = None
 
     if result_state in [PROGRESS, SUCCESS]:
         # construct a status message directly from the task result's result:
         # it needs to go back with the entry passed in.
-        instructor_task.task_output = json.dumps(returned_result)
-#        output['task_progress'] = returned_result
-        log.info("background task (%s), succeeded: %s", task_id, returned_result)
-
+        log.info("background task (%s), state %s:  result: %s", task_id, result_state, returned_result)
+        task_progress = returned_result
     elif result_state == FAILURE:
         # on failure, the result's result contains the exception that caused the failure
         exception = returned_result
         traceback = result_traceback if result_traceback is not None else ''
         task_progress = {'exception': type(exception).__name__, 'message': str(exception.message)}
-#        output['message'] = exception.message
         log.warning("background task (%s) failed: %s %s", task_id, returned_result, traceback)
         if result_traceback is not None:
-#            output['task_traceback'] = result_traceback
             # truncate any traceback that goes into the InstructorTask model:
             task_progress['traceback'] = result_traceback[:700]
-        # save progress into the entry, even if it's not being saved:
-        # when celery is run in "ALWAYS_EAGER" mode, progress needs to go back
-        # with the entry passed in.
-        instructor_task.task_output = json.dumps(task_progress)
-#        output['task_progress'] = task_progress
 
     elif result_state == REVOKED:
         # on revocation, the result's result doesn't contain anything
         # but we cannot rely on the worker thread to set this status,
         # so we set it here.
         entry_needs_saving = True
-        message = 'Task revoked before running'
-#        output['message'] = message
         log.warning("background task (%s) revoked.", task_id)
-        task_progress = {'message': message}
-        instructor_task.task_output = json.dumps(task_progress)
-#        output['task_progress'] = task_progress
+        task_progress = {'message': 'Task revoked before running'}
 
-    # Always update the local version of the entry if the state has changed.
-    # This is important for getting the task_id into the initial version
-    # of the instructor_task, and also for development environments
-    # when this code is executed when celery is run in "ALWAYS_EAGER" mode.
-    if result_state != instructor_task.task_state:
-        instructor_task.task_state = result_state
-        instructor_task.task_id = task_id
+    # save progress and state into the entry, even if it's not being saved:
+    # when celery is run in "ALWAYS_EAGER" mode, progress needs to go back
+    # with the entry passed in.
+    instructor_task.task_state = result_state
+    if task_progress is not None:
+        instructor_task.task_output = json.dumps(task_progress)
 
     if entry_needs_saving:
         instructor_task.save()
 
-    return output
 
+def get_updated_instructor_task(task_id):
+    """
+    Returns InstructorTask object corresponding to a given `task_id`.
 
-def _get_updated_instructor_task(task_id):
+    If the InstructorTask thinks the task is still running, then
+    the task's result is checked to return an updated state and output.
+    """
     # First check if the task_id is known
     try:
         instructor_task = InstructorTask.objects.get(task_id=task_id)
@@ -210,49 +181,31 @@ def _get_updated_instructor_task(task_id):
     return instructor_task
 
 
-# def _get_instructor_task_status(task_id):
-def _get_instructor_task_status(instructor_task):
+def get_status_from_instructor_task(instructor_task):
     """
-    Get the status for a given task_id.
+    Get the status for a given InstructorTask entry.
 
     Returns a dict, with the following keys:
-      'task_id'
-      'task_state'
-      'in_progress': boolean indicating if the task is still running.
-      'message': status message reporting on progress, or providing exception message if failed.
+      'task_id': id assigned by LMS and used by celery.
+      'task_state': state of task as stored in celery's result store.
+      'in_progress': boolean indicating if task is still running.
       'task_progress': dict containing progress information.  This includes:
           'attempted': number of attempts made
           'updated': number of attempts that "succeeded"
           'total': number of possible subtasks to attempt
           'action_name': user-visible verb to use in status messages.  Should be past-tense.
           'duration_ms': how long the task has (or had) been running.
-      'task_traceback': optional, returned if task failed and produced a traceback.
-      'succeeded': on complete tasks, indicates if the task outcome was successful:
-          did it achieve what it set out to do.
-          This is in contrast with a successful task_state, which indicates that the
-          task merely completed.
+          'exception': name of exception class raised in failed tasks.
+          'message': returned for failed and revoked tasks.
+          'traceback': optional, returned if task failed and produced a traceback.
 
       If task doesn't exist, returns None.
 
-      If task has been REVOKED, the InstructorTask entry will be updated.
+      If task has been REVOKED, the InstructorTask entry will be updated in
+      persistent storage as a side effect.
     """
-#     # First check if the task_id is known
-#     try:
-#         instructor_task = InstructorTask.objects.get(task_id=task_id)
-#     except InstructorTask.DoesNotExist:
-#         log.warning("query for InstructorTask status failed: task_id=(%s) not found", task_id)
-#         return None
-
     status = {}
 
-    # if the task is not already known to be done, then we need to query
-    # the underlying task's result object:
-#     if instructor_task.task_state not in READY_STATES:
-#         result = AsyncResult(task_id)
-#         status.update(_update_instructor_task(instructor_task, result))
-
-#    elif instructor_task.task_output is not None:
-        # task is already known to have finished, but report on its status:
     if instructor_task.task_output is not None:
         status['task_progress'] = json.loads(instructor_task.task_output)
 
@@ -260,11 +213,6 @@ def _get_instructor_task_status(instructor_task):
     status['task_id'] = instructor_task.task_id
     status['task_state'] = instructor_task.task_state
     status['in_progress'] = instructor_task.task_state not in READY_STATES
-
-#     if instructor_task.task_state in READY_STATES:
-#         succeeded, message = get_task_completion_info(instructor_task)
-#         status['message'] = message
-#         status['succeeded'] = succeeded
 
     return status
 
@@ -312,19 +260,24 @@ def submit_task(request, task_type, task_class, course_id, task_input, task_key)
     checking to see if the task is already running.  The `task_input` is also passed so that
     it can be stored in the resulting InstructorTask entry.  Arguments are extracted from
     the `request` provided by the originating server request.  Then the task is submitted to run
-    asynchronously, using the specified `task_class`. Finally the InstructorTask entry is
-    updated in order to store the task_id.
+    asynchronously, using the specified `task_class` and using the task_id constructed for it.
 
     `AlreadyRunningError` is raised if the task is already running.
+
+    The _reserve_task method makes sure the InstructorTask entry is committed.
+    When called from any view that is wrapped by TransactionMiddleware,
+    and thus in a "commit-on-success" transaction, an autocommit buried within here
+    will cause any pending transaction to be committed by a successful
+    save here.  Any future database operations will take place in a
+    separate transaction.
+
     """
     # check to see if task is already running, and reserve it otherwise:
     instructor_task = _reserve_task(course_id, task_type, task_key, task_input, request.user)
 
     # submit task:
+    task_id = instructor_task.task_id
     task_args = [instructor_task.id, course_id, task_input, _get_xmodule_instance_args(request)]
-    task_result = task_class.apply_async(task_args)
-
-    # Update info in table with the resulting task_id (and state).
-    _update_task(instructor_task, task_result)
+    task_class.apply_async(task_args, task_id=task_id)
 
     return instructor_task

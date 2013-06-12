@@ -60,14 +60,14 @@ class TaskSubmitTestCase(TestCase):
         progress_json = json.dumps(task_output)
         task_input, task_key = encode_problem_and_student_input(self.problem_url, student)
 
-        course_task = InstructorTaskFactory.create(course_id=TEST_COURSE_ID,
+        instructor_task = InstructorTaskFactory.create(course_id=TEST_COURSE_ID,
                                                requester=self.instructor,
                                                task_input=json.dumps(task_input),
                                                task_key=task_key,
                                                task_id=task_id,
                                                task_state=task_state,
                                                task_output=progress_json)
-        return course_task
+        return instructor_task
 
     def _create_failure_entry(self):
         """Creates a InstructorTask entry representing a failed task."""
@@ -97,24 +97,24 @@ class TaskSubmitTestCase(TestCase):
             self._create_failure_entry()
             self._create_success_entry()
         progress_task_ids = [self._create_progress_entry().task_id for _ in range(1, 5)]
-        task_ids = [course_task.task_id for course_task in get_running_instructor_tasks(TEST_COURSE_ID)]
+        task_ids = [instructor_task.task_id for instructor_task in get_running_instructor_tasks(TEST_COURSE_ID)]
         self.assertEquals(set(task_ids), set(progress_task_ids))
 
-    def _get_course_task_status(self, task_id):
+    def _get_instructor_task_status(self, task_id):
         request = Mock()
         request.REQUEST = {'task_id': task_id}
         return instructor_task_status(request)
 
-    def test_course_task_status(self):
-        course_task = self._create_failure_entry()
-        task_id = course_task.task_id
+    def test_instructor_task_status(self):
+        instructor_task = self._create_failure_entry()
+        task_id = instructor_task.task_id
         request = Mock()
         request.REQUEST = {'task_id': task_id}
         response = instructor_task_status(request)
         output = json.loads(response.content)
         self.assertEquals(output['task_id'], task_id)
 
-    def test_course_task_status_list(self):
+    def test_instructor_task_status_list(self):
         # Fetch status for existing tasks by arg list, as if called from ajax.
         # Note that ajax does something funny with the marshalling of
         # list data, so the key value has "[]" appended to it.
@@ -128,9 +128,9 @@ class TaskSubmitTestCase(TestCase):
             self.assertEquals(output[task_id]['task_id'], task_id)
 
     def test_get_status_from_failure(self):
-        course_task = self._create_failure_entry()
-        task_id = course_task.task_id
-        response = self._get_course_task_status(task_id)
+        instructor_task = self._create_failure_entry()
+        task_id = instructor_task.task_id
+        response = self._get_instructor_task_status(task_id)
         output = json.loads(response.content)
         self.assertEquals(output['task_id'], task_id)
         self.assertEquals(output['task_state'], FAILURE)
@@ -138,9 +138,9 @@ class TaskSubmitTestCase(TestCase):
         self.assertEquals(output['message'], TEST_FAILURE_MESSAGE)
 
     def test_get_status_from_success(self):
-        course_task = self._create_success_entry()
-        task_id = course_task.task_id
-        response = self._get_course_task_status(task_id)
+        instructor_task = self._create_success_entry()
+        task_id = instructor_task.task_id
+        response = self._get_instructor_task_status(task_id)
         output = json.loads(response.content)
         self.assertEquals(output['task_id'], task_id)
         self.assertEquals(output['task_state'], SUCCESS)
@@ -148,8 +148,8 @@ class TaskSubmitTestCase(TestCase):
 
     def test_update_progress_to_progress(self):
         # view task entry for task in progress
-        course_task = self._create_progress_entry()
-        task_id = course_task.task_id
+        instructor_task = self._create_progress_entry()
+        task_id = instructor_task.task_id
         mock_result = Mock()
         mock_result.task_id = task_id
         mock_result.state = PROGRESS
@@ -159,7 +159,7 @@ class TaskSubmitTestCase(TestCase):
                               'action_name': 'rescored'}
         with patch('celery.result.AsyncResult.__new__') as mock_result_ctor:
             mock_result_ctor.return_value = mock_result
-            response = self._get_course_task_status(task_id)
+            response = self._get_instructor_task_status(task_id)
         output = json.loads(response.content)
         self.assertEquals(output['task_id'], task_id)
         self.assertEquals(output['task_state'], PROGRESS)
@@ -168,8 +168,8 @@ class TaskSubmitTestCase(TestCase):
 
     def test_update_progress_to_failure(self):
         # view task entry for task in progress that later fails
-        course_task = self._create_progress_entry()
-        task_id = course_task.task_id
+        instructor_task = self._create_progress_entry()
+        task_id = instructor_task.task_id
         mock_result = Mock()
         mock_result.task_id = task_id
         mock_result.state = FAILURE
@@ -177,7 +177,7 @@ class TaskSubmitTestCase(TestCase):
         mock_result.traceback = "random traceback"
         with patch('celery.result.AsyncResult.__new__') as mock_result_ctor:
             mock_result_ctor.return_value = mock_result
-            response = self._get_course_task_status(task_id)
+            response = self._get_instructor_task_status(task_id)
         output = json.loads(response.content)
         self.assertEquals(output['task_id'], task_id)
         self.assertEquals(output['task_state'], FAILURE)
@@ -186,14 +186,14 @@ class TaskSubmitTestCase(TestCase):
 
     def test_update_progress_to_revoked(self):
         # view task entry for task in progress that later fails
-        course_task = self._create_progress_entry()
-        task_id = course_task.task_id
+        instructor_task = self._create_progress_entry()
+        task_id = instructor_task.task_id
         mock_result = Mock()
         mock_result.task_id = task_id
         mock_result.state = REVOKED
         with patch('celery.result.AsyncResult.__new__') as mock_result_ctor:
             mock_result_ctor.return_value = mock_result
-            response = self._get_course_task_status(task_id)
+            response = self._get_instructor_task_status(task_id)
         output = json.loads(response.content)
         self.assertEquals(output['task_id'], task_id)
         self.assertEquals(output['task_state'], REVOKED)
@@ -201,10 +201,10 @@ class TaskSubmitTestCase(TestCase):
         self.assertEquals(output['message'], "Task revoked before running")
 
     def _get_output_for_task_success(self, attempted, updated, total, student=None):
-        """returns the task_id and the result returned by course_task_status()."""
+        """returns the task_id and the result returned by instructor_task_status()."""
         # view task entry for task in progress
-        course_task = self._create_progress_entry(student)
-        task_id = course_task.task_id
+        instructor_task = self._create_progress_entry(student)
+        task_id = instructor_task.task_id
         mock_result = Mock()
         mock_result.task_id = task_id
         mock_result.state = SUCCESS
@@ -214,7 +214,7 @@ class TaskSubmitTestCase(TestCase):
                               'action_name': 'rescored'}
         with patch('celery.result.AsyncResult.__new__') as mock_result_ctor:
             mock_result_ctor.return_value = mock_result
-            response = self._get_course_task_status(task_id)
+            response = self._get_instructor_task_status(task_id)
         output = json.loads(response.content)
         return task_id, output
 
@@ -271,9 +271,9 @@ class TaskSubmitTestCase(TestCase):
 
 #    def test_submit_when_running(self):
 #        # get exception when trying to submit a task that is already running
-#        course_task = self._create_progress_entry()
-#        problem_url = json.loads(course_task.task_input).get('problem_url')
-#        course_id = course_task.course_id
+#        instructor_task = self._create_progress_entry()
+#        problem_url = json.loads(instructor_task.task_input).get('problem_url')
+#        course_id = instructor_task.course_id
 #        # requester doesn't have to be the same when determining if a task is already running
 #        request = Mock()
 #        request.user = self.instructor

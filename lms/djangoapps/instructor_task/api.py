@@ -54,6 +54,14 @@ def submit_rescore_problem_for_student(request, course_id, problem_url, student)
     ItemNotFoundException is raised if the problem doesn't exist, or AlreadyRunningError
     if the problem is already being rescored for this student, or NotImplementedError if
     the problem doesn't support rescoring.
+
+    This method makes sure the InstructorTask entry is committed.
+    When called from any view that is wrapped by TransactionMiddleware,
+    and thus in a "commit-on-success" transaction, an autocommit buried within here
+    will cause any pending transaction to be committed by a successful
+    save here.  Any future database operations will take place in a
+    separate transaction.
+
     """
     # check arguments:  let exceptions return up to the caller.
     check_arguments_for_rescoring(course_id, problem_url)
@@ -76,6 +84,13 @@ def submit_rescore_problem_for_all_students(request, course_id, problem_url):
     ItemNotFoundException is raised if the problem doesn't exist, or AlreadyRunningError
     if the problem is already being rescored, or NotImplementedError if the problem doesn't
     support rescoring.
+
+    This method makes sure the InstructorTask entry is committed.
+    When called from any view that is wrapped by TransactionMiddleware,
+    and thus in a "commit-on-success" transaction, an autocommit buried within here
+    will cause any pending transaction to be committed by a successful
+    save here.  Any future database operations will take place in a
+    separate transaction.
     """
     # check arguments:  let exceptions return up to the caller.
     check_arguments_for_rescoring(course_id, problem_url)
@@ -98,6 +113,13 @@ def submit_reset_problem_attempts_for_all_students(request, course_id, problem_u
 
     ItemNotFoundException is raised if the problem doesn't exist, or AlreadyRunningError
     if the problem is already being reset.
+
+    This method makes sure the InstructorTask entry is committed.
+    When called from any view that is wrapped by TransactionMiddleware,
+    and thus in a "commit-on-success" transaction, an autocommit buried within here
+    will cause any pending transaction to be committed by a successful
+    save here.  Any future database operations will take place in a
+    separate transaction.
     """
     # check arguments:  make sure that the problem_url is defined
     # (since that's currently typed in).  If the corresponding module descriptor doesn't exist,
@@ -121,6 +143,13 @@ def submit_delete_problem_state_for_all_students(request, course_id, problem_url
 
     ItemNotFoundException is raised if the problem doesn't exist, or AlreadyRunningError
     if the particular problem is already being deleted.
+
+    This method makes sure the InstructorTask entry is committed.
+    When called from any view that is wrapped by TransactionMiddleware,
+    and thus in a "commit-on-success" transaction, an autocommit buried within here
+    will cause any pending transaction to be committed by a successful
+    save here.  Any future database operations will take place in a
+    separate transaction.
     """
     # check arguments:  make sure that the problem_url is defined
     # (since that's currently typed in).  If the corresponding module descriptor doesn't exist,

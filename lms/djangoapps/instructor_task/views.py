@@ -6,8 +6,8 @@ from django.http import HttpResponse
 
 from celery.states import FAILURE, REVOKED, READY_STATES
 
-from instructor_task.api_helper import (_get_instructor_task_status,
-                                        _get_updated_instructor_task)
+from instructor_task.api_helper import (get_status_from_instructor_task,
+                                        get_updated_instructor_task)
 
 
 log = logging.getLogger(__name__)
@@ -31,10 +31,36 @@ def instructor_task_status(request):
 
       Task_id values that are unrecognized are skipped.
 
+    The dict with status information for a task contains the following keys:
+      'message': status message reporting on progress, or providing exception message if failed.
+      'succeeded': on complete tasks, indicates if the task outcome was successful:
+          did it achieve what it set out to do.
+          This is in contrast with a successful task_state, which indicates that the
+          task merely completed.
+      'task_id': id assigned by LMS and used by celery.
+      'task_state': state of task as stored in celery's result store.
+      'in_progress': boolean indicating if task is still running.
+      'task_progress': dict containing progress information.  This includes:
+          'attempted': number of attempts made
+          'updated': number of attempts that "succeeded"
+          'total': number of possible subtasks to attempt
+          'action_name': user-visible verb to use in status messages.  Should be past-tense.
+          'duration_ms': how long the task has (or had) been running.
+          'exception': name of exception class raised in failed tasks.
+          'message': returned for failed and revoked tasks.
+          'traceback': optional, returned if task failed and produced a traceback.
+
     """
     def get_instructor_task_status(task_id):
-        instructor_task = _get_updated_instructor_task(task_id)
-        status = _get_instructor_task_status(instructor_task)
+        """
+        Returns status for a specific task.
+
+        Written as an internal method here (rather than as a helper)
+        so that get_task_completion_info() can be called without
+        causing a circular dependency (since it's also called directly).
+        """
+        instructor_task = get_updated_instructor_task(task_id)
+        status = get_status_from_instructor_task(instructor_task)
         if instructor_task.task_state in READY_STATES:
             succeeded, message = get_task_completion_info(instructor_task)
             status['message'] = message
