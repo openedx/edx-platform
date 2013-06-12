@@ -551,14 +551,19 @@ section.problem {
   section.action {
     margin-top: 20px;
 
-    input.save {
+    .save, .check, .show {
+      height: ($baseline*2);
+      font-weight: 600;
+      vertical-align: middle;
+    }
+
+    .save {
       @extend .blue-button;
     }
 
-    button.show {
-      height: ($baseline*2);
+    .show {
 
-      span {
+      .show-label {
         font-size: 1.0em;
         font-weight: 600;
       }
