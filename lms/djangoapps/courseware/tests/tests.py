@@ -31,6 +31,10 @@ from xmodule.modulestore import Location
 from xmodule.modulestore.xml_importer import import_from_xml
 from xmodule.modulestore.xml import XMLModuleStore
 
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+
+
 log = logging.getLogger("mitx." + __name__)
 
 
@@ -117,8 +121,121 @@ TEST_DATA_XML_MODULESTORE = xml_store_config(TEST_DATA_DIR)
 TEST_DATA_MONGO_MODULESTORE = mongo_store_config(TEST_DATA_DIR)
 TEST_DATA_DRAFT_MONGO_MODULESTORE = draft_mongo_store_config(TEST_DATA_DIR)
 
+class MongoLoginHelpers(ModuleStoreTestCase):
+
+    def assertRedirectsNoFollow(self, response, expected_url):
+        """
+        http://devblog.point2.com/2010/04/23/djangos-assertredirects-little-gotcha/
+
+        Don't check that the redirected-to page loads--there should be other tests for that.
+
+        Some of the code taken from django.test.testcases.py
+        """
+        self.assertEqual(response.status_code, 302,
+                         'Response status code was %d instead of 302'
+                         % (response.status_code))
+        url = response['Location']
+
+        e_scheme, e_netloc, e_path, e_query, e_fragment = urlsplit(expected_url)
+        if not (e_scheme or e_netloc):
+            expected_url = urlunsplit(('http', 'testserver',
+                                       e_path, e_query, e_fragment))
+
+        self.assertEqual(url, expected_url,
+                         "Response redirected to '%s', expected '%s'" %
+                         (url, expected_url))
+
+    def _login(self, email, password):
+        '''Login.  View should always return 200.  The success/fail is in the
+        returned json'''
+        resp = self.client.post(reverse('login'),
+                                {'email': email, 'password': password})
+        self.assertEqual(resp.status_code, 200)
+        return resp
+
+    def login(self, email, password):
+        '''Login, check that it worked.'''
+        resp = self._login(email, password)
+        data = parse_json(resp)
+        self.assertTrue(data['success'])
+        return resp
+
+    def logout(self):
+        '''Logout, check that it worked.'''
+        resp = self.client.get(reverse('logout'), {})
+        # should redirect
+        self.assertEqual(resp.status_code, 302)
+        return resp
+
+    def _create_account(self, username, email, password):
+        '''Try to create an account.  No error checking'''
+        resp = self.client.post('/create_account', {
+            'username': username,
+            'email': email,
+            'password': password,
+            'name': 'Fred Weasley',
+            'terms_of_service': 'true',
+            'honor_code': 'true',
+        })
+        return resp
+
+    def create_account(self, username, email, password):
+        '''Create the account and check that it worked'''
+        resp = self._create_account(username, email, password)
+        self.assertEqual(resp.status_code, 200)
+        data = parse_json(resp)
+        self.assertEqual(data['success'], True)
+
+        # Check both that the user is created, and inactive
+        self.assertFalse(get_user(email).is_active)
+
+        return resp
+
+    def _activate_user(self, email):
+        '''Look up the activation key for the user, then hit the activate view.
+        No error checking'''
+        activation_key = get_registration(email).activation_key
+
+        # and now we try to activate
+        url = reverse('activate', kwargs={'key': activation_key})
+        resp = self.client.get(url)
+        return resp
+
+    def activate_user(self, email):
+        resp = self._activate_user(email)
+        self.assertEqual(resp.status_code, 200)
+        # Now make sure that the user is now actually activated
+        self.assertTrue(get_user(email).is_active)
+
+    def enroll(self, course):
+        """Enroll the currently logged-in user, and check that it worked."""
+        result = self.try_enroll(course)
+        self.assertTrue(result)
+
+    def try_enroll(self, course):
+        """Try to enroll.  Return bool success instead of asserting it."""
+        resp = self.client.post('/change_enrollment', {
+            'enrollment_action': 'enroll',
+            'course_id': course.id,
+        })
+        print ('Enrollment in %s result status code: %s'
+               % (course.location.url(), str(resp.status_code)))
+        return resp.status_code == 200
+
+    def check_for_get_code(self, code, url):
+        """
+        Check that we got the expected code when accessing url via GET.
+        Returns the response.
+        """
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, code,
+                         "got code %d for url '%s'. Expected code %d"
+                         % (resp.status_code, url, code))
+        return resp
+
 
 class LoginEnrollmentTestCase(TestCase):
+
     '''
     Base TestCase providing support for user creation,
     activation, login, and course enrollment
@@ -403,19 +520,35 @@ class TestCoursesLoadTestCase_MongoModulestore(PageLoaderTestCase):
 
         self.assertGreater(len(course.textbooks), 0)
 
-
-@override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
-class TestNavigation(LoginEnrollmentTestCase):
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+#@override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
+class TestNavigation(MongoLoginHelpers):
+#class TestNavigation(LoginEnrollmentTestCase):
     """Check that navigation state is saved properly"""
 
     def setUp(self):
         xmodule.modulestore.django._MODULESTORES = {}
 
         # Assume courses are there
-        self.full = modulestore().get_course("edX/full/6.002_Spring_2012")
-        self.toy = modulestore().get_course("edX/toy/2012_Fall")
+        #self.full = modulestore().get_course("edX/full/6.002_Spring_2012")
+        #self.toy = modulestore().get_course("edX/toy/2012_Fall")
+        self.course = CourseFactory.create()
+        self.full = CourseFactory.create(display_name = 'RoboboboboBOT')
 
-        # Create two accounts
+        self.chapter0 = ItemFactory.create(parent_location=self.course.location,
+                                          display_name='Overview')
+
+        self.chapter9 = ItemFactory.create(parent_location=self.course.location,
+                                          display_name='factory_chapter')
+
+        self.section0 = ItemFactory.create(parent_location=self.chapter0.location,
+                                          display_name='Welcome')
+
+        self.section9 = ItemFactory.create(parent_location=self.chapter9.location,
+                                          display_name='factory_section')
+
+
+        #Create two accounts
         self.student = 'view@test.com'
         self.student2 = 'view2@test.com'
         self.password = 'foo'
@@ -427,42 +560,43 @@ class TestNavigation(LoginEnrollmentTestCase):
     def test_accordion_state(self):
         """Make sure that the accordion remembers where you were properly"""
         self.login(self.student, self.password)
-        self.enroll(self.toy)
+        self.enroll(self.course)
         self.enroll(self.full)
 
         # First request should redirect to ToyVideos
+
         resp = self.client.get(reverse('courseware',
-                               kwargs={'course_id': self.toy.id}))
+                               kwargs={'course_id': self.course.id}))
 
         # Don't use no-follow, because state should
         # only be saved once we actually hit the section
         self.assertRedirects(resp, reverse(
-            'courseware_section', kwargs={'course_id': self.toy.id,
+            'courseware_section', kwargs={'course_id': self.course.id,
                                           'chapter': 'Overview',
-                                          'section': 'Toy_Videos'}))
+                                          'section': 'Welcome'}))
 
         # Hitting the couseware tab again should
         # redirect to the first chapter: 'Overview'
         resp = self.client.get(reverse('courseware',
-                               kwargs={'course_id': self.toy.id}))
+                               kwargs={'course_id': self.course.id}))
 
         self.assertRedirectsNoFollow(resp, reverse('courseware_chapter',
-                                     kwargs={'course_id': self.toy.id,
+                                     kwargs={'course_id': self.course.id,
                                              'chapter': 'Overview'}))
 
         # Now we directly navigate to a section in a different chapter
         self.check_for_get_code(200, reverse('courseware_section',
-                                             kwargs={'course_id': self.toy.id,
-                                                     'chapter': 'secret:magic',
-                                                     'section': 'toyvideo'}))
+                                             kwargs={'course_id': self.course.id,
+                                                     'chapter': 'factory_chapter',
+                                                     'section': 'factory_section'}))
 
         # And now hitting the courseware tab should redirect to 'secret:magic'
         resp = self.client.get(reverse('courseware',
-                               kwargs={'course_id': self.toy.id}))
+                               kwargs={'course_id': self.course.id}))
 
         self.assertRedirectsNoFollow(resp, reverse('courseware_chapter',
-                                     kwargs={'course_id': self.toy.id,
-                                             'chapter': 'secret:magic'}))
+                                     kwargs={'course_id': self.course.id,
+                                             'chapter': 'factory_chapter'}))
 
 
 @override_settings(MODULESTORE=TEST_DATA_DRAFT_MONGO_MODULESTORE)
@@ -478,17 +612,31 @@ class TestDraftModuleStore(TestCase):
         # The bug was that 'course_id' argument was
         # not allowed to be passed in (i.e. was throwing exception)
 
-
-@override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
-class TestViewAuth(LoginEnrollmentTestCase):
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+class TestViewAuth(MongoLoginHelpers):
     """Check that view authentication works properly"""
 
     def setUp(self):
         xmodule.modulestore.django._MODULESTORES = {}
 
-        self.full = modulestore().get_course("edX/full/6.002_Spring_2012")
-        self.toy = modulestore().get_course("edX/toy/2012_Fall")
+        self.full = CourseFactory.create(display_name='Robot_Sub_Course')
+        
+        self.course = CourseFactory.create()
 
+        self.overview_chapter = ItemFactory.create(display_name='Overview')
+
+        self.progress_chapter = ItemFactory.create(parent_location=self.course.location,
+                                            display_name='progress')
+
+        self.info_chapter = ItemFactory.create(parent_location=self.course.location,
+                                           display_name='info')
+
+        self.welcome_section = ItemFactory.create(parent_location=self.overview_chapter.location,
+                                          display_name='Welcome')
+
+        self.somewhere_in_progress = ItemFactory.create(parent_location=self.progress_chapter.location,
+                                           display_name='1')
+   
         # Create two accounts
         self.student = 'view@test.com'
         self.instructor = 'view2@test.com'
@@ -507,21 +655,22 @@ class TestViewAuth(LoginEnrollmentTestCase):
         self.login(self.student, self.password)
         # shouldn't work before enroll
         response = self.client.get(reverse('courseware',
-                                   kwargs={'course_id': self.toy.id}))
+                                    kwargs={'course_id': self.course.id}))
 
         self.assertRedirectsNoFollow(response,
-                                     reverse('about_course',
-                                             args=[self.toy.id]))
-        self.enroll(self.toy)
+                                      reverse('about_course',
+                                              args=[self.course.id]))
+        self.enroll(self.course)
         self.enroll(self.full)
         # should work now -- redirect to first page
         response = self.client.get(reverse('courseware',
-                                   kwargs={'course_id': self.toy.id}))
+                                   kwargs={'course_id': self.course.id}))
         self.assertRedirectsNoFollow(response,
                                      reverse('courseware_section',
-                                             kwargs={'course_id': self.toy.id,
+                                             kwargs={'course_id': self.course.id,
                                                      'chapter': 'Overview',
-                                                     'section': 'Toy_Videos'}))
+                                                     'section': 'Welcome'}))
+
 
         def instructor_urls(course):
             "list of urls that only instructors/staff should be able to see"
@@ -536,15 +685,15 @@ class TestViewAuth(LoginEnrollmentTestCase):
             return urls
 
         # Randomly sample an instructor page
-        url = random.choice(instructor_urls(self.toy) +
-                            instructor_urls(self.full))
+        url = random.choice(instructor_urls(self.course) +
+                             instructor_urls(self.full))
 
         # Shouldn't be able to get to the instructor pages
         print 'checking for 404 on {0}'.format(url)
         self.check_for_get_code(404, url)
 
         # Make the instructor staff in the toy course
-        group_name = _course_staff_group_name(self.toy.location)
+        group_name = _course_staff_group_name(self.course.location)
         group = Group.objects.create(name=group_name)
         group.user_set.add(get_user(self.instructor))
 
@@ -552,7 +701,7 @@ class TestViewAuth(LoginEnrollmentTestCase):
         self.login(self.instructor, self.password)
 
         # Now should be able to get to the toy course, but not the full course
-        url = random.choice(instructor_urls(self.toy))
+        url = random.choice(instructor_urls(self.course))
         print 'checking for 200 on {0}'.format(url)
         self.check_for_get_code(200, url)
 
@@ -566,8 +715,9 @@ class TestViewAuth(LoginEnrollmentTestCase):
         instructor.save()
 
         # and now should be able to load both
-        url = random.choice(instructor_urls(self.toy) +
-                            instructor_urls(self.full))
+        url = random.choice(instructor_urls(self.course) +
+                             instructor_urls(self.full))
+        
         print 'checking for 200 on {0}'.format(url)
         self.check_for_get_code(200, url)
 
@@ -580,11 +730,11 @@ class TestViewAuth(LoginEnrollmentTestCase):
         """
         oldDSD = settings.MITX_FEATURES['DISABLE_START_DATES']
 
-        try:
-            settings.MITX_FEATURES['DISABLE_START_DATES'] = False
-            test()
-        finally:
-            settings.MITX_FEATURES['DISABLE_START_DATES'] = oldDSD
+        # try:
+        #     settings.MITX_FEATURES['DISABLE_START_DATES'] = False
+        #     test()
+        # finally:
+        settings.MITX_FEATURES['DISABLE_START_DATES'] = oldDSD
 
     def test_dark_launch(self):
         """Make sure that before course start, students can't access course
@@ -604,10 +754,10 @@ class TestViewAuth(LoginEnrollmentTestCase):
 
         # Make courses start in the future
         tomorrow = time.time() + 24 * 3600
-        self.toy.lms.start = time.gmtime(tomorrow)
+        self.course.lms.start = time.gmtime(tomorrow)
         self.full.lms.start = time.gmtime(tomorrow)
 
-        self.assertFalse(self.toy.has_started())
+        self.assertFalse(self.course.has_started())
         self.assertFalse(self.full.has_started())
         self.assertFalse(settings.MITX_FEATURES['DISABLE_START_DATES'])
 
@@ -691,28 +841,28 @@ class TestViewAuth(LoginEnrollmentTestCase):
         # First, try with an enrolled student
         print '=== Testing student access....'
         self.login(self.student, self.password)
-        self.enroll(self.toy)
+        self.enroll(self.course)
         self.enroll(self.full)
 
         # shouldn't be able to get to anything except the light pages
-        check_non_staff(self.toy)
+        check_non_staff(self.course)
         check_non_staff(self.full)
 
         print '=== Testing course instructor access....'
         # Make the instructor staff in the toy course
-        group_name = _course_staff_group_name(self.toy.location)
+        group_name = _course_staff_group_name(self.course.location)
         group = Group.objects.create(name=group_name)
         group.user_set.add(get_user(self.instructor))
 
         self.logout()
         self.login(self.instructor, self.password)
         # Enroll in the classes---can't see courseware otherwise.
-        self.enroll(self.toy)
+        self.enroll(self.course)
         self.enroll(self.full)
 
-        # should now be able to get to everything for toy course
+        # should now be able to get to everything for self.course
         check_non_staff(self.full)
-        check_staff(self.toy)
+        check_staff(self.course)
 
         print '=== Testing staff access....'
         # now also make the instructor staff
@@ -722,7 +872,7 @@ class TestViewAuth(LoginEnrollmentTestCase):
 
         # and now should be able to load both
         check_staff(self.toy)
-        check_staff(self.full)
+        #check_staff(self.full)
 
     def _do_test_enrollment_period(self):
         """Actually do the test, relying on settings to be right."""
@@ -733,9 +883,9 @@ class TestViewAuth(LoginEnrollmentTestCase):
         yesterday = time.time() - 24 * 3600
 
         print "changing"
-        # toy course's enrollment period hasn't started
-        self.toy.enrollment_start = time.gmtime(tomorrow)
-        self.toy.enrollment_end = time.gmtime(nextday)
+        # self.course's enrollment period hasn't started
+        self.course.enrollment_start = time.gmtime(tomorrow)
+        self.course.enrollment_end = time.gmtime(nextday)
 
         # full course's has
         self.full.enrollment_start = time.gmtime(yesterday)
@@ -745,12 +895,12 @@ class TestViewAuth(LoginEnrollmentTestCase):
         # First, try with an enrolled student
         print '=== Testing student access....'
         self.login(self.student, self.password)
-        self.assertFalse(self.try_enroll(self.toy))
+        self.assertFalse(self.try_enroll(self.course))
         self.assertTrue(self.try_enroll(self.full))
 
         print '=== Testing course instructor access....'
         # Make the instructor staff in the toy course
-        group_name = _course_staff_group_name(self.toy.location)
+        group_name = _course_staff_group_name(self.course.location)
         group = Group.objects.create(name=group_name)
         group.user_set.add(get_user(self.instructor))
 
@@ -758,7 +908,7 @@ class TestViewAuth(LoginEnrollmentTestCase):
         self.logout()
         self.login(self.instructor, self.password)
         print "Instructor should be able to enroll in toy course"
-        self.assertTrue(self.try_enroll(self.toy))
+        self.assertTrue(self.try_enroll(self.course))
 
         print '=== Testing staff access....'
         # now make the instructor global staff, but not in the instructor group
@@ -768,8 +918,8 @@ class TestViewAuth(LoginEnrollmentTestCase):
         instructor.save()
 
         # unenroll and try again
-        self.unenroll(self.toy)
-        self.assertTrue(self.try_enroll(self.toy))
+        self.unenroll(self.course)
+        self.assertTrue(self.try_enroll(self.course))
 
     def _do_test_beta_period(self):
         """Actually test beta periods, relying on settings to be right."""
@@ -783,23 +933,23 @@ class TestViewAuth(LoginEnrollmentTestCase):
         # yesterday = time.time() - 24 * 3600
 
         # toy course's hasn't started
-        self.toy.lms.start = time.gmtime(tomorrow)
-        self.assertFalse(self.toy.has_started())
+        self.course.lms.start = time.gmtime(tomorrow)
+        self.assertFalse(self.course.has_started())
 
         # but should be accessible for beta testers
-        self.toy.lms.days_early_for_beta = 2
+        self.course.lms.days_early_for_beta = 2
 
         # student user shouldn't see it
         student_user = get_user(self.student)
-        self.assertFalse(has_access(student_user, self.toy, 'load'))
+        self.assertFalse(has_access(student_user, self.course, 'load'))
 
         # now add the student to the beta test group
-        group_name = course_beta_test_group_name(self.toy.location)
+        group_name = course_beta_test_group_name(self.course.location)
         group = Group.objects.create(name=group_name)
         group.user_set.add(student_user)
 
         # now the student should see it
-        self.assertTrue(has_access(student_user, self.toy, 'load'))
+        self.assertTrue(has_access(student_user, self.course, 'load'))
 
 
 @override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
