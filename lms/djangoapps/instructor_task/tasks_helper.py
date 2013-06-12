@@ -1,5 +1,5 @@
 """
-This file contains tasks that are designed to perform background operations on the 
+This file contains tasks that are designed to perform background operations on the
 running state of a course.
 
 
@@ -50,7 +50,7 @@ class UpdateProblemModuleStateError(Exception):
 
 
 def _perform_module_state_update(course_id, module_state_key, student_identifier, update_fcn, action_name, filter_fcn,
-                                          xmodule_instance_args):
+                                 xmodule_instance_args):
     """
     Performs generic update by visiting StudentModule instances with the update_fcn provided.
 
@@ -161,7 +161,7 @@ def _save_course_task(course_task):
     course_task.save()
 
 
-def _update_problem_module_state(entry_id, course_id, module_state_key, student_ident, update_fcn, action_name, filter_fcn,
+def update_problem_module_state(entry_id, update_fcn, action_name, filter_fcn,
                                  xmodule_instance_args):
     """
     Performs generic update by visiting StudentModule instances with the update_fcn provided.
@@ -195,15 +195,20 @@ def _update_problem_module_state(entry_id, course_id, module_state_key, student_
     result object that Celery creates.
 
     """
-    task_id = current_task.request.id
-    fmt = 'Starting to update problem modules as task "{task_id}": course "{course_id}" problem "{state_key}": nothing {action} yet'
-    TASK_LOG.info(fmt.format(task_id=task_id, course_id=course_id, state_key=module_state_key, action=action_name))
 
     # get the InstructorTask to be updated.  If this fails, then let the exception return to Celery.
     # There's no point in catching it here.
     entry = InstructorTask.objects.get(pk=entry_id)
-    entry.task_id = task_id
-    _save_course_task(entry)
+
+    # get inputs to use in this task from the entry:
+    task_id = entry.task_id
+    course_id = entry.course_id
+    task_input = json.loads(entry.task_input)
+    module_state_key = task_input.get('problem_url')
+    student_ident = task_input['student'] if 'student' in task_input else None
+
+    fmt = 'Starting to update problem modules as task "{task_id}": course "{course_id}" problem "{state_key}": nothing {action} yet'
+    TASK_LOG.info(fmt.format(task_id=task_id, course_id=course_id, state_key=module_state_key, action=action_name))
 
     # add task_id to xmodule_instance_args, so that it can be output with tracking info:
     if xmodule_instance_args is not None:
@@ -212,6 +217,16 @@ def _update_problem_module_state(entry_id, course_id, module_state_key, student_
     # now that we have an entry we can try to catch failures:
     task_progress = None
     try:
+        # check that the task_id submitted in the InstructorTask matches the current task
+        # that is running.
+        request_task_id = current_task.request.id
+        if task_id != request_task_id:
+            fmt = 'Requested task "{task_id}" did not match actual task "{actual_id}"'
+            message = fmt.format(task_id=task_id, course_id=course_id, state_key=module_state_key, actual_id=request_task_id)
+            TASK_LOG.error(message)
+            raise UpdateProblemModuleStateError(message)
+
+        # now do the work:
         with dog_stats_api.timer('courseware.tasks.module.{0}.overall_time'.format(action_name)):
             task_progress = _perform_module_state_update(course_id, module_state_key, student_ident, update_fcn,
                                                          action_name, filter_fcn, xmodule_instance_args)
@@ -280,7 +295,7 @@ def _get_module_instance_for_task(course_id, student, module_descriptor, xmodule
 
 
 @transaction.autocommit
-def _rescore_problem_module_state(module_descriptor, student_module, xmodule_instance_args=None):
+def rescore_problem_module_state(module_descriptor, student_module, xmodule_instance_args=None):
     '''
     Takes an XModule descriptor and a corresponding StudentModule object, and
     performs rescoring on the student's problem submission.
@@ -330,7 +345,7 @@ def _rescore_problem_module_state(module_descriptor, student_module, xmodule_ins
 
 
 @transaction.autocommit
-def _reset_problem_attempts_module_state(_module_descriptor, student_module, xmodule_instance_args=None):
+def reset_attempts_module_state(_module_descriptor, student_module, xmodule_instance_args=None):
     """
     Resets problem attempts to zero for specified `student_module`.
 
@@ -356,7 +371,7 @@ def _reset_problem_attempts_module_state(_module_descriptor, student_module, xmo
 
 
 @transaction.autocommit
-def _delete_problem_module_state(_module_descriptor, student_module, xmodule_instance_args=None):
+def delete_problem_module_state(_module_descriptor, student_module, xmodule_instance_args=None):
     """
     Delete the StudentModule entry.
 

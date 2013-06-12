@@ -24,7 +24,7 @@ from instructor_task.api import (get_running_instructor_tasks,
                                  submit_delete_problem_state_for_all_students)
 
 from instructor_task.api_helper import (QUEUING,
-                                        AlreadyRunningError,
+#                                        AlreadyRunningError,
                                         encode_problem_and_student_input,
                                         )
 
@@ -61,12 +61,12 @@ class TaskSubmitTestCase(TestCase):
         task_input, task_key = encode_problem_and_student_input(self.problem_url, student)
 
         instructor_task = InstructorTaskFactory.create(course_id=TEST_COURSE_ID,
-                                               requester=self.instructor,
-                                               task_input=json.dumps(task_input),
-                                               task_key=task_key,
-                                               task_id=task_id,
-                                               task_state=task_state,
-                                               task_output=progress_json)
+                                                       requester=self.instructor,
+                                                       task_input=json.dumps(task_input),
+                                                       task_key=task_key,
+                                                       task_id=task_id,
+                                                       task_state=task_state,
+                                                       task_output=progress_json)
         return instructor_task
 
     def _create_failure_entry(self):
@@ -101,6 +101,7 @@ class TaskSubmitTestCase(TestCase):
         self.assertEquals(set(task_ids), set(progress_task_ids))
 
     def _get_instructor_task_status(self, task_id):
+        """Returns status corresponding to task_id via api method."""
         request = Mock()
         request.REQUEST = {'task_id': task_id}
         return instructor_task_status(request)

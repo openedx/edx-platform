@@ -2,7 +2,7 @@
 Integration Test for LMS instructor-initiated background tasks
 
 Runs tasks on answers to course problems to validate that code
-paths actually work. 
+paths actually work.
 
 """
 import logging
@@ -32,7 +32,6 @@ from instructor_task.api import (submit_rescore_problem_for_all_students,
                                  submit_reset_problem_attempts_for_all_students,
                                  submit_delete_problem_state_for_all_students)
 from instructor_task.models import InstructorTask
-from instructor_task.tests.factories import InstructorTaskFactory
 from instructor_task.views import instructor_task_status
 
 
@@ -235,6 +234,7 @@ class TestRescoringBase(LoginEnrollmentTestCase, ModuleStoreTestCase):
             self.assertGreater(len(state['student_answers']), 0)
 
     def get_task_status(self, task_id):
+        """Use api method to fetch task status, using mock request."""
         mock_request = Mock()
         mock_request.REQUEST = {'task_id': task_id}
         response = instructor_task_status(mock_request)
