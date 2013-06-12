@@ -51,7 +51,7 @@ def index_course(database, sjson_directory, course_name, mapping):
     all_transcripts = grab_transcripts(sjson_directory)
     video_counter = 0
     for transcript_tuple in all_transcripts:
-        data_map = {"searchable_text": transcript tuple[0], "uuid": transcript_tuple[1]}
+        data_map = {"searchable_text": transcript_tuple[0], "uuid": transcript_tuple[1]}
         data_map['phonetic_text'] = phonetic_transcript(transcript_tuple[0], stemmer)
         database.index(data_map, "transcript-index", course_name)
         video_counter += 1
@@ -65,6 +65,7 @@ def tokenize(transcript, punkt):
     words = []
     words = [words.extend(word_splitter(sentence)) for sentence in sentences]
     return words
+
 
 def fuzzy_search(database, query, course_name):
     search_query = FuzzyLikeThisFieldQuery("searchable_text", query)
