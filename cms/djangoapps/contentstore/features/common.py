@@ -58,6 +58,7 @@ def i_have_opened_a_new_course(step):
 ####### HELPER FUNCTIONS ##############
 def open_new_course():
     world.clear_courses()
+    create_studio_user()
     log_into_studio()
     create_a_course()
 
@@ -90,10 +91,7 @@ def fill_in_course_info(
 def log_into_studio(
         uname='robot',
         email='robot+studio@edx.org',
-        password='test',
-        is_staff=False):
-
-    create_studio_user(uname=uname, email=email, is_staff=is_staff)
+        password='test'):
 
     world.browser.cookies.delete()
     world.visit('/')

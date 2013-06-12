@@ -22,13 +22,3 @@ Feature: Static Pages
         When I "edit" the "Empty" page
         And I change the name to "New"
         Then I should see a "New" static page
-
-    Scenario: Users can reorder static pages
-        Given I have opened a new course in Studio
-        And I go to the static pages page
-        And I add a new page
-        And I "edit" the "Empty" page
-        And I change the name to "New"
-        And I add a new page
-        When I move "New" after "Empty"
-        Then I see the order is "Empty New"

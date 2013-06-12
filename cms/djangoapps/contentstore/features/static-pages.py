@@ -50,27 +50,10 @@ def change_name(step, new_name):
     world.css_find(save_button).click()
 
 
-@step(u'I move "([^"]*)" after "([^"]*)"$')
-def change_list(step, item1, item2):
-    index1 = get_index(item1)
-    index2 = get_index(item2)
-    assert index1 != -1 and index2 != -1
-    world.drag_sortable_after(".component", index1, index2, ".ui-sortable")
-
-
-@step(u'I see the order is "([^"]*)"$')
-def check_order(step, items):
-    items = items.split(' ')
-    name_css = 'section[data-type="HTMLModule"]'
-    all_elements = world.css_find(name_css)
-    for i in range(len(items)):
-        assert all_elements[i].html == '\n    %s\n' % items[i]
-
-
 def get_index(name):
     page_name_css = 'section[data-type="HTMLModule"]'
     all_pages = world.css_find(page_name_css)
     for i in range(len(all_pages)):
-        if all_pages[i].html == '\n    %s\n' % name:
+        if all_pages[i].html == '\n    {name}\n'.format(name=name):
             return i
     return -1

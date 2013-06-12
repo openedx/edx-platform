@@ -158,15 +158,3 @@ def click_tools():
     tools_css = 'li.nav-course-tools'
     if world.browser.is_element_present_by_css(tools_css):
         world.css_click(tools_css)
-
-
-@world.absorb
-def drag_sortable_after(item_css, index1, index2, sortable_css):
-    """
-    This is a hack in order to simulate jQuery's sortable list dragging as Selenium cannot currently do it with action_chains
-    Please note that this is very finnicky with keeping the changes after refreshing the page so be careful when testing persistant changes
-    Also note that this is mainly for visualization of the sortable list and the true sortable drag and drop fires many events
-    """
-    world.browser.execute_script('$("%(item_css)s:eq(%(index_one)s)").insertAfter($("%(item_css)s:eq(%(index_two)s)"));\
-        $("%(sortable_css)s").trigger("sortupdate")' %
-         {'item_css': item_css, 'index_one': index1, 'index_two': index2, 'sortable_css': sortable_css})
