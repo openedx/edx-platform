@@ -34,9 +34,8 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError, NoPathToItem
 from xmodule.modulestore.search import path_to_location
 
-from jabber.models import JabberUser
-
 import comment_client
+import jabber.utils
 
 log = logging.getLogger("mitx.courseware")
 
@@ -235,36 +234,6 @@ def update_timelimit_module(user, course_id, model_data_cache, timelimit_descrip
     return context
 
 
-def chat_settings(course, user):
-    """
-    Returns a dict containing the settings required to connect to a
-    Jabber chat server and room.
-    """
-    domain = getattr(settings, "JABBER_DOMAIN", None)
-    if domain is None:
-        raise ImproperlyConfigured("Missing JABBER_DOMAIN in the settings")
-
-    # username/password from somewhere
-    jabber_user, created = JabberUser.objects.get_or_create(username=user.username,
-                                                            defaults={'password' : 'bobobo'})
-
-    if created:
-        log.info("CREATED PASSWORD FOR USER %s\n" % user.username)
-
-    return {
-        'domain': domain,
-
-        # Jabber doesn't like slashes, so replace with dashes
-        'room': "{ID}_class".format(ID=course.id.replace('/', '-')),
-
-        'username': "{USER}@{DOMAIN}".format(
-            USER=jabber_user.username, DOMAIN=domain
-        ),
-
-        'password': jabber_user.password
-    }
-
-
 @login_required
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
@@ -333,7 +302,12 @@ def index(request, course_id, chapter=None, section=None,
         # by the course.
         context['show_chat'] = course.show_chat and settings.MITX_FEATURES.get('ENABLE_CHAT')
         if context['show_chat']:
-            context['chat'] = chat_settings(course, user)
+            context['chat'] = {
+                'bosh_url': jabber.utils.get_bosh_url(),
+                'course_room': jabber.utils.get_room_name_for_course(course.id),
+                'username': "%s@%s" % (user.username, settings.JABBER.get('HOST')),
+                'password': jabber.utils.get_password_for_user(user.username)
+            }
 
         chapter_descriptor = course.get_child_by(lambda m: m.url_name == chapter)
         if chapter_descriptor is not None:
