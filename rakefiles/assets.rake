@@ -10,10 +10,11 @@ def xmodule_cmd(watch=false, debug=false)
     xmodule_cmd = 'xmodule_assets common/static/xmodule'
     if watch
         "watchmedo shell-command " +
-                   "--patterns='*.js;*.coffee;*.sass;*.scss;*.css' " +
-                   "--recursive " +
-                   "--command='#{xmodule_cmd}' " +
-                   "common/lib/xmodule"
+                  "--patterns='*.js;*.coffee;*.sass;*.scss;*.css' " +
+                  "--recursive " +
+                  "--command='#{xmodule_cmd}' " +
+                  "--wait " +
+                  "common/lib/xmodule"
     else
         xmodule_cmd
     end
@@ -27,15 +28,16 @@ def coffee_cmd(watch=false, debug=false)
         #
         # Ref: https://github.com/joyent/node/issues/2479
         #
-        # Rather than watching all of the directories in one command
-        # watch each static files subdirectory separately
-        cmds = []
-        ['lms/static/coffee', 'cms/static/coffee', 'common/static/coffee', 'common/static/xmodule'].each do |coffee_folder|
-            cmds << "node_modules/.bin/coffee --watch --compile #{coffee_folder}"
-        end
-        cmds
+        # So, instead, we use watchmedo, which works around the problem
+        "watchmedo shell-command " +
+                  "--command 'node_modules/.bin/coffee -c ${watch_src_path}' " +
+                  "--recursive " +
+                  "--patterns '*.coffee' " +
+                  "--ignore-directories " +
+                  "--wait " +
+                  "."
     else
-        'node_modules/.bin/coffee --compile */static'
+        'node_modules/.bin/coffee --compile .'
     end
 end
 
@@ -75,8 +77,8 @@ namespace :assets do
         $stdin.gets
     end
 
-    {:xmodule => :install_python_prereqs,
-     :coffee => :install_node_prereqs,
+    {:xmodule => [:install_python_prereqs],
+     :coffee => [:install_node_prereqs],
      :sass => [:install_ruby_prereqs, :preprocess]}.each_pair do |asset_type, prereq_tasks|
         desc "Compile all #{asset_type} assets"
         task asset_type => prereq_tasks do
@@ -105,7 +107,8 @@ namespace :assets do
                 $stdin.gets
             end
 
-            task :_watch => prereq_tasks do
+            # Fully compile before watching for changes
+            task :_watch => (prereq_tasks + ["assets:#{asset_type}:debug"]) do
                 cmd = send(asset_type.to_s + "_cmd", watch=true, debug=true)
                 if cmd.kind_of?(Array)
                     cmd.each {|c| background_process(c)}
@@ -118,18 +121,17 @@ namespace :assets do
 
     multitask :sass => 'assets:xmodule'
     namespace :sass do
-        # In watch mode, sass doesn't immediately compile out of date files,
-        # so force a recompile first
-        # Also force xmodule files to be generated before we start watching anything
-        task :_watch => ['assets:sass:debug', 'assets:xmodule']
         multitask :debug => 'assets:xmodule:debug'
     end
 
     multitask :coffee => 'assets:xmodule'
     namespace :coffee do
-        # Force xmodule files to be generated before we start watching anything
-        task :_watch => 'assets:xmodule'
         multitask :debug => 'assets:xmodule:debug'
+    end
+
+    namespace :xmodule do
+        # Only start the xmodule watcher after the coffee and sass watchers have already started
+        task :_watch => ['assets:coffee:_watch', 'assets:sass:_watch']
     end
 end
 

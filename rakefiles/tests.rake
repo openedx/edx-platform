@@ -1,8 +1,5 @@
-
 # Set up the clean and clobber tasks
 CLOBBER.include(REPORT_DIR, 'test_root/*_repo', 'test_root/staticfiles')
-
-$failed_tests = 0
 
 def run_under_coverage(cmd, root)
     cmd0, cmd_rest = cmd.split(" ", 2)
@@ -17,12 +14,7 @@ def run_tests(system, report_dir, test_id=nil, stop_on_failure=true)
     dirs = Dir["common/djangoapps/*"] + Dir["#{system}/djangoapps/*"]
     test_id = dirs.join(' ') if test_id.nil? or test_id == ''
     cmd = django_admin(system, :test, 'test', '--logging-clear-handlers', test_id)
-    sh(run_under_coverage(cmd, system)) do |ok, res|
-        if !ok and stop_on_failure
-            abort "Test failed!"
-        end
-        $failed_tests += 1 unless ok
-    end
+    test_sh(run_under_coverage(cmd, system))
 end
 
 def run_acceptance_tests(system, report_dir, harvest_args)
@@ -38,19 +30,13 @@ def run_acceptance_tests(system, report_dir, harvest_args)
     end
     sh(django_admin(system, 'acceptance', 'syncdb', '--noinput'))
     sh(django_admin(system, 'acceptance', 'migrate', '--noinput'))
-    sh(django_admin(system, 'acceptance', 'harvest', '--debug-mode', '--tag -skip', harvest_args))
+    test_sh(django_admin(system, 'acceptance', 'harvest', '--debug-mode', '--tag -skip', harvest_args))
 end
 
 
 directory REPORT_DIR
 
 task :clean_test_files do
-
-    # Delete all files in the reports directory, while preserving
-    # the directory structure.
-    sh("find #{REPORT_DIR} -type f -print0 | xargs --no-run-if-empty -0 rm")
-
-    # Reset the test fixtures
     sh("git clean -fqdx test_root")
 end
 
@@ -61,13 +47,13 @@ TEST_TASK_DIRS = []
 
     # Per System tasks
     desc "Run all django tests on our djangoapps for the #{system}"
-    task "test_#{system}", [:test_id, :stop_on_failure] => ["clean_test_files", :predjango, "#{system}:gather_assets:test", "fasttest_#{system}"]
+    task "test_#{system}", [:test_id] => ["clean_test_files", :predjango, "#{system}:gather_assets:test", "fasttest_#{system}"]
 
     # Have a way to run the tests without running collectstatic -- useful when debugging without
     # messing with static files.
-    task "fasttest_#{system}", [:test_id, :stop_on_failure] => [report_dir, :install_prereqs, :predjango] do |t, args|
-        args.with_defaults(:stop_on_failure => 'true', :test_id => nil)
-        run_tests(system, report_dir, args.test_id, args.stop_on_failure)
+    task "fasttest_#{system}", [:test_id] => [report_dir, :install_prereqs, :predjango] do |t, args|
+        args.with_defaults(:test_id => nil)
+        run_tests(system, report_dir, args.test_id)
     end
 
     # Run acceptance tests
@@ -94,9 +80,7 @@ Dir["common/lib/*"].select{|lib| File.directory?(lib)}.each do |lib|
     task "test_#{lib}"  => ["clean_test_files", report_dir] do
         ENV['NOSE_XUNIT_FILE'] = File.join(report_dir, "nosetests.xml")
         cmd = "nosetests #{lib}"
-        sh(run_under_coverage(cmd, lib)) do |ok, res|
-            $failed_tests += 1 unless ok
-        end
+        test_sh(run_under_coverage(cmd, lib))
     end
     TEST_TASK_DIRS << lib
 
@@ -115,17 +99,11 @@ TEST_TASK_DIRS.each do |dir|
     report_dir = report_dir_path(dir)
     directory report_dir
     task :report_dirs => [REPORT_DIR, report_dir]
+    task :test => "test_#{dir}"
 end
 
-task :test do
-    TEST_TASK_DIRS.each do |dir|
-        Rake::Task["test_#{dir}"].invoke(nil, false)
-    end
-
-    if $failed_tests > 0
-        abort "Tests failed!"
-    end
-end
+desc "Run all tests"
+task :test
 
 desc "Build the html, xml, and diff coverage reports"
 task :coverage => :report_dirs do

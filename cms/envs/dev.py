@@ -165,3 +165,11 @@ MITX_FEATURES['ENABLE_SERVICE_STATUS'] = True
 
 # segment-io key for dev
 SEGMENT_IO_KEY = 'mty8edrrsg'
+
+
+#####################################################################
+# Lastly, see if the developer has any local overrides.
+try:
+    from .private import *
+except ImportError:
+    pass

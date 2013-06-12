@@ -28,7 +28,7 @@ jasmine.stubRequests = ->
   spyOn($, 'ajax').andCallFake (settings) ->
     if match = settings.url.match /youtube\.com\/.+\/videos\/(.+)\?v=2&alt=jsonc/
       settings.success data: jasmine.stubbedMetadata[match[1]]
-    else if match = settings.url.match /static\/subs\/(.+)\.srt\.sjson/
+    else if match = settings.url.match /static(\/.*)?\/subs\/(.+)\.srt\.sjson/
       settings.success jasmine.stubbedCaption
     else if settings.url.match /.+\/problem_get$/
       settings.success html: readFixtures('problem_content.html')
@@ -47,19 +47,15 @@ jasmine.stubYoutubePlayer = ->
 
 jasmine.stubVideoPlayer = (context, enableParts, createPlayer=true) ->
   enableParts = [enableParts] unless $.isArray(enableParts)
-
   suite = context.suite
   currentPartName = suite.description while suite = suite.parentSuite
   enableParts.push currentPartName
 
-  for part in ['VideoCaption', 'VideoSpeedControl', 'VideoVolumeControl', 'VideoProgressSlider']
-    unless $.inArray(part, enableParts) >= 0
-      spyOn window, part
-
   loadFixtures 'video.html'
   jasmine.stubRequests()
   YT.Player = undefined
-  context.video = new Video 'example', '.75:slowerSpeedYoutubeId,1.0:normalSpeedYoutubeId'
+  videosDefinition = '0.75:slowerSpeedYoutubeId,1.0:normalSpeedYoutubeId'
+  context.video = new Video '#example', videosDefinition
   jasmine.stubYoutubePlayer()
   if createPlayer
     return new VideoPlayer(video: context.video)

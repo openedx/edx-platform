@@ -1,6 +1,9 @@
-# TODO: figure out why failing
-xdescribe 'VideoPlayer', ->
+describe 'VideoPlayer', ->
   beforeEach ->
+    window.onTouchBasedDevice = jasmine.createSpy('onTouchBasedDevice').andReturn false
+    # It tries to call methods of VideoProgressSlider on Spy
+    for part in ['VideoCaption', 'VideoSpeedControl', 'VideoVolumeControl', 'VideoProgressSlider', 'VideoControl']
+      spyOn(window[part].prototype, 'initialize').andCallThrough()
     jasmine.stubVideoPlayer @, [], false
 
   afterEach ->
@@ -8,7 +11,6 @@ xdescribe 'VideoPlayer', ->
 
   describe 'constructor', ->
     beforeEach ->
-      spyOn window, 'VideoControl'
       spyOn YT, 'Player'
       $.fn.qtip.andCallFake ->
         $(this).data('qtip', true)
@@ -22,32 +24,47 @@ xdescribe 'VideoPlayer', ->
         expect(@player.currentTime).toEqual 0
 
       it 'set the element', ->
-        expect(@player.el).toBe '#video_example'
+        expect(@player.el).toHaveId 'video_id'
 
       it 'create video control', ->
-        expect(window.VideoControl).toHaveBeenCalledWith el: $('.video-controls', @player.el)
+        expect(window.VideoControl.prototype.initialize).toHaveBeenCalled()
+        expect(@player.control).toBeDefined()
+        expect(@player.control.el).toBe $('.video-controls', @player.el)
 
       it 'create video caption', ->
-        expect(window.VideoCaption).toHaveBeenCalledWith el: @player.el, youtubeId: 'normalSpeedYoutubeId', currentSpeed: '1.0'
+        expect(window.VideoCaption.prototype.initialize).toHaveBeenCalled()
+        expect(@player.caption).toBeDefined()
+        expect(@player.caption.el).toBe @player.el
+        expect(@player.caption.youtubeId).toEqual 'normalSpeedYoutubeId'
+        expect(@player.caption.currentSpeed).toEqual '1.0'
+        expect(@player.caption.captionAssetPath).toEqual '/static/subs/'
 
       it 'create video speed control', ->
-        expect(window.VideoSpeedControl).toHaveBeenCalledWith el: $('.secondary-controls', @player.el), speeds: ['0.75', '1.0'], currentSpeed: '1.0'
+        expect(window.VideoSpeedControl.prototype.initialize).toHaveBeenCalled()
+        expect(@player.speedControl).toBeDefined()
+        expect(@player.speedControl.el).toBe $('.secondary-controls', @player.el)
+        expect(@player.speedControl.speeds).toEqual ['0.75', '1.0']
+        expect(@player.speedControl.currentSpeed).toEqual '1.0'
 
       it 'create video progress slider', ->
-        expect(window.VideoProgressSlider).toHaveBeenCalledWith el: $('.slider', @player.el)
+        expect(window.VideoSpeedControl.prototype.initialize).toHaveBeenCalled()
+        expect(@player.progressSlider).toBeDefined()
+        expect(@player.progressSlider.el).toBe $('.slider', @player.el)
 
       it 'create Youtube player', ->
-        expect(YT.Player).toHaveBeenCalledWith('example', {
+        expect(YT.Player).toHaveBeenCalledWith('id', {
           playerVars:
             controls: 0
             wmode: 'transparent'
             rel: 0
             showinfo: 0
             enablejsapi: 1
+            modestbranding: 1
           videoId: 'normalSpeedYoutubeId'
           events:
             onReady: @player.onReady
             onStateChange: @player.onStateChange
+            onPlaybackQualityChange: @player.onPlaybackQualityChange
         })
 
       it 'bind to video control play event', ->
@@ -69,14 +86,13 @@ xdescribe 'VideoPlayer', ->
         expect($(@player.volumeControl)).toHandleWith 'volumeChange', @player.onVolumeChange
 
       it 'bind to key press', ->
-        expect($(document)).toHandleWith 'keyup', @player.bindExitFullScreen
+        expect($(document.documentElement)).toHandleWith 'keyup', @player.bindExitFullScreen
 
       it 'bind to fullscreen switching button', ->
         expect($('.add-fullscreen')).toHandleWith 'click', @player.toggleFullScreen
 
     describe 'when not on a touch based device', ->
       beforeEach ->
-        spyOn(window, 'onTouchBasedDevice').andReturn false
         $('.add-fullscreen, .hide-subtitles').removeData 'qtip'
         @player = new VideoPlayer video: @video
 
@@ -85,11 +101,13 @@ xdescribe 'VideoPlayer', ->
         expect($('.hide-subtitles')).toHaveData 'qtip'
 
       it 'create video volume control', ->
-        expect(window.VideoVolumeControl).toHaveBeenCalledWith el: $('.secondary-controls', @player.el)
+        expect(window.VideoVolumeControl.prototype.initialize).toHaveBeenCalled()
+        expect(@player.volumeControl).toBeDefined()
+        expect(@player.volumeControl.el).toBe $('.secondary-controls', @player.el)
 
     describe 'when on a touch based device', ->
       beforeEach ->
-        spyOn(window, 'onTouchBasedDevice').andReturn true
+        window.onTouchBasedDevice.andReturn true
         $('.add-fullscreen, .hide-subtitles').removeData 'qtip'
         @player = new VideoPlayer video: @video
 
@@ -98,7 +116,8 @@ xdescribe 'VideoPlayer', ->
         expect($('.hide-subtitles')).not.toHaveData 'qtip'
 
       it 'does not create video volume control', ->
-        expect(window.VideoVolumeControl).not.toHaveBeenCalled()
+        expect(window.VideoVolumeControl.prototype.initialize).not.toHaveBeenCalled()
+        expect(@player.volumeControl).not.toBeDefined()
 
   describe 'onReady', ->
     beforeEach ->
@@ -110,7 +129,6 @@ xdescribe 'VideoPlayer', ->
 
     describe 'when not on a touch based device', ->
       beforeEach ->
-        spyOn(window, 'onTouchBasedDevice').andReturn false
         spyOn @player, 'play'
         @player.onReady()
 
@@ -119,7 +137,7 @@ xdescribe 'VideoPlayer', ->
 
     describe 'when on a touch based device', ->
       beforeEach ->
-        spyOn(window, 'onTouchBasedDevice').andReturn true
+        window.onTouchBasedDevice.andReturn true
         spyOn @player, 'play'
         @player.onReady()
 
@@ -347,9 +365,6 @@ xdescribe 'VideoPlayer', ->
       it 'replace the full screen button tooltip', ->
         expect($('.add-fullscreen')).toHaveAttr 'title', 'Exit fill browser'
 
-      it 'add a new exit from fullscreen button', ->
-        expect(@player.el).toContain 'a.exit'
-
       it 'add the fullscreen class', ->
         expect(@player.el).toHaveClass 'fullscreen'
 
@@ -438,7 +453,7 @@ xdescribe 'VideoPlayer', ->
 
   describe 'volume', ->
     beforeEach ->
-      @player = new VideoPlayer @video
+      @player = new VideoPlayer video: @video
       @player.player.getVolume.andReturn 42
 
     describe 'without value', ->

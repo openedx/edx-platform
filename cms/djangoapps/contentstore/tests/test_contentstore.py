@@ -37,6 +37,9 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from contentstore.views.component import ADVANCED_COMPONENT_TYPES
 
 from django_comment_common.utils import are_permissions_roles_seeded
+from xmodule.exceptions import InvalidVersionError
+import datetime
+from pytz import UTC
 
 TEST_DATA_MODULESTORE = copy.deepcopy(settings.MODULESTORE)
 TEST_DATA_MODULESTORE['default']['OPTIONS']['fs_root'] = path('common/test/data')
@@ -119,6 +122,17 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
     def test_advanced_components_require_two_clicks(self):
         self.check_components_on_page(['videoalpha'], ['Video Alpha'])
+
+    def test_malformed_edit_unit_request(self):
+        store = modulestore('direct')
+        import_from_xml(store, 'common/test/data/', ['simple'])
+
+        # just pick one vertical
+        descriptor = store.get_items(Location('i4x', 'edX', 'simple', 'vertical', None, None))[0]
+        location = descriptor.location._replace(name='.' + descriptor.location.name)
+
+        resp = self.client.get(reverse('edit_unit', kwargs={'location': location.url()}))
+        self.assertEqual(resp.status_code, 400)
 
     def check_edit_unit(self, test_course_name):
         import_from_xml(modulestore('direct'), 'common/test/data/', [test_course_name])
@@ -403,6 +417,32 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             print "Checking {0} should now also be at {1}".format(descriptor.location.url(), new_loc.url())
             resp = self.client.get(reverse('edit_unit', kwargs={'location': new_loc.url()}))
             self.assertEqual(resp.status_code, 200)
+
+    def test_illegal_draft_crud_ops(self):
+        draft_store = modulestore('draft')
+        direct_store = modulestore('direct')
+
+        CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course')
+
+        location = Location('i4x://MITx/999/chapter/neuvo')
+        self.assertRaises(InvalidVersionError, draft_store.clone_item, 'i4x://edx/templates/chapter/Empty',
+            location)
+        direct_store.clone_item('i4x://edx/templates/chapter/Empty', location)
+        self.assertRaises(InvalidVersionError, draft_store.clone_item, location,
+            location)
+
+        self.assertRaises(InvalidVersionError, draft_store.update_item, location,
+            'chapter data')
+
+        # taking advantage of update_children and other functions never checking that the ids are valid
+        self.assertRaises(InvalidVersionError, draft_store.update_children, location,
+            ['i4x://MITx/999/problem/doesntexist'])
+
+        self.assertRaises(InvalidVersionError, draft_store.update_metadata, location,
+            {'due': datetime.datetime.now(UTC)})
+
+        self.assertRaises(InvalidVersionError, draft_store.unpublish, location)
+
 
     def test_bad_contentstore_request(self):
         resp = self.client.get('http://localhost:8001/c4x/CDX/123123/asset/&images_circuits_Lab7Solution2.png')

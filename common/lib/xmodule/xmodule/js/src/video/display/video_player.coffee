@@ -15,7 +15,7 @@ class @VideoPlayer extends Subview
     $(@progressSlider).bind('seek', @onSeek)
     if @volumeControl
       $(@volumeControl).bind('volumeChange', @onVolumeChange)
-    $(document).keyup @bindExitFullScreen
+    $(document.documentElement).keyup @bindExitFullScreen
 
     @$('.add-fullscreen').click @toggleFullScreen
     @addToolTip() unless onTouchBasedDevice()
