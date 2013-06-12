@@ -99,7 +99,7 @@ class @VideoPlayerAlpha extends SubviewAlpha
     @video.log 'load_video'
     if @video.videoType is 'html5'
       @player.setPlaybackRate @video.speed
-    unless onTouchBasedDevice() or $('.video:first').data('autoplay') == 'False'
+    if not onTouchBasedDevice() and $('.video:first').data('autoplay') is 'True'
       $('.video-load-complete:first').data('video').player.play()
 
   onStateChange: (event) =>
