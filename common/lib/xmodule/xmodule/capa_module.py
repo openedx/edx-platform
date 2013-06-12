@@ -18,7 +18,7 @@ from .progress import Progress
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
-from xblock.core import Scope, String, Boolean, Object, Integer, Float
+from xblock.core import Scope, String, Boolean, Dict, Integer, Float
 from .fields import Timedelta, Date
 from xmodule.util.date_utils import time_to_datetime
 
@@ -95,9 +95,9 @@ class CapaFields(object):
                                                         {"display_name": "Per Student", "value": "per_student"}]
     )
     data = String(help="XML data for the problem", scope=Scope.content)
-    correct_map = Object(help="Dictionary with the correctness of current student answers", scope=Scope.user_state, default={})
-    input_state = Object(help="Dictionary for maintaining the state of inputtypes", scope=Scope.user_state)
-    student_answers = Object(help="Dictionary with the current student responses", scope=Scope.user_state)
+    correct_map = Dict(help="Dictionary with the correctness of current student answers", scope=Scope.user_state, default={})
+    input_state = Dict(help="Dictionary for maintaining the state of inputtypes", scope=Scope.user_state)
+    student_answers = Dict(help="Dictionary with the current student responses", scope=Scope.user_state)
     done = Boolean(help="Whether the student has answered the problem", scope=Scope.user_state)
     seed = Integer(help="Random seed for this student", scope=Scope.user_state)
     weight = Float(

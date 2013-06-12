@@ -10,7 +10,7 @@ from .x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xmodule.modulestore.django import modulestore
 from .timeinfo import TimeInfo
-from xblock.core import Object, String, Scope, Boolean, Integer, Float
+from xblock.core import Dict, String, Scope, Boolean, Integer, Float
 from xmodule.fields import Date
 
 from xmodule.open_ended_grading_classes.peer_grading_service import PeerGradingService, GradingServiceError, MockPeerGradingService
@@ -49,7 +49,7 @@ class PeerGradingFields(object):
         help="The maximum grade that a student can receive for this problem.", default=MAX_SCORE,
         scope=Scope.settings, values={"min": 0}
     )
-    student_data_for_location = Object(
+    student_data_for_location = Dict(
         help="Student data for a given peer grading problem.",
         scope=Scope.user_state
     )

@@ -6,7 +6,7 @@ import sys
 from collections import namedtuple
 from lxml import etree
 
-from xblock.core import Object, Scope
+from xblock.core import Dict, Scope
 from xmodule.x_module import (XModuleDescriptor, policy_key)
 from xmodule.modulestore import Location
 from xmodule.modulestore.inheritance import own_metadata
@@ -120,7 +120,7 @@ class XmlDescriptor(XModuleDescriptor):
     Mixin class for standardized parsing of from xml
     """
 
-    xml_attributes = Object(help="Map of unhandled xml attributes, used only for storage between import and export",
+    xml_attributes = Dict(help="Map of unhandled xml attributes, used only for storage between import and export",
         default={}, scope=Scope.settings)
 
     # Extension to append to filename paths

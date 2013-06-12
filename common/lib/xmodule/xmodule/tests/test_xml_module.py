@@ -2,7 +2,7 @@
 #pylint: disable=C0111
 
 from xmodule.x_module import XModuleFields
-from xblock.core import Scope, String, Object, Boolean, Integer, Float, Any, List
+from xblock.core import Scope, String, Dict, Boolean, Integer, Float, Any, List
 from xmodule.fields import Date, Timedelta
 from xmodule.xml_module import XmlDescriptor, serialize_field, deserialize_field
 import unittest
@@ -22,7 +22,7 @@ class TestFields(object):
     # Will not be returned by editable_metadata_fields because filtered out by non_editable_metadata_fields.
     due = Date(scope=Scope.settings)
     # Will not be returned by editable_metadata_fields because is not Scope.settings.
-    student_answers = Object(scope=Scope.user_state)
+    student_answers = Dict(scope=Scope.user_state)
     # Will be returned, and can override the inherited value from XModule.
     display_name = String(scope=Scope.settings, default='local default', display_name='Local Display Name',
                           help='local help')

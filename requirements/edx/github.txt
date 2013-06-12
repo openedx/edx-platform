@@ -9,6 +9,6 @@
 
 # Our libraries:
 
--e git+https://github.com/edx/XBlock.git@2abd2937e134e2f78dfa118d6cfd56ec510fd3a4#egg=XBlock
+-e git+https://github.com/edx/XBlock.git@3464c0fbfe07bb16791386b26979f66ee2708b06#egg=XBlock
 -e git+https://github.com/edx/codejail.git@5fb5fa0#egg=codejail
 -e git+https://github.com/edx/diff-cover.git@v0.1.0#egg=diff_cover
