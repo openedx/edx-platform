@@ -736,8 +736,6 @@ body.discussion {
         color: $gray-l1;
         font-size: 28px;
         z-index: 100;
-        width: 25px;
-        height: 25px;
         opacity: 1;
         @include transition(all .2s ease-out);
       }
