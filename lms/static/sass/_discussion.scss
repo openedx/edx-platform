@@ -731,7 +731,7 @@ body.discussion {
         position: absolute;
         top: 30%;
         left: 30%;
-        color: $gray;
+        color: $gray-l1;
         font-size: 28px;
         z-index: 100;
         width: 25px;
@@ -1063,7 +1063,7 @@ body.discussion {
   .post-list-wrapper {
     overflow-y: scroll;
     overflow-x: hidden;
-    border-right: 1px solid transparent;
+    //border-right: 1px solid transparent;
   }
 
   .post-list {
