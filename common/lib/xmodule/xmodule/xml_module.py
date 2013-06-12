@@ -79,6 +79,42 @@ class AttrMap(_AttrMapBase):
         return _AttrMapBase.__new__(_cls, from_xml, to_xml)
 
 
+def serialize_field(value):
+    """
+        Return a string version of the value (where value is the JSON-formatted, internally stored value).
+
+        By default, this is the result of calling json.dumps on the input value.
+        """
+    return json.dumps(value)
+
+
+def deserialize_field(field, value):
+    """
+    Deserialize the string version to the value stored internally.
+
+    Note that this is not the same as the value returned by from_json, as model types typically store
+    their value internally as JSON. By default, this method will return the result of calling json.loads
+    on the supplied value, unless json.loads throws a TypeError, or the type of the value returned by json.loads
+    is not supported for this class (see 'is_type_supported'). In either of those cases, this method returns
+    the input value.
+    """
+    try:
+        deserialized = json.loads(value)
+
+        if deserialized is None:
+            return deserialized
+        try:
+            field.from_json(deserialized)
+            return deserialized
+        except (ValueError, TypeError):
+            # Support older serialized forms by simply returning the String representation
+            return value
+
+    except (ValueError, TypeError):
+        # Support older serialized version, which was just the String (not the result of json.dumps).
+        return value
+
+
 class XmlDescriptor(XModuleDescriptor):
     """
     Mixin class for standardized parsing of from xml
@@ -124,8 +160,8 @@ class XmlDescriptor(XModuleDescriptor):
     def get_map_for_field(cls, attr):
         for field in set(cls.fields + cls.lms.fields):
             if field.name == attr:
-                from_xml = lambda val: field.deserialize(val)
-                to_xml = lambda val : field.serialize(val)
+                from_xml = lambda val: deserialize_field(field, val)
+                to_xml = lambda val : serialize_field(val)
                 return AttrMap(from_xml, to_xml)
 
         return AttrMap()

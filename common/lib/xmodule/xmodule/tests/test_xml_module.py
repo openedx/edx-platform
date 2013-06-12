@@ -2,11 +2,12 @@
 #pylint: disable=C0111
 
 from xmodule.x_module import XModuleFields
-from xblock.core import Scope, String, Object, Boolean, Integer, Float
-from xmodule.fields import Date
-from xmodule.xml_module import XmlDescriptor
+from xblock.core import Scope, String, Object, Boolean, Integer, Float, Any, List
+from xmodule.fields import Date, Timedelta
+from xmodule.xml_module import XmlDescriptor, serialize_field, deserialize_field
 import unittest
 from .import test_system
+from nose.tools import assert_equals
 from mock import Mock
 
 
@@ -171,3 +172,186 @@ class EditableMetadataFieldsTest(unittest.TestCase):
 
         self.assertEqual(explicitly_set, test_field['explicitly_set'])
         self.assertEqual(inheritable, test_field['inheritable'])
+
+
+def assertSerializeEqual(expected, arg):
+    """
+    Asserts the result of serialize_field.
+    """
+    assert_equals(expected, serialize_field(arg))
+
+
+def assertDeserializeEqual(field, expected, arg):
+    """
+    Asserts the result of deserialize_field.
+    """
+    assert_equals(expected, deserialize_field(field, arg))
+
+
+class TestSerializeInteger(unittest.TestCase):
+    """ Tests serialize/deserialize as related to Integer type. """
+
+    def test_serialize(self):
+        assertSerializeEqual('-2', -2)
+        assertSerializeEqual('"2"', '2')
+        assertSerializeEqual('null', None)
+
+    def test_deserialize(self):
+        assertDeserializeEqual(Integer(), None, 'null')
+        assertDeserializeEqual(Integer(), -2, '-2')
+        assertDeserializeEqual(Integer(), "450", '"450"')
+
+        # False can be parsed as a int (converts to 0)
+        assertDeserializeEqual(Integer(), False, 'false')
+        # True can be parsed as a int (converts to 1)
+        assertDeserializeEqual(Integer(), True, 'true')
+
+    def test_deserialize_unsupported_types(self):
+        assertDeserializeEqual(Integer(), '[3]', '[3]')
+        self.assertRaises(TypeError, deserialize_field, None)
+
+
+class FloatTest(unittest.TestCase):
+    """ Tests serialize/deserialize as related to Float type. """
+
+    def test_serialize(self):
+        assertSerializeEqual('-2', -2)
+        assertSerializeEqual('"2"', '2')
+        assertSerializeEqual('-3.41', -3.41)
+        assertSerializeEqual('"2.589"', '2.589')
+        assertSerializeEqual('null', None)
+
+    def test_deserialize(self):
+        assertDeserializeEqual(Float(), None, 'null')
+        assertDeserializeEqual(Float(), -2, '-2')
+        assertDeserializeEqual(Float(), "450", '"450"')
+        assertDeserializeEqual(Float(), -2.78, '-2.78')
+        assertDeserializeEqual(Float(), "0.45", '"0.45"')
+
+        # False can be parsed as a float (converts to 0)
+        assertDeserializeEqual(Float(), False, 'false')
+        # True can be parsed as a float (converts to 1)
+        assertDeserializeEqual(Float(), True, 'true')
+
+    def test_deserialize_unsupported_types(self):
+        assertDeserializeEqual(Float(), '[3]', '[3]')
+        self.assertRaises(TypeError, deserialize_field, None)
+
+
+class BooleanTest(unittest.TestCase):
+    """ Tests serialize/deserialize as related to Boolean type. """
+
+    def test_serialize(self):
+        assertSerializeEqual('false', False)
+        assertSerializeEqual('"false"', 'false')
+        assertSerializeEqual('"fAlse"', 'fAlse')
+        assertSerializeEqual('null', None)
+
+    def test_deserialize(self):
+        # json.loads converts the value to Python bool
+        assertDeserializeEqual(Boolean(), False, 'false')
+        assertDeserializeEqual(Boolean(), True, 'true')
+
+        # json.loads fails, string value is returned.
+        assertDeserializeEqual(Boolean(), 'False', 'False')
+        assertDeserializeEqual(Boolean(), 'True', 'True')
+
+        # json.loads deserializes 'null' to None
+        assertDeserializeEqual(Boolean(), None, 'null')
+
+        # json.loads deserializes as a string
+        assertDeserializeEqual(Boolean(), 'false', '"false"')
+        assertDeserializeEqual(Boolean(), 'fAlse', '"fAlse"')
+        assertDeserializeEqual(Boolean(), "TruE", '"TruE"')
+
+    def test_deserialize_unsupported_types(self):
+        self.assertRaises(TypeError, deserialize_field, None)
+
+
+class StringTest(unittest.TestCase):
+    """ Tests serialize/deserialize as related to String type. """
+
+    def test_serialize(self):
+        assertSerializeEqual('"hat box"', 'hat box')
+        assertSerializeEqual('null', None)
+
+    def test_deserialize(self):
+        assertDeserializeEqual(String(), 'hAlf', '"hAlf"')
+        assertDeserializeEqual(String(), 'false', '"false"')
+        assertDeserializeEqual(String(), 'single quote', 'single quote')
+        assertDeserializeEqual(String(), None, 'null')
+
+    def test_deserialize_unsupported_types(self):
+        assertDeserializeEqual(String(), '3.4', '3.4')
+        assertDeserializeEqual(String(), 'false', 'false')
+        assertDeserializeEqual(String(), '2', '2')
+        assertDeserializeEqual(String(), '[3]', '[3]')
+        self.assertRaises(TypeError, deserialize_field, None)
+
+
+class AnyTest(unittest.TestCase):
+    """ Tests serialize/deserialize as related to Any type. """
+
+    def test_serialize(self):
+        assertSerializeEqual('{"bar": "hat", "frog": "green"}', {'bar': 'hat', 'frog' : 'green'})
+        assertSerializeEqual('[3.5, 5.6]', [3.5, 5.6])
+        assertSerializeEqual('"hat box"', 'hat box')
+        assertSerializeEqual('null', None)
+
+    def test_deserialize(self):
+        assertDeserializeEqual(Any(), 'hAlf', '"hAlf"')
+        assertDeserializeEqual(Any(), 'false', '"false"')
+        assertDeserializeEqual(Any(), None, 'null')
+        assertDeserializeEqual(Any(), {'bar': 'hat', 'frog' : 'green'}, '{"bar": "hat", "frog": "green"}')
+        assertDeserializeEqual(Any(), [3.5, 5.6], '[3.5, 5.6]')
+        assertDeserializeEqual(Any(), '[', '[')
+        assertDeserializeEqual(Any(), False, 'false')
+        assertDeserializeEqual(Any(), 3.4, '3.4')
+
+    def test_deserialize_unsupported_types(self):
+        self.assertRaises(TypeError, deserialize_field, None)
+
+
+class ListTest(unittest.TestCase):
+    """ Tests serialize/deserialize as related to Any type. """
+
+    def test_serialize(self):
+        assertSerializeEqual('["foo", "bar"]', ['foo', 'bar'])
+        assertSerializeEqual('[3.5, 5.6]', [3.5, 5.6])
+        assertSerializeEqual('null', None)
+
+    def test_deserialize(self):
+        assertDeserializeEqual(List(), ['foo', 'bar'], '["foo", "bar"]')
+        assertDeserializeEqual(List(), [3.5, 5.6], '[3.5, 5.6]')
+        assertDeserializeEqual(List(), [], '[]')
+        assertDeserializeEqual(List(), None, 'null')
+
+    def test_deserialize_unsupported_types(self):
+        assertDeserializeEqual(List(), '3.4', '3.4')
+        assertDeserializeEqual(List(), 'false', 'false')
+        assertDeserializeEqual(List(), '2', '2')
+        self.assertRaises(TypeError, deserialize_field, None)
+
+
+class DateTest(unittest.TestCase):
+    """ Tests serialize/deserialize as related to Date type. """
+
+    def test_serialize(self):
+        assertSerializeEqual('"2012-12-31T23:59:59Z"', "2012-12-31T23:59:59Z")
+
+    def test_deserialize(self):
+        assertDeserializeEqual(Date(), '2012-12-31T23:59:59Z', "2012-12-31T23:59:59Z")
+        assertDeserializeEqual(Date(), '2012-12-31T23:59:59Z', '"2012-12-31T23:59:59Z"')
+
+
+class TimedeltaTest(unittest.TestCase):
+
+    def test_serialize(self):
+        assertSerializeEqual('"1 day 12 hours 59 minutes 59 seconds"',
+            "1 day 12 hours 59 minutes 59 seconds")
+
+    def test_deserialize(self):
+        assertDeserializeEqual(Timedelta(), '1 day 12 hours 59 minutes 59 seconds',
+            '1 day 12 hours 59 minutes 59 seconds')
+        assertDeserializeEqual(Timedelta(), '1 day 12 hours 59 minutes 59 seconds',
+            '"1 day 12 hours 59 minutes 59 seconds"')

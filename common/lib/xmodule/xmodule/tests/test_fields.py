@@ -78,22 +78,6 @@ class DateTest(unittest.TestCase):
                 DateTest.date.from_json("2012-12-31T23:00:01-01:00")),
             "2013-01-01T00:00:01Z")
 
-    def test_serialize(self):
-        self.assertEqual(
-            DateTest.date.serialize("2012-12-31T23:59:59Z"),
-            '"2012-12-31T23:59:59Z"'
-        )
-
-    def test_deserialize(self):
-        self.assertEqual(
-            '2012-12-31T23:59:59Z',
-            DateTest.date.deserialize("2012-12-31T23:59:59Z"),
-        )
-        self.assertEqual(
-            '2012-12-31T23:59:59Z',
-            DateTest.date.deserialize('"2012-12-31T23:59:59Z"'),
-        )
-
 
 class TimedeltaTest(unittest.TestCase):
     delta = Timedelta()
@@ -113,20 +97,4 @@ class TimedeltaTest(unittest.TestCase):
         self.assertEqual(
             '1 days 46799 seconds',
             TimedeltaTest.delta.to_json(datetime.timedelta(days=1, hours=12, minutes=59, seconds=59))
-        )
-
-    def test_serialize(self):
-        self.assertEqual(
-            TimedeltaTest.delta.serialize('1 day 12 hours 59 minutes 59 seconds'),
-            '"1 day 12 hours 59 minutes 59 seconds"'
-        )
-
-    def test_deserialize(self):
-        self.assertEqual(
-            '1 day 12 hours 59 minutes 59 seconds',
-            TimedeltaTest.delta.deserialize('1 day 12 hours 59 minutes 59 seconds')
-        )
-        self.assertEqual(
-            '1 day 12 hours 59 minutes 59 seconds',
-            TimedeltaTest.delta.deserialize('"1 day 12 hours 59 minutes 59 seconds"')
         )
