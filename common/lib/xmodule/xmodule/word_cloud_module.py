@@ -240,7 +240,7 @@ class WordCloudModule(WordCloudFields, XModule):
         return self.content
 
 
-class WordCloudDescriptor(MetadataOnlyEditingDescriptor, RawDescriptor, WordCloudFields):
+class WordCloudDescriptor(WordCloudFields, MetadataOnlyEditingDescriptor, RawDescriptor):
     """Descriptor for WordCloud Xmodule."""
     module_class = WordCloudModule
     template_dir_name = 'word_cloud'
