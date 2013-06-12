@@ -24,7 +24,8 @@ from xmodule.contentstore.content import StaticContent
 from contentstore.course_info_model import (
     get_course_updates, update_course_updates, delete_course_update)
 from contentstore.utils import (
-    get_lms_link_for_item, add_extra_panel_tab, remove_extra_panel_tab)
+    get_lms_link_for_item, add_extra_panel_tab, remove_extra_panel_tab,
+    get_modulestore)
 from models.settings.course_details import (
     CourseDetails, CourseSettingsEncoder)
 
@@ -428,7 +429,7 @@ def textbook_index(request, org, course, name):
     org, course, name: Attributes of the Location for the item to edit
     """
     location = get_location_and_verify_access(request, org, course, name)
-    store = modulestore()
+    store = get_modulestore(location)
     course_module = store.get_item(location, depth=3)
 
     if request.is_ajax():
