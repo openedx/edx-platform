@@ -18,6 +18,7 @@ from xmodule.modulestore.django import modulestore
 
 USER_COUNT = 11
 
+
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestGradebook(ModuleStoreTestCase):
     grading_policy = None
@@ -43,10 +44,7 @@ class TestGradebook(ModuleStoreTestCase):
             metadata={'graded': True, 'format': 'Homework'}
         )
 
-        self.users = [
-            UserFactory.create(username='robot%d' % i, email='robot+test+%d@edx.org' % i)
-            for i in xrange(USER_COUNT)
-        ]
+        self.users = [UserFactory() for _ in xrange(USER_COUNT)]
 
         for user in self.users:
             CourseEnrollmentFactory.create(user=user, course_id=self.course.id)
@@ -74,10 +72,11 @@ class TestGradebook(ModuleStoreTestCase):
     def test_response_code(self):
         self.assertEquals(self.response.status_code, 200)
 
+
 class TestDefaultGradingPolicy(TestGradebook):
     def test_all_users_listed(self):
         for user in self.users:
-            self.assertIn(user.username, self.response.content)
+            self.assertIn(str(user.username), str(self.response.content))
 
     def test_default_policy(self):
         # Default >= 50% passes, so Users 5-10 should be passing for Homework 1 [6]
@@ -93,6 +92,7 @@ class TestDefaultGradingPolicy(TestGradebook):
         # All other grades are None [29 categories * 11 users - 27 non-empty grades = 292]
         # One use at the top of the page [1]
         self.assertEquals(293, self.response.content.count('grade_None'))
+
 
 class TestLetterCutoffPolicy(TestGradebook):
     grading_policy = {
