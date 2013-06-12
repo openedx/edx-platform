@@ -5,7 +5,6 @@ describe 'Video', ->
     loadFixtures 'video.html'
     jasmine.stubRequests()
 
-    @videosDefinition = '0.75:slowerSpeedYoutubeId,1.0:normalSpeedYoutubeId'
     @slowerSpeedYoutubeId = 'slowerSpeedYoutubeId'
     @normalSpeedYoutubeId = 'normalSpeedYoutubeId'
     metadata =
@@ -30,7 +29,7 @@ describe 'Video', ->
       beforeEach ->
         spyOn(window.Video.prototype, 'fetchMetadata').andCallFake ->
           @metadata = metadata
-        @video = new Video '#example', @videosDefinition
+        @video = new Video '#example'
       it 'reset the current video player', ->
         expect(window.player).toBeNull()
 
