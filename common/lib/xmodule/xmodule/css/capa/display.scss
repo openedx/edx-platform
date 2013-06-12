@@ -553,7 +553,8 @@ section.problem {
 
     .save, .check, .show {
       height: ($baseline*2);
-      font-weight: 600;
+      font-weight: 500;
+      vertical-align: middle;
     }
 
     .save {
@@ -564,7 +565,7 @@ section.problem {
 
       .show-label {
         font-size: 1.0em;
-        font-weight: 600;
+        font-weight: 500;
       }
     }
 
