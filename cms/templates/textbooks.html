@@ -250,6 +250,8 @@ CMS.Views.ListTextbooks = Backbone.View.extend({
     },
     addOne: function(e) {
         if(e && e.preventDefault) { e.preventDefault(); }
+        // if the existing edited textbook is empty, don't do anything
+        if(this.collection.editing && this.collection.editing.isEmpty()) { return; }
         var m = new this.collection.model;
         this.collection.add(m);
         this.collection.trigger("editOne", m);
