@@ -733,11 +733,7 @@ body.discussion {
         position: absolute;
         top: 30%;
         left: 30%;
-<<<<<<< HEAD
         color: $gray-l1;
-=======
-        color: $gray;
->>>>>>> basic shell for home page exists, along with start of color cleanup for the rest of _discussion.scss
         font-size: 28px;
         z-index: 100;
         width: 25px;
@@ -1012,11 +1008,7 @@ body.discussion {
     border-bottom: 1px solid $gray-l3;
     @include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
     background-color: $gray-l2;
-<<<<<<< HEAD
     box-shadow: 0 1px 0 $white-t1 inset;
-=======
-    box-shadow: 0 1px 0 rgba(255, 255, 255, .2) inset;
->>>>>>> basic shell for home page exists, along with start of color cleanup for the rest of _discussion.scss
 
     span,
     a {
@@ -1305,10 +1297,6 @@ body.discussion {
     }
 
     .label {
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> addition of font-awesome to LMS sass vendor assets, in additio nto light organization for applicaiton.scss to match studio sass breakdown.
       display: block;
       font-size: 12px;
     }
@@ -1318,14 +1306,6 @@ body.discussion {
       padding-bottom: $baseline/2;
     }
 
-<<<<<<< HEAD
-=======
-      font-size: 12px;
-    }
-
->>>>>>> basic shell for discussion home page with both profile information and email notification settings
-=======
->>>>>>> basic shell for home page exists, along with start of color cleanup for the rest of _discussion.scss
     .home-header {
       margin: 0;
     }
@@ -1341,44 +1321,22 @@ body.discussion {
       margin-bottom: $baseline/2;
     }
     .home-stats {
-<<<<<<< HEAD
-<<<<<<< HEAD
       padding: $baseline 0;
-=======
->>>>>>> basic shell for discussion home page with both profile information and email notification settings
-=======
-      padding: $baseline 0;
->>>>>>> basic shell for home page exists, along with start of color cleanup for the rest of _discussion.scss
       
       .label-area {
         display: inline-block;
         min-width: $baseline*5;
-<<<<<<< HEAD
-<<<<<<< HEAD
         width: 25%;
         vertical-align: middle;
 
         .profile-link {
           font-weight: 700;
-=======
-        width: 20%;
-=======
-        width: 25%;
->>>>>>> addition of font-awesome to LMS sass vendor assets, in additio nto light organization for applicaiton.scss to match studio sass breakdown.
-        vertical-align: middle;
-
-        .profile-link {
-          //something
->>>>>>> basic shell for discussion home page with both profile information and email notification settings
         }
       }
 
       .stats-grouping {
         display: inline-block;
-<<<<<<< HEAD
-<<<<<<< HEAD
         width: 70%;
-<<<<<<< HEAD
         padding-left: $baseline;
 
         .profile-stat {
@@ -1397,35 +1355,6 @@ body.discussion {
           .profile-stat-label{
             vertical-align: middle;
           }
-=======
-=======
-        width: 65%;
->>>>>>> addition of font-awesome to LMS sass vendor assets, in additio nto light organization for applicaiton.scss to match studio sass breakdown.
-=======
-        width: 70%;
-        padding-left: $baseline;
->>>>>>> basic shell for home page exists, along with start of color cleanup for the rest of _discussion.scss
-
-        .profile-stat {
-          display: inline-block;
-          width: 30%;
-          vertical-align: middle;
-<<<<<<< HEAD
->>>>>>> basic shell for discussion home page with both profile information and email notification settings
-=======
-          font-size: 12px;
-
-          .count {
-            display: inline-block;
-            font-size: 28px;
-            padding: 0 $baseline/2;
-            vertical-align: middle;
-          }
-
-          .profile-stat-label{
-            vertical-align: middle;
-          }
->>>>>>> addition of font-awesome to LMS sass vendor assets, in additio nto light organization for applicaiton.scss to match studio sass breakdown.
         }
       }
     }
@@ -1435,7 +1364,6 @@ body.discussion {
       border-radius: 3px;
       border: 1px solid #b2b2b2;
       box-shadow: 0 1px 3px rgba(0, 0, 0, .15);
-<<<<<<< HEAD
     }
   }
 
@@ -1509,87 +1437,7 @@ body.discussion {
     .icon-envelope {color: $gray;}
   }
 
-=======
-    }
-  }
 
-  .helpgrid-list {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-
-
-    .helpgrid-row {
-      border-bottom: 1px solid #b2b2b2;
-
-      .row-title {
-        padding: 30px $baseline;
-        display: inline-block;
-        width: 15%;
-        background-color: $gray-l4;
-        font-size: 12px;
-      }
-
-      .row-item-full, .row-item {
-        display: inline-block;
-        font-size: 12px;
-        padding-left: $baseline/2;
-        width: 23%;
-        vertical-align: middle;
-
-        .icon {
-          padding: 0 $baseline/2;
-          font-size: 24px;
-          display: inline-block;
-          vertical-align: middle;
-        }
-
-        .icon-stack i {
-          padding: 0 $baseline/2;
-        }
-
-        .row-setting {
-          padding-left: $baseline;
-        }
-
-        .row-description {
-          display: inline-block;
-          width: 70%;
-          vertical-align: middle;
-        }
-      }
-
-      .row-item-full {
-        width: 70%;
-
-        .row-description {
-          width: 80%;
-          padding-left: 15px;
-        }
-      }
-    }
-  }
-
-<<<<<<< HEAD
->>>>>>> basic shell for discussion home page with both profile information and email notification settings
-=======
-  .helpgrid-row-navigation {
-    .icon-sort-down {color: $light-gray;}
-    .icon-search {color: $light-gray;}
-    .icon-sort {color: $light-gray;}
-  }
-
-  .helpgrid-row-participation {
-    .icon-plus {color: $green-u2;}
-    .icon-flag {color: $red-u2;}
-    .icon-star {color: $blue;}
-  }
-
-  .helpgrid-row-notification {
-    .icon-sign-blank {color: $green;}
-  }
-
->>>>>>> cleaned up variables styling to sync up closer to studio, incorporated fontawesome icons into discusison home with basic positioning
   .discussion-article {
     position: relative;
     padding: $baseline*2;
