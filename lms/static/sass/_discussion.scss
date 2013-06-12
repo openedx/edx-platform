@@ -1321,7 +1321,7 @@ body.discussion {
         vertical-align: middle;
 
         .profile-link {
-          //something
+          font-weight: 700;
         }
       }
 
@@ -1422,8 +1422,8 @@ body.discussion {
   }
 
   .helpgrid-row-participation {
-    .icon-plus {color: $green-u2;}
-    .icon-flag {color: $red-u2;}
+    .icon-plus {color: $green;}
+    .icon-flag {color: $pink;}
     .icon-star {color: $blue;}
   }
 
