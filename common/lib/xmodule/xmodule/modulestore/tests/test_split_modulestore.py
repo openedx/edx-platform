@@ -15,6 +15,7 @@ from xblock.core import Scope
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.exceptions import InsufficientSpecificationError, ItemNotFoundError, VersionConflictError
 from xmodule.modulestore.locator import CourseLocator, BlockUsageLocator, VersionTree, DescriptionLocator
+from pytz import UTC
 
 class SplitModuleTest(unittest.TestCase):
     '''
@@ -458,7 +459,7 @@ class TestItemCrud(SplitModuleTest):
         # grab link to course to ensure new versioning works
         locator = CourseLocator(course_id="GreekHero", revision='draft')
         premod_course = modulestore().get_course(locator)
-        premod_time = datetime.datetime.utcnow()
+        premod_time = datetime.datetime.now(UTC)
         # add minimal one w/o a parent
         category = 'sequential'
         new_module = modulestore().create_item(locator, category, 'user123',
@@ -475,7 +476,7 @@ class TestItemCrud(SplitModuleTest):
         self.assertEqual(str(history_info['original_version']), self.GUID_D3)
         self.assertEqual(history_info['edited_by'], "user123")
         self.assertGreaterEqual(history_info['edited_on'], premod_time)
-        self.assertLessEqual(history_info['edited_on'], datetime.datetime.utcnow())
+        self.assertLessEqual(history_info['edited_on'], datetime.datetime.now(UTC))
         # check block's info: category, definition_locator, and display_name
         self.assertEqual(new_module.category, 'sequential')
         self.assertIsNotNone(new_module.definition_locator)
@@ -509,7 +510,7 @@ class TestItemCrud(SplitModuleTest):
         """
         locator = BlockUsageLocator(course_id="contender", usage_id="head345679", revision='draft')
         category = 'problem'
-        premod_time = datetime.datetime.utcnow()
+        premod_time = datetime.datetime.now(UTC)
         new_payload = "<problem>empty</problem>"
         new_module = modulestore().create_item(locator, category, 'anotheruser',
             metadata={'display_name': 'problem 1'}, new_def_data=new_payload)
@@ -530,7 +531,7 @@ class TestItemCrud(SplitModuleTest):
         self.assertIsNone(new_history['previous_version'])
         self.assertEqual(new_history['original_version'], new_module.definition_locator.definition_id)
         self.assertEqual(new_history['edited_by'], "anotheruser")
-        self.assertLessEqual(new_history['edited_on'], datetime.datetime.utcnow())
+        self.assertLessEqual(new_history['edited_on'], datetime.datetime.now(UTC))
         self.assertGreaterEqual(new_history['edited_on'], premod_time)
         another_history = modulestore().get_definition_history_info(another_module.definition_locator)
         self.assertEqual(another_history['previous_version'], 'problem12345_3_1')
@@ -546,7 +547,7 @@ class TestItemCrud(SplitModuleTest):
         pre_version_guid = problem.location.version_guid
         self.assertIsNotNone(pre_def_id)
         self.assertIsNotNone(pre_version_guid)
-        premod_time = datetime.datetime.utcnow()
+        premod_time = datetime.datetime.now(UTC)
         self.assertNotEqual(problem.max_attempts, 4, "Invalidates rest of test")
 
         problem.max_attempts = 4
@@ -569,7 +570,7 @@ class TestItemCrud(SplitModuleTest):
         self.assertEqual(str(history_info['original_version']), self.GUID_D3)
         self.assertEqual(history_info['edited_by'], "changeMaven")
         self.assertGreaterEqual(history_info['edited_on'], premod_time)
-        self.assertLessEqual(history_info['edited_on'], datetime.datetime.utcnow())
+        self.assertLessEqual(history_info['edited_on'], datetime.datetime.now(UTC))
 
     def test_update_children(self):
         """
@@ -720,7 +721,7 @@ class TestCourseCreation(SplitModuleTest):
         The simplest case but probing all expected results from it.
         """
         # Oddly getting differences of 200nsec
-        pre_time = datetime.datetime.utcnow() - datetime.timedelta(milliseconds=1)
+        pre_time = datetime.datetime.now(UTC) - datetime.timedelta(milliseconds=1)
         new_course = modulestore().create_course('test_org', 'test_course', 'create_user')
         new_locator = new_course.location
         # check index entry
@@ -728,14 +729,14 @@ class TestCourseCreation(SplitModuleTest):
         self.assertEqual(index_info['org'], 'test_org')
         self.assertEqual(index_info['prettyid'], 'test_course')
         self.assertGreaterEqual(index_info["edited_on"], pre_time)
-        self.assertLessEqual(index_info["edited_on"], datetime.datetime.utcnow())
+        self.assertLessEqual(index_info["edited_on"], datetime.datetime.now(UTC))
         self.assertEqual(index_info['edited_by'], 'create_user')
         # check structure info
         structure_info = modulestore().get_course_history_info(new_locator)
         self.assertEqual(structure_info['original_version'], index_info['versions']['draft'])
         self.assertIsNone(structure_info['previous_version'])
         self.assertGreaterEqual(structure_info["edited_on"], pre_time)
-        self.assertLessEqual(structure_info["edited_on"], datetime.datetime.utcnow())
+        self.assertLessEqual(structure_info["edited_on"], datetime.datetime.now(UTC))
         self.assertEqual(structure_info['edited_by'], 'create_user')
         # check the returned course object
         self.assertIsInstance(new_course, CourseDescriptor)
@@ -751,7 +752,7 @@ class TestCourseCreation(SplitModuleTest):
         """
         Test making a course which points to an existing draft and published but not making any changes to either.
         """
-        pre_time = datetime.datetime.utcnow()
+        pre_time = datetime.datetime.now(UTC)
         original_locator = CourseLocator(course_id="wonderful", revision='draft')
         original_index = modulestore().get_course_index_info(original_locator)
         new_draft = modulestore().create_course(
@@ -766,7 +767,7 @@ class TestCourseCreation(SplitModuleTest):
         # however the edited_by and other meta fields on course_index will be this one
         new_index = modulestore().get_course_index_info(new_draft_locator)
         self.assertGreaterEqual(new_index["edited_on"], pre_time)
-        self.assertLessEqual(new_index["edited_on"], datetime.datetime.utcnow())
+        self.assertLessEqual(new_index["edited_on"], datetime.datetime.now(UTC))
         self.assertEqual(new_index['edited_by'], 'leech_master')
 
         new_published_locator = CourseLocator(course_id=new_draft_locator.course_id, revision='published')
@@ -789,7 +790,7 @@ class TestCourseCreation(SplitModuleTest):
         self.assertNotEqual(new_draft.location.version_guid, original_index['versions']['draft'])
         structure_info = modulestore().get_course_history_info(new_draft_locator)
         self.assertGreaterEqual(structure_info["edited_on"], pre_time)
-        self.assertLessEqual(structure_info["edited_on"], datetime.datetime.utcnow())
+        self.assertLessEqual(structure_info["edited_on"], datetime.datetime.now(UTC))
         self.assertEqual(structure_info['edited_by'], 'leech_master')
 
         original_course = modulestore().get_course(original_locator)
@@ -801,7 +802,7 @@ class TestCourseCreation(SplitModuleTest):
         """
         Create a new course which overrides metadata and course_data
         """
-        pre_time = datetime.datetime.utcnow()
+        pre_time = datetime.datetime.now(UTC)
         original_locator = CourseLocator(course_id="contender", revision='draft')
         original = modulestore().get_course(original_locator)
         original_index = modulestore().get_course_index_info(original_locator)
@@ -826,7 +827,7 @@ class TestCourseCreation(SplitModuleTest):
         # however the edited_by and other meta fields on course_index will be this one
         new_index = modulestore().get_course_index_info(new_draft_locator)
         self.assertGreaterEqual(new_index["edited_on"], pre_time)
-        self.assertLessEqual(new_index["edited_on"], datetime.datetime.utcnow())
+        self.assertLessEqual(new_index["edited_on"], datetime.datetime.now(UTC))
         self.assertEqual(new_index['edited_by'], 'leech_master')
         self.assertEqual(new_draft.display_name, metadata_payload['display_name'])
         self.assertDictEqual(new_draft.grading_policy['GRADE_CUTOFFS'],
@@ -849,7 +850,7 @@ class TestCourseCreation(SplitModuleTest):
         self.assertRaises(ValueError, modulestore().update_course_index, locator, {'_id': 'funkygreeks'})
 
         self.assertRaises(ValueError, modulestore().update_course_index, locator,
-            {'edited_on': datetime.datetime.utcnow()})
+            {'edited_on': datetime.datetime.now(UTC)})
         self.assertRaises(ValueError, modulestore().update_course_index, locator,
             {'edited_by': 'sneak'})
 
