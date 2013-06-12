@@ -55,6 +55,7 @@ setup(
             "word_cloud = xmodule.word_cloud_module:WordCloudDescriptor",
             "hidden = xmodule.hidden_module:HiddenDescriptor",
             "raw = xmodule.raw_module:RawDescriptor",
+            "crowdsource_hinter = xmodule.crowdsource_hinter:CrowdsourceHinterDescriptor",
         ],
         'console_scripts': [
             'xmodule_assets = xmodule.static_content:main',
