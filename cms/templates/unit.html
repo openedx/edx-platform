@@ -58,7 +58,7 @@
                   % if type == 'advanced' or len(templates) > 1:
                     <a href="#" class="multiple-templates" data-type="${type}">
                   % else:
-                    % for _, category, _, _, _ in templates:
+                    % for _, category, _, _ in templates:
                     <a href="#" class="single-template" data-type="${type}" data-category="${category}">
                     % endfor
                   % endif
@@ -85,11 +85,11 @@
                     % endif
                     <div class="tab current" id="tab1">
                       <ul class="new-component-template">
-                          % for name, category, has_markdown, is_empty, boilerplate_name in templates:
+                          % for name, category, has_markdown, boilerplate_name in templates:
                             % if has_markdown or type != "problem":
-                                % if is_empty:
+                                % if boilerplate_name is None:
                                   <li class="editor-md empty">
-                                    <a href="#" data-category="${category}">
+                                    <a href="#" data-category="${category}" data-display_name="New ${type}">
                                       <span class="name">${name}</span>
                                     </a>
                                   </li>
@@ -110,12 +110,7 @@
                     % if type == "problem":
                         <div class="tab" id="tab2">
                           <ul class="new-component-template">
-                              <li class="editor-manual empty">
-                                <a href="#" data-category="problem" data-metadata="{markdown: null}">
-                                  <span class="name">Blank</span>
-                                </a>
-                              </li>
-                              % for name, category, has_markdown, is_empty, boilerplate_name in templates:
+                              % for name, category, has_markdown, boilerplate_name in templates:
                                 % if not has_markdown:
                                   <li class="editor-manual">
                                     <a href="#" data-category="${category}" 

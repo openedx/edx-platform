@@ -17,7 +17,7 @@ def i_created_blank_common_problem(step):
     world.create_component_instance(
         step,
         '.large-problem-icon',
-        'i4x://edx/templates/problem/Blank_Common_Problem',
+        'problem',
         '.xmodule_CapaModule'
     )
 
@@ -31,11 +31,12 @@ def i_edit_and_select_settings(step):
 def i_see_five_settings_with_values(step):
     world.verify_all_setting_entries(
         [
-            [DISPLAY_NAME, "Blank Common Problem", True],
+            [DISPLAY_NAME, "New problem", True],
             [MAXIMUM_ATTEMPTS, "", False],
             [PROBLEM_WEIGHT, "", False],
-            [RANDOMIZATION, "Never", True],
-            [SHOW_ANSWER, "Finished", True]
+            # Not sure why these are True other than via inspection
+            [RANDOMIZATION, "Always", True],
+            [SHOW_ANSWER, "Closed", True]
         ])
 
 
@@ -154,7 +155,7 @@ def create_latex_problem(step):
     # Go to advanced tab (waiting for the tab to be visible)
     world.css_find('#ui-id-2')
     world.css_click('#ui-id-2')
-    world.click_component_from_menu("i4x://edx/templates/problem/Problem_Written_in_LaTeX", '.xmodule_CapaModule')
+    world.click_component_from_menu("problem", "latex_problem.yaml", '.xmodule_CapaModule')
 
 
 def verify_high_level_source(step, visible):
@@ -180,7 +181,7 @@ def verify_modified_display_name_with_special_chars():
 
 
 def verify_unset_display_name():
-    world.verify_setting_entry(world.get_setting_entry(DISPLAY_NAME), DISPLAY_NAME, '', False)
+    world.verify_setting_entry(world.get_setting_entry(DISPLAY_NAME), DISPLAY_NAME, 'New', False)
 
 
 def set_weight(weight):

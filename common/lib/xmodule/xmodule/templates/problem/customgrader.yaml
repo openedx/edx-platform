@@ -3,6 +3,7 @@ metadata:
     display_name: Custom Python-Evaluated Input
     rerandomize: never
     showanswer: finished
+    markdown: !!null
 data: |
       <problem>
       <p>

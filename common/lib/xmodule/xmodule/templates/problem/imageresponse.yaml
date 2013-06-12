@@ -3,6 +3,7 @@ metadata:
     display_name: Image Mapped Input
     rerandomize: never
     showanswer: finished
+    markdown: !!null
 data: |
   <problem>
   <p>

@@ -41,7 +41,7 @@ __all__ = ['OPEN_ENDED_COMPONENT_TYPES',
 log = logging.getLogger(__name__)
 
 # NOTE: edit_unit assumes this list is disjoint from ADVANCED_COMPONENT_TYPES
-COMPONENT_TYPES = ['customtag', 'discussion', 'html', 'problem', 'video']
+COMPONENT_TYPES = ['discussion', 'html', 'problem', 'video']
 
 OPEN_ENDED_COMPONENT_TYPES = ["combinedopenended", "peergrading"]
 NOTE_COMPONENT_TYPES = ['notes']
@@ -146,7 +146,6 @@ def edit_unit(request, location):
             component_class.display_name.default or 'Blank',
             category,
             has_markdown,
-            True,
             None  # no boilerplate for overrides
         ))
         # add boilerplates
@@ -155,7 +154,6 @@ def edit_unit(request, location):
                 template['metadata'].get('display_name'),
                 category,
                 template['metadata'].get('markdown') is not None,
-                False,
                 template.get('template_id')
             ))
 
@@ -177,7 +175,6 @@ def edit_unit(request, location):
                         component_class.display_name.default or category,
                         category,
                         hasattr(component_class, 'markdown') and component_class.markdown is not None,
-                        False,
                         None  # don't override default data
                         ))
                 except PluginMissingError:

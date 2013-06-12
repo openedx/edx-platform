@@ -113,7 +113,6 @@ class CapaFields(object):
         values={"min": 0, "step": .1},
         scope=Scope.settings
     )
-    # markdown is tricky but unit.html has hardcoding for adding the blank advanced version; so, the default is ""
     markdown = String(help="Markdown source of this module", default="", scope=Scope.settings)
     source_code = String(help="Source code for LaTeX and Word problems. This feature is not well-supported.",
         scope=Scope.settings)
