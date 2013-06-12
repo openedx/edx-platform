@@ -733,13 +733,17 @@ body.discussion {
         position: absolute;
         top: 30%;
         left: 30%;
+<<<<<<< HEAD
         color: $gray-l1;
+=======
+        color: $gray;
+>>>>>>> basic shell for home page exists, along with start of color cleanup for the rest of _discussion.scss
         font-size: 28px;
         z-index: 100;
         width: 25px;
         height: 25px;
         opacity: 1;
-        @include transition(none);
+        @include transition(all .2s ease-out);
       }
     }
 
@@ -1008,7 +1012,11 @@ body.discussion {
     border-bottom: 1px solid $gray-l3;
     @include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
     background-color: $gray-l2;
+<<<<<<< HEAD
     box-shadow: 0 1px 0 $white-t1 inset;
+=======
+    box-shadow: 0 1px 0 rgba(255, 255, 255, .2) inset;
+>>>>>>> basic shell for home page exists, along with start of color cleanup for the rest of _discussion.scss
 
     span,
     a {
@@ -1294,7 +1302,6 @@ body.discussion {
 
     section {
       border-bottom: 1px solid #ccc;
-      margin: $baseline $baseline $baseline 0;
     }
 
     .label {
@@ -1311,11 +1318,14 @@ body.discussion {
       padding-bottom: $baseline/2;
     }
 
+<<<<<<< HEAD
 =======
       font-size: 12px;
     }
 
 >>>>>>> basic shell for discussion home page with both profile information and email notification settings
+=======
+>>>>>>> basic shell for home page exists, along with start of color cleanup for the rest of _discussion.scss
     .home-header {
       margin: 0;
     }
@@ -1332,9 +1342,13 @@ body.discussion {
     }
     .home-stats {
 <<<<<<< HEAD
+<<<<<<< HEAD
       padding: $baseline 0;
 =======
 >>>>>>> basic shell for discussion home page with both profile information and email notification settings
+=======
+      padding: $baseline 0;
+>>>>>>> basic shell for home page exists, along with start of color cleanup for the rest of _discussion.scss
       
       .label-area {
         display: inline-block;
@@ -1362,6 +1376,7 @@ body.discussion {
       .stats-grouping {
         display: inline-block;
 <<<<<<< HEAD
+<<<<<<< HEAD
         width: 70%;
 <<<<<<< HEAD
         padding-left: $baseline;
@@ -1386,6 +1401,10 @@ body.discussion {
 =======
         width: 65%;
 >>>>>>> addition of font-awesome to LMS sass vendor assets, in additio nto light organization for applicaiton.scss to match studio sass breakdown.
+=======
+        width: 70%;
+        padding-left: $baseline;
+>>>>>>> basic shell for home page exists, along with start of color cleanup for the rest of _discussion.scss
 
         .profile-stat {
           display: inline-block;
@@ -1400,6 +1419,11 @@ body.discussion {
             display: inline-block;
             font-size: 28px;
             padding: 0 $baseline/2;
+            vertical-align: middle;
+          }
+
+          .profile-stat-label{
+            vertical-align: middle;
           }
 >>>>>>> addition of font-awesome to LMS sass vendor assets, in additio nto light organization for applicaiton.scss to match studio sass breakdown.
         }
@@ -1499,17 +1523,18 @@ body.discussion {
       border-bottom: 1px solid #b2b2b2;
 
       .row-title {
-        padding: $baseline;
+        padding: 30px $baseline;
         display: inline-block;
         width: 15%;
-        background-color: $light-gray;
+        background-color: $gray-l4;
         font-size: 12px;
       }
 
       .row-item-full, .row-item {
         display: inline-block;
         font-size: 12px;
-        width: 25%;
+        padding-left: $baseline/2;
+        width: 23%;
         vertical-align: middle;
 
         .icon {
@@ -1517,6 +1542,14 @@ body.discussion {
           font-size: 24px;
           display: inline-block;
           vertical-align: middle;
+        }
+
+        .icon-stack i {
+          padding: 0 $baseline/2;
+        }
+
+        .row-setting {
+          padding-left: $baseline;
         }
 
         .row-description {
@@ -1530,7 +1563,8 @@ body.discussion {
         width: 70%;
 
         .row-description {
-          width: 90%;
+          width: 80%;
+          padding-left: 15px;
         }
       }
     }
