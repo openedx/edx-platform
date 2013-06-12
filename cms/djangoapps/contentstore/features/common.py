@@ -113,7 +113,7 @@ def create_a_course():
 
     # Add the user to the instructor group of the course
     # so they will have the permissions to see it in studio
-    g = world.GroupFactory.create(name='instructor_MITx/%s/%s' % (COURSE_NUM, COURSE_NAME.replace(" ", "_"),))
+    g = world.GroupFactory.create(name='instructor_MITx/{course_num}/{course_name}'.format(course_num=COURSE_NUM, course_name=COURSE_NAME.replace(" ", "_")))
     u = get_user_by_email('robot+studio@edx.org')
     u.groups.add(g)
     u.save()

@@ -35,7 +35,7 @@ def add_other_user(step, name):
 
 @step(u'I delete "([^"]*)" from the course team')
 def delete_other_user(step, name):
-    to_delete_css = '.remove-user[data-id="{name}{extension}"]'.format(name=name, extension=EMAIL_EXTENSION,)
+    to_delete_css = '.remove-user[data-id="{name}{extension}"]'.format(name=name, extension=EMAIL_EXTENSION)
     world.css_click(to_delete_css)
 
 
