@@ -77,14 +77,15 @@ class BaseTestXmodule(ModuleStoreTestCase):
             data=self.DATA
         )
 
-        location = self.item_descriptor.location
         system = test_system()
         system.render_template = lambda template, context: context
+        model_data = {'location': self.item_descriptor.location}
+        model_data.update(self.MODEL_DATA)
 
         self.item_module = self.item_descriptor.module_class(
-            system, location, self.item_descriptor, self.MODEL_DATA
+            system, self.item_descriptor, model_data
         )
-        self.item_url = Location(location).url()
+        self.item_url = Location(self.item_module.location).url()
 
         # login all users for acces to Xmodule
         self.clients = {user.username: Client() for user in self.users}

@@ -94,11 +94,11 @@ class ErrorDescriptor(ErrorFields, JSONEditingDescriptor):
         model_data = {
             'error_msg': str(error_msg),
             'contents': contents,
-            'display_name': 'Error: ' + location.name
+            'display_name': 'Error: ' + location.name,
+            'location': location,
         }
         return cls(
             system,
-            location,
             model_data,
         )
 
