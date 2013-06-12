@@ -22,7 +22,7 @@ modulestore_options = {
     'db': 'xmodule',
     'collection': 'modulestore',
     'fs_root': GITHUB_REPO_ROOT,
-    'render_template': 'mitxmako.shortcuts.render_to_string',
+    'render_template': 'mitxmako.shortcuts.render_to_string'
 }
 
 MODULESTORE = {
@@ -64,7 +64,7 @@ REPOS = {
     },
     'content-mit-6002x': {
         'branch': 'master',
-        #'origin': 'git@github.com:MITx/6002x-fall-2012.git',
+        # 'origin': 'git@github.com:MITx/6002x-fall-2012.git',
         'origin': 'git@github.com:MITx/content-mit-6002x.git',
     },
     '6.00x': {

@@ -1,13 +1,17 @@
 """Test safe_exec.py"""
 
 import hashlib
+import os
 import os.path
 import random
 import textwrap
 import unittest
 
+from nose.plugins.skip import SkipTest
+
 from capa.safe_exec import safe_exec, update_hash
 from codejail.safe_exec import SafeExecException
+from codejail.jail_code import is_configured
 
 
 class TestSafeExec(unittest.TestCase):
@@ -66,6 +70,24 @@ class TestSafeExec(unittest.TestCase):
         with self.assertRaises(SafeExecException) as cm:
             safe_exec("1/0", g)
         self.assertIn("ZeroDivisionError", cm.exception.message)
+
+
+class TestSafeOrNot(unittest.TestCase):
+    def test_cant_do_something_forbidden(self):
+        # Can't test for forbiddenness if CodeJail isn't configured for python.
+        if not is_configured("python"):
+            raise SkipTest
+
+        g = {}
+        with self.assertRaises(SafeExecException) as cm:
+            safe_exec("import os; files = os.listdir('/')", g)
+        self.assertIn("OSError", cm.exception.message)
+        self.assertIn("Permission denied", cm.exception.message)
+
+    def test_can_do_something_forbidden_if_run_unsafely(self):
+        g = {}
+        safe_exec("import os; files = os.listdir('/')", g, unsafely=True)
+        self.assertEqual(g['files'], os.listdir('/'))
 
 
 class DictCache(object):

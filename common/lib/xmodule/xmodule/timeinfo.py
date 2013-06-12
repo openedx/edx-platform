@@ -1,5 +1,4 @@
 from .timeparse import parse_timedelta
-from xmodule.util.date_utils import time_to_datetime
 
 import logging
 log = logging.getLogger(__name__)
@@ -17,7 +16,7 @@ class TimeInfo(object):
     """
     def __init__(self, due_date, grace_period_string):
         if due_date is not None:
-            self.display_due_date = time_to_datetime(due_date)
+            self.display_due_date = due_date
 
         else:
             self.display_due_date = None
