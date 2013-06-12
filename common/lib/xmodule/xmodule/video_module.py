@@ -6,6 +6,8 @@ import logging
 
 from lxml import etree
 from pkg_resources import resource_string, resource_listdir
+import datetime
+import time
 
 from django.http import Http404
 
@@ -137,10 +139,10 @@ class VideoDescriptor(VideoFields,
         tag = _get_first_external(xml, 'tag')
         if tag:
             video.tag = tag
-        start_time = xml.get('from')
+        start_time = _parse_time(xml.get('from'))
         if start_time:
             video.start_time = start_time
-        end_time = xml.get('to')
+        end_time = _parse_time(xml.get('to'))
         if end_time:
             video.end_time = end_time
         return video
@@ -177,3 +179,17 @@ def _parse_youtube(data):
         # properly.
         ret['%.2f' % float(pieces[0])] = pieces[1]
     return ret
+
+
+def _parse_time(str_time):
+    """Converts s in '12:34:45' format to seconds. If s is
+    None, returns empty string"""
+    if str_time is None:
+        return ''
+    else:
+        obj_time = time.strptime(str_time, '%H:%M:%S')
+        return datetime.timedelta(
+            hours=obj_time.tm_hour,
+            minutes=obj_time.tm_min,
+            seconds=obj_time.tm_sec
+        ).total_seconds()

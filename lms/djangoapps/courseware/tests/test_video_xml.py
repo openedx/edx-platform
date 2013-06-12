@@ -18,7 +18,7 @@ import unittest
 from mock import Mock
 from lxml import etree
 
-from xmodule.video_module import VideoDescriptor, VideoModule
+from xmodule.video_module import VideoDescriptor, VideoModule, _parse_time, _parse_youtube
 from xmodule.modulestore import Location
 from xmodule.tests import test_system
 from xmodule.tests.test_logic import LogicTest
@@ -67,30 +67,31 @@ class VideoModuleLogicTest(LogicTest):
         'data': '<video />'
     }
 
-    def test_get_timeframe_no_parameters(self):
-        """Make sure that timeframe() works correctly w/o parameters"""
-        xmltree = etree.fromstring('<video>test</video>')
-        output = self.xmodule.get_timeframe(xmltree)
-        self.assertEqual(output, ('', ''))
+    def test_parse_time(self):
+        """Ensure that times are parse correctly into seconds."""
+        output = _parse_time('00:04:07')
+        self.assertEqual(output, 247)
 
-    def test_get_timeframe_with_one_parameter(self):
-        """Make sure that timeframe() works correctly with one parameter"""
-        xmltree = etree.fromstring(
-            '<video from="00:04:07">test</video>'
-        )
-        output = self.xmodule.get_timeframe(xmltree)
-        self.assertEqual(output, (247, ''))
+    def test_parse_youtube(self):
+        """Test parsing old-style Youtube ID strings into a dict."""
+        youtube_str = '0.75:jNCf2gIqpeE,1.0:ZwkTiUPN0mg,1.25:rsq9auxASqI,1.50:kMyNdzVHHgg'
+        output = _parse_youtube(youtube_str)
+        self.assertEqual(output, {'0.75': 'jNCf2gIqpeE',
+                                  '1.00': 'ZwkTiUPN0mg',
+                                  '1.25': 'rsq9auxASqI',
+                                  '1.50': 'kMyNdzVHHgg'})
 
-    def test_get_timeframe_with_two_parameters(self):
-        """Make sure that timeframe() works correctly with two parameters"""
-        xmltree = etree.fromstring(
-            '''<video
-                    from="00:04:07"
-                    to="13:04:39"
-                >test</video>'''
-        )
-        output = self.xmodule.get_timeframe(xmltree)
-        self.assertEqual(output, (247, 47079))
+    def test_parse_youtube_one_video(self):
+        """
+        Ensure that all keys are present and missing speeds map to the
+        empty string.
+        """
+        youtube_str = '0.75:jNCf2gIqpeE'
+        output = _parse_youtube(youtube_str)
+        self.assertEqual(output, {'0.75': 'jNCf2gIqpeE',
+                                  '1.00': '',
+                                  '1.25': '',
+                                  '1.50': ''})
 
 
 class VideoModuleUnitTest(unittest.TestCase):
