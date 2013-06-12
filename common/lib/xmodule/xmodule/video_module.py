@@ -21,15 +21,15 @@ log = logging.getLogger(__name__)
 class VideoFields(object):
     """Fields for `VideoModule` and `VideoDescriptor`."""
     position = Integer(help="Current position in the video", scope=Scope.user_state, default=0)
-    show_captions = StringyBoolean(help="Whether or not captions are shown", display_name="Show Captions", scope=Scope.settings, default=True)
-    youtube_id_1_0 = String(help="Youtube ID for normal speed video", display_name="Normal Speed", scope=Scope.settings, default="")
-    youtube_id_0_75 = String(help="Youtube ID for .75x speed video", display_name=".75x", scope=Scope.settings, default="")
-    youtube_id_1_25 = String(help="Youtube ID for 1.25x speed video", display_name="1.25x", scope=Scope.settings, default="")
-    youtube_id_1_5 = String(help="Youtube ID for 1.5x speed video", display_name="1.5x", scope=Scope.settings, default="")
+    show_captions = StringyBoolean(help="This controls whether or not captions are shown by default.", display_name="Show Captions", scope=Scope.settings, default=True)
+    youtube_id_1_0 = String(help="This is the Youtube ID reference for the normal speed video.", display_name="Default Speed", scope=Scope.settings, default="")
+    youtube_id_0_75 = String(help="The Youtube ID for the .75x speed video.", display_name="Speed: .75x", scope=Scope.settings, default="")
+    youtube_id_1_25 = String(help="The Youtube ID for the 1.25x speed video.", display_name="Speed: 1.25x", scope=Scope.settings, default="")
+    youtube_id_1_5 = String(help="The Youtube ID for the 1.5x speed video.", display_name="Speed: 1.5x", scope=Scope.settings, default="")
     start_time = StringyFloat(help="Time the video starts", display_name="Start Time", scope=Scope.settings, default=0.0)
     end_time = StringyFloat(help="Time the video ends", display_name="End Time", scope=Scope.settings, default=0.0)
-    source = String(help="Source to download video", display_name="Source", scope=Scope.settings, default="")
-    track = String(help="Source to download subtitle track", display_name="Track", scope=Scope.settings, default="")
+    source = String(help="The external URL to download the video. This appears as a link beneath the video.", display_name="Download Video", scope=Scope.settings, default="")
+    track = String(help="The external URL to download the subtitle track. This appears as a link beneath the video.", display_name="Download Track", scope=Scope.settings, default="")
 
 
 class VideoModule(VideoFields, XModule):
