@@ -75,7 +75,7 @@ CMS.Views.TextbookShow = Backbone.View.extend({
     tagName: "li",
     events: {
         "click .edit": "editTextbook",
-        "click .delete": "delete",
+        "click .delete": "confirmDelete",
         "click .show-chapters": "showChapters",
         "click .hide-chapters": "hideChapters"
     },
@@ -87,24 +87,44 @@ CMS.Views.TextbookShow = Backbone.View.extend({
         if(e && e.preventDefault) { e.preventDefault(); }
         this.model.collection.trigger("editOne", this.model);
     },
-    delete: function(e) {
+    confirmDelete: function(e) {
         if(e && e.preventDefault) { e.preventDefault(); }
-        var collection = this.model.collection;
-        collection.remove(this.model);
-        msg = new CMS.Models.SystemFeedback({
-            intent: "saving",
-            title: gettext("Deleting&hellip;")
-        });
-        notif = new CMS.Views.Notification({
-            model: msg,
-            closeIcon: false,
-            minShown: 1250
-        });
-        collection.save({
-            complete: function() {
-                notif.hide();
+        var textbook = this.model, collection = this.model.collection;
+        var msg = new CMS.Models.WarningMessage({
+            title: _.str.sprintf(gettext("Delete “%s”?"),
+                textbook.escape('name')),
+            message: gettext("Deleting a textbook cannot be undone and once deleted any reference to it in your courseware's navigation will also be removed."),
+            actions: {
+                primary: {
+                    text: gettext("Delete"),
+                    click: function(view) {
+                        view.hide();
+                        collection.remove(textbook);
+                        var delmsg = new CMS.Models.SystemFeedback({
+                            intent: "saving",
+                            title: gettext("Deleting&hellip;")
+                        });
+                        var notif = new CMS.Views.Notification({
+                            model: delmsg,
+                            closeIcon: false,
+                            minShown: 1250
+                        });
+                        collection.save({
+                            complete: function() {
+                                notif.hide();
+                            }
+                        });
+                    }
+                },
+                secondary: [{
+                    text: gettext("Cancel"),
+                    click: function(view) {
+                        view.hide();
+                    }
+                }]
             }
         });
+        var prompt = new CMS.Views.Prompt({model: msg});
     },
     showChapters: function(e) {
         if(e && e.preventDefault) { e.preventDefault(); }
