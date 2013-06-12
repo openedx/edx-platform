@@ -1,5 +1,6 @@
 import requests
 import json
+import os
 
 
 class ElasticDatabase:
@@ -78,6 +79,22 @@ class ElasticDatabase:
         else:
             print "Got an unexpected reponse code: " + str(status)
             raise
+
+    def index_directory_transcripts(self, directory, index, type_):
+        """Indexes all transcripts that are present in a given directory
+
+        Will recursively go through the directory and assume all .srt.sjson files are transcript"""
+        srt_check = lambda name: name[-10:] == ".srt.sjson"
+        # Needs to be lazily evaluated
+        transcripts = (name for name in os.walk(directory) if srt_check(name))
+
+    def index_transcript(self, transcript_file, index, type_):
+        file_uuid = transcript_file[transcript_file.find("/"):-10]
+        with open(transcript_file, 'rb') as transcript:
+            try:
+                string = " ".join(json.loads(transcript)["text"])
+            except:
+                return "INVALID JSON"
 
     def setup_index(self, index):
         """Creates a new elasticsearch index, returns the response it gets"""
