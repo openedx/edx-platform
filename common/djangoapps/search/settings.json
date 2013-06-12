@@ -1,6 +1,7 @@
 {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 	"mappings": {
 		"properties": {
 			"searchable_text": {
@@ -154,33 +155,47 @@
 =======
 	"transcript": {
 	    "analyzer": {
+=======
+	"mappings": {
+		"transcript": {
+			"properties": {
+				"searchable_text": {
+					"type": "string",
+					"store": "yes",
+					"index": "analyzed",
+					"term_vector": "with_positions_offsets",
+					"analyzer": "transcript_analyzer",
+					"similarity": "BM25"
+				},
+>>>>>>> Moved past difficulty in file integration and adding configurability to elasticsearch analyzers
 
-	        "transcript_analyzer": {
-	            "type": "custom",
-	            "tokenizer": "standard",
-	            "filter": ["protected", "asciifolding", "custom_word_delimiter", "lowercase", "custom_stemmer", "shingle"],
-	            "char_filter": ["custom_mapping"]
-	        }
-	    },
+				"location": {
+					"type": "string",
+					"store": "yes"
+				}
+			}
+		}
+	},
 
-	    "filter" : {
+	"settings": {
+		"analysis":{
+		    "analyzer": {
 
-	        "custom_word_delimiter":{
-	            "type": "word_delimiter",
-	            "preserve_original": "true"
-	        },
+		        "transcript_analyzer": {
+		            "type": "custom",
+		            "tokenizer": "standard",
+		            "filter": ["asciifolding", "custom_word_delimiter", "lowercase", "custom_stemmer", "shingle"]
+		        }
+		    },
 
-	        "custom_stemmer": {
-	            "type": "stemmer",
-	            "name": "english"
-	        }, 
+		    "filter" : {
 
-	        "protected": {
-	            "type": "keyword_marker",
-	            "keywords_path": "protectedWords.txt"
-	        }
-	    },
+		        "custom_word_delimiter":{
+		            "type": "word_delimiter",
+		            "preserve_original": "true"
+		        },
 
+<<<<<<< HEAD
 	    "char_filter": {
 	        "custom_mapping": {
 	            "type": "mapping",
@@ -188,5 +203,13 @@
 	        }
 	    }
 >>>>>>> Added sentence tokenizing for manual gensim lda
+=======
+		        "custom_stemmer": {
+		            "type": "stemmer",
+		            "name": "english"
+		        }
+		    }
+		}
+>>>>>>> Moved past difficulty in file integration and adding configurability to elasticsearch analyzers
 	}
 }
