@@ -78,7 +78,7 @@ namespace :assets do
     end
 
     {:xmodule => [:install_python_prereqs],
-     :coffee => [:install_node_prereqs],
+     :coffee => [:install_node_prereqs, :'assets:coffee:clobber'],
      :sass => [:install_ruby_prereqs, :preprocess]}.each_pair do |asset_type, prereq_tasks|
         desc "Compile all #{asset_type} assets"
         task asset_type => prereq_tasks do
@@ -127,6 +127,11 @@ namespace :assets do
     multitask :coffee => 'assets:xmodule'
     namespace :coffee do
         multitask :debug => 'assets:xmodule:debug'
+
+        desc "Remove compiled coffeescript files"
+        task :clobber do
+            FileList['*/static/coffee/**/*.js'].each {|f| File.delete(f)}
+        end
     end
 
     namespace :xmodule do
