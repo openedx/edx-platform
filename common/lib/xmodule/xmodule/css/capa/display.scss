@@ -551,16 +551,16 @@ section.problem {
   section.action {
     margin-top: 20px;
 
-    input.save {
+    .save, .check, .show {
+      height: ($baseline*2);
+      font-weight: 600;
+    }
+
+    .save {
       @extend .blue-button;
     }
 
-    .check {
-      height: ($baseline*2);
-    }
-
     .show {
-      height: ($baseline*2);
 
       .show-label {
         font-size: 1.0em;
