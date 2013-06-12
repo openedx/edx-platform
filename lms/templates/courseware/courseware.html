@@ -123,8 +123,8 @@
   <script type="text/javascript">
     // initialize the Candy.js plugin
     $(document).ready(function() {
-      Candy.init("http://${chat['domain']}:5280/http-bind/", {
-        core: { debug: true, autojoin: ["${chat['room']}@conference.${chat['domain']}"] },
+      Candy.init("${chat['bosh_url']}", {
+        core: { debug: true, autojoin: ["${chat['course_room']}"] },
         view: { resources: "${static.url('candy_res/')}"}
       });
       Candy.Core.connect("${chat['username']}", "${chat['password']}");
