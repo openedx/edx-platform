@@ -75,7 +75,7 @@ CMS.Views.TextbookShow = Backbone.View.extend({
     tagName: "li",
     events: {
         "click .edit": "editTextbook",
-        "click .delete": "removeSelf",
+        "click .delete": "delete",
         "click .show-chapters": "showChapters",
         "click .hide-chapters": "hideChapters"
     },
@@ -87,9 +87,24 @@ CMS.Views.TextbookShow = Backbone.View.extend({
         if(e && e.preventDefault) { e.preventDefault(); }
         this.model.collection.trigger("editOne", this.model);
     },
-    removeSelf: function(e) {
+    delete: function(e) {
         if(e && e.preventDefault) { e.preventDefault(); }
-        this.model.collection.remove(this.model);
+        var collection = this.model.collection;
+        collection.remove(this.model);
+        msg = new CMS.Models.SystemFeedback({
+            intent: "saving",
+            title: gettext("Deleting&hellip;")
+        });
+        notif = new CMS.Views.Notification({
+            model: msg,
+            closeIcon: false,
+            minShown: 1250
+        });
+        collection.save({
+            complete: function() {
+                notif.hide();
+            }
+        });
     },
     showChapters: function(e) {
         if(e && e.preventDefault) { e.preventDefault(); }
