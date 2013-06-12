@@ -75,7 +75,7 @@ class VideoModule(VideoFields, XModule):
             'track': self.track,
             'display_name': self.display_name_with_default,
             'caption_asset_path': "/static/subs/",
-            'show_captions': self.show_captions,
+            'show_captions': 'true' if self.show_captions else 'false',
             'start': self.start_time,
             'end': self.end_time
         })
