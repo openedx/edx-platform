@@ -713,11 +713,11 @@ body.discussion {
       width: 20%;
       height: 100%;
       @include linear-gradient(top, rgba(255, 255, 255, .5), rgba(255, 255, 255, 0));
-      background-color: #dcdcdc;
-      @include transition(all .2s ease-out 0s);
+      background-color: $gray-l4;
+      @include transition(all .2s ease-out);
 
       &:hover {
-        background-color: #e9e9e9;
+        background-color: $gray-l3;
       }
     }
 
@@ -731,12 +731,13 @@ body.discussion {
         position: absolute;
         top: 30%;
         left: 30%;
+        color: $gray;
         font-size: 28px;
         z-index: 100;
         width: 25px;
         height: 25px;
         opacity: 1;
-        @include transition(none);
+        @include transition(all .2s ease-out);
       }
     }
 
@@ -997,9 +998,9 @@ body.discussion {
   .sort-bar {
     height: auto;
     min-height: 27px;
-    border-bottom: 1px solid #a3a3a3;
+    border-bottom: 1px solid $gray-l3;
     @include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
-    background-color: #aaaaaa;
+    background-color: $gray-l2;
     box-shadow: 0 1px 0 rgba(255, 255, 255, .2) inset;
 
     span,
@@ -1007,7 +1008,7 @@ body.discussion {
       font-size: 9px;
       font-weight: bold;
       line-height: 25px;
-      color: #333;
+      color: $gray-d3;
       text-transform: uppercase;
       text-shadow: 0 1px 0 rgba(255, 255, 255, .4);
     }
@@ -1028,18 +1029,18 @@ body.discussion {
       height: 18px;
       padding: 0 9px;
       border-radius: 19px;
-      color: #333;
+      color: $gray-d3;
       line-height: 17px;
 
       &:hover {
         @include linear-gradient(top, rgba(255, 255, 255, .4), rgba(255, 255, 255, .2));
-        color: #333;
+        color: $gray-d3;
       }
 
       &.active {
         @include linear-gradient(top, rgba(0, 0, 0, .3), rgba(0, 0, 0, 0));
         background-color: #999;
-        color: #fff;
+        color: $white;
         text-shadow: 0 -1px 0 rgba(0, 0, 0, .3);
         box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 1px rgba(0, 0, 0, .2) inset;
       }
@@ -1286,12 +1287,16 @@ body.discussion {
 
     section {
       border-bottom: 1px solid #ccc;
-      margin: $baseline $baseline $baseline 0;
     }
 
     .label {
       display: block;
       font-size: 12px;
+    }
+
+    .label-settings {
+      padding-top: $baseline;
+      padding-bottom: $baseline/2;
     }
 
     .home-header {
@@ -1309,6 +1314,7 @@ body.discussion {
       margin-bottom: $baseline/2;
     }
     .home-stats {
+      padding: $baseline 0;
       
       .label-area {
         display: inline-block;
@@ -1323,7 +1329,8 @@ body.discussion {
 
       .stats-grouping {
         display: inline-block;
-        width: 65%;
+        width: 70%;
+        padding-left: $baseline;
 
         .profile-stat {
           display: inline-block;
@@ -1335,6 +1342,11 @@ body.discussion {
             display: inline-block;
             font-size: 28px;
             padding: 0 $baseline/2;
+            vertical-align: middle;
+          }
+
+          .profile-stat-label{
+            vertical-align: middle;
           }
         }
       }
@@ -1358,17 +1370,18 @@ body.discussion {
       border-bottom: 1px solid #b2b2b2;
 
       .row-title {
-        padding: $baseline;
+        padding: 30px $baseline;
         display: inline-block;
         width: 15%;
-        background-color: $light-gray;
+        background-color: $gray-l4;
         font-size: 12px;
       }
 
       .row-item-full, .row-item {
         display: inline-block;
         font-size: 12px;
-        width: 25%;
+        padding-left: $baseline/2;
+        width: 23%;
         vertical-align: middle;
 
         .icon {
@@ -1376,6 +1389,14 @@ body.discussion {
           font-size: 24px;
           display: inline-block;
           vertical-align: middle;
+        }
+
+        .icon-stack i {
+          padding: 0 $baseline/2;
+        }
+
+        .row-setting {
+          padding-left: $baseline;
         }
 
         .row-description {
@@ -1389,7 +1410,8 @@ body.discussion {
         width: 70%;
 
         .row-description {
-          width: 90%;
+          width: 80%;
+          padding-left: 15px;
         }
       }
     }
