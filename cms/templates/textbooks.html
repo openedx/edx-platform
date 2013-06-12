@@ -72,6 +72,7 @@ CMS.Views.TextbookShow = Backbone.View.extend({
         this.template = _.template($("#show-textbook-tpl").text());
         this.listenTo(this.model, "change", this.render);
     },
+    tagName: "li",
     events: {
         "click .edit": "editTextbook",
         "click .delete": "removeSelf",
@@ -108,9 +109,7 @@ CMS.Views.TextbookEdit = Backbone.View.extend({
         this.listenTo(chapters, "all", this.render);
         this.listenTo(this.model.collection, "editOne", this.remove);
     },
-    tagName: "form",
-    className: "edit-textbook",
-    id: "edit_textbook_form",
+    tagName: "li",
     render: function() {
         this.$el.html(this.template({
             name: this.model.escape('name'),

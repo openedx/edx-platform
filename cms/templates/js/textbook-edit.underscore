@@ -1,24 +1,26 @@
-<% if (errors) { %>
-  <div id="edit_textbook_error" class="message message-status message-status error" name="edit_textbook_error">
-    <%= errors %>
+<form class="edit-textbook" id="edit_textbook_form">
+  <% if (errors) { %>
+    <div id="edit_textbook_error" class="message message-status message-status error" name="edit_textbook_error">
+      <%= errors %>
+    </div>
+  <% } %>
+
+  <fieldset class="textbook">
+    <legend class="sr"><%= gettext("Textbook information") %></legend>
+        <div class="input-wrap field text required add-textbook-name">
+          <label for="textbook-name-input"><%= gettext("Textbook Name") %></label>
+          <input id="textbook-name-input" name="textbook-name" type="text" placeholder="<%= gettext("Introduction to Cookie Baking") %>" value="<%= name %>">
+          <span class="tip tip-stacked"><%= gettext("the title/name of the text book as you would like your students to see it.") %></span>
+        </div>
+  </fieldset>
+  <fieldset class="chapters">
+    <legend class="sr"><%= gettext("Chapter(s) information") %></legend>
+      <ol class="chapters list-input enum"></ol>
+  </fieldset>
+
+  <div class="actions">
+    <button class="action action-add-chapter"><i class="icon-plus"></i> <%= gettext("Add a Chapter") %></button>
+    <button class="action action-primary" type="submit"><%= gettext("Save") %></button>
+    <button class="action action-secondary action-cancel"><%= gettext("Cancel") %></button>
   </div>
-<% } %>
-
-<fieldset class="textbook">
-  <legend class="sr"><%= gettext("Textbook information") %></legend>
-      <div class="input-wrap field text required add-textbook-name">
-        <label for="textbook-name-input"><%= gettext("Textbook Name") %></label>
-        <input id="textbook-name-input" name="textbook-name" type="text" placeholder="<%= gettext("Introduction to Cookie Baking") %>" value="<%= name %>">
-        <span class="tip tip-stacked"><%= gettext("the title/name of the text book as you would like your students to see it.") %></span>
-      </div>
-</fieldset>
-<fieldset class="chapters">
-  <legend class="sr"><%= gettext("Chapter(s) information") %></legend>
-    <ol class="chapters list-input enum"></ol>
-</fieldset>
-
-<div class="actions">
-  <button class="action action-add-chapter"><i class="icon-plus"></i> <%= gettext("Add a Chapter") %></button>
-  <button class="action action-primary" type="submit"><%= gettext("Save") %></button>
-  <button class="action action-secondary action-cancel"><%= gettext("Cancel") %></button>
-</div>
+</form>

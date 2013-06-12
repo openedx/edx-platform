@@ -1,25 +1,23 @@
-<li class="textbook">
-    <span class="name"><%= name %></span>
-    <% if(chapters.length > 1) {%>
-        <a href="#" class="chapter-toggle
-            <% if(showChapters){ print('hide'); } else { print('show'); } %>-chapters">
-            <i class="icon-chevron-<% if(showChapters){ print('down'); } else { print('right'); } %>"></i>
-            <%= chapters.length %> PDF Chapters
-        </a>
-    <% } else if(chapters.length === 1) { %>
-        <%= chapters.at(0).get("asset_path") %>
-    <% } %>
-    <a href="#" class="view"><%= gettext("view in course") %></a>
-    <button class="edit"><%= gettext("Edit") %></button>
-    <button class="delete"><%= gettext("Delete") %></button>
-    <% if(showChapters) { %>
-    <hr>
-    <ol class="chapters">
-      <% chapters.each(function(chapter) { %>
-        <li><span class="chapter-name"><%= chapter.get('name') %></span>
-            <span class="chapter-asset-path"><%= chapter.get('asset_path') %></span>
-        </li>
-      <% }) %>
-    </ol>
-    <% } %>
-</li>
+<span class="name"><%= name %></span>
+<% if(chapters.length > 1) {%>
+    <a href="#" class="chapter-toggle
+        <% if(showChapters){ print('hide'); } else { print('show'); } %>-chapters">
+        <i class="icon-chevron-<% if(showChapters){ print('down'); } else { print('right'); } %>"></i>
+        <%= chapters.length %> PDF Chapters
+    </a>
+<% } else if(chapters.length === 1) { %>
+    <%= chapters.at(0).get("asset_path") %>
+<% } %>
+<a href="#" class="view"><%= gettext("view in course") %></a>
+<button class="edit"><%= gettext("Edit") %></button>
+<button class="delete"><%= gettext("Delete") %></button>
+<% if(showChapters) { %>
+<hr>
+<ol class="chapters">
+  <% chapters.each(function(chapter) { %>
+    <li><span class="chapter-name"><%= chapter.get('name') %></span>
+        <span class="chapter-asset-path"><%= chapter.get('asset_path') %></span>
+    </li>
+  <% }) %>
+</ol>
+<% } %>
