@@ -1858,7 +1858,7 @@ body.discussion {
   }
 
   .new-post-form {
-    margin-top: $baseline
+    margin-top: $baseline;
     @include clearfix;
   }
 
