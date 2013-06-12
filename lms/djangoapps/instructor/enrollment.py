@@ -1,0 +1,130 @@
+"""
+Enrollment operations for use by instructor APIs.
+
+Does not include any access control, be sure to check access before calling.
+"""
+
+import re
+from django.contrib.auth.models import User
+from student.models import CourseEnrollment, CourseEnrollmentAllowed
+
+
+def enroll_emails(course_id, student_emails, auto_enroll=False):
+    """
+    Enroll multiple students by email.
+
+    students is a list of student emails e.g. ["foo@bar.com", "bar@foo.com]
+    each of whom possibly does not exist in db.
+
+    return a mapping from status to emails.
+    """
+
+    auto_string = {False: 'allowed', True: 'autoenrolled'}[auto_enroll]
+
+    status_map = {
+        'unprocessed':               student_emails,
+        'user/ce/alreadyenrolled':   [],
+        'user/!ce/enrolled':         [],
+        'user/!ce/rejected':         [],
+        '!user/cea/' + auto_string:  [],
+        '!user/!cea/' + auto_string: [],
+    }
+
+    for student_email in status_map['unprocessed']:
+        # status: user
+        try:
+            user = User.objects.get(email=student_email)
+
+            # status: user/ce
+            try:
+                CourseEnrollment.objects.get(user=user, course_id=course_id)
+                status_map['user/ce/alreadyenrolled'].append(student_email)
+            # status: user/!ce
+            except CourseEnrollment.DoesNotExist:
+                # status: user/!ce/enrolled
+                try:
+                    ce = CourseEnrollment(user=user, course_id=course_id)
+                    ce.save()
+                    status_map['user/!ce/enrolled'].append(student_email)
+                # status: user/!ce/rejected
+                except:
+                    status_map['user/!ce/rejected'].append(student_email)
+        # status: !user
+        except User.DoesNotExist:
+            # status: !user/cea
+            try:
+                cea = CourseEnrollmentAllowed.objects.get(user=user, course_id=course_id)
+                cea.auto_enroll = auto_enroll
+                cea.save()
+                status_map['!user/cea/' + auto_string].append(student_email)
+            # status: !user/!cea
+            except CourseEnrollmentAllowed.DoesNotExist:
+                cea = CourseEnrollmentAllowed(email=student_email, course_id=course_id, auto_enroll=auto_enroll)
+                cea.save()
+                status_map['!user/!cea/' + auto_string].append(student_email)
+
+    return status_map
+
+
+def unenroll_emails(course_id, student_emails):
+    """
+    Unenroll multiple students by email.
+
+    students is a list of student emails e.g. ["foo@bar.com", "bar@foo.com]
+    each of whom possibly does not exist in db.
+
+    return a mapping from status to emails.
+    """
+
+    # NOTE these are not mutually exclusive
+    status_map = {
+        'unprocessed': student_emails,
+        'cea/disallowed': [],
+        'ce/unenrolled': [],
+        'ce/failed': [],
+        '!ce/notenrolled': [],
+    }
+
+    for student_email in student_emails:
+        # delete CourseEnrollmentAllowed
+        try:
+            cea = CourseEnrollmentAllowed.objects.get(course_id=course_id, email=student_email)
+            cea.delete()
+            status_map['cea/disallowed'].append(student_email)
+        except CourseEnrollmentAllowed.DoesNotExist:
+            pass
+
+        # delete CourseEnrollment
+        try:
+            ce = CourseEnrollment.objects.get(course_id=course_id, user__email=student_email)
+            try:
+                ce.delete()
+                status_map['ce/unenrolled'].append(student_email)
+            except Exception:
+                status_map['ce/failed'].append(student_email)
+        except CourseEnrollment.DoesNotExist:
+            status_map['!ce/notenrolled'].append(student_email)
+
+    return status_map
+
+
+def _split_input_list(str_list):
+    """
+    Separate out individual student email from the comma, or space separated string.
+
+    e.g.
+    in: "Lorem@ipsum.dolor, sit@amet.consectetur\nadipiscing@elit.Aenean\r convallis@at.lacus\r, ut@lacinia.Sed"
+    out: ['Lorem@ipsum.dolor', 'sit@amet.consectetur', 'adipiscing@elit.Aenean', 'convallis@at.lacus', 'ut@lacinia.Sed']
+
+    In:
+    students: string coming from the input text area
+    Return:
+    students: list of cleaned student emails
+    students_lc: list of lower case cleaned student emails
+    """
+
+    new_list = re.split(r'[\n\r\s,]', str_list)
+    new_list = [str(s.strip()) for s in new_list]
+    new_list = [s for s in new_list if s != '']
+
+    return new_list
