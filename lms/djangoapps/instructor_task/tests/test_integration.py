@@ -1,5 +1,5 @@
 """
-Integration Test for LMS instructor-initiated background tasks
+Integration Tests for LMS instructor-initiated background tasks
 
 Runs tasks on answers to course problems to validate that code
 paths actually work.
@@ -13,144 +13,26 @@ import textwrap
 from celery.states import SUCCESS, FAILURE
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
-from django.test.utils import override_settings
 
-from capa.tests.response_xml_factory import (OptionResponseXMLFactory,
-                                             CodeResponseXMLFactory,
+from capa.tests.response_xml_factory import (CodeResponseXMLFactory,
                                              CustomResponseXMLFactory)
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import ItemFactory
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
-from student.tests.factories import CourseEnrollmentFactory, UserFactory, AdminFactory
 from courseware.model_data import StudentModule
-from courseware.tests.tests import LoginEnrollmentTestCase, TEST_DATA_MONGO_MODULESTORE
 
 from instructor_task.api import (submit_rescore_problem_for_all_students,
                                  submit_rescore_problem_for_student,
                                  submit_reset_problem_attempts_for_all_students,
                                  submit_delete_problem_state_for_all_students)
 from instructor_task.models import InstructorTask
-from instructor_task.views import instructor_task_status
+from instructor_task.tests.test_base import InstructorTaskTestCase, TEST_COURSE_ORG, TEST_COURSE_NUMBER
 
 
 log = logging.getLogger(__name__)
 
 
-TEST_COURSE_ORG = 'edx'
-TEST_COURSE_NAME = 'Test Course'
-TEST_COURSE_NUMBER = '1.23x'
-TEST_SECTION_NAME = "Problem"
-
-
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
-class TestRescoringBase(LoginEnrollmentTestCase, ModuleStoreTestCase):
-    """
-    Test that all students' answers to a problem can be rescored after the
-    definition of the problem has been redefined.
-    """
-    course = None
-    current_user = None
-
-    def initialize_course(self):
-        """Create a course in the store, with a chapter and section."""
-        self.module_store = modulestore()
-
-        # Create the course
-        self.course = CourseFactory.create(org=TEST_COURSE_ORG,
-                                           number=TEST_COURSE_NUMBER,
-                                           display_name=TEST_COURSE_NAME)
-
-        # Add a chapter to the course
-        chapter = ItemFactory.create(parent_location=self.course.location,
-                                     display_name=TEST_SECTION_NAME)
-
-        # add a sequence to the course to which the problems can be added
-        self.problem_section = ItemFactory.create(parent_location=chapter.location,
-                                                  template='i4x://edx/templates/sequential/Empty',
-                                                  display_name=TEST_SECTION_NAME)
-
-    @staticmethod
-    def get_user_email(username):
-        """Generate email address based on username"""
-        return '{0}@test.com'.format(username)
-
-    def login_username(self, username):
-        """Login the user, given the `username`."""
-        self.login(TestRescoringBase.get_user_email(username), "test")
-        self.current_user = username
-
-    def _create_user(self, username, is_staff=False):
-        """Creates a user and enrolls them in the test course."""
-        email = TestRescoringBase.get_user_email(username)
-        if (is_staff):
-            AdminFactory.create(username=username, email=email)
-        else:
-            UserFactory.create(username=username, email=email)
-        thisuser = User.objects.get(username=username)
-        CourseEnrollmentFactory.create(user=thisuser, course_id=self.course.id)
-        return thisuser
-
-    def create_instructor(self, username):
-        """Creates an instructor for the test course."""
-        return self._create_user(username, is_staff=True)
-
-    def create_student(self, username):
-        """Creates a student for the test course."""
-        return self._create_user(username, is_staff=False)
-
-    @staticmethod
-    def problem_location(problem_url_name):
-        """
-        Create an internal location for a test problem.
-        """
-        if "i4x:" in problem_url_name:
-            return problem_url_name
-        else:
-            return "i4x://{org}/{number}/problem/{problem_url_name}".format(org=TEST_COURSE_ORG,
-                                                                            number=TEST_COURSE_NUMBER,
-                                                                            problem_url_name=problem_url_name)
-
-    def define_option_problem(self, problem_url_name):
-        """Create the problem definition so the answer is Option 1"""
-        factory = OptionResponseXMLFactory()
-        factory_args = {'question_text': 'The correct answer is Option 1',
-                        'options': ['Option 1', 'Option 2'],
-                        'correct_option': 'Option 1',
-                        'num_responses': 2}
-        problem_xml = factory.build_xml(**factory_args)
-        ItemFactory.create(parent_location=self.problem_section.location,
-                           template="i4x://edx/templates/problem/Blank_Common_Problem",
-                           display_name=str(problem_url_name),
-                           data=problem_xml)
-
-    def redefine_option_problem(self, problem_url_name):
-        """Change the problem definition so the answer is Option 2"""
-        factory = OptionResponseXMLFactory()
-        factory_args = {'question_text': 'The correct answer is Option 2',
-                        'options': ['Option 1', 'Option 2'],
-                        'correct_option': 'Option 2',
-                        'num_responses': 2}
-        problem_xml = factory.build_xml(**factory_args)
-        location = TestRescoring.problem_location(problem_url_name)
-        self.module_store.update_item(location, problem_xml)
-
-    def render_problem(self, username, problem_url_name):
-        """
-        Use ajax interface to request html for a problem.
-        """
-        # make sure that the requested user is logged in, so that the ajax call works
-        # on the right problem:
-        if self.current_user != username:
-            self.login_username(username)
-        # make ajax call:
-        modx_url = reverse('modx_dispatch',
-                           kwargs={'course_id': self.course.id,
-                                   'location': TestRescoring.problem_location(problem_url_name),
-                                   'dispatch': 'problem_get', })
-        resp = self.client.post(modx_url, {})
-        return resp
+class TestIntegrationTask(InstructorTaskTestCase):
 
     def submit_student_answer(self, username, problem_url_name, responses):
         """
@@ -171,7 +53,7 @@ class TestRescoringBase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         # make ajax call:
         modx_url = reverse('modx_dispatch',
                            kwargs={'course_id': self.course.id,
-                                   'location': TestRescoring.problem_location(problem_url_name),
+                                   'location': InstructorTaskTestCase.problem_location(problem_url_name),
                                    'dispatch': 'problem_check', })
 
         resp = self.client.post(modx_url, {
@@ -189,29 +71,34 @@ class TestRescoringBase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         request.is_secure = Mock(return_value=False)
         return request
 
-    def submit_rescore_all_student_answers(self, instructor, problem_url_name):
-        """Submits the particular problem for rescoring"""
-        return submit_rescore_problem_for_all_students(self.create_task_request(instructor), self.course.id,
-                                                       TestRescoringBase.problem_location(problem_url_name))
 
-    def submit_rescore_one_student_answer(self, instructor, problem_url_name, student):
-        """Submits the particular problem for rescoring for a particular student"""
-        return submit_rescore_problem_for_student(self.create_task_request(instructor), self.course.id,
-                                                  TestRescoringBase.problem_location(problem_url_name),
-                                                  student)
+class TestRescoringTask(TestIntegrationTask):
+    """Test rescoring problems in a background task."""
 
-    def rescore_all_student_answers(self, instructor, problem_url_name):
-        """Runs the task to rescore the current problem"""
-        return submit_rescore_problem_for_all_students(self.create_task_request(instructor), self.course.id,
-                                                       TestRescoringBase.problem_location(problem_url_name))
+    def setUp(self):
+        self.initialize_course()
+        self.create_instructor('instructor')
+        self.create_student('u1')
+        self.create_student('u2')
+        self.create_student('u3')
+        self.create_student('u4')
+        self.logout()
 
-    def get_student_module(self, username, descriptor):
-        """Get StudentModule object for test course, given the `username` and the problem's `descriptor`."""
-        return StudentModule.objects.get(course_id=self.course.id,
-                                         student=User.objects.get(username=username),
-                                         module_type=descriptor.location.category,
-                                         module_state_key=descriptor.location.url(),
-                                         )
+    def render_problem(self, username, problem_url_name):
+        """
+        Use ajax interface to request html for a problem.
+        """
+        # make sure that the requested user is logged in, so that the ajax call works
+        # on the right problem:
+        if self.current_user != username:
+            self.login_username(username)
+        # make ajax call:
+        modx_url = reverse('modx_dispatch',
+                           kwargs={'course_id': self.course.id,
+                                   'location': InstructorTaskTestCase.problem_location(problem_url_name),
+                                   'dispatch': 'problem_get', })
+        resp = self.client.post(modx_url, {})
+        return resp
 
     def check_state(self, username, descriptor, expected_score, expected_max_score, expected_attempts):
         """
@@ -233,33 +120,28 @@ class TestRescoringBase(LoginEnrollmentTestCase, ModuleStoreTestCase):
             self.assertGreater(len(state['correct_map']), 0)
             self.assertGreater(len(state['student_answers']), 0)
 
-    def get_task_status(self, task_id):
-        """Use api method to fetch task status, using mock request."""
-        mock_request = Mock()
-        mock_request.REQUEST = {'task_id': task_id}
-        response = instructor_task_status(mock_request)
-        status = json.loads(response.content)
-        return status
+    def submit_rescore_all_student_answers(self, instructor, problem_url_name):
+        """Submits the particular problem for rescoring"""
+        return submit_rescore_problem_for_all_students(self.create_task_request(instructor), self.course.id,
+                                                       InstructorTaskTestCase.problem_location(problem_url_name))
 
+    def submit_rescore_one_student_answer(self, instructor, problem_url_name, student):
+        """Submits the particular problem for rescoring for a particular student"""
+        return submit_rescore_problem_for_student(self.create_task_request(instructor), self.course.id,
+                                                  InstructorTaskTestCase.problem_location(problem_url_name),
+                                                  student)
 
-class TestRescoring(TestRescoringBase):
-    """Test rescoring problems in a background task."""
-
-    def setUp(self):
-        self.initialize_course()
-        self.create_instructor('instructor')
-        self.create_student('u1')
-        self.create_student('u2')
-        self.create_student('u3')
-        self.create_student('u4')
-        self.logout()
+    def rescore_all_student_answers(self, instructor, problem_url_name):
+        """Runs the task to rescore the current problem"""
+        return submit_rescore_problem_for_all_students(self.create_task_request(instructor), self.course.id,
+                                                       InstructorTaskTestCase.problem_location(problem_url_name))
 
     def test_rescoring_option_problem(self):
         '''Run rescore scenario on option problem'''
         # get descriptor:
         problem_url_name = 'H1P1'
         self.define_option_problem(problem_url_name)
-        location = TestRescoring.problem_location(problem_url_name)
+        location = InstructorTaskTestCase.problem_location(problem_url_name)
         descriptor = self.module_store.get_instance(self.course.id, location)
 
         # first store answers for each of the separate users:
@@ -312,7 +194,7 @@ class TestRescoring(TestRescoringBase):
         self.assertEqual(instructor_task.task_type, 'rescore_problem')
         task_input = json.loads(instructor_task.task_input)
         self.assertFalse('student' in task_input)
-        self.assertEqual(task_input['problem_url'], TestRescoring.problem_location(problem_url_name))
+        self.assertEqual(task_input['problem_url'], InstructorTaskTestCase.problem_location(problem_url_name))
         status = json.loads(instructor_task.task_output)
         self.assertEqual(status['exception'], 'ZeroDivisionError')
         self.assertEqual(status['message'], expected_message)
@@ -395,7 +277,7 @@ class TestRescoring(TestRescoringBase):
             """)
         problem_xml = factory.build_xml(script=script, cfn="check_func", expect="42", num_responses=1)
         if redefine:
-            self.module_store.update_item(TestRescoringBase.problem_location(problem_url_name), problem_xml)
+            self.module_store.update_item(InstructorTaskTestCase.problem_location(problem_url_name), problem_xml)
         else:
             # Use "per-student" rerandomization so that check-problem can be called more than once.
             # Using "always" means we cannot check a problem twice, but we want to call once to get the
@@ -413,7 +295,7 @@ class TestRescoring(TestRescoringBase):
         # First define the custom response problem:
         problem_url_name = 'H1P1'
         self.define_randomized_custom_response_problem(problem_url_name)
-        location = TestRescoring.problem_location(problem_url_name)
+        location = InstructorTaskTestCase.problem_location(problem_url_name)
         descriptor = self.module_store.get_instance(self.course.id, location)
         # run with more than one user
         userlist = ['u1', 'u2', 'u3', 'u4']
@@ -459,7 +341,7 @@ class TestRescoring(TestRescoringBase):
             self.check_state(username, descriptor, 0, 1, 2)
 
 
-class TestResetAttempts(TestRescoringBase):
+class TestResetAttemptsTask(TestIntegrationTask):
     """Test resetting problem attempts in a background task."""
     userlist = ['u1', 'u2', 'u3', 'u4']
 
@@ -479,14 +361,14 @@ class TestResetAttempts(TestRescoringBase):
     def reset_problem_attempts(self, instructor, problem_url_name):
         """Submits the current problem for resetting"""
         return submit_reset_problem_attempts_for_all_students(self.create_task_request(instructor), self.course.id,
-                                                              TestRescoringBase.problem_location(problem_url_name))
+                                                              InstructorTaskTestCase.problem_location(problem_url_name))
 
     def test_reset_attempts_on_problem(self):
         '''Run reset-attempts scenario on option problem'''
         # get descriptor:
         problem_url_name = 'H1P1'
         self.define_option_problem(problem_url_name)
-        location = TestRescoringBase.problem_location(problem_url_name)
+        location = InstructorTaskTestCase.problem_location(problem_url_name)
         descriptor = self.module_store.get_instance(self.course.id, location)
         num_attempts = 3
         # first store answers for each of the separate users:
@@ -520,7 +402,7 @@ class TestResetAttempts(TestRescoringBase):
         self.assertEqual(instructor_task.task_type, 'reset_problem_attempts')
         task_input = json.loads(instructor_task.task_input)
         self.assertFalse('student' in task_input)
-        self.assertEqual(task_input['problem_url'], TestRescoring.problem_location(problem_url_name))
+        self.assertEqual(task_input['problem_url'], TestRescoringTask.problem_location(problem_url_name))
         status = json.loads(instructor_task.task_output)
         self.assertEqual(status['exception'], 'ZeroDivisionError')
         self.assertEqual(status['message'], expected_message)
@@ -543,7 +425,7 @@ class TestResetAttempts(TestRescoringBase):
             self.reset_problem_attempts('instructor', problem_url_name)
 
 
-class TestDeleteProblem(TestRescoringBase):
+class TestDeleteProblemTask(TestIntegrationTask):
     """Test deleting problem state in a background task."""
     userlist = ['u1', 'u2', 'u3', 'u4']
 
@@ -557,14 +439,14 @@ class TestDeleteProblem(TestRescoringBase):
     def delete_problem_state(self, instructor, problem_url_name):
         """Submits the current problem for deletion"""
         return submit_delete_problem_state_for_all_students(self.create_task_request(instructor), self.course.id,
-                                                            TestRescoringBase.problem_location(problem_url_name))
+                                                            InstructorTaskTestCase.problem_location(problem_url_name))
 
     def test_delete_problem_state(self):
         '''Run delete-state scenario on option problem'''
         # get descriptor:
         problem_url_name = 'H1P1'
         self.define_option_problem(problem_url_name)
-        location = TestRescoringBase.problem_location(problem_url_name)
+        location = InstructorTaskTestCase.problem_location(problem_url_name)
         descriptor = self.module_store.get_instance(self.course.id, location)
         # first store answers for each of the separate users:
         for username in self.userlist:
@@ -597,7 +479,7 @@ class TestDeleteProblem(TestRescoringBase):
         self.assertEqual(instructor_task.task_type, 'delete_problem_state')
         task_input = json.loads(instructor_task.task_input)
         self.assertFalse('student' in task_input)
-        self.assertEqual(task_input['problem_url'], TestRescoring.problem_location(problem_url_name))
+        self.assertEqual(task_input['problem_url'], TestRescoringTask.problem_location(problem_url_name))
         status = json.loads(instructor_task.task_output)
         self.assertEqual(status['exception'], 'ZeroDivisionError')
         self.assertEqual(status['message'], expected_message)

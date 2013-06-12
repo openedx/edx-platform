@@ -1,5 +1,5 @@
 """
-Test for LMS courseware background task queue management
+Test for LMS instructor background task queue management
 """
 import logging
 import json
