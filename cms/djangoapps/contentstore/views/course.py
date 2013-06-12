@@ -18,9 +18,6 @@ from xmodule.modulestore.exceptions import (
     ItemNotFoundError, InvalidLocationError)
 from xmodule.modulestore import Location
 
-from xmodule.contentstore.django import contentstore
-from xmodule.contentstore.content import StaticContent
-
 from contentstore.course_info_model import (
     get_course_updates, update_course_updates, delete_course_update)
 from contentstore.utils import (
@@ -35,7 +32,6 @@ from auth.authz import create_all_course_groups, is_user_in_creator_group
 from util.json_request import expect_json
 
 from .access import has_access, get_location_and_verify_access
-from .assets import assets_to_json_dict
 from .requests import get_request_method
 from .tabs import initialize_course_tabs
 from .component import (
