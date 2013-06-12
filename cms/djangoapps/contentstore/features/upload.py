@@ -21,7 +21,7 @@ def upload_file(step, file_name):
     file_css = '.file-input'
     upload = world.css_find(file_css)
     #uploading the file itself
-    upload._element.send_keys(os.getcwd() + '/' + file_name)
+    upload._element.send_keys(os.path.dirname(__file__) + '/' + file_name)
 
     close_css = '.close-button'
     world.css_find(close_css).click()
