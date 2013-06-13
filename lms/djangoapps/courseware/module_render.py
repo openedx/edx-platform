@@ -2,8 +2,6 @@ import json
 import logging
 import re
 import sys
-import static_replace
-
 from functools import partial
 
 from django.conf import settings
@@ -15,27 +13,31 @@ from django.http import Http404
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
 
+import pyparsing
 from requests.auth import HTTPBasicAuth
+from statsd import statsd
 
 from capa.xqueue_interface import XQueueInterface
-from courseware.masquerade import setup_masquerade
-from courseware.access import has_access
 from mitxmako.shortcuts import render_to_string
-from .models import StudentModule
-from psychometrics.psychoanalyze import make_psychometrics_data_update_handler
-from student.models import unique_id_for_user
+from xblock.runtime import DbModel
+from xmodule.error_module import ErrorDescriptor, NonStaffErrorDescriptor
 from xmodule.errortracker import exc_info_to_str
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
-from xmodule.x_module import ModuleSystem
-from xmodule.error_module import ErrorDescriptor, NonStaffErrorDescriptor
-from xblock.runtime import DbModel
-from xmodule_modifiers import replace_course_urls, replace_static_urls, add_histogram, wrap_xmodule
-from .model_data import LmsKeyValueStore, LmsUsage, ModelDataCache
-
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from statsd import statsd
+from xmodule.x_module import ModuleSystem
+from xmodule_modifiers import replace_course_urls, replace_static_urls, add_histogram, wrap_xmodule
+
+import static_replace
+from psychometrics.psychoanalyze import make_psychometrics_data_update_handler
+from student.models import unique_id_for_user
+
+from courseware.access import has_access
+from courseware.masquerade import setup_masquerade
+from courseware.model_data import LmsKeyValueStore, LmsUsage, ModelDataCache
+from courseware.models import StudentModule
+
 
 log = logging.getLogger(__name__)
 
