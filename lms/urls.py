@@ -116,6 +116,11 @@ urlpatterns = ('',  # nopep8
 
     # TODO: These urls no longer work. They need to be updated before they are re-enabled
     # url(r'^reactivate/(?P<key>[^/]*)$', 'student.views.reactivation_email'),
+
+    # Search
+    url(r'^search$', 'search.views.search'),
+    url(r'^find/$', 'search.views.find')
+
 )
 
 if settings.PERFSTATS:
