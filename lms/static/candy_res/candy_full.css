@@ -19,10 +19,10 @@ html, body {
 	bottom: 0;
 	right: 0;
 	width: 100%;
-	background-color: #bdb7a1;
+	background-color: #d5d0c0;
 	color: #333;
 	overflow: hidden;
-	border: 1px solid #bdb7a1;
+	border: 1px solid #3f3c30;
 	border-top-right-radius: 10px;
 	box-sizing: border-box;
 }
@@ -55,10 +55,9 @@ ul {
 }
 
 #chat-tabs {
-	margin: 0 0 0 28px;
+	margin: 0;
 	padding: 0;
 	overflow: auto;
-	border-left: 1px solid #bdb7a1;
 }
 
 #chat-pane.collapsed-message-pane #chat-tabs {
@@ -102,6 +101,9 @@ ul {
 #chat-tabs li a.label {
 	border-right: 1px solid #bdb7a1;
 	border-bottom: 1px solid #bdb7a1;
+	font-size: 1em;
+	padding-right: 30px;
+	padding-left: 10px;
 }
 
 #chat-pane.collapsed-message-pane #chat-tabs li a.label {
@@ -411,18 +413,22 @@ ul {
 
 .message-form input.submit {
 	cursor: pointer;
-	background-color: #333;
+	background-color: #333 !important;
+	background-image: none !important;
+	border: none !important;
 	color: #e9e6df;
 	position: absolute;
 	bottom: 0;
 	right: 0;
 	margin: 3px;
-	padding: 5px;
-	width: 40px;
+	padding: 5px 10px;
+	width: 55px;
 	font-size: 12px;
 	line-height: 12px;
 	height: 24px;
 	font-weight: bold;
+	box-shadow: none !important;
+	text-shadow: none !important;
 }
 
 #tooltip {
@@ -443,7 +449,7 @@ ul {
 }
 
 #context-menu {
-	position: absolute;
+	position: fixed;
 	z-index: 10;
 	display: none;
 	padding: 15px 10px;
@@ -529,7 +535,7 @@ ul {
 	margin-left: -155px;
 	margin-top: -45px;
 	text-align: center;
-	display: none;
+	display: none !important;
 	z-index: 100;
 	border-radius: 5px;
 }
@@ -542,7 +548,7 @@ ul {
 	bottom: 0;
 	z-index: 90;
 	background-image: url(img/overlay.png);
-	border-top-left-radius: 8px;
+	border-top-right-radius: 8px;
 }
 
 #chat-modal.modal-login {
