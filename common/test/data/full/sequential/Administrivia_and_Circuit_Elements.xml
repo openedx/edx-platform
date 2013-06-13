@@ -8,7 +8,7 @@
   </vertical>
   <vertical filename="vertical_89" slug="vertical_89" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never"/>
   <vertical slug="vertical_94" graceperiod="1 day 12 hours 59 minutes 59 seconds" showanswer="attempted" rerandomize="never">
-    <video youtube="0.75:XNh13VZhThQ,1.0:XbDRmF6J0K0,1.25:JDty12WEQWk,1.50:wELKGj-5iyM" slug="What_s_next" name="What's next"/>
+    <video  youtube_id_0_75="XNh13VZhThQ" youtube_id_1_0="XbDRmF6J0K0" youtube_id_1_25="JDty12WEQWk" youtube_id_1_5="wELKGj-5iyM" slug="What_s_next" name="What's next"/>
     <html slug="html_95">Minor correction: Six elements (five resistors)…</html>
     <customtag tag="S1" slug="discuss_96" impl="discuss"/>
   </vertical>
