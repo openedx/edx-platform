@@ -97,6 +97,9 @@ class @VideoPlayerAlpha extends SubviewAlpha
 
   onReady: (event) =>
     @video.log 'load_video'
+    # Following line is work around for youtube API Bug
+    # 6/13/13
+    @player.addEventListener('onStateChange', @onStateChange)
     if @video.videoType is 'html5'
       @player.setPlaybackRate @video.speed
     unless onTouchBasedDevice()
