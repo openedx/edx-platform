@@ -15,7 +15,7 @@ from xmodule.util.decorators import lazyproperty
 from xmodule.graders import grader_from_conf
 import json
 
-from xblock.core import Scope, List, String, Object, Boolean
+from xblock.core import Scope, List, String, Dict, Boolean
 from .fields import Date
 from django.utils.timezone import UTC
 from xmodule.util import date_utils
@@ -154,25 +154,25 @@ class CourseFields(object):
     start = Date(help="Start time when this module is visible", scope=Scope.settings)
     end = Date(help="Date that this class ends", scope=Scope.settings)
     advertised_start = String(help="Date that this course is advertised to start", scope=Scope.settings)
-    grading_policy = Object(help="Grading policy definition for this class", scope=Scope.content)
+    grading_policy = Dict(help="Grading policy definition for this class", scope=Scope.content)
     show_calculator = Boolean(help="Whether to show the calculator in this course", default=False, scope=Scope.settings)
     display_name = String(help="Display name for this module", scope=Scope.settings)
     tabs = List(help="List of tabs to enable in this course", scope=Scope.settings)
     end_of_course_survey_url = String(help="Url for the end-of-course survey", scope=Scope.settings)
     discussion_blackouts = List(help="List of pairs of start/end dates for discussion blackouts", scope=Scope.settings)
-    discussion_topics = Object(
+    discussion_topics = Dict(
         help="Map of topics names to ids",
         scope=Scope.settings
         )
-    testcenter_info = Object(help="Dictionary of Test Center info", scope=Scope.settings)
+    testcenter_info = Dict(help="Dictionary of Test Center info", scope=Scope.settings)
     announcement = Date(help="Date this course is announced", scope=Scope.settings)
-    cohort_config = Object(help="Dictionary defining cohort configuration", scope=Scope.settings)
+    cohort_config = Dict(help="Dictionary defining cohort configuration", scope=Scope.settings)
     is_new = Boolean(help="Whether this course should be flagged as new", scope=Scope.settings)
     no_grade = Boolean(help="True if this course isn't graded", default=False, scope=Scope.settings)
     disable_progress_graph = Boolean(help="True if this course shouldn't display the progress graph", default=False, scope=Scope.settings)
     pdf_textbooks = List(help="List of dictionaries containing pdf_textbook configuration", scope=Scope.settings)
     html_textbooks = List(help="List of dictionaries containing html_textbook configuration", scope=Scope.settings)
-    remote_gradebook = Object(scope=Scope.settings)
+    remote_gradebook = Dict(scope=Scope.settings)
     allow_anonymous = Boolean(scope=Scope.settings, default=True)
     allow_anonymous_to_peers = Boolean(scope=Scope.settings, default=False)
     advanced_modules = List(help="Beta modules used in your course", scope=Scope.settings)

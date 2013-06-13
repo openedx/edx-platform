@@ -6,7 +6,7 @@ from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xmodule.xml_module import XmlDescriptor
 from xmodule.exceptions import InvalidDefinitionError
-from xblock.core import String, Scope, Object
+from xblock.core import String, Scope, Dict
 
 DEFAULT = "_DEFAULT_GROUP"
 
@@ -32,9 +32,9 @@ def group_from_value(groups, v):
 
 
 class ABTestFields(object):
-    group_portions = Object(help="What proportions of students should go in each group", default={DEFAULT: 1}, scope=Scope.content)
-    group_assignments = Object(help="What group this user belongs to", scope=Scope.preferences, default={})
-    group_content = Object(help="What content to display to each group", scope=Scope.content, default={DEFAULT: []})
+    group_portions = Dict(help="What proportions of students should go in each group", default={DEFAULT: 1}, scope=Scope.content)
+    group_assignments = Dict(help="What group this user belongs to", scope=Scope.preferences, default={})
+    group_content = Dict(help="What content to display to each group", scope=Scope.content, default={DEFAULT: []})
     experiment = String(help="Experiment that this A/B test belongs to", scope=Scope.content)
     has_children = True
 

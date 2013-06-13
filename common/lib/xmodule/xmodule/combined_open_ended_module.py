@@ -5,10 +5,10 @@ from pkg_resources import resource_string
 
 from xmodule.raw_module import RawDescriptor
 from .x_module import XModule
-from xblock.core import Integer, Scope, String, List
+from xblock.core import Integer, Scope, String, List, Float, Boolean
 from xmodule.open_ended_grading_classes.combined_open_ended_modulev1 import CombinedOpenEndedV1Module, CombinedOpenEndedV1Descriptor
 from collections import namedtuple
-from .fields import Date, StringyFloat, StringyInteger, StringyBoolean
+from .fields import Date
 
 log = logging.getLogger("mitx.courseware")
 
@@ -53,27 +53,27 @@ class CombinedOpenEndedFields(object):
         help="This name appears in the horizontal navigation at the top of the page.",
         default="Open Ended Grading", scope=Scope.settings
     )
-    current_task_number = StringyInteger(help="Current task that the student is on.", default=0, scope=Scope.user_state)
+    current_task_number = Integer(help="Current task that the student is on.", default=0, scope=Scope.user_state)
     task_states = List(help="List of state dictionaries of each task within this module.", scope=Scope.user_state)
     state = String(help="Which step within the current task that the student is on.", default="initial",
                    scope=Scope.user_state)
-    student_attempts = StringyInteger(help="Number of attempts taken by the student on this problem", default=0,
+    student_attempts = Integer(help="Number of attempts taken by the student on this problem", default=0,
                                       scope=Scope.user_state)
-    ready_to_reset = StringyBoolean(
+    ready_to_reset = Boolean(
         help="If the problem is ready to be reset or not.", default=False,
         scope=Scope.user_state
     )
-    attempts = StringyInteger(
+    attempts = Integer(
         display_name="Maximum Attempts",
         help="The number of times the student can try to answer this problem.", default=1,
         scope=Scope.settings, values = {"min" : 1 }
     )
-    is_graded = StringyBoolean(display_name="Graded", help="Whether or not the problem is graded.", default=False, scope=Scope.settings)
-    accept_file_upload = StringyBoolean(
+    is_graded = Boolean(display_name="Graded", help="Whether or not the problem is graded.", default=False, scope=Scope.settings)
+    accept_file_upload = Boolean(
         display_name="Allow File Uploads",
         help="Whether or not the student can submit files as a response.", default=False, scope=Scope.settings
     )
-    skip_spelling_checks = StringyBoolean(
+    skip_spelling_checks = Boolean(
         display_name="Disable Quality Filter",
         help="If False, the Quality Filter is enabled and submissions with poor spelling, short length, or poor grammar will not be peer reviewed.",
         default=False, scope=Scope.settings
@@ -86,7 +86,7 @@ class CombinedOpenEndedFields(object):
     )
     version = VersionInteger(help="Current version number", default=DEFAULT_VERSION, scope=Scope.settings)
     data = String(help="XML data for the problem", scope=Scope.content)
-    weight = StringyFloat(
+    weight = Float(
         display_name="Problem Weight",
         help="Defines the number of points each problem is worth. If the value is not set, each problem is worth one point.",
         scope=Scope.settings, values = {"min" : 0 , "step": ".1"}
