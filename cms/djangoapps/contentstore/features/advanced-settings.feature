@@ -37,6 +37,8 @@ Feature: Advanced (manual) course policy
     Given I am on the Advanced Course Settings page in Studio
     When I create a JSON object as a value for "display_name"
     Then I get an error on save
+    And I reload the page
+    Then the policy key value is unchanged
 
   Scenario: Test automatic quoting of non-JSON values
     Given I am on the Advanced Course Settings page in Studio
