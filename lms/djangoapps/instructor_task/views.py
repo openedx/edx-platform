@@ -32,7 +32,8 @@ def instructor_task_status(request):
       Task_id values that are unrecognized are skipped.
 
     The dict with status information for a task contains the following keys:
-      'message': status message reporting on progress, or providing exception message if failed.
+      'message': on complete tasks, status message reporting on final progress, 
+          or providing exception message if failed.
       'succeeded': on complete tasks, indicates if the task outcome was successful:
           did it achieve what it set out to do.
           This is in contrast with a successful task_state, which indicates that the
@@ -96,25 +97,44 @@ def get_task_completion_info(instructor_task):
     """
     succeeded = False
 
+    # if still in progress, then we assume there is no completion info to provide:
+    if instructor_task.task_state not in READY_STATES:
+        return (succeeded, "No status information available")
+
+    # we're more surprised if there is no output for a completed task, but just warn:
     if instructor_task.task_output is None:
         log.warning("No task_output information found for instructor_task {0}".format(instructor_task.task_id))
         return (succeeded, "No status information available")
 
-    task_output = json.loads(instructor_task.task_output)
+    try:
+        task_output = json.loads(instructor_task.task_output)
+    except ValueError:
+        fmt = "No parsable task_output information found for instructor_task {0}: {1}"
+        log.warning(fmt.format(instructor_task.task_id, instructor_task.task_output))
+        return (succeeded, "No parsable status information available")
+
     if instructor_task.task_state in [FAILURE, REVOKED]:
-        return(succeeded, task_output['message'])
+        return (succeeded, task_output.get('message', 'No message provided'))
 
-    action_name = task_output['action_name']
-    num_attempted = task_output['attempted']
-    num_updated = task_output['updated']
-    num_total = task_output['total']
+    if any([key not in task_output for key in ['action_name', 'attempted', 'updated', 'total']]):
+        fmt = "Invalid task_output information found for instructor_task {0}: {1}"
+        log.warning(fmt.format(instructor_task.task_id, instructor_task.task_output))
+        return (succeeded, "No progress status information available")
 
-    if instructor_task.task_input is None:
-        log.warning("No task_input information found for instructor_task {0}".format(instructor_task.task_id))
-        return (succeeded, "No status information available")
-    task_input = json.loads(instructor_task.task_input)
-    problem_url = task_input.get('problem_url')
-    student = task_input.get('student')
+    action_name = task_output.get('action_name')
+    num_attempted = task_output.get('attempted')
+    num_updated = task_output.get('updated')
+    num_total = task_output.get('total')
+
+    student = None
+    try:
+        task_input = json.loads(instructor_task.task_input)
+    except ValueError:
+        fmt = "No parsable task_input information found for instructor_task {0}: {1}"
+        log.warning(fmt.format(instructor_task.task_id, instructor_task.task_input))
+    else:
+        student = task_input.get('student')
+
     if student is not None:
         if num_attempted == 0:
             msg_format = "Unable to find submission to be {action} for student '{student}'"
@@ -133,10 +153,11 @@ def get_task_completion_info(instructor_task):
     else:  # num_updated < num_attempted
         msg_format = "Problem {action} for {updated} of {attempted} students"
 
-    if student is not None and num_attempted != num_total:
+    if student is None and num_attempted != num_total:
         msg_format += " (out of {total})"
 
     # Update status in task result object itself:
-    message = msg_format.format(action=action_name, updated=num_updated, attempted=num_attempted, total=num_total,
-                                student=student, problem=problem_url)
+    message = msg_format.format(action=action_name, updated=num_updated,
+                                attempted=num_attempted, total=num_total,
+                                student=student)
     return (succeeded, message)

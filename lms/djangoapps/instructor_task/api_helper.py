@@ -14,7 +14,6 @@ from xmodule.modulestore.django import modulestore
 from instructor_task.models import InstructorTask
 from instructor_task.tasks_helper import PROGRESS
 
-
 log = logging.getLogger(__name__)
 
 # define a "state" used in InstructorTask
@@ -49,6 +48,13 @@ def _reserve_task(course_id, task_type, task_key, task_input, requester):
     will cause any pending transaction to be committed by a successful
     save here.  Any future database operations will take place in a
     separate transaction.
+
+    Note that there is a chance of a race condition here, when two users
+    try to run the same task at almost exactly the same time.  One user
+    could be after the check and before the create when the second user
+    gets to the check.  At that point, both users are able to run their
+    tasks simultaneously.  This is deemed a small enough risk to not
+    put in further safeguards.
     """
 
     if _task_is_running(course_id, task_type, task_key):

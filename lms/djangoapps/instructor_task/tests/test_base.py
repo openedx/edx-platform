@@ -17,7 +17,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
-from student.tests.factories import CourseEnrollmentFactory, UserFactory, AdminFactory
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from courseware.model_data import StudentModule
 from courseware.tests.tests import LoginEnrollmentTestCase, TEST_DATA_MONGO_MODULESTORE
 
@@ -36,8 +36,8 @@ TEST_SECTION_NAME = "Problem"
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class InstructorTaskTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
-    Test that all students' answers to a problem can be rescored after the
-    definition of the problem has been redefined.
+    Base test class for InstructorTask-related tests that require
+    the setup of a course and problem.
     """
     course = None
     current_user = None
@@ -67,16 +67,14 @@ class InstructorTaskTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
 
     def login_username(self, username):
         """Login the user, given the `username`."""
-        self.login(InstructorTaskTestCase.get_user_email(username), "test")
-        self.current_user = username
+        if self.current_user != username:
+            self.login(InstructorTaskTestCase.get_user_email(username), "test")
+            self.current_user = username
 
     def _create_user(self, username, is_staff=False):
         """Creates a user and enrolls them in the test course."""
         email = InstructorTaskTestCase.get_user_email(username)
-        if (is_staff):
-            AdminFactory.create(username=username, email=email)
-        else:
-            UserFactory.create(username=username, email=email)
+        UserFactory.create(username=username, email=email, is_staff=is_staff)
         thisuser = User.objects.get(username=username)
         CourseEnrollmentFactory.create(user=thisuser, course_id=self.course.id)
         return thisuser
@@ -140,3 +138,12 @@ class InstructorTaskTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         response = instructor_task_status(mock_request)
         status = json.loads(response.content)
         return status
+
+    def create_task_request(self, requester_username):
+        """Generate request that can be used for submitting tasks"""
+        request = Mock()
+        request.user = User.objects.get(username=requester_username)
+        request.get_host = Mock(return_value="testhost")
+        request.META = {'REMOTE_ADDR': '0:0:0:0', 'SERVER_NAME': 'testhost'}
+        request.is_secure = Mock(return_value=False)
+        return request

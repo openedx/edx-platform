@@ -7,7 +7,7 @@ paths actually work.
 """
 import logging
 import json
-from mock import Mock, patch
+from mock import patch
 import textwrap
 
 from celery.states import SUCCESS, FAILURE
@@ -33,6 +33,9 @@ log = logging.getLogger(__name__)
 
 
 class TestIntegrationTask(InstructorTaskTestCase):
+    """
+    Base class to provide general methods used for "integration" testing of particular tasks. 
+    """
 
     def submit_student_answer(self, username, problem_url_name, responses):
         """
@@ -48,8 +51,7 @@ class TestIntegrationTask(InstructorTaskTestCase):
 
         # make sure that the requested user is logged in, so that the ajax call works
         # on the right problem:
-        if self.current_user != username:
-            self.login_username(username)
+        self.login_username(username)
         # make ajax call:
         modx_url = reverse('modx_dispatch',
                            kwargs={'course_id': self.course.id,
@@ -62,18 +64,13 @@ class TestIntegrationTask(InstructorTaskTestCase):
         })
         return resp
 
-    def create_task_request(self, requester_username):
-        """Generate request that can be used for submitting tasks"""
-        request = Mock()
-        request.user = User.objects.get(username=requester_username)
-        request.get_host = Mock(return_value="testhost")
-        request.META = {'REMOTE_ADDR': '0:0:0:0', 'SERVER_NAME': 'testhost'}
-        request.is_secure = Mock(return_value=False)
-        return request
-
 
 class TestRescoringTask(TestIntegrationTask):
-    """Test rescoring problems in a background task."""
+    """
+    Integration-style tests for rescoring problems in a background task.
+
+    Exercises real problems with a minimum of patching.
+    """
 
     def setUp(self):
         self.initialize_course()
@@ -90,8 +87,7 @@ class TestRescoringTask(TestIntegrationTask):
         """
         # make sure that the requested user is logged in, so that the ajax call works
         # on the right problem:
-        if self.current_user != username:
-            self.login_username(username)
+        self.login_username(username)
         # make ajax call:
         modx_url = reverse('modx_dispatch',
                            kwargs={'course_id': self.course.id,
@@ -109,11 +105,11 @@ class TestRescoringTask(TestIntegrationTask):
         Values checked include the number of attempts, the score, and the max score for a problem.
         """
         module = self.get_student_module(username, descriptor)
-        self.assertEqual(module.grade, expected_score, "Scores were not equal")
-        self.assertEqual(module.max_grade, expected_max_score, "Max scores were not equal")
+        self.assertEqual(module.grade, expected_score)
+        self.assertEqual(module.max_grade, expected_max_score)
         state = json.loads(module.state)
         attempts = state['attempts']
-        self.assertEqual(attempts, expected_attempts, "Attempts were not equal")
+        self.assertEqual(attempts, expected_attempts)
         if attempts > 0:
             self.assertTrue('correct_map' in state)
             self.assertTrue('student_answers' in state)
@@ -342,7 +338,11 @@ class TestRescoringTask(TestIntegrationTask):
 
 
 class TestResetAttemptsTask(TestIntegrationTask):
-    """Test resetting problem attempts in a background task."""
+    """
+    Integration-style tests for resetting problem attempts in a background task.
+
+    Exercises real problems with a minimum of patching.
+    """
     userlist = ['u1', 'u2', 'u3', 'u4']
 
     def setUp(self):
@@ -402,7 +402,7 @@ class TestResetAttemptsTask(TestIntegrationTask):
         self.assertEqual(instructor_task.task_type, 'reset_problem_attempts')
         task_input = json.loads(instructor_task.task_input)
         self.assertFalse('student' in task_input)
-        self.assertEqual(task_input['problem_url'], TestRescoringTask.problem_location(problem_url_name))
+        self.assertEqual(task_input['problem_url'], InstructorTaskTestCase.problem_location(problem_url_name))
         status = json.loads(instructor_task.task_output)
         self.assertEqual(status['exception'], 'ZeroDivisionError')
         self.assertEqual(status['message'], expected_message)
@@ -426,7 +426,11 @@ class TestResetAttemptsTask(TestIntegrationTask):
 
 
 class TestDeleteProblemTask(TestIntegrationTask):
-    """Test deleting problem state in a background task."""
+    """
+    Integration-style tests for deleting problem state in a background task.
+
+    Exercises real problems with a minimum of patching.
+    """
     userlist = ['u1', 'u2', 'u3', 'u4']
 
     def setUp(self):
@@ -479,7 +483,7 @@ class TestDeleteProblemTask(TestIntegrationTask):
         self.assertEqual(instructor_task.task_type, 'delete_problem_state')
         task_input = json.loads(instructor_task.task_input)
         self.assertFalse('student' in task_input)
-        self.assertEqual(task_input['problem_url'], TestRescoringTask.problem_location(problem_url_name))
+        self.assertEqual(task_input['problem_url'], InstructorTaskTestCase.problem_location(problem_url_name))
         status = json.loads(instructor_task.task_output)
         self.assertEqual(status['exception'], 'ZeroDivisionError')
         self.assertEqual(status['message'], expected_message)
