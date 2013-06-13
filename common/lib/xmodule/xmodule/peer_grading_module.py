@@ -54,7 +54,7 @@ class PeerGradingFields(object):
         help="Student data for a given peer grading problem.",
         scope=Scope.user_state
     )
-    weight = StringyFloat(
+    weight = Float(
         display_name="Problem Weight",
         help="Defines the number of points each problem is worth. If the value is not set, each problem is worth one point.",
         scope=Scope.settings, values={"min": 0, "step": ".1"}
@@ -112,7 +112,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
         if not self.ajax_url.endswith("/"):
             self.ajax_url = self.ajax_url + "/"
 
-        # StringyInteger could return None, so keep this check.
+        # Integer could return None, so keep this check.
         if not isinstance(self.max_grade, int):
             raise TypeError("max_grade needs to be an integer.")
 

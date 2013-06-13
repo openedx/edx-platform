@@ -315,7 +315,7 @@ class CapaModule(CapaFields, XModule):
         # If the user has forced the save button to display,
         # then show it as long as the problem is not closed
         # (past due / too many attempts)
-        if self.force_save_button == "true":
+        if self.force_save_button:
             return not self.closed()
         else:
             is_survey_question = (self.max_attempts == 0)

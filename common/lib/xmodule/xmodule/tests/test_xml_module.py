@@ -105,7 +105,7 @@ class EditableMetadataFieldsTest(unittest.TestCase):
 
     def test_type_and_options(self):
         # test_display_name_field verifies that a String field is of type "Generic".
-        # test_integer_field verifies that a StringyInteger field is of type "Integer".
+        # test_integer_field verifies that a Integer field is of type "Integer".
 
         descriptor = self.get_descriptor({})
         editable_fields = descriptor.editable_metadata_fields
