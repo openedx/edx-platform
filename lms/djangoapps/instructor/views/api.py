@@ -7,26 +7,11 @@ TODO add tracking
 """
 
 import json
-import logging
-import os
-import re
-import requests
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
-from mitxmako.shortcuts import render_to_response
-from django.core.urlresolvers import reverse
-from django.utils.html import escape
-from django.http import HttpResponse, HttpResponseBadRequest
+from django.http import HttpResponse
 
-from django.conf import settings
-from courseware.access import has_access, get_access_group_name, course_beta_test_group_name
 from courseware.courses import get_course_with_access
-from django_comment_client.utils import has_forum_access
-from instructor.offline_gradecalc import student_grades, offline_grades_available
-from django_comment_common.models import Role, FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA
-from xmodule.modulestore.django import modulestore
-from student.models import CourseEnrollment
-from django.contrib.auth.models import User
 
 import analytics.basic
 import analytics.distributions
