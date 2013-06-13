@@ -96,11 +96,11 @@ def check_variables(string, variables):
     general_whitespace = re.compile('[^\\w]+')
     # List of all alnums in string
     possible_variables = re.split(general_whitespace, string)
-    bad_variables = list()
+    bad_variables = []
     for var in possible_variables:
         if len(var) == 0:
             continue
-        if var[0] <= '9' and '0' <= var:  # Skip things that begin with numbers
+        if var[0].isdigit():  # Skip things that begin with numbers
             continue
         if var not in variables:
             bad_variables.append(var)
@@ -117,7 +117,7 @@ def lower_dict(input_dict):
     variables that have the same lowercase representation. It would be hard to
     tell which is used in the final dict and which isn't.
     """
-    return dict([(k.lower(), input_dict[k]) for k in input_dict])
+    return {k.lower(): v for k, v in input_dict.iteritems()}
 
 
 # The following few functions define parse actions, which are run on lists of
@@ -151,8 +151,7 @@ def exp_parse_action(parse_result):
     e.g. [ 3, 2, 3 ] (which is 3^2^3 = 3^(2^3)) -> 6561
     """
     # pyparsing.ParseResults doesn't play well with reverse()
-    parse_result = parse_result.asList()
-    parse_result.reverse()
+    parse_result = reversed(parse_result)
     # the result of an exponentiation is called a power
     power = reduce(lambda a, b: b ** a, parse_result)
     return power
