@@ -89,6 +89,44 @@ if not settings.MITX_FEATURES["USE_CUSTOM_THEME"]:
 urlpatterns += (
     url(r'^404$', 'static_template_view.views.render',
         {'template': '404.html'}, name="404"),
+    url(r'^about$', 'static_template_view.views.render',
+        {'template': 'about.html'}, name="about_edx"),
+    url(r'^jobs$', 'static_template_view.views.render',
+        {'template': 'jobs.html'}, name="jobs"),
+    url(r'^contact$', 'static_template_view.views.render',
+        {'template': 'contact.html'}, name="contact"),
+    url(r'^press$', 'student.views.press', name="press"),
+    url(r'^media-kit$', 'static_template_view.views.render',
+        {'template': 'media-kit.html'}, name="media-kit"),
+    url(r'^faq$', 'static_template_view.views.render',
+        {'template': 'faq.html'}, name="faq_edx"),
+    url(r'^help$', 'static_template_view.views.render',
+        {'template': 'help.html'}, name="help_edx"),
+
+    url(r'^tos$', 'static_template_view.views.render',
+        {'template': 'tos.html'}, name="tos"),
+    url(r'^privacy$', 'static_template_view.views.render',
+        {'template': 'privacy.html'}, name="privacy_edx"),
+    # TODO: (bridger) The copyright has been removed until it is updated for edX
+    # url(r'^copyright$', 'static_template_view.views.render',
+    #     {'template': 'copyright.html'}, name="copyright"),
+    url(r'^honor$', 'static_template_view.views.render',
+        {'template': 'honor.html'}, name="honor"),
+
+    #Press releases
+    url(r'^press/([_a-zA-Z0-9-]+)$', 'static_template_view.views.render_press_release', name='press_release'),
+
+    # Favicon
+    (r'^favicon\.ico$', 'django.views.generic.simple.redirect_to', {'url': '/static/images/favicon.ico'}),
+
+    url(r'^submit_feedback$', 'util.views.submit_feedback_via_zendesk'),
+
+    # TODO: These urls no longer work. They need to be updated before they are re-enabled
+    # url(r'^reactivate/(?P<key>[^/]*)$', 'student.views.reactivation_email'),
+
+    # Search
+    url(r'^search$', 'search.views.search'),
+    url(r'^find/$', 'search.views.find')
 )
 
 # Semi-static views only used by edX, not by themes
