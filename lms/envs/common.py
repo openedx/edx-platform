@@ -758,6 +758,7 @@ TEMPLATE_VISIBLE_SETTINGS = [
 
 ############################### CHAT ################################
 JABBER = {}
+DATABASE_ROUTERS = []
 
 ############################### THEME ################################
 def enable_theme(theme_name):
