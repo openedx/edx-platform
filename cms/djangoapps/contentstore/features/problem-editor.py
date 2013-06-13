@@ -41,7 +41,9 @@ def i_see_five_settings_with_values(step):
 
 @step('I can modify the display name')
 def i_can_modify_the_display_name(step):
-    world.get_setting_entry(DISPLAY_NAME).find_by_css('.setting-input')[0].fill('modified')
+    # Verifying that the display name can be a string containing a floating point value
+    # (to confirm that we don't throw an error because it is of the wrong type).
+    world.get_setting_entry(DISPLAY_NAME).find_by_css('.setting-input')[0].fill('3.4')
     verify_modified_display_name()
 
 
@@ -172,7 +174,7 @@ def verify_modified_randomization():
 
 
 def verify_modified_display_name():
-    world.verify_setting_entry(world.get_setting_entry(DISPLAY_NAME), DISPLAY_NAME, 'modified', True)
+    world.verify_setting_entry(world.get_setting_entry(DISPLAY_NAME), DISPLAY_NAME, '3.4', True)
 
 
 def verify_modified_display_name_with_special_chars():

@@ -2,8 +2,7 @@
 #pylint: disable=W0621
 
 from lettuce import world, step
-from common import *
-from nose.tools import assert_false, assert_equal
+from nose.tools import assert_false, assert_equal, assert_regexp_matches
 
 """
 http://selenium.googlecode.com/svn/trunk/docs/api/py/webdriver/selenium.webdriver.common.keys.html
@@ -52,9 +51,9 @@ def edit_the_value_of_a_policy_key_and_save(step):
     change_display_name_value(step, '"foo"')
 
 
-@step('I create a JSON object as a value$')
-def create_JSON_object(step):
-    change_display_name_value(step, '{"key": "value", "key_2": "value_2"}')
+@step('I create a JSON object as a value for "(.*)"$')
+def create_JSON_object(step, key):
+    change_value(step, key, '{"key": "value", "key_2": "value_2"}')
 
 
 @step('I create a non-JSON value not in quotes$')
@@ -82,7 +81,12 @@ def they_are_alphabetized(step):
 
 @step('it is displayed as formatted$')
 def it_is_formatted(step):
-    assert_policy_entries([DISPLAY_NAME_KEY], ['{\n    "key": "value",\n    "key_2": "value_2"\n}'])
+    assert_policy_entries(['discussion_topics'], ['{\n    "key": "value",\n    "key_2": "value_2"\n}'])
+
+
+@step('I get an error on save$')
+def error_on_save(step):
+    assert_regexp_matches(world.css_text('#notification-error-description'), 'Incorrect setting format')
 
 
 @step('it is displayed as a string')
@@ -124,11 +128,16 @@ def get_display_name_value():
 
 
 def change_display_name_value(step, new_value):
+    change_value(step, DISPLAY_NAME_KEY, new_value)
 
-    world.css_find(".CodeMirror")[get_index_of(DISPLAY_NAME_KEY)].click()
+
+def change_value(step, key, new_value):
+    index = get_index_of(key)
+    world.css_find(".CodeMirror")[index].click()
     g = world.css_find("div.CodeMirror.CodeMirror-focused > div > textarea")
-    display_name = get_display_name_value()
-    for count in range(len(display_name)):
+    current_value = world.css_find(VALUE_CSS)[index].value
+    g._element.send_keys(Keys.CONTROL + Keys.END)
+    for count in range(len(current_value)):
         g._element.send_keys(Keys.END, Keys.BACK_SPACE)
         # Must delete "" before typing the JSON value
     g._element.send_keys(Keys.END, Keys.BACK_SPACE, Keys.BACK_SPACE, new_value)
