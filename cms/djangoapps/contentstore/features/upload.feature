@@ -4,12 +4,28 @@ Feature: Upload Files
     Scenario: Users can upload files
         Given I have opened a new course in Studio
         And I go to the files and uploads page
-        When I upload the file "upload.feature"
-        Then I see the file "upload.feature" was uploaded
+        When I upload the file "test"
+        Then I see the file "test" was uploaded
+        And The url for the file "test" is valid
 
     Scenario: Users can update files
         Given I have opened a new course in studio
         And I go to the files and uploads page
-        When I upload the file "upload.feature"
-        And I upload the file "upload.feature"
-        Then I see only one "upload.feature"
+        When I upload the file "test"
+        And I upload the file "test"
+        Then I see only one "test"
+
+    Scenario: Users can download files
+        Given I have opened a new course in studio
+        And I go to the files and uploads page
+        When I upload the file "test"
+        Then I can download the correct "test" file
+
+    Scenario: Users can download updated files
+        Given I have opened a new course in studio
+        And I go to the files and uploads page
+        When I upload the file "test"
+        And I modify "test"
+        And I reload the page
+        And I upload the file "test"
+        Then I can download the correct "test" file

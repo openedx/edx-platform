@@ -2,7 +2,13 @@
 #pylint: disable=W0621
 
 from lettuce import world, step
-import os
+from django.conf import settings
+import requests
+import string
+import random
+
+TEST_ROOT = settings.COMMON_TEST_DATA_ROOT
+HTTP_PREFIX = "http://localhost:8001"
 
 
 @step(u'I go to the files and uploads page')
@@ -21,16 +27,22 @@ def upload_file(step, file_name):
     file_css = '.file-input'
     upload = world.css_find(file_css)
     #uploading the file itself
-    upload._element.send_keys(os.path.dirname(__file__) + '/' + file_name)
+    upload._element.send_keys(TEST_ROOT + '/uploads/' + file_name)
 
     close_css = '.close-button'
     world.css_find(close_css).click()
 
 
-@step(u'I see the file "([^"]*)" was uploaded')
+@step(u'I see the file "([^"]*)" was uploaded$')
 def check_upload(step, file_name):
     index = get_index(file_name)
     assert index != -1
+
+
+@step(u'The url for the file "([^"]*)" is valid$')
+def check_url(step, file_name):
+    r = get_file(file_name)
+    assert r.status_code == 200
 
 
 @step(u'I see only one "([^"]*)"$')
@@ -44,6 +56,24 @@ def no_duplicate(step, file_name):
     assert only_one
 
 
+@step(u'I can download the correct "([^"]*)" file$')
+def check_download(step, file_name):
+    cur_file = open(TEST_ROOT + '/uploads/' + file_name, 'r')
+    cur_text = cur_file.read()
+    r = get_file(file_name)
+    downloaded_text = r.text
+    assert cur_text == downloaded_text
+    cur_file.close()
+
+
+@step(u'I modify "([^"]*)"$')
+def modify_upload(step, file_name):
+    new_text = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(10))
+    cur_file = open(TEST_ROOT + '/uploads/' + file_name, 'w')
+    cur_file.write(new_text)
+    cur_file.close()
+
+
 def get_index(file_name):
     names_css = '.name-col > a.filename'
     all_names = world.css_find(names_css)
@@ -51,3 +81,12 @@ def get_index(file_name):
         if file_name == all_names[i].html:
             return i
     return -1
+
+
+def get_file(file_name):
+    index = get_index(file_name)
+    assert index != -1
+
+    url_css = 'input.embeddable-xml-input'
+    url = world.css_find(url_css)[index].value
+    return requests.get(HTTP_PREFIX + url)
