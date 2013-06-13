@@ -6,11 +6,11 @@ from lettuce import world, step
 
 @step('I see the correct settings and default values$')
 def i_see_the_correct_settings_and_values(step):
-    world.verify_all_setting_entries([['.75x', '', False],
-                                      ['1.25x', '', False],
-                                      ['1.5x', '', False],
+    world.verify_all_setting_entries([['Default Speed', '', False],
                                       ['Display Name', 'default', True],
-                                      ['Normal Speed', '', False],
+                                      ['Download Track', '', False],
+                                      ['Download Video', '', False],
                                       ['Show Captions', 'True', False],
-                                      ['Source', '', False],
-                                      ['Track', '', False]])
+                                      ['Speed: .75x', '', False],
+                                      ['Speed: 1.25x', '', False],
+                                      ['Speed: 1.5x', '', False]])
