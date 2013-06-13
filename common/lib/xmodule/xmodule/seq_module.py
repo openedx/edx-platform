@@ -59,10 +59,10 @@ class SequenceModule(SequenceFields, XModule):
         # TODO: Cache progress or children array?
         children = self.get_children()
         progresses = [child.get_progress() for child in children]
-        progress = reduce(Progress.add_counts, progresses)
+        progress = reduce(Progress.add_counts, progresses, None)
         return progress
 
-    def handle_ajax(self, dispatch, get):		# TODO: bounds checking
+    def handle_ajax(self, dispatch, get):  # TODO: bounds checking
         ''' get = request.POST instance '''
         if dispatch == 'goto_position':
             self.position = int(get['position'])

@@ -135,8 +135,8 @@ class CapaModule(CapaFields, XModule):
     js_module_name = "Problem"
     css = {'scss': [resource_string(__name__, 'css/capa/display.scss')]}
 
-    def __init__(self, system, location, descriptor, model_data):
-        XModule.__init__(self, system, location, descriptor, model_data)
+    def __init__(self, system, location, descriptor, descriptor_model_data):
+        XModule.__init__(self, system, location, descriptor, descriptor_model_data)
 
         due_date = self.due
 

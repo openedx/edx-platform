@@ -9,14 +9,14 @@ from lettuce import world, step
 from lettuce.django import django_url
 from common import i_am_registered_for_the_course, TEST_SECTION_NAME
 from problems_setup import PROBLEM_DICT, answer_problem, problem_has_answer, add_problem_to_course
-from nose.tools import assert_equal, assert_not_equal
+from nose.tools import assert_equal, assert_not_equal, assert_greater_equal
 
 @step(u'I am viewing a "([^"]*)" problem with "([^"]*)" attempt')
 def view_problem_with_attempts(step, problem_type, attempts):
     i_am_registered_for_the_course(step, 'model_course')
 
     # Ensure that the course has this problem type
-    add_problem_to_course('model_course', problem_type, {'attempts': attempts})
+    newele = add_problem_to_course('model_course', problem_type, {'max_attempts': attempts})
 
     # Go to the one section in the factory-created course
     # which should be loaded with the correct problem
@@ -125,13 +125,20 @@ def press_the_button_with_label(step, buttonname):
 
 
 @step(u'The "([^"]*)" button does( not)? appear')
-def action_button_present(step, buttonname, doesnt_appear):
+def action_button_present(_step, buttonname, doesnt_appear):
     button_css = 'button span.show-label'
-    elem = world.css_find(button_css).first
+    elems = world.css_find(button_css)
     if doesnt_appear:
-        assert_not_equal(elem.text, buttonname)
+        for elem in elems:
+            assert_not_equal(elem.text, buttonname)
     else:
-        assert_equal(elem.text, buttonname)
+        assert_greater_equal(1, len(elems))
+        found = False
+        for elem in elems:
+            if elem.text == buttonname:
+                found = True
+                break
+        assert found
 
 
 @step(u'My "([^"]*)" answer is marked "([^"]*)"')

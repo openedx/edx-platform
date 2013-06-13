@@ -55,11 +55,11 @@ class BaseTestXmodule(ModuleStoreTestCase):
 
         chapter = ItemFactory.create(
             parent_location=self.course.location,
-            template="i4x://edx/templates/sequential/Empty",
+            category="sequential",
         )
         section = ItemFactory.create(
             parent_location=chapter.location,
-            template="i4x://edx/templates/sequential/Empty"
+            category="sequential"
         )
 
         # username = robot{0}, password = 'test'

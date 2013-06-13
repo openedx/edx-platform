@@ -86,7 +86,9 @@ class XModuleFields(object):
         display_name="Display Name",
         help="This name appears in the horizontal navigation at the top of the page.",
         scope=Scope.settings,
-        default="New"
+        # it'd be nice to have a useful default but it screws up other things; so,
+        # use display_name_with_default for those
+        default=None
     )
 
 
@@ -148,10 +150,7 @@ class XModule(XModuleFields, HTMLSnippet, XBlock):
         Return a display name for the module: use display_name if defined in
         metadata, otherwise convert the url name.
         '''
-        name = None
-        # if explicitly set, use display_name, but don't use its default
-        if 'display_name' in self._model_data:
-            name = self.display_name
+        name = self.display_name
         if name is None:
             name = self.url_name.replace('_', ' ')
         return name

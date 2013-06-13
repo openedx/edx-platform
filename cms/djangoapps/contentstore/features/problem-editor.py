@@ -181,7 +181,7 @@ def verify_modified_display_name_with_special_chars():
 
 
 def verify_unset_display_name():
-    world.verify_setting_entry(world.get_setting_entry(DISPLAY_NAME), DISPLAY_NAME, 'New', False)
+    world.verify_setting_entry(world.get_setting_entry(DISPLAY_NAME), DISPLAY_NAME, '', False)
 
 
 def set_weight(weight):
