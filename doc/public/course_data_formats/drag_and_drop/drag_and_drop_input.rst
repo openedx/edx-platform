@@ -420,6 +420,6 @@ Draggables can be reused
 .. literalinclude:: drag-n-drop-demo2.xml
 
 Examples of targets on draggables
-------------------------
+---------------------------------
 
 .. literalinclude:: drag-n-drop-demo3.xml
