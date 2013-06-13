@@ -16,20 +16,11 @@ import os
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-sys.path.insert(0, os.path.abspath('.'))
+# sys.path.insert(0, os.path.abspath('.'))
 sys.path.insert(0, os.path.abspath('../..'))  # mitx folder
-sys.path.insert(0, os.path.join(os.path.abspath('../..'), 'common', 'lib', 'calc'))  # calc module
-sys.path.insert(0, os.path.join(os.path.abspath('../..'), 'common', 'lib', 'chem'))  # calc module
-sys.path.insert(0, os.path.join(os.path.abspath('../..'), 'common', 'lib', 'sandbox-packages'))  # calc module
-sys.path.insert(0, os.path.join(os.path.abspath('../..'), 'common', 'lib', 'capa'))  # capa module
-sys.path.insert(0, os.path.join(os.path.abspath('../..'), 'common', 'lib', 'xmodule'))  # xmodule
-sys.path.insert(0, os.path.join(os.path.abspath('../..'), 'lms', 'djangoapps'))  # lms djangoapps
-sys.path.insert(0, os.path.join(os.path.abspath('../..'), 'cms', 'djangoapps'))  # cms djangoapps
-sys.path.insert(0, os.path.join(os.path.abspath('../..'), 'common', 'djangoapps'))  # common djangoapps
 
 #  django configuration  - careful here
-import os
-os.environ['DJANGO_SETTINGS_MODULE'] = 'lms.envs.dev'
+os.environ['DJANGO_SETTINGS_MODULE'] = 'lms.envs.test'
 
 
 # -- General configuration -----------------------------------------------------
