@@ -2,12 +2,10 @@ import time
 import logging
 import re
 
-from datetime import timedelta
 from xblock.core import ModelType
 import datetime
 import dateutil.parser
 
-from xblock.core import Integer, Float, Boolean
 from django.utils.timezone import UTC
 
 log = logging.getLogger(__name__)
