@@ -756,6 +756,9 @@ TEMPLATE_VISIBLE_SETTINGS = [
     # TODO: augment me
 ]
 
+############################### CHAT ################################
+JABBER = {}
+
 ############################### THEME ################################
 def enable_theme(theme_name):
     """
@@ -786,4 +789,3 @@ def enable_theme(theme_name):
     # avoid collisions with default edX static files
     STATICFILES_DIRS.append((u'themes/%s' % theme_name,
                              theme_root / 'static'))
-
