@@ -80,7 +80,12 @@ def asset_index(request, org, course, name):
         'active_tab': 'assets',
         'context_course': course_module,
         'assets': asset_display,
-        'upload_asset_callback_url': upload_asset_callback_url
+        'upload_asset_callback_url': upload_asset_callback_url,
+        'remove_asset_callback_url': reverse('remove_asset', kwargs={
+            'org': org,
+            'course': course,
+            'name': name
+        })
     })
 
 
@@ -151,16 +156,19 @@ def upload_asset(request, org, course, coursename):
 
 @ensure_csrf_cookie
 @login_required
-def remove_asset(request, org, course, name, location):
+def remove_asset(request, org, course, name):
     '''
     This method will perform a 'soft-delete' of an asset, which is basically to copy the asset from
     the main GridFS collection and into a Trashcan
     '''
     get_location_and_verify_access(request, org, course, name)
 
+    location = request.POST['location']
+    logging.debug('location = {0}'.format(location))
+
     # make sure the location is valid
     try:
-        loc = StaticContent.get_location_from_path(request.path)
+        loc = StaticContent.get_location_from_path(location)
     except InvalidLocationError:
         # return a 'Bad Request' to browser as we have a malformed Location
         response = HttpResponse()
@@ -194,6 +202,8 @@ def remove_asset(request, org, course, name, location):
     contentstore().delete(content.get_id())
     # remove from cache
     del_cached_content(content.location)
+
+    return HttpResponse()
 
 
 @ensure_csrf_cookie
