@@ -115,7 +115,7 @@ CMS templates. Fortunately, `rake` will do all of this for you! Just run:
 
 If you are running these commands using the [`zsh`](http://www.zsh.org/) shell,
 zsh will assume that you are doing
-[shell globbing](https://en.wikipedia.org/wiki/Glob_(programming)), search for
+[shell globbing](https://en.wikipedia.org/wiki/Glob_%28programming%29), search for
 a file in your directory named `django-adminsyncdb` or `django-adminmigrate`,
 and fail. To fix this, just surround the argument with quotation marks, so that
 you're running `rake "django-admin[syncdb]"`.
