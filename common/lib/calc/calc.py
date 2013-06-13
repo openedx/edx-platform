@@ -5,7 +5,6 @@ Uses pyparsing to parse. Main function as of now is evaluator().
 """
 
 import copy
-import logging
 import math
 import operator
 import re
@@ -67,15 +66,14 @@ DEFAULT_VARIABLES = {'i': numpy.complex(0, 1),
                      'q': scipy.constants.e
                      }
 
-# We eliminated extreme ones, since they're rarely used, and potentially
+# We eliminated the following extreme suffixes:
+# P (1e15), E (1e18), Z (1e21), Y (1e24),
+# f (1e-15), a (1e-18), z (1e-21), y (1e-24)
+# since they're rarely used, and potentially
 # confusing. They may also conflict with variables if we ever allow e.g.
 # 5R instead of 5*R
-SUFFIXES = {'%': 0.01, 'k': 1e3, 'M': 1e6, 'G': 1e9,
-            'T': 1e12,  # 'P':1e15,'E':1e18,'Z':1e21,'Y':1e24,
-            'c': 1e-2, 'm': 1e-3, 'u': 1e-6,
-            'n': 1e-9, 'p': 1e-12}  # ,'f':1e-15,'a':1e-18,'z':1e-21,'y':1e-24}
-
-LOG = logging.getLogger("mitx.courseware.capa")
+SUFFIXES = {'%': 0.01, 'k': 1e3, 'M': 1e6, 'G': 1e9, 'T': 1e12,
+            'c': 1e-2, 'm': 1e-3, 'u': 1e-6, 'n': 1e-9, 'p': 1e-12}
 
 
 class UndefinedVariable(Exception):
@@ -84,10 +82,6 @@ class UndefinedVariable(Exception):
     instructor.
     """
     pass
-    # unused for now
-    # def raiseself(self):
-    #     ''' Helper so we can use inside of a lambda '''
-    #     raise self
 
 
 def check_variables(string, variables):
@@ -96,13 +90,8 @@ def check_variables(string, variables):
 
     Otherwise, raise an UndefinedVariable containing all bad variables.
 
-    Pyparsing uses a left-to-right parser, which makes the more
+    Pyparsing uses a left-to-right parser, which makes a more
     elegant approach pretty hopeless.
-
-    achar = reduce(lambda a,b:a|b ,map(Literal,alphas)) # Any alphabetic character
-    undefined_variable = achar + Word(alphanums)
-    undefined_variable.setParseAction(lambda x:UndefinedVariable("".join(x)).raiseself())
-    varnames = varnames | undefined_variable
     """
     general_whitespace = re.compile('[^\\w]+')
     # List of all alnums in string
@@ -235,9 +224,6 @@ def evaluator(variables, functions, string, cs=False):
     cs: Case sensitive
 
     """
-    # LOG.debug("variables: {0}".format(variables))
-    # LOG.debug("functions: {0}".format(functions))
-    # LOG.debug("string: {0}".format(string))
 
     all_variables = copy.copy(DEFAULT_VARIABLES)
     all_functions = copy.copy(DEFAULT_FUNCTIONS)
