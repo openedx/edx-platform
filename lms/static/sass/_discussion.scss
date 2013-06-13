@@ -812,6 +812,7 @@ body.discussion {
     .browse-topic-drop-btn {
       display: block;
       position: absolute;
+      padding-top: 10%;
       top: -1px;
       left: -1px;
       z-index: 50;
@@ -823,13 +824,14 @@ body.discussion {
       @include transition(none);
 
       .current-board {
-        white-space: nowrap;
+        white-space: normal;
+
       }
 
       span {
         font-size: 14px;
-        font-weight: 700;
-        line-height: 58px;
+        font-weight: 400;
+        line-height: 1.2;
         color: #333;
         text-shadow: 0 1px 0 $white-t3;
         opacity: 0.0;
@@ -1332,7 +1334,7 @@ body.discussion {
 
         .profile-stat {
           display: inline-block;
-          width: 30%;
+          width: 32.5%;
           vertical-align: middle;
           font-size: 12px;
 
@@ -1393,10 +1395,6 @@ body.discussion {
           padding: 0 $baseline/2;
         }
 
-        .row-setting {
-          padding-left: $baseline;
-        }
-
         .row-description {
           display: inline-block;
           width: 70%;
@@ -1405,7 +1403,7 @@ body.discussion {
       }
 
       .row-item-full {
-        width: 70%;
+        width: 77%;
 
         .row-description {
           width: 80%;
