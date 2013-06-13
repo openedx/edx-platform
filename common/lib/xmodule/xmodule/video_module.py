@@ -90,12 +90,12 @@ class VideoDescriptor(VideoFields,
     stores_state = True
     template_dir_name = "video"
 
-    metadata_attributes = RawDescriptor.metadata_attributes + ('youtube_id_1_0',
-                                                               'youtube_id_0_75',
-                                                               'youtube_id_1_25',
-                                                               'youtube_id_1_5')
+    # metadata_attributes = RawDescriptor.metadata_attributes + ('youtube_id_1_0',
+    #                                                            'youtube_id_0_75',
+    #                                                            'youtube_id_1_25',
+    #                                                            'youtube_id_1_5')
 
-    metadata_to_strip = RawDescriptor.metadata_to_strip + ('show_captions',)
+    # metadata_to_strip = RawDescriptor.metadata_to_strip + ('show_captions',)
 
     @property
     def non_editable_metadata_fields(self):
