@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+#pylint: disable=C0103
+#pylint: disable=W0622
+#pylint: disable=W0212
+#pylint: disable=W0613
 """ EdX documentation build configuration file, created by
  sphinx-quickstart on Fri Nov  2 15:43:00 2012.
 
@@ -30,9 +34,9 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'lms.envs.test'
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.doctest', 'sphinx.ext.intersphinx',
-                    'sphinx.ext.todo', 'sphinx.ext.coverage', 'sphinx.ext.pngmath',
-                    'sphinx.ext.mathjax', 'sphinx.ext.viewcode']
+extensions = [
+    'sphinx.ext.autodoc', 'sphinx.ext.doctest', 'sphinx.ext.intersphinx', 'sphinx.ext.todo', 'sphinx.ext.coverage',
+    'sphinx.ext.pngmath', 'sphinx.ext.mathjax', 'sphinx.ext.viewcode']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -177,21 +181,21 @@ htmlhelp_basename = 'edXDocs'
 # -- Options for LaTeX output --------------------------------------------------
 
 latex_elements = {
-# The paper size ('letterpaper' or 'a4paper').
-#'papersize': 'letterpaper',
+    # The paper size ('letterpaper' or 'a4paper').
+    #'papersize': 'letterpaper',
 
-# The font size ('10pt', '11pt' or '12pt').
-#'pointsize': '10pt',
+    # The font size ('10pt', '11pt' or '12pt').
+    #'pointsize': '10pt',
 
-# Additional stuff for the LaTeX preamble.
-#'preamble': '',
+    # Additional stuff for the LaTeX preamble.
+    #'preamble': '',
 }
 
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'edXDocs.tex', u'EdX Dev Data Documentation',
-   u'EdX Team', 'manual'),
+    ('index', 'edXDocs.tex', u'EdX Dev Data Documentation',
+     u'EdX Team', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -234,9 +238,9 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'EdXDocs', u'EdX Dev Data Documentation',
-   u'EdX Team', 'EdXDocs', 'One line description of project.',
-   'Miscellaneous'),
+    ('index', 'EdXDocs', u'EdX Dev Data Documentation',
+     u'EdX Team', 'EdXDocs', 'One line description of project.',
+     'Miscellaneous'),
 ]
 
 # Documents to append as an appendix to all manuals.
@@ -261,8 +265,12 @@ from django.utils.encoding import force_unicode
 
 
 def process_docstring(app, what, name, obj, options, lines):
+    """Autodoc django models"""
+
     # This causes import errors if left outside the function
     from django.db import models
+
+    # If you want extract docs from django forms:
     # from django import forms
     # from django.forms.models import BaseInlineFormSet
 
@@ -322,5 +330,6 @@ def process_docstring(app, what, name, obj, options, lines):
 
 
 def setup(app):
-    # Register the docstring processor with sphinx
+    """Setup docsting processors"""
+    #Register the docstring processor with sphinx
     app.connect('autodoc-process-docstring', process_docstring)
