@@ -23,7 +23,7 @@ def enroll_emails(course_id, student_emails, auto_enroll=False):
     return a mapping from status to emails.
     """
 
-    auto_string = {False: 'allowed', True: 'autoenrolled'}[auto_enroll]
+    auto_string = {False: 'allowed', True: 'willautoenroll'}[auto_enroll]
 
     status_map = {
         'user/ce/alreadyenrolled':   [],
@@ -89,7 +89,7 @@ def unenroll_emails(course_id, student_emails):
     status_map = {
         'cea/disallowed': [],
         'ce/unenrolled': [],
-        'ce/failed': [],
+        'ce/rejected': [],
         '!ce/notenrolled': [],
     }
 
@@ -109,7 +109,7 @@ def unenroll_emails(course_id, student_emails):
                 ce.delete()
                 status_map['ce/unenrolled'].append(student_email)
             except Exception:
-                status_map['ce/failed'].append(student_email)
+                status_map['ce/rejected'].append(student_email)
         except CourseEnrollment.DoesNotExist:
             status_map['!ce/notenrolled'].append(student_email)
 

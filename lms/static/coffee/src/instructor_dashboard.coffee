@@ -77,14 +77,74 @@ setup_section_enrollment = (section) ->
   btn_unenroll.click -> log 'click btn_unenroll'
 
   btn_enroll.click -> $.getJSON btn_enroll.data('endpoint'), enroll: emails_input.val() , (data) ->
-    log 'received response for enroll button'
-    log data
-    task_response.text JSON.stringify(data)
+    log 'received response for enroll button', data
+    display_response(data)
 
   btn_unenroll.click -> $.getJSON btn_unenroll.data('endpoint'), unenroll: emails_input.val() , (data) ->
-    log 'received response for unenroll button'
-    log data
-    task_response.text JSON.stringify(data)
+    log 'received response for unenroll button', data
+    display_response(data)
+
+  display_response = (data_from_server) ->
+    task_response.empty()
+
+    response_code_dict = _.extend {}, data_from_server.enrolled, data_from_server.unenrolled
+    # response_code_dict e.g. {'code': ['email1', 'email2'], ...}
+    message_ordering = [
+      'msg_error_enroll'
+      'msg_error_unenroll'
+      'msg_enrolled'
+      'msg_unenrolled'
+      'msg_willautoenroll'
+      'msg_allowed'
+      'msg_disallowed'
+      'msg_already_enrolled'
+      'msg_notenrolled'
+    ]
+
+    msg_to_txt = {
+      msg_already_enrolled: "Already enrolled:"
+      msg_enrolled:         "Enrolled:"
+      msg_error_enroll:     "There was an error enrolling these students:"
+      msg_allowed:          "These students will be allowed to enroll once they register:"
+      msg_willautoenroll:   "These students will be enrolled once they register:"
+      msg_unenrolled:       "Unenrolled:"
+      msg_error_unenroll:   "There was an error unenrolling these students:"
+      msg_disallowed:       "These students were removed from those who can enroll once they register:"
+      msg_notenrolled:      "These students were not enrolled:"
+    }
+
+    msg_to_codes = {
+      msg_already_enrolled: ['user/ce/alreadyenrolled']
+      msg_enrolled:         ['user/!ce/enrolled']
+      msg_error_enroll:     ['user/!ce/rejected']
+      msg_allowed:          ['!user/cea/allowed', '!user/!cea/allowed']
+      msg_willautoenroll:   ['!user/cea/willautoenroll', '!user/!cea/willautoenroll']
+      msg_unenrolled:       ['ce/unenrolled']
+      msg_error_unenroll:   ['ce/rejected']
+      msg_disallowed:       ['cea/disallowed']
+      msg_notenrolled:      ['!ce/notenrolled']
+    }
+
+    for msg_symbol in message_ordering
+      # task_response.text JSON.stringify(data)
+      msg_txt = msg_to_txt[msg_symbol]
+      label = $ '<div/>', text: msg_txt
+      will_attach = false
+
+      for code in msg_to_codes[msg_symbol]
+        log 'logging code', code
+        emails = response_code_dict[code]
+        log 'emails', emails
+        if emails and emails.length
+          for email in emails
+            log 'logging email', email
+            label.append '<br>' + email
+            will_attach = true
+
+      if will_attach
+        task_response.append label
+      else
+        label.remove()
 
 
 # setup the data download section
