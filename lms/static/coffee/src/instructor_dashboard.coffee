@@ -58,12 +58,36 @@ setup_instructor_dashboard = (idash_content) =>
 # call setup handlers for each section
 setup_instructor_dashboard_sections = (idash_content) ->
   log "setting up instructor dashboard sections"
+  setup_section_enrollment    idash_content.find(".#{CSS_IDASH_SECTION}#enrollment")
   setup_section_data_download idash_content.find(".#{CSS_IDASH_SECTION}#data-download")
   setup_section_analytics     idash_content.find(".#{CSS_IDASH_SECTION}#analytics")
 
 
 # setup the data download section
+setup_section_enrollment = (section) ->
+  log "setting up instructor dashboard section - enrollment"
+
+  emails_input = section.find("input[name='student-emails']'")
+  btn_enroll = section.find("input[name='enroll']'")
+  btn_unenroll = section.find("input[name='unenroll']'")
+
+  emails_input.click -> log 'click emails_input'
+  btn_enroll.click -> log 'click btn_enroll'
+  btn_unenroll.click -> log 'click btn_unenroll'
+
+  btn_enroll.click -> $.getJSON btn_enroll.data('endpoint'), enroll: emails_input.val() , (data) ->
+    log 'received response for enroll button'
+    log data
+
+  btn_unenroll.click -> $.getJSON btn_unenroll.data('endpoint'), unenroll: emails_input.val() , (data) ->
+    log 'received response for unenroll button'
+    log data
+
+
+# setup the data download section
 setup_section_data_download = (section) ->
+  log "setting up instructor dashboard section - data download"
+
   display = section.find('.data-display')
   display_text = display.find('.data-display-text')
   display_table = display.find('.data-display-table')

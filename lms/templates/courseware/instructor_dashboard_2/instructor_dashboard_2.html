@@ -39,7 +39,7 @@
   ## when the javascript loads, it clicks on idash-default-section
   <h2 class="instructor-nav">
     <a href="" data-section="course-info" class="idash-default-section"> Course Info   </a>
-    <a href="" data-section="enrollment"> Enrollment    </a>
+    <a href="" data-section="enrollment"> Enrollment </a>
     <a href="" data-section="student-admin"> Student Admin  </a>
     <a href="" data-section="data-download"> Data Download </a>
     <a href="" data-section="analytics"> Analytics </a>
@@ -54,19 +54,12 @@
 
 
   <section id="enrollment" class="idash-section">
-    <div class="single">
-      <h2>Single Student Enrollment</h2>
-      <input type="email" name="student-email" value="Student Email">
-      <input type="button" name="enroll" value="Enroll">
-      <input type="button" name="unenroll" value="Unenroll">
-    </div>
-
     <div>
       <h2>Batch Enrollment</h2>
       <p>Enter student emails separated by new lines or commas.</p>
       <input type="text" name="student-emails" value="Student Emails">
-      <input type="button" name="enroll" value="Enroll">
-      <input type="button" name="unenroll" value="Unenroll">
+      <input type="button" name="enroll" value="Enroll" data-endpoint="${ section_data['enrollment']['enroll_button_url'] }" >
+      <input type="button" name="unenroll" value="Unenroll" data-endpoint="${ section_data['enrollment']['unenroll_button_url'] }" >
     </div>
   </section>
 

@@ -13,9 +13,32 @@ from django.http import HttpResponse
 
 from courseware.courses import get_course_with_access
 
+from instructor.enrollment import split_input_list, enroll_emails, unenroll_emails
 import analytics.basic
 import analytics.distributions
 import analytics.csvs
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+def enroll_unenroll(request, course_id):
+    """
+    Enroll or unenroll students by email.
+    """
+    course = get_course_with_access(request.user, course_id, 'staff', depth=None)
+
+    emails_to_enroll = split_input_list(request.GET.get('enroll', ''))
+    emails_to_unenroll = split_input_list(request.GET.get('unenroll', ''))
+
+    enrolled_result = enroll_emails(course_id, emails_to_enroll)
+    unenrolled_result = unenroll_emails(course_id, emails_to_unenroll)
+
+    response_payload = {
+        'enrolled':   enrolled_result,
+        'unenrolled': unenrolled_result,
+    }
+    response = HttpResponse(json.dumps(response_payload), content_type="application/json")
+    return response
 
 
 @ensure_csrf_cookie

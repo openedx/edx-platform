@@ -81,7 +81,10 @@ def _section_course_info(request, course_id):
 
 def _section_enrollment(course_id):
     """ Provide data for the corresponding dashboard section """
-    section_data = {}
+    section_data = {
+        'enroll_button_url':   reverse('enroll_unenroll', kwargs={'course_id': course_id}),
+        'unenroll_button_url': reverse('enroll_unenroll', kwargs={'course_id': course_id}),
+    }
     return section_data
 
 
