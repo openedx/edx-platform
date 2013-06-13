@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 '''
 Unit tests for enrollment methods in views.py
 
@@ -11,167 +12,138 @@ from courseware.tests.tests import LoginEnrollmentTestCase, TEST_DATA_XML_MODULE
 from xmodule.modulestore.django import modulestore
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from instructor.views import get_and_clean_student_list
+from django.test import TestCase
+from student.tests.factories import UserFactory
+
+from student.models import CourseEnrollment, CourseEnrollmentAllowed
+from instructor.enrollment import enroll_emails, unenroll_emails, split_input_list
 
 
-@override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
-class TestInstructorEnrollsStudent(LoginEnrollmentTestCase):
-    '''
-    Check Enrollment/Unenrollment with/without auto-enrollment on activation
-    '''
-
+class TestInstructorEnrollmentDB(TestCase):
+    '''Test instructor enrollment administration against database effects'''
     def setUp(self):
+        self.course = MockCourse('jus:/a/fake/c::rse/id')
 
-        self.full = modulestore().get_course("edX/full/6.002_Spring_2012")
-        self.toy = modulestore().get_course("edX/toy/2012_Fall")
+    def test_split_input_list(self):
+        strings = []
+        lists = []
+        strings.append("Lorem@ipsum.dolor, sit@amet.consectetur\nadipiscing@elit.Aenean\r convallis@at.lacus\r, ut@lacinia.Sed")
+        lists.append(['Lorem@ipsum.dolor', 'sit@amet.consectetur', 'adipiscing@elit.Aenean', 'convallis@at.lacus', 'ut@lacinia.Sed'])
 
-        #Create instructor and student accounts
-        self.instructor = 'instructor1@test.com'
-        self.student1 = 'student1@test.com'
-        self.student2 = 'student2@test.com'
-        self.password = 'foo'
-        self.create_account('it1', self.instructor, self.password)
-        self.create_account('st1', self.student1, self.password)
-        self.create_account('st2', self.student2, self.password)
-        self.activate_user(self.instructor)
-        self.activate_user(self.student1)
-        self.activate_user(self.student2)
+        for (s, l) in zip(strings, lists):
+            self.assertEqual(split_input_list(s), l)
 
-        def make_instructor(course):
-            group_name = _course_staff_group_name(course.location)
-            g = Group.objects.create(name=group_name)
-            g.user_set.add(get_user(self.instructor))
+    def test_enroll_emails_userexists_alreadyenrolled(self):
+        user = UserFactory()
+        ce = CourseEnrollment(course_id=self.course.course_id, user=user)
+        ce.save()
 
-        make_instructor(self.toy)
+        self.assertEqual(CourseEnrollment.objects.filter(course_id=self.course.course_id, user__email=user.email).count(), 1)
 
-        #Enroll Students
-        self.logout()
-        self.login(self.student1, self.password)
-        self.enroll(self.toy)
+        enroll_emails(self.course.course_id, [user.email])
 
-        self.logout()
-        self.login(self.student2, self.password)
-        self.enroll(self.toy)
+        self.assertEqual(CourseEnrollment.objects.filter(course_id=self.course.course_id, user__email=user.email).count(), 1)
 
-        #Enroll Instructor
-        self.logout()
-        self.login(self.instructor, self.password)
-        self.enroll(self.toy)
+    def test_enroll_emails_userexists_succeedenrolling(self):
+        user = UserFactory()
 
-    def test_unenrollment(self):
-        '''
-        Do un-enrollment test
-        '''
+        self.assertEqual(CourseEnrollment.objects.filter(course_id=self.course.course_id, user__email=user.email).count(), 0)
 
-        course = self.toy
-        url = reverse('instructor_dashboard', kwargs={'course_id': course.id})
-        response = self.client.post(url, {'action': 'Unenroll multiple students', 'multiple_students': 'student1@test.com, student2@test.com'})
+        enroll_emails(self.course.course_id, [user.email])
 
-         #Check the page output
-        self.assertContains(response, '<td>student1@test.com</td>')
-        self.assertContains(response, '<td>student2@test.com</td>')
-        self.assertContains(response, '<td>un-enrolled</td>')
+        self.assertEqual(CourseEnrollment.objects.filter(course_id=self.course.course_id, user__email=user.email).count(), 1)
 
-        #Check the enrollment table
-        user = User.objects.get(email='student1@test.com')
-        ce = CourseEnrollment.objects.filter(course_id=course.id, user=user)
-        self.assertEqual(0, len(ce))
+    def test_enroll_emails_nouser_alreadyallowed(self):
+        email_without_user = 'test_enroll_emails_nouser_alreadyallowed@test.org'
 
-        user = User.objects.get(email='student2@test.com')
-        ce = CourseEnrollment.objects.filter(course_id=course.id, user=user)
-        self.assertEqual(0, len(ce))
+        self.assertEqual(User.objects.filter(email=email_without_user).count(), 0)
+        self.assertEqual(CourseEnrollment.objects.filter(course_id=self.course.course_id, user__email=email_without_user).count(), 0)
+        self.assertEqual(CourseEnrollmentAllowed.objects.filter(course_id=self.course.course_id, email=email_without_user).count(), 0)
 
-    def test_enrollment_new_student_autoenroll_on(self):
-        '''
-        Do auto-enroll on test
-        '''
+        cea = CourseEnrollmentAllowed(course_id=self.course.course_id, email=email_without_user, auto_enroll=False)
+        cea.save()
 
-        #Run the Enroll students command
-        course = self.toy
-        url = reverse('instructor_dashboard', kwargs={'course_id': course.id})
-        response = self.client.post(url, {'action': 'Enroll multiple students', 'multiple_students': 'test1_1@student.com, test1_2@student.com', 'auto_enroll': 'on'})
+        enroll_emails(self.course.course_id, [email_without_user])
 
-        #Check the page output
-        self.assertContains(response, '<td>test1_1@student.com</td>')
-        self.assertContains(response, '<td>test1_2@student.com</td>')
-        self.assertContains(response, '<td>user does not exist, enrollment allowed, pending with auto enrollment on</td>')
+        self.assertEqual(CourseEnrollment.objects.filter(course_id=self.course.course_id, user__email=email_without_user).count(), 0)
+        self.assertEqual(CourseEnrollmentAllowed.objects.filter(course_id=self.course.course_id, email=email_without_user).count(), 1)
+        self.assertEqual(CourseEnrollmentAllowed.objects.get(course_id=self.course.course_id, email=email_without_user).auto_enroll, False)
 
-        #Check the enrollmentallowed db entries
-        cea = CourseEnrollmentAllowed.objects.filter(email='test1_1@student.com', course_id=course.id)
-        self.assertEqual(1, cea[0].auto_enroll)
-        cea = CourseEnrollmentAllowed.objects.filter(email='test1_2@student.com', course_id=course.id)
-        self.assertEqual(1, cea[0].auto_enroll)
+    def test_enroll_emails_nouser_suceedallow(self):
+        email_without_user = 'test_enroll_emails_nouser_suceedallow@test.org'
 
-        #Check there is no enrollment db entry other than for the setup instructor and students
-        ce = CourseEnrollment.objects.filter(course_id=course.id)
-        self.assertEqual(3, len(ce))
+        self.assertEqual(User.objects.filter(email=email_without_user).count(), 0)
+        self.assertEqual(CourseEnrollment.objects.filter(course_id=self.course.course_id, user__email=email_without_user).count(), 0)
+        self.assertEqual(CourseEnrollmentAllowed.objects.filter(course_id=self.course.course_id, email=email_without_user).count(), 0)
 
-        #Create and activate student accounts with same email
-        self.student1 = 'test1_1@student.com'
-        self.password = 'bar'
-        self.create_account('s1_1', self.student1, self.password)
-        self.activate_user(self.student1)
+        enroll_emails(self.course.course_id, [email_without_user])
 
-        self.student2 = 'test1_2@student.com'
-        self.create_account('s1_2', self.student2, self.password)
-        self.activate_user(self.student2)
+        self.assertEqual(CourseEnrollment.objects.filter(course_id=self.course.course_id, user__email=email_without_user).count(), 0)
+        self.assertEqual(CourseEnrollmentAllowed.objects.filter(course_id=self.course.course_id, email=email_without_user).count(), 1)
+        self.assertEqual(CourseEnrollmentAllowed.objects.get(course_id=self.course.course_id, email=email_without_user).auto_enroll, False)
 
-        #Check students are enrolled
-        user = User.objects.get(email='test1_1@student.com')
-        ce = CourseEnrollment.objects.filter(course_id=course.id, user=user)
-        self.assertEqual(1, len(ce))
+    def test_enroll_multiple(self):
+        user1 = UserFactory()
+        user2 = UserFactory()
+        user3 = UserFactory()
+        email_without_user1 = 'test_enroll_emails_nouser_suceedallow_1@test.org'
+        email_without_user2 = 'test_enroll_emails_nouser_suceedallow_2@test.org'
+        email_without_user3 = 'test_enroll_emails_nouser_suceedallow_3@test.org'
 
-        user = User.objects.get(email='test1_2@student.com')
-        ce = CourseEnrollment.objects.filter(course_id=course.id, user=user)
-        self.assertEqual(1, len(ce))
+        def test_db(auto_enroll):
+            for user in [user1, user2, user3]:
+                self.assertEqual(CourseEnrollment.objects.filter(course_id=self.course.course_id, user=user).count(), 1)
+                self.assertEqual(CourseEnrollmentAllowed.objects.filter(course_id=self.course.course_id, email=user.email).count(), 0)
 
-    def test_enrollmemt_new_student_autoenroll_off(self):
-        '''
-        Do auto-enroll off test
-        '''
+            for email in [email_without_user1, email_without_user2, email_without_user3]:
+                self.assertEqual(CourseEnrollment.objects.filter(course_id=self.course.course_id, user__email=email).count(), 0)
+                self.assertEqual(CourseEnrollmentAllowed.objects.filter(course_id=self.course.course_id, email=email).count(), 1)
+                self.assertEqual(CourseEnrollmentAllowed.objects.get(course_id=self.course.course_id, email=email).auto_enroll, auto_enroll)
 
-        #Run the Enroll students command
-        course = self.toy
-        url = reverse('instructor_dashboard', kwargs={'course_id': course.id})
-        response = self.client.post(url, {'action': 'Enroll multiple students', 'multiple_students': 'test2_1@student.com, test2_2@student.com'})
+        enroll_emails(self.course.course_id, [user1.email, user2.email, user3.email, email_without_user1, email_without_user2, email_without_user3], auto_enroll=True)
+        test_db(True)
+        enroll_emails(self.course.course_id, [user1.email, user2.email, user3.email, email_without_user1, email_without_user2, email_without_user3], auto_enroll=False)
+        test_db(False)
 
-        #Check the page output
-        self.assertContains(response, '<td>test2_1@student.com</td>')
-        self.assertContains(response, '<td>test2_2@student.com</td>')
-        self.assertContains(response, '<td>user does not exist, enrollment allowed, pending with auto enrollment off</td>')
+    def test_unenroll_alreadyallowed(self):
+        email_without_user = 'test_unenroll_alreadyallowed@test.org'
+        cea = CourseEnrollmentAllowed(course_id=self.course.course_id, email=email_without_user, auto_enroll=False)
+        cea.save()
 
-        #Check the enrollmentallowed db entries
-        cea = CourseEnrollmentAllowed.objects.filter(email='test2_1@student.com', course_id=course.id)
-        self.assertEqual(0, cea[0].auto_enroll)
-        cea = CourseEnrollmentAllowed.objects.filter(email='test2_2@student.com', course_id=course.id)
-        self.assertEqual(0, cea[0].auto_enroll)
+        unenroll_emails(self.course.course_id, [email_without_user])
 
-        #Check there is no enrollment db entry other than for the setup instructor and students
-        ce = CourseEnrollment.objects.filter(course_id=course.id)
-        self.assertEqual(3, len(ce))
+        self.assertEqual(User.objects.filter(email=email_without_user).count(), 0)
+        self.assertEqual(CourseEnrollment.objects.filter(course_id=self.course.course_id, user__email=email_without_user).count(), 0)
+        self.assertEqual(CourseEnrollmentAllowed.objects.filter(course_id=self.course.course_id, email=email_without_user).count(), 0)
 
-        #Create and activate student accounts with same email
-        self.student = 'test2_1@student.com'
-        self.password = 'bar'
-        self.create_account('s2_1', self.student, self.password)
-        self.activate_user(self.student)
+    def test_unenroll_alreadyenrolled(self):
+        user = UserFactory()
+        ce = CourseEnrollment(course_id=self.course.course_id, user=user)
+        ce.save()
 
-        self.student = 'test2_2@student.com'
-        self.create_account('s2_2', self.student, self.password)
-        self.activate_user(self.student)
+        unenroll_emails(self.course.course_id, [user.email])
 
-        #Check students are not enrolled
-        user = User.objects.get(email='test2_1@student.com')
-        ce = CourseEnrollment.objects.filter(course_id=course.id, user=user)
-        self.assertEqual(0, len(ce))
-        user = User.objects.get(email='test2_2@student.com')
-        ce = CourseEnrollment.objects.filter(course_id=course.id, user=user)
-        self.assertEqual(0, len(ce))
+        self.assertEqual(CourseEnrollment.objects.filter(course_id=self.course.course_id, user=user).count(), 0)
+        self.assertEqual(CourseEnrollmentAllowed.objects.filter(course_id=self.course.course_id, email=user.email).count(), 0)
 
-    def test_get_and_clean_student_list(self):
-        '''
-        Clean user input test
-        '''
+    def test_unenroll_notenrolled(self):
+        user = UserFactory()
 
-        string = "abc@test.com, def@test.com ghi@test.com \n \n jkl@test.com      "
-        cleaned_string, cleaned_string_lc = get_and_clean_student_list(string)
-        self.assertEqual(cleaned_string, ['abc@test.com', 'def@test.com', 'ghi@test.com', 'jkl@test.com'])
+        unenroll_emails(self.course.course_id, [user.email])
+
+        self.assertEqual(CourseEnrollment.objects.filter(course_id=self.course.course_id, user=user).count(), 0)
+        self.assertEqual(CourseEnrollmentAllowed.objects.filter(course_id=self.course.course_id, email=user.email).count(), 0)
+
+    def test_unenroll_nosuchuser(self):
+        email_without_user = 'test_unenroll_nosuchuser@test.org'
+
+        unenroll_emails(self.course.course_id, [email_without_user])
+
+        self.assertEqual(User.objects.filter(email=email_without_user).count(), 0)
+        self.assertEqual(CourseEnrollment.objects.filter(course_id=self.course.course_id, user__email=email_without_user).count(), 0)
+        self.assertEqual(CourseEnrollmentAllowed.objects.filter(course_id=self.course.course_id, email=email_without_user).count(), 0)
+
+
+class MockCourse(object):
+    def __init__(self, course_id):
+        self.course_id = course_id
