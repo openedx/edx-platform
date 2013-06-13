@@ -132,7 +132,7 @@ $footer_margin: ($baseline/4) 0 ($baseline*1.5) 0;
 //-----------------
 $homepage-bg-image: '../images/homepage-bg.jpg';
 
-$login-banner-image: '../images/bg-banner-login.png';
-$register-banner-image: '../images/bg-banner-register.png';
+$login-banner-image: url(../images/bg-banner-login.png);
+$register-banner-image: url(../images/bg-banner-register.png);
 
 $video-thumb-url: '../images/courses/video-thumb.jpg';

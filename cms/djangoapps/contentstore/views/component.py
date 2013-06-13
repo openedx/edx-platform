@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django_future.csrf import ensure_csrf_cookie
 from django.conf import settings
-
+from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
 from mitxmako.shortcuts import render_to_response
 
 from xmodule.modulestore import Location
@@ -50,11 +50,18 @@ ADVANCED_COMPONENT_POLICY_KEY = 'advanced_modules'
 @login_required
 def edit_subsection(request, location):
     # check that we have permissions to edit this item
-    course = get_course_for_item(location)
+    try:
+        course = get_course_for_item(location)
+    except InvalidLocationError:
+        return HttpResponseBadRequest()
+
     if not has_access(request.user, course.location):
         raise PermissionDenied()
 
-    item = modulestore().get_item(location, depth=1)
+    try:
+        item = modulestore().get_item(location, depth=1)
+    except ItemNotFoundError:
+        return HttpResponseBadRequest()
 
     lms_link = get_lms_link_for_item(location, course_id=course.location.course_id)
     preview_link = get_lms_link_for_item(location, course_id=course.location.course_id, preview=True)
@@ -113,11 +120,18 @@ def edit_unit(request, location):
 
     id: A Location URL
     """
-    course = get_course_for_item(location)
+    try:
+        course = get_course_for_item(location)
+    except InvalidLocationError:
+        return HttpResponseBadRequest()
+
     if not has_access(request.user, course.location):
         raise PermissionDenied()
 
-    item = modulestore().get_item(location, depth=1)
+    try:
+        item = modulestore().get_item(location, depth=1)
+    except ItemNotFoundError:
+        return HttpResponseBadRequest()
 
     lms_link = get_lms_link_for_item(item.location, course_id=course.location.course_id)
 

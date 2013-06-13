@@ -7,12 +7,15 @@ from xblock.core import ModelType
 import datetime
 import dateutil.parser
 
+from xblock.core import Integer, Float, Boolean
+from django.utils.timezone import UTC
+
 log = logging.getLogger(__name__)
 
 
 class Date(ModelType):
     '''
-    Date fields know how to parse and produce json (iso) compatible formats.
+    Date fields know how to parse and produce json (iso) compatible formats. Converts to tz aware datetimes.
     '''
     def from_json(self, field):
         """
@@ -25,11 +28,15 @@ class Date(ModelType):
         elif field is "":
             return None
         elif isinstance(field, basestring):
-            d = dateutil.parser.parse(field)
-            return d.utctimetuple()
+            result = dateutil.parser.parse(field)
+            if result.tzinfo is None:
+                result = result.replace(tzinfo=UTC())
+            return result
         elif isinstance(field, (int, long, float)):
-            return time.gmtime(field / 1000)
+            return datetime.datetime.fromtimestamp(field / 1000, UTC())
         elif isinstance(field, time.struct_time):
+            return datetime.datetime.fromtimestamp(time.mktime(field), UTC())
+        elif isinstance(field, datetime.datetime):
             return field
         else:
             msg = "Field {0} has bad value '{1}'".format(
@@ -47,7 +54,11 @@ class Date(ModelType):
             # struct_times are always utc
             return time.strftime('%Y-%m-%dT%H:%M:%SZ', value)
         elif isinstance(value, datetime.datetime):
-            return value.isoformat() + 'Z'
+            if value.tzinfo is None or value.utcoffset().total_seconds() == 0:
+                # isoformat adds +00:00 rather than Z
+                return value.strftime('%Y-%m-%dT%H:%M:%SZ')
+            else:
+                return value.isoformat()
 
 
 TIMEDELTA_REGEX = re.compile(r'^((?P<days>\d+?) day(?:s?))?(\s)?((?P<hours>\d+?) hour(?:s?))?(\s)?((?P<minutes>\d+?) minute(?:s)?)?(\s)?((?P<seconds>\d+?) second(?:s)?)?$')
@@ -64,6 +75,8 @@ class Timedelta(ModelType):
 
         Returns a datetime.timedelta parsed from the string
         """
+        if time_str is None:
+            return None
         parts = TIMEDELTA_REGEX.match(time_str)
         if not parts:
             return
@@ -72,7 +85,7 @@ class Timedelta(ModelType):
         for (name, param) in parts.iteritems():
             if param:
                 time_params[name] = int(param)
-        return timedelta(**time_params)
+        return datetime.timedelta(**time_params)
 
     def to_json(self, value):
         values = []

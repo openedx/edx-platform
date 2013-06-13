@@ -3,8 +3,12 @@ from datetime import datetime
 from . import ModuleStoreBase, Location, namedtuple_to_son
 from .exceptions import ItemNotFoundError
 from .inheritance import own_metadata
+from xmodule.exceptions import InvalidVersionError
+from pytz import UTC
 
 DRAFT = 'draft'
+# Things w/ these categories should never be marked as version='draft'
+DIRECT_ONLY_CATEGORIES = ['course', 'chapter', 'sequential', 'about', 'static_tab', 'course_info']
 
 
 def as_draft(location):
@@ -111,6 +115,8 @@ class DraftModuleStore(ModuleStoreBase):
         Clone a new item that is a copy of the item at the location `source`
         and writes it to `location`
         """
+        if Location(location).category in DIRECT_ONLY_CATEGORIES:
+            raise InvalidVersionError(location)
         return wrap_draft(super(DraftModuleStore, self).clone_item(source, as_draft(location)))
 
     def update_item(self, location, data, allow_not_found=False):
@@ -192,7 +198,7 @@ class DraftModuleStore(ModuleStoreBase):
         """
         draft = self.get_item(location)
 
-        draft.cms.published_date = datetime.utcnow()
+        draft.cms.published_date = datetime.now(UTC)
         draft.cms.published_by = published_by_id
         super(DraftModuleStore, self).update_item(location, draft._model_data._kvs._data)
         super(DraftModuleStore, self).update_children(location, draft._model_data._kvs._children)
@@ -203,6 +209,8 @@ class DraftModuleStore(ModuleStoreBase):
         """
         Turn the published version into a draft, removing the published version
         """
+        if Location(location).category in DIRECT_ONLY_CATEGORIES:
+            raise InvalidVersionError(location)
         super(DraftModuleStore, self).clone_item(location, as_draft(location))
         super(DraftModuleStore, self).delete_item(location)
 

@@ -1,5 +1,5 @@
 <section id="textbox_${id}" class="textbox">
-  <textarea rows="${rows}" cols="${cols}" name="input_${id}" id="input_${id}"
+  <textarea rows="${rows}" cols="${cols}" name="input_${id}" aria-describedby="answer_${id}" id="input_${id}"
        % if hidden:
       	    style="display:none;"
        % endif
@@ -7,13 +7,13 @@
 
   <div class="grader-status">
     % if status == 'unsubmitted':
-      <span class="unanswered" style="display:inline-block;" id="status_${id}">Unanswered</span>
+      <span class="unanswered" style="display:inline-block;" id="status_${id}"><span class="sr">Status: </span>Unanswered</span>
     % elif status == 'correct':
-      <span class="correct" id="status_${id}">Correct</span>
+      <span class="correct" id="status_${id}" aria-describedby="input_${id}"><span class="sr">Status: </span>Correct</span>
     % elif status == 'incorrect':
-      <span class="incorrect" id="status_${id}">Incorrect</span>
+      <span class="incorrect" id="status_${id}" aria-describedby="input_${id}"><span class="sr">Status: </span>Incorrect</span>
     % elif status == 'queued':
-      <span class="processing" id="status_${id}">Queued</span>
+      <span class="processing" id="status_${id}" aria-describedby="input_${id}"><span class="sr">Status: </span>Queued</span>
       <span style="display:none;" class="xqueue" id="${id}" >${queue_len}</span>
     % endif
 
@@ -71,7 +71,7 @@
           $(parent_elt).find('.action').after(alert_elem);
           $(parent_elt).find('.capa_alert').css({opacity: 0}).animate({opacity: 1}, 700);
       }
-      
+
 
       // hook up the plot button
       var plot = function(event) {
@@ -97,10 +97,10 @@
               }
           }
 
-          var save_callback = function(response) { 
+          var save_callback = function(response) {
                   if(response.success) {
                       // send information to the problem's plot functionality
-                      Problem.inputAjax(url, input_id, 'plot', 
+                      Problem.inputAjax(url, input_id, 'plot',
                         {'submission': submission}, plot_callback);
                   }
                   else {

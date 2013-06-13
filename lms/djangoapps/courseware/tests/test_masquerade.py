@@ -64,7 +64,7 @@ class TestStaffMasqueradeAsStudent(LoginEnrollmentTestCase):
     def test_staff_debug_for_staff(self):
         resp = self.get_cw_section()
         sdebug = '<div><a href="#i4x_edX_graded_problem_H1P1_debug" id="i4x_edX_graded_problem_H1P1_trig">Staff Debug Info</a></div>'
-    
+
         self.assertTrue(sdebug in resp.content)
 
 
@@ -84,9 +84,9 @@ class TestStaffMasqueradeAsStudent(LoginEnrollmentTestCase):
 
         resp = self.get_cw_section()
         sdebug = '<div><a href="#i4x_edX_graded_problem_H1P1_debug" id="i4x_edX_graded_problem_H1P1_trig">Staff Debug Info</a></div>'
-    
+
         self.assertFalse(sdebug in resp.content)
-        
+
     def get_problem(self):
         pun = 'H1P1'
         problem_location = "i4x://edX/graded/problem/%s" % pun
@@ -105,7 +105,7 @@ class TestStaffMasqueradeAsStudent(LoginEnrollmentTestCase):
         resp = self.get_problem()
         html = json.loads(resp.content)['html']
         print html
-        sabut = '<input class="show" type="button" value="Show Answer">'
+        sabut = '<button class="show"><span class="show-label">Show Answer(s)</span> <span class="sr">(for question(s) above - adjacent to each field)</span></button>'
         self.assertTrue(sabut in html)
 
     def test_no_showanswer_for_student(self):
@@ -116,5 +116,5 @@ class TestStaffMasqueradeAsStudent(LoginEnrollmentTestCase):
         resp = self.get_problem()
         html = json.loads(resp.content)['html']
         print html
-        sabut = '<input class="show" type="button" value="Show Answer">'
+        sabut = '<button class="show"><span class="show-label">Show Answer(s)</span> <span class="sr">(for question(s) above - adjacent to each field)</span></button>'
         self.assertFalse(sabut in html)

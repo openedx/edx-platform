@@ -12,6 +12,7 @@ from django.core.validators import ValidationError, validate_email
 from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed, HttpResponseServerError
 from django.shortcuts import redirect
 from django_future.csrf import ensure_csrf_cookie
+from dogapi import dog_stats_api
 from mitxmako.shortcuts import render_to_response, render_to_string
 from urllib import urlencode
 import zendesk
@@ -73,11 +74,64 @@ class _ZendeskApi(object):
         self._zendesk_instance.update_ticket(ticket_id=ticket_id, data=update)
 
 
-def submit_feedback_via_zendesk(request):
+def _record_feedback_in_zendesk(realname, email, subject, details, tags, additional_info):
     """
     Create a new user-requested Zendesk ticket.
 
-    If Zendesk submission is not enabled, any request will raise `Http404`.
+    Once created, the ticket will be updated with a private comment containing
+    additional information from the browser and server, such as HTTP headers
+    and user state. Returns a boolean value indicating whether ticket creation
+    was successful, regardless of whether the private comment update succeeded.
+    """
+    zendesk_api = _ZendeskApi()
+
+    additional_info_string = (
+        "Additional information:\n\n" +
+        "\n".join("%s: %s" % (key, value) for (key, value) in additional_info.items() if value is not None)
+    )
+
+    # Tag all issues with LMS to distinguish channel in Zendesk; requested by student support team
+    zendesk_tags = list(tags.values()) + ["LMS"]
+    new_ticket = {
+        "ticket": {
+            "requester": {"name": realname, "email": email},
+            "subject": subject,
+            "comment": {"body": details},
+            "tags": zendesk_tags
+        }
+    }
+    try:
+        ticket_id = zendesk_api.create_ticket(new_ticket)
+    except zendesk.ZendeskError as err:
+        log.error("Error creating Zendesk ticket: %s", str(err))
+        return False
+
+    # Additional information is provided as a private update so the information
+    # is not visible to the user.
+    ticket_update = {"ticket": {"comment": {"public": False, "body": additional_info_string}}}
+    try:
+        zendesk_api.update_ticket(ticket_id, ticket_update)
+    except zendesk.ZendeskError as err:
+        log.error("Error updating Zendesk ticket: %s", str(err))
+        # The update is not strictly necessary, so do not indicate failure to the user
+        pass
+
+    return True
+
+
+DATADOG_FEEDBACK_METRIC = "lms_feedback_submissions"
+
+
+def _record_feedback_in_datadog(tags):
+    datadog_tags = ["{k}:{v}".format(k=k, v=v) for k, v in tags.items()]
+    dog_stats_api.increment(DATADOG_FEEDBACK_METRIC, tags=datadog_tags)
+
+
+def submit_feedback(request):
+    """
+    Create a new user-requested ticket, currently implemented with Zendesk.
+
+    If feedback submission is not enabled, any request will raise `Http404`.
     If any configuration parameter (`ZENDESK_URL`, `ZENDESK_USER`, or
     `ZENDESK_API_KEY`) is missing, any request will raise an `Exception`.
     The request must be a POST request specifying `subject` and `details`.
@@ -85,12 +139,9 @@ def submit_feedback_via_zendesk(request):
     `email`. If the user is authenticated, the `name` and `email` will be
     populated from the user's information. If any required parameter is
     missing, a 400 error will be returned indicating which field is missing and
-    providing an error message. If Zendesk returns any error on ticket
-    creation, a 500 error will be returned with no body. Once created, the
-    ticket will be updated with a private comment containing additional
-    information from the browser and server, such as HTTP headers and user
-    state. Whether or not the update succeeds, if the user's ticket is
-    successfully created, an empty successful response (200) will be returned.
+    providing an error message. If Zendesk ticket creation fails, 500 error
+    will be returned with no body; if ticket creation succeeds, an empty
+    successful response (200) will be returned.
     """
     if not settings.MITX_FEATURES.get('ENABLE_FEEDBACK_SUBMISSION', False):
         raise Http404()
@@ -124,9 +175,9 @@ def submit_feedback_via_zendesk(request):
 
     subject = request.POST["subject"]
     details = request.POST["details"]
-    tags = []
-    if "tag" in request.POST:
-        tags = [request.POST["tag"]]
+    tags = dict(
+        [(tag, request.POST[tag]) for tag in ["issue_type", "course_id"] if tag in request.POST]
+    )
 
     if request.user.is_authenticated():
         realname = request.user.profile.name
@@ -140,41 +191,18 @@ def submit_feedback_via_zendesk(request):
         except ValidationError:
             return build_error_response(400, "email", required_field_errs["email"])
 
-    for header in ["HTTP_REFERER", "HTTP_USER_AGENT"]:
-        additional_info[header] = request.META.get(header)
+    for header, pretty in [
+        ("HTTP_REFERER", "Page"),
+        ("HTTP_USER_AGENT", "Browser"),
+        ("REMOTE_ADDR", "Client IP"),
+        ("SERVER_NAME", "Host")
+    ]:
+        additional_info[pretty] = request.META.get(header)
 
-    zendesk_api = _ZendeskApi()
+    success = _record_feedback_in_zendesk(realname, email, subject, details, tags, additional_info)
+    _record_feedback_in_datadog(tags)
 
-    additional_info_string = (
-        "Additional information:\n\n" +
-        "\n".join("%s: %s" % (key, value) for (key, value) in additional_info.items() if value is not None)
-    )
-
-    new_ticket = {
-        "ticket": {
-            "requester": {"name": realname, "email": email},
-            "subject": subject,
-            "comment": {"body": details},
-            "tags": tags
-        }
-    }
-    try:
-        ticket_id = zendesk_api.create_ticket(new_ticket)
-    except zendesk.ZendeskError as err:
-        log.error("Error creating Zendesk ticket: %s", str(err))
-        return HttpResponse(status=500)
-
-    # Additional information is provided as a private update so the information
-    # is not visible to the user.
-    ticket_update = {"ticket": {"comment": {"public": False, "body": additional_info_string}}}
-    try:
-        zendesk_api.update_ticket(ticket_id, ticket_update)
-    except zendesk.ZendeskError as err:
-        log.error("Error updating Zendesk ticket: %s", str(err))
-        # The update is not strictly necessary, so do not indicate failure to the user
-        pass
-
-    return HttpResponse()
+    return HttpResponse(status=(200 if success else 500))
 
 
 def info(request):

@@ -11,12 +11,12 @@
     % elif status == 'incomplete':
     <div class="incomplete" id="status_${id}">
     % endif
-    
+
     <div id="protex_container"></div>
     <input type="hidden" name="target_shape" id="target_shape" value ="${target_shape}"></input>
-    <input type="hidden" name="input_${id}" id="input_${id}" value="${value|h}"/>
+    <input type="hidden" name="input_${id}" id="input_${id}" aria-describedby="answer_${id}" value="${value|h}"/>
 
-    <p class="status">
+    <p class="status" aria-describedby="input_${id}">
       % if status == 'unsubmitted':
       unanswered
       % elif status == 'correct':

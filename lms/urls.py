@@ -111,7 +111,7 @@ if not settings.MITX_FEATURES["USE_CUSTOM_THEME"]:
         # Favicon
         (r'^favicon\.ico$', 'django.views.generic.simple.redirect_to', {'url': '/static/images/favicon.ico'}),
 
-        url(r'^submit_feedback$', 'util.views.submit_feedback_via_zendesk'),
+        url(r'^submit_feedback$', 'util.views.submit_feedback'),
 
         # TODO: These urls no longer work. They need to be updated before they are re-enabled
         # url(r'^reactivate/(?P<key>[^/]*)$', 'student.views.reactivation_email'),
@@ -267,8 +267,6 @@ if settings.COURSEWARE_ENABLED:
             'instructor.views.gradebook', name='gradebook'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/grade_summary$',
             'instructor.views.grade_summary', name='grade_summary'),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/enroll_students$',
-            'instructor.views.enroll_students', name='enroll_students'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/staff_grading$',
             'open_ended_grading.views.staff_grading', name='staff_grading'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/staff_grading/get_next$',
