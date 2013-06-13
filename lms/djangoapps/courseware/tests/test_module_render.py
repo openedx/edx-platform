@@ -127,7 +127,6 @@ class ModuleRenderTestCase(LoginEnrollmentTestCase):
 class TestTOC(TestCase):
     """Check the Table of Contents for a course"""
     def setUp(self):
-        self.maxDiff = None
 
         # Toy courses should be loaded
         self.course_name = 'edX/toy/2012_Fall'

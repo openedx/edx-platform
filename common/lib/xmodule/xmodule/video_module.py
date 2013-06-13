@@ -90,13 +90,6 @@ class VideoDescriptor(VideoFields,
     stores_state = True
     template_dir_name = "video"
 
-    # metadata_attributes = RawDescriptor.metadata_attributes + ('youtube_id_1_0',
-    #                                                            'youtube_id_0_75',
-    #                                                            'youtube_id_1_25',
-    #                                                            'youtube_id_1_5')
-
-    # metadata_to_strip = RawDescriptor.metadata_to_strip + ('show_captions',)
-
     @property
     def non_editable_metadata_fields(self):
         non_editable_fields = super(MetadataOnlyEditingDescriptor, self).non_editable_metadata_fields
@@ -136,9 +129,9 @@ class VideoDescriptor(VideoFields,
         source = _get_first_external(xml, 'source')
         if source:
             video.source = source
-        tag = _get_first_external(xml, 'tag')
-        if tag:
-            video.tag = tag
+        track = _get_first_external(xml, 'track')
+        if track:
+            video.track = track
         start_time = _parse_time(xml.get('from'))
         if start_time:
             video.start_time = start_time
