@@ -36,13 +36,15 @@
 </div>
 
 <div class="error-log">
-  <h2>Course Errors:</h2>
-  %for error in section_data['course_info']['course_errors']:
-    <div class="course-error">
-      <code class=course-error-first>  ${ error[0] } </code><br>
-      <code class=course-error-second> ${ error[1] } </code>
-    </div>
-  %endfor
+  %if len(section_data['course_info']['course_errors']):
+    <h2>Course Errors:</h2>
+    %for error in section_data['course_info']['course_errors']:
+      <div class="course-error">
+        <code class=course-error-first>  ${ error[0] } </code><br>
+        <code class=course-error-second> ${ error[1] } </code>
+      </div>
+    %endfor
+  %endif
 </div>
 
 ## <div class="basic-data">
