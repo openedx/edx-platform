@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <head>
 	${css_link("../static/css/search.css")}
 </head>
@@ -37,3 +38,26 @@
 <%def name="css_link(path, media='')">
 	<link rel="stylesheet" type="text/css" href="${path|h}" media="${media}"></link>
 </%def>
+=======
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+	<meta charset="utf-8" />
+	<title>Search Attempt</title>
+
+	<link rel="stylesheet" href="static/css/search.css" type="text/css" />
+</head>
+
+<body id="index" class="home">
+
+	<div id="searchwrapper">
+		<form action="/search" method="post"> {% csrf_token %}
+			<input type="text" class="searchbox" name="s" value="" />
+			<input type="image" src="static/images/search-icon.svg" class="searchbox_submit" value="" />
+		</form>
+	</div>
+	
+</body>
+</html>
+>>>>>>> Search working, basic functionality and styling in place, as well as csrf protection, snippeting, results highlighting, and spell correction

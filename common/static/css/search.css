@@ -1,10 +1,25 @@
+<<<<<<< HEAD
 .searchwrapper {
 	width:45%;
+=======
+#searchwrapper {
+	width: 250px;
+	height: 30px;
+	background: -moz-linear-gradient(top,  #ffffff 0%, #ededed 49%, #fafafa 50%, #ededed 50%, #dcdcdc 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(49%,#ededed), color-stop(50%,#fafafa), color-stop(50%,#ededed), color-stop(100%,#dcdcdc)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top,  #ffffff 0%,#ededed 49%,#fafafa 50%,#ededed 50%,#dcdcdc 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top,  #ffffff 0%,#ededed 49%,#fafafa 50%,#ededed 50%,#dcdcdc 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top,  #ffffff 0%,#ededed 49%,#fafafa 50%,#ededed 50%,#dcdcdc 100%); /* IE10+ */
+	background: linear-gradient(to bottom,  #ffffff 0%,#ededed 49%,#fafafa 50%,#ededed 50%,#dcdcdc 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#dcdcdc',GradientType=0 ); /* IE6-9 */
+
+>>>>>>> Search working, basic functionality and styling in place, as well as csrf protection, snippeting, results highlighting, and spell correction
 	padding: 0;
 	margin: 0;
 	position:relative;
 }
 
+<<<<<<< HEAD
 .result-title{
 	text-align: center;
 	word-wrap: normal;
@@ -30,6 +45,13 @@
 	background: -ms-linear-gradient(top,  #ffffff 0%,#ededed 49%,#fafafa 50%,#ededed 50%,#dcdcdc 100%); /* IE10+ */
 	background: linear-gradient(to bottom,  #ffffff 0%,#ededed 49%,#fafafa 50%,#ededed 50%,#dcdcdc 100%); /* W3C */
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#dcdcdc',GradientType=0 ); /* IE6-9 */
+=======
+#searchwrapper form { display: inline; }
+
+.searchbox {
+	border:0;
+	background-color:transparent;
+>>>>>>> Search working, basic functionality and styling in place, as well as csrf protection, snippeting, results highlighting, and spell correction
 	position:absolute;
 	top:3px;
 	left:0;
@@ -41,6 +63,7 @@
 	border: 0;
 	background-image: url("../images/search-icon.svg");
 	background-color: transparent;
+<<<<<<< HEAD
 	background-size: cover;
 	position: absolute;
 	top: 2.5px;
@@ -69,6 +92,13 @@
 	display: block;
 	text-align: right;
 	padding-top: 10px;
+=======
+	position: absolute;
+	top: 4px;
+	left: 225px;
+	width:25px;
+	height:25px;
+>>>>>>> Search working, basic functionality and styling in place, as well as csrf protection, snippeting, results highlighting, and spell correction
 }
 
 .searchbox_submit:hover {
@@ -79,6 +109,7 @@
 .results_snippet{
 	color: #666666;
 	font-family: "Open Sans", "Arial";
+<<<<<<< HEAD
 	font-weight: 300;
 	height: 155px;
 	width: 360px;
@@ -103,4 +134,8 @@
 
 .columnate{
 	float:left;
+=======
+	font-size: 14px;
+	font-weight: 300;
+>>>>>>> Search working, basic functionality and styling in place, as well as csrf protection, snippeting, results highlighting, and spell correction
 }
