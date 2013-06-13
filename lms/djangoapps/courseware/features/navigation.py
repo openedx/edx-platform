@@ -84,7 +84,8 @@ def click_on_section(step, section):
 
     subid = "ui-accordion-accordion-panel-" + str(int(section) - 1)
     subsection_css = 'ul[id="%s"]> li > a' % subid
-    world.css_click(subsection_css)
+    #for some reason needed to do it in two steps
+    world.css_find(subsection_css).click()
 
 
 @step(u'I click on subsection "([^"]*)"$')
