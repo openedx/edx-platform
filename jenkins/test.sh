@@ -77,7 +77,6 @@ rake test_cms || TESTS_FAILED=1
 rake test_lms || TESTS_FAILED=1
 rake test_common/lib/capa || TESTS_FAILED=1
 rake test_common/lib/xmodule || TESTS_FAILED=1
-rake test_common/lib/calc || TESTS_FAILED=1
 
 # Run the javascript unit tests
 rake phantomjs_jasmine_lms || TESTS_FAILED=1
