@@ -146,6 +146,7 @@ $(document).ready(function() {
     $('.edit-section-start-save').bind('click', saveSetSectionScheduleDate);
 
     $('.upload-modal .choose-file-button').bind('click', showFileSelectionMenu);
+    $('.remove-asset-button').bind('click', removeAsset);
 
     $body.on('click', '.section-published-date .edit-button', editSectionPublishDate);
     $body.on('click', '.section-published-date .schedule-button', editSectionPublishDate);
@@ -396,6 +397,29 @@ function _deleteItem($el) {
     function(data) {
         $el.remove();
     });
+}
+
+function removeAsset(e) {
+    e.preventDefault();
+
+    // replace with new notification moodal
+    if (!confirm('Are you sure you wish to delete this item. It cannot be reversed!')) return;
+
+    var remove_asset_url = $('.asset-library').data('remove-asset-callback-url');
+    var location = $(this).closest('tr').data('id');
+    var that = this;
+    $.post(remove_asset_url,
+        { 'location': location },
+        function() {
+            // show the alert
+            $(".wrapper-alert-confirmation").addClass("is-shown").attr('aria-hidden','false');
+            $(that).closest('tr').remove();
+            analytics.track('Deleted Asset', {
+                'course': course_location_analytics,
+                'id': location
+            });
+        }
+    );
 }
 
 function showUploadModal(e) {

@@ -76,8 +76,8 @@ urlpatterns = ('',  # nopep8
 
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/assets/(?P<name>[^/]+)$',
         'contentstore.views.asset_index', name='asset_index'),
-    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/assets/remove/(?P<location>.*?)$',
-        'contentstore.views.remove_asset', name='remove_asset'),
+    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/assets/(?P<name>[^/]+)/remove$',
+        'contentstore.views.assets.remove_asset', name='remove_asset'),
 
     # this is a generic method to return the data/metadata associated with a xmodule
     url(r'^module_info/(?P<module_location>.*)$',
