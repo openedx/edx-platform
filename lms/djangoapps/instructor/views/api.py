@@ -35,16 +35,6 @@ import analytics.csvs
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-def test(request, course_id):
-    response_payload = {
-        'testing': 'ok',
-    }
-    response = HttpResponse(json.dumps(response_payload), content_type="application/json")
-    return response
-
-
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def grading_config(request, course_id):
     """
     Respond with json which contains a html formatted grade summary.
@@ -72,6 +62,7 @@ def enrolled_students_profiles(request, course_id, csv=False):
 
     TODO accept requests for different attribute sets
     """
+    course = get_course_with_access(request.user, course_id, 'staff', depth=None)
 
     available_features = analytics.basic.AVAILABLE_STUDENT_FEATURES + analytics.basic.AVAILABLE_PROFILE_FEATURES
     query_features = ['username', 'name', 'language', 'location', 'year_of_birth', 'gender',
@@ -114,6 +105,7 @@ def profile_distribution(request, course_id):
     TODO how should query parameter interpretation work?
     TODO respond to csv requests as well
     """
+    course = get_course_with_access(request.user, course_id, 'staff', depth=None)
 
     try:
         features = json.loads(request.GET.get('features'))
