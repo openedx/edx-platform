@@ -67,9 +67,10 @@ setup_instructor_dashboard_sections = (idash_content) ->
 setup_section_enrollment = (section) ->
   log "setting up instructor dashboard section - enrollment"
 
-  emails_input = section.find("input[name='student-emails']'")
+  emails_input = section.find("textarea[name='student-emails']'")
   btn_enroll = section.find("input[name='enroll']'")
   btn_unenroll = section.find("input[name='unenroll']'")
+  task_response = section.find(".task-response")
 
   emails_input.click -> log 'click emails_input'
   btn_enroll.click -> log 'click btn_enroll'
@@ -78,10 +79,12 @@ setup_section_enrollment = (section) ->
   btn_enroll.click -> $.getJSON btn_enroll.data('endpoint'), enroll: emails_input.val() , (data) ->
     log 'received response for enroll button'
     log data
+    task_response.text JSON.stringify(data)
 
   btn_unenroll.click -> $.getJSON btn_unenroll.data('endpoint'), unenroll: emails_input.val() , (data) ->
     log 'received response for unenroll button'
     log data
+    task_response.text JSON.stringify(data)
 
 
 # setup the data download section

@@ -57,9 +57,10 @@
     <div>
       <h2>Batch Enrollment</h2>
       <p>Enter student emails separated by new lines or commas.</p>
-      <input type="text" name="student-emails" value="Student Emails">
+      <textarea rows="6" cols="70" name="student-emails">Student Emails</textarea>
       <input type="button" name="enroll" value="Enroll" data-endpoint="${ section_data['enrollment']['enroll_button_url'] }" >
       <input type="button" name="unenroll" value="Unenroll" data-endpoint="${ section_data['enrollment']['unenroll_button_url'] }" >
+      <div class="task-response"></div>
     </div>
   </section>
 
