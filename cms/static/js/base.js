@@ -403,7 +403,7 @@ function removeAsset(e) {
     e.preventDefault();
 
     // replace with new notification moodal
-    if (!confirm('Are you sure you wish to delete this item. It cannot be reversed!')) return;
+    if (!confirm('Are you sure you wish to delete this item. It cannot be reversed!\n\nAlso any content that links/refers to this item will no longer work (e.g. broken images and/or links)')) return;
 
     var remove_asset_url = $('.asset-library').data('remove-asset-callback-url');
     var location = $(this).closest('tr').data('id');
