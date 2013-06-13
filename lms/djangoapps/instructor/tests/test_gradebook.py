@@ -76,7 +76,7 @@ class TestGradebook(ModuleStoreTestCase):
 class TestDefaultGradingPolicy(TestGradebook):
     def test_all_users_listed(self):
         for user in self.users:
-            self.assertIn(str(user.username), str(self.response.content))
+            self.assertIn(user.username, unicode(self.response.content, 'utf-8'))
 
     def test_default_policy(self):
         # Default >= 50% passes, so Users 5-10 should be passing for Homework 1 [6]
