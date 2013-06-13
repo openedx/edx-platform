@@ -148,7 +148,10 @@ class XModule(XModuleFields, HTMLSnippet, XBlock):
         Return a display name for the module: use display_name if defined in
         metadata, otherwise convert the url name.
         '''
-        name = self.display_name
+        name = None
+        # if explicitly set, use display_name, but don't use its default
+        if 'display_name' in self._model_data:
+            name = self.display_name
         if name is None:
             name = self.url_name.replace('_', ' ')
         return name

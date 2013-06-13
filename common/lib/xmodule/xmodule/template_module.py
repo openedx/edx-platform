@@ -35,6 +35,7 @@ class CustomTagModule(XModule):
 class CustomTagDescriptor(RawDescriptor):
     """ Descriptor for custom tags.  Loads the template when created."""
     module_class = CustomTagModule
+    template_dir_name = 'customtag'
 
     def render_template(self, system, xml_data):
         '''Render the template, given the definition xml_data'''
@@ -49,12 +50,12 @@ class CustomTagDescriptor(RawDescriptor):
             else:
                 # TODO (vshnayder): better exception type
                 raise Exception("Could not find impl attribute in customtag {0}"
-                                .format(location))
+                                .format(self.location))
 
         params = dict(xmltree.items())
 
         # cdodge: look up the template as a module
-        template_loc = self.location._replace(category='custom_tag_template', name=template_name)
+        template_loc = self.location.replace(category='custom_tag_template', name=template_name)
 
         template_module = modulestore().get_instance(system.course_id, template_loc)
         template_module_data = template_module.data

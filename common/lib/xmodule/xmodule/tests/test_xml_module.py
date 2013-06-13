@@ -48,7 +48,7 @@ class EditableMetadataFieldsTest(unittest.TestCase):
         self.assertEqual(1, len(editable_fields), "Expected only 1 editable field for xml descriptor.")
         self.assert_field_values(
             editable_fields, 'display_name', XModuleFields.display_name,
-            explicitly_set=False, inheritable=False, value=None, default_value=None
+            explicitly_set=False, inheritable=False, value="New", default_value="New"
         )
 
     def test_override_default(self):
@@ -56,7 +56,7 @@ class EditableMetadataFieldsTest(unittest.TestCase):
         editable_fields = self.get_xml_editable_fields({'display_name': 'foo'})
         self.assert_field_values(
             editable_fields, 'display_name', XModuleFields.display_name,
-            explicitly_set=True, inheritable=False, value='foo', default_value=None
+            explicitly_set=True, inheritable=False, value='foo', default_value="New"
         )
 
     def test_integer_field(self):
