@@ -47,12 +47,6 @@ def i_see_the_course_in_my_courses(step):
     assert world.css_has_text(course_css, 'Robot Super Course')
 
 
-@step('the course is loaded$')
-def course_is_loaded(step):
-    class_css = 'a.class-name'
-    assert world.css_has_text(course_css, 'Robot Super Cousre')
-
-
 @step('I am on the "([^"]*)" tab$')
 def i_am_on_tab(step, tab_name):
     header_css = 'div.inner-wrapper h1'

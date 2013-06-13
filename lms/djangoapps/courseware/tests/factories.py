@@ -12,6 +12,7 @@ from courseware.models import StudentModule, XModuleContentField, XModuleSetting
 from courseware.models import XModuleStudentInfoField, XModuleStudentPrefsField
 
 from xmodule.modulestore import Location
+from pytz import UTC
 
 location = partial(Location, 'i4x', 'edX', 'test_course', 'problem')
 
@@ -28,8 +29,8 @@ class RegistrationFactory(StudentRegistrationFactory):
 class UserFactory(StudentUserFactory):
     email = 'robot@edx.org'
     last_name = 'Tester'
-    last_login = datetime.now()
-    date_joined = datetime.now()
+    last_login = datetime.now(UTC)
+    date_joined = datetime.now(UTC)
 
 
 class GroupFactory(StudentGroupFactory):

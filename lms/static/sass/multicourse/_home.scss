@@ -15,7 +15,7 @@
     @include clearfix;
     height: 460px;
     overflow: hidden;
-    margin-top: -69px;
+    margin-top: $header_image_margin;
     padding: 0px;
     width: flex-grid(12);
 

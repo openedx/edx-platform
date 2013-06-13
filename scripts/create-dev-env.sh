@@ -207,7 +207,8 @@ case `uname -s` in
         distro=`lsb_release -cs`
         case $distro in
             wheezy|jessie|maya|olivia|nadia|precise|quantal) 
-                warning "Debian support is not fully debugged. Assuming you have standard
+                warning "
+                        Debian support is not fully debugged. Assuming you have standard
                         development packages already working like scipy rvm, the 
                         installation should go fine, but this is still a work in progress.
 
@@ -219,7 +220,8 @@ case `uname -s` in
                 read dummy
                 sudo apt-get install git ;;  
             squeeze|lisa|katya|oneiric|natty|raring)
-                warning "It seems like you're using $distro which has been deprecated.
+                warning "
+                          It seems like you're using $distro which has been deprecated.
                           While we don't technically support this release, the install
                           script will probably still work.
 
@@ -310,13 +312,13 @@ case `uname -s` in
         curl -sL get.rvm.io | bash -s -- --version 1.15.7
     ;;
 
-    squeeze|wheezy|jessie|maya|lisa|olivia|nadia|natty|oneiric|precise|quantal|raring)
+    [Ll]inux)
         warning "Setting up rvm on linux. This is a known pain point. If the script fails here
                 refer to the following stack overflow question: 
                 http://stackoverflow.com/questions/9056008/installed-ruby-1-9-3-with-rvm-but-command-line-doesnt-show-ruby-v/9056395#9056395"
         sudo apt-get --purge remove ruby-rvm
         sudo rm -rf /usr/share/ruby-rvm /etc/rvmrc /etc/profile.d/rvm.sh
-        curl -sL https://get.rvm.io | bash -s stable --ruby --autolibs=enable --autodotfiles
+        curl -sL https://get.rvm.io | bash -s stable --ruby --autolibs=enable --auto-dotfiles
     ;;
 esac
         
@@ -392,7 +394,7 @@ if [[ `type -t mkvirtualenv` != "function" ]]; then
             source `which virtualenvwrapper.sh`
         ;;
 
-        squeeze|wheezy|jessie|maya|lisa|olivia|nadia|natty|oneiric|precise|quantal|raring)
+        [Ll]inux)
         if [[ -f "/etc/bash_completion.d/virtualenvwrapper" ]]; then
             source /etc/bash_completion.d/virtualenvwrapper
         else
@@ -483,7 +485,7 @@ pip install -r $BASE/edx-platform/requirements/edx/pre.txt
 output "Installing edX requirements"
 # Install prereqs
 cd $BASE/edx-platform
-rvm use $RUBY_VER
+rvm use "$RUBY_VER@edx-platform"
 rake install_prereqs
 
 # Final dependecy
@@ -499,7 +501,7 @@ mkdir "$BASE/data" || true
 
 rake django-admin[syncdb]
 rake django-admin[migrate]
-rake django-admin[update-templates]
+rake cms:update_templates
 # Configure Git
 
 output "Fixing your git default settings"

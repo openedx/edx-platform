@@ -243,3 +243,18 @@ MITX_FEATURES['ENABLE_PEARSON_LOGIN'] = False
 
 ANALYTICS_SERVER_URL = "http://127.0.0.1:9000/"
 ANALYTICS_API_KEY = ""
+
+##### segment-io  ######
+
+# If there's an environment variable set, grab it and turn on segment io
+SEGMENT_IO_LMS_KEY = os.environ.get('SEGMENT_IO_LMS_KEY')
+if SEGMENT_IO_LMS_KEY:
+    MITX_FEATURES['SEGMENT_IO_LMS'] = True
+
+
+#####################################################################
+# Lastly, see if the developer has any local overrides.
+try:
+    from .private import *
+except ImportError:
+    pass

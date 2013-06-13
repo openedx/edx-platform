@@ -1,53 +1,44 @@
-# TODO: figure out why failing
-xdescribe 'VideoControl', ->
+describe 'VideoControl', ->
   beforeEach ->
-    jasmine.stubVideoPlayer @
+    window.onTouchBasedDevice = jasmine.createSpy('onTouchBasedDevice').andReturn false
+    loadFixtures 'video.html'
     $('.video-controls').html ''
 
   describe 'constructor', ->
+
     it 'render the video controls', ->
-      new VideoControl(el: $('.video-controls'))
-      expect($('.video-controls').html()).toContain '''
-        <div class="slider"></div>
-        <div>
-          <ul class="vcr">
-            <li><a class="video_control play" href="#">Play</a></li>
-            <li>
-              <div class="vidtime">0:00 / 0:00</div>
-            </li>
-          </ul>
-          <div class="secondary-controls">
-            <a href="#" class="add-fullscreen" title="Fill browser">Fill Browser</a>
-          </div>
-        </div>
-      '''
+      @control = new window.VideoControl(el: $('.video-controls'))
+      expect($('.video-controls')).toContain
+      ['.slider', 'ul.vcr', 'a.play', '.vidtime', '.add-fullscreen'].join(',')
+      expect($('.video-controls').find('.vidtime')).toHaveText '0:00 / 0:00'
 
     it 'bind the playback button', ->
-      control = new VideoControl(el: $('.video-controls'))
-      expect($('.video_control')).toHandleWith 'click', control.togglePlayback
+      @control = new window.VideoControl(el: $('.video-controls'))
+      expect($('.video_control')).toHandleWith 'click', @control.togglePlayback
 
     describe 'when on a touch based device', ->
       beforeEach ->
-        spyOn(window, 'onTouchBasedDevice').andReturn true
+        window.onTouchBasedDevice.andReturn true
+        @control = new window.VideoControl(el: $('.video-controls'))
 
       it 'does not add the play class to video control', ->
-        new VideoControl(el: $('.video-controls'))
         expect($('.video_control')).not.toHaveClass 'play'
         expect($('.video_control')).not.toHaveHtml 'Play'
 
 
     describe 'when on a non-touch based device', ->
+
       beforeEach ->
-        spyOn(window, 'onTouchBasedDevice').andReturn false
+        @control = new window.VideoControl(el: $('.video-controls'))
 
       it 'add the play class to video control', ->
-        new VideoControl(el: $('.video-controls'))
         expect($('.video_control')).toHaveClass 'play'
         expect($('.video_control')).toHaveHtml 'Play'
 
   describe 'play', ->
+
     beforeEach ->
-      @control = new VideoControl(el: $('.video-controls'))
+      @control = new window.VideoControl(el: $('.video-controls'))
       @control.play()
 
     it 'switch playback button to play state', ->
@@ -56,8 +47,9 @@ xdescribe 'VideoControl', ->
       expect($('.video_control')).toHaveHtml 'Pause'
 
   describe 'pause', ->
+
     beforeEach ->
-      @control = new VideoControl(el: $('.video-controls'))
+      @control = new window.VideoControl(el: $('.video-controls'))
       @control.pause()
 
     it 'switch playback button to pause state', ->
@@ -66,8 +58,9 @@ xdescribe 'VideoControl', ->
       expect($('.video_control')).toHaveHtml 'Play'
 
   describe 'togglePlayback', ->
+
     beforeEach ->
-      @control = new VideoControl(el: $('.video-controls'))
+      @control = new window.VideoControl(el: $('.video-controls'))
 
     describe 'when the control does not have play or pause class', ->
       beforeEach ->

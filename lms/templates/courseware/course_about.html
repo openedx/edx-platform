@@ -8,7 +8,11 @@
 <%inherit file="../main.html" />
 
 <%block name="headextra">
-  <%include file="../google_analytics.html" />
+  % if self.theme_enabled():
+    <%include file="../theme-google-analytics.html" />
+  % else:
+    <%include file="../google_analytics.html" />
+  % endif
 </%block>
 
 <%block name="js_extra">
@@ -46,7 +50,12 @@
       <div class="table">
       <section class="intro">
         <hgroup>
-          <h1>${course.number}: ${get_course_about_section(course, "title")}<a href="${reverse('university_profile', args=[course.org])}">${get_course_about_section(course, "university")}</a></h1>
+          <h1>
+            ${course.number}: ${get_course_about_section(course, "title")}
+            % if not self.theme_enabled():
+              <a href="${reverse('university_profile', args=[course.org])}">${get_course_about_section(course, "university")}</a>
+            % endif
+          </h1>
         </hgroup>
 
         <div class="main-cta">
@@ -105,14 +114,26 @@
         <header>
           <div class="social-sharing">
             <div class="sharing-message">Share with friends and family!</div>
-            <a href="http://twitter.com/intent/tweet?text=I+just+registered+for+${course.number}+${get_course_about_section(course, 'title')}+through+@edxonline:+http://www.edx.org${reverse('about_course', args=[course.id])}" class="share">
-              <img src="${static.url('images/social/twitter-sharing.png')}">
-            </a>
-            <a href="http://www.facebook.com/EdxOnline" class="share"> <img src="${static.url('images/social/facebook-sharing.png')}">
-            </a>
-            <a href="mailto:?subject=Take%20a%20course%20with%20edX%20online&body=I%20just%20registered%20for%20${course.number}%20${get_course_about_section(course, 'title')}%20through%20edX:+http://edx.org/${reverse('about_course', args=[course.id])}" class="share">
-              <img src="${static.url('images/social/email-sharing.png')}">
-            </a>
+            ## TODO: this should probably be an overrideable block,
+            ##       or something allowing themes to do whatever they
+            ##       want here (and on this whole page, really).
+            % if self.stanford_theme_enabled():
+              <a href="http://twitter.com/intent/tweet?text=I+just+registered+for+${course.number}+${get_course_about_section(course, 'title')}!+(http://class.stanford.edu)" class="share">
+                <img src="${static.url('images/social/twitter-sharing.png')}">
+              </a>
+              <a href="mailto:?subject=Take%20a%20course%20at%20Stanford%20online!&body=I%20just%20registered%20for%20${course.number}%20${get_course_about_section(course, 'title')}+(http://class.stanford.edu)" class="share">
+                <img src="${static.url('images/social/email-sharing.png')}">
+              </a>
+            % else:
+              <a href="http://twitter.com/intent/tweet?text=I+just+registered+for+${course.number}+${get_course_about_section(course, 'title')}+through+@edxonline:+http://www.edx.org${reverse('about_course', args=[course.id])}" class="share">
+                <img src="${static.url('images/social/twitter-sharing.png')}">
+              </a>
+              <a href="http://www.facebook.com/EdxOnline" class="share"> <img src="${static.url('images/social/facebook-sharing.png')}">
+              </a>
+              <a href="mailto:?subject=Take%20a%20course%20with%20edX%20online&body=I%20just%20registered%20for%20${course.number}%20${get_course_about_section(course, 'title')}%20through%20edX:+http://edx.org/${reverse('about_course', args=[course.id])}" class="share">
+                <img src="${static.url('images/social/email-sharing.png')}">
+              </a>
+            % endif
           </div>
         </header>
 

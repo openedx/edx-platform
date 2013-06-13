@@ -239,4 +239,3 @@ class WordCloudDescriptor(MetadataOnlyEditingDescriptor, RawDescriptor, WordClou
     """Descriptor for WordCloud Xmodule."""
     module_class = WordCloudModule
     template_dir_name = 'word_cloud'
-    stores_state = True

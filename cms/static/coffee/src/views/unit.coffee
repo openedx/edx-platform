@@ -1,6 +1,7 @@
 class CMS.Views.UnitEdit extends Backbone.View
   events:
-    'click .new-component .new-component-type a': 'showComponentTemplates'
+    'click .new-component .new-component-type a.multiple-templates': 'showComponentTemplates'
+    'click .new-component .new-component-type a.single-template': 'saveNewComponent'
     'click .new-component .cancel-button': 'closeNewComponent'
     'click .new-component-templates .new-component-template a': 'saveNewComponent'
     'click .new-component-templates .cancel-button': 'closeNewComponent'

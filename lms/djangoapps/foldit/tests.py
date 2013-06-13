@@ -13,6 +13,7 @@ from foldit.models import PuzzleComplete, Score
 from student.models import UserProfile, unique_id_for_user
 
 from datetime import datetime, timedelta
+from pytz import UTC
 
 log = logging.getLogger(__name__)
 
@@ -28,7 +29,7 @@ class FolditTestCase(TestCase):
         self.user2 = User.objects.create_user('testuser2', 'test2@test.com', pwd)
         self.unique_user_id = unique_id_for_user(self.user)
         self.unique_user_id2 = unique_id_for_user(self.user2)
-        now = datetime.now()
+        now = datetime.now(UTC)
         self.tomorrow = now + timedelta(days=1)
         self.yesterday = now - timedelta(days=1)
 
@@ -222,7 +223,7 @@ class FolditTestCase(TestCase):
         verify = {"Verify": verify_code(self.user.email, puzzles_str),
                   "VerifyMethod":"FoldItVerify"}
 
-        data =  {'SetPuzzlesCompleteVerify': json.dumps(verify),
+        data = {'SetPuzzlesCompleteVerify': json.dumps(verify),
                 'SetPuzzlesComplete': puzzles_str}
 
         request = self.make_request(data)

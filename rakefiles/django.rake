@@ -15,14 +15,22 @@ task :fastlms do
     sh("#{django_admin} runserver --traceback --settings=lms.envs.dev   --pythonpath=.")
 end
 
+# Start :system locally with the specified :env and :options.
+#
+# This task should be invoked via the wrapper below, so we don't
+# include a description to keep it from showing up in rake -T.
+task :runserver, [:system, :env, :options] => [:install_prereqs, 'assets:_watch', :predjango] do |t, args|
+    sh(django_admin(args.system, args.env, 'runserver', args.options))
+end
+
 [:lms, :cms].each do |system|
     desc <<-desc
         Start the #{system} locally with the specified environment (defaults to dev).
         Other useful environments are devplus (for dev testing with a real local database)
         desc
-    task system, [:env, :options] => [:install_prereqs, 'assets:_watch', :predjango] do |t, args|
+    task system, [:env, :options] do |t, args|
         args.with_defaults(:env => 'dev', :options => default_options[system])
-        sh(django_admin(system, args.env, 'runserver', args.options))
+        Rake::Task[:runserver].invoke(system, args.env, args.options)
     end
 
     desc "Start #{system} Celery worker"

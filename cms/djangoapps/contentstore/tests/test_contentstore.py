@@ -37,6 +37,9 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from contentstore.views.component import ADVANCED_COMPONENT_TYPES
 
 from django_comment_common.utils import are_permissions_roles_seeded
+from xmodule.exceptions import InvalidVersionError
+import datetime
+from pytz import UTC
 
 TEST_DATA_MODULESTORE = copy.deepcopy(settings.MODULESTORE)
 TEST_DATA_MODULESTORE['default']['OPTIONS']['fs_root'] = path('common/test/data')
@@ -77,14 +80,25 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.client = Client()
         self.client.login(username=uname, password=password)
 
-    def test_advanced_components_in_edit_unit(self):
+    def check_components_on_page(self, component_types, expected_types):
+        """
+        Ensure that the right types end up on the page.
+
+        component_types is the list of advanced components.
+
+        expected_types is the list of elements that should appear on the page.
+
+        expected_types and component_types should be similar, but not
+        exactly the same -- for example, 'videoalpha' in
+        component_types should cause 'Video Alpha' to be present.
+        """
         store = modulestore('direct')
         import_from_xml(store, 'common/test/data/', ['simple'])
 
         course = store.get_item(Location(['i4x', 'edX', 'simple',
                                           'course', '2012_Fall', None]), depth=None)
 
-        course.advanced_modules = ADVANCED_COMPONENT_TYPES
+        course.advanced_modules = component_types
 
         store.update_metadata(course.location, own_metadata(course))
 
@@ -94,13 +108,31 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         resp = self.client.get(reverse('edit_unit', kwargs={'location': descriptor.location.url()}))
         self.assertEqual(resp.status_code, 200)
 
+        for expected in expected_types:
+            self.assertIn(expected, resp.content)
+
+    def test_advanced_components_in_edit_unit(self):
         # This could be made better, but for now let's just assert that we see the advanced modules mentioned in the page
         # response HTML
-        self.assertIn('Video Alpha', resp.content)
-        self.assertIn('Word cloud', resp.content)
-        self.assertIn('Annotation', resp.content)
-        self.assertIn('Open Ended Response', resp.content)
-        self.assertIn('Peer Grading Interface', resp.content)
+        self.check_components_on_page(ADVANCED_COMPONENT_TYPES, ['Video Alpha',
+                                                                 'Word cloud',
+                                                                 'Annotation',
+                                                                 'Open Ended Response',
+                                                                 'Peer Grading Interface'])
+
+    def test_advanced_components_require_two_clicks(self):
+        self.check_components_on_page(['videoalpha'], ['Video Alpha'])
+
+    def test_malformed_edit_unit_request(self):
+        store = modulestore('direct')
+        import_from_xml(store, 'common/test/data/', ['simple'])
+
+        # just pick one vertical
+        descriptor = store.get_items(Location('i4x', 'edX', 'simple', 'vertical', None, None))[0]
+        location = descriptor.location._replace(name='.' + descriptor.location.name)
+
+        resp = self.client.get(reverse('edit_unit', kwargs={'location': location.url()}))
+        self.assertEqual(resp.status_code, 400)
 
     def check_edit_unit(self, test_course_name):
         import_from_xml(modulestore('direct'), 'common/test/data/', [test_course_name])
@@ -239,7 +271,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         )
         self.assertTrue(getattr(draft_problem, 'is_draft', False))
 
-        #now requery with depth
+        # now requery with depth
         course = modulestore('draft').get_item(
             Location(['i4x', 'edX', 'simple', 'course', '2012_Fall', None]),
             depth=None
@@ -386,6 +418,32 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             resp = self.client.get(reverse('edit_unit', kwargs={'location': new_loc.url()}))
             self.assertEqual(resp.status_code, 200)
 
+    def test_illegal_draft_crud_ops(self):
+        draft_store = modulestore('draft')
+        direct_store = modulestore('direct')
+
+        CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course')
+
+        location = Location('i4x://MITx/999/chapter/neuvo')
+        self.assertRaises(InvalidVersionError, draft_store.clone_item, 'i4x://edx/templates/chapter/Empty',
+            location)
+        direct_store.clone_item('i4x://edx/templates/chapter/Empty', location)
+        self.assertRaises(InvalidVersionError, draft_store.clone_item, location,
+            location)
+
+        self.assertRaises(InvalidVersionError, draft_store.update_item, location,
+            'chapter data')
+
+        # taking advantage of update_children and other functions never checking that the ids are valid
+        self.assertRaises(InvalidVersionError, draft_store.update_children, location,
+            ['i4x://MITx/999/problem/doesntexist'])
+
+        self.assertRaises(InvalidVersionError, draft_store.update_metadata, location,
+            {'due': datetime.datetime.now(UTC)})
+
+        self.assertRaises(InvalidVersionError, draft_store.unpublish, location)
+
+
     def test_bad_contentstore_request(self):
         resp = self.client.get('http://localhost:8001/c4x/CDX/123123/asset/&images_circuits_Lab7Solution2.png')
         self.assertEqual(resp.status_code, 400)
@@ -468,6 +526,9 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         # check for custom_tags
         self.verify_content_existence(module_store, root_dir, location, 'custom_tags', 'custom_tag_template')
 
+        # check for about content
+        self.verify_content_existence(module_store, root_dir, location, 'about', 'about', '.html')
+
         # check for graiding_policy.json
         filesystem = OSFS(root_dir / 'test_export/policies/6.002_Spring_2012')
         self.assertTrue(filesystem.exists('grading_policy.json'))
@@ -478,7 +539,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             on_disk = loads(grading_policy.read())
             self.assertEqual(on_disk, course.grading_policy)
 
-        #check for policy.json
+        # check for policy.json
         self.assertTrue(filesystem.exists('policy.json'))
 
         # compare what's on disk to what we have in the course module

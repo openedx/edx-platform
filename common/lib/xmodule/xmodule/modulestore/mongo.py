@@ -231,6 +231,7 @@ class MongoModuleStore(ModuleStoreBase):
         self.collection = pymongo.connection.Connection(
             host=host,
             port=port,
+            tz_aware=True,
             **kwargs
         )[db][collection]
 

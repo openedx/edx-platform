@@ -121,8 +121,6 @@ class SequenceDescriptor(SequenceFields, MakoModuleDescriptor, XmlDescriptor):
     mako_template = 'widgets/sequence-edit.html'
     module_class = SequenceModule
 
-    stores_state = True  # For remembering where in the sequence the student is
-
     js = {'coffee': [resource_string(__name__, 'js/src/sequence/edit.coffee')]}
     js_module_name = "SequenceDescriptor"
 

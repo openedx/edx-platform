@@ -41,7 +41,9 @@ def marketing_link(name):
         return settings.MKTG_URLS.get('ROOT') + settings.MKTG_URLS.get(name)
     # only link to the old pages when the marketing site isn't on
     elif not settings.MITX_FEATURES.get('ENABLE_MKTG_SITE') and name in link_map:
-        return reverse(link_map[name])
+        # don't try to reverse disabled marketing links
+        if link_map[name] is not None:
+            return reverse(link_map[name])
     else:
         log.warning("Cannot find corresponding link for name: {name}".format(name=name))
         return '#'

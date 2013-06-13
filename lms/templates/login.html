@@ -1,8 +1,11 @@
 <%inherit file="main.html" />
 
 <%namespace name='static' file='static_content.html'/>
+
 <%! from django.core.urlresolvers import reverse %>
-<%block name="title"><title>Log into your edX Account</title></%block>
+<%! from django.utils.translation import ugettext as _ %>
+
+<%block name="title"><title>Log into your ${settings.PLATFORM_NAME} Account</title></%block>
 
 <%block name="js_extra">
   <script type="text/javascript">
@@ -63,7 +66,7 @@
         $submitButton.
           removeClass('is-disabled').
           removeProp('disabled').
-          html('Log into My edX Account <span class="orn-plus">+</span> Access My Courses');
+          html('Log into My ${settings.PLATFORM_NAME} Account <span class="orn-plus">+</span> Access My Courses');
       }
       else {
         $submitButton.
@@ -77,21 +80,17 @@
 
 <section class="introduction">
   <header>
-    <h1 class="sr">Log Into Your Account</h1>
+    <h1 class="sr">${_("Log Into Your Account")}</h1>
   </header>
 </section>
 
 <section class="login container">
   <section role="main" class="content">
-    <header>
-      <h2 class="sr">Login Form</h2>
-    </header>
-
-    <form role="form" id="login-form" method="post" data-remote="true" action="/login_ajax">
+    <form role="form" id="login-form" method="post" data-remote="true" action="/login_ajax" novalidate>
 
       <!-- status messages -->
       <div role="alert" class="status message">
-        <h3 class="message-title">We're Sorry, edX accounts are unavailable currently</h3>
+        <h3 class="message-title">We're Sorry, ${settings.PLATFORM_NAME} accounts are unavailable currently</h3>
         <p class="message-copy">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Lorem ipsum dolor sit amet, consectetuer adipiscing elit.</p>
       </div>
 
@@ -103,7 +102,7 @@
       </div>
 
       <p class="instructions sr">
-        Please provide the following information to log into your edX account. Required fields are noted by <strong class="indicator">bold text and an asterisk (*)</strong>.
+        Please provide the following information to log into your ${settings.PLATFORM_NAME} account. Required fields are noted by <strong class="indicator">bold text and an asterisk (*)</strong>.
       </p>
 
       <fieldset class="group group-form group-form-requiredinformation">
@@ -112,11 +111,11 @@
         <ol class="list-input">
           <li class="field required text" id="field-email">
             <label for="email">E-mail</label>
-            <input class="" id="email" type="email" name="email" value="" placeholder="example: username@domain.com" />
+            <input class="" id="email" type="email" name="email" value="" placeholder="example: username@domain.com" required aria-required="true" />
           </li>
           <li class="field required password" id="field-password">
             <label for="password">Password</label>
-            <input id="password" type="password" name="password" value="" />
+            <input id="password" type="password" name="password" value="" required aria-required="true" />
             <span class="tip tip-input">
               <a href="#forgot-password-modal" rel="leanModal" class="pwd-reset action action-forgotpw">Forgot password?</a>
             </span>
@@ -161,14 +160,16 @@
 
     <div class="cta cta-help">
       <h3>Not Enrolled?</h3>
-      <p><a href="${reverse('register_user')}">Sign up for edX today!</a></p>
+      <p><a href="${reverse('register_user')}">Sign up for ${settings.PLATFORM_NAME} today!</a></p>
 
-      <h3>Need Help?</h3>
-      <p>Looking for help in logging in or with your edX account?
-      <a href="${marketing_link('FAQ')}">
-          View our help section for answers to commonly asked questions.
-      </a></p>
-
+      ## Disable help unless the FAQ marketing link is enabled
+      % if settings.MKTG_URL_LINK_MAP.get('FAQ'):
+        <h3>Need Help?</h3>
+        <p>Looking for help in logging in or with your ${settings.PLATFORM_NAME} account?
+        <a href="${marketing_link('FAQ')}">
+            View our help section for answers to commonly asked questions.
+        </a></p>
+      % endif
     </div>
   </aside>
   </section>
