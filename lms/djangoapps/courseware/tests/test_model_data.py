@@ -26,7 +26,6 @@ def mock_field(scope, name):
 
 def mock_descriptor(fields=[], lms_fields=[]):
     descriptor = Mock()
-    descriptor.stores_state = True
     descriptor.location = location('def_id')
     descriptor.module_class.fields = fields
     descriptor.module_class.lms.fields = lms_fields

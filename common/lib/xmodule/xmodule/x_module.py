@@ -327,10 +327,6 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
 
     # Attributes for inspection of the descriptor
 
-    # Indicates whether the xmodule state should be
-    # stored in a database (independent of shared state)
-    stores_state = False
-
     # This indicates whether the xmodule is a problem-type.
     # It should respond to max_score() and grade(). It can be graded or ungraded
     # (like a practice problem).

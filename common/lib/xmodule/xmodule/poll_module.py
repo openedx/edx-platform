@@ -141,7 +141,6 @@ class PollDescriptor(PollFields, MakoModuleDescriptor, XmlDescriptor):
 
     module_class = PollModule
     template_dir_name = 'poll'
-    stores_state = True
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):
