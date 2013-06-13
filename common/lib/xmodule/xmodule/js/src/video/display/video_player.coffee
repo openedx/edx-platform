@@ -66,6 +66,9 @@ class @VideoPlayer extends Subview
         at: 'top center'
 
   onReady: (event) =>
+    # Following line is work around for youtube API Bug
+    # 6/13/13
+    @player.addEventListener('onStateChange', @onStateChange)
     unless onTouchBasedDevice() or $('.video:first').data('autoplay') == 'False'
       $('.video-load-complete:first').data('video').player.play()
 
