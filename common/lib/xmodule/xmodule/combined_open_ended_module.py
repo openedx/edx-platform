@@ -239,7 +239,6 @@ class CombinedOpenEndedDescriptor(CombinedOpenEndedFields, RawDescriptor):
     mako_template = "widgets/open-ended-edit.html"
     module_class = CombinedOpenEndedModule
 
-    stores_state = True
     has_score = True
     always_recalculate_grades = True
     template_dir_name = "combinedopenended"

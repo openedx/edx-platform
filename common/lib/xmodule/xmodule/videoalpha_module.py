@@ -153,5 +153,4 @@ class VideoAlphaModule(VideoAlphaFields, XModule):
 
 class VideoAlphaDescriptor(VideoAlphaFields, RawDescriptor):
     module_class = VideoAlphaModule
-    stores_state = True
     template_dir_name = "videoalpha"
