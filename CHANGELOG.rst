@@ -10,6 +10,8 @@ instance, Boolean, Integer, String), but also allow them to hold either the
 typed value, or a String that can be converted to their typed value. For example,
 an Integer can contain 3 or '3'. This changed an update to the xblock library.
 
+CMS: Allow editors to delete uploaded files/assets
+
 LMS: Some errors handling Non-ASCII data in XML courses have been fixed.
 
 LMS: Add page-load tracking using segment-io (if SEGMENT_IO_LMS_KEY and
