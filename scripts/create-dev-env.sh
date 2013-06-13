@@ -501,6 +501,14 @@ mkdir "$BASE/data" || true
 
 rake django-admin[syncdb]
 rake django-admin[migrate]
+
+case `uname -s` in Darwin)
+        output "This next step needs Mongo to run"
+        output "Ensure that Mongo is running, then press Enter, or press control-C to quit"
+        read dummy
+        ;;
+esac
+
 rake cms:update_templates
 # Configure Git
 
