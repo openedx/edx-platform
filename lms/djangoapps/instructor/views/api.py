@@ -50,7 +50,7 @@ def enrolled_students_profiles(request, course_id, csv=False):
     course = get_course_with_access(request.user, course_id, 'staff', depth=None)
 
     available_features = analytics.basic.AVAILABLE_STUDENT_FEATURES + analytics.basic.AVAILABLE_PROFILE_FEATURES
-    query_features = ['username', 'name', 'language', 'location', 'year_of_birth', 'gender',
+    query_features = ['username', 'name', 'email', 'language', 'location', 'year_of_birth', 'gender',
                       'level_of_education', 'mailing_address', 'goals']
 
     student_data = analytics.basic.enrolled_students_profiles(course_id, query_features)
