@@ -1,6 +1,6 @@
 import unittest
 from xmodule.modulestore import Location
-from .import test_system
+from .import system_test
 from test_util_open_ended import MockQueryDict, DummyModulestore
 import json
 
@@ -39,8 +39,8 @@ class PeerGradingModuleTest(unittest.TestCase, DummyModulestore):
         Create a peer grading module from a test system
         @return:
         """
-        self.test_system = test_system()
-        self.test_system.open_ended_grading_interface = None
+        self.system_test = system_test()
+        self.system_test.open_ended_grading_interface = None
         self.setup_modulestore(COURSE)
         self.peer_grading = self.get_module_from_location(self.problem_location, COURSE)
 
@@ -151,8 +151,8 @@ class PeerGradingModuleScoredTest(unittest.TestCase, DummyModulestore):
         Create a peer grading module from a test system
         @return:
         """
-        self.test_system = test_system()
-        self.test_system.open_ended_grading_interface = None
+        self.system_test = system_test()
+        self.system_test.open_ended_grading_interface = None
         self.setup_modulestore(COURSE)
 
     def test_metadata_load(self):
