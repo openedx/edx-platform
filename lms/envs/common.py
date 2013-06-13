@@ -738,6 +738,11 @@ MKTG_URL_LINK_MAP = {
     'PRIVACY': 'privacy_edx',
 }
 
+
+############################### CHAT ################################
+JABBER = {}
+DATABASE_ROUTERS = []
+
 ############################### THEME ################################
 def enable_theme(theme_name):
     """
@@ -764,4 +769,3 @@ def enable_theme(theme_name):
     # avoid collisions with default edX static files
     STATICFILES_DIRS.append((u'themes/%s' % theme_name,
                              theme_root / 'static'))
-
