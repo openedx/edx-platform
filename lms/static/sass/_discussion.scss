@@ -2674,19 +2674,18 @@ display:none;
 }
 
 .discussion-flag-abuse {
-      font-size: 12px;
-      float:right;
-      padding-right: 5px;
-      font-style: italic;
-      cursor:pointer;
-      opacity: 0.8;
+  font-size: 12px;
+  float:right;
+  padding-right: 5px;
+  font-style: italic;
+  cursor:pointer;
+  opacity: 0.8;
 
-      &:hover {
-        @include transition(opacity .2s linear 0s);
-        opacity: 1.0;
-      }
-
-    }
+  &:hover {
+    @include transition(opacity .2s linear 0s);
+    opacity: 1.0;
+  }
+}
 
 .notflagged .icon
 {
@@ -2696,18 +2695,18 @@ display:none;
   width: 10px;
   height: 14px;
   padding-right: 3px;
-  background: transparent url('../images/notflagged.png') no-repeat 0 0;
 }
 
 .flagged .icon
 {
   display: block;
+  color: $gray-l2;
   float: left;
   margin: 3px;
   width: 10px;
   height: 14px;
   padding-right: 3px;
-  background: transparent url('../images/flagged.png') no-repeat 0 0;
+  color: $pink;
 }
 
 .flagged span {
