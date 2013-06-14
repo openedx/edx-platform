@@ -306,7 +306,7 @@ def index(request, course_id, chapter=None, section=None,
                 'bosh_url': jabber.utils.get_bosh_url(),
                 'course_room': jabber.utils.get_room_name_for_course(course.id),
                 'username': "%s@%s" % (user.username, settings.JABBER.get('HOST')),
-                'password': jabber.utils.get_password_for_user(user.username)
+                'password': jabber.utils.get_or_create_password_for_user(user.username)
             }
 
         chapter_descriptor = course.get_child_by(lambda m: m.url_name == chapter)

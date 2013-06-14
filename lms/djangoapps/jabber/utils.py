@@ -53,7 +53,7 @@ def get_bosh_url():
     return bosh_url
 
 
-def get_password_for_user(username):
+def get_or_create_password_for_user(username):
     """
     Retrieve the password for the user with the given username. If
     a password doesn't exist, then we'll create one by generating a
