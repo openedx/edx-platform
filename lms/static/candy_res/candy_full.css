@@ -22,7 +22,7 @@ html, body {
 	background-color: #d5d0c0;
 	color: #333;
 	overflow: hidden;
-	border: 1px solid #3f3c30;
+	border: 1px solid #333;
 	border-top-right-radius: 10px;
 	box-sizing: border-box;
 }
@@ -54,10 +54,13 @@ ul {
 	margin: 0;
 }
 
+#chat-pane {
+	overflow-x: scroll;
+}
+
 #chat-tabs {
 	margin: 0;
 	padding: 0;
-	overflow: auto;
 }
 
 #chat-pane.collapsed-message-pane #chat-tabs {
@@ -83,9 +86,9 @@ ul {
 
 #chat-tabs li {
 	margin: 0;
-	float: left;
 	position: relative;
 	white-space: nowrap;
+	display: inline;
 }
 
 #chat-tabs li a {
@@ -128,12 +131,14 @@ ul {
 #chat-tabs li a.close {
 	background-color: transparent;
 	position: absolute;
-	top: 2px;
 	right: 7px;
 	height: auto;
-	padding: 0;
+	padding: 2px 0 0 0;
 	margin: 0;
 	color: #999;
+}
+#chat-tabs li.roomtype-groupchat a.close {
+	display: none !important;
 }
 #chat-tabs li a.close:hover, #chat-tabs li.active a.close:hover {
 	color: #333;
@@ -142,13 +147,13 @@ ul {
 #chat-tabs li .unread {
 	color: white;
 	background-color: #8C1515;
-	padding: 1px 2px;
+	padding: 1px 5px;
 	font-weight: normal;
 	font-size: 10px;
 	position: absolute;
-	top: 12px;
-	right: 30px;
-	border-radius: 5px;
+	top: 6px;
+	right: 10px;
+	border-radius: 6px;
 }
 
 #chat-tabs li.offline a.label {
@@ -230,15 +235,16 @@ ul {
 .roster-pane {
 	position: absolute;
 	overflow: auto;
+	overflow-x: hidden;
 	top: 30px;
 	right: 0;
 	bottom: 30px;
-	width: 198px;
+	width: 199px;
 	margin: 0;
 }
 .roster-pane .user {
 	cursor: pointer;
-	width: 90%;
+	width: 91%;
 	padding: 6px 5%;
 	font-size: 14px;
 	margin: 0;
@@ -250,13 +256,15 @@ ul {
 	background-color: #d3cec0;
 	border-bottom: 1px solid #bdb7a1;
 }
-.roster-pane .user.me {
-	font-weight: bold;
-	cursor: default;
-}
-.roster-pane .user:hover,
-.roster-pane .user.me:hover {
+.roster-pane .user:hover {
 	background-color: #e9e6df;
+}
+.roster-pane .user.me,
+.roster-pane .user.me:hover {
+	font-weight: bold;
+	background-color: #666;
+	color: #e9e6df;
+	cursor: default;
 }
 .roster-pane .user.status-ignored {
 	cursor: default;
@@ -547,7 +555,7 @@ ul {
 	right: 0;
 	bottom: 0;
 	z-index: 90;
-	background-image: url(img/overlay.png);
+	background-color: #333;
 	border-top-right-radius: 8px;
 }
 
