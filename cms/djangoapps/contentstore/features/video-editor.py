@@ -6,7 +6,7 @@ from lettuce import world, step
 
 @step('I see the correct settings and default values$')
 def i_see_the_correct_settings_and_values(step):
-    world.verify_all_setting_entries([['Default Speed', '', False],
+    world.verify_all_setting_entries([['Default Speed', 'OEoXaMPEzfM', False],
                                       ['Display Name', 'default', True],
                                       ['Download Track', '', False],
                                       ['Download Video', '', False],
