@@ -269,9 +269,11 @@ describe 'VideoCaptionAlpha', ->
       expect(parseInt($('.subtitles').css('maxHeight'))).toBeCloseTo $('.video-wrapper').height(), 2
 
     it 'set the height of caption spacing', ->
-      expect(Math.abs(parseInt($('.subtitles .spacing:first').css('height')) - @caption.topSpacingHeight())).toBeLessThan 1
-      expect(Math.abs(parseInt($('.subtitles .spacing:last').css('height')) - @caption.bottomSpacingHeight())).toBeLessThan 1
+      firstSpacing = Math.abs(parseInt($('.subtitles .spacing:first').css('height')))
+      lastSpacing = Math.abs(parseInt($('.subtitles .spacing:last').css('height')))
 
+      expect(firstSpacing - @caption.topSpacingHeight()).toBeLessThan 1
+      expect(lastSpacing - @caption.bottomSpacingHeight()).toBeLessThan 1
 
     it 'scroll caption to new position', ->
       expect($.fn.scrollTo).toHaveBeenCalled()
@@ -308,8 +310,10 @@ describe 'VideoCaptionAlpha', ->
           @caption.scrollCaption()
 
         it 'scroll to current caption', ->
+          offset = -0.5 * ($('.video-wrapper').height() - $('.subtitles .current:first').height())
+
           expect($.fn.scrollTo).toHaveBeenCalledWith $('.subtitles .current:first', @caption.el),
-            offset: - ($('.video-wrapper').height() / 2 - $('.subtitles .current:first').height() / 2)
+            offset: offset
 
   describe 'seekPlayer', ->
 
