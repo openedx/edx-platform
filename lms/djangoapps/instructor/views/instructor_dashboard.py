@@ -42,7 +42,7 @@ def instructor_dashboard_2(request, course_id):
 
     sections = [
         _section_course_info(course_id),
-        _section_enrollment(course_id),
+        _section_membership(course_id),
         _section_student_admin(course_id),
         _section_data_download(course_id),
         _section_analytics(course_id),
@@ -99,11 +99,11 @@ def _section_course_info(course_id):
     return section_data
 
 
-def _section_enrollment(course_id):
+def _section_membership(course_id):
     """ Provide data for the corresponding dashboard section """
     section_data = {
-        'section_key': 'enrollment',
-        'section_display_name': 'Enrollment',
+        'section_key': 'membership',
+        'section_display_name': 'Membership',
         'enroll_button_url':   reverse('enroll_unenroll', kwargs={'course_id': course_id}),
         'unenroll_button_url': reverse('enroll_unenroll', kwargs={'course_id': course_id}),
     }
