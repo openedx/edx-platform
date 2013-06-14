@@ -57,3 +57,20 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
         self.assertEquals(output.end_time, 0.0)
         self.assertEquals(output.track, 'http://www.example.com/track')
         self.assertEquals(output.source, 'http://www.example.com/source.mp4')
+
+    def test_from_xml_no_attributes(self):
+        '''
+        Make sure settings are correct if none are explicitly set in XML.
+        '''
+        module_system = DummySystem(load_error_modules=True)
+        xml_data = '<video></video>'
+        output = VideoDescriptor.from_xml(xml_data, module_system)
+        self.assertEquals(output.youtube_id_0_75, '')
+        self.assertEquals(output.youtube_id_1_0, 'OEoXaMPEzfM')
+        self.assertEquals(output.youtube_id_1_25, '')
+        self.assertEquals(output.youtube_id_1_5, '')
+        self.assertEquals(output.show_captions, True)
+        self.assertEquals(output.start_time, 0.0)
+        self.assertEquals(output.end_time, 0.0)
+        self.assertEquals(output.track, '')
+        self.assertEquals(output.source, '')

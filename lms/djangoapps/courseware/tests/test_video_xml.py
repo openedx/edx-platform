@@ -68,13 +68,23 @@ class VideoModuleLogicTest(LogicTest):
     }
 
     def test_parse_time(self):
-        """Ensure that times are parse correctly into seconds."""
+        """Ensure that times are parsed correctly into seconds."""
         output = _parse_time('00:04:07')
         self.assertEqual(output, 247)
 
+    def test_parse_time_none(self):
+        """Check parsing of None."""
+        output = _parse_time(None)
+        self.assertEqual(output, '')
+
+    def test_parse_time_empty(self):
+        """Check parsing of the empty string."""
+        output = _parse_time('')
+        self.assertEqual(output, '')
+
     def test_parse_youtube(self):
         """Test parsing old-style Youtube ID strings into a dict."""
-        youtube_str = '0.75:jNCf2gIqpeE,1.0:ZwkTiUPN0mg,1.25:rsq9auxASqI,1.50:kMyNdzVHHgg'
+        youtube_str = '0.75:jNCf2gIqpeE,1.00:ZwkTiUPN0mg,1.25:rsq9auxASqI,1.50:kMyNdzVHHgg'
         output = _parse_youtube(youtube_str)
         self.assertEqual(output, {'0.75': 'jNCf2gIqpeE',
                                   '1.00': 'ZwkTiUPN0mg',
@@ -92,3 +102,11 @@ class VideoModuleLogicTest(LogicTest):
                                   '1.00': '',
                                   '1.25': '',
                                   '1.50': ''})
+
+    def test_parse_youtube_key_format(self):
+        """
+        Make sure that inconsistent speed keys are parsed correctly.
+        """
+        youtube_str = '1.00:p2Q6BrNhdh8'
+        youtube_str_hack = '1.0:p2Q6BrNhdh8'
+        self.assertEqual(_parse_youtube(youtube_str), _parse_youtube(youtube_str_hack))

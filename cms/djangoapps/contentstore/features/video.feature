@@ -16,15 +16,9 @@ Feature: Video Component
 
   Scenario: Captions are shown correctly
     Given I have created a Video component
-    And I have shown captions
     Then when I view the video it does show the captions
 
-  Scenario: Captions are hidden when "show captions" is false
+  Scenario: Captions are toggled correctly
     Given I have created a Video component
-    And I have set "show captions" to False
-    Then when I view the video it does not show the captions
-
-  Scenario: Captions are shown when "show captions" is true
-    Given I have created a Video component
-    And I have set "show captions" to True
+    And I have toggled captions
     Then when I view the video it does show the captions

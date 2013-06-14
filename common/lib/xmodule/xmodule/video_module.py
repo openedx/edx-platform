@@ -14,8 +14,7 @@ from django.http import Http404
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xmodule.editing_module import MetadataOnlyEditingDescriptor
-from xblock.core import Integer, Scope, String
-from fields import StringyFloat, StringyBoolean
+from xblock.core import Integer, Scope, String, Float, Boolean
 
 log = logging.getLogger(__name__)
 
@@ -23,13 +22,13 @@ log = logging.getLogger(__name__)
 class VideoFields(object):
     """Fields for `VideoModule` and `VideoDescriptor`."""
     position = Integer(help="Current position in the video", scope=Scope.user_state, default=0)
-    show_captions = StringyBoolean(help="This controls whether or not captions are shown by default.", display_name="Show Captions", scope=Scope.settings, default=True)
-    youtube_id_1_0 = String(help="This is the Youtube ID reference for the normal speed video.", display_name="Default Speed", scope=Scope.settings, default="")
+    show_captions = Boolean(help="This controls whether or not captions are shown by default.", display_name="Show Captions", scope=Scope.settings, default=True)
+    youtube_id_1_0 = String(help="This is the Youtube ID reference for the normal speed video.", display_name="Default Speed", scope=Scope.settings, default="OEoXaMPEzfM")
     youtube_id_0_75 = String(help="The Youtube ID for the .75x speed video.", display_name="Speed: .75x", scope=Scope.settings, default="")
     youtube_id_1_25 = String(help="The Youtube ID for the 1.25x speed video.", display_name="Speed: 1.25x", scope=Scope.settings, default="")
     youtube_id_1_5 = String(help="The Youtube ID for the 1.5x speed video.", display_name="Speed: 1.5x", scope=Scope.settings, default="")
-    start_time = StringyFloat(help="Time the video starts", display_name="Start Time", scope=Scope.settings, default=0.0)
-    end_time = StringyFloat(help="Time the video ends", display_name="End Time", scope=Scope.settings, default=0.0)
+    start_time = Float(help="Time the video starts", display_name="Start Time", scope=Scope.settings, default=0.0)
+    end_time = Float(help="Time the video ends", display_name="End Time", scope=Scope.settings, default=0.0)
     source = String(help="The external URL to download the video. This appears as a link beneath the video.", display_name="Download Video", scope=Scope.settings, default="")
     track = String(help="The external URL to download the subtitle track. This appears as a link beneath the video.", display_name="Download Track", scope=Scope.settings, default="")
 
@@ -125,7 +124,9 @@ class VideoDescriptor(VideoFields,
                 video.youtube_id_1_25 = speeds['1.25']
             if speeds['1.50']:
                 video.youtube_id_1_5 = speeds['1.50']
-        video.show_captions = True if xml.get('show_captions') == 'true' else False
+        show_captions = xml.get('show_captions')
+        if show_captions:
+            video.show_captions = json.loads(show_captions)
         source = _get_first_external(xml, 'source')
         if source:
             video.source = source
@@ -177,7 +178,7 @@ def _parse_youtube(data):
 def _parse_time(str_time):
     """Converts s in '12:34:45' format to seconds. If s is
     None, returns empty string"""
-    if str_time is None:
+    if str_time is None or str_time == '':
         return ''
     else:
         obj_time = time.strptime(str_time, '%H:%M:%S')
