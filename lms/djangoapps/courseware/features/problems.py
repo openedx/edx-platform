@@ -9,7 +9,7 @@ from lettuce import world, step
 from lettuce.django import django_url
 from common import i_am_registered_for_the_course, TEST_SECTION_NAME
 from problems_setup import PROBLEM_DICT, answer_problem, problem_has_answer, add_problem_to_course
-
+from nose.tools import assert_equal, assert_not_equal
 
 @step(u'I am viewing a "([^"]*)" problem with "([^"]*)" attempt')
 def view_problem_with_attempts(step, problem_type, attempts):
@@ -116,6 +116,14 @@ def reset_problem(step):
     world.css_click('input.reset')
 
 
+@step(u'I press the button with the label "([^"]*)"$')
+def press_the_button_with_label(step, buttonname):
+    button_css = 'button span.show-label'
+    elem = world.css_find(button_css).first
+    assert_equal(elem.text, buttonname)
+    elem.click()
+
+
 @step(u'The "([^"]*)" button does( not)? appear')
 def action_button_present(step, buttonname, doesnt_appear):
     button_css = 'section.action input[value*="%s"]' % buttonname
@@ -123,6 +131,16 @@ def action_button_present(step, buttonname, doesnt_appear):
         assert world.is_css_not_present(button_css)
     else:
         assert world.is_css_present(button_css)
+
+
+@step(u'the button with the label "([^"]*)" does( not)? appear')
+def button_with_label_present(step, buttonname, doesnt_appear):
+    button_css = 'button span.show-label'
+    elem = world.css_find(button_css).first
+    if doesnt_appear:
+        assert_not_equal(elem.text, buttonname)
+    else:
+        assert_equal(elem.text, buttonname)
 
 
 @step(u'My "([^"]*)" answer is marked "([^"]*)"')

@@ -56,7 +56,7 @@ ${progress_graph.body(grade_summary, course.grade_cutoffs, "grade-detail-graph",
               <h3><a href="${reverse('courseware_section', kwargs=dict(course_id=course.id, chapter=chapter['url_name'], section=section['url_name']))}">
                 ${ section['display_name'] }
                 %if total > 0 or earned > 0:
-                  <span class="visuallyhidden">
+                  <span class="sr">
                     ${"{0:.3n} of {1:.3n} possible points".format( float(earned), float(total) )}
                   </span></a>
                 %endif

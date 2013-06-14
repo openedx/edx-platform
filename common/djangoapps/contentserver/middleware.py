@@ -1,7 +1,4 @@
-import logging
-import time
-
-from django.http import HttpResponse, Http404, HttpResponseNotModified
+from django.http import HttpResponse, HttpResponseNotModified
 
 from xmodule.contentstore.django import contentstore
 from xmodule.contentstore.content import StaticContent, XASSET_LOCATION_TAG
@@ -20,7 +17,7 @@ class StaticContentServer(object):
                 # return a 'Bad Request' to browser as we have a malformed Location
                 response = HttpResponse()
                 response.status_code = 400
-                return response     
+                return response
 
             # first look in our cache so we don't have to round-trip to the DB
             content = get_cached_content(loc)

@@ -288,7 +288,14 @@ class LoncapaResponse(object):
             }
 
             try:
-                safe_exec.safe_exec(code, globals_dict, python_path=self.context['python_path'], slug=self.id)
+                safe_exec.safe_exec(
+                    code,
+                    globals_dict,
+                    python_path=self.context['python_path'],
+                    slug=self.id,
+                    random_seed=self.context['seed'],
+                    unsafely=self.system.can_execute_unsafe_code(),
+                )
             except Exception as err:
                 msg = 'Error %s in evaluating hint function %s' % (err, hintfn)
                 msg += "\nSee XML source line %s" % getattr(
@@ -973,7 +980,14 @@ class CustomResponse(LoncapaResponse):
                             'ans': ans,
                         }
                         globals_dict.update(kwargs)
-                        safe_exec.safe_exec(code, globals_dict, python_path=self.context['python_path'], slug=self.id)
+                        safe_exec.safe_exec(
+                            code,
+                            globals_dict,
+                            python_path=self.context['python_path'],
+                            slug=self.id,
+                            random_seed=self.context['seed'],
+                            unsafely=self.system.can_execute_unsafe_code(),
+                        )
                         return globals_dict['cfn_return']
                     return check_function
 
@@ -1090,7 +1104,14 @@ class CustomResponse(LoncapaResponse):
         # exec the check function
         if isinstance(self.code, basestring):
             try:
-                safe_exec.safe_exec(self.code, self.context, cache=self.system.cache, slug=self.id)
+                safe_exec.safe_exec(
+                    self.code,
+                    self.context,
+                    cache=self.system.cache,
+                    slug=self.id,
+                    random_seed=self.context['seed'],
+                    unsafely=self.system.can_execute_unsafe_code(),
+                )
             except Exception as err:
                 self._handle_exec_exception(err)
 
@@ -1814,7 +1835,14 @@ class SchematicResponse(LoncapaResponse):
         ]
         self.context.update({'submission': submission})
         try:
-            safe_exec.safe_exec(self.code, self.context, cache=self.system.cache, slug=self.id)
+            safe_exec.safe_exec(
+                self.code,
+                self.context,
+                cache=self.system.cache,
+                slug=self.id,
+                random_seed=self.context['seed'],
+                unsafely=self.system.can_execute_unsafe_code(),
+            )
         except Exception as err:
             msg = 'Error %s in evaluating SchematicResponse' % err
             raise ResponseError(msg)
