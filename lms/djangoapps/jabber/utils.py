@@ -4,6 +4,7 @@ functions to parse the settings, create and retrieve chat-specific
 passwords for users, etc.
 """
 import base64
+import os
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -106,8 +107,7 @@ def __generate_random_string(length):
     # so figure out how many random bytes we need to get a string of
     # just the right length
     num_bytes = length / 4 * 3
-    with open("/dev/random", "rb") as random:
-        return base64.b64encode(random.read(num_bytes))
+    return base64.b64encode(os.urandom(num_bytes))
 
 
 def __validate_settings():
