@@ -435,14 +435,12 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         import_from_xml(module_store, 'common/test/data/', ['full'], static_content_store=content_store)
 
-        content = None
-        try:
-            location = StaticContent.get_location_from_path('/c4x/edX/full/asset/circuits_duality.gif')
-            content = content_store.find(location)
-        except NotFoundError:
-            pass
-
+        # look up original (and thumbnail) in content store, should be there after import
+        location = StaticContent.get_location_from_path('/c4x/edX/full/asset/circuits_duality.gif')
+        content = content_store.find(location, throw_on_not_found=False)
+        thumbnail_location = content.thumbnail_location
         self.assertIsNotNone(content)
+        self.assertIsNotNone(thumbnail_location)
 
         # go through the website to do the delete, since the soft-delete logic is in the view
 
@@ -453,26 +451,14 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         asset_location = StaticContent.get_location_from_path('/c4x/edX/full/asset/circuits_duality.gif')
 
         # now try to find it in store, but they should not be there any longer
-        content = None
-        thumbnail = None
-        try:
-            content = content_store.find(asset_location)
-            thumbnail = trash_store.find(content.thumbnail_location)
-        except NotFoundError:
-            pass
+        content = content_store.find(asset_location, throw_on_not_found=False)
+        thumbnail = content_store.find(thumbnail_location, throw_on_not_found=False)
         self.assertIsNone(content)
         self.assertIsNone(thumbnail)
 
-        # now try to find it and the thumbnail in trashcan
-        content = None
-        thumbnail = None
-        try:
-            content = trash_store.find(asset_location)
-            thumbnail = trash_store.find(content.thumbnail_location)
-        except NotFoundError:
-            pass
-
-        # should be in trashcan
+        # now try to find it and the thumbnail in trashcan - should be in there
+        content = trash_store.find(asset_location, throw_on_not_found=False)
+        thumbnail = trash_store.find(thumbnail_location, throw_on_not_found=False)
         self.assertIsNotNone(content)
         self.assertIsNotNone(thumbnail)
 
@@ -480,13 +466,8 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         restore_asset_from_trashcan('/c4x/edX/full/asset/circuits_duality.gif')
 
         # now try to find it in courseware store, and they should be back after restore
-        content = None
-        thumbnail = None
-        try:
-            content = content_store.find(asset_location)
-            thumbnail = trash_store.find(content.thumbnail_location)
-        except NotFoundError:
-            pass
+        content = content_store.find(asset_location, throw_on_not_found=False)
+        thumbnail = content_store.find(thumbnail_location, throw_on_not_found=False)
         self.assertIsNotNone(content)
         self.assertIsNotNone(thumbnail)
 
@@ -502,13 +483,8 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         course_location = CourseDescriptor.id_to_location('edX/full/6.002_Spring_2012')
 
-        content = None
-        try:
-            location = StaticContent.get_location_from_path('/c4x/edX/full/asset/circuits_duality.gif')
-            content = content_store.find(location)
-        except NotFoundError:
-            pass
-
+        location = StaticContent.get_location_from_path('/c4x/edX/full/asset/circuits_duality.gif')
+        content = content_store.find(location, throw_on_not_found=False)
         self.assertIsNotNone(content)
 
         # go through the website to do the delete, since the soft-delete logic is in the view

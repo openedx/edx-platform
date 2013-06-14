@@ -43,7 +43,7 @@ class MongoContentStore(ContentStore):
         if self.fs.exists({"_id": id}):
             self.fs.delete(id)
 
-    def find(self, location):
+    def find(self, location, throw_on_not_found=True):
         id = StaticContent.get_id_from_location(location)
         try:
             with self.fs.get(id) as fp:
@@ -52,7 +52,10 @@ class MongoContentStore(ContentStore):
                                      thumbnail_location=fp.thumbnail_location if hasattr(fp, 'thumbnail_location') else None,
                                      import_path=fp.import_path if hasattr(fp, 'import_path') else None)
         except NoFile:
-            raise NotFoundError()
+            if throw_on_not_found:
+                raise NotFoundError()
+            else:
+                return None
 
     def export(self, location, output_directory):
         content = self.find(location)
