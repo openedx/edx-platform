@@ -28,6 +28,8 @@ from xmodule.templates import update_templates
 from xmodule.modulestore.xml_exporter import export_to_xml
 from xmodule.modulestore.xml_importer import import_from_xml, perform_xlint
 from xmodule.modulestore.inheritance import own_metadata
+from xmodule.contentstore.content import StaticContent
+from xmodule.contentstore.utils import restore_asset_from_trashcan
 
 from xmodule.capa_module import CapaDescriptor
 from xmodule.course_module import CourseDescriptor
@@ -35,6 +37,7 @@ from xmodule.seq_module import SequenceDescriptor
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from contentstore.views.component import ADVANCED_COMPONENT_TYPES
+from xmodule.exceptions import NotFoundError
 
 from django_comment_common.utils import are_permissions_roles_seeded
 from xmodule.exceptions import InvalidVersionError
@@ -381,6 +384,111 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         source_location = CourseDescriptor.id_to_location('edX/full/6.002_Spring_2012')
         course = module_store.get_item(source_location)
         self.assertFalse(course.hide_progress_tab)
+
+    def test_asset_import(self):
+        '''
+        This test validates that an image asset is imported and a thumbnail was generated for a .gif
+        '''
+        content_store = contentstore()
+
+        module_store = modulestore('direct')
+        import_from_xml(module_store, 'common/test/data/', ['full'], static_content_store=content_store)
+
+        course_location = CourseDescriptor.id_to_location('edX/full/6.002_Spring_2012')
+        course = module_store.get_item(course_location)
+
+        self.assertIsNotNone(course)
+
+        # make sure we have some assets in our contentstore
+        all_assets = content_store.get_all_content_for_course(course_location)
+        self.assertGreater(len(all_assets), 0)
+
+        # make sure we have some thumbnails in our contentstore
+        all_thumbnails = content_store.get_all_content_thumbnails_for_course(course_location)
+        self.assertGreater(len(all_thumbnails), 0)
+
+        content = None
+        try:
+            location = StaticContent.get_location_from_path('/c4x/edX/full/asset/circuits_duality.gif')
+            content = content_store.find(location)
+        except NotFoundError:
+            pass
+
+        self.assertIsNotNone(content)
+        self.assertIsNotNone(content.thumbnail_location)
+
+        thumbnail = None
+        try:
+            thumbnail = content_store.find(content.thumbnail_location)
+        except:
+            pass
+
+        self.assertIsNotNone(thumbnail)
+
+    def test_asset_delete_and_restore(self):
+        '''
+        This test will exercise the soft delete/restore functionality of the assets
+        '''
+        content_store = contentstore()
+        trash_store = contentstore('trashcan')
+        module_store = modulestore('direct')
+
+        import_from_xml(module_store, 'common/test/data/', ['full'], static_content_store=content_store)
+
+        content = None
+        try:
+            location = StaticContent.get_location_from_path('/c4x/edX/full/asset/circuits_duality.gif')
+            content = content_store.find(location)
+        except NotFoundError:
+            pass
+
+        self.assertIsNotNone(content)
+
+        # go through the website to do the delete, since the soft-delete logic is in the view
+
+        url = reverse('remove_asset', kwargs={'org': 'edX', 'course': 'full', 'name': '6.002_Spring_2012'})
+        resp = self.client.post(url, {'location': '/c4x/edX/full/asset/circuits_duality.gif'})
+        self.assertEqual(resp.status_code, 200)
+
+        asset_location = StaticContent.get_location_from_path('/c4x/edX/full/asset/circuits_duality.gif')
+
+        # now try to find it in store, but they should not be there any longer
+        content = None
+        thumbnail = None
+        try:
+            content = content_store.find(asset_location)
+            thumbnail = trash_store.find(content.thumbnail_location)
+        except NotFoundError:
+            pass
+        self.assertIsNone(content)
+        self.assertIsNone(thumbnail)
+
+        # now try to find it and the thumbnail in trashcan
+        content = None
+        thumbnail = None
+        try:
+            content = trash_store.find(asset_location)
+            thumbnail = trash_store.find(content.thumbnail_location)
+        except NotFoundError:
+            pass
+
+        # should be in trashcan
+        self.assertIsNotNone(content)
+        self.assertIsNotNone(thumbnail)
+
+        # let's restore the asset
+        restore_asset_from_trashcan('/c4x/edX/full/asset/circuits_duality.gif')
+
+        # now try to find it in courseware store, and they should be back after restore
+        content = None
+        thumbnail = None
+        try:
+            content = content_store.find(asset_location)
+            thumbnail = trash_store.find(content.thumbnail_location)
+        except NotFoundError:
+            pass
+        self.assertIsNotNone(content)
+        self.assertIsNotNone(thumbnail)
 
     def test_clone_course(self):
 

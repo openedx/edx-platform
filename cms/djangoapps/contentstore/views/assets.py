@@ -164,7 +164,6 @@ def remove_asset(request, org, course, name):
     get_location_and_verify_access(request, org, course, name)
 
     location = request.POST['location']
-    logging.debug('location = {0}'.format(location))
 
     # make sure the location is valid
     try:
