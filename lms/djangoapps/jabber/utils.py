@@ -4,17 +4,13 @@ functions to parse the settings, create and retrieve chat-specific
 passwords for users, etc.
 """
 import base64
+import math
 import os
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 
 from .models import JabberUser
-
-# The default length of the Jabber passwords we create. We set a
-# really long default since we're storing these passwords in
-# plaintext (ejabberd implementation detail).
-DEFAULT_PASSWORD_LENGTH = 256
 
 def get_bosh_url():
     """
@@ -45,7 +41,7 @@ def get_bosh_url():
         bosh_url += ":%s" % str(port)
 
     # Also optional is the "path", which could possibly use a better
-    # name...help @jrbl?
+    # name...
     path = settings.JABBER.get("PATH")
     if path is not None:
         bosh_url += "/%s" % path
@@ -53,7 +49,7 @@ def get_bosh_url():
     return bosh_url
 
 
-def get_password_for_user(username):
+def get_or_create_password_for_user(username):
     """
     Retrieve the password for the user with the given username. If
     a password doesn't exist, then we'll create one by generating a
@@ -62,7 +58,7 @@ def get_password_for_user(username):
     try:
         jabber_user = JabberUser.objects.get(username=username)
     except JabberUser.DoesNotExist:
-        password = __generate_random_string(DEFAULT_PASSWORD_LENGTH)
+        password = __generate_random_string(JabberUser.DEFAULT_PASSWORD_LENGTH)
         jabber_user = JabberUser(username=username,
                                  password=password)
         jabber_user.save()
@@ -100,14 +96,22 @@ def get_room_name_for_course(course_id):
 
 def __generate_random_string(length):
     """
-    Generate a Base64-encoded random string of the specified length,
+    Generate a random, printable string of the specified length,
     suitable for a password that can be stored in a database.
     """
-    # Base64 encoding gives us 4 chars for every 3 bytes we give it,
-    # so figure out how many random bytes we need to get a string of
-    # just the right length
-    num_bytes = length / 4 * 3
-    return base64.b64encode(os.urandom(num_bytes))
+    # A Base64-encoded string's length is always a multiple of 4. The
+    # encoding gives us 4 chars for every 3 bytes we give it, so
+    # figure out roughly how many random bytes we'll need to get a
+    # string of just the right length.
+    num_bytes = math.ceil(float(length) * 3 / 4)
+
+    # Grab random bytes from /dev/urandom, which isn't *true*
+    # randomness, but secure enough for our purposes. (And it doesn't
+    # block like /dev/random if there's not enough entropy, which is
+    # important when running on AWS). Truncate the string to just the
+    # right length, which is fine since we don't care about decoding
+    # the Base64.
+    return base64.b64encode(os.urandom(int(num_bytes)))[:length]
 
 
 def __validate_settings():
