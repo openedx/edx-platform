@@ -65,3 +65,9 @@ Feature: Problem Editor
     Given I have created a LaTeX Problem
     And I edit and select Settings
     Then Edit High Level Source is visible
+
+  Scenario: High Level source is persisted for LaTeX problem (bug STUD-280)
+    Given I have created a LaTeX Problem
+    And I edit the High Level Source
+    Then my change to the High Level Source is persisted
+    And when I view the High Level Source I see my changes

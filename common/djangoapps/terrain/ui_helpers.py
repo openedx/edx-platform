@@ -3,6 +3,7 @@
 
 from lettuce import world
 import time
+import platform
 from urllib import quote_plus
 from selenium.common.exceptions import WebDriverException, StaleElementReferenceException
 from selenium.webdriver.support import expected_conditions as EC
@@ -158,3 +159,8 @@ def click_tools():
     tools_css = 'li.nav-course-tools'
     if world.browser.is_element_present_by_css(tools_css):
         world.css_click(tools_css)
+
+
+@world.absorb
+def is_mac():
+    return platform.mac_ver()[0] is not ''
