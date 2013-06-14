@@ -129,7 +129,10 @@ body.discussion {
       width: 16px;
       height: 17px;
       margin: 8px 7px 0 0;
-      background: url(../images/new-post-icon.png) no-repeat;
+      font-size: 16px;
+      padding-right: $baseline/2;
+      vertical-align: middle;
+      color: $white;
     }
   }
 
@@ -1414,7 +1417,7 @@ body.discussion {
   }
 
   .helpgrid-row-navigation {
-    .icon-sort-down {color: $light-gray;}
+    .icon-reorder {color: $light-gray;}
     .icon-search {color: $light-gray;}
     .icon-sort {color: $light-gray;}
   }
@@ -2304,7 +2307,10 @@ body.discussion {
     width: 16px;
     height: 17px;
     margin: 8px 7px 0 0;
-    background: url(../images/new-post-icon.png) no-repeat;
+    font-size: 16px;
+    padding-right: $baseline/2;
+    vertical-align: middle;
+    color: $white;
   }
 
   .moderator-actions {
@@ -2603,13 +2609,8 @@ body.discussion {
       float:right;
       padding-right: 5px;
       font-style: italic;
-<<<<<<< HEAD
-      cursor:pointer;
-      margin-right: 10px;
-=======
       cursor:pointer; 
       margin-right: $baseline/2;
->>>>>>> cleaned up margin and padding to use baseline variable
       opacity: 0.8;
 
       span {
