@@ -35,10 +35,11 @@ load-plugins=
 # it should appear only once).
 disable=
 # Never going to use these
+# I0011: Locally disabling W0232
 # C0301: Line too long
 # W0141: Used builtin function 'map'
 # W0142: Used * or ** magic
-    C0301,W0141,W0142,
+    I0011,C0301,W0141,W0142,
 
 # Might use these when the code is in better shape
 # C0302: Too many lines in module
