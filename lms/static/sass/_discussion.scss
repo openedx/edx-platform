@@ -2692,26 +2692,24 @@ display:none;
 
     }  
     
-.notflagged .icon
-{
+.notflagged .icon {
   display: block; 
   float: left;
   margin: 3px;
   width: 10px; 
   height: 14px;
   padding-right: 3px;
-  background: transparent url('../images/notflagged.png') no-repeat 0 0; 
+  color: $gray-l2;
 }
 
-.flagged .icon
-{
+.flagged .icon {
   display: block; 
   float: left;
   margin: 3px;
   width: 10px; 
   height: 14px; 
   padding-right: 3px;
-  background: transparent url('../images/flagged.png') no-repeat 0 0; 
+  color: $pink;
 }
 
 .flagged span {
