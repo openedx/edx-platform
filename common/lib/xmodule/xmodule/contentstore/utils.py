@@ -3,7 +3,7 @@ from xmodule.contentstore.content import StaticContent
 from .django import contentstore
 
 
-def empty_asset_trashcan(course_locs=None):
+def empty_asset_trashcan(course_locs):
     '''
     This method will hard delete all assets (optionally within a course_id) from the trashcan
     '''
