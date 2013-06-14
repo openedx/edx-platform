@@ -15,6 +15,8 @@ LMS: Some errors handling Non-ASCII data in XML courses have been fixed.
 LMS: Add page-load tracking using segment-io (if SEGMENT_IO_LMS_KEY and
 SEGMENT_IO_LMS feature flag is on)
 
+Blades: Simplify calc.py (which is used for the Numerical/Formula responses); add trig/other functions.
+
 LMS: Background colors on login, register, and courseware have been corrected
 back to white.
 
