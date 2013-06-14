@@ -129,7 +129,10 @@ body.discussion {
       width: 16px;
       height: 17px;
       margin: 8px 7px 0 0;
-      background: url(../images/new-post-icon.png) no-repeat;
+      font-size: 16px;
+      padding-right: $baseline/2;
+      vertical-align: middle;
+      color: $white;
     }
   }
 
@@ -1417,7 +1420,7 @@ body.discussion {
   }
 
   .helpgrid-row-navigation {
-    .icon-sort-down {color: $light-gray;}
+    .icon-reorder {color: $light-gray;}
     .icon-search {color: $light-gray;}
     .icon-sort {color: $light-gray;}
   }
@@ -2308,7 +2311,10 @@ body.discussion {
     width: 16px;
     height: 17px;
     margin: 8px 7px 0 0;
-    background: url(../images/new-post-icon.png) no-repeat;
+    font-size: 16px;
+    padding-right: $baseline/2;
+    vertical-align: middle;
+    color: $white;
   }
 
   .moderator-actions {
