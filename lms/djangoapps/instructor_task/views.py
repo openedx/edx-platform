@@ -8,9 +8,13 @@ from celery.states import FAILURE, REVOKED, READY_STATES
 
 from instructor_task.api_helper import (get_status_from_instructor_task,
                                         get_updated_instructor_task)
+from instructor_task.tasks_helper import PROGRESS
 
 
 log = logging.getLogger(__name__)
+
+# return status for completed tasks and tasks in progress
+STATES_WITH_STATUS = [state for state in READY_STATES] + [PROGRESS]
 
 
 def instructor_task_status(request):
@@ -32,10 +36,11 @@ def instructor_task_status(request):
       Task_id values that are unrecognized are skipped.
 
     The dict with status information for a task contains the following keys:
-      'message': on complete tasks, status message reporting on final progress, 
-          or providing exception message if failed.
-      'succeeded': on complete tasks, indicates if the task outcome was successful:
-          did it achieve what it set out to do.
+      'message': on complete tasks, status message reporting on final progress,
+          or providing exception message if failed.  For tasks in progress,
+          indicates the current progress.
+      'succeeded': on complete tasks or tasks in progress, indicates if the
+          task outcome was successful:  did it achieve what it set out to do.
           This is in contrast with a successful task_state, which indicates that the
           task merely completed.
       'task_id': id assigned by LMS and used by celery.
@@ -62,7 +67,7 @@ def instructor_task_status(request):
         """
         instructor_task = get_updated_instructor_task(task_id)
         status = get_status_from_instructor_task(instructor_task)
-        if instructor_task.task_state in READY_STATES:
+        if instructor_task.task_state in STATES_WITH_STATUS:
             succeeded, message = get_task_completion_info(instructor_task)
             status['message'] = message
             status['succeeded'] = succeeded
@@ -97,8 +102,7 @@ def get_task_completion_info(instructor_task):
     """
     succeeded = False
 
-    # if still in progress, then we assume there is no completion info to provide:
-    if instructor_task.task_state not in READY_STATES:
+    if instructor_task.task_state not in STATES_WITH_STATUS:
         return (succeeded, "No status information available")
 
     # we're more surprised if there is no output for a completed task, but just warn:
@@ -135,7 +139,10 @@ def get_task_completion_info(instructor_task):
     else:
         student = task_input.get('student')
 
-    if student is not None:
+    if instructor_task.task_state == PROGRESS:
+        # special message for providing progress updates:
+        msg_format = "Progress: {action} {updated} of {attempted} so far"
+    elif student is not None:
         if num_attempted == 0:
             msg_format = "Unable to find submission to be {action} for student '{student}'"
         elif num_updated == 0:

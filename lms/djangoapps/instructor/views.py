@@ -39,8 +39,7 @@ from instructor_task.api import (get_running_instructor_tasks,
                                  get_instructor_task_history,
                                  submit_rescore_problem_for_all_students,
                                  submit_rescore_problem_for_student,
-                                 submit_reset_problem_attempts_for_all_students,
-                                 submit_delete_problem_state_for_all_students)
+                                 submit_reset_problem_attempts_for_all_students)
 from instructor_task.views import get_task_completion_info
 from mitxmako.shortcuts import render_to_response
 from psychometrics import psychoanalyze
@@ -1138,7 +1137,7 @@ def _do_unenroll_students(course_id, students):
     """Do the actual work of un-enrolling multiple students, presented as a string
     of emails separated by commas or returns"""
 
-    old_students, old_students_lc = get_and_clean_student_list(students)
+    old_students, _ = get_and_clean_student_list(students)
     status = dict([x, 'unprocessed'] for x in old_students)
 
     for student in old_students:
@@ -1162,7 +1161,7 @@ def _do_unenroll_students(course_id, students):
             try:
                 ce[0].delete()
                 status[student] = "un-enrolled"
-            except Exception as err:
+            except Exception:
                 if not isok:
                     status[student] = "Error!  Failed to un-enroll"
 
@@ -1319,7 +1318,7 @@ def get_background_task_table(course_id, problem_url, student=None):
                                "Task Id",
                                "Requester",
                                "Submitted",
-                               "Duration (ms)",
+                               "Duration (sec)",
                                "Task State",
                                "Task Status",
                                "Task Output"]
@@ -1327,11 +1326,11 @@ def get_background_task_table(course_id, problem_url, student=None):
         datatable['data'] = []
         for instructor_task in history_entries:
             # get duration info, if known:
-            duration_ms = 'unknown'
-            if hasattr(instructor_task, 'task_output'):
+            duration_sec = 'unknown'
+            if hasattr(instructor_task, 'task_output') and instructor_task.task_output is not None:
                 task_output = json.loads(instructor_task.task_output)
                 if 'duration_ms' in task_output:
-                    duration_ms = task_output['duration_ms']
+                    duration_sec = int(task_output['duration_ms'] / 1000.0)
             # get progress status message:
             success, task_message = get_task_completion_info(instructor_task)
             status = "Complete" if success else "Incomplete"
@@ -1340,7 +1339,7 @@ def get_background_task_table(course_id, problem_url, student=None):
                    str(instructor_task.task_id),
                    str(instructor_task.requester),
                    instructor_task.created.isoformat(' '),
-                   duration_ms,
+                   duration_sec,
                    str(instructor_task.task_state),
                    status,
                    task_message]

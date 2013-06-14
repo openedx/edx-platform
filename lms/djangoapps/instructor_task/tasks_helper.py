@@ -13,6 +13,7 @@ from traceback import format_exc
 
 from celery import current_task
 from celery.utils.log import get_task_logger
+from celery.signals import worker_process_init
 from celery.states import SUCCESS, FAILURE
 
 from django.contrib.auth.models import User
@@ -37,6 +38,26 @@ PROGRESS = 'PROGRESS'
 
 # define value to use when no task_id is provided:
 UNKNOWN_TASK_ID = 'unknown-task_id'
+
+
+def initialize_mako(sender=None, conf=None, **kwargs):
+    """
+    Get mako templates to work on celery worker server's worker thread.
+
+    The initialization of Mako templating is usually done when Django is
+    initializing middleware packages as part of processing a server request.
+    When this is run on a celery worker server, no such initialization is
+    called.
+
+    To make sure that we don't load this twice (just in case), we look for the
+    result: the defining of the lookup paths for templates.
+    """
+    if 'main' not in middleware.lookup:
+        TASK_LOG.info("Initializing Mako middleware explicitly")
+        middleware.MakoMiddleware()
+
+# Actually make the call to define the hook:
+worker_process_init.connect(initialize_mako)
 
 
 class UpdateProblemModuleStateError(Exception):
@@ -90,17 +111,6 @@ def _perform_module_state_update(course_id, module_state_key, student_identifier
     # get start time for task:
     start_time = time()
 
-    # Hack to get mako templates to work on celery worker server's worker thread.
-    # The initialization of Mako templating is usually done when Django is
-    # initializing middleware packages as part of processing a server request.
-    # When this is run on a celery worker server, no such initialization is
-    # called. Using @worker_ready.connect doesn't run in the right container.
-    #  So we look for the result: the defining of the lookup paths
-    # for templates.
-    if 'main' not in middleware.lookup:
-        TASK_LOG.debug("Initializing Mako middleware explicitly")
-        middleware.MakoMiddleware()
-
     # find the problem descriptor:
     module_descriptor = modulestore().get_instance(course_id, module_state_key)
 
@@ -147,7 +157,7 @@ def _perform_module_state_update(course_id, module_state_key, student_identifier
         num_attempted += 1
         # There is no try here:  if there's an error, we let it throw, and the task will
         # be marked as FAILED, with a stack trace.
-        with dog_stats_api.timer('instructor_tasks.module.{0}.time'.format(action_name)):
+        with dog_stats_api.timer('instructor_tasks.module.time.step', tags=['action:{name}'.format(name=action_name)]):
             if update_fcn(module_descriptor, module_to_update, xmodule_instance_args):
                 # If the update_fcn returns true, then it performed some kind of work.
                 # Logging of failures is left to the update_fcn itself.
@@ -232,7 +242,7 @@ def update_problem_module_state(entry_id, update_fcn, action_name, filter_fcn,
             raise UpdateProblemModuleStateError(message)
 
         # now do the work:
-        with dog_stats_api.timer('instructor_tasks.module.{0}.overall_time'.format(action_name)):
+        with dog_stats_api.timer('instructor_tasks.module.time.overall', tags=['action:{name}'.format(name=action_name)]):
             task_progress = _perform_module_state_update(course_id, module_state_key, student_ident, update_fcn,
                                                          action_name, filter_fcn, xmodule_instance_args)
     except Exception:
@@ -316,7 +326,6 @@ def rescore_problem_module_state(module_descriptor, student_module, xmodule_inst
     course_id = student_module.course_id
     student = student_module.student
     module_state_key = student_module.module_state_key
-
     instance = _get_module_instance_for_task(course_id, student, module_descriptor, xmodule_instance_args, grade_bucket_type='rescore')
 
     if instance is None:

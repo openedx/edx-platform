@@ -26,14 +26,6 @@
 
     this.InstructorTaskProgress = (function() {
 
-        // Hardcode the refresh interval to be every five seconds.
-        // TODO: allow the refresh interval to be set.  (And if it is disabled,
-        // then don't set the timeout at all.)
-        var refresh_interval = 5000;
-
-        // Hardcode the initial delay before the first refresh to two seconds:
-        var initial_refresh_delay = 2000;
-
         function InstructorTaskProgress(element) {
             this.update_progress = __bind(this.update_progress, this);
             this.get_status = __bind(this.get_status, this);
@@ -42,7 +34,8 @@
             if (window.queuePollerID) {
                 window.clearTimeout(window.queuePollerID);
             }
-            window.queuePollerID = window.setTimeout(this.get_status, this.initial_refresh_delay);
+            // Hardcode the initial delay before the first refresh to one second:
+            window.queuePollerID = window.setTimeout(this.get_status, 1000);
         }
 
         InstructorTaskProgress.prototype.$ = function(selector) {
@@ -60,7 +53,8 @@
                 // find the corresponding entry, and update it:
                 entry = $(_this.element).find('[data-task-id="' + task_id + '"]');
                 entry.find('.task-state').text(task_dict.task_state)
-                var duration_value = (task_dict.task_progress && task_dict.task_progress.duration_ms) || 'unknown';
+                var duration_value = (task_dict.task_progress && task_dict.task_progress.duration_ms
+                                        && Math.round(task_dict.task_progress.duration_ms/1000)) || 'unknown';
                 entry.find('.task-duration').text(duration_value);
                 var progress_value = task_dict.message || '';
                 entry.find('.task-progress').text(progress_value);
@@ -74,8 +68,11 @@
             }
             
             // if some entries are still incomplete, then repoll:
+            // Hardcode the refresh interval to be every five seconds.
+            // TODO: allow the refresh interval to be set.  (And if it is disabled,
+            // then don't set the timeout at all.)
             if (something_in_progress) {
-                window.queuePollerID = window.setTimeout(_this.get_status, _this.refresh_interval);
+                window.queuePollerID = window.setTimeout(_this.get_status, 5000);
             } else {
                 delete window.queuePollerID;
             }
@@ -741,7 +738,7 @@ function goto( mode)
           <th>Requester</th>
           <th>Submitted</th>
           <th>Task State</th>
-          <th>Duration (ms)</th>
+          <th>Duration (sec)</th>
           <th>Task Progress</th>
         </tr>
       %for tasknum, instructor_task in enumerate(instructor_tasks):

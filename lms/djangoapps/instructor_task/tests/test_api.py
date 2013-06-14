@@ -211,11 +211,11 @@ class InstructorTaskReportTest(TestCase):
                               'total': 10,
                               'action_name': 'rescored'}
         output = self._test_get_status_from_result(task_id, mock_result)
+        self.assertEquals(output['message'], "Progress: rescored 4 of 5 so far (out of 10)")
+        self.assertEquals(output['succeeded'], False)
         self.assertEquals(output['task_state'], PROGRESS)
         self.assertTrue(output['in_progress'])
         self.assertEquals(output['task_progress'], mock_result.result)
-        for key in ['message', 'succeeded']:
-            self.assertTrue(key not in output)
 
     def test_update_progress_to_failure(self):
         # view task entry for task in progress that later fails
