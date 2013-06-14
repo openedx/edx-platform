@@ -2641,7 +2641,7 @@ body.discussion {
   width: 10px;
   height: 14px;
   padding-right: 3px;
-  background: transparent url('../images/unpinned.png') no-repeat 0 0;
+  color: $gray-l2;
 }
 
 .pinned .icon {
@@ -2651,7 +2651,7 @@ body.discussion {
   width: 10px;
   height: 14px;
   padding-right: 3px;
-  background: transparent url('../images/pinned.png') no-repeat 0 0;
+  color: $pink;
 }
 
 .pinned span {
