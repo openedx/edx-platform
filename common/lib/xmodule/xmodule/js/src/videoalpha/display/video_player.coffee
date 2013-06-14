@@ -66,7 +66,16 @@ class @VideoPlayerAlpha extends SubviewAlpha
     if @video.end
       # work in AS3, not HMLT5. but iframe use AS3
       @playerVars.end = @video.end
+
+    # There is a bug which prevents YouTube API to correctly set the speed to 1.0 from another speed
+    # in Firefox when in HTML5 mode. There is a fix which basically reloads the video at speed 1.0
+    # when this change is requested (instead of simply requesting a speed change to 1.0). This has to
+    # be done only when the video is being watched in Firefox. We need to figure out what browser is
+    # currently executing this code.
+    @video.isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1
+
     if @video.videoType is 'html5'
+      @video.playerType = 'browser'
       @player = new HTML5Video.Player @video.el,
         playerVars: @playerVars,
         videoSources: @video.html5Sources,
@@ -79,6 +88,7 @@ class @VideoPlayerAlpha extends SubviewAlpha
         youTubeId = @video.videos['1.0']
       else
         youTubeId = @video.youtubeId()
+      @video.playerType = 'youtube'
       @player = new YT.Player @video.id,
         playerVars: @playerVars
         videoId: youTubeId
@@ -235,13 +245,18 @@ class @VideoPlayerAlpha extends SubviewAlpha
     if @video.videoType is 'youtube'
       if @video.show_captions is true
         @caption.currentSpeed = newSpeed
-    if @video.videoType is 'html5'
-      @player.setPlaybackRate newSpeed
-    else if @video.videoType is 'youtube'
+
+    # We request the reloading of the video in the case when YouTube is in Flash player mode,
+    # or when we are in Firefox, and the new speed is 1.0. The second case is necessary to
+    # avoid the bug where in Firefox speed switching to 1.0 in HTML5 player mode is handled
+    # incorrectly by YouTube API.
+    if (@video.videoType is 'youtube') or ((@video.isFirefox) and (@video.playerType is 'youtube') and (newSpeed is '1.0'))
       if @isPlaying()
         @player.loadVideoById(@video.youtubeId(), @currentTime)
       else
         @player.cueVideoById(@video.youtubeId(), @currentTime)
+    else if @video.videoType is 'html5'
+      @player.setPlaybackRate newSpeed
     if @video.videoType is 'youtube'
       @updatePlayTime @currentTime
 
