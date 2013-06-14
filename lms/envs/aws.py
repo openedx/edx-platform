@@ -172,8 +172,9 @@ for name, value in ENV_TOKENS.get("CODE_JAIL", {}).items():
 
 COURSES_WITH_UNSAFE_CODE = ENV_TOKENS.get("COURSES_WITH_UNSAFE_CODE", [])
 
+############### Mixed Related(Secure/Not-Secure) Items ##########
 # If segment.io key specified, load it and turn on segment IO if the feature flag is set
-SEGMENT_IO_LMS_KEY = ENV_TOKENS.get('SEGMENT_IO_LMS_KEY')
+SEGMENT_IO_LMS_KEY = AUTH_TOKENS.get('SEGMENT_IO_LMS_KEY')
 if SEGMENT_IO_LMS_KEY:
     MITX_FEATURES['SEGMENT_IO_LMS'] = ENV_TOKENS.get('SEGMENT_IO_LMS', False)
 
