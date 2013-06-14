@@ -79,8 +79,10 @@ class ErrorDescriptor(ErrorFields, JSONEditingDescriptor):
     @classmethod
     def _construct(cls, system, contents, error_msg, location):
 
-        if location.name is None:
-            location = location._replace(
+        if isinstance(location, dict) and 'course' in location:
+            location = Location(location)
+        if isinstance(location, Location) and location.name is None:
+            location = location.replace(
                 category='error',
                 # Pick a unique url_name -- the sha1 hash of the contents.
                 # NOTE: We could try to pull out the url_name of the errored descriptor,
@@ -94,12 +96,14 @@ class ErrorDescriptor(ErrorFields, JSONEditingDescriptor):
         model_data = {
             'error_msg': str(error_msg),
             'contents': contents,
-            'display_name': 'Error: ' + location.name
+            'display_name': 'Error: ' + location.url()
         }
         return cls(
             system,
+            'error',
             location,
-            model_data,
+            None,
+            model_data
         )
 
     def get_context(self):
@@ -109,12 +113,12 @@ class ErrorDescriptor(ErrorFields, JSONEditingDescriptor):
         }
 
     @classmethod
-    def from_json(cls, json_data, system, error_msg='Error not available'):
+    def from_json(cls, json_data, system, location, error_msg='Error not available'):
         return cls._construct(
             system,
-            json.dumps(json_data, indent=4),
+            json.dumps(json_data, skipkeys=True, indent=4),
             error_msg,
-            location=Location(json_data['location']),
+            location=location
         )
 
     @classmethod

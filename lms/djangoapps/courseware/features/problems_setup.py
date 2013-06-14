@@ -272,9 +272,9 @@ def add_problem_to_course(course, problem_type, extraMeta=None):
     # Create a problem item using our generated XML
     # We set rerandomize=always in the metadata so that the "Reset" button
     # will appear.
-    template_name = "i4x://edx/templates/problem/Blank_Common_Problem"
-    world.ItemFactory.create(parent_location=section_location(course),
-                            template=template_name,
+    category_name = "problem"
+    return world.ItemFactory.create(parent_location=section_location(course),
+                            category=category_name,
                             display_name=str(problem_type),
                             data=problem_xml,
                             metadata=metadata)

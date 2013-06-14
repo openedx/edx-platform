@@ -1,7 +1,7 @@
 <%inherit file="base.html" />
 <%!
    import logging
-   from xmodule.util.date_utils import get_default_time_display
+   from xmodule.util.date_utils import get_default_time_display, almost_same_datetime
 %>
 
 <%! from django.core.urlresolvers import reverse %>
@@ -47,9 +47,10 @@
                 placeholder="HH:MM" class="time" size='10' autocomplete="off"/>
           </div>
         </div>
-        % if subsection.lms.start != parent_item.lms.start and subsection.lms.start:
+        % if subsection.lms.start and not almost_same_datetime(subsection.lms.start, parent_item.lms.start):
             % if parent_item.lms.start is None:
-            <p class="notice">The date above differs from the release date of ${parent_item.display_name_with_default}, which is unset.
+            <p class="notice">The date above differs from the release date of 
+            ${parent_item.display_name_with_default}, which is unset.
             % else:
             <p class="notice">The date above differs from the release date of ${parent_item.display_name_with_default} –
                 ${get_default_time_display(parent_item.lms.start)}.

@@ -9,12 +9,12 @@ from common import TEST_COURSE_NAME, TEST_SECTION_NAME, i_am_registered_for_the_
 ############### ACTIONS ####################
 
 
-@step('when I view the video it has autoplay enabled')
+@step('when I view the video alpha it has autoplay enabled')
 def does_autoplay(step):
     assert(world.css_find('.videoalpha')[0]['data-autoplay'] == 'True')
 
 
-@step('the course has a Video component')
+@step('the course has a VideoAlpha component')
 def view_videoalpha(step):
     coursename = TEST_COURSE_NAME.replace(' ', '_')
     i_am_registered_for_the_course(step, coursename)
@@ -30,7 +30,7 @@ def view_videoalpha(step):
 
 
 def add_videoalpha_to_course(course):
-    template_name = 'i4x://edx/templates/videoalpha/default'
+    category = 'videoalpha'
     world.ItemFactory.create(parent_location=section_location(course),
-                             template=template_name,
+                             category=category,
                              display_name='Video Alpha 1')

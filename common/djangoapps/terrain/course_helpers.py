@@ -1,5 +1,5 @@
-#pylint: disable=C0111
-#pylint: disable=W0621
+# pylint: disable=C0111
+# pylint: disable=W0621
 
 from lettuce import world, step
 from .factories import *
@@ -11,7 +11,6 @@ from django.contrib.auth.middleware import AuthenticationMiddleware
 from django.contrib.sessions.middleware import SessionMiddleware
 from student.models import CourseEnrollment
 from xmodule.modulestore.django import _MODULESTORES, modulestore
-from xmodule.templates import update_templates
 from bs4 import BeautifulSoup
 import os.path
 from urllib import quote_plus
@@ -132,4 +131,3 @@ def clear_courses():
     # $ mongo test_xmodule --eval "db.dropDatabase()"
     _MODULESTORES = {}
     modulestore().collection.drop()
-    update_templates(modulestore('direct'))

@@ -65,18 +65,21 @@ class ComplexEncoder(json.JSONEncoder):
 
 
 class CapaFields(object):
-    attempts = Integer(help="Number of attempts taken by the student on this problem", default=0, scope=Scope.user_state)
+    attempts = Integer(help="Number of attempts taken by the student on this problem", default=0,
+        scope=Scope.user_state)
     max_attempts = Integer(
         display_name="Maximum Attempts",
         help="Defines the number of times a student can try to answer this problem. If the value is not set, infinite attempts are allowed.",
         values={"min": 0}, scope=Scope.settings
     )
     due = Date(help="Date that this problem is due by", scope=Scope.settings)
-    graceperiod = Timedelta(help="Amount of time after the due date that submissions will be accepted", scope=Scope.settings)
+    graceperiod = Timedelta(help="Amount of time after the due date that submissions will be accepted",
+        scope=Scope.settings)
     showanswer = String(
         display_name="Show Answer",
+        default="closed",
         help="Defines when to show the answer to the problem. A default value can be set in Advanced Settings.",
-        scope=Scope.settings, default="closed",
+        scope=Scope.settings,
         values=[
             {"display_name": "Always", "value": "always"},
             {"display_name": "Answered", "value": "answered"},
@@ -86,16 +89,20 @@ class CapaFields(object):
             {"display_name": "Past Due", "value": "past_due"},
             {"display_name": "Never", "value": "never"}]
     )
-    force_save_button = Boolean(help="Whether to force the save button to appear on the page", scope=Scope.settings, default=False)
+    force_save_button = Boolean(help="Whether to force the save button to appear on the page", scope=Scope.settings,
+        default=False)
     rerandomize = Randomization(
         display_name="Randomization", help="Defines how often inputs are randomized when a student loads the problem. This setting only applies to problems that can have randomly generated numeric values. A default value can be set in Advanced Settings.",
-        default="always", scope=Scope.settings, values=[{"display_name": "Always", "value": "always"},
-                                                        {"display_name": "On Reset", "value": "onreset"},
-                                                        {"display_name": "Never", "value": "never"},
-                                                        {"display_name": "Per Student", "value": "per_student"}]
+        default="always",
+        scope=Scope.settings,
+        values=[{"display_name": "Always", "value": "always"},
+            {"display_name": "On Reset", "value": "onreset"},
+            {"display_name": "Never", "value": "never"},
+            {"display_name": "Per Student", "value": "per_student"}]
     )
-    data = String(help="XML data for the problem", scope=Scope.content)
-    correct_map = Dict(help="Dictionary with the correctness of current student answers", scope=Scope.user_state, default={})
+    data = String(help="XML data for the problem", default="<problem></problem>", scope=Scope.content)
+    correct_map = Dict(help="Dictionary with the correctness of current student answers",
+        scope=Scope.user_state, default={})
     input_state = Dict(help="Dictionary for maintaining the state of inputtypes", scope=Scope.user_state)
     student_answers = Dict(help="Dictionary with the current student responses", scope=Scope.user_state)
     done = Boolean(help="Whether the student has answered the problem", scope=Scope.user_state)
@@ -106,12 +113,9 @@ class CapaFields(object):
         values={"min": 0, "step": .1},
         scope=Scope.settings
     )
-    markdown = String(help="Markdown source of this module", scope=Scope.settings)
-    source_code = String(
-        help="Source code for LaTeX and Word problems. This feature is not well-supported.",
-        scope=Scope.settings
-    )
-
+    markdown = String(help="Markdown source of this module", default="", scope=Scope.settings)
+    source_code = String(help="Source code for LaTeX and Word problems. This feature is not well-supported.",
+        scope=Scope.settings)
 
 class CapaModule(CapaFields, XModule):
     '''
@@ -131,8 +135,8 @@ class CapaModule(CapaFields, XModule):
     js_module_name = "Problem"
     css = {'scss': [resource_string(__name__, 'css/capa/display.scss')]}
 
-    def __init__(self, system, location, descriptor, model_data):
-        XModule.__init__(self, system, location, descriptor, model_data)
+    def __init__(self, system, location, descriptor, descriptor_model_data):
+        XModule.__init__(self, system, location, descriptor, descriptor_model_data)
 
         due_date = self.due
 

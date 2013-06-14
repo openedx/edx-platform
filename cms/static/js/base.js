@@ -341,7 +341,7 @@ function createNewUnit(e) {
     e.preventDefault();
 
     var parent = $(this).data('parent');
-    var template = $(this).data('template');
+    var category = $(this).data('category');
 
     analytics.track('Created a Unit', {
         'course': course_location_analytics,
@@ -349,9 +349,9 @@ function createNewUnit(e) {
     });
 
 
-    $.post('/clone_item', {
+    $.post('/create_item', {
         'parent_location': parent,
-        'template': template,
+        'category': category,
         'display_name': 'New Unit'
     },
 
@@ -627,7 +627,7 @@ function saveNewSection(e) {
 
     var $saveButton = $(this).find('.new-section-name-save');
     var parent = $saveButton.data('parent');
-    var template = $saveButton.data('template');
+    var category = $saveButton.data('category');
     var display_name = $(this).find('.new-section-name').val();
 
     analytics.track('Created a Section', {
@@ -635,9 +635,9 @@ function saveNewSection(e) {
         'display_name': display_name
     });
 
-    $.post('/clone_item', {
+    $.post('/create_item', {
         'parent_location': parent,
-        'template': template,
+        'category': category,
         'display_name': display_name,
     },
 
@@ -671,7 +671,6 @@ function saveNewCourse(e) {
     e.preventDefault();
 
     var $newCourse = $(this).closest('.new-course');
-    var template = $(this).find('.new-course-save').data('template');
     var org = $newCourse.find('.new-course-org').val();
     var number = $newCourse.find('.new-course-number').val();
     var display_name = $newCourse.find('.new-course-name').val();
@@ -688,7 +687,6 @@ function saveNewCourse(e) {
     });
 
     $.post('/create_new_course', {
-        'template': template,
         'org': org,
         'number': number,
         'display_name': display_name
@@ -722,7 +720,7 @@ function addNewSubsection(e) {
     var parent = $(this).parents("section.branch").data("id");
 
     $saveButton.data('parent', parent);
-    $saveButton.data('template', $(this).data('template'));
+    $saveButton.data('category', $(this).data('category'));
 
     $newSubsection.find('.new-subsection-form').bind('submit', saveNewSubsection);
     $cancelButton.bind('click', cancelNewSubsection);
@@ -735,7 +733,7 @@ function saveNewSubsection(e) {
     e.preventDefault();
 
     var parent = $(this).find('.new-subsection-name-save').data('parent');
-    var template = $(this).find('.new-subsection-name-save').data('template');
+    var category = $(this).find('.new-subsection-name-save').data('category');
     var display_name = $(this).find('.new-subsection-name-input').val();
 
     analytics.track('Created a Subsection', {
@@ -744,9 +742,9 @@ function saveNewSubsection(e) {
     });
 
 
-    $.post('/clone_item', {
+    $.post('/create_item', {
         'parent_location': parent,
-        'template': template,
+        'category': category,
         'display_name': display_name
     },
 

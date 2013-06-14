@@ -11,6 +11,7 @@ from django.http import Http404
 
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
+from xmodule.contentstore.content import StaticContent
 from xblock.core import Integer, Scope, String
 
 import datetime
@@ -21,7 +22,9 @@ log = logging.getLogger(__name__)
 
 class VideoFields(object):
     """Fields for `VideoModule` and `VideoDescriptor`."""
-    data = String(help="XML data for the problem", scope=Scope.content)
+    data = String(help="XML data for the problem",
+        default='<video  youtube="0.75:JMD_ifUUfsU,1.0:OEoXaMPEzfM,1.25:AKqURZnYqpk,1.50:DYpADpL7jAY"/>',
+        scope=Scope.content)
     position = Integer(help="Current position in the video", scope=Scope.user_state, default=0)
 
 
@@ -138,4 +141,3 @@ class VideoModule(VideoFields, XModule):
 class VideoDescriptor(VideoFields, RawDescriptor):
     """Descriptor for `VideoModule`."""
     module_class = VideoModule
-    template_dir_name = "video"
