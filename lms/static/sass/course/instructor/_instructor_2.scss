@@ -85,6 +85,22 @@
     height: 100px;
     width: 500px;
   }
+
+  .task-res-section {
+    h3 {
+      color: #646464;
+    }
+
+    ul {
+      padding: 0;
+      margin: 0;
+      margin-top: 0.5em;
+      line-height: 1.5em;
+      list-style-type: none;
+      li {
+      }
+    }
+  }
 }
 
 

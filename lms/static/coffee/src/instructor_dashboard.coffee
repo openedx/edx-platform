@@ -128,23 +128,27 @@ setup_section_enrollment = (section) ->
     for msg_symbol in message_ordering
       # task_response.text JSON.stringify(data)
       msg_txt = msg_to_txt[msg_symbol]
-      label = $ '<div/>', text: msg_txt
+      task_res_section = $ '<div/>', class: 'task-res-section'
+      task_res_section.append $ '<h3/>', text: msg_txt
+      email_list = $ '<ul/>'
+      task_res_section.append email_list
       will_attach = false
 
       for code in msg_to_codes[msg_symbol]
         log 'logging code', code
         emails = response_code_dict[code]
         log 'emails', emails
+
         if emails and emails.length
           for email in emails
             log 'logging email', email
-            label.append '<br>' + email
+            email_list.append $ '<li/>', text: email
             will_attach = true
 
       if will_attach
-        task_response.append label
+        task_response.append task_res_section
       else
-        label.remove()
+        task_res_section.remove()
 
 
 # setup the data download section
