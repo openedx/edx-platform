@@ -4,6 +4,11 @@ from uuid import uuid4
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.inheritance import own_metadata
+from xmodule.x_module import ModuleSystem
+from mitxmako.shortcuts import render_to_string
+from xblock.runtime import InvalidScopeError
+import datetime
+from pytz import UTC
 
 
 class XModuleCourseFactory(Factory):
@@ -35,7 +40,7 @@ class XModuleCourseFactory(Factory):
         if display_name is not None:
             new_course.display_name = display_name
 
-        new_course.lms.start = gmtime()
+        new_course.lms.start = datetime.datetime.now(UTC)
         new_course.tabs = kwargs.get(
             'tabs',
             [
@@ -159,3 +164,32 @@ class ItemFactory(XModuleItemFactory):
     @lazy_attribute_sequence
     def display_name(attr, n):
         return "{} {}".format(attr.category.title(), n)
+
+
+def get_test_xmodule_for_descriptor(descriptor):
+    """
+    Attempts to create an xmodule which responds usually correctly from the descriptor. Not guaranteed.
+
+    :param descriptor:
+    """
+    module_sys = ModuleSystem(
+        ajax_url='',
+        track_function=None,
+        get_module=None,
+        render_template=render_to_string,
+        replace_urls=None,
+        xblock_model_data=_test_xblock_model_data_accessor(descriptor)
+    )
+    return descriptor.xmodule(module_sys)
+
+def _test_xblock_model_data_accessor(descriptor):
+    simple_map = {}
+    for field in descriptor.fields:
+        try:
+            simple_map[field.name] = getattr(descriptor, field.name)
+        except InvalidScopeError:
+            simple_map[field.name] = field.default
+    for field in descriptor.module_class.fields:
+        if field.name not in simple_map:
+            simple_map[field.name] = field.default
+    return lambda o: simple_map

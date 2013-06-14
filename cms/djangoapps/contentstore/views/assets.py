@@ -62,7 +62,7 @@ def asset_index(request, org, course, name):
         asset_id = asset['_id']
         display_info = {}
         display_info['displayname'] = asset['displayname']
-        display_info['uploadDate'] = get_default_time_display(asset['uploadDate'].timetuple())
+        display_info['uploadDate'] = get_default_time_display(asset['uploadDate'])
 
         asset_location = StaticContent.compute_location(asset_id['org'], asset_id['course'], asset_id['name'])
         display_info['url'] = StaticContent.get_url_path_from_location(asset_location)
@@ -103,6 +103,9 @@ def upload_asset(request, org, course, coursename):
         logging.error('Could not find course' + location)
         return HttpResponseBadRequest()
 
+    if 'file' not in request.FILES:
+        return HttpResponseBadRequest()
+
     # compute a 'filename' which is similar to the location formatting, we're using the 'filename'
     # nomenclature since we're using a FileSystem paradigm here. We're just imposing
     # the Location string formatting expectations to keep things a bit more consistent
@@ -131,7 +134,7 @@ def upload_asset(request, org, course, coursename):
     readback = contentstore().find(content.location)
 
     response_payload = {'displayname': content.name,
-                        'uploadDate': get_default_time_display(readback.last_modified_at.timetuple()),
+                        'uploadDate': get_default_time_display(readback.last_modified_at),
                         'url': StaticContent.get_url_path_from_location(content.location),
                         'thumb_url': StaticContent.get_url_path_from_location(thumbnail_location) if thumbnail_content is not None else None,
                         'msg': 'Upload completed'
@@ -227,11 +230,9 @@ def generate_export_course(request, org, course, name):
     root_dir = path(mkdtemp())
 
     # export out to a tempdir
-
     logging.debug('root = {0}'.format(root_dir))
 
     export_to_xml(modulestore('direct'), contentstore(), loc, root_dir, name, modulestore())
-    #filename = root_dir / name + '.tar.gz'
 
     logging.debug('tar file being generated at {0}'.format(export_file.name))
     tar_file = tarfile.open(name=export_file.name, mode='w:gz')

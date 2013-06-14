@@ -3,7 +3,6 @@ Test for lms courseware app
 '''
 import logging
 import json
-import time
 import random
 
 from urlparse import urlsplit, urlunsplit
@@ -30,6 +29,8 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import Location
 from xmodule.modulestore.xml_importer import import_from_xml
 from xmodule.modulestore.xml import XMLModuleStore
+import datetime
+from django.utils.timezone import UTC
 
 log = logging.getLogger("mitx." + __name__)
 
@@ -64,7 +65,7 @@ def mongo_store_config(data_dir):
                 'db': 'test_xmodule',
                 'collection': 'modulestore_%s' % uuid4().hex,
                 'fs_root': data_dir,
-                'render_template': 'mitxmako.shortcuts.render_to_string',
+                'render_template': 'mitxmako.shortcuts.render_to_string'
             }
         }
     }
@@ -287,7 +288,7 @@ class PageLoaderTestCase(LoginEnrollmentTestCase):
         '''
         Choose a page in the course randomly, and assert that it loads
         '''
-       # enroll in the course before trying to access pages
+        # enroll in the course before trying to access pages
         courses = module_store.get_courses()
         self.assertEqual(len(courses), 1)
         course = courses[0]
@@ -603,9 +604,9 @@ class TestViewAuth(LoginEnrollmentTestCase):
         """Actually do the test, relying on settings to be right."""
 
         # Make courses start in the future
-        tomorrow = time.time() + 24 * 3600
-        self.toy.lms.start = time.gmtime(tomorrow)
-        self.full.lms.start = time.gmtime(tomorrow)
+        tomorrow = datetime.datetime.now(UTC()) + datetime.timedelta(days=1)
+        self.toy.lms.start = tomorrow
+        self.full.lms.start = tomorrow
 
         self.assertFalse(self.toy.has_started())
         self.assertFalse(self.full.has_started())
@@ -728,18 +729,18 @@ class TestViewAuth(LoginEnrollmentTestCase):
         """Actually do the test, relying on settings to be right."""
 
         # Make courses start in the future
-        tomorrow = time.time() + 24 * 3600
-        nextday = tomorrow + 24 * 3600
-        yesterday = time.time() - 24 * 3600
+        tomorrow = datetime.datetime.now(UTC()) + datetime.timedelta(days=1)
+        nextday = tomorrow + datetime.timedelta(days=1)
+        yesterday = datetime.datetime.now(UTC()) - datetime.timedelta(days=1)
 
         print "changing"
         # toy course's enrollment period hasn't started
-        self.toy.enrollment_start = time.gmtime(tomorrow)
-        self.toy.enrollment_end = time.gmtime(nextday)
+        self.toy.enrollment_start = tomorrow
+        self.toy.enrollment_end = nextday
 
         # full course's has
-        self.full.enrollment_start = time.gmtime(yesterday)
-        self.full.enrollment_end = time.gmtime(tomorrow)
+        self.full.enrollment_start = yesterday
+        self.full.enrollment_end = tomorrow
 
         print "login"
         # First, try with an enrolled student
@@ -778,12 +779,10 @@ class TestViewAuth(LoginEnrollmentTestCase):
         self.assertFalse(settings.MITX_FEATURES['DISABLE_START_DATES'])
 
         # Make courses start in the future
-        tomorrow = time.time() + 24 * 3600
-        # nextday = tomorrow + 24 * 3600
-        # yesterday = time.time() - 24 * 3600
+        tomorrow = datetime.datetime.now(UTC()) + datetime.timedelta(days=1)
 
         # toy course's hasn't started
-        self.toy.lms.start = time.gmtime(tomorrow)
+        self.toy.lms.start = tomorrow
         self.assertFalse(self.toy.has_started())
 
         # but should be accessible for beta testers
@@ -854,7 +853,7 @@ class TestSubmittingProblems(LoginEnrollmentTestCase):
         modx_url = self.modx_url(problem_location, 'problem_check')
         answer_key_prefix = 'input_i4x-edX-{}-problem-{}_'.format(self.course_slug, problem_url_name)
         resp = self.client.post(modx_url,
-            { (answer_key_prefix + k): v for k,v in responses.items() }
+            { (answer_key_prefix + k): v for k, v in responses.items() }
             )
         return resp
 
@@ -925,7 +924,7 @@ class TestCourseGrader(TestSubmittingProblems):
         # Only get half of the first problem correct
         self.submit_question_answer('H1P1', {'2_1': 'Correct', '2_2': 'Incorrect'})
         self.check_grade_percent(0.06)
-        self.assertEqual(earned_hw_scores(), [1.0, 0, 0])   # Order matters
+        self.assertEqual(earned_hw_scores(), [1.0, 0, 0])  # Order matters
         self.assertEqual(score_for_hw('Homework1'), [1.0, 0.0])
 
         # Get both parts of the first problem correct
@@ -958,16 +957,16 @@ class TestCourseGrader(TestSubmittingProblems):
 
         # Third homework
         self.submit_question_answer('H3P1', {'2_1': 'Correct', '2_2': 'Correct'})
-        self.check_grade_percent(0.42)   # Score didn't change
+        self.check_grade_percent(0.42)  # Score didn't change
         self.assertEqual(earned_hw_scores(), [4.0, 4.0, 2.0])
 
         self.submit_question_answer('H3P2', {'2_1': 'Correct', '2_2': 'Correct'})
-        self.check_grade_percent(0.5)   # Now homework2 dropped. Score changes
+        self.check_grade_percent(0.5)  # Now homework2 dropped. Score changes
         self.assertEqual(earned_hw_scores(), [4.0, 4.0, 4.0])
 
         # Now we answer the final question (worth half of the grade)
         self.submit_question_answer('FinalQuestion', {'2_1': 'Correct', '2_2': 'Correct'})
-        self.check_grade_percent(1.0)   # Hooray! We got 100%
+        self.check_grade_percent(1.0)  # Hooray! We got 100%
 
 
 @override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
@@ -1000,7 +999,7 @@ class TestSchematicResponse(TestSubmittingProblems):
             { '2_1': json.dumps(
                 [['transient', {'Z': [
                 [0.0000004, 2.8],
-                [0.0000009, 0.0],       # wrong.
+                [0.0000009, 0.0],  # wrong.
                 [0.0000014, 2.8],
                 [0.0000019, 2.8],
                 [0.0000024, 2.8],

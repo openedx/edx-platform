@@ -48,7 +48,7 @@ MODULESTORE_OPTIONS = {
     'db': 'test_xmodule',
     'collection': 'test_modulestore',
     'fs_root': TEST_ROOT / "data",
-    'render_template': 'mitxmako.shortcuts.render_to_string',
+    'render_template': 'mitxmako.shortcuts.render_to_string'
 }
 
 MODULESTORE = {
@@ -121,7 +121,7 @@ CELERY_RESULT_BACKEND = 'cache'
 BROKER_TRANSPORT = 'memory'
 
 ################### Make tests faster
-#http://slacy.com/blog/2012/04/make-your-tests-faster-in-django-1-4/
+# http://slacy.com/blog/2012/04/make-your-tests-faster-in-django-1-4/
 PASSWORD_HASHERS = (
     'django.contrib.auth.hashers.SHA1PasswordHasher',
     'django.contrib.auth.hashers.MD5PasswordHasher',

@@ -1,5 +1,6 @@
 import logging
 
+from django.conf import settings
 from django.test.utils import override_settings
 from django.test.client import Client
 from django.contrib.auth.models import User
@@ -8,6 +9,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from django.core.urlresolvers import reverse
 from django.core.management import call_command
+from util.testing import UrlResetMixin
 
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from nose.tools import assert_true, assert_equal
@@ -18,8 +20,19 @@ log = logging.getLogger(__name__)
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 @patch('comment_client.utils.requests.request')
-class ViewsTestCase(ModuleStoreTestCase):
+class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
     def setUp(self):
+
+        # This feature affects the contents of urls.py, so we change
+        # it before the call to super.setUp() which reloads urls.py (because
+        # of the UrlResetMixin)
+
+        # This setting is cleaned up at the end of the test by @override_settings, which
+        # restores all of the old settings
+        settings.MITX_FEATURES['ENABLE_DISCUSSION_SERVICE'] = True
+
+        super(ViewsTestCase, self).setUp()
+
         # create a course
         self.course = CourseFactory.create(org='MITx', course='999',
                                            display_name='Robot Super Course')

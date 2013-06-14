@@ -19,7 +19,7 @@ DB = 'test'
 COLLECTION = 'modulestore'
 FS_ROOT = DATA_DIR  # TODO (vshnayder): will need a real fs_root for testing load_item
 DEFAULT_CLASS = 'xmodule.raw_module.RawDescriptor'
-RENDER_TEMPLATE = lambda t_n, d, ctx=None, nsp='main': ''
+RENDER_TEMPLATE = lambda t_n, d, ctx = None, nsp = 'main': ''
 
 
 class TestMongoModuleStore(object):
@@ -42,7 +42,8 @@ class TestMongoModuleStore(object):
     @staticmethod
     def initdb():
         # connect to the db
-        store = MongoModuleStore(HOST, DB, COLLECTION, FS_ROOT, RENDER_TEMPLATE, default_class=DEFAULT_CLASS)
+        store = MongoModuleStore(HOST, DB, COLLECTION, FS_ROOT, RENDER_TEMPLATE,
+            default_class=DEFAULT_CLASS)
         # Explicitly list the courses to load (don't want the big one)
         courses = ['toy', 'simple']
         import_from_xml(store, DATA_DIR, courses)
