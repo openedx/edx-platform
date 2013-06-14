@@ -147,11 +147,42 @@ def external_login_or_signup(request,
 
     internal_user = eamap.user
     if internal_user is None:
-        log.debug('No user for %s yet, doing signup' % eamap.external_email)
-        return signup(request, eamap)
+        if settings.MITX_FEATURES.get('AUTH_USE_SHIB'):
+            # if we are using shib, try to link accounts using email
+            try:
+                link_user = User.objects.get(email=eamap.external_email)
+                if not ExternalAuthMap.objects.filter(user=link_user).exists():
+                    # if there's no pre-existing linked eamap, we link the user
+                    eamap.user = link_user
+                    eamap.save()
+                    internal_user = link_user
+                    log.debug('Linking existing account for %s' % eamap.external_email)
+                    # now pass through to log in
+                else:
+                    # otherwise, set external_email to '' to ask for a new one at user signup
+                    eamap.external_email = ''
+                    eamap.save()
+                    log.debug('User with external login found for %s, asking for new email during signup' % email)
+                    return signup(request, eamap)
+            except User.DoesNotExist:
+                log.debug('No user for %s yet, doing signup' % eamap.external_email)
+                return signup(request, eamap)
+        else:
+            log.debug('No user for %s yet, doing signup' % eamap.external_email)
+            return signup(request, eamap)
 
-    uname = internal_user.username
-    user = authenticate(username=uname, password=eamap.internal_password)
+    # We trust shib's authentication, so no need to authenticate using the password again
+    if settings.MITX_FEATURES.get('AUTH_USE_SHIB'):
+        user = internal_user
+        # Assuming this 'AUTHENTICATION_BACKENDS' is set in settings, which I think is safe
+        if settings.AUTHENTICATION_BACKENDS:
+            auth_backend = settings.AUTHENTICATION_BACKENDS[0]
+        else:
+            auth_backend = 'django.contrib.auth.backends.ModelBackend'
+        user.backend = auth_backend
+    else:
+        uname = internal_user.username
+        user = authenticate(username=uname, password=eamap.internal_password)
     if user is None:
         log.warning("External Auth Login failed for %s / %s" %
                     (uname, eamap.internal_password))
