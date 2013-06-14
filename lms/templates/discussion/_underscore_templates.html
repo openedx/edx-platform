@@ -53,12 +53,12 @@
         
       % if course and has_permission(user, 'openclose_thread', course.id):
       <div class="admin-pin discussion-pin notpinned" data-role="thread-pin" data-tooltip="pin this thread">                
-      <i class="icon"></i><span class="pin-label">Pin Thread</span></div> 
+      <i class="icon icon-pushpin"></i><span class="pin-label">Pin Thread</span></div> 
 
       %else:
       ${"<% if (pinned) { %>"}
       <div class="discussion-pin notpinned" data-role="thread-pin" data-tooltip="pin this thread">                
-      <i class="icon"></i><span class="pin-label">Pin Thread</span></div> 
+      <i class="icon icon-pushpin"></i><span class="pin-label">Pin Thread</span></div> 
       ${"<% }  %>"}  
       % endif
       
