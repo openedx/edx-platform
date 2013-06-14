@@ -136,7 +136,7 @@
         core: { debug: true, autojoin: ["${chat['course_room']}"] },
         view: { resources: "${static.url('candy_res/')}"}
       });
-      $('#chat-tabs').before('<a href="#" class="scroll-arrow left-arrow">&lsaquo;</a>').after('<a href="#" class="scroll-arrow right-arrow">&rsaquo;</a>');
+      $('#chat-tabs').before('<div class="scroll-arrow left-arrow">&lsaquo;</div>').after('<div class="scroll-arrow right-arrow">&rsaquo;</div>');
       $('#chat-toolbar').remove();
       
       // show/hide the chat widget

@@ -66,6 +66,8 @@ ul {
 	text-align: center;
 	font-weight: bold;
 	color: #666;
+	cursor: pointer;
+	line-height: 1em;
 }
 #chat-pane .scroll-arrow.left-arrow {
 	border-right: 1px solid #bdb7a1;
