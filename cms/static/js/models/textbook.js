@@ -16,18 +16,19 @@ CMS.Models.Textbook = Backbone.AssociatedModel.extend({
         return !this.get('name') && this.get('chapters').isEmpty();
     },
     parse: function(response) {
-        if("tab_title" in response && !("name" in response)) {
-            response.name = response.tab_title;
-            delete response.tab_title;
+        var ret = $.extend(true, {}, response);
+        if("tab_title" in ret && !("name" in ret)) {
+            ret.name = ret.tab_title;
+            delete ret.tab_title;
         }
-        if("url" in response && !("chapters" in response)) {
-            response.chapters = {"url": response.url};
-            delete response.url;
+        if("url" in ret && !("chapters" in ret)) {
+            ret.chapters = {"url": ret.url};
+            delete ret.url;
         }
-        _.each(response.chapters, function(chapter, i) {
+        _.each(ret.chapters, function(chapter, i) {
             chapter.order = chapter.order || i+1;
         });
-        return response;
+        return ret;
     },
     toJSON: function() {
         return {
