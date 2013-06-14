@@ -17,6 +17,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 from models.settings.course_metadata import CourseMetadata
 from xmodule.modulestore.xml_importer import import_from_xml
+from xmodule.modulestore.django import modulestore
 from xmodule.fields import Date
 
 
@@ -46,7 +47,7 @@ class CourseTestCase(ModuleStoreTestCase):
         self.client = Client()
         self.client.login(username=uname, password=password)
 
-        course = CourseFactory.create(template='i4x://edx/templates/course/Empty', org='MITx', number='999', display_name='Robot Super Course')
+        course = CourseFactory.create(org='MITx', number='999', display_name='Robot Super Course')
         self.course_location = course.location
 
 
@@ -59,7 +60,6 @@ class CourseDetailsTestCase(CourseTestCase):
         self.assertIsNone(details.enrollment_start, "enrollment_start date somehow initialized " + str(details.enrollment_start))
         self.assertIsNone(details.enrollment_end, "enrollment_end date somehow initialized " + str(details.enrollment_end))
         self.assertIsNone(details.syllabus, "syllabus somehow initialized" + str(details.syllabus))
-        self.assertEqual(details.overview, "", "overview somehow initialized" + details.overview)
         self.assertIsNone(details.intro_video, "intro_video somehow initialized" + str(details.intro_video))
         self.assertIsNone(details.effort, "effort somehow initialized" + str(details.effort))
 
@@ -72,7 +72,6 @@ class CourseDetailsTestCase(CourseTestCase):
         self.assertIsNone(jsondetails['enrollment_start'], "enrollment_start date somehow initialized ")
         self.assertIsNone(jsondetails['enrollment_end'], "enrollment_end date somehow initialized ")
         self.assertIsNone(jsondetails['syllabus'], "syllabus somehow initialized")
-        self.assertEqual(jsondetails['overview'], "", "overview somehow initialized")
         self.assertIsNone(jsondetails['intro_video'], "intro_video somehow initialized")
         self.assertIsNone(jsondetails['effort'], "effort somehow initialized")
 
@@ -116,6 +115,11 @@ class CourseDetailsTestCase(CourseTestCase):
         self.assertEqual(
             CourseDetails.update_from_json(jsondetails.__dict__).effort,
             jsondetails.effort, "After set effort"
+        )
+        jsondetails.start_date = datetime.datetime(2010, 10, 1, 0, tzinfo=UTC())
+        self.assertEqual(
+            CourseDetails.update_from_json(jsondetails.__dict__).start_date,
+            jsondetails.start_date
         )
 
 
@@ -172,8 +176,8 @@ class CourseDetailsViewTest(CourseTestCase):
                 dt1 = date.from_json(encoded[field])
                 dt2 = details[field]
 
-                expected_delta = datetime.timedelta(0)
-                self.assertEqual(dt1 - dt2, expected_delta, str(dt1) + "!=" + str(dt2) + " at " + context)
+                expected_delta = datetime.timedelta(seconds=1)
+                self.assertLessEqual(abs(dt1 - dt2), expected_delta, str(dt1) + "!=" + str(dt2) + " at " + context)
             else:
                 self.fail(field + " missing from encoded but in details at " + context)
         elif field in encoded and encoded[field] is not None:
@@ -259,7 +263,7 @@ class CourseMetadataEditingTest(CourseTestCase):
     def setUp(self):
         CourseTestCase.setUp(self)
         # add in the full class too
-        import_from_xml(get_modulestore(self.course_location), 'common/test/data/', ['full'])
+        import_from_xml(modulestore('direct'), 'common/test/data/', ['full'])
         self.fullcourse_location = Location(['i4x', 'edX', 'full', 'course', '6.002_Spring_2012', None])
 
     def test_fetch_initial_fields(self):

@@ -49,7 +49,7 @@ class VideoFactory(object):
                              "SampleProblem1"])
         model_data = {'data': VideoFactory.sample_problem_xml_youtube}
 
-        descriptor = Mock(weight="1")
+        descriptor = Mock(weight="1", url_name="SampleProblem1")
 
         system = test_system()
         system.render_template = lambda template, context: context

@@ -27,6 +27,38 @@ VERSION_TUPLES = {
 }
 
 DEFAULT_VERSION = 1
+DEFAULT_DATA = """
+    <combinedopenended>
+        <rubric>
+            <rubric>
+                <category>
+                  <description>Category 1</description>
+                  <option>
+                      The response does not incorporate what is needed for a one response.
+                  </option>
+                  <option>
+                      The response is correct for category 1.
+                  </option>
+                </category>
+            </rubric>
+        </rubric>
+        <prompt>
+            <p>Why is the sky blue?</p>
+        </prompt>
+        <task>
+            <selfassessment/>
+        </task>
+        <task>
+            <openended min_score_to_attempt="1" max_score_to_attempt="2">
+                    <openendedparam>
+                        <initial_display>Enter essay here.</initial_display>
+                        <answer_display>This is the answer.</answer_display>
+                        <grader_payload>{"grader_settings" : "peer_grading.conf", "problem_id" : "700x/Demo"}</grader_payload>
+                    </openendedparam>
+            </openended>
+        </task>
+    </combinedopenended>
+"""
 
 
 class VersionInteger(Integer):
@@ -58,7 +90,7 @@ class CombinedOpenEndedFields(object):
     state = String(help="Which step within the current task that the student is on.", default="initial",
                    scope=Scope.user_state)
     student_attempts = Integer(help="Number of attempts taken by the student on this problem", default=0,
-                                      scope=Scope.user_state)
+                               scope=Scope.user_state)
     ready_to_reset = Boolean(
         help="If the problem is ready to be reset or not.", default=False,
         scope=Scope.user_state
@@ -66,7 +98,7 @@ class CombinedOpenEndedFields(object):
     attempts = Integer(
         display_name="Maximum Attempts",
         help="The number of times the student can try to answer this problem.", default=1,
-        scope=Scope.settings, values = {"min" : 1 }
+        scope=Scope.settings, values={"min" : 1 }
     )
     is_graded = Boolean(display_name="Graded", help="Whether or not the problem is graded.", default=False, scope=Scope.settings)
     accept_file_upload = Boolean(
@@ -85,11 +117,12 @@ class CombinedOpenEndedFields(object):
         scope=Scope.settings
     )
     version = VersionInteger(help="Current version number", default=DEFAULT_VERSION, scope=Scope.settings)
-    data = String(help="XML data for the problem", scope=Scope.content)
+    data = String(help="XML data for the problem", scope=Scope.content,
+        default=DEFAULT_DATA)
     weight = Float(
         display_name="Problem Weight",
         help="Defines the number of points each problem is worth. If the value is not set, each problem is worth one point.",
-        scope=Scope.settings, values = {"min" : 0 , "step": ".1"}
+        scope=Scope.settings, values={"min" : 0 , "step": ".1"}
     )
     markdown = String(help="Markdown source of this module", scope=Scope.settings)
 
@@ -241,7 +274,6 @@ class CombinedOpenEndedDescriptor(CombinedOpenEndedFields, RawDescriptor):
 
     has_score = True
     always_recalculate_grades = True
-    template_dir_name = "combinedopenended"
 
     #Specify whether or not to pass in S3 interface
     needs_s3_interface = True

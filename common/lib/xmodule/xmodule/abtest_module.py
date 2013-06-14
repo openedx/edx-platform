@@ -80,8 +80,6 @@ class ABTestModule(ABTestFields, XModule):
 class ABTestDescriptor(ABTestFields, RawDescriptor, XmlDescriptor):
     module_class = ABTestModule
 
-    template_dir_name = "abtest"
-
     @classmethod
     def definition_from_xml(cls, xml_object, system):
         """

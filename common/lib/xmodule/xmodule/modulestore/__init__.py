@@ -196,7 +196,7 @@ class Location(_LocationBase):
                 raise InvalidLocationError(location)
 
             if len(location) == 5:
-                args = tuple(location) + (None, )
+                args = tuple(location) + (None,)
             else:
                 args = tuple(location)
 
@@ -324,14 +324,7 @@ class ModuleStore(object):
         """
         raise NotImplementedError
 
-    def clone_item(self, source, location):
-        """
-        Clone a new item that is a copy of the item at the location `source`
-        and writes it to `location`
-        """
-        raise NotImplementedError
-
-    def update_item(self, location, data):
+    def update_item(self, location, data, allow_not_found=False):
         """
         Set the data in the item specified by the location to
         data
@@ -415,7 +408,7 @@ class ModuleStoreBase(ModuleStore):
         '''
         Set up the error-tracking logic.
         '''
-        self._location_errors = {}    # location -> ErrorLog
+        self._location_errors = {}  # location -> ErrorLog
         self.metadata_inheritance_cache = None
         self.modulestore_update_signal = None  # can be set by runtime to route notifications of datastore changes
 
@@ -440,7 +433,7 @@ class ModuleStoreBase(ModuleStore):
         """
         # check that item is present and raise the promised exceptions if needed
         # TODO (vshnayder): post-launch, make errors properties of items
-        #self.get_item(location)
+        # self.get_item(location)
 
         errorlog = self._get_errorlog(location)
         return errorlog.errors

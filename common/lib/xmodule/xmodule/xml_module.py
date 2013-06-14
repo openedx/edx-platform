@@ -10,6 +10,8 @@ from xblock.core import Dict, Scope
 from xmodule.x_module import (XModuleDescriptor, policy_key)
 from xmodule.modulestore import Location
 from xmodule.modulestore.inheritance import own_metadata
+import datetime
+from xmodule.modulestore.xml_exporter import EdxJSONEncoder
 
 log = logging.getLogger(__name__)
 
@@ -56,13 +58,22 @@ def get_metadata_from_xml(xml_object, remove=True):
     if meta is None:
         return ''
     dmdata = meta.text
-    #log.debug('meta for %s loaded: %s' % (xml_object,dmdata))
+    # log.debug('meta for %s loaded: %s' % (xml_object,dmdata))
     if remove:
         xml_object.remove(meta)
     return dmdata
 
 _AttrMapBase = namedtuple('_AttrMap', 'from_xml to_xml')
 
+
+def datetime_to_xml(obj):
+    if isinstance(obj, datetime.datetime):
+        if obj.tzinfo is not None and obj.utcoffset() is None:
+            return obj.isoformat() + 'Z'
+        else:
+            return obj.isoformat()
+    else:
+        return obj
 
 class AttrMap(_AttrMapBase):
     """
@@ -75,7 +86,7 @@ class AttrMap(_AttrMapBase):
             the value to store in the xml.
     """
     def __new__(_cls, from_xml=lambda x: x,
-                to_xml=lambda x: x):
+                to_xml=datetime_to_xml):
         return _AttrMapBase.__new__(_cls, from_xml, to_xml)
 
 
@@ -85,7 +96,7 @@ def serialize_field(value):
 
         By default, this is the result of calling json.dumps on the input value.
         """
-    return json.dumps(value)
+    return json.dumps(value, cls=EdxJSONEncoder)
 
 
 def deserialize_field(field, value):
@@ -142,9 +153,9 @@ class XmlDescriptor(XModuleDescriptor):
     # Related: What's the right behavior for clean_metadata?
     metadata_attributes = ('format', 'graceperiod', 'showanswer', 'rerandomize',
         'start', 'due', 'graded', 'display_name', 'url_name', 'hide_from_toc',
-        'ispublic', 	# if True, then course is listed for all users; see
-        'xqa_key',  	# for xqaa server access
-        'giturl',	# url of git server for origin of file
+        'ispublic',  # if True, then course is listed for all users; see
+        'xqa_key',  # for xqaa server access
+        'giturl',  # url of git server for origin of file
         # information about testcenter exams is a dict (of dicts), not a string,
         # so it cannot be easily exportable as a course element's attribute.
         'testcenter_info',
@@ -254,7 +265,7 @@ class XmlDescriptor(XModuleDescriptor):
         definition, children = cls.definition_from_xml(definition_xml, system)
         if definition_metadata:
             definition['definition_metadata'] = definition_metadata
-        definition['filename'] = [ filepath, filename ]     
+        definition['filename'] = [ filepath, filename ]
 
         return definition, children
 
@@ -348,15 +359,17 @@ class XmlDescriptor(XModuleDescriptor):
         model_data['children'] = children
 
         model_data['xml_attributes'] = {}
-        model_data['xml_attributes']['filename'] = definition.get('filename', ['', None]) # for git link
+        model_data['xml_attributes']['filename'] = definition.get('filename', ['', None])  # for git link
         for key, value in metadata.items():
             if key not in set(f.name for f in cls.fields + cls.lms.fields):
                 model_data['xml_attributes'][key] = value
 
         return cls(
             system,
+            xml_object.tag,
             location,
-            model_data,
+            None,
+            model_data
         )
 
     @classmethod
@@ -410,7 +423,7 @@ class XmlDescriptor(XModuleDescriptor):
             # don't want e.g. data_dir
             if attr not in self.metadata_to_strip and attr not in self.metadata_to_export_to_policy:
                 val = val_for_xml(attr)
-                #logging.debug('location.category = {0}, attr = {1}'.format(self.location.category, attr))
+                # logging.debug('location.category = {0}, attr = {1}'.format(self.location.category, attr))
                 try:
                     xml_object.set(attr, val)
                 except Exception, e:

@@ -65,7 +65,7 @@ def mongo_store_config(data_dir):
                 'db': 'test_xmodule',
                 'collection': 'modulestore_%s' % uuid4().hex,
                 'fs_root': data_dir,
-                'render_template': 'mitxmako.shortcuts.render_to_string'
+                'render_template': 'mitxmako.shortcuts.render_to_string',
             }
         }
     }
@@ -77,7 +77,7 @@ def draft_mongo_store_config(data_dir):
     '''Defines default module store using DraftMongoModuleStore'''
     return {
         'default': {
-            'ENGINE': 'xmodule.modulestore.mongo.DraftMongoModuleStore',
+            'ENGINE': 'xmodule.modulestore.draft.DraftModuleStore',
             'OPTIONS': {
                 'default_class': 'xmodule.raw_module.RawDescriptor',
                 'host': 'localhost',

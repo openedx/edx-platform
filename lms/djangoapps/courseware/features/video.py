@@ -8,12 +8,12 @@ from common import TEST_COURSE_NAME, TEST_SECTION_NAME, i_am_registered_for_the_
 
 
 @step('when I view the video it has autoplay enabled')
-def does_autoplay(step):
+def does_autoplay(_step):
     assert(world.css_find('.video')[0]['data-autoplay'] == 'True')
 
 
 @step('the course has a Video component')
-def view_video(step):
+def view_video(_step):
     coursename = TEST_COURSE_NAME.replace(' ', '_')
     i_am_registered_for_the_course(step, coursename)
 
@@ -28,7 +28,6 @@ def view_video(step):
 
 
 def add_video_to_course(course):
-    template_name = 'i4x://edx/templates/video/default'
     world.ItemFactory.create(parent_location=section_location(course),
-                             template=template_name,
+                             category='video',
                              display_name='Video')

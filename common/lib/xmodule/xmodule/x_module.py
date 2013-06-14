@@ -1,5 +1,4 @@
 import logging
-import copy
 import yaml
 import os
 
@@ -7,15 +6,18 @@ from lxml import etree
 from collections import namedtuple
 from pkg_resources import resource_listdir, resource_string, resource_isdir
 
-from xmodule.modulestore import Location
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from xblock.core import XBlock, Scope, String, Integer, Float
+from xmodule.modulestore import inheritance, Location
+from xmodule.modulestore.locator import BlockUsageLocator
+import copy
+from xmodule.contentstore.content import XASSET_SRCREF_PREFIX, StaticContent
 
 log = logging.getLogger(__name__)
 
 
-def dummy_track(event_type, event):
+def dummy_track(_event_type, _event):
     pass
 
 
@@ -84,6 +86,8 @@ class XModuleFields(object):
         display_name="Display Name",
         help="This name appears in the horizontal navigation at the top of the page.",
         scope=Scope.settings,
+        # it'd be nice to have a useful default but it screws up other things; so,
+        # use display_name_with_default for those
         default=None
     )
 
@@ -123,10 +127,17 @@ class XModule(XModuleFields, HTMLSnippet, XBlock):
         '''
         self._model_data = model_data
         self.system = system
-        self.location = Location(location)
+        # TODO ensure each caller passes correct type (removed coercion)
+        self.location = location
         self.descriptor = descriptor
-        self.url_name = self.location.name
-        self.category = self.location.category
+        # LMS tests don't require descriptor but really it's required
+        if descriptor:
+            self.url_name = descriptor.url_name
+            self.category = descriptor.category
+        elif isinstance(location, Location):
+            self.url_name = location.name
+        elif isinstance(location, BlockUsageLocator):
+            self.url_name = location.usage_id
         self._loaded_children = None
 
     @property
@@ -173,6 +184,7 @@ class XModule(XModuleFields, HTMLSnippet, XBlock):
         These children will be the same children returned by the
         descriptor unless descriptor.has_dynamic_children() is true.
         '''
+        # FIXME wrong place to get children
         return self.descriptor.get_children()
 
     def get_child_by(self, selector):
@@ -208,7 +220,7 @@ class XModule(XModuleFields, HTMLSnippet, XBlock):
         '''
         return self.icon_class
 
-    ### Functions used in the LMS
+    # Functions used in the LMS
 
     def get_score(self):
         """
@@ -249,7 +261,7 @@ class XModule(XModuleFields, HTMLSnippet, XBlock):
         '''
         return None
 
-    def handle_ajax(self, dispatch, get):
+    def handle_ajax(self, _dispatch, _get):
         ''' dispatch is last part of the URL.
             get is a dictionary-like object '''
         return ""
@@ -280,35 +292,66 @@ Template = namedtuple("Template", "metadata data children")
 
 
 class ResourceTemplates(object):
+    """
+    Gets the templates associated w/ a containing cls. The cls must have a 'template_dir_name' attribute.
+    It finds the templates as directly in this directory under 'templates'.
+    """
     @classmethod
     def templates(cls):
         """
-        Returns a list of Template objects that describe possible templates that can be used
-        to create a module of this type.
-        If no templates are provided, there will be no way to create a module of
-        this type
+        Returns a list of dictionary field: value objects that describe possible templates that can be used
+        to seed a module of this type.
 
         Expects a class attribute template_dir_name that defines the directory
         inside the 'templates' resource directory to pull templates from
         """
         templates = []
-        dirname = os.path.join('templates', cls.template_dir_name)
-        if not resource_isdir(__name__, dirname):
-            log.warning("No resource directory {dir} found when loading {cls_name} templates".format(
-                dir=dirname,
-                cls_name=cls.__name__,
-            ))
-            return []
-
-        for template_file in resource_listdir(__name__, dirname):
-            if not template_file.endswith('.yaml'):
-                log.warning("Skipping unknown template file %s" % template_file)
-                continue
-            template_content = resource_string(__name__, os.path.join(dirname, template_file))
-            template = yaml.safe_load(template_content)
-            templates.append(Template(**template))
+        dirname = cls.get_template_dir()
+        if dirname is not None:
+            for template_file in resource_listdir(__name__, dirname):
+                if not template_file.endswith('.yaml'):
+                    log.warning("Skipping unknown template file %s", template_file)
+                    continue
+                template_content = resource_string(__name__, os.path.join(dirname, template_file))
+                template = yaml.safe_load(template_content)
+                template['template_id'] = template_file
+                templates.append(template)
 
         return templates
+
+    @classmethod
+    def get_template_dir(cls):
+        if getattr(cls, 'template_dir_name', None):
+            dirname = os.path.join('templates', getattr(cls, 'template_dir_name'))
+            if not resource_isdir(__name__, dirname):
+                log.warning("No resource directory {dir} found when loading {cls_name} templates".format(
+                    dir=dirname,
+                    cls_name=cls.__name__,
+                ))
+                return None
+            else:
+                return dirname
+        else:
+            return None
+
+    @classmethod
+    def get_template(cls, template_id):
+        """
+        Get a single template by the given id (which is the file name identifying it w/in the class's
+        template_dir_name)
+
+        """
+        dirname = cls.get_template_dir()
+        if dirname is not None:
+            try:
+                template_content = resource_string(__name__, os.path.join(dirname, template_id))
+            except IOError:
+                return None
+            template = yaml.safe_load(template_content)
+            template['template_id'] = template_id
+            return template
+        else:
+            return None
 
 
 class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
@@ -336,9 +379,6 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
     # be equal
     equality_attributes = ('_model_data', 'location')
 
-    # Name of resource directory to load templates from
-    template_dir_name = "default"
-
     # Class level variable
     always_recalculate_grades = False
     """
@@ -359,31 +399,38 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
     # ============================= STRUCTURAL MANIPULATION ===================
     def __init__(self,
                  system,
+                 category,
                  location,
+                 definition_id,
                  model_data):
         """
-        Construct a new XModuleDescriptor. The only required arguments are the
-        system, used for interaction with external resources, and the
-        definition, which specifies all the data needed to edit and display the
-        problem (but none of the associated metadata that handles recordkeeping
-        around the problem).
-
-        This allows for maximal flexibility to add to the interface while
-        preserving backwards compatibility.
+        Construct a new XModuleDescriptor.
 
         system: A DescriptorSystem for interacting with external resources
 
-        location: Something Location-like that identifies this xmodule
+        location: a Locator
 
         model_data: A dictionary-like object that maps field names to values
             for those fields.
         """
         self.system = system
-        self.location = Location(location)
-        self.url_name = self.location.name
-        self.category = self.location.category
+        # TODO removed coercion to Location: verify all callers pass right obj
+        self.location = location
+        self.category = category
+        # update_version is the version which last updated this xblock v prev being the penultimate updater
+        # leaving off original_version since it complicates creation w/o any obv value yet and is computable
+        # by following previous until None
+        self.edited_by = self.edited_on = self.previous_version = self.update_version = None
+        # only used by mongostores which separate definitions from blocks
+        self.definition_locator = definition_id
         self._model_data = model_data
-
+        if isinstance(location, Location):
+            self.url_name = location.name
+        elif isinstance(location, BlockUsageLocator):
+            self.url_name = location.usage_id
+        else:
+            log.warning("cannot derive url_name from: {}".format(location))
+            self.url_name = location
         self._child_instances = None
 
     @property
@@ -415,11 +462,14 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         if self._child_instances is None:
             self._child_instances = []
             for child_loc in self.children:
-                try:
-                    child = self.system.load_item(child_loc)
-                except ItemNotFoundError:
-                    log.exception('Unable to load item {loc}, skipping'.format(loc=child_loc))
-                    continue
+                if isinstance(child_loc, XModuleDescriptor):
+                    child = child_loc
+                else:
+                    try:
+                        child = self.system.load_item(child_loc)
+                    except ItemNotFoundError:
+                        log.exception('Unable to load item {loc}, skipping'.format(loc=child_loc))
+                        continue
                 self._child_instances.append(child)
 
         return self._child_instances
@@ -439,6 +489,7 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
 
         system: Module system
         """
+        # TODO refactor for split mongo
         return self.module_class(
             system,
             self.location,
@@ -456,61 +507,61 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         """
         return False
 
+
     # ================================= JSON PARSING ===========================
     @staticmethod
-    def load_from_json(json_data, system, default_class=None):
+    def load_from_json(json_data, system, default_class=None, parent_xblock=None):
         """
         This method instantiates the correct subclass of XModuleDescriptor based
-        on the contents of json_data.
+        on the contents of json_data. It does not persist it and can create one which
+        has no usage id.
 
-        json_data must contain a 'location' element, and must be suitable to be
-        passed into the subclasses `from_json` method as model_data
+        parent_xblock is used to compute inherited metadata as well as to append the new xblock.
+
+        json_data:
+        - 'category': the xmodule category (required)
+        - 'metadata': a dict of locally set metadata (not inherited)
+        - 'children': a list of children's usage_ids w/in this course
+        - 'definition':
+        - '_id' (optional): the usage_id of this. Will generate one if not given one.
         """
+        # NOTE: this won't work if category is not in json_data (i.e., old modulestore)
         class_ = XModuleDescriptor.load_class(
-            json_data['location']['category'],
+            json_data['category'],
             default_class
         )
-        return class_.from_json(json_data, system)
+        return class_.from_json(json_data, system, parent_xblock)
 
     @classmethod
-    def from_json(cls, json_data, system):
+    def from_json(cls, json_data, system, parent_xblock=None):
         """
         Creates an instance of this descriptor from the supplied json_data.
         This may be overridden by subclasses
 
-        json_data: A json object with the keys 'definition' and 'metadata',
-            definition: A json object with the keys 'data' and 'children'
-                data: A json value
-                children: A list of edX Location urls
-            metadata: A json object with any keys
+        This method instantiates the correct subclass of XModuleDescriptor based
+        on the contents of json_data. It does not persist it and can create one which
+        has a temporary usage id.
 
-        This json_data is transformed to model_data using the following rules:
-            1) The model data contains all of the fields from metadata
-            2) The model data contains the 'children' array
-            3) If 'definition.data' is a json object, model data contains all of its fields
-               Otherwise, it contains the single field 'data'
-            4) Any value later in this list overrides a value earlier in this list
+        parent_usage_id is used to compute inherited metadata.
 
-        system: A DescriptorSystem for interacting with external resources
+        json_data:
+        - 'category': the xmodule category (required)
+        - 'metadata': a dict of locally set metadata (not inherited)
+        - 'children': a list of children's usage_ids w/in this course
+        - 'definition':
+        - '_id' (optional): the usage_id of this. Will generate one if not given one.
         """
-        model_data = {}
-
-        for key, value in json_data.get('metadata', {}).items():
-            model_data[cls._translate(key)] = value
-
-        model_data.update(json_data.get('metadata', {}))
-
-        definition = json_data.get('definition', {})
-        if 'children' in definition:
-            model_data['children'] = definition['children']
-
-        if 'data' in definition:
-            if isinstance(definition['data'], dict):
-                model_data.update(definition['data'])
-            else:
-                model_data['data'] = definition['data']
-
-        return cls(system=system, location=json_data['location'], model_data=model_data)
+        usage_id = json_data.get('_id', None)
+        if not '_inherited_metadata' in json_data and parent_xblock is not None:
+            json_data['_inherited_metadata'] = parent_xblock.xblock_kvs().get_inherited_metadata().copy()
+            json_metadata = json_data.get('metadata', {})
+            for field in inheritance.INHERITABLE_METADATA:
+                if field in json_metadata:
+                    json_data['_inherited_metadata'][field] = json_metadata[field]
+        new_block = system.xblock_from_json(cls, usage_id, json_data)
+        if parent_xblock is not None:
+            parent_xblock.children.append(new_block)
+        return new_block
 
     @classmethod
     def _translate(cls, key):
@@ -520,10 +571,10 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
     # ================================= XML PARSING ============================
     @staticmethod
     def load_from_xml(xml_data,
-                      system,
-                      org=None,
-                      course=None,
-                      default_class=None):
+            system,
+            org=None,
+            course=None,
+            default_class=None):
         """
         This method instantiates the correct subclass of XModuleDescriptor based
         on the contents of xml_data.
@@ -586,6 +637,12 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         """
         return [('{}', '{}')]
 
+    def xblock_kvs(self):
+        """
+        Use w/ caution. Really intended for use by the persistence layer.
+        """
+        return self._model_data._kvs
+
     # =============================== BUILTIN METHODS ==========================
     def __eq__(self, other):
         eq = (self.__class__ == other.__class__ and
@@ -642,13 +699,13 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
             # 1. A select editor for fields with a list of possible values (includes Booleans).
             # 2. Number editors for integers and floats.
             # 3. A generic string editor for anything else (editing JSON representation of the value).
-            type = "Generic"
+            editor_type = "Generic"
             values = [] if field.values is None else copy.deepcopy(field.values)
             if isinstance(values, tuple):
                 values = list(values)
             if isinstance(values, list):
                 if len(values) > 0:
-                    type = "Select"
+                    editor_type = "Select"
                 for index, choice in enumerate(values):
                     json_choice = copy.deepcopy(choice)
                     if isinstance(json_choice, dict) and 'value' in json_choice:
@@ -657,11 +714,11 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
                         json_choice = field.to_json(json_choice)
                     values[index] = json_choice
             elif isinstance(field, Integer):
-                type = "Integer"
+                editor_type = "Integer"
             elif isinstance(field, Float):
-                type = "Float"
+                editor_type = "Float"
             metadata_fields[field.name] = {'field_name': field.name,
-                                           'type': type,
+                                           'type': editor_type,
                                            'display_name': field.display_name,
                                            'value': field.to_json(value),
                                            'options': values,
@@ -857,7 +914,7 @@ class ModuleSystem(object):
 
 class DoNothingCache(object):
     """A duck-compatible object to use in ModuleSystem when there's no cache."""
-    def get(self, key):
+    def get(self, _key):
         return None
 
     def set(self, key, value, timeout=None):

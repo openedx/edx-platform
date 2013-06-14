@@ -172,7 +172,8 @@ class TestPeerGradingService(LoginEnrollmentTestCase):
             s3_interface=test_util_open_ended.S3_INTERFACE,
             open_ended_grading_interface=test_util_open_ended.OPEN_ENDED_GRADING_INTERFACE
         )
-        self.descriptor = peer_grading_module.PeerGradingDescriptor(self.system, location, model_data)
+        self.descriptor = peer_grading_module.PeerGradingDescriptor(
+            self.system, 'peergrading', location, None, model_data)
         model_data = {}
         self.peer_module = peer_grading_module.PeerGradingModule(self.system, location, self.descriptor, model_data)
         self.peer_module.peer_gs = self.mock_service
