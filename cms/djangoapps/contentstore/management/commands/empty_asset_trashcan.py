@@ -1,6 +1,3 @@
-###
-### Script for cloning a course
-###
 from django.core.management.base import BaseCommand, CommandError
 from xmodule.course_module import CourseDescriptor
 from xmodule.contentstore.utils import empty_asset_trashcan
