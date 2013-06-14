@@ -86,7 +86,6 @@ class VideoDescriptor(VideoFields,
                       MetadataOnlyEditingDescriptor,
                       RawDescriptor):
     module_class = VideoModule
-    stores_state = True
     template_dir_name = "video"
 
     @property

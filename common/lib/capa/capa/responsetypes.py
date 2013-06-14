@@ -1738,6 +1738,7 @@ class FormulaResponse(LoncapaResponse):
             student_variables = dict()
             # ranges give numerical ranges for testing
             for var in ranges:
+                # TODO: allow specified ranges (i.e. integers and complex numbers) for random variables
                 value = random.uniform(*ranges[var])
                 instructor_variables[str(var)] = value
                 student_variables[str(var)] = value
