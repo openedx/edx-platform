@@ -4,6 +4,7 @@ Instructor Dashboard API views
 Non-html views which the instructor dashboard requests.
 
 TODO add tracking
+TODO a lot of these GETs should be PUTs
 """
 
 import json
@@ -12,8 +13,10 @@ from django.views.decorators.cache import cache_control
 from django.http import HttpResponse
 
 from courseware.courses import get_course_with_access
+from django.contrib.auth.models import User, Group
 
 from instructor.enrollment import split_input_list, enroll_emails, unenroll_emails
+from instructor.access import allow_access, revoke_access
 import analytics.basic
 import analytics.distributions
 import analytics.csvs
@@ -36,6 +39,39 @@ def enroll_unenroll(request, course_id):
     response_payload = {
         'enrolled':   enrolled_result,
         'unenrolled': unenrolled_result,
+    }
+    response = HttpResponse(json.dumps(response_payload), content_type="application/json")
+    return response
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+def access_allow_revoke(request, course_id):
+    """
+    Modify staff/instructor access. (instructor available only)
+
+    Query parameters:
+    email is the target users email
+    level is one of ['instructor', 'staff']
+    mode is one of ['allow', 'revoke']
+    """
+    course = get_course_with_access(request.user, course_id, 'instructor', depth=None)
+
+    email = request.GET.get('email')
+    level = request.GET.get('level')
+    mode = request.GET.get('mode')
+
+    user = User.objects.get(email=email)
+
+    if mode == 'allow':
+        allow_access(course, user, level)
+    elif mode == 'revoke':
+        revoke_access(course, user, level)
+    else:
+        raise ValueError("unrecognized mode '{}'".format(mode))
+
+    response_payload = {
+        'done': 'yup',
     }
     response = HttpResponse(json.dumps(response_payload), content_type="application/json")
     return response
