@@ -29,7 +29,7 @@ from xmodule.modulestore.xml_exporter import export_to_xml
 from xmodule.modulestore.xml_importer import import_from_xml, perform_xlint
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.contentstore.content import StaticContent
-from xmodule.contentstore.utils import restore_asset_from_trashcan
+from xmodule.contentstore.utils import restore_asset_from_trashcan, empty_asset_trashcan
 
 from xmodule.capa_module import CapaDescriptor
 from xmodule.course_module import CourseDescriptor
@@ -489,6 +489,50 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             pass
         self.assertIsNotNone(content)
         self.assertIsNotNone(thumbnail)
+
+    def test_empty_trashcan(self):
+        '''
+        This test will exercise the empting of the asset trashcan
+        '''
+        content_store = contentstore()
+        trash_store = contentstore('trashcan')
+        module_store = modulestore('direct')
+
+        import_from_xml(module_store, 'common/test/data/', ['full'], static_content_store=content_store)
+
+        course_location = CourseDescriptor.id_to_location('edX/full/6.002_Spring_2012')
+
+        content = None
+        try:
+            location = StaticContent.get_location_from_path('/c4x/edX/full/asset/circuits_duality.gif')
+            content = content_store.find(location)
+        except NotFoundError:
+            pass
+
+        self.assertIsNotNone(content)
+
+        # go through the website to do the delete, since the soft-delete logic is in the view
+
+        url = reverse('remove_asset', kwargs={'org': 'edX', 'course': 'full', 'name': '6.002_Spring_2012'})
+        resp = self.client.post(url, {'location': '/c4x/edX/full/asset/circuits_duality.gif'})
+        self.assertEqual(resp.status_code, 200)
+
+        # make sure there's something in the trashcan
+        all_assets = trash_store.get_all_content_for_course(course_location)
+        self.assertGreater(len(all_assets), 0)
+
+        # make sure we have some thumbnails in our trashcan
+        all_thumbnails = trash_store.get_all_content_thumbnails_for_course(course_location)
+        self.assertGreater(len(all_thumbnails), 0)
+
+        # empty the trashcan
+        empty_asset_trashcan([course_location])
+
+        # make sure trashcan is empty
+        all_assets = trash_store.get_all_content_for_course(course_location)
+        all_thumbnails = trash_store.get_all_content_thumbnails_for_course(course_location)
+        self.assertEqual(len(all_assets), 0)
+        self.assertEqual(len(all_thumbnails), 0)
 
     def test_clone_course(self):
 
