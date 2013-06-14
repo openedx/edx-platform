@@ -1,4 +1,4 @@
-from nose.tools import assert_equals, assert_true, assert_false
+from nose.tools import assert_equals
 from lxml import etree
 from xmodule.stringify import stringify_children
 

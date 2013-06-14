@@ -7,7 +7,6 @@ from django.template.loaders.filesystem import Loader as FilesystemLoader
 from django.template.loaders.app_directories import Loader as AppDirectoriesLoader
 
 from mitxmako.template import Template
-import mitxmako.middleware
 
 import tempdir
 

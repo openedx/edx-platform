@@ -11,7 +11,6 @@ Used by capa_problem.py
 # standard library imports
 import abc
 import cgi
-import hashlib
 import inspect
 import json
 import logging

@@ -10,8 +10,6 @@ from .registry import TagRegistry
 
 import logging
 import re
-import shlex  # for splitting quoted strings
-import json
 
 from lxml import etree
 import xml.sax.saxutils as saxutils

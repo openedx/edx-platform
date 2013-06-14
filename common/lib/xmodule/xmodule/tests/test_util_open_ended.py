@@ -1,6 +1,6 @@
 from .import get_test_system
 from xmodule.modulestore import Location
-from xmodule.modulestore.xml import ImportSystem, XMLModuleStore
+from xmodule.modulestore.xml import XMLModuleStore
 from xmodule.tests.test_export import DATA_DIR
 
 OPEN_ENDED_GRADING_INTERFACE = {

@@ -2,9 +2,7 @@
 ## A script to create some dummy users
 
 from django.core.management.base import BaseCommand
-from django.conf import settings
-from django.contrib.auth.models import User
-from student.models import UserProfile, CourseEnrollment
+from student.models import CourseEnrollment
 
 from student.views import _do_create_account, get_random_post_override
 

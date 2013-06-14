@@ -10,7 +10,6 @@
 # Provides sympy representation.
 
 import os
-import sys
 import string
 import re
 import logging
@@ -25,8 +24,7 @@ from sympy.physics.quantum.state import *
 # from sympy.core.operations import LatticeOp
 # import sympy.physics.quantum.qubit
 
-import urllib
-from xml.sax.saxutils import escape, unescape
+from xml.sax.saxutils import unescape
 import sympy
 import unicodedata
 from lxml import etree

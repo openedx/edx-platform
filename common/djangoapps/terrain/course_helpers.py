@@ -1,7 +1,7 @@
 # pylint: disable=C0111
 # pylint: disable=W0621
 
-from lettuce import world, step
+from lettuce import world
 from .factories import *
 from django.conf import settings
 from django.http import HttpRequest
@@ -15,7 +15,6 @@ from xmodule.templates import update_templates
 from bs4 import BeautifulSoup
 import os.path
 from urllib import quote_plus
-from lettuce.django import django_url
 
 
 @world.absorb
