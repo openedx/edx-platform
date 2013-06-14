@@ -5,7 +5,6 @@ log = -> console.log.apply console, arguments
 CSS_INSTRUCTOR_CONTENT = 'instructor-dashboard-content-2'
 CSS_ACTIVE_SECTION = 'active-section'
 CSS_IDASH_SECTION = 'idash-section'
-CSS_IDASH_DEFAULT_SECTION = 'idash-default-section'
 CSS_INSTRUCTOR_NAV = 'instructor-nav'
 
 HASH_LINK_PREFIX = '#view-'
@@ -52,14 +51,14 @@ setup_instructor_dashboard = (idash_content) =>
     link = links.filter "[data-section='#{section_name}']"
     link.click()
   else
-    links.filter(".#{CSS_IDASH_DEFAULT_SECTION}").click()
+    links.eq(0).click()
 
 
 # call setup handlers for each section
 setup_instructor_dashboard_sections = (idash_content) ->
   log "setting up instructor dashboard sections"
   setup_section_enrollment    idash_content.find(".#{CSS_IDASH_SECTION}#enrollment")
-  setup_section_data_download idash_content.find(".#{CSS_IDASH_SECTION}#data-download")
+  setup_section_data_download idash_content.find(".#{CSS_IDASH_SECTION}#data_download")
   setup_section_analytics     idash_content.find(".#{CSS_IDASH_SECTION}#analytics")
 
 

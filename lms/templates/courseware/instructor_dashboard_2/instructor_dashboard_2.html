@@ -38,81 +38,19 @@
   ## the links are acativated and handled in instructor_dashboard.coffee
   ## when the javascript loads, it clicks on idash-default-section
   <h2 class="instructor-nav">
-    <a href="" data-section="course-info" class="idash-default-section"> Course Info   </a>
-    <a href="" data-section="enrollment"> Enrollment </a>
-    <a href="" data-section="student-admin"> Student Admin  </a>
-    <a href="" data-section="data-download"> Data Download </a>
-    <a href="" data-section="analytics"> Analytics </a>
+    % for section_data in sections:
+      <a href="" data-section="${ section_data['section_key'] }">${ section_data['section_display_name'] }</a>
+    % endfor
   </h2>
 
   ## each section corresponds to a section_data sub-dictionary provided by the view
   ## to keep this short, sections can be pulled out into their own files
 
-  <section id="course-info" class="idash-section">
-    <%include file="course_info.html"/>
-  </section>
-
-
-  <section id="enrollment" class="idash-section">
-    <div>
-      <h2>Batch Enrollment</h2>
-      <p>Enter student emails separated by new lines or commas.</p>
-      <textarea rows="6" cols="70" name="student-emails">Student Emails</textarea>
-      <input type="button" name="enroll" value="Enroll" data-endpoint="${ section_data['enrollment']['enroll_button_url'] }" >
-      <input type="button" name="unenroll" value="Unenroll" data-endpoint="${ section_data['enrollment']['unenroll_button_url'] }" >
-      <div class="task-response"></div>
-    </div>
-  </section>
-
-
-  <section id="student-admin" class="idash-section">
-    <div class="h-row">
-      <p> Select student </p>
-      <input type="text" name="student-select" value="Jerry Smort">
-    </div>
-
-    <div class="h-row">
-      <p>grade</p>
-      <p>85 (B)</p>
-    </div>
-
-    <div class="h-row">
-      <a href="" class="progress-link">progress link</a>
-      <input type="button" name="unenroll" value="Unenroll">
-    </div>
-
-    <div class="h-row">
-      <select class="problems">
-        <option>Getting problems...</option>
-      </select>
-      <input type="button" name="reset-attempts" value="Reset Student Attempts">
-    </div>
-  </section>
-
-
-  <section id="data-download" class="idash-section">
-    <input type="button" name="list-profiles" value="List enrolled students with profile information" data-endpoint="${ section_data['data_download']['enrolled_students_profiles_url'] }" >
-    <input type="button" name="list-profiles" value="[CSV]" data-csv="true" data-endpoint="${ section_data['data_download']['enrolled_students_profiles_url'] }" >
-    <input type="button" name="list-grades" value="Student grades">
-    <input type="button" name="list-answer-distributions" value="Answer distributions (x students got y points)">
-    <input type="button" name="dump-gradeconf" value="Grading Configuration" data-endpoint="${ section_data['data_download']['grading_config_url'] }">
-    <div class="data-display">
-      <div class="data-display-text"></div>
-      <div class="data-display-table"></div>
-    </div>
-  </section>
-
-  <section id="analytics" class="idash-section">
-    <h2>Distributions</h2>
-    <select id="distributions" data-endpoint="${ section_data['analytics']['profile_distributions_url'] }">
-      <option> Getting available distributions... </option>
-    </select>
-    <div class="distribution-display">
-      <div class="distribution-display-text"></div>
-      <div class="distribution-display-graph"></div>
-      <div class="distribution-display-table"></div>
-    </div>
-  </section>
+  % for section_data in sections:
+    <section id="${ section_data['section_key'] }" class="idash-section">
+      <%include file="${ section_data['section_key'] }.html" args="section_data=section_data" />
+    </section>
+  % endfor
 
 </section>
 </div>
