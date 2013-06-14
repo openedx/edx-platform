@@ -434,11 +434,11 @@ ul {
 .message-form input {
 	border: 0 none;
 	font-size: 14px;
-	width: 100%;
+	width: 338px;
 	height: 100%;
 	display: block;
 	outline-width: 0;
-	padding: 0 50px 0 5px;
+	padding: 2px 5px;
 	background-color: transparent;
 }
 .message-form input:focus {

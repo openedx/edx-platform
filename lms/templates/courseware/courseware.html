@@ -138,6 +138,7 @@
       });
       $('#chat-tabs').before('<div class="scroll-arrow left-arrow">&lsaquo;</div>').after('<div class="scroll-arrow right-arrow">&rsaquo;</div>');
       $('#chat-toolbar').remove();
+      $('#chat-modal-overlay').append('<h2 style="text-align: center; margin-top: 175px;">Connecting...</h2>');
       
       // show/hide the chat widget
       $('#chat-toggle').click(function() {
@@ -147,16 +148,14 @@
 	    Candy.Core.connect("${chat['username']}", "${chat['password']}");
 	    toggle.addClass('connected');
 	  } 
-          $('#chat-block').show().animate({height: '400px'}, 'slow', function() {
-            $('#chat-open').hide();
-            $('#chat-close').show();
-          });
+          $('#chat-block').show().css({height: '400px'});
+          $('#chat-open').hide();
+          $('#chat-close').show();
         } else {
-          $('#chat-block').animate({height: '0px'}, 'slow', function() {
-            $('#chat-open').show();
-            $('#chat-close').hide();
-            $(this).hide(); // do this at the very end
-          });
+          $('#chat-block').css({height: '0px'})
+          $('#chat-open').show();
+          $('#chat-close').hide();
+          $('#chat-block').hide(); // do this at the very end
         }
         toggle.toggleClass('closed');
       });
