@@ -350,9 +350,7 @@ class MongoModuleStore(ModuleStoreBase):
             if self.metadata_inheritance_cache_subsystem is not None:
                 tree = self.metadata_inheritance_cache_subsystem.get(key, {})
             else:
-                # DON'T CHECK IN
-                pass
-#                 logging.warning('Running MongoModuleStore without a metadata_inheritance_cache_subsystem. This is OK in localdev and testing environment. Not OK in production.')
+                logging.warning('Running MongoModuleStore without a metadata_inheritance_cache_subsystem. This is OK in localdev and testing environment. Not OK in production.')
 
         if not tree:
             # if not in subsystem, or we are on force refresh, then we have to compute

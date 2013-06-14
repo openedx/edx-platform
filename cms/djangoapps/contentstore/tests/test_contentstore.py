@@ -220,7 +220,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         draft_store.convert_to_draft(html_module.location)
         html_module = draft_store.get_item(['i4x', 'edX', 'simple', 'html', 'test_html', None])
 
-        new_graceperiod = timedelta(**{'hours': 1})
+        new_graceperiod = timedelta(hours=1)
 
         self.assertNotIn('graceperiod', own_metadata(html_module))
         html_module.lms.graceperiod = new_graceperiod
@@ -457,15 +457,15 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.assertEqual(len(items), 0)
 
     def verify_content_existence(self, store, root_dir, location, dirname, category_name, filename_suffix=''):
-        fs = OSFS(root_dir / 'test_export')
-        self.assertTrue(fs.exists(dirname))
+        filesystem = OSFS(root_dir / 'test_export')
+        self.assertTrue(filesystem.exists(dirname))
 
         query_loc = Location('i4x', location.org, location.course, category_name, None)
         items = store.get_items(query_loc)
 
         for item in items:
-            fs = OSFS(root_dir / ('test_export/' + dirname))
-            self.assertTrue(fs.exists(item.location.name + filename_suffix))
+            filesystem = OSFS(root_dir / ('test_export/' + dirname))
+            self.assertTrue(filesystem.exists(item.location.name + filename_suffix))
 
     def test_export_course(self):
         module_store = modulestore('direct')
@@ -479,7 +479,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         vertical = module_store.get_item(Location(['i4x', 'edX', 'full',
                                          'vertical', 'vertical_66', None]), depth=1)
         # We had a bug where orphaned draft nodes caused export to fail. This is here to cover that case.
-        vertical.location = draft.as_draft(vertical.location._replace(name='no_references'))
+        vertical.location = draft.as_draft(vertical.location.replace(name='no_references'))
         draft_store.save_xmodule(vertical)
         orphan_vertical = draft_store.get_item(vertical.location)
         self.assertEqual(orphan_vertical.location.name, 'no_references')
@@ -532,20 +532,20 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.verify_content_existence(module_store, root_dir, location, 'about', 'about', '.html')
 
         # check for graiding_policy.json
-        fs = OSFS(root_dir / 'test_export/policies/6.002_Spring_2012')
-        self.assertTrue(fs.exists('grading_policy.json'))
+        filesystem = OSFS(root_dir / 'test_export/policies/6.002_Spring_2012')
+        self.assertTrue(filesystem.exists('grading_policy.json'))
 
         course = module_store.get_item(location)
         # compare what's on disk compared to what we have in our course
-        with fs.open('grading_policy.json', 'r') as grading_policy:
+        with filesystem.open('grading_policy.json', 'r') as grading_policy:
             on_disk = loads(grading_policy.read())
             self.assertEqual(on_disk, course.grading_policy)
 
         # check for policy.json
-        self.assertTrue(fs.exists('policy.json'))
+        self.assertTrue(filesystem.exists('policy.json'))
 
         # compare what's on disk to what we have in the course module
-        with fs.open('policy.json', 'r') as course_policy:
+        with filesystem.open('policy.json', 'r') as course_policy:
             on_disk = loads(course_policy.read())
             self.assertIn('course/6.002_Spring_2012', on_disk)
             ownmeta = own_metadata(course)

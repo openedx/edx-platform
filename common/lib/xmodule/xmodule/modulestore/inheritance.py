@@ -23,7 +23,9 @@ def compute_inherited_metadata(descriptor):
     NOTE: This means that there is no such thing as lazy loading at the
     moment--this accesses all the children."""
     for child in descriptor.get_children():
-        # force inherited fields w/ defaults to take the defaults so the children can inherit
+        # force set inherited fields w/ defaults to the defaults so the children can inherit
+        # that is, xblock defaults are fetched lazily but inheritance won't provoke the lazy fetching
+        # on children which don't explicitly define/inherit the xblock fields via xblocks.
         for attr in INHERITABLE_METADATA:
             if hasattr(descriptor, attr):
                 descriptor._model_data[attr] = getattr(descriptor, attr)

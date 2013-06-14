@@ -5,7 +5,7 @@ from pkg_resources import resource_string
 
 from xmodule.raw_module import RawDescriptor
 from .x_module import XModule
-from xblock.core import Integer, Scope, String, Boolean, List
+from xblock.core import Integer, Scope, String, List
 from xmodule.open_ended_grading_classes.combined_open_ended_modulev1 import CombinedOpenEndedV1Module, CombinedOpenEndedV1Descriptor
 from collections import namedtuple
 from .fields import Date, StringyFloat, StringyInteger, StringyBoolean
@@ -98,7 +98,7 @@ class CombinedOpenEndedFields(object):
     attempts = StringyInteger(
         display_name="Maximum Attempts",
         help="The number of times the student can try to answer this problem.", default=1,
-        scope=Scope.settings, values = {"min" : 1 }
+        scope=Scope.settings, values={"min" : 1 }
     )
     is_graded = StringyBoolean(display_name="Graded", help="Whether or not the problem is graded.", default=False, scope=Scope.settings)
     accept_file_upload = StringyBoolean(
@@ -122,7 +122,7 @@ class CombinedOpenEndedFields(object):
     weight = StringyFloat(
         display_name="Problem Weight",
         help="Defines the number of points each problem is worth. If the value is not set, each problem is worth one point.",
-        scope=Scope.settings, values = {"min" : 0 , "step": ".1"}
+        scope=Scope.settings, values={"min" : 0 , "step": ".1"}
     )
     markdown = String(help="Markdown source of this module", scope=Scope.settings)
 

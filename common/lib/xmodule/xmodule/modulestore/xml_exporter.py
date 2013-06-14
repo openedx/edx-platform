@@ -4,7 +4,6 @@ from xmodule.modulestore.inheritance import own_metadata
 from fs.osfs import OSFS
 from json import dumps
 import json
-import time
 from json.encoder import JSONEncoder
 import datetime
 
@@ -12,8 +11,6 @@ class EdxJSONEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, Location):
             return obj.url()
-        elif isinstance(obj, time.struct_time):
-            return time.strftime('%Y-%m-%dT%H:%M:%SZ', obj)
         elif isinstance(obj, datetime.datetime):
             if obj.tzinfo is not None:
                 if obj.utcoffset() is None:

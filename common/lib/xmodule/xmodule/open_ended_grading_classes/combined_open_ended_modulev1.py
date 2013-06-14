@@ -511,7 +511,6 @@ class CombinedOpenEndedV1Module():
         """
         changed = self.update_task_states()
         if changed:
-            # return_html=self.get_html()
             pass
         return return_html
 
