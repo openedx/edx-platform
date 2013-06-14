@@ -1,9 +1,5 @@
-###
-### Script for cloning a course
-###
 from django.core.management.base import BaseCommand, CommandError
 from xmodule.contentstore.utils import restore_asset_from_trashcan
-from xmodule.modulestore import Location
 
 
 class Command(BaseCommand):
