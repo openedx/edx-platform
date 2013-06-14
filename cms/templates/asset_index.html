@@ -8,6 +8,11 @@
 
 <%block name="jsextra">
 <script src="${static.url('js/vendor/mustache.js')}"></script>
+
+<script type='text/javascript'>
+  // we just want a singleton
+  confirm_delete_prompt = null;
+</script>
 </%block>
 
 <%block name="content">
