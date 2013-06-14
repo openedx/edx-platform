@@ -159,7 +159,13 @@
   });
 
   function save_hls(el) {
-      el.find('.hls-data').val(el.data('editor').getValue());
+      ## copy textarea contents to metadata editor input element
+      var melin = el.closest('.component').find('.metadata_edit').find('.wrapper-comp-setting').find('label:contains("source_code")').parent().find('input');
+      var datval = el.data('editor').getValue();
+      melin.after('<textarea class="input setting-input" id="'+melin[0].id+'">' + datval + '</textarea>')
+      melin[0].id = "old";
+      melin.trigger('change');
+
       el.closest('.component').find('.save-button').click();
   }
 
