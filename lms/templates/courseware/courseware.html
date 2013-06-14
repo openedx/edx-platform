@@ -136,6 +136,7 @@
         core: { debug: true, autojoin: ["${chat['course_room']}"] },
         view: { resources: "${static.url('candy_res/')}"}
       });
+      $('#chat-tabs').before('<a href="#" class="scroll-arrow left-arrow">&lsaquo;</a>').after('<a href="#" class="scroll-arrow right-arrow">&rsaquo;</a>');
       $('#chat-toolbar').remove();
       
       // show/hide the chat widget
@@ -158,6 +159,14 @@
           });
         }
         toggle.toggleClass('closed');
+      });
+      
+      $('#chat-pane .scroll-arrow.right-arrow').click(function() {
+	$('#chat-tabs').animate({scrollLeft: '+=250'}, 250);
+      });
+      
+      $('#chat-pane .scroll-arrow.left-arrow').click(function() {
+	$('#chat-tabs').animate({scrollLeft: '-=250'}, 250);
       });
     });
   </script>

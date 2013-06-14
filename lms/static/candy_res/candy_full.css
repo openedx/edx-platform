@@ -54,12 +54,33 @@ ul {
 	margin: 0;
 }
 
-#chat-pane {
-	overflow-x: scroll;
+#chat-pane .scroll-arrow {
+	position: absolute;
+	width: 25px;
+	height: 30px;
+	z-index: 10;
+	margin: 0;
+	padding: 0;
+	background-color: #d5d0c0;
+	font-size: 26px;
+	text-align: center;
+	font-weight: bold;
+	color: #666;
+}
+#chat-pane .scroll-arrow.left-arrow {
+	border-right: 1px solid #bdb7a1;
+	top: 0;
+	left: 0;
+}
+#chat-pane .scroll-arrow.right-arrow {
+	border-top-right-radius: 10px;
+	top: 0;
+	right: 0;
 }
 
 #chat-tabs {
-	margin: 0;
+	overflow-x: scroll;
+	margin: 0 25px;
 	padding: 0;
 }
 
@@ -103,10 +124,12 @@ ul {
 
 #chat-tabs li a.label {
 	border-right: 1px solid #bdb7a1;
+	border-left: 1px solid #bdb7a1;
 	border-bottom: 1px solid #bdb7a1;
 	font-size: 1em;
 	padding-right: 30px;
 	padding-left: 10px;
+	margin-right: -1px;
 }
 
 #chat-pane.collapsed-message-pane #chat-tabs li a.label {
@@ -122,6 +145,7 @@ ul {
 #chat-tabs li.active a.label {
 	border-bottom: 1px solid white;
 	background-color: white;
+	margin-left: -1px;
 }
 
 #chat-tabs li a.transition {
@@ -151,8 +175,8 @@ ul {
 	font-weight: normal;
 	font-size: 10px;
 	position: absolute;
-	top: 6px;
-	right: 10px;
+	top: 0;
+	right: 7px;
 	border-radius: 6px;
 }
 
