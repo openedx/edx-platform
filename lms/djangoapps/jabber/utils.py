@@ -11,11 +11,6 @@ from django.core.exceptions import ImproperlyConfigured
 
 from .models import JabberUser
 
-# The default length of the Jabber passwords we create. We set a
-# really long default since we're storing these passwords in
-# plaintext (ejabberd implementation detail).
-DEFAULT_PASSWORD_LENGTH = 256
-
 def get_bosh_url():
     """
     Build a "Bidirectional-streams Over Synchronous HTTP" (BOSH) URL
@@ -62,7 +57,7 @@ def get_or_create_password_for_user(username):
     try:
         jabber_user = JabberUser.objects.get(username=username)
     except JabberUser.DoesNotExist:
-        password = __generate_random_string(DEFAULT_PASSWORD_LENGTH)
+        password = __generate_random_string(JabberUser.DEFAULT_PASSWORD_LENGTH)
         jabber_user = JabberUser(username=username,
                                  password=password)
         jabber_user.save()

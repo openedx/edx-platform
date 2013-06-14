@@ -1,6 +1,11 @@
 from django.db import models
 
 class JabberUser(models.Model):
+    # The default length of the Jabber passwords we create. We set a
+    # really long default since we're storing these passwords in
+    # plaintext (ejabberd implementation detail).
+    DEFAULT_PASSWORD_LENGTH = 256
+
     class Meta:
         app_label = 'jabber'
         db_table = 'users'
