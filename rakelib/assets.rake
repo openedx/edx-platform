@@ -30,7 +30,7 @@ def coffee_cmd(watch=false, debug=false)
         #
         # So, instead, we use watchmedo, which works around the problem
         "watchmedo shell-command " +
-                  "--command 'node_modules/.bin/coffee -c ${watch_src_path}' " +
+                  "--command 'echo \">>> Change detected to ${watch_src_path}\" && node_modules/.bin/coffee -c ${watch_src_path}' " +
                   "--recursive " +
                   "--patterns '*.coffee' " +
                   "--ignore-directories " +
