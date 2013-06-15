@@ -239,7 +239,12 @@ def signup(request, eamap=None):
                'extauth_email': eamap.external_email,
                'extauth_username': username,
                'extauth_name': eamap.external_name,
+               'ask_for_tos': True,
                }
+
+    # Can't have terms of service for Stanford users, according to Stanford's Office of General Counsel
+    if settings.MITX_FEATURES['AUTH_USE_SHIB'] and ('stanford' in eamap.external_domain):
+        context['ask_for_tos'] = False
 
     # detect if full name is blank and ask for it from user
     context['ask_for_fullname'] = eamap.external_name.strip() == ''
