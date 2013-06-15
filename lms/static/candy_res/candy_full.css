@@ -19,10 +19,10 @@ html, body {
 	bottom: 0;
 	right: 0;
 	width: 100%;
-	background-color: #bdb7a1;
+	background-color: #d5d0c0;
 	color: #333;
 	overflow: hidden;
-	border: 1px solid #bdb7a1;
+	border: 1px solid #333;
 	border-top-right-radius: 10px;
 	box-sizing: border-box;
 }
@@ -54,11 +54,36 @@ ul {
 	margin: 0;
 }
 
-#chat-tabs {
-	margin: 0 0 0 28px;
+#chat-pane .scroll-arrow {
+	position: absolute;
+	width: 25px;
+	height: 30px;
+	z-index: 10;
+	margin: 0;
 	padding: 0;
-	overflow: auto;
-	border-left: 1px solid #bdb7a1;
+	background-color: #d5d0c0;
+	font-size: 26px;
+	text-align: center;
+	font-weight: bold;
+	color: #666;
+	cursor: pointer;
+	line-height: 1em;
+}
+#chat-pane .scroll-arrow.left-arrow {
+	border-right: 1px solid #bdb7a1;
+	top: 0;
+	left: 0;
+}
+#chat-pane .scroll-arrow.right-arrow {
+	border-top-right-radius: 10px;
+	top: 0;
+	right: 0;
+}
+
+#chat-tabs {
+	overflow-x: scroll;
+	margin: 0 25px;
+	padding: 0;
 }
 
 #chat-pane.collapsed-message-pane #chat-tabs {
@@ -84,9 +109,9 @@ ul {
 
 #chat-tabs li {
 	margin: 0;
-	float: left;
 	position: relative;
 	white-space: nowrap;
+	display: inline;
 }
 
 #chat-tabs li a {
@@ -101,7 +126,12 @@ ul {
 
 #chat-tabs li a.label {
 	border-right: 1px solid #bdb7a1;
+	border-left: 1px solid #bdb7a1;
 	border-bottom: 1px solid #bdb7a1;
+	font-size: 1em;
+	padding-right: 30px;
+	padding-left: 10px;
+	margin-right: -1px;
 }
 
 #chat-pane.collapsed-message-pane #chat-tabs li a.label {
@@ -117,6 +147,7 @@ ul {
 #chat-tabs li.active a.label {
 	border-bottom: 1px solid white;
 	background-color: white;
+	margin-left: -1px;
 }
 
 #chat-tabs li a.transition {
@@ -126,12 +157,14 @@ ul {
 #chat-tabs li a.close {
 	background-color: transparent;
 	position: absolute;
-	top: 2px;
 	right: 7px;
 	height: auto;
-	padding: 0;
+	padding: 2px 0 0 0;
 	margin: 0;
 	color: #999;
+}
+#chat-tabs li.roomtype-groupchat a.close {
+	display: none !important;
 }
 #chat-tabs li a.close:hover, #chat-tabs li.active a.close:hover {
 	color: #333;
@@ -140,13 +173,13 @@ ul {
 #chat-tabs li .unread {
 	color: white;
 	background-color: #8C1515;
-	padding: 1px 2px;
+	padding: 1px 5px;
 	font-weight: normal;
 	font-size: 10px;
 	position: absolute;
-	top: 12px;
-	right: 30px;
-	border-radius: 5px;
+	top: 0;
+	right: 7px;
+	border-radius: 6px;
 }
 
 #chat-tabs li.offline a.label {
@@ -228,15 +261,16 @@ ul {
 .roster-pane {
 	position: absolute;
 	overflow: auto;
+	overflow-x: hidden;
 	top: 30px;
 	right: 0;
 	bottom: 30px;
-	width: 198px;
+	width: 199px;
 	margin: 0;
 }
 .roster-pane .user {
 	cursor: pointer;
-	width: 90%;
+	width: 91%;
 	padding: 6px 5%;
 	font-size: 14px;
 	margin: 0;
@@ -248,13 +282,15 @@ ul {
 	background-color: #d3cec0;
 	border-bottom: 1px solid #bdb7a1;
 }
-.roster-pane .user.me {
-	font-weight: bold;
-	cursor: default;
-}
-.roster-pane .user:hover,
-.roster-pane .user.me:hover {
+.roster-pane .user:hover {
 	background-color: #e9e6df;
+}
+.roster-pane .user.me,
+.roster-pane .user.me:hover {
+	font-weight: bold;
+	background-color: #666;
+	color: #e9e6df;
+	cursor: default;
 }
 .roster-pane .user.status-ignored {
 	cursor: default;
@@ -398,11 +434,11 @@ ul {
 .message-form input {
 	border: 0 none;
 	font-size: 14px;
-	width: 100%;
+	width: 338px;
 	height: 100%;
 	display: block;
 	outline-width: 0;
-	padding: 0 50px 0 5px;
+	padding: 2px 5px;
 	background-color: transparent;
 }
 .message-form input:focus {
@@ -411,18 +447,22 @@ ul {
 
 .message-form input.submit {
 	cursor: pointer;
-	background-color: #333;
+	background-color: #333 !important;
+	background-image: none !important;
+	border: none !important;
 	color: #e9e6df;
 	position: absolute;
 	bottom: 0;
 	right: 0;
 	margin: 3px;
-	padding: 5px;
-	width: 40px;
+	padding: 5px 10px;
+	width: 55px;
 	font-size: 12px;
 	line-height: 12px;
 	height: 24px;
 	font-weight: bold;
+	box-shadow: none !important;
+	text-shadow: none !important;
 }
 
 #tooltip {
@@ -443,7 +483,7 @@ ul {
 }
 
 #context-menu {
-	position: absolute;
+	position: fixed;
 	z-index: 10;
 	display: none;
 	padding: 15px 10px;
@@ -529,7 +569,7 @@ ul {
 	margin-left: -155px;
 	margin-top: -45px;
 	text-align: center;
-	display: none;
+	display: none !important;
 	z-index: 100;
 	border-radius: 5px;
 }
@@ -541,8 +581,8 @@ ul {
 	right: 0;
 	bottom: 0;
 	z-index: 90;
-	background-image: url(img/overlay.png);
-	border-top-left-radius: 8px;
+	background-color: #333;
+	border-top-right-radius: 8px;
 }
 
 #chat-modal.modal-login {

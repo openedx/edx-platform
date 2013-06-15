@@ -119,32 +119,53 @@
 % if show_chat:
   <script type="text/javascript" src="${static.url('js/vendor/candy_libs/libs.min.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/candy.min.js')}"></script>
+  
+  <script type="text/template">
+    <div class="client-load-fail" style="margin: 25px; ">
+      <h3 style="margin-top: 25px; font-weight: bold;">Oops! The chat client failed to load!</h3>
+      <p style="margin: 25px 0;">Please email us at <a href="mailto:${settings.BUGS_EMAIL}">${settings.BUGS_EMAIL}</a>, including the following:</p>
+      <p class="userAgent" style="padding: 10px; border: 1px solid #666;"></p>
+    </div>
+  </script>
 
   <script type="text/javascript">
-    // initialize the Candy.js plugin
     $(document).ready(function() {
+      $("#candyUserAgent").text(navigator.userAgent);
+      // initialize the Candy.js plugin
       Candy.init("${chat['bosh_url']}", {
         core: { debug: true, autojoin: ["${chat['course_room']}"] },
         view: { resources: "${static.url('candy_res/')}"}
       });
-      Candy.Core.connect("${chat['username']}", "${chat['password']}");
-
+      $('#chat-tabs').before('<div class="scroll-arrow left-arrow">&lsaquo;</div>').after('<div class="scroll-arrow right-arrow">&rsaquo;</div>');
+      $('#chat-toolbar').remove();
+      $('#chat-modal-overlay').append('<h2 style="text-align: center; margin-top: 175px;">Connecting...</h2>');
+      
       // show/hide the chat widget
       $('#chat-toggle').click(function() {
         var toggle = $(this);
         if (toggle.hasClass('closed')) {
-          $('#chat-block').show().animate({height: '400px'}, 'slow', function() {
-            $('#chat-open').hide();
-            $('#chat-close').show();
-          });
+	  if (!toggle.hasClass('connected')) {
+	    Candy.Core.connect("${chat['username']}", "${chat['password']}");
+	    toggle.addClass('connected');
+	  } 
+          $('#chat-block').show().css({height: '400px'});
+          $('#chat-open').hide();
+          $('#chat-close').show();
         } else {
-          $('#chat-block').animate({height: '0px'}, 'slow', function() {
-            $('#chat-open').show();
-            $('#chat-close').hide();
-            $(this).hide(); // do this at the very end
-          });
+          $('#chat-block').css({height: '0px'})
+          $('#chat-open').show();
+          $('#chat-close').hide();
+          $('#chat-block').hide(); // do this at the very end
         }
         toggle.toggleClass('closed');
+      });
+      
+      $('#chat-pane .scroll-arrow.right-arrow').click(function() {
+	$('#chat-tabs').animate({scrollLeft: '+=250'}, 250);
+      });
+      
+      $('#chat-pane .scroll-arrow.left-arrow').click(function() {
+	$('#chat-tabs').animate({scrollLeft: '-=250'}, 250);
       });
     });
   </script>
@@ -193,12 +214,18 @@
 % if show_chat:
   <div id="chat-wrapper">
     <div id="chat-toggle" class="closed">
-      <span id="chat-open">${_("Open Chat")} <em class="icon-chevron-up"></em></span>
-      <span id="chat-close">${_("Close Chat")} <em class="icon-chevron-down"></em></span>
+      <span id="chat-open">${_("Open Chat")}</span>
+      <span id="chat-close">${_("Close Chat")}</span>
     </div>
     <div id="chat-block">
       ## The Candy.js plugin wants to render in an element with #candy
-      <div id="candy"></div>
+      <div id="candy">
+	<div class="client-load-fail" style="margin: 25px; ">
+	  <h3 style="margin-top: 25px; font-weight: bold;">Oops! The chat client failed to load!</h3>
+	  <p style="margin: 25px 0;">Please email us at <a href="mailto:${settings.BUGS_EMAIL}">${settings.BUGS_EMAIL}</a>, including the following:</p>
+	  <p id="candyUserAgent" style="padding: 10px; border: 1px solid #666;"></p>
+	</div>
+      </div>
     </div>
   </div>
 % endif
