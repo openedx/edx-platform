@@ -231,10 +231,15 @@
 
         <ol class="list-input">
           <li class="field-group">
+
+            % if has_extauth_info is UNDEFINED or ask_for_tos :
+
             <div class="field required checkbox" id="field-tos">
               <input id="tos-yes" type="checkbox" name="terms_of_service" value="true" required aria-required="true" />
               <label for="tos-yes">I agree to the <a href="${marketing_link('TOS')}" class="new-vp">Terms of Service</a></label>
             </div>
+
+            % endif
 
             <div class="field required checkbox" id="field-honorcode">
               <input id="honorcode-yes" type="checkbox" name="honor_code" value="true" />

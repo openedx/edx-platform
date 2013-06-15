@@ -613,17 +613,27 @@ def create_account(request, post_override=None):
         js['field'] = 'honor_code'
         return HttpResponse(json.dumps(js))
 
-    if post_vars.get('terms_of_service', 'false') != u'true':
-        js['value'] = "You must accept the terms of service.".format(field=a)
-        js['field'] = 'terms_of_service'
-        return HttpResponse(json.dumps(js))
+    # Can't have terms of service for Stanford users, according to Stanford's Office of General Counsel
+    if settings.MITX_FEATURES.get("AUTH_USE_SHIB") and DoExternalAuth and ("stanford" in eamap.external_domain):
+        pass
+    else:
+        if post_vars.get('terms_of_service', 'false') != u'true':
+            js['value'] = "You must accept the terms of service.".format(field=a)
+            js['field'] = 'terms_of_service'
+            return HttpResponse(json.dumps(js))
 
     # Confirm appropriate fields are there.
     # TODO: Check e-mail format is correct.
     # TODO: Confirm e-mail is not from a generic domain (mailinator, etc.)? Not sure if
     # this is a good idea
     # TODO: Check password is sane
-    for a in ['username', 'email', 'name', 'password', 'terms_of_service', 'honor_code']:
+
+    required_post_vars = ['username', 'email', 'name', 'password', 'terms_of_service', 'honor_code']
+    if settings.MITX_FEATURES.get("AUTH_USE_SHIB") and DoExternalAuth and ("stanford" in eamap.external_domain):
+        # Can't have terms of service for Stanford users, according to Stanford's Office of General Counsel
+        required_post_vars =  ['username', 'email', 'name', 'password', 'honor_code']
+
+    for a in required_post_vars:
         if len(post_vars[a]) < 2:
             error_str = {'username': 'Username must be minimum of two characters long.',
                          'email': 'A properly formatted e-mail is required.',
