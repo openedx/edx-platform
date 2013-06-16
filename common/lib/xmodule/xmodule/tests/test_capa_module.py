@@ -657,18 +657,18 @@ class CapaModuleTest(unittest.TestCase):
 
     def test_check_button_name(self):
 
-        # If last attempt, button name changes to "Final Check"
+        # If last attempt, button name changes to "Submit"
         # Just in case, we also check what happens if we have
         # more attempts than allowed.
         attempts = random.randint(1, 10)
         module = CapaFactory.create(attempts=attempts - 1, max_attempts=attempts)
-        self.assertEqual(module.check_button_name(), "Final Check")
+        self.assertEqual(module.check_button_name(), "Submit")
 
         module = CapaFactory.create(attempts=attempts, max_attempts=attempts)
-        self.assertEqual(module.check_button_name(), "Final Check")
+        self.assertEqual(module.check_button_name(), "Submit")
 
         module = CapaFactory.create(attempts=attempts + 1, max_attempts=attempts)
-        self.assertEqual(module.check_button_name(), "Final Check")
+        self.assertEqual(module.check_button_name(), "Submit")
 
         # Otherwise, button name is "Check"
         module = CapaFactory.create(attempts=attempts - 2, max_attempts=attempts)
