@@ -3,6 +3,7 @@
 
 from lettuce import world, step
 from nose.tools import assert_equal
+from common import type_in_codemirror
 
 DISPLAY_NAME = "Display Name"
 MAXIMUM_ATTEMPTS = "Maximum Attempts"
@@ -135,12 +136,12 @@ def set_the_max_attempts(step, max_attempts_set, max_attempts_displayed, max_att
 
 @step('Edit High Level Source is not visible')
 def edit_high_level_source_not_visible(step):
-    verify_high_level_source(step, False)
+    verify_high_level_source_links(step, False)
 
 
 @step('Edit High Level Source is visible')
-def edit_high_level_source_visible(step):
-    verify_high_level_source(step, True)
+def edit_high_level_source_links_visible(step):
+    verify_high_level_source_links(step, True)
 
 
 @step('If I press Cancel my changes are not persisted')
@@ -159,7 +160,33 @@ def create_latex_problem(step):
     world.click_component_from_menu("i4x://edx/templates/problem/Problem_Written_in_LaTeX", '.xmodule_CapaModule')
 
 
-def verify_high_level_source(step, visible):
+@step('I edit the High Level Source')
+def edit_latex_source(step):
+    world.css_click('a.edit-button')
+    world.css_find('.launch-latex-compiler').find_by_css('a').click()
+    # Without the wait, the second code mirror is not yet clickable.
+    world.wait(1)
+    type_in_codemirror(1, "hi")
+    world.css_click('.hls-compile')
+
+
+@step('my change to the High Level Source is persisted')
+def high_level_source_persisted(step):
+    def verify_text(driver):
+        return world.css_find('.problem').text == 'hi'
+
+    world.wait_for(verify_text)
+
+
+@step('I view the High Level Source I see my changes')
+def high_level_source_in_editor(step):
+    world.css_click('a.edit-button')
+    world.css_find('.launch-latex-compiler').find_by_css('a').click()
+    world.wait(2)
+    assert_equal('hi', world.css_find('.source-edit-box').value)
+
+
+def verify_high_level_source_links(step, visible):
     assert_equal(visible, world.is_css_present('.launch-latex-compiler'))
     world.cancel_component(step)
     assert_equal(visible, world.is_css_present('.upload-button'))
