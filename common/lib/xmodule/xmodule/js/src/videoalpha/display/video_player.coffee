@@ -74,6 +74,9 @@ class @VideoPlayerAlpha extends SubviewAlpha
     # when this change is requested (instead of simply requesting a speed change to 1.0). This has to
     # be done only when the video is being watched in Firefox. We need to figure out what browser is
     # currently executing this code.
+    #
+    # TODO: Check the status of http://code.google.com/p/gdata-issues/issues/detail?id=4654
+    #       When the YouTube team fixes the API bug, we can remove this temporary bug fix.
     @video.isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1
 
     if @video.videoType is 'html5'
@@ -252,6 +255,9 @@ class @VideoPlayerAlpha extends SubviewAlpha
     # or when we are in Firefox, and the new speed is 1.0. The second case is necessary to
     # avoid the bug where in Firefox speed switching to 1.0 in HTML5 player mode is handled
     # incorrectly by YouTube API.
+    #
+    # TODO: Check the status of http://code.google.com/p/gdata-issues/issues/detail?id=4654
+    #       When the YouTube team fixes the API bug, we can remove this temporary bug fix.
     if (@video.videoType is 'youtube') or ((@video.isFirefox) and (@video.playerType is 'youtube') and (newSpeed is '1.0'))
       if @isPlaying()
         @player.loadVideoById(@video.youtubeId(), @currentTime)
