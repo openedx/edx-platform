@@ -1,6 +1,12 @@
-require 'json'
-require 'rake/clean'
-require './rakelib/helpers.rb'
+begin
+    require 'json'
+    require 'rake/clean'
+    require './rakelib/helpers.rb'
+rescue LoadError => error
+    puts "Import faild (#{error})"
+    puts "Please run `bundle install` to bootstrap ruby dependencies"
+    exit 1
+end
 
 # Build Constants
 REPO_ROOT = File.dirname(__FILE__)
