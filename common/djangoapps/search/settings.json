@@ -1,6 +1,6 @@
 {
 	"mappings": {
-		"transcript": {
+		"_all": {
 			"properties": {
 				"searchable_text": {
 					"type": "string",
@@ -11,9 +11,19 @@
 					"similarity": "BM25"
 				},
 
-				"location": {
+				"org": {
 					"type": "string",
-					"store": "yes"
+					"store": "true"
+				},
+
+				"course_id": {
+					"type": "string",
+					"store":"true"
+				},
+
+				"uuid": {
+					"type": "string",
+					"store": "true"
 				}
 			}
 		}
