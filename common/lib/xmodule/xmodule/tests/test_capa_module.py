@@ -86,7 +86,7 @@ class CapaFactory(object):
         """
         location = Location(["i4x", "edX", "capa_test", "problem",
                              "SampleProblem{0}".format(CapaFactory.next_num())])
-        model_data = {'data': CapaFactory.sample_problem_xml}
+        model_data = {'data': CapaFactory.sample_problem_xml, 'location': location}
 
         if graceperiod is not None:
             model_data['graceperiod'] = graceperiod
@@ -113,7 +113,7 @@ class CapaFactory(object):
 
         system = test_system()
         system.render_template = Mock(return_value="<div>Test Template HTML</div>")
-        module = CapaModule(system, location, descriptor, model_data)
+        module = CapaModule(system, descriptor, model_data)
 
         if correct:
             # TODO: probably better to actually set the internal state properly, but...

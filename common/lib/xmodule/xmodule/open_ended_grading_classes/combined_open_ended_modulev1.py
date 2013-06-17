@@ -117,7 +117,6 @@ class CombinedOpenEndedV1Module():
 
         self.instance_state = instance_state
         self.display_name = instance_state.get('display_name', "Open Ended")
-        self.rewrite_content_links = static_data.get('rewrite_content_links', "")
 
         #We need to set the location here so the child modules can use it
         system.set('location', location)
@@ -354,17 +353,7 @@ class CombinedOpenEndedV1Module():
         Output: Child task HTML
         """
         self.update_task_states()
-        html = self.current_task.get_html(self.system)
-        return_html = html
-        try:
-            #Without try except block, get this error:
-            # File "/home/vik/mitx_all/mitx/common/lib/xmodule/xmodule/x_module.py", line 263, in rewrite_content_links
-            # if link.startswith(XASSET_SRCREF_PREFIX):
-            # Placing try except so that if the error is fixed, this code will start working again.
-            return_html = rewrite_links(html, self.rewrite_content_links)
-        except Exception:
-            pass
-        return return_html
+        return self.current_task.get_html(self.system)
 
     def get_current_attributes(self, task_number):
         """

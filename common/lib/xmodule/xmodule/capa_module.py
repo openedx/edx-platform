@@ -117,6 +117,8 @@ class CapaModule(CapaFields, XModule):
     '''
     An XModule implementing LonCapa format problems, implemented by way of
     capa.capa_problem.LoncapaProblem
+
+    CapaModule.__init__ takes the same arguments as xmodule.x_module:XModule.__init__
     '''
     icon_class = 'problem'
 
@@ -131,8 +133,9 @@ class CapaModule(CapaFields, XModule):
     js_module_name = "Problem"
     css = {'scss': [resource_string(__name__, 'css/capa/display.scss')]}
 
-    def __init__(self, system, location, descriptor, model_data):
-        XModule.__init__(self, system, location, descriptor, model_data)
+    def __init__(self, *args, **kwargs):
+        """ Accepts the same arguments as xmodule.x_module:XModule.__init__ """
+        XModule.__init__(self, *args, **kwargs)
 
         due_date = self.due
 

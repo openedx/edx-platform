@@ -17,6 +17,10 @@ captions.
 
 CMS: Allow editors to delete uploaded files/assets
 
+XModules: `XModuleDescriptor.__init__` and `XModule.__init__` dropped the
+`location` parameter (and added it as a field), and renamed `system` to `runtime`,
+to accord more closely to `XBlock.__init__`
+
 LMS: Some errors handling Non-ASCII data in XML courses have been fixed.
 
 LMS: Add page-load tracking using segment-io (if SEGMENT_IO_LMS_KEY and
