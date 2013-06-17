@@ -112,3 +112,77 @@ describe "CMS.Views.TextbookEdit", ->
             expect(@collection.save).not.toHaveBeenCalled()
             expect(@collection.editing).toBeUndefined()
 
+
+describe "CMS.Views.ListTextbooks", ->
+    noTextbooksTpl = readFixtures("no-textbooks.underscore")
+
+    beforeEach ->
+        setFixtures($("<script>", {id: "no-textbooks-tpl", type: "text/template"}).text(noTextbooksTpl))
+        @showSpies = spyOnConstructor(CMS.Views, "TextbookShow", ["render"])
+        @showSpies.render.andReturn(@showSpies) # equivalent of `return this`
+        showEl = $("<li>")
+        @showSpies.$el = showEl
+        @showSpies.el = showEl.get(0)
+        @editSpies = spyOnConstructor(CMS.Views, "TextbookEdit", ["render"])
+        editEl = $("<li>")
+        @editSpies.render.andReturn(@editSpies)
+        @editSpies.$el = editEl
+        @editSpies.el= editEl.get(0)
+
+        @collection = new CMS.Collections.TextbookSet
+        @view = new CMS.Views.ListTextbooks({collection: @collection})
+        @view.render()
+        @showSpies.constructor.reset()
+        @editSpies.constructor.reset()
+
+    it "should render the empty template if there are no textbooks", ->
+        expect(@view.$el).toContainText("You haven't added any textbooks to this course yet")
+        expect(@view.$el).toContain(".new-button")
+
+    it "should render TextbookShow views by default if no textbook is being edited", ->
+        # add three empty textbooks to the collection
+        @collection.add([{}, {}, {}])
+        # reset spies due to re-rendering on collection modification
+        @showSpies.constructor.reset()
+        @editSpies.constructor.reset()
+        # render once and test
+        @view.render()
+
+        expect(@view.$el).not.toContainText(
+            "You haven't added any textbooks to this course yet")
+        expect(@view.$el).toBe("ul")
+        expect(@showSpies.constructor).toHaveBeenCalled()
+        expect(@showSpies.constructor.calls.length).toEqual(3);
+        expect(@editSpies.constructor).not.toHaveBeenCalled()
+
+    it "should render a TextbookEdit view for a textbook being edited", ->
+        # add three empty textbooks to the collection
+        @collection.add([{}, {}, {}])
+        # mark the second one as being edited
+        editing = @collection.at(1)
+        @collection.trigger('editOne', editing)
+        # reset spies
+        @showSpies.constructor.reset()
+        @editSpies.constructor.reset()
+        # render once and test
+        @view.render()
+
+        expect(@showSpies.constructor).toHaveBeenCalled()
+        expect(@showSpies.constructor.calls.length).toEqual(2)
+        expect(@showSpies.constructor).not.toHaveBeenCalledWith({model: editing})
+        expect(@editSpies.constructor).toHaveBeenCalled()
+        expect(@editSpies.constructor.calls.length).toEqual(1)
+        expect(@editSpies.constructor).toHaveBeenCalledWith({model: editing})
+
+    it "should add a new textbook when the new-button is clicked", ->
+        @view.$(".new-button").click()
+
+        expect(@collection.length).toEqual(1)
+        expect(@collection.editing).toBeDefined()
+        editing = @collection.editing
+        expect(editing).toEqual(@collection.at(0))
+        expect(@editSpies.constructor).toHaveBeenCalledWith({model: editing})
+        expect(@view.$el).toContain(@editSpies.$el)
+        expect(@view.$el).not.toContain(@showSpies.$el)
+
+
