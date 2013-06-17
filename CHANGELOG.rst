@@ -13,6 +13,20 @@ instance, Boolean, Integer, String), but also allow them to hold either the
 typed value, or a String that can be converted to their typed value. For example,
 an Integer can contain 3 or '3'. This changed an update to the xblock library.
 
+LMS: Courses whose id matches a regex in the COURSES_WITH_UNSAFE_CODE Django
+setting now run entirely outside the Python sandbox.
+
+Blades: Video Alpha bug fix for speed changing to 1.0 in Firefox.
+
+Blades: Additional event tracking added to Video Alpha: fullscreen switch, show/hide
+captions.
+
+CMS: Allow editors to delete uploaded files/assets
+
+XModules: `XModuleDescriptor.__init__` and `XModule.__init__` dropped the
+`location` parameter (and added it as a field), and renamed `system` to `runtime`,
+to accord more closely to `XBlock.__init__`
+
 LMS: Some errors handling Non-ASCII data in XML courses have been fixed.
 
 LMS: Add page-load tracking using segment-io (if SEGMENT_IO_LMS_KEY and
@@ -35,7 +49,7 @@ student.
 Blades: Staff debug info is now accessible for Graphical Slider Tool problems.
 
 Blades: For Video Alpha the events ready, play, pause, seek, and speed change
-are logged on the server (in the logs). 
+are logged on the server (in the logs).
 
 Common: Developers can now have private Django settings files.
 
@@ -56,7 +70,7 @@ Common: The "duplicate email" error message is more informative.
 
 Studio: Component metadata settings editor.
 
-Studio: Autoplay is disabled (only in Studio).
+Studio: Autoplay for Video Alpha is disabled (only in Studio).
 
 Studio: Single-click creation for video and discussion components.
 

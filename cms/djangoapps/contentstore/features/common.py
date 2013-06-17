@@ -179,3 +179,14 @@ def shows_captions(step, show_captions):
         assert world.css_find('.video')[0].has_class('closed')
     else:
         assert world.is_css_not_present('.video.closed')
+
+
+def type_in_codemirror(index, text):
+    world.css_click(".CodeMirror", index=index)
+    g = world.css_find("div.CodeMirror.CodeMirror-focused > div > textarea")
+    if world.is_mac():
+        g._element.send_keys(Keys.COMMAND + 'a')
+    else:
+        g._element.send_keys(Keys.CONTROL + 'a')
+    g._element.send_keys(Keys.DELETE)
+    g._element.send_keys(text)

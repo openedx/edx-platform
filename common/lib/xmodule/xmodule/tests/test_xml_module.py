@@ -142,7 +142,7 @@ class EditableMetadataFieldsTest(unittest.TestCase):
     def get_xml_editable_fields(self, model_data):
         system = test_system()
         system.render_template = Mock(return_value="<div>Test Template HTML</div>")
-        return XmlDescriptor(system=system, location=None, model_data=model_data).editable_metadata_fields
+        return XmlDescriptor(runtime=system, model_data=model_data).editable_metadata_fields
 
     def get_descriptor(self, model_data):
         class TestModuleDescriptor(TestFields, XmlDescriptor):
@@ -154,7 +154,7 @@ class EditableMetadataFieldsTest(unittest.TestCase):
 
         system = test_system()
         system.render_template = Mock(return_value="<div>Test Template HTML</div>")
-        return TestModuleDescriptor(system=system, location=None, model_data=model_data)
+        return TestModuleDescriptor(runtime=system, model_data=model_data)
 
     def assert_field_values(self, editable_fields, name, field, explicitly_set, inheritable, value, default_value,
                             type='Generic', options=[]):

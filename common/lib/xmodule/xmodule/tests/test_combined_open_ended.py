@@ -175,7 +175,6 @@ class OpenEndedModuleTest(unittest.TestCase):
         'max_score': max_score,
         'display_name': 'Name',
         'accept_file_upload': False,
-        'rewrite_content_links': "",
         'close_date': None,
         's3_interface': test_util_open_ended.S3_INTERFACE,
         'open_ended_grading_interface': test_util_open_ended.OPEN_ENDED_GRADING_INTERFACE,
@@ -332,7 +331,6 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
         'max_score': max_score,
         'display_name': 'Name',
         'accept_file_upload': False,
-        'rewrite_content_links': "",
         'close_date': "",
         's3_interface': test_util_open_ended.S3_INTERFACE,
         'open_ended_grading_interface': test_util_open_ended.OPEN_ENDED_GRADING_INTERFACE,
@@ -370,10 +368,15 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
     full_definition = definition_template.format(prompt=prompt, rubric=rubric, task1=task_xml1, task2=task_xml2)
     descriptor = Mock(data=full_definition)
     test_system = test_system()
-    combinedoe_container = CombinedOpenEndedModule(test_system,
-                                                   location,
-                                                   descriptor,
-                                                   model_data={'data': full_definition, 'weight': '1'})
+    combinedoe_container = CombinedOpenEndedModule(
+        test_system,
+        descriptor,
+        model_data={
+            'data': full_definition,
+            'weight': '1',
+            'location': location
+        }
+    )
 
     def setUp(self):
         # TODO: this constructor call is definitely wrong, but neither branch
