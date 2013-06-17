@@ -61,7 +61,7 @@ setup_instructor_dashboard_sections = (idash_content) ->
   log "setting up instructor dashboard sections"
   plantTimeout 0, -> setup_section_data_download idash_content.find(".#{CSS_IDASH_SECTION}#data_download")
   plantTimeout 0, -> setup_section_membership    idash_content.find(".#{CSS_IDASH_SECTION}#membership")
-  plantTimeout 0, -> window.InstructorDashboard.sections.Analytics idash_content.find(".#{CSS_IDASH_SECTION}#analytics")
+  plantTimeout 0, -> new window.InstructorDashboard.sections.Analytics idash_content.find(".#{CSS_IDASH_SECTION}#analytics")
 
 
 # setup the data download section
