@@ -111,11 +111,6 @@ class @Sequence
     if (1 <= new_position) and (new_position <= @num_contents)
       Logger.log "seq_goto", old: @position, new: new_position, id: @id
 
-      analytics.track "Sequential Goto",
-        old: @position
-        new: new_position
-        id: @id
-
       # On Sequence chage, destroy any existing polling thread
       #   for queued submissions, see ../capa/display.coffee
       if window.queuePollerID
@@ -132,21 +127,11 @@ class @Sequence
     Logger.log "seq_next", old: @position, new: new_position, id: @id
     @render new_position
 
-    analytics.track "Sequential Next",
-        old: @position
-        new: new_position
-        id: @id
-
   previous: (event) =>
     event.preventDefault()
     new_position = @position - 1
     Logger.log "seq_prev", old: @position, new: new_position, id: @id
     @render new_position
-
-    analytics.track "Sequential Previous",
-        old: @position
-        new: new_position
-        id: @id
 
   link_for: (position) ->
     @$("#sequence-list a[data-element=#{position}]")
