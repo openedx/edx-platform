@@ -189,28 +189,30 @@ class ElasticDatabase:
 
     def __init__(self, url, index_settings_file):
         """
-        Will initialize elastic search object with specified indices
-        specifically the url should be something of the form `http://localhost:9200`
-        importantly do not include a slash at the end of the url name."""
+Will initialize elastic search object with specified indices
+specifically the url should be something of the form `http://localhost:9200`
+importantly do not include a slash at the end of the url name."""
 
         self.url = url
         self.index_settings = json.loads(open(index_settings_file, 'rb').read())
 
     def setup_type(self, index, type_, json_mapping):
         """
-        json_mapping should be a dictionary starting at the properties level of a mapping.
+yaml_mapping should be a dictionary starting at the properties level of a mapping.
 
-        The type level will be added, so if you include it things will break. The purpose of this
-        is to encourage loose coupling between types and mappings for better code
-        """
-        full_url = "/".join([self.url, index, type_, "_mapping"])
-        json_put_body = {type_: json_mapping}
-        requests.put(full_url, data=json_put_body)
+The type level will be added, so if you include it things will break. The purpose of this
+is to encourage loose coupling between types and mappings for better code
+"""
+
+        full_url = "/".join([self.url, index, type_]) + "/"
+        dictionary = json.loads(open(json_mapping).read())
+        print dictionary
+        return requests.post(full_url, data=json.dumps(dictionary))
 
     def has_index(self, index):
         """Checks to see if a given index exists in the database returns existance boolean,
 
-        If this returns something other than a 200 or a 404 something is wrong and so we error"""
+If this returns something other than a 200 or a 404 something is wrong and so we error"""
         full_url = "/".join([self.url, index])
         status = requests.head(full_url).status_code
         if status == 200:
@@ -236,10 +238,10 @@ class ElasticDatabase:
     def index_directory_files(self, directory, index, type_, silent=False, **kwargs):
         """Starts a pygrep instance and indexes all files in the given directory
 
-        Available kwargs are file_ending, callback, and conserve_kwargs.
-        Respectively these allow you to choose the file ending to be indexed, the
-        callback used to do the indexing, and whether or not you would like to pass
-        additional kwargs to the callback function."""
+Available kwargs are file_ending, callback, and conserve_kwargs.
+Respectively these allow you to choose the file ending to be indexed, the
+callback used to do the indexing, and whether or not you would like to pass
+additional kwargs to the callback function."""
         # Needs to be lazily evaluatedy
         file_ending = kwargs.get("file_ending", ".srt.sjson")
         callback = kwargs.get("callback", self.index_transcript)
@@ -348,15 +350,15 @@ class EnchantDictionary:
     def produce_dictionary(self, output_file, **kwargs):
         """Produces a dictionary or updates it depending on kwargs
 
-        If no kwargs are given then this method will write a full dictionary including all
-        entries in all indices and types and output it in an enchant-friendly way to the output file.
+If no kwargs are given then this method will write a full dictionary including all
+entries in all indices and types and output it in an enchant-friendly way to the output file.
 
-        Accepted kwargs are index, and source_file. If you want to index multiple types
-        or indices you should pass them in as comma delimited strings. Source file should be
-        an absolute path to an existing enchant-friendly dictionary file.
+Accepted kwargs are index, and source_file. If you want to index multiple types
+or indices you should pass them in as comma delimited strings. Source file should be
+an absolute path to an existing enchant-friendly dictionary file.
 
-        max_results will also set the maximum number of entries to be used in generating the dictionary.
-        Set to 50k by default"""
+max_results will also set the maximum number of entries to be used in generating the dictionary.
+Set to 50k by default"""
         index = kwargs.get("index", "_all")
         max_results = kwargs.get("max_results", 50000)
         words = set()
@@ -392,3 +394,4 @@ class EnchantDictionary:
 #print test.setup_type("transcript", "cleaning", mapping)._content
 #print test.get_type_mapping("transcript-index", "2-1x")
 #print test.index_directory_transcripts("/home/slater/edx_all/data", "transcript-index", "transcript")
+#test.generate_dictionary("transcript-index", "transcript", "pyenchant_corpus.txt")

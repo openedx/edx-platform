@@ -157,7 +157,7 @@
 	    "analyzer": {
 =======
 	"mappings": {
-		"transcript": {
+		"_all": {
 			"properties": {
 				"searchable_text": {
 					"type": "string",
@@ -169,9 +169,19 @@
 				},
 >>>>>>> Moved past difficulty in file integration and adding configurability to elasticsearch analyzers
 
-				"location": {
+				"org": {
 					"type": "string",
-					"store": "yes"
+					"store": "true"
+				},
+
+				"course_id": {
+					"type": "string",
+					"store":"true"
+				},
+
+				"uuid": {
+					"type": "string",
+					"store": "true"
 				}
 			}
 		}
