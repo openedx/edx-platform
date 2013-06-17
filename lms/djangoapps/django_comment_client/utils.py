@@ -170,7 +170,7 @@ def initialize_discussion_info(course):
         last_category = category.split("/")[-1]
         discussion_id_map[id] = {"location": module.location, "title": last_category + " / " + title}
         #Handle case where module.lms.start is None
-        entry_start_date = module.lms.start if module.lms.start else pytz.UTC.localize(datetime.max)
+        entry_start_date = module.lms.start if module.lms.start else datetime.max.replace(tzinfo=pytz.UTC)
         unexpanded_category_map[category].append({"title": title, "id": id, "sort_key": sort_key, "start_date": entry_start_date})
 
     category_map = {"entries": defaultdict(dict), "subcategories": defaultdict(dict)}
