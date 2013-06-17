@@ -59,6 +59,8 @@ setup_instructor_dashboard = (idash_content) =>
 # call setup handlers for each section
 setup_instructor_dashboard_sections = (idash_content) ->
   log "setting up instructor dashboard sections"
+  # fault isolation
+  # an error thrown in one section will not block other sections from exectuing
   plantTimeout 0, -> setup_section_data_download idash_content.find(".#{CSS_IDASH_SECTION}#data_download")
   plantTimeout 0, -> setup_section_membership    idash_content.find(".#{CSS_IDASH_SECTION}#membership")
   plantTimeout 0, -> new window.InstructorDashboard.sections.Analytics idash_content.find(".#{CSS_IDASH_SECTION}#analytics")
@@ -209,6 +211,7 @@ setup_section_membership = (section) ->
 
     allow_button.click ->
       access_change(allow_field.val(), 'staff', 'allow', reload_staff_list)
+      allow_field.val ''
 
     access_change = (email, level, mode, cb) ->
       url = access_change_endpoint
