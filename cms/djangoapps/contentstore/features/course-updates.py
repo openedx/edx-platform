@@ -3,6 +3,7 @@
 
 from lettuce import world, step
 from selenium.webdriver.common.keys import Keys
+from common import type_in_codemirror
 
 
 @step(u'I go to the course updates page')
@@ -78,15 +79,6 @@ def check_handout(step, handout):
 
 
 def change_text(text):
-    text_css = 'div.CodeMirror > div > textarea'
-    prev_css = 'div.CodeMirror-lines > div > div:last-child > pre'
-    all_lines = world.css_find(prev_css)
-    all_text = ''
-    for i in range(len(all_lines)):
-        all_text = all_lines[i].html
-    text_area = world.css_find(text_css)
-    for i in range(len(all_text)):
-        text_area._element.send_keys(Keys.END, Keys.BACK_SPACE)
-    text_area._element.send_keys(text)
+    type_in_codemirror(0, text)
     save_css = '.save-button'
     world.css_click(save_css)
