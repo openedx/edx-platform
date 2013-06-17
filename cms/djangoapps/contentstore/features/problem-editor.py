@@ -159,7 +159,7 @@ def create_latex_problem(step):
     world.click_component_from_menu("i4x://edx/templates/problem/Problem_Written_in_LaTeX", '.xmodule_CapaModule')
 
 
-@step('I edit the High Level Source')
+@step('I edit and compile the High Level Source')
 def edit_latex_source(step):
     world.css_click('a.edit-button')
     world.css_find('.launch-latex-compiler').find_by_css('a').click()
