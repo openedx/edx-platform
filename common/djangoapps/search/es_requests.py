@@ -2,6 +2,77 @@ import requests
 import json
 import os
 import re
+from pymongo import MongoClient
+
+
+class MongoIndexer:
+
+    def __init__(self, host='localhost', port=27017, content_database='xcontent', file_collection="fs.files",
+                 chunk_collection="fs.chunks", module_database='xmodule', module_collection='modulestore'):
+        self.host = host
+        self.port = port
+        self.client = MongoClient(host, port)
+        self.content_db = self.client[content_database]
+        self.module_db = self.client[module_database]
+        try:
+            self.content_db.collection_names().index(file_collection)
+        except ValueError:
+            print "No collection named: " + file_collection
+            raise
+        try:
+            self.content_db.collection_names().index(chunk_collection)
+        except ValueError:
+            print "No collection named: " + chunk_collection
+        try:
+            self.module_db.collection_names().index(module_collection)
+        except ValueError:
+            print "No collection named: " + module_collection
+        self.file_collection = self.content_db[file_collection]
+        self.chunk_collection = self.content_db[chunk_collection]
+        self.module_collection = self.module_db[module_collection]
+
+    def find_transcripts(self, file_ending=".srt.sjson"):
+        """Returns a cursor that will lazily generate transcript objects when next() is called"""
+        return self.file_collection.find({"filename": re.compile(".*?"+re.escape(file_ending))})
+
+    def find_transcript_content(self, mongo_element):
+        """Finds the corresponding chunk to the file element from a cursor similar to that from find_transcripts"""
+        filename = mongo_element["_id"]["name"]
+        database_object = self.chunk_collection.find_one({"files_id.name": filename})
+        return json.loads(database_object["data"].decode())["text"]
+
+    def module_for_uuid(self, transcript_uuid):
+        """Given the transcript uuid found from the xcontent database, returns the mongo document for the video"""
+        regex_pattern = re.compile(".*?"+str(transcript_uuid)+".*?")
+        video_module = self.module_collection.find_one({"definition.data": regex_pattern})
+        return video_module
+
+    def uuid_from_file_name(self, file_name):
+        """Returns a youtube uuid given the filename of a transcript"""
+        print file_name
+        if file_name[:5] == "subs_":
+            file_name = file_name[5:]
+        return file_name[:file_name.find(".")]
+
+    def index_all_transcripts(self, es_instance, index):
+        cursor = self.find_transcripts()
+        for i in range(0, cursor.count()):
+            check = cursor.next()
+            print check.keys()
+            course = check["_id"]["course"]
+            org = check["_id"]["org"]
+            uuid = self.uuid_from_file_name(check["_id"]["name"])
+            video_module = self.module_for_uuid(uuid)
+            try:
+                display_name = org + " " + course + " " + video_module["metadata"]["display_name"]
+            except TypeError:
+                print "Could not find module for: " + uuid
+                display_name = org + " " + course
+            transcript = " ".join(self.find_transcript_content(check))
+            data = {"course": course, "org": org, "uuid": uuid, "searchable_text": transcript,
+                    "display_name": display_name}
+            type_ = course.replace(".", "-")
+            print es_instance.index_data(index, type_, data)._content
 
 
 class ElasticDatabase:
@@ -9,12 +80,11 @@ class ElasticDatabase:
     def __init__(self, url, index_settings_file, *args):
         """
         Will initialize elastic search object with any indices specified by args
-
         specifically the url should be something of the form `http://localhost:9200`
         importantly do not include a slash at the end of the url name.
 
         args should be a list of dictionaries, each dictionary specifying a JSON mapping
-        to be used for a specific type.
+        to be used for a specific type. See settings.json for a more in-depth example
 
         Example Dictionary:
             {"index": "transcript", "type": "6-002x", "mapping":
@@ -99,23 +169,18 @@ class ElasticDatabase:
 
         Will recursively go through the directory and assume all .srt.sjson files are transcript"""
         # Needs to be lazily evaluatedy
-        id_ = 1
         transcripts = self.os_walk_transcript(os.walk(directory))
         for transcript_list in transcripts:
             for transcript in transcript_list:
-                print self.index_transcript(index, type_, str(id_), transcript)
-                id_ += 1
+                print self.index_transcript(index, type_, transcript)
 
-    def index_transcript(self, index, type_, id_, transcript_file):
+    def index_transcript(self, index, type_, transcript_file):
         """opens and indexes the given transcript file as the given index, type, and id"""
         file_uuid = transcript_file.rsplit("/")[-1][:-10]
         transcript = open(transcript_file, 'rb').read()
-        #try:
         searchable_text = " ".join(filter(None, json.loads(transcript)["text"])).replace("\n", " ")
         data = {"searchable_text": searchable_text, "uuid": file_uuid}
-        #except:
-        #   return "INVALID JSON: " + file_uuid
-        return self.index_data(index, type_, id_, data)._content
+        return self.index_data(index, type_, data)._content
 
     def setup_index(self, index):
         """Creates a new elasticsearch index, returns the response it gets"""
@@ -128,21 +193,25 @@ class ElasticDatabase:
         full_url = "/".join([self.url, index]) + "/"
         #closing the index so it can be changed
         requests.post(full_url+"/_close")
-        response = requests.post(full_url+"/_settings", data=json.dumps(index_settings))
+        response = requests.post(full_url+"/", data=json.dumps(index_settings))
         #reopening the index so it can be read
         requests.post(full_url+"/_open")
         return response
 
-    def index_data(self, index, type_, id_, data):
+    def index_data(self, index, type_, data):
         """Data should be passed in as a dictionary, assumes it matches the given mapping"""
-        full_url = "/".join([self.url, index, type_, id_])
-        response = requests.put(full_url, json.dumps(data))
+        full_url = "/".join([self.url, index, type_]) + "/"
+        response = requests.post(full_url, json.dumps(data))
         return response
 
     def get_index_settings(self, index):
         """Returns the current settings of a given index"""
         full_url = "/".join([self.url, index, "_settings"])
         return json.loads(requests.get(full_url)._content)
+
+    def delete_index(self, index):
+        full_url = "/".join([self.url, index])
+        return requests.delete(full_url)
 
     def get_type_mapping(self, index, type_):
         """Return the current mapping of the indicated type"""
@@ -172,10 +241,14 @@ class ElasticDatabase:
 url = "https://localhost:9200"
 settings_file = "settings.json"
 
+mongo = MongoIndexer()
 test = ElasticDatabase("http://localhost:9200", settings_file)
-#print test.setup_index("transcript-index")._content
+#print test.delete_index("transcript-index")
+#print test.add_index_settings("transcript-index")._content
 #print test.get_index_settings("transcript-index")
+mongo.index_all_transcripts(test, "transcript-index")
+
 #print test.setup_type("transcript", "cleaning", mapping)._content
-#print test.get_type_mapping("transcript-index", "transcript")
+#print test.get_type_mapping("transcript-index", "2-1x")
 #print test.index_directory_transcripts("/home/slater/edx_all/data", "transcript-index", "transcript")
-test.generate_dictionary("transcript-index", "transcript", "pyenchant_corpus.txt")
+# test.generate_dictionary("transcript-index", "transcript", "pyenchant_corpus.txt")
