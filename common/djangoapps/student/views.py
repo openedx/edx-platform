@@ -349,6 +349,7 @@ def change_enrollment(request):
         return HttpResponseBadRequest("Course id not specified")
 
     if action == "enroll":
+
         # Make sure the course exists
         # We don't do this check on unenroll, or a bad course id can't be unenrolled from
         try:
@@ -357,7 +358,6 @@ def change_enrollment(request):
             log.warning("User {0} tried to enroll in non-existent course {1}"
                       .format(user.username, course_id))
             return HttpResponseBadRequest("Course id is invalid")
-
         if not has_access(user, course, 'enroll'):
             return HttpResponseBadRequest("Enrollment is closed")
 

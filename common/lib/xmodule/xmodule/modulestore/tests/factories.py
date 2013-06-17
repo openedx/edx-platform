@@ -1,5 +1,5 @@
 from factory import Factory, lazy_attribute_sequence, lazy_attribute
-from time import gmtime
+from time import gmtime, time
 from uuid import uuid4
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
@@ -35,7 +35,10 @@ class XModuleCourseFactory(Factory):
         if display_name is not None:
             new_course.display_name = display_name
 
+        tomorrow = time() + 24 * 3600
+
         new_course.lms.start = gmtime()
+        new_course.enrollment_start = gmtime(tomorrow)
         new_course.tabs = kwargs.get(
             'tabs',
             [
@@ -54,6 +57,8 @@ class XModuleCourseFactory(Factory):
         data = kwargs.get('data')
         if data is not None:
             store.update_item(new_course.location, data)
+
+        new_course = store.get_instance(new_course.id, new_course.location)
 
         return new_course
 
