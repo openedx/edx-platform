@@ -10,7 +10,7 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.middleware import AuthenticationMiddleware
 from django.contrib.sessions.middleware import SessionMiddleware
 from student.models import CourseEnrollment
-from xmodule.modulestore.django import _MODULESTORES, modulestore
+from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.django import contentstore
 from xmodule.templates import update_templates
 from bs4 import BeautifulSoup
@@ -112,7 +112,6 @@ def save_the_course_content(path='/tmp'):
     u = world.browser.url
     section_url = u[u.find('courseware/') + 11:]
 
-
     if not os.path.exists(path):
         os.makedirs(path)
 
@@ -131,7 +130,6 @@ def clear_courses():
     # (though it shouldn't), do this manually
     # from the bash shell to drop it:
     # $ mongo test_xmodule --eval "db.dropDatabase()"
-    _MODULESTORES = {}
     modulestore().collection.drop()
     update_templates(modulestore('direct'))
     contentstore().fs_files.drop()
