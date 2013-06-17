@@ -1,10 +1,6 @@
 require 'json'
 require 'rake/clean'
-require './rakefiles/helpers.rb'
-
-Dir['rakefiles/*.rake'].each do |rakefile|
-    import rakefile
-end
+require './rakelib/helpers.rb'
 
 # Build Constants
 REPO_ROOT = File.dirname(__FILE__)
