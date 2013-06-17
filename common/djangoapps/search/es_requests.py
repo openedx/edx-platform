@@ -2,7 +2,6 @@ import requests
 import json
 import os
 import re
-<<<<<<< HEAD
 import urllib
 import base64
 from pymongo import MongoClient
@@ -15,8 +14,6 @@ from StringIO import StringIO as IO
 from wand.image import Image
 from wand.exceptions import DelegateError, MissingDelegateError, CorruptImageError
 from xhtml2pdf import pisa as pisa
-=======
->>>>>>> Search working, basic functionality and styling in place, as well as csrf protection, snippeting, results highlighting, and spell correction
 
 
 class MongoIndexer:
@@ -278,7 +275,6 @@ If this returns something other than a 200 or a 404 something is wrong and so we
             print "Got an unexpected reponse code: " + str(status)
             raise
 
-<<<<<<< HEAD
     def has_type(self, index, type_):
         """Same as has_index, but for a given type"""
         full_url = "/".join([self.url, index, type_])
@@ -329,43 +325,7 @@ additional kwargs to the callback function."""
             return self.index_data(index, type_, data)._content
         else:
             return self.index_data(index, type_, data, id_=id_)
-=======
-    def os_walk_transcript(self, walk_results):
-        """Takes the results of os.walk on the data directory and returns a list of absolute paths"""
-        file_check = lambda walk: len(walk[2]) > 0
-        srt_prelim = lambda walk: ".srt.sjson" in " ".join(walk[2])
-        relevant_results = (entry for entry in walk_results if file_check(entry) and srt_prelim(entry))
-        return (self.os_path_tuple_srts(result) for result in relevant_results)
-
-    def os_path_tuple_srts(self, os_walk_tuple):
-        """Given the path tuples from the os.walk method, constructs absolute paths to transcripts"""
-        srt_check = lambda file_name: file_name[-10:] == ".srt.sjson"
-        directory, subfolders, file_paths = os_walk_tuple
-        return [os.path.join(directory, file_path) for file_path in file_paths if srt_check(file_path)]
-
-    def index_directory_transcripts(self, directory, index, type_):
-        """Indexes all transcripts that are present in a given directory
-
-        Will recursively go through the directory and assume all .srt.sjson files are transcript"""
-        # Needs to be lazily evaluatedy
-        id_ = 1
-        transcripts = self.os_walk_transcript(os.walk(directory))
-        for transcript_list in transcripts:
-            for transcript in transcript_list:
-                print self.index_transcript(index, type_, str(id_), transcript)
-                id_ += 1
-
-    def index_transcript(self, index, type_, id_, transcript_file):
-        """opens and indexes the given transcript file as the given index, type, and id"""
-        file_uuid = transcript_file.rsplit("/")[-1][:-10]
-        transcript = open(transcript_file, 'rb').read()
-        #try:
-        searchable_text = " ".join(filter(None, json.loads(transcript)["text"])).replace("\n", " ")
-        data = {"searchable_text": searchable_text, "uuid": file_uuid}
-        #except:
-        #   return "INVALID JSON: " + file_uuid
         return self.index_data(index, type_, id_, data)._content
->>>>>>> Search working, basic functionality and styling in place, as well as csrf protection, snippeting, results highlighting, and spell correction
 
     def setup_index(self, index):
         """Creates a new elasticsearch index, returns the response it gets"""
@@ -394,12 +354,7 @@ additional kwargs to the callback function."""
 
     def get_data(self, index, type_, id_):
         full_url = "/".join([self.url, index, type_, id_])
-<<<<<<< HEAD
         return requests.get(full_url)
-=======
-        response = requests.put(full_url, json.dumps(data))
-        return response
->>>>>>> Search working, basic functionality and styling in place, as well as csrf protection, snippeting, results highlighting, and spell correction
 
     def get_index_settings(self, index):
         """Returns the current settings of a given index"""
@@ -419,7 +374,6 @@ additional kwargs to the callback function."""
         full_url = "/".join([self.url, index, type_, "_mapping"])
         return json.loads(requests.get(full_url)._content)
 
-<<<<<<< HEAD
 
 class PyGrep:
 
@@ -496,35 +450,4 @@ dictionary.produce_dictionary("pyenchant_corpus.txt", max_results=500000)
 #print test.get_type_mapping("transcript-index", "2-1x")
 #print test.index_directory_transcripts("/home/slater/edx_all/data", "transcript-index", "transcript")
 #test.generate_dictionary("transcript-index", "transcript", "pyenchant_corpus.txt")
-=======
-    def generate_dictionary(self, index, type_, output_file):
-        """Generates a suitable pyenchant dictionary based on the current state of the database"""
-        base_url = "/".join([self.url, index, type_])
-        words = set()
-        id_ = 1
-        status_code = 200
-        while status_code == 200:
-            transcript = requests.get(base_url+"/"+str(id_))
-            status_code = transcript.status_code
-            try:
-                text = json.loads(transcript._content)["_source"]["searchable_text"]
-                words |= set(re.findall(r'[a-z]+', text.lower()))
-            except KeyError:
-                pass
-            id_ += 1
-            print id_
-        with open(output_file, 'wb') as dictionary:
-            for word in words:
-                dictionary.write(word + "\n")
-
-url = "https://localhost:9200"
-settings_file = "settings.json"
-
-test = ElasticDatabase("http://localhost:9200", settings_file)
-#print test.setup_index("transcript-index")._content
-#print test.get_index_settings("transcript-index")
-#print test.setup_type("transcript", "cleaning", mapping)._content
-#print test.get_type_mapping("transcript-index", "transcript")
-#print test.index_directory_transcripts("/home/slater/edx_all/data", "transcript-index", "transcript")
 test.generate_dictionary("transcript-index", "transcript", "pyenchant_corpus.txt")
->>>>>>> Search working, basic functionality and styling in place, as well as csrf protection, snippeting, results highlighting, and spell correction
