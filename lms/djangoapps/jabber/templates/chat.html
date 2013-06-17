@@ -1,0 +1,43 @@
+<%namespace name='static' file='/static_content.html'/>
+<html>
+	<head>
+    <link rel="stylesheet" href="${static.url('css/vendor/ui-lightness/jquery-ui-1.8.22.custom.css')}" />
+
+    ## It'd be better to have this in a place like lms/css/vendor/candy,
+    ## but the candy_res/ folder contains images and other junk, and it
+    ## all needs to stay together for the Candy.js plugin to work.
+    <link rel="stylesheet" href="${static.url('candy_res/candy_full.css')}" />
+
+    ## Load in jQuery libs from standard edX locations.
+    <script type="text/javascript" src="${static.url('js/vendor/jquery.min.js')}"></script>
+    <script type="text/javascript" src="${static.url('js/vendor/jquery-ui.min.js')}"></script>
+
+    ## Include the Candy.js libraries. Wooooo.
+    <script type="text/javascript" src="${static.url('js/vendor/candy_libs/libs.min.js')}"></script>
+    <script type="text/javascript" src="${static.url('js/vendor/candy.min.js')}"></script>
+    <script type="text/javascript" src="${static.url('js/vendor/candy_ui.js')}"></script>
+
+    ## Include edX-specific Candy plugins
+    <script type="text/javascript" src="${static.url('js/candy_shop.js')}"></script>
+	</head>
+	<body>
+    ## Candy.js renders itself in an element with #candy
+		<div id="candy"></div>
+
+    ## Initialize the Candy.js plugin
+    <script type="text/javascript">
+      $(document).ready(function() {
+        Candy.init("${bosh_url}", {
+          //core: { debug: true, autojoin: ["${course_room}"] },
+          core: { debug: true, autojoin: ["dev@conference.jabber.class.stanford.edu"] },
+          view: { resources: "${static.url('candy_res/')}"}
+        });
+
+        ## Initialize edX-specific Candy plugins
+        //CandyShop.EdX.init();
+
+        Candy.Core.connect("${username}", "${password}");
+      });
+    </script>
+	</body>
+</html>

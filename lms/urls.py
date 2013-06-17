@@ -325,6 +325,15 @@ if settings.COURSEWARE_ENABLED:
             url(r'^masquerade/(?P<marg>.*)$', 'courseware.masquerade.handle_ajax', name="masquerade-switch"),
         )
 
+    # chat renders inside an iframe so that we can better track
+    # an active chat user between page requests and pop out the chat
+    # widget window
+    if settings.MITX_FEATURES.get('ENABLE_CHAT'):
+        urlpatterns += (
+            url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/chat/?$',
+                'jabber.views.chat', name="chat"),
+        )
+
     # discussion forums live within courseware, so courseware must be enabled first
     if settings.MITX_FEATURES.get('ENABLE_DISCUSSION_SERVICE'):
         urlpatterns += (

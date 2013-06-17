@@ -101,15 +101,6 @@ class ViewsTestCase(TestCase):
         self.assertRaises(Http404, views.redirect_to_course_position,
                           mock_module)
 
-    def test_registered_for_course(self):
-        self.assertFalse(views.registered_for_course('Basketweaving', None))
-        mock_user = MagicMock()
-        mock_user.is_authenticated.return_value = False
-        self.assertFalse(views.registered_for_course('dummy', mock_user))
-        mock_course = MagicMock()
-        mock_course.id = self.course_id
-        self.assertTrue(views.registered_for_course(mock_course, self.user))
-
     def test_jump_to_invalid(self):
         request = self.request_factory.get(self.chapter_url)
         self.assertRaisesRegexp(Http404, 'Invalid location', views.jump_to,

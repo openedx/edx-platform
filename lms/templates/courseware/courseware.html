@@ -1,19 +1,13 @@
 <%inherit file="/main.html" />
 <%namespace name='static' file='/static_content.html'/>
 <%! from django.utils.translation import ugettext as _ %>
+<%! from django.core.urlresolvers import reverse %>
 <%block name="bodyclass">courseware ${course.css_class}</%block>
 <%block name="title"><title>${course.number} Courseware</title></%block>
 
 <%block name="headextra">
   <%static:css group='course'/>
   <%include file="../discussion/_js_head_dependencies.html" />
-  % if show_chat:
-    <link rel="stylesheet" href="${static.url('css/vendor/ui-lightness/jquery-ui-1.8.22.custom.css')}" />
-    ## It'd be better to have this in a place like lms/css/vendor/candy,
-    ## but the candy_res/ folder contains images and other junk, and it
-    ## all needs to stay together for the Candy.js plugin to work.
-    <link rel="stylesheet" href="${static.url('candy_res/candy_full.css')}" />
-  % endif
 </%block>
 
 <%block name="js_extra">
@@ -116,19 +110,9 @@
   </script>
 % endif
 
-% if show_chat:
-  <script type="text/javascript" src="${static.url('js/vendor/candy_libs/libs.min.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/vendor/candy.min.js')}"></script>
-
+% if settings.MITX_FEATURES.get("ENABLE_CHAT") and course.show_chat:
   <script type="text/javascript">
-    // initialize the Candy.js plugin
-    $(document).ready(function() {
-      Candy.init("${chat['bosh_url']}", {
-        core: { debug: true, autojoin: ["${chat['course_room']}"] },
-        view: { resources: "${static.url('candy_res/')}"}
-      });
-      Candy.Core.connect("${chat['username']}", "${chat['password']}");
-
+    $(function() {
       // show/hide the chat widget
       $('#chat-toggle').click(function() {
         var toggle = $(this);
@@ -146,6 +130,8 @@
         }
         toggle.toggleClass('closed');
       });
+
+      // TODO: add pop-in/pop-out functionality here
     });
   </script>
 % endif
@@ -190,17 +176,19 @@
   </div>
 </section>
 
-% if show_chat:
+% if settings.MITX_FEATURES.get("ENABLE_CHAT") and course.show_chat:
   <div id="chat-wrapper">
     <div id="chat-toggle" class="closed">
       <span id="chat-open">${_("Open Chat")} <em class="icon-chevron-up"></em></span>
       <span id="chat-close">${_("Close Chat")} <em class="icon-chevron-down"></em></span>
     </div>
-    <div id="chat-block">
-      ## The Candy.js plugin wants to render in an element with #candy
-      <div id="candy"></div>
+    <div id="chat-frame-wrapper">
+      ## TODO: this link probably needs course ID as a parameter...
+      <iframe id="chat-block" src="${reverse('chat', kwargs={'course_id': course.id})}"></iframe>
     </div>
+    <a id="chat-popout" href="#" title="${_('Pop-Out Chat Window')}" class="icon-signout"></a>
   </div>
+  <a id="chat-popin" href="#" title="${_('Pop-In Chat Window')}" class="icon-signin"></a>
 % endif
 
 % if course.show_calculator:

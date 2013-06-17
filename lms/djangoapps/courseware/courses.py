@@ -24,6 +24,7 @@ from static_replace import replace_static_urls
 from courseware.access import has_access
 import branding
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from student.models import CourseEnrollment
 
 log = logging.getLogger(__name__)
 
@@ -298,3 +299,15 @@ def sort_by_announcement(courses):
     courses = sorted(courses, key=key)
 
     return courses
+
+
+def registered_for_course(course, user):
+    """
+    Return CourseEnrollment if user is registered for course, else False
+    """
+    if user is None:
+        return False
+    if user.is_authenticated():
+        return CourseEnrollment.objects.filter(user=user, course_id=course.id).exists()
+    else:
+        return False

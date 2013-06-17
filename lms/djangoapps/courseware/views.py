@@ -18,7 +18,9 @@ from django.views.decorators.cache import cache_control
 from courseware import grades
 from courseware.access import has_access
 from courseware.courses import (get_courses, get_course_with_access,
-                                get_courses_by_university, sort_by_announcement)
+                                get_courses_by_university,
+                                registered_for_course,
+                                sort_by_announcement)
 import courseware.tabs as tabs
 from courseware.masquerade import setup_masquerade
 from courseware.model_data import ModelDataCache
@@ -35,7 +37,6 @@ from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundErr
 from xmodule.modulestore.search import path_to_location
 
 import comment_client
-import jabber.utils
 
 log = logging.getLogger("mitx.courseware")
 
@@ -298,16 +299,6 @@ def index(request, course_id, chapter=None, section=None,
             'xqa_server': settings.MITX_FEATURES.get('USE_XQA_SERVER', 'http://xqa:server@content-qa.mitx.mit.edu/xqa')
             }
 
-        # Only show the chat if it's enabled both in the settings and
-        # by the course.
-        context['show_chat'] = course.show_chat and settings.MITX_FEATURES.get('ENABLE_CHAT')
-        if context['show_chat']:
-            context['chat'] = {
-                'bosh_url': jabber.utils.get_bosh_url(),
-                'course_room': jabber.utils.get_room_name_for_course(course.id),
-                'username': "%s@%s" % (user.username, settings.JABBER.get('HOST')),
-                'password': jabber.utils.get_or_create_password_for_user(user.username)
-            }
 
         chapter_descriptor = course.get_child_by(lambda m: m.url_name == chapter)
         if chapter_descriptor is not None:
@@ -509,18 +500,6 @@ def syllabus(request, course_id):
 
     return render_to_response('courseware/syllabus.html', {'course': course,
                                             'staff_access': staff_access, })
-
-
-def registered_for_course(course, user):
-    """
-    Return CourseEnrollment if user is registered for course, else False
-    """
-    if user is None:
-        return False
-    if user.is_authenticated():
-        return CourseEnrollment.objects.filter(user=user, course_id=course.id).exists()
-    else:
-        return False
 
 
 @ensure_csrf_cookie
