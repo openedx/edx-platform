@@ -102,17 +102,25 @@ class InstructorTask(models.Model):
 
     @staticmethod
     def create_output_for_success(returned_result):
-        """Converts successful result to output format"""
+        """
+        Converts successful result to output format.
+
+        Raises a ValueError exception if the output is too long.
+        """
+        # In future, there should be a check here that the resulting JSON
+        # will fit in the column.  In the meantime, just return an exception.
         json_output = json.dumps(returned_result)
+        if len(json_output) > 1023:
+            raise ValueError("Length of task output is too long: {0}".format(json_output))
         return json_output
 
     @staticmethod
     def create_output_for_failure(exception, traceback_string):
         """
-        Converts failed result inofrmation to output format.
+        Converts failed result information to output format.
 
         Traceback information is truncated or not included if it would result in an output string
-        that would not fit in the database.  If the output is still too long, then the 
+        that would not fit in the database.  If the output is still too long, then the
         exception message is also truncated.
 
         Truncation is indicated by adding "..." to the end of the value.
@@ -143,5 +151,5 @@ class InstructorTask(models.Model):
 
     @staticmethod
     def create_output_for_revoked():
-       """Creates standard message to store in output format for revoked tasks."""
-       return json.dumps({'message': 'Task revoked before running'})
+        """Creates standard message to store in output format for revoked tasks."""
+        return json.dumps({'message': 'Task revoked before running'})

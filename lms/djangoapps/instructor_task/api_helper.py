@@ -186,11 +186,7 @@ def get_status_from_instructor_task(instructor_task):
           'message': returned for failed and revoked tasks.
           'traceback': optional, returned if task failed and produced a traceback.
 
-      If task doesn't exist, returns None.
-
-      If task has been REVOKED, the InstructorTask entry will be updated in
-      persistent storage as a side effect.
-    """
+     """
     status = {}
 
     if instructor_task.task_output is not None:
@@ -231,7 +227,7 @@ def encode_problem_and_student_input(problem_url, student=None):
         task_key_stub = "{student}_{problem}".format(student=student.id, problem=problem_url)
     else:
         task_input = {'problem_url': problem_url}
-        task_key_stub = "{student}_{problem}".format(student="", problem=problem_url)
+        task_key_stub = "_{problem}".format(problem=problem_url)
 
     # create the key value by using MD5 hash:
     task_key = hashlib.md5(task_key_stub).hexdigest()

@@ -39,7 +39,7 @@ def instructor_task_status(request):
       'message': on complete tasks, status message reporting on final progress,
           or providing exception message if failed.  For tasks in progress,
           indicates the current progress.
-      'succeeded': on complete tasks or tasks in progress, indicates if the
+      'succeeded': on complete tasks or tasks in progress, boolean value indicates if the
           task outcome was successful:  did it achieve what it set out to do.
           This is in contrast with a successful task_state, which indicates that the
           task merely completed.
@@ -125,10 +125,10 @@ def get_task_completion_info(instructor_task):
         log.warning(fmt.format(instructor_task.task_id, instructor_task.task_output))
         return (succeeded, "No progress status information available")
 
-    action_name = task_output.get('action_name')
-    num_attempted = task_output.get('attempted')
-    num_updated = task_output.get('updated')
-    num_total = task_output.get('total')
+    action_name = task_output['action_name']
+    num_attempted = task_output['attempted']
+    num_updated = task_output['updated']
+    num_total = task_output['total']
 
     student = None
     try:

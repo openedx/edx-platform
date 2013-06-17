@@ -218,10 +218,10 @@ def update_problem_module_state(entry_id, update_fcn, action_name, filter_fcn,
     if xmodule_instance_args is not None:
         xmodule_instance_args['task_id'] = task_id
 
-    # now that we have an entry we can try to catch failures:
+    # Now that we have an entry we can try to catch failures:
     task_progress = None
     try:
-        # check that the task_id submitted in the InstructorTask matches the current task
+        # Check that the task_id submitted in the InstructorTask matches the current task
         # that is running.
         request_task_id = _get_current_task().request.id
         if task_id != request_task_id:
@@ -230,10 +230,17 @@ def update_problem_module_state(entry_id, update_fcn, action_name, filter_fcn,
             TASK_LOG.error(message)
             raise UpdateProblemModuleStateError(message)
 
-        # now do the work:
+        # Now do the work:
         with dog_stats_api.timer('instructor_tasks.module.time.overall', tags=['action:{name}'.format(name=action_name)]):
             task_progress = _perform_module_state_update(course_id, module_state_key, student_ident, update_fcn,
                                                          action_name, filter_fcn, xmodule_instance_args)
+        # If we get here, we assume we've succeeded, so update the InstructorTask entry in anticipation.
+        # But we do this within the try, in case creating the task_output causes an exception to be
+        # raised.
+        entry.task_output = InstructorTask.create_output_for_success(task_progress)
+        entry.task_state = SUCCESS
+        entry.save_now()
+
     except Exception:
         # try to write out the failure to the entry before failing
         _, exception, traceback = exc_info()
@@ -243,11 +250,6 @@ def update_problem_module_state(entry_id, update_fcn, action_name, filter_fcn,
         entry.task_state = FAILURE
         entry.save_now()
         raise
-
-    # if we get here, we assume we've succeeded, so update the InstructorTask entry in anticipation:
-    entry.task_output = json.dumps(task_progress)
-    entry.task_state = SUCCESS
-    entry.save_now()
 
     # log and exit, returning task_progress info as task result:
     fmt = 'Finishing task "{task_id}": course "{course_id}" problem "{state_key}": final: {progress}'

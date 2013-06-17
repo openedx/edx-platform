@@ -29,7 +29,7 @@ def get_running_instructor_tasks(course_id):
     # exclude states that are "ready" (i.e. not "running", e.g. failure, success, revoked):
     for state in READY_STATES:
         instructor_tasks = instructor_tasks.exclude(task_state=state)
-    return instructor_tasks
+    return instructor_tasks.order_by('-id')
 
 
 def get_instructor_task_history(course_id, problem_url, student=None):
@@ -142,7 +142,7 @@ def submit_delete_problem_state_for_all_students(request, course_id, problem_url
     using i4x-type notation.
 
     ItemNotFoundException is raised if the problem doesn't exist, or AlreadyRunningError
-    if the particular problem is already being deleted.
+    if the particular problem's state is already being deleted.
 
     This method makes sure the InstructorTask entry is committed.
     When called from any view that is wrapped by TransactionMiddleware,
