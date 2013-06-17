@@ -13,6 +13,14 @@ from django.contrib.auth.models import User, Group
 from courseware.access import get_access_group_name
 
 
+def list_with_level(course, level):
+    grpname = get_access_group_name(course, level)
+    try:
+        return Group.objects.get(name=grpname).user_set.all()
+    except Group.DoesNotExist:
+        return []
+
+
 def allow_access(course, user, level):
     """
     Allow user access to course modification.

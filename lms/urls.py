@@ -272,6 +272,8 @@ if settings.COURSEWARE_ENABLED:
         # api endpoints for instructor
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/enroll_unenroll$',
             'instructor.views.api.enroll_unenroll', name="enroll_unenroll"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/list_instructors_staff$',
+            'instructor.views.api.list_instructors_staff', name="list_instructors_staff"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/access_allow_revoke$',
             'instructor.views.api.access_allow_revoke', name="access_allow_revoke"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/grading_config$',

@@ -16,7 +16,7 @@ from courseware.courses import get_course_with_access
 from django.contrib.auth.models import User, Group
 
 from instructor.enrollment import split_input_list, enroll_emails, unenroll_emails
-from instructor.access import allow_access, revoke_access
+from instructor.access import allow_access, revoke_access, list_with_level
 import analytics.basic
 import analytics.distributions
 import analytics.csvs
@@ -72,6 +72,32 @@ def access_allow_revoke(request, course_id):
 
     response_payload = {
         'done': 'yup',
+    }
+    response = HttpResponse(json.dumps(response_payload), content_type="application/json")
+    return response
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+def list_instructors_staff(request, course_id):
+    """
+    List instructors and staff.
+    Requires staff access.
+    """
+    course = get_course_with_access(request.user, course_id, 'staff', depth=None)
+
+    def extract_user(user):
+        return {
+            'username': user.username,
+            'email': user.email,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+        }
+
+    response_payload = {
+        'course_id':   course_id,
+        'instructors': map(extract_user, list_with_level(course, 'instructor')),
+        'staff':       map(extract_user, list_with_level(course, 'staff')),
     }
     response = HttpResponse(json.dumps(response_payload), content_type="application/json")
     return response

@@ -106,6 +106,7 @@ def _section_membership(course_id):
         'section_display_name': 'Membership',
         'enroll_button_url':   reverse('enroll_unenroll', kwargs={'course_id': course_id}),
         'unenroll_button_url': reverse('enroll_unenroll', kwargs={'course_id': course_id}),
+        'list_instructors_staff_url': reverse('list_instructors_staff', kwargs={'course_id': course_id}),
     }
     return section_data
 
