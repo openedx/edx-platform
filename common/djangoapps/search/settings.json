@@ -1,5 +1,6 @@
 {
 	"mappings": {
+<<<<<<< HEAD
 		"properties": {
 			"searchable_text": {
 				"type": "multi_field",
@@ -57,6 +58,29 @@
 				},
 
 				"course_id": {
+=======
+		"_all": {
+			"properties": {
+				"searchable_text": {
+>>>>>>> Added mongo integration with elasticsearch requests module
+					"type": "string",
+					"store":"true"
+				},
+
+<<<<<<< HEAD
+				"uuid": {
+=======
+				"org": {
+>>>>>>> Added mongo integration with elasticsearch requests module
+					"type": "string",
+					"store": "true"
+				},
+
+<<<<<<< HEAD
+				"thumbnail": {
+					"type": "binary"
+=======
+				"course_id": {
 					"type": "string",
 					"store":"true"
 				},
@@ -64,10 +88,7 @@
 				"uuid": {
 					"type": "string",
 					"store": "true"
-				},
-
-				"thumbnail": {
-					"type": "binary"
+>>>>>>> Added mongo integration with elasticsearch requests module
 				}
 			}
 		}
