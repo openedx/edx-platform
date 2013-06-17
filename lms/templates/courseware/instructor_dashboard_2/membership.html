@@ -1,10 +1,31 @@
 <%page args="section_data"/>
 
-<div>
+<div class="vert-left batch-enrollment">
   <h2>Batch Enrollment</h2>
   <p>Enter student emails separated by new lines or commas.</p>
-  <textarea rows="6" cols="70" name="student-emails">Student Emails</textarea>
+  <textarea rows="6" cols="70" name="student-emails" placeholder="Student Emails"></textarea>
+  <br>
   <input type="button" name="enroll" value="Enroll" data-endpoint="${ section_data['enroll_button_url'] }" >
   <input type="button" name="unenroll" value="Unenroll" data-endpoint="${ section_data['unenroll_button_url'] }" >
   <div class="task-response"></div>
+</div>
+
+<div class="vert-right instructor-staff-management">
+  <div class="auth-list-container auth-list-staff">
+    <h2>Staff Management</h2>
+    <div class="auth-list-table" data-endpoint="${ section_data['list_instructors_staff_url'] }"></div>
+    <div class="auth-list-add" data-endpoint="${ section_data['access_allow_revoke_url'] }">
+      <input type="text" name="email" placeholder="Enter Email" spellcheck="false">
+      <input type="button" name="allow" value="Grant Staff Access">
+    </div>
+  </div>
+
+  <div class="auth-list-container auth-list-instructor">
+    <h2>Instructor Management</h2>
+    <div class="auth-list-table" data-endpoint="${ section_data['list_instructors_staff_url'] }"></div>
+    <div class="auth-list-add" data-endpoint="${ section_data['access_allow_revoke_url'] }">
+      <input type="text" name="email" placeholder="Enter Email" spellcheck="false">
+      <input type="button" name="allow" value="Grant Instructor Access">
+    </div>
+  </div>
 </div>

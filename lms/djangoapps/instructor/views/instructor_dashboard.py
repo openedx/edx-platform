@@ -106,6 +106,8 @@ def _section_membership(course_id):
         'section_display_name': 'Membership',
         'enroll_button_url':   reverse('enroll_unenroll', kwargs={'course_id': course_id}),
         'unenroll_button_url': reverse('enroll_unenroll', kwargs={'course_id': course_id}),
+        'list_instructors_staff_url': reverse('list_instructors_staff', kwargs={'course_id': course_id}),
+        'access_allow_revoke_url': reverse('access_allow_revoke', kwargs={'course_id': course_id}),
     }
     return section_data
 
@@ -115,6 +117,9 @@ def _section_student_admin(course_id):
     section_data = {
         'section_key': 'student_admin',
         'section_display_name': 'Student Admin',
+        'get_student_progress_url': reverse('get_student_progress_url', kwargs={'course_id': course_id}),
+        'unenroll_button_url': reverse('enroll_unenroll', kwargs={'course_id': course_id}),
+        'reset_student_attempts_url': reverse('reset_student_attempts', kwargs={'course_id': course_id}),
     }
     return section_data
 

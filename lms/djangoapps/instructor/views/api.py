@@ -10,13 +10,16 @@ TODO a lot of these GETs should be PUTs
 import json
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
-from django.http import HttpResponse
+from django.core.urlresolvers import reverse
+from django.http import HttpResponse, HttpResponseBadRequest
 
 from courseware.courses import get_course_with_access
 from django.contrib.auth.models import User, Group
 
+from courseware.models import StudentModule
+import instructor.enrollment as enrollment
 from instructor.enrollment import split_input_list, enroll_emails, unenroll_emails
-from instructor.access import allow_access, revoke_access
+from instructor.access import allow_access, revoke_access, list_with_level
 import analytics.basic
 import analytics.distributions
 import analytics.csvs
@@ -27,6 +30,7 @@ import analytics.csvs
 def enroll_unenroll(request, course_id):
     """
     Enroll or unenroll students by email.
+    Requires staff access.
     """
     course = get_course_with_access(request.user, course_id, 'staff', depth=None)
 
@@ -48,7 +52,8 @@ def enroll_unenroll(request, course_id):
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def access_allow_revoke(request, course_id):
     """
-    Modify staff/instructor access. (instructor available only)
+    Modify staff/instructor access.
+    Requires instructor access.
 
     Query parameters:
     email is the target users email
@@ -71,7 +76,33 @@ def access_allow_revoke(request, course_id):
         raise ValueError("unrecognized mode '{}'".format(mode))
 
     response_payload = {
-        'done': 'yup',
+        'DONE': 'YES',
+    }
+    response = HttpResponse(json.dumps(response_payload), content_type="application/json")
+    return response
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+def list_instructors_staff(request, course_id):
+    """
+    List instructors and staff.
+    Requires staff access.
+    """
+    course = get_course_with_access(request.user, course_id, 'staff', depth=None)
+
+    def extract_user(user):
+        return {
+            'username': user.username,
+            'email': user.email,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+        }
+
+    response_payload = {
+        'course_id':   course_id,
+        'instructor':  map(extract_user, list_with_level(course, 'instructor')),
+        'staff':       map(extract_user, list_with_level(course, 'staff')),
     }
     response = HttpResponse(json.dumps(response_payload), content_type="application/json")
     return response
@@ -175,6 +206,98 @@ def profile_distribution(request, course_id):
             'year_of_birth': 'Year Of Birth',
         },
         'feature_results':    feature_results,
+    }
+    response = HttpResponse(json.dumps(response_payload), content_type="application/json")
+    return response
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+def get_student_progress_url(request, course_id):
+    """
+    Get the progress url of a student.
+    Limited to staff access.
+
+    Takes query paremeter student_email and if the student exists
+    returns e.g. {
+        'progress_url': '/../...'
+    }
+    """
+    course = get_course_with_access(request.user, course_id, 'staff', depth=None)
+
+    student_email = request.GET.get('student_email')
+    if not student_email:
+        # TODO Is there a way to do a - say - 'raise Http400'?
+        return HttpResponseBadRequest()
+    user = User.objects.get(email=student_email)
+
+    progress_url = reverse('student_progress', kwargs={'course_id': course_id, 'student_id': user.id})
+
+    response_payload = {
+        'course_id':    course_id,
+        'progress_url': progress_url,
+    }
+    response = HttpResponse(json.dumps(response_payload), content_type="application/json")
+    return response
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+def redirect_to_student_progress(request, course_id):
+    """
+    Redirects to the specified students progress page
+    Limited to staff access.
+
+    Takes query parameter student_email
+    """
+    course = get_course_with_access(request.user, course_id, 'staff', depth=None)
+
+    student_email = request.GET.get('student_email')
+    if not student_email:
+        # TODO Is there a way to do a - say - 'raise Http400'?
+        return HttpResponseBadRequest()
+    user = User.objects.get(email=student_email)
+
+    progress_url = reverse('student_progress', kwargs={'course_id': course_id, 'student_id': user.id})
+
+    response_payload = {
+        'course_id':    course_id,
+        'progress_url': progress_url,
+    }
+    response = HttpResponse(json.dumps(response_payload), content_type="application/json")
+    return response
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+def reset_student_attempts(request, course_id):
+    """
+    Resets a students attempts counter. Optionally deletes student state for a problem.
+    Limited to staff access.
+
+    Takes query parameter student_email
+    Takes query parameter problem_to_reset
+    Takes query parameter delete_module
+    """
+    course = get_course_with_access(request.user, course_id, 'staff', depth=None)
+
+    student_email = request.GET.get('student_email')
+    problem_to_reset = request.GET.get('problem_to_reset')
+    will_delete_module = {'true': True}.get(request.GET.get('delete_module', ''), False)
+
+    if not student_email or not problem_to_reset:
+        return HttpResponseBadRequest()
+
+    user = User.objects.get(email=student_email)
+
+    try:
+        enrollment.reset_student_attempts(course_id, user, problem_to_reset, delete_module=will_delete_module)
+    except StudentModule.DoesNotExist:
+        return HttpResponseBadRequest()
+
+    response_payload = {
+        'course_id':    course_id,
+        'delete_module': will_delete_module,
     }
     response = HttpResponse(json.dumps(response_payload), content_type="application/json")
     return response

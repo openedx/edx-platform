@@ -5,8 +5,10 @@ Does not include any access control, be sure to check access before calling.
 """
 
 import re
+import json
 from django.contrib.auth.models import User
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
+from courseware.models import StudentModule
 
 
 def enroll_emails(course_id, student_emails, auto_enroll=False):
@@ -136,3 +138,52 @@ def split_input_list(str_list):
     new_list = [s for s in new_list if s != '']
 
     return new_list
+
+
+def reset_student_attempts(course_id, student, problem_to_reset, delete_module=False):
+    """
+    Reset student attempts for a problem. Optionally deletes all student state for the specified problem.
+
+    In the previous instructor dashboard it was possible to modify/delete
+    modules that were not problems. That has been disabled for safety.
+
+    student is a User
+    problem_to_reset is the name of a problem e.g. 'L2Node1'.
+    To build the module_state_key 'problem/' and course information will be appended to problem_to_reset.
+    """
+    if problem_to_reset[-4:] == ".xml":
+        problem_to_reset = problem_to_reset[:-4]
+
+    problem_to_reset = "problem/" + problem_to_reset
+
+    (org, course_name, _) = course_id.split("/")
+    module_state_key = "i4x://" + org + "/" + course_name + "/" + problem_to_reset
+    module_to_reset = StudentModule.objects.get(student_id=student.id,
+                                                course_id=course_id,
+                                                module_state_key=module_state_key)
+
+    if delete_module:
+        module_to_reset.delete()
+    else:
+        _reset_module_attempts(module_to_reset)
+
+
+def _reset_module_attempts(studentmodule):
+    """ Reset the number of attempts on a studentmodule. """
+    # load the state json
+    problem_state = json.loads(studentmodule.state)
+    # old_number_of_attempts = problem_state["attempts"]
+    problem_state["attempts"] = 0
+
+    # save
+    studentmodule.state = json.dumps(problem_state)
+    studentmodule.save()
+    # track.views.server_track(request,
+    #                          '{instructor} reset attempts from {old_attempts} to 0 for {student} on problem {problem} in {course}'.format(
+    #                              old_attempts=old_number_of_attempts,
+    #                              student=student_to_reset,
+    #                              problem=studentmodule.module_state_key,
+    #                              instructor=request.user,
+    #                              course=course_id),
+    #                          {},
+    #                          page='idashboard')

@@ -77,42 +77,62 @@
 
 
 .instructor-dashboard-wrapper-2 section.idash-section#membership {
-  div {
-    margin-top: 2em;
+  .vert-left {
+    float: left;
+    width: 45%;
   }
 
-  textarea {
-    height: 100px;
-    width: 500px;
-  }
+  .vert-right {
+    float: right;
+    width: 45%;
 
-  .task-res-section {
-    h3 {
-      color: #646464;
+    .auth-list-container {
+      margin-bottom: 1.5em;
+
+      .auth-list-table {
+        .slickgrid {
+          height: 250px;
+        }
+      }
+
+      .auth-list-add {
+        margin-top: 0.5em;
+      }
     }
 
-    ul {
-      padding: 0;
-      margin: 0;
-      margin-top: 0.5em;
-      line-height: 1.5em;
-      list-style-type: none;
-      li {
+  }
+
+  .batch-enrollment {
+    textarea {
+      height: 100px;
+      width: 500px;
+    }
+
+    .task-res-section {
+      margin-top: 1.5em;
+
+      h3 {
+        color: #646464;
+      }
+
+      ul {
+        padding: 0;
+        margin: 0;
+        margin-top: 0.5em;
+        line-height: 1.5em;
+        list-style-type: none;
+        li {
+        }
       }
     }
   }
 }
 
 
-.instructor-dashboard-wrapper-2 section.idash-section#student_admin {
-  .h-row {
-    margin-bottom: 1em;
-    clear: both;
-  }
-
-  p input select {
-    float: left;
-  }
+.instructor-dashboard-wrapper-2 section.idash-section#student_admin > {
+  h3    { margin-top: 2em; }
+  input { margin-top: 2em; }
+  a     { margin-top: 2em; }
 }
 
 
