@@ -107,7 +107,7 @@ class Analytics
 
 
 # exports
-_.extend window, InstructorDashboard: {}
-_.extend window.InstructorDashboard, sections: {}
-_.extend window.InstructorDashboard.sections,
+_.defaults window, InstructorDashboard: {}
+_.defaults window.InstructorDashboard, sections: {}
+_.defaults window.InstructorDashboard.sections,
   Analytics: Analytics
