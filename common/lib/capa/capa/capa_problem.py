@@ -22,10 +22,10 @@ from lxml import etree
 from xml.sax.saxutils import unescape
 from copy import deepcopy
 
-from .correctmap import CorrectMap
+from capa.correctmap import CorrectMap
 import capa.inputtypes as inputtypes
 import capa.customrender as customrender
-from .util import contextualize_text, convert_files_to_filenames
+from capa.util import contextualize_text, convert_files_to_filenames
 import capa.xqueue_interface as xqueue_interface
 
 # to be replaced with auto-registering
@@ -43,8 +43,8 @@ response_properties = ["codeparam", "responseparam", "answer", "openendedparam"]
 
 # special problem tags which should be turned into innocuous HTML
 html_transforms = {'problem': {'tag': 'div'},
-                   "text": {'tag': 'span'},
-                   "math": {'tag': 'span'},
+                   'text': {'tag': 'span'},
+                   'math': {'tag': 'span'},
                    }
 
 # These should be removed from HTML output, including all subelements
@@ -284,20 +284,15 @@ class LoncapaProblem(object):
         permits rescoring to be complete when the rescoring call returns.
         """
         return all('filesubmission' not in responder.allowed_inputfields for responder in self.responders.values())
-#         for responder in self.responders.values():
-#             if 'filesubmission' in responder.allowed_inputfields:
-#                 return False
-#
-#         return True
 
     def rescore_existing_answers(self):
-        '''
+        """
         Rescore student responses.  Called by capa_module.rescore_problem.
-        '''
+        """
         return self._grade_answers(None)
 
     def _grade_answers(self, student_answers):
-        '''
+        """
         Internal grading call used for checking new 'student_answers' and also
         rescoring existing student_answers.
 
@@ -309,13 +304,13 @@ class LoncapaProblem(object):
         For rescoring, `student_answers` is None.
 
         Calls the Response for each question in this problem, to do the actual grading.
-        '''
+        """
         # old CorrectMap
         oldcmap = self.correct_map
 
         # start new with empty CorrectMap
         newcmap = CorrectMap()
-        # log.debug('Responders: %s' % self.responders)
+
         # Call each responsetype instance to do actual grading
         for responder in self.responders.values():
             # File objects are passed only if responsetype explicitly allows
@@ -335,7 +330,6 @@ class LoncapaProblem(object):
             newcmap.update(results)
 
         self.correct_map = newcmap
-        # log.debug('%s: in grade_answers, student_answers=%s, cmap=%s' % (self,student_answers,newcmap))
         return newcmap
 
     def get_question_answers(self):

@@ -662,7 +662,6 @@ class StringResponseTest(ResponseTest):
         )
         correct_map = problem.grade_answers({'1_2_1': '2'})
         hint = correct_map.get_hint('1_2_1')
-#        rand = random.Random(problem.seed)
         self.assertEqual(hint, self._get_random_number_result(problem.seed))
 
 

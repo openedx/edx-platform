@@ -828,9 +828,7 @@ class CapaModule(CapaFields, XModule):
         Returns the error messages for exceptions occurring while performing
         the rescoring, rather than throwing them.
         """
-        event_info = dict()
-        event_info['state'] = self.lcp.get_state()
-        event_info['problem_id'] = self.location.url()
+        event_info = {'state': self.lcp.get_state(), 'problem_id': self.location.url()}
 
         if not self.lcp.supports_rescoring():
             event_info['failure'] = 'unsupported'
@@ -851,8 +849,8 @@ class CapaModule(CapaFields, XModule):
             correct_map = self.lcp.rescore_existing_answers()
 
         except (StudentInputError, ResponseError, LoncapaProblemError) as inst:
-            log.warning("StudentInputError in capa_module:problem_rescore", exc_info=True)
-            event_info['failure'] = 'student_input_error'
+            log.warning("Input error in capa_module:problem_rescore", exc_info=True)
+            event_info['failure'] = 'input_error'
             self.system.track_function('problem_rescore_fail', event_info)
             return {'success': "Error: {0}".format(inst.message)}
 

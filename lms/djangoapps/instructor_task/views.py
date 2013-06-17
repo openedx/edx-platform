@@ -8,7 +8,7 @@ from celery.states import FAILURE, REVOKED, READY_STATES
 
 from instructor_task.api_helper import (get_status_from_instructor_task,
                                         get_updated_instructor_task)
-from instructor_task.tasks_helper import PROGRESS
+from instructor_task.models import PROGRESS
 
 
 log = logging.getLogger(__name__)

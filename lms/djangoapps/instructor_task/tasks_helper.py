@@ -2,8 +2,6 @@
 This file contains tasks that are designed to perform background operations on the
 running state of a course.
 
-
-
 """
 
 import json
@@ -28,13 +26,10 @@ from track.views import task_track
 from courseware.models import StudentModule
 from courseware.model_data import ModelDataCache
 from courseware.module_render import get_module_for_descriptor_internal
-from instructor_task.models import InstructorTask
+from instructor_task.models import InstructorTask, PROGRESS
 
 # define different loggers for use within tasks and on client side
 TASK_LOG = get_task_logger(__name__)
-
-# define custom task state:
-PROGRESS = 'PROGRESS'
 
 # define value to use when no task_id is provided:
 UNKNOWN_TASK_ID = 'unknown-task_id'
@@ -94,7 +89,7 @@ def _perform_module_state_update(course_id, module_state_key, student_identifier
     the update is successful; False indicates the update on the particular student module failed.
     A raised exception indicates a fatal condition -- that no other student modules should be considered.
 
-    If no exceptions are raised, a dict containing the task's result is returned, with the following keys:
+    The return value is a dict containing the task's results, with the following keys:
 
           'attempted': number of attempts made
           'updated': number of attempts that "succeeded"
@@ -170,12 +165,6 @@ def _perform_module_state_update(course_id, module_state_key, student_identifier
     return task_progress
 
 
-@transaction.autocommit
-def _save_course_task(course_task):
-    """Writes InstructorTask course_task immediately, ensuring the transaction is committed."""
-    course_task.save()
-
-
 def update_problem_module_state(entry_id, update_fcn, action_name, filter_fcn,
                                 xmodule_instance_args):
     """
@@ -198,7 +187,7 @@ def update_problem_module_state(entry_id, update_fcn, action_name, filter_fcn,
 
     Before returning, this is also JSON-serialized and stored in the task_output column of the InstructorTask entry.
 
-    If exceptions were raised internally, they are caught and recorded in the InstructorTask entry.
+    If an exception is raised internally, it is caught and recorded in the InstructorTask entry.
     This is also a JSON-serialized dict, stored in the task_output column, containing the following keys:
 
            'exception':  type of exception object
@@ -247,21 +236,18 @@ def update_problem_module_state(entry_id, update_fcn, action_name, filter_fcn,
                                                          action_name, filter_fcn, xmodule_instance_args)
     except Exception:
         # try to write out the failure to the entry before failing
-        exception_type, exception, traceback = exc_info()
+        _, exception, traceback = exc_info()
         traceback_string = format_exc(traceback) if traceback is not None else ''
-        task_progress = {'exception': exception_type.__name__, 'message': str(exception.message)}
         TASK_LOG.warning("background task (%s) failed: %s %s", task_id, exception, traceback_string)
-        if traceback is not None:
-            task_progress['traceback'] = traceback_string[:700]
-        entry.task_output = json.dumps(task_progress)
+        entry.task_output = InstructorTask.create_output_for_failure(exception, traceback_string)
         entry.task_state = FAILURE
-        _save_course_task(entry)
+        entry.save_now()
         raise
 
     # if we get here, we assume we've succeeded, so update the InstructorTask entry in anticipation:
     entry.task_output = json.dumps(task_progress)
     entry.task_state = SUCCESS
-    _save_course_task(entry)
+    entry.save_now()
 
     # log and exit, returning task_progress info as task result:
     fmt = 'Finishing task "{task_id}": course "{course_id}" problem "{state_key}": final: {progress}'
@@ -317,7 +303,7 @@ def rescore_problem_module_state(module_descriptor, student_module, xmodule_inst
 
     Throws exceptions if the rescoring is fatal and should be aborted if in a loop.
     In particular, raises UpdateProblemModuleStateError if module fails to instantiate,
-    and if the module doesn't support rescoring.
+    or if the module doesn't support rescoring.
 
     Returns True if problem was successfully rescored for the given student, and False
     if problem encountered some kind of error in rescoring.

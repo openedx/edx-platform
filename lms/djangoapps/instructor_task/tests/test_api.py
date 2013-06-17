@@ -22,12 +22,9 @@ from instructor_task.api import (get_running_instructor_tasks,
                                  submit_reset_problem_attempts_for_all_students,
                                  submit_delete_problem_state_for_all_students)
 
-from instructor_task.api_helper import (QUEUING,
-                                        AlreadyRunningError,
-                                        encode_problem_and_student_input,
-                                        )
-from instructor_task.models import InstructorTask
-from instructor_task.tasks_helper import PROGRESS
+from instructor_task.api_helper import (AlreadyRunningError,
+                                        encode_problem_and_student_input)
+from instructor_task.models import InstructorTask, PROGRESS, QUEUING
 from instructor_task.tests.test_base import InstructorTaskTestCase
 from instructor_task.tests.factories import InstructorTaskFactory
 from instructor_task.views import instructor_task_status, get_task_completion_info
@@ -376,9 +373,9 @@ class InstructorTaskSubmitTest(InstructorTaskTestCase):
             submit_delete_problem_state_for_all_students(request, course_id, problem_url)
 
     def test_submit_nonrescorable_modules(self):
-        # confirm that a rescore of a non-existent module returns an exception
+        # confirm that a rescore of an existent but unscorable module returns an exception
         # (Note that it is easier to test a non-rescorable module in test_tasks,
-        # where we are creating real modules.
+        # where we are creating real modules.)
         problem_url = self.problem_section.location.url()
         course_id = self.course.id
         request = None
@@ -386,6 +383,28 @@ class InstructorTaskSubmitTest(InstructorTaskTestCase):
             submit_rescore_problem_for_student(request, course_id, problem_url, self.student)
         with self.assertRaises(NotImplementedError):
             submit_rescore_problem_for_all_students(request, course_id, problem_url)
+
+    def _test_submit_with_long_url(self, task_class, student=None):
+        problem_url_name = 'x' * 255
+        self.define_option_problem(problem_url_name)
+        location = InstructorTaskTestCase.problem_location(problem_url_name)
+        with self.assertRaises(ValueError):
+            if student is not None:
+                task_class(self.create_task_request(self.instructor), self.course.id, location, student)
+            else:
+                task_class(self.create_task_request(self.instructor), self.course.id, location)
+
+    def test_submit_rescore_all_with_long_url(self):
+        self._test_submit_with_long_url(submit_rescore_problem_for_all_students)
+
+    def test_submit_rescore_student_with_long_url(self):
+        self._test_submit_with_long_url(submit_rescore_problem_for_student, self.student)
+
+    def test_submit_reset_all_with_long_url(self):
+        self._test_submit_with_long_url(submit_reset_problem_attempts_for_all_students)
+
+    def test_submit_delete_all_with_long_url(self):
+        self._test_submit_with_long_url(submit_delete_problem_state_for_all_students)
 
     def _test_submit_task(self, task_class, student=None):
         problem_url_name = 'H1P1'

@@ -1,7 +1,6 @@
 import hashlib
 import json
 import logging
-from uuid import uuid4
 
 from django.db import transaction
 
@@ -11,16 +10,14 @@ from celery.states import READY_STATES, SUCCESS, FAILURE, REVOKED
 from courseware.module_render import get_xqueue_callback_url_prefix
 
 from xmodule.modulestore.django import modulestore
-from instructor_task.models import InstructorTask
-from instructor_task.tasks_helper import PROGRESS
+from instructor_task.models import InstructorTask, PROGRESS
+
 
 log = logging.getLogger(__name__)
 
-# define a "state" used in InstructorTask
-QUEUING = 'QUEUING'
-
 
 class AlreadyRunningError(Exception):
+    """Exception indicating that a background task is already running"""
     pass
 
 
@@ -60,20 +57,8 @@ def _reserve_task(course_id, task_type, task_key, task_input, requester):
     if _task_is_running(course_id, task_type, task_key):
         raise AlreadyRunningError("requested task is already running")
 
-    # create the task_id here, and pass it into celery:
-    task_id = str(uuid4())
-
-    # Create log entry now, so that future requests won't
-    tasklog_args = {'course_id': course_id,
-                    'task_type': task_type,
-                    'task_id': task_id,
-                    'task_key': task_key,
-                    'task_input': json.dumps(task_input),
-                    'task_state': 'QUEUING',
-                    'requester': requester}
-
-    instructor_task = InstructorTask.objects.create(**tasklog_args)
-    return instructor_task
+    # Create log entry now, so that future requests will know it's running.
+    return InstructorTask.create(course_id, task_type, task_key, task_input, requester)
 
 
 def _get_xmodule_instance_args(request):
@@ -128,37 +113,33 @@ def _update_instructor_task(instructor_task, task_result):
 
     # Assume we don't always update the InstructorTask entry if we don't have to:
     entry_needs_saving = False
-    task_progress = None
+    task_output = None
 
     if result_state in [PROGRESS, SUCCESS]:
         # construct a status message directly from the task result's result:
         # it needs to go back with the entry passed in.
         log.info("background task (%s), state %s:  result: %s", task_id, result_state, returned_result)
-        task_progress = returned_result
+        task_output = InstructorTask.create_output_for_success(returned_result)
     elif result_state == FAILURE:
         # on failure, the result's result contains the exception that caused the failure
         exception = returned_result
         traceback = result_traceback if result_traceback is not None else ''
-        task_progress = {'exception': type(exception).__name__, 'message': str(exception.message)}
         log.warning("background task (%s) failed: %s %s", task_id, returned_result, traceback)
-        if result_traceback is not None:
-            # truncate any traceback that goes into the InstructorTask model:
-            task_progress['traceback'] = result_traceback[:700]
-
+        task_output = InstructorTask.create_output_for_failure(exception, result_traceback)
     elif result_state == REVOKED:
         # on revocation, the result's result doesn't contain anything
         # but we cannot rely on the worker thread to set this status,
         # so we set it here.
         entry_needs_saving = True
         log.warning("background task (%s) revoked.", task_id)
-        task_progress = {'message': 'Task revoked before running'}
+        task_output = InstructorTask.create_output_for_revoked()
 
     # save progress and state into the entry, even if it's not being saved:
     # when celery is run in "ALWAYS_EAGER" mode, progress needs to go back
     # with the entry passed in.
     instructor_task.task_state = result_state
-    if task_progress is not None:
-        instructor_task.task_output = json.dumps(task_progress)
+    if task_output is not None:
+        instructor_task.task_output = task_output
 
     if entry_needs_saving:
         instructor_task.save()
