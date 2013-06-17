@@ -27,6 +27,7 @@ from instructor_task.api import (submit_rescore_problem_for_all_students,
                                  submit_delete_problem_state_for_all_students)
 from instructor_task.models import InstructorTask
 from instructor_task.tests.test_base import InstructorTaskTestCase, TEST_COURSE_ORG, TEST_COURSE_NUMBER
+from capa.responsetypes import StudentInputError
 
 
 log = logging.getLogger(__name__)
@@ -34,7 +35,7 @@ log = logging.getLogger(__name__)
 
 class TestIntegrationTask(InstructorTaskTestCase):
     """
-    Base class to provide general methods used for "integration" testing of particular tasks. 
+    Base class to provide general methods used for "integration" testing of particular tasks.
     """
 
     def submit_student_answer(self, username, problem_url_name, responses):
@@ -198,6 +199,36 @@ class TestRescoringTask(TestIntegrationTask):
         # check status returned:
         status = self.get_task_status(instructor_task.task_id)
         self.assertEqual(status['message'], expected_message)
+
+    def test_rescoring_bad_unicode_input(self):
+        """Generate a real failure in rescoring a problem, with an answer including unicode"""
+        # At one point, the student answers that resulted in StudentInputErrors were being
+        # persisted (even though they were not counted as an attempt).  That is not possible
+        # now, so it's harder to generate a test for how such input is handled.
+        problem_url_name = 'H1P1'
+        # set up an option problem -- doesn't matter really what problem it is, but we need
+        # it to have an answer.
+        self.define_option_problem(problem_url_name)
+        self.submit_student_answer('u1', problem_url_name, ['Option 1', 'Option 1'])
+
+        # return an input error as if it were a numerical response, with an embedded unicode character:
+        expected_message = u"Could not interpret '2/3\u03a9' as a number"
+        with patch('capa.capa_problem.LoncapaProblem.rescore_existing_answers') as mock_rescore:
+            mock_rescore.side_effect = StudentInputError(expected_message)
+            instructor_task = self.submit_rescore_all_student_answers('instructor', problem_url_name)
+
+        # check instructor_task returned
+        instructor_task = InstructorTask.objects.get(id=instructor_task.id)
+        self.assertEqual(instructor_task.task_state, 'SUCCESS')
+        self.assertEqual(instructor_task.requester.username, 'instructor')
+        self.assertEqual(instructor_task.task_type, 'rescore_problem')
+        task_input = json.loads(instructor_task.task_input)
+        self.assertFalse('student' in task_input)
+        self.assertEqual(task_input['problem_url'], InstructorTaskTestCase.problem_location(problem_url_name))
+        status = json.loads(instructor_task.task_output)
+        self.assertEqual(status['attempted'], 1)
+        self.assertEqual(status['updated'], 0)
+        self.assertEqual(status['total'], 1)
 
     def test_rescoring_non_problem(self):
         """confirm that a non-problem will not submit"""

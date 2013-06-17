@@ -331,15 +331,15 @@ def rescore_problem_module_state(module_descriptor, student_module, xmodule_inst
     result = instance.rescore_problem()
     if 'success' not in result:
         # don't consider these fatal, but false means that the individual call didn't complete:
-        TASK_LOG.warning("error processing rescore call for course {course}, problem {loc} and student {student}: "
+        TASK_LOG.warning(u"error processing rescore call for course {course}, problem {loc} and student {student}: "
                          "unexpected response {msg}".format(msg=result, course=course_id, loc=module_state_key, student=student))
         return False
     elif result['success'] not in ['correct', 'incorrect']:
-        TASK_LOG.warning("error processing rescore call for course {course}, problem {loc} and student {student}: "
+        TASK_LOG.warning(u"error processing rescore call for course {course}, problem {loc} and student {student}: "
                          "{msg}".format(msg=result['success'], course=course_id, loc=module_state_key, student=student))
         return False
     else:
-        TASK_LOG.debug("successfully processed rescore call for course {course}, problem {loc} and student {student}: "
+        TASK_LOG.debug(u"successfully processed rescore call for course {course}, problem {loc} and student {student}: "
                        "{msg}".format(msg=result['success'], course=course_id, loc=module_state_key, student=student))
         return True
 

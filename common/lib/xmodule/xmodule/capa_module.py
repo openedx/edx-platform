@@ -852,14 +852,14 @@ class CapaModule(CapaFields, XModule):
             log.warning("Input error in capa_module:problem_rescore", exc_info=True)
             event_info['failure'] = 'input_error'
             self.system.track_function('problem_rescore_fail', event_info)
-            return {'success': "Error: {0}".format(inst.message)}
+            return {'success': u"Error: {0}".format(inst.message)}
 
         except Exception as err:
             event_info['failure'] = 'unexpected'
             self.system.track_function('problem_rescore_fail', event_info)
             if self.system.DEBUG:
-                msg = "Error checking problem: " + str(err)
-                msg += '\nTraceback:\n' + traceback.format_exc()
+                msg = u"Error checking problem: {0}".format(err.message)
+                msg += u'\nTraceback:\n' + traceback.format_exc()
                 return {'success': msg}
             raise
 
