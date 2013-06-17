@@ -172,7 +172,7 @@ def open_new_unit(step):
 
 
 def type_in_codemirror(index, text):
-    world.css_find(".CodeMirror")[index].click()
+    world.css_click(".CodeMirror", index=index)
     g = world.css_find("div.CodeMirror.CodeMirror-focused > div > textarea")
     if world.is_mac():
         g._element.send_keys(Keys.COMMAND + 'a')

@@ -154,8 +154,7 @@ def cancel_does_not_save_changes(step):
 @step('I have created a LaTeX Problem')
 def create_latex_problem(step):
     world.click_new_component_button(step, '.large-problem-icon')
-    # Go to advanced tab (waiting for the tab to be visible)
-    world.css_find('#ui-id-2')
+    # Go to advanced tab.
     world.css_click('#ui-id-2')
     world.click_component_from_menu("i4x://edx/templates/problem/Problem_Written_in_LaTeX", '.xmodule_CapaModule')
 
@@ -164,8 +163,6 @@ def create_latex_problem(step):
 def edit_latex_source(step):
     world.css_click('a.edit-button')
     world.css_find('.launch-latex-compiler').find_by_css('a').click()
-    # Without the wait, the second code mirror is not yet clickable.
-    world.wait(1)
     type_in_codemirror(1, "hi")
     world.css_click('.hls-compile')
 
@@ -182,7 +179,6 @@ def high_level_source_persisted(step):
 def high_level_source_in_editor(step):
     world.css_click('a.edit-button')
     world.css_find('.launch-latex-compiler').find_by_css('a').click()
-    world.wait(2)
     assert_equal('hi', world.css_find('.source-edit-box').value)
 
 

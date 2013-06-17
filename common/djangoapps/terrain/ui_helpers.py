@@ -58,20 +58,28 @@ def css_find(css, wait_time=5):
 
 
 @world.absorb
-def css_click(css_selector):
+def css_click(css_selector, index=0, attempts=5):
     """
     Perform a click on a CSS selector, retrying if it initially fails
+    This function will return if the click worked (since it is try/excepting all errors)
     """
     assert is_css_present(css_selector)
-    try:
-        world.browser.find_by_css(css_selector).click()
-
-    except WebDriverException:
-        # Occassionally, MathJax or other JavaScript can cover up
-        # an element  temporarily.
-        # If this happens, wait a second, then try again
-        world.wait(1)
-        world.browser.find_by_css(css_selector).click()
+    attempt = 0
+    result = False
+    while attempt < attempts:
+        try:
+            world.css_find(css_selector)[index].click()
+            result = True
+            break
+        except WebDriverException:
+            # Occasionally, MathJax or other JavaScript can cover up
+            # an element temporarily.
+            # If this happens, wait a second, then try again
+            world.wait(1)
+            attempt += 1
+        except:
+            attempt += 1
+    return result
 
 
 @world.absorb
