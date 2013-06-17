@@ -52,6 +52,16 @@ describe 'VideoAlpha HTML5Video', ->
     it 'check if click event is handled on the player', ->
         expect(@videoEl).toHandle 'click'
 
+  # NOTE: According to
+  #
+  # https://github.com/ariya/phantomjs/wiki/Supported-Web-Standards#unsupported-features
+  #
+  # Video and Audio (due to the nature of PhantomJS) are not supported. After discussion
+  # with William Daly, some tests are disabled (Jenkins uses phantomjs for running tests
+  # and those tests fail).
+  #
+  # During code review, please enable the test below (change "xdescribe" to "describe"
+  # to enable the test).
   xdescribe 'events:', ->
 
     beforeEach ->
@@ -201,6 +211,16 @@ describe 'VideoAlpha HTML5Video', ->
           jasmine.fireEvent @videoEl, "timeupdate"
           expect(@player.end).toBe @videoEl.duration
 
+  # NOTE: According to
+  #
+  # https://github.com/ariya/phantomjs/wiki/Supported-Web-Standards#unsupported-features
+  #
+  # Video and Audio (due to the nature of PhantomJS) are not supported. After discussion
+  # with William Daly, some tests are disabled (Jenkins uses phantomjs for running tests
+  # and those tests fail).
+  #
+  # During code review, please enable the test below (change "xdescribe" to "describe"
+  # to enable the test).
   xdescribe 'methods:', ->
 
     beforeEach ->

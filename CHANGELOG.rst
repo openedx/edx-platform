@@ -13,8 +13,12 @@ instance, Boolean, Integer, String), but also allow them to hold either the
 typed value, or a String that can be converted to their typed value. For example,
 an Integer can contain 3 or '3'. This changed an update to the xblock library.
 
+<<<<<<< HEAD
 LMS: Courses whose id matches a regex in the COURSES_WITH_UNSAFE_CODE Django
 setting now run entirely outside the Python sandbox.
+=======
+Blades: Added tests for Video Alpha player.
+>>>>>>> 812be7a... Added comment about enabling some Video Alpha tests when testing locally. Updated CHANGELOG.
 
 Blades: Video Alpha bug fix for speed changing to 1.0 in Firefox.
 
