@@ -28,12 +28,19 @@
 
 .searchbox_submit {
 	border: 0;
+	background-image: url("../images/search-icon.svg");
 	background-color: transparent;
+	background-size: cover;
 	position: absolute;
 	top: 4px;
 	left: 225px;
 	width:25px;
 	height:25px;
+}
+
+.searchbox_submit:hover {
+	cursor:pointer;
+	cursor: hand;
 }
 
 .results_snippet{

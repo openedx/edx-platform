@@ -1,7 +1,6 @@
 from django.http import HttpResponse, Http404
-from django.template import Context, RequestContext
 from django.core.context_processors import csrf
-from django.template.loader import render_to_string
+from mitxmako.shortcuts import render_to_string
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 import requests
@@ -18,7 +17,7 @@ def search(request):
     if request.GET:
         results_string = find(request)
         context.update({"old_query": request.GET['s']})
-    search_bar = render_to_string("search.html", Context(context))
+    search_bar = render_to_string("search.html", context)
     return HttpResponse(search_bar + results_string)
 
 
@@ -46,7 +45,7 @@ def find(request, database="http://127.0.0.1:9200",
     correction = spell_check(query)
     results_pages = Paginator(data, results_per_page)
     context.update({"spelling_correction": correction})
-    return render_to_string("search_templates/results.html", context, context_instance=RequestContext(request))
+    return render_to_string("search_templates/results.html", context)
 
 
 def query_reduction(query, stopwords):
@@ -63,6 +62,7 @@ def proper_page(page, data, results_per_page=15):
     except EmptyPage:
         correct_page = pages.page(pages.num_pages)
     return correct_page
+
 
 def match(words):
     contained = lambda words: (words[0] in words[1]) or (words[1] in words[0])

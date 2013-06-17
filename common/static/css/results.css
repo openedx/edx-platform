@@ -3,6 +3,11 @@
 	font-family: "Open Sans", "Arial";
 	font-size: 14px;
 	font-weight: 500;
+	padding-left: 10%;
+}
+
+.result_wrapper{
+	width:50%;
 }
 
 .highlight{
