@@ -6,7 +6,7 @@ from xblock.core import ModelType
 import datetime
 import dateutil.parser
 
-from django.utils.timezone import UTC
+from pytz import UTC
 
 log = logging.getLogger(__name__)
 
@@ -15,6 +15,10 @@ class Date(ModelType):
     '''
     Date fields know how to parse and produce json (iso) compatible formats. Converts to tz aware datetimes.
     '''
+    # See note below about not defaulting these
+    CURRENT_YEAR = datetime.datetime.now(UTC).year
+    DEFAULT_DATE0 = datetime.datetime(CURRENT_YEAR, 1, 1, tzinfo=UTC)
+    DEFAULT_DATE1 = datetime.datetime(CURRENT_YEAR, 2, 2, tzinfo=UTC)
     def from_json(self, field):
         """
         Parse an optional metadata key containing a time: if present, complain
@@ -26,14 +30,21 @@ class Date(ModelType):
         elif field is "":
             return None
         elif isinstance(field, basestring):
-            result = dateutil.parser.parse(field)
+            # It's not trivial to replace dateutil b/c parsing timezones as Z, +03:30, -400 is hard in python
+            # however, we don't want dateutil to default the month or day (but some tests at least expect
+            # us to default year); so, we'll see if dateutil uses the defaults for these the hard way
+            result = dateutil.parser.parse(field, default=self.DEFAULT_DATE0)
+            result_other = dateutil.parser.parse(field, default=self.DEFAULT_DATE1)
+            if result != result_other:
+                log.warning("Field {0} is missing month or day".format(self._name, field))
+                return None
             if result.tzinfo is None:
-                result = result.replace(tzinfo=UTC())
+                result = result.replace(tzinfo=UTC)
             return result
         elif isinstance(field, (int, long, float)):
-            return datetime.datetime.fromtimestamp(field / 1000, UTC())
+            return datetime.datetime.fromtimestamp(field / 1000, UTC)
         elif isinstance(field, time.struct_time):
-            return datetime.datetime.fromtimestamp(time.mktime(field), UTC())
+            return datetime.datetime.fromtimestamp(time.mktime(field), UTC)
         elif isinstance(field, datetime.datetime):
             return field
         else:
