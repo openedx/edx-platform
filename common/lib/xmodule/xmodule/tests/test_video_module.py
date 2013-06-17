@@ -6,9 +6,9 @@ from .test_import import DummySystem
 
 
 class VideoDescriptorImportTestCase(unittest.TestCase):
-    '''
+    """
     Make sure that VideoDescriptor can import an old XML-based video correctly.
-    '''
+    """
 
     def test_from_xml(self):
         module_system = DummySystem(load_error_modules=True)
@@ -34,10 +34,10 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
         self.assertEquals(output.source, 'http://www.example.com/source.mp4')
 
     def test_from_xml_missing_attributes(self):
-        '''
+        """
         Ensure that attributes have the right values if they aren't
         explicitly set in XML.
-        '''
+        """
         module_system = DummySystem(load_error_modules=True)
         xml_data = '''
             <video display_name="Test Video"
@@ -59,9 +59,9 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
         self.assertEquals(output.source, 'http://www.example.com/source.mp4')
 
     def test_from_xml_no_attributes(self):
-        '''
+        """
         Make sure settings are correct if none are explicitly set in XML.
-        '''
+        """
         module_system = DummySystem(load_error_modules=True)
         xml_data = '<video></video>'
         output = VideoDescriptor.from_xml(xml_data, module_system)

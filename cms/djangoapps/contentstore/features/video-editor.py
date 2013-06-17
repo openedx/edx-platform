@@ -14,3 +14,10 @@ def i_see_the_correct_settings_and_values(step):
                                       ['Speed: .75x', '', False],
                                       ['Speed: 1.25x', '', False],
                                       ['Speed: 1.5x', '', False]])
+
+
+@step('I have set "show captions" to (.*)')
+def set_show_captions(step, setting):
+    world.css_click('a.edit-button')
+    world.browser.select('Show Captions', setting)
+    world.css_click('a.save-button')

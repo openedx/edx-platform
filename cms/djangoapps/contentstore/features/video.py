@@ -31,20 +31,3 @@ def hide_or_show_captions(step, shown):
         button = world.css_find(button_css)
         button.mouse_out()
         world.css_click(button_css)
-
-
-@step('when I view the video it (.*) show the captions')
-def shows_captions(step, show_captions):
-    # Prevent cookies from overriding course settings
-    world.browser.cookies.delete('hide_captions')
-    if show_captions == 'does not':
-        assert world.css_find('.video')[0].has_class('closed')
-    else:
-        assert world.is_css_not_present('.video.closed')
-
-
-@step('I have set "show captions" to (.*)')
-def set_show_captions(step, setting):
-    world.css_click('a.edit-button')
-    world.browser.select('Show Captions', setting)
-    world.css_click('a.save-button')
