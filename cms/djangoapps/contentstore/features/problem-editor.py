@@ -161,8 +161,7 @@ def create_latex_problem(step):
 
 @step('I edit and compile the High Level Source')
 def edit_latex_source(step):
-    world.css_click('a.edit-button')
-    world.css_find('.launch-latex-compiler').find_by_css('a').click()
+    open_high_level_source()
     type_in_codemirror(1, "hi")
     world.css_click('.hls-compile')
 
@@ -177,8 +176,7 @@ def high_level_source_persisted(step):
 
 @step('I view the High Level Source I see my changes')
 def high_level_source_in_editor(step):
-    world.css_click('a.edit-button')
-    world.css_find('.launch-latex-compiler').find_by_css('a').click()
+    open_high_level_source()
     assert_equal('hi', world.css_find('.source-edit-box').value)
 
 
@@ -210,3 +208,8 @@ def verify_unset_display_name():
 
 def set_weight(weight):
     world.get_setting_entry(PROBLEM_WEIGHT).find_by_css('.setting-input')[0].fill(weight)
+
+
+def open_high_level_source():
+    world.css_click('a.edit-button')
+    world.css_click('.launch-latex-compiler > a')
