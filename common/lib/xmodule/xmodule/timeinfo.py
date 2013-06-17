@@ -1,5 +1,5 @@
 import logging
-from xmodule.fields import Date
+from xmodule.fields import Timedelta
 log = logging.getLogger(__name__)
 
 class TimeInfo(object):
@@ -13,7 +13,7 @@ class TimeInfo(object):
         self.close_date - the real due date
 
     """
-    _date_standin = Date()
+    _delta_standin = Timedelta()
     def __init__(self, due_date, grace_period_string):
         if due_date is not None:
             self.display_due_date = due_date
@@ -23,7 +23,7 @@ class TimeInfo(object):
 
         if grace_period_string is not None and self.display_due_date:
             try:
-                self.grace_period = self._date_standin.from_json(grace_period_string)
+                self.grace_period = TimeInfo._delta_standin.from_json(grace_period_string)
                 self.close_date = self.display_due_date + self.grace_period
             except:
                 log.error("Error parsing the grace period {0}".format(grace_period_string))

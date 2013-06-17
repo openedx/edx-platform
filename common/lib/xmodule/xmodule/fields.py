@@ -36,7 +36,7 @@ class Date(ModelType):
             result = dateutil.parser.parse(field, default=self.DEFAULT_DATE0)
             result_other = dateutil.parser.parse(field, default=self.DEFAULT_DATE1)
             if result != result_other:
-                log.warning("Field {0} is missing year, month, or day".format(self._name, field))
+                log.warning("Field {0} is missing month or day".format(self._name, field))
                 return None
             if result.tzinfo is None:
                 result = result.replace(tzinfo=UTC)
