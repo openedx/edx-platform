@@ -132,12 +132,12 @@ describe "CMS.Views.ListTextbooks", ->
         @collection = new CMS.Collections.TextbookSet
         @view = new CMS.Views.ListTextbooks({collection: @collection})
         @view.render()
-        @showSpies.constructor.reset()
-        @editSpies.constructor.reset()
 
     it "should render the empty template if there are no textbooks", ->
         expect(@view.$el).toContainText("You haven't added any textbooks to this course yet")
         expect(@view.$el).toContain(".new-button")
+        expect(@showSpies.constructor).not.toHaveBeenCalled()
+        expect(@editSpies.constructor).not.toHaveBeenCalled()
 
     it "should render TextbookShow views by default if no textbook is being edited", ->
         # add three empty textbooks to the collection
@@ -175,6 +175,10 @@ describe "CMS.Views.ListTextbooks", ->
         expect(@editSpies.constructor).toHaveBeenCalledWith({model: editing})
 
     it "should add a new textbook when the new-button is clicked", ->
+        # reset spies
+        @showSpies.constructor.reset()
+        @editSpies.constructor.reset()
+        # test
         @view.$(".new-button").click()
 
         expect(@collection.length).toEqual(1)
