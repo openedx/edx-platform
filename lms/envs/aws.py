@@ -172,17 +172,13 @@ for name, value in ENV_TOKENS.get("CODE_JAIL", {}).items():
 
 COURSES_WITH_UNSAFE_CODE = ENV_TOKENS.get("COURSES_WITH_UNSAFE_CODE", [])
 
-############### Mixed Related(Secure/Not-Secure) Items ##########
-# If segment.io key specified, load it and turn on segment IO if the feature flag is set
-SEGMENT_IO_LMS_KEY = AUTH_TOKENS.get('SEGMENT_IO_LMS_KEY')
-if SEGMENT_IO_LMS_KEY:
-    MITX_FEATURES['SEGMENT_IO_LMS'] = ENV_TOKENS.get('SEGMENT_IO_LMS', False)
-
 ############################## SECURE AUTH ITEMS ###############
 # Secret things: passwords, access keys, etc.
 
 with open(ENV_ROOT / CONFIG_PREFIX + "auth.json") as auth_file:
     AUTH_TOKENS = json.load(auth_file)
+
+SEGMENT_IO_LMS_KEY = AUTH_TOKENS.get('SEGMENT_IO_LMS_KEY', None)
 
 SECRET_KEY = AUTH_TOKENS['SECRET_KEY']
 
