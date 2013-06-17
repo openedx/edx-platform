@@ -1,6 +1,8 @@
 # Instructor Dashboard Tab Manager
 
 log = -> console.log.apply console, arguments
+plantTimeout = (ms, cb) -> setTimeout cb, ms
+
 
 CSS_INSTRUCTOR_CONTENT = 'instructor-dashboard-content-2'
 CSS_ACTIVE_SECTION = 'active-section'
@@ -57,9 +59,9 @@ setup_instructor_dashboard = (idash_content) =>
 # call setup handlers for each section
 setup_instructor_dashboard_sections = (idash_content) ->
   log "setting up instructor dashboard sections"
-  setup_section_data_download idash_content.find(".#{CSS_IDASH_SECTION}#data_download")
-  setup_section_membership    idash_content.find(".#{CSS_IDASH_SECTION}#membership")
-  setup_section_analytics     idash_content.find(".#{CSS_IDASH_SECTION}#analytics")
+  plantTimeout 0, -> setup_section_data_download idash_content.find(".#{CSS_IDASH_SECTION}#data_download")
+  plantTimeout 0, -> setup_section_membership    idash_content.find(".#{CSS_IDASH_SECTION}#membership")
+  plantTimeout 0, -> window.InstructorDashboard.sections.Analytics idash_content.find(".#{CSS_IDASH_SECTION}#analytics")
 
 
 # setup the data download section
@@ -264,89 +266,3 @@ setup_section_data_download = (section) ->
     $.getJSON url, (data) ->
       reset_display()
       display_text.html data['grading_config_summary']
-
-
-# setup the analytics section
-setup_section_analytics = (section) ->
-  log "setting up instructor dashboard section - analytics"
-
-  display = section.find('.distribution-display')
-  display_text = display.find('.distribution-display-text')
-  display_graph = display.find('.distribution-display-graph')
-  display_table = display.find('.distribution-display-table')
-
-  reset_display = ->
-    display_text.empty()
-    display_graph.empty()
-    display_table.empty()
-
-  distribution_select = section.find('select#distributions')
-
-  # ask for available distributions
-  $.getJSON distribution_select.data('endpoint'), features: JSON.stringify([]), (data) ->
-      distribution_select.find('option').eq(0).text "-- Select distribution"
-
-      for feature in data.available_features
-        opt = $ '<option/>',
-          text: data.display_names[feature]
-          data:
-            feature: feature
-
-        distribution_select.append opt
-
-      distribution_select.change ->
-        opt = $(this).children('option:selected')
-        log "distribution selected: #{opt.data 'feature'}"
-        feature = opt.data 'feature'
-        reset_display()
-        $.getJSON distribution_select.data('endpoint'), features: JSON.stringify([feature]), (data) ->
-          feature_res = data.feature_results[feature]
-          # feature response format: {'error': 'optional error string', 'type': 'SOME_TYPE', 'data': [stuff]}
-          if feature_res.error
-            console.warn(feature_res.error)
-            display_text.text 'Error fetching data'
-          else
-            if feature_res.type is 'EASY_CHOICE'
-              # display_text.text JSON.stringify(feature_res.data)
-              log feature_res.data
-
-              # setup SlickGrid
-              options =
-                enableCellNavigation: true
-                enableColumnReorder: false
-
-              columns = [
-                id: feature
-                field: feature
-                name: feature
-              ,
-                id: 'count'
-                field: 'count'
-                name: 'Count'
-              ]
-
-              grid_data = _.map feature_res.data, (value, key) ->
-                datapoint = {}
-                datapoint[feature] = key
-                datapoint['count'] = value
-                datapoint
-
-              log grid_data
-
-              table_placeholder = $ '<div/>', class: 'slickgrid'
-              display_table.append table_placeholder
-              grid = new Slick.Grid(table_placeholder, grid_data, columns, options)
-              grid.autosizeColumns()
-            else if feature is 'year_of_birth'
-              graph_placeholder = $ '<div/>', class: 'year-of-birth'
-              display_graph.append graph_placeholder
-
-              graph_data = _.map feature_res.data, (value, key) -> [parseInt(key), value]
-              log graph_data
-
-              $.plot graph_placeholder, [
-                data: graph_data
-              ]
-            else
-              console.warn("don't know how to show #{feature_res.type}")
-              display_text.text 'Unavailable Metric\n' + JSON.stringify(feature_res)
