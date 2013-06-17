@@ -19,17 +19,8 @@ def search(request):
         context.update({"old_query": request.GET['s']})
     context.update({"previous_content": content})
     search_bar = render_to_string("search_templates/search.html", context)
-<<<<<<< HEAD
-<<<<<<< HEAD
     full_html = render_to_string("search_templates/wrapper.html", {"body": search_bar+results_string})
     return HttpResponse(full_html)
-=======
-    return HttpResponse(search_bar + results_string)
->>>>>>> Refactored some code and added full elasticsearch module test suite
-=======
-    full_html = render_to_string("search_templates/wrapper.html", {"body": search_bar+results_string})
-    return HttpResponse(full_html)
->>>>>>> Made prettier, added requirements, and included main edX page
 
 
 def find(request, database="http://127.0.0.1:9200",
@@ -48,33 +39,13 @@ def find(request, database="http://127.0.0.1:9200",
         uuids = [entry["display_name"] for entry in data]
         transcripts = [entry["searchable_text"] for entry in data]
         snippets = [snippet_generator(transcript, query) for transcript in transcripts]
-<<<<<<< HEAD
-<<<<<<< HEAD
         thumbnails = ["data:image/jpg;base64,"+entry["thumbnail"] for entry in data]
         data = zip(uuids, snippets, thumbnails)
-=======
-        data = zip(uuids, snippets)
->>>>>>> Refactored some code and added full elasticsearch module test suite
     except KeyError:
-<<<<<<< HEAD
         data = [("No results found, please try again", "")]
     if len(data) == 0:
         data = [("No results found, please try again", "")]
-=======
-        data = [("No results found", "Please try again")]
-<<<<<<< HEAD
     context.update({"data": data})
->>>>>>> Integrated module data and improved settings file
-=======
->>>>>>> Refactored some code and added full elasticsearch module test suite
-=======
-        thumbnails = ["data:image/jpg;base64,"+entry["thumbnail"] for entry in data]
-        data = zip(uuids, snippets, thumbnails)
-    except KeyError:
-        data = [("No results found, please try again", "")]
-    if len(data) == 0:
-        data = [("No results found, please try again", "")]
->>>>>>> Made prettier, added requirements, and included main edX page
 
     correction = spell_check(query)
     results_pages = Paginator(data, results_per_page)
@@ -114,21 +85,9 @@ def prev_link(request, paginator):
 
 def search_correction_link(request, term, page="1"):
     if term:
-<<<<<<< HEAD
-<<<<<<< HEAD
         return request.path+"?s="+term+"&page="+page+"&content="+request.GET.get("content", "transcript")
     else:
         return request.path+"?s="+request.GET["s"]+"&page"+page+"&content="+request.GET.get("content", "transcript")
-=======
-        return request.path+"?s="+term+"&page="+page
-    else:
-        return request.path+"?s="+request.GET["s"]+"&page"+page
->>>>>>> Refactored some code and added full elasticsearch module test suite
-=======
-        return request.path+"?s="+term+"&page="+page+"&content="+request.GET.get("content", "transcript")
-    else:
-        return request.path+"?s="+request.GET["s"]+"&page"+page+"&content="+request.GET.get("content", "transcript")
->>>>>>> Made prettier, added requirements, and included main edX page
 
 
 def match(words):
