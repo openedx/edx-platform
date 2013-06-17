@@ -27,6 +27,7 @@ import analytics.csvs
 def enroll_unenroll(request, course_id):
     """
     Enroll or unenroll students by email.
+    Requires staff access.
     """
     course = get_course_with_access(request.user, course_id, 'staff', depth=None)
 
@@ -48,7 +49,8 @@ def enroll_unenroll(request, course_id):
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def access_allow_revoke(request, course_id):
     """
-    Modify staff/instructor access. (instructor available only)
+    Modify staff/instructor access.
+    Requires instructor access.
 
     Query parameters:
     email is the target users email
