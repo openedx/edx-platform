@@ -190,3 +190,82 @@ describe "CMS.Views.ListTextbooks", ->
         expect(@view.$el).not.toContain(@showSpies.$el)
 
 
+describe "CMS.Views.UploadDialog", ->
+    tpl = readFixtures("upload-dialog.underscore")
+
+    beforeEach ->
+        setFixtures($("<script>", {id: "upload-dialog-tpl", type: "text/template"}).text(tpl))
+        window.UPLOAD_ASSET_CALLBACK_URL = "/upload"
+        @requests = requests = []
+        @xhr = sinon.useFakeXMLHttpRequest()
+        @xhr.onCreate = (xhr) -> requests.push(xhr)
+
+        @model = new CMS.Models.FileUpload()
+        @chapter = new CMS.Models.Chapter()
+        @view = new CMS.Views.UploadDialog({model: @model, chapter: @chapter})
+        spyOn(@view, 'remove').andCallThrough()
+
+        # create mock file input, so that we aren't subject to browser restrictions
+        @mockFiles = []
+        mockFileInput = jasmine.createSpy('mockFileInput')
+        mockFileInput.files = @mockFiles
+        jqMockFileInput = jasmine.createSpyObj('jqMockFileInput', ['get', 'replaceWith'])
+        jqMockFileInput.get.andReturn(mockFileInput)
+        realMethod = @view.$
+        spyOn(@view, "$").andCallFake (selector) ->
+            if selector == "input[type=file]"
+                jqMockFileInput
+            else
+                realMethod.apply(this, arguments)
+
+    afterEach ->
+        delete window.UPLOAD_ASSET_CALLBACK_URL
+        @xhr.restore()
+
+    it "should be shown by default", ->
+        expect(@view.options.shown).toBeTruthy()
+
+    it "should render without a file selected", ->
+        @view.render()
+        expect(@view.$el).toContain("input[type=file]")
+        expect(@view.$(".action-upload")).toBeDisabled()
+
+    it "should render with a file selected", ->
+        @mockFiles.push({name: "fake.pdf"})
+        @view.render()
+        expect(@view.$el).toContain("input[type=file]")
+        expect(@view.$(".action-upload")).not.toBeDisabled()
+
+    it "adds body class on show()", ->
+        @view.show()
+        expect(@view.options.shown).toBeTruthy()
+        # can't test: this blows up the spec runner
+        # expect($("body")).toHaveClass("dialog-is-shown")
+
+    it "removes body class on hide()", ->
+        @view.hide()
+        expect(@view.options.shown).toBeFalsy()
+        # can't test: this blows up the spec runner
+        # expect($("body")).not.toHaveClass("dialog-is-shown")
+
+    it "can upload correctly", ->
+        @view.upload()
+        expect(@model.get("uploading")).toBeTruthy()
+        expect(@requests.length).toEqual(1)
+        request = @requests[0]
+        expect(request.url).toEqual(UPLOAD_ASSET_CALLBACK_URL)
+        expect(request.method).toEqual("POST")
+
+        request.respond(200, {"Content-Type": "application/json"},
+                '{"displayname": "starfish", "url": "/uploaded/starfish.pdf"}')
+        expect(@model.get("uploading")).toBeFalsy()
+        expect(@chapter.get("name")).toEqual("starfish")
+        expect(@chapter.get("asset_path")).toEqual("/uploaded/starfish.pdf")
+        expect(@view.remove).toHaveBeenCalled()
+
+    it "can handle upload errors", ->
+        @view.upload()
+        @requests[0].respond(500)
+        expect(@model.get("title")).toMatch(/error/)
+        expect(@view.remove).not.toHaveBeenCalled()
+
