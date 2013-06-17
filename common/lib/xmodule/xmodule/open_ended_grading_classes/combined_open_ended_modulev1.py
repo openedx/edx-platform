@@ -19,18 +19,18 @@ log = logging.getLogger("mitx.courseware")
 # attempts specified in xml definition overrides this.
 MAX_ATTEMPTS = 1
 
-#The highest score allowed for the overall xmodule and for each rubric point
+# The highest score allowed for the overall xmodule and for each rubric point
 MAX_SCORE_ALLOWED = 50
 
-#If true, default behavior is to score module as a practice problem.  Otherwise, no grade at all is shown in progress
-#Metadata overrides this.
+# If true, default behavior is to score module as a practice problem.  Otherwise, no grade at all is shown in progress
+# Metadata overrides this.
 IS_SCORED = False
 
-#If true, then default behavior is to require a file upload or pasted link from a student for this problem.
-#Metadata overrides this.
+# If true, then default behavior is to require a file upload or pasted link from a student for this problem.
+# Metadata overrides this.
 ACCEPT_FILE_UPLOAD = False
 
-#Contains all reasonable bool and case combinations of True
+# Contains all reasonable bool and case combinations of True
 TRUE_DICT = ["True", True, "TRUE", "true"]
 
 HUMAN_TASK_TYPE = {
@@ -38,8 +38,8 @@ HUMAN_TASK_TYPE = {
     'openended': "edX Assessment",
 }
 
-#Default value that controls whether or not to skip basic spelling checks in the controller
-#Metadata overrides this
+# Default value that controls whether or not to skip basic spelling checks in the controller
+# Metadata overrides this
 SKIP_BASIC_CHECKS = False
 
 
@@ -74,7 +74,7 @@ class CombinedOpenEndedV1Module():
     INTERMEDIATE_DONE = 'intermediate_done'
     DONE = 'done'
 
-    #Where the templates live for this problem
+    # Where the templates live for this problem
     TEMPLATE_DIR = "combinedopenended"
 
     def __init__(self, system, location, definition, descriptor,
@@ -118,21 +118,21 @@ class CombinedOpenEndedV1Module():
         self.instance_state = instance_state
         self.display_name = instance_state.get('display_name', "Open Ended")
 
-        #We need to set the location here so the child modules can use it
+        # We need to set the location here so the child modules can use it
         system.set('location', location)
         self.system = system
 
-        #Tells the system which xml definition to load
+        # Tells the system which xml definition to load
         self.current_task_number = instance_state.get('current_task_number', 0)
-        #This loads the states of the individual children
+        # This loads the states of the individual children
         self.task_states = instance_state.get('task_states', [])
-        #Overall state of the combined open ended module
+        # Overall state of the combined open ended module
         self.state = instance_state.get('state', self.INITIAL)
 
         self.student_attempts = instance_state.get('student_attempts', 0)
         self.weight = instance_state.get('weight', 1)
 
-        #Allow reset is true if student has failed the criteria to move to the next child task
+        # Allow reset is true if student has failed the criteria to move to the next child task
         self.ready_to_reset = instance_state.get('ready_to_reset', False)
         self.attempts = self.instance_state.get('attempts', MAX_ATTEMPTS)
         self.is_scored = self.instance_state.get('is_graded', IS_SCORED) in TRUE_DICT
@@ -153,7 +153,7 @@ class CombinedOpenEndedV1Module():
         rubric_string = stringify_children(definition['rubric'])
         self._max_score = self.rubric_renderer.check_if_rubric_is_parseable(rubric_string, location, MAX_SCORE_ALLOWED)
 
-        #Static data is passed to the child modules to render
+        # Static data is passed to the child modules to render
         self.static_data = {
             'max_score': self._max_score,
             'max_attempts': self.attempts,
@@ -243,11 +243,11 @@ class CombinedOpenEndedV1Module():
 
         self.current_task_descriptor = children['descriptors'][current_task_type](self.system)
 
-        #This is the xml object created from the xml definition of the current task
+        # This is the xml object created from the xml definition of the current task
         etree_xml = etree.fromstring(self.current_task_xml)
 
-        #This sends the etree_xml object through the descriptor module of the current task, and
-        #returns the xml parsed by the descriptor
+        # This sends the etree_xml object through the descriptor module of the current task, and
+        # returns the xml parsed by the descriptor
         self.current_task_parsed_xml = self.current_task_descriptor.definition_from_xml(etree_xml, self.system)
         if current_task_state is None and self.current_task_number == 0:
             self.current_task = child_task_module(self.system, self.location,
@@ -293,8 +293,9 @@ class CombinedOpenEndedV1Module():
             if self.current_task_number > 0:
                 last_response_data = self.get_last_response(self.current_task_number - 1)
                 current_response_data = self.get_current_attributes(self.current_task_number)
+
                 if (current_response_data['min_score_to_attempt'] > last_response_data['score']
-                        or current_response_data['max_score_to_attempt'] < last_response_data['score']):
+                    or current_response_data['max_score_to_attempt'] < last_response_data['score']):
                     self.state = self.DONE
                     self.ready_to_reset = True
 
@@ -307,7 +308,7 @@ class CombinedOpenEndedV1Module():
         Output: A dictionary that can be rendered into the combined open ended template.
         """
         task_html = self.get_html_base()
-        #set context variables and render template
+        # set context variables and render template
 
         context = {
             'items': [{'content': task_html}],
@@ -499,7 +500,6 @@ class CombinedOpenEndedV1Module():
         """
         changed = self.update_task_states()
         if changed:
-            #return_html=self.get_html()
             pass
         return return_html
 
@@ -730,15 +730,15 @@ class CombinedOpenEndedV1Module():
         max_score = None
         score = None
         if self.is_scored and self.weight is not None:
-            #Finds the maximum score of all student attempts and keeps it.
+            # Finds the maximum score of all student attempts and keeps it.
             score_mat = []
             for i in xrange(0, len(self.task_states)):
-                #For each task, extract all student scores on that task (each attempt for each task)
+                # For each task, extract all student scores on that task (each attempt for each task)
                 last_response = self.get_last_response(i)
                 max_score = last_response.get('max_score', None)
                 score = last_response.get('all_scores', None)
                 if score is not None:
-                    #Convert none scores and weight scores properly
+                    # Convert none scores and weight scores properly
                     for z in xrange(0, len(score)):
                         if score[z] is None:
                             score[z] = 0
@@ -746,19 +746,19 @@ class CombinedOpenEndedV1Module():
                     score_mat.append(score)
 
             if len(score_mat) > 0:
-                #Currently, assume that the final step is the correct one, and that those are the final scores.
-                #This will change in the future, which is why the machinery above exists to extract all scores on all steps
-                #TODO: better final score handling.
+                # Currently, assume that the final step is the correct one, and that those are the final scores.
+                # This will change in the future, which is why the machinery above exists to extract all scores on all steps
+                # TODO: better final score handling.
                 scores = score_mat[-1]
                 score = max(scores)
             else:
                 score = 0
 
             if max_score is not None:
-                #Weight the max score if it is not None
+                # Weight the max score if it is not None
                 max_score *= float(self.weight)
             else:
-                #Without a max_score, we cannot have a score!
+                # Without a max_score, we cannot have a score!
                 score = None
 
         score_dict = {
@@ -833,7 +833,7 @@ class CombinedOpenEndedV1Descriptor():
         expected_children = ['task', 'rubric', 'prompt']
         for child in expected_children:
             if len(xml_object.xpath(child)) == 0:
-                #This is a staff_facing_error
+                # This is a staff_facing_error
                 raise ValueError(
                     "Combined Open Ended definition must include at least one '{0}' tag. Contact the learning sciences group for assistance. {1}".format(
                         child, xml_object))
@@ -847,6 +847,7 @@ class CombinedOpenEndedV1Descriptor():
             return xml_object.xpath(k)[0]
 
         return {'task_xml': parse_task('task'), 'prompt': parse('prompt'), 'rubric': parse('rubric')}
+
 
     def definition_to_xml(self, resource_fs):
         '''Return an xml element representing this definition.'''
