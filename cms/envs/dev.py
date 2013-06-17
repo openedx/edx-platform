@@ -22,7 +22,7 @@ modulestore_options = {
     'db': 'xmodule',
     'collection': 'modulestore',
     'fs_root': GITHUB_REPO_ROOT,
-    'render_template': 'mitxmako.shortcuts.render_to_string',
+    'render_template': 'mitxmako.shortcuts.render_to_string'
 }
 
 MODULESTORE = {
@@ -43,9 +43,14 @@ CONTENTSTORE = {
     'OPTIONS': {
         'host': 'localhost',
         'db': 'xcontent',
+    },
+    # allow for additional options that can be keyed on a name, e.g. 'trashcan'
+    'ADDITIONAL_OPTIONS': {
+        'trashcan': {
+            'bucket': 'trash_fs'
+        }
     }
 }
-
 
 DATABASES = {
     'default': {
@@ -64,7 +69,7 @@ REPOS = {
     },
     'content-mit-6002x': {
         'branch': 'master',
-        #'origin': 'git@github.com:MITx/6002x-fall-2012.git',
+        # 'origin': 'git@github.com:MITx/6002x-fall-2012.git',
         'origin': 'git@github.com:MITx/content-mit-6002x.git',
     },
     '6.00x': {

@@ -94,7 +94,6 @@ class RandomizeDescriptor(RandomizeFields, SequenceDescriptor):
 
     filename_extension = "xml"
 
-    stores_state = True
 
     def definition_to_xml(self, resource_fs):
 

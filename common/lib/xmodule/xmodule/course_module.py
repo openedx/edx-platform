@@ -4,7 +4,6 @@ from math import exp
 from lxml import etree
 from path import path  # NOTE (THK): Only used for detecting presence of syllabus
 import requests
-import time
 from datetime import datetime
 
 import dateutil.parser
@@ -14,11 +13,12 @@ from xmodule.seq_module import SequenceDescriptor, SequenceModule
 from xmodule.timeparse import parse_time
 from xmodule.util.decorators import lazyproperty
 from xmodule.graders import grader_from_conf
-from xmodule.util.date_utils import time_to_datetime
 import json
 
-from xblock.core import Scope, List, String, Object, Boolean
+from xblock.core import Scope, List, String, Dict, Boolean
 from .fields import Date
+from django.utils.timezone import UTC
+from xmodule.util import date_utils
 
 
 log = logging.getLogger(__name__)
@@ -93,7 +93,7 @@ class Textbook(object):
             # see if we already fetched this
             if toc_url in _cached_toc:
                 (table_of_contents, timestamp) = _cached_toc[toc_url]
-                age = datetime.now() - timestamp
+                age = datetime.now(UTC) - timestamp
                 # expire every 10 minutes
                 if age.seconds < 600:
                     return table_of_contents
@@ -154,25 +154,25 @@ class CourseFields(object):
     start = Date(help="Start time when this module is visible", scope=Scope.settings)
     end = Date(help="Date that this class ends", scope=Scope.settings)
     advertised_start = String(help="Date that this course is advertised to start", scope=Scope.settings)
-    grading_policy = Object(help="Grading policy definition for this class", scope=Scope.content)
+    grading_policy = Dict(help="Grading policy definition for this class", scope=Scope.content)
     show_calculator = Boolean(help="Whether to show the calculator in this course", default=False, scope=Scope.settings)
     display_name = String(help="Display name for this module", scope=Scope.settings)
     tabs = List(help="List of tabs to enable in this course", scope=Scope.settings)
     end_of_course_survey_url = String(help="Url for the end-of-course survey", scope=Scope.settings)
     discussion_blackouts = List(help="List of pairs of start/end dates for discussion blackouts", scope=Scope.settings)
-    discussion_topics = Object(
+    discussion_topics = Dict(
         help="Map of topics names to ids",
         scope=Scope.settings
         )
-    testcenter_info = Object(help="Dictionary of Test Center info", scope=Scope.settings)
+    testcenter_info = Dict(help="Dictionary of Test Center info", scope=Scope.settings)
     announcement = Date(help="Date this course is announced", scope=Scope.settings)
-    cohort_config = Object(help="Dictionary defining cohort configuration", scope=Scope.settings)
+    cohort_config = Dict(help="Dictionary defining cohort configuration", scope=Scope.settings)
     is_new = Boolean(help="Whether this course should be flagged as new", scope=Scope.settings)
     no_grade = Boolean(help="True if this course isn't graded", default=False, scope=Scope.settings)
     disable_progress_graph = Boolean(help="True if this course shouldn't display the progress graph", default=False, scope=Scope.settings)
     pdf_textbooks = List(help="List of dictionaries containing pdf_textbook configuration", scope=Scope.settings)
     html_textbooks = List(help="List of dictionaries containing html_textbook configuration", scope=Scope.settings)
-    remote_gradebook = Object(scope=Scope.settings)
+    remote_gradebook = Dict(scope=Scope.settings)
     allow_anonymous = Boolean(scope=Scope.settings, default=True)
     allow_anonymous_to_peers = Boolean(scope=Scope.settings, default=False)
     advanced_modules = List(help="Beta modules used in your course", scope=Scope.settings)
@@ -219,8 +219,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         msg = None
         if self.start is None:
             msg = "Course loaded without a valid start date. id = %s" % self.id
-            # hack it -- start in 1970
-            self.start = time.gmtime(0)
+            self.start = datetime.now(UTC())
             log.critical(msg)
             self.system.error_tracker(msg)
 
@@ -392,7 +391,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
                 textbook_xml_object.set('book_url', textbook.book_url)
 
             xml_object.append(textbook_xml_object)
-        
+
         return xml_object
 
     def has_ended(self):
@@ -403,10 +402,10 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         if self.end is None:
             return False
 
-        return time.gmtime() > self.end
+        return datetime.now(UTC()) > self.end
 
     def has_started(self):
-        return time.gmtime() > self.start
+        return datetime.now(UTC()) > self.start
 
     @property
     def grader(self):
@@ -547,14 +546,16 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
 
         announcement = self.announcement
         if announcement is not None:
-            announcement = time_to_datetime(announcement)
+            announcement = announcement
 
         try:
             start = dateutil.parser.parse(self.advertised_start)
+            if start.tzinfo is None:
+                start = start.replace(tzinfo=UTC())
         except (ValueError, AttributeError):
-            start = time_to_datetime(self.start)
+            start = self.start
 
-        now = datetime.utcnow()
+        now = datetime.now(UTC())
 
         return announcement, start, now
 
@@ -656,7 +657,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         elif self.advertised_start is None and self.start is None:
             return 'TBD'
         else:
-            return time.strftime("%b %d, %Y", self.advertised_start or self.start)
+            return (self.advertised_start or self.start).strftime("%b %d, %Y")
 
     @property
     def end_date_text(self):
@@ -665,7 +666,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
 
         If the course does not have an end date set (course.end is None), an empty string will be returned.
         """
-        return '' if self.end is None else time.strftime("%b %d, %Y", self.end)
+        return '' if self.end is None else self.end.strftime("%b %d, %Y")
 
     @property
     def forum_posts_allowed(self):
@@ -673,7 +674,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
             blackout_periods = [(parse_time(start), parse_time(end))
                                 for start, end
                                 in self.discussion_blackouts]
-            now = time.gmtime()
+            now = datetime.now(UTC())
             for start, end in blackout_periods:
                 if start <= now <= end:
                     return False
@@ -699,7 +700,8 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
             self.last_eligible_appointment_date = self._try_parse_time('Last_Eligible_Appointment_Date')  # or self.first_eligible_appointment_date
             if self.last_eligible_appointment_date is None:
                 raise ValueError("Last appointment date must be specified")
-            self.registration_start_date = self._try_parse_time('Registration_Start_Date') or time.gmtime(0)
+            self.registration_start_date = (self._try_parse_time('Registration_Start_Date') or
+                datetime.utcfromtimestamp(0))
             self.registration_end_date = self._try_parse_time('Registration_End_Date') or self.last_eligible_appointment_date
             # do validation within the exam info:
             if self.registration_start_date > self.registration_end_date:
@@ -725,32 +727,32 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
                 return None
 
         def has_started(self):
-            return time.gmtime() > self.first_eligible_appointment_date
+            return datetime.now(UTC()) > self.first_eligible_appointment_date
 
         def has_ended(self):
-            return time.gmtime() > self.last_eligible_appointment_date
+            return datetime.now(UTC()) > self.last_eligible_appointment_date
 
         def has_started_registration(self):
-            return time.gmtime() > self.registration_start_date
+            return datetime.now(UTC()) > self.registration_start_date
 
         def has_ended_registration(self):
-            return time.gmtime() > self.registration_end_date
+            return datetime.now(UTC()) > self.registration_end_date
 
         def is_registering(self):
-            now = time.gmtime()
+            now = datetime.now(UTC())
             return now >= self.registration_start_date and now <= self.registration_end_date
 
         @property
         def first_eligible_appointment_date_text(self):
-            return time.strftime("%b %d, %Y", self.first_eligible_appointment_date)
+            return self.first_eligible_appointment_date.strftime("%b %d, %Y")
 
         @property
         def last_eligible_appointment_date_text(self):
-            return time.strftime("%b %d, %Y", self.last_eligible_appointment_date)
+            return self.last_eligible_appointment_date.strftime("%b %d, %Y")
 
         @property
         def registration_end_date_text(self):
-            return time.strftime("%b %d, %Y at %H:%M UTC", self.registration_end_date)
+            return date_utils.get_default_time_display(self.registration_end_date)
 
     @property
     def current_test_center_exam(self):

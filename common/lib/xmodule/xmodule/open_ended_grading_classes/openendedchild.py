@@ -16,6 +16,7 @@ from .peer_grading_service import PeerGradingService, MockPeerGradingService
 import controller_query_service
 
 from datetime import datetime
+from django.utils.timezone import UTC
 
 log = logging.getLogger("mitx.courseware")
 
@@ -56,7 +57,7 @@ class OpenEndedChild(object):
     POST_ASSESSMENT = 'post_assessment'
     DONE = 'done'
 
-    #This is used to tell students where they are at in the module
+    # This is used to tell students where they are at in the module
     HUMAN_NAMES = {
         'initial': 'Not started',
         'assessing': 'In progress',
@@ -102,7 +103,7 @@ class OpenEndedChild(object):
         if system.open_ended_grading_interface:
             self.peer_gs = PeerGradingService(system.open_ended_grading_interface, system)
             self.controller_qs = controller_query_service.ControllerQueryService(
-                system.open_ended_grading_interface,system
+                system.open_ended_grading_interface, system
             )
         else:
             self.peer_gs = MockPeerGradingService()
@@ -130,7 +131,7 @@ class OpenEndedChild(object):
         pass
 
     def closed(self):
-        if self.close_date is not None and datetime.utcnow() > self.close_date:
+        if self.close_date is not None and datetime.now(UTC()) > self.close_date:
             return True
         return False
 
@@ -138,13 +139,13 @@ class OpenEndedChild(object):
         if self.closed():
             return True, {
                 'success': False,
-                #This is a student_facing_error
+                # This is a student_facing_error
                 'error': 'The problem close date has passed, and this problem is now closed.'
             }
         elif self.child_attempts > self.max_attempts:
             return True, {
                 'success': False,
-                #This is a student_facing_error
+                # This is a student_facing_error
                 'error': 'You have attempted this problem {0} times.  You are allowed {1} attempts.'.format(
                     self.child_attempts, self.max_attempts
                 )
@@ -272,7 +273,7 @@ class OpenEndedChild(object):
             try:
                 return Progress(int(self.get_score()['score']), int(self._max_score))
             except Exception as err:
-                #This is a dev_facing_error
+                # This is a dev_facing_error
                 log.exception("Got bad progress from open ended child module. Max Score: {0}".format(self._max_score))
                 return None
         return None
@@ -281,10 +282,10 @@ class OpenEndedChild(object):
         """
         return dict out-of-sync error message, and also log.
         """
-        #This is a dev_facing_error
+        # This is a dev_facing_error
         log.warning("Open ended child state out sync. state: %r, get: %r. %s",
                     self.child_state, get, msg)
-        #This is a student_facing_error
+        # This is a student_facing_error
         return {'success': False,
                 'error': 'The problem state got out-of-sync.  Please try reloading the page.'}
 
@@ -391,7 +392,7 @@ class OpenEndedChild(object):
         """
         overall_success = False
         if not self.accept_file_upload:
-            #If the question does not accept file uploads, do not do anything
+            # If the question does not accept file uploads, do not do anything
             return True, get_data
 
         has_file_to_upload, uploaded_to_s3, image_ok, image_tag = self.check_for_image_and_upload(get_data)
@@ -399,19 +400,19 @@ class OpenEndedChild(object):
             get_data['student_answer'] += image_tag
             overall_success = True
         elif has_file_to_upload and not uploaded_to_s3 and image_ok:
-            #In this case, an image was submitted by the student, but the image could not be uploaded to S3.  Likely
-            #a config issue (development vs deployment).  For now, just treat this as a "success"
+            # In this case, an image was submitted by the student, but the image could not be uploaded to S3.  Likely
+            # a config issue (development vs deployment).  For now, just treat this as a "success"
             log.exception("Student AJAX post to combined open ended xmodule indicated that it contained an image, "
                           "but the image was not able to be uploaded to S3.  This could indicate a config"
                           "issue with this deployment, but it could also indicate a problem with S3 or with the"
                           "student image itself.")
             overall_success = True
         elif not has_file_to_upload:
-            #If there is no file to upload, probably the student has embedded the link in the answer text
+            # If there is no file to upload, probably the student has embedded the link in the answer text
             success, get_data['student_answer'] = self.check_for_url_in_text(get_data['student_answer'])
             overall_success = success
 
-        #log.debug("Has file: {0} Uploaded: {1} Image Ok: {2}".format(has_file_to_upload, uploaded_to_s3, image_ok))
+        # log.debug("Has file: {0} Uploaded: {1} Image Ok: {2}".format(has_file_to_upload, uploaded_to_s3, image_ok))
 
         return overall_success, get_data
 
@@ -441,7 +442,7 @@ class OpenEndedChild(object):
         success = False
         allowed_to_submit = True
         response = {}
-        #This is a student_facing_error
+        # This is a student_facing_error
         error_string = ("You need to peer grade {0} more in order to make another submission.  "
                         "You have graded {1}, and {2} are required.  You have made {3} successful peer grading submissions.")
         try:
@@ -451,17 +452,17 @@ class OpenEndedChild(object):
             student_sub_count = response['student_sub_count']
             success = True
         except:
-            #This is a dev_facing_error
+            # This is a dev_facing_error
             log.error("Could not contact external open ended graders for location {0} and student {1}".format(
                 self.location_string, student_id))
-            #This is a student_facing_error
+            # This is a student_facing_error
             error_message = "Could not contact the graders.  Please notify course staff."
             return success, allowed_to_submit, error_message
         if count_graded >= count_required:
             return success, allowed_to_submit, ""
         else:
             allowed_to_submit = False
-            #This is a student_facing_error
+            # This is a student_facing_error
             error_message = error_string.format(count_required - count_graded, count_graded, count_required,
                                                 student_sub_count)
             return success, allowed_to_submit, error_message

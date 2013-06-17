@@ -60,9 +60,9 @@ class ConditionalFactory(object):
         source_location = Location(["i4x", "edX", "conditional_test", "problem", "SampleProblem"])
         if source_is_error_module:
             # Make an error descriptor and module
-            source_descriptor = NonStaffErrorDescriptor.from_xml('some random xml data', 
+            source_descriptor = NonStaffErrorDescriptor.from_xml('some random xml data',
                                                                  system,
-                                                                 org=source_location.org, 
+                                                                 org=source_location.org,
                                                                  course=source_location.course,
                                                                  error_msg='random error message')
             source_module = source_descriptor.xmodule(system)
@@ -87,8 +87,8 @@ class ConditionalFactory(object):
 
         # construct conditional module:
         cond_location = Location(["i4x", "edX", "conditional_test", "conditional", "SampleConditional"])
-        model_data = {'data': '<conditional/>'}
-        cond_module = ConditionalModule(system, cond_location, cond_descriptor, model_data)
+        model_data = {'data': '<conditional/>', 'location': cond_location}
+        cond_module = ConditionalModule(system, cond_descriptor, model_data)
 
         # return dict:
         return {'cond_module': cond_module,
@@ -106,7 +106,7 @@ class ConditionalModuleBasicTest(unittest.TestCase):
         self.test_system = test_system()
 
     def test_icon_class(self):
-        '''verify that get_icon_class works independent of condition satisfaction''' 
+        '''verify that get_icon_class works independent of condition satisfaction'''
         modules = ConditionalFactory.create(self.test_system)
         for attempted in ["false", "true"]:
             for icon_class in [ 'other', 'problem', 'video']:
@@ -186,7 +186,6 @@ class ConditionalModuleXmlTest(unittest.TestCase):
             if isinstance(descriptor, Location):
                 location = descriptor
                 descriptor = self.modulestore.get_instance(course.id, location, depth=None)
-            location = descriptor.location
             return descriptor.xmodule(self.test_system)
 
         # edx - HarvardX

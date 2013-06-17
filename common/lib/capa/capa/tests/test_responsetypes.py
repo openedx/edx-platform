@@ -640,6 +640,23 @@ class StringResponseTest(ResponseTest):
         correct_map = problem.grade_answers(input_dict)
         self.assertEquals(correct_map.get_hint('1_2_1'), "Hello??")
 
+    def test_hint_function_randomization(self):
+        # The hint function should get the seed from the problem.
+        problem = self.build_problem(
+            answer="1",
+            hintfn="gimme_a_random_hint",
+            script=textwrap.dedent("""
+                def gimme_a_random_hint(answer_ids, student_answers, new_cmap, old_cmap):
+                    answer = str(random.randint(0, 1e9))
+                    new_cmap.set_hint_and_mode(answer_ids[0], answer, "always")
+
+            """)
+        )
+        correct_map = problem.grade_answers({'1_2_1': '2'})
+        hint = correct_map.get_hint('1_2_1')
+        r = random.Random(problem.seed)
+        self.assertEqual(hint, str(r.randint(0, 1e9)))
+
 
 class CodeResponseTest(ResponseTest):
     from response_xml_factory import CodeResponseXMLFactory
@@ -948,7 +965,6 @@ class CustomResponseTest(ResponseTest):
     xml_factory_class = CustomResponseXMLFactory
 
     def test_inline_code(self):
-
         # For inline code, we directly modify global context variables
         # 'answers' is a list of answers provided to us
         # 'correct' is a list we fill in with True/False
@@ -961,15 +977,14 @@ class CustomResponseTest(ResponseTest):
         self.assert_grade(problem, '0', 'incorrect')
 
     def test_inline_message(self):
-
         # Inline code can update the global messages list
         # to pass messages to the CorrectMap for a particular input
         # The code can also set the global overall_message (str)
         # to pass a message that applies to the whole response
         inline_script = textwrap.dedent("""
-        messages[0] = "Test Message"
-        overall_message = "Overall message"
-        """)
+            messages[0] = "Test Message"
+            overall_message = "Overall message"
+            """)
         problem = self.build_problem(answer=inline_script)
 
         input_dict = {'1_2_1': '0'}
@@ -983,8 +998,19 @@ class CustomResponseTest(ResponseTest):
         overall_msg = correctmap.get_overall_message()
         self.assertEqual(overall_msg, "Overall message")
 
-    def test_function_code_single_input(self):
+    def test_inline_randomization(self):
+        # Make sure the seed from the problem gets fed into the script execution.
+        inline_script = """messages[0] = str(random.randint(0, 1e9))"""
+        problem = self.build_problem(answer=inline_script)
 
+        input_dict = {'1_2_1': '0'}
+        correctmap = problem.grade_answers(input_dict)
+
+        input_msg = correctmap.get_msg('1_2_1')
+        r = random.Random(problem.seed)
+        self.assertEqual(input_msg, str(r.randint(0, 1e9)))
+
+    def test_function_code_single_input(self):
         # For function code, we pass in these arguments:
         #
         #   'expect' is the expect attribute of the <customresponse>
@@ -1212,6 +1238,29 @@ class CustomResponseTest(ResponseTest):
         with self.assertRaises(ResponseError):
             problem.grade_answers({'1_2_1': '42'})
 
+    def test_setup_randomization(self):
+        # Ensure that the problem setup script gets the random seed from the problem.
+        script = textwrap.dedent("""
+            num = random.randint(0, 1e9)
+            """)
+        problem = self.build_problem(script=script)
+        r = random.Random(problem.seed)
+        self.assertEqual(r.randint(0, 1e9), problem.context['num'])
+
+    def test_check_function_randomization(self):
+        # The check function should get random-seeded from the problem.
+        script = textwrap.dedent("""
+            def check_func(expect, answer_given):
+                return {'ok': True, 'msg': str(random.randint(0, 1e9))}
+        """)
+
+        problem = self.build_problem(script=script, cfn="check_func", expect="42")
+        input_dict = {'1_2_1': '42'}
+        correct_map = problem.grade_answers(input_dict)
+        msg = correct_map.get_msg('1_2_1')
+        r = random.Random(problem.seed)
+        self.assertEqual(msg, str(r.randint(0, 1e9)))
+
     def test_module_imports_inline(self):
         '''
         Check that the correct modules are available to custom
@@ -1275,7 +1324,6 @@ class SchematicResponseTest(ResponseTest):
     xml_factory_class = SchematicResponseXMLFactory
 
     def test_grade(self):
-
         # Most of the schematic-specific work is handled elsewhere
         # (in client-side JavaScript)
         # The <schematicresponse> is responsible only for executing the
@@ -1290,7 +1338,7 @@ class SchematicResponseTest(ResponseTest):
 
         # The actual dictionary would contain schematic information
         # sent from the JavaScript simulation
-        submission_dict = {'test': 'test'}
+        submission_dict = {'test': 'the_answer'}
         input_dict = {'1_2_1': json.dumps(submission_dict)}
         correct_map = problem.grade_answers(input_dict)
 
@@ -1299,8 +1347,19 @@ class SchematicResponseTest(ResponseTest):
         # is what we expect)
         self.assertEqual(correct_map.get_correctness('1_2_1'), 'correct')
 
-    def test_script_exception(self):
+    def test_check_function_randomization(self):
+        # The check function should get a random seed from the problem.
+        script = "correct = ['correct' if (submission[0]['num'] == random.randint(0, 1e9)) else 'incorrect']"
+        problem = self.build_problem(answer=script)
 
+        r = random.Random(problem.seed)
+        submission_dict = {'num': r.randint(0, 1e9)}
+        input_dict = {'1_2_1': json.dumps(submission_dict)}
+        correct_map = problem.grade_answers(input_dict)
+
+        self.assertEqual(correct_map.get_correctness('1_2_1'), 'correct')
+
+    def test_script_exception(self):
         # Construct a script that will raise an exception
         script = "raise Exception('test')"
         problem = self.build_problem(answer=script)

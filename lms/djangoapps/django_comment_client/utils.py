@@ -1,14 +1,9 @@
-import time
 from collections import defaultdict
 import logging
-import time
 import urllib
 from datetime import datetime
 
 from courseware.module_render import get_module
-from xmodule.modulestore import Location
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.search import path_to_location
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.db import connection
@@ -16,13 +11,12 @@ from django.http import HttpResponse
 from django.utils import simplejson
 from django_comment_common.models import Role
 from django_comment_client.permissions import check_permissions_by_view
-from xmodule.modulestore.exceptions import NoPathToItem
 
 from mitxmako import middleware
 import pystache_custom as pystache
 
-from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
+from django.utils.timezone import UTC
 
 log = logging.getLogger(__name__)
 
@@ -100,7 +94,7 @@ def get_discussion_category_map(course):
 
 def filter_unstarted_categories(category_map):
 
-    now = time.gmtime()
+    now = datetime.now(UTC())
 
     result_map = {}
 
@@ -220,12 +214,12 @@ def initialize_discussion_info(course):
     for topic, entry in course.discussion_topics.items():
         category_map['entries'][topic] = {"id": entry["id"],
                                           "sort_key": entry.get("sort_key", topic),
-                                          "start_date": time.gmtime()}
+                                          "start_date": datetime.now(UTC())}
     sort_map_entries(category_map)
 
     _DISCUSSIONINFO[course.id]['id_map'] = discussion_id_map
     _DISCUSSIONINFO[course.id]['category_map'] = category_map
-    _DISCUSSIONINFO[course.id]['timestamp'] = datetime.now()
+    _DISCUSSIONINFO[course.id]['timestamp'] = datetime.now(UTC())
 
 
 class JsonResponse(HttpResponse):
@@ -292,7 +286,7 @@ def get_ability(course_id, content, user):
         'can_vote': check_permissions_by_view(user, course_id, content, "vote_for_thread" if content['type'] == 'thread' else "vote_for_comment"),
     }
 
-#TODO: RENAME
+# TODO: RENAME
 
 
 def get_annotated_content_info(course_id, content, user, user_info):
@@ -310,7 +304,7 @@ def get_annotated_content_info(course_id, content, user, user_info):
         'ability': get_ability(course_id, content, user),
     }
 
-#TODO: RENAME
+# TODO: RENAME
 
 
 def get_annotated_content_infos(course_id, thread, user, user_info):

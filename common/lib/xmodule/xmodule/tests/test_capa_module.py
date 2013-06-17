@@ -18,6 +18,7 @@ from xmodule.modulestore import Location
 from django.http import QueryDict
 
 from . import test_system
+from pytz import UTC
 
 
 class CapaFactory(object):
@@ -85,7 +86,7 @@ class CapaFactory(object):
         """
         location = Location(["i4x", "edX", "capa_test", "problem",
                              "SampleProblem{0}".format(CapaFactory.next_num())])
-        model_data = {'data': CapaFactory.sample_problem_xml}
+        model_data = {'data': CapaFactory.sample_problem_xml, 'location': location}
 
         if graceperiod is not None:
             model_data['graceperiod'] = graceperiod
@@ -112,7 +113,7 @@ class CapaFactory(object):
 
         system = test_system()
         system.render_template = Mock(return_value="<div>Test Template HTML</div>")
-        module = CapaModule(system, location, descriptor, model_data)
+        module = CapaModule(system, descriptor, model_data)
 
         if correct:
             # TODO: probably better to actually set the internal state properly, but...
@@ -126,7 +127,7 @@ class CapaFactory(object):
 class CapaModuleTest(unittest.TestCase):
 
     def setUp(self):
-        now = datetime.datetime.now()
+        now = datetime.datetime.now(UTC)
         day_delta = datetime.timedelta(days=1)
         self.yesterday_str = str(now - day_delta)
         self.today_str = str(now)
@@ -475,12 +476,12 @@ class CapaModuleTest(unittest.TestCase):
 
         # Simulate that the problem is queued
         with patch('capa.capa_problem.LoncapaProblem.is_queued') \
-                as mock_is_queued,\
+                as mock_is_queued, \
             patch('capa.capa_problem.LoncapaProblem.get_recentmost_queuetime') \
                 as mock_get_queuetime:
 
             mock_is_queued.return_value = True
-            mock_get_queuetime.return_value = datetime.datetime.now()
+            mock_get_queuetime.return_value = datetime.datetime.now(UTC)
 
             get_request_dict = {CapaFactory.input_key(): '3.14'}
             result = module.check_problem(get_request_dict)
