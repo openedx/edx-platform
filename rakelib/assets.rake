@@ -6,6 +6,8 @@ if USE_CUSTOM_THEME
     THEME_SASS = File.join(THEME_ROOT, "static", "sass")
 end
 
+MINIMAL_DARWIN_NOFILE_LIMIT = 8000
+
 def xmodule_cmd(watch=false, debug=false)
     xmodule_cmd = 'xmodule_assets common/static/xmodule'
     if watch
@@ -21,24 +23,14 @@ def xmodule_cmd(watch=false, debug=false)
 end
 
 def coffee_cmd(watch=false, debug=false)
-    if watch
-        # On OSx, coffee fails with EMFILE when
-        # trying to watch all of our coffee files at the same
-        # time.
-        #
-        # Ref: https://github.com/joyent/node/issues/2479
-        #
-        # So, instead, we use watchmedo, which works around the problem
-        "watchmedo shell-command " +
-                  "--command 'node_modules/.bin/coffee -c ${watch_src_path}' " +
-                  "--recursive " +
-                  "--patterns '*.coffee' " +
-                  "--ignore-directories " +
-                  "--wait " +
-                  "."
-    else
-        'node_modules/.bin/coffee --compile .'
+    if watch && Launchy::Application.new.host_os_family.darwin?
+        available_files = Process::getrlimit(:NOFILE)[0]
+        if available_files < MINIMAL_DARWIN_NOFILE_LIMIT
+            Process.setrlimit(:NOFILE, MINIMAL_DARWIN_NOFILE_LIMIT)
+
+        end
     end
+    "node_modules/.bin/coffee --compile #{watch ? '--watch' : ''} ."
 end
 
 def sass_cmd(watch=false, debug=false)

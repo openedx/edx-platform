@@ -5,6 +5,8 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Common: Use coffee directly when watching for coffeescript file changes.
+
 Common: Make rake provide better error messages if packages are missing.
 
 Common: Repairs development documentation generation by sphinx.
