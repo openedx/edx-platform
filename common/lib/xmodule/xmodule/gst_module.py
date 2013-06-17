@@ -84,7 +84,7 @@ class GraphicalSliderToolModule(GraphicalSliderToolFields, XModule):
 
         xml = html.fromstring(html_string)
 
-        #substitute plot, if presented
+        # substitute plot, if presented
         plot_div = '<div class="{element_class}_plot" id="{element_id}_plot" \
                     style="{style}"></div>'
         plot_el = xml.xpath('//plot')
@@ -95,7 +95,7 @@ class GraphicalSliderToolModule(GraphicalSliderToolFields, XModule):
                                                element_id=self.html_id,
                                                style=plot_el.get('style', ""))))
 
-        #substitute sliders
+        # substitute sliders
         slider_div = '<div class="{element_class}_slider" \
                                    id="{element_id}_slider_{var}" \
                                    data-var="{var}" \
