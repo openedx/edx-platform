@@ -64,6 +64,7 @@
 	background-image: url("../images/search-icon.svg");
 	background-color: transparent;
 <<<<<<< HEAD
+<<<<<<< HEAD
 	background-size: cover;
 	position: absolute;
 	top: 2.5px;
@@ -93,6 +94,9 @@
 	text-align: right;
 	padding-top: 10px;
 =======
+=======
+	background-size: cover;
+>>>>>>> Coverted templates to use mako
 	position: absolute;
 	top: 4px;
 	left: 225px;
