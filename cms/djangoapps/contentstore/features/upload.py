@@ -6,6 +6,7 @@ from django.conf import settings
 import requests
 import string
 import random
+import os
 
 TEST_ROOT = settings.COMMON_TEST_DATA_ROOT
 HTTP_PREFIX = "http://localhost:8001"
@@ -27,7 +28,8 @@ def upload_file(step, file_name):
     file_css = '.file-input'
     upload = world.css_find(file_css)
     #uploading the file itself
-    upload._element.send_keys(TEST_ROOT + '/uploads/' + file_name)
+    path = os.path.join(TEST_ROOT, 'uploads/', file_name)
+    upload._element.send_keys(os.path.abspath(path))
 
     close_css = '.close-button'
     world.css_find(close_css).click()
@@ -58,20 +60,20 @@ def no_duplicate(step, file_name):
 
 @step(u'I can download the correct "([^"]*)" file$')
 def check_download(step, file_name):
-    cur_file = open(TEST_ROOT + '/uploads/' + file_name, 'r')
-    cur_text = cur_file.read()
-    r = get_file(file_name)
-    downloaded_text = r.text
-    assert cur_text == downloaded_text
-    cur_file.close()
+    path = os.path.join(TEST_ROOT, 'uploads/', file_name)
+    with open(os.path.abspath(path), 'r') as cur_file:
+        cur_text = cur_file.read()
+        r = get_file(file_name)
+        downloaded_text = r.text
+        assert cur_text == downloaded_text
 
 
 @step(u'I modify "([^"]*)"$')
 def modify_upload(step, file_name):
     new_text = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(10))
-    cur_file = open(TEST_ROOT + '/uploads/' + file_name, 'w')
-    cur_file.write(new_text)
-    cur_file.close()
+    path = os.path.join(TEST_ROOT, 'uploads/', file_name)
+    with open(os.path.abspath(path), 'w') as cur_file:
+        cur_file.write(new_text)
 
 
 def get_index(file_name):
