@@ -1,10 +1,27 @@
 <%page args="section_data"/>
 
-<div>
+<div class="vert-left batch-enrollment">
   <h2>Batch Enrollment</h2>
   <p>Enter student emails separated by new lines or commas.</p>
-  <textarea rows="6" cols="70" name="student-emails">Student Emails</textarea>
+  <textarea rows="6" cols="70" name="student-emails" placeholder="Student Emails"></textarea>
+  <br>
   <input type="button" name="enroll" value="Enroll" data-endpoint="${ section_data['enroll_button_url'] }" >
   <input type="button" name="unenroll" value="Unenroll" data-endpoint="${ section_data['unenroll_button_url'] }" >
   <div class="task-response"></div>
+</div>
+
+<div class="vert-right instructor_staff_management">
+  <div class="management-section staff-management">
+    <h2>Staff Management</h2>
+    <div class="staff-management-table" data-endpoint="${ section_data['list_instructors_staff_url'] }"></div>
+    <div class="add-staff" data-endpoint="${ section_data['access_allow_revoke_url'] }">
+      <input type="text" name="staff-email" placeholder="Enter Email" spellcheck="false">
+      <input type="button" name="staff-allow" value="Make Staff">
+    </div>
+  </div>
+
+  <div class="management-section instructor-management">
+    <h2>Instructor Management</h2>
+    ## <div class="instructor-management-table"></div>
+  </div>
 </div>

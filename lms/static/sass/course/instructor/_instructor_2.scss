@@ -77,8 +77,29 @@
 
 
 .instructor-dashboard-wrapper-2 section.idash-section#membership {
-  div {
-    margin-top: 2em;
+  .vert-left {
+    float: left;
+    width: 45%;
+  }
+
+  .vert-right {
+    float: right;
+    width: 45%;
+
+    .management-section {
+      margin-bottom: 1.5em;
+
+      .staff-management-table {
+        .slickgrid {
+          height: 250px;
+        }
+      }
+
+      .add-staff {
+        margin-top: 0.5em;
+      }
+    }
+
   }
 
   textarea {
@@ -87,6 +108,8 @@
   }
 
   .task-res-section {
+    margin-top: 1.5em;
+
     h3 {
       color: #646464;
     }
