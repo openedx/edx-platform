@@ -21,12 +21,12 @@
       </section>
     </div>
   </div>
-%elif settings.MITX_FEATURES.get('USE_YOUTUBE_OBJECT_API') and normal_speed_video_id:
+%elif settings.MITX_FEATURES.get('USE_YOUTUBE_OBJECT_API') and youtube_id_1_0:
   <object width="640" height="390">
     <param name="movie"
-           value="https://www.youtube.com/v/${normal_speed_video_id}?version=3&amp;autoplay=1&amp;rel=0"></param>
+           value="https://www.youtube.com/v/${youtube_id_1_0}?version=3&amp;autoplay=1&amp;rel=0"></param>
     <param name="allowScriptAccess" value="always"></param>
-    <embed src="https://www.youtube.com/v/${normal_speed_video_id}?version=3&amp;autoplay=1&amp;rel=0"
+    <embed src="https://www.youtube.com/v/${youtube_id_1_0}?version=3&amp;autoplay=1&amp;rel=0"
            type="application/x-shockwave-flash"
            allowscriptaccess="always"
            width="640" height="390"></embed>
@@ -35,7 +35,7 @@
   <div id="video_${id}"
        class="video"
        data-youtube-id-0-75="${youtube_id_0_75}"
-       data-normal-speed-video-id="${normal_speed_video_id}"
+       data-youtube-id-1-0="${youtube_id_1_0}"
        data-youtube-id-1-25="${youtube_id_1_25}"
        data-youtube-id-1-5="${youtube_id_1_5}"
        data-show-captions="${show_captions}"

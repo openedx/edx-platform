@@ -67,7 +67,7 @@ class VideoModule(VideoFields, XModule):
     def get_html(self):
         return self.system.render_template('video.html', {
             'youtube_id_0_75': self.youtube_id_0_75,
-            'normal_speed_video_id': self.youtube_id_1_0,
+            'youtube_id_1_0': self.youtube_id_1_0,
             'youtube_id_1_25': self.youtube_id_1_25,
             'youtube_id_1_5': self.youtube_id_1_5,
             'id': self.location.html_id(),
@@ -109,9 +109,11 @@ class VideoDescriptor(VideoFields,
         """
         video = super(VideoDescriptor, cls).from_xml(xml_data, system, org, course)
         xml = etree.fromstring(xml_data)
+
         display_name = xml.get('display_name')
         if display_name:
             video.display_name = display_name
+
         youtube = xml.get('youtube')
         if youtube:
             speeds = _parse_youtube(youtube)
@@ -123,29 +125,35 @@ class VideoDescriptor(VideoFields,
                 video.youtube_id_1_25 = speeds['1.25']
             if speeds['1.50']:
                 video.youtube_id_1_5 = speeds['1.50']
+
         show_captions = xml.get('show_captions')
         if show_captions:
             video.show_captions = json.loads(show_captions)
+
         source = _get_first_external(xml, 'source')
         if source:
             video.source = source
+
         track = _get_first_external(xml, 'track')
         if track:
             video.track = track
+
         start_time = _parse_time(xml.get('from'))
         if start_time:
             video.start_time = start_time
+
         end_time = _parse_time(xml.get('to'))
         if end_time:
             video.end_time = end_time
+
         return video
 
 
 def _get_first_external(xmltree, tag):
-    '''
+    """
     Returns the src attribute of the nested `tag` in `xmltree`, if it
     exists.
-    '''
+    """
     for element in xmltree.findall(tag):
         src = element.get('src')
         if src:
@@ -154,11 +162,11 @@ def _get_first_external(xmltree, tag):
 
 
 def _parse_youtube(data):
-    '''
+    """
     Parses a string of Youtube IDs such as "1.0:AXdE34_U,1.5:VO3SxfeD"
     into a dictionary. Necessary for backwards compatibility with
     XML-based courses.
-    '''
+    """
     ret = {'0.75': '', '1.00': '', '1.25': '', '1.50': ''}
     videos = data.split(',')
     for video in videos:

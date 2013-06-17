@@ -29,8 +29,8 @@ class @Video
     @videos = {}
     if @el.data('youtube-id-0-75')
       @videos['0.75'] = @el.data('youtube-id-0-75')
-    if @el.data('normal-speed-video-id')
-      @videos['1.0'] = @el.data('normal-speed-video-id')
+    if @el.data('youtube-id-1-0')
+      @videos['1.0'] = @el.data('youtube-id-1-0')
     if @el.data('youtube-id-1-25')
       @videos['1.25'] = @el.data('youtube-id-1-25')
     if @el.data('youtube-id-1-5')
