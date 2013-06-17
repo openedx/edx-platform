@@ -14,33 +14,55 @@ import string
 
 def search(request):
     context = {}
-    context.update((csrf(request)))
     results_string = ""
-    if request.POST:
+    if request.GET:
         results_string = find(request)
+        context.update({"old_query": request.GET['s']})
     search_bar = render_to_string("search.html", Context(context))
     return HttpResponse(search_bar + results_string)
 
 
-def find(request, database="http://127.0.0.1:9200", index="transcript-index",
-         value_="transcript", field="searchable_text", max_result=100,
-         results_per_page=15):
-    query = request.POST['s']
+def find(request, database="http://127.0.0.1:9200",
+         value_="transcript", field="searchable_text", max_result=100):
+    query = request.GET.get("s", "")
+    page = request.GET.get("page", 1)
+    results_per_page = request.GET.get("results", 15)
+    ordering = request.GET.get("ordering", False)
+    index = request.GET.get("content", "transcript")+"-index"
     full_url = "/".join([database, index, value_, "_search?q="+field+":"])
-    results = json.loads(requests.get(full_url+query+"&size="+str(max_result))._content)["hits"]["hits"]
-    uuids = [entry["_source"]["uuid"] for entry in results]
-    transcripts = [entry["_source"]["searchable_text"] for entry in results]
-    snippets = [snippet_generator(transcript, query) for transcript in transcripts]
+    context = {}
+
+    try:
+        results = json.loads(requests.get(full_url+query+"&size="+str(max_result))._content)["hits"]["hits"]
+        uuids = [entry["_source"]["uuid"] for entry in results]
+        transcripts = [entry["_source"]["searchable_text"] for entry in results]
+        snippets = [snippet_generator(transcript, query) for transcript in transcripts]
+        data = zip(uuids, snippets)
+        data = proper_page(page, data, results_per_page)
+    except KeyError:
+        data = ("No results found", "Please try again")
+    context.update({"data": data})
+
     correction = spell_check(query)
-    data = zip(uuids, snippets)
-    results_pages = Paginator(data, results_per_page) 
-    context = {"data": data, "search_correction": correction}
+    results_pages = Paginator(data, results_per_page)
+    context.update({"spelling_correction": correction})
     return render_to_string("search_templates/results.html", context, context_instance=RequestContext(request))
 
 
 def query_reduction(query, stopwords):
     return [word.lower() for word in query.split() if word not in stopwords]
 
+
+def proper_page(page, data, results_per_page=15):
+    pages = Paginator(data, results_per_page)
+    correct_page = ""
+    try:
+        correct_page = pages.page(page)
+    except PageNotAnInteger:
+        correct_page = pages.page(1)
+    except EmptyPage:
+        correct_page = pages.page(pages.num_pages)
+    return correct_page
 
 def match(words):
     contained = lambda words: (words[0] in words[1]) or (words[1] in words[0])
@@ -64,7 +86,7 @@ def match_highlighter(query, response, tag="b", css_class="highlight", highlight
     return bold_response
 
 
-def snippet_generator(transcript, query, soft_max=100, word_margin=50, bold=True):
+def snippet_generator(transcript, query, soft_max=50, word_margin=30, bold=True):
     punkt = nltk.data.load('tokenizers/punkt/english.pickle')
     stop_words = word_filter.stopwords.words("english")
     sentences = punkt.tokenize(transcript)
