@@ -4,6 +4,7 @@ import unittest
 from django.utils.timezone import UTC
 from xmodule.fields import Date, Timedelta
 from xmodule.timeinfo import TimeInfo
+import time
 
 
 class DateTest(unittest.TestCase):
@@ -54,6 +55,14 @@ class DateTest(unittest.TestCase):
             datetime.datetime(current.year, 12, 4, 16, 30, tzinfo=UTC()),
             DateTest.date.from_json("December 4 16:30"))
         self.assertIsNone(DateTest.date.from_json("12 12:00"))
+
+    def test_odd_from_json(self):
+        now = datetime.datetime.now(UTC())
+        delta = now - datetime.datetime.fromtimestamp(0, UTC())
+        self.assertEqual(DateTest.date.from_json(delta.total_seconds() * 1000),
+            now)
+        yesterday = datetime.datetime.now(UTC()) - datetime.timedelta(days=-1)
+        self.assertEqual(DateTest.date.from_json(yesterday), yesterday)
 
     def test_to_json(self):
         '''
