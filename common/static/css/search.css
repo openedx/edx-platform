@@ -39,6 +39,7 @@
 
 .searchbox_submit {
 	border: 0;
+	background-image: url("../images/search-icon.svg");
 	background-color: transparent;
 	background-size: cover;
 	position: absolute;
@@ -68,6 +69,11 @@
 	display: block;
 	text-align: right;
 	padding-top: 10px;
+}
+
+.searchbox_submit:hover {
+	cursor:pointer;
+	cursor: hand;
 }
 
 .results_snippet{
