@@ -163,8 +163,12 @@ MITX_FEATURES['STUDIO_NPS_SURVEY'] = False
 # Enable URL that shows information about the status of variuous services
 MITX_FEATURES['ENABLE_SERVICE_STATUS'] = True
 
-# segment-io key for dev
-SEGMENT_IO_KEY = 'mty8edrrsg'
+############################# SEGMENT-IO ##################################
+
+# If there's an environment variable set, grab it and turn on segment io
+SEGMENT_IO_KEY = os.environ.get('SEGMENT_IO_KEY')
+if SEGMENT_IO_KEY:
+    MITX_FEATURES['SEGMENT_IO'] = True
 
 
 #####################################################################
