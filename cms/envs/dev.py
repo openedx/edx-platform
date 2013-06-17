@@ -43,9 +43,14 @@ CONTENTSTORE = {
     'OPTIONS': {
         'host': 'localhost',
         'db': 'xcontent',
+    },
+    # allow for additional options that can be keyed on a name, e.g. 'trashcan'
+    'ADDITIONAL_OPTIONS': {
+        'trashcan': {
+            'bucket': 'trash_fs'
+        }
     }
 }
-
 
 DATABASES = {
     'default': {

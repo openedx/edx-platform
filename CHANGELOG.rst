@@ -15,6 +15,8 @@ Blades: Video Alpha bug fix for speed changing to 1.0 in Firefox.
 Blades: Additional event tracking added to Video Alpha: fullscreen switch, show/hide
 captions.
 
+CMS: Allow editors to delete uploaded files/assets
+
 LMS: Some errors handling Non-ASCII data in XML courses have been fixed.
 
 LMS: Add page-load tracking using segment-io (if SEGMENT_IO_LMS_KEY and
