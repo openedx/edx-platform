@@ -1,0 +1,18 @@
+<head>
+	${css_link("../static/css/search.css")}
+</head>
+
+<div id="searchwrapper">
+	<form action="/search" method="get">
+		% if old_query:
+		<input type="text" class="searchbox" name="s" value="${old_query}" />
+		% else:
+		<input type="text" class="searchbox" name="s" value="" />
+		% endif
+		<input type="submit" class="searchbox_submit" value="" />
+	</form>
+</div>
+
+<%def name="css_link(path, media='')">
+	<link rel="stylesheet" type="text/css" href="${path|h}" media="${media}"></link>
+</%def>

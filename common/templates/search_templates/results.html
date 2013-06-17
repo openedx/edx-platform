@@ -1,4 +1,5 @@
 <head>
+<<<<<<< HEAD
 	${css_link("../static/css/search.css")}
 	${js_link("../static/js/div_sizing.js")}
 </head>
@@ -63,3 +64,30 @@
 <%def name="js_link(path)">
 	<script type="text/javascript" src="${path|h}"></script>
 </%def>
+=======
+	${css_link("../static/css/results.css")}
+</head>
+
+% if search_correction:
+<div class="correction_div">
+	<p class="search_correction">
+		Did you Mean: ${search_correction } ?
+	</p>
+</div>
+% endif
+
+% for datum in data:
+<section class="result">
+	<div class="result_wrapper">
+		<h1>${datum[0]}</h1>
+		<p class="results_snippet"> 
+			${datum[1]}
+		</p>
+	</div>
+</section>
+% endfor
+
+<%def name="css_link(path, media='')">
+	<link rel="stylesheet" type="text/css" href="${path|h}" media="${media}"></link>
+</%def>
+>>>>>>> Coverted templates to use mako
