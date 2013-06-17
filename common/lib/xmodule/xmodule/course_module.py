@@ -10,7 +10,6 @@ import dateutil.parser
 
 from xmodule.modulestore import Location
 from xmodule.seq_module import SequenceDescriptor, SequenceModule
-from xmodule.timeparse import parse_time
 from xmodule.util.decorators import lazyproperty
 from xmodule.graders import grader_from_conf
 import json
@@ -645,8 +644,11 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
     def start_date_text(self):
         def try_parse_iso_8601(text):
             try:
-                result = datetime.strptime(text, "%Y-%m-%dT%H:%M")
-                result = result.strftime("%b %d, %Y")
+                result = Date().from_json(text)
+                if result is None:
+                    result = text.title()
+                else:
+                    result = result.strftime("%b %d, %Y")
             except ValueError:
                 result = text.title()
 
@@ -670,8 +672,10 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
 
     @property
     def forum_posts_allowed(self):
+        datestandin = Date()
         try:
-            blackout_periods = [(parse_time(start), parse_time(end))
+            blackout_periods = [(datestandin.from_json(start),
+                                 datestandin.from_json(end))
                                 for start, end
                                 in self.discussion_blackouts]
             now = datetime.now(UTC())
@@ -701,7 +705,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
             if self.last_eligible_appointment_date is None:
                 raise ValueError("Last appointment date must be specified")
             self.registration_start_date = (self._try_parse_time('Registration_Start_Date') or
-                datetime.utcfromtimestamp(0))
+                datetime.fromtimestamp(0, UTC()))
             self.registration_end_date = self._try_parse_time('Registration_End_Date') or self.last_eligible_appointment_date
             # do validation within the exam info:
             if self.registration_start_date > self.registration_end_date:
@@ -720,7 +724,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
             """
             if key in self.exam_info:
                 try:
-                    return parse_time(self.exam_info[key])
+                    return Date().from_json(self.exam_info[key])
                 except ValueError as e:
                     msg = "Exam {0} in course {1} loaded with a bad exam_info key '{2}': '{3}'".format(self.exam_name, self.course_id, self.exam_info[key], e)
                     log.warning(msg)
