@@ -113,6 +113,7 @@ for feature, value in ENV_TOKENS.get('MITX_FEATURES', {}).items():
     MITX_FEATURES[feature] = value
 
 # If Segment.io key specified, load it and turn on Segment.io if the feature flag is set
+# Note that this is the Studio key. There is a separate key for the LMS.
 SEGMENT_IO_KEY = AUTH_TOKENS.get('SEGMENT_IO_KEY')
 if SEGMENT_IO_KEY:
     MITX_FEATURES['SEGMENT_IO'] = ENV_TOKENS.get('SEGMENT_IO', False)

@@ -165,7 +165,8 @@ MITX_FEATURES['ENABLE_SERVICE_STATUS'] = True
 
 ############################# SEGMENT-IO ##################################
 
-# If there's an environment variable set, grab it and turn on segment io
+# If there's an environment variable set, grab it and turn on Segment.io
+# Note that this is the Studio key. There is a separate key for the LMS.
 SEGMENT_IO_KEY = os.environ.get('SEGMENT_IO_KEY')
 if SEGMENT_IO_KEY:
     MITX_FEATURES['SEGMENT_IO'] = True
