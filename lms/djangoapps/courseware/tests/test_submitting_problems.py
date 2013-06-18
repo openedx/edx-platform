@@ -383,7 +383,7 @@ class TestCourseGrader(TestSubmittingProblems):
                 "weight": 1.0
             }],
             "GRADE_CUTOFFS": {
-            'A': 1.0,
+            'A': .9,
             'B': .33
             }
         }
@@ -410,7 +410,7 @@ class TestCourseGrader(TestSubmittingProblems):
         self.check_letter_grade('B')
 
     def test_B_grade_above(self):
-        #check that at exactly the cutoff, the grade is B
+        #check grade between cutoffs
         self.basic_setup()
         self.submit_question_answer('p1', {'2_1': 'Correct'})
         self.submit_question_answer('p2', {'2_1': 'Correct'})
@@ -418,7 +418,7 @@ class TestCourseGrader(TestSubmittingProblems):
         self.check_letter_grade('B')
 
     def test_A_grade(self):
-        #check that at exactly the cutoff, the grade is B
+        #check that 100% comlpetion gets an A
         self.basic_setup()
         self.submit_question_answer('p1', {'2_1': 'Correct'})
         self.submit_question_answer('p2', {'2_1': 'Correct'})
