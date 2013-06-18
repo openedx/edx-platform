@@ -47,7 +47,13 @@ def randomization_bin(seed, problem_id):
 
 
 class Randomization(String):
+    """
+    Define a field to store how to randomize a problem.
+    """
     def from_json(self, value):
+        """
+        For backward compatability?
+        """
         if value in ("", "true"):
             return "always"
         elif value == "false":
@@ -58,13 +64,22 @@ class Randomization(String):
 
 
 class ComplexEncoder(json.JSONEncoder):
+    """
+    Extend the JSON encoder to correctly handle complex numbers
+    """
     def default(self, obj):
+        """
+        Print a nicely formatted complex number, or default to the JSON encoder
+        """
         if isinstance(obj, complex):
             return u"{real:.7g}{imag:+.7g}*j".format(real=obj.real, imag=obj.imag)
         return json.JSONEncoder.default(self, obj)
 
 
 class CapaFields(object):
+    """
+    Define the possible fields for a Capa problem
+    """
     attempts = Integer(help="Number of attempts taken by the student on this problem",
                        default=0, scope=Scope.user_state)
     max_attempts = Integer(
@@ -130,12 +145,12 @@ class CapaFields(object):
 
 
 class CapaModule(CapaFields, XModule):
-    '''
+    """
     An XModule implementing LonCapa format problems, implemented by way of
     capa.capa_problem.LoncapaProblem
 
     CapaModule.__init__ takes the same arguments as xmodule.x_module:XModule.__init__
-    '''
+    """
     icon_class = 'problem'
 
     js = {'coffee': [resource_string(__name__, 'js/src/capa/display.coffee'),
@@ -150,7 +165,9 @@ class CapaModule(CapaFields, XModule):
     css = {'scss': [resource_string(__name__, 'css/capa/display.scss')]}
 
     def __init__(self, *args, **kwargs):
-        """ Accepts the same arguments as xmodule.x_module:XModule.__init__ """
+        """
+        Accepts the same arguments as xmodule.x_module:XModule.__init__
+        """
         XModule.__init__(self, *args, **kwargs)
 
         due_date = self.due
@@ -211,7 +228,9 @@ class CapaModule(CapaFields, XModule):
         assert self.seed is not None
 
     def choose_new_seed(self):
-        """Choose a new seed."""
+        """
+        Choose a new seed.
+        """
         if self.rerandomize == 'never':
             self.seed = 1
         elif self.rerandomize == "per_student" and hasattr(self.system, 'seed'):
@@ -225,6 +244,9 @@ class CapaModule(CapaFields, XModule):
             self.seed %= MAX_RANDOMIZATION_BINS
 
     def new_lcp(self, state, text=None):
+        """
+        Generate a new Loncapa Problem
+        """
         if text is None:
             text = self.data
 
@@ -237,6 +259,9 @@ class CapaModule(CapaFields, XModule):
         )
 
     def get_state_for_lcp(self):
+        """
+        Give a dictionary holding the state of the module
+        """
         return {
             'done': self.done,
             'correct_map': self.correct_map,
@@ -246,6 +271,9 @@ class CapaModule(CapaFields, XModule):
         }
 
     def set_state_from_lcp(self):
+        """
+        Set the module's state from the settings in `self.lcp`
+        """
         lcp_state = self.lcp.get_state()
         self.done = lcp_state['done']
         self.correct_map = lcp_state['correct_map']
@@ -254,26 +282,36 @@ class CapaModule(CapaFields, XModule):
         self.seed = lcp_state['seed']
 
     def get_score(self):
+        """
+        Access the problem's score
+        """
         return self.lcp.get_score()
 
     def max_score(self):
+        """
+        Access the problem's max score
+        """
         return self.lcp.get_max_score()
 
     def get_progress(self):
-        ''' For now, just return score / max_score
-        '''
+        """
+        For now, just return score / max_score
+        """
         d = self.get_score()
         score = d['score']
         total = d['total']
         if total > 0:
             try:
                 return Progress(score, total)
-            except Exception:
+            except (TypeError, ValueError):
                 log.exception("Got bad progress")
                 return None
         return None
 
     def get_html(self):
+        """
+        Return some html with data about the module
+        """
         return self.system.render_template('problem_ajax.html', {
             'element_id': self.location.html_id(),
             'id': self.id,
@@ -284,6 +322,7 @@ class CapaModule(CapaFields, XModule):
     def check_button_name(self):
         """
         Determine the name for the "check" button.
+
         Usually it is just "Check", but if this is the student's
         final attempt, change the name to "Final Check"
         """
@@ -369,12 +408,12 @@ class CapaModule(CapaFields, XModule):
 
     def handle_problem_html_error(self, err):
         """
-        Change our problem to a dummy problem containing
-        a warning message to display to users.
+        Create a dummy problem to represent any errors.
 
-        Returns the HTML to show to users
+        Change our problem to a dummy problem containing a warning message to
+        display to users. Returns the HTML to show to users
 
-        *err* is the Exception encountered while rendering the problem HTML.
+        `err` is the Exception encountered while rendering the problem HTML.
         """
         log.exception(err)
 
@@ -434,8 +473,12 @@ class CapaModule(CapaFields, XModule):
         return html
 
     def get_problem_html(self, encapsulate=True):
-        '''Return html for the problem.  Adds check, reset, save buttons
-        as necessary based on the problem config and state.'''
+        """
+        Return html for the problem.
+
+        Adds check, reset, save buttons as necessary based on the problem config
+        and state.
+        """
 
         try:
             html = self.lcp.get_html()
@@ -480,15 +523,16 @@ class CapaModule(CapaFields, XModule):
         return self.system.replace_urls(html)
 
     def handle_ajax(self, dispatch, get):
-        '''
+        """
         This is called by courseware.module_render, to handle an AJAX call.
-        "get" is request.POST.
+
+        `get` is request.POST.
 
         Returns a json dictionary:
         { 'progress_changed' : True/False,
           'progress' : 'none'/'in_progress'/'done',
           <other request-specific values here > }
-        '''
+        """
         handlers = {
             'problem_get': self.get_problem,
             'problem_check': self.check_problem,
@@ -527,7 +571,9 @@ class CapaModule(CapaFields, XModule):
                 datetime.datetime.now(UTC()) > self.close_date)
 
     def closed(self):
-        ''' Is the student still allowed to submit answers? '''
+        """
+        Is the student still allowed to submit answers?
+        """
         if self.max_attempts is not None and self.attempts >= self.max_attempts:
             return True
         if self.is_past_due():
@@ -546,18 +592,24 @@ class CapaModule(CapaFields, XModule):
         return self.lcp.done
 
     def is_attempted(self):
-        """Used by conditional module"""
+        """
+        Has the problem been attempted?
+
+        used by conditional module
+        """
         return self.attempts > 0
 
     def is_correct(self):
-        """True if full points"""
+        """
+        True iff full points
+        """
         d = self.get_score()
         return d['score'] == d['total']
 
     def answer_available(self):
-        '''
+        """
         Is the user allowed to see an answer?
-        '''
+        """
         if self.showanswer == '':
             return False
         elif self.showanswer == "never":
@@ -589,7 +641,7 @@ class CapaModule(CapaFields, XModule):
         Delivers grading response (e.g. from asynchronous code checking) to
             the capa problem, so its score can be updated
 
-        'get' must have a field 'response' which is a string that contains the
+        `get` must have a field `response` which is a string that contains the
             grader's response
 
         No ajax return is needed. Return empty dict.
@@ -603,7 +655,7 @@ class CapaModule(CapaFields, XModule):
         return dict()  # No AJAX return is needed
 
     def handle_ungraded_response(self, get):
-        '''
+        """
         Delivers a response from the XQueue to the capa problem
 
         The score of the problem will not be updated
@@ -616,7 +668,7 @@ class CapaModule(CapaFields, XModule):
             empty dictionary
 
         No ajax return is needed, so an empty dict is returned
-        '''
+        """
         queuekey = get['queuekey']
         score_msg = get['xqueue_body']
         # pass along the xqueue message to the problem
@@ -625,25 +677,25 @@ class CapaModule(CapaFields, XModule):
         return dict()
 
     def handle_input_ajax(self, get):
-        '''
+        """
         Handle ajax calls meant for a particular input in the problem
 
         Args:
             - get (dict) - data that should be passed to the input
         Returns:
             - dict containing the response from the input
-        '''
+        """
         response = self.lcp.handle_input_ajax(get)
         # save any state changes that may occur
         self.set_state_from_lcp()
         return response
 
     def get_answer(self, get):
-        '''
+        """
         For the "show answer" button.
 
         Returns the answers: {'answers' : answers}
-        '''
+        """
         event_info = dict()
         event_info['problem_id'] = self.location.url()
         self.system.track_function('showanswer', event_info)
@@ -669,40 +721,44 @@ class CapaModule(CapaFields, XModule):
 
     # Figure out if we should move these to capa_problem?
     def get_problem(self, get):
-        ''' Return results of get_problem_html, as a simple dict for json-ing.
+        """
+        Return results of get_problem_html, as a simple dict for json-ing.
+
         { 'html': <the-html> }
 
-            Used if we want to reconfirm we have the right thing e.g. after
-            several AJAX calls.
-        '''
+        Used if we want to reconfirm we have the right thing e.g. after
+        several AJAX calls.
+        """
         return {'html': self.get_problem_html(encapsulate=False)}
 
     @staticmethod
     def make_dict_of_responses(get):
-        '''Make dictionary of student responses (aka "answers")
-        get is POST dictionary (Django QueryDict).
+        """
+        Make dictionary of student responses (aka "answers")
 
-        The *get* dict has keys of the form 'x_y', which are mapped
+        `get` is POST dictionary (Django QueryDict).
+
+        The `get` dict has keys of the form 'x_y', which are mapped
         to key 'y' in the returned dict.  For example,
         'input_1_2_3' would be mapped to '1_2_3' in the returned dict.
 
         Some inputs always expect a list in the returned dict
         (e.g. checkbox inputs).  The convention is that
-        keys in the *get* dict that end with '[]' will always
+        keys in the `get` dict that end with '[]' will always
         have list values in the returned dict.
-        For example, if the *get* dict contains {'input_1[]': 'test' }
+        For example, if the `get` dict contains {'input_1[]': 'test' }
         then the output dict would contain {'1': ['test'] }
         (the value is a list).
 
         Raises an exception if:
 
-            A key in the *get* dictionary does not contain >= 1 underscores
-            (e.g. "input" is invalid; "input_1" is valid)
+        -A key in the `get` dictionary does not contain at least one underscore
+          (e.g. "input" is invalid, but "input_1" is valid)
 
-            Two keys end up with the same name in the returned dict.
-            (e.g. 'input_1' and 'input_1[]', which both get mapped
-            to 'input_1' in the returned dict)
-        '''
+        -Two keys end up with the same name in the returned dict.
+          (e.g. 'input_1' and 'input_1[]', which both get mapped to 'input_1'
+           in the returned dict)
+        """
         answers = dict()
 
         for key in get:
@@ -749,12 +805,13 @@ class CapaModule(CapaFields, XModule):
         })
 
     def check_problem(self, get):
-        ''' Checks whether answers to a problem are correct, and
-            returns a map of correct/incorrect answers:
+        """
+        Checks whether answers to a problem are correct
 
-            {'success' : 'correct' | 'incorrect' | AJAX alert msg string,
-             'contents' : html}
-            '''
+        Returns a map of correct/incorrect answers:
+          {'success' : 'correct' | 'incorrect' | AJAX alert msg string,
+           'contents' : html}
+        """
         event_info = dict()
         event_info['state'] = self.lcp.get_state()
         event_info['problem_id'] = self.location.url()
@@ -958,16 +1015,17 @@ class CapaModule(CapaFields, XModule):
                 'msg': msg}
 
     def reset_problem(self, get):
-        ''' Changes problem state to unfinished -- removes student answers,
-            and causes problem to rerender itself.
+        """
+        Changes problem state to unfinished -- removes student answers,
+        and causes problem to rerender itself.
 
-            Returns a dictionary of the form:
-            {'success': True/False,
-            'html': Problem HTML string }
+        Returns a dictionary of the form:
+          {'success': True/False,
+           'html': Problem HTML string }
 
-            If an error occurs, the dictionary will also have an
-            'error' key containing an error message.
-        '''
+        If an error occurs, the dictionary will also have an
+        `error` key containing an error message.
+        """
         event_info = dict()
         event_info['old_state'] = self.lcp.get_state()
         event_info['problem_id'] = self.location.url()

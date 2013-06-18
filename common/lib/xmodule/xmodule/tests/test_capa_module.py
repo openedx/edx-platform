@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
-"""Tests of the Capa XModule"""
+"""
+Tests of the Capa XModule
+"""
 #pylint: disable=C0111
 #pylint: disable=R0904
 #pylint: disable=C0103
@@ -48,12 +50,16 @@ class CapaFactory(object):
 
     @staticmethod
     def input_key():
-        """ Return the input key to use when passing GET parameters """
+        """
+        Return the input key to use when passing GET parameters
+        """
         return ("input_" + CapaFactory.answer_key())
 
     @staticmethod
     def answer_key():
-        """ Return the key stored in the capa problem answer dict """
+        """
+        Return the key stored in the capa problem answer dict
+        """
         return ("-".join(['i4x', 'edX', 'capa_test', 'problem',
                          'SampleProblem%d' % CapaFactory.num]) +
                 "_2_1")
@@ -362,7 +368,9 @@ class CapaModuleTest(unittest.TestCase):
             result = CapaModule.make_dict_of_responses(invalid_get_dict)
 
     def _querydict_from_dict(self, param_dict):
-        """ Create a Django QueryDict from a Python dictionary """
+        """
+        Create a Django QueryDict from a Python dictionary
+        """
 
         # QueryDict objects are immutable by default, so we make
         # a copy that we can update.
