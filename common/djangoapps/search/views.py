@@ -22,24 +22,26 @@ def search(request):
 
 
 def find(request, database="http://127.0.0.1:9200",
-         value_="transcript", field="searchable_text", max_result=100):
+         field="searchable_text", max_result=100):
     query = request.GET.get("s", "")
     page = request.GET.get("page", 1)
     results_per_page = request.GET.get("results", 15)
     ordering = request.GET.get("ordering", False)
     index = request.GET.get("content", "transcript")+"-index"
-    full_url = "/".join([database, index, value_, "_search?q="+field+":"])
+    full_url = "/".join([database, index, "_search?q="+field+":"])
     context = {}
 
     try:
         results = json.loads(requests.get(full_url+query+"&size="+str(max_result))._content)["hits"]["hits"]
-        uuids = [entry["_source"]["uuid"] for entry in results]
-        transcripts = [entry["_source"]["searchable_text"] for entry in results]
+        data = [entry["_source"] for entry in results]
+        #titles = [entry["display_name"] for entry in data]
+        uuids = [entry["display_name"] for entry in data]
+        transcripts = [entry["searchable_text"] for entry in data]
         snippets = [snippet_generator(transcript, query) for transcript in transcripts]
         data = zip(uuids, snippets)
         data = proper_page(page, data, results_per_page)
     except KeyError:
-        data = ("No results found", "Please try again")
+        data = [("No results found", "Please try again")]
     context.update({"data": data})
 
     correction = spell_check(query)
@@ -122,7 +124,10 @@ def spell_check(query, pyenchant_dictionary_file="common/djangoapps/search/pyenc
     """Returns corrected version with attached html if there are suggested corrections."""
     dictionary = enchant.request_pwl_dict(pyenchant_dictionary_file)
     words = query_reduction(query, stopwords)
-    possible_corrections = [dictionary.suggest(word)[0] for word in words]
+    try:
+        possible_corrections = [dictionary.suggest(word)[0] for word in words]
+    except IndexError:
+        return False
     if possible_corrections == words:
         return None
     else:

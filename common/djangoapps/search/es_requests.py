@@ -7,24 +7,29 @@ from pymongo import MongoClient
 
 class MongoIndexer:
 
-    def __init__(self, host='localhost', port=27017, database='xcontent', file_collection="fs.files",
-                 chunk_collection="fs.chunks"):
+    def __init__(self, host='localhost', port=27017, content_database='xcontent', file_collection="fs.files",
+                 chunk_collection="fs.chunks", module_database='xmodule', module_collection='modulestore'):
         self.host = host
         self.port = port
-        self.database = database
         self.client = MongoClient(host, port)
-        self.db = self.client[database]
+        self.content_db = self.client[content_database]
+        self.module_db = self.client[module_database]
         try:
-            self.db.collection_names().index(file_collection)
+            self.content_db.collection_names().index(file_collection)
         except ValueError:
             print "No collection named: " + file_collection
             raise
         try:
-            self.db.collection_names().index(chunk_collection)
+            self.content_db.collection_names().index(chunk_collection)
         except ValueError:
             print "No collection named: " + chunk_collection
-        self.file_collection = self.db[file_collection]
-        self.chunk_collection = self.db[chunk_collection]
+        try:
+            self.module_db.collection_names().index(module_collection)
+        except ValueError:
+            print "No collection named: " + module_collection
+        self.file_collection = self.content_db[file_collection]
+        self.chunk_collection = self.content_db[chunk_collection]
+        self.module_collection = self.module_db[module_collection]
 
     def find_transcripts(self, file_ending=".srt.sjson"):
         """Returns a cursor that will lazily generate transcript objects when next() is called"""
@@ -36,6 +41,19 @@ class MongoIndexer:
         database_object = self.chunk_collection.find_one({"files_id.name": filename})
         return json.loads(database_object["data"].decode())["text"]
 
+    def module_for_uuid(self, transcript_uuid):
+        """Given the transcript uuid found from the xcontent database, returns the mongo document for the video"""
+        regex_pattern = re.compile(".*?"+str(transcript_uuid)+".*?")
+        video_module = self.module_collection.find_one({"definition.data": regex_pattern})
+        return video_module
+
+    def uuid_from_file_name(self, file_name):
+        """Returns a youtube uuid given the filename of a transcript"""
+        print file_name
+        if file_name[:5] == "subs_":
+            file_name = file_name[5:]
+        return file_name[:file_name.find(".")]
+
     def index_all_transcripts(self, es_instance, index):
         cursor = self.find_transcripts()
         for i in range(0, cursor.count()):
@@ -43,12 +61,18 @@ class MongoIndexer:
             print check.keys()
             course = check["_id"]["course"]
             org = check["_id"]["org"]
-            uuid_field = check["_id"]["name"]
-            uuid = uuid_field[:uuid_field.find(".")]
+            uuid = self.uuid_from_file_name(check["_id"]["name"])
+            video_module = self.module_for_uuid(uuid)
+            try:
+                display_name = org + " " + course + " " + video_module["metadata"]["display_name"]
+            except TypeError:
+                print "Could not find module for: " + uuid
+                display_name = org + " " + course
             transcript = " ".join(self.find_transcript_content(check))
-            data = {"course": course, "org": org, "uuid": uuid, "searchable_text": transcript}
+            data = {"course": course, "org": org, "uuid": uuid, "searchable_text": transcript,
+                    "display_name": display_name}
             type_ = course.replace(".", "-")
-            es_instance.index_data(index, type_, data)
+            print es_instance.index_data(index, type_, data)._content
 
 
 class ElasticDatabase:
@@ -60,7 +84,7 @@ class ElasticDatabase:
         importantly do not include a slash at the end of the url name.
 
         args should be a list of dictionaries, each dictionary specifying a JSON mapping
-        to be used for a specific type.
+        to be used for a specific type. See settings.json for a more in-depth example
 
         Example Dictionary:
             {"index": "transcript", "type": "6-002x", "mapping":
@@ -154,11 +178,8 @@ class ElasticDatabase:
         """opens and indexes the given transcript file as the given index, type, and id"""
         file_uuid = transcript_file.rsplit("/")[-1][:-10]
         transcript = open(transcript_file, 'rb').read()
-        #try:
         searchable_text = " ".join(filter(None, json.loads(transcript)["text"])).replace("\n", " ")
         data = {"searchable_text": searchable_text, "uuid": file_uuid}
-        #except:
-        #   return "INVALID JSON: " + file_uuid
         return self.index_data(index, type_, data)._content
 
     def setup_index(self, index):
@@ -172,7 +193,7 @@ class ElasticDatabase:
         full_url = "/".join([self.url, index]) + "/"
         #closing the index so it can be changed
         requests.post(full_url+"/_close")
-        response = requests.post(full_url+"/_settings", data=json.dumps(index_settings))
+        response = requests.post(full_url+"/", data=json.dumps(index_settings))
         #reopening the index so it can be read
         requests.post(full_url+"/_open")
         return response
@@ -187,6 +208,10 @@ class ElasticDatabase:
         """Returns the current settings of a given index"""
         full_url = "/".join([self.url, index, "_settings"])
         return json.loads(requests.get(full_url)._content)
+
+    def delete_index(self, index):
+        full_url = "/".join([self.url, index])
+        return requests.delete(full_url)
 
     def get_type_mapping(self, index, type_):
         """Return the current mapping of the indicated type"""
@@ -216,13 +241,14 @@ class ElasticDatabase:
 url = "https://localhost:9200"
 settings_file = "settings.json"
 
-#mongo = MongoIndexer()
+mongo = MongoIndexer()
 test = ElasticDatabase("http://localhost:9200", settings_file)
+#print test.delete_index("transcript-index")
 #print test.add_index_settings("transcript-index")._content
 #print test.get_index_settings("transcript-index")
-#mongo.index_all_transcripts(test, "transcript-index")
+mongo.index_all_transcripts(test, "transcript-index")
 
 #print test.setup_type("transcript", "cleaning", mapping)._content
-print test.get_type_mapping("transcript-index", "2-1x")
+#print test.get_type_mapping("transcript-index", "2-1x")
 #print test.index_directory_transcripts("/home/slater/edx_all/data", "transcript-index", "transcript")
 # test.generate_dictionary("transcript-index", "transcript", "pyenchant_corpus.txt")
