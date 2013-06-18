@@ -18,14 +18,16 @@ class MakoModuleDescriptor(XModuleDescriptor):
     Expects the descriptor to have the `mako_template` attribute set
     with the name of the template to render, and it will pass
     the descriptor as the `module` parameter to that template
+
+    MakoModuleDescriptor.__init__ takes the same arguments as xmodule.x_module:XModuleDescriptor.__init__
     """
 
-    def __init__(self, system, location, model_data):
-        if getattr(system, 'render_template', None) is None:
-            raise TypeError('{system} must have a render_template function'
+    def __init__(self, *args, **kwargs):
+        super(MakoModuleDescriptor, self).__init__(*args, **kwargs)
+        if getattr(self.runtime, 'render_template', None) is None:
+            raise TypeError('{runtime} must have a render_template function'
                             ' in order to use a MakoDescriptor'.format(
-                    system=system))
-        super(MakoModuleDescriptor, self).__init__(system, location, model_data)
+                    runtime=self.runtime))
 
     def get_context(self):
         """

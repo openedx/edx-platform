@@ -28,6 +28,8 @@ from xmodule.templates import update_templates
 from xmodule.modulestore.xml_exporter import export_to_xml
 from xmodule.modulestore.xml_importer import import_from_xml, perform_xlint
 from xmodule.modulestore.inheritance import own_metadata
+from xmodule.contentstore.content import StaticContent
+from xmodule.contentstore.utils import restore_asset_from_trashcan, empty_asset_trashcan
 
 from xmodule.capa_module import CapaDescriptor
 from xmodule.course_module import CourseDescriptor
@@ -35,8 +37,12 @@ from xmodule.seq_module import SequenceDescriptor
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from contentstore.views.component import ADVANCED_COMPONENT_TYPES
+from xmodule.exceptions import NotFoundError
 
 from django_comment_common.utils import are_permissions_roles_seeded
+from xmodule.exceptions import InvalidVersionError
+import datetime
+from pytz import UTC
 
 TEST_DATA_MODULESTORE = copy.deepcopy(settings.MODULESTORE)
 TEST_DATA_MODULESTORE['default']['OPTIONS']['fs_root'] = path('common/test/data')
@@ -119,6 +125,17 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
     def test_advanced_components_require_two_clicks(self):
         self.check_components_on_page(['videoalpha'], ['Video Alpha'])
+
+    def test_malformed_edit_unit_request(self):
+        store = modulestore('direct')
+        import_from_xml(store, 'common/test/data/', ['simple'])
+
+        # just pick one vertical
+        descriptor = store.get_items(Location('i4x', 'edX', 'simple', 'vertical', None, None))[0]
+        location = descriptor.location._replace(name='.' + descriptor.location.name)
+
+        resp = self.client.get(reverse('edit_unit', kwargs={'location': location.url()}))
+        self.assertEqual(resp.status_code, 400)
 
     def check_edit_unit(self, test_course_name):
         import_from_xml(modulestore('direct'), 'common/test/data/', [test_course_name])
@@ -257,7 +274,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         )
         self.assertTrue(getattr(draft_problem, 'is_draft', False))
 
-        #now requery with depth
+        # now requery with depth
         course = modulestore('draft').get_item(
             Location(['i4x', 'edX', 'simple', 'course', '2012_Fall', None]),
             depth=None
@@ -368,6 +385,159 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         course = module_store.get_item(source_location)
         self.assertFalse(course.hide_progress_tab)
 
+    def test_asset_import(self):
+        '''
+        This test validates that an image asset is imported and a thumbnail was generated for a .gif
+        '''
+        content_store = contentstore()
+
+        module_store = modulestore('direct')
+        import_from_xml(module_store, 'common/test/data/', ['full'], static_content_store=content_store)
+
+        course_location = CourseDescriptor.id_to_location('edX/full/6.002_Spring_2012')
+        course = module_store.get_item(course_location)
+
+        self.assertIsNotNone(course)
+
+        # make sure we have some assets in our contentstore
+        all_assets = content_store.get_all_content_for_course(course_location)
+        self.assertGreater(len(all_assets), 0)
+
+        # make sure we have some thumbnails in our contentstore
+        all_thumbnails = content_store.get_all_content_thumbnails_for_course(course_location)
+
+        #
+        # cdodge: temporarily comment out assertion on thumbnails because many environments
+        # will not have the jpeg converter installed and this test will fail
+        #
+        #
+        # self.assertGreater(len(all_thumbnails), 0)
+
+        content = None
+        try:
+            location = StaticContent.get_location_from_path('/c4x/edX/full/asset/circuits_duality.gif')
+            content = content_store.find(location)
+        except NotFoundError:
+            pass
+
+        self.assertIsNotNone(content)
+
+        #
+        # cdodge: temporarily comment out assertion on thumbnails because many environments
+        # will not have the jpeg converter installed and this test will fail
+        #
+        # self.assertIsNotNone(content.thumbnail_location)
+        #
+        # thumbnail = None
+        # try:
+        #    thumbnail = content_store.find(content.thumbnail_location)
+        # except:
+        #    pass
+        #
+        # self.assertIsNotNone(thumbnail)
+
+    def test_asset_delete_and_restore(self):
+        '''
+        This test will exercise the soft delete/restore functionality of the assets
+        '''
+        content_store = contentstore()
+        trash_store = contentstore('trashcan')
+        module_store = modulestore('direct')
+
+        import_from_xml(module_store, 'common/test/data/', ['full'], static_content_store=content_store)
+
+        # look up original (and thumbnail) in content store, should be there after import
+        location = StaticContent.get_location_from_path('/c4x/edX/full/asset/circuits_duality.gif')
+        content = content_store.find(location, throw_on_not_found=False)
+        thumbnail_location = content.thumbnail_location
+        self.assertIsNotNone(content)
+
+        #
+        # cdodge: temporarily comment out assertion on thumbnails because many environments
+        # will not have the jpeg converter installed and this test will fail
+        #
+        # self.assertIsNotNone(thumbnail_location)
+
+        # go through the website to do the delete, since the soft-delete logic is in the view
+
+        url = reverse('remove_asset', kwargs={'org': 'edX', 'course': 'full', 'name': '6.002_Spring_2012'})
+        resp = self.client.post(url, {'location': '/c4x/edX/full/asset/circuits_duality.gif'})
+        self.assertEqual(resp.status_code, 200)
+
+        asset_location = StaticContent.get_location_from_path('/c4x/edX/full/asset/circuits_duality.gif')
+
+        # now try to find it in store, but they should not be there any longer
+        content = content_store.find(asset_location, throw_on_not_found=False)
+        self.assertIsNone(content)
+
+        if thumbnail_location:
+            thumbnail = content_store.find(thumbnail_location, throw_on_not_found=False)
+            self.assertIsNone(thumbnail)
+
+        # now try to find it and the thumbnail in trashcan - should be in there
+        content = trash_store.find(asset_location, throw_on_not_found=False)
+        self.assertIsNotNone(content)
+
+        if thumbnail_location:
+            thumbnail = trash_store.find(thumbnail_location, throw_on_not_found=False)
+            self.assertIsNotNone(thumbnail)
+
+        # let's restore the asset
+        restore_asset_from_trashcan('/c4x/edX/full/asset/circuits_duality.gif')
+
+        # now try to find it in courseware store, and they should be back after restore
+        content = content_store.find(asset_location, throw_on_not_found=False)
+        self.assertIsNotNone(content)
+
+        if thumbnail_location:
+            thumbnail = content_store.find(thumbnail_location, throw_on_not_found=False)
+            self.assertIsNotNone(thumbnail)
+
+    def test_empty_trashcan(self):
+        '''
+        This test will exercise the empting of the asset trashcan
+        '''
+        content_store = contentstore()
+        trash_store = contentstore('trashcan')
+        module_store = modulestore('direct')
+
+        import_from_xml(module_store, 'common/test/data/', ['full'], static_content_store=content_store)
+
+        course_location = CourseDescriptor.id_to_location('edX/full/6.002_Spring_2012')
+
+        location = StaticContent.get_location_from_path('/c4x/edX/full/asset/circuits_duality.gif')
+        content = content_store.find(location, throw_on_not_found=False)
+        self.assertIsNotNone(content)
+
+        # go through the website to do the delete, since the soft-delete logic is in the view
+
+        url = reverse('remove_asset', kwargs={'org': 'edX', 'course': 'full', 'name': '6.002_Spring_2012'})
+        resp = self.client.post(url, {'location': '/c4x/edX/full/asset/circuits_duality.gif'})
+        self.assertEqual(resp.status_code, 200)
+
+        # make sure there's something in the trashcan
+        all_assets = trash_store.get_all_content_for_course(course_location)
+        self.assertGreater(len(all_assets), 0)
+
+        # make sure we have some thumbnails in our trashcan
+        all_thumbnails = trash_store.get_all_content_thumbnails_for_course(course_location)
+        #
+        # cdodge: temporarily comment out assertion on thumbnails because many environments
+        # will not have the jpeg converter installed and this test will fail
+        #
+        # self.assertGreater(len(all_thumbnails), 0)
+
+        # empty the trashcan
+        empty_asset_trashcan([course_location])
+
+        # make sure trashcan is empty
+        all_assets = trash_store.get_all_content_for_course(course_location)
+        self.assertEqual(len(all_assets), 0)
+
+
+        all_thumbnails = trash_store.get_all_content_thumbnails_for_course(course_location)
+        self.assertEqual(len(all_thumbnails), 0)
+
     def test_clone_course(self):
 
         course_data = {
@@ -403,6 +573,32 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             print "Checking {0} should now also be at {1}".format(descriptor.location.url(), new_loc.url())
             resp = self.client.get(reverse('edit_unit', kwargs={'location': new_loc.url()}))
             self.assertEqual(resp.status_code, 200)
+
+    def test_illegal_draft_crud_ops(self):
+        draft_store = modulestore('draft')
+        direct_store = modulestore('direct')
+
+        CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course')
+
+        location = Location('i4x://MITx/999/chapter/neuvo')
+        self.assertRaises(InvalidVersionError, draft_store.clone_item, 'i4x://edx/templates/chapter/Empty',
+            location)
+        direct_store.clone_item('i4x://edx/templates/chapter/Empty', location)
+        self.assertRaises(InvalidVersionError, draft_store.clone_item, location,
+            location)
+
+        self.assertRaises(InvalidVersionError, draft_store.update_item, location,
+            'chapter data')
+
+        # taking advantage of update_children and other functions never checking that the ids are valid
+        self.assertRaises(InvalidVersionError, draft_store.update_children, location,
+            ['i4x://MITx/999/problem/doesntexist'])
+
+        self.assertRaises(InvalidVersionError, draft_store.update_metadata, location,
+            {'due': datetime.datetime.now(UTC)})
+
+        self.assertRaises(InvalidVersionError, draft_store.unpublish, location)
+
 
     def test_bad_contentstore_request(self):
         resp = self.client.get('http://localhost:8001/c4x/CDX/123123/asset/&images_circuits_Lab7Solution2.png')
@@ -499,7 +695,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             on_disk = loads(grading_policy.read())
             self.assertEqual(on_disk, course.grading_policy)
 
-        #check for policy.json
+        # check for policy.json
         self.assertTrue(filesystem.exists('policy.json'))
 
         # compare what's on disk to what we have in the course module

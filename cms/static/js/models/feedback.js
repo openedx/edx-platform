@@ -42,6 +42,12 @@ CMS.Models.ErrorMessage = CMS.Models.SystemFeedback.extend({
     })
 });
 
+CMS.Models.ConfirmAssetDeleteMessage = CMS.Models.SystemFeedback.extend({
+    defaults: $.extend({}, CMS.Models.SystemFeedback.prototype.defaults, {
+        "intent": "warning"
+    })
+});
+
 CMS.Models.ConfirmationMessage = CMS.Models.SystemFeedback.extend({
     defaults: $.extend({}, CMS.Models.SystemFeedback.prototype.defaults, {
         "intent": "confirmation"

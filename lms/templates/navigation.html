@@ -65,11 +65,11 @@ site_status_msg = get_site_status_msg(course_id)
       <li class="primary">
         <a href="${reverse('dashboard')}" class="user-link">
           <span class="avatar"></span>
-          ${user.username}
+          <span class="sr">Dashboard for: </span> ${user.username}
         </a>
       </li>
       <li class="primary">
-        <a href="#" class="dropdown">&#9662</a>
+        <a href="#" class="dropdown"><span class="sr">More options dropdown</span> &#9662</a>
         <ul class="dropdown-menu">
           <%block name="navigation_dropdown_menu_links" >
             <li><a href="${marketing_link('FAQ')}">Help</a></li>

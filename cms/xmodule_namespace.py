@@ -5,7 +5,6 @@ Namespace defining common fields used by Studio for all blocks
 import datetime
 
 from xblock.core import Namespace, Scope, ModelType, String
-from xmodule.fields import StringyBoolean
 
 
 class DateTuple(ModelType):
@@ -28,4 +27,3 @@ class CmsNamespace(Namespace):
     """
     published_date = DateTuple(help="Date when the module was published", scope=Scope.settings)
     published_by = String(help="Id of the user who published this module", scope=Scope.settings)
-
