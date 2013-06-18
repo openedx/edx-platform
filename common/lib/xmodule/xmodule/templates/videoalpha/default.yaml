@@ -1,6 +1,6 @@
 ---
 metadata:
-    display_name: Video Alpha 1
+    display_name: Video Alpha
     version: 1
 data: |
   <videoalpha show_captions="true" sub="name_of_file" youtube="0.75:JMD_ifUUfsU,1.0:OEoXaMPEzfM,1.25:AKqURZnYqpk,1.50:DYpADpL7jAY" >

@@ -6,7 +6,7 @@ class @VideoPlayerAlpha extends SubviewAlpha
     # we must pause the player (stop setInterval() method).
     if (window.OldVideoPlayerAlpha) and (window.OldVideoPlayerAlpha.onPause)
       window.OldVideoPlayerAlpha.onPause()
-    window.OldVideoPlayerAlpha = this
+    window.OldVideoPlayerAlpha = @
 
     if @video.videoType is 'youtube'
       @PlayerState = YT.PlayerState
@@ -29,7 +29,7 @@ class @VideoPlayerAlpha extends SubviewAlpha
     $(@progressSlider).bind('slide_seek', @onSeek)
     if @volumeControl
       $(@volumeControl).bind('volumeChange', @onVolumeChange)
-    $(document).keyup @bindExitFullScreen
+    $(document.documentElement).keyup @bindExitFullScreen
 
     @$('.add-fullscreen').click @toggleFullScreen
     @addToolTip() unless onTouchBasedDevice()
@@ -114,7 +114,7 @@ class @VideoPlayerAlpha extends SubviewAlpha
     @video.log 'load_video'
     if @video.videoType is 'html5'
       @player.setPlaybackRate @video.speed
-    if not onTouchBasedDevice() and $('.video:first').data('autoplay') is 'True'
+    if not onTouchBasedDevice() and $('.video:first').data('autoplay') isnt 'False'
       $('.video-load-complete:first').data('video').player.play()
 
   onStateChange: (event) =>
@@ -308,7 +308,7 @@ class @VideoPlayerAlpha extends SubviewAlpha
     @player.pauseVideo() if @player.pauseVideo
 
   duration: ->
-    duration = @player.getDuration()
+    duration = @player.getDuration() if @player.getDuration
     if isFinite(duration) is false
       duration = @video.getDuration()
     duration
