@@ -157,15 +157,55 @@
 	    "analyzer": {
 =======
 	"mappings": {
-		"_all": {
-			"properties": {
-				"searchable_text": {
-					"type": "string",
-					"store": "yes",
-					"index": "analyzed",
-					"term_vector": "with_positions_offsets",
-					"analyzer": "transcript_analyzer",
-					"similarity": "BM25"
+		"properties": {
+			"searchable_text": {
+				"type": "multi_field",
+				"fields": {
+					"full_words": {
+						"type": "string",
+						"store": "yes",
+						"index": "analyzed",
+						"term_vector": "with_positions_offsets",
+						"analyzer": "transcript_analyzer",
+						"boost": 2.0,
+						"similarity": "BM25"
+					},
+
+					"ngrams": {
+						"type": "string",
+						"store": "yes",
+						"index": "analyzed",
+						"term_vector": "with_positions_offsets",
+						"analyzer": "ngram_analyzer",
+						"boost": 1.0,
+						"similarity": "BM25"
+					}
+				}
+			},
+
+			"display_name": {
+				"type": "multi_field",
+				"fields": {
+
+					"depth_search": {
+						"type": "string",
+						"store": "yes",
+						"index": "analyzed",
+						"term_vector": "with_positions_offsets",
+						"analyzer": "depth_analyzer",
+						"boost": 1.0,
+						"similarity": "BM25"
+					},
+
+					"breadth_search": {
+						"type": "string",
+						"store": "yes",
+						"index": "analyzed",
+						"term_vector": "with_positions_offsets",
+						"analyzer": "breadth_analyzer",
+						"boost": 2.0,
+						"similarity": "BM25"
+					}
 				},
 >>>>>>> Moved past difficulty in file integration and adding configurability to elasticsearch analyzers
 
@@ -194,13 +234,59 @@
 		        "transcript_analyzer": {
 		            "type": "custom",
 		            "tokenizer": "standard",
-		            "filter": ["asciifolding", "custom_word_delimiter", "lowercase", "custom_stemmer", "shingle"]
+		            "filter": ["asciifolding", "custom_word_delimiter", "lowercase", "custom_stemmer", "shingle",
+		            		    "custom_phonetic"]
+		        },
+
+		        "ngram_analyzer": {
+		        	"type": "custom",
+		        	"tokenizer": "custom_ngram",
+		        	"filter": ["asciifolding", "word_delimiter", "lowercase", "custom_stemmer", "custom_phonetic"]
+		        },
+
+		        "depth_analyzer": {
+		        	"type": "custom",
+		        	"tokenizer": "full_ngram",
+		        	"filter": ["custom_word_delimiter", "lowercase", "shingle", "custom_phonetic"]
+		        },
+
+		        "breadth_analyzer": {
+		        	"type": "custom",
+		        	"tokenizer": "letter",
+		        	"filter": ["asciifolding", "lowercase", "simple_phonetic"]
 		        }
+		    },
+
+		    "tokenizer" : {
+
+		    	"custom_ngram": {
+		    		"type": "nGram",
+		    		"min_gram": 1,
+		    		"max_gram": 3
+		    	},
+
+		    	"full_ngram": {
+		    		"type": "nGram",
+		    		"min_gram": 1,
+		    		"max_gram": 5
+		    	}
 		    },
 
 		    "filter" : {
 
-		        "custom_word_delimiter":{
+		    	"simple_phonetic": {
+		    		"type": "phonetic",
+		    		"encoder": "nysiis",
+		    		"replace": true
+		    	},
+
+		    	"custom_phonetic": {
+		    		"type": "phonetic",
+		    		"encoder": "doublemetaphone",
+		    		"replace": false
+		    	},
+
+		        "custom_word_delimiter": {
 		            "type": "word_delimiter",
 		            "preserve_original": "true"
 		        },
