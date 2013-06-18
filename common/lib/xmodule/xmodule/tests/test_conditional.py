@@ -107,11 +107,7 @@ class ConditionalModuleBasicTest(unittest.TestCase):
 
     def test_icon_class(self):
         '''verify that get_icon_class works independent of condition satisfaction'''
-<<<<<<< HEAD
         modules = ConditionalFactory.create(self.get_test_system)
-=======
-        modules = ConditionalFactory.create(self.test_system)
->>>>>>> master
         for attempted in ["false", "true"]:
             for icon_class in [ 'other', 'problem', 'video']:
                 modules['source_module'].is_attempted = attempted
