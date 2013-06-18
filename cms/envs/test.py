@@ -70,7 +70,7 @@ CONTENTSTORE = {
     'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
     'OPTIONS': {
         'host': 'localhost',
-        'db': 'test_xmodule',
+        'db': 'test_xcontent',
     },
     # allow for additional options that can be keyed on a name, e.g. 'trashcan'
     'ADDITIONAL_OPTIONS': {

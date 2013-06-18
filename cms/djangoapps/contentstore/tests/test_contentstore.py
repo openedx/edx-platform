@@ -43,10 +43,13 @@ from django_comment_common.utils import are_permissions_roles_seeded
 from xmodule.exceptions import InvalidVersionError
 import datetime
 from pytz import UTC
+#from uuid import uuid4
 
 TEST_DATA_MODULESTORE = copy.deepcopy(settings.MODULESTORE)
 TEST_DATA_MODULESTORE['default']['OPTIONS']['fs_root'] = path('common/test/data')
 TEST_DATA_MODULESTORE['direct']['OPTIONS']['fs_root'] = path('common/test/data')
+TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
+TEST_DATA_CONTENTSTORE['OPTIONS']['db'] = 'test_xcontent_%s' % 4  #uuid4().hex
 
 
 class MongoCollectionFindWrapper(object):
@@ -60,6 +63,7 @@ class MongoCollectionFindWrapper(object):
 
 
 @override_settings(MODULESTORE=TEST_DATA_MODULESTORE)
+@override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
 class ContentStoreToyCourseTest(ModuleStoreTestCase):
     """
     Tests that rely on the toy courses.
@@ -82,6 +86,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         self.client = Client()
         self.client.login(username=uname, password=password)
+
 
     def check_components_on_page(self, component_types, expected_types):
         """
@@ -809,6 +814,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         export_to_xml(module_store, content_store, location, root_dir, 'test_export')
 
 
+@override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
 class ContentStoreTest(ModuleStoreTestCase):
     """
     Tests for the CMS ContentStore application.
