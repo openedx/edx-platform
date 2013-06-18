@@ -40,17 +40,6 @@ from capa.tests.response_xml_factory import OptionResponseXMLFactory, \
     FormulaResponseXMLFactory, CustomResponseXMLFactory, \
     CodeResponseXMLFactory
 
-#========= These Imports Cause the test not to run with the error I showed you
-
-#problem utilities.  For some reason, really cryptic error if you do this
-# from courseware.features.problems_setup import (PROBLEM_DICT, answer_problem, problem_has_answer, add_problem_to_course)
-
-# from courseware import fhh
-
-# from common import section_location
-
-#=================
-
 log = logging.getLogger("mitx." + __name__)
 
 
@@ -138,7 +127,6 @@ TEST_DATA_MONGO_MODULESTORE = mongo_store_config(TEST_DATA_DIR)
 TEST_DATA_DRAFT_MONGO_MODULESTORE = draft_mongo_store_config(TEST_DATA_DIR)
 
 
-## @override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestSubmittingProblems(ModuleStoreTestCase):
     """Check that a course gets graded properly"""
@@ -162,9 +150,7 @@ class TestSubmittingProblems(ModuleStoreTestCase):
         self.create_account('u1', self.student, self.password)
         self.activate_user(self.student)
         self.enroll(self.course)
-
         self.student_user = get_user(self.student)
-
         self.factory = RequestFactory()
 
     def refresh_course(self):
@@ -198,9 +184,7 @@ class TestSubmittingProblems(ModuleStoreTestCase):
 
         answer_key_prefix = 'input_i4x-'+self.course.org+'-{}-problem-{}_'.format(self.course_slug, problem_url_name)
 
-        resp = self.client.post(modx_url,
-            {(answer_key_prefix + k): v for k, v in responses.items()}
-        )
+        resp = self.client.post(modx_url, {(answer_key_prefix + k): v for k, v in responses.items()})
 
         return resp
 
@@ -314,10 +298,10 @@ class TestCourseGrader(TestSubmittingProblems):
         return section
 
     def add_grading_policy(self, grading_policy):
+        '''add a grading policy to the course'''
         course_data = {'grading_policy': grading_policy}
-        
-        # update the course with the grading Policy
         modulestore().update_item(self.course.location, course_data)
+        self.refresh_course()
 
     def get_grade_summary(self):
         '''calls grades.grade for current user and course'''
@@ -373,7 +357,7 @@ class TestCourseGrader(TestSubmittingProblems):
         return [s.earned for s in hw_section['scores']]
 
     def basic_setup(self):
-        # set up a simple course for testing basic grading functionality
+        '''set up a simple course for testing basic grading functionality'''
         grading_policy = {
             "GRADER": [{
                 "type": "Homework",
@@ -397,20 +381,20 @@ class TestCourseGrader(TestSubmittingProblems):
         self.refresh_course()
 
     def test_None_grade(self):
-        #check grade is 0 to begin
+        '''check grade is 0 to begin'''
         self.basic_setup()
         self.check_grade_percent(0)
         self.check_letter_grade(None)
 
     def test_B_grade_exact(self):
-        #check that at exactly the cutoff, the grade is B
+        '''check that at exactly the cutoff, the grade is B'''
         self.basic_setup()
         self.submit_question_answer('p1', {'2_1': 'Correct'})
         self.check_grade_percent(0.33)
         self.check_letter_grade('B')
 
     def test_B_grade_above(self):
-        #check grade between cutoffs
+        '''check grade between cutoffs'''
         self.basic_setup()
         self.submit_question_answer('p1', {'2_1': 'Correct'})
         self.submit_question_answer('p2', {'2_1': 'Correct'})
@@ -418,7 +402,7 @@ class TestCourseGrader(TestSubmittingProblems):
         self.check_letter_grade('B')
 
     def test_A_grade(self):
-        #check that 100% comlpetion gets an A
+        '''check that 100% comlpetion gets an A'''
         self.basic_setup()
         self.submit_question_answer('p1', {'2_1': 'Correct'})
         self.submit_question_answer('p2', {'2_1': 'Correct'})
@@ -427,7 +411,7 @@ class TestCourseGrader(TestSubmittingProblems):
         self.check_letter_grade('A')
 
     def test_weighted_grading(self):
-        # Set up a simple course for testing weighted grading functionality
+        '''Set up a simple course for testing weighted grading functionality'''
         grading_policy = {
             "GRADER": [
             {
@@ -470,7 +454,7 @@ class TestCourseGrader(TestSubmittingProblems):
         self.check_grade_percent(1.0)   # Hooray! We got 100%
 
     def test_dropping_homework(self):
-        # Set up a simple course for testing the dropping grading functionality
+        '''Set up a simple course for testing the dropping grading functionality'''
         grading_policy = {
             "GRADER": [
             {
@@ -500,12 +484,14 @@ class TestCourseGrader(TestSubmittingProblems):
         self.check_grade_percent(0.25)
         self.assertEqual(self.earned_hw_scores(), [1.0, 0, 0])   # Order matters
         self.assertEqual(self.score_for_hw('homework1'), [1.0, 0.0])
+        self.check_letter_grade(None)
 
         #Get the second problem incorrect
         self.submit_question_answer('H1P2', {'2_1': 'Incorrect'})
         self.check_grade_percent(0.25)
         self.assertEqual(self.earned_hw_scores(), [1.0, 0, 0])   # Order matters
         self.assertEqual(self.score_for_hw('homework1'), [1.0, 0.0])
+        self.check_letter_grade(None)
 
         #Get Homework2 correct
         self.submit_question_answer('H2P1', {'2_1': 'Correct'})
@@ -513,18 +499,21 @@ class TestCourseGrader(TestSubmittingProblems):
         self.check_grade_percent(0.75)
         self.assertEqual(self.earned_hw_scores(), [1.0, 2.0, 0])   # Order matters
         self.assertEqual(self.score_for_hw('homework2'), [1.0, 1.0])
+        self.check_letter_grade('Pass')
 
         #Get homework3 half correct, shouldn't change grade
         self.submit_question_answer('H3P1', {'2_1': 'Correct'})
         self.check_grade_percent(0.75)
         self.assertEqual(self.earned_hw_scores(), [1.0, 2.0, 1.0])   # Order matters
         self.assertEqual(self.score_for_hw('homework3'), [1.0, 0.0])
+        self.check_letter_grade('Pass')
 
         #get all of homework3 correct, which hsould replace homework 1
         self.submit_question_answer('H3P2', {'2_1': 'Correct'})
         self.check_grade_percent(1.0)
         self.assertEqual(self.earned_hw_scores(), [1.0, 2.0, 2.0])   # Order matters
         self.assertEqual(self.score_for_hw('homework3'), [1.0, 1.0])
+        self.check_letter_grade('Pass')
 
 
 # @override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
