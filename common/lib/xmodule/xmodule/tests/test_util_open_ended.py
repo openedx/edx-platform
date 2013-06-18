@@ -1,4 +1,4 @@
-from .import system_test
+from .import get_test_system
 from xmodule.modulestore import Location
 from xmodule.modulestore.xml import ImportSystem, XMLModuleStore
 from xmodule.tests.test_export import DATA_DIR
@@ -37,7 +37,7 @@ class DummyModulestore(object):
     """
     A mixin that allows test classes to have convenience functions to get a module given a location
     """
-    system_test = system_test()
+    get_test_system = get_test_system()
 
     def setup_modulestore(self, name):
         self.modulestore = XMLModuleStore(DATA_DIR, course_dirs=[name])
@@ -52,4 +52,4 @@ class DummyModulestore(object):
         if not isinstance(location, Location):
             location = Location(location)
         descriptor = self.modulestore.get_instance(course.id, location, depth=None)
-        return descriptor.xmodule(self.system_test)
+        return descriptor.xmodule(self.get_test_system)

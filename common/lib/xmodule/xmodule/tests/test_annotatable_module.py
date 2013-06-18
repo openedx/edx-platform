@@ -8,7 +8,7 @@ from mock import Mock
 from xmodule.annotatable_module import AnnotatableModule
 from xmodule.modulestore import Location
 
-from . import system_test
+from . import get_test_system
 
 class AnnotatableModuleTestCase(unittest.TestCase):
     location = Location(["i4x", "edX", "toy", "annotatable", "guided_discussion"])
@@ -32,7 +32,7 @@ class AnnotatableModuleTestCase(unittest.TestCase):
     module_data = {'data': sample_xml}
 
     def setUp(self):
-        self.annotatable = AnnotatableModule(system_test(), self.location, self.descriptor, self.module_data)
+        self.annotatable = AnnotatableModule(get_test_system(), self.location, self.descriptor, self.module_data)
 
     def test_annotation_data_attr(self):
         el = etree.fromstring('<annotation title="bar" body="foo" problem="0">test</annotation>')

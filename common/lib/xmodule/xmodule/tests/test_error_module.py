@@ -2,7 +2,7 @@
 Tests for ErrorModule and NonStaffErrorModule
 """
 import unittest
-from xmodule.tests import system_test
+from xmodule.tests import get_test_system
 import xmodule.error_module as error_module
 from xmodule.modulestore import Location
 from xmodule.x_module import XModuleDescriptor
@@ -14,7 +14,7 @@ class TestErrorModule(unittest.TestCase):
     Tests for ErrorModule and ErrorDescriptor
     """
     def setUp(self):
-        self.system = system_test()
+        self.system = get_test_system()
         self.org = "org"
         self.course = "course"
         self.location = Location(['i4x', self.org, self.course, None, None])
@@ -50,7 +50,7 @@ class TestNonStaffErrorModule(unittest.TestCase):
     Tests for NonStaffErrorModule and NonStaffErrorDescriptor
     """
     def setUp(self):
-        self.system = system_test()
+        self.system = get_test_system()
         self.org = "org"
         self.course = "course"
         self.location = Location(['i4x', self.org, self.course, None, None])

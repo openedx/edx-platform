@@ -6,7 +6,7 @@ from xblock.core import Scope, String, Object, Boolean
 from xmodule.fields import Date, StringyInteger, StringyFloat
 from xmodule.xml_module import XmlDescriptor
 import unittest
-from .import system_test
+from .import get_test_system
 from mock import Mock
 
 
@@ -139,7 +139,7 @@ class EditableMetadataFieldsTest(unittest.TestCase):
 
     # Start of helper methods
     def get_xml_editable_fields(self, model_data):
-        system = system_test()
+        system = get_test_system()
         system.render_template = Mock(return_value="<div>Test Template HTML</div>")
         return XmlDescriptor(system=system, location=None, model_data=model_data).editable_metadata_fields
 
@@ -151,7 +151,7 @@ class EditableMetadataFieldsTest(unittest.TestCase):
                 non_editable_fields.append(TestModuleDescriptor.due)
                 return non_editable_fields
 
-        system = system_test()
+        system = get_test_system()
         system.render_template = Mock(return_value="<div>Test Template HTML</div>")
         return TestModuleDescriptor(system=system, location=None, model_data=model_data)
 

@@ -15,7 +15,7 @@ from xmodule.tests.test_export import DATA_DIR
 ORG = 'test_org'
 COURSE = 'conditional'      # name of directory with course data
 
-from . import system_test
+from . import get_test_system
 
 
 class DummySystem(ImportSystem):
@@ -103,11 +103,11 @@ class ConditionalModuleBasicTest(unittest.TestCase):
     """
 
     def setUp(self):
-        self.system_test = system_test()
+        self.get_test_system = get_test_system()
 
     def test_icon_class(self):
         '''verify that get_icon_class works independent of condition satisfaction'''
-        modules = ConditionalFactory.create(self.system_test)
+        modules = ConditionalFactory.create(self.get_test_system)
         for attempted in ["false", "true"]:
             for icon_class in [ 'other', 'problem', 'video']:
                 modules['source_module'].is_attempted = attempted
@@ -116,8 +116,8 @@ class ConditionalModuleBasicTest(unittest.TestCase):
 
 
     def test_get_html(self):
-        modules = ConditionalFactory.create(self.system_test)
-        # because system_test returns the repr of the context dict passed to render_template,
+        modules = ConditionalFactory.create(self.get_test_system)
+        # because get_test_system returns the repr of the context dict passed to render_template,
         # we reverse it here
         html = modules['cond_module'].get_html()
         html_dict = literal_eval(html)
@@ -126,7 +126,7 @@ class ConditionalModuleBasicTest(unittest.TestCase):
         self.assertEqual(html_dict['depends'], 'i4x-edX-conditional_test-problem-SampleProblem')
 
     def test_handle_ajax(self):
-        modules = ConditionalFactory.create(self.system_test)
+        modules = ConditionalFactory.create(self.get_test_system)
         modules['source_module'].is_attempted = "false"
         ajax = json.loads(modules['cond_module'].handle_ajax('', ''))
         print "ajax: ", ajax
@@ -145,7 +145,7 @@ class ConditionalModuleBasicTest(unittest.TestCase):
         Check that handle_ajax works properly if the source is really an ErrorModule,
         and that the condition is not satisfied.
         '''
-        modules = ConditionalFactory.create(self.system_test, source_is_error_module=True)
+        modules = ConditionalFactory.create(self.get_test_system, source_is_error_module=True)
         ajax = json.loads(modules['cond_module'].handle_ajax('', ''))
         html = ajax['html']
         self.assertFalse(any(['This is a secret' in item for item in html]))
@@ -161,7 +161,7 @@ class ConditionalModuleXmlTest(unittest.TestCase):
         return DummySystem(load_error_modules)
 
     def setUp(self):
-        self.system_test = system_test()
+        self.get_test_system = get_test_system()
 
     def get_course(self, name):
         """Get a test course by directory name.  If there's more than one, error."""
@@ -187,7 +187,7 @@ class ConditionalModuleXmlTest(unittest.TestCase):
                 location = descriptor
                 descriptor = self.modulestore.get_instance(course.id, location, depth=None)
             location = descriptor.location
-            return descriptor.xmodule(self.system_test)
+            return descriptor.xmodule(self.get_test_system)
 
         # edx - HarvardX
         # cond_test - ER22x
@@ -195,8 +195,8 @@ class ConditionalModuleXmlTest(unittest.TestCase):
 
         def replace_urls(text, staticfiles_prefix=None, replace_prefix='/static/', course_namespace=None):
             return text
-        self.system_test.replace_urls = replace_urls
-        self.system_test.get_module = inner_get_module
+        self.get_test_system.replace_urls = replace_urls
+        self.get_test_system.get_module = inner_get_module
 
         module = inner_get_module(location)
         print "module: ", module
