@@ -424,7 +424,7 @@ class CapaModule(CapaFields, XModule):
 
         # If we cannot construct the problem HTML,
         # then generate an error message instead.
-        except Exception, err:
+        except Exception as err:
             html = self.handle_problem_html_error(err)
 
         # The convention is to pass the name of the check button
@@ -655,7 +655,7 @@ class CapaModule(CapaFields, XModule):
     @staticmethod
     def make_dict_of_responses(get):
         '''Make dictionary of student responses (aka "answers")
-        get is POST dictionary (Djano QueryDict).
+        get is POST dictionary (Django QueryDict).
 
         The *get* dict has keys of the form 'x_y', which are mapped
         to key 'y' in the returned dict.  For example,
@@ -739,13 +739,13 @@ class CapaModule(CapaFields, XModule):
         # Too late. Cannot submit
         if self.closed():
             event_info['failure'] = 'closed'
-            self.system.track_function('save_problem_check_fail', event_info)
+            self.system.track_function('problem_check_fail', event_info)
             raise NotFoundError('Problem is closed')
 
         # Problem submitted. Student should reset before checking again
         if self.done and self.rerandomize == "always":
             event_info['failure'] = 'unreset'
-            self.system.track_function('save_problem_check_fail', event_info)
+            self.system.track_function('problem_check_fail', event_info)
             raise NotFoundError('Problem must be reset before it can be checked again')
 
         # Problem queued. Students must wait a specified waittime before they are allowed to submit
@@ -759,6 +759,8 @@ class CapaModule(CapaFields, XModule):
 
         try:
             correct_map = self.lcp.grade_answers(answers)
+            self.attempts = self.attempts + 1
+            self.lcp.done = True
             self.set_state_from_lcp()
 
         except (StudentInputError, ResponseError, LoncapaProblemError) as inst:
@@ -778,17 +780,13 @@ class CapaModule(CapaFields, XModule):
 
             return {'success': msg}
 
-        except Exception, err:
+        except Exception as err:
             if self.system.DEBUG:
                 msg = "Error checking problem: " + str(err)
                 msg += '\nTraceback:\n' + traceback.format_exc()
                 return {'success': msg}
             raise
 
-        self.attempts = self.attempts + 1
-        self.lcp.done = True
-
-        self.set_state_from_lcp()
         self.publish_grade()
 
         # success = correct if ALL questions in this problem are correct
@@ -802,7 +800,7 @@ class CapaModule(CapaFields, XModule):
         event_info['correct_map'] = correct_map.get_dict()
         event_info['success'] = success
         event_info['attempts'] = self.attempts
-        self.system.track_function('save_problem_check', event_info)
+        self.system.track_function('problem_check', event_info)
 
         if hasattr(self.system, 'psychometrics_handler'):  # update PsychometricsData using callback
             self.system.psychometrics_handler(self.get_state_for_lcp())
@@ -814,12 +812,92 @@ class CapaModule(CapaFields, XModule):
                 'contents': html,
                 }
 
+    def rescore_problem(self):
+        """
+        Checks whether the existing answers to a problem are correct.
+
+        This is called when the correct answer to a problem has been changed,
+        and the grade should be re-evaluated.
+
+        Returns a dict with one key:
+            {'success' : 'correct' | 'incorrect' | AJAX alert msg string }
+
+        Raises NotFoundError if called on a problem that has not yet been
+        answered, or NotImplementedError if it's a problem that cannot be rescored.
+
+        Returns the error messages for exceptions occurring while performing
+        the rescoring, rather than throwing them.
+        """
+        event_info = {'state': self.lcp.get_state(), 'problem_id': self.location.url()}
+
+        if not self.lcp.supports_rescoring():
+            event_info['failure'] = 'unsupported'
+            self.system.track_function('problem_rescore_fail', event_info)
+            raise NotImplementedError("Problem's definition does not support rescoring")
+
+        if not self.done:
+            event_info['failure'] = 'unanswered'
+            self.system.track_function('problem_rescore_fail', event_info)
+            raise NotFoundError('Problem must be answered before it can be graded again')
+
+        # get old score, for comparison:
+        orig_score = self.lcp.get_score()
+        event_info['orig_score'] = orig_score['score']
+        event_info['orig_total'] = orig_score['total']
+
+        try:
+            correct_map = self.lcp.rescore_existing_answers()
+
+        except (StudentInputError, ResponseError, LoncapaProblemError) as inst:
+            log.warning("Input error in capa_module:problem_rescore", exc_info=True)
+            event_info['failure'] = 'input_error'
+            self.system.track_function('problem_rescore_fail', event_info)
+            return {'success': u"Error: {0}".format(inst.message)}
+
+        except Exception as err:
+            event_info['failure'] = 'unexpected'
+            self.system.track_function('problem_rescore_fail', event_info)
+            if self.system.DEBUG:
+                msg = u"Error checking problem: {0}".format(err.message)
+                msg += u'\nTraceback:\n' + traceback.format_exc()
+                return {'success': msg}
+            raise
+
+        # rescoring should have no effect on attempts, so don't
+        # need to increment here, or mark done.  Just save.
+        self.set_state_from_lcp()
+
+        self.publish_grade()
+
+        new_score = self.lcp.get_score()
+        event_info['new_score'] = new_score['score']
+        event_info['new_total'] = new_score['total']
+
+        # success = correct if ALL questions in this problem are correct
+        success = 'correct'
+        for answer_id in correct_map:
+            if not correct_map.is_correct(answer_id):
+                success = 'incorrect'
+
+        # NOTE: We are logging both full grading and queued-grading submissions. In the latter,
+        #       'success' will always be incorrect
+        event_info['correct_map'] = correct_map.get_dict()
+        event_info['success'] = success
+        event_info['attempts'] = self.attempts
+        self.system.track_function('problem_rescore', event_info)
+
+        # psychometrics should be called on rescoring requests in the same way as check-problem
+        if hasattr(self.system, 'psychometrics_handler'):  # update PsychometricsData using callback
+            self.system.psychometrics_handler(self.get_state_for_lcp())
+
+        return {'success': success}
+
     def save_problem(self, get):
-        '''
+        """
         Save the passed in answers.
-        Returns a dict { 'success' : bool, ['error' : error-msg]},
-        with the error key only present if success is False.
-        '''
+        Returns a dict { 'success' : bool, 'msg' : message }
+        The message is informative on success, and an error message on failure.
+        """
         event_info = dict()
         event_info['state'] = self.lcp.get_state()
         event_info['problem_id'] = self.location.url()
