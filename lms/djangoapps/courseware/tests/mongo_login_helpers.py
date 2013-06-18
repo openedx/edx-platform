@@ -3,32 +3,13 @@ import json
 
 from urlparse import urlsplit, urlunsplit
 
-from django.contrib.auth.models import User, Group
-from django.test import TestCase
-from django.test.client import RequestFactory
-from django.conf import settings
+from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
-from django.test.utils import override_settings
-
-import xmodule.modulestore.django
-
-# Need access to internal func to put users in the right group
-from courseware import grades
-from courseware.model_data import ModelDataCache
-from courseware.access import (has_access, _course_staff_group_name,
-                               course_beta_test_group_name)
 
 from student.models import Registration
-from xmodule.error_module import ErrorDescriptor
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore import Location
-from xmodule.modulestore.xml_importer import import_from_xml
-from xmodule.modulestore.xml import XMLModuleStore
 
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
-from xmodule.modulestore.mongo import MongoModuleStore
 log = logging.getLogger("mitx." + __name__)
 
 
