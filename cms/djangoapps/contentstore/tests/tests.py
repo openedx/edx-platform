@@ -3,6 +3,10 @@ from django.core.urlresolvers import reverse
 
 from .utils import parse_json, user, registration
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from contentstore.tests.test_course_settings import CourseTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
+import datetime
+from pytz import UTC
 
 
 class ContentStoreTestCase(ModuleStoreTestCase):
@@ -162,3 +166,21 @@ class AuthTestCase(ContentStoreTestCase):
         self.assertEqual(resp.status_code, 302)
 
         # Logged in should work.
+
+
+class ForumTestCase(CourseTestCase):
+    def setUp(self):
+        """ Creates the test course. """
+        super(ForumTestCase, self).setUp()
+        self.course = CourseFactory.create(org='testX', number='727', display_name='Forum Course')
+
+    def test_blackouts(self):
+        now = datetime.datetime.now(UTC)
+        self.course.discussion_blackouts = [(t.isoformat(), t2.isoformat()) for t, t2 in
+            [(now - datetime.timedelta(days=14), now - datetime.timedelta(days=11)),
+                (now + datetime.timedelta(days=24), now + datetime.timedelta(days=30))]]
+        self.assertTrue(self.course.forum_posts_allowed)
+        self.course.discussion_blackouts = [(t.isoformat(), t2.isoformat()) for t, t2 in
+            [(now - datetime.timedelta(days=14), now + datetime.timedelta(days=2)),
+                (now + datetime.timedelta(days=24), now + datetime.timedelta(days=30))]]
+        self.assertFalse(self.course.forum_posts_allowed)
