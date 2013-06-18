@@ -1,10 +1,22 @@
 describe 'Logger', ->
+  beforeEach ->
+    window.analytics = jasmine.createSpyObj('analytics', ['track'])
+    analytics.track.andCallFake(->
+      $.ajax('/foo');
+    )
+    @requests = requests = []
+    @xhr = sinon.useFakeXMLHttpRequest()
+    @xhr.onCreate = (xhr) -> requests.push(xhr)
+  
+  afterEach ->
+    @xhr.restore()
+    delete window.analytics
+
   it 'expose window.log_event', ->
     expect(window.log_event).toBe Logger.log
 
   describe 'log', ->
-    it 'send event to Segment.io if event is whitelisted', ->
-      spyOn 'analytics.track'
+    it 'sends an event to Segment.io, if the event is whitelisted', ->
       Logger.log 'seq_goto', 'data'
       expect(analytics.track).toHaveBeenCalledWith 'seq_goto', 'data'
 
@@ -13,6 +25,17 @@ describe 'Logger', ->
       Logger.log 'example', 'data'
       expect($.getWithPrefix).toHaveBeenCalledWith '/event',
         event_type: 'example'
+        event: '"data"'
+        page: window.location.href
+
+    it 'continues to log events if Segment.io is down', ->
+      spyOn($, 'getWithPrefix').andCallThrough()
+      Logger.log 'seq_goto', 'data'
+      expect(@requests.length).toEqual 2
+      expect(@requests[0].url).toMatch /foo/
+      @requests[0].respond(500)
+      expect($.getWithPrefix).toHaveBeenCalledWith '/event',
+        event_type: 'seq_goto'
         event: '"data"'
         page: window.location.href
 
