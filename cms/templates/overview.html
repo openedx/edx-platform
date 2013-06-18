@@ -1,7 +1,7 @@
 <%inherit file="base.html" />
 <%!
    import logging
-   from xmodule.util.date_utils import get_time_struct_display
+   from xmodule.util import date_utils
 %>
 <%! from django.core.urlresolvers import reverse %>
 <%block name="title">Course Outline</%block>
@@ -154,14 +154,19 @@
               <h3 class="section-name" data-name="${section.display_name_with_default | h}"></h3>
               <div class="section-published-date">
                 <%
-                  start_date_str = get_time_struct_display(section.lms.start, '%m/%d/%Y')
-                  start_time_str = get_time_struct_display(section.lms.start, '%H:%M')
+                  if section.lms.start is not None:
+                      start_date_str = section.lms.start.strftime('%m/%d/%Y')
+                      start_time_str = section.lms.start.strftime('%H:%M')
+                  else:
+                      start_date_str = ''
+                      start_time_str = ''
                 %>
                 %if section.lms.start is None:
                   <span class="published-status">This section has not been released.</span>
                   <a href="#" class="schedule-button" data-date="" data-time="" data-id="${section.location}">Schedule</a>
                 %else:
-                  <span class="published-status"><strong>Will Release:</strong> ${get_time_struct_display(section.lms.start, '%m/%d/%Y at %H:%M UTC')}</span>
+                  <span class="published-status"><strong>Will Release:</strong> 
+                  ${date_utils.get_default_time_display(section.lms.start)}</span>
                   <a href="#" class="edit-button" data-date="${start_date_str}" data-time="${start_time_str}" data-id="${section.location}">Edit</a>
                 %endif
               </div>

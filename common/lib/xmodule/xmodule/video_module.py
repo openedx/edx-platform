@@ -138,5 +138,4 @@ class VideoModule(VideoFields, XModule):
 class VideoDescriptor(VideoFields, RawDescriptor):
     """Descriptor for `VideoModule`."""
     module_class = VideoModule
-    stores_state = True
     template_dir_name = "video"

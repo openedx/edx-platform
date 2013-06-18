@@ -16,7 +16,7 @@ describe 'Problem', ->
 
     # note that the fixturesPath is set in spec/helper.coffee
     loadFixtures 'problem.html'
- 
+
     spyOn Logger, 'log'
     spyOn($.fn, 'load').andCallFake (url, callback) ->
       $(@).html readFixtures('problem_content.html')
@@ -27,13 +27,13 @@ describe 'Problem', ->
     it 'set the element from html', ->
       @problem999 = new Problem ("
         <section class='xmodule_display xmodule_CapaModule' data-type='Problem'>
-          <section id='problem_999' 
-                   class='problems-wrapper' 
-                   data-problem-id='i4x://edX/999/problem/Quiz' 
+          <section id='problem_999'
+                   class='problems-wrapper'
+                   data-problem-id='i4x://edX/999/problem/Quiz'
                    data-url='/problem/quiz/'>
           </section>
         </section>
-        ")      
+        ")
       expect(@problem999.element_id).toBe 'problem_999'
 
     it 'set the element from loadFixtures', ->
@@ -62,7 +62,7 @@ describe 'Problem', ->
       expect($('section.action input.reset')).toHandleWith 'click', @problem.reset
 
     it 'bind the show button', ->
-      expect($('section.action input.show')).toHandleWith 'click', @problem.show
+      expect($('section.action button.show')).toHandleWith 'click', @problem.show
 
     it 'bind the save button', ->
       expect($('section.action input.save')).toHandleWith 'click', @problem.save
@@ -126,14 +126,14 @@ describe 'Problem', ->
 
     describe 'when the response is correct', ->
       it 'call render with returned content', ->
-        spyOn($, 'postWithPrefix').andCallFake (url, answers, callback) -> 
+        spyOn($, 'postWithPrefix').andCallFake (url, answers, callback) ->
           callback(success: 'correct', contents: 'Correct!')
         @problem.check()
         expect(@problem.el.html()).toEqual 'Correct!'
 
     describe 'when the response is incorrect', ->
       it 'call render with returned content', ->
-        spyOn($, 'postWithPrefix').andCallFake (url, answers, callback) -> 
+        spyOn($, 'postWithPrefix').andCallFake (url, answers, callback) ->
           callback(success: 'incorrect', contents: 'Incorrect!')
         @problem.check()
         expect(@problem.el.html()).toEqual 'Incorrect!'
@@ -159,7 +159,7 @@ describe 'Problem', ->
     it 'POST to the problem reset page', ->
       spyOn $, 'postWithPrefix'
       @problem.reset()
-      expect($.postWithPrefix).toHaveBeenCalledWith '/problem/Problem1/problem_reset', 
+      expect($.postWithPrefix).toHaveBeenCalledWith '/problem/Problem1/problem_reset',
           { id: 'i4x://edX/101/problem/Problem1' }, jasmine.any(Function)
 
     it 'render the returned content', ->
@@ -179,7 +179,7 @@ describe 'Problem', ->
 
       it 'log the problem_show event', ->
         @problem.show()
-        expect(Logger.log).toHaveBeenCalledWith 'problem_show', 
+        expect(Logger.log).toHaveBeenCalledWith 'problem_show',
             problem: 'i4x://edX/101/problem/Problem1'
 
       it 'fetch the answers', ->
@@ -198,7 +198,7 @@ describe 'Problem', ->
       it 'toggle the show answer button', ->
         spyOn($, 'postWithPrefix').andCallFake (url, callback) -> callback(answers: {})
         @problem.show()
-        expect($('.show')).toHaveValue 'Hide Answer'
+        expect($('.show .show-label')).toHaveText 'Hide Answer(s)'
 
       it 'add the showed class to element', ->
         spyOn($, 'postWithPrefix').andCallFake (url, callback) -> callback(answers: {})
@@ -223,7 +223,7 @@ describe 'Problem', ->
           expect($('label[for="input_1_1_3"]')).toHaveAttr 'correct_answer', 'true'
           expect($('label[for="input_1_2_1"]')).not.toHaveAttr 'correct_answer', 'true'
 
-    describe 'when the answers are alreay shown', ->
+    describe 'when the answers are already shown', ->
       beforeEach ->
         @problem.el.addClass 'showed'
         @problem.el.prepend '''
@@ -243,7 +243,7 @@ describe 'Problem', ->
 
       it 'toggle the show answer button', ->
         @problem.show()
-        expect($('.show')).toHaveValue 'Show Answer'
+        expect($('.show .show-label')).toHaveText 'Show Answer(s)'
 
       it 'remove the showed class from element', ->
         @problem.show()
@@ -261,7 +261,7 @@ describe 'Problem', ->
     it 'POST to save problem', ->
       spyOn $, 'postWithPrefix'
       @problem.save()
-      expect($.postWithPrefix).toHaveBeenCalledWith '/problem/Problem1/problem_save', 
+      expect($.postWithPrefix).toHaveBeenCalledWith '/problem/Problem1/problem_save',
           'foo=1&bar=2', jasmine.any(Function)
 
     # TODO: figure out why failing

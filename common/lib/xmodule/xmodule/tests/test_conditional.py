@@ -87,8 +87,8 @@ class ConditionalFactory(object):
 
         # construct conditional module:
         cond_location = Location(["i4x", "edX", "conditional_test", "conditional", "SampleConditional"])
-        model_data = {'data': '<conditional/>'}
-        cond_module = ConditionalModule(system, cond_location, cond_descriptor, model_data)
+        model_data = {'data': '<conditional/>', 'location': cond_location}
+        cond_module = ConditionalModule(system, cond_descriptor, model_data)
 
         # return dict:
         return {'cond_module': cond_module,
@@ -107,7 +107,11 @@ class ConditionalModuleBasicTest(unittest.TestCase):
 
     def test_icon_class(self):
         '''verify that get_icon_class works independent of condition satisfaction'''
+<<<<<<< HEAD
         modules = ConditionalFactory.create(self.get_test_system)
+=======
+        modules = ConditionalFactory.create(self.test_system)
+>>>>>>> master
         for attempted in ["false", "true"]:
             for icon_class in [ 'other', 'problem', 'video']:
                 modules['source_module'].is_attempted = attempted
@@ -186,7 +190,6 @@ class ConditionalModuleXmlTest(unittest.TestCase):
             if isinstance(descriptor, Location):
                 location = descriptor
                 descriptor = self.modulestore.get_instance(course.id, location, depth=None)
-            location = descriptor.location
             return descriptor.xmodule(self.get_test_system)
 
         # edx - HarvardX

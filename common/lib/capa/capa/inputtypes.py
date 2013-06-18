@@ -144,11 +144,11 @@ class InputTypeBase(object):
         self.tag = xml.tag
         self.system = system
 
-        ## NOTE: ID should only come from one place.  If it comes from multiple,
-        ## we use state first, XML second (in case the xml changed, but we have
-        ## existing state with an old id). Since we don't make this guarantee,
-        ## we can swap this around in the future if there's a more logical
-        ## order.
+        # NOTE: ID should only come from one place.  If it comes from multiple,
+        # we use state first, XML second (in case the xml changed, but we have
+        # existing state with an old id). Since we don't make this guarantee,
+        # we can swap this around in the future if there's a more logical
+        # order.
 
         self.input_id = state.get('id', xml.get('id'))
         if self.input_id is None:
@@ -769,7 +769,7 @@ class MatlabInput(CodeInput):
 
         # construct xqueue headers
         qinterface = self.system.xqueue['interface']
-        qtime = datetime.strftime(datetime.utcnow(), xqueue_interface.dateformat)
+        qtime = datetime.utcnow().strftime(xqueue_interface.dateformat)
         callback_url = self.system.xqueue['construct_callback']('ungraded_response')
         anonymous_student_id = self.system.anonymous_student_id
         queuekey = xqueue_interface.make_hashkey(str(self.system.seed) + qtime +

@@ -470,6 +470,7 @@ class LoncapaProblem(object):
                     python_path=python_path,
                     cache=self.system.cache,
                     slug=self.problem_id,
+                    unsafely=self.system.can_execute_unsafe_code(),
                 )
             except Exception as err:
                 log.exception("Error while execing script code: " + all_code)

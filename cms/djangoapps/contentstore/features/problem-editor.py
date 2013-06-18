@@ -3,6 +3,7 @@
 
 from lettuce import world, step
 from nose.tools import assert_equal
+from common import type_in_codemirror
 
 DISPLAY_NAME = "Display Name"
 MAXIMUM_ATTEMPTS = "Maximum Attempts"
@@ -41,7 +42,9 @@ def i_see_five_settings_with_values(step):
 
 @step('I can modify the display name')
 def i_can_modify_the_display_name(step):
-    world.get_setting_entry(DISPLAY_NAME).find_by_css('.setting-input')[0].fill('modified')
+    # Verifying that the display name can be a string containing a floating point value
+    # (to confirm that we don't throw an error because it is of the wrong type).
+    world.get_setting_entry(DISPLAY_NAME).find_by_css('.setting-input')[0].fill('3.4')
     verify_modified_display_name()
 
 
@@ -133,12 +136,12 @@ def set_the_max_attempts(step, max_attempts_set, max_attempts_displayed, max_att
 
 @step('Edit High Level Source is not visible')
 def edit_high_level_source_not_visible(step):
-    verify_high_level_source(step, False)
+    verify_high_level_source_links(step, False)
 
 
 @step('Edit High Level Source is visible')
-def edit_high_level_source_visible(step):
-    verify_high_level_source(step, True)
+def edit_high_level_source_links_visible(step):
+    verify_high_level_source_links(step, True)
 
 
 @step('If I press Cancel my changes are not persisted')
@@ -151,13 +154,33 @@ def cancel_does_not_save_changes(step):
 @step('I have created a LaTeX Problem')
 def create_latex_problem(step):
     world.click_new_component_button(step, '.large-problem-icon')
-    # Go to advanced tab (waiting for the tab to be visible)
-    world.css_find('#ui-id-2')
+    # Go to advanced tab.
     world.css_click('#ui-id-2')
     world.click_component_from_menu("i4x://edx/templates/problem/Problem_Written_in_LaTeX", '.xmodule_CapaModule')
 
 
-def verify_high_level_source(step, visible):
+@step('I edit and compile the High Level Source')
+def edit_latex_source(step):
+    open_high_level_source()
+    type_in_codemirror(1, "hi")
+    world.css_click('.hls-compile')
+
+
+@step('my change to the High Level Source is persisted')
+def high_level_source_persisted(step):
+    def verify_text(driver):
+        return world.css_find('.problem').text == 'hi'
+
+    world.wait_for(verify_text)
+
+
+@step('I view the High Level Source I see my changes')
+def high_level_source_in_editor(step):
+    open_high_level_source()
+    assert_equal('hi', world.css_find('.source-edit-box').value)
+
+
+def verify_high_level_source_links(step, visible):
     assert_equal(visible, world.is_css_present('.launch-latex-compiler'))
     world.cancel_component(step)
     assert_equal(visible, world.is_css_present('.upload-button'))
@@ -172,7 +195,7 @@ def verify_modified_randomization():
 
 
 def verify_modified_display_name():
-    world.verify_setting_entry(world.get_setting_entry(DISPLAY_NAME), DISPLAY_NAME, 'modified', True)
+    world.verify_setting_entry(world.get_setting_entry(DISPLAY_NAME), DISPLAY_NAME, '3.4', True)
 
 
 def verify_modified_display_name_with_special_chars():
@@ -185,3 +208,8 @@ def verify_unset_display_name():
 
 def set_weight(weight):
     world.get_setting_entry(PROBLEM_WEIGHT).find_by_css('.setting-input')[0].fill(weight)
+
+
+def open_high_level_source():
+    world.css_click('a.edit-button')
+    world.css_click('.launch-latex-compiler > a')
