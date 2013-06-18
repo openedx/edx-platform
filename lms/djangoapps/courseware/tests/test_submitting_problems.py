@@ -30,6 +30,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import Location
 from xmodule.modulestore.xml_importer import import_from_xml
 from xmodule.modulestore.xml import XMLModuleStore
+from mongo_login_helpers import *
 
 #import factories for testing
 from xmodule.modulestore.tests.factories import *
@@ -128,7 +129,7 @@ TEST_DATA_DRAFT_MONGO_MODULESTORE = draft_mongo_store_config(TEST_DATA_DIR)
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
-class TestSubmittingProblems(ModuleStoreTestCase):
+class TestSubmittingProblems(MongoLoginHelpers):
     """Check that a course gets graded properly"""
 
     # Subclasses should specify the course slug
@@ -194,61 +195,6 @@ class TestSubmittingProblems(ModuleStoreTestCase):
         modx_url = self.modx_url(problem_location, 'problem_reset')
         resp = self.client.post(modx_url)
         return resp
-
-    def _create_account(self, username, email, password):
-        '''Try to create an account.  No error checking'''
-        resp = self.client.post('/create_account', {
-            'username': username,
-            'email': email,
-            'password': password,
-            'name': 'Fred Weasley',
-            'terms_of_service': 'true',
-            'honor_code': 'true',
-        })
-        return resp
-
-    def create_account(self, username, email, password):
-        '''Create the account and check that it worked'''
-        resp = self._create_account(username, email, password)
-        self.assertEqual(resp.status_code, 200)
-        data = parse_json(resp)
-        self.assertEqual(data['success'], True)
-
-        # Check both that the user is created, and inactive
-        self.assertFalse(get_user(email).is_active)
-
-        return resp
-
-    def _activate_user(self, email):
-        '''Look up the activation key for the user, then hit the activate view.
-        No error checking'''
-        activation_key = get_registration(email).activation_key
-
-        # and now we try to activate
-        url = reverse('activate', kwargs={'key': activation_key})
-        resp = self.client.get(url)
-        return resp
-
-    def activate_user(self, email):
-        resp = self._activate_user(email)
-        self.assertEqual(resp.status_code, 200)
-        # Now make sure that the user is now actually activated
-        self.assertTrue(get_user(email).is_active)
-
-    def try_enroll(self, course):
-        """Try to enroll.  Return bool success instead of asserting it."""
-        resp = self.client.post('/change_enrollment', {
-            'enrollment_action': 'enroll',
-            'course_id': course.id,
-        })
-        print ('Enrollment in %s result status code: %s'
-               % (course.location.url(), str(resp.status_code)))
-        return resp.status_code == 200
-
-    def enroll(self, course):
-        """Enroll the currently logged-in user, and check that it worked."""
-        result = self.try_enroll(course)
-        self.assertTrue(result)
 
 
 class TestCourseGrader(TestSubmittingProblems):
@@ -468,7 +414,7 @@ class TestCourseGrader(TestSubmittingProblems):
         self.add_grading_policy(grading_policy)
 
         # Set up a course structure that just consists of 3 homeworks.
-        # Since the grading policy drops 1, each problem is worth 25% 
+        # Since the grading policy drops 1, each problem is worth 25%
         self.homework1 = self.add_graded_section_to_course('homework1')
         self.h1p1 = self.add_problem_to_section(self.homework1.location, 'H1P1', 1)
         self.h1p2 = self.add_problem_to_section(self.homework1.location, 'H1P2', 1)
@@ -514,69 +460,3 @@ class TestCourseGrader(TestSubmittingProblems):
         self.assertEqual(self.earned_hw_scores(), [1.0, 2.0, 2.0])   # Order matters
         self.assertEqual(self.score_for_hw('homework3'), [1.0, 1.0])
         self.check_letter_grade('Pass')
-
-
-# @override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
-class TestSchematicResponse(TestSubmittingProblems):
-    """Check that we can submit a schematic response, and it answers properly."""
-
-    course_slug = "embedded_python"
-    course_when = "2013_Spring"
-
-    def test_schematic(self):
-        resp = self.submit_question_answer('schematic_problem',
-            { '2_1': json.dumps(
-                [['transient', {'Z': [
-                [0.0000004, 2.8],
-                [0.0000009, 2.8],
-                [0.0000014, 2.8],
-                [0.0000019, 2.8],
-                [0.0000024, 2.8],
-                [0.0000029, 0.2],
-                [0.0000034, 0.2],
-                [0.0000039, 0.2]
-                ]}]]
-                )
-            })
-        respdata = json.loads(resp.content)
-        self.assertEqual(respdata['success'], 'correct')
-
-        self.reset_question_answer('schematic_problem')
-        resp = self.submit_question_answer('schematic_problem',
-            { '2_1': json.dumps(
-                [['transient', {'Z': [
-                [0.0000004, 2.8],
-                [0.0000009, 0.0],       # wrong.
-                [0.0000014, 2.8],
-                [0.0000019, 2.8],
-                [0.0000024, 2.8],
-                [0.0000029, 0.2],
-                [0.0000034, 0.2],
-                [0.0000039, 0.2]
-                ]}]]
-                )
-            })
-        respdata = json.loads(resp.content)
-        self.assertEqual(respdata['success'], 'incorrect')
-
-    def test_check_function(self):
-        resp = self.submit_question_answer('cfn_problem', {'2_1': "0, 1, 2, 3, 4, 5, 'Outside of loop', 6"})
-        respdata = json.loads(resp.content)
-        self.assertEqual(respdata['success'], 'correct')
-
-        self.reset_question_answer('cfn_problem')
-
-        resp = self.submit_question_answer('cfn_problem', {'2_1': "xyzzy!"})
-        respdata = json.loads(resp.content)
-        self.assertEqual(respdata['success'], 'incorrect')
-
-    def test_computed_answer(self):
-        resp = self.submit_question_answer('computed_answer', {'2_1': "Xyzzy"})
-        respdata = json.loads(resp.content)
-        self.assertEqual(respdata['success'], 'correct')
-
-        self.reset_question_answer('computed_answer')
-
-        resp = self.submit_question_answer('computed_answer', {'2_1': "NO!"})
-        respdata = json.loads(resp.content)
-        self.assertEqual(respdata['success'], 'incorrect')

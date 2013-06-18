@@ -53,12 +53,14 @@ class XModuleCourseFactory(Factory):
         )
         new_course.discussion_link = kwargs.get('discussion_link')
 
-        # Update the data in the mongo datastore
+        # Update the data in the mongo datastore and refetch item
         store.update_metadata(new_course.location.url(), own_metadata(new_course))
-
         data = kwargs.get('data')
         if data is not None:
             store.update_item(new_course.location, data)
+
+        #refetch item
+        new_course = store.get_instance(new_course.id, new_course.location)
 
         return new_course
 
@@ -148,6 +150,7 @@ class XModuleItemFactory(Factory):
         if new_item.location.category not in DETACHED_CATEGORIES:
             store.update_children(parent_location, parent.children + [new_item.location.url()])
 
+        #added return of parent since I cant figure out how to update the course from within the test
         return new_item
 
 
