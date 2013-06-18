@@ -1,6 +1,3 @@
-'''
-Test for lms courseware app
-'''
 import logging
 import json
 import time
@@ -30,10 +27,10 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import Location
 from xmodule.modulestore.xml_importer import import_from_xml
 from xmodule.modulestore.xml import XMLModuleStore
-from mongo_login_helpers import *
+from mongo_login_helpers import MongoLoginHelpers
 
 #import factories for testing
-from xmodule.modulestore.tests.factories import *
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from capa.tests.response_xml_factory import OptionResponseXMLFactory, \
     ChoiceResponseXMLFactory, MultipleChoiceResponseXMLFactory, \
@@ -81,51 +78,8 @@ def mongo_store_config(data_dir):
     store['direct'] = store['default']
     return store
 
-
-def draft_mongo_store_config(data_dir):
-    '''Defines default module store using DraftMongoModuleStore'''
-    return {
-        'default': {
-            'ENGINE': 'xmodule.modulestore.mongo.DraftMongoModuleStore',
-            'OPTIONS': {
-                'default_class': 'xmodule.raw_module.RawDescriptor',
-                'host': 'localhost',
-                'db': 'test_xmodule',
-                'collection': 'modulestore_%s' % uuid4().hex,
-                'fs_root': data_dir,
-                'render_template': 'mitxmako.shortcuts.render_to_string',
-            }
-        },
-        'direct': {
-            'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
-            'OPTIONS': {
-                'default_class': 'xmodule.raw_module.RawDescriptor',
-                'host': 'localhost',
-                'db': 'test_xmodule',
-                'collection': 'modulestore_%s' % uuid4().hex,
-                'fs_root': data_dir,
-                'render_template': 'mitxmako.shortcuts.render_to_string',
-            }
-        }
-    }
-
-
-def xml_store_config(data_dir):
-    '''Defines default module store using XMLModuleStore'''
-    return {
-        'default': {
-            'ENGINE': 'xmodule.modulestore.xml.XMLModuleStore',
-            'OPTIONS': {
-                'data_dir': data_dir,
-                'default_class': 'xmodule.hidden_module.HiddenDescriptor',
-            }
-        }
-    }
-
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
-TEST_DATA_XML_MODULESTORE = xml_store_config(TEST_DATA_DIR)
 TEST_DATA_MONGO_MODULESTORE = mongo_store_config(TEST_DATA_DIR)
-TEST_DATA_DRAFT_MONGO_MODULESTORE = draft_mongo_store_config(TEST_DATA_DIR)
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
@@ -289,7 +243,7 @@ class TestCourseGrader(TestSubmittingProblems):
 
     def check_letter_grade(self, letter):
         '''assert letter grade is as expected'''
-        self.assertEqual(self.get_letter_grade(),letter)
+        self.assertEqual(self.get_letter_grade(), letter)
 
     def earned_hw_scores(self):
         """Global scores, each Score is a Problem Set"""
@@ -367,12 +321,12 @@ class TestCourseGrader(TestSubmittingProblems):
                 "short_label": "HW",
                 "weight": 0.25
             },
-            {
-                "type": "Final",
-                "name": "Final Section",
-                "short_label": "Final",
-                "weight": 0.75
-            }]
+                {
+                    "type": "Final",
+                    "name": "Final Section",
+                    "short_label": "Final",
+                    "weight": 0.75
+                }]
         }
         self.add_grading_policy(grading_policy)
 

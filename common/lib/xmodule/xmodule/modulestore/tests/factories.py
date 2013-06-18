@@ -59,10 +59,6 @@ class XModuleCourseFactory(Factory):
         if data is not None:
             store.update_item(new_course.location, data)
 
-<<<<<<< HEAD
-        #refetch item
-=======
->>>>>>> jnater/courseware_tests
         new_course = store.get_instance(new_course.id, new_course.location)
 
         return new_course
