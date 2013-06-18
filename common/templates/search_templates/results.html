@@ -2,10 +2,10 @@
 	${css_link("../static/css/results.css")}
 </head>
 
-% if search_correction:
+% if spelling_correction:
 <div class="correction_div">
 	<p class="search_correction">
-		Did you Mean: ${search_correction } ?
+		Did you Mean: ${spelling_correction } ?
 	</p>
 </div>
 % endif
@@ -23,4 +23,8 @@
 
 <%def name="css_link(path, media='')">
 	<link rel="stylesheet" type="text/css" href="${path|h}" media="${media}"></link>
+</%def>
+
+<%def name="js_link(path)">
+	<script type="text/javascript" src="${path|h}"></script>
 </%def>
