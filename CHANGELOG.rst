@@ -8,6 +8,9 @@ the top.  Include a label indicating the component affected.
 Studio: Remove XML from the video component editor. All settings are
 moved to be edited as metadata.
 
+LMS: Forums.  Added handling for case where discussion module can get `None` as 
+value of lms.start in `lms/djangoapps/django_comment_client/utils.py`
+
 Studio, LMS: Make ModelTypes more strict about their expected content (for
 instance, Boolean, Integer, String), but also allow them to hold either the
 typed value, or a String that can be converted to their typed value. For example,
