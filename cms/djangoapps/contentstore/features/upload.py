@@ -35,10 +35,13 @@ def upload_file(step, file_name):
     world.css_find(close_css).click()
 
 
-@step(u'I see the file "([^"]*)" was uploaded$')
-def check_upload(step, file_name):
+@step(u'I should( not)? see the file "([^"]*)" was uploaded$')
+def check_upload(step, do_not_see_file, file_name):
     index = get_index(file_name)
-    assert index != -1
+    if do_not_see_file:
+        assert index == -1
+    else:
+        assert index != -1
 
 
 @step(u'The url for the file "([^"]*)" is valid$')
@@ -47,7 +50,18 @@ def check_url(step, file_name):
     assert r.status_code == 200
 
 
-@step(u'I see only one "([^"]*)"$')
+@step(u'I delete the file "([^"]*)"$')
+def delete_file(step, file_name):
+    index = get_index(file_name)
+    assert index != -1
+    delete_css = ".remove-asset-button"
+    world.css_click(delete_css, index=index)
+
+    prompt_confirm_css = 'li.nav-item > a.action-primary'
+    world.css_click(prompt_confirm_css)
+
+
+@step(u'I should see only one "([^"]*)"$')
 def no_duplicate(step, file_name):
     names_css = '.name-col > a.filename'
     all_names = world.css_find(names_css)

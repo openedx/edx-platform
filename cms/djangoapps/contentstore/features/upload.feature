@@ -5,7 +5,7 @@ Feature: Upload Files
         Given I have opened a new course in Studio
         And I go to the files and uploads page
         When I upload the file "test"
-        Then I see the file "test" was uploaded
+        Then I should see the file "test" was uploaded
         And The url for the file "test" is valid
 
     Scenario: Users can update files
@@ -13,7 +13,14 @@ Feature: Upload Files
         And I go to the files and uploads page
         When I upload the file "test"
         And I upload the file "test"
-        Then I see only one "test"
+        Then I should see only one "test"
+
+    Scenario: Users can delete uploaded files
+        Given I have opened a new course in studio
+        And I go to the files and uploads page
+        When I upload the file "test"
+        And I delete the file "test"
+        Then I should not see the file "test" was uploaded
 
     Scenario: Users can download files
         Given I have opened a new course in studio
