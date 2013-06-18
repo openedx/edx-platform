@@ -81,8 +81,7 @@ def see_assignment_name(step, do_not, name):
 @step(u'I delete the assignment type "([^"]*)"$')
 def delete_assignment_type(step, to_delete):
     delete_css = '.remove-grading-data'
-    delete = world.css_find(delete_css)[get_type_index(to_delete)]
-    delete.click()
+    world.css_click(delete_css, index=get_type_index(to_delete))
 
 
 @step(u'I add a new assignment type "([^"]*)"$')
