@@ -169,3 +169,14 @@ def open_new_unit(step):
     step.given('I have added a new subsection')
     step.given('I expand the first section')
     world.css_click('a.new-unit-item')
+
+
+def type_in_codemirror(index, text):
+    world.css_click(".CodeMirror", index=index)
+    g = world.css_find("div.CodeMirror.CodeMirror-focused > div > textarea")
+    if world.is_mac():
+        g._element.send_keys(Keys.COMMAND + 'a')
+    else:
+        g._element.send_keys(Keys.CONTROL + 'a')
+    g._element.send_keys(Keys.DELETE)
+    g._element.send_keys(text)

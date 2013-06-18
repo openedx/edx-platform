@@ -29,10 +29,10 @@ class AnnotatableModuleTestCase(unittest.TestCase):
         </annotatable>
     '''
     descriptor = Mock()
-    module_data = {'data': sample_xml}
+    module_data = {'data': sample_xml, 'location': location}
 
     def setUp(self):
-        self.annotatable = AnnotatableModule(test_system(), self.location, self.descriptor, self.module_data)
+        self.annotatable = AnnotatableModule(test_system(), self.descriptor, self.module_data)
 
     def test_annotation_data_attr(self):
         el = etree.fromstring('<annotation title="bar" body="foo" problem="0">test</annotation>')

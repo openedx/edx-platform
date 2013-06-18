@@ -25,6 +25,8 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import Location
 from xmodule.contentstore.content import StaticContent
 from xmodule.util.date_utils import get_default_time_display
+from xmodule.modulestore import InvalidLocationError
+from xmodule.exceptions import NotFoundError
 
 from ..utils import get_url_reverse
 from .access import get_location_and_verify_access
@@ -78,10 +80,17 @@ def asset_index(request, org, course, name):
         'active_tab': 'assets',
         'context_course': course_module,
         'assets': asset_display,
-        'upload_asset_callback_url': upload_asset_callback_url
+        'upload_asset_callback_url': upload_asset_callback_url,
+        'remove_asset_callback_url': reverse('remove_asset', kwargs={
+            'org': org,
+            'course': course,
+            'name': name
+        })
     })
 
 
+@login_required
+@ensure_csrf_cookie
 def upload_asset(request, org, course, coursename):
     '''
     cdodge: this method allows for POST uploading of files into the course asset library, which will
@@ -143,6 +152,57 @@ def upload_asset(request, org, course, coursename):
     response = HttpResponse(json.dumps(response_payload))
     response['asset_url'] = StaticContent.get_url_path_from_location(content.location)
     return response
+
+
+@ensure_csrf_cookie
+@login_required
+def remove_asset(request, org, course, name):
+    '''
+    This method will perform a 'soft-delete' of an asset, which is basically to copy the asset from
+    the main GridFS collection and into a Trashcan
+    '''
+    get_location_and_verify_access(request, org, course, name)
+
+    location = request.POST['location']
+
+    # make sure the location is valid
+    try:
+        loc = StaticContent.get_location_from_path(location)
+    except InvalidLocationError:
+        # return a 'Bad Request' to browser as we have a malformed Location
+        response = HttpResponse()
+        response.status_code = 400
+        return response
+
+    # also make sure the item to delete actually exists
+    try:
+        content = contentstore().find(loc)
+    except NotFoundError:
+        response = HttpResponse()
+        response.status_code = 404
+        return response
+
+    # ok, save the content into the trashcan
+    contentstore('trashcan').save(content)
+
+    # see if there is a thumbnail as well, if so move that as well
+    if content.thumbnail_location is not None:
+        try:
+            thumbnail_content = contentstore().find(content.thumbnail_location)
+            contentstore('trashcan').save(thumbnail_content)
+            # hard delete thumbnail from origin
+            contentstore().delete(thumbnail_content.get_id())
+            # remove from any caching
+            del_cached_content(thumbnail_content.location)
+        except:
+            pass  # OK if this is left dangling
+
+    # delete the original
+    contentstore().delete(content.get_id())
+    # remove from cache
+    del_cached_content(content.location)
+
+    return HttpResponse()
 
 
 @ensure_csrf_cookie

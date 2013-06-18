@@ -15,8 +15,8 @@ class TestVideo(BaseTestXmodule):
             user.username: self.clients[user.username].post(
                 self.get_url('whatever'),
                 {},
-                HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-            for user in self.users
+                HTTP_X_REQUESTED_WITH='XMLHttpRequest'
+            ) for user in self.users
         }
 
         self.assertEqual(

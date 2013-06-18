@@ -30,13 +30,13 @@ class LogicTest(unittest.TestCase):
             pass
 
         self.system = None
-        self.location = None
         self.descriptor = EmptyClass()
 
         self.xmodule_class = self.descriptor_class.module_class
         self.xmodule = self.xmodule_class(
-            self.system, self.location,
-            self.descriptor, self.raw_model_data
+            self.system,
+            self.descriptor,
+            self.raw_model_data
         )
 
     def ajax_request(self, dispatch, get):

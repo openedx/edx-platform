@@ -116,6 +116,8 @@ class CombinedOpenEndedModule(CombinedOpenEndedFields, XModule):
     incorporates multiple children (tasks):
         openendedmodule
         selfassessmentmodule
+
+    CombinedOpenEndedModule.__init__ takes the same arguments as xmodule.x_module:XModule.__init__
     """
     STATE_VERSION = 1
 
@@ -139,8 +141,7 @@ class CombinedOpenEndedModule(CombinedOpenEndedFields, XModule):
 
     css = {'scss': [resource_string(__name__, 'css/combinedopenended/display.scss')]}
 
-    def __init__(self, system, location, descriptor, model_data):
-        XModule.__init__(self, system, location, descriptor, model_data)
+    def __init__(self, *args, **kwargs):
         """
         Definition file should have one or many task blocks, a rubric block, and a prompt block:
 
@@ -175,9 +176,9 @@ class CombinedOpenEndedModule(CombinedOpenEndedFields, XModule):
         </combinedopenended>
 
         """
+        XModule.__init__(self, *args, **kwargs)
 
-        self.system = system
-        self.system.set('location', location)
+        self.system.set('location', self.location)
 
         if self.task_states is None:
             self.task_states = []
@@ -189,13 +190,11 @@ class CombinedOpenEndedModule(CombinedOpenEndedFields, XModule):
 
         attributes = self.student_attributes + self.settings_attributes
 
-        static_data = {
-            'rewrite_content_links': self.rewrite_content_links,
-        }
+        static_data = {}
         instance_state = {k: getattr(self, k) for k in attributes}
         self.child_descriptor = version_tuple.descriptor(self.system)
         self.child_definition = version_tuple.descriptor.definition_from_xml(etree.fromstring(self.data), self.system)
-        self.child_module = version_tuple.module(self.system, location, self.child_definition, self.child_descriptor,
+        self.child_module = version_tuple.module(self.system, self.location, self.child_definition, self.child_descriptor,
                                                  instance_state=instance_state, static_data=static_data,
                                                  attributes=attributes)
         self.save_instance_data()
