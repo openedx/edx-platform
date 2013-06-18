@@ -54,8 +54,8 @@ class CourseTestCase(ModuleStoreTestCase):
         self.client = Client()
         self.client.login(username=uname, password=password)
 
-        course = CourseFactory.create(template='i4x://edx/templates/course/Empty', org='MITx', number='999', display_name='Robot Super Course')
-        self.course_location = course.location
+        self.course = CourseFactory.create(template='i4x://edx/templates/course/Empty', org='MITx', number='999', display_name='Robot Super Course')
+        self.course_location = self.course.location
 
 
 class CourseDetailsTestCase(CourseTestCase):
