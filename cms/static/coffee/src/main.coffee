@@ -18,9 +18,13 @@ $ ->
   $(document).ajaxError (event, jqXHR, ajaxSettings, thrownError) ->
     if ajaxSettings.notifyOnError is false
       return
+    if jqXHR.responseText
+        message = _.str.truncate(jqXHR.responseText, 300)
+    else
+        message = gettext("This may be happening because of an error with our server or your internet connection. Try refreshing the page or making sure you are online.")
     msg = new CMS.Views.Notification.Error(
         "title": gettext("Studio's having trouble saving your work")
-        "message": jqXHR.responseText || gettext("This may be happening because of an error with our server or your internet connection. Try refreshing the page or making sure you are online.")
+        "message": message
     )
     msg.show()
 
