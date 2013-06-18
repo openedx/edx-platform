@@ -15,7 +15,7 @@ from xblock.core import XBlock, Scope, String, Integer, Float, ModelType
 log = logging.getLogger(__name__)
 
 
-def dummy_track(event_type, event):
+def dummy_track(_event_type, _event):
     pass
 
 
@@ -231,7 +231,7 @@ class XModule(XModuleFields, HTMLSnippet, XBlock):
         '''
         return self.icon_class
 
-    ### Functions used in the LMS
+    # Functions used in the LMS
 
     def get_score(self):
         """
@@ -272,7 +272,7 @@ class XModule(XModuleFields, HTMLSnippet, XBlock):
         '''
         return None
 
-    def handle_ajax(self, dispatch, get):
+    def handle_ajax(self, _dispatch, _get):
         ''' dispatch is last part of the URL.
             get is a dictionary-like object '''
         return ""
@@ -647,13 +647,13 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
             # 1. A select editor for fields with a list of possible values (includes Booleans).
             # 2. Number editors for integers and floats.
             # 3. A generic string editor for anything else (editing JSON representation of the value).
-            type = "Generic"
+            editor_type = "Generic"
             values = [] if field.values is None else copy.deepcopy(field.values)
             if isinstance(values, tuple):
                 values = list(values)
             if isinstance(values, list):
                 if len(values) > 0:
-                    type = "Select"
+                    editor_type = "Select"
                 for index, choice in enumerate(values):
                     json_choice = copy.deepcopy(choice)
                     if isinstance(json_choice, dict) and 'value' in json_choice:
@@ -662,11 +662,11 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
                         json_choice = field.to_json(json_choice)
                     values[index] = json_choice
             elif isinstance(field, Integer):
-                type = "Integer"
+                editor_type = "Integer"
             elif isinstance(field, Float):
-                type = "Float"
+                editor_type = "Float"
             metadata_fields[field.name] = {'field_name': field.name,
-                                           'type': type,
+                                           'type': editor_type,
                                            'display_name': field.display_name,
                                            'value': field.to_json(value),
                                            'options': values,
@@ -862,7 +862,7 @@ class ModuleSystem(object):
 
 class DoNothingCache(object):
     """A duck-compatible object to use in ModuleSystem when there's no cache."""
-    def get(self, key):
+    def get(self, _key):
         return None
 
     def set(self, key, value, timeout=None):

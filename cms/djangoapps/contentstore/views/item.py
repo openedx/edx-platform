@@ -103,7 +103,7 @@ def clone_item(request):
 @expect_json
 def delete_item(request):
     item_location = request.POST['id']
-    item_loc = Location(item_location)
+    item_location = Location(item_location)
 
     # check permissions for this user within this course
     if not has_access(request.user, item_location):
@@ -124,11 +124,11 @@ def delete_item(request):
 
     # cdodge: we need to remove our parent's pointer to us so that it is no longer dangling
     if delete_all_versions:
-        parent_locs = modulestore('direct').get_parent_locations(item_loc, None)
+        parent_locs = modulestore('direct').get_parent_locations(item_location, None)
 
         for parent_loc in parent_locs:
             parent = modulestore('direct').get_item(parent_loc)
-            item_url = item_loc.url()
+            item_url = item_location.url()
             if item_url in parent.children:
                 children = parent.children
                 children.remove(item_url)

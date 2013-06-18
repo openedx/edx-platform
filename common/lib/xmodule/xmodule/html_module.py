@@ -57,7 +57,7 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):
         if path.endswith('.html.xml'):
             path = path[:-9] + '.html'  # backcompat--look for html instead of xml
         if path.endswith('.html.html'):
-            path = path[:-5]            # some people like to include .html in filenames..
+            path = path[:-5]  # some people like to include .html in filenames..
         candidates = []
         while os.sep in path:
             candidates.append(path)
@@ -100,9 +100,9 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):
             pointer_path = "{category}/{url_path}".format(category='html',
                                                   url_path=name_to_pathname(location.name))
             base = path(pointer_path).dirname()
-            #log.debug("base = {0}, base.dirname={1}, filename={2}".format(base, base.dirname(), filename))
+            # log.debug("base = {0}, base.dirname={1}, filename={2}".format(base, base.dirname(), filename))
             filepath = "{base}/{name}.html".format(base=base, name=filename)
-            #log.debug("looking for html file for {0} at {1}".format(location, filepath))
+            # log.debug("looking for html file for {0} at {1}".format(location, filepath))
 
             # VS[compat]
             # TODO (cpennington): If the file doesn't exist at the right path,
@@ -111,7 +111,7 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):
             # online and has imported all current (fall 2012) courses from xml
             if not system.resources_fs.exists(filepath):
                 candidates = cls.backcompat_paths(filepath)
-                #log.debug("candidates = {0}".format(candidates))
+                # log.debug("candidates = {0}".format(candidates))
                 for candidate in candidates:
                     if system.resources_fs.exists(candidate):
                         filepath = candidate
