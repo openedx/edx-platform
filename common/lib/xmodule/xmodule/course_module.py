@@ -672,10 +672,10 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
 
     @property
     def forum_posts_allowed(self):
-        datestandin = Date()
+        date_proxy = Date()
         try:
-            blackout_periods = [(datestandin.from_json(start),
-                                 datestandin.from_json(end))
+            blackout_periods = [(date_proxy.from_json(start),
+                                 date_proxy.from_json(end))
                                 for start, end
                                 in self.discussion_blackouts]
             now = datetime.now(UTC())
