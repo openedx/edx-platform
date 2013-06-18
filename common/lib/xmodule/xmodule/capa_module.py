@@ -22,7 +22,7 @@ from xblock.core import Scope, String, Boolean, Dict, Integer, Float
 from .fields import Timedelta, Date
 from django.utils.timezone import UTC
 
-log = logging.getLogger("mitx.courseware")
+log = logging.getLogger("mitx.courseware")  # pylint: disable=C0103
 
 
 # Generate this many different variants of problems with rerandomize=per_student
@@ -65,17 +65,23 @@ class ComplexEncoder(json.JSONEncoder):
 
 
 class CapaFields(object):
-    attempts = Integer(help="Number of attempts taken by the student on this problem", default=0, scope=Scope.user_state)
+    attempts = Integer(help="Number of attempts taken by the student on this problem",
+                       default=0, scope=Scope.user_state)
     max_attempts = Integer(
         display_name="Maximum Attempts",
-        help="Defines the number of times a student can try to answer this problem. If the value is not set, infinite attempts are allowed.",
+        help=("Defines the number of times a student can try to answer this problem. "
+              "If the value is not set, infinite attempts are allowed."),
         values={"min": 0}, scope=Scope.settings
     )
     due = Date(help="Date that this problem is due by", scope=Scope.settings)
-    graceperiod = Timedelta(help="Amount of time after the due date that submissions will be accepted", scope=Scope.settings)
+    graceperiod = Timedelta(
+        help="Amount of time after the due date that submissions will be accepted",
+        scope=Scope.settings
+    )
     showanswer = String(
         display_name="Show Answer",
-        help="Defines when to show the answer to the problem. A default value can be set in Advanced Settings.",
+        help=("Defines when to show the answer to the problem. "
+              "A default value can be set in Advanced Settings."),
         scope=Scope.settings, default="closed",
         values=[
             {"display_name": "Always", "value": "always"},
@@ -86,23 +92,33 @@ class CapaFields(object):
             {"display_name": "Past Due", "value": "past_due"},
             {"display_name": "Never", "value": "never"}]
     )
-    force_save_button = Boolean(help="Whether to force the save button to appear on the page", scope=Scope.settings, default=False)
+    force_save_button = Boolean(
+        help="Whether to force the save button to appear on the page",
+        scope=Scope.settings, default=False
+    )
     rerandomize = Randomization(
-        display_name="Randomization", help="Defines how often inputs are randomized when a student loads the problem. This setting only applies to problems that can have randomly generated numeric values. A default value can be set in Advanced Settings.",
-        default="always", scope=Scope.settings, values=[{"display_name": "Always", "value": "always"},
-                                                        {"display_name": "On Reset", "value": "onreset"},
-                                                        {"display_name": "Never", "value": "never"},
-                                                        {"display_name": "Per Student", "value": "per_student"}]
+        display_name="Randomization",
+        help="Defines how often inputs are randomized when a student loads the problem. "
+        "This setting only applies to problems that can have randomly generated numeric values. "
+        "A default value can be set in Advanced Settings.",
+        default="always", scope=Scope.settings, values=[
+            {"display_name": "Always", "value": "always"},
+            {"display_name": "On Reset", "value": "onreset"},
+            {"display_name": "Never", "value": "never"},
+            {"display_name": "Per Student", "value": "per_student"}
+        ]
     )
     data = String(help="XML data for the problem", scope=Scope.content)
-    correct_map = Dict(help="Dictionary with the correctness of current student answers", scope=Scope.user_state, default={})
+    correct_map = Dict(help="Dictionary with the correctness of current student answers",
+                       scope=Scope.user_state, default={})
     input_state = Dict(help="Dictionary for maintaining the state of inputtypes", scope=Scope.user_state)
     student_answers = Dict(help="Dictionary with the current student responses", scope=Scope.user_state)
     done = Boolean(help="Whether the student has answered the problem", scope=Scope.user_state)
     seed = Integer(help="Random seed for this student", scope=Scope.user_state)
     weight = Float(
         display_name="Problem Weight",
-        help="Defines the number of points each problem is worth. If the value is not set, each response field in the problem is worth one point.",
+        help=("Defines the number of points each problem is worth. "
+              "If the value is not set, each response field in the problem is worth one point."),
         values={"min": 0, "step": .1},
         scope=Scope.settings
     )
@@ -998,7 +1014,8 @@ class CapaDescriptor(CapaFields, RawDescriptor):
     mako_template = "widgets/problem-edit.html"
     js = {'coffee': [resource_string(__name__, 'js/src/problem/edit.coffee')]}
     js_module_name = "MarkdownEditingDescriptor"
-    css = {'scss': [resource_string(__name__, 'css/editor/edit.scss'), resource_string(__name__, 'css/problem/edit.scss')]}
+    css = {'scss': [resource_string(__name__, 'css/editor/edit.scss'),
+                    resource_string(__name__, 'css/problem/edit.scss')]}
 
     # Capa modules have some additional metadata:
     # TODO (vshnayder): do problems have any other metadata?  Do they
