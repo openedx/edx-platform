@@ -156,19 +156,6 @@ class TestSubmittingProblems(ModuleStoreTestCase):
         self.course = CourseFactory.create(display_name='course_name', number=number)
         assert self.course, "Couldn't load course %r" % course_name
 
-
-        # what does the course look like?
-        f = open("/users/irh/Desktop/out.txt", "w")
-        string_to_write = str("<====== The Mongo Templates Looks Like \n" +''+"\n======>")
-        f.write(string_to_write)
-        string_to_write = str("<====== The Course Children Looks Like \n" + str(self.course.get_children())+"\n======>")
-        f.write(string_to_write)
-        string_to_write = str("<====== The Course Grading Context Looks Like \n" + str(self.course.grading_context)+"\n======>")
-        f.write(string_to_write)
-        string_to_write = str("<====== The mongo store Looks Like \n" + str(modulestore)+"\n======>")
-        f.write(string_to_write)
-        f.close()
-
         # create a test student
         self.student = 'view@test.com'
         self.password = 'foo'
@@ -181,9 +168,7 @@ class TestSubmittingProblems(ModuleStoreTestCase):
         self.factory = RequestFactory()
 
     def refresh_course(self):
-        """
-            re-fetch the course from the database so that the object being dealt with has everything added to it
-        """
+        """re-fetch the course from the database so that the object being dealt with has everything added to it"""
         self.course = modulestore().get_instance(self.course.id, self.course.location)
 
     def problem_location(self, problem_url_name):
@@ -216,8 +201,6 @@ class TestSubmittingProblems(ModuleStoreTestCase):
         resp = self.client.post(modx_url,
             {(answer_key_prefix + k): v for k, v in responses.items()}
         )
-
-        # print resp
 
         return resp
 
@@ -330,6 +313,12 @@ class TestCourseGrader(TestSubmittingProblems):
         self.refresh_course()
         return section
 
+    def add_grading_policy(self, grading_policy):
+        course_data = {'grading_policy': grading_policy}
+        
+        # update the course with the grading Policy
+        modulestore().update_item(self.course.location, course_data)
+
     def get_grade_summary(self):
         '''calls grades.grade for current user and course'''
         model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
@@ -340,6 +329,10 @@ class TestCourseGrader(TestSubmittingProblems):
 
         return grades.grade(self.student_user, fake_request,
                             self.course, model_data_cache)
+
+    def get_letter_grade(self):
+        '''get the students letter grade'''
+        return self.get_grade_summary()['grade']
 
     def get_homework_scores(self):
         '''get scores for homeworks'''
@@ -364,6 +357,10 @@ class TestCourseGrader(TestSubmittingProblems):
         grade_summary = self.get_grade_summary()
         self.assertEqual(grade_summary['percent'], percent)
 
+    def check_letter_grade(self, letter):
+        '''assert letter grade is as expected'''
+        self.assertEqual(self.get_letter_grade(),letter)
+
     def earned_hw_scores(self):
         """Global scores, each Score is a Problem Set"""
         return [s.earned for s in self.get_homework_scores()]
@@ -375,8 +372,62 @@ class TestCourseGrader(TestSubmittingProblems):
                       if section.get('url_name') == hw_url_name][0]
         return [s.earned for s in hw_section['scores']]
 
-    def test_basic_grading(self):
-        # Set up a simple course for testing basic grading functionality
+    def basic_setup(self):
+        # set up a simple course for testing basic grading functionality
+        grading_policy = {
+            "GRADER": [{
+                "type": "Homework",
+                "min_count": 1,
+                "drop_count": 0,
+                "short_label": "HW",
+                "weight": 1.0
+            }],
+            "GRADE_CUTOFFS": {
+            'A': 1.0,
+            'B': .33
+            }
+        }
+        self.add_grading_policy(grading_policy)
+
+        #set up a simple course with four problems
+        self.homework = self.add_graded_section_to_course('homework')
+        self.p1 = self.add_problem_to_section(self.homework.location, 'p1', 1)
+        self.p2 = self.add_problem_to_section(self.homework.location, 'p2', 1)
+        self.p3 = self.add_problem_to_section(self.homework.location, 'p3', 1)
+        self.refresh_course()
+
+    def test_None_grade(self):
+        #check grade is 0 to begin
+        self.basic_setup()
+        self.check_grade_percent(0)
+        self.check_letter_grade(None)
+
+    def test_B_grade_exact(self):
+        #check that at exactly the cutoff, the grade is B
+        self.basic_setup()
+        self.submit_question_answer('p1', {'2_1': 'Correct'})
+        self.check_grade_percent(0.33)
+        self.check_letter_grade('B')
+
+    def test_B_grade_above(self):
+        #check that at exactly the cutoff, the grade is B
+        self.basic_setup()
+        self.submit_question_answer('p1', {'2_1': 'Correct'})
+        self.submit_question_answer('p2', {'2_1': 'Correct'})
+        self.check_grade_percent(0.67)
+        self.check_letter_grade('B')
+
+    def test_A_grade(self):
+        #check that at exactly the cutoff, the grade is B
+        self.basic_setup()
+        self.submit_question_answer('p1', {'2_1': 'Correct'})
+        self.submit_question_answer('p2', {'2_1': 'Correct'})
+        self.submit_question_answer('p3', {'2_1': 'Correct'})
+        self.check_grade_percent(1.0)
+        self.check_letter_grade('A')
+
+    def test_weighted_grading(self):
+        # Set up a simple course for testing weighted grading functionality
         grading_policy = {
             "GRADER": [
             {
@@ -393,10 +444,7 @@ class TestCourseGrader(TestSubmittingProblems):
                 "weight": 0.75
             }]
         }
-        course_data = {'grading_policy': grading_policy}
-        
-        # update the course with the grading Policy
-        modulestore().update_item(self.course.location, course_data)
+        self.add_grading_policy(grading_policy)
 
         #set up a structure of 1 homework and 1 final
         self.homework = self.add_graded_section_to_course('homework')
@@ -433,10 +481,7 @@ class TestCourseGrader(TestSubmittingProblems):
                 "weight": 1
             }]
         }
-        course_data = {'grading_policy': grading_policy}
-
-        # update the course with the grading Policy
-        modulestore().update_item(self.course.location, course_data)
+        self.add_grading_policy(grading_policy)
 
         # Set up a course structure that just consists of 3 homeworks.
         # Since the grading policy drops 1, each problem is worth 25% 
