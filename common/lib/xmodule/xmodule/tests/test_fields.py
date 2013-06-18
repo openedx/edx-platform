@@ -56,7 +56,10 @@ class DateTest(unittest.TestCase):
             DateTest.date.from_json("December 4 16:30"))
         self.assertIsNone(DateTest.date.from_json("12 12:00"))
 
-    def test_odd_from_json(self):
+    def test_non_std_from_json(self):
+        """
+        Test the non-standard args being passed to from_json
+        """
         now = datetime.datetime.now(UTC())
         delta = now - datetime.datetime.fromtimestamp(0, UTC())
         self.assertEqual(DateTest.date.from_json(delta.total_seconds() * 1000),

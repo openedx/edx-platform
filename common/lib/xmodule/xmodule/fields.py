@@ -17,8 +17,9 @@ class Date(ModelType):
     '''
     # See note below about not defaulting these
     CURRENT_YEAR = datetime.datetime.now(UTC).year
-    DEFAULT_DATE0 = datetime.datetime(CURRENT_YEAR, 1, 1, tzinfo=UTC)
-    DEFAULT_DATE1 = datetime.datetime(CURRENT_YEAR, 2, 2, tzinfo=UTC)
+    PREVENT_DEFAULT_DAY_MON_SEED1 = datetime.datetime(CURRENT_YEAR, 1, 1, tzinfo=UTC)
+    PREVENT_DEFAULT_DAY_MON_SEED2 = datetime.datetime(CURRENT_YEAR, 2, 2, tzinfo=UTC)
+
     def _parse_date_wo_default_month_day(self, field):
         """
         Parse the field as an iso string but prevent dateutils from defaulting the day or month while
@@ -27,8 +28,8 @@ class Date(ModelType):
         # It's not trivial to replace dateutil b/c parsing timezones as Z, +03:30, -400 is hard in python
         # however, we don't want dateutil to default the month or day (but some tests at least expect
         # us to default year); so, we'll see if dateutil uses the defaults for these the hard way
-        result = dateutil.parser.parse(field, default=self.DEFAULT_DATE0)
-        result_other = dateutil.parser.parse(field, default=self.DEFAULT_DATE1)
+        result = dateutil.parser.parse(field, default=self.PREVENT_DEFAULT_DAY_MON_SEED1)
+        result_other = dateutil.parser.parse(field, default=self.PREVENT_DEFAULT_DAY_MON_SEED1)
         if result != result_other:
             log.warning("Field {0} is missing month or day".format(self._name, field))
             return None
