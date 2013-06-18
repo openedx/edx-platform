@@ -5,6 +5,7 @@
     ## but the candy_res/ folder contains images and other junk, and it
     ## all needs to stay together for the Candy.js plugin to work.
     <link rel="stylesheet" href="${static.url('candy_res/default.css')}" />
+    <link rel="stylesheet" href="${static.url('candy_res/candy_custom.css')}" />
 
     ## Load in jQuery from standard edX location.
     <script type="text/javascript" src="${static.url('js/vendor/jquery.min.js')}"></script>
@@ -25,6 +26,8 @@
           //core: { debug: true, autojoin: ["dev@conference.jabber.class.stanford.edu"] },
           view: { resources: "${static.url('candy_res/')}"}
         });
+	
+	$('#chat-toolbar #chat-sound-control').remove();
 
         Candy.Core.connect("${username}", "${password}");
       });
