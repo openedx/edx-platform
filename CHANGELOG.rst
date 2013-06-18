@@ -5,7 +5,7 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
-LMS: Forums.  Added handling for case where discussion module can get `None` as 
+LMS: Forums.  Added handling for case where discussion module can get `None` as
 value of lms.start in `lms/djangoapps/django_comment_client/utils.py`
 
 Studio, LMS: Make ModelTypes more strict about their expected content (for
@@ -15,6 +15,8 @@ an Integer can contain 3 or '3'. This changed an update to the xblock library.
 
 LMS: Courses whose id matches a regex in the COURSES_WITH_UNSAFE_CODE Django
 setting now run entirely outside the Python sandbox.
+
+Blades: Added tests for Video Alpha player.
 
 Blades: Video Alpha bug fix for speed changing to 1.0 in Firefox.
 

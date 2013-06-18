@@ -25,8 +25,8 @@ class BaseTestXmodule(ModuleStoreTestCase):
     """Base class for testing Xmodules with mongo store.
 
     This class prepares course and users for tests:
-        1. create test course
-        2. create, enrol and login users for this course
+        1. create test course;
+        2. create, enrol and login users for this course;
 
     Any xmodule should overwrite only next parameters for test:
         1. TEMPLATE_NAME
