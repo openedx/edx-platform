@@ -91,7 +91,7 @@ class InstructorTask(models.Model):
                           task_input=json_task_input,
                           task_state=QUEUING,
                           requester=requester)
-        instructor_task.save()
+        instructor_task.save_now()
 
         return instructor_task
 
@@ -125,6 +125,7 @@ class InstructorTask(models.Model):
 
         Truncation is indicated by adding "..." to the end of the value.
         """
+        tag = '...'
         task_progress = {'exception': type(exception).__name__, 'message': str(exception.message)}
         if traceback_string is not None:
             # truncate any traceback that goes into the InstructorTask model:
@@ -135,17 +136,17 @@ class InstructorTask(models.Model):
         too_long = len(json_output) - 1023
         if too_long > 0:
             if traceback_string is not None:
-                if too_long >= len(traceback_string) - len('...'):
+                if too_long >= len(traceback_string) - len(tag):
                     # remove the traceback entry entirely (so no key or value)
                     del task_progress['traceback']
                     too_long -= (len(traceback_string) + len('traceback'))
                 else:
                     # truncate the traceback:
-                    task_progress['traceback'] = traceback_string[:-(too_long + 3)] + "..."
-                    too_long = -1
+                    task_progress['traceback'] = traceback_string[:-(too_long + len(tag))] + tag
+                    too_long = 0
             if too_long > 0:
                 # we need to shorten the message:
-                task_progress['message'] = task_progress['message'][:-(too_long + 3)] + "..."
+                task_progress['message'] = task_progress['message'][:-(too_long + len(tag))] + tag
             json_output = json.dumps(task_progress)
         return json_output
 

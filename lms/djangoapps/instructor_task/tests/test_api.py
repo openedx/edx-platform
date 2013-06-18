@@ -109,10 +109,10 @@ class InstructorTaskSubmitTest(InstructorTaskModuleTestCase):
         location = InstructorTaskModuleTestCase.problem_location(problem_url_name)
         if student is not None:
             instructor_task = task_function(self.create_task_request(self.instructor),
-                                         self.course.id, location, student)
+                                            self.course.id, location, student)
         else:
             instructor_task = task_function(self.create_task_request(self.instructor),
-                                         self.course.id, location)
+                                            self.course.id, location)
 
         # test resubmitting, by updating the existing record:
         instructor_task = InstructorTask.objects.get(id=instructor_task.id)

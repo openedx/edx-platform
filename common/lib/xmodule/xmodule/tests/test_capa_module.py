@@ -658,11 +658,11 @@ class CapaModuleTest(unittest.TestCase):
 
         # Simulate answering a problem that raises the exception
         with patch('capa.capa_problem.LoncapaProblem.rescore_existing_answers') as mock_rescore:
-            mock_rescore.side_effect = exception_class(u'test error u\03a9')
+            mock_rescore.side_effect = exception_class(u'test error \u03a9')
             result = module.rescore_problem()
 
         # Expect an AJAX alert message in 'success'
-        expected_msg = u'Error: test error u\03a9'
+        expected_msg = u'Error: test error \u03a9'
         self.assertEqual(result['success'], expected_msg)
 
         # Expect that the number of attempts is NOT incremented
