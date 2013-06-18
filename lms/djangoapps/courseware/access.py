@@ -245,7 +245,8 @@ def _has_access_descriptor(user, descriptor, action, course_context=None):
         if descriptor.lms.start is not None:
             now = datetime.now(UTC())
             effective_start = _adjust_start_date_for_beta_testers(user, descriptor)
-            if now > effective_start:
+            difference = (now - effective_start).total_seconds()
+            if difference > 3600:
                 # after start date, everyone can see it
                 debug("Allow: now > effective start date")
                 return True
@@ -508,6 +509,7 @@ def _adjust_start_date_for_beta_testers(user, descriptor):
         start_as_datetime = descriptor.lms.start
         delta = timedelta(descriptor.lms.days_early_for_beta)
         effective = start_as_datetime - delta
+
         # ...and back to time_struct
         return effective
 
@@ -570,7 +572,6 @@ def _has_access_to_location(user, location, access_level, course_context):
         debug("Deny: user not in groups %s", instructor_groups)
     else:
         log.debug("Error in access._has_access_to_location access_level=%s unknown" % access_level)
-
     return False
 
 

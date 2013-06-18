@@ -1,12 +1,13 @@
 from factory import Factory, lazy_attribute_sequence, lazy_attribute
 from uuid import uuid4
+import datetime
+
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.x_module import ModuleSystem
 from mitxmako.shortcuts import render_to_string
 from xblock.runtime import InvalidScopeError
-import datetime
 from pytz import UTC
 
 
@@ -148,6 +149,8 @@ class XModuleItemFactory(Factory):
 
         if new_item.location.category not in DETACHED_CATEGORIES:
             store.update_children(parent_location, parent.children + [new_item.location.url()])
+
+        new_item = store.get_item(new_item.location)
 
         return new_item
 

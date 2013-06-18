@@ -1,5 +1,4 @@
 import logging
-import time
 import datetime
 import pytz
 import random
@@ -80,10 +79,14 @@ class TestViewAuth(MongoLoginHelpers):
     def setUp(self):
         xmodule.modulestore.django._MODULESTORES = {}
 
-        self.full = CourseFactory.create(display_name='Robot_Sub_Course')
+        self.full = CourseFactory.create(number='666', display_name='Robot_Sub_Course')
         self.course = CourseFactory.create()
-
         self.overview_chapter = ItemFactory.create(display_name='Overview')
+        self.courseware_chapter = ItemFactory.create(display_name='courseware')
+        self.sub_courseware_chapter = ItemFactory.create(parent_location=self.full.location,
+                                                         display_name='courseware')
+        self.sub_overview_chapter = ItemFactory.create(parent_location=self.sub_courseware_chapter.location,
+                                                       display_name='Overview')
         self.progress_chapter = ItemFactory.create(parent_location=self.course.location,
                                                    display_name='progress')
         self.info_chapter = ItemFactory.create(parent_location=self.course.location,
@@ -121,6 +124,7 @@ class TestViewAuth(MongoLoginHelpers):
         # should work now -- redirect to first page
         response = self.client.get(reverse('courseware',
                                    kwargs={'course_id': self.course.id}))
+
         self.assertRedirectsNoFollow(response,
                                      reverse('courseware_section',
                                              kwargs={'course_id': self.course.id,
@@ -210,8 +214,8 @@ class TestViewAuth(MongoLoginHelpers):
         # Make courses start in the future
         now = datetime.datetime.now(pytz.UTC)
         tomorrow = now + datetime.timedelta(days=1)
-        self.course.start = tomorrow
-        self.full.start = tomorrow
+        self.course.lms.start = tomorrow
+        self.full.lms.start = tomorrow
 
         self.assertFalse(self.course.has_started())
         self.assertFalse(self.full.has_started())
@@ -344,7 +348,6 @@ class TestViewAuth(MongoLoginHelpers):
 
         print "changing"
         # self.course's enrollment period hasn't started
-        print self.course.enrollment_start
         self.course = update_course(self.course, course_data)
         # full course's has
         self.full = update_course(self.full, full_data)
@@ -391,7 +394,7 @@ class TestViewAuth(MongoLoginHelpers):
         # nextday = tomorrow + 24 * 3600
         # yesterday = time.time() - 24 * 3600
 
-        # toy course's hasn't started
+        # self.course's hasn't started
         self.course.lms.start = tomorrow
         self.assertFalse(self.course.has_started())
 
