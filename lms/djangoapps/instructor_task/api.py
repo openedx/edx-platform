@@ -1,7 +1,9 @@
 """
 API for submitting background tasks by an instructor for a course.
 
-TODO:
+Also includes methods for getting information about tasks that have
+already been submitted, filtered either by running state or input
+arguments.
 
 """
 

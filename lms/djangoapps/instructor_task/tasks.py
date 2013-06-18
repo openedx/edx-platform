@@ -2,6 +2,22 @@
 This file contains tasks that are designed to perform background operations on the
 running state of a course.
 
+At present, these tasks all operate on StudentModule objects in one way or another,
+so they share a visitor architecture.  Each task defines an "update function" that
+takes a module_descriptor, a particular StudentModule object, and xmodule_instance_args.
+
+A task may optionally specify a "filter function" that takes a query for StudentModule
+objects, and adds additional filter clauses.
+
+A task also passes through "xmodule_instance_args", that are used to provide
+information to our code that instantiates xmodule instances.
+
+The task definition then calls the traversal function, passing in the three arguments
+above, along with the id value for an InstructorTask object.  The InstructorTask
+object contains a 'task_input' row which is a JSON-encoded dict containing
+a problem URL and optionally a student.  These are used to set up the initial value
+of the query for traversing StudentModule objects.
+
 """
 from celery import task
 from instructor_task.tasks_helper import (update_problem_module_state,
