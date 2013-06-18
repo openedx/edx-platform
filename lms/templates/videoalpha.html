@@ -5,7 +5,11 @@
 <div
   id="video_${id}"
   class="video"
+  
+  % if not settings.MITX_FEATURES['STUB_VIDEO_FOR_TESTING']:
   data-streams="${youtube_streams}"
+  % endif
+
   ${'data-sub="{}"'.format(sub) if sub else ''}
 
   % if not settings.MITX_FEATURES['STUB_VIDEO_FOR_TESTING']:
