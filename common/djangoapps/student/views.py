@@ -3,6 +3,7 @@ import feedparser
 import json
 import logging
 import random
+import re
 import string
 import urllib
 import uuid
@@ -95,9 +96,8 @@ def course_from_id(course_id):
     course_loc = CourseDescriptor.id_to_location(course_id)
     return modulestore().get_instance(course_id, course_loc)
 
-import re
-day_pattern = re.compile('\s\d+,\s')
-multimonth_pattern = re.compile('\s?\-\s?\S+\s')
+day_pattern = re.compile(r'\s\d+,\s')
+multimonth_pattern = re.compile(r'\s?\-\s?\S+\s')
 
 
 def get_date_for_press(publish_date):

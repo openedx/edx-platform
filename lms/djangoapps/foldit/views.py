@@ -46,7 +46,7 @@ def foldit_ops(request):
             # To allow for fixes without breaking this, the regex should only
             # match unquoted strings,
             a = re.compile(r':([a-zA-Z]*),')
-            puzzle_scores_json = re.sub(a, ':"\g<1>",', puzzle_scores_json)
+            puzzle_scores_json = re.sub(a, r':"\g<1>",', puzzle_scores_json)
             puzzle_scores = json.loads(puzzle_scores_json)
             responses.append(save_scores(request.user, puzzle_scores))
 

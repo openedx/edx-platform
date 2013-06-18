@@ -21,7 +21,7 @@ from logging import getLogger
 logger = getLogger(__name__)
 
 
-@step(u'I wait (?:for )?"(\d+)" seconds?$')
+@step(r'I wait (?:for )?"(\d+)" seconds?$')
 def wait(step, seconds):
     world.wait(seconds)
 

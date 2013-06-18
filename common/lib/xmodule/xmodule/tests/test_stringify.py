@@ -12,7 +12,7 @@ def test_stringify():
 
 
 def test_stringify_again():
-    html = """<html name="Voltage Source Answer" >A voltage source is non-linear!
+    html = r"""<html name="Voltage Source Answer" >A voltage source is non-linear!
 <div align="center">
     <img src="/static/images/circuits/voltage-source.png"/>
     \(V=V_C\)

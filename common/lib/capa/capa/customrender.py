@@ -26,7 +26,7 @@ class MathRenderer(object):
     tags = ['math']
 
     def __init__(self, system, xml):
-        '''
+        r'''
         Render math using latex-like formatting.
 
         Examples:
@@ -41,7 +41,7 @@ class MathRenderer(object):
         self.system = system
         self.xml = xml
 
-        mathstr = re.sub('\$(.*)\$', r'[mathjaxinline]\1[/mathjaxinline]', xml.text)
+        mathstr = re.sub(r'\$(.*)\$', r'[mathjaxinline]\1[/mathjaxinline]', xml.text)
         mtag = 'mathjax'
         if not r'\displaystyle' in mathstr:
             mtag += 'inline'

@@ -50,7 +50,7 @@ class dot(sympy.operations.LatticeOp):	 # my dot product
 
 
 def _print_dot(self, expr):
-    return '{((%s) \cdot (%s))}' % (expr.args[0], expr.args[1])
+    return r'{((%s) \cdot (%s))}' % (expr.args[0], expr.args[1])
 
 LatexPrinter._print_dot = _print_dot
 
@@ -202,7 +202,7 @@ class formula(object):
         return xml
 
     def preprocess_pmathml(self, xml):
-        '''
+        r'''
         Pre-process presentation MathML from ASCIIMathML to make it more
         acceptable for SnuggleTeX, and also to accomodate some sympy
         conventions (eg hat(i) for \hat{i}).

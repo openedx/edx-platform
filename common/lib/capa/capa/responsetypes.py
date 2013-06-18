@@ -1902,8 +1902,7 @@ class ImageResponse(LoncapaResponse):
             if not given:  # No answer to parse. Mark as incorrect and move on
                 continue
             # parse given answer
-            m = re.match(
-                '\[([0-9]+),([0-9]+)]', given.strip().replace(' ', ''))
+            m = re.match(r'\[([0-9]+),([0-9]+)]', given.strip().replace(' ', ''))
             if not m:
                 raise Exception('[capamodule.capa.responsetypes.imageinput] '
                                 'error grading %s (input=%s)' % (aid, given))
@@ -1918,7 +1917,7 @@ class ImageResponse(LoncapaResponse):
                     # parse expected answer
                     # TODO: Compile regexp on file load
                     m = re.match(
-                        '[\(\[]([0-9]+),([0-9]+)[\)\]]-[\(\[]([0-9]+),([0-9]+)[\)\]]',
+                        r'[\(\[]([0-9]+),([0-9]+)[\)\]]-[\(\[]([0-9]+),([0-9]+)[\)\]]',
                         solution_rectangle.strip().replace(' ', ''))
                     if not m:
                         msg = 'Error in problem specification! cannot parse rectangle in %s' % (
