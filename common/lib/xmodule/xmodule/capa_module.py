@@ -60,7 +60,7 @@ class Randomization(String):
 class ComplexEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, complex):
-            return "{real:.7g}{imag:+.7g}*j".format(real=obj.real, imag=obj.imag)
+            return u"{real:.7g}{imag:+.7g}*j".format(real=obj.real, imag=obj.imag)
         return json.JSONEncoder.default(self, obj)
 
 
@@ -167,7 +167,7 @@ class CapaModule(CapaFields, XModule):
                 self.seed = self.lcp.seed
 
         except Exception as err:
-            msg = 'cannot create LoncapaProblem {loc}: {err}'.format(
+            msg = u'cannot create LoncapaProblem {loc}: {err}'.format(
                 loc=self.location.url(), err=err)
             # TODO (vshnayder): do modules need error handlers too?
             # We shouldn't be switching on DEBUG.
@@ -176,12 +176,15 @@ class CapaModule(CapaFields, XModule):
                 # TODO (vshnayder): This logic should be general, not here--and may
                 # want to preserve the data instead of replacing it.
                 # e.g. in the CMS
-                msg = '<p>%s</p>' % msg.replace('<', '&lt;')
-                msg += '<p><pre>%s</pre></p>' % traceback.format_exc().replace('<', '&lt;')
+                msg = u'<p>{msg}</p>'.format(msg=cgi.escape(msg))
+                msg += u'<p><pre>{tb}</pre></p>'.format(
+                    tb=cgi.escape(traceback.format_exc()))
                 # create a dummy problem with error message instead of failing
-                problem_text = ('<problem><text><span class="inline-error">'
-                                'Problem %s has an error:</span>%s</text></problem>' %
-                                (self.location.url(), msg))
+                problem_text = (u'<problem><text><span class="inline-error">'
+                                u'Problem {url} has an error:</span>{msg}</text></problem>'.format(
+                                    url=self.location.url(),
+                                    msg=msg)
+                                )
                 self.lcp = self.new_lcp(self.get_state_for_lcp(), text=problem_text)
             else:
                 # add extra info and raise
@@ -362,15 +365,14 @@ class CapaModule(CapaFields, XModule):
         # TODO (vshnayder): another switch on DEBUG.
         if self.system.DEBUG:
             msg = (
-                '[courseware.capa.capa_module] <font size="+1" color="red">'
-                'Failed to generate HTML for problem %s</font>' %
-                (self.location.url()))
-            msg += '<p>Error:</p><p><pre>%s</pre></p>' % str(err).replace('<', '&lt;')
-            msg += '<p><pre>%s</pre></p>' % traceback.format_exc().replace('<', '&lt;')
+                u'[courseware.capa.capa_module] <font size="+1" color="red">'
+                u'Failed to generate HTML for problem {url}</font>'.format(
+                    url=cgi.escape(self.location.url()))
+            )
+            msg += u'<p>Error:</p><p><pre>{msg}</pre></p>'.format(msg=cgi.escape(err.message))
+            msg += u'<p><pre>{tb}</pre></p>'.format(tb=cgi.escape(traceback.format_exc()))
             html = msg
 
-        # We're in non-debug mode, and possibly even in production. We want
-        #   to avoid bricking of problem as much as possible
         else:
             # We're in non-debug mode, and possibly even in production. We want
             #   to avoid bricking of problem as much as possible
@@ -454,8 +456,9 @@ class CapaModule(CapaFields, XModule):
 
         html = self.system.render_template('problem.html', context)
         if encapsulate:
-            html = '<div id="problem_{id}" class="problem" data-url="{ajax_url}">'.format(
-                id=self.location.html_id(), ajax_url=self.system.ajax_url) + html + "</div>"
+            html = u'<div id="problem_{id}" class="problem" data-url="{ajax_url}">'.format(
+                id=self.location.html_id(), ajax_url=self.system.ajax_url
+            ) + html + "</div>"
 
         # now do the substitutions which are filesystem based, e.g. '/static/' prefixes
         return self.system.replace_urls(html)
@@ -641,7 +644,8 @@ class CapaModule(CapaFields, XModule):
             try:
                 new_answer = {answer_id: self.system.replace_urls(answers[answer_id])}
             except TypeError:
-                log.debug('Unable to perform URL substitution on answers[%s]: %s' % (answer_id, answers[answer_id]))
+                log.debug(u'Unable to perform URL substitution on answers[%s]: %s',
+                          answer_id, answers[answer_id])
                 new_answer = {answer_id: answers[answer_id]}
             new_answers.update(new_answer)
 
@@ -693,7 +697,7 @@ class CapaModule(CapaFields, XModule):
             # will return (key, '', '')
             # We detect this and raise an error
             if not name:
-                raise ValueError("%s must contain at least one underscore" % str(key))
+                raise ValueError(u"{key} must contain at least one underscore".format(key=key))
 
             else:
                 # This allows for answers which require more than one value for
@@ -711,7 +715,7 @@ class CapaModule(CapaFields, XModule):
                 # If the name already exists, then we don't want
                 # to override it.  Raise an error instead
                 if name in answers:
-                    raise ValueError("Key %s already exists in answers dict" % str(name))
+                    raise ValueError(u"Key {name} already exists in answers dict".format(name=name))
                 else:
                     answers[name] = val
 
@@ -759,7 +763,8 @@ class CapaModule(CapaFields, XModule):
             prev_submit_time = self.lcp.get_recentmost_queuetime()
             waittime_between_requests = self.system.xqueue['waittime']
             if (current_time - prev_submit_time).total_seconds() < waittime_between_requests:
-                msg = 'You must wait at least %d seconds between submissions' % waittime_between_requests
+                msg = u'You must wait at least {wait} seconds between submissions'.format(
+                    wait=waittime_between_requests)
                 return {'success': msg, 'html': ''}  # Prompts a modal dialog in ajax callback
 
         try:
@@ -776,7 +781,7 @@ class CapaModule(CapaFields, XModule):
             # the full exception, including traceback,
             # in the response
             if self.system.user_is_staff:
-                msg = "Staff debug info: %s" % traceback.format_exc()
+                msg = u"Staff debug info: {tb}".format(tb=cgi.escape(traceback.format_exc()))
 
             # Otherwise, display just an error message,
             # without a stack trace
@@ -787,7 +792,7 @@ class CapaModule(CapaFields, XModule):
 
         except Exception as err:
             if self.system.DEBUG:
-                msg = "Error checking problem: " + str(err)
+                msg = "Error checking problem: " + err.message
                 msg += '\nTraceback:\n' + traceback.format_exc()
                 return {'success': msg}
             raise
