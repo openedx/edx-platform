@@ -394,6 +394,11 @@ if settings.MITX_FEATURES.get('ENABLE_SERVICE_STATUS'):
         url(r'^status/', include('service_status.urls')),
     )
 
+if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
+    urlpatterns += (
+        url(r'^instructor_task_status/$', 'instructor_task.views.instructor_task_status', name='instructor_task_status'),
+    )
+
 # FoldIt views
 urlpatterns += (
     # The path is hardcoded into their app...
