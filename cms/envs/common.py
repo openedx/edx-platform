@@ -24,6 +24,7 @@ Longer TODO:
 # pylint: disable=W0401, W0614
 
 import sys
+import os
 import lms.envs.common
 from lms.envs.common import USE_TZ
 from path import path
