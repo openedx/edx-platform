@@ -212,6 +212,19 @@ class MongoIndexer:
             }
             print es_instance.index_data(index, course, data)._content
 
+    def module_for_uuid(self, transcript_uuid):
+        """Given the transcript uuid found from the xcontent database, returns the mongo document for the video"""
+        regex_pattern = re.compile(".*?"+str(transcript_uuid)+".*?")
+        video_module = self.module_collection.find_one({"definition.data": regex_pattern})
+        return video_module
+
+    def uuid_from_file_name(self, file_name):
+        """Returns a youtube uuid given the filename of a transcript"""
+        print file_name
+        if file_name[:5] == "subs_":
+            file_name = file_name[5:]
+        return file_name[:file_name.find(".")]
+
     def index_all_transcripts(self, es_instance, index):
         cursor = self.find_files_with_type(".srt.sjson")
         for i in range(0, cursor.count()):
