@@ -16,8 +16,7 @@ an Integer can contain 3 or '3'. This changed an update to the xblock library.
 LMS: Courses whose id matches a regex in the COURSES_WITH_UNSAFE_CODE Django
 setting now run entirely outside the Python sandbox.
 
-Blades: Added tests for Video Alpha player. Added comment about enabling some
-        Video Alpha tests when testing locally. Updated CHANGELOG.
+Blades: Added tests for Video Alpha player.
 
 Blades: Video Alpha bug fix for speed changing to 1.0 in Firefox.
 
