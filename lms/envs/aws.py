@@ -147,6 +147,11 @@ for app in ENV_TOKENS.get('ADDL_INSTALLED_APPS', []):
 for feature, value in ENV_TOKENS.get('MITX_FEATURES', {}).items():
     MITX_FEATURES[feature] = value
 
+# Chat
+if MITX_FEATURES.get("ENABLE_CHAT"):
+    MAKO_TEMPLATES['main'].append(PROJECT_ROOT / 'djangoapps' / 'jabber' / 'templates')
+    STATICFILES_DIRS.append(PROJECT_ROOT / 'djangoapps' / 'jabber' / 'static')
+
 WIKI_ENABLED = ENV_TOKENS.get('WIKI_ENABLED', WIKI_ENABLED)
 local_loglevel = ENV_TOKENS.get('LOCAL_LOGLEVEL', 'INFO')
 
