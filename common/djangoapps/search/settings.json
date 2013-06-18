@@ -1,6 +1,9 @@
 {
 	"mappings": {
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> Integrated module data and improved settings file
 		"properties": {
 			"searchable_text": {
 				"type": "multi_field",
@@ -50,6 +53,7 @@
 						"boost": 2.0,
 						"similarity": "BM25"
 					}
+<<<<<<< HEAD
 				},
 
 				"org": {
@@ -65,6 +69,8 @@
 >>>>>>> Added mongo integration with elasticsearch requests module
 					"type": "string",
 					"store":"true"
+=======
+>>>>>>> Integrated module data and improved settings file
 				},
 
 <<<<<<< HEAD

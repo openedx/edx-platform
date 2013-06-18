@@ -42,9 +42,14 @@ def find(request, database="http://127.0.0.1:9200",
         thumbnails = ["data:image/jpg;base64,"+entry["thumbnail"] for entry in data]
         data = zip(uuids, snippets, thumbnails)
     except KeyError:
+<<<<<<< HEAD
         data = [("No results found, please try again", "")]
     if len(data) == 0:
         data = [("No results found, please try again", "")]
+=======
+        data = [("No results found", "Please try again")]
+    context.update({"data": data})
+>>>>>>> Integrated module data and improved settings file
 
     correction = spell_check(query)
     results_pages = Paginator(data, results_per_page)
