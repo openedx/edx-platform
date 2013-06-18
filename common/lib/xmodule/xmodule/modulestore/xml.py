@@ -52,7 +52,7 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
 
         xmlstore: the XMLModuleStore to store the loaded modules in
         """
-        self.unnamed = defaultdict(int)     # category -> num of new url_names for that category
+        self.unnamed = defaultdict(int)  # category -> num of new url_names for that category
         self.used_names = defaultdict(set)  # category -> set of used url_names
         self.org, self.course, self.url_name = course_id.split('/')
         # cdodge: adding the course_id as passed in for later reference rather than having to recomine the org/course/url_name
@@ -108,7 +108,8 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                         orig_name = orig_name[len(tag) + 1:-12]
                     # append the hash of the content--the first 12 bytes should be plenty.
                     orig_name = "_" + orig_name if orig_name not in (None, "") else ""
-                    return tag + orig_name + "_" + hashlib.sha1(xml).hexdigest()[:12]
+                    xml_bytes = xml.encode('utf8')
+                    return tag + orig_name + "_" + hashlib.sha1(xml_bytes).hexdigest()[:12]
 
                 # Fallback if there was nothing we could use:
                 if url_name is None or url_name == "":
@@ -123,7 +124,7 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                     else:
                         # TODO (vshnayder): We may want to enable this once course repos are cleaned up.
                         # (or we may want to give up on the requirement for non-state-relevant issues...)
-                        #error_tracker("WARNING: no name specified for module. xml='{0}...'".format(xml[:100]))
+                        # error_tracker("WARNING: no name specified for module. xml='{0}...'".format(xml[:100]))
                         pass
 
                 # Make sure everything is unique
@@ -322,7 +323,7 @@ class XMLModuleStore(ModuleStoreBase):
         '''
         String representation - for debugging
         '''
-        return '<XMLModuleStore>data_dir=%s, %d courses, %d modules' % (
+        return '<XMLModuleStore data_dir=%r, %d courses, %d modules>' % (
             self.data_dir, len(self.courses), len(self.modules))
 
     def load_policy(self, policy_path, tracker):
@@ -446,7 +447,7 @@ class XMLModuleStore(ModuleStoreBase):
     def load_extra_content(self, system, course_descriptor, category, base_dir, course_dir, url_name):
         self._load_extra_content(system, course_descriptor, category, base_dir, course_dir)
 
-         # then look in a override folder based on the course run
+        # then look in a override folder based on the course run
         if os.path.isdir(base_dir / url_name):
             self._load_extra_content(system, course_descriptor, category, base_dir / url_name, course_dir)
 

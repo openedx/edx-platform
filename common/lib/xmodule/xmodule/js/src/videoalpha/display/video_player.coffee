@@ -24,9 +24,9 @@ class @VideoPlayerAlpha extends SubviewAlpha
     if @video.videoType is 'youtube'
       $(@qualityControl).bind('changeQuality', @handlePlaybackQualityChange)
     if @video.show_captions is true
-      $(@caption).bind('seek', @onSeek)
+      $(@caption).bind('caption_seek', @onSeek)
     $(@speedControl).bind('speedChange', @onSpeedChange)
-    $(@progressSlider).bind('seek', @onSeek)
+    $(@progressSlider).bind('slide_seek', @onSeek)
     if @volumeControl
       $(@volumeControl).bind('volumeChange', @onVolumeChange)
     $(document).keyup @bindExitFullScreen
@@ -45,6 +45,8 @@ class @VideoPlayerAlpha extends SubviewAlpha
     if @video.show_captions is true
       @caption = new VideoCaptionAlpha
         el: @el
+        video: @video
+        player: @
         youtubeId: @video.youtubeId('1.0')
         currentSpeed: @currentSpeed()
         captionAssetPath: @video.caption_asset_path
@@ -66,7 +68,19 @@ class @VideoPlayerAlpha extends SubviewAlpha
     if @video.end
       # work in AS3, not HMLT5. but iframe use AS3
       @playerVars.end = @video.end
+
+    # There is a bug which prevents YouTube API to correctly set the speed to 1.0 from another speed
+    # in Firefox when in HTML5 mode. There is a fix which basically reloads the video at speed 1.0
+    # when this change is requested (instead of simply requesting a speed change to 1.0). This has to
+    # be done only when the video is being watched in Firefox. We need to figure out what browser is
+    # currently executing this code.
+    #
+    # TODO: Check the status of http://code.google.com/p/gdata-issues/issues/detail?id=4654
+    #       When the YouTube team fixes the API bug, we can remove this temporary bug fix.
+    @video.isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1
+
     if @video.videoType is 'html5'
+      @video.playerType = 'browser'
       @player = new HTML5Video.Player @video.el,
         playerVars: @playerVars,
         videoSources: @video.html5Sources,
@@ -79,6 +93,7 @@ class @VideoPlayerAlpha extends SubviewAlpha
         youTubeId = @video.videos['1.0']
       else
         youTubeId = @video.youtubeId()
+      @video.playerType = 'youtube'
       @player = new YT.Player @video.id,
         playerVars: @playerVars
         videoId: youTubeId
@@ -96,9 +111,10 @@ class @VideoPlayerAlpha extends SubviewAlpha
         at: 'top center'
 
   onReady: (event) =>
+    @video.log 'load_video'
     if @video.videoType is 'html5'
       @player.setPlaybackRate @video.speed
-    unless onTouchBasedDevice()
+    if not onTouchBasedDevice() and $('.video:first').data('autoplay') is 'True'
       $('.video-load-complete:first').data('video').player.play()
 
   onStateChange: (event) =>
@@ -184,7 +200,8 @@ class @VideoPlayerAlpha extends SubviewAlpha
       @caption.pause()
 
   onPlay: =>
-    @video.log 'play_video'
+    @video.log 'play_video',
+      currentTime: @currentTime
     unless @player.interval
       @player.interval = setInterval(@update, 200)
     if @video.show_captions is true
@@ -193,7 +210,8 @@ class @VideoPlayerAlpha extends SubviewAlpha
     @progressSlider.play()
 
   onPause: =>
-    @video.log 'pause_video'
+    @video.log 'pause_video',
+      currentTime: @currentTime
     clearInterval(@player.interval)
     @player.interval = null
     if @video.show_captions is true
@@ -206,6 +224,10 @@ class @VideoPlayerAlpha extends SubviewAlpha
       @caption.pause()
 
   onSeek: (event, time) =>
+    @video.log 'seek_video',
+      old_time: @currentTime
+      new_time: time
+      type: event.type
     @player.seekTo(time, true)
     if @isPlaying()
       clearInterval(@player.interval)
@@ -218,17 +240,31 @@ class @VideoPlayerAlpha extends SubviewAlpha
     if @video.videoType is 'youtube'
       @currentTime = Time.convert(@currentTime, parseFloat(@currentSpeed()), newSpeed)
     newSpeed = parseFloat(newSpeed).toFixed(2).replace /\.00$/, '.0'
+
+    @video.log 'speed_change_video',
+      currentTime: @currentTime
+      old_speed: @currentSpeed()
+      new_speed: newSpeed
+
     @video.setSpeed newSpeed, updateCookie
     if @video.videoType is 'youtube'
       if @video.show_captions is true
         @caption.currentSpeed = newSpeed
-    if @video.videoType is 'html5'
-      @player.setPlaybackRate newSpeed
-    else if @video.videoType is 'youtube'
+
+    # We request the reloading of the video in the case when YouTube is in Flash player mode,
+    # or when we are in Firefox, and the new speed is 1.0. The second case is necessary to
+    # avoid the bug where in Firefox speed switching to 1.0 in HTML5 player mode is handled
+    # incorrectly by YouTube API.
+    #
+    # TODO: Check the status of http://code.google.com/p/gdata-issues/issues/detail?id=4654
+    #       When the YouTube team fixes the API bug, we can remove this temporary bug fix.
+    if (@video.videoType is 'youtube') or ((@video.isFirefox) and (@video.playerType is 'youtube') and (newSpeed is '1.0'))
       if @isPlaying()
         @player.loadVideoById(@video.youtubeId(), @currentTime)
       else
         @player.cueVideoById(@video.youtubeId(), @currentTime)
+    else if @video.videoType is 'html5'
+      @player.setPlaybackRate newSpeed
     if @video.videoType is 'youtube'
       @updatePlayTime @currentTime
 
@@ -249,11 +285,15 @@ class @VideoPlayerAlpha extends SubviewAlpha
   toggleFullScreen: (event) =>
     event.preventDefault()
     if @el.hasClass('fullscreen')
+      type = 'not_fullscreen'
       @$('.add-fullscreen').attr('title', 'Fill browser')
       @el.removeClass('fullscreen')
     else
+      type = 'fullscreen'
       @el.addClass('fullscreen')
       @$('.add-fullscreen').attr('title', 'Exit fill browser')
+    @video.log type,
+      currentTime: @currentTime
     if @video.show_captions is true
       @caption.resize()
 

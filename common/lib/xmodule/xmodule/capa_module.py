@@ -11,16 +11,16 @@ import sys
 from pkg_resources import resource_string
 
 from capa.capa_problem import LoncapaProblem
-from capa.responsetypes import StudentInputError,\
+from capa.responsetypes import StudentInputError, \
     ResponseError, LoncapaProblemError
 from capa.util import convert_files_to_filenames
 from .progress import Progress
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
-from xblock.core import Scope, String, Boolean, Object
-from .fields import Timedelta, Date, StringyInteger, StringyFloat
-from xmodule.util.date_utils import time_to_datetime
+from xblock.core import Scope, String, Boolean, Dict, Integer, Float
+from .fields import Timedelta, Date
+from django.utils.timezone import UTC
 
 log = logging.getLogger("mitx.courseware")
 
@@ -65,11 +65,11 @@ class ComplexEncoder(json.JSONEncoder):
 
 
 class CapaFields(object):
-    attempts = StringyInteger(help="Number of attempts taken by the student on this problem", default=0, scope=Scope.user_state)
-    max_attempts = StringyInteger(
+    attempts = Integer(help="Number of attempts taken by the student on this problem", default=0, scope=Scope.user_state)
+    max_attempts = Integer(
         display_name="Maximum Attempts",
         help="Defines the number of times a student can try to answer this problem. If the value is not set, infinite attempts are allowed.",
-        values={"min": 1}, scope=Scope.settings
+        values={"min": 0}, scope=Scope.settings
     )
     due = Date(help="Date that this problem is due by", scope=Scope.settings)
     graceperiod = Timedelta(help="Amount of time after the due date that submissions will be accepted", scope=Scope.settings)
@@ -95,12 +95,12 @@ class CapaFields(object):
                                                         {"display_name": "Per Student", "value": "per_student"}]
     )
     data = String(help="XML data for the problem", scope=Scope.content)
-    correct_map = Object(help="Dictionary with the correctness of current student answers", scope=Scope.user_state, default={})
-    input_state = Object(help="Dictionary for maintaining the state of inputtypes", scope=Scope.user_state)
-    student_answers = Object(help="Dictionary with the current student responses", scope=Scope.user_state)
+    correct_map = Dict(help="Dictionary with the correctness of current student answers", scope=Scope.user_state, default={})
+    input_state = Dict(help="Dictionary for maintaining the state of inputtypes", scope=Scope.user_state)
+    student_answers = Dict(help="Dictionary with the current student responses", scope=Scope.user_state)
     done = Boolean(help="Whether the student has answered the problem", scope=Scope.user_state)
-    seed = StringyInteger(help="Random seed for this student", scope=Scope.user_state)
-    weight = StringyFloat(
+    seed = Integer(help="Random seed for this student", scope=Scope.user_state)
+    weight = Float(
         display_name="Problem Weight",
         help="Defines the number of points each problem is worth. If the value is not set, each response field in the problem is worth one point.",
         values={"min": 0, "step": .1},
@@ -134,7 +134,7 @@ class CapaModule(CapaFields, XModule):
     def __init__(self, system, location, descriptor, model_data):
         XModule.__init__(self, system, location, descriptor, model_data)
 
-        due_date = time_to_datetime(self.due)
+        due_date = self.due
 
         if self.graceperiod is not None and due_date:
             self.close_date = due_date + self.graceperiod
@@ -315,7 +315,7 @@ class CapaModule(CapaFields, XModule):
         # If the user has forced the save button to display,
         # then show it as long as the problem is not closed
         # (past due / too many attempts)
-        if self.force_save_button == "true":
+        if self.force_save_button:
             return not self.closed()
         else:
             is_survey_question = (self.max_attempts == 0)
@@ -502,7 +502,7 @@ class CapaModule(CapaFields, XModule):
         Is it now past this problem's due date, including grace period?
         """
         return (self.close_date is not None and
-                datetime.datetime.utcnow() > self.close_date)
+                datetime.datetime.now(UTC()) > self.close_date)
 
     def closed(self):
         ''' Is the student still allowed to submit answers? '''
@@ -747,7 +747,7 @@ class CapaModule(CapaFields, XModule):
 
         # Problem queued. Students must wait a specified waittime before they are allowed to submit
         if self.lcp.is_queued():
-            current_time = datetime.datetime.now()
+            current_time = datetime.datetime.now(UTC())
             prev_submit_time = self.lcp.get_recentmost_queuetime()
             waittime_between_requests = self.system.xqueue['waittime']
             if (current_time - prev_submit_time).total_seconds() < waittime_between_requests:
@@ -902,7 +902,6 @@ class CapaDescriptor(CapaFields, RawDescriptor):
 
     module_class = CapaModule
 
-    stores_state = True
     has_score = True
     template_dir_name = 'problem'
     mako_template = "widgets/problem-edit.html"

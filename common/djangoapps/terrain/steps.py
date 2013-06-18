@@ -159,3 +159,33 @@ def registered_edx_user(step, uname):
 @step(u'All dialogs should be closed$')
 def dialogs_are_closed(step):
     assert world.dialogs_closed()
+
+
+@step('I will confirm all alerts')
+def i_confirm_all_alerts(step):
+    """
+    Please note: This method must be called RIGHT BEFORE an expected alert
+    Window variables are page local and thus all changes are removed upon navigating to a new page
+    In addition, this method changes the functionality of ONLY future alerts
+    """
+    world.browser.execute_script('window.confirm = function(){return true;} ; window.alert = function(){return;}')
+
+
+@step('I will cancel all alerts')
+def i_cancel_all_alerts(step):
+    """
+    Please note: This method must be called RIGHT BEFORE an expected alert
+    Window variables are page local and thus all changes are removed upon navigating to a new page
+    In addition, this method changes the functionality of ONLY future alerts
+    """
+    world.browser.execute_script('window.confirm = function(){return false;} ; window.alert = function(){return;}')
+
+
+@step('I will answer all prompts with "([^"]*)"')
+def i_answer_prompts_with(step, prompt):
+    """
+    Please note: This method must be called RIGHT BEFORE an expected alert
+    Window variables are page local and thus all changes are removed upon navigating to a new page
+    In addition, this method changes the functionality of ONLY future alerts
+    """
+    world.browser.execute_script('window.prompt = function(){return %s;}') % prompt

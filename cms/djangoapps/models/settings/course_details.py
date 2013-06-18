@@ -3,26 +3,26 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.inheritance import own_metadata
 import json
 from json.encoder import JSONEncoder
-import time
 from contentstore.utils import get_modulestore
 from models.settings import course_grading
 from contentstore.utils import update_item
 from xmodule.fields import Date
 import re
 import logging
+import datetime
 
 
 class CourseDetails(object):
     def __init__(self, location):
-        self.course_location = location    # a Location obj
+        self.course_location = location  # a Location obj
         self.start_date = None  # 'start'
-        self.end_date = None    # 'end'
+        self.end_date = None  # 'end'
         self.enrollment_start = None
         self.enrollment_end = None
-        self.syllabus = None    # a pdf file asset
-        self.overview = ""      # html to render as the overview
-        self.intro_video = None    # a video pointer
-        self.effort = None      # int hours/week
+        self.syllabus = None  # a pdf file asset
+        self.overview = ""  # html to render as the overview
+        self.intro_video = None  # a video pointer
+        self.effort = None  # int hours/week
 
     @classmethod
     def fetch(cls, course_location):
@@ -73,9 +73,9 @@ class CourseDetails(object):
         """
         Decode the json into CourseDetails and save any changed attrs to the db
         """
-        ## TODO make it an error for this to be undefined & for it to not be retrievable from modulestore
+        # TODO make it an error for this to be undefined & for it to not be retrievable from modulestore
         course_location = jsondict['course_location']
-        ## Will probably want to cache the inflight courses because every blur generates an update
+        # Will probably want to cache the inflight courses because every blur generates an update
         descriptor = get_modulestore(course_location).get_item(course_location)
 
         dirty = False
@@ -181,7 +181,7 @@ class CourseSettingsEncoder(json.JSONEncoder):
             return obj.__dict__
         elif isinstance(obj, Location):
             return obj.dict()
-        elif isinstance(obj, time.struct_time):
+        elif isinstance(obj, datetime.datetime):
             return Date().to_json(obj)
         else:
             return JSONEncoder.default(self, obj)

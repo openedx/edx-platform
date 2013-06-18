@@ -32,12 +32,10 @@ Feature: Create Subsection
     And I reload the page
     Then I see the correct dates
 
-  # Skipped because Ubuntu ChromeDriver hangs on alert
-  @skip
   Scenario: Delete a subsection
     Given I have opened a new course section in Studio
     And I have added a new subsection
     And I see my subsection on the Courseware page
-    When I press the "subsection" delete icon
-    And I confirm the alert
+    When I will confirm all alerts
+    And I press the "subsection" delete icon
     Then the subsection does not exist

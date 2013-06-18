@@ -178,6 +178,13 @@ COURSES_WITH_UNSAFE_CODE = ENV_TOKENS.get("COURSES_WITH_UNSAFE_CODE", [])
 with open(ENV_ROOT / CONFIG_PREFIX + "auth.json") as auth_file:
     AUTH_TOKENS = json.load(auth_file)
 
+############### Mixed Related(Secure/Not-Secure) Items ##########
+# If segment.io key specified, load it and turn on segment IO if the feature flag is set
+SEGMENT_IO_LMS_KEY = AUTH_TOKENS.get('SEGMENT_IO_LMS_KEY')
+if SEGMENT_IO_LMS_KEY:
+    MITX_FEATURES['SEGMENT_IO_LMS'] = ENV_TOKENS.get('SEGMENT_IO_LMS', False)
+
+
 SECRET_KEY = AUTH_TOKENS['SECRET_KEY']
 
 AWS_ACCESS_KEY_ID = AUTH_TOKENS["AWS_ACCESS_KEY_ID"]

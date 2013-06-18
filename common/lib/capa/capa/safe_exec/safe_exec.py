@@ -1,6 +1,7 @@
 """Capa's specialized use of codejail.safe_exec."""
 
 from codejail.safe_exec import safe_exec as codejail_safe_exec
+from codejail.safe_exec import not_safe_exec as codejail_not_safe_exec
 from codejail.safe_exec import json_safe, SafeExecException
 from . import lazymod
 from statsd import statsd
@@ -71,7 +72,7 @@ def update_hash(hasher, obj):
 
 
 @statsd.timed('capa.safe_exec.time')
-def safe_exec(code, globals_dict, random_seed=None, python_path=None, cache=None, slug=None):
+def safe_exec(code, globals_dict, random_seed=None, python_path=None, cache=None, slug=None, unsafely=False):
     """
     Execute python code safely.
 
@@ -89,6 +90,8 @@ def safe_exec(code, globals_dict, random_seed=None, python_path=None, cache=None
 
     `slug` is an arbitrary string, a description that's meaningful to the
     caller, that will be used in log messages.
+
+    If `unsafely` is true, then the code will actually be executed without sandboxing.
 
     """
     # Check the cache for a previous result.
@@ -111,9 +114,15 @@ def safe_exec(code, globals_dict, random_seed=None, python_path=None, cache=None
     # Create the complete code we'll run.
     code_prolog = CODE_PROLOG % random_seed
 
+    # Decide which code executor to use.
+    if unsafely:
+        exec_fn = codejail_not_safe_exec
+    else:
+        exec_fn = codejail_safe_exec
+
     # Run the code!  Results are side effects in globals_dict.
     try:
-        codejail_safe_exec(
+        exec_fn(
             code_prolog + LAZY_IMPORTS + code, globals_dict,
             python_path=python_path, slug=slug,
         )

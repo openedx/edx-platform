@@ -8,6 +8,7 @@ from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 
 from student.models import TestCenterRegistration, ACCOMMODATION_REJECTED_CODE
+from pytz import UTC
 
 
 class Command(BaseCommand):
@@ -51,7 +52,7 @@ class Command(BaseCommand):
     def handle(self, **options):
         # update time should use UTC in order to be comparable to the user_updated_at
         # field
-        uploaded_at = datetime.utcnow()
+        uploaded_at = datetime.now(UTC)
 
         # if specified destination is an existing directory, then
         # create a filename for it automatically.  If it doesn't exist,

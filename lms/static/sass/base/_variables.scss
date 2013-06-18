@@ -88,9 +88,10 @@ $dashboard-profile-header-color: transparent;
 $dashboard-profile-color: rgb(252,252,252);
 $dot-color: $light-gray;
 
-$content-wrapper-bg: shade($body-bg, 2%);
+$content-wrapper-bg: $white;
 $course-bg-color: #d6d6d6;
 $course-bg-image: url(../images/bg-texture.png);
+$account-content-wrapper-bg: shade($body-bg, 2%);
 
 $course-profile-bg: rgb(245,245,245);
 $course-header-bg: rgba(255,255,255, 0.93);
@@ -131,7 +132,7 @@ $footer_margin: ($baseline/4) 0 ($baseline*1.5) 0;
 //-----------------
 $homepage-bg-image: '../images/homepage-bg.jpg';
 
-$login-banner-image: '../images/bg-banner-login.png';
-$register-banner-image: '../images/bg-banner-register.png';
+$login-banner-image: url(../images/bg-banner-login.png);
+$register-banner-image: url(../images/bg-banner-register.png);
 
 $video-thumb-url: '../images/courses/video-thumb.jpg';

@@ -6,7 +6,7 @@
 
 // page-level
 .view-register, .view-login, .view-passwordreset {
-  background: $body-bg;
+  background: $container-bg;
 
 
 
@@ -98,7 +98,7 @@
 
   // layout
   .content-wrapper {
-    background: $content-wrapper-bg;
+    background: $account-content-wrapper-bg;
     padding-bottom: 0;
   }
 
@@ -331,7 +331,7 @@
         }
 
         textarea, input {
-          background: $body-bg;
+          background: $container-bg;
           color: rgba(0,0,0,.25);
         }
       }
@@ -493,7 +493,7 @@
     header {
       height: 120px;
       border-bottom: 1px solid $m-gray;
-      background: transparent url($login-banner-image) 0 0 no-repeat;
+      background: transparent $login-banner-image 0 0 no-repeat;
     }
   }
 }
@@ -507,7 +507,7 @@
     header {
       height: 120px;
       border-bottom: 1px solid $m-gray;
-      background: transparent url($register-banner-image) 0 0 no-repeat;
+      background: transparent $register-banner-image 0 0 no-repeat;
     }
   }
 }

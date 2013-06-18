@@ -208,9 +208,10 @@ class TestViewAuth(MongoLoginHelpers):
         """Actually do the test, relying on settings to be right."""
 
         # Make courses start in the future
-        tomorrow = time.time() + 24 * 3600
-        self.course.start = time.gmtime(tomorrow)
-        self.full.start = time.gmtime(tomorrow)
+        now = datetime.datetime.now(pytz.UTC)
+        tomorrow = now + datetime.timedelta(days=1)
+        self.course.start = tomorrow
+        self.full.start = tomorrow
 
         self.assertFalse(self.course.has_started())
         self.assertFalse(self.full.has_started())
@@ -345,17 +346,8 @@ class TestViewAuth(MongoLoginHelpers):
         # self.course's enrollment period hasn't started
         print self.course.enrollment_start
         self.course = update_course(self.course, course_data)
-        print 'FLAG'
-        print self.course.enrollment_start
-        print 'FLAG'
-        #self.course.enrollment_start = time.gmtime(tomorrow)
-        #self.course.enrollment_end = time.gmtime(nextday)
         # full course's has
-        print self.full.enrollment_start
         self.full = update_course(self.full, full_data)
-        print self.full.enrollment_start
-        #self.full.enrollment_start = time.gmtime(yesterday)
-        #self.full.enrollment_end = time.gmtime(tomorrow)
 
         print "login"
         # First, try with an enrolled student
@@ -394,12 +386,13 @@ class TestViewAuth(MongoLoginHelpers):
         self.assertFalse(settings.MITX_FEATURES['DISABLE_START_DATES'])
 
         # Make courses start in the future
-        tomorrow = time.time() + 24 * 3600
+        now = datetime.datetime.now(pytz.UTC)
+        tomorrow = now + datetime.timedelta(days=1)
         # nextday = tomorrow + 24 * 3600
         # yesterday = time.time() - 24 * 3600
 
         # toy course's hasn't started
-        self.course.lms.start = time.gmtime(tomorrow)
+        self.course.lms.start = tomorrow
         self.assertFalse(self.course.has_started())
 
         # but should be accessible for beta testers

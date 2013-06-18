@@ -98,6 +98,8 @@ if not settings.MITX_FEATURES["USE_CUSTOM_THEME"]:
         url(r'^press$', 'student.views.press', name="press"),
         url(r'^media-kit$', 'static_template_view.views.render',
             {'template': 'media-kit.html'}, name="media-kit"),
+        url(r'^faq$', 'static_template_view.views.render',
+            {'template': 'faq.html'}, name="faq_edx"),
         url(r'^help$', 'static_template_view.views.render',
             {'template': 'help.html'}, name="help_edx"),
 
@@ -111,7 +113,7 @@ if not settings.MITX_FEATURES["USE_CUSTOM_THEME"]:
         # Favicon
         (r'^favicon\.ico$', 'django.views.generic.simple.redirect_to', {'url': '/static/images/favicon.ico'}),
 
-        url(r'^submit_feedback$', 'util.views.submit_feedback_via_zendesk'),
+        url(r'^submit_feedback$', 'util.views.submit_feedback'),
 
         # TODO: These urls no longer work. They need to be updated before they are re-enabled
         # url(r'^reactivate/(?P<key>[^/]*)$', 'student.views.reactivation_email'),
@@ -125,7 +127,7 @@ for key, value in settings.MKTG_URL_LINK_MAP.items():
         continue
 
     # These urls are enabled separately
-    if key == "ROOT" or key == "COURSES":
+    if key == "ROOT" or key == "COURSES" or key == "FAQ":
         continue
 
     # Make the assumptions that the templates are all in the same dir
@@ -267,8 +269,6 @@ if settings.COURSEWARE_ENABLED:
             'instructor.views.gradebook', name='gradebook'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/grade_summary$',
             'instructor.views.grade_summary', name='grade_summary'),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/enroll_students$',
-            'instructor.views.enroll_students', name='enroll_students'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/staff_grading$',
             'open_ended_grading.views.staff_grading', name='staff_grading'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/staff_grading/get_next$',

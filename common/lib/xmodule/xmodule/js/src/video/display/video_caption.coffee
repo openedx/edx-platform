@@ -37,7 +37,7 @@ class @VideoCaption extends Subview
         @loaded = true
 
         if onTouchBasedDevice()
-          $('.subtitles li').html "Caption will be displayed when you start playing the video."
+          $('.subtitles').html "<li>Caption will be displayed when you start playing the video.</li>"
         else
           @renderCaption()
 

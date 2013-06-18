@@ -209,7 +209,7 @@ mark {
 }
 
 .sr {
-  @include text-sr();
+  @extend .text-sr;
 }
 
 .help-tab {
