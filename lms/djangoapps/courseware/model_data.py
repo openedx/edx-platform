@@ -163,7 +163,7 @@ class ModelDataCache(object):
             return self._chunked_query(
                 XModuleStudentPrefsField,
                 'module_type__in',
-                set(descriptor.location.category for descriptor in self.descriptors),
+                set(descriptor.module_class.__name__ for descriptor in self.descriptors),
                 student=self.user.pk,
                 field_name__in=set(field.name for field in fields),
             )
