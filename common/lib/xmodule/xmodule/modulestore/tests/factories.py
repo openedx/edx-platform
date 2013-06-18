@@ -1,13 +1,13 @@
 from factory import Factory, lazy_attribute_sequence, lazy_attribute
-from time import gmtime
 from uuid import uuid4
+import datetime
+
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.x_module import ModuleSystem
 from mitxmako.shortcuts import render_to_string
 from xblock.runtime import InvalidScopeError
-import datetime
 from pytz import UTC
 
 
@@ -59,7 +59,10 @@ class XModuleCourseFactory(Factory):
         if data is not None:
             store.update_item(new_course.location, data)
 
+<<<<<<< HEAD
         #refetch item
+=======
+>>>>>>> jnater/courseware_tests
         new_course = store.get_instance(new_course.id, new_course.location)
 
         return new_course
@@ -150,7 +153,8 @@ class XModuleItemFactory(Factory):
         if new_item.location.category not in DETACHED_CATEGORIES:
             store.update_children(parent_location, parent.children + [new_item.location.url()])
 
-        #added return of parent since I cant figure out how to update the course from within the test
+        new_item = store.get_item(new_item.location)
+
         return new_item
 
 
@@ -184,6 +188,7 @@ def get_test_xmodule_for_descriptor(descriptor):
         xblock_model_data=_test_xblock_model_data_accessor(descriptor)
     )
     return descriptor.xmodule(module_sys)
+
 
 def _test_xblock_model_data_accessor(descriptor):
     simple_map = {}

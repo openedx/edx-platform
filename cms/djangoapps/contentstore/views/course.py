@@ -402,8 +402,11 @@ def course_advanced_updates(request, org, course, name):
                         request_body.update({'tabs': new_tabs})
                         # Indicate that tabs should *not* be filtered out of the metadata
                         filter_tabs = False
-
-        response_json = json.dumps(CourseMetadata.update_from_json(location,
+        try:
+            response_json = json.dumps(CourseMetadata.update_from_json(location,
                                                                    request_body,
                                                                    filter_tabs=filter_tabs))
+        except (TypeError, ValueError), e:
+            return HttpResponseBadRequest("Incorrect setting format. " + str(e), content_type="text/plain")
+
         return HttpResponse(response_json, mimetype="application/json")
