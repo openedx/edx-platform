@@ -5,6 +5,8 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+LMS: Fixed the preferences scope for storing data in xmodules.
+
 LMS: Forums.  Added handling for case where discussion module can get `None` as
 value of lms.start in `lms/djangoapps/django_comment_client/utils.py`
 
