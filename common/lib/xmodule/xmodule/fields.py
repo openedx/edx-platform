@@ -29,7 +29,7 @@ class Date(ModelType):
         # however, we don't want dateutil to default the month or day (but some tests at least expect
         # us to default year); so, we'll see if dateutil uses the defaults for these the hard way
         result = dateutil.parser.parse(field, default=self.PREVENT_DEFAULT_DAY_MON_SEED1)
-        result_other = dateutil.parser.parse(field, default=self.PREVENT_DEFAULT_DAY_MON_SEED1)
+        result_other = dateutil.parser.parse(field, default=self.PREVENT_DEFAULT_DAY_MON_SEED2)
         if result != result_other:
             log.warning("Field {0} is missing month or day".format(self._name, field))
             return None
