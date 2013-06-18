@@ -45,9 +45,7 @@ import datetime
 from pytz import UTC
 #from uuid import uuid4
 
-TEST_DATA_MODULESTORE = copy.deepcopy(settings.MODULESTORE)
-TEST_DATA_MODULESTORE['default']['OPTIONS']['fs_root'] = path('common/test/data')
-TEST_DATA_MODULESTORE['direct']['OPTIONS']['fs_root'] = path('common/test/data')
+
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['OPTIONS']['db'] = 'test_xcontent_%s' % 4  #uuid4().hex
 
@@ -62,7 +60,7 @@ class MongoCollectionFindWrapper(object):
         return self.original(query, *args, **kwargs)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MODULESTORE)
+#@override_settings(MODULESTORE=TEST_DATA_MODULESTORE)
 @override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
 class ContentStoreToyCourseTest(ModuleStoreTestCase):
     """
@@ -70,6 +68,9 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
     TODO: refactor using CourseFactory so they do not.
     """
     def setUp(self):
+
+        settings.MODULESTORE['default']['OPTIONS']['fs_root'] = path('common/test/data')
+        settings.MODULESTORE['direct']['OPTIONS']['fs_root'] = path('common/test/data')
         uname = 'testuser'
         email = 'test+courses@edx.org'
         password = 'foo'
@@ -86,6 +87,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         self.client = Client()
         self.client.login(username=uname, password=password)
+
 
 
     def check_components_on_page(self, component_types, expected_types):
