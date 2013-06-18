@@ -17,6 +17,23 @@ log = logging.getLogger(__name__)
 STATES_WITH_STATUS = [state for state in READY_STATES] + [PROGRESS]
 
 
+def _get_instructor_task_status(task_id):
+    """
+    Returns status for a specific task.
+
+    Written as an internal method here (rather than as a helper)
+    so that get_task_completion_info() can be called without
+    causing a circular dependency (since it's also called directly).
+    """
+    instructor_task = get_updated_instructor_task(task_id)
+    status = get_status_from_instructor_task(instructor_task)
+    if instructor_task is not None and instructor_task.task_state in STATES_WITH_STATUS:
+        succeeded, message = get_task_completion_info(instructor_task)
+        status['message'] = message
+        status['succeeded'] = succeeded
+    return status
+
+
 def instructor_task_status(request):
     """
     View method that returns the status of a course-related task or tasks.
@@ -57,30 +74,15 @@ def instructor_task_status(request):
           'traceback': optional, returned if task failed and produced a traceback.
 
     """
-    def get_instructor_task_status(task_id):
-        """
-        Returns status for a specific task.
-
-        Written as an internal method here (rather than as a helper)
-        so that get_task_completion_info() can be called without
-        causing a circular dependency (since it's also called directly).
-        """
-        instructor_task = get_updated_instructor_task(task_id)
-        status = get_status_from_instructor_task(instructor_task)
-        if instructor_task.task_state in STATES_WITH_STATUS:
-            succeeded, message = get_task_completion_info(instructor_task)
-            status['message'] = message
-            status['succeeded'] = succeeded
-        return status
 
     output = {}
     if 'task_id' in request.REQUEST:
         task_id = request.REQUEST['task_id']
-        output = get_instructor_task_status(task_id)
+        output = _get_instructor_task_status(task_id)
     elif 'task_ids[]' in request.REQUEST:
         tasks = request.REQUEST.getlist('task_ids[]')
         for task_id in tasks:
-            task_output = get_instructor_task_status(task_id)
+            task_output = _get_instructor_task_status(task_id)
             if task_output is not None:
                 output[task_id] = task_output
 

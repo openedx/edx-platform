@@ -36,6 +36,14 @@ class InstructorTaskReportTest(InstructorTaskTestCase):
         output = json.loads(response.content)
         self.assertEquals(output['task_id'], task_id)
 
+    def test_missing_instructor_task_status(self):
+        task_id = "missing_id"
+        request = Mock()
+        request.REQUEST = {'task_id': task_id}
+        response = instructor_task_status(request)
+        output = json.loads(response.content)
+        self.assertEquals(output, {})
+
     def test_instructor_task_status_list(self):
         # Fetch status for existing tasks by arg list, as if called from ajax.
         # Note that ajax does something funny with the marshalling of

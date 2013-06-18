@@ -189,13 +189,13 @@ def get_status_from_instructor_task(instructor_task):
      """
     status = {}
 
-    if instructor_task.task_output is not None:
-        status['task_progress'] = json.loads(instructor_task.task_output)
-
-    # status basic information matching what's stored in InstructorTask:
-    status['task_id'] = instructor_task.task_id
-    status['task_state'] = instructor_task.task_state
-    status['in_progress'] = instructor_task.task_state not in READY_STATES
+    if instructor_task is not None:
+        # status basic information matching what's stored in InstructorTask:
+        status['task_id'] = instructor_task.task_id
+        status['task_state'] = instructor_task.task_state
+        status['in_progress'] = instructor_task.task_state not in READY_STATES
+        if instructor_task.task_output is not None:
+            status['task_progress'] = json.loads(instructor_task.task_output)
 
     return status
 
