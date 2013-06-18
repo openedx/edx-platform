@@ -133,7 +133,6 @@ describe "CMS.Views.Notification minShown and maxShown", ->
         @clock = sinon.useFakeTimers()
 
     afterEach ->
-        delete CMS.Views.Notification.active;
         @clock.restore()
 
     it "a minShown view should not hide too quickly", ->
