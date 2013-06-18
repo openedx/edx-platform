@@ -1,33 +1,30 @@
 log = -> console.log.apply console, arguments
 plantTimeout = (ms, cb) -> setTimeout cb, ms
 
-# setup the data download section
-setup_section_membership = (section) ->
-  log "setting up instructor dashboard section - membership"
 
-  setup_batch_enrollment = ->
+class BatchEnrollment
+  constructor: (@$container) ->
     log "setting up instructor dashboard subsection - batch enrollment"
 
-    subsection = section.find('.batch-enrollment')
-    emails_input = subsection.find("textarea[name='student-emails']'")
-    btn_enroll = subsection.find("input[name='enroll']'")
-    btn_unenroll = subsection.find("input[name='unenroll']'")
-    task_response = subsection.find(".task-response")
+    $emails_input = @$container.find("textarea[name='student-emails']'")
+    $btn_enroll = @$container.find("input[name='enroll']'")
+    $btn_unenroll = @$container.find("input[name='unenroll']'")
+    $task_response = @$container.find(".task-response")
 
-    emails_input.click -> log 'click emails_input'
-    btn_enroll.click -> log 'click btn_enroll'
-    btn_unenroll.click -> log 'click btn_unenroll'
+    $emails_input.click -> log 'click $emails_input'
+    $btn_enroll.click -> log 'click $btn_enroll'
+    $btn_unenroll.click -> log 'click $btn_unenroll'
 
-    btn_enroll.click -> $.getJSON btn_enroll.data('endpoint'), enroll: emails_input.val() , (data) ->
+    $btn_enroll.click -> $.getJSON $btn_enroll.data('endpoint'), enroll: $emails_input.val() , (data) ->
       log 'received response for enroll button', data
       display_response(data)
 
-    btn_unenroll.click -> $.getJSON btn_unenroll.data('endpoint'), unenroll: emails_input.val() , (data) ->
+    $btn_unenroll.click -> $.getJSON $btn_unenroll.data('endpoint'), unenroll: $emails_input.val() , (data) ->
       log 'received response for unenroll button', data
       display_response(data)
 
     display_response = (data_from_server) ->
-      task_response.empty()
+      $task_response.empty()
 
       response_code_dict = _.extend {}, data_from_server.enrolled, data_from_server.unenrolled
       # response_code_dict e.g. {'code': ['email1', 'email2'], ...}
@@ -68,7 +65,7 @@ setup_section_membership = (section) ->
       }
 
       for msg_symbol in message_ordering
-        # task_response.text JSON.stringify(data)
+        # $task_response.text JSON.stringify(data)
         msg_txt = msg_to_txt[msg_symbol]
         task_res_section = $ '<div/>', class: 'task-res-section'
         task_res_section.append $ '<h3/>', text: msg_txt
@@ -88,27 +85,29 @@ setup_section_membership = (section) ->
               will_attach = true
 
         if will_attach
-          task_response.append task_res_section
+          $task_response.append task_res_section
         else
           task_res_section.remove()
 
 
-  setup_instructor_staff_management = ->
-    log 'setting up instructor dashboard subsection - instructor staff management'
+# manages a list of instructors or staff and the control of their access.
+class AuthorityList
+  # level is in ['instructor', 'staff']
+  constructor: (@$container, level) ->
+    log 'setting up instructor dashboard subsection - authlist management for #{level}'
 
-    subsection = section.find('.instructor_staff_management')
-    display_table = subsection.find('.staff-management-table')
-    add_section = subsection.find('.add-staff')
-    allow_field = add_section.find("input[name='staff-email']")
-    allow_button = add_section.find("input[name='staff-allow']")
-    list_endpoint = display_table.data 'endpoint'
-    access_change_endpoint = add_section.data 'endpoint'
+    $display_table = @$container.find('.auth-list-table')
+    $add_section = @$container.find('.auth-list-add')
+    $allow_field = $add_section.find("input[name='email']")
+    $allow_button = $add_section.find("input[name='allow']")
+    list_endpoint = $display_table.data 'endpoint'
+    @access_change_endpoint = $add_section.data 'endpoint'
 
-    reload_staff_list = ->
-      $.getJSON list_endpoint, (data) ->
+    reload_auth_list = =>
+      $.getJSON list_endpoint, (data) =>
         log data
 
-        display_table.empty()
+        $display_table.empty()
 
         options =
           enableCellNavigation: true
@@ -130,45 +129,41 @@ setup_section_membership = (section) ->
             "<span class='revoke-link'>Revoke Access</span>"
         ]
 
-        table_data = data.staff
+        table_data = data[level]
         log 'table_data', table_data
 
         table_placeholder = $ '<div/>', class: 'slickgrid'
-        display_table.append table_placeholder
-        log 'display_table', table_placeholder
+        $display_table.append table_placeholder
+        log '$display_table', table_placeholder
         grid = new Slick.Grid(table_placeholder, table_data, columns, options)
         grid.autosizeColumns()
 
-        grid.onClick.subscribe (e, args) ->
+        grid.onClick.subscribe (e, args) =>
           item = args.grid.getDataItem(args.row)
           if args.cell is 2
-            access_change(item.email, 'staff', 'revoke', reload_staff_list)
+            @access_change(item.email, level, 'revoke', reload_auth_list)
 
-    allow_button.click ->
-      access_change(allow_field.val(), 'staff', 'allow', reload_staff_list)
-      allow_field.val ''
+    $allow_button.click =>
+      @access_change($allow_field.val(), level, 'allow', reload_auth_list)
+      $allow_field.val ''
 
-    access_change = (email, level, mode, cb) ->
-      url = access_change_endpoint
-      $.getJSON access_change_endpoint, {email: email, level: level, mode: mode}, (data) ->
-        log data
-        cb?()
+    reload_auth_list()
 
-    reload_staff_list()
-
-
-  setup_batch_enrollment()
-  setup_instructor_staff_management()
+  access_change: (email, level, mode, cb) ->
+    url = @access_change_endpoint
+    $.getJSON @access_change_endpoint, {email: email, level: level, mode: mode}, (data) ->
+      log data
+      cb?()
 
 
 class Membership
   constructor: (@$section) ->
     log "setting up instructor dashboard section - membership"
 
-    setup_section_membership @$section
-
-  onClickTitle: ->
-    setup_section_membership @$section
+    # isolate sections from each other's errors.
+    plantTimeout 0, => @batchenrollment = new BatchEnrollment @$section.find '.batch-enrollment'
+    plantTimeout 0, => @stafflist       = new AuthorityList (@$section.find '.auth-list-container.auth-list-staff'), 'staff'
+    plantTimeout 0, => @instructorlist  = new AuthorityList (@$section.find '.auth-list-container.auth-list-instructor'), 'instructor'
 
 
 # exports

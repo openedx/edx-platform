@@ -86,41 +86,43 @@
     float: right;
     width: 45%;
 
-    .management-section {
+    .auth-list-container {
       margin-bottom: 1.5em;
 
-      .staff-management-table {
+      .auth-list-table {
         .slickgrid {
           height: 250px;
         }
       }
 
-      .add-staff {
+      .auth-list-add {
         margin-top: 0.5em;
       }
     }
 
   }
 
-  textarea {
-    height: 100px;
-    width: 500px;
-  }
-
-  .task-res-section {
-    margin-top: 1.5em;
-
-    h3 {
-      color: #646464;
+  .batch-enrollment {
+    textarea {
+      height: 100px;
+      width: 500px;
     }
 
-    ul {
-      padding: 0;
-      margin: 0;
-      margin-top: 0.5em;
-      line-height: 1.5em;
-      list-style-type: none;
-      li {
+    .task-res-section {
+      margin-top: 1.5em;
+
+      h3 {
+        color: #646464;
+      }
+
+      ul {
+        padding: 0;
+        margin: 0;
+        margin-top: 0.5em;
+        line-height: 1.5em;
+        list-style-type: none;
+        li {
+        }
       }
     }
   }

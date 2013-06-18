@@ -73,7 +73,7 @@ def access_allow_revoke(request, course_id):
         raise ValueError("unrecognized mode '{}'".format(mode))
 
     response_payload = {
-        'done': 'yup',
+        'DONE': 'YES',
     }
     response = HttpResponse(json.dumps(response_payload), content_type="application/json")
     return response
@@ -98,7 +98,7 @@ def list_instructors_staff(request, course_id):
 
     response_payload = {
         'course_id':   course_id,
-        'instructors': map(extract_user, list_with_level(course, 'instructor')),
+        'instructor':  map(extract_user, list_with_level(course, 'instructor')),
         'staff':       map(extract_user, list_with_level(course, 'staff')),
     }
     response = HttpResponse(json.dumps(response_payload), content_type="application/json")
