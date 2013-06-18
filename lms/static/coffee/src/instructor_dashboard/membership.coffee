@@ -93,65 +93,65 @@ class BatchEnrollment
 # manages a list of instructors or staff and the control of their access.
 class AuthorityList
   # level is in ['instructor', 'staff']
-  constructor: (@$container, level) ->
-    log 'setting up instructor dashboard subsection - authlist management for #{level}'
+  constructor: (@$container, @level) ->
+    log 'setting up instructor dashboard subsection - authlist management for #{@level}'
 
-    $display_table = @$container.find('.auth-list-table')
+    @$display_table = @$container.find('.auth-list-table')
     $add_section = @$container.find('.auth-list-add')
     $allow_field = $add_section.find("input[name='email']")
     $allow_button = $add_section.find("input[name='allow']")
-    list_endpoint = $display_table.data 'endpoint'
+    @list_endpoint = @$display_table.data 'endpoint'
     @access_change_endpoint = $add_section.data 'endpoint'
 
-    reload_auth_list = =>
-      $.getJSON list_endpoint, (data) =>
-        log data
-
-        $display_table.empty()
-
-        options =
-          enableCellNavigation: true
-          enableColumnReorder: false
-
-        columns = [
-          id: 'username'
-          field: 'username'
-          name: 'Username'
-        ,
-          id: 'email'
-          field: 'email'
-          name: 'Email'
-        ,
-          id: 'revoke'
-          field: 'revoke'
-          name: 'Revoke'
-          formatter: (row, cell, value, columnDef, dataContext) ->
-            "<span class='revoke-link'>Revoke Access</span>"
-        ]
-
-        table_data = data[level]
-        log 'table_data', table_data
-
-        table_placeholder = $ '<div/>', class: 'slickgrid'
-        $display_table.append table_placeholder
-        log '$display_table', table_placeholder
-        grid = new Slick.Grid(table_placeholder, table_data, columns, options)
-        grid.autosizeColumns()
-
-        grid.onClick.subscribe (e, args) =>
-          item = args.grid.getDataItem(args.row)
-          if args.cell is 2
-            @access_change(item.email, level, 'revoke', reload_auth_list)
-
     $allow_button.click =>
-      @access_change($allow_field.val(), level, 'allow', reload_auth_list)
+      @access_change($allow_field.val(), @level, 'allow', @reload_auth_list)
       $allow_field.val ''
 
-    reload_auth_list()
+    @reload_auth_list()
+
+  reload_auth_list: =>
+    $.getJSON @list_endpoint, (data) =>
+      log data
+
+      @$display_table.empty()
+
+      options =
+        enableCellNavigation: true
+        enableColumnReorder: false
+
+      columns = [
+        id: 'username'
+        field: 'username'
+        name: 'Username'
+      ,
+        id: 'email'
+        field: 'email'
+        name: 'Email'
+      ,
+        id: 'revoke'
+        field: 'revoke'
+        name: 'Revoke'
+        formatter: (row, cell, value, columnDef, dataContext) ->
+          "<span class='revoke-link'>Revoke Access</span>"
+      ]
+
+      table_data = data[@level]
+      log 'table_data', table_data
+
+      $table_placeholder = $ '<div/>', class: 'slickgrid'
+      @$display_table.append $table_placeholder
+      log '@$display_table', $table_placeholder
+      grid = new Slick.Grid($table_placeholder, table_data, columns, options)
+      grid.autosizeColumns()
+
+      grid.onClick.subscribe (e, args) =>
+        item = args.grid.getDataItem(args.row)
+        if args.cell is 2
+          @access_change(item.email, @level, 'revoke', @reload_auth_list)
 
   access_change: (email, level, mode, cb) ->
     url = @access_change_endpoint
-    $.getJSON @access_change_endpoint, {email: email, level: level, mode: mode}, (data) ->
+    $.getJSON @access_change_endpoint, {email: email, level: @level, mode: mode}, (data) ->
       log data
       cb?()
 
@@ -159,11 +159,18 @@ class AuthorityList
 class Membership
   constructor: (@$section) ->
     log "setting up instructor dashboard section - membership"
+    @$section.data 'wrapper', @
 
     # isolate sections from each other's errors.
     plantTimeout 0, => @batchenrollment = new BatchEnrollment @$section.find '.batch-enrollment'
     plantTimeout 0, => @stafflist       = new AuthorityList (@$section.find '.auth-list-container.auth-list-staff'), 'staff'
     plantTimeout 0, => @instructorlist  = new AuthorityList (@$section.find '.auth-list-container.auth-list-instructor'), 'instructor'
+
+  onClickTitle: ->
+    @stafflist.$display_table.empty()
+    @stafflist.reload_auth_list()
+    @instructorlist.$display_table.empty()
+    @instructorlist.reload_auth_list()
 
 
 # exports

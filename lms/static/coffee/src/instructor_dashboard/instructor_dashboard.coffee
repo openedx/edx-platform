@@ -35,6 +35,8 @@ setup_instructor_dashboard = (idash_content) =>
       section_name = $(this).data 'section'
       section = idash_content.find "##{section_name}"
 
+      section.data('wrapper')?.onClickTitle?()
+
       # activate (styling) active
       section.addClass CSS_ACTIVE_SECTION
       $(this).addClass CSS_ACTIVE_SECTION
