@@ -56,6 +56,9 @@ Blades: Staff debug info is now accessible for Graphical Slider Tool problems.
 Blades: For Video Alpha the events ready, play, pause, seek, and speed change
 are logged on the server (in the logs).
 
+Common: all dates and times are not time zone aware datetimes. No code should create or use struct_times nor naive
+datetimes.
+
 Common: Developers can now have private Django settings files.
 
 Common: Safety code added to prevent anything above the vertical level in the
