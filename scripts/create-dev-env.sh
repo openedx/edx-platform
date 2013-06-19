@@ -495,9 +495,9 @@ pip install argcomplete
 cd $BASE/edx-platform
 bundle install
 
-mkdir "$BASE/log" || true
-mkdir "$BASE/db" || true
-mkdir "$BASE/data" || true
+mkdir -p "$BASE/log"
+mkdir -p "$BASE/db"
+mkdir -p "$BASE/data"
 
 rake django-admin[syncdb]
 rake django-admin[migrate]
