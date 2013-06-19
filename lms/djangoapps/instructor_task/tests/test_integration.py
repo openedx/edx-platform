@@ -1,5 +1,5 @@
 """
-Integration Tests for LMS instructor-initiated background tasks
+Integration Tests for LMS instructor-initiated background tasks.
 
 Runs tasks on answers to course problems to validate that code
 paths actually work.
