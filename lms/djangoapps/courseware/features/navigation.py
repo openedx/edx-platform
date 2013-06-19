@@ -91,7 +91,7 @@ def click_on_section(step, section):
 @step(u'I click on subsection "([^"]*)"$')
 def click_on_subsection(step, subsection):
     subsection_css = 'ul[id="ui-accordion-accordion-panel-0"]> li > a'
-    world.css_find(subsection_css)[int(subsection) - 1].click()
+    world.css_click(subsection_css, index=(int(subsection) - 1))
 
 
 @step(u'I click on sequence "([^"]*)"$')
