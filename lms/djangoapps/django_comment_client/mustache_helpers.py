@@ -1,7 +1,6 @@
 from .utils import url_for_tags as _url_for_tags
 
 import django.core.urlresolvers as urlresolvers
-import urllib
 import sys
 import inspect
 

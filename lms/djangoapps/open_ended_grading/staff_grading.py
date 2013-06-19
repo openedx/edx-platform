@@ -5,7 +5,6 @@ LMS part of instructor grading:
 - calls the instructor grading service
 """
 
-import json
 import logging
 
 log = logging.getLogger(__name__)

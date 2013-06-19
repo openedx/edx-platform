@@ -5,7 +5,6 @@
 import json
 import logging
 import os
-from pprint import pprint
 import xmodule.modulestore.django as xmodule_django
 from xmodule.modulestore.django import modulestore
 

@@ -4,17 +4,9 @@
 #
 # interactively list and edit membership in course staff and instructor groups
 
-import os
-import sys
-import string
 import re
-import datetime
-from getpass import getpass
-import json
-import readline
 
 from django.core.management.base import BaseCommand
-from django.conf import settings
 from django.contrib.auth.models import User, Group
 
 #-----------------------------------------------------------------------------

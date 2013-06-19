@@ -1,6 +1,5 @@
 import json
 import logging
-import pyparsing
 import re
 import sys
 import static_replace
