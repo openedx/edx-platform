@@ -34,14 +34,8 @@ def press_the_notification_button(step, name):
     save_clicked = lambda : world.is_css_not_present('.is-shown.wrapper-notification-warning') or \
         world.is_css_present('.is-shown.wrapper-notification-error')
 
-    attempts = 0
-    while attempts < 5:
-        world.css_click(css)
-        if save_clicked():
-            break
-        attempts+=1
-
-    assert_true(save_clicked(), 'The save button was not clicked after 5 attempts.')
+    assert_true(world.css_click(css, success_condition=save_clicked),
+        'The save button was not clicked after 5 attempts.')
 
 
 @step(u'I edit the value of a policy key$')
