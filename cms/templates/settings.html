@@ -90,17 +90,22 @@ from contentstore import utils
             <div class="copy">
               <p><a class="link-courseURL" rel="external" href="https:${utils.get_lms_link_for_about_page(course_location)}" />https:${utils.get_lms_link_for_about_page(course_location)}</a></p>
             </div>
-            % if not about_page_editable:
-            <div>
-              <p>${_("Note: your course summary page will not be viewable until your course has been announced. To provide content for the page and preview it, follow the instructions provided by your PM or Conrad Warre (conrad@edx.org).")}</p>
-            </div>
-            % endif
+
             <ul class="list-actions">
               <li class="action-item">
                 <a title="${_('Send a note to students via email')}" href="mailto:someone@domain.com?Subject=Enroll%20in%20${context_course.display_name_with_default}&body=The%20course%20&quot;${context_course.display_name_with_default}&quot;,%20provided%20by%20edX,%20is%20open%20for%20enrollment.%20Please%20navigate%20to%20this%20course%20at%20https:${utils.get_lms_link_for_about_page(course_location)}%20to%20enroll." class="action action-primary"><i class="icon-envelope-alt icon-inline"></i>${_("Invite your students")}</a>
               </li>
             </ul>
           </div>
+
+          % if not about_page_editable:
+          <div class="notice notice-incontext notice-workflow">
+            <h3 class="title">${_("Note: About Your Course's Promotion")}</h3>
+            <div class="copy">
+              <p>${_('Your course summary page will not be viewable until your course has been announced. To provide content for the page and preview it, follow the instructions provided by <abbr title="Program Manager">PM</abbr> or Conrad Warre <a rel="email" class="action action-email" href="mailto:conrad@edx.org">(conrad@edx.org)</a>.')}</p>
+            </div>
+          </div>
+          % endif
         </section>
 
         <hr class="divide" />
@@ -110,12 +115,6 @@ from contentstore import utils
             <h2 class="title-2">${_('Course Schedule')}</h2>
             <span class="tip">${_('Dates that control when your course can be viewed.')}</span>
           </header>
-
-          % if not about_page_editable:
-          <div>
-            <p>${_("Note: these dates impact when your courseware can be viewed, but they are not the dates shown on your course summary page.  To provide the course start and registration dates as shown on your course summary page, follow the instructions provided by your PM or Conrad Warre (conrad@edx.org).")}</p>
-          </div>
-          % endif
 
           <ol class="list-input">
             <li class="field-group field-group-course-start" id="course-start">
@@ -146,6 +145,7 @@ from contentstore import utils
               </div>
             </li>
           </ol>
+
           % if about_page_editable:
           <ol class="list-input">
             <li class="field-group field-group-enrollment-start" id="enrollment-start">
@@ -176,6 +176,15 @@ from contentstore import utils
               </div>
             </li>
           </ol>
+          % endif
+
+          % if not about_page_editable:
+          <div class="notice notice-incontext notice-workflow">
+            <h3 class="title">${_("Note: These Dates Are Not Used When Promoting Your Course")}</h3>
+            <div class="copy">
+              <p>${_('These dates impact <strong>when your courseware can be viewed</strong>, but they are <strong>not the dates shown on your course summary page</strong>.  To provide the course start and registration dates as shown on your course summary page, follow the instructions provided by your <abbr title="Program Manager">PM</abbr> or Conrad Warre <a rel="email" class="action action-email" href="mailto:conrad@edx.org">(conrad@edx.org)</a>.')}</p>
+            </div>
+          </div>
           % endif
         </section>
         <hr class="divide" />
