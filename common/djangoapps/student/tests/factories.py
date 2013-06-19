@@ -5,6 +5,7 @@ from django.contrib.auth.models import Group
 from datetime import datetime
 from factory import DjangoModelFactory, SubFactory, PostGenerationMethodCall, post_generation, Sequence
 from uuid import uuid4
+from pytz import UTC
 
 # Factories don't have __init__ methods, and are self documenting
 # pylint: disable=W0232
@@ -46,8 +47,8 @@ class UserFactory(DjangoModelFactory):
     is_staff = False
     is_active = True
     is_superuser = False
-    last_login = datetime(2012, 1, 1)
-    date_joined = datetime(2011, 1, 1)
+    last_login = datetime(2012, 1, 1, tzinfo=UTC)
+    date_joined = datetime(2011, 1, 1, tzinfo=UTC)
 
     @post_generation
     def profile(obj, create, extracted, **kwargs):

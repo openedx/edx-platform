@@ -98,6 +98,8 @@ if not settings.MITX_FEATURES["USE_CUSTOM_THEME"]:
         url(r'^press$', 'student.views.press', name="press"),
         url(r'^media-kit$', 'static_template_view.views.render',
             {'template': 'media-kit.html'}, name="media-kit"),
+        url(r'^faq$', 'static_template_view.views.render',
+            {'template': 'faq.html'}, name="faq_edx"),
         url(r'^help$', 'static_template_view.views.render',
             {'template': 'help.html'}, name="help_edx"),
 
@@ -125,7 +127,7 @@ for key, value in settings.MKTG_URL_LINK_MAP.items():
         continue
 
     # These urls are enabled separately
-    if key == "ROOT" or key == "COURSES":
+    if key == "ROOT" or key == "COURSES" or key == "FAQ":
         continue
 
     # Make the assumptions that the templates are all in the same dir
@@ -390,6 +392,11 @@ if settings.MITX_FEATURES.get('ENABLE_SQL_TRACKING_LOGS'):
 if settings.MITX_FEATURES.get('ENABLE_SERVICE_STATUS'):
     urlpatterns += (
         url(r'^status/', include('service_status.urls')),
+    )
+
+if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
+    urlpatterns += (
+        url(r'^instructor_task_status/$', 'instructor_task.views.instructor_task_status', name='instructor_task_status'),
     )
 
 # FoldIt views

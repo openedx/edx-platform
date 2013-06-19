@@ -3,11 +3,11 @@
 # Third-party:
 -e git://github.com/edx/django-staticfiles.git@6d2504e5c8#egg=django-staticfiles
 -e git://github.com/edx/django-pipeline.git#egg=django-pipeline
--e git://github.com/edx/django-wiki.git@e2e84558#egg=django-wiki
+-e git://github.com/edx/django-wiki.git@ac906abe#egg=django-wiki
 -e git://github.com/dementrock/pystache_custom.git@776973740bdaad83a3b029f96e415a7d1e8bec2f#egg=pystache_custom-dev
 -e git://github.com/eventbrite/zendesk.git@d53fe0e81b623f084e91776bcf6369f8b7b63879#egg=zendesk
 
 # Our libraries:
--e git+https://github.com/edx/XBlock.git@2144a25d#egg=XBlock
+-e git+https://github.com/edx/XBlock.git@4d8735e883#egg=XBlock
 -e git+https://github.com/edx/codejail.git@0a1b468#egg=codejail
--e git+https://github.com/edx/diff-cover.git@v0.1.1#egg=diff_cover
+-e git+https://github.com/edx/diff-cover.git@v0.1.2#egg=diff_cover
