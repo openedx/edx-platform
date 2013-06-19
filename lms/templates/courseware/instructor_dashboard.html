@@ -9,7 +9,9 @@
   <script type="text/javascript" src="${static.url('js/vendor/jquery-jvectormap-1.1.1/jquery-jvectormap-1.1.1.min.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/jquery-jvectormap-1.1.1/jquery-jvectormap-world-mill-en.js')}"></script>
   <script type="text/javascript" src="${static.url('js/course_groups/cohorts.js')}"></script>
-
+%if instructor_tasks is not None:
+  <script type="text/javascript" src="${static.url('js/pending_tasks.js')}"></script>>
+%endif
 </%block>
 
 <%include file="/courseware/course_navigation.html" args="active_page='instructor'" />
@@ -194,19 +196,77 @@ function goto( mode)
     <hr width="40%" style="align:left">
 
   %endif
+  %if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
+    <H2>Course-specific grade adjustment</h2>
+
+    <p>
+      Specify a particular problem in the course here by its url:
+      <input type="text" name="problem_for_all_students" size="60">
+    </p>
+    <p>
+      You may use just the "urlname" if a problem, or "modulename/urlname" if not.
+      (For example, if the location is <tt>i4x://university/course/problem/problemname</tt>,
+      then just provide the <tt>problemname</tt>.
+      If the location is <tt>i4x://university/course/notaproblem/someothername</tt>, then
+      provide <tt>notaproblem/someothername</tt>.)
+    </p>
+    <p>
+      Then select an action:
+      <input type="submit" name="action" value="Reset ALL students' attempts">
+      <input type="submit" name="action" value="Rescore ALL students' problem submissions">
+    </p>
+    <p>
+    <p>These actions run in the background, and status for active tasks will appear in a table below.
+       To see status for all tasks submitted for this problem, click on this button:
+    </p>
+    <p>
+      <input type="submit" name="action" value="Show Background Task History">
+    </p>
+
+    <hr width="40%" style="align:left">
+  %endif
 
     <H2>Student-specific grade inspection and adjustment</h2>
-    <p>edX email address or their username: </p>
-    <p><input type="text" name="unique_student_identifier">  <input type="submit" name="action" value="Get link to student's progress page"></p>
-    <p>and, if you want to reset the number of attempts for a problem, the urlname of that problem 
-    (e.g. if the location is <tt>i4x://university/course/problem/problemname</tt>, then the urlname is <tt>problemname</tt>).</p>
-    <p> <input type="text" name="problem_to_reset" size="60"> <input type="submit" name="action" value="Reset student's attempts">  </p>
+    <p>
+      Specify the edX email address or username of a student here:
+      <input type="text" name="unique_student_identifier">
+    </p>
+    <p>
+      Click this, and a link to student's progress page will appear below:
+      <input type="submit" name="action" value="Get link to student's progress page">
+    </p>
+    <p>
+      Specify a particular problem in the course here by its url:
+      <input type="text" name="problem_for_student" size="60">
+    </p>
+    <p>
+      You may use just the "urlname" if a problem, or "modulename/urlname" if not.
+      (For example, if the location is <tt>i4x://university/course/problem/problemname</tt>,
+      then just provide the <tt>problemname</tt>.
+      If the location is <tt>i4x://university/course/notaproblem/someothername</tt>, then
+      provide <tt>notaproblem/someothername</tt>.)
+    </p>
+    <p>
+      Then select an action:
+      <input type="submit" name="action" value="Reset student's attempts">
+      %if settings.MITX_FEATURES.get('ENABLE_COURSE_BACKGROUND_TASKS'):
+      <input type="submit" name="action" value="Rescore student's problem submission">
+      %endif
+    </p>
 
     %if instructor_access:
-    <p> You may also delete the entire state of a student for a problem:
-    <input type="submit" name="action" value="Delete student state for problem">  </p>
-    <p>To delete the state of other XBlocks specify modulename/urlname, eg
-       <tt>combinedopenended/Humanities_SA_Peer</tt></p>
+    <p>
+      You may also delete the entire state of a student for the specified module:
+      <input type="submit" name="action" value="Delete student state for module">
+    </p>
+    %endif
+    %if settings.MITX_FEATURES.get('ENABLE_COURSE_BACKGROUND_TASKS'):
+    <p>Rescoring runs in the background, and status for active tasks will appear in a table below.
+       To see status for all tasks submitted for this course and student, click on this button:
+    </p>
+    <p>
+      <input type="submit" name="action" value="Show Background Task History for Student">
+    </p>
     %endif
 
  %endif
@@ -234,6 +294,7 @@ function goto( mode)
 
 ##-----------------------------------------------------------------------------
 %if modeflag.get('Admin'):
+
   %if instructor_access:
     <hr width="40%" style="align:left">
     <p>
@@ -373,6 +434,7 @@ function goto( mode)
 %if msg:
     <p></p><p>${msg}</p>
 %endif
+
 ##-----------------------------------------------------------------------------
 
 %if modeflag.get('Analytics'):
@@ -549,6 +611,69 @@ function goto( mode)
 	%endfor
 	</tr>
         %for row in datatable['data']:
+          <tr>
+	    %for value in row:
+	      <td>${value | h}</td>
+	    %endfor
+	  </tr>
+        %endfor
+      </table>
+    </p>
+%endif
+
+## Output tasks in progress
+
+%if instructor_tasks is not None and len(instructor_tasks) > 0:
+    <hr width="100%">
+    <h2>Pending Instructor Tasks</h2>
+    <div id="task-progress-wrapper">
+      <table class="stat_table">
+        <tr>
+          <th>Task Type</th>
+          <th>Task inputs</th>
+          <th>Task Id</th>
+          <th>Requester</th>
+          <th>Submitted</th>
+          <th>Task State</th>
+          <th>Duration (sec)</th>
+          <th>Task Progress</th>
+        </tr>
+      %for tasknum, instructor_task in enumerate(instructor_tasks):
+        <tr id="task-progress-entry-${tasknum}" class="task-progress-entry"
+	    data-task-id="${instructor_task.task_id}"
+	    data-in-progress="true">
+          <td>${instructor_task.task_type}</td>
+          <td>${instructor_task.task_input}</td>
+          <td class="task-id">${instructor_task.task_id}</td>
+          <td>${instructor_task.requester}</td>
+          <td>${instructor_task.created}</td>
+          <td class="task-state">${instructor_task.task_state}</td>
+          <td class="task-duration">unknown</td>
+          <td class="task-progress">unknown</td>
+        </tr>
+      %endfor
+      </table>
+    </div>
+  <br/>
+
+%endif
+
+##-----------------------------------------------------------------------------
+
+%if course_stats and modeflag.get('Psychometrics') is None:
+
+    <br/>
+    <br/>
+    <p>
+      <hr width="100%">
+      <h2>${course_stats['title'] | h}</h2>
+      <table class="stat_table">
+        <tr>
+	%for hname in course_stats['header']:
+	  <th>${hname | h}</th>
+	%endfor
+	</tr>
+        %for row in course_stats['data']:
           <tr>
 	    %for value in row:
 	      <td>${value | h}</td>

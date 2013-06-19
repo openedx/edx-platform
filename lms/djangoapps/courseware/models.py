@@ -4,9 +4,9 @@ WE'RE USING MIGRATIONS!
 If you make changes to this model, be sure to create an appropriate migration
 file and check it in at the same time as your model changes. To do that,
 
-1. Go to the mitx dir
+1. Go to the edx-platform dir
 2. ./manage.py schemamigration courseware --auto description_of_your_change
-3. Add the migration file created in mitx/courseware/migrations/
+3. Add the migration file created in edx-platform/lms/djangoapps/courseware/migrations/
 
 
 ASSUMPTIONS: modules have unique IDs, even across different module_types
@@ -16,6 +16,7 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+
 
 class StudentModule(models.Model):
     """
