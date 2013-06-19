@@ -22,7 +22,7 @@ CMS.Views.TextbookShow = Backbone.View.extend({
     confirmDelete: function(e) {
         if(e && e.preventDefault) { e.preventDefault(); }
         var textbook = this.model, collection = this.model.collection;
-        var msg = new CMS.Models.WarningMessage({
+        var msg = new CMS.Views.Prompt.Warning({
             title: _.str.sprintf(gettext("Delete “%s”?"),
                 textbook.escape('name')),
             message: gettext("Deleting a textbook cannot be undone and once deleted any reference to it in your courseware's navigation will also be removed."),
@@ -32,18 +32,14 @@ CMS.Views.TextbookShow = Backbone.View.extend({
                     click: function(view) {
                         view.hide();
                         collection.remove(textbook);
-                        var delmsg = new CMS.Models.SystemFeedback({
-                            intent: "saving",
-                            title: gettext("Deleting&hellip;")
-                        });
-                        var notif = new CMS.Views.Notification({
-                            model: delmsg,
+                        var delmsg = new CMS.Views.Notification.Saving({
+                            title: gettext("Deleting&hellip;"),
                             closeIcon: false,
                             minShown: 1250
-                        });
+                        }).show();
                         collection.save({
                             complete: function() {
-                                notif.hide();
+                                delmsg.hide();
                             }
                         });
                     }
@@ -55,8 +51,7 @@ CMS.Views.TextbookShow = Backbone.View.extend({
                     }
                 }]
             }
-        });
-        var prompt = new CMS.Views.Prompt({model: msg});
+        }).show();
     },
     showChapters: function(e) {
         if(e && e.preventDefault) { e.preventDefault(); }
@@ -93,7 +88,7 @@ CMS.Views.TextbookEdit = Backbone.View.extend({
     },
     addOne: function(chapter) {
         var view = new CMS.Views.ChapterEdit({model: chapter});
-        this.$("ol.chapters").append(view.render().el)
+        this.$("ol.chapters").append(view.render().el);
         return this;
     },
     addAll: function() {
@@ -116,19 +111,15 @@ CMS.Views.TextbookEdit = Backbone.View.extend({
             chapter.set({
                 "name": $(".chapter-name", li).val(),
                 "asset_path": $(".chapter-asset-path", li).val()
-            })
+            });
         });
         return this;
     },
     setAndClose: function(e) {
         if(e && e.preventDefault) { e.preventDefault(); }
         this.setValues();
-        msg = new CMS.Models.SystemFeedback({
-            intent: "saving",
-            title: gettext("Saving&hellip;")
-        });
-        notif = new CMS.Views.Notification({
-            model: msg,
+        var saving = new CMS.Views.Notification.Saving({
+            title: gettext("Saving&hellip;"),
             closeIcon: false,
             minShown: 1250
         });
@@ -138,7 +129,7 @@ CMS.Views.TextbookEdit = Backbone.View.extend({
                 that.close();
             },
             complete: function() {
-                notif.hide();
+                saving.hide();
             }
         });
     },

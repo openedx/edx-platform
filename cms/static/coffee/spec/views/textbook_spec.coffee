@@ -36,17 +36,18 @@ describe "CMS.Views.TextbookShow", ->
             expect(@collection.editing).toEqual(@model)
 
         it "should pop a delete confirmation when the delete button is clicked", ->
-            promptSpies = spyOnConstructor(CMS.Views, "Prompt")
+            promptSpies = spyOnConstructor(CMS.Views.Prompt, "Warning", ["show", "hide"])
             @view.render().$(".delete").click()
             expect(promptSpies.constructor).toHaveBeenCalled()
-            msg = promptSpies.constructor.mostRecentCall.args[0].model
-            expect(msg.get("title")).toMatch(/Life Sciences/)
+            ctorOptions = promptSpies.constructor.mostRecentCall.args[0]
+            expect(ctorOptions.title).toMatch(/Life Sciences/)
             # hasn't actually been removed
             expect(@collection).toContain(@model)
             expect(@collection.save).not.toHaveBeenCalled()
             # run the primary function to indicate confirmation
             view = jasmine.createSpyObj('view', ['hide'])
-            msg.get("actions").primary.click.call(msg, view)
+            context = jasmine.createSpy('context')
+            ctorOptions.actions.primary.click.call(context, view)
             # now it's been removed
             expect(@collection).not.toContain(@model)
             expect(@collection.save).toHaveBeenCalled()
@@ -150,7 +151,6 @@ describe "CMS.Views.ListTextbooks", ->
 
         expect(@view.$el).not.toContainText(
             "You haven't added any textbooks to this course yet")
-        expect(@view.$el).toBe("ul")
         expect(@showSpies.constructor).toHaveBeenCalled()
         expect(@showSpies.constructor.calls.length).toEqual(3);
         expect(@editSpies.constructor).not.toHaveBeenCalled()
