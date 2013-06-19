@@ -38,7 +38,7 @@ var textbooks = new CMS.Collections.TextbookSet(${json.dumps(course.pdf_textbook
 var tbView = new CMS.Views.ListTextbooks({collection: textbooks});
 
 $(function() {
-    $(".inner-wrapper").append(tbView.render().el);
+    $(".content-primary").append(tbView.render().el);
     $(".nav-actions .new-button").click(function(e) {
         tbView.addOne(e);
     })
@@ -69,23 +69,44 @@ $(function() {
 
   <div class="wrapper-content wrapper">
     <section class="content">
-    <article class="content-primary" role="main">
-    <div class="inner-wrapper">
-        <div class="introduction">
-          <p class="copy">Use this page to upload textbooks for your course. <strong>Note: It's best practice to break your course's textbook into multiple chapters</strong> to reduce loading times for students. Breaking up textbooks into chapters can also help with students more easily finding a concept or topic-based information.</p>
-        </div>
+      <article class="content-primary" role="main">
 
-    </div>
-    </article>
-    <aside class="content-supplementary" role="complimentary">
+<!--
+        <section id="textbook1" class="textbook">
+
+          <header>
+            <h3 class="textbook-title">
+            [textbook name]
+            </h3>
+          </header>
+
+          <ul class="chapter-list">
+            <li class="chapter"></li>
+          </ul>
+
+        </section>
+-->
+
+
+      </article>
+      <aside class="content-supplementary" role="complimentary">
+
+        <div class="bit">
+        <h3 class="title-3">Why should I break my text into chapters?</h3>
+        <p>It's best practice to break your course's textbook into multiple chapters to reduce loading times for students. Breaking up textbooks into chapters can also help students more easily find topic-based information.</p>
+        </div>
 
         <div class="bit">
         <h3 class="title-3">What if my book isn't divided into chapters?</h3>
         <p>If you haven't broken your textbook into chapters, you can upload the entire text as Chapter 1.</p>
         </div>
 
-    </aside>
+
+      </aside>
+
     </section>
+
+
   </div>
 
 

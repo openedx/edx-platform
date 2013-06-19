@@ -3,7 +3,8 @@ CMS.Views.TextbookShow = Backbone.View.extend({
         this.template = _.template($("#show-textbook-tpl").text());
         this.listenTo(this.model, "change", this.render);
     },
-    tagName: "li",
+    tagName: "section",
+    className: "textbook",
     events: {
         "click .edit": "editTextbook",
         "click .delete": "confirmDelete",
@@ -75,7 +76,7 @@ CMS.Views.TextbookEdit = Backbone.View.extend({
         this.listenTo(chapters, "all", this.render);
         this.listenTo(this.model.collection, "editOne", this.remove);
     },
-    tagName: "li",
+    tagName: "section",
     render: function() {
         this.$el.html(this.template({
             name: this.model.escape('name'),
@@ -162,7 +163,7 @@ CMS.Views.ListTextbooks = Backbone.View.extend({
         this.emptyTemplate = _.template($("#no-textbooks-tpl").text());
         this.listenTo(this.collection, 'all', this.render);
     },
-    tagName: "ul",
+    tagName: "div",
     className: "textbooks",
     render: function() {
         var textbooks = this.collection;
