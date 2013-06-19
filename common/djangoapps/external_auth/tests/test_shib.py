@@ -1,3 +1,4 @@
+# coding=utf-8
 """
 Tests for Shibboleth Authentication
 @jbau
@@ -6,11 +7,12 @@ import unittest
 
 from django.conf import settings
 from django.http import HttpResponseRedirect
-from django.test.client import RequestFactory
+from django.test.client import RequestFactory, Client as DjangoTestClient
 from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import AnonymousUser, User
 from django.contrib.sessions.backends.base import SessionBase
+from django.utils.importlib import import_module
 
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -34,23 +36,27 @@ from student.tests.factories import UserFactory
 IDP = 'https://idp.stanford.edu/'
 REMOTE_USER = 'test_user@stanford.edu'
 MAILS = [None, '', 'test_user@stanford.edu']
-GIVENNAMES = [None, '', 'Jason', 'jason; John; bob']  # At Stanford, the givenNames can be a list delimited by ';'
-SNS = [None, '', 'Bau', 'bau; smith']  # At Stanford, the sns can be a list delimited by ';'
+GIVENNAMES = [None, '', 'Jason', 'jasön; John; bob']  # At Stanford, the givenNames can be a list delimited by ';'
+SNS = [None, '', 'Bau', '包; smith']  # At Stanford, the sns can be a list delimited by ';'
 
 
 def gen_all_identities():
-    """A generator for all combinations of identity inputs"""
+    """
+    A generator for all combinations of test inputs.
+    Each generated item is a dict that represents what a shib IDP
+    could potentially pass to django via request.META, i.e.
+    setting (or not) request.META['givenName'], etc.
+    """
     def _build_identity_dict(mail, given_name, surname):
         """ Helper function to return a dict of test identity """
-        meta_dict = {}
-        meta_dict.update({'Shib-Identity-Provider': IDP,
-                          'REMOTE_USER': REMOTE_USER})
+        meta_dict = {'Shib-Identity-Provider': IDP,
+                     'REMOTE_USER': REMOTE_USER}
         if mail is not None:
-            meta_dict.update({'mail': mail})
+            meta_dict['mail'] = mail
         if given_name is not None:
-            meta_dict.update({'givenName': given_name})
+            meta_dict['givenName'] = given_name
         if surname is not None:
-            meta_dict.update({'sn': surname})
+            meta_dict['sn'] = surname
         return meta_dict
 
     for mail in MAILS:
@@ -59,48 +65,84 @@ def gen_all_identities():
                 yield _build_identity_dict(mail, given_name, surname)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE, SESSION_ENGINE='django.contrib.sessions.backends.cache')
 class ShibSPTest(ModuleStoreTestCase):
     """
     Tests for the Shibboleth SP, which communicates via request.META
     (Apache environment variables set by mod_shib)
     """
-    factory = RequestFactory()
+    request_factory = RequestFactory()
 
     def setUp(self):
         self.store = modulestore()
 
     @unittest.skipUnless(settings.MITX_FEATURES.get('AUTH_USE_SHIB'), True)
+    def test_exception_shib_login(self):
+        """
+        Tests that we get the error page when there is no REMOTE_USER
+        or Shib-Identity-Provider in request.META
+        """
+        no_remote_user_request = self.request_factory.get('/shib-login')
+        no_remote_user_request.META.update({'Shib-Identity-Provider': IDP})
+        no_remote_user_response = shib_login(no_remote_user_request)
+        self.assertEqual(no_remote_user_response.status_code, 403)
+        self.assertIn("identity server did not return your ID information", no_remote_user_response.content)
+
+        no_idp_request = self.request_factory.get('/shib-login')
+        no_idp_request.META.update({'REMOTE_USER': REMOTE_USER})
+        no_idp_response = shib_login(no_idp_request)
+        self.assertEqual(no_idp_response.status_code, 403)
+        self.assertIn("identity server did not return your ID information", no_idp_response.content)
+
+
+    @unittest.skipUnless(settings.MITX_FEATURES.get('AUTH_USE_SHIB'), True)
     def test_shib_login(self):
         """
-        Tests that a user with a shib ExternalAuthMap gets logged in while when
-        shib-login is called, while a user without such gets the registration form.
+        Tests that:
+          * shib credentials that match an existing ExternalAuthMap with a linked user logs the user in
+          * shib credentials that match an existing ExternalAuthMap without a linked user and also match the email
+            of an existing user without an existing ExternalAuthMap links the two and log the user in
+          * shib credentials that match an existing ExternalAuthMap without a linked user and also match the email
+            of an existing user that already has an ExternalAuthMap causes an error (403)
+          * shib credentials that do not match an existing ExternalAuthMap causes the registration form to appear
         """
 
-        student = UserFactory.create()
-        extauth = ExternalAuthMap(external_id='testuser@stanford.edu',
+        user_w_map = UserFactory.create(email='withmap@stanford.edu')
+        extauth = ExternalAuthMap(external_id='withmap@stanford.edu',
                                   external_email='',
                                   external_domain='shib:https://idp.stanford.edu/',
                                   external_credentials="",
-                                  user=student)
-        student.save()
+                                  user=user_w_map)
+        user_wo_map = UserFactory.create(email='womap@stanford.edu')
+        user_w_map.save()
+        user_wo_map.save()
         extauth.save()
 
         idps = ['https://idp.stanford.edu/', 'https://someother.idp.com/']
-        remote_users = ['testuser@stanford.edu', 'testuser2@someother_idp.com']
+        remote_users = ['withmap@stanford.edu', 'womap@stanford.edu', 'testuser2@someother_idp.com']
 
         for idp in idps:
             for remote_user in remote_users:
-                request = self.factory.get('/shib-login')
-                request.session = SessionBase()  # empty session
+                request = self.request_factory.get('/shib-login')
+                request.session = import_module(settings.SESSION_ENGINE).SessionStore()  # empty session
                 request.META.update({'Shib-Identity-Provider': idp,
-                                     'REMOTE_USER': remote_user})
+                                     'REMOTE_USER': remote_user,
+                                     'mail': remote_user})
                 request.user = AnonymousUser()
                 response = shib_login(request)
-                if idp == "https://idp.stanford.edu" and remote_user == 'testuser@stanford.edu':
+                if idp == "https://idp.stanford.edu/" and remote_user == 'withmap@stanford.edu':
                     self.assertIsInstance(response, HttpResponseRedirect)
-                    self.assertEqual(request.user, student)
+                    self.assertEqual(request.user, user_w_map)
                     self.assertEqual(response['Location'], '/')
+                elif idp == "https://idp.stanford.edu/" and remote_user == 'womap@stanford.edu':
+                    self.assertIsNotNone(ExternalAuthMap.objects.get(user=user_wo_map))
+                    self.assertIsInstance(response, HttpResponseRedirect)
+                    self.assertEqual(request.user, user_wo_map)
+                    self.assertEqual(response['Location'], '/')
+                elif idp == "https://someother.idp.com/" and remote_user in \
+                            ['withmap@stanford.edu', 'womap@stanford.edu']:
+                    self.assertEqual(response.status_code, 403)
+                    self.assertIn("You have already created an account using an external login", response.content)
                 else:
                     self.assertEqual(response.status_code, 200)
                     self.assertContains(response, "<title>Register for")
@@ -113,10 +155,9 @@ class ShibSPTest(ModuleStoreTestCase):
         Uses django test client for its session support
         """
         for identity in gen_all_identities():
-            self.client.logout()
-            request_kwargs = {'path': '/shib-login/', 'data': {}, 'follow': False}
-            request_kwargs.update(identity)
-            response = self.client.get(**request_kwargs)  # identity k/v pairs will show up in request.META
+            client = DjangoTestClient()
+            # identity k/v pairs will show up in request.META
+            response = client.get(path='/shib-login/', data={}, follow=False, **identity)
 
             self.assertEquals(response.status_code, 200)
             mail_input_HTML = '<input class="" id="email" type="email" name="email"'
@@ -124,8 +165,8 @@ class ShibSPTest(ModuleStoreTestCase):
                 self.assertContains(response, mail_input_HTML)
             else:
                 self.assertNotContains(response, mail_input_HTML)
-            sn_empty = identity.get('sn', '') == ''
-            given_name_empty = identity.get('givenName', '') == ''
+            sn_empty = not identity.get('sn')
+            given_name_empty = not identity.get('givenName')
             fullname_input_HTML = '<input id="name" type="text" name="name"'
             if sn_empty and given_name_empty:
                 self.assertContains(response, fullname_input_HTML)
@@ -133,7 +174,7 @@ class ShibSPTest(ModuleStoreTestCase):
                 self.assertNotContains(response, fullname_input_HTML)
 
             #clean up b/c we don't want existing ExternalAuthMap for the next run
-            self.client.session['ExternalAuthMap'].delete()
+            client.session['ExternalAuthMap'].delete()
 
     @unittest.skipUnless(settings.MITX_FEATURES.get('AUTH_USE_SHIB'), True)
     def test_registration_formSubmit(self):
@@ -146,10 +187,8 @@ class ShibSPTest(ModuleStoreTestCase):
         """
         for identity in gen_all_identities():
             #First we pop the registration form
-            self.client.logout()
-            request1_kwargs = {'path': '/shib-login/', 'data': {}, 'follow': False}
-            request1_kwargs.update(identity)
-            response1 = self.client.get(**request1_kwargs)
+            client = DjangoTestClient()
+            response1 = client.get(path='/shib-login/', data={}, follow=False, **identity)
             #Then we have the user answer the registration form
             postvars = {'email': 'post_email@stanford.edu',
                         'username': 'post_username',
@@ -158,8 +197,8 @@ class ShibSPTest(ModuleStoreTestCase):
                         'terms_of_service': 'true',
                         'honor_code': 'true'}
             #use RequestFactory instead of TestClient here because we want access to request.user
-            request2 = self.factory.post('/create_account', data=postvars)
-            request2.session = self.client.session
+            request2 = self.request_factory.post('/create_account', data=postvars)
+            request2.session = client.session
             request2.user = AnonymousUser()
             response2 = create_account(request2)
 
@@ -177,13 +216,12 @@ class ShibSPTest(ModuleStoreTestCase):
 
             #check that the created user profile has the right name, either taken from shib or user input
             profile = UserProfile.objects.get(user=user)
-            sn_empty = identity.get('sn', '') == ''
-            given_name_empty = identity.get('givenName', '') == ''
+            sn_empty = not identity.get('sn')
+            given_name_empty = not identity.get('givenName')
             if sn_empty and given_name_empty:
                 self.assertEqual(profile.name, postvars['name'])
             else:
                 self.assertEqual(profile.name, request2.session['ExternalAuthMap'].external_name)
-
             #clean up for next loop
             request2.session['ExternalAuthMap'].delete()
             UserProfile.objects.filter(user=user).delete()
@@ -206,12 +244,12 @@ class ShibSPTest(ModuleStoreTestCase):
             self.store.update_metadata(course.location.url(), metadata)
 
             #setting location to test that GET params get passed through
-            login_request = self.factory.get('/course_specific_login/MITx/999/Robot_Super_Course' +
-                                             '?course_id=MITx/999/Robot_Super_Course' +
-                                             '&enrollment_action=enroll')
-            reg_request = self.factory.get('/course_specific_register/MITx/999/Robot_Super_Course' +
-                                           '?course_id=MITx/999/course/Robot_Super_Course' +
-                                           '&enrollment_action=enroll')
+            login_request = self.request_factory.get('/course_specific_login/MITx/999/Robot_Super_Course' +
+                                                     '?course_id=MITx/999/Robot_Super_Course' +
+                                                     '&enrollment_action=enroll')
+            reg_request = self.request_factory.get('/course_specific_register/MITx/999/Robot_Super_Course' +
+                                                   '?course_id=MITx/999/course/Robot_Super_Course' +
+                                                   '&enrollment_action=enroll')
 
             login_response = course_specific_login(login_request, 'MITx/999/Robot_Super_Course')
             reg_response = course_specific_register(login_request, 'MITx/999/Robot_Super_Course')
@@ -241,12 +279,12 @@ class ShibSPTest(ModuleStoreTestCase):
 
             # Now test for non-existent course
             #setting location to test that GET params get passed through
-            login_request = self.factory.get('/course_specific_login/DNE/DNE/DNE' +
-                                             '?course_id=DNE/DNE/DNE' +
-                                             '&enrollment_action=enroll')
-            reg_request = self.factory.get('/course_specific_register/DNE/DNE/DNE' +
-                                           '?course_id=DNE/DNE/DNE/Robot_Super_Course' +
-                                           '&enrollment_action=enroll')
+            login_request = self.request_factory.get('/course_specific_login/DNE/DNE/DNE' +
+                                                     '?course_id=DNE/DNE/DNE' +
+                                                     '&enrollment_action=enroll')
+            reg_request = self.request_factory.get('/course_specific_register/DNE/DNE/DNE' +
+                                                   '?course_id=DNE/DNE/DNE/Robot_Super_Course' +
+                                                   '&enrollment_action=enroll')
 
             login_response = course_specific_login(login_request, 'DNE/DNE/DNE')
             reg_response = course_specific_register(login_request, 'DNE/DNE/DNE')
@@ -270,54 +308,54 @@ class ShibSPTest(ModuleStoreTestCase):
         """
 
         #create 2 course, one with limited enrollment one without
-        course1 = CourseFactory.create(org='Stanford', number='123', display_name='Shib Only')
-        course1.enrollment_domain = 'shib:https://idp.stanford.edu/'
-        metadata = own_metadata(course1)
-        metadata['enrollment_domain'] = course1.enrollment_domain
-        self.store.update_metadata(course1.location.url(), metadata)
+        shib_course = CourseFactory.create(org='Stanford', number='123', display_name='Shib Only')
+        shib_course.enrollment_domain = 'shib:https://idp.stanford.edu/'
+        metadata = own_metadata(shib_course)
+        metadata['enrollment_domain'] = shib_course.enrollment_domain
+        self.store.update_metadata(shib_course.location.url(), metadata)
 
-        course2 = CourseFactory.create(org='MITx', number='999', display_name='Robot Super Course')
-        course2.enrollment_domain = ''
-        metadata = own_metadata(course2)
-        metadata['enrollment_domain'] = course2.enrollment_domain
-        self.store.update_metadata(course2.location.url(), metadata)
+        open_enroll_course = CourseFactory.create(org='MITx', number='999', display_name='Robot Super Course')
+        open_enroll_course.enrollment_domain = ''
+        metadata = own_metadata(open_enroll_course)
+        metadata['enrollment_domain'] = open_enroll_course.enrollment_domain
+        self.store.update_metadata(open_enroll_course.location.url(), metadata)
 
-        # create 3 kinds of students, external_auth matching course1, external_auth not matching, no external auth
-        student1 = UserFactory.create()
-        student1.save()
+        # create 3 kinds of students, external_auth matching shib_course, external_auth not matching, no external auth
+        shib_student = UserFactory.create()
+        shib_student.save()
         extauth = ExternalAuthMap(external_id='testuser@stanford.edu',
                                   external_email='',
                                   external_domain='shib:https://idp.stanford.edu/',
                                   external_credentials="",
-                                  user=student1)
+                                  user=shib_student)
         extauth.save()
 
-        student2 = UserFactory.create()
-        student2.username = "teststudent2"
-        student2.email = "teststudent2@other.edu"
-        student2.save()
+        other_ext_student = UserFactory.create()
+        other_ext_student.username = "teststudent2"
+        other_ext_student.email = "teststudent2@other.edu"
+        other_ext_student.save()
         extauth = ExternalAuthMap(external_id='testuser1@other.edu',
                                   external_email='',
                                   external_domain='shib:https://other.edu/',
                                   external_credentials="",
-                                  user=student2)
+                                  user=other_ext_student)
         extauth.save()
 
-        student3 = UserFactory.create()
-        student3.username = "teststudent3"
-        student3.email = "teststudent3@gmail.com"
-        student3.save()
+        int_student = UserFactory.create()
+        int_student.username = "teststudent3"
+        int_student.email = "teststudent3@gmail.com"
+        int_student.save()
 
         #Tests the two case for courses, limited and not
-        for course in [course1, course2]:
-            for student in [student1, student2, student3]:
-                request = self.factory.post('/change_enrollment')
+        for course in [shib_course, open_enroll_course]:
+            for student in [shib_student, other_ext_student, int_student]:
+                request = self.request_factory.post('/change_enrollment')
                 request.POST.update({'enrollment_action': 'enroll',
                                      'course_id': course.id})
                 request.user = student
                 response = change_enrollment(request)
                 #if course is not limited or student has correct shib extauth then enrollment should be allowed
-                if course is course2 or student is student1:
+                if course is open_enroll_course or student is shib_student:
                     self.assertEqual(response.status_code, 200)
                     self.assertEqual(CourseEnrollment.objects.filter(user=student, course_id=course.id).count(), 1)
                     #clean up

@@ -599,7 +599,7 @@ def create_account(request, post_override=None):
         password = eamap.internal_password
         post_vars = dict(post_vars.items())
         post_vars.update(dict(email=email, name=name, password=password))
-        log.debug('extauth test: post_vars = %s' % post_vars)
+        log.info('In create_account with external_auth: post_vars = %s' % post_vars)
 
     # Confirm we have a properly formed request
     for a in ['username', 'email', 'password', 'name']:
@@ -699,10 +699,11 @@ def create_account(request, post_override=None):
         eamap.user = login_user
         eamap.dtsignup = datetime.datetime.now(UTC)
         eamap.save()
-        log.debug('Updated ExternalAuthMap for %s to be %s' % (post_vars['username'], eamap))
+        log.info("User registered with external_auth %s" % post_vars['username'])
+        log.info('Updated ExternalAuthMap for %s to be %s' % (post_vars['username'], eamap))
 
         if settings.MITX_FEATURES.get('BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH'):
-            log.debug('bypassing activation email')
+            log.info('bypassing activation email')
             login_user.is_active = True
             login_user.save()
 
