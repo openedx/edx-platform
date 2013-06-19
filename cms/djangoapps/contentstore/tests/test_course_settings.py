@@ -1,11 +1,13 @@
 import datetime
 import json
 import copy
+import mock
 
 from django.contrib.auth.models import User
 from django.test.client import Client
 from django.core.urlresolvers import reverse
 from django.utils.timezone import UTC
+from django.test.utils import override_settings
 
 from xmodule.modulestore import Location
 from models.settings.course_details import (CourseDetails, CourseSettingsEncoder)
@@ -117,6 +119,49 @@ class CourseDetailsTestCase(CourseTestCase):
             CourseDetails.update_from_json(jsondetails.__dict__).effort,
             jsondetails.effort, "After set effort"
         )
+
+    @override_settings(MKTG_URLS={'ROOT': 'dummy-root'})
+    def test_marketing_site_fetch(self):
+        settings_details_url = reverse('settings_details',
+            kwargs= {'org': self.course_location.org,
+                     'name': self.course_location.name,
+                     'course': self.course_location.course
+                    })
+
+        with mock.patch.dict('django.conf.settings.MITX_FEATURES', {'ENABLE_MKTG_SITE': True}):
+            response = self.client.get(settings_details_url)
+            self.assertContains(response, "Course Summary Page")
+            self.assertContains(response, "your course summary page will not be viewable")
+
+            self.assertContains(response, "Course Start Date")
+            self.assertContains(response, "Course End Date")
+            self.assertNotContains(response, "Enrollment Start Date")
+            self.assertNotContains(response, "Enrollment End Date")
+            self.assertContains(response, "not the dates shown on your course summary page")
+
+            self.assertNotContains(response, "Introducing Your Course")
+            self.assertNotContains(response, "Requirements")
+
+    def test_regular_site_fetch(self):
+        settings_details_url = reverse('settings_details',
+            kwargs= {'org': self.course_location.org,
+                     'name': self.course_location.name,
+                     'course': self.course_location.course
+                })
+
+        with mock.patch.dict('django.conf.settings.MITX_FEATURES', {'ENABLE_MKTG_SITE': False}):
+            response = self.client.get(settings_details_url)
+            self.assertContains(response, "Course Summary Page")
+            self.assertNotContains(response, "your course summary page will not be viewable")
+
+            self.assertContains(response, "Course Start Date")
+            self.assertContains(response, "Course End Date")
+            self.assertContains(response, "Enrollment Start Date")
+            self.assertContains(response, "Enrollment End Date")
+            self.assertNotContains(response, "not the dates shown on your course summary page")
+
+            self.assertContains(response, "Introducing Your Course")
+            self.assertContains(response, "Requirements")
 
 
 class CourseDetailsViewTest(CourseTestCase):
