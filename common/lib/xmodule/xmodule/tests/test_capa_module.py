@@ -17,7 +17,7 @@ from xmodule.modulestore import Location
 
 from django.http import QueryDict
 
-from . import test_system
+from . import get_test_system
 from pytz import UTC
 from capa.correctmap import CorrectMap
 
@@ -112,7 +112,7 @@ class CapaFactory(object):
             # since everything else is a string.
             model_data['attempts'] = int(attempts)
 
-        system = test_system()
+        system = get_test_system()
         system.render_template = Mock(return_value="<div>Test Template HTML</div>")
         module = CapaModule(system, descriptor, model_data)
 
@@ -1002,7 +1002,7 @@ class CapaModuleTest(unittest.TestCase):
         # is asked to render itself as HTML
         module.lcp.get_html = Mock(side_effect=Exception("Test"))
 
-        # Stub out the test_system rendering function
+        # Stub out the get_test_system rendering function
         module.system.render_template = Mock(return_value="<div>Test Template HTML</div>")
 
         # Turn off DEBUG
