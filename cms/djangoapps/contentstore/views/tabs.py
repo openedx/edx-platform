@@ -10,7 +10,7 @@ from mitxmako.shortcuts import render_to_response
 from xmodule.modulestore import Location
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.django import modulestore
-from ..utils import get_course_for_item
+from ..utils import get_course_for_item, get_modulestore
 from .access import get_location_and_verify_access
 
 __all__ = ['edit_tabs', 'reorder_static_tabs', 'static_pages', 'edit_static']
@@ -82,7 +82,8 @@ def reorder_static_tabs(request):
 @ensure_csrf_cookie
 def edit_tabs(request, org, course, coursename):
     location = ['i4x', org, course, 'course', coursename]
-    course_item = modulestore().get_item(location)
+    store = get_modulestore(location)
+    course_item = store.get_item(location)
 
     # check that logged in user has permissions to this item
     if not has_access(request.user, location):

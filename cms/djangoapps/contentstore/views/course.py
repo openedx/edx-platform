@@ -437,9 +437,19 @@ def textbook_index(request, org, course, name):
             except ValueError:
                 msg = {"error": "invalid JSON"}
                 return HttpResponseBadRequest(json.dumps(msg), content_type="application/json")
+            if not isinstance(obj, (list, tuple)):
+                msg = {"error": "must be JSON list"}
+                return HttpResponseBadRequest(json.dumps(msg), content_type="application/json")
+            for textbook in obj:
+                if not textbook.get("tab_title"):
+                    msg = {"error": "every textbook must have a tab_title"}
+                    return HttpResponseBadRequest(json.dumps(msg), content_type="application/json")
             course_module.pdf_textbooks = obj
+            if not any(tab['type'] == 'pdf_textbooks' for tab in course_module.tabs):
+                course_module.tabs.append({"type": "pdf_textbooks"})
             store.update_metadata(course_module.location, own_metadata(course_module))
-            return HttpResponse('', content_type="application/json", status=201)
+
+            return HttpResponse('', content_type="application/json", status=204)
     else:
         upload_asset_callback_url = reverse('upload_asset', kwargs={
             'org': org,
