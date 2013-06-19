@@ -29,6 +29,25 @@
 	
 	$('#chat-toolbar #chat-sound-control').remove();
 
+        /* After a period of inactivity, users will be disconnected
+         * from the chat server and prompted to log in again. They
+         * won't know their username/password, however, since we take
+         * care of that for them.
+         *
+         * Therefore, we override this function so that the user
+         * never sees a true login form. We just give them a button
+         * to click when they're ready to (re)connect.
+         */
+        Candy.View.Pane.Chat.Modal.showLoginForm = function(message, presetJid) {
+          var loginMsg = "Click below to connect to the chat server" +
+                         "<p>&nbsp</p>" +
+                         "<button id='connect'>Connect</button>";
+          Candy.View.Pane.Chat.Modal.show(loginMsg);
+          $("#connect").click(function() {
+            Candy.Core.connect("${username}", "${password}");
+          });
+        }
+
         Candy.Core.connect("${username}", "${password}");
 	
 	$("#candy").focus();
