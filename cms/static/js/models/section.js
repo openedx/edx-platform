@@ -22,22 +22,16 @@ CMS.Models.Section = Backbone.Model.extend({
     },
     showNotification: function() {
         if(!this.msg) {
-            this.msg = new CMS.Models.SystemFeedback({
-                intent: "saving",
-                title: gettext("Saving&hellip;")
-            });
-        }
-        if(!this.msgView) {
-            this.msgView = new CMS.Views.Notification({
-                model: this.msg,
+            this.msg = new CMS.Views.Notification.Saving({
+                title: gettext("Saving&hellip;"),
                 closeIcon: false,
                 minShown: 1250
             });
         }
-        this.msgView.show();
+        this.msg.show();
     },
     hideNotification: function() {
-        if(!this.msgView) { return; }
-        this.msgView.hide();
+        if(!this.msg) { return; }
+        this.msg.hide();
     }
 });

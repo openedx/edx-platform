@@ -132,7 +132,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         # just pick one vertical
         descriptor = store.get_items(Location('i4x', 'edX', 'simple', 'vertical', None, None))[0]
-        location = descriptor.location._replace(name='.' + descriptor.location.name)
+        location = descriptor.location.replace(name='.' + descriptor.location.name)
 
         resp = self.client.get(reverse('edit_unit', kwargs={'location': location.url()}))
         self.assertEqual(resp.status_code, 400)
@@ -224,7 +224,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         draft_store.clone_item(html_module.location, html_module.location)
         html_module = draft_store.get_item(['i4x', 'edX', 'simple', 'html', 'test_html', None])
 
-        new_graceperiod = timedelta(**{'hours': 1})
+        new_graceperiod = timedelta(hours=1)
 
         self.assertNotIn('graceperiod', own_metadata(html_module))
         html_module.lms.graceperiod = new_graceperiod
@@ -369,7 +369,6 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         '''
         module_store = modulestore('direct')
         import_from_xml(module_store, 'common/test/data/', ['full'])
-
         effort = module_store.get_item(Location(['i4x', 'edX', 'full', 'about', 'effort', None]))
         self.assertEqual(effort.data, '6 hours')
 
@@ -617,12 +616,12 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         items = module_store.get_items(Location(['i4x', 'edX', 'full', 'vertical', None]))
         self.assertEqual(len(items), 0)
 
-    def verify_content_existence(self, modulestore, root_dir, location, dirname, category_name, filename_suffix=''):
+    def verify_content_existence(self, store, root_dir, location, dirname, category_name, filename_suffix=''):
         filesystem = OSFS(root_dir / 'test_export')
         self.assertTrue(filesystem.exists(dirname))
 
         query_loc = Location('i4x', location.org, location.course, category_name, None)
-        items = modulestore.get_items(query_loc)
+        items = store.get_items(query_loc)
 
         for item in items:
             filesystem = OSFS(root_dir / ('test_export/' + dirname))
@@ -768,7 +767,6 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
     def test_prefetch_children(self):
         module_store = modulestore('direct')
         import_from_xml(module_store, 'common/test/data/', ['full'])
-
         location = CourseDescriptor.id_to_location('edX/full/6.002_Spring_2012')
 
         wrapper = MongoCollectionFindWrapper(module_store.collection.find)
@@ -864,7 +862,7 @@ class ContentStoreTest(ModuleStoreTestCase):
 
     def test_create_course_duplicate_course(self):
         """Test new course creation - error path"""
-        resp = self.client.post(reverse('create_new_course'), self.course_data)
+        self.client.post(reverse('create_new_course'), self.course_data)
         resp = self.client.post(reverse('create_new_course'), self.course_data)
         data = parse_json(resp)
         self.assertEqual(resp.status_code, 200)
@@ -872,7 +870,7 @@ class ContentStoreTest(ModuleStoreTestCase):
 
     def test_create_course_duplicate_number(self):
         """Test new course creation - error path"""
-        resp = self.client.post(reverse('create_new_course'), self.course_data)
+        self.client.post(reverse('create_new_course'), self.course_data)
         self.course_data['display_name'] = 'Robot Super Course Two'
 
         resp = self.client.post(reverse('create_new_course'), self.course_data)
@@ -1090,11 +1088,9 @@ class ContentStoreTest(ModuleStoreTestCase):
                                 json.dumps({'id': del_loc.url()}), "application/json")
         self.assertEqual(200, resp.status_code)
 
-
     def test_import_metadata_with_attempts_empty_string(self):
         module_store = modulestore('direct')
         import_from_xml(module_store, 'common/test/data/', ['simple'])
-
         did_load_item = False
         try:
             module_store.get_item(Location(['i4x', 'edX', 'simple', 'problem', 'ps01-simple', None]))
