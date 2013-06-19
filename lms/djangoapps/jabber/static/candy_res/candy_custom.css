@@ -22,6 +22,11 @@
 #chat-rooms .message-pane-wrapper {
     background-color: #fbfbf9;
 }
+
+#chat-rooms .message-pane {
+    margin-right: 10px;
+}
+
 #chat-rooms .roster-pane .user {
     background-color: #e9e6df;
     border: 1px solid #c4bfab;
@@ -41,9 +46,13 @@
 }
 
 #chat-rooms .message-form-wrapper,
-#chat-rooms .message-form,
-#chat-rooms .message-form input {
+#chat-rooms form.message-form {
     background-color: #e9e6df;
+}
+
+#chat-rooms form.message-form input.field {
+    background-color: transparent;
+    width: 850px;
 }
 
 #chat-rooms .message-form input.submit {
@@ -52,7 +61,7 @@
 }
 
 #chat-toolbar {
-    background-color: #c4bfab;
+    background-color: #e9e6df;
 }
 #chat-toolbar .usercount span {
     background-color: #3f3c30;
