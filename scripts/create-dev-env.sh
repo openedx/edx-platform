@@ -494,6 +494,7 @@ cd $BASE
 pip install argcomplete
 cd $BASE/edx-platform
 bundle install
+rake install_prereqs
 
 mkdir -p "$BASE/log"
 mkdir -p "$BASE/db"
