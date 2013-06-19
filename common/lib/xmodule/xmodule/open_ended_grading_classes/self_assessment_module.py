@@ -287,7 +287,6 @@ class SelfAssessmentDescriptor():
     filename_extension = "xml"
 
     has_score = True
-    template_dir_name = "selfassessment"
 
     def __init__(self, system):
         self.system = system

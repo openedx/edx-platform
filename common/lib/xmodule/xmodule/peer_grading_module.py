@@ -22,7 +22,7 @@ log = logging.getLogger(__name__)
 USE_FOR_SINGLE_LOCATION = False
 LINK_TO_LOCATION = ""
 MAX_SCORE = 1
-IS_GRADED = False
+IS_GRADED = True
 
 EXTERNAL_GRADER_NO_CONTACT_ERROR = "Failed to contact external graders.  Please notify course staff."
 
@@ -59,6 +59,14 @@ class PeerGradingFields(object):
         help="Defines the number of points each problem is worth. If the value is not set, each problem is worth one point.",
         scope=Scope.settings, values={"min": 0, "step": ".1"}
     )
+    display_name = String(
+        help="Display name for this module",
+        scope=Scope.settings,
+        default="Peer Grading Interface"
+    )
+    data = String(help="Html contents to display for this module",
+        default='<peergrading></peergrading>',
+        scope=Scope.content)
 
 
 class PeerGradingModule(PeerGradingFields, XModule):
@@ -606,7 +614,6 @@ class PeerGradingDescriptor(PeerGradingFields, RawDescriptor):
 
     has_score = True
     always_recalculate_grades = True
-    template_dir_name = "peer_grading"
 
     #Specify whether or not to pass in open ended interface
     needs_open_ended_interface = True

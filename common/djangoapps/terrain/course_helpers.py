@@ -12,7 +12,6 @@ from django.contrib.sessions.middleware import SessionMiddleware
 from student.models import CourseEnrollment
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.django import contentstore
-from xmodule.templates import update_templates
 from urllib import quote_plus
 
 
@@ -84,5 +83,4 @@ def clear_courses():
     # from the bash shell to drop it:
     # $ mongo test_xmodule --eval "db.dropDatabase()"
     modulestore().collection.drop()
-    update_templates(modulestore('direct'))
     contentstore().fs_files.drop()

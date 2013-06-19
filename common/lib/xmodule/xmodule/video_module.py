@@ -13,6 +13,7 @@ from django.http import Http404
 
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
+from xmodule.contentstore.content import StaticContent
 from xmodule.editing_module import MetadataOnlyEditingDescriptor
 from xblock.core import Integer, Scope, String, Float, Boolean
 
@@ -21,6 +22,9 @@ log = logging.getLogger(__name__)
 
 class VideoFields(object):
     """Fields for `VideoModule` and `VideoDescriptor`."""
+    data = String(help="XML data for the problem",
+        default='',
+        scope=Scope.content)
     position = Integer(help="Current position in the video", scope=Scope.user_state, default=0)
     show_captions = Boolean(help="This controls whether or not captions are shown by default.", display_name="Show Captions", scope=Scope.settings, default=True)
     youtube_id_1_0 = String(help="This is the Youtube ID reference for the normal speed video.", display_name="Default Speed", scope=Scope.settings, default="OEoXaMPEzfM")
@@ -86,7 +90,6 @@ class VideoDescriptor(VideoFields,
                       MetadataOnlyEditingDescriptor,
                       RawDescriptor):
     module_class = VideoModule
-    template_dir_name = "video"
 
     @property
     def non_editable_metadata_fields(self):

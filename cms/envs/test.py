@@ -12,9 +12,10 @@ sessions. Assumes structure:
 # want to import all variables from base settings files
 # pylint: disable=W0401, W0614
 
-from .common import *
 import os
 from path import path
+from .common import *
+import uuid
 
 # Nose Test Runner
 INSTALLED_APPS += ('django_nose',)
@@ -46,14 +47,14 @@ MODULESTORE_OPTIONS = {
     'default_class': 'xmodule.raw_module.RawDescriptor',
     'host': 'localhost',
     'db': 'test_xmodule',
-    'collection': 'test_modulestore',
-    'fs_root': TEST_ROOT / "data",
-    'render_template': 'mitxmako.shortcuts.render_to_string'
+    'collection': 'modulestore{0}'.format(uuid.uuid4().hex),
+    'fs_root': TEST_ROOT,
+    'render_template': 'mitxmako.shortcuts.render_to_string',
 }
 
 MODULESTORE = {
     'default': {
-        'ENGINE': 'xmodule.modulestore.mongo.DraftMongoModuleStore',
+        'ENGINE': 'xmodule.modulestore.draft.DraftModuleStore',
         'OPTIONS': MODULESTORE_OPTIONS
     },
     'direct': {
@@ -61,7 +62,11 @@ MODULESTORE = {
         'OPTIONS': MODULESTORE_OPTIONS
     },
     'draft': {
-        'ENGINE': 'xmodule.modulestore.mongo.DraftMongoModuleStore',
+        'ENGINE': 'xmodule.modulestore.draft.DraftModuleStore',
+        'OPTIONS': MODULESTORE_OPTIONS
+    },
+    'split': {
+        'ENGINE': 'xmodule.modulestore.split_mongo.SplitMongoModuleStore',
         'OPTIONS': MODULESTORE_OPTIONS
     }
 }

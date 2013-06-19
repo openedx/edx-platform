@@ -10,6 +10,8 @@ from xblock.core import Dict, Scope
 from xmodule.x_module import (XModuleDescriptor, policy_key)
 from xmodule.modulestore import Location
 from xmodule.modulestore.inheritance import own_metadata
+import datetime
+from xmodule.modulestore.xml_exporter import EdxJSONEncoder
 
 log = logging.getLogger(__name__)
 
@@ -409,7 +411,6 @@ class XmlDescriptor(XModuleDescriptor):
             # don't want e.g. data_dir
             if attr not in self.metadata_to_strip and attr not in self.metadata_to_export_to_policy:
                 val = val_for_xml(attr)
-                #logging.debug('location.category = {0}, attr = {1}'.format(self.location.category, attr))
                 try:
                     xml_object.set(attr, val)
                 except Exception, e:
