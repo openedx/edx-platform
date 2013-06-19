@@ -15,7 +15,7 @@ from xmodule.tests.test_export import DATA_DIR
 ORG = 'test_org'
 COURSE = 'conditional'      # name of directory with course data
 
-from . import test_system
+from . import get_test_system
 
 
 class DummySystem(ImportSystem):
@@ -104,7 +104,7 @@ class ConditionalModuleBasicTest(unittest.TestCase):
     """
 
     def setUp(self):
-        self.test_system = test_system()
+        self.test_system = get_test_system()
 
     def test_icon_class(self):
         '''verify that get_icon_class works independent of condition satisfaction'''
@@ -117,7 +117,7 @@ class ConditionalModuleBasicTest(unittest.TestCase):
 
     def test_get_html(self):
         modules = ConditionalFactory.create(self.test_system)
-        # because test_system returns the repr of the context dict passed to render_template,
+        # because get_test_system returns the repr of the context dict passed to render_template,
         # we reverse it here
         html = modules['cond_module'].get_html()
         html_dict = literal_eval(html)
@@ -161,7 +161,7 @@ class ConditionalModuleXmlTest(unittest.TestCase):
         return DummySystem(load_error_modules)
 
     def setUp(self):
-        self.test_system = test_system()
+        self.test_system = get_test_system()
 
     def get_course(self, name):
         """Get a test course by directory name.  If there's more than one, error."""
