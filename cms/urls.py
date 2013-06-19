@@ -1,5 +1,8 @@
 from django.conf import settings
 from django.conf.urls import patterns, include, url
+
+# Import this file so it can do its work, even though we don't use the name.
+# pylint: disable=W0611
 from . import one_time_startup
 
 # Uncomment the next two lines to enable the admin:

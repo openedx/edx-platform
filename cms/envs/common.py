@@ -21,7 +21,7 @@ Longer TODO:
 
 # We intentionally define lots of variables that aren't used, and
 # want to import all variables from base settings files
-# pylint: disable=W0401, W0614
+# pylint: disable=W0401, W0611, W0614
 
 import sys
 import lms.envs.common
@@ -155,7 +155,7 @@ MIDDLEWARE_CLASSES = (
 
 ############################ SIGNAL HANDLERS ################################
 # This is imported to register the exception signal handling that logs exceptions
-import monitoring.exceptions  # noqa
+import monitoring.exceptions  # noqa # pylint: disable=W0611
 
 ############################ DJANGO_BUILTINS ################################
 # Change DEBUG/TEMPLATE_DEBUG in your environment settings files, not here
