@@ -65,4 +65,5 @@ setup_instructor_dashboard_sections = (idash_content) ->
   # an error thrown in one section will not block other sections from exectuing
   plantTimeout 0, -> new window.InstructorDashboard.sections.DataDownload idash_content.find ".#{CSS_IDASH_SECTION}#data_download"
   plantTimeout 0, -> new window.InstructorDashboard.sections.Membership   idash_content.find ".#{CSS_IDASH_SECTION}#membership"
+  plantTimeout 0, -> new window.InstructorDashboard.sections.StudentAdmin idash_content.find ".#{CSS_IDASH_SECTION}#student_admin"
   plantTimeout 0, -> new window.InstructorDashboard.sections.Analytics    idash_content.find ".#{CSS_IDASH_SECTION}#analytics"

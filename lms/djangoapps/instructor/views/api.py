@@ -10,7 +10,8 @@ TODO a lot of these GETs should be PUTs
 import json
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
-from django.http import HttpResponse
+from django.core.urlresolvers import reverse
+from django.http import HttpResponse, HttpResponseBadRequest
 
 from courseware.courses import get_course_with_access
 from django.contrib.auth.models import User, Group
@@ -203,6 +204,63 @@ def profile_distribution(request, course_id):
             'year_of_birth': 'Year Of Birth',
         },
         'feature_results':    feature_results,
+    }
+    response = HttpResponse(json.dumps(response_payload), content_type="application/json")
+    return response
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+def get_student_progress_url(request, course_id):
+    """
+    Get the progress url of a student.
+    Limited to staff access.
+
+    Takes query paremeter student_email and if the student exists
+    returns e.g. {
+        'progress_url': '/../...'
+    }
+    """
+    course = get_course_with_access(request.user, course_id, 'staff', depth=None)
+
+    student_email = request.GET.get('student_email')
+    if not student_email:
+        # TODO Is there a way to do a - say - 'raise Http400'?
+        return HttpResponseBadRequest()
+    user = User.objects.get(email=student_email)
+
+    progress_url = reverse('student_progress', kwargs={'course_id': course_id, 'student_id': user.id})
+
+    response_payload = {
+        'course_id':    course_id,
+        'progress_url': progress_url,
+    }
+    response = HttpResponse(json.dumps(response_payload), content_type="application/json")
+    return response
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+def redirect_to_student_progress(request, course_id):
+    """
+    Redirects to the specified students progress page
+    Limited to staff access.
+
+    Takes query parameter student_email
+    """
+    course = get_course_with_access(request.user, course_id, 'staff', depth=None)
+
+    student_email = request.GET.get('student_email')
+    if not student_email:
+        # TODO Is there a way to do a - say - 'raise Http400'?
+        return HttpResponseBadRequest()
+    user = User.objects.get(email=student_email)
+
+    progress_url = reverse('student_progress', kwargs={'course_id': course_id, 'student_id': user.id})
+
+    response_payload = {
+        'course_id':    course_id,
+        'progress_url': progress_url,
     }
     response = HttpResponse(json.dumps(response_payload), content_type="application/json")
     return response

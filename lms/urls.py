@@ -282,7 +282,8 @@ if settings.COURSEWARE_ENABLED:
             'instructor.views.api.enrolled_students_profiles', name="enrolled_students_profiles"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/profile_distribution$',
             'instructor.views.api.profile_distribution', name="profile_distribution"),
-
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/get_student_progress_url$',
+            'instructor.views.api.get_student_progress_url', name="get_student_progress_url"),
 
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/gradebook$',
             'instructor.views.legacy.gradebook', name='gradebook'),

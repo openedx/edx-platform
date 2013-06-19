@@ -15,13 +15,16 @@ class BatchEnrollment
     $btn_enroll.click -> log 'click $btn_enroll'
     $btn_unenroll.click -> log 'click $btn_unenroll'
 
-    $btn_enroll.click -> $.getJSON $btn_enroll.data('endpoint'), enroll: $emails_input.val() , (data) ->
-      log 'received response for enroll button', data
-      display_response(data)
+    $btn_enroll.click ->
+      $.getJSON $btn_enroll.data('endpoint'), enroll: $emails_input.val() , (data) ->
+        log 'received response for enroll button', data
+        display_response(data)
 
-    $btn_unenroll.click -> $.getJSON $btn_unenroll.data('endpoint'), unenroll: $emails_input.val() , (data) ->
-      log 'received response for unenroll button', data
-      display_response(data)
+    $btn_unenroll.click ->
+      log 'VAL', $emails_input.val()
+      $.getJSON $btn_unenroll.data('endpoint'), unenroll: $emails_input.val() , (data) ->
+        # log 'received response for unenroll button', data
+        # display_response(data)
 
     display_response = (data_from_server) ->
       $task_response.empty()

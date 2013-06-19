@@ -129,15 +129,10 @@
 }
 
 
-.instructor-dashboard-wrapper-2 section.idash-section#student_admin {
-  .h-row {
-    margin-bottom: 1em;
-    clear: both;
-  }
-
-  p input select {
-    float: left;
-  }
+.instructor-dashboard-wrapper-2 section.idash-section#student_admin > {
+  h3    { margin-top: 2em; }
+  input { margin-top: 2em; }
+  a     { margin-top: 2em; }
 }
 
 
