@@ -1,3 +1,5 @@
+'''integration tests for submitting problem responses and getting grades'''
+
 import logging
 import json
 import time
@@ -32,11 +34,7 @@ from mongo_login_helpers import MongoLoginHelpers
 #import factories for testing
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from capa.tests.response_xml_factory import OptionResponseXMLFactory, \
-    ChoiceResponseXMLFactory, MultipleChoiceResponseXMLFactory, \
-    StringResponseXMLFactory, NumericalResponseXMLFactory, \
-    FormulaResponseXMLFactory, CustomResponseXMLFactory, \
-    CodeResponseXMLFactory
+from capa.tests.response_xml_factory import OptionResponseXMLFactory
 
 log = logging.getLogger("mitx." + __name__)
 
@@ -138,7 +136,7 @@ class TestSubmittingProblems(MongoLoginHelpers):
         modx_url = self.modx_url(problem_location, 'problem_check')
 
         answer_key_prefix = 'input_i4x-'+self.course.org+'-{}-problem-{}_'.format(self.course_slug, problem_url_name)
-
+        print modx_url
         resp = self.client.post(modx_url, {(answer_key_prefix + k): v for k, v in responses.items()})
 
         return resp
@@ -150,14 +148,7 @@ class TestSubmittingProblems(MongoLoginHelpers):
         resp = self.client.post(modx_url)
         return resp
 
-
-class TestCourseGrader(TestSubmittingProblems):
-    """Check that a course gets graded properly"""
-
-    course_slug = "graded"
-    course_when = "2012_Fall"
-
-    def add_problem_to_section(self, section_location, name, num_inputs=2):
+    def add_dropdown_to_section(self, section_location, name, num_inputs=2):
         """create and return problem with two option response inputs (dropdown)"""
 
         problem_template = "i4x://edx/templates/problem/Blank_Common_Problem"
@@ -175,6 +166,7 @@ class TestCourseGrader(TestSubmittingProblems):
             metadata={'randomize': 'always'},
             display_name=name
         )
+
         self.refresh_course()
         return problem
 
@@ -196,6 +188,13 @@ class TestCourseGrader(TestSubmittingProblems):
         )
         self.refresh_course()
         return section
+
+
+class TestCourseGrader(TestSubmittingProblems):
+    """Check that a course gets graded properly"""
+
+    course_slug = "graded"
+    course_when = "2012_Fall"
 
     def add_grading_policy(self, grading_policy):
         '''add a grading policy to the course'''
@@ -275,9 +274,9 @@ class TestCourseGrader(TestSubmittingProblems):
 
         #set up a simple course with four problems
         self.homework = self.add_graded_section_to_course('homework')
-        self.p1 = self.add_problem_to_section(self.homework.location, 'p1', 1)
-        self.p2 = self.add_problem_to_section(self.homework.location, 'p2', 1)
-        self.p3 = self.add_problem_to_section(self.homework.location, 'p3', 1)
+        self.p1 = self.add_dropdown_to_section(self.homework.location, 'p1', 1)
+        self.p2 = self.add_dropdown_to_section(self.homework.location, 'p2', 1)
+        self.p3 = self.add_dropdown_to_section(self.homework.location, 'p3', 1)
         self.refresh_course()
 
     def test_None_grade(self):
@@ -332,9 +331,9 @@ class TestCourseGrader(TestSubmittingProblems):
 
         #set up a structure of 1 homework and 1 final
         self.homework = self.add_graded_section_to_course('homework')
-        self.problem = self.add_problem_to_section(self.homework.location, 'H1P1')
+        self.problem = self.add_dropdown_to_section(self.homework.location, 'H1P1')
         self.final = self.add_graded_section_to_course('Final Section', 'Final')
-        self.final_question = self.add_problem_to_section(self.final.location, 'FinalQuestion')
+        self.final_question = self.add_dropdown_to_section(self.final.location, 'FinalQuestion')
 
         # Only get half of the first problem correct
         self.submit_question_answer('H1P1', {'2_1': 'Correct', '2_2': 'Incorrect'})
@@ -370,14 +369,14 @@ class TestCourseGrader(TestSubmittingProblems):
         # Set up a course structure that just consists of 3 homeworks.
         # Since the grading policy drops 1, each problem is worth 25%
         self.homework1 = self.add_graded_section_to_course('homework1')
-        self.h1p1 = self.add_problem_to_section(self.homework1.location, 'H1P1', 1)
-        self.h1p2 = self.add_problem_to_section(self.homework1.location, 'H1P2', 1)
+        self.h1p1 = self.add_dropdown_to_section(self.homework1.location, 'H1P1', 1)
+        self.h1p2 = self.add_dropdown_to_section(self.homework1.location, 'H1P2', 1)
         self.homework2 = self.add_graded_section_to_course('homework2')
-        self.h1p1 = self.add_problem_to_section(self.homework2.location, 'H2P1', 1)
-        self.h1p2 = self.add_problem_to_section(self.homework2.location, 'H2P2', 1)
+        self.h1p1 = self.add_dropdown_to_section(self.homework2.location, 'H2P1', 1)
+        self.h1p2 = self.add_dropdown_to_section(self.homework2.location, 'H2P2', 1)
         self.homework3 = self.add_graded_section_to_course('homework3')
-        self.h3p1 = self.add_problem_to_section(self.homework3.location, 'H3P1', 1)
-        self.h3p2 = self.add_problem_to_section(self.homework3.location, 'H3P2', 1)
+        self.h3p1 = self.add_dropdown_to_section(self.homework3.location, 'H3P1', 1)
+        self.h3p2 = self.add_dropdown_to_section(self.homework3.location, 'H3P2', 1)
 
         #Get The first problem correct
         self.submit_question_answer('H1P1', {'2_1': 'Correct'})
@@ -414,3 +413,223 @@ class TestCourseGrader(TestSubmittingProblems):
         self.assertEqual(self.earned_hw_scores(), [1.0, 2.0, 2.0])   # Order matters
         self.assertEqual(self.score_for_hw('homework3'), [1.0, 1.0])
         self.check_letter_grade('Pass')
+
+
+class TestPythonGradedResponse(TestSubmittingProblems):
+    """Check that we can submit a schematic response and custom response, and it answers properly."""
+
+    course_slug = "embedded_python"
+    course_when = "2013_Spring"
+
+    def setUp(self):
+        super(TestPythonGradedResponse, self).setUp()
+        self.section = self.add_graded_section_to_course('section')
+        self.correct_responses = {}
+        self.incorrect_responses = {}
+
+    def schematic_setup(self, name):
+        '''set up an example Circuit_Schematic_Builder problem'''
+
+        from capa.tests.response_xml_factory import SchematicResponseXMLFactory
+        schematic_template = "i4x://edx/templates/problem/Circuit_Schematic_Builder"
+        script = """# for a schematic response, submission[i] is the json representation
+# of the diagram and analysis results for the i-th schematic tag
+
+def get_tran(json,signal):
+  for element in json:
+    if element[0] == 'transient':
+      return element[1].get(signal,[])
+  return []
+
+def get_value(at,output):
+  for (t,v) in output:
+    if at == t: return v
+  return None
+
+output = get_tran(submission[0],'Z')
+okay = True
+
+# output should be 1, 1, 1, 1, 1, 0, 0, 0
+if get_value(0.0000004,output) < 2.7: okay = False;
+if get_value(0.0000009,output) < 2.7: okay = False;
+if get_value(0.0000014,output) < 2.7: okay = False;
+if get_value(0.0000019,output) < 2.7: okay = False;
+if get_value(0.0000024,output) < 2.7: okay = False;
+if get_value(0.0000029,output) > 0.25: okay = False;
+if get_value(0.0000034,output) > 0.25: okay = False;
+if get_value(0.0000039,output) > 0.25: okay = False;
+
+correct = ['correct' if okay else 'incorrect']"""
+        xmldata = SchematicResponseXMLFactory().build_xml(answer=script)
+        problem = ItemFactory.create(
+            parent_location=self.section.location,
+            template=schematic_template,
+            display_name=name,
+            data=xmldata
+        )
+
+                #define the correct and incorrect responses to this problem
+        self.correct_responses[name] = json.dumps(
+            [['transient', {'Z': [
+                [0.0000004, 2.8],
+                [0.0000009, 2.8],
+                [0.0000014, 2.8],
+                [0.0000019, 2.8],
+                [0.0000024, 2.8],
+                [0.0000029, 0.2],
+                [0.0000034, 0.2],
+                [0.0000039, 0.2]
+            ]}]]
+        )
+
+        self.incorrect_responses[name] = json.dumps(
+            [['transient', {'Z': [
+                [0.0000004, 2.8],
+                [0.0000009, 0.0],  # wrong.
+                [0.0000014, 2.8],
+                [0.0000019, 2.8],
+                [0.0000024, 2.8],
+                [0.0000029, 0.2],
+                [0.0000034, 0.2],
+                [0.0000039, 0.2]
+            ]}]]
+        )
+
+        self.refresh_course()
+
+    def costum_response_setup(self, name):
+        '''set up an example custom response problem using a check function'''
+
+        from capa.tests.response_xml_factory import CustomResponseXMLFactory
+        custom_template = "i4x://edx/templates/problem/Custom_Python-Evaluated_Input"
+        test_csv = """def test_csv(expect, ans):
+   # Take out all spaces in expected answer
+   expect = [i.strip(' ') for i in str(expect).split(',')]
+   # Take out all spaces in student solution
+   ans = [i.strip(' ') for i in str(ans).split(',')]
+
+   def strip_q(x):
+      # Strip quotes around strings if students have entered them
+      stripped_ans = []
+      for item in x:
+         if item[0] == "'" and item[-1]=="'":
+            item = item.strip("'")
+         elif item[0] == '"' and item[-1] == '"':
+            item = item.strip('"')
+         stripped_ans.append(item)
+      return stripped_ans
+
+   return strip_q(expect) == strip_q(ans)"""
+        expect = "0, 1, 2, 3, 4, 5, 'Outside of loop', 6"
+        cfn_problem_xml = CustomResponseXMLFactory().build_xml(script=test_csv, cfn='test_csv', expect=expect)
+
+        problem = ItemFactory.create(
+            parent_location=self.section.location,
+            template=custom_template,
+            data=cfn_problem_xml,
+            display_name=name
+        )
+
+        self.correct_responses[name] = expect
+        self.incorrect_responses[name] = 'Xyzzy'
+
+        self.refresh_course()
+        return problem
+
+    def computed_answer_setup(self, name):
+        '''set up an example problem using an answer script'''
+
+        script = """if submission[0] == "Xyzzy":
+    correct = ['correct']
+else:
+    correct = ['incorrect']"""
+
+        from capa.tests.response_xml_factory import CustomResponseXMLFactory
+        custom_template = "i4x://edx/templates/problem/Custom_Python-Evaluated_Input"
+
+        computed_xml = CustomResponseXMLFactory().build_xml(answer=script)
+
+        problem = ItemFactory.create(
+            parent_location=self.section.location,
+            template=custom_template,
+            data=computed_xml,
+            display_name=name
+        )
+
+        self.correct_responses[name] = 'Xyzzy'
+        self.incorrect_responses[name] = "No!"
+
+        self.refresh_course()
+        return problem
+
+    def check_correct(self, name):
+        '''check that problem named "name" gets evaluated correctly correctly'''
+        resp = self.submit_question_answer(name, {'2_1': self.correct_responses[name]})
+
+        respdata = json.loads(resp.content)
+        self.assertEqual(respdata['success'], 'correct')
+
+    def check_incorrect(self, name):
+        '''check that problem named "name" gets evaluated correctly correctly'''
+        resp = self.submit_question_answer(name, {'2_1': self.incorrect_responses[name]})
+
+        respdata = json.loads(resp.content)
+        self.assertEqual(respdata['success'], 'incorrect')
+
+    def check_reset(self, name):
+        '''check that the problem can be reset'''
+        #first, get the question wrong
+        resp = self.submit_question_answer(name, {'2_1': self.incorrect_responses[name]})
+        #reset the question
+        self.reset_question_answer(name)
+        #then get it right
+        resp = self.submit_question_answer(name, {'2_1': self.correct_responses[name]})
+
+        respdata = json.loads(resp.content)
+        self.assertEqual(respdata['success'], 'correct')
+
+
+    def test_schematic_correct(self):
+        name = "schematic_problem"
+        self.schematic_setup(name)
+        self.check_correct(name)
+
+    def test_schematic_incorrect(self):
+        name = "schematic_problem"
+        self.schematic_setup(name)
+        self.check_incorrect(name)
+
+    def test_schematic_reset(self):
+        name = "schematic_problem"
+        self.schematic_setup(name)
+        self.check_reset(name)
+
+    def test_check_function_correct(self):
+        name = 'cfn_problem'
+        self.costum_response_setup(name)
+        self.check_correct(name)
+
+    def test_check_function_incorrect(self):
+        name = 'cfn_problem'
+        self.costum_response_setup(name)
+        self.check_incorrect(name)
+
+    def test_check_function_reset(self):
+        name = 'cfn_problem'
+        self.costum_response_setup(name)
+        self.check_reset(name)
+
+    def test_computed_correct(self):
+        name = 'computed_answer'
+        self.computed_answer_setup(name)
+        self.check_correct(name)
+
+    def test_computed_incorrect(self):
+        name = 'computed_answer'
+        self.computed_answer_setup(name)
+        self.check_incorrect(name)
+
+    def test_computed_reset(self):
+        name = 'computed_answer'
+        self.computed_answer_setup(name)
+        self.check_reset(name)
