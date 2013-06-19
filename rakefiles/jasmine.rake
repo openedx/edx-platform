@@ -61,10 +61,10 @@ def template_jasmine_runner(lib)
     yield File.expand_path(template_output)
 end
 
-def jasmine_browser(url, wait=10)
+def jasmine_browser(url, jitter=3, wait=10)
     # Jitter starting the browser so that the tests don't all try and
     # start the browser simultaneously
-    sleep(rand(3))
+    sleep(rand(jitter))
     sh("python -m webbrowser -t '#{url}'")
     sleep(wait)
 end
@@ -85,6 +85,15 @@ end
                 django_for_jasmine(system, true) do |jasmine_url|
                     jasmine_browser(jasmine_url)
                 end
+            end
+
+            desc "Open jasmine tests for #{system} in your default browser, and dynamically recompile coffeescript"
+            task :'browser:watch' => :'assets:coffee:_watch' do
+                django_for_jasmine(system, true) do |jasmine_url|
+                    jasmine_browser(jasmine_url, jitter=0, wait=0)
+                end
+                puts "Press ENTER to terminate".red
+                $stdin.gets
             end
 
             desc "Use phantomjs to run jasmine tests for #{system} from the console"

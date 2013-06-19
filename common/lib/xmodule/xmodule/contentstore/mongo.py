@@ -1,4 +1,3 @@
-from bson.son import SON
 from pymongo import Connection
 import gridfs
 from gridfs.errors import NoFile
@@ -15,15 +14,16 @@ import os
 
 
 class MongoContentStore(ContentStore):
-    def __init__(self, host, db, port=27017, user=None, password=None, **kwargs):
+    def __init__(self, host, db, port=27017, user=None, password=None, bucket='fs', **kwargs):
         logging.debug('Using MongoDB for static content serving at host={0} db={1}'.format(host, db))
         _db = Connection(host=host, port=port, **kwargs)[db]
 
         if user is not None and password is not None:
             _db.authenticate(user, password)
 
-        self.fs = gridfs.GridFS(_db)
-        self.fs_files = _db["fs.files"]   # the underlying collection GridFS uses
+        self.fs = gridfs.GridFS(_db, bucket)
+
+        self.fs_files = _db[bucket + ".files"]   # the underlying collection GridFS uses
 
     def save(self, content):
         id = content.get_id()
@@ -43,7 +43,7 @@ class MongoContentStore(ContentStore):
         if self.fs.exists({"_id": id}):
             self.fs.delete(id)
 
-    def find(self, location):
+    def find(self, location, throw_on_not_found=True):
         id = StaticContent.get_id_from_location(location)
         try:
             with self.fs.get(id) as fp:
@@ -52,7 +52,10 @@ class MongoContentStore(ContentStore):
                                      thumbnail_location=fp.thumbnail_location if hasattr(fp, 'thumbnail_location') else None,
                                      import_path=fp.import_path if hasattr(fp, 'import_path') else None)
         except NoFile:
-            raise NotFoundError()
+            if throw_on_not_found:
+                raise NotFoundError()
+            else:
+                return None
 
     def export(self, location, output_directory):
         content = self.find(location)

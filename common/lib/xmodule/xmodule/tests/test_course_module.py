@@ -1,5 +1,4 @@
 import unittest
-from time import strptime
 import datetime
 
 from fs.memoryfs import MemoryFS
@@ -8,13 +7,13 @@ from mock import Mock, patch
 
 from xmodule.modulestore.xml import ImportSystem, XMLModuleStore
 import xmodule.course_module
-from xmodule.util.date_utils import time_to_datetime
+from django.utils.timezone import UTC
 
 
 ORG = 'test_org'
 COURSE = 'test_course'
 
-NOW = strptime('2013-01-01T01:00:00', '%Y-%m-%dT%H:%M:00')
+NOW = datetime.datetime.strptime('2013-01-01T01:00:00', '%Y-%m-%dT%H:%M:00').replace(tzinfo=UTC())
 
 
 class DummySystem(ImportSystem):
@@ -81,10 +80,10 @@ class IsNewCourseTestCase(unittest.TestCase):
             Mock(wraps=datetime.datetime)
         )
         mocked_datetime = datetime_patcher.start()
-        mocked_datetime.utcnow.return_value = time_to_datetime(NOW)
+        mocked_datetime.now.return_value = NOW
         self.addCleanup(datetime_patcher.stop)
 
-    @patch('xmodule.course_module.time.gmtime')
+    @patch('xmodule.course_module.datetime.now')
     def test_sorting_score(self, gmtime_mock):
         gmtime_mock.return_value = NOW
 
@@ -125,7 +124,7 @@ class IsNewCourseTestCase(unittest.TestCase):
             print "Comparing %s to %s" % (a, b)
             assertion(a_score, b_score)
 
-    @patch('xmodule.course_module.time.gmtime')
+    @patch('xmodule.course_module.datetime.now')
     def test_start_date_text(self, gmtime_mock):
         gmtime_mock.return_value = NOW
 

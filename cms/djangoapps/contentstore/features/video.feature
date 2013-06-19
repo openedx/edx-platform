@@ -8,3 +8,8 @@ Feature: Video Component
   Scenario: Creating a video takes a single click
     Given I have clicked the new unit button
     Then creating a video takes a single click
+
+  Scenario: Captions are shown correctly
+    Given I have created a Video component
+    And I have hidden captions
+    Then when I view the video it does not show the captions

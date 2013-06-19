@@ -54,6 +54,7 @@ class CourseDetailsTestCase(CourseTestCase):
     def test_virgin_fetch(self):
         details = CourseDetails.fetch(self.course_location)
         self.assertEqual(details.course_location, self.course_location, "Location not copied into")
+        self.assertIsNotNone(details.start_date.tzinfo)
         self.assertIsNone(details.end_date, "end date somehow initialized " + str(details.end_date))
         self.assertIsNone(details.enrollment_start, "enrollment_start date somehow initialized " + str(details.enrollment_start))
         self.assertIsNone(details.enrollment_end, "enrollment_end date somehow initialized " + str(details.enrollment_end))
@@ -67,7 +68,6 @@ class CourseDetailsTestCase(CourseTestCase):
         jsondetails = json.dumps(details, cls=CourseSettingsEncoder)
         jsondetails = json.loads(jsondetails)
         self.assertTupleEqual(Location(jsondetails['course_location']), self.course_location, "Location !=")
-        # Note, start_date is being initialized someplace. I'm not sure why b/c the default will make no sense.
         self.assertIsNone(jsondetails['end_date'], "end date somehow initialized ")
         self.assertIsNone(jsondetails['enrollment_start'], "enrollment_start date somehow initialized ")
         self.assertIsNone(jsondetails['enrollment_end'], "enrollment_end date somehow initialized ")
@@ -75,6 +75,23 @@ class CourseDetailsTestCase(CourseTestCase):
         self.assertEqual(jsondetails['overview'], "", "overview somehow initialized")
         self.assertIsNone(jsondetails['intro_video'], "intro_video somehow initialized")
         self.assertIsNone(jsondetails['effort'], "effort somehow initialized")
+
+    def test_ooc_encoder(self):
+        """
+        Test the encoder out of its original constrained purpose to see if it functions for general use
+        """
+        details = {'location': Location(['tag', 'org', 'course', 'category', 'name']),
+            'number': 1,
+            'string': 'string',
+            'datetime': datetime.datetime.now(UTC())}
+        jsondetails = json.dumps(details, cls=CourseSettingsEncoder)
+        jsondetails = json.loads(jsondetails)
+
+        self.assertIn('location', jsondetails)
+        self.assertIn('org', jsondetails['location'])
+        self.assertEquals('org', jsondetails['location'][1])
+        self.assertEquals(1, jsondetails['number'])
+        self.assertEqual(jsondetails['string'], 'string')
 
     def test_update_and_fetch(self):
         # # NOTE: I couldn't figure out how to validly test time setting w/ all the conversions
@@ -116,11 +133,8 @@ class CourseDetailsViewTest(CourseTestCase):
         self.compare_details_with_encoding(json.loads(resp.content), details.__dict__, field + str(val))
 
     @staticmethod
-    def convert_datetime_to_iso(datetime):
-        if datetime is not None:
-            return datetime.isoformat("T")
-        else:
-            return None
+    def convert_datetime_to_iso(dt):
+        return Date().to_json(dt)
 
     def test_update_and_fetch(self):
         details = CourseDetails.fetch(self.course_location)
@@ -151,22 +165,12 @@ class CourseDetailsViewTest(CourseTestCase):
         self.assertEqual(details['intro_video'], encoded.get('intro_video', None), context + " intro_video not ==")
         self.assertEqual(details['effort'], encoded['effort'], context + " efforts not ==")
 
-    @staticmethod
-    def struct_to_datetime(struct_time):
-        return datetime.datetime(*struct_time[:6], tzinfo=UTC())
-
     def compare_date_fields(self, details, encoded, context, field):
         if details[field] is not None:
             date = Date()
             if field in encoded and encoded[field] is not None:
-                encoded_encoded = date.from_json(encoded[field])
-                dt1 = CourseDetailsViewTest.struct_to_datetime(encoded_encoded)
-
-                if isinstance(details[field], datetime.datetime):
-                    dt2 = details[field]
-                else:
-                    details_encoded = date.from_json(details[field])
-                    dt2 = CourseDetailsViewTest.struct_to_datetime(details_encoded)
+                dt1 = date.from_json(encoded[field])
+                dt2 = details[field]
 
                 expected_delta = datetime.timedelta(0)
                 self.assertEqual(dt1 - dt2, expected_delta, str(dt1) + "!=" + str(dt2) + " at " + context)

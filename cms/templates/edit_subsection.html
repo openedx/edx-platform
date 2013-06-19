@@ -1,7 +1,7 @@
 <%inherit file="base.html" />
 <%!
    import logging
-   from xmodule.util.date_utils import get_time_struct_display
+   from xmodule.util.date_utils import get_default_time_display
 %>
 
 <%! from django.core.urlresolvers import reverse %>
@@ -36,11 +36,15 @@
         <div class="datepair" data-language="javascript">
           <div class="field field-start-date">
             <label for="start_date">Release Day</label>
-            <input type="text" id="start_date" name="start_date" value="${get_time_struct_display(subsection.lms.start, '%m/%d/%Y')}" placeholder="MM/DD/YYYY" class="date" size='15' autocomplete="off"/>
+            <input type="text" id="start_date" name="start_date" 
+                value="${subsection.lms.start.strftime('%m/%d/%Y') if subsection.lms.start else ''}" 
+                placeholder="MM/DD/YYYY" class="date" size='15' autocomplete="off"/>
           </div>
           <div class="field field-start-time">
             <label for="start_time">Release Time (<abbr title="Coordinated Universal Time">UTC</abbr>)</label>
-            <input type="text" id="start_time" name="start_time" value="${get_time_struct_display(subsection.lms.start, '%H:%M')}" placeholder="HH:MM" class="time" size='10' autocomplete="off"/>
+            <input type="text" id="start_time" name="start_time" 
+                value="${subsection.lms.start.strftime('%H:%M') if subsection.lms.start else ''}" 
+                placeholder="HH:MM" class="time" size='10' autocomplete="off"/>
           </div>
         </div>
         % if subsection.lms.start != parent_item.lms.start and subsection.lms.start:
@@ -48,7 +52,7 @@
             <p class="notice">The date above differs from the release date of ${parent_item.display_name_with_default}, which is unset.
             % else:
             <p class="notice">The date above differs from the release date of ${parent_item.display_name_with_default} –
-                ${get_time_struct_display(parent_item.lms.start, '%m/%d/%Y at %H:%M UTC')}.
+                ${get_default_time_display(parent_item.lms.start)}.
             % endif
             <a href="#" class="sync-date no-spinner">Sync to ${parent_item.display_name_with_default}.</a></p>
         % endif
@@ -65,11 +69,15 @@
       <div class="datepair date-setter">
         <div class="field field-start-date">
           <label for="due_date">Due Day</label>
-          <input type="text" id="due_date" name="due_date" value="${get_time_struct_display(subsection.lms.due, '%m/%d/%Y')}" placeholder="MM/DD/YYYY" class="date" size='15' autocomplete="off"/>
+          <input type="text" id="due_date" name="due_date" 
+          value="${subsection.lms.due.strftime('%m/%d/%Y') if subsection.lms.due else ''}" 
+          placeholder="MM/DD/YYYY" class="date" size='15' autocomplete="off"/>
         </div>
         <div class="field field-start-time">
           <label for="due_time">Due Time (<abbr title="Coordinated Universal Time">UTC</abbr>)</label>
-          <input type="text" id="due_time" name="due_time" value="${get_time_struct_display(subsection.lms.due, '%H:%M')}" placeholder="HH:MM" class="time" size='10' autocomplete="off"/>
+          <input type="text" id="due_time" name="due_time" 
+            value="${subsection.lms.due.strftime('%H:%M') if subsection.lms.due else ''}" 
+            placeholder="HH:MM" class="time" size='10' autocomplete="off"/>
         </div>
         <a href="#" class="remove-date">Remove due date</a>
       </div>

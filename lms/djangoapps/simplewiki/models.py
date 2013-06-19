@@ -11,6 +11,7 @@ from markdown import markdown
 
 from .wiki_settings import *
 from util.cache import cache
+from pytz import UTC
 
 
 class ShouldHaveExactlyOneRootSlug(Exception):
@@ -265,7 +266,7 @@ class Revision(models.Model):
                 return
             else:
                 import datetime
-                self.article.modified_on = datetime.datetime.now()
+                self.article.modified_on = datetime.datetime.now(UTC)
                 self.article.save()
 
         # Increment counter according to previous revision
