@@ -4,6 +4,7 @@
 // notices - in-context: to be used as notices to users within the context of a form/action
 .notice-incontext {
   @extend .ui-well;
+  @include border-radius(($baseline/10));
 
   .title {
     @extend .t-title7;
