@@ -307,7 +307,7 @@ class MongoModuleStore(ModuleStoreBase):
             location = Location(result['_id'])
             # We need to collate between draft and non-draft
             # i.e. draft verticals can have children which are not in non-draft versions
-            location = location._replace(revision=None)
+            location = location.replace(revision=None)
             location_url = location.url()
             if location_url in results_by_url:
                 existing_children = results_by_url[location_url].get('definition', {}).get('children', [])

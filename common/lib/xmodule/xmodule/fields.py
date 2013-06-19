@@ -77,9 +77,7 @@ class Date(ModelType):
             else:
                 return value.isoformat()
 
-
 TIMEDELTA_REGEX = re.compile(r'^((?P<days>\d+?) day(?:s?))?(\s)?((?P<hours>\d+?) hour(?:s?))?(\s)?((?P<minutes>\d+?) minute(?:s)?)?(\s)?((?P<seconds>\d+?) second(?:s)?)?$')
-
 
 class Timedelta(ModelType):
     def from_json(self, time_str):

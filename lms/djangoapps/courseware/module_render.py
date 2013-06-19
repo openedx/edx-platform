@@ -298,7 +298,7 @@ def get_module_for_descriptor_internal(user, descriptor, model_data_cache, cours
         student_module.max_grade = event.get('max_value')
         student_module.save()
 
-        #Bin score into range and increment stats
+        # Bin score into range and increment stats
         score_bucket = get_score_bucket(student_module.grade, student_module.max_grade)
         org, course_num, run = course_id.split("/")
 
@@ -472,13 +472,13 @@ def modx_dispatch(request, dispatch, location, course_id):
             inputfiles = request.FILES.getlist(fileinput_id)
 
             if len(inputfiles) > settings.MAX_FILEUPLOADS_PER_INPUT:
-                too_many_files_msg = 'Submission aborted! Maximum %d files may be submitted at once' %\
+                too_many_files_msg = 'Submission aborted! Maximum %d files may be submitted at once' % \
                     settings.MAX_FILEUPLOADS_PER_INPUT
                 return HttpResponse(json.dumps({'success': too_many_files_msg}))
 
             for inputfile in inputfiles:
-                if inputfile.size > settings.STUDENT_FILEUPLOAD_MAX_SIZE:   # Bytes
-                    file_too_big_msg = 'Submission aborted! Your file "%s" is too large (max size: %d MB)' %\
+                if inputfile.size > settings.STUDENT_FILEUPLOAD_MAX_SIZE:  # Bytes
+                    file_too_big_msg = 'Submission aborted! Your file "%s" is too large (max size: %d MB)' % \
                                         (inputfile.name, settings.STUDENT_FILEUPLOAD_MAX_SIZE / (1000 ** 2))
                     return HttpResponse(json.dumps({'success': file_too_big_msg}))
             p[fileinput_id] = inputfiles
