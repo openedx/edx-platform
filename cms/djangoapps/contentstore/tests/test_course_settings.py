@@ -6,8 +6,6 @@ import json
 import copy
 import mock
 
-from django.contrib.auth.models import User
-from django.test.client import Client
 from django.core.urlresolvers import reverse
 from django.utils.timezone import UTC
 from django.test.utils import override_settings
@@ -17,45 +15,12 @@ from models.settings.course_details import (CourseDetails, CourseSettingsEncoder
 from models.settings.course_grading import CourseGradingModel
 from contentstore.utils import get_modulestore
 
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
 
 from models.settings.course_metadata import CourseMetadata
 from xmodule.modulestore.xml_importer import import_from_xml
 from xmodule.fields import Date
 
-
-class CourseTestCase(ModuleStoreTestCase):
-    """
-    Base class for test classes below.
-    """
-    def setUp(self):
-        """
-        These tests need a user in the DB so that the django Test Client
-        can log them in.
-        They inherit from the ModuleStoreTestCase class so that the mongodb collection
-        will be cleared out before each test case execution and deleted
-        afterwards.
-        """
-        uname = 'testuser'
-        email = 'test+courses@edx.org'
-        password = 'foo'
-
-        # Create the use so we can log them in.
-        self.user = User.objects.create_user(uname, email, password)
-
-        # Note that we do not actually need to do anything
-        # for registration if we directly mark them active.
-        self.user.is_active = True
-        # Staff has access to view all courses
-        self.user.is_staff = True
-        self.user.save()
-
-        self.client = Client()
-        self.client.login(username=uname, password=password)
-
-        course = CourseFactory.create(template='i4x://edx/templates/course/Empty', org='MITx', number='999', display_name='Robot Super Course')
-        self.course_location = course.location
+from .utils import CourseTestCase
 
 
 class CourseDetailsTestCase(CourseTestCase):
@@ -63,8 +28,8 @@ class CourseDetailsTestCase(CourseTestCase):
     Tests the first course settings page (course dates, overview, etc.).
     """
     def test_virgin_fetch(self):
-        details = CourseDetails.fetch(self.course_location)
-        self.assertEqual(details.course_location, self.course_location, "Location not copied into")
+        details = CourseDetails.fetch(self.course.location)
+        self.assertEqual(details.course_location, self.course.location, "Location not copied into")
         self.assertIsNotNone(details.start_date.tzinfo)
         self.assertIsNone(details.end_date, "end date somehow initialized " + str(details.end_date))
         self.assertIsNone(details.enrollment_start, "enrollment_start date somehow initialized " + str(details.enrollment_start))
@@ -75,10 +40,10 @@ class CourseDetailsTestCase(CourseTestCase):
         self.assertIsNone(details.effort, "effort somehow initialized" + str(details.effort))
 
     def test_encoder(self):
-        details = CourseDetails.fetch(self.course_location)
+        details = CourseDetails.fetch(self.course.location)
         jsondetails = json.dumps(details, cls=CourseSettingsEncoder)
         jsondetails = json.loads(jsondetails)
-        self.assertTupleEqual(Location(jsondetails['course_location']), self.course_location, "Location !=")
+        self.assertTupleEqual(Location(jsondetails['course_location']), self.course.location, "Location !=")
         self.assertIsNone(jsondetails['end_date'], "end date somehow initialized ")
         self.assertIsNone(jsondetails['enrollment_start'], "enrollment_start date somehow initialized ")
         self.assertIsNone(jsondetails['enrollment_end'], "enrollment_end date somehow initialized ")
@@ -91,10 +56,12 @@ class CourseDetailsTestCase(CourseTestCase):
         """
         Test the encoder out of its original constrained purpose to see if it functions for general use
         """
-        details = {'location': Location(['tag', 'org', 'course', 'category', 'name']),
-                   'number': 1,
-                   'string': 'string',
-                   'datetime': datetime.datetime.now(UTC())}
+        details = {
+            'location': Location(['tag', 'org', 'course', 'category', 'name']),
+            'number': 1,
+            'string': 'string',
+            'datetime': datetime.datetime.now(UTC())
+        }
         jsondetails = json.dumps(details, cls=CourseSettingsEncoder)
         jsondetails = json.loads(jsondetails)
 
@@ -105,7 +72,7 @@ class CourseDetailsTestCase(CourseTestCase):
         self.assertEqual(jsondetails['string'], 'string')
 
     def test_update_and_fetch(self):
-        jsondetails = CourseDetails.fetch(self.course_location)
+        jsondetails = CourseDetails.fetch(self.course.location)
         jsondetails.syllabus = "<a href='foo'>bar</a>"
         # encode - decode to convert date fields and other data which changes form
         self.assertEqual(
@@ -204,11 +171,12 @@ class CourseDetailsViewTest(CourseTestCase):
         return Date().to_json(dt)
 
     def test_update_and_fetch(self):
-        details = CourseDetails.fetch(self.course_location)
+        loc = self.course.location
+        details = CourseDetails.fetch(loc)
 
         # resp s/b json from here on
-        url = reverse('course_settings', kwargs={'org': self.course_location.org, 'course': self.course_location.course,
-                                                 'name': self.course_location.name, 'section': 'details'})
+        url = reverse('course_settings', kwargs={'org': loc.org, 'course': loc.course,
+                                                 'name': loc.name, 'section': 'details'})
         resp = self.client.get(url)
         self.compare_details_with_encoding(json.loads(resp.content), details.__dict__, "virgin get")
 
@@ -251,49 +219,49 @@ class CourseGradingTest(CourseTestCase):
     Tests for the course settings grading page.
     """
     def test_initial_grader(self):
-        descriptor = get_modulestore(self.course_location).get_item(self.course_location)
+        descriptor = get_modulestore(self.course.location).get_item(self.course.location)
         test_grader = CourseGradingModel(descriptor)
         # ??? How much should this test bake in expectations about defaults and thus fail if defaults change?
-        self.assertEqual(self.course_location, test_grader.course_location, "Course locations")
+        self.assertEqual(self.course.location, test_grader.course_location, "Course locations")
         self.assertIsNotNone(test_grader.graders, "No graders")
         self.assertIsNotNone(test_grader.grade_cutoffs, "No cutoffs")
 
     def test_fetch_grader(self):
-        test_grader = CourseGradingModel.fetch(self.course_location.url())
-        self.assertEqual(self.course_location, test_grader.course_location, "Course locations")
+        test_grader = CourseGradingModel.fetch(self.course.location.url())
+        self.assertEqual(self.course.location, test_grader.course_location, "Course locations")
         self.assertIsNotNone(test_grader.graders, "No graders")
         self.assertIsNotNone(test_grader.grade_cutoffs, "No cutoffs")
 
-        test_grader = CourseGradingModel.fetch(self.course_location)
-        self.assertEqual(self.course_location, test_grader.course_location, "Course locations")
+        test_grader = CourseGradingModel.fetch(self.course.location)
+        self.assertEqual(self.course.location, test_grader.course_location, "Course locations")
         self.assertIsNotNone(test_grader.graders, "No graders")
         self.assertIsNotNone(test_grader.grade_cutoffs, "No cutoffs")
 
         for i, grader in enumerate(test_grader.graders):
-            subgrader = CourseGradingModel.fetch_grader(self.course_location, i)
+            subgrader = CourseGradingModel.fetch_grader(self.course.location, i)
             self.assertDictEqual(grader, subgrader, str(i) + "th graders not equal")
 
-        subgrader = CourseGradingModel.fetch_grader(self.course_location.list(), 0)
+        subgrader = CourseGradingModel.fetch_grader(self.course.location.list(), 0)
         self.assertDictEqual(test_grader.graders[0], subgrader, "failed with location as list")
 
     def test_fetch_cutoffs(self):
-        test_grader = CourseGradingModel.fetch_cutoffs(self.course_location)
+        test_grader = CourseGradingModel.fetch_cutoffs(self.course.location)
         # ??? should this check that it's at least a dict? (expected is { "pass" : 0.5 } I think)
         self.assertIsNotNone(test_grader, "No cutoffs via fetch")
 
-        test_grader = CourseGradingModel.fetch_cutoffs(self.course_location.url())
+        test_grader = CourseGradingModel.fetch_cutoffs(self.course.location.url())
         self.assertIsNotNone(test_grader, "No cutoffs via fetch with url")
 
     def test_fetch_grace(self):
-        test_grader = CourseGradingModel.fetch_grace_period(self.course_location)
+        test_grader = CourseGradingModel.fetch_grace_period(self.course.location)
         # almost a worthless test
         self.assertIn('grace_period', test_grader, "No grace via fetch")
 
-        test_grader = CourseGradingModel.fetch_grace_period(self.course_location.url())
+        test_grader = CourseGradingModel.fetch_grace_period(self.course.location.url())
         self.assertIn('grace_period', test_grader, "No cutoffs via fetch with url")
 
     def test_update_from_json(self):
-        test_grader = CourseGradingModel.fetch(self.course_location)
+        test_grader = CourseGradingModel.fetch(self.course.location)
         altered_grader = CourseGradingModel.update_from_json(test_grader.__dict__)
         self.assertDictEqual(test_grader.__dict__, altered_grader.__dict__, "Noop update")
 
@@ -307,11 +275,10 @@ class CourseGradingTest(CourseTestCase):
 
         test_grader.grace_period = {'hours': 4, 'minutes': 5, 'seconds': 0}
         altered_grader = CourseGradingModel.update_from_json(test_grader.__dict__)
-        print test_grader.grace_period, altered_grader.grace_period
         self.assertDictEqual(test_grader.__dict__, altered_grader.__dict__, "4 hour grace period")
 
     def test_update_grader_from_json(self):
-        test_grader = CourseGradingModel.fetch(self.course_location)
+        test_grader = CourseGradingModel.fetch(self.course.location)
         altered_grader = CourseGradingModel.update_grader_from_json(test_grader.course_location, test_grader.graders[1])
         self.assertDictEqual(test_grader.graders[1], altered_grader, "Noop update")
 
@@ -331,11 +298,11 @@ class CourseMetadataEditingTest(CourseTestCase):
     def setUp(self):
         CourseTestCase.setUp(self)
         # add in the full class too
-        import_from_xml(get_modulestore(self.course_location), 'common/test/data/', ['full'])
+        import_from_xml(get_modulestore(self.course.location), 'common/test/data/', ['full'])
         self.fullcourse_location = Location(['i4x', 'edX', 'full', 'course', '6.002_Spring_2012', None])
 
     def test_fetch_initial_fields(self):
-        test_model = CourseMetadata.fetch(self.course_location)
+        test_model = CourseMetadata.fetch(self.course.location)
         self.assertIn('display_name', test_model, 'Missing editable metadata field')
         self.assertEqual(test_model['display_name'], 'Robot Super Course', "not expected value")
 
@@ -348,17 +315,17 @@ class CourseMetadataEditingTest(CourseTestCase):
         self.assertIn('xqa_key', test_model, 'xqa_key field ')
 
     def test_update_from_json(self):
-        test_model = CourseMetadata.update_from_json(self.course_location, {
+        test_model = CourseMetadata.update_from_json(self.course.location, {
             "advertised_start": "start A",
             "testcenter_info": {"c": "test"},
             "days_early_for_beta": 2
         })
         self.update_check(test_model)
         # try fresh fetch to ensure persistence
-        test_model = CourseMetadata.fetch(self.course_location)
+        test_model = CourseMetadata.fetch(self.course.location)
         self.update_check(test_model)
         # now change some of the existing metadata
-        test_model = CourseMetadata.update_from_json(self.course_location, {
+        test_model = CourseMetadata.update_from_json(self.course.location, {
             "advertised_start": "start B",
             "display_name": "jolly roger"}
         )

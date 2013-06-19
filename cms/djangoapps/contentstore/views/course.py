@@ -416,6 +416,23 @@ def course_advanced_updates(request, org, course, name):
         return HttpResponse(response_json, mimetype="application/json")
 
 
+class TextbookValidationError(Exception):
+    pass
+
+
+def validate_textbook_json(text):
+    try:
+        obj = json.loads(text)
+    except ValueError:
+        raise TextbookValidationError("invalid JSON")
+    if not isinstance(obj, (list, tuple)):
+        raise TextbookValidationError("must be JSON list")
+    for textbook in obj:
+        if not textbook.get("tab_title"):
+            raise TextbookValidationError("every textbook must have a tab_title")
+    return obj
+
+
 @login_required
 @ensure_csrf_cookie
 def textbook_index(request, org, course, name):
@@ -433,18 +450,10 @@ def textbook_index(request, org, course, name):
             return HttpResponse(json.dumps(course_module.pdf_textbooks), content_type="application/json")
         elif request.method == 'POST':
             try:
-                obj = json.loads(request.raw_post_data)
-            except ValueError:
-                msg = {"error": "invalid JSON"}
+                course_module.pdf_textbooks = validate_textbook_json(request.body)
+            except TextbookValidationError as e:
+                msg = {"error": e.message}
                 return HttpResponseBadRequest(json.dumps(msg), content_type="application/json")
-            if not isinstance(obj, (list, tuple)):
-                msg = {"error": "must be JSON list"}
-                return HttpResponseBadRequest(json.dumps(msg), content_type="application/json")
-            for textbook in obj:
-                if not textbook.get("tab_title"):
-                    msg = {"error": "every textbook must have a tab_title"}
-                    return HttpResponseBadRequest(json.dumps(msg), content_type="application/json")
-            course_module.pdf_textbooks = obj
             if not any(tab['type'] == 'pdf_textbooks' for tab in course_module.tabs):
                 course_module.tabs.append({"type": "pdf_textbooks"})
             store.update_metadata(course_module.location, own_metadata(course_module))
