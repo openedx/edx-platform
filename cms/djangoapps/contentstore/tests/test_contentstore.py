@@ -43,11 +43,12 @@ from django_comment_common.utils import are_permissions_roles_seeded
 from xmodule.exceptions import InvalidVersionError
 import datetime
 from pytz import UTC
-#from uuid import uuid4
+from uuid import uuid4
+import pymongo
 
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
-TEST_DATA_CONTENTSTORE['OPTIONS']['db'] = 'test_xcontent_%s' % 4  #uuid4().hex
+TEST_DATA_CONTENTSTORE['OPTIONS']['db'] = 'test_xcontent_%s' % uuid4().hex
 
 
 class MongoCollectionFindWrapper(object):
@@ -88,7 +89,10 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.client = Client()
         self.client.login(username=uname, password=password)
 
-
+    def tearDown(self):
+        m = pymongo.MongoClient()
+        m.drop_database(TEST_DATA_CONTENTSTORE['OPTIONS']['db'])
+        #contentstore().fs_files.drop()
 
     def check_components_on_page(self, component_types, expected_types):
         """
@@ -449,7 +453,6 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         content_store = contentstore()
         trash_store = contentstore('trashcan')
         module_store = modulestore('direct')
-
         import_from_xml(module_store, 'common/test/data/', ['full'], static_content_store=content_store)
 
         # look up original (and thumbnail) in content store, should be there after import
@@ -852,6 +855,11 @@ class ContentStoreTest(ModuleStoreTestCase):
             'number': '999',
             'display_name': 'Robot Super Course',
         }
+
+    def tearDown(self):
+        m = pymongo.MongoClient()
+        m.drop_database(TEST_DATA_CONTENTSTORE['OPTIONS']['db'])
+        #contentstore().fs_files.drop()
 
     def test_create_course(self):
         """Test new course creation - happy path"""
