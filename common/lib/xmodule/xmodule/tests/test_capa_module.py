@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """Tests of the Capa XModule"""
 #pylint: disable=C0111
 #pylint: disable=R0904
@@ -515,6 +516,33 @@ class CapaModuleTest(unittest.TestCase):
 
             # Expect an AJAX alert message in 'success'
             expected_msg = 'Error: test error'
+            self.assertEqual(expected_msg, result['success'])
+
+            # Expect that the number of attempts is NOT incremented
+            self.assertEqual(module.attempts, 1)
+
+    def test_check_problem_error_nonascii(self):
+
+        # Try each exception that capa_module should handle
+        for exception_class in [StudentInputError,
+                                LoncapaProblemError,
+                                ResponseError]:
+
+            # Create the module
+            module = CapaFactory.create(attempts=1)
+
+            # Ensure that the user is NOT staff
+            module.system.user_is_staff = False
+
+            # Simulate answering a problem that raises the exception
+            with patch('capa.capa_problem.LoncapaProblem.grade_answers') as mock_grade:
+                mock_grade.side_effect = exception_class(u"ȧƈƈḗƞŧḗḓ ŧḗẋŧ ƒǿř ŧḗşŧīƞɠ")
+
+                get_request_dict = {CapaFactory.input_key(): '3.14'}
+                result = module.check_problem(get_request_dict)
+
+            # Expect an AJAX alert message in 'success'
+            expected_msg = u'Error: ȧƈƈḗƞŧḗḓ ŧḗẋŧ ƒǿř ŧḗşŧīƞɠ'
             self.assertEqual(expected_msg, result['success'])
 
             # Expect that the number of attempts is NOT incremented

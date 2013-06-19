@@ -781,7 +781,7 @@ class CapaModule(CapaFields, XModule):
             # Otherwise, display just an error message,
             # without a stack trace
             else:
-                msg = "Error: %s" % str(inst.message)
+                msg = u"Error: {msg}".format(msg=inst.message)
 
             return {'success': msg}
 
