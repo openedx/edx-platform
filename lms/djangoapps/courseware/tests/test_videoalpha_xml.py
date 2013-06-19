@@ -22,7 +22,7 @@ from django.conf import settings
 
 from xmodule.videoalpha_module import VideoAlphaDescriptor, VideoAlphaModule
 from xmodule.modulestore import Location
-from xmodule.tests import test_system
+from xmodule.tests import get_test_system
 from xmodule.tests.test_logic import LogicTest
 
 
@@ -58,7 +58,7 @@ class VideoAlphaFactory(object):
 
         descriptor = Mock(weight="1")
 
-        system = test_system()
+        system = get_test_system()
         system.render_template = lambda template, context: context
         VideoAlphaModule.location = location
         module = VideoAlphaModule(system, descriptor, model_data)
