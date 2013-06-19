@@ -21,7 +21,7 @@ body.course.settings {
     font-size: 14px;
   }
 
-  .message-status { 
+  .message-status {
     display: none;
     @include border-top-radius(2px);
     @include box-sizing(border-box);
@@ -51,6 +51,12 @@ body.course.settings {
       display: block;
     }
   }
+
+  // notices - used currently for edx mktg
+  .notice-workflow {
+    margin-top: ($baseline);
+  }
+
 
   // in form - elements
   .group-settings {
