@@ -55,8 +55,9 @@ def sass_cmd(watch=false, debug=false)
           "#{watch ? '--watch' : '--update'} -E utf-8 #{sass_watch_paths.join(' ')}"
 end
 
+# This task takes arguments purely to pass them via dependencies to the preprocess task
 desc "Compile all assets"
-multitask :assets => 'assets:all'
+task :assets, [:system, :env] => 'assets:all'
 
 namespace :assets do
 
@@ -80,8 +81,9 @@ namespace :assets do
     {:xmodule => [:install_python_prereqs],
      :coffee => [:install_node_prereqs, :'assets:coffee:clobber'],
      :sass => [:install_ruby_prereqs, :preprocess]}.each_pair do |asset_type, prereq_tasks|
+        # This task takes arguments purely to pass them via dependencies to the preprocess task
         desc "Compile all #{asset_type} assets"
-        task asset_type => prereq_tasks do
+        task asset_type, [:system, :env] => prereq_tasks do |t, args|
             cmd = send(asset_type.to_s + "_cmd", watch=false, debug=false)
             if cmd.kind_of?(Array)
                 cmd.each {|c| sh(c)}
@@ -90,7 +92,8 @@ namespace :assets do
             end
         end
 
-        multitask :all => asset_type
+        # This task takes arguments purely to pass them via dependencies to the preprocess task
+        multitask :all, [:system, :env] => asset_type
         multitask :debug => "assets:#{asset_type}:debug"
         multitask :_watch => "assets:#{asset_type}:_watch"
 
