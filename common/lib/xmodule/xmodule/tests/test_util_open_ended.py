@@ -52,4 +52,4 @@ class DummyModulestore(object):
         if not isinstance(location, Location):
             location = Location(location)
         descriptor = self.modulestore.get_instance(course.id, location, depth=None)
-        return descriptor.xmodule(self.get_test_system)
+        return descriptor.xmodule(self.test_system)

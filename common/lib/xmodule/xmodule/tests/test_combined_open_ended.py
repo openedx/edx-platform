@@ -68,8 +68,8 @@ class OpenEndedChildTest(unittest.TestCase):
     descriptor = Mock()
 
     def setUp(self):
-        self.get_test_system = get_test_system()
-        self.openendedchild = OpenEndedChild(self.get_test_system, self.location,
+        self.test_system = get_test_system()
+        self.openendedchild = OpenEndedChild(self.test_system, self.location,
                                              self.definition, self.descriptor, self.static_data, self.metadata)
 
     def test_latest_answer_empty(self):
@@ -81,7 +81,7 @@ class OpenEndedChildTest(unittest.TestCase):
         self.assertEqual(answer, None)
 
     def test_latest_post_assessment_empty(self):
-        answer = self.openendedchild.latest_post_assessment(self.get_test_system)
+        answer = self.openendedchild.latest_post_assessment(self.test_system)
         self.assertEqual(answer, "")
 
     def test_new_history_entry(self):
@@ -116,7 +116,7 @@ class OpenEndedChildTest(unittest.TestCase):
         post_assessment = "Post assessment"
         self.openendedchild.record_latest_post_assessment(post_assessment)
         self.assertEqual(post_assessment,
-                         self.openendedchild.latest_post_assessment(self.get_test_system))
+                         self.openendedchild.latest_post_assessment(self.test_system))
 
     def test_get_score(self):
         new_answer = "New Answer"
@@ -134,7 +134,7 @@ class OpenEndedChildTest(unittest.TestCase):
         self.assertEqual(score['total'], self.static_data['max_score'])
 
     def test_reset(self):
-        self.openendedchild.reset(self.get_test_system)
+        self.openendedchild.reset(self.test_system)
         state = json.loads(self.openendedchild.get_instance_state())
         self.assertEqual(state['child_state'], OpenEndedChild.INITIAL)
 
@@ -192,19 +192,19 @@ class OpenEndedModuleTest(unittest.TestCase):
     descriptor = Mock()
 
     def setUp(self):
-        self.get_test_system = get_test_system()
+        self.test_system = get_test_system()
 
-        self.get_test_system.location = self.location
+        self.test_system.location = self.location
         self.mock_xqueue = MagicMock()
         self.mock_xqueue.send_to_queue.return_value = (None, "Message")
 
         def constructed_callback(dispatch="score_update"):
             return dispatch
 
-        self.get_test_system.xqueue = {'interface': self.mock_xqueue, 'construct_callback': constructed_callback,
+        self.test_system.xqueue = {'interface': self.mock_xqueue, 'construct_callback': constructed_callback,
                                    'default_queuename': 'testqueue',
                                    'waittime': 1}
-        self.openendedmodule = OpenEndedModule(self.get_test_system, self.location,
+        self.openendedmodule = OpenEndedModule(self.test_system, self.location,
                                                self.definition, self.descriptor, self.static_data, self.metadata)
 
     def test_message_post(self):
@@ -213,7 +213,7 @@ class OpenEndedModuleTest(unittest.TestCase):
                'grader_id': '1',
                'score': 3}
         qtime = datetime.strftime(datetime.now(), xqueue_interface.dateformat)
-        student_info = {'anonymous_student_id': self.get_test_system.anonymous_student_id,
+        student_info = {'anonymous_student_id': self.test_system.anonymous_student_id,
                         'submission_time': qtime}
         contents = {
             'feedback': get['feedback'],
@@ -223,7 +223,7 @@ class OpenEndedModuleTest(unittest.TestCase):
             'student_info': json.dumps(student_info)
         }
 
-        result = self.openendedmodule.message_post(get, self.get_test_system)
+        result = self.openendedmodule.message_post(get, self.test_system)
         self.assertTrue(result['success'])
         # make sure it's actually sending something we want to the queue
         self.mock_xqueue.send_to_queue.assert_called_with(body=json.dumps(contents), header=ANY)
@@ -234,7 +234,7 @@ class OpenEndedModuleTest(unittest.TestCase):
     def test_send_to_grader(self):
         submission = "This is a student submission"
         qtime = datetime.strftime(datetime.now(), xqueue_interface.dateformat)
-        student_info = {'anonymous_student_id': self.get_test_system.anonymous_student_id,
+        student_info = {'anonymous_student_id': self.test_system.anonymous_student_id,
                         'submission_time': qtime}
         contents = self.openendedmodule.payload.copy()
         contents.update({
@@ -242,7 +242,7 @@ class OpenEndedModuleTest(unittest.TestCase):
             'student_response': submission,
             'max_score': self.max_score
         })
-        result = self.openendedmodule.send_to_grader(submission, self.get_test_system)
+        result = self.openendedmodule.send_to_grader(submission, self.test_system)
         self.assertTrue(result)
         self.mock_xqueue.send_to_queue.assert_called_with(body=json.dumps(contents), header=ANY)
 
@@ -256,7 +256,7 @@ class OpenEndedModuleTest(unittest.TestCase):
         }
         get = {'queuekey': "abcd",
                'xqueue_body': score_msg}
-        self.openendedmodule.update_score(get, self.get_test_system)
+        self.openendedmodule.update_score(get, self.test_system)
 
     def update_score_single(self):
         self.openendedmodule.new_history_entry("New Entry")
@@ -279,11 +279,11 @@ class OpenEndedModuleTest(unittest.TestCase):
         }
         get = {'queuekey': "abcd",
                'xqueue_body': json.dumps(score_msg)}
-        self.openendedmodule.update_score(get, self.get_test_system)
+        self.openendedmodule.update_score(get, self.test_system)
 
     def test_latest_post_assessment(self):
         self.update_score_single()
-        assessment = self.openendedmodule.latest_post_assessment(self.get_test_system)
+        assessment = self.openendedmodule.latest_post_assessment(self.test_system)
         self.assertFalse(assessment == '')
         # check for errors
         self.assertFalse('errors' in assessment)
@@ -367,9 +367,9 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
     definition = {'prompt': etree.XML(prompt), 'rubric': etree.XML(rubric), 'task_xml': [task_xml1, task_xml2]}
     full_definition = definition_template.format(prompt=prompt, rubric=rubric, task1=task_xml1, task2=task_xml2)
     descriptor = Mock(data=full_definition)
-    get_test_system = get_test_system()
+    test_system = get_test_system()
     combinedoe_container = CombinedOpenEndedModule(
-        get_test_system,
+        test_system,
         descriptor,
         model_data={
             'data': full_definition,
@@ -381,7 +381,7 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
     def setUp(self):
         # TODO: this constructor call is definitely wrong, but neither branch
         # of the merge matches the module constructor.  Someone (Vik?) should fix this.
-        self.combinedoe = CombinedOpenEndedV1Module(self.get_test_system,
+        self.combinedoe = CombinedOpenEndedV1Module(self.test_system,
                                                     self.location,
                                                     self.definition,
                                                     self.descriptor,
@@ -441,7 +441,7 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
         for xml in xml_to_test:
             definition = {'prompt': etree.XML(self.prompt), 'rubric': etree.XML(self.rubric), 'task_xml': xml}
             descriptor = Mock(data=definition)
-            combinedoe = CombinedOpenEndedV1Module(self.get_test_system,
+            combinedoe = CombinedOpenEndedV1Module(self.test_system,
                                                    self.location,
                                                    definition,
                                                    descriptor,
@@ -471,7 +471,7 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
         definition = {'prompt': etree.XML(self.prompt), 'rubric': etree.XML(rubric),
                       'task_xml': [self.task_xml1, self.task_xml2]}
         descriptor = Mock(data=definition)
-        combinedoe = CombinedOpenEndedV1Module(self.get_test_system,
+        combinedoe = CombinedOpenEndedV1Module(self.test_system,
                                                self.location,
                                                definition,
                                                descriptor,
@@ -493,8 +493,8 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
     hint = "blah"
 
     def setUp(self):
-        self.get_test_system = get_test_system()
-        self.get_test_system.xqueue['interface'] = Mock(
+        self.test_system = get_test_system()
+        self.test_system.xqueue['interface'] = Mock(
             send_to_queue=Mock(side_effect=[1, "queued"])
         )
         self.setup_modulestore(COURSE)
@@ -569,6 +569,7 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
         #Mock a student submitting an assessment
         assessment_dict = MockQueryDict()
         assessment_dict.update({'assessment': sum(assessment), 'score_list[]': assessment})
+        #from nose.tools import set_trace; set_trace()
         module.handle_ajax("save_assessment", assessment_dict)
         task_one_json = json.loads(module.task_states[0])
         self.assertEqual(json.loads(task_one_json['child_history'][0]['post_assessment']), assessment)

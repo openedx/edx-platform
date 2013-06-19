@@ -39,8 +39,8 @@ class PeerGradingModuleTest(unittest.TestCase, DummyModulestore):
         Create a peer grading module from a test system
         @return:
         """
-        self.get_test_system = get_test_system()
-        self.get_test_system.open_ended_grading_interface = None
+        self.test_system = get_test_system()
+        self.test_system.open_ended_grading_interface = None
         self.setup_modulestore(COURSE)
         self.peer_grading = self.get_module_from_location(self.problem_location, COURSE)
 
@@ -151,8 +151,8 @@ class PeerGradingModuleScoredTest(unittest.TestCase, DummyModulestore):
         Create a peer grading module from a test system
         @return:
         """
-        self.get_test_system = get_test_system()
-        self.get_test_system.open_ended_grading_interface = None
+        self.test_system = get_test_system()
+        self.test_system.open_ended_grading_interface = None
         self.setup_modulestore(COURSE)
 
     def test_metadata_load(self):
