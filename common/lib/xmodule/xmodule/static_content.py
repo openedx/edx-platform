@@ -121,15 +121,23 @@ def _write_js(output_root, classes):
             type=filetype)
         contents[filename] = fragment
 
-    _write_files(output_root, contents)
+    _write_files(output_root, contents, {'.coffee': '.js'})
 
     return [output_root / filename for filename in contents.keys()]
 
 
-def _write_files(output_root, contents):
+def _write_files(output_root, contents, generated_suffix_map=None):
     _ensure_dir(output_root)
-    for extra_file in set(output_root.files()) - set(contents.keys()):
-        extra_file.remove_p()
+    to_delete = set(file.basename() for file in output_root.files()) - set(contents.keys())
+
+    if generated_suffix_map:
+        for output_file in contents.keys():
+            for suffix, generated_suffix in generated_suffix_map.items():
+                if output_file.endswith(suffix):
+                    to_delete.discard(output_file.replace(suffix, generated_suffix))
+
+    for extra_file in to_delete:
+        (output_root / extra_file).remove_p()
 
     for filename, file_content in contents.iteritems():
         (output_root / filename).write_bytes(file_content)
