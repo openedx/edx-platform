@@ -49,7 +49,7 @@ def css_has_text(css_selector, text):
 
 @world.absorb
 def css_find(css, wait_time=5):
-    def is_visible(driver):
+    def is_visible(_driver):
         return EC.visibility_of_element_located((By.CSS_SELECTOR, css,))
 
     world.browser.is_element_present_by_css(css, wait_time=wait_time)
@@ -58,7 +58,7 @@ def css_find(css, wait_time=5):
 
 
 @world.absorb
-def css_click(css_selector, index=0, attempts=5, success_condition=lambda:True):
+def css_click(css_selector, index=0, attempts=5, success_condition=lambda: True):
     """
     Perform a click on a CSS selector, retrying if it initially fails.
 
@@ -90,15 +90,15 @@ def css_click(css_selector, index=0, attempts=5, success_condition=lambda:True):
 
 
 @world.absorb
-def css_click_at(css, x=10, y=10):
+def css_click_at(css, x_cord=10, y_cord=10):
     '''
     A method to click at x,y coordinates of the element
     rather than in the center of the element
     '''
-    e = css_find(css).first
-    e.action_chains.move_to_element_with_offset(e._element, x, y)
-    e.action_chains.click()
-    e.action_chains.perform()
+    element = css_find(css).first
+    element.action_chains.move_to_element_with_offset(element._element, x_cord, y_cord)
+    element.action_chains.click()
+    element.action_chains.perform()
 
 
 @world.absorb
@@ -143,7 +143,7 @@ def css_visible(css_selector):
 
 @world.absorb
 def dialogs_closed():
-    def are_dialogs_closed(driver):
+    def are_dialogs_closed(_driver):
         '''
         Return True when no modal dialogs are visible
         '''
@@ -154,12 +154,12 @@ def dialogs_closed():
 
 @world.absorb
 def save_the_html(path='/tmp'):
-    u = world.browser.url
+    url = world.browser.url
     html = world.browser.html.encode('ascii', 'ignore')
-    filename = '%s.html' % quote_plus(u)
-    f = open('%s/%s' % (path, filename), 'w')
-    f.write(html)
-    f.close()
+    filename = '%s.html' % quote_plus(url)
+    file = open('%s/%s' % (path, filename), 'w')
+    file.write(html)
+    file.close()
 
 
 @world.absorb
