@@ -135,12 +135,10 @@ def action_button_present(_step, buttonname, doesnt_appear):
 
 @step(u'the button with the label "([^"]*)" does( not)? appear')
 def button_with_label_present(step, buttonname, doesnt_appear):
-    button_css = 'button span.show-label'
-    elem = world.css_find(button_css).first
     if doesnt_appear:
-        assert_not_equal(elem.text, buttonname)
+        world.browser.is_text_not_present(buttonname, wait_time=5)
     else:
-        assert_equal(elem.text, buttonname)
+        world.browser.is_text_present(buttonname, wait_time=5)
 
 
 @step(u'My "([^"]*)" answer is marked "([^"]*)"')
