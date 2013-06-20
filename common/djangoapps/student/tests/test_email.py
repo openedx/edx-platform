@@ -55,11 +55,15 @@ class ReactivationEmailTests(EmailTestMixin, TestCase):
 
     def setUp(self):
         self.user = UserFactory.create()
+        self.unregisteredUser = UserFactory.create()
         self.registration = RegistrationFactory.create(user=self.user)
 
-    def reactivation_email(self):
-        """Send the reactivation email, and return the response as json data"""
-        return json.loads(reactivation_email_for_user(self.user).content)
+    def reactivation_email(self, user):
+        """
+        Send the reactivation email to the specified user,
+        and return the response as json data.
+        """
+        return json.loads(reactivation_email_for_user(user).content)
 
     def assertReactivateEmailSent(self, email_user):
         """Assert that the correct reactivation email has been sent"""
@@ -78,13 +82,22 @@ class ReactivationEmailTests(EmailTestMixin, TestCase):
 
     def test_reactivation_email_failure(self, email_user):
         self.user.email_user.side_effect = Exception
-        response_data = self.reactivation_email()
+        response_data = self.reactivation_email(self.user)
 
         self.assertReactivateEmailSent(email_user)
         self.assertFalse(response_data['success'])
 
+    def test_reactivation_for_unregistered_user(self, email_user):
+        """
+        Test that trying to send a reactivation email to an unregistered
+        user fails without throwing a 500 error.
+        """
+        response_data = self.reactivation_email(self.unregisteredUser)
+
+        self.assertFalse(response_data['success'])
+
     def test_reactivation_email_success(self, email_user):
-        response_data = self.reactivation_email()
+        response_data = self.reactivation_email(self.user)
 
         self.assertReactivateEmailSent(email_user)
         self.assertTrue(response_data['success'])
@@ -150,7 +163,7 @@ class EmailChangeRequestTests(TestCase):
         self.check_duplicate_email(self.new_email)
 
     def test_capitalized_duplicate_email(self):
-        raise SkipTest("We currently don't check for emails in a case insensitive way, but we should")
+        """Test that we check for email addresses in a case insensitive way"""
         UserFactory.create(email=self.new_email)
         self.check_duplicate_email(self.new_email.capitalize())
 
