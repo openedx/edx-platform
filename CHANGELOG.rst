@@ -14,6 +14,8 @@ the associated javascript)
 Common: Make asset watchers run as singletons (so they won't start if the
 watcher is already running in another shell).
 
+Common: Use coffee directly when watching for coffeescript file changes.
+
 Common: Make rake provide better error messages if packages are missing.
 
 Common: Repairs development documentation generation by sphinx.
