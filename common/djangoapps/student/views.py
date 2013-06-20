@@ -80,7 +80,7 @@ def index(request, extra_context={}, user=None):
     # The course selection work is done in courseware.courses.
     domain = settings.MITX_FEATURES.get('FORCE_UNIVERSITY_DOMAIN')  # normally False
     # do explicit check, because domain=None is valid
-    if domain == False:
+    if domain is False:
         domain = request.META.get('HTTP_HOST')
 
     courses = get_courses(None, domain=domain)
@@ -178,7 +178,7 @@ def _cert_info(user, course, cert_status):
         CertificateStatuses.downloadable: 'ready',
         CertificateStatuses.notpassing: 'notpassing',
         CertificateStatuses.restricted: 'restricted',
-        }
+    }
 
     status = template_state.get(cert_status['status'], default_status)
 
@@ -187,10 +187,10 @@ def _cert_info(user, course, cert_status):
          'show_disabled_download_button': status == 'generating', }
 
     if (status in ('generating', 'ready', 'notpassing', 'restricted') and
-        course.end_of_course_survey_url is not None):
+            course.end_of_course_survey_url is not None):
         d.update({
-         'show_survey_button': True,
-         'survey_url': process_survey_link(course.end_of_course_survey_url, user)})
+            'show_survey_button': True,
+            'survey_url': process_survey_link(course.end_of_course_survey_url, user)})
     else:
         d['show_survey_button'] = False
 
@@ -971,7 +971,11 @@ def reactivation_email(request):
 
 
 def reactivation_email_for_user(user):
-    reg = Registration.objects.get(user=user)
+    try:
+        reg = Registration.objects.get(user=user)
+    except Registration.DoesNotExist:
+        return HttpResponse(json.dumps({'success': False,
+                                        'error': 'No inactive user with this e-mail exists'}))
 
     d = {'name': user.profile.name,
          'key': reg.activation_key}
