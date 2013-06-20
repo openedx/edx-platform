@@ -281,11 +281,11 @@ def add_problem_to_course(course, problem_type, extraMeta=None):
 
 
 def inputfield(problem_type, choice=None, input_num=1):
-    """ Return the css element for *problem_type*.
+    """ Return the css selector for `problem_type`.
     For example, if problem_type is 'string', return
     the text field for the string problem in the test course.
 
-    *choice* is the name of the checkbox input in a group
+    `choice` is the name of the checkbox input in a group
     of checkboxes. """
 
     sel = ("input#input_i4x-edx-model_course-problem-%s_2_%s" %
