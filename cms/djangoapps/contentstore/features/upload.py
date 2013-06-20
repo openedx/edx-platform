@@ -13,7 +13,7 @@ HTTP_PREFIX = "http://localhost:8001"
 
 
 @step(u'I go to the files and uploads page')
-def go_to_uploads(step):
+def go_to_uploads(_step):
     menu_css = 'li.nav-course-courseware'
     uploads_css = '.nav-course-courseware-uploads'
     world.css_find(menu_css).click()
@@ -21,7 +21,7 @@ def go_to_uploads(step):
 
 
 @step(u'I upload the file "([^"]*)"$')
-def upload_file(step, file_name):
+def upload_file(_step, file_name):
     upload_css = '.upload-button'
     world.css_find(upload_css).click()
 
@@ -36,7 +36,7 @@ def upload_file(step, file_name):
 
 
 @step(u'I should( not)? see the file "([^"]*)" was uploaded$')
-def check_upload(step, do_not_see_file, file_name):
+def check_upload(_step, do_not_see_file, file_name):
     index = get_index(file_name)
     if do_not_see_file:
         assert index == -1
@@ -45,13 +45,13 @@ def check_upload(step, do_not_see_file, file_name):
 
 
 @step(u'The url for the file "([^"]*)" is valid$')
-def check_url(step, file_name):
+def check_url(_step, file_name):
     r = get_file(file_name)
     assert r.status_code == 200
 
 
 @step(u'I delete the file "([^"]*)"$')
-def delete_file(step, file_name):
+def delete_file(_step, file_name):
     index = get_index(file_name)
     assert index != -1
     delete_css = ".remove-asset-button"
@@ -62,7 +62,7 @@ def delete_file(step, file_name):
 
 
 @step(u'I should see only one "([^"]*)"$')
-def no_duplicate(step, file_name):
+def no_duplicate(_step, file_name):
     names_css = '.name-col > a.filename'
     all_names = world.css_find(names_css)
     only_one = False
@@ -73,7 +73,7 @@ def no_duplicate(step, file_name):
 
 
 @step(u'I can download the correct "([^"]*)" file$')
-def check_download(step, file_name):
+def check_download(_step, file_name):
     path = os.path.join(TEST_ROOT, 'uploads/', file_name)
     with open(os.path.abspath(path), 'r') as cur_file:
         cur_text = cur_file.read()
@@ -83,7 +83,7 @@ def check_download(step, file_name):
 
 
 @step(u'I modify "([^"]*)"$')
-def modify_upload(step, file_name):
+def modify_upload(_step, file_name):
     new_text = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(10))
     path = os.path.join(TEST_ROOT, 'uploads/', file_name)
     with open(os.path.abspath(path), 'w') as cur_file:

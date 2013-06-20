@@ -6,7 +6,7 @@ from selenium.webdriver.common.keys import Keys
 
 
 @step(u'I go to the static pages page')
-def go_to_uploads(step):
+def go_to_uploads(_step):
     menu_css = 'li.nav-course-courseware'
     uploads_css = '.nav-course-courseware-pages'
     world.css_find(menu_css).click()
@@ -14,13 +14,13 @@ def go_to_uploads(step):
 
 
 @step(u'I add a new page')
-def add_page(step):
+def add_page(_step):
     button_css = '.new-button'
     world.css_find(button_css).click()
 
 
 @step(u'I should( not)? see a "([^"]*)" static page$')
-def see_page(step, doesnt, page):
+def see_page(_step, doesnt, page):
     index = get_index(page)
     if doesnt:
         assert index == -1
@@ -29,7 +29,7 @@ def see_page(step, doesnt, page):
 
 
 @step(u'I "([^"]*)" the "([^"]*)" page$')
-def click_edit_delete(step, edit_delete, page):
+def click_edit_delete(_step, edit_delete, page):
     button_css = '.%s-button' % edit_delete
     index = get_index(page)
     assert index != -1
@@ -37,7 +37,7 @@ def click_edit_delete(step, edit_delete, page):
 
 
 @step(u'I change the name to "([^"]*)"$')
-def change_name(step, new_name):
+def change_name(_step, new_name):
     settings_css = '#settings-mode'
     world.css_find(settings_css).click()
     input_css = '.setting-input'

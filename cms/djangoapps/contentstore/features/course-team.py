@@ -9,19 +9,19 @@ EMAIL_EXTENSION = '@edx.org'
 
 
 @step(u'I am viewing the course team settings')
-def view_grading_settings(step):
+def view_grading_settings(_step):
     world.click_course_settings()
     link_css = 'li.nav-course-settings-team a'
     world.css_click(link_css)
 
 
 @step(u'The user "([^"]*)" exists$')
-def create_other_user(step, name):
+def create_other_user(_step, name):
     create_studio_user(uname=name, password=PASSWORD, email=(name + EMAIL_EXTENSION))
 
 
 @step(u'I add "([^"]*)" to the course team')
-def add_other_user(step, name):
+def add_other_user(_step, name):
     new_user_css = 'a.new-user-button'
     world.css_click(new_user_css)
 
@@ -34,18 +34,18 @@ def add_other_user(step, name):
 
 
 @step(u'I delete "([^"]*)" from the course team')
-def delete_other_user(step, name):
+def delete_other_user(_step, name):
     to_delete_css = '.remove-user[data-id="{name}{extension}"]'.format(name=name, extension=EMAIL_EXTENSION)
     world.css_click(to_delete_css)
 
 
 @step(u'"([^"]*)" logs in$')
-def other_user_login(step, name):
+def other_user_login(_step, name):
     log_into_studio(uname=name, password=PASSWORD, email=name + EMAIL_EXTENSION)
 
 
 @step(u'He does( not)? see the course on his page')
-def see_course(step, doesnt_see_course):
+def see_course(_step, doesnt_see_course):
     class_css = '.class-name'
     all_courses = world.css_find(class_css)
     all_names = [item.html for item in all_courses]
@@ -56,12 +56,12 @@ def see_course(step, doesnt_see_course):
 
 
 @step(u'He cannot delete users')
-def cannot_delete(step):
+def cannot_delete(_step):
     to_delete_css = '.remove-user'
     assert world.is_css_not_present(to_delete_css)
 
 
 @step(u'He cannot add users')
-def cannot_add(step):
+def cannot_add(_step):
     add_css = '.new-user'
     assert world.is_css_not_present(add_css)

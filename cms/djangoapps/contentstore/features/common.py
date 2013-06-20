@@ -3,7 +3,6 @@
 
 from lettuce import world, step
 from nose.tools import assert_true
-from nose.tools import assert_equal
 
 from auth.authz import get_user_by_email
 
@@ -13,11 +12,12 @@ import time
 from logging import getLogger
 logger = getLogger(__name__)
 
-COURSE_NAME = 'Robot Super Course'
-COURSE_NUM = '999'
-COURSE_ORG = 'MITx'
+_COURSE_NAME = 'Robot Super Course'
+_COURSE_NUM = '999'
+_COURSE_ORG = 'MITx'
 
 ###########  STEP HELPERS ##############
+
 
 @step('I (?:visit|access|open) the Studio homepage$')
 def i_visit_the_studio_homepage(_step):
@@ -78,10 +78,11 @@ def create_studio_user(
     registration.register(studio_user)
     registration.activate()
 
+
 def fill_in_course_info(
-        name=COURSE_NAME,
-        org=COURSE_ORG,
-        num=COURSE_NUM):
+        name=_COURSE_NAME,
+        org=_COURSE_ORG,
+        num=_COURSE_NUM):
     world.css_fill('.new-course-name', name)
     world.css_fill('.new-course-org', org)
     world.css_fill('.new-course-number', num)
@@ -108,14 +109,14 @@ def log_into_studio(
 
 
 def create_a_course():
-    c = world.CourseFactory.create(org=COURSE_ORG, course=COURSE_NUM, display_name=COURSE_NAME)
+    world.CourseFactory.create(org=_COURSE_ORG, course=_COURSE_NUM, display_name=_COURSE_NAME)
 
     # Add the user to the instructor group of the course
     # so they will have the permissions to see it in studio
-    g = world.GroupFactory.create(name='instructor_MITx/{course_num}/{course_name}'.format(course_num=COURSE_NUM, course_name=COURSE_NAME.replace(" ", "_")))
-    u = get_user_by_email('robot+studio@edx.org')
-    u.groups.add(g)
-    u.save()
+    course = world.GroupFactory.create(name='instructor_MITx/{course_num}/{course_name}'.format(course_num=_COURSE_NUM, course_name=_COURSE_NAME.replace(" ", "_")))
+    user = get_user_by_email('robot+studio@edx.org')
+    user.groups.add(course)
+    user.save()
     world.browser.reload()
 
     course_link_css = 'span.class-name'
