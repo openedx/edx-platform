@@ -1,5 +1,3 @@
-require './rakefiles/helpers.rb'
-
 PREREQS_MD5_DIR = ENV["PREREQ_CACHE_DIR"] || File.join(REPO_ROOT, '.prereqs_cache')
 
 CLOBBER.include(PREREQS_MD5_DIR)
