@@ -2,7 +2,7 @@
 #pylint: disable=W0621
 
 from lettuce import world, step
-from common import create_studio_user, log_into_studio, COURSE_NAME
+from common import create_studio_user, log_into_studio, _COURSE_NAME
 
 PASSWORD = 'test'
 EMAIL_EXTENSION = '@edx.org'
@@ -35,7 +35,7 @@ def add_other_user(_step, name):
 
 @step(u'I delete "([^"]*)" from the course team')
 def delete_other_user(_step, name):
-    to_delete_css = '.remove-user[data-id="{name}{extension}"]'.format(name=name, extension=EMAIL_EXTENSION)
+    to_delete_css = 'a.remove-user[data-id="{name}{extension}"]'.format(name=name, extension=EMAIL_EXTENSION)
     world.css_click(to_delete_css)
 
 
@@ -46,22 +46,22 @@ def other_user_login(_step, name):
 
 @step(u'He does( not)? see the course on his page')
 def see_course(_step, doesnt_see_course):
-    class_css = '.class-name'
+    class_css = 'span.class-name'
     all_courses = world.css_find(class_css)
     all_names = [item.html for item in all_courses]
     if doesnt_see_course:
-        assert not COURSE_NAME in all_names
+        assert not _COURSE_NAME in all_names
     else:
-        assert COURSE_NAME in all_names
+        assert _COURSE_NAME in all_names
 
 
 @step(u'He cannot delete users')
 def cannot_delete(_step):
-    to_delete_css = '.remove-user'
+    to_delete_css = 'a.remove-user'
     assert world.is_css_not_present(to_delete_css)
 
 
 @step(u'He cannot add users')
 def cannot_add(_step):
-    add_css = '.new-user'
+    add_css = 'a.new-user'
     assert world.is_css_not_present(add_css)

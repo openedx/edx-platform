@@ -15,23 +15,23 @@ HTTP_PREFIX = "http://localhost:8001"
 @step(u'I go to the files and uploads page')
 def go_to_uploads(_step):
     menu_css = 'li.nav-course-courseware'
-    uploads_css = '.nav-course-courseware-uploads'
+    uploads_css = 'li.nav-course-courseware-uploads'
     world.css_find(menu_css).click()
     world.css_find(uploads_css).click()
 
 
 @step(u'I upload the file "([^"]*)"$')
 def upload_file(_step, file_name):
-    upload_css = '.upload-button'
+    upload_css = 'a.upload-button'
     world.css_find(upload_css).click()
 
-    file_css = '.file-input'
+    file_css = 'input.file-input'
     upload = world.css_find(file_css)
     #uploading the file itself
     path = os.path.join(TEST_ROOT, 'uploads/', file_name)
     upload._element.send_keys(os.path.abspath(path))
 
-    close_css = '.close-button'
+    close_css = 'a.close-button'
     world.css_find(close_css).click()
 
 
@@ -54,7 +54,8 @@ def check_url(_step, file_name):
 def delete_file(_step, file_name):
     index = get_index(file_name)
     assert index != -1
-    delete_css = ".remove-asset-button"
+    from pdb import set_trace; set_trace()
+    delete_css = "a.remove-asset-button"
     world.css_click(delete_css, index=index)
 
     prompt_confirm_css = 'li.nav-item > a.action-primary'
@@ -63,7 +64,7 @@ def delete_file(_step, file_name):
 
 @step(u'I should see only one "([^"]*)"$')
 def no_duplicate(_step, file_name):
-    names_css = '.name-col > a.filename'
+    names_css = 'td.name-col > a.filename'
     all_names = world.css_find(names_css)
     only_one = False
     for i in range(len(all_names)):
@@ -91,7 +92,7 @@ def modify_upload(_step, file_name):
 
 
 def get_index(file_name):
-    names_css = '.name-col > a.filename'
+    names_css = 'td.name-col > a.filename'
     all_names = world.css_find(names_css)
     for i in range(len(all_names)):
         if file_name == all_names[i].html:
