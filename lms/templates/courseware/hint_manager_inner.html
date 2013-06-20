@@ -1,0 +1,39 @@
+<%block name="main">
+<div id="field-label" style="display:none"> ${field} </div>
+
+<h1> ${field_label} </h1>
+Switch to <a id="switch-fields" other-field="${other_field}"> ${other_field_label} </a>
+
+
+% for problem in all_hints:
+    <h2> Problem: ${problem.definition_id} </h2>
+    <% 
+        import json
+        loaded_json = json.loads(problem.value).items()
+    %>
+    % for answer, hint_dict in loaded_json:
+        <h4> Answer: ${answer} </h4>
+        % for pk, hint in hint_dict.items():
+            <p data-problem="${problem.definition_id}" data-pk="${pk}" data-answer="${answer}">
+                <input class="hint-select" type="checkbox"/> ${hint[0]}
+                <br /> 
+                Votes: <input type="text" class="votes" value="${str(hint[1])}"></input>
+            </p>
+        % endfor
+    % endfor        
+
+    <h4> Add a hint to this problem </h4>
+    Answer (exact formatting):
+    <input type="text" id="new-hint-answer-${problem.definition_id}"/>
+    <br /> 
+    Hint: <br />
+    <textarea cols="50" style="height:200px" id="new-hint-${problem.definition_id}"></textarea>
+    <br />
+    <button class="submit-new-hint" data-problem="${problem.definition_id}"> Submit </button>
+    <br />
+% endfor
+
+<button id="hint-delete"> Delete selected </button> <button id="update-votes"> Update votes </button>
+   
+
+</%block>
