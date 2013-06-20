@@ -94,26 +94,26 @@ class BatchEnrollment
 
 
 # manages a list of instructors or staff and the control of their access.
-class AuthorityList
-  # level is in ['instructor', 'staff']
-  constructor: (@$container, @level) ->
-    log 'setting up instructor dashboard subsection - authlist management for #{@level}'
+class AuthList
+  # rolename is in ['instructor', 'staff'] for instructor_staff endpoints
+  # rolename is the name of Role for forums for the forum endpoints
+  constructor: (@$container, @rolename) ->
+    log "setting up instructor dashboard subsection - authlist management for #{@rolename}"
 
     @$display_table = @$container.find('.auth-list-table')
-    $add_section = @$container.find('.auth-list-add')
-    $allow_field = $add_section.find("input[name='email']")
-    $allow_button = $add_section.find("input[name='allow']")
-    @list_endpoint = @$display_table.data 'endpoint'
-    @access_change_endpoint = $add_section.data 'endpoint'
+    @$add_section   = @$container.find('.auth-list-add')
+    $allow_field    = @$add_section.find("input[name='email']")
+    $allow_button   = @$add_section.find("input[name='allow']")
 
     $allow_button.click =>
-      @access_change($allow_field.val(), @level, 'allow', @reload_auth_list)
+      @access_change($allow_field.val(), @rolename, 'allow', @reload_auth_list)
       $allow_field.val ''
 
     @reload_auth_list()
 
   reload_auth_list: =>
-    $.getJSON @list_endpoint, (data) =>
+    list_endpoint = @$display_table.data 'endpoint'
+    $.getJSON list_endpoint, {rolename: @rolename}, (data) =>
       log data
 
       @$display_table.empty()
@@ -138,7 +138,7 @@ class AuthorityList
           "<span class='revoke-link'>Revoke Access</span>"
       ]
 
-      table_data = data[@level]
+      table_data = data[@rolename]
       log 'table_data', table_data
 
       $table_placeholder = $ '<div/>', class: 'slickgrid'
@@ -150,11 +150,11 @@ class AuthorityList
       grid.onClick.subscribe (e, args) =>
         item = args.grid.getDataItem(args.row)
         if args.cell is 2
-          @access_change(item.email, @level, 'revoke', @reload_auth_list)
+          @access_change(item.email, @rolename, 'revoke', @reload_auth_list)
 
-  access_change: (email, level, mode, cb) ->
-    url = @access_change_endpoint
-    $.getJSON @access_change_endpoint, {email: email, level: @level, mode: mode}, (data) ->
+  access_change: (email, rolename, mode, cb) ->
+    access_change_endpoint = @$add_section.data 'endpoint'
+    $.getJSON access_change_endpoint, {email: email, rolename: @rolename, mode: mode}, (data) ->
       log data
       cb?()
 
@@ -166,14 +166,30 @@ class Membership
 
     # isolate sections from each other's errors.
     plantTimeout 0, => @batchenrollment = new BatchEnrollment @$section.find '.batch-enrollment'
-    plantTimeout 0, => @stafflist       = new AuthorityList (@$section.find '.auth-list-container.auth-list-staff'), 'staff'
-    plantTimeout 0, => @instructorlist  = new AuthorityList (@$section.find '.auth-list-container.auth-list-instructor'), 'instructor'
+    plantTimeout 0, => @stafflist       = new AuthList (@$section.find '.auth-list-container.auth-list-staff'), 'staff'
+    plantTimeout 0, => @instructorlist  = new AuthList (@$section.find '.auth-list-container.auth-list-instructor'), 'instructor'
+
+    # TODO names like 'Administrator' should come from server through template.
+    plantTimeout 0, => @forum_admin_list  = new AuthList (@$section.find '.auth-list-container.auth-list-forum-admin'),        'Administrator'
+    plantTimeout 0, => @forum_mod_list  = new AuthList (@$section.find '.auth-list-container.auth-list-forum-moderator'),    'Moderator'
+    plantTimeout 0, => @forum_comta_list  = new AuthList (@$section.find '.auth-list-container.auth-list-forum-community-ta'), 'Community TA'
 
   onClickTitle: ->
     @stafflist.$display_table.empty()
     @stafflist.reload_auth_list()
+
     @instructorlist.$display_table.empty()
     @instructorlist.reload_auth_list()
+
+    @forum_admin_list.$display_table.empty()
+    @forum_admin_list.reload_auth_list()
+
+    @forum_mod_list.$display_table.empty()
+    @forum_mod_list.reload_auth_list()
+
+    @forum_comta_list.$display_table.empty()
+    @forum_comta_list.reload_auth_list()
+
 
 
 # exports

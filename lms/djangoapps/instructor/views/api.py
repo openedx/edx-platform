@@ -15,11 +15,15 @@ from django.http import HttpResponse, HttpResponseBadRequest
 
 from courseware.courses import get_course_with_access
 from django.contrib.auth.models import User, Group
+from django_comment_common.models import (Role,
+                                          FORUM_ROLE_ADMINISTRATOR,
+                                          FORUM_ROLE_MODERATOR,
+                                          FORUM_ROLE_COMMUNITY_TA)
 
 from courseware.models import StudentModule
 import instructor.enrollment as enrollment
 from instructor.enrollment import split_input_list, enroll_emails, unenroll_emails
-from instructor.access import allow_access, revoke_access, list_with_level
+import instructor.access as access
 import analytics.basic
 import analytics.distributions
 import analytics.csvs
@@ -57,21 +61,21 @@ def access_allow_revoke(request, course_id):
 
     Query parameters:
     email is the target users email
-    level is one of ['instructor', 'staff']
+    rolename is one of ['instructor', 'staff']
     mode is one of ['allow', 'revoke']
     """
     course = get_course_with_access(request.user, course_id, 'instructor', depth=None)
 
     email = request.GET.get('email')
-    level = request.GET.get('level')
+    rolename = request.GET.get('rolename')
     mode = request.GET.get('mode')
 
     user = User.objects.get(email=email)
 
     if mode == 'allow':
-        allow_access(course, user, level)
+        access.allow_access(course, user, rolename)
     elif mode == 'revoke':
-        revoke_access(course, user, level)
+        access.revoke_access(course, user, rolename)
     else:
         raise ValueError("unrecognized mode '{}'".format(mode))
 
@@ -88,10 +92,17 @@ def list_instructors_staff(request, course_id):
     """
     List instructors and staff.
     Requires staff access.
+
+    rolename is one of ['instructor', 'staff']
     """
     course = get_course_with_access(request.user, course_id, 'staff', depth=None)
 
-    def extract_user(user):
+    rolename = request.GET.get('rolename', '')
+
+    if not rolename in ['instructor', 'staff']:
+        return HttpResponseBadRequest()
+
+    def extract_user_info(user):
         return {
             'username': user.username,
             'email': user.email,
@@ -101,8 +112,7 @@ def list_instructors_staff(request, course_id):
 
     response_payload = {
         'course_id':   course_id,
-        'instructor':  map(extract_user, list_with_level(course, 'instructor')),
-        'staff':       map(extract_user, list_with_level(course, 'staff')),
+        rolename:  map(extract_user_info, access.list_with_level(course, rolename)),
     }
     response = HttpResponse(json.dumps(response_payload), content_type="application/json")
     return response
@@ -298,6 +308,79 @@ def reset_student_attempts(request, course_id):
     response_payload = {
         'course_id':    course_id,
         'delete_module': will_delete_module,
+    }
+    response = HttpResponse(json.dumps(response_payload), content_type="application/json")
+    return response
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+def list_forum_members(request, course_id):
+    """
+    Resets a students attempts counter. Optionally deletes student state for a problem.
+    Limited to staff access.
+
+    Takes query parameter rolename
+    """
+    course = get_course_with_access(request.user, course_id, 'staff', depth=None)
+
+    rolename = request.GET.get('rolename', '')
+
+    if not rolename in [FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA]:
+        return HttpResponseBadRequest()
+
+    try:
+        role = Role.objects.get(name=rolename, course_id=course_id)
+        users = role.users.all().order_by('username')
+    except Role.DoesNotExist:
+        users = []
+
+    def extract_user_info(user):
+        return {
+            'username': user.username,
+            'email': user.email,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+        }
+
+    response_payload = {
+        'course_id': course_id,
+        rolename:   map(extract_user_info, users),
+    }
+    response = HttpResponse(json.dumps(response_payload), content_type="application/json")
+    return response
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+def update_forum_role_membership(request, course_id):
+    """
+    Modify forum role access.
+
+    Query parameters:
+    email is the target users email
+    rolename is one of [FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA]
+    mode is one of ['allow', 'revoke']
+    """
+    course = get_course_with_access(request.user, course_id, 'instructor', depth=None)
+
+    email = request.GET.get('email', '')
+    rolename = request.GET.get('rolename', '')
+    mode = request.GET.get('mode', '')
+
+    if not rolename in [access.FORUM_ROLE_ADMINISTRATOR, access.FORUM_ROLE_MODERATOR, access.FORUM_ROLE_COMMUNITY_TA]:
+        return HttpResponseBadRequest()
+
+    try:
+        user = User.objects.get(email=email)
+        access.update_forum_role_membership(course_id, user, rolename, mode)
+    except User.DoesNotExist, Role.DoesNotExist:
+        return HttpResponseBadRequest()
+
+    response_payload = {
+        'course_id': course_id,
+        'mode':      mode,
+        'DONE': 'YES',
     }
     response = HttpResponse(json.dumps(response_payload), content_type="application/json")
     return response
