@@ -10,21 +10,23 @@
     @extend .t-title7;
     margin-bottom: ($baseline/4);
     font-weight: 600;
-
-    [class^="icon-"] {
-      @extend .t-icon5;
-      display: inline-block;
-      vertical-align: middle;
-      margin-right: ($baseline/4);
-    }
   }
 
   .copy {
-    @extend .t-copy-sub2;
+    @extend .t-copy-sub1;
+    @include transition(opacity 0.25s ease-in-out 0);
+    opacity: 0.75;
   }
 
   strong {
     font-weight: 600;
+  }
+
+  &:hover {
+
+    .copy {
+      opacity: 1.0;
+    }
   }
 }
 
@@ -34,9 +36,5 @@
 
   .copy {
     color: $gray-d1;
-  }
-
-  .icon-warning-sign {
-    color: $yellow-s3;
   }
 }
