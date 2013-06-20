@@ -11,6 +11,9 @@ XModule: Don't delete generated xmodule asset files when compiling (for
 instance, when XModule provides a coffeescript file, don't delete
 the associated javascript)
 
+Studio: For courses running on edx.org (marketing site), disable fields in
+Course Settings that do not apply.
+
 Common: Make asset watchers run as singletons (so they won't start if the
 watcher is already running in another shell).
 
