@@ -22,9 +22,7 @@ task :showdocs, [:options] do |t, args|
         path = "docs"
     end
 
-    Dir.chdir("#{path}/build/html") do
-        Launchy.open('index.html')
-    end
+    Launchy.open("#{path}/build/html/index.html")
 end
 
 desc "Build docs and show them in browser"

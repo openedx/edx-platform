@@ -1,6 +1,7 @@
 *******************************************
-CMS module
+Calc
 *******************************************
 
-.. module:: cms
-
+.. automodule:: calc
+    :members:
+    :show-inheritance:

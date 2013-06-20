@@ -8,14 +8,6 @@ Contents:
 .. toctree::
     :maxdepth: 2
 
-    chem.rst
-
-Calc
-====
-
-.. automodule:: capa.calc
-    :members:
-    :show-inheritance:
 
 Capa_problem
 ============
