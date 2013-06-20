@@ -5,6 +5,9 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Studio: Remove XML from the video component editor. All settings are
+moved to be edited as metadata.
+
 XModule: Only write out assets files if the contents have changed.
 
 XModule: Don't delete generated xmodule asset files when compiling (for
