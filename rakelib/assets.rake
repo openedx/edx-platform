@@ -114,9 +114,9 @@ namespace :assets do
             task :_watch => (prereq_tasks + ["assets:#{asset_type}:debug"]) do
                 cmd = send(asset_type.to_s + "_cmd", watch=true, debug=true)
                 if cmd.kind_of?(Array)
-                    cmd.each {|c| background_process(c)}
+                    cmd.each {|c| singleton_process(c)}
                 else
-                    background_process(cmd)
+                    singleton_process(cmd)
                 end
             end
         end
