@@ -747,8 +747,6 @@ def instructor_dashboard(request, course_id):
                'plots': plots,			# psychometrics
                'course_errors': modulestore().get_item_errors(course.location),
                'instructor_tasks': instructor_tasks,
-               'djangopid': os.getpid(),
-               'mitx_version': getattr(settings, 'MITX_VERSION_STRING', ''),
                'offline_grade_log': offline_grades_available(course_id),
                'cohorts_ajax_url': reverse('cohorts', kwargs={'course_id': course_id}),
 
