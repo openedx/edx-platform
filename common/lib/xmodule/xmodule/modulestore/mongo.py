@@ -46,11 +46,12 @@ class MongoKeyValueStore(KeyValueStore):
     A KeyValueStore that maps keyed data access to one of the 3 data areas
     known to the MongoModuleStore (data, children, and metadata)
     """
-    def __init__(self, data, children, metadata, location):
+    def __init__(self, data, children, metadata, location, category):
         self._data = data
         self._children = children
         self._metadata = metadata
         self._location = location
+        self._category = category
 
     def get(self, key):
         if key.scope == Scope.children:
@@ -62,6 +63,8 @@ class MongoKeyValueStore(KeyValueStore):
         elif key.scope == Scope.content:
             if key.field_name == 'location':
                 return self._location
+            elif key.field_name == 'category':
+                return self._category
             elif key.field_name == 'data' and not isinstance(self._data, dict):
                 return self._data
             else:
@@ -77,6 +80,8 @@ class MongoKeyValueStore(KeyValueStore):
         elif key.scope == Scope.content:
             if key.field_name == 'location':
                 self._location = value
+            elif key.field_name == 'category':
+                self._category = value
             elif key.field_name == 'data' and not isinstance(self._data, dict):
                 self._data = value
             else:
@@ -93,6 +98,8 @@ class MongoKeyValueStore(KeyValueStore):
         elif key.scope == Scope.content:
             if key.field_name == 'location':
                 self._location = Location(None)
+            elif key.field_name == 'category':
+                self._category = None
             elif key.field_name == 'data' and not isinstance(self._data, dict):
                 self._data = None
             else:
@@ -107,7 +114,10 @@ class MongoKeyValueStore(KeyValueStore):
             return key.field_name in self._metadata
         elif key.scope == Scope.content:
             if key.field_name == 'location':
+                # WHY TRUE? if it's been deleted should it be False?
                 return True
+            elif key.field_name == 'category':
+                return self._category is not None
             elif key.field_name == 'data' and not isinstance(self._data, dict):
                 return True
             else:
@@ -186,6 +196,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
                     definition.get('children', []),
                     metadata,
                     location,
+                    category
                 )
 
                 model_data = DbModel(kvs, class_, None, MongoUsage(self.course_id, location))
@@ -817,7 +828,9 @@ class MongoModuleStore(ModuleStoreBase):
         kvs = MongoKeyValueStore(
             definition_data,
             [],
-            metadata
+            metadata,
+            location,
+            category
         )
 
         class_ = XModuleDescriptor.load_class(

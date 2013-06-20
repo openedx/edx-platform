@@ -122,7 +122,7 @@ class TestMongoKeyValueStore(object):
         self.location = Location('i4x://org/course/category/name@version')
         self.children = ['i4x://org/course/child/a', 'i4x://org/course/child/b']
         self.metadata = {'meta': 'meta_val'}
-        self.kvs = MongoKeyValueStore(self.data, self.children, self.metadata, self.location)
+        self.kvs = MongoKeyValueStore(self.data, self.children, self.metadata, self.location, 'category')
 
     def _check_read(self, key, expected_value):
         assert_equals(expected_value, self.kvs.get(key))

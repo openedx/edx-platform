@@ -49,7 +49,7 @@ def add_video_to_course(course):
 
 
 def add_videoalpha_to_course(course):
-    template_name = 'i4x://edx/templates/videoalpha/Video_Alpha'
+    category = 'videoalpha'
     world.ItemFactory.create(parent_location=section_location(course),
-                             template=template_name,
+                             category=category,
                              display_name='Video Alpha')

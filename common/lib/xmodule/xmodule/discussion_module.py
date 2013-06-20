@@ -47,13 +47,8 @@ class DiscussionModule(DiscussionFields, XModule):
 
 class DiscussionDescriptor(DiscussionFields, MetadataOnlyEditingDescriptor, RawDescriptor):
 
-    def __init__(self, system, category, location, definition_id, model_data):
-        super(DiscussionDescriptor, self).__init__(
-            system,
-            category,
-            location,
-            definition_id,
-            model_data)
+    def __init__(self, *args, **kwargs):
+        super(DiscussionDescriptor, self).__init__(*args, **kwargs)
         # is this too late? i.e., will it get persisted and stay static w/ the first value
         # any code references. I believe so.
         if self.discussion_id == '$$GUID$$':

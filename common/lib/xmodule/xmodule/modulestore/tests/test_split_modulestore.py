@@ -3,8 +3,6 @@ Created on Mar 25, 2013
 
 @author: dmitchell
 '''
-import os
-import re
 import datetime
 import subprocess
 import unittest
@@ -16,6 +14,8 @@ from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.exceptions import InsufficientSpecificationError, ItemNotFoundError, VersionConflictError
 from xmodule.modulestore.locator import CourseLocator, BlockUsageLocator, VersionTree, DescriptionLocator
 from pytz import UTC
+from path import path
+import re
 
 class SplitModuleTest(unittest.TestCase):
     '''
@@ -29,13 +29,17 @@ class SplitModuleTest(unittest.TestCase):
         'host': 'localhost',
         'db': 'test_xmodule',
         'collection': 'modulestore{0}'.format(uuid.uuid4().hex),
-        'fs_root': ''
+        'fs_root': '',
     }
 
     MODULESTORE = {
         'ENGINE': 'xmodule.modulestore.split_mongo.SplitMongoModuleStore',
         'OPTIONS': modulestore_options
     }
+
+    # don't create django dependency; so, duplicates common.py in envs
+    match = re.search(r'(.*?/common)(?:$|/)', path(__file__))
+    COMMON_ROOT = match.group(1)
 
     modulestore = None
 
@@ -50,22 +54,19 @@ class SplitModuleTest(unittest.TestCase):
     GUID_D5 = "1d00000000000000dddd5555"  # v345679d
     GUID_P = "1d00000000000000eeee0000"  # v23456p
 
-    @classmethod
-    def setUpClass(cls):
+    @staticmethod
+    def bootstrapDB():
         '''
         Loads the initial data into the db ensuring the collection name is
         unique.
         '''
-        dbname = cls.MODULESTORE['OPTIONS']['db']
-        collection_prefix = cls.MODULESTORE['OPTIONS']['collection']
-        match = re.search(r'(.*?/(?:edx-platform|mitx))(?:$|/)', os.getcwd())
-        cwd = match.group(1) + '/'
+        collection_prefix = SplitModuleTest.MODULESTORE['OPTIONS']['collection'] + '.'
+        dbname = SplitModuleTest.MODULESTORE['OPTIONS']['db']
         processes = [
-            # /usr/local/bin/mongoimport
-            subprocess.Popen(['/usr/local/bin/mongoimport', '-d', dbname, '-c',
-                collection_prefix + '.' + collection, '--jsonArray',
+            subprocess.Popen(['mongoimport', '-d', dbname, '-c',
+                collection_prefix + collection, '--jsonArray',
                 '--file',
-                cwd + 'fixtures/splitmongo_json/' + collection + '.json'])
+                SplitModuleTest.COMMON_ROOT + '/test/data/splitmongo_json/' + collection + '.json'])
                 for collection in ('active_versions', 'structures', 'definitions')]
         for p in processes:
             if p.wait() != 0:
@@ -73,11 +74,12 @@ class SplitModuleTest(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        collection_prefix = cls.MODULESTORE['OPTIONS']['collection'] + '.'
-        for collection in ('active_versions', 'structures', 'definitions'):
-            modulestore().db.drop_collection(collection_prefix + collection)
-        # drop the modulestore to force re init
-        SplitModuleTest.modulestore = None
+        collection_prefix = SplitModuleTest.MODULESTORE['OPTIONS']['collection'] + '.'
+        if SplitModuleTest.modulestore:
+            for collection in ('active_versions', 'structures', 'definitions'):
+                modulestore().db.drop_collection(collection_prefix + collection)
+            # drop the modulestore to force re init
+            SplitModuleTest.modulestore = None
 
     def findByIdInResult(self, collection, _id):
         """
@@ -809,7 +811,7 @@ class TestCourseCreation(SplitModuleTest):
         data_payload = {}
         metadata_payload = {}
         for field in original.fields:
-            if field.scope == Scope.content:
+            if field.scope == Scope.content and field.name != 'location':
                 data_payload[field.name] = getattr(original, field.name)
             elif field.scope == Scope.settings:
                 metadata_payload[field.name] = getattr(original, field.name)
@@ -902,6 +904,7 @@ def modulestore():
         return getattr(import_module(module_path), name)
 
     if SplitModuleTest.modulestore is None:
+        SplitModuleTest.bootstrapDB()
         class_ = load_function(SplitModuleTest.MODULESTORE['ENGINE'])
 
         options = {}

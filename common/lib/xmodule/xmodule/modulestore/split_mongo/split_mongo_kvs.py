@@ -14,7 +14,7 @@ class SplitMongoKVS(KeyValueStore):
     A KeyValueStore that maps keyed data access to one of the 3 data areas
     known to the MongoModuleStore (data, children, and metadata)
     """
-    def __init__(self, definition, children, metadata, _inherited_metadata):
+    def __init__(self, definition, children, metadata, _inherited_metadata, location, category):
         """
 
         :param definition:
@@ -34,6 +34,8 @@ class SplitMongoKVS(KeyValueStore):
         self._children = copy.copy(children)
         self._metadata = copy.copy(metadata)
         self._inherited_metadata = _inherited_metadata
+        self._location = location
+        self._category = category
 
     def get(self, key):
         if key.scope == Scope.children:
@@ -48,15 +50,20 @@ class SplitMongoKVS(KeyValueStore):
             else:
                 raise KeyError()
         elif key.scope == Scope.content:
-            if isinstance(self._definition, DefinitionLazyLoader):
-                self._definition = self._definition.fetch()
-            if (key.field_name == 'data' and
-                not isinstance(self._definition.get('data'), dict)):
-                return self._definition.get('data')
-            elif 'data' not in self._definition or key.field_name not in self._definition['data']:
-                raise KeyError()
+            if key.field_name == 'location':
+                return self._location
+            elif key.field_name == 'category':
+                return self._category
             else:
-                return self._definition['data'][key.field_name]
+                if isinstance(self._definition, DefinitionLazyLoader):
+                    self._definition = self._definition.fetch()
+                if (key.field_name == 'data' and
+                    not isinstance(self._definition.get('data'), dict)):
+                    return self._definition.get('data')
+                elif 'data' not in self._definition or key.field_name not in self._definition['data']:
+                    raise KeyError()
+                else:
+                    return self._definition['data'][key.field_name]
         else:
             raise InvalidScopeError(key.scope)
 
@@ -70,13 +77,18 @@ class SplitMongoKVS(KeyValueStore):
             # TODO if inheritable, push down to children who don't override
             self._metadata[key.field_name] = value
         elif key.scope == Scope.content:
-            if isinstance(self._definition, DefinitionLazyLoader):
-                self._definition = self._definition.fetch()
-            if (key.field_name == 'data' and
-                not isinstance(self._definition.get('data'), dict)):
-                self._definition.get('data')
+            if key.field_name == 'location':
+                self._location = value
+            elif key.field_name == 'category':
+                self._category = value
             else:
-                self._definition.setdefault('data', {})[key.field_name] = value
+                if isinstance(self._definition, DefinitionLazyLoader):
+                    self._definition = self._definition.fetch()
+                if (key.field_name == 'data' and
+                    not isinstance(self._definition.get('data'), dict)):
+                    self._definition.get('data')
+                else:
+                    self._definition.setdefault('data', {})[key.field_name] = value
         else:
             raise InvalidScopeError(key.scope)
 
@@ -90,16 +102,22 @@ class SplitMongoKVS(KeyValueStore):
             if key.field_name in self._metadata:
                 del self._metadata[key.field_name]
         elif key.scope == Scope.content:
-            if isinstance(self._definition, DefinitionLazyLoader):
-                self._definition = self._definition.fetch()
-            if (key.field_name == 'data' and
-                not isinstance(self._definition.get('data'), dict)):
-                self._definition.setdefault('data', None)
+            # don't allow deletion of location nor category
+            if key.field_name == 'location':
+                pass
+            elif key.field_name == 'category':
+                pass
             else:
-                try:
-                    del self._definition['data'][key.field_name]
-                except KeyError:
-                    pass
+                if isinstance(self._definition, DefinitionLazyLoader):
+                    self._definition = self._definition.fetch()
+                if (key.field_name == 'data' and
+                    not isinstance(self._definition.get('data'), dict)):
+                    self._definition.setdefault('data', None)
+                else:
+                    try:
+                        del self._definition['data'][key.field_name]
+                    except KeyError:
+                        pass
         else:
             raise InvalidScopeError(key.scope)
 
@@ -109,13 +127,18 @@ class SplitMongoKVS(KeyValueStore):
         elif key.scope == Scope.settings:
             return key.field_name in self._metadata or key.field_name in self._inherited_metadata
         elif key.scope == Scope.content:
-            if isinstance(self._definition, DefinitionLazyLoader):
-                self._definition = self._definition.fetch()
-            if (key.field_name == 'data' and
-                not isinstance(self._definition.get('data'), dict)):
-                return self._definition.get('data') is not None
+            if key.field_name == 'location':
+                return True
+            elif key.field_name == 'category':
+                return self._category is not None
             else:
-                return key.field_name in self._definition.get('data', {})
+                if isinstance(self._definition, DefinitionLazyLoader):
+                    self._definition = self._definition.fetch()
+                if (key.field_name == 'data' and
+                    not isinstance(self._definition.get('data'), dict)):
+                    return self._definition.get('data') is not None
+                else:
+                    return key.field_name in self._definition.get('data', {})
         else:
             return False
 

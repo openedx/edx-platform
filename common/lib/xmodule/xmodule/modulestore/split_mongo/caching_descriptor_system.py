@@ -77,24 +77,26 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         definition = json_data.get('definition', {})
         metadata = json_data.get('metadata', {})
 
-        kvs = SplitMongoKVS(definition,
-            json_data.get('children', []),
-            metadata, json_data.get('_inherited_metadata'))
-
         block_locator = BlockUsageLocator(
             version_guid=course_entry_override['_id'],
             usage_id=usage_id,
             course_id=course_entry_override.get('course_id'),
             revision=course_entry_override.get('revision')
         )
+
+        kvs = SplitMongoKVS(
+            definition,
+            json_data.get('children', []),
+            metadata,
+            json_data.get('_inherited_metadata'),
+            block_locator,
+            json_data.get('category'))
         model_data = DbModel(kvs, class_, None,
             SplitMongoKVSid(
                 # DbModel req's that these support .url()
                 block_locator,
                 self.modulestore.definition_locator(definition)))
-        model_data['category'] = json_data.get('category')
-        model_data['location'] = block_locator
-        #                 , ,
+
         try:
             module = class_(self, model_data)
         except Exception:

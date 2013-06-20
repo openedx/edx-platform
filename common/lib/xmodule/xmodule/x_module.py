@@ -31,7 +31,10 @@ class LocationField(ModelType):
         try:
             return Location(value)
         except InvalidLocationError:
-            return BlockUsageLocator(value)
+            if isinstance(value, BlockUsageLocator):
+                return value
+            else:
+                return BlockUsageLocator(value)
 
     def to_json(self, value):
         """
@@ -165,7 +168,7 @@ class XModule(XModuleFields, HTMLSnippet, XBlock):
         # LMS tests don't require descriptor but really it's required
         if descriptor:
             self.url_name = descriptor.url_name
-            self.category = descriptor.category
+            # don't need to set category as it will automatically get from descriptor
         elif isinstance(self.location, Location):
             self.url_name = self.location.name
             if not hasattr(self, 'category'):
@@ -552,7 +555,7 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         """
         # NOTE: this won't work if category is not in json_data (i.e., old modulestore)
         class_ = XModuleDescriptor.load_class(
-            json_data.get('category', json_data['location'].get('category')),
+            json_data.get('category', json_data.get('location', {}).get('category')),
             default_class
         )
         return class_.from_json(json_data, system, parent_xblock)

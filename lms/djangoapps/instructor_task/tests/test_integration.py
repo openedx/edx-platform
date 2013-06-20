@@ -243,7 +243,7 @@ class TestRescoringTask(TestIntegrationTask):
                                         grader_payload=grader_payload,
                                         num_responses=2)
         ItemFactory.create(parent_location=self.problem_section.location,
-                           template="i4x://edx/templates/problem/Blank_Common_Problem",
+                           category="problem",
                            display_name=str(problem_url_name),
                            data=problem_xml)
 
@@ -293,7 +293,7 @@ class TestRescoringTask(TestIntegrationTask):
             # Per-student rerandomization will at least generate different seeds for different users, so
             # we get a little more test coverage.
             ItemFactory.create(parent_location=self.problem_section.location,
-                               template="i4x://edx/templates/problem/Blank_Common_Problem",
+                               category="problem",
                                display_name=str(problem_url_name),
                                data=problem_xml,
                                metadata={"rerandomize": "per_student"})
