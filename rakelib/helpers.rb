@@ -1,4 +1,6 @@
 require 'digest/md5'
+require 'sys/proctable'
+require 'colorize'
 
 def find_executable(exec)
     path = %x(which #{exec}).strip
@@ -81,6 +83,16 @@ def background_process(*command)
                 puts "Done waiting on process group #{pgid}"
             end
         end
+    end
+end
+
+# Runs a command as a background process, as long as no other processes
+# tagged with the same tag are running
+def singleton_process(*command)
+    if Sys::ProcTable.ps.select {|proc| proc.cmdline.include?(command.join(' '))}.empty?
+        background_process(*command)
+    else
+        puts "Process '#{command.join(' ')} already running, skipping".blue
     end
 end
 
