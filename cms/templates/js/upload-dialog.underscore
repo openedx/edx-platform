@@ -11,6 +11,7 @@
   <h2 class="title"><%= title %></h2>
   <p id="dialog-assetupload-description" class="message"><%= message %></p>
   <input type="file" name="file" />
+  <% if(error) {%><p class="error"><%= error %></p><% } %>
 
   <% if(uploading) { %>
     <% if (uploadedBytes && totalBytes) { %>

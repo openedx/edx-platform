@@ -94,9 +94,14 @@ CMS.Models.FileUpload = Backbone.Model.extend({
     defaults: {
         "title": "",
         "message": "",
-        "selectFile": null,
+        "selectedFile": null,
         "uploading": false,
         "uploadedBytes": 0,
         "totalBytes": 0
+    },
+    validate: function(attrs, options) {
+        if(attrs.selectedFile && attrs.selectedFile.type !== "application/pdf") {
+            return gettext("Only PDF files can be uploaded");
+        }
     }
 });

@@ -133,3 +133,26 @@ describe "CMS.Collections.ChapterSet", ->
         # try going back one
         @collection.remove(@collection.last())
         expect(@collection.nextOrder()).toEqual(2)
+
+
+describe "CMS.Models.FileUpload", ->
+    beforeEach ->
+        @model = new CMS.Models.FileUpload()
+
+    it "is valid by default", ->
+        expect(@model.isValid()).toBeTruthy()
+
+    it "is valid for PDF files", ->
+        file = {"type": "application/pdf"}
+        @model.set("selectedFile", file);
+        expect(@model.isValid()).toBeTruthy()
+
+    it "is invalid for text files", ->
+        file = {"type": "text/plain"}
+        @model.set("selectedFile", file);
+        expect(@model.isValid()).toBeFalsy()
+
+    it "is invalid for PNG files", ->
+        file = {"type": "image/png"}
+        @model.set("selectedFile", file);
+        expect(@model.isValid()).toBeFalsy()

@@ -230,11 +230,24 @@ describe "CMS.Views.UploadDialog", ->
         expect(@view.$el).toContain("input[type=file]")
         expect(@view.$(".action-upload")).toBeDisabled()
 
-    it "should render with a file selected", ->
-        @mockFiles.push({name: "fake.pdf"})
+    it "should render with a PDF selected", ->
+        file = {name: "fake.pdf", "type": "application/pdf"}
+        @mockFiles.push(file)
+        @model.set("selectedFile", file)
         @view.render()
         expect(@view.$el).toContain("input[type=file]")
+        expect(@view.$el).not.toContain("p.error")
         expect(@view.$(".action-upload")).not.toBeDisabled()
+
+    it "should render an error with an invalid file type selected", ->
+        file = {name: "fake.png", "type": "image/png"}
+        @mockFiles.push(file)
+        @model.set("selectedFile", file)
+        @view.render()
+        expect(@view.$el).toContain("input[type=file]")
+        expect(@view.$el).toContain("p.error")
+        expect(@view.$(".action-upload")).toBeDisabled()
+
 
     it "adds body class on show()", ->
         @view.show()

@@ -233,18 +233,12 @@ CMS.Views.UploadDialog = Backbone.View.extend({
     initialize: function() {
         this.template = _.template($("#upload-dialog-tpl").text());
         this.listenTo(this.model, "change", this.render);
+        this.listenTo(this.model, "invalid", this.handleInvalid);
     },
     render: function() {
-        // some browsers (like Chrome) allow you to assign to the .files attribute
-        // of an <input type="file"> DOM element -- for those browsers, we can
-        // create a new DOM element and assign the old content to it. Other browsers
-        // (like Firefox) make this attribute read-only, and we have to save the
-        // old DOM element in order to save it's content. For compatibility purposes,
-        // we'll just save the old element every time.
-        var oldInput = this.$("input[type=file]").get(0), selectedFile;
-        if (oldInput && oldInput.files.length) {
-            selectedFile = oldInput.files[0];
-        }
+        if(!this.model.isValid()) {return this;}
+        var selectedFile = this.model.get('selectedFile');
+        var oldInput = this.$("input[type=file]").get(0);
         this.$el.html(this.template({
             shown: this.options.shown,
             url: UPLOAD_ASSET_CALLBACK_URL,
@@ -253,12 +247,17 @@ CMS.Views.UploadDialog = Backbone.View.extend({
             selectedFile: selectedFile,
             uploading: this.model.get('uploading'),
             uploadedBytes: this.model.get('uploadedBytes'),
-            totalBytes: this.model.get('totalBytes')
+            totalBytes: this.model.get('totalBytes'),
+            error: this.model.get('error')
         }));
-        if (oldInput) {
+        // ideally, we'd like to tell the browser to pre-populate the
+        // <input type="file"> with the selectedFile if we have one -- but
+        // browser security prohibits that. So instead, we'll swap out the
+        // new input (that has no file selected) with the old input (that
+        // already has the selectedFile selected).
+        if (selectedFile) {
             this.$('input[type=file]').replaceWith(oldInput);
         }
-
         return this;
     },
     events: {
@@ -267,7 +266,10 @@ CMS.Views.UploadDialog = Backbone.View.extend({
         "click .action-upload": "upload"
     },
     selectFile: function(e) {
-        this.model.set('fileList', e.target.files);
+        this.model.set({
+            selectedFile: e.target.files[0] || null,
+            error: null
+        });
     },
     show: function(e) {
         if(e && e.preventDefault) { e.preventDefault(); }
@@ -284,6 +286,12 @@ CMS.Views.UploadDialog = Backbone.View.extend({
     hideAndRemove: function(e) {
         if(e && e.preventDefault) { e.preventDefault(); }
         return this.hide().remove();
+    },
+    handleInvalid: function(model, error, options) {
+        model.set({
+            selectedFile: null,
+            error: error
+        });
     },
     upload: function(e) {
         this.model.set('uploading', true);
