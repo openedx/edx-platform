@@ -41,7 +41,6 @@ class TextbookTestCase(CourseTestCase):
             {"tab_title": "Hi, mom!"},
             {"tab_title": "Textbook 2"},
         ]
-        # import nose; nose.tools.set_trace()
         resp = self.client.post(
             self.url,
             data=json.dumps(textbooks),
@@ -56,6 +55,18 @@ class TextbookTestCase(CourseTestCase):
         store = get_modulestore(self.course.location)
         course = store.get_item(self.course.location)
         self.assertEqual(course.pdf_textbooks, textbooks)
+
+    def test_view_index_xhr_post_invalid(self):
+        resp = self.client.post(
+            self.url,
+            data="invalid",
+            content_type="application/json",
+            HTTP_ACCEPT="application/json",
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest'
+        )
+        self.assertEqual(resp.status_code, 400)
+        obj = json.loads(resp.content)
+        self.assertIn("error", obj)
 
 
 class TextbookValidationTestCase(TestCase):
