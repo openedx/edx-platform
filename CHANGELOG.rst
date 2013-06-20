@@ -5,6 +5,19 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+XModule: Only write out assets files if the contents have changed.
+
+XModule: Don't delete generated xmodule asset files when compiling (for
+instance, when XModule provides a coffeescript file, don't delete
+the associated javascript)
+
+Common: Make asset watchers run as singletons (so they won't start if the
+watcher is already running in another shell).
+
+Common: Use coffee directly when watching for coffeescript file changes.
+
+Common: Make rake provide better error messages if packages are missing.
+
 Common: Repairs development documentation generation by sphinx.
 
 LMS: Problem rescoring.  Added options on the Grades tab of the
