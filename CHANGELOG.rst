@@ -27,6 +27,8 @@ students' number of attempts to zero.  Provides a list of background
 tasks that are currently running for the course, and an option to
 see a history of background tasks for a given problem.
 
+LMS: Fixed the preferences scope for storing data in xmodules.
+
 LMS: Forums.  Added handling for case where discussion module can get `None` as
 value of lms.start in `lms/djangoapps/django_comment_client/utils.py`
 
