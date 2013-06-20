@@ -83,7 +83,7 @@ def click_on_section(step, section):
     world.css_click(section_css)
 
     subid = "ui-accordion-accordion-panel-" + str(int(section) - 1)
-    subsection_css = 'ul.ui-accordion-content-active[id=\'%s\'][aria-expanded=\'true\']> li > a' % subid
+    subsection_css = 'ul.ui-accordion-content-active[id=\'%s\'] > li > a' % subid
     prev_url = world.browser.url
     changed_section = lambda: prev_url != world.browser.url
 
