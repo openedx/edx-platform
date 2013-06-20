@@ -286,6 +286,10 @@ if settings.COURSEWARE_ENABLED:
             'instructor.views.api.get_student_progress_url', name="get_student_progress_url"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/reset_student_attempts$',
             'instructor.views.api.reset_student_attempts', name="reset_student_attempts"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/list_forum_members$',
+            'instructor.views.api.list_forum_members', name="list_forum_members"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/update_forum_role_membership$',
+            'instructor.views.api.update_forum_role_membership', name="update_forum_role_membership"),
 
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/gradebook$',
             'instructor.views.legacy.gradebook', name='gradebook'),
