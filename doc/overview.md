@@ -122,11 +122,6 @@ In production, the django `collectstatic` command recompiles everything and puts
 
 In development, we don't use collectstatic, instead accessing the files in place.  The auto-compilation is run via `common/djangoapps/pipeline_mako/templates/static_content.html`.  Details: templates include `<%namespace name='static' file='static_content.html'/>`, then something like `<%static:css group='application'/>` to call the functions in `common/djangoapps/pipeline_mako/__init__.py`, which call the `django-pipeline` compilers.
 
-### Other modules
-
-- Wiki -- in `lms/djangoapps/simplewiki`.  Has some markdown extentions for embedding circuits, videos, etc.
-
-
 ## Testing
 
 See `testing.md`.
