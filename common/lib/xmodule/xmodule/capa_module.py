@@ -279,7 +279,7 @@ class CapaModule(CapaFields, XModule):
         """
         Return True/False to indicate whether to show the "Check" button.
         """
-        submitted_without_reset = (self.is_completed() and self.rerandomize == "always")
+        submitted_without_reset = (self.is_submitted() and self.rerandomize == "always")
 
         # If the problem is closed (past due / too many attempts)
         # then we do NOT show the "check" button
@@ -302,7 +302,7 @@ class CapaModule(CapaFields, XModule):
             # then do NOT show the reset button.
             # If the problem hasn't been submitted yet, then do NOT show
             # the reset button.
-            if (self.closed() and not is_survey_question) or not self.is_completed():
+            if (self.closed() and not is_survey_question) or not self.is_submitted():
                 return False
             else:
                 return True
@@ -322,7 +322,7 @@ class CapaModule(CapaFields, XModule):
             return not self.closed()
         else:
             is_survey_question = (self.max_attempts == 0)
-            needs_reset = self.is_completed() and self.rerandomize == "always"
+            needs_reset = self.is_submitted() and self.rerandomize == "always"
 
             # If the student has unlimited attempts, and their answers
             # are not randomized, then we do not need a save button
@@ -516,19 +516,18 @@ class CapaModule(CapaFields, XModule):
 
         return False
 
-    def is_completed(self):
-        """ Used to decide to show or hide RESET or CHECK buttons.
+    def is_submitted(self):
+        """
+        Used to decide to show or hide RESET or CHECK buttons.
 
-        Actually means that student submitted problem and nothing more.
+        Means that student submitted problem and nothing more.
         Problem can be completely wrong.
         Pressing RESET button makes this function to return False.
-        Suggestion: rename it to is_submitted.
-
-        # older comment: return self.answer_available()"""
+        """
         return self.lcp.done
 
     def is_attempted(self):
-        # used by conditional module
+        """Used by conditional module"""
         return self.attempts > 0
 
     def is_correct(self):
