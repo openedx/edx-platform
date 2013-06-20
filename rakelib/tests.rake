@@ -1,6 +1,9 @@
 # Set up the clean and clobber tasks
 CLOBBER.include(REPORT_DIR, 'test_root/*_repo', 'test_root/staticfiles')
 
+# Create the directory to hold coverage reports, if it doesn't already exist.
+directory REPORT_DIR
+
 def run_under_coverage(cmd, root)
     cmd0, cmd_rest = cmd.split(" ", 2)
     # We use "python -m coverage" so that the proper python will run the importable coverage
@@ -45,11 +48,18 @@ task :test_docs do
     test_sh('rake builddocs[pub]')
 end
 
-directory REPORT_DIR
-
 task :clean_test_files do
+    desc "Clean fixture files used by tests"
     sh("git clean -fqdx test_root")
 end
+
+task :clean_reports_dir do
+    desc "Clean coverage files, to ensure that we don't use stale data to generate reports."
+    # We delete the files but preserve the directory structure
+    # so that coverage.py has a place to put the reports.
+    sh("find #{REPORT_DIR} -type f -delete")
+end
+
 
 TEST_TASK_DIRS = []
 
@@ -58,21 +68,21 @@ TEST_TASK_DIRS = []
 
     # Per System tasks
     desc "Run all django tests on our djangoapps for the #{system}"
-    task "test_#{system}", [:test_id] => ["clean_test_files", :predjango, "#{system}:gather_assets:test", "fasttest_#{system}"]
+    task "test_#{system}", [:test_id] => [:clean_test_files, :predjango, "#{system}:gather_assets:test", "fasttest_#{system}"]
 
     # Have a way to run the tests without running collectstatic -- useful when debugging without
     # messing with static files.
-    task "fasttest_#{system}", [:test_id] => [report_dir, :install_prereqs, :predjango] do |t, args|
+    task "fasttest_#{system}", [:test_id] => [report_dir, :clean_reports_dir, :install_prereqs, :predjango] do |t, args|
         args.with_defaults(:test_id => nil)
         run_tests(system, report_dir, args.test_id)
     end
 
     # Run acceptance tests
     desc "Run acceptance tests"
-    task "test_acceptance_#{system}", [:harvest_args] => ["#{system}:gather_assets:acceptance", "fasttest_acceptance_#{system}"]
+    task "test_acceptance_#{system}", [:harvest_args] => [:clean_test_files, "#{system}:gather_assets:acceptance", "fasttest_acceptance_#{system}"]
 
     desc "Run acceptance tests without collectstatic"
-    task "fasttest_acceptance_#{system}", [:harvest_args] => ["clean_test_files", :predjango, report_dir] do |t, args|
+    task "fasttest_acceptance_#{system}", [:harvest_args] => [:clean_reports_dir, :predjango, report_dir] do |t, args|
         args.with_defaults(:harvest_args => '')
         run_acceptance_tests(system, report_dir, args.harvest_args)
     end
@@ -88,7 +98,7 @@ Dir["common/lib/*"].select{|lib| File.directory?(lib)}.each do |lib|
     report_dir = report_dir_path(lib)
 
     desc "Run tests for common lib #{lib}"
-    task "test_#{lib}"  => ["clean_test_files", report_dir] do
+    task "test_#{lib}"  => [:clean_reports_dir, report_dir] do
         ENV['NOSE_XUNIT_FILE'] = File.join(report_dir, "nosetests.xml")
         cmd = "nosetests #{lib}"
         test_sh(run_under_coverage(cmd, lib))
