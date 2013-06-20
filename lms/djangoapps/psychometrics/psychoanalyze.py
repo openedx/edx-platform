@@ -15,6 +15,7 @@ from scipy.optimize import curve_fit
 from django.conf import settings
 from django.db.models import Sum, Max
 from psychometrics.models import *
+from pytz import UTC
 
 log = logging.getLogger("mitx.psychometrics")
 
@@ -110,7 +111,7 @@ def make_histogram(ydata, bins=None):
     nbins = len(bins)
     hist = dict(zip(bins, [0] * nbins))
     for y in ydata:
-        for b in bins[::-1]:    # in reverse order
+        for b in bins[::-1]:  # in reverse order
             if y > b:
                 hist[b] += 1
                 break
@@ -149,7 +150,7 @@ def generate_plots_for_problem(problem):
 
     agdat = pmdset.aggregate(Sum('attempts'), Max('attempts'))
     max_attempts = agdat['attempts__max']
-    total_attempts = agdat['attempts__sum']     # not used yet
+    total_attempts = agdat['attempts__sum']  # not used yet
 
     msg += "max attempts = %d" % max_attempts
 
@@ -200,7 +201,7 @@ def generate_plots_for_problem(problem):
     dtsv = StatVar()
     for pmd in pmdset:
         try:
-            checktimes = eval(pmd.checktimes)                   # update log of attempt timestamps
+            checktimes = eval(pmd.checktimes)  # update log of attempt timestamps
         except:
             continue
         if len(checktimes) < 2:
@@ -208,7 +209,7 @@ def generate_plots_for_problem(problem):
         ct0 = checktimes[0]
         for ct in checktimes[1:]:
             dt = (ct - ct0).total_seconds() / 60.0
-            if dt < 20:                   # ignore if dt too long
+            if dt < 20:  # ignore if dt too long
                 dtset.append(dt)
                 dtsv += dt
             ct0 = ct
@@ -244,7 +245,7 @@ def generate_plots_for_problem(problem):
             ylast = y + ylast
         yset['ydat'] = ydat
 
-        if len(ydat) > 3:         # try to fit to logistic function if enough data points
+        if len(ydat) > 3:  # try to fit to logistic function if enough data points
             try:
                 cfp = curve_fit(func_2pl, xdat, ydat, [1.0, max_attempts / 2.0])
                 yset['fitparam'] = cfp
@@ -337,10 +338,10 @@ def make_psychometrics_data_update_handler(course_id, user, module_state_key):
             log.exception("no attempts for %s (state=%s)" % (sm, sm.state))
 
         try:
-            checktimes = eval(pmd.checktimes)                   # update log of attempt timestamps
+            checktimes = eval(pmd.checktimes)  # update log of attempt timestamps
         except:
             checktimes = []
-        checktimes.append(datetime.datetime.now())
+        checktimes.append(datetime.datetime.now(UTC))
         pmd.checktimes = checktimes
         try:
             pmd.save()

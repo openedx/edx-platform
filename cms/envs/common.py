@@ -25,19 +25,30 @@ Longer TODO:
 
 import sys
 import lms.envs.common
+from lms.envs.common import USE_TZ
 from path import path
 
 ############################ FEATURE CONFIGURATION #############################
 
 MITX_FEATURES = {
     'USE_DJANGO_PIPELINE': True,
+    
     'GITHUB_PUSH': False,
+    
     'ENABLE_DISCUSSION_SERVICE': False,
+    
     'AUTH_USE_MIT_CERTIFICATES': False,
-    'STUB_VIDEO_FOR_TESTING': False,   # do not display video when running automated acceptance tests
-    'STAFF_EMAIL': '',			# email address for staff (eg to request course creation)
+    
+    # do not display video when running automated acceptance tests
+    'STUB_VIDEO_FOR_TESTING': False,
+    
+    # email address for staff (eg to request course creation)
+    'STAFF_EMAIL': '',
+    
     'STUDIO_NPS_SURVEY': True,
-    'SEGMENT_IO': True,
+    
+    # Segment.io - must explicitly turn it on for production
+    'SEGMENT_IO': False,
 
     # Enable URL that shows information about the status of various services
     'ENABLE_SERVICE_STATUS': False,
@@ -183,7 +194,7 @@ STATICFILES_DIRS = [
 
 # Locale/Internationalization
 TIME_ZONE = 'America/New_York'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
-LANGUAGE_CODE = 'en'            # http://www.i18nguy.com/unicode/language-identifiers.html
+LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
 
 USE_I18N = True
 USE_L10N = True
@@ -227,7 +238,8 @@ PIPELINE_JS = {
         ) + ['js/hesitate.js', 'js/base.js',
              'js/models/feedback.js', 'js/views/feedback.js',
              'js/models/section.js', 'js/views/section.js',
-             'js/models/metadata_model.js', 'js/views/metadata_editor_view.js'],
+             'js/models/metadata_model.js', 'js/views/metadata_editor_view.js',
+             'js/views/assets.js'],
         'output_filename': 'js/cms-application.js',
         'test_order': 0
     },

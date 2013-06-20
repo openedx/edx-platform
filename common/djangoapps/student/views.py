@@ -49,6 +49,7 @@ from courseware.views import get_module_for_descriptor, jump_to
 from courseware.model_data import ModelDataCache
 
 from statsd import statsd
+from pytz import UTC
 
 log = logging.getLogger("mitx.student")
 Article = namedtuple('Article', 'title url author image deck publication publish_date')
@@ -77,7 +78,7 @@ def index(request, extra_context={}, user=None):
     '''
 
     # The course selection work is done in courseware.courses.
-    domain = settings.MITX_FEATURES.get('FORCE_UNIVERSITY_DOMAIN')     # normally False
+    domain = settings.MITX_FEATURES.get('FORCE_UNIVERSITY_DOMAIN')  # normally False
     # do explicit check, because domain=None is valid
     if domain == False:
         domain = request.META.get('HTTP_HOST')
@@ -630,7 +631,7 @@ def create_account(request, post_override=None):
 
     # Ok, looks like everything is legit.  Create the account.
     ret = _do_create_account(post_vars)
-    if isinstance(ret, HttpResponse):		# if there was an error then return that
+    if isinstance(ret, HttpResponse):  # if there was an error then return that
         return ret
     (user, profile, registration) = ret
 
@@ -668,7 +669,7 @@ def create_account(request, post_override=None):
 
     if DoExternalAuth:
         eamap.user = login_user
-        eamap.dtsignup = datetime.datetime.now()
+        eamap.dtsignup = datetime.datetime.now(UTC)
         eamap.save()
         log.debug('Updated ExternalAuthMap for %s to be %s' % (post_vars['username'], eamap))
 

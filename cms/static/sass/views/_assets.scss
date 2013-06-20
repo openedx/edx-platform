@@ -76,6 +76,10 @@ body.course.uploads {
         width: 250px;
       }
 
+      .delete-col {
+        width: 20px;
+      }
+
       .embeddable-xml-input {
         @include box-shadow(none);
         width: 100%;

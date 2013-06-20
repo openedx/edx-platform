@@ -1,5 +1,4 @@
 from optparse import make_option
-from time import strftime
 
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
@@ -128,8 +127,8 @@ class Command(BaseCommand):
             exam = CourseDescriptor.TestCenterExam(course_id, exam_name, exam_info)
             # update option values for date_first and date_last to use YYYY-MM-DD format
             # instead of YYYY-MM-DDTHH:MM
-            our_options['eligibility_appointment_date_first'] = strftime("%Y-%m-%d", exam.first_eligible_appointment_date)
-            our_options['eligibility_appointment_date_last'] = strftime("%Y-%m-%d", exam.last_eligible_appointment_date)
+            our_options['eligibility_appointment_date_first'] = exam.first_eligible_appointment_date.strftime("%Y-%m-%d")
+            our_options['eligibility_appointment_date_last'] = exam.last_eligible_appointment_date.strftime("%Y-%m-%d")
 
         if exam is None:
             raise CommandError("Exam for course_id {} does not exist".format(course_id))

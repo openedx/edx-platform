@@ -160,7 +160,7 @@ class TestPeerGradingService(LoginEnrollmentTestCase):
         self.course_id = "edX/toy/2012_Fall"
         self.toy = modulestore().get_course(self.course_id)
         location = "i4x://edX/toy/peergrading/init"
-        model_data = {'data': "<peergrading/>"}
+        model_data = {'data': "<peergrading/>", 'location': location}
         self.mock_service = peer_grading_service.MockPeerGradingService()
         self.system = ModuleSystem(
             ajax_url=location,
@@ -172,9 +172,9 @@ class TestPeerGradingService(LoginEnrollmentTestCase):
             s3_interface=test_util_open_ended.S3_INTERFACE,
             open_ended_grading_interface=test_util_open_ended.OPEN_ENDED_GRADING_INTERFACE
         )
-        self.descriptor = peer_grading_module.PeerGradingDescriptor(self.system, location, model_data)
-        model_data = {}
-        self.peer_module = peer_grading_module.PeerGradingModule(self.system, location, self.descriptor, model_data)
+        self.descriptor = peer_grading_module.PeerGradingDescriptor(self.system, model_data)
+        model_data = {'location': location}
+        self.peer_module = peer_grading_module.PeerGradingModule(self.system, self.descriptor, model_data)
         self.peer_module.peer_gs = self.mock_service
         self.logout()
 
