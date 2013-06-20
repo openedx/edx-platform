@@ -9,12 +9,12 @@ from common import TEST_COURSE_NAME, TEST_SECTION_NAME, i_am_registered_for_the_
 ############### ACTIONS ####################
 
 
-@step('when I view the video it has autoplay enabled')
+@step('when I view the Video Alpha it has autoplay enabled')
 def does_autoplay(step):
     assert(world.css_find('.videoalpha')[0]['data-autoplay'] == 'True')
 
 
-@step('the course has a Video component')
+@step('the course has a Video Alpha component')
 def view_videoalpha(step):
     coursename = TEST_COURSE_NAME.replace(' ', '_')
     i_am_registered_for_the_course(step, coursename)
