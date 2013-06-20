@@ -507,7 +507,7 @@ case `uname -s` in Darwin)
         output "If you'd like Mongo automatically started up, press m"
         output "Otherwise start up Mongo, then press enter to continue. Or to quit, press control-C."
         read dummy
-        if [ "$dummy" = "m" ]; then mongod; fi
+        if [ "$dummy" = "m" ]; then mongod --fork; fi
         ;;
 esac
 
