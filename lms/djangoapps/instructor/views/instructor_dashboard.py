@@ -119,6 +119,7 @@ def _section_student_admin(course_id):
         'section_display_name': 'Student Admin',
         'get_student_progress_url': reverse('get_student_progress_url', kwargs={'course_id': course_id}),
         'unenroll_button_url': reverse('enroll_unenroll', kwargs={'course_id': course_id}),
+        'reset_student_attempts_url': reverse('reset_student_attempts', kwargs={'course_id': course_id}),
     }
     return section_data
 

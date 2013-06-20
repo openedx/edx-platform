@@ -16,6 +16,8 @@ from django.http import HttpResponse, HttpResponseBadRequest
 from courseware.courses import get_course_with_access
 from django.contrib.auth.models import User, Group
 
+from courseware.models import StudentModule
+import instructor.enrollment as enrollment
 from instructor.enrollment import split_input_list, enroll_emails, unenroll_emails
 from instructor.access import allow_access, revoke_access, list_with_level
 import analytics.basic
@@ -261,6 +263,41 @@ def redirect_to_student_progress(request, course_id):
     response_payload = {
         'course_id':    course_id,
         'progress_url': progress_url,
+    }
+    response = HttpResponse(json.dumps(response_payload), content_type="application/json")
+    return response
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+def reset_student_attempts(request, course_id):
+    """
+    Resets a students attempts counter. Optionally deletes student state for a problem.
+    Limited to staff access.
+
+    Takes query parameter student_email
+    Takes query parameter problem_to_reset
+    Takes query parameter delete_module
+    """
+    course = get_course_with_access(request.user, course_id, 'staff', depth=None)
+
+    student_email = request.GET.get('student_email')
+    problem_to_reset = request.GET.get('problem_to_reset')
+    will_delete_module = {'true': True}.get(request.GET.get('delete_module', ''), False)
+
+    if not student_email or not problem_to_reset:
+        return HttpResponseBadRequest()
+
+    user = User.objects.get(email=student_email)
+
+    try:
+        enrollment.reset_student_attempts(course_id, user, problem_to_reset, delete_module=will_delete_module)
+    except StudentModule.DoesNotExist:
+        return HttpResponseBadRequest()
+
+    response_payload = {
+        'course_id':    course_id,
+        'delete_module': will_delete_module,
     }
     response = HttpResponse(json.dumps(response_payload), content_type="application/json")
     return response
