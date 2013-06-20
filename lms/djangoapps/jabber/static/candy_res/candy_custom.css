@@ -24,7 +24,12 @@
 }
 
 #chat-rooms .message-pane {
-    margin-right: 10px;
+    margin: 0 25px 0 10px;
+    padding: 5px 0;
+}
+#chat-rooms .message-pane dd {
+    overflow: hidden;
+    padding-left: 140px;
 }
 
 #chat-rooms .roster-pane .user {
@@ -45,14 +50,20 @@
     color: #fbfbf9;
 }
 
-#chat-rooms .message-form-wrapper,
+#chat-rooms .message-form-wrapper {
+    background-color: #e9e6df;
+}
+
 #chat-rooms form.message-form {
+    margin-right: 260px;
     background-color: #e9e6df;
 }
 
 #chat-rooms form.message-form input.field {
-    background-color: transparent;
-    width: 850px;
+    background-color: #fbfbf9;
+    margin: 3px 5px;
+    padding: 4px 8px;
+    border-radius: 3px;
 }
 
 #chat-rooms .message-form input.submit {
@@ -69,5 +80,8 @@
 }
 
 #chat-modal img {
+    display: none !important;
+}
+#chat-modal #login-form {
     display: none !important;
 }
