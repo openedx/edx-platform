@@ -58,10 +58,16 @@ def css_find(css, wait_time=5):
 
 
 @world.absorb
-def css_click(css_selector, index=0, attempts=5):
+def css_click(css_selector, index=0, attempts=5, success_condition=lambda:True):
     """
-    Perform a click on a CSS selector, retrying if it initially fails
-    This function will return if the click worked (since it is try/excepting all errors)
+    Perform a click on a CSS selector, retrying if it initially fails.
+
+    This function handles errors that may be thrown if the component cannot be clicked on.
+    However, there are cases where an error may not be thrown, and yet the operation did not
+    actually succeed. For those cases, a success_condition lambda can be supplied to verify that the click worked.
+
+    This function will return True if the click worked (taking into account both errors and the optional
+    success_condition).
     """
     assert is_css_present(css_selector)
     attempt = 0
@@ -69,8 +75,9 @@ def css_click(css_selector, index=0, attempts=5):
     while attempt < attempts:
         try:
             world.css_find(css_selector)[index].click()
-            result = True
-            break
+            if success_condition():
+                result = True
+                break
         except WebDriverException:
             # Occasionally, MathJax or other JavaScript can cover up
             # an element temporarily.
