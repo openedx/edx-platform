@@ -1,12 +1,19 @@
 .instructor-dashboard-wrapper-2 {
-  @extend .table-wrapper;
-  display: table;
+  // @extend .table-wrapper;
+  // display: table;
+  position: relative;
+
+  .olddash-button-wrapper {
+    position: absolute;
+    top: 2em;
+    right: 2em;
+  }
 
   section.instructor-dashboard-content-2 {
     @extend .content;
     padding: 40px;
     width: 100%;
-    position: relative;
+    // position: relative;
 
     .slick-header-column {
       height: 100%;

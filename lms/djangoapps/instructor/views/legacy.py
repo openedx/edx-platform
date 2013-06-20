@@ -749,6 +749,7 @@ def instructor_dashboard(request, course_id):
                'instructor_tasks': instructor_tasks,
                'offline_grade_log': offline_grades_available(course_id),
                'cohorts_ajax_url': reverse('cohorts', kwargs={'course_id': course_id}),
+               'beta_dashboard_url': reverse('instructor_dashboard_2', kwargs={'course_id': course_id}),
 
                'analytics_results': analytics_results,
                }
