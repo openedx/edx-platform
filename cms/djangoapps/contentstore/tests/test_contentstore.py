@@ -41,6 +41,7 @@ from xmodule.exceptions import NotFoundError
 
 from django_comment_common.utils import are_permissions_roles_seeded
 from xmodule.exceptions import InvalidVersionError
+import xmodule.contentstore.django
 import datetime
 from pytz import UTC
 from uuid import uuid4
@@ -92,7 +93,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
     def tearDown(self):
         m = pymongo.MongoClient()
         m.drop_database(TEST_DATA_CONTENTSTORE['OPTIONS']['db'])
-        #contentstore().fs_files.drop()
+        xmodule.contentstore.django._CONTENTSTORE.clear()
 
     def check_components_on_page(self, component_types, expected_types):
         """
@@ -859,7 +860,7 @@ class ContentStoreTest(ModuleStoreTestCase):
     def tearDown(self):
         m = pymongo.MongoClient()
         m.drop_database(TEST_DATA_CONTENTSTORE['OPTIONS']['db'])
-        #contentstore().fs_files.drop()
+        xmodule.contentstore.django._CONTENTSTORE.clear()
 
     def test_create_course(self):
         """Test new course creation - happy path"""
