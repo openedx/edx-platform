@@ -131,9 +131,14 @@ class CourseDetailsTestCase(CourseTestCase):
 
     @override_settings(MKTG_URLS={'ROOT': 'dummy-root'})
     def test_marketing_site_fetch(self):
-        settings_details_url = reverse('settings_details',
-            kwargs={'org': self.course_location.org, 'name': self.course_location.name,
-                    'course': self.course_location.course})
+        settings_details_url = reverse(
+            'settings_details',
+            kwargs={
+                'org': self.course_location.org,
+                'name': self.course_location.name,
+                'course': self.course_location.course
+            }
+        )
 
         with mock.patch.dict('django.conf.settings.MITX_FEATURES', {'ENABLE_MKTG_SITE': True}):
             response = self.client.get(settings_details_url)
@@ -150,9 +155,14 @@ class CourseDetailsTestCase(CourseTestCase):
             self.assertNotContains(response, "Requirements")
 
     def test_regular_site_fetch(self):
-        settings_details_url = reverse('settings_details',
-            kwargs={'org': self.course_location.org, 'name': self.course_location.name,
-                    'course': self.course_location.course})
+        settings_details_url = reverse(
+            'settings_details',
+            kwargs={
+                'org': self.course_location.org,
+                'name': self.course_location.name,
+                'course': self.course_location.course
+            }
+        )
 
         with mock.patch.dict('django.conf.settings.MITX_FEATURES', {'ENABLE_MKTG_SITE': False}):
             response = self.client.get(settings_details_url)
