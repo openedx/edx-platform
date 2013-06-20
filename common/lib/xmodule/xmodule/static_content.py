@@ -4,6 +4,7 @@ This module has utility functions for gathering up the static content
 that is defined by XModules and XModuleDescriptors (javascript and css)
 """
 
+import logging
 import hashlib
 import os
 import errno
@@ -13,6 +14,9 @@ from docopt import docopt
 from path import path
 
 from xmodule.x_module import XModuleDescriptor
+
+
+LOG = logging.getLogger(__name__)
 
 
 def write_module_styles(output_root):
@@ -121,18 +125,32 @@ def _write_js(output_root, classes):
             type=filetype)
         contents[filename] = fragment
 
-    _write_files(output_root, contents)
+    _write_files(output_root, contents, {'.coffee': '.js'})
 
     return [output_root / filename for filename in contents.keys()]
 
 
-def _write_files(output_root, contents):
+def _write_files(output_root, contents, generated_suffix_map=None):
     _ensure_dir(output_root)
-    for extra_file in set(output_root.files()) - set(contents.keys()):
-        extra_file.remove_p()
+    to_delete = set(file.basename() for file in output_root.files()) - set(contents.keys())
+
+    if generated_suffix_map:
+        for output_file in contents.keys():
+            for suffix, generated_suffix in generated_suffix_map.items():
+                if output_file.endswith(suffix):
+                    to_delete.discard(output_file.replace(suffix, generated_suffix))
+
+    for extra_file in to_delete:
+        (output_root / extra_file).remove_p()
 
     for filename, file_content in contents.iteritems():
-        (output_root / filename).write_bytes(file_content)
+        output_file = output_root / filename
+
+        if not output_file.isfile() or output_file.read_md5() != hashlib.md5(file_content).digest():
+            LOG.debug("Writing %s", output_file)
+            output_file.write_bytes(file_content)
+        else:
+            LOG.debug("%s unchanged, skipping", output_file)
 
 
 def main():

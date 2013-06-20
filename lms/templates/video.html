@@ -2,6 +2,7 @@
   <h2> ${display_name} </h2>
 % endif
 
+<<<<<<< HEAD
 %if settings.MITX_FEATURES['STUB_VIDEO_FOR_TESTING']:
   <div id="stub_out_video_for_testing">
     <div class="video" data-autoplay="${settings.MITX_FEATURES['AUTOPLAY_VIDEOS']}">
@@ -43,6 +44,35 @@
        data-end="${end}"
        data-caption-asset-path="${caption_asset_path}"
        data-autoplay="${settings.MITX_FEATURES['AUTOPLAY_VIDEOS']}">
+=======
+%if settings.MITX_FEATURES.get('USE_YOUTUBE_OBJECT_API') and normal_speed_video_id:
+  <object width="640" height="390">
+    <param name="movie"
+    % if not settings.MITX_FEATURES['STUB_VIDEO_FOR_TESTING']:
+    value="https://www.youtube.com/v/${normal_speed_video_id}?version=3&amp;autoplay=1&amp;rel=0">
+    % endif
+    </param>
+    <param name="allowScriptAccess" value="always"></param>
+    <embed 
+       % if not settings.MITX_FEATURES['STUB_VIDEO_FOR_TESTING']:
+       src="https://www.youtube.com/v/${normal_speed_video_id}?version=3&amp;autoplay=1&amp;rel=0"
+       % endif
+       type="application/x-shockwave-flash"
+       allowscriptaccess="always"
+       width="640" height="390"></embed>
+  </object>
+%else:
+<div id="video_${id}" class="video" 
+
+    % if not settings.MITX_FEATURES['STUB_VIDEO_FOR_TESTING']:
+    data-streams="${streams}" 
+    % endif
+
+    data-show-captions="${show_captions}" 
+    data-start="${start}" data-end="${end}" 
+    data-caption-asset-path="${caption_asset_path}" 
+    data-autoplay="${settings.MITX_FEATURES['AUTOPLAY_VIDEOS']}">
+>>>>>>> master
     <div class="tc-wrapper">
       <article class="video-wrapper">
         <section class="video-player">
