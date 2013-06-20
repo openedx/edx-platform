@@ -28,6 +28,7 @@
                     data_dict[i] = [$(this).parent().attr("data-problem"), 
                                     $(this).parent().attr("data-answer"), 
                                     $(this).parent().attr("data-pk")];
+                    i += 1
                 }
             });
             $.ajax(window.location.pathname, {
@@ -64,6 +65,40 @@
               });
         });
 
+        $(".submit-new-hint").click(function(){
+            problem_name = $(this).data("problem");
+            hint_text = $(".submit-hint-text").filter('*[data-problem="'+problem_name+'"]').val();
+            hint_answer = $(".submit-hint-answer").filter('*[data-problem="'+problem_name+'"]').val();
+            data_dict = {'op': 'add hint',
+                         'field': field,
+                         'problem': problem_name,
+                         'answer': hint_answer,
+                         'hint': hint_text};
+            $.ajax(window.location.pathname, {
+                type: "POST",
+                data: data_dict,
+                success: update_contents
+            });
+        });
+
+        $("#approve").click(function(){
+            var data_dict = {'op': 'approve',
+                             'field': field}
+            var i = 1
+            $(".hint-select").each(function(){
+                if ($(this).is(":checked")) {
+                    data_dict[i] = [$(this).parent().attr("data-problem"), 
+                                    $(this).parent().attr("data-answer"), 
+                                    $(this).parent().attr("data-pk")];
+                    i += 1
+                }
+            });
+            $.ajax(window.location.pathname, {
+                type: "POST", 
+                data: data_dict,
+                success: update_contents
+            });
+        });
     }
 
     $(document).ready(setup);
