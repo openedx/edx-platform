@@ -19,7 +19,10 @@ $ ->
     if ajaxSettings.notifyOnError is false
       return
     if jqXHR.responseText
-        message = _.str.truncate(jqXHR.responseText, 300)
+        try
+          message = JSON.parse(jqXHR.responseText).error
+        catch
+          message = _.str.truncate(jqXHR.responseText, 300)
     else
         message = gettext("This may be happening because of an error with our server or your internet connection. Try refreshing the page or making sure you are online.")
     msg = new CMS.Views.Notification.Error(
