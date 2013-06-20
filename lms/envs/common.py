@@ -689,7 +689,6 @@ INSTALLED_APPS = (
     'student',
     'static_template_view',
     'staticbook',
-    'simplewiki',
     'track',
     'util',
     'certificates',
