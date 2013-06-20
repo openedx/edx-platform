@@ -8,7 +8,16 @@ the top.  Include a label indicating the component affected.
 Studio: Remove XML from the video component editor. All settings are
 moved to be edited as metadata.
 
-LMS: Forums.  Added handling for case where discussion module can get `None` as 
+Common: Repairs development documentation generation by sphinx.
+
+LMS: Problem rescoring.  Added options on the Grades tab of the
+Instructor Dashboard to allow all students' submissions for a
+particular problem to be rescored.  Also supports resetting all
+students' number of attempts to zero.  Provides a list of background
+tasks that are currently running for the course, and an option to
+see a history of background tasks for a given problem.
+
+LMS: Forums.  Added handling for case where discussion module can get `None` as
 value of lms.start in `lms/djangoapps/django_comment_client/utils.py`
 
 Studio, LMS: Make ModelTypes more strict about their expected content (for

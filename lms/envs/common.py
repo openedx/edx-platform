@@ -102,7 +102,7 @@ MITX_FEATURES = {
     # Staff Debug tool.
     'ENABLE_STUDENT_HISTORY_VIEW': True,
 
-    # segment.io for LMS--need to explicitly turn it on on production.
+    # segment.io for LMS--need to explicitly turn it on for production.
     'SEGMENT_IO_LMS': False,
 
     # Enables the student notes API and UI.
@@ -122,7 +122,10 @@ MITX_FEATURES = {
     'USE_CUSTOM_THEME': False,
 
     # Do autoplay videos for students
-    'AUTOPLAY_VIDEOS': True
+    'AUTOPLAY_VIDEOS': True,
+
+    # Enable instructor dash to submit background tasks
+    'ENABLE_INSTRUCTOR_BACKGROUND_TASKS': True,
 }
 
 # Used for A/B testing
@@ -691,6 +694,7 @@ INSTALLED_APPS = (
     'util',
     'certificates',
     'instructor',
+    'instructor_task',
     'open_ended_grading',
     'psychometrics',
     'licenses',

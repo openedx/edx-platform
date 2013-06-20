@@ -6,7 +6,7 @@ from xmodule.open_ended_grading_classes.self_assessment_module import SelfAssess
 from xmodule.modulestore import Location
 from lxml import etree
 
-from . import test_system
+from . import get_test_system
 
 import test_util_open_ended
 
@@ -51,7 +51,7 @@ class SelfAssessmentTest(unittest.TestCase):
             'skip_basic_checks': False,
         }
 
-        self.module = SelfAssessmentModule(test_system(), self.location,
+        self.module = SelfAssessmentModule(get_test_system(), self.location,
                                            self.definition,
                                            self.descriptor,
                                            static_data)

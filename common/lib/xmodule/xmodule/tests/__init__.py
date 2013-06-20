@@ -29,14 +29,14 @@ open_ended_grading_interface = {
     }
 
 
-def test_system():
+def get_test_system():
     """
     Construct a test ModuleSystem instance.
 
     By default, the render_template() method simply returns the repr of the
     context it is passed.  You can override this behavior by monkey patching::
 
-        system = test_system()
+        system = get_test_system()
         system.render_template = my_render_func
 
     where `my_render_func` is a function of the form my_render_func(template, context).

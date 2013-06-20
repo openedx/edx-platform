@@ -13,7 +13,7 @@ from django.test.client import Client
 
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
-from xmodule.tests import test_system
+from xmodule.tests import get_test_system
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -77,7 +77,7 @@ class BaseTestXmodule(ModuleStoreTestCase):
             data=self.DATA
         )
 
-        system = test_system()
+        system = get_test_system()
         system.render_template = lambda template, context: context
         model_data = {'location': self.item_descriptor.location}
         model_data.update(self.MODEL_DATA)
