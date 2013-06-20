@@ -92,21 +92,20 @@
   .vert-right {
     float: right;
     width: 45%;
+  }
 
-    .auth-list-container {
-      margin-bottom: 1.5em;
+  .auth-list-container {
+    margin-bottom: 1.5em;
 
-      .auth-list-table {
-        .slickgrid {
-          height: 250px;
-        }
-      }
-
-      .auth-list-add {
-        margin-top: 0.5em;
+    .auth-list-table {
+      .slickgrid {
+        height: 250px;
       }
     }
 
+    .auth-list-add {
+      margin-top: 0.5em;
+    }
   }
 
   .batch-enrollment {

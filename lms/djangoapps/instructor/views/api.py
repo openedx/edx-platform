@@ -61,21 +61,21 @@ def access_allow_revoke(request, course_id):
 
     Query parameters:
     email is the target users email
-    level is one of ['instructor', 'staff']
+    rolename is one of ['instructor', 'staff']
     mode is one of ['allow', 'revoke']
     """
     course = get_course_with_access(request.user, course_id, 'instructor', depth=None)
 
     email = request.GET.get('email')
-    level = request.GET.get('level')
+    rolename = request.GET.get('rolename')
     mode = request.GET.get('mode')
 
     user = User.objects.get(email=email)
 
     if mode == 'allow':
-        access.allow_access(course, user, level)
+        access.allow_access(course, user, rolename)
     elif mode == 'revoke':
-        access.revoke_access(course, user, level)
+        access.revoke_access(course, user, rolename)
     else:
         raise ValueError("unrecognized mode '{}'".format(mode))
 
@@ -92,10 +92,17 @@ def list_instructors_staff(request, course_id):
     """
     List instructors and staff.
     Requires staff access.
+
+    rolename is one of ['instructor', 'staff']
     """
     course = get_course_with_access(request.user, course_id, 'staff', depth=None)
 
-    def extract_user(user):
+    rolename = request.GET.get('rolename', '')
+
+    if not rolename in ['instructor', 'staff']:
+        return HttpResponseBadRequest()
+
+    def extract_user_info(user):
         return {
             'username': user.username,
             'email': user.email,
@@ -105,8 +112,7 @@ def list_instructors_staff(request, course_id):
 
     response_payload = {
         'course_id':   course_id,
-        'instructor':  map(extract_user, access.list_with_level(course, 'instructor')),
-        'staff':       map(extract_user, access.list_with_level(course, 'staff')),
+        rolename:  map(extract_user_info, access.list_with_level(course, rolename)),
     }
     response = HttpResponse(json.dumps(response_payload), content_type="application/json")
     return response
@@ -333,12 +339,13 @@ def list_forum_members(request, course_id):
         return {
             'username': user.username,
             'email': user.email,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
         }
 
     response_payload = {
         'course_id': course_id,
-        'role':      rolename,
-        'members':   map(extract_user_info, users),
+        rolename:   map(extract_user_info, users),
     }
     response = HttpResponse(json.dumps(response_payload), content_type="application/json")
     return response

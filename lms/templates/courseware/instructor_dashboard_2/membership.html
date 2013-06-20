@@ -8,6 +8,33 @@
   <input type="button" name="enroll" value="Enroll" data-endpoint="${ section_data['enroll_button_url'] }" >
   <input type="button" name="unenroll" value="Unenroll" data-endpoint="${ section_data['unenroll_button_url'] }" >
   <div class="task-response"></div>
+
+  <div class="auth-list-container auth-list-forum-admin">
+    <h2>Instructor Management</h2>
+    <div class="auth-list-table" data-endpoint="${ section_data['list_forum_members_url'] }"></div>
+    <div class="auth-list-add" data-endpoint="${ section_data['update_forum_role_membership_url'] }">
+      <input type="text" name="email" placeholder="Enter Email" spellcheck="false">
+      <input type="button" name="allow" value="Grant Forum Admin">
+    </div>
+  </div>
+
+  <div class="auth-list-container auth-list-forum-moderator">
+    <h2>Instructor Management</h2>
+    <div class="auth-list-table" data-endpoint="${ section_data['list_forum_members_url'] }"></div>
+    <div class="auth-list-add" data-endpoint="${ section_data['update_forum_role_membership_url'] }">
+      <input type="text" name="email" placeholder="Enter Email" spellcheck="false">
+      <input type="button" name="allow" value="Grant Forum Moderator">
+    </div>
+  </div>
+
+  <div class="auth-list-container auth-list-forum-community-ta">
+    <h2>Instructor Management</h2>
+    <div class="auth-list-table" data-endpoint="${ section_data['list_forum_members_url'] }"></div>
+    <div class="auth-list-add" data-endpoint="${ section_data['update_forum_role_membership_url'] }">
+      <input type="text" name="email" placeholder="Enter Email" spellcheck="false">
+      <input type="button" name="allow" value="Grant Community TA">
+    </div>
+  </div>
 </div>
 
 <div class="vert-right instructor-staff-management">
