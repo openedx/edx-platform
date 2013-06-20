@@ -5,6 +5,8 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Common: Repairs development documentation generation by sphinx.
+
 LMS: Problem rescoring.  Added options on the Grades tab of the
 Instructor Dashboard to allow all students' submissions for a
 particular problem to be rescored.  Also supports resetting all
