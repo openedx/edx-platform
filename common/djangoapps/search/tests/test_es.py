@@ -1,9 +1,13 @@
 from django.test import TestCase
 import requests
+<<<<<<< HEAD
 from ..es_requests import ElasticDatabase, PyGrep
 import json
 import time
 import os
+=======
+from ..es_requests import ElasticDatabase
+>>>>>>> Removed hackathon files, added some tests, included indexing of problems and pdfs
 
 
 class EsTest(TestCase):
@@ -11,6 +15,7 @@ class EsTest(TestCase):
     def setUp(self, es_instance="http://localhost:9200"):
         # Making sure that there is actually a running es_instance before testing
         database_request = requests.get(es_instance)
+<<<<<<< HEAD
         self.assertEqual(database_request.status_code, 200)
         self.elastic_search = ElasticDatabase(es_instance, "common/djangoapps/search/tests/test_settings.json")
         type_request = self.elastic_search.setup_type("test-index", "test-type",
@@ -100,6 +105,30 @@ class EsTest(TestCase):
         self.assertEqual(good_object.status_code, 200)
         self.assertEqual(json.loads(bad_object._content)["_source"]["searchable_text"], "INVALID JSON")
         self.assertEqual(json.loads(good_object._content)["_source"]["searchable_text"], "Success!")
+=======
+        print database_request._content
+        self.assertEqual(database_request.status_code, 200)
+        self.elastic_search = ElasticDatabase(es_instance, "common/djangoapps/search/tests/test_settings.json")
+        self.assertEqual(isinstance(self.elastic_search, ElasticDatabase), True)
+        index_request = self.elastic_search.setup_index("test-index")
+        print index_request._content
+        self.assertEqual(index_request.status_code, 200)
+        type_request = self.elastic_search.setup_type("test-index", "test_type",
+                                                      "common/djangoapps/search/tests/test_mapping.json")
+        print type_request._content
+        self.assertEqual(type_request.status_code, 200)
+
+    def test_index_creation(self):
+        settings = self.elastic_search.get_index_settings("test-index")["test-index"]["settings"]
+        self.assertEqual(self.elastic_search.has_index("test-index"), True)
+        self.assertEqual(settings["index.number_of_replicas"], "5")
+        self.assertEqual(settings["index.number_of_shards"], "10")
+
+    def test_type_creation(self):
+        check = self.elastic_search.get_type_mapping("test-index", "test-type")
+        print check
+        self.assertEqual(True, False)
+>>>>>>> Removed hackathon files, added some tests, included indexing of problems and pdfs
 
     def tearDown(self):
         self.elastic_search.delete_type("test-index", "test-type")

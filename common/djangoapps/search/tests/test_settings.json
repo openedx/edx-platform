@@ -1,2 +1,9 @@
 {
+<<<<<<< HEAD
+=======
+	"settings": {
+		"number_of_shards": 10,
+		"number_of_replicas": 5
+	}
+>>>>>>> Removed hackathon files, added some tests, included indexing of problems and pdfs
 }

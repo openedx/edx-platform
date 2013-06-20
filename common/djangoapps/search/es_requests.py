@@ -161,6 +161,30 @@ class MongoIndexer:
             type_ = course.replace(".", "-")
             print es_instance.index_data(index, type_, data)._content
 
+    def pdf_to_text(self, mongo_element):
+        onlyAscii = lambda s: "".join(c for c in s if ord(c) < 128)
+        resource = PDFResourceManager()
+        return_string = cIO()
+        params = LAParams()
+        converter = TextConverter(resource, return_string, codec='utf-8', laparams=params)
+        fake_file = IO(mongo_element["data"].__str__())
+        try:
+            process_pdf(resource, converter, fake_file)
+        except PDFSyntaxError:
+            print mongo_element["files_id"]["name"] + " cannot be read, moving on."
+            return ""
+        text_value = onlyAscii(return_string.getvalue()).replace("\n", " ")
+        return text_value
+
+    def searchable_text_from_problem_data(self, mongo_element):
+        """The data field from the problem is in weird xml, which is good for functionality, but bad for search"""
+        data = mongo_element["definition"]["data"]
+        paragraphs = " ".join([text for text in re.findall("<p>(.*?)</p>", data) if text is not "Explanation"])
+        cleaned_text = re.sub("\\(.*?\\)", "", paragraphs).replace("\\", "")
+        remove_tags = re.sub("<[a-zA-Z0-9/\.\= \"_-]+>", "", cleaned_text)
+        remove_repetitions = re.sub(r"(.)\1{4,}", "", remove_tags)
+        print remove_repetitions
+
     def module_for_uuid(self, transcript_uuid):
         """Given the transcript uuid found from the xcontent database, returns the mongo document for the video"""
         regex_pattern = re.compile(".*?"+str(transcript_uuid)+".*?")
@@ -173,6 +197,38 @@ class MongoIndexer:
         if file_name[:5] == "subs_":
             file_name = file_name[5:]
         return file_name[:file_name.find(".")]
+
+    def index_all_lecture_slides(self, es_instance, index):
+        cursor = self.find_chunks_with_type(".pdf")
+        for i in range(0, cursor.count()):
+            item = cursor.next()
+            # Not sure if this true is for every course, but it seems to
+            # be a sensible limitations for the courses on my local machine
+            if item["files_id"]["name"][:3] == "lec":
+                course = item["files_id"]["course"]
+                org = item["files_id"]["org"]
+                # The lecture slides don't seem to have any kind of uuid or guid
+                uuid = item["files_id"]["name"]
+                display_name = org + " " + course + " " + item["files_id"]["name"]
+                searchable_text = self.pdf_to_text(item)
+                data = {"course": course, "org": org, "uuid": uuid, "searchable_text": searchable_text,
+                        "display_name": display_name}
+                type_ = course.replace(".", "-")
+                print es_instance.index_data(index, type_, data)._content
+
+    def index_all_problems(self, es_instance, index):
+        cursor = self.find_modules_by_category("problem")
+        for i in range(0, cursor.count()):
+            item = cursor.next()
+            course = item["_id"]["course"]
+            org = item["_id"]["org"]
+            uuid = item["_id"]["name"]
+            display_name = org + " " + course + " " + item["metadata"]["display_name"]
+            searchable_text = self.searchable_text_from_problem_data(item)
+            data = {"course": course, "org": org, "uuid": uuid, "searchable_text": searchable_text,
+                    "display_name": display_name}
+            type_ = course.replace(".", "-")
+            print es_instance.index_data(index, type_, data)._content
 
     def index_all_transcripts(self, es_instance, index):
         cursor = self.find_files_with_type(".srt.sjson")
@@ -401,7 +457,6 @@ class EnchantDictionary:
 #mongo.index_all_lecture_slides(test, "slide-index")
 #mongo.index_all_transcripts(test, "transcript-index")
 #mongo.index_all_problems(test, "problem-index")
-
 #print test.setup_type("transcript", "cleaning", mapping)._content
 #print test.get_type_mapping("transcript-index", "2-1x")
 #print test.index_directory_transcripts("/home/slater/edx_all/data", "transcript-index", "transcript")
