@@ -168,6 +168,8 @@ def _parse_youtube(data):
     XML-based courses.
     """
     ret = {'0.75': '', '1.00': '', '1.25': '', '1.50': ''}
+    if data == '':
+        return ret
     videos = data.split(',')
     for video in videos:
         pieces = video.split(':')

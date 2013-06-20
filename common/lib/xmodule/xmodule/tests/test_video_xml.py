@@ -110,3 +110,14 @@ class VideoModuleLogicTest(LogicTest):
         youtube_str = '1.00:p2Q6BrNhdh8'
         youtube_str_hack = '1.0:p2Q6BrNhdh8'
         self.assertEqual(_parse_youtube(youtube_str), _parse_youtube(youtube_str_hack))
+
+    def test_parse_youtube_empty(self):
+        """
+        Some courses have empty youtube attributes, so we should handle
+        that well.
+        """
+        self.assertEqual(_parse_youtube(''),
+                         {'0.75': '',
+                          '1.00': '',
+                          '1.25': '',
+                          '1.50': ''})
