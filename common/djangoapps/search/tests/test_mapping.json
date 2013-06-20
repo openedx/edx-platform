@@ -1,5 +1,6 @@
 {
 	"mappings": {
+<<<<<<< HEAD
 		"test-string": {
 			"type": "string",
 			"store": "yes",
@@ -13,4 +14,20 @@
 		}
 	}
 
+=======
+		"properties": {
+			"test-string": {
+				"type": "string",
+				"store": "yes",
+				"index": "analyzed",
+				"term_vector": "with_positions_offsets"
+			},
+
+			"test-float": {
+				"type": "float",
+				"store": "yes"
+			}
+		}
+	}
+>>>>>>> Removed hackathon files, added some tests, included indexing of problems and pdfs
 }
