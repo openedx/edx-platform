@@ -33,6 +33,17 @@ def run_acceptance_tests(system, report_dir, harvest_args)
     test_sh(django_admin(system, 'acceptance', 'harvest', '--debug-mode', '--tag -skip', harvest_args))
 end
 
+# Run documentation tests
+desc "Run documentation tests"
+task :test_docs do
+    # Be sure that sphinx can build docs w/o exceptions.
+    test_message = "If test fails, you shoud run %s and look at whole output and fix exceptions.
+(You shouldn't fix rst warnings and errors for this to pass, just get rid of exceptions.)"
+    puts (test_message  % ["rake doc"]).colorize( :light_green )
+    test_sh('rake builddocs')
+    puts  (test_message  % ["rake doc[pub]"]).colorize( :light_green )
+    test_sh('rake builddocs[pub]')
+end
 
 directory REPORT_DIR
 
@@ -103,7 +114,7 @@ TEST_TASK_DIRS.each do |dir|
 end
 
 desc "Run all tests"
-task :test
+task :test => :test_docs
 
 desc "Build the html, xml, and diff coverage reports"
 task :coverage => :report_dirs do

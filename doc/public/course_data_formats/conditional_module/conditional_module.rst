@@ -53,7 +53,7 @@ Examples of conditional depends on poll
     </conditional>
 
 Examples of conditional depends on poll (use <show> tag)
--------------------------------------------
+--------------------------------------------------------
 
 .. code-block:: xml
 

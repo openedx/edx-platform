@@ -19,11 +19,11 @@ This is a partial list of features, to be revised as we go along:
 
       An example of a problem::
 
-      <symbolicresponse expect="a_b^c + b_x__d" size="30">
-        <textline math="1"
+        <symbolicresponse expect="a_b^c + b_x__d" size="30">
+          <textline math="1"
            preprocessorClassName="SymbolicMathjaxPreprocessor"
            preprocessorSrc="/static/js/capa/symbolic_mathjax_preprocessor.js"/>
-      </symbolicresponse>
+        </symbolicresponse>
 
       It's a bit of a pain to enter that.
 
