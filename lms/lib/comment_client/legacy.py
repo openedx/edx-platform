@@ -5,16 +5,14 @@ def delete_threads(commentable_id, *args, **kwargs):
 def get_threads(commentable_id, recursive=False, query_params={}, *args, **kwargs):
     default_params = {'page': 1, 'per_page': 20, 'recursive': recursive}
     attributes = dict(default_params.items() + query_params.items())
-    response = _perform_request('get', _url_for_threads(commentable_id), \
-            attributes, *args, **kwargs)
+    response = _perform_request('get', _url_for_threads(commentable_id), attributes, *args, **kwargs)
     return response.get('collection', []), response.get('page', 1), response.get('num_pages', 1)
 
 
 def search_threads(course_id, recursive=False, query_params={}, *args, **kwargs):
     default_params = {'page': 1, 'per_page': 20, 'course_id': course_id, 'recursive': recursive}
     attributes = dict(default_params.items() + query_params.items())
-    response = _perform_request('get', _url_for_search_threads(), \
-            attributes, *args, **kwargs)
+    response = _perform_request('get', _url_for_search_threads(), attributes, *args, **kwargs)
     return response.get('collection', []), response.get('page', 1), response.get('num_pages', 1)
 
 

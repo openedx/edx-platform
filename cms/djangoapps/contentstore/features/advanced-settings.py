@@ -2,7 +2,7 @@
 #pylint: disable=W0621
 
 from lettuce import world, step
-from nose.tools import assert_false, assert_equal, assert_regexp_matches
+from nose.tools import assert_false, assert_equal, assert_regexp_matches, assert_true
 from common import type_in_codemirror
 
 KEY_CSS = '.key input.policy-key'
@@ -28,7 +28,15 @@ def i_am_on_advanced_course_settings(step):
 @step(u'I press the "([^"]*)" notification button$')
 def press_the_notification_button(step, name):
     css = 'a.%s-button' % name.lower()
-    world.css_click(css)
+
+    # Save was clicked if either the save notification bar is gone, or we have a error notification
+    # overlaying it (expected in the case of typing Object into display_name).
+    def save_clicked():
+        confirmation_dismissed = world.is_css_not_present('.is-shown.wrapper-notification-warning')
+        error_showing = world.is_css_present('.is-shown.wrapper-notification-error')
+        return confirmation_dismissed or error_showing
+
+    assert_true(world.css_click(css, success_condition=save_clicked), 'Save button not clicked after 5 attempts.')
 
 
 @step(u'I edit the value of a policy key$')

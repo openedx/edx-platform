@@ -1,11 +1,16 @@
+"""
+Tests for Studio Course Settings.
+"""
 import datetime
 import json
 import copy
+import mock
 
 from django.contrib.auth.models import User
 from django.test.client import Client
 from django.core.urlresolvers import reverse
 from django.utils.timezone import UTC
+from django.test.utils import override_settings
 
 from xmodule.modulestore import Location
 from models.settings.course_details import (CourseDetails, CourseSettingsEncoder)
@@ -21,6 +26,9 @@ from xmodule.fields import Date
 
 
 class CourseTestCase(ModuleStoreTestCase):
+    """
+    Base class for test classes below.
+    """
     def setUp(self):
         """
         These tests need a user in the DB so that the django Test Client
@@ -51,6 +59,9 @@ class CourseTestCase(ModuleStoreTestCase):
 
 
 class CourseDetailsTestCase(CourseTestCase):
+    """
+    Tests the first course settings page (course dates, overview, etc.).
+    """
     def test_virgin_fetch(self):
         details = CourseDetails.fetch(self.course_location)
         self.assertEqual(details.course_location, self.course_location, "Location not copied into")
@@ -81,9 +92,9 @@ class CourseDetailsTestCase(CourseTestCase):
         Test the encoder out of its original constrained purpose to see if it functions for general use
         """
         details = {'location': Location(['tag', 'org', 'course', 'category', 'name']),
-            'number': 1,
-            'string': 'string',
-            'datetime': datetime.datetime.now(UTC())}
+                   'number': 1,
+                   'string': 'string',
+                   'datetime': datetime.datetime.now(UTC())}
         jsondetails = json.dumps(details, cls=CourseSettingsEncoder)
         jsondetails = json.loads(jsondetails)
 
@@ -118,8 +129,60 @@ class CourseDetailsTestCase(CourseTestCase):
             jsondetails.effort, "After set effort"
         )
 
+    @override_settings(MKTG_URLS={'ROOT': 'dummy-root'})
+    def test_marketing_site_fetch(self):
+        settings_details_url = reverse(
+            'settings_details',
+            kwargs={
+                'org': self.course_location.org,
+                'name': self.course_location.name,
+                'course': self.course_location.course
+            }
+        )
+
+        with mock.patch.dict('django.conf.settings.MITX_FEATURES', {'ENABLE_MKTG_SITE': True}):
+            response = self.client.get(settings_details_url)
+            self.assertContains(response, "Course Summary Page")
+            self.assertContains(response, "course summary page will not be viewable")
+
+            self.assertContains(response, "Course Start Date")
+            self.assertContains(response, "Course End Date")
+            self.assertNotContains(response, "Enrollment Start Date")
+            self.assertNotContains(response, "Enrollment End Date")
+            self.assertContains(response, "not the dates shown on your course summary page")
+
+            self.assertNotContains(response, "Introducing Your Course")
+            self.assertNotContains(response, "Requirements")
+
+    def test_regular_site_fetch(self):
+        settings_details_url = reverse(
+            'settings_details',
+            kwargs={
+                'org': self.course_location.org,
+                'name': self.course_location.name,
+                'course': self.course_location.course
+            }
+        )
+
+        with mock.patch.dict('django.conf.settings.MITX_FEATURES', {'ENABLE_MKTG_SITE': False}):
+            response = self.client.get(settings_details_url)
+            self.assertContains(response, "Course Summary Page")
+            self.assertNotContains(response, "course summary page will not be viewable")
+
+            self.assertContains(response, "Course Start Date")
+            self.assertContains(response, "Course End Date")
+            self.assertContains(response, "Enrollment Start Date")
+            self.assertContains(response, "Enrollment End Date")
+            self.assertNotContains(response, "not the dates shown on your course summary page")
+
+            self.assertContains(response, "Introducing Your Course")
+            self.assertContains(response, "Requirements")
+
 
 class CourseDetailsViewTest(CourseTestCase):
+    """
+    Tests for modifying content on the first course settings page (course dates, overview, etc.).
+    """
     def alter_field(self, url, details, field, val):
         setattr(details, field, val)
         # Need to partially serialize payload b/c the mock doesn't handle it correctly
@@ -181,6 +244,9 @@ class CourseDetailsViewTest(CourseTestCase):
 
 
 class CourseGradingTest(CourseTestCase):
+    """
+    Tests for the course settings grading page.
+    """
     def test_initial_grader(self):
         descriptor = get_modulestore(self.course_location).get_item(self.course_location)
         test_grader = CourseGradingModel(descriptor)
@@ -256,6 +322,9 @@ class CourseGradingTest(CourseTestCase):
 
 
 class CourseMetadataEditingTest(CourseTestCase):
+    """
+    Tests for CourseMetadata.
+    """
     def setUp(self):
         CourseTestCase.setUp(self)
         # add in the full class too

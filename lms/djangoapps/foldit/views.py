@@ -36,9 +36,13 @@ def foldit_ops(request):
                               "Success": "false",
                               "ErrorString": "Verification failed",
                               "ErrorCode": "VerifyFailed"})
-            log.warning("Verification of SetPlayerPuzzleScores failed:" +
-                     "user %s, scores json %r, verify %r",
-                     request.user, puzzle_scores_json, pz_verify_json)
+            log.warning(
+                "Verification of SetPlayerPuzzleScores failed:"
+                "user %s, scores json %r, verify %r",
+                request.user,
+                puzzle_scores_json,
+                pz_verify_json
+            )
         else:
             # This is needed because we are not getting valid json - the
             # value of ScoreType is an unquoted string. Right now regexes are
@@ -65,9 +69,13 @@ def foldit_ops(request):
                               "Success": "false",
                               "ErrorString": "Verification failed",
                               "ErrorCode": "VerifyFailed"})
-            log.warning("Verification of SetPuzzlesComplete failed:" +
-                     " user %s, puzzles json %r, verify %r",
-                     request.user, puzzles_complete_json, pc_verify_json)
+            log.warning(
+                "Verification of SetPuzzlesComplete failed:"
+                " user %s, puzzles json %r, verify %r",
+                request.user,
+                puzzles_complete_json,
+                pc_verify_json
+            )
         else:
             puzzles_complete = json.loads(puzzles_complete_json)
             responses.append(save_complete(request.user, puzzles_complete))

@@ -90,6 +90,7 @@ CMS.Views.SystemFeedback = Backbone.View.extend({
         var parent = CMS.Views[_.str.capitalize(this.options.type)];
         if(parent && parent.active && parent.active !== this) {
             parent.active.stopListening();
+            parent.active.undelegateEvents();
         }
         this.$el.html(this.template(this.options));
         parent.active = this;

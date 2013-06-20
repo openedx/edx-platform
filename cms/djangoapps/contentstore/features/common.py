@@ -174,6 +174,16 @@ def open_new_unit(step):
     world.css_click('a.new-unit-item')
 
 
+@step('when I view the video it (.*) show the captions')
+def shows_captions(step, show_captions):
+    # Prevent cookies from overriding course settings
+    world.browser.cookies.delete('hide_captions')
+    if show_captions == 'does not':
+        assert world.css_find('.video')[0].has_class('closed')
+    else:
+        assert world.is_css_not_present('.video.closed')
+
+
 def type_in_codemirror(index, text):
     world.css_click(".CodeMirror", index=index)
     g = world.css_find("div.CodeMirror.CodeMirror-focused > div > textarea")

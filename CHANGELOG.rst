@@ -5,12 +5,35 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Studio: Remove XML from the video component editor. All settings are
+moved to be edited as metadata.
+
+XModule: Only write out assets files if the contents have changed.
+
+XModule: Don't delete generated xmodule asset files when compiling (for
+instance, when XModule provides a coffeescript file, don't delete
+the associated javascript)
+
+Studio: For courses running on edx.org (marketing site), disable fields in
+Course Settings that do not apply.
+
+Common: Make asset watchers run as singletons (so they won't start if the
+watcher is already running in another shell).
+
+Common: Use coffee directly when watching for coffeescript file changes.
+
+Common: Make rake provide better error messages if packages are missing.
+
+Common: Repairs development documentation generation by sphinx.
+
 LMS: Problem rescoring.  Added options on the Grades tab of the
 Instructor Dashboard to allow all students' submissions for a
 particular problem to be rescored.  Also supports resetting all
 students' number of attempts to zero.  Provides a list of background
 tasks that are currently running for the course, and an option to
 see a history of background tasks for a given problem.
+
+LMS: Fixed the preferences scope for storing data in xmodules.
 
 LMS: Forums.  Added handling for case where discussion module can get `None` as
 value of lms.start in `lms/djangoapps/django_comment_client/utils.py`

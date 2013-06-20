@@ -8,7 +8,7 @@ import unittest
 from xmodule.poll_module import PollDescriptor
 from xmodule.conditional_module import ConditionalDescriptor
 from xmodule.word_cloud_module import WordCloudDescriptor
-from xmodule.tests import test_system
+from xmodule.tests import get_test_system
 
 class PostData:
     """Class which emulate postdata."""
@@ -30,7 +30,7 @@ class LogicTest(unittest.TestCase):
             """Empty object."""
             pass
 
-        self.system = test_system()
+        self.system = get_test_system()
         self.descriptor = EmptyClass()
 
         self.xmodule_class = self.descriptor_class.module_class

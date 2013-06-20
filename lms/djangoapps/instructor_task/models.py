@@ -84,13 +84,15 @@ class InstructorTask(models.Model):
             raise ValueError(msg)
 
         # create the task, then save it:
-        instructor_task = cls(course_id=course_id,
-                          task_type=task_type,
-                          task_id=task_id,
-                          task_key=task_key,
-                          task_input=json_task_input,
-                          task_state=QUEUING,
-                          requester=requester)
+        instructor_task = cls(
+            course_id=course_id,
+            task_type=task_type,
+            task_id=task_id,
+            task_key=task_key,
+            task_input=json_task_input,
+            task_state=QUEUING,
+            requester=requester
+        )
         instructor_task.save_now()
 
         return instructor_task
