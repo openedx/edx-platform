@@ -3,11 +3,8 @@ import csv
 from zipfile import ZipFile, is_zipfile
 from time import strptime, strftime
 
-from collections import OrderedDict
 from datetime import datetime
-from os.path import isdir
-from optparse import make_option
-from dogapi import dog_http_api, dog_stats_api
+from dogapi import dog_http_api
 
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings

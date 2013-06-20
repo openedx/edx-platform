@@ -4,7 +4,6 @@ Tests for memcache in util app
 
 from django.test import TestCase
 from django.core.cache import get_cache
-from django.conf import settings
 from util.memcache import safe_key
 
 

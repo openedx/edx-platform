@@ -9,7 +9,6 @@ from mock import MagicMock, patch, Mock
 
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import Group
-from django.http import HttpResponse
 from django.conf import settings
 from mitxmako.shortcuts import render_to_string
 

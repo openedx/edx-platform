@@ -5,7 +5,6 @@ from functools import partial
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.test.client import RequestFactory
-from django.conf import settings
 from django.core.urlresolvers import reverse
 
 from foldit.views import foldit_ops, verify_code

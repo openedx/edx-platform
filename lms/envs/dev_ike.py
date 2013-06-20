@@ -13,7 +13,6 @@ sessions. Assumes structure:
 # pylint: disable=W0401, W0614
 
 from .common import *
-from logsettings import get_logger_config
 from .dev import *
 import socket
 

@@ -11,23 +11,16 @@ actually generates the CourseTab.
 
 from collections import namedtuple
 import logging
-import json
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
 
-from fs.errors import ResourceNotFoundError
-
 from courseware.access import has_access
 
-from lxml.html import rewrite_links
 from .module_render import get_module
 from courseware.access import has_access
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.xml import XMLModuleStore
-from xmodule.x_module import XModule
-from student.models import unique_id_for_user
 from courseware.model_data import ModelDataCache
 
 from open_ended_grading import open_ended_notifications

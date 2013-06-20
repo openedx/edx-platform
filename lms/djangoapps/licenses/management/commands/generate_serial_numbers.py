@@ -1,6 +1,4 @@
-import os.path
 from uuid import uuid4
-from optparse import make_option
 
 from django.utils.html import escape
 from django.core.management.base import BaseCommand, CommandError

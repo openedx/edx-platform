@@ -2,7 +2,6 @@ import unittest
 from lxml import etree
 import os
 import textwrap
-import json
 
 import mock
 

@@ -14,7 +14,7 @@ from django.test import TestCase
 from django.core.management import call_command
 from nose.plugins.skip import SkipTest
 
-from student.models import User, TestCenterRegistration, TestCenterUser, get_testcenter_registration
+from student.models import User, TestCenterUser, get_testcenter_registration
 
 log = logging.getLogger(__name__)
 
