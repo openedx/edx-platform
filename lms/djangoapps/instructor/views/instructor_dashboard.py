@@ -57,6 +57,7 @@ def instructor_dashboard_2(request, course_id):
         'djangopid': os.getpid(),
         'mitx_version': getattr(settings, 'MITX_VERSION_STRING', ''),
         'cohorts_ajax_url': reverse('cohorts', kwargs={'course_id': course_id}),
+        'old_dashboard_url': reverse('instructor_dashboard', kwargs={'course_id': course_id}),
         'sections': sections
     }
 

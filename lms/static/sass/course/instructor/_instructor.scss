@@ -1,5 +1,14 @@
 .instructor-dashboard-wrapper {
 	display: table;
+  @extend .table-wrapper;
+  display: table;
+  position: relative;
+
+  .beta-button-wrapper {
+    position: absolute;
+    top: 2em;
+    right: 2em;
+  }
 
 	section.instructor-dashboard-content {
 		@extend .content;
