@@ -1,3 +1,5 @@
+<%! from django.utils.translation import ugettext as _ %>
+
 <%inherit file="base.html" />
 <%block name="title">Schedule &amp; Details Settings</%block>
 <%block name="bodyclass">is-signedin course schedule settings</%block>
@@ -50,8 +52,8 @@ from contentstore import utils
 <div class="wrapper-mast wrapper">
   <header class="mast has-subtitle">
     <h1 class="page-header">
-      <small class="subtitle">Settings</small>
-      <span class="sr">&gt; </span>Schedule &amp; Details
+      <small class="subtitle">${_("Settings")}</small>
+      <span class="sr">&gt; </span>${_("Schedule & Details")}
     </h1>
   </header>
 </div>
@@ -62,59 +64,68 @@ from contentstore import utils
       <form id="settings_details" class="settings-details" method="post" action="">
         <section class="group-settings basic">
           <header>
-            <h2 class="title-2">Basic Information</h2>
-            <span class="tip">The nuts and bolts of your course</span>
+            <h2 class="title-2">${_("Basic Information")}</h2>
+            <span class="tip">${_("The nuts and bolts of your course")}</span>
           </header>
 
           <ol class="list-input">
             <li class="field text is-not-editable" id="field-course-organization">
-              <label for="course-organization">Organization</label>
-              <input title="This field is disabled: this information cannot be changed." type="text" class="long" id="course-organization" value="[Course Organization]" readonly />
+              <label for="course-organization">${_("Organization")}</label>
+              <input title="${_('This field is disabled: this information cannot be changed.')}" type="text" class="long" id="course-organization" value="[Course Organization]" readonly />
             </li>
 
             <li class="field text is-not-editable" id="field-course-number">
-              <label for="course-number">Course Number</label>
-              <input title="This field is disabled: this information cannot be changed." type="text" class="short" id="course-number" value="[Course No.]" readonly>
+              <label for="course-number">${_("Course Number")}</label>
+              <input title="${_('This field is disabled: this information cannot be changed.')}" type="text" class="short" id="course-number" value="[Course No.]" readonly>
             </li>
 
             <li class="field text is-not-editable" id="field-course-name">
-              <label for="course-name">Course Name</label>
-              <input title="This field is disabled: this information cannot be changed." type="text" class="long" id="course-name" value="[Course Name]" readonly />
+              <label for="course-name">${_("Course Name")}</label>
+              <input title="${_('This field is disabled: this information cannot be changed.')}" type="text" class="long" id="course-name" value="[Course Name]" readonly />
             </li>
           </ol>
 
           <div class="note note-promotion note-promotion-courseURL has-actions">
-            <h3 class="title">Course Summary Page <span class="tip">(for student enrollment and access)</span></h3>
+            <h3 class="title">${_("Course Summary Page")} <span class="tip">${_("(for student enrollment and access)")}</span></h3>
             <div class="copy">
               <p><a class="link-courseURL" rel="external" href="https:${utils.get_lms_link_for_about_page(course_location)}" />https:${utils.get_lms_link_for_about_page(course_location)}</a></p>
             </div>
 
             <ul class="list-actions">
               <li class="action-item">
-                <a title="Send a note to students via email" href="mailto:someone@domain.com?Subject=Enroll%20in%20${context_course.display_name_with_default}&body=The%20course%20&quot;${context_course.display_name_with_default}&quot;,%20provided%20by%20edX,%20is%20open%20for%20enrollment.%20Please%20navigate%20to%20this%20course%20at%20https:${utils.get_lms_link_for_about_page(course_location)}%20to%20enroll." class="action action-primary"><i class="icon-envelope-alt icon-inline"></i> Invite your students</a>
+                <a title="${_('Send a note to students via email')}" href="mailto:someone@domain.com?Subject=Enroll%20in%20${context_course.display_name_with_default}&body=The%20course%20&quot;${context_course.display_name_with_default}&quot;,%20provided%20by%20edX,%20is%20open%20for%20enrollment.%20Please%20navigate%20to%20this%20course%20at%20https:${utils.get_lms_link_for_about_page(course_location)}%20to%20enroll." class="action action-primary"><i class="icon-envelope-alt icon-inline"></i>${_("Invite your students")}</a>
               </li>
             </ul>
           </div>
+
+          % if not about_page_editable:
+          <div class="notice notice-incontext notice-workflow">
+            <h3 class="title">${_("Promoting Your Course with edX")}</h3>
+            <div class="copy">
+              <p>${_('Your course summary page will not be viewable until your course has been announced. To provide content for the page and preview it, follow the instructions provided by your <abbr title="Program Manager">PM</abbr> or Conrad Warre <a rel="email" class="action action-email" href="mailto:conrad@edx.org">(conrad@edx.org)</a>.')}</p>
+            </div>
+          </div>
+          % endif
         </section>
 
         <hr class="divide" />
 
         <section class="group-settings schedule">
           <header>
-            <h2 class="title-2">Course Schedule</h2>
-            <span class="tip">Important steps and segments of your course</span>
+            <h2 class="title-2">${_('Course Schedule')}</h2>
+            <span class="tip">${_('Dates that control when your course can be viewed.')}</span>
           </header>
 
           <ol class="list-input">
             <li class="field-group field-group-course-start" id="course-start">
               <div class="field date" id="field-course-start-date">
-                <label for="course-start-date">Course Start Date</label>
+                <label for="course-start-date">${_("Course Start Date")}</label>
                 <input type="text" class="start-date date start datepicker" id="course-start-date" placeholder="MM/DD/YYYY" autocomplete="off" />
-                <span class="tip tip-stacked">First day the course begins</span>
+                <span class="tip tip-stacked">${_("First day the course begins")}</span>
               </div>
 
               <div class="field time" id="field-course-start-time">
-                <label for="course-start-time">Course Start Time</label>
+                <label for="course-start-time">${_("Course Start Time")}</label>
                 <input type="text" class="time start timepicker" id="course-start-time" value="" placeholder="HH:MM" autocomplete="off" />
                 <span class="tip tip-stacked" id="timezone"></span>
               </div>
@@ -122,29 +133,30 @@ from contentstore import utils
 
             <li class="field-group field-group-course-end" id="course-end">
               <div class="field date" id="field-course-end-date">
-                <label for="course-end-date">Course End Date</label>
+                <label for="course-end-date">${_("Course End Date")}</label>
                 <input type="text" class="end-date date end" id="course-end-date" placeholder="MM/DD/YYYY" autocomplete="off" />
-                <span class="tip tip-stacked">Last day your course is active</span>
+                <span class="tip tip-stacked">${_("Last day your course is active")}</span>
               </div>
 
               <div class="field time" id="field-course-end-time">
-                <label for="course-end-time">Course End Time</label>
+                <label for="course-end-time">${_("Course End Time")}</label>
                 <input type="text" class="time end" id="course-end-time" value="" placeholder="HH:MM" autocomplete="off" />
                 <span class="tip tip-stacked" id="timezone"></span>
               </div>
             </li>
           </ol>
 
+          % if about_page_editable:
           <ol class="list-input">
             <li class="field-group field-group-enrollment-start" id="enrollment-start">
               <div class="field date" id="field-enrollment-start-date">
-                <label for="course-enrollment-start-date">Enrollment Start Date</label>
+                <label for="course-enrollment-start-date">${_("Enrollment Start Date")}</label>
                 <input type="text" class="start-date date start" id="course-enrollment-start-date" placeholder="MM/DD/YYYY" autocomplete="off" />
-                <span class="tip tip-stacked">First day students can enroll</span>
+                <span class="tip tip-stacked">${_("First day students can enroll")}</span>
               </div>
 
               <div class="field time" id="field-enrollment-start-time">
-                <label for="course-enrollment-start-time">Enrollment Start Time</label>
+                <label for="course-enrollment-start-time">${_("Enrollment Start Time")}</label>
                 <input type="text" class="time start" id="course-enrollment-start-time" value="" placeholder="HH:MM" autocomplete="off" />
                 <span class="tip tip-stacked" id="timezone"></span>
               </div>
@@ -152,91 +164,106 @@ from contentstore import utils
 
             <li class="field-group field-group-enrollment-end" id="enrollment-end">
               <div class="field date" id="field-enrollment-end-date">
-                <label for="course-enrollment-end-date">Enrollment End Date</label>
+                <label for="course-enrollment-end-date">${_("Enrollment End Date")}</label>
                 <input type="text" class="end-date date end" id="course-enrollment-end-date" placeholder="MM/DD/YYYY" autocomplete="off" />
-                <span class="tip tip-stacked">Last day students can enroll</span>
+                <span class="tip tip-stacked">${_("Last day students can enroll")}</span>
               </div>
 
               <div class="field time" id="field-enrollment-end-time">
-                <label for="course-enrollment-end-time">Enrollment End Time</label>
+                <label for="course-enrollment-end-time">${_("Enrollment End Time")}</label>
                 <input type="text" class="time end" id="course-enrollment-end-time" value="" placeholder="HH:MM" autocomplete="off" />
                 <span class="tip tip-stacked" id="timezone"></span>
               </div>
             </li>
           </ol>
-        </section>
+          % endif
 
+          % if not about_page_editable:
+          <div class="notice notice-incontext notice-workflow">
+            <h3 class="title">${_("These Dates Are Not Used When Promoting Your Course")}</h3>
+            <div class="copy">
+              <p>${_('These dates impact <strong>when your courseware can be viewed</strong>, but they are <strong>not the dates shown on your course summary page</strong>.  To provide the course start and registration dates as shown on your course summary page, follow the instructions provided by your <abbr title="Program Manager">PM</abbr> or Conrad Warre <a rel="email" class="action action-email" href="mailto:conrad@edx.org">(conrad@edx.org)</a>.')}</p>
+            </div>
+          </div>
+          % endif
+        </section>
         <hr class="divide" />
+        % if about_page_editable:
+            <section class="group-settings marketing">
+              <header>
+                <h2 class="title-2">${_("Introducing Your Course")}</h2>
+                <span class="tip">${_("Information for prospective students")}</span>
+              </header>
 
-        <section class="group-settings marketing">
-          <header>
-            <h2 class="title-2">Introducing Your Course</h2>
-            <span class="tip">Information for prospective students</span>
-          </header>
+              <ol class="list-input">
+                <li class="field text" id="field-course-overview">
+                  <label for="course-overview">${_("Course Overview")}</label>
+                  <textarea class="tinymce text-editor" id="course-overview"></textarea>
+                  <%def name='overview_text()'><%
+                    a_link_start = '<a class="link-courseURL" rel="external" href="'
+                    a_link_end = '">' + _("your course summary page") + '</a>'
+                    a_link = a_link_start + utils.get_lms_link_for_about_page(course_location) + a_link_end
+                    text = _("Introductions, prerequisites, FAQs that are used on %s (formatted in HTML)") % a_link
+                    %>${text}</%def>
+                  <span class="tip tip-stacked">${overview_text()}</span>
+                </li>
 
-          <ol class="list-input">
-            <li class="field text" id="field-course-overview">
-              <label for="course-overview">Course Overview</label>
-              <textarea class="tinymce text-editor" id="course-overview"></textarea>
-              <span class="tip tip-stacked">Introductions, prerequisites, FAQs that are used on <a class="link-courseURL" rel="external" href="${utils.get_lms_link_for_about_page(course_location)}">your course summary page</a> (formatted in HTML)</span>
-            </li>
+                <li class="field video" id="field-course-introduction-video">
+                  <label for="course-overview">${_("Course Introduction Video")}</label>
+                  <div class="input input-existing">
+                    <div class="current current-course-introduction-video">
+                      <iframe width="618" height="350" src="" frameborder="0" allowfullscreen></iframe>
+                    </div>
+                    <div class="actions">
+                      <a href="#" class="remove-item remove-course-introduction-video remove-video-data"><span class="delete-icon"></span>${_("Delete Current Video")}</a>
+                    </div>
+                  </div>
 
-            <li class="field video" id="field-course-introduction-video">
-              <label for="course-overview">Course Introduction Video</label>
-              <div class="input input-existing">
-                <div class="current current-course-introduction-video">
-                  <iframe width="618" height="350" src="" frameborder="0" allowfullscreen></iframe>
-                </div>
-                <div class="actions">
-                  <a href="#" class="remove-item remove-course-introduction-video remove-video-data"><span class="delete-icon"></span> Delete Current Video</a>
-                </div>
-              </div>
+                  <div class="input">
+                    <input type="text" class="long new-course-introduction-video add-video-data" id="course-introduction-video" value="" placeholder="your YouTube video's ID" autocomplete="off" />
+                    <span class="tip tip-stacked">${_("Enter your YouTube video's ID (along with any restriction parameters)")}</span>
+                  </div>
+                </li>
+              </ol>
+            </section>
 
-              <div class="input">
-                <input type="text" class="long new-course-introduction-video add-video-data" id="course-introduction-video" value="" placeholder="your YouTube video's ID" autocomplete="off" />
-                <span class="tip tip-stacked">Enter your YouTube video's ID (along with any restriction parameters)</span>
-              </div>
-            </li>
-          </ol>
-        </section>
+            <hr class="divide" />
 
-        <hr class="divide" />
+            <section class="group-settings requirements">
+              <header>
+                <h2 class="title-2">${_("Requirements")}</h2>
+                <span class="tip">${_("Expectations of the students taking this course")}</span>
+              </header>
 
-        <section class="group-settings requirements">
-          <header>
-            <h2 class="title-2">Requirements</h2>
-            <span class="tip">Expectations of the students taking this course</span>
-          </header>
-
-          <ol class="list-input">
-            <li class="field text" id="field-course-effort">
-              <label for="course-effort">Hours of Effort per Week</label>
-              <input type="text" class="short time" id="course-effort" placeholder="HH:MM" />
-              <span class="tip tip-inline">Time spent on all course work</span>
-            </li>
-          </ol>
-        </section>
+              <ol class="list-input">
+                <li class="field text" id="field-course-effort">
+                  <label for="course-effort">${_("Hours of Effort per Week")}</label>
+                  <input type="text" class="short time" id="course-effort" placeholder="HH:MM" />
+                  <span class="tip tip-inline">${_("Time spent on all course work")}</span>
+                </li>
+              </ol>
+            </section>
+        % endif
       </form>
     </article>
-
     <aside class="content-supplementary" role="complimentary">
      <div class="bit">
-        <h3 class="title-3">How will these settings be used?</h3>
-        <p>Your course's schedule settings determine when students can enroll in and begin a course as well as when the course.</p>
+        <h3 class="title-3">${_("How will these settings be used?")}</h3>
+        <p>${_("Your course's schedule settings determine when students can enroll in and begin a course.")}</p>
 
-        <p>Additionally, details provided on this page are also used in edX's catalog of courses, which new and returning students use to choose new courses to study.</p>
+        <p>${_("Additionally, details provided on this page are also used in edX's catalog of courses, which new and returning students use to choose new courses to study.")}</p>
       </div>
 
       <div class="bit">
       % if context_course:
       <% ctx_loc = context_course.location %>
       <%! from django.core.urlresolvers import reverse %>
-        <h3 class="title-3">Other Course Settings</h3>
+        <h3 class="title-3">${_("Other Course Settings")}</h3>
         <nav class="nav-related">
           <ul>
-            <li class="nav-item"><a href="${reverse('contentstore.views.course_config_graders_page', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">Grading</a></li>
-            <li class="nav-item"><a href="${reverse('manage_users', kwargs=dict(location=ctx_loc))}">Course Team</a></li>
-            <li class="nav-item"><a href="${reverse('course_advanced_settings', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">Advanced Settings</a></li>
+            <li class="nav-item"><a href="${reverse('contentstore.views.course_config_graders_page', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">${_("Grading")}</a></li>
+            <li class="nav-item"><a href="${reverse('manage_users', kwargs=dict(location=ctx_loc))}">${_("Course Team")}</a></li>
+            <li class="nav-item"><a href="${reverse('course_advanced_settings', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">${_("Advanced Settings")}</a></li>
           </ul>
         </nav>
       % endif
