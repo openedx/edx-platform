@@ -42,6 +42,14 @@ class CrowdsourceHinterFields(object):
     user_voted = Boolean(help='Specifies if the user has voted on this problem or not.',
         scope=Scope.user_state, default=False)
 
+    moderate = String(help='''If 'True', then all hints must be approved by staff before
+        becoming visible.
+        This field is automatically populated from the xml metadata.''', scope=Scope.settings,
+        default='False')
+
+    mod_queue = Dict(help='''Contains hints that have not been approved by the staff yet.  Structured
+        identically to the hints dictionary.''', scope=Scope.content, default={})
+
 
 class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
     ''' An Xmodule that makes crowdsourced hints.
@@ -115,7 +123,11 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         print self.hints
         answer = self.ans_to_text(get)
         # Look for a hint to give.
+<<<<<<< HEAD
         if answer not in self.hints:
+=======
+        if (answer not in self.hints) or (len(self.hints[answer]) == 0):
+>>>>>>> Began work on instructor view to hinting system.
             # No hints to give.  Return.
             self.previous_answers += [(answer, (None, None, None))]
             return json.dumps({'contents': ' '})
@@ -126,12 +138,23 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         if len(self.hints[answer]) == 1:
             rand_hint_1 = ''
             rand_hint_2 = ''
+<<<<<<< HEAD
             self.previous_answers += [(answer, (0, None, None))]
         elif len(self.hints[answer]) == 2:
             best_hint = self.hints[answer][0][0]
             rand_hint_1 = self.hints[answer][1][0]
             rand_hint_2 = ''
             self.previous_answers += [(answer, (0, 1, None))]
+=======
+            self.previous_answers += [[answer, [best_hint_index, None, None]]]
+        elif n_hints == 2:
+            best_hint = self.hints[answer].values()[0][0]
+            best_hint_index = self.hints[answer].keys()[0]
+            rand_hint_1 = self.hints[answer].values()[1][0]
+            hint_index_1 = self.hints[answer].keys()[1]
+            rand_hint_2 = ''
+            self.previous_answers += [[answer, [best_hint_index, hint_index_1, None]]]
+>>>>>>> Began work on instructor view to hinting system.
         else:
             hint_index_1, hint_index_2 = random.sample(xrange(len(self.hints[answer])), 2)
             rand_hint_1 = self.hints[answer][hint_index_1][0]
@@ -163,10 +186,20 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
                 '" style="display:none"> Which hint was most helpful when you got the wrong answer of '\
                     + answer + '?'
                 # Add each hint to the html string, with a vote button.
-                for j, hint_id in enumerate(hints_offered):
+                for hint_id in hints_offered:
                     if hint_id != None:
+<<<<<<< HEAD
                         out += '<br /><input class="vote" data-answer="'+str(i)+'" data-hintno="'+str(j)+\
                             '" type="button" value="Vote"> ' + self.hints[answer][hint_id][0]
+=======
+                        hint_id = str(hint_id)
+                        try:
+                            out += '<br /><input class="vote" data-answer="'+str(i)+'" data-hintno="'+hint_id+\
+                                '" type="button" value="Vote"> ' + self.hints[answer][hint_id][0]
+                        except KeyError:
+                            # Sometimes, the hint that a user saw will have been deleted by the instructor.
+                            continue
+>>>>>>> Began work on instructor view to hinting system.
                         
 
             # Or, let the student create his own hint
@@ -227,15 +260,45 @@ What would you say to help someone who got this wrong answer?
         answer = self.previous_answers[int(get['answer'])][0]
         # Add the new hint to self.hints.  (Awkward because a direct write 
         # is necessary.)
+<<<<<<< HEAD
         temp_dict = self.hints
         temp_dict[answer].append([hint, 1])     # With one vote (the user himself).
         self.hints = temp_dict
+=======
+        if self.moderate:
+            temp_dict = self.mod_queue
+        else:
+            temp_dict = self.hints
+        if answer in temp_dict:
+            temp_dict[answer][self.hint_pk] = [hint, 1]     # With one vote (the user himself).
+        else:
+            temp_dict[answer] = {self.hint_pk: [hint, 1]}
+        self.hint_pk += 1
+        if self.moderate:
+            self.mod_queue = temp_dict
+        else:
+            self.hints = temp_dict
+>>>>>>> Began work on instructor view to hinting system.
         # Mark the user has having voted; reset previous_answers
         self.user_voted = True
         self.previous_answers = []
         return json.dumps({'contents': 'Thank you for your hint!'})
 
 
+<<<<<<< HEAD
+=======
+    def delete_hint(self, answer, hint_id):
+        '''
+        From the answer, delete the hint with hint_id.
+        Not designed to be accessed via POST request, for now.
+        -LIKELY DEPRECATED.
+        '''
+        temp_hints = self.hints
+        del temp_hints[answer][str(hint_id)]
+        self.hints = temp_hints
+
+
+>>>>>>> Began work on instructor view to hinting system.
 class CrowdsourceHinterDescriptor(CrowdsourceHinterFields, XmlDescriptor):
     module_class = CrowdsourceHinterModule
     stores_state = True
