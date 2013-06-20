@@ -15,12 +15,12 @@ from xmodule.tests.test_export import DATA_DIR
 ORG = 'test_org'
 COURSE = 'conditional'      # name of directory with course data
 
-from . import test_system
+from . import get_test_system
 
 
 class DummySystem(ImportSystem):
 
-    @patch('xmodule.modulestore.xml.OSFS', lambda dir: MemoryFS())
+    @patch('xmodule.modulestore.xml.OSFS', lambda directory: MemoryFS())
     def __init__(self, load_error_modules):
 
         xmlstore = XMLModuleStore("data_dir", course_dirs=[], load_error_modules=load_error_modules)
@@ -41,7 +41,8 @@ class DummySystem(ImportSystem):
         )
 
     def render_template(self, template, context):
-            raise Exception("Shouldn't be called")
+        raise Exception("Shouldn't be called")
+
 
 class ConditionalFactory(object):
     """
@@ -93,7 +94,7 @@ class ConditionalFactory(object):
         # return dict:
         return {'cond_module': cond_module,
                 'source_module': source_module,
-                'child_module': child_module }
+                'child_module': child_module}
 
 
 class ConditionalModuleBasicTest(unittest.TestCase):
@@ -103,21 +104,20 @@ class ConditionalModuleBasicTest(unittest.TestCase):
     """
 
     def setUp(self):
-        self.test_system = test_system()
+        self.test_system = get_test_system()
 
     def test_icon_class(self):
         '''verify that get_icon_class works independent of condition satisfaction'''
         modules = ConditionalFactory.create(self.test_system)
         for attempted in ["false", "true"]:
-            for icon_class in [ 'other', 'problem', 'video']:
+            for icon_class in ['other', 'problem', 'video']:
                 modules['source_module'].is_attempted = attempted
                 modules['child_module'].get_icon_class = lambda: icon_class
                 self.assertEqual(modules['cond_module'].get_icon_class(), icon_class)
 
-
     def test_get_html(self):
         modules = ConditionalFactory.create(self.test_system)
-        # because test_system returns the repr of the context dict passed to render_template,
+        # because get_test_system returns the repr of the context dict passed to render_template,
         # we reverse it here
         html = modules['cond_module'].get_html()
         html_dict = literal_eval(html)
@@ -161,7 +161,7 @@ class ConditionalModuleXmlTest(unittest.TestCase):
         return DummySystem(load_error_modules)
 
     def setUp(self):
-        self.test_system = test_system()
+        self.test_system = get_test_system()
 
     def get_course(self, name):
         """Get a test course by directory name.  If there's more than one, error."""
@@ -224,4 +224,3 @@ class ConditionalModuleXmlTest(unittest.TestCase):
         print "post-attempt ajax: ", ajax
         html = ajax['html']
         self.assertTrue(any(['This is a secret' in item for item in html]))
-

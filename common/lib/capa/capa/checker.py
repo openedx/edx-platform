@@ -12,8 +12,8 @@ from path import path
 from cStringIO import StringIO
 from collections import defaultdict
 
-from .calc import UndefinedVariable
-from .capa_problem import LoncapaProblem
+from calc import UndefinedVariable
+from capa.capa_problem import LoncapaProblem
 from mako.lookup import TemplateLookup
 
 logging.basicConfig(format="%(levelname)s %(message)s")

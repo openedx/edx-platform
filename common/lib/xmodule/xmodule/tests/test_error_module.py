@@ -2,24 +2,29 @@
 Tests for ErrorModule and NonStaffErrorModule
 """
 import unittest
-from xmodule.tests import test_system
+from xmodule.tests import get_test_system
 import xmodule.error_module as error_module
 from xmodule.modulestore import Location
 from xmodule.x_module import XModuleDescriptor
 from mock import MagicMock
 
 
-class TestErrorModule(unittest.TestCase):
-    """
-    Tests for ErrorModule and ErrorDescriptor
-    """
+class SetupTestErrorModules():
     def setUp(self):
-        self.system = test_system()
+        self.system = get_test_system()
         self.org = "org"
         self.course = "course"
         self.location = Location(['i4x', self.org, self.course, None, None])
         self.valid_xml = u"<problem>ABC \N{SNOWMAN}</problem>"
         self.error_msg = "Error"
+
+
+class TestErrorModule(unittest.TestCase, SetupTestErrorModules):
+    """
+    Tests for ErrorModule and ErrorDescriptor
+    """
+    def setUp(self):
+        SetupTestErrorModules.setUp(self)
 
     def test_error_module_xml_rendering(self):
         descriptor = error_module.ErrorDescriptor.from_xml(
@@ -45,10 +50,12 @@ class TestErrorModule(unittest.TestCase):
         self.assertIn(repr(descriptor), context_repr)
 
 
-class TestNonStaffErrorModule(TestErrorModule):
+class TestNonStaffErrorModule(unittest.TestCase, SetupTestErrorModules):
     """
     Tests for NonStaffErrorModule and NonStaffErrorDescriptor
     """
+    def setUp(self):
+        SetupTestErrorModules.setUp(self)
 
     def test_non_staff_error_module_create(self):
         descriptor = error_module.NonStaffErrorDescriptor.from_xml(

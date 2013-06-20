@@ -6,7 +6,7 @@ from xblock.core import Scope, String, Dict, Boolean, Integer, Float, Any, List
 from xmodule.fields import Date, Timedelta
 from xmodule.xml_module import XmlDescriptor, serialize_field, deserialize_field
 import unittest
-from .import test_system
+from .import get_test_system
 from nose.tools import assert_equals
 from mock import Mock
 
@@ -140,7 +140,7 @@ class EditableMetadataFieldsTest(unittest.TestCase):
 
     # Start of helper methods
     def get_xml_editable_fields(self, model_data):
-        system = test_system()
+        system = get_test_system()
         system.render_template = Mock(return_value="<div>Test Template HTML</div>")
         return XmlDescriptor(runtime=system, model_data=model_data).editable_metadata_fields
 
@@ -152,7 +152,7 @@ class EditableMetadataFieldsTest(unittest.TestCase):
                 non_editable_fields.append(TestModuleDescriptor.due)
                 return non_editable_fields
 
-        system = test_system()
+        system = get_test_system()
         system.render_template = Mock(return_value="<div>Test Template HTML</div>")
         return TestModuleDescriptor(runtime=system, model_data=model_data)
 

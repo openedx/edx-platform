@@ -18,7 +18,7 @@ import logging
 
 log = logging.getLogger(__name__)
 
-from . import test_system
+from . import get_test_system
 
 ORG = 'edX'
 COURSE = 'open_ended'      # name of directory with course data
@@ -68,7 +68,7 @@ class OpenEndedChildTest(unittest.TestCase):
     descriptor = Mock()
 
     def setUp(self):
-        self.test_system = test_system()
+        self.test_system = get_test_system()
         self.openendedchild = OpenEndedChild(self.test_system, self.location,
                                              self.definition, self.descriptor, self.static_data, self.metadata)
 
@@ -192,7 +192,7 @@ class OpenEndedModuleTest(unittest.TestCase):
     descriptor = Mock()
 
     def setUp(self):
-        self.test_system = test_system()
+        self.test_system = get_test_system()
 
         self.test_system.location = self.location
         self.mock_xqueue = MagicMock()
@@ -367,7 +367,7 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
     definition = {'prompt': etree.XML(prompt), 'rubric': etree.XML(rubric), 'task_xml': [task_xml1, task_xml2]}
     full_definition = definition_template.format(prompt=prompt, rubric=rubric, task1=task_xml1, task2=task_xml2)
     descriptor = Mock(data=full_definition)
-    test_system = test_system()
+    test_system = get_test_system()
     combinedoe_container = CombinedOpenEndedModule(
         test_system,
         descriptor,
@@ -493,7 +493,7 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
     hint = "blah"
 
     def setUp(self):
-        self.test_system = test_system()
+        self.test_system = get_test_system()
         self.test_system.xqueue['interface'] = Mock(
             send_to_queue=Mock(side_effect=[1, "queued"])
         )
@@ -569,6 +569,7 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
         #Mock a student submitting an assessment
         assessment_dict = MockQueryDict()
         assessment_dict.update({'assessment': sum(assessment), 'score_list[]': assessment})
+        #from nose.tools import set_trace; set_trace()
         module.handle_ajax("save_assessment", assessment_dict)
         task_one_json = json.loads(module.task_states[0])
         self.assertEqual(json.loads(task_one_json['child_history'][0]['post_assessment']), assessment)

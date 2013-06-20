@@ -8,12 +8,6 @@
 
 <%block name="jsextra">
 <script src="${static.url('js/vendor/mustache.js')}"></script>
-<script type="text/javascript" src="${static.url('js/views/assets.js')}"></script>
-
-<script type='text/javascript'>
-  // we just want a singleton
-  confirm_delete_prompt = null;
-</script>
 </%block>
 
 <%block name="content">
@@ -99,7 +93,7 @@
               </td>
               <td class="delete-col">
                 <a href="#" data-tooltip="${_('Delete this asset')}" class="remove-asset-button"><span class="delete-icon"></span></a>
-              </td>             
+              </td>
             </tr>
           % endfor
           </tbody>

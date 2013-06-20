@@ -99,6 +99,7 @@ class ChecklistTestCase(CourseTestCase):
                                                            'name': self.course.location.name,
                                                            'checklist_index': 2})
 
+
         def get_first_item(checklist):
             return checklist['items'][0]
 
