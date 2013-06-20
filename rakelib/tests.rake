@@ -16,7 +16,7 @@ def run_tests(system, report_dir, test_id=nil, stop_on_failure=true)
     ENV['NOSE_XUNIT_FILE'] = File.join(report_dir, "nosetests.xml")
     dirs = Dir["common/djangoapps/*"] + Dir["#{system}/djangoapps/*"]
     test_id = dirs.join(' ') if test_id.nil? or test_id == ''
-    cmd = django_admin(system, :test, 'test', '--logging-clear-handlers', test_id)
+    cmd = django_admin(system, :test, 'test', '--logging-clear-handlers', '--liveserver=localhost:8000-9000', test_id)
     test_sh(run_under_coverage(cmd, system))
 end
 
