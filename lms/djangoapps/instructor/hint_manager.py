@@ -26,6 +26,8 @@ from django.core.urlresolvers import reverse
 
 from courseware.courses import get_course_with_access
 from courseware.models import XModuleContentField
+from xmodule.modulestore import Location
+from xmodule.modulestore.django import modulestore
 
 
 @ensure_csrf_cookie
@@ -48,6 +50,10 @@ def hint_manager(request, course_id):
         pass
     if request.POST['op'] == 'change votes':
         change_votes(request, course_id, field)
+    if request.POST['op'] == 'add hint':
+        add_hint(request, course_id, field)
+    if request.POST['op'] == 'approve':
+        approve(request, course_id, field)
     rendered_html = render_to_string('courseware/hint_manager_inner.html', get_hints(request, course_id, field))
     return HttpResponse(json.dumps({'success': True, 'contents': rendered_html}))
 
@@ -59,7 +65,6 @@ def get_hints(request, course_id, field):
     # DON'T TRUST field attributes that come from ajax.  Use an if statement
     # to make sure the field is valid before plugging into functions.
 
-    out = ''
     if field == 'mod_queue':
         other_field = 'hints'
         field_label = 'Hints Awaiting Moderation'
@@ -71,32 +76,40 @@ def get_hints(request, course_id, field):
     chopped_id = '/'.join(course_id.split('/')[:-1])
     chopped_id = re.escape(chopped_id)
     all_hints = XModuleContentField.objects.filter(field_name=field, definition_id__regex=chopped_id)
+    big_out_dict = {}
+    name_dict = {}
     for problem in all_hints:
-        out += '<h2> Problem: ' + problem.definition_id + '</h2>'
-        for answer, hint_dict in json.loads(problem.value).items():
-            out += '<h4> Answer: ' + answer + '</h4>'
-            for pk, hint in hint_dict.items():
-                out += '<p data-problem="'\
-                    + problem.definition_id + '" data-pk="' + str(pk) + '" data-answer="'\
-                    + answer + '">'
-                out += '<input class="hint-select" type="checkbox"/>' + hint[0] + \
-                    '<br /> Votes: <input type="text" class="votes" value="' + str(hint[1]) + '"></input>'
-                out += '</p>'
-        out += '''<h4> Add a hint to this problem </h4>
-            Answer (exact formatting):
-            <input type="text" id="new-hint-answer-''' + problem.definition_id \
-            + '"/> <br /> Hint: <br /><textarea cols="50" style="height:200px" id="new-hint-' + problem.definition_id \
-            + '"></textarea> <br /> <button class="submit-new-hint" data-problem="' + problem.definition_id \
-            + '"> Submit </button><br />'
+        loc = Location(problem.definition_id)
+        try:
+            descriptor = modulestore().get_items(loc)[0]
+        except IndexError:
+            # Sometimes, the problem is no longer in the course.  Just
+            # don't include said problem.
+            continue
+        name_dict[problem.definition_id] = descriptor.get_children()[0].display_name
+        # Answer list contains (answer, dict_of_hints) tuples.
 
+        def answer_sorter(thing):
+            '''
+            thing is a tuple, where thing[0] contains an answer, and thing[1] contains
+            a dict of hints.  This function returns an index based on thing[0], which 
+            is used as a key to sort the list of things.
+            '''
+            try:
+                return float(thing[0])
+            except ValueError:
+                # Put all non-numerical answers first.
+                return float('-inf')
 
-    out += '<button id="hint-delete"> Delete selected </button> <button id="update-votes"> Update votes </button>'
-    render_dict = {'out': out,
-                   'field': field,
+        answer_list = sorted(json.loads(problem.value).items(), key=answer_sorter)
+        big_out_dict[problem.definition_id] = answer_list
+
+    render_dict = {'field': field,
                    'other_field': other_field,
                    'field_label': field_label,
                    'other_field_label': other_field_label,
-                   'all_hints': all_hints}
+                   'all_hints': big_out_dict,
+                   'id_to_name': name_dict}
     return render_dict
 
 def delete_hints(request, course_id, field):
@@ -131,6 +144,80 @@ def change_votes(request, course_id, field):
         problem_dict[answer][pk][1] = new_votes
         this_problem.value = json.dumps(problem_dict)
         this_problem.save()
+
+def add_hint(request, course_id, field):
+    '''
+    Add a new hint.  POST:
+    op
+    field
+    problem - The problem id
+    answer - The answer to which a hint will be added
+    hint - The text of the hint
+    '''
+    problem_id = request.POST['problem']
+    answer = request.POST['answer']
+    hint_text = request.POST['hint']
+    this_problem = XModuleContentField.objects.get(field_name=field, definition_id=problem_id)
+
+    hint_pk_entry = XModuleContentField.objects.get(field_name='hint_pk', definition_id=problem_id)
+    this_pk = int(hint_pk_entry.value)
+    hint_pk_entry.value = this_pk + 1
+    hint_pk_entry.save()
+
+    problem_dict = json.loads(this_problem.value)
+    if answer not in problem_dict:
+        problem_dict[answer] = {}
+    problem_dict[answer][this_pk] = [hint_text, 1]
+    this_problem.value = json.dumps(problem_dict)
+    this_problem.save()
+
+def approve(request, course_id, field):
+    '''
+    Approve a list of hints, moving them from the mod_queue to the real
+    hint list.  POST:
+    op, field
+    (some number) -> [problem, answer, pk]
+    '''
+    for key in request.POST:
+        if key == 'op' or key == 'field':
+            continue
+        problem_id, answer, pk = request.POST.getlist(key)
+        # Can be optimized - sort the delete list by problem_id, and load each problem
+        # from the database only once.
+        problem_in_mod = XModuleContentField.objects.get(field_name=field, definition_id=problem_id)
+        problem_dict = json.loads(problem_in_mod.value)
+        hint_to_move = problem_dict[answer][pk]
+        del problem_dict[answer][pk]
+        problem_in_mod.value = json.dumps(problem_dict)
+        problem_in_mod.save()
+
+        problem_in_hints = XModuleContentField.objects.get(field_name='hints', definition_id=problem_id)
+        problem_dict = json.loads(problem_in_hints.value)
+        if answer not in problem_dict:
+            problem_dict[answer] = {}
+        problem_dict[answer][pk] = hint_to_move
+        problem_in_hints.value = json.dumps(problem_dict)
+        problem_in_hints.save()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
