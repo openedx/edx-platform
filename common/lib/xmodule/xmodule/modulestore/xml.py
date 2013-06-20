@@ -38,7 +38,7 @@ log = logging.getLogger(__name__)
 # into the cms from xml
 def clean_out_mako_templating(xml_string):
     xml_string = xml_string.replace('%include', 'include')
-    xml_string = re.sub("(?m)^\s*%.*$", '', xml_string)
+    xml_string = re.sub(r"(?m)^\s*%.*$", '', xml_string)
     return xml_string
 
 

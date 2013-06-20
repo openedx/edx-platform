@@ -3,8 +3,8 @@ import feedparser
 import json
 import logging
 import random
+import re
 import string
-import sys
 import urllib
 import uuid
 import time
@@ -20,9 +20,9 @@ from django.core.mail import send_mail
 from django.core.urlresolvers import reverse
 from django.core.validators import validate_email, validate_slug, ValidationError
 from django.db import IntegrityError, transaction
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotAllowed, HttpResponseRedirect, Http404
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotAllowed, Http404
 from django.shortcuts import redirect
-from django_future.csrf import ensure_csrf_cookie, csrf_exempt
+from django_future.csrf import ensure_csrf_cookie
 from django.utils.http import cookie_date
 
 from mitxmako.shortcuts import render_to_response, render_to_string
@@ -39,14 +39,11 @@ from certificates.models import CertificateStatuses, certificate_status_for_stud
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore import Location
 
 from collections import namedtuple
 
 from courseware.courses import get_courses, sort_by_announcement
 from courseware.access import has_access
-from courseware.views import get_module_for_descriptor, jump_to
-from courseware.model_data import ModelDataCache
 
 from statsd import statsd
 from pytz import UTC
@@ -99,9 +96,8 @@ def course_from_id(course_id):
     course_loc = CourseDescriptor.id_to_location(course_id)
     return modulestore().get_instance(course_id, course_loc)
 
-import re
-day_pattern = re.compile('\s\d+,\s')
-multimonth_pattern = re.compile('\s?\-\s?\S+\s')
+day_pattern = re.compile(r'\s\d+,\s')
+multimonth_pattern = re.compile(r'\s?\-\s?\S+\s')
 
 
 def get_date_for_press(publish_date):

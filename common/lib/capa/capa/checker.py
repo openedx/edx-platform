@@ -10,7 +10,6 @@ import sys
 from path import path
 
 from cStringIO import StringIO
-from collections import defaultdict
 
 from calc import UndefinedVariable
 from capa.capa_problem import LoncapaProblem

@@ -11,10 +11,8 @@ from lxml import etree
 import capa.xqueue_interface as xqueue_interface
 
 from xmodule.capa_module import ComplexEncoder
-from xmodule.editing_module import EditingDescriptor
 from xmodule.progress import Progress
 from xmodule.stringify import stringify_children
-from xmodule.xml_module import XmlDescriptor
 from capa.util import *
 import openendedchild
 

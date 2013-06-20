@@ -17,7 +17,6 @@ from django.core.urlresolvers import reverse
 from capa.tests.response_xml_factory import (CodeResponseXMLFactory,
                                              CustomResponseXMLFactory)
 from xmodule.modulestore.tests.factories import ItemFactory
-from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from courseware.model_data import StudentModule
 

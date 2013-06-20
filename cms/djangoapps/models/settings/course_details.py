@@ -153,9 +153,9 @@ class CourseDetails(object):
         if not raw_video:
             return None
 
-        keystring_matcher = re.search('(?<=embed/)[a-zA-Z0-9_-]+', raw_video)
+        keystring_matcher = re.search(r'(?<=embed/)[a-zA-Z0-9_-]+', raw_video)
         if keystring_matcher is None:
-            keystring_matcher = re.search('<?=\d+:[a-zA-Z0-9_-]+', raw_video)
+            keystring_matcher = re.search(r'<?=\d+:[a-zA-Z0-9_-]+', raw_video)
 
         if keystring_matcher:
             return keystring_matcher.group(0)

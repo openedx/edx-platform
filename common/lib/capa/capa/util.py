@@ -1,4 +1,4 @@
-from calc import evaluator, UndefinedVariable
+from calc import evaluator
 from cmath import isinf
 
 #-----------------------------------------------------------------------------

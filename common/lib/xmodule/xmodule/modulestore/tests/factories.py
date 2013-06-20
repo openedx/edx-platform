@@ -1,5 +1,4 @@
 from factory import Factory, lazy_attribute_sequence, lazy_attribute
-from time import gmtime
 from uuid import uuid4
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore

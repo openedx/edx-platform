@@ -9,7 +9,6 @@ from django.core.urlresolvers import reverse
 from courseware.access import _course_staff_group_name
 from courseware.tests.tests import LoginEnrollmentTestCase, TEST_DATA_XML_MODULESTORE, get_user
 from xmodule.modulestore.django import modulestore
-import xmodule.modulestore.django
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from instructor.views import get_and_clean_student_list
 

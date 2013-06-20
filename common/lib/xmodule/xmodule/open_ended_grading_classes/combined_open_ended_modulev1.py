@@ -1,13 +1,10 @@
 import json
 import logging
 from lxml import etree
-from lxml.html import rewrite_links
 from xmodule.timeinfo import TimeInfo
 from xmodule.capa_module import ComplexEncoder
-from xmodule.editing_module import EditingDescriptor
 from xmodule.progress import Progress
 from xmodule.stringify import stringify_children
-from xmodule.xml_module import XmlDescriptor
 import self_assessment_module
 import open_ended_module
 from .combined_open_ended_rubric import CombinedOpenEndedRubric, GRADER_TYPE_IMAGE_DICT, HUMAN_GRADER_TYPE, LEGEND_LIST

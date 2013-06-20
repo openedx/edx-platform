@@ -3,7 +3,6 @@ from xmodule.raw_module import RawDescriptor
 from lxml import etree
 from mako.template import Template
 from xmodule.modulestore.django import modulestore
-import logging
 
 
 class CustomTagModule(XModule):
