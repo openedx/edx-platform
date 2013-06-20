@@ -54,7 +54,6 @@ def check_url(_step, file_name):
 def delete_file(_step, file_name):
     index = get_index(file_name)
     assert index != -1
-    from pdb import set_trace; set_trace()
     delete_css = "a.remove-asset-button"
     world.css_click(delete_css, index=index)
 
