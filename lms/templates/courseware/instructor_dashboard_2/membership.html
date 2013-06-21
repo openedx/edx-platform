@@ -10,7 +10,7 @@
   <div class="task-response"></div>
 
   <div class="auth-list-container auth-list-forum-admin">
-    <h2>Instructor Management</h2>
+    <h2>Forum Admin Management</h2>
     <div class="auth-list-table" data-endpoint="${ section_data['list_forum_members_url'] }"></div>
     <div class="auth-list-add" data-endpoint="${ section_data['update_forum_role_membership_url'] }">
       <input type="text" name="email" placeholder="Enter Email" spellcheck="false">
@@ -19,7 +19,7 @@
   </div>
 
   <div class="auth-list-container auth-list-forum-moderator">
-    <h2>Instructor Management</h2>
+    <h2>Forum Moderator Management</h2>
     <div class="auth-list-table" data-endpoint="${ section_data['list_forum_members_url'] }"></div>
     <div class="auth-list-add" data-endpoint="${ section_data['update_forum_role_membership_url'] }">
       <input type="text" name="email" placeholder="Enter Email" spellcheck="false">
@@ -28,7 +28,7 @@
   </div>
 
   <div class="auth-list-container auth-list-forum-community-ta">
-    <h2>Instructor Management</h2>
+    <h2>Forum Community TA Management</h2>
     <div class="auth-list-table" data-endpoint="${ section_data['list_forum_members_url'] }"></div>
     <div class="auth-list-add" data-endpoint="${ section_data['update_forum_role_membership_url'] }">
       <input type="text" name="email" placeholder="Enter Email" spellcheck="false">
@@ -40,7 +40,7 @@
 <div class="vert-right instructor-staff-management">
   <div class="auth-list-container auth-list-staff">
     <h2>Staff Management</h2>
-    <div class="auth-list-table" data-endpoint="${ section_data['list_instructors_staff_url'] }"></div>
+    <div class="auth-list-table" data-endpoint="${ section_data['list_course_role_members_url'] }"></div>
     <div class="auth-list-add" data-endpoint="${ section_data['access_allow_revoke_url'] }">
       <input type="text" name="email" placeholder="Enter Email" spellcheck="false">
       <input type="button" name="allow" value="Grant Staff Access">
@@ -49,7 +49,7 @@
 
   <div class="auth-list-container auth-list-instructor">
     <h2>Instructor Management</h2>
-    <div class="auth-list-table" data-endpoint="${ section_data['list_instructors_staff_url'] }"></div>
+    <div class="auth-list-table" data-endpoint="${ section_data['list_course_role_members_url'] }"></div>
     <div class="auth-list-add" data-endpoint="${ section_data['access_allow_revoke_url'] }">
       <input type="text" name="email" placeholder="Enter Email" spellcheck="false">
       <input type="button" name="allow" value="Grant Instructor Access">
