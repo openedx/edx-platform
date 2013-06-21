@@ -72,6 +72,7 @@ CMS.Views.TextbookEdit = Backbone.View.extend({
         this.listenTo(this.model.collection, "editOne", this.remove);
     },
     tagName: "section",
+    className: "textbook",
     render: function() {
         this.$el.html(this.template({
             name: this.model.escape('name'),
@@ -155,7 +156,7 @@ CMS.Views.ListTextbooks = Backbone.View.extend({
         this.listenTo(this.collection, 'all', this.render);
     },
     tagName: "div",
-    className: "textbooks",
+    className: "textbooks-list",
     render: function() {
         var textbooks = this.collection;
         if(textbooks.length === 0) {
@@ -219,7 +220,7 @@ CMS.Views.ChapterEdit = Backbone.View.extend({
         var msg = new CMS.Models.FileUpload({
             title: _.str.sprintf(gettext("Upload a new asset to %s"),
                 section.escape('name')),
-            message: "This is sample text about asset upload requirements, like no bigger than 2MB, must be in PDF format or whatever."
+            message: "Files must be in PDF format."
         });
         var view = new CMS.Views.UploadDialog({model: msg, chapter: this.model});
         $(".wrapper-view").after(view.show().el);

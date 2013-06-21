@@ -1,3 +1,4 @@
+ <div class="view-textbook">
     <header>
         <h3 class="textbook-title"><%= name %></h3>
     </header>
@@ -5,21 +6,23 @@
 <% if(chapters.length > 1) {%>
     <p><a href="#" class="chapter-toggle
         <% if(showChapters){ print('hide'); } else { print('show'); } %>-chapters">
-        <i class="icon-chevron-<% if(showChapters){ print('down'); } else { print('right'); } %>"></i>
+        <i class="ui-toggle-expansion icon-caret-<% if(showChapters){ print('down'); } else { print('right'); } %>"></i>
         <%= chapters.length %> PDF Chapters
     </a></p>
 <% } else if(chapters.length === 1) { %>
-    <%= chapters.at(0).get("asset_path") %>
+    <p>
+        <%= chapters.at(0).get("asset_path") %>
+    </p>
 <% } %>
 
 <ul  class="actions textbook-actions">
-    <li>
+    <li class="action action-view">
         <a href="#" class="view"><%= gettext("view in course") %></a>
     </li>
-    <li>
+    <li class="action action-edit">
         <button class="edit"><%= gettext("Edit") %></button>
     </li>
-    <li>
+    <li class="action action-delete">
         <button class="delete"><%= gettext("Delete") %></button>
     </li>
 </ul>
@@ -29,9 +32,11 @@
 <% if(showChapters) { %>
 <ol class="chapters">
   <% chapters.each(function(chapter) { %>
-    <li><span class="chapter-name"><%= chapter.get('name') %></span>
+    <li class="chapter">
+        <span class="chapter-name"><%= chapter.get('name') %></span>
         <span class="chapter-asset-path"><%= chapter.get('asset_path') %></span>
     </li>
   <% }) %>
 </ol>
 <% } %>
+</div>

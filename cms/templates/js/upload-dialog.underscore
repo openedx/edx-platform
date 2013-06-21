@@ -27,7 +27,7 @@
     <h3 class="sr"><%= gettext('Form Actions') %></h3>
   <ul>
   <li class="action-item">
-    <input type="button" class="button action-upload btn-primary-blue" value="<%= gettext('Upload') %>" <% if (!selectedFile) { %>disabled="disabled"<% } %> />
+    <input type="button" class="button action-upload" value="<%= gettext('Upload') %>" <% if (!selectedFile) { %>disabled="disabled"<% } %> />
   </li>
   <li class="action-item">
     <input type="button" class="button action-cancel" value="<%= gettext('Cancel') %>" />

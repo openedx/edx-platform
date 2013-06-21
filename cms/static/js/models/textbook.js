@@ -101,7 +101,7 @@ CMS.Models.FileUpload = Backbone.Model.extend({
     },
     validate: function(attrs, options) {
         if(attrs.selectedFile && attrs.selectedFile.type !== "application/pdf") {
-            return gettext("Only PDF files can be uploaded");
+            return gettext("Only PDF files can be uploaded. Please select a file ending in .pdf to upload.");
         }
     }
 });

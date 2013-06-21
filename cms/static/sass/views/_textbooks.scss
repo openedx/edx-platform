@@ -27,231 +27,320 @@ body.course.textbooks {
 
     .textbook {
       @extend .window;
+      position: relative;
       padding: $baseline ($baseline*1.5);
-    }
 
-  form {
-    @include box-sizing(border-box);
-    @include border-radius(2px);
-    width: 100%;
-    background: $white;
+      .view-textbook {
 
-    fieldset {
-        margin-bottom: $baseline;
-    }
-
-    .actions {
-
-      .action-add-chapter {
-          @extend .t-action2;
-          //@include grey-button;
-          @include transition(all .15s);
-          display: block;
-          width: 100%;
-          margin-bottom: ($baseline*1.5);
-          border-radius: 5px;
-          border: none;
-          padding: $baseline;
-          background-color: $blue-l3;
-          color: $white;
-          font-weight: 600;
-
-          &:hover {
-            background: #5597DD;
-          }
-      }
-
-      .action-primary {
-        @include blue-button;
-        @extend .t-action2;
-        @include transition(all .15s);
-        display: inline-block;
-        padding: ($baseline/5) $baseline;
-        font-weight: 600;
-        text-transform: uppercase;
-      }
-
-      .action-secondary {
-        @include grey-button;
-        @extend .t-action2;
-        @include transition(all .15s);
-        display: inline-block;
-        padding: ($baseline/5) $baseline;
-        font-weight: 600;
-        text-transform: uppercase;
-      }
-
-
-    }
-
-    .copy {
-      @include font-size(12);
-      margin: ($baseline) 0 ($baseline/2) 0;
-      color: $gray;
-
-
-      strong {
-        font-weight: 600;
-      }
-
-
-    }
-
-    .list-input,
-    .textbook {
-      list-style: none;
-
-      .field {
-        margin: 0 0 ($baseline*0.75) 0;
-
-        &:last-child {
+        header {
           margin-bottom: 0;
+          border-bottom: 0;
         }
 
-        &.required {
+        .textbook-title {
+          @extend .t-title4;
+          margin-right: 280px;
+          font-weight: bold;
+        }
 
-          label {
+        .ui-toggle-expansion {
+          @include transition(rotate .15s ease-in-out .25s);
+          @include font-size(21);
+          display: inline-block;
+          width: 15px;
+          vertical-align: text-bottom;
+        }
+
+        &.is-selectable {
+          cursor: pointer;
+
+          &:hover {
+            color: $blue;
+
+            .ui-toggle-expansion {
+              color: $blue;
+            }
+          }
+        }
+
+        .chapters {
+          margin-left: $baseline;
+
+          .chapter {
+            @include font-size(12);
+            margin-bottom: ($baseline/4);
+            border-bottom: 1px solid $gray-l4;
+
+            .chapter-name {
+              display: inline-block;
+              width: 45%;
+              margin-right: ($baseline/2);
+              overflow: hidden;
+              white-space: nowrap;
+              text-overflow: ellipsis;
+              vertical-align: middle;
+            }
+
+            .chapter-asset-path {
+              display: inline-block;
+              width: 50%;
+              color: $gray-l1;
+            }
+          }
+        }
+
+        .actions {
+          position: absolute;
+          top: $baseline;
+          right: $baseline;
+
+          .action {
+            display: inline-block;
+            margin-right: ($baseline/4);
+
+            .view {
+              color: $gray;
+              @include font-size(12);
+
+              &:hover {
+                color: $blue;
+              }
+            }
+
+            .edit {
+              @include blue-button;
+              @extend .t-action4;
+            }
+
+            .delete {
+              @include grey-button;
+            }
+          }
+
+
+        }
+
+      }
+
+
+    .edit-textbook {
+        @include box-sizing(border-box);
+        @include border-radius(2px);
+        width: 100%;
+        background: $white;
+
+        fieldset {
+            margin-bottom: $baseline;
+        }
+
+        .actions {
+
+          .action-add-chapter {
+              @extend .t-action2;
+              @include transition(all .15s);
+              display: block;
+              width: 100%;
+              margin-bottom: ($baseline*1.5);
+              border-radius: 5px;
+              border: none;
+              padding: $baseline;
+              background-color: $blue-l3;
+              color: $white;
+              font-weight: 600;
+
+              &:hover {
+                background: #5597DD;
+              }
+          }
+
+          .action-primary {
+            @include blue-button;
+            @extend .t-action2;
+            @include transition(all .15s);
+            display: inline-block;
+            padding: ($baseline/5) $baseline;
+            font-weight: 600;
+            text-transform: uppercase;
+          }
+
+          .action-secondary {
+            @include grey-button;
+            @extend .t-action2;
+            @include transition(all .15s);
+            display: inline-block;
+            padding: ($baseline/5) $baseline;
+            font-weight: 600;
+            text-transform: uppercase;
+          }
+
+
+        }
+
+        .copy {
+          @include font-size(12);
+          margin: ($baseline) 0 ($baseline/2) 0;
+          color: $gray;
+
+
+          strong {
             font-weight: 600;
           }
 
-          label:after {
-            margin-left: ($baseline/4);
-            content: "*";
-          }
+
         }
 
-        label, input, textarea {
-          display: block;
-        }
+        .list-input,
+        .textbook-fields {
+          list-style: none;
 
-        label {
-          @extend  .t-copy-sub1;
-          @include transition(color, 0.15s, ease-in-out);
-          margin: 0 0 ($baseline/4) 0;
+          .field {
+            margin: 0 0 ($baseline*0.75) 0;
 
-          &.is-focused {
-            color: $blue;
+            &:last-child {
+              margin-bottom: 0;
+            }
+
+            &.required {
+
+              label {
+                font-weight: 600;
+              }
+
+              label:after {
+                margin-left: ($baseline/4);
+                content: "*";
+              }
+            }
+
+            label, input, textarea {
+              display: block;
+            }
+
+            label {
+              @extend  .t-copy-sub1;
+              @include transition(color, 0.15s, ease-in-out);
+              margin: 0 0 ($baseline/4) 0;
+
+              &.is-focused {
+                color: $blue;
+              }
+            }
+
+
+            &.add-textbook-name label {
+              @extend .t-title5;
+            }
+
+            input, textarea {
+              @extend .t-copy-base;
+              height: 100%;
+              width: 100%;
+              padding: ($baseline/2);
+
+              &.long {
+                width: 100%;
+              }
+
+              &.short {
+                width: 25%;
+              }
+
+              ::-webkit-input-placeholder {
+                 color: $gray-l4;
+              }
+
+              :-moz-placeholder {
+                 color: $gray-l3;
+              }
+
+              ::-moz-placeholder {
+                 color: $gray-l3;
+              }
+
+              :-ms-input-placeholder {
+                 color: $gray-l3;
+              }
+
+              &:focus {
+
+                + .tip {
+                  color: $gray;
+                }
+              }
+            }
+
+            textarea.long {
+              height: ($baseline*5);
+            }
+
+            input[type="checkbox"] {
+              display: inline-block;
+              margin-right: ($baseline/4);
+              width: auto;
+              height: auto;
+
+              & + label {
+                display: inline-block;
+              }
+            }
+
+            .tip {
+              @extend .t-copy-sub2;
+              @include transition(color, 0.15s, ease-in-out);
+              display: block;
+              margin-top: ($baseline/4);
+              color: $gray-l3;
+            }
           }
-        }
 
+          .field-group {
+            @include clearfix();
+            margin: 0 0 ($baseline/2) 0;
 
-        &.add-textbook-name label {
-          @extend .t-title5;
-        }
+            .field {
+              display: block;
+              width: 46%;
+              border-bottom: none;
+              margin: 0 ($baseline*.75) 0 0;
+              padding: ($baseline/4) 0 0 0;
+              float: left;
+              position: relative;
 
-        input, textarea {
-          @extend .t-copy-base;
-          height: 100%;
-          width: 100%;
-          padding: ($baseline/2);
+              input, textarea {
+                width: 100%;
+              }
 
-          &.long {
-            width: 100%;
-          }
+              .action-upload {
+                  @extend .t-action4;
+                  @include blue-button;
+                  @include transition(all .15s);
+                  @include font-size(12);
+                  font-weight: 600;
+                  text-align: center;
+                  position: absolute;
+                  top: 3px;
+                  right: 0;
+                  padding: 1px ($baseline/2) 2px ($baseline/2);
+              }
 
-          &.short {
-            width: 25%;
-          }
+            }
 
-          ::-webkit-input-placeholder {
-             color: $gray-l4;
-          }
+            .action-close {
+              @include transition(color 0.25s ease-in-out);
+              @include font-size(18);
+              display: inline-block;
+              margin-top: ($baseline*2);
+              border: 0;
+              padding: 0;
+              background: transparent;
+              color: $gray-l1;
 
-          :-moz-placeholder {
-             color: $gray-l3;
-          }
-
-          ::-moz-placeholder {
-             color: $gray-l3;
-          }
-
-          :-ms-input-placeholder {
-             color: $gray-l3;
-          }
-
-          &:focus {
-
-            + .tip {
-              color: $gray;
+              &:hover {
+                color: $blue;
+              }
             }
           }
         }
-
-        textarea.long {
-          height: ($baseline*5);
-        }
-
-        input[type="checkbox"] {
-          display: inline-block;
-          margin-right: ($baseline/4);
-          width: auto;
-          height: auto;
-
-          & + label {
-            display: inline-block;
-          }
-        }
-
-        .tip {
-          @extend .t-copy-sub2;
-          @include transition(color, 0.15s, ease-in-out);
-          display: block;
-          margin-top: ($baseline/4);
-          color: $gray-l3;
-        }
-      }
-
-      .field-group {
-        @include clearfix();
-        margin: 0 0 ($baseline/2) 0;
-
-        .field {
-          display: block;
-          width: 46.5%;
-          border-bottom: none;
-          margin: 0 $baseline 0 0;
-          padding: ($baseline/4) 0 0 0;
-          float: left;
-          position: relative;
-
-          input, textarea {
-            width: 100%;
-          }
-
-          .action-upload {
-              @extend .t-action4;
-              @include blue-button;
-              @include transition(all .15s);
-              @include font-size(12);
-              font-weight: 600;
-              text-align: center;
-              position: absolute;
-              top: 2px;
-              right: 0;
-/*              height: 40px;
-              top: 33px;
-              right: 2px; */
-              padding: 3px ($baseline/2) 1px ($baseline/2);
-          }
-
-        }
-
-        .action-close {
-            @include transition(color 0.25s ease-in-out);
-            @include font-size(18);
-            display: inline-block;
-            margin-top: ($baseline*2);
-            border: 0;
-            padding: 0;
-            background: transparent;
-            color: $gray-l1;
-
-            &:hover {
-              color: $blue;
-            }
-        }
-
-      }
     }
   }
 }
@@ -284,19 +373,26 @@ body.course.textbooks {
     background-color: $white;
     display: inline-block;
     vertical-align: middle;
-    width: $baseline*20;
+    width: $baseline*23;
     text-align: left;
 
     .title {
       @include font-size(18);
       margin-bottom: ($baseline/2);
-      font-weight: bold;
+      font-weight: 600;
       color: $black;
     }
 
     .message {
       @extend .t-copy-sub2;
       color: $gray;
+    }
+
+    .error {
+      @extend .t-copy-sub2;
+      margin-top: ($baseline*.75);
+      font-weight: 600;
+      color: $red;
     }
 
     form {
@@ -315,11 +411,11 @@ body.course.textbooks {
 
       .wrapper-progress {
         @include box-shadow(inset 0 0 3px $shadow-d1);
-
+        display: block;
         margin-top: $baseline;
         border-radius: ($baseline*.75);
-        background-color: $gray-l4;
-        padding: 2px 8px 1px 8px;
+        background-color: $gray-l5;
+        padding: 1px 8px 2px 8px;
         height: 25px;
 
         progress {
@@ -328,7 +424,7 @@ body.course.textbooks {
           width: 100%;
           border: none;
           border-radius: ($baseline*.75);
-          background-color: $gray-l4;
+          background-color: $gray-l5;
 
           &::-webkit-progress-bar {
             background-color: transparent;
@@ -336,12 +432,12 @@ body.course.textbooks {
           }
 
           &::-webkit-progress-value {
-            background-color: $green-s1;
+            background-color: $pink;
             border-radius: ($baseline*.75);
           }
 
           &::-moz-progress-bar {
-            background-color: $green-s1;
+            background-color: $pink;
             border-radius: ($baseline*.75);
           }
 
@@ -353,7 +449,7 @@ body.course.textbooks {
         @include box-shadow(inset 0 1px 2px $shadow);
         border-top: 1px solid $gray-l1;
         padding: ($baseline*0.75) $baseline;
-        background: $gray-l4;
+        background: $gray-l6;
 
         .action-item {
           @extend .t-action4;
@@ -366,6 +462,7 @@ body.course.textbooks {
         }
 
         .action-upload {
+          @extend .btn-primary-blue;
           font-weight: 600;
           color: $white;
         }
