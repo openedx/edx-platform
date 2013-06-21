@@ -55,4 +55,13 @@
       <input type="button" name="allow" value="Grant Instructor Access">
     </div>
   </div>
+
+  <div class="auth-list-container auth-list-beta">
+    <h2>Beta Testers</h2>
+    <div class="auth-list-table" data-endpoint="${ section_data['list_course_role_members_url'] }"></div>
+    <div class="auth-list-add" data-endpoint="${ section_data['access_allow_revoke_url'] }">
+      <input type="text" name="email" placeholder="Enter Email" spellcheck="false">
+      <input type="button" name="allow" value="Grant Beta Tester Access">
+    </div>
+  </div>
 </div>

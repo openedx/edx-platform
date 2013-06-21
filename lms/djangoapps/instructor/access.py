@@ -18,7 +18,16 @@ from django_comment_common.models import (Role,
 
 
 def list_with_level(course, level):
-    grpname = get_access_group_name(course, level)
+    """
+    List users who have 'level' access.
+
+    level is in ['instructor', 'staff', 'beta']
+    """
+    if level in ['beta']:
+        grpname = course_beta_test_group_name(course.location)
+    else:
+        grpname = get_access_group_name(course, level)
+
     try:
         return Group.objects.get(name=grpname).user_set.all()
     except Group.DoesNotExist:
@@ -52,7 +61,7 @@ def _change_access(course, user, level, mode):
     """
 
     if level in ['beta']:
-        grpname = course_beta_test_group_name(course)
+        grpname = course_beta_test_group_name(course.location)
     else:
         grpname = get_access_group_name(course, level)
     group, _ = Group.objects.get_or_create(name=grpname)
