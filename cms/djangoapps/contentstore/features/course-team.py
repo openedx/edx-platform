@@ -15,7 +15,7 @@ def view_grading_settings(_step):
     world.css_click(link_css)
 
 
-@step(u'The user "([^"]*)" exists$')
+@step(u'the user "([^"]*)" exists$')
 def create_other_user(_step, name):
     create_studio_user(uname=name, password=PASSWORD, email=(name + EMAIL_EXTENSION))
 
@@ -44,8 +44,8 @@ def other_user_login(_step, name):
     log_into_studio(uname=name, password=PASSWORD, email=name + EMAIL_EXTENSION)
 
 
-@step(u'He does( not)? see the course on his page')
-def see_course(_step, doesnt_see_course):
+@step(u's?he does( not)? see the course on (his|her) page')
+def see_course(_step, doesnt_see_course, gender):
     class_css = 'span.class-name'
     all_courses = world.css_find(class_css)
     all_names = [item.html for item in all_courses]
@@ -55,13 +55,13 @@ def see_course(_step, doesnt_see_course):
         assert _COURSE_NAME in all_names
 
 
-@step(u'He cannot delete users')
+@step(u's?he cannot delete users')
 def cannot_delete(_step):
     to_delete_css = 'a.remove-user'
     assert world.is_css_not_present(to_delete_css)
 
 
-@step(u'He cannot add users')
+@step(u's?he cannot add users')
 def cannot_add(_step):
     add_css = 'a.new-user'
     assert world.is_css_not_present(add_css)

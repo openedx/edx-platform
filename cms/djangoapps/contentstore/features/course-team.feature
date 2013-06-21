@@ -3,32 +3,32 @@ Feature: Course Team
 
     Scenario: Users can add other users
         Given I have opened a new course in Studio
-        And The user "abcd" exists
+        And the user "alice" exists
         And I am viewing the course team settings
-        When I add "abcd" to the course team
-        And "abcd" logs in
-        Then He does see the course on his page
+        When I add "alice" to the course team
+        And "alice" logs in
+        Then she does see the course on her page
 
     Scenario: Added users cannot delete or add other users
         Given I have opened a new course in Studio
-        And The user "abcd" exists
+        And the user "bob" exists
         And I am viewing the course team settings
-        When I add "abcd" to the course team
-        And "abcd" logs in
-        Then He cannot delete users
-        And He cannot add users
+        When I add "bob" to the course team
+        And "bob" logs in
+        Then he cannot delete users
+        And he cannot add users
 
     Scenario: Users can delete other users
         Given I have opened a new course in Studio
-        And The user "abcd" exists
+        And the user "carol" exists
         And I am viewing the course team settings
-        When I add "abcd" to the course team
-        And I delete "abcd" from the course team
-        And "abcd" logs in
-        Then He does not see the course on his page
+        When I add "carol" to the course team
+        And I delete "carol" from the course team
+        And "carol" logs in
+        Then she does not see the course on her page
 
     Scenario: Users cannot add users that do not exist
         Given I have opened a new course in Studio
         And I am viewing the course team settings
-        When I add "abcd" to the course team
+        When I add "dennis" to the course team
         Then I should see "Could not find user by email address" somewhere on the page
