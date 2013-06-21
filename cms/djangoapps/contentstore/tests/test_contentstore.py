@@ -90,8 +90,8 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.client.login(username=uname, password=password)
 
     def tearDown(self):
-        m = MongoClient()
-        m.drop_database(TEST_DATA_CONTENTSTORE['OPTIONS']['db'])
+        mongo = MongoClient()
+        mongo.drop_database(TEST_DATA_CONTENTSTORE['OPTIONS']['db'])
         xmodule.contentstore.django._CONTENTSTORE.clear()
 
     def check_components_on_page(self, component_types, expected_types):
@@ -414,7 +414,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.assertGreater(len(all_assets), 0)
 
         # make sure we have some thumbnails in our contentstore
-        all_thumbnails = content_store.get_all_content_thumbnails_for_course(course_location)
+        content_store.get_all_content_thumbnails_for_course(course_location)
 
         #
         # cdodge: temporarily comment out assertion on thumbnails because many environments
@@ -543,7 +543,6 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         all_assets = trash_store.get_all_content_for_course(course_location)
         self.assertEqual(len(all_assets), 0)
 
-
         all_thumbnails = trash_store.get_all_content_thumbnails_for_course(course_location)
         self.assertEqual(len(all_thumbnails), 0)
 
@@ -607,7 +606,6 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             {'due': datetime.datetime.now(UTC)})
 
         self.assertRaises(InvalidVersionError, draft_store.unpublish, location)
-
 
     def test_bad_contentstore_request(self):
         resp = self.client.get('http://localhost:8001/c4x/CDX/123123/asset/&images_circuits_Lab7Solution2.png')
@@ -857,8 +855,8 @@ class ContentStoreTest(ModuleStoreTestCase):
         }
 
     def tearDown(self):
-        m = MongoClient()
-        m.drop_database(TEST_DATA_CONTENTSTORE['OPTIONS']['db'])
+        mongo = MongoClient()
+        mongo.drop_database(TEST_DATA_CONTENTSTORE['OPTIONS']['db'])
         xmodule.contentstore.django._CONTENTSTORE.clear()
 
     def test_create_course(self):
