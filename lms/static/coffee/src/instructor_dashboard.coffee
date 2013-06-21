@@ -82,7 +82,8 @@ setup_section_analytics = (section) ->
   log "setting up instructor dashboard section - analytics"
 
   distribution_select = section.find('select#distributions')
-  $.getJSON distribution_select.data('endpoint'), features: JSON.stringify(['']), (data) ->
+  # ask for available distributions
+  $.getJSON distribution_select.data('endpoint'), features: JSON.stringify([]), (data) ->
       distribution_select.find('option').eq(0).text "-- Select distribution"
 
       for feature in data.available_features
