@@ -2,7 +2,7 @@
 <%namespace name='static' file='static_content.html'/>
 <%! import json %>
 
-<%block name="title">Textbooks</%block>
+<%block name="title">${_("Textbooks")}</%block>
 <%block name="bodyclass">is-signedin course textbooks</%block>
 
 <%block name="header_extras">
@@ -44,23 +44,21 @@ $(function() {
     })
 })
 </script>
-
-
 </%block>
 
 <%block name="content">
   <div class="wrapper-mast wrapper">
     <header class="mast has-actions has-subtitle">
       <h1 class="page-header">
-        <small class="subtitle">Course Content</small>
-        <span class="sr">&gt; </span>Textbooks
+        <small class="subtitle">${_("Course Content")}</small>
+        <span class="sr">&gt; </span>${_("Textbooks")}
       </h1>
 
       <nav class="nav-actions">
-        <h3 class="sr">Page Actions</h3>
+        <h3 class="sr">${_("Page Actions")}</h3>
         <ul>
           <li class="nav-item">
-            <a href="#" class="button upload-button new-button"><i class="icon-cloud-upload "></i> New Textbook</a>
+            <a href="#" class="button upload-button new-button"><i class="icon-cloud-upload "></i> ${_("New Textbook")}</a>
           </li>
         </ul>
       </nav>
@@ -73,26 +71,15 @@ $(function() {
 
       </article>
       <aside class="content-supplementary" role="complimentary">
-
         <div class="bit">
-        <h3 class="title-3">Why should I break my text into chapters?</h3>
-        <p>It's best practice to break your course's textbook into multiple chapters to reduce loading times for students. Breaking up textbooks into chapters can also help students more easily find topic-based information.</p>
+        <h3 class="title-3">${_("Why should I break my text into chapters?")}</h3>
+        <p>${_("It's best practice to break your course's textbook into multiple chapters to reduce loading times for students. Breaking up textbooks into chapters can also help students more easily find topic-based information.")}</p>
         </div>
-
         <div class="bit">
-        <h3 class="title-3">What if my book isn't divided into chapters?</h3>
-        <p>If you haven't broken your textbook into chapters, you can upload the entire text as Chapter 1.</p>
+        <h3 class="title-3">${_("What if my book isn't divided into chapters?")}</h3>
+        <p>${_("If you haven't broken your textbook into chapters, you can upload the entire text as Chapter 1.")}</p>
         </div>
-
-
       </aside>
-
     </section>
-
-
   </div>
-
-
-
-
 </%block>
