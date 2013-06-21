@@ -15,10 +15,11 @@ from util.cache import cache_if_anonymous
 valid_templates = []
 
 if settings.STATIC_GRAB:
-    valid_templates = valid_templates + ['server-down.html',
-                                       'server-error.html'
-                                       'server-overloaded.html',
-                                       ]
+    valid_templates = valid_templates + [
+        'server-down.html',
+        'server-error.html'
+        'server-overloaded.html',
+    ]
 
 
 def index(request, template):

@@ -12,7 +12,7 @@ from django.test.utils import override_settings
 
 from django.core.urlresolvers import reverse
 
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import Group
 from courseware.access import _course_staff_group_name
 from courseware.tests.tests import LoginEnrollmentTestCase, TEST_DATA_XML_MODULESTORE, get_user
 from xmodule.modulestore.django import modulestore

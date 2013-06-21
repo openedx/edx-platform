@@ -23,8 +23,11 @@ be specified for this tag::
 
     sources - location id of required modules, separated by ';'
     [message | ""] - message for case, where one or more are not passed. Here you can use variable {link}, which generate link to required module.
+        
+    [submitted] - map to `is_submitted` module method.
+    (pressing RESET button makes this function to return False.)
 
-    [completed] - map to `is_completed` module method
+    [correct] - map to `is_correct` module method
     [attempted] - map to `is_attempted` module method
     [poll_answer] - map to `poll_answer` module attribute
     [voted] - map to `voted` module attribute
@@ -53,7 +56,7 @@ Examples of conditional depends on poll
     </conditional>
 
 Examples of conditional depends on poll (use <show> tag)
--------------------------------------------
+--------------------------------------------------------
 
 .. code-block:: xml
 

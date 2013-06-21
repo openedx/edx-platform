@@ -112,12 +112,12 @@ def assert_problem_has_answer(step, problem_type, answer_class):
 
 
 @step(u'I reset the problem')
-def reset_problem(step):
+def reset_problem(_step):
     world.css_click('input.reset')
 
 
 @step(u'I press the button with the label "([^"]*)"$')
-def press_the_button_with_label(step, buttonname):
+def press_the_button_with_label(_step, buttonname):
     button_css = 'button span.show-label'
     elem = world.css_find(button_css).first
     assert_equal(elem.text, buttonname)
@@ -125,7 +125,7 @@ def press_the_button_with_label(step, buttonname):
 
 
 @step(u'The "([^"]*)" button does( not)? appear')
-def action_button_present(step, buttonname, doesnt_appear):
+def action_button_present(_step, buttonname, doesnt_appear):
     button_css = 'section.action input[value*="%s"]' % buttonname
     if doesnt_appear:
         assert world.is_css_not_present(button_css)
@@ -135,12 +135,10 @@ def action_button_present(step, buttonname, doesnt_appear):
 
 @step(u'the button with the label "([^"]*)" does( not)? appear')
 def button_with_label_present(step, buttonname, doesnt_appear):
-    button_css = 'button span.show-label'
-    elem = world.css_find(button_css).first
     if doesnt_appear:
-        assert_not_equal(elem.text, buttonname)
+        world.browser.is_text_not_present(buttonname, wait_time=5)
     else:
-        assert_equal(elem.text, buttonname)
+        world.browser.is_text_present(buttonname, wait_time=5)
 
 
 @step(u'My "([^"]*)" answer is marked "([^"]*)"')

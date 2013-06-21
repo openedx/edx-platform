@@ -13,7 +13,7 @@ from django.test.client import Client
 
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
-from xmodule.tests import test_system
+from xmodule.tests import get_test_system
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -25,8 +25,8 @@ class BaseTestXmodule(ModuleStoreTestCase):
     """Base class for testing Xmodules with mongo store.
 
     This class prepares course and users for tests:
-        1. create test course
-        2. create, enrol and login users for this course
+        1. create test course;
+        2. create, enrol and login users for this course;
 
     Any xmodule should overwrite only next parameters for test:
         1. TEMPLATE_NAME
@@ -77,14 +77,15 @@ class BaseTestXmodule(ModuleStoreTestCase):
             data=self.DATA
         )
 
-        location = self.item_descriptor.location
-        system = test_system()
+        system = get_test_system()
         system.render_template = lambda template, context: context
+        model_data = {'location': self.item_descriptor.location}
+        model_data.update(self.MODEL_DATA)
 
         self.item_module = self.item_descriptor.module_class(
-            system, location, self.item_descriptor, self.MODEL_DATA
+            system, self.item_descriptor, model_data
         )
-        self.item_url = Location(location).url()
+        self.item_url = Location(self.item_module.location).url()
 
         # login all users for acces to Xmodule
         self.clients = {user.username: Client() for user in self.users}

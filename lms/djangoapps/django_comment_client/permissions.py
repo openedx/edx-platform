@@ -1,8 +1,3 @@
-from django_comment_common.models import Role, Permission
-from django.db.models.signals import post_save
-from django.dispatch import receiver
-from student.models import CourseEnrollment
-
 import logging
 from util.cache import cache
 from django.core import cache

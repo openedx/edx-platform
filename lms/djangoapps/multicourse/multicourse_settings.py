@@ -10,7 +10,7 @@
 # keys being the COURSE_NAME (spaces ok), and the value being a dict of
 # parameter,value pairs. The required parameters are:
 #
-# - number  : course number (used in the simplewiki pages)
+# - number  : course number (used in the wiki pages)
 # - title   : humanized descriptive course title
 #
 # Optional parameters:

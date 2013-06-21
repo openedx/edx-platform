@@ -21,23 +21,24 @@ class SimpleTest(TestCase):
         """
         # since I had to remap files, pedantically test all press releases
         # published to date. Decent positive test while we're at it.
-        all_releases = ["/press/mit-and-harvard-announce-edx",
-                "/press/uc-berkeley-joins-edx",
-                "/press/edX-announces-proctored-exam-testing",
-                "/press/elsevier-collaborates-with-edx",
-                "/press/ut-joins-edx",
-                "/press/cengage-to-provide-book-content",
-                "/press/gates-foundation-announcement",
-                "/press/wellesley-college-joins-edx",
-                "/press/georgetown-joins-edx",
-                "/press/spring-courses",
-                "/press/lewin-course-announcement",
-                "/press/bostonx-announcement",
-                "/press/eric-lander-secret-of-life",
-                "/press/edx-expands-internationally",
-                "/press/xblock_announcement",
-                "/press/stanford-to-work-with-edx",
-            ]
+        all_releases = [
+            "/press/mit-and-harvard-announce-edx",
+            "/press/uc-berkeley-joins-edx",
+            "/press/edX-announces-proctored-exam-testing",
+            "/press/elsevier-collaborates-with-edx",
+            "/press/ut-joins-edx",
+            "/press/cengage-to-provide-book-content",
+            "/press/gates-foundation-announcement",
+            "/press/wellesley-college-joins-edx",
+            "/press/georgetown-joins-edx",
+            "/press/spring-courses",
+            "/press/lewin-course-announcement",
+            "/press/bostonx-announcement",
+            "/press/eric-lander-secret-of-life",
+            "/press/edx-expands-internationally",
+            "/press/xblock_announcement",
+            "/press/stanford-to-work-with-edx",
+        ]
 
         for rel in all_releases:
             response = self.client.get(rel)
@@ -55,7 +56,7 @@ class SimpleTest(TestCase):
         response = self.client.get("/press/../homework.html")
         self.assertEqual(response.status_code, 404)
 
-        # "." in is ascii 2E 
+        # "." in is ascii 2E
         response = self.client.get("/press/%2E%2E/homework.html")
         self.assertEqual(response.status_code, 404)
 

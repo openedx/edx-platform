@@ -44,8 +44,17 @@ class CMS.Views.ModuleEdit extends Backbone.View
         [@metadataEditor.getDisplayName()])
       @$el.find('.component-name').html(title)
 
+  customMetadata: ->
+      # Hack to support metadata fields that aren't part of the metadata editor (ie, LaTeX high level source).
+      # Walk through the set of elements which have the 'data-metadata_name' attribute and
+      # build up an object to pass back to the server on the subsequent POST.
+      # Note that these values will always be sent back on POST, even if they did not actually change.
+      _metadata = {}
+      _metadata[$(el).data("metadata-name")] = el.value for el in $('[data-metadata-name]',  @$component_editor())
+      return _metadata
+
   changedMetadata: ->
-    return @metadataEditor.getModifiedMetadataValues()
+    return _.extend(@metadataEditor.getModifiedMetadataValues(), @customMetadata())
 
   cloneTemplate: (parent, template) ->
     $.post("/clone_item", {

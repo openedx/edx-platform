@@ -270,8 +270,10 @@ def get_problem_list(request, course_id):
                             mimetype="application/json")
     except GradingServiceError:
         #This is a dev_facing_error
-        log.exception("Error from staff grading service in open ended grading.  server url: {0}"
-        .format(staff_grading_service().url))
+        log.exception(
+            "Error from staff grading service in open "
+            "ended grading.  server url: {0}".format(staff_grading_service().url)
+        )
         #This is a staff_facing_error
         return HttpResponse(json.dumps({'success': False,
                                         'error': STAFF_ERROR_MESSAGE}))
@@ -285,8 +287,10 @@ def _get_next(course_id, grader_id, location):
         return staff_grading_service().get_next(course_id, location, grader_id)
     except GradingServiceError:
         #This is a dev facing error
-        log.exception("Error from staff grading service in open ended grading.  server url: {0}"
-        .format(staff_grading_service().url))
+        log.exception(
+            "Error from staff grading service in open "
+            "ended grading.  server url: {0}".format(staff_grading_service().url)
+        )
         #This is a staff_facing_error
         return json.dumps({'success': False,
                            'error': STAFF_ERROR_MESSAGE})

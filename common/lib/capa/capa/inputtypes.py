@@ -856,7 +856,7 @@ class ImageInput(InputTypeBase):
         """
         if value is of the form [x,y] then parse it and send along coordinates of previous answer
         """
-        m = re.match('\[([0-9]+),([0-9]+)]',
+        m = re.match(r'\[([0-9]+),([0-9]+)]',
                      self.value.strip().replace(' ', ''))
         if m:
             # Note: we subtract 15 to compensate for the size of the dot on the screen.

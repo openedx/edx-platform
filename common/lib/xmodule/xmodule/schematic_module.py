@@ -1,4 +1,3 @@
-import json
 
 from .x_module import XModule, XModuleDescriptor
 

@@ -8,7 +8,6 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 
-from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.django import modulestore
 import courseware.module_render as render
 from courseware.tests.tests import LoginEnrollmentTestCase

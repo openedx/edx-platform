@@ -3,14 +3,8 @@ import logging
 from lxml.html.clean import Cleaner, autolink_html
 import re
 
-from xmodule.capa_module import ComplexEncoder
 import open_ended_image_submission
-from xmodule.editing_module import EditingDescriptor
-from xmodule.html_checker import check_html
 from xmodule.progress import Progress
-from xmodule.stringify import stringify_children
-from xmodule.xml_module import XmlDescriptor
-from xmodule.modulestore import Location
 from capa.util import *
 from .peer_grading_service import PeerGradingService, MockPeerGradingService
 import controller_query_service

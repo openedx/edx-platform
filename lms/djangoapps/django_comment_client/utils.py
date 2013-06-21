@@ -1,9 +1,9 @@
+import pytz
 from collections import defaultdict
 import logging
 import urllib
 from datetime import datetime
 
-from courseware.module_render import get_module
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.db import connection
@@ -169,7 +169,9 @@ def initialize_discussion_info(course):
         category = " / ".join([x.strip() for x in category.split("/")])
         last_category = category.split("/")[-1]
         discussion_id_map[id] = {"location": module.location, "title": last_category + " / " + title}
-        unexpanded_category_map[category].append({"title": title, "id": id, "sort_key": sort_key, "start_date": module.lms.start})
+        #Handle case where module.lms.start is None
+        entry_start_date = module.lms.start if module.lms.start else datetime.max.replace(tzinfo=pytz.UTC)
+        unexpanded_category_map[category].append({"title": title, "id": id, "sort_key": sort_key, "start_date": entry_start_date})
 
     category_map = {"entries": defaultdict(dict), "subcategories": defaultdict(dict)}
     for category_path, entries in unexpanded_category_map.items():
