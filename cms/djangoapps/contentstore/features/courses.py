@@ -10,6 +10,7 @@ from common import *
 @step('There are no courses$')
 def no_courses(step):
     world.clear_courses()
+    create_studio_user()
 
 
 @step('I click the New Course button$')
