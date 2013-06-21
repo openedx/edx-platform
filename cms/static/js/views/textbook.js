@@ -78,6 +78,10 @@ CMS.Views.TextbookEdit = Backbone.View.extend({
             name: this.model.escape('name'),
             errors: null
         }));
+        var chapters = this.model.get('chapters');
+        if (chapters.length === 0) {
+            chapters.add([{}]);
+        }
         this.addAll();
         return this;
     },
@@ -109,6 +113,7 @@ CMS.Views.TextbookEdit = Backbone.View.extend({
         var that = this;
         _.each(this.$("li"), function(li, i) {
             var chapter = that.model.get('chapters').at(i);
+            if(!chapter) { return; }
             chapter.set({
                 "name": $(".chapter-name", li).val(),
                 "asset_path": $(".chapter-asset-path", li).val()
@@ -145,6 +150,11 @@ CMS.Views.TextbookEdit = Backbone.View.extend({
         // if the textbook has no content, remove it from the collection
         if(this.model.isEmpty()) {
             textbooks.remove(this.model);
+        } else {
+            // remove empty chapters from textbook
+            var chapters = this.model.get("chapters");
+            chapters.remove(chapters.filter(
+                function(chapter) { return chapter.isEmpty(); }));
         }
         textbooks.trigger('render');
         return this;

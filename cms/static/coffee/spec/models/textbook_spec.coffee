@@ -14,10 +14,11 @@ describe "CMS.Models.Textbook", ->
     it "should not show chapters by default", ->
         expect(@model.get("showChapters")).toBeFalsy()
 
-    it "should have a ChapterSet with one chapter by default", ->
+    it "should have an empty ChapterSet by default", ->
         chapters = @model.get("chapters")
         expect(chapters).toBeInstanceOf(CMS.Collections.ChapterSet)
-        expect(chapters.length).toEqual(1)
+        expect(chapters.isEmpty()).toBeTruthy()
+        expect(chapters.length).toEqual(0)
 
     it "should be empty by default", ->
         expect(@model.isEmpty()).toBeTruthy()

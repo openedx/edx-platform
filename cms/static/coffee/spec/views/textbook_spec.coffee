@@ -89,10 +89,18 @@ describe "CMS.Views.TextbookEdit", ->
             @view.render()
             expect(@view.$("input[name=textbook-name]").val()).toEqual("Life Sciences")
 
-        it "should allow you to create new chapters", ->
+        it "should create an empty chapter when it is rendered, if there are no chapters", ->
+            expect(@model.get("chapters").length).toEqual(0)
+            @view.render()
+            expect(@model.get("chapters").length).toEqual(1)
+            expect(@model.get("chapters").last().isEmpty()).toBeTruthy()
+
+        it "should allow you to create new empty chapters", ->
+            @view.render()
             numChapters = @model.get("chapters").length
-            @view.render().$(".action-add-chapter").click()
+            @view.$(".action-add-chapter").click()
             expect(@model.get("chapters").length).toEqual(numChapters+1)
+            expect(@model.get("chapters").last().isEmpty()).toBeTruthy()
 
         it "should save properly", ->
             @view.render()
@@ -104,6 +112,7 @@ describe "CMS.Views.TextbookEdit", ->
             expect(@collection.save).toHaveBeenCalled()
 
         it "does not save on cancel", ->
+            @model.get("chapters").add([{name: "a", asset_path: "b"}])
             @view.render()
             @view.$("input[name=textbook-name]").val("starfish")
             @view.$("input[name=chapter1-name]").val("foobar")
@@ -112,6 +121,14 @@ describe "CMS.Views.TextbookEdit", ->
             expect(@model.get("chapters").at(0).get("name")).not.toEqual("foobar")
             expect(@collection.save).not.toHaveBeenCalled()
             expect(@collection.editing).toBeUndefined()
+
+        it "does not save empty chapters on cancel", ->
+            chapters = @model.get("chapters")
+            origLength = chapters.length
+            @view.render()
+            chapters.add([{}, {}, {}]) # add three empty chapters
+            @view.$(".action-cancel").click()
+            expect(chapters.length).toEqual(origLength)
 
 
 describe "CMS.Views.ListTextbooks", ->

@@ -2,7 +2,7 @@ CMS.Models.Textbook = Backbone.AssociatedModel.extend({
     defaults: function() {
         return {
             name: "",
-            chapters: new CMS.Collections.ChapterSet([{}]),
+            chapters: new CMS.Collections.ChapterSet(),
             showChapters: false
         };
     },
