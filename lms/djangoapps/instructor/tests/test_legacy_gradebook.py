@@ -41,10 +41,7 @@ class TestGradebook(ModuleStoreTestCase):
             metadata={'graded': True, 'format': 'Homework'}
         )
 
-        self.users = [
-            UserFactory.create(username='robot%d' % i, email='robot+test+%d@edx.org' % i)
-            for i in xrange(USER_COUNT)
-        ]
+        self.users = [UserFactory.create() for _ in xrange(USER_COUNT)]
 
         for user in self.users:
             CourseEnrollmentFactory.create(user=user, course_id=self.course.id)
@@ -75,7 +72,7 @@ class TestGradebook(ModuleStoreTestCase):
 class TestDefaultGradingPolicy(TestGradebook):
     def test_all_users_listed(self):
         for user in self.users:
-            self.assertIn(user.username, self.response.content)
+            self.assertIn(str(user.username), str(self.response.content))
 
     def test_default_policy(self):
         # Default >= 50% passes, so Users 5-10 should be passing for Homework 1 [6]
