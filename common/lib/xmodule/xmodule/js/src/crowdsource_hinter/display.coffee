@@ -30,6 +30,7 @@ class @Hinter
     @$('input.vote').click @vote
     @$('#feedback-select').change @feedback_ui_change
     @$('input.submit-hint').click @submit_hint
+    @$('.custom-hint').click @clear_default_text
 
 
   vote: (eventObj) =>
@@ -45,6 +46,13 @@ class @Hinter
     post_json = {'answer': target.data('answer'), 'hint': @$(textarea_id).val()}
     $.postWithPrefix "#{@url}/submit_hint",post_json, (response) =>
       @render(response.contents)
+
+  clear_default_text: (eventObj) =>
+    target = @$(eventObj.currentTarget)
+    if target.data('cleared') == undefined
+      target.val('')
+      target.data('cleared', true)
+
 
   feedback_ui_change: =>
     # Make all of the previous-answer divs hidden.

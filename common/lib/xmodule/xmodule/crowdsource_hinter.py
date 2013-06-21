@@ -14,7 +14,7 @@ from xmodule.modulestore import Location
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.x_module import XModule
 from xmodule.xml_module import XmlDescriptor
-from xblock.core import XBlock, Scope, String, Integer, Float, Object, Boolean
+from xblock.core import XBlock, Scope, String, Integer, Float, Boolean, Dict, List
 
 from django.utils.html import escape
 
@@ -23,18 +23,10 @@ log = logging.getLogger(__name__)
 
 class CrowdsourceHinterFields(object):
     has_children = True
-    hints = Object(help='''A dictionary mapping answers to lists of [hint, number_of_votes] pairs.
-    ''', scope=Scope.content, default=     {
-            '4':
-            [['This is a hint.', 5],
-            ['This is hint 2', 3],
-            ['This is hint 3', 2],
-            ['This is hint 4', 1]]})
-    '''
-    Testing data for hints:
+    hints = Dict(help='''A dictionary mapping answers to lists of [hint, number_of_votes] pairs.
+    ''', scope=Scope.content, default= {})
 
-    '''
-    previous_answers = Object(help='''A list of previous answers this student made to this problem.
+    previous_answers = List(help='''A list of previous answers this student made to this problem.
         Of the form (answer, (hint_id_1, hint_id_2, hint_id_3)) for each problem.  hint_id's are
         None if the hint was not given.''',
         scope=Scope.user_state, default=[])
@@ -50,6 +42,8 @@ class CrowdsourceHinterFields(object):
     mod_queue = Dict(help='''Contains hints that have not been approved by the staff yet.  Structured
         identically to the hints dictionary.''', scope=Scope.content, default={})
 
+    hint_pk = Integer(help='Used to index hints.', scope=Scope.content, default=0)
+
 
 class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
     ''' An Xmodule that makes crowdsourced hints.
@@ -62,8 +56,8 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
     js_module_name = "Hinter"
 
 
-    def __init__(self, system, location, descriptor, model_data):
-        XModule.__init__(self, system, location, descriptor, model_data)
+    def __init__(self, *args, **kwargs):
+        XModule.__init__(self, *args, **kwargs)
 
 
     def get_html(self):
@@ -104,7 +98,7 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         of the answer.
         -Lon-capa dependent.
         '''
-        return answer.values()[0][0]
+        return str(float(answer.values()[0]))
 
 
     def handle_ajax(self, dispatch, get):
@@ -124,16 +118,15 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         '''
         The student got the incorrect answer found in get.  Give him a hint.
         '''
-        print self.hints
         answer = self.ans_to_text(get)
         # Look for a hint to give.
         if (answer not in self.hints) or (len(self.hints[answer]) == 0):
             # No hints to give.  Return.
-            self.previous_answers += [(answer, (None, None, None))]
+            self.previous_answers += [[answer, [None, None, None]]]
             return json.dumps({'contents': ' '})
         # Get the top hint, plus two random hints.
         n_hints = len(self.hints[answer])
-        best_hint_index = max(xrange(n_hints), key=lambda i:self.hints[answer][i][1])
+        best_hint_index = max(self.hints[answer], key=lambda key: self.hints[answer][key][1])
         best_hint = self.hints[answer][best_hint_index][0]
         if len(self.hints[answer]) == 1:
             rand_hint_1 = ''
@@ -147,9 +140,10 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
             rand_hint_2 = ''
             self.previous_answers += [[answer, [best_hint_index, hint_index_1, None]]]
         else:
-            hint_index_1, hint_index_2 = random.sample(xrange(len(self.hints[answer])), 2)
-            rand_hint_1 = self.hints[answer][hint_index_1][0]
-            rand_hint_2 = self.hints[answer][hint_index_2][0]
+            (hint_index_1, rand_hint_1), (hint_index_2, rand_hint_2) =\
+                random.sample(self.hints[answer].items(), 2)
+            rand_hint_1 = rand_hint_1[0]
+            rand_hint_2 = rand_hint_2[0]
             self.previous_answers += [(answer, (best_hint_index, hint_index_1, hint_index_2))]
         hint_text = best_hint + '<br />' + rand_hint_1 + '<br />' + rand_hint_2
         return json.dumps({'contents': hint_text})
@@ -172,9 +166,10 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
             answer, hints_offered = self.previous_answers[i]
             pretty_answers.append(answer)
             # If there are previous hints for this answer, ask the student to vote on one.
+            out += '<div class = "previous-answer" id="previous-answer-' + str(i) + \
+                '" style="display:none">'
             if answer in self.hints:
-                out += '<div class = "previous-answer" id="previous-answer-' + str(i) + \
-                '" style="display:none"> Which hint was most helpful when you got the wrong answer of '\
+                out += 'Which hint was most helpful when you got the wrong answer of '\
                     + answer + '?'
                 # Add each hint to the html string, with a vote button.
                 for hint_id in hints_offered:
@@ -190,7 +185,7 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
 
             # Or, let the student create his own hint
             out += '''<br /> If you didn\'t like any of these, plese submit your own: <br />
-                <textarea cols="50" id="custom-hint-'''+str(i)+'''">
+                <textarea cols="50" style="height:100px" class="custom-hint" id="custom-hint-'''+str(i)+'''">
 What would you say to help someone who got this wrong answer?
 (Don't give away the answer, please.)
                 </textarea>'''
@@ -220,7 +215,7 @@ What would you say to help someone who got this wrong answer?
         if self.user_voted:
            return json.dumps({'contents': 'Sorry, but you have already voted!'})
         ans_no = int(get['answer']) 
-        hint_no = int(get['hint'])
+        hint_no = str(get['hint'])
         answer = self.previous_answers[ans_no][0]
         temp_dict = self.hints
         temp_dict[answer][hint_no][1] += 1
@@ -244,18 +239,11 @@ What would you say to help someone who got this wrong answer?
         # Do html escaping.  Perhaps in the future do profanity filtering, etc. as well.
         hint = escape(get['hint'])
         answer = self.previous_answers[int(get['answer'])][0]
+        if self.user_voted:
+           return json.dumps({'contents': 'Sorry, but you have already voted!'})
         # Add the new hint to self.hints.  (Awkward because a direct write 
         # is necessary.)
-<<<<<<< HEAD
-<<<<<<< HEAD
-        temp_dict = self.hints
-        temp_dict[answer].append([hint, 1])     # With one vote (the user himself).
-        self.hints = temp_dict
-=======
-        if self.moderate:
-=======
         if self.moderate == 'True':
->>>>>>> Made tests of the crowdsource hinter module more standardized and easier to read.  Fixed database non-initialization bug in crowdsource hinter module.
             temp_dict = self.mod_queue
         else:
             temp_dict = self.hints
@@ -268,15 +256,12 @@ What would you say to help someone who got this wrong answer?
             self.mod_queue = temp_dict
         else:
             self.hints = temp_dict
->>>>>>> Began work on instructor view to hinting system.
         # Mark the user has having voted; reset previous_answers
         self.user_voted = True
         self.previous_answers = []
         return json.dumps({'contents': 'Thank you for your hint!'})
 
 
-<<<<<<< HEAD
-=======
     def delete_hint(self, answer, hint_id):
         '''
         From the answer, delete the hint with hint_id.
@@ -288,7 +273,6 @@ What would you say to help someone who got this wrong answer?
         self.hints = temp_hints
 
 
->>>>>>> Began work on instructor view to hinting system.
 class CrowdsourceHinterDescriptor(CrowdsourceHinterFields, XmlDescriptor):
     module_class = CrowdsourceHinterModule
     stores_state = True
