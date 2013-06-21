@@ -1,4 +1,5 @@
 <form class="edit-textbook" id="edit_textbook_form">
+  <div class="wrapper-form">
   <% if (errors) { %>
     <div id="edit_textbook_error" class="message message-status message-status error" name="edit_textbook_error">
       <%= errors %>
@@ -16,10 +17,11 @@
   <fieldset class="chapters-fields">
     <legend class="sr"><%= gettext("Chapter(s) information") %></legend>
       <ol class="chapters list-input enum"></ol>
-  </fieldset>
 
-  <div class="actions">
     <button class="action action-add-chapter"><i class="icon-plus"></i> <%= gettext("Add a Chapter") %></button>
+  </fieldset>
+  </div>
+  <div class="actions">
     <button class="action action-primary" type="submit"><%= gettext("Save") %></button>
     <button class="action action-secondary action-cancel"><%= gettext("Cancel") %></button>
   </div>

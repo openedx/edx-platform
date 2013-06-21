@@ -13,8 +13,7 @@ body.course.textbooks {
     margin-right: flex-gutter();
 
     .no-textbook-content {
-      @include box-shadow(0 0 4px $shadow-d1 inset);
-      @include border-radius(2px);
+      @extend .ui-well;
       padding: $baseline*2;
       background-color: $gray-l4;
       text-align: center;
@@ -22,15 +21,16 @@ body.course.textbooks {
 
       .button {
         margin-left: $baseline;
+        @include font-size(14);
       }
     }
 
     .textbook {
       @extend .window;
       position: relative;
-      padding: $baseline ($baseline*1.5);
 
       .view-textbook {
+        padding: $baseline ($baseline*1.5);
 
         header {
           margin-bottom: 0;
@@ -90,22 +90,11 @@ body.course.textbooks {
         }
 
         .actions {
-
-        @include transition(opacity .15s .25s ease-in-out);
-        @include clearfix();
-        display: inline-block;
-        vertical-align: middle;
-        float: right;
-        width: flex-grid(2,9);
-        margin: ($baseline/2) 0 0 flex-gutter();
-        opacity: 0.0;
-        pointer-events: none;
-        text-align: right;
-        /*
+          @include transition(opacity .15s .25s ease-in-out);
+          opacity: 0.0;
           position: absolute;
           top: $baseline;
           right: $baseline;
-          */
 
           .action {
             display: inline-block;
@@ -144,218 +133,230 @@ body.course.textbooks {
         width: 100%;
         background: $white;
 
-        fieldset {
-            margin-bottom: $baseline;
+      .wrapper-form {
+        padding: $baseline ($baseline*1.5);
+      }
+
+
+      fieldset {
+          margin-bottom: $baseline;
+      }
+
+      .actions {
+        @include box-shadow(inset 0 1px 2px $shadow);
+        border-top: 1px solid $gray-l1;
+        padding: ($baseline*0.75) $baseline;
+        background: $gray-l6;
+
+        // add a chapter is below with chapters styling
+
+        .action-primary {
+          @include blue-button;
+          @extend .t-action2;
+          @include transition(all .15s);
+          display: inline-block;
+          padding: ($baseline/5) $baseline;
+          font-weight: 600;
+          text-transform: uppercase;
         }
 
-        .actions {
-
-          .action-add-chapter {
-              @extend .t-action2;
-              @include transition(all .15s);
-              display: block;
-              width: 100%;
-              margin-bottom: ($baseline*1.5);
-              border-radius: 5px;
-              border: none;
-              padding: $baseline;
-              background-color: $blue-l3;
-              color: $white;
-              font-weight: 600;
-
-              &:hover {
-                background: #5597DD;
-              }
-          }
-
-          .action-primary {
-            @include blue-button;
-            @extend .t-action2;
-            @include transition(all .15s);
-            display: inline-block;
-            padding: ($baseline/5) $baseline;
-            font-weight: 600;
-            text-transform: uppercase;
-          }
-
-          .action-secondary {
-            @include grey-button;
-            @extend .t-action2;
-            @include transition(all .15s);
-            display: inline-block;
-            padding: ($baseline/5) $baseline;
-            font-weight: 600;
-            text-transform: uppercase;
-          }
-
-
+        .action-secondary {
+          @include grey-button;
+          @extend .t-action2;
+          @include transition(all .15s);
+          display: inline-block;
+          padding: ($baseline/5) $baseline;
+          font-weight: 600;
+          text-transform: uppercase;
         }
 
-        .copy {
-          @include font-size(12);
-          margin: ($baseline) 0 ($baseline/2) 0;
-          color: $gray;
+
+      }
+
+      .copy {
+        @include font-size(12);
+        margin: ($baseline) 0 ($baseline/2) 0;
+        color: $gray;
 
 
-          strong {
-            font-weight: 600;
-          }
-
-
+        strong {
+          font-weight: 600;
         }
 
-        .list-input,
-        .textbook-fields {
-          list-style: none;
 
-          .field {
-            margin: 0 0 ($baseline*0.75) 0;
+      }
 
-            &:last-child {
-              margin-bottom: 0;
-            }
+      .chapters-fields,
+      .textbook-fields {
+        list-style: none;
 
-            &.required {
+        .field {
+          margin: 0 0 ($baseline*0.75) 0;
 
-              label {
-                font-weight: 600;
-              }
+          &:last-child {
+            margin-bottom: 0;
+          }
 
-              label:after {
-                margin-left: ($baseline/4);
-                content: "*";
-              }
-            }
-
-            label, input, textarea {
-              display: block;
-            }
+          &.required {
 
             label {
-              @extend  .t-copy-sub1;
-              @include transition(color, 0.15s, ease-in-out);
-              margin: 0 0 ($baseline/4) 0;
-
-              &.is-focused {
-                color: $blue;
-              }
+              font-weight: 600;
             }
 
-
-            &.add-textbook-name label {
-              @extend .t-title5;
-            }
-
-            input, textarea {
-              @extend .t-copy-base;
-              height: 100%;
-              width: 100%;
-              padding: ($baseline/2);
-
-              &.long {
-                width: 100%;
-              }
-
-              &.short {
-                width: 25%;
-              }
-
-              ::-webkit-input-placeholder {
-                 color: $gray-l4;
-              }
-
-              :-moz-placeholder {
-                 color: $gray-l3;
-              }
-
-              ::-moz-placeholder {
-                 color: $gray-l3;
-              }
-
-              :-ms-input-placeholder {
-                 color: $gray-l3;
-              }
-
-              &:focus {
-
-                + .tip {
-                  color: $gray;
-                }
-              }
-            }
-
-            textarea.long {
-              height: ($baseline*5);
-            }
-
-            input[type="checkbox"] {
-              display: inline-block;
-              margin-right: ($baseline/4);
-              width: auto;
-              height: auto;
-
-              & + label {
-                display: inline-block;
-              }
-            }
-
-            .tip {
-              @extend .t-copy-sub2;
-              @include transition(color, 0.15s, ease-in-out);
-              display: block;
-              margin-top: ($baseline/4);
-              color: $gray-l3;
+            label:after {
+              margin-left: ($baseline/4);
+              content: "*";
             }
           }
 
-          .field-group {
-            @include clearfix();
-            margin: 0 0 ($baseline/2) 0;
+          label, input, textarea {
+            display: block;
+          }
 
-            .field {
-              display: block;
-              width: 46%;
-              border-bottom: none;
-              margin: 0 ($baseline*.75) 0 0;
-              padding: ($baseline/4) 0 0 0;
-              float: left;
-              position: relative;
+          label {
+            @extend  .t-copy-sub1;
+            @include transition(color, 0.15s, ease-in-out);
+            margin: 0 0 ($baseline/4) 0;
 
-              input, textarea {
-                width: 100%;
-              }
+            &.is-focused {
+              color: $blue;
+            }
+          }
 
-              .action-upload {
-                  @extend .t-action4;
-                  @include blue-button;
-                  @include transition(all .15s);
-                  @include font-size(12);
-                  font-weight: 600;
-                  text-align: center;
-                  position: absolute;
-                  top: 3px;
-                  right: 0;
-                  padding: 1px ($baseline/2) 2px ($baseline/2);
-              }
 
+          &.add-textbook-name label {
+            @extend .t-title5;
+          }
+
+          input, textarea {
+            @extend .t-copy-base;
+            height: 100%;
+            width: 100%;
+            padding: ($baseline/2);
+
+            &.long {
+              width: 100%;
             }
 
-            .action-close {
-              @include transition(color 0.25s ease-in-out);
-              @include font-size(18);
-              display: inline-block;
-              margin-top: ($baseline*2);
-              border: 0;
-              padding: 0;
-              background: transparent;
-              color: $gray-l1;
+            &.short {
+              width: 25%;
+            }
 
-              &:hover {
-                color: $blue;
+            ::-webkit-input-placeholder {
+               color: $gray-l4;
+            }
+
+            :-moz-placeholder {
+               color: $gray-l3;
+            }
+
+            ::-moz-placeholder {
+               color: $gray-l3;
+            }
+
+            :-ms-input-placeholder {
+               color: $gray-l3;
+            }
+
+            &:focus {
+
+              + .tip {
+                color: $gray;
               }
+            }
+          }
+
+          textarea.long {
+            height: ($baseline*5);
+          }
+
+          input[type="checkbox"] {
+            display: inline-block;
+            margin-right: ($baseline/4);
+            width: auto;
+            height: auto;
+
+            & + label {
+              display: inline-block;
+            }
+          }
+
+          .tip {
+            @extend .t-copy-sub2;
+            @include transition(color, 0.15s, ease-in-out);
+            display: block;
+            margin-top: ($baseline/4);
+            color: $gray-l3;
+          }
+        }
+
+        .field-group {
+          @include clearfix();
+          margin: 0 0 ($baseline/2) 0;
+
+          .field {
+            display: block;
+            width: 46%;
+            border-bottom: none;
+            margin: 0 ($baseline*.75) 0 0;
+            padding: ($baseline/4) 0 0 0;
+            float: left;
+            position: relative;
+
+            input, textarea {
+              width: 100%;
+            }
+
+            .action-upload {
+                @extend .t-action4;
+                @include blue-button;
+                @include transition(all .15s);
+                @include font-size(12);
+                font-weight: 600;
+                text-align: center;
+                position: absolute;
+                top: 3px;
+                right: 0;
+                padding: 1px ($baseline/2) 2px ($baseline/2);
+            }
+
+          }
+
+          .action-close {
+            @include transition(color 0.25s ease-in-out);
+            @include font-size(18);
+            display: inline-block;
+            margin-top: ($baseline*2);
+            border: 0;
+            padding: 0;
+            background: transparent;
+            color: $gray-l1;
+
+            &:hover {
+              color: $blue;
             }
           }
         }
+      }
+
+
+      .action-add-chapter {
+        @extend .t-action2;
+        @include transition(all .15s);
+        display: block;
+        width: 100%;
+        margin: ($baseline*1.5) 0 0 0;
+        border-radius: 5px;
+        border: none;
+        padding: $baseline;
+        background-color: $blue-l3;
+        color: $white;
+        font-weight: 600;
+
+        &:hover {
+          background: #5597DD;
+        }
+      }
     }
   }
 }

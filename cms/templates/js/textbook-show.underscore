@@ -1,4 +1,6 @@
  <div class="view-textbook">
+
+<div class="wrap-textbook">
     <header>
         <h3 class="textbook-title"><%= name %></h3>
     </header>
@@ -15,6 +17,21 @@
     </p>
 <% } %>
 
+
+<% if(showChapters) { %>
+<ol class="chapters">
+  <% chapters.each(function(chapter) { %>
+    <li class="chapter">
+        <span class="chapter-name"><%= chapter.get('name') %></span>
+        <span class="chapter-asset-path"><%= chapter.get('asset_path') %></span>
+    </li>
+  <% }) %>
+</ol>
+<% } %>
+
+</div>
+
+
 <ul  class="actions textbook-actions">
     <li class="action action-view">
         <a href="#" class="view"><%= gettext("view in course") %></a>
@@ -29,14 +46,4 @@
 
 
 
-<% if(showChapters) { %>
-<ol class="chapters">
-  <% chapters.each(function(chapter) { %>
-    <li class="chapter">
-        <span class="chapter-name"><%= chapter.get('name') %></span>
-        <span class="chapter-asset-path"><%= chapter.get('asset_path') %></span>
-    </li>
-  <% }) %>
-</ol>
-<% } %>
 </div>
