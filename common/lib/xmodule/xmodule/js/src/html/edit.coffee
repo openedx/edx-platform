@@ -25,6 +25,10 @@ class @HTMLEditingDescriptor
       convert_urls : false,
       # TODO: we should share this CSS with studio (and LMS)
       content_css : "/static/css/tiny-mce.css",
+      # The default popup_css path uses an absolute path referencing page in which tinyMCE is being hosted.
+      # Supply the correct relative path as well.
+      popup_css: false,
+      popup_css_add: '/static/js/vendor/tiny_mce/themes/advanced/skins/default/dialog.css',
       formats : {
         # Disable h4, h5, and h6 styles as we don't have CSS for them.
         h4: {},
