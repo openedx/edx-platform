@@ -1,5 +1,3 @@
-from .utils import *
-
 import models
 import settings
 
