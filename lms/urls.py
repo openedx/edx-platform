@@ -413,6 +413,12 @@ if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
         url(r'^instructor_task_status/$', 'instructor_task.views.instructor_task_status', name='instructor_task_status'),
     )
 
+if settings.MITX_FEATURES.get('RUN_AS_ANALYTICS_SERVER_ENABLED'):
+    urlpatterns += (
+        url(r'^edinsights_service/', include('edinsights.core.urls')),
+    )
+    import edinsights.core.registry
+
 # FoldIt views
 urlpatterns += (
     # The path is hardcoded into their app...
@@ -432,3 +438,5 @@ if settings.DEBUG:
 #Custom error pages
 handler404 = 'static_template_view.views.render_404'
 handler500 = 'static_template_view.views.render_500'
+
+

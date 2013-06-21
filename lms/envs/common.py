@@ -103,6 +103,13 @@ MITX_FEATURES = {
     # analytics experiments
     'ENABLE_INSTRUCTOR_ANALYTICS': False,
 
+    # enable analytics server.  
+    # WARNING: THIS SHOULD ALWAYS BE SET TO FALSE UNDER NORMAL
+    # LMS OPERATION. See analytics.py for details about what
+    # this does. 
+
+    'RUN_AS_ANALYTICS_SERVER_ENABLED' : False, 
+
     # Flip to True when the YouTube iframe API breaks (again)
     'USE_YOUTUBE_OBJECT_API': False,
 
