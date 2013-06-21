@@ -22,7 +22,7 @@ from xblock.core import Scope, String, Boolean, Dict, Integer, Float
 from .fields import Timedelta, Date
 from django.utils.timezone import UTC
 
-log = logging.getLogger("mitx.courseware")  # pylint: disable=C0103
+log = logging.getLogger("mitx.courseware")
 
 
 # Generate this many different variants of problems with rerandomize=per_student
@@ -51,9 +51,6 @@ class Randomization(String):
     Define a field to store how to randomize a problem.
     """
     def from_json(self, value):
-        """
-        For backward compatability?
-        """
         if value in ("", "true"):
             return "always"
         elif value == "false":
@@ -865,8 +862,8 @@ class CapaModule(CapaFields, XModule):
 
         except Exception as err:
             if self.system.DEBUG:
-                msg = "Error checking problem: " + err.message
-                msg += '\nTraceback:\n' + traceback.format_exc()
+                msg = u"Error checking problem: {}".format(err.message)
+                msg += u'\nTraceback:\n{}'.format(traceback.format_exc())
                 return {'success': msg}
             raise
 

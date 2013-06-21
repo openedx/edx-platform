@@ -505,9 +505,10 @@ class CapaModuleTest(unittest.TestCase):
     def test_check_problem_error(self):
 
         # Try each exception that capa_module should handle
-        for exception_class in [StudentInputError,
-                                LoncapaProblemError,
-                                ResponseError]:
+        exception_classes = [StudentInputError,
+                             LoncapaProblemError,
+                             ResponseError]
+        for exception_class in exception_classes:
 
             # Create the module
             module = CapaFactory.create(attempts=1)
@@ -532,9 +533,10 @@ class CapaModuleTest(unittest.TestCase):
     def test_check_problem_error_nonascii(self):
 
         # Try each exception that capa_module should handle
-        for exception_class in [StudentInputError,
-                                LoncapaProblemError,
-                                ResponseError]:
+        exception_classes = [StudentInputError,
+                             LoncapaProblemError,
+                             ResponseError]
+        for exception_class in exception_classes:
 
             # Create the module
             module = CapaFactory.create(attempts=1)
