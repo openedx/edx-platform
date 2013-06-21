@@ -1,6 +1,7 @@
 <%inherit file="base.html" />
 <%namespace name='static' file='static_content.html'/>
 <%! import json %>
+<%! from django.utils.translation import ugettext as _ %>
 
 <%block name="title">${_("Textbooks")}</%block>
 <%block name="bodyclass">is-signedin course textbooks</%block>
