@@ -3,7 +3,6 @@
 log = -> console.log.apply console, arguments
 plantTimeout = (ms, cb) -> setTimeout cb, ms
 
-
 CSS_INSTRUCTOR_CONTENT = 'instructor-dashboard-content-2'
 CSS_ACTIVE_SECTION = 'active-section'
 CSS_IDASH_SECTION = 'idash-section'

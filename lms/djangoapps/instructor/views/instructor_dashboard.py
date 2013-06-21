@@ -107,7 +107,7 @@ def _section_membership(course_id):
         'section_display_name': 'Membership',
         'enroll_button_url':   reverse('enroll_unenroll', kwargs={'course_id': course_id}),
         'unenroll_button_url': reverse('enroll_unenroll', kwargs={'course_id': course_id}),
-        'list_instructors_staff_url': reverse('list_instructors_staff', kwargs={'course_id': course_id}),
+        'list_course_role_members_url': reverse('list_course_role_members', kwargs={'course_id': course_id}),
         'access_allow_revoke_url': reverse('access_allow_revoke', kwargs={'course_id': course_id}),
         'list_forum_members_url': reverse('list_forum_members', kwargs={'course_id': course_id}),
         'update_forum_role_membership_url': reverse('update_forum_role_membership', kwargs={'course_id': course_id}),

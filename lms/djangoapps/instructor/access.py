@@ -10,7 +10,7 @@ TODO sync instructor and staff flags
 """
 
 from django.contrib.auth.models import User, Group
-from courseware.access import get_access_group_name
+from courseware.access import get_access_group_name, course_beta_test_group_name
 from django_comment_common.models import (Role,
                                           FORUM_ROLE_ADMINISTRATOR,
                                           FORUM_ROLE_MODERATOR,
@@ -29,7 +29,7 @@ def allow_access(course, user, level):
     """
     Allow user access to course modification.
 
-    level is one of ['instructor', 'staff']
+    level is one of ['instructor', 'staff', 'beta']
     """
     _change_access(course, user, level, 'allow')
 
@@ -38,7 +38,7 @@ def revoke_access(course, user, level):
     """
     Revoke access from user to course modification.
 
-    level is one of ['instructor', 'staff']
+    level is one of ['instructor', 'staff', 'beta']
     """
     _change_access(course, user, level, 'revoke')
 
@@ -47,10 +47,14 @@ def _change_access(course, user, level, mode):
     """
     Change access of user.
 
-    level is one of ['instructor', 'staff']
+    level is one of ['instructor', 'staff', 'beta']
     mode is one of ['allow', 'revoke']
     """
-    grpname = get_access_group_name(course, level)
+
+    if level in ['beta']:
+        grpname = course_beta_test_group_name(course)
+    else:
+        grpname = get_access_group_name(course, level)
     group, _ = Group.objects.get_or_create(name=grpname)
 
     if mode == 'allow':
