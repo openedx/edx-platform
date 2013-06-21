@@ -985,19 +985,6 @@ def password_reset(request):
                                         'error': 'Invalid e-mail'}))
 
 
-@ensure_csrf_cookie
-def reactivation_email(request):
-    ''' Send an e-mail to reactivate a deactivated account, or to
-    resend an activation e-mail. Untested. '''
-    email = request.POST['email']
-    try:
-        user = User.objects.get(email='email')
-    except User.DoesNotExist:
-        return HttpResponse(json.dumps({'success': False,
-                                        'error': 'No inactive user with this e-mail exists'}))
-    return reactivation_email_for_user(user)
-
-
 def reactivation_email_for_user(user):
     reg = Registration.objects.get(user=user)
 
