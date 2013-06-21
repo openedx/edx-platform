@@ -21,7 +21,7 @@ body.course.textbooks {
       color: $gray;
 
       .button {
-        margin-left: 20px;
+        margin-left: $baseline;
       }
     }
 
@@ -47,7 +47,7 @@ body.course.textbooks {
           @include transition(rotate .15s ease-in-out .25s);
           @include font-size(21);
           display: inline-block;
-          width: 15px;
+          width: ($baseline*.75);
           vertical-align: text-bottom;
         }
 
@@ -90,9 +90,22 @@ body.course.textbooks {
         }
 
         .actions {
+
+        @include transition(opacity .15s .25s ease-in-out);
+        @include clearfix();
+        display: inline-block;
+        vertical-align: middle;
+        float: right;
+        width: flex-grid(2,9);
+        margin: ($baseline/2) 0 0 flex-gutter();
+        opacity: 0.0;
+        pointer-events: none;
+        text-align: right;
+        /*
           position: absolute;
           top: $baseline;
           right: $baseline;
+          */
 
           .action {
             display: inline-block;
@@ -117,11 +130,13 @@ body.course.textbooks {
             }
           }
 
-
         }
 
       }
 
+      &:hover .actions {
+        opacity: 1.0;
+      }
 
     .edit-textbook {
         @include box-sizing(border-box);
