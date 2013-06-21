@@ -13,7 +13,8 @@ class @Hinter
     # request.
     answers = data[0]
     response = data[1]
-    if response.search(/class="correct "/) == -1
+    console.debug(response)
+    if response.search(/class="correct/) == -1
       # Incorrect.  Get hints.
       $.postWithPrefix "#{@url}/get_hint", answers, (response) =>
         @render(response.contents)
