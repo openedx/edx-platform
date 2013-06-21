@@ -119,6 +119,7 @@ describe "CMS.Views.ListTextbooks", ->
 
     beforeEach ->
         setFixtures($("<script>", {id: "no-textbooks-tpl", type: "text/template"}).text(noTextbooksTpl))
+        appendSetFixtures($("<script>", {id: "system-feedback-tpl", type: "text/template"}).text(feedbackTpl))
         @showSpies = spyOnConstructor(CMS.Views, "TextbookShow", ["render"])
         @showSpies.render.andReturn(@showSpies) # equivalent of `return this`
         showEl = $("<li>")
@@ -190,11 +191,61 @@ describe "CMS.Views.ListTextbooks", ->
         expect(@view.$el).not.toContain(@showSpies.$el)
 
 
+describe "CMS.Views.ChapterEdit", ->
+    tpl = readFixtures("chapter.underscore")
+
+    beforeEach ->
+        setFixtures($("<script>", {id: "new-chapter-tpl", type: "text/template"}).text(tpl))
+        appendSetFixtures($("<script>", {id: "system-feedback-tpl", type: "text/template"}).text(feedbackTpl))
+        @model = new CMS.Models.Chapter
+            name: "Chapter 1"
+            asset_path: "/ch1.pdf"
+        @collection = new CMS.Collections.ChapterSet()
+        @collection.add(@model)
+        @view = new CMS.Views.ChapterEdit({model: @model})
+        spyOn(@view, "remove").andCallThrough()
+        window.UPLOAD_ASSET_CALLBACK_URL = "/upload"
+        window.section = new CMS.Models.Section({name: "abcde"})
+
+    afterEach ->
+        delete window.UPLOAD_ASSET_CALLBACK_URL
+        delete window.section
+
+    it "can render", ->
+        @view.render()
+        expect(@view.$("input.chapter-name").val()).toEqual("Chapter 1")
+        expect(@view.$("input.chapter-asset-path").val()).toEqual("/ch1.pdf")
+
+    it "can delete itself", ->
+        @view.render().$(".action-close").click()
+        expect(@collection.length).toEqual(0)
+        expect(@view.remove).toHaveBeenCalled()
+
+    it "can open an upload dialog", ->
+        uploadSpies = spyOnConstructor(CMS.Views, "UploadDialog", ["show", "el"])
+        uploadSpies.show.andReturn(uploadSpies)
+
+        @view.render().$(".action-upload").click()
+        ctorOptions = uploadSpies.constructor.mostRecentCall.args[0]
+        expect(ctorOptions.model.get('title')).toMatch(/abcde/)
+        expect(ctorOptions.chapter).toBe(@model)
+        expect(uploadSpies.show).toHaveBeenCalled()
+
+    it "saves content when opening upload dialog", ->
+        @view.render()
+        @view.$("input.chapter-name").val("rainbows")
+        @view.$("input.chapter-asset-path").val("unicorns")
+        @view.$(".action-upload").click()
+        expect(@model.get("name")).toEqual("rainbows")
+        expect(@model.get("asset_path")).toEqual("unicorns")
+
+
 describe "CMS.Views.UploadDialog", ->
     tpl = readFixtures("upload-dialog.underscore")
 
     beforeEach ->
         setFixtures($("<script>", {id: "upload-dialog-tpl", type: "text/template"}).text(tpl))
+        appendSetFixtures($("<script>", {id: "system-feedback-tpl", type: "text/template"}).text(feedbackTpl))
         window.UPLOAD_ASSET_CALLBACK_URL = "/upload"
         @requests = requests = []
         @xhr = sinon.useFakeXMLHttpRequest()

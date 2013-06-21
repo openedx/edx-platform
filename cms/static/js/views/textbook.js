@@ -217,6 +217,10 @@ CMS.Views.ChapterEdit = Backbone.View.extend({
     },
     openUploadDialog: function(e) {
         if(e && e.preventDefault) { e.preventDefault(); }
+        this.model.set({
+            name: this.$("input.chapter-name").val(),
+            asset_path: this.$("input.chapter-asset-path").val()
+        });
         var msg = new CMS.Models.FileUpload({
             title: _.str.sprintf(gettext("Upload a new asset to %s"),
                 section.escape('name')),
