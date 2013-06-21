@@ -7,3 +7,8 @@ Contents:
 
    xmodule.rst
    capa.rst
+   chem.rst
+   sandbox-packages.rst
+   symmath.rst
+   calc.rst
+

@@ -362,7 +362,7 @@ that has to be updated on a parameter's change, then one can define
 a special function to handle this. The "output" of such a function must be
 set to "none", and the JavaScript code inside this function must update the
 MathJax element by itself. Before exiting, MathJax typeset function should
-be called so that the new text will be re-rendered by MathJax. For example,
+be called so that the new text will be re-rendered by MathJax. For example::
 
     <render>
         ...

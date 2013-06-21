@@ -3,8 +3,8 @@ import feedparser
 import json
 import logging
 import random
+import re
 import string
-import sys
 import urllib
 import uuid
 import time
@@ -20,9 +20,9 @@ from django.core.mail import send_mail
 from django.core.urlresolvers import reverse
 from django.core.validators import validate_email, validate_slug, ValidationError
 from django.db import IntegrityError, transaction
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotAllowed, HttpResponseRedirect, Http404
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotAllowed, Http404
 from django.shortcuts import redirect
-from django_future.csrf import ensure_csrf_cookie, csrf_exempt
+from django_future.csrf import ensure_csrf_cookie
 from django.utils.http import cookie_date
 
 from mitxmako.shortcuts import render_to_response, render_to_string
@@ -39,14 +39,13 @@ from certificates.models import CertificateStatuses, certificate_status_for_stud
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore import Location
 
 from collections import namedtuple
 
 from courseware.courses import get_courses, sort_by_announcement
 from courseware.access import has_access
-from courseware.views import get_module_for_descriptor, jump_to
-from courseware.model_data import ModelDataCache
+
+from external_auth.models import ExternalAuthMap
 
 from statsd import statsd
 from pytz import UTC
@@ -99,9 +98,8 @@ def course_from_id(course_id):
     course_loc = CourseDescriptor.id_to_location(course_id)
     return modulestore().get_instance(course_id, course_loc)
 
-import re
-day_pattern = re.compile('\s\d+,\s')
-multimonth_pattern = re.compile('\s?\-\s?\S+\s')
+day_pattern = re.compile(r'\s\d+,\s')
+multimonth_pattern = re.compile(r'\s?\-\s?\S+\s')
 
 
 def get_date_for_press(publish_date):
@@ -230,7 +228,7 @@ def signin_user(request):
 
 
 @ensure_csrf_cookie
-def register_user(request):
+def register_user(request, extra_context={}):
     """
     This view will display the non-modal registration form
     """
@@ -241,6 +239,8 @@ def register_user(request):
         'course_id': request.GET.get('course_id'),
         'enrollment_action': request.GET.get('enrollment_action')
     }
+    context.update(extra_context)
+
     return render_to_response('register.html', context)
 
 
@@ -282,9 +282,17 @@ def dashboard(request):
 
     # Get the 3 most recent news
     top_news = _get_news(top=3) if not settings.MITX_FEATURES.get('ENABLE_MKTG_SITE', False) else None
+            
+    # get info w.r.t ExternalAuthMap
+    external_auth_map = None
+    try:
+        external_auth_map = ExternalAuthMap.objects.get(user=user)
+    except ExternalAuthMap.DoesNotExist:
+        pass
 
     context = {'courses': courses,
                'message': message,
+               'external_auth_map': external_auth_map,
                'staff_access': staff_access,
                'errored_courses': errored_courses,
                'show_courseware_links_for': show_courseware_links_for,
@@ -571,15 +579,23 @@ def create_account(request, post_override=None):
 
     # if doing signup for an external authorization, then get email, password, name from the eamap
     # don't use the ones from the form, since the user could have hacked those
+    # unless originally we didn't get a valid email or name from the external auth
     DoExternalAuth = 'ExternalAuthMap' in request.session
     if DoExternalAuth:
         eamap = request.session['ExternalAuthMap']
-        email = eamap.external_email
-        name = eamap.external_name
+        try:
+            validate_email(eamap.external_email)
+            email = eamap.external_email
+        except ValidationError:
+            email = post_vars.get('email', '')
+        if eamap.external_name.strip() == '':
+            name = post_vars.get('name', '')
+        else:
+            name = eamap.external_name 
         password = eamap.internal_password
         post_vars = dict(post_vars.items())
         post_vars.update(dict(email=email, name=name, password=password))
-        log.debug('extauth test: post_vars = %s' % post_vars)
+        log.info('In create_account with external_auth: post_vars = %s' % post_vars)
 
     # Confirm we have a properly formed request
     for a in ['username', 'email', 'password', 'name']:
@@ -593,17 +609,28 @@ def create_account(request, post_override=None):
         js['field'] = 'honor_code'
         return HttpResponse(json.dumps(js))
 
-    if post_vars.get('terms_of_service', 'false') != u'true':
-        js['value'] = "You must accept the terms of service.".format(field=a)
-        js['field'] = 'terms_of_service'
-        return HttpResponse(json.dumps(js))
+    # Can't have terms of service for certain SHIB users, like at Stanford
+    tos_not_required = settings.MITX_FEATURES.get("AUTH_USE_SHIB") \
+                       and settings.MITX_FEATURES.get('SHIB_DISABLE_TOS') \
+                       and DoExternalAuth and ("shib" in eamap.external_domain)
+
+    if not tos_not_required:
+        if post_vars.get('terms_of_service', 'false') != u'true':
+            js['value'] = "You must accept the terms of service.".format(field=a)
+            js['field'] = 'terms_of_service'
+            return HttpResponse(json.dumps(js))
 
     # Confirm appropriate fields are there.
     # TODO: Check e-mail format is correct.
     # TODO: Confirm e-mail is not from a generic domain (mailinator, etc.)? Not sure if
     # this is a good idea
     # TODO: Check password is sane
-    for a in ['username', 'email', 'name', 'password', 'terms_of_service', 'honor_code']:
+
+    required_post_vars = ['username', 'email', 'name', 'password', 'terms_of_service', 'honor_code']
+    if tos_not_required:
+        required_post_vars =  ['username', 'email', 'name', 'password', 'honor_code']
+
+    for a in required_post_vars:
         if len(post_vars[a]) < 2:
             error_str = {'username': 'Username must be minimum of two characters long.',
                          'email': 'A properly formatted e-mail is required.',
@@ -665,18 +692,19 @@ def create_account(request, post_override=None):
     login(request, login_user)
     request.session.set_expiry(0)
 
-    try_change_enrollment(request)
-
     if DoExternalAuth:
         eamap.user = login_user
         eamap.dtsignup = datetime.datetime.now(UTC)
         eamap.save()
-        log.debug('Updated ExternalAuthMap for %s to be %s' % (post_vars['username'], eamap))
+        log.info("User registered with external_auth %s" % post_vars['username'])
+        log.info('Updated ExternalAuthMap for %s to be %s' % (post_vars['username'], eamap))
 
         if settings.MITX_FEATURES.get('BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH'):
-            log.debug('bypassing activation email')
+            log.info('bypassing activation email')
             login_user.is_active = True
             login_user.save()
+
+    try_change_enrollment(request)
 
     statsd.increment("common.student.account_created")
 

@@ -17,8 +17,9 @@ from xmodule.modulestore import Location
 
 from django.http import QueryDict
 
-from . import test_system
+from . import get_test_system
 from pytz import UTC
+from capa.correctmap import CorrectMap
 
 
 class CapaFactory(object):
@@ -86,7 +87,7 @@ class CapaFactory(object):
         """
         location = Location(["i4x", "edX", "capa_test", "problem",
                              "SampleProblem{0}".format(CapaFactory.next_num())])
-        model_data = {'data': CapaFactory.sample_problem_xml}
+        model_data = {'data': CapaFactory.sample_problem_xml, 'location': location}
 
         if graceperiod is not None:
             model_data['graceperiod'] = graceperiod
@@ -111,9 +112,9 @@ class CapaFactory(object):
             # since everything else is a string.
             model_data['attempts'] = int(attempts)
 
-        system = test_system()
+        system = get_test_system()
         system.render_template = Mock(return_value="<div>Test Template HTML</div>")
-        module = CapaModule(system, location, descriptor, model_data)
+        module = CapaModule(system, descriptor, model_data)
 
         if correct:
             # TODO: probably better to actually set the internal state properly, but...
@@ -597,6 +598,85 @@ class CapaModuleTest(unittest.TestCase):
         # Expect that the problem was NOT reset
         self.assertTrue('success' in result and not result['success'])
 
+    def test_rescore_problem_correct(self):
+
+        module = CapaFactory.create(attempts=1, done=True)
+
+        # Simulate that all answers are marked correct, no matter
+        # what the input is, by patching LoncapaResponse.evaluate_answers()
+        with patch('capa.responsetypes.LoncapaResponse.evaluate_answers') as mock_evaluate_answers:
+            mock_evaluate_answers.return_value = CorrectMap(CapaFactory.answer_key(), 'correct')
+            result = module.rescore_problem()
+
+        # Expect that the problem is marked correct
+        self.assertEqual(result['success'], 'correct')
+
+        # Expect that we get no HTML
+        self.assertFalse('contents' in result)
+
+        # Expect that the number of attempts is not incremented
+        self.assertEqual(module.attempts, 1)
+
+    def test_rescore_problem_incorrect(self):
+        # make sure it also works when attempts have been reset,
+        # so add this to the test:
+        module = CapaFactory.create(attempts=0, done=True)
+
+        # Simulate that all answers are marked incorrect, no matter
+        # what the input is, by patching LoncapaResponse.evaluate_answers()
+        with patch('capa.responsetypes.LoncapaResponse.evaluate_answers') as mock_evaluate_answers:
+            mock_evaluate_answers.return_value = CorrectMap(CapaFactory.answer_key(), 'incorrect')
+            result = module.rescore_problem()
+
+        # Expect that the problem is marked incorrect
+        self.assertEqual(result['success'], 'incorrect')
+
+        # Expect that the number of attempts is not incremented
+        self.assertEqual(module.attempts, 0)
+
+    def test_rescore_problem_not_done(self):
+        # Simulate that the problem is NOT done
+        module = CapaFactory.create(done=False)
+
+        # Try to rescore the problem, and get exception
+        with self.assertRaises(xmodule.exceptions.NotFoundError):
+            module.rescore_problem()
+
+    def test_rescore_problem_not_supported(self):
+        module = CapaFactory.create(done=True)
+
+        # Try to rescore the problem, and get exception
+        with patch('capa.capa_problem.LoncapaProblem.supports_rescoring') as mock_supports_rescoring:
+            mock_supports_rescoring.return_value = False
+            with self.assertRaises(NotImplementedError):
+                module.rescore_problem()
+
+    def _rescore_problem_error_helper(self, exception_class):
+        """Helper to allow testing all errors that rescoring might return."""
+        # Create the module
+        module = CapaFactory.create(attempts=1, done=True)
+
+        # Simulate answering a problem that raises the exception
+        with patch('capa.capa_problem.LoncapaProblem.rescore_existing_answers') as mock_rescore:
+            mock_rescore.side_effect = exception_class(u'test error \u03a9')
+            result = module.rescore_problem()
+
+        # Expect an AJAX alert message in 'success'
+        expected_msg = u'Error: test error \u03a9'
+        self.assertEqual(result['success'], expected_msg)
+
+        # Expect that the number of attempts is NOT incremented
+        self.assertEqual(module.attempts, 1)
+
+    def test_rescore_problem_student_input_error(self):
+        self._rescore_problem_error_helper(StudentInputError)
+
+    def test_rescore_problem_problem_error(self):
+        self._rescore_problem_error_helper(LoncapaProblemError)
+
+    def test_rescore_problem_response_error(self):
+        self._rescore_problem_error_helper(ResponseError)
+
     def test_save_problem(self):
         module = CapaFactory.create(done=False)
 
@@ -922,7 +1002,7 @@ class CapaModuleTest(unittest.TestCase):
         # is asked to render itself as HTML
         module.lcp.get_html = Mock(side_effect=Exception("Test"))
 
-        # Stub out the test_system rendering function
+        # Stub out the get_test_system rendering function
         module.system.render_template = Mock(return_value="<div>Test Template HTML</div>")
 
         # Turn off DEBUG

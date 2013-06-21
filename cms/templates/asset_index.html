@@ -1,5 +1,6 @@
 <%inherit file="base.html" />
 <%! from django.core.urlresolvers import reverse %>
+<%! from django.utils.translation import ugettext as _ %>
 <%block name="bodyclass">is-signedin course uploads</%block>
 <%block name="title">Files &amp; Uploads</%block>
 
@@ -30,6 +31,9 @@
       <td class="embed-col">
         <input type="text" class="embeddable-xml-input" value='{{url}}' readonly>
       </td>
+      <td class="delete-col">
+        <a href="#" data-tooltip="${_('Delete this asset')}" class="remove-asset-button"><span class="delete-icon"></span></a>
+      </td>
     </tr>
   </script>
 
@@ -56,7 +60,7 @@
       <div class="page-actions">
         <input type="text" class="asset-search-input search wip-box" placeholder="search assets" style="display:none"/>
       </div>
-      <article class="asset-library">
+      <article class="asset-library" data-remove-asset-callback-url='${remove_asset_callback_url}'>
         <table>
           <thead>
             <tr>
@@ -64,6 +68,7 @@
               <th class="name-col">Name</th>
               <th class="date-col">Date Added</th>
               <th class="embed-col">URL</th>
+              <th class="delete-col"></th>
             </tr>
           </thead>
           <tbody id="asset_table_body">
@@ -85,6 +90,9 @@
               </td>
               <td class="embed-col">
                 <input type="text" class="embeddable-xml-input" value="${asset['url']}" readonly>
+              </td>
+              <td class="delete-col">
+                <a href="#" data-tooltip="${_('Delete this asset')}" class="remove-asset-button"><span class="delete-icon"></span></a>
               </td>
             </tr>
           % endfor
@@ -128,4 +136,22 @@
 	<div class="modal-cover"></div>
 
 
+</%block>
+
+<%block name="view_alerts">
+<!-- alert: save confirmed with close -->
+<div class="wrapper wrapper-alert wrapper-alert-confirmation" role="status">
+  <div class="alert confirmation">
+    <i class="icon-ok"></i>
+
+    <div class="copy">
+      <h2 class="title title-3">${_('Your file has been deleted.')}</h2>
+    </div>
+
+    <a href="" rel="view" class="action action-alert-close">
+      <i class="icon-remove-sign"></i>
+      <span class="label">${_('close alert')}</span>
+    </a>
+  </div>
+</div>
 </%block>

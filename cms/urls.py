@@ -1,5 +1,8 @@
 from django.conf import settings
 from django.conf.urls import patterns, include, url
+
+# Import this file so it can do its work, even though we don't use the name.
+# pylint: disable=W0611
 from . import one_time_startup
 
 # Uncomment the next two lines to enable the admin:
@@ -35,6 +38,8 @@ urlpatterns = ('',  # nopep8
         'contentstore.views.preview_dispatch', name='preview_dispatch'),
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)/upload_asset$',
         'contentstore.views.upload_asset', name='upload_asset'),
+
+
     url(r'^manage_users/(?P<location>.*?)$', 'contentstore.views.manage_users', name='manage_users'),
     url(r'^add_user/(?P<location>.*?)$',
         'contentstore.views.add_user', name='add_user'),
@@ -71,8 +76,11 @@ urlpatterns = ('',  # nopep8
         'contentstore.views.edit_static', name='edit_static'),
     url(r'^edit_tabs/(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)$',
         'contentstore.views.edit_tabs', name='edit_tabs'),
+
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/assets/(?P<name>[^/]+)$',
         'contentstore.views.asset_index', name='asset_index'),
+    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/assets/(?P<name>[^/]+)/remove$',
+        'contentstore.views.assets.remove_asset', name='remove_asset'),
 
     # this is a generic method to return the data/metadata associated with a xmodule
     url(r'^module_info/(?P<module_location>.*)$',

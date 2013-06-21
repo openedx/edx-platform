@@ -3,7 +3,6 @@ import json
 import logging
 import requests
 from requests.exceptions import RequestException, ConnectionError, HTTPError
-import sys
 
 from .combined_open_ended_rubric import CombinedOpenEndedRubric
 from lxml import etree

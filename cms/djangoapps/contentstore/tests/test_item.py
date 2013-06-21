@@ -1,4 +1,3 @@
-from contentstore.utils import get_modulestore, get_url_reverse
 from contentstore.tests.test_course_settings import CourseTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from django.core.urlresolvers import reverse

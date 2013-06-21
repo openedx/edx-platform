@@ -3,7 +3,8 @@ from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from django.conf.urls.static import static
 
-from . import one_time_startup
+# Not used, the work is done in the imported module.
+from . import one_time_startup      # pylint: disable=W0611
 
 import django.contrib.auth.views
 
@@ -363,6 +364,21 @@ if settings.MITX_FEATURES.get('AUTH_USE_OPENID'):
         url(r'^openid/logo.gif$', 'django_openid_auth.views.logo', name='openid-logo'),
     )
 
+if settings.MITX_FEATURES.get('AUTH_USE_SHIB'):
+    urlpatterns += (
+        url(r'^shib-login/$', 'external_auth.views.shib_login', name='shib-login'),
+    )
+
+if settings.MITX_FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD'):
+    urlpatterns += (
+        url(r'^course_specific_login/(?P<course_id>[^/]+/[^/]+/[^/]+)/$',
+            'external_auth.views.course_specific_login', name='course-specific-login'),
+        url(r'^course_specific_register/(?P<course_id>[^/]+/[^/]+/[^/]+)/$',
+            'external_auth.views.course_specific_register', name='course-specific-register'),
+
+    )
+
+
 if settings.MITX_FEATURES.get('AUTH_USE_OPENID_PROVIDER'):
     urlpatterns += (
         url(r'^openid/provider/login/$', 'external_auth.views.provider_login', name='openid-provider-login'),
@@ -392,6 +408,11 @@ if settings.MITX_FEATURES.get('ENABLE_SQL_TRACKING_LOGS'):
 if settings.MITX_FEATURES.get('ENABLE_SERVICE_STATUS'):
     urlpatterns += (
         url(r'^status/', include('service_status.urls')),
+    )
+
+if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
+    urlpatterns += (
+        url(r'^instructor_task_status/$', 'instructor_task.views.instructor_task_status', name='instructor_task_status'),
     )
 
 # FoldIt views

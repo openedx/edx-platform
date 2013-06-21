@@ -2,12 +2,8 @@
 #pylint: disable=W0621
 
 from lettuce import world, step
-from nose.tools import assert_false, assert_equal, assert_regexp_matches
-
-"""
-http://selenium.googlecode.com/svn/trunk/docs/api/py/webdriver/selenium.webdriver.common.keys.html
-"""
-from selenium.webdriver.common.keys import Keys
+from nose.tools import assert_false, assert_equal, assert_regexp_matches, assert_true
+from common import type_in_codemirror
 
 KEY_CSS = '.key input.policy-key'
 VALUE_CSS = 'textarea.json'
@@ -32,18 +28,20 @@ def i_am_on_advanced_course_settings(step):
 @step(u'I press the "([^"]*)" notification button$')
 def press_the_notification_button(step, name):
     css = 'a.%s-button' % name.lower()
-    world.css_click(css)
+
+    # Save was clicked if either the save notification bar is gone, or we have a error notification
+    # overlaying it (expected in the case of typing Object into display_name).
+    def save_clicked():
+        confirmation_dismissed = world.is_css_not_present('.is-shown.wrapper-notification-warning')
+        error_showing = world.is_css_present('.is-shown.wrapper-notification-error')
+        return confirmation_dismissed or error_showing
+
+    assert_true(world.css_click(css, success_condition=save_clicked), 'Save button not clicked after 5 attempts.')
 
 
 @step(u'I edit the value of a policy key$')
 def edit_the_value_of_a_policy_key(step):
-    """
-    It is hard to figure out how to get into the CodeMirror
-    area, so cheat and do it from the policy key field :)
-    """
-    world.css_find(".CodeMirror")[get_index_of(DISPLAY_NAME_KEY)].click()
-    g = world.css_find("div.CodeMirror.CodeMirror-focused > div > textarea")
-    g._element.send_keys(Keys.ARROW_LEFT, ' ', 'X')
+    type_in_codemirror(get_index_of(DISPLAY_NAME_KEY), 'X')
 
 
 @step(u'I edit the value of a policy key and save$')
@@ -132,13 +130,5 @@ def change_display_name_value(step, new_value):
 
 
 def change_value(step, key, new_value):
-    index = get_index_of(key)
-    world.css_find(".CodeMirror")[index].click()
-    g = world.css_find("div.CodeMirror.CodeMirror-focused > div > textarea")
-    current_value = world.css_find(VALUE_CSS)[index].value
-    g._element.send_keys(Keys.CONTROL + Keys.END)
-    for count in range(len(current_value)):
-        g._element.send_keys(Keys.END, Keys.BACK_SPACE)
-        # Must delete "" before typing the JSON value
-    g._element.send_keys(Keys.END, Keys.BACK_SPACE, Keys.BACK_SPACE, new_value)
+    type_in_codemirror(get_index_of(key), new_value)
     press_the_notification_button(step, "Save")

@@ -1,20 +1,12 @@
-import datetime
 import json
 import logging
-import pprint
 import sys
 
 from django.conf import settings
-from django.contrib.auth.models import User
-from django.core.context_processors import csrf
-from django.core.mail import send_mail
 from django.core.validators import ValidationError, validate_email
-from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed, HttpResponseServerError
-from django.shortcuts import redirect
-from django_future.csrf import ensure_csrf_cookie
+from django.http import Http404, HttpResponse, HttpResponseNotAllowed
 from dogapi import dog_stats_api
-from mitxmako.shortcuts import render_to_response, render_to_string
-from urllib import urlencode
+from mitxmako.shortcuts import render_to_response
 import zendesk
 
 import calc

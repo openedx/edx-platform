@@ -1,6 +1,6 @@
-from .import test_system
+from .import get_test_system
 from xmodule.modulestore import Location
-from xmodule.modulestore.xml import ImportSystem, XMLModuleStore
+from xmodule.modulestore.xml import XMLModuleStore
 from xmodule.tests.test_export import DATA_DIR
 
 OPEN_ENDED_GRADING_INTERFACE = {
@@ -37,7 +37,7 @@ class DummyModulestore(object):
     """
     A mixin that allows test classes to have convenience functions to get a module given a location
     """
-    test_system = test_system()
+    get_test_system = get_test_system()
 
     def setup_modulestore(self, name):
         self.modulestore = XMLModuleStore(DATA_DIR, course_dirs=[name])

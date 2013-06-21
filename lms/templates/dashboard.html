@@ -138,8 +138,14 @@
           <span class="title"><div class="icon name-icon"></div>Full Name (<a href="#apply_name_change" rel="leanModal" class="edit-name">edit</a>)</span> <span class="data">${ user.profile.name | h }</span>
         </li>
         <li>
-          <span class="title"><div class="icon email-icon"></div>Email (<a href="#change_email" rel="leanModal" class="edit-email">edit</a>)</span> <span class="data">${ user.email | h }</span>
+          <span class="title"><div class="icon email-icon"></div>Email
+            % if external_auth_map is None or 'shib' not in external_auth_map.external_domain:
+            (<a href="#change_email" rel="leanModal" class="edit-email">edit</a>)
+            % endif
+          </span> <span class="data">${ user.email | h }</span>
         </li>
+
+        % if external_auth_map is None or 'shib' not in external_auth_map.external_domain:
         <li>
           <span class="title"><a href="#password_reset_complete" rel="leanModal" id="pwd_reset_button">Reset Password</a></span>
           <form id="password_reset_form" method="post" data-remote="true" action="${reverse('password_reset')}">
@@ -147,6 +153,8 @@
             <!-- <input type="submit" id="pwd_reset_button" value="Reset Password" /> -->
           </form>
         </li>
+        % endif
+
       </ul>
     </section>
 

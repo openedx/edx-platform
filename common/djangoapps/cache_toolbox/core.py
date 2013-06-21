@@ -12,7 +12,6 @@ from django.core.cache import cache
 from django.db import DEFAULT_DB_ALIAS
 
 from . import app_settings
-from xmodule.contentstore.content import StaticContent
 
 
 def get_instance(model, instance_or_pk, timeout=None, using=None):

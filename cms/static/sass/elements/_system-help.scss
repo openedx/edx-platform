@@ -1,2 +1,40 @@
 // studio - elements - system help
 // ====================
+
+// notices - in-context: to be used as notices to users within the context of a form/action
+.notice-incontext {
+  @extend .ui-well;
+  @include border-radius(($baseline/10));
+
+  .title {
+    @extend .t-title7;
+    margin-bottom: ($baseline/4);
+    font-weight: 600;
+  }
+
+  .copy {
+    @extend .t-copy-sub1;
+    @include transition(opacity 0.25s ease-in-out 0);
+    opacity: 0.75;
+  }
+
+  strong {
+    font-weight: 600;
+  }
+
+  &:hover {
+
+    .copy {
+      opacity: 1.0;
+    }
+  }
+}
+
+// particular warnings around a workflow for something
+.notice-workflow {
+  background: $yellow-l5;
+
+  .copy {
+    color: $gray-d1;
+  }
+}

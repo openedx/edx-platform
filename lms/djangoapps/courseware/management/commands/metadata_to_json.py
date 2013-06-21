@@ -2,7 +2,6 @@
 A script to walk a course xml tree, generate a dictionary of all the metadata,
 and print it out as a json dict.
 """
-import os
 import sys
 import json
 

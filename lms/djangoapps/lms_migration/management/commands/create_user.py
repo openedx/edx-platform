@@ -7,7 +7,6 @@
 import os
 import sys
 import string
-import re
 import datetime
 from getpass import getpass
 import json

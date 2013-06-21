@@ -56,7 +56,6 @@ def get_metadata_from_xml(xml_object, remove=True):
     if meta is None:
         return ''
     dmdata = meta.text
-    #log.debug('meta for %s loaded: %s' % (xml_object,dmdata))
     if remove:
         xml_object.remove(meta)
     return dmdata
@@ -254,7 +253,7 @@ class XmlDescriptor(XModuleDescriptor):
         definition, children = cls.definition_from_xml(definition_xml, system)
         if definition_metadata:
             definition['definition_metadata'] = definition_metadata
-        definition['filename'] = [ filepath, filename ]     
+        definition['filename'] = [ filepath, filename ]
 
         return definition, children
 
@@ -352,10 +351,10 @@ class XmlDescriptor(XModuleDescriptor):
         for key, value in metadata.items():
             if key not in set(f.name for f in cls.fields + cls.lms.fields):
                 model_data['xml_attributes'][key] = value
+        model_data['location'] = location
 
         return cls(
             system,
-            location,
             model_data,
         )
 

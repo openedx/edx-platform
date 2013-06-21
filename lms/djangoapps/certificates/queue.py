@@ -3,6 +3,7 @@ from certificates.models import certificate_status_for_student
 from certificates.models import CertificateStatuses as status
 from certificates.models import CertificateWhitelist
 
+from mitxmako.middleware import MakoMiddleware
 from courseware import grades, courses
 from django.test.client import RequestFactory
 from capa.xqueue_interface import XQueueInterface
@@ -51,6 +52,14 @@ class XQueueCertInterface(object):
     """
 
     def __init__(self, request=None):
+        # MakoMiddleware Note:
+        # Line below has the side-effect of writing to a module level lookup
+        # table that will allow problems to render themselves. If this is not
+        # present, problems that a student hasn't seen will error when loading,
+        # causing the grading system to under-count the possible score and
+        # inflate their grade. This dependency is bad and was probably recently
+        # introduced. This is the bandage until we can trace the root cause.
+        m = MakoMiddleware()
 
         # Get basic auth (username/password) for
         # xqueue connection if it's in the settings
@@ -161,6 +170,10 @@ class XQueueCertInterface(object):
             cert, created = GeneratedCertificate.objects.get_or_create(
                    user=student, course_id=course_id)
 
+            # Needed
+            self.request.user = student
+            self.request.session = {}
+
             grade = grades.grade(student, self.request, course)
             is_whitelisted = self.whitelist.filter(
                 user=student, course_id=course_id, whitelist=True).exists()
@@ -211,5 +224,5 @@ class XQueueCertInterface(object):
         (error, msg) = self.xqueue_interface.send_to_queue(
                 header=xheader, body=json.dumps(contents))
         if error:
-            logger.critical('Unable to add a request to the queue')
+            logger.critical('Unable to add a request to the queue: {} {}'.format(error, msg))
             raise Exception('Unable to send queue message')

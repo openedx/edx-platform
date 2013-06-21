@@ -8,10 +8,6 @@
 #
 # Takes in math expressions given as Presentation MathML (from ASCIIMathML), converts to Content MathML using SnuggleTeX
 
-import os
-import sys
-import string
-import re
 import traceback
 from .formula import *
 import logging
