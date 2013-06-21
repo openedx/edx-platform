@@ -7,7 +7,8 @@ from django.test.utils import override_settings
 from django.contrib.auth.models import Group, User
 from django.core.urlresolvers import reverse
 from courseware.access import _course_staff_group_name
-from courseware.tests.tests import LoginEnrollmentTestCase, TEST_DATA_XML_MODULESTORE, get_user
+from courseware.tests.helpers import LoginEnrollmentTestCase
+from courseware.tests.modulestore_config import TEST_DATA_XML_MODULESTORE
 from xmodule.modulestore.django import modulestore
 import xmodule.modulestore.django
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
@@ -40,7 +41,7 @@ class TestInstructorEnrollsStudent(LoginEnrollmentTestCase):
         def make_instructor(course):
             group_name = _course_staff_group_name(course.location)
             g = Group.objects.create(name=group_name)
-            g.user_set.add(get_user(self.instructor))
+            g.user_set.add(User.objects.get(email=self.instructor))
 
         make_instructor(self.toy)
 

@@ -245,8 +245,7 @@ def _has_access_descriptor(user, descriptor, action, course_context=None):
         if descriptor.lms.start is not None:
             now = datetime.now(UTC())
             effective_start = _adjust_start_date_for_beta_testers(user, descriptor)
-            difference = (now - effective_start).total_seconds()
-            if difference > 3600:
+            if now > effective_start:
                 # after start date, everyone can see it
                 debug("Allow: now > effective start date")
                 return True

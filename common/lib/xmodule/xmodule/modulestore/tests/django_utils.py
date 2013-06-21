@@ -14,6 +14,22 @@ class ModuleStoreTestCase(TestCase):
     collection with templates before running the TestCase
     and drops it they are finished. """
 
+    def update_course(self, course, data):
+        """
+        Updates the version of course in the mongo modulestore
+        with the metadata in data and returns the updated version.
+        """
+
+        store = xmodule.modulestore.django.modulestore()
+
+        store.update_item(course.location, data)
+
+        store.update_metadata(course.location, data)
+
+        updated_course = store.get_instance(course.id, course.location)
+
+        return updated_course
+
     @staticmethod
     def flush_mongo_except_templates():
         '''
