@@ -27,9 +27,8 @@ from student.models import Registration
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import Location
-from xmodule.modulestore.xml_importer import import_from_xml
-from xmodule.modulestore.xml import XMLModuleStore
 from mongo_login_helpers import MongoLoginHelpers
+# from helpers import LoginEnrollmentTestCase
 
 #import factories for testing
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -37,22 +36,6 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
 
 log = logging.getLogger("mitx." + __name__)
-
-
-def parse_json(response):
-    """Parse response, which is assumed to be json"""
-    return json.loads(response.content)
-
-
-def get_user(email):
-    '''look up a user by email'''
-    return User.objects.get(email=email)
-
-
-def get_registration(email):
-    '''look up registration object by email'''
-    return Registration.objects.get(user__email=email)
-
 
 def mongo_store_config(data_dir):
     '''
@@ -103,7 +86,7 @@ class TestSubmittingProblems(MongoLoginHelpers):
         self.create_account('u1', self.student, self.password)
         self.activate_user(self.student)
         self.enroll(self.course)
-        self.student_user = get_user(self.student)
+        self.student_user = User.objects.get(email=self.student)
         self.factory = RequestFactory()
 
     def refresh_course(self):
@@ -213,14 +196,6 @@ class TestCourseGrader(TestSubmittingProblems):
         return grades.grade(self.student_user, fake_request,
                             self.course, model_data_cache)
 
-    def get_letter_grade(self):
-        '''get the students letter grade'''
-        return self.get_grade_summary()['grade']
-
-    def get_homework_scores(self):
-        '''get scores for homeworks'''
-        return self.get_grade_summary()['totaled_scores']['Homework']
-
     def get_progress_summary(self):
         '''return progress summary structure for current user and course'''
         model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
@@ -242,11 +217,11 @@ class TestCourseGrader(TestSubmittingProblems):
 
     def check_letter_grade(self, letter):
         '''assert letter grade is as expected'''
-        self.assertEqual(self.get_letter_grade(), letter)
+        self.assertEqual(self.get_grade_summary()['grade'], letter)
 
     def earned_hw_scores(self):
         """Global scores, each Score is a Problem Set"""
-        return [s.earned for s in self.get_homework_scores()]
+        return [s.earned for s in self.get_grade_summary()['totaled_scores']['Homework']]
 
     def score_for_hw(self, hw_url_name):
         """returns list of scores for a given url"""
@@ -450,14 +425,14 @@ output = get_tran(submission[0],'Z')
 okay = True
 
 # output should be 1, 1, 1, 1, 1, 0, 0, 0
-if get_value(0.0000004,output) < 2.7: okay = False;
-if get_value(0.0000009,output) < 2.7: okay = False;
-if get_value(0.0000014,output) < 2.7: okay = False;
-if get_value(0.0000019,output) < 2.7: okay = False;
-if get_value(0.0000024,output) < 2.7: okay = False;
-if get_value(0.0000029,output) > 0.25: okay = False;
-if get_value(0.0000034,output) > 0.25: okay = False;
-if get_value(0.0000039,output) > 0.25: okay = False;
+if get_value(0.0000004, output) < 2.7: okay = False;
+if get_value(0.0000009, output) < 2.7: okay = False;
+if get_value(0.0000014, output) < 2.7: okay = False;
+if get_value(0.0000019, output) < 2.7: okay = False;
+if get_value(0.0000024, output) < 2.7: okay = False;
+if get_value(0.0000029, output) > 0.25: okay = False;
+if get_value(0.0000034, output) > 0.25: okay = False;
+if get_value(0.0000039, output) > 0.25: okay = False;
 
 correct = ['correct' if okay else 'incorrect']"""
         xmldata = SchematicResponseXMLFactory().build_xml(answer=script)
@@ -570,7 +545,7 @@ else:
         self.assertEqual(respdata['success'], 'correct')
 
     def check_incorrect(self, name):
-        '''check that problem named "name" gets evaluated correctly correctly'''
+        '''check that problem named "name" gets evaluated incorrectly correctly'''
         resp = self.submit_question_answer(name, {'2_1': self.incorrect_responses[name]})
 
         respdata = json.loads(resp.content)
