@@ -1,5 +1,6 @@
 from mock import Mock, patch
 import unittest
+import copy
 
 import xmodule
 from xmodule.crowdsource_hinter import CrowdsourceHinterModule
@@ -168,19 +169,15 @@ class CrowdsourceHinterTest(unittest.TestCase):
         a voting dialog, with the correct choices, plus a hint submission
         dialog.
         '''
-        m = CHModuleFactory.create(hints={
-                '24.0': {'0': ['a hint', 42],
-                                 '1': ['another hint', 35],
-                                 '2': ['irrelevent hint', 25.0]}
-            },
+        m = CHModuleFactory.create(
             previous_answers=[
-                ['24.0', [0, 1, None]]],
+                ['24.0', [0, 3, None]]],
             )
         json_in = {'problem_name': '42.5'}
         json_out = json.loads(m.get_feedback(json_in))['contents']
-        self.assertTrue('a hint' in json_out)
-        self.assertTrue('another hint' in json_out)
-        self.assertTrue('irrelevent hint' not in json_out)
+        self.assertTrue('Best hint' in json_out)
+        self.assertTrue('Another hint' in json_out)
+        self.assertTrue('third hint' not in json_out)
         self.assertTrue('textarea' in json_out)
 
 
@@ -189,51 +186,33 @@ class CrowdsourceHinterTest(unittest.TestCase):
         A user tries to vote for a hint, but he has already voted!
         Should not change any vote tallies.
         '''
-        m = CHModuleFactory.create(hints={
-                '24.0': {'0': ['a hint', 42],
-                                 '1': ['another hint', 35],
-                                 '2': ['irrelevent hint', 25.0]}
-            },
-            previous_answers=[
-                ['24.0', [0, 1, None]]],
-            user_voted=True
-            )
+        m = CHModuleFactory.create(user_voted=True)
         json_in = {'answer': 0, 'hint': 1}
+        old_hints = copy.deepcopy(m.hints)
         json_out = json.loads(m.tally_vote(json_in))['contents']
-        self.assertTrue(m.hints['24.0']['0'][1] == 42)
-        self.assertTrue(m.hints['24.0']['1'][1] == 35)
-        self.assertTrue(m.hints['24.0']['2'][1] == 25.0)
+        self.assertTrue(m.hints == old_hints)
 
 
     def test_vote_withpermission(self):
         '''
         A user votes for a hint.
         '''
-        m = CHModuleFactory.create(hints={
-                '24.0': {'0': ['a hint', 42],
-                                 '1': ['another hint', 35],
-                                 '2': ['irrelevent hint', 25.0]}
-            },
-            previous_answers=[
-                ['24.0', [0, 1, None]]],
-            )
-        json_in = {'answer': 0, 'hint': 1}
+        m = CHModuleFactory.create()
+        json_in = {'answer': 0, 'hint': 3}
         json_out = json.loads(m.tally_vote(json_in))['contents'] 
-        self.assertTrue(m.hints['24.0']['0'][1] == 42)
-        self.assertTrue(m.hints['24.0']['1'][1] == 36)
-        self.assertTrue(m.hints['24.0']['2'][1] == 25.0)
+        self.assertTrue(m.hints['24.0']['0'][1] == 40)
+        self.assertTrue(m.hints['24.0']['3'][1] == 31)
+        self.assertTrue(m.hints['24.0']['4'][1] == 20)
 
 
     def test_submithint_nopermission(self):
         '''
         A user tries to submit a hint, but he has already voted.
         '''
-        m = CHModuleFactory.create(previous_answers=[
-                ['24.0', [None, None, None]]],
-            user_voted=True)
-        json_in = {'answer': 0, 'hint': 'This is a new hint.'}
+        m = CHModuleFactory.create(user_voted=True)
+        json_in = {'answer': 1, 'hint': 'This is a new hint.'}
         m.submit_hint(json_in)
-        self.assertTrue('24.0' not in m.hints)
+        self.assertTrue('29.0' not in m.hints)
 
 
     def test_submithint_withpermission_new(self):
@@ -241,13 +220,11 @@ class CrowdsourceHinterTest(unittest.TestCase):
         A user submits a hint to an answer for which no hints
         exist yet.
         '''
-        m = CHModuleFactory.create(previous_answers=[
-                ['24.0', [None, None, None]]],
-            )
-        json_in = {'answer': 0, 'hint': 'This is a new hint.'}
+        m = CHModuleFactory.create()
+        json_in = {'answer': 1, 'hint': 'This is a new hint.'}
         m.submit_hint(json_in)
         # Make a hint request.
-        json_in = {'problem name': '24.0'}
+        json_in = {'problem name': '29.0'}
         json_out = json.loads(m.get_hint(json_in))['contents']
         self.assertTrue('This is a new hint.' in json_out)
 
@@ -257,30 +234,27 @@ class CrowdsourceHinterTest(unittest.TestCase):
         A user submits a hint to an answer that has other hints
         already.
         '''
-        m = CHModuleFactory.create(previous_answers=[
-                ['24.0', [0, None, None]]],
-            hints={'24.0': {'0': ['Existing hint.', 1]}}
-        )
+        m = CHModuleFactory.create(previous_answers = [['25.0', [1, None, None]]])
         json_in = {'answer': 0, 'hint': 'This is a new hint.'}
         m.submit_hint(json_in)
         # Make a hint request.
-        json_in = {'problem name': '24.0'}
+        json_in = {'problem name': '25.0'}
         json_out = json.loads(m.get_hint(json_in))['contents']
         self.assertTrue('This is a new hint.' in json_out)
 
-    def test_deletehint(self):
+
+    def test_submithint_moderate(self):
         '''
-        An admin / instructor deletes a hint.
+        A user submits a hint, but moderation is on.  The hint should
+        show up in the mod_queue, not the public-facing hints
+        dict.
         '''
-        m = CHModuleFactory.create(hints={
-                '24.0': {'0': ['Deleted hint', 5],
-                         '1': ['Safe hint', 4]}
-            })
-        m.delete_hint('24.0', '0')
-        json_in = {'problem name': '24.0'}
-        json_out = json.loads(m.get_hint(json_in))['contents']
-        self.assertTrue('Deleted hint' not in json_out)
-        self.assertTrue('Safe hint' in json_out)
+        m = CHModuleFactory.create(moderate='True')
+        json_in = {'answer': 1, 'hint': 'This is a new hint.'}
+        m.submit_hint(json_in)
+        self.assertTrue('29.0' not in m.hints)
+        self.assertTrue('29.0' in m.mod_queue)
+
 
 
 
