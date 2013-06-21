@@ -105,9 +105,9 @@ class CourseDetailsTestCase(CourseTestCase):
         settings_details_url = reverse(
             'settings_details',
             kwargs={
-                'org': self.course_location.org,
-                'name': self.course_location.name,
-                'course': self.course_location.course
+                'org': self.course.location.org,
+                'name': self.course.location.name,
+                'course': self.course.location.course
             }
         )
 
@@ -129,9 +129,9 @@ class CourseDetailsTestCase(CourseTestCase):
         settings_details_url = reverse(
             'settings_details',
             kwargs={
-                'org': self.course_location.org,
-                'name': self.course_location.name,
-                'course': self.course_location.course
+                'org': self.course.location.org,
+                'name': self.course.location.name,
+                'course': self.course.location.course
             }
         )
 
