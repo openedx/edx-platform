@@ -16,11 +16,14 @@
   <% if(uploading) { %>
     <% if (uploadedBytes && totalBytes) { %>
       <div class="wrapper-progress">
-      <progress value="<%= uploadedBytes %>" max="<%= totalBytes %>"><%= uploadedBytes/totalBytes*100 %>%</progress>
+        <progress value="<%= uploadedBytes %>" max="<%= totalBytes %>"><%= uploadedBytes/totalBytes*100 %>%</progress>
       </div>
     <% } else { %>
       <progress></progress>
     <% } %>
+  <% } %>
+  <% if(finished) { %>
+     <strong><%= gettext("Success!") %></strong>
   <% } %>
   </div>
   <div class="actions">

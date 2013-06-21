@@ -140,6 +140,12 @@ describe "CMS.Models.FileUpload", ->
     beforeEach ->
         @model = new CMS.Models.FileUpload()
 
+    it "is unfinished by default", ->
+        expect(@model.get("finished")).toBeFalsy()
+
+    it "is not uploading by default", ->
+        expect(@model.get("uploading")).toBeFalsy()
+
     it "is valid by default", ->
         expect(@model.isValid()).toBeTruthy()
 

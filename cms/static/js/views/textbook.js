@@ -243,7 +243,8 @@ CMS.Views.ChapterEdit = Backbone.View.extend({
 
 CMS.Views.UploadDialog = Backbone.View.extend({
     options: {
-        shown: true
+        shown: true,
+        successMessageTimeout: 2000 // 2 seconds
     },
     initialize: function() {
         this.template = _.template($("#upload-dialog-tpl").text());
@@ -263,6 +264,7 @@ CMS.Views.UploadDialog = Backbone.View.extend({
             uploading: this.model.get('uploading'),
             uploadedBytes: this.model.get('uploadedBytes'),
             totalBytes: this.model.get('totalBytes'),
+            finished: this.model.get('finished'),
             error: this.model.get('error')
         }));
         // ideally, we'd like to tell the browser to pre-populate the
@@ -326,7 +328,10 @@ CMS.Views.UploadDialog = Backbone.View.extend({
         });
     },
     success: function(response, statusText, xhr, form) {
-        this.model.set('uploading', false);
+        this.model.set({
+            uploading: false,
+            finished: true
+        });
         var chapter = this.options.chapter;
         if(chapter) {
             var options = {};
@@ -336,7 +341,10 @@ CMS.Views.UploadDialog = Backbone.View.extend({
             options.asset_path = response.url;
             chapter.set(options);
         }
-        this.remove();
+        var that = this;
+        this.removalTimeout = setTimeout(function() {
+            that.hide().remove();
+        }, this.options.successMessageTimeout);
     },
     error: function() {
         this.model.set({

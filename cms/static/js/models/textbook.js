@@ -97,7 +97,8 @@ CMS.Models.FileUpload = Backbone.Model.extend({
         "selectedFile": null,
         "uploading": false,
         "uploadedBytes": 0,
-        "totalBytes": 0
+        "totalBytes": 0,
+        "finished": false
     },
     validate: function(attrs, options) {
         if(attrs.selectedFile && attrs.selectedFile.type !== "application/pdf") {
