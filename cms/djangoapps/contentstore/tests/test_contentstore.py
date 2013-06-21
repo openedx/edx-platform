@@ -45,7 +45,7 @@ import xmodule.contentstore.django
 import datetime
 from pytz import UTC
 from uuid import uuid4
-import pymongo
+from pymongo import MongoClient
 
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
@@ -62,7 +62,6 @@ class MongoCollectionFindWrapper(object):
         return self.original(query, *args, **kwargs)
 
 
-#@override_settings(MODULESTORE=TEST_DATA_MODULESTORE)
 @override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
 class ContentStoreToyCourseTest(ModuleStoreTestCase):
     """
@@ -91,7 +90,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.client.login(username=uname, password=password)
 
     def tearDown(self):
-        m = pymongo.MongoClient()
+        m = MongoClient()
         m.drop_database(TEST_DATA_CONTENTSTORE['OPTIONS']['db'])
         xmodule.contentstore.django._CONTENTSTORE.clear()
 
@@ -858,7 +857,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         }
 
     def tearDown(self):
-        m = pymongo.MongoClient()
+        m = MongoClient()
         m.drop_database(TEST_DATA_CONTENTSTORE['OPTIONS']['db'])
         xmodule.contentstore.django._CONTENTSTORE.clear()
 
