@@ -1,23 +1,17 @@
 from django_future.csrf import ensure_csrf_cookie
-from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.contrib.auth.models import User
-from django.core.context_processors import csrf
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse
-from django.http import HttpResponse, HttpResponseForbidden, Http404
-from django.shortcuts import redirect
+from django.http import HttpResponse
 import json
 import logging
 import re
 
 from courseware.courses import get_course_with_access
-from mitxmako.shortcuts import render_to_response, render_to_string
+from mitxmako.shortcuts import render_to_response
 
-from .models import CourseUserGroup
 from . import cohorts
-
-import track.views
 
 
 log = logging.getLogger(__name__)

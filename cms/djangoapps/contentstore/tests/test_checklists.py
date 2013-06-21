@@ -19,7 +19,6 @@ class ChecklistTestCase(CourseTestCase):
         modulestore = get_modulestore(self.course.location)
         return modulestore.get_item(self.course.location).checklists
 
-
     def compare_checklists(self, persisted, request):
         """
         Handles url expansion as possible difference and descends into guts
@@ -98,7 +97,6 @@ class ChecklistTestCase(CourseTestCase):
                                                            'course': self.course.location.course,
                                                            'name': self.course.location.name,
                                                            'checklist_index': 2})
-
 
         def get_first_item(checklist):
             return checklist['items'][0]

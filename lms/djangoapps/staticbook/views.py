@@ -1,6 +1,5 @@
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
-from django.core.urlresolvers import reverse
 from mitxmako.shortcuts import render_to_response
 
 from courseware.access import has_access

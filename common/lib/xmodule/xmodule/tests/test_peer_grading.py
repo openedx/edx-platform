@@ -2,10 +2,6 @@ import unittest
 from xmodule.modulestore import Location
 from .import get_test_system
 from test_util_open_ended import MockQueryDict, DummyModulestore
-import json
-
-from xmodule.peer_grading_module import PeerGradingModule, PeerGradingDescriptor
-from xmodule.open_ended_grading_classes.grading_service_module import GradingServiceError
 
 import logging
 

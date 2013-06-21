@@ -21,7 +21,7 @@ Longer TODO:
 
 # We intentionally define lots of variables that aren't used, and
 # want to import all variables from base settings files
-# pylint: disable=W0401, W0614
+# pylint: disable=W0401, W0611, W0614
 
 import sys
 import os
@@ -91,6 +91,14 @@ MITX_FEATURES = {
     'AUTH_USE_OPENID': False,
     'AUTH_USE_MIT_CERTIFICATES': False,
     'AUTH_USE_OPENID_PROVIDER': False,
+    'AUTH_USE_SHIB': False,
+
+    # This flag disables the requirement of having to agree to the TOS for users registering
+    # with Shib.  Feature was requested by Stanford's office of general counsel
+    'SHIB_DISABLE_TOS': False,
+    
+    # Enables ability to restrict enrollment in specific courses by the user account login method
+    'RESTRICT_ENROLL_BY_REG_METHOD': False,
 
     # analytics experiments
     'ENABLE_INSTRUCTOR_ANALYTICS': False,
@@ -691,7 +699,6 @@ INSTALLED_APPS = (
     'student',
     'static_template_view',
     'staticbook',
-    'simplewiki',
     'track',
     'util',
     'certificates',
@@ -702,6 +709,10 @@ INSTALLED_APPS = (
     'licenses',
     'course_groups',
     'bulk_email',
+
+    # External auth (OpenID, shib)
+    'external_auth',
+    'django_openid_auth',
 
     #For the wiki
     'wiki',  # The new django-wiki from benjaoming

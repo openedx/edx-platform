@@ -15,13 +15,13 @@ from lettuce import world, step
 from .course_helpers import *
 from .ui_helpers import *
 from lettuce.django import django_url
-from nose.tools import assert_equals, assert_in
+from nose.tools import assert_equals
 
 from logging import getLogger
 logger = getLogger(__name__)
 
 
-@step(u'I wait (?:for )?"(\d+)" seconds?$')
+@step(r'I wait (?:for )?"(\d+)" seconds?$')
 def wait(step, seconds):
     world.wait(seconds)
 

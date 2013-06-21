@@ -7,9 +7,7 @@
 # FORCE_SCRIPT_NAME = '/cms'
 
 from .common import *
-from logsettings import get_logger_config
 from .dev import *
-import socket
 
 MITX_FEATURES['AUTH_USE_MIT_CERTIFICATES'] = True
 

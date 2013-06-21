@@ -1,11 +1,8 @@
-# Create your views here.
-import json
-from datetime import datetime
 from django.http import Http404
 from mitxmako.shortcuts import render_to_response
 from django.db import connection
 
-from student.models import CourseEnrollment, CourseEnrollmentAllowed
+from student.models import CourseEnrollment
 from django.contrib.auth.models import User
 
 

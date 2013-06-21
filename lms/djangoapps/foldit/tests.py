@@ -5,7 +5,6 @@ from functools import partial
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.test.client import RequestFactory
-from django.conf import settings
 from django.core.urlresolvers import reverse
 
 from foldit.views import foldit_ops, verify_code
@@ -95,13 +94,19 @@ class FolditTestCase(TestCase):
         response = self.make_puzzle_score_request([1, 2], [0.078034, 0.080000])
 
         self.assertEqual(response.content, json.dumps(
-            [{"OperationID": "SetPlayerPuzzleScores",
-              "Value": [{
-                  "PuzzleID": 1,
-                  "Status": "Success"},
-
-                  {"PuzzleID": 2,
-                  "Status": "Success"}]}]))
+            [{
+                "OperationID": "SetPlayerPuzzleScores",
+                "Value": [
+                    {
+                        "PuzzleID": 1,
+                        "Status": "Success"
+                    }, {
+                        "PuzzleID": 2,
+                        "Status": "Success"
+                    }
+                ]
+            }]
+        ))
 
 
     def test_SetPlayerPuzzleScores_multiple(self):
@@ -126,9 +131,11 @@ class FolditTestCase(TestCase):
         self.assertEqual(len(top_10), 1)
 
         # Floats always get in the way, so do almostequal
-        self.assertAlmostEqual(top_10[0]['score'],
-               Score.display_score(better_score),
-               delta=0.5)
+        self.assertAlmostEqual(
+            top_10[0]['score'],
+            Score.display_score(better_score),
+            delta=0.5
+        )
 
         # reporting a worse score shouldn't
         worse_score = 0.065
@@ -137,9 +144,11 @@ class FolditTestCase(TestCase):
         top_10 = Score.get_tops_n(10, puzzle_id)
         self.assertEqual(len(top_10), 1)
         # should still be the better score
-        self.assertAlmostEqual(top_10[0]['score'],
-                Score.display_score(better_score),
-                delta=0.5)
+        self.assertAlmostEqual(
+            top_10[0]['score'],
+            Score.display_score(better_score),
+            delta=0.5
+        )
 
     def test_SetPlayerPuzzleScores_manyplayers(self):
         """
@@ -150,28 +159,34 @@ class FolditTestCase(TestCase):
         puzzle_id = ['1']
         player1_score = 0.08
         player2_score = 0.02
-        response1 = self.make_puzzle_score_request(puzzle_id, player1_score,
-                self.user)
+        response1 = self.make_puzzle_score_request(
+            puzzle_id, player1_score, self.user
+        )
 
         # There should now be a score in the db.
         top_10 = Score.get_tops_n(10, puzzle_id)
         self.assertEqual(len(top_10), 1)
         self.assertEqual(top_10[0]['score'], Score.display_score(player1_score))
 
-        response2 = self.make_puzzle_score_request(puzzle_id, player2_score,
-                self.user2)
+        response2 = self.make_puzzle_score_request(
+            puzzle_id, player2_score, self.user2
+        )
 
         # There should now be two scores in the db
         top_10 = Score.get_tops_n(10, puzzle_id)
         self.assertEqual(len(top_10), 2)
 
         # Top score should be player2_score. Second should be player1_score
-        self.assertAlmostEqual(top_10[0]['score'],
-                Score.display_score(player2_score),
-                delta=0.5)
-        self.assertAlmostEqual(top_10[1]['score'],
-                Score.display_score(player1_score),
-                delta=0.5)
+        self.assertAlmostEqual(
+            top_10[0]['score'],
+            Score.display_score(player2_score),
+            delta=0.5
+        )
+        self.assertAlmostEqual(
+            top_10[1]['score'],
+            Score.display_score(player1_score),
+            delta=0.5
+        )
 
         # Top score user should be self.user2.username
         self.assertEqual(top_10[0]['username'], self.user2.username)

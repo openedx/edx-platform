@@ -20,22 +20,27 @@ LOG = logging.getLogger(__name__)
 
 
 def write_module_styles(output_root):
+    """Write all registered XModule css, sass, and scss files to output root."""
     return _write_styles('.xmodule_display', output_root, _list_modules())
 
 
 def write_module_js(output_root):
+    """Write all registered XModule js and coffee files to output root."""
     return _write_js(output_root, _list_modules())
 
 
 def write_descriptor_styles(output_root):
+    """Write all registered XModuleDescriptor css, sass, and scss files to output root."""
     return _write_styles('.xmodule_edit', output_root, _list_descriptors())
 
 
 def write_descriptor_js(output_root):
+    """Write all registered XModuleDescriptor js and coffee files to output root."""
     return _write_js(output_root, _list_descriptors())
 
 
 def _list_descriptors():
+    """Return a list of all registered XModuleDescriptor classes."""
     return [
         desc for desc in [
             desc for (_, desc) in XModuleDescriptor.load_classes()
@@ -44,6 +49,7 @@ def _list_descriptors():
 
 
 def _list_modules():
+    """Return a list of all registered XModule classes."""
     return [
         desc.module_class
         for desc
@@ -51,9 +57,10 @@ def _list_modules():
     ]
 
 
-def _ensure_dir(dir_):
+def _ensure_dir(directory):
+    """Ensure that `directory` exists."""
     try:
-        os.makedirs(dir_)
+        os.makedirs(directory)
     except OSError as exc:
         if exc.errno == errno.EEXIST:
             pass
@@ -131,6 +138,19 @@ def _write_js(output_root, classes):
 
 
 def _write_files(output_root, contents, generated_suffix_map=None):
+    """
+    Write file contents to output root.
+
+    Any files not listed in contents that exists in output_root will be deleted,
+    unless it matches one of the patterns in `generated_suffix_map`.
+
+    output_root (path): The root directory to write the file contents in
+    contents (dict): A map from filenames to file contents to be written to the output_root
+    generated_suffix_map (dict): Optional. Maps file suffix to generated file suffix.
+        For any file in contents, if the suffix matches a key in `generated_suffix_map`,
+        then the same filename with the suffix replaced by the value from `generated_suffix_map`
+        will be ignored
+    """
     _ensure_dir(output_root)
     to_delete = set(file.basename() for file in output_root.files()) - set(contents.keys())
 
@@ -146,7 +166,12 @@ def _write_files(output_root, contents, generated_suffix_map=None):
     for filename, file_content in contents.iteritems():
         output_file = output_root / filename
 
-        if not output_file.isfile() or output_file.read_md5() != hashlib.md5(file_content).digest():
+        not_file = not output_file.isfile()
+
+        # not_file is included to short-circuit this check, because
+        # read_md5 depends on the file already existing
+        write_file = not_file or output_file.read_md5() != hashlib.md5(file_content).digest()  # pylint: disable=E1121
+        if write_file:
             LOG.debug("Writing %s", output_file)
             output_file.write_bytes(file_content)
         else:

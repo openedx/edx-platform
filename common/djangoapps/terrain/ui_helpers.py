@@ -58,7 +58,7 @@ def css_find(css, wait_time=5):
 
 
 @world.absorb
-def css_click(css_selector, index=0, attempts=5, success_condition=lambda: True):
+def css_click(css_selector, index=0, max_attempts=5, success_condition=lambda: True):
     """
     Perform a click on a CSS selector, retrying if it initially fails.
 
@@ -72,9 +72,41 @@ def css_click(css_selector, index=0, attempts=5, success_condition=lambda: True)
     assert is_css_present(css_selector)
     attempt = 0
     result = False
-    while attempt < attempts:
+    while attempt < max_attempts:
         try:
             world.css_find(css_selector)[index].click()
+            if success_condition():
+                result = True
+                break
+        except WebDriverException:
+            # Occasionally, MathJax or other JavaScript can cover up
+            # an element temporarily.
+            # If this happens, wait a second, then try again
+            world.wait(1)
+            attempt += 1
+        except:
+            attempt += 1
+    return result
+
+
+@world.absorb
+def css_check(css_selector, index=0, max_attempts=5, success_condition=lambda: True):
+    """
+    Checks a check box based on a CSS selector, retrying if it initially fails.
+
+    This function handles errors that may be thrown if the component cannot be clicked on.
+    However, there are cases where an error may not be thrown, and yet the operation did not
+    actually succeed. For those cases, a success_condition lambda can be supplied to verify that the check worked.
+
+    This function will return True if the check worked (taking into account both errors and the optional
+    success_condition).
+    """
+    assert is_css_present(css_selector)
+    attempt = 0
+    result = False
+    while attempt < max_attempts:
+        try:
+            world.css_find(css_selector)[index].check()
             if success_condition():
                 result = True
                 break

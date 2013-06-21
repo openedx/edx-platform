@@ -103,8 +103,8 @@ class LoncapaProblem(object):
         self.input_state = state.get('input_state', {})
 
         # Convert startouttext and endouttext to proper <text></text>
-        problem_text = re.sub("startouttext\s*/", "text", problem_text)
-        problem_text = re.sub("endouttext\s*/", "/text", problem_text)
+        problem_text = re.sub(r"startouttext\s*/", "text", problem_text)
+        problem_text = re.sub(r"endouttext\s*/", "/text", problem_text)
         self.problem_text = problem_text
 
         # parse problem XML file into an element tree

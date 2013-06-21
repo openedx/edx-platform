@@ -1,13 +1,10 @@
 import json
-import os
 
 import xml.etree.ElementTree
 
-from django.conf import settings
 from django.http import Http404
 from django.http import HttpResponse
-from django.shortcuts import redirect
-from mitxmako.shortcuts import render_to_response, render_to_string
+from mitxmako.shortcuts import render_to_response
 
 from .models import ServerCircuit
 

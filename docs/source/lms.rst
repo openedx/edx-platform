@@ -314,34 +314,6 @@ Psychoanalyze
     :members:
     :show-inheritance:
 
-Simple wiki
-===========
-
-.. automodule:: simplewiki
-    :members:
-    :show-inheritance:
-
-Models
-------
-
-.. automodule:: simplewiki.models
-    :members:
-    :show-inheritance:
-
-Views
------
-
-.. automodule:: simplewiki.views
-    :members:
-    :show-inheritance:
-
-Tests
------
-
-.. automodule:: simplewiki.tests
-    :members:
-    :show-inheritance:
-
 
 Static template view
 ====================

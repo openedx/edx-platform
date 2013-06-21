@@ -1,6 +1,6 @@
-from nose.tools import assert_equals, assert_raises, assert_not_equals, with_setup
+from nose.tools import assert_equals, assert_raises
 
-from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
+from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.search import path_to_location
 
 
