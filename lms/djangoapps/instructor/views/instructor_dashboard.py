@@ -40,9 +40,15 @@ def instructor_dashboard_2(request, course_id):
     if not staff_access:
         raise Http404
 
+    access = {
+        'instructor':  instructor_access,
+        'staff':       staff_access,
+        'forum_admin': forum_admin_access,
+    }
+
     sections = [
         _section_course_info(course_id),
-        _section_membership(course_id),
+        _section_membership(course_id, access),
         _section_student_admin(course_id),
         _section_data_download(course_id),
         _section_analytics(course_id),
@@ -100,13 +106,16 @@ def _section_course_info(course_id):
     return section_data
 
 
-def _section_membership(course_id):
+def _section_membership(course_id, access):
     """ Provide data for the corresponding dashboard section """
     section_data = {
         'section_key': 'membership',
         'section_display_name': 'Membership',
-        'enroll_button_url':   reverse('enroll_unenroll', kwargs={'course_id': course_id}),
-        'unenroll_button_url': reverse('enroll_unenroll', kwargs={'course_id': course_id}),
+
+        'access': access,
+
+        'enroll_button_url':   reverse('students_update_enrollment_email', kwargs={'course_id': course_id}),
+        'unenroll_button_url': reverse('students_update_enrollment_email', kwargs={'course_id': course_id}),
         'list_course_role_members_url': reverse('list_course_role_members', kwargs={'course_id': course_id}),
         'access_allow_revoke_url': reverse('access_allow_revoke', kwargs={'course_id': course_id}),
         'list_forum_members_url': reverse('list_forum_members', kwargs={'course_id': course_id}),
@@ -121,7 +130,7 @@ def _section_student_admin(course_id):
         'section_key': 'student_admin',
         'section_display_name': 'Student Admin',
         'get_student_progress_url': reverse('get_student_progress_url', kwargs={'course_id': course_id}),
-        'unenroll_button_url': reverse('enroll_unenroll', kwargs={'course_id': course_id}),
+        'unenroll_button_url': reverse('students_update_enrollment_email', kwargs={'course_id': course_id}),
         'reset_student_attempts_url': reverse('reset_student_attempts', kwargs={'course_id': course_id}),
     }
     return section_data

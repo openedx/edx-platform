@@ -31,22 +31,33 @@ import analytics.csvs
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-def enroll_unenroll(request, course_id):
+def students_update_enrollment_email(request, course_id):
     """
     Enroll or unenroll students by email.
     Requires staff access.
+
+    Query Parameters:
+    - action in ['enroll', 'unenroll']
+    - emails is string containing a list of emails separated by anything split_input_list can handle.
+    - auto_enroll is a boolean (defaults to false)
     """
     course = get_course_with_access(request.user, course_id, 'staff', depth=None)
 
-    emails_to_enroll = split_input_list(request.GET.get('enroll', ''))
-    emails_to_unenroll = split_input_list(request.GET.get('unenroll', ''))
+    action = request.GET.get('action', '')
+    emails = split_input_list(request.GET.get('emails', ''))
+    auto_enroll = request.GET.get('auto_enroll', '') in ['true', 'Talse', True]
 
-    enrolled_result = enroll_emails(course_id, emails_to_enroll)
-    unenrolled_result = unenroll_emails(course_id, emails_to_unenroll)
+    if action == 'enroll':
+        results = enroll_emails(course_id, emails, auto_enroll=auto_enroll)
+    elif action == 'unenroll':
+        results = unenroll_emails(course_id, emails)
+    else:
+        raise ValueError("unrecognized action '{}'".format(action))
 
     response_payload = {
-        'enrolled':   enrolled_result,
-        'unenrolled': unenrolled_result,
+        'action':      action,
+        'results':     results,
+        'auto_enroll': auto_enroll,
     }
     response = HttpResponse(json.dumps(response_payload), content_type="application/json")
     return response

@@ -24,8 +24,12 @@ class StudentAdmin
           console.warn 'error getting student progress url for ' + email
 
     @$unenroll_btn.click =>
-      $.getJSON @$unenroll_btn.data('endpoint'), unenroll: @$student_email_field.val(), (data) ->
-        log 'data'
+      send_data =
+        action: 'unenroll'
+        emails: @$student_email_field.val()
+        auto_enroll: false
+      $.getJSON @$unenroll_btn.data('endpoint'), send_data, (data) ->
+        log data
 
     @$reset_attempts_btn.click =>
       email = @$student_email_field.val()
@@ -77,7 +81,8 @@ class StudentAdmin
 
 
 # exports
-_.defaults window, InstructorDashboard: {}
-_.defaults window.InstructorDashboard, sections: {}
-_.defaults window.InstructorDashboard.sections,
-  StudentAdmin: StudentAdmin
+if _?
+  _.defaults window, InstructorDashboard: {}
+  _.defaults window.InstructorDashboard, sections: {}
+  _.defaults window.InstructorDashboard.sections,
+    StudentAdmin: StudentAdmin

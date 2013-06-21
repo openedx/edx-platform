@@ -63,19 +63,28 @@
 
 
 .instructor-dashboard-wrapper-2 section.idash-section#course_info {
-  .error-log {
-    margin-top: 1em;
+  .course-errors-wrapper {
+    margin-top: 2em;
 
-    .course-error {
-      margin-bottom: 1em;
+    h2 {
+      color: #D60000;
+    }
 
-      code {
-        &.course-error-first {
-          color: #111;
-        }
+    .course-errors-visibility-wrapper {
+      display: none;
 
-        &.course-error-second {
-          color: black;
+      .course-error {
+        margin-bottom: 1em;
+        margin-left: 0.5em;
+
+        code {
+          &.course-error-first {
+            color: #111;
+          }
+
+          &.course-error-second {
+            color: #111;
+          }
         }
       }
     }
@@ -86,16 +95,25 @@
 .instructor-dashboard-wrapper-2 section.idash-section#membership {
   .vert-left {
     float: left;
-    width: 45%;
+    width: 47%;
   }
 
   .vert-right {
     float: right;
-    width: 45%;
+    width: 47%;
+  }
+
+  select {
+    margin-bottom: 1em;
   }
 
   .auth-list-container {
+    display: none;
     margin-bottom: 1.5em;
+
+    &.active {
+      display: block;
+    }
 
     .auth-list-table {
       .slickgrid {
@@ -110,6 +128,9 @@
 
   .batch-enrollment {
     textarea {
+      margin-top: 0.2em;
+      margin-bottom: 1em;
+
       height: 100px;
       width: 500px;
     }
@@ -146,6 +167,7 @@
   input {
     // display: block;
     margin-bottom: 1em;
+    line-height: 1.3em;
   }
 
   .data-display {

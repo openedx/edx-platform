@@ -7,52 +7,68 @@
   <br>
   <input type="button" name="enroll" value="Enroll" data-endpoint="${ section_data['enroll_button_url'] }" >
   <input type="button" name="unenroll" value="Unenroll" data-endpoint="${ section_data['unenroll_button_url'] }" >
+  <input type="checkbox" name="auto-enroll" value="Auto-Enroll">
+  <label for="auto-enroll">Auto Enroll</label>
   <div class="task-response"></div>
-
-  <div class="auth-list-container auth-list-forum-admin">
-    <h2>Instructor Management</h2>
-    <div class="auth-list-table" data-endpoint="${ section_data['list_forum_members_url'] }"></div>
-    <div class="auth-list-add" data-endpoint="${ section_data['update_forum_role_membership_url'] }">
-      <input type="text" name="email" placeholder="Enter Email" spellcheck="false">
-      <input type="button" name="allow" value="Grant Forum Admin">
-    </div>
-  </div>
-
-  <div class="auth-list-container auth-list-forum-moderator">
-    <h2>Instructor Management</h2>
-    <div class="auth-list-table" data-endpoint="${ section_data['list_forum_members_url'] }"></div>
-    <div class="auth-list-add" data-endpoint="${ section_data['update_forum_role_membership_url'] }">
-      <input type="text" name="email" placeholder="Enter Email" spellcheck="false">
-      <input type="button" name="allow" value="Grant Forum Moderator">
-    </div>
-  </div>
-
-  <div class="auth-list-container auth-list-forum-community-ta">
-    <h2>Instructor Management</h2>
-    <div class="auth-list-table" data-endpoint="${ section_data['list_forum_members_url'] }"></div>
-    <div class="auth-list-add" data-endpoint="${ section_data['update_forum_role_membership_url'] }">
-      <input type="text" name="email" placeholder="Enter Email" spellcheck="false">
-      <input type="button" name="allow" value="Grant Community TA">
-    </div>
-  </div>
 </div>
 
-<div class="vert-right instructor-staff-management">
-  <div class="auth-list-container auth-list-staff">
-    <h2>Staff Management</h2>
-    <div class="auth-list-table" data-endpoint="${ section_data['list_instructors_staff_url'] }"></div>
+<div class="vert-right member-lists-management">
+  <h2> Member List Management </h2>
+
+  <select id="member-lists-selector">
+    <option> Getting available lists... </option>
+  </select>
+
+  <div class="auth-list-container" data-rolename="staff" data-display-name="Staff">
+    <div class="auth-list-table" data-endpoint="${ section_data['list_course_role_members_url'] }"></div>
     <div class="auth-list-add" data-endpoint="${ section_data['access_allow_revoke_url'] }">
       <input type="text" name="email" placeholder="Enter Email" spellcheck="false">
       <input type="button" name="allow" value="Grant Staff Access">
     </div>
   </div>
 
-  <div class="auth-list-container auth-list-instructor">
-    <h2>Instructor Management</h2>
-    <div class="auth-list-table" data-endpoint="${ section_data['list_instructors_staff_url'] }"></div>
+  %if section_data['access']['instructor']:
+    <div class="auth-list-container" data-rolename="instructor" data-display-name="Instructors">
+      <div class="auth-list-table" data-endpoint="${ section_data['list_course_role_members_url'] }"></div>
+      <div class="auth-list-add" data-endpoint="${ section_data['access_allow_revoke_url'] }">
+        <input type="text" name="email" placeholder="Enter Email" spellcheck="false">
+        <input type="button" name="allow" value="Grant Instructor Access">
+      </div>
+    </div>
+  %endif
+
+  <div class="auth-list-container" data-rolename="beta" data-display-name="Beta Testers">
+    <div class="auth-list-table" data-endpoint="${ section_data['list_course_role_members_url'] }"></div>
     <div class="auth-list-add" data-endpoint="${ section_data['access_allow_revoke_url'] }">
       <input type="text" name="email" placeholder="Enter Email" spellcheck="false">
-      <input type="button" name="allow" value="Grant Instructor Access">
+      <input type="button" name="allow" value="Grant Beta Tester Access">
     </div>
   </div>
+
+  %if section_data['access']['forum_admin']:
+    <div class="auth-list-container" data-rolename="Administrator" data-display-name="Forum Admins">
+      <div class="auth-list-table" data-endpoint="${ section_data['list_forum_members_url'] }"></div>
+      <div class="auth-list-add" data-endpoint="${ section_data['update_forum_role_membership_url'] }">
+        <input type="text" name="email" placeholder="Enter Email" spellcheck="false">
+        <input type="button" name="allow" value="Grant Forum Admin">
+      </div>
+    </div>
+
+    <div class="auth-list-container" data-rolename="Moderator" data-display-name="Forum Moderators">
+      <div class="auth-list-table" data-endpoint="${ section_data['list_forum_members_url'] }"></div>
+      <div class="auth-list-add" data-endpoint="${ section_data['update_forum_role_membership_url'] }">
+        <input type="text" name="email" placeholder="Enter Email" spellcheck="false">
+        <input type="button" name="allow" value="Grant Forum Moderator">
+      </div>
+    </div>
+
+    <div class="auth-list-container" data-rolename="Community TA" data-display-name="Forum Community TAs">
+      <div class="auth-list-table" data-endpoint="${ section_data['list_forum_members_url'] }"></div>
+      <div class="auth-list-add" data-endpoint="${ section_data['update_forum_role_membership_url'] }">
+        <input type="text" name="email" placeholder="Enter Email" spellcheck="false">
+        <input type="button" name="allow" value="Grant Community TA">
+      </div>
+    </div>
+  %endif
+
 </div>
