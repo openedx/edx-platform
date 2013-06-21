@@ -136,6 +136,7 @@ class CrowdsourceHinterTest(unittest.TestCase):
         m = CHModuleFactory.create()
         json_in = {'problem_name': '24.0'}
         json_out = json.loads(m.get_hint(json_in))['contents']
+        print json_out
         self.assertTrue('Best hint' in json_out)
         self.assertTrue(json_out.count('hint') == 3)
 
@@ -211,7 +212,9 @@ class CrowdsourceHinterTest(unittest.TestCase):
         '''
         m = CHModuleFactory.create(user_voted=True)
         json_in = {'answer': 1, 'hint': 'This is a new hint.'}
+        print m.user_voted
         m.submit_hint(json_in)
+        print m.hints
         self.assertTrue('29.0' not in m.hints)
 
 
