@@ -13,6 +13,8 @@ from xmodule.modulestore.inheritance import compute_inherited_metadata
 from xmodule.fields import Date
 
 from .test_export import DATA_DIR
+import datetime
+from django.utils.timezone import UTC
 
 ORG = 'test_org'
 COURSE = 'test_course'
@@ -40,8 +42,8 @@ class DummySystem(ImportSystem):
             load_error_modules=load_error_modules,
         )
 
-    def render_template(self, template, context):
-            raise Exception("Shouldn't be called")
+    def render_template(self, _template, _context):
+        raise Exception("Shouldn't be called")
 
 
 class BaseCourseTestCase(unittest.TestCase):
@@ -53,7 +55,7 @@ class BaseCourseTestCase(unittest.TestCase):
 
     def get_course(self, name):
         """Get a test course by directory name.  If there's more than one, error."""
-        print "Importing {0}".format(name)
+        print("Importing {0}".format(name))
 
         modulestore = XMLModuleStore(DATA_DIR, course_dirs=[name])
         courses = modulestore.get_courses()
@@ -62,17 +64,18 @@ class BaseCourseTestCase(unittest.TestCase):
 
 
 class ImportTestCase(BaseCourseTestCase):
+    date = Date()
 
     def test_fallback(self):
         '''Check that malformed xml loads as an ErrorDescriptor.'''
 
-        bad_xml = '''<sequential display_name="oops"><video url="hi"></sequential>'''
+        # Use an exotic character to also flush out Unicode issues.
+        bad_xml = u'''<sequential display_name="oops\N{SNOWMAN}"><video url="hi"></sequential>'''
         system = self.get_system()
 
         descriptor = system.process_xml(bad_xml)
 
-        self.assertEqual(descriptor.__class__.__name__,
-                         'ErrorDescriptor')
+        self.assertEqual(descriptor.__class__.__name__, 'ErrorDescriptor')
 
     def test_unique_url_names(self):
         '''Check that each error gets its very own url_name'''
@@ -145,15 +148,18 @@ class ImportTestCase(BaseCourseTestCase):
         descriptor = system.process_xml(start_xml)
         compute_inherited_metadata(descriptor)
 
-        print descriptor, descriptor._model_data
-        self.assertEqual(descriptor.lms.due, Date().from_json(v))
+        # pylint: disable=W0212
+        print(descriptor, descriptor._model_data)
+        self.assertEqual(descriptor.lms.due, ImportTestCase.date.from_json(v))
 
         # Check that the child inherits due correctly
         child = descriptor.get_children()[0]
-        self.assertEqual(child.lms.due, Date().from_json(v))
+        self.assertEqual(child.lms.due, ImportTestCase.date.from_json(v))
         self.assertEqual(child._inheritable_metadata, child._inherited_metadata)
         self.assertEqual(2, len(child._inherited_metadata))
-        self.assertEqual('1970-01-01T00:00:00Z', child._inherited_metadata['start'])
+        self.assertLessEqual(ImportTestCase.date.from_json(
+            child._inherited_metadata['start']),
+            datetime.datetime.now(UTC()))
         self.assertEqual(v, child._inherited_metadata['due'])
 
         # Now export and check things
@@ -161,7 +167,7 @@ class ImportTestCase(BaseCourseTestCase):
         exported_xml = descriptor.export_to_xml(resource_fs)
 
         # Check that the exported xml is just a pointer
-        print "Exported xml:", exported_xml
+        print("Exported xml:", exported_xml)
         pointer = etree.fromstring(exported_xml)
         self.assertTrue(is_pointer_tag(pointer))
         # but it's a special case course pointer
@@ -209,9 +215,13 @@ class ImportTestCase(BaseCourseTestCase):
         # Check that the child does not inherit a value for due
         child = descriptor.get_children()[0]
         self.assertEqual(child.lms.due, None)
+        # pylint: disable=W0212
         self.assertEqual(child._inheritable_metadata, child._inherited_metadata)
         self.assertEqual(1, len(child._inherited_metadata))
-        self.assertEqual('1970-01-01T00:00:00Z', child._inherited_metadata['start'])
+        # why do these tests look in the internal structure v just calling child.start?
+        self.assertLessEqual(
+            ImportTestCase.date.from_json(child._inherited_metadata['start']),
+            datetime.datetime.now(UTC()))
 
     def test_metadata_override_default(self):
         """
@@ -230,14 +240,17 @@ class ImportTestCase(BaseCourseTestCase):
         </course>'''.format(due=course_due, org=ORG, course=COURSE, url_name=url_name)
         descriptor = system.process_xml(start_xml)
         child = descriptor.get_children()[0]
+        # pylint: disable=W0212
         child._model_data['due'] = child_due
         compute_inherited_metadata(descriptor)
 
-        self.assertEqual(descriptor.lms.due, Date().from_json(course_due))
-        self.assertEqual(child.lms.due, Date().from_json(child_due))
+        self.assertEqual(descriptor.lms.due, ImportTestCase.date.from_json(course_due))
+        self.assertEqual(child.lms.due, ImportTestCase.date.from_json(child_due))
         # Test inherited metadata. Due does not appear here (because explicitly set on child).
         self.assertEqual(1, len(child._inherited_metadata))
-        self.assertEqual('1970-01-01T00:00:00Z', child._inherited_metadata['start'])
+        self.assertLessEqual(
+            ImportTestCase.date.from_json(child._inherited_metadata['start']),
+            datetime.datetime.now(UTC()))
         # Test inheritable metadata. This has the course inheritable value for due.
         self.assertEqual(2, len(child._inheritable_metadata))
         self.assertEqual(course_due, child._inheritable_metadata['due'])
@@ -255,29 +268,29 @@ class ImportTestCase(BaseCourseTestCase):
 
         no = ["""<html url_name="blah" also="this"/>""",
               """<html url_name="blah">some text</html>""",
-               """<problem url_name="blah"><sub>tree</sub></problem>""",
-               """<course org="HogwartsX" course="Mathemagics" url_name="3.14159">
+              """<problem url_name="blah"><sub>tree</sub></problem>""",
+              """<course org="HogwartsX" course="Mathemagics" url_name="3.14159">
                      <chapter>3</chapter>
                   </course>
-               """]
+              """]
 
         for xml_str in yes:
-            print "should be True for {0}".format(xml_str)
+            print("should be True for {0}".format(xml_str))
             self.assertTrue(is_pointer_tag(etree.fromstring(xml_str)))
 
         for xml_str in no:
-            print "should be False for {0}".format(xml_str)
+            print("should be False for {0}".format(xml_str))
             self.assertFalse(is_pointer_tag(etree.fromstring(xml_str)))
 
     def test_metadata_inherit(self):
         """Make sure that metadata is inherited properly"""
 
-        print "Starting import"
+        print("Starting import")
         course = self.get_course('toy')
 
         def check_for_key(key, node):
             "recursive check for presence of key"
-            print "Checking {0}".format(node.location.url())
+            print("Checking {0}".format(node.location.url()))
             self.assertTrue(key in node._model_data)
             for c in node.get_children():
                 check_for_key(key, c)
@@ -322,14 +335,14 @@ class ImportTestCase(BaseCourseTestCase):
 
         location = Location(["i4x", "edX", "toy", "video", "Welcome"])
         toy_video = modulestore.get_instance(toy_id, location)
-        two_toy_video =  modulestore.get_instance(two_toy_id, location)
+        two_toy_video = modulestore.get_instance(two_toy_id, location)
         self.assertEqual(etree.fromstring(toy_video.data).get('youtube'), "1.0:p2Q6BrNhdh8")
         self.assertEqual(etree.fromstring(two_toy_video.data).get('youtube'), "1.0:p2Q6BrNhdh9")
 
     def test_colon_in_url_name(self):
         """Ensure that colons in url_names convert to file paths properly"""
 
-        print "Starting import"
+        print("Starting import")
         # Not using get_courses because we need the modulestore object too afterward
         modulestore = XMLModuleStore(DATA_DIR, course_dirs=['toy'])
         courses = modulestore.get_courses()
@@ -337,10 +350,10 @@ class ImportTestCase(BaseCourseTestCase):
         course = courses[0]
         course_id = course.id
 
-        print "course errors:"
+        print("course errors:")
         for (msg, err) in modulestore.get_item_errors(course.location):
-            print msg
-            print err
+            print(msg)
+            print(err)
 
         chapters = course.get_children()
         self.assertEquals(len(chapters), 2)
@@ -348,12 +361,12 @@ class ImportTestCase(BaseCourseTestCase):
         ch2 = chapters[1]
         self.assertEquals(ch2.url_name, "secret:magic")
 
-        print "Ch2 location: ", ch2.location
+        print("Ch2 location: ", ch2.location)
 
         also_ch2 = modulestore.get_instance(course_id, ch2.location)
         self.assertEquals(ch2, also_ch2)
 
-        print "making sure html loaded"
+        print("making sure html loaded")
         cloc = course.location
         loc = Location(cloc.tag, cloc.org, cloc.course, 'html', 'secret:toylab')
         html = modulestore.get_instance(course_id, loc)
@@ -378,11 +391,11 @@ class ImportTestCase(BaseCourseTestCase):
         for i in (2, 3):
             video = sections[i]
             # Name should be 'video_{hash}'
-            print "video {0} url_name: {1}".format(i, video.url_name)
+            print("video {0} url_name: {1}".format(i, video.url_name))
 
             self.assertEqual(len(video.url_name), len('video_') + 12)
 
-    def test_poll_and_conditional_xmodule(self):
+    def test_poll_and_conditional_import(self):
         modulestore = XMLModuleStore(DATA_DIR, course_dirs=['conditional_and_poll'])
 
         course = modulestore.get_courses()[0]
@@ -393,10 +406,31 @@ class ImportTestCase(BaseCourseTestCase):
         self.assertEqual(len(sections), 1)
 
         location = course.location
-        location = Location(location.tag, location.org, location.course,
-            'sequential', 'Problem_Demos')
-        module = modulestore.get_instance(course.id, location)
-        self.assertEqual(len(module.children), 2)
+
+        conditional_location = Location(
+            location.tag, location.org, location.course,
+            'conditional', 'condone'
+        )
+        module = modulestore.get_instance(course.id, conditional_location)
+        self.assertEqual(len(module.children), 1)
+
+        poll_location = Location(
+            location.tag, location.org, location.course,
+            'poll_question', 'first_poll'
+        )
+        module = modulestore.get_instance(course.id, poll_location)
+        self.assertEqual(len(module.get_children()), 0)
+        self.assertEqual(module.voted, False)
+        self.assertEqual(module.poll_answer, '')
+        self.assertEqual(module.poll_answers, {})
+        self.assertEqual(
+            module.answers,
+            [
+                {'text': u'Yes', 'id': 'Yes'},
+                {'text': u'No', 'id': 'No'},
+                {'text': u"Don't know", 'id': 'Dont_know'}
+            ]
+        )
 
     def test_error_on_import(self):
         '''Check that when load_error_module is false, an exception is raised, rather than returning an ErrorModule'''
@@ -405,7 +439,6 @@ class ImportTestCase(BaseCourseTestCase):
         system = self.get_system(False)
 
         self.assertRaises(etree.XMLSyntaxError, system.process_xml, bad_xml)
-
 
     def test_graphicslidertool_import(self):
         '''
@@ -422,6 +455,26 @@ class ImportTestCase(BaseCourseTestCase):
         <slider var="a" style="width:400px;float:left;"/>\
 <plot style="margin-top:15px;margin-bottom:15px;"/>""".strip()
         self.assertEqual(gst_sample.render, render_string_from_sample_gst_xml)
+
+    def test_word_cloud_import(self):
+        modulestore = XMLModuleStore(DATA_DIR, course_dirs=['word_cloud'])
+
+        course = modulestore.get_courses()[0]
+        chapters = course.get_children()
+        ch1 = chapters[0]
+        sections = ch1.get_children()
+
+        self.assertEqual(len(sections), 1)
+
+        location = course.location
+        location = Location(
+            location.tag, location.org, location.course,
+            'word_cloud', 'cloud1'
+        )
+        module = modulestore.get_instance(course.id, location)
+        self.assertEqual(len(module.get_children()), 0)
+        self.assertEqual(module.num_inputs, 5)
+        self.assertEqual(module.num_top_words, 250)
 
     def test_cohort_config(self):
         """

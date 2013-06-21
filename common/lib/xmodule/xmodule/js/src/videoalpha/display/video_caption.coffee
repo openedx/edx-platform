@@ -27,16 +27,19 @@ class @VideoCaptionAlpha extends SubviewAlpha
     @fetchCaption()
 
   fetchCaption: ->
-    $.getWithPrefix @captionURL(), (captions) =>
-      @captions = captions.text
-      @start = captions.start
+    $.ajaxWithPrefix
+      url: @captionURL()
+      notifyOnError: false
+      success: (captions) =>
+        @captions = captions.text
+        @start = captions.start
 
-      @loaded = true
+        @loaded = true
 
-      if onTouchBasedDevice()
-        $('.subtitles li').html "Caption will be displayed when you start playing the video."
-      else
-        @renderCaption()
+        if onTouchBasedDevice()
+          $('.subtitles li').html "Caption will be displayed when you start playing the video."
+        else
+          @renderCaption()
 
   renderCaption: ->
     container = $('<ol>')
@@ -117,7 +120,7 @@ class @VideoCaptionAlpha extends SubviewAlpha
   seekPlayer: (event) =>
     event.preventDefault()
     time = Math.round(Time.convert($(event.target).data('start'), '1.0', @currentSpeed) / 1000)
-    $(@).trigger('seek', time)
+    $(@).trigger('caption_seek', time)
 
   calculateOffset: (element) ->
     @captionHeight() / 2 - element.height() / 2

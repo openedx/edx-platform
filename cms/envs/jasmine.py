@@ -2,6 +2,10 @@
 This configuration is used for running jasmine tests
 """
 
+# We intentionally define lots of variables that aren't used, and
+# want to import all variables from base settings files
+# pylint: disable=W0401, W0614
+
 from .test import *
 from logsettings import get_logger_config
 
@@ -32,8 +36,13 @@ PIPELINE_JS['spec'] = {
 }
 
 JASMINE_TEST_DIRECTORY = PROJECT_ROOT + '/static/coffee'
+JASMINE_REPORT_DIR = os.environ.get('JASMINE_REPORT_DIR', 'reports/cms/jasmine')
 
-STATICFILES_DIRS.append(COMMON_ROOT / 'test' / 'phantom-jasmine' / 'lib')
+TEMPLATE_CONTEXT_PROCESSORS += ('settings_context_processor.context_processors.settings',)
+TEMPLATE_VISIBLE_SETTINGS = ('JASMINE_REPORT_DIR', )
+
+STATICFILES_DIRS.append(REPO_ROOT/'node_modules/phantom-jasmine/lib')
+STATICFILES_DIRS.append(REPO_ROOT/'node_modules/jasmine-reporters/src')
 
 # Remove the localization middleware class because it requires the test database
 # to be sync'd and migrated in order to run the jasmine tests interactively
@@ -41,4 +50,4 @@ STATICFILES_DIRS.append(COMMON_ROOT / 'test' / 'phantom-jasmine' / 'lib')
 MIDDLEWARE_CLASSES = tuple(e for e in MIDDLEWARE_CLASSES \
                            if e != 'django.middleware.locale.LocaleMiddleware')
 
-INSTALLED_APPS += ('django_jasmine', )
+INSTALLED_APPS += ('django_jasmine', 'settings_context_processor')

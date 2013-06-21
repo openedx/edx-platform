@@ -1,6 +1,10 @@
 """
 This config file runs the simplest dev environment"""
 
+# We intentionally define lots of variables that aren't used, and
+# want to import all variables from base settings files
+# pylint: disable=W0401, W0614
+
 from .common import *
 from logsettings import get_logger_config
 
@@ -18,7 +22,7 @@ modulestore_options = {
     'db': 'xmodule',
     'collection': 'modulestore',
     'fs_root': GITHUB_REPO_ROOT,
-    'render_template': 'mitxmako.shortcuts.render_to_string',
+    'render_template': 'mitxmako.shortcuts.render_to_string'
 }
 
 MODULESTORE = {
@@ -51,6 +55,7 @@ DATABASES = {
 }
 
 LMS_BASE = "localhost:8000"
+MITX_FEATURES['PREVIEW_LMS_BASE'] = "localhost:8000"
 
 REPOS = {
     'edx4edx': {
@@ -59,7 +64,7 @@ REPOS = {
     },
     'content-mit-6002x': {
         'branch': 'master',
-        #'origin': 'git@github.com:MITx/6002x-fall-2012.git',
+        # 'origin': 'git@github.com:MITx/6002x-fall-2012.git',
         'origin': 'git@github.com:MITx/content-mit-6002x.git',
     },
     '6.00x': {
@@ -116,10 +121,14 @@ SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 
 PIPELINE_SASS_ARGUMENTS = '--debug-info --require {proj_dir}/static/sass/bourbon/lib/bourbon.rb'.format(proj_dir=PROJECT_ROOT)
 
+################################# CELERY ######################################
+
+# By default don't use a worker, execute tasks as if they were local functions
+CELERY_ALWAYS_EAGER = True
+
 ################################ DEBUG TOOLBAR #################################
 INSTALLED_APPS += ('debug_toolbar', 'debug_toolbar_mongo')
-MIDDLEWARE_CLASSES += ('django_comment_client.utils.QueryCountDebugMiddleware',
-                       'debug_toolbar.middleware.DebugToolbarMiddleware',)
+MIDDLEWARE_CLASSES += ('debug_toolbar.middleware.DebugToolbarMiddleware',)
 INTERNAL_IPS = ('127.0.0.1',)
 
 DEBUG_TOOLBAR_PANELS = (
@@ -151,5 +160,16 @@ DEBUG_TOOLBAR_MONGO_STACKTRACES = True
 # disable NPS survey in dev mode
 MITX_FEATURES['STUDIO_NPS_SURVEY'] = False
 
+# Enable URL that shows information about the status of variuous services
+MITX_FEATURES['ENABLE_SERVICE_STATUS'] = True
+
 # segment-io key for dev
 SEGMENT_IO_KEY = 'mty8edrrsg'
+
+
+#####################################################################
+# Lastly, see if the developer has any local overrides.
+try:
+    from .private import *
+except ImportError:
+    pass

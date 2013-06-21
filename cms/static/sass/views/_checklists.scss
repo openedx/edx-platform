@@ -23,7 +23,7 @@ body.course.checklists {
 
     // visual status
     .viz-checklist-status {
-      @include text-hide();
+      @extend .text-hide;
       @include size(100%,($baseline/4));
       position: relative;
       display: block;
@@ -40,7 +40,7 @@ body.course.checklists {
         background: $green;
 
         .int {
-          @include text-sr();
+          @extend .text-sr;
         }
       }
     }
@@ -62,7 +62,7 @@ body.course.checklists {
 
         .ui-toggle-expansion {
           @include transition(rotate .15s ease-in-out .25s);
-          @include font-size(14);
+          @include font-size(21);
           display: inline-block;
           vertical-align: middle;
           margin-right: ($baseline/2);
@@ -83,24 +83,23 @@ body.course.checklists {
       }
 
       .checklist-status {
-        @include font-size(13);
+        @extend .t-copy-sub1;
         width: flex-grid(3, 9);
         float: right;
         margin-top: ($baseline/2);
         text-align: right;
         color: $gray-l2;
-        
 
-        .icon-confirm {
+
+        .icon-ok {
           @include font-size(20);
           display: inline-block;
-          vertical-align: middle;
           margin-left: ($baseline/2);
           color: $gray-l4;
         }
 
         .status-count {
-          @include font-size(16);
+          @extend .t-copy-base;
           margin-left: ($baseline/4);
           margin-right: ($baseline/4);
           color: $gray-d3;
@@ -108,7 +107,7 @@ body.course.checklists {
         }
 
         .status-amount {
-          @include font-size(16);
+          @extend .t-copy-base;
           margin-left: ($baseline/4);
           color: $gray-d3;
           font-weight: 600;
@@ -138,8 +137,8 @@ body.course.checklists {
       }
 
       .action-secondary {
-        @include font-size(14);
         @include grey-button();
+        @extend .t-action3;
         font-weight: 400;
         float: right;
 
@@ -174,7 +173,7 @@ body.course.checklists {
 
     // state - completed
     &.is-completed {
-      
+
       .viz-checklist-status {
 
         .viz-checklist-status-value {
@@ -184,14 +183,14 @@ body.course.checklists {
 
       header {
 
-        .checklist-title, .icon-confirm {
+        .checklist-title, .icon-caret-down {
           color: $green;
         }
 
         .checklist-status {
-          
-          .status-count, .status-amount, .icon-confirm {
-            color: $green;          
+
+          .status-count, .status-amount, .icon-ok {
+            color: $green;
           }
         }
       }
@@ -244,18 +243,18 @@ body.course.checklists {
           vertical-align: baseline;
           cursor: pointer;
           margin-bottom: 0;
-        }   
+        }
 
         .task-description {
+          @extend .t-copy-sub1;
           @include transition(color .15s .25s ease-in-out);
-          @include font-size(14);
           color: $gray-l2;
         }
 
         .task-support {
+          @extend .t-copy-sub2;
           @include transition(opacity .15s .25s ease-in-out);
-          @include font-size(12);
-          opacity: 0;
+          opacity: 0.0;
           pointer-events: none;
         }
       }
@@ -268,20 +267,20 @@ body.course.checklists {
         float: right;
         width: flex-grid(2,9);
         margin: ($baseline/2) 0 0 flex-gutter();
-        opacity: 0;
+        opacity: 0.0;
         pointer-events: none;
         text-align: right;
 
         .action-primary {
           @include blue-button;
+          @extend .t-action4;
           @include transition(all .15s);
-          @include font-size(12);
           font-weight: 600;
           text-align: center;
         }
 
         .action-secondary {
-          @include font-size(13);
+          @extend .t-action4;
           margin-top: ($baseline/2);
         }
       }
@@ -322,7 +321,7 @@ body.course.checklists {
 
           .action-primary {
             @include grey-button;
-            @include font-size(12);
+            @extend .t-action4;
             font-weight: 600;
             text-align: center;
           }

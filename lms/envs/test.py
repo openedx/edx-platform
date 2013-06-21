@@ -7,6 +7,11 @@ sessions. Assumes structure:
         /mitx # The location of this repo
         /log  # Where we're going to write log files
 """
+
+# We intentionally define lots of variables that aren't used, and
+# want to import all variables from base settings files
+# pylint: disable=W0401, W0614
+
 from .common import *
 import os
 from path import path
@@ -15,8 +20,12 @@ from path import path
 # can test everything else :)
 MITX_FEATURES['DISABLE_START_DATES'] = True
 
-# Until we have discussion actually working in test mode, just turn it off
+# Most tests don't use the discussion service, so we turn it off to speed them up.
+# Tests that do can enable this flag, but must use the UrlResetMixin class to force urls.py
+# to reload
 MITX_FEATURES['ENABLE_DISCUSSION_SERVICE'] = False
+
+MITX_FEATURES['ENABLE_SERVICE_STATUS'] = True
 
 # Need wiki for courseware views to work. TODO (vshnayder): shouldn't need it.
 WIKI_ENABLED = True
@@ -124,7 +133,7 @@ CACHES = {
 # Dummy secret key for dev
 SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 
-################################## OPENID ######################################
+################################## OPENID #####################################
 MITX_FEATURES['AUTH_USE_OPENID'] = True
 MITX_FEATURES['AUTH_USE_OPENID_PROVIDER'] = True
 
@@ -135,6 +144,12 @@ OPENID_PROVIDER_TRUSTED_ROOTS = ['*']
 
 INSTALLED_APPS += ('external_auth',)
 INSTALLED_APPS += ('django_openid_auth',)
+
+################################# CELERY ######################################
+
+CELERY_ALWAYS_EAGER = True
+CELERY_RESULT_BACKEND = 'cache'
+BROKER_TRANSPORT = 'memory'
 
 ############################ STATIC FILES #############################
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'

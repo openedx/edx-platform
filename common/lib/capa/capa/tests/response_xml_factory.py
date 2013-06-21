@@ -221,6 +221,8 @@ class CustomResponseXMLFactory(ResponseXMLFactory):
         cfn = kwargs.get('cfn', None)
         expect = kwargs.get('expect', None)
         answer = kwargs.get('answer', None)
+        options = kwargs.get('options', None)
+        cfn_extra_args = kwargs.get('cfn_extra_args', None)
 
         # Create the response element
         response_element = etree.Element("customresponse")
@@ -235,6 +237,33 @@ class CustomResponseXMLFactory(ResponseXMLFactory):
             answer_element = etree.SubElement(response_element, "answer")
             answer_element.text = str(answer)
 
+        if options:
+            response_element.set('options', str(options))
+
+        if cfn_extra_args:
+            response_element.set('cfn_extra_args', str(cfn_extra_args))
+
+        return response_element
+
+    def create_input_element(self, **kwargs):
+        return ResponseXMLFactory.textline_input_xml(**kwargs)
+
+
+class SymbolicResponseXMLFactory(ResponseXMLFactory):
+    """ Factory for creating <symbolicresponse> XML trees """
+
+    def create_response_element(self, **kwargs):
+        cfn = kwargs.get('cfn', None)
+        answer = kwargs.get('answer', None)
+        options = kwargs.get('options', None)
+
+        response_element = etree.Element("symbolicresponse")
+        if cfn:
+            response_element.set('cfn', str(cfn))
+        if answer:
+            response_element.set('answer', str(answer))
+        if options:
+            response_element.set('options', str(options))
         return response_element
 
     def create_input_element(self, **kwargs):
@@ -638,12 +667,16 @@ class StringResponseXMLFactory(ResponseXMLFactory):
                 Where *hint_prompt* is the string for which we show the hint,
                 *hint_name* is an internal identifier for the hint,
                 and *hint_text* is the text we show for the hint.
+
+            *hintfn*: The name of a function in the script to use for hints.
+
         """
         # Retrieve the **kwargs
         answer = kwargs.get("answer", None)
         case_sensitive = kwargs.get("case_sensitive", True)
         hint_list = kwargs.get('hints', None)
-        assert(answer)
+        hint_fn = kwargs.get('hintfn', None)
+        assert answer
 
         # Create the <stringresponse> element
         response_element = etree.Element("stringresponse")
@@ -655,18 +688,24 @@ class StringResponseXMLFactory(ResponseXMLFactory):
         response_element.set("type", "cs" if case_sensitive else "ci")
 
         # Add the hints if specified
-        if hint_list:
+        if hint_list or hint_fn:
             hintgroup_element = etree.SubElement(response_element, "hintgroup")
-            for (hint_prompt, hint_name, hint_text) in hint_list:
-                stringhint_element = etree.SubElement(hintgroup_element, "stringhint")
-                stringhint_element.set("answer", str(hint_prompt))
-                stringhint_element.set("name", str(hint_name))
+            if hint_list:
+                assert not hint_fn
+                for (hint_prompt, hint_name, hint_text) in hint_list:
+                    stringhint_element = etree.SubElement(hintgroup_element, "stringhint")
+                    stringhint_element.set("answer", str(hint_prompt))
+                    stringhint_element.set("name", str(hint_name))
 
-                hintpart_element = etree.SubElement(hintgroup_element, "hintpart")
-                hintpart_element.set("on", str(hint_name))
+                    hintpart_element = etree.SubElement(hintgroup_element, "hintpart")
+                    hintpart_element.set("on", str(hint_name))
 
-                hint_text_element = etree.SubElement(hintpart_element, "text")
-                hint_text_element.text = str(hint_text)
+                    hint_text_element = etree.SubElement(hintpart_element, "text")
+                    hint_text_element.text = str(hint_text)
+
+            if hint_fn:
+                assert not hint_list
+                hintgroup_element.set("hintfn", hint_fn)
 
         return response_element
 
@@ -705,3 +744,38 @@ class AnnotationResponseXMLFactory(ResponseXMLFactory):
             option_element.text = description
 
         return input_element
+
+
+class SymbolicResponseXMLFactory(ResponseXMLFactory):
+    """ Factory for producing <symbolicresponse> xml """
+
+    def create_response_element(self, **kwargs):
+        """ Build the <symbolicresponse> XML element.
+
+        Uses **kwargs:
+
+        *expect*: The correct answer (a sympy string)
+
+        *options*: list of option strings to pass to symmath_check
+            (e.g. 'matrix', 'qbit', 'imaginary', 'numerical')"""
+
+        # Retrieve **kwargs
+        expect = kwargs.get('expect', '')
+        options = kwargs.get('options', [])
+
+        # Symmath check expects a string of options
+        options_str = ",".join(options)
+
+        # Construct the <symbolicresponse> element
+        response_element = etree.Element('symbolicresponse')
+
+        if expect:
+            response_element.set('expect', str(expect))
+
+        if options_str:
+            response_element.set('options', str(options_str))
+
+        return response_element
+
+    def create_input_element(self, **kwargs):
+        return ResponseXMLFactory.textline_input_xml(**kwargs)

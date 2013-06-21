@@ -2,9 +2,7 @@
 metadata:
     display_name: Text Input
     rerandomize: never
-    showanswer: always
-    weight: ""
-    attempts: ""
+    showanswer: finished
     # Note, the extra newlines are needed to make the yaml parser add blank lines instead of folding
     markdown: 
         "A text input problem accepts a line of text from the 

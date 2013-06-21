@@ -7,15 +7,15 @@
   }
 
   > header {
-    background: rgb(255,255,255);
-    @include background-image(url('/static/images/homepage-bg.jpg'));
+    background: $dashboard-profile-color;
+    @include background-image(url($homepage-bg-image));
     background-size: cover;
-    border-bottom: 1px solid rgb(80,80,80);
-    @include box-shadow(0 1px 0 0 rgba(255,255,255, 0.9), inset 0 -1px 5px 0 rgba(0,0,0, 0.1));
+    border-bottom: 1px solid $border-color-3;
+    @include box-shadow(0 1px 0 0 $course-header-bg, inset 0 -1px 5px 0 rgba(0,0,0, 0.1));
     @include clearfix;
     height: 460px;
-    margin-top: -69px;
     overflow: hidden;
+    margin-top: $header_image_margin;
     padding: 0px;
     width: flex-grid(12);
 
@@ -31,8 +31,8 @@
 
     .title {
       background: #FFF;
-      background: rgba(255,255,255, 0.93);
-      border: 1px solid rgb(100,100,100);
+      background: $course-header-bg;
+      border: 1px solid $border-color-3;
       @include box-shadow(0 4px 25px 0 rgba(0,0,0, 0.5));
       @include box-sizing(border-box);
       min-height: 120px;
@@ -53,7 +53,7 @@
         @include box-sizing(border-box);
         @include inline-block;
         left: 0px;
-        opacity: 1;
+        opacity: 1.0;
         padding: 20px 30px;
         top: 0px;
         @include transition(all, 0.2s, linear);
@@ -80,8 +80,8 @@
 
     .media {
       background: #FFF;
-      background: rgba(255,255,255, 0.93);
-      border: 1px solid rgb(100,100,100);
+      background: $course-header-bg;
+      border: 1px solid $border-color-3;
       border-left: 0;
       @include box-sizing(border-box);
       // @include box-shadow(0 4px 25px 0 rgba(0,0,0, 0.5));
@@ -101,7 +101,7 @@
         height: 100%;
         overflow: hidden;
         position: relative;
-        background: url('../images/courses/video-thumb.jpg') center no-repeat;
+        background: url($video-thumb-url) center no-repeat;
         @include background-size(cover);
 
         .play-intro {
@@ -164,9 +164,9 @@
 
     > h2 {
       @include background-image(linear-gradient(-90deg, rgb(250,250,250), rgb(230,230,230)));
-      border: 1px solid rgb(200,200,200);
+      border: 1px solid $border-color-2;
       @include border-radius(4px);
-      border-top-color: rgb(190,190,190);
+      border-top-color: $border-color-1;
       @include box-shadow(inset 0 0 0 1px rgba(255,255,255, 0.4), 0 0px 12px 0 rgba(0,0,0, 0.2));
       color: $lighter-base-font-color;
       letter-spacing: 1px;
@@ -180,7 +180,7 @@
   }
 
   .university-partners {
-    border-bottom: 1px solid rgb(210,210,210);
+    border-bottom: 1px solid $border-color-2;
     margin-bottom: 0px;
     overflow: hidden;
     position: relative;
@@ -312,7 +312,7 @@
           text-decoration: none;
 
           &::before {
-            opacity: 1;
+            opacity: 1.0;
           }
 
           .name {
@@ -366,13 +366,13 @@
   }
 
   .more-info {
-    border: 1px solid rgb(200,200,200);
+    border: 1px solid $border-color-2;
     margin-bottom: 80px;
     width: flex-grid(12);
 
     header {
       @include background-image(linear-gradient(-90deg, rgb(250,250,250), rgb(230,230,230)));
-      border-bottom: 1px solid rgb(200,200,200);
+      border-bottom: 1px solid $border-color-2;
       @include clearfix;
       padding: 10px 20px 8px;
       position: relative;
@@ -415,14 +415,14 @@
       width: flex-grid(12);
 
       .blog-posts {
-        border-bottom: 1px solid rgb(220,220,220);
+        border-bottom: 1px solid $border-color-2;
         margin-bottom: 20px;
         padding-bottom: 20px;
         @include clearfix;
 
         > article {
           border: 1px dotted transparent;
-          border-color: rgb(220,220,220);
+          border-color: $border-color-2;
           @include box-sizing(border-box);
           @include clearfix;
           float: left;
@@ -432,8 +432,8 @@
           width: flex-grid(4);
 
           &:hover {
-            background: rgb(248,248,248);
-            border: 1px solid rgb(220,220,220);
+            background: $body-bg;
+            border: 1px solid $border-color-2;
             @include box-shadow(inset 0 0 3px 0 rgba(0,0,0, 0.1));
           }
 
@@ -442,7 +442,7 @@
           }
 
           .post-graphics {
-            border: 1px solid rgb(190,190,190);
+            border: 1px solid $border-color-1;
             @include box-sizing(border-box);
             display: block;
             float: left;

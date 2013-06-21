@@ -2,12 +2,24 @@
 // ====================
 
 body.course.uploads {
-  
+
+
+  .nav-actions {
+
+    .icon-cloud-upload {
+      @include font-size(16);
+      vertical-align: bottom;
+      margin-right: ($baseline/5);
+    }
+
+  }
+
   input.asset-search-input {
     float: left;
     width: 260px;
     background-color: #fff;
   }
+
 
   .asset-library {
     @include clearfix;
@@ -102,7 +114,7 @@ body.course.uploads {
 }
 
 .upload-modal {
-  display: none;  
+  display: none;
   width: 640px !important;
   margin-left: -320px !important;
 

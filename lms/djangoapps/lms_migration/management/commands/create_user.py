@@ -18,6 +18,7 @@ from django.core.management.base import BaseCommand
 from student.models import UserProfile, Registration
 from external_auth.models import ExternalAuthMap
 from django.contrib.auth.models import User, Group
+from pytz import UTC
 
 
 class MyCompleter(object):  # Custom completer
@@ -124,7 +125,7 @@ class Command(BaseCommand):
                                     external_credentials=json.dumps(credentials),
                 )
             eamap.user = user
-            eamap.dtsignup = datetime.datetime.now()
+            eamap.dtsignup = datetime.datetime.now(UTC)
             eamap.save()
 
         print "User %s created successfully!" % user

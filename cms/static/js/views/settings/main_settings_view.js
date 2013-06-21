@@ -16,7 +16,7 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
 
     },
     initialize : function() {
-        this.fileAnchorTemplate = _.template('<a href="<%= fullpath %>"> <i class="ss-icon ss-standard">&#x1F4C4;</i><%= filename %></a>');
+        this.fileAnchorTemplate = _.template('<a href="<%= fullpath %>"> <i class="icon-file"></i><%= filename %></a>');
         // fill in fields
         this.$el.find("#course-name").val(this.model.get('location').get('name'));
         this.$el.find("#course-organization").val(this.model.get('location').get('org'));
@@ -26,7 +26,6 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
         var dateIntrospect = new Date();
         this.$el.find('#timezone').html("(" + dateIntrospect.getTimezone() + ")");
 
-        this.listenTo(this.model, 'error', CMS.ServerError);
         this.listenTo(this.model, 'invalid', this.handleValidationError);
         this.selectorToField = _.invert(this.fieldToSelectorMap);
     },

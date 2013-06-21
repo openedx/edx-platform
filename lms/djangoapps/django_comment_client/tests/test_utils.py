@@ -1,20 +1,8 @@
 from django.test import TestCase
-from factory import DjangoModelFactory
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
-
-from django_comment_client.models import Role, Permission
+from django_comment_common.models import Role, Permission
+from factories import RoleFactory
 import django_comment_client.utils as utils
-
-
-class RoleFactory(DjangoModelFactory):
-    FACTORY_FOR = Role
-    name = 'Student'
-    course_id = 'edX/toy/2012_Fall'
-
-
-class PermissionFactory(DjangoModelFactory):
-    FACTORY_FOR = Permission
-    name = 'create_comment'
 
 
 class DictionaryTestCase(TestCase):

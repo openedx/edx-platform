@@ -1,3 +1,8 @@
+"""
+Modules that get shown to the users when an error has occured while
+loading or rendering other modules
+"""
+
 import hashlib
 import logging
 import json
@@ -22,12 +27,19 @@ log = logging.getLogger(__name__)
 
 
 class ErrorFields(object):
+    """
+    XBlock fields used by the ErrorModules
+    """
     contents = String(scope=Scope.content)
     error_msg = String(scope=Scope.content)
     display_name = String(scope=Scope.settings)
 
 
 class ErrorModule(ErrorFields, XModule):
+    """
+    Module that gets shown to staff when there has been an error while
+    loading or rendering other modules
+    """
 
     def get_html(self):
         '''Show an error to staff.
@@ -42,6 +54,10 @@ class ErrorModule(ErrorFields, XModule):
 
 
 class NonStaffErrorModule(ErrorFields, XModule):
+    """
+    Module that gets shown to students when there has been an error while
+    loading or rendering other modules
+    """
     def get_html(self):
         '''Show an error to a student.
         TODO (vshnayder): proper style, divs, etc.
@@ -61,7 +77,7 @@ class ErrorDescriptor(ErrorFields, JSONEditingDescriptor):
     module_class = ErrorModule
 
     @classmethod
-    def _construct(self, system, contents, error_msg, location):
+    def _construct(cls, system, contents, error_msg, location):
 
         if location.name is None:
             location = location._replace(
@@ -71,7 +87,7 @@ class ErrorDescriptor(ErrorFields, JSONEditingDescriptor):
                 # but url_names aren't guaranteed to be unique between descriptor types,
                 # and ErrorDescriptor can wrap any type.  When the wrapped module is fixed,
                 # it will be written out with the original url_name.
-                name=hashlib.sha1(contents).hexdigest()
+                name=hashlib.sha1(contents.encode('utf8')).hexdigest()
             )
 
         # real metadata stays in the content, but add a display name
@@ -80,7 +96,7 @@ class ErrorDescriptor(ErrorFields, JSONEditingDescriptor):
             'contents': contents,
             'display_name': 'Error: ' + location.name
         }
-        return ErrorDescriptor(
+        return cls(
             system,
             location,
             model_data,
@@ -105,7 +121,7 @@ class ErrorDescriptor(ErrorFields, JSONEditingDescriptor):
     def from_descriptor(cls, descriptor, error_msg='Error not available'):
         return cls._construct(
             descriptor.system,
-            descriptor._model_data,
+            str(descriptor),
             error_msg,
             location=descriptor.location,
         )

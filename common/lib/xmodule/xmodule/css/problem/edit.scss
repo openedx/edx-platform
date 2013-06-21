@@ -5,7 +5,7 @@
     .advanced-toggle {
       @include white-button;
       height: auto;
-      margin-top: -1px;
+      margin-top: -4px;
       padding: 3px 9px;
       font-size: 12px;
 
@@ -16,7 +16,7 @@
         color: $darkGrey !important;
         pointer-events: none;
         cursor: none;
-        
+
         &:hover {
           box-shadow: 0 0 0 0 !important;
         }
@@ -27,7 +27,7 @@
       width: 21px;
       height: 21px;
       padding: 0;
-      margin: 0 5px 0 15px;
+      margin: -1px 5px 0 15px;
       border-radius: 22px;
       border: 1px solid #a5aaaf;
       background: #e5ecf3;
@@ -96,6 +96,13 @@
   code {
     padding: 0;
     background: none;
+  }
+}
+
+.problem-editor {
+// adding padding to simple editor only - adjacent selector is needed since there are no toggles for CodeMirror
+ .markdown-box+.CodeMirror {
+    padding: 10px;
   }
 }
 

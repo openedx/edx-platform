@@ -10,19 +10,19 @@
   ${ problem['html'] }
 
   <section class="action">
-    <input type="hidden" name="problem_id" value="${ problem['name'] }">
+    <input type="hidden" name="problem_id" value="${ problem['name'] }" />
 
     % if check_button:
-    <input class="check ${ check_button }" type="button" value="${ check_button }">
+    <input class="check ${ check_button }" type="button" value="${ check_button }" />
     % endif
     % if reset_button:
-    <input class="reset" type="button" value="Reset">
+    <input class="reset" type="button" value="Reset" />
     % endif
     % if save_button:
-    <input class="save" type="button" value="Save">
+    <input class="save" type="button" value="Save" />
     % endif
     % if answer_available:
-    <input class="show" type="button" value="Show Answer">
+    <button class="show"><span class="show-label">Show Answer(s)</span> <span class="sr">(for question(s) above - adjacent to each field)</span></button>
     % endif
     % if attempts_allowed :
     <section class="submission_feedback">

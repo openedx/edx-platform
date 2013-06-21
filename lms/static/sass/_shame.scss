@@ -1,0 +1,113 @@
+// edX LMS - shame
+// shame file - used for any bad-form/orphaned scss that knowingly violate edX FED architecture/standards (see - http://csswizardry.com/2013/04/shame-css/)
+// ====================
+
+// marketing site - registration iframe band-aid (poor form enough to isolate out)
+.view-partial-mktgregister {
+  background: transparent;
+
+  // dimensions needed for course about page on marketing site
+  .wrapper-view {
+    overflow: hidden;
+  }
+
+  // button elements - not a better place to put these, sadly
+  .btn {
+    @include box-sizing('border-box');
+    display: block;
+    padding: $baseline/2;
+    text-transform: lowercase;
+    color: $white;
+    letter-spacing: 0.1rem;
+    cursor: pointer;
+    text-align: center;
+    border: none !important;
+    text-decoration: none;
+    text-shadow: none;
+    letter-spacing: 0.1rem;
+    font-size: 17px;
+    font-weight: 300;
+    box-shadow: 0 !important;
+
+    strong {
+      font-weight: 400;
+      text-transform: none;
+    }
+  }
+
+  .btn-primary {
+    @extend .btn;
+    @include linear-gradient($m-blue-s1 5%, $m-blue-d1 95%);
+
+    // no hover state conventions to follow from marketing :/
+    &:hover, &:active {
+
+    }
+  }
+
+  .btn-secondary {
+    @extend .btn;
+    @include linear-gradient($m-gray 5%, $m-gray-d1 95%);
+
+    // no hover state conventions to follow from marketing :/
+    &:hover, &:active {
+
+    }
+  }
+
+  .btn-tertiary {
+    @extend .btn;
+    background: $m-blue-l1;
+    color: $m-blue;
+
+    // no hover state conventions to follow from marketing :/
+    &:hover, &:active {
+
+    }
+  }
+
+  // nav list
+  .list-actions {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    .item {
+      margin: 0;
+    }
+  }
+
+  .action {
+
+    // register or access courseware
+    &.action-register, &.access-courseware {
+      @extend .btn-primary;
+    }
+
+    // already registered but course not started or registration is closed
+    &.is-registered, &.registration-closed {
+      @extend .btn-secondary;
+      pointer-events: none !important;
+    }
+
+    // coming soon
+    &.coming-soon {
+      @extend .btn-tertiary;
+      pointer-events: none !important;
+      outline: none;
+    }
+  }
+}
+
+//--------------------------------------
+//   The Following is to enable themes to
+//   display H1s on login and register pages
+//--------------------------------------
+.view-login .introduction header h1,
+.view-register .introduction header h1 {
+  @include login_register_h1_style;
+}
+
+footer .references {
+  @include footer_references_style;
+}

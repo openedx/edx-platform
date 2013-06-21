@@ -9,7 +9,7 @@ import re
 from collections import namedtuple
 
 from .exceptions import InvalidLocationError, InsufficientSpecificationError
-from xmodule.errortracker import ErrorLog, make_error_tracker
+from xmodule.errortracker import make_error_tracker
 from bson.son import SON
 
 log = logging.getLogger('mitx.' + 'modulestore')
@@ -64,14 +64,12 @@ class Location(_LocationBase):
         """
         return re.sub('_+', '_', invalid.sub('_', value))
 
-
     @staticmethod
     def clean(value):
         """
         Return value, made into a form legal for locations
         """
         return Location._clean(value, INVALID_CHARS)
-
 
     @staticmethod
     def clean_keeping_underscores(value):
@@ -81,7 +79,6 @@ class Location(_LocationBase):
         transcript asset name to match. In the future we may want to change the behavior of _clean.
         """
         return INVALID_CHARS.sub('_', value)
-
 
     @staticmethod
     def clean_for_url_name(value):
@@ -154,9 +151,7 @@ class Location(_LocationBase):
         to mean wildcard selection.
         """
 
-
-        if (org is None and course is None and category is None and
-            name is None and revision is None):
+        if (org is None and course is None and category is None and name is None and revision is None):
             location = loc_or_tag
         else:
             location = (loc_or_tag, org, course, category, name, revision)
@@ -191,7 +186,7 @@ class Location(_LocationBase):
                 match = MISSING_SLASH_URL_RE.match(location)
                 if match is None:
                     log.debug('location is instance of %s but no URL match' % basestring)
-                    raise InvalidLocationError(location)    
+                    raise InvalidLocationError(location)
             groups = match.groupdict()
             check_dict(groups)
             return _LocationBase.__new__(_cls, **groups)
@@ -233,7 +228,7 @@ class Location(_LocationBase):
         html id attributes
         """
         s = "-".join(str(v) for v in self.list()
-                        if v is not None)
+                     if v is not None)
         return Location.clean_for_html(s)
 
     def dict(self):
@@ -257,6 +252,12 @@ class Location(_LocationBase):
         """Return the ID of the Course that this item belongs to by looking
         at the location URL hierachy"""
         return "/".join([self.org, self.course, self.name])
+
+    def replace(self, **kwargs):
+        '''
+        Expose a public method for replacing location elements
+        '''
+        return self._replace(**kwargs)
 
 
 class ModuleStore(object):
@@ -382,12 +383,6 @@ class ModuleStore(object):
         '''
         raise NotImplementedError
 
-    def get_course(self, course_id):
-        '''
-        Look for a specific course id.  Returns the course descriptor, or None if not found.
-        '''
-        raise NotImplementedError
-
     def get_parent_locations(self, location, course_id):
         '''Find all locations that are the parents of this location in this
         course.  Needed for path_to_location().
@@ -406,8 +401,7 @@ class ModuleStore(object):
         courses = [
             course
             for course in self.get_courses()
-            if course.location.org == location.org
-               and course.location.course == location.course
+            if course.location.org == location.org and course.location.course == location.course
         ]
 
         return courses

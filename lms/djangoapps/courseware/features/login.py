@@ -19,13 +19,13 @@ def i_am_an_activated_user(step):
 def i_submit_my_credentials_on_the_login_form(step):
     fill_in_the_login_form('email', 'robot@edx.org')
     fill_in_the_login_form('password', 'test')
-    login_form = world.browser.find_by_css('form#login_form')
-    login_form.find_by_value('Access My Courses').click()
+    login_form = world.browser.find_by_css('form#login-form')
+    login_form.find_by_name('submit').click()
 
 
 @step(u'I should see the login error message "([^"]*)"$')
 def i_should_see_the_login_error_message(step, msg):
-    login_error_div = world.browser.find_by_css('form#login_form #login_error')
+    login_error_div = world.browser.find_by_css('.submission-error.is-shown')
     assert (msg in login_error_div.text)
 
 
@@ -49,6 +49,6 @@ def user_is_an_activated_user(uname):
 
 
 def fill_in_the_login_form(field, value):
-    login_form = world.browser.find_by_css('form#login_form')
+    login_form = world.browser.find_by_css('form#login-form')
     form_field = login_form.find_by_name(field)
     form_field.fill(value)

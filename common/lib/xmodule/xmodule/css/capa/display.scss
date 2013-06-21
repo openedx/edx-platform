@@ -551,8 +551,22 @@ section.problem {
   section.action {
     margin-top: 20px;
 
-    input.save {
+    .save, .check, .show {
+      height: ($baseline*2);
+      font-weight: 600;
+      vertical-align: middle;
+    }
+
+    .save {
       @extend .blue-button;
+    }
+
+    .show {
+
+      .show-label {
+        font-size: 1.0em;
+        font-weight: 600;
+      }
     }
 
     .submission_feedback {
@@ -811,13 +825,13 @@ section.problem {
       }
       .selected-grade {
         background: #666;
-        color: white; 
+        color: white;
       }
       input[type=radio]:checked + label {
         background: #666;
         color: white; }
       input[class='score-selection'] {
-        display: none; 
+        display: none;
       }
   }
 
@@ -878,11 +892,11 @@ section.problem {
         .tag-status, .tag { padding: .25em .5em; }
       }
     }
-    textarea.comment { 
+    textarea.comment {
       $num-lines-to-show: 5;
       $line-height: 1.4em;
       $padding: .2em;
-      width: 100%; 
+      width: 100%;
       padding: $padding (2 * $padding);
       line-height: $line-height;
       height: ($num-lines-to-show * $line-height) + (2*$padding) - (($line-height - 1)/2);

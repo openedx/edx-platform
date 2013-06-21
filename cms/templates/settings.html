@@ -15,7 +15,6 @@ from contentstore import utils
   <script src="${static.url('js/vendor/date.js')}"></script>
 
   <script type="text/javascript" src="${static.url('js/template_loader.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/views/server_error.js')}"></script>
   <script type="text/javascript" src="${static.url('js/models/course_relative.js')}"></script>
   <script type="text/javascript" src="${static.url('js/views/validating_view.js')}"></script>
   <script type="text/javascript" src="${static.url('js/views/settings/main_settings_view.js')}"></script>
@@ -32,15 +31,15 @@ from contentstore import utils
         });
       var model = new CMS.Models.Settings.CourseDetails();
       model.urlRoot = '${details_url}';
-      model.fetch({success :
-          function(model) {
-              var editor = new CMS.Views.Settings.Details({
-                  el: $('.settings-details'),
-                  model: model
-                });
-
-              editor.render();
-          }
+      model.fetch({
+        success: function(model) {
+          var editor = new CMS.Views.Settings.Details({
+              el: $('.settings-details'),
+              model: model
+          });
+          editor.render();
+        },
+        reset: true
       });
     });
 
@@ -50,10 +49,10 @@ from contentstore import utils
 <%block name="content">
 <div class="wrapper-mast wrapper">
   <header class="mast has-subtitle">
-    <div class="title">
-      <span class="title-sub">Settings</span>
-      <h1 class="title-1">Schedule &amp; Details</h1>
-    </div>
+    <h1 class="page-header">
+      <small class="subtitle">Settings</small>
+      <span class="sr">&gt; </span>Schedule &amp; Details
+    </h1>
   </header>
 </div>
 
@@ -92,7 +91,7 @@ from contentstore import utils
 
             <ul class="list-actions">
               <li class="action-item">
-                <a title="Send a note to students via email" href="mailto:someone@domain.com?Subject=Enroll%20in%20${context_course.display_name_with_default}&body=The%20course%20&quot;${context_course.display_name_with_default}&quot;,%20provided%20by%20edX,%20is%20open%20for%20enrollment.%20Please%20navigate%20to%20this%20course%20at%20https:${utils.get_lms_link_for_about_page(course_location)}%20to%20enroll." class="action action-primary"><i class="ss-icon icon ss-symbolicons-standard icon icon-inline icon-announcement">&#x2709;</i> Invite your students</a>
+                <a title="Send a note to students via email" href="mailto:someone@domain.com?Subject=Enroll%20in%20${context_course.display_name_with_default}&body=The%20course%20&quot;${context_course.display_name_with_default}&quot;,%20provided%20by%20edX,%20is%20open%20for%20enrollment.%20Please%20navigate%20to%20this%20course%20at%20https:${utils.get_lms_link_for_about_page(course_location)}%20to%20enroll." class="action action-primary"><i class="icon-envelope-alt icon-inline"></i> Invite your students</a>
               </li>
             </ul>
           </div>

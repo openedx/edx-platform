@@ -2,6 +2,7 @@
 // ====================
 
 .wrapper-header {
+  @extend .depth3;
   margin: 0;
   padding: $baseline;
   border-bottom: 1px solid $gray;
@@ -10,7 +11,6 @@
   height: 76px;
   position: relative;
   width: 100%;
-  z-index: 1000;
 
   a {
     color: $baseFontColor;
@@ -67,7 +67,7 @@
   padding-right: ($baseline*0.75);
 
   a {
-    @include text-hide();
+    @extend .text-hide;
     display: block;
     width: 164px;
     height: 32px;
@@ -106,13 +106,19 @@
     width: 1px;
   }
 
-  .course-org {
-    margin-right: ($baseline/4);
-  }
-
   .course-number, .course-org {
     @include font-size(12);
     display: inline-block;
+    max-width: 70px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    line-height: 1.3;
+  }
+
+  .course-org {
+    margin-right: ($baseline/4);
+    max-width: 140px;
   }
 
   .course-title {
@@ -132,9 +138,9 @@
 
 // specific elements - course nav
 .nav-course {
-  width: 285px;
+  width: 290px;
+  @extend .t-copy-sub1;
   margin-top: -($baseline/4);
-  @include font-size(14);
 
   > ol > .nav-item {
     vertical-align: bottom;
@@ -146,14 +152,14 @@
 
     .title {
       display: block;
-      padding: 5px;
+      padding: 0 ($baseline/4);
       text-transform: uppercase;
       font-weight: 600;
       color: $gray-d3;
 
       .label-prefix {
-        display: block;
         @include font-size(11);
+        display: block;
         font-weight: 400;
       }
     }
@@ -213,10 +219,11 @@
   .nav-item {
     position: relative;
 
-    .icon-expand {
+    .icon-caret-down {
       @include font-size(14);
       @include transition (color 0.5s ease-in-out, opacity 0.5s ease-in-out);
       display: inline-block;
+      vertical-align: middle;
       margin-left: 2px;
       opacity: 0.5;
       color: $gray-l2;
@@ -224,7 +231,7 @@
 
     &:hover {
 
-      .icon-expand {
+      .icon-caret-down {
         color: $blue;
         opacity: 1.0;
       }
@@ -236,7 +243,7 @@
     left: -7px;
     top: 47px;
     width: 140px;
-    opacity: 0;
+    opacity: 0.0;
     pointer-events: none;
   }
 
@@ -516,21 +523,21 @@ body.signup .nav-not-signedin-signin {
 
   a {
     background-color: #d9e3ee;
-    color: #6d788b;    
+    color: #6d788b;
   }
 }
 
 body.signin .nav-not-signedin-signup {
-  
+
   a {
     background-color: #62aaf5;
-    color: #fff;    
+    color: #fff;
   }
 }
 
 // ====================
 
-// STATE: js enabled 
+// STATE: js enabled
 .js {
 
   .nav-dropdown {
@@ -551,7 +558,7 @@ body.signin .nav-not-signedin-signup {
 
   .wrapper-nav-sub {
     @include transition (opacity 1.0s ease-in-out 0s);
-    opacity: 0;
+    opacity: 0.0;
     pointer-events: none;
 
     &.is-shown {

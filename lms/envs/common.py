@@ -18,6 +18,11 @@ Longer TODO:
 3. We need to handle configuration for multiple courses. This could be as
    multiple sites, but we do need a way to map their data assets.
 """
+
+# We intentionally define lots of variables that aren't used, and
+# want to import all variables from base settings files
+# pylint: disable=W0401, W0614
+
 import sys
 import os
 
@@ -26,6 +31,9 @@ from path import path
 from .discussionsettings import *
 
 ################################### FEATURES ###################################
+# The display name of the platform to be used in templates/emails/etc.
+PLATFORM_NAME = "edX"
+
 COURSEWARE_ENABLED = True
 ENABLE_JASMINE = False
 
@@ -36,13 +44,14 @@ DISCUSSION_SETTINGS = {
     'MAX_COMMENT_DEPTH': 2,
 }
 
+
 # Features
 MITX_FEATURES = {
     'SAMPLE': False,
     'USE_DJANGO_PIPELINE': True,
     'DISPLAY_HISTOGRAMS_TO_STAFF': True,
-    'REROUTE_ACTIVATION_EMAIL': False,		# nonempty string = address for all activation emails
-    'DEBUG_LEVEL': 0,				# 0 = lowest level, least verbose, 255 = max level, most verbose
+    'REROUTE_ACTIVATION_EMAIL': False,  # nonempty string = address for all activation emails
+    'DEBUG_LEVEL': 0,  # 0 = lowest level, least verbose, 255 = max level, most verbose
 
     ## DO NOT SET TO True IN THIS FILE
     ## Doing so will cause all courses to be released on production
@@ -58,14 +67,15 @@ MITX_FEATURES = {
     # university to use for branding purposes
     'SUBDOMAIN_BRANDING': False,
 
-    'FORCE_UNIVERSITY_DOMAIN': False,  	# set this to the university domain to use, as an override to HTTP_HOST
+    'FORCE_UNIVERSITY_DOMAIN': False,  # set this to the university domain to use, as an override to HTTP_HOST
                                         # set to None to do no university selection
 
     'ENABLE_TEXTBOOK': True,
     'ENABLE_DISCUSSION_SERVICE': True,
 
-    'ENABLE_PSYCHOMETRICS': False,  	# real-time psychometrics (eg item response theory analysis in instructor dashboard)
+    'ENABLE_PSYCHOMETRICS': False,  # real-time psychometrics (eg item response theory analysis in instructor dashboard)
 
+    'ENABLE_DJANGO_ADMIN_SITE': False,  # set true to enable django's admin site, even on prod (e.g. for course ops)
     'ENABLE_SQL_TRACKING_LOGS': False,
     'ENABLE_LMS_MIGRATION': False,
     'ENABLE_MANUAL_GIT_RELOAD': False,
@@ -74,7 +84,7 @@ MITX_FEATURES = {
 
     'DISABLE_LOGIN_BUTTON': False,  # used in systems where login is automatic, eg MIT SSL
 
-    'STUB_VIDEO_FOR_TESTING': False,   # do not display video when running automated acceptance tests
+    'STUB_VIDEO_FOR_TESTING': False,  # do not display video when running automated acceptance tests
 
     # extrernal access methods
     'ACCESS_REQUIRE_STAFF_FOR_COURSE': False,
@@ -99,8 +109,27 @@ MITX_FEATURES = {
     # Staff Debug tool.
     'ENABLE_STUDENT_HISTORY_VIEW': True,
 
+    # segment.io for LMS--need to explicitly turn it on on production.
+    'SEGMENT_IO_LMS': False,
+
+    # Enables the student notes API and UI.
+    'ENABLE_STUDENT_NOTES': True,
+
     # Provide a UI to allow users to submit feedback from the LMS
     'ENABLE_FEEDBACK_SUBMISSION': False,
+
+    # Turn on a page that lets staff enter Python code to be run in the
+    # sandbox, for testing whether it's enabled properly.
+    'ENABLE_DEBUG_RUN_PYTHON': False,
+
+    # Enable URL that shows information about the status of variuous services
+    'ENABLE_SERVICE_STATUS': False,
+
+    # Toggle to indicate use of a custom theme
+    'USE_CUSTOM_THEME': False,
+
+    # Do autoplay videos for students
+    'AUTOPLAY_VIDEOS': True
 }
 
 # Used for A/B testing
@@ -110,7 +139,7 @@ DEFAULT_GROUPS = []
 GENERATE_PROFILE_SCORES = False
 
 # Used with XQueue
-XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5   # seconds
+XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5  # seconds
 
 
 ############################# SET PATH INFORMATION #############################
@@ -130,9 +159,7 @@ sys.path.append(COMMON_ROOT / 'lib')
 
 # For Node.js
 
-system_node_path = os.environ.get("NODE_PATH", None)
-if system_node_path is None:
-    system_node_path = "/usr/local/lib/node_modules"
+system_node_path = os.environ.get("NODE_PATH", REPO_ROOT / 'node_modules')
 
 node_paths = [COMMON_ROOT / "static/js/vendor",
               COMMON_ROOT / "static/coffee/src",
@@ -160,20 +187,20 @@ MAKO_TEMPLATES['main'] = [PROJECT_ROOT / 'templates',
 
 # This is where Django Template lookup is defined. There are a few of these
 # still left lying around.
-TEMPLATE_DIRS = (
+TEMPLATE_DIRS = [
     PROJECT_ROOT / "templates",
     COMMON_ROOT / 'templates',
     COMMON_ROOT / 'lib' / 'capa' / 'capa' / 'templates',
     COMMON_ROOT / 'djangoapps' / 'pipeline_mako' / 'templates',
-)
+]
 
 TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.request',
     'django.core.context_processors.static',
     'django.contrib.messages.context_processors.messages',
     #'django.core.context_processors.i18n',
-    'django.contrib.auth.context_processors.auth',   # this is required for admin
-    'django.core.context_processors.csrf',   # necessary for csrf protection
+    'django.contrib.auth.context_processors.auth',  # this is required for admin
+    'django.core.context_processors.csrf',  # necessary for csrf protection
 
     # Added for django-wiki
     'django.core.context_processors.media',
@@ -181,9 +208,12 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.messages.context_processors.messages',
     'sekizai.context_processors.sekizai',
     'course_wiki.course_nav.context_processor',
+
+    # Hack to get required link URLs to password reset templates
+    'mitxmako.shortcuts.marketing_link_context_processor',
 )
 
-STUDENT_FILEUPLOAD_MAX_SIZE = 4 * 1000 * 1000   # 4 MB
+STUDENT_FILEUPLOAD_MAX_SIZE = 4 * 1000 * 1000  # 4 MB
 MAX_FILEUPLOADS_PER_INPUT = 20
 
 # FIXME:
@@ -193,7 +223,7 @@ LIB_URL = '/static/js/'
 
 # Dev machines shouldn't need the book
 # BOOK_URL = '/static/book/'
-BOOK_URL = 'https://mitxstatic.s3.amazonaws.com/book_images/'   # For AWS deploys
+BOOK_URL = 'https://mitxstatic.s3.amazonaws.com/book_images/'  # For AWS deploys
 # RSS_URL = r'lms/templates/feed.rss'
 # PRESS_URL = r''
 RSS_TIMEOUT = 600
@@ -217,14 +247,14 @@ COURSE_TITLE = "Circuits and Electronics"
 
 ### Dark code. Should be enabled in local settings for devel.
 
-ENABLE_MULTICOURSE = False     # set to False to disable multicourse display (see lib.util.views.mitxhome)
+ENABLE_MULTICOURSE = False  # set to False to disable multicourse display (see lib.util.views.mitxhome)
 
 WIKI_ENABLED = False
 
 ###
 
 COURSE_DEFAULT = '6.002x_Fall_2012'
-COURSE_SETTINGS =  {'6.002x_Fall_2012': {'number': '6.002x',
+COURSE_SETTINGS = {'6.002x_Fall_2012': {'number': '6.002x',
                                           'title': 'Circuits and Electronics',
                                           'xmlpath': '6002x/',
                                           'location': 'i4x://edx/6002xs12/course/6.002x_Fall_2012',
@@ -252,6 +282,31 @@ MODULESTORE = {
 }
 CONTENTSTORE = None
 
+#################### Python sandbox ############################################
+
+CODE_JAIL = {
+    # Path to a sandboxed Python executable.  None means don't bother.
+    'python_bin': None,
+    # User to run as in the sandbox.
+    'user': 'sandbox',
+
+    # Configurable limits.
+    'limits': {
+        # How many CPU seconds can jailed code use?
+        'CPU': 1,
+    },
+}
+
+# Some courses are allowed to run unsafe code. This is a list of regexes, one
+# of them must match the course id for that course to run unsafe code.
+#
+# For example:
+#
+#   COURSES_WITH_UNSAFE_CODE = [
+#       r"Harvard/XY123.1/.*"
+#   ]
+COURSES_WITH_UNSAFE_CODE = []
+
 ############################ SIGNAL HANDLERS ################################
 # This is imported to register the exception signal handling that logs exceptions
 import monitoring.exceptions  # noqa
@@ -260,6 +315,7 @@ import monitoring.exceptions  # noqa
 # Change DEBUG/TEMPLATE_DEBUG in your environment settings files, not here
 DEBUG = False
 TEMPLATE_DEBUG = False
+USE_TZ = True
 
 # Site info
 SITE_ID = 1
@@ -273,6 +329,9 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'registration@edx.org'
 DEFAULT_FEEDBACK_EMAIL = 'feedback@edx.org'
 SERVER_EMAIL = 'devops@edx.org'
+TECH_SUPPORT_EMAIL = 'technical@edx.org'
+CONTACT_EMAIL = 'info@edx.org'
+BUGS_EMAIL = 'bugs@edx.org'
 ADMINS = (
     ('edX Admins', 'admin@edx.org'),
 )
@@ -288,9 +347,11 @@ STATICFILES_DIRS = [
     PROJECT_ROOT / "static",
 ]
 
+FAVICON_PATH = 'images/favicon.ico'
+
 # Locale/Internationalization
-TIME_ZONE = 'America/New_York'   # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
-LANGUAGE_CODE = 'en'   # http://www.i18nguy.com/unicode/language-identifiers.html
+TIME_ZONE = 'America/New_York'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
+LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
 USE_I18N = True
 USE_L10N = True
 
@@ -311,7 +372,7 @@ ALLOWED_GITRELOAD_IPS = ['207.97.227.253', '50.57.128.197', '108.171.174.178']
 # setting is, I'm just bumping the expiration time to something absurd (100
 # years). This is only used if DEFAULT_FILE_STORAGE is overriden to use S3
 # in the global settings.py
-AWS_QUERYSTRING_EXPIRE = 10 * 365 * 24 * 60 * 60   # 10 years
+AWS_QUERYSTRING_EXPIRE = 10 * 365 * 24 * 60 * 60  # 10 years
 
 ################################# SIMPLEWIKI ###################################
 SIMPLE_WIKI_REQUIRE_LOGIN_EDIT = True
@@ -320,8 +381,8 @@ SIMPLE_WIKI_REQUIRE_LOGIN_VIEW = False
 ################################# WIKI ###################################
 WIKI_ACCOUNT_HANDLING = False
 WIKI_EDITOR = 'course_wiki.editors.CodeMirror'
-WIKI_SHOW_MAX_CHILDREN = 0   # We don't use the little menu that shows children of an article in the breadcrumb
-WIKI_ANONYMOUS = False   # Don't allow anonymous access until the styling is figured out
+WIKI_SHOW_MAX_CHILDREN = 0  # We don't use the little menu that shows children of an article in the breadcrumb
+WIKI_ANONYMOUS = False  # Don't allow anonymous access until the styling is figured out
 WIKI_CAN_CHANGE_PERMISSIONS = lambda article, user: user.is_staff or user.is_superuser
 WIKI_CAN_ASSIGN = lambda article, user: user.is_staff or user.is_superuser
 
@@ -404,6 +465,7 @@ MIDDLEWARE_CLASSES = (
     # 'debug_toolbar.middleware.DebugToolbarMiddleware',
 
     'django_comment_client.utils.ViewNameMiddleware',
+    'codejail.django_integration.ConfigureCodeJailMiddleware',
 )
 
 ############################### Pipeline #######################################
@@ -431,11 +493,15 @@ main_vendor_js = [
   'js/vendor/jquery.qtip.min.js',
   'js/vendor/swfobject/swfobject.js',
   'js/vendor/jquery.ba-bbq.min.js',
+  'js/vendor/annotator.min.js',
+  'js/vendor/annotator.store.min.js',
+  'js/vendor/annotator.tags.min.js'
 ]
 
 discussion_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/discussion/**/*.js'))
 staff_grading_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/staff_grading/**/*.js'))
 open_ended_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/open_ended/**/*.js'))
+notes_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/notes/**/*.coffee'))
 
 PIPELINE_CSS = {
     'application': {
@@ -448,6 +514,7 @@ PIPELINE_CSS = {
             'css/vendor/jquery.treeview.css',
             'css/vendor/ui-lightness/jquery-ui-1.8.22.custom.css',
             'css/vendor/jquery.qtip.min.css',
+            'css/vendor/annotator.min.css',
             'sass/course.css',
             'xmodule/modules.css',
         ],
@@ -469,7 +536,7 @@ PIPELINE_JS = {
         'source_filenames': sorted(
             set(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/**/*.js') +
                 rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/**/*.js')) -
-            set(courseware_js + discussion_js + staff_grading_js + open_ended_js)
+            set(courseware_js + discussion_js + staff_grading_js + open_ended_js + notes_js)
         ) + [
             'js/form.ext.js',
             'js/my_courses_dropdown.js',
@@ -510,7 +577,12 @@ PIPELINE_JS = {
         'source_filenames': open_ended_js,
         'output_filename': 'js/open_ended.js',
         'test_order': 6,
-    }
+    },
+    'notes': {
+        'source_filenames': notes_js,
+        'output_filename': 'js/notes.js',
+        'test_order': 7
+    },
 }
 
 PIPELINE_DISABLE_WRAPPER = True
@@ -528,7 +600,7 @@ if os.path.isdir(DATA_DIR):
                 new_filename = os.path.splitext(filename)[0] + ".js"
                 if os.path.exists(js_dir / new_filename):
                     coffee_timestamp = os.stat(js_dir / filename).st_mtime
-                    js_timestamp     = os.stat(js_dir / new_filename).st_mtime
+                    js_timestamp = os.stat(js_dir / new_filename).st_mtime
                     if coffee_timestamp <= js_timestamp:
                         continue
                 os.system("rm %s" % (js_dir / new_filename))
@@ -548,7 +620,52 @@ PIPELINE_YUI_BINARY = 'yui-compressor'
 # Setting that will only affect the MITx version of django-pipeline until our changes are merged upstream
 PIPELINE_COMPILE_INPLACE = True
 
-################################### APPS #######################################
+################################# CELERY ######################################
+
+# Message configuration
+
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+
+CELERY_MESSAGE_COMPRESSION = 'gzip'
+
+# Results configuration
+
+CELERY_IGNORE_RESULT = False
+CELERY_STORE_ERRORS_EVEN_IF_IGNORED = True
+
+# Events configuration
+
+CELERY_TRACK_STARTED = True
+
+CELERY_SEND_EVENTS = True
+CELERY_SEND_TASK_SENT_EVENT = True
+
+# Exchange configuration
+
+CELERY_DEFAULT_EXCHANGE = 'edx.core'
+CELERY_DEFAULT_EXCHANGE_TYPE = 'direct'
+
+# Queues configuration
+
+HIGH_PRIORITY_QUEUE = 'edx.core.high'
+DEFAULT_PRIORITY_QUEUE = 'edx.core.default'
+LOW_PRIORITY_QUEUE = 'edx.core.low'
+
+CELERY_QUEUE_HA_POLICY = 'all'
+
+CELERY_CREATE_MISSING_QUEUES = True
+
+CELERY_DEFAULT_QUEUE = DEFAULT_PRIORITY_QUEUE
+CELERY_DEFAULT_ROUTING_KEY = DEFAULT_PRIORITY_QUEUE
+
+CELERY_QUEUES = {
+    HIGH_PRIORITY_QUEUE: {},
+    LOW_PRIORITY_QUEUE: {},
+    DEFAULT_PRIORITY_QUEUE: {}
+}
+
+################################### APPS ######################################
 INSTALLED_APPS = (
     # Standard ones that are always installed...
     'django.contrib.auth',
@@ -557,9 +674,14 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.sessions',
     'django.contrib.sites',
+    'djcelery',
     'south',
 
+    # Monitor the status of services
+    'service_status',
+
     # For asset pipelining
+    'mitxmako',
     'pipeline',
     'staticfiles',
     'static_replace',
@@ -582,9 +704,9 @@ INSTALLED_APPS = (
     'course_groups',
 
     #For the wiki
-    'wiki',   # The new django-wiki from benjaoming
+    'wiki',  # The new django-wiki from benjaoming
     'django_notify',
-    'course_wiki',   # Our customizations
+    'course_wiki',  # Our customizations
     'mptt',
     'sekizai',
     #'wiki.plugins.attachments',
@@ -596,9 +718,53 @@ INSTALLED_APPS = (
     'foldit',
 
     # For testing
-    'django.contrib.admin',   # only used in DEBUG mode
+    'django.contrib.admin',  # only used in DEBUG mode
+    'debug',
 
     # Discussion forums
     'django_comment_client',
+    'django_comment_common',
+    'notes',
 )
+
+######################### MARKETING SITE ###############################
+EDXMKTG_COOKIE_NAME = 'edxloggedin'
+MKTG_URLS = {}
+MKTG_URL_LINK_MAP = {
+    'ABOUT': 'about_edx',
+    'CONTACT': 'contact',
+    'FAQ': 'help_edx',
+    'COURSES': 'courses',
+    'ROOT': 'root',
+    'TOS': 'tos',
+    'HONOR': 'honor',
+    'PRIVACY': 'privacy_edx',
+}
+
+############################### THEME ################################
+def enable_theme(theme_name):
+    """
+    Enable the settings for a custom theme, whose files should be stored
+    in ENV_ROOT/themes/THEME_NAME (e.g., edx_all/themes/stanford).
+
+    The THEME_NAME setting should be configured separately since it can't
+    be set here (this function closes too early). An idiom for doing this
+    is:
+
+    THEME_NAME = "stanford"
+    enable_theme(THEME_NAME)
+    """
+    MITX_FEATURES['USE_CUSTOM_THEME'] = True
+
+    # Calculate the location of the theme's files
+    theme_root = ENV_ROOT / "themes" / theme_name
+
+    # Include the theme's templates in the template search paths
+    TEMPLATE_DIRS.append(theme_root / 'templates')
+    MAKO_TEMPLATES['main'].append(theme_root / 'templates')
+
+    # Namespace the theme's static files to 'themes/<theme_name>' to
+    # avoid collisions with default edX static files
+    STATICFILES_DIRS.append((u'themes/%s' % theme_name,
+                             theme_root / 'static'))
 

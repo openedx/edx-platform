@@ -7,6 +7,11 @@ sessions. Assumes structure:
         /mitx # The location of this repo
         /log  # Where we're going to write log files
 """
+
+# We intentionally define lots of variables that aren't used, and
+# want to import all variables from base settings files
+# pylint: disable=W0401, W0614
+
 from .common import *
 import os
 from path import path
@@ -41,14 +46,14 @@ MODULESTORE_OPTIONS = {
     'default_class': 'xmodule.raw_module.RawDescriptor',
     'host': 'localhost',
     'db': 'test_xmodule',
-    'collection': 'modulestore',
-    'fs_root': GITHUB_REPO_ROOT,
-    'render_template': 'mitxmako.shortcuts.render_to_string',
+    'collection': 'test_modulestore',
+    'fs_root': TEST_ROOT / "data",
+    'render_template': 'mitxmako.shortcuts.render_to_string'
 }
 
 MODULESTORE = {
     'default': {
-        'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
+        'ENGINE': 'xmodule.modulestore.mongo.DraftMongoModuleStore',
         'OPTIONS': MODULESTORE_OPTIONS
     },
     'direct': {
@@ -77,6 +82,7 @@ DATABASES = {
 }
 
 LMS_BASE = "localhost:8000"
+MITX_FEATURES['PREVIEW_LMS_BASE'] = "preview"
 
 CACHES = {
     # This is the cache used for most things. Askbot will not work without a
@@ -108,8 +114,14 @@ CACHES = {
     }
 }
 
+################################# CELERY ######################################
+
+CELERY_ALWAYS_EAGER = True
+CELERY_RESULT_BACKEND = 'cache'
+BROKER_TRANSPORT = 'memory'
+
 ################### Make tests faster
-#http://slacy.com/blog/2012/04/make-your-tests-faster-in-django-1-4/
+# http://slacy.com/blog/2012/04/make-your-tests-faster-in-django-1-4/
 PASSWORD_HASHERS = (
     'django.contrib.auth.hashers.SHA1PasswordHasher',
     'django.contrib.auth.hashers.MD5PasswordHasher',
@@ -121,3 +133,4 @@ SEGMENT_IO_KEY = '***REMOVED***'
 # disable NPS survey in test mode
 MITX_FEATURES['STUDIO_NPS_SURVEY'] = False
 
+MITX_FEATURES['ENABLE_SERVICE_STATUS'] = True

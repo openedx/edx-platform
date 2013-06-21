@@ -12,9 +12,15 @@ $fg-max-columns: 12;
 $fg-max-width: 1280px;
 $fg-min-width: 900px;
 
-// type
-$sans-serif: 'Open Sans', $verdana;
-$body-line-height: golden-ratio(.875em, 1);
+// ====================
+
+// fonts
+$f-serif: 'Bree Serif', Georgia, Cambria, 'Times New Roman', Times, serif;
+$f-sans-serif: 'Open Sans','Helvetica Neue', Helvetica, Arial, sans-serif;
+$f-decorative: '';
+$f-monospace: 'Bitstream Vera Sans Mono', Consolas, Courier, monospace;
+
+// ====================
 
 // colors - new for re-org
 $black: rgb(0,0,0);
@@ -152,11 +158,14 @@ $shadow-l1: rgba(0,0,0,0.1);
 $shadow-l2: rgba(0,0,0,0.05);
 $shadow-d1: rgba(0,0,0,0.4);
 
+// ====================
 
 // specific UI
 $notification-height: ($baseline*10);
 
-// colors - inherited 
+// ====================
+
+// inherited
 $baseFontColor: $gray-d2;
 $offBlack: #3c3c3c;
 $green: #108614;
@@ -173,3 +182,8 @@ $darkGreen: rgb(52, 133, 76);
 $lightBluishGrey: rgb(197, 207, 223);
 $lightBluishGrey2: rgb(213, 220, 228);
 $error-red: rgb(253, 87, 87);
+
+// type
+$sans-serif: $f-sans-serif;
+$body-line-height: golden-ratio(.875em, 1);
+

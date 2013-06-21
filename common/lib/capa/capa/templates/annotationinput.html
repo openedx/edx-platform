@@ -14,7 +14,7 @@
     <div class="block block-comment">${comment}</div>
 
     <div class="block">${comment_prompt}</div>
-    <textarea class="comment" id="input_${id}_comment" name="input_${id}_comment">${comment_value|h}</textarea>
+    <textarea class="comment" id="input_${id}_comment" name="input_${id}_comment" aria-describedby="answer_${id}">${comment_value|h}</textarea>
 
     <div class="block">${tag_prompt}</div>
     <ul class="tags">
@@ -22,11 +22,11 @@
         <li>
             % if has_options_value:
                 % if all([c == 'correct' for c in option['choice'], status]):
-                <span class="tag-status correct" id="status_${id}"></span>
+                <span class="tag-status correct" id="status_${id}" aria-describedby="input_${id}_comment"><span class="sr">Status: Correct</span></span>
                 % elif all([c == 'partially-correct' for c in option['choice'], status]):
-                <span class="tag-status partially-correct" id="status_${id}"></span>
+                <span class="tag-status partially-correct" id="status_${id}" aria-describedby="input_${id}_comment"><span class="sr">Status: Partially Correct</span></span>
                 % elif all([c == 'incorrect' for c in option['choice'], status]):
-                <span class="tag-status incorrect" id="status_${id}"></span>
+                <span class="tag-status incorrect" id="status_${id}" aria-describedby="input_${id}_comment"><span class="sr">Status: Incorrect</span></span>
                 % endif
             % endif
 
@@ -53,11 +53,11 @@
     % endif
 
     % if status == 'unsubmitted':
-    <span class="unanswered" style="display:inline-block;" id="status_${id}"></span>
+    <span class="unanswered" style="display:inline-block;" id="status_${id}" aria-describedby="input_${id}"><span class="sr">Status: Unanswered</span></span>
     % elif status == 'incomplete':
-    <span class="incorrect" id="status_${id}"></span>
+    <span class="incorrect" id="status_${id}" aria-describedby="input_${id}"><span class="sr">Status: Incorrect</span></span>
     % elif status == 'incorrect' and not has_options_value:
-    <span class="incorrect" id="status_${id}"></span>
+    <span class="incorrect" id="status_${id}" aria-describedby="input_${id}"><span class="sr">Status: Incorrect</span></span>
     % endif
 
     <p id="answer_${id}" class="answer answer-annotation"></p>

@@ -16,7 +16,6 @@ import json
 import logging
 import uuid
 from random import randint
-from time import strftime
 
 
 from django.conf import settings
@@ -27,6 +26,7 @@ from django.dispatch import receiver
 from django.forms import ModelForm, forms
 
 import comment_client as cc
+from pytz import UTC
 
 
 log = logging.getLogger(__name__)
@@ -54,7 +54,7 @@ class UserProfile(models.Model):
     class Meta:
         db_table = "auth_userprofile"
 
-    ## CRITICAL TODO/SECURITY
+    # CRITICAL TODO/SECURITY
     # Sanitize all fields.
     # This is not visible to other users, but could introduce holes later
     user = models.OneToOneField(User, unique=True, db_index=True, related_name='profile')
@@ -254,7 +254,7 @@ class TestCenterUserForm(ModelForm):
     def update_and_save(self):
         new_user = self.save(commit=False)
         # create additional values here:
-        new_user.user_updated_at = datetime.utcnow()
+        new_user.user_updated_at = datetime.now(UTC)
         new_user.upload_status = ''
         new_user.save()
         log.info("Updated demographic information for user's test center exam registration: username \"{}\" ".format(new_user.user.username))
@@ -429,8 +429,8 @@ class TestCenterRegistration(models.Model):
         registration.course_id = exam.course_id
         registration.accommodation_request = accommodation_request.strip()
         registration.exam_series_code = exam.exam_series_code
-        registration.eligibility_appointment_date_first = strftime("%Y-%m-%d", exam.first_eligible_appointment_date)
-        registration.eligibility_appointment_date_last = strftime("%Y-%m-%d", exam.last_eligible_appointment_date)
+        registration.eligibility_appointment_date_first = exam.first_eligible_appointment_date.strftime("%Y-%m-%d")
+        registration.eligibility_appointment_date_last = exam.last_eligible_appointment_date.strftime("%Y-%m-%d")
         registration.client_authorization_id = cls._create_client_authorization_id()
         # accommodation_code remains blank for now, along with Pearson confirmation information
         return registration
@@ -556,7 +556,7 @@ class TestCenterRegistrationForm(ModelForm):
     def update_and_save(self):
         registration = self.save(commit=False)
         # create additional values here:
-        registration.user_updated_at = datetime.utcnow()
+        registration.user_updated_at = datetime.now(UTC)
         registration.upload_status = ''
         registration.save()
         log.info("Updated registration information for user's test center exam registration: username \"{}\" course \"{}\", examcode \"{}\"".format(registration.testcenter_user.user.username, registration.course_id, registration.exam_series_code))
@@ -598,7 +598,7 @@ def unique_id_for_user(user):
     return h.hexdigest()
 
 
-## TODO: Should be renamed to generic UserGroup, and possibly
+# TODO: Should be renamed to generic UserGroup, and possibly
 # Given an optional field for type of group
 class UserTestGroup(models.Model):
     users = models.ManyToManyField(User, db_index=True)
@@ -626,7 +626,6 @@ class Registration(models.Model):
     def activate(self):
         self.user.is_active = True
         self.user.save()
-        #self.delete()
 
 
 class PendingNameChange(models.Model):
@@ -648,7 +647,7 @@ class CourseEnrollment(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, db_index=True)
 
     class Meta:
-        unique_together = (('user', 'course_id'), )
+        unique_together = (('user', 'course_id'),)
 
     def __unicode__(self):
         return "[CourseEnrollment] %s: %s (%s)" % (self.user, self.course_id, self.created)
@@ -662,16 +661,17 @@ class CourseEnrollmentAllowed(models.Model):
     """
     email = models.CharField(max_length=255, db_index=True)
     course_id = models.CharField(max_length=255, db_index=True)
+    auto_enroll = models.BooleanField(default=0)
 
     created = models.DateTimeField(auto_now_add=True, null=True, db_index=True)
 
     class Meta:
-        unique_together = (('email', 'course_id'), )
+        unique_together = (('email', 'course_id'),)
 
     def __unicode__(self):
         return "[CourseEnrollmentAllowed] %s: %s (%s)" % (self.email, self.course_id, self.created)
 
-#cache_relation(User.profile)
+# cache_relation(User.profile)
 
 #### Helper methods for use from python manage.py shell and other classes.
 

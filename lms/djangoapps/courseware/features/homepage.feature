@@ -5,36 +5,27 @@ Feature: Homepage for web users
 
   Scenario: User can see the "Login" button
     Given I visit the homepage
-    Then I should see a link called "Log In"
+    Then I should see a link called "Log in"
 
-  Scenario: User can see the "Sign up" button
+  Scenario: User can see the "Register Now" button
     Given I visit the homepage
-    Then I should see a link called "Sign Up"
+    Then I should see a link called "Register Now"
 
   Scenario Outline: User can see main parts of the page
     Given I visit the homepage
-    Then I should see a link called "<Link>"
-    When I click the link with the text "<Link>"
-    Then I should see that the path is "<Path>"
+    Then I should see the following links and ids
+    | id      | Link   |
+    | about   | About  |
+    | jobs    | Jobs   |
+    | faq     | FAQ    |
+    | contact | Contact|
+    | press   | Press  |
 
-    Examples:
-    | Link         | Path     |
-    | Find Courses | /courses |
-    | About        | /about   |
-    | Jobs         | /jobs    |
-    | Contact      | /contact |
-
-  Scenario: User can visit the blog
-    Given I visit the homepage
-    When I click the link with the text "Blog"
-    Then I should see that the url is "http://blog.edx.org/"
 
   # TODO: test according to domain or policy
   Scenario: User can see the partner institutions
     Given I visit the homepage
-    Then I should see "<Partner>" in the Partners section
-
-    Examples:
+    Then I should see the following Partners in the Partners section
     | Partner     |
     | MITx        |
     | HarvardX    |

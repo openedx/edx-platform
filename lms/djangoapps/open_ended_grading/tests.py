@@ -5,19 +5,21 @@ django-admin.py test --settings=lms.envs.test --pythonpath=. lms/djangoapps/open
 """
 
 import json
-from mock import MagicMock
+from mock import MagicMock, patch, Mock
 
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import Group
+from django.http import HttpResponse
+from django.conf import settings
 from mitxmako.shortcuts import render_to_string
 
-from xmodule.open_ended_grading_classes import peer_grading_service
+from xmodule.open_ended_grading_classes import peer_grading_service, controller_query_service
 from xmodule import peer_grading_module
 from xmodule.modulestore.django import modulestore
 import xmodule.modulestore.django
 from xmodule.x_module import ModuleSystem
 
-from open_ended_grading import staff_grading_service
+from open_ended_grading import staff_grading_service, views
 from courseware.access import _course_staff_group_name
 from courseware.tests.tests import LoginEnrollmentTestCase, TEST_DATA_XML_MODULESTORE, get_user
 
@@ -25,10 +27,10 @@ import logging
 
 log = logging.getLogger(__name__)
 from django.test.utils import override_settings
-from django.http import QueryDict
 
 from xmodule.tests import test_util_open_ended
 
+from courseware.tests import factories
 
 @override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
 class TestStaffGradingService(LoginEnrollmentTestCase):
@@ -55,8 +57,8 @@ class TestStaffGradingService(LoginEnrollmentTestCase):
 
         def make_instructor(course):
             group_name = _course_staff_group_name(course.location)
-            g = Group.objects.create(name=group_name)
-            g.user_set.add(get_user(self.instructor))
+            group = Group.objects.create(name=group_name)
+            group.user_set.add(get_user(self.instructor))
 
         make_instructor(self.toy)
 
@@ -76,28 +78,28 @@ class TestStaffGradingService(LoginEnrollmentTestCase):
             self.check_for_get_code(404, url)
             self.check_for_post_code(404, url)
 
-
     def test_get_next(self):
         self.login(self.instructor, self.password)
 
         url = reverse('staff_grading_get_next', kwargs={'course_id': self.course_id})
         data = {'location': self.location}
 
-        r = self.check_for_post_code(200, url, data)
-        d = json.loads(r.content)
-        self.assertTrue(d['success'])
-        self.assertEquals(d['submission_id'], self.mock_service.cnt)
-        self.assertIsNotNone(d['submission'])
-        self.assertIsNotNone(d['num_graded'])
-        self.assertIsNotNone(d['min_for_ml'])
-        self.assertIsNotNone(d['num_pending'])
-        self.assertIsNotNone(d['prompt'])
-        self.assertIsNotNone(d['ml_error_info'])
-        self.assertIsNotNone(d['max_score'])
-        self.assertIsNotNone(d['rubric'])
+        response = self.check_for_post_code(200, url, data)
 
+        content = json.loads(response.content)
 
-    def save_grade_base(self,skip=False):
+        self.assertTrue(content['success'])
+        self.assertEquals(content['submission_id'], self.mock_service.cnt)
+        self.assertIsNotNone(content['submission'])
+        self.assertIsNotNone(content['num_graded'])
+        self.assertIsNotNone(content['min_for_ml'])
+        self.assertIsNotNone(content['num_pending'])
+        self.assertIsNotNone(content['prompt'])
+        self.assertIsNotNone(content['ml_error_info'])
+        self.assertIsNotNone(content['max_score'])
+        self.assertIsNotNone(content['rubric'])
+
+    def save_grade_base(self, skip=False):
         self.login(self.instructor, self.password)
 
         url = reverse('staff_grading_save_grade', kwargs={'course_id': self.course_id})
@@ -109,12 +111,12 @@ class TestStaffGradingService(LoginEnrollmentTestCase):
                 'submission_flagged': "true",
                 'rubric_scores[]': ['1', '2']}
         if skip:
-            data.update({'skipped' : True})
+            data.update({'skipped': True})
 
-        r = self.check_for_post_code(200, url, data)
-        d = json.loads(r.content)
-        self.assertTrue(d['success'], str(d))
-        self.assertEquals(d['submission_id'], self.mock_service.cnt)
+        response = self.check_for_post_code(200, url, data)
+        content = json.loads(response.content)
+        self.assertTrue(content['success'], str(content))
+        self.assertEquals(content['submission_id'], self.mock_service.cnt)
 
     def test_save_grade(self):
         self.save_grade_base(skip=False)
@@ -128,10 +130,11 @@ class TestStaffGradingService(LoginEnrollmentTestCase):
         url = reverse('staff_grading_get_problem_list', kwargs={'course_id': self.course_id})
         data = {}
 
-        r = self.check_for_post_code(200, url, data)
-        d = json.loads(r.content)
-        self.assertTrue(d['success'], str(d))
-        self.assertIsNotNone(d['problem_list'])
+        response = self.check_for_post_code(200, url, data)
+        content = json.loads(response.content)
+
+        self.assertTrue(content['success'], str(content))
+        self.assertIsNotNone(content['problem_list'])
 
 
 @override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
@@ -178,13 +181,14 @@ class TestPeerGradingService(LoginEnrollmentTestCase):
     def test_get_next_submission_success(self):
         data = {'location': self.location}
 
-        r = self.peer_module.get_next_submission(data)
-        d = json.loads(r)
-        self.assertTrue(d['success'])
-        self.assertIsNotNone(d['submission_id'])
-        self.assertIsNotNone(d['prompt'])
-        self.assertIsNotNone(d['submission_key'])
-        self.assertIsNotNone(d['max_score'])
+        response = self.peer_module.get_next_submission(data)
+        content = response
+
+        self.assertTrue(content['success'])
+        self.assertIsNotNone(content['submission_id'])
+        self.assertIsNotNone(content['prompt'])
+        self.assertIsNotNone(content['submission_key'])
+        self.assertIsNotNone(content['max_score'])
 
     def test_get_next_submission_missing_location(self):
         data = {}
@@ -212,9 +216,9 @@ class TestPeerGradingService(LoginEnrollmentTestCase):
         qdict.getlist = fake_get_item
         qdict.keys = data.keys
 
-        r = self.peer_module.save_grade(qdict)
-        d = json.loads(r)
-        self.assertTrue(d['success'])
+        response = self.peer_module.save_grade(qdict)
+
+        self.assertTrue(response['success'])
 
     def test_save_grade_missing_keys(self):
         data = {}
@@ -224,37 +228,35 @@ class TestPeerGradingService(LoginEnrollmentTestCase):
 
     def test_is_calibrated_success(self):
         data = {'location': self.location}
-        r = self.peer_module.is_student_calibrated(data)
-        d = json.loads(r)
-        self.assertTrue(d['success'])
-        self.assertTrue('calibrated' in d)
+        response = self.peer_module.is_student_calibrated(data)
+
+        self.assertTrue(response['success'])
+        self.assertTrue('calibrated' in response)
 
     def test_is_calibrated_failure(self):
         data = {}
-        d = self.peer_module.is_student_calibrated(data)
-        self.assertFalse(d['success'])
-        self.assertFalse('calibrated' in d)
+        response = self.peer_module.is_student_calibrated(data)
+        self.assertFalse(response['success'])
+        self.assertFalse('calibrated' in response)
 
     def test_show_calibration_essay_success(self):
         data = {'location': self.location}
 
-        r = self.peer_module.show_calibration_essay(data)
-        d = json.loads(r)
-        log.debug(d)
-        log.debug(type(d))
-        self.assertTrue(d['success'])
-        self.assertIsNotNone(d['submission_id'])
-        self.assertIsNotNone(d['prompt'])
-        self.assertIsNotNone(d['submission_key'])
-        self.assertIsNotNone(d['max_score'])
+        response = self.peer_module.show_calibration_essay(data)
+
+        self.assertTrue(response['success'])
+        self.assertIsNotNone(response['submission_id'])
+        self.assertIsNotNone(response['prompt'])
+        self.assertIsNotNone(response['submission_key'])
+        self.assertIsNotNone(response['max_score'])
 
     def test_show_calibration_essay_missing_key(self):
         data = {}
 
-        d = self.peer_module.show_calibration_essay(data)
+        response = self.peer_module.show_calibration_essay(data)
 
-        self.assertFalse(d['success'])
-        self.assertEqual(d['error'], "Missing required keys: location")
+        self.assertFalse(response['success'])
+        self.assertEqual(response['error'], "Missing required keys: location")
 
     def test_save_calibration_essay_success(self):
         data = {
@@ -276,13 +278,44 @@ class TestPeerGradingService(LoginEnrollmentTestCase):
         qdict.getlist = fake_get_item
         qdict.keys = data.keys
 
-        d = self.peer_module.save_calibration_essay(qdict)
-        self.assertTrue(d['success'])
-        self.assertTrue('actual_score' in d)
+        response = self.peer_module.save_calibration_essay(qdict)
+        self.assertTrue(response['success'])
+        self.assertTrue('actual_score' in response)
 
     def test_save_calibration_essay_missing_keys(self):
         data = {}
-        d = self.peer_module.save_calibration_essay(data)
-        self.assertFalse(d['success'])
-        self.assertTrue(d['error'].find('Missing required keys:') > -1)
-        self.assertFalse('actual_score' in d)
+        response = self.peer_module.save_calibration_essay(data)
+        self.assertFalse(response['success'])
+        self.assertTrue(response['error'].find('Missing required keys:') > -1)
+        self.assertFalse('actual_score' in response)
+
+
+@override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
+class TestPanel(LoginEnrollmentTestCase):
+    """
+    Run tests on the open ended panel
+    """
+
+    def setUp(self):
+        # Toy courses should be loaded
+        self.course_name = 'edX/open_ended/2012_Fall'
+        self.course = modulestore().get_course(self.course_name)
+        self.user = factories.UserFactory()
+
+    def test_open_ended_panel(self):
+        """
+        Test to see if the peer grading module in the demo course is found
+        @return:
+        """
+        found_module, peer_grading_module = views.find_peer_grading_module(self.course)
+        self.assertTrue(found_module)
+
+    @patch('open_ended_grading.views.controller_qs', controller_query_service.MockControllerQueryService(settings.OPEN_ENDED_GRADING_INTERFACE, views.system))
+    def test_problem_list(self):
+        """
+        Ensure that the problem list from the grading controller server can be rendered properly locally
+        @return:
+        """
+        request = Mock(user=self.user)
+        response = views.student_problem_list(request, self.course.id)
+        self.assertRegexpMatches(response.content, "Here are a list of open ended problems for this course.")

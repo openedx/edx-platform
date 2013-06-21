@@ -19,9 +19,7 @@ DISPLAY_NAME_VALUE = '"Robot Super Course"'
 ############### ACTIONS ####################
 @step('I select the Advanced Settings$')
 def i_select_advanced_settings(step):
-    expand_icon_css = 'li.nav-course-settings i.icon-expand'
-    if world.browser.is_element_present_by_css(expand_icon_css):
-        world.css_click(expand_icon_css)
+    world.click_course_settings()
     link_css = 'li.nav-course-settings-advanced a'
     world.css_click(link_css)
 
@@ -44,8 +42,9 @@ def edit_the_value_of_a_policy_key(step):
     It is hard to figure out how to get into the CodeMirror
     area, so cheat and do it from the policy key field :)
     """
-    e = world.css_find(KEY_CSS)[get_index_of(DISPLAY_NAME_KEY)]
-    e._element.send_keys(Keys.TAB, Keys.END, Keys.ARROW_LEFT, ' ', 'X')
+    world.css_find(".CodeMirror")[get_index_of(DISPLAY_NAME_KEY)].click()
+    g = world.css_find("div.CodeMirror.CodeMirror-focused > div > textarea")
+    g._element.send_keys(Keys.ARROW_LEFT, ' ', 'X')
 
 
 @step(u'I edit the value of a policy key and save$')
@@ -125,10 +124,12 @@ def get_display_name_value():
 
 
 def change_display_name_value(step, new_value):
-    e = world.css_find(KEY_CSS)[get_index_of(DISPLAY_NAME_KEY)]
+
+    world.css_find(".CodeMirror")[get_index_of(DISPLAY_NAME_KEY)].click()
+    g = world.css_find("div.CodeMirror.CodeMirror-focused > div > textarea")
     display_name = get_display_name_value()
     for count in range(len(display_name)):
-        e._element.send_keys(Keys.TAB, Keys.END, Keys.BACK_SPACE)
+        g._element.send_keys(Keys.END, Keys.BACK_SPACE)
         # Must delete "" before typing the JSON value
-    e._element.send_keys(Keys.TAB, Keys.END, Keys.BACK_SPACE, Keys.BACK_SPACE, new_value)
+    g._element.send_keys(Keys.END, Keys.BACK_SPACE, Keys.BACK_SPACE, new_value)
     press_the_notification_button(step, "Save")

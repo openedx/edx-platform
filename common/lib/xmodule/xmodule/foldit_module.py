@@ -8,7 +8,6 @@ from xmodule.x_module import XModule
 from xmodule.xml_module import XmlDescriptor
 from xblock.core import Scope, Integer, String
 from .fields import Date
-from xmodule.util.date_utils import time_to_datetime
 
 
 log = logging.getLogger(__name__)
@@ -16,6 +15,8 @@ log = logging.getLogger(__name__)
 
 class FolditFields(object):
     # default to what Spring_7012x uses
+    required_level_half_credit = Integer(default=3, scope=Scope.settings)
+    required_sublevel_half_credit = Integer(default=5, scope=Scope.settings)
     required_level = Integer(default=4, scope=Scope.settings)
     required_sublevel = Integer(default=5, scope=Scope.settings)
     due = Date(help="Date that this problem is due by", scope=Scope.settings)
@@ -29,17 +30,17 @@ class FolditModule(FolditFields, XModule):
     css = {'scss': [resource_string(__name__, 'css/foldit/leaderboard.scss')]}
 
     def __init__(self, *args, **kwargs):
-        XModule.__init__(self, *args, **kwargs)
         """
-
         Example:
          <foldit show_basic_score="true"
             required_level="4"
             required_sublevel="3"
+            required_level_half_credit="2"
+            required_sublevel_half_credit="3"
             show_leaderboard="false"/>
         """
-
-        self.due_time = time_to_datetime(self.due)
+        XModule.__init__(self, *args, **kwargs)
+        self.due_time = self.due
 
     def is_complete(self):
         """
@@ -54,6 +55,22 @@ class FolditModule(FolditFields, XModule):
             self.system.anonymous_student_id,
             self.required_level,
             self.required_sublevel,
+            self.due_time)
+        return complete
+
+    def is_half_complete(self):
+        """
+        Did the user reach the required level for half credit?
+
+        Ideally this would be more flexible than just 0, 0.5, or 1 credit. On
+        the other hand, the xml attributes for specifying more specific
+        cut-offs and partial grades can get more confusing.
+        """
+        from foldit.models import PuzzleComplete
+        complete = PuzzleComplete.is_level_complete(
+            self.system.anonymous_student_id,
+            self.required_level_half_credit,
+            self.required_sublevel_half_credit,
             self.due_time)
         return complete
 
@@ -82,7 +99,7 @@ class FolditModule(FolditFields, XModule):
         from foldit.models import Score
 
         leaders = [(e['username'], e['score']) for e in Score.get_tops_n(10)]
-        leaders.sort(key=lambda x: -x[1])
+        leaders.sort(key=lambda x:-x[1])
 
         return leaders
 
@@ -139,9 +156,18 @@ class FolditModule(FolditFields, XModule):
 
     def get_score(self):
         """
-        0 / 1 based on whether student has gotten far enough.
+        0 if required_level_half_credit - required_sublevel_half_credit not
+        reached.
+        0.5 if required_level_half_credit and required_sublevel_half_credit
+        reached.
+        1 if requred_level and required_sublevel reached.
         """
-        score = 1 if self.is_complete() else 0
+        if self.is_complete():
+            score = 1
+        elif self.is_half_complete():
+            score = 0.5
+        else:
+            score = 0
         return {'score': score,
                 'total': self.max_score()}
 

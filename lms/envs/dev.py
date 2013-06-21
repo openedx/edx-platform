@@ -7,6 +7,11 @@ sessions. Assumes structure:
         /mitx # The location of this repo
         /log  # Where we're going to write log files
 """
+
+# We intentionally define lots of variables that aren't used, and
+# want to import all variables from base settings files
+# pylint: disable=W0401, W0614
+
 from .common import *
 from logsettings import get_logger_config
 
@@ -22,8 +27,7 @@ MITX_FEATURES['FORCE_UNIVERSITY_DOMAIN'] = None		# show all university courses i
 MITX_FEATURES['ENABLE_MANUAL_GIT_RELOAD'] = True
 MITX_FEATURES['ENABLE_PSYCHOMETRICS'] = False    # real-time psychometrics (eg item response theory analysis in instructor dashboard)
 MITX_FEATURES['ENABLE_INSTRUCTOR_ANALYTICS'] = True
-
-
+MITX_FEATURES['ENABLE_SERVICE_STATUS'] = True
 
 WIKI_ENABLED = True
 
@@ -143,7 +147,7 @@ if os.path.isdir(DATA_DIR):
 
 MITX_VERSION_STRING = os.popen('cd %s; git describe' % REPO_ROOT).read().strip()
 
-################################# Open ended grading config  #####################
+############################ Open ended grading config  #####################
 
 OPEN_ENDED_GRADING_INTERFACE = {
     'url' : 'http://127.0.0.1:3033/',
@@ -154,7 +158,7 @@ OPEN_ENDED_GRADING_INTERFACE = {
     'grading_controller' : 'grading_controller'
 }
 
-################################ LMS Migration #################################
+############################## LMS Migration ##################################
 MITX_FEATURES['ENABLE_LMS_MIGRATION'] = True
 MITX_FEATURES['ACCESS_REQUIRE_STAFF_FOR_COURSE'] = False   # require that user be in the staff_* group to be able to enroll
 MITX_FEATURES['USE_XQA_SERVER'] = 'http://xqa:server@content-qa.mitx.mit.edu/xqa'
@@ -164,6 +168,7 @@ INSTALLED_APPS += ('lms_migration',)
 LMS_MIGRATION_ALLOWED_IPS = ['127.0.0.1']
 
 ################################ OpenID Auth #################################
+
 MITX_FEATURES['AUTH_USE_OPENID'] = True
 MITX_FEATURES['AUTH_USE_OPENID_PROVIDER'] = True
 MITX_FEATURES['BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH'] = True
@@ -173,16 +178,22 @@ INSTALLED_APPS += ('django_openid_auth',)
 
 OPENID_CREATE_USERS = False
 OPENID_UPDATE_DETAILS_FROM_SREG = True
-OPENID_SSO_SERVER_URL = 'https://www.google.com/accounts/o8/id'  	# TODO: accept more endpoints
+OPENID_SSO_SERVER_URL = 'https://www.google.com/accounts/o8/id'  # TODO: accept more endpoints
 OPENID_USE_AS_ADMIN_LOGIN = False
 
 OPENID_PROVIDER_TRUSTED_ROOTS = ['*']
 
-################################ MIT Certificates SSL Auth #################################
+######################## MIT Certificates SSL Auth ############################
 
 MITX_FEATURES['AUTH_USE_MIT_CERTIFICATES'] = True
 
-################################ DEBUG TOOLBAR #################################
+################################# CELERY ######################################
+
+# By default don't use a worker, execute tasks as if they were local functions
+CELERY_ALWAYS_EAGER = True
+
+################################ DEBUG TOOLBAR ################################
+
 INSTALLED_APPS += ('debug_toolbar',)
 MIDDLEWARE_CLASSES += ('django_comment_client.utils.QueryCountDebugMiddleware',
                        'debug_toolbar.middleware.DebugToolbarMiddleware',)
@@ -208,7 +219,9 @@ DEBUG_TOOLBAR_PANELS = (
 DEBUG_TOOLBAR_CONFIG = {
     'INTERCEPT_REDIRECTS': False
 }
-############################ FILE UPLOADS (for discussion forums) #############################
+
+#################### FILE UPLOADS (for discussion forums) #####################
+
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 MEDIA_ROOT = ENV_ROOT / "uploads"
 MEDIA_URL = "/static/uploads/"
@@ -230,3 +243,18 @@ MITX_FEATURES['ENABLE_PEARSON_LOGIN'] = False
 
 ANALYTICS_SERVER_URL = "http://127.0.0.1:9000/"
 ANALYTICS_API_KEY = ""
+
+##### segment-io  ######
+
+# If there's an environment variable set, grab it and turn on segment io
+SEGMENT_IO_LMS_KEY = os.environ.get('SEGMENT_IO_LMS_KEY')
+if SEGMENT_IO_LMS_KEY:
+    MITX_FEATURES['SEGMENT_IO_LMS'] = True
+
+
+#####################################################################
+# Lastly, see if the developer has any local overrides.
+try:
+    from .private import *
+except ImportError:
+    pass

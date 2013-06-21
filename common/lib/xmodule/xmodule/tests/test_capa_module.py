@@ -18,6 +18,7 @@ from xmodule.modulestore import Location
 from django.http import QueryDict
 
 from . import test_system
+from pytz import UTC
 
 
 class CapaFactory(object):
@@ -126,7 +127,7 @@ class CapaFactory(object):
 class CapaModuleTest(unittest.TestCase):
 
     def setUp(self):
-        now = datetime.datetime.now()
+        now = datetime.datetime.now(UTC)
         day_delta = datetime.timedelta(days=1)
         self.yesterday_str = str(now - day_delta)
         self.today_str = str(now)
@@ -475,12 +476,12 @@ class CapaModuleTest(unittest.TestCase):
 
         # Simulate that the problem is queued
         with patch('capa.capa_problem.LoncapaProblem.is_queued') \
-                as mock_is_queued,\
+                as mock_is_queued, \
             patch('capa.capa_problem.LoncapaProblem.get_recentmost_queuetime') \
                 as mock_get_queuetime:
 
             mock_is_queued.return_value = True
-            mock_get_queuetime.return_value = datetime.datetime.now()
+            mock_get_queuetime.return_value = datetime.datetime.now(UTC)
 
             get_request_dict = {CapaFactory.input_key(): '3.14'}
             result = module.check_problem(get_request_dict)
@@ -550,6 +551,7 @@ class CapaModuleTest(unittest.TestCase):
     def test_reset_problem(self):
         module = CapaFactory.create(done=True)
         module.new_lcp = Mock(wraps=module.new_lcp)
+        module.choose_new_seed = Mock(wraps=module.choose_new_seed)
 
         # Stub out HTML rendering
         with patch('xmodule.capa_module.CapaModule.get_problem_html') as mock_html:
@@ -567,7 +569,8 @@ class CapaModuleTest(unittest.TestCase):
         self.assertEqual(result['html'], "<div>Test HTML</div>")
 
         # Expect that the problem was reset
-        module.new_lcp.assert_called_once_with({'seed': None})
+        module.new_lcp.assert_called_once_with(None)
+        module.choose_new_seed.assert_called_once_with()
 
     def test_reset_problem_closed(self):
         module = CapaFactory.create()
@@ -1033,3 +1036,13 @@ class CapaModuleTest(unittest.TestCase):
                 self.assertTrue(module.seed is not None)
                 msg = 'Could not get a new seed from reset after 5 tries'
                 self.assertTrue(success, msg)
+
+    def test_random_seed_bins(self):
+        # Assert that we are limiting the number of possible seeds.
+
+        # Check the conditions that generate random seeds
+        for rerandomize in ['always', 'per_student', 'true', 'onreset']:
+            # Get a bunch of seeds, they should all be in 0-999.
+            for i in range(200):
+                module = CapaFactory.create(rerandomize=rerandomize)
+                assert 0 <= module.seed < 1000

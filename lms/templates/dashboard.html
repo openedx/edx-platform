@@ -59,14 +59,16 @@
       $("#unenroll_course_number").text( $(event.target).data("course-number") );
     });
 
-    $(document).delegate('#unenroll_form', 'ajax:success', function(data, json, xhr) {
-      if(json.success) {
-        location.href="${reverse('dashboard')}";
+    $('#unenroll_form').on('ajax:complete', function(event, xhr) {
+      if(xhr.status == 200) {
+        location.href = "${reverse('dashboard')}";
+      } else if (xhr.status == 403) {
+        location.href = "${reverse('signin_user')}?course_id=" +
+          $("#unenroll_course_id").val() + "&enrollment_action=unenroll";
       } else {
-        if($('#unenroll_error').length == 0) {
-          $('#unenroll_form').prepend('<div id="unenroll_error" class="modal-form-error"></div>');
-        }
-        $('#unenroll_error').text(json.error).stop().css("display", "block");
+        $('#unenroll_error').html(
+          xhr.responseText ? xhr.responseText : "An error occurred. Please try again later."
+        ).stop().css("display", "block");
       }
     });
 
@@ -148,6 +150,8 @@
       </ul>
     </section>
 
+    ## `news` should be `None` whenever a non-edX theme is enabled:
+    ## see common/djangoapps/student/views.py#_get_news
     %if news:
     <article class="news-carousel">
       <header>
@@ -192,17 +196,20 @@
 
         <article class="my-course">
           <%
-          if has_access(user, course, 'load'):
             course_target = reverse('info', args=[course.id])
-          else:
-            course_target = reverse('about_course', args=[course.id])
           %>
 
 
 
-          <a href="${course_target}" class="cover">
-            <img src="${course_image_url(course)}" />
-          </a>
+          % if course.id in show_courseware_links_for:
+            <a href="${course_target}" class="cover">
+              <img src="${course_image_url(course)}" />
+            </a>
+          % else:
+            <div class="cover">
+              <img src="${course_image_url(course)}" />
+            </div>
+          % endif
 
           <section class="info">
             <hgroup>
@@ -216,7 +223,13 @@
               % endif
               </p>
               <h2 class="university">${get_course_about_section(course, 'university')}</h2>
-              <h3><a href="${course_target}">${course.number} ${course.display_name_with_default}</a></h3>
+              <h3>
+                % if course.id in show_courseware_links_for:
+                  <a href="${course_target}">${course.number} ${course.display_name_with_default}</a>
+                % else:
+                  <span>${course.number} ${course.display_name_with_default}</span>
+                % endif
+              </h3>
             </hgroup>
 
             <%
@@ -281,7 +294,7 @@
                            ${"{0:.0f}%".format(float(course.lowest_passing_grade)*100)}</span>.
                       % elif cert_status['status'] == 'restricted':
                           <p class="message-copy">
-                          Your certificate is being held pending confirmation that the issuance of your certificate is in compliance with strict U.S. embargoes on Iran, Cuba, Syria and Sudan. If you think our system has mistakenly identified you as being connected with one of those countries, please let us know by contacting <a class="contact-link" href="mailto:info@edx.org">info@edx.org</a>.
+                          Your certificate is being held pending confirmation that the issuance of your certificate is in compliance with strict U.S. embargoes on Iran, Cuba, Syria and Sudan. If you think our system has mistakenly identified you as being connected with one of those countries, please let us know by contacting <a class="contact-link" href="mailto:${settings.CONTACT_EMAIL}">${settings.CONTACT_EMAIL}</a>.
                           </p>
                       % endif
                       </p>
@@ -326,7 +339,9 @@
     % else:
       <section class="empty-dashboard-message">
         <p>Looks like you haven't registered for any courses yet.</p>
-        <a href="${reverse('courses')}">Find courses now!</a>
+        <a href="${marketing_link('COURSES')}">
+            Find courses now!
+        </a>
       </section>
     % endif
 
@@ -354,6 +369,8 @@
       <h2>Are you sure you want to unregister from <span id="unenroll_course_number"></span>?</h2>
       <hr/>
     </header>
+
+    <div id="unenroll_error" class="modal-form-error"></div>
 
     <form id="unenroll_form" method="post" data-remote="true" action="${reverse('change_enrollment')}">
       <input name="course_id" id="unenroll_course_id" type="hidden" />
@@ -434,11 +451,11 @@
     <div id="change_name_body">
       <form id="change_name_form">
         <div id="change_name_error" class="modal-form-error"> </div>
-        <p>To uphold the credibility of edX certificates, all name changes will be logged and recorded.</p>
+        <p>To uphold the credibility of ${settings.PLATFORM_NAME} certificates, all name changes will be logged and recorded.</p>
         <br/>
         <fieldset>
           <div class="input-group">
-            <label>Enter your desired full name, as it will appear on the edX certificates: </label>
+            <label>Enter your desired full name, as it will appear on the ${settings.PLATFORM_NAME} certificates: </label>
             <input id="new_name_field" value="" type="text" />
             <label>Reason for name change:</label>
             <textarea id="name_rationale_field" value=""></textarea>
