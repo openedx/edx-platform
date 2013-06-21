@@ -1,4 +1,3 @@
-# coding=utf-8
 """
 Tests for Shibboleth Authentication
 @jbau
@@ -36,8 +35,8 @@ from student.tests.factories import UserFactory
 IDP = 'https://idp.stanford.edu/'
 REMOTE_USER = 'test_user@stanford.edu'
 MAILS = [None, '', 'test_user@stanford.edu']
-GIVENNAMES = [None, '', 'Jason', 'jasön; John; bob']  # At Stanford, the givenNames can be a list delimited by ';'
-SNS = [None, '', 'Bau', '包; smith']  # At Stanford, the sns can be a list delimited by ';'
+GIVENNAMES = [None, '', 'Jason', 'jas\xc3\xb6n; John; bob']  # At Stanford, the givenNames can be a list delimited by ';'
+SNS = [None, '', 'Bau', '\xe5\x8c\x85; smith']  # At Stanford, the sns can be a list delimited by ';'
 
 
 def gen_all_identities():

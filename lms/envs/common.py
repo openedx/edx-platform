@@ -92,6 +92,10 @@ MITX_FEATURES = {
     'AUTH_USE_MIT_CERTIFICATES': False,
     'AUTH_USE_OPENID_PROVIDER': False,
     'AUTH_USE_SHIB': False,
+
+    # This flag disables the requirement of having to agree to the TOS for users registering
+    # with Shib.  Feature was requested by Stanford's office of general counsel
+    'SHIB_DISABLE_TOS': False,
     
     # Enables ability to restrict enrollment in specific courses by the user account login method
     'RESTRICT_ENROLL_BY_REG_METHOD': False,
@@ -703,6 +707,10 @@ INSTALLED_APPS = (
     'psychometrics',
     'licenses',
     'course_groups',
+
+    # External auth (OpenID, shib)
+    'external_auth',
+    'django_openid_auth',
 
     #For the wiki
     'wiki',  # The new django-wiki from benjaoming

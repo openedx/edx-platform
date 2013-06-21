@@ -48,6 +48,8 @@ from courseware.access import has_access
 from courseware.views import get_module_for_descriptor, jump_to
 from courseware.model_data import ModelDataCache
 
+from external_auth.models import ExternalAuthMap
+
 from statsd import statsd
 from pytz import UTC
 
@@ -287,12 +289,10 @@ def dashboard(request):
             
     # get info w.r.t ExternalAuthMap
     external_auth_map = None
-    if 'external_auth' in settings.INSTALLED_APPS:
-        from external_auth.models import ExternalAuthMap
-        try:
-            external_auth_map = ExternalAuthMap.objects.get(user=user)
-        except ExternalAuthMap.DoesNotExist:
-            pass
+    try:
+        external_auth_map = ExternalAuthMap.objects.get(user=user)
+    except ExternalAuthMap.DoesNotExist:
+        pass
 
     context = {'courses': courses,
                'message': message,
@@ -613,10 +613,12 @@ def create_account(request, post_override=None):
         js['field'] = 'honor_code'
         return HttpResponse(json.dumps(js))
 
-    # Can't have terms of service for Stanford users, according to Stanford's Office of General Counsel
-    if settings.MITX_FEATURES.get("AUTH_USE_SHIB") and DoExternalAuth and ("stanford" in eamap.external_domain):
-        pass
-    else:
+    # Can't have terms of service for certain SHIB users, like at Stanford
+    tos_not_required = settings.MITX_FEATURES.get("AUTH_USE_SHIB") \
+                       and settings.MITX_FEATURES.get('SHIB_DISABLE_TOS') \
+                       and DoExternalAuth and ("shib" in eamap.external_domain)
+
+    if not tos_not_required:
         if post_vars.get('terms_of_service', 'false') != u'true':
             js['value'] = "You must accept the terms of service.".format(field=a)
             js['field'] = 'terms_of_service'
@@ -629,8 +631,7 @@ def create_account(request, post_override=None):
     # TODO: Check password is sane
 
     required_post_vars = ['username', 'email', 'name', 'password', 'terms_of_service', 'honor_code']
-    if settings.MITX_FEATURES.get("AUTH_USE_SHIB") and DoExternalAuth and ("stanford" in eamap.external_domain):
-        # Can't have terms of service for Stanford users, according to Stanford's Office of General Counsel
+    if tos_not_required:
         required_post_vars =  ['username', 'email', 'name', 'password', 'honor_code']
 
     for a in required_post_vars:

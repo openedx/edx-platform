@@ -245,8 +245,10 @@ def signup(request, eamap=None):
                'ask_for_tos': True,
                }
 
-    # Can't have terms of service for Stanford users, according to Stanford's Office of General Counsel
-    if settings.MITX_FEATURES['AUTH_USE_SHIB'] and ('stanford' in eamap.external_domain):
+    # Some openEdX instances can't have terms of service for shib users, like
+    # according to Stanford's Office of General Counsel
+    if settings.MITX_FEATURES.get('AUTH_USE_SHIB') and settings.MITX_FEATURES.get('SHIB_DISABLE_TOS') and \
+       ('shib' in eamap.external_domain):
         context['ask_for_tos'] = False
 
     # detect if full name is blank and ask for it from user
@@ -387,10 +389,10 @@ def shib_login(request):
         """))
 
     if not request.META.get('REMOTE_USER'):
-        log.exception("SHIB: no REMOTE_USER found in request.META")
+        log.error("SHIB: no REMOTE_USER found in request.META")
         return default_render_failure(request, shib_error_msg)
     elif not request.META.get('Shib-Identity-Provider'):
-        log.exception("SHIB: no Shib-Identity-Provider in request.META")
+        log.error("SHIB: no Shib-Identity-Provider in request.META")
         return default_render_failure(request, shib_error_msg)
     else:
         #if we get here, the user has authenticated properly
