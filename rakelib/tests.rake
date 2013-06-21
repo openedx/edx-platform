@@ -55,6 +55,7 @@ end
 
 task :clean_reports_dir do
     desc "Clean coverage files, to ensure that we don't use stale data to generate reports."
+
     # We delete the files but preserve the directory structure
     # so that coverage.py has a place to put the reports.
     sh("find #{REPORT_DIR} -type f -delete")
@@ -82,7 +83,7 @@ TEST_TASK_DIRS = []
     task "test_acceptance_#{system}", [:harvest_args] => [:clean_test_files, "#{system}:gather_assets:acceptance", "fasttest_acceptance_#{system}"]
 
     desc "Run acceptance tests without collectstatic"
-    task "fasttest_acceptance_#{system}", [:harvest_args] => [:clean_reports_dir, :predjango, report_dir] do |t, args|
+    task "fasttest_acceptance_#{system}", [:harvest_args] => [report_dir, :clean_reports_dir, :predjango] do |t, args|
         args.with_defaults(:harvest_args => '')
         run_acceptance_tests(system, report_dir, args.harvest_args)
     end
@@ -98,7 +99,7 @@ Dir["common/lib/*"].select{|lib| File.directory?(lib)}.each do |lib|
     report_dir = report_dir_path(lib)
 
     desc "Run tests for common lib #{lib}"
-    task "test_#{lib}"  => [:clean_reports_dir, report_dir] do
+    task "test_#{lib}"  => [report_dir, :clean_reports_dir] do
         ENV['NOSE_XUNIT_FILE'] = File.join(report_dir, "nosetests.xml")
         cmd = "nosetests #{lib}"
         test_sh(run_under_coverage(cmd, lib))
