@@ -42,9 +42,9 @@ class CrowdsourceHinterFields(object):
     user_voted = Boolean(help='Specifies if the user has voted on this problem or not.',
         scope=Scope.user_state, default=False)
 
-    moderate = String(help='''If 'True', then all hints must be approved by staff before
+    moderate = String(help='''If True, then all hints must be approved by staff before
         becoming visible.
-        This field is automatically populated from the xml metadata.''', scope=Scope.settings,
+        This field is automatically populated from the xml metadata.''', scope=Scope.content,
         default='False')
 
     mod_queue = Dict(help='''Contains hints that have not been approved by the staff yet.  Structured
@@ -73,6 +73,10 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         '''
         # Reset the user vote, for debugging only!  Remove for prod.
         self.user_voted = False
+        # You are invited to guess what the lines below do :)
+        if self.hints == {}:
+            self.hints = {}
+
         for child in self.get_display_items():
             out = child.get_html()
             # The event listener uses the ajax url to find the child.
@@ -123,11 +127,7 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         print self.hints
         answer = self.ans_to_text(get)
         # Look for a hint to give.
-<<<<<<< HEAD
-        if answer not in self.hints:
-=======
         if (answer not in self.hints) or (len(self.hints[answer]) == 0):
->>>>>>> Began work on instructor view to hinting system.
             # No hints to give.  Return.
             self.previous_answers += [(answer, (None, None, None))]
             return json.dumps({'contents': ' '})
@@ -138,14 +138,6 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         if len(self.hints[answer]) == 1:
             rand_hint_1 = ''
             rand_hint_2 = ''
-<<<<<<< HEAD
-            self.previous_answers += [(answer, (0, None, None))]
-        elif len(self.hints[answer]) == 2:
-            best_hint = self.hints[answer][0][0]
-            rand_hint_1 = self.hints[answer][1][0]
-            rand_hint_2 = ''
-            self.previous_answers += [(answer, (0, 1, None))]
-=======
             self.previous_answers += [[answer, [best_hint_index, None, None]]]
         elif n_hints == 2:
             best_hint = self.hints[answer].values()[0][0]
@@ -154,7 +146,6 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
             hint_index_1 = self.hints[answer].keys()[1]
             rand_hint_2 = ''
             self.previous_answers += [[answer, [best_hint_index, hint_index_1, None]]]
->>>>>>> Began work on instructor view to hinting system.
         else:
             hint_index_1, hint_index_2 = random.sample(xrange(len(self.hints[answer])), 2)
             rand_hint_1 = self.hints[answer][hint_index_1][0]
@@ -188,10 +179,6 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
                 # Add each hint to the html string, with a vote button.
                 for hint_id in hints_offered:
                     if hint_id != None:
-<<<<<<< HEAD
-                        out += '<br /><input class="vote" data-answer="'+str(i)+'" data-hintno="'+str(j)+\
-                            '" type="button" value="Vote"> ' + self.hints[answer][hint_id][0]
-=======
                         hint_id = str(hint_id)
                         try:
                             out += '<br /><input class="vote" data-answer="'+str(i)+'" data-hintno="'+hint_id+\
@@ -199,7 +186,6 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
                         except KeyError:
                             # Sometimes, the hint that a user saw will have been deleted by the instructor.
                             continue
->>>>>>> Began work on instructor view to hinting system.
                         
 
             # Or, let the student create his own hint
@@ -261,11 +247,15 @@ What would you say to help someone who got this wrong answer?
         # Add the new hint to self.hints.  (Awkward because a direct write 
         # is necessary.)
 <<<<<<< HEAD
+<<<<<<< HEAD
         temp_dict = self.hints
         temp_dict[answer].append([hint, 1])     # With one vote (the user himself).
         self.hints = temp_dict
 =======
         if self.moderate:
+=======
+        if self.moderate == 'True':
+>>>>>>> Made tests of the crowdsource hinter module more standardized and easier to read.  Fixed database non-initialization bug in crowdsource hinter module.
             temp_dict = self.mod_queue
         else:
             temp_dict = self.hints
@@ -274,7 +264,7 @@ What would you say to help someone who got this wrong answer?
         else:
             temp_dict[answer] = {self.hint_pk: [hint, 1]}
         self.hint_pk += 1
-        if self.moderate:
+        if self.moderate == 'True':
             self.mod_queue = temp_dict
         else:
             self.hints = temp_dict
