@@ -116,8 +116,6 @@ if not settings.MITX_FEATURES["USE_CUSTOM_THEME"]:
 
         url(r'^submit_feedback$', 'util.views.submit_feedback'),
 
-        # TODO: These urls no longer work. They need to be updated before they are re-enabled
-        # url(r'^reactivate/(?P<key>[^/]*)$', 'student.views.reactivation_email'),
     )
 
 # Only enable URLs for those marketing links actually enabled in the
