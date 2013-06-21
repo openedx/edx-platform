@@ -38,13 +38,12 @@
         toggleSubmitButton(false);
       });
 
-      $('#login-form').on('ajax:complete', function() {
+      $('#login-form').on('ajax:error', function() {
         toggleSubmitButton(true);
       });
 
       $('#login-form').on('ajax:success', function(event, json, xhr) {
         if(json.success) {
-          $('.message.submission-error').removeClass('is-shown');
           var u=decodeURI(window.location.search);
           next=u.split("next=")[1];
           if (next) {
@@ -53,6 +52,7 @@
             location.href="${reverse('dashboard')}";
           }
         } else {
+          toggleSubmitButton(true);
           $('.message.submission-error').addClass('is-shown').focus();
           $('.message.submission-error .message-copy').html(json.value);
         }
