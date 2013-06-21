@@ -61,7 +61,7 @@ def access_allow_revoke(request, course_id):
 
     Query parameters:
     email is the target users email
-    rolename is one of ['instructor', 'staff']
+    rolename is one of ['instructor', 'staff', 'beta']
     mode is one of ['allow', 'revoke']
     """
     course = get_course_with_access(request.user, course_id, 'instructor', depth=None)
@@ -88,18 +88,18 @@ def access_allow_revoke(request, course_id):
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-def list_instructors_staff(request, course_id):
+def list_course_role_members(request, course_id):
     """
     List instructors and staff.
     Requires staff access.
 
-    rolename is one of ['instructor', 'staff']
+    rolename is one of ['instructor', 'staff', 'beta']
     """
     course = get_course_with_access(request.user, course_id, 'staff', depth=None)
 
     rolename = request.GET.get('rolename', '')
 
-    if not rolename in ['instructor', 'staff']:
+    if not rolename in ['instructor', 'staff', 'beta']:
         return HttpResponseBadRequest()
 
     def extract_user_info(user):
