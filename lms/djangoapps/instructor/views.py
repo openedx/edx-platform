@@ -683,7 +683,8 @@ def instructor_dashboard(request, course_id):
                             hash=md5((html_message+subject+datetime.datetime.isoformat(datetime.datetime.now())).encode('utf-8')).hexdigest())
         email.save()
 
-        delegate_emails(email.hash, email.to, course)
+        course_url = request.build_absolute_uri(reverse('course_root',  kwargs={'course_id': course_id}))
+        delegate_emails(email.hash, email.to, course_id, course.display_name, course_url)
         
     #----------------------------------------
     # psychometrics
