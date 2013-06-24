@@ -21,6 +21,7 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
             }
         );
         this.listenTo(this.model, 'invalid', this.handleValidationError);
+        this.savedBar = undefined;
     },
     render: function() {
         // catch potential outside call before template loaded
@@ -136,15 +137,22 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
             success : function() {
                 self.render();
                 var message = gettext("Please note that validation of your policy key and value pairs is not currently in place yet. If you are having difficulties, please review your policy pairs.");
-                var saving = new CMS.Views.Alert.Confirmation({
+                self.saved = new CMS.Views.Alert.Confirmation({
                     title: gettext("Your policy changes have been saved."),
                     message: message,
                     closeIcon: false
                 });
-                saving.show();
+                self.saved.show();
                 analytics.track('Saved Advanced Settings', {
                     'course': course_location_analytics
                 });
+            },
+            error: function() {
+                // If we've already saved some data this will be
+                // shown; hide it away again.
+                if(self.saved) {
+                    self.saved.hide();
+                }
             }
         });
     },
