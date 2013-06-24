@@ -4,6 +4,7 @@ AjaxPrefix.addAjaxPrefix(jQuery, -> CMS.prefix)
   Models: {}
   Views: {}
   Collections: {}
+  URL: {}
 
   prefix: $("meta[name='path_prefix']").attr('content')
 

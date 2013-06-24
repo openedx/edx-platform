@@ -460,7 +460,7 @@ def textbook_index(request, org, course, name):
 
             return HttpResponse('', content_type="application/json", status=204)
     else:
-        upload_asset_callback_url = reverse('upload_asset', kwargs={
+        upload_asset_url = reverse('upload_asset', kwargs={
             'org': org,
             'course': course,
             'coursename': name,
@@ -473,6 +473,6 @@ def textbook_index(request, org, course, name):
         return render_to_response('textbooks.html', {
             'context_course': course_module,
             'course': course_module,
-            'upload_asset_callback_url': upload_asset_callback_url,
+            'upload_asset_url': upload_asset_url,
             'textbook_url': textbook_url,
         })

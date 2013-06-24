@@ -39,7 +39,7 @@ CMS.Models.Textbook = Backbone.AssociatedModel.extend({
 });
 CMS.Collections.TextbookSet = Backbone.Collection.extend({
     model: CMS.Models.Textbook,
-    url: function() { return window.TEXTBOOK_URL; },
+    url: function() { return CMS.URL.TEXTBOOK; },
     initialize: function() {
         this.listenTo(this, "editOne", this.editOne);
     },

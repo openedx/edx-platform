@@ -225,11 +225,11 @@ describe "CMS.Views.EditChapter", ->
         @collection.add(@model)
         @view = new CMS.Views.EditChapter({model: @model})
         spyOn(@view, "remove").andCallThrough()
-        window.UPLOAD_ASSET_CALLBACK_URL = "/upload"
+        CMS.URL.UPLOAD_ASSET = "/upload"
         window.section = new CMS.Models.Section({name: "abcde"})
 
     afterEach ->
-        delete window.UPLOAD_ASSET_CALLBACK_URL
+        delete CMS.URL.UPLOAD_ASSET
         delete window.section
 
     it "can render", ->
@@ -267,7 +267,7 @@ describe "CMS.Views.UploadDialog", ->
     beforeEach ->
         setFixtures($("<script>", {id: "upload-dialog-tpl", type: "text/template"}).text(tpl))
         appendSetFixtures($("<script>", {id: "system-feedback-tpl", type: "text/template"}).text(feedbackTpl))
-        window.UPLOAD_ASSET_CALLBACK_URL = "/upload"
+        CMS.URL.UPLOAD_ASSET = "/upload"
 
         @model = new CMS.Models.FileUpload()
         @chapter = new CMS.Models.Chapter()
@@ -288,7 +288,7 @@ describe "CMS.Views.UploadDialog", ->
                 realMethod.apply(this, arguments)
 
     afterEach ->
-        delete window.UPLOAD_ASSET_CALLBACK_URL
+        delete CMS.URL.UPLOAD_ASSET
 
     describe "Basic", ->
         it "should be shown by default", ->
@@ -346,7 +346,7 @@ describe "CMS.Views.UploadDialog", ->
             expect(@model.get("uploading")).toBeTruthy()
             expect(@requests.length).toEqual(1)
             request = @requests[0]
-            expect(request.url).toEqual(UPLOAD_ASSET_CALLBACK_URL)
+            expect(request.url).toEqual("/upload")
             expect(request.method).toEqual("POST")
 
             request.respond(200, {"Content-Type": "application/json"},

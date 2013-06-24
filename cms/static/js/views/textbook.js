@@ -259,7 +259,7 @@ CMS.Views.UploadDialog = Backbone.View.extend({
         var oldInput = this.$("input[type=file]").get(0);
         this.$el.html(this.template({
             shown: this.options.shown,
-            url: UPLOAD_ASSET_CALLBACK_URL,
+            url: CMS.URL.UPLOAD_ASSET,
             title: this.model.escape('title'),
             message: this.model.escape('message'),
             selectedFile: selectedFile,

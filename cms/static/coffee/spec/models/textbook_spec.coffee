@@ -71,14 +71,14 @@ describe "CMS.Models.Textbook input/output", ->
 
 describe "CMS.Collections.TextbookSet", ->
     beforeEach ->
-        window.TEXTBOOK_URL = "/textbooks"
+        CMS.URL.TEXTBOOK = "/textbooks"
         @collection = new CMS.Collections.TextbookSet()
 
     afterEach ->
-        delete window.TEXTBOOK_URL
+        delete CMS.URL.TEXTBOOK
 
     it "should have a url set", ->
-        expect(_.result(@collection, "url"), window.TEXTBOOK_URL)
+        expect(_.result(@collection, "url"), "/textbooks")
 
     it "can call save", ->
         spyOn(@collection, "sync")
