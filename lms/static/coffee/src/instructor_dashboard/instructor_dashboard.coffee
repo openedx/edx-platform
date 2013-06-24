@@ -26,6 +26,7 @@ setup_instructor_dashboard = (idash_content) =>
   # setup section header click handlers
   for link in ($ link for link in links)
     link.click (e) ->
+      e.preventDefault()
       # deactivate (styling) all sections
       idash_content.find(".#{CSS_IDASH_SECTION}").removeClass CSS_ACTIVE_SECTION
       idash_content.find(".#{CSS_INSTRUCTOR_NAV}").children().removeClass CSS_ACTIVE_SECTION
@@ -33,8 +34,6 @@ setup_instructor_dashboard = (idash_content) =>
       # find paired section
       section_name = $(this).data 'section'
       section = idash_content.find "##{section_name}"
-
-      section.data('wrapper')?.onClickTitle?()
 
       # activate (styling) active
       section.addClass CSS_ACTIVE_SECTION
@@ -44,7 +43,8 @@ setup_instructor_dashboard = (idash_content) =>
       location.hash = "#{HASH_LINK_PREFIX}#{section_name}"
 
       log "clicked #{section_name}"
-      e.preventDefault()
+
+      plantTimeout 0, -> section.data('wrapper')?.onClickTitle?()
 
   # recover deep link from url
   # click default or go to section specified by hash
