@@ -413,12 +413,6 @@ function hideModal(e) {
     }
 }
 
-function onKeyUp(e) {
-    if (e.which == 87) {
-        $body.toggleClass('show-wip hide-wip');
-    }
-}
-
 function toggleSock(e) {
     e.preventDefault();
 
