@@ -29,11 +29,9 @@ describe "CMS.Views.ShowTextbook", ->
             @view.render()
             expect(@view.$el).toContainText("Life Sciences")
 
-        it "should trigger an editOne event on the collection when the edit button is clicked", ->
-            spyOn(@collection, "trigger").andCallThrough()
+        it "should set the 'editing' property on the model when the edit button is clicked", ->
             @view.render().$(".edit").click()
-            expect(@collection.trigger).toHaveBeenCalledWith("editOne", @model)
-            expect(@collection.editing).toEqual(@model)
+            expect(@model.get("editing")).toBeTruthy()
 
         it "should pop a delete confirmation when the delete button is clicked", ->
             promptSpies = spyOnConstructor(CMS.Views.Prompt, "Warning", ["show", "hide"])
@@ -77,11 +75,10 @@ describe "CMS.Views.EditTextbook", ->
             appendSetFixtures($("<script>", {id: "system-feedback-tpl", type: "text/template"}).text(feedbackTpl))
             appendSetFixtures(sandbox({id: "page-notification"}))
             appendSetFixtures(sandbox({id: "page-prompt"}))
-            @model = new CMS.Models.Textbook({name: "Life Sciences"})
+            @model = new CMS.Models.Textbook({name: "Life Sciences", editing: true})
             @collection = new CMS.Collections.TextbookSet()
             spyOn(@collection, 'save')
             @collection.add(@model)
-            @collection.editing = @model
             @view = new CMS.Views.EditTextbook({model: @model})
             spyOn(@view, 'render').andCallThrough()
 
@@ -114,7 +111,6 @@ describe "CMS.Views.EditTextbook", ->
             expect(@model.get("name")).not.toEqual("starfish")
             expect(@model.get("chapters").at(0).get("name")).not.toEqual("foobar")
             expect(@collection.save).not.toHaveBeenCalled()
-            expect(@collection.editing).toBeUndefined()
 
         it "removes all empty chapters on cancel if the model has a non-empty chapter", ->
             chapters = @model.get("chapters")
@@ -178,11 +174,11 @@ describe "CMS.Views.ListTextbooks", ->
         expect(@editSpies.constructor).not.toHaveBeenCalled()
 
     it "should render an EditTextbook view for a textbook being edited", ->
-        # add three empty textbooks to the collection
-        @collection.add([{}, {}, {}])
-        # mark the second one as being edited
+        # add three empty textbooks to the collection: the first and third
+        # should be shown, and the second should be edited
+        @collection.add([{editing: false}, {editing: true}, {editing: false}])
         editing = @collection.at(1)
-        @collection.trigger('editOne', editing)
+        expect(editing.get("editing")).toBeTruthy()
         # reset spies
         @showSpies.constructor.reset()
         @editSpies.constructor.reset()
@@ -204,10 +200,6 @@ describe "CMS.Views.ListTextbooks", ->
         @view.$(".new-button").click()
 
         expect(@collection.length).toEqual(1)
-        expect(@collection.editing).toBeDefined()
-        editing = @collection.editing
-        expect(editing).toEqual(@collection.at(0))
-        expect(@editSpies.constructor).toHaveBeenCalledWith({model: editing})
         expect(@view.$el).toContain(@editSpies.$el)
         expect(@view.$el).not.toContain(@showSpies.$el)
 

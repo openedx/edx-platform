@@ -53,6 +53,7 @@ describe "CMS.Models.Textbook input/output", ->
         clientModelSpec = {
             "name": "My Textbook",
             "showChapters": false,
+            "editing": false,
             "chapters": [{
                     "name": "Chapter 1",
                     "asset_path": "/ch1.pdf",
@@ -84,11 +85,6 @@ describe "CMS.Collections.TextbookSet", ->
         spyOn(@collection, "sync")
         @collection.save()
         expect(@collection.sync).toHaveBeenCalledWith("update", @collection, undefined)
-
-    it "should respond to editOne events", ->
-        model = new CMS.Models.Textbook()
-        @collection.trigger('editOne', model)
-        expect(@collection.editing).toEqual(model)
 
 
 describe "CMS.Models.Chapter", ->

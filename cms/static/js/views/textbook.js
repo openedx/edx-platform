@@ -17,7 +17,7 @@ CMS.Views.ShowTextbook = Backbone.View.extend({
     },
     editTextbook: function(e) {
         if(e && e.preventDefault) { e.preventDefault(); }
-        this.model.collection.trigger("editOne", this.model);
+        this.model.set("editing", true);
     },
     confirmDelete: function(e) {
         if(e && e.preventDefault) { e.preventDefault(); }
@@ -69,7 +69,6 @@ CMS.Views.EditTextbook = Backbone.View.extend({
         this.listenTo(chapters, "add", this.addOne);
         this.listenTo(chapters, "reset", this.addAll);
         this.listenTo(chapters, "all", this.render);
-        this.listenTo(this.model.collection, "editOne", this.remove);
     },
     tagName: "section",
     className: "textbook",
@@ -141,7 +140,6 @@ CMS.Views.EditTextbook = Backbone.View.extend({
     },
     close: function() {
         var textbooks = this.model.collection;
-        delete textbooks.editing;
         this.remove();
         // if the textbook has no content, remove it from the collection
         if(this.model.isEmpty()) {
@@ -157,8 +155,9 @@ CMS.Views.EditTextbook = Backbone.View.extend({
                 emptyChapters = _.tail(emptyChapters);
             }
             chapters.remove(emptyChapters);
+            // don't forget to tell the model that it's no longer being edited
+            this.model.set("editing", false);
         }
-        textbooks.trigger('render');
         return this;
     }
 });
@@ -178,7 +177,7 @@ CMS.Views.ListTextbooks = Backbone.View.extend({
             var that = this;
             textbooks.each(function(textbook) {
                 var view;
-                if (textbook === textbooks.editing) {
+                if (textbook.get("editing")) {
                     view = new CMS.Views.EditTextbook({model: textbook});
                 } else {
                     view = new CMS.Views.ShowTextbook({model: textbook});
@@ -193,11 +192,7 @@ CMS.Views.ListTextbooks = Backbone.View.extend({
     },
     addOne: function(e) {
         if(e && e.preventDefault) { e.preventDefault(); }
-        // if the existing edited textbook is empty, don't do anything
-        if(this.collection.editing && this.collection.editing.isEmpty()) { return; }
-        var m = new this.collection.model();
-        this.collection.add(m);
-        this.collection.trigger("editOne", m);
+        this.collection.add([{editing: true}]);
     }
 });
 CMS.Views.EditChapter = Backbone.View.extend({

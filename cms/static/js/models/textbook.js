@@ -3,7 +3,8 @@ CMS.Models.Textbook = Backbone.AssociatedModel.extend({
         return {
             name: "",
             chapters: new CMS.Collections.ChapterSet([{}]),
-            showChapters: false
+            showChapters: false,
+            editing: false
         };
     },
     relations: [{
@@ -40,12 +41,6 @@ CMS.Models.Textbook = Backbone.AssociatedModel.extend({
 CMS.Collections.TextbookSet = Backbone.Collection.extend({
     model: CMS.Models.Textbook,
     url: function() { return CMS.URL.TEXTBOOK; },
-    initialize: function() {
-        this.listenTo(this, "editOne", this.editOne);
-    },
-    editOne: function(textbook) {
-        this.editing = textbook;
-    },
     save: function(options) {
         return this.sync('update', this, options);
     }
