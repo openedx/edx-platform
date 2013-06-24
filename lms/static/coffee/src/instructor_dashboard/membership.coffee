@@ -155,6 +155,12 @@ class AuthList
         if args.cell is 2
           @access_change(item.email, @rolename, 'revoke', @reload_auth_list)
 
+  # slickgrid collapses when rendered in an invisible div
+  # use this method to reload the widget
+  refresh: ->
+    @$display_table.empty()
+    @reload_auth_list()
+
   access_change: (email, rolename, mode, cb) ->
     access_change_endpoint = @$add_section.data 'endpoint'
     $.getJSON access_change_endpoint, {email: email, rolename: @rolename, mode: mode}, (data) ->
@@ -166,37 +172,36 @@ class Membership
     log "setting up instructor dashboard section - membership"
     @$section.data 'wrapper', @
 
-    # isolate sections from each other's errors.
-    plantTimeout 0, => @batchenrollment = new BatchEnrollment @$section.find '.batch-enrollment'
-    plantTimeout 0, => @staff_list       = new AuthList (@$section.find '.auth-list-container.auth-list-staff'), 'staff'
-    plantTimeout 0, => @instructor_list  = new AuthList (@$section.find '.auth-list-container.auth-list-instructor'), 'instructor'
-    plantTimeout 0, => @beta_list        = new AuthList (@$section.find '.auth-list-container.auth-list-beta'), 'beta'
+    @$list_selector = @$section.find('select#member-lists-selector')
 
-    # forum lists
-    # TODO names like 'Administrator' should come from server through template.
-    plantTimeout 0, => @forum_admin_list = new AuthList (@$section.find '.auth-list-container.auth-list-forum-admin'),        'Administrator'
-    plantTimeout 0, => @forum_mod_list   = new AuthList (@$section.find '.auth-list-container.auth-list-forum-moderator'),    'Moderator'
-    plantTimeout 0, => @forum_comta_list = new AuthList (@$section.find '.auth-list-container.auth-list-forum-community-ta'), 'Community TA'
+    plantTimeout 0, => @batchenrollment = new BatchEnrollment @$section.find '.batch-enrollment'
+
+    @auth_lists = _.map (@$section.find '.auth-list-container'), (auth_list_container) ->
+      rolename = $(auth_list_container).data 'rolename'
+      new AuthList $(auth_list_container), rolename
+
+    # populate selector
+    @$list_selector.empty()
+    for auth_list in @auth_lists
+      @$list_selector.append $ '<option/>',
+        text: auth_list.$container.data 'display-name'
+        data:
+          auth_list: auth_list
+
+    @$list_selector.change =>
+      $opt = @$list_selector.children('option:selected')
+      for auth_list in @auth_lists
+        auth_list.$container.removeClass 'active'
+      auth_list = $opt.data('auth_list')
+      auth_list.refresh()
+      auth_list.$container.addClass 'active'
+
+    @$list_selector.change()
+
 
   onClickTitle: ->
-    @staff_list.$display_table.empty()
-    @staff_list.reload_auth_list()
-
-    @instructor_list.$display_table.empty()
-    @instructor_list.reload_auth_list()
-
-    @beta_list.$display_table.empty()
-    @beta_list.reload_auth_list()
-
-    @forum_admin_list.$display_table.empty()
-    @forum_admin_list.reload_auth_list()
-
-    @forum_mod_list.$display_table.empty()
-    @forum_mod_list.reload_auth_list()
-
-    @forum_comta_list.$display_table.empty()
-    @forum_comta_list.reload_auth_list()
-
+    for auth_list in @auth_lists
+      auth_list.refresh()
 
 
 # exports
