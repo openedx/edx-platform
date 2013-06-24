@@ -157,9 +157,12 @@
 
 
 .instructor-dashboard-wrapper-2 section.idash-section#student_admin > {
-  h3    { margin-top: 2em; }
-  input { margin-top: 2em; }
-  a     { margin-top: 2em; }
+  .progress-link-wrapper {
+    margin-top: 0.7em;
+  }
+  // h3    { margin-top: 2em; }
+  // input { margin-top: 2em; }
+  // a     { margin-top: 2em; }
 }
 
 
