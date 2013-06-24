@@ -153,10 +153,10 @@ def press(request):
 
 def process_survey_link(survey_link, user):
     """
-    If {UNIQUE_ID} appears in the link, replace it with a unique id for the user.
+    If {EDX_ID} appears in the link, replace it with a unique id for the user.
     Currently, this is sha1(user.username).  Otherwise, return survey_link.
     """
-    return survey_link.format(UNIQUE_ID=unique_id_for_user(user))
+    return survey_link.format(EDX_ID=unique_id_for_user(user))
 
 
 def cert_info(user, course):
