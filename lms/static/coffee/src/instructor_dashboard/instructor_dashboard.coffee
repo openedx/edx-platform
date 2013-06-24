@@ -3,6 +3,20 @@
 log = -> console.log.apply console, arguments
 plantTimeout = (ms, cb) -> setTimeout cb, ms
 
+
+# # intercepts a jquery method
+# # calls the original method after callback
+# intercept_jquery_method = (method_name, callback) ->
+#   original = jQuery.fn[method_name]
+#   jQuery.fn[method_name] = ->
+#     callback.apply this, arguments
+#     original.apply this, arguments
+
+
+# intercept_jquery_method 'on', (event_name) ->
+#   this.addClass "has-event-handler-for-#{event_name}"
+
+
 CSS_INSTRUCTOR_CONTENT = 'instructor-dashboard-content-2'
 CSS_ACTIVE_SECTION = 'active-section'
 CSS_IDASH_SECTION = 'idash-section'
@@ -42,7 +56,9 @@ setup_instructor_dashboard = (idash_content) =>
       # write deep link
       location.hash = "#{HASH_LINK_PREFIX}#{section_name}"
 
+      log "clicked section #{section_name}"
       plantTimeout 0, -> section.data('wrapper')?.onClickTitle?()
+      # plantTimeout 0, -> section.data('wrapper')?.onExit?()
 
   # recover deep link from url
   # click default or go to section specified by hash
@@ -51,8 +67,12 @@ setup_instructor_dashboard = (idash_content) =>
     section_name = rmatch[1]
     link = links.filter "[data-section='#{section_name}']"
     link.click()
+    link.data('wrapper')?.onClickTitle?()
   else
-    links.eq(0).click()
+    link = links.eq(0)
+    link.click()
+    link.data('wrapper')?.onClickTitle?()
+
 
 
 # call setup handlers for each section
@@ -60,7 +80,7 @@ setup_instructor_dashboard_sections = (idash_content) ->
   log "setting up instructor dashboard sections"
   # fault isolation
   # an error thrown in one section will not block other sections from exectuing
-  plantTimeout 0, -> new window.InstructorDashboard.sections.CourseInfo idash_content.find ".#{CSS_IDASH_SECTION}#course_info"
+  plantTimeout 0, -> new window.InstructorDashboard.sections.CourseInfo   idash_content.find ".#{CSS_IDASH_SECTION}#course_info"
   plantTimeout 0, -> new window.InstructorDashboard.sections.DataDownload idash_content.find ".#{CSS_IDASH_SECTION}#data_download"
   plantTimeout 0, -> new window.InstructorDashboard.sections.Membership   idash_content.find ".#{CSS_IDASH_SECTION}#membership"
   plantTimeout 0, -> new window.InstructorDashboard.sections.StudentAdmin idash_content.find ".#{CSS_IDASH_SECTION}#student_admin"

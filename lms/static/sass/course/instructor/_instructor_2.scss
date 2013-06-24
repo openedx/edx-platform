@@ -15,8 +15,26 @@
     width: 100%;
     // position: relative;
 
-    .slick-header-column {
-      height: 100%;
+    // .has-event-handler-for-click {
+    //   border: 1px solid blue;
+    // }
+
+    .slickgrid {
+      font-family: verdana,arial,sans-serif;
+      font-size:11px;
+      color:#333333;
+      margin-left: 1px;
+
+      .slick-header-column {
+        // height: 100%;
+      }
+
+      .slick-cell {
+        white-space: normal;
+        word-wrap: break-word;
+        border: 1px dotted silver;
+        border-collapse: collapse;
+      }
     }
 
     h1 {
@@ -157,9 +175,33 @@
 
 
 .instructor-dashboard-wrapper-2 section.idash-section#student_admin > {
-  h3    { margin-top: 2em; }
-  input { margin-top: 2em; }
-  a     { margin-top: 2em; }
+  .progress-link-wrapper {
+    margin-top: 0.7em;
+  }
+
+  // .task-history-single-table { .slickgrid
+  //   max-height: 500px;
+  // } }
+
+  // .running-tasks-table { .slickgrid {
+  //   max-height: 500px;
+  // } }
+
+  .task-history-all-table    {
+    margin-top: 1em;
+    // height: 300px;
+    // overflow-y: scroll;
+  }
+  .task-history-single-table {
+    margin-top: 1em;
+    // height: 300px;
+    // overflow-y: scroll;
+  }
+  .running-tasks-table {
+    margin-top: 1em;
+    // height: 500px;
+    // overflow-y: scroll;
+  }
 }
 
 

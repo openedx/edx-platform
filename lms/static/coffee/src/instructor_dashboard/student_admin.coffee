@@ -1,83 +1,258 @@
 log = -> console.log.apply console, arguments
 plantTimeout = (ms, cb) -> setTimeout cb, ms
+plantInterval = (ms, cb) -> setInterval cb, ms
+
+
+std_ajax_err = (handler) -> (jqXHR, textStatus, errorThrown) ->
+  console.warn """ajax error
+                  textStatus: #{textStatus}
+                  errorThrown: #{errorThrown}"""
+  handler.apply this, arguments
+
+
+create_task_list_table = ($table_tasks, tasks_data) ->
+  $table_tasks.empty()
+
+  options =
+    enableCellNavigation: true
+    enableColumnReorder: false
+    autoHeight: true
+    rowHeight: 60
+    forceFitColumns: true
+
+  columns = [
+    id: 'task_type'
+    field: 'task_type'
+    name: 'Task Type'
+  ,
+    id: 'requester'
+    field: 'requester'
+    name: 'Requester'
+    width: 30
+  ,
+    id: 'task_input'
+    field: 'task_input'
+    name: 'Input'
+  ,
+    id: 'task_state'
+    field: 'task_state'
+    name: 'State'
+    width: 30
+  ,
+    id: 'task_id'
+    field: 'task_id'
+    name: 'Task ID'
+    width: 50
+  ,
+    id: 'created'
+    field: 'created'
+    name: 'Created'
+  ]
+
+  table_data = tasks_data
+
+  $table_placeholder = $ '<div/>', class: 'slickgrid'
+  $table_tasks.append $table_placeholder
+  grid = new Slick.Grid($table_placeholder, table_data, columns, options)
 
 
 class StudentAdmin
   constructor: (@$section) ->
     log "setting up instructor dashboard section - student admin"
+    @$section.data 'wrapper', @
 
-    @$student_email_field = @$section.find("input[name='student-select']")
-    @$student_progress_link = @$section.find('a.progress-link')
-    @$unenroll_btn = @$section.find("input[name='unenroll']")
-    @$problem_select_field = @$section.find("input[name='problem-select']")
-    @$reset_attempts_btn = @$section.find("input[name='reset-attempts']")
-    @$delete_states_btn = @$section.find("input[name='delete-state']")
+    # get jquery element and assert its existance
+    # for debugging
+    find_and_assert = ($root, selector) ->
+      item = $root.find selector
+      if item.length != 1
+        console.error "element selection failed for '#{selector}' resulted in length #{item.length}"
+        throw "Failed Element Selection"
+      else
+        item
 
-    @$student_progress_link.click (e) =>
+    # collect buttons
+    @$field_student_select        = find_and_assert @$section, "input[name='student-select']"
+    @$progress_link               = find_and_assert @$section, "a.progress-link"
+    @$btn_enroll                  = find_and_assert @$section, "input[name='enroll']"
+    @$btn_unenroll                = find_and_assert @$section, "input[name='unenroll']"
+    @$field_problem_select_single = find_and_assert @$section, "input[name='problem-select-single']"
+    @$btn_reset_attempts_single   = find_and_assert @$section, "input[name='reset-attempts-single']"
+    @$btn_delete_state_single     = find_and_assert @$section, "input[name='delete-state-single']"
+    @$btn_rescore_problem_single  = find_and_assert @$section, "input[name='rescore-problem-single']"
+    @$btn_task_history_single     = find_and_assert @$section, "input[name='task-history-single']"
+    @$table_task_history_single   = find_and_assert @$section, ".task-history-single-table"
+    @$field_problem_select_all    = find_and_assert @$section, "input[name='problem-select-all']"
+    @$btn_reset_attempts_all      = find_and_assert @$section, "input[name='reset-attempts-all']"
+    @$btn_rescore_problem_all     = find_and_assert @$section, "input[name='rescore-problem-all']"
+    @$btn_task_history_all        = find_and_assert @$section, "input[name='task-history-all']"
+    @$table_task_history_all      = find_and_assert @$section, ".task-history-all-table"
+    @$table_running_tasks         = find_and_assert @$section, ".running-tasks-table"
+
+    @start_refresh_running_task_poll_loop()
+
+    # go to student progress page
+    @$progress_link.click (e) =>
       e.preventDefault()
-      email = @$student_email_field.val()
-      @get_student_progress_link email,
+      email = @$field_student_select.val()
+
+      $.ajax
+        dataType: 'json'
+        url: @$progress_link.data 'endpoint'
+        data: student_email: email
         success: (data) ->
           log 'redirecting...'
           window.location = data.progress_url
-        error: ->
-          console.warn 'error getting student progress url for ' + email
+        error: std_ajax_err -> console.warn 'error getting student progress url for ' + email
 
-    @$unenroll_btn.click =>
+    # enroll student
+    @$btn_enroll.click =>
+      send_data =
+        action: 'enroll'
+        emails: @$field_student_select.val()
+        auto_enroll: false
+
+      $.ajax
+        dataType: 'json'
+        url: @$btn_unenroll.data 'endpoint'
+        data: send_data
+        success: -> console.log "student #{send_data.emails} enrolled"
+        error: std_ajax_err -> console.warn 'error enrolling student'
+
+    # unenroll student
+    @$btn_unenroll.click =>
       send_data =
         action: 'unenroll'
-        emails: @$student_email_field.val()
+        emails: @$field_student_select.val()
         auto_enroll: false
-      $.getJSON @$unenroll_btn.data('endpoint'), send_data, (data) ->
-        log data
 
-    @$reset_attempts_btn.click =>
-      email = @$student_email_field.val()
-      problem_to_reset = @$problem_select_field.val()
-      @reset_student_progress email, problem_to_reset, false,
-        success: -> log 'problem attempts reset!'
-        error:   -> console.warn 'error resetting problem state'
+      $.ajax
+        dataType: 'json'
+        url: @$btn_unenroll.data 'endpoint'
+        data: send_data
+        success: -> console.log "student #{send_data.emails} unenrolled"
+        error: std_ajax_err -> console.warn 'error unenrolling student'
 
-    @$delete_states_btn.click =>
-      email = @$student_email_field.val()
-      problem_to_reset = @$problem_select_field.val()
-      @reset_student_progress email, problem_to_reset, true,
-        success: -> log 'problem state deleted!'
-        error:   -> console.warn 'error deleting problem state'
+    # reset attempts for student on problem
+    @$btn_reset_attempts_single.click =>
+      send_data =
+        student_email: @$field_student_select.val()
+        problem_to_reset: @$field_problem_select_single.val()
+        delete_module: false
+
+      $.ajax
+        dataType: 'json'
+        url: @$btn_reset_attempts_single.data 'endpoint'
+        data: send_data
+        success: -> log 'problem attempts reset'
+        error: std_ajax_err   -> console.warn 'error resetting problem state'
+
+    # delete state for student on problem
+    @$btn_delete_state_single.click =>
+      send_data =
+        student_email: @$field_student_select.val()
+        problem_to_reset: @$field_problem_select_single.val()
+        delete_module: true
+
+      $.ajax
+        dataType: 'json'
+        url: @$btn_delete_state_single.data 'endpoint'
+        data: send_data
+        success: -> log 'module state deleted'
+        error: std_ajax_err   -> console.warn 'error deleting problem state'
+
+    # start task to rescore problem for student
+    @$btn_rescore_problem_single.click =>
+      send_data =
+        student_email: @$field_student_select.val()
+        problem_to_reset: @$field_problem_select_single.val()
+
+      $.ajax
+        dataType: 'json'
+        url: @$btn_rescore_problem_single.data 'endpoint'
+        data: send_data
+        success: -> log 'started rescore problem task'
+        error: std_ajax_err -> console.warn 'error starting rescore problem (single student) task'
+
+    # list task history for student+problem
+    @$btn_task_history_single.click =>
+      send_data =
+        student_email: @$field_student_select.val()
+        problem_urlname: @$field_problem_select_single.val()
+
+      if not send_data.student_email then return
+      if not send_data.problem_urlname then return
+
+      $.ajax
+        dataType: 'json'
+        url: @$btn_task_history_single.data 'endpoint'
+        data: send_data
+        success: (data) =>
+          create_task_list_table @$table_task_history_single, data.tasks
+        error: std_ajax_err -> console.warn 'error listing task history for student+problem'
+
+    # start task to reset attempts on problem for all students
+    @$btn_reset_attempts_all.click =>
+      send_data =
+        all_students: true
+        problem_to_reset: @$field_problem_select_all.val()
+
+      $.ajax
+        dataType: 'json'
+        url: @$btn_reset_attempts_all.data 'endpoint'
+        data: send_data
+        success: -> log 'started reset attempts task'
+        error: std_ajax_err (jqXHR, textStatus, errorThrown) ->
+          console.warn "error starting reset attempts (all students) task"
+
+    # start task to rescore problem for all students
+    @$btn_rescore_problem_all.click =>
+      send_data =
+        all_students: true
+        problem_to_reset: @$field_problem_select_all.val()
+
+      $.ajax
+        dataType: 'json'
+        url: @$btn_rescore_problem_all.data 'endpoint'
+        data: send_data
+        success: -> log 'started rescore problem task'
+        error: std_ajax_err (jqXHR, textStatus, errorThrown) ->
+          console.warn "error starting rescore problem (all students) task"
+
+    # list task history for problem
+    @$btn_task_history_all.click =>
+      send_data =
+        problem_urlname: @$field_problem_select_all.val()
+
+      if not send_data.problem_urlname then return
+
+      $.ajax
+        dataType: 'json'
+        url: @$btn_task_history_all.data 'endpoint'
+        data: send_data
+        success: (data) =>
+          create_task_list_table @$table_task_history_all, data.tasks
+        error: std_ajax_err -> console.warn 'error listing task history for student+problem'
 
 
-  # handler can be either a callback for success or a mapping e.g. {success: ->, error: ->, complete: ->}
-  get_student_progress_link: (student_email, handler) ->
-    settings =
+  reload_running_tasks_list: =>
+    list_endpoint = @$table_running_tasks.data 'endpoint'
+    $.ajax
       dataType: 'json'
-      url: @$student_progress_link.data 'endpoint'
-      data: student_email: student_email
+      url: list_endpoint
+      success: (data) => create_task_list_table @$table_running_tasks, data.tasks
+      error: std_ajax_err -> console.warn "error listing all instructor tasks"
 
-    if typeof handler is 'function'
-      _.extend settings, success: handler
-    else
-      _.extend settings, handler
+  start_refresh_running_task_poll_loop: ->
+    @reload_running_tasks_list()
+    if @$section.hasClass 'active-section'
+      plantTimeout 5000, => @start_refresh_running_task_poll_loop()
 
-    $.ajax settings
+  onClickTitle: ->
+    @start_refresh_running_task_poll_loop()
 
-
-  # handler can be either a callback for success or a mapping e.g. {success: ->, error: ->, complete: ->}
-  reset_student_progress: (student_email, problem_to_reset, delete_module, handler) ->
-    settings =
-      dataType: 'json'
-      url: @$reset_attempts_btn.data 'endpoint'
-      data:
-        student_email: student_email
-        problem_to_reset: problem_to_reset
-        delete_module: delete_module
-
-    if typeof handler is 'function'
-      _.extend settings, success: handler
-    else
-      _.extend settings, handler
-
-    $.ajax settings
-
+  # onExit: ->
+  #   clearInterval @reload_running_task_list_slot
 
 
 # exports

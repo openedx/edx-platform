@@ -126,7 +126,10 @@ class AuthList
       options =
         enableCellNavigation: true
         enableColumnReorder: false
+        # autoHeight: true
+        forceFitColumns: true
 
+      WHICH_CELL_IS_REVOKE = 3
       columns = [
         id: 'username'
         field: 'username'
@@ -136,6 +139,14 @@ class AuthList
         field: 'email'
         name: 'Email'
       ,
+        id: 'first_name'
+        field: 'first_name'
+        name: 'First Name'
+      ,
+      #   id: 'last_name'
+      #   field: 'last_name'
+      #   name: 'Last Name'
+      # ,
         id: 'revoke'
         field: 'revoke'
         name: 'Revoke'
@@ -148,11 +159,11 @@ class AuthList
       $table_placeholder = $ '<div/>', class: 'slickgrid'
       @$display_table.append $table_placeholder
       grid = new Slick.Grid($table_placeholder, table_data, columns, options)
-      grid.autosizeColumns()
+      # grid.autosizeColumns()
 
       grid.onClick.subscribe (e, args) =>
         item = args.grid.getDataItem(args.row)
-        if args.cell is 2
+        if args.cell is WHICH_CELL_IS_REVOKE
           @access_change(item.email, @rolename, 'revoke', @reload_auth_list)
 
   # slickgrid collapses when rendered in an invisible div

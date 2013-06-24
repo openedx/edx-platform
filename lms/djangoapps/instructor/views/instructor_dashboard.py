@@ -95,11 +95,14 @@ def _section_course_info(course_id):
     section_data['enrollment_count'] = CourseEnrollment.objects.filter(course_id=course_id).count()
     section_data['has_started'] = course.has_started()
     section_data['has_ended'] = course.has_ended()
-    section_data['grade_cutoffs'] = "[" + reduce(lambda memo, (letter, score): "{}: {}, ".format(letter, score) + memo , course.grade_cutoffs.items(), "")[:-2] + "]"
-    section_data['offline_grades'] = offline_grades_available(course_id)
+    try:
+        section_data['grade_cutoffs'] = "" + reduce(lambda memo, (letter, score): "{}: {}, ".format(letter, score) + memo, course.grade_cutoffs.items(), "")[:-2] + ""
+    except:
+        section_data['grade_cutoffs'] = "Not Available"
+    # section_data['offline_grades'] = offline_grades_available(course_id)
 
     try:
-        section_data['course_errors'] = [(escape(a), '') for (a,b) in modulestore().get_item_errors(course.location)]
+        section_data['course_errors'] = [(escape(a), '') for (a, b) in modulestore().get_item_errors(course.location)]
     except Exception:
         section_data['course_errors'] = [('Error fetching errors', '')]
 
@@ -111,9 +114,7 @@ def _section_membership(course_id, access):
     section_data = {
         'section_key': 'membership',
         'section_display_name': 'Membership',
-
         'access': access,
-
         'enroll_button_url':   reverse('students_update_enrollment_email', kwargs={'course_id': course_id}),
         'unenroll_button_url': reverse('students_update_enrollment_email', kwargs={'course_id': course_id}),
         'list_course_role_members_url': reverse('list_course_role_members', kwargs={'course_id': course_id}),
@@ -130,8 +131,10 @@ def _section_student_admin(course_id):
         'section_key': 'student_admin',
         'section_display_name': 'Student Admin',
         'get_student_progress_url': reverse('get_student_progress_url', kwargs={'course_id': course_id}),
-        'unenroll_button_url': reverse('students_update_enrollment_email', kwargs={'course_id': course_id}),
+        'enrollment_url': reverse('students_update_enrollment_email', kwargs={'course_id': course_id}),
         'reset_student_attempts_url': reverse('reset_student_attempts', kwargs={'course_id': course_id}),
+        'rescore_problem_url': reverse('rescore_problem', kwargs={'course_id': course_id}),
+        'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': course_id}),
     }
     return section_data
 

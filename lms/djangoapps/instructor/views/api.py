@@ -21,6 +21,7 @@ from django_comment_common.models import (Role,
                                           FORUM_ROLE_COMMUNITY_TA)
 
 from courseware.models import StudentModule
+import instructor_task.api
 import instructor.enrollment as enrollment
 from instructor.enrollment import split_input_list, enroll_emails, unenroll_emails
 import instructor.access as access
@@ -45,7 +46,7 @@ def students_update_enrollment_email(request, course_id):
 
     action = request.GET.get('action', '')
     emails = split_input_list(request.GET.get('emails', ''))
-    auto_enroll = request.GET.get('auto_enroll', '') in ['true', 'Talse', True]
+    auto_enroll = request.GET.get('auto_enroll', '') in ['true', 'True', True]
 
     if action == 'enroll':
         results = enroll_emails(course_id, emails, auto_enroll=auto_enroll)
@@ -293,32 +294,126 @@ def redirect_to_student_progress(request, course_id):
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def reset_student_attempts(request, course_id):
     """
-    Resets a students attempts counter. Optionally deletes student state for a problem.
+    Resets a students attempts counter or starts a task to reset all students attempts counters. Optionally deletes student state for a problem.
     Limited to staff access.
 
-    Takes query parameter student_email
-    Takes query parameter problem_to_reset
-    Takes query parameter delete_module
+    Takes either of the following query paremeters
+        - problem_to_reset is a urlname of a problem
+        - student_email is an email
+        - all_students is a boolean
+        - delete_module is a boolean
     """
     course = get_course_with_access(request.user, course_id, 'staff', depth=None)
 
-    student_email = request.GET.get('student_email')
     problem_to_reset = request.GET.get('problem_to_reset')
-    will_delete_module = {'true': True}.get(request.GET.get('delete_module', ''), False)
+    student_email = request.GET.get('student_email')
+    all_students = request.GET.get('all_students', False) in ['true', 'True', True]
+    will_delete_module = request.GET.get('delete_module', False) in ['true', 'True', True]
 
-    if not student_email or not problem_to_reset:
+    if not (problem_to_reset and (all_students or student_email)):
+        return HttpResponseBadRequest()
+    if will_delete_module and all_students:
         return HttpResponseBadRequest()
 
-    user = User.objects.get(email=student_email)
+    module_state_key = _module_state_key_from_problem_urlname(course_id, problem_to_reset)
 
-    try:
-        enrollment.reset_student_attempts(course_id, user, problem_to_reset, delete_module=will_delete_module)
-    except StudentModule.DoesNotExist:
+    response_payload = {}
+    response_payload['problem_to_reset'] = problem_to_reset
+
+    if student_email:
+        student = User.objects.get(email=student_email)
+        try:
+            enrollment.reset_student_attempts(course_id, student, module_state_key, delete_module=will_delete_module)
+        except StudentModule.DoesNotExist:
+            return HttpResponseBadRequest()
+    elif all_students:
+        task = instructor_task.api.submit_reset_problem_attempts_for_all_students(request, course_id, module_state_key)
+        response_payload['task'] = 'created'
+    else:
         return HttpResponseBadRequest()
+
+    response = HttpResponse(json.dumps(response_payload), content_type="application/json")
+    return response
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+def rescore_problem(request, course_id):
+    """
+    Starts a background process a students attempts counter. Optionally deletes student state for a problem.
+    Limited to staff access.
+
+    Takes either of the following query paremeters
+        - problem_to_reset is a urlname of a problem
+        - student_email is an email
+        - all_students is a boolean
+
+    all_students will be ignored if student_email is present
+    """
+    course = get_course_with_access(request.user, course_id, 'staff', depth=None)
+
+    problem_to_reset = request.GET.get('problem_to_reset')
+    student_email = request.GET.get('student_email', False)
+    all_students = request.GET.get('all_students', '') in ['true', 'True', True]
+
+    if not (problem_to_reset and (all_students or student_email)):
+        return HttpResponseBadRequest()
+
+    module_state_key = _module_state_key_from_problem_urlname(course_id, problem_to_reset)
+
+    response_payload = {}
+    response_payload['problem_to_reset'] = problem_to_reset
+
+    if student_email:
+        response_payload['student_email'] = student_email
+        student = User.objects.get(email=student_email)
+        task = instructor_task.api.submit_rescore_problem_for_student(request, course_id, module_state_key, student)
+        response_payload['task'] = 'created'
+    elif all_students:
+        task = instructor_task.api.submit_rescore_problem_for_all_students(request, course_id, module_state_key)
+        response_payload['task'] = 'created'
+    else:
+        return HttpResponseBadRequest()
+
+    response = HttpResponse(json.dumps(response_payload), content_type="application/json")
+    return response
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+def list_instructor_tasks(request, course_id):
+    """
+    List instructor tasks.
+    Limited to instructor access.
+
+    Takes either of the following query paremeters
+        - (optional) problem_urlname (same format as problem_to_reset in other api methods)
+        - (optional) student_email
+    """
+    course = get_course_with_access(request.user, course_id, 'instructor', depth=None)
+
+    problem_urlname = request.GET.get('problem_urlname', False)
+    student_email = request.GET.get('student_email', False)
+
+    if student_email and not problem_urlname:
+        return HttpResponseBadRequest()
+
+    if problem_urlname:
+        module_state_key = _module_state_key_from_problem_urlname(course_id, problem_urlname)
+        if student_email:
+            student = User.objects.get(email=student_email)
+            tasks = instructor_task.api.get_instructor_task_history(course_id, module_state_key, student)
+        else:
+            tasks = instructor_task.api.get_instructor_task_history(course_id, module_state_key)
+    else:
+        tasks = instructor_task.api.get_running_instructor_tasks(course_id)
+
+    def extract_task_features(task):
+        FEATURES = ['task_type', 'task_input', 'task_id', 'requester', 'created', 'task_state']
+        return dict((feature, str(getattr(task, feature))) for feature in FEATURES)
 
     response_payload = {
-        'course_id':    course_id,
-        'delete_module': will_delete_module,
+        'tasks': map(extract_task_features, tasks),
     }
     response = HttpResponse(json.dumps(response_payload), content_type="application/json")
     return response
@@ -395,3 +490,14 @@ def update_forum_role_membership(request, course_id):
     }
     response = HttpResponse(json.dumps(response_payload), content_type="application/json")
     return response
+
+
+def _module_state_key_from_problem_urlname(course_id, urlname):
+    if urlname[-4:] == ".xml":
+        urlname = urlname[:-4]
+
+    urlname = "problem/" + urlname
+
+    (org, course_name, _) = course_id.split("/")
+    module_state_key = "i4x://" + org + "/" + course_name + "/" + urlname
+    return module_state_key

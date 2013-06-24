@@ -1,16 +1,74 @@
 <%page args="section_data"/>
 
-<h3> Select student </h3>
+<H2>Student-specific grade adjustment</h2>
+
 <input type="text" name="student-select" placeholder="Student Email">
 <br>
-## <p>grade</p>
-## <p>85 (B)</p>
-<a href="" class="progress-link" data-endpoint="${ section_data['get_student_progress_url'] }">Student Progress Page</a>
+
+<div class="progress-link-wrapper">
+  <a href="" class="progress-link" data-endpoint="${ section_data['get_student_progress_url'] }">Student Progress Page</a>
+</div>
+
 <br>
-<input type="button" name="unenroll" value="Unenroll" data-endpoint="${ section_data['unenroll_button_url'] }">
+<input type="button" name="enroll" value="Enroll" data-endpoint="${ section_data['enrollment_url'] }">
+<input type="button" name="unenroll" value="Unenroll" data-endpoint="${ section_data['enrollment_url'] }">
 ## <select class="problems">
 ##   <option>Getting problems...</option>
 ## </select>
-<input type="text" name="problem-select" placeholder="Problem URL-name">
-<input type="button" name="reset-attempts" value="Reset Student Attempts" data-endpoint="${ section_data['reset_student_attempts_url'] }">
-<input type="button" name="delete-state" value="Delete Student State" data-endpoint="${ section_data['reset_student_attempts_url'] }">
+
+<p> Specify a particular problem in the course here by its url: </p>
+<input type="text" name="problem-select-single" placeholder="Problem urlname">
+<p>
+  You may use just the "urlname" if a problem, or "modulename/urlname" if not.
+  (For example, if the location is <tt>i4x://university/course/problem/problemname</tt>,
+  then just provide the <tt>problemname</tt>.
+  If the location is <tt>i4x://university/course/notaproblem/someothername</tt>, then
+  provide <tt>notaproblem/someothername</tt>.)
+</p>
+<input type="button" name="reset-attempts-single" value="Reset Student Attempts" data-endpoint="${ section_data['reset_student_attempts_url'] }">
+<p> You may also delete the entire state of a student for the specified module: </p>
+<input type="button" name="delete-state-single" value="Delete Student State for Module" data-endpoint="${ section_data['reset_student_attempts_url'] }">
+<input type="button" name="rescore-problem-single" value="Rescore Student Submission" data-endpoint="${ section_data['rescore_problem_url'] }">
+
+
+<p>
+  Rescoring runs in the background, and status for active tasks will appear in a table below.
+  To see status for all tasks submitted for this course and student, click on this button:
+</p>
+
+<input type="button" name="task-history-single" value="Show Background Task History for Student" data-endpoint="${ section_data['list_instructor_tasks_url'] }">
+<div class="task-history-single-table"></div>
+
+<hr>
+
+
+<H2>Course-specific grade adjustment</h2>
+
+<p>
+  Specify a particular problem in the course here by its url:
+  <input type="text" name="problem-select-all" size="60">
+</p>
+<p>
+  You may use just the "urlname" if a problem, or "modulename/urlname" if not.
+  (For example, if the location is <tt>i4x://university/course/problem/problemname</tt>,
+  then just provide the <tt>problemname</tt>.
+  If the location is <tt>i4x://university/course/notaproblem/someothername</tt>, then
+  provide <tt>notaproblem/someothername</tt>.)
+</p>
+<p>
+  Then select an action:
+  <input type="button" name="reset-attempts-all" value="Reset ALL students' attempts" data-endpoint="${ section_data['reset_student_attempts_url'] }">
+  <input type="button" name="rescore-problem-all" value="Rescore ALL students' problem submissions" data-endpoint="${ section_data['rescore_problem_url'] }">
+</p>
+<p>
+<p>These actions run in the background, and status for active tasks will appear in a table below.
+   To see status for all tasks submitted for this problem, click on this button:
+</p>
+  <input type="button" name="task-history-all" value="Show Background Task History for Problem" data-endpoint="${ section_data['list_instructor_tasks_url'] }">
+  <div class="task-history-all-table"></div>
+</p>
+
+<hr>
+
+<h2> Pending Instructor Tasks </h2>
+<div class="running-tasks-table" data-endpoint="${ section_data['list_instructor_tasks_url'] }"></div>

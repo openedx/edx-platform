@@ -56,6 +56,7 @@ class Analytics
           options =
             enableCellNavigation: true
             enableColumnReorder: false
+            forceFitColumns: true
 
           columns = [
             id: feature
@@ -76,7 +77,7 @@ class Analytics
           table_placeholder = $ '<div/>', class: 'slickgrid'
           @$display_table.append table_placeholder
           grid = new Slick.Grid(table_placeholder, grid_data, columns, options)
-          grid.autosizeColumns()
+          # grid.autosizeColumns()
         else if feature is 'year_of_birth'
           graph_placeholder = $ '<div/>', class: 'year-of-birth'
           @$display_graph.append graph_placeholder
