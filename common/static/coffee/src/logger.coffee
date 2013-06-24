@@ -1,6 +1,6 @@
 class @Logger
   # events we want sent to Segment.io for tracking
-  SEGMENT_IO_WHITELIST = ["seq_goto", "seq_next", "seq_prev"]
+  SEGMENT_IO_WHITELIST = ["seq_goto", "seq_next", "seq_prev", "problem_check", "problem_reset", "problem_show", "problem_save"]
 
   @log: (event_type, data) ->
     if event_type in SEGMENT_IO_WHITELIST
