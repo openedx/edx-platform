@@ -23,7 +23,7 @@ class Analytics
 
   populate_selector: (cb) ->
     @get_profile_distributions [], (data) =>
-        @$distribution_select.find('option').eq(0).text "-- Select distribution"
+        @$distribution_select.find('option').eq(0).text "-- Select Distribution --"
 
         for feature in data.available_features
           opt = $ '<option/>',
