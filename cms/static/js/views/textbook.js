@@ -172,8 +172,8 @@ CMS.Views.ListTextbooks = Backbone.View.extend({
         if(textbooks.length === 0) {
             this.$el.html(this.emptyTemplate());
         } else {
-            var $el = this.$el;
-            $el.empty();
+            this.$el.empty();
+            var that = this;
             textbooks.each(function(textbook) {
                 var view;
                 if (textbook === textbooks.editing) {
@@ -181,7 +181,7 @@ CMS.Views.ListTextbooks = Backbone.View.extend({
                 } else {
                     view = new CMS.Views.ShowTextbook({model: textbook});
                 }
-                $el.append(view.render().el);
+                that.$el.append(view.render().el);
             });
         }
         return this;
