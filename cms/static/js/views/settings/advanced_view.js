@@ -20,9 +20,6 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
                 self.render();
             }
         );
-        // because these are outside of this.$el, they can't be in the event hash
-        $('.save-button').on('click', this, this.saveView);
-        $('.cancel-button').on('click', this, this.revertView);
         this.listenTo(this.model, 'invalid', this.handleValidationError);
     },
     render: function() {
@@ -45,7 +42,6 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
 
         var policyValues = listEle$.find('.json');
         _.each(policyValues, this.attachJSONEditor, this);
-        this.showMessage();
         return this;
     },
     attachJSONEditor : function (textarea) {
@@ -61,7 +57,9 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
             mode: "application/json", lineNumbers: false, lineWrapping: false,
             onChange: function(instance, changeobj) {
                 // this event's being called even when there's no change :-(
-                if (instance.getValue() !== oldValue) self.showSaveCancelButtons();
+                if (instance.getValue() !== oldValue && !self.notificationBarShowing) {
+                    self.showNotificationBar();
+                }
             },
             onFocus : function(mirror) {
               $(textarea).parent().children('label').addClass("is-focused");
@@ -99,59 +97,65 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
             }
         });
     },
-    showMessage: function (type) {
-        $(".wrapper-alert").removeClass("is-shown");
-        if (type) {
-            if (type === this.error_saving) {
-                $(".wrapper-alert-error").addClass("is-shown").attr('aria-hidden','false');
-            }
-            else if (type === this.successful_changes) {
-                $(".wrapper-alert-confirmation").addClass("is-shown").attr('aria-hidden','false');
-                this.hideSaveCancelButtons();
-            }
-        }
-        else {
-            // This is the case of the page first rendering, or when Cancel is pressed.
-            this.hideSaveCancelButtons();
+    showNotificationBar: function() {
+        var self = this;
+        var message = gettext("Your changes will not take effect until you save your progress. Take care with key and value formatting, as validation is not implemented.")
+        var confirm = new CMS.Views.Notification.Warning({
+            title: gettext("You've Made Some Changes"),
+            message: message,
+            actions: {
+                primary: {
+                    "text": gettext("Save Changes"),
+                    "class": "action-save",
+                    "click": function() {
+                        self.saveView();
+                        confirm.hide();
+                        self.notificationBarShowing = false;
+                    }
+                },
+                secondary: [{
+                    "text": gettext("Cancel"),
+                    "class": "action-cancel",
+                    "click": function() {
+                        self.revertView();
+                        confirm.hide();
+                        self.notificationBarShowing = false;
+                    }
+                }]
+            }});
+        this.notificationBarShowing = true;
+        confirm.show();
+        if(this.saved) {
+            this.saved.hide();
         }
     },
-    showSaveCancelButtons: function(event) {
-        if (!this.notificationBarShowing) {
-            this.$el.find(".message-status").removeClass("is-shown");
-            $('.wrapper-notification').removeClass('is-hiding').addClass('is-shown').attr('aria-hidden','false');
-            this.notificationBarShowing = true;
-        }
-    },
-    hideSaveCancelButtons: function() {
-        if (this.notificationBarShowing) {
-            $('.wrapper-notification').removeClass('is-shown').addClass('is-hiding').attr('aria-hidden','true');
-            this.notificationBarShowing = false;
-        }
-    },
-    saveView : function(event) {
-        window.CmsUtils.smoothScrollTop(event);
+    saveView : function() {
         // TODO one last verification scan:
         //    call validateKey on each to ensure proper format
         //    check for dupes
-        var self = event.data;
-        self.model.save({},
+        var self = this;
+        this.model.save({},
             {
             success : function() {
                 self.render();
-                self.showMessage(self.successful_changes);
+                var message = gettext("Please note that validation of your policy key and value pairs is not currently in place yet. If you are having difficulties, please review your policy pairs.");
+                self.saved = new CMS.Views.Alert.Confirmation({
+                    title: gettext("Your policy changes have been saved."),
+                    message: message,
+                    closeIcon: false
+                });
+                self.saved.show();
                 analytics.track('Saved Advanced Settings', {
                     'course': course_location_analytics
                 });
-
             }
         });
     },
-    revertView : function(event) {
-        event.preventDefault();
-        var self = event.data;
-        self.model.deleteKeys = [];
-        self.model.clear({silent : true});
-        self.model.fetch({
+    revertView : function() {
+        var self = this;
+        this.model.deleteKeys = [];
+        this.model.clear({silent : true});
+        this.model.fetch({
             success : function() { self.render(); },
             reset: true
         });

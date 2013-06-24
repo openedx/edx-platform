@@ -232,6 +232,9 @@ FILE_UPLOAD_HANDLERS = (
     'django.core.files.uploadhandler.TemporaryFileUploadHandler',
 )
 
+MITX_FEATURES['AUTH_USE_SHIB'] = True
+MITX_FEATURES['RESTRICT_ENROLL_BY_REG_METHOD'] = True
+
 ########################### PIPELINE #################################
 
 PIPELINE_SASS_ARGUMENTS = '--debug-info --require {proj_dir}/static/sass/bourbon/lib/bourbon.rb'.format(proj_dir=PROJECT_ROOT)
@@ -255,6 +258,6 @@ if SEGMENT_IO_LMS_KEY:
 #####################################################################
 # Lastly, see if the developer has any local overrides.
 try:
-    from .private import *
+    from .private import *      # pylint: disable=F0401
 except ImportError:
     pass

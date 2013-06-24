@@ -25,7 +25,6 @@ $(document).ready(function() {
     $newComponentTemplatePickers = $('.new-component-templates');
     $newComponentButton = $('.new-component-button');
     $spinner = $('<span class="spinner-in-field-icon"></span>');
-    $body.bind('keyup', onKeyUp);
 
     $('.expand-collapse-icon').bind('click', toggleSubmodules);
     $('.visibility-options').bind('change', setVisibility);
@@ -410,12 +409,6 @@ function hideModal(e) {
         $('.file-input').unbind('change', startUpload);
         $modal.hide();
         $modalCover.hide();
-    }
-}
-
-function onKeyUp(e) {
-    if (e.which == 87) {
-        $body.toggleClass('show-wip hide-wip');
     }
 }
 

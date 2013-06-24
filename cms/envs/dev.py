@@ -181,6 +181,6 @@ if SEGMENT_IO_KEY:
 #####################################################################
 # Lastly, see if the developer has any local overrides.
 try:
-    from .private import *
+    from .private import *      # pylint: disable=F0401
 except ImportError:
     pass

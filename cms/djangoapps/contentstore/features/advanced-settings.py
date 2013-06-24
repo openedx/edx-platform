@@ -27,7 +27,7 @@ def i_am_on_advanced_course_settings(step):
 
 @step(u'I press the "([^"]*)" notification button$')
 def press_the_notification_button(step, name):
-    css = 'a.%s-button' % name.lower()
+    css = 'a.action-%s' % name.lower()
 
     # Save was clicked if either the save notification bar is gone, or we have a error notification
     # overlaying it (expected in the case of typing Object into display_name).

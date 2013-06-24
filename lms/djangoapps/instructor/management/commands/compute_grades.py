@@ -3,7 +3,7 @@
 # django management command: dump grades to csv files
 # for use by batch processes
 
-from instructor.offline_gradecalc import *
+from instructor.offline_gradecalc import offline_grade_calculation
 from courseware.courses import get_course_by_id
 from xmodule.modulestore.django import modulestore
 

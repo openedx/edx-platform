@@ -2,7 +2,7 @@ from django.conf import settings
 from .mustache_helpers import mustache_helpers
 from functools import partial
 
-from .utils import *
+from .utils import extend_content, merge_dict, render_mustache
 import django_comment_client.settings as cc_settings
 
 import pystache_custom as pystache

@@ -37,7 +37,7 @@ urlpatterns = ('',  # nopep8
     url(r'^login_ajax$', 'student.views.login_user', name="login"),
     url(r'^login_ajax/(?P<error>[^/]*)$', 'student.views.login_user'),
     url(r'^logout$', 'student.views.logout_user', name='logout'),
-    url(r'^create_account$', 'student.views.create_account'),
+    url(r'^create_account$', 'student.views.create_account', name='create_account'),
     url(r'^activate/(?P<key>[^/]*)$', 'student.views.activate_account', name="activate"),
 
     url(r'^begin_exam_registration/(?P<course_id>[^/]+/[^/]+/[^/]+)$', 'student.views.begin_exam_registration', name="begin_exam_registration"),
@@ -116,8 +116,6 @@ if not settings.MITX_FEATURES["USE_CUSTOM_THEME"]:
 
         url(r'^submit_feedback$', 'util.views.submit_feedback'),
 
-        # TODO: These urls no longer work. They need to be updated before they are re-enabled
-        # url(r'^reactivate/(?P<key>[^/]*)$', 'student.views.reactivation_email'),
     )
 
 # Only enable URLs for those marketing links actually enabled in the
@@ -364,6 +362,21 @@ if settings.MITX_FEATURES.get('AUTH_USE_OPENID'):
         url(r'^openid/logo.gif$', 'django_openid_auth.views.logo', name='openid-logo'),
     )
 
+if settings.MITX_FEATURES.get('AUTH_USE_SHIB'):
+    urlpatterns += (
+        url(r'^shib-login/$', 'external_auth.views.shib_login', name='shib-login'),
+    )
+
+if settings.MITX_FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD'):
+    urlpatterns += (
+        url(r'^course_specific_login/(?P<course_id>[^/]+/[^/]+/[^/]+)/$',
+            'external_auth.views.course_specific_login', name='course-specific-login'),
+        url(r'^course_specific_register/(?P<course_id>[^/]+/[^/]+/[^/]+)/$',
+            'external_auth.views.course_specific_register', name='course-specific-register'),
+
+    )
+
+
 if settings.MITX_FEATURES.get('AUTH_USE_OPENID_PROVIDER'):
     urlpatterns += (
         url(r'^openid/provider/login/$', 'external_auth.views.provider_login', name='openid-provider-login'),
@@ -400,6 +413,12 @@ if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
         url(r'^instructor_task_status/$', 'instructor_task.views.instructor_task_status', name='instructor_task_status'),
     )
 
+if settings.MITX_FEATURES.get('RUN_AS_ANALYTICS_SERVER_ENABLED'):
+    urlpatterns += (
+        url(r'^edinsights_service/', include('edinsights.core.urls')),
+    )
+    import edinsights.core.registry
+
 # FoldIt views
 urlpatterns += (
     # The path is hardcoded into their app...
@@ -419,3 +438,5 @@ if settings.DEBUG:
 #Custom error pages
 handler404 = 'static_template_view.views.render_404'
 handler500 = 'static_template_view.views.render_500'
+
+

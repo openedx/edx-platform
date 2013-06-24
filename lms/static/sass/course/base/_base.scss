@@ -46,6 +46,13 @@ form {
   }
 }
 
+form.choicegroup {
+  label {
+    clear: both;
+    float: left;
+  }
+}
+
 textarea,
 input[type="text"],
 input[type="email"],
