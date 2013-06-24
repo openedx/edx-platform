@@ -12,7 +12,12 @@ def check_for_get_code(self, code, url):
         """
         Check that we got the expected code when accessing url via GET.
         Returns the HTTP response.
-        'self' is a class that subclasses TestCase.
+
+        `self` is a class that subclasses TestCase.
+
+        `code` is a status code for HTTP responses.
+
+        `url` is a url pattern for which we have to test the response.
         """
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, code,
@@ -25,7 +30,11 @@ def check_for_post_code(self, code, url, data={}):
         """
         Check that we got the expected code when accessing url via POST.
         Returns the HTTP response.
-        'self' is a class that subclasses TestCase.
+        `self` is a class that subclasses TestCase.
+
+        `code` is a status code for HTTP responses.
+
+        `url` is a url pattern for which we want to test the response.
         """
         resp = self.client.post(url, data)
         self.assertEqual(resp.status_code, code,
@@ -62,8 +71,8 @@ class LoginEnrollmentTestCase(TestCase):
 
     def logout(self):
         """
-        Logout, check that it worked.
-        Returns an HTTP response which e
+        Logout; check that the HTTP response code indicates redirection
+        as expected.
         """
         resp = self.client.get(reverse('logout'), {})
         # should redirect
@@ -106,8 +115,8 @@ class LoginEnrollmentTestCase(TestCase):
     def enroll(self, course, verify=False):
         """
         Try to enroll and return boolean indicating result.
-        'course' is an instance of CourseDescriptor.
-        'verify' is an optional parameter specifying whether we
+        `course` is an instance of CourseDescriptor.
+        `verify` is an optional parameter specifying whether we
         want to verify that the student was successfully enrolled
         in the course.
         """
@@ -122,20 +131,12 @@ class LoginEnrollmentTestCase(TestCase):
             self.assertTrue(result)
         return result
 
-    # def enroll(self, course):
-    #     """
-    #     Enroll the currently logged-in user, and check that it worked.
-    #     """
-
-    #     result = self.try_enroll(course)
-    #     self.assertTrue(result)
-
     def unenroll(self, course):
         """
         Unenroll the currently logged-in user, and check that it worked.
-        'course' is an instance of CourseDescriptor.
+        `course` is an instance of CourseDescriptor.
         """
-        resp = self.client.post('/change_enrollment', {
+        resp = self.client.post(reverse('change_enrollment'), {
             'enrollment_action': 'unenroll',
             'course_id': course.id,
         })

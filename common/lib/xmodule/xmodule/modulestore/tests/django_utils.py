@@ -14,10 +14,16 @@ class ModuleStoreTestCase(TestCase):
     collection with templates before running the TestCase
     and drops it they are finished. """
 
-    def update_course(self, course, data):
+    @staticmethod
+    def update_course(course, data):
         """
         Updates the version of course in the mongo modulestore
         with the metadata in data and returns the updated version.
+
+        'course' is an instance of CourseDescriptor for which we want
+        to update metadata.
+
+        'data' is a dictionary with an entry for each CourseField we want to update.
         """
 
         store = xmodule.modulestore.django.modulestore()

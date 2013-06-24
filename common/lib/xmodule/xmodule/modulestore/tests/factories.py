@@ -60,8 +60,8 @@ class XModuleCourseFactory(Factory):
         if data is not None:
             store.update_item(new_course.location, data)
 
-        '''update_item updates the the course as it exists in the modulestore, but doesn't
-        update the instance we are working with, so have to refetch the course after updating it.'''
+        #update_item updates the the course as it exists in the modulestore, but doesn't
+        #update the instance we are working with, so have to refetch the course after updating it.
         new_course = store.get_instance(new_course.id, new_course.location)
 
         return new_course
@@ -152,8 +152,8 @@ class XModuleItemFactory(Factory):
         if new_item.location.category not in DETACHED_CATEGORIES:
             store.update_children(parent_location, parent.children + [new_item.location.url()])
 
-        '''update_children updates the the item as it exists in the modulestore, but doesn't
-        update the instance we are working with, so have to refetch the item after updating it.'''
+        #update_children updates the the item as it exists in the modulestore, but doesn't
+        #update the instance we are working with, so have to refetch the item after updating it.
         new_item = store.get_item(new_item.location)
 
         return new_item

@@ -36,15 +36,18 @@ class TestNavigation(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
         # Create student accounts and activate them.
         for i in range(len(self.STUDENT_INFO)):
-            self.create_account('u{0}'.format(i), self.STUDENT_INFO[i][0], self.STUDENT_INFO[i][1])
-            self.activate_user(self.STUDENT_INFO[i][0])
+            email, password = self.STUDENT_INFO[i]
+            username = 'u{0}'.format(i)
+            self.create_account(username, email, password)
+            self.activate_user(email)
 
     def test_redirects_first_time(self):
         """
         Verify that the first time we click on the courseware tab we are
         redirected to the 'Welcome' section.
         """
-        self.login(self.STUDENT_INFO[0][0], self.STUDENT_INFO[0][1])
+        email, password = self.STUDENT_INFO[0]
+        self.login(email, password)
         self.enroll(self.course, True)
         self.enroll(self.full, True)
 
@@ -61,7 +64,8 @@ class TestNavigation(ModuleStoreTestCase, LoginEnrollmentTestCase):
         Verify the accordion remembers we've already visited the Welcome section
         and redirects correpondingly.
         """
-        self.login(self.STUDENT_INFO[0][0], self.STUDENT_INFO[0][1])
+        email, password = self.STUDENT_INFO[0]
+        self.login(email, password)
         self.enroll(self.course, True)
         self.enroll(self.full, True)
 
@@ -80,8 +84,8 @@ class TestNavigation(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         Verify the accordion remembers which chapter you were last viewing.
         """
-
-        self.login(self.STUDENT_INFO[0][0], self.STUDENT_INFO[0][1])
+        email, password = self.STUDENT_INFO[0]
+        self.login(email, password)
         self.enroll(self.course, True)
         self.enroll(self.full, True)
 

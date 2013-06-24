@@ -4,11 +4,11 @@ from django.conf import settings
 
 
 def mongo_store_config(data_dir):
-    '''
-    Defines default module store using MongoModuleStore
+    """
+    Defines default module store using MongoModuleStore.
 
-    Use of this config requires mongo to be running
-    '''
+    Use of this config requires mongo to be running.
+    """
     store = {
         'default': {
             'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
@@ -27,7 +27,9 @@ def mongo_store_config(data_dir):
 
 
 def draft_mongo_store_config(data_dir):
-    '''Defines default module store using DraftMongoModuleStore'''
+    """
+    Defines default module store using DraftMongoModuleStore.
+    """
     return {
         'default': {
             'ENGINE': 'xmodule.modulestore.mongo.DraftMongoModuleStore',
@@ -55,7 +57,9 @@ def draft_mongo_store_config(data_dir):
 
 
 def xml_store_config(data_dir):
-    '''Defines default module store using XMLModuleStore'''
+    """
+    Defines default module store using XMLModuleStore.
+    """
     return {
         'default': {
             'ENGINE': 'xmodule.modulestore.xml.XMLModuleStore',

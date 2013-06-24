@@ -32,28 +32,40 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
     @classmethod
     def _instructor_urls(self, course):
         """
-        List of urls that only instructors/staff should be able to see.
+        `course` is an instance of CourseDescriptor whose section URLs are to be returned.
+
+        Returns a list of URLs corresponding to sections in the passed in course.
         """
+
         urls = [reverse(name, kwargs={'course_id': course.id}) for name in (
             'instructor_dashboard',
             'gradebook',
             'grade_summary',)]
 
+        email, _ = self.ACCOUNT_INFO[0]
+        student_id = User.objects.get(email=email).id
+
         urls.append(reverse('student_progress',
                             kwargs={'course_id': course.id,
-                                    'student_id': User.objects.get(email=self.ACCOUNT_INFO[0][0]).id}))
+                                    'student_id': student_id}))
         return urls
 
     @staticmethod
     def _reverse_urls(names, course):
         """
         Reverse a list of course urls.
+
+        `names` is a list of URL names that correspond to sections in a course.
+
+        `course` is the instance of CourseDescriptor whose section URLs are to be returned.
+
+        Returns a list URLs corresponding to section in the passed in course.
+
         """
         return [reverse(name, kwargs={'course_id': course.id})
                 for name in names]
 
     def setUp(self):
-        xmodule.modulestore.django._MODULESTORES = {}
 
         self.full = CourseFactory.create(number='666', display_name='Robot_Sub_Course')
         self.course = CourseFactory.create()
@@ -68,8 +80,9 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
         # Create two accounts and activate them.
         for i in range(len(self.ACCOUNT_INFO)):
-            self.create_account('u{0}'.format(i), self.ACCOUNT_INFO[i][0], self.ACCOUNT_INFO[i][1])
-            self.activate_user(self.ACCOUNT_INFO[i][0])
+            username, email, password = 'u{0}'.format(i), self.ACCOUNT_INFO[i][0], self.ACCOUNT_INFO[i][1]
+            self.create_account(username, email, password)
+            self.activate_user(email)
 
     def test_redirection_unenrolled(self):
         """
@@ -77,7 +90,8 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         instead of the 'Welcome' section after clicking on the courseware tab.
         """
 
-        self.login(self.ACCOUNT_INFO[0][0], self.ACCOUNT_INFO[0][1])
+        email, password = self.ACCOUNT_INFO[0]
+        self.login(email, password)
         response = self.client.get(reverse('courseware',
                                            kwargs={'course_id': self.course.id}))
         self.assertRedirects(response,
@@ -90,7 +104,8 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         the chapter after clicking on the courseware tab.
         """
 
-        self.login(self.ACCOUNT_INFO[0][0], self.ACCOUNT_INFO[0][1])
+        email, password = self.ACCOUNT_INFO[0]
+        self.login(email, password)
         self.enroll(self.course)
 
         response = self.client.get(reverse('courseware',
@@ -108,7 +123,8 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         dashboard, the grade views, and student profile pages.
         """
 
-        self.login(self.ACCOUNT_INFO[0][0], self.ACCOUNT_INFO[0][1])
+        email, password = self.ACCOUNT_INFO[0]
+        self.login(email, password)
 
         self.enroll(self.course)
         self.enroll(self.full)
@@ -127,12 +143,14 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         and student profile pages for their course.
         """
 
+        email, password = self.ACCOUNT_INFO[1]
+
         # Make the instructor staff in self.course
         group_name = _course_staff_group_name(self.course.location)
         group = Group.objects.create(name=group_name)
-        group.user_set.add(User.objects.get(email=self.ACCOUNT_INFO[1][0]))
+        group.user_set.add(User.objects.get(email=email))
 
-        self.login(self.ACCOUNT_INFO[1][0], self.ACCOUNT_INFO[1][1])
+        self.login(email, password)
 
         # Now should be able to get to self.course, but not  self.full
         url = random.choice(self._instructor_urls(self.course))
@@ -149,10 +167,11 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         staff permissions.
         """
 
-        self.login(self.ACCOUNT_INFO[1][0], self.ACCOUNT_INFO[1][1])
+        email, password = self.ACCOUNT_INFO[1]
+        self.login(email, password)
 
         # now make the instructor also staff
-        instructor = User.objects.get(email=self.ACCOUNT_INFO[1][0])
+        instructor = User.objects.get(email=email)
         instructor.is_staff = True
         instructor.save()
 
@@ -201,6 +220,9 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         Actually do the test, relying on settings to be right.
         """
+
+        student_email, student_password = self.ACCOUNT_INFO[0]
+        instructor_email, instructor_password = self.ACCOUNT_INFO[1]
 
         # Make courses start in the future
         now = datetime.datetime.now(pytz.UTC)
@@ -300,7 +322,7 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
         # First, try with an enrolled student
         print '=== Testing student access....'
-        self.login(self.ACCOUNT_INFO[0][0], self.ACCOUNT_INFO[0][1])
+        self.login(student_email, student_password)
         self.enroll(self.course, True)
         self.enroll(self.full, True)
 
@@ -314,10 +336,10 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         # Make the instructor staff in  self.course
         group_name = _course_staff_group_name(self.course.location)
         group = Group.objects.create(name=group_name)
-        group.user_set.add(User.objects.get(email=self.ACCOUNT_INFO[1][0]))
+        group.user_set.add(User.objects.get(email=instructor_email))
 
         self.logout()
-        self.login(self.ACCOUNT_INFO[1][0], self.ACCOUNT_INFO[1][1])
+        self.login(instructor_email, instructor_password)
         # Enroll in the classes---can't see courseware otherwise.
         self.enroll(self.course, True)
         self.enroll(self.full, True)
@@ -329,7 +351,7 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
         print '=== Testing staff access....'
         # now also make the instructor staff
-        instructor = User.objects.get(email=self.ACCOUNT_INFO[1][0])
+        instructor = User.objects.get(email=instructor_email)
         instructor.is_staff = True
         instructor.save()
 
@@ -341,6 +363,9 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         Actually do the test, relying on settings to be right.
         """
+
+        student_email, student_password = self.ACCOUNT_INFO[0]
+        instructor_email, instructor_password = self.ACCOUNT_INFO[1]
 
         # Make courses start in the future
         now = datetime.datetime.now(pytz.UTC)
@@ -360,7 +385,7 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         print "login"
         # First, try with an enrolled student
         print '=== Testing student access....'
-        self.login(self.ACCOUNT_INFO[0][0], self.ACCOUNT_INFO[0][1])
+        self.login(student_email, student_password)
         self.assertFalse(self.enroll(self.course))
         self.assertTrue(self.enroll(self.full))
 
@@ -368,18 +393,18 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         # Make the instructor staff in the self.course
         group_name = _course_staff_group_name(self.course.location)
         group = Group.objects.create(name=group_name)
-        group.user_set.add(User.objects.get(email=self.ACCOUNT_INFO[1][0]))
+        group.user_set.add(User.objects.get(email=instructor_email))
 
         print "logout/login"
         self.logout()
-        self.login(self.ACCOUNT_INFO[1][0], self.ACCOUNT_INFO[1][1])
+        self.login(instructor_email, instructor_password)
         print "Instructor should be able to enroll in self.course"
         self.assertTrue(self.enroll(self.course))
 
         print '=== Testing staff access....'
         # now make the instructor global staff, but not in the instructor group
-        group.user_set.remove(User.objects.get(email=self.ACCOUNT_INFO[1][0]))
-        instructor = User.objects.get(email=self.ACCOUNT_INFO[1][0])
+        group.user_set.remove(User.objects.get(email=instructor_email))
+        instructor = User.objects.get(email=instructor_email)
         instructor.is_staff = True
         instructor.save()
 
@@ -391,6 +416,9 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         Actually test beta periods, relying on settings to be right.
         """
+
+        student_email, student_password = self.ACCOUNT_INFO[0]
+        instructor_email, instructor_password = self.ACCOUNT_INFO[1]
 
         # trust, but verify :)
         self.assertFalse(settings.MITX_FEATURES['DISABLE_START_DATES'])
@@ -408,7 +436,7 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.course.lms.days_early_for_beta = 2
 
         # student user shouldn't see it
-        student_user = User.objects.get(email=self.ACCOUNT_INFO[0][0])
+        student_user = User.objects.get(email=student_email)
         self.assertFalse(has_access(student_user, self.course, 'load'))
 
         # now add the student to the beta test group
