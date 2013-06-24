@@ -89,12 +89,6 @@ describe "CMS.Views.EditTextbook", ->
             @view.render()
             expect(@view.$("input[name=textbook-name]").val()).toEqual("Life Sciences")
 
-        it "should create an empty chapter when it is rendered, if there are no chapters", ->
-            expect(@model.get("chapters").length).toEqual(0)
-            @view.render()
-            expect(@model.get("chapters").length).toEqual(1)
-            expect(@model.get("chapters").last().isEmpty()).toBeTruthy()
-
         it "should allow you to create new empty chapters", ->
             @view.render()
             numChapters = @model.get("chapters").length
@@ -122,13 +116,23 @@ describe "CMS.Views.EditTextbook", ->
             expect(@collection.save).not.toHaveBeenCalled()
             expect(@collection.editing).toBeUndefined()
 
-        it "does not save empty chapters on cancel", ->
+        it "removes all empty chapters on cancel if the model has a non-empty chapter", ->
             chapters = @model.get("chapters")
-            origLength = chapters.length
+            chapters.at(0).set("name", "non-empty")
             @view.render()
             chapters.add([{}, {}, {}]) # add three empty chapters
+            expect(chapters.length).toEqual(4)
             @view.$(".action-cancel").click()
-            expect(chapters.length).toEqual(origLength)
+            expect(chapters.length).toEqual(1)
+            expect(chapters.at(0).get('name')).toEqual("non-empty")
+
+        it "removes all empty chapters on cancel except one if the model has no non-empty chapters", ->
+            chapters = @model.get("chapters")
+            @view.render()
+            chapters.add([{}, {}, {}]) # add three empty chapters
+            expect(chapters.length).toEqual(4)
+            @view.$(".action-cancel").click()
+            expect(chapters.length).toEqual(1)
 
 
 describe "CMS.Views.ListTextbooks", ->

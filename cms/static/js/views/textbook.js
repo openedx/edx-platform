@@ -78,10 +78,6 @@ CMS.Views.EditTextbook = Backbone.View.extend({
             name: this.model.escape('name'),
             errors: null
         }));
-        var chapters = this.model.get('chapters');
-        if (chapters.length === 0) {
-            chapters.add([{}]);
-        }
         this.addAll();
         return this;
     },
@@ -153,8 +149,14 @@ CMS.Views.EditTextbook = Backbone.View.extend({
         } else {
             // remove empty chapters from textbook
             var chapters = this.model.get("chapters");
-            chapters.remove(chapters.filter(
-                function(chapter) { return chapter.isEmpty(); }));
+            var emptyChapters = chapters.filter(function(chapter) {
+                return chapter.isEmpty(); });
+            if (chapters.length === emptyChapters.length) {
+                // make sure that there's always at least one chapter remaining
+                // in the chapterset, even if it's empty
+                emptyChapters = _.tail(emptyChapters);
+            }
+            chapters.remove(emptyChapters);
         }
         textbooks.trigger('render');
         return this;
