@@ -58,21 +58,24 @@ In the discussion service, notifications are handled asynchronously using a thir
 
     bundle exec rake jobs:work
 
-## Initialize roles and permissions
+## From the edx-platform django app, initialize roles and permissions
 
 To fully test the discussion forum, you might want to act as a moderator or an administrator. Currently, moderators can manage everything in the forum, and administrator can manage everything plus assigning and revoking moderator status of other users.
 
 First make sure that the database is up-to-date:
 
-    rake django-admin[syncdb]
-    rake django-admin[migrate]
+    rake resetdb
+
+If you have created users in the edx-platform django apps when the comment service was not running, you will need to one-way sync the users into the comment service back end database:
+
+    rake django-admin[sync_user_info]
 
 For convenience, add the following environment variables to the terminal (assuming that you're using configuration set lms.envs.dev):
 
     export DJANGO_SETTINGS_MODULE=lms.envs.dev
     export PYTHONPATH=.
 
-Now initialzie roles and permissions, providing a course id eg.:
+Now initialize roles and permissions, providing a course id. See the example below. Note that you do not need to do this for Studio-created courses, as the Studio application does this for you.
 
     django-admin.py seed_permissions_roles "MITx/6.002x/2012_Fall"
 
