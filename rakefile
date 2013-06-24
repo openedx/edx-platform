@@ -3,7 +3,7 @@ begin
     require 'rake/clean'
     require './rakelib/helpers.rb'
 rescue LoadError => error
-    puts "Import faild (#{error})"
+    puts "Import failed (#{error})"
     puts "Please run `bundle install` to bootstrap ruby dependencies"
     exit 1
 end
