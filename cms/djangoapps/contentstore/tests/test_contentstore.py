@@ -164,10 +164,6 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
     def test_edit_unit_toy(self):
         self.check_edit_unit('toy')
 
-#FIX
-    def test_edit_unit_full(self):
-        self.check_edit_unit('full')
-
     def _get_draft_counts(self, item):
         cnt = 1 if getattr(item, 'is_draft', False) else 0
         for child in item.get_children():
@@ -300,55 +296,59 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         num_drafts = self._get_draft_counts(course)
         self.assertEqual(num_drafts, 1)
 
-#FIX
     def test_import_textbook_as_content_element(self):
         module_store = modulestore('direct')
-        import_from_xml(module_store, 'common/test/data/', ['full'])
+        import_from_xml(module_store, 'common/test/data/', ['toy'])
 
-        course = module_store.get_item(Location(['i4x', 'edX', 'full', 'course', '6.002_Spring_2012', None]))
+        course = module_store.get_item(Location(['i4x', 'edX', 'toy', 'course', '2012_Fall', None]))
 
         self.assertGreater(len(course.textbooks), 0)
 
-#FIX
     def test_static_tab_reordering(self):
         module_store = modulestore('direct')
-        import_from_xml(module_store, 'common/test/data/', ['full'])
+        CourseFactory.create(org='edX', course='999', display_name='Robot Super Course')
+        course_location = Location(['i4x', 'edX', '999', 'course', 'Robot_Super_Course', None])
 
-        course = module_store.get_item(Location(['i4x', 'edX', 'full', 'course', '6.002_Spring_2012', None]))
+        ItemFactory.create(parent_location=course_location,
+                                            template="i4x://edx/templates/static_tab/Empty",
+                                            display_name="Static_1")
+        ItemFactory.create(parent_location=course_location,
+                                            template="i4x://edx/templates/static_tab/Empty",
+                                            display_name="Static_2")
+
+        course = module_store.get_item(Location(['i4x', 'edX', '999', 'course', 'Robot_Super_Course', None]))
 
         # reverse the ordering
         reverse_tabs = []
         for tab in course.tabs:
             if tab['type'] == 'static_tab':
-                reverse_tabs.insert(0, 'i4x://edX/full/static_tab/{0}'.format(tab['url_slug']))
+                reverse_tabs.insert(0, 'i4x://edX/999/static_tab/{0}'.format(tab['url_slug']))
 
         self.client.post(reverse('reorder_static_tabs'), json.dumps({'tabs': reverse_tabs}), "application/json")
 
-        course = module_store.get_item(Location(['i4x', 'edX', 'full', 'course', '6.002_Spring_2012', None]))
+        course = module_store.get_item(Location(['i4x', 'edX', '999', 'course', 'Robot_Super_Course', None]))
 
         # compare to make sure that the tabs information is in the expected order after the server call
         course_tabs = []
         for tab in course.tabs:
             if tab['type'] == 'static_tab':
-                course_tabs.append('i4x://edX/full/static_tab/{0}'.format(tab['url_slug']))
+                course_tabs.append('i4x://edX/999/static_tab/{0}'.format(tab['url_slug']))
 
         self.assertEqual(reverse_tabs, course_tabs)
 
-#FIX
     def test_import_polls(self):
         module_store = modulestore('direct')
-        import_from_xml(module_store, 'common/test/data/', ['full'])
+        import_from_xml(module_store, 'common/test/data/', ['toy'])
 
-        items = module_store.get_items(['i4x', 'edX', 'full', 'poll_question', None, None])
+        items = module_store.get_items(['i4x', 'edX', 'toy', 'poll_question', None, None])
         found = len(items) > 0
 
         self.assertTrue(found)
         # check that there's actually content in the 'question' field
         self.assertGreater(len(items[0].question), 0)
 
-#FIX
     def test_xlint_fails(self):
-        err_cnt = perform_xlint('common/test/data', ['full'])
+        err_cnt = perform_xlint('common/test/data', ['toy'])
         self.assertGreater(err_cnt, 0)
 
     @override_settings(COURSES_WITH_UNSAFE_CODE=['edX/full/.*'])
@@ -376,11 +376,14 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 #FIX
     def test_delete(self):
         direct_store = modulestore('direct')
-        import_from_xml(direct_store, 'common/test/data/', ['full'])
+        CourseFactory.create(org='edX', course='999', display_name='Robot Super Course')
+        course_location = Location(['i4x', 'edX', '999', 'course', 'Robot_Super_Course', None])
 
-        sequential = direct_store.get_item(Location(['i4x', 'edX', 'full', 'sequential', 'Administrivia_and_Circuit_Elements', None]))
+        chapterloc = ItemFactory.create(parent_location=course_location, display_name="Chapter").location
+        ItemFactory.create(parent_location=chapterloc, template='i4x://edx/templates/sequential/Empty', display_name="Sequential")
 
-        chapter = direct_store.get_item(Location(['i4x', 'edX', 'full', 'chapter', 'Week_1', None]))
+        sequential = direct_store.get_item(Location(['i4x', 'edX', '999', 'sequential', 'Sequential', None]))
+        chapter = direct_store.get_item(Location(['i4x', 'edX', '999', 'chapter', 'Chapter', None]))
 
         # make sure the parent points to the child object which is to be deleted
         self.assertTrue(sequential.location.url() in chapter.children)
@@ -393,40 +396,37 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         found = False
         try:
-            direct_store.get_item(Location(['i4x', 'edX', 'full', 'sequential', 'Administrivia_and_Circuit_Elements', None]))
+            direct_store.get_item(Location(['i4x', 'edX', '999', 'sequential', 'Sequential', None]))
             found = True
         except ItemNotFoundError:
             pass
 
         self.assertFalse(found)
 
-        chapter = direct_store.get_item(Location(['i4x', 'edX', 'full', 'chapter', 'Week_1', None]))
+        chapter = direct_store.get_item(Location(['i4x', 'edX', '999', 'chapter', 'Chapter', None]))
 
         # make sure the parent no longer points to the child object which was deleted
         self.assertFalse(sequential.location.url() in chapter.children)
 
-#FIX
     def test_about_overrides(self):
         '''
         This test case verifies that a course can use specialized override for about data, e.g. /about/Fall_2012/effort.html
         while there is a base definition in /about/effort.html
         '''
         module_store = modulestore('direct')
-        import_from_xml(module_store, 'common/test/data/', ['full'])
-        effort = module_store.get_item(Location(['i4x', 'edX', 'full', 'about', 'effort', None]))
+        import_from_xml(module_store, 'common/test/data/', ['toy'])
+        effort = module_store.get_item(Location(['i4x', 'edX', 'toy', 'about', 'effort', None]))
         self.assertEqual(effort.data, '6 hours')
 
         # this one should be in a non-override folder
-        effort = module_store.get_item(Location(['i4x', 'edX', 'full', 'about', 'end_date', None]))
+        effort = module_store.get_item(Location(['i4x', 'edX', 'toy', 'about', 'end_date', None]))
         self.assertEqual(effort.data, 'TBD')
 
-#FIX
     def test_remove_hide_progress_tab(self):
         module_store = modulestore('direct')
-        import_from_xml(module_store, 'common/test/data/', ['full'])
-
-        source_location = CourseDescriptor.id_to_location('edX/full/6.002_Spring_2012')
-        course = module_store.get_item(source_location)
+        CourseFactory.create(org='edX', course='999', display_name='Robot Super Course')
+        course_location = Location(['i4x', 'edX', '999', 'course', 'Robot_Super_Course', None])
+        course = module_store.get_item(course_location)
         self.assertFalse(course.hide_progress_tab)
 
 #FIX
