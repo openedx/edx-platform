@@ -10,6 +10,7 @@ from xblock.core import Dict, Scope
 from xmodule.x_module import (XModuleDescriptor, policy_key)
 from xmodule.modulestore import Location
 from xmodule.modulestore.inheritance import own_metadata
+from xmodule.modulestore.xml_exporter import EdxJSONEncoder
 
 log = logging.getLogger(__name__)
 
@@ -84,7 +85,7 @@ def serialize_field(value):
 
         By default, this is the result of calling json.dumps on the input value.
         """
-    return json.dumps(value)
+    return json.dumps(value, cls=EdxJSONEncoder)
 
 
 def deserialize_field(field, value):
