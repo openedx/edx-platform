@@ -185,6 +185,9 @@ class TestEdxJsonEncoder(unittest.TestCase):
             self.encoder.default(datetime(2013, 5, 3, 10, 20, 30, 0, self.null_utc_tz))
         )
 
-    def test_other_classes(self):
+    def test_fallthrough(self):
         with self.assertRaises(TypeError):
             self.encoder.default(None)
+
+        with self.assertRaises(TypeError):
+            self.encoder.default({})
