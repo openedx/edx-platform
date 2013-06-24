@@ -10,8 +10,8 @@ from .x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xmodule.modulestore.django import modulestore
 from .timeinfo import TimeInfo
-from xblock.core import Object, String, Scope
-from xmodule.fields import Date, StringyFloat, StringyInteger, StringyBoolean
+from xblock.core import Dict, String, Scope, Boolean, Integer, Float
+from xmodule.fields import Date
 
 from xmodule.open_ended_grading_classes.peer_grading_service import PeerGradingService, GradingServiceError, MockPeerGradingService
 from open_ended_grading_classes import combined_open_ended_rubric
@@ -21,7 +21,6 @@ log = logging.getLogger(__name__)
 
 USE_FOR_SINGLE_LOCATION = False
 LINK_TO_LOCATION = ""
-TRUE_DICT = [True, "True", "true", "TRUE"]
 MAX_SCORE = 1
 IS_GRADED = False
 
@@ -29,7 +28,7 @@ EXTERNAL_GRADER_NO_CONTACT_ERROR = "Failed to contact external graders.  Please 
 
 
 class PeerGradingFields(object):
-    use_for_single_location = StringyBoolean(
+    use_for_single_location = Boolean(
         display_name="Show Single Problem",
         help='When True, only the single problem specified by "Link to Problem Location" is shown. '
              'When False, a panel is displayed with all problems available for peer grading.',
@@ -40,22 +39,22 @@ class PeerGradingFields(object):
         help='The location of the problem being graded. Only used when "Show Single Problem" is True.',
         default=LINK_TO_LOCATION, scope=Scope.settings
     )
-    is_graded = StringyBoolean(
+    is_graded = Boolean(
         display_name="Graded",
         help='Defines whether the student gets credit for grading this problem. Only used when "Show Single Problem" is True.',
         default=IS_GRADED, scope=Scope.settings
     )
     due_date = Date(help="Due date that should be displayed.", default=None, scope=Scope.settings)
     grace_period_string = String(help="Amount of grace to give on the due date.", default=None, scope=Scope.settings)
-    max_grade = StringyInteger(
+    max_grade = Integer(
         help="The maximum grade that a student can receive for this problem.", default=MAX_SCORE,
         scope=Scope.settings, values={"min": 0}
     )
-    student_data_for_location = Object(
+    student_data_for_location = Dict(
         help="Student data for a given peer grading problem.",
         scope=Scope.user_state
     )
-    weight = StringyFloat(
+    weight = Float(
         display_name="Problem Weight",
         help="Defines the number of points each problem is worth. If the value is not set, each problem is worth one point.",
         scope=Scope.settings, values={"min": 0, "step": ".1"}
@@ -63,6 +62,9 @@ class PeerGradingFields(object):
 
 
 class PeerGradingModule(PeerGradingFields, XModule):
+    """
+    PeerGradingModule.__init__ takes the same arguments as xmodule.x_module:XModule.__init__
+    """
     _VERSION = 1
 
     js = {'coffee': [resource_string(__name__, 'js/src/peergrading/peer_grading.coffee'),
@@ -74,18 +76,17 @@ class PeerGradingModule(PeerGradingFields, XModule):
 
     css = {'scss': [resource_string(__name__, 'css/combinedopenended/display.scss')]}
 
-    def __init__(self, system, location, descriptor, model_data):
-        XModule.__init__(self, system, location, descriptor, model_data)
+    def __init__(self, *args, **kwargs):
+        super(PeerGradingModule, self).__init__(*args, **kwargs)
 
-        # We need to set the location here so the child modules can use it
-        system.set('location', location)
-        self.system = system
+        #We need to set the location here so the child modules can use it
+        self.runtime.set('location', self.location)
         if (self.system.open_ended_grading_interface):
             self.peer_gs = PeerGradingService(self.system.open_ended_grading_interface, self.system)
         else:
             self.peer_gs = MockPeerGradingService()
 
-        if self.use_for_single_location in TRUE_DICT:
+        if self.use_for_single_location:
             try:
                 self.linked_problem = modulestore().get_instance(self.system.course_id, self.link_to_location)
             except:
@@ -113,7 +114,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
         if not self.ajax_url.endswith("/"):
             self.ajax_url = self.ajax_url + "/"
 
-        # StringyInteger could return None, so keep this check.
+        # Integer could return None, so keep this check.
         if not isinstance(self.max_grade, int):
             raise TypeError("max_grade needs to be an integer.")
 
@@ -147,7 +148,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
         """
         if self.closed():
             return self.peer_grading_closed()
-        if self.use_for_single_location not in TRUE_DICT:
+        if not self.use_for_single_location:
             return self.peer_grading()
         else:
             return self.peer_grading_problem({'location': self.link_to_location})['html']
@@ -204,7 +205,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
             'score': score,
             'total': max_score,
         }
-        if self.use_for_single_location not in TRUE_DICT or self.is_graded not in TRUE_DICT:
+        if not self.use_for_single_location or not self.is_graded:
             return score_dict
 
         try:
@@ -239,7 +240,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
               randomization, and 5/7 on another
         '''
         max_grade = None
-        if self.use_for_single_location in TRUE_DICT and self.is_graded in TRUE_DICT:
+        if self.use_for_single_location and self.is_graded:
             max_grade = self.max_grade
         return max_grade
 
@@ -557,7 +558,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
         Show individual problem interface
         '''
         if get is None or get.get('location') is None:
-            if self.use_for_single_location not in TRUE_DICT:
+            if not self.use_for_single_location:
                 # This is an error case, because it must be set to use a single location to be called without get parameters
                 # This is a dev_facing_error
                 log.error(
@@ -603,7 +604,6 @@ class PeerGradingDescriptor(PeerGradingFields, RawDescriptor):
     module_class = PeerGradingModule
     filename_extension = "xml"
 
-    stores_state = True
     has_score = True
     always_recalculate_grades = True
     template_dir_name = "peer_grading"

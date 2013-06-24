@@ -194,6 +194,105 @@ class EvaluatorTest(unittest.TestCase):
         arctan_angles = arcsin_angles
         self.assert_function_values('arctan', arctan_inputs, arctan_angles)
 
+    def test_reciprocal_trig_functions(self):
+        """
+        Test the reciprocal trig functions provided in calc.py
+
+        which are: sec, csc, cot, arcsec, arccsc, arccot
+        """
+        angles = ['-pi/4', 'pi/6', 'pi/5', '5*pi/4', '9*pi/4', '1 + j']
+        sec_values = [1.414, 1.155, 1.236, -1.414, 1.414, 0.498 + 0.591j]
+        csc_values = [-1.414, 2, 1.701, -1.414, 1.414, 0.622 - 0.304j]
+        cot_values = [-1, 1.732, 1.376, 1, 1, 0.218 - 0.868j]
+
+        self.assert_function_values('sec', angles, sec_values)
+        self.assert_function_values('csc', angles, csc_values)
+        self.assert_function_values('cot', angles, cot_values)
+
+        arcsec_inputs = ['1.1547', '1.2361', '2', '-2', '-1.4142', '0.4983+0.5911*j']
+        arcsec_angles = [0.524, 0.628, 1.047, 2.094, 2.356, 1 + 1j]
+        self.assert_function_values('arcsec', arcsec_inputs, arcsec_angles)
+
+        arccsc_inputs = ['-1.1547', '-1.4142', '2', '1.7013', '1.1547', '0.6215-0.3039*j']
+        arccsc_angles = [-1.047, -0.785, 0.524, 0.628, 1.047, 1 + 1j]
+        self.assert_function_values('arccsc', arccsc_inputs, arccsc_angles)
+
+        # Has the same range as arccsc
+        arccot_inputs = ['-0.5774', '-1', '1.7321', '1.3764', '0.5774', '(0.2176-0.868*j)']
+        arccot_angles = arccsc_angles
+        self.assert_function_values('arccot', arccot_inputs, arccot_angles)
+
+    def test_hyperbolic_functions(self):
+        """
+        Test the hyperbolic functions
+
+        which are: sinh, cosh, tanh, sech, csch, coth
+        """
+        inputs = ['0', '0.5', '1', '2', '1+j']
+        neg_inputs = ['0', '-0.5', '-1', '-2', '-1-j']
+        negate = lambda x: [-k for k in x]
+
+        # sinh is odd
+        sinh_vals = [0, 0.521, 1.175, 3.627, 0.635 + 1.298j]
+        self.assert_function_values('sinh', inputs, sinh_vals)
+        self.assert_function_values('sinh', neg_inputs, negate(sinh_vals))
+
+        # cosh is even - do not negate
+        cosh_vals = [1, 1.128, 1.543, 3.762, 0.834 + 0.989j]
+        self.assert_function_values('cosh', inputs, cosh_vals)
+        self.assert_function_values('cosh', neg_inputs, cosh_vals)
+
+        # tanh is odd
+        tanh_vals = [0, 0.462, 0.762, 0.964, 1.084 + 0.272j]
+        self.assert_function_values('tanh', inputs, tanh_vals)
+        self.assert_function_values('tanh', neg_inputs, negate(tanh_vals))
+
+        # sech is even - do not negate
+        sech_vals = [1, 0.887, 0.648, 0.266, 0.498 - 0.591j]
+        self.assert_function_values('sech', inputs, sech_vals)
+        self.assert_function_values('sech', neg_inputs, sech_vals)
+
+        # the following functions do not have 0 in their domain
+        inputs = inputs[1:]
+        neg_inputs = neg_inputs[1:]
+
+        # csch is odd
+        csch_vals = [1.919, 0.851, 0.276, 0.304 - 0.622j]
+        self.assert_function_values('csch', inputs, csch_vals)
+        self.assert_function_values('csch', neg_inputs, negate(csch_vals))
+
+        # coth is odd
+        coth_vals = [2.164, 1.313, 1.037, 0.868 - 0.218j]
+        self.assert_function_values('coth', inputs, coth_vals)
+        self.assert_function_values('coth', neg_inputs, negate(coth_vals))
+
+    def test_hyperbolic_inverses(self):
+        """
+        Test the inverse hyperbolic functions
+
+        which are of the form arc[X]h
+        """
+        results = [0, 0.5, 1, 2, 1 + 1j]
+
+        sinh_vals = ['0', '0.5211', '1.1752', '3.6269', '0.635+1.2985*j']
+        self.assert_function_values('arcsinh', sinh_vals, results)
+
+        cosh_vals = ['1', '1.1276', '1.5431', '3.7622', '0.8337+0.9889*j']
+        self.assert_function_values('arccosh', cosh_vals, results)
+
+        tanh_vals = ['0', '0.4621', '0.7616', '0.964', '1.0839+0.2718*j']
+        self.assert_function_values('arctanh', tanh_vals, results)
+
+        sech_vals = ['1.0', '0.8868', '0.6481', '0.2658', '0.4983-0.5911*j']
+        self.assert_function_values('arcsech', sech_vals, results)
+
+        results = results[1:]
+        csch_vals = ['1.919', '0.8509', '0.2757', '0.3039-0.6215*j']
+        self.assert_function_values('arccsch', csch_vals, results)
+
+        coth_vals = ['2.164', '1.313', '1.0373', '0.868-0.2176*j']
+        self.assert_function_values('arccoth', coth_vals, results)
+
     def test_other_functions(self):
         """
         Test the non-trig functions provided in calc.py

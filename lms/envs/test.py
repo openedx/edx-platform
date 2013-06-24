@@ -20,8 +20,10 @@ from path import path
 # can test everything else :)
 MITX_FEATURES['DISABLE_START_DATES'] = True
 
-# Until we have discussion actually working in test mode, just turn it off
-MITX_FEATURES['ENABLE_DISCUSSION_SERVICE'] = True
+# Most tests don't use the discussion service, so we turn it off to speed them up.
+# Tests that do can enable this flag, but must use the UrlResetMixin class to force urls.py
+# to reload
+MITX_FEATURES['ENABLE_DISCUSSION_SERVICE'] = False
 
 MITX_FEATURES['ENABLE_SERVICE_STATUS'] = True
 

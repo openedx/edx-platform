@@ -20,7 +20,7 @@ from . import test_system
 
 class DummySystem(ImportSystem):
 
-    @patch('xmodule.modulestore.xml.OSFS', lambda dir: MemoryFS())
+    @patch('xmodule.modulestore.xml.OSFS', lambda directory: MemoryFS())
     def __init__(self, load_error_modules):
 
         xmlstore = XMLModuleStore("data_dir", course_dirs=[], load_error_modules=load_error_modules)
@@ -41,7 +41,8 @@ class DummySystem(ImportSystem):
         )
 
     def render_template(self, template, context):
-            raise Exception("Shouldn't be called")
+        raise Exception("Shouldn't be called")
+
 
 class ConditionalFactory(object):
     """
@@ -60,9 +61,9 @@ class ConditionalFactory(object):
         source_location = Location(["i4x", "edX", "conditional_test", "problem", "SampleProblem"])
         if source_is_error_module:
             # Make an error descriptor and module
-            source_descriptor = NonStaffErrorDescriptor.from_xml('some random xml data', 
+            source_descriptor = NonStaffErrorDescriptor.from_xml('some random xml data',
                                                                  system,
-                                                                 org=source_location.org, 
+                                                                 org=source_location.org,
                                                                  course=source_location.course,
                                                                  error_msg='random error message')
             source_module = source_descriptor.xmodule(system)
@@ -87,13 +88,13 @@ class ConditionalFactory(object):
 
         # construct conditional module:
         cond_location = Location(["i4x", "edX", "conditional_test", "conditional", "SampleConditional"])
-        model_data = {'data': '<conditional/>'}
-        cond_module = ConditionalModule(system, cond_location, cond_descriptor, model_data)
+        model_data = {'data': '<conditional/>', 'location': cond_location}
+        cond_module = ConditionalModule(system, cond_descriptor, model_data)
 
         # return dict:
         return {'cond_module': cond_module,
                 'source_module': source_module,
-                'child_module': child_module }
+                'child_module': child_module}
 
 
 class ConditionalModuleBasicTest(unittest.TestCase):
@@ -106,14 +107,13 @@ class ConditionalModuleBasicTest(unittest.TestCase):
         self.test_system = test_system()
 
     def test_icon_class(self):
-        '''verify that get_icon_class works independent of condition satisfaction''' 
+        '''verify that get_icon_class works independent of condition satisfaction'''
         modules = ConditionalFactory.create(self.test_system)
         for attempted in ["false", "true"]:
-            for icon_class in [ 'other', 'problem', 'video']:
+            for icon_class in ['other', 'problem', 'video']:
                 modules['source_module'].is_attempted = attempted
                 modules['child_module'].get_icon_class = lambda: icon_class
                 self.assertEqual(modules['cond_module'].get_icon_class(), icon_class)
-
 
     def test_get_html(self):
         modules = ConditionalFactory.create(self.test_system)
@@ -186,7 +186,6 @@ class ConditionalModuleXmlTest(unittest.TestCase):
             if isinstance(descriptor, Location):
                 location = descriptor
                 descriptor = self.modulestore.get_instance(course.id, location, depth=None)
-            location = descriptor.location
             return descriptor.xmodule(self.test_system)
 
         # edx - HarvardX
@@ -225,4 +224,3 @@ class ConditionalModuleXmlTest(unittest.TestCase):
         print "post-attempt ajax: ", ajax
         html = ajax['html']
         self.assertTrue(any(['This is a secret' in item for item in html]))
-

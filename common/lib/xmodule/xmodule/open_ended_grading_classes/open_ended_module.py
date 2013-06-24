@@ -731,7 +731,6 @@ class OpenEndedDescriptor():
     module_class = OpenEndedModule
     filename_extension = "xml"
 
-    stores_state = True
     has_score = True
     template_dir_name = "openended"
 

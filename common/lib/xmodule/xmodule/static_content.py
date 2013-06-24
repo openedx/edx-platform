@@ -129,7 +129,7 @@ def _write_js(output_root, classes):
 def _write_files(output_root, contents):
     _ensure_dir(output_root)
     for extra_file in set(output_root.files()) - set(contents.keys()):
-        extra_file.remove()
+        extra_file.remove_p()
 
     for filename, file_content in contents.iteritems():
         (output_root / filename).write_bytes(file_content)

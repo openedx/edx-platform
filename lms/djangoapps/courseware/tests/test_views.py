@@ -13,6 +13,7 @@ from xmodule.modulestore.django import modulestore
 
 import courseware.views as views
 from xmodule.modulestore import Location
+from pytz import UTC
 
 
 class Stub():
@@ -63,7 +64,7 @@ class ViewsTestCase(TestCase):
     def setUp(self):
         self.user = User.objects.create(username='dummy', password='123456',
                                         email='test@mit.edu')
-        self.date = datetime.datetime(2013, 1, 22)
+        self.date = datetime.datetime(2013, 1, 22, tzinfo=UTC)
         self.course_id = 'edX/toy/2012_Fall'
         self.enrollment = CourseEnrollment.objects.get_or_create(user=self.user,
                                                   course_id=self.course_id,
