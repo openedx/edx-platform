@@ -1,0 +1,13 @@
+<li class="test-summary">
+    <ul class="test-input-list">
+        % for value in answers:
+        <li>
+            ${value}
+        </li>
+        % endfor
+    </ul>
+    <a href="#" id_to_delete="${id}" class="remove-tests"><i class="icon-remove-sign">X</i></a>
+    <span class="test-message">
+    ${msg}
+    </span>
+</li>

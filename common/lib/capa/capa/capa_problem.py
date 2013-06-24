@@ -474,7 +474,6 @@ class LoncapaProblem(object):
 
         # find additional comma-separated modules search path
         path = []
-
         for dir in raw_path:
             if not dir:
                 continue
@@ -557,6 +556,7 @@ class LoncapaProblem(object):
         '''
         if (problemtree.tag == 'script' and problemtree.get('type')
             and 'javascript' in problemtree.get('type')):
+
             # leave javascript intact.
             return deepcopy(problemtree)
 
@@ -645,10 +645,16 @@ class LoncapaProblem(object):
         '''
         response_id = 1
         self.responders = {}
+        self.responders_by_id = {}
         for response in tree.xpath('//' + "|//".join(response_tag_dict)):
             response_id_str = self.problem_id + "_" + str(response_id)
             # create and save ID for this response
             response.set('id', response_id_str)
+
+            # This nex line should occure at the end of the loop after the
+            # `for entry in inputfields:` loop.  This is a bug.  It has been
+            # decided that it will be fixed in the general restructuring of
+            # the capa_problem which is slated for down the road.
             response_id += 1
 
             answer_id = 1
@@ -670,6 +676,7 @@ class LoncapaProblem(object):
                                                         self.context, self.system)
             # save in list in self
             self.responders[response] = responder
+            self.responders_by_id[responder.id] = responder
 
         # get responder answers (do this only once, since there may be a performance cost,
         # eg with externalresponse)

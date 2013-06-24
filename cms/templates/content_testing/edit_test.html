@@ -1,0 +1,28 @@
+<%inherit file="../base.html" />
+##<%namespace name='static' file='../static_content.html'/>
+
+<%block name="title">Create A Problem Test</%block>
+
+<%block name='content'>
+<div class="main-wrapper">
+<div class="inner-wrapper">
+<div class="main-column">
+<ol>
+    <li>
+    <form id="create_test" action=${"/test_problem/save/?location="+location} method="post">
+      <input type="hidden" name="csrfmiddlewaretoken" value=${csrf} >
+      <section class="xmodule_display xmodule_CapaModule" data-type="Problem">
+      <section class="problem">
+        ${problem_html}
+      </section>
+      </section>
+      <input type="hidden" name="location" value=${location}>
+      <input type="submit" value="save">
+      <a href=${"/test_problem/?location="+location}>cancle</a>
+    </form>
+    </li>
+</ol>
+</div>
+</div>
+</div>
+</%block>

@@ -20,7 +20,7 @@ from xblock.runtime import DbModel
 from util.sandboxing import can_execute_unsafe_code
 
 import static_replace
-from .session_kv_store import SessionKeyValueStore
+from .session_kv_store import SessionKeyValueStore, StaticPreviewKeyValueStore
 from .requests import render_from_lms
 from .access import has_access
 from ..utils import get_course_for_item
@@ -43,7 +43,7 @@ def preview_dispatch(request, preview_id, location, dispatch=None):
     """
 
     descriptor = modulestore().get_item(location)
-    instance = load_preview_module(request, preview_id, descriptor)
+    instance = load_preview_module(preview_id, descriptor, request)
     # Let the module handle the AJAX
     try:
         ajax_return = instance.handle_ajax(dispatch, request.POST)
@@ -82,12 +82,12 @@ def preview_component(request, location):
     )
 
     return render_to_response('component.html', {
-        'preview': get_preview_html(request, component, 0),
+        'preview': get_preview_html(component, 0, request),
         'editor': component.runtime.render(component, None, 'studio_view').content,
     })
 
 
-def preview_module_system(request, preview_id, descriptor):
+def preview_module_system(preview_id, descriptor, request=None):
     """
     Returns a ModuleSystem for the specified descriptor that is specialized for
     rendering module previews.
@@ -97,10 +97,18 @@ def preview_module_system(request, preview_id, descriptor):
     descriptor: An XModuleDescriptor
     """
 
+    if request is not None:
+        kvs = SessionKeyValueStore(request, descriptor._model_data)
+        user = request.user
+
+    else:
+        kvs = StaticPreviewKeyValueStore(descriptor._model_data)
+        user = None
+
     def preview_model_data(descriptor):
         "Helper method to create a DbModel from a descriptor"
         return DbModel(
-            SessionKeyValueStore(request, descriptor._model_data),
+            kvs,
             descriptor.module_class,
             preview_id,
             MongoUsage(preview_id, descriptor.location.url()),
@@ -113,25 +121,26 @@ def preview_module_system(request, preview_id, descriptor):
         # TODO (cpennington): Do we want to track how instructors are using the preview problems?
         track_function=lambda event_type, event: None,
         filestore=descriptor.system.resources_fs,
-        get_module=partial(load_preview_module, request, preview_id),
+        get_module=partial(load_preview_module, preview_id, request=request),
         render_template=render_from_lms,
         debug=True,
         replace_urls=partial(static_replace.replace_static_urls, data_directory=None, course_id=course_id),
-        user=request.user,
+        user=user,
         xblock_model_data=preview_model_data,
         can_execute_unsafe_code=(lambda: can_execute_unsafe_code(course_id)),
     )
 
 
-def load_preview_module(request, preview_id, descriptor):
+def load_preview_module(preview_id, descriptor, request=None):
     """
-    Return a preview XModule instantiated from the supplied descriptor.
+    Returns a preview XModule at the specified location. The preview_data is chosen arbitrarily
+    from the set of preview data for the descriptor specified by Location
 
     request: The active django request
     preview_id (str): An identifier specifying which preview this module is used for
-    descriptor: An XModuleDescriptor
+    location: A Location
     """
-    system = preview_module_system(request, preview_id, descriptor)
+    system = preview_module_system(preview_id, descriptor, request)
     try:
         module = descriptor.xmodule(system)
     except:
@@ -171,10 +180,10 @@ def load_preview_module(request, preview_id, descriptor):
     return module
 
 
-def get_preview_html(request, descriptor, idx):
+def get_preview_html(descriptor, idx, request):
     """
     Returns the HTML returned by the XModule's student_view,
     specified by the descriptor and idx.
     """
-    module = load_preview_module(request, str(idx), descriptor)
+    module = load_preview_module(str(idx), descriptor, request)
     return module.runtime.render(module, None, "student_view").content

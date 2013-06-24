@@ -2,6 +2,8 @@ class CMS.Views.ModuleEdit extends Backbone.View
   tagName: 'li'
   className: 'component'
   editorMode: 'editor-mode'
+  settingsMode: 'settings-mode'
+  testMode: 'test-mode'
 
   events:
     "click .component-editor .cancel-button": 'clickCancelButton'
@@ -126,21 +128,42 @@ class CMS.Views.ModuleEdit extends Backbone.View
   selectMode: (mode) =>
     dataEditor = @$el.find('.wrapper-comp-editor')
     settingsEditor = @$el.find('.wrapper-comp-settings')
+    testEditor = @$el.find('.wrapper-comp-testor')
     editorModeButton =  @$el.find('#editor-mode').find("a")
     settingsModeButton = @$el.find('#settings-mode').find("a")
+    testModeButton = @$el.find('#test-mode').find("a")
 
     if mode == @editorMode
       # Because of CodeMirror editor, cannot hide the data editor when it is first loaded. Therefore
       # we have to use a class of is-inactive instead of is-active.
       dataEditor.removeClass('is-inactive')
       editorModeButton.addClass('is-set')
+      
       settingsEditor.removeClass('is-active')
       settingsModeButton.removeClass('is-set')
-    else
+      
+      testEditor.removeClass('is-active')
+      testModeButton.removeClass('is-set')
+    
+    else if mode == @settingsMode
       dataEditor.addClass('is-inactive')
       editorModeButton.removeClass('is-set')
+      
       settingsEditor.addClass('is-active')
       settingsModeButton.addClass('is-set')
+
+      testEditor.removeClass('is-active')
+      testModeButton.removeClass('is-set')
+
+    else if mode == @testMode
+      dataEditor.addClass('is-inactive')
+      editorModeButton.removeClass('is-set')
+      
+      settingsEditor.removeClass('is-active')
+      settingsModeButton.removeClass('is-set')
+
+      testEditor.addClass('is-active')
+      testModeButton.addClass('is-set')
 
   hideDataEditor: =>
     editorModeButtonParent =  @$el.find('#editor-mode')

@@ -18,7 +18,7 @@ from .progress import Progress
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
-from xblock.core import Scope, String, Boolean, Dict, Integer, Float
+from xblock.core import Scope, String, Boolean, Dict, Integer, Float, List
 from .fields import Timedelta, Date
 from django.utils.timezone import UTC
 
@@ -151,6 +151,7 @@ class CapaFields(object):
         help="Source code for LaTeX and Word problems. This feature is not well-supported.",
         scope=Scope.settings
     )
+    tests = List(help="Tests cases for the LCP", default=[], scope=Scope.settings)
 
 
 class CapaModule(CapaFields, XModule):
@@ -564,7 +565,7 @@ class CapaModule(CapaFields, XModule):
             'problem_show': self.get_answer,
             'score_update': self.update_score,
             'input_ajax': self.handle_input_ajax,
-            'ungraded_response': self.handle_ungraded_response
+            'ungraded_response': self.handle_ungraded_response,
         }
 
         generic_error_message = (
@@ -1171,5 +1172,6 @@ class CapaDescriptor(CapaFields, RawDescriptor):
     def non_editable_metadata_fields(self):
         non_editable_fields = super(CapaDescriptor, self).non_editable_metadata_fields
         non_editable_fields.extend([CapaDescriptor.due, CapaDescriptor.graceperiod,
-                                    CapaDescriptor.force_save_button, CapaDescriptor.markdown])
+                                    CapaDescriptor.force_save_button, CapaDescriptor.markdown,
+                                    CapaDescriptor.tests])
         return non_editable_fields
