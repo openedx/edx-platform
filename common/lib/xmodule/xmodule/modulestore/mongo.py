@@ -19,7 +19,6 @@ from xblock.runtime import DbModel, KeyValueStore, InvalidScopeError
 from xblock.core import Scope
 
 from . import ModuleStoreBase, Location, namedtuple_to_son
-from .draft import DraftModuleStore
 from .exceptions import (ItemNotFoundError,
                          DuplicateItemError)
 from .inheritance import own_metadata, INHERITABLE_METADATA, inherit_metadata
@@ -761,12 +760,3 @@ class MongoModuleStore(ModuleStoreBase):
         return {}
 
 
-# DraftModuleStore is first, because it needs to intercept calls to MongoModuleStore
-class DraftMongoModuleStore(DraftModuleStore, MongoModuleStore):
-    """
-    Version of MongoModuleStore with draft capability mixed in
-    """
-    """
-    Version of MongoModuleStore with draft capability mixed in
-    """
-    pass

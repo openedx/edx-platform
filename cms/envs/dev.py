@@ -27,7 +27,7 @@ modulestore_options = {
 
 MODULESTORE = {
     'default': {
-        'ENGINE': 'xmodule.modulestore.mongo.DraftMongoModuleStore',
+        'ENGINE': 'xmodule.modulestore.draft.DraftModuleStore',
         'OPTIONS': modulestore_options
     },
     'direct': {

@@ -36,7 +36,7 @@ def wrap_draft(item):
     return item
 
 
-class DraftModuleStore(ModuleStoreBase):
+class DraftModuleStore(MongoModuleStore):
     """
     This mixin modifies a modulestore to give it draft semantics.
     That is, edits made to units are stored to locations that have the revision DRAFT,
