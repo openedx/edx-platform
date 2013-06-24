@@ -10,16 +10,15 @@
     // Use this array to keep track of the elements that have already been
     // initialized.
     jsinput.jsinputarr = jsinput.jsinputarr || [];
-    if (isFirst) {
-        jsinput.jsinputarr.exists = function (id) {
-            this.filter(function(e, i, a) {
-                return e.id = id;
-            });
-        };
-    }
+    jsinput.jsinputarr.exists = function (id) {
+        this.filter(function(e, i, a) {
+            return e.id = id;
+        });
+    };
+    
 
     function jsinputConstructor(spec) {
-        // Define an class that will be instantiated for each.jsinput element
+        // Define an class that will be instantiated for each jsinput element
         // of the DOM
 
         // 'that' is the object returned by the constructor. It has a single
@@ -34,6 +33,11 @@
             var parent = $(spec.elem).parent();
             return parent.find('input[id^="input_"]');
         }
+
+        // For the state and grade functions below, use functions instead of
+        // storing their return values since we might need to call them
+        // repeatedly, and they might change (e.g., they might not be defined
+        // when we first try calling them).
 
         // Get the grade function name
         function getgradefn() {
@@ -54,24 +58,24 @@
             return $(sect).attr("data-stored");
         }
 
+        var thisIFrame = $(spec.elem).
+                        find('iframe[name^="iframe_"]').
+                        get(0);
+
+        var cWindow = thisIFrame.contentWindow;
+
         // Put the return value of gradefn in the hidden inputfield.
         // If passed an argument, does not call gradefn, and instead directly
         // updates the inputfield with the passed value.
         var update = function (answer) {
 
             var ans;
-            ans = $(spec.elem).
-                find('iframe[name^="iframe_"]').
-                get(0).      // jquery might not be available in the iframe
-                contentWindow[gradefn]();
+            ans = cWindow[gradefn]();
             // setstate presumes getstate, so don't getstate unless setstate is
             // defined.
             if (getgetstate() && getsetstate()) {
                 var state, store;
-                state = $(spec.elem).
-                            find('iframe[name^="iframe_"]').
-                            get(0).
-                            contentWindow[getgetstate()]();
+                state = cWindow[getgetstate()]();
                 store = {
                     answer: ans,
                     state:  state
@@ -90,8 +94,6 @@
                     find('button[class="update"]').get(0);
             $(updatebutton).click(update);
         }
-
-
 
         /*                       Public methods                     */
 
@@ -116,19 +118,30 @@
             updateHandler();
             bindCheck();
             // Check whether application takes in state and there is a saved
-            // state to give it
+            // state to give it. If getsetstate is specified but calling it
+            // fails, wait and try again, since the iframe might still be
+            // loading.
             if (getsetstate() && getstoredstate()) {
-                console.log("Using stored state...");
                 var sval;
                 if (typeof(getstoredstate()) === "object") {
                     sval = getstoredstate()["state"];
                 } else {
                     sval = getstoredstate();
                 }
-                $(spec.elem).
-                    find('iframe[name^="iframe_"]').
-                    get(0).
-                    contentWindow[getsetstate()](sval);
+                function whileloop(n) {
+                    if (n < 10){
+                        try {
+                            cWindow[getsetstate()](sval);
+                        } catch (err) {
+                            setTimeout(whileloop(n+1), 200);
+                        }
+                    }
+                    else {
+                        console.log("Error: could not set state");
+                    }
+                }
+                whileloop(0);
+                
             }
         } else {
             // NOT CURRENTLY SUPPORTED
@@ -171,11 +184,13 @@
         all.each(function() {
             // Get just the mako variable 'id' from the id attribute
             newid = $(this).attr("id").replace(/^inputtype_/, "");
-            var newJsElem = jsinputConstructor({
-                id: newid,
-                elem: this,
-                passive: false
-            });
+            if (! jsinput.jsinputarr.exists(newid)){
+                var newJsElem = jsinputConstructor({
+                    id: newid,
+                    elem: this,
+                    passive: false
+                });
+            }
         });
     }
 
@@ -193,5 +208,6 @@
         //}
     //};
 
-    setTimeout(walkDOM, 200);
+   
+    setTimeout(walkDOM, 100);
 })(window.jsinput = window.jsinput || {})

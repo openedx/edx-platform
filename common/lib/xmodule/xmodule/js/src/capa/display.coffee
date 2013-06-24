@@ -129,6 +129,30 @@ class @Problem
         if setupMethod?
           @inputtypeDisplays[id] = setupMethod(inputtype)
 
+  # If some function wants to be called before sending the answer to the
+  # server, give it a chance to do so.
+  #
+  # check_waitfor allows the callee to send alerts if the user's input is
+  # invalid. To do so, the callee must throw an exception named "Waitfor
+  # Exception". This and any other errors or exceptions that arise from the
+  # callee are rethrown and abort the submission.
+  # 
+  # In order to use this feature, add a 'data-waitfor' attribute to the input,
+  # and specify the function to be called by the check button before sending
+  # off @answers
+  check_waitfor: =>
+    for inp in @inputs
+      if not ($(inp).attr("data-waitfor")?)
+        try
+          $(inp).data("waitfor")()
+        catch e
+          if e.name == "Waitfor Exception"
+            alert e.message
+          else
+            alert "Could not grade your answer. The submission was aborted."
+          throw e
+    @refreshAnswers()
+
 
   ###
   # 'check_fd' uses FormData to allow file submissions in the 'problem_check' dispatch,
@@ -140,11 +164,7 @@ class @Problem
   check_fd: =>
     Logger.log 'problem_check', @answers
 
-    # If some function wants to be called before sending the answer to the
-    # server, give it a chance to do so.
-    if $('input[waitfor]').length != 0
-      ($(lcall).data("waitfor").call() for lcall in $('input[waitfor]'))
-      @refreshAnswers()
+
     # If there are no file inputs in the problem, we can fall back on @check
     if $('input:file').length == 0
       @check()
@@ -217,6 +237,7 @@ class @Problem
       $.ajaxWithPrefix("#{@url}/problem_check", settings)
 
   check: =>
+    @check_waitfor()
     Logger.log 'problem_check', @answers
     $.postWithPrefix "#{@url}/problem_check", @answers, (response) =>
       switch response.success

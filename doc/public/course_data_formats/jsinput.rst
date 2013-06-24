@@ -87,6 +87,11 @@ attributes are also used) be passed as a string to the enclosing response type.
 In the customresponse example above, this means cfn will be passed this answer
 as `ans`.
 
+If the `gradefn` function throws an exception when a student attempts to
+submit a problem, the submission is aborted, and the student receives a generic
+alert. The alert can be customised by making the exception name `Waitfor
+Exception`; in that case, the alert message will be the exception message.
+
 **IMPORTANT** : the `gradefn` function should not be at all asynchronous, since
 this could result in the student's latest answer not being passed correctly.
 Moreover, the function should also return promptly, since currently the student
