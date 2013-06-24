@@ -130,7 +130,7 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
         problem = ItemFactory.create(
             parent_location=section_location,
-            template=problem_template,
+            category='problem',
             data=prob_xml,
             metadata={'randomize': 'always'},
             display_name=name
@@ -149,13 +149,13 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
         if not(hasattr(self, 'chapter')):
             self.chapter = ItemFactory.create(
                 parent_location=self.course.location,
-                template="i4x://edx/templates/chapter/Empty",
+                category='chapter'
             )
 
         section = ItemFactory.create(
             parent_location=self.chapter.location,
             display_name=name,
-            template="i4x://edx/templates/sequential/Empty",
+            category='sequential',
             metadata={'graded': True, 'format': section_format}
         )
 

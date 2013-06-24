@@ -234,7 +234,7 @@ class StaticTabDescriptor(StaticTabFields, HtmlDescriptor):
     These pieces of course content are treated as HtmlModules but we need to overload where the templates are located
     in order to be able to create new ones
     """
-    template_dir_name = "statictab"
+    template_dir_name = None
     module_class = StaticTabModule
 
 
@@ -261,5 +261,5 @@ class CourseInfoDescriptor(CourseInfoFields, HtmlDescriptor):
     These pieces of course content are treated as HtmlModules but we need to overload where the templates are located
     in order to be able to create new ones
     """
-    template_dir_name = "courseinfo"
+    template_dir_name = None
     module_class = CourseInfoModule

@@ -158,7 +158,7 @@ def create_latex_problem(step):
     world.click_new_component_button(step, '.large-problem-icon')
     # Go to advanced tab.
     world.css_click('#ui-id-2')
-    world.click_component_from_menu("i4x://edx/templates/problem/Problem_Written_in_LaTeX", '.xmodule_CapaModule')
+    world.click_component_from_menu("problem", "latex_problem.yaml", '.xmodule_CapaModule')
 
 
 @step('I edit and compile the High Level Source')

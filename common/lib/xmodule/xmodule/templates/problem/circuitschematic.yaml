@@ -1,9 +1,9 @@
-
 ---
 metadata:
     display_name: Circuit Schematic Builder
     rerandomize: never
     showanswer: finished
+    markdown: !!null
 data: |
       <problem >
         Please make a voltage divider that splits the provided voltage evenly.

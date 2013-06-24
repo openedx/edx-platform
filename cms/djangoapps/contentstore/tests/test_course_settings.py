@@ -19,6 +19,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 from models.settings.course_metadata import CourseMetadata
 from xmodule.modulestore.xml_importer import import_from_xml
+from xmodule.modulestore.django import modulestore
 from xmodule.fields import Date
 
 from .utils import CourseTestCase

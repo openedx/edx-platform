@@ -613,7 +613,6 @@ class PeerGradingDescriptor(PeerGradingFields, RawDescriptor):
 
     has_score = True
     always_recalculate_grades = True
-    template_dir_name = "peer_grading"
 
     #Specify whether or not to pass in open ended interface
     needs_open_ended_interface = True

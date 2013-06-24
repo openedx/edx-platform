@@ -97,7 +97,6 @@ class VideoDescriptor(VideoFields,
                       MetadataOnlyEditingDescriptor,
                       RawDescriptor):
     module_class = VideoModule
-    template_dir_name = "video"
 
     def __init__(self, *args, **kwargs):
         super(VideoDescriptor, self).__init__(*args, **kwargs)

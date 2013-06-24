@@ -15,10 +15,11 @@ from xmodule.modulestore.xml_importer import import_from_xml
 from xmodule.modulestore.xml import XMLModuleStore
 
 from helpers import LoginEnrollmentTestCase
-from modulestore_config import TEST_DATA_DIR,\
-    TEST_DATA_XML_MODULESTORE,\
-    TEST_DATA_MONGO_MODULESTORE,\
+from modulestore_config import TEST_DATA_DIR, \
+    TEST_DATA_XML_MODULESTORE, \
+    TEST_DATA_MONGO_MODULESTORE, \
     TEST_DATA_DRAFT_MONGO_MODULESTORE
+import xmodule
 
 
 class ActivateLoginTest(LoginEnrollmentTestCase):
@@ -50,7 +51,7 @@ class PageLoaderTestCase(LoginEnrollmentTestCase):
         """
         Choose a page in the course randomly, and assert that it loads.
         """
-       # enroll in the course before trying to access pages
+        # enroll in the course before trying to access pages
         courses = module_store.get_courses()
         self.assertEqual(len(courses), 1)
         course = courses[0]

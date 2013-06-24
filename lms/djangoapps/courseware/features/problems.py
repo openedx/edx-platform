@@ -17,7 +17,7 @@ def view_problem_with_attempts(step, problem_type, attempts):
     i_am_registered_for_the_course(step, 'model_course')
 
     # Ensure that the course has this problem type
-    add_problem_to_course(world.scenario_dict['COURSE'].number, problem_type, {'attempts': attempts})
+    add_problem_to_course(world.scenario_dict['COURSE'].number, problem_type, {'max_attempts': attempts})
 
     # Go to the one section in the factory-created course
     # which should be loaded with the correct problem
