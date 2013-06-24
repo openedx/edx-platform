@@ -412,7 +412,7 @@ class CapaModule(CapaFields, XModule):
 
         `err` is the Exception encountered while rendering the problem HTML.
         """
-        log.exception(err)
+        log.exception(err.message)
 
         # TODO (vshnayder): another switch on DEBUG.
         if self.system.DEBUG:
