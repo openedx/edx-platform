@@ -4,7 +4,7 @@ import json
 import logging
 import random
 import re
-import string
+import string       # pylint: disable=W0402
 import urllib
 import uuid
 import time

@@ -26,8 +26,6 @@ def load_function(path):
 
 
 def modulestore(name='default'):
-    global _MODULESTORES
-
     if name not in _MODULESTORES:
         class_ = load_function(settings.MODULESTORE[name]['ENGINE'])
 

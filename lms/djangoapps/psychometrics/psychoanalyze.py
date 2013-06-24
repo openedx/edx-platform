@@ -14,7 +14,8 @@ from scipy.optimize import curve_fit
 
 from django.conf import settings
 from django.db.models import Sum, Max
-from psychometrics.models import *
+from psychometrics.models import PsychometricData
+from courseware.models import StudentModule
 from pytz import UTC
 
 log = logging.getLogger("mitx.psychometrics")
@@ -303,7 +304,7 @@ def generate_plots_for_problem(problem):
 def make_psychometrics_data_update_handler(course_id, user, module_state_key):
     """
     Construct and return a procedure which may be called to update
-    the PsychometricsData instance for the given StudentModule instance.
+    the PsychometricData instance for the given StudentModule instance.
     """
     sm, status = StudentModule.objects.get_or_create(
                        course_id=course_id,

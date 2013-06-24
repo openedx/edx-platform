@@ -5,6 +5,9 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+LMS: Small UX fix on capa multiple-choice problems.  Make labels only
+as wide as the text to reduce accidental choice selections.
+
 Studio: Remove XML from the video component editor. All settings are
 moved to be edited as metadata.
 

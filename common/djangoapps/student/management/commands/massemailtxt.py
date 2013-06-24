@@ -37,7 +37,6 @@ rate -- messages per second
         self.log_file.write(datetime.datetime.utcnow().isoformat() + ' -- ' + text + '\n')
 
     def handle(self, *args, **options):
-        global log_file
         (user_file, message_base, logfilename, ratestr) = args
 
         users = [u.strip() for u in open(user_file).readlines()]
