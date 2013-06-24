@@ -120,7 +120,7 @@ class LoginEnrollmentTestCase(TestCase):
         """
         Try to enroll and return boolean indicating result.
         `course` is an instance of CourseDescriptor.
-        `verify` is an optional parameter specifying whether we
+        `verify` is an optional boolean parameter specifying whether we
         want to verify that the student was successfully enrolled
         in the course.
         """
