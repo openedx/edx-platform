@@ -22,6 +22,10 @@ body.course.textbooks {
       .button {
         margin-left: $baseline;
         @include font-size(14);
+
+        [class^="icon-"] {
+          margin-right: ($baseline/2);
+        }
       }
     }
 
