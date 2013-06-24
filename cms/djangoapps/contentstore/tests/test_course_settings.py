@@ -295,6 +295,7 @@ class CourseMetadataEditingTest(CourseTestCase):
     """
     Tests for CourseMetadata.
     """
+    #FIX
     def setUp(self):
         CourseTestCase.setUp(self)
         # add in the full class too

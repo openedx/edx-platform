@@ -164,6 +164,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
     def test_edit_unit_toy(self):
         self.check_edit_unit('toy')
 
+#FIX
     def test_edit_unit_full(self):
         self.check_edit_unit('full')
 
@@ -299,6 +300,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         num_drafts = self._get_draft_counts(course)
         self.assertEqual(num_drafts, 1)
 
+#FIX
     def test_import_textbook_as_content_element(self):
         module_store = modulestore('direct')
         import_from_xml(module_store, 'common/test/data/', ['full'])
@@ -307,6 +309,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         self.assertGreater(len(course.textbooks), 0)
 
+#FIX
     def test_static_tab_reordering(self):
         module_store = modulestore('direct')
         import_from_xml(module_store, 'common/test/data/', ['full'])
@@ -331,6 +334,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         self.assertEqual(reverse_tabs, course_tabs)
 
+#FIX
     def test_import_polls(self):
         module_store = modulestore('direct')
         import_from_xml(module_store, 'common/test/data/', ['full'])
@@ -342,6 +346,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         # check that there's actually content in the 'question' field
         self.assertGreater(len(items[0].question), 0)
 
+#FIX
     def test_xlint_fails(self):
         err_cnt = perform_xlint('common/test/data', ['full'])
         self.assertGreater(err_cnt, 0)
@@ -368,6 +373,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
 
+#FIX
     def test_delete(self):
         direct_store = modulestore('direct')
         import_from_xml(direct_store, 'common/test/data/', ['full'])
@@ -399,6 +405,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         # make sure the parent no longer points to the child object which was deleted
         self.assertFalse(sequential.location.url() in chapter.children)
 
+#FIX
     def test_about_overrides(self):
         '''
         This test case verifies that a course can use specialized override for about data, e.g. /about/Fall_2012/effort.html
@@ -413,6 +420,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         effort = module_store.get_item(Location(['i4x', 'edX', 'full', 'about', 'end_date', None]))
         self.assertEqual(effort.data, 'TBD')
 
+#FIX
     def test_remove_hide_progress_tab(self):
         module_store = modulestore('direct')
         import_from_xml(module_store, 'common/test/data/', ['full'])
@@ -421,6 +429,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         course = module_store.get_item(source_location)
         self.assertFalse(course.hide_progress_tab)
 
+#FIX
     def test_asset_import(self):
         '''
         This test validates that an image asset is imported and a thumbnail was generated for a .gif
@@ -472,6 +481,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         #
         # self.assertIsNotNone(thumbnail)
 
+#FIX
     def test_asset_delete_and_restore(self):
         '''
         This test will exercise the soft delete/restore functionality of the assets
@@ -528,6 +538,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             thumbnail = content_store.find(thumbnail_location, throw_on_not_found=False)
             self.assertIsNotNone(thumbnail)
 
+#FIX
     def test_empty_trashcan(self):
         '''
         This test will exercise the empting of the asset trashcan
@@ -572,6 +583,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         all_thumbnails = trash_store.get_all_content_thumbnails_for_course(course_location)
         self.assertEqual(len(all_thumbnails), 0)
 
+#FIX
     def test_clone_course(self):
 
         course_data = {
@@ -635,6 +647,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         resp = self.client.get('http://localhost:8001/c4x/CDX/123123/asset/&images_circuits_Lab7Solution2.png')
         self.assertEqual(resp.status_code, 400)
 
+#FIX
     def test_delete_course(self):
         """
         This test will import a course, make a draft item, and delete it. This will also assert that the
@@ -683,6 +696,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             filesystem = OSFS(root_dir / ('test_export/' + dirname))
             self.assertTrue(filesystem.exists(item.location.name + filename_suffix))
 
+#FIX
     def test_export_course(self):
         module_store = modulestore('direct')
         draft_store = modulestore('draft')
@@ -802,6 +816,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         shutil.rmtree(root_dir)
 
+#FIX
     def test_course_handouts_rewrites(self):
         module_store = modulestore('direct')
 
@@ -820,6 +835,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         # note, we know the link it should be because that's what in the 'full' course in the test data
         self.assertContains(resp, '/c4x/edX/full/asset/handouts_schematic_tutorial.pdf')
 
+#FIX
     def test_prefetch_children(self):
         module_store = modulestore('direct')
         import_from_xml(module_store, 'common/test/data/', ['full'])
@@ -842,6 +858,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.assertFalse(Location(['i4x', 'edX', 'full', 'vertical', 'vertical_58', None])
                          in course.system.module_data)
 
+#FIX
     def test_export_course_with_unknown_metadata(self):
         module_store = modulestore('direct')
         content_store = contentstore()
@@ -1200,6 +1217,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         # make sure we found the item (e.g. it didn't error while loading)
         self.assertTrue(did_load_item)
 
+#FIX
     def test_forum_id_generation(self):
         module_store = modulestore('direct')
         import_from_xml(module_store, 'common/test/data/', ['full'])
@@ -1214,6 +1232,7 @@ class ContentStoreTest(ModuleStoreTestCase):
 
         self.assertNotEquals(new_discussion_item.discussion_id, '$$GUID$$')
 
+#FIX
     def test_update_modulestore_signal_did_fire(self):
         module_store = modulestore('direct')
         import_from_xml(module_store, 'common/test/data/', ['full'])
@@ -1239,6 +1258,7 @@ class ContentStoreTest(ModuleStoreTestCase):
 
         self.assertTrue(self.got_signal)
 
+#FIX
     def test_metadata_inheritance(self):
         module_store = modulestore('direct')
         import_from_xml(module_store, 'common/test/data/', ['full'])
