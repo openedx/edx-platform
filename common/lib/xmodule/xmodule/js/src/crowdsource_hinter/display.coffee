@@ -13,7 +13,6 @@ class @Hinter
     # request.
     answers = data[0]
     response = data[1]
-    console.debug(response)
     if response.search(/class="correct/) == -1
       # Incorrect.  Get hints.
       $.postWithPrefix "#{@url}/get_hint", answers, (response) =>
@@ -29,9 +28,9 @@ class @Hinter
   bind: =>
     window.update_schematics()
     @$('input.vote').click @vote
-    @$('#feedback-select').change @feedback_ui_change
     @$('input.submit-hint').click @submit_hint
     @$('.custom-hint').click @clear_default_text
+    @$('#answer-tabs').tabs({active: 0})
 
 
   vote: (eventObj) =>
