@@ -36,7 +36,7 @@ def hint_manager(request, course_id):
         course = get_course_with_access(request.user, course_id, 'staff', depth=None)
     except Http404:
         out = 'Sorry, but students are not allowed to access the hint manager!'
-        return
+        return HttpResponse(out)
     if request.method == 'GET':
         out = get_hints(request, course_id, 'mod_queue')
         return render_to_response('courseware/hint_manager.html', out)

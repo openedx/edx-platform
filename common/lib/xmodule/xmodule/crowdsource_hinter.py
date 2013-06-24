@@ -106,13 +106,20 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         This is the landing method for AJAX calls.
         '''
         if dispatch == 'get_hint':
-            return self.get_hint(get)
+            out = self.get_hint(get)
         if dispatch == 'get_feedback':
-            return self.get_feedback(get)
+            out = self.get_feedback(get)
         if dispatch == 'vote':
-            return self.tally_vote(get)
+            out = self.tally_vote(get)
         if dispatch == 'submit_hint':
-            return self.submit_hint(get)
+            out = self.submit_hint(get)
+
+        if out == None:
+            out = {'op': 'empty'}
+        else:
+            out.update({'op': dispatch})
+        return json.dumps({'contents': self.system.render_template('hinter_display.html', out)})
+
 
     def get_hint(self, get):
         '''
@@ -123,7 +130,7 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         if (answer not in self.hints) or (len(self.hints[answer]) == 0):
             # No hints to give.  Return.
             self.previous_answers += [[answer, [None, None, None]]]
-            return json.dumps({'contents': ' '})
+            return
         # Get the top hint, plus two random hints.
         n_hints = len(self.hints[answer])
         best_hint_index = max(self.hints[answer], key=lambda key: self.hints[answer][key][1])
@@ -145,8 +152,11 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
             rand_hint_1 = rand_hint_1[0]
             rand_hint_2 = rand_hint_2[0]
             self.previous_answers += [(answer, (best_hint_index, hint_index_1, hint_index_2))]
-        hint_text = best_hint + '<br />' + rand_hint_1 + '<br />' + rand_hint_2
-        return json.dumps({'contents': hint_text})
+
+        return {'best_hint': best_hint,
+                'rand_hint_1': rand_hint_1, 
+                'rand_hint_2': rand_hint_2, 
+                'answer': answer}
 
     def get_feedback(self, get):
         '''
@@ -154,55 +164,33 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         '''
         # The student got it right.
         # Did he submit at least one wrong answer?
-        out = ' '
+        out = ''
         if len(self.previous_answers) == 0:
             # No.  Nothing to do here.
-            return json.dumps({'contents': out})
+            return
         # Make a hint-voting interface for each wrong answer.  The student will only
         # be allowed to make one vote / submission, but he can choose which wrong answer
         # he wants to look at.
-        pretty_answers = []
+        # index_to_hints[previous answer #] = [(hint text, hint pk), + ]
+        index_to_hints = {}
+        # index_to_answer[previous answer #] = answer text
+        index_to_answer = {}
+
         for i in xrange(len(self.previous_answers)):
             answer, hints_offered = self.previous_answers[i]
-            pretty_answers.append(answer)
-            # If there are previous hints for this answer, ask the student to vote on one.
-            out += '<div class = "previous-answer" id="previous-answer-' + str(i) + \
-                '" style="display:none">'
+            index_to_hints[i] = []
+            index_to_answer[i] = answer
             if answer in self.hints:
-                out += 'Which hint was most helpful when you got the wrong answer of '\
-                    + answer + '?'
                 # Add each hint to the html string, with a vote button.
                 for hint_id in hints_offered:
                     if hint_id != None:
-                        hint_id = str(hint_id)
                         try:
-                            out += '<br /><input class="vote" data-answer="'+str(i)+'" data-hintno="'+hint_id+\
-                                '" type="button" value="Vote"> ' + self.hints[answer][hint_id][0]
+                            index_to_hints[i].append((self.hints[answer][hint_id][0], hint_id))
                         except KeyError:
                             # Sometimes, the hint that a user saw will have been deleted by the instructor.
                             continue
-                        
 
-            # Or, let the student create his own hint
-            out += '''<br /> If you didn\'t like any of these, plese submit your own: <br />
-                <textarea cols="50" style="height:100px" class="custom-hint" id="custom-hint-'''+str(i)+'''">
-What would you say to help someone who got this wrong answer?
-(Don't give away the answer, please.)
-                </textarea>'''
-
-            out += '<input class="submit-hint" data-answer="' + str(i) + '" type="button" value="submit">'
-
-            # Close the .previous-answer div.
-            out += '</div>'
-
-        # Add preamble.
-        out2 = '''Help us improve our hinting system by voting on the hint that was most helpful 
-            to you.  Start by picking one of your previous incorrect answers from below: <br />
-            <select id="feedback-select">'''
-        for i, answer in enumerate(pretty_answers):
-            out2 += '<option value=' + str(i) + '>' + str(answer) + '</option>'
-        out2 += '</select><br />'
-        return json.dumps({'contents': out2 + out})
+        return {'index_to_hints': index_to_hints, 'index_to_answer': index_to_answer}
 
 
     def tally_vote(self, get):
@@ -226,7 +214,7 @@ What would you say to help someone who got this wrong answer?
         # Reset self.previous_answers.
         self.previous_answers = []
         # In the future, return a list of how many votes each hint got, maybe?
-        return json.dumps({'contents': 'Congrats, you\'ve voted!'})
+        return {'message': 'Congrats, you\'ve voted!'}
 
 
     def submit_hint(self, get):
@@ -240,7 +228,7 @@ What would you say to help someone who got this wrong answer?
         hint = escape(get['hint'])
         answer = self.previous_answers[int(get['answer'])][0]
         if self.user_voted:
-           return json.dumps({'contents': 'Sorry, but you have already voted!'})
+           return {'message': 'Sorry, but you have already voted!'}
         # Add the new hint to self.hints.  (Awkward because a direct write 
         # is necessary.)
         if self.moderate == 'True':
@@ -259,7 +247,7 @@ What would you say to help someone who got this wrong answer?
         # Mark the user has having voted; reset previous_answers
         self.user_voted = True
         self.previous_answers = []
-        return json.dumps({'contents': 'Thank you for your hint!'})
+        return {'message': 'Thank you for your hint!'}
 
 
     def delete_hint(self, answer, hint_id):
