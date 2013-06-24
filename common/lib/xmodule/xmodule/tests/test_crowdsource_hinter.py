@@ -8,7 +8,7 @@ from xmodule.modulestore import Location
 
 from django.http import QueryDict
 
-from . import test_system
+from . import get_test_system
 
 import json
 
@@ -90,7 +90,7 @@ class CHModuleFactory(object):
             model_data['moderate'] = moderate
         
         descriptor = Mock(weight="1")
-        system = test_system()
+        system = get_test_system()
         system.render_template = Mock(return_value="<div>Test Template HTML</div>")
         module = CrowdsourceHinterModule(system, descriptor, model_data)
 
