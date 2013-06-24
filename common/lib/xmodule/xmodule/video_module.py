@@ -54,9 +54,9 @@ class VideoModule(VideoFields, XModule):
     def __init__(self, *args, **kwargs):
         XModule.__init__(self, *args, **kwargs)
 
-    def handle_ajax(self, dispatch, get):
+    def handle_ajax(self, dispatch, data):
         """This is not being called right now and we raise 404 error."""
-        log.debug(u"GET {0}".format(get))
+        log.debug(u"GET {0}".format(data))
         log.debug(u"DISPATCH {0}".format(dispatch))
         raise Http404()
 

@@ -500,10 +500,10 @@ class CombinedOpenEndedV1Module():
             pass
         return return_html
 
-    def get_rubric(self, get):
+    def get_rubric(self, _data):
         """
         Gets the results of a given grader via ajax.
-        Input: AJAX get dictionary
+        Input: AJAX data dictionary
         Output: Dictionary to be rendered via ajax that contains the result html.
         """
         all_responses = []
@@ -532,10 +532,10 @@ class CombinedOpenEndedV1Module():
         html = self.system.render_template('{0}/combined_open_ended_results.html'.format(self.TEMPLATE_DIR), context)
         return {'html': html, 'success': True}
 
-    def get_legend(self, get):
+    def get_legend(self, _data):
         """
         Gets the results of a given grader via ajax.
-        Input: AJAX get dictionary
+        Input: AJAX data dictionary
         Output: Dictionary to be rendered via ajax that contains the result html.
         """
         context = {
@@ -544,10 +544,10 @@ class CombinedOpenEndedV1Module():
         html = self.system.render_template('{0}/combined_open_ended_legend.html'.format(self.TEMPLATE_DIR), context)
         return {'html': html, 'success': True}
 
-    def get_results(self, get):
+    def get_results(self, _data):
         """
         Gets the results of a given grader via ajax.
-        Input: AJAX get dictionary
+        Input: AJAX data dictionary
         Output: Dictionary to be rendered via ajax that contains the result html.
         """
         self.update_task_states()
@@ -588,19 +588,19 @@ class CombinedOpenEndedV1Module():
         html = self.system.render_template('{0}/combined_open_ended_results.html'.format(self.TEMPLATE_DIR), context)
         return {'html': html, 'success': True}
 
-    def get_status_ajax(self, get):
+    def get_status_ajax(self, _data):
         """
         Gets the results of a given grader via ajax.
-        Input: AJAX get dictionary
+        Input: AJAX data dictionary
         Output: Dictionary to be rendered via ajax that contains the result html.
         """
         html = self.get_status(True)
         return {'html': html, 'success': True}
 
-    def handle_ajax(self, dispatch, get):
+    def handle_ajax(self, dispatch, data):
         """
         This is called by courseware.module_render, to handle an AJAX call.
-        "get" is request.POST.
+        "data" is request.POST.
 
         Returns a json dictionary:
         { 'progress_changed' : True/False,
@@ -618,30 +618,30 @@ class CombinedOpenEndedV1Module():
         }
 
         if dispatch not in handlers:
-            return_html = self.current_task.handle_ajax(dispatch, get, self.system)
+            return_html = self.current_task.handle_ajax(dispatch, data, self.system)
             return self.update_task_states_ajax(return_html)
 
-        d = handlers[dispatch](get)
+        d = handlers[dispatch](data)
         return json.dumps(d, cls=ComplexEncoder)
 
-    def next_problem(self, get):
+    def next_problem(self, _data):
         """
         Called via ajax to advance to the next problem.
-        Input: AJAX get request.
+        Input: AJAX data request.
         Output: Dictionary to be rendered
         """
         self.update_task_states()
         return {'success': True, 'html': self.get_html_nonsystem(), 'allow_reset': self.ready_to_reset}
 
-    def reset(self, get):
+    def reset(self, data):
         """
         If resetting is allowed, reset the state of the combined open ended module.
-        Input: AJAX get dictionary
+        Input: AJAX data dictionary
         Output: AJAX dictionary to tbe rendered
         """
         if self.state != self.DONE:
             if not self.ready_to_reset:
-                return self.out_of_sync_error(get)
+                return self.out_of_sync_error(data)
 
         if self.student_attempts > self.attempts:
             return {
@@ -789,13 +789,13 @@ class CombinedOpenEndedV1Module():
 
         return progress_object
 
-    def out_of_sync_error(self, get, msg=''):
+    def out_of_sync_error(self, data, msg=''):
         """
         return dict out-of-sync error message, and also log.
         """
         #This is a dev_facing_error
-        log.warning("Combined module state out sync. state: %r, get: %r. %s",
-                    self.state, get, msg)
+        log.warning("Combined module state out sync. state: %r, data: %r. %s",
+                    self.state, data, msg)
         #This is a student_facing_error
         return {'success': False,
                 'error': 'The problem state got out-of-sync.  Please try reloading the page.'}
