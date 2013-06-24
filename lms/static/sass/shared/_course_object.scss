@@ -71,7 +71,7 @@
       }
 
       .meta-info {
-        background: rgba(0,0,0, 0.6);
+        background: $dark-trans-bg;
         bottom: 6px;
         border: 1px solid rgba(0,0,0, 0.5);
         @include border-right-radius(2px);
