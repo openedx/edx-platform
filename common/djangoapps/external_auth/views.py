@@ -3,7 +3,7 @@ import json
 import logging
 import random
 import re
-import string
+import string       # pylint: disable=W0402
 import fnmatch
 
 from textwrap import dedent

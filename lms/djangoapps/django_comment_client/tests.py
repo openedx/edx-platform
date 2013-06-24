@@ -1,4 +1,4 @@
-import string
+import string       # pylint: disable=W0402
 import random
 
 from django.contrib.auth.models import User
