@@ -21,7 +21,6 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
             }
         );
         this.listenTo(this.model, 'invalid', this.handleValidationError);
-        this.savedBar = undefined;
     },
     render: function() {
         // catch potential outside call before template loaded
@@ -122,10 +121,13 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
                         confirm.hide();
                         self.notificationBarShowing = false;
                     }
-                }],
+                }]
             }});
         this.notificationBarShowing = true;
         confirm.show();
+        if(this.saved) {
+            this.saved.hide();
+        }
     },
     saveView : function() {
         // TODO one last verification scan:
@@ -146,13 +148,6 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
                 analytics.track('Saved Advanced Settings', {
                     'course': course_location_analytics
                 });
-            },
-            error: function() {
-                // If we've already saved some data this will be
-                // shown; hide it away again.
-                if(self.saved) {
-                    self.saved.hide();
-                }
             }
         });
     },
