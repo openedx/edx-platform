@@ -27,45 +27,18 @@ from student.models import Registration
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import Location
-from mongo_login_helpers import MongoLoginHelpers
-# from helpers import LoginEnrollmentTestCase
+from helpers import LoginEnrollmentTestCase
 
 #import factories for testing
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
 
-log = logging.getLogger("mitx." + __name__)
-
-
-def mongo_store_config(data_dir):
-    '''
-    Defines default module store using MongoModuleStore
-
-    Use of this config requires mongo to be running
-    '''
-    store = {
-        'default': {
-            'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
-            'OPTIONS': {
-                'default_class': 'xmodule.raw_module.RawDescriptor',
-                'host': 'localhost',
-                'db': 'test_xmodule',
-                'collection': 'modulestore_%s' % uuid4().hex,
-                'fs_root': data_dir,
-                'render_template': 'mitxmako.shortcuts.render_to_string',
-            }
-        }
-    }
-    store['direct'] = store['default']
-    return store
-
-TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
-TEST_DATA_MONGO_MODULESTORE = mongo_store_config(TEST_DATA_DIR)
+from modulestore_config import TEST_DATA_MONGO_MODULESTORE
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
-class TestSubmittingProblems(MongoLoginHelpers):
+class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """Check that a course gets graded properly"""
 
     # Subclasses should specify the course slug
