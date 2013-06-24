@@ -63,19 +63,28 @@
 
 
 .instructor-dashboard-wrapper-2 section.idash-section#course_info {
-  .error-log {
-    margin-top: 1em;
+  .course-errors-wrapper {
+    margin-top: 2em;
 
-    .course-error {
-      margin-bottom: 1em;
+    h2 {
+      color: #D60000;
+    }
 
-      code {
-        &.course-error-first {
-          color: #111;
-        }
+    .course-errors-visibility-wrapper {
+      display: none;
 
-        &.course-error-second {
-          color: black;
+      .course-error {
+        margin-bottom: 1em;
+        margin-left: 0.5em;
+
+        code {
+          &.course-error-first {
+            color: #111;
+          }
+
+          &.course-error-second {
+            color: #111;
+          }
         }
       }
     }

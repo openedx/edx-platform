@@ -37,14 +37,16 @@
   ${ section_data['offline_grades'] }
 </div>
 
-<div class="error-log">
-  %if len(section_data['course_errors']):
-    <h2>Course Errors:</h2>
-    %for error in section_data['course_errors']:
-      <div class="course-error">
-        <code class=course-error-first>  ${ error[0] } </code><br>
-        <code class=course-error-second> ${ error[1] } </code>
-      </div>
-    %endfor
-  %endif
-</div>
+%if len(section_data['course_errors']):
+  <div class="course-errors-wrapper">
+    <a href=""><h2 class="title">Course Warnings:</h2></a>
+    <div class="course-errors-visibility-wrapper">
+      %for error in section_data['course_errors']:
+        <div class="course-error">
+          <code class=course-error-first>  ${ error[0] } </code><br>
+          <code class=course-error-second> ${ error[1] } </code>
+        </div>
+      %endfor
+    </div>
+  </div>
+%endif
