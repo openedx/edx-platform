@@ -37,6 +37,7 @@ from capa.tests.response_xml_factory import OptionResponseXMLFactory
 
 log = logging.getLogger("mitx." + __name__)
 
+
 def mongo_store_config(data_dir):
     '''
     Defines default module store using MongoModuleStore
@@ -215,9 +216,9 @@ class TestCourseGrader(TestSubmittingProblems):
         grade_summary = self.get_grade_summary()
         self.assertEqual(grade_summary['percent'], percent)
 
-    def check_letter_grade(self, letter):
-        '''assert letter grade is as expected'''
-        self.assertEqual(self.get_grade_summary()['grade'], letter)
+    # def check_letter_grade(self, letter):
+    #     '''assert letter grade is as expected'''
+    #     self.assertEqual(self.get_grade_summary()['grade'], letter)
 
     def earned_hw_scores(self):
         """Global scores, each Score is a Problem Set"""
@@ -254,37 +255,7 @@ class TestCourseGrader(TestSubmittingProblems):
         self.p3 = self.add_dropdown_to_section(self.homework.location, 'p3', 1)
         self.refresh_course()
 
-    def test_None_grade(self):
-        '''check grade is 0 to begin'''
-        self.basic_setup()
-        self.check_grade_percent(0)
-        self.check_letter_grade(None)
-
-    def test_B_grade_exact(self):
-        '''check that at exactly the cutoff, the grade is B'''
-        self.basic_setup()
-        self.submit_question_answer('p1', {'2_1': 'Correct'})
-        self.check_grade_percent(0.33)
-        self.check_letter_grade('B')
-
-    def test_B_grade_above(self):
-        '''check grade between cutoffs'''
-        self.basic_setup()
-        self.submit_question_answer('p1', {'2_1': 'Correct'})
-        self.submit_question_answer('p2', {'2_1': 'Correct'})
-        self.check_grade_percent(0.67)
-        self.check_letter_grade('B')
-
-    def test_A_grade(self):
-        '''check that 100% comlpetion gets an A'''
-        self.basic_setup()
-        self.submit_question_answer('p1', {'2_1': 'Correct'})
-        self.submit_question_answer('p2', {'2_1': 'Correct'})
-        self.submit_question_answer('p3', {'2_1': 'Correct'})
-        self.check_grade_percent(1.0)
-        self.check_letter_grade('A')
-
-    def test_weighted_grading(self):
+    def weighted_setup(self):
         '''Set up a simple course for testing weighted grading functionality'''
         grading_policy = {
             "GRADER": [
@@ -310,24 +281,7 @@ class TestCourseGrader(TestSubmittingProblems):
         self.final = self.add_graded_section_to_course('Final Section', 'Final')
         self.final_question = self.add_dropdown_to_section(self.final.location, 'FinalQuestion')
 
-        # Only get half of the first problem correct
-        self.submit_question_answer('H1P1', {'2_1': 'Correct', '2_2': 'Incorrect'})
-        self.check_grade_percent(0.13)
-        self.assertEqual(self.earned_hw_scores(), [1.0])   # Order matters
-        self.assertEqual(self.score_for_hw('homework'), [1.0])
-
-        # Get both parts correct
-        self.submit_question_answer('H1P1', {'2_1': 'Correct', '2_2': 'Correct'})
-        self.check_grade_percent(0.25)
-        self.assertEqual(self.earned_hw_scores(), [2.0])   # Order matters
-        self.assertEqual(self.score_for_hw('homework'), [2.0])
-
-        # Do the final
-        # Now we answer the final question (worth 75% of the grade)
-        self.submit_question_answer('FinalQuestion', {'2_1': 'Correct', '2_2': 'Correct'})
-        self.check_grade_percent(1.0)   # Hooray! We got 100%
-
-    def test_dropping_homework(self):
+    def dropping_setup(self):
         '''Set up a simple course for testing the dropping grading functionality'''
         grading_policy = {
             "GRADER": [
@@ -353,41 +307,114 @@ class TestCourseGrader(TestSubmittingProblems):
         self.h3p1 = self.add_dropdown_to_section(self.homework3.location, 'H3P1', 1)
         self.h3p2 = self.add_dropdown_to_section(self.homework3.location, 'H3P2', 1)
 
-        #Get The first problem correct
+    def test_None_grade(self):
+        '''check grade is 0 to begin'''
+        self.basic_setup()
+        self.check_grade_percent(0)
+        self.assertEqual(self.get_grade_summary()['grade'], None)
+
+    def test_B_grade_exact(self):
+        '''check that at exactly the cutoff, the grade is B'''
+        self.basic_setup()
+        self.submit_question_answer('p1', {'2_1': 'Correct'})
+        self.check_grade_percent(0.33)
+        self.assertEqual(self.get_grade_summary()['grade'], 'B')
+
+    def test_B_grade_above(self):
+        '''check grade between cutoffs'''
+        self.basic_setup()
+        self.submit_question_answer('p1', {'2_1': 'Correct'})
+        self.submit_question_answer('p2', {'2_1': 'Correct'})
+        self.check_grade_percent(0.67)
+        self.assertEqual(self.get_grade_summary()['grade'], 'B')
+
+    def test_A_grade(self):
+        '''check that 100 percent completion gets an A'''
+        self.basic_setup()
+        self.submit_question_answer('p1', {'2_1': 'Correct'})
+        self.submit_question_answer('p2', {'2_1': 'Correct'})
+        self.submit_question_answer('p3', {'2_1': 'Correct'})
+        self.check_grade_percent(1.0)
+        self.assertEqual(self.get_grade_summary()['grade'], 'A')
+
+    def test_wrong_asnwers(self):
+        '''check that answering incorrectly is graded properly'''
+        self.basic_setup()
+        self.submit_question_answer('p1', {'2_1': 'Correct'})
+        self.submit_question_answer('p2', {'2_1': 'Correct'})
+        self.submit_question_answer('p3', {'2_1': 'Incorrect'})
+        self.check_grade_percent(0.67)
+        self.assertEqual(self.get_grade_summary()['grade'], 'B')
+
+    def test_weighted_homework(self):
+        '''test that the homework section has proper weight'''
+        self.weighted_setup()
+
+        # Get both parts correct
+        self.submit_question_answer('H1P1', {'2_1': 'Correct', '2_2': 'Correct'})
+        self.check_grade_percent(0.25)
+        self.assertEqual(self.earned_hw_scores(), [2.0])   # Order matters
+        self.assertEqual(self.score_for_hw('homework'), [2.0])
+
+    def test_weighted_exam(self):
+        '''test that the exam section has the proper weight'''
+        self.weighted_setup()
+        self.submit_question_answer('FinalQuestion', {'2_1': 'Correct', '2_2': 'Correct'})
+        self.check_grade_percent(0.75)
+
+    def test_weighted_total(self):
+        '''test that the weighted total adds to 100'''
+        self.weighted_setup()
+        self.submit_question_answer('H1P1', {'2_1': 'Correct', '2_2': 'Correct'})
+        self.submit_question_answer('FinalQuestion', {'2_1': 'Correct', '2_2': 'Correct'})
+        self.check_grade_percent(1.0)
+
+    def dropping_homework_stage1(self):
+        '''helper function for dropping tests'''
         self.submit_question_answer('H1P1', {'2_1': 'Correct'})
-        self.check_grade_percent(0.25)
-        self.assertEqual(self.earned_hw_scores(), [1.0, 0, 0])   # Order matters
-        self.assertEqual(self.score_for_hw('homework1'), [1.0, 0.0])
-        self.check_letter_grade(None)
-
-        #Get the second problem incorrect
         self.submit_question_answer('H1P2', {'2_1': 'Incorrect'})
-        self.check_grade_percent(0.25)
-        self.assertEqual(self.earned_hw_scores(), [1.0, 0, 0])   # Order matters
-        self.assertEqual(self.score_for_hw('homework1'), [1.0, 0.0])
-        self.check_letter_grade(None)
-
-        #Get Homework2 correct
         self.submit_question_answer('H2P1', {'2_1': 'Correct'})
         self.submit_question_answer('H2P2', {'2_1': 'Correct'})
-        self.check_grade_percent(0.75)
-        self.assertEqual(self.earned_hw_scores(), [1.0, 2.0, 0])   # Order matters
+
+    def test_dropping_grades_normally(self):
+        '''test that the dropping policy does not change things before it should'''
+        self.dropping_setup()
+        # get half the first homework correct and all of homework2
+        self.submit_question_answer('H1P1', {'2_1': 'Correct'})
+        self.submit_question_answer('H1P2', {'2_1': 'Incorrect'})
+        self.submit_question_answer('H2P1', {'2_1': 'Correct'})
+        self.submit_question_answer('H2P2', {'2_1': 'Correct'})
+
+        self.assertEqual(self.score_for_hw('homework1'), [1.0, 0.0])
         self.assertEqual(self.score_for_hw('homework2'), [1.0, 1.0])
-        self.check_letter_grade('Pass')
-
-        #Get homework3 half correct, shouldn't change grade
-        self.submit_question_answer('H3P1', {'2_1': 'Correct'})
+        self.assertEqual(self.earned_hw_scores(), [1.0, 2.0, 0])   # Order matters
         self.check_grade_percent(0.75)
-        self.assertEqual(self.earned_hw_scores(), [1.0, 2.0, 1.0])   # Order matters
-        self.assertEqual(self.score_for_hw('homework3'), [1.0, 0.0])
-        self.check_letter_grade('Pass')
 
-        #get all of homework3 correct, which hsould replace homework 1
+    def test_dropping_nochange(self):
+        '''tests that grade does not change when making the global homework grade minimum not unique'''
+        self.dropping_setup()
+
+        # get half the first homework correct and all of homework2
+        self.dropping_homework_stage1()
+        self.submit_question_answer('H3P1', {'2_1': 'Correct'})
+
+        self.assertEqual(self.score_for_hw('homework1'), [1.0, 0.0])
+        self.assertEqual(self.score_for_hw('homework2'), [1.0, 1.0])
+        self.assertEqual(self.score_for_hw('homework3'), [1.0, 0.0])
+        self.assertEqual(self.earned_hw_scores(), [1.0, 2.0, 1.0])   # Order matters
+        self.check_grade_percent(0.75)
+
+    def test_dropping_all_correct(self):
+        '''test that the lowest is dropped for a perfect score'''
+        self.dropping_setup()
+
+        self.dropping_homework_stage1()
+        self.submit_question_answer('H3P1', {'2_1': 'Correct'})
         self.submit_question_answer('H3P2', {'2_1': 'Correct'})
+
         self.check_grade_percent(1.0)
         self.assertEqual(self.earned_hw_scores(), [1.0, 2.0, 2.0])   # Order matters
         self.assertEqual(self.score_for_hw('homework3'), [1.0, 1.0])
-        self.check_letter_grade('Pass')
 
 
 class TestPythonGradedResponse(TestSubmittingProblems):
@@ -562,7 +589,6 @@ else:
 
         respdata = json.loads(resp.content)
         self.assertEqual(respdata['success'], 'correct')
-
 
     def test_schematic_correct(self):
         name = "schematic_problem"
