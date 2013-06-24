@@ -1,10 +1,14 @@
 <%page args="section_data"/>
 
 <input type="button" name="list-profiles" value="List enrolled students with profile information" data-endpoint="${ section_data['enrolled_students_profiles_url'] }" >
-<input type="button" name="list-profiles" value="[CSV]" data-csv="true" data-endpoint="${ section_data['enrolled_students_profiles_url'] }" >
+<input type="button" name="list-profiles" value="CSV" data-csv="true" class="csv" data-endpoint="${ section_data['enrolled_students_profiles_url'] }" >
+<br>
 <input type="button" name="list-grades" value="Student grades">
+<br>
 <input type="button" name="list-answer-distributions" value="Answer distributions (x students got y points)">
+<br>
 <input type="button" name="dump-gradeconf" value="Grading Configuration" data-endpoint="${ section_data['grading_config_url'] }">
+
 <div class="data-display">
   <div class="data-display-text"></div>
   <div class="data-display-table"></div>
