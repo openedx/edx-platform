@@ -5,8 +5,6 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
-import xmodule.modulestore.django
-
 from helpers import LoginEnrollmentTestCase, check_for_get_code
 from modulestore_config import TEST_DATA_MONGO_MODULESTORE
 

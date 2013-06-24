@@ -224,21 +224,6 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
             print 'checking for 200 on {0}'.format(url)
             check_for_get_code(self, 200, url)
 
-    def run_wrapped(self, test):
-        """
-        test.py turns off start dates.  Enable them.
-        Because settings is global, be careful not to mess it up for other tests
-        (Can't use override_settings because we're only changing part of the
-        MITX_FEATURES dict)
-        """
-        oldDSD = settings.MITX_FEATURES['DISABLE_START_DATES']
-
-        try:
-            settings.MITX_FEATURES['DISABLE_START_DATES'] = False
-            test()
-        finally:
-            settings.MITX_FEATURES['DISABLE_START_DATES'] = oldDSD
-
     def test_dark_launch(self):
         """
         Make sure that before course start, students can't access course
