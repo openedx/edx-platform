@@ -429,7 +429,6 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         course = module_store.get_item(course_location)
         self.assertFalse(course.hide_progress_tab)
 
-#FIX
     def test_asset_import(self):
         '''
         This test validates that an image asset is imported and a thumbnail was generated for a .gif
@@ -437,9 +436,9 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         content_store = contentstore()
 
         module_store = modulestore('direct')
-        import_from_xml(module_store, 'common/test/data/', ['full'], static_content_store=content_store)
+        import_from_xml(module_store, 'common/test/data/', ['toy'], static_content_store=content_store)
 
-        course_location = CourseDescriptor.id_to_location('edX/full/6.002_Spring_2012')
+        course_location = CourseDescriptor.id_to_location('edX/toy/2012_Fall')
         course = module_store.get_item(course_location)
 
         self.assertIsNotNone(course)
@@ -460,7 +459,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         content = None
         try:
-            location = StaticContent.get_location_from_path('/c4x/edX/full/asset/circuits_duality.gif')
+            location = StaticContent.get_location_from_path('/c4x/edX/toy/asset/sample_static.txt')
             content = content_store.find(location)
         except NotFoundError:
             pass
@@ -481,7 +480,6 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         #
         # self.assertIsNotNone(thumbnail)
 
-#FIX
     def test_asset_delete_and_restore(self):
         '''
         This test will exercise the soft delete/restore functionality of the assets
@@ -489,10 +487,10 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         content_store = contentstore()
         trash_store = contentstore('trashcan')
         module_store = modulestore('direct')
-        import_from_xml(module_store, 'common/test/data/', ['full'], static_content_store=content_store)
+        import_from_xml(module_store, 'common/test/data/', ['toy'], static_content_store=content_store)
 
         # look up original (and thumbnail) in content store, should be there after import
-        location = StaticContent.get_location_from_path('/c4x/edX/full/asset/circuits_duality.gif')
+        location = StaticContent.get_location_from_path('/c4x/edX/toy/asset/sample_static.txt')
         content = content_store.find(location, throw_on_not_found=False)
         thumbnail_location = content.thumbnail_location
         self.assertIsNotNone(content)
@@ -505,11 +503,11 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         # go through the website to do the delete, since the soft-delete logic is in the view
 
-        url = reverse('remove_asset', kwargs={'org': 'edX', 'course': 'full', 'name': '6.002_Spring_2012'})
-        resp = self.client.post(url, {'location': '/c4x/edX/full/asset/circuits_duality.gif'})
+        url = reverse('remove_asset', kwargs={'org': 'edX', 'course': 'toy', 'name': '2012_Fall'})
+        resp = self.client.post(url, {'location': '/c4x/edX/toy/asset/sample_static.txt'})
         self.assertEqual(resp.status_code, 200)
 
-        asset_location = StaticContent.get_location_from_path('/c4x/edX/full/asset/circuits_duality.gif')
+        asset_location = StaticContent.get_location_from_path('/c4x/edX/toy/asset/sample_static.txt')
 
         # now try to find it in store, but they should not be there any longer
         content = content_store.find(asset_location, throw_on_not_found=False)
@@ -528,7 +526,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             self.assertIsNotNone(thumbnail)
 
         # let's restore the asset
-        restore_asset_from_trashcan('/c4x/edX/full/asset/circuits_duality.gif')
+        restore_asset_from_trashcan('/c4x/edX/toy/asset/sample_static.txt')
 
         # now try to find it in courseware store, and they should be back after restore
         content = content_store.find(asset_location, throw_on_not_found=False)
@@ -547,18 +545,18 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         trash_store = contentstore('trashcan')
         module_store = modulestore('direct')
 
-        import_from_xml(module_store, 'common/test/data/', ['full'], static_content_store=content_store)
+        import_from_xml(module_store, 'common/test/data/', ['toy'], static_content_store=content_store)
 
-        course_location = CourseDescriptor.id_to_location('edX/full/6.002_Spring_2012')
+        course_location = CourseDescriptor.id_to_location('edX/toy/6.002_Spring_2012')
 
-        location = StaticContent.get_location_from_path('/c4x/edX/full/asset/circuits_duality.gif')
+        location = StaticContent.get_location_from_path('/c4x/edX/toy/asset/sample_static.txt')
         content = content_store.find(location, throw_on_not_found=False)
         self.assertIsNotNone(content)
 
         # go through the website to do the delete, since the soft-delete logic is in the view
 
-        url = reverse('remove_asset', kwargs={'org': 'edX', 'course': 'full', 'name': '6.002_Spring_2012'})
-        resp = self.client.post(url, {'location': '/c4x/edX/full/asset/circuits_duality.gif'})
+        url = reverse('remove_asset', kwargs={'org': 'edX', 'course': 'toy', 'name': '2012_Fall'})
+        resp = self.client.post(url, {'location': '/c4x/edX/toy/asset/sample_static.txt'})
         self.assertEqual(resp.status_code, 200)
 
         # make sure there's something in the trashcan
