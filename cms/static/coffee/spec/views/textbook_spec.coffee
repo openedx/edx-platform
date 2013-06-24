@@ -10,9 +10,9 @@ beforeEach ->
             else
                 return trimmedText.indexOf(text) != -1;
 
-describe "CMS.Views.TextbookShow", ->
+describe "CMS.Views.ShowTextbook", ->
     describe "Basic", ->
-        tpl = readFixtures('textbook-show.underscore')
+        tpl = readFixtures('show-textbook.underscore')
 
         beforeEach ->
             setFixtures($("<script>", {id: "show-textbook-tpl", type: "text/template"}).text(tpl))
@@ -23,7 +23,7 @@ describe "CMS.Views.TextbookShow", ->
             @collection = new CMS.Collections.TextbookSet()
             spyOn(@collection, 'save')
             @collection.add(@model)
-            @view = new CMS.Views.TextbookShow({model: @model})
+            @view = new CMS.Views.ShowTextbook({model: @model})
 
         it "should render properly", ->
             @view.render()
@@ -66,14 +66,14 @@ describe "CMS.Views.TextbookShow", ->
 
 
 
-describe "CMS.Views.TextbookEdit", ->
+describe "CMS.Views.EditTextbook", ->
     describe "Basic", ->
-        tpl = readFixtures('textbook-edit.underscore')
-        chapterTpl = readFixtures('chapter.underscore')
+        tpl = readFixtures('edit-textbook.underscore')
+        chapterTpl = readFixtures('edit-chapter.underscore')
 
         beforeEach ->
-            setFixtures($("<script>", {id: "new-textbook-tpl", type: "text/template"}).text(tpl))
-            appendSetFixtures($("<script>", {id: "new-chapter-tpl", type: "text/template"}).text(chapterTpl))
+            setFixtures($("<script>", {id: "edit-textbook-tpl", type: "text/template"}).text(tpl))
+            appendSetFixtures($("<script>", {id: "edit-chapter-tpl", type: "text/template"}).text(chapterTpl))
             appendSetFixtures($("<script>", {id: "system-feedback-tpl", type: "text/template"}).text(feedbackTpl))
             appendSetFixtures(sandbox({id: "page-notification"}))
             appendSetFixtures(sandbox({id: "page-prompt"}))
@@ -82,7 +82,7 @@ describe "CMS.Views.TextbookEdit", ->
             spyOn(@collection, 'save')
             @collection.add(@model)
             @collection.editing = @model
-            @view = new CMS.Views.TextbookEdit({model: @model})
+            @view = new CMS.Views.EditTextbook({model: @model})
             spyOn(@view, 'render').andCallThrough()
 
         it "should render properly", ->
@@ -137,12 +137,12 @@ describe "CMS.Views.ListTextbooks", ->
     beforeEach ->
         setFixtures($("<script>", {id: "no-textbooks-tpl", type: "text/template"}).text(noTextbooksTpl))
         appendSetFixtures($("<script>", {id: "system-feedback-tpl", type: "text/template"}).text(feedbackTpl))
-        @showSpies = spyOnConstructor(CMS.Views, "TextbookShow", ["render"])
+        @showSpies = spyOnConstructor(CMS.Views, "ShowTextbook", ["render"])
         @showSpies.render.andReturn(@showSpies) # equivalent of `return this`
         showEl = $("<li>")
         @showSpies.$el = showEl
         @showSpies.el = showEl.get(0)
-        @editSpies = spyOnConstructor(CMS.Views, "TextbookEdit", ["render"])
+        @editSpies = spyOnConstructor(CMS.Views, "EditTextbook", ["render"])
         editEl = $("<li>")
         @editSpies.render.andReturn(@editSpies)
         @editSpies.$el = editEl
@@ -158,7 +158,7 @@ describe "CMS.Views.ListTextbooks", ->
         expect(@showSpies.constructor).not.toHaveBeenCalled()
         expect(@editSpies.constructor).not.toHaveBeenCalled()
 
-    it "should render TextbookShow views by default if no textbook is being edited", ->
+    it "should render ShowTextbook views by default if no textbook is being edited", ->
         # add three empty textbooks to the collection
         @collection.add([{}, {}, {}])
         # reset spies due to re-rendering on collection modification
@@ -173,7 +173,7 @@ describe "CMS.Views.ListTextbooks", ->
         expect(@showSpies.constructor.calls.length).toEqual(3);
         expect(@editSpies.constructor).not.toHaveBeenCalled()
 
-    it "should render a TextbookEdit view for a textbook being edited", ->
+    it "should render an EditTextbook view for a textbook being edited", ->
         # add three empty textbooks to the collection
         @collection.add([{}, {}, {}])
         # mark the second one as being edited
@@ -208,18 +208,18 @@ describe "CMS.Views.ListTextbooks", ->
         expect(@view.$el).not.toContain(@showSpies.$el)
 
 
-describe "CMS.Views.ChapterEdit", ->
-    tpl = readFixtures("chapter.underscore")
+describe "CMS.Views.EditChapter", ->
+    tpl = readFixtures("edit-chapter.underscore")
 
     beforeEach ->
-        setFixtures($("<script>", {id: "new-chapter-tpl", type: "text/template"}).text(tpl))
+        setFixtures($("<script>", {id: "edit-chapter-tpl", type: "text/template"}).text(tpl))
         appendSetFixtures($("<script>", {id: "system-feedback-tpl", type: "text/template"}).text(feedbackTpl))
         @model = new CMS.Models.Chapter
             name: "Chapter 1"
             asset_path: "/ch1.pdf"
         @collection = new CMS.Collections.ChapterSet()
         @collection.add(@model)
-        @view = new CMS.Views.ChapterEdit({model: @model})
+        @view = new CMS.Views.EditChapter({model: @model})
         spyOn(@view, "remove").andCallThrough()
         window.UPLOAD_ASSET_CALLBACK_URL = "/upload"
         window.section = new CMS.Models.Section({name: "abcde"})

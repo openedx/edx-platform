@@ -9,7 +9,7 @@ CMS.Models.Textbook = Backbone.AssociatedModel.extend({
     relations: [{
         type: Backbone.Many,
         key: "chapters",
-        relatedModel: "CMS.Models.Chapter",
+        relatedModel: "CMS.Models.EditChapter",
         collectionType: "CMS.Collections.ChapterSet"
     }],
     isEmpty: function() {

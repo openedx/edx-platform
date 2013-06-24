@@ -1,4 +1,4 @@
-CMS.Views.TextbookShow = Backbone.View.extend({
+CMS.Views.ShowTextbook = Backbone.View.extend({
     initialize: function() {
         this.template = _.template($("#show-textbook-tpl").text());
         this.listenTo(this.model, "change", this.render);
@@ -62,9 +62,9 @@ CMS.Views.TextbookShow = Backbone.View.extend({
         this.model.set('showChapters', false);
     }
 });
-CMS.Views.TextbookEdit = Backbone.View.extend({
+CMS.Views.EditTextbook = Backbone.View.extend({
     initialize: function() {
-        this.template = _.template($("#new-textbook-tpl").text());
+        this.template = _.template($("#edit-textbook-tpl").text());
         var chapters = this.model.get('chapters');
         this.listenTo(chapters, "add", this.addOne);
         this.listenTo(chapters, "reset", this.addAll);
@@ -92,7 +92,7 @@ CMS.Views.TextbookEdit = Backbone.View.extend({
         "click .action-add-chapter": "createChapter"
     },
     addOne: function(chapter) {
-        var view = new CMS.Views.ChapterEdit({model: chapter});
+        var view = new CMS.Views.EditChapter({model: chapter});
         this.$("ol.chapters").append(view.render().el);
         return this;
     },
@@ -177,9 +177,9 @@ CMS.Views.ListTextbooks = Backbone.View.extend({
             textbooks.each(function(textbook) {
                 var view;
                 if (textbook === textbooks.editing) {
-                    view = new CMS.Views.TextbookEdit({model: textbook});
+                    view = new CMS.Views.EditTextbook({model: textbook});
                 } else {
-                    view = new CMS.Views.TextbookShow({model: textbook});
+                    view = new CMS.Views.ShowTextbook({model: textbook});
                 }
                 $el.append(view.render().el);
             });
@@ -198,9 +198,9 @@ CMS.Views.ListTextbooks = Backbone.View.extend({
         this.collection.trigger("editOne", m);
     }
 });
-CMS.Views.ChapterEdit = Backbone.View.extend({
+CMS.Views.EditChapter = Backbone.View.extend({
     initialize: function() {
-        this.template = _.template($("#new-chapter-tpl").text());
+        this.template = _.template($("#edit-chapter-tpl").text());
         this.listenTo(this.model, "change", this.render);
     },
     tagName: "li",

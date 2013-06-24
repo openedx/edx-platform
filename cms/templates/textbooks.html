@@ -7,21 +7,11 @@
 <%block name="bodyclass">is-signedin course textbooks</%block>
 
 <%block name="header_extras">
-  <script type="text/template" id="new-textbook-tpl">
-    <%static:include path="js/textbook-edit.underscore" />
+% for template_name in ["edit-textbook", "show-textbook", "edit-chapter", "no-textbooks", "upload-dialog"]:
+  <script type="text/template" id="${template_name}-tpl">
+    <%static:include path="js/${template_name}.underscore" />
   </script>
-  <script type="text/template" id="show-textbook-tpl">
-    <%static:include path="js/textbook-show.underscore" />
-  </script>
-  <script type="text/template" id="new-chapter-tpl">
-    <%static:include path="js/chapter.underscore" />
-  </script>
-  <script type="text/template" id="no-textbooks-tpl">
-    <%static:include path="js/no-textbooks.underscore" />
-  </script>
-  <script type="text/template" id="upload-dialog-tpl">
-    <%static:include path="js/upload-dialog.underscore" />
-  </script>
+% endfor
 </%block>
 
 <%block name="jsextra">
