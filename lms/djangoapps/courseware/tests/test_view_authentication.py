@@ -10,7 +10,7 @@ from django.test.utils import override_settings
 
 # Need access to internal func to put users in the right group
 from courseware.access import (has_access, _course_staff_group_name,
-                               course_beta_test_group_name)
+                               course_beta_test_group_name, settings as access_settings)
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
@@ -20,6 +20,7 @@ from helpers import LoginEnrollmentTestCase, check_for_get_code
 from modulestore_config import TEST_DATA_MONGO_MODULESTORE
 
 
+#@patch.dict(access_settings.MITX_FEATURES, {'DISABLE_START_DATES': True})
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
@@ -81,18 +82,11 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         List of urls that students should be able to see before
         launch.
+        `course` is an instance of CourseDescriptor.
         """
         urls = self._reverse_urls(['about_course'], course)
         urls.append(reverse('courses'))
 
-        return urls
-
-    def instructor_urls(self, course):
-        """
-        List of urls that only instructors/staff should be able to see.
-        """
-        urls = self._reverse_urls(['instructor_dashboard',
-                                   'gradebook', 'grade_summary'], course)
         return urls
 
     def _check_non_staff_light(self, course):
@@ -295,25 +289,12 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         Make sure that before course start, students can't access course
         pages, but instructors can.
         """
-        self.run_wrapped(self._do_test_dark_launch_enrolled_student)
-        self.run_wrapped(self._do_test_dark_launch_instructor)
-        self.run_wrapped(self._do_test_dark_launch_staff)
 
-    def test_enrollment_period(self):
+    @patch.dict(access_settings.MITX_FEATURES, {'DISABLE_START_DATES': False})
+    def test_dark_launch_enrolled_student(self):
         """
-        Check that enrollment periods work.
-        """
-        self.run_wrapped(self._do_test_enrollment_period)
-
-    # def test_beta_period(self):
-    #     """
-    #     Check that beta-test access works.
-    #     """
-    #     self.run_wrapped(self._do_test_beta_period)
-
-    def _do_test_dark_launch_enrolled_student(self):
-        """
-        Actually do the test, relying on settings to be right.
+        Make sure that before course start, students can't access course
+        pages.
         """
 
         student_email, student_password = self.ACCOUNT_INFO[0]
@@ -328,7 +309,6 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
         self.assertFalse(self.course.has_started())
         self.assertFalse(self.full.has_started())
-        self.assertFalse(settings.MITX_FEATURES['DISABLE_START_DATES'])
 
         # First, try with an enrolled student
         print '=== Testing student access....'
@@ -342,7 +322,12 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self._check_non_staff_light(self.full)
         self._check_non_staff_dark(self.full)
 
-    def _do_test_dark_launch_instructor(self):
+    @patch.dict(access_settings.MITX_FEATURES, {'DISABLE_START_DATES': False})
+    def test_dark_launch_instructor(self):
+        """
+        Make sure that before course start instructors can access the
+        page for their course.
+        """
 
         instructor_email, instructor_password = self.ACCOUNT_INFO[1]
 
@@ -369,7 +354,12 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self._check_non_staff_dark(self.full)
         self._check_staff(self.course)
 
-    def _do_test_dark_launch_staff(self):
+    @patch.dict(access_settings.MITX_FEATURES, {'DISABLE_START_DATES': False})
+    def test_dark_launch_staff(self):
+        """
+        Make sure that before course start staff can access
+        course pages.
+        """
 
         instructor_email, instructor_password = self.ACCOUNT_INFO[1]
 
@@ -394,9 +384,10 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self._check_staff(self.course)
         self._check_staff(self.full)
 
-    def _do_test_enrollment_period(self):
+    @patch.dict(access_settings.MITX_FEATURES, {'DISABLE_START_DATES': False})
+    def test_enrollment_period(self):
         """
-        Actually do the test, relying on settings to be right.
+        Check that enrollment periods work.
         """
 
         student_email, student_password = self.ACCOUNT_INFO[0]
@@ -447,19 +438,14 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.unenroll(self.course)
         self.assertTrue(self.enroll(self.course))
 
-    #from courseware.access import MITX_FEATURES
-
-    #@patch.dict(MITX_FEATURES, {'DISABLE_START_DATES': True})
-    def _do_test_beta_period(self):
+    @patch.dict(access_settings.MITX_FEATURES, {'DISABLE_START_DATES': False})
+    def test_beta_period(self):
         """
-        Actually test beta periods, relying on settings to be right.
+        Check that beta-test access works.
         """
 
         student_email, student_password = self.ACCOUNT_INFO[0]
         instructor_email, instructor_password = self.ACCOUNT_INFO[1]
-
-        # trust, but verify :)
-        self.assertFalse(settings.MITX_FEATURES['DISABLE_START_DATES'])
 
         # Make courses start in the future
         now = datetime.datetime.now(pytz.UTC)

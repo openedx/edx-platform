@@ -21,7 +21,6 @@ class TestNavigation(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
 
     def setUp(self):
-        xmodule.modulestore.django._MODULESTORES = {}
 
         self.course = CourseFactory.create()
         self.full = CourseFactory.create(display_name='Robot_Sub_Course')
