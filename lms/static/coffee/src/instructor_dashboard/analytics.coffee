@@ -107,7 +107,8 @@ class Analytics
 
 
 # exports
-_.defaults window, InstructorDashboard: {}
-_.defaults window.InstructorDashboard, sections: {}
-_.defaults window.InstructorDashboard.sections,
-  Analytics: Analytics
+if _?
+  _.defaults window, InstructorDashboard: {}
+  _.defaults window.InstructorDashboard, sections: {}
+  _.defaults window.InstructorDashboard.sections,
+    Analytics: Analytics

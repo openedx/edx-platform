@@ -21,7 +21,8 @@ class CourseInfo
 
 
 # exports
-_.defaults window, InstructorDashboard: {}
-_.defaults window.InstructorDashboard, sections: {}
-_.defaults window.InstructorDashboard.sections,
-  CourseInfo: CourseInfo
+if _?
+  _.defaults window, InstructorDashboard: {}
+  _.defaults window.InstructorDashboard, sections: {}
+  _.defaults window.InstructorDashboard.sections,
+    CourseInfo: CourseInfo

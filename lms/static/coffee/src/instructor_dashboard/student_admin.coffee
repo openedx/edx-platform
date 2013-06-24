@@ -81,7 +81,8 @@ class StudentAdmin
 
 
 # exports
-_.defaults window, InstructorDashboard: {}
-_.defaults window.InstructorDashboard, sections: {}
-_.defaults window.InstructorDashboard.sections,
-  StudentAdmin: StudentAdmin
+if _?
+  _.defaults window, InstructorDashboard: {}
+  _.defaults window.InstructorDashboard, sections: {}
+  _.defaults window.InstructorDashboard.sections,
+    StudentAdmin: StudentAdmin

@@ -205,7 +205,8 @@ class Membership
 
 
 # exports
-_.defaults window, InstructorDashboard: {}
-_.defaults window.InstructorDashboard, sections: {}
-_.defaults window.InstructorDashboard.sections,
-  Membership: Membership
+if _?
+  _.defaults window, InstructorDashboard: {}
+  _.defaults window.InstructorDashboard, sections: {}
+  _.defaults window.InstructorDashboard.sections,
+    Membership: Membership
