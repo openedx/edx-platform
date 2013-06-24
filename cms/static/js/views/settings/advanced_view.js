@@ -57,8 +57,14 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
             mode: "application/json", lineNumbers: false, lineWrapping: false,
             onChange: function(instance, changeobj) {
                 // this event's being called even when there's no change :-(
-                if (instance.getValue() !== oldValue && !self.notificationBarShowing) {
-                    self.showNotificationBar();
+                if (instance.getValue() !== oldValue) {
+                    var message = gettext("Your changes will not take effect until you save your progress. Take care with key and value formatting, as validation is not implemented.");
+                    self.showNotificationBar(message,
+                                             _.bind(self.saveView, self),
+                                             _.bind(self.revertView, self));
+                    if(self.saved) {
+                        self.saved.hide();
+                    }
                 }
             },
             onFocus : function(mirror) {
@@ -96,38 +102,6 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
                 }
             }
         });
-    },
-    showNotificationBar: function() {
-        var self = this;
-        var message = gettext("Your changes will not take effect until you save your progress. Take care with key and value formatting, as validation is not implemented.")
-        var confirm = new CMS.Views.Notification.Warning({
-            title: gettext("You've Made Some Changes"),
-            message: message,
-            actions: {
-                primary: {
-                    "text": gettext("Save Changes"),
-                    "class": "action-save",
-                    "click": function() {
-                        self.saveView();
-                        confirm.hide();
-                        self.notificationBarShowing = false;
-                    }
-                },
-                secondary: [{
-                    "text": gettext("Cancel"),
-                    "class": "action-cancel",
-                    "click": function() {
-                        self.revertView();
-                        confirm.hide();
-                        self.notificationBarShowing = false;
-                    }
-                }]
-            }});
-        this.notificationBarShowing = true;
-        confirm.show();
-        if(this.saved) {
-            this.saved.hide();
-        }
     },
     saveView : function() {
         // TODO one last verification scan:

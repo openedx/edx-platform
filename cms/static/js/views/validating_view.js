@@ -67,5 +67,39 @@ CMS.Views.ValidatingView = Backbone.View.extend({
             // put error on the contained inputs
             return $(ele).find(inputElements);
         }
+    },
+
+    showNotificationBar: function(message, primaryClick, secondaryClick) {
+        if(this.notificationBarShowing) {
+            return;
+        }
+        var self = this;
+        this.confirmation = new CMS.Views.Notification.Warning({
+            title: gettext("You've made some changes"),
+            message: message,
+            actions: {
+                primary: {
+                    "text": gettext("Save Changes"),
+                    "class": "action-save",
+                    "click": function() {
+                        primaryClick();
+                        self.confirmation.hide();
+                        self.notificationBarShowing = false;
+                    }
+                },
+                secondary: [{
+                    "text": gettext("Cancel"),
+                    "class": "action-cancel",
+                    "click": function() {
+                        if(secondaryClick) {
+                            secondaryClick();
+                        }
+                        self.confirmation.hide();
+                        self.notificationBarShowing = false;
+                    }
+                }]
+            }});
+        this.notificationBarShowing = true;
+        this.confirmation.show();
     }
 });
