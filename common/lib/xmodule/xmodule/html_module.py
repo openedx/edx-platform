@@ -18,7 +18,7 @@ log = logging.getLogger("mitx.courseware")
 
 
 class HtmlFields(object):
-    data = String(help="Html contents to display for this module", scope=Scope.content)
+    data = String(help="Html contents to display for this module", default="", scope=Scope.content)
     source_code = String(help="Source code for LaTeX documents. This feature is not well-supported.", scope=Scope.settings)
 
 
@@ -176,6 +176,65 @@ class AboutDescriptor(HtmlDescriptor):
     in order to be able to create new ones
     """
     template_dir_name = "about"
+    display_name = String(
+        help="Display name for this module",
+        scope=Scope.settings,
+        default="overview",
+    )
+    data = String(help="Html contents to display for this module",
+        # TODO should we load/import this from a file?
+        default='''
+            <section class="about">
+                  <h2>About This Course</h2>
+                  <p>Include your long course description here. The long course description should contain 150-400 words.</p>
+
+                  <p>This is paragraph 2 of the long course description. Add more paragraphs as needed. Make sure to enclose them in paragraph tags.</p>
+                </section>
+
+                <section class="prerequisites">
+                  <h2>Prerequisites</h2>
+                  <p>Add information about course prerequisites here.</p>
+                </section>
+
+                <section class="course-staff">
+                  <h2>Course Staff</h2>
+                  <article class="teacher">
+                    <div class="teacher-image">
+                      <img src="/static/images/pl-faculty.png" align="left" style="margin:0 20 px 0">
+                    </div>
+
+                    <h3>Staff Member #1</h3>
+                    <p>Biography of instructor/staff member #1</p>
+                  </article>
+
+                  <article class="teacher">
+                    <div class="teacher-image">
+                      <img src="/static/images/pl-faculty.png" align="left" style="margin:0 20 px 0">
+                    </div>
+
+                    <h3>Staff Member #2</h3>
+                    <p>Biography of instructor/staff member #2</p>
+                  </article>
+                </section>
+
+                <section class="faq">
+                  <section class="responses">
+                    <h2>Frequently Asked Questions</h2>
+                    <article class="response">
+                      <h3>Do I need to buy a textbook?</h3>
+                      <p>No, a free online version of Chemistry: Principles, Patterns, and Applications,
+                      First Edition by Bruce Averill and Patricia Eldredge will be available, though you can purchase
+                      a printed version (published by FlatWorld Knowledge) if you would like.</p>
+                    </article>
+
+                    <article class="response">
+                      <h3>Question #2</h3>
+                      <p>Your answer would be displayed here.</p>
+                    </article>
+                  </section>
+                </section>
+                ''',
+                scope=Scope.content)
 
 
 class StaticTabDescriptor(HtmlDescriptor):
@@ -184,6 +243,9 @@ class StaticTabDescriptor(HtmlDescriptor):
     in order to be able to create new ones
     """
     template_dir_name = "statictab"
+    data = String(default="""
+    <p>This is where you can add additional pages to your courseware. Click the 'edit' button to begin editing.</p>
+    """, scope=Scope.content, help="HTML for the additional pages")
 
 
 class CourseInfoDescriptor(HtmlDescriptor):
@@ -192,3 +254,5 @@ class CourseInfoDescriptor(HtmlDescriptor):
     in order to be able to create new ones
     """
     template_dir_name = "courseinfo"
+    data = String(help="Html contents to display for this module",
+        default="<ol></ol>", scope=Scope.content)

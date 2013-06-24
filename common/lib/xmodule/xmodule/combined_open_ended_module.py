@@ -27,6 +27,38 @@ VERSION_TUPLES = {
 }
 
 DEFAULT_VERSION = 1
+DEFAULT_DATA = """
+    <combinedopenended>
+        <rubric>
+            <rubric>
+                <category>
+                  <description>Category 1</description>
+                  <option>
+                      The response does not incorporate what is needed for a one response.
+                  </option>
+                  <option>
+                      The response is correct for category 1.
+                  </option>
+                </category>
+            </rubric>
+        </rubric>
+        <prompt>
+            <p>Why is the sky blue?</p>
+        </prompt>
+        <task>
+            <selfassessment/>
+        </task>
+        <task>
+            <openended min_score_to_attempt="1" max_score_to_attempt="2">
+                    <openendedparam>
+                        <initial_display>Enter essay here.</initial_display>
+                        <answer_display>This is the answer.</answer_display>
+                        <grader_payload>{"grader_settings" : "peer_grading.conf", "problem_id" : "700x/Demo"}</grader_payload>
+                    </openendedparam>
+            </openended>
+        </task>
+    </combinedopenended>
+"""
 
 
 class VersionInteger(Integer):
@@ -85,7 +117,8 @@ class CombinedOpenEndedFields(object):
         scope=Scope.settings
     )
     version = VersionInteger(help="Current version number", default=DEFAULT_VERSION, scope=Scope.settings)
-    data = String(help="XML data for the problem", scope=Scope.content)
+    data = String(help="XML data for the problem", scope=Scope.content,
+        default=DEFAULT_DATA)
     weight = Float(
         display_name="Problem Weight",
         help="Defines the number of points each problem is worth. If the value is not set, each problem is worth one point.",

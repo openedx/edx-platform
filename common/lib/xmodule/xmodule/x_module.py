@@ -101,6 +101,8 @@ class XModuleFields(object):
         display_name="Display Name",
         help="This name appears in the horizontal navigation at the top of the page.",
         scope=Scope.settings,
+        # it'd be nice to have a useful default but it screws up other things; so,
+        # use display_name_with_default for those
         default=None
     )
 
@@ -315,7 +317,12 @@ class ResourceTemplates(object):
                 log.warning("Skipping unknown template file %s" % template_file)
                 continue
             template_content = resource_string(__name__, os.path.join(dirname, template_file))
-            template = yaml.safe_load(template_content)
+            template = {
+                'metadata': {},
+                'data': {},
+                'children': []
+            }
+            template.update(yaml.safe_load(template_content))
             templates.append(Template(**template))
 
         return templates

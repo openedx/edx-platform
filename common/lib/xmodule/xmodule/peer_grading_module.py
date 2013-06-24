@@ -59,6 +59,14 @@ class PeerGradingFields(object):
         help="Defines the number of points each problem is worth. If the value is not set, each problem is worth one point.",
         scope=Scope.settings, values={"min": 0, "step": ".1"}
     )
+    display_name = String(
+        help="Display name for this module",
+        scope=Scope.settings,
+        default="Peer Grading Interface"
+    )
+    data = String(help="Html contents to display for this module",
+        default='<peergrading></peergrading>',
+        scope=Scope.content)
 
 
 class PeerGradingModule(PeerGradingFields, XModule):

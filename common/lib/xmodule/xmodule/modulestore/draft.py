@@ -1,9 +1,10 @@
 from datetime import datetime
 
-from . import ModuleStoreBase, Location, namedtuple_to_son
+from . import Location, namedtuple_to_son
 from .exceptions import ItemNotFoundError
 from .inheritance import own_metadata
 from xmodule.exceptions import InvalidVersionError
+from xmodule.modulestore.mongo import MongoModuleStore
 from pytz import UTC
 
 DRAFT = 'draft'

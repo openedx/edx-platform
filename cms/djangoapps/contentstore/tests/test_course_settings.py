@@ -70,7 +70,6 @@ class CourseDetailsTestCase(CourseTestCase):
         self.assertIsNone(details.enrollment_start, "enrollment_start date somehow initialized " + str(details.enrollment_start))
         self.assertIsNone(details.enrollment_end, "enrollment_end date somehow initialized " + str(details.enrollment_end))
         self.assertIsNone(details.syllabus, "syllabus somehow initialized" + str(details.syllabus))
-        self.assertEqual(details.overview, "", "overview somehow initialized" + details.overview)
         self.assertIsNone(details.intro_video, "intro_video somehow initialized" + str(details.intro_video))
         self.assertIsNone(details.effort, "effort somehow initialized" + str(details.effort))
 
@@ -83,7 +82,6 @@ class CourseDetailsTestCase(CourseTestCase):
         self.assertIsNone(jsondetails['enrollment_start'], "enrollment_start date somehow initialized ")
         self.assertIsNone(jsondetails['enrollment_end'], "enrollment_end date somehow initialized ")
         self.assertIsNone(jsondetails['syllabus'], "syllabus somehow initialized")
-        self.assertEqual(jsondetails['overview'], "", "overview somehow initialized")
         self.assertIsNone(jsondetails['intro_video'], "intro_video somehow initialized")
         self.assertIsNone(jsondetails['effort'], "effort somehow initialized")
 

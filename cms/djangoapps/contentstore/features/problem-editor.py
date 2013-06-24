@@ -32,11 +32,12 @@ def i_edit_and_select_settings(step):
 def i_see_five_settings_with_values(step):
     world.verify_all_setting_entries(
         [
-            [DISPLAY_NAME, "Blank Common Problem", True],
+            [DISPLAY_NAME, "New problem", True],
             [MAXIMUM_ATTEMPTS, "", False],
             [PROBLEM_WEIGHT, "", False],
-            [RANDOMIZATION, "Never", True],
-            [SHOW_ANSWER, "Finished", True]
+            # Not sure why these are True other than via inspection
+            [RANDOMIZATION, "Always", True],
+            [SHOW_ANSWER, "Closed", True]
         ])
 
 
