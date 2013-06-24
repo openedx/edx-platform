@@ -49,6 +49,11 @@ CMS.Views.SystemFeedback = Backbone.View.extend({
         }
         this.template = _.template(tpl);
         this.setElement($("#page-"+this.options.type));
+        // handle single "secondary" action
+        if (this.options.actions && this.options.actions.secondary &&
+            !_.isArray(this.options.actions.secondary)) {
+            this.options.actions.secondary = [this.options.actions.secondary];
+        }
         return this;
     },
     // public API: show() and hide()
