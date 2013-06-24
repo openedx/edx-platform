@@ -369,7 +369,7 @@ def user_profile(request, course_id, user_id):
             }
 
             return render_to_response('discussion/user_profile.html', context)
-    except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError) as err:
+    except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError, User.DoesNotExist) as err:
         raise Http404
 
 
@@ -412,5 +412,5 @@ def followed_threads(request, course_id, user_id):
             }
 
             return render_to_response('discussion/user_profile.html', context)
-    except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError):
+    except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError, User.DoesNotExist) as err:
         raise Http404
