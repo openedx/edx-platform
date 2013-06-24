@@ -1,6 +1,7 @@
 from mock import Mock, patch
 import unittest
 import copy
+import random
 
 import xmodule
 from xmodule.crowdsource_hinter import CrowdsourceHinterModule
@@ -13,12 +14,12 @@ from . import get_test_system
 import json
 
 class CHModuleFactory(object):
-    '''
+    """
     Helps us make a CrowdsourceHinterModule with the specified internal
     state.
-    '''
+    """
 
-    sample_problem_xml = '''
+    sample_problem_xml = """
     <?xml version="1.0"?>
     <crowdsource_hinter>
         <problem display_name="Numerical Input" markdown="A numerical input problem accepts a line of text input from the student, and evaluates the input for correctness based on its numerical value.&#10;&#10;The answer is correct if it is within a specified numerical tolerance of the expected answer.&#10;&#10;Enter the number of fingers on a human hand:&#10;= 5&#10;&#10;[explanation]&#10;If you look at your hand, you can count that you have five fingers. [explanation] " rerandomize="never" showanswer="finished">
@@ -36,7 +37,7 @@ class CHModuleFactory(object):
           </solution>
         </problem>
     </crowdsource_hinter>
-    '''
+    """
 
     num = 0
 
@@ -91,102 +92,101 @@ class CHModuleFactory(object):
         
         descriptor = Mock(weight="1")
         system = get_test_system()
-        system.render_template = Mock(return_value="<div>Test Template HTML</div>")
         module = CrowdsourceHinterModule(system, descriptor, model_data)
 
         return module
 
+
+
+
 class CrowdsourceHinterTest(unittest.TestCase):
-    '''
+    """
     In the below tests, '24.0' represents a wrong answer, and '42.5' represents
     a correct answer.
-    '''
+    """
 
     def test_gethint_0hint(self):
-        '''
+        """
         Someone asks for a hint, when there's no hint to give.
         - Output should be blank.
         - New entry should be added to previous_answers
-        '''
+        """
         m = CHModuleFactory.create()
         json_in = {'problem_name': '26.0'}
-        json_out = json.loads(m.get_hint(json_in))['contents']
-        self.assertTrue(json_out == ' ')
+        out = m.get_hint(json_in)
+        self.assertTrue(out == None)
         self.assertTrue(['26.0', [None, None, None]] in m.previous_answers)
 
     def test_gethint_1hint(self):
-        '''
+        """
         Someone asks for a hint, with exactly one hint in the database.
         Output should contain that hint.
-        '''
+        """
         m = CHModuleFactory.create()
         json_in = {'problem_name': '25.0'}
-        json_out = json.loads(m.get_hint(json_in))['contents']
-        self.assertTrue('Really popular hint' in json_out)
+        out = m.get_hint(json_in)
+        self.assertTrue(out['best_hint'] == 'Really popular hint')
 
 
     def test_gethint_manyhints(self):
-        '''
+        """
         Someone asks for a hint, with many matching hints in the database.
         - The top-rated hint should be returned.
         - Two other random hints should be returned.
         Currently, the best hint could be returned twice - need to fix this
         in implementation.
-        '''
+        """
         m = CHModuleFactory.create()
         json_in = {'problem_name': '24.0'}
-        json_out = json.loads(m.get_hint(json_in))['contents']
-        print json_out
-        self.assertTrue('Best hint' in json_out)
-        self.assertTrue(json_out.count('hint') == 3)
+        out = m.get_hint(json_in)
+        self.assertTrue(out['best_hint'] == 'Best hint')
+        self.assertTrue('rand_hint_1' in out)
+        self.assertTrue('rand_hint_2' in out)
 
 
     def test_getfeedback_0wronganswers(self):
-        '''
+        """
         Someone has gotten the problem correct on the first try.
         Output should be empty.
-        '''
+        """
         m = CHModuleFactory.create(previous_answers=[])
         json_in = {'problem_name': '42.5'}
-        json_out = json.loads(m.get_feedback(json_in))['contents']
-        self.assertTrue(json_out == ' ')
+        out = m.get_feedback(json_in)
+        self.assertTrue(out == None)
 
     def test_getfeedback_1wronganswer_nohints(self):
-        '''
+        """
         Someone has gotten the problem correct, with one previous wrong
         answer.  However, we don't actually have hints for this problem.
         There should be a dialog to submit a new hint.
-        '''
+        """
         m = CHModuleFactory.create(previous_answers=[['26.0',[None, None, None]]])
         json_in = {'problem_name': '42.5'}
-        json_out = json.loads(m.get_feedback(json_in))['contents']
-        self.assertTrue('textarea' in json_out)
-        self.assertTrue('Vote' not in json_out)
+        out = m.get_feedback(json_in)
+        print out['index_to_answer']
+        self.assertTrue(out['index_to_hints'][0] == [])
+        self.assertTrue(out['index_to_answer'][0] == '26.0')
 
 
     def test_getfeedback_1wronganswer_withhints(self):
-        '''
+        """
         Same as above, except the user did see hints.  There should be
         a voting dialog, with the correct choices, plus a hint submission
         dialog.
-        '''
+        """
         m = CHModuleFactory.create(
             previous_answers=[
                 ['24.0', [0, 3, None]]],
             )
         json_in = {'problem_name': '42.5'}
-        json_out = json.loads(m.get_feedback(json_in))['contents']
-        self.assertTrue('Best hint' in json_out)
-        self.assertTrue('Another hint' in json_out)
-        self.assertTrue('third hint' not in json_out)
-        self.assertTrue('textarea' in json_out)
-
+        out = m.get_feedback(json_in)
+        self.assertTrue(len(out['index_to_hints'][0])==2)
 
     def test_vote_nopermission(self):
-        '''
+        """
         A user tries to vote for a hint, but he has already voted!
         Should not change any vote tallies.
-        '''
+        """
         m = CHModuleFactory.create(user_voted=True)
         json_in = {'answer': 0, 'hint': 1}
         old_hints = copy.deepcopy(m.hints)
@@ -195,21 +195,21 @@ class CrowdsourceHinterTest(unittest.TestCase):
 
 
     def test_vote_withpermission(self):
-        '''
+        """
         A user votes for a hint.
-        '''
+        """
         m = CHModuleFactory.create()
         json_in = {'answer': 0, 'hint': 3}
-        json_out = json.loads(m.tally_vote(json_in))['contents'] 
+        m.tally_vote(json_in)
         self.assertTrue(m.hints['24.0']['0'][1] == 40)
         self.assertTrue(m.hints['24.0']['3'][1] == 31)
         self.assertTrue(m.hints['24.0']['4'][1] == 20)
 
 
     def test_submithint_nopermission(self):
-        '''
+        """
         A user tries to submit a hint, but he has already voted.
-        '''
+        """
         m = CHModuleFactory.create(user_voted=True)
         json_in = {'answer': 1, 'hint': 'This is a new hint.'}
         print m.user_voted
@@ -219,39 +219,37 @@ class CrowdsourceHinterTest(unittest.TestCase):
 
 
     def test_submithint_withpermission_new(self):
-        '''
+        """
         A user submits a hint to an answer for which no hints
         exist yet.
-        '''
+        """
         m = CHModuleFactory.create()
         json_in = {'answer': 1, 'hint': 'This is a new hint.'}
         m.submit_hint(json_in)
-        # Make a hint request.
-        json_in = {'problem name': '29.0'}
-        json_out = json.loads(m.get_hint(json_in))['contents']
-        self.assertTrue('This is a new hint.' in json_out)
+        self.assertTrue('29.0' in m.hints)
 
 
     def test_submithint_withpermission_existing(self):
-        '''
+        """
         A user submits a hint to an answer that has other hints
         already.
-        '''
+        """
         m = CHModuleFactory.create(previous_answers = [['25.0', [1, None, None]]])
         json_in = {'answer': 0, 'hint': 'This is a new hint.'}
         m.submit_hint(json_in)
         # Make a hint request.
         json_in = {'problem name': '25.0'}
-        json_out = json.loads(m.get_hint(json_in))['contents']
-        self.assertTrue('This is a new hint.' in json_out)
+        out = m.get_hint(json_in)
+        self.assertTrue((out['best_hint'] == 'This is a new hint.')
+            or (out['rand_hint_1'] == 'This is a new hint.'))
 
 
     def test_submithint_moderate(self):
-        '''
+        """
         A user submits a hint, but moderation is on.  The hint should
         show up in the mod_queue, not the public-facing hints
         dict.
-        '''
+        """
         m = CHModuleFactory.create(moderate='True')
         json_in = {'answer': 1, 'hint': 'This is a new hint.'}
         m.submit_hint(json_in)
@@ -259,9 +257,28 @@ class CrowdsourceHinterTest(unittest.TestCase):
         self.assertTrue('29.0' in m.mod_queue)
 
 
+    def test_template_gethint(self):
+        """
+        Test the templates for get_hint.
+        """
+        m = CHModuleFactory.create()
 
+        def fake_get_hint(get):
+            """
+            Creates a rendering dictionary, with which we can test
+            the templates.
+            """
+            return {'best_hint': 'This is the best hint.',
+                    'rand_hint_1': 'A random hint',
+                    'rand_hint_2': 'Another random hint',
+                    'answer': '42.5'}
 
-
+        m.get_hint = fake_get_hint
+        json_in = {'problem_name': '42.5'}
+        out = json.loads(m.handle_ajax('get_hint', json_in))['contents']
+        self.assertTrue('This is the best hint.' in out)
+        self.assertTrue('A random hint' in out)
+        self.assertTrue('Another random hint' in out)
 
 
 
