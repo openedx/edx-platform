@@ -1,6 +1,6 @@
 
 """
-Test for LMS instructor background task queue management
+Test for LMS instructor background task views.
 """
 import json
 from celery.states import SUCCESS, FAILURE, REVOKED, PENDING
@@ -18,7 +18,7 @@ from instructor_task.views import instructor_task_status, get_task_completion_in
 
 class InstructorTaskReportTest(InstructorTaskTestCase):
     """
-    Tests API and view methods that involve the reporting of status for background tasks.
+    Tests view methods that involve the reporting of status for background tasks.
     """
 
     def _get_instructor_task_status(self, task_id):
@@ -263,4 +263,3 @@ class InstructorTaskReportTest(InstructorTaskTestCase):
         succeeded, message = get_task_completion_info(instructor_task)
         self.assertFalse(succeeded)
         self.assertEquals(message, "Problem rescored for 2 of 3 students (out of 5)")
-
