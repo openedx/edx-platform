@@ -25,7 +25,6 @@ $(document).ready(function() {
     $newComponentTemplatePickers = $('.new-component-templates');
     $newComponentButton = $('.new-component-button');
     $spinner = $('<span class="spinner-in-field-icon"></span>');
-    $body.bind('keyup', onKeyUp);
 
     $('.expand-collapse-icon').bind('click', toggleSubmodules);
     $('.visibility-options').bind('change', setVisibility);
