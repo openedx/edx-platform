@@ -18,8 +18,6 @@ def load_function(path):
 
 
 def contentstore(name='default'):
-    global _CONTENTSTORE
-
     if name not in _CONTENTSTORE:
         class_ = load_function(settings.CONTENTSTORE['ENGINE'])
         options = {}
