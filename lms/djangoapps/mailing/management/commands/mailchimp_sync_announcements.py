@@ -21,8 +21,6 @@ BATCH_SIZE = 5000
 
 log = logging.getLogger('edx.mailchimp')
 
-FIELD_TYPES = {'UNIQUE_ID': 'text'}
-
 
 class Command(BaseCommand):
     args = '<mailchimp_key mailchimp_list course_id>'

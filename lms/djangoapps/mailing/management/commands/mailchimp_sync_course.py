@@ -18,7 +18,7 @@ BATCH_SIZE = 5000
 
 log = logging.getLogger('edx.mailchimp')
 
-FIELD_TYPES = {'UNIQUE_ID': 'text'}
+FIELD_TYPES = {'EDX_ID': 'text'}
 
 
 class Command(BaseCommand):
@@ -57,8 +57,8 @@ class Command(BaseCommand):
 
         mailchimp = connect_mailchimp(key)
 
-        if not verify_list(mailchimp, list_id, course_id):
-            raise CommandError('course_id does not match list name')
+        # if not verify_list(mailchimp, list_id, course_id):
+        #     raise CommandError('course_id does not match list name')
 
         subscribed = get_subscribed(mailchimp, list_id)
         unsubscribed = get_unsubscribed(mailchimp, list_id)
@@ -126,8 +126,8 @@ def get_student_data(students, exclude=None):
         e = {'EMAIL': v['user__email'],
              'FULLNAME': v['name'].title()}
 
-        e['UNIQUE_ID'] = unique_id_for_user(FakeUser(v['user_id'],
-                                                     v['user__username']))
+        e['EDX_ID'] = unique_id_for_user(FakeUser(v['user_id'],
+                                                  v['user__username']))
         return e
 
     fields = 'user__email', 'name', 'user_id', 'user__username'
