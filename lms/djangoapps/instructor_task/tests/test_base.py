@@ -170,6 +170,7 @@ class InstructorTaskModuleTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase)
         problem_xml = factory.build_xml(**factory_args)
         ItemFactory.create(parent_location=self.problem_section.location,
                            category="problem",
+                           metadata={"rerandomize": "never"},
                            display_name=str(problem_url_name),
                            data=problem_xml)
 

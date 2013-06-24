@@ -28,7 +28,13 @@ class LocationField(ModelType):
         """
         Parse the json value as a Location
         """
-        return Location(value)
+        try:
+            return Location(value)
+        except InvalidLocationError:
+            if isinstance(value, BlockUsageLocator):
+                return value
+            else:
+                return BlockUsageLocator(value)
 
     def to_json(self, value):
         """
@@ -167,6 +173,10 @@ class XModule(XModuleFields, HTMLSnippet, XBlock):
             self.url_name = self.location.name
             if not hasattr(self, 'category'):
                 self.category = self.location.category
+        elif isinstance(self.location, BlockUsageLocator):
+            self.url_name = self.location.usage_id
+            if not hasattr(self, 'category'):
+                raise InsufficientSpecificationError()
         else:
             raise InsufficientSpecificationError()
         self._loaded_children = None
@@ -215,6 +225,7 @@ class XModule(XModuleFields, HTMLSnippet, XBlock):
         These children will be the same children returned by the
         descriptor unless descriptor.has_dynamic_children() is true.
         '''
+        # FIXME wrong place to get children
         return self.descriptor.get_children()
 
     def get_child_by(self, selector):
@@ -433,12 +444,22 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         """
         super(XModuleDescriptor, self).__init__(*args, **kwargs)
         self.system = self.runtime
+        # CODE REVIEW: should I treat category like location or like previous_version? (same re definition_locator)
         if isinstance(self.location, Location):
             self.url_name = self.location.name
             if not hasattr(self, 'category'):
                 self.category = self.location.category
+        elif isinstance(self.location, BlockUsageLocator):
+            self.url_name = self.location.usage_id
+            if not hasattr(self, 'category'):
+                raise InsufficientSpecificationError()
         else:
             raise InsufficientSpecificationError()
+        # update_version is the version which last updated this xblock v prev being the penultimate updater
+        # leaving off original_version since it complicates creation w/o any obv value yet and is computable
+        # by following previous until None
+        # definition_locator is only used by mongostores which separate definitions from blocks
+        self.edited_by = self.edited_on = self.previous_version = self.update_version = self.definition_locator = None
         self._child_instances = None
 
     @property
@@ -497,6 +518,7 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
 
         system: Module system
         """
+        # TODO refactor for split mongo
         return self.module_class(
             system,
             self,

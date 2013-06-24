@@ -41,6 +41,7 @@ from xmodule.exceptions import NotFoundError
 from django_comment_common.utils import are_permissions_roles_seeded
 from xmodule.exceptions import InvalidVersionError
 import datetime
+from xmodule.fields import Date
 from pytz import UTC
 
 TEST_DATA_MODULESTORE = copy.deepcopy(settings.MODULESTORE)
@@ -704,7 +705,17 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         with filesystem.open('policy.json', 'r') as course_policy:
             on_disk = loads(course_policy.read())
             self.assertIn('course/6.002_Spring_2012', on_disk)
-            self.assertEqual(on_disk['course/6.002_Spring_2012'], own_metadata(course))
+            ownmeta = own_metadata(course)
+            date_proxy = Date()
+            for k, v in on_disk['course/6.002_Spring_2012'].iteritems():
+                self.assertIn(k, ownmeta)
+                if isinstance(ownmeta[k], datetime.datetime):
+                    self.assertLessEqual(
+                        abs(date_proxy.from_json(v) - ownmeta[k]),
+                        datetime.timedelta(seconds=1))
+                else:
+                    self.assertEqual(v, ownmeta[k])
+            self.assertEqual(len(on_disk['course/6.002_Spring_2012']), len(ownmeta))
 
         # remove old course
         delete_course(module_store, content_store, location)

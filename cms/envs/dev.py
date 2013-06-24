@@ -33,6 +33,10 @@ MODULESTORE = {
     'direct': {
         'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
         'OPTIONS': modulestore_options
+    },
+    'split': {
+        'ENGINE': 'xmodule.modulestore.split_mongo.SplitMongoModuleStore',
+        'OPTIONS': modulestore_options
     }
 }
 

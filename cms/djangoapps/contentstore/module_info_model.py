@@ -33,6 +33,7 @@ def get_module_info(store, location, parent_location=None, rewrite_static_links=
         'id': module.location.url(),
         'data': data,
         # TODO (cpennington): This really shouldn't have to do this much reaching in to get the metadata
+        # will own_metadata suffice?
         'metadata': module._model_data._kvs._metadata
     }
 
