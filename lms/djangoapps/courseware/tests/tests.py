@@ -65,7 +65,7 @@ def mongo_store_config(data_dir):
                 'db': 'test_xmodule',
                 'collection': 'modulestore_%s' % uuid4().hex,
                 'fs_root': data_dir,
-                'render_template': 'mitxmako.shortcuts.render_to_string'
+                'render_template': 'mitxmako.shortcuts.render_to_string',
             }
         }
     }
