@@ -1,4 +1,4 @@
-'''integration tests for submitting problem responses and getting grades'''
+"""Integration tests for submitting problem responses and getting grades."""
 
 import logging
 import json
