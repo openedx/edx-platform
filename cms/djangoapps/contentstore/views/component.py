@@ -38,7 +38,8 @@ __all__ = ['OPEN_ENDED_COMPONENT_TYPES',
 
 log = logging.getLogger(__name__)
 
-COMPONENT_TYPES = ['customtag', 'discussion', 'html', 'problem', 'video']
+# NOTE: edit_unit assumes this list is disjoint from ADVANCED_COMPONENT_TYPES
+COMPONENT_TYPES = ['discussion', 'html', 'problem', 'video']
 
 OPEN_ENDED_COMPONENT_TYPES = ["combinedopenended", "peergrading"]
 NOTE_COMPONENT_TYPES = ['notes']
