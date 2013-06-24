@@ -29,27 +29,6 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
     ACCOUNT_INFO = [('view@test.com', 'foo'), ('view2@test.com', 'foo')]
 
-    @classmethod
-    def _instructor_urls(self, course):
-        """
-        `course` is an instance of CourseDescriptor whose section URLs are to be returned.
-
-        Returns a list of URLs corresponding to sections in the passed in course.
-        """
-
-        urls = [reverse(name, kwargs={'course_id': course.id}) for name in (
-            'instructor_dashboard',
-            'gradebook',
-            'grade_summary',)]
-
-        email, _ = self.ACCOUNT_INFO[0]
-        student_id = User.objects.get(email=email).id
-
-        urls.append(reverse('student_progress',
-                            kwargs={'course_id': course.id,
-                                    'student_id': student_id}))
-        return urls
-
     @staticmethod
     def _reverse_urls(names, course):
         """
@@ -64,30 +43,6 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         return [reverse(name, kwargs={'course_id': course.id})
                 for name in names]
-
-    def _dark_student_urls(self, course):
-        """
-        List of urls that students should be able to see only
-        after launch, but staff should see before
-        """
-        urls = self._reverse_urls(['info', 'progress'], course)
-        urls.extend([
-            reverse('book', kwargs={'course_id': course.id,
-                                    'book_index': index})
-            for index, book in enumerate(course.textbooks)
-        ])
-        return urls
-
-    def _light_student_urls(self, course):
-        """
-        List of urls that students should be able to see before
-        launch.
-        `course` is an instance of CourseDescriptor.
-        """
-        urls = self._reverse_urls(['about_course'], course)
-        urls.append(reverse('courses'))
-
-        return urls
 
     def _check_non_staff_light(self, course):
         """
