@@ -2,12 +2,13 @@ from auth.authz import STAFF_ROLE_NAME, INSTRUCTOR_ROLE_NAME
 from auth.authz import is_user_in_course_group_role
 from django.core.exceptions import PermissionDenied
 from ..utils import get_course_location_for_item
+from xmodule.modulestore import Location
 
 
 def get_location_and_verify_access(request, org, course, name):
     """
-    Create the location tuple verify that the user has permissions
-    to view the location. Returns the location.
+    Create the location, verify that the user has permissions
+    to view the location. Returns the location as a Location
     """
     location = ['i4x', org, course, 'course', name]
 
@@ -15,7 +16,7 @@ def get_location_and_verify_access(request, org, course, name):
     if not has_access(request.user, location):
         raise PermissionDenied()
 
-    return location
+    return Location(location)
 
 
 def has_access(user, location, role=STAFF_ROLE_NAME):

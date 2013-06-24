@@ -258,7 +258,7 @@ def import_course(request, org, course, name):
         _module_store, course_items = import_from_xml(modulestore('direct'), settings.GITHUB_REPO_ROOT,
                                                       [course_subdir], load_error_modules=False,
                                                       static_content_store=contentstore(),
-                                                      target_location_namespace=Location(location),
+                                                      target_location_namespace=location,
                                                       draft_store=modulestore())
 
         # we can blow this away when we're done importing.
