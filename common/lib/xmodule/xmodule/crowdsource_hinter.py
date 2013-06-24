@@ -23,31 +23,31 @@ log = logging.getLogger(__name__)
 
 class CrowdsourceHinterFields(object):
     has_children = True
-    hints = Dict(help='''A dictionary mapping answers to lists of [hint, number_of_votes] pairs.
-    ''', scope=Scope.content, default= {})
+    hints = Dict(help="""A dictionary mapping answers to lists of [hint, number_of_votes] pairs.
+    """, scope=Scope.content, default= {})
 
-    previous_answers = List(help='''A list of previous answers this student made to this problem.
+    previous_answers = List(help="""A list of previous answers this student made to this problem.
         Of the form (answer, (hint_id_1, hint_id_2, hint_id_3)) for each problem.  hint_id's are
-        None if the hint was not given.''',
+        None if the hint was not given.""",
         scope=Scope.user_state, default=[])
 
     user_voted = Boolean(help='Specifies if the user has voted on this problem or not.',
         scope=Scope.user_state, default=False)
 
-    moderate = String(help='''If True, then all hints must be approved by staff before
+    moderate = String(help="""If True, then all hints must be approved by staff before
         becoming visible.
-        This field is automatically populated from the xml metadata.''', scope=Scope.content,
+        This field is automatically populated from the xml metadata.""", scope=Scope.content,
         default='False')
 
-    mod_queue = Dict(help='''Contains hints that have not been approved by the staff yet.  Structured
-        identically to the hints dictionary.''', scope=Scope.content, default={})
+    mod_queue = Dict(help="""Contains hints that have not been approved by the staff yet.  Structured
+        identically to the hints dictionary.""", scope=Scope.content, default={})
 
     hint_pk = Integer(help='Used to index hints.', scope=Scope.content, default=0)
 
 
 class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
-    ''' An Xmodule that makes crowdsourced hints.
-    '''
+    """ An Xmodule that makes crowdsourced hints.
+    """
     icon_class = 'crowdsource_hinter'
 
     js = {'coffee': [resource_string(__name__, 'js/src/crowdsource_hinter/display.coffee'),
@@ -61,10 +61,10 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
 
 
     def get_html(self):
-        '''
+        """
         Does a regular expression find and replace to change the AJAX url.
         - Dependent on lon-capa problem.
-        '''
+        """
         # Reset the user vote, for debugging only!  Remove for prod.
         self.user_voted = False
         # You are invited to guess what the lines below do :)
@@ -82,10 +82,10 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         return out
 
     def capa_make_answer_hashable(self, answer):
-        '''
+        """
         Capa answer format: dict[problem name] -> [list of answers]
         Output format: ((problem name, (answers)))
-        '''
+        """
         out = []
         for problem, a in answer.items():
             out.append((problem, tuple(a)))
@@ -93,18 +93,18 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
 
 
     def ans_to_text(self, answer):
-        '''
+        """
         Converts capa answer format to a string representation
         of the answer.
         -Lon-capa dependent.
-        '''
+        """
         return str(float(answer.values()[0]))
 
 
     def handle_ajax(self, dispatch, get):
-        '''
+        """
         This is the landing method for AJAX calls.
-        '''
+        """
         if dispatch == 'get_hint':
             out = self.get_hint(get)
         if dispatch == 'get_feedback':
@@ -122,33 +122,35 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
 
 
     def get_hint(self, get):
-        '''
+        """
         The student got the incorrect answer found in get.  Give him a hint.
-        '''
+        """
         answer = self.ans_to_text(get)
         # Look for a hint to give.
-        if (answer not in self.hints) or (len(self.hints[answer]) == 0):
+        # Make a local copy of self.hints - this means we only need to do one json unpacking.
+        local_hints = self.hints
+        if (answer not in local_hints) or (len(local_hints[answer]) == 0):
             # No hints to give.  Return.
             self.previous_answers += [[answer, [None, None, None]]]
             return
         # Get the top hint, plus two random hints.
-        n_hints = len(self.hints[answer])
-        best_hint_index = max(self.hints[answer], key=lambda key: self.hints[answer][key][1])
-        best_hint = self.hints[answer][best_hint_index][0]
-        if len(self.hints[answer]) == 1:
+        n_hints = len(local_hints[answer])
+        best_hint_index = max(local_hints[answer], key=lambda key: local_hints[answer][key][1])
+        best_hint = local_hints[answer][best_hint_index][0]
+        if len(local_hints[answer]) == 1:
             rand_hint_1 = ''
             rand_hint_2 = ''
             self.previous_answers += [[answer, [best_hint_index, None, None]]]
         elif n_hints == 2:
-            best_hint = self.hints[answer].values()[0][0]
-            best_hint_index = self.hints[answer].keys()[0]
-            rand_hint_1 = self.hints[answer].values()[1][0]
-            hint_index_1 = self.hints[answer].keys()[1]
+            best_hint = local_hints[answer].values()[0][0]
+            best_hint_index = local_hints[answer].keys()[0]
+            rand_hint_1 = local_hints[answer].values()[1][0]
+            hint_index_1 = local_hints[answer].keys()[1]
             rand_hint_2 = ''
             self.previous_answers += [[answer, [best_hint_index, hint_index_1, None]]]
         else:
             (hint_index_1, rand_hint_1), (hint_index_2, rand_hint_2) =\
-                random.sample(self.hints[answer].items(), 2)
+                random.sample(local_hints[answer].items(), 2)
             rand_hint_1 = rand_hint_1[0]
             rand_hint_2 = rand_hint_2[0]
             self.previous_answers += [(answer, (best_hint_index, hint_index_1, hint_index_2))]
@@ -159,9 +161,9 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
                 'answer': answer}
 
     def get_feedback(self, get):
-        '''
+        """
         The student got it correct.  Ask him to vote on hints, or submit a hint.
-        '''
+        """
         # The student got it right.
         # Did he submit at least one wrong answer?
         out = ''
@@ -181,11 +183,10 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
             index_to_hints[i] = []
             index_to_answer[i] = answer
             if answer in self.hints:
-                # Add each hint to the html string, with a vote button.
                 for hint_id in hints_offered:
                     if hint_id != None:
                         try:
-                            index_to_hints[i].append((self.hints[answer][hint_id][0], hint_id))
+                            index_to_hints[i].append((self.hints[answer][str(hint_id)][0], hint_id))
                         except KeyError:
                             # Sometimes, the hint that a user saw will have been deleted by the instructor.
                             continue
@@ -194,12 +195,12 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
 
 
     def tally_vote(self, get):
-        '''
+        """
         Tally a user's vote on his favorite hint.
         get:
             'answer': ans_no (index in previous_answers)
             'hint': hint_no
-        '''
+        """
         if self.user_voted:
            return json.dumps({'contents': 'Sorry, but you have already voted!'})
         ans_no = int(get['answer']) 
@@ -211,19 +212,25 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         self.hints = temp_dict
         # Don't let the user vote again!
         self.user_voted = True
+
+        # Return a list of how many votes each hint got.
+        hint_and_votes = []
+        for hint_no in self.previous_answers[ans_no][1]:
+            if hint_no == None:
+                continue
+            hint_and_votes.append(temp_dict[answer][str(hint_no)])
+
         # Reset self.previous_answers.
         self.previous_answers = []
-        # In the future, return a list of how many votes each hint got, maybe?
-        return {'message': 'Congrats, you\'ve voted!'}
-
+        return {'hint_and_votes': hint_and_votes}
 
     def submit_hint(self, get):
-        '''
+        """
         Take a hint submission and add it to the database.
         get:
             'answer': answer index in previous_answers
             'hint': text of the new hint that the user is adding
-        '''
+        """
         # Do html escaping.  Perhaps in the future do profanity filtering, etc. as well.
         hint = escape(get['hint'])
         answer = self.previous_answers[int(get['answer'])][0]
@@ -251,11 +258,11 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
 
 
     def delete_hint(self, answer, hint_id):
-        '''
+        """
         From the answer, delete the hint with hint_id.
         Not designed to be accessed via POST request, for now.
         -LIKELY DEPRECATED.
-        '''
+        """
         temp_hints = self.hints
         del temp_hints[answer][str(hint_id)]
         self.hints = temp_hints
