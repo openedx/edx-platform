@@ -7,7 +7,6 @@ from django.template.loaders.filesystem import Loader as FilesystemLoader
 from django.template.loaders.app_directories import Loader as AppDirectoriesLoader
 
 from mitxmako.template import Template
-import mitxmako.middleware
 
 import tempdir
 
@@ -44,7 +43,11 @@ class MakoLoader(object):
 
         if source.startswith("## mako\n"):
             # This is a mako template
-            template = Template(filename=file_path, module_directory=self.module_directory, uri=template_name)
+            template = Template(filename=file_path,
+                                module_directory=self.module_directory,
+                                input_encoding='utf-8',
+                                output_encoding='utf-8',
+                                uri=template_name)
             return template, None
         else:
             # This is a regular template

@@ -212,6 +212,7 @@ body.course.updates {
 	@include edit-box;
 	position: absolute;
 	right: 0;
+	top: 0;
 	z-index: 10001;
 	width: 800px;
 	padding: 30px;

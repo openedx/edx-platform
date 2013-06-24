@@ -12,17 +12,11 @@ def i_click_on_view_courseware(step):
 @step('I click on the "([^"]*)" tab$')
 def i_click_on_the_tab(step, tab_text):
     world.click_link(tab_text)
-    world.save_the_html()
 
 
 @step('I visit the courseware URL$')
 def i_visit_the_course_info_url(step):
     world.visit('/courses/MITx/6.002x/2012_Fall/courseware')
-
-
-@step(u'I do not see "([^"]*)" anywhere on the page')
-def i_do_not_see_text_anywhere_on_the_page(step, text):
-    assert world.browser.is_text_not_present(text)
 
 
 @step(u'I am on the dashboard page$')

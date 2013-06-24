@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+
+#Exit if any commands return a non-zero status
 set -e
 
 # posix compliant sanity check
@@ -27,10 +29,17 @@ EOL
 
 }
 
+#Setting error color to red before reset
 error() {
       printf '\E[31m'; echo "$@"; printf '\E[0m'
 }
 
+#Setting warning color to magenta before reset
+warning() {
+      printf '\E[35m'; echo "$@"; printf '\E[0m'
+}
+
+#Setting output color to cyan before reset
 output() {
       printf '\E[36m'; echo "$@"; printf '\E[0m'
 }
@@ -51,7 +60,7 @@ EO
 
 info() {
     cat<<EO
-    MITx base dir : $BASE
+    edX base dir : $BASE
     Python virtualenv dir : $PYTHON_DIR
     Ruby RVM dir : $RUBY_DIR
     Ruby ver : $RUBY_VER
@@ -59,38 +68,47 @@ info() {
 EO
 }
 
+change_git_push_defaults() {
+
+    #Set git push defaults to upstream rather than master
+    output "Changing git defaults"
+    git config --global push.default upstream
+
+}
+
 clone_repos() {
+
+    change_git_push_defaults
+
     cd "$BASE"
 
-    if [[ -d "$BASE/mitx/.git" ]]; then
-        output "Pulling mitx"
-        cd "$BASE/mitx"
+    if [[ -d "$BASE/edx-platform/.git" ]]; then
+        output "Pulling edx platform"
+        cd "$BASE/edx-platform"
         git pull
     else
-        output "Cloning mitx"
-        if [[ -d "$BASE/mitx" ]]; then
-            mv "$BASE/mitx" "${BASE}/mitx.bak.$$"
+        output "Cloning edx platform"
+        if [[ -d "$BASE/edx-platform" ]]; then
+            output "Creating backup for existing edx platform"
+            mv "$BASE/edx-platform" "${BASE}/edx-platform.bak.$$"
         fi
-        git clone git@github.com:MITx/mitx.git
-    fi
-
-    # By default, dev environments start with a copy of 6.002x
-    cd "$BASE"
-    mkdir -p "$BASE/data"
-    REPO="content-mit-6002x"
-    if [[ -d "$BASE/data/$REPO/.git" ]]; then
-        output "Pulling $REPO"
-        cd "$BASE/data/$REPO"
-        git pull
-    else
-        output "Cloning $REPO"
-        if [[ -d "$BASE/data/$REPO" ]]; then
-            mv "$BASE/data/$REPO" "${BASE}/data/$REPO.bak.$$"
-        fi
-        cd "$BASE/data"
-        git clone git@github.com:MITx/$REPO
+        git clone https://github.com/edx/edx-platform.git
     fi
 }
+
+set_base_default() {  # if PROJECT_HOME not set
+    # 2 possibilities: this is from cloned repo, or not
+    # this script is in "./scripts" if a git clone
+    this_repo=$(cd "${BASH_SOURCE%/*}/.." && pwd)
+    if [[ "${this_repo##*/}" = "edx-platform" && -d "$this_repo/.git" ]]; then
+        # set BASE one-up from this_repo;
+        echo "${this_repo%/*}"
+    else
+        echo "$HOME/edx_all"
+    fi
+}
+
+
 
 
 ### START
@@ -98,7 +116,7 @@ clone_repos() {
 PROG=${0##*/}
 
 # Adjust this to wherever you'd like to place the codebase
-BASE="${PROJECT_HOME:-$HOME}/mitx_all"
+BASE="${PROJECT_HOME:-$(set_base_default)}"
 
 # Use a sensible default (~/.virtualenvs) for your Python virtualenvs
 # unless you've already got one set up with virtualenvwrapper.
@@ -161,7 +179,7 @@ done
 
 cat<<EO
 
-  This script will setup a local MITx environment, this
+  This script will setup a local edX environment, this
   includes
 
        * Django
@@ -202,9 +220,33 @@ case `uname -s` in
 
         distro=`lsb_release -cs`
         case $distro in
-            maya|lisa|natty|oneiric|precise|quantal)
+            wheezy|jessie|maya|olivia|nadia|precise|quantal)
+                warning "
+                        Debian support is not fully debugged. Assuming you have standard
+                        development packages already working like scipy rvm, the
+                        installation should go fine, but this is still a work in progress.
+
+                        Please report issues you have and let us know if you are able to figure
+                        out any workarounds or solutions
+
+                        Press return to continue or control-C to abort"
+
+                read dummy
+                sudo apt-get install git ;;
+            squeeze|lisa|katya|oneiric|natty|raring)
+                warning "
+                          It seems like you're using $distro which has been deprecated.
+                          While we don't technically support this release, the install
+                          script will probably still work.
+
+                          Raring requires an install of rvm to work correctly as the raring
+                          package manager does not yet include a package for rvm
+
+                          Press return to continue or control-C to abort"
+                read dummy
                 sudo apt-get install git
                 ;;
+
             *)
                 error "Unsupported distribution - $distro"
                 exit 1
@@ -241,7 +283,7 @@ EO
 
         ;;
     *)
-        error "Unsupported platform"
+        error "Unsupported platform. Try switching to either Mac or a Debian-based linux distribution (Ubuntu, Debian, or Mint)"
         exit 1
         ;;
 esac
@@ -251,10 +293,17 @@ esac
 
 clone_repos
 
+# Sanity check to make sure the repo layout hasn't changed
+if [[ -d $BASE/edx-platform/scripts ]]; then
+    output "Installing system-level dependencies"
+    bash $BASE/edx-platform/scripts/install-system-req.sh
+else
+    error "It appears that our directory structure has changed and somebody failed to update this script.
+            raise an issue on Github and someone should fix it."
+    exit 1
+fi
 
 # Install system-level dependencies
-
-bash $BASE/mitx/install-system-req.sh
 
 output "Installing RVM, Ruby, and required gems"
 
@@ -271,7 +320,22 @@ if [ "$HOME/.rvm" != $RUBY_DIR ]; then
   fi
 fi
 
-curl -sL get.rvm.io | bash -s -- --version 1.15.7
+# rvm has issues in debian family, this is taken from stack overflow
+case `uname -s` in
+    Darwin)
+        curl -sL get.rvm.io | bash -s -- --version 1.15.7
+    ;;
+
+    [Ll]inux)
+        warning "Setting up rvm on linux. This is a known pain point. If the script fails here
+                refer to the following stack overflow question:
+                http://stackoverflow.com/questions/9056008/installed-ruby-1-9-3-with-rvm-but-command-line-doesnt-show-ruby-v/9056395#9056395"
+        sudo apt-get --purge remove ruby-rvm
+        sudo rm -rf /usr/share/ruby-rvm /etc/rvmrc /etc/profile.d/rvm.sh
+        curl -sL https://get.rvm.io | bash -s stable --ruby --autolibs=enable --auto-dotfiles
+    ;;
+esac
+
 
 # Ensure we have RVM available as a shell function so that it can mess
 # with the environment and set everything up properly. The RVM install
@@ -294,8 +358,8 @@ case `uname -s` in
 esac
 
 # Let the repo override the version of Ruby to install
-if [[ -r $BASE/mitx/.ruby-version ]]; then
-  RUBY_VER=`cat $BASE/mitx/.ruby-version`
+if [[ -r $BASE/edx-platform/.ruby-version ]]; then
+  RUBY_VER=`cat $BASE/edx-platform/.ruby-version`
 fi
 
 # Current stable version of RVM (1.19.0) requires the following to build Ruby:
@@ -311,14 +375,15 @@ fi
 # any required libs are missing.
 LESS="-E" rvm install $RUBY_VER --with-readline
 
-# Create the "mitx" gemset
-rvm use "$RUBY_VER@mitx" --create
+# Create the "edx" gemset
+rvm use "$RUBY_VER@edx-platform" --create
+rvm rubygems latest
 
 output "Installing gem bundler"
 gem install bundler
 
 output "Installing ruby packages"
-bundle install --gemfile $BASE/mitx/Gemfile
+bundle install --gemfile $BASE/edx-platform/Gemfile
 
 
 # Install Python virtualenv
@@ -338,20 +403,33 @@ export WORKON_HOME=$PYTHON_DIR
 
 # Load in the mkvirtualenv function if needed
 if [[ `type -t mkvirtualenv` != "function" ]]; then
-  source `which virtualenvwrapper.sh`
+    case `uname -s` in
+        Darwin)
+            source `which virtualenvwrapper.sh`
+        ;;
+
+        [Ll]inux)
+        if [[ -f "/etc/bash_completion.d/virtualenvwrapper" ]]; then
+            source /etc/bash_completion.d/virtualenvwrapper
+        else
+            error "Could not find virtualenvwrapper"
+            exit 1
+        fi
+        ;;
+    esac
 fi
 
-# Create MITx virtualenv and link it to repo
+# Create edX virtualenv and link it to repo
 # virtualenvwrapper automatically sources the activation script
 if [[ $systempkgs ]]; then
-    mkvirtualenv -a "$BASE/mitx" --system-site-packages mitx || {
+    mkvirtualenv -a "$HOME/.virtualenvs" --system-site-packages edx-platform || {
       error "mkvirtualenv exited with a non-zero error"
       return 1
     }
 else
     # default behavior for virtualenv>1.7 is
     # --no-site-packages
-    mkvirtualenv -a "$BASE/mitx" mitx || {
+    mkvirtualenv -a "$HOME/.virtualenvs" edx-platform || {
       error "mkvirtualenv exited with a non-zero error"
       return 1
     }
@@ -380,10 +458,30 @@ if [[ -n $compile ]]; then
     rm -rf numpy-${NUMPY_VER} scipy-${SCIPY_VER}
 fi
 
+# building correct version of distribute from source
+DISTRIBUTE_VER="0.6.28"
+output "Building Distribute"
+SITE_PACKAGES="$HOME/.virtualenvs/edx-platform/lib/python2.7/site-packages"
+cd "$SITE_PACKAGES"
+curl -O http://pypi.python.org/packages/source/d/distribute/distribute-${DISTRIBUTE_VER}.tar.gz
+tar -xzvf distribute-${DISTRIBUTE_VER}.tar.gz
+cd distribute-${DISTRIBUTE_VER}
+python setup.py install
+cd ..
+rm distribute-${DISTRIBUTE_VER}.tar.gz
+
+DISTRIBUTE_VERSION=`pip freeze | grep distribute`
+
+if [[ "$DISTRIBUTE_VERSION" == "distribute==0.6.28" ]]; then
+  output "Distribute successfully installed"
+else
+  error "Distribute failed to build correctly. This script requires a working version of Distribute 0.6.28 in your virtualenv's python installation"
+  exit 1
+fi
+
 case `uname -s` in
     Darwin)
         # on mac os x get the latest distribute and pip
-        curl http://python-distribute.org/distribute_setup.py | python
         pip install -U pip
         # need latest pytz before compiling numpy and scipy
         pip install -U pytz
@@ -395,18 +493,30 @@ case `uname -s` in
         ;;
 esac
 
-output "Installing MITx pre-requirements"
-pip install -r $BASE/mitx/pre-requirements.txt
+output "Installing edX pre-requirements"
+pip install -r $BASE/edx-platform/requirements/edx/pre.txt
 
-output "Installing MITx requirements"
-# Need to be in the mitx dir to get the paths to local modules right
-cd $BASE/mitx
-pip install -r requirements.txt
+output "Installing edX requirements"
+# Install prereqs
+cd $BASE/edx-platform
+rvm use "$RUBY_VER@edx-platform"
+rake install_prereqs
 
-mkdir "$BASE/log" || true
-mkdir "$BASE/db" || true
+# Final dependecy
+output "Finishing Touches"
+cd $BASE
+pip install argcomplete
+cd $BASE/edx-platform
+bundle install
+rake install_prereqs
 
+mkdir -p "$BASE/log"
+mkdir -p "$BASE/db"
+mkdir -p "$BASE/data"
 
+rake django-admin[syncdb]
+rake django-admin[migrate]
+rake cms:update_templates
 # Configure Git
 
 output "Fixing your git default settings"

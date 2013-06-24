@@ -2,10 +2,6 @@
 #
 # generate pyschometrics data from tracking logs and student module data
 
-import os
-import sys
-import string
-import datetime
 import json
 
 from courseware.models import *

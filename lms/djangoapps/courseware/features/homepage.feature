@@ -13,9 +13,7 @@ Feature: Homepage for web users
 
   Scenario Outline: User can see main parts of the page
     Given I visit the homepage
-    Then I should see a link with the id "<id>" called "<Link>"
-
-    Examples:
+    Then I should see the following links and ids
     | id      | Link   |
     | about   | About  |
     | jobs    | Jobs   |
@@ -27,9 +25,7 @@ Feature: Homepage for web users
   # TODO: test according to domain or policy
   Scenario: User can see the partner institutions
     Given I visit the homepage
-    Then I should see "<Partner>" in the Partners section
-
-    Examples:
+    Then I should see the following Partners in the Partners section
     | Partner     |
     | MITx        |
     | HarvardX    |

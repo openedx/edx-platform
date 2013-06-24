@@ -52,6 +52,12 @@ body.course.settings {
     }
   }
 
+  // notices - used currently for edx mktg
+  .notice-workflow {
+    margin-top: ($baseline);
+  }
+
+
   // in form - elements
   .group-settings {
     margin: 0 0 ($baseline*2) 0;
@@ -386,6 +392,11 @@ body.course.settings {
       #course-overview {
         height: ($baseline*20);
       }
+
+      //adds back in CodeMirror border removed due to Unit page styling of component editors
+      .CodeMirror {
+        border: 1px solid $gray-l2;
+      }
     }
 
     // specific fields - video
@@ -698,7 +709,7 @@ body.course.settings {
 
           .tip {
             @include transition (opacity 0.5s ease-in-out 0s);
-            opacity: 0;
+            opacity: 0.0;
             position: absolute;
             bottom: ($baseline*1.25);
           }
@@ -713,7 +724,7 @@ body.course.settings {
           input.error {
 
             & + .tip {
-              opacity: 0;
+              opacity: 0.0;
             }
           }
         }

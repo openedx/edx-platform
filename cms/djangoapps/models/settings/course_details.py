@@ -3,26 +3,26 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.inheritance import own_metadata
 import json
 from json.encoder import JSONEncoder
-import time
 from contentstore.utils import get_modulestore
 from models.settings import course_grading
 from contentstore.utils import update_item
 from xmodule.fields import Date
 import re
 import logging
+import datetime
 
 
 class CourseDetails(object):
     def __init__(self, location):
-        self.course_location = location    # a Location obj
+        self.course_location = location  # a Location obj
         self.start_date = None  # 'start'
-        self.end_date = None    # 'end'
+        self.end_date = None  # 'end'
         self.enrollment_start = None
         self.enrollment_end = None
-        self.syllabus = None    # a pdf file asset
-        self.overview = ""      # html to render as the overview
-        self.intro_video = None    # a video pointer
-        self.effort = None      # int hours/week
+        self.syllabus = None  # a pdf file asset
+        self.overview = ""  # html to render as the overview
+        self.intro_video = None  # a video pointer
+        self.effort = None  # int hours/week
 
     @classmethod
     def fetch(cls, course_location):
@@ -41,25 +41,25 @@ class CourseDetails(object):
         course.enrollment_start = descriptor.enrollment_start
         course.enrollment_end = descriptor.enrollment_end
 
-        temploc = course_location._replace(category='about', name='syllabus')
+        temploc = course_location.replace(category='about', name='syllabus')
         try:
             course.syllabus = get_modulestore(temploc).get_item(temploc).data
         except ItemNotFoundError:
             pass
 
-        temploc = temploc._replace(name='overview')
+        temploc = temploc.replace(name='overview')
         try:
             course.overview = get_modulestore(temploc).get_item(temploc).data
         except ItemNotFoundError:
             pass
 
-        temploc = temploc._replace(name='effort')
+        temploc = temploc.replace(name='effort')
         try:
             course.effort = get_modulestore(temploc).get_item(temploc).data
         except ItemNotFoundError:
             pass
 
-        temploc = temploc._replace(name='video')
+        temploc = temploc.replace(name='video')
         try:
             raw_video = get_modulestore(temploc).get_item(temploc).data
             course.intro_video = CourseDetails.parse_video_tag(raw_video)
@@ -73,9 +73,9 @@ class CourseDetails(object):
         """
         Decode the json into CourseDetails and save any changed attrs to the db
         """
-        ## TODO make it an error for this to be undefined & for it to not be retrievable from modulestore
+        # TODO make it an error for this to be undefined & for it to not be retrievable from modulestore
         course_location = jsondict['course_location']
-        ## Will probably want to cache the inflight courses because every blur generates an update
+        # Will probably want to cache the inflight courses because every blur generates an update
         descriptor = get_modulestore(course_location).get_item(course_location)
 
         dirty = False
@@ -126,16 +126,16 @@ class CourseDetails(object):
 
         # NOTE: below auto writes to the db w/o verifying that any of the fields actually changed
         # to make faster, could compare against db or could have client send over a list of which fields changed.
-        temploc = Location(course_location)._replace(category='about', name='syllabus')
+        temploc = Location(course_location).replace(category='about', name='syllabus')
         update_item(temploc, jsondict['syllabus'])
 
-        temploc = temploc._replace(name='overview')
+        temploc = temploc.replace(name='overview')
         update_item(temploc, jsondict['overview'])
 
-        temploc = temploc._replace(name='effort')
+        temploc = temploc.replace(name='effort')
         update_item(temploc, jsondict['effort'])
 
-        temploc = temploc._replace(name='video')
+        temploc = temploc.replace(name='video')
         recomposed_video_tag = CourseDetails.recompose_video_tag(jsondict['intro_video'])
         update_item(temploc, recomposed_video_tag)
 
@@ -153,9 +153,9 @@ class CourseDetails(object):
         if not raw_video:
             return None
 
-        keystring_matcher = re.search('(?<=embed/)[a-zA-Z0-9_-]+', raw_video)
+        keystring_matcher = re.search(r'(?<=embed/)[a-zA-Z0-9_-]+', raw_video)
         if keystring_matcher is None:
-            keystring_matcher = re.search('<?=\d+:[a-zA-Z0-9_-]+', raw_video)
+            keystring_matcher = re.search(r'<?=\d+:[a-zA-Z0-9_-]+', raw_video)
 
         if keystring_matcher:
             return keystring_matcher.group(0)
@@ -174,14 +174,14 @@ class CourseDetails(object):
         return result
 
 
-# TODO move to a more general util? Is there a better way to do the isinstance model check?
+# TODO move to a more general util?
 class CourseSettingsEncoder(json.JSONEncoder):
     def default(self, obj):
-        if isinstance(obj, CourseDetails) or isinstance(obj, course_grading.CourseGradingModel):
+        if isinstance(obj, (CourseDetails, course_grading.CourseGradingModel)):
             return obj.__dict__
         elif isinstance(obj, Location):
             return obj.dict()
-        elif isinstance(obj, time.struct_time):
+        elif isinstance(obj, datetime.datetime):
             return Date().to_json(obj)
         else:
             return JSONEncoder.default(self, obj)

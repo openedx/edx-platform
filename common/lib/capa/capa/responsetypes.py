@@ -11,7 +11,6 @@ Used by capa_problem.py
 # standard library imports
 import abc
 import cgi
-import hashlib
 import inspect
 import json
 import logging
@@ -288,7 +287,14 @@ class LoncapaResponse(object):
             }
 
             try:
-                safe_exec.safe_exec(code, globals_dict, python_path=self.context['python_path'], slug=self.id)
+                safe_exec.safe_exec(
+                    code,
+                    globals_dict,
+                    python_path=self.context['python_path'],
+                    slug=self.id,
+                    random_seed=self.context['seed'],
+                    unsafely=self.system.can_execute_unsafe_code(),
+                )
             except Exception as err:
                 msg = 'Error %s in evaluating hint function %s' % (err, hintfn)
                 msg += "\nSee XML source line %s" % getattr(
@@ -973,7 +979,14 @@ class CustomResponse(LoncapaResponse):
                             'ans': ans,
                         }
                         globals_dict.update(kwargs)
-                        safe_exec.safe_exec(code, globals_dict, python_path=self.context['python_path'], slug=self.id)
+                        safe_exec.safe_exec(
+                            code,
+                            globals_dict,
+                            python_path=self.context['python_path'],
+                            slug=self.id,
+                            random_seed=self.context['seed'],
+                            unsafely=self.system.can_execute_unsafe_code(),
+                        )
                         return globals_dict['cfn_return']
                     return check_function
 
@@ -1090,7 +1103,14 @@ class CustomResponse(LoncapaResponse):
         # exec the check function
         if isinstance(self.code, basestring):
             try:
-                safe_exec.safe_exec(self.code, self.context, cache=self.system.cache, slug=self.id)
+                safe_exec.safe_exec(
+                    self.code,
+                    self.context,
+                    cache=self.system.cache,
+                    slug=self.id,
+                    random_seed=self.context['seed'],
+                    unsafely=self.system.can_execute_unsafe_code(),
+                )
             except Exception as err:
                 self._handle_exec_exception(err)
 
@@ -1717,6 +1737,7 @@ class FormulaResponse(LoncapaResponse):
             student_variables = dict()
             # ranges give numerical ranges for testing
             for var in ranges:
+                # TODO: allow specified ranges (i.e. integers and complex numbers) for random variables
                 value = random.uniform(*ranges[var])
                 instructor_variables[str(var)] = value
                 student_variables[str(var)] = value
@@ -1814,7 +1835,14 @@ class SchematicResponse(LoncapaResponse):
         ]
         self.context.update({'submission': submission})
         try:
-            safe_exec.safe_exec(self.code, self.context, cache=self.system.cache, slug=self.id)
+            safe_exec.safe_exec(
+                self.code,
+                self.context,
+                cache=self.system.cache,
+                slug=self.id,
+                random_seed=self.context['seed'],
+                unsafely=self.system.can_execute_unsafe_code(),
+            )
         except Exception as err:
             msg = 'Error %s in evaluating SchematicResponse' % err
             raise ResponseError(msg)
@@ -1874,8 +1902,7 @@ class ImageResponse(LoncapaResponse):
             if not given:  # No answer to parse. Mark as incorrect and move on
                 continue
             # parse given answer
-            m = re.match(
-                '\[([0-9]+),([0-9]+)]', given.strip().replace(' ', ''))
+            m = re.match(r'\[([0-9]+),([0-9]+)]', given.strip().replace(' ', ''))
             if not m:
                 raise Exception('[capamodule.capa.responsetypes.imageinput] '
                                 'error grading %s (input=%s)' % (aid, given))
@@ -1890,7 +1917,7 @@ class ImageResponse(LoncapaResponse):
                     # parse expected answer
                     # TODO: Compile regexp on file load
                     m = re.match(
-                        '[\(\[]([0-9]+),([0-9]+)[\)\]]-[\(\[]([0-9]+),([0-9]+)[\)\]]',
+                        r'[\(\[]([0-9]+),([0-9]+)[\)\]]-[\(\[]([0-9]+),([0-9]+)[\)\]]',
                         solution_rectangle.strip().replace(' ', ''))
                     if not m:
                         msg = 'Error in problem specification! cannot parse rectangle in %s' % (

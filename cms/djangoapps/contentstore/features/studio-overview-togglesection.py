@@ -1,5 +1,5 @@
-#pylint: disable=C0111
-#pylint: disable=W0621
+# pylint: disable=C0111
+# pylint: disable=W0621
 
 from lettuce import world, step
 from common import *
@@ -50,7 +50,8 @@ def have_a_course_with_two_sections(step):
 
 @step(u'I navigate to the course overview page$')
 def navigate_to_the_course_overview_page(step):
-    log_into_studio(is_staff=True)
+    create_studio_user(is_staff=True)
+    log_into_studio()
     course_locator = '.class-name'
     world.css_click(course_locator)
 
@@ -112,7 +113,7 @@ def all_sections_are_expanded(step):
 
 
 @step(u'all sections are collapsed$')
-def all_sections_are_expanded(step):
+def all_sections_are_collapsed(step):
     subsection_locator = 'div.subsection-list'
     subsections = world.css_find(subsection_locator)
     for s in subsections:

@@ -63,6 +63,25 @@ To get a full list of available rake tasks, use:
 
     rake -T
 
+### Troubleshooting
+
+#### Reference Error: XModule is not defined (javascript)
+This means that the javascript defining an xmodule hasn't loaded correctly. There are a number
+of different things that could be causing this:
+
+1. See `Error: watch EMFILE`
+
+#### Error: watch EMFILE (coffee)
+When running a development server, we also start a watcher process alongside to recompile coffeescript
+and sass as changes are made. On Mac OSX systems, the coffee watcher process takes more file handles
+than are allowed by default. This will result in `EMFILE` errors when coffeescript is running, and
+will prevent javascript from compiling, leading to the error 'XModule is not defined'
+
+To work around this issue, we use `Process::setrlimit` to set the number of allowed open files.
+Coffee watches both directories and files, so you will need to set this fairly high (anecdotally,
+8000 seems to do the trick on OSX 10.7.5, 10.8.3, and 10.8.4)
+
+
 ## Running Tests
 
 See `testing.md` for instructions on running the test suite.

@@ -29,14 +29,14 @@ open_ended_grading_interface = {
     }
 
 
-def test_system():
+def get_test_system():
     """
     Construct a test ModuleSystem instance.
 
-    By default, the render_template() method simply returns the context it is
-    passed as a string.  You can override this behavior by monkey patching::
+    By default, the render_template() method simply returns the repr of the
+    context it is passed.  You can override this behavior by monkey patching::
 
-        system = test_system()
+        system = get_test_system()
         system.render_template = my_render_func
 
     where `my_render_func` is a function of the form my_render_func(template, context).
@@ -46,7 +46,7 @@ def test_system():
         ajax_url='courses/course_id/modx/a_location',
         track_function=Mock(),
         get_module=Mock(),
-        render_template=lambda template, context: str(context),
+        render_template=lambda template, context: repr(context),
         replace_urls=lambda html: str(html),
         user=Mock(is_staff=False),
         filestore=Mock(),

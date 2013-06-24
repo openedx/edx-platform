@@ -2,7 +2,6 @@
 Ideally, it will be the only place that needs to know about any special settings
 like DISABLE_START_DATES"""
 import logging
-import time
 from datetime import datetime, timedelta
 from functools import partial
 
@@ -15,7 +14,9 @@ from xmodule.modulestore import Location
 from xmodule.x_module import XModule, XModuleDescriptor
 
 from student.models import CourseEnrollmentAllowed
+from external_auth.models import ExternalAuthMap
 from courseware.masquerade import is_masquerading_as_student
+from django.utils.timezone import UTC
 
 DEBUG_ACCESS = False
 
@@ -129,15 +130,33 @@ def _has_access_course_desc(user, course, action):
 
     def can_enroll():
         """
-        If the course has an enrollment period, check whether we are in it.
+        First check if restriction of enrollment by login method is enabled, both
+            globally and by the course.
+        If it is, then the user must pass the criterion set by the course, e.g. that ExternalAuthMap 
+            was set by 'shib:https://idp.stanford.edu/", in addition to requirements below.
+        Rest of requirements:
+        Enrollment can only happen in the course enrollment period, if one exists.
+            or
+        
+        (CourseEnrollmentAllowed always overrides)
         (staff can always enroll)
         """
+        # if using registration method to restrict (say shibboleth)
+        if settings.MITX_FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
+            if user is not None and user.is_authenticated() and \
+                ExternalAuthMap.objects.filter(user=user, external_domain=course.enrollment_domain):
+                debug("Allow: external_auth of " + course.enrollment_domain)
+                reg_method_ok = True
+            else:
+                reg_method_ok = False
+        else:
+            reg_method_ok = True #if not using this access check, it's always OK.
 
-        now = time.gmtime()
+        now = datetime.now(UTC())
         start = course.enrollment_start
         end = course.enrollment_end
 
-        if (start is None or now > start) and (end is None or now < end):
+        if reg_method_ok and (start is None or now > start) and (end is None or now < end):
             # in enrollment period, so any user is allowed to enroll.
             debug("Allow: in enrollment period")
             return True
@@ -242,7 +261,7 @@ def _has_access_descriptor(user, descriptor, action, course_context=None):
 
         # Check start date
         if descriptor.lms.start is not None:
-            now = time.gmtime()
+            now = datetime.now(UTC())
             effective_start = _adjust_start_date_for_beta_testers(user, descriptor)
             if now > effective_start:
                 # after start date, everyone can see it
@@ -365,7 +384,7 @@ def _course_org_staff_group_name(location, course_context=None):
 
 
 def group_names_for(role, location, course_context=None):
-    """Returns the group names for a given role with this location. Plural 
+    """Returns the group names for a given role with this location. Plural
     because it will return both the name we expect now as well as the legacy
     group name we support for backwards compatibility. This should not check
     the DB for existence of a group (like some of its callers do) because that's
@@ -483,8 +502,7 @@ def _adjust_start_date_for_beta_testers(user, descriptor):
        non-None start date.
 
     Returns:
-        A time, in the same format as returned by time.gmtime().  Either the same as
-        start, or earlier for beta testers.
+        A datetime.  Either the same as start, or earlier for beta testers.
 
     NOTE: number of days to adjust should be cached to avoid looking it up thousands of
     times per query.
@@ -505,15 +523,11 @@ def _adjust_start_date_for_beta_testers(user, descriptor):
     beta_group = course_beta_test_group_name(descriptor.location)
     if beta_group in user_groups:
         debug("Adjust start time: user in group %s", beta_group)
-        # time_structs don't support subtraction, so convert to datetimes,
-        # subtract, convert back.
-        # (fun fact: datetime(*a_time_struct[:6]) is the beautiful syntax for
-        # converting time_structs into datetimes)
-        start_as_datetime = datetime(*descriptor.lms.start[:6])
+        start_as_datetime = descriptor.lms.start
         delta = timedelta(descriptor.lms.days_early_for_beta)
         effective = start_as_datetime - delta
         # ...and back to time_struct
-        return effective.timetuple()
+        return effective
 
     return descriptor.lms.start
 
@@ -564,7 +578,7 @@ def _has_access_to_location(user, location, access_level, course_context):
                 return True
         debug("Deny: user not in groups %s", staff_groups)
 
-    if access_level == 'instructor' or access_level == 'staff': 	# instructors get staff privileges
+    if access_level == 'instructor' or access_level == 'staff':  # instructors get staff privileges
         instructor_groups = group_names_for_instructor(location, course_context) + \
                             [_course_org_instructor_group_name(location, course_context)]
         for instructor_group in instructor_groups:

@@ -37,7 +37,7 @@ class @VideoCaptionAlpha extends SubviewAlpha
         @loaded = true
 
         if onTouchBasedDevice()
-          $('.subtitles li').html "Caption will be displayed when you start playing the video."
+          $('.subtitles').html "<li>Caption will be displayed when you start playing the video.</li>"
         else
           @renderCaption()
 
@@ -120,7 +120,7 @@ class @VideoCaptionAlpha extends SubviewAlpha
   seekPlayer: (event) =>
     event.preventDefault()
     time = Math.round(Time.convert($(event.target).data('start'), '1.0', @currentSpeed) / 1000)
-    $(@).trigger('seek', time)
+    $(@).trigger('caption_seek', time)
 
   calculateOffset: (element) ->
     @captionHeight() / 2 - element.height() / 2
@@ -140,12 +140,16 @@ class @VideoCaptionAlpha extends SubviewAlpha
 
   hideCaptions: (hide_captions) =>
     if hide_captions
+      type = 'hide_transcript'
       @$('.hide-subtitles').attr('title', 'Turn on captions')
       @el.addClass('closed')
     else
+      type = 'show_transcript'
       @$('.hide-subtitles').attr('title', 'Turn off captions')
       @el.removeClass('closed')
       @scrollCaption()
+    @video.log type,
+      currentTime: @player.currentTime
     $.cookie('hide_captions', hide_captions, expires: 3650, path: '/')
 
   captionHeight: ->

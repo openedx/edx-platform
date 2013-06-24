@@ -1,6 +1,5 @@
 from xmodule.modulestore import Location
 from contentstore.utils import get_modulestore
-from xmodule.x_module import XModuleDescriptor
 from xmodule.modulestore.inheritance import own_metadata
 from xblock.core import Scope
 from xmodule.course_module import CourseDescriptor

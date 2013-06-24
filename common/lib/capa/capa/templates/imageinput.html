@@ -5,12 +5,20 @@
   </div>
 
   % if status == 'unsubmitted':
-  <span class="unanswered" style="display:inline-block;" id="status_${id}"></span>
-  % elif status == 'correct': 
-  <span class="correct" id="status_${id}"></span>
+  <span class="unanswered" style="display:inline-block;" id="status_${id}" aria-describedby="input_${id}">
+    <span class="sr">Status: unanswered</span>
+  </span>
+  % elif status == 'correct':
+  <span class="correct" id="status_${id}" aria-describedby="input_${id}">
+    <span class="sr">Status: correct</span>
+  </span>
   % elif status == 'incorrect':
-  <span class="incorrect" id="status_${id}"></span>
+  <span class="incorrect" id="status_${id}" aria-describedby="input_${id}">
+    <span class="sr">Status: incorrect</span>
+  </span>
   % elif status == 'incomplete':
-  <span class="incorrect" id="status_${id}"></span>
+  <span class="incorrect" id="status_${id}" aria-describedby="input_${id}">
+    <span class="sr">Status: incorrect</span>
+  </span>
   % endif
 </span>

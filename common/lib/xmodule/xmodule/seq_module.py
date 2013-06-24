@@ -62,7 +62,7 @@ class SequenceModule(SequenceFields, XModule):
         progress = reduce(Progress.add_counts, progresses)
         return progress
 
-    def handle_ajax(self, dispatch, get):		# TODO: bounds checking
+    def handle_ajax(self, dispatch, get):  # TODO: bounds checking
         ''' get = request.POST instance '''
         if dispatch == 'goto_position':
             self.position = int(get['position'])
@@ -120,8 +120,6 @@ class SequenceModule(SequenceFields, XModule):
 class SequenceDescriptor(SequenceFields, MakoModuleDescriptor, XmlDescriptor):
     mako_template = 'widgets/sequence-edit.html'
     module_class = SequenceModule
-
-    stores_state = True  # For remembering where in the sequence the student is
 
     js = {'coffee': [resource_string(__name__, 'js/src/sequence/edit.coffee')]}
     js_module_name = "SequenceDescriptor"

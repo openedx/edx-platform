@@ -3,16 +3,14 @@ import csv
 from zipfile import ZipFile, is_zipfile
 from time import strptime, strftime
 
-from collections import OrderedDict
 from datetime import datetime
-from os.path import isdir
-from optparse import make_option
-from dogapi import dog_http_api, dog_stats_api
+from dogapi import dog_http_api
 
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
 
 from student.models import TestCenterUser, TestCenterRegistration
+from pytz import UTC
 
 
 class Command(BaseCommand):
@@ -68,7 +66,7 @@ class Command(BaseCommand):
                     Command.datadog_error("Found authorization record for user {}".format(registration.testcenter_user.user.username), eacfile.name)
                     # now update the record:
                     registration.upload_status = row['Status']
-                    registration.upload_error_message =  row['Message']
+                    registration.upload_error_message = row['Message']
                     try:
                         registration.processed_at = strftime('%Y-%m-%d %H:%M:%S', strptime(row['Date'], '%Y/%m/%d %H:%M:%S'))
                     except ValueError as ve:
@@ -80,7 +78,7 @@ class Command(BaseCommand):
                         except ValueError as ve:
                             Command.datadog_error("Bad AuthorizationID value found for {}: message {}".format(client_authorization_id, ve), eacfile.name)
 
-                    registration.confirmed_at = datetime.utcnow()
+                    registration.confirmed_at = datetime.now(UTC)
                     registration.save()
                 except TestCenterRegistration.DoesNotExist:
                     Command.datadog_error("Failed to find record for client_auth_id {}".format(client_authorization_id), eacfile.name)

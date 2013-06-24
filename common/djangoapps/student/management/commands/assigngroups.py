@@ -1,9 +1,4 @@
-import os.path
-
-from lxml import etree
-
 from django.core.management.base import BaseCommand
-from django.conf import settings
 from django.contrib.auth.models import User
 
 import mitxmako.middleware as middleware
@@ -14,6 +9,7 @@ import sys
 import datetime
 
 import json
+from pytz import UTC
 
 middleware.MakoMiddleware()
 
@@ -32,7 +28,7 @@ def group_from_value(groups, v):
 
 
 class Command(BaseCommand):
-    help =  \
+    help = \
 ''' Assign users to test groups. Takes a list
 of groups:
 a:0.3,b:0.4,c:0.3 file.txt "Testing something"
@@ -75,7 +71,7 @@ Will log what happened to file.txt.
             utg = UserTestGroup()
             utg.name = group
             utg.description = json.dumps({"description": args[2]},
-                                         {"time": datetime.datetime.utcnow().isoformat()})
+                                         {"time": datetime.datetime.now(UTC).isoformat()})
             group_objects[group] = utg
             group_objects[group].save()
 

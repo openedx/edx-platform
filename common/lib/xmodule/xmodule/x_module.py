@@ -1,4 +1,5 @@
 import logging
+import copy
 import yaml
 import os
 
@@ -9,13 +10,30 @@ from pkg_resources import resource_listdir, resource_string, resource_isdir
 from xmodule.modulestore import Location
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
-from xblock.core import XBlock, Scope, String
+from xblock.core import XBlock, Scope, String, Integer, Float, ModelType
 
 log = logging.getLogger(__name__)
 
 
-def dummy_track(event_type, event):
+def dummy_track(_event_type, _event):
     pass
+
+
+class LocationField(ModelType):
+    """
+    XBlock field for storing Location values
+    """
+    def from_json(self, value):
+        """
+        Parse the json value as a Location
+        """
+        return Location(value)
+
+    def to_json(self, value):
+        """
+        Store the Location as a url string in json
+        """
+        return value.url()
 
 
 class HTMLSnippet(object):
@@ -75,14 +93,25 @@ class HTMLSnippet(object):
         """
         raise NotImplementedError(
             "get_html() must be provided by specific modules - not present in {0}"
-                                  .format(self.__class__))
+            .format(self.__class__))
 
 
 class XModuleFields(object):
     display_name = String(
-        help="Display name for this module",
+        display_name="Display Name",
+        help="This name appears in the horizontal navigation at the top of the page.",
         scope=Scope.settings,
         default=None
+    )
+
+    # Please note that in order to be compatible with XBlocks more generally,
+    # the LMS and CMS shouldn't be using this field. It's only for internal
+    # consumption by the XModules themselves
+    location = LocationField(
+        display_name="Location",
+        help="This is the location id for the XModule.",
+        scope=Scope.content,
+        default=Location(None),
     )
 
 
@@ -104,24 +133,20 @@ class XModule(XModuleFields, HTMLSnippet, XBlock):
     icon_class = 'other'
 
 
-    def __init__(self, system, location, descriptor, model_data):
+    def __init__(self, runtime, descriptor, model_data):
         '''
         Construct a new xmodule
 
-        system: A ModuleSystem allowing access to external resources
-
-        location: Something Location-like that identifies this xmodule
+        runtime: An XBlock runtime allowing access to external resources
 
         descriptor: the XModuleDescriptor that this module is an instance of.
-            TODO (vshnayder): remove the definition parameter and location--they
-            can come from the descriptor.
 
         model_data: A dictionary-like object that maps field names to values
             for those fields.
         '''
+        super(XModule, self).__init__(runtime, model_data)
         self._model_data = model_data
-        self.system = system
-        self.location = Location(location)
+        self.system = runtime
         self.descriptor = descriptor
         self.url_name = self.location.name
         self.category = self.location.category
@@ -206,7 +231,7 @@ class XModule(XModuleFields, HTMLSnippet, XBlock):
         '''
         return self.icon_class
 
-    ### Functions used in the LMS
+    # Functions used in the LMS
 
     def get_score(self):
         """
@@ -247,23 +272,10 @@ class XModule(XModuleFields, HTMLSnippet, XBlock):
         '''
         return None
 
-    def handle_ajax(self, dispatch, get):
+    def handle_ajax(self, _dispatch, _get):
         ''' dispatch is last part of the URL.
             get is a dictionary-like object '''
         return ""
-
-    # cdodge: added to support dynamic substitutions of
-    # links for courseware assets (e.g. images). <link> is passed through from lxml.html parser
-    def rewrite_content_links(self, link):
-        # see if we start with our format, e.g. 'xasset:<filename>'
-        if link.startswith(XASSET_SRCREF_PREFIX):
-            # yes, then parse out the name
-            name = link[len(XASSET_SRCREF_PREFIX):]
-            loc = Location(self.location)
-            # resolve the reference to our internal 'filepath' which
-            link = StaticContent.compute_location_filename(loc.org, loc.course, name)
-
-        return link
 
 
 def policy_key(location):
@@ -325,10 +337,6 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
 
     # Attributes for inspection of the descriptor
 
-    # Indicates whether the xmodule state should be
-    # stored in a database (independent of shared state)
-    stores_state = False
-
     # This indicates whether the xmodule is a problem-type.
     # It should respond to max_score() and grade(). It can be graded or ungraded
     # (like a practice problem).
@@ -342,13 +350,12 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
     template_dir_name = "default"
 
     # Class level variable
+
+    # True if this descriptor always requires recalculation of grades, for
+    # example if the score can change via an extrnal service, not just when the
+    # student interacts with the module on the page.  A specific example is
+    # FoldIt, which posts grade-changing updates through a separate API.
     always_recalculate_grades = False
-    """
-    Return whether this descriptor always requires recalculation of grades, for
-    example if the score can change via an extrnal service, not just when the
-    student interacts with the module on the page.  A specific example is
-    FoldIt, which posts grade-changing updates through a separate API.
-    """
 
     # VS[compat].  Backwards compatibility code that can go away after
     # importing 2012 courses.
@@ -356,13 +363,10 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
     metadata_translations = {
         'slug': 'url_name',
         'name': 'display_name',
-        }
+    }
 
     # ============================= STRUCTURAL MANIPULATION ===================
-    def __init__(self,
-                 system,
-                 location,
-                 model_data):
+    def __init__(self, *args, **kwargs):
         """
         Construct a new XModuleDescriptor. The only required arguments are the
         system, used for interaction with external resources, and the
@@ -373,19 +377,17 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         This allows for maximal flexibility to add to the interface while
         preserving backwards compatibility.
 
-        system: A DescriptorSystem for interacting with external resources
-
-        location: Something Location-like that identifies this xmodule
+        runtime: A DescriptorSystem for interacting with external resources
 
         model_data: A dictionary-like object that maps field names to values
             for those fields.
+
+        XModuleDescriptor.__init__ takes the same arguments as xblock.core:XBlock.__init__
         """
-        self.system = system
-        self.location = Location(location)
+        super(XModuleDescriptor, self).__init__(*args, **kwargs)
+        self.system = self.runtime
         self.url_name = self.location.name
         self.category = self.location.category
-        self._model_data = model_data
-
         self._child_instances = None
 
     @property
@@ -443,7 +445,6 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         """
         return self.module_class(
             system,
-            self.location,
             self,
             system.xblock_model_data(self),
         )
@@ -457,7 +458,6 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         children that the module will return for any student.
         """
         return False
-
 
     # ================================= JSON PARSING ===========================
     @staticmethod
@@ -513,7 +513,9 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
             else:
                 model_data['data'] = definition['data']
 
-        return cls(system=system, location=json_data['location'], model_data=model_data)
+        model_data['location'] = json_data['location']
+
+        return cls(system, model_data)
 
     @classmethod
     def _translate(cls, key):
@@ -523,10 +525,10 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
     # ================================= XML PARSING ============================
     @staticmethod
     def load_from_xml(xml_data,
-            system,
-            org=None,
-            course=None,
-            default_class=None):
+                      system,
+                      org=None,
+                      course=None,
+                      default_class=None):
         """
         This method instantiates the correct subclass of XModuleDescriptor based
         on the contents of xml_data.
@@ -541,7 +543,7 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         class_ = XModuleDescriptor.load_class(
             etree.fromstring(xml_data).tag,
             default_class
-            )
+        )
         # leave next line, commented out - useful for low-level debugging
         # log.debug('[XModuleDescriptor.load_from_xml] tag=%s, class_=%s' % (
         #        etree.fromstring(xml_data).tag,class_))
@@ -625,7 +627,7 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         """
         inherited_metadata = getattr(self, '_inherited_metadata', {})
         inheritable_metadata = getattr(self, '_inheritable_metadata', {})
-        metadata = {}
+        metadata_fields = {}
         for field in self.fields:
 
             if field.scope != Scope.settings or field in self.non_editable_metadata_fields:
@@ -641,13 +643,39 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
                 if field.name in inherited_metadata:
                     explicitly_set = False
 
-            metadata[field.name] = {'field': field,
-                                    'value': value,
-                                    'default_value': default_value,
-                                    'inheritable': inheritable,
-                                    'explicitly_set': explicitly_set }
+            # We support the following editors:
+            # 1. A select editor for fields with a list of possible values (includes Booleans).
+            # 2. Number editors for integers and floats.
+            # 3. A generic string editor for anything else (editing JSON representation of the value).
+            editor_type = "Generic"
+            values = [] if field.values is None else copy.deepcopy(field.values)
+            if isinstance(values, tuple):
+                values = list(values)
+            if isinstance(values, list):
+                if len(values) > 0:
+                    editor_type = "Select"
+                for index, choice in enumerate(values):
+                    json_choice = copy.deepcopy(choice)
+                    if isinstance(json_choice, dict) and 'value' in json_choice:
+                        json_choice['value'] = field.to_json(json_choice['value'])
+                    else:
+                        json_choice = field.to_json(json_choice)
+                    values[index] = json_choice
+            elif isinstance(field, Integer):
+                editor_type = "Integer"
+            elif isinstance(field, Float):
+                editor_type = "Float"
+            metadata_fields[field.name] = {'field_name': field.name,
+                                           'type': editor_type,
+                                           'display_name': field.display_name,
+                                           'value': field.to_json(value),
+                                           'options': values,
+                                           'default_value': field.to_json(default_value),
+                                           'inheritable': inheritable,
+                                           'explicitly_set': explicitly_set,
+                                           'help': field.help}
 
-        return metadata
+        return metadata_fields
 
 
 class DescriptorSystem(object):
@@ -740,7 +768,7 @@ class ModuleSystem(object):
                  s3_interface=None,
                  cache=None,
                  can_execute_unsafe_code=None,
-                ):
+    ):
         '''
         Create a closure around the system environment.
 
@@ -834,7 +862,7 @@ class ModuleSystem(object):
 
 class DoNothingCache(object):
     """A duck-compatible object to use in ModuleSystem when there's no cache."""
-    def get(self, key):
+    def get(self, _key):
         return None
 
     def set(self, key, value, timeout=None):

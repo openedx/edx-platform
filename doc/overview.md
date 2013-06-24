@@ -1,4 +1,4 @@
-# Documentation for edX code (mitx repo)
+# Documentation for edX code (edx-platform repo)
 
 This document explains the general structure of the edX platform, and defines some of the acronyms and terms you'll see flying around in the code.
 
@@ -121,11 +121,6 @@ We use a fork of django-pipeline to make sure that the js and css always reflect
 In production, the django `collectstatic` command recompiles everything and puts all the generated static files in a static/ dir.  A starting point in the code is `django-pipeline/pipeline/packager.py:pack`.
 
 In development, we don't use collectstatic, instead accessing the files in place.  The auto-compilation is run via `common/djangoapps/pipeline_mako/templates/static_content.html`.  Details: templates include `<%namespace name='static' file='static_content.html'/>`, then something like `<%static:css group='application'/>` to call the functions in `common/djangoapps/pipeline_mako/__init__.py`, which call the `django-pipeline` compilers.
-
-### Other modules
-
-- Wiki -- in `lms/djangoapps/simplewiki`.  Has some markdown extentions for embedding circuits, videos, etc.
-
 
 ## Testing
 

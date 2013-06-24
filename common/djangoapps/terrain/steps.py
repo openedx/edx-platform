@@ -15,13 +15,13 @@ from lettuce import world, step
 from .course_helpers import *
 from .ui_helpers import *
 from lettuce.django import django_url
-from nose.tools import assert_equals, assert_in
+from nose.tools import assert_equals
 
 from logging import getLogger
 logger = getLogger(__name__)
 
 
-@step(u'I wait (?:for )?"(\d+)" seconds?$')
+@step(r'I wait (?:for )?"(\d+)" seconds?$')
 def wait(step, seconds):
     world.wait(seconds)
 
@@ -129,9 +129,12 @@ def should_have_link_with_id_and_text(step, link_id, text):
     assert_equals(link.text, text)
 
 
-@step(r'should see "(.*)" (?:somewhere|anywhere) in (?:the|this) page')
-def should_see_in_the_page(step, text):
-    assert_in(text, world.css_text('body'))
+@step(r'should( not)? see "(.*)" (?:somewhere|anywhere) (?:in|on) (?:the|this) page')
+def should_see_in_the_page(step, doesnt_appear, text):
+    if doesnt_appear:
+        assert world.browser.is_text_not_present(text, wait_time=5)
+    else:
+        assert world.browser.is_text_present(text, wait_time=5)
 
 
 @step('I am logged in$')
@@ -156,3 +159,33 @@ def registered_edx_user(step, uname):
 @step(u'All dialogs should be closed$')
 def dialogs_are_closed(step):
     assert world.dialogs_closed()
+
+
+@step('I will confirm all alerts')
+def i_confirm_all_alerts(step):
+    """
+    Please note: This method must be called RIGHT BEFORE an expected alert
+    Window variables are page local and thus all changes are removed upon navigating to a new page
+    In addition, this method changes the functionality of ONLY future alerts
+    """
+    world.browser.execute_script('window.confirm = function(){return true;} ; window.alert = function(){return;}')
+
+
+@step('I will cancel all alerts')
+def i_cancel_all_alerts(step):
+    """
+    Please note: This method must be called RIGHT BEFORE an expected alert
+    Window variables are page local and thus all changes are removed upon navigating to a new page
+    In addition, this method changes the functionality of ONLY future alerts
+    """
+    world.browser.execute_script('window.confirm = function(){return false;} ; window.alert = function(){return;}')
+
+
+@step('I will answer all prompts with "([^"]*)"')
+def i_answer_prompts_with(step, prompt):
+    """
+    Please note: This method must be called RIGHT BEFORE an expected alert
+    Window variables are page local and thus all changes are removed upon navigating to a new page
+    In addition, this method changes the functionality of ONLY future alerts
+    """
+    world.browser.execute_script('window.prompt = function(){return %s;}') % prompt

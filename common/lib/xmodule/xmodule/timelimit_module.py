@@ -1,4 +1,3 @@
-import json
 import logging
 
 from lxml import etree
@@ -122,9 +121,6 @@ class TimeLimitModule(TimeLimitFields, XModule):
 class TimeLimitDescriptor(TimeLimitFields, XMLEditingDescriptor, XmlDescriptor):
 
     module_class = TimeLimitModule
-
-    # For remembering when a student started, and when they should end
-    stores_state = True
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):

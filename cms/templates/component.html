@@ -1,19 +1,41 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%namespace name='static' file='static_content.html'/>
+
+<script type="text/javascript" src="${static.url('js/models/metadata_model.js')}"></script>
+<script type="text/javascript" src="${static.url('js/views/metadata_editor_view.js')}"></script>
+<script src="${static.url('js/vendor/html5-input-polyfills/number-polyfill.js')}"></script>
+<link rel="stylesheet" type="text/css" href="${static.url('css/vendor/html5-input-polyfills/number-polyfill.css')}" />
+
 <div class="wrapper wrapper-component-editor">
 	<div class="component-editor">
-	  <div class="module-editor">
-	    ${editor}
-	  </div>
-	  <div class="row module-actions">
-			<a href="#" class="save-button">Save</a>
-			<a href="#" class="cancel-button">Cancel</a>	  	
-	  </div>
-	</div>
+		<div class="component-edit-header">
+  			<span class="component-name"></span>
+  	  		<ul class="nav-edit-modes">
+  	  			<li id="editor-mode" class="mode active-mode" aria-controls="editor-tab" role="tab">
+  	  				<a href="#">${_("Editor")}</a>
+	  			</li>
+	  			<li id="settings-mode" class="mode active-mode" aria-controls="settings-tab" role="tab">
+	  				<a href="#">${_("Settings")}</a>
+	  			</li>
+	  		</ul>
+		</div> <!-- Editor Header -->
+
+		<div class="component-edit-modes">
+	        <div class="module-editor">
+	            ${editor}
+	        </div>
+		</div>
+		<div class="row module-actions">
+	  		<a href="#" class="save-button">${_("Save")}</a>
+	  		<a href="#" class="cancel-button">${_("Cancel")}</a>
+		</div> <!-- Module Actions-->
+  </div>
 </div>
 
 <div class="component-actions">
-  <a href="#" class="edit-button standard"><span class="edit-icon"></span>Edit</a>
-  <a href="#" class="delete-button standard"><span class="delete-icon"></span>Delete</a>  
+  <a href="#" class="edit-button standard"><span class="edit-icon"></span>${_("Edit")}</a>
+  <a href="#" class="delete-button standard"><span class="delete-icon"></span>${_("Delete")}</a>
 </div>
-<a data-tooltip="Drag to reorder" href="#" class="drag-handle"></a>
+<a data-tooltip='${_("Drag to reorder")}' href="#" class="drag-handle"></a>
 ${preview}
 

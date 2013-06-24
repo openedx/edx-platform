@@ -2,33 +2,38 @@
   <h2> ${display_name} </h2>
 % endif
 
-%if settings.MITX_FEATURES['STUB_VIDEO_FOR_TESTING']:
-  <div id="stub_out_video_for_testing"></div>
-%else:
-  <div
-      id="video_${id}"
-      class="video"
-      data-streams="${youtube_streams}"
-      ${'data-sub="{}"'.format(sub) if sub else ''}
-      ${'data-mp4-source="{}"'.format(sources.get('mp4')) if sources.get('mp4') else ''}
-      ${'data-webm-source="{}"'.format(sources.get('webm')) if sources.get('webm') else ''}
-      ${'data-ogg-source="{}"'.format(sources.get('ogv')) if sources.get('ogv') else ''}
-      data-caption-data-dir="${data_dir}"
-      data-show-captions="${show_captions}"
-      data-start="${start}"
-      data-end="${end}"
-      data-caption-asset-path="${caption_asset_path}"
-  >
-    <div class="tc-wrapper">
-      <article class="video-wrapper">
-        <section class="video-player">
-          <div id="${id}"></div>
-        </section>
-        <section class="video-controls"></section>
-      </article>
-    </div>
-  </div>
-%endif
+<div
+  id="video_${id}"
+  class="video"
+  
+  % if not settings.MITX_FEATURES['STUB_VIDEO_FOR_TESTING']:
+  data-streams="${youtube_streams}"
+  % endif
+
+  ${'data-sub="{}"'.format(sub) if sub else ''}
+
+  % if not settings.MITX_FEATURES['STUB_VIDEO_FOR_TESTING']:
+  ${'data-mp4-source="{}"'.format(sources.get('mp4')) if sources.get('mp4') else ''}
+  ${'data-webm-source="{}"'.format(sources.get('webm')) if sources.get('webm') else ''}
+  ${'data-ogg-source="{}"'.format(sources.get('ogv')) if sources.get('ogv') else ''}
+  % endif
+
+  data-caption-data-dir="${data_dir}"
+  data-show-captions="${show_captions}"
+  data-start="${start}"
+  data-end="${end}"
+  data-caption-asset-path="${caption_asset_path}"
+  data-autoplay="${autoplay}"
+>
+<div class="tc-wrapper">
+  <article class="video-wrapper">
+    <section class="video-player">
+      <div id="${id}"></div>
+    </section>
+    <section class="video-controls"></section>
+  </article>
+</div>
+</div>
 
 % if sources.get('main'):
 <div class="video-sources">

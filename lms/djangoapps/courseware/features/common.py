@@ -1,5 +1,5 @@
-#pylint: disable=C0111
-#pylint: disable=W0621
+# pylint: disable=C0111
+# pylint: disable=W0621
 
 from __future__ import absolute_import
 
@@ -20,7 +20,7 @@ logger = getLogger(__name__)
 
 TEST_COURSE_ORG = 'edx'
 TEST_COURSE_NAME = 'Test Course'
-TEST_SECTION_NAME = "Problem"
+TEST_SECTION_NAME = 'Test Section'
 
 
 @step(u'The course "([^"]*)" exists$')

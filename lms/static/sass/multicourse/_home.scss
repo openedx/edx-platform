@@ -15,7 +15,7 @@
     @include clearfix;
     height: 460px;
     overflow: hidden;
-    margin-top: -69px;
+    margin-top: $header_image_margin;
     padding: 0px;
     width: flex-grid(12);
 
@@ -53,7 +53,7 @@
         @include box-sizing(border-box);
         @include inline-block;
         left: 0px;
-        opacity: 1;
+        opacity: 1.0;
         padding: 20px 30px;
         top: 0px;
         @include transition(all, 0.2s, linear);
@@ -312,7 +312,7 @@
           text-decoration: none;
 
           &::before {
-            opacity: 1;
+            opacity: 1.0;
           }
 
           .name {

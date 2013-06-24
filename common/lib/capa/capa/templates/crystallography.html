@@ -20,9 +20,9 @@
     % endif
 
 
-    <input type="text" name="input_${id}" id="input_${id}" value="${value|h}" style="display:none;"/>
+    <input type="text" name="input_${id}" aria-describedby="answer_${id}" id="input_${id}" value="${value|h}" style="display:none;"/>
 
-    <p class="status">
+    <p class="status" aria-describedby="input_${id}">
         % if status == 'unsubmitted':
         unanswered
         % elif status == 'correct':

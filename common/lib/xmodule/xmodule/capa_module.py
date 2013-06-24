@@ -11,16 +11,16 @@ import sys
 from pkg_resources import resource_string
 
 from capa.capa_problem import LoncapaProblem
-from capa.responsetypes import StudentInputError,\
+from capa.responsetypes import StudentInputError, \
     ResponseError, LoncapaProblemError
 from capa.util import convert_files_to_filenames
 from .progress import Progress
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
-from xblock.core import Scope, String, Boolean, Object
-from .fields import Timedelta, Date, StringyInteger, StringyFloat
-from xmodule.util.date_utils import time_to_datetime
+from xblock.core import Scope, String, Boolean, Dict, Integer, Float
+from .fields import Timedelta, Date
+from django.utils.timezone import UTC
 
 log = logging.getLogger("mitx.courseware")
 
@@ -65,29 +65,60 @@ class ComplexEncoder(json.JSONEncoder):
 
 
 class CapaFields(object):
-    attempts = StringyInteger(help="Number of attempts taken by the student on this problem", default=0, scope=Scope.user_state)
-    max_attempts = StringyInteger(help="Maximum number of attempts that a student is allowed", scope=Scope.settings)
+    attempts = Integer(help="Number of attempts taken by the student on this problem", default=0, scope=Scope.user_state)
+    max_attempts = Integer(
+        display_name="Maximum Attempts",
+        help="Defines the number of times a student can try to answer this problem. If the value is not set, infinite attempts are allowed.",
+        values={"min": 0}, scope=Scope.settings
+    )
     due = Date(help="Date that this problem is due by", scope=Scope.settings)
     graceperiod = Timedelta(help="Amount of time after the due date that submissions will be accepted", scope=Scope.settings)
-    showanswer = String(help="When to show the problem answer to the student", scope=Scope.settings, default="closed",
-                        values=["answered", "always", "attempted", "closed", "never"])
+    showanswer = String(
+        display_name="Show Answer",
+        help="Defines when to show the answer to the problem. A default value can be set in Advanced Settings.",
+        scope=Scope.settings, default="closed",
+        values=[
+            {"display_name": "Always", "value": "always"},
+            {"display_name": "Answered", "value": "answered"},
+            {"display_name": "Attempted", "value": "attempted"},
+            {"display_name": "Closed", "value": "closed"},
+            {"display_name": "Finished", "value": "finished"},
+            {"display_name": "Past Due", "value": "past_due"},
+            {"display_name": "Never", "value": "never"}]
+    )
     force_save_button = Boolean(help="Whether to force the save button to appear on the page", scope=Scope.settings, default=False)
-    rerandomize = Randomization(help="When to rerandomize the problem", default="always", scope=Scope.settings)
+    rerandomize = Randomization(
+        display_name="Randomization", help="Defines how often inputs are randomized when a student loads the problem. This setting only applies to problems that can have randomly generated numeric values. A default value can be set in Advanced Settings.",
+        default="always", scope=Scope.settings, values=[{"display_name": "Always", "value": "always"},
+                                                        {"display_name": "On Reset", "value": "onreset"},
+                                                        {"display_name": "Never", "value": "never"},
+                                                        {"display_name": "Per Student", "value": "per_student"}]
+    )
     data = String(help="XML data for the problem", scope=Scope.content)
-    correct_map = Object(help="Dictionary with the correctness of current student answers", scope=Scope.user_state, default={})
-    input_state = Object(help="Dictionary for maintaining the state of inputtypes", scope=Scope.user_state)
-    student_answers = Object(help="Dictionary with the current student responses", scope=Scope.user_state)
+    correct_map = Dict(help="Dictionary with the correctness of current student answers", scope=Scope.user_state, default={})
+    input_state = Dict(help="Dictionary for maintaining the state of inputtypes", scope=Scope.user_state)
+    student_answers = Dict(help="Dictionary with the current student responses", scope=Scope.user_state)
     done = Boolean(help="Whether the student has answered the problem", scope=Scope.user_state)
-    seed = StringyInteger(help="Random seed for this student", scope=Scope.user_state)
-    weight = StringyFloat(help="How much to weight this problem by", scope=Scope.settings)
+    seed = Integer(help="Random seed for this student", scope=Scope.user_state)
+    weight = Float(
+        display_name="Problem Weight",
+        help="Defines the number of points each problem is worth. If the value is not set, each response field in the problem is worth one point.",
+        values={"min": 0, "step": .1},
+        scope=Scope.settings
+    )
     markdown = String(help="Markdown source of this module", scope=Scope.settings)
-    source_code = String(help="Source code for LaTeX and Word problems. This feature is not well-supported.", scope=Scope.settings)
+    source_code = String(
+        help="Source code for LaTeX and Word problems. This feature is not well-supported.",
+        scope=Scope.settings
+    )
 
 
 class CapaModule(CapaFields, XModule):
     '''
     An XModule implementing LonCapa format problems, implemented by way of
     capa.capa_problem.LoncapaProblem
+
+    CapaModule.__init__ takes the same arguments as xmodule.x_module:XModule.__init__
     '''
     icon_class = 'problem'
 
@@ -102,10 +133,11 @@ class CapaModule(CapaFields, XModule):
     js_module_name = "Problem"
     css = {'scss': [resource_string(__name__, 'css/capa/display.scss')]}
 
-    def __init__(self, system, location, descriptor, model_data):
-        XModule.__init__(self, system, location, descriptor, model_data)
+    def __init__(self, *args, **kwargs):
+        """ Accepts the same arguments as xmodule.x_module:XModule.__init__ """
+        XModule.__init__(self, *args, **kwargs)
 
-        due_date = time_to_datetime(self.due)
+        due_date = self.due
 
         if self.graceperiod is not None and due_date:
             self.close_date = due_date + self.graceperiod
@@ -247,7 +279,7 @@ class CapaModule(CapaFields, XModule):
         """
         Return True/False to indicate whether to show the "Check" button.
         """
-        submitted_without_reset = (self.is_completed() and self.rerandomize == "always")
+        submitted_without_reset = (self.is_submitted() and self.rerandomize == "always")
 
         # If the problem is closed (past due / too many attempts)
         # then we do NOT show the "check" button
@@ -270,7 +302,7 @@ class CapaModule(CapaFields, XModule):
             # then do NOT show the reset button.
             # If the problem hasn't been submitted yet, then do NOT show
             # the reset button.
-            if (self.closed() and not is_survey_question) or not self.is_completed():
+            if (self.closed() and not is_survey_question) or not self.is_submitted():
                 return False
             else:
                 return True
@@ -286,11 +318,11 @@ class CapaModule(CapaFields, XModule):
         # If the user has forced the save button to display,
         # then show it as long as the problem is not closed
         # (past due / too many attempts)
-        if self.force_save_button == "true":
+        if self.force_save_button:
             return not self.closed()
         else:
             is_survey_question = (self.max_attempts == 0)
-            needs_reset = self.is_completed() and self.rerandomize == "always"
+            needs_reset = self.is_submitted() and self.rerandomize == "always"
 
             # If the student has unlimited attempts, and their answers
             # are not randomized, then we do not need a save button
@@ -392,7 +424,7 @@ class CapaModule(CapaFields, XModule):
 
         # If we cannot construct the problem HTML,
         # then generate an error message instead.
-        except Exception, err:
+        except Exception as err:
             html = self.handle_problem_html_error(err)
 
         # The convention is to pass the name of the check button
@@ -473,7 +505,7 @@ class CapaModule(CapaFields, XModule):
         Is it now past this problem's due date, including grace period?
         """
         return (self.close_date is not None and
-                datetime.datetime.utcnow() > self.close_date)
+                datetime.datetime.now(UTC()) > self.close_date)
 
     def closed(self):
         ''' Is the student still allowed to submit answers? '''
@@ -484,13 +516,18 @@ class CapaModule(CapaFields, XModule):
 
         return False
 
-    def is_completed(self):
-        # used by conditional module
-        # return self.answer_available()
+    def is_submitted(self):
+        """
+        Used to decide to show or hide RESET or CHECK buttons.
+
+        Means that student submitted problem and nothing more.
+        Problem can be completely wrong.
+        Pressing RESET button makes this function to return False.
+        """
         return self.lcp.done
 
     def is_attempted(self):
-        # used by conditional module
+        """Used by conditional module"""
         return self.attempts > 0
 
     def is_correct(self):
@@ -623,7 +660,7 @@ class CapaModule(CapaFields, XModule):
     @staticmethod
     def make_dict_of_responses(get):
         '''Make dictionary of student responses (aka "answers")
-        get is POST dictionary (Djano QueryDict).
+        get is POST dictionary (Django QueryDict).
 
         The *get* dict has keys of the form 'x_y', which are mapped
         to key 'y' in the returned dict.  For example,
@@ -707,18 +744,18 @@ class CapaModule(CapaFields, XModule):
         # Too late. Cannot submit
         if self.closed():
             event_info['failure'] = 'closed'
-            self.system.track_function('save_problem_check_fail', event_info)
+            self.system.track_function('problem_check_fail', event_info)
             raise NotFoundError('Problem is closed')
 
         # Problem submitted. Student should reset before checking again
         if self.done and self.rerandomize == "always":
             event_info['failure'] = 'unreset'
-            self.system.track_function('save_problem_check_fail', event_info)
+            self.system.track_function('problem_check_fail', event_info)
             raise NotFoundError('Problem must be reset before it can be checked again')
 
         # Problem queued. Students must wait a specified waittime before they are allowed to submit
         if self.lcp.is_queued():
-            current_time = datetime.datetime.now()
+            current_time = datetime.datetime.now(UTC())
             prev_submit_time = self.lcp.get_recentmost_queuetime()
             waittime_between_requests = self.system.xqueue['waittime']
             if (current_time - prev_submit_time).total_seconds() < waittime_between_requests:
@@ -727,6 +764,8 @@ class CapaModule(CapaFields, XModule):
 
         try:
             correct_map = self.lcp.grade_answers(answers)
+            self.attempts = self.attempts + 1
+            self.lcp.done = True
             self.set_state_from_lcp()
 
         except (StudentInputError, ResponseError, LoncapaProblemError) as inst:
@@ -746,17 +785,13 @@ class CapaModule(CapaFields, XModule):
 
             return {'success': msg}
 
-        except Exception, err:
+        except Exception as err:
             if self.system.DEBUG:
                 msg = "Error checking problem: " + str(err)
                 msg += '\nTraceback:\n' + traceback.format_exc()
                 return {'success': msg}
             raise
 
-        self.attempts = self.attempts + 1
-        self.lcp.done = True
-
-        self.set_state_from_lcp()
         self.publish_grade()
 
         # success = correct if ALL questions in this problem are correct
@@ -770,7 +805,7 @@ class CapaModule(CapaFields, XModule):
         event_info['correct_map'] = correct_map.get_dict()
         event_info['success'] = success
         event_info['attempts'] = self.attempts
-        self.system.track_function('save_problem_check', event_info)
+        self.system.track_function('problem_check', event_info)
 
         if hasattr(self.system, 'psychometrics_handler'):  # update PsychometricsData using callback
             self.system.psychometrics_handler(self.get_state_for_lcp())
@@ -782,12 +817,92 @@ class CapaModule(CapaFields, XModule):
                 'contents': html,
                 }
 
+    def rescore_problem(self):
+        """
+        Checks whether the existing answers to a problem are correct.
+
+        This is called when the correct answer to a problem has been changed,
+        and the grade should be re-evaluated.
+
+        Returns a dict with one key:
+            {'success' : 'correct' | 'incorrect' | AJAX alert msg string }
+
+        Raises NotFoundError if called on a problem that has not yet been
+        answered, or NotImplementedError if it's a problem that cannot be rescored.
+
+        Returns the error messages for exceptions occurring while performing
+        the rescoring, rather than throwing them.
+        """
+        event_info = {'state': self.lcp.get_state(), 'problem_id': self.location.url()}
+
+        if not self.lcp.supports_rescoring():
+            event_info['failure'] = 'unsupported'
+            self.system.track_function('problem_rescore_fail', event_info)
+            raise NotImplementedError("Problem's definition does not support rescoring")
+
+        if not self.done:
+            event_info['failure'] = 'unanswered'
+            self.system.track_function('problem_rescore_fail', event_info)
+            raise NotFoundError('Problem must be answered before it can be graded again')
+
+        # get old score, for comparison:
+        orig_score = self.lcp.get_score()
+        event_info['orig_score'] = orig_score['score']
+        event_info['orig_total'] = orig_score['total']
+
+        try:
+            correct_map = self.lcp.rescore_existing_answers()
+
+        except (StudentInputError, ResponseError, LoncapaProblemError) as inst:
+            log.warning("Input error in capa_module:problem_rescore", exc_info=True)
+            event_info['failure'] = 'input_error'
+            self.system.track_function('problem_rescore_fail', event_info)
+            return {'success': u"Error: {0}".format(inst.message)}
+
+        except Exception as err:
+            event_info['failure'] = 'unexpected'
+            self.system.track_function('problem_rescore_fail', event_info)
+            if self.system.DEBUG:
+                msg = u"Error checking problem: {0}".format(err.message)
+                msg += u'\nTraceback:\n' + traceback.format_exc()
+                return {'success': msg}
+            raise
+
+        # rescoring should have no effect on attempts, so don't
+        # need to increment here, or mark done.  Just save.
+        self.set_state_from_lcp()
+
+        self.publish_grade()
+
+        new_score = self.lcp.get_score()
+        event_info['new_score'] = new_score['score']
+        event_info['new_total'] = new_score['total']
+
+        # success = correct if ALL questions in this problem are correct
+        success = 'correct'
+        for answer_id in correct_map:
+            if not correct_map.is_correct(answer_id):
+                success = 'incorrect'
+
+        # NOTE: We are logging both full grading and queued-grading submissions. In the latter,
+        #       'success' will always be incorrect
+        event_info['correct_map'] = correct_map.get_dict()
+        event_info['success'] = success
+        event_info['attempts'] = self.attempts
+        self.system.track_function('problem_rescore', event_info)
+
+        # psychometrics should be called on rescoring requests in the same way as check-problem
+        if hasattr(self.system, 'psychometrics_handler'):  # update PsychometricsData using callback
+            self.system.psychometrics_handler(self.get_state_for_lcp())
+
+        return {'success': success}
+
     def save_problem(self, get):
-        '''
+        """
         Save the passed in answers.
-        Returns a dict { 'success' : bool, ['error' : error-msg]},
-        with the error key only present if success is False.
-        '''
+        Returns a dict { 'success' : bool, 'msg' : message }
+        The message is informative on success, and an error message on failure.
+        """
         event_info = dict()
         event_info['state'] = self.lcp.get_state()
         event_info['problem_id'] = self.location.url()
@@ -873,7 +988,6 @@ class CapaDescriptor(CapaFields, RawDescriptor):
 
     module_class = CapaModule
 
-    stores_state = True
     has_score = True
     template_dir_name = 'problem'
     mako_template = "widgets/problem-edit.html"

@@ -1,19 +1,18 @@
-This is edX, a platform for online course delivery. The project is primarily
-written in [Python](http://python.org/), using the
-[Django](https://www.djangoproject.com/) framework. We also use some
-[Ruby](http://www.ruby-lang.org/) and some [NodeJS](http://nodejs.org/).
+This is the main edX platform which consists of LMS and Studio.
+
+See [code.edx.org](http://code.edx.org/) for other parts of the edX code base.
 
 Installation
 ============
-The installation process is a bit messy at the moment. Here's a high-level
-overview of what you should do to get started.
 
-**TLDR:** There is a `scripts/create-dev-env.sh` script that will attempt to set all
-of this up for you. If you're in a hurry, run that script. Otherwise, I suggest
-that you understand what the script is doing, and why, by reading this document.
+There is a `scripts/create-dev-env.sh` that will attempt to set up a development
+environment.
+
+If you want to better understand what the script is doing, keep reading.
 
 Directory Hierarchy
 -------------------
+
 This code assumes that it is checked out in a directory that has three sibling
 directories: `data` (used for XML course data), `db` (used to hold a
 [sqlite](https://sqlite.org/) database), and `log` (used to hold logs). If you
@@ -77,6 +76,7 @@ environment), and Node has a library installer called
 Once you've got your languages and virtual environments set up, install
 the libraries like so:
 
+    $ pip install -r requirements/edx/pre.txt
     $ pip install -r requirements/edx/base.txt
     $ pip install -r requirements/edx/post.txt
     $ bundle install
@@ -111,11 +111,11 @@ CMS templates. Fortunately, `rake` will do all of this for you! Just run:
 
     $ rake django-admin[syncdb]
     $ rake django-admin[migrate]
-    $ rake django-admin[update_templates]
+    $ rake cms:update_templates
 
 If you are running these commands using the [`zsh`](http://www.zsh.org/) shell,
 zsh will assume that you are doing
-[shell globbing](https://en.wikipedia.org/wiki/Glob_(programming)), search for
+[shell globbing](https://en.wikipedia.org/wiki/Glob_%28programming%29), search for
 a file in your directory named `django-adminsyncdb` or `django-adminmigrate`,
 and fail. To fix this, just surround the argument with quotation marks, so that
 you're running `rake "django-admin[syncdb]"`.
@@ -144,10 +144,28 @@ in the `data` directory, instead of in Mongo. To run this older version, run:
 
     $ rake lms
 
-Further Documentation
-=====================
-Once you've got your project up and running, you can check out the `docs`
-directory to see more documentation about how edX is structured.
+License
+-------
 
+The code in this repository is licensed under version 3 of the AGPL unless
+otherwise noted.
 
+Please see ``LICENSE.txt`` for details.
 
+How to Contribute
+-----------------
+
+Contributions are very welcome. The easiest way is to fork this repo, and then
+make a pull request from your fork. The first time you make a pull request, you
+may be asked to sign a Contributor Agreement.
+
+Reporting Security Issues
+-------------------------
+
+Please do not report security issues in public. Please email security@edx.org
+
+Mailing List and IRC Channel
+----------------------------
+
+You can discuss this code on the [edx-code Google Group](https://groups.google.com/forum/#!forum/edx-code) or in the
+`edx-code` IRC channel on Freenode.

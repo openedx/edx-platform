@@ -5,10 +5,10 @@ from pkg_resources import resource_string
 
 from xmodule.raw_module import RawDescriptor
 from .x_module import XModule
-from xblock.core import Integer, Scope, String, Boolean, List
+from xblock.core import Integer, Scope, String, List, Float, Boolean
 from xmodule.open_ended_grading_classes.combined_open_ended_modulev1 import CombinedOpenEndedV1Module, CombinedOpenEndedV1Descriptor
 from collections import namedtuple
-from .fields import Date, StringyFloat, StringyInteger, StringyBoolean
+from .fields import Date
 
 log = logging.getLogger("mitx.courseware")
 
@@ -48,27 +48,49 @@ class VersionInteger(Integer):
 
 
 class CombinedOpenEndedFields(object):
-    display_name = String(help="Display name for this module", default="Open Ended Grading", scope=Scope.settings)
-    current_task_number = StringyInteger(help="Current task that the student is on.", default=0, scope=Scope.user_state)
+    display_name = String(
+        display_name="Display Name",
+        help="This name appears in the horizontal navigation at the top of the page.",
+        default="Open Ended Grading", scope=Scope.settings
+    )
+    current_task_number = Integer(help="Current task that the student is on.", default=0, scope=Scope.user_state)
     task_states = List(help="List of state dictionaries of each task within this module.", scope=Scope.user_state)
     state = String(help="Which step within the current task that the student is on.", default="initial",
                    scope=Scope.user_state)
-    student_attempts = StringyInteger(help="Number of attempts taken by the student on this problem", default=0,
-                                      scope=Scope.user_state)
-    ready_to_reset = StringyBoolean(help="If the problem is ready to be reset or not.", default=False,
-                                    scope=Scope.user_state)
-    attempts = StringyInteger(help="Maximum number of attempts that a student is allowed.", default=1, scope=Scope.settings)
-    is_graded = StringyBoolean(help="Whether or not the problem is graded.", default=False, scope=Scope.settings)
-    accept_file_upload = StringyBoolean(help="Whether or not the problem accepts file uploads.", default=False,
-                                        scope=Scope.settings)
-    skip_spelling_checks = StringyBoolean(help="Whether or not to skip initial spelling checks.", default=True,
-                                          scope=Scope.settings)
+    student_attempts = Integer(help="Number of attempts taken by the student on this problem", default=0,
+                               scope=Scope.user_state)
+    ready_to_reset = Boolean(
+        help="If the problem is ready to be reset or not.", default=False,
+        scope=Scope.user_state
+    )
+    attempts = Integer(
+        display_name="Maximum Attempts",
+        help="The number of times the student can try to answer this problem.", default=1,
+        scope=Scope.settings, values={"min" : 1 }
+    )
+    is_graded = Boolean(display_name="Graded", help="Whether or not the problem is graded.", default=False, scope=Scope.settings)
+    accept_file_upload = Boolean(
+        display_name="Allow File Uploads",
+        help="Whether or not the student can submit files as a response.", default=False, scope=Scope.settings
+    )
+    skip_spelling_checks = Boolean(
+        display_name="Disable Quality Filter",
+        help="If False, the Quality Filter is enabled and submissions with poor spelling, short length, or poor grammar will not be peer reviewed.",
+        default=False, scope=Scope.settings
+    )
     due = Date(help="Date that this problem is due by", default=None, scope=Scope.settings)
-    graceperiod = String(help="Amount of time after the due date that submissions will be accepted", default=None,
-                         scope=Scope.settings)
+    graceperiod = String(
+        help="Amount of time after the due date that submissions will be accepted",
+        default=None,
+        scope=Scope.settings
+    )
     version = VersionInteger(help="Current version number", default=DEFAULT_VERSION, scope=Scope.settings)
     data = String(help="XML data for the problem", scope=Scope.content)
-    weight = StringyFloat(help="How much to weight this problem by", scope=Scope.settings)
+    weight = Float(
+        display_name="Problem Weight",
+        help="Defines the number of points each problem is worth. If the value is not set, each problem is worth one point.",
+        scope=Scope.settings, values={"min" : 0 , "step": ".1"}
+    )
     markdown = String(help="Markdown source of this module", scope=Scope.settings)
 
 
@@ -94,6 +116,8 @@ class CombinedOpenEndedModule(CombinedOpenEndedFields, XModule):
     incorporates multiple children (tasks):
         openendedmodule
         selfassessmentmodule
+
+    CombinedOpenEndedModule.__init__ takes the same arguments as xmodule.x_module:XModule.__init__
     """
     STATE_VERSION = 1
 
@@ -117,8 +141,7 @@ class CombinedOpenEndedModule(CombinedOpenEndedFields, XModule):
 
     css = {'scss': [resource_string(__name__, 'css/combinedopenended/display.scss')]}
 
-    def __init__(self, system, location, descriptor, model_data):
-        XModule.__init__(self, system, location, descriptor, model_data)
+    def __init__(self, *args, **kwargs):
         """
         Definition file should have one or many task blocks, a rubric block, and a prompt block:
 
@@ -153,9 +176,9 @@ class CombinedOpenEndedModule(CombinedOpenEndedFields, XModule):
         </combinedopenended>
 
         """
+        XModule.__init__(self, *args, **kwargs)
 
-        self.system = system
-        self.system.set('location', location)
+        self.system.set('location', self.location)
 
         if self.task_states is None:
             self.task_states = []
@@ -167,13 +190,11 @@ class CombinedOpenEndedModule(CombinedOpenEndedFields, XModule):
 
         attributes = self.student_attributes + self.settings_attributes
 
-        static_data = {
-            'rewrite_content_links': self.rewrite_content_links,
-        }
+        static_data = {}
         instance_state = {k: getattr(self, k) for k in attributes}
         self.child_descriptor = version_tuple.descriptor(self.system)
         self.child_definition = version_tuple.descriptor.definition_from_xml(etree.fromstring(self.data), self.system)
-        self.child_module = version_tuple.module(self.system, location, self.child_definition, self.child_descriptor,
+        self.child_module = version_tuple.module(self.system, self.location, self.child_definition, self.child_descriptor,
                                                  instance_state=instance_state, static_data=static_data,
                                                  attributes=attributes)
         self.save_instance_data()
@@ -217,7 +238,6 @@ class CombinedOpenEndedDescriptor(CombinedOpenEndedFields, RawDescriptor):
     mako_template = "widgets/open-ended-edit.html"
     module_class = CombinedOpenEndedModule
 
-    stores_state = True
     has_score = True
     always_recalculate_grades = True
     template_dir_name = "combinedopenended"
@@ -244,6 +264,6 @@ class CombinedOpenEndedDescriptor(CombinedOpenEndedFields, RawDescriptor):
     def non_editable_metadata_fields(self):
         non_editable_fields = super(CombinedOpenEndedDescriptor, self).non_editable_metadata_fields
         non_editable_fields.extend([CombinedOpenEndedDescriptor.due, CombinedOpenEndedDescriptor.graceperiod,
-                                    CombinedOpenEndedDescriptor.markdown])
+                                    CombinedOpenEndedDescriptor.markdown, CombinedOpenEndedDescriptor.version])
         return non_editable_fields
 

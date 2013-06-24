@@ -62,9 +62,10 @@ nav.course-material {
 
 header.global.slim {
   @include box-shadow(0 1px 2px rgba(0, 0, 0, .1));
-  height: 50px;
+  height: auto;
+  padding: 5px 0 10px 0;
   border-bottom: 1px solid $outer-border-color;
-  background: $white;
+  background: $header-bg;
 
   .guest .secondary {
     margin-right: 0;
@@ -106,16 +107,15 @@ header.global.slim {
     padding-top: 5px;
   }
 
-  h1.logo {    
-    margin-left: 13px;
-    margin-right: 20px;
+  h1.logo {
+    margin: 0 10px 0 13px;
     padding-right: 20px;
 
     &:before {
       @extend .faded-vertical-divider;
       content: "";
       display: block;
-      height: 40px;
+      height: 35px;
       position: absolute;
       right: 3px;
       top: 0;
@@ -126,11 +126,15 @@ header.global.slim {
       @extend .faded-vertical-divider-light;
       content: "";
       display: block;
-      height: 40px;
+      height: 35px;
       position: absolute;
-      right: 0px;
+      right: 0;
       top: 0;
       width: 1px;
+    }
+
+    img {
+      height: 30px;
     }
   }
 
@@ -147,6 +151,7 @@ header.global.slim {
     color: #777;
     letter-spacing: 0;
     margin-top: 9px;
+    margin-bottom: 0;
     text-transform: none;
     text-shadow: 0 1px 0 #fff;
     white-space: nowrap;

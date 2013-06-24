@@ -1,3 +1,15 @@
+# pylint: disable=W0223
+"""VideoAlpha is ungraded Xmodule for support video content.
+It's new improved video module, which support additional feature:
+
+- Can play non-YouTube video sources via in-browser HTML5 video player.
+- YouTube defaults to HTML5 mode from the start.
+- Speed changes in both YouTube and non-YouTube videos happen via
+in-browser HTML5 video method (when in HTML5 mode).
+- Navigational subtitles can be disabled altogether via an attribute
+in XML.
+"""
+
 import json
 import logging
 
@@ -5,6 +17,7 @@ from lxml import etree
 from pkg_resources import resource_string, resource_listdir
 
 from django.http import Http404
+from django.conf import settings
 
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
@@ -20,6 +33,7 @@ log = logging.getLogger(__name__)
 
 
 class VideoAlphaFields(object):
+    """Fields for `VideoAlphaModule` and `VideoAlphaDescriptor`."""
     data = String(help="XML data for the problem", scope=Scope.content)
     position = Integer(help="Current position in the video", scope=Scope.user_state, default=0)
     display_name = String(help="Display name for this module", scope=Scope.settings)
@@ -67,7 +81,7 @@ class VideoAlphaModule(VideoAlphaFields, XModule):
             'ogv': self._get_source(xmltree, ['ogv']),
         }
         self.track = self._get_track(xmltree)
-        self.start_time, self.end_time = self._get_timeframe(xmltree)
+        self.start_time, self.end_time = self.get_timeframe(xmltree)
 
     def _get_source(self, xmltree, exts=None):
         """Find the first valid source, which ends with one of `exts`."""
@@ -76,7 +90,7 @@ class VideoAlphaModule(VideoAlphaFields, XModule):
         return self._get_first_external(xmltree, 'source', condition)
 
     def _get_track(self, xmltree):
-        # find the first valid track
+        """Find the first valid track."""
         return self._get_first_external(xmltree, 'track')
 
     def _get_first_external(self, xmltree, tag, condition=bool):
@@ -92,39 +106,33 @@ class VideoAlphaModule(VideoAlphaFields, XModule):
                 break
         return result
 
-    def _get_timeframe(self, xmltree):
+    def get_timeframe(self, xmltree):
         """ Converts 'start_time' and 'end_time' parameters in video tag to seconds.
         If there are no parameters, returns empty string. """
 
-        def parse_time(s):
+        def parse_time(str_time):
             """Converts s in '12:34:45' format to seconds. If s is
             None, returns empty string"""
-            if s is None:
+            if str_time is None:
                 return ''
             else:
-                x = time.strptime(s, '%H:%M:%S')
+                obj_time = time.strptime(str_time, '%H:%M:%S')
                 return datetime.timedelta(
-                    hours=x.tm_hour,
-                    minutes=x.tm_min,
-                    seconds=x.tm_sec
+                    hours=obj_time.tm_hour,
+                    minutes=obj_time.tm_min,
+                    seconds=obj_time.tm_sec
                 ).total_seconds()
 
         return parse_time(xmltree.get('start_time')), parse_time(xmltree.get('end_time'))
 
     def handle_ajax(self, dispatch, get):
-        """Handle ajax calls to this video.
-        TODO (vshnayder): This is not being called right now, so the
-        position is not being saved.
-        """
+        """This is not being called right now and we raise 404 error."""
         log.debug(u"GET {0}".format(get))
         log.debug(u"DISPATCH {0}".format(dispatch))
-        if dispatch == 'goto_position':
-            self.position = int(float(get['position']))
-            log.info(u"NEW POSITION {0}".format(self.position))
-            return json.dumps({'success': True})
         raise Http404()
 
     def get_instance_state(self):
+        """Return information about state (position)."""
         return json.dumps({'position': self.position})
 
     def get_html(self):
@@ -142,16 +150,18 @@ class VideoAlphaModule(VideoAlphaFields, XModule):
             'sources': self.sources,
             'track': self.track,
             'display_name': self.display_name_with_default,
-            # TODO (cpennington): This won't work when we move to data that isn't on the filesystem
+            # This won't work when we move to data that
+            # isn't on the filesystem
             'data_dir': getattr(self, 'data_dir', None),
             'caption_asset_path': caption_asset_path,
             'show_captions': self.show_captions,
             'start': self.start_time,
-            'end': self.end_time
+            'end': self.end_time,
+            'autoplay': settings.MITX_FEATURES.get('AUTOPLAY_VIDEOS', True)
         })
 
 
 class VideoAlphaDescriptor(VideoAlphaFields, RawDescriptor):
+    """Descriptor for `VideoAlphaModule`."""
     module_class = VideoAlphaModule
-    stores_state = True
     template_dir_name = "videoalpha"

@@ -10,6 +10,7 @@ from common import *
 @step('There are no courses$')
 def no_courses(step):
     world.clear_courses()
+    create_studio_user()
 
 
 @step('I click the New Course button$')
@@ -45,12 +46,6 @@ def courseware_page_has_loaded_in_studio(step):
 def i_see_the_course_in_my_courses(step):
     course_css = 'span.class-name'
     assert world.css_has_text(course_css, 'Robot Super Course')
-
-
-@step('the course is loaded$')
-def course_is_loaded(step):
-    class_css = 'a.class-name'
-    assert world.css_has_text(course_css, 'Robot Super Cousre')
 
 
 @step('I am on the "([^"]*)" tab$')

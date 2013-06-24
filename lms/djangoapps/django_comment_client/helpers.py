@@ -1,8 +1,5 @@
-from django.core.urlresolvers import reverse
 from django.conf import settings
-from mitxmako.shortcuts import render_to_string
 from .mustache_helpers import mustache_helpers
-from django.core.urlresolvers import reverse
 from functools import partial
 
 from .utils import *

@@ -6,12 +6,13 @@ class @VideoProgressSliderAlpha extends SubviewAlpha
     @slider = @el.slider
       range: 'min'
       change: @onChange
+
       slide: @onSlide
       stop: @onStop
     @buildHandle()
 
   buildHandle: ->
-    @handle = @$('.slider .ui-slider-handle')
+    @handle = @$('.ui-slider-handle')
     @handle.qtip
       content: "#{Time.format(@slider.slider('value'))}"
       position:
@@ -35,14 +36,14 @@ class @VideoProgressSliderAlpha extends SubviewAlpha
   onSlide: (event, ui) =>
     @frozen = true
     @updateTooltip(ui.value)
-    $(@).trigger('seek', ui.value)
+    $(@).trigger('slide_seek', ui.value)
 
   onChange: (event, ui) =>
     @updateTooltip(ui.value)
 
   onStop: (event, ui) =>
     @frozen = true
-    $(@).trigger('seek', ui.value)
+    $(@).trigger('slide_seek', ui.value)
     setTimeout (=> @frozen = false), 200
 
   updateTooltip: (value)->

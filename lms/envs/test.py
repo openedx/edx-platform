@@ -20,8 +20,10 @@ from path import path
 # can test everything else :)
 MITX_FEATURES['DISABLE_START_DATES'] = True
 
-# Until we have discussion actually working in test mode, just turn it off
-MITX_FEATURES['ENABLE_DISCUSSION_SERVICE'] = True
+# Most tests don't use the discussion service, so we turn it off to speed them up.
+# Tests that do can enable this flag, but must use the UrlResetMixin class to force urls.py
+# to reload
+MITX_FEATURES['ENABLE_DISCUSSION_SERVICE'] = False
 
 MITX_FEATURES['ENABLE_SERVICE_STATUS'] = True
 
@@ -135,13 +137,15 @@ SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 MITX_FEATURES['AUTH_USE_OPENID'] = True
 MITX_FEATURES['AUTH_USE_OPENID_PROVIDER'] = True
 
+################################## SHIB #######################################
+MITX_FEATURES['AUTH_USE_SHIB'] = True
+MITX_FEATURES['SHIB_DISABLE_TOS'] = True
+MITX_FEATURES['RESTRICT_ENROLL_BY_REG_METHOD'] = True
+
 OPENID_CREATE_USERS = False
 OPENID_UPDATE_DETAILS_FROM_SREG = True
 OPENID_USE_AS_ADMIN_LOGIN = False
 OPENID_PROVIDER_TRUSTED_ROOTS = ['*']
-
-INSTALLED_APPS += ('external_auth',)
-INSTALLED_APPS += ('django_openid_auth',)
 
 ################################# CELERY ######################################
 

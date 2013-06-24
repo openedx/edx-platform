@@ -232,6 +232,9 @@ FILE_UPLOAD_HANDLERS = (
     'django.core.files.uploadhandler.TemporaryFileUploadHandler',
 )
 
+MITX_FEATURES['AUTH_USE_SHIB'] = True
+MITX_FEATURES['RESTRICT_ENROLL_BY_REG_METHOD'] = True
+
 ########################### PIPELINE #################################
 
 PIPELINE_SASS_ARGUMENTS = '--debug-info --require {proj_dir}/static/sass/bourbon/lib/bourbon.rb'.format(proj_dir=PROJECT_ROOT)
@@ -243,3 +246,18 @@ MITX_FEATURES['ENABLE_PEARSON_LOGIN'] = False
 
 ANALYTICS_SERVER_URL = "http://127.0.0.1:9000/"
 ANALYTICS_API_KEY = ""
+
+##### segment-io  ######
+
+# If there's an environment variable set, grab it and turn on segment io
+SEGMENT_IO_LMS_KEY = os.environ.get('SEGMENT_IO_LMS_KEY')
+if SEGMENT_IO_LMS_KEY:
+    MITX_FEATURES['SEGMENT_IO_LMS'] = True
+
+
+#####################################################################
+# Lastly, see if the developer has any local overrides.
+try:
+    from .private import *
+except ImportError:
+    pass

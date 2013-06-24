@@ -3,6 +3,10 @@ from django.core.urlresolvers import reverse
 
 from .utils import parse_json, user, registration
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from contentstore.tests.test_course_settings import CourseTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
+import datetime
+from pytz import UTC
 
 
 class ContentStoreTestCase(ModuleStoreTestCase):
@@ -111,6 +115,18 @@ class AuthTestCase(ContentStoreTestCase):
         # Now login should work
         self.login(self.email, self.pw)
 
+    def test_login_link_on_activation_age(self):
+        self.create_account(self.username, self.email, self.pw)
+        # we want to test the rendering of the activation page when the user isn't logged in
+        self.client.logout()
+        resp = self._activate_user(self.email)
+        self.assertEqual(resp.status_code, 200)
+
+        # check the the HTML has links to the right login page. Note that this is merely a content
+        # check and thus could be fragile should the wording change on this page
+        expected = 'You can now <a href="' + reverse('login') + '">login</a>.'
+        self.assertIn(expected, resp.content)
+
     def test_private_pages_auth(self):
         """Make sure pages that do require login work."""
         auth_pages = (
@@ -150,3 +166,21 @@ class AuthTestCase(ContentStoreTestCase):
         self.assertEqual(resp.status_code, 302)
 
         # Logged in should work.
+
+
+class ForumTestCase(CourseTestCase):
+    def setUp(self):
+        """ Creates the test course. """
+        super(ForumTestCase, self).setUp()
+        self.course = CourseFactory.create(org='testX', number='727', display_name='Forum Course')
+
+    def test_blackouts(self):
+        now = datetime.datetime.now(UTC)
+        self.course.discussion_blackouts = [(t.isoformat(), t2.isoformat()) for t, t2 in
+            [(now - datetime.timedelta(days=14), now - datetime.timedelta(days=11)),
+                (now + datetime.timedelta(days=24), now + datetime.timedelta(days=30))]]
+        self.assertTrue(self.course.forum_posts_allowed)
+        self.course.discussion_blackouts = [(t.isoformat(), t2.isoformat()) for t, t2 in
+            [(now - datetime.timedelta(days=14), now + datetime.timedelta(days=2)),
+                (now + datetime.timedelta(days=24), now + datetime.timedelta(days=30))]]
+        self.assertFalse(self.course.forum_posts_allowed)

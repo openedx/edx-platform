@@ -4,7 +4,6 @@ Tests of responsetypes
 
 from datetime import datetime
 import json
-from nose.plugins.skip import SkipTest
 import os
 import random
 import unittest
@@ -56,9 +55,18 @@ class ResponseTest(unittest.TestCase):
             self.assertEqual(result, 'incorrect',
                              msg="%s should be marked incorrect" % str(input_str))
 
+    def _get_random_number_code(self):
+        """Returns code to be used to generate a random result."""
+        return "str(random.randint(0, 1e9))"
+
+    def _get_random_number_result(self, seed_value):
+        """Returns a result that should be generated using the random_number_code."""
+        rand = random.Random(seed_value)
+        return str(rand.randint(0, 1e9))
+
 
 class MultiChoiceResponseTest(ResponseTest):
-    from response_xml_factory import MultipleChoiceResponseXMLFactory
+    from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
     xml_factory_class = MultipleChoiceResponseXMLFactory
 
     def test_multiple_choice_grade(self):
@@ -80,7 +88,7 @@ class MultiChoiceResponseTest(ResponseTest):
 
 
 class TrueFalseResponseTest(ResponseTest):
-    from response_xml_factory import TrueFalseResponseXMLFactory
+    from capa.tests.response_xml_factory import TrueFalseResponseXMLFactory
     xml_factory_class = TrueFalseResponseXMLFactory
 
     def test_true_false_grade(self):
@@ -120,7 +128,7 @@ class TrueFalseResponseTest(ResponseTest):
 
 
 class ImageResponseTest(ResponseTest):
-    from response_xml_factory import ImageResponseXMLFactory
+    from capa.tests.response_xml_factory import ImageResponseXMLFactory
     xml_factory_class = ImageResponseXMLFactory
 
     def test_rectangle_grade(self):
@@ -184,7 +192,7 @@ class ImageResponseTest(ResponseTest):
 
 
 class SymbolicResponseTest(ResponseTest):
-    from response_xml_factory import SymbolicResponseXMLFactory
+    from capa.tests.response_xml_factory import SymbolicResponseXMLFactory
     xml_factory_class = SymbolicResponseXMLFactory
 
     def test_grade_single_input(self):
@@ -224,8 +232,8 @@ class SymbolicResponseTest(ResponseTest):
 
     def test_complex_number_grade(self):
         problem = self.build_problem(math_display=True,
-            expect="[[cos(theta),i*sin(theta)],[i*sin(theta),cos(theta)]]",
-            options=["matrix", "imaginary"])
+                                     expect="[[cos(theta),i*sin(theta)],[i*sin(theta),cos(theta)]]",
+                                     options=["matrix", "imaginary"])
 
         # For LaTeX-style inputs, symmath_check() will try to contact
         # a server to convert the input to MathML.
@@ -312,16 +320,16 @@ class SymbolicResponseTest(ResponseTest):
         # Should not allow multiple inputs, since we specify
         # only one "expect" value
         with self.assertRaises(Exception):
-            problem = self.build_problem(math_display=True,
-                                        expect="2*x+3*y",
-                                        num_inputs=3)
+            self.build_problem(math_display=True,
+                               expect="2*x+3*y",
+                               num_inputs=3)
 
     def _assert_symbolic_grade(self, problem,
-                                student_input,
-                                dynamath_input,
-                                expected_correctness):
+                               student_input,
+                               dynamath_input,
+                               expected_correctness):
         input_dict = {'1_2_1': str(student_input),
-                        '1_2_1_dynamath': str(dynamath_input)}
+                      '1_2_1_dynamath': str(dynamath_input)}
 
         correct_map = problem.grade_answers(input_dict)
 
@@ -330,7 +338,7 @@ class SymbolicResponseTest(ResponseTest):
 
 
 class OptionResponseTest(ResponseTest):
-    from response_xml_factory import OptionResponseXMLFactory
+    from capa.tests.response_xml_factory import OptionResponseXMLFactory
     xml_factory_class = OptionResponseXMLFactory
 
     def test_grade(self):
@@ -350,7 +358,7 @@ class FormulaResponseTest(ResponseTest):
     """
     Test the FormulaResponse class
     """
-    from response_xml_factory import FormulaResponseXMLFactory
+    from capa.tests.response_xml_factory import FormulaResponseXMLFactory
     xml_factory_class = FormulaResponseXMLFactory
 
     def test_grade(self):
@@ -570,7 +578,7 @@ class FormulaResponseTest(ResponseTest):
 
 
 class StringResponseTest(ResponseTest):
-    from response_xml_factory import StringResponseXMLFactory
+    from capa.tests.response_xml_factory import StringResponseXMLFactory
     xml_factory_class = StringResponseXMLFactory
 
     def test_case_sensitive(self):
@@ -640,9 +648,25 @@ class StringResponseTest(ResponseTest):
         correct_map = problem.grade_answers(input_dict)
         self.assertEquals(correct_map.get_hint('1_2_1'), "Hello??")
 
+    def test_hint_function_randomization(self):
+        # The hint function should get the seed from the problem.
+        problem = self.build_problem(
+            answer="1",
+            hintfn="gimme_a_random_hint",
+            script=textwrap.dedent("""
+                def gimme_a_random_hint(answer_ids, student_answers, new_cmap, old_cmap):
+                    answer = {code}
+                    new_cmap.set_hint_and_mode(answer_ids[0], answer, "always")
+
+            """.format(code=self._get_random_number_code()))
+        )
+        correct_map = problem.grade_answers({'1_2_1': '2'})
+        hint = correct_map.get_hint('1_2_1')
+        self.assertEqual(hint, self._get_random_number_result(problem.seed))
+
 
 class CodeResponseTest(ResponseTest):
-    from response_xml_factory import CodeResponseXMLFactory
+    from capa.tests.response_xml_factory import CodeResponseXMLFactory
     xml_factory_class = CodeResponseXMLFactory
 
     def setUp(self):
@@ -656,6 +680,7 @@ class CodeResponseTest(ResponseTest):
 
     @staticmethod
     def make_queuestate(key, time):
+        """Create queuestate dict"""
         timestr = datetime.strftime(time, dateformat)
         return {'key': key, 'time': timestr}
 
@@ -693,7 +718,7 @@ class CodeResponseTest(ResponseTest):
         old_cmap = CorrectMap()
         for i, answer_id in enumerate(answer_ids):
             queuekey = 1000 + i
-            queuestate = CodeResponseTest.make_queuestate(1000 + i, datetime.now())
+            queuestate = CodeResponseTest.make_queuestate(queuekey, datetime.now())
             old_cmap.update(CorrectMap(answer_id=answer_ids[i], queuestate=queuestate))
 
         # Message format common to external graders
@@ -754,7 +779,7 @@ class CodeResponseTest(ResponseTest):
         for i, answer_id in enumerate(answer_ids):
             queuekey = 1000 + i
             latest_timestamp = datetime.now()
-            queuestate = CodeResponseTest.make_queuestate(1000 + i, latest_timestamp)
+            queuestate = CodeResponseTest.make_queuestate(queuekey, latest_timestamp)
             cmap.update(CorrectMap(answer_id=answer_id, queuestate=queuestate))
         self.problem.correct_map.update(cmap)
 
@@ -779,7 +804,7 @@ class CodeResponseTest(ResponseTest):
 
 
 class ChoiceResponseTest(ResponseTest):
-    from response_xml_factory import ChoiceResponseXMLFactory
+    from capa.tests.response_xml_factory import ChoiceResponseXMLFactory
     xml_factory_class = ChoiceResponseXMLFactory
 
     def test_radio_group_grade(self):
@@ -811,7 +836,7 @@ class ChoiceResponseTest(ResponseTest):
 
 
 class JavascriptResponseTest(ResponseTest):
-    from response_xml_factory import JavascriptResponseXMLFactory
+    from capa.tests.response_xml_factory import JavascriptResponseXMLFactory
     xml_factory_class = JavascriptResponseXMLFactory
 
     def test_grade(self):
@@ -841,7 +866,7 @@ class JavascriptResponseTest(ResponseTest):
         system.can_execute_unsafe_code = lambda: False
 
         with self.assertRaises(LoncapaProblemError):
-            problem = self.build_problem(
+            self.build_problem(
                 system=system,
                 generator_src="test_problem_generator.js",
                 grader_src="test_problem_grader.js",
@@ -852,7 +877,7 @@ class JavascriptResponseTest(ResponseTest):
 
 
 class NumericalResponseTest(ResponseTest):
-    from response_xml_factory import NumericalResponseXMLFactory
+    from capa.tests.response_xml_factory import NumericalResponseXMLFactory
     xml_factory_class = NumericalResponseXMLFactory
 
     def test_grade_exact(self):
@@ -944,11 +969,10 @@ class NumericalResponseTest(ResponseTest):
 
 
 class CustomResponseTest(ResponseTest):
-    from response_xml_factory import CustomResponseXMLFactory
+    from capa.tests.response_xml_factory import CustomResponseXMLFactory
     xml_factory_class = CustomResponseXMLFactory
 
     def test_inline_code(self):
-
         # For inline code, we directly modify global context variables
         # 'answers' is a list of answers provided to us
         # 'correct' is a list we fill in with True/False
@@ -961,15 +985,14 @@ class CustomResponseTest(ResponseTest):
         self.assert_grade(problem, '0', 'incorrect')
 
     def test_inline_message(self):
-
         # Inline code can update the global messages list
         # to pass messages to the CorrectMap for a particular input
         # The code can also set the global overall_message (str)
         # to pass a message that applies to the whole response
         inline_script = textwrap.dedent("""
-        messages[0] = "Test Message"
-        overall_message = "Overall message"
-        """)
+            messages[0] = "Test Message"
+            overall_message = "Overall message"
+            """)
         problem = self.build_problem(answer=inline_script)
 
         input_dict = {'1_2_1': '0'}
@@ -983,8 +1006,18 @@ class CustomResponseTest(ResponseTest):
         overall_msg = correctmap.get_overall_message()
         self.assertEqual(overall_msg, "Overall message")
 
-    def test_function_code_single_input(self):
+    def test_inline_randomization(self):
+        # Make sure the seed from the problem gets fed into the script execution.
+        inline_script = "messages[0] = {code}".format(code=self._get_random_number_code())
+        problem = self.build_problem(answer=inline_script)
 
+        input_dict = {'1_2_1': '0'}
+        correctmap = problem.grade_answers(input_dict)
+
+        input_msg = correctmap.get_msg('1_2_1')
+        self.assertEqual(input_msg, self._get_random_number_result(problem.seed))
+
+    def test_function_code_single_input(self):
         # For function code, we pass in these arguments:
         #
         #   'expect' is the expect attribute of the <customresponse>
@@ -1212,6 +1245,27 @@ class CustomResponseTest(ResponseTest):
         with self.assertRaises(ResponseError):
             problem.grade_answers({'1_2_1': '42'})
 
+    def test_setup_randomization(self):
+        # Ensure that the problem setup script gets the random seed from the problem.
+        script = textwrap.dedent("""
+            num = {code}
+            """.format(code=self._get_random_number_code()))
+        problem = self.build_problem(script=script)
+        self.assertEqual(problem.context['num'], self._get_random_number_result(problem.seed))
+
+    def test_check_function_randomization(self):
+        # The check function should get random-seeded from the problem.
+        script = textwrap.dedent("""
+            def check_func(expect, answer_given):
+                return {{'ok': True, 'msg': {code} }}
+        """.format(code=self._get_random_number_code()))
+
+        problem = self.build_problem(script=script, cfn="check_func", expect="42")
+        input_dict = {'1_2_1': '42'}
+        correct_map = problem.grade_answers(input_dict)
+        msg = correct_map.get_msg('1_2_1')
+        self.assertEqual(msg, self._get_random_number_result(problem.seed))
+
     def test_module_imports_inline(self):
         '''
         Check that the correct modules are available to custom
@@ -1271,11 +1325,10 @@ class CustomResponseTest(ResponseTest):
 
 
 class SchematicResponseTest(ResponseTest):
-    from response_xml_factory import SchematicResponseXMLFactory
+    from capa.tests.response_xml_factory import SchematicResponseXMLFactory
     xml_factory_class = SchematicResponseXMLFactory
 
     def test_grade(self):
-
         # Most of the schematic-specific work is handled elsewhere
         # (in client-side JavaScript)
         # The <schematicresponse> is responsible only for executing the
@@ -1290,7 +1343,7 @@ class SchematicResponseTest(ResponseTest):
 
         # The actual dictionary would contain schematic information
         # sent from the JavaScript simulation
-        submission_dict = {'test': 'test'}
+        submission_dict = {'test': 'the_answer'}
         input_dict = {'1_2_1': json.dumps(submission_dict)}
         correct_map = problem.grade_answers(input_dict)
 
@@ -1299,8 +1352,18 @@ class SchematicResponseTest(ResponseTest):
         # is what we expect)
         self.assertEqual(correct_map.get_correctness('1_2_1'), 'correct')
 
-    def test_script_exception(self):
+    def test_check_function_randomization(self):
+        # The check function should get a random seed from the problem.
+        script = "correct = ['correct' if (submission[0]['num'] == {code}) else 'incorrect']".format(code=self._get_random_number_code())
+        problem = self.build_problem(answer=script)
 
+        submission_dict = {'num': self._get_random_number_result(problem.seed)}
+        input_dict = {'1_2_1': json.dumps(submission_dict)}
+        correct_map = problem.grade_answers(input_dict)
+
+        self.assertEqual(correct_map.get_correctness('1_2_1'), 'correct')
+
+    def test_script_exception(self):
         # Construct a script that will raise an exception
         script = "raise Exception('test')"
         problem = self.build_problem(answer=script)
@@ -1313,7 +1376,7 @@ class SchematicResponseTest(ResponseTest):
 
 
 class AnnotationResponseTest(ResponseTest):
-    from response_xml_factory import AnnotationResponseXMLFactory
+    from capa.tests.response_xml_factory import AnnotationResponseXMLFactory
     xml_factory_class = AnnotationResponseXMLFactory
 
     def test_grade(self):
@@ -1334,7 +1397,7 @@ class AnnotationResponseTest(ResponseTest):
             {'correctness': incorrect, 'points': 0, 'answers': {answer_id: 'null'}},
         ]
 
-        for (index, test) in enumerate(tests):
+        for test in tests:
             expected_correctness = test['correctness']
             expected_points = test['points']
             answers = test['answers']

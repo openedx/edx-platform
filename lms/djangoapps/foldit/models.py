@@ -1,10 +1,7 @@
 import logging
 
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
-
-from student.models import unique_id_for_user
 
 
 log = logging.getLogger(__name__)

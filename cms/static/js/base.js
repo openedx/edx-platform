@@ -25,15 +25,12 @@ $(document).ready(function() {
     $newComponentTemplatePickers = $('.new-component-templates');
     $newComponentButton = $('.new-component-button');
     $spinner = $('<span class="spinner-in-field-icon"></span>');
-    $body.bind('keyup', onKeyUp);
 
     $('.expand-collapse-icon').bind('click', toggleSubmodules);
     $('.visibility-options').bind('change', setVisibility);
 
     $modal.bind('click', hideModal);
     $modalCover.bind('click', hideModal);
-    $('.uploads .upload-button').bind('click', showUploadModal);
-    $('.upload-modal .close-button').bind('click', hideModal);
 
     $body.on('click', '.embeddable-xml-input', function() {
         $(this).select();
@@ -144,8 +141,6 @@ $(document).ready(function() {
     $('.set-publish-date').bind('click', setSectionScheduleDate);
     $('.edit-section-start-cancel').bind('click', cancelSetSectionScheduleDate);
     $('.edit-section-start-save').bind('click', saveSetSectionScheduleDate);
-
-    $('.upload-modal .choose-file-button').bind('click', showFileSelectionMenu);
 
     $body.on('click', '.section-published-date .edit-button', editSectionPublishDate);
     $body.on('click', '.section-published-date .schedule-button', editSectionPublishDate);
@@ -398,69 +393,6 @@ function _deleteItem($el) {
     });
 }
 
-function showUploadModal(e) {
-    e.preventDefault();
-    $modal = $('.upload-modal').show();
-    $('.file-input').bind('change', startUpload);
-    $modalCover.show();
-}
-
-function showFileSelectionMenu(e) {
-    e.preventDefault();
-    $('.file-input').click();
-}
-
-function startUpload(e) {
-    $('.upload-modal h1').html(gettext('Uploading…'));
-    $('.upload-modal .file-name').html($('.file-input').val().replace('C:\\fakepath\\', ''));
-    $('.upload-modal .file-chooser').ajaxSubmit({
-        beforeSend: resetUploadBar,
-        uploadProgress: showUploadFeedback,
-        complete: displayFinishedUpload
-    });
-    $('.upload-modal .choose-file-button').hide();
-    $('.upload-modal .progress-bar').removeClass('loaded').show();
-}
-
-function resetUploadBar() {
-    var percentVal = '0%';
-    $('.upload-modal .progress-fill').width(percentVal);
-    $('.upload-modal .progress-fill').html(percentVal);
-}
-
-function showUploadFeedback(event, position, total, percentComplete) {
-    var percentVal = percentComplete + '%';
-    $('.upload-modal .progress-fill').width(percentVal);
-    $('.upload-modal .progress-fill').html(percentVal);
-}
-
-function displayFinishedUpload(xhr) {
-    if (xhr.status = 200) {
-        markAsLoaded();
-    }
-
-    var resp = JSON.parse(xhr.responseText);
-    $('.upload-modal .embeddable-xml-input').val(xhr.getResponseHeader('asset_url'));
-    $('.upload-modal .embeddable').show();
-    $('.upload-modal .file-name').hide();
-    $('.upload-modal .progress-fill').html(resp.msg);
-    $('.upload-modal .choose-file-button').html(gettext('Load Another File')).show();
-    $('.upload-modal .progress-fill').width('100%');
-
-    // see if this id already exists, if so, then user must have updated an existing piece of content
-    $("tr[data-id='" + resp.url + "']").remove();
-
-    var template = $('#new-asset-element').html();
-    var html = Mustache.to_html(template, resp);
-    $('table > tbody').prepend(html);
-
-    analytics.track('Uploaded a File', {
-        'course': course_location_analytics,
-        'asset_url': resp.url
-    });
-
-}
-
 function markAsLoaded() {
     $('.upload-modal .copy-button').css('display', 'inline-block');
     $('.upload-modal .progress-bar').addClass('loaded');
@@ -477,12 +409,6 @@ function hideModal(e) {
         $('.file-input').unbind('change', startUpload);
         $modal.hide();
         $modalCover.hide();
-    }
-}
-
-function onKeyUp(e) {
-    if (e.which == 87) {
-        $body.toggleClass('show-wip hide-wip');
     }
 }
 

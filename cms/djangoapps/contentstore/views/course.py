@@ -2,7 +2,6 @@
 Views related to operations on course objects
 """
 import json
-import time
 
 from django.contrib.auth.decorators import login_required
 from django_future.csrf import ensure_csrf_cookie
@@ -13,8 +12,8 @@ from django.core.urlresolvers import reverse
 from mitxmako.shortcuts import render_to_response
 
 from xmodule.modulestore.django import modulestore
-
-from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
+from xmodule.modulestore.exceptions import ItemNotFoundError, \
+     InvalidLocationError
 from xmodule.modulestore import Location
 
 from contentstore.course_info_model import get_course_updates, update_course_updates, delete_course_update
@@ -32,9 +31,8 @@ from .component import OPEN_ENDED_COMPONENT_TYPES, \
      NOTE_COMPONENT_TYPES, ADVANCED_COMPONENT_POLICY_KEY
 
 from django_comment_common.utils import seed_permissions_roles
-
-# TODO: should explicitly enumerate exports with __all__
-
+import datetime
+from django.utils.timezone import UTC
 __all__ = ['course_index', 'create_new_course', 'course_info',
            'course_info_updates', 'get_course_settings',
            'course_config_graders_page',
@@ -130,7 +128,7 @@ def create_new_course(request):
         new_course.display_name = display_name
 
     # set a default start date to now
-    new_course.start = time.gmtime()
+    new_course.start = datetime.datetime.now(UTC())
 
     initialize_course_tabs(new_course)
 
@@ -229,7 +227,8 @@ def get_course_settings(request, org, course, name):
                                kwargs={"org": org,
                                        "course": course,
                                        "name": name,
-                                       "section": "details"})
+                                       "section": "details"}),
+        'about_page_editable': not settings.MITX_FEATURES.get('ENABLE_MKTG_SITE', False)
     })
 
 
@@ -357,52 +356,55 @@ def course_advanced_updates(request, org, course, name):
         # Whether or not to filter the tabs key out of the settings metadata
         filter_tabs = True
 
-        #Check to see if the user instantiated any advanced components. This is a hack
-        #that does the following : 
-        #   1) adds/removes the open ended panel tab to a course automatically if the user 
+        # Check to see if the user instantiated any advanced components. This is a hack
+        # that does the following :
+        #   1) adds/removes the open ended panel tab to a course automatically if the user
         #   has indicated that they want to edit the combinedopendended or peergrading module
         #   2) adds/removes the notes panel tab to a course automatically if the user has
         #   indicated that they want the notes module enabled in their course
         # TODO refactor the above into distinct advanced policy settings
         if ADVANCED_COMPONENT_POLICY_KEY in request_body:
-            #Get the course so that we can scrape current tabs
+            # Get the course so that we can scrape current tabs
             course_module = modulestore().get_item(location)
 
-            #Maps tab types to components 
+            # Maps tab types to components
             tab_component_map = {
-                'open_ended': OPEN_ENDED_COMPONENT_TYPES, 
+                'open_ended': OPEN_ENDED_COMPONENT_TYPES,
                 'notes': NOTE_COMPONENT_TYPES,
             }
 
-            #Check to see if the user instantiated any notes or open ended components
+            # Check to see if the user instantiated any notes or open ended components
             for tab_type in tab_component_map.keys():
                 component_types = tab_component_map.get(tab_type)
                 found_ac_type = False
                 for ac_type in component_types:
                     if ac_type in request_body[ADVANCED_COMPONENT_POLICY_KEY]:
-                        #Add tab to the course if needed
+                        # Add tab to the course if needed
                         changed, new_tabs = add_extra_panel_tab(tab_type, course_module)
-                        #If a tab has been added to the course, then send the metadata along to CourseMetadata.update_from_json
+                        # If a tab has been added to the course, then send the metadata along to CourseMetadata.update_from_json
                         if changed:
                             course_module.tabs = new_tabs
                             request_body.update({'tabs': new_tabs})
-                            #Indicate that tabs should not be filtered out of the metadata
+                            # Indicate that tabs should not be filtered out of the metadata
                             filter_tabs = False
-                        #Set this flag to avoid the tab removal code below.
+                        # Set this flag to avoid the tab removal code below.
                         found_ac_type = True
                         break
-                #If we did not find a module type in the advanced settings,
+                # If we did not find a module type in the advanced settings,
                 # we may need to remove the tab from the course.
                 if not found_ac_type:
-                    #Remove tab from the course if needed
+                    # Remove tab from the course if needed
                     changed, new_tabs = remove_extra_panel_tab(tab_type, course_module)
                     if changed:
                         course_module.tabs = new_tabs
                         request_body.update({'tabs': new_tabs})
-                        #Indicate that tabs should *not* be filtered out of the metadata
+                        # Indicate that tabs should *not* be filtered out of the metadata
                         filter_tabs = False
-
-        response_json = json.dumps(CourseMetadata.update_from_json(location,
+        try:
+            response_json = json.dumps(CourseMetadata.update_from_json(location,
                                                                    request_body,
                                                                    filter_tabs=filter_tabs))
+        except (TypeError, ValueError), e:
+            return HttpResponseBadRequest("Incorrect setting format. " + str(e), content_type="text/plain")
+
         return HttpResponse(response_json, mimetype="application/json")

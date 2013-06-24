@@ -5,15 +5,15 @@ class @Video
     @start = @el.data('start')
     @end = @el.data('end')
     @caption_asset_path = @el.data('caption-asset-path')
-    @show_captions = @el.data('show-captions') == "true"
+    @show_captions = @el.data('show-captions')
     window.player = null
     @el = $("#video_#{@id}")
-    @parseVideos @el.data('streams')
+    @parseVideos()
     @fetchMetadata()
     @parseSpeed()
     $("#video_#{@id}").data('video', this).addClass('video-load-complete')
 
-    @hide_captions = $.cookie('hide_captions') == 'true'
+    @hide_captions = $.cookie('hide_captions') == 'true' or (not @show_captions)
 
     if YT.Player
       @embed()
@@ -27,10 +27,14 @@ class @Video
 
   parseVideos: (videos) ->
     @videos = {}
-    $.each videos.split(/,/), (index, video) =>
-      video = video.split(/:/)
-      speed = parseFloat(video[0]).toFixed(2).replace /\.00$/, '.0'
-      @videos[speed] = video[1]
+    if @el.data('youtube-id-0-75')
+      @videos['0.75'] = @el.data('youtube-id-0-75')
+    if @el.data('youtube-id-1-0')
+      @videos['1.0'] = @el.data('youtube-id-1-0')
+    if @el.data('youtube-id-1-25')
+      @videos['1.25'] = @el.data('youtube-id-1-25')
+    if @el.data('youtube-id-1-5')
+      @videos['1.50'] = @el.data('youtube-id-1-5')
 
   parseSpeed: ->
     @setSpeed($.cookie('video_speed'))

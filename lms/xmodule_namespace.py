@@ -1,15 +1,15 @@
 """
 Namespace that defines fields common to all blocks used in the LMS
 """
-from xblock.core import Namespace, Boolean, Scope, String
-from xmodule.fields import Date, Timedelta, StringyFloat, StringyBoolean
+from xblock.core import Namespace, Boolean, Scope, String, Float
+from xmodule.fields import Date, Timedelta
 
 
 class LmsNamespace(Namespace):
     """
     Namespace that defines fields common to all blocks used in the LMS
     """
-    hide_from_toc = StringyBoolean(
+    hide_from_toc = Boolean(
         help="Whether to display this module in the table of contents",
         default=False,
         scope=Scope.settings
@@ -37,7 +37,7 @@ class LmsNamespace(Namespace):
     )
     showanswer = String(help="When to show the problem answer to the student", scope=Scope.settings, default="closed")
     rerandomize = String(help="When to rerandomize the problem", default="always", scope=Scope.settings)
-    days_early_for_beta = StringyFloat(
+    days_early_for_beta = Float(
         help="Number of days early to show content to beta users",
         default=None,
         scope=Scope.settings

@@ -170,7 +170,7 @@ nav.sequence-nav {
           font-family: $sans-serif;
           line-height: lh();
           left: 0px;
-          opacity: 0;
+          opacity: 0.0;
           padding: 6px;
           position: absolute;
           top: 48px;
@@ -204,7 +204,7 @@ nav.sequence-nav {
           p {
             display: block;
             margin-top: 4px;
-            opacity: 1;
+            opacity: 1.0;
           }
         }
       }
@@ -248,12 +248,12 @@ nav.sequence-nav {
           }
 
           &:hover {
-            opacity: .5;
+            opacity: 0.5;
           }
 
           &.disabled {
             cursor: normal;
-            opacity: .4;
+            opacity: 0.4;
           }
         }
       }
@@ -320,12 +320,12 @@ nav.sequence-bottom {
           outline: 0;
 
           &:hover {
-            opacity: .5;
+            opacity: 0.5;
             background-position: center 15px;
           }
 
           &.disabled {
-            opacity: .4;
+            opacity: 0.4;
           }
 
           &:focus {

@@ -1,5 +1,4 @@
 import django_comment_common.models as models
-import django_comment_client.permissions as permissions
 from django.test import TestCase
 
 
@@ -44,7 +43,7 @@ class RoleClassTestCase(TestCase):
 
 class PermissionClassTestCase(TestCase):
     def setUp(self):
-        self.permission = permissions.Permission.objects.get_or_create(name="test")[0]
+        self.permission = models.Permission.objects.get_or_create(name="test")[0]
 
     def testUnicode(self):
         self.assertEqual(str(self.permission), "test")

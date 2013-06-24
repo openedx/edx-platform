@@ -364,7 +364,7 @@ def get_score(course_id, user, problem_descriptor, module_creator, model_data_ca
         else:
             return (None, None)
 
-    if not (problem_descriptor.stores_state and problem_descriptor.has_score):
+    if not problem_descriptor.has_score:
         # These are not problems, and do not have a score
         return (None, None)
 
