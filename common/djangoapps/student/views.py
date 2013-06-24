@@ -975,7 +975,7 @@ def password_reset(request):
                                         'value': render_to_string('registration/password_reset_done.html', {})}))
     else:
         return HttpResponse(json.dumps({'success': False,
-                                        'error': 'Invalid e-mail'}))
+                                        'error': 'Invalid e-mail or user'}))
 
 def password_reset_confirm_wrapper(request, uidb36=None, token=None):
     ''' A wrapper around django.contrib.auth.views.password_reset_confirm.
