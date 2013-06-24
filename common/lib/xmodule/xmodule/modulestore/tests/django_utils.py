@@ -48,7 +48,7 @@ def draft_mongo_store_config(data_dir):
 
     return {
         'default': {
-            'ENGINE': 'xmodule.modulestore.mongo.DraftMongoModuleStore',
+            'ENGINE': 'xmodule.modulestore.mongo.draft.DraftModuleStore',
             'OPTIONS': modulestore_options
         },
         'direct': {

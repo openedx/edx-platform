@@ -8,7 +8,6 @@ from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 
 import xmodule.modulestore.django
-
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import Location
@@ -134,7 +133,7 @@ class TestCoursesLoadTestCase_XmlModulestore(PageLoaderTestCase):
     def setUp(self):
         super(TestCoursesLoadTestCase_XmlModulestore, self).setUp()
         self.setup_user()
-        xmodule.modulestore.django._MODULESTORES = {}
+        xmodule.modulestore.django._MODULESTORES.clear()
 
     def test_toy_course_loads(self):
         module_class = 'xmodule.hidden_module.HiddenDescriptor'
@@ -155,7 +154,7 @@ class TestCoursesLoadTestCase_MongoModulestore(PageLoaderTestCase):
     def setUp(self):
         super(TestCoursesLoadTestCase_MongoModulestore, self).setUp()
         self.setup_user()
-        xmodule.modulestore.django._MODULESTORES = {}
+        xmodule.modulestore.django._MODULESTORES.clear()
         modulestore().collection.drop()
 
     def test_toy_course_loads(self):
