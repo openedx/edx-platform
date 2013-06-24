@@ -70,10 +70,11 @@ def course_index(request, org, course, name):
         'sections': sections,
         'course_graders': json.dumps(CourseGradingModel.fetch(course.location).graders),
         'parent_location': course.location,
-        'new_section_template': Location('i4x', 'edx', 'templates', 'chapter', 'Empty'),
-        'new_subsection_template': Location('i4x', 'edx', 'templates', 'sequential', 'Empty'),  # for now they are the same, but the could be different at some point...
+        'new_section_category': 'chapter',
+        'new_subsection_category': 'sequential',
         'upload_asset_callback_url': upload_asset_callback_url,
-        'create_new_unit_template': Location('i4x', 'edx', 'templates', 'vertical', 'Empty')
+        'new_unit_category': 'vertical',
+        'category': 'vertical'
     })
 
 
@@ -84,21 +85,14 @@ def create_new_course(request):
     if settings.MITX_FEATURES.get('DISABLE_COURSE_CREATION', False) and not request.user.is_staff:
         raise PermissionDenied()
 
-    # This logic is repeated in xmodule/modulestore/tests/factories.py
-    # so if you change anything here, you need to also change it there.
-    # TODO: write a test that creates two courses, one with the factory and
-    # the other with this method, then compare them to make sure they are
-    # equivalent.
-    template = Location(request.POST['template'])
     org = request.POST.get('org')
     number = request.POST.get('number')
     display_name = request.POST.get('display_name')
 
     try:
         dest_location = Location('i4x', org, number, 'course', Location.clean(display_name))
-    except InvalidLocationError as error:
-        return HttpResponse(json.dumps({'ErrMsg': "Unable to create course '" +
-                                        display_name + "'.\n\n" + error.message}))
+    except InvalidLocationError as e:
+        return HttpResponse(json.dumps({'ErrMsg': "Unable to create course '" + display_name + "'.\n\n" + e.message}))
 
     # see if the course already exists
     existing_course = None
@@ -106,29 +100,26 @@ def create_new_course(request):
         existing_course = modulestore('direct').get_item(dest_location)
     except ItemNotFoundError:
         pass
-
     if existing_course is not None:
         return HttpResponse(json.dumps({'ErrMsg': 'There is already a course defined with this name.'}))
 
     course_search_location = ['i4x', dest_location.org, dest_location.course, 'course', None]
     courses = modulestore().get_items(course_search_location)
-
     if len(courses) > 0:
         return HttpResponse(json.dumps({'ErrMsg': 'There is already a course defined with the same organization and course number.'}))
 
-    new_course = modulestore('direct').clone_item(template, dest_location)
+    # instantiate the CourseDescriptor and then persist it
+    # note: no system to pass
+    if display_name is None:
+        metadata = {}
+    else:
+        metadata = {'display_name': display_name}
+    modulestore('direct').create_and_save_xmodule(dest_location, metadata=metadata)
+    new_course = modulestore('direct').get_item(dest_location)
 
     # clone a default 'about' module as well
-
-    about_template_location = Location(['i4x', 'edx', 'templates', 'about', 'overview'])
     dest_about_location = dest_location._replace(category='about', name='overview')
-    modulestore('direct').clone_item(about_template_location, dest_about_location)
-
-    if display_name is not None:
-        new_course.display_name = display_name
-
-    # set a default start date to now
-    new_course.start = datetime.datetime.now(UTC())
+    modulestore('direct').create_and_save_xmodule(dest_about_location, system=new_course.system)
 
     initialize_course_tabs(new_course)
 

@@ -175,7 +175,7 @@ class AboutDescriptor(HtmlDescriptor):
     These pieces of course content are treated as HtmlModules but we need to overload where the templates are located
     in order to be able to create new ones
     """
-    template_dir_name = "about"
+    template_dir_name = None
     display_name = String(
         help="Display name for this module",
         scope=Scope.settings,
@@ -242,7 +242,7 @@ class StaticTabDescriptor(HtmlDescriptor):
     These pieces of course content are treated as HtmlModules but we need to overload where the templates are located
     in order to be able to create new ones
     """
-    template_dir_name = "statictab"
+    template_dir_name = None
     data = String(default="""
     <p>This is where you can add additional pages to your courseware. Click the 'edit' button to begin editing.</p>
     """, scope=Scope.content, help="HTML for the additional pages")
@@ -253,6 +253,6 @@ class CourseInfoDescriptor(HtmlDescriptor):
     These pieces of course content are treated as HtmlModules but we need to overload where the templates are located
     in order to be able to create new ones
     """
-    template_dir_name = "courseinfo"
+    template_dir_name = None
     data = String(help="Html contents to display for this module",
         default="<ol></ol>", scope=Scope.content)

@@ -43,6 +43,7 @@ def index(request):
     # filter out courses that we don't have access too
     def course_filter(course):
         return (has_access(request.user, course.location)
+                # TODO remove this condition when templates purged from db
                 and course.location.course != 'templates'
                 and course.location.org != ''
                 and course.location.course != ''
@@ -50,7 +51,6 @@ def index(request):
     courses = filter(course_filter, courses)
 
     return render_to_response('index.html', {
-        'new_course_template': Location('i4x', 'edx', 'templates', 'course', 'Empty'),
         'courses': [(course.display_name,
                     get_url_reverse('CourseOutline', course),
                     get_lms_link_for_item(course.location, course_id=course.location.course_id))

@@ -65,7 +65,8 @@
           <h3 class="section-name">
           <form class="section-name-form">
             <input type="text" value="New Section Name" class="new-section-name" />
-            <input type="submit" class="new-section-name-save" data-parent="${parent_location}" data-template="${new_section_template}" value="Save" />
+            <input type="submit" class="new-section-name-save" data-parent="${parent_location}" 
+                   data-category="${new_section_category}" value="Save" />
             <input type="button" class="new-section-name-cancel" value="Cancel" /></h3>
           </form>
         </div>
@@ -82,7 +83,8 @@
           <span class="section-name-span">Click here to set the section name</span>
           <form class="section-name-form">
             <input type="text" value="New Section Name" class="new-section-name" />
-            <input type="submit" class="new-section-name-save" data-parent="${parent_location}" data-template="${new_section_template}" value="Save" />
+            <input type="submit" class="new-section-name-save" data-parent="${parent_location}" 
+                   data-category="${new_section_category}" value="Save" />
             <input type="button" class="new-section-name-cancel" value="Cancel" /></h3>
           </form>
         </div>
@@ -179,7 +181,7 @@
           </header>
           <div class="subsection-list">
             <div class="list-header">
-              <a href="#" class="new-subsection-item" data-template="${new_subsection_template}">
+              <a href="#" class="new-subsection-item" data-category="${new_subsection_category}">
                 <span class="new-folder-icon"></span>New Subsection
               </a>
             </div>

@@ -22,7 +22,7 @@ def have_a_course_with_1_section(step):
     section = world.ItemFactory.create(parent_location=course.location)
     subsection1 = world.ItemFactory.create(
         parent_location=section.location,
-        template='i4x://edx/templates/sequential/Empty',
+        category='sequential',
         display_name='Subsection One',)
 
 
@@ -33,18 +33,18 @@ def have_a_course_with_two_sections(step):
     section = world.ItemFactory.create(parent_location=course.location)
     subsection1 = world.ItemFactory.create(
         parent_location=section.location,
-        template='i4x://edx/templates/sequential/Empty',
+        category='sequential',
         display_name='Subsection One',)
     section2 = world.ItemFactory.create(
         parent_location=course.location,
         display_name='Section Two',)
     subsection2 = world.ItemFactory.create(
         parent_location=section2.location,
-        template='i4x://edx/templates/sequential/Empty',
+        category='sequential',
         display_name='Subsection Alpha',)
     subsection3 = world.ItemFactory.create(
         parent_location=section2.location,
-        template='i4x://edx/templates/sequential/Empty',
+        category='sequential',
         display_name='Subsection Beta',)
 
 

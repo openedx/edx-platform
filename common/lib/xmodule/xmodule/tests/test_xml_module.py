@@ -142,6 +142,7 @@ class EditableMetadataFieldsTest(unittest.TestCase):
     def get_xml_editable_fields(self, model_data):
         system = get_test_system()
         system.render_template = Mock(return_value="<div>Test Template HTML</div>")
+        model_data['category'] = 'test'
         return XmlDescriptor(runtime=system, model_data=model_data).editable_metadata_fields
 
     def get_descriptor(self, model_data):

@@ -353,6 +353,7 @@ class XmlDescriptor(XModuleDescriptor):
             if key not in set(f.name for f in cls.fields + cls.lms.fields):
                 model_data['xml_attributes'][key] = value
         model_data['location'] = location
+        model_data['category'] = xml_object.tag
 
         return cls(
             system,

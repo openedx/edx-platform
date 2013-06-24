@@ -3,9 +3,11 @@ from datetime import datetime
 from . import Location, namedtuple_to_son
 from .exceptions import ItemNotFoundError
 from .inheritance import own_metadata
-from xmodule.exceptions import InvalidVersionError
-from xmodule.modulestore.mongo import MongoModuleStore
+from xmodule.modulestore.mongo import location_to_query, get_course_id_no_run, MongoModuleStore
+import pymongo
+from xmodule.modulestore.exceptions import DuplicateItemError
 from pytz import UTC
+from xmodule.exceptions import InvalidVersionError
 
 DRAFT = 'draft'
 # Things w/ these categories should never be marked as version='draft'
@@ -84,6 +86,21 @@ class DraftModuleStore(MongoModuleStore):
         except ItemNotFoundError:
             return wrap_draft(super(DraftModuleStore, self).get_instance(course_id, location, depth=depth))
 
+    def create_xmodule(self, location, definition_data=None, metadata=None, system=None):
+        """
+        Create the new xmodule but don't save it. Returns the new module with a draft locator
+
+        :param location: a Location--must have a category
+        :param definition_data: can be empty. The initial definition_data for the kvs
+        :param metadata: can be empty, the initial metadata for the kvs
+        :param system: if you already have an xmodule from the course, the xmodule.system value
+        """
+        draft_loc = as_draft(location)
+        if draft_loc.category in DIRECT_ONLY_CATEGORIES:
+            raise InvalidVersionError(location)
+        return super(DraftModuleStore, self).create_xmodule(draft_loc, definition_data, metadata, system)
+
+
     def get_items(self, location, course_id=None, depth=0):
         """
         Returns a list of XModuleDescriptor instances for the items
@@ -111,14 +128,26 @@ class DraftModuleStore(MongoModuleStore):
         ]
         return [wrap_draft(item) for item in draft_items + non_draft_items]
 
-    def clone_item(self, source, location):
+    def convert_to_draft(self, source_location):
         """
-        Clone a new item that is a copy of the item at the location `source`
-        and writes it to `location`
+        Create a copy of the source and mark its revision as draft.
+
+        :param source: the location of the source (its revision must be None)
         """
-        if Location(location).category in DIRECT_ONLY_CATEGORIES:
-            raise InvalidVersionError(location)
-        return wrap_draft(super(DraftModuleStore, self).clone_item(source, as_draft(location)))
+        original = self.collection.find_one(location_to_query(source_location))
+        draft_location = as_draft(source_location)
+        if draft_location.category in DIRECT_ONLY_CATEGORIES:
+            raise InvalidVersionError(source_location)
+        original['_id'] = draft_location.dict()
+        try:
+            self.collection.insert(original)
+        except pymongo.errors.DuplicateKeyError:
+            raise DuplicateItemError(original['_id'])
+
+        self.refresh_cached_metadata_inheritance_tree(draft_location)
+        self.fire_updated_modulestore_signal(get_course_id_no_run(draft_location), draft_location)
+
+        return self._load_items([original])[0]
 
     def update_item(self, location, data, allow_not_found=False):
         """
@@ -132,7 +161,7 @@ class DraftModuleStore(MongoModuleStore):
         try:
             draft_item = self.get_item(location)
             if not getattr(draft_item, 'is_draft', False):
-                self.clone_item(location, draft_loc)
+                self.convert_to_draft(location)
         except ItemNotFoundError, e:
             if not allow_not_found:
                 raise e
@@ -150,7 +179,7 @@ class DraftModuleStore(MongoModuleStore):
         draft_loc = as_draft(location)
         draft_item = self.get_item(location)
         if not getattr(draft_item, 'is_draft', False):
-            self.clone_item(location, draft_loc)
+            self.convert_to_draft(location)
 
         return super(DraftModuleStore, self).update_children(draft_loc, children)
 
@@ -166,7 +195,7 @@ class DraftModuleStore(MongoModuleStore):
         draft_item = self.get_item(location)
 
         if not getattr(draft_item, 'is_draft', False):
-            self.clone_item(location, draft_loc)
+            self.convert_to_draft(location)
 
         if 'is_draft' in metadata:
             del metadata['is_draft']
@@ -210,9 +239,7 @@ class DraftModuleStore(MongoModuleStore):
         """
         Turn the published version into a draft, removing the published version
         """
-        if Location(location).category in DIRECT_ONLY_CATEGORIES:
-            raise InvalidVersionError(location)
-        super(DraftModuleStore, self).clone_item(location, as_draft(location))
+        self.convert_to_draft(location)
         super(DraftModuleStore, self).delete_item(location)
 
     def _query_children_for_cache_children(self, items):

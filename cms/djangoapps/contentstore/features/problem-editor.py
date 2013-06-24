@@ -18,7 +18,7 @@ def i_created_blank_common_problem(step):
     world.create_component_instance(
         step,
         '.large-problem-icon',
-        'i4x://edx/templates/problem/Blank_Common_Problem',
+        'problem',
         '.xmodule_CapaModule'
     )
 
@@ -157,7 +157,7 @@ def create_latex_problem(step):
     world.click_new_component_button(step, '.large-problem-icon')
     # Go to advanced tab.
     world.css_click('#ui-id-2')
-    world.click_component_from_menu("i4x://edx/templates/problem/Problem_Written_in_LaTeX", '.xmodule_CapaModule')
+    world.click_component_from_menu("problem", "latex_problem.yaml", '.xmodule_CapaModule')
 
 
 @step('I edit and compile the High Level Source')

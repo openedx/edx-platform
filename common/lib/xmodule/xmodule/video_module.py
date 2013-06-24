@@ -89,7 +89,6 @@ class VideoDescriptor(VideoFields,
                       MetadataOnlyEditingDescriptor,
                       RawDescriptor):
     module_class = VideoModule
-    template_dir_name = "video"
 
     @property
     def non_editable_metadata_fields(self):
