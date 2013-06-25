@@ -135,7 +135,7 @@ class ConditionalModule(ConditionalFields, XModule):
             'depends': ';'.join(self.required_html_ids)
         })
 
-    def handle_ajax(self, dispatch, post):
+    def handle_ajax(self, _dispatch, _data):
         """This is called by courseware.moduleodule_render, to handle
         an AJAX call.
         """
