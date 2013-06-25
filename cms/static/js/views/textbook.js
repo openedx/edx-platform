@@ -120,9 +120,7 @@ CMS.Views.EditTextbook = Backbone.View.extend({
         if(e && e.preventDefault) { e.preventDefault(); }
         this.setValues();
         var saving = new CMS.Views.Notification.Saving({
-            title: gettext("Saving&hellip;"),
-            closeIcon: false,
-            minShown: 1250
+            title: gettext("Saving&hellip;")
         });
         var that = this;
         this.model.collection.save({

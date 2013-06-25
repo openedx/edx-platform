@@ -186,3 +186,9 @@ _.each(types, function(type) {
         klass[capitalCamel(intent)] = subklass;
     });
 });
+
+// set more sensible defaults for Notification-Saving views
+var savingOptions = CMS.Views.Notification.Saving.prototype.options;
+savingOptions.minShown = 1250;
+savingOptions.closeIcon = false;
+
