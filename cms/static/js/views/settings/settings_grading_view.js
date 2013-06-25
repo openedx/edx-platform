@@ -88,9 +88,12 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
         'grace_period' : 'course-grading-graceperiod'
     },
     setGracePeriod : function(event) {
-        event.data.clearValidationErrors();
-        var newVal = event.data.model.dateToGracePeriod($(event.currentTarget).timepicker('getTime'));
-        if (event.data.model.get('grace_period') != newVal) event.data.model.save('grace_period', newVal);
+        var self = event.data;
+        self.clearValidationErrors();
+        var newVal = self.model.dateToGracePeriod($(event.currentTarget).timepicker('getTime'));
+        self.model.set('grace_period', newVal, {validate: true});
+        self.showNotificationBar(self.save_message,
+                                 _.bind(self.saveModel, self));
     },
     updateModel : function(event) {
         if (!this.selectorToField[event.currentTarget.id]) return;
@@ -100,9 +103,12 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
             break;
 
         default:
-            this.saveIfChanged(event);
+            this.setField(event);
         break;
         }
+        var self = this;
+        this.showNotificationBar(this.save_message,
+                                 _.bind(self.saveModel, self));
     },
 
     // Grade sliders attributes and methods
@@ -220,13 +226,16 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
     },
 
     saveCutoffs: function() {
-        this.model.save('grade_cutoffs',
+        this.model.set('grade_cutoffs',
                 _.reduce(this.descendingCutoffs,
                         function(object, cutoff) {
                     object[cutoff['designation']] = cutoff['cutoff'] / 100.0;
                     return object;
                 },
-                {}));
+                {}),
+                {validate: true});
+        this.showNotificationBar(this.save_message,
+                                 _.bind(this.saveModel, this));
     },
 
     addNewGrade: function(e) {
@@ -342,11 +351,12 @@ CMS.Views.Settings.GraderView = CMS.Views.ValidatingView.extend({
         switch (event.currentTarget.id) {
         case 'course-grading-assignment-totalassignments':
             this.$el.find('#course-grading-assignment-droppable').attr('max', $(event.currentTarget).val());
-            this.saveIfChanged(event);
+            this.setField(event);
             break;
         case 'course-grading-assignment-name':
             var oldName = this.model.get('type');
-            if (this.saveIfChanged(event) && !_.isEmpty(oldName)) {
+            // If the name has changed, alert the user to change all subsection names.
+            if (this.setField(event) != oldName && !_.isEmpty(oldName)) {
                 // overload the error display logic
                 this._cacheValidationErrors.push(event.currentTarget);
                 $(event.currentTarget).parent().append(
@@ -355,9 +365,12 @@ CMS.Views.Settings.GraderView = CMS.Views.ValidatingView.extend({
             }
             break;
         default:
-            this.saveIfChanged(event);
+            this.setField(event);
         break;
         }
+        var self = this;
+        this.showNotificationBar(this.save_message,
+                                 _.bind(this.saveModel, this));
     },
     deleteModel : function(e) {
         this.model.destroy();

@@ -9,6 +9,8 @@ CMS.Views.ValidatingView = Backbone.View.extend({
 
     errorTemplate : _.template('<span class="message-error"><%= message %></span>'),
 
+    save_message: gettext("Your changes will not take effect until you save your progress."),
+
     events : {
         "change input" : "clearValidationErrors",
         "change textarea" : "clearValidationErrors"
@@ -38,17 +40,13 @@ CMS.Views.ValidatingView = Backbone.View.extend({
         }
     },
 
-    saveIfChanged : function(event) {
-        // returns true if the value changed and was thus sent to server
+    setField : function(event) {
+        // Set model field and return the new value.
+        this.clearValidationErrors();
         var field = this.selectorToField[event.currentTarget.id];
-        var currentVal = this.model.get(field);
         var newVal = $(event.currentTarget).val();
-        this.clearValidationErrors(); // curr = new if user reverts manually
-        if (currentVal != newVal) {
-            this.model.save(field, newVal);
-            return true;
-        }
-        else return false;
+        this.model.set(field, newVal, {validate: true});
+        return newVal;
     },
     // these should perhaps go into a superclass but lack of event hash inheritance demotivates me
     inputFocus : function(event) {
@@ -101,5 +99,23 @@ CMS.Views.ValidatingView = Backbone.View.extend({
             }});
         this.notificationBarShowing = true;
         this.confirmation.show();
+    },
+
+    showSavedBar: function(title, message) {
+        var defaultTitle = gettext('Your changes have been saved.');
+        this.saved = new CMS.Views.Alert.Confirmation({
+            title: title || defaultTitle,
+            message: message,
+            closeIcon: false
+        });
+        this.saved.show();
+    },
+
+    saveModel: function() {
+        var self = this;
+        this.model.save({},
+                        {success: function() {
+                            self.showSavedBar();
+                        }});
     }
 });

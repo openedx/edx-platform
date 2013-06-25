@@ -55,6 +55,12 @@ def i_have_opened_a_new_course(_step):
     open_new_course()
 
 
+@step('I (save|cancel) my changes$')
+def save_changes(step, action):
+    button_css = '.action-%s' % action
+    world.css_click(button_css)
+
+
 ####### HELPER FUNCTIONS ##############
 def open_new_course():
     world.clear_courses()

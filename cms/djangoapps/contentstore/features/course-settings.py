@@ -47,8 +47,6 @@ def test_and_i_set_course_dates(step):
     set_date_or_time(COURSE_START_TIME_CSS, DUMMY_TIME)
     set_date_or_time(ENROLLMENT_END_TIME_CSS, DUMMY_TIME)
 
-    pause()
-
 
 @step('Then I see the set dates on refresh$')
 def test_then_i_see_the_set_dates_on_refresh(step):
@@ -70,8 +68,6 @@ def test_and_i_clear_all_the_dates_except_start(step):
     set_date_or_time(COURSE_END_DATE_CSS, '')
     set_date_or_time(ENROLLMENT_START_DATE_CSS, '')
     set_date_or_time(ENROLLMENT_END_DATE_CSS, '')
-
-    pause()
 
 
 @step('Then I see cleared dates on refresh$')
@@ -119,7 +115,6 @@ def test_i_have_tried_to_clear_the_course_start(step):
 @step('I have entered a new course start date$')
 def test_i_have_entered_a_new_course_start_date(step):
     set_date_or_time(COURSE_START_DATE_CSS, '12/22/2013')
-    pause()
 
 
 @step('The warning about course start date goes away$')
@@ -135,6 +130,20 @@ def test_my_new_course_start_date_is_shown_on_refresh(step):
     verify_date_or_time(COURSE_START_DATE_CSS, '12/22/2013')
     # Time should have stayed from before attempt to clear date.
     verify_date_or_time(COURSE_START_TIME_CSS, DUMMY_TIME)
+
+
+@step('I change fields$')
+def test_i_change_fields(step):
+    set_date_or_time(COURSE_START_DATE_CSS, '7/7/7777')
+    set_date_or_time(COURSE_END_DATE_CSS, '7/7/7777')
+    set_date_or_time(ENROLLMENT_START_DATE_CSS, '7/7/7777')
+    set_date_or_time(ENROLLMENT_END_DATE_CSS, '7/7/7777')
+
+
+@step('I do not see the new changes persisted on refresh$')
+def test_changes_not_shown_on_refresh(step):
+    reload_the_page(step)
+    step.then('Then I see the set dates on refresh')
 
 
 ############### HELPER METHODS ####################
@@ -153,11 +162,3 @@ def verify_date_or_time(css, date_or_time):
     Verifies date or time field.
     """
     assert_equal(date_or_time, world.css_find(css).first.value)
-
-
-def pause():
-    """
-    Must sleep briefly to allow last time save to finish,
-    else refresh of browser will fail.
-    """
-    time.sleep(float(1))

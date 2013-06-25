@@ -32,6 +32,7 @@ Feature: Course Grading
         And I have populated the course
         And I am viewing the grading settings
         When I change assignment type "Homework" to "New Type"
+        And I save my changes
         And I go back to the main course page
         Then I do see the assignment name "New Type"
         And I do not see the assignment name "Homework"
@@ -49,5 +50,14 @@ Feature: Course Grading
         And I have populated the course
         And I am viewing the grading settings
         When I add a new assignment type "New Type"
+        And I save my changes
         And I go back to the main course page
         Then I do see the assignment name "New Type"
+
+    Scenario: Settings are only persisted when saved
+        Given I have opened a new course in Studio
+        And I have populated the course
+        And I am viewing the grading settings
+        When I change assignment type "Homework" to "New Type"
+        And I cancel my changes
+        Then I do not see the changes persisted on refresh

@@ -3,6 +3,7 @@
 
 from lettuce import world, step
 from common import *
+from terrain.steps import reload_the_page
 
 
 @step(u'I am viewing the grading settings')
@@ -59,6 +60,8 @@ def change_assignment_name(step, old_name, new_name):
     for count in range(len(old_name)):
         f._element.send_keys(Keys.END, Keys.BACK_SPACE)
     f._element.send_keys(new_name)
+    # Without this, the "you've made changes" notification won't pop up
+    f._element.send_keys(Keys.ENTER)
 
 
 @step(u'I go back to the main course page')
@@ -91,12 +94,22 @@ def add_assignment_type(step, new_name):
     name_id = '#course-grading-assignment-name'
     f = world.css_find(name_id)[4]
     f._element.send_keys(new_name)
+    # Without this, the "you've made changes" notification won't pop up
+    f._element.send_keys(Keys.ENTER)
 
 
 @step(u'I have populated the course')
 def populate_course(step):
     step.given('I have added a new section')
     step.given('I have added a new subsection')
+
+
+@step(u'I do not see the changes persisted on refresh$')
+def changes_not_persisted(step):
+    reload_the_page(step)
+    name_id = '#course-grading-assignment-name'
+    ele = world.css_find(name_id)[0]
+    assert(ele.value == 'Homework')
 
 
 def get_type_index(name):
