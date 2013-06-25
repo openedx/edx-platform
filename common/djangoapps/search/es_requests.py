@@ -53,7 +53,10 @@ class MongoIndexer:
         """Finds the corresponding chunk to the file element from a cursor similar to that from find_transcripts"""
         filename = mongo_element["_id"]["name"]
         database_object = self.chunk_collection.find_one({"files_id.name": filename})
-        return json.loads(database_object["data"].decode())["text"]
+        try:
+            return filter(None, json.loads(database_object["data"].decode('utf-8', "ignore"))["text"])
+        except ValueError:
+            return ["n/a"]
 
     def pdf_to_text(self, mongo_element):
         onlyAscii = lambda s: "".join(c for c in s if ord(c) < 128)
@@ -73,7 +76,10 @@ class MongoIndexer:
     def searchable_text_from_problem_data(self, mongo_element):
         """The data field from the problem is in weird xml, which is good for functionality, but bad for search"""
         data = mongo_element["definition"]["data"]
-        paragraphs = " ".join([text for text in re.findall("<p>(.*?)</p>", data) if text is not "Explanation"])
+        try:
+            paragraphs = " ".join([text for text in re.findall("<p>(.*?)</p>", data) if text is not "Explanation"])
+        except TypeError:
+            paragraphs = "n/a"
         cleaned_text = re.sub("\\(.*?\\)", "", paragraphs).replace("\\", "")
         remove_tags = re.sub("<[a-zA-Z0-9/\.\= \"_-]+>", "", cleaned_text)
         remove_repetitions = re.sub(r"(.)\1{4,}", "", remove_tags)
@@ -117,7 +123,10 @@ class MongoIndexer:
             course = item["_id"]["course"]
             org = item["_id"]["org"]
             uuid = item["_id"]["name"]
-            display_name = org + " " + course + " " + item["metadata"]["display_name"]
+            try:
+                display_name = org + " " + course + " " + item["metadata"]["display_name"]
+            except KeyError:
+                display_name = org + " " + course
             searchable_text = self.searchable_text_from_problem_data(item)
             data = {"course": course, "org": org, "uuid": uuid, "searchable_text": searchable_text,
                     "display_name": display_name}
@@ -137,6 +146,9 @@ class MongoIndexer:
             except TypeError:
                 print "Could not find module for: " + uuid
                 display_name = org + " " + course
+            except KeyError:
+                print "Transcript for: " + uuid + " has no metadata"
+                display_name = org + " "+course
             transcript = " ".join(self.find_transcript_content(item))
             data = {"course": course, "org": org, "uuid": uuid, "searchable_text": transcript,
                     "display_name": display_name}
@@ -146,65 +158,27 @@ class MongoIndexer:
 
 class ElasticDatabase:
 
-    def __init__(self, url, index_settings_file, *args):
+    def __init__(self, url, index_settings_file):
         """
-        Will initialize elastic search object with any indices specified by args
+        Will initialize elastic search object with specified indices
         specifically the url should be something of the form `http://localhost:9200`
-        importantly do not include a slash at the end of the url name.
-
-        args should be a list of dictionaries, each dictionary specifying a JSON mapping
-        to be used for a specific type. See settings.json for a more in-depth example
-
-        Example Dictionary:
-            {"index": "transcript", "type": "6-002x", "mapping":
-                {
-                "properties" : {
-                    "searchable_text": {
-                        "type": "string",
-                        "store": "yes",
-                        "index": "analyzed"
-                       }
-                    }
-                }
-            }
-
-        Eventually we will support different configuration files for different indices, but
-        since this is only indexing transcripts right now it seems excessive"""
+        importantly do not include a slash at the end of the url name."""
 
         self.url = url
-        self.args = args
         self.index_settings = json.loads(open(index_settings_file, 'rb').read())
-
-    def parse_args(self):
-        for mapping in self.args:
-            try:
-                json_mapping = json.loads(mapping)
-            except ValueError:
-                print "Badly formed JSON args, please check your mappings file"
-                break
-
-            try:
-                index = json_mapping['index']
-                type_ = json_mapping['type']
-                mapping = json_mapping['mapping']
-                self.setup_index(index)
-                self.setup_type(index, type_, mapping)
-            except KeyError:
-                print "Could not find needed keys. Keys found: "
-                print mapping.keys()
-                continue
 
     def setup_type(self, index, type_, json_mapping):
         """
-        json_mapping should be a dictionary starting at the properties level of a mapping.
+        yaml_mapping should be a dictionary starting at the properties level of a mapping.
 
         The type level will be added, so if you include it things will break. The purpose of this
         is to encourage loose coupling between types and mappings for better code
         """
 
-        full_url = "/".join([self.url, index, type_, "_mapping"]) + "/"
-        json_put_body = json.dumps({type_: json_mapping})
-        return requests.put(full_url, data=json_put_body)
+        full_url = "/".join([self.url, index, type_]) + "/"
+        dictionary = json.loads(open(json_mapping).read())
+        print dictionary
+        return requests.post(full_url, data=json.dumps(dictionary))
 
     def has_index(self, index):
         """Checks to see if a given index exists in the database returns existance boolean,
@@ -214,47 +188,73 @@ class ElasticDatabase:
         status = requests.head(full_url).status_code
         if status == 200:
             return True
-        if status == 404:
+        elif status == 404:
             return False
         else:
             print "Got an unexpected reponse code: " + str(status)
             raise
 
-    def os_walk_transcript(self, walk_results):
-        """Takes the results of os.walk on the data directory and returns a list of absolute paths"""
+    def has_type(self, index, type_):
+        """Same as has_index, but for a given type"""
+        full_url = "/".join([self.url, index, type_])
+        status = requests.head(full_url).status_code
+        if status == 200:
+            return True
+        elif status == 404:
+            return False
+        else:
+            print "Got an unexpected response code: " + str(status)
+            raise
+
+    def os_walk_transcript(self, walk_results, file_ending=".srt.sjson"):
+        """Takes the results of os.walk and returns a list of absolute paths to all files with given file_ending"""
         file_check = lambda walk: len(walk[2]) > 0
-        srt_prelim = lambda walk: ".srt.sjson" in " ".join(walk[2])
-        relevant_results = (entry for entry in walk_results if file_check(entry) and srt_prelim(entry))
-        return (self.os_path_tuple_srts(result) for result in relevant_results)
+        ending_prelim = lambda walk: file_ending in " ".join(walk[2])
+        relevant_results = (entry for entry in walk_results if file_check(entry) and ending_prelim(entry))
+        return (self.os_path_tuple_ending(result, file_ending) for result in relevant_results)
 
-    def os_path_tuple_srts(self, os_walk_tuple):
+    def os_path_tuple_ending(self, os_walk_tuple, file_ending=".srt.sjson"):
         """Given the path tuples from the os.walk method, constructs absolute paths to transcripts"""
-        srt_check = lambda file_name: file_name[-10:] == ".srt.sjson"
+        format_check = lambda file_name: file_ending in file_name
         directory, subfolders, file_paths = os_walk_tuple
-        return [os.path.join(directory, file_path) for file_path in file_paths if srt_check(file_path)]
+        return [os.path.join(directory, file_path) for file_path in file_paths if format_check(file_path)]
 
-    def index_directory_transcripts(self, directory, index, type_):
+    def index_directory_transcripts(self, directory, index, type_, silent=False):
         """Indexes all transcripts that are present in a given directory
 
-        Will recursively go through the directory and assume all .srt.sjson files are transcript"""
+        Will recursively go through the directory and assume all .srt.sjson files are transcript,
+
+        silent option dictates whether the method will fail silently on badly formed JSON. If set to True
+        then the Searchable text of a transcript will simply be set to 'INVALID JSON'"""
         # Needs to be lazily evaluatedy
         transcripts = self.os_walk_transcript(os.walk(directory))
+        responses = []
         for transcript_list in transcripts:
             for transcript in transcript_list:
-                print self.index_transcript(index, type_, transcript)
+                responses.append(self.index_transcript(index, type_, transcript, silent))
+        return responses
 
-    def index_transcript(self, index, type_, transcript_file):
+    def index_transcript(self, index, type_, transcript_file, silent=False, id_=None):
         """opens and indexes the given transcript file as the given index, type, and id"""
         file_uuid = transcript_file.rsplit("/")[-1][:-10]
         transcript = open(transcript_file, 'rb').read()
-        searchable_text = " ".join(filter(None, json.loads(transcript)["text"])).replace("\n", " ")
+        try:
+            searchable_text = " ".join(filter(None, json.loads(transcript)["text"])).replace("\n", " ")
+        except ValueError:
+            if silent:
+                searchable_text = "INVALID JSON"
+            else:
+                raise
         data = {"searchable_text": searchable_text, "uuid": file_uuid}
-        return self.index_data(index, type_, data)._content
+        if not id_:
+            return self.index_data(index, type_, data)._content
+        else:
+            return self.index_data(index, type_, data, id_=id_)
 
     def setup_index(self, index):
         """Creates a new elasticsearch index, returns the response it gets"""
         full_url = "/".join([self.url, index]) + "/"
-        return requests.post(full_url, data=json.dumps(self.index_settings))
+        return requests.put(full_url, data=json.dumps(self.index_settings))
 
     def add_index_settings(self, index, index_settings=None):
         """Allows the editing of an index's settings"""
@@ -267,11 +267,18 @@ class ElasticDatabase:
         requests.post(full_url+"/_open")
         return response
 
-    def index_data(self, index, type_, data):
+    def index_data(self, index, type_, data, id_=None):
         """Data should be passed in as a dictionary, assumes it matches the given mapping"""
-        full_url = "/".join([self.url, index, type_]) + "/"
+        if not id_:
+            full_url = "/".join([self.url, index, type_]) + "/"
+        else:
+            full_url = "/".join([self.url, index, type_, id_])
         response = requests.post(full_url, json.dumps(data))
         return response
+
+    def get_data(self, index, type_, id_):
+        full_url = "/".join([self.url, index, type_, id_])
+        return requests.get(full_url)
 
     def get_index_settings(self, index):
         """Returns the current settings of a given index"""
@@ -311,18 +318,18 @@ class ElasticDatabase:
             for word in words:
                 dictionary.write(word + "\n")
 
-url = "http://localhost:9200"
-settings_file = "settings.json"
+#url = "http://localhost:9200"
+#settings_file = "settings.json"
 
-mongo = MongoIndexer()
+#mongo = MongoIndexer(content_database="edge-xcontent", module_database="edge-xmodule")
 
-test = ElasticDatabase(url, settings_file)
+#test = ElasticDatabase(url, settings_file)
 #print test.delete_index("transcript-index")
-print test.add_index_settings("slides-index")._content
-print test.get_index_settings("slides-index")
-mongo.index_all_lecture_slides(test, "slides-index")
+#mongo.index_all_lecture_slides(test, "pdf-index")
+#mongo.index_all_transcripts(test, "transcript-index")
+#mongo.index_all_problems(test, "problem-index")
 
 #print test.setup_type("transcript", "cleaning", mapping)._content
 #print test.get_type_mapping("transcript-index", "2-1x")
 #print test.index_directory_transcripts("/home/slater/edx_all/data", "transcript-index", "transcript")
-# test.generate_dictionary("transcript-index", "transcript", "pyenchant_corpus.txt")
+#test.generate_dictionary("transcript-index", "transcript", "pyenchant_corpus.txt")
