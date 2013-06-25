@@ -17,6 +17,16 @@ beforeEach ->
                 return text.test(trimmedText)
             else
                 return trimmedText.indexOf(text) != -1;
+        toHaveBeenPrevented: ->
+            # remove this when we upgrade jasmine-jquery
+            eventName = @actual.eventName
+            selector = @actual.selector
+            @message = ->
+                [
+                  "Expected event #{eventName} to have been prevented on #{selector}",
+                  "Expected event #{eventName} not to have been prevented on #{selector}"
+                ]
+            return jasmine.JQuery.events.wasPrevented(selector, eventName)
 
 describe "CMS.Views.SystemFeedback", ->
     beforeEach ->
@@ -123,6 +133,35 @@ describe "CMS.Views.SystemFeedback click events", ->
     it "should apply class to secondary action", ->
         expect(@view.$(".action-secondary")).toHaveClass("cancel-button")
 
+    it "should preventDefault on primary action", ->
+        spyOnEvent(".action-primary", "click")
+        @view.$(".action-primary").click()
+        expect("click").toHaveBeenPreventedOn(".action-primary")
+
+    it "should preventDefault on secondary action", ->
+        spyOnEvent(".action-secondary", "click")
+        @view.$(".action-secondary").click()
+        expect("click").toHaveBeenPreventedOn(".action-secondary")
+
+describe "CMS.Views.SystemFeedback not preventing events", ->
+    beforeEach ->
+        @clickSpy = jasmine.createSpy('clickSpy')
+        @view = new CMS.Views.Alert.Confirmation(
+            title: "It's all good"
+            message: "No reason for this alert"
+            actions:
+                primary:
+                    text: "Whatever"
+                    click: @clickSpy
+                    preventDefault: false
+        )
+        @view.show()
+
+    it "should not preventDefault", ->
+        spyOnEvent(".action-primary", "click")
+        @view.$(".action-primary").click()
+        expect("click").not.toHaveBeenPreventedOn(".action-primary")
+        expect(@clickSpy).toHaveBeenCalled()
 
 describe "CMS.Views.SystemFeedback multiple secondary actions", ->
     beforeEach ->
