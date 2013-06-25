@@ -18,9 +18,9 @@ CMS.Models.Textbook = Backbone.AssociatedModel.extend({
     },
     url: function() {
         if(this.isNew()) {
-            return CMS.URL.TEXTBOOK + "/new";
+            return CMS.URL.TEXTBOOKS + "/new";
         } else {
-            return CMS.URL.TEXTBOOK + "/" + this.id;
+            return CMS.URL.TEXTBOOKS + "/" + this.id;
         }
     },
     parse: function(response) {
@@ -71,7 +71,7 @@ CMS.Models.Textbook = Backbone.AssociatedModel.extend({
 });
 CMS.Collections.TextbookSet = Backbone.Collection.extend({
     model: CMS.Models.Textbook,
-    url: function() { return CMS.URL.TEXTBOOK; },
+    url: function() { return CMS.URL.TEXTBOOKS; },
     save: function(options) {
         return this.sync('update', this, options);
     }
