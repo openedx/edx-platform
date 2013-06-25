@@ -1,16 +1,11 @@
-{
-	"mappings": {
-		"test-string": {
+mappings: 
+	properties: 
+		"test-string": 
 			"type": "string",
 			"store": "yes",
 			"index": "analyzed",
 			"term_vector": "with_positions_offsets"
-		},
 
-		"test-float": {
+		"test-float": 
 			"type": "float",
 			"store": "yes"
-		}
-	}
-
-}

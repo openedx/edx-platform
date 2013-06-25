@@ -1,6 +1,14 @@
-#searchwrapper {
-	width: 250px;
-	height: 30px;
+.searchwrapper {
+	width:45%;
+	padding: 0;
+	margin: 0;
+	position:relative;
+}
+
+.searchwrapper form { display: inline; }
+
+.searchbox {
+	border:0;
 	background: -moz-linear-gradient(top,  #ffffff 0%, #ededed 49%, #fafafa 50%, #ededed 50%, #dcdcdc 100%); /* FF3.6+ */
 	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(49%,#ededed), color-stop(50%,#fafafa), color-stop(50%,#ededed), color-stop(100%,#dcdcdc)); /* Chrome,Safari4+ */
 	background: -webkit-linear-gradient(top,  #ffffff 0%,#ededed 49%,#fafafa 50%,#ededed 50%,#dcdcdc 100%); /* Chrome10+,Safari5.1+ */
@@ -8,17 +16,6 @@
 	background: -ms-linear-gradient(top,  #ffffff 0%,#ededed 49%,#fafafa 50%,#ededed 50%,#dcdcdc 100%); /* IE10+ */
 	background: linear-gradient(to bottom,  #ffffff 0%,#ededed 49%,#fafafa 50%,#ededed 50%,#dcdcdc 100%); /* W3C */
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#dcdcdc',GradientType=0 ); /* IE6-9 */
-
-	padding: 0;
-	margin: 0;
-	position:relative;
-}
-
-#searchwrapper form { display: inline; }
-
-.searchbox {
-	border:0;
-	background-color:transparent;
 	position:absolute;
 	top:3px;
 	left:0;
@@ -41,6 +38,12 @@
 .searchbox_submit:hover {
 	cursor:pointer;
 	cursor: hand;
+}
+
+.content-select{
+	display: block;
+	text-align: right;
+	padding-top: 10px;
 }
 
 .results_snippet{
