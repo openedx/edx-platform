@@ -179,7 +179,10 @@ class MongoIndexer:
     def searchable_text_from_problem_data(self, mongo_element):
         """The data field from the problem is in weird xml, which is good for functionality, but bad for search"""
         data = mongo_element["definition"]["data"]
-        paragraphs = " ".join([text for text in re.findall("<p>(.*?)</p>", data) if text is not "Explanation"])
+        try:
+            paragraphs = " ".join([text for text in re.findall("<p>(.*?)</p>", data) if text is not "Explanation"])
+        except TypeError:
+            paragraphs = "n/a"
         cleaned_text = re.sub("\\(.*?\\)", "", paragraphs).replace("\\", "")
         remove_tags = re.sub("<[a-zA-Z0-9/\.\= \"_-]+>", "", cleaned_text)
         remove_repetitions = re.sub(r"(.)\1{4,}", "", remove_tags)
@@ -223,7 +226,10 @@ class MongoIndexer:
             course = item["_id"]["course"]
             org = item["_id"]["org"]
             uuid = item["_id"]["name"]
-            display_name = org + " " + course + " " + item["metadata"]["display_name"]
+            try:
+                display_name = org + " " + course + " " + item["metadata"]["display_name"]
+            except KeyError:
+                display_name = org + " " + course
             searchable_text = self.searchable_text_from_problem_data(item)
             data = {"course": course, "org": org, "uuid": uuid, "searchable_text": searchable_text,
                     "display_name": display_name}
@@ -448,7 +454,6 @@ class EnchantDictionary:
 #settings_file = "settings.json"
 
 #mongo = MongoIndexer()
-
 
 #test = ElasticDatabase(url, settings_file)
 #dictionary = EnchantDictionary(test)

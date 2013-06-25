@@ -5,20 +5,29 @@
 <div class="searchwrapper">
 	<form action="/search" method="get">
 		<span>
+<<<<<<< HEAD
 		<span class="searchbox-wrapper">
+=======
+		<span class="searchbox">
+>>>>>>> Refactored some code and added full elasticsearch module test suite
 			% if old_query:
 			<input type="text" class="searchbox" name="s" value="${old_query}" />
 			% else:
 			<input type="text" class="searchbox" name="s" value="" />
 			% endif
+<<<<<<< HEAD
 			<div class="searchbox_submit">
 				<input type="submit" value="" />
 			</div>
+=======
+			<input type="submit" class="searchbox_submit" value="" />
+>>>>>>> Refactored some code and added full elasticsearch module test suite
 		</span>
 		<span class="content-select">
 			% if previous_content == "transcript":
 				<input type="radio" name="content" value="transcript" checked>Videos
 				<input type="radio" name="content" value="problem">Problems
+<<<<<<< HEAD
 				<input type="radio" name="content" value="slide">Slides
 			% elif previous_content == "problem":
 				<input type="radio" name="content" value="transcript">Videos
@@ -28,6 +37,17 @@
 				<input type="radio" name="content" value="transcript">Videos
 				<input type="radio" name="content" value="problem">Problems
 				<input type="radio" name="content" value="slide" checked>Slides
+=======
+				<input type="radio" name="content" value="pdf">PDFs
+			% elif previous_content == "problem":
+				<input type="radio" name="content" value="transcript">Videos
+				<input type="radio" name="content" value="problem" checked>Problems
+				<input type="radio" name="content" value="pdf">PDFs
+			% else:
+				<input type="radio" name="content" value="transcript">Videos
+				<input type="radio" name="content" value="problem">Problems
+				<input type="radio" name="content" value="pdf" checked>PDFs
+>>>>>>> Refactored some code and added full elasticsearch module test suite
 			% endif
 		</span>
 	</span>
@@ -36,4 +56,8 @@
 
 <%def name="css_link(path, media='')">
 	<link rel="stylesheet" type="text/css" href="${path|h}" media="${media}"></link>
+<<<<<<< HEAD
 </%def>
+=======
+</%def>
+>>>>>>> Refactored some code and added full elasticsearch module test suite

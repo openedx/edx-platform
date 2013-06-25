@@ -5,6 +5,7 @@
 	position:relative;
 }
 
+<<<<<<< HEAD
 .result-title{
 	text-align: center;
 	word-wrap: normal;
@@ -20,6 +21,9 @@
 .result-content{
 	margin-top: -20px;
 }
+=======
+.searchwrapper form { display: inline; }
+>>>>>>> Refactored some code and added full elasticsearch module test suite
 
 .searchbox {
 	border:0;
@@ -74,6 +78,12 @@
 .searchbox_submit:hover {
 	cursor:pointer;
 	cursor: hand;
+}
+
+.content-select{
+	display: block;
+	text-align: right;
+	padding-top: 10px;
 }
 
 .results_snippet{
