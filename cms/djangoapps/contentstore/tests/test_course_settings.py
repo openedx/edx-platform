@@ -239,8 +239,7 @@ class CourseDetailsViewTest(CourseTestCase):
                 dt1 = date.from_json(encoded[field])
                 dt2 = details[field]
 
-                expected_delta = datetime.timedelta(0)
-                self.assertEqual(dt1 - dt2, expected_delta, str(dt1) + "!=" + str(dt2) + " at " + context)
+                self.assertEqual(dt1, dt2, msg="{} != {} at {}".format(dt1, dt2, context))
             else:
                 self.fail(field + " missing from encoded but in details at " + context)
         elif field in encoded and encoded[field] is not None:
