@@ -18,7 +18,6 @@ import random as random_module
 import sys
 random = random_module.Random(%r)
 random.Random = random_module.Random
-del random_module
 sys.modules['random'] = random
 """
 
