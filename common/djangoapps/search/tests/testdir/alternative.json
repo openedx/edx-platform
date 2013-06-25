@@ -1,0 +1,12 @@
+{
+	"dummy": [
+	"Goodbye, ", "World"],
+
+	"text": [
+	"Hello,", "World"
+	],
+
+	"test": {
+		"value": "Success!"
+	}
+}
