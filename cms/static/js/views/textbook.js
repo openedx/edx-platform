@@ -65,6 +65,7 @@ CMS.Views.ShowTextbook = Backbone.View.extend({
 CMS.Views.EditTextbook = Backbone.View.extend({
     initialize: function() {
         this.template = _.template($("#edit-textbook-tpl").text());
+        this.listenTo(this.model, "invalid", this.render);
         var chapters = this.model.get('chapters');
         this.listenTo(chapters, "add", this.addOne);
         this.listenTo(chapters, "reset", this.addAll);
@@ -75,7 +76,7 @@ CMS.Views.EditTextbook = Backbone.View.extend({
     render: function() {
         this.$el.html(this.template({
             name: this.model.escape('name'),
-            errors: null
+            error: this.model.validationError
         }));
         this.addAll();
         return this;
@@ -119,13 +120,14 @@ CMS.Views.EditTextbook = Backbone.View.extend({
     setAndClose: function(e) {
         if(e && e.preventDefault) { e.preventDefault(); }
         this.setValues();
+        if(!this.model.isValid()) { return; }
         var saving = new CMS.Views.Notification.Saving({
             title: gettext("Saving&hellip;")
         });
         var that = this;
         this.model.save({}, {
             success: function() {
-                that.setOriginalAttributes();
+                that.model.setOriginalAttributes();
                 that.close();
             },
             complete: function() {

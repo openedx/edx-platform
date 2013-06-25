@@ -21,7 +21,7 @@ CMS.Models.Textbook = Backbone.AssociatedModel.extend({
         this._originalAttributes = this.parse(this.toJSON());
     },
     reset: function() {
-        this.set(this._originalAttributes);
+        this.set(this._originalAttributes, {parse: true});
     },
     isEmpty: function() {
         return !this.get('name') && this.get('chapters').isEmpty();

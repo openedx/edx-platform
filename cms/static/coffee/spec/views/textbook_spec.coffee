@@ -96,31 +96,53 @@ describe "CMS.Views.EditTextbook", ->
         it "should save properly", ->
             @view.render()
             @view.$("input[name=textbook-name]").val("starfish")
-            @view.$("input[name=chapter1-name]").val("foobar")
+            @view.$("input[name=chapter1-asset-path]").val("foobar")
             @view.$("form").submit()
             expect(@model.get("name")).toEqual("starfish")
-            expect(@model.get("chapters").at(0).get("name")).toEqual("foobar")
+            expect(@model.get("chapters").at(0).get("asset_path")).toEqual("foobar")
             expect(@model.save).toHaveBeenCalled()
+
+        it "should not save on invalid", ->
+            @view.render()
+            @view.$("input[name=textbook-name]").val("")
+            @view.$("input[name=chapter1-asset-path]").val("foobar.pdf")
+            @view.$("form").submit()
+            expect(@model.validationError).toBeTruthy()
+            expect(@model.save).not.toHaveBeenCalled()
 
         it "does not save on cancel", ->
             @model.get("chapters").add([{name: "a", asset_path: "b"}])
             @view.render()
             @view.$("input[name=textbook-name]").val("starfish")
-            @view.$("input[name=chapter1-name]").val("foobar")
+            @view.$("input[name=chapter1-asset-path]").val("foobar.pdf")
             @view.$(".action-cancel").click()
             expect(@model.get("name")).not.toEqual("starfish")
-            expect(@model.get("chapters").at(0).get("name")).not.toEqual("foobar")
+            expect(@model.get("chapters").first().get("asset_path")).not.toEqual("foobar")
             expect(@model.save).not.toHaveBeenCalled()
+
+        it "should be possible to correct validation errors", ->
+            @view.render()
+            @view.$("input[name=textbook-name]").val("")
+            @view.$("input[name=chapter1-asset-path]").val("foobar.pdf")
+            @view.$("form").submit()
+            expect(@model.validationError).toBeTruthy()
+            expect(@model.save).not.toHaveBeenCalled()
+            @view.$("input[name=textbook-name]").val("starfish")
+            @view.$("input[name=chapter1-name]").val("foobar")
+            @view.$("form").submit()
+            expect(@model.validationError).toBeFalsy()
+            expect(@model.save).toHaveBeenCalled()
 
         it "removes all empty chapters on cancel if the model has a non-empty chapter", ->
             chapters = @model.get("chapters")
             chapters.at(0).set("name", "non-empty")
+            @model.setOriginalAttributes()
             @view.render()
             chapters.add([{}, {}, {}]) # add three empty chapters
             expect(chapters.length).toEqual(4)
             @view.$(".action-cancel").click()
             expect(chapters.length).toEqual(1)
-            expect(chapters.at(0).get('name')).toEqual("non-empty")
+            expect(chapters.first().get('name')).toEqual("non-empty")
 
         it "removes all empty chapters on cancel except one if the model has no non-empty chapters", ->
             chapters = @model.get("chapters")
