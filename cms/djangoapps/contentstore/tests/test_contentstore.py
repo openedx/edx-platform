@@ -23,7 +23,7 @@ from xmodule.modulestore import Location
 from xmodule.modulestore.store_utilities import clone_course
 from xmodule.modulestore.store_utilities import delete_course
 from xmodule.modulestore.django import modulestore
-from xmodule.contentstore.django import contentstore
+from xmodule.contentstore.django import contentstore, _CONTENTSTORE
 from xmodule.templates import update_templates
 from xmodule.modulestore.xml_exporter import export_to_xml
 from xmodule.modulestore.xml_importer import import_from_xml, perform_xlint
@@ -43,10 +43,12 @@ from django_comment_common.utils import are_permissions_roles_seeded
 from xmodule.exceptions import InvalidVersionError
 import datetime
 from pytz import UTC
+from uuid import uuid4
+from pymongo import MongoClient
 
-TEST_DATA_MODULESTORE = copy.deepcopy(settings.MODULESTORE)
-TEST_DATA_MODULESTORE['default']['OPTIONS']['fs_root'] = path('common/test/data')
-TEST_DATA_MODULESTORE['direct']['OPTIONS']['fs_root'] = path('common/test/data')
+
+TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
+TEST_DATA_CONTENTSTORE['OPTIONS']['db'] = 'test_xcontent_%s' % uuid4().hex
 
 
 class MongoCollectionFindWrapper(object):
@@ -59,13 +61,16 @@ class MongoCollectionFindWrapper(object):
         return self.original(query, *args, **kwargs)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MODULESTORE)
+@override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
 class ContentStoreToyCourseTest(ModuleStoreTestCase):
     """
     Tests that rely on the toy courses.
     TODO: refactor using CourseFactory so they do not.
     """
     def setUp(self):
+
+        settings.MODULESTORE['default']['OPTIONS']['fs_root'] = path('common/test/data')
+        settings.MODULESTORE['direct']['OPTIONS']['fs_root'] = path('common/test/data')
         uname = 'testuser'
         email = 'test+courses@edx.org'
         password = 'foo'
@@ -82,6 +87,11 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         self.client = Client()
         self.client.login(username=uname, password=password)
+
+    def tearDown(self):
+        mongo = MongoClient()
+        mongo.drop_database(TEST_DATA_CONTENTSTORE['OPTIONS']['db'])
+        _CONTENTSTORE.clear()
 
     def check_components_on_page(self, component_types, expected_types):
         """
@@ -403,7 +413,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.assertGreater(len(all_assets), 0)
 
         # make sure we have some thumbnails in our contentstore
-        all_thumbnails = content_store.get_all_content_thumbnails_for_course(course_location)
+        content_store.get_all_content_thumbnails_for_course(course_location)
 
         #
         # cdodge: temporarily comment out assertion on thumbnails because many environments
@@ -442,7 +452,6 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         content_store = contentstore()
         trash_store = contentstore('trashcan')
         module_store = modulestore('direct')
-
         import_from_xml(module_store, 'common/test/data/', ['full'], static_content_store=content_store)
 
         # look up original (and thumbnail) in content store, should be there after import
@@ -533,7 +542,6 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         all_assets = trash_store.get_all_content_for_course(course_location)
         self.assertEqual(len(all_assets), 0)
 
-
         all_thumbnails = trash_store.get_all_content_thumbnails_for_course(course_location)
         self.assertEqual(len(all_thumbnails), 0)
 
@@ -597,7 +605,6 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             {'due': datetime.datetime.now(UTC)})
 
         self.assertRaises(InvalidVersionError, draft_store.unpublish, location)
-
 
     def test_bad_contentstore_request(self):
         resp = self.client.get('http://localhost:8001/c4x/CDX/123123/asset/&images_circuits_Lab7Solution2.png')
@@ -809,6 +816,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         export_to_xml(module_store, content_store, location, root_dir, 'test_export')
 
 
+@override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
 class ContentStoreTest(ModuleStoreTestCase):
     """
     Tests for the CMS ContentStore application.
@@ -844,6 +852,11 @@ class ContentStoreTest(ModuleStoreTestCase):
             'number': '999',
             'display_name': 'Robot Super Course',
         }
+
+    def tearDown(self):
+        mongo = MongoClient()
+        mongo.drop_database(TEST_DATA_CONTENTSTORE['OPTIONS']['db'])
+        _CONTENTSTORE.clear()
 
     def test_create_course(self):
         """Test new course creation - happy path"""

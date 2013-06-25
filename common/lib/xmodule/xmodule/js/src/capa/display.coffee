@@ -364,8 +364,6 @@ class @Problem
     choicegroup: (element, display, answers) =>
       element = $(element)
 
-      element.find('input').attr('disabled', 'disabled')
-
       input_id = element.attr('id').replace(/inputtype_/,'')
       answer = answers[input_id]
       for choice in answer
@@ -379,7 +377,6 @@ class @Problem
   inputtypeHideAnswerMethods:
     choicegroup: (element, display) =>
       element = $(element)
-      element.find('input').attr('disabled', null)
       element.find('label').removeClass('choicegroup_correct')
 
     javascriptinput: (element, display) =>

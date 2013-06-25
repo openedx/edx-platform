@@ -1,4 +1,7 @@
-"""Tests of the Capa XModule"""
+# -*- coding: utf-8 -*-
+"""
+Tests of the Capa XModule
+"""
 #pylint: disable=C0111
 #pylint: disable=R0904
 #pylint: disable=C0103
@@ -8,11 +11,12 @@ import datetime
 from mock import Mock, patch
 import unittest
 import random
+import json
 
 import xmodule
-from capa.responsetypes import StudentInputError, \
-    LoncapaProblemError, ResponseError
-from xmodule.capa_module import CapaModule
+from capa.responsetypes import (StudentInputError, LoncapaProblemError,
+                                ResponseError)
+from xmodule.capa_module import CapaModule, ComplexEncoder
 from xmodule.modulestore import Location
 
 from django.http import QueryDict
@@ -47,12 +51,16 @@ class CapaFactory(object):
 
     @staticmethod
     def input_key():
-        """ Return the input key to use when passing GET parameters """
+        """
+        Return the input key to use when passing GET parameters
+        """
         return ("input_" + CapaFactory.answer_key())
 
     @staticmethod
     def answer_key():
-        """ Return the key stored in the capa problem answer dict """
+        """
+        Return the key stored in the capa problem answer dict
+        """
         return ("-".join(['i4x', 'edX', 'capa_test', 'problem',
                          'SampleProblem%d' % CapaFactory.num]) +
                 "_2_1")
@@ -361,7 +369,9 @@ class CapaModuleTest(unittest.TestCase):
             result = CapaModule.make_dict_of_responses(invalid_get_dict)
 
     def _querydict_from_dict(self, param_dict):
-        """ Create a Django QueryDict from a Python dictionary """
+        """
+        Create a Django QueryDict from a Python dictionary
+        """
 
         # QueryDict objects are immutable by default, so we make
         # a copy that we can update.
@@ -496,9 +506,10 @@ class CapaModuleTest(unittest.TestCase):
     def test_check_problem_error(self):
 
         # Try each exception that capa_module should handle
-        for exception_class in [StudentInputError,
-                                LoncapaProblemError,
-                                ResponseError]:
+        exception_classes = [StudentInputError,
+                             LoncapaProblemError,
+                             ResponseError]
+        for exception_class in exception_classes:
 
             # Create the module
             module = CapaFactory.create(attempts=1)
@@ -515,6 +526,60 @@ class CapaModuleTest(unittest.TestCase):
 
             # Expect an AJAX alert message in 'success'
             expected_msg = 'Error: test error'
+            self.assertEqual(expected_msg, result['success'])
+
+            # Expect that the number of attempts is NOT incremented
+            self.assertEqual(module.attempts, 1)
+
+    def test_check_problem_other_errors(self):
+        """
+        Test that errors other than the expected kinds give an appropriate message.
+
+        See also `test_check_problem_error` for the "expected kinds" or errors.
+        """
+        # Create the module
+        module = CapaFactory.create(attempts=1)
+
+        # Ensure that the user is NOT staff
+        module.system.user_is_staff = False
+
+        # Ensure that DEBUG is on
+        module.system.DEBUG = True
+
+        # Simulate answering a problem that raises the exception
+        with patch('capa.capa_problem.LoncapaProblem.grade_answers') as mock_grade:
+            error_msg = u"Superterrible error happened: ☠"
+            mock_grade.side_effect = Exception(error_msg)
+
+            get_request_dict = {CapaFactory.input_key(): '3.14'}
+            result = module.check_problem(get_request_dict)
+
+        # Expect an AJAX alert message in 'success'
+        self.assertTrue(error_msg in result['success'])
+
+    def test_check_problem_error_nonascii(self):
+
+        # Try each exception that capa_module should handle
+        exception_classes = [StudentInputError,
+                             LoncapaProblemError,
+                             ResponseError]
+        for exception_class in exception_classes:
+
+            # Create the module
+            module = CapaFactory.create(attempts=1)
+
+            # Ensure that the user is NOT staff
+            module.system.user_is_staff = False
+
+            # Simulate answering a problem that raises the exception
+            with patch('capa.capa_problem.LoncapaProblem.grade_answers') as mock_grade:
+                mock_grade.side_effect = exception_class(u"ȧƈƈḗƞŧḗḓ ŧḗẋŧ ƒǿř ŧḗşŧīƞɠ")
+
+                get_request_dict = {CapaFactory.input_key(): '3.14'}
+                result = module.check_problem(get_request_dict)
+
+            # Expect an AJAX alert message in 'success'
+            expected_msg = u'Error: ȧƈƈḗƞŧḗḓ ŧḗẋŧ ƒǿř ŧḗşŧīƞɠ'
             self.assertEqual(expected_msg, result['success'])
 
             # Expect that the number of attempts is NOT incremented
@@ -1021,6 +1086,33 @@ class CapaModuleTest(unittest.TestCase):
         # Expect that the module has created a new dummy problem with the error
         self.assertNotEqual(original_problem, module.lcp)
 
+    def test_get_problem_html_error_w_debug(self):
+        """
+        Test the html response when an error occurs with DEBUG on
+        """
+        module = CapaFactory.create()
+
+        # Simulate throwing an exception when the capa problem
+        # is asked to render itself as HTML
+        error_msg = u"Superterrible error happened: ☠"
+        module.lcp.get_html = Mock(side_effect=Exception(error_msg))
+
+        # Stub out the get_test_system rendering function
+        module.system.render_template = Mock(return_value="<div>Test Template HTML</div>")
+
+        # Make sure DEBUG is on
+        module.system.DEBUG = True
+
+        # Try to render the module with DEBUG turned on
+        html = module.get_problem_html()
+
+        self.assertTrue(html is not None)
+
+        # Check the rendering context
+        render_args, _ = module.system.render_template.call_args
+        context = render_args[1]
+        self.assertTrue(error_msg in context['problem']['html'])
+
     def test_random_seed_no_change(self):
 
         # Run the test for each possible rerandomize value
@@ -1126,3 +1218,28 @@ class CapaModuleTest(unittest.TestCase):
             for i in range(200):
                 module = CapaFactory.create(rerandomize=rerandomize)
                 assert 0 <= module.seed < 1000
+
+    @patch('xmodule.capa_module.log')
+    @patch('xmodule.capa_module.Progress')
+    def test_get_progress_error(self, mock_progress, mock_log):
+        """
+        Check that an exception given in `Progress` produces a `log.exception` call.
+        """
+        error_types = [TypeError, ValueError]
+        for error_type in error_types:
+            mock_progress.side_effect = error_type
+            module = CapaFactory.create()
+            self.assertIsNone(module.get_progress())
+            mock_log.exception.assert_called_once_with('Got bad progress')
+            mock_log.reset_mock()
+
+
+class ComplexEncoderTest(unittest.TestCase):
+    def test_default(self):
+        """
+        Check that complex numbers can be encoded into JSON.
+        """
+        complex_num = 1 - 1j
+        expected_str = '1-1*j'
+        json_str = json.dumps(complex_num, cls=ComplexEncoder)
+        self.assertEqual(expected_str, json_str[1:-1])  # ignore quotes

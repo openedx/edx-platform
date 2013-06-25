@@ -2,8 +2,6 @@ import hashlib
 import json
 import logging
 
-from django.db import transaction
-
 from celery.result import AsyncResult
 from celery.states import READY_STATES, SUCCESS, FAILURE, REVOKED
 
@@ -30,7 +28,6 @@ def _task_is_running(course_id, task_type, task_key):
     return len(runningTasks) > 0
 
 
-@transaction.autocommit
 def _reserve_task(course_id, task_type, task_key, task_input, requester):
     """
     Creates a database entry to indicate that a task is in progress.
@@ -39,9 +36,9 @@ def _reserve_task(course_id, task_type, task_key, task_input, requester):
     Includes the creation of an arbitrary value for task_id, to be
     submitted with the task call to celery.
 
-    Autocommit annotation makes sure the database entry is committed.
+    The InstructorTask.create method makes sure the InstructorTask entry is committed.
     When called from any view that is wrapped by TransactionMiddleware,
-    and thus in a "commit-on-success" transaction, this autocommit here
+    and thus in a "commit-on-success" transaction, an autocommit buried within here
     will cause any pending transaction to be committed by a successful
     save here.  Any future database operations will take place in a
     separate transaction.
