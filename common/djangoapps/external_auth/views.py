@@ -176,6 +176,7 @@ def external_login_or_signup(request,
 
     # We trust shib's authentication, so no need to authenticate using the password again
     if settings.MITX_FEATURES.get('AUTH_USE_SHIB'):
+        uname = internal_user.username
         user = internal_user
         # Assuming this 'AUTHENTICATION_BACKENDS' is set in settings, which I think is safe
         if settings.AUTHENTICATION_BACKENDS:
