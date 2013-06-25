@@ -105,7 +105,6 @@ class CourseDetailsTestCase(CourseTestCase):
         self.assertEqual(jsondetails['string'], 'string')
 
     def test_update_and_fetch(self):
-        # # NOTE: I couldn't figure out how to validly test time setting w/ all the conversions
         jsondetails = CourseDetails.fetch(self.course_location)
         jsondetails.syllabus = "<a href='foo'>bar</a>"
         # encode - decode to convert date fields and other data which changes form
@@ -127,6 +126,11 @@ class CourseDetailsTestCase(CourseTestCase):
         self.assertEqual(
             CourseDetails.update_from_json(jsondetails.__dict__).effort,
             jsondetails.effort, "After set effort"
+        )
+        jsondetails.start_date = datetime.datetime(2010, 10, 1, 0, tzinfo=UTC())
+        self.assertEqual(
+            CourseDetails.update_from_json(jsondetails.__dict__).start_date,
+            jsondetails.start_date
         )
 
     @override_settings(MKTG_URLS={'ROOT': 'dummy-root'})
