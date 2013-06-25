@@ -1,5 +1,6 @@
 import json
 import shutil
+import mock
 from django.test.client import Client
 from django.test.utils import override_settings
 from django.conf import settings
@@ -15,6 +16,8 @@ from django.contrib.auth.models import User
 from django.dispatch import Signal
 from contentstore.utils import get_modulestore
 from contentstore.tests.utils import parse_json
+
+from auth.authz import add_user_to_creator_group
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -860,6 +863,12 @@ class ContentStoreTest(ModuleStoreTestCase):
 
     def test_create_course(self):
         """Test new course creation - happy path"""
+        self.assert_created_course()
+
+    def assert_created_course(self):
+        """
+        Checks that the course was created properly.
+        """
         resp = self.client.post(reverse('create_new_course'), self.course_data)
         self.assertEqual(resp.status_code, 200)
         data = parse_json(resp)
@@ -867,41 +876,71 @@ class ContentStoreTest(ModuleStoreTestCase):
 
     def test_create_course_check_forum_seeding(self):
         """Test new course creation and verify forum seeding """
-        resp = self.client.post(reverse('create_new_course'), self.course_data)
-        self.assertEqual(resp.status_code, 200)
-        data = parse_json(resp)
-        self.assertEqual(data['id'], 'i4x://MITx/999/course/Robot_Super_Course')
+        self.assert_created_course()
         self.assertTrue(are_permissions_roles_seeded('MITx/999/Robot_Super_Course'))
 
     def test_create_course_duplicate_course(self):
         """Test new course creation - error path"""
         self.client.post(reverse('create_new_course'), self.course_data)
+        self.assert_course_creation_failed('There is already a course defined with this name.')
+
+    def assert_course_creation_failed(self, error_message):
+        """
+        Checks that the course did not get created
+        """
         resp = self.client.post(reverse('create_new_course'), self.course_data)
-        data = parse_json(resp)
         self.assertEqual(resp.status_code, 200)
-        self.assertEqual(data['ErrMsg'], 'There is already a course defined with this name.')
+        data = parse_json(resp)
+        self.assertEqual(data['ErrMsg'], error_message)
 
     def test_create_course_duplicate_number(self):
         """Test new course creation - error path"""
         self.client.post(reverse('create_new_course'), self.course_data)
         self.course_data['display_name'] = 'Robot Super Course Two'
 
-        resp = self.client.post(reverse('create_new_course'), self.course_data)
-        data = parse_json(resp)
-
-        self.assertEqual(resp.status_code, 200)
-        self.assertEqual(data['ErrMsg'],
-                         'There is already a course defined with the same organization and course number.')
+        self.assert_course_creation_failed('There is already a course defined with the same organization and course number.')
 
     def test_create_course_with_bad_organization(self):
         """Test new course creation - error path for bad organization name"""
         self.course_data['org'] = 'University of California, Berkeley'
-        resp = self.client.post(reverse('create_new_course'), self.course_data)
-        data = parse_json(resp)
+        self.assert_course_creation_failed("Unable to create course 'Robot Super Course'.\n\nInvalid characters in 'University of California, Berkeley'.")
 
-        self.assertEqual(resp.status_code, 200)
-        self.assertEqual(data['ErrMsg'],
-                         "Unable to create course 'Robot Super Course'.\n\nInvalid characters in 'University of California, Berkeley'.")
+    def test_create_course_with_course_creation_disabled_staff(self):
+        """Test new course creation -- course creation disabled, but staff access."""
+        with mock.patch.dict('django.conf.settings.MITX_FEATURES', {'DISABLE_COURSE_CREATION': True}):
+            self.assert_created_course()
+
+    def test_create_course_with_course_creation_disabled_not_staff(self):
+        """Test new course creation -- error path for course creation disabled, not staff access."""
+        with mock.patch.dict('django.conf.settings.MITX_FEATURES', {'DISABLE_COURSE_CREATION': True}):
+            self.user.is_staff = False
+            self.user.save()
+            self.assert_course_permission_denied()
+
+    def test_create_course_no_course_creators_staff(self):
+        """Test new course creation -- course creation group enabled, staff, group is empty."""
+        with mock.patch.dict('django.conf.settings.MITX_FEATURES', {'ENABLE_CREATOR_GROUP': True}):
+            self.assert_created_course()
+
+    def test_create_course_no_course_creators_not_staff(self):
+        """Test new course creation -- error path for course creator group enabled, not staff, group is empty."""
+        with mock.patch.dict('django.conf.settings.MITX_FEATURES', {"ENABLE_CREATOR_GROUP" : True}):
+            self.user.is_staff = False
+            self.user.save()
+            self.assert_course_permission_denied()
+
+    def test_create_course_with_course_creator(self):
+        """Test new course creation -- use course creator group"""
+        with mock.patch.dict('django.conf.settings.MITX_FEATURES', {"ENABLE_CREATOR_GROUP" : True}):
+            add_user_to_creator_group(self.user)
+            self.assert_created_course()
+
+    def assert_course_permission_denied(self):
+        """
+        Checks that the course did not get created due to a PermissionError.
+        """
+        resp = self.client.post(reverse('create_new_course'), self.course_data)
+        self.assertEqual(resp.status_code, 403)
 
     def test_course_index_view_with_no_courses(self):
         """Test viewing the index page with no courses"""
