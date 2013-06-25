@@ -1,0 +1,1 @@
+from split import SplitMongoModuleStore

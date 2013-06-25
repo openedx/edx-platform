@@ -50,6 +50,8 @@ def inherit_metadata(descriptor, model_data):
 
 
 def own_metadata(module):
+    # IN SPLIT MONGO this is just ['metadata'] as it keeps ['_inherited_metadata'] separate!
+    # FIXME move into kvs? will that work for xml mongo?
     """
     Return a dictionary that contains only non-inherited field keys,
     mapped to their values

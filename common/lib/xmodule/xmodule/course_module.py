@@ -15,6 +15,7 @@ import json
 
 from xblock.core import Scope, List, String, Dict, Boolean
 from .fields import Date
+from xmodule.modulestore.locator import CourseLocator
 from django.utils.timezone import UTC
 from xmodule.util import date_utils
 
@@ -373,7 +374,10 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         super(CourseDescriptor, self).__init__(*args, **kwargs)
 
         if self.wiki_slug is None:
-            self.wiki_slug = self.location.course
+            if isinstance(self.location, Location):
+                self.wiki_slug = self.location.course
+            elif isinstance(self.location, CourseLocator):
+                self.wiki_slug = self.location.course_id or self.display_name
 
         msg = None
 
