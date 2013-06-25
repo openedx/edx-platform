@@ -36,6 +36,30 @@ CMS.Models.Textbook = Backbone.AssociatedModel.extend({
             tab_title: this.get('name'),
             chapters: this.get('chapters').toJSON()
         };
+    },
+    validate: function(attrs, options) {
+        if (!attrs.name) {
+            return "name is required";
+        }
+        if (attrs.chapters.length === 0) {
+            return "at least one asset is required";
+        } else if (attrs.chapters.length === 1) {
+            // only asset_path is required: we don't need a name
+            if (!attrs.chapters.first().get('asset_path')) {
+                return "at least one asset is required";
+            }
+        } else {
+            // validate all chapters
+            var allChaptersValid = true;
+            attrs.chapters.each(function(chapter) {
+                if(!chapter.isValid()) {
+                    allChaptersValid = false;
+                }
+            });
+            if(!allChaptersValid) {
+                return "invalid chapter";
+            }
+        }
     }
 });
 CMS.Collections.TextbookSet = Backbone.Collection.extend({
@@ -72,6 +96,15 @@ CMS.Models.Chapter = Backbone.AssociatedModel.extend({
             title: this.get('name'),
             url: this.get('asset_path')
         };
+    },
+    validate: function(attrs, options) {
+        if(!attrs.name && !attrs.asset_path) {
+            return "name and asset_path are both required";
+        } else if(!attrs.name) {
+            return "name is required";
+        } else if (!attrs.asset_path) {
+            return "asset_path is required";
+        }
     }
 });
 CMS.Collections.ChapterSet = Backbone.Collection.extend({
