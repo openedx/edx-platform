@@ -14,10 +14,6 @@ logger = getLogger(__name__)
 
 from terrain.browser import reset_data
 
-_COURSE_NAME = 'Robot Super Course'
-_COURSE_NUM = '999'
-_COURSE_ORG = 'MITx'
-
 ###########  STEP HELPERS ##############
 
 
@@ -124,9 +120,9 @@ def create_studio_user(
 
 
 def fill_in_course_info(
-        name=_COURSE_NAME,
-        org=_COURSE_ORG,
-        num=_COURSE_NUM):
+        name=world.scenario_dict['COURSE_NAME'],
+        org=world.scenario_dict['COURSE_ORG'],
+        num=world.scenario_dict['COURSE_NUM']):
     world.css_fill('.new-course-name', name)
     world.css_fill('.new-course-org', org)
     world.css_fill('.new-course-number', num)
@@ -151,15 +147,24 @@ def log_into_studio(
         login_form.find_by_name('submit').click()
     world.retry_on_exception(fill_login_form)
     assert_true(world.is_css_present('.new-course-button'))
+    world.scenario_dict['username'] = uname
+    world.scenario_dict['userpassword'] = password
+    world.scenario_dict['useremail'] = email
 
 
 def create_a_course():
-    world.CourseFactory.create(org=_COURSE_ORG, course=_COURSE_NUM, display_name=_COURSE_NAME)
+    world.scenario_dict['COURSE_NAME'] = 'Robot Super Course'
+    world.scenario_dict['COURSE_NUM'] = '999'
+    world.scenario_dict['COURSE_ORG'] = 'MITx'
+    world.CourseFactory.create(org=world.scenario_dict['COURSE_ORG'], course=world.scenario_dict['COURSE_NUM'], display_name=world.scenario_dict['COURSE_NAME'])
 
     # Add the user to the instructor group of the course
     # so they will have the permissions to see it in studio
-    course = world.GroupFactory.create(name='instructor_MITx/{course_num}/{course_name}'.format(course_num=_COURSE_NUM, course_name=_COURSE_NAME.replace(" ", "_")))
-    user = get_user_by_email('robot+studio@edx.org')
+    course = world.GroupFactory.create(name='instructor_MITx/{course_num}/{course_name}'.format(course_num=world.scenario_dict['COURSE_NUM'], course_name=world.scenario_dict['COURSE_NAME'].replace(" ", "_")))
+    if world.scenario_dict['useremail']:
+        user = get_user_by_email(world.scenario_dict['useremail'])
+    else:
+        user = get_user_by_email('robot+studio@edx.org')
     user.groups.add(course)
     user.save()
     world.browser.reload()

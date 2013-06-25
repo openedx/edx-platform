@@ -17,14 +17,14 @@ from urllib import quote_plus
 
 
 @world.absorb
-def create_user(uname):
+def create_user(uname, password):
 
     # If the user already exists, don't try to create it again
     if len(User.objects.filter(username=uname)) > 0:
         return
 
     portal_user = UserFactory.build(username=uname, email=uname + '@edx.org')
-    portal_user.set_password('test')
+    portal_user.set_password(password)
     portal_user.save()
 
     registration = world.RegistrationFactory(user=portal_user)
@@ -62,6 +62,8 @@ def log_in(username, password):
     cookie_dict = {settings.SESSION_COOKIE_NAME: request.session.session_key}
     world.browser.cookies.delete()
     world.browser.cookies.add(cookie_dict)
+    world.scenario_dict['username'] = username
+    world.scenario_dict['userpassword'] = password
 
 
 @world.absorb

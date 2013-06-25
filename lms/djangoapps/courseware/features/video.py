@@ -2,7 +2,7 @@
 
 from lettuce import world, step
 from lettuce.django import django_url
-from common import TEST_COURSE_NAME, TEST_SECTION_NAME, i_am_registered_for_the_course, section_location
+from common import i_am_registered_for_the_course, section_location
 
 ############### ACTIONS ####################
 
@@ -14,30 +14,30 @@ def does_autoplay(_step):
 
 @step('the course has a Video component')
 def view_video(_step):
-    coursename = TEST_COURSE_NAME.replace(' ', '_')
+    coursename = world.scenario_dict['COURSE_NAME'].replace(' ', '_')
     i_am_registered_for_the_course(step, coursename)
 
     # Make sure we have a video
     add_video_to_course(coursename)
-    chapter_name = TEST_SECTION_NAME.replace(" ", "_")
+    chapter_name = world.scenario_dict['SECTION_NAME'].replace(" ", "_")
     section_name = chapter_name
-    url = django_url('/courses/edx/Test_Course/Test_Course/courseware/%s/%s' %
-                     (chapter_name, section_name))
+    url = django_url('/courses/%s/%s/%s/courseware/%s/%s' %
+                    (world.scenario_dict['COURSE_ORG'], world.scenario_dict['COURSE_NUM'], world.scenario_dict['COURSE_NAME'].replace(' ', '_'), chapter_name, section_name,))
 
     world.browser.visit(url)
 
 
 @step('the course has a VideoAlpha component')
 def view_videoalpha(step):
-    coursename = TEST_COURSE_NAME.replace(' ', '_')
+    coursename = world.scenario_dict['COURSE_NAME'].replace(' ', '_')
     i_am_registered_for_the_course(step, coursename)
 
     # Make sure we have a videoalpha
     add_videoalpha_to_course(coursename)
-    chapter_name = TEST_SECTION_NAME.replace(" ", "_")
+    chapter_name = world.scenario_dict['SECTION_NAME'].replace(" ", "_")
     section_name = chapter_name
-    url = django_url('/courses/edx/Test_Course/Test_Course/courseware/%s/%s' %
-                     (chapter_name, section_name))
+    url = django_url('/courses/%s/%s/%s/courseware/%s/%s' %
+                    (world.scenario_dict['COURSE_ORG'], world.scenario_dict['COURSE_NUM'], world.scenario_dict['COURSE_NAME'].replace(' ', '_'), chapter_name, section_name,))
 
     world.browser.visit(url)
 
