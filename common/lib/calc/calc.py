@@ -93,7 +93,7 @@ def check_variables(string, variables):
     Pyparsing uses a left-to-right parser, which makes a more
     elegant approach pretty hopeless.
     """
-    general_whitespace = re.compile('[^\\w]+')
+    general_whitespace = re.compile('[^\\w]+')  # TODO consider non-ascii
     # List of all alnums in string
     possible_variables = re.split(general_whitespace, string)
     bad_variables = []

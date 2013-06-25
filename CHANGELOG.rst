@@ -51,6 +51,8 @@ setting now run entirely outside the Python sandbox.
 
 Blades: Added tests for Video Alpha player.
 
+Common: Have the capa module handle unicode better (especially errors)
+
 Blades: Video Alpha bug fix for speed changing to 1.0 in Firefox.
 
 Blades: Additional event tracking added to Video Alpha: fullscreen switch, show/hide
