@@ -123,7 +123,7 @@ CMS.Views.EditTextbook = Backbone.View.extend({
             title: gettext("Saving&hellip;")
         });
         var that = this;
-        this.model.collection.save({
+        this.model.save({}, {
             success: function() {
                 that.close();
             },

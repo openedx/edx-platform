@@ -23,6 +23,9 @@ describe "CMS.Models.Textbook", ->
     it "should be empty by default", ->
         expect(@model.isEmpty()).toBeTruthy()
 
+    it "should have a URL set", ->
+        expect(_.result(@model, "url")).toBeTruthy()
+
 
 describe "CMS.Models.Textbook input/output", ->
     # replace with Backbone.Assocations.deepAttributes when

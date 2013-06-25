@@ -16,6 +16,13 @@ CMS.Models.Textbook = Backbone.AssociatedModel.extend({
     isEmpty: function() {
         return !this.get('name') && this.get('chapters').isEmpty();
     },
+    url: function() {
+        if(this.isNew()) {
+            return CMS.URL.TEXTBOOK + "/new";
+        } else {
+            return CMS.URL.TEXTBOOK + "/" + this.id;
+        }
+    },
     parse: function(response) {
         var ret = $.extend(true, {}, response);
         if("tab_title" in ret && !("name" in ret)) {

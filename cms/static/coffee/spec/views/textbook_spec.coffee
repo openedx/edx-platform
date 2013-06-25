@@ -76,8 +76,8 @@ describe "CMS.Views.EditTextbook", ->
             appendSetFixtures(sandbox({id: "page-notification"}))
             appendSetFixtures(sandbox({id: "page-prompt"}))
             @model = new CMS.Models.Textbook({name: "Life Sciences", editing: true})
+            spyOn(@model, 'save')
             @collection = new CMS.Collections.TextbookSet()
-            spyOn(@collection, 'save')
             @collection.add(@model)
             @view = new CMS.Views.EditTextbook({model: @model})
             spyOn(@view, 'render').andCallThrough()
@@ -100,7 +100,7 @@ describe "CMS.Views.EditTextbook", ->
             @view.$("form").submit()
             expect(@model.get("name")).toEqual("starfish")
             expect(@model.get("chapters").at(0).get("name")).toEqual("foobar")
-            expect(@collection.save).toHaveBeenCalled()
+            expect(@model.save).toHaveBeenCalled()
 
         it "does not save on cancel", ->
             @model.get("chapters").add([{name: "a", asset_path: "b"}])
@@ -110,7 +110,7 @@ describe "CMS.Views.EditTextbook", ->
             @view.$(".action-cancel").click()
             expect(@model.get("name")).not.toEqual("starfish")
             expect(@model.get("chapters").at(0).get("name")).not.toEqual("foobar")
-            expect(@collection.save).not.toHaveBeenCalled()
+            expect(@model.save).not.toHaveBeenCalled()
 
         it "removes all empty chapters on cancel if the model has a non-empty chapter", ->
             chapters = @model.get("chapters")

@@ -2,10 +2,13 @@
 Views related to operations on course objects
 """
 import json
+import random
+import string
 
 from django.contrib.auth.decorators import login_required
 from django_future.csrf import ensure_csrf_cookie
 from django.conf import settings
+from django.views.decorators.http import require_http_methods
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseBadRequest
@@ -48,7 +51,8 @@ __all__ = ['course_index', 'create_new_course', 'course_info',
            'course_config_advanced_page',
            'course_settings_updates',
            'course_grader_updates',
-           'course_advanced_updates', 'textbook_index']
+           'course_advanced_updates', 'textbook_index', 'textbook_by_id',
+           'create_textbook']
 
 
 @login_required
@@ -421,17 +425,48 @@ class TextbookValidationError(Exception):
     pass
 
 
-def validate_textbook_json(text):
+def validate_textbooks_json(text):
     try:
-        obj = json.loads(text)
+        textbooks = json.loads(text)
     except ValueError:
         raise TextbookValidationError("invalid JSON")
-    if not isinstance(obj, (list, tuple)):
+    if not isinstance(textbooks, (list, tuple)):
         raise TextbookValidationError("must be JSON list")
-    for textbook in obj:
-        if not textbook.get("tab_title"):
-            raise TextbookValidationError("every textbook must have a tab_title")
-    return obj
+    for textbook in textbooks:
+        validate_textbook_json(textbook)
+    # check specified IDs for uniqueness
+    all_ids = [textbook["id"] for textbook in textbooks if "id" in textbook]
+    unique_ids = set(all_ids)
+    if len(all_ids) > len(unique_ids):
+        raise TextbookValidationError("IDs must be unique")
+    return textbooks
+
+
+def validate_textbook_json(textbook, used_ids=()):
+    if isinstance(textbook, basestring):
+        try:
+            textbook = json.loads(textbook)
+        except ValueError:
+            raise TextbookValidationError("invalid JSON")
+    if not isinstance(textbook, dict):
+        raise TextbookValidationError("must be JSON object")
+    if not textbook.get("tab_title"):
+        raise TextbookValidationError("must have tab_title")
+    tid = str(textbook.get("id", ""))
+    if tid and not tid[0].isdigit():
+        raise TextbookValidationError("textbook ID must start with a digit")
+    return textbook
+
+
+def assign_textbook_id(textbook, used_ids=()):
+    tid = Location.clean(textbook["tab_title"])
+    if not tid[0].isdigit():
+        # stick a random digit in front
+        tid = random.choice(string.digits) + tid
+    while tid in used_ids:
+        # add a random ASCII character to the end
+        tid = tid + random.choice(string.ascii_lowercase)
+    return tid
 
 
 @login_required
@@ -451,13 +486,22 @@ def textbook_index(request, org, course, name):
             return JsonResponse(course_module.pdf_textbooks)
         elif request.method == 'POST':
             try:
-                course_module.pdf_textbooks = validate_textbook_json(request.body)
+                textbooks = validate_textbooks_json(request.body)
             except TextbookValidationError as e:
                 return JsonResponse({"error": e.message}, status=400)
+
+            tids = set(t["id"] for t in textbooks if "id" in t)
+            for textbook in textbooks:
+                if not "id" in textbook:
+                    tid = assign_textbook_id(textbook, tids)
+                    textbook["id"] = tid
+                    tids.add(tid)
+
             if not any(tab['type'] == 'pdf_textbooks' for tab in course_module.tabs):
                 course_module.tabs.append({"type": "pdf_textbooks"})
+            course_module.pdf_textbooks = textbooks
             store.update_metadata(course_module.location, own_metadata(course_module))
-            return JsonResponse('', status=204)
+            return JsonResponse(course_module.pdf_textbooks)
     else:
         upload_asset_url = reverse('upload_asset', kwargs={
             'org': org,
@@ -475,3 +519,74 @@ def textbook_index(request, org, course, name):
             'upload_asset_url': upload_asset_url,
             'textbook_url': textbook_url,
         })
+
+
+@login_required
+@ensure_csrf_cookie
+@require_http_methods(("POST",))
+def create_textbook(request, org, course, name):
+    location = get_location_and_verify_access(request, org, course, name)
+    store = get_modulestore(location)
+    course_module = store.get_item(location, depth=3)
+
+    try:
+        textbook = validate_textbook_json(request.body)
+    except TextbookValidationError:
+        return JsonResponse({"error": e.message}, status=400)
+    if not textbook.get("id"):
+        tids = set(t["id"] for t in course_module.pdf_textbooks if "id" in t)
+        textbook["id"] = assign_textbook_id(textbook, tids)
+    course_module.pdf_textbooks.append(textbook)
+    store.update_metadata(course_module.location, own_metadata(course_module))
+    resp = JsonResponse(textbook, status=201)
+    resp["Location"] = reverse("textbook_by_id", kwargs={
+        'org': org,
+        'course': course,
+        'name': name,
+        'tid': textbook["id"],
+    })
+    return resp
+
+
+@login_required
+@ensure_csrf_cookie
+@require_http_methods(("GET", "POST", "DELETE"))
+def textbook_by_id(request, org, course, name, tid):
+    location = get_location_and_verify_access(request, org, course, name)
+    store = get_modulestore(location)
+    course_module = store.get_item(location, depth=3)
+    matching_id = [tb for tb in course_module.pdf_textbooks if tb.get("id") == tid]
+    if matching_id:
+        textbook = matching_id[0]
+    else:
+        textbook = None
+
+    if request.method == 'GET':
+        if not textbook:
+            return JsonResponse(status=404)
+        return JsonResponse(textbook)
+    elif request.method == 'POST':
+        try:
+            new_textbook = validate_textbook_json(request.body)
+        except TextbookValidationError:
+            return JsonResponse({"error": e.message}, status=400)
+        new_textbook["id"] = tid
+        if textbook:
+            i = course_module.pdf_textbooks.index(textbook)
+            new_textbooks = course_module.pdf_textbooks[0:i]
+            new_textbooks.append(new_textbook)
+            new_textbooks.extend(course_module.pdf_textbooks[i+1:])
+            course_module.pdf_textbooks = new_textbooks
+        else:
+            course_module.pdf_textbooks.append(new_textbook)
+        store.update_metadata(course_module.location, own_metadata(course_module))
+        return JsonResponse(new_textbook, status=201)
+    elif request.method == 'DELETE':
+        if not textbook:
+            return JsonResponse(status=404)
+        i = course_module.pdf_textbooks.index(textbook)
+        new_textbooks = course_module.pdf_textbooks[0:i]
+        new_textbooks.extend(course_module.pdf_textbooks[i+1:])
+        course_module.pdf_textbooks = new_textbooks
+        store.update_metadata(course_module.location, own_metadata(course_module))
+        return JsonResponse(new_textbook)
