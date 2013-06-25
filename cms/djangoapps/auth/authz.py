@@ -102,13 +102,18 @@ def add_user_to_course_group(caller, user, location, role):
     return _add_user_to_group(user, group)
 
 
-def add_user_to_creator_group(user):
+def add_user_to_creator_group(caller, user):
     """
     Adds the user to the group of course creators.
+
+    The caller must have staff access to perform this operation.
 
     Note that on the edX site, we currently limit course creators to edX staff, and this
     method is a no-op in that environment.
     """
+    if not caller.is_active or not caller.is_authenticated or not caller.is_staff:
+        raise PermissionDenied
+
     (group, created) = Group.objects.get_or_create(name=COURSE_CREATOR_GROUP_NAME)
     if created:
         group.save()
@@ -149,10 +154,15 @@ def remove_user_from_course_group(caller, user, location, role):
         _remove_user_from_group(user, get_course_groupname_for_role(location, role))
 
 
-def remove_user_from_creator_group(user):
+def remove_user_from_creator_group(caller, user):
     """
     Removes user from the course creator group.
+
+    The caller must have staff access to perform this operation.
     """
+    if not caller.is_active or not caller.is_authenticated or not caller.is_staff:
+        raise PermissionDenied
+
     _remove_user_from_group(user, COURSE_CREATOR_GROUP_NAME)
 
 
