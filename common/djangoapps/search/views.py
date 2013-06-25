@@ -14,10 +14,12 @@ import string
 def search(request):
     context = {}
     results_string = ""
+    content = request.GET.get("content", "transcript")
     if request.GET:
         results_string = find(request)
         context.update({"old_query": request.GET['s']})
-    search_bar = render_to_string("search.html", context)
+    context.update({"previous_content": content})
+    search_bar = render_to_string("search_templates/search.html", context)
     return HttpResponse(search_bar + results_string)
 
 
@@ -26,7 +28,6 @@ def find(request, database="http://127.0.0.1:9200",
     query = request.GET.get("s", "")
     page = request.GET.get("page", 1)
     results_per_page = request.GET.get("results", 15)
-    ordering = request.GET.get("ordering", False)
     index = request.GET.get("content", "transcript")+"-index"
     full_url = "/".join([database, index, "_search?q="+field+":"])
     context = {}
@@ -39,13 +40,16 @@ def find(request, database="http://127.0.0.1:9200",
         transcripts = [entry["searchable_text"] for entry in data]
         snippets = [snippet_generator(transcript, query) for transcript in transcripts]
         data = zip(uuids, snippets)
-        data = proper_page(page, data, results_per_page)
     except KeyError:
         data = [("No results found", "Please try again")]
-    context.update({"data": data})
 
     correction = spell_check(query)
     results_pages = Paginator(data, results_per_page)
+
+    data = proper_page(results_pages, page)
+    context.update({"data": data})
+    context.update({"next_page": next_link(request, data), "prev_page": prev_link(request, data)})
+    context.update({"search_correction_link": search_correction_link(request, correction)})
     context.update({"spelling_correction": correction})
     return render_to_string("search_templates/results.html", context)
 
@@ -54,16 +58,32 @@ def query_reduction(query, stopwords):
     return [word.lower() for word in query.split() if word not in stopwords]
 
 
-def proper_page(page, data, results_per_page=15):
-    pages = Paginator(data, results_per_page)
-    correct_page = ""
+def proper_page(pages, index):
+    correct_page = pages.page(1)
     try:
-        correct_page = pages.page(page)
+        correct_page = pages.page(index)
     except PageNotAnInteger:
         correct_page = pages.page(1)
     except EmptyPage:
         correct_page = pages.page(pages.num_pages)
     return correct_page
+
+
+def next_link(request, paginator):
+    return request.path+"?s="+request.GET.get("s", "") + \
+        "&content=" + request.GET.get("content", "transcript") + "&page="+str(paginator.next_page_number())
+
+
+def prev_link(request, paginator):
+    return request.path+"?s="+request.GET.get("s", "") + \
+        "&content=" + request.GET.get("content", "transcript") + "&page="+str(paginator.previous_page_number())
+
+
+def search_correction_link(request, term, page="1"):
+    if term:
+        return request.path+"?s="+term+"&page="+page
+    else:
+        return request.path+"?s="+request.GET["s"]+"&page"+page
 
 
 def match(words):
