@@ -2,81 +2,159 @@ log = -> console.log.apply console, arguments
 plantTimeout = (ms, cb) -> setTimeout cb, ms
 
 
+std_ajax_err = (handler) -> (jqXHR, textStatus, errorThrown) ->
+  console.warn """ajax error
+                  textStatus: #{textStatus}
+                  errorThrown: #{errorThrown}"""
+  handler.apply this, arguments
+
+
 class StudentAdmin
-  constructor: (@$section) ->
+  constructor: (@$container) ->
     log "setting up instructor dashboard section - student admin"
 
-    @$student_email_field = @$section.find("input[name='student-select']")
-    @$student_progress_link = @$section.find('a.progress-link')
-    @$unenroll_btn = @$section.find("input[name='unenroll']")
-    @$problem_select_field = @$section.find("input[name='problem-select']")
-    @$reset_attempts_btn = @$section.find("input[name='reset-attempts']")
-    @$delete_states_btn = @$section.find("input[name='delete-state']")
+    # get jquery element and assert its existance
+    # for debugging
+    find_and_assert = ($root, selector) ->
+      item = $root.find selector
+      if item.length != 1
+        console.error "element selection failed for '#{selector}' resulted in length #{item.length}"
+        throw "Failed Element Selection"
+      else
+        item
 
-    @$student_progress_link.click (e) =>
+    # collect buttons
+    @$field_student_select        = find_and_assert @$container, "input[name='student-select']"
+    @$progress_link               = find_and_assert @$container, "a.progress-link"
+    @$btn_enroll                  = find_and_assert @$container, "input[name='enroll']"
+    @$btn_unenroll                = find_and_assert @$container, "input[name='unenroll']"
+    @$field_problem_select_single = find_and_assert @$container, "input[name='problem-select-single']"
+    @$btn_reset_attempts_single   = find_and_assert @$container, "input[name='reset-attempts-single']"
+    @$btn_delete_state_single     = find_and_assert @$container, "input[name='delete-state-single']"
+    @$btn_rescore_problem_single  = find_and_assert @$container, "input[name='rescore-problem-single']"
+    @$btn_task_history_single     = find_and_assert @$container, "input[name='task-history-single']"
+    @$field_problem_select_all    = find_and_assert @$container, "input[name='problem-select-all']"
+    @$btn_reset_attempts_all      = find_and_assert @$container, "input[name='reset-attempts-all']"
+    @$btn_rescore_problem_all     = find_and_assert @$container, "input[name='rescore-problem-all']"
+    @$btn_task_history_all        = find_and_assert @$container, "input[name='task-history-all']"
+
+
+    # go to student progress page
+    @$progress_link.click (e) =>
       e.preventDefault()
-      email = @$student_email_field.val()
-      @get_student_progress_link email,
+      email = @$field_student_select.val()
+
+      $.ajax
+        dataType: 'json'
+        url: @$progress_link.data 'endpoint'
+        data: student_email: email
         success: (data) ->
           log 'redirecting...'
           window.location = data.progress_url
-        error: ->
-          console.warn 'error getting student progress url for ' + email
+        error: std_ajax_err -> console.warn 'error getting student progress url for ' + email
 
-    @$unenroll_btn.click =>
+    # enroll student
+    @$btn_enroll.click =>
+      send_data =
+        action: 'enroll'
+        emails: @$field_student_select.val()
+        auto_enroll: false
+
+      $.ajax
+        dataType: 'json'
+        url: @$btn_unenroll.data 'endpoint'
+        data: send_data
+        success: -> console.log "student #{send_data.emails} enrolled"
+        error: std_ajax_err -> console.warn 'error enrolling student'
+
+    # unenroll student
+    @$btn_unenroll.click =>
       send_data =
         action: 'unenroll'
-        emails: @$student_email_field.val()
+        emails: @$field_student_select.val()
         auto_enroll: false
-      $.getJSON @$unenroll_btn.data('endpoint'), send_data, (data) ->
-        log data
 
-    @$reset_attempts_btn.click =>
-      email = @$student_email_field.val()
-      problem_to_reset = @$problem_select_field.val()
-      @reset_student_progress email, problem_to_reset, false,
-        success: -> log 'problem attempts reset!'
-        error:   -> console.warn 'error resetting problem state'
+      $.ajax
+        dataType: 'json'
+        url: @$btn_unenroll.data 'endpoint'
+        data: send_data
+        success: -> console.log "student #{send_data.emails} unenrolled"
+        error: std_ajax_err -> console.warn 'error unenrolling student'
 
-    @$delete_states_btn.click =>
-      email = @$student_email_field.val()
-      problem_to_reset = @$problem_select_field.val()
-      @reset_student_progress email, problem_to_reset, true,
-        success: -> log 'problem state deleted!'
-        error:   -> console.warn 'error deleting problem state'
+    # reset attempts for student on problem
+    @$btn_reset_attempts_single.click =>
+      send_data =
+        student_email: @$field_student_select.val()
+        problem_to_reset: @$field_problem_select_single.val()
+        delete_module: false
 
+      $.ajax
+        dataType: 'json'
+        url: @$btn_reset_attempts_single.data 'endpoint'
+        data: send_data
+        success: -> log 'problem attempts reset'
+        error: std_ajax_err   -> console.warn 'error resetting problem state'
 
-  # handler can be either a callback for success or a mapping e.g. {success: ->, error: ->, complete: ->}
-  get_student_progress_link: (student_email, handler) ->
-    settings =
-      dataType: 'json'
-      url: @$student_progress_link.data 'endpoint'
-      data: student_email: student_email
+    # delete state for student on problem
+    @$btn_delete_state_single.click =>
+      send_data =
+        student_email: @$field_student_select.val()
+        problem_to_reset: @$field_problem_select_single.val()
+        delete_module: true
 
-    if typeof handler is 'function'
-      _.extend settings, success: handler
-    else
-      _.extend settings, handler
+      $.ajax
+        dataType: 'json'
+        url: @$btn_delete_state_single.data 'endpoint'
+        data: send_data
+        success: -> log 'module state deleted'
+        error: std_ajax_err   -> console.warn 'error deleting problem state'
 
-    $.ajax settings
+    # start task to rescore problem for student
+    @$btn_rescore_problem_single.click =>
+      send_data =
+        student_email: @$field_student_select.val()
+        problem_to_reset: @$field_problem_select_single.val()
 
+      $.ajax
+        dataType: 'json'
+        url: @$btn_rescore_problem_single.data 'endpoint'
+        data: send_data
+        success: -> log 'started rescore problem task'
+        error: std_ajax_err   -> console.warn 'error starting rescore problem (single student) task'
 
-  # handler can be either a callback for success or a mapping e.g. {success: ->, error: ->, complete: ->}
-  reset_student_progress: (student_email, problem_to_reset, delete_module, handler) ->
-    settings =
-      dataType: 'json'
-      url: @$reset_attempts_btn.data 'endpoint'
-      data:
-        student_email: student_email
-        problem_to_reset: problem_to_reset
-        delete_module: delete_module
+    # TODO
+    # @$btn_task_history_single
 
-    if typeof handler is 'function'
-      _.extend settings, success: handler
-    else
-      _.extend settings, handler
+    # start task to reset attempts on problem for all students
+    @$btn_reset_attempts_all.click =>
+      send_data =
+        all_students: true
+        problem_to_reset: @$field_problem_select_all.val()
 
-    $.ajax settings
+      $.ajax
+        dataType: 'json'
+        url: @$btn_reset_attempts_all.data 'endpoint'
+        data: send_data
+        success: -> log 'started reset attempts task'
+        error: std_ajax_err (jqXHR, textStatus, errorThrown) ->
+          console.warn "error starting reset attempts (all students) task"
+
+    # start task to rescore problem for all students
+    @$btn_rescore_problem_all.click =>
+      send_data =
+        all_students: true
+        problem_to_reset: @$field_problem_select_all.val()
+
+      $.ajax
+        dataType: 'json'
+        url: @$btn_rescore_problem_all.data 'endpoint'
+        data: send_data
+        success: -> log 'started rescore problem task'
+        error: std_ajax_err (jqXHR, textStatus, errorThrown) ->
+          console.warn "error starting rescore problem (all students) task"
+
+    # TODO
+    # @$btn_task_history_all
 
 
 

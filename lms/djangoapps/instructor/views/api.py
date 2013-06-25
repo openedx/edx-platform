@@ -21,6 +21,7 @@ from django_comment_common.models import (Role,
                                           FORUM_ROLE_COMMUNITY_TA)
 
 from courseware.models import StudentModule
+import instructor_task.api
 import instructor.enrollment as enrollment
 from instructor.enrollment import split_input_list, enroll_emails, unenroll_emails
 import instructor.access as access
@@ -45,7 +46,7 @@ def students_update_enrollment_email(request, course_id):
 
     action = request.GET.get('action', '')
     emails = split_input_list(request.GET.get('emails', ''))
-    auto_enroll = request.GET.get('auto_enroll', '') in ['true', 'Talse', True]
+    auto_enroll = request.GET.get('auto_enroll', '') in ['true', 'True', True]
 
     if action == 'enroll':
         results = enroll_emails(course_id, emails, auto_enroll=auto_enroll)
@@ -293,33 +294,88 @@ def redirect_to_student_progress(request, course_id):
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def reset_student_attempts(request, course_id):
     """
-    Resets a students attempts counter. Optionally deletes student state for a problem.
+    Resets a students attempts counter or starts a task to reset all students attempts counters. Optionally deletes student state for a problem.
     Limited to staff access.
 
-    Takes query parameter student_email
-    Takes query parameter problem_to_reset
-    Takes query parameter delete_module
+    Takes either of the following query paremeters
+        - problem_to_reset is a urlname of a problem
+        - student_email is an email
+        - all_students is a boolean
+        - delete_module is a boolean
     """
     course = get_course_with_access(request.user, course_id, 'staff', depth=None)
 
-    student_email = request.GET.get('student_email')
     problem_to_reset = request.GET.get('problem_to_reset')
-    will_delete_module = {'true': True}.get(request.GET.get('delete_module', ''), False)
+    student_email = request.GET.get('student_email')
+    all_students = request.GET.get('all_students', False) in ['true', 'True', True]
+    will_delete_module = request.GET.get('delete_module', False) in ['true', 'True', True]
 
-    if not student_email or not problem_to_reset:
+    if not (problem_to_reset and (all_students or student_email)):
+        return HttpResponseBadRequest()
+    if will_delete_module and all_students:
         return HttpResponseBadRequest()
 
-    user = User.objects.get(email=student_email)
+    module_state_key = _module_state_key_from_problem_urlname(course_id, problem_to_reset)
 
-    try:
-        enrollment.reset_student_attempts(course_id, user, problem_to_reset, delete_module=will_delete_module)
-    except StudentModule.DoesNotExist:
+    response_payload = {}
+    response_payload['problem_to_reset'] = problem_to_reset
+
+    if student_email:
+        student = User.objects.get(email=student_email)
+        try:
+            enrollment.reset_student_attempts(course_id, student, module_state_key, delete_module=will_delete_module)
+        except StudentModule.DoesNotExist:
+            return HttpResponseBadRequest()
+    elif all_students:
+        task = instructor_task.api.submit_reset_problem_attempts_for_all_students(request, course_id, module_state_key)
+        response_payload['task'] = 'created'
+    else:
         return HttpResponseBadRequest()
 
-    response_payload = {
-        'course_id':    course_id,
-        'delete_module': will_delete_module,
-    }
+    response = HttpResponse(json.dumps(response_payload), content_type="application/json")
+    return response
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+def rescore_problem(request, course_id):
+    """
+    Starts a background process a students attempts counter. Optionally deletes student state for a problem.
+    Limited to staff access.
+
+    Takes query parameter problem_to_reset
+    Takes either of the following query paremeters
+        - problem_to_reset is a urlname of a problem
+        - student_email is an email
+        - all_students is a boolean
+
+    all_students will be ignored if student_email is present
+    """
+    course = get_course_with_access(request.user, course_id, 'staff', depth=None)
+
+    problem_to_reset = request.GET.get('problem_to_reset')
+    student_email = request.GET.get('student_email', False)
+    all_students = request.GET.get('all_students', '') in ['true', 'True', True]
+
+    if not (problem_to_reset and (all_students or student_email)):
+        return HttpResponseBadRequest()
+
+    module_state_key = _module_state_key_from_problem_urlname(course_id, problem_to_reset)
+
+    response_payload = {}
+    response_payload['problem_to_reset'] = problem_to_reset
+
+    if student_email:
+        response_payload['student_email'] = student_email
+        student = User.objects.get(email=student_email)
+        task = instructor_task.api.submit_rescore_problem_for_student(request, course_id, module_state_key, student)
+        response_payload['task'] = 'created'
+    elif all_students:
+        task = instructor_task.api.submit_rescore_problem_for_all_students(request, course_id, module_state_key)
+        response_payload['task'] = 'created'
+    else:
+        return HttpResponseBadRequest()
+
     response = HttpResponse(json.dumps(response_payload), content_type="application/json")
     return response
 
@@ -395,3 +451,80 @@ def update_forum_role_membership(request, course_id):
     }
     response = HttpResponse(json.dumps(response_payload), content_type="application/json")
     return response
+
+
+def _module_state_key_from_problem_urlname(course_id, urlname):
+    if urlname[-4:] == ".xml":
+        urlname = urlname[:-4]
+
+    urlname = "problem/" + urlname
+
+    (org, course_name, _) = course_id.split("/")
+    module_state_key = "i4x://" + org + "/" + course_name + "/" + urlname
+    return module_state_key
+
+
+# TODO integrate
+def get_background_task_table(course_id, problem_url, student=None):
+    """
+    Construct the "datatable" structure to represent background task history.
+
+    Filters the background task history to the specified course and problem.
+    If a student is provided, filters to only those tasks for which that student
+    was specified.
+
+    Returns a tuple of (msg, datatable), where the msg is a possible error message,
+    and the datatable is the datatable to be used for display.
+    """
+    history_entries = get_instructor_task_history(course_id, problem_url, student)
+    datatable = {}
+    msg = ""
+    # first check to see if there is any history at all
+    # (note that we don't have to check that the arguments are valid; it
+    # just won't find any entries.)
+    if (history_entries.count()) == 0:
+        if student is not None:
+            template = '<font color="red">Failed to find any background tasks for course "{course}", module "{problem}" and student "{student}".</font>'
+            msg += template.format(course=course_id, problem=problem_url, student=student.username)
+        else:
+            msg += '<font color="red">Failed to find any background tasks for course "{course}" and module "{problem}".</font>'.format(course=course_id, problem=problem_url)
+    else:
+        datatable['header'] = ["Task Type",
+                               "Task Id",
+                               "Requester",
+                               "Submitted",
+                               "Duration (sec)",
+                               "Task State",
+                               "Task Status",
+                               "Task Output"]
+
+        datatable['data'] = []
+        for instructor_task in history_entries:
+            # get duration info, if known:
+            duration_sec = 'unknown'
+            if hasattr(instructor_task, 'task_output') and instructor_task.task_output is not None:
+                task_output = json.loads(instructor_task.task_output)
+                if 'duration_ms' in task_output:
+                    duration_sec = int(task_output['duration_ms'] / 1000.0)
+            # get progress status message:
+            success, task_message = get_task_completion_info(instructor_task)
+            status = "Complete" if success else "Incomplete"
+            # generate row for this task:
+            row = [str(instructor_task.task_type),
+                   str(instructor_task.task_id),
+                   str(instructor_task.requester),
+                   instructor_task.created.isoformat(' '),
+                   duration_sec,
+                   str(instructor_task.task_state),
+                   status,
+                   task_message]
+            datatable['data'].append(row)
+
+        if student is not None:
+            datatable['title'] = "{course_id} > {location} > {student}".format(course_id=course_id,
+                                                                               location=problem_url,
+                                                                               student=student.username)
+        else:
+            datatable['title'] = "{course_id} > {location}".format(course_id=course_id, location=problem_url)
+
+    return msg, datatable

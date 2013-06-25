@@ -3,6 +3,20 @@
 log = -> console.log.apply console, arguments
 plantTimeout = (ms, cb) -> setTimeout cb, ms
 
+
+# intercepts a jquery method
+# calls the original method after callback
+intercept_jquery_method = (method_name, callback) ->
+  original = jQuery.fn[method_name]
+  jQuery.fn[method_name] = ->
+    callback.apply this, arguments
+    original.apply this, arguments
+
+
+intercept_jquery_method 'on', (event_name) ->
+  this.addClass "has-event-handler-for-#{event_name}"
+
+
 CSS_INSTRUCTOR_CONTENT = 'instructor-dashboard-content-2'
 CSS_ACTIVE_SECTION = 'active-section'
 CSS_IDASH_SECTION = 'idash-section'

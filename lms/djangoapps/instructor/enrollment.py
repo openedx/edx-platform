@@ -140,7 +140,7 @@ def split_input_list(str_list):
     return new_list
 
 
-def reset_student_attempts(course_id, student, problem_to_reset, delete_module=False):
+def reset_student_attempts(course_id, student, module_state_key, delete_module=False):
     """
     Reset student attempts for a problem. Optionally deletes all student state for the specified problem.
 
@@ -151,13 +151,6 @@ def reset_student_attempts(course_id, student, problem_to_reset, delete_module=F
     problem_to_reset is the name of a problem e.g. 'L2Node1'.
     To build the module_state_key 'problem/' and course information will be appended to problem_to_reset.
     """
-    if problem_to_reset[-4:] == ".xml":
-        problem_to_reset = problem_to_reset[:-4]
-
-    problem_to_reset = "problem/" + problem_to_reset
-
-    (org, course_name, _) = course_id.split("/")
-    module_state_key = "i4x://" + org + "/" + course_name + "/" + problem_to_reset
     module_to_reset = StudentModule.objects.get(student_id=student.id,
                                                 course_id=course_id,
                                                 module_state_key=module_state_key)
@@ -178,12 +171,3 @@ def _reset_module_attempts(studentmodule):
     # save
     studentmodule.state = json.dumps(problem_state)
     studentmodule.save()
-    # track.views.server_track(request,
-    #                          '{instructor} reset attempts from {old_attempts} to 0 for {student} on problem {problem} in {course}'.format(
-    #                              old_attempts=old_number_of_attempts,
-    #                              student=student_to_reset,
-    #                              problem=studentmodule.module_state_key,
-    #                              instructor=request.user,
-    #                              course=course_id),
-    #                          {},
-    #                          page='idashboard')

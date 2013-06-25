@@ -39,10 +39,10 @@ table.stat_table td {
 	border-color: #666666;
 	background-color: #ffffff;
 }
-.divScroll {  
-	height: 200px;  
-	overflow: scroll;  
-}  
+.divScroll {
+	height: 200px;
+	overflow: scroll;
+}
 
 a.selectedmode { background-color: yellow; }
 
@@ -116,7 +116,7 @@ function goto( mode)
           <a href="#" onclick="goto('Data');" class="${modeflag.get('Data')}">DataDump</a> |
           <a href="#" onclick="goto('Manage Groups');" class="${modeflag.get('Manage Groups')}">Manage Groups</a>
           %if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_ANALYTICS'):
-             | <a href="#" onclick="goto('Analytics');" class="${modeflag.get('Analytics')}">Analytics</a> 
+             | <a href="#" onclick="goto('Analytics');" class="${modeflag.get('Analytics')}">Analytics</a>
           %endif
 	  ]
     </h2>
@@ -248,9 +248,9 @@ function goto( mode)
     <p>
       Then select an action:
       <input type="submit" name="action" value="Reset student's attempts">
-      %if settings.MITX_FEATURES.get('ENABLE_COURSE_BACKGROUND_TASKS'):
+      ##%if settings.MITX_FEATURES.get('ENABLE_COURSE_BACKGROUND_TASKS'):
       <input type="submit" name="action" value="Rescore student's problem submission">
-      %endif
+      ##%endif
     </p>
 
     %if instructor_access:
@@ -594,7 +594,7 @@ function goto( mode)
 
 %endif
 
-##----------------------------------------------------------------------------- 
+##-----------------------------------------------------------------------------
 
 %if datatable and modeflag.get('Psychometrics') is None:
 

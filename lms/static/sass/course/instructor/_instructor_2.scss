@@ -15,6 +15,10 @@
     width: 100%;
     // position: relative;
 
+    .has-event-handler-for-click {
+      border: 3px solid blue;
+    }
+
     .slick-header-column {
       height: 100%;
     }
@@ -160,6 +164,7 @@
   .progress-link-wrapper {
     margin-top: 0.7em;
   }
+
   // h3    { margin-top: 2em; }
   // input { margin-top: 2em; }
   // a     { margin-top: 2em; }
