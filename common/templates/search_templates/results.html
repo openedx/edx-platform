@@ -206,6 +206,25 @@
 % endif
 
 
+% if len(data) > 1:
+	<section class="pagination">
+		<span class="step-links">
+			% if data.number > 1:
+				<a href="${ prev_page }">Prev</a>
+			% endif
+
+			<span class="current">
+				Page ${ data.number } of ${ data.paginator.num_pages }
+			</span> 
+
+			% if data.number < data.paginator.num_pages:
+				<a href="${next_page}">Next</a>
+			%endif
+		</span>
+	</section>
+% endif
+
+
 <%def name="css_link(path, media='')">
 	<link rel="stylesheet" type="text/css" href="${path|h}" media="${media}"></link>
 </%def>
