@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 <head>
 	${css_link("../static/css/search.css")}
 </head>
@@ -41,19 +42,21 @@
 =======
 <!DOCTYPE html>
 <html lang="en">
+=======
+>>>>>>> Refactored some code and added full elasticsearch module test suite
 <head>
-
-	<meta charset="utf-8" />
-	<title>Search Attempt</title>
-
-	<link rel="stylesheet" href="static/css/search.css" type="text/css" />
+	${css_link("../static/css/search.css")}
 </head>
 
-<body id="index" class="home">
-
-	<div id="searchwrapper">
-		<form action="/search" method="post"> {% csrf_token %}
+<div class="searchwrapper">
+	<form action="/search" method="get">
+		<span>
+		<span class="searchbox">
+			% if old_query:
+			<input type="text" class="searchbox" name="s" value="${old_query}" />
+			% else:
 			<input type="text" class="searchbox" name="s" value="" />
+<<<<<<< HEAD
 			<input type="image" src="static/images/search-icon.svg" class="searchbox_submit" value="" />
 		</form>
 	</div>
@@ -61,3 +64,30 @@
 </body>
 </html>
 >>>>>>> Search working, basic functionality and styling in place, as well as csrf protection, snippeting, results highlighting, and spell correction
+=======
+			% endif
+			<input type="submit" class="searchbox_submit" value="" />
+		</span>
+		<span class="content-select">
+			% if previous_content == "transcript":
+				<input type="radio" name="content" value="transcript" checked>Videos
+				<input type="radio" name="content" value="problem">Problems
+				<input type="radio" name="content" value="pdf">PDFs
+			% elif previous_content == "problem":
+				<input type="radio" name="content" value="transcript">Videos
+				<input type="radio" name="content" value="problem" checked>Problems
+				<input type="radio" name="content" value="pdf">PDFs
+			% else:
+				<input type="radio" name="content" value="transcript">Videos
+				<input type="radio" name="content" value="problem">Problems
+				<input type="radio" name="content" value="pdf" checked>PDFs
+			% endif
+		</span>
+	</span>
+	</form>
+</div>
+
+<%def name="css_link(path, media='')">
+	<link rel="stylesheet" type="text/css" href="${path|h}" media="${media}"></link>
+</%def>
+>>>>>>> Refactored some code and added full elasticsearch module test suite
