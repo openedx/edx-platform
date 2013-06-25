@@ -22,13 +22,16 @@ of the query for traversing StudentModule objects.
 from django.utils.translation import ugettext_noop
 from celery import task
 from functools import partial
+
 from instructor_task.tasks_helper import (
     run_main_task,
     BaseInstructorTask,
-    perform_module_state_update,
+    delete_problem_module_state,
+    _perform_module_state_update, # Evil, temporary
     rescore_problem_module_state,
     reset_attempts_module_state,
-    delete_problem_module_state,
+    update_offline_grade,
+    update_problem_module_state
 )
 from bulk_email.tasks import perform_delegate_email_batches
 
@@ -60,7 +63,7 @@ def rescore_problem(entry_id, xmodule_instance_args):
         """Filter that matches problems which are marked as being done"""
         return modules_to_update.filter(state__contains='"done": true')
 
-    visit_fcn = partial(perform_module_state_update, update_fcn, filter_fcn)
+    visit_fcn = partial(_perform_module_state_update, update_fcn, filter_fcn)
     return run_main_task(entry_id, visit_fcn, action_name)
 
 
@@ -112,9 +115,9 @@ def delete_problem_state(entry_id, xmodule_instance_args):
 def send_bulk_course_email(entry_id, _xmodule_instance_args):
     """Sends emails to recipients enrolled in a course.
 
-    `entry_id` is the id value of the InstructorTask entry that corresponds to this task.
-    The entry contains the `course_id` that identifies the course, as well as the
-    `task_input`, which contains task-specific input.
+    action_name = 'deleted'
+    update_fcn = partial(delete_problem_module_state, xmodule_instance_args)
+    return update_problem_module_state(entry_id, update_fcn, action_name, filter_fcn=None)
 
     The task_input should be a dict with the following entries:
 
@@ -127,3 +130,21 @@ def send_bulk_course_email(entry_id, _xmodule_instance_args):
     action_name = ugettext_noop('emailed')
     visit_fcn = perform_delegate_email_batches
     return run_main_task(entry_id, visit_fcn, action_name)
+
+
+@task(base=BaseInstructorTask)  # pylint: disable=E1102
+def update_offline_grades(entry_id, xmodule_instance_args):
+    """Updates grades stored offline for all students in a course.
+
+    `entry_id` is the id value of the InstructorTask entry that corresponds to this task.
+    The entry contains the `course_id` that identifies the course, as well as the
+    `task_input`, which contains task-specific input.
+
+    The task_input should be a dict with no entries.
+
+    `xmodule_instance_args` provides information needed by _get_module_instance_for_task()
+    to instantiate an xmodule instance.
+    """
+    action_name = 'graded'
+    update_fcn = partial(update_offline_grade, xmodule_instance_args)
+    return update_students(entry_id, update_fcn, action_name, filter_fcn=None)

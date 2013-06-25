@@ -16,7 +16,8 @@ from instructor_task.models import InstructorTask
 from instructor_task.tasks import (rescore_problem,
                                    reset_problem_attempts,
                                    delete_problem_state,
-                                   send_bulk_course_email)
+                                   send_bulk_course_email,
+                                   update_offline_grades)
 
 from instructor_task.api_helper import (check_arguments_for_rescoring,
                                         encode_problem_and_student_input,
@@ -205,4 +206,28 @@ def submit_bulk_course_email(request, course_id, email_id):
     task_key_stub = "{email_id}_{to_option}".format(email_id=email_id, to_option=to_option)
     # create the key value by using MD5 hash:
     task_key = hashlib.md5(task_key_stub).hexdigest()
+    return submit_task(request, task_type, task_class, course_id, task_input, task_key)
+
+def submit_update_offline_grades(request, course_id):
+    """
+    Request to have state deleted for a problem as a background task.
+
+    The offline grades will be updated for all students who have enrolled
+    in a course.  Parameters are the `course_id`.
+
+    AlreadyRunningError is raised if the course's grades are already being updated.
+    """
+    # check arguments:  make sure that the course is defined?
+    # TODO: what is the right test here?
+    # modulestore().get_instance(course_id, problem_url)
+
+    task_type = 'update_offline_grades'
+    task_class = update_offline_grades
+    # TODO: figure out if we need to encode in a standard way, or if we can get away
+    # with doing this manually.  Shouldn't be hard to make the encode call explicitly,
+    # and allow no problem_url or student to be defined.  Like this:
+    # task_input, task_key = encode_problem_and_student_input()
+    task_input = {}
+    task_key = ""
+
     return submit_task(request, task_type, task_class, course_id, task_input, task_key)
