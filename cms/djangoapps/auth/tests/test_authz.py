@@ -8,10 +8,12 @@ from django.contrib.auth.models import User
 
 from auth.authz import add_user_to_creator_group, remove_user_from_creator_group, is_user_in_creator_group
 
+
 class CreatorGroupTest(TestCase):
     """
     Tests for the course creator group.
     """
+
     def setUp(self):
         """ Test case setup """
         self.user = User.objects.create_user('testuser', 'test+courses@edx.org', 'foo')
@@ -25,7 +27,7 @@ class CreatorGroupTest(TestCase):
 
     def test_creator_group_enabled_but_empty(self):
         """ Tests creator group feature on, but group empty. """
-        with mock.patch.dict('django.conf.settings.MITX_FEATURES', {"ENABLE_CREATOR_GROUP" : True}):
+        with mock.patch.dict('django.conf.settings.MITX_FEATURES', {"ENABLE_CREATOR_GROUP": True}):
             self.assertFalse(is_user_in_creator_group(self.user))
 
             # Make user staff. This will cause is_user_in_creator_group to return True.
@@ -34,7 +36,7 @@ class CreatorGroupTest(TestCase):
 
     def test_creator_group_enabled_nonempty(self):
         """ Tests creator group feature on, user added. """
-        with mock.patch.dict('django.conf.settings.MITX_FEATURES', {"ENABLE_CREATOR_GROUP" : True}):
+        with mock.patch.dict('django.conf.settings.MITX_FEATURES', {"ENABLE_CREATOR_GROUP": True}):
             self.assertTrue(add_user_to_creator_group(self.user))
             self.assertTrue(is_user_in_creator_group(self.user))
 
@@ -62,7 +64,8 @@ class CreatorGroupTest(TestCase):
 
     def test_course_creation_disabled(self):
         """ Tests that the COURSE_CREATION_DISABLED flag overrides course creator group settings. """
-        with mock.patch.dict('django.conf.settings.MITX_FEATURES', {'DISABLE_COURSE_CREATION': True, "ENABLE_CREATOR_GROUP" : True}):
+        with mock.patch.dict('django.conf.settings.MITX_FEATURES',
+                             {'DISABLE_COURSE_CREATION': True, "ENABLE_CREATOR_GROUP": True}):
             # Add user to creator group.
             self.assertTrue(add_user_to_creator_group(self.user))
 

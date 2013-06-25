@@ -531,7 +531,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.assertGreater(len(all_assets), 0)
 
         # make sure we have some thumbnails in our trashcan
-        all_thumbnails = trash_store.get_all_content_thumbnails_for_course(course_location)
+        _all_thumbnails = trash_store.get_all_content_thumbnails_for_course(course_location)
         #
         # cdodge: temporarily comment out assertion on thumbnails because many environments
         # will not have the jpeg converter installed and this test will fail
@@ -592,20 +592,18 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         location = Location('i4x://MITx/999/chapter/neuvo')
         self.assertRaises(InvalidVersionError, draft_store.clone_item, 'i4x://edx/templates/chapter/Empty',
-            location)
+                          location)
         direct_store.clone_item('i4x://edx/templates/chapter/Empty', location)
-        self.assertRaises(InvalidVersionError, draft_store.clone_item, location,
-            location)
+        self.assertRaises(InvalidVersionError, draft_store.clone_item, location, location)
 
-        self.assertRaises(InvalidVersionError, draft_store.update_item, location,
-            'chapter data')
+        self.assertRaises(InvalidVersionError, draft_store.update_item, location, 'chapter data')
 
         # taking advantage of update_children and other functions never checking that the ids are valid
         self.assertRaises(InvalidVersionError, draft_store.update_children, location,
-            ['i4x://MITx/999/problem/doesntexist'])
+                          ['i4x://MITx/999/problem/doesntexist'])
 
         self.assertRaises(InvalidVersionError, draft_store.update_metadata, location,
-            {'due': datetime.datetime.now(UTC)})
+                          {'due': datetime.datetime.now(UTC)})
 
         self.assertRaises(InvalidVersionError, draft_store.unpublish, location)
 
@@ -903,7 +901,8 @@ class ContentStoreTest(ModuleStoreTestCase):
     def test_create_course_with_bad_organization(self):
         """Test new course creation - error path for bad organization name"""
         self.course_data['org'] = 'University of California, Berkeley'
-        self.assert_course_creation_failed("Unable to create course 'Robot Super Course'.\n\nInvalid characters in 'University of California, Berkeley'.")
+        self.assert_course_creation_failed(
+            "Unable to create course 'Robot Super Course'.\n\nInvalid characters in 'University of California, Berkeley'.")
 
     def test_create_course_with_course_creation_disabled_staff(self):
         """Test new course creation -- course creation disabled, but staff access."""
@@ -924,14 +923,14 @@ class ContentStoreTest(ModuleStoreTestCase):
 
     def test_create_course_no_course_creators_not_staff(self):
         """Test new course creation -- error path for course creator group enabled, not staff, group is empty."""
-        with mock.patch.dict('django.conf.settings.MITX_FEATURES', {"ENABLE_CREATOR_GROUP" : True}):
+        with mock.patch.dict('django.conf.settings.MITX_FEATURES', {"ENABLE_CREATOR_GROUP": True}):
             self.user.is_staff = False
             self.user.save()
             self.assert_course_permission_denied()
 
     def test_create_course_with_course_creator(self):
         """Test new course creation -- use course creator group"""
-        with mock.patch.dict('django.conf.settings.MITX_FEATURES', {"ENABLE_CREATOR_GROUP" : True}):
+        with mock.patch.dict('django.conf.settings.MITX_FEATURES', {"ENABLE_CREATOR_GROUP": True}):
             add_user_to_creator_group(self.user)
             self.assert_created_course()
 
