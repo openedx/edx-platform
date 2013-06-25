@@ -18,6 +18,53 @@
 </%def>
 
 <%def name="get_feedback()">
+    <style>
+        #answer-tabs {
+            background: transparent;
+            border: none;
+        }
+
+        #answer-tabs .ui-widget-header {
+            border-bottom: 1px solid #DCDCDC;
+        }
+
+        #answer-tabs .ui-tabs-nav .ui-state-default {
+            border: 1px solid #DCDCDC;
+            background: #EEEEEE;
+            margin-bottom: 0px;
+        }
+
+        #answer-tabs .ui-tabs-nav .ui-state-default:hover {
+            background: transparent;
+        }
+
+        #answer-tabs .ui-tabs-nav .ui-state-active {
+            border: 1px solid #DCDCDC;
+            background: transparent;
+            margin-bottom: 0px;
+        }
+
+        #answer-tabs .ui-tabs-nav .ui-state-active a {
+            color: #222222;
+        }
+
+        #answer-tabs .ui-tabs-nav .ui-state-default a:hover {
+            color: #222222;
+        }
+
+        .hint-inner-container {
+            padding-left: 15px;
+            padding-right: 15px;
+            font-size: 16px;
+        }
+
+        .vote {
+            padding-top: 0px !important;
+            padding-bottom: 0px !important;
+        }
+
+    </style>
+
     <i> Participation in the hinting system is strictly optional, and will not influence
     your grade. </i>
     <br />
@@ -33,6 +80,7 @@
 
         % for index, answer in index_to_answer.items():
         <div class = "previous-answer" id="previous-answer-${index}">
+        <div class = "hint-inner-container">
             % if index in index_to_hints and len(index_to_hints[index]) > 0:
                 Which hint was most helpful when you got the wrong answer of ${answer}?
                 <br />
@@ -53,7 +101,7 @@ What would you say to help someone who got this wrong answer?
             </textarea>
 
             <input class="submit-hint" data-answer="${index}" type="button" value="submit">
-        </div>
+        </div></div>
         % endfor
     </div>
 
