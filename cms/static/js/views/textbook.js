@@ -125,6 +125,7 @@ CMS.Views.EditTextbook = Backbone.View.extend({
         var that = this;
         this.model.save({}, {
             success: function() {
+                that.setOriginalAttributes();
                 that.close();
             },
             complete: function() {
@@ -134,6 +135,7 @@ CMS.Views.EditTextbook = Backbone.View.extend({
     },
     cancel: function(e) {
         if(e && e.preventDefault) { e.preventDefault(); }
+        this.model.reset();
         return this.close();
     },
     close: function() {

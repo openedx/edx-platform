@@ -13,6 +13,16 @@ CMS.Models.Textbook = Backbone.AssociatedModel.extend({
         relatedModel: "CMS.Models.Chapter",
         collectionType: "CMS.Collections.ChapterSet"
     }],
+    initialize: function() {
+        this.setOriginalAttributes();
+        return this;
+    },
+    setOriginalAttributes: function() {
+        this._originalAttributes = this.parse(this.toJSON());
+    },
+    reset: function() {
+        this.set(this._originalAttributes);
+    },
     isEmpty: function() {
         return !this.get('name') && this.get('chapters').isEmpty();
     },
