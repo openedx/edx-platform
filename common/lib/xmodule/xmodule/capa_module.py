@@ -519,11 +519,11 @@ class CapaModule(CapaFields, XModule):
         # now do the substitutions which are filesystem based, e.g. '/static/' prefixes
         return self.system.replace_urls(html)
 
-    def handle_ajax(self, dispatch, get):
+    def handle_ajax(self, dispatch, data):
         """
         This is called by courseware.module_render, to handle an AJAX call.
 
-        `get` is request.POST.
+        `data` is request.POST.
 
         Returns a json dictionary:
         { 'progress_changed' : True/False,
@@ -547,18 +547,19 @@ class CapaModule(CapaFields, XModule):
         before = self.get_progress()
 
         try:
-            d = handlers[dispatch](get)
-
+            result = handlers[dispatch](data)
         except Exception as err:
             _, _, traceback_obj = sys.exc_info()
-            raise ProcessingError, err.message, traceback_obj
+            raise ProcessingError(err.message, traceback_obj)
 
         after = self.get_progress()
-        d.update({
+
+        result.update({
             'progress_changed': after != before,
             'progress_status': Progress.to_js_status_str(after),
         })
-        return json.dumps(d, cls=ComplexEncoder)
+
+        return json.dumps(result, cls=ComplexEncoder)
 
     def is_past_due(self):
         """
@@ -633,32 +634,32 @@ class CapaModule(CapaFields, XModule):
 
         return False
 
-    def update_score(self, get):
+    def update_score(self, data):
         """
         Delivers grading response (e.g. from asynchronous code checking) to
             the capa problem, so its score can be updated
 
-        `get` must have a field `response` which is a string that contains the
+        'data' must have a key 'response' which is a string that contains the
             grader's response
 
         No ajax return is needed. Return empty dict.
         """
-        queuekey = get['queuekey']
-        score_msg = get['xqueue_body']
+        queuekey = data['queuekey']
+        score_msg = data['xqueue_body']
         self.lcp.update_score(score_msg, queuekey)
         self.set_state_from_lcp()
         self.publish_grade()
 
         return dict()  # No AJAX return is needed
 
-    def handle_ungraded_response(self, get):
+    def handle_ungraded_response(self, data):
         """
         Delivers a response from the XQueue to the capa problem
 
         The score of the problem will not be updated
 
         Args:
-            - get (dict) must contain keys:
+            - data (dict) must contain keys:
                             queuekey - a key specific to this response
                             xqueue_body - the body of the response
         Returns:
@@ -666,28 +667,30 @@ class CapaModule(CapaFields, XModule):
 
         No ajax return is needed, so an empty dict is returned
         """
-        queuekey = get['queuekey']
-        score_msg = get['xqueue_body']
+        queuekey = data['queuekey']
+        score_msg = data['xqueue_body']
+
         # pass along the xqueue message to the problem
         self.lcp.ungraded_response(score_msg, queuekey)
         self.set_state_from_lcp()
         return dict()
 
-    def handle_input_ajax(self, get):
+    def handle_input_ajax(self, data):
         """
         Handle ajax calls meant for a particular input in the problem
 
         Args:
-            - get (dict) - data that should be passed to the input
+            - data (dict) - data that should be passed to the input
         Returns:
             - dict containing the response from the input
         """
-        response = self.lcp.handle_input_ajax(get)
+        response = self.lcp.handle_input_ajax(data)
+
         # save any state changes that may occur
         self.set_state_from_lcp()
         return response
 
-    def get_answer(self, get):
+    def get_answer(self, data):
         """
         For the "show answer" button.
 
@@ -717,10 +720,9 @@ class CapaModule(CapaFields, XModule):
         return {'answers': new_answers}
 
     # Figure out if we should move these to capa_problem?
-    def get_problem(self, get):
+    def get_problem(self, _data):
         """
         Return results of get_problem_html, as a simple dict for json-ing.
-
         { 'html': <the-html> }
 
         Used if we want to reconfirm we have the right thing e.g. after
@@ -729,27 +731,27 @@ class CapaModule(CapaFields, XModule):
         return {'html': self.get_problem_html(encapsulate=False)}
 
     @staticmethod
-    def make_dict_of_responses(get):
+    def make_dict_of_responses(data):
         """
         Make dictionary of student responses (aka "answers")
 
-        `get` is POST dictionary (Django QueryDict).
+        `data` is POST dictionary (Django QueryDict).
 
-        The `get` dict has keys of the form 'x_y', which are mapped
+        The `data` dict has keys of the form 'x_y', which are mapped
         to key 'y' in the returned dict.  For example,
         'input_1_2_3' would be mapped to '1_2_3' in the returned dict.
 
         Some inputs always expect a list in the returned dict
         (e.g. checkbox inputs).  The convention is that
-        keys in the `get` dict that end with '[]' will always
+        keys in the `data` dict that end with '[]' will always
         have list values in the returned dict.
-        For example, if the `get` dict contains {'input_1[]': 'test' }
+        For example, if the `data` dict contains {'input_1[]': 'test' }
         then the output dict would contain {'1': ['test'] }
         (the value is a list).
 
         Raises an exception if:
 
-        -A key in the `get` dictionary does not contain at least one underscore
+        -A key in the `data` dictionary does not contain at least one underscore
           (e.g. "input" is invalid, but "input_1" is valid)
 
         -Two keys end up with the same name in the returned dict.
@@ -758,7 +760,7 @@ class CapaModule(CapaFields, XModule):
         """
         answers = dict()
 
-        for key in get:
+        for key in data:
             # e.g. input_resistor_1 ==> resistor_1
             _, _, name = key.partition('_')
 
@@ -777,9 +779,9 @@ class CapaModule(CapaFields, XModule):
                 name = name[:-2] if is_list_key else name
 
                 if is_list_key:
-                    val = get.getlist(key)
+                    val = data.getlist(key)
                 else:
-                    val = get[key]
+                    val = data[key]
 
                 # If the name already exists, then we don't want
                 # to override it.  Raise an error instead
@@ -801,7 +803,7 @@ class CapaModule(CapaFields, XModule):
             'max_value': score['total'],
         })
 
-    def check_problem(self, get):
+    def check_problem(self, data):
         """
         Checks whether answers to a problem are correct
 
@@ -813,8 +815,9 @@ class CapaModule(CapaFields, XModule):
         event_info['state'] = self.lcp.get_state()
         event_info['problem_id'] = self.location.url()
 
-        answers = self.make_dict_of_responses(get)
+        answers = self.make_dict_of_responses(data)
         event_info['answers'] = convert_files_to_filenames(answers)
+
         # Too late. Cannot submit
         if self.closed():
             event_info['failure'] = 'closed'
@@ -972,7 +975,7 @@ class CapaModule(CapaFields, XModule):
 
         return {'success': success}
 
-    def save_problem(self, get):
+    def save_problem(self, data):
         """
         Save the passed in answers.
         Returns a dict { 'success' : bool, 'msg' : message }
@@ -982,7 +985,7 @@ class CapaModule(CapaFields, XModule):
         event_info['state'] = self.lcp.get_state()
         event_info['problem_id'] = self.location.url()
 
-        answers = self.make_dict_of_responses(get)
+        answers = self.make_dict_of_responses(data)
         event_info['answers'] = answers
 
         # Too late. Cannot submit
@@ -1011,7 +1014,7 @@ class CapaModule(CapaFields, XModule):
         return {'success': True,
                 'msg': msg}
 
-    def reset_problem(self, get):
+    def reset_problem(self, _data):
         """
         Changes problem state to unfinished -- removes student answers,
         and causes problem to rerender itself.
