@@ -138,7 +138,7 @@ class @Problem
   #       maybe preferable to consolidate all dispatches to use FormData
   ###
   check_fd: =>
-    Logger.log 'problem_check', answers: @answers
+    Logger.log 'problem_check', @answers
 
     # If there are no file inputs in the problem, we can fall back on @check
     if $('input:file').length == 0
@@ -212,7 +212,8 @@ class @Problem
       $.ajaxWithPrefix("#{@url}/problem_check", settings)
 
   check: =>
-    Logger.log 'problem_check', answers: @answers
+    # Calling check from within check_fd will result in firing the 'problem_check' event twice
+    # Logger.log 'problem_check', @answers
     $.postWithPrefix "#{@url}/problem_check", @answers, (response) =>
       switch response.success
         when 'incorrect', 'correct'
@@ -224,7 +225,7 @@ class @Problem
           @gentle_alert response.success
 
   reset: =>
-    Logger.log 'problem_reset', answers: @answers
+    Logger.log 'problem_reset', @answers
     $.postWithPrefix "#{@url}/problem_reset", id: @id, (response) =>
         @render(response.html)
         @updateProgress response
@@ -284,7 +285,7 @@ class @Problem
     @el.find('.capa_alert').css(opacity: 0).animate(opacity: 1, 700)
 
   save: =>
-    Logger.log 'problem_save', answers: @answers
+    Logger.log 'problem_save', @answers
     $.postWithPrefix "#{@url}/problem_save", @answers, (response) =>
       saveMessage = response.msg
       @gentle_alert saveMessage
