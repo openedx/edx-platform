@@ -13,8 +13,9 @@ from util.json_request import expect_json
 from ..utils import get_modulestore
 from .access import has_access
 from .requests import _xmodule_recurse
+from xmodule.x_module import XModuleDescriptor
 
-__all__ = ['save_item', 'clone_item', 'delete_item']
+__all__ = ['save_item', 'create_item', 'delete_item']
 
 # cdodge: these are categories which should not be parented, they are detached from the hierarchy
 DETACHED_CATEGORIES = ['about', 'static_tab', 'course_info']
@@ -73,28 +74,38 @@ def save_item(request):
 
 @login_required
 @expect_json
-def clone_item(request):
+def create_item(request):
     parent_location = Location(request.POST['parent_location'])
-    template = Location(request.POST['template'])
+    category = request.POST['category']
 
     display_name = request.POST.get('display_name')
 
     if not has_access(request.user, parent_location):
         raise PermissionDenied()
 
-    parent = get_modulestore(template).get_item(parent_location)
-    dest_location = parent_location._replace(category=template.category, name=uuid4().hex)
+    parent = get_modulestore(category).get_item(parent_location)
+    dest_location = parent_location.replace(category=category, name=uuid4().hex)
 
-    new_item = get_modulestore(template).clone_item(template, dest_location)
+    # get the metadata, display_name, and definition from the request
+    metadata = {}
+    data = None
+    template_id = request.POST.get('boilerplate')
+    if template_id is not None:
+        clz = XModuleDescriptor.load_class(category)
+        if clz is not None:
+            template = clz.get_template(template_id)
+            if template is not None:
+                metadata = template.get('metadata', {})
+                data = template.get('data')
 
-    # replace the display name with an optional parameter passed in from the caller
     if display_name is not None:
-        new_item.display_name = display_name
+        metadata['display_name'] = display_name
 
-    get_modulestore(template).update_metadata(new_item.location.url(), own_metadata(new_item))
+    get_modulestore(category).create_and_save_xmodule(dest_location, definition_data=data,
+        metadata=metadata, system=parent.system)
 
-    if new_item.location.category not in DETACHED_CATEGORIES:
-        get_modulestore(parent.location).update_children(parent_location, parent.children + [new_item.location.url()])
+    if category not in DETACHED_CATEGORIES:
+        get_modulestore(parent.location).update_children(parent_location, parent.children + [dest_location.url()])
 
     return HttpResponse(json.dumps({'id': dest_location.url()}))
 

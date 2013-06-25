@@ -646,7 +646,7 @@ class CombinedOpenEndedV1Module():
         if self.student_attempts > self.attempts:
             return {
                 'success': False,
-                #This is a student_facing_error
+                # This is a student_facing_error
                 'error': (
                     'You have attempted this question {0} times.  '
                     'You are only allowed to attempt it {1} times.'
@@ -810,7 +810,6 @@ class CombinedOpenEndedV1Descriptor():
     filename_extension = "xml"
 
     has_score = True
-    template_dir_name = "combinedopenended"
 
     def __init__(self, system):
         self.system = system

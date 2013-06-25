@@ -5,7 +5,6 @@ from django.test import TestCase
 
 from django.conf import settings
 import xmodule.modulestore.django
-from xmodule.templates import update_templates
 
 
 class ModuleStoreTestCase(TestCase):
@@ -27,22 +26,6 @@ class ModuleStoreTestCase(TestCase):
 
         # Remove everything except templates
         modulestore.collection.remove(query)
-
-    @staticmethod
-    def load_templates_if_necessary():
-        '''
-        Load templates into the direct modulestore only if they do not already exist.
-        We need the templates, because they are copied to create
-        XModules such as sections and problems
-        '''
-        modulestore = xmodule.modulestore.django.modulestore('direct')
-
-        # Count the number of templates
-        query = {"_id.course": "templates"}
-        num_templates = modulestore.collection.find(query).count()
-
-        if num_templates < 1:
-            update_templates(modulestore)
 
     @classmethod
     def setUpClass(cls):
@@ -86,9 +69,6 @@ class ModuleStoreTestCase(TestCase):
 
         # Flush anything that is not a template
         ModuleStoreTestCase.flush_mongo_except_templates()
-
-        # Check that we have templates loaded; if not, load them
-        ModuleStoreTestCase.load_templates_if_necessary()
 
         # Call superclass implementation
         super(ModuleStoreTestCase, self)._pre_setup()

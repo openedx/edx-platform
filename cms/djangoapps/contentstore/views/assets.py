@@ -239,26 +239,28 @@ def import_course(request, org, course, name):
 
         # find the 'course.xml' file
 
+        found_course_dir = None
         for dirpath, _dirnames, filenames in os.walk(course_dir):
             for files in filenames:
                 if files == 'course.xml':
+                    found_course_dir = dirpath
                     break
-            if files == 'course.xml':
+            if found_course_dir is not None:
                 break
 
-        if files != 'course.xml':
+        if found_course_dir is None:
             return HttpResponse(json.dumps({'ErrMsg': 'Could not find the course.xml file in the package.'}))
 
-        logging.debug('found course.xml at {0}'.format(dirpath))
+        logging.debug('found course.xml at {0}'.format(found_course_dir))
 
-        if dirpath != course_dir:
-            for fname in os.listdir(dirpath):
-                shutil.move(dirpath / fname, course_dir)
+        if found_course_dir != course_dir:
+            for fname in os.listdir(found_course_dir):
+                shutil.move(found_course_dir / fname, course_dir)
 
         _module_store, course_items = import_from_xml(modulestore('direct'), settings.GITHUB_REPO_ROOT,
                                                       [course_subdir], load_error_modules=False,
                                                       static_content_store=contentstore(),
-                                                      target_location_namespace=Location(location),
+                                                      target_location_namespace=location,
                                                       draft_store=modulestore())
 
         # we can blow this away when we're done importing.

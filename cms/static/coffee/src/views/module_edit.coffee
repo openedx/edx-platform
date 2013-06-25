@@ -56,14 +56,15 @@ class CMS.Views.ModuleEdit extends Backbone.View
   changedMetadata: ->
     return _.extend(@metadataEditor.getModifiedMetadataValues(), @customMetadata())
 
-  cloneTemplate: (parent, template) ->
-    $.post("/clone_item", {
-      parent_location: parent
-      template: template
-    }, (data) => 
-      @model.set(id: data.id)
-      @$el.data('id', data.id)
-      @render()
+  createItem: (parent, payload) ->
+    payload.parent_location = parent
+    $.post(
+        "/create_item"
+        payload 
+        (data) => 
+            @model.set(id: data.id)
+            @$el.data('id', data.id)
+            @render()
     )
 
   render: ->

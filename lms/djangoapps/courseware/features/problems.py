@@ -2,8 +2,8 @@
 Steps for problem.feature lettuce tests
 '''
 
-#pylint: disable=C0111
-#pylint: disable=W0621
+# pylint: disable=C0111
+# pylint: disable=W0621
 
 from lettuce import world, step
 from lettuce.django import django_url
@@ -17,7 +17,7 @@ def view_problem_with_attempts(step, problem_type, attempts):
     i_am_registered_for_the_course(step, 'model_course')
 
     # Ensure that the course has this problem type
-    add_problem_to_course('model_course', problem_type, {'attempts': attempts})
+    add_problem_to_course('model_course', problem_type, {'max_attempts': attempts})
 
     # Go to the one section in the factory-created course
     # which should be loaded with the correct problem
@@ -135,7 +135,7 @@ def action_button_present(_step, buttonname, doesnt_appear):
 
 
 @step(u'the button with the label "([^"]*)" does( not)? appear')
-def button_with_label_present(step, buttonname, doesnt_appear):
+def button_with_label_present(_step, buttonname, doesnt_appear):
     if doesnt_appear:
         assert world.browser.is_text_not_present(buttonname, wait_time=5)
     else:

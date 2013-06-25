@@ -1,5 +1,5 @@
 # disable missing docstring
-#pylint: disable=C0111
+# pylint: disable=C0111
 
 from lettuce import world, step
 
@@ -7,7 +7,7 @@ from lettuce import world, step
 @step('I see the correct settings and default values$')
 def i_see_the_correct_settings_and_values(step):
     world.verify_all_setting_entries([['Default Speed', 'OEoXaMPEzfM', False],
-                                      ['Display Name', 'default', True],
+                                      ['Display Name', '', False],
                                       ['Download Track', '', False],
                                       ['Download Video', '', False],
                                       ['Show Captions', 'True', False],
