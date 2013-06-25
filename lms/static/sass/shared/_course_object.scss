@@ -66,6 +66,11 @@
         width: 0;
       }
 
+      a {
+        position: relative;
+        display: block;
+      }
+
       a:hover {
         text-decoration: none;
       }

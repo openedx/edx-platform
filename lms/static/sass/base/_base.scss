@@ -84,6 +84,10 @@ a:link, a:visited {
   }
 }
 
+a:focus {
+  outline: 3px groove $black;
+}
+
 .content-wrapper {
   width: flex-grid(12);
   margin: 0 auto;
