@@ -1,6 +1,10 @@
 from functools import wraps
 import copy
 import json
+from django.core.serializers import serialize
+from django.core.serializers.json import DjangoJSONEncoder
+from django.db.models.query import QuerySet
+from django.http import HttpResponse
 
 
 def expect_json(view_function):
@@ -21,3 +25,20 @@ def expect_json(view_function):
             return view_function(request, *args, **kwargs)
 
     return expect_json_with_cloned_request
+
+
+class JsonResponse(HttpResponse):
+    """
+    Django HttpResponse subclass that has sensible defaults for outputting JSON.
+    """
+    def __init__(self, object=None, *args, **kwargs):
+        if object in (None, ""):
+            content = ""
+            kwargs.setdefault("status", 204)
+        elif isinstance(object, QuerySet):
+            content = serialize('json', object)
+        else:
+            content = json.dumps(object, indent=2, cls=DjangoJSONEncoder,
+                                 ensure_ascii=False)
+        kwargs.setdefault("content_type", "application/json")
+        super(JsonResponse, self).__init__(content, *args, **kwargs)

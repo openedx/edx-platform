@@ -7,8 +7,9 @@ from django.contrib.auth.decorators import login_required
 from django_future.csrf import ensure_csrf_cookie
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
-from django.http import HttpResponse, HttpResponseBadRequest
 from django.core.urlresolvers import reverse
+from django.http import HttpResponse, HttpResponseBadRequest
+from util.json_request import JsonResponse
 from mitxmako.shortcuts import render_to_response
 
 from xmodule.modulestore.django import modulestore
@@ -447,18 +448,16 @@ def textbook_index(request, org, course, name):
 
     if request.is_ajax():
         if request.method == 'GET':
-            return HttpResponse(json.dumps(course_module.pdf_textbooks), content_type="application/json")
+            return JsonResponse(course_module.pdf_textbooks)
         elif request.method == 'POST':
             try:
                 course_module.pdf_textbooks = validate_textbook_json(request.body)
             except TextbookValidationError as e:
-                msg = {"error": e.message}
-                return HttpResponseBadRequest(json.dumps(msg), content_type="application/json")
+                return JsonResponse({"error": e.message}, status=400)
             if not any(tab['type'] == 'pdf_textbooks' for tab in course_module.tabs):
                 course_module.tabs.append({"type": "pdf_textbooks"})
             store.update_metadata(course_module.location, own_metadata(course_module))
-
-            return HttpResponse('', content_type="application/json", status=204)
+            return JsonResponse('', status=204)
     else:
         upload_asset_url = reverse('upload_asset', kwargs={
             'org': org,
