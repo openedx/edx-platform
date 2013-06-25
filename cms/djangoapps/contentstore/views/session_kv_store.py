@@ -25,4 +25,4 @@ class SessionKeyValueStore(KeyValueStore):
             del self._session[tuple(key)]
 
     def has(self, key):
-        return key in self._descriptor_model_data or key in self._session
+        return key.field_name in self._descriptor_model_data or tuple(key) in self._session
