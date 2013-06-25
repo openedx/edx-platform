@@ -5,6 +5,11 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+LMS: Problem rescoring.  Added options on the Grades tab of the
+Instructor Dashboard to allow a particular student's submission for a
+particular problem to be rescored.  Provides an option to see a
+history of background tasks for a given problem and student.
+
 Blades: Small UX fix on capa multiple-choice problems.  Make labels only
 as wide as the text to reduce accidental choice selections.
 
