@@ -21,7 +21,7 @@ class ProgressTestCase(TestCase):
         self.course = MagicMock()
         self.mockuser1.is_authenticated.return_value = True
         self.mockuser0.is_authenticated.return_value = False
-        self.course.id = 'edX/full/6.002_Spring_2012'
+        self.course.id = 'edX/toy/2012_Fall'
         self.tab = {'name': 'same'}
         self.active_page1 = 'progress'
         self.active_page0 = 'stagnation'
@@ -51,7 +51,7 @@ class WikiTestCase(TestCase):
 
         self.user = MagicMock()
         self.course = MagicMock()
-        self.course.id = 'edX/full/6.002_Spring_2012'
+        self.course.id = 'edX/toy/2012_Fall'
         self.tab = {'name': 'same'}
         self.active_page1 = 'wiki'
         self.active_page0 = 'miki'
@@ -118,7 +118,7 @@ class StaticTabTestCase(TestCase):
         self.user = MagicMock()
         self.course = MagicMock()
         self.tabby = {'name': 'same', 'url_slug': 'schmug'}
-        self.course.id = 'edX/full/6.002_Spring_2012'
+        self.course.id = 'edX/toy/2012_Fall'
         self.active_page1 = 'static_tab_schmug'
         self.active_page0 = 'static_tab_schlug'
 
@@ -154,7 +154,7 @@ class TextbooksTestCase(TestCase):
         T = MagicMock()
         self.mockuser1.is_authenticated.return_value = True
         self.mockuser0.is_authenticated.return_value = False
-        self.course.id = 'edX/full/6.002_Spring_2012'
+        self.course.id = 'edX/toy/2012_Fall'
         self.active_page0 = 'textbook/0'
         self.active_page1 = 'textbook/1'
         self.active_pageX = 'you_shouldnt_be_seein_this'
