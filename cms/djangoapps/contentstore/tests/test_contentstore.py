@@ -536,7 +536,6 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             thumbnail = content_store.find(thumbnail_location, throw_on_not_found=False)
             self.assertIsNotNone(thumbnail)
 
-#FIX
     def test_empty_trashcan(self):
         '''
         This test will exercise the empting of the asset trashcan
@@ -581,7 +580,6 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         all_thumbnails = trash_store.get_all_content_thumbnails_for_course(course_location)
         self.assertEqual(len(all_thumbnails), 0)
 
-#FIX
     def test_clone_course(self):
 
         course_data = {
@@ -592,7 +590,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         }
 
         module_store = modulestore('direct')
-        import_from_xml(module_store, 'common/test/data/', ['full'])
+        import_from_xml(module_store, 'common/test/data/', ['toy'])
 
         resp = self.client.post(reverse('create_new_course'), course_data)
         self.assertEqual(resp.status_code, 200)
@@ -601,16 +599,16 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         content_store = contentstore()
 
-        source_location = CourseDescriptor.id_to_location('edX/full/6.002_Spring_2012')
+        source_location = CourseDescriptor.id_to_location('edX/toy/2012_Fall')
         dest_location = CourseDescriptor.id_to_location('MITx/999/Robot_Super_Course')
 
         clone_course(module_store, content_store, source_location, dest_location)
 
         # now loop through all the units in the course and verify that the clone can render them, which
         # means the objects are at least present
-        items = module_store.get_items(Location(['i4x', 'edX', 'full', 'vertical', None]))
+        items = module_store.get_items(Location(['i4x', 'edX', 'toy', 'poll_question', None]))
         self.assertGreater(len(items), 0)
-        clone_items = module_store.get_items(Location(['i4x', 'MITx', '999', 'vertical', None]))
+        clone_items = module_store.get_items(Location(['i4x', 'MITx', '999', 'poll_question', None]))
         self.assertGreater(len(clone_items), 0)
         for descriptor in items:
             new_loc = descriptor.location.replace(org='MITx', course='999')
@@ -645,19 +643,19 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         resp = self.client.get('http://localhost:8001/c4x/CDX/123123/asset/&images_circuits_Lab7Solution2.png')
         self.assertEqual(resp.status_code, 400)
 
-#FIX
     def test_delete_course(self):
         """
         This test will import a course, make a draft item, and delete it. This will also assert that the
         draft content is also deleted
         """
         module_store = modulestore('direct')
+
         content_store = contentstore()
         draft_store = modulestore('draft')
 
         import_from_xml(module_store, 'common/test/data/', ['full'], static_content_store=content_store)
 
-        location = CourseDescriptor.id_to_location('edX/full/6.002_Spring_2012')
+        location = CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course').location
 
         # verify that we actually have assets
         assets = content_store.get_all_content_for_course(location)
@@ -674,9 +672,13 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         # delete the course
         delete_course(module_store, content_store, location, commit=True)
 
+<<<<<<< HEAD
         # assert that there's absolutely no non-draft modules in the course
         # this should also include all draft items
         items = draft_store.get_items(Location(['i4x', 'edX', 'full', None, None]))
+=======
+        items = module_store.get_items(Location(['i4x', 'edX', '999', 'course', None]))
+>>>>>>> 69dc373... All cms unit test no longer rely on the full course.
         self.assertEqual(len(items), 0)
 
         # assert that all content in the asset library is also deleted
@@ -694,23 +696,22 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             filesystem = OSFS(root_dir / ('test_export/' + dirname))
             self.assertTrue(filesystem.exists(item.location.name + filename_suffix))
 
-#FIX
     def test_export_course(self):
         module_store = modulestore('direct')
         draft_store = modulestore('draft')
         content_store = contentstore()
 
-        import_from_xml(module_store, 'common/test/data/', ['full'])
-        location = CourseDescriptor.id_to_location('edX/full/6.002_Spring_2012')
+        import_from_xml(module_store, 'common/test/data/', ['toy'])
+        location = CourseDescriptor.id_to_location('edX/toy/2012_Fall')
 
         # get a vertical (and components in it) to put into 'draft'
-        vertical = module_store.get_item(Location(['i4x', 'edX', 'full',
-                                         'vertical', 'vertical_66', None]), depth=1)
+        vertical = module_store.get_item(Location(['i4x', 'edX', 'toy',
+                                         'vertical', 'vertical_test', None]), depth=1)
 
         draft_store.clone_item(vertical.location, vertical.location)
 
         # We had a bug where orphaned draft nodes caused export to fail. This is here to cover that case.
-        draft_store.clone_item(vertical.location, Location(['i4x', 'edX', 'full',
+        draft_store.clone_item(vertical.location, Location(['i4x', 'edX', 'toy',
                                                             'vertical', 'no_references', 'draft']))
 
         for child in vertical.get_children():
@@ -720,18 +721,18 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         # now create a private vertical
         private_vertical = draft_store.clone_item(vertical.location,
-                                                  Location(['i4x', 'edX', 'full', 'vertical', 'a_private_vertical', None]))
+                                                  Location(['i4x', 'edX', 'toy', 'vertical', 'a_private_vertical', None]))
 
         # add private to list of children
-        sequential = module_store.get_item(Location(['i4x', 'edX', 'full',
-                                           'sequential', 'Administrivia_and_Circuit_Elements', None]))
+        sequential = module_store.get_item(Location(['i4x', 'edX', 'toy',
+                                           'sequential', 'vertical_sequential', None]))
         private_location_no_draft = private_vertical.location.replace(revision=None)
         module_store.update_children(sequential.location, sequential.children +
                                      [private_location_no_draft.url()])
 
         # read back the sequential, to make sure we have a pointer to
-        sequential = module_store.get_item(Location(['i4x', 'edX', 'full',
-                                                     'sequential', 'Administrivia_and_Circuit_Elements', None]))
+        sequential = module_store.get_item(Location(['i4x', 'edX', 'toy',
+                                                     'sequential', 'vertical_sequential', None]))
 
         self.assertIn(private_location_no_draft.url(), sequential.children)
 
@@ -743,17 +744,11 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         # check for static tabs
         self.verify_content_existence(module_store, root_dir, location, 'tabs', 'static_tab', '.html')
 
-        # check for custom_tags
-        self.verify_content_existence(module_store, root_dir, location, 'info', 'course_info', '.html')
-
-        # check for custom_tags
-        self.verify_content_existence(module_store, root_dir, location, 'custom_tags', 'custom_tag_template')
-
         # check for about content
         self.verify_content_existence(module_store, root_dir, location, 'about', 'about', '.html')
 
         # check for graiding_policy.json
-        filesystem = OSFS(root_dir / 'test_export/policies/6.002_Spring_2012')
+        filesystem = OSFS(root_dir / 'test_export/policies/2012_Fall')
         self.assertTrue(filesystem.exists('grading_policy.json'))
 
         course = module_store.get_item(location)
@@ -768,8 +763,8 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         # compare what's on disk to what we have in the course module
         with filesystem.open('policy.json', 'r') as course_policy:
             on_disk = loads(course_policy.read())
-            self.assertIn('course/6.002_Spring_2012', on_disk)
-            self.assertEqual(on_disk['course/6.002_Spring_2012'], own_metadata(course))
+            self.assertIn('course/2012_Fall', on_disk)
+            self.assertEqual(on_disk['course/2012_Fall'], own_metadata(course))
 
         # remove old course
         delete_course(module_store, content_store, location)
@@ -777,7 +772,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         # reimport
         import_from_xml(module_store, root_dir, ['test_export'], draft_store=draft_store)
 
-        items = module_store.get_items(Location(['i4x', 'edX', 'full', 'vertical', None]))
+        items = module_store.get_items(Location(['i4x', 'edX', 'toy', 'vertical', None]))
         self.assertGreater(len(items), 0)
         for descriptor in items:
             # don't try to look at private verticals. Right now we're running
@@ -788,56 +783,53 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
                 self.assertEqual(resp.status_code, 200)
 
         # verify that we have the content in the draft store as well
-        vertical = draft_store.get_item(Location(['i4x', 'edX', 'full',
-                                                  'vertical', 'vertical_66', None]), depth=1)
+        vertical = draft_store.get_item(Location(['i4x', 'edX', 'toy',
+                                                  'vertical', 'vertical_test', None]), depth=1)
 
         self.assertTrue(getattr(vertical, 'is_draft', False))
         for child in vertical.get_children():
             self.assertTrue(getattr(child, 'is_draft', False))
 
         # make sure that we don't have a sequential that is in draft mode
-        sequential = draft_store.get_item(Location(['i4x', 'edX', 'full',
-                                                    'sequential', 'Administrivia_and_Circuit_Elements', None]))
+        sequential = draft_store.get_item(Location(['i4x', 'edX', 'toy',
+                                                    'sequential', 'vertical_sequential', None]))
 
         self.assertFalse(getattr(sequential, 'is_draft', False))
 
         # verify that we have the private vertical
-        test_private_vertical = draft_store.get_item(Location(['i4x', 'edX', 'full',
-                                                               'vertical', 'vertical_66', None]))
+        test_private_vertical = draft_store.get_item(Location(['i4x', 'edX', 'toy',
+                                                               'vertical', 'a_private_vertical', None]))
 
         self.assertTrue(getattr(test_private_vertical, 'is_draft', False))
 
         # make sure the textbook survived the export/import
-        course = module_store.get_item(Location(['i4x', 'edX', 'full', 'course', '6.002_Spring_2012', None]))
+        course = module_store.get_item(Location(['i4x', 'edX', 'toy', 'course', '2012_Fall', None]))
 
         self.assertGreater(len(course.textbooks), 0)
 
         shutil.rmtree(root_dir)
 
-#FIX
     def test_course_handouts_rewrites(self):
         module_store = modulestore('direct')
 
         # import a test course
-        import_from_xml(module_store, 'common/test/data/', ['full'])
+        import_from_xml(module_store, 'common/test/data/', ['toy'])
 
-        handout_location = Location(['i4x', 'edX', 'full', 'course_info', 'handouts'])
+        handout_location = Location(['i4x', 'edX', 'toy', 'course_info', 'handouts'])
 
         # get module info
         resp = self.client.get(reverse('module_info', kwargs={'module_location': handout_location}))
 
         # make sure we got a successful response
         self.assertEqual(resp.status_code, 200)
-
         # check that /static/ has been converted to the full path
         # note, we know the link it should be because that's what in the 'full' course in the test data
-        self.assertContains(resp, '/c4x/edX/full/asset/handouts_schematic_tutorial.pdf')
+        self.assertContains(resp, '/c4x/edX/toy/asset/handouts_sample_handout.txt')
 
-#FIX
     def test_prefetch_children(self):
         module_store = modulestore('direct')
-        import_from_xml(module_store, 'common/test/data/', ['full'])
-        location = CourseDescriptor.id_to_location('edX/full/6.002_Spring_2012')
+        import_from_xml(module_store, 'common/test/data/', ['toy'])
+        location = CourseDescriptor.id_to_location('edX/toy/2012_Fall')
 
         wrapper = MongoCollectionFindWrapper(module_store.collection.find)
         module_store.collection.find = wrapper.find
@@ -849,20 +841,19 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.assertEqual(wrapper.counter, 4)
 
         # make sure we pre-fetched a known sequential which should be at depth=2
-        self.assertTrue(Location(['i4x', 'edX', 'full', 'sequential',
-                                  'Administrivia_and_Circuit_Elements', None]) in course.system.module_data)
+        self.assertTrue(Location(['i4x', 'edX', 'toy', 'sequential',
+                                  'vertical_sequential', None]) in course.system.module_data)
 
         # make sure we don't have a specific vertical which should be at depth=3
-        self.assertFalse(Location(['i4x', 'edX', 'full', 'vertical', 'vertical_58', None])
+        self.assertFalse(Location(['i4x', 'edX', 'toy', 'vertical', 'vertical_test', None])
                          in course.system.module_data)
 
-#FIX
     def test_export_course_with_unknown_metadata(self):
         module_store = modulestore('direct')
         content_store = contentstore()
 
-        import_from_xml(module_store, 'common/test/data/', ['full'])
-        location = CourseDescriptor.id_to_location('edX/full/6.002_Spring_2012')
+        import_from_xml(module_store, 'common/test/data/', ['toy'])
+        location = CourseDescriptor.id_to_location('edX/toy/2012_Fall')
 
         root_dir = path(mkdtemp_clean())
 
@@ -1215,12 +1206,11 @@ class ContentStoreTest(ModuleStoreTestCase):
         # make sure we found the item (e.g. it didn't error while loading)
         self.assertTrue(did_load_item)
 
-#FIX
     def test_forum_id_generation(self):
         module_store = modulestore('direct')
-        import_from_xml(module_store, 'common/test/data/', ['full'])
+        CourseFactory.create(org='edX', course='999', display_name='Robot Super Course')
 
-        new_component_location = Location('i4x', 'edX', 'full', 'discussion', 'new_component')
+        new_component_location = Location('i4x', 'edX', '999', 'discussion', 'new_component')
         source_template_location = Location('i4x', 'edx', 'templates', 'discussion', 'Discussion_Tag')
 
         # crate a new module and add it as a child to a vertical
@@ -1230,10 +1220,9 @@ class ContentStoreTest(ModuleStoreTestCase):
 
         self.assertNotEquals(new_discussion_item.discussion_id, '$$GUID$$')
 
-#FIX
     def test_update_modulestore_signal_did_fire(self):
         module_store = modulestore('direct')
-        import_from_xml(module_store, 'common/test/data/', ['full'])
+        CourseFactory.create(org='edX', course='999', display_name='Robot Super Course')
 
         try:
             module_store.modulestore_update_signal = Signal(providing_args=['modulestore', 'course_id', 'location'])
@@ -1245,7 +1234,7 @@ class ContentStoreTest(ModuleStoreTestCase):
 
             module_store.modulestore_update_signal.connect(_signal_hander)
 
-            new_component_location = Location('i4x', 'edX', 'full', 'html', 'new_component')
+            new_component_location = Location('i4x', 'edX', '999', 'html', 'new_component')
             source_template_location = Location('i4x', 'edx', 'templates', 'html', 'Blank_HTML_Page')
 
             # crate a new module
@@ -1256,14 +1245,13 @@ class ContentStoreTest(ModuleStoreTestCase):
 
         self.assertTrue(self.got_signal)
 
-#FIX
     def test_metadata_inheritance(self):
         module_store = modulestore('direct')
-        import_from_xml(module_store, 'common/test/data/', ['full'])
+        import_from_xml(module_store, 'common/test/data/', ['toy'])
 
-        course = module_store.get_item(Location(['i4x', 'edX', 'full', 'course', '6.002_Spring_2012', None]))
+        course = module_store.get_item(Location(['i4x', 'edX', 'toy', 'course', '2012_Fall', None]))
 
-        verticals = module_store.get_items(['i4x', 'edX', 'full', 'vertical', None, None])
+        verticals = module_store.get_items(['i4x', 'edX', 'toy', 'vertical', None, None])
 
         # let's assert on the metadata_inheritance on an existing vertical
         for vertical in verticals:
@@ -1271,7 +1259,7 @@ class ContentStoreTest(ModuleStoreTestCase):
 
         self.assertGreater(len(verticals), 0)
 
-        new_component_location = Location('i4x', 'edX', 'full', 'html', 'new_component')
+        new_component_location = Location('i4x', 'edX', 'toy', 'html', 'new_component')
         source_template_location = Location('i4x', 'edx', 'templates', 'html', 'Blank_HTML_Page')
 
         # crate a new module and add it as a child to a vertical
