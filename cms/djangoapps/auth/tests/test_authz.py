@@ -5,8 +5,11 @@ import mock
 
 from django.test import TestCase
 from django.contrib.auth.models import User
+from django.core.exceptions import PermissionDenied
 
-from auth.authz import add_user_to_creator_group, remove_user_from_creator_group, is_user_in_creator_group
+from auth.authz import add_user_to_creator_group, remove_user_from_creator_group, is_user_in_creator_group,\
+    create_all_course_groups, add_user_to_course_group, STAFF_ROLE_NAME, INSTRUCTOR_ROLE_NAME,\
+    is_user_in_course_group_role, remove_user_from_course_group
 
 
 class CreatorGroupTest(TestCase):
@@ -79,3 +82,60 @@ class CreatorGroupTest(TestCase):
             # Remove user from creator group. is_user_in_creator_group still returns true because is_staff=True
             remove_user_from_creator_group(self.user)
             self.assertTrue(is_user_in_creator_group(self.user))
+
+
+class CourseGroupTest(TestCase):
+    """
+    Tests for instructor and staff groups for a particular course.
+    """
+
+    def setUp(self):
+        """ Test case setup """
+        self.creator = User.objects.create_user('testcreator', 'testcreator+courses@edx.org', 'foo')
+        self.staff = User.objects.create_user('teststaff', 'teststaff+courses@edx.org', 'foo')
+        self.location = 'i4x', 'mitX', '101', 'course', 'test'
+
+    def test_add_user_to_course_group(self):
+        """
+        Tests adding user to course group (happy path).
+        """
+        # Create groups for a new course (and assign instructor role to the creator).
+        self.assertFalse(is_user_in_course_group_role(self.creator, self.location, INSTRUCTOR_ROLE_NAME))
+        create_all_course_groups(self.creator, self.location)
+        self.assertTrue(is_user_in_course_group_role(self.creator, self.location, INSTRUCTOR_ROLE_NAME))
+
+        # Add another user to the staff role.
+        self.assertFalse(is_user_in_course_group_role(self.staff, self.location, STAFF_ROLE_NAME))
+        self.assertTrue(add_user_to_course_group(self.creator, self.staff, self.location, STAFF_ROLE_NAME))
+        self.assertTrue(is_user_in_course_group_role(self.staff, self.location, STAFF_ROLE_NAME))
+
+    def test_add_user_to_course_group_permission_denied(self):
+        """
+        Verifies PermissionDenied if caller of add_user_to_course_group is not instructor role.
+        """
+        create_all_course_groups(self.creator, self.location)
+        with self.assertRaises(PermissionDenied):
+            add_user_to_course_group(self.staff, self.staff, self.location, STAFF_ROLE_NAME)
+
+    def remove_user_from_course_group(self):
+        """
+        Tests removing user from course group (happy path).
+        """
+        create_all_course_groups(self.creator, self.location)
+
+        self.assertTrue(add_user_to_course_group(self.creator, self.staff, self.location, STAFF_ROLE_NAME))
+        self.assertTrue(is_user_in_course_group_role(self.staff, self.location, STAFF_ROLE_NAME))
+
+        remove_user_from_course_group(self.creator, self.location, self.staff, STAFF_ROLE_NAME)
+        self.assertFalse(is_user_in_course_group_role(self.staff, self.location, STAFF_ROLE_NAME))
+
+        remove_user_from_course_group(self.creator, self.location, self.creator, INSTRUCTOR_ROLE_NAME)
+        self.assertFalse(is_user_in_course_group_role(self.creator, self.location, INSTRUCTOR_ROLE_NAME))
+
+    def test_remove_user_from_course_group_permission_denied(self):
+        """
+        Verifies PermissionDenied if caller of remove_user_from_course_group is not instructor role.
+        """
+        create_all_course_groups(self.creator, self.location)
+        with self.assertRaises(PermissionDenied):
+            remove_user_from_course_group(self.staff, self.staff, self.location, STAFF_ROLE_NAME)
