@@ -66,11 +66,14 @@ should be located in the content directory.
 The iframe is created using the sandbox attribute; while popups, scripts, and
 pointer locks are allowed, the iframe cannot access its parent's attributes.
 
-The html file should contain a top-level function for the gradefn function. To
-check whether the gradefn will be accessible to JSInput, check that, in the
-console,::
-    window["`gradefn`"]
-Returns the right thing.
+The html file should contain an accesible gradefn function. To check whether
+the gradefn will be accessible to JSInput, check that, in the console,::
+    "`gradefn"
+Returns the right thing. When used by JSInput, `gradefn` is called with::
+    `gradefn`.call(`obj`)
+Where `obj` is the object-part of `gradefn`. For example, if `gradefn` is
+`myprog.myfn`, JSInput will call `myprog.myfun.call(myprog)`. (This is to
+ensure "`this`" continues to refer to what `gradefn` expects.)
 
 Aside from that, more or less anything goes. Note that currently there is no
 support for inheriting css or javascript from the parent (aside from the

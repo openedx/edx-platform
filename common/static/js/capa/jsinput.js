@@ -4,6 +4,29 @@
     // most relevantly, jquery). Keep in mind what happens in which context
     // when modifying this file.
 
+
+    // _deepKey and _ctxCall are helper functions used to ensure that gradefn
+    // etc. can be nested objects (e.g., "firepad.getText") and that when
+    // called they receive the appropriate objects as "this" (e.g., "firepad").
+
+    // Take a string and find the nested object that corresponds to it. E.g.:
+    //    deepKey(obj, "an.example") -> obj["an"]["example"]
+    var _deepKey = function(obj, path){
+        for (var i = 0, path=path.split('.'), len = path.length; i < len; i++){
+            obj = obj[path[i]];
+        }
+        return obj;
+    };
+
+    var _ctxCall = function(obj, fn) {
+        var func = _deepKey(obj, fn);
+        var oldthis = fn.split('.');
+        oldthis.pop();
+        oldthis = oldthis.join();
+        var newthis = _deepKey(obj, oldthis);
+        return func.apply(newthis);
+    };
+   
     // First time this function was called?
     var isFirst = typeof(jsinput.jsinputarr) != 'undefined';
 
@@ -70,12 +93,12 @@
         var update = function (answer) {
 
             var ans;
-            ans = cWindow[gradefn]();
+            ans = _ctxCall(cWindow, gradefn);
             // setstate presumes getstate, so don't getstate unless setstate is
             // defined.
             if (getgetstate() && getsetstate()) {
                 var state, store;
-                state = cWindow[getgetstate()]();
+                state = _ctxCall(cWindow, getgetstate());
                 store = {
                     answer: ans,
                     state:  state
@@ -131,7 +154,7 @@
                 function whileloop(n) {
                     if (n < 10){
                         try {
-                            cWindow[getsetstate()](sval);
+                            _ctxCall(cWindow, getsetstate(), sval);
                         } catch (err) {
                             setTimeout(whileloop(n+1), 200);
                         }
