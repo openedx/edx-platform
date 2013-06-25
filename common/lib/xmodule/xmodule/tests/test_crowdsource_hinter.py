@@ -281,6 +281,26 @@ class CrowdsourceHinterTest(unittest.TestCase):
         self.assertTrue('Another random hint' in out)
 
 
+    def test_template_feedback(self):
+        """
+        Test the templates for get_feedback.
+        """
+        m = CHModuleFactory.create()
+
+        def fake_get_feedback(get):
+            index_to_answer = {'0': '42.0', '1': '9000.01'}
+            index_to_hints = {'0': [('A hint for 42', 12),
+                                    ('Another hint for 42', 14)],
+                              '1': [('A hint for 9000.01', 32)]}
+            return {'index_to_hints': index_to_hints, 'index_to_answer': index_to_answer}
+
+        m.get_feedback = fake_get_feedback
+        json_in = {'problem_name': '42.5'}
+        out = json.loads(m.handle_ajax('get_feedback', json_in))['contents']
+
+
+
+
 
 
 
