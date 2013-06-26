@@ -40,6 +40,9 @@ class Command(BaseCommand):
         self.set_level(course, User.objects.get(email='jd108@edx.org'), 'staff')
         self.set_level(course, User.objects.get(email='jd109@edx.org'), 'staff')
 
+        # for i in range(110, 160):
+        #     self.set_level(course, User.objects.get(email='jd{}@edx.org'.format(i)), 'staff')
+
     def set_level(self, course, user, level):
         """ level is one of [None, 'staff', 'instructor'] """
         revoke_access(course, user, 'instructor')
