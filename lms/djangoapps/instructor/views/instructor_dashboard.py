@@ -95,8 +95,11 @@ def _section_course_info(course_id):
     section_data['enrollment_count'] = CourseEnrollment.objects.filter(course_id=course_id).count()
     section_data['has_started'] = course.has_started()
     section_data['has_ended'] = course.has_ended()
-    section_data['grade_cutoffs'] = "[" + reduce(lambda memo, (letter, score): "{}: {}, ".format(letter, score) + memo, course.grade_cutoffs.items(), "")[:-2] + "]"
-    section_data['offline_grades'] = offline_grades_available(course_id)
+    try:
+        section_data['grade_cutoffs'] = "[" + reduce(lambda memo, (letter, score): "{}: {}, ".format(letter, score) + memo, course.grade_cutoffs.items(), "")[:-2] + "]"
+    except:
+        section_data['grade_cutoffs'] = "Not Available"
+    # section_data['offline_grades'] = offline_grades_available(course_id)
 
     try:
         section_data['course_errors'] = [(escape(a), '') for (a, b) in modulestore().get_item_errors(course.location)]

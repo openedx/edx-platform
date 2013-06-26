@@ -25,17 +25,10 @@ create_task_list_table = ($table_tasks, tasks_data) ->
     field: 'task_type'
     name: 'Task Type'
   ,
-    id: 'task_id'
-    field: 'task_id'
-    name: 'Task ID'
-  ,
     id: 'requester'
     field: 'requester'
     name: 'Requester'
-  ,
-    id: 'created'
-    field: 'created'
-    name: 'Created'
+    width: 30
   ,
     id: 'task_input'
     field: 'task_input'
@@ -44,6 +37,16 @@ create_task_list_table = ($table_tasks, tasks_data) ->
     id: 'task_state'
     field: 'task_state'
     name: 'State'
+    width: 30
+  ,
+    id: 'task_id'
+    field: 'task_id'
+    name: 'Task ID'
+    width: 50
+  ,
+    id: 'created'
+    field: 'created'
+    name: 'Created'
   ]
 
   table_data = tasks_data
