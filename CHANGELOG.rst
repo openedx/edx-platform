@@ -5,6 +5,10 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Common: Add tests for documentation generation to test suite
+
+Blades: User answer now preserved (and changeable) after clicking "show answer" in choice problems
+
 Blades: Small UX fix on capa multiple-choice problems.  Make labels only
 as wide as the text to reduce accidental choice selections.
 
