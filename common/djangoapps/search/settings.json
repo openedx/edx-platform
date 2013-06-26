@@ -71,6 +71,7 @@
 
 				"thumbnail": {
 					"type": "binary"
+<<<<<<< HEAD
 				}
 			}
 		}
@@ -222,6 +223,8 @@
 				"uuid": {
 					"type": "string",
 					"store": "true"
+=======
+>>>>>>> Made prettier, added requirements, and included main edX page
 				}
 			}
 		}
