@@ -36,10 +36,10 @@
   To see status for all tasks submitted for this course and student, click on this button:
 </p>
 
-<input type="button" name="task-history-single" value="Show Background Task History for Student">
+<input type="button" name="task-history-single" value="Show Background Task History for Student" data-endpoint="${ section_data['list_instructor_tasks_url'] }">
+<div class="task-history-single-table"></div>
 
-
-<hr width="100%" style="align:left">
+<hr>
 
 
 <H2>Course-specific grade adjustment</h2>
@@ -64,6 +64,11 @@
 <p>These actions run in the background, and status for active tasks will appear in a table below.
    To see status for all tasks submitted for this problem, click on this button:
 </p>
-<p>
-  <input type="button" name="task-history-all" value="Show Background Task History">
+  <input type="button" name="task-history-all" value="Show Background Task History for Problem" data-endpoint="${ section_data['list_instructor_tasks_url'] }">
+  <div class="task-history-all-table"></div>
 </p>
+
+<hr>
+
+<h2> Pending Instructor Tasks </h2>
+<div class="running-tasks-table" data-endpoint="${ section_data['list_instructor_tasks_url'] }"></div>

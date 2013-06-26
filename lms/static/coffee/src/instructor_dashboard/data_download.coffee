@@ -24,6 +24,7 @@ class DataDownload
           options =
             enableCellNavigation: true
             enableColumnReorder: false
+            forceFitColumns: true
 
           columns = ({id: feature, field: feature, name: feature} for feature in data.queried_features)
           grid_data = data.students
@@ -31,7 +32,7 @@ class DataDownload
           $table_placeholder = $ '<div/>', class: 'slickgrid'
           @$display_table.append $table_placeholder
           grid = new Slick.Grid($table_placeholder, grid_data, columns, options)
-          grid.autosizeColumns()
+          # grid.autosizeColumns()
 
     $grade_config_btn = @$section.find("input[name='dump-gradeconf']'")
     $grade_config_btn.click (e) =>

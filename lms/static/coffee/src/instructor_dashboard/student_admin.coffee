@@ -1,5 +1,6 @@
 log = -> console.log.apply console, arguments
 plantTimeout = (ms, cb) -> setTimeout cb, ms
+plantInterval = (ms, cb) -> setInterval cb, ms
 
 
 std_ajax_err = (handler) -> (jqXHR, textStatus, errorThrown) ->
@@ -9,9 +10,53 @@ std_ajax_err = (handler) -> (jqXHR, textStatus, errorThrown) ->
   handler.apply this, arguments
 
 
+create_task_list_table = ($table_tasks, tasks_data) ->
+  $table_tasks.empty()
+
+  options =
+    enableCellNavigation: true
+    enableColumnReorder: false
+    autoHeight: true
+    rowHeight: 60
+    forceFitColumns: true
+
+  columns = [
+    id: 'task_type'
+    field: 'task_type'
+    name: 'Task Type'
+  ,
+    id: 'task_id'
+    field: 'task_id'
+    name: 'Task ID'
+  ,
+    id: 'requester'
+    field: 'requester'
+    name: 'Requester'
+  ,
+    id: 'created'
+    field: 'created'
+    name: 'Created'
+  ,
+    id: 'task_input'
+    field: 'task_input'
+    name: 'Input'
+  ,
+    id: 'task_state'
+    field: 'task_state'
+    name: 'State'
+  ]
+
+  table_data = tasks_data
+
+  $table_placeholder = $ '<div/>', class: 'slickgrid'
+  $table_tasks.append $table_placeholder
+  grid = new Slick.Grid($table_placeholder, table_data, columns, options)
+
+
 class StudentAdmin
-  constructor: (@$container) ->
+  constructor: (@$section) ->
     log "setting up instructor dashboard section - student admin"
+    @$section.data 'wrapper', @
 
     # get jquery element and assert its existance
     # for debugging
@@ -24,20 +69,24 @@ class StudentAdmin
         item
 
     # collect buttons
-    @$field_student_select        = find_and_assert @$container, "input[name='student-select']"
-    @$progress_link               = find_and_assert @$container, "a.progress-link"
-    @$btn_enroll                  = find_and_assert @$container, "input[name='enroll']"
-    @$btn_unenroll                = find_and_assert @$container, "input[name='unenroll']"
-    @$field_problem_select_single = find_and_assert @$container, "input[name='problem-select-single']"
-    @$btn_reset_attempts_single   = find_and_assert @$container, "input[name='reset-attempts-single']"
-    @$btn_delete_state_single     = find_and_assert @$container, "input[name='delete-state-single']"
-    @$btn_rescore_problem_single  = find_and_assert @$container, "input[name='rescore-problem-single']"
-    @$btn_task_history_single     = find_and_assert @$container, "input[name='task-history-single']"
-    @$field_problem_select_all    = find_and_assert @$container, "input[name='problem-select-all']"
-    @$btn_reset_attempts_all      = find_and_assert @$container, "input[name='reset-attempts-all']"
-    @$btn_rescore_problem_all     = find_and_assert @$container, "input[name='rescore-problem-all']"
-    @$btn_task_history_all        = find_and_assert @$container, "input[name='task-history-all']"
+    @$field_student_select        = find_and_assert @$section, "input[name='student-select']"
+    @$progress_link               = find_and_assert @$section, "a.progress-link"
+    @$btn_enroll                  = find_and_assert @$section, "input[name='enroll']"
+    @$btn_unenroll                = find_and_assert @$section, "input[name='unenroll']"
+    @$field_problem_select_single = find_and_assert @$section, "input[name='problem-select-single']"
+    @$btn_reset_attempts_single   = find_and_assert @$section, "input[name='reset-attempts-single']"
+    @$btn_delete_state_single     = find_and_assert @$section, "input[name='delete-state-single']"
+    @$btn_rescore_problem_single  = find_and_assert @$section, "input[name='rescore-problem-single']"
+    @$btn_task_history_single     = find_and_assert @$section, "input[name='task-history-single']"
+    @$table_task_history_single   = find_and_assert @$section, ".task-history-single-table"
+    @$field_problem_select_all    = find_and_assert @$section, "input[name='problem-select-all']"
+    @$btn_reset_attempts_all      = find_and_assert @$section, "input[name='reset-attempts-all']"
+    @$btn_rescore_problem_all     = find_and_assert @$section, "input[name='rescore-problem-all']"
+    @$btn_task_history_all        = find_and_assert @$section, "input[name='task-history-all']"
+    @$table_task_history_all      = find_and_assert @$section, ".task-history-all-table"
+    @$table_running_tasks         = find_and_assert @$section, ".running-tasks-table"
 
+    @start_refresh_running_task_poll_loop()
 
     # go to student progress page
     @$progress_link.click (e) =>
@@ -120,10 +169,24 @@ class StudentAdmin
         url: @$btn_rescore_problem_single.data 'endpoint'
         data: send_data
         success: -> log 'started rescore problem task'
-        error: std_ajax_err   -> console.warn 'error starting rescore problem (single student) task'
+        error: std_ajax_err -> console.warn 'error starting rescore problem (single student) task'
 
-    # TODO
-    # @$btn_task_history_single
+    # list task history for student+problem
+    @$btn_task_history_single.click =>
+      send_data =
+        student_email: @$field_student_select.val()
+        problem_urlname: @$field_problem_select_single.val()
+
+      if not send_data.student_email then return
+      if not send_data.problem_urlname then return
+
+      $.ajax
+        dataType: 'json'
+        url: @$btn_task_history_single.data 'endpoint'
+        data: send_data
+        success: (data) =>
+          create_task_list_table @$table_task_history_single, data.tasks
+        error: std_ajax_err -> console.warn 'error listing task history for student+problem'
 
     # start task to reset attempts on problem for all students
     @$btn_reset_attempts_all.click =>
@@ -153,9 +216,40 @@ class StudentAdmin
         error: std_ajax_err (jqXHR, textStatus, errorThrown) ->
           console.warn "error starting rescore problem (all students) task"
 
-    # TODO
-    # @$btn_task_history_all
+    # list task history for problem
+    @$btn_task_history_all.click =>
+      send_data =
+        problem_urlname: @$field_problem_select_all.val()
 
+      if not send_data.problem_urlname then return
+
+      $.ajax
+        dataType: 'json'
+        url: @$btn_task_history_all.data 'endpoint'
+        data: send_data
+        success: (data) =>
+          create_task_list_table @$table_task_history_all, data.tasks
+        error: std_ajax_err -> console.warn 'error listing task history for student+problem'
+
+
+  reload_running_tasks_list: =>
+    list_endpoint = @$table_running_tasks.data 'endpoint'
+    $.ajax
+      dataType: 'json'
+      url: list_endpoint
+      success: (data) => create_task_list_table @$table_running_tasks, data.tasks
+      error: std_ajax_err -> console.warn "error listing all instructor tasks"
+
+  start_refresh_running_task_poll_loop: ->
+    @reload_running_tasks_list()
+    if @$section.hasClass 'active-section'
+      plantTimeout 5000, => @start_refresh_running_task_poll_loop()
+
+  onClickTitle: ->
+    @start_refresh_running_task_poll_loop()
+
+  # onExit: ->
+  #   clearInterval @reload_running_task_list_slot
 
 
 # exports
