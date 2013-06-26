@@ -44,9 +44,9 @@ def students_update_enrollment_email(request, course_id):
     """
     course = get_course_with_access(request.user, course_id, 'staff', depth=None)
 
-    action = request.GET.get('action', '')
-    emails = split_input_list(request.GET.get('emails', ''))
-    auto_enroll = request.GET.get('auto_enroll', '') in ['true', 'True', True]
+    action = request.GET.get('action')
+    emails = split_input_list(request.GET.get('emails'))
+    auto_enroll = request.GET.get('auto_enroll') in ['true', 'True', True]
 
     if action == 'enroll':
         results = enroll_emails(course_id, emails, auto_enroll=auto_enroll)
@@ -82,7 +82,10 @@ def access_allow_revoke(request, course_id):
     rolename = request.GET.get('rolename')
     mode = request.GET.get('mode')
 
-    user = User.objects.get(email=email)
+    try:
+        user = User.objects.get(email=email)
+    except User.DoesNotExist:
+        return HttpResponseBadRequest("user does not exist")
 
     if mode == 'allow':
         access.allow_access(course, user, rolename)
@@ -109,7 +112,7 @@ def list_course_role_members(request, course_id):
     """
     course = get_course_with_access(request.user, course_id, 'staff', depth=None)
 
-    rolename = request.GET.get('rolename', '')
+    rolename = request.GET.get('rolename')
 
     if not rolename in ['instructor', 'staff', 'beta']:
         return HttpResponseBadRequest()
@@ -354,7 +357,7 @@ def rescore_problem(request, course_id):
 
     problem_to_reset = request.GET.get('problem_to_reset')
     student_email = request.GET.get('student_email', False)
-    all_students = request.GET.get('all_students', '') in ['true', 'True', True]
+    all_students = request.GET.get('all_students') in ['true', 'True', True]
 
     if not (problem_to_reset and (all_students or student_email)):
         return HttpResponseBadRequest()
@@ -430,7 +433,7 @@ def list_forum_members(request, course_id):
     """
     course = get_course_with_access(request.user, course_id, 'staff', depth=None)
 
-    rolename = request.GET.get('rolename', '')
+    rolename = request.GET.get('rolename')
 
     if not rolename in [FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA]:
         return HttpResponseBadRequest()
@@ -470,9 +473,9 @@ def update_forum_role_membership(request, course_id):
     """
     course = get_course_with_access(request.user, course_id, 'instructor', depth=None)
 
-    email = request.GET.get('email', '')
-    rolename = request.GET.get('rolename', '')
-    mode = request.GET.get('mode', '')
+    email = request.GET.get('email')
+    rolename = request.GET.get('rolename')
+    mode = request.GET.get('mode')
 
     if not rolename in [access.FORUM_ROLE_ADMINISTRATOR, access.FORUM_ROLE_MODERATOR, access.FORUM_ROLE_COMMUNITY_TA]:
         return HttpResponseBadRequest()

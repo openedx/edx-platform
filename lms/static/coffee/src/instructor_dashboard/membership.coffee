@@ -1,17 +1,23 @@
 log = -> console.log.apply console, arguments
 plantTimeout = (ms, cb) -> setTimeout cb, ms
 
+std_ajax_err = (handler) -> (jqXHR, textStatus, errorThrown) ->
+  console.warn """ajax error
+                  textStatus: #{textStatus}
+                  errorThrown: #{errorThrown}"""
+  handler.apply this, arguments
+
 
 class BatchEnrollment
   constructor: (@$container) ->
     log "setting up instructor dashboard subsection - batch enrollment"
 
-    $emails_input = @$container.find("textarea[name='student-emails']'")
-    $btn_enroll = @$container.find("input[name='enroll']'")
-    $btn_unenroll = @$container.find("input[name='unenroll']'")
+    $emails_input        = @$container.find("textarea[name='student-emails']'")
+    $btn_enroll          = @$container.find("input[name='enroll']'")
+    $btn_unenroll        = @$container.find("input[name='unenroll']'")
     $checkbox_autoenroll = @$container.find("input[name='auto-enroll']'")
-    window.autoenroll = $checkbox_autoenroll
-    $task_response = @$container.find(".task-response")
+    $task_response       = @$container.find(".task-response")
+    $task_response_error = @$container.find(".task-response-error")
 
     $emails_input.click -> log 'click $emails_input'
     $btn_enroll.click -> log 'click $btn_enroll'
@@ -22,21 +28,37 @@ class BatchEnrollment
         action: 'enroll'
         emails: $emails_input.val()
         auto_enroll: $checkbox_autoenroll.is(':checked')
-      $.getJSON $btn_enroll.data('endpoint'), send_data, (data) ->
-        log 'received response for enroll button', data
-        display_response(data)
+
+      $.ajax
+        dataType: 'json'
+        url: $btn_enroll.data 'endpoint'
+        data: send_data
+        success: (data) -> display_response(data)
+        error: std_ajax_err -> fail_with_error "Error enrolling/unenrolling students."
 
     $btn_unenroll.click ->
       send_data =
         action: 'unenroll'
         emails: $emails_input.val()
         auto_enroll: $checkbox_autoenroll.is(':checked')
-      $.getJSON $btn_unenroll.data('endpoint'), send_data, (data) ->
-        log 'received response for unenroll button', data
-        display_response(data)
+
+      $.ajax
+        dataType: 'json'
+        url: $btn_unenroll.data 'endpoint'
+        data: send_data
+        success: (data) -> display_response(data)
+        error: std_ajax_err -> fail_with_error "Error enrolling/unenrolling students."
+
+
+    fail_with_error = (msg) ->
+      console.warn msg
+      $task_response.empty()
+      $task_response_error.empty()
+      $task_response_error.text msg
 
     display_response = (data_from_server) ->
       $task_response.empty()
+      $task_response_error.empty()
 
       response_code_dict = _.extend {}, data_from_server.results
       # response_code_dict e.g. {'code': ['email1', 'email2'], ...}

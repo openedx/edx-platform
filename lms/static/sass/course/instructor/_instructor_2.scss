@@ -5,8 +5,9 @@
 
   .olddash-button-wrapper {
     position: absolute;
-    top: 2em;
-    right: 2em;
+    top: 17px;
+    right: 15px;
+    font-size: 11pt;
   }
 
   section.instructor-dashboard-content-2 {
@@ -41,6 +42,13 @@
       @extend .top-header;
       border-bottom: 0;
       padding-bottom: 0;
+    }
+
+    input {
+      // display: block;
+      margin-bottom: 1em;
+      line-height: 1.3em;
+      padding: 8px 17px 8px 17px;
     }
 
     .instructor_dash_glob_info {
@@ -125,25 +133,6 @@
     margin-bottom: 1em;
   }
 
-  .auth-list-container {
-    display: none;
-    margin-bottom: 1.5em;
-
-    &.active {
-      display: block;
-    }
-
-    .auth-list-table {
-      .slickgrid {
-        height: 250px;
-      }
-    }
-
-    .auth-list-add {
-      margin-top: 0.5em;
-    }
-  }
-
   .batch-enrollment {
     textarea {
       margin-top: 0.2em;
@@ -151,6 +140,10 @@
 
       height: 100px;
       width: 500px;
+    }
+
+    input {
+      margin-right: 5px;
     }
 
     .task-res-section {
@@ -169,6 +162,30 @@
         li {
         }
       }
+    }
+
+    .task-response-error {
+      color: red;
+      margin-top: 1em;
+    }
+  }
+
+  .auth-list-container {
+    display: none;
+    margin-bottom: 1.5em;
+
+    &.active {
+      display: block;
+    }
+
+    .auth-list-table {
+      .slickgrid {
+        height: 250px;
+      }
+    }
+
+    .auth-list-add {
+      margin-top: 0.5em;
     }
   }
 }
