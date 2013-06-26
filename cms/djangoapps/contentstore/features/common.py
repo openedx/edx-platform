@@ -120,9 +120,9 @@ def create_studio_user(
 
 
 def fill_in_course_info(
-        name=world.scenario_dict['COURSE_NAME'],
-        org=world.scenario_dict['COURSE_ORG'],
-        num=world.scenario_dict['COURSE_NUM']):
+        name='Robot Super Course',
+        org='MITx',
+        num='999'):
     world.css_fill('.new-course-name', name)
     world.css_fill('.new-course-org', org)
     world.css_fill('.new-course-number', num)
