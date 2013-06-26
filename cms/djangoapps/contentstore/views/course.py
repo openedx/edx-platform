@@ -21,7 +21,7 @@ from contentstore.utils import get_lms_link_for_item, add_extra_panel_tab, remov
 from models.settings.course_details import CourseDetails, CourseSettingsEncoder
 from models.settings.course_grading import CourseGradingModel
 from models.settings.course_metadata import CourseMetadata
-from auth.authz import create_all_course_groups
+from auth.authz import create_all_course_groups, is_user_in_creator_group
 from util.json_request import expect_json
 
 from .access import has_access, get_location_and_verify_access
@@ -81,7 +81,7 @@ def course_index(request, org, course, name):
 @expect_json
 def create_new_course(request):
 
-    if settings.MITX_FEATURES.get('DISABLE_COURSE_CREATION', False) and not request.user.is_staff:
+    if not is_user_in_creator_group(request.user):
         raise PermissionDenied()
 
     # This logic is repeated in xmodule/modulestore/tests/factories.py
