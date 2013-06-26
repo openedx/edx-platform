@@ -12,8 +12,12 @@ class Email(models.Model):
         abstract = True
 
 class CourseEmail(Email, models.Model):
+    TO_OPTIONS = (('myself', 'Myself'),
+                  ('staff', 'Staff and instructors'),
+                  ('all', 'All')
+                  )
     course_id = models.CharField(max_length=255, db_index=True)
-    to = models.CharField(max_length=64)
+    to = models.CharField(max_length=64, choices=TO_OPTIONS, default='myself')
 
     def __unicode__(self):
         return self.subject

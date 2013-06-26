@@ -437,14 +437,30 @@ function goto( mode)
     <p>
     <label for="id_to">Send to:</label>
     <select id="id_to" name="to">
-      <option value="students">All Students</option>
-      <option value="staff">All Course Staff</option>
-      <option value="all">All (students and staff)</option>
+      <option value="myself">Myself</option>
+      %if to == "staff":
+        <option value="staff" selected="selected">Staff and instructors</option>
+      %else:
+	<option value="staff">Staff and instructors</option>
+      %endif
+      %if to == "all":
+        <option value="all" selected="selected">All (students, staff and instructors)</option>
+      %else:
+	<option value="all">All (students, staff and instructors)</option>
+      %endif
     </select>
     <label for="id_subject">Subject: </label>
-    <input type="text" id="id_subject" name="subject" maxlength="100" size="75">
+    %if subject:
+      <input type="text" id="id_subject" name="subject" maxlength="100" size="75" value="${subject}">
+    %else:
+      <input type="text" id="id_subject" name="subject" maxlength="100" size="75">
+    %endif
     <label for="id_message">Message:</label>
-    <textarea cols="100" id="id_message" name="message"></textarea>
+    %if message:
+      <textarea cols="100" id="id_message" name="message">${message}</textarea>
+    %else:
+      <textarea cols="100" id="id_message" name="message"></textarea>
+    %endif
     </p>
     <p>
     <input type="submit" name="action" value="Send email">

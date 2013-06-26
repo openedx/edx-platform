@@ -7,7 +7,8 @@ from django.contrib.auth.models import User, Group
 from celery.task import current
 from bulk_email.models import *
 
-from courseware.access import get_access_group_name
+from courseware.courses import get_course_by_id
+from courseware.access import _course_staff_group_name, _course_instructor_group_name
 
 import math
 import time
@@ -17,7 +18,7 @@ log = logging.getLogger(__name__)
 EMAILS_PER_WORKER=getattr(settings, 'EMAILS_PER_WORKER', 10)
 
 @task()
-def delegate_emails(hash_for_msg, recipient, course_id, course_title, course_url):
+def delegate_emails(hash_for_msg, recipient, course_id, course_url, user_id):
     '''
     Delegates emails by querying for the list of recipients who should
     get the mail, chopping up into batches of EMAILS_PER_WORKER size,
@@ -27,12 +28,23 @@ def delegate_emails(hash_for_msg, recipient, course_id, course_title, course_url
 
     Returns the number of batches (workers) kicked off.
     '''
-    if recipient == "students":
-        recipient_qset = User.objects.filter(courseenrollment__course_id=course_id, is_staff=False).values('profile__name', 'email')
-    elif recipient == "staff":
-        recipient_qset = User.objects.filter(courseenrollment__course_id=course_id, is_staff=True).values('profile__name', 'email')
+    course = get_course_by_id(course_id)
+
+    if recipient == "myself":
+        recipient_qset = User.objects.filter(id=user_id).values('profile__name', 'email')
     else:
-        recipient_qset = User.objects.filter(courseenrollment__course_id=course_id).values('profile__name', 'email')
+        staff_grpname = _course_staff_group_name(course.location)
+        staff_group, created = Group.objects.get_or_create(name=staff_grpname)
+        staff_qset = staff_group.user_set.values('profile__name', 'email')
+        instructor_grpname = _course_instructor_group_name(course.location)
+        instructor_group, created = Group.objects.get_or_create(name=instructor_grpname)
+        instructor_qset = instructor_group.user_set.values('profile__name', 'email')
+        recipient_qset = staff_qset | instructor_qset
+
+        if recipient == "all":
+            enrollment_qset = User.objects.filter(courseenrollment__course_id=course.id).values('profile__name', 'email')
+            recipient_qset = recipient_qset | enrollment_qset
+        recipient_qset = recipient_qset.distinct()
 
     recipient_list = list(recipient_qset)
     total_num_emails = recipient_qset.count()
@@ -41,7 +53,7 @@ def delegate_emails(hash_for_msg, recipient, course_id, course_title, course_url
 
     for i in range(num_workers):
         to_list=recipient_list[i*chunk:i*chunk+chunk]
-        course_email(hash_for_msg, to_list, course_title, course_url, False)
+        course_email.delay(hash_for_msg, to_list, course.display_name, course_url, False)
     return num_workers
 
 
@@ -73,7 +85,7 @@ def course_email(hash_for_msg, to_list, course_title, course_url, throttle=False
         num_error = 0
 
         while to_list:
-            (name, email) = to_list[-1]
+            (name, email) = to_list[-1].values()
             html_footer = render_to_string('emails/email_footer.html',
                                            {'name':name,
                                             'email':email,

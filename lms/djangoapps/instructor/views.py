@@ -50,7 +50,7 @@ import track.views
 from bulk_email.models import CourseEmail
 import datetime
 from hashlib import md5
-from bulk_email.tasks import delegate_emails
+from bulk_email import tasks
 
 log = logging.getLogger(__name__)
 
@@ -77,6 +77,9 @@ def instructor_dashboard(request, course_id):
     forum_admin_access = has_forum_access(request.user, course_id, FORUM_ROLE_ADMINISTRATOR)
 
     msg = ''
+    to = None
+    subject = None
+    html_message = None
     problems = []
     plots = []
     datatable = {}
@@ -684,8 +687,10 @@ def instructor_dashboard(request, course_id):
         email.save()
 
         course_url = request.build_absolute_uri(reverse('course_root',  kwargs={'course_id': course_id}))
-        delegate_emails(email.hash, email.to, course_id, course.display_name, course_url)
-        
+        tasks.delegate_emails.delay(email.hash, email.to, course_id, course_url, request.user.id)
+        msg = "<font color='green'>Your email was successfully queued for sending.  Please note that for large public classe\
+s (~10k), it may take 1-2 hours to send all emails.</font>"
+
     #----------------------------------------
     # psychometrics
 
@@ -767,6 +772,9 @@ def instructor_dashboard(request, course_id):
                'course_stats': course_stats,
                'msg': msg,
                'modeflag': {idash_mode: 'selectedmode'},
+               'to': to,                #email
+               'subject': subject,      #email
+               'message': html_message, #email
                'problems': problems,		# psychometrics
                'plots': plots,			# psychometrics
                'course_errors': modulestore().get_item_errors(course.location),
