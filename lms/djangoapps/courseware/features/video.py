@@ -14,11 +14,11 @@ def does_autoplay(_step):
 
 @step('the course has a Video component')
 def view_video(_step):
-    coursename = world.scenario_dict['COURSE_NAME'].replace(' ', '_')
-    i_am_registered_for_the_course(step, coursename)
+    coursenum = 'test_course'
+    i_am_registered_for_the_course(step, coursenum)
 
     # Make sure we have a video
-    add_video_to_course(coursename)
+    add_video_to_course(coursenum)
     chapter_name = world.scenario_dict['SECTION_NAME'].replace(" ", "_")
     section_name = chapter_name
     url = django_url('/courses/%s/%s/%s/courseware/%s/%s' %
@@ -29,11 +29,11 @@ def view_video(_step):
 
 @step('the course has a VideoAlpha component')
 def view_videoalpha(step):
-    coursename = world.scenario_dict['COURSE_NAME'].replace(' ', '_')
-    i_am_registered_for_the_course(step, coursename)
+    coursenum = 'test_course'
+    i_am_registered_for_the_course(step, coursenum)
 
     # Make sure we have a videoalpha
-    add_videoalpha_to_course(coursename)
+    add_videoalpha_to_course(coursenum)
     chapter_name = world.scenario_dict['SECTION_NAME'].replace(" ", "_")
     section_name = chapter_name
     url = django_url('/courses/%s/%s/%s/courseware/%s/%s' %
