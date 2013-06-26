@@ -1,7 +1,6 @@
-from django.http import HttpResponse, Http404
-from django.core.context_processors import csrf
 from mitxmako.shortcuts import render_to_string
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.http import HttpResponse
 
 import requests
 import json
@@ -20,7 +19,8 @@ def search(request):
         context.update({"old_query": request.GET['s']})
     context.update({"previous_content": content})
     search_bar = render_to_string("search_templates/search.html", context)
-    return HttpResponse(search_bar + results_string)
+    full_html = render_to_string("search_templates/wrapper.html", {"body": search_bar+results_string})
+    return HttpResponse(full_html)
 
 
 def find(request, database="http://127.0.0.1:9200",
@@ -39,9 +39,12 @@ def find(request, database="http://127.0.0.1:9200",
         uuids = [entry["display_name"] for entry in data]
         transcripts = [entry["searchable_text"] for entry in data]
         snippets = [snippet_generator(transcript, query) for transcript in transcripts]
-        data = zip(uuids, snippets)
+        thumbnails = ["data:image/jpg;base64,"+entry["thumbnail"] for entry in data]
+        data = zip(uuids, snippets, thumbnails)
     except KeyError:
-        data = [("No results found", "Please try again")]
+        data = [("No results found, please try again", "")]
+    if len(data) == 0:
+        data = [("No results found, please try again", "")]
 
     correction = spell_check(query)
     results_pages = Paginator(data, results_per_page)
@@ -81,9 +84,9 @@ def prev_link(request, paginator):
 
 def search_correction_link(request, term, page="1"):
     if term:
-        return request.path+"?s="+term+"&page="+page
+        return request.path+"?s="+term+"&page="+page+"&content="+request.GET.get("content", "transcript")
     else:
-        return request.path+"?s="+request.GET["s"]+"&page"+page
+        return request.path+"?s="+request.GET["s"]+"&page"+page+"&content="+request.GET.get("content", "transcript")
 
 
 def match(words):
@@ -108,7 +111,7 @@ def match_highlighter(query, response, tag="b", css_class="highlight", highlight
     return bold_response
 
 
-def snippet_generator(transcript, query, soft_max=50, word_margin=30, bold=True):
+def snippet_generator(transcript, query, soft_max=50, word_margin=25, bold=True):
     punkt = nltk.data.load('tokenizers/punkt/english.pickle')
     stop_words = word_filter.stopwords.words("english")
     sentences = punkt.tokenize(transcript)
