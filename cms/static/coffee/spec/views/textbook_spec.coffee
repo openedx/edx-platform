@@ -11,20 +11,22 @@ beforeEach ->
                 return trimmedText.indexOf(text) != -1;
 
 describe "CMS.Views.ShowTextbook", ->
+    tpl = readFixtures('show-textbook.underscore')
+
+    beforeEach ->
+        setFixtures($("<script>", {id: "show-textbook-tpl", type: "text/template"}).text(tpl))
+        appendSetFixtures($("<script>", {id: "system-feedback-tpl", type: "text/template"}).text(feedbackTpl))
+        appendSetFixtures(sandbox({id: "page-notification"}))
+        appendSetFixtures(sandbox({id: "page-prompt"}))
+        @model = new CMS.Models.Textbook({name: "Life Sciences", id: "0life-sciences"})
+        spyOn(@model, "destroy").andCallThrough()
+        @collection = new CMS.Collections.TextbookSet([@model])
+        @view = new CMS.Views.ShowTextbook({model: @model})
+
+        @promptSpies = spyOnConstructor(CMS.Views.Prompt, "Warning", ["show", "hide"])
+        @promptSpies.show.andReturn(@promptSpies)
+
     describe "Basic", ->
-        tpl = readFixtures('show-textbook.underscore')
-
-        beforeEach ->
-            setFixtures($("<script>", {id: "show-textbook-tpl", type: "text/template"}).text(tpl))
-            appendSetFixtures($("<script>", {id: "system-feedback-tpl", type: "text/template"}).text(feedbackTpl))
-            appendSetFixtures(sandbox({id: "page-notification"}))
-            appendSetFixtures(sandbox({id: "page-prompt"}))
-            @model = new CMS.Models.Textbook({name: "Life Sciences"})
-            @collection = new CMS.Collections.TextbookSet()
-            spyOn(@collection, 'save')
-            @collection.add(@model)
-            @view = new CMS.Views.ShowTextbook({model: @model})
-
         it "should render properly", ->
             @view.render()
             expect(@view.$el).toContainText("Life Sciences")
@@ -34,21 +36,13 @@ describe "CMS.Views.ShowTextbook", ->
             expect(@model.get("editing")).toBeTruthy()
 
         it "should pop a delete confirmation when the delete button is clicked", ->
-            promptSpies = spyOnConstructor(CMS.Views.Prompt, "Warning", ["show", "hide"])
             @view.render().$(".delete").click()
-            expect(promptSpies.constructor).toHaveBeenCalled()
-            ctorOptions = promptSpies.constructor.mostRecentCall.args[0]
+            expect(@promptSpies.constructor).toHaveBeenCalled()
+            ctorOptions = @promptSpies.constructor.mostRecentCall.args[0]
             expect(ctorOptions.title).toMatch(/Life Sciences/)
             # hasn't actually been removed
+            expect(@model.destroy).not.toHaveBeenCalled()
             expect(@collection).toContain(@model)
-            expect(@collection.save).not.toHaveBeenCalled()
-            # run the primary function to indicate confirmation
-            view = jasmine.createSpyObj('view', ['hide'])
-            context = jasmine.createSpy('context')
-            ctorOptions.actions.primary.click.call(context, view)
-            # now it's been removed
-            expect(@collection).not.toContain(@model)
-            expect(@collection.save).toHaveBeenCalled()
 
         it "should show chapters appropriately", ->
             @model.get("chapters").add([{}, {}, {}])
@@ -62,7 +56,36 @@ describe "CMS.Views.ShowTextbook", ->
             @view.render().$(".hide-chapters").click()
             expect(@model.get('showChapters')).toBeFalsy()
 
+    describe "AJAX", ->
+        beforeEach ->
+            @requests = requests = []
+            @xhr = sinon.useFakeXMLHttpRequest()
+            @xhr.onCreate = (xhr) -> requests.push(xhr)
 
+            @savingSpies = spyOnConstructor(CMS.Views.Notification, "Saving",
+                ["show", "hide"])
+            @savingSpies.show.andReturn(@savingSpies)
+
+        afterEach ->
+            @xhr.restore()
+
+        it "should destroy itself on confirmation", ->
+            @view.render().$(".delete").click()
+            ctorOptions = @promptSpies.constructor.mostRecentCall.args[0]
+            # run the primary function to indicate confirmation
+            ctorOptions.actions.primary.click(@promptSpies)
+            # AJAX request has been sent, but not yet returned
+            expect(@model.destroy).toHaveBeenCalled()
+            expect(@requests.length).toEqual(1)
+            expect(@savingSpies.constructor).toHaveBeenCalled()
+            expect(@savingSpies.show).toHaveBeenCalled()
+            expect(@savingSpies.hide).not.toHaveBeenCalled()
+            savingOptions = @savingSpies.constructor.mostRecentCall.args[0]
+            expect(savingOptions.title).toMatch(/Deleting/)
+            # return a success response
+            @requests[0].respond(200)
+            expect(@savingSpies.hide).toHaveBeenCalled()
+            expect(@collection.contains(@model)).toBeFalsy()
 
 describe "CMS.Views.EditTextbook", ->
     describe "Basic", ->

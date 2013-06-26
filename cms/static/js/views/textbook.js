@@ -31,25 +31,24 @@ CMS.Views.ShowTextbook = Backbone.View.extend({
                     text: gettext("Delete"),
                     click: function(view) {
                         view.hide();
-                        collection.remove(textbook);
                         var delmsg = new CMS.Views.Notification.Saving({
                             title: gettext("Deleting&hellip;"),
                             closeIcon: false,
                             minShown: 1250
                         }).show();
-                        collection.save({
+                        textbook.destroy({
                             complete: function() {
                                 delmsg.hide();
                             }
                         });
                     }
                 },
-                secondary: [{
+                secondary: {
                     text: gettext("Cancel"),
                     click: function(view) {
                         view.hide();
                     }
-                }]
+                }
             }
         }).show();
     },
@@ -167,6 +166,7 @@ CMS.Views.ListTextbooks = Backbone.View.extend({
     initialize: function() {
         this.emptyTemplate = _.template($("#no-textbooks-tpl").text());
         this.listenTo(this.collection, 'all', this.render);
+        this.listenTo(this.collection, 'destroy', this.handleDestroy);
     },
     tagName: "div",
     className: "textbooks-list",
@@ -195,6 +195,9 @@ CMS.Views.ListTextbooks = Backbone.View.extend({
     addOne: function(e) {
         if(e && e.preventDefault) { e.preventDefault(); }
         this.collection.add([{editing: true}]);
+    },
+    handleDestroy: function(model, collection, options) {
+        collection.remove(model);
     }
 });
 CMS.Views.EditChapter = Backbone.View.extend({
