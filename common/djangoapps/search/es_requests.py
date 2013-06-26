@@ -2,6 +2,8 @@ import requests
 import json
 import os
 import re
+import urllib
+import base64
 from pymongo import MongoClient
 from pdfminer.pdfinterp import PDFResourceManager, process_pdf
 from pdfminer.converter import TextConverter
@@ -9,6 +11,9 @@ from pdfminer.layout import LAParams
 from pdfminer.pdfparser import PDFSyntaxError
 from cStringIO import StringIO as cIO
 from StringIO import StringIO as IO
+from wand.image import Image
+from wand.exceptions import DelegateError, MissingDelegateError, CorruptImageError
+from xhtml2pdf import pisa as pisa
 
 
 class MongoIndexer:
@@ -98,6 +103,22 @@ class MongoIndexer:
             file_name = file_name[5:]
         return file_name[:file_name.find(".")]
 
+    def thumbnail_from_uuid(self, uuid):
+        image = urllib.urlopen("http://img.youtube.com/vi/" + uuid + "/0.jpg")
+        return base64.b64encode(image.read())
+
+    def thumbnail_from_pdf(self, pdf):
+        try:
+            with Image(blob=pdf) as img:
+                return base64.b64encode(img.make_blob('jpg'))
+        except (DelegateError, MissingDelegateError, CorruptImageError):
+            raise
+
+    def thumbnail_from_html(self, html):
+        pseudo_dest = cIO()
+        pisa.CreatePDF(IO(html), pseudo_dest)
+        return self.thumbnail_from_pdf(pseudo_dest.getvalue())
+
     def index_all_lecture_slides(self, es_instance, index):
         cursor = self.find_chunks_with_type(".pdf")
         for i in range(0, cursor.count()):
@@ -111,8 +132,12 @@ class MongoIndexer:
                 uuid = item["files_id"]["name"]
                 display_name = org + " " + course + " " + item["files_id"]["name"]
                 searchable_text = self.pdf_to_text(item)
+                try:
+                    thumbnail = self.thumbnail_from_pdf(item["data"].__str__())
+                except (DelegateError, MissingDelegateError, CorruptImageError):
+                    print "Slide with uuid: " + uuid + " is corrupt."
                 data = {"course": course, "org": org, "uuid": uuid, "searchable_text": searchable_text,
-                        "display_name": display_name}
+                        "display_name": display_name, "thumbnail": thumbnail}
                 type_ = course.replace(".", "-")
                 print es_instance.index_data(index, type_, data)._content
 
@@ -128,8 +153,9 @@ class MongoIndexer:
             except KeyError:
                 display_name = org + " " + course
             searchable_text = self.searchable_text_from_problem_data(item)
+            thumbnail = self.thumbnail_from_html(item["definition"]["data"])
             data = {"course": course, "org": org, "uuid": uuid, "searchable_text": searchable_text,
-                    "display_name": display_name}
+                    "display_name": display_name, "thumbnail": thumbnail}
             type_ = course.replace(".", "-")
             print es_instance.index_data(index, type_, data)._content
 
@@ -150,8 +176,9 @@ class MongoIndexer:
                 print "Transcript for: " + uuid + " has no metadata"
                 display_name = org + " "+course
             transcript = " ".join(self.find_transcript_content(item))
+            thumbnail = self.thumbnail_from_uuid(uuid)
             data = {"course": course, "org": org, "uuid": uuid, "searchable_text": transcript,
-                    "display_name": display_name}
+                    "display_name": display_name, 'thumbnail': thumbnail}
             type_ = course.replace(".", "-")
             print es_instance.index_data(index, type_, data)._content
 
@@ -318,16 +345,16 @@ class ElasticDatabase:
             for word in words:
                 dictionary.write(word + "\n")
 
-#url = "http://localhost:9200"
-#settings_file = "settings.json"
+url = "http://localhost:9200"
+settings_file = "settings.json"
 
-#mongo = MongoIndexer(content_database="edge-xcontent", module_database="edge-xmodule")
+mongo = MongoIndexer()
 
-#test = ElasticDatabase(url, settings_file)
+test = ElasticDatabase(url, settings_file)
 #print test.delete_index("transcript-index")
-#mongo.index_all_lecture_slides(test, "pdf-index")
+#mongo.index_all_lecture_slides(test, "slide-index")
 #mongo.index_all_transcripts(test, "transcript-index")
-#mongo.index_all_problems(test, "problem-index")
+mongo.index_all_problems(test, "problem-index")
 
 #print test.setup_type("transcript", "cleaning", mapping)._content
 #print test.get_type_mapping("transcript-index", "2-1x")
