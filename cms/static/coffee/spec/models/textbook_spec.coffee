@@ -26,6 +26,11 @@ describe "CMS.Models.Textbook", ->
     it "should have a URL set", ->
         expect(_.result(@model, "url")).toBeTruthy()
 
+    it "should be able to reset itself", ->
+        @model.set("name", "foobar")
+        @model.reset()
+        expect(@model.get("name")).toEqual("")
+
     it "should not be dirty by default", ->
         expect(@model.isDirty()).toBeFalsy()
 
