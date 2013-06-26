@@ -205,3 +205,10 @@ def is_user_in_creator_group(user):
         return user.groups.filter(name=COURSE_CREATOR_GROUP_NAME).count() > 0
 
     return True
+
+
+def _grant_instructors_creator_access(caller):
+    for group in Group.objects.all():
+        if group.name.startswith(INSTRUCTOR_ROLE_NAME + "_"):
+            for user in group.user_set.all():
+                add_user_to_creator_group(caller, user)
