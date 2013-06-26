@@ -12,6 +12,8 @@ import time
 from logging import getLogger
 logger = getLogger(__name__)
 
+from terrain.browser import reset_data
+
 _COURSE_NAME = 'Robot Super Course'
 _COURSE_NUM = '999'
 _COURSE_ORG = 'MITx'
@@ -54,11 +56,41 @@ def i_press_the_category_delete_icon(_step, category):
 def i_have_opened_a_new_course(_step):
     open_new_course()
 
+@step(u'I press the "([^"]*)" notification button$')
+def press_the_notification_button(step, name):
+    css = 'a.action-%s' % name.lower()
 
-@step('I (save|cancel) my changes$')
-def save_changes(step, action):
-    button_css = '.action-%s' % action
-    world.css_click(button_css)
+    # Save was clicked if either the save notification bar is gone, or we have a error notification
+    # overlaying it (expected in the case of typing Object into display_name).
+    def save_clicked():
+        confirmation_dismissed = world.is_css_not_present('.is-shown.wrapper-notification-warning')
+        error_showing = world.is_css_present('.is-shown.wrapper-notification-error')
+        return confirmation_dismissed or error_showing
+
+    assert_true(world.css_click(css, success_condition=save_clicked), 'Save button not clicked after 5 attempts.')
+
+
+@step('I change the "(.*)" field to "(.*)"$')
+def i_change_field_to_value(step, field, value):
+    # Special casing this because we should type into CodeMirror
+    field_css = '#%s' % '-'.join([s.lower() for s in field.split()])
+    if field_css == '#course-overview':
+        type_in_codemirror(0, value)
+    else:
+        ele = world.css_find(field_css).first
+        ele.fill(value)
+        ele._element.send_keys(Keys.ENTER)
+
+
+@step('I reset the database')
+def reset_the_db(step):
+    reset_data(None)
+
+
+@step('I see a confirmation that my changes have been saved')
+def i_see_a_confirmation(step):
+    confirmation_css = '#alert-confirmation'
+    assert world.is_css_present(confirmation_css)
 
 
 ####### HELPER FUNCTIONS ##############

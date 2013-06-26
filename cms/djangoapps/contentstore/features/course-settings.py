@@ -4,6 +4,7 @@
 from lettuce import world, step
 from terrain.steps import reload_the_page
 from selenium.webdriver.common.keys import Keys
+from common import type_in_codemirror
 import time
 
 from nose.tools import assert_true, assert_false, assert_equal

@@ -2,8 +2,8 @@
 #pylint: disable=W0621
 
 from lettuce import world, step
-from nose.tools import assert_false, assert_equal, assert_regexp_matches
-from common import type_in_codemirror
+from nose.tools import assert_false, assert_equal, assert_regexp_matches, assert_true
+from common import type_in_codemirror, press_the_notification_button
 
 KEY_CSS = '.key input.policy-key'
 VALUE_CSS = 'textarea.json'
@@ -23,20 +23,6 @@ def i_select_advanced_settings(step):
 def i_am_on_advanced_course_settings(step):
     step.given('I have opened a new course in Studio')
     step.given('I select the Advanced Settings')
-
-
-@step(u'I press the "([^"]*)" notification button$')
-def press_the_notification_button(step, name):
-    css = 'a.action-%s' % name.lower()
-
-    # Save was clicked if either the save notification bar is gone, or we have a error notification
-    # overlaying it (expected in the case of typing Object into display_name).
-    def save_clicked():
-        confirmation_dismissed = world.is_css_not_present('.is-shown.wrapper-notification-warning')
-        error_showing = world.is_css_present('.is-shown.wrapper-notification-error')
-        return confirmation_dismissed or error_showing
-
-    world.css_click(css, success_condition=save_clicked)
 
 
 @step(u'I edit the value of a policy key$')
