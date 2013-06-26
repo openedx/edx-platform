@@ -343,7 +343,6 @@ def rescore_problem(request, course_id):
     Starts a background process a students attempts counter. Optionally deletes student state for a problem.
     Limited to staff access.
 
-    Takes query parameter problem_to_reset
     Takes either of the following query paremeters
         - problem_to_reset is a urlname of a problem
         - student_email is an email
@@ -376,6 +375,46 @@ def rescore_problem(request, course_id):
     else:
         return HttpResponseBadRequest()
 
+    response = HttpResponse(json.dumps(response_payload), content_type="application/json")
+    return response
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+def list_instructor_tasks(request, course_id):
+    """
+    List instructor tasks.
+    Limited to instructor access.
+
+    Takes either of the following query paremeters
+        - (optional) problem_urlname (same format as problem_to_reset in other api methods)
+        - (optional) student_email
+    """
+    course = get_course_with_access(request.user, course_id, 'instructor', depth=None)
+
+    problem_urlname = request.GET.get('problem_urlname', False)
+    student_email = request.GET.get('student_email', False)
+
+    if student_email and not problem_urlname:
+        return HttpResponseBadRequest()
+
+    if problem_urlname:
+        module_state_key = _module_state_key_from_problem_urlname(course_id, problem_urlname)
+        if student_email:
+            student = User.objects.get(email=student_email)
+            tasks = instructor_task.api.get_instructor_task_history(course_id, module_state_key, student)
+        else:
+            tasks = instructor_task.api.get_instructor_task_history(course_id, module_state_key)
+    else:
+        tasks = instructor_task.api.get_running_instructor_tasks(course_id)
+
+    def extract_task_features(task):
+        FEATURES = ['task_type', 'task_input', 'task_id', 'requester', 'created', 'task_state']
+        return dict((feature, str(getattr(task, feature))) for feature in FEATURES)
+
+    response_payload = {
+        'tasks': map(extract_task_features, tasks),
+    }
     response = HttpResponse(json.dumps(response_payload), content_type="application/json")
     return response
 
