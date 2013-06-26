@@ -201,6 +201,22 @@ class MongoIndexer:
             file_name = file_name[5:]
         return file_name[:file_name.find(".")]
 
+    def thumbnail_from_uuid(self, uuid):
+        image = urllib.urlopen("http://img.youtube.com/vi/" + uuid + "/0.jpg")
+        return base64.b64encode(image.read())
+
+    def thumbnail_from_pdf(self, pdf):
+        try:
+            with Image(blob=pdf) as img:
+                return base64.b64encode(img.make_blob('jpg'))
+        except (DelegateError, MissingDelegateError, CorruptImageError):
+            raise
+
+    def thumbnail_from_html(self, html):
+        pseudo_dest = cIO()
+        pisa.CreatePDF(IO(html), pseudo_dest)
+        return self.thumbnail_from_pdf(pseudo_dest.getvalue())
+
     def index_all_lecture_slides(self, es_instance, index):
         cursor = self.find_chunks_with_type(".pdf")
         for i in range(0, cursor.count()):
@@ -214,8 +230,12 @@ class MongoIndexer:
                 uuid = item["files_id"]["name"]
                 display_name = org + " " + course + " " + item["files_id"]["name"]
                 searchable_text = self.pdf_to_text(item)
+                try:
+                    thumbnail = self.thumbnail_from_pdf(item["data"].__str__())
+                except (DelegateError, MissingDelegateError, CorruptImageError):
+                    print "Slide with uuid: " + uuid + " is corrupt."
                 data = {"course": course, "org": org, "uuid": uuid, "searchable_text": searchable_text,
-                        "display_name": display_name}
+                        "display_name": display_name, "thumbnail": thumbnail}
                 type_ = course.replace(".", "-")
                 print es_instance.index_data(index, type_, data)._content
 
@@ -231,8 +251,9 @@ class MongoIndexer:
             except KeyError:
                 display_name = org + " " + course
             searchable_text = self.searchable_text_from_problem_data(item)
+            thumbnail = self.thumbnail_from_html(item["definition"]["data"])
             data = {"course": course, "org": org, "uuid": uuid, "searchable_text": searchable_text,
-                    "display_name": display_name}
+                    "display_name": display_name, "thumbnail": thumbnail}
             type_ = course.replace(".", "-")
             print es_instance.index_data(index, type_, data)._content
 
@@ -450,8 +471,8 @@ class EnchantDictionary:
                 dictionary.write(word+"\n")
 
 
-#url = "http://localhost:9200"
-#settings_file = "settings.json"
+url = "http://localhost:9200"
+settings_file = "settings.json"
 
 #mongo = MongoIndexer()
 

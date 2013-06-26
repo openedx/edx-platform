@@ -6,6 +6,7 @@
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 .result-title{
 	text-align: center;
 	word-wrap: normal;
@@ -22,9 +23,19 @@
 	margin-top: -20px;
 }
 =======
+=======
+.result-title{
+	text-align: center;
+	word-wrap: normal;
+}
+>>>>>>> Made prettier, added requirements, and included main edX page
 .searchwrapper form { display: inline; }
 >>>>>>> Refactored some code and added full elasticsearch module test suite
 
+.search-results{
+	margin-left: 10%;
+	margin-top: 20px;
+}
 .searchbox {
 	border:0;
 	background: -moz-linear-gradient(top,  #ffffff 0%, #ededed 49%, #fafafa 50%, #ededed 50%, #dcdcdc 100%); /* FF3.6+ */
@@ -43,13 +54,38 @@
 
 .searchbox_submit {
 	border: 0;
-	background-image: url("../images/search-icon.svg");
 	background-color: transparent;
 	background-size: cover;
 	position: absolute;
 	top: 2.5px;
 	left: 210px;
 	/*width: 35px;*/
+<<<<<<< HEAD
+}
+
+.searchbox_submit:before{
+	position: absolute;
+    content: '';
+    background-image: url("../images/search-icon.svg");
+    background-size: cover;
+    background-color: transparent;
+    margin-left: 6px;
+    margin-top: 4px;
+    width:30px;
+    height:30px;
+    pointer-events: none;
+}
+.searchbox_submit:hover {
+	cursor:pointer;
+	cursor: hand;
+}
+
+.content-select{
+	display: block;
+	text-align: right;
+	padding-top: 10px;
+=======
+>>>>>>> Made prettier, added requirements, and included main edX page
 }
 
 .searchbox_submit:before{
@@ -75,33 +111,31 @@
 	padding-top: 10px;
 }
 
-.searchbox_submit:hover {
-	cursor:pointer;
-	cursor: hand;
-}
-
-.content-select{
-	display: block;
-	text-align: right;
-	padding-top: 10px;
-}
-
 .results_snippet{
 	color: #666666;
 	font-family: "Open Sans", "Arial";
 	font-weight: 300;
 	height: 155px;
 	width: 360px;
+<<<<<<< HEAD
+=======
+	padding-left: 10%;
+>>>>>>> Made prettier, added requirements, and included main edX page
 	text-align: justify;
 }
 
 .result_wrapper{
+<<<<<<< HEAD
 	width: 705px;
+=======
+	width: 520px;
+>>>>>>> Made prettier, added requirements, and included main edX page
 }
 
 .snippet_container{
 	overflow: hidden;
 	height: 155px;
+<<<<<<< HEAD
 	width: 360px;
 	margin-left: 15px;
 }
@@ -114,3 +148,7 @@
 .columnate{
 	float:left;
 }
+=======
+	width: 400px;
+}
+>>>>>>> Made prettier, added requirements, and included main edX page

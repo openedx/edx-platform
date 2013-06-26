@@ -6,15 +6,20 @@
 	<form action="/search" method="get">
 		<span>
 <<<<<<< HEAD
+<<<<<<< HEAD
 		<span class="searchbox-wrapper">
 =======
 		<span class="searchbox">
 >>>>>>> Refactored some code and added full elasticsearch module test suite
+=======
+		<span class="searchbox-wrapper">
+>>>>>>> Made prettier, added requirements, and included main edX page
 			% if old_query:
 			<input type="text" class="searchbox" name="s" value="${old_query}" />
 			% else:
 			<input type="text" class="searchbox" name="s" value="" />
 			% endif
+<<<<<<< HEAD
 <<<<<<< HEAD
 			<div class="searchbox_submit">
 				<input type="submit" value="" />
@@ -22,11 +27,17 @@
 =======
 			<input type="submit" class="searchbox_submit" value="" />
 >>>>>>> Refactored some code and added full elasticsearch module test suite
+=======
+			<div class="searchbox_submit">
+				<input type="submit" value="" />
+			</div>
+>>>>>>> Made prettier, added requirements, and included main edX page
 		</span>
 		<span class="content-select">
 			% if previous_content == "transcript":
 				<input type="radio" name="content" value="transcript" checked>Videos
 				<input type="radio" name="content" value="problem">Problems
+<<<<<<< HEAD
 <<<<<<< HEAD
 				<input type="radio" name="content" value="slide">Slides
 			% elif previous_content == "problem":
@@ -39,15 +50,22 @@
 				<input type="radio" name="content" value="slide" checked>Slides
 =======
 				<input type="radio" name="content" value="pdf">PDFs
+=======
+				<input type="radio" name="content" value="slide">Slides
+>>>>>>> Made prettier, added requirements, and included main edX page
 			% elif previous_content == "problem":
 				<input type="radio" name="content" value="transcript">Videos
 				<input type="radio" name="content" value="problem" checked>Problems
-				<input type="radio" name="content" value="pdf">PDFs
+				<input type="radio" name="content" value="slide">Slides
 			% else:
 				<input type="radio" name="content" value="transcript">Videos
 				<input type="radio" name="content" value="problem">Problems
+<<<<<<< HEAD
 				<input type="radio" name="content" value="pdf" checked>PDFs
 >>>>>>> Refactored some code and added full elasticsearch module test suite
+=======
+				<input type="radio" name="content" value="slide" checked>Slides
+>>>>>>> Made prettier, added requirements, and included main edX page
 			% endif
 		</span>
 	</span>

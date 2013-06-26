@@ -94,7 +94,14 @@
 				"uuid": {
 					"type": "string",
 					"store": "true"
+<<<<<<< HEAD
 >>>>>>> Added mongo integration with elasticsearch requests module
+=======
+				},
+
+				"thumbnail": {
+					"type": "binary"
+>>>>>>> Made prettier, added requirements, and included main edX page
 				}
 			}
 		}
