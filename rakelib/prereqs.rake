@@ -32,6 +32,7 @@ task :install_python_prereqs => "ws:migrate" do
         sh('pip install --exists-action w -r requirements/edx/pre.txt')
         sh('pip install --exists-action w -r requirements/edx/base.txt')
         sh('pip install --exists-action w -r requirements/edx/post.txt')
+        sh('python -m nltk.downloader stopwords wordnet')
         # requirements/private.txt is used to install our libs as
         # working dirs, or for personal-use tools.
         if File.file?("requirements/private.txt")
