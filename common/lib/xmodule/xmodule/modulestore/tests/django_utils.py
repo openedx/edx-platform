@@ -6,6 +6,7 @@ from django.test import TestCase
 from django.conf import settings
 import xmodule.modulestore.django
 from xmodule.templates import update_templates
+from unittest.util import safe_repr
 
 
 def mongo_store_config(data_dir):
@@ -183,3 +184,23 @@ class ModuleStoreTestCase(TestCase):
 
         # Call superclass implementation
         super(ModuleStoreTestCase, self)._post_teardown()
+
+    def assert2XX(self, status_code, msg=None):
+        if not 200 <= status_code < 300:
+            msg = self._formatMessage(msg, "%s is not a success status" % safe_repr(status_code))
+            raise self.failureExecption(msg)
+
+    def assert3XX(self, status_code, msg=None):
+        if not 300 <= status_code < 400:
+            msg = self._formatMessage(msg, "%s is not a redirection status" % safe_repr(status_code))
+            raise self.failureExecption(msg)
+
+    def assert4XX(self, status_code, msg=None):
+        if not 400 <= status_code < 500:
+            msg = self._formatMessage(msg, "%s is not a client error status" % safe_repr(status_code))
+            raise self.failureExecption(msg)
+
+    def assert5XX(self, status_code, msg=None):
+        if not 500 <= status_code < 600:
+            msg = self._formatMessage(msg, "%s is not a server error status" % safe_repr(status_code))
+            raise self.failureExecption(msg)

@@ -13,6 +13,7 @@ from django_future.csrf import ensure_csrf_cookie
 from django.core.urlresolvers import reverse
 from django.core.servers.basehttp import FileWrapper
 from django.core.files.temp import NamedTemporaryFile
+from django.views.decorators.http import require_POST
 
 from mitxmako.shortcuts import render_to_response
 from cache_toolbox.core import del_cached_content
@@ -30,6 +31,7 @@ from xmodule.exceptions import NotFoundError
 
 from ..utils import get_url_reverse
 from .access import get_location_and_verify_access
+from util.json_request import JsonResponse
 
 
 __all__ = ['asset_index', 'upload_asset', 'import_course', 'generate_export_course', 'export_course']
@@ -89,7 +91,7 @@ def asset_index(request, org, course, name):
     assets = sorted(assets, key=lambda asset: asset['uploadDate'], reverse=True)
 
     if request.META.get('HTTP_ACCEPT', "").startswith("application/json"):
-        return HttpResponse(json.dumps(assets_to_json_dict(assets)), content_type="application/json")
+        return JsonResponse(assets_to_json_dict(assets))
 
     asset_display = []
     for asset in assets:
@@ -120,6 +122,7 @@ def asset_index(request, org, course, name):
     })
 
 
+@require_POST
 @ensure_csrf_cookie
 @login_required
 def upload_asset(request, org, course, coursename):
@@ -127,10 +130,6 @@ def upload_asset(request, org, course, coursename):
     This method allows for POST uploading of files into the course asset library, which will
     be supported by GridFS in MongoDB.
     '''
-    if request.method != 'POST':
-        # (cdodge) @todo: Is there a way to do a - say - 'raise Http400'?
-        return HttpResponseBadRequest()
-
     # construct a location from the passed in path
     location = get_location_and_verify_access(request, org, course, coursename)
 

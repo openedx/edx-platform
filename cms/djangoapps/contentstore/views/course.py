@@ -8,7 +8,7 @@ import string
 from django.contrib.auth.decorators import login_required
 from django_future.csrf import ensure_csrf_cookie
 from django.conf import settings
-from django.views.decorators.http import require_http_methods
+from django.views.decorators.http import require_http_methods, require_POST
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseBadRequest
@@ -521,9 +521,9 @@ def textbook_index(request, org, course, name):
         })
 
 
+@require_POST
 @login_required
 @ensure_csrf_cookie
-@require_http_methods(("POST",))
 def create_textbook(request, org, course, name):
     location = get_location_and_verify_access(request, org, course, name)
     store = get_modulestore(location)
@@ -531,7 +531,7 @@ def create_textbook(request, org, course, name):
 
     try:
         textbook = validate_textbook_json(request.body)
-    except TextbookValidationError:
+    except TextbookValidationError as e:
         return JsonResponse({"error": e.message}, status=400)
     if not textbook.get("id"):
         tids = set(t["id"] for t in course_module.pdf_textbooks if "id" in t)
@@ -555,7 +555,8 @@ def textbook_by_id(request, org, course, name, tid):
     location = get_location_and_verify_access(request, org, course, name)
     store = get_modulestore(location)
     course_module = store.get_item(location, depth=3)
-    matching_id = [tb for tb in course_module.pdf_textbooks if tb.get("id") == tid]
+    matching_id = [tb for tb in course_module.pdf_textbooks
+                   if str(tb.get("id")) == str(tid)]
     if matching_id:
         textbook = matching_id[0]
     else:
@@ -589,4 +590,4 @@ def textbook_by_id(request, org, course, name, tid):
         new_textbooks.extend(course_module.pdf_textbooks[i+1:])
         course_module.pdf_textbooks = new_textbooks
         store.update_metadata(course_module.location, own_metadata(course_module))
-        return JsonResponse(new_textbook)
+        return JsonResponse()
