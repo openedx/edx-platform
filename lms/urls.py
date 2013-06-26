@@ -125,8 +125,7 @@ urlpatterns += (
     # url(r'^reactivate/(?P<key>[^/]*)$', 'student.views.reactivation_email'),
 
     # Search
-    url(r'^search$', 'search.views.search'),
-    url(r'^find/$', 'search.views.find')
+    url(r'^search$', 'search.views.search')
 )
 
 # Semi-static views only used by edX, not by themes
