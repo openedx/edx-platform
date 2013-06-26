@@ -20,6 +20,8 @@ from django.http import HttpResponse
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
 from django.core.urlresolvers import reverse
+from django.core.mail import send_mail
+
 import xmodule.graders as xmgraders
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
@@ -45,6 +47,7 @@ from mitxmako.shortcuts import render_to_response
 from psychometrics import psychoanalyze
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
 import track.views
+from mitxmako.shortcuts import render_to_string
 
 
 log = logging.getLogger(__name__)
@@ -634,13 +637,15 @@ def instructor_dashboard(request, course_id):
 
         students = request.POST.get('multiple_students', '')
         auto_enroll = bool(request.POST.get('auto_enroll'))
-        ret = _do_enroll_students(course, course_id, students, auto_enroll=auto_enroll)
+        email_students = bool(request.POST.get('email_students'))
+        ret = _do_enroll_students(course, course_id, students, auto_enroll=auto_enroll, email_students=email_students)
         datatable = ret['datatable']
 
     elif action == 'Unenroll multiple students':
 
         students = request.POST.get('multiple_students', '')
-        ret = _do_unenroll_students(course_id, students)
+        email_students = bool(request.POST.get('email_students'))
+        ret = _do_unenroll_students(course_id, students, email_students=email_students)
         datatable = ret['datatable']
 
     elif action == 'List sections available in remote gradebook':
@@ -1068,9 +1073,17 @@ def grade_summary(request, course_id):
 #-----------------------------------------------------------------------------
 # enrollment
 
-def _do_enroll_students(course, course_id, students, overload=False, auto_enroll=False):
-    """Do the actual work of enrolling multiple students, presented as a string
-    of emails separated by commas or returns"""
+def _do_enroll_students(course, course_id, students, overload=False, auto_enroll=False, email_students=False):
+    """
+    Do the actual work of enrolling multiple students, presented as a string
+    of emails separated by commas or returns
+    `course` is course object
+    `course_id` id of course (a `str`)
+    `students` string of student emails separated by commas or returns (a `str`)
+    `overload` un-enrolls all existing students (a `boolean`)
+    `auto_enroll` is user input preference (a `boolean`)
+    `email_students` is user input preference (a `boolean`)
+    """
 
     new_students, new_students_lc = get_and_clean_student_list(students)
     status = dict([x, 'unprocessed'] for x in new_students)
@@ -1088,12 +1101,22 @@ def _do_enroll_students(course, course_id, students, overload=False, auto_enroll
             status[cea.email] = 'removed from pending enrollment list'
         ceaset.delete()
 
+    if email_students:
+        registration_url = 'https://' + settings.SITE_NAME + reverse('student.views.register_user')
+        #Composition of email
+        d = {'site_name': settings.SITE_NAME,
+             'registration_url': registration_url,
+             'course_id': course_id,
+             'auto_enroll': auto_enroll,
+             'course_url': registration_url + '/courses/' + course_id,
+             }
+
     for student in new_students:
         try:
             user = User.objects.get(email=student)
         except User.DoesNotExist:
 
-            #User not signed up yet, put in pending enrollment allowed table
+            #Student not signed up yet, put in pending enrollment allowed table
             cea = CourseEnrollmentAllowed.objects.filter(email=student, course_id=course_id)
 
             #If enrollmentallowed already exists, update auto_enroll flag to however it was set in UI
@@ -1104,18 +1127,42 @@ def _do_enroll_students(course, course_id, students, overload=False, auto_enroll
                 status[student] = 'user does not exist, enrollment already allowed, pending with auto enrollment ' \
                     + ('on' if auto_enroll else 'off')
                 continue
+
+            #EnrollmentAllowed doesn't exist so create it
             cea = CourseEnrollmentAllowed(email=student, course_id=course_id, auto_enroll=auto_enroll)
             cea.save()
-            status[student] = 'user does not exist, enrollment allowed, pending with auto enrollment ' + ('on' if auto_enroll else 'off')
+
+            status[student] = 'user does not exist, enrollment allowed, pending with auto enrollment ' \
+                + ('on' if auto_enroll else 'off')
+
+            if email_students:
+                #User is allowed to enroll but has not signed up yet
+                d['email_address'] = student
+                d['message'] = 'allowed_enroll'
+                send_mail_ret = send_mail_to_student(student, d)
+                status[student] += (', email sent' if send_mail_ret else '')
             continue
 
+        #Student has already registered
         if CourseEnrollment.objects.filter(user=user, course_id=course_id):
             status[student] = 'already enrolled'
             continue
+
         try:
+            #Not enrolled yet
             ce = CourseEnrollment(user=user, course_id=course_id)
             ce.save()
             status[student] = 'added'
+
+            if email_students:
+                #User enrolled for first time, populate dict with user specific info
+                d['email_address'] = student
+                d['first_name'] = user.first_name
+                d['last_name'] = user.last_name
+                d['message'] = 'enrolled_enroll'
+                send_mail_ret = send_mail_to_student(student, d)
+                status[student] += (', email sent' if send_mail_ret else '')
+
         except:
             status[student] = 'rejected'
 
@@ -1133,12 +1180,22 @@ def _do_enroll_students(course, course_id, students, overload=False, auto_enroll
 
 
 #Unenrollment
-def _do_unenroll_students(course_id, students):
-    """Do the actual work of un-enrolling multiple students, presented as a string
-    of emails separated by commas or returns"""
+def _do_unenroll_students(course_id, students, email_students=False):
+    """
+    Do the actual work of un-enrolling multiple students, presented as a string
+    of emails separated by commas or returns
+    `course_id` is id of course (a `str`)
+    `students` is string of student emails separated by commas or returns (a `str`)
+    `email_students` is user input preference (a `boolean`)
+    """
 
     old_students, _ = get_and_clean_student_list(students)
     status = dict([x, 'unprocessed'] for x in old_students)
+
+    if email_students:
+        #Composition of email
+        d = {'site_name': settings.SITE_NAME,
+             'course_id': course_id}
 
     for student in old_students:
 
@@ -1153,6 +1210,14 @@ def _do_unenroll_students(course_id, students):
         try:
             user = User.objects.get(email=student)
         except User.DoesNotExist:
+
+            if isok and email_students:
+                #User was allowed to join but had not signed up yet
+                d['email_address'] = student
+                d['message'] = 'allowed_unenroll'
+                send_mail_ret = send_mail_to_student(student, d)
+                status[student] += (', email sent' if send_mail_ret else '')
+
             continue
 
         ce = CourseEnrollment.objects.filter(user=user, course_id=course_id)
@@ -1161,6 +1226,15 @@ def _do_unenroll_students(course_id, students):
             try:
                 ce[0].delete()
                 status[student] = "un-enrolled"
+                if email_students:
+                    #User was enrolled
+                    d['email_address'] = student
+                    d['first_name'] = user.first_name
+                    d['last_name'] = user.last_name
+                    d['message'] = 'enrolled_unenroll'
+                    send_mail_ret = send_mail_to_student(student, d)
+                    status[student] += (', email sent' if send_mail_ret else '')
+
             except Exception:
                 if not isok:
                     status[student] = "Error!  Failed to un-enroll"
@@ -1173,13 +1247,48 @@ def _do_unenroll_students(course_id, students):
     return data
 
 
+def send_mail_to_student(student, param_dict):
+    """
+    Construct the email using templates and then send it.
+    `student` is the student's email address (a `str`),
+    
+    `param_dict` is a `dict` with keys [
+    `site_name`: name given to edX instance (a `str`)
+    `registration_url`: url for registration (a `str`)
+    `course_id`: id of course (a `str`)
+    `auto_enroll`: user input option (a `str`)
+    `course_url`: url of course (a `str`)
+    `email_address`: email of student (a `str`)
+    `first_name`: student first name (a `str`)
+    `last_name`: student last name (a `str`)
+    `message`: type of email to send and template to use (a `str`)
+                                        ]
+    Returns a boolean indicating whether the email was sent successfully.
+    """
+
+    EMAIL_TEMPLATE_DICT = {'allowed_enroll': ('emails/enroll_email_allowedsubject.txt', 'emails/enroll_email_allowedmessage.txt'),
+                           'enrolled_enroll': ('emails/enroll_email_enrolledsubject.txt', 'emails/enroll_email_enrolledmessage.txt'),
+                           'allowed_unenroll': ('emails/unenroll_email_subject.txt', 'emails/unenroll_email_allowedmessage.txt'),
+                           'enrolled_unenroll': ('emails/unenroll_email_subject.txt', 'emails/unenroll_email_enrolledmessage.txt')}
+
+    subject_template, message_template = EMAIL_TEMPLATE_DICT.get(param_dict['message'], (None, None))
+    if subject_template is not None and message_template is not None:
+        subject = render_to_string(subject_template, param_dict)
+        message = render_to_string(message_template, param_dict)
+
+        # Email subject *must not* contain newlines
+        subject = ''.join(subject.splitlines())
+        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [student], fail_silently=False)
+        return True
+    else:
+        return False
+
+
 def get_and_clean_student_list(students):
     """
     Separate out individual student email from the comma, or space separated string.
-
-    In:
-    students: string coming from the input text area
-    Return:
+    `students` is string of student emails separated by commas or returns (a `str`)
+    Returns:
     students: list of cleaned student emails
     students_lc: list of lower case cleaned student emails
     """

@@ -44,7 +44,7 @@ class GroupFactory(sf.GroupFactory):
 
 
 @world.absorb
-class CourseEnrollmentAllowedFactory(sf.CourseEnrollmentAllowed):
+class CourseEnrollmentAllowedFactory(sf.CourseEnrollmentAllowedFactory):
     """
     Users allowed to enroll in the course outside of the usual window
     """
