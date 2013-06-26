@@ -125,7 +125,7 @@ urlpatterns += (
     # url(r'^reactivate/(?P<key>[^/]*)$', 'student.views.reactivation_email'),
 
     # Search
-    url(r'^search$', 'search.views.search'),
+    url(r'^search$', 'search.views.search')
 
 )
 
