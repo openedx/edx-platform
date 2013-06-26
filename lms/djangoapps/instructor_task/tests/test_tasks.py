@@ -21,8 +21,8 @@ from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from instructor_task.models import InstructorTask
 from instructor_task.tests.test_base import InstructorTaskModuleTestCase
 from instructor_task.tests.factories import InstructorTaskFactory
-from instructor_task.tasks import rescore_problem, reset_problem_attempts, delete_problem_state
-from instructor_task.tasks_helper import UpdateProblemModuleStateError
+from instructor_task.tasks import rescore_problem, reset_problem_attempts, delete_problem_state, update_offline_grades
+from instructor_task.tasks_helper import UpdateProblemModuleStateError, run_update_task, perform_module_state_update, initialize_mako
 
 PROBLEM_URL_NAME = "test_urlname"
 
@@ -132,6 +132,8 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
                                         grade=grade,
                                         max_grade=max_grade,
                                         state=state)
+            CourseEnrollmentFactory.create(course_id=self.course.id, user=student)
+
         return students
 
     def _assert_num_attempts(self, students, num_attempts):
@@ -205,15 +207,55 @@ class TestRescoreInstructorTask(TestInstructorTasks):
     def test_rescore_undefined_course(self):
         self._test_undefined_course(rescore_problem)
 
+    def test_rescore_undefined_problem(self):
+        self._test_undefined_problem(rescore_problem)
+
+    def test_rescore_with_no_state(self):
+        self._test_run_with_no_state(rescore_problem, 'rescored')
+
+    def test_rescore_with_failure(self):
+        self._test_run_with_failure(rescore_problem, 'We expected this to fail')
+
+    def test_rescore_with_long_error_msg(self):
+        self._test_run_with_long_error_msg(rescore_problem)
+
+    def test_rescore_with_short_error_msg(self):
+        self._test_run_with_short_error_msg(rescore_problem)
+
     def test_successful_result_too_long(self):
         # while we don't expect the existing tasks to generate output that is too
         # long, we can test the framework will handle such an occurrence.
         task_entry = self._create_input_entry()
         self.define_option_problem(PROBLEM_URL_NAME)
         action_name = 'x' * 1000
+        # define a custom task that does nothing:
         update_fcn = lambda(_module_descriptor, _student_module): True
+        visit_fcn = perform_module_state_update
         task_function = (lambda entry_id, xmodule_instance_args:
-                         update_problem_module_state(entry_id, update_fcn, action_name, filter_fcn=None))
+                         run_update_task(entry_id, visit_fcn, update_fcn, action_name, filter_fcn=None))
+
+    def test_rescoring_unrescorable(self):
+        # run the task:
+        with self.assertRaises(ValueError):
+            self._run_task_with_mock_celery(task_function, task_entry.id, task_entry.task_id)
+        # compare with entry in table:
+        entry = InstructorTask.objects.get(id=task_entry.id)
+        self.assertEquals(entry.task_state, FAILURE)
+        self.assertGreater(1023, len(entry.task_output))
+        output = json.loads(entry.task_output)
+        self.assertEquals(output['exception'], 'ValueError')
+        self.assertTrue("Length of task output is too long" in output['message'])
+        self.assertTrue('traceback' not in output)
+
+
+class TestRescoreInstructorTask(TestInstructorTasks):
+    """Tests problem-rescoring instructor task."""
+
+    def test_rescore_missing_current_task(self):
+        self._test_missing_current_task(rescore_problem)
+
+    def test_rescore_undefined_course(self):
+        self._test_undefined_course(rescore_problem)
 
     def test_rescore_undefined_problem(self):
         self._test_undefined_problem(rescore_problem)
@@ -230,7 +272,10 @@ class TestRescoreInstructorTask(TestInstructorTasks):
     def test_rescore_with_short_error_msg(self):
         self._test_run_with_short_error_msg(rescore_problem)
 
+    @skip
     def test_rescoring_unrescorable(self):
+        # This test needs to have Mako templates initialized
+        # to make sure that the creation of an XModule works.
         input_state = json.dumps({'done': True})
         num_students = 1
         self._create_students_with_state(num_students, input_state)
@@ -254,6 +299,7 @@ class TestRescoreInstructorTask(TestInstructorTasks):
         self._create_students_with_state(num_students, input_state)
         task_entry = self._create_input_entry()
         mock_instance = Mock()
+
         mock_instance.rescore_problem = Mock(return_value={'success': 'correct'})
         with patch('instructor_task.tasks_helper.get_module_for_descriptor_internal') as mock_get_module:
             mock_get_module.return_value = mock_instance
@@ -447,3 +493,53 @@ class TestDeleteStateInstructorTask(TestInstructorTasks):
                 StudentModule.objects.get(course_id=self.course.id,
                                           student=student,
                                           module_state_key=self.problem_url)
+
+
+class TestOfflineGradeInstructorTask(TestInstructorTasks):
+    """Tests instructor task that calculates grades off-line."""
+
+    def _create_input_entry(self, student_ident=None, use_problem_url=False, course_id=None):
+        """
+        Creates a InstructorTask entry for testing.
+
+        Overrides the base class version in that this does not specify a particular problem by default.
+        """
+        return super(TestOfflineGradeInstructorTask, self)._create_input_entry(student_ident=student_ident,
+                                                                               use_problem_url=use_problem_url,
+                                                                               course_id=course_id)
+
+    def test_grade_missing_current_task(self):
+        self._test_missing_current_task(update_offline_grades)
+
+    def test_grade_with_failure(self):
+        self._test_run_with_failure(update_offline_grades, 'We expected this to fail')
+
+    def test_grade_with_long_error_msg(self):
+        self._test_run_with_long_error_msg(update_offline_grades)
+
+    def test_grade_with_short_error_msg(self):
+        self._test_run_with_short_error_msg(update_offline_grades)
+
+    def test_grade_undefined_course(self):
+        # Check that we fail when passing in a course that doesn't exist.
+        self._test_undefined_course(update_offline_grades)
+
+    def test_grade_with_problem_specified(self):
+        # Check that we get a failure when passing in a problem_url argument.
+        task_entry = self._create_input_entry(use_problem_url=True)
+        with self.assertRaises(ValueError):
+            self._run_task_with_mock_celery(update_offline_grades, task_entry.id, task_entry.task_id)
+
+    def test_grade_with_some_state(self):
+        input_state = json.dumps({'grade': 1, 'max_grade': 2})
+        num_students = 10
+        students = self._create_students_with_state(num_students, input_state)
+        # TODO: check that students in the course were not yet graded
+
+        # Run the task.
+        # The number of users graded should be one more than the students, since the
+        # course instructor is also enrolled.
+        self._test_run_with_task(update_offline_grades, 'graded', num_students + 1)
+
+        # TODO: check that students in the course were graded
+

@@ -4,6 +4,7 @@ running state of a course.
 
 """
 import json
+from json import JSONEncoder
 from time import time
 
 from celery import Task, current_task
@@ -14,12 +15,13 @@ from django.contrib.auth.models import User
 from django.db import transaction, reset_queries
 from dogapi import dog_stats_api
 
+from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.django import modulestore
 
 from track.views import task_track
 
-from courseware.grades import grade
-from courseware.models import StudentModule
+from courseware.grades import grade, grade_as_task
+from courseware.models import StudentModule, OfflineComputedGrade
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module_for_descriptor_internal
 from instructor_task.models import InstructorTask, PROGRESS
@@ -205,7 +207,78 @@ def run_main_task(entry_id, task_fcn, action_name):
     return task_progress
 
 
-def _perform_module_state_update(course_id, module_state_key, student_identifier, update_fcn, action_name, filter_fcn):
+def perform_enrolled_student_update(course_id, _module_state_key, student_identifier, update_fcn, action_name, filter_fcn):
+    """
+    """
+    # Throw an exception if _module_state_key is specified, because that's not meaningful here
+    if _module_state_key is not None:
+        raise ValueError("Value for problem_url not expected")
+
+    # Get start time for task:
+    start_time = time()
+
+    # Find the course descriptor.
+    # Depth is set to zero, to indicate that the number of levels of children
+    # for the modulestore to cache should be infinite.  If the course is not found,
+    # let it throw the exception.
+    course_loc = CourseDescriptor.id_to_location(course_id)
+    course_descriptor = modulestore().get_instance(course_id, course_loc, depth=0)
+
+    enrolled_students = User.objects.filter(courseenrollment__course_id=course_id).prefetch_related("groups").order_by('username')
+
+    # Give the option of updating an individual student. If not specified,
+    # then updates all students who have enrolled in the course
+    student = None
+    if student_identifier is not None:
+        # if an identifier is supplied, then look for the student,
+        # and let it throw an exception if none is found.
+        if "@" in student_identifier:
+            student = User.objects.get(email=student_identifier)
+        elif student_identifier is not None:
+            student = User.objects.get(username=student_identifier)
+
+    if student is not None:
+        enrolled_students = enrolled_students.filter(id=student.id)
+
+    if filter_fcn is not None:
+        enrolled_students = filter_fcn(enrolled_students)
+
+    # perform the main loop
+    num_updated = 0
+    num_attempted = 0
+    num_total = enrolled_students.count()
+
+    def get_task_progress():
+        """Return a dict containing info about current task"""
+        current_time = time()
+        progress = {'action_name': action_name,
+                    'attempted': num_attempted,
+                    'updated': num_updated,
+                    'total': num_total,
+                    'duration_ms': int((current_time - start_time) * 1000),
+                    }
+        return progress
+
+    task_progress = get_task_progress()
+    _get_current_task().update_state(state=PROGRESS, meta=task_progress)
+    for enrolled_student in enrolled_students:
+        num_attempted += 1
+        # There is no try here:  if there's an error, we let it throw, and the task will
+        # be marked as FAILED, with a stack trace.
+        with dog_stats_api.timer('instructor_tasks.student.time.step', tags=['action:{name}'.format(name=action_name)]):
+            if update_fcn(course_descriptor, enrolled_student):
+                # If the update_fcn returns true, then it performed some kind of work.
+                # Logging of failures is left to the update_fcn itself.
+                num_updated += 1
+
+        # update task status:
+        task_progress = get_task_progress()
+        _get_current_task().update_state(state=PROGRESS, meta=task_progress)
+
+    return task_progress
+
+
+def perform_module_state_update(course_id, module_state_key, student_identifier, update_fcn, action_name, filter_fcn):
     """
     Performs generic update by visiting StudentModule instances with the update_fcn provided.
 
@@ -314,21 +387,21 @@ def _perform_module_state_update(course_id, module_state_key, student_identifier
 
     return task_progress
 
-
 def _get_task_id_from_xmodule_args(xmodule_instance_args):
     """Gets task_id from `xmodule_instance_args` dict, or returns default value if missing."""
     return xmodule_instance_args.get('task_id', UNKNOWN_TASK_ID) if xmodule_instance_args is not None else UNKNOWN_TASK_ID
 
-# Possibly obsolete now that we have run_main_task?
-def update_problem_module_state(entry_id, update_fcn, action_name, filter_fcn):
+def run_update_task(entry_id, visit_fcn, update_fcn, action_name, filter_fcn):
     """
+    TODO: UPDATE THIS DOCSTRING
+
     Performs generic update by visiting StudentModule instances with the update_fcn provided.
 
     The `entry_id` is the primary key for the InstructorTask entry representing the task.  This function
-    updates the entry on success and failure of the _perform_module_state_update function it
+    updates the entry on success and failure of the perform_module_state_update function it
     wraps.  It is setting the entry's value for task_state based on what Celery would set it to once
     the task returns to Celery:  FAILURE if an exception is encountered, and SUCCESS if it returns normally.
-    Other arguments are pass-throughs to _perform_module_state_update, and documented there.
+    Other arguments are pass-throughs to perform_module_state_update, and documented there.
 
     If no exceptions are raised, a dict containing the task's result is returned, with the following keys:
 
@@ -350,10 +423,13 @@ def update_problem_module_state(entry_id, update_fcn, action_name, filter_fcn):
     course_id = entry.course_id
     task_input = json.loads(entry.task_input)
     module_state_key = task_input.get('problem_url')
-    student_ident = task_input['student'] if 'student' in task_input else None
+    student_ident = task_input.get('student')
 
-    fmt = 'Starting to update problem modules as task "{task_id}": course "{course_id}" problem "{state_key}": nothing {action} yet'
-    TASK_LOG.info(fmt.format(task_id=task_id, course_id=course_id, state_key=module_state_key, action=action_name))
+    # construct log message:
+    fmt = 'task "{task_id}": course "{course_id}" problem "{state_key}"'
+    task_info_string = fmt.format(task_id=task_id, course_id=course_id, state_key=module_state_key)
+
+    TASK_LOG.info('Starting update (nothing %s yet): %s', action_name, task_info_string)
 
     # Now that we have an entry we can try to catch failures:
     task_progress = None
@@ -362,15 +438,14 @@ def update_problem_module_state(entry_id, update_fcn, action_name, filter_fcn):
         # that is running.
         request_task_id = _get_current_task().request.id
         if task_id != request_task_id:
-            fmt = 'Requested task "{task_id}" did not match actual task "{actual_id}"'
-            message = fmt.format(task_id=task_id, course_id=course_id, state_key=module_state_key, actual_id=request_task_id)
+            fmt = 'Requested task did not match actual task "{actual_id}": {task_info}'
+            message = fmt.format(actual_id=request_task_id, task_info=task_info_string)
             TASK_LOG.error(message)
             raise UpdateProblemModuleStateError(message)
 
         # Now do the work:
-        with dog_stats_api.timer('instructor_tasks.module.time.overall', tags=['action:{name}'.format(name=action_name)]):
-            task_progress = _perform_module_state_update(course_id, module_state_key, student_ident, update_fcn,
-                                                         action_name, filter_fcn)
+        with dog_stats_api.timer('instructor_tasks.time.overall', tags=['action:{name}'.format(name=action_name)]):
+            task_progress = visit_fcn(course_id, module_state_key, student_ident, update_fcn, action_name, filter_fcn)
         # If we get here, we assume we've succeeded, so update the InstructorTask entry in anticipation.
         # But we do this within the try, in case creating the task_output causes an exception to be
         # raised.
@@ -389,12 +464,34 @@ def update_problem_module_state(entry_id, update_fcn, action_name, filter_fcn):
         raise
 
     # log and exit, returning task_progress info as task result:
-    fmt = 'Finishing task "{task_id}": course "{course_id}" problem "{state_key}": final: {progress}'
-    TASK_LOG.info(fmt.format(task_id=task_id, course_id=course_id, state_key=module_state_key, progress=task_progress))
+    TASK_LOG.info('Finishing %s: final: %s', task_info_string, task_progress)
     return task_progress
 
 def _get_xqueue_callback_url_prefix(xmodule_instance_args):
     """Gets prefix to use when constructing xqueue_callback_url."""
+    return xmodule_instance_args.get('xqueue_callback_url_prefix', '') if xmodule_instance_args is not None else ''
+
+
+def _get_track_function_for_task(student, xmodule_instance_args=None, source_page='x_module_task'):
+    """
+    Make a tracking function that logs what happened.
+
+    For insertion into ModuleSystem, and used by CapaModule, which will
+    provide the event_type (as string) and event (as dict) as arguments.
+    The request_info and task_info (and page) are provided here.
+    """
+    # get request-related tracking information from args passthrough, and supplement with task-specific
+    # information:
+    request_info = xmodule_instance_args.get('request_info', {}) if xmodule_instance_args is not None else {}
+    task_info = {'student': student.username, 'task_id': _get_task_id_from_xmodule_args(xmodule_instance_args)}
+
+    return lambda event_type, event: task_track(request_info, task_info, event_type, event, page=source_page)
+
+
+def _get_xqueue_callback_url_prefix(xmodule_instance_args):
+    """
+
+    """
     return xmodule_instance_args.get('xqueue_callback_url_prefix', '') if xmodule_instance_args is not None else ''
 
 
@@ -426,26 +523,9 @@ def _get_module_instance_for_task(course_id, student, module_descriptor, xmodule
     # reconstitute the problem's corresponding XModule:
     field_data_cache = FieldDataCache.cache_for_descriptor_descendents(course_id, student, module_descriptor)
 
-    # get request-related tracking information from args passthrough, and supplement with task-specific
-    # information:
-    request_info = xmodule_instance_args.get('request_info', {}) if xmodule_instance_args is not None else {}
-    task_info = {"student": student.username, "task_id": _get_task_id_from_xmodule_args(xmodule_instance_args)}
-
-    def make_track_function():
-        '''
-        Make a tracking function that logs what happened.
-
-        For insertion into ModuleSystem, and used by CapaModule, which will
-        provide the event_type (as string) and event (as dict) as arguments.
-        The request_info and task_info (and page) are provided here.
-        '''
-        return lambda event_type, event: task_track(request_info, task_info, event_type, event, page='x_module_task')
-
-    xqueue_callback_url_prefix = xmodule_instance_args.get('xqueue_callback_url_prefix', '') \
-        if xmodule_instance_args is not None else ''
-
     return get_module_for_descriptor_internal(student, module_descriptor, field_data_cache, course_id,
-                                              make_track_function(), xqueue_callback_url_prefix,
+                                              _get_track_function_for_task(student, xmodule_instance_args),
+                                              _get_xqueue_callback_url_prefix(xmodule_instance_args),
                                               grade_bucket_type=grade_bucket_type)
 
 
@@ -694,6 +774,18 @@ def delete_problem_module_state(xmodule_instance_args, _module_descriptor, stude
 #     print ocgl
 #     print "All Done!"
 
+
+class GradingJSONEncoder(JSONEncoder):
+
+    def _iterencode(self, obj, markers=None):
+        if isinstance(obj, tuple) and hasattr(obj, '_asdict'):
+            gen = self._iterencode_dict(obj._asdict(), markers)
+        else:
+            gen = JSONEncoder._iterencode(self, obj, markers)
+        for chunk in gen:
+            yield chunk
+
+
 @transaction.autocommit
 def update_offline_grade(xmodule_instance_args, course_descriptor, student):
     """
@@ -701,16 +793,20 @@ def update_offline_grade(xmodule_instance_args, course_descriptor, student):
 
     Always returns true, indicating success, if it doesn't raise an exception due to database error.
     """
-    # TODO: we need the course object.  Can we assume it has been passed in?
-#     course_loc = CourseDescriptor.id_to_location(course_id)
-#     return modulestore().get_instance(course_id, course_loc, depth=depth)
+    # TODO: this could be made into a global?  Are there threading issues that
+    # might arise if we did that?  Savings by pulling it out of this inner loop?
+    json_encoder = GradingJSONEncoder()
 
     # call the main grading function:
-    request = {}
-    gradeset = grade(student, request, course_descriptor, keep_raw_scores=True)
+    track_function = _get_track_function_for_task(student, xmodule_instance_args)
+    xqueue_callback_url_prefix = _get_xqueue_callback_url_prefix(xmodule_instance_args)
+    gradeset = grade_as_task(student, course_descriptor, track_function, xqueue_callback_url_prefix)
+    json_grades = json_encoder.encode(gradeset)
+    offline_grade_entry, created = OfflineComputedGrade.objects.get_or_create(user=student, course_id=course_descriptor.id)
+    offline_grade_entry.gradeset = json_grades
+    offline_grade_entry.save()
+
     # get request-related tracking information from args passthrough,
     # and supplement with task-specific information:
-#     request_info = xmodule_instance_args.get('request_info', {}) if xmodule_instance_args is not None else {}
-#     task_info = {"student": student_module.student.username, "task_id": _get_task_id_from_xmodule_args(xmodule_instance_args)}
-#     task_track(request_info, task_info, 'problem_delete_state', {}, page='x_module_task')
+    track_function('offline_grade', {'created': created})
     return True

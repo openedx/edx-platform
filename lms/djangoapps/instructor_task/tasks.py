@@ -27,6 +27,7 @@ from instructor_task.tasks_helper import (
     run_main_task,
     BaseInstructorTask,
     delete_problem_module_state,
+    perform_enrolled_student_update,
     _perform_module_state_update, # Evil, temporary
     rescore_problem_module_state,
     reset_attempts_module_state,
@@ -117,7 +118,8 @@ def send_bulk_course_email(entry_id, _xmodule_instance_args):
 
     action_name = 'deleted'
     update_fcn = partial(delete_problem_module_state, xmodule_instance_args)
-    return update_problem_module_state(entry_id, update_fcn, action_name, filter_fcn=None)
+    visit_fcn = perform_module_state_update
+    return run_update_task(entry_id, visit_fcn, update_fcn, action_name, filter_fcn=None)
 
     The task_input should be a dict with the following entries:
 
@@ -147,4 +149,5 @@ def update_offline_grades(entry_id, xmodule_instance_args):
     """
     action_name = 'graded'
     update_fcn = partial(update_offline_grade, xmodule_instance_args)
-    return update_students(entry_id, update_fcn, action_name, filter_fcn=None)
+    visit_fcn = perform_enrolled_student_update
+    return run_update_task(entry_id, visit_fcn, update_fcn, action_name, filter_fcn=None)
