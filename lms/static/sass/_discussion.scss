@@ -68,7 +68,7 @@
   font-family: 'Monaco', monospace;
   font-size: 13px;
   line-height: 1.6;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) inset;
+  box-shadow: 0 1px 3px $black-t0 inset;
 }
 
 @mixin discussion-wmd-preview {
@@ -1365,35 +1365,27 @@ body.discussion {
     }
   }
 
-  .helpgrid-list {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-
-
-    .helpgrid-row {
+  .helpgrid-row {
       border-bottom: 1px solid #b2b2b2;
 
       .row-title {
         padding: 30px $baseline;
-        display: inline-block;
-        width: 15%;
+        //width: 15%;
         background-color: $gray-l4;
         font-size: 12px;
       }
 
       .row-item-full, .row-item {
-        display: inline-block;
         font-size: 12px;
         padding-left: $baseline/2;
-        width: 23%;
+        width: 30%;
         vertical-align: middle;
 
         .icon {
           padding: 0 $baseline/2;
           font-size: 24px;
-          display: inline-block;
           vertical-align: middle;
+          display: table-cell;
         }
 
         .icon-stack i {
@@ -1401,22 +1393,23 @@ body.discussion {
         }
 
         .row-description {
-          display: inline-block;
-          width: 70%;
           vertical-align: middle;
+          display: table-cell;
         }
       }
 
       .row-item-full {
-        width: 77%;
+
+        .row-setting {
+          display: table-cell;
+          vertical-align: middle;
+        }
 
         .row-description {
-          width: 80%;
           padding-left: 15px;
         }
       }
     }
-  }
 
   .helpgrid-row-navigation {
     .icon-reorder {color: $light-gray;}
