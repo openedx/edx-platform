@@ -1,17 +1,23 @@
 log = -> console.log.apply console, arguments
 plantTimeout = (ms, cb) -> setTimeout cb, ms
 
+std_ajax_err = (handler) -> (jqXHR, textStatus, errorThrown) ->
+  console.warn """ajax error
+                  textStatus: #{textStatus}
+                  errorThrown: #{errorThrown}"""
+  handler.apply this, arguments
+
 
 class BatchEnrollment
   constructor: (@$container) ->
     log "setting up instructor dashboard subsection - batch enrollment"
 
-    $emails_input = @$container.find("textarea[name='student-emails']'")
-    $btn_enroll = @$container.find("input[name='enroll']'")
-    $btn_unenroll = @$container.find("input[name='unenroll']'")
-    $checkbox_autoenroll = @$container.find("input[name='auto-enroll']'")
-    window.autoenroll = $checkbox_autoenroll
-    $task_response = @$container.find(".task-response")
+    $emails_input           = @$container.find("textarea[name='student-emails']'")
+    $btn_enroll             = @$container.find("input[name='enroll']'")
+    $btn_unenroll           = @$container.find("input[name='unenroll']'")
+    $checkbox_autoenroll    = @$container.find("input[name='auto-enroll']'")
+    $task_response          = @$container.find(".request-response")
+    $request_response_error = @$container.find(".request-response-error")
 
     $emails_input.click -> log 'click $emails_input'
     $btn_enroll.click -> log 'click $btn_enroll'
@@ -22,21 +28,37 @@ class BatchEnrollment
         action: 'enroll'
         emails: $emails_input.val()
         auto_enroll: $checkbox_autoenroll.is(':checked')
-      $.getJSON $btn_enroll.data('endpoint'), send_data, (data) ->
-        log 'received response for enroll button', data
-        display_response(data)
+
+      $.ajax
+        dataType: 'json'
+        url: $btn_enroll.data 'endpoint'
+        data: send_data
+        success: (data) -> display_response(data)
+        error: std_ajax_err -> fail_with_error "Error enrolling/unenrolling students."
 
     $btn_unenroll.click ->
       send_data =
         action: 'unenroll'
         emails: $emails_input.val()
         auto_enroll: $checkbox_autoenroll.is(':checked')
-      $.getJSON $btn_unenroll.data('endpoint'), send_data, (data) ->
-        log 'received response for unenroll button', data
-        display_response(data)
+
+      $.ajax
+        dataType: 'json'
+        url: $btn_unenroll.data 'endpoint'
+        data: send_data
+        success: (data) -> display_response(data)
+        error: std_ajax_err -> fail_with_error "Error enrolling/unenrolling students."
+
+
+    fail_with_error = (msg) ->
+      console.warn msg
+      $task_response.empty()
+      $request_response_error.empty()
+      $request_response_error.text msg
 
     display_response = (data_from_server) ->
       $task_response.empty()
+      $request_response_error.empty()
 
       response_code_dict = _.extend {}, data_from_server.results
       # response_code_dict e.g. {'code': ['email1', 'email2'], ...}
@@ -79,7 +101,7 @@ class BatchEnrollment
       for msg_symbol in message_ordering
         # $task_response.text JSON.stringify(data)
         msg_txt = msg_to_txt[msg_symbol]
-        task_res_section = $ '<div/>', class: 'task-res-section'
+        task_res_section = $ '<div/>', class: 'request-res-section'
         task_res_section.append $ '<h3/>', text: msg_txt
         email_list = $ '<ul/>'
         task_res_section.append email_list
@@ -106,21 +128,21 @@ class AuthList
   constructor: (@$container, @rolename) ->
     log "setting up instructor dashboard subsection - authlist management for #{@rolename}"
 
-    @$display_table = @$container.find('.auth-list-table')
-    @$add_section   = @$container.find('.auth-list-add')
-    $allow_field    = @$add_section.find("input[name='email']")
-    $allow_button   = @$add_section.find("input[name='allow']")
+    @$display_table          = @$container.find('.auth-list-table')
+    @$request_response_error = @$container.find('.request-response-error')
+    @$add_section            = @$container.find('.auth-list-add')
+    @$allow_field             = @$add_section.find("input[name='email']")
+    @$allow_button            = @$add_section.find("input[name='allow']")
 
-    $allow_button.click =>
-      @access_change($allow_field.val(), @rolename, 'allow', @reload_auth_list)
-      $allow_field.val ''
+    @$allow_button.click =>
+      @access_change @$allow_field.val(), @rolename, 'allow', => @reload_auth_list()
+      @$allow_field.val ''
 
     @reload_auth_list()
 
-  reload_auth_list: =>
-    list_endpoint = @$display_table.data 'endpoint'
-    $.getJSON list_endpoint, {rolename: @rolename}, (data) =>
-
+  reload_auth_list: ->
+    load_auth_list = (data) =>
+      @$request_response_error.empty()
       @$display_table.empty()
 
       options =
@@ -164,7 +186,15 @@ class AuthList
       grid.onClick.subscribe (e, args) =>
         item = args.grid.getDataItem(args.row)
         if args.cell is WHICH_CELL_IS_REVOKE
-          @access_change(item.email, @rolename, 'revoke', @reload_auth_list)
+          @access_change item.email, @rolename, 'revoke', => @reload_auth_list()
+
+    $.ajax
+      dataType: 'json'
+      url: @$display_table.data 'endpoint'
+      data: rolename: @rolename
+      success: load_auth_list
+      error: std_ajax_err => @$request_response_error.text "Error fetching list for '#{@rolename}'"
+
 
   # slickgrid collapses when rendered in an invisible div
   # use this method to reload the widget
@@ -173,9 +203,15 @@ class AuthList
     @reload_auth_list()
 
   access_change: (email, rolename, mode, cb) ->
-    access_change_endpoint = @$add_section.data 'endpoint'
-    $.getJSON access_change_endpoint, {email: email, rolename: @rolename, mode: mode}, (data) ->
-      cb?(data)
+    $.ajax
+      dataType: 'json'
+      url: @$add_section.data 'endpoint'
+      data:
+        email: email
+        rolename: rolename
+        mode: mode
+      success: (data) -> cb?(data)
+      error: std_ajax_err => @$request_response_error.text "Error changing user's permissions."
 
 
 class Membership

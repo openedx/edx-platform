@@ -82,12 +82,16 @@ class StudentAdmin
     @$btn_rescore_problem_single  = find_and_assert @$section, "input[name='rescore-problem-single']"
     @$btn_task_history_single     = find_and_assert @$section, "input[name='task-history-single']"
     @$table_task_history_single   = find_and_assert @$section, ".task-history-single-table"
+
     @$field_problem_select_all    = find_and_assert @$section, "input[name='problem-select-all']"
     @$btn_reset_attempts_all      = find_and_assert @$section, "input[name='reset-attempts-all']"
     @$btn_rescore_problem_all     = find_and_assert @$section, "input[name='rescore-problem-all']"
     @$btn_task_history_all        = find_and_assert @$section, "input[name='task-history-all']"
     @$table_task_history_all      = find_and_assert @$section, ".task-history-all-table"
     @$table_running_tasks         = find_and_assert @$section, ".running-tasks-table"
+
+    @$request_response_error_single = find_and_assert @$section, ".student-specific-container .request-response-error"
+    @$request_response_error_all    = find_and_assert @$section, ".course-specific-container .request-response-error"
 
     @start_refresh_running_task_poll_loop()
 
@@ -100,10 +104,10 @@ class StudentAdmin
         dataType: 'json'
         url: @$progress_link.data 'endpoint'
         data: student_email: email
-        success: (data) ->
+        success: @clear_errors_then (data) ->
           log 'redirecting...'
           window.location = data.progress_url
-        error: std_ajax_err -> console.warn 'error getting student progress url for ' + email
+        error: std_ajax_err => @$request_response_error_single.text "Error getting student progress url for '#{email}'."
 
     # enroll student
     @$btn_enroll.click =>
@@ -116,8 +120,8 @@ class StudentAdmin
         dataType: 'json'
         url: @$btn_unenroll.data 'endpoint'
         data: send_data
-        success: -> console.log "student #{send_data.emails} enrolled"
-        error: std_ajax_err -> console.warn 'error enrolling student'
+        success: @clear_errors_then -> console.log "student #{send_data.emails} enrolled"
+        error: std_ajax_err => @$request_response_error_single.text "Error enrolling student '#{send_data.emails}'."
 
     # unenroll student
     @$btn_unenroll.click =>
@@ -130,8 +134,8 @@ class StudentAdmin
         dataType: 'json'
         url: @$btn_unenroll.data 'endpoint'
         data: send_data
-        success: -> console.log "student #{send_data.emails} unenrolled"
-        error: std_ajax_err -> console.warn 'error unenrolling student'
+        success: @clear_errors_then -> console.log "student #{send_data.emails} unenrolled"
+        error: std_ajax_err => @$request_response_error_single.text "Error unenrolling student '#{send_data.emails}'."
 
     # reset attempts for student on problem
     @$btn_reset_attempts_single.click =>
@@ -144,8 +148,8 @@ class StudentAdmin
         dataType: 'json'
         url: @$btn_reset_attempts_single.data 'endpoint'
         data: send_data
-        success: -> log 'problem attempts reset'
-        error: std_ajax_err   -> console.warn 'error resetting problem state'
+        success: @clear_errors_then -> log 'problem attempts reset'
+        error: std_ajax_err => @$request_response_error_single.text "Error resetting problem attempts."
 
     # delete state for student on problem
     @$btn_delete_state_single.click =>
@@ -158,8 +162,8 @@ class StudentAdmin
         dataType: 'json'
         url: @$btn_delete_state_single.data 'endpoint'
         data: send_data
-        success: -> log 'module state deleted'
-        error: std_ajax_err   -> console.warn 'error deleting problem state'
+        success: @clear_errors_then -> log 'module state deleted'
+        error: std_ajax_err => @$request_response_error_single.text "Error deleting problem state."
 
     # start task to rescore problem for student
     @$btn_rescore_problem_single.click =>
@@ -171,8 +175,8 @@ class StudentAdmin
         dataType: 'json'
         url: @$btn_rescore_problem_single.data 'endpoint'
         data: send_data
-        success: -> log 'started rescore problem task'
-        error: std_ajax_err -> console.warn 'error starting rescore problem (single student) task'
+        success: @clear_errors_then -> log 'started rescore problem task'
+        error: std_ajax_err => @$request_response_error_single.text "Error starting a task to rescore student's problem."
 
     # list task history for student+problem
     @$btn_task_history_single.click =>
@@ -180,16 +184,18 @@ class StudentAdmin
         student_email: @$field_student_select.val()
         problem_urlname: @$field_problem_select_single.val()
 
-      if not send_data.student_email then return
-      if not send_data.problem_urlname then return
+      if not send_data.student_email
+        return @$request_response_error_single.text "Enter a student email."
+      if not send_data.problem_urlname
+        return @$request_response_error_single.text "Enter a problem urlname."
 
       $.ajax
         dataType: 'json'
         url: @$btn_task_history_single.data 'endpoint'
         data: send_data
-        success: (data) =>
+        success: @clear_errors_then (data) =>
           create_task_list_table @$table_task_history_single, data.tasks
-        error: std_ajax_err -> console.warn 'error listing task history for student+problem'
+        error: std_ajax_err => @$request_response_error_single.text "Error getting task history for student+problem"
 
     # start task to reset attempts on problem for all students
     @$btn_reset_attempts_all.click =>
@@ -201,9 +207,8 @@ class StudentAdmin
         dataType: 'json'
         url: @$btn_reset_attempts_all.data 'endpoint'
         data: send_data
-        success: -> log 'started reset attempts task'
-        error: std_ajax_err (jqXHR, textStatus, errorThrown) ->
-          console.warn "error starting reset attempts (all students) task"
+        success: @clear_errors_then -> log 'started reset attempts task'
+        error: std_ajax_err => @$request_response_error_all.text "Error starting a task to reset attempts for all students on this problem."
 
     # start task to rescore problem for all students
     @$btn_rescore_problem_all.click =>
@@ -215,24 +220,24 @@ class StudentAdmin
         dataType: 'json'
         url: @$btn_rescore_problem_all.data 'endpoint'
         data: send_data
-        success: -> log 'started rescore problem task'
-        error: std_ajax_err (jqXHR, textStatus, errorThrown) ->
-          console.warn "error starting rescore problem (all students) task"
+        success: @clear_errors_then -> log 'started rescore problem task'
+        error: std_ajax_err => @$request_response_error_all.text "Error starting a task to rescore this problem for all students."
 
     # list task history for problem
     @$btn_task_history_all.click =>
       send_data =
         problem_urlname: @$field_problem_select_all.val()
 
-      if not send_data.problem_urlname then return
+      if not send_data.problem_urlname
+        return @$request_response_error_all.text "Enter a problem urlname."
 
       $.ajax
         dataType: 'json'
         url: @$btn_task_history_all.data 'endpoint'
         data: send_data
-        success: (data) =>
+        success: @clear_errors_then (data) =>
           create_task_list_table @$table_task_history_all, data.tasks
-        error: std_ajax_err -> console.warn 'error listing task history for student+problem'
+        error: std_ajax_err => @$request_response_error_all.text "Error listing task history for this student and problem."
 
 
   reload_running_tasks_list: =>
@@ -241,12 +246,18 @@ class StudentAdmin
       dataType: 'json'
       url: list_endpoint
       success: (data) => create_task_list_table @$table_running_tasks, data.tasks
-      error: std_ajax_err -> console.warn "error listing all instructor tasks"
+      error: std_ajax_err => console.warn "error listing all instructor tasks"
 
   start_refresh_running_task_poll_loop: ->
     @reload_running_tasks_list()
     if @$section.hasClass 'active-section'
       plantTimeout 5000, => @start_refresh_running_task_poll_loop()
+
+  clear_errors_then: (cb) ->
+    @$request_response_error_single.empty()
+    @$request_response_error_all.empty()
+    ->
+      cb?.apply this, arguments
 
   onClickTitle: ->
     @start_refresh_running_task_poll_loop()

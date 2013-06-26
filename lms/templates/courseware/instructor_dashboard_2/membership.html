@@ -3,13 +3,14 @@
 <div class="vert-left batch-enrollment">
   <h2>Batch Enrollment</h2>
   <p>Enter student emails separated by new lines or commas.</p>
-  <textarea rows="6" cols="70" name="student-emails" placeholder="Student Emails"></textarea>
+  <textarea rows="6" cols="70" name="student-emails" placeholder="Student Emails" spellcheck="false"></textarea>
   <br>
   <input type="button" name="enroll" value="Enroll" data-endpoint="${ section_data['enroll_button_url'] }" >
   <input type="button" name="unenroll" value="Unenroll" data-endpoint="${ section_data['unenroll_button_url'] }" >
-  <input type="checkbox" name="auto-enroll" value="Auto-Enroll">
+  <input type="checkbox" name="auto-enroll" value="Auto-Enroll" style="margin-top: 1em;">
   <label for="auto-enroll">Auto Enroll</label>
-  <div class="task-response"></div>
+  <div class="request-response"></div>
+  <div class="request-response-error"></div>
 </div>
 
 <div class="vert-right member-lists-management">
@@ -25,6 +26,7 @@
       <input type="text" name="email" placeholder="Enter Email" spellcheck="false">
       <input type="button" name="allow" value="Grant Staff Access">
     </div>
+    <div class="request-response-error"></div>
   </div>
 
   %if section_data['access']['instructor']:
@@ -34,6 +36,7 @@
         <input type="text" name="email" placeholder="Enter Email" spellcheck="false">
         <input type="button" name="allow" value="Grant Instructor Access">
       </div>
+      <div class="request-response-error"></div>
     </div>
   %endif
 
@@ -43,6 +46,7 @@
       <input type="text" name="email" placeholder="Enter Email" spellcheck="false">
       <input type="button" name="allow" value="Grant Beta Tester Access">
     </div>
+    <div class="request-response-error"></div>
   </div>
 
   %if section_data['access']['forum_admin']:
@@ -52,6 +56,7 @@
         <input type="text" name="email" placeholder="Enter Email" spellcheck="false">
         <input type="button" name="allow" value="Grant Forum Admin">
       </div>
+      <div class="request-response-error"></div>
     </div>
 
     <div class="auth-list-container" data-rolename="Moderator" data-display-name="Forum Moderators">
@@ -60,6 +65,7 @@
         <input type="text" name="email" placeholder="Enter Email" spellcheck="false">
         <input type="button" name="allow" value="Grant Forum Moderator">
       </div>
+      <div class="request-response-error"></div>
     </div>
 
     <div class="auth-list-container" data-rolename="Community TA" data-display-name="Forum Community TAs">
@@ -68,6 +74,7 @@
         <input type="text" name="email" placeholder="Enter Email" spellcheck="false">
         <input type="button" name="allow" value="Grant Community TA">
       </div>
+      <div class="request-response-error"></div>
     </div>
   %endif
 

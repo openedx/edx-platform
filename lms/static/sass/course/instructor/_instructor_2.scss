@@ -5,8 +5,9 @@
 
   .olddash-button-wrapper {
     position: absolute;
-    top: 2em;
-    right: 2em;
+    top: 17px;
+    right: 15px;
+    font-size: 11pt;
   }
 
   section.instructor-dashboard-content-2 {
@@ -18,6 +19,12 @@
     // .has-event-handler-for-click {
     //   border: 1px solid blue;
     // }
+
+    .request-response-error {
+      color: red;
+      margin-top: 1em;
+      margin-bottom: 1em;
+    }
 
     .slickgrid {
       font-family: verdana,arial,sans-serif;
@@ -41,6 +48,13 @@
       @extend .top-header;
       border-bottom: 0;
       padding-bottom: 0;
+    }
+
+    input {
+      // display: block;
+      margin-bottom: 1em;
+      line-height: 1.3em;
+      padding: 8px 17px 8px 17px;
     }
 
     .instructor_dash_glob_info {
@@ -125,6 +139,38 @@
     margin-bottom: 1em;
   }
 
+  .batch-enrollment {
+    textarea {
+      margin-top: 0.2em;
+      margin-bottom: 1em;
+
+      height: 100px;
+      width: 500px;
+    }
+
+    input {
+      margin-right: 5px;
+    }
+
+    .request-res-section {
+      margin-top: 1.5em;
+
+      h3 {
+        color: #646464;
+      }
+
+      ul {
+        padding: 0;
+        margin: 0;
+        margin-top: 0.5em;
+        line-height: 1.5em;
+        list-style-type: none;
+        li {
+        }
+      }
+    }
+  }
+
   .auth-list-container {
     display: none;
     margin-bottom: 1.5em;
@@ -141,34 +187,6 @@
 
     .auth-list-add {
       margin-top: 0.5em;
-    }
-  }
-
-  .batch-enrollment {
-    textarea {
-      margin-top: 0.2em;
-      margin-bottom: 1em;
-
-      height: 100px;
-      width: 500px;
-    }
-
-    .task-res-section {
-      margin-top: 1.5em;
-
-      h3 {
-        color: #646464;
-      }
-
-      ul {
-        padding: 0;
-        margin: 0;
-        margin-top: 0.5em;
-        line-height: 1.5em;
-        list-style-type: none;
-        li {
-        }
-      }
     }
   }
 }

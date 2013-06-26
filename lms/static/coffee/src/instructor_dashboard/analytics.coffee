@@ -1,16 +1,23 @@
 log = -> console.log.apply console, arguments
 plantTimeout = (ms, cb) -> setTimeout cb, ms
 
+std_ajax_err = (handler) -> (jqXHR, textStatus, errorThrown) ->
+  console.warn """ajax error
+                  textStatus: #{textStatus}
+                  errorThrown: #{errorThrown}"""
+  handler.apply this, arguments
+
 
 class Analytics
   constructor: (@$section) ->
     log "setting up instructor dashboard section - analytics"
 
-    $display = @$section.find('.distribution-display')
-    @$display_text  = $display.find('.distribution-display-text')
-    @$display_graph = $display.find('.distribution-display-graph')
-    @$display_table = $display.find('.distribution-display-table')
-    @$distribution_select = @$section.find('select#distributions')
+    @$display                = @$section.find '.distribution-display'
+    @$display_text           = @$display.find '.distribution-display-text'
+    @$display_graph          = @$display.find '.distribution-display-graph'
+    @$display_table          = @$display.find '.distribution-display-table'
+    @$distribution_select    = @$section.find 'select#distributions'
+    @$request_response_error = @$display.find '.request-response-error'
 
     @populate_selector => @$distribution_select.change => @on_selector_change()
 
@@ -19,10 +26,13 @@ class Analytics
       @$display_text.empty()
       @$display_graph.empty()
       @$display_table.empty()
+      @$request_response_error.empty()
 
 
   populate_selector: (cb) ->
-    @get_profile_distributions [], (data) =>
+    @get_profile_distributions [],
+      error: std_ajax_err => @$request_response_error.text "Error getting available distributions."
+      success: (data) =>
         @$distribution_select.find('option').eq(0).text "-- Select Distribution --"
 
         for feature in data.available_features
@@ -44,52 +54,54 @@ class Analytics
 
     @reset_display()
     return unless feature
-    @get_profile_distributions [feature], (data) =>
-      feature_res = data.feature_results[feature]
-      # feature response format: {'error': 'optional error string', 'type': 'SOME_TYPE', 'data': [stuff]}
-      if feature_res.error
-        console.warn(feature_res.error)
-        @$display_text.text 'Error fetching data'
-      else
-        if feature_res.type is 'EASY_CHOICE'
-          # setup SlickGrid
-          options =
-            enableCellNavigation: true
-            enableColumnReorder: false
-            forceFitColumns: true
-
-          columns = [
-            id: feature
-            field: feature
-            name: feature
-          ,
-            id: 'count'
-            field: 'count'
-            name: 'Count'
-          ]
-
-          grid_data = _.map feature_res.data, (value, key) ->
-            datapoint = {}
-            datapoint[feature] = key
-            datapoint['count'] = value
-            datapoint
-
-          table_placeholder = $ '<div/>', class: 'slickgrid'
-          @$display_table.append table_placeholder
-          grid = new Slick.Grid(table_placeholder, grid_data, columns, options)
-          # grid.autosizeColumns()
-        else if feature is 'year_of_birth'
-          graph_placeholder = $ '<div/>', class: 'year-of-birth'
-          @$display_graph.append graph_placeholder
-
-          graph_data = _.map feature_res.data, (value, key) -> [parseInt(key), value]
-
-          $.plot graph_placeholder, [
-            data: graph_data
-          ]
+    @get_profile_distributions [feature],
+      error: std_ajax_err => @$request_response_error.text "Error getting distribution for '#{feature}'."
+      success: (data) =>
+        feature_res = data.feature_results[feature]
+        # feature response format: {'error': 'optional error string', 'type': 'SOME_TYPE', 'data': [stuff]}
+        if feature_res.error
+          console.warn(feature_res.error)
+          @$display_text.text 'Error fetching data'
         else
-          console.warn("don't know how to show #{feature_res.type}")
-          @$display_text.text 'Unavailable Metric\n' + JSON.stringify(feature_res)
+          if feature_res.type is 'EASY_CHOICE'
+            # setup SlickGrid
+            options =
+              enableCellNavigation: true
+              enableColumnReorder: false
+              forceFitColumns: true
+
+            columns = [
+              id: feature
+              field: feature
+              name: feature
+            ,
+              id: 'count'
+              field: 'count'
+              name: 'Count'
+            ]
+
+            grid_data = _.map feature_res.data, (value, key) ->
+              datapoint = {}
+              datapoint[feature] = key
+              datapoint['count'] = value
+              datapoint
+
+            table_placeholder = $ '<div/>', class: 'slickgrid'
+            @$display_table.append table_placeholder
+            grid = new Slick.Grid(table_placeholder, grid_data, columns, options)
+            # grid.autosizeColumns()
+          else if feature is 'year_of_birth'
+            graph_placeholder = $ '<div/>', class: 'year-of-birth'
+            @$display_graph.append graph_placeholder
+
+            graph_data = _.map feature_res.data, (value, key) -> [parseInt(key), value]
+
+            $.plot graph_placeholder, [
+              data: graph_data
+            ]
+          else
+            console.warn("don't know how to show #{feature_res.type}")
+            @$display_text.text 'Unavailable Metric\n' + JSON.stringify(feature_res)
 
 
   # handler can be either a callback for success or a mapping e.g. {success: ->, error: ->, complete: ->}
