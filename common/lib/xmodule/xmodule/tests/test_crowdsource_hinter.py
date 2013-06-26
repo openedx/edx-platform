@@ -97,6 +97,17 @@ class CHModuleFactory(object):
         return module
 
 
+class FakeChild(object):
+    """
+    A fake Xmodule.
+    """
+    def __init__(self):
+        self.system = Mock()
+        self.system.ajax_url = 'this/is/a/fake/ajax/url'
+
+    def get_html(self):
+        return 'This is supposed to be test html.'
+
 
 
 class CrowdsourceHinterTest(unittest.TestCase):
@@ -104,6 +115,22 @@ class CrowdsourceHinterTest(unittest.TestCase):
     In the below tests, '24.0' represents a wrong answer, and '42.5' represents
     a correct answer.
     """
+
+    def test_gethtml(self):
+        """
+        A simple test of get_html - make sure it returns the html of the inner 
+        problem.
+        """
+        m = CHModuleFactory.create()
+        def fake_get_display_items():
+            """
+            A mock of get_display_items
+            """
+            return [FakeChild()]
+        m.get_display_items = fake_get_display_items
+        out_html = m.get_html()
+        self.assertTrue('This is supposed to be test html.' in out_html)
+        self.assertTrue('this/is/a/fake/ajax/url' in out_html)
 
     def test_gethint_0hint(self):
         """
@@ -182,6 +209,18 @@ class CrowdsourceHinterTest(unittest.TestCase):
         out = m.get_feedback(json_in)
         self.assertTrue(len(out['index_to_hints'][0])==2)
 
+
+    def test_getfeedback_missingkey(self):
+        """
+        Someone gets a problem correct, but one of the hints that he saw
+        earlier (pk=100) has been deleted.  Should just skip that hint.
+        """
+        m = CHModuleFactory.create(
+            previous_answers=[['24.0', [0, 100, None]]])
+        json_in = {'problem_name': '42.5'}
+        out = m.get_feedback(json_in)
+        self.assertTrue(len(out['index_to_hints'][0])==1)
+
     def test_vote_nopermission(self):
         """
         A user tries to vote for a hint, but he has already voted!
@@ -197,13 +236,16 @@ class CrowdsourceHinterTest(unittest.TestCase):
     def test_vote_withpermission(self):
         """
         A user votes for a hint.
+        Also tests vote result rendering.
         """
-        m = CHModuleFactory.create()
+        m = CHModuleFactory.create(
+            previous_answers=[['24.0', [0, 3, None]]])
         json_in = {'answer': 0, 'hint': 3}
-        m.tally_vote(json_in)
+        dict_out = m.tally_vote(json_in)
         self.assertTrue(m.hints['24.0']['0'][1] == 40)
         self.assertTrue(m.hints['24.0']['3'][1] == 31)
-        self.assertTrue(m.hints['24.0']['4'][1] == 20)
+        self.assertTrue(['Best hint', 40] in dict_out['hint_and_votes'])
+        self.assertTrue(['Another hint', 31] in dict_out['hint_and_votes'])
 
 
     def test_submithint_nopermission(self):
@@ -256,6 +298,16 @@ class CrowdsourceHinterTest(unittest.TestCase):
         self.assertTrue('29.0' not in m.hints)
         self.assertTrue('29.0' in m.mod_queue)
 
+    def test_submithint_escape(self):
+        """
+        Make sure that hints are being html-escaped.
+        """
+        m = CHModuleFactory.create()
+        json_in = {'answer': 1, 'hint': '<script> alert("Trololo"); </script>'}
+        m.submit_hint(json_in)
+        print m.hints
+        self.assertTrue(m.hints['29.0'][0][0] == u'&lt;script&gt; alert(&quot;Trololo&quot;); &lt;/script&gt;')
+
 
     def test_template_gethint(self):
         """
@@ -284,7 +336,9 @@ class CrowdsourceHinterTest(unittest.TestCase):
     def test_template_feedback(self):
         """
         Test the templates for get_feedback.
-        """
+        NOT FINISHED
+        
+        from lxml import etree
         m = CHModuleFactory.create()
 
         def fake_get_feedback(get):
@@ -297,9 +351,11 @@ class CrowdsourceHinterTest(unittest.TestCase):
         m.get_feedback = fake_get_feedback
         json_in = {'problem_name': '42.5'}
         out = json.loads(m.handle_ajax('get_feedback', json_in))['contents']
+        html_tree = etree.XML(out)
+        # To be continued...
 
-
-
+        """
+        pass
 
 
 
