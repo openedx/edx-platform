@@ -64,6 +64,10 @@
 				"uuid": {
 					"type": "string",
 					"store": "true"
+				},
+
+				"thumbnail": {
+					"type": "binary"
 				}
 			}
 		}

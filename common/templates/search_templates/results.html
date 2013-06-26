@@ -1,5 +1,6 @@
 <head>
 	${css_link("../static/css/results.css")}
+	${js_link("../static/js/div_sizing.js")}
 </head>
 
 % if spelling_correction:
@@ -12,16 +13,27 @@
 </div>
 % endif
 
-% for datum in data:
-<section class="result">
-	<div class="result_wrapper">
-		<h1>${datum[0]}</h1>
-		<p class="results_snippet"> 
-			${datum[1]}
-		</p>
-	</div>
+<section class="search-results">
+	% for datum in data:
+	<section class="result">
+		<div class="result_wrapper">
+			<h1 class="result-title">${datum[0]}</h1>
+			<span>
+				<div>
+					% if len(datum) >= 3:
+						<img src="${datum[2]}" alt="${datum[0]}" height="130px" width="160px" align="left">
+					%endif
+				</div>
+				<div class="snippet_container">
+					<p  class="results_snippet scaled-text">
+						${datum[1]}
+					</p>
+				</div>
+			</span>
+		</div>
+	</section>
+	% endfor
 </section>
-% endfor
 
 % if len(data) > 1:
 	<section class="pagination">
