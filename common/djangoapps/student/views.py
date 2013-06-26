@@ -11,9 +11,9 @@ import time
 
 from django.conf import settings
 from django.contrib.auth import logout, authenticate, login
-from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.views import password_reset_confirm
 from django.core.cache import cache
 from django.core.context_processors import csrf
 from django.core.mail import send_mail
@@ -24,6 +24,7 @@ from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbid
 from django.shortcuts import redirect
 from django_future.csrf import ensure_csrf_cookie
 from django.utils.http import cookie_date
+from django.utils.http import base36_to_int
 
 from mitxmako.shortcuts import render_to_response, render_to_string
 from bs4 import BeautifulSoup
@@ -33,6 +34,8 @@ from student.models import (Registration, UserProfile, TestCenterUser, TestCente
                             PendingNameChange, PendingEmailChange,
                             CourseEnrollment, unique_id_for_user,
                             get_testcenter_registration, CourseEnrollmentAllowed)
+
+from student.forms import PasswordResetFormNoActive
 
 from certificates.models import CertificateStatuses, certificate_status_for_student
 
@@ -962,17 +965,7 @@ def password_reset(request):
     if request.method != "POST":
         raise Http404
 
-    # By default, Django doesn't allow Users with is_active = False to reset their passwords,
-    # but this bites people who signed up a long time ago, never activated, and forgot their
-    # password. So for their sake, we'll auto-activate a user for whom password_reset is called.
-    try:
-        user = User.objects.get(email=request.POST['email'])
-        user.is_active = True
-        user.save()
-    except:
-        log.exception("Tried to auto-activate user to enable password reset, but failed.")
-
-    form = PasswordResetForm(request.POST)
+    form = PasswordResetFormNoActive(request.POST)
     if form.is_valid():
         form.save(use_https=request.is_secure(),
                   from_email=settings.DEFAULT_FROM_EMAIL,
@@ -982,7 +975,21 @@ def password_reset(request):
                                         'value': render_to_string('registration/password_reset_done.html', {})}))
     else:
         return HttpResponse(json.dumps({'success': False,
-                                        'error': 'Invalid e-mail'}))
+                                        'error': 'Invalid e-mail or user'}))
+
+def password_reset_confirm_wrapper(request, uidb36=None, token=None):
+    ''' A wrapper around django.contrib.auth.views.password_reset_confirm.
+        Needed because we want to set the user as active at this step.
+    '''
+    #cribbed from django.contrib.auth.views.password_reset_confirm
+    try:
+        uid_int = base36_to_int(uidb36)
+        user = User.objects.get(id=uid_int)
+        user.is_active = True
+        user.save()
+    except (ValueError, User.DoesNotExist):
+        pass
+    return password_reset_confirm(request, uidb36=uidb36, token=token)
 
 
 def reactivation_email_for_user(user):

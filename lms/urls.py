@@ -51,7 +51,7 @@ urlpatterns = ('',  # nopep8
     url(r'^password_change_done/$', django.contrib.auth.views.password_change_done,
         name='auth_password_change_done'),
     url(r'^password_reset_confirm/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$',
-        django.contrib.auth.views.password_reset_confirm,
+        'student.views.password_reset_confirm_wrapper',
         name='auth_password_reset_confirm'),
     url(r'^password_reset_complete/$', django.contrib.auth.views.password_reset_complete,
         name='auth_password_reset_complete'),
