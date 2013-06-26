@@ -142,7 +142,7 @@ class @Problem
   # off @answers
   check_waitfor: =>
     for inp in @inputs
-      if not ($(inp).attr("data-waitfor")?)
+      if ($(inp).attr("waitfor")?)
         try
           $(inp).data("waitfor")()
         catch e
