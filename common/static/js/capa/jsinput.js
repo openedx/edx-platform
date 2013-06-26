@@ -24,7 +24,11 @@
         oldthis.pop();
         oldthis = oldthis.join();
         var newthis = _deepKey(obj, oldthis);
-        return func.apply(newthis);
+
+        var args = Array.prototype.slice.call(arguments);
+        args = args.slice(2, args.length);
+
+        return func.apply(newthis, args);
     };
    
     // First time this function was called?
