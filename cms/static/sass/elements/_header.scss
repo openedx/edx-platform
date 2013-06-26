@@ -42,7 +42,6 @@
       @extend .t-action2;
       display: inline-block;
       vertical-align: middle;
-      margin-right: ($baseline);
       font-weight: 600;
 
       &:last-child {
@@ -56,17 +55,18 @@
 
     .title {
       @extend .t-action2;
-
-      &:hover {
-        @extend .fake-link;
-      }
+      @extend .btn-nav-primary;
+      @include transition(all 0.25s ease-in-out 0);
 
       .label, .icon-caret-down {
 
       }
 
+      .label {
+
+      }
+
       .icon-caret-down {
-        @include transition(opacity 0.25s ease-in-out 0);
         opacity: 0.25;
       }
 
@@ -98,6 +98,9 @@
 
   // specific elements - course name/info
   .info-course {
+    margin-right: ($baseline/4);
+    border-right: 1px solid $gray-l3;
+    padding: ($baseline/2) $baseline ($baseline/2) 0;
 
     .course-org, .course-number {
       @extend .text-sr;
@@ -111,8 +114,7 @@
       white-space: nowrap;
       text-overflow: ellipsis;
       font-weight: 600;
-      color: $gray-d1;
-
+      color: $gray;
     }
 
     // entire link
@@ -162,22 +164,24 @@
 // CASE: user signed in
 .is-signedin {
 
-  .branding {
-    width: flex-grid(2, 12);
-    margin-right: flex-gutter();
-  }
+  .wrapper-header {
 
-  .info-course {
-    width: flex-grid(3, 12);
-    margin-right: flex-gutter();
-  }
+    .branding {
+      width: flex-grid(2, 12);
+      margin-right: flex-gutter();
+    }
 
-  .nav-course {
-    width: flex-grid(4, 12);
-  }
+    .info-course {
+      width: flex-grid(3, 12);
+    }
 
-  .nav-account {
-    width: flex-grid(3, 12);
+    .nav-course {
+      width: flex-grid(4, 12);
+    }
+
+    .nav-account {
+      width: flex-grid(3, 12);
+    }
   }
 }
 
@@ -186,11 +190,22 @@
 // CASE: user not signed in
 .not-signedin {
 
-  .branding {
-    width: flex-grid(2, 12);
-  }
+  .wrapper-header {
 
-  .nav-pitch {
-    width: flex-grid(10, 12);
+    nav > ol > .nav-item {
+      margin-right: $baseline;
+
+      &:last-child {
+        margin-right: 0;
+      }
+    }
+
+    .branding {
+      width: flex-grid(2, 12);
+    }
+
+    .nav-pitch {
+      width: flex-grid(10, 12);
+    }
   }
 }

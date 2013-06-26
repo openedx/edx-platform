@@ -136,6 +136,26 @@
 // ====================
 
 // layout-based buttons
+.btn-nav-primary {
+  @extend .btn-nav-simple;
+  background: $white;
+  border-color: $white;
+  color: $gray;
+
+  &:hover, &:active {
+    background: $white;
+    color: $blue-s1;
+  }
+
+  &.current, &.active {
+    background: $white;
+    color: $gray-d4;
+
+    &:hover, &:active {
+      color: $blue-s1;
+    }
+  }
+}
 
 // ====================
 
