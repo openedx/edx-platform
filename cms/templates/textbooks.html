@@ -30,6 +30,12 @@ $(function() {
     $(".nav-actions .new-button").click(function(e) {
         tbView.addOne(e);
     })
+    $(window).on("beforeunload", function() {
+        var dirty = textbooks.find(function(textbook) { return textbook.isDirty(); });
+        if(dirty) {
+            return "You have unsaved changes. Do you really want to leave this page?";
+        }
+    })
 })
 </script>
 </%block>

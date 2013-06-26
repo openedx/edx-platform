@@ -26,6 +26,18 @@ describe "CMS.Models.Textbook", ->
     it "should have a URL set", ->
         expect(_.result(@model, "url")).toBeTruthy()
 
+    it "should not be dirty by default", ->
+        expect(@model.isDirty()).toBeFalsy()
+
+    it "should be dirty after it's been changed", ->
+        @model.set("name", "foobar")
+        expect(@model.isDirty()).toBeTruthy()
+
+    it "should not be dirty after calling setOriginalAttributes", ->
+        @model.set("name", "foobar")
+        @model.setOriginalAttributes()
+        expect(@model.isDirty()).toBeFalsy()
+
 
 describe "CMS.Models.Textbook input/output", ->
     # replace with Backbone.Assocations.deepAttributes when
