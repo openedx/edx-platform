@@ -104,6 +104,10 @@
 
 				"thumbnail": {
 					"type": "binary"
+<<<<<<< HEAD
+>>>>>>> Made prettier, added requirements, and included main edX page
+=======
+<<<<<<< HEAD
 >>>>>>> Made prettier, added requirements, and included main edX page
 				}
 			}
@@ -256,6 +260,8 @@
 				"uuid": {
 					"type": "string",
 					"store": "true"
+=======
+>>>>>>> Made prettier, added requirements, and included main edX page
 				}
 			}
 		}
