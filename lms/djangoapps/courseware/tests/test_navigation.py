@@ -20,8 +20,8 @@ class TestNavigation(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
     def setUp(self):
 
-        self.course = CourseFactory.create()
-        self.full = CourseFactory.create(display_name='Robot_Sub_Course')
+        self.test_course = CourseFactory.create(display_name='Robot_Sub_Course')
+        self.course = CourseFactory.create(display_name='Robot_Super_Course')
         self.chapter0 = ItemFactory.create(parent_location=self.course.location,
                                            display_name='Overview')
         self.chapter9 = ItemFactory.create(parent_location=self.course.location,
@@ -46,7 +46,7 @@ class TestNavigation(ModuleStoreTestCase, LoginEnrollmentTestCase):
         email, password = self.STUDENT_INFO[0]
         self.login(email, password)
         self.enroll(self.course, True)
-        self.enroll(self.full, True)
+        self.enroll(self.test_course, True)
 
         resp = self.client.get(reverse('courseware',
                                kwargs={'course_id': self.course.id}))
@@ -64,7 +64,7 @@ class TestNavigation(ModuleStoreTestCase, LoginEnrollmentTestCase):
         email, password = self.STUDENT_INFO[0]
         self.login(email, password)
         self.enroll(self.course, True)
-        self.enroll(self.full, True)
+        self.enroll(self.test_course, True)
 
         self.client.get(reverse('courseware_section', kwargs={'course_id': self.course.id,
                                                               'chapter': 'Overview',
@@ -84,7 +84,7 @@ class TestNavigation(ModuleStoreTestCase, LoginEnrollmentTestCase):
         email, password = self.STUDENT_INFO[0]
         self.login(email, password)
         self.enroll(self.course, True)
-        self.enroll(self.full, True)
+        self.enroll(self.test_course, True)
 
         # Now we directly navigate to a section in a chapter other than 'Overview'.
         check_for_get_code(self, 200, reverse('courseware_section',

@@ -526,7 +526,6 @@ def _adjust_start_date_for_beta_testers(user, descriptor):
         start_as_datetime = descriptor.lms.start
         delta = timedelta(descriptor.lms.days_early_for_beta)
         effective = start_as_datetime - delta
-
         # ...and back to time_struct
         return effective
 

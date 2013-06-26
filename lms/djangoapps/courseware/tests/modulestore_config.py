@@ -16,7 +16,7 @@ def mongo_store_config(data_dir):
                 'default_class': 'xmodule.raw_module.RawDescriptor',
                 'host': 'localhost',
                 'db': 'test_xmodule',
-                'collection': 'modulestore_%s' % uuid4().hex,
+                'collection': 'modulestore',
                 'fs_root': data_dir,
                 'render_template': 'mitxmako.shortcuts.render_to_string'
             }
@@ -30,28 +30,24 @@ def draft_mongo_store_config(data_dir):
     """
     Defines default module store using DraftMongoModuleStore.
     """
+
+    modulestore_options = {
+        'default_class': 'xmodule.raw_module.RawDescriptor',
+        'host': 'localhost',
+        'db': 'xmodule',
+        'collection': 'modulestore_%s' % uuid4().hex,
+        'fs_root': data_dir,
+        'render_template': 'mitxmako.shortcuts.render_to_string'
+    }
+
     return {
         'default': {
             'ENGINE': 'xmodule.modulestore.mongo.DraftMongoModuleStore',
-            'OPTIONS': {
-                'default_class': 'xmodule.raw_module.RawDescriptor',
-                'host': 'localhost',
-                'db': 'test_xmodule',
-                'collection': 'modulestore_%s' % uuid4().hex,
-                'fs_root': data_dir,
-                'render_template': 'mitxmako.shortcuts.render_to_string',
-            }
+            'OPTIONS': modulestore_options
         },
         'direct': {
             'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
-            'OPTIONS': {
-                'default_class': 'xmodule.raw_module.RawDescriptor',
-                'host': 'localhost',
-                'db': 'test_xmodule',
-                'collection': 'modulestore_%s' % uuid4().hex,
-                'fs_root': data_dir,
-                'render_template': 'mitxmako.shortcuts.render_to_string',
-            }
+            'OPTIONS': modulestore_options
         }
     }
 
