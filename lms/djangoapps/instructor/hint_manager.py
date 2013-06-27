@@ -66,7 +66,6 @@ def get_hints(request, course_id, field):
           Sorted by answer.
         - id_to_name: A dictionary mapping problem id to problem name.
     """
-
     if field == 'mod_queue':
         other_field = 'hints'
         field_label = 'Hints Awaiting Moderation'
@@ -85,13 +84,10 @@ def get_hints(request, course_id, field):
 
     for hints_by_problem in all_hints:
         loc = Location(hints_by_problem.definition_id)
-        try:
-            descriptor = modulestore().get_items(loc)[0]
-        except IndexError:
-            # Sometimes, the problem is no longer in the course.  Just
-            # don't include said problem.
+        name = location_to_problem_name(loc)
+        if name is None:
             continue
-        id_to_name[hints_by_problem.definition_id] = descriptor.get_children()[0].display_name
+        id_to_name[hints_by_problem.definition_id] = name
         # Answer list contains (answer, dict_of_hints) tuples.
 
         def answer_sorter(thing):
@@ -117,6 +113,19 @@ def get_hints(request, course_id, field):
                    'id_to_name': id_to_name}
     return render_dict
 
+def location_to_problem_name(loc):
+    """
+    Given the location of a crowdsource_hinter module, try to return the name of the
+    problem it wraps around.  Return None if the hinter no longer exists.
+    """
+    try:
+        descriptor = modulestore().get_items(loc)[0]
+        return descriptor.get_children()[0].display_name
+    except IndexError:
+        # Sometimes, the problem is no longer in the course.  Just
+        # don't include said problem.
+        return None
+
 
 def delete_hints(request, course_id, field):
     """
@@ -128,8 +137,8 @@ def delete_hints(request, course_id, field):
     Example request.POST:
     {'op': 'delete_hints',
      'field': 'mod_queue',
-      1: ['problem_whatever', '42.0', 3],
-      2: ['problem_whatever', '32.5', 12]}
+      1: ['problem_whatever', '42.0', '3'],
+      2: ['problem_whatever', '32.5', '12']}
     """
 
     for key in request.POST:
@@ -160,7 +169,7 @@ def change_votes(request, course_id, field):
         this_problem = XModuleContentField.objects.get(field_name=field, definition_id=problem_id)
         problem_dict = json.loads(this_problem.value)
         # problem_dict[answer][pk] points to a [hint_text, #votes] pair.
-        problem_dict[answer][pk][1] = new_votes
+        problem_dict[answer][pk][1] = int(new_votes)
         this_problem.value = json.dumps(problem_dict)
         this_problem.save()
 
