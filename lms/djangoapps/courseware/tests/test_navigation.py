@@ -11,12 +11,11 @@ from modulestore_config import TEST_DATA_MONGO_MODULESTORE
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestNavigation(ModuleStoreTestCase, LoginEnrollmentTestCase):
-
-    STUDENT_INFO = [('view@test.com', 'foo'), ('view2@test.com', 'foo')]
-
     """
     Check that navigation state is saved properly.
     """
+
+    STUDENT_INFO = [('view@test.com', 'foo'), ('view2@test.com', 'foo')]
 
     def setUp(self):
 
