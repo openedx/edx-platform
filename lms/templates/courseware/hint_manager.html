@@ -15,7 +15,7 @@
     function setup() {
         field = $("#field-label").html()
         changed_votes = []
-        $(".votes").live('input', function() {
+        $(".votes").on('input', function() {
             changed_votes.push($(this))
           });
 
@@ -43,9 +43,9 @@
                              'field': field}
             for (var i=0; i<changed_votes.length; i++) {
                 data_dict[i] = [$(changed_votes[i]).parent().attr("data-problem"), 
-                                    $(changed_votes[i]).parent().attr("data-answer"), 
-                                    $(changed_votes[i]).parent().attr("data-pk"),
-                                    $(changed_votes[i]).val()];
+                                $(changed_votes[i]).parent().attr("data-answer"), 
+                                $(changed_votes[i]).parent().attr("data-pk"),
+                                $(changed_votes[i]).val()];
             }
             $.ajax(window.location.pathname, {
                 type: "POST", 
