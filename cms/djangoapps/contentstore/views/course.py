@@ -558,7 +558,7 @@ def textbook_by_id(request, org, course, name, tid):
     elif request.method == 'POST':
         try:
             new_textbook = validate_textbook_json(request.body)
-        except TextbookValidationError:
+        except TextbookValidationError as e:
             return JsonResponse({"error": e.message}, status=400)
         new_textbook["id"] = tid
         if textbook:
