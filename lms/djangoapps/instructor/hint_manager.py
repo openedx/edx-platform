@@ -54,17 +54,17 @@ def get_hints(request, course_id, field):
     Load all of the hints submitted to the course.
 
     Args:
-    request -- Django request object.
-    course_id -- The course id, like 'Me/19.002/test_course'
-    field -- Either 'hints' or 'mod_queue'; specifies which set of hints to load.
+    `request` -- Django request object.
+    `course_id` -- The course id, like 'Me/19.002/test_course'
+    `field` -- Either 'hints' or 'mod_queue'; specifies which set of hints to load.
 
     Keys in returned dict:
-        - field: Same as input
-        - other_field: 'mod_queue' if field == 'hints'; and vice-versa.
-        - field_label, other_field_label: English name for the above.
-        - all_hints: A list of [answer, pk dict] pairs, representing all hints.
+        - 'field': Same as input
+        - 'other_field': 'mod_queue' if `field` == 'hints'; and vice-versa.
+        - 'field_label', 'other_field_label': English name for the above.
+        - 'all_hints': A list of [answer, pk dict] pairs, representing all hints.
           Sorted by answer.
-        - id_to_name: A dictionary mapping problem id to problem name.
+        - 'id_to_name': A dictionary mapping problem id to problem name.
     """
     if field == 'mod_queue':
         other_field = 'hints'
@@ -92,8 +92,8 @@ def get_hints(request, course_id, field):
 
         def answer_sorter(thing):
             """
-            thing is a tuple, where thing[0] contains an answer, and thing[1] contains
-            a dict of hints.  This function returns an index based on thing[0], which
+            `thing` is a tuple, where `thing[0]` contains an answer, and `thing[1]` contains
+            a dict of hints.  This function returns an index based on `thing[0]`, which
             is used as a key to sort the list of things.
             """
             try:
@@ -131,10 +131,10 @@ def delete_hints(request, course_id, field):
     """
     Deletes the hints specified.
 
-    request.POST contains some fields keyed by integers.  Each such field contains a
+    `request.POST` contains some fields keyed by integers.  Each such field contains a
     [problem_defn_id, answer, pk] tuple.  These tuples specify the hints to be deleted.
 
-    Example request.POST:
+    Example `request.POST`:
     {'op': 'delete_hints',
      'field': 'mod_queue',
       1: ['problem_whatever', '42.0', '3'],
@@ -158,8 +158,8 @@ def change_votes(request, course_id, field):
     """
     Updates the number of votes.
 
-    The numbered fields of request.POST contain [problem_id, answer, pk, new_votes] tuples.
-    - Very similar to delete_hints.  Is there a way to merge them?  Nah, too complicated.
+    The numbered fields of `request.POST` contain [problem_id, answer, pk, new_votes] tuples.
+    - Very similar to `delete_hints`.  Is there a way to merge them?  Nah, too complicated.
     """
 
     for key in request.POST:
@@ -176,7 +176,7 @@ def change_votes(request, course_id, field):
 
 def add_hint(request, course_id, field):
     """
-    Add a new hint.  request.POST:
+    Add a new hint.  `request.POST`:
     op
     field
     problem - The problem id
