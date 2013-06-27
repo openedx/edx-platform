@@ -17,6 +17,8 @@ from selenium.common.exceptions import WebDriverException
 # These names aren't used, but do important work on import.
 from lms import one_time_startup        # pylint: disable=W0611
 from cms import one_time_startup        # pylint: disable=W0611
+from pymongo import MongoClient
+import xmodule.modulestore.django
 
 # There is an import issue when using django-staticfiles with lettuce
 # Lettuce assumes that we are using django.contrib.staticfiles,
@@ -103,3 +105,7 @@ def teardown_browser(total):
     Quit the browser after executing the tests.
     """
     world.browser.quit()
+    mongo = MongoClient()
+    mongo.drop_database(settings.CONTENTSTORE['OPTIONS']['db'])
+    modulestore = xmodule.modulestore.django.modulestore()
+    modulestore.collection.drop()

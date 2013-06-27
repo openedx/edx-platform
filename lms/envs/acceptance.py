@@ -16,13 +16,14 @@ DEBUG = True
 # Disable warnings for acceptance tests, to make the logs readable
 import logging
 logging.disable(logging.ERROR)
+from uuid import uuid4
 
 # Use the mongo store for acceptance tests
 modulestore_options = {
     'default_class': 'xmodule.raw_module.RawDescriptor',
     'host': 'localhost',
     'db': 'test_xmodule',
-    'collection': 'acceptance_modulestore',
+    'collection': 'acceptance_modulestore_%s' % uuid4().hex,
     'fs_root': TEST_ROOT / "data",
     'render_template': 'mitxmako.shortcuts.render_to_string',
 }
@@ -42,7 +43,7 @@ CONTENTSTORE = {
     'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
     'OPTIONS': {
         'host': 'localhost',
-        'db': 'test_xmodule',
+        'db': 'acceptance_xcontent_%s' % uuid4().hex,
     }
 }
 
