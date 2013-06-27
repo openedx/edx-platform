@@ -3,14 +3,15 @@
 Set Content Release Dates and Visibility
 *****************************************
 
-    The release schedule for course material is determined by setting release dates for sections and subsections.
+The release schedule for course material is determined by setting release dates
+for sections and subsections.
 
 Section
 *******
 
     To set the release date for a section:
 
-    1. On the **Course Content **menu, click **Course Outline**.
+    1. On the **Course Content** menu, click **Course Outline**.
 
     2. Find the section you are looking for in the course outline.
 
@@ -20,9 +21,13 @@ Section
 Subsection
 **********
 
-    Subsections inherit the release date of the section they are in, but you can change this date so that different subsections are released at different times.
+Subsections inherit the release date of the section they are in, but you can
+change this date so that different subsections are released at different times.
 
-Note that if the release date for a subsection falls before the release date for the section that contains it, students will not be able to see the subsection until the release date for the *section *has passed. Section release dates override subsection release dates.
+Note that if the release date for a subsection falls before the release date for
+the section that contains it, students will not be able to see the subsection
+until the release date for the *section *has passed. Section release dates
+override subsection release dates.
 
    To set the release date for a subsection:
 
@@ -35,9 +40,14 @@ Note that if the release date for a subsection falls before the release date for
 Unit
 ****
      
-    Individual units inherit the release date of the subsection they are in, but have an additional **Visibility** setting that can be set to **Public** or **Private**. Private units are never visible to students.
+Individual units inherit the release date of the subsection they are in, but
+have an additional **Visibility** setting that can be set to **Public** or
+**Private**. Private units are never visible to students.
 
-**Note: You can modify private units directly. To modify a unit that is marked as Public, you must create a draft. For more information, see :ref:`Modify Published Content<Create-Section-Subsection>` *TBD Insert LINK***
+*Note: You can modify private units directly. To modify a unit that is marked
+Public you must create a draft.*
+
+For more information, see :doc:`modify_published_content` .
 
     
        

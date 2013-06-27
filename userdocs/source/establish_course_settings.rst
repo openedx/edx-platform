@@ -6,7 +6,7 @@ Add Collaborators
 *****************
  
  
-    Studio has support for rudimentary collaborative editing of a course. Users must have registered at studio.edge.edx.org, and must have activated their account via the  ail link. If a user is not found, you will be notified.
+    Studio has support for rudimentary collaborative editing of a course. Users must have registered at studio.edge.edx.org, and must have activated their account via the mail link. If a user is not found, you will be notified.
  
  
     Before you add a new user, consider the following.
@@ -37,7 +37,7 @@ Add Collaborators
     .. image:: images/image117.png
  
  
-    3. In the **email** box, type the  ail address of the user, and then click **Add User**.
+    3. In the **email** box, type the  mail address of the user, and then click **Add User**.
 
  
 
@@ -51,7 +51,7 @@ Add Manual Policy Data
  
  
     You should only add manual policy data if you are very familiar with valid configuration key value pairs and the ways these pairs will affect your course.
-    Errors on this page can cause significant probl s with your course.
+    Errors on this page can cause significant problems with your course.
  
  
     The edX program managers can help you learn about how to apply these settings.
@@ -60,7 +60,7 @@ Add Manual Policy Data
     1. On the navigation bar, click **Course Settings**, and then click **Advanced Settings**.
  
  
-    2. Click **New Manual Policy**.
+    2. Click **New Manual Policy** .
  
  
       .. image:: images/image119.png  
@@ -76,7 +76,7 @@ Add Course Catalog Information
 ******************************
  
  
-    To add scheduling information, a description, and other information for your course, use the **Course Settings **menu.
+    To add scheduling information, a description, and other information for your course, use the **Course Settings** menu.
  
  
      .. image:: images/image121.png  
@@ -88,18 +88,18 @@ Schedule and Details Page
 =========================
  
  
-    1. At the top of this page, you will find a section with the **Basic Information** for your course. It is here that you can locate the title of your course and find the URL for your course, which you can  ail to students to invite students to enroll in your course. 
+1. At the top of this page, you will find a section with the **Basic Information** for your course. It is here that you can locate the title of your course and find the URL for your course, which you can  mail to students to invite students to enroll in your course. 
 
-    .. image:: images/image281.png   
+ .. image:: images/image281.png   
  
  
-    2. In the **Course Schedule** section, enter the date you want your course to start in the **Course**    **Start Date **box, and then enter the time you want your course to start in the **Course** **Start Time **box.
+2. In the **Course Schedule** section, enter the date you want your course to start in the **Course Start Date** box, and then enter the time you want your course to start in the **Course** **Start Time** box.
  
  
-    *Note: The Course Start Time on this screen will reflect the current time zone in your browser, depending on your geography. Course start times for students will show as UTC on Edge.*
+*Note: The Course Start Time on this screen will reflect the current time zone in your browser, depending on your geography. Course start times for students will show as UTC on Edge.*
         
  
-    3. In the **Course Schedule** section, enter the date you want your course to end in the **Course** **End Date **
+3. In the **Course Schedule** section, enter the date you want your course to end in the **Course** **End Date **
     box, and then enter the time you want your course to end in the **Course** **End Time** box.
  
 
@@ -107,17 +107,17 @@ Add Enrollment Information
 ==========================
  
  
-    1. On the navigation bar, click **Course **Settings, and then click **Schedule & Details** .
+1. On the navigation bar, click **Course **Settings, and then click **Schedule & Details** .
  
  
-    2. In the **Course Schedule** section, enter the date you want enrollment for your course to start in the **Enrollment Start Date** box, and then enter the time you want enrollment for your course to start in the **Enrollment Start Time** box.
+2. In the **Course Schedule** section, enter the date you want enrollment for your course to start in the **Enrollment Start Date** box, and then enter the time you want enrollment for your course to start in the **Enrollment Start Time** box.
  
  
-    3. In the **Course Schedule** section, enter the date you want enrollment for your course to end in the **Enrollment End Date **
-    box, and then enter the time you want enrollment for your course to end in the **Enrollment End Time** box.
+3. In the **Course Schedule** section, enter the date you want enrollment for your course to end in the **Enrollment End Date**
+box, and then enter the time you want enrollment for your course to end in the **Enrollment End Time** box.
  
  
-     *Note: The Enrollment dates on this screen will reflect the current time zone in your browser, depending on your geography. Enrollment times for students will show as UTC on Edge.*
+*Note: The Enrollment dates on this screen will reflect the current time zone in your browser, depending on your geography. Enrollment times for students will show as UTC on Edge.*
         
 
   
@@ -125,78 +125,79 @@ Add a Course Overview
 =====================
  
  
-    1. On the navigation bar, click **Course Settings**, and then click   ** Schedule &amp; Details   ** .
+1. On the navigation bar, click **Course Settings**, and then click   ** Schedule &amp; Details   ** .
  
  
-    2. Scroll down to the **Introducing Your Course** section, and then locate the **Course Overview** box.
+2. Scroll down to the **Introducing Your Course** section, and then locate the **Course Overview** box.
 
-    .. image:: images/image123.png
+.. image:: images/image123.png
    
 
  
  
-    3. In the **Course Overview** box, enter a description of your course. 
+3. In the **Course Overview** box, enter a description of your course. 
 
 
-    The content for this box must be formated in HTML. For a template that you
-    can use that includes placeholders, see :doc:`appendices/a`.
+The content for this box must be formated in HTML. For a template that you
+can use that includes placeholders, see :doc:`appendices/a`.
 
     
  
-    If your course has prerequisites, you can include that information in the course overview.
+If your course has prerequisites, you can include that information in the course overview.
  
  
-    *Note: There is no save button. Studio automatically saves your changes.*
+*Note: There is no save button. Studio automatically saves your changes.*
  
  
-    The following is example content for the **Course Overview** box:
+The following is example content for the **Course Overview** box:
  
  
-    .. image:: images/image125.png   
+.. image:: images/image125.png   
+
   
 Add an About Video
 ==================
  
  
-    You can create an About video that will appear on the **About** page for your course.
+You can create an About video that will appear on the **About** page for your course.
  
  
-    1. Upload the video that you want to YouTube. Make note of the code that appears between   ** watch?v =**  and   ** &amp;feature**  in the URL. This code appears in the green box below.
+1. Upload the video that you want to YouTube. Make note of the code that appears between   ** watch?v =**  and   ** &feature**  in the URL. This code appears in the green box below.
 
 
-    .. image:: images/image127.png      
+.. image:: images/image127.png      
  
  
-    2. On the navigation bar, click **Course Settings**, and then click **Schedule & Details** .
+2. On the navigation bar, click **Course Settings**, and then click **Schedule & Details** .
  
  
-    3. Scroll down to the **Introducing Your Course** section, and then locate the **Course** **Introduction Video**
+3. Scroll down to the **Introducing Your Course** section, and then locate the **Course** **Introduction Video**
     field. If you have not already added a video, you see a blank field above an **id** box.
  
  
-    .. image:: images/image129.png    
+.. image:: images/image129.png    
  
  
-    4. In the ** your YouTube video's ID**  box, enter your video code. When you add the code, the video automatically appears in the field above the   **your YouTube video's ID**  box.
+4. In the **your YouTube video's ID**  box, enter your video code. When you add the code, the video automatically appears in the field above the   **your YouTube video's ID**  box.
  
  
-   *Note: There is no save button. Studio automatically saves your changes.*
+*Note: There is no save button. Studio automatically saves your changes.*
  
  
-    For example, your course introduction video appears as follows.
+For example, your course introduction video appears as follows.
  
  
-      .. image:: images/image131.png 
+.. image:: images/image131.png 
  
   
 Add Weekly Time Requirements Information
 ======================================== 
  
  
-    1. On the navigation bar, click **Course Settings**, and then click **Schedule & Details** .
+1. On the navigation bar, click **Course Settings**, and then click **Schedule & Details** .
  
  
-    2. Scroll down to the **Requirments** section.
+2. Scroll down to the **Requirments** section.
  
  
-    3. In the **Hours of Effort per Week** box, enter the number of hours you expect students to work on this course each week.
+3. In the **Hours of Effort per Week** box, enter the number of hours you expect students to work on this course each week.
