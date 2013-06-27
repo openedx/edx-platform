@@ -50,9 +50,9 @@ def see_course(_step, doesnt_see_course, gender):
     all_courses = world.css_find(class_css, wait_time=1)
     all_names = [item.html for item in all_courses]
     if doesnt_see_course:
-        assert not world.scenario_dict['COURSE_NAME'] in all_names
+        assert not world.scenario_dict['COURSE'].display_name in all_names
     else:
-        assert world.scenario_dict['COURSE_NAME'] in all_names
+        assert world.scenario_dict['COURSE'].display_name in all_names
 
 
 @step(u's?he cannot delete users')

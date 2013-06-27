@@ -21,10 +21,6 @@ logger = getLogger(__name__)
 
 @step(u'The course "([^"]*)" exists$')
 def create_course(step, course):
-    world.scenario_dict['COURSE_NUM'] = course
-    world.scenario_dict['SECTION_NAME'] = 'Test Section'
-    world.scenario_dict['COURSE_NAME'] = 'Test Course'
-    world.scenario_dict['COURSE_ORG'] = 'edx'
 
     # First clear the modulestore so we don't try to recreate
     # the same course twice
@@ -34,17 +30,17 @@ def create_course(step, course):
     # Create the course
     # We always use the same org and display name,
     # but vary the course identifier (e.g. 600x or 191x)
-    course = world.CourseFactory.create(org=world.scenario_dict['COURSE_ORG'],
+    world.scenario_dict['COURSE'] = world.CourseFactory.create(org='edx',
                                         number=course,
-                                        display_name=world.scenario_dict['COURSE_NAME'])
+                                        display_name='Test Course')
 
     # Add a section to the course to contain problems
-    section = world.ItemFactory.create(parent_location=course.location,
-                                       display_name=world.scenario_dict['SECTION_NAME'])
+    world.scenario_dict['SECTION'] = world.ItemFactory.create(parent_location=world.scenario_dict['COURSE'].location,
+                                       display_name='Test Section')
 
-    problem_section = world.ItemFactory.create(parent_location=section.location,
+    problem_section = world.ItemFactory.create(parent_location=world.scenario_dict['SECTION'].location,
                                                template='i4x://edx/templates/sequential/Empty',
-                                               display_name=world.scenario_dict['SECTION_NAME'])
+                                               display_name='Test Section')
 
 
 @step(u'I am registered for the course "([^"]*)"$')
@@ -71,24 +67,24 @@ def add_tab_to_course(step, course, extra_tab_name):
 
 
 def course_id(course_num):
-    return "%s/%s/%s" % (world.scenario_dict['COURSE_ORG'], course_num,
-                         world.scenario_dict['COURSE_NAME'].replace(" ", "_"))
+    return "%s/%s/%s" % (world.scenario_dict['COURSE'].org, course_num,
+                         world.scenario_dict['COURSE'].display_name.replace(" ", "_"))
 
 
 def course_location(course_num):
     return Location(loc_or_tag="i4x",
-                    org=world.scenario_dict['COURSE_ORG'],
+                    org=world.scenario_dict['COURSE'].org,
                     course=course_num,
                     category='course',
-                    name=world.scenario_dict['COURSE_NAME'].replace(" ", "_"))
+                    name=world.scenario_dict['COURSE'].display_name.replace(" ", "_"))
 
 
 def section_location(course_num):
     return Location(loc_or_tag="i4x",
-                    org=world.scenario_dict['COURSE_ORG'],
+                    org=world.scenario_dict['COURSE'].org,
                     course=course_num,
                     category='sequential',
-                    name=world.scenario_dict['SECTION_NAME'].replace(" ", "_"))
+                    name=world.scenario_dict['SECTION'].display_name.replace(" ", "_"))
 
 
 def get_courses():

@@ -16,11 +16,11 @@ TEST_SUBSECTION_NAME = 'Test Subsection'
 def view_course_multiple_sections(step):
     create_course()
     # Add a section to the course to contain problems
-    section1 = world.ItemFactory.create(parent_location=course_location(world.scenario_dict['COURSE_NUM']),
+    section1 = world.ItemFactory.create(parent_location=course_location(world.scenario_dict['COURSE'].number),
                                        display_name=section_name(1))
 
     # Add a section to the course to contain problems
-    section2 = world.ItemFactory.create(parent_location=course_location(world.scenario_dict['COURSE_NUM']),
+    section2 = world.ItemFactory.create(parent_location=course_location(world.scenario_dict['COURSE'].number),
                                        display_name=section_name(2))
 
     place1 = world.ItemFactory.create(parent_location=section1.location,
@@ -42,7 +42,7 @@ def view_course_multiple_subsections(step):
     create_course()
 
     # Add a section to the course to contain problems
-    section1 = world.ItemFactory.create(parent_location=course_location(world.scenario_dict['COURSE_NUM']),
+    section1 = world.ItemFactory.create(parent_location=course_location(world.scenario_dict['COURSE'].number),
                                        display_name=section_name(1))
 
     place1 = world.ItemFactory.create(parent_location=section1.location,
@@ -62,7 +62,7 @@ def view_course_multiple_subsections(step):
 def view_course_multiple_sequences(step):
     create_course()
     # Add a section to the course to contain problems
-    section1 = world.ItemFactory.create(parent_location=course_location(world.scenario_dict['COURSE_NUM']),
+    section1 = world.ItemFactory.create(parent_location=course_location(world.scenario_dict['COURSE'].number),
                                        display_name=section_name(1))
 
     place1 = world.ItemFactory.create(parent_location=section1.location,
@@ -142,19 +142,14 @@ def subsection_name(section):
 def create_course():
     world.clear_courses()
 
-    world.scenario_dict['COURSE_NAME'] = 'Test Course'
-    world.scenario_dict['COURSE_ORG'] = 'edx'
-    world.scenario_dict['COURSE_NUM'] = 'model_course'
-    world.CourseFactory.create(org=world.scenario_dict['COURSE_ORG'],
-                                        number=world.scenario_dict['COURSE_NUM'],
-                                        display_name=world.scenario_dict['COURSE_NAME'])
+    world.scenario_dict['COURSE'] = world.CourseFactory.create(org='edx', number='model_course', display_name='Test Course')
 
 
 def create_user_and_visit_course():
     world.create_user('robot', 'test')
     u = User.objects.get(username='robot')
 
-    CourseEnrollment.objects.get_or_create(user=u, course_id=course_id(world.scenario_dict['COURSE_NUM']))
+    CourseEnrollment.objects.get_or_create(user=u, course_id=course_id(world.scenario_dict['COURSE'].number))
 
     world.log_in('robot', 'test')
     chapter_name = (TEST_SECTION_NAME + "1").replace(" ", "_")

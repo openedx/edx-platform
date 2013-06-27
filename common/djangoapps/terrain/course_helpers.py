@@ -43,7 +43,7 @@ def log_in(username, password):
     """
 
     # Authenticate the user
-    user = authenticate(username=username, password=password)
+    world.scenario_dict['USER'] = authenticate(username=username, password=password)
     assert(user is not None and user.is_active)
 
     # Send a fake HttpRequest to log the user in
@@ -62,8 +62,6 @@ def log_in(username, password):
     cookie_dict = {settings.SESSION_COOKIE_NAME: request.session.session_key}
     world.browser.cookies.delete()
     world.browser.cookies.add(cookie_dict)
-    world.scenario_dict['username'] = username
-    world.scenario_dict['userpassword'] = password
 
 
 @world.absorb
