@@ -653,6 +653,7 @@ class CombinedOpenEndedV1Module():
                 ).format(self.student_attempts, self.attempts)
             }
         self.state = self.INITIAL
+        self.student_attempts +=1
         self.ready_to_reset = False
         for i in xrange(0, len(self.task_xml)):
             self.current_task_number = i
