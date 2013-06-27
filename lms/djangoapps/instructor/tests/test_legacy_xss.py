@@ -12,7 +12,7 @@ from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from instructor import views
+from instructor.views import legacy
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestXss(ModuleStoreTestCase):
@@ -47,7 +47,7 @@ class TestXss(ModuleStoreTestCase):
         )
         req.user = self._instructor
         req.session = {}
-        resp = views.instructor_dashboard(req, self._course.id)
+        resp = legacy.instructor_dashboard(req, self._course.id)
         respUnicode = resp.content.decode(settings.DEFAULT_CHARSET)
         self.assertNotIn(self._evil_student.profile.name, respUnicode)
         self.assertIn(escape(self._evil_student.profile.name), respUnicode)

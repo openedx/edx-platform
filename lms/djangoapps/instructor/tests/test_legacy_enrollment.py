@@ -12,7 +12,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from student.tests.factories import UserFactory, CourseEnrollmentFactory, AdminFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
-from instructor.views import get_and_clean_student_list, send_mail_to_student
+from instructor.views.legacy import get_and_clean_student_list, send_mail_to_student
 from django.core import mail
 
 USER_COUNT = 4
