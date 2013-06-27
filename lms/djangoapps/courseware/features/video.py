@@ -19,7 +19,7 @@ def view_video(_step):
 
     # Make sure we have a video
     add_video_to_course(coursenum)
-    chapter_name = world.scenario_dict['SECTION_NAME'].replace(" ", "_")
+    chapter_name = world.scenario_dict['SECTION'].display_name.replace(" ", "_")
     section_name = chapter_name
     url = django_url('/courses/%s/%s/%s/courseware/%s/%s' %
                     (world.scenario_dict['COURSE'].org, world.scenario_dict['COURSE'].number, world.scenario_dict['COURSE'].display_name.replace(' ', '_'),
@@ -34,7 +34,7 @@ def view_videoalpha(step):
 
     # Make sure we have a videoalpha
     add_videoalpha_to_course(coursenum)
-    chapter_name = world.scenario_dict['SECTION_NAME'].replace(" ", "_")
+    chapter_name = world.scenario_dict['SECTION'].display_name.replace(" ", "_")
     section_name = chapter_name
     url = django_url('/courses/%s/%s/%s/courseware/%s/%s' %
                     (world.scenario_dict['COURSE'].org, world.scenario_dict['COURSE'].number, world.scenario_dict['COURSE'].display_name.replace(' ', '_'),

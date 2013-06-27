@@ -156,7 +156,7 @@ def create_a_course():
     # Add the user to the instructor group of the course
     # so they will have the permissions to see it in studio
 
-    course = world.GroupFactory.create(name='instructor_MITx/{course_num}/{course_name}'.format(course_num=world.scenario_dict['COURSE'].number, course_name=world.scenario_dict['COURSE_NAME'].display_name.replace(" ", "_")))
+    course = world.GroupFactory.create(name='instructor_MITx/{course_num}/{course_name}'.format(course_num=world.scenario_dict['COURSE'].number, course_name=world.scenario_dict['COURSE'].display_name.replace(" ", "_")))
     if world.scenario_dict['USER']:
         user = world.scenario_dict['USER']
     else:

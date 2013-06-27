@@ -21,7 +21,7 @@ def view_problem_with_attempts(step, problem_type, attempts):
 
     # Go to the one section in the factory-created course
     # which should be loaded with the correct problem
-    chapter_name = world.scenario_dict['SECTION_NAME'].replace(" ", "_")
+    chapter_name = world.scenario_dict['SECTION'].display_name.replace(" ", "_")
     section_name = chapter_name
     url = django_url('/courses/%s/%s/%s/courseware/%s/%s' %
                     (world.scenario_dict['COURSE'].org, world.scenario_dict['COURSE'].number, world.scenario_dict['COURSE'].display_name.replace(' ', '_'),
@@ -38,7 +38,7 @@ def view_problem_with_show_answer(step, problem_type, answer):
 
     # Go to the one section in the factory-created course
     # which should be loaded with the correct problem
-    chapter_name = world.scenario_dict['SECTION_NAME'].replace(" ", "_")
+    chapter_name = world.scenario_dict['SECTION'].display_name.replace(" ", "_")
     section_name = chapter_name
     url = django_url('/courses/%s/%s/%s/courseware/%s/%s' %
                     (world.scenario_dict['COURSE'].org, world.scenario_dict['COURSE'].number, world.scenario_dict['COURSE'].display_name.replace(' ', '_'),
@@ -55,7 +55,7 @@ def view_problem(step, problem_type):
 
     # Go to the one section in the factory-created course
     # which should be loaded with the correct problem
-    chapter_name = world.scenario_dict['SECTION_NAME'].replace(" ", "_")
+    chapter_name = world.scenario_dict['SECTION'].display_name.replace(" ", "_")
     section_name = chapter_name
     url = django_url('/courses/%s/%s/%s/courseware/%s/%s' %
                     (world.scenario_dict['COURSE'].org, world.scenario_dict['COURSE'].number, world.scenario_dict['COURSE'].display_name.replace(' ', '_'),

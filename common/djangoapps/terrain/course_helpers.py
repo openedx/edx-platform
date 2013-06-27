@@ -44,7 +44,7 @@ def log_in(username, password):
 
     # Authenticate the user
     world.scenario_dict['USER'] = authenticate(username=username, password=password)
-    assert(user is not None and user.is_active)
+    assert(world.scenario_dict['USER'] is not None and world.scenario_dict['USER'].is_active)
 
     # Send a fake HttpRequest to log the user in
     # We need to process the request using
@@ -53,7 +53,7 @@ def log_in(username, password):
     request = HttpRequest()
     SessionMiddleware().process_request(request)
     AuthenticationMiddleware().process_request(request)
-    login(request, user)
+    login(request, world.scenario_dict['USER'])
 
     # Save the session
     request.session.save()
