@@ -1,45 +1,20 @@
-from factory import DjangoModelFactory
 import unittest
 import nose.tools
 import json
 
 from django.http import Http404
-from django.test.client import Client
+from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
 import mitxmako.middleware
 
 from courseware.models import XModuleContentField
+from courseware.tests.factories import ContentFactory
+from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 import instructor.hint_manager as view
 from student.tests.factories import UserFactory, AdminFactory
-from xmodule.modulestore.tests.factories import CourseFactory
-from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
-
-class HintsFactory(DjangoModelFactory):
-    FACTORY_FOR = XModuleContentField
-    definition_id = 'i4x://Me/19.002/crowdsource_hinter/crowdsource_hinter_001'
-    field_name = 'hints'
-    value = json.dumps({'1.0': 
-                               {'1': ['Hint 1', 2],
-                                '3': ['Hint 3', 12]},
-                        '2.0':
-                               {'4': ['Hint 4', 3]}
-                        })
-
-class ModQueueFactory(DjangoModelFactory):
-    FACTORY_FOR = XModuleContentField
-    definition_id = 'i4x://Me/19.002/crowdsource_hinter/crowdsource_hinter_001'
-    field_name = 'mod_queue'
-    value = json.dumps({'2.0':
-                               {'2': ['Hint 2', 1]}
-                        })
-
-class PKFactory(DjangoModelFactory):
-    FACTORY_FOR = XModuleContentField
-    definition_id = 'i4x://Me/19.002/crowdsource_hinter/crowdsource_hinter_001'
-    field_name = 'hint_pk'
-    value = 5
             
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class HintManagerTest(ModuleStoreTestCase):
@@ -49,18 +24,39 @@ class HintManagerTest(ModuleStoreTestCase):
         Makes a course, which will be the same for all tests.
         Set up mako middleware, which is necessary for template rendering to happen.
         """
-        course = CourseFactory.create(org='Me', number='19.002', display_name='test_course')
+        self.course = CourseFactory.create(org='Me', number='19.002', display_name='test_course')
+        self.url = '/courses/Me/19.002/test_course/hint_manager'
+        self.user = UserFactory.create(username='robot', email='robot@edx.org', password='test', is_staff=True)
+        self.c = Client()
+        self.c.login(username='robot', password='test')
+        self.problem_id = 'i4x://Me/19.002/crowdsource_hinter/crowdsource_hinter_001'
+        self.course_id = 'Me/19.002/test_course'
+        ContentFactory.create(field_name='hints',
+                              definition_id=self.problem_id,
+                              value=json.dumps({'1.0': {'1': ['Hint 1', 2],
+                                                        '3': ['Hint 3', 12]},
+                                                '2.0': {'4': ['Hint 4', 3]}
+                              }))
+        ContentFactory.create(field_name='mod_queue',
+                              definition_id=self.problem_id,
+                              value=json.dumps({'2.0': {'2': ['Hint 2', 1]}}))
+
+        ContentFactory.create(field_name='hint_pk',
+                              definition_id=self.problem_id,
+                              value=5)
+        # Mock out location_to_problem_name, which ordinarily accesses the modulestore.
+        # (I can't figure out how to get fake structures into the modulestore.)
+        view.location_to_problem_name = lambda loc: "Test problem"
 
 
     def test_student_block(self):
         """
         Makes sure that students cannot see the hint management view.
         """
-        nose.tools.set_trace()
         c = Client()
-        user = UserFactory.create(username='robot', email='robot@edx.org', password='test')
-        c.login(username='robot', password='test')
-        out = c.get('/courses/Me/19.002/test_course/hint_manager')
+        user = UserFactory.create(username='student', email='student@edx.org', password='test')
+        c.login(username='student', password='test')
+        out = c.get(self.url)
         print out
         self.assertTrue('Sorry, but students are not allowed to access the hint manager!' in out.content)
 
@@ -68,12 +64,62 @@ class HintManagerTest(ModuleStoreTestCase):
         """
         Makes sure that staff can access the hint management view.
         """
-        c = Client()
-        user = UserFactory.create(username='robot', email='robot@edx.org', password='test', is_staff=True)
-        c.login(username='robot', password='test')
-        out = c.get('/courses/Me/19.002/test_course/hint_manager')
+        out = self.c.get('/courses/Me/19.002/test_course/hint_manager')
         print out
         self.assertTrue('Hints Awaiting Moderation' in out.content)
+
+    def test_invalid_field_access(self):
+        """
+        Makes sure that field names other than 'mod_queue' and 'hints' are 
+        rejected.
+        """
+        out = self.c.post(self.url, {'op': 'delete hints', 'field': 'all your private data'})
+        # Keep this around for reference - might be useful later.
+        # request = RequestFactory()
+        # post = request.post(self.url, {'op': 'delete hints', 'field': 'all your private data'})
+        # out = view.hint_manager(post, 'Me/19.002/test_course')
+        print out
+        self.assertTrue('an invalid field was accessed' in out.content)
+
+    def test_gethints(self):
+        """
+        Checks that gethints returns the right data.
+        """
+        request = RequestFactory()
+        post = request.post(self.url, {'field': 'mod_queue'})
+        out = view.get_hints(post, self.course_id, 'mod_queue')
+        print out
+        self.assertTrue(out['other_field'] == 'hints')
+        expected = {self.problem_id: [(u'2.0', {u'2': [u'Hint 2', 1]})]}
+        self.assertTrue(out['all_hints'] == expected)
+
+    def test_deletehints(self):
+        """
+        Checks that delete_hints deletes the right stuff.
+        """
+        request = RequestFactory()
+        post = request.post(self.url, {'field': 'hints',
+                                       'op': 'delete hints',
+                                       1: [self.problem_id, '1.0', '1']})
+        view.delete_hints(post, self.course_id, 'hints')
+        problem_hints = XModuleContentField.objects.get(field_name='hints', definition_id=self.problem_id).value
+        self.assertTrue('1' not in json.loads(problem_hints)['1.0'])
+
+    def test_changevotes(self):
+        """
+        Checks that vote changing works.
+        """
+        request = RequestFactory()
+        post = request.post(self.url, {'field': 'hints',
+                                       'op': 'change votes',
+                                       1: [self.problem_id, '1.0', '1', 5]})
+        view.change_votes(post, self.course_id, 'hints')
+        problem_hints = XModuleContentField.objects.get(field_name='hints', definition_id=self.problem_id).value
+        # hints[answer][hint_pk (string)] = [hint text, vote count]
+        print json.loads(problem_hints)['1.0']['1']
+        self.assertTrue(json.loads(problem_hints)['1.0']['1'][1] == 5)
+
+
 
 
 
