@@ -7,7 +7,8 @@ from django.test.utils import override_settings
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from courseware.access import _course_staff_group_name
-from courseware.tests.tests import LoginEnrollmentTestCase, TEST_DATA_XML_MODULESTORE, get_user
+from courseware.tests.helpers import LoginEnrollmentTestCase
+from courseware.tests.modulestore_config import TEST_DATA_XML_MODULESTORE
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory
 from student.tests.factories import UserFactory, CourseEnrollmentFactory, AdminFactory

@@ -586,7 +586,6 @@ def _has_access_to_location(user, location, access_level, course_context):
         debug("Deny: user not in groups %s", instructor_groups)
     else:
         log.debug("Error in access._has_access_to_location access_level=%s unknown" % access_level)
-
     return False
 
 

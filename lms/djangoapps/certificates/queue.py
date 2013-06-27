@@ -194,6 +194,7 @@ class XQueueCertInterface(object):
                 # on the queue
                 if self.restricted.filter(user=student).exists():
                     cert.status = status.restricted
+                    cert.save()
                 else:
                     contents = {
                         'action': 'create',
@@ -202,15 +203,15 @@ class XQueueCertInterface(object):
                         'name': profile.name,
                     }
                     cert.status = status.generating
+                    cert.save()
                     self._send_to_xqueue(contents, key)
-                cert.save()
             else:
                 cert_status = status.notpassing
                 cert.grade = grade['percent']
-                cert.status = cert_status
                 cert.user = student
                 cert.course_id = course_id
                 cert.name = profile.name
+                cert.status = cert_status
                 cert.save()
 
         return cert_status
