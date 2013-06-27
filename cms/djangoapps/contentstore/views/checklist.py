@@ -3,6 +3,7 @@ import json
 from util.json_request import JsonResponse
 from django.http import HttpResponseBadRequest
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_http_methods
 from django_future.csrf import ensure_csrf_cookie
 from mitxmako.shortcuts import render_to_response
 
@@ -10,7 +11,6 @@ from xmodule.modulestore import Location
 from xmodule.modulestore.inheritance import own_metadata
 
 from ..utils import get_modulestore, get_url_reverse
-from .requests import get_request_method
 from .access import get_location_and_verify_access
 
 __all__ = ['get_checklists', 'update_checklist']
@@ -47,6 +47,7 @@ def get_checklists(request, org, course, name):
                               })
 
 
+@require_http_methods(("GET", "POST", "PUT"))
 @ensure_csrf_cookie
 @login_required
 def update_checklist(request, org, course, name, checklist_index=None):
@@ -63,8 +64,7 @@ def update_checklist(request, org, course, name, checklist_index=None):
     modulestore = get_modulestore(location)
     course_module = modulestore.get_item(location)
 
-    real_method = get_request_method(request)
-    if real_method == 'POST' or real_method == 'PUT':
+    if request.method in ("POST", "PUT"):
         if checklist_index is not None and 0 <= int(checklist_index) < len(course_module.checklists):
             index = int(checklist_index)
             course_module.checklists[index] = json.loads(request.body)
@@ -83,8 +83,6 @@ def update_checklist(request, org, course, name, checklist_index=None):
         if modified:
             modulestore.update_metadata(location, own_metadata(course_module))
         return JsonResponse(checklists)
-    else:
-        return HttpResponseBadRequest("Unsupported request.", content_type="text/plain")
 
 
 def expand_checklist_action_urls(course_module):

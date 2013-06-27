@@ -4,6 +4,7 @@ from collections import defaultdict
 
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_http_methods
 from django.core.exceptions import PermissionDenied
 from django_future.csrf import ensure_csrf_cookie
 from django.conf import settings
@@ -23,7 +24,7 @@ from contentstore.utils import get_modulestore, get_lms_link_for_item, \
 
 from models.settings.course_grading import CourseGradingModel
 
-from .requests import get_request_method, _xmodule_recurse
+from .requests import _xmodule_recurse
 from .access import has_access
 
 __all__ = ['OPEN_ENDED_COMPONENT_TYPES',
@@ -288,6 +289,7 @@ def unpublish_unit(request):
 
 
 @expect_json
+@require_http_methods(("GET", "POST", "PUT"))
 @login_required
 @ensure_csrf_cookie
 def module_info(request, module_location):
@@ -297,8 +299,6 @@ def module_info(request, module_location):
     if not has_access(request.user, location):
         raise PermissionDenied()
 
-    real_method = get_request_method(request)
-
     rewrite_static_links = request.GET.get('rewrite_url_links', 'True') in ['True', 'true']
     logging.debug('rewrite_static_links = {0} {1}'.format(request.GET.get('rewrite_url_links', 'False'), rewrite_static_links))
 
@@ -306,9 +306,7 @@ def module_info(request, module_location):
     if not has_access(request.user, location):
         raise PermissionDenied()
 
-    if real_method == 'GET':
+    if request.method == 'GET':
         return JsonResponse(get_module_info(get_modulestore(location), location, rewrite_static_links=rewrite_static_links))
-    elif real_method == 'POST' or real_method == 'PUT':
+    elif request.method in ("POST", "PUT"):
         return JsonResponse(set_module_info(get_modulestore(location), location, request.POST))
-    else:
-        return HttpResponseBadRequest()
