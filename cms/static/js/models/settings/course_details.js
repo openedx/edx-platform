@@ -38,23 +38,23 @@ CMS.Models.Settings.CourseDetails = Backbone.Model.extend({
         // A bit funny in that the video key validation is asynchronous; so, it won't stop the validation.
         var errors = {};
         if (newattrs.start_date === null) {
-            errors.start_date = "The course must have an assigned start date.";
+            errors.start_date = gettext("The course must have an assigned start date.");
         }
         if (newattrs.start_date && newattrs.end_date && newattrs.start_date >= newattrs.end_date) {
-            errors.end_date = "The course end date cannot be before the course start date.";
+            errors.end_date = gettext("The course end date cannot be before the course start date.");
         }
         if (newattrs.start_date && newattrs.enrollment_start && newattrs.start_date < newattrs.enrollment_start) {
-            errors.enrollment_start = "The course start date cannot be before the enrollment start date.";
+            errors.enrollment_start = gettext("The course start date cannot be before the enrollment start date.");
         }
         if (newattrs.enrollment_start && newattrs.enrollment_end && newattrs.enrollment_start >= newattrs.enrollment_end) {
-            errors.enrollment_end = "The enrollment start date cannot be after the enrollment end date.";
+            errors.enrollment_end = gettext("The enrollment start date cannot be after the enrollment end date.");
         }
         if (newattrs.end_date && newattrs.enrollment_end && newattrs.end_date < newattrs.enrollment_end) {
-            errors.enrollment_end = "The enrollment end date cannot be after the course end date.";
+            errors.enrollment_end = gettext("The enrollment end date cannot be after the course end date.");
         }
         if (newattrs.intro_video && newattrs.intro_video !== this.get('intro_video')) {
             if (this._videokey_illegal_chars.exec(newattrs.intro_video)) {
-                errors.intro_video = "Key should only contain letters, numbers, _, or -";
+                errors.intro_video = gettext("Key should only contain letters, numbers, _, or -");
             }
             // TODO check if key points to a real video using google's youtube api
         }

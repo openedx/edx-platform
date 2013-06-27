@@ -2,6 +2,7 @@ from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
+from django.utils.translation import ugettext as _
 from django_future.csrf import ensure_csrf_cookie
 from mitxmako.shortcuts import render_to_response
 
@@ -94,7 +95,7 @@ def add_user(request, location):
     email = request.POST["email"]
 
     if email == '':
-        return create_json_response('Please specify an email address.')
+        return create_json_response(_('Please specify an email address.'))
 
     # check that logged in user has admin permissions to this course
     if not has_access(request.user, location, role=INSTRUCTOR_ROLE_NAME):
@@ -104,11 +105,11 @@ def add_user(request, location):
 
     # user doesn't exist?!? Return error.
     if user is None:
-        return create_json_response('Could not find user by email address \'{0}\'.'.format(email))
+        return create_json_response(_('Could not find user by email address \'{0}\'.').format(email))
 
     # user exists, but hasn't activated account?!?
     if not user.is_active:
-        return create_json_response('User {0} has registered but has not yet activated his/her account.'.format(email))
+        return create_json_response(_('User {0} has registered but has not yet activated his/her account.').format(email))
 
     # ok, we're cool to add to the course group
     add_user_to_course_group(request.user, user, location, STAFF_ROLE_NAME)
@@ -133,7 +134,7 @@ def remove_user(request, location):
 
     user = get_user_by_email(email)
     if user is None:
-        return create_json_response('Could not find user by email address \'{0}\'.'.format(email))
+        return create_json_response(_('Could not find user by email address \'{0}\'.').format(email))
 
     # make sure we're not removing ourselves
     if user.id == request.user.id:

@@ -1,3 +1,4 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
 
 <%
@@ -37,7 +38,7 @@ def url_for_user(user_id): #TODO
   % if notification.get('actor_id', None):
     <a href="${url_for_user(notification['actor_id'])}">${info['actor_username']}</a>
   % else:
-    Anonymous
+    ${_("Anonymous")}
   % endif
 </%def>
 
@@ -48,7 +49,7 @@ def url_for_user(user_id): #TODO
 
 <%def name="render_comment_link(notification)">
   <% info = notification['info'] %>
-  <a href="${url_for_comment(info['commentable_id'], info['thread_id'], info['comment_id'])}">comment</a>
+  <a href="${url_for_comment(info['commentable_id'], info['thread_id'], info['comment_id'])}">${_("comment")}</a>
 </%def>
 
 <%def name="render_discussion_link(notification)">
@@ -59,11 +60,11 @@ def url_for_user(user_id): #TODO
 <%def name="render_notification(notification)">
   <div class="notification">
     % if notification['notification_type'] == 'post_reply':
-      ${render_user_link(notification)} posted a ${render_comment_link(notification)}
-      to the thread ${render_thread_link(notification)} in discussion ${render_discussion_link(notification)}
+    ${_("%s posted a %s to the thread %s in discussion %s") % {render_user_link(notification), \
+    render_comment_link(notification), render_thread_link(notification), render_discussion_link(notification)}}
     % elif notification['notification_type'] == 'post_topic':
-      ${render_user_link(notification)} posted a new thread ${render_thread_link(notification)}
-      in discussion ${render_discussion_link(notification)}
+    ${_("%s posted a new thread %s in discussion %s") \
+    % {render_user_link(notification), render_thread_link(notification), render_discussion_link(notification)}}
     % elif notification['notification_type'] == 'at_user':
       ${render_user(info)} mentioned you in
       % if notification['info']['content_type'] == 'thread':

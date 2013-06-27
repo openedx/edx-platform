@@ -1,5 +1,6 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%inherit file="base.html" />
-<%block name="title">Course Team Settings</%block>
+<%block name="title">${_("Course Team Settings")}</%block>
 <%block name="bodyclass">is-signedin course users settings team</%block>
 
 
@@ -7,16 +8,16 @@
 <div class="wrapper-mast wrapper">
   <header class="mast has-actions has-subtitle">
     <h1 class="page-header">
-      <small class="subtitle">Course Settings</small>
-      <span class="sr">&gt; </span>Course Team
+      <small class="subtitle">${_("Course Settings")}</small>
+      <span class="sr">&gt; </span>${_("Course Team")}
     </h1>
 
     <nav class="nav-actions">
-      <h3 class="sr">Page Actions</h3>
+      <h3 class="sr">${_("Page Actions")}</h3>
       <ul>
         %if allow_actions:
         <li class="nav-item">
-          <a href="#" class="button new-button new-user-button"><i class="icon-plus"></i> New User</a>
+          <a href="#" class="button new-button new-user-button"><i class="icon-plus"></i> ${_("New User")}</a>
         </li>
         %endif
       </ul>
@@ -28,7 +29,7 @@
   <div class="inner-wrapper">
 
     <div class="details">
-      <p>The following list of users have been designated as course staff. This means that these users will have permissions to modify course content. You may add additional course staff below, if you are the course instructor. Please note that they must have already registered and verified their account.</p>
+      <p>${_("The following list of users have been designated as course staff. This means that these users will have permissions to modify course content. You may add additional course staff below, if you are the course instructor. Please note that they must have already registered and verified their account.")}</p>
     </div>
 
     <article class="user-overview">

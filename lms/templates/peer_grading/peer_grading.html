@@ -1,24 +1,25 @@
+<%! from django.utils.translation import ugettext as _ %>
 <section class="container peer-grading-container">
     <div class="peer-grading" data-ajax-url="${ajax_url}" data-use-single-location="${use_single_location}">
         <div class="error-container">${error_text}</div>
-        <h1>Peer Grading</h1>
-        <h2>Instructions</h2>
-        <p>Here are a list of problems that need to be peer graded for this course.</p>
+        <h1>${_("Peer Grading")}</h1>
+        <h2>${_("Instructions")}</h2>
+        <p>${_("Here are a list of problems that need to be peer graded for this course.")}</p>
         % if success:
             % if len(problem_list) == 0:
             <div class="message-container">
-                Nothing to grade!
+              ${_("Nothing to grade!")}
             </div>
             %else:
             <div class="problem-list-container">
                 <table class="problem-list">
                     <tr>
-                        <th>Problem Name</th>
-                        <th>Due date</th>
-                        <th>Graded</th>
-                        <th>Available</th>
-                        <th>Required</th>
-                        <th>Progress</th>
+                      <th>${_("Problem Name")}</th>
+                      <th>${_("Due date")}</th>
+                      <th>${_("Graded")}</th>
+                      <th>${_("Available")}</th>
+                      <th>${_("Required")}</th>
+                      <th>${_("Progress")}</th>
                     </tr>
                 %for problem in problem_list:
                 <tr data-graded="${problem['num_graded']}" data-required="${problem['num_required']}">
@@ -33,7 +34,7 @@
                         % if problem['due']:
                             ${problem['due']}
                         % else:
-                            No due date
+                        ${_("No due date")}
                         % endif
                     </td>
                     <td>

@@ -1,4 +1,6 @@
-def get_default_time_display(dt, show_timezone=True):
+from django.template.defaultfilters import date as _date
+from datetime import datetime
+def get_default_time_display(dt, show_timezone=False):
     """
     Converts a datetime to a string representation. This is the default
     representation used in Studio and LMS.
@@ -19,4 +21,5 @@ def get_default_time_display(dt, show_timezone=True):
                 timezone = dt.strftime('%z')
         else:
             timezone = " UTC"
-    return dt.strftime("%b %d, %Y at %H:%M") + timezone
+    #return dt.strftime("%b %d, %Y at %H:%M") + timezone
+    return _date(datetime.now(), "Y bd H:i")

@@ -1,3 +1,4 @@
+<%! from django.utils.translation import ugettext as _ %>
 <section>
   <div>${parent_name}</div>
   <div>${parent_location}</div>
@@ -14,6 +15,6 @@
     </div>
     % endfor
   </div>
-  <a class='cancel'>Cancel</a>
+  <a class='cancel'>${_("Cancel")}</a>
 </section>
 

@@ -1,6 +1,7 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%inherit file="../main.html" />
 
 <section class="outside-app">
-  <h1>Currently the <em>${settings.PLATFORM_NAME}</em> servers are overloaded</h1>
-  <p>Our staff is currently working to get the site back up as soon as possible. Please email us at <a href="mailto:${settings.TECH_SUPPORT_EMAIL}">${settings.TECH_SUPPORT_EMAIL}</a> to report any problems or downtime.</p>
+  <h1>${_("Currently the <em>%s</em> servers are overloaded") % settings.PLATFORM_NAME}</h1>
+  <p>${_("Our staff is currently working to get the site back up as soon as possible. Please email us at <a href=\"mailto:\%s\">%s</a> to report any problems or downtime.") % {settings.TECH_SUPPORT_EMAIL, settings.TECH_SUPPORT_EMAIL}}</p>
 </section>

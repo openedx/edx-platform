@@ -79,10 +79,10 @@ $(document).ready(function() {
     });
 
     // general link management - new window/tab
-    $('a[rel="external"]').attr('title', 'This link will open in a new browser window/tab').bind('click', linkNewWindow);
+    $('a[rel="external"]').attr('title', gettext('This link will open in a new browser window/tab')).bind('click', linkNewWindow);
 
     // general link management - lean modal window
-    $('a[rel="modal"]').attr('title', 'This link will open in a modal window').leanModal({
+    $('a[rel="modal"]').attr('title', gettext('This link will open in a modal window')).leanModal({
         overlay: 0.50,
         closeButton: '.action-modal-close'
     });
@@ -199,8 +199,8 @@ function toggleSections(e) {
     $section = $('.courseware-section');
     sectionCount = $section.length;
     $button = $(this);
-    $labelCollapsed = $('<i class="icon-arrow-up"></i> <span class="label">Collapse All Sections</span>');
-    $labelExpanded = $('<i class="icon-arrow-down"></i> <span class="label">Expand All Sections</span>');
+    $labelCollapsed = $(gettext('<i class="icon-arrow-up"></i> <span class="label">Collapse All Sections</span>'));
+    $labelExpanded = $(gettext('<i class="icon-arrow-down"></i> <span class="label">Expand All Sections</span>'));
 
     var buttonLabel = $button.hasClass('is-activated') ? $labelCollapsed : $labelExpanded;
     $button.toggleClass('is-activated').html(buttonLabel);
@@ -326,7 +326,7 @@ function saveSubsection() {
             $changedInput = null;
         },
         error: function() {
-            showToastMessage('There has been an error while saving your changes.');
+            showToastMessage(gettext('There has been an error while saving your changes.'));
         }
     });
 }
@@ -372,11 +372,11 @@ function deleteSection(e) {
 }
 
 function _deleteItem($el) {
-    if (!confirm('Are you sure you wish to delete this item. It cannot be reversed!')) return;
+    if (!confirm(gettext('Are you sure you wish to delete this item. It cannot be reversed!'))) return;
 
     var id = $el.data('id');
 
-    analytics.track('Deleted an Item', {
+    analytics.track(gettext('Deleted an Item'), {
         'course': course_location_analytics,
         'id': id
     });
@@ -552,7 +552,7 @@ function saveNewSection(e) {
     var template = $saveButton.data('template');
     var display_name = $(this).find('.new-section-name').val();
 
-    analytics.track('Created a Section', {
+    analytics.track(gettext('Created a Section'), {
         'course': course_location_analytics,
         'display_name': display_name
     });
@@ -599,11 +599,11 @@ function saveNewCourse(e) {
     var display_name = $newCourse.find('.new-course-name').val();
 
     if (org == '' || number == '' || display_name == '') {
-        alert('You must specify all fields in order to create a new course.');
+        alert(gettext('You must specify all fields in order to create a new course.'));
         return;
     }
 
-    analytics.track('Created a Course', {
+    analytics.track(gettext('Created a Course'), {
         'org': org,
         'number': number,
         'display_name': display_name
@@ -660,7 +660,7 @@ function saveNewSubsection(e) {
     var template = $(this).find('.new-subsection-name-save').data('template');
     var display_name = $(this).find('.new-subsection-name-input').val();
 
-    analytics.track('Created a Subsection', {
+    analytics.track(gettext('Created a Subsection'), {
         'course': course_location_analytics,
         'display_name': display_name
     });
@@ -706,7 +706,7 @@ function saveSetSectionScheduleDate(e) {
 
     var id = $modal.attr('data-id');
 
-    analytics.track('Edited Section Release Date', {
+    analytics.track(gettext('Edited Section Release Date'), {
         'course': course_location_analytics,
         'id': id,
         'start': start
