@@ -129,11 +129,11 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
 
         Called by hinter javascript after a problem is graded as incorrect.
         Args:
-        get -- must be interpretable by capa_answer_to_str.
+        `get` -- must be interpretable by capa_answer_to_str.
         Output keys:
-            - best_hint is the hint text with the most votes.
-            - rand_hint_1 and rand_hint_2 are two random hints to the answer in get.
-            - answer is the parsed answer that was submitted.
+            - 'best_hint' is the hint text with the most votes.
+            - 'rand_hint_1' and 'rand_hint_2' are two random hints to the answer in `get`.
+            - 'answer' is the parsed answer that was submitted.
         """
         answer = self.capa_answer_to_str(get)
         # Look for a hint to give.
@@ -176,10 +176,10 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         The student got it correct.  Ask him to vote on hints, or submit a hint.
 
         Args:
-        get -- not actually used.  (It is assumed that the answer is correct.)
+        `get` -- not actually used.  (It is assumed that the answer is correct.)
         Output keys:
-            - index_to_hints maps previous answer indices to hints that the user saw earlier.
-            - index_to_answer maps previous answer indices to the actual answer submitted.
+            - 'index_to_hints' maps previous answer indices to hints that the user saw earlier.
+            - 'index_to_answer' maps previous answer indices to the actual answer submitted.
         """
         # The student got it right.
         # Did he submit at least one wrong answer?
@@ -217,10 +217,10 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         Tally a user's vote on his favorite hint.
 
         Args:
-        get -- expected to have the following keys:
+        `get` -- expected to have the following keys:
             'answer': ans_no (index in previous_answers)
             'hint': hint_pk
-        Returns key hint_and_votes, a list of (hint_text, #votes) pairs.
+        Returns key 'hint_and_votes', a list of (hint_text, #votes) pairs.
         """
         if self.user_voted:
             return json.dumps({'contents': 'Sorry, but you have already voted!'})
@@ -250,7 +250,7 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         Take a hint submission and add it to the database.
 
         Args:
-        get -- expected to have the following keys:
+        `get` -- expected to have the following keys:
             'answer': answer index in previous_answers
             'hint': text of the new hint that the user is adding
         Returns a thank-you message.

@@ -192,6 +192,21 @@ class CrowdsourceHinterTest(unittest.TestCase):
         self.assertTrue('This is supposed to be test html.' in out_html)
         self.assertTrue('this/is/a/fake/ajax/url' in out_html)
 
+    def test_gethtml_nochild(self):
+        """
+        get_html, except the module has no child :(  Should return a polite
+        error message.
+        """
+        m = CHModuleFactory.create()
+        def fake_get_display_items():
+            """
+            Returns no children.
+            """
+            return []
+        m.get_display_items = fake_get_display_items
+        out_html = m.get_html()
+        self.assertTrue('Error in loading crowdsourced hinter' in out_html)
+
     def test_gethtml_multiple(self):
         """
         Makes sure that multiple crowdsourced hinters play nice, when get_html
