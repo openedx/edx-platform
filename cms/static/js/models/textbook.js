@@ -59,14 +59,14 @@ CMS.Models.Textbook = Backbone.AssociatedModel.extend({
     },
     validate: function(attrs, options) {
         if (!attrs.name) {
-            return "name is required";
+            return "Textbook name is required";
         }
         if (attrs.chapters.length === 0) {
-            return "at least one asset is required";
+            return "Please add at least one asset";
         } else if (attrs.chapters.length === 1) {
             // only asset_path is required: we don't need a name
             if (!attrs.chapters.first().get('asset_path')) {
-                return "at least one asset is required";
+                return "Please add at least one asset";
             }
         } else {
             // validate all chapters
@@ -77,7 +77,7 @@ CMS.Models.Textbook = Backbone.AssociatedModel.extend({
                 }
             });
             if(!allChaptersValid) {
-                return "invalid chapter";
+                return "All chapters must have a name and asset";
             }
         }
     }
@@ -119,9 +119,9 @@ CMS.Models.Chapter = Backbone.AssociatedModel.extend({
     },
     validate: function(attrs, options) {
         if(!attrs.name && !attrs.asset_path) {
-            return "name and asset_path are both required";
+            return "Chapter name and asset_path are both required";
         } else if(!attrs.name) {
-            return "name is required";
+            return "Chapter name is required";
         } else if (!attrs.asset_path) {
             return "asset_path is required";
         }

@@ -1,7 +1,7 @@
 <form class="edit-textbook" id="edit_textbook_form">
   <div class="wrapper-form">
   <% if (error) { %>
-    <div id="edit_textbook_error" class="message message-status message-status error" name="edit_textbook_error">
+    <div id="edit_textbook_error" class="message message-status message-status error is-shown" name="edit_textbook_error">
       <%= error %>
     </div>
   <% } %>
