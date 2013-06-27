@@ -5,6 +5,7 @@ import random
 
 import xmodule
 from xmodule.crowdsource_hinter import CrowdsourceHinterModule
+from xmodule.vertical_module import VerticalModule, VerticalDescriptor
 from xmodule.modulestore import Location
 
 from django.http import QueryDict
@@ -96,6 +97,65 @@ class CHModuleFactory(object):
 
         return module
 
+class VerticalWithModulesFactory(object):
+    """
+    Makes a vertical with several crowdsourced hinter modules inside.
+    Used to make sure that several crowdsourced hinter modules can co-exist
+    on one vertical.
+    """
+
+    sample_problem_xml = """<?xml version="1.0"?>
+    <vertical display_name="Test vertical">
+        <crowdsource_hinter>
+            <problem display_name="Numerical Input" markdown=" " rerandomize="never" showanswer="finished">
+              <p>Test numerical problem.</p>
+              <numericalresponse answer="5">
+                <textline/>
+              </numericalresponse>
+              <solution>
+                <div class="detailed-solution">
+                  <p>Explanation</p>
+                  <p>If you look at your hand, you can count that you have five fingers. </p>
+                </div>
+              </solution>
+            </problem>
+        </crowdsource_hinter>
+
+        <crowdsource_hinter>
+            <problem display_name="Numerical Input" markdown=" " rerandomize="never" showanswer="finished">
+              <p>Another test numerical problem.</p>
+              <numericalresponse answer="5">
+                <textline/>
+              </numericalresponse>
+              <solution>
+                <div class="detailed-solution">
+                  <p>Explanation</p>
+                  <p>If you look at your hand, you can count that you have five fingers. </p>
+                </div>
+              </solution>
+            </problem>
+        </crowdsource_hinter>
+    </vertical>
+    """
+
+    num = 0
+
+    @staticmethod
+    def next_num():
+        CHModuleFactory.num += 1
+        return CHModuleFactory.num
+
+    @staticmethod
+    def create():
+        location = Location(["i4x", "edX", "capa_test", "vertical",
+                             "SampleVertical{0}".format(CHModuleFactory.next_num())])
+        model_data = {'data': VerticalWithModulesFactory.sample_problem_xml}
+        system = get_test_system()
+        descriptor = VerticalDescriptor.from_xml(VerticalWithModulesFactory.sample_problem_xml, system)
+        module = VerticalModule(system, descriptor, model_data)
+
+        return module
+
 
 class FakeChild(object):
     """
@@ -131,6 +191,19 @@ class CrowdsourceHinterTest(unittest.TestCase):
         out_html = m.get_html()
         self.assertTrue('This is supposed to be test html.' in out_html)
         self.assertTrue('this/is/a/fake/ajax/url' in out_html)
+
+    def test_gethtml_multiple(self):
+        """
+        Makes sure that multiple crowdsourced hinters play nice, when get_html
+        is called.
+        NOT WORKING RIGHT NOW
+        """
+        return
+        m = VerticalWithModulesFactory.create()
+        out_html = m.get_html()
+        print out_html
+        self.assertTrue('Test numerical problem.' in out_html)
+        self.assertTrue('Another test numerical problem.' in out_html)
 
     def test_gethint_0hint(self):
         """
