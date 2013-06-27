@@ -28,7 +28,7 @@ Overview
 
     • `Writing Exercises <https://edge.edx.org/courses/edX/edX101/How_to_Create_an_edX_Course/courseware/a45de3baa8a9468cbfb1a301fdcd7e86/d15cfeaff0af4dd7be4765cd0988d172/1>`_ has more in-depth discussion about problem types, and some general pedagogical considerations for adapting to the online format and a `Gallery of Response Types <https://edge.edx.org/accounts/login?next=/courses/edX/edX101/How_to_Create_an_edX_Course/courseware/a45de3baa8a9468cbfb1a301fdcd7e86/3ba055e760d04f389150a75edfecb844/1>`_
     
-    •  The Appendix contains `XML Documentation <https://edge.edx.org/courses/edX/edX101/How_to_Create_an_edX_Course/jump_to/i4x:/edX/edX101/sequential/2b789a363cba4af09cbf5e14fd7a1a7f>`_ for the different problem response types.
+    •  The :doc:`appendices/a` contains XML documentaion for the different problem response types.
 
     •  The `Discussion Forum <https://edge.edx.org/courses/edX/edX101/How_to_Create_an_edX_Course/discussion/forum">`_  for this class is a good place to ask questions about exercise types, report any errors or oddities that you may encounter, and get technical support.
    
@@ -41,8 +41,7 @@ Overview
 
     • The **Simple Editor** allows you to edit problems visually, without having to work with XML.
 
-    • The **Advanced Editor** converts the problem to edX's XML standard and allows you to edit that XML directly. For more information about
-        the XML for different problem types, see Appendix E: Problem Types
+    • The **Advanced Editor** converts the problem to edX's XML standard and allows you to edit that XML directly. For more information about the XML for different problem types, see Appendix E: Problem Types
         
  
     Some of the simpler problem templates, including multiple choice, open in the Simple Editor and allow you to switch to the Advanced Editor. The more complicated problem types, such as Circuit Response, open in the Advanced Editor.

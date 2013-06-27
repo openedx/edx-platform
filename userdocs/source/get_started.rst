@@ -58,7 +58,7 @@ Studio (http://studio.edge.edx.org) is our web-based course authoring tool. It i
  :width: 800
 
 
-
+*****************
 Create an Account
 *****************
 
@@ -115,7 +115,7 @@ e.  Click to select I agree to the Terms of Service.
 .. image:: images/image017.png
  :width: 800
 
-
+*******************
 Create a New Course
 *******************
 
