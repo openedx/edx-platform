@@ -204,9 +204,9 @@ class CombinedOpenEndedModule(CombinedOpenEndedFields, XModule):
         return_value = self.child_module.get_html()
         return return_value
 
-    def handle_ajax(self, dispatch, get):
+    def handle_ajax(self, dispatch, data):
         self.save_instance_data()
-        return_value = self.child_module.handle_ajax(dispatch, get)
+        return_value = self.child_module.handle_ajax(dispatch, data)
         self.save_instance_data()
         return return_value
 
@@ -266,4 +266,3 @@ class CombinedOpenEndedDescriptor(CombinedOpenEndedFields, RawDescriptor):
         non_editable_fields.extend([CombinedOpenEndedDescriptor.due, CombinedOpenEndedDescriptor.graceperiod,
                                     CombinedOpenEndedDescriptor.markdown, CombinedOpenEndedDescriptor.version])
         return non_editable_fields
-
