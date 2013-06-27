@@ -53,7 +53,7 @@ task :clean_test_files do
     sh("git clean -fqdx test_root")
 end
 
-task :clean_reports_dir do
+task :clean_reports_dir => REPORT_DIR do
     desc "Clean coverage files, to ensure that we don't use stale data to generate reports."
 
     # We delete the files but preserve the directory structure
