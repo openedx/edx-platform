@@ -10,8 +10,12 @@ CMS.Views.SystemFeedback = Backbone.View.extend({
         minShown: 0,  // length of time after this view has been shown before it can be hidden (milliseconds)
         maxShown: Infinity  // length of time after this view has been shown before it will be automatically hidden (milliseconds)
 
-        /* could also have an "actions" hash: here is an example demonstrating
-           the expected structure
+        /* Could also have an "actions" hash: here is an example demonstrating
+           the expected structure. For each action, by default the framework
+           will call preventDefault on the click event before the function is
+           run; to make it not do that, just pass `preventDefault: false` in
+           the action object.
+
         actions: {
             primary: {
                 "text": "Save",
@@ -106,6 +110,9 @@ CMS.Views.SystemFeedback = Backbone.View.extend({
         if(!actions) { return; }
         var primary = actions.primary;
         if(!primary) { return; }
+        if(primary.preventDefault !== false) {
+            event.preventDefault();
+        }
         if(primary.click) {
             primary.click.call(event.target, this, event);
         }
@@ -121,6 +128,9 @@ CMS.Views.SystemFeedback = Backbone.View.extend({
             i = _.indexOf(this.$(".action-secondary"), event.target);
         }
         var secondary = secondaryList[i];
+        if(secondary.preventDefault !== false) {
+            event.preventDefault();
+        }
         if(secondary.click) {
             secondary.click.call(event.target, this, event);
         }

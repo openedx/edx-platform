@@ -47,12 +47,12 @@ class PollModule(PollFields, XModule):
     css = {'scss': [resource_string(__name__, 'css/poll/display.scss')]}
     js_module_name = "Poll"
 
-    def handle_ajax(self, dispatch, get):
+    def handle_ajax(self, dispatch, data):
         """Ajax handler.
 
         Args:
             dispatch: string request slug
-            get: dict request get parameters
+            data: dict request data parameters
 
         Returns:
             json string
