@@ -9,6 +9,7 @@ from urlparse import parse_qs
 
 from django.conf import settings
 from django.test import TestCase, LiveServerTestCase
+from django.test.utils import override_settings
 # from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.test.client import RequestFactory
@@ -188,6 +189,38 @@ class OpenIdProviderTest(TestCase):
             "openid.assoc_handle": "{HMAC-SHA1}{50ff8120}{rh87+Q==}",
             "openid.claimed_id": "http://specs.openid.net/auth/2.0/identifier_select",
             "openid.ns": "http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0",
+            "openid.realm": "http://testserver/",
+            "openid.identity": "http://specs.openid.net/auth/2.0/identifier_select",
+            "openid.ns.ax": "http://openid.net/srv/ax/1.0",
+            "openid.ax.mode": "fetch_request",
+            "openid.ax.required": "email,fullname,old_email,firstname,old_nickname,lastname,old_fullname,nickname",
+            "openid.ax.type.fullname": "http://axschema.org/namePerson",
+            "openid.ax.type.lastname": "http://axschema.org/namePerson/last",
+            "openid.ax.type.firstname": "http://axschema.org/namePerson/first",
+            "openid.ax.type.nickname": "http://axschema.org/namePerson/friendly",
+            "openid.ax.type.email": "http://axschema.org/contact/email",
+            "openid.ax.type.old_email": "http://schema.openid.net/contact/email",
+            "openid.ax.type.old_nickname": "http://schema.openid.net/namePerson/friendly",
+            "openid.ax.type.old_fullname": "http://schema.openid.net/namePerson",
+        }
+        resp = self.client.post(url, post_args)
+        code = 403
+        self.assertEqual(resp.status_code, code,
+                         "got code {0} for url '{1}'. Expected code {2}"
+                         .format(resp.status_code, url, code))
+
+    @override_settings(OPENID_PROVIDER_TRUSTED_ROOTS=['http://apps.cs50.edx.org'])
+    def test_invalid_return_url(self):
+        """ Test for 403 error code when the url"""
+        if not settings.MITX_FEATURES.get('AUTH_USE_OPENID_PROVIDER'):
+            return
+        url = reverse('openid-provider-login')
+        post_args = {
+            "openid.mode": "checkid_setup",
+            "openid.return_to": "http://apps.cs50.edx.or",
+            "openid.assoc_handle": "{HMAC-SHA1}{50ff8120}{rh87+Q==}",
+            "openid.claimed_id": "http://specs.openid.net/auth/2.0/identifier_select",
+            "openid.ns": "http://specs.openid.net/auth/2.0",
             "openid.realm": "http://testserver/",
             "openid.identity": "http://specs.openid.net/auth/2.0/identifier_select",
             "openid.ns.ax": "http://openid.net/srv/ax/1.0",

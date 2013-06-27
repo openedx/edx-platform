@@ -36,7 +36,7 @@ import django_openid_auth.views as openid_views
 from django_openid_auth import auth as openid_auth
 from openid.consumer.consumer import SUCCESS
 
-from openid.server.server import Server, ProtocolError
+from openid.server.server import Server, ProtocolError, UntrustedReturnURL
 from openid.server.trustroot import TrustRoot
 from openid.extensions import ax, sreg
 
@@ -642,7 +642,7 @@ def provider_login(request):
         # decode request
         try:
             openid_request = server.decodeRequest(querydict)
-        except ProtocolError:
+        except (UntrustedReturnURL, ProtocolError):
             return default_render_failure(request, "Invalid OpenID request")
 
         if not openid_request:
