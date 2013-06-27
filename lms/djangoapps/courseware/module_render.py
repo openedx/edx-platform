@@ -354,7 +354,7 @@ def get_module_for_descriptor_internal(user, descriptor, model_data_cache, cours
     system.set('position', position)
     system.set('DEBUG', settings.DEBUG)
     if settings.MITX_FEATURES.get('ENABLE_PSYCHOMETRICS'):
-        system.set('psychometrics_handler',		# set callback for updating PsychometricsData
+        system.set('psychometrics_handler',  # set callback for updating PsychometricsData
                    make_psychometrics_data_update_handler(course_id, user, descriptor.location.url()))
 
     try:
