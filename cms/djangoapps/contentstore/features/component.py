@@ -3,49 +3,34 @@
 
 from lettuce import world, step
 
-data_location = 'i4x://edx/templates'
+DATA_LOCATION = 'i4x://edx/templates'
 
 
-@step(u'I am on a new unit')
+@step(u'I am editing a new unit')
 def add_unit(step):
-    section_css = 'a.new-courseware-section-button'
-    world.css_click(section_css)
-    save_section_css = 'input.new-section-name-save'
-    world.css_click(save_section_css)
-    subsection_css = 'a.new-subsection-item'
-    world.css_click(subsection_css)
-    save_subsection_css = 'input.new-subsection-name-save'
-    world.css_click(save_subsection_css)
-    expand_css = 'div.section-item a.expand-collapse-icon'
-    world.css_click(expand_css)
-    unit_css = 'a.new-unit-item'
-    world.css_click(unit_css)
+    css_selectors = ['a.new-courseware-section-button', 'input.new-section-name-save', 'a.new-subsection-item', 'input.new-subsection-name-save', 'div.section-item a.expand-collapse-icon', 'a.new-unit-item']
+    for selector in css_selectors:
+        world.css_click(selector)
 
 
 @step(u'I add the following components:')
 def add_components(step):
-    for component in step.hashes:
-        #due to the way lettuce stores the dictionary
-        component = component['Component']
-        #from pdb import set_trace; set_trace()
-        assert component in component_dictionary
-        how_to_add = component_dictionary[component]['steps']
-        for css in how_to_add:
+    for component in [step_hash['Component'] for step_hash in step.hashes]:
+        assert component in COMPONENT_DICTIONARY
+        for css in COMPONENT_DICTIONARY[component]['steps']:
             world.css_click(css)
 
 
 @step(u'I see the following components')
 def check_components(step):
-    for component in step.hashes:
-        component = component['Component']
-        assert component in component_dictionary
-        assert component_dictionary[component]['found']()
+    for component in [step_hash['Component'] for step_hash in step.hashes]:
+        assert component in COMPONENT_DICTIONARY
+        assert COMPONENT_DICTIONARY[component]['found_func']()
 
 
 @step(u'I delete all components')
 def delete_all_components(step):
-    components_num = len(component_dictionary)
-    for delete in range(0, components_num):
+    for _ in range(len(COMPONENT_DICTIONARY)):
         world.css_click('a.delete-button')
 
 
@@ -54,73 +39,90 @@ def see_no_components(steps):
     assert world.is_css_not_present('li.component')
 
 
-component_dictionary = {
+def step_selector_list(data_type, path, index=1):
+    selector_list = ['a[data-type="{}"]'.format(data_type)]
+    if index != 1:
+        selector_list.append('a[id="ui-id-{}"]'.format(index))
+    if path is not None:
+        selector_list.append('a[data-location="{}/{}/{}"]'.format(DATA_LOCATION, data_type, path))
+    return selector_list
+
+
+def found_text_func(text):
+    return lambda: world.browser.is_text_present(text)
+
+
+def found_css_func(css):
+    return lambda: world.is_css_present(css, wait_time=2)
+
+COMPONENT_DICTIONARY = {
     'Discussion': {
-        'steps': ['a[data-type="discussion"]'],
-        'found': lambda: world.is_css_present('section.xmodule_DiscussionModule', wait_time=2)
+        'steps': step_selector_list('discussion', None),
+        'found_func': found_css_func('section.xmodule_DiscussionModule')
     },
     'Announcement': {
-        'steps': ['a[data-type="html"]', 'a[data-location="%s/html/Announcement"]' % data_location],
-        'found': lambda: world.browser.is_text_present('Heading of document')
+        'steps': step_selector_list('html', 'Announcement'),
+        'found_func': found_text_func('Heading of document')
     },
     'Blank HTML': {
-        'steps': ['a[data-type="html"]', 'a[data-location="%s/html/Blank_HTML_Page"]' % data_location],
-        'found': lambda: '\n    \n' in [x.html for x in world.css_find('section.xmodule_HtmlModule')]
+        'steps': step_selector_list('html', 'Blank_HTML_Page'),
+        #this one is a blank html so a more refined search is being done
+        'found_func': lambda: '\n    \n' in [x.html for x in world.css_find('section.xmodule_HtmlModule')]
     },
     'LaTex': {
-        'steps': ['a[data-type="html"]', 'a[data-location="%s/html/E-text_Written_in_LaTeX"]' % data_location],
-        'found': lambda: world.browser.is_text_present('EXAMPLE: E-TEXT PAGE', wait_time=2)
+        'steps': step_selector_list('html', 'E-text_Written_in_LaTeX'),
+        'found_func': found_text_func('EXAMPLE: E-TEXT PAGE')
     },
     'Blank Problem': {
-        'steps': ['a[data-type="problem"]', 'a[data-location="%s/problem/Blank_Common_Problem"]' % data_location],
-        'found': lambda: world.browser.is_text_present('BLANK COMMON PROBLEM', wait_time=2)
+        'steps': step_selector_list('problem', 'Blank_Common_Problem'),
+        'found_func': found_text_func('BLANK COMMON PROBLEM')
     },
     'Dropdown': {
-        'steps': ['a[data-type="problem"]', 'a[data-location="%s/problem/Dropdown"]' % data_location],
-        'found': lambda: world.browser.is_text_present('DROPDOWN', wait_time=2)
+        'steps': step_selector_list('problem', 'Dropdown'),
+        'found_func': found_text_func('DROPDOWN')
     },
     'Multi Choice': {
-        'steps': ['a[data-type="problem"]', 'a[data-location="%s/problem/Multiple_Choice"]' % data_location],
-        'found': lambda: world.browser.is_text_present('MULTIPLE CHOICE', wait_time=2)
+        'steps': step_selector_list('problem', 'Multiple_Choice'),
+        'found_func': found_text_func('MULTIPLE CHOICE')
     },
     'Numerical': {
-        'steps': ['a[data-type="problem"]', 'a[data-location="%s/problem/Numerical_Input"]' % data_location],
-        'found': lambda: world.browser.is_text_present('NUMERICAL INPUT', wait_time=2)
+        'steps': step_selector_list('problem', 'Numerical_Input'),
+        'found_func': found_text_func('NUMERICAL INPUT')
     },
     'Text Input': {
-        'steps': ['a[data-type="problem"]', 'a[data-location="%s/problem/Text_Input"]' % data_location],
-        'found': lambda: world.browser.is_text_present('TEXT INPUT', wait_time=2)
+        'steps': step_selector_list('problem', 'Text_Input'),
+        'found_func': found_text_func('TEXT INPUT')
     },
     'Advanced': {
-        'steps': ['a[data-type="problem"]', 'a[id="ui-id-2"]', 'a[data-location="%s/problem/Blank_Advanced_Problem"]' % data_location],
-        'found': lambda: world.browser.is_text_present('BLANK ADVANCED PROBLEM', wait_time=2)
+        'steps': step_selector_list('problem', 'Blank_Advanced_Problem', index=2),
+        'found_func': found_text_func('BLANK ADVANCED PROBLEM')
     },
     'Circuit': {
-        'steps': ['a[data-type="problem"]', 'a[id="ui-id-2"]', 'a[data-location="%s/problem/Circuit_Schematic_Builder"]' % data_location],
-        'found': lambda: world.browser.is_text_present('CIRCUIT SCHEMATIC BUILDER', wait_time=2)
+        'steps': step_selector_list('problem', 'Circuit_Schematic_Builder', index=2),
+        'found_func': found_text_func('CIRCUIT SCHEMATIC BUILDER')
     },
     'Custom Python': {
-        'steps': ['a[data-type="problem"]', 'a[id="ui-id-2"]', 'a[data-location="%s/problem/Custom_Python-Evaluated_Input"]' % data_location],
-        'found': lambda: world.browser.is_text_present('CUSTOM PYTHON-EVALUATED INPUT', wait_time=2)
+        'steps': step_selector_list('problem', 'Custom_Python-Evaluated_Input', index=2),
+        'found_func': found_text_func('CUSTOM PYTHON-EVALUATED INPUT')
     },
     'Image Mapped': {
-        'steps': ['a[data-type="problem"]', 'a[id="ui-id-2"]', 'a[data-location="%s/problem/Image_Mapped_Input"]' % data_location],
-        'found': lambda: world.browser.is_text_present('IMAGE MAPPED INPUT', wait_time=2)
+        'steps': step_selector_list('problem', 'Image_Mapped_Input', index=2),
+        'found_func': found_text_func('IMAGE MAPPED INPUT')
     },
     'Math Input': {
-        'steps': ['a[data-type="problem"]', 'a[id="ui-id-2"]', 'a[data-location="%s/problem/Math_Expression_Input"]' % data_location],
-        'found': lambda: world.browser.is_text_present('MATH EXPRESSION INPUT', wait_time=2)
+        'steps': step_selector_list('problem', 'Math_Expression_Input', index=2),
+        'found_func': found_text_func('MATH EXPRESSION INPUT')
     },
     'Problem LaTex': {
-        'steps': ['a[data-type="problem"]', 'a[id="ui-id-2"]', 'a[data-location="%s/problem/Problem_Written_in_LaTeX"]' % data_location],
-        'found': lambda: world.browser.is_text_present('PROBLEM WRITTEN IN LATEX', wait_time=2)
+        'steps': step_selector_list('problem', 'Problem_Written_in_LaTeX', index=2),
+        'found_func': found_text_func('PROBLEM WRITTEN IN LATEX')
     },
     'Adaptive Hint': {
-        'steps': ['a[data-type="problem"]', 'a[id="ui-id-2"]', 'a[data-location="%s/problem/Problem_with_Adaptive_Hint"]' % data_location],
-        'found': lambda: world.browser.is_text_present('PROBLEM WITH ADAPTIVE HINT', wait_time=2)
+        'steps': step_selector_list('problem', 'Problem_with_Adaptive_Hint', index=2),
+        'found_func': found_text_func('PROBLEM WITH ADAPTIVE HINT')
     },
     'Video': {
-        'steps': ['a[data-type="video"]'],
-        'found': lambda: world.is_css_present('section.xmodule_VideoModule', wait_time=2)
+        'steps': step_selector_list('video', None),
+        'found_func': found_css_func('section.xmodule_VideoModule')
     }
 }

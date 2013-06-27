@@ -3,7 +3,7 @@ Feature: Component Adding
 
     Scenario: I can add components
         Given I have opened a new course in studio
-        And I am on a new unit
+        And I am editing a new unit
         When I add the following components:
             | Component    |
             | Discussion   |
@@ -46,7 +46,7 @@ Feature: Component Adding
 
     Scenario: I can delete Components
         Given I have opened a new course in studio
-        And I am on a new unit
+        And I am editing a new unit
         And I add the following components:
             | Component    |
             | Discussion   |
