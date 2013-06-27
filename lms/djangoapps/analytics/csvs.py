@@ -27,30 +27,34 @@ def create_csv_response(filename, header, datarows):
 
 def format_dictlist(dictlist):
     """
-    Convert from [
+    Convert FROM [
         {
-            'label1': 'value1,1',
-            'label2': 'value2,1',
-            'label3': 'value3,1',
-            'label4': 'value4,1',
+            'label1': 'value-1,1',
+            'label2': 'value-1,2',
+            'label3': 'value-1,3',
+            'label4': 'value-1,4',
         },
         {
-            'label1': 'value1,2',
-            'label2': 'value2,2',
-            'label3': 'value3,2',
-            'label4': 'value4,2',
+            'label1': 'value-2,1',
+            'label2': 'value-2,2',
+            'label3': 'value-2,3',
+            'label4': 'value-2,4',
         }
     ]
 
-    to {
+    TO {
         'header': ['label1', 'label2', 'label3', 'label4'],
-        'datarows': ['value1,1', 'value2,1', 'value3,1', 'value4,1'], ['value1,2', 'value2,2', 'value3,2', 'value4,2']
+        'datarows': [['value-1,1', 'value-1,2', 'value-1,3', 'value-1,4'],
+                     ['value-2,1', 'value-2,2', 'value-2,3', 'value-2,4']]
     }
 
-    Do not handle empty lists.
+    Assumes all keys for input dicts are the same.
     """
 
-    header = dictlist[0].keys()
+    if len(dictlist) > 0:
+        header = dictlist[0].keys()
+    else:
+        header = []
 
     def dict_to_entry(d):
         ordered = sorted(d.items(), key=lambda (k, v): header.index(k))

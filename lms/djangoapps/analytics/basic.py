@@ -8,8 +8,9 @@ from django.contrib.auth.models import User
 import xmodule.graders as xmgraders
 
 
-AVAILABLE_STUDENT_FEATURES = ['username', 'first_name', 'last_name', 'is_staff', 'email']
-AVAILABLE_PROFILE_FEATURES = ['name', 'language', 'location', 'year_of_birth', 'gender', 'level_of_education', 'mailing_address', 'goals']
+STUDENT_FEATURES = ('username', 'first_name', 'last_name', 'is_staff', 'email')
+PROFILE_FEATURES = ('name', 'language', 'location', 'year_of_birth', 'gender', 'level_of_education', 'mailing_address', 'goals')
+AVAILABLE_FEATURES = STUDENT_FEATURES + PROFILE_FEATURES
 
 
 def enrolled_students_profiles(course_id, features):
@@ -19,10 +20,12 @@ def enrolled_students_profiles(course_id, features):
     # enrollments = CourseEnrollment.objects.filter(course_id=course_id)
     # students = [enrollment.user for enrollment in enrollments]
     students = User.objects.filter(courseenrollment__course_id=course_id).order_by('username').select_related('profile')
+    print len(students)
+    print students
 
     def extract_student(student):
-        student_features = [feature for feature in features if feature in AVAILABLE_STUDENT_FEATURES]
-        profile_features = [feature for feature in features if feature in AVAILABLE_PROFILE_FEATURES]
+        student_features = [feature for feature in features if feature in STUDENT_FEATURES]
+        profile_features = [feature for feature in features if feature in PROFILE_FEATURES]
 
         student_dict = dict((feature, getattr(student, feature)) for feature in student_features)
         profile = student.profile
@@ -35,7 +38,7 @@ def enrolled_students_profiles(course_id, features):
 
 def dump_grading_context(course):
     """
-    Dump information about course grading context (eg which problems are graded in what assignments)
+    Render information about course grading context (eg which problems are graded in what assignments)
     Useful for debugging grading_policy.json and policy.json
 
     Returns HTML string

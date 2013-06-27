@@ -1,0 +1,83 @@
+from django.test import TestCase
+from nose.tools import raises
+from django.contrib.auth.models import User, Group
+from student.models import CourseEnrollment
+from xmodule.modulestore.tests.factories import CourseFactory
+from student.tests.factories import UserFactory
+
+from analytics.distributions import profile_distribution, AVAILABLE_PROFILE_FEATURES
+
+
+class TestAnalyticsDistributions(TestCase):
+    '''Test analytics distribution gathering.'''
+
+    def setUp(self):
+        self.course_id = 'some/robot/course/id'
+
+        self.users = tuple(UserFactory(
+            profile__gender=['m', 'f', 'o'][i % 3],
+            profile__year_of_birth=i + 1930
+        ) for i in xrange(30))
+
+        self.ces = tuple(CourseEnrollment.objects.create(course_id=self.course_id, user=user) for user in self.users)
+
+    @raises(ValueError)
+    def test_profile_distribution_bad_feature(self):
+        feature = 'robot-not-a-real-feature'
+        self.assertNotIn(feature, AVAILABLE_PROFILE_FEATURES)
+        profile_distribution(self.course_id, feature)
+
+    @raises(NotImplementedError)
+    def test_profile_distribution_not_implemented_feature(self):
+        feature = 'ROBOT_DO_NOT_USE_FEATURE'
+        AVAILABLE_PROFILE_FEATURES.append(feature)
+        self.assertIn(feature, AVAILABLE_PROFILE_FEATURES)
+        profile_distribution(self.course_id, feature)
+
+    def test_profile_distribution_easy_choice(self):
+        feature = 'gender'
+        self.assertIn(feature, AVAILABLE_PROFILE_FEATURES)
+        distribution = profile_distribution(self.course_id, feature)
+        self.assertEqual(distribution['type'], 'EASY_CHOICE')
+        self.assertEqual(distribution['data']['no_data'], 0)
+        self.assertEqual(distribution['data']['m'], len(self.users) / 3)
+        self.assertEqual(distribution['display_names']['m'], 'Male')
+
+    def test_profile_distribution_open_choice(self):
+        feature = 'year_of_birth'
+        self.assertIn(feature, AVAILABLE_PROFILE_FEATURES)
+        distribution = profile_distribution(self.course_id, feature)
+        print distribution
+        self.assertEqual(distribution['type'], 'OPEN_CHOICE')
+        self.assertNotIn('display_names', distribution)
+        self.assertNotIn('no_data', distribution['data'])
+        self.assertEqual(distribution['data'][1930], 1)
+
+
+class TestAnalyticsDistributionsNoData(TestCase):
+    '''Test analytics distribution gathering.'''
+
+    def setUp(self):
+        self.course_id = 'some/robot/course/id'
+
+        self.users = tuple(UserFactory(
+            profile__year_of_birth=i + 1930,
+        ) for i in xrange(5))
+
+        self.nodata_users = tuple(UserFactory(
+            profile__year_of_birth=None,
+        ) for _ in xrange(4))
+
+        self.users += self.nodata_users
+
+        self.ces = tuple(CourseEnrollment.objects.create(course_id=self.course_id, user=user) for user in self.users)
+
+    def test_profile_distribution_open_choice_nodata(self):
+        feature = 'year_of_birth'
+        self.assertIn(feature, AVAILABLE_PROFILE_FEATURES)
+        distribution = profile_distribution(self.course_id, feature)
+        print distribution
+        self.assertEqual(distribution['type'], 'OPEN_CHOICE')
+        self.assertNotIn('display_names', distribution)
+        self.assertIn('no_data', distribution['data'])
+        self.assertEqual(distribution['data']['no_data'], len(self.nodata_users))

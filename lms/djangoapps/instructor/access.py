@@ -88,7 +88,5 @@ def update_forum_role_membership(course_id, user, rolename, mode):
         role.users.add(user)
     elif mode == 'revoke':
         role.users.remove(user)
-        print "\n" * 5
-        print role.users.all()
     else:
         raise ValueError("unrecognized mode '{}'".format(mode))
