@@ -67,6 +67,7 @@ def user_track(request):
         "time": datetime.datetime.now(UTC).isoformat(),
         "host": request.META['SERVER_NAME'],
     }
+
     log_event(event)
     return HttpResponse('success')
 
