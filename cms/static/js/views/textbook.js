@@ -213,7 +213,8 @@ CMS.Views.EditChapter = Backbone.View.extend({
         this.$el.html(this.template({
             name: this.model.escape('name'),
             asset_path: this.model.escape('asset_path'),
-            order: this.model.get('order')
+            order: this.model.get('order'),
+            error: this.model.validationError
         }));
         return this;
     },
@@ -267,7 +268,7 @@ CMS.Views.UploadDialog = Backbone.View.extend({
             uploadedBytes: this.model.get('uploadedBytes'),
             totalBytes: this.model.get('totalBytes'),
             finished: this.model.get('finished'),
-            error: this.model.get('error')
+            error: this.model.validationError
         }));
         // ideally, we'd like to tell the browser to pre-populate the
         // <input type="file"> with the selectedFile if we have one -- but
@@ -286,8 +287,7 @@ CMS.Views.UploadDialog = Backbone.View.extend({
     },
     selectFile: function(e) {
         this.model.set({
-            selectedFile: e.target.files[0] || null,
-            error: null
+            selectedFile: e.target.files[0] || null
         });
     },
     show: function(e) {
@@ -308,8 +308,7 @@ CMS.Views.UploadDialog = Backbone.View.extend({
     },
     handleInvalid: function(model, error, options) {
         model.set({
-            selectedFile: null,
-            error: error
+            selectedFile: null
         });
     },
     upload: function(e) {

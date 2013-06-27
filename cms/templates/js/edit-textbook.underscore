@@ -1,14 +1,14 @@
 <form class="edit-textbook" id="edit_textbook_form">
   <div class="wrapper-form">
-  <% if (error) { %>
+  <% if (error && error.message) { %>
     <div id="edit_textbook_error" class="message message-status message-status error is-shown" name="edit_textbook_error">
-      <%= error %>
+      <%= gettext(error.message) %>
     </div>
   <% } %>
 
   <fieldset class="textbook-fields">
     <legend class="sr"><%= gettext("Textbook information") %></legend>
-        <div class="input-wrap field text required add-textbook-name">
+        <div class="input-wrap field text required add-textbook-name <% if(error && error.attributes && error.attributes.name) { print('error'); } %>">
           <label for="textbook-name-input"><%= gettext("Textbook Name") %></label>
           <input id="textbook-name-input" name="textbook-name" type="text" placeholder="<%= gettext("Introduction to Cookie Baking") %>" value="<%= name %>">
           <span class="tip tip-stacked"><%= gettext("the title/name of the text book as you would like your students to see it.") %></span>

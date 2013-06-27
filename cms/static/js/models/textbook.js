@@ -59,25 +59,37 @@ CMS.Models.Textbook = Backbone.AssociatedModel.extend({
     },
     validate: function(attrs, options) {
         if (!attrs.name) {
-            return "Textbook name is required";
+            return {
+                message: "Textbook name is required",
+                attributes: {name: true}
+            };
         }
         if (attrs.chapters.length === 0) {
-            return "Please add at least one asset";
+            return {
+                message: "Please add at least one asset",
+                attributes: {chapters: true}
+            };
         } else if (attrs.chapters.length === 1) {
             // only asset_path is required: we don't need a name
             if (!attrs.chapters.first().get('asset_path')) {
-                return "Please add at least one asset";
+                return {
+                    message: "Please add at least one asset",
+                    attributes: {chapters: true}
+                };
             }
         } else {
             // validate all chapters
-            var allChaptersValid = true;
+            var invalidChapters = [];
             attrs.chapters.each(function(chapter) {
                 if(!chapter.isValid()) {
-                    allChaptersValid = false;
+                    invalidChapters.push(chapter);
                 }
             });
-            if(!allChaptersValid) {
-                return "All chapters must have a name and asset";
+            if(invalidChapters) {
+                return {
+                    message: "All chapters must have a name and asset",
+                    attributes: {chapters: invalidChapters}
+                };
             }
         }
     }
@@ -119,11 +131,20 @@ CMS.Models.Chapter = Backbone.AssociatedModel.extend({
     },
     validate: function(attrs, options) {
         if(!attrs.name && !attrs.asset_path) {
-            return "Chapter name and asset_path are both required";
+            return {
+                message: "Chapter name and asset_path are both required",
+                attributes: {name: true, asset_path: true}
+            };
         } else if(!attrs.name) {
-            return "Chapter name is required";
+            return {
+                message: "Chapter name is required",
+                attributes: {name: true}
+            };
         } else if (!attrs.asset_path) {
-            return "asset_path is required";
+            return {
+                message: "asset_path is required",
+                attributes: {asset_path: true}
+            };
         }
     }
 });
@@ -150,7 +171,10 @@ CMS.Models.FileUpload = Backbone.Model.extend({
     },
     validate: function(attrs, options) {
         if(attrs.selectedFile && attrs.selectedFile.type !== "application/pdf") {
-            return gettext("Only PDF files can be uploaded. Please select a file ending in .pdf to upload.");
+            return {
+                message: "Only PDF files can be uploaded. Please select a file ending in .pdf to upload.",
+                attributes: {selectedFile: true}
+            };
         }
     }
 });
