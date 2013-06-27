@@ -31,14 +31,16 @@ class JsonResponse(HttpResponse):
     """
     Django HttpResponse subclass that has sensible defaults for outputting JSON.
     """
-    def __init__(self, object=None, *args, **kwargs):
+    def __init__(self, object=None, status=None, encoder=DjangoJSONEncoder,
+                 *args, **kwargs):
         if object in (None, ""):
             content = ""
-            kwargs.setdefault("status", 204)
+            status = status or 204
         elif isinstance(object, QuerySet):
             content = serialize('json', object)
         else:
-            content = json.dumps(object, indent=2, cls=DjangoJSONEncoder,
-                                 ensure_ascii=False)
+            content = json.dumps(object, cls=encoder, indent=2, ensure_ascii=False)
         kwargs.setdefault("content_type", "application/json")
+        if status:
+            kwargs["status"] = status
         super(JsonResponse, self).__init__(content, *args, **kwargs)

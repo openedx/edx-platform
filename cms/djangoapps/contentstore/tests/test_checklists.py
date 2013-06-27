@@ -117,4 +117,4 @@ class ChecklistTestCase(CourseTestCase):
                                                            'name': self.course.location.name,
                                                            'checklist_index': 100})
         response = self.client.delete(update_url)
-        self.assertContains(response, 'Unsupported request', status_code=400)
+        self.assertEqual(response.status_code, 405)

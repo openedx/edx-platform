@@ -15,7 +15,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.util.date_utils import get_default_time_display
 
 from xblock.core import Scope
-from util.json_request import expect_json
+from util.json_request import expect_json, JsonResponse
 
 from contentstore.module_info_model import get_module_info, set_module_info
 from contentstore.utils import get_modulestore, get_lms_link_for_item, \
@@ -236,11 +236,9 @@ def assignment_type_update(request, org, course, category, name):
         raise HttpResponseForbidden()
 
     if request.method == 'GET':
-        return HttpResponse(json.dumps(CourseGradingModel.get_section_grader_type(location)),
-                            mimetype="application/json")
+        return JsonResponse(CourseGradingModel.get_section_grader_type(location))
     elif request.method == 'POST':  # post or put, doesn't matter.
-        return HttpResponse(json.dumps(CourseGradingModel.update_section_grader_type(location, request.POST)),
-                            mimetype="application/json")
+        return JsonResponse(CourseGradingModel.update_section_grader_type(location, request.POST))
 
 
 @login_required
@@ -309,8 +307,8 @@ def module_info(request, module_location):
         raise PermissionDenied()
 
     if real_method == 'GET':
-        return HttpResponse(json.dumps(get_module_info(get_modulestore(location), location, rewrite_static_links=rewrite_static_links)), mimetype="application/json")
+        return JsonResponse(get_module_info(get_modulestore(location), location, rewrite_static_links=rewrite_static_links))
     elif real_method == 'POST' or real_method == 'PUT':
-        return HttpResponse(json.dumps(set_module_info(get_modulestore(location), location, request.POST)), mimetype="application/json")
+        return JsonResponse(set_module_info(get_modulestore(location), location, request.POST))
     else:
         return HttpResponseBadRequest()
