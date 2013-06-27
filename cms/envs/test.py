@@ -48,7 +48,7 @@ MODULESTORE_OPTIONS = {
     'db': 'test_xmodule',
     'collection': 'test_modulestore',
     'fs_root': TEST_ROOT / "data",
-    'render_template': 'mitxmako.shortcuts.render_to_string'
+    'render_template': 'mitxmako.shortcuts.render_to_string',
 }
 
 MODULESTORE = {
