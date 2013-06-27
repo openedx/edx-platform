@@ -74,12 +74,16 @@ class HintManagerTest(ModuleStoreTestCase):
         rejected.
         """
         out = self.c.post(self.url, {'op': 'delete hints', 'field': 'all your private data'})
-        # Keep this around for reference - might be useful later.
-        # request = RequestFactory()
-        # post = request.post(self.url, {'op': 'delete hints', 'field': 'all your private data'})
-        # out = view.hint_manager(post, 'Me/19.002/test_course')
         print out
         self.assertTrue('an invalid field was accessed' in out.content)
+
+    def test_switchfields(self):
+        """
+        Checks that the op: 'switch fields' POST request works.
+        """
+        out = self.c.post(self.url, {'op': 'switch fields', 'field': 'mod_queue'})
+        print out
+        self.assertTrue('Hint 2' in out.content)
 
     def test_gethints(self):
         """
@@ -92,6 +96,21 @@ class HintManagerTest(ModuleStoreTestCase):
         self.assertTrue(out['other_field'] == 'hints')
         expected = {self.problem_id: [(u'2.0', {u'2': [u'Hint 2', 1]})]}
         self.assertTrue(out['all_hints'] == expected)
+
+    def test_gethints_other(self):
+        """
+        Same as above, with hints instead of mod_queue
+        """
+        request = RequestFactory()
+        post = request.post(self.url, {'field': 'hints'})
+        out = view.get_hints(post, self.course_id, 'hints')
+        print out
+        self.assertTrue(out['other_field'] == 'mod_queue')
+        expected = {self.problem_id: [('1.0', {'1': ['Hint 1', 2],
+                                               '3': ['Hint 3', 12]}),
+                                      ('2.0', {'4': ['Hint 4', 3]})
+                                      ]}
+        self.assertTrue(out['all_hints'] == expected)        
 
     def test_deletehints(self):
         """
@@ -119,7 +138,35 @@ class HintManagerTest(ModuleStoreTestCase):
         print json.loads(problem_hints)['1.0']['1']
         self.assertTrue(json.loads(problem_hints)['1.0']['1'][1] == 5)
 
+    def test_addhint(self):
+        """
+        Check that instructors can add new hints.
+        """
+        request = RequestFactory()
+        post = request.post(self.url, {'field': 'mod_queue',
+                                       'op': 'add hint',
+                                       'problem': self.problem_id,
+                                       'answer': '3.14',
+                                       'hint': 'This is a new hint.'})
+        view.add_hint(post, self.course_id, 'mod_queue')
+        problem_hints = XModuleContentField.objects.get(field_name='mod_queue', definition_id=self.problem_id).value
+        self.assertTrue('3.14' in json.loads(problem_hints))
 
+    def test_approve(self):
+        """
+        Check that instructors can approve hints.  (Move them
+        from the mod_queue to the hints.)
+        """
+        request = RequestFactory()
+        post = request.post(self.url, {'field': 'mod_queue',
+                                       'op': 'approve',
+                                       1: [self.problem_id, '2.0', '2']})
+        view.approve(post, self.course_id, 'mod_queue')
+        problem_hints = XModuleContentField.objects.get(field_name='mod_queue', definition_id=self.problem_id).value
+        self.assertTrue('2.0' not in json.loads(problem_hints) or len(json.loads(problem_hints)['2.0']) == 0)
+        problem_hints = XModuleContentField.objects.get(field_name='hints', definition_id=self.problem_id).value
+        self.assertTrue(json.loads(problem_hints)['2.0']['2'] == ['Hint 2', 1])
+        self.assertTrue(len(json.loads(problem_hints)['2.0']) == 2)
 
 
 
