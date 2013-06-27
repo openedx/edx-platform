@@ -88,6 +88,13 @@ class VideoDescriptor(VideoFields,
     module_class = VideoModule
     template_dir_name = "video"
 
+    def __init__(self, *args, **kwargs):
+        super(VideoDescriptor, self).__init__(*args, **kwargs)
+        # If we don't have a `youtube_id_1_0`, this is an XML course
+        # and we parse out the fields.
+        if self.data and 'youtube_id_1_0' not in self._model_data:
+            _parse_video_xml(self, self.data)
+
     @property
     def non_editable_metadata_fields(self):
         non_editable_fields = super(MetadataOnlyEditingDescriptor, self).non_editable_metadata_fields
@@ -108,45 +115,52 @@ class VideoDescriptor(VideoFields,
             url identifiers
         """
         video = super(VideoDescriptor, cls).from_xml(xml_data, system, org, course)
-        xml = etree.fromstring(xml_data)
-
-        display_name = xml.get('display_name')
-        if display_name:
-            video.display_name = display_name
-
-        youtube = xml.get('youtube')
-        if youtube:
-            speeds = _parse_youtube(youtube)
-            if speeds['0.75']:
-                video.youtube_id_0_75 = speeds['0.75']
-            if speeds['1.00']:
-                video.youtube_id_1_0 = speeds['1.00']
-            if speeds['1.25']:
-                video.youtube_id_1_25 = speeds['1.25']
-            if speeds['1.50']:
-                video.youtube_id_1_5 = speeds['1.50']
-
-        show_captions = xml.get('show_captions')
-        if show_captions:
-            video.show_captions = json.loads(show_captions)
-
-        source = _get_first_external(xml, 'source')
-        if source:
-            video.source = source
-
-        track = _get_first_external(xml, 'track')
-        if track:
-            video.track = track
-
-        start_time = _parse_time(xml.get('from'))
-        if start_time:
-            video.start_time = start_time
-
-        end_time = _parse_time(xml.get('to'))
-        if end_time:
-            video.end_time = end_time
-
+        _parse_video_xml(video, xml_data)
         return video
+
+
+def _parse_video_xml(video, xml_data):
+    """
+    Parse video fields out of xml_data. The fields are set if they are
+    present in the XML.
+    """
+    xml = etree.fromstring(xml_data)
+
+    display_name = xml.get('display_name')
+    if display_name:
+        video.display_name = display_name
+
+    youtube = xml.get('youtube')
+    if youtube:
+        speeds = _parse_youtube(youtube)
+        if speeds['0.75']:
+            video.youtube_id_0_75 = speeds['0.75']
+        if speeds['1.00']:
+            video.youtube_id_1_0 = speeds['1.00']
+        if speeds['1.25']:
+            video.youtube_id_1_25 = speeds['1.25']
+        if speeds['1.50']:
+            video.youtube_id_1_5 = speeds['1.50']
+
+    show_captions = xml.get('show_captions')
+    if show_captions:
+        video.show_captions = json.loads(show_captions)
+
+    source = _get_first_external(xml, 'source')
+    if source:
+        video.source = source
+
+    track = _get_first_external(xml, 'track')
+    if track:
+        video.track = track
+
+    start_time = _parse_time(xml.get('from'))
+    if start_time:
+        video.start_time = start_time
+
+    end_time = _parse_time(xml.get('to'))
+    if end_time:
+        video.end_time = end_time
 
 
 def _get_first_external(xmltree, tag):
