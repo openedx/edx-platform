@@ -203,7 +203,7 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
             if answer in self.hints:
                 # Go through each hint, and add to index_to_hints
                 for hint_id in hints_offered:
-                    if hint_id is None:
+                    if hint_id is not None:
                         try:
                             index_to_hints[i].append((self.hints[answer][str(hint_id)][0], hint_id))
                         except KeyError:

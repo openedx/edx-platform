@@ -27,6 +27,8 @@ MITX_FEATURES['ENABLE_DISCUSSION_SERVICE'] = False
 
 MITX_FEATURES['ENABLE_SERVICE_STATUS'] = True
 
+MITX_FEATURES['ENABLE_HINTER_INSTRUCTOR_VIEW'] = True
+
 # Need wiki for courseware views to work. TODO (vshnayder): shouldn't need it.
 WIKI_ENABLED = True
 
