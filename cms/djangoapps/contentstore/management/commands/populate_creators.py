@@ -1,5 +1,7 @@
 """
 Script for granting existing course instructors course creator privileges.
+
+This script is only intended to be run once on a given environment.
 """
 from auth.authz import _grant_instructors_creator_access
 from django.core.management.base import BaseCommand

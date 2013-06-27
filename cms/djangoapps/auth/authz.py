@@ -210,7 +210,10 @@ def is_user_in_creator_group(user):
 def _grant_instructors_creator_access(caller):
     """
     This is to be called only by either a command line code path or through an app which has already
-    asserted permissions to do this action
+    asserted permissions to do this action.
+
+    Gives all users with instructor role course creator rights.
+    This is only intended to be run once on a given environment.
     """
     for group in Group.objects.all():
         if group.name.startswith(INSTRUCTOR_ROLE_NAME + "_"):
