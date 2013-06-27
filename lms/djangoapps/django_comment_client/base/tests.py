@@ -1,6 +1,5 @@
 import logging
 
-from django.conf import settings
 from django.test.utils import override_settings
 from django.test.client import Client
 from django.contrib.auth.models import User
@@ -21,16 +20,13 @@ log = logging.getLogger(__name__)
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 @patch('comment_client.utils.requests.request')
 class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
+
+    @patch.dict("django.conf.settings.MITX_FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
 
-        # This feature affects the contents of urls.py, so we change
-        # it before the call to super.setUp() which reloads urls.py (because
+        # Patching the ENABLE_DISCUSSION_SERVICE value affects the contents of urls.py,
+        # so we need to call super.setUp() which reloads urls.py (because
         # of the UrlResetMixin)
-
-        # This setting is cleaned up at the end of the test by @override_settings, which
-        # restores all of the old settings
-        settings.MITX_FEATURES['ENABLE_DISCUSSION_SERVICE'] = True
-
         super(ViewsTestCase, self).setUp()
 
         # create a course
