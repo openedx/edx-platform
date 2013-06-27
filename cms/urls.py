@@ -25,6 +25,7 @@ urlpatterns = ('',  # nopep8
     url(r'^reorder_static_tabs', 'contentstore.views.reorder_static_tabs', name='reorder_static_tabs'),
     url(r'^import_subtitles$', 'contentstore.views.import_subtitles', name='import_subtitles'),
     url(r'^upload_subtitles$', 'contentstore.views.upload_subtitles', name='upload_subtitles'),
+    url(r'^download_subtitles$', 'contentstore.views.download_subtitles', name='download_subtitles'),
 
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<name>[^/]+)$',
         'contentstore.views.course_index', name='course_index'),

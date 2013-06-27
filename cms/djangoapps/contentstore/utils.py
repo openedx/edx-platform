@@ -9,13 +9,14 @@ import logging
 import re
 import json
 import HTMLParser
+import StringIO
 from functools import wraps
 
 import requests
 from lxml import etree
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from pysrt import SubRipFile
+from pysrt import SubRipTime, SubRipItem, SubRipFile
 
 from cache_toolbox.core import del_cached_content
 from django_comment_client.utils import JsonResponse
@@ -457,3 +458,31 @@ def generate_subs_from_source(speed_subs, subs_type, subs_filedata, item):
             item)
 
     return True
+
+
+def generate_srt_from_sjson(sjson_subs, speed):
+    """Generate subtitles with speed = 1.0 from sjson to SubRip (*.srt).
+
+    :param sjson_subs: "sjson" subs.
+    :param speed: speed of `sjson_subs`.
+    :returns: "srt" subs.
+    """
+    if len(sjson_subs['start']) != len(sjson_subs['end']) or \
+       len(sjson_subs['start']) != len(sjson_subs['text']):
+        return None
+
+    sjson_speed_1 = generate_subs(speed, 1, sjson_subs)
+    output = StringIO.StringIO()
+
+    for i in range(len(sjson_speed_1['start'])):
+        item = SubRipItem(
+            index=i,
+            start=SubRipTime(milliseconds=sjson_speed_1['start'][i]),
+            end=SubRipTime(milliseconds=sjson_speed_1['end'][i]),
+            text=sjson_speed_1['text'][i])
+        output.write(unicode(item))
+        output.write('\n')
+
+    output.seek(0)
+
+    return output.read()
