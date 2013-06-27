@@ -1,3 +1,6 @@
+"""
+Script for granting existing course instructors course creator privileges.
+"""
 from auth.authz import _grant_instructors_creator_access
 from django.core.management.base import BaseCommand
 
@@ -6,9 +9,15 @@ from django.db.utils import IntegrityError
 
 
 class Command(BaseCommand):
+    """
+    Script for granting existing course instructors course creator privileges.
+    """
     help = 'Grants all users with INSTRUCTOR role permission to create courses'
 
     def handle(self, *args, **options):
+        """
+        The logic of the command.
+        """
         username = 'populate_creators_command'
         email = 'grant+creator+access@edx.org'
         try:
