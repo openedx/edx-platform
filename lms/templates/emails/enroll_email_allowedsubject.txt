@@ -1,0 +1,1 @@
+You have been invited to register for ${course_id}

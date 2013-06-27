@@ -13,15 +13,16 @@ data: |
 
   <script type="loncapa/python">
 
-  def test_add_to_ten(expect,ans):
-    a1=float(ans[0])
-    a2=float(ans[1])
-    return (a1+a2)==10
+  def test_add(expect, ans):
+      try:
+          a1=int(ans[0])
+          a2=int(ans[1])
+          return (a1+a2) == int(expect)
+      except ValueError:
+          return False
 
-  def test_add(expect,ans):
-    a1=float(ans[0])
-    a2=float(ans[1])
-    return (a1+a2)== float(expect)
+  def test_add_to_ten(expect, ans):
+      return test_add(10, ans)
 
   </script>
 
@@ -40,7 +41,7 @@ data: |
       <solution>
           <div class="detailed-solution">
               <p>Explanation</p>
-              <p>Any set of values on the line \(y = 10 - x\) and \(y = 20 - x\) satisfy these constraints.</p>
+              <p>Any set of integers on the line \(y = 10 - x\) and \(y = 20 - x\) satisfy these constraints.</p>
               <img src="/static/images/simple_graph.png"/>
           </div>
       </solution>

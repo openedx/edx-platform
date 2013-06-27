@@ -22,7 +22,7 @@ from instructor_task.tests.test_base import (InstructorTaskTestCase,
 
 class InstructorTaskReportTest(InstructorTaskTestCase):
     """
-    Tests API and view methods that involve the reporting of status for background tasks.
+    Tests API methods that involve the reporting of status for background tasks.
     """
 
     def test_get_running_instructor_tasks(self):

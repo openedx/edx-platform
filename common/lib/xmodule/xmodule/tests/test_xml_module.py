@@ -248,7 +248,7 @@ class TestDeserializeFloat(TestDeserialize):
     test_field = Float
 
     def test_deserialize(self):
-        self.assertDeserializeEqual( -2, '-2')
+        self.assertDeserializeEqual(-2, '-2')
         self.assertDeserializeEqual("450", '"450"')
         self.assertDeserializeEqual(-2.78, '-2.78')
         self.assertDeserializeEqual("0.45", '"0.45"')
@@ -256,7 +256,7 @@ class TestDeserializeFloat(TestDeserialize):
         # False can be parsed as a float (converts to 0)
         self.assertDeserializeEqual(False, 'false')
         # True can be parsed as a float (converts to 1)
-        self.assertDeserializeEqual( True, 'true')
+        self.assertDeserializeEqual(True, 'true')
 
     def test_deserialize_unsupported_types(self):
         self.assertDeserializeEqual('[3]', '[3]')

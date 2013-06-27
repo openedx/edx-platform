@@ -240,13 +240,13 @@ def import_course(request, org, course, name):
         # find the 'course.xml' file
 
         for dirpath, _dirnames, filenames in os.walk(course_dir):
-            for files in filenames:
-                if files == 'course.xml':
+            for filename in filenames:
+                if filename == 'course.xml':
                     break
-            if files == 'course.xml':
+            if filename == 'course.xml':
                 break
 
-        if files != 'course.xml':
+        if filename != 'course.xml':
             return HttpResponse(json.dumps({'ErrMsg': 'Could not find the course.xml file in the package.'}))
 
         logging.debug('found course.xml at {0}'.format(dirpath))
