@@ -36,7 +36,7 @@ def get_course_groupname_for_role(location, role):
 
 def get_users_in_course_group_by_role(location, role):
     groupname = get_course_groupname_for_role(location, role)
-    (group, created) = Group.objects.get_or_create(name=groupname)
+    (group, _created) = Group.objects.get_or_create(name=groupname)
     return group.user_set.all()
 
 
@@ -59,6 +59,7 @@ def create_new_course_group(creator, location, role):
 
     return
 
+
 def _delete_course_group(location):
     """
     This is to be called only by either a command line code path or through a app which has already
@@ -74,6 +75,7 @@ def _delete_course_group(location):
     for user in staff.user_set.all():
         user.groups.remove(staff)
         user.save()
+
 
 def _copy_course_group(source, dest):
     """

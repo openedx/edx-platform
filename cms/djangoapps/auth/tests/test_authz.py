@@ -184,8 +184,8 @@ class GrantInstructorsCreatorAccessTest(TestCase):
         """
         Creates a course with one instructor and one staff member.
         """
-        creator = User.objects.create_user('testcreator'+str(index), 'testcreator+courses@edx.org', 'foo')
-        staff = User.objects.create_user('teststaff'+str(index), 'teststaff+courses@edx.org', 'foo')
+        creator = User.objects.create_user('testcreator' + str(index), 'testcreator+courses@edx.org', 'foo')
+        staff = User.objects.create_user('teststaff' + str(index), 'teststaff+courses@edx.org', 'foo')
         location = 'i4x', 'mitX', str(index), 'course', 'test'
         create_all_course_groups(creator, location)
         add_user_to_course_group(creator, staff, location, STAFF_ROLE_NAME)
@@ -213,4 +213,3 @@ class GrantInstructorsCreatorAccessTest(TestCase):
             self.assertTrue(is_user_in_creator_group(creator2))
             self.assertFalse(is_user_in_creator_group(staff1))
             self.assertFalse(is_user_in_creator_group(staff2))
-
