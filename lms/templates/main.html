@@ -1,3 +1,5 @@
+<%! from django.utils.translation import ugettext as _ %>
+
 <%namespace name='static' file='static_content.html'/>
 <%! from django.utils import html %>
 
@@ -18,10 +20,10 @@
 <head>
   <%block name="title">
     % if stanford_theme_enabled():
-      <title>Home | class.stanford.edu</title>
+      <title>${_("Home | class.stanford.edu")}</title>
     % else:
-      <title>edX</title>
-      
+      <title>${_("edX")}</title>
+
       <script type="text/javascript">
         /* immediately break out of an iframe if coming from the marketing website */
         (function(window) {
@@ -32,6 +34,20 @@
       </script>
     % endif
   </%block>
+      <title>${_("edX")}</title>
+    % endif
+  </%block>
+  <script type="text/javascript" src="/jsi18n/"></script>
+  <script type="text/javascript">
+
+  /* immediately break out of an iframe if coming
+     from the marketing website */
+  (function(window) {
+    if (window.location !== window.top.location) {
+      window.top.location = window.location;
+    }
+  })(this);
+  </script>
 
   <link rel="icon" type="image/x-icon" href="${static.url(settings.FAVICON_PATH)}" />
 

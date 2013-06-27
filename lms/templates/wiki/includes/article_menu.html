@@ -1,3 +1,4 @@
+<%! from django.utils.translation import ugettext as _ %>
 ## mako
 <%! 
   from django.core.urlresolvers import reverse
@@ -40,7 +41,7 @@
 
 
 <%doc>
-This should be enabled for all non-anonymous users once the notifications app has been integrated and styled.
+${_("This should be enabled for all non-anonymous users once the notifications app has been integrated and styled.")}
 </%doc>
 
 %if can_change_permissions(article,user):

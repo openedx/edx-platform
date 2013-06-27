@@ -1,8 +1,9 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%inherit file="../main.html" />
 
-<%block name="title"><title>404</title></%block>
+<%block name="title"><title>${_("404")}</title></%block>
 
 <section class="outside-app">
-  <h1>Page not found</h1>
-  <p>The page that you were looking for was not found. Go back to the <a href="/">homepage</a> or let us know about any pages that may have been moved at <a href="mailto:${settings.TECH_SUPPORT_EMAIL}">${settings.TECH_SUPPORT_EMAIL}</a>.</p>
+<h1>${_("Page not found")}</h1>
+<p>${_('The page that you were looking for was not found. Go back to the <a href="/">homepage</a> or let us know about any pages that may have been moved at <a href="mailto:%s">%s</a>.') % {settings.TECH_SUPPORT_EMAIL, settings.TECH_SUPPORT_EMAIL}}</p>
 </section>

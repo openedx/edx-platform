@@ -8,13 +8,13 @@
     id="<%= 'course-checklist' + checklistIndex %>">
     <% var widthPercentage = 'width:' + percentChecked + '%;'; %>
     <span class="viz viz-checklist-status"><span class="viz value viz-checklist-status-value" style="<%= widthPercentage %>">
-        <span class="int"><%= percentChecked %></span>% of checklist completed</span></span>
+        <span class="int"><%= percentChecked %></span>${_("% of checklist completed")}</span></span>
     <header>
         <h3 class="checklist-title title-2 is-selectable" title="Collapse/Expand this Checklist">
             <i class="icon-caret-down ui-toggle-expansion"></i>
             <%= checklistShortDescription %></h3>
               <span class="checklist-status status">
-                Tasks Completed: <span class="status-count"><%= itemsChecked %></span>/<span class="status-amount"><%= items.length %></span>
+                ${_("Tasks Completed:")} <span class="status-count"><%= itemsChecked %></span>/<span class="status-amount"><%= items.length %></span>
                 <i class="icon-ok"></i>
               </span>
     </header>

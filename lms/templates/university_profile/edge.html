@@ -1,33 +1,34 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%inherit file="../stripped-main.html" />
 <%! from django.core.urlresolvers import reverse %>
-<%block name="title"><title>edX edge</title></%block>
+<%block name="title"><title>${_("edX edge")}</title></%block>
 <%block name="bodyclass">no-header edge-landing</%block>
 
 <%block name="content">
 <div class="main-wrapper">
-  <div class="edx-edge-logo-large">edX edge</div>
+  <div class="edx-edge-logo-large">${_("edX edge")}</div>
   <div class="content">
     <div class="log-in-form">
-      <h2>Log in to your courses</h2>
+      <h2>${_("Log in to your courses")}</h2>
       <form id="login_form" data-remote="true" method="post" action="/login_ajax">
         <div class="row">
-          <label>Email</label>
+          <label>${_("Email")}</label>
           <input name="email" type="email" class="email-field" tabindex="1">
         </div>
         <div class="row">
-          <label>Password</label>
+          <label>${_("Password")}</label>
           <input name="password" type="password" class="password-field" tabindex="2">
         </div>
         <div class="row submit">
-          <input name="submit" type="submit" value="Log In" class="log-in-submit-button" tabindex="3">
-          <a href="#forgot-password-modal"  rel="leanModal" class="pwd-reset forgot-button">Forgot password?</a>
+          <input name="submit" type="submit" value="${_("Log In")}" class="log-in-submit-button" tabindex="3">
+          <a href="#forgot-password-modal"  rel="leanModal" class="pwd-reset forgot-button">${_("Forgot password?")}</a>
         </div>
       </form>
     </div>
     <div class="sign-up">
-      <h3>Register for classes</h3>
-      <p>Take free online courses from today's leading universities.</p>
-      <p><a href="#signup-modal" id="signup" rel="leanModal" class="register-button">Register</a></p>
+      <h3>${_("Register for classes")}</h3>
+      <p>${_("Take free online courses from today's leading universities.")}</p>
+      <p><a href="#signup-modal" id="signup" rel="leanModal" class="register-button">${_("Register")}</a></p>
     </div>
   </div>
 </div>

@@ -1,7 +1,8 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%inherit file="base.html" />
 <%namespace name='static' file='../static_content.html'/>
 
-<%block name="title"><title>McGillX</title></%block>
+<%block name="title"><title>${_("McGillX")}</title></%block>
 
 <%block name="university_header">
   <header class="search" style="background: url('/static/images/university/mcgill/mcgill-cover.jpg')">
@@ -10,7 +11,7 @@
         <div class="logo">
            <img src="${static.url('images/university/mcgill/mcgill.png')}" />
         </div>
-        <h1>McGillX</h1>
+        <h1>${_("McGillX")}</h1>
       </hgroup>
     </div>
   </header>
@@ -18,7 +19,7 @@
 </%block>
 
 <%block name="university_description">
-    <p>McGill University is one of Canada's best-known institutions of higher learning and one of the leading universities in the world. McGill is located in vibrant multicultural Montreal, in the province of Quebec. Our 11 faculties and 11 professional schools offer more than 300 programs to some 38,000 graduate, undergraduate and continuing studies students. McGill ranks 1st in Canada among medical-doctoral universities (Maclean’s) and 18th in the world (QS World University Rankings).</p>
+    <p>${_("McGill University is one of Canada's best-known institutions of higher learning and one of the leading universities in the world. McGill is located in vibrant multicultural Montreal, in the province of Quebec. Our 11 faculties and 11 professional schools offer more than 300 programs to some 38,000 graduate, undergraduate and continuing studies students. McGill ranks 1st in Canada among medical-doctoral universities (Maclean\'s) and 18th in the world (QS World University Rankings).")}</p>
 </%block>
 
 ${parent.body()}

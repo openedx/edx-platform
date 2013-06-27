@@ -59,7 +59,20 @@ urlpatterns = ('',  # nopep8
         name='auth_password_reset_done'),
 
     url(r'^heartbeat$', include('heartbeat.urls')),
+
 )
+
+js_info_dict = {
+    'domain': 'djangojs',
+    'packages': ('lms',),
+}
+
+urlpatterns += (
+    # Serve catalog of localized strings to be rendered by Javascript
+    url(r'^jsi18n/$', 'django.views.i18n.javascript_catalog', js_info_dict),
+)
+
+
 
 # University profiles only make sense in the default edX context
 if not settings.MITX_FEATURES["USE_CUSTOM_THEME"]:

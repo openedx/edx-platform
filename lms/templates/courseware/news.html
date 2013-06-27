@@ -1,7 +1,8 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%inherit file="main.html" />
 <%namespace name='static' file='../static_content.html'/>
 <%block name="bodyclass">courseware news</%block>
-<%block name="title"><title>News – MITx 6.002x</title></%block>
+<%block name="title"><title>${_("News - MITx 6.002x")}</title></%block>
 
 <%block name="headextra">
 <%static:css group='course'/>
@@ -15,7 +16,7 @@
 <section class="container">
   <div class="course-wrapper">
     <section class="course-content">
-      <h3> Updates to Discussion Posts You Follow </h3>
+      <h3> ${_("Updates to Discussion Posts You Follow")} </h3>
       ${content}
     </section>
   </div>

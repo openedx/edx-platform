@@ -1,7 +1,8 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%inherit file="base.html" />
 <%namespace name='static' file='../static_content.html'/>
 
-<%block name="title"><title>University of TorontoX</title></%block>
+<%block name="title"><title>${_("University of TorontoX")}</title></%block>
 
 <%block name="university_header">
   <header class="search" style="background: url('/static/images/university/toronto/toronto-cover.jpg')">
@@ -10,7 +11,7 @@
         <div class="logo">
            <img src="${static.url('images/university/toronto/toronto.png')}" />
         </div>
-        <h1>University of TorontoX</h1>
+        <h1>${_("University of TorontoX")}</h1>
       </hgroup>
     </div>
   </header>
@@ -18,7 +19,7 @@
 </%block>
 
 <%block name="university_description">
-    <p>Established in 1827, the University of Toronto is a vibrant and diverse academic community. It includes 80,000 students, 12,000 colleagues holding faculty appointments, 200 librarians, and 6,000 staff members across three distinctive campuses and at many partner sites, including world-renowned hospitals. With over 800 undergraduate programs, 150 graduate programs, and 40 professional programs, U of T attracts students of the highest calibre, from across Canada and from 160 countries around the world. The University is one of the most respected and influential institutions of higher education and advanced research in the world. Its strengths extend across the full range of disciplines: the 2012-13 Times Higher Education ranking groups the University of Toronto with Stanford, UC Berkeley, UCLA, Columbia, Cambridge, Oxford, the University of Melbourne, and the University of Michigan as the only institutions in the top 27 in all 6 broad disciplinary areas. The University is also consistently rated one of Canada’s Top 100 employers, and ranks with Harvard and Yale for the top university library resources in North America.</p>
+    <p>${_("Established in 1827, the University of Toronto is a vibrant and diverse academic community. It includes 80,000 students, 12,000 colleagues holding faculty appointments, 200 librarians, and 6,000 staff members across three distinctive campuses and at many partner sites, including world-renowned hospitals. With over 800 undergraduate programs, 150 graduate programs, and 40 professional programs, U of T attracts students of the highest calibre, from across Canada and from 160 countries around the world. The University is one of the most respected and influential institutions of higher education and advanced research in the world. Its strengths extend across the full range of disciplines: the 2012-13 Times Higher Education ranking groups the University of Toronto with Stanford, UC Berkeley, UCLA, Columbia, Cambridge, Oxford, the University of Melbourne, and the University of Michigan as the only institutions in the top 27 in all 6 broad disciplinary areas. The University is also consistently rated one of Canada\'s Top 100 employers, and ranks with Harvard and Yale for the top university library resources in North America.")}</p>
 </%block>
 
 ${parent.body()}

@@ -1,9 +1,11 @@
+<%! from django.utils.translation import ugettext as _ %>
+
 <%inherit file="main.html" />
 <%namespace name='static' file='static_content.html'/>
 <%block name="title">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <title>${course.number} Textbook</title>
+    <title>${_('%s Textbook') % course.number}</title>
 </%block>
 
 <%block name="headextra">
@@ -50,7 +52,7 @@
           <div id="toolbarContainer">
             <div id="toolbarViewer">
               <div id="toolbarViewerLeft">
-                <label id="pageNumberLabel" class="toolbarLabel" for="pageNumber">Page: </label>
+                <label id="pageNumberLabel" class="toolbarLabel" for="pageNumber">${_('Page:')} </label>
                 <input type="number" id="pageNumber" class="toolbarField pageNumber" value="1" size="4" min="1" tabindex="7">
                 </input>
                 <span id="numPages" class="toolbarLabel"></span>
@@ -59,21 +61,21 @@
               <div class="outerCenter">
                 <div class="innerCenter" id="toolbarViewerMiddle">
                   <div class="splitToolbarButton">
-                    <button class="toolbarButton zoomOut" id="zoom_out" title="Zoom Out" tabindex="8">
-                      <span>Zoom Out</span>
+                    <button class="toolbarButton zoomOut" id="zoom_out" title="${_('Zoom Out')}" tabindex="8">
+                      <span>${_('Zoom Out')}</span>
                     </button>
                     <div class="splitToolbarButtonSeparator"></div>
-                    <button class="toolbarButton zoomIn" id="zoom_in" title="Zoom In" tabindex="9">
-                      <span>Zoom In</span>
+                    <button class="toolbarButton zoomIn" id="zoom_in" title="${_('Zoom In')}" tabindex="9">
+                      <span>${_('Zoom In')}</span>
                      </button>
                   </div>
                   <span id="scaleSelectContainer" class="dropdownToolbarButton">
-                     <select id="scaleSelect" title="Zoom" oncontextmenu="return false;" tabindex="10">
+                     <select id="scaleSelect" title="${_('Zoom')}" oncontextmenu="return false;" tabindex="10">
 <!--
-                      <option id="pageAutoOption" value="auto" selected="selected">Automatic Zoom</option>
-                      <option id="pageActualOption" value="page-actual">Actual Size</option>
-                      <option id="pageFitOption" value="page-fit">Fit Page</option>
-                      <option id="pageWidthOption" value="page-width">Full Width</option>
+                      <option id="pageAutoOption" value="auto" selected="selected">${_('Automatic Zoom')}</option>
+                      <option id="pageActualOption" value="page-actual">${_('Actual Size')}</option>
+                      <option id="pageFitOption" value="page-fit">${_('Fit Page')}</option>
+                      <option id="pageWidthOption" value="page-width">${_('Full Width')}</option>
 -->
                       <option id="customScaleOption" value="custom"></option>
                       <option value="0.5">50%</option>
@@ -91,7 +93,7 @@
         </div>
 
         %if 'chapters' in textbook:
-	<section aria-label="Textbook Navigation" class="book-sidebar">
+	<section aria-label="${_('Textbook Navigation')}" class="book-sidebar">
 	  <ul id="booknav" class="treeview-booknav">
 	      <%def name="print_entry(entry, index_value)">
 		  <li id="pdfchapter-${index_value}">
@@ -114,10 +116,10 @@
             <nav>
               <ul>
                 <li class="last">
-                  <a id="previous">Previous page</a>
+                  <a id="previous">${_('Previous page')}</a>
                 </li>
                 <li class="next">
-                  <a id="next">Next page</a>
+                  <a id="next">${_('Next page')}</a>
                 </li>
               </ul>
             </nav>

@@ -1,23 +1,24 @@
+<%! from django.utils.translation import ugettext as _ %>
 <div class="external-grader-message">
     ${msg|n}
     <div class="collapsible evaluation-response">
         <header>
-            <a href="#">Respond to Feedback</a>
+            <a href="#">${_("Respond to Feedback")}</a>
         </header>
         <section id="evaluation_${id}" class="evaluation">
-            <p>How accurate do you find this feedback?</p>
+            <p>${_("How accurate do you find this feedback?")}</p>
             <div class="evaluation-scoring">
                 <ul class="scoring-list">
-                    <li><input type="radio" name="evaluation-score" id="evaluation-score-5" value="5" /> <label for="evaluation-score-5"> Correct</label></li>
-                    <li><input type="radio" name="evaluation-score" id="evaluation-score-4" value="4" /> <label for="evaluation-score-4"> Partially Correct</label></li>
-                    <li><input type="radio" name="evaluation-score" id="evaluation-score-3" value="3" /> <label for="evaluation-score-3"> No Opinion</label></li>
-                    <li><input type="radio" name="evaluation-score" id="evaluation-score-2" value="2" /> <label for="evaluation-score-2"> Partially Incorrect</label></li>
-                    <li><input type="radio" name="evaluation-score" id="evaluation-score-1" value="1" /> <label for="evaluation-score-1"> Incorrect</label></li>
+                    <li><input type="radio" name="evaluation-score" id="evaluation-score-5" value="5" /> <label for="evaluation-score-5"> ${_("Correct")}</label></li>
+                    <li><input type="radio" name="evaluation-score" id="evaluation-score-4" value="4" /> <label for="evaluation-score-4"> ${_("Partially Correct")}</label></li>
+                    <li><input type="radio" name="evaluation-score" id="evaluation-score-3" value="3" /> <label for="evaluation-score-3"> ${_("No Opinion")}</label></li>
+                    <li><input type="radio" name="evaluation-score" id="evaluation-score-2" value="2" /> <label for="evaluation-score-2"> ${_("Partially Incorrect")}</label></li>
+                    <li><input type="radio" name="evaluation-score" id="evaluation-score-1" value="1" /> <label for="evaluation-score-1"> ${_("Incorrect")}</label></li>
                 </ul>
             </div>
-            <p>Additional comments:</p>
+            <p>${_("Additional comments:")}</p>
             <textarea rows="${rows}" cols="${cols}" name="feedback_${id}" class="feedback-on-feedback" id="feedback_${id}"></textarea>
-            <input type="button" value="Submit Feedback" class="submit-evaluation-button" name="reset"/>
+            <input type="button" value="${_("Submit Feedback")}" class="submit-evaluation-button" name="reset"/>
         </section>
     </div>
 </div>

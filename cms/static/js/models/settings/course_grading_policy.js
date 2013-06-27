@@ -79,13 +79,13 @@ CMS.Models.Settings.CourseGrader = Backbone.Model.extend({
                 // FIXME somehow this.collection is unbound sometimes. I can't track down when
                 var existing = this.collection && this.collection.some(function(other) { return (other != this) && (other.get('type') == attrs['type']);}, this);
                 if (existing) {
-                    errors.type = "There's already another assignment type with this name.";
+                    errors.type = gettext("There's already another assignment type with this name.");
                 }
             }
         }
         if (attrs['weight']) {
             if (!isFinite(attrs.weight) || /\D+/.test(attrs.weight)) {
-                errors.weight = "Please enter an integer between 0 and 100.";
+                errors.weight = gettext("Please enter an integer between 0 and 100.");
             }
             else {
                 attrs.weight = parseInt(attrs.weight); // see if this ensures value saved is int
@@ -99,18 +99,18 @@ CMS.Models.Settings.CourseGrader = Backbone.Model.extend({
             }}
         if (attrs['min_count']) {
             if (!isFinite(attrs.min_count) || /\D+/.test(attrs.min_count)) {
-                errors.min_count = "Please enter an integer.";
+                errors.min_count = gettext("Please enter an integer.");
             }
             else attrs.min_count = parseInt(attrs.min_count);
         }
         if (attrs['drop_count']) {
             if (!isFinite(attrs.drop_count) || /\D+/.test(attrs.drop_count)) {
-                errors.drop_count = "Please enter an integer.";
+                errors.drop_count = gettext("Please enter an integer.");
             }
             else attrs.drop_count = parseInt(attrs.drop_count);
         }
         if (attrs['min_count'] && attrs['drop_count'] && attrs.drop_count > attrs.min_count) {
-            errors.drop_count = "Cannot drop more " + attrs.type + " than will assigned.";
+            errors.drop_count = gettext("Cannot drop more %s than will assigned.").split("%s").join(attrs.type);
         }
         if (!_.isEmpty(errors)) return errors;
     }

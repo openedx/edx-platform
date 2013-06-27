@@ -1,5 +1,6 @@
 {
   "static_files": [
+    "../jsi18n/",
     "js/vendor/RequireJS.js",
     "js/vendor/jquery.min.js",
     "js/vendor/jquery-ui.min.js",

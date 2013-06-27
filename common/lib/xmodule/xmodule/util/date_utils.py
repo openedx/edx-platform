@@ -2,8 +2,11 @@
 Convenience methods for working with datetime objects
 """
 
-import datetime
-def get_default_time_display(dt, show_timezone=True):
+from django.template.defaultfilters import date as _date
+from datetime import datetime, timedelta
+
+
+def get_default_time_display(dt, show_timezone=False):
     """
     Converts a datetime to a string representation. This is the default
     representation used in Studio and LMS.
@@ -24,10 +27,10 @@ def get_default_time_display(dt, show_timezone=True):
                 timezone = dt.strftime('%z')
         else:
             timezone = " UTC"
-    return dt.strftime("%b %d, %Y at %H:%M") + timezone
+    return _date(datetime.now(), "Y bd H:i") + timezone
 
 
-def almost_same_datetime(dt1, dt2, allowed_delta=datetime.timedelta(minutes=1)):
+def almost_same_datetime(dt1, dt2, allowed_delta=timedelta(minutes=1)):
     """
     Returns true if these are w/in a minute of each other. (in case secs saved to db
     or timezone aren't same)

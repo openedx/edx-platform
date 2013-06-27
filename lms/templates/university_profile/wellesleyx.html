@@ -1,7 +1,8 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%inherit file="base.html" />
 <%namespace name='static' file='../static_content.html'/>
 
-<%block name="title"><title>WellesleyX</title></%block>
+<%block name="title"><title>${_("WellesleyX")}</title></%block>
 
 <%block name="university_header">
   <header class="search" style="background: url('/static/images/university/wellesley/wellesley-cover_2025x550.jpg')">
@@ -10,7 +11,7 @@
         <div class="logo">
            <img src="${static.url('images/university/wellesley/wellesley.png')}" />
         </div>
-        <h1>WellesleyX</h1>
+        <h1>${_("WellesleyX")}</h1>
       </hgroup>
     </div>
   </header>
@@ -18,7 +19,7 @@
 </%block>
 
 <%block name="university_description">
-    <p>Since 1875, Wellesley College has been the preeminent liberal arts college for women. Known for its intellectual rigor and its remarkable track record for the cultivation of women leaders in every arena, Wellesley—only 12 miles from Boston—is home to some 2300 undergraduates from every state and 75 countries.</p>
+    <p>${_("Since 1875, Wellesley College has been the preeminent liberal arts college for women. Known for its intellectual rigor and its remarkable track record for the cultivation of women leaders in every arena, Wellesley-only 12 miles from Boston-is home to some 2300 undergraduates from every state and 75 countries.")}</p>
 </%block>
 
 ${parent.body()}
