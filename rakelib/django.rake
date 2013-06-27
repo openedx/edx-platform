@@ -1,6 +1,6 @@
 default_options = {
-    :lms => '8000',
-    :cms => '8001',
+    :lms => '0.0.0.0:8000',
+    :cms => '0.0.0.0:8001',
 }
 
 task :predjango => :install_python_prereqs do
