@@ -50,13 +50,13 @@ class HintManagerTest(ModuleStoreTestCase):
         Set up mako middleware, which is necessary for template rendering to happen.
         """
         course = CourseFactory.create(org='Me', number='19.002', display_name='test_course')
-        # mitxmako.middleware.MakoMiddleware()
 
 
     def test_student_block(self):
         """
         Makes sure that students cannot see the hint management view.
         """
+        nose.tools.set_trace()
         c = Client()
         user = UserFactory.create(username='robot', email='robot@edx.org', password='test')
         c.login(username='robot', password='test')

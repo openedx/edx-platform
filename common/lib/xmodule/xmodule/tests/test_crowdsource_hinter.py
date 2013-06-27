@@ -207,6 +207,7 @@ class CrowdsourceHinterTest(unittest.TestCase):
             )
         json_in = {'problem_name': '42.5'}
         out = m.get_feedback(json_in)
+        print out['index_to_hints']
         self.assertTrue(len(out['index_to_hints'][0])==2)
 
 
