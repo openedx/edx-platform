@@ -6,7 +6,6 @@ from xmodule.modulestore import InvalidLocationError
 from cache_toolbox.core import get_cached_content, set_cached_content
 from xmodule.exceptions import NotFoundError
 
-import logging
 
 class StaticContentServer(object):
     def process_request(self, request):
