@@ -1,12 +1,13 @@
 from factory import Factory, lazy_attribute_sequence, lazy_attribute
 from uuid import uuid4
+import datetime
+
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.x_module import ModuleSystem
 from mitxmako.shortcuts import render_to_string
 from xblock.runtime import InvalidScopeError
-import datetime
 from pytz import UTC
 
 
@@ -58,6 +59,10 @@ class XModuleCourseFactory(Factory):
         data = kwargs.get('data')
         if data is not None:
             store.update_item(new_course.location, data)
+
+        # update_item updates the the course as it exists in the modulestore, but doesn't
+        # update the instance we are working with, so have to refetch the course after updating it.
+        new_course = store.get_instance(new_course.id, new_course.location)
 
         return new_course
 
@@ -147,6 +152,10 @@ class XModuleItemFactory(Factory):
         if new_item.location.category not in DETACHED_CATEGORIES:
             store.update_children(parent_location, parent.children + [new_item.location.url()])
 
+        # update_children updates the the item as it exists in the modulestore, but doesn't
+        # update the instance we are working with, so have to refetch the item after updating it.
+        new_item = store.get_item(new_item.location)
+
         return new_item
 
 
@@ -180,6 +189,7 @@ def get_test_xmodule_for_descriptor(descriptor):
         xblock_model_data=_test_xblock_model_data_accessor(descriptor)
     )
     return descriptor.xmodule(module_sys)
+
 
 def _test_xblock_model_data_accessor(descriptor):
     simple_map = {}

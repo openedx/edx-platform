@@ -52,8 +52,8 @@ class Location(_LocationBase):
     Locations representations of URLs of the
     form {tag}://{org}/{course}/{category}/{name}[@{revision}]
 
-    However, they can also be represented a dictionaries (specifying each component),
-    tuples or list (specified in order), or as strings of the url
+    However, they can also be represented as dictionaries (specifying each component),
+    tuples or lists (specified in order), or as strings of the url
     '''
     __slots__ = ()
 
