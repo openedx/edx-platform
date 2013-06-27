@@ -124,14 +124,14 @@
       @extend .t-action4;
       display: inline-block;
       vertical-align: middle;
+      max-width: 45%;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
       opacity: 0.75;
     }
 
     .course-org {
-      width: 50%;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
       margin-right: ($baseline/4);
     }
 
