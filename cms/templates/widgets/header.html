@@ -14,11 +14,11 @@
       </a>
     </h2>
 
-    <nav class="nav-course">
+    <nav class="nav-course nav-dd ui-left">
       <h2 class="sr">${context_course.display_name_with_default}'s Navigation:</h2>
 
       <ol>
-        <li class="nav-item nav-course-courseware nav-dd">
+        <li class="nav-item nav-course-courseware">
           <h3 class="title"><span class="label"><span class="label-prefix sr">Course </span>Content</span> <i class="icon-caret-down"></i></h3>
 
           <div class="wrapper wrapper-nav-sub">
@@ -41,7 +41,7 @@
           </div>
         </li>
 
-        <li class="nav-item nav-course-settings nav-dd">
+        <li class="nav-item nav-course-settings">
           <h3 class="title"><span class="label"><span class="label-prefix sr">Course </span>Settings</span> <i class="icon-caret-down"></i></h3>
 
           <div class="wrapper wrapper-nav-sub">
@@ -50,7 +50,7 @@
                 <li class="nav-item nav-course-settings-schedule">
                   <a href="${reverse('contentstore.views.get_course_settings', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">Schedule &amp; Details</a>
                 </li>
-                <!-- <li class="nav-item nav-course-settings-grading"> -->
+                <li class="nav-item nav-course-settings-grading">
                   <a href="${reverse('contentstore.views.course_config_graders_page', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">Grading</a>
                 </li>
                 <li class="nav-item nav-course-settings-team">
@@ -64,7 +64,7 @@
           </div>
         </li>
 
-        <li class="nav-item nav-course-tools nav-dd">
+        <li class="nav-item nav-course-tools">
           <h3 class="title"><span class="label">Tools</span> <i class="icon-caret-down"></i></h3>
 
           <div class="wrapper wrapper-nav-sub">
@@ -88,31 +88,31 @@
     % endif
 
     % if user.is_authenticated():
-    <nav class="nav-account nav-is-signedin">
+    <nav class="nav-account nav-is-signedin nav-dd ui-right">
       <h2 class="sr">Help &amp; Account Navigation</h2>
 
       <ol>
-        <li class="nav-item nav-account-help nav-dd">
+        <li class="nav-item nav-account-help">
           <h3 class="title"><span class="label">Help</span> <i class="icon-caret-down"></i></h3>
 
           <div class="wrapper wrapper-nav-sub">
             <div class="nav-sub">
               <ul>
-                <li class="nav-item nav-account-">
-                  <a href="">Help Link #1</a>
+                <li class="nav-item nav-help-documentation">
+                  <a href="http://files.edx.org/Getting_Started_with_Studio.pdf" title="This is a PDF Document">Studio Documentation</a>
                 </li>
-                <li class="nav-item nav-account-">
-                  <a href="">Help Link #2</a>
+                <li class="nav-item nav-help-helpcenter">
+                  <a href="http://help.edge.edx.org/" rel="external">Studio Help Center</a>
                 </li>
-                <li class="nav-item nav-account-">
-                  <a href="">Help Link #3</a>
+                <li class="nav-item nav-help-feedback">
+                  <a href="http://help.edge.edx.org/discussion/new" class="show-tender" title="Use our feedback tool, Tender, to share your feedback">Contact Us</a>
                 </li>
               </ul>
             </div>
           </div>
         </li>
 
-        <li class="nav-item nav-account-user nav-dd">
+        <li class="nav-item nav-account-user">
           <h3 class="title"><span class="label"><span class="sr">Currently signed in as:</span><span class="label account-username">${ user.username }</span></span> <i class="icon-caret-down"></i></h3>
 
           <div class="wrapper wrapper-nav-sub">
