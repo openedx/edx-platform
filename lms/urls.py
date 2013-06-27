@@ -3,7 +3,8 @@ from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from django.conf.urls.static import static
 
-from . import one_time_startup
+# Not used, the work is done in the imported module.
+from . import one_time_startup      # pylint: disable=W0611
 
 import django.contrib.auth.views
 
@@ -50,7 +51,7 @@ urlpatterns = ('',  # nopep8
     url(r'^password_change_done/$', django.contrib.auth.views.password_change_done,
         name='auth_password_change_done'),
     url(r'^password_reset_confirm/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$',
-        django.contrib.auth.views.password_reset_confirm,
+        'student.views.password_reset_confirm_wrapper',
         name='auth_password_reset_confirm'),
     url(r'^password_reset_complete/$', django.contrib.auth.views.password_reset_complete,
         name='auth_password_reset_complete'),
@@ -98,6 +99,8 @@ if not settings.MITX_FEATURES["USE_CUSTOM_THEME"]:
         url(r'^press$', 'student.views.press', name="press"),
         url(r'^media-kit$', 'static_template_view.views.render',
             {'template': 'media-kit.html'}, name="media-kit"),
+        url(r'^faq$', 'static_template_view.views.render',
+            {'template': 'faq.html'}, name="faq_edx"),
         url(r'^help$', 'static_template_view.views.render',
             {'template': 'help.html'}, name="help_edx"),
 
@@ -113,8 +116,6 @@ if not settings.MITX_FEATURES["USE_CUSTOM_THEME"]:
 
         url(r'^submit_feedback$', 'util.views.submit_feedback'),
 
-        # TODO: These urls no longer work. They need to be updated before they are re-enabled
-        # url(r'^reactivate/(?P<key>[^/]*)$', 'student.views.reactivation_email'),
     )
 
 # Only enable URLs for those marketing links actually enabled in the
@@ -125,7 +126,7 @@ for key, value in settings.MKTG_URL_LINK_MAP.items():
         continue
 
     # These urls are enabled separately
-    if key == "ROOT" or key == "COURSES":
+    if key == "ROOT" or key == "COURSES" or key == "FAQ":
         continue
 
     # Make the assumptions that the templates are all in the same dir
@@ -187,7 +188,7 @@ if settings.COURSEWARE_ENABLED:
         # into the database.
         url(r'^software-licenses$', 'licenses.views.user_software_license', name="user_software_license"),
 
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/xqueue/(?P<userid>[^/]*)/(?P<id>.*?)/(?P<dispatch>[^/]*)$',
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/xqueue/(?P<userid>[^/]*)/(?P<mod_id>.*?)/(?P<dispatch>[^/]*)$',
             'courseware.module_render.xqueue_callback',
             name='xqueue_callback'),
         url(r'^change_setting$', 'student.views.change_setting',
@@ -361,6 +362,21 @@ if settings.MITX_FEATURES.get('AUTH_USE_OPENID'):
         url(r'^openid/logo.gif$', 'django_openid_auth.views.logo', name='openid-logo'),
     )
 
+if settings.MITX_FEATURES.get('AUTH_USE_SHIB'):
+    urlpatterns += (
+        url(r'^shib-login/$', 'external_auth.views.shib_login', name='shib-login'),
+    )
+
+if settings.MITX_FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD'):
+    urlpatterns += (
+        url(r'^course_specific_login/(?P<course_id>[^/]+/[^/]+/[^/]+)/$',
+            'external_auth.views.course_specific_login', name='course-specific-login'),
+        url(r'^course_specific_register/(?P<course_id>[^/]+/[^/]+/[^/]+)/$',
+            'external_auth.views.course_specific_register', name='course-specific-register'),
+
+    )
+
+
 if settings.MITX_FEATURES.get('AUTH_USE_OPENID_PROVIDER'):
     urlpatterns += (
         url(r'^openid/provider/login/$', 'external_auth.views.provider_login', name='openid-provider-login'),
@@ -391,6 +407,17 @@ if settings.MITX_FEATURES.get('ENABLE_SERVICE_STATUS'):
     urlpatterns += (
         url(r'^status/', include('service_status.urls')),
     )
+
+if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
+    urlpatterns += (
+        url(r'^instructor_task_status/$', 'instructor_task.views.instructor_task_status', name='instructor_task_status'),
+    )
+
+if settings.MITX_FEATURES.get('RUN_AS_ANALYTICS_SERVER_ENABLED'):
+    urlpatterns += (
+        url(r'^edinsights_service/', include('edinsights.core.urls')),
+    )
+    import edinsights.core.registry
 
 # FoldIt views
 urlpatterns += (

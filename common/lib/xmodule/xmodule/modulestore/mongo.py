@@ -37,15 +37,23 @@ def get_course_id_no_run(location):
     return "/".join([location.org, location.course])
 
 
+class InvalidWriteError(Exception):
+    """
+    Raised to indicate that writing to a particular key
+    in the KeyValueStore is disabled
+    """
+
+
 class MongoKeyValueStore(KeyValueStore):
     """
     A KeyValueStore that maps keyed data access to one of the 3 data areas
     known to the MongoModuleStore (data, children, and metadata)
     """
-    def __init__(self, data, children, metadata):
+    def __init__(self, data, children, metadata, location):
         self._data = data
         self._children = children
         self._metadata = metadata
+        self._location = location
 
     def get(self, key):
         if key.scope == Scope.children:
@@ -55,7 +63,9 @@ class MongoKeyValueStore(KeyValueStore):
         elif key.scope == Scope.settings:
             return self._metadata[key.field_name]
         elif key.scope == Scope.content:
-            if key.field_name == 'data' and not isinstance(self._data, dict):
+            if key.field_name == 'location':
+                return self._location
+            elif key.field_name == 'data' and not isinstance(self._data, dict):
                 return self._data
             else:
                 return self._data[key.field_name]
@@ -68,7 +78,9 @@ class MongoKeyValueStore(KeyValueStore):
         elif key.scope == Scope.settings:
             self._metadata[key.field_name] = value
         elif key.scope == Scope.content:
-            if key.field_name == 'data' and not isinstance(self._data, dict):
+            if key.field_name == 'location':
+                self._location = value
+            elif key.field_name == 'data' and not isinstance(self._data, dict):
                 self._data = value
             else:
                 self._data[key.field_name] = value
@@ -82,7 +94,9 @@ class MongoKeyValueStore(KeyValueStore):
             if key.field_name in self._metadata:
                 del self._metadata[key.field_name]
         elif key.scope == Scope.content:
-            if key.field_name == 'data' and not isinstance(self._data, dict):
+            if key.field_name == 'location':
+                self._location = Location(None)
+            elif key.field_name == 'data' and not isinstance(self._data, dict):
                 self._data = None
             else:
                 del self._data[key.field_name]
@@ -95,7 +109,9 @@ class MongoKeyValueStore(KeyValueStore):
         elif key.scope == Scope.settings:
             return key.field_name in self._metadata
         elif key.scope == Scope.content:
-            if key.field_name == 'data' and not isinstance(self._data, dict):
+            if key.field_name == 'location':
+                return True
+            elif key.field_name == 'data' and not isinstance(self._data, dict):
                 return True
             else:
                 return key.field_name in self._data
@@ -171,14 +187,15 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
                     definition.get('data', {}),
                     definition.get('children', []),
                     metadata,
+                    location,
                 )
 
                 model_data = DbModel(kvs, class_, None, MongoUsage(self.course_id, location))
-                module = class_(self, location, model_data)
+                module = class_(self, model_data)
                 if self.cached_metadata is not None:
                     # parent container pointers don't differentiate between draft and non-draft
                     # so when we do the lookup, we should do so with a non-draft location
-                    non_draft_loc = location._replace(revision=None)
+                    non_draft_loc = location.replace(revision=None)
                     metadata_to_inherit = self.cached_metadata.get(non_draft_loc.url(), {})
                     inherit_metadata(module, metadata_to_inherit)
                 return module
@@ -290,7 +307,7 @@ class MongoModuleStore(ModuleStoreBase):
             location = Location(result['_id'])
             # We need to collate between draft and non-draft
             # i.e. draft verticals can have children which are not in non-draft versions
-            location = location._replace(revision=None)
+            location = location.replace(revision=None)
             location_url = location.url()
             if location_url in results_by_url:
                 existing_children = results_by_url[location_url].get('definition', {}).get('children', [])

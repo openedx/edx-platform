@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
+# pylint: disable=W0232
 """Test for Xmodule functional logic."""
 
 import json
 import unittest
 
-from lxml import etree
-
 from xmodule.poll_module import PollDescriptor
 from xmodule.conditional_module import ConditionalDescriptor
 from xmodule.word_cloud_module import WordCloudDescriptor
-from xmodule.videoalpha_module import VideoAlphaDescriptor
+from xmodule.tests import get_test_system
 
 class PostData:
     """Class which emulate postdata."""
@@ -17,6 +16,7 @@ class PostData:
         self.dict_data = dict_data
 
     def getlist(self, key):
+        """Get data by key from `self.dict_data`."""
         return self.dict_data.get(key)
 
 
@@ -27,23 +27,26 @@ class LogicTest(unittest.TestCase):
 
     def setUp(self):
         class EmptyClass:
+            """Empty object."""
             pass
 
-        self.system = None
-        self.location = None
+        self.system = get_test_system()
         self.descriptor = EmptyClass()
 
         self.xmodule_class = self.descriptor_class.module_class
         self.xmodule = self.xmodule_class(
-            self.system, self.location,
-            self.descriptor, self.raw_model_data
+            self.system,
+            self.descriptor,
+            self.raw_model_data
         )
 
-    def ajax_request(self, dispatch, get):
-        return json.loads(self.xmodule.handle_ajax(dispatch, get))
+    def ajax_request(self, dispatch, data):
+        """Call Xmodule.handle_ajax."""
+        return json.loads(self.xmodule.handle_ajax(dispatch, data))
 
 
 class PollModuleTest(LogicTest):
+    """Logic tests for Poll Xmodule."""
     descriptor_class = PollDescriptor
     raw_model_data = {
         'poll_answers': {'Yes': 1, 'Dont_know': 0, 'No': 0},
@@ -69,6 +72,7 @@ class PollModuleTest(LogicTest):
 
 
 class ConditionalModuleTest(LogicTest):
+    """Logic tests for Conditional Xmodule."""
     descriptor_class = ConditionalDescriptor
 
     def test_ajax_request(self):
@@ -83,6 +87,7 @@ class ConditionalModuleTest(LogicTest):
 
 
 class WordCloudModuleTest(LogicTest):
+    """Logic tests for Word Cloud Xmodule."""
     descriptor_class = WordCloudDescriptor
     raw_model_data = {
         'all_words': {'cat': 10, 'dog': 5, 'mom': 1, 'dad': 2},
@@ -91,8 +96,6 @@ class WordCloudModuleTest(LogicTest):
     }
 
     def test_bad_ajax_request(self):
-
-        # TODO: move top global test. Formalize all our Xmodule errors.
         response = self.ajax_request('bad_dispatch', {})
         self.assertDictEqual(response, {
             'status': 'fail',
@@ -118,34 +121,6 @@ class WordCloudModuleTest(LogicTest):
              {'text': 'cat', 'size': 12, 'percent': 54.0}]
         )
 
-        self.assertEqual(100.0, sum(i['percent'] for i in response['top_words']) )
-
-
-class VideoAlphaModuleTest(LogicTest):
-    descriptor_class = VideoAlphaDescriptor
-
-    raw_model_data = {
-        'data': '<videoalpha />'
-    }
-
-    def test_get_timeframe_no_parameters(self):
-        xmltree = etree.fromstring('<videoalpha>test</videoalpha>')
-        output = self.xmodule._get_timeframe(xmltree)
-        self.assertEqual(output, ('', ''))
-
-    def test_get_timeframe_with_one_parameter(self):
-        xmltree = etree.fromstring(
-            '<videoalpha start_time="00:04:07">test</videoalpha>'
-        )
-        output = self.xmodule._get_timeframe(xmltree)
-        self.assertEqual(output, (247, ''))
-
-    def test_get_timeframe_with_two_parameters(self):
-        xmltree = etree.fromstring(
-            '''<videoalpha
-                    start_time="00:04:07"
-                    end_time="13:04:39"
-                >test</videoalpha>'''
-        )
-        output = self.xmodule._get_timeframe(xmltree)
-        self.assertEqual(output, (247, 47079))
+        self.assertEqual(
+            100.0,
+            sum(i['percent'] for i in response['top_words']))

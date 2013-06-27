@@ -3,7 +3,6 @@ This file contains the logic for cohort groups, as exposed internally to the
 forums, and to the cohort admin views.
 """
 
-from django.contrib.auth.models import User
 from django.http import Http404
 import logging
 import random
@@ -27,7 +26,7 @@ def local_random():
     """
     # ironic, isn't it?
     global _local_random
-    
+
     if _local_random is None:
         _local_random = random.Random()
 

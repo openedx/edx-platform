@@ -10,7 +10,6 @@ import os
 import re
 import requests
 from requests.status_codes import codes
-import urllib
 from collections import OrderedDict
 
 from StringIO import StringIO
@@ -20,8 +19,12 @@ from django.contrib.auth.models import User, Group
 from django.http import HttpResponse
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
-from mitxmako.shortcuts import render_to_response
 from django.core.urlresolvers import reverse
+from django.core.mail import send_mail
+
+import xmodule.graders as xmgraders
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from courseware import grades
 from courseware.access import (has_access, get_access_group_name,
@@ -33,13 +36,19 @@ from django_comment_common.models import (Role,
                                           FORUM_ROLE_MODERATOR,
                                           FORUM_ROLE_COMMUNITY_TA)
 from django_comment_client.utils import has_forum_access
+from instructor.offline_gradecalc import student_grades, offline_grades_available
+from instructor_task.api import (get_running_instructor_tasks,
+                                 get_instructor_task_history,
+                                 submit_rescore_problem_for_all_students,
+                                 submit_rescore_problem_for_student,
+                                 submit_reset_problem_attempts_for_all_students)
+from instructor_task.views import get_task_completion_info
+from mitxmako.shortcuts import render_to_response
 from psychometrics import psychoanalyze
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
-from xmodule.modulestore.django import modulestore
-import xmodule.graders as xmgraders
 import track.views
+from mitxmako.shortcuts import render_to_string
 
-from .offline_gradecalc import student_grades, offline_grades_available
 
 log = logging.getLogger(__name__)
 
@@ -68,6 +77,7 @@ def instructor_dashboard(request, course_id):
     msg = ''
     problems = []
     plots = []
+    datatable = {}
 
     # the instructor dashboard page is modal: grades, psychometrics, admin
     # keep that state in request.session (defaults to grades mode)
@@ -78,26 +88,29 @@ def instructor_dashboard(request, course_id):
         idash_mode = request.session.get('idash_mode', 'Grades')
 
     # assemble some course statistics for output to instructor
-    datatable = {'header': ['Statistic', 'Value'],
-                 'title': 'Course Statistics At A Glance',
-                 }
-    data = [['# Enrolled', CourseEnrollment.objects.filter(course_id=course_id).count()]]
-    data += compute_course_stats(course).items()
-    if request.user.is_staff:
-        for field in course.fields:
-            if getattr(field.scope, 'user', False):
-                continue
-
-            data.append([field.name, json.dumps(field.read_json(course))])
-        for namespace in course.namespaces:
-            for field in getattr(course, namespace).fields:
+    def get_course_stats_table():
+        datatable = {'header': ['Statistic', 'Value'],
+                     'title': 'Course Statistics At A Glance',
+                     }
+        data = [['# Enrolled', CourseEnrollment.objects.filter(course_id=course_id).count()]]
+        data += compute_course_stats(course).items()
+        if request.user.is_staff:
+            for field in course.fields:
                 if getattr(field.scope, 'user', False):
                     continue
 
-                data.append(["{}.{}".format(namespace, field.name), json.dumps(field.read_json(course))])
-    datatable['data'] = data
+                data.append([field.name, json.dumps(field.read_json(course))])
+            for namespace in course.namespaces:
+                for field in getattr(course, namespace).fields:
+                    if getattr(field.scope, 'user', False):
+                        continue
+
+                    data.append(["{}.{}".format(namespace, field.name), json.dumps(field.read_json(course))])
+        datatable['data'] = data
+        return datatable
 
     def return_csv(fn, datatable, fp=None):
+        """Outputs a CSV file from the contents of a datatable."""
         if fp is None:
             response = HttpResponse(mimetype='text/csv')
             response['Content-Disposition'] = 'attachment; filename={0}'.format(fn)
@@ -111,12 +124,15 @@ def instructor_dashboard(request, course_id):
         return response
 
     def get_staff_group(course):
+        """Get or create the staff access group"""
         return get_group(course, 'staff')
 
     def get_instructor_group(course):
+        """Get or create the instructor access group"""
         return get_group(course, 'instructor')
 
     def get_group(course, groupname):
+        """Get or create an access group"""
         grpname = get_access_group_name(course, groupname)
         try:
             group = Group.objects.get(name=grpname)
@@ -135,6 +151,39 @@ def instructor_dashboard(request, course_id):
         name = course_beta_test_group_name(course.location)
         (group, _) = Group.objects.get_or_create(name=name)
         return group
+
+    def get_module_url(urlname):
+        """
+        Construct full URL for a module from its urlname.
+
+        Form is either urlname or modulename/urlname.  If no modulename
+        is provided, "problem" is assumed.
+        """
+        # tolerate an XML suffix in the urlname
+        if urlname[-4:] == ".xml":
+            urlname = urlname[:-4]
+
+        # implement default
+        if '/' not in urlname:
+            urlname = "problem/" + urlname
+
+        # complete the url using information about the current course:
+        (org, course_name, _) = course_id.split("/")
+        return "i4x://" + org + "/" + course_name + "/" + urlname
+
+    def get_student_from_identifier(unique_student_identifier):
+        """Gets a student object using either an email address or username"""
+        msg = ""
+        try:
+            if "@" in unique_student_identifier:
+                student = User.objects.get(email=unique_student_identifier)
+            else:
+                student = User.objects.get(username=unique_student_identifier)
+            msg += "Found a single student.  "
+        except User.DoesNotExist:
+            student = None
+            msg += "<font color='red'>Couldn't find student with that email or username.  </font>"
+        return msg, student
 
     # process actions from form POST
     action = request.POST.get('action', '')
@@ -205,88 +254,138 @@ def instructor_dashboard(request, course_id):
         track.views.server_track(request, action, {}, page='idashboard')
         msg += dump_grading_context(course)
 
-    elif "Reset student's attempts" in action or "Delete student state for problem" in action:
+    elif "Rescore ALL students' problem submissions" in action:
+        problem_urlname = request.POST.get('problem_for_all_students', '')
+        problem_url = get_module_url(problem_urlname)
+        try:
+            instructor_task = submit_rescore_problem_for_all_students(request, course_id, problem_url)
+            if instructor_task is None:
+                msg += '<font color="red">Failed to create a background task for rescoring "{0}".</font>'.format(problem_url)
+            else:
+                track_msg = 'rescore problem {problem} for all students in {course}'.format(problem=problem_url, course=course_id)
+                track.views.server_track(request, track_msg, {}, page='idashboard')
+        except ItemNotFoundError as e:
+            msg += '<font color="red">Failed to create a background task for rescoring "{0}": problem not found.</font>'.format(problem_url)
+        except Exception as e:
+            log.error("Encountered exception from rescore: {0}".format(e))
+            msg += '<font color="red">Failed to create a background task for rescoring "{0}": {1}.</font>'.format(problem_url, e.message)
+
+    elif "Reset ALL students' attempts" in action:
+        problem_urlname = request.POST.get('problem_for_all_students', '')
+        problem_url = get_module_url(problem_urlname)
+        try:
+            instructor_task = submit_reset_problem_attempts_for_all_students(request, course_id, problem_url)
+            if instructor_task is None:
+                msg += '<font color="red">Failed to create a background task for resetting "{0}".</font>'.format(problem_url)
+            else:
+                track_msg = 'reset problem {problem} for all students in {course}'.format(problem=problem_url, course=course_id)
+                track.views.server_track(request, track_msg, {}, page='idashboard')
+        except ItemNotFoundError as e:
+            log.error('Failure to reset: unknown problem "{0}"'.format(e))
+            msg += '<font color="red">Failed to create a background task for resetting "{0}": problem not found.</font>'.format(problem_url)
+        except Exception as e:
+            log.error("Encountered exception from reset: {0}".format(e))
+            msg += '<font color="red">Failed to create a background task for resetting "{0}": {1}.</font>'.format(problem_url, e.message)
+
+    elif "Show Background Task History for Student" in action:
+        # put this before the non-student case, since the use of "in" will cause this to be missed
+        unique_student_identifier = request.POST.get('unique_student_identifier', '')
+        message, student = get_student_from_identifier(unique_student_identifier)
+        if student is None:
+            msg += message
+        else:
+            problem_urlname = request.POST.get('problem_for_student', '')
+            problem_url = get_module_url(problem_urlname)
+            message, datatable = get_background_task_table(course_id, problem_url, student)
+            msg += message
+
+    elif "Show Background Task History" in action:
+        problem_urlname = request.POST.get('problem_for_all_students', '')
+        problem_url = get_module_url(problem_urlname)
+        message, datatable = get_background_task_table(course_id, problem_url)
+        msg += message
+
+    elif ("Reset student's attempts" in action or
+          "Delete student state for module" in action or
+          "Rescore student's problem submission" in action):
         # get the form data
         unique_student_identifier = request.POST.get('unique_student_identifier', '')
-        problem_to_reset = request.POST.get('problem_to_reset', '')
-
-        if problem_to_reset[-4:] == ".xml":
-            problem_to_reset = problem_to_reset[:-4]
-
+        problem_urlname = request.POST.get('problem_for_student', '')
+        module_state_key = get_module_url(problem_urlname)
         # try to uniquely id student by email address or username
-        try:
-            if "@" in unique_student_identifier:
-                student_to_reset = User.objects.get(email=unique_student_identifier)
-            else:
-                student_to_reset = User.objects.get(username=unique_student_identifier)
-            msg += "Found a single student to reset.  "
-        except:
-            student_to_reset = None
-            msg += "<font color='red'>Couldn't find student with that email or username.  </font>"
-
-        if student_to_reset is not None:
+        message, student = get_student_from_identifier(unique_student_identifier)
+        msg += message
+        student_module = None
+        if student is not None:
             # find the module in question
-            if '/' not in problem_to_reset:				# allow state of modules other than problem to be reset
-                problem_to_reset = "problem/" + problem_to_reset    # but problem is the default
             try:
-                (org, course_name, _) = course_id.split("/")
-                module_state_key = "i4x://" + org + "/" + course_name + "/" + problem_to_reset
-                module_to_reset = StudentModule.objects.get(student_id=student_to_reset.id,
-                                                            course_id=course_id,
-                                                            module_state_key=module_state_key)
-                msg += "Found module to reset.  "
-            except Exception:
+                student_module = StudentModule.objects.get(student_id=student.id,
+                                                           course_id=course_id,
+                                                           module_state_key=module_state_key)
+                msg += "Found module.  "
+            except StudentModule.DoesNotExist:
                 msg += "<font color='red'>Couldn't find module with that urlname.  </font>"
 
-        if "Delete student state for problem" in action:
-            # delete the state
-            try:
-                module_to_reset.delete()
-                msg += "<font color='red'>Deleted student module state for %s!</font>" % module_state_key
-            except:
-                msg += "Failed to delete module state for %s/%s" % (unique_student_identifier, problem_to_reset)
-        else:
-            # modify the problem's state
-            try:
-                # load the state json
-                problem_state = json.loads(module_to_reset.state)
-                old_number_of_attempts = problem_state["attempts"]
-                problem_state["attempts"] = 0
+        if student_module is not None:
+            if "Delete student state for module" in action:
+                # delete the state
+                try:
+                    student_module.delete()
+                    msg += "<font color='red'>Deleted student module state for %s!</font>" % module_state_key
+                    track_format = 'delete student module state for problem {problem} for student {student} in {course}'
+                    track_msg = track_format.format(problem=problem_url, student=unique_student_identifier, course=course_id)
+                    track.views.server_track(request, track_msg, {}, page='idashboard')
+                except:
+                    msg += "Failed to delete module state for %s/%s" % (unique_student_identifier, problem_urlname)
+            elif "Reset student's attempts" in action:
+                # modify the problem's state
+                try:
+                    # load the state json
+                    problem_state = json.loads(student_module.state)
+                    old_number_of_attempts = problem_state["attempts"]
+                    problem_state["attempts"] = 0
 
-                # save
-                module_to_reset.state = json.dumps(problem_state)
-                module_to_reset.save()
-                track.views.server_track(request,
-                                         '{instructor} reset attempts from {old_attempts} to 0 for {student} on problem {problem} in {course}'.format(
-                                             old_attempts=old_number_of_attempts,
-                                             student=student_to_reset,
-                                             problem=module_to_reset.module_state_key,
-                                             instructor=request.user,
-                                             course=course_id),
-                                         {},
-                                         page='idashboard')
-                msg += "<font color='green'>Module state successfully reset!</font>"
-            except:
-                msg += "<font color='red'>Couldn't reset module state.  </font>"
+                    # save
+                    student_module.state = json.dumps(problem_state)
+                    student_module.save()
+                    track_format = '{instructor} reset attempts from {old_attempts} to 0 for {student} on problem {problem} in {course}'
+                    track_msg = track_format.format(old_attempts=old_number_of_attempts,
+                                                    student=student,
+                                                    problem=student_module.module_state_key,
+                                                    instructor=request.user,
+                                                    course=course_id)
+                    track.views.server_track(request, track_msg, {}, page='idashboard')
+                    msg += "<font color='green'>Module state successfully reset!</font>"
+                except:
+                    msg += "<font color='red'>Couldn't reset module state.  </font>"
+            else:
+                # "Rescore student's problem submission" case
+                try:
+                    instructor_task = submit_rescore_problem_for_student(request, course_id, module_state_key, student)
+                    if instructor_task is None:
+                        msg += '<font color="red">Failed to create a background task for rescoring "{0}" for student {1}.</font>'.format(module_state_key, unique_student_identifier)
+                    else:
+                        track_msg = 'rescore problem {problem} for student {student} in {course}'.format(problem=module_state_key, student=unique_student_identifier, course=course_id)
+                        track.views.server_track(request, track_msg, {}, page='idashboard')
+                except Exception as e:
+                    log.exception("Encountered exception from rescore: {0}")
+                    msg += '<font color="red">Failed to create a background task for rescoring "{0}": {1}.</font>'.format(module_state_key, e.message)
 
     elif "Get link to student's progress page" in action:
         unique_student_identifier = request.POST.get('unique_student_identifier', '')
-        try:
-            if "@" in unique_student_identifier:
-                student_to_reset = User.objects.get(email=unique_student_identifier)
-            else:
-                student_to_reset = User.objects.get(username=unique_student_identifier)
-            progress_url = reverse('student_progress', kwargs={'course_id': course_id, 'student_id': student_to_reset.id})
+        # try to uniquely id student by email address or username
+        message, student = get_student_from_identifier(unique_student_identifier)
+        msg += message
+        if student is not None:
+            progress_url = reverse('student_progress', kwargs={'course_id': course_id, 'student_id': student.id})
             track.views.server_track(request,
                                      '{instructor} requested progress page for {student} in {course}'.format(
-                                         student=student_to_reset,
+                                         student=student,
                                          instructor=request.user,
                                          course=course_id),
                                      {},
                                      page='idashboard')
-            msg += "<a href='{0}' target='_blank'> Progress page for username: {1} with email address: {2}</a>.".format(progress_url, student_to_reset.username, student_to_reset.email)
-        except:
-            msg += "<font color='red'>Couldn't find student with that username.  </font>"
+            msg += "<a href='{0}' target='_blank'> Progress page for username: {1} with email address: {2}</a>.".format(progress_url, student.username, student.email)
 
     #----------------------------------------
     # export grades to remote gradebook
@@ -427,7 +526,7 @@ def instructor_dashboard(request, course_id):
         if problem_to_dump[-4:] == ".xml":
             problem_to_dump = problem_to_dump[:-4]
         try:
-            (org, course_name, run) = course_id.split("/")
+            (org, course_name, _) = course_id.split("/")
             module_state_key = "i4x://" + org + "/" + course_name + "/problem/" + problem_to_dump
             smdat = StudentModule.objects.filter(course_id=course_id,
                                                  module_state_key=module_state_key)
@@ -538,13 +637,15 @@ def instructor_dashboard(request, course_id):
 
         students = request.POST.get('multiple_students', '')
         auto_enroll = bool(request.POST.get('auto_enroll'))
-        ret = _do_enroll_students(course, course_id, students, auto_enroll=auto_enroll)
+        email_students = bool(request.POST.get('email_students'))
+        ret = _do_enroll_students(course, course_id, students, auto_enroll=auto_enroll, email_students=email_students)
         datatable = ret['datatable']
 
     elif action == 'Unenroll multiple students':
 
         students = request.POST.get('multiple_students', '')
-        ret = _do_unenroll_students(course_id, students)
+        email_students = bool(request.POST.get('email_students'))
+        ret = _do_unenroll_students(course_id, students, email_students=email_students)
         datatable = ret['datatable']
 
     elif action == 'List sections available in remote gradebook':
@@ -625,6 +726,16 @@ def instructor_dashboard(request, course_id):
     if use_offline:
         msg += "<br/><font color='orange'>Grades from %s</font>" % offline_grades_available(course_id)
 
+    # generate list of pending background tasks
+    if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
+        instructor_tasks = get_running_instructor_tasks(course_id)
+    else:
+        instructor_tasks = None
+
+    # display course stats only if there is no other table to display:
+    course_stats = None
+    if not datatable:
+        course_stats = get_course_stats_table()
     #----------------------------------------
     # context for rendering
 
@@ -634,12 +745,13 @@ def instructor_dashboard(request, course_id):
                'instructor_access': instructor_access,
                'forum_admin_access': forum_admin_access,
                'datatable': datatable,
+               'course_stats': course_stats,
                'msg': msg,
                'modeflag': {idash_mode: 'selectedmode'},
                'problems': problems,		# psychometrics
                'plots': plots,			# psychometrics
                'course_errors': modulestore().get_item_errors(course.location),
-
+               'instructor_tasks': instructor_tasks,
                'djangopid': os.getpid(),
                'mitx_version': getattr(settings, 'MITX_VERSION_STRING', ''),
                'offline_grade_log': offline_grades_available(course_id),
@@ -961,9 +1073,17 @@ def grade_summary(request, course_id):
 #-----------------------------------------------------------------------------
 # enrollment
 
-def _do_enroll_students(course, course_id, students, overload=False, auto_enroll=False):
-    """Do the actual work of enrolling multiple students, presented as a string
-    of emails separated by commas or returns"""
+def _do_enroll_students(course, course_id, students, overload=False, auto_enroll=False, email_students=False):
+    """
+    Do the actual work of enrolling multiple students, presented as a string
+    of emails separated by commas or returns
+    `course` is course object
+    `course_id` id of course (a `str`)
+    `students` string of student emails separated by commas or returns (a `str`)
+    `overload` un-enrolls all existing students (a `boolean`)
+    `auto_enroll` is user input preference (a `boolean`)
+    `email_students` is user input preference (a `boolean`)
+    """
 
     new_students, new_students_lc = get_and_clean_student_list(students)
     status = dict([x, 'unprocessed'] for x in new_students)
@@ -981,12 +1101,22 @@ def _do_enroll_students(course, course_id, students, overload=False, auto_enroll
             status[cea.email] = 'removed from pending enrollment list'
         ceaset.delete()
 
+    if email_students:
+        registration_url = 'https://' + settings.SITE_NAME + reverse('student.views.register_user')
+        #Composition of email
+        d = {'site_name': settings.SITE_NAME,
+             'registration_url': registration_url,
+             'course_id': course_id,
+             'auto_enroll': auto_enroll,
+             'course_url': registration_url + '/courses/' + course_id,
+             }
+
     for student in new_students:
         try:
             user = User.objects.get(email=student)
         except User.DoesNotExist:
 
-            #User not signed up yet, put in pending enrollment allowed table
+            #Student not signed up yet, put in pending enrollment allowed table
             cea = CourseEnrollmentAllowed.objects.filter(email=student, course_id=course_id)
 
             #If enrollmentallowed already exists, update auto_enroll flag to however it was set in UI
@@ -997,18 +1127,42 @@ def _do_enroll_students(course, course_id, students, overload=False, auto_enroll
                 status[student] = 'user does not exist, enrollment already allowed, pending with auto enrollment ' \
                     + ('on' if auto_enroll else 'off')
                 continue
+
+            #EnrollmentAllowed doesn't exist so create it
             cea = CourseEnrollmentAllowed(email=student, course_id=course_id, auto_enroll=auto_enroll)
             cea.save()
-            status[student] = 'user does not exist, enrollment allowed, pending with auto enrollment ' + ('on' if auto_enroll else 'off')
+
+            status[student] = 'user does not exist, enrollment allowed, pending with auto enrollment ' \
+                + ('on' if auto_enroll else 'off')
+
+            if email_students:
+                #User is allowed to enroll but has not signed up yet
+                d['email_address'] = student
+                d['message'] = 'allowed_enroll'
+                send_mail_ret = send_mail_to_student(student, d)
+                status[student] += (', email sent' if send_mail_ret else '')
             continue
 
+        #Student has already registered
         if CourseEnrollment.objects.filter(user=user, course_id=course_id):
             status[student] = 'already enrolled'
             continue
+
         try:
+            #Not enrolled yet
             ce = CourseEnrollment(user=user, course_id=course_id)
             ce.save()
             status[student] = 'added'
+
+            if email_students:
+                #User enrolled for first time, populate dict with user specific info
+                d['email_address'] = student
+                d['first_name'] = user.first_name
+                d['last_name'] = user.last_name
+                d['message'] = 'enrolled_enroll'
+                send_mail_ret = send_mail_to_student(student, d)
+                status[student] += (', email sent' if send_mail_ret else '')
+
         except:
             status[student] = 'rejected'
 
@@ -1026,12 +1180,22 @@ def _do_enroll_students(course, course_id, students, overload=False, auto_enroll
 
 
 #Unenrollment
-def _do_unenroll_students(course_id, students):
-    """Do the actual work of un-enrolling multiple students, presented as a string
-    of emails separated by commas or returns"""
+def _do_unenroll_students(course_id, students, email_students=False):
+    """
+    Do the actual work of un-enrolling multiple students, presented as a string
+    of emails separated by commas or returns
+    `course_id` is id of course (a `str`)
+    `students` is string of student emails separated by commas or returns (a `str`)
+    `email_students` is user input preference (a `boolean`)
+    """
 
-    old_students, old_students_lc = get_and_clean_student_list(students)
+    old_students, _ = get_and_clean_student_list(students)
     status = dict([x, 'unprocessed'] for x in old_students)
+
+    if email_students:
+        #Composition of email
+        d = {'site_name': settings.SITE_NAME,
+             'course_id': course_id}
 
     for student in old_students:
 
@@ -1046,6 +1210,14 @@ def _do_unenroll_students(course_id, students):
         try:
             user = User.objects.get(email=student)
         except User.DoesNotExist:
+
+            if isok and email_students:
+                #User was allowed to join but had not signed up yet
+                d['email_address'] = student
+                d['message'] = 'allowed_unenroll'
+                send_mail_ret = send_mail_to_student(student, d)
+                status[student] += (', email sent' if send_mail_ret else '')
+
             continue
 
         ce = CourseEnrollment.objects.filter(user=user, course_id=course_id)
@@ -1054,7 +1226,16 @@ def _do_unenroll_students(course_id, students):
             try:
                 ce[0].delete()
                 status[student] = "un-enrolled"
-            except Exception as err:
+                if email_students:
+                    #User was enrolled
+                    d['email_address'] = student
+                    d['first_name'] = user.first_name
+                    d['last_name'] = user.last_name
+                    d['message'] = 'enrolled_unenroll'
+                    send_mail_ret = send_mail_to_student(student, d)
+                    status[student] += (', email sent' if send_mail_ret else '')
+
+            except Exception:
                 if not isok:
                     status[student] = "Error!  Failed to un-enroll"
 
@@ -1066,13 +1247,48 @@ def _do_unenroll_students(course_id, students):
     return data
 
 
+def send_mail_to_student(student, param_dict):
+    """
+    Construct the email using templates and then send it.
+    `student` is the student's email address (a `str`),
+    
+    `param_dict` is a `dict` with keys [
+    `site_name`: name given to edX instance (a `str`)
+    `registration_url`: url for registration (a `str`)
+    `course_id`: id of course (a `str`)
+    `auto_enroll`: user input option (a `str`)
+    `course_url`: url of course (a `str`)
+    `email_address`: email of student (a `str`)
+    `first_name`: student first name (a `str`)
+    `last_name`: student last name (a `str`)
+    `message`: type of email to send and template to use (a `str`)
+                                        ]
+    Returns a boolean indicating whether the email was sent successfully.
+    """
+
+    EMAIL_TEMPLATE_DICT = {'allowed_enroll': ('emails/enroll_email_allowedsubject.txt', 'emails/enroll_email_allowedmessage.txt'),
+                           'enrolled_enroll': ('emails/enroll_email_enrolledsubject.txt', 'emails/enroll_email_enrolledmessage.txt'),
+                           'allowed_unenroll': ('emails/unenroll_email_subject.txt', 'emails/unenroll_email_allowedmessage.txt'),
+                           'enrolled_unenroll': ('emails/unenroll_email_subject.txt', 'emails/unenroll_email_enrolledmessage.txt')}
+
+    subject_template, message_template = EMAIL_TEMPLATE_DICT.get(param_dict['message'], (None, None))
+    if subject_template is not None and message_template is not None:
+        subject = render_to_string(subject_template, param_dict)
+        message = render_to_string(message_template, param_dict)
+
+        # Email subject *must not* contain newlines
+        subject = ''.join(subject.splitlines())
+        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [student], fail_silently=False)
+        return True
+    else:
+        return False
+
+
 def get_and_clean_student_list(students):
     """
     Separate out individual student email from the comma, or space separated string.
-
-    In:
-    students: string coming from the input text area
-    Return:
+    `students` is string of student emails separated by commas or returns (a `str`)
+    Returns:
     students: list of cleaned student emails
     students_lc: list of lower case cleaned student emails
     """
@@ -1113,11 +1329,11 @@ def get_answers_distribution(request, course_id):
 
 
 def compute_course_stats(course):
-    '''
+    """
     Compute course statistics, including number of problems, videos, html.
 
     course is a CourseDescriptor from the xmodule system.
-    '''
+    """
 
     # walk the course by using get_children() until we come to the leaves; count the
     # number of different leaf types
@@ -1137,10 +1353,10 @@ def compute_course_stats(course):
 
 
 def dump_grading_context(course):
-    '''
+    """
     Dump information about course grading context (eg which problems are graded in what assignments)
     Very useful for debugging grading_policy.json and policy.json
-    '''
+    """
     msg = "-----------------------------------------------------------------------------\n"
     msg += "Course grader:\n"
 
@@ -1164,10 +1380,10 @@ def dump_grading_context(course):
         msg += "--> Section %s:\n" % (gs)
         for sec in gsvals:
             s = sec['section_descriptor']
-            format = getattr(s.lms, 'format', None)
+            grade_format = getattr(s.lms, 'grade_format', None)
             aname = ''
-            if format in graders:
-                g = graders[format]
+            if grade_format in graders:
+                g = graders[grade_format]
                 aname = '%s %02d' % (g.short_label, g.index)
                 g.index += 1
             elif s.display_name in graders:
@@ -1176,8 +1392,73 @@ def dump_grading_context(course):
             notes = ''
             if getattr(s, 'score_by_attempt', False):
                 notes = ', score by attempt!'
-            msg += "      %s (format=%s, Assignment=%s%s)\n" % (s.display_name, format, aname, notes)
+            msg += "      %s (grade_format=%s, Assignment=%s%s)\n" % (s.display_name, grade_format, aname, notes)
     msg += "all descriptors:\n"
     msg += "length=%d\n" % len(gc['all_descriptors'])
     msg = '<pre>%s</pre>' % msg.replace('<', '&lt;')
     return msg
+
+
+def get_background_task_table(course_id, problem_url, student=None):
+    """
+    Construct the "datatable" structure to represent background task history.
+
+    Filters the background task history to the specified course and problem.
+    If a student is provided, filters to only those tasks for which that student
+    was specified.
+
+    Returns a tuple of (msg, datatable), where the msg is a possible error message,
+    and the datatable is the datatable to be used for display.
+    """
+    history_entries = get_instructor_task_history(course_id, problem_url, student)
+    datatable = {}
+    msg = ""
+    # first check to see if there is any history at all
+    # (note that we don't have to check that the arguments are valid; it
+    # just won't find any entries.)
+    if (history_entries.count()) == 0:
+        if student is not None:
+            template = '<font color="red">Failed to find any background tasks for course "{course}", module "{problem}" and student "{student}".</font>'
+            msg += template.format(course=course_id, problem=problem_url, student=student.username)
+        else:
+            msg += '<font color="red">Failed to find any background tasks for course "{course}" and module "{problem}".</font>'.format(course=course_id, problem=problem_url)
+    else:
+        datatable['header'] = ["Task Type",
+                               "Task Id",
+                               "Requester",
+                               "Submitted",
+                               "Duration (sec)",
+                               "Task State",
+                               "Task Status",
+                               "Task Output"]
+
+        datatable['data'] = []
+        for instructor_task in history_entries:
+            # get duration info, if known:
+            duration_sec = 'unknown'
+            if hasattr(instructor_task, 'task_output') and instructor_task.task_output is not None:
+                task_output = json.loads(instructor_task.task_output)
+                if 'duration_ms' in task_output:
+                    duration_sec = int(task_output['duration_ms'] / 1000.0)
+            # get progress status message:
+            success, task_message = get_task_completion_info(instructor_task)
+            status = "Complete" if success else "Incomplete"
+            # generate row for this task:
+            row = [str(instructor_task.task_type),
+                   str(instructor_task.task_id),
+                   str(instructor_task.requester),
+                   instructor_task.created.isoformat(' '),
+                   duration_sec,
+                   str(instructor_task.task_state),
+                   status,
+                   task_message]
+            datatable['data'].append(row)
+
+        if student is not None:
+            datatable['title'] = "{course_id} > {location} > {student}".format(course_id=course_id,
+                                                                               location=problem_url,
+                                                                               student=student.username)
+        else:
+            datatable['title'] = "{course_id} > {location}".format(course_id=course_id, location=problem_url)
+
+    return msg, datatable

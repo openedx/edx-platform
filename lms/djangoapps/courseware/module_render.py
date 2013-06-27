@@ -1,10 +1,7 @@
 import json
 import logging
-import pyparsing
 import re
 import sys
-import static_replace
-
 from functools import partial
 
 from django.conf import settings
@@ -16,27 +13,31 @@ from django.http import Http404
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
 
+import pyparsing
 from requests.auth import HTTPBasicAuth
+from statsd import statsd
 
 from capa.xqueue_interface import XQueueInterface
-from courseware.masquerade import setup_masquerade
-from courseware.access import has_access
 from mitxmako.shortcuts import render_to_string
-from .models import StudentModule
-from psychometrics.psychoanalyze import make_psychometrics_data_update_handler
-from student.models import unique_id_for_user
+from xblock.runtime import DbModel
+from xmodule.error_module import ErrorDescriptor, NonStaffErrorDescriptor
 from xmodule.errortracker import exc_info_to_str
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
-from xmodule.x_module import ModuleSystem
-from xmodule.error_module import ErrorDescriptor, NonStaffErrorDescriptor
-from xblock.runtime import DbModel
-from xmodule_modifiers import replace_course_urls, replace_static_urls, add_histogram, wrap_xmodule
-from .model_data import LmsKeyValueStore, LmsUsage, ModelDataCache
-
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from statsd import statsd
+from xmodule.x_module import ModuleSystem
+from xmodule_modifiers import replace_course_urls, replace_static_urls, add_histogram, wrap_xmodule
+
+import static_replace
+from psychometrics.psychoanalyze import make_psychometrics_data_update_handler
+from student.models import unique_id_for_user
+
+from courseware.access import has_access
+from courseware.masquerade import setup_masquerade
+from courseware.model_data import LmsKeyValueStore, LmsUsage, ModelDataCache
+from courseware.models import StudentModule
+
 
 log = logging.getLogger(__name__)
 
@@ -121,7 +122,7 @@ def toc_for_course(user, request, course, active_chapter, active_section, model_
 
 
 def get_module(user, request, location, model_data_cache, course_id,
-               position=None, not_found_ok = False, wrap_xmodule_display=True,
+               position=None, not_found_ok=False, wrap_xmodule_display=True,
                grade_bucket_type=None, depth=0):
     """
     Get an instance of the xmodule class identified by location,
@@ -161,15 +162,48 @@ def get_module(user, request, location, model_data_cache, course_id,
         return None
 
 
-def get_module_for_descriptor(user, request, descriptor, model_data_cache, course_id,
-                position=None, wrap_xmodule_display=True, grade_bucket_type=None):
+def get_xqueue_callback_url_prefix(request):
     """
-    Actually implement get_module.  See docstring there for details.
-    """
+    Calculates default prefix based on request, but allows override via settings
 
+    This is separated from get_module_for_descriptor so that it can be called
+    by the LMS before submitting background tasks to run.  The xqueue callbacks
+    should go back to the LMS, not to the worker.
+    """
+    prefix = '{proto}://{host}'.format(
+            proto=request.META.get('HTTP_X_FORWARDED_PROTO', 'https' if request.is_secure() else 'http'),
+            host=request.get_host()
+        )
+    return settings.XQUEUE_INTERFACE.get('callback_url', prefix)
+
+
+def get_module_for_descriptor(user, request, descriptor, model_data_cache, course_id,
+                              position=None, wrap_xmodule_display=True, grade_bucket_type=None):
+    """
+    Implements get_module, extracting out the request-specific functionality.
+
+    See get_module() docstring for further details.
+    """
     # allow course staff to masquerade as student
     if has_access(user, descriptor, 'staff', course_id):
         setup_masquerade(request, True)
+
+    track_function = make_track_function(request)
+    xqueue_callback_url_prefix = get_xqueue_callback_url_prefix(request)
+
+    return get_module_for_descriptor_internal(user, descriptor, model_data_cache, course_id,
+                                              track_function, xqueue_callback_url_prefix,
+                                              position, wrap_xmodule_display, grade_bucket_type)
+
+
+def get_module_for_descriptor_internal(user, descriptor, model_data_cache, course_id,
+                                       track_function, xqueue_callback_url_prefix,
+                                       position=None, wrap_xmodule_display=True, grade_bucket_type=None):
+    """
+    Actually implement get_module, without requiring a request.
+
+    See get_module() docstring for further details.
+    """
 
     # Short circuit--if the user shouldn't have access, bail without doing any work
     if not has_access(user, descriptor, 'load', course_id):
@@ -186,19 +220,13 @@ def get_module_for_descriptor(user, request, descriptor, model_data_cache, cours
 
     def make_xqueue_callback(dispatch='score_update'):
         # Fully qualified callback URL for external queueing system
-        xqueue_callback_url = '{proto}://{host}'.format(
-            host=request.get_host(),
-            proto=request.META.get('HTTP_X_FORWARDED_PROTO', 'https' if request.is_secure() else 'http')
-        )
-        xqueue_callback_url = settings.XQUEUE_INTERFACE.get('callback_url',xqueue_callback_url)	# allow override
-
-        xqueue_callback_url += reverse('xqueue_callback',
-                                      kwargs=dict(course_id=course_id,
-                                                  userid=str(user.id),
-                                                  id=descriptor.location.url(),
-                                                  dispatch=dispatch),
-                                      )
-        return xqueue_callback_url
+        relative_xqueue_callback_url = reverse('xqueue_callback',
+                                               kwargs=dict(course_id=course_id,
+                                                           userid=str(user.id),
+                                                           mod_id=descriptor.location.url(),
+                                                           dispatch=dispatch),
+                                       )
+        return xqueue_callback_url_prefix + relative_xqueue_callback_url
 
     # Default queuename is course-specific and is derived from the course that
     #   contains the current module.
@@ -211,20 +239,20 @@ def get_module_for_descriptor(user, request, descriptor, model_data_cache, cours
               'waittime': settings.XQUEUE_WAITTIME_BETWEEN_REQUESTS
              }
 
-    #This is a hacky way to pass settings to the combined open ended xmodule
-    #It needs an S3 interface to upload images to S3
-    #It needs the open ended grading interface in order to get peer grading to be done
-    #this first checks to see if the descriptor is the correct one, and only sends settings if it is
+    # This is a hacky way to pass settings to the combined open ended xmodule
+    # It needs an S3 interface to upload images to S3
+    # It needs the open ended grading interface in order to get peer grading to be done
+    # this first checks to see if the descriptor is the correct one, and only sends settings if it is
 
-    #Get descriptor metadata fields indicating needs for various settings
+    # Get descriptor metadata fields indicating needs for various settings
     needs_open_ended_interface = getattr(descriptor, "needs_open_ended_interface", False)
     needs_s3_interface = getattr(descriptor, "needs_s3_interface", False)
 
-    #Initialize interfaces to None
+    # Initialize interfaces to None
     open_ended_grading_interface = None
     s3_interface = None
 
-    #Create interfaces if needed
+    # Create interfaces if needed
     if needs_open_ended_interface:
         open_ended_grading_interface = settings.OPEN_ENDED_GRADING_INTERFACE
         open_ended_grading_interface['mock_peer_grading'] = settings.MOCK_PEER_GRADING
@@ -238,10 +266,15 @@ def get_module_for_descriptor(user, request, descriptor, model_data_cache, cours
 
     def inner_get_module(descriptor):
         """
-        Delegate to get_module.  It does an access check, so may return None
+        Delegate to get_module_for_descriptor_internal() with all values except `descriptor` set.
+
+        Because it does an access check, it may return None.
         """
-        return get_module_for_descriptor(user, request, descriptor,
-                                         model_data_cache, course_id, position)
+        # TODO: fix this so that make_xqueue_callback uses the descriptor passed into
+        # inner_get_module, not the parent's callback.  Add it as an argument....
+        return get_module_for_descriptor_internal(user, descriptor, model_data_cache, course_id,
+                                                  track_function, make_xqueue_callback,
+                                                  position, wrap_xmodule_display, grade_bucket_type)
 
     def xblock_model_data(descriptor):
         return DbModel(
@@ -266,7 +299,7 @@ def get_module_for_descriptor(user, request, descriptor, model_data_cache, cours
         student_module.max_grade = event.get('max_value')
         student_module.save()
 
-        #Bin score into range and increment stats
+        # Bin score into range and increment stats
         score_bucket = get_score_bucket(student_module.grade, student_module.max_grade)
         org, course_num, run = course_id.split("/")
 
@@ -291,7 +324,7 @@ def get_module_for_descriptor(user, request, descriptor, model_data_cache, cours
     # TODO (cpennington): When modules are shared between courses, the static
     # prefix is going to have to be specific to the module, not the directory
     # that the xml was loaded from
-    system = ModuleSystem(track_function=make_track_function(request),
+    system = ModuleSystem(track_function=track_function,
                           render_template=render_to_string,
                           ajax_url=ajax_url,
                           xqueue=xqueue,
@@ -321,7 +354,7 @@ def get_module_for_descriptor(user, request, descriptor, model_data_cache, cours
     system.set('position', position)
     system.set('DEBUG', settings.DEBUG)
     if settings.MITX_FEATURES.get('ENABLE_PSYCHOMETRICS'):
-        system.set('psychometrics_handler',		# set callback for updating PsychometricsData
+        system.set('psychometrics_handler',  # set callback for updating PsychometricsData
                    make_psychometrics_data_update_handler(course_id, user, descriptor.location.url()))
 
     try:
@@ -366,40 +399,47 @@ def get_module_for_descriptor(user, request, descriptor, model_data_cache, cours
 
 
 @csrf_exempt
-def xqueue_callback(request, course_id, userid, id, dispatch):
+def xqueue_callback(request, course_id, userid, mod_id, dispatch):
     '''
     Entry point for graded results from the queueing system.
     '''
+    data = request.POST.copy()
+
     # Test xqueue package, which we expect to be:
     #   xpackage = {'xqueue_header': json.dumps({'lms_key':'secretkey',...}),
     #               'xqueue_body'  : 'Message from grader'}
-    get = request.POST.copy()
     for key in ['xqueue_header', 'xqueue_body']:
-        if not get.has_key(key):
+        if key not in data:
             raise Http404
-    header = json.loads(get['xqueue_header'])
-    if not isinstance(header, dict) or not header.has_key('lms_key'):
+
+    header = json.loads(data['xqueue_header'])
+    if not isinstance(header, dict) or 'lms_key' not in header:
         raise Http404
 
     # Retrieve target StudentModule
     user = User.objects.get(id=userid)
-
-    model_data_cache = ModelDataCache.cache_for_descriptor_descendents(course_id,
-        user, modulestore().get_instance(course_id, id), depth=0, select_for_update=True)
-    instance = get_module(user, request, id, model_data_cache, course_id, grade_bucket_type='xqueue')
+    model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
+        course_id,
+        user,
+        modulestore().get_instance(course_id, mod_id),
+        depth=0,
+        select_for_update=True
+    )
+    instance = get_module(user, request, mod_id, model_data_cache, course_id, grade_bucket_type='xqueue')
     if instance is None:
-        log.debug("No module {0} for user {1}--access denied?".format(id, user))
+        msg = "No module {0} for user {1}--access denied?".format(mod_id, user)
+        log.debug(msg)
         raise Http404
 
-    # Transfer 'queuekey' from xqueue response header to 'get'. This is required to
-    #   use the interface defined by 'handle_ajax'
-    get.update({'queuekey': header['lms_key']})
+    # Transfer 'queuekey' from xqueue response header to the data.
+    # This is required to use the interface defined by 'handle_ajax'
+    data.update({'queuekey': header['lms_key']})
 
     # We go through the "AJAX" path
-    #   So far, the only dispatch from xqueue will be 'score_update'
+    # So far, the only dispatch from xqueue will be 'score_update'
     try:
         # Can ignore the return value--not used for xqueue_callback
-        instance.handle_ajax(dispatch, get)
+        instance.handle_ajax(dispatch, data)
     except:
         log.exception("error processing ajax call")
         raise
@@ -433,23 +473,15 @@ def modx_dispatch(request, dispatch, location, course_id):
     if not request.user.is_authenticated():
         raise PermissionDenied
 
-    # Check for submitted files and basic file size checks
-    p = request.POST.copy()
-    if request.FILES:
-        for fileinput_id in request.FILES.keys():
-            inputfiles = request.FILES.getlist(fileinput_id)
+    # Get the submitted data
+    data = request.POST.copy()
 
-            if len(inputfiles) > settings.MAX_FILEUPLOADS_PER_INPUT:
-                too_many_files_msg = 'Submission aborted! Maximum %d files may be submitted at once' %\
-                    settings.MAX_FILEUPLOADS_PER_INPUT
-                return HttpResponse(json.dumps({'success': too_many_files_msg}))
-
-            for inputfile in inputfiles:
-                if inputfile.size > settings.STUDENT_FILEUPLOAD_MAX_SIZE:   # Bytes
-                    file_too_big_msg = 'Submission aborted! Your file "%s" is too large (max size: %d MB)' %\
-                                        (inputfile.name, settings.STUDENT_FILEUPLOAD_MAX_SIZE / (1000 ** 2))
-                    return HttpResponse(json.dumps({'success': file_too_big_msg}))
-            p[fileinput_id] = inputfiles
+    # Get and check submitted files
+    files = request.FILES or {}
+    error_msg = _check_files_limits(files)
+    if error_msg:
+        return HttpResponse(json.dumps({'success': error_msg}))
+    data.update(files)  # Merge files into data dictionary
 
     try:
         descriptor = modulestore().get_instance(course_id, location)
@@ -462,8 +494,11 @@ def modx_dispatch(request, dispatch, location, course_id):
         )
         raise Http404
 
-    model_data_cache = ModelDataCache.cache_for_descriptor_descendents(course_id,
-        request.user, descriptor)
+    model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
+        course_id,
+        request.user,
+        descriptor
+    )
 
     instance = get_module(request.user, request, location, model_data_cache, course_id, grade_bucket_type='ajax')
     if instance is None:
@@ -474,7 +509,7 @@ def modx_dispatch(request, dispatch, location, course_id):
 
     # Let the module handle the AJAX
     try:
-        ajax_return = instance.handle_ajax(dispatch, p)
+        ajax_return = instance.handle_ajax(dispatch, data)
 
     # If we can't find the module, respond with a 404
     except NotFoundError:
@@ -496,7 +531,6 @@ def modx_dispatch(request, dispatch, location, course_id):
     return HttpResponse(ajax_return)
 
 
-
 def get_score_bucket(grade, max_grade):
     """
     Function to split arbitrary score ranges into 3 buckets.
@@ -509,3 +543,30 @@ def get_score_bucket(grade, max_grade):
         score_bucket = "correct"
 
     return score_bucket
+
+
+def _check_files_limits(files):
+    """
+    Check if the files in a request are under the limits defined by
+    `settings.MAX_FILEUPLOADS_PER_INPUT` and
+    `settings.STUDENT_FILEUPLOAD_MAX_SIZE`.
+
+    Returns None if files are correct or an error messages otherwise.
+    """
+    for fileinput_id in files.keys():
+        inputfiles = files.getlist(fileinput_id)
+
+        # Check number of files submitted
+        if len(inputfiles) > settings.MAX_FILEUPLOADS_PER_INPUT:
+            msg = 'Submission aborted! Maximum %d files may be submitted at once' %\
+                  settings.MAX_FILEUPLOADS_PER_INPUT
+            return msg
+
+        # Check file sizes
+        for inputfile in inputfiles:
+            if inputfile.size > settings.STUDENT_FILEUPLOAD_MAX_SIZE:   # Bytes
+                msg = 'Submission aborted! Your file "%s" is too large (max size: %d MB)' %\
+                      (inputfile.name, settings.STUDENT_FILEUPLOAD_MAX_SIZE / (1000 ** 2))
+                return msg
+
+    return None

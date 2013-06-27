@@ -14,8 +14,7 @@ from xmodule.raw_module import RawDescriptor
 from xmodule.editing_module import MetadataOnlyEditingDescriptor
 from xmodule.x_module import XModule
 
-from xblock.core import Scope, Object, Boolean, List
-from fields import StringyBoolean, StringyInteger
+from xblock.core import Scope, Dict, Boolean, List, Integer
 
 log = logging.getLogger(__name__)
 
@@ -32,21 +31,21 @@ def pretty_bool(value):
 
 class WordCloudFields(object):
     """XFields for word cloud."""
-    num_inputs = StringyInteger(
+    num_inputs = Integer(
         display_name="Inputs",
         help="Number of text boxes available for students to input words/sentences.",
         scope=Scope.settings,
         default=5,
         values={"min": 1}
     )
-    num_top_words = StringyInteger(
+    num_top_words = Integer(
         display_name="Maximum Words",
         help="Maximum number of words to be displayed in generated word cloud.",
         scope=Scope.settings,
         default=250,
         values={"min": 1}
     )
-    display_student_percents = StringyBoolean(
+    display_student_percents = Boolean(
         display_name="Show Percents",
         help="Statistics are shown for entered words near that word.",
         scope=Scope.settings,
@@ -64,11 +63,11 @@ class WordCloudFields(object):
         scope=Scope.user_state,
         default=[]
     )
-    all_words = Object(
+    all_words = Dict(
         help="All possible words from all students.",
         scope=Scope.content
     )
-    top_words = Object(
+    top_words = Dict(
         help="Top num_top_words words for word cloud.",
         scope=Scope.content
     )
@@ -169,12 +168,12 @@ class WordCloudModule(WordCloudFields, XModule):
             )[:amount]
         )
 
-    def handle_ajax(self, dispatch, post):
+    def handle_ajax(self, dispatch, data):
         """Ajax handler.
 
         Args:
             dispatch: string request slug
-            post: dict request get parameters
+            data: dict request get parameters
 
         Returns:
             json string
@@ -188,7 +187,7 @@ class WordCloudModule(WordCloudFields, XModule):
 
             # Student words from client.
             # FIXME: we must use raw JSON, not a post data (multipart/form-data)
-            raw_student_words = post.getlist('student_words[]')
+            raw_student_words = data.getlist('student_words[]')
             student_words = filter(None, map(self.good_word, raw_student_words))
 
             self.student_words = student_words
@@ -239,4 +238,3 @@ class WordCloudDescriptor(MetadataOnlyEditingDescriptor, RawDescriptor, WordClou
     """Descriptor for WordCloud Xmodule."""
     module_class = WordCloudModule
     template_dir_name = 'word_cloud'
-    stores_state = True

@@ -4,7 +4,6 @@ Browser set up for acceptance tests.
 
 #pylint: disable=E1101
 #pylint: disable=W0613
-#pylint: disable=W0611
 
 from lettuce import before, after, world
 from splinter.browser import Browser
@@ -15,8 +14,9 @@ from selenium.common.exceptions import WebDriverException
 
 # Let the LMS and CMS do their one-time setup
 # For example, setting up mongo caches
-from lms import one_time_startup
-from cms import one_time_startup
+# These names aren't used, but do important work on import.
+from lms import one_time_startup        # pylint: disable=W0611
+from cms import one_time_startup        # pylint: disable=W0611
 
 # There is an import issue when using django-staticfiles with lettuce
 # Lettuce assumes that we are using django.contrib.staticfiles,

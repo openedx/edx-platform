@@ -22,7 +22,7 @@ modulestore_options = {
     'db': 'xmodule',
     'collection': 'modulestore',
     'fs_root': GITHUB_REPO_ROOT,
-    'render_template': 'mitxmako.shortcuts.render_to_string'
+    'render_template': 'mitxmako.shortcuts.render_to_string',
 }
 
 MODULESTORE = {
@@ -43,9 +43,14 @@ CONTENTSTORE = {
     'OPTIONS': {
         'host': 'localhost',
         'db': 'xcontent',
+    },
+    # allow for additional options that can be keyed on a name, e.g. 'trashcan'
+    'ADDITIONAL_OPTIONS': {
+        'trashcan': {
+            'bucket': 'trash_fs'
+        }
     }
 }
-
 
 DATABASES = {
     'default': {
@@ -163,13 +168,19 @@ MITX_FEATURES['STUDIO_NPS_SURVEY'] = False
 # Enable URL that shows information about the status of variuous services
 MITX_FEATURES['ENABLE_SERVICE_STATUS'] = True
 
-# segment-io key for dev
-SEGMENT_IO_KEY = 'mty8edrrsg'
+############################# SEGMENT-IO ##################################
+
+# If there's an environment variable set, grab it and turn on Segment.io
+# Note that this is the Studio key. There is a separate key for the LMS.
+import os
+SEGMENT_IO_KEY = os.environ.get('SEGMENT_IO_KEY')
+if SEGMENT_IO_KEY:
+    MITX_FEATURES['SEGMENT_IO'] = True
 
 
 #####################################################################
 # Lastly, see if the developer has any local overrides.
 try:
-    from .private import *
+    from .private import *      # pylint: disable=F0401
 except ImportError:
     pass

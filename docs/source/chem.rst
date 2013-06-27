@@ -1,5 +1,5 @@
 *******************************************
-Chem module
+Chemistry modules
 *******************************************
 
 .. module:: chem
@@ -7,7 +7,7 @@ Chem module
 Miller
 ======
 
-.. automodule:: capa.chem.miller
+.. automodule:: chem.miller
     :members:
     :show-inheritance:
 
@@ -47,14 +47,14 @@ Documentation from **crystallography.js**::
 Chemcalc
 ========
 
-.. automodule:: capa.chem.chemcalc
+.. automodule:: chem.chemcalc
     :members:
     :show-inheritance:
 
 Chemtools
 =========
 
-.. automodule:: capa.chem.chemtools
+.. automodule:: chem.chemtools
     :members:
     :show-inheritance:
 
@@ -62,7 +62,7 @@ Chemtools
 Tests
 =====
 
-.. automodule:: capa.chem.tests
+.. automodule:: chem.tests
     :members:
     :show-inheritance:
 

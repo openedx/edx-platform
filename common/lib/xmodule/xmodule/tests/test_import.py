@@ -157,9 +157,10 @@ class ImportTestCase(BaseCourseTestCase):
         self.assertEqual(child.lms.due, ImportTestCase.date.from_json(v))
         self.assertEqual(child._inheritable_metadata, child._inherited_metadata)
         self.assertEqual(2, len(child._inherited_metadata))
-        self.assertLessEqual(ImportTestCase.date.from_json(
-            child._inherited_metadata['start']),
-            datetime.datetime.now(UTC()))
+        self.assertLessEqual(
+            ImportTestCase.date.from_json(child._inherited_metadata['start']),
+            datetime.datetime.now(UTC())
+        )
         self.assertEqual(v, child._inherited_metadata['due'])
 
         # Now export and check things
@@ -221,7 +222,8 @@ class ImportTestCase(BaseCourseTestCase):
         # why do these tests look in the internal structure v just calling child.start?
         self.assertLessEqual(
             ImportTestCase.date.from_json(child._inherited_metadata['start']),
-            datetime.datetime.now(UTC()))
+            datetime.datetime.now(UTC())
+        )
 
     def test_metadata_override_default(self):
         """
@@ -336,8 +338,8 @@ class ImportTestCase(BaseCourseTestCase):
         location = Location(["i4x", "edX", "toy", "video", "Welcome"])
         toy_video = modulestore.get_instance(toy_id, location)
         two_toy_video = modulestore.get_instance(two_toy_id, location)
-        self.assertEqual(etree.fromstring(toy_video.data).get('youtube'), "1.0:p2Q6BrNhdh8")
-        self.assertEqual(etree.fromstring(two_toy_video.data).get('youtube'), "1.0:p2Q6BrNhdh9")
+        self.assertEqual(toy_video.youtube_id_1_0, "p2Q6BrNhdh8")
+        self.assertEqual(two_toy_video.youtube_id_1_0, "p2Q6BrNhdh9")
 
     def test_colon_in_url_name(self):
         """Ensure that colons in url_names convert to file paths properly"""

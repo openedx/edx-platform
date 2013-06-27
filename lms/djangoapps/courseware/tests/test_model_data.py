@@ -26,10 +26,10 @@ def mock_field(scope, name):
 
 def mock_descriptor(fields=[], lms_fields=[]):
     descriptor = Mock()
-    descriptor.stores_state = True
     descriptor.location = location('def_id')
     descriptor.module_class.fields = fields
     descriptor.module_class.lms.fields = lms_fields
+    descriptor.module_class.__name__ = 'MockProblemModule'
     return descriptor
 
 location = partial(Location, 'i4x', 'edX', 'test_course', 'problem')
@@ -38,7 +38,7 @@ course_id = 'edX/test_course/test'
 content_key = partial(LmsKeyValueStore.Key, Scope.content, None, location('def_id'))
 settings_key = partial(LmsKeyValueStore.Key, Scope.settings, None, location('def_id'))
 user_state_key = partial(LmsKeyValueStore.Key, Scope.user_state, 'user', location('def_id'))
-prefs_key = partial(LmsKeyValueStore.Key, Scope.preferences, 'user', 'problem')
+prefs_key = partial(LmsKeyValueStore.Key, Scope.preferences, 'user', 'MockProblemModule')
 user_info_key = partial(LmsKeyValueStore.Key, Scope.user_info, 'user', None)
 
 
@@ -190,6 +190,10 @@ class StorageTestBase(object):
         self.desc_md = {}
         self.mdc = ModelDataCache([mock_descriptor([mock_field(self.scope, 'existing_field')])], course_id, self.user)
         self.kvs = LmsKeyValueStore(self.desc_md, self.mdc)
+
+    def test_set_and_get_existing_field(self):
+        self.kvs.set(self.key_factory('existing_field'), 'test_value')
+        self.assertEquals('test_value', self.kvs.get(self.key_factory('existing_field')))
 
     def test_get_existing_field(self):
         "Test that getting an existing field in an existing Storage Field works"

@@ -6,7 +6,7 @@ import sys
 from collections import namedtuple
 from lxml import etree
 
-from xblock.core import Object, Scope
+from xblock.core import Dict, Scope
 from xmodule.x_module import (XModuleDescriptor, policy_key)
 from xmodule.modulestore import Location
 from xmodule.modulestore.inheritance import own_metadata
@@ -56,7 +56,6 @@ def get_metadata_from_xml(xml_object, remove=True):
     if meta is None:
         return ''
     dmdata = meta.text
-    #log.debug('meta for %s loaded: %s' % (xml_object,dmdata))
     if remove:
         xml_object.remove(meta)
     return dmdata
@@ -79,12 +78,53 @@ class AttrMap(_AttrMapBase):
         return _AttrMapBase.__new__(_cls, from_xml, to_xml)
 
 
+def serialize_field(value):
+    """
+        Return a string version of the value (where value is the JSON-formatted, internally stored value).
+
+        By default, this is the result of calling json.dumps on the input value.
+        """
+    return json.dumps(value)
+
+
+def deserialize_field(field, value):
+    """
+    Deserialize the string version to the value stored internally.
+
+    Note that this is not the same as the value returned by from_json, as model types typically store
+    their value internally as JSON. By default, this method will return the result of calling json.loads
+    on the supplied value, unless json.loads throws a TypeError, or the type of the value returned by json.loads
+    is not supported for this class (from_json throws an Error). In either of those cases, this method returns
+    the input value.
+    """
+    try:
+        deserialized = json.loads(value)
+        if deserialized is None:
+            return deserialized
+        try:
+            field.from_json(deserialized)
+            return deserialized
+        except (ValueError, TypeError):
+            # Support older serialized version, which was just a string, not result of json.dumps.
+            # If the deserialized version cannot be converted to the type (via from_json),
+            # just return the original value. For example, if a string value of '3.4' was
+            # stored for a String field (before we started storing the result of json.dumps),
+            # then it would be deserialized as 3.4, but 3.4 is not supported for a String
+            # field. Therefore field.from_json(3.4) will throw an Error, and we should
+            # actually return the original value of '3.4'.
+            return value
+
+    except (ValueError, TypeError):
+        # Support older serialized version.
+        return value
+
+
 class XmlDescriptor(XModuleDescriptor):
     """
     Mixin class for standardized parsing of from xml
     """
 
-    xml_attributes = Object(help="Map of unhandled xml attributes, used only for storage between import and export",
+    xml_attributes = Dict(help="Map of unhandled xml attributes, used only for storage between import and export",
         default={}, scope=Scope.settings)
 
     # Extension to append to filename paths
@@ -101,9 +141,9 @@ class XmlDescriptor(XModuleDescriptor):
     # Related: What's the right behavior for clean_metadata?
     metadata_attributes = ('format', 'graceperiod', 'showanswer', 'rerandomize',
         'start', 'due', 'graded', 'display_name', 'url_name', 'hide_from_toc',
-        'ispublic', 	# if True, then course is listed for all users; see
-        'xqa_key',  	# for xqaa server access
-        'giturl',	# url of git server for origin of file
+        'ispublic',  # if True, then course is listed for all users; see
+        'xqa_key',  # for xqaa server access
+        'giturl',  # url of git server for origin of file
         # information about testcenter exams is a dict (of dicts), not a string,
         # so it cannot be easily exportable as a course element's attribute.
         'testcenter_info',
@@ -120,25 +160,15 @@ class XmlDescriptor(XModuleDescriptor):
 
     metadata_to_export_to_policy = ('discussion_topics')
 
-    # A dictionary mapping xml attribute names AttrMaps that describe how
-    # to import and export them
-    # Allow json to specify either the string "true", or the bool True.  The string is preferred.
-    to_bool = lambda val: val == 'true' or val == True
-    from_bool = lambda val: str(val).lower()
-    bool_map = AttrMap(to_bool, from_bool)
+    @classmethod
+    def get_map_for_field(cls, attr):
+        for field in set(cls.fields + cls.lms.fields):
+            if field.name == attr:
+                from_xml = lambda val: deserialize_field(field, val)
+                to_xml = lambda val : serialize_field(val)
+                return AttrMap(from_xml, to_xml)
 
-    to_int = lambda val: int(val)
-    from_int = lambda val: str(val)
-    int_map = AttrMap(to_int, from_int)
-    xml_attribute_map = {
-        # type conversion: want True/False in python, "true"/"false" in xml
-        'graded': bool_map,
-        'hide_progress_tab': bool_map,
-        'allow_anonymous': bool_map,
-        'allow_anonymous_to_peers': bool_map,
-        'show_timezone': bool_map,
-    }
-
+        return AttrMap()
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):
@@ -188,7 +218,6 @@ class XmlDescriptor(XModuleDescriptor):
                 filepath, location.url(), str(err))
             raise Exception, msg, sys.exc_info()[2]
 
-
     @classmethod
     def load_definition(cls, xml_object, system, location):
         '''Load a descriptor definition from the specified xml_object.
@@ -224,7 +253,7 @@ class XmlDescriptor(XModuleDescriptor):
         definition, children = cls.definition_from_xml(definition_xml, system)
         if definition_metadata:
             definition['definition_metadata'] = definition_metadata
-        definition['filename'] = [ filepath, filename ]     
+        definition['filename'] = [ filepath, filename ]
 
         return definition, children
 
@@ -246,7 +275,7 @@ class XmlDescriptor(XModuleDescriptor):
                     # don't load these
                     continue
 
-                attr_map = cls.xml_attribute_map.get(attr, AttrMap())
+                attr_map = cls.get_map_for_field(attr)
                 metadata[attr] = attr_map.from_xml(val)
         return metadata
 
@@ -258,7 +287,7 @@ class XmlDescriptor(XModuleDescriptor):
         through the attrmap.  Updates the metadata dict in place.
         """
         for attr in policy:
-            attr_map = cls.xml_attribute_map.get(attr, AttrMap())
+            attr_map = cls.get_map_for_field(attr)
             metadata[cls._translate(attr)] = attr_map.from_xml(policy[attr])
 
     @classmethod
@@ -318,14 +347,14 @@ class XmlDescriptor(XModuleDescriptor):
         model_data['children'] = children
 
         model_data['xml_attributes'] = {}
-        model_data['xml_attributes']['filename'] = definition.get('filename', ['', None]) # for git link
+        model_data['xml_attributes']['filename'] = definition.get('filename', ['', None])  # for git link
         for key, value in metadata.items():
             if key not in set(f.name for f in cls.fields + cls.lms.fields):
                 model_data['xml_attributes'][key] = value
+        model_data['location'] = location
 
         return cls(
             system,
-            location,
             model_data,
         )
 
@@ -347,7 +376,7 @@ class XmlDescriptor(XModuleDescriptor):
 
     def export_to_xml(self, resource_fs):
         """
-        Returns an xml string representign this module, and all modules
+        Returns an xml string representing this module, and all modules
         underneath it.  May also write required resources out to resource_fs
 
         Assumes that modules have single parentage (that no module appears twice
@@ -372,7 +401,7 @@ class XmlDescriptor(XModuleDescriptor):
             """Get the value for this attribute that we want to store.
             (Possible format conversion through an AttrMap).
              """
-            attr_map = self.xml_attribute_map.get(attr, AttrMap())
+            attr_map = self.get_map_for_field(attr)
             return attr_map.to_xml(self._model_data[attr])
 
         # Add the non-inherited metadata
@@ -380,7 +409,6 @@ class XmlDescriptor(XModuleDescriptor):
             # don't want e.g. data_dir
             if attr not in self.metadata_to_strip and attr not in self.metadata_to_export_to_policy:
                 val = val_for_xml(attr)
-                #logging.debug('location.category = {0}, attr = {1}'.format(self.location.category, attr))
                 try:
                     xml_object.set(attr, val)
                 except Exception, e:

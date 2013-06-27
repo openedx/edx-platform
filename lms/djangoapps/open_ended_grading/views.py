@@ -1,7 +1,6 @@
 # Grading Views
 
 import logging
-import urllib
 
 from django.conf import settings
 from django.views.decorators.cache import cache_control

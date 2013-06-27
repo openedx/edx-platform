@@ -1,14 +1,9 @@
 from collections import defaultdict
 from fs.errors import ResourceNotFoundError
-from functools import wraps
 import logging
 import inspect
 
-from lxml.html import rewrite_links
-
 from path import path
-from django.conf import settings
-from django.core.urlresolvers import reverse
 from django.http import Http404
 
 from .module_render import get_module
@@ -17,13 +12,11 @@ from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.content import StaticContent
 from xmodule.modulestore.xml import XMLModuleStore
-from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.x_module import XModule
+from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
 from courseware.model_data import ModelDataCache
 from static_replace import replace_static_urls
 from courseware.access import has_access
 import branding
-from xmodule.modulestore.exceptions import ItemNotFoundError
 
 log = logging.getLogger(__name__)
 
@@ -55,7 +48,8 @@ def get_course_by_id(course_id, depth=0):
         return modulestore().get_instance(course_id, course_loc, depth=depth)
     except (KeyError, ItemNotFoundError):
         raise Http404("Course not found.")
-
+    except InvalidLocationError:
+        raise Http404("Invalid location")
 
 def get_course_with_access(user, course_id, action, depth=0):
     """

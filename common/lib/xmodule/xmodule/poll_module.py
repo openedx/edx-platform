@@ -19,7 +19,7 @@ from xmodule.x_module import XModule
 from xmodule.stringify import stringify_children
 from xmodule.mako_module import MakoModuleDescriptor
 from xmodule.xml_module import XmlDescriptor
-from xblock.core import Scope, String, Object, Boolean, List
+from xblock.core import Scope, String, Dict, Boolean, List
 
 log = logging.getLogger(__name__)
 
@@ -30,7 +30,7 @@ class PollFields(object):
 
     voted = Boolean(help="Whether this student has voted on the poll", scope=Scope.user_state, default=False)
     poll_answer = String(help="Student answer", scope=Scope.user_state, default='')
-    poll_answers = Object(help="All possible answers for the poll fro other students", scope=Scope.content)
+    poll_answers = Dict(help="All possible answers for the poll fro other students", scope=Scope.content)
 
     answers = List(help="Poll answers from xml", scope=Scope.content, default=[])
     question = String(help="Poll question", scope=Scope.content, default='')
@@ -47,12 +47,12 @@ class PollModule(PollFields, XModule):
     css = {'scss': [resource_string(__name__, 'css/poll/display.scss')]}
     js_module_name = "Poll"
 
-    def handle_ajax(self, dispatch, get):
+    def handle_ajax(self, dispatch, data):
         """Ajax handler.
 
         Args:
             dispatch: string request slug
-            get: dict request get parameters
+            data: dict request data parameters
 
         Returns:
             json string
@@ -141,7 +141,6 @@ class PollDescriptor(PollFields, MakoModuleDescriptor, XmlDescriptor):
 
     module_class = PollModule
     template_dir_name = 'poll'
-    stores_state = True
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):

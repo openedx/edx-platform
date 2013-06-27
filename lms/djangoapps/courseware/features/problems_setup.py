@@ -142,34 +142,34 @@ def answer_problem(problem_type, correctness):
 
     elif problem_type == "multiple choice":
         if correctness == 'correct':
-            inputfield('multiple choice', choice='choice_2').check()
+            world.css_check(inputfield('multiple choice', choice='choice_2'))
         else:
-            inputfield('multiple choice', choice='choice_1').check()
+            world.css_check(inputfield('multiple choice', choice='choice_1'))
 
     elif problem_type == "checkbox":
         if correctness == 'correct':
-            inputfield('checkbox', choice='choice_0').check()
-            inputfield('checkbox', choice='choice_2').check()
+            world.css_check(inputfield('checkbox', choice='choice_0'))
+            world.css_check(inputfield('checkbox', choice='choice_2'))
         else:
-            inputfield('checkbox', choice='choice_3').check()
+            world.css_check(inputfield('checkbox', choice='choice_3'))
 
     elif problem_type == 'radio':
         if correctness == 'correct':
-            inputfield('radio', choice='choice_2').check()
+            world.css_check(inputfield('radio', choice='choice_2'))
         else:
-            inputfield('radio', choice='choice_1').check()
+            world.css_check(inputfield('radio', choice='choice_1'))
 
     elif problem_type == 'string':
         textvalue = 'correct string' if correctness == 'correct' else 'incorrect'
-        inputfield('string').fill(textvalue)
+        world.css_fill(inputfield('string'), textvalue)
 
     elif problem_type == 'numerical':
         textvalue = "pi + 1" if correctness == 'correct' else str(random.randint(-2, 2))
-        inputfield('numerical').fill(textvalue)
+        world.css_fill(inputfield('numerical'), textvalue)
 
     elif problem_type == 'formula':
         textvalue = "x^2+2*x+y" if correctness == 'correct' else 'x^2'
-        inputfield('formula').fill(textvalue)
+        world.css_fill(inputfield('formula'), textvalue)
 
     elif problem_type == 'script':
         # Correct answer is any two integers that sum to 10
@@ -181,8 +181,8 @@ def answer_problem(problem_type, correctness):
         if correctness == 'incorrect':
             second_addend += random.randint(1, 10)
 
-        inputfield('script', input_num=1).fill(str(first_addend))
-        inputfield('script', input_num=2).fill(str(second_addend))
+        world.css_fill(inputfield('script', input_num=1), str(first_addend))
+        world.css_fill(inputfield('script', input_num=2), str(second_addend))
 
     elif problem_type == 'code':
         # The fake xqueue server is configured to respond
@@ -281,11 +281,11 @@ def add_problem_to_course(course, problem_type, extraMeta=None):
 
 
 def inputfield(problem_type, choice=None, input_num=1):
-    """ Return the <input> element for *problem_type*.
+    """ Return the css selector for `problem_type`.
     For example, if problem_type is 'string', return
     the text field for the string problem in the test course.
 
-    *choice* is the name of the checkbox input in a group
+    `choice` is the name of the checkbox input in a group
     of checkboxes. """
 
     sel = ("input#input_i4x-edx-model_course-problem-%s_2_%s" %
@@ -299,7 +299,7 @@ def inputfield(problem_type, choice=None, input_num=1):
     assert world.is_css_present(sel)
 
     # Retrieve the input element
-    return world.browser.find_by_css(sel)
+    return sel
 
 
 def assert_checked(problem_type, choices):
@@ -312,7 +312,7 @@ def assert_checked(problem_type, choices):
 
     all_choices = ['choice_0', 'choice_1', 'choice_2', 'choice_3']
     for this_choice in all_choices:
-        element = inputfield(problem_type, choice=this_choice)
+        element = world.css_find(inputfield(problem_type, choice=this_choice))
 
         if this_choice in choices:
             assert element.checked
@@ -321,5 +321,5 @@ def assert_checked(problem_type, choices):
 
 
 def assert_textfield(problem_type, expected_text, input_num=1):
-    element = inputfield(problem_type, input_num=input_num)
+    element = world.css_find(inputfield(problem_type, input_num=input_num))
     assert element.value == expected_text

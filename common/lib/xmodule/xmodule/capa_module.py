@@ -18,8 +18,8 @@ from .progress import Progress
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
-from xblock.core import Scope, String, Boolean, Object
-from .fields import Timedelta, Date, StringyInteger, StringyFloat
+from xblock.core import Scope, String, Boolean, Dict, Integer, Float
+from .fields import Timedelta, Date
 from django.utils.timezone import UTC
 
 log = logging.getLogger("mitx.courseware")
@@ -47,6 +47,9 @@ def randomization_bin(seed, problem_id):
 
 
 class Randomization(String):
+    """
+    Define a field to store how to randomize a problem.
+    """
     def from_json(self, value):
         if value in ("", "true"):
             return "always"
@@ -58,24 +61,39 @@ class Randomization(String):
 
 
 class ComplexEncoder(json.JSONEncoder):
+    """
+    Extend the JSON encoder to correctly handle complex numbers
+    """
     def default(self, obj):
+        """
+        Print a nicely formatted complex number, or default to the JSON encoder
+        """
         if isinstance(obj, complex):
-            return "{real:.7g}{imag:+.7g}*j".format(real=obj.real, imag=obj.imag)
+            return u"{real:.7g}{imag:+.7g}*j".format(real=obj.real, imag=obj.imag)
         return json.JSONEncoder.default(self, obj)
 
 
 class CapaFields(object):
-    attempts = StringyInteger(help="Number of attempts taken by the student on this problem", default=0, scope=Scope.user_state)
-    max_attempts = StringyInteger(
+    """
+    Define the possible fields for a Capa problem
+    """
+    attempts = Integer(help="Number of attempts taken by the student on this problem",
+                       default=0, scope=Scope.user_state)
+    max_attempts = Integer(
         display_name="Maximum Attempts",
-        help="Defines the number of times a student can try to answer this problem. If the value is not set, infinite attempts are allowed.",
+        help=("Defines the number of times a student can try to answer this problem. "
+              "If the value is not set, infinite attempts are allowed."),
         values={"min": 0}, scope=Scope.settings
     )
     due = Date(help="Date that this problem is due by", scope=Scope.settings)
-    graceperiod = Timedelta(help="Amount of time after the due date that submissions will be accepted", scope=Scope.settings)
+    graceperiod = Timedelta(
+        help="Amount of time after the due date that submissions will be accepted",
+        scope=Scope.settings
+    )
     showanswer = String(
         display_name="Show Answer",
-        help="Defines when to show the answer to the problem. A default value can be set in Advanced Settings.",
+        help=("Defines when to show the answer to the problem. "
+              "A default value can be set in Advanced Settings."),
         scope=Scope.settings, default="closed",
         values=[
             {"display_name": "Always", "value": "always"},
@@ -86,23 +104,33 @@ class CapaFields(object):
             {"display_name": "Past Due", "value": "past_due"},
             {"display_name": "Never", "value": "never"}]
     )
-    force_save_button = Boolean(help="Whether to force the save button to appear on the page", scope=Scope.settings, default=False)
+    force_save_button = Boolean(
+        help="Whether to force the save button to appear on the page",
+        scope=Scope.settings, default=False
+    )
     rerandomize = Randomization(
-        display_name="Randomization", help="Defines how often inputs are randomized when a student loads the problem. This setting only applies to problems that can have randomly generated numeric values. A default value can be set in Advanced Settings.",
-        default="always", scope=Scope.settings, values=[{"display_name": "Always", "value": "always"},
-                                                        {"display_name": "On Reset", "value": "onreset"},
-                                                        {"display_name": "Never", "value": "never"},
-                                                        {"display_name": "Per Student", "value": "per_student"}]
+        display_name="Randomization",
+        help="Defines how often inputs are randomized when a student loads the problem. "
+        "This setting only applies to problems that can have randomly generated numeric values. "
+        "A default value can be set in Advanced Settings.",
+        default="always", scope=Scope.settings, values=[
+            {"display_name": "Always", "value": "always"},
+            {"display_name": "On Reset", "value": "onreset"},
+            {"display_name": "Never", "value": "never"},
+            {"display_name": "Per Student", "value": "per_student"}
+        ]
     )
     data = String(help="XML data for the problem", scope=Scope.content)
-    correct_map = Object(help="Dictionary with the correctness of current student answers", scope=Scope.user_state, default={})
-    input_state = Object(help="Dictionary for maintaining the state of inputtypes", scope=Scope.user_state)
-    student_answers = Object(help="Dictionary with the current student responses", scope=Scope.user_state)
+    correct_map = Dict(help="Dictionary with the correctness of current student answers",
+                       scope=Scope.user_state, default={})
+    input_state = Dict(help="Dictionary for maintaining the state of inputtypes", scope=Scope.user_state)
+    student_answers = Dict(help="Dictionary with the current student responses", scope=Scope.user_state)
     done = Boolean(help="Whether the student has answered the problem", scope=Scope.user_state)
-    seed = StringyInteger(help="Random seed for this student", scope=Scope.user_state)
-    weight = StringyFloat(
+    seed = Integer(help="Random seed for this student", scope=Scope.user_state)
+    weight = Float(
         display_name="Problem Weight",
-        help="Defines the number of points each problem is worth. If the value is not set, each response field in the problem is worth one point.",
+        help=("Defines the number of points each problem is worth. "
+              "If the value is not set, each response field in the problem is worth one point."),
         values={"min": 0, "step": .1},
         scope=Scope.settings
     )
@@ -114,10 +142,12 @@ class CapaFields(object):
 
 
 class CapaModule(CapaFields, XModule):
-    '''
+    """
     An XModule implementing LonCapa format problems, implemented by way of
     capa.capa_problem.LoncapaProblem
-    '''
+
+    CapaModule.__init__ takes the same arguments as xmodule.x_module:XModule.__init__
+    """
     icon_class = 'problem'
 
     js = {'coffee': [resource_string(__name__, 'js/src/capa/display.coffee'),
@@ -131,8 +161,11 @@ class CapaModule(CapaFields, XModule):
     js_module_name = "Problem"
     css = {'scss': [resource_string(__name__, 'css/capa/display.scss')]}
 
-    def __init__(self, system, location, descriptor, model_data):
-        XModule.__init__(self, system, location, descriptor, model_data)
+    def __init__(self, *args, **kwargs):
+        """
+        Accepts the same arguments as xmodule.x_module:XModule.__init__
+        """
+        XModule.__init__(self, *args, **kwargs)
 
         due_date = self.due
 
@@ -164,7 +197,7 @@ class CapaModule(CapaFields, XModule):
                 self.seed = self.lcp.seed
 
         except Exception as err:
-            msg = 'cannot create LoncapaProblem {loc}: {err}'.format(
+            msg = u'cannot create LoncapaProblem {loc}: {err}'.format(
                 loc=self.location.url(), err=err)
             # TODO (vshnayder): do modules need error handlers too?
             # We shouldn't be switching on DEBUG.
@@ -173,12 +206,15 @@ class CapaModule(CapaFields, XModule):
                 # TODO (vshnayder): This logic should be general, not here--and may
                 # want to preserve the data instead of replacing it.
                 # e.g. in the CMS
-                msg = '<p>%s</p>' % msg.replace('<', '&lt;')
-                msg += '<p><pre>%s</pre></p>' % traceback.format_exc().replace('<', '&lt;')
+                msg = u'<p>{msg}</p>'.format(msg=cgi.escape(msg))
+                msg += u'<p><pre>{tb}</pre></p>'.format(
+                    tb=cgi.escape(traceback.format_exc()))
                 # create a dummy problem with error message instead of failing
-                problem_text = ('<problem><text><span class="inline-error">'
-                                'Problem %s has an error:</span>%s</text></problem>' %
-                                (self.location.url(), msg))
+                problem_text = (u'<problem><text><span class="inline-error">'
+                                u'Problem {url} has an error:</span>{msg}</text></problem>'.format(
+                                    url=self.location.url(),
+                                    msg=msg)
+                                )
                 self.lcp = self.new_lcp(self.get_state_for_lcp(), text=problem_text)
             else:
                 # add extra info and raise
@@ -189,7 +225,9 @@ class CapaModule(CapaFields, XModule):
         assert self.seed is not None
 
     def choose_new_seed(self):
-        """Choose a new seed."""
+        """
+        Choose a new seed.
+        """
         if self.rerandomize == 'never':
             self.seed = 1
         elif self.rerandomize == "per_student" and hasattr(self.system, 'seed'):
@@ -203,6 +241,9 @@ class CapaModule(CapaFields, XModule):
             self.seed %= MAX_RANDOMIZATION_BINS
 
     def new_lcp(self, state, text=None):
+        """
+        Generate a new Loncapa Problem
+        """
         if text is None:
             text = self.data
 
@@ -215,6 +256,9 @@ class CapaModule(CapaFields, XModule):
         )
 
     def get_state_for_lcp(self):
+        """
+        Give a dictionary holding the state of the module
+        """
         return {
             'done': self.done,
             'correct_map': self.correct_map,
@@ -224,6 +268,9 @@ class CapaModule(CapaFields, XModule):
         }
 
     def set_state_from_lcp(self):
+        """
+        Set the module's state from the settings in `self.lcp`
+        """
         lcp_state = self.lcp.get_state()
         self.done = lcp_state['done']
         self.correct_map = lcp_state['correct_map']
@@ -232,26 +279,36 @@ class CapaModule(CapaFields, XModule):
         self.seed = lcp_state['seed']
 
     def get_score(self):
+        """
+        Access the problem's score
+        """
         return self.lcp.get_score()
 
     def max_score(self):
+        """
+        Access the problem's max score
+        """
         return self.lcp.get_max_score()
 
     def get_progress(self):
-        ''' For now, just return score / max_score
-        '''
+        """
+        For now, just return score / max_score
+        """
         d = self.get_score()
         score = d['score']
         total = d['total']
         if total > 0:
             try:
                 return Progress(score, total)
-            except Exception:
+            except (TypeError, ValueError):
                 log.exception("Got bad progress")
                 return None
         return None
 
     def get_html(self):
+        """
+        Return some html with data about the module
+        """
         return self.system.render_template('problem_ajax.html', {
             'element_id': self.location.html_id(),
             'id': self.id,
@@ -262,6 +319,7 @@ class CapaModule(CapaFields, XModule):
     def check_button_name(self):
         """
         Determine the name for the "check" button.
+
         Usually it is just "Check", but if this is the student's
         final attempt, change the name to "Final Check"
         """
@@ -276,7 +334,7 @@ class CapaModule(CapaFields, XModule):
         """
         Return True/False to indicate whether to show the "Check" button.
         """
-        submitted_without_reset = (self.is_completed() and self.rerandomize == "always")
+        submitted_without_reset = (self.is_submitted() and self.rerandomize == "always")
 
         # If the problem is closed (past due / too many attempts)
         # then we do NOT show the "check" button
@@ -299,7 +357,7 @@ class CapaModule(CapaFields, XModule):
             # then do NOT show the reset button.
             # If the problem hasn't been submitted yet, then do NOT show
             # the reset button.
-            if (self.closed() and not is_survey_question) or not self.is_completed():
+            if (self.closed() and not is_survey_question) or not self.is_submitted():
                 return False
             else:
                 return True
@@ -315,11 +373,11 @@ class CapaModule(CapaFields, XModule):
         # If the user has forced the save button to display,
         # then show it as long as the problem is not closed
         # (past due / too many attempts)
-        if self.force_save_button == "true":
+        if self.force_save_button:
             return not self.closed()
         else:
             is_survey_question = (self.max_attempts == 0)
-            needs_reset = self.is_completed() and self.rerandomize == "always"
+            needs_reset = self.is_submitted() and self.rerandomize == "always"
 
             # If the student has unlimited attempts, and their answers
             # are not randomized, then we do not need a save button
@@ -347,27 +405,26 @@ class CapaModule(CapaFields, XModule):
 
     def handle_problem_html_error(self, err):
         """
-        Change our problem to a dummy problem containing
-        a warning message to display to users.
+        Create a dummy problem to represent any errors.
 
-        Returns the HTML to show to users
+        Change our problem to a dummy problem containing a warning message to
+        display to users. Returns the HTML to show to users
 
-        *err* is the Exception encountered while rendering the problem HTML.
+        `err` is the Exception encountered while rendering the problem HTML.
         """
-        log.exception(err)
+        log.exception(err.message)
 
         # TODO (vshnayder): another switch on DEBUG.
         if self.system.DEBUG:
             msg = (
-                '[courseware.capa.capa_module] <font size="+1" color="red">'
-                'Failed to generate HTML for problem %s</font>' %
-                (self.location.url()))
-            msg += '<p>Error:</p><p><pre>%s</pre></p>' % str(err).replace('<', '&lt;')
-            msg += '<p><pre>%s</pre></p>' % traceback.format_exc().replace('<', '&lt;')
+                u'[courseware.capa.capa_module] <font size="+1" color="red">'
+                u'Failed to generate HTML for problem {url}</font>'.format(
+                    url=cgi.escape(self.location.url()))
+            )
+            msg += u'<p>Error:</p><p><pre>{msg}</pre></p>'.format(msg=cgi.escape(err.message))
+            msg += u'<p><pre>{tb}</pre></p>'.format(tb=cgi.escape(traceback.format_exc()))
             html = msg
 
-        # We're in non-debug mode, and possibly even in production. We want
-        #   to avoid bricking of problem as much as possible
         else:
             # We're in non-debug mode, and possibly even in production. We want
             #   to avoid bricking of problem as much as possible
@@ -413,15 +470,19 @@ class CapaModule(CapaFields, XModule):
         return html
 
     def get_problem_html(self, encapsulate=True):
-        '''Return html for the problem.  Adds check, reset, save buttons
-        as necessary based on the problem config and state.'''
+        """
+        Return html for the problem.
+
+        Adds check, reset, save buttons as necessary based on the problem config
+        and state.
+        """
 
         try:
             html = self.lcp.get_html()
 
         # If we cannot construct the problem HTML,
         # then generate an error message instead.
-        except Exception, err:
+        except Exception as err:
             html = self.handle_problem_html_error(err)
 
         # The convention is to pass the name of the check button
@@ -451,22 +512,24 @@ class CapaModule(CapaFields, XModule):
 
         html = self.system.render_template('problem.html', context)
         if encapsulate:
-            html = '<div id="problem_{id}" class="problem" data-url="{ajax_url}">'.format(
-                id=self.location.html_id(), ajax_url=self.system.ajax_url) + html + "</div>"
+            html = u'<div id="problem_{id}" class="problem" data-url="{ajax_url}">'.format(
+                id=self.location.html_id(), ajax_url=self.system.ajax_url
+            ) + html + "</div>"
 
         # now do the substitutions which are filesystem based, e.g. '/static/' prefixes
         return self.system.replace_urls(html)
 
-    def handle_ajax(self, dispatch, get):
-        '''
+    def handle_ajax(self, dispatch, data):
+        """
         This is called by courseware.module_render, to handle an AJAX call.
-        "get" is request.POST.
+
+        `data` is request.POST.
 
         Returns a json dictionary:
         { 'progress_changed' : True/False,
           'progress' : 'none'/'in_progress'/'done',
           <other request-specific values here > }
-        '''
+        """
         handlers = {
             'problem_get': self.get_problem,
             'problem_check': self.check_problem,
@@ -484,18 +547,19 @@ class CapaModule(CapaFields, XModule):
         before = self.get_progress()
 
         try:
-            d = handlers[dispatch](get)
-
+            result = handlers[dispatch](data)
         except Exception as err:
             _, _, traceback_obj = sys.exc_info()
-            raise ProcessingError, err.message, traceback_obj
+            raise ProcessingError(err.message, traceback_obj)
 
         after = self.get_progress()
-        d.update({
+
+        result.update({
             'progress_changed': after != before,
             'progress_status': Progress.to_js_status_str(after),
         })
-        return json.dumps(d, cls=ComplexEncoder)
+
+        return json.dumps(result, cls=ComplexEncoder)
 
     def is_past_due(self):
         """
@@ -505,7 +569,9 @@ class CapaModule(CapaFields, XModule):
                 datetime.datetime.now(UTC()) > self.close_date)
 
     def closed(self):
-        ''' Is the student still allowed to submit answers? '''
+        """
+        Is the student still allowed to submit answers?
+        """
         if self.max_attempts is not None and self.attempts >= self.max_attempts:
             return True
         if self.is_past_due():
@@ -513,24 +579,35 @@ class CapaModule(CapaFields, XModule):
 
         return False
 
-    def is_completed(self):
-        # used by conditional module
-        # return self.answer_available()
+    def is_submitted(self):
+        """
+        Used to decide to show or hide RESET or CHECK buttons.
+
+        Means that student submitted problem and nothing more.
+        Problem can be completely wrong.
+        Pressing RESET button makes this function to return False.
+        """
         return self.lcp.done
 
     def is_attempted(self):
-        # used by conditional module
+        """
+        Has the problem been attempted?
+
+        used by conditional module
+        """
         return self.attempts > 0
 
     def is_correct(self):
-        """True if full points"""
+        """
+        True iff full points
+        """
         d = self.get_score()
         return d['score'] == d['total']
 
     def answer_available(self):
-        '''
+        """
         Is the user allowed to see an answer?
-        '''
+        """
         if self.showanswer == '':
             return False
         elif self.showanswer == "never":
@@ -557,66 +634,68 @@ class CapaModule(CapaFields, XModule):
 
         return False
 
-    def update_score(self, get):
+    def update_score(self, data):
         """
         Delivers grading response (e.g. from asynchronous code checking) to
             the capa problem, so its score can be updated
 
-        'get' must have a field 'response' which is a string that contains the
+        'data' must have a key 'response' which is a string that contains the
             grader's response
 
         No ajax return is needed. Return empty dict.
         """
-        queuekey = get['queuekey']
-        score_msg = get['xqueue_body']
+        queuekey = data['queuekey']
+        score_msg = data['xqueue_body']
         self.lcp.update_score(score_msg, queuekey)
         self.set_state_from_lcp()
         self.publish_grade()
 
         return dict()  # No AJAX return is needed
 
-    def handle_ungraded_response(self, get):
-        '''
+    def handle_ungraded_response(self, data):
+        """
         Delivers a response from the XQueue to the capa problem
 
         The score of the problem will not be updated
 
         Args:
-            - get (dict) must contain keys:
+            - data (dict) must contain keys:
                             queuekey - a key specific to this response
                             xqueue_body - the body of the response
         Returns:
             empty dictionary
 
         No ajax return is needed, so an empty dict is returned
-        '''
-        queuekey = get['queuekey']
-        score_msg = get['xqueue_body']
+        """
+        queuekey = data['queuekey']
+        score_msg = data['xqueue_body']
+
         # pass along the xqueue message to the problem
         self.lcp.ungraded_response(score_msg, queuekey)
         self.set_state_from_lcp()
         return dict()
 
-    def handle_input_ajax(self, get):
-        '''
+    def handle_input_ajax(self, data):
+        """
         Handle ajax calls meant for a particular input in the problem
 
         Args:
-            - get (dict) - data that should be passed to the input
+            - data (dict) - data that should be passed to the input
         Returns:
             - dict containing the response from the input
-        '''
-        response = self.lcp.handle_input_ajax(get)
+        """
+        response = self.lcp.handle_input_ajax(data)
+
         # save any state changes that may occur
         self.set_state_from_lcp()
         return response
 
-    def get_answer(self, get):
-        '''
+    def get_answer(self, data):
+        """
         For the "show answer" button.
 
         Returns the answers: {'answers' : answers}
-        '''
+        """
         event_info = dict()
         event_info['problem_id'] = self.location.url()
         self.system.track_function('showanswer', event_info)
@@ -633,51 +712,55 @@ class CapaModule(CapaFields, XModule):
             try:
                 new_answer = {answer_id: self.system.replace_urls(answers[answer_id])}
             except TypeError:
-                log.debug('Unable to perform URL substitution on answers[%s]: %s' % (answer_id, answers[answer_id]))
+                log.debug(u'Unable to perform URL substitution on answers[%s]: %s',
+                          answer_id, answers[answer_id])
                 new_answer = {answer_id: answers[answer_id]}
             new_answers.update(new_answer)
 
         return {'answers': new_answers}
 
     # Figure out if we should move these to capa_problem?
-    def get_problem(self, get):
-        ''' Return results of get_problem_html, as a simple dict for json-ing.
+    def get_problem(self, _data):
+        """
+        Return results of get_problem_html, as a simple dict for json-ing.
         { 'html': <the-html> }
 
-            Used if we want to reconfirm we have the right thing e.g. after
-            several AJAX calls.
-        '''
+        Used if we want to reconfirm we have the right thing e.g. after
+        several AJAX calls.
+        """
         return {'html': self.get_problem_html(encapsulate=False)}
 
     @staticmethod
-    def make_dict_of_responses(get):
-        '''Make dictionary of student responses (aka "answers")
-        get is POST dictionary (Djano QueryDict).
+    def make_dict_of_responses(data):
+        """
+        Make dictionary of student responses (aka "answers")
 
-        The *get* dict has keys of the form 'x_y', which are mapped
+        `data` is POST dictionary (Django QueryDict).
+
+        The `data` dict has keys of the form 'x_y', which are mapped
         to key 'y' in the returned dict.  For example,
         'input_1_2_3' would be mapped to '1_2_3' in the returned dict.
 
         Some inputs always expect a list in the returned dict
         (e.g. checkbox inputs).  The convention is that
-        keys in the *get* dict that end with '[]' will always
+        keys in the `data` dict that end with '[]' will always
         have list values in the returned dict.
-        For example, if the *get* dict contains {'input_1[]': 'test' }
+        For example, if the `data` dict contains {'input_1[]': 'test' }
         then the output dict would contain {'1': ['test'] }
         (the value is a list).
 
         Raises an exception if:
 
-            A key in the *get* dictionary does not contain >= 1 underscores
-            (e.g. "input" is invalid; "input_1" is valid)
+        -A key in the `data` dictionary does not contain at least one underscore
+          (e.g. "input" is invalid, but "input_1" is valid)
 
-            Two keys end up with the same name in the returned dict.
-            (e.g. 'input_1' and 'input_1[]', which both get mapped
-            to 'input_1' in the returned dict)
-        '''
+        -Two keys end up with the same name in the returned dict.
+          (e.g. 'input_1' and 'input_1[]', which both get mapped to 'input_1'
+           in the returned dict)
+        """
         answers = dict()
 
-        for key in get:
+        for key in data:
             # e.g. input_resistor_1 ==> resistor_1
             _, _, name = key.partition('_')
 
@@ -685,7 +768,7 @@ class CapaModule(CapaFields, XModule):
             # will return (key, '', '')
             # We detect this and raise an error
             if not name:
-                raise ValueError("%s must contain at least one underscore" % str(key))
+                raise ValueError(u"{key} must contain at least one underscore".format(key=key))
 
             else:
                 # This allows for answers which require more than one value for
@@ -696,14 +779,14 @@ class CapaModule(CapaFields, XModule):
                 name = name[:-2] if is_list_key else name
 
                 if is_list_key:
-                    val = get.getlist(key)
+                    val = data.getlist(key)
                 else:
-                    val = get[key]
+                    val = data[key]
 
                 # If the name already exists, then we don't want
                 # to override it.  Raise an error instead
                 if name in answers:
-                    raise ValueError("Key %s already exists in answers dict" % str(name))
+                    raise ValueError(u"Key {name} already exists in answers dict".format(name=name))
                 else:
                     answers[name] = val
 
@@ -720,29 +803,31 @@ class CapaModule(CapaFields, XModule):
             'max_value': score['total'],
         })
 
-    def check_problem(self, get):
-        ''' Checks whether answers to a problem are correct, and
-            returns a map of correct/incorrect answers:
+    def check_problem(self, data):
+        """
+        Checks whether answers to a problem are correct
 
-            {'success' : 'correct' | 'incorrect' | AJAX alert msg string,
-             'contents' : html}
-            '''
+        Returns a map of correct/incorrect answers:
+          {'success' : 'correct' | 'incorrect' | AJAX alert msg string,
+           'contents' : html}
+        """
         event_info = dict()
         event_info['state'] = self.lcp.get_state()
         event_info['problem_id'] = self.location.url()
 
-        answers = self.make_dict_of_responses(get)
+        answers = self.make_dict_of_responses(data)
         event_info['answers'] = convert_files_to_filenames(answers)
+
         # Too late. Cannot submit
         if self.closed():
             event_info['failure'] = 'closed'
-            self.system.track_function('save_problem_check_fail', event_info)
+            self.system.track_function('problem_check_fail', event_info)
             raise NotFoundError('Problem is closed')
 
         # Problem submitted. Student should reset before checking again
         if self.done and self.rerandomize == "always":
             event_info['failure'] = 'unreset'
-            self.system.track_function('save_problem_check_fail', event_info)
+            self.system.track_function('problem_check_fail', event_info)
             raise NotFoundError('Problem must be reset before it can be checked again')
 
         # Problem queued. Students must wait a specified waittime before they are allowed to submit
@@ -751,11 +836,14 @@ class CapaModule(CapaFields, XModule):
             prev_submit_time = self.lcp.get_recentmost_queuetime()
             waittime_between_requests = self.system.xqueue['waittime']
             if (current_time - prev_submit_time).total_seconds() < waittime_between_requests:
-                msg = 'You must wait at least %d seconds between submissions' % waittime_between_requests
+                msg = u'You must wait at least {wait} seconds between submissions'.format(
+                    wait=waittime_between_requests)
                 return {'success': msg, 'html': ''}  # Prompts a modal dialog in ajax callback
 
         try:
             correct_map = self.lcp.grade_answers(answers)
+            self.attempts = self.attempts + 1
+            self.lcp.done = True
             self.set_state_from_lcp()
 
         except (StudentInputError, ResponseError, LoncapaProblemError) as inst:
@@ -766,26 +854,22 @@ class CapaModule(CapaFields, XModule):
             # the full exception, including traceback,
             # in the response
             if self.system.user_is_staff:
-                msg = "Staff debug info: %s" % traceback.format_exc()
+                msg = u"Staff debug info: {tb}".format(tb=cgi.escape(traceback.format_exc()))
 
             # Otherwise, display just an error message,
             # without a stack trace
             else:
-                msg = "Error: %s" % str(inst.message)
+                msg = u"Error: {msg}".format(msg=inst.message)
 
             return {'success': msg}
 
-        except Exception, err:
+        except Exception as err:
             if self.system.DEBUG:
-                msg = "Error checking problem: " + str(err)
-                msg += '\nTraceback:\n' + traceback.format_exc()
+                msg = u"Error checking problem: {}".format(err.message)
+                msg += u'\nTraceback:\n{}'.format(traceback.format_exc())
                 return {'success': msg}
             raise
 
-        self.attempts = self.attempts + 1
-        self.lcp.done = True
-
-        self.set_state_from_lcp()
         self.publish_grade()
 
         # success = correct if ALL questions in this problem are correct
@@ -799,7 +883,7 @@ class CapaModule(CapaFields, XModule):
         event_info['correct_map'] = correct_map.get_dict()
         event_info['success'] = success
         event_info['attempts'] = self.attempts
-        self.system.track_function('save_problem_check', event_info)
+        self.system.track_function('problem_check', event_info)
 
         if hasattr(self.system, 'psychometrics_handler'):  # update PsychometricsData using callback
             self.system.psychometrics_handler(self.get_state_for_lcp())
@@ -811,17 +895,97 @@ class CapaModule(CapaFields, XModule):
                 'contents': html,
                 }
 
-    def save_problem(self, get):
-        '''
+    def rescore_problem(self):
+        """
+        Checks whether the existing answers to a problem are correct.
+
+        This is called when the correct answer to a problem has been changed,
+        and the grade should be re-evaluated.
+
+        Returns a dict with one key:
+            {'success' : 'correct' | 'incorrect' | AJAX alert msg string }
+
+        Raises NotFoundError if called on a problem that has not yet been
+        answered, or NotImplementedError if it's a problem that cannot be rescored.
+
+        Returns the error messages for exceptions occurring while performing
+        the rescoring, rather than throwing them.
+        """
+        event_info = {'state': self.lcp.get_state(), 'problem_id': self.location.url()}
+
+        if not self.lcp.supports_rescoring():
+            event_info['failure'] = 'unsupported'
+            self.system.track_function('problem_rescore_fail', event_info)
+            raise NotImplementedError("Problem's definition does not support rescoring")
+
+        if not self.done:
+            event_info['failure'] = 'unanswered'
+            self.system.track_function('problem_rescore_fail', event_info)
+            raise NotFoundError('Problem must be answered before it can be graded again')
+
+        # get old score, for comparison:
+        orig_score = self.lcp.get_score()
+        event_info['orig_score'] = orig_score['score']
+        event_info['orig_total'] = orig_score['total']
+
+        try:
+            correct_map = self.lcp.rescore_existing_answers()
+
+        except (StudentInputError, ResponseError, LoncapaProblemError) as inst:
+            log.warning("Input error in capa_module:problem_rescore", exc_info=True)
+            event_info['failure'] = 'input_error'
+            self.system.track_function('problem_rescore_fail', event_info)
+            return {'success': u"Error: {0}".format(inst.message)}
+
+        except Exception as err:
+            event_info['failure'] = 'unexpected'
+            self.system.track_function('problem_rescore_fail', event_info)
+            if self.system.DEBUG:
+                msg = u"Error checking problem: {0}".format(err.message)
+                msg += u'\nTraceback:\n' + traceback.format_exc()
+                return {'success': msg}
+            raise
+
+        # rescoring should have no effect on attempts, so don't
+        # need to increment here, or mark done.  Just save.
+        self.set_state_from_lcp()
+
+        self.publish_grade()
+
+        new_score = self.lcp.get_score()
+        event_info['new_score'] = new_score['score']
+        event_info['new_total'] = new_score['total']
+
+        # success = correct if ALL questions in this problem are correct
+        success = 'correct'
+        for answer_id in correct_map:
+            if not correct_map.is_correct(answer_id):
+                success = 'incorrect'
+
+        # NOTE: We are logging both full grading and queued-grading submissions. In the latter,
+        #       'success' will always be incorrect
+        event_info['correct_map'] = correct_map.get_dict()
+        event_info['success'] = success
+        event_info['attempts'] = self.attempts
+        self.system.track_function('problem_rescore', event_info)
+
+        # psychometrics should be called on rescoring requests in the same way as check-problem
+        if hasattr(self.system, 'psychometrics_handler'):  # update PsychometricsData using callback
+            self.system.psychometrics_handler(self.get_state_for_lcp())
+
+        return {'success': success}
+
+    def save_problem(self, data):
+        """
         Save the passed in answers.
-        Returns a dict { 'success' : bool, ['error' : error-msg]},
-        with the error key only present if success is False.
-        '''
+        Returns a dict { 'success' : bool, 'msg' : message }
+        The message is informative on success, and an error message on failure.
+        """
         event_info = dict()
         event_info['state'] = self.lcp.get_state()
         event_info['problem_id'] = self.location.url()
 
-        answers = self.make_dict_of_responses(get)
+        answers = self.make_dict_of_responses(data)
         event_info['answers'] = answers
 
         # Too late. Cannot submit
@@ -850,17 +1014,18 @@ class CapaModule(CapaFields, XModule):
         return {'success': True,
                 'msg': msg}
 
-    def reset_problem(self, get):
-        ''' Changes problem state to unfinished -- removes student answers,
-            and causes problem to rerender itself.
+    def reset_problem(self, _data):
+        """
+        Changes problem state to unfinished -- removes student answers,
+        and causes problem to rerender itself.
 
-            Returns a dictionary of the form:
-            {'success': True/False,
-            'html': Problem HTML string }
+        Returns a dictionary of the form:
+          {'success': True/False,
+           'html': Problem HTML string }
 
-            If an error occurs, the dictionary will also have an
-            'error' key containing an error message.
-        '''
+        If an error occurs, the dictionary will also have an
+        `error` key containing an error message.
+        """
         event_info = dict()
         event_info['old_state'] = self.lcp.get_state()
         event_info['problem_id'] = self.location.url()
@@ -902,13 +1067,13 @@ class CapaDescriptor(CapaFields, RawDescriptor):
 
     module_class = CapaModule
 
-    stores_state = True
     has_score = True
     template_dir_name = 'problem'
     mako_template = "widgets/problem-edit.html"
     js = {'coffee': [resource_string(__name__, 'js/src/problem/edit.coffee')]}
     js_module_name = "MarkdownEditingDescriptor"
-    css = {'scss': [resource_string(__name__, 'css/editor/edit.scss'), resource_string(__name__, 'css/problem/edit.scss')]}
+    css = {'scss': [resource_string(__name__, 'css/editor/edit.scss'),
+                    resource_string(__name__, 'css/problem/edit.scss')]}
 
     # Capa modules have some additional metadata:
     # TODO (vshnayder): do problems have any other metadata?  Do they

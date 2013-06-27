@@ -38,6 +38,7 @@
     <script type="text/javascript" src="/jsi18n/"></script>
     <script type="text/javascript" src="${static.url('js/vendor/json2.js')}"></script>
     <script type="text/javascript" src="${static.url('js/vendor/underscore-min.js')}"></script>
+    <script type="text/javascript" src="${static.url('js/vendor/underscore.string.min.js')}"></script>
     <script type="text/javascript" src="${static.url('js/vendor/backbone-min.js')}"></script>
     <script type="text/javascript" src="${static.url('js/vendor/markitup/jquery.markitup.js')}"></script>
     <script type="text/javascript" src="${static.url('js/vendor/markitup/sets/wiki/set.js')}"></script>
@@ -54,15 +55,12 @@
     <script type="text/javascript" src="${static.url('js/vendor/CodeMirror/css.js')}"></script>
     <script type="text/javascript" src="//www.youtube.com/player_api"></script>
 
-    <script src="${static.url('js/models/feedback.js')}"></script>
     <script src="${static.url('js/views/feedback.js')}"></script>
 
     <!-- view -->
     <div class="wrapper wrapper-view">
       <%include file="widgets/header.html" />
 
-      ## remove this block after advanced settings notification is rewritten
-      <%block name="view_alerts"></%block>
       <div id="page-alert"></div>
 
       <%block name="content"></%block>
@@ -74,13 +72,9 @@
       <%include file="widgets/footer.html" />
       <%include file="widgets/tender.html" />
 
-      ## remove this block after advanced settings notification is rewritten
-      <%block name="view_notifications"></%block>
       <div id="page-notification"></div>
     </div>
 
-    ## remove this block after advanced settings notification is rewritten
-    <%block name="view_prompts"></%block>
     <div id="page-prompt"></div>
     <%block name="jsextra"></%block>
   </body>

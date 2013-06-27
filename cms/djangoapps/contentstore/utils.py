@@ -10,7 +10,7 @@ from xmodule.modulestore.draft import DIRECT_ONLY_CATEGORIES
 
 log = logging.getLogger(__name__)
 
-#In order to instantiate an open ended tab automatically, need to have this data
+# In order to instantiate an open ended tab automatically, need to have this data
 OPEN_ENDED_PANEL = {"name": "Open Ended Panel", "type": "open_ended"}
 NOTES_PANEL = {"name": "My Notes", "type": "notes"}
 EXTRA_TAB_PANELS = dict([(p['type'], p) for p in [OPEN_ENDED_PANEL, NOTES_PANEL]])
@@ -224,14 +224,14 @@ def add_extra_panel_tab(tab_type, course):
     @param course: A course object from the modulestore.
     @return: Boolean indicating whether or not a tab was added and a list of tabs for the course.
     """
-    #Copy course tabs
+    # Copy course tabs
     course_tabs = copy.copy(course.tabs)
     changed = False
-    #Check to see if open ended panel is defined in the course
+    # Check to see if open ended panel is defined in the course
 
     tab_panel = EXTRA_TAB_PANELS.get(tab_type)
     if tab_panel not in course_tabs:
-        #Add panel to the tabs if it is not defined
+        # Add panel to the tabs if it is not defined
         course_tabs.append(tab_panel)
         changed = True
     return changed, course_tabs
@@ -244,14 +244,14 @@ def remove_extra_panel_tab(tab_type, course):
     @param course: A course object from the modulestore.
     @return: Boolean indicating whether or not a tab was added and a list of tabs for the course.
     """
-    #Copy course tabs
+    # Copy course tabs
     course_tabs = copy.copy(course.tabs)
     changed = False
-    #Check to see if open ended panel is defined in the course
+    # Check to see if open ended panel is defined in the course
 
     tab_panel = EXTRA_TAB_PANELS.get(tab_type)
     if tab_panel in course_tabs:
-        #Add panel to the tabs if it is not defined
+        # Add panel to the tabs if it is not defined
         course_tabs = [ct for ct in course_tabs if ct != tab_panel]
         changed = True
     return changed, course_tabs

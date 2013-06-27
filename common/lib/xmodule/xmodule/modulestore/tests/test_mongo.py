@@ -1,21 +1,24 @@
 import pymongo
 
-from mock import Mock
-from nose.tools import assert_equals, assert_raises, assert_not_equals, with_setup, assert_false
+from nose.tools import assert_equals, assert_raises, assert_not_equals, assert_false
 from pprint import pprint
 
+from xblock.core import Scope
+from xblock.runtime import KeyValueStore, InvalidScopeError
+
 from xmodule.modulestore import Location
-from xmodule.modulestore.mongo import MongoModuleStore
+from xmodule.modulestore.mongo import MongoModuleStore, MongoKeyValueStore
 from xmodule.modulestore.xml_importer import import_from_xml
 from xmodule.templates import update_templates
 
 from .test_modulestore import check_path_to_location
 from . import DATA_DIR
+from uuid import uuid4
 
 
 HOST = 'localhost'
 PORT = 27017
-DB = 'test'
+DB = 'test_mongo_%s' % uuid4().hex
 COLLECTION = 'modulestore'
 FS_ROOT = DATA_DIR  # TODO (vshnayder): will need a real fs_root for testing load_item
 DEFAULT_CLASS = 'xmodule.raw_module.RawDescriptor'
@@ -37,7 +40,8 @@ class TestMongoModuleStore(object):
 
     @classmethod
     def teardownClass(cls):
-        pass
+        cls.connection = pymongo.connection.Connection(HOST, PORT)
+        cls.connection.drop_database(DB)
 
     @staticmethod
     def initdb():
@@ -114,3 +118,75 @@ class TestMongoModuleStore(object):
                 course.location.org == 'edx' and course.location.course == 'templates',
                 '{0} is a template course'.format(course)
             )
+
+class TestMongoKeyValueStore(object):
+
+    def setUp(self):
+        self.data = {'foo': 'foo_value'}
+        self.location = Location('i4x://org/course/category/name@version')
+        self.children = ['i4x://org/course/child/a', 'i4x://org/course/child/b']
+        self.metadata = {'meta': 'meta_val'}
+        self.kvs = MongoKeyValueStore(self.data, self.children, self.metadata, self.location)
+
+    def _check_read(self, key, expected_value):
+        assert_equals(expected_value, self.kvs.get(key))
+        assert self.kvs.has(key)
+
+    def test_read(self):
+        assert_equals(self.data['foo'], self.kvs.get(KeyValueStore.Key(Scope.content, None, None, 'foo')))
+        assert_equals(self.location, self.kvs.get(KeyValueStore.Key(Scope.content, None, None, 'location')))
+        assert_equals(self.children, self.kvs.get(KeyValueStore.Key(Scope.children, None, None, 'children')))
+        assert_equals(self.metadata['meta'], self.kvs.get(KeyValueStore.Key(Scope.settings, None, None, 'meta')))
+        assert_equals(None, self.kvs.get(KeyValueStore.Key(Scope.parent, None, None, 'parent')))
+
+    def test_read_invalid_scope(self):
+        for scope in (Scope.preferences, Scope.user_info, Scope.user_state):
+            key = KeyValueStore.Key(scope, None, None, 'foo')
+            with assert_raises(InvalidScopeError):
+                self.kvs.get(key)
+            assert_false(self.kvs.has(key))
+
+    def test_read_non_dict_data(self):
+        self.kvs._data = 'xml_data'
+        assert_equals('xml_data', self.kvs.get(KeyValueStore.Key(Scope.content, None, None, 'data')))
+
+    def _check_write(self, key, value):
+        self.kvs.set(key, value)
+        assert_equals(value, self.kvs.get(key))
+
+    def test_write(self):
+        yield (self._check_write, KeyValueStore.Key(Scope.content, None, None, 'foo'), 'new_data')
+        yield (self._check_write, KeyValueStore.Key(Scope.content, None, None, 'location'), Location('i4x://org/course/category/name@new_version'))
+        yield (self._check_write, KeyValueStore.Key(Scope.children, None, None, 'children'), [])
+        yield (self._check_write, KeyValueStore.Key(Scope.settings, None, None, 'meta'), 'new_settings')
+
+    def test_write_non_dict_data(self):
+        self.kvs._data = 'xml_data'
+        self._check_write(KeyValueStore.Key(Scope.content, None, None, 'data'), 'new_data')
+
+    def test_write_invalid_scope(self):
+        for scope in (Scope.preferences, Scope.user_info, Scope.user_state, Scope.parent):
+            with assert_raises(InvalidScopeError):
+                self.kvs.set(KeyValueStore.Key(scope, None, None, 'foo'), 'new_value')
+
+    def _check_delete_default(self, key, default_value):
+        self.kvs.delete(key)
+        assert_equals(default_value, self.kvs.get(key))
+        assert self.kvs.has(key)
+
+    def _check_delete_key_error(self, key):
+        self.kvs.delete(key)
+        with assert_raises(KeyError):
+            self.kvs.get(key)
+        assert_false(self.kvs.has(key))
+
+    def test_delete(self):
+        yield (self._check_delete_key_error, KeyValueStore.Key(Scope.content, None, None, 'foo'))
+        yield (self._check_delete_default, KeyValueStore.Key(Scope.content, None, None, 'location'), Location(None))
+        yield (self._check_delete_default, KeyValueStore.Key(Scope.children, None, None, 'children'), [])
+        yield (self._check_delete_key_error, KeyValueStore.Key(Scope.settings, None, None, 'meta'))
+
+    def test_delete_invalid_scope(self):
+        for scope in (Scope.preferences, Scope.user_info, Scope.user_state, Scope.parent):
+            with assert_raises(InvalidScopeError):
+                self.kvs.delete(KeyValueStore.Key(scope, None, None, 'foo'))

@@ -1,16 +1,7 @@
 from __future__ import division
-import copy
 from fractions import Fraction
-import logging
-import math
-import operator
-import re
-import numpy
-import numbers
-import scipy.constants
 
-from pyparsing import (Literal, Keyword, Word, nums, StringEnd, Optional,
-                       Forward, OneOrMore, ParseException)
+from pyparsing import (Literal, StringEnd, OneOrMore, ParseException)
 import nltk
 from nltk.tree import Tree
 

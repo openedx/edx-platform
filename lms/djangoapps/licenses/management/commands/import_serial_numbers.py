@@ -1,5 +1,4 @@
 import os.path
-from optparse import make_option
 
 from django.utils.html import escape
 from django.core.management.base import BaseCommand, CommandError

@@ -144,13 +144,6 @@ Templates
     :members:
     :show-inheritance:
 
-Time parse
-==========
-
-.. automodule:: xmodule.timeparse
-    :members:
-    :show-inheritance:
-
 Vertical
 ========
 

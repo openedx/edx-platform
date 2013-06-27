@@ -12,8 +12,8 @@ from django.core.urlresolvers import reverse
 from mitxmako.shortcuts import render_to_response
 
 from xmodule.modulestore.django import modulestore
-
-from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
+from xmodule.modulestore.exceptions import ItemNotFoundError, \
+     InvalidLocationError
 from xmodule.modulestore import Location
 
 from contentstore.course_info_model import get_course_updates, update_course_updates, delete_course_update
@@ -21,7 +21,7 @@ from contentstore.utils import get_lms_link_for_item, add_extra_panel_tab, remov
 from models.settings.course_details import CourseDetails, CourseSettingsEncoder
 from models.settings.course_grading import CourseGradingModel
 from models.settings.course_metadata import CourseMetadata
-from auth.authz import create_all_course_groups
+from auth.authz import create_all_course_groups, is_user_in_creator_group
 from util.json_request import expect_json
 
 from .access import has_access, get_location_and_verify_access
@@ -33,9 +33,6 @@ from .component import OPEN_ENDED_COMPONENT_TYPES, \
 from django_comment_common.utils import seed_permissions_roles
 import datetime
 from django.utils.timezone import UTC
-
-# TODO: should explicitly enumerate exports with __all__
-
 __all__ = ['course_index', 'create_new_course', 'course_info',
            'course_info_updates', 'get_course_settings',
            'course_config_graders_page',
@@ -84,7 +81,7 @@ def course_index(request, org, course, name):
 @expect_json
 def create_new_course(request):
 
-    if settings.MITX_FEATURES.get('DISABLE_COURSE_CREATION', False) and not request.user.is_staff:
+    if not is_user_in_creator_group(request.user):
         raise PermissionDenied()
 
     # This logic is repeated in xmodule/modulestore/tests/factories.py
@@ -230,7 +227,8 @@ def get_course_settings(request, org, course, name):
                                kwargs={"org": org,
                                        "course": course,
                                        "name": name,
-                                       "section": "details"})
+                                       "section": "details"}),
+        'about_page_editable': not settings.MITX_FEATURES.get('ENABLE_MKTG_SITE', False)
     })
 
 
@@ -402,8 +400,11 @@ def course_advanced_updates(request, org, course, name):
                         request_body.update({'tabs': new_tabs})
                         # Indicate that tabs should *not* be filtered out of the metadata
                         filter_tabs = False
-
-        response_json = json.dumps(CourseMetadata.update_from_json(location,
+        try:
+            response_json = json.dumps(CourseMetadata.update_from_json(location,
                                                                    request_body,
                                                                    filter_tabs=filter_tabs))
+        except (TypeError, ValueError), e:
+            return HttpResponseBadRequest("Incorrect setting format. " + str(e), content_type="text/plain")
+
         return HttpResponse(response_json, mimetype="application/json")

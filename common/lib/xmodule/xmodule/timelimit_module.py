@@ -1,4 +1,3 @@
-import json
 import logging
 
 from lxml import etree
@@ -99,7 +98,7 @@ class TimeLimitModule(TimeLimitFields, XModule):
         progress = reduce(Progress.add_counts, progresses)
         return progress
 
-    def handle_ajax(self, dispatch, get):
+    def handle_ajax(self, _dispatch, _data):
         raise NotFoundError('Unexpected dispatch type')
 
     def render(self):
@@ -123,9 +122,6 @@ class TimeLimitDescriptor(TimeLimitFields, XMLEditingDescriptor, XmlDescriptor):
 
     module_class = TimeLimitModule
 
-    # For remembering when a student started, and when they should end
-    stores_state = True
-
     @classmethod
     def definition_from_xml(cls, xml_object, system):
         children = []
@@ -145,4 +141,3 @@ class TimeLimitDescriptor(TimeLimitFields, XMLEditingDescriptor, XmlDescriptor):
             xml_object.append(
                 etree.fromstring(child.export_to_xml(resource_fs)))
         return xml_object
-

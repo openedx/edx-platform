@@ -54,7 +54,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         @param system: Modulesystem
         @return: Rendered HTML
         """
-        #set context variables and render template
+        # set context variables and render template
         if self.child_state != self.INITIAL:
             latest = self.latest_answer()
             previous_answer = latest if latest is not None else ''
@@ -75,10 +75,10 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         html = system.render_template('{0}/self_assessment_prompt.html'.format(self.TEMPLATE_DIR), context)
         return html
 
-    def handle_ajax(self, dispatch, get, system):
+    def handle_ajax(self, dispatch, data, system):
         """
         This is called by courseware.module_render, to handle an AJAX call.
-        "get" is request.POST.
+        "data" is request.POST.
 
         Returns a json dictionary:
         { 'progress_changed' : True/False,
@@ -93,13 +93,13 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         }
 
         if dispatch not in handlers:
-            #This is a dev_facing_error
+            # This is a dev_facing_error
             log.error("Cannot find {0} in handlers in handle_ajax function for open_ended_module.py".format(dispatch))
-            #This is a dev_facing_error
+            # This is a dev_facing_error
             return json.dumps({'error': 'Error handling action.  Please try again.', 'success': False})
 
         before = self.get_progress()
-        d = handlers[dispatch](get, system)
+        d = handlers[dispatch](data, system)
         after = self.get_progress()
         d.update({
             'progress_changed': after != before,
@@ -129,7 +129,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         elif self.child_state in (self.POST_ASSESSMENT, self.DONE):
             context['read_only'] = True
         else:
-            #This is a dev_facing_error
+            # This is a dev_facing_error
             raise ValueError("Self assessment module is in an illegal state '{0}'".format(self.child_state))
 
         return system.render_template('{0}/self_assessment_rubric.html'.format(self.TEMPLATE_DIR), context)
@@ -155,17 +155,17 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         elif self.child_state == self.DONE:
             context['read_only'] = True
         else:
-            #This is a dev_facing_error
+            # This is a dev_facing_error
             raise ValueError("Self Assessment module is in an illegal state '{0}'".format(self.child_state))
 
         return system.render_template('{0}/self_assessment_hint.html'.format(self.TEMPLATE_DIR), context)
 
-    def save_answer(self, get, system):
+    def save_answer(self, data, system):
         """
         After the answer is submitted, show the rubric.
 
         Args:
-            get: the GET dictionary passed to the ajax request.  Should contain
+            data: the request dictionary passed to the ajax request.  Should contain
                 a key 'student_answer'
 
         Returns:
@@ -178,32 +178,32 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
             return msg
 
         if self.child_state != self.INITIAL:
-            return self.out_of_sync_error(get)
+            return self.out_of_sync_error(data)
 
         error_message = ""
         # add new history element with answer and empty score and hint.
-        success, get = self.append_image_to_student_answer(get)
+        success, data = self.append_image_to_student_answer(data)
         if success:
             success, allowed_to_submit, error_message = self.check_if_student_can_submit()
             if allowed_to_submit:
-                get['student_answer'] = SelfAssessmentModule.sanitize_html(get['student_answer'])
-                self.new_history_entry(get['student_answer'])
+                data['student_answer'] = SelfAssessmentModule.sanitize_html(data['student_answer'])
+                self.new_history_entry(data['student_answer'])
                 self.change_state(self.ASSESSING)
             else:
-                #Error message already defined
+                # Error message already defined
                 success = False
         else:
-            #This is a student_facing_error
+            # This is a student_facing_error
             error_message = "There was a problem saving the image in your submission.  Please try a different image, or try pasting a link to an image into the answer box."
 
         return {
             'success': success,
             'rubric_html': self.get_rubric_html(system),
             'error': error_message,
-            'student_response': get['student_answer'],
+            'student_response': data['student_answer'],
         }
 
-    def save_assessment(self, get, system):
+    def save_assessment(self, data, _system):
         """
         Save the assessment.  If the student said they're right, don't ask for a
         hint, and go straight to the done state.  Otherwise, do ask for a hint.
@@ -219,20 +219,20 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         """
 
         if self.child_state != self.ASSESSING:
-            return self.out_of_sync_error(get)
+            return self.out_of_sync_error(data)
 
         try:
-            score = int(get['assessment'])
-            score_list = get.getlist('score_list[]')
+            score = int(data['assessment'])
+            score_list = data.getlist('score_list[]')
             for i in xrange(0, len(score_list)):
                 score_list[i] = int(score_list[i])
         except ValueError:
-            #This is a dev_facing_error
+            # This is a dev_facing_error
             log.error("Non-integer score value passed to save_assessment ,or no score list present.")
-            #This is a student_facing_error
+            # This is a student_facing_error
             return {'success': False, 'error': "Error saving your score.  Please notify course staff."}
 
-        #Record score as assessment and rubric scores as post assessment
+        # Record score as assessment and rubric scores as post assessment
         self.record_latest_score(score)
         self.record_latest_post_assessment(json.dumps(score_list))
 
@@ -244,7 +244,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         d['state'] = self.child_state
         return d
 
-    def save_hint(self, get, system):
+    def save_hint(self, data, _system):
         '''
         Not used currently, as hints have been removed from the system.
         Save the hint.
@@ -258,9 +258,9 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         if self.child_state != self.POST_ASSESSMENT:
             # Note: because we only ask for hints on wrong answers, may not have
             # the same number of hints and answers.
-            return self.out_of_sync_error(get)
+            return self.out_of_sync_error(data)
 
-        self.record_latest_post_assessment(get['hint'])
+        self.record_latest_post_assessment(data['hint'])
         self.change_state(self.DONE)
 
         return {'success': True,
@@ -272,7 +272,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         try:
             rubric_scores = json.loads(latest_post_assessment)
         except:
-            #This is a dev_facing_error
+            # This is a dev_facing_error
             log.error("Cannot parse rubric scores in self assessment module from {0}".format(latest_post_assessment))
             rubric_scores = []
         return [rubric_scores]
@@ -286,7 +286,6 @@ class SelfAssessmentDescriptor():
     module_class = SelfAssessmentModule
     filename_extension = "xml"
 
-    stores_state = True
     has_score = True
     template_dir_name = "selfassessment"
 
@@ -307,7 +306,7 @@ class SelfAssessmentDescriptor():
         expected_children = []
         for child in expected_children:
             if len(xml_object.xpath(child)) != 1:
-                #This is a staff_facing_error
+                # This is a staff_facing_error
                 raise ValueError(
                     "Self assessment definition must include exactly one '{0}' tag. Contact the learning sciences group for assistance.".format(
                         child))

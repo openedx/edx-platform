@@ -183,7 +183,6 @@ class FolditDescriptor(FolditFields, XmlDescriptor, EditingDescriptor):
     module_class = FolditModule
     filename_extension = "xml"
 
-    stores_state = True
     has_score = True
     template_dir_name = "foldit"
 

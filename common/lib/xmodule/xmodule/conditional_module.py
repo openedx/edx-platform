@@ -35,8 +35,11 @@ class ConditionalModule(ConditionalFields, XModule):
         <conditional> tag attributes:
             sources - location id of required modules, separated by ';'
 
-            completed - map to `is_completed` module method
+            submitted - map to `is_submitted` module method.
+            (pressing RESET button makes this function to return False.)
+
             attempted - map to `is_attempted` module method
+            correct - map to `is_correct` module method
             poll_answer - map to `poll_answer` module attribute
             voted - map to `voted` module attribute
 
@@ -70,8 +73,18 @@ class ConditionalModule(ConditionalFields, XModule):
     # value: <name of module attribute>
     conditions_map = {
         'poll_answer': 'poll_answer',  # poll_question attr
-        'completed': 'is_completed',  # capa_problem attr
+
+        # problem was submitted (it can be wrong)
+        # if student will press reset button after that,
+        # state will be reverted
+        'submitted': 'is_submitted',  # capa_problem attr
+
+        # if student attempted problem
         'attempted': 'is_attempted',  # capa_problem attr
+
+        # if problem is full points
+        'correct': 'is_correct',
+
         'voted': 'voted'  # poll_question attr
     }
 
@@ -92,7 +105,7 @@ class ConditionalModule(ConditionalFields, XModule):
         if xml_value and self.required_modules:
             for module in self.required_modules:
                 if not hasattr(module, attr_name):
-                    # We don't throw an exception here because it is possible for 
+                    # We don't throw an exception here because it is possible for
                     # the descriptor of a required module to have a property but
                     # for the resulting module to be a (flavor of) ErrorModule.
                     # So just log and return false.
@@ -122,7 +135,7 @@ class ConditionalModule(ConditionalFields, XModule):
             'depends': ';'.join(self.required_html_ids)
         })
 
-    def handle_ajax(self, dispatch, post):
+    def handle_ajax(self, _dispatch, _data):
         """This is called by courseware.moduleodule_render, to handle
         an AJAX call.
         """
@@ -161,7 +174,6 @@ class ConditionalDescriptor(ConditionalFields, SequenceDescriptor):
 
     filename_extension = "xml"
 
-    stores_state = True
     has_score = False
 
     @staticmethod
