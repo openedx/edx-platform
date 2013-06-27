@@ -208,6 +208,10 @@ def is_user_in_creator_group(user):
 
 
 def _grant_instructors_creator_access(caller):
+    """
+    This is to be called only by either a command line code path or through an app which has already
+    asserted permissions to do this action
+    """
     for group in Group.objects.all():
         if group.name.startswith(INSTRUCTOR_ROLE_NAME + "_"):
             for user in group.user_set.all():

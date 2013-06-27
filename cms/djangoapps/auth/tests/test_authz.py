@@ -177,8 +177,13 @@ class CourseGroupTest(TestCase):
 
 
 class GrantInstructorsCreatorAccessTest(TestCase):
-
+    """
+    Tests granting existing instructors course creator rights.
+    """
     def create_course(self, index):
+        """
+        Creates a course with one instructor and one staff member.
+        """
         creator = User.objects.create_user('testcreator'+str(index), 'testcreator+courses@edx.org', 'foo')
         staff = User.objects.create_user('teststaff'+str(index), 'teststaff+courses@edx.org', 'foo')
         location = 'i4x', 'mitX', str(index), 'course', 'test'
@@ -187,9 +192,13 @@ class GrantInstructorsCreatorAccessTest(TestCase):
         return [creator, staff]
 
     def test_grant_creator_access(self):
+        """
+        Test for _grant_instructors_creator_access.
+        """
         [creator1, staff1] = self.create_course(1)
         [creator2, staff2] = self.create_course(2)
         with mock.patch.dict('django.conf.settings.MITX_FEATURES', {"ENABLE_CREATOR_GROUP": True}):
+            # Initially no creators.
             self.assertFalse(is_user_in_creator_group(creator1))
             self.assertFalse(is_user_in_creator_group(creator2))
             self.assertFalse(is_user_in_creator_group(staff1))
@@ -198,9 +207,10 @@ class GrantInstructorsCreatorAccessTest(TestCase):
             admin = User.objects.create_user('populate_creators_command', 'grant+creator+access@edx.org', 'foo')
             admin.is_staff = True
             _grant_instructors_creator_access(admin)
-            _grant_instructors_creator_access(admin)
 
+            # Now instructors only are creators.
             self.assertTrue(is_user_in_creator_group(creator1))
             self.assertTrue(is_user_in_creator_group(creator2))
             self.assertFalse(is_user_in_creator_group(staff1))
             self.assertFalse(is_user_in_creator_group(staff2))
+
