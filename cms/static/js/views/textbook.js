@@ -219,9 +219,21 @@ CMS.Views.EditChapter = Backbone.View.extend({
         return this;
     },
     events: {
+        "change .chapter-name": "changeName",
+        "change .chapter-asset-path": "changeAssetPath",
         "click .action-close": "removeChapter",
         "click .action-upload": "openUploadDialog",
         "submit": "uploadAsset"
+    },
+    changeName: function(e) {
+        if(e && e.preventDefault) { e.preventDefault(); }
+        this.model.set("name", this.$(".chapter-name").val());
+        return this;
+    },
+    changeAssetPath: function(e) {
+        if(e && e.preventDefault) { e.preventDefault(); }
+        this.model.set("asset_path", this.$(".chapter-asset-path").val());
+        return this;
     },
     removeChapter: function(e) {
         if(e && e.preventDefault) { e.preventDefault(); }
