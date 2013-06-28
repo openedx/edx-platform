@@ -184,6 +184,12 @@
 
     .nav-account-user {
 
+      .account-username {
+        width: 100%;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
     }
   }
 
@@ -209,13 +215,12 @@
   .wrapper-header {
 
     .branding {
-      width: flex-grid(2, 12);
-      margin-right: flex-gutter();
+      width: 15%;
+      margin-right: 2%;
     }
 
     .nav-account {
-      width: flex-grid(9, 12);
-      right: -($baseline*6);
+      width: 80%;
     }
   }
 }
@@ -228,21 +233,20 @@
   .wrapper-header {
 
     .branding {
-      width: flex-grid(2, 12);
-      margin-right: flex-gutter();
+      width: 15%;
+      margin-right: 2%;
     }
 
     .info-course {
-      width: flex-grid(3, 12);
+      width: 25%;
     }
 
     .nav-course {
-      width: flex-grid(4, 12);
+      width: 34%;
     }
 
     .nav-account {
-      width: flex-grid(3, 12);
-      right: -($baseline*1.5);
+      width: 20%;
     }
   }
 }
@@ -255,12 +259,12 @@
   .wrapper-header {
 
     .branding {
-      width: flex-grid(2, 12);
+      width: 15%;
+      margin-right: 2%;
     }
 
     .nav-pitch {
-      width: flex-grid(9, 12);
-      right: -($baseline*6);
+      width: 80%;
 
       .nav-item {
         margin-right: ($baseline/2);
