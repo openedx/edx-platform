@@ -61,6 +61,6 @@ class CMS.Views.SubtitlesImportYT extends Backbone.View
           data: JSON.stringify(
               'id': @options.component_id
           )
+          success: @xhrSuccessHandler
+          error: @xhrErrorHandler
       )
-      .success(@xhrSuccessHandler)
-      .error(@xhrErrorHandler)
