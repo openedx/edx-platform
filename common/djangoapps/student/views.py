@@ -286,37 +286,31 @@ def dashboard(request):
     username = str(request.user)
     #Recommended courses for the user
     cursor = connection.cursor()
-    query_getuserid = "select id,username from auth_user "
+    query_getuserid = "select id,username from auth_user where username='"+username+"'"
     user_id = -1;
     cursor.execute(query_getuserid)
     row = cursor.fetchall()
     for a in row:
-                                if a[1] == username:
-		user_id = a[0]
-		break
-    query = "select user_id,area_of_interest from auth_userprofile "
+	user_id = a[0]
+    query = "select user_id,area_of_interest from auth_userprofile where user_id='"+str(user_id)+"'"
     cursor.execute(query)
     area_interest = ""
     row = cursor.fetchall() 
     for a in row: 
-    	if a[0] == user_id:
-		area_interest = a[1]
-		break
+	area_interest = a[1]
     interested_category="" 
     for code,categ in UserProfile.COURSE_CATEGORIES:
 	if code == str(area_interest):
 		interested_category = categ
 		break
-    query_course_category = "select courseName,courseCategory from course_categories"
+    query_course_category = "select courseName,courseCategory from course_categories where courseCategory='"+area_interest+"'"
     cursor.execute(query_course_category)
     row = cursor.fetchall()
     similar_category_courses = []
     for a in row:
-	if a[1] == area_interest:
-		similar_category_courses.append(a[0])
-    print "The similar courses for this guy\n\n\n"
+	similar_category_courses.append(a[0])
     print similar_category_courses
-    
+    input() 
     recommended_courses = get_courses(request.user, request.META.get('HTTP_HOST'))
     recommend_courses = []
     for check_course in recommended_courses:
