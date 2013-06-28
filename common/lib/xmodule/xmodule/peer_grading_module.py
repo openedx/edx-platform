@@ -32,23 +32,35 @@ class PeerGradingFields(object):
         display_name="Show Single Problem",
         help='When True, only the single problem specified by "Link to Problem Location" is shown. '
              'When False, a panel is displayed with all problems available for peer grading.',
-        default=USE_FOR_SINGLE_LOCATION, scope=Scope.settings
+        default=USE_FOR_SINGLE_LOCATION,
+        scope=Scope.settings
     )
     link_to_location = String(
         display_name="Link to Problem Location",
         help='The location of the problem being graded. Only used when "Show Single Problem" is True.',
-        default=LINK_TO_LOCATION, scope=Scope.settings
+        default=LINK_TO_LOCATION,
+        scope=Scope.settings
     )
     is_graded = Boolean(
         display_name="Graded",
         help='Defines whether the student gets credit for grading this problem. Only used when "Show Single Problem" is True.',
-        default=IS_GRADED, scope=Scope.settings
+        default=IS_GRADED,
+        scope=Scope.settings
     )
-    due_date = Date(help="Due date that should be displayed.", default=None, scope=Scope.settings)
-    grace_period_string = String(help="Amount of grace to give on the due date.", default=None, scope=Scope.settings)
+    due_date = Date(
+        help="Due date that should be displayed.",
+        default=None,
+        scope=Scope.settings)
+    grace_period_string = String(
+        help="Amount of grace to give on the due date.",
+        default=None,
+        scope=Scope.settings
+    )
     max_grade = Integer(
-        help="The maximum grade that a student can receive for this problem.", default=MAX_SCORE,
-        scope=Scope.settings, values={"min": 0}
+        help="The maximum grade that a student can receive for this problem.", 
+        default=MAX_SCORE,
+        scope=Scope.settings,
+        values={"min": 0}
     )
     student_data_for_location = Dict(
         help="Student data for a given peer grading problem.",
@@ -57,7 +69,8 @@ class PeerGradingFields(object):
     weight = Float(
         display_name="Problem Weight",
         help="Defines the number of points each problem is worth. If the value is not set, each problem is worth one point.",
-        scope=Scope.settings, values={"min": 0, "step": ".1"}
+        scope=Scope.settings, values={"min": 0, "step": ".1"},
+        default=1
     )
 
 
