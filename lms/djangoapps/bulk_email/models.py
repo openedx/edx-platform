@@ -21,3 +21,10 @@ class CourseEmail(Email, models.Model):
 
     def __unicode__(self):
         return self.subject
+
+class Optout(models.Model):
+    email = models.CharField(max_length=255, db_index=True)
+    course_id = models.CharField(max_length=255, db_index=True)
+
+    class Meta:
+        unique_together = ('email', 'course_id')

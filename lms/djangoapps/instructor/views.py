@@ -676,7 +676,7 @@ def instructor_dashboard(request, course_id):
         email.save()
 
         course_url = request.build_absolute_uri(reverse('course_root',  kwargs={'course_id': course_id}))
-        tasks.delegate_emails.delay(email.hash, email.to, course_id, course_url, request.user.id)
+        tasks.delegate_email_batches.delay(email.hash, email.to, course_id, course_url, request.user.id)
         msg = "<font color='green'>Your email was successfully queued for sending.  Please note that for large public classe\
 s (~10k), it may take 1-2 hours to send all emails.</font>"
 

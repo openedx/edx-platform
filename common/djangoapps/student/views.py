@@ -50,6 +50,8 @@ from courseware.access import has_access
 
 from external_auth.models import ExternalAuthMap
 
+from bulk_email.models import Optout
+
 from statsd import statsd
 from pytz import UTC
 
@@ -264,6 +266,8 @@ def dashboard(request):
             log.error("User {0} enrolled in non-existent course {1}"
                       .format(user.username, enrollment.course_id))
 
+    course_optouts = Optout.objects.filter(email=user.email).values_list('course_id', flat=True)
+
     message = ""
     if not user.is_active:
         message = render_to_string('registration/activate_account_notice.html', {'email': user.email})
@@ -294,6 +298,7 @@ def dashboard(request):
         pass
 
     context = {'courses': courses,
+               'course_optouts': course_optouts,
                'message': message,
                'external_auth_map': external_auth_map,
                'staff_access': staff_access,
@@ -1221,6 +1226,19 @@ def accept_name_change(request):
 
     return accept_name_change_by_id(int(request.POST['id']))
 
+@ensure_csrf_cookie
+def change_email_settings(request):
+    if request.method != "POST":
+        return HttpResponseNotAllowed(["POST"])
+
+    course_id = request.POST.get("course_id")
+    receive_emails = request.POST.get("receive_emails")
+    if receive_emails:
+        Optout.objects.filter(email=request.user.email, course_id=course_id).delete()
+    else:
+        Optout.objects.get_or_create(email=request.user.email, course_id=course_id)
+
+    return HttpResponse(json.dumps({'success': True}))
 
 def _get_news(top=None):
     "Return the n top news items on settings.RSS_URL"

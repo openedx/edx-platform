@@ -18,7 +18,7 @@ log = logging.getLogger(__name__)
 EMAILS_PER_WORKER=getattr(settings, 'EMAILS_PER_WORKER', 10)
 
 @task()
-def delegate_emails(hash_for_msg, recipient, course_id, course_url, user_id):
+def delegate_email_batches(hash_for_msg, recipient, course_id, course_url, user_id):
     '''
     Delegates emails by querying for the list of recipients who should
     get the mail, chopping up into batches of EMAILS_PER_WORKER size,
@@ -42,7 +42,10 @@ def delegate_emails(hash_for_msg, recipient, course_id, course_url, user_id):
         recipient_qset = staff_qset | instructor_qset
 
         if recipient == "all":
-            enrollment_qset = User.objects.filter(courseenrollment__course_id=course.id).values('profile__name', 'email')
+            #Execute two queries per performance considerations for MySQL
+            #https://docs.djangoproject.com/en/1.2/ref/models/querysets/#in
+            course_optouts = Optout.objects.filter(course_id=course_id).values_list('email', flat=True)
+            enrollment_qset = User.objects.filter(courseenrollment__course_id=course_id).exclude(email__in=list(course_optouts)).values('profile__name', 'email')
             recipient_qset = recipient_qset | enrollment_qset
         recipient_qset = recipient_qset.distinct()
 
