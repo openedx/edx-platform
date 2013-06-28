@@ -15,7 +15,7 @@ from django_comment_client.utils import has_forum_access
 
 from courseware.access import _course_staff_group_name
 from courseware.tests.helpers import LoginEnrollmentTestCase
-from courseware.tests.modulestore_config import TEST_DATA_XML_MODULESTORE
+from course_groups.tests.modulestore_config import TEST_DATA_XML_MODULESTORE
 from xmodule.modulestore.django import modulestore
 import xmodule.modulestore.django
 
