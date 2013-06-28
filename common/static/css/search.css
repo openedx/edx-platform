@@ -17,6 +17,7 @@
 .search-results{
 	margin-left: 10%;
 	margin-top: -150px;
+<<<<<<< HEAD
 }
 
 .result-content{
@@ -35,7 +36,14 @@
 .search-results{
 	margin-left: 10%;
 	margin-top: 20px;
+=======
+>>>>>>> Refactored ES code for readability and ease of testing. Trying to fix firefox svg error
 }
+
+.result-content{
+	margin-top: -20px;
+}
+
 .searchbox {
 	border:0;
 	background: -moz-linear-gradient(top,  #ffffff 0%, #ededed 49%, #fafafa 50%, #ededed 50%, #dcdcdc 100%); /* FF3.6+ */
@@ -118,24 +126,34 @@
 	height: 155px;
 	width: 360px;
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 	padding-left: 10%;
 >>>>>>> Made prettier, added requirements, and included main edX page
+=======
+>>>>>>> Refactored ES code for readability and ease of testing. Trying to fix firefox svg error
 	text-align: justify;
 }
 
 .result_wrapper{
 <<<<<<< HEAD
+<<<<<<< HEAD
 	width: 705px;
 =======
 	width: 520px;
 >>>>>>> Made prettier, added requirements, and included main edX page
+=======
+	width: 705px;
+>>>>>>> Refactored ES code for readability and ease of testing. Trying to fix firefox svg error
 }
 
 .snippet_container{
 	overflow: hidden;
 	height: 155px;
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> Refactored ES code for readability and ease of testing. Trying to fix firefox svg error
 	width: 360px;
 	margin-left: 15px;
 }
@@ -147,8 +165,12 @@
 
 .columnate{
 	float:left;
+<<<<<<< HEAD
 }
 =======
 	width: 400px;
 }
 >>>>>>> Made prettier, added requirements, and included main edX page
+=======
+}
+>>>>>>> Refactored ES code for readability and ease of testing. Trying to fix firefox svg error
