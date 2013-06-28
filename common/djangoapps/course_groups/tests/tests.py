@@ -10,21 +10,11 @@ from course_groups.cohorts import (get_cohort, get_course_cohorts,
 
 from xmodule.modulestore.django import modulestore, _MODULESTORES
 
+from xmodule.modulestore.tests.django_utils import xml_store_config
+
 # NOTE: running this with the lms.envs.test config works without
 # manually overriding the modulestore.  However, running with
 # cms.envs.test doesn't.
-
-
-def xml_store_config(data_dir):
-    return {
-    'default': {
-        'ENGINE': 'xmodule.modulestore.xml.XMLModuleStore',
-        'OPTIONS': {
-            'data_dir': data_dir,
-            'default_class': 'xmodule.hidden_module.HiddenDescriptor',
-        }
-    }
-}
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 TEST_DATA_XML_MODULESTORE = xml_store_config(TEST_DATA_DIR)
