@@ -40,9 +40,10 @@ def find(request, database="http://127.0.0.1:9200",
         transcripts = [entry["searchable_text"] for entry in data]
         snippets = [snippet_generator(transcript, query) for transcript in transcripts]
         thumbnails = ["data:image/jpg;base64,"+entry["thumbnail"] for entry in data]
-        data = zip(uuids, snippets, thumbnails)
+        urls = [get_datum_url(request, datum) for datum in data]
+        data = zip(uuids, snippets, thumbnails, urls)
     except KeyError:
-        data = [("No results found, please try again", "")]
+        data = [(data[0], "")]
     if len(data) == 0:
         data = [("No results found, please try again", "")]
 
@@ -55,6 +56,17 @@ def find(request, database="http://127.0.0.1:9200",
     context.update({"search_correction_link": search_correction_link(request, correction)})
     context.update({"spelling_correction": correction})
     return render_to_string("search_templates/results.html", context)
+
+
+def get_datum_url(request, datum):
+    url = request.environ.get('HTTP_REFERER', "")
+    host = request.environ.get("HTTP_HOST", "edx.org")
+    trigger = "courseware"
+    if trigger in url:
+        base = url[:url.find(trigger)+len(trigger)+1]
+        return base+datum["url"]
+    else:
+        return "http://" + host + "/courses/" + datum["course_section"]+"/courseware/" + datum["url"]
 
 
 def query_reduction(query, stopwords):

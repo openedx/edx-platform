@@ -1,3 +1,4 @@
+
 <head>
 	${css_link("../static/css/search.css")}
 </head>
@@ -5,7 +6,7 @@
 <div class="searchwrapper">
 	<form action="/search" method="get">
 		<span>
-		<span class="searchbox-wrapper">
+		<div class="searchbox-wrapper">
 			% if old_query:
 			<input type="text" class="searchbox" name="s" value="${old_query}" />
 			% else:
@@ -14,22 +15,22 @@
 			<div class="searchbox_submit">
 				<input type="submit" value="" />
 			</div>
-		</span>
-		<span class="content-select">
+		</div>
+		<div class="content-select">
 			% if previous_content == "transcript":
-				<input type="radio" name="content" value="transcript" checked>Videos
-				<input type="radio" name="content" value="problem">Problems
-				<input type="radio" name="content" value="slide">Slides
+				<input type="radio" class="content" name="content" value="transcript" checked>Videos
+				<input type="radio" class="content" name="content" value="problem">Problems
+				<input type="radio" class="content" name="content" value="pdf">PDFs
 			% elif previous_content == "problem":
-				<input type="radio" name="content" value="transcript">Videos
-				<input type="radio" name="content" value="problem" checked>Problems
-				<input type="radio" name="content" value="slide">Slides
+				<input type="radio" class="content" name="content" value="transcript">Videos
+				<input type="radio" class="content" name="content" value="problem" checked>Problems
+				<input type="radio" class="content" name="content" value="pdf">PDFs
 			% else:
-				<input type="radio" name="content" value="transcript">Videos
-				<input type="radio" name="content" value="problem">Problems
-				<input type="radio" name="content" value="slide" checked>Slides
+				<input type="radio" class="content" name="content" value="transcript">Videos
+				<input type="radio" class="content" name="content" value="problem">Problems
+				<input type="radio" class="content" name="content" value="pdf" checked>PDFs
 			% endif
-		</span>
+		</div>
 	</span>
 	</form>
 </div>

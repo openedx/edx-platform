@@ -1,20 +1,26 @@
 .searchwrapper {
 	width:45%;
-	padding: 0;
+	left: 30px;
 	margin: 0;
 	position:relative;
 }
+
 
 .result-title{
 	text-align: center;
 	word-wrap: normal;
 	padding-top: 175px;
 }
+
 .searchwrapper form { display: inline; }
 
 .search-results{
 	margin-left: 10%;
-	margin-top: -150px;
+	margin-top: -100px;
+}
+
+.result-content{
+	margin-top: -20px;
 }
 
 .result-content{
@@ -39,34 +45,34 @@
 
 .searchbox_submit {
 	border: 0;
-	background-color: transparent;
-	background-size: cover;
-	position: absolute;
-	top: 2.5px;
+	position: relative;
+	width: 40px;
 	left: 210px;
-	/*width: 35px;*/
+	top: 3.5px;
 }
 
+.content{
+	margin-left: 10px;
+}
 .searchbox_submit:before{
 	position: absolute;
     content: '';
     background-image: url("../images/search-icon.svg");
     background-size: cover;
-    background-color: transparent;
     margin-left: 6px;
     margin-top: 4px;
     width:30px;
     height:30px;
     pointer-events: none;
 }
+
 .searchbox_submit:hover {
 	cursor:pointer;
 	cursor: hand;
 }
 
 .content-select{
-	display: block;
-	text-align: right;
+	float: left;
 	padding-top: 10px;
 }
 
@@ -97,4 +103,26 @@
 
 .columnate{
 	float:left;
+}
+
+.result_wrapper{
+	width: 705px;
+}
+
+.snippet_container{
+	overflow: hidden;
+	height: 155px;
+	width: 360px;
+	margin-left: 15px;
+}
+
+.thumbnail{
+	width: 190px;
+	height: 155px;
+}
+
+.pagination{
+	position: relative;
+	margin-top: 200px;
+	margin-left: 10%;
 }
