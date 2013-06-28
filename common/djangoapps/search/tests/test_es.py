@@ -1,6 +1,7 @@
 from django.test import TestCase
 import requests
 <<<<<<< HEAD
+<<<<<<< HEAD
 from ..es_requests import ElasticDatabase, PyGrep
 import json
 import time
@@ -10,6 +11,9 @@ from ..es_requests import ElasticDatabase
 <<<<<<< HEAD
 >>>>>>> Removed hackathon files, added some tests, included indexing of problems and pdfs
 =======
+=======
+from ..es_requests import ElasticDatabase, PyGrep
+>>>>>>> Removed old html resources, rewrote tests to fit with new es_requests implementation
 import json
 import time
 import os
@@ -123,6 +127,7 @@ class EsTest(TestCase):
         time.sleep(1)  # Without sleep, tests will run without setUp finishing.
         self.assertEqual(type_request.status_code, 201)
         self.current_path = os.path.dirname(os.path.abspath(__file__))
+        self.crawler = PyGrep(self.current_path)
 
     def test_index_creation(self):
         settings = self.elastic_search.get_index_settings("test-index")["test-index"]["settings"]
@@ -153,19 +158,19 @@ class EsTest(TestCase):
         relative_paths = ["/testdir/malformed.srt.sjson", "/testdir/transcript.srt.sjson",
                           "/testdir/nested/goal.srt.sjson"]
         absolute_paths = set([self.current_path+item for item in relative_paths])
-        paths = self.elastic_search.os_walk_transcript(os.walk(self.current_path))
+        paths = self.crawler.grab_all_files_with_ending(".srt.sjson")
         flat_paths = set([item for sublist in paths for item in sublist])
         self.assertTrue(flat_paths == absolute_paths)
 
     def test_alternate_directory_search(self):
         relative_paths = ["/testdir/extension.foo", "/testdir/nested/extension2.foo"]
         absolute_paths = set([self.current_path+item for item in relative_paths])
-        paths = self.elastic_search.os_walk_transcript(os.walk(self.current_path), file_ending=".foo")
+        paths = self.crawler.grab_all_files_with_ending(".foo")
         flat_paths = set([item for sublist in paths for item in sublist])
         self.assertTrue(flat_paths == absolute_paths)
         success = False
         try:
-            self.elastic_search.os_walk_transcript(os.walk(self.current_path), ".fake").next()
+            self.crawler.grab_all_files_with_ending(".fake").next()
         except StopIteration:
             success = True
         except:
@@ -173,8 +178,9 @@ class EsTest(TestCase):
         self.assertTrue(success)
 
     def test_data_indexing(self):
-        responses = self.elastic_search.index_directory_transcripts(self.current_path, "test-index",
-                                                                    "test-type", silent=True)
+        responses = self.elastic_search.index_directory_files(self.current_path, "test-index", "test-type",
+                                                              silent=True, file_ending=".srt.sjson",
+                                                              callback=self.elastic_search.index_transcript)
         successes = [json.loads(response)["ok"] for response in responses]
         correct_indices = [json.loads(response)["_index"] == "test-index" for response in responses]
         correct_types = [json.loads(response)["_type"] == "test-type" for response in responses]
