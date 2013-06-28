@@ -23,14 +23,7 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
                 '<% if (removable) {%><a href="#" class="remove-button">remove</a><% ;} %>' +
         '</li>');
 
-        // Instrument grading scale
-        // convert cutoffs to inversely ordered list
-        var modelCutoffs = this.model.get('grade_cutoffs');
-        for (var cutoff in modelCutoffs) {
-            this.descendingCutoffs.push({designation: cutoff, cutoff: Math.round(modelCutoffs[cutoff] * 100)});
-        }
-        this.descendingCutoffs = _.sortBy(this.descendingCutoffs,
-                function (gradeEle) { return -gradeEle['cutoff']; });
+        this.setupCutoffs();
 
         // Instrument grace period
         this.$el.find('#course-grading-graceperiod').timepicker();
@@ -45,7 +38,6 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
         }
         );
         this.listenTo(this.model, 'invalid', this.handleValidationError);
-        this.model.get('graders').on('remove', this.render, this);
         this.model.get('graders').on('reset', this.render, this);
         this.model.get('graders').on('add', this.render, this);
         this.selectorToField = _.invert(this.fieldToSelectorMap);
@@ -61,11 +53,25 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
         // Undo the double invocation error. At some point, fix the double invocation
         $(gradelist).empty();
         var gradeCollection = this.model.get('graders');
+        // We need to bind the 'remove' event here (rather than in
+        // initialize), or else we can only press the delete button
+        // once due to the graders collection changing when we cancel
+        // our changes.
+        gradeCollection.on('remove', function() {
+            this.showNotificationBar();
+            this.render();
+        }, this);
         gradeCollection.each(function(gradeModel) {
             $(gradelist).append(self.template({model : gradeModel }));
             var newEle = gradelist.children().last();
             var newView = new CMS.Views.Settings.GraderView({el: newEle,
                 model : gradeModel, collection : gradeCollection });
+            // Listen in order to rerender when the 'cancel' button is
+            // pressed
+            self.listenTo(newView, 'revert', _.bind(self.render, self));
+            self.listenTo(gradeModel, 'change', function() {
+                self.showNotificationBar();
+            });
         });
 
         // render the grade cutoffs
@@ -83,6 +89,7 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
     addAssignmentType : function(e) {
         e.preventDefault();
         this.model.get('graders').push({});
+        this.showNotificationBar();
     },
     fieldToSelectorMap : {
         'grace_period' : 'course-grading-graceperiod'
@@ -92,8 +99,7 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
         self.clearValidationErrors();
         var newVal = self.model.dateToGracePeriod($(event.currentTarget).timepicker('getTime'));
         self.model.set('grace_period', newVal, {validate: true});
-        self.showNotificationBar(self.save_message,
-                                 _.bind(self.saveModel, self));
+        self.showNotificationBar();
     },
     updateModel : function(event) {
         if (!this.selectorToField[event.currentTarget.id]) return;
@@ -106,9 +112,7 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
             this.setField(event);
         break;
         }
-        var self = this;
-        this.showNotificationBar(this.save_message,
-                                 _.bind(self.saveModel, self));
+        this.showNotificationBar();
     },
 
     // Grade sliders attributes and methods
@@ -234,8 +238,7 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
                 },
                 {}),
                 {validate: true});
-        this.showNotificationBar(this.save_message,
-                                 _.bind(this.saveModel, this));
+        this.showNotificationBar();
     },
 
     addNewGrade: function(e) {
@@ -310,8 +313,36 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
     },
     setTopGradeLabel: function() {
         this.$el.find('.grades .letter-grade').first().html(this.descendingCutoffs[0]['designation']);
+    },
+    setupCutoffs: function() {
+        // Instrument grading scale
+        // convert cutoffs to inversely ordered list
+        var modelCutoffs = this.model.get('grade_cutoffs');
+        for (var cutoff in modelCutoffs) {
+            this.descendingCutoffs.push({designation: cutoff, cutoff: Math.round(modelCutoffs[cutoff] * 100)});
+        }
+        this.descendingCutoffs = _.sortBy(this.descendingCutoffs,
+                                          function (gradeEle) { return -gradeEle['cutoff']; });
+    },
+    revertView: function() {
+        var self = this;
+        this.model.fetch({
+            success: function() {
+                self.descendingCutoffs = [];
+                self.setupCutoffs();
+                self.render();
+                self.renderCutoffBar();
+            },
+            reset: true});
+    },
+    showNotificationBar: function() {
+        // We always call showNotificationBar with the same args, just
+        // delegate to superclass
+        CMS.Views.ValidatingView.prototype.showNotificationBar.call(this,
+                                                                    this.save_message,
+                                                                    _.bind(this.saveView, this),
+                                                                    _.bind(this.revertView, this));
     }
-
 });
 
 CMS.Views.Settings.GraderView = CMS.Views.ValidatingView.extend({
@@ -368,13 +399,9 @@ CMS.Views.Settings.GraderView = CMS.Views.ValidatingView.extend({
             this.setField(event);
         break;
         }
-        var self = this;
-        this.showNotificationBar(this.save_message,
-                                 _.bind(this.saveModel, this));
     },
     deleteModel : function(e) {
-        this.model.destroy();
         e.preventDefault();
+        this.collection.remove(this.model);
     }
-
 });

@@ -144,7 +144,8 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
         }
         var self = this;
         this.showNotificationBar(this.save_message,
-                                 _.bind(this.saveModel, this));
+                                 _.bind(this.saveView, this),
+                                 _.bind(this.revertView, this));
     },
 
     removeSyllabus: function() {
@@ -185,12 +186,29 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
                     if (cachethis.model.get(field) != newVal) {
                         cachethis.model.set(field, newVal);
                         cachethis.showNotificationBar(cachethis.save_message,
-                                                      _.bind(cachethis.saveModel, cachethis));
+                                                      _.bind(cachethis.saveView, cachethis),
+                                                      _.bind(cachethis.revertView, cachethis));
                     }
                 }
             });
         }
-    }
+    },
 
+    revertView: function() {
+        // Make sure that the CodeMirror instance has the correct
+        // data from its corresponding textarea
+        var self = this;
+        this.model.fetch({
+            success: function() {
+                self.render();
+                _.each(self.codeMirrors,
+                       function(mirror) {
+                           var ele = mirror.getTextArea();
+                           var field = self.selectorToField[ele.id];
+                           mirror.setValue(self.model.get(field));
+                       });
+            },
+            reset: true});
+    }
 });
 

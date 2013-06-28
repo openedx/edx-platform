@@ -61,7 +61,10 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
                     var message = gettext("Your changes will not take effect until you save your progress. Take care with key and value formatting, as validation is not implemented.");
                     self.showNotificationBar(message,
                                              _.bind(self.saveView, self),
-                                             _.bind(self.revertView, self));
+                                             function() {
+                                                 self.model.deleteKeys = [];
+                                                 self.revertView();
+                                             });
                     if(self.saved) {
                         self.saved.hide();
                     }
@@ -112,25 +115,19 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
             {
             success : function() {
                 self.render();
+                var title = gettext("Your policy changes have been saved.");
                 var message = gettext("Please note that validation of your policy key and value pairs is not currently in place yet. If you are having difficulties, please review your policy pairs.");
-                self.saved = new CMS.Views.Alert.Confirmation({
-                    title: gettext("Your policy changes have been saved."),
-                    message: message,
-                    closeIcon: false
-                });
-                self.saved.show();
+                self.showSavedBar(title, message);
                 analytics.track('Saved Advanced Settings', {
                     'course': course_location_analytics
                 });
             }
         });
     },
-    revertView : function() {
+    revertView: function() {
         var self = this;
-        this.model.deleteKeys = [];
-        this.model.clear({silent : true});
         this.model.fetch({
-            success : function() { self.render(); },
+            success: function() { self.render(); },
             reset: true
         });
     },

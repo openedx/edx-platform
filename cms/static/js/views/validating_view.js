@@ -92,6 +92,11 @@ CMS.Views.ValidatingView = Backbone.View.extend({
                         if(secondaryClick) {
                             secondaryClick();
                         }
+                        self.model.clear({silent : true});
+                        /*self.model.fetch({
+                            success : function() { self.render(); },
+                            reset: true
+                        });*/
                         self.confirmation.hide();
                         self.notificationBarShowing = false;
                     }
@@ -111,7 +116,7 @@ CMS.Views.ValidatingView = Backbone.View.extend({
         this.saved.show();
     },
 
-    saveModel: function() {
+    saveView: function() {
         var self = this;
         this.model.save({},
                         {success: function() {
