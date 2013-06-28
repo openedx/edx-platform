@@ -156,8 +156,9 @@ def create_a_course():
     # Add the user to the instructor group of the course
     # so they will have the permissions to see it in studio
 
-    course = world.GroupFactory.create(name='instructor_MITx/{course_num}/{course_name}'.format(course_num=world.scenario_dict['COURSE'].number, course_name=world.scenario_dict['COURSE'].display_name.replace(" ", "_")))
-    if world.scenario_dict['USER']:
+    course = world.GroupFactory.create(name='instructor_MITx/{}/{}'.format(world.scenario_dict['COURSE'].number,
+                                                                    world.scenario_dict['COURSE'].display_name.replace(" ", "_")))
+    if world.scenario_dict.get('USER') is None:
         user = world.scenario_dict['USER']
     else:
         user = get_user_by_email('robot+studio@edx.org')

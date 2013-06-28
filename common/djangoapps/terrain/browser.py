@@ -79,7 +79,6 @@ def initial_setup(server):
 
     # Set the browser size to 1280x1024
     world.browser.driver.set_window_size(1280, 1024)
-    #world.absorb({}, 'scenario_dict')
 
 
 @before.each_scenario

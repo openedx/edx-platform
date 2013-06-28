@@ -64,7 +64,9 @@ def change_assignment_name(step, old_name, new_name):
 
 @step(u'I go back to the main course page')
 def main_course_page(step):
-    main_page_link_css = 'a[href="/%s/%s/course/%s"]' % (world.scenario_dict['COURSE'].org, world.scenario_dict['COURSE'].number, world.scenario_dict['COURSE'].display_name.replace(' ', '_'),)
+    main_page_link_css = 'a[href="/%s/%s/course/%s"]' % (world.scenario_dict['COURSE'].org,
+                                                        world.scenario_dict['COURSE'].number,
+                                                        world.scenario_dict['COURSE'].display_name.replace(' ', '_'),)
     world.css_click(main_page_link_css)
 
 
