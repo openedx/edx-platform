@@ -331,7 +331,8 @@ def instructor_dashboard(request, course_id):
                 try:
                     student_module.delete()
                     msg += "<font color='red'>Deleted student module state for %s!</font>" % module_state_key
-                    track.views.server_track(request, "delete-student-module-state", {"problem": problem_url, "student": unique_student_identifier, "course": course_id}, page="idashboard")
+                    event = {"problem": problem_url, "student": unique_student_identifier, "course": course_id}
+                    track.views.server_track(request, "delete-student-module-state", event, page="idashboard")
                 except:
                     msg += "Failed to delete module state for %s/%s" % (unique_student_identifier, problem_urlname)
             elif "Reset student's attempts" in action:
@@ -345,7 +346,12 @@ def instructor_dashboard(request, course_id):
                     # save
                     student_module.state = json.dumps(problem_state)
                     student_module.save()
-                    track.views.server_track(request, "reset-student-attempts", {"old_attempts": old_number_of_attempts, "student": student, "problem": student_module.module_state_key, "instructor": request.user, "course": course_id}, page="idashboard")
+                    event = {"old_attempts": old_number_of_attempts, 
+                             "student": student, 
+                             "problem": student_module.module_state_key, 
+                             "instructor": request.user, 
+                             "course": course_id}
+                    track.views.server_track(request, "reset-student-attempts", event, page="idashboard")
                     msg += "<font color='green'>Module state successfully reset!</font>"
                 except:
                     msg += "<font color='red'>Couldn't reset module state.  </font>"
