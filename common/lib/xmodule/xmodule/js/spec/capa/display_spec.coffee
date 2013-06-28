@@ -236,30 +236,30 @@ describe 'Problem', ->
     <span class="unanswered" style="display:inline-block;" id="status_1_2_1"></span>
   </div>
   <fieldset>
-    <label for="1_2_1_choiceinput_0bc">
+    <section id="forinput1_2_1_choiceinput_0bc">
       <input class="ctinput" type="radio" name="choiceinput_1_2_1" id="1_2_1_choiceinput_0bc" value="choiceinput_0"">
       <input class="ctinput" type="text" name="choiceinput_0_textinput_0" id="1_2_1_choiceinput_0_textinput_0" value=" ">
       <p id="answer_1_2_1_choiceinput_0bc" class="answer"></p>
-    </label>
-    <label for="1_2_1_choiceinput_1bc">
+    </>
+    <section id="forinput1_2_1_choiceinput_1bc">
       <input class="ctinput" type="radio" name="choiceinput_1_2_1" id="1_2_1_choiceinput_1bc" value="choiceinput_1" >
       <input class="ctinput" type="text" name="choiceinput_1_textinput_0" id="1_2_1_choiceinput_1_textinput_0" value=" " >
       <p id="answer_1_2_1_choiceinput_1bc" class="answer"></p>
-    </label>
-    <label for="1_2_1_choiceinput_2bc">
+    </section>
+    <section id="forinput1_2_1_choiceinput_2bc">
       <input class="ctinput" type="radio" name="choiceinput_1_2_1" id="1_2_1_choiceinput_2bc" value="choiceinput_2" >
       <input class="ctinput" type="text" name="choiceinput_2_textinput_0" id="1_2_1_choiceinput_2_textinput_0" value=" " >
       <p id="answer_1_2_1_choiceinput_2bc" class="answer"></p>
-    </label></fieldset><input class="choicetextvalue" type="hidden" name="input_1_2_1" id="input_1_2_1"></form>
+    </section></fieldset><input class="choicetextvalue" type="hidden" name="input_1_2_1" id="input_1_2_1"></form>
 </section></span></div>
 </section>
 '''
-        it 'sets the correct class on the mock_label for the correct choice', ->
+        it 'sets the correct class on the section for the correct choice', ->
           spyOn($, 'postWithPrefix').andCallFake (url, callback) ->
             callback answers: "1_2_1": ["1_2_1_choiceinput_0bc"], "1_2_1_choiceinput_0bc": "3"
           @problem.show()
 
-          expect($('label[for="1_2_1_choiceinput_0bc"]').attr('class')).toEqual(
+          expect($('#forinput1_2_1_choiceinput_0bc').attr('class')).toEqual(
             'choicetextgroup_show_correct')
           expect($('#answer_1_2_1_choiceinput_0bc').text()).toEqual('3')
           expect($('#answer_1_2_1_choiceinput_1bc').text()).toEqual('')
