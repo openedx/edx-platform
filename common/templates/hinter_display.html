@@ -4,7 +4,7 @@
 
 <%def name="get_hint()">
     % if best_hint != '':
-        <h4> Other students who arrived at the wrong answer of ${answer} recommend the following hints: </h4>
+        <h4> Hints from students who made similar mistakes: </h4>
         <ul>
         <li> ${best_hint} </li>
     % endif
@@ -65,11 +65,12 @@
 
     </style>
 
+    <p>
     <i> Participation in the hinting system is strictly optional, and will not influence
     your grade. </i>
     <br />
-    Help us improve our hinting system.  Start by picking one of your previous incorrect answers from below:
-    <br /><br />
+    Help your classmates by writing hints for this problem. Start by picking one of your previous incorrect answers from below:
+    </p>
 
     <div id="answer-tabs">
         <ul>
@@ -82,19 +83,54 @@
         <div class = "previous-answer" id="previous-answer-${index}">
         <div class = "hint-inner-container">
             % if index in index_to_hints and len(index_to_hints[index]) > 0:
-                Which hint was most helpful when you got the wrong answer of ${answer}?
-                <br />
+                <p>
+                Which hint would be most effective to show a student who also got ${answer}?
+                </p>
                 % for hint_text, hint_pk in index_to_hints[index]:
+                    <p>
                     <input class="vote" data-answer="${index}" data-hintno="${hint_pk}" type="button" value="Vote">
                     ${hint_text}
-                    <br />
+                    </p>
                 % endfor
+                <p>
                 Don't like any of the hints above?  You can also submit your own.
             % else:
-                Write a hint for other students who get the wrong answer of ${answer}.
+                <p>
             % endif
-            Try to describe what concepts you misunderstood, or what mistake you made.  Please don't
-            give away the answer.
+            What hint would you give a student who made the same mistake you did?  Please don't give away the answer.
+            Read about <a class="expand-goodhint" href="javascript:;">what makes a good hint</a>.
+            </p>
+            <div class="goodhint" style="display:none">
+                <h4>What makes a good hint?</h4>
+
+                <p>It depends on the type of problem you ran into. For stupid errors --
+                an arithmetic error or similar -- simply letting the student you'll be
+                helping to check their signs is sufficient.</p>
+
+                <p>For deeper errors of understanding, the best hints allow students to
+                discover a contradiction in how they are thinking about the
+                problem. An example that clearly demonstrates inconsistency or
+                <a href="http://en.wikipedia.org/wiki/Cognitive_dissonance" target="_blank"> cognitive dissonace </a>
+                is ideal, although in most cases, not possible.</p>
+
+                <p>
+                Good hints either:
+                <ul>
+                <li> Point out the specific misunderstanding your classmate might have </li>
+                <li> Point to concepts or theories where your classmates might have a
+                misunderstanding </li>
+                <li> Show simpler, analogous examples. </li>
+                <li> Provide references to relevant parts of the text </li>
+                </ul>
+                </p>
+
+                <p>Still, remember even a crude hint -- virtually anything short of
+                giving away the answer -- is better than no hint.</p>
+
+                <p>
+                <a href="http://www.apa.org/education/k12/misconceptions.aspx?item=2" target="_blank">Learn even more</a>
+                </p>
+            </div>
             <textarea cols="50" style="height:100px" class="custom-hint" id="custom-hint-${index}">
 What would you say to help someone who got this wrong answer?
 (Don't give away the answer, please.)
