@@ -7,7 +7,7 @@ from django.core.urlresolvers import reverse
 
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
@@ -40,9 +40,9 @@ class StaticBookTest(ModuleStoreTestCase):
         Make a course with an enrolled logged-in student.
         """
         course = CourseFactory.create(**kwargs)
-        self.user = UserFactory.create()
-        CourseEnrollmentFactory.create(user=self.user, course_id=course.id)
-        self.client.login(username=self.user.username, password='test')
+        user = UserFactory.create()
+        CourseEnrollmentFactory.create(user=user, course_id=course.id)
+        self.client.login(username=user.username, password='test')
         return course
 
 
