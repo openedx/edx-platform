@@ -36,10 +36,6 @@ def index(request, course_id, book_index, page=None):
     )
 
 
-def index_shifted(request, course_id, page):
-    return index(request, course_id=course_id, page=int(page) + 24)
-
-
 def remap_static_url(original_url, course):
     """Remap a URL in the ways the course requires."""
     # Ick: this should be possible without having to quote and unquote the URL...
