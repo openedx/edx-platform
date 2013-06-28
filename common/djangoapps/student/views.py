@@ -309,8 +309,7 @@ def dashboard(request):
     similar_category_courses = []
     for a in row:
 	similar_category_courses.append(a[0])
-    print similar_category_courses
-    input() 
+    
     recommended_courses = get_courses(request.user, request.META.get('HTTP_HOST'))
     recommend_courses = []
     for check_course in recommended_courses:
