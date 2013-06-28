@@ -4,6 +4,8 @@
   from courseware.access import has_access
   from certificates.models import CertificateStatuses
 %>
+<%! from student.models import UserProfile %>
+
 <%inherit file="main.html" />
 
 <%namespace name='static' file='static_content.html'/>
@@ -115,7 +117,24 @@
              });
        return false;
     });
+ $("#change_interest_form").submit(function(){
+      var new_interest = $('#area_of_interest').val();
 
+
+          $.post('${reverse("change_interest")}',
+             {"new_interest":new_interest},
+             function(data) {
+               if(data.success) {
+                 location.reload();
+                 // $("#change_name_body").html("<p>Name changed.</p>");
+               } else {
+
+                 $("#change_interest_error").html(data.error).stop().css("display", "block");
+               }
+             });
+       return false;
+    });
+    
   })(this)
   </script>
 </%block>
@@ -138,14 +157,14 @@
           <span class="title"><div class="icon name-icon"></div>Full Name (<a href="#apply_name_change" rel="leanModal" class="edit-name">edit</a>)</span> <span class="data">${ user.profile.name | h }</span>
         </li>
         <li>
-          <span class="title"><div class="icon email-icon"></div>Email
-            % if external_auth_map is None or 'shib' not in external_auth_map.external_domain:
-            (<a href="#change_email" rel="leanModal" class="edit-email">edit</a>)
-            % endif
-          </span> <span class="data">${ user.email | h }</span>
+          <span class="title"><div class="icon email-icon"></div>Email (<a href="#change_email" rel="leanModal" class="edit-email">edit</a>)</span> <span class="data">${ user.email | h }</span>
         </li>
-
-        % if external_auth_map is None or 'shib' not in external_auth_map.external_domain:
+	<li>
+	  <span class="title"><div class="icon email-icon"></div>Area of Interest(<a href="#apply_change_interest" rel="leanModal">edit</a>)</span>
+	  <span >
+	  	<center>${categ}</center>
+	  </span>
+	</li>
         <li>
           <span class="title"><a href="#password_reset_complete" rel="leanModal" id="pwd_reset_button">Reset Password</a></span>
           <form id="password_reset_form" method="post" data-remote="true" action="${reverse('password_reset')}">
@@ -153,8 +172,6 @@
             <!-- <input type="submit" id="pwd_reset_button" value="Reset Password" /> -->
           </form>
         </li>
-        % endif
-
       </ul>
     </section>
 
@@ -270,7 +287,6 @@
                    	% if not registration.is_accepted and not registration.is_rejected:
 	            <div class="message message-status is-shown">
     	              <p class="message-copy"><strong>Your <a href="${testcenter_register_target}" id="exam_register_link">registration for the Pearson exam</a> is pending</strong>. Within a few days, you should see a confirmation number here, which can be used to schedule your exam.</p>
-                </div>
                     % endif
                 % endif
             % endif
@@ -340,6 +356,7 @@
             <a href="#unenroll-modal" class="unenroll" rel="leanModal" data-course-id="${course.id}" data-course-number="${course.number}">Unregister</a>
           </section>
         </article>
+	
 
 
 
@@ -352,6 +369,28 @@
         </a>
       </section>
     % endif
+
+
+<!-- Recommended courses for the student 
+-->
+	<header>
+	<h2>Recommended Courses</h2></header>
+	<section class="find-courses">
+	<section class="container">
+	  <section class="courses">
+	    <ul class="courses-listing">
+		%for course in recommended_courses:
+		<li class="courses-listing-item">
+		  %if user.is_authenticated(): 
+		   <%include file="course.html" args="course=course"/>
+		  %endif
+		</li>
+		%endfor
+	   </ul>
+	  </section>
+	</section>
+	</section>
+
 
     % if staff_access and len(errored_courses) > 0:
       <div id="course-errors">
@@ -481,3 +520,37 @@
     </div>
   </div>
 </section>
+
+<section id="apply_change_interest" class="modal">
+  <div class="inner-wrapper">
+    <header>
+      <h2>Change your Area of Interest</h2>
+      <hr/>
+    </header>
+    <div id="change_interest_body">
+      <form id="change_interest_form">
+        <div id="change_interest_error" class="modal-form-error"> </div>
+        <fieldset>
+          <div class="input-group">
+            <label>Select your desired area of interest: </label>
+            <select id="area_of_interest">
+		<option value="">--</option>
+		%for code,category in UserProfile.COURSE_CATEGORIES:
+			<option value="${code}">${category}</option>
+		%endfor
+	    </select>
+          </div>
+          <div class="submit">
+            <input type="submit" id="submit" value="Change ">
+          </div>
+        </fieldset>
+      </form>
+    </div>
+    <div class="close-modal">
+      <div class="inner">
+        <p>&#10005;</p>
+      </div>
+    </div>
+  </div>
+</section>
+
