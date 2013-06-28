@@ -124,7 +124,7 @@ class EsTest(TestCase):
         self.elastic_search = ElasticDatabase(es_instance, "common/djangoapps/search/tests/test_settings.json")
         type_request = self.elastic_search.setup_type("test-index", "test-type",
                                                       "common/djangoapps/search/tests/test_mapping.json")
-        time.sleep(1)  # Without sleep, tests will run without setUp finishing.
+        time.sleep(0.1)  # Without sleep, tests will run without setUp finishing.
         self.assertEqual(type_request.status_code, 201)
         self.current_path = os.path.dirname(os.path.abspath(__file__))
         self.crawler = PyGrep(self.current_path)
