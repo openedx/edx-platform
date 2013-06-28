@@ -629,3 +629,54 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
         #reset the problem
         module.handle_ajax("reset", {})
         self.assertEqual(module.state, "initial")
+
+class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
+    """
+    Test the student flow in the combined open ended xmodule
+    """
+    problem_location = Location(["i4x", "edX", "open_ended", "combinedopenended", "SampleQuestion1Attempt"])
+    answer = "blah blah"
+    assessment = [0, 1]
+    hint = "blah"
+
+    def setUp(self):
+        self.test_system = get_test_system()
+        self.test_system.xqueue['interface'] = Mock(
+            send_to_queue=Mock(side_effect=[1, "queued"])
+        )
+        self.setup_modulestore(COURSE)
+
+    def test_reset_fail(self):
+        """
+       Test the flow of the module if we complete the self assessment step and then reset
+       @return:
+       """
+        assessment = [0, 1]
+        module = self.get_module_from_location(self.problem_location, COURSE)
+
+        #Simulate a student saving an answer
+        module.handle_ajax("save_answer", {"student_answer": self.answer})
+        status = module.handle_ajax("get_status", {})
+        self.assertTrue(isinstance(status, basestring))
+
+        #Mock a student submitting an assessment
+        assessment_dict = MockQueryDict()
+        assessment_dict.update({'assessment': sum(assessment), 'score_list[]': assessment})
+        module.handle_ajax("save_assessment", assessment_dict)
+        task_one_json = json.loads(module.task_states[0])
+        self.assertEqual(json.loads(task_one_json['child_history'][0]['post_assessment']), assessment)
+        status = module.handle_ajax("get_status", {})
+        self.assertTrue(isinstance(status, basestring))
+
+        #Move to the next step in the problem
+        module.handle_ajax("next_problem", {})
+        self.assertEqual(module.current_task_number, 0)
+
+        html = module.get_html()
+        self.assertTrue(isinstance(html, basestring))
+
+        rubric = module.handle_ajax("get_combined_rubric", {})
+        self.assertTrue(isinstance(rubric, basestring))
+        self.assertEqual(module.state, "done")
+        reset_data = json.loads(module.handle_ajax("reset", {}))
+        self.assertEqual(reset_data['success'], False)
