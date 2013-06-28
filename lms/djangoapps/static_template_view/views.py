@@ -9,7 +9,8 @@ from django.shortcuts import redirect
 from django.conf import settings
 from django.http import HttpResponseNotFound, HttpResponseServerError, Http404
 from django_future.csrf import ensure_csrf_cookie
-
+from courseware.courses import (get_courses, get_course_with_access,
+                                get_courses_by_university, sort_by_announcement)
 from util.cache import cache_if_anonymous
 
 valid_templates = []
@@ -59,6 +60,19 @@ def render_press_release(request, slug):
         raise Http404
     else:
         return resp
+def search(request, template):
+    courses = get_courses(request.user, request.META.get('HTTP_HOST'))
+    courses = sort_by_announcement(courses)
+    result=[]
+    for a in courses:
+	x=str(a.location)
+	z=x.replace("course","")
+	z=z.replace("None","")
+	z=z.replace("/","")
+	z=z.replace("i4x:","")
+	if request.GET['search'].lower() in z.lower():
+		result.append(a)
+    return render_to_response("courseware/courses.html", {'courses': result})
 
 
 def render_404(request):

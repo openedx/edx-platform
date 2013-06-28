@@ -20,7 +20,8 @@ urlpatterns = ('',  # nopep8
     url(r'^dashboard$', 'student.views.dashboard', name="dashboard"),
     url(r'^login$', 'student.views.signin_user', name="signin_user"),
     url(r'^register$', 'student.views.register_user', name="register_user"),
-
+    url(r'^search_course/$', 'static_template_view.views.search',
+             {'template': 'search_course.html'}, name="how_it_works"),
     url(r'^admin_dashboard$', 'dashboard.views.dashboard'),
 
     url(r'^change_email$', 'student.views.change_email_request', name="change_email"),
