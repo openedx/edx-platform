@@ -377,8 +377,8 @@ Set to 50k by default"""
                 dictionary.write(word+"\n")
 
 
-url = "http://localhost:9200"
-settings_file = "settings.json"
+#url = "http://localhost:9200"
+#settings_file = "settings.json"
 
 #mongo = MongoIndexer()
 
@@ -389,7 +389,7 @@ settings_file = "settings.json"
 #print test.delete_index("transcript-index")
 #mongo.index_all_lecture_slides(test, "slide-index")
 #mongo.index_all_transcripts(test, "transcript-index")
-mongo.index_all_problems(test, "problem-index")
+#mongo.index_all_problems(test, "problem-index")
 
 #print test.setup_type("transcript", "cleaning", mapping)._content
 #print test.get_type_mapping("transcript-index", "2-1x")
