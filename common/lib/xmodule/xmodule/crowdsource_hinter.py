@@ -58,6 +58,7 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
     -debug="True" will let users vote as often as they want.
     """
     icon_class = 'crowdsource_hinter'
+    css = {'scss': [resource_string(__name__, 'css/crowdsource_hinter/display.scss')]}
     js = {'coffee': [resource_string(__name__, 'js/src/crowdsource_hinter/display.coffee')],
           'js': []}
     js_module_name = "Hinter"
@@ -91,6 +92,7 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         # Wrap the module in a <section>.  This lets us pass data attributes to the javascript.
         out += '<section class="crowdsource-wrapper" data-url="' + self.system.ajax_url +\
             '" data-child-url = "' + child_url + '"> </section>'
+
         return out
 
     def capa_answer_to_str(self, answer):
