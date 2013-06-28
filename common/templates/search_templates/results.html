@@ -13,32 +13,34 @@
 </div>
 % endif
 
-<section class="search-results">
+<div class="search-results">
 	% for datum in data:
-	<section class="result">
-		<div class="result_wrapper">
-			<h1 class="result-title">${datum[0]}</h1>
-			<div class="result-content">
-				<div class="columnate">
-					% if len(datum) >= 3:
-						<img class="thumbnail" src="${datum[2]}" alt="${datum[0]}">
-					%endif
-				</div>
-				<div class="columnate">
-					<div class="snippet_container">
-						<p  class="results_snippet scaled-text">
-							${datum[1]}
-						</p>
+		<a href=${datum[3]}>
+			<section class="result">
+				<div class="result_wrapper">
+					<h1 class="result-title">${datum[0]}</h1>
+					<div class="result-content">
+						<div class="columnate">
+							% if len(datum) >= 3:
+								<img class="thumbnail" src="${datum[2]}" alt="${datum[0]}">
+							% endif
+						</div>
+						<div class="columnate">
+							<div class="snippet_container">
+								<p  class="results_snippet scaled-text">
+									${datum[1]}
+								</p>
+							</div>
+						</div>
 					</div>
 				</div>
-			</div>
-		</div>
-	</section>
+			</section>
+		</a>
 	% endfor
-</section>
+</div>
 
 % if len(data) > 1:
-	<section class="pagination">
+	<div class="pagination">
 		<span class="step-links">
 			% if data.number > 1:
 				<a href="${ prev_page }">Prev</a>
@@ -52,7 +54,7 @@
 				<a href="${next_page}">Next</a>
 			%endif
 		</span>
-	</section>
+	</div>
 % endif
 
 
