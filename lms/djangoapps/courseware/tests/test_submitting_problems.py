@@ -50,8 +50,9 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
         # Create course
         number = self.course_slug
+        course_name = 'course_name'
 
-        self.course = CourseFactory.create(display_name='course_name', number=number)
+        self.course = CourseFactory.create(display_name=course_name, number=number)
         assert self.course, "Couldn't load course %r" % course_name
 
         # create a test student
