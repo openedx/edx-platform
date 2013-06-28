@@ -270,6 +270,11 @@ def get_problem_list(request, course_id):
         problem_list = response['problem_list']
         valid_problem_list = []
         for i in xrange(0,len(problem_list)):
+            #Needed to ensure that the 'location' key can be accessed
+            try:
+                problem_list[i] = json.loads(problem_list[i])
+            except Exception:
+                pass
             if does_location_exist(course_id, problem_list[i]['location']):
                 valid_problem_list.append(problem_list[i])
         response['problem_list'] = valid_problem_list

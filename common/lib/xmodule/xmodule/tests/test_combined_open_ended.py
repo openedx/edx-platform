@@ -630,9 +630,9 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
         module.handle_ajax("reset", {})
         self.assertEqual(module.state, "initial")
 
-class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
+class OpenEndedModuleXmlAttemptTest(unittest.TestCase, DummyModulestore):
     """
-    Test the student flow in the combined open ended xmodule
+    Test if student is able to reset the problem
     """
     problem_location = Location(["i4x", "edX", "open_ended", "combinedopenended", "SampleQuestion1Attempt"])
     answer = "blah blah"
@@ -649,6 +649,7 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
     def test_reset_fail(self):
         """
        Test the flow of the module if we complete the self assessment step and then reset
+       Since the problem only allows one attempt, should fail.
        @return:
        """
         assessment = [0, 1]
@@ -675,8 +676,11 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
         html = module.get_html()
         self.assertTrue(isinstance(html, basestring))
 
+        #Module should now be done
         rubric = module.handle_ajax("get_combined_rubric", {})
         self.assertTrue(isinstance(rubric, basestring))
         self.assertEqual(module.state, "done")
+
+        #Try to reset, should fail because only 1 attempt is allowed
         reset_data = json.loads(module.handle_ajax("reset", {}))
         self.assertEqual(reset_data['success'], False)
