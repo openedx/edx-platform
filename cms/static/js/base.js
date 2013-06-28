@@ -25,6 +25,7 @@ $(document).ready(function() {
     $newComponentTemplatePickers = $('.new-component-templates');
     $newComponentButton = $('.new-component-button');
     $spinner = $('<span class="spinner-in-field-icon"></span>');
+    $body.bind('keyup', onKeyUp);
 
     $('.expand-collapse-icon').bind('click', toggleSubmodules);
     $('.visibility-options').bind('change', setVisibility);
@@ -412,6 +413,12 @@ function hideModal(e) {
     }
 }
 
+function onKeyUp(e) {
+    if (e.which == 87) {
+        $body.toggleClass('show-wip hide-wip');
+    }
+}
+
 function toggleSock(e) {
     e.preventDefault();
 
@@ -597,7 +604,9 @@ function saveNewCourse(e) {
     var org = $newCourse.find('.new-course-org').val();
     var number = $newCourse.find('.new-course-number').val();
     var display_name = $newCourse.find('.new-course-name').val();
+    var courseCategory = $newCourse.find('.new-course-category').val();
 
+    alert("WORKING"+courseCategory+"hellow");
     if (org == '' || number == '' || display_name == '') {
         alert('You must specify all fields in order to create a new course.');
         return;
@@ -613,7 +622,8 @@ function saveNewCourse(e) {
         'template': template,
         'org': org,
         'number': number,
-        'display_name': display_name
+        'display_name': display_name,
+        'coursecategory': courseCategory
     },
 
     function(data) {
