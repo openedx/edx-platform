@@ -80,7 +80,7 @@ end
     namespace :jasmine do
         namespace system do
             desc "Open jasmine tests for #{system} in your default browser"
-            task :browser do
+            task :browser => [:clean_reports_dir] do
                 Rake::Task[:assets].invoke(system, 'jasmine')
                 django_for_jasmine(system, true) do |jasmine_url|
                     jasmine_browser(jasmine_url)
@@ -88,7 +88,7 @@ end
             end
 
             desc "Open jasmine tests for #{system} in your default browser, and dynamically recompile coffeescript"
-            task :'browser:watch' => :'assets:coffee:_watch' do
+            task :'browser:watch' => [:clean_reports_dir, :'assets:coffee:_watch'] do
                 django_for_jasmine(system, true) do |jasmine_url|
                     jasmine_browser(jasmine_url, jitter=0, wait=0)
                 end
@@ -97,7 +97,7 @@ end
             end
 
             desc "Use phantomjs to run jasmine tests for #{system} from the console"
-            task :phantomjs do
+            task :phantomjs => [:clean_reports_dir] do
                 Rake::Task[:assets].invoke(system, 'jasmine')
                 phantomjs = ENV['PHANTOMJS_PATH'] || 'phantomjs'
                 django_for_jasmine(system, false) do |jasmine_url|
@@ -122,7 +122,7 @@ static_js_dirs.each do |dir|
     namespace :jasmine do
         namespace dir do
             desc "Open jasmine tests for #{dir} in your default browser"
-            task :browser do
+            task :browser => [:clean_reports_dir] do
                 # We need to use either CMS or LMS to preprocess files. Use LMS by default
                 Rake::Task['assets:coffee'].invoke('lms', 'jasmine')
                 template_jasmine_runner(dir) do |f|
@@ -131,7 +131,7 @@ static_js_dirs.each do |dir|
             end
 
             desc "Use phantomjs to run jasmine tests for #{dir} from the console"
-            task :phantomjs do
+            task :phantomjs => [:clean_reports_dir] do
                 # We need to use either CMS or LMS to preprocess files. Use LMS by default
                 Rake::Task[:assets].invoke('lms', 'jasmine')
                 template_jasmine_runner(dir) do |f|

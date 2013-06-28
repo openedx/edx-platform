@@ -60,10 +60,7 @@ fi
 
 export PIP_DOWNLOAD_CACHE=/mnt/pip-cache
 
-# Allow django liveserver tests to use a range of ports
-export DJANGO_LIVE_TEST_SERVER_ADDRESS=${DJANGO_LIVE_TEST_SERVER_ADDRESS-localhost:8000-9000}
-
-source /mnt/virtualenvs/"$JOB_NAME"/bin/activate
+source $VIRTUALENV_DIR/bin/activate
 
 bundle install
 

@@ -48,7 +48,6 @@ class LoginEnrollmentTestCase(TestCase):
     Provides support for user creation,
     activation, login, and course enrollment.
     """
-
     def setup_user(self):
         """
         Create a user account, activate, and log in.
@@ -67,8 +66,8 @@ class LoginEnrollmentTestCase(TestCase):
         """
         Login, check that the corresponding view's response has a 200 status code.
         """
-        resp = resp = self.client.post(reverse('login'),
-                                       {'email': email, 'password': password})
+        resp = self.client.post(reverse('login'),
+                                {'email': email, 'password': password})
         self.assertEqual(resp.status_code, 200)
         data = json.loads(resp.content)
         self.assertTrue(data['success'])
@@ -78,15 +77,14 @@ class LoginEnrollmentTestCase(TestCase):
         Logout; check that the HTTP response code indicates redirection
         as expected.
         """
-        resp = self.client.get(reverse('logout'), {})
         # should redirect
-        self.assertEqual(resp.status_code, 302)
+        check_for_get_code(self, 302, reverse('logout'))
 
     def create_account(self, username, email, password):
         """
         Create the account and check that it worked.
         """
-        resp = self.client.post(reverse('create_account'), {
+        resp = check_for_post_code(self, 200, reverse('create_account'), {
             'username': username,
             'email': email,
             'password': password,
@@ -94,10 +92,8 @@ class LoginEnrollmentTestCase(TestCase):
             'terms_of_service': 'true',
             'honor_code': 'true',
         })
-        self.assertEqual(resp.status_code, 200)
         data = json.loads(resp.content)
         self.assertEqual(data['success'], True)
-
         # Check both that the user is created, and inactive
         self.assertFalse(User.objects.get(email=email).is_active)
 
@@ -107,12 +103,8 @@ class LoginEnrollmentTestCase(TestCase):
         No error checking.
         """
         activation_key = Registration.objects.get(user__email=email).activation_key
-
         # and now we try to activate
-        url = reverse('activate', kwargs={'key': activation_key})
-
-        resp = self.client.get(url)
-        self.assertEqual(resp.status_code, 200)
+        check_for_get_code(self, 200, reverse('activate', kwargs={'key': activation_key}))
         # Now make sure that the user is now actually activated
         self.assertTrue(User.objects.get(email=email).is_active)
 
@@ -128,8 +120,6 @@ class LoginEnrollmentTestCase(TestCase):
             'enrollment_action': 'enroll',
             'course_id': course.id,
         })
-        print ('Enrollment in %s result status code: %s'
-               % (course.location.url(), str(resp.status_code)))
         result = resp.status_code == 200
         if verify:
             self.assertTrue(result)
@@ -140,8 +130,5 @@ class LoginEnrollmentTestCase(TestCase):
         Unenroll the currently logged-in user, and check that it worked.
         `course` is an instance of CourseDescriptor.
         """
-        resp = self.client.post(reverse('change_enrollment'), {
-            'enrollment_action': 'unenroll',
-            'course_id': course.id,
-        })
-        self.assertEqual(resp.status_code, 200)
+        check_for_post_code(self, 200, reverse('change_enrollment'), {'enrollment_action': 'unenroll',
+                                                                      'course_id': course.id})

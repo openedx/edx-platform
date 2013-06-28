@@ -1,0 +1,1 @@
+You have been un-enrolled from ${course_id}

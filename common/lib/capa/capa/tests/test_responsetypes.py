@@ -1266,6 +1266,24 @@ class CustomResponseTest(ResponseTest):
         msg = correct_map.get_msg('1_2_1')
         self.assertEqual(msg, self._get_random_number_result(problem.seed))
 
+    def test_random_isnt_none(self):
+        # Bug LMS-500 says random.seed(10) fails with:
+        #     File "<string>", line 61, in <module>
+        #     File "/usr/lib/python2.7/random.py", line 116, in seed
+        #       super(Random, self).seed(a)
+        #   TypeError: must be type, not None
+
+        r = random.Random()
+        r.seed(10)
+        num = r.randint(0, 1e9)
+
+        script = textwrap.dedent("""
+            random.seed(10)
+            num = random.randint(0, 1e9)
+            """)
+        problem = self.build_problem(script=script)
+        self.assertEqual(problem.context['num'], num)
+
     def test_module_imports_inline(self):
         '''
         Check that the correct modules are available to custom
