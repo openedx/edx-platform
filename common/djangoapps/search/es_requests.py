@@ -34,10 +34,12 @@ class MongoIndexer:
             self.content_db.collection_names().index(chunk_collection)
         except ValueError:
             print "No collection named: " + chunk_collection
+            raise
         try:
             self.module_db.collection_names().index(module_collection)
         except ValueError:
             print "No collection named: " + module_collection
+            raise
         self.file_collection = self.content_db[file_collection]
         self.chunk_collection = self.content_db[chunk_collection]
         self.module_collection = self.module_db[module_collection]
