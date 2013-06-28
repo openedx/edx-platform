@@ -88,7 +88,7 @@ class MongoIndexer:
         cleaned_text = re.sub("\\(.*?\\)", "", paragraphs).replace("\\", "")
         remove_tags = re.sub("<[a-zA-Z0-9/\.\= \"_-]+>", "", cleaned_text)
         remove_repetitions = re.sub(r"(.)\1{4,}", "", remove_tags)
-        print remove_repetitions
+        return remove_repetitions
 
     def module_for_uuid(self, transcript_uuid):
         """Given the transcript uuid found from the xcontent database, returns the mongo document for the video"""
@@ -233,32 +233,26 @@ class ElasticDatabase:
             print "Got an unexpected response code: " + str(status)
             raise
 
-    def os_walk_transcript(self, walk_results, file_ending=".srt.sjson"):
-        """Takes the results of os.walk and returns a list of absolute paths to all files with given file_ending"""
-        file_check = lambda walk: len(walk[2]) > 0
-        ending_prelim = lambda walk: file_ending in " ".join(walk[2])
-        relevant_results = (entry for entry in walk_results if file_check(entry) and ending_prelim(entry))
-        return (self.os_path_tuple_ending(result, file_ending) for result in relevant_results)
+    def index_directory_files(self, directory, index, type_, silent=False, **kwargs):
+        """Starts a DirectoryCrawler instance and indexes all files in the given directory
 
-    def os_path_tuple_ending(self, os_walk_tuple, file_ending=".srt.sjson"):
-        """Given the path tuples from the os.walk method, constructs absolute paths to transcripts"""
-        format_check = lambda file_name: file_ending in file_name
-        directory, subfolders, file_paths = os_walk_tuple
-        return [os.path.join(directory, file_path) for file_path in file_paths if format_check(file_path)]
-
-    def index_directory_transcripts(self, directory, index, type_, silent=False):
-        """Indexes all transcripts that are present in a given directory
-
-        Will recursively go through the directory and assume all .srt.sjson files are transcript,
-
-        silent option dictates whether the method will fail silently on badly formed JSON. If set to True
-        then the Searchable text of a transcript will simply be set to 'INVALID JSON'"""
+        Available kwargs are file_ending, callback, and conserve_kwargs.
+        Respectively these allow you to choose the file ending to be indexed, the
+        callback used to do the indexing, and whether or not you would like to pass
+        additional kwargs to the callback function."""
         # Needs to be lazily evaluatedy
-        transcripts = self.os_walk_transcript(os.walk(directory))
+        file_ending = kwargs.get("file_ending", ".srt.sjson")
+        callback = kwargs.get("callback", self.index_transcript)
+        conserve_kwargs = kwargs.get("conserve_kwargs", False)
+        directoryCrawler = DirectoryCrawler(directory)
+        all_files = directoryCrawler.grab_all_files_with_ending(file_ending)
         responses = []
-        for transcript_list in transcripts:
-            for transcript in transcript_list:
-                responses.append(self.index_transcript(index, type_, transcript, silent))
+        for file_list in all_files:
+            for file_ in file_list:
+                if conserve_kwargs:
+                    responses.append(callback(index, type_, file_, silent, kwargs))
+                else:
+                    responses.append(callback(index, type_, file_, silent))
         return responses
 
     def index_transcript(self, index, type_, transcript_file, silent=False, id_=None):
@@ -325,36 +319,73 @@ class ElasticDatabase:
         full_url = "/".join([self.url, index, type_, "_mapping"])
         return json.loads(requests.get(full_url)._content)
 
-    def generate_dictionary(self, index, type_, output_file):
-        """Generates a suitable pyenchant dictionary based on the current state of the database"""
-        base_url = "/".join([self.url, index, type_])
+
+class DirectoryCrawler:
+
+    def __init__(self, directory):
+        self.directory = directory
+
+    def grab_all_files_with_ending(self, file_ending):
+        walk_results = os.walk(self.directory)
+        file_check = lambda walk: len(walk[2]) > 0
+        ending_prelim = lambda walk: file_ending in " ".join(walk[2])
+        relevant_results = (entry for entry in walk_results if file_check(entry) and ending_prelim(entry))
+        return (self.grab_files_from_os_walk(result, file_ending) for result in relevant_results)
+
+    def grab_files_from_os_walk(self, os_walk_tuple, file_ending):
+        format_check = lambda file_name: file_ending in file_name
+        directory, subfolders, file_paths = os_walk_tuple
+        return [os.path.join(directory, file_path) for file_path in file_paths if format_check(file_path)]
+
+
+class EnchantDictionary:
+
+    def __init__(self, esDatabase):
+        self.es_instance = esDatabase
+
+    def produce_dictionary(self, output_file, **kwargs):
+        """Produces a dictionary or updates it depending on kwargs
+
+        If no kwargs are given then this method will write a full dictionary including all
+        entries in all indices and types and output it in an enchant-friendly way to the output file.
+
+        Accepted kwargs are index, and source_file. If you want to index multiple types
+        or indices you should pass them in as comma delimited strings. Source file should be
+        an absolute path to an existing enchant-friendly dictionary file.
+
+        max_results will also set the maximum number of entries to be used in generating the dictionary.
+        Set to 50k by default"""
+        index = kwargs.get("index", "_all")
+        max_results = kwargs.get("max_results", 50000)
         words = set()
-        id_ = 1
-        status_code = 200
-        while status_code == 200:
-            transcript = requests.get(base_url+"/"+str(id_))
-            status_code = transcript.status_code
-            try:
-                text = json.loads(transcript._content)["_source"]["searchable_text"]
+        if kwargs.get("source_file", None):
+            words = set(open(kwargs["source_file"]).readlines())
+        url = "/".join([self.es_instance.url, index, "_search?size="+str(max_results)+"&q=*.*"])
+        response = requests.get(url)
+        for entry in json.loads(response._content)['hits']['hits']:
+            if entry["_source"]["searchable_text"]:
+                text = entry["_source"]["searchable_text"]
                 words |= set(re.findall(r'[a-z]+', text.lower()))
-            except KeyError:
-                pass
-            id_ += 1
-            print id_
+            else:
+                continue
         with open(output_file, 'wb') as dictionary:
             for word in words:
-                dictionary.write(word + "\n")
+                dictionary.write(word+"\n")
+
 
 url = "http://localhost:9200"
 settings_file = "settings.json"
 
-mongo = MongoIndexer()
+#mongo = MongoIndexer()
+
 
 test = ElasticDatabase(url, settings_file)
+dictionary = EnchantDictionary(test)
+dictionary.produce_dictionary("pyenchant_corpus.txt", max_results=500000)
 #print test.delete_index("transcript-index")
 #mongo.index_all_lecture_slides(test, "slide-index")
 #mongo.index_all_transcripts(test, "transcript-index")
-mongo.index_all_problems(test, "problem-index")
+#mongo.index_all_problems(test, "problem-index")
 
 #print test.setup_type("transcript", "cleaning", mapping)._content
 #print test.get_type_mapping("transcript-index", "2-1x")
