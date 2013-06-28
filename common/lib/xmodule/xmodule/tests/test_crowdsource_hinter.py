@@ -1,18 +1,18 @@
-from mock import Mock, patch
+"""
+Tests the crowdsourced hinter xmodule.
+"""
+
+from mock import Mock
 import unittest
 import copy
-import random
 
-import xmodule
 from xmodule.crowdsource_hinter import CrowdsourceHinterModule
 from xmodule.vertical_module import VerticalModule, VerticalDescriptor
-from xmodule.modulestore import Location
-
-from django.http import QueryDict
 
 from . import get_test_system
 
 import json
+
 
 class CHModuleFactory(object):
     """
@@ -44,6 +44,9 @@ class CHModuleFactory(object):
 
     @staticmethod
     def next_num():
+        """
+        Helps make unique names for our mock CrowdsourceHinterModule's
+        """
         CHModuleFactory.num += 1
         return CHModuleFactory.num
 
@@ -53,23 +56,23 @@ class CHModuleFactory(object):
                user_voted=None,
                moderate=None,
                mod_queue=None):
-
-        location = Location(["i4x", "edX", "capa_test", "problem",
-                             "SampleProblem{0}".format(CHModuleFactory.next_num())])
+        """
+        A factory method for making CHM's
+        """
         model_data = {'data': CHModuleFactory.sample_problem_xml}
 
-        if hints != None:
+        if hints is not None:
             model_data['hints'] = hints
         else:
             model_data['hints'] = {
                 '24.0': {'0': ['Best hint', 40],
-                          '3': ['Another hint', 30],
-                          '4': ['A third hint', 20],
-                          '6': ['A less popular hint', 3]},
+                         '3': ['Another hint', 30],
+                         '4': ['A third hint', 20],
+                         '6': ['A less popular hint', 3]},
                 '25.0': {'1': ['Really popular hint', 100]}
             }
 
-        if mod_queue != None:
+        if mod_queue is not None:
             model_data['mod_queue'] = mod_queue
         else:
             model_data['mod_queue'] = {
@@ -77,7 +80,7 @@ class CHModuleFactory(object):
                 '26.0': {'5': ['Another non-approved hint']}
             }
 
-        if previous_answers != None:
+        if previous_answers is not None:
             model_data['previous_answers'] = previous_answers
         else:
             model_data['previous_answers'] = [
@@ -85,17 +88,18 @@ class CHModuleFactory(object):
                 ['29.0', [None, None, None]]
             ]
 
-        if user_voted != None:
+        if user_voted is not None:
             model_data['user_voted'] = user_voted
 
-        if moderate != None:
+        if moderate is not None:
             model_data['moderate'] = moderate
-        
+
         descriptor = Mock(weight="1")
         system = get_test_system()
         module = CrowdsourceHinterModule(system, descriptor, model_data)
 
         return module
+
 
 class VerticalWithModulesFactory(object):
     """
@@ -147,8 +151,6 @@ class VerticalWithModulesFactory(object):
 
     @staticmethod
     def create():
-        location = Location(["i4x", "edX", "capa_test", "vertical",
-                             "SampleVertical{0}".format(CHModuleFactory.next_num())])
         model_data = {'data': VerticalWithModulesFactory.sample_problem_xml}
         system = get_test_system()
         descriptor = VerticalDescriptor.from_xml(VerticalWithModulesFactory.sample_problem_xml, system)
@@ -166,8 +168,10 @@ class FakeChild(object):
         self.system.ajax_url = 'this/is/a/fake/ajax/url'
 
     def get_html(self):
+        """
+        Return a fake html string.
+        """
         return 'This is supposed to be test html.'
-
 
 
 class CrowdsourceHinterTest(unittest.TestCase):
@@ -178,10 +182,11 @@ class CrowdsourceHinterTest(unittest.TestCase):
 
     def test_gethtml(self):
         """
-        A simple test of get_html - make sure it returns the html of the inner 
+        A simple test of get_html - make sure it returns the html of the inner
         problem.
         """
         m = CHModuleFactory.create()
+
         def fake_get_display_items():
             """
             A mock of get_display_items
@@ -198,6 +203,7 @@ class CrowdsourceHinterTest(unittest.TestCase):
         error message.
         """
         m = CHModuleFactory.create()
+
         def fake_get_display_items():
             """
             Returns no children.
@@ -207,13 +213,13 @@ class CrowdsourceHinterTest(unittest.TestCase):
         out_html = m.get_html()
         self.assertTrue('Error in loading crowdsourced hinter' in out_html)
 
+    @unittest.skip("Needs to be finished.")
     def test_gethtml_multiple(self):
         """
         Makes sure that multiple crowdsourced hinters play nice, when get_html
         is called.
         NOT WORKING RIGHT NOW
         """
-        return
         m = VerticalWithModulesFactory.create()
         out_html = m.get_html()
         print out_html
@@ -229,7 +235,7 @@ class CrowdsourceHinterTest(unittest.TestCase):
         m = CHModuleFactory.create()
         json_in = {'problem_name': '26.0'}
         out = m.get_hint(json_in)
-        self.assertTrue(out == None)
+        self.assertTrue(out is None)
         self.assertTrue(['26.0', [None, None, None]] in m.previous_answers)
 
     def test_gethint_1hint(self):
@@ -241,7 +247,6 @@ class CrowdsourceHinterTest(unittest.TestCase):
         json_in = {'problem_name': '25.0'}
         out = m.get_hint(json_in)
         self.assertTrue(out['best_hint'] == 'Really popular hint')
-
 
     def test_gethint_manyhints(self):
         """
@@ -258,7 +263,6 @@ class CrowdsourceHinterTest(unittest.TestCase):
         self.assertTrue('rand_hint_1' in out)
         self.assertTrue('rand_hint_2' in out)
 
-
     def test_getfeedback_0wronganswers(self):
         """
         Someone has gotten the problem correct on the first try.
@@ -267,7 +271,7 @@ class CrowdsourceHinterTest(unittest.TestCase):
         m = CHModuleFactory.create(previous_answers=[])
         json_in = {'problem_name': '42.5'}
         out = m.get_feedback(json_in)
-        self.assertTrue(out == None)
+        self.assertTrue(out is None)
 
     def test_getfeedback_1wronganswer_nohints(self):
         """
@@ -275,13 +279,12 @@ class CrowdsourceHinterTest(unittest.TestCase):
         answer.  However, we don't actually have hints for this problem.
         There should be a dialog to submit a new hint.
         """
-        m = CHModuleFactory.create(previous_answers=[['26.0',[None, None, None]]])
+        m = CHModuleFactory.create(previous_answers=[['26.0', [None, None, None]]])
         json_in = {'problem_name': '42.5'}
         out = m.get_feedback(json_in)
         print out['index_to_answer']
         self.assertTrue(out['index_to_hints'][0] == [])
         self.assertTrue(out['index_to_answer'][0] == '26.0')
-
 
     def test_getfeedback_1wronganswer_withhints(self):
         """
@@ -289,15 +292,11 @@ class CrowdsourceHinterTest(unittest.TestCase):
         a voting dialog, with the correct choices, plus a hint submission
         dialog.
         """
-        m = CHModuleFactory.create(
-            previous_answers=[
-                ['24.0', [0, 3, None]]],
-            )
+        m = CHModuleFactory.create(previous_answers=[['24.0', [0, 3, None]]])
         json_in = {'problem_name': '42.5'}
         out = m.get_feedback(json_in)
         print out['index_to_hints']
-        self.assertTrue(len(out['index_to_hints'][0])==2)
-
+        self.assertTrue(len(out['index_to_hints'][0]) == 2)
 
     def test_getfeedback_missingkey(self):
         """
@@ -308,7 +307,7 @@ class CrowdsourceHinterTest(unittest.TestCase):
             previous_answers=[['24.0', [0, 100, None]]])
         json_in = {'problem_name': '42.5'}
         out = m.get_feedback(json_in)
-        self.assertTrue(len(out['index_to_hints'][0])==1)
+        self.assertTrue(len(out['index_to_hints'][0]) == 1)
 
     def test_vote_nopermission(self):
         """
@@ -318,9 +317,8 @@ class CrowdsourceHinterTest(unittest.TestCase):
         m = CHModuleFactory.create(user_voted=True)
         json_in = {'answer': 0, 'hint': 1}
         old_hints = copy.deepcopy(m.hints)
-        json_out = json.loads(m.tally_vote(json_in))['contents']
+        m.tally_vote(json_in)
         self.assertTrue(m.hints == old_hints)
-
 
     def test_vote_withpermission(self):
         """
@@ -336,7 +334,6 @@ class CrowdsourceHinterTest(unittest.TestCase):
         self.assertTrue(['Best hint', 40] in dict_out['hint_and_votes'])
         self.assertTrue(['Another hint', 31] in dict_out['hint_and_votes'])
 
-
     def test_submithint_nopermission(self):
         """
         A user tries to submit a hint, but he has already voted.
@@ -348,7 +345,6 @@ class CrowdsourceHinterTest(unittest.TestCase):
         print m.hints
         self.assertTrue('29.0' not in m.hints)
 
-
     def test_submithint_withpermission_new(self):
         """
         A user submits a hint to an answer for which no hints
@@ -359,21 +355,19 @@ class CrowdsourceHinterTest(unittest.TestCase):
         m.submit_hint(json_in)
         self.assertTrue('29.0' in m.hints)
 
-
     def test_submithint_withpermission_existing(self):
         """
         A user submits a hint to an answer that has other hints
         already.
         """
-        m = CHModuleFactory.create(previous_answers = [['25.0', [1, None, None]]])
+        m = CHModuleFactory.create(previous_answers=[['25.0', [1, None, None]]])
         json_in = {'answer': 0, 'hint': 'This is a new hint.'}
         m.submit_hint(json_in)
         # Make a hint request.
         json_in = {'problem name': '25.0'}
         out = m.get_hint(json_in)
         self.assertTrue((out['best_hint'] == 'This is a new hint.')
-            or (out['rand_hint_1'] == 'This is a new hint.'))
-
+                        or (out['rand_hint_1'] == 'This is a new hint.'))
 
     def test_submithint_moderate(self):
         """
@@ -396,7 +390,6 @@ class CrowdsourceHinterTest(unittest.TestCase):
         m.submit_hint(json_in)
         print m.hints
         self.assertTrue(m.hints['29.0'][0][0] == u'&lt;script&gt; alert(&quot;Trololo&quot;); &lt;/script&gt;')
-
 
     def test_template_gethint(self):
         """
@@ -421,12 +414,11 @@ class CrowdsourceHinterTest(unittest.TestCase):
         self.assertTrue('A random hint' in out)
         self.assertTrue('Another random hint' in out)
 
-
     def test_template_feedback(self):
         """
         Test the templates for get_feedback.
         NOT FINISHED
-        
+
         from lxml import etree
         m = CHModuleFactory.create()
 
@@ -445,11 +437,3 @@ class CrowdsourceHinterTest(unittest.TestCase):
 
         """
         pass
-
-
-
-
-
-
-
-

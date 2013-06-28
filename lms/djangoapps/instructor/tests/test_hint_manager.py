@@ -1,21 +1,17 @@
-import unittest
-import nose.tools
 import json
 
-from django.http import Http404
 from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
-import mitxmako.middleware
 
 from courseware.models import XModuleContentField
 from courseware.tests.factories import ContentFactory
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 import instructor.hint_manager as view
-from student.tests.factories import UserFactory, AdminFactory
+from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-            
+
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class HintManagerTest(ModuleStoreTestCase):
 
@@ -36,7 +32,7 @@ class HintManagerTest(ModuleStoreTestCase):
                               value=json.dumps({'1.0': {'1': ['Hint 1', 2],
                                                         '3': ['Hint 3', 12]},
                                                 '2.0': {'4': ['Hint 4', 3]}
-                              }))
+                                                }))
         ContentFactory.create(field_name='mod_queue',
                               definition_id=self.problem_id,
                               value=json.dumps({'2.0': {'2': ['Hint 2', 1]}}))
@@ -48,13 +44,12 @@ class HintManagerTest(ModuleStoreTestCase):
         # (I can't figure out how to get fake structures into the modulestore.)
         view.location_to_problem_name = lambda loc: "Test problem"
 
-
     def test_student_block(self):
         """
         Makes sure that students cannot see the hint management view.
         """
         c = Client()
-        user = UserFactory.create(username='student', email='student@edx.org', password='test')
+        UserFactory.create(username='student', email='student@edx.org', password='test')
         c.login(username='student', password='test')
         out = c.get(self.url)
         print out
@@ -70,7 +65,7 @@ class HintManagerTest(ModuleStoreTestCase):
 
     def test_invalid_field_access(self):
         """
-        Makes sure that field names other than 'mod_queue' and 'hints' are 
+        Makes sure that field names other than 'mod_queue' and 'hints' are
         rejected.
         """
         out = self.c.post(self.url, {'op': 'delete hints', 'field': 'all your private data'})
@@ -110,7 +105,7 @@ class HintManagerTest(ModuleStoreTestCase):
                                                '3': ['Hint 3', 12]}),
                                       ('2.0', {'4': ['Hint 4', 3]})
                                       ]}
-        self.assertTrue(out['all_hints'] == expected)        
+        self.assertTrue(out['all_hints'] == expected)
 
     def test_deletehints(self):
         """
@@ -167,6 +162,3 @@ class HintManagerTest(ModuleStoreTestCase):
         problem_hints = XModuleContentField.objects.get(field_name='hints', definition_id=self.problem_id).value
         self.assertTrue(json.loads(problem_hints)['2.0']['2'] == ['Hint 2', 1])
         self.assertTrue(len(json.loads(problem_hints)['2.0']) == 2)
-
-
-

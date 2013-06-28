@@ -29,13 +29,16 @@ class CrowdsourceHinterFields(object):
                       default='False')
     debug = String(help='String "True"/"False" - allows multiple voting', scope=Scope.content,
                    default='False')
-    # hints[answer] = {str(pk): [hint_text, #votes]}
+    # Usage: hints[answer] = {str(pk): [hint_text, #votes]}
+    # hints is a dictionary that takes answer keys.
+    # Each value is itself a dictionary, accepting hint_pk strings as keys,
+    # and returning [hint text, #votes] pairs as values
     hints = Dict(help='A dictionary containing all the active hints.', scope=Scope.content, default={})
     mod_queue = Dict(help='A dictionary containing hints still awaiting approval', scope=Scope.content,
                      default={})
     hint_pk = Integer(help='Used to index hints.', scope=Scope.content, default=0)
     # A list of previous answers this student made to this problem.
-    # Of the form (answer, (hint_pk_1, hint_pk_2, hint_pk_3)) for each problem.  hint_pk's are
+    # Of the form [answer, [hint_pk_1, hint_pk_2, hint_pk_3]] for each problem.  hint_pk's are
     # None if the hint was not given.
     previous_answers = List(help='A list of previous submissions.', scope=Scope.user_state, default=[])
     user_voted = Boolean(help='Specifies if the user has voted on this problem or not.',
@@ -166,7 +169,7 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
                 random.sample(local_hints[answer].items(), 2)
             rand_hint_1 = rand_hint_1[0]
             rand_hint_2 = rand_hint_2[0]
-            self.previous_answers += [(answer, (best_hint_index, hint_index_1, hint_index_2))]
+            self.previous_answers += [[answer, [best_hint_index, hint_index_1, hint_index_2]]]
 
         return {'best_hint': best_hint,
                 'rand_hint_1': rand_hint_1,
@@ -185,7 +188,6 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         """
         # The student got it right.
         # Did he submit at least one wrong answer?
-        out = ''
         if len(self.previous_answers) == 0:
             # No.  Nothing to do here.
             return

@@ -22,7 +22,7 @@ from xmodule.modulestore.django import modulestore
 @ensure_csrf_cookie
 def hint_manager(request, course_id):
     try:
-        course = get_course_with_access(request.user, course_id, 'staff', depth=None)
+        get_course_with_access(request.user, course_id, 'staff', depth=None)
     except Http404:
         out = 'Sorry, but students are not allowed to access the hint manager!'
         return HttpResponse(out)
@@ -74,12 +74,17 @@ def get_hints(request, course_id, field):
         other_field = 'mod_queue'
         field_label = 'Approved Hints'
         other_field_label = 'Hints Awaiting Moderation'
+    # The course_id is of the form school/number/classname.
+    # We want to use the course_id to find all matching definition_id's.
+    # To do this, just take the school/number part - leave off the classname.
     chopped_id = '/'.join(course_id.split('/')[:-1])
     chopped_id = re.escape(chopped_id)
     all_hints = XModuleContentField.objects.filter(field_name=field, definition_id__regex=chopped_id)
     # big_out_dict[problem id] = [[answer, {pk: [hint, votes]}], sorted by answer]
+    # big_out_dict maps a problem id to a list of [answer, hints] pairs, sorted in order of answer.
     big_out_dict = {}
-    # name_dict[problem id] = Display name of problem
+    # id_to name maps a problem id to the name of the problem.
+    # id_to_name[problem id] = Display name of problem
     id_to_name = {}
 
     for hints_by_problem in all_hints:
@@ -88,7 +93,6 @@ def get_hints(request, course_id, field):
         if name is None:
             continue
         id_to_name[hints_by_problem.definition_id] = name
-        # Answer list contains (answer, dict_of_hints) tuples.
 
         def answer_sorter(thing):
             """
@@ -102,6 +106,7 @@ def get_hints(request, course_id, field):
                 # Put all non-numerical answers first.
                 return float('-inf')
 
+        # Answer list contains [answer, dict_of_hints] pairs.
         answer_list = sorted(json.loads(hints_by_problem.value).items(), key=answer_sorter)
         big_out_dict[hints_by_problem.definition_id] = answer_list
 
@@ -112,6 +117,7 @@ def get_hints(request, course_id, field):
                    'all_hints': big_out_dict,
                    'id_to_name': id_to_name}
     return render_dict
+
 
 def location_to_problem_name(loc):
     """
