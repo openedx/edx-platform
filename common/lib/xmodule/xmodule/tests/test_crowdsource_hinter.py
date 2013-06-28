@@ -294,9 +294,7 @@ class CrowdsourceHinterTest(unittest.TestCase):
         mock_module = CHModuleFactory.create(previous_answers=[['26.0', [None, None, None]]])
         json_in = {'problem_name': '42.5'}
         out = mock_module.get_feedback(json_in)
-        print out['index_to_answer']
-        self.assertTrue(out['index_to_hints'][0] == [])
-        self.assertTrue(out['index_to_answer'][0] == '26.0')
+        self.assertTrue(out['answer_to_hints'] == {'26.0': {}})
 
     def test_getfeedback_1wronganswer_withhints(self):
         """
@@ -307,8 +305,7 @@ class CrowdsourceHinterTest(unittest.TestCase):
         mock_module = CHModuleFactory.create(previous_answers=[['24.0', [0, 3, None]]])
         json_in = {'problem_name': '42.5'}
         out = mock_module.get_feedback(json_in)
-        print out['index_to_hints']
-        self.assertTrue(len(out['index_to_hints'][0]) == 2)
+        self.assertTrue(len(out['answer_to_hints']['24.0']) == 2)
 
     def test_getfeedback_missingkey(self):
         """
@@ -319,7 +316,7 @@ class CrowdsourceHinterTest(unittest.TestCase):
             previous_answers=[['24.0', [0, 100, None]]])
         json_in = {'problem_name': '42.5'}
         out = mock_module.get_feedback(json_in)
-        self.assertTrue(len(out['index_to_hints'][0]) == 1)
+        self.assertTrue(len(out['answer_to_hints']['24.0']) == 1)
 
     def test_vote_nopermission(self):
         """
@@ -327,7 +324,7 @@ class CrowdsourceHinterTest(unittest.TestCase):
         Should not change any vote tallies.
         """
         mock_module = CHModuleFactory.create(user_voted=True)
-        json_in = {'answer': 0, 'hint': 1}
+        json_in = {'answer': '24.0', 'hint': 1, 'pk_list': json.dumps([1, 3])}
         old_hints = copy.deepcopy(mock_module.hints)
         mock_module.tally_vote(json_in)
         self.assertTrue(mock_module.hints == old_hints)
@@ -339,7 +336,7 @@ class CrowdsourceHinterTest(unittest.TestCase):
         """
         mock_module = CHModuleFactory.create(
             previous_answers=[['24.0', [0, 3, None]]])
-        json_in = {'answer': 0, 'hint': 3}
+        json_in = {'answer': '24.0', 'hint': 3, 'pk_list': json.dumps([0, 3])}
         dict_out = mock_module.tally_vote(json_in)
         self.assertTrue(mock_module.hints['24.0']['0'][1] == 40)
         self.assertTrue(mock_module.hints['24.0']['3'][1] == 31)
@@ -351,7 +348,7 @@ class CrowdsourceHinterTest(unittest.TestCase):
         A user tries to submit a hint, but he has already voted.
         """
         mock_module = CHModuleFactory.create(user_voted=True)
-        json_in = {'answer': 1, 'hint': 'This is a new hint.'}
+        json_in = {'answer': '29.0', 'hint': 'This is a new hint.'}
         print mock_module.user_voted
         mock_module.submit_hint(json_in)
         print mock_module.hints
@@ -363,7 +360,7 @@ class CrowdsourceHinterTest(unittest.TestCase):
         exist yet.
         """
         mock_module = CHModuleFactory.create()
-        json_in = {'answer': 1, 'hint': 'This is a new hint.'}
+        json_in = {'answer': '29.0', 'hint': 'This is a new hint.'}
         mock_module.submit_hint(json_in)
         self.assertTrue('29.0' in mock_module.hints)
 
@@ -372,8 +369,8 @@ class CrowdsourceHinterTest(unittest.TestCase):
         A user submits a hint to an answer that has other hints
         already.
         """
-        mock_module = CHModuleFactory.create(previous_answers=[['25.0', [1, None, None]]])
-        json_in = {'answer': 0, 'hint': 'This is a new hint.'}
+        mock_module = CHModuleFactory.create(previous_answers = [['25.0', [1, None, None]]])
+        json_in = {'answer': '25.0', 'hint': 'This is a new hint.'}
         mock_module.submit_hint(json_in)
         # Make a hint request.
         json_in = {'problem name': '25.0'}
@@ -388,7 +385,7 @@ class CrowdsourceHinterTest(unittest.TestCase):
         dict.
         """
         mock_module = CHModuleFactory.create(moderate='True')
-        json_in = {'answer': 1, 'hint': 'This is a new hint.'}
+        json_in = {'answer': '29.0', 'hint': 'This is a new hint.'}
         mock_module.submit_hint(json_in)
         self.assertTrue('29.0' not in mock_module.hints)
         self.assertTrue('29.0' in mock_module.mod_queue)
@@ -398,10 +395,9 @@ class CrowdsourceHinterTest(unittest.TestCase):
         Make sure that hints are being html-escaped.
         """
         mock_module = CHModuleFactory.create()
-        json_in = {'answer': 1, 'hint': '<script> alert("Trololo"); </script>'}
+        json_in = {'answer': '29.0', 'hint': '<script> alert("Trololo"); </script>'}
         mock_module.submit_hint(json_in)
-        print mock_module.hints
-        self.assertTrue(mock_module.hints['29.0'][0][0] == u'&lt;script&gt; alert(&quot;Trololo&quot;); &lt;/script&gt;')
+        self.assertTrue(mock_module.hints['29.0']['0'][0] == u'&lt;script&gt; alert(&quot;Trololo&quot;); &lt;/script&gt;')
 
     def test_template_gethint(self):
         """

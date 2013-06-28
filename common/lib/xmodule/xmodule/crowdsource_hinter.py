@@ -199,7 +199,7 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         # Make a hint-voting interface for each wrong answer.  The student will only
         # be allowed to make one vote / submission, but he can choose which wrong answer
         # he wants to look at.
-        answer_to_hints = {}    #answer_to_hints[answer text][hint pk] -> hint text
+        answer_to_hints = {}    # answer_to_hints[answer text][hint pk] -> hint text
 
         # Go through each previous answer, and populate index_to_hints and index_to_answer.
         for i in xrange(len(self.previous_answers)):
@@ -224,7 +224,7 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
 
         Args:
         `data` -- expected to have the following keys:
-            'answer': ans_no (index in previous_answers)
+            'answer': text of answer we're voting on
             'hint': hint_pk
             'pk_list': We will return a list of how many votes each hint has so far.
                        It's up to the browser to specify which hints to return vote counts for.
@@ -246,7 +246,7 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         # Return a list of how many votes each hint got.
         hint_and_votes = []
         for vote_pk in pk_list:
-            hint_and_votes.append(temp_dict[ans][vote_pk])
+            hint_and_votes.append(temp_dict[ans][str(vote_pk)])
 
         hint_and_votes.sort(key=lambda pair: pair[1], reverse=True)
         # Reset self.previous_answers.
@@ -259,7 +259,7 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
 
         Args:
         `data` -- expected to have the following keys:
-            'answer': answer index in previous_answers
+            'answer': text of answer
             'hint': text of the new hint that the user is adding
         Returns a thank-you message.
         """
@@ -276,9 +276,9 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         else:
             temp_dict = self.hints
         if answer in temp_dict:
-            temp_dict[answer][self.hint_pk] = [hint, 1]     # With one vote (the user himself).
+            temp_dict[answer][str(self.hint_pk)] = [hint, 1]     # With one vote (the user himself).
         else:
-            temp_dict[answer] = {self.hint_pk: [hint, 1]}
+            temp_dict[answer] = {str(self.hint_pk): [hint, 1]}
         self.hint_pk += 1
         if self.moderate == 'True':
             self.mod_queue = temp_dict
