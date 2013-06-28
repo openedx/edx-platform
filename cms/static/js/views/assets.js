@@ -23,9 +23,10 @@ function removeAsset(e){
                         { 'location': row.data('id') },
                         function() {
                             // show the post-commit confirmation
-                            var deleted = new CMS.Views.Alert.Confirmation({
+                            var deleted = new CMS.Views.Notification.Confirmation({
                                 title: gettext("Your file has been deleted."),
-                                closeIcon: false
+                                closeIcon: false,
+                                maxShown: 2000
                             });
                             deleted.show();
                             row.remove();
