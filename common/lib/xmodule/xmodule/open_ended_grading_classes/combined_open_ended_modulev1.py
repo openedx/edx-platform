@@ -727,7 +727,12 @@ class CombinedOpenEndedV1Module():
         """
         max_score = None
         score = None
-        if self.is_scored and self.weight is not None:
+
+        #The old default was None, so set to 1 if it is the old default weight
+        weight = self.weight
+        if weight is None:
+            weight = 1
+        if self.is_scored:
             # Finds the maximum score of all student attempts and keeps it.
             score_mat = []
             for i in xrange(0, len(self.task_states)):
@@ -740,7 +745,7 @@ class CombinedOpenEndedV1Module():
                     for z in xrange(0, len(score)):
                         if score[z] is None:
                             score[z] = 0
-                        score[z] *= float(self.weight)
+                        score[z] *= float(weight)
                     score_mat.append(score)
 
             if len(score_mat) > 0:
@@ -754,7 +759,7 @@ class CombinedOpenEndedV1Module():
 
             if max_score is not None:
                 # Weight the max score if it is not None
-                max_score *= float(self.weight)
+                max_score *= float(weight)
             else:
                 # Without a max_score, we cannot have a score!
                 score = None

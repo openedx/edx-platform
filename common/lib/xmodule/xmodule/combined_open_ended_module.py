@@ -82,7 +82,8 @@ class CombinedOpenEndedFields(object):
         display_name="Maximum Attempts",
         help="The number of times the student can try to answer this problem.",
         default=1,
-        scope=Scope.settings, values={"min" : 1 }
+        scope=Scope.settings,
+        values={"min" : 1 }
     )
     is_graded = Boolean(
         display_name="Graded",
@@ -99,7 +100,8 @@ class CombinedOpenEndedFields(object):
     skip_spelling_checks = Boolean(
         display_name="Disable Quality Filter",
         help="If False, the Quality Filter is enabled and submissions with poor spelling, short length, or poor grammar will not be peer reviewed.",
-        default=False, scope=Scope.settings
+        default=False,
+        scope=Scope.settings
     )
     due = Date(
         help="Date that this problem is due by",
@@ -123,7 +125,8 @@ class CombinedOpenEndedFields(object):
     weight = Float(
         display_name="Problem Weight",
         help="Defines the number of points each problem is worth. If the value is not set, each problem is worth one point.",
-        scope=Scope.settings, values={"min" : 0 , "step": ".1"},
+        scope=Scope.settings,
+        values={"min" : 0 , "step": ".1"},
         default=1
     )
     markdown = String(

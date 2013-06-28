@@ -57,7 +57,7 @@ class PeerGradingFields(object):
         scope=Scope.settings
     )
     max_grade = Integer(
-        help="The maximum grade that a student can receive for this problem.", 
+        help="The maximum grade that a student can receive for this problem.",
         default=MAX_SCORE,
         scope=Scope.settings,
         values={"min": 0}
@@ -214,6 +214,11 @@ class PeerGradingModule(PeerGradingFields, XModule):
     def get_score(self):
         max_score = None
         score = None
+        weight = self.weight
+
+        #The old default was None, so set to 1 if it is the old default weight
+        if weight is None:
+            weight = 1
         score_dict = {
             'score': score,
             'total': max_score,
@@ -238,11 +243,10 @@ class PeerGradingModule(PeerGradingFields, XModule):
                 # Ensures that once a student receives a final score for peer grading, that it does not change.
                 self.student_data_for_location = response
 
-        if self.weight is not None:
-            score = int(count_graded >= count_required and count_graded > 0) * float(self.weight)
-            total = self.max_grade * float(self.weight)
-            score_dict['score'] = score
-            score_dict['total'] = total
+        score = int(count_graded >= count_required and count_graded > 0) * float(weight)
+        total = self.max_grade * float(weight)
+        score_dict['score'] = score
+        score_dict['total'] = total
 
         return score_dict
 
