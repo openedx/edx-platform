@@ -34,6 +34,13 @@ class @Hinter
     @$('input.submit-hint').click @submit_hint
     @$('.custom-hint').click @clear_default_text
     @$('#answer-tabs').tabs({active: 0})
+    @$('.expand-goodhint').click @expand_goodhint
+
+  expand_goodhint: =>
+    if @$('.goodhint').css('display') == 'none'
+      @$('.goodhint').css('display', 'block')
+    else
+      @$('.goodhint').css('display', 'none')
 
   vote: (eventObj) =>
     target = @$(eventObj.currentTarget)
