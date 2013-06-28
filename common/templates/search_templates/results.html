@@ -93,7 +93,7 @@
 =======
 >>>>>>> Coverted templates to use mako
 <head>
-	${css_link("../static/css/results.css")}
+	${css_link("../static/css/search.css")}
 	${js_link("../static/js/div_sizing.js")}
 </head>
 
@@ -140,18 +140,20 @@
 	<section class="result">
 		<div class="result_wrapper">
 			<h1 class="result-title">${datum[0]}</h1>
-			<span>
-				<div>
+			<div class="result-content">
+				<div class="columnate">
 					% if len(datum) >= 3:
-						<img src="${datum[2]}" alt="${datum[0]}" height="130px" width="160px" align="left">
+						<img class="thumbnail" src="${datum[2]}" alt="${datum[0]}">
 					%endif
 				</div>
-				<div class="snippet_container">
-					<p  class="results_snippet scaled-text">
-						${datum[1]}
-					</p>
+				<div class="columnate">
+					<div class="snippet_container">
+						<p  class="results_snippet scaled-text">
+							${datum[1]}
+						</p>
+					</div>
 				</div>
-			</span>
+			</div>
 		</div>
 	</section>
 	% endfor
