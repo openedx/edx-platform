@@ -776,6 +776,13 @@ class CapaModule(CapaFields, XModule):
         then the output dict would contain {'1': ['test'] }
         (the value is a list).
 
+        Some other inputs such as ChoiceTextInput expect a dict of values in the returned
+        dict  If the key ends with '{}' then we will assume that the value is a json
+        encoded dict and deserialize it.
+        For example, if the `data` dict contains {'input_1{}': '{"1_2_1": 1}'}
+        then the output dict would contain {'1': {"1_2_1": 1} }
+        (the value is a dictionary)
+
         Raises an exception if:
 
         -A key in the `data` dictionary does not contain at least one underscore
@@ -802,11 +809,21 @@ class CapaModule(CapaFields, XModule):
                 # the same form input (e.g. checkbox inputs). The convention is that
                 # if the name ends with '[]' (which looks like an array), then the
                 # answer will be an array.
+                # if the name ends with '{}' (Which looks like a dict),
+                # then the answer will be a dict
                 is_list_key = name.endswith('[]')
-                name = name[:-2] if is_list_key else name
+                is_dict_key = name.endswith('{}')
+                name = name[:-2] if is_list_key or is_dict_key else name
 
                 if is_list_key:
                     val = data.getlist(key)
+                elif is_dict_key:
+                    try:
+                        val = json.loads(data[key])
+                    except(KeyError, ValueError):
+                        # Send this information along to be reported by
+                        # The grading method
+                        val = {"error": "error"}
                 else:
                     val = data[key]
 
