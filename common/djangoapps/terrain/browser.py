@@ -19,6 +19,7 @@ from lms import one_time_startup        # pylint: disable=W0611
 from cms import one_time_startup        # pylint: disable=W0611
 from pymongo import MongoClient
 import xmodule.modulestore.django
+from xmodule.contentstore.django import _CONTENTSTORE
 
 # There is an import issue when using django-staticfiles with lettuce
 # Lettuce assumes that we are using django.contrib.staticfiles,
@@ -89,6 +90,17 @@ def reset_data(scenario):
     LOGGER.debug("Flushing the test database...")
     call_command('flush', interactive=False)
 
+
+@after.each_scenario
+def reset_databases(scenario):
+    mongo = MongoClient()
+    mongo.drop_database(settings.CONTENTSTORE['OPTIONS']['db'])
+    _CONTENTSTORE.clear()
+    modulestore = xmodule.modulestore.django.modulestore()
+    modulestore.collection.drop()
+    xmodule.modulestore.django._MODULESTORES.clear()
+
+
 # Uncomment below to trigger a screenshot on error
 # @after.each_scenario
 def screenshot_on_error(scenario):
@@ -105,7 +117,3 @@ def teardown_browser(total):
     Quit the browser after executing the tests.
     """
     world.browser.quit()
-    mongo = MongoClient()
-    mongo.drop_database(settings.CONTENTSTORE['OPTIONS']['db'])
-    modulestore = xmodule.modulestore.django.modulestore()
-    modulestore.collection.drop()
