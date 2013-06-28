@@ -220,9 +220,8 @@ def answer_problem(problem_type, correctness):
             else "5"
         choice = "choiceinput_0bc" if correctness == 'correct' \
             else "choiceinput_1bc"
-
-        inputfield(problem_type, choice=choice).check()
-        inputfield(problem_type, choice="choiceinput_0_textinput_0").fill(input_value)
+        world.css_check(inputfield(problem_type, choice=choice))
+        world.css_fill(inputfield(problem_type, choice="choiceinput_0_textinput_0"), input_value)
 
 
 def problem_has_answer(problem_type, answer_class):
@@ -336,6 +335,7 @@ def inputfield(problem_type, choice=None, input_num=1):
         sel = ("input#i4x-edx-model_course-problem-%s_2_%s" %
                (problem_type.replace(" ", "_"), str(input_num)))
 
+
     if choice is not None:
         base = "_choice_" if problem_type == "multiple choice" else "_"
         sel = sel + base + str(choice)
@@ -379,7 +379,7 @@ def assert_choicetext_values(problem_type, choices, expected_values):
     all_choices = ['choiceinput_0bc', 'choiceinput_1bc']
     all_inputs = ["choiceinput_0_textinput_0", "choiceinput_1_textinput_0"]
     for this_choice in all_choices:
-        element = inputfield(problem_type, choice=this_choice)
+        element = world.css_find(inputfield(problem_type, choice=this_choice))
 
         if this_choice in choices:
             assert element.checked
@@ -387,6 +387,6 @@ def assert_choicetext_values(problem_type, choices, expected_values):
             assert not element.checked
 
     for (name, expected) in zip(all_inputs, expected_values):
-        element = inputfield(problem_type, name)
+        element = world.css_find(inputfield(problem_type, name))
         #values end up with a trailing space somehow
         assert element.value.strip() == expected
