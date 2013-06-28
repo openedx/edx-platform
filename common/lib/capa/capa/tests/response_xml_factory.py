@@ -779,3 +779,62 @@ class SymbolicResponseXMLFactory(ResponseXMLFactory):
 
     def create_input_element(self, **kwargs):
         return ResponseXMLFactory.textline_input_xml(**kwargs)
+
+
+class ChoiceTextResponseXMLFactory(ResponseXMLFactory):
+    """ Factory for producing <choicetextresponse> xml """
+
+    def create_response_element(self, **kwargs):
+        """ Create a <choicetextresponse> element """
+        return etree.Element("choicetextresponse")
+
+    def create_input_element(self, **kwargs):
+        """ Create a <checkboxgroup> element."""
+        if "demo" in kwargs:
+            choices = self.create_demo_choices()
+        else:
+            choices = kwargs.get('choices', [self.create_choice_element(**kwargs)])
+        input_type = kwargs.get('type', 'radiotextgroup')
+        input_element = etree.Element(input_type)
+        for ind, c in enumerate(choices):
+            c.text = "choice_{0}".format(ind)
+            c.set("name", "choice_{0}".format(ind))
+            for index, child in enumerate(c):
+                c.set('name', "choice_{0}_input_{1}".format(ind, index))
+            input_element.append(c)
+
+        return input_element
+
+    @staticmethod
+    def create_choice_element(**kwargs):
+        text = kwargs.get('text', '')
+        correct = kwargs.get('correctness', "true")
+        inputs = kwargs.get('inputs', [])
+        choice_element = etree.Element("choice")
+        choice_element.set("correct", correct)
+        choice_element.text = text
+        for i in inputs:
+            choice_element.append(i)
+
+        return choice_element
+
+    @staticmethod
+    def create_textinput_element(**kwargs):
+        answer = kwargs['answer'] if 'answer' in kwargs else None
+        tolerance = kwargs['tolerance'] if 'tolerance' in kwargs else None
+        text_input = etree.Element("textinput")
+        if answer:
+            text_input.set('answer', answer)
+            if tolerance:
+                text_input.set('tolerance', tolerance)
+            else:
+                text_input.set('tolerance', 0)
+        return text_input
+
+    def create_demo_choices(self):
+        """makes a two choice two input problem"""
+        answer_0 = self.create_textinput_element(**{"answer": "8", "tolerance": "1"})
+        answer_1 = self.create_textinput_element(**{"answer": "8", "tolerance": "1"})
+        choice_0 = self.create_choice_element(**{"correctness": "true", "inputs": [answer_0]})
+        choice_1 = self.create_choice_element(**{"correctness": "false", "inputs": [answer_1]})
+        return [choice_0, choice_1]

@@ -1306,3 +1306,79 @@ class AnnotationInput(InputTypeBase):
         return extra_context
 
 registry.register(AnnotationInput)
+
+
+class ChoiceTextGroup(InputTypeBase):
+    """
+    Groups of radiobutton/checkboxes with text inputs
+
+    Example:
+    """
+    template = "choicetext.html"
+    tags = ['radiotextgroup', 'checkboxtextgroup']
+
+    def setup(self):
+        self.text_input_values = {}
+        if self.tag == 'radiotextgroup':
+            self.html_input_type = "radio"
+        elif self.tag == 'checkboxtextgroup':
+            self.html_input_type = "checkbox"
+        else:
+            raise Exception("ChoiceGroup: unexpected tag {0}".format(self.tag))
+
+        if self.value == '':
+            #need an iterable json value to start with
+            self.value = '{}'
+        self.choices = self.extract_choices(self.xml)
+
+    @classmethod
+    def get_attributes(cls):
+        return [Attribute("show_correctness", "always"),
+                Attribute("submitted_message", "Answer received.")]
+
+    def _extra_context(self):
+        return {'input_type': self.html_input_type,
+                'choices': self.choices
+                }
+
+    @staticmethod
+    def extract_choices(element):
+        '''
+        Extracts choices for a few input types, such as ChoiceGroup, RadioGroup and
+        CheckboxGroup.
+
+        returns list of (choice_name, choice_text) tuples
+        components gives list of what is returned, mixed text and tuple
+        '''
+
+        choices = []
+
+        for choice in element:
+            components = []
+            choice_text = ''
+            if choice.text is not None:
+                choice_text += choice.text
+            adder = {'type': 'text', 'contents': choice_text, 'tail_text': '', 'value': ''}
+            components.append(adder)
+            if choice.tag != 'choice':
+                raise Exception(
+                    "[capa.inputtypes.extract_choices] Expected a <choice> tag; got %s instead"
+                    % choice.tag)
+            choice_text = ''.join([etree.tostring(x) for x in choice])
+            for x in choice:
+                adder = {'type': 'text', 'contents': '', 'tail_text': '', 'value': ''}
+                tag_type = x.tag
+                if tag_type == 'textinput':
+                    adder['type'] = 'textinput'
+                    adder['contents'] = x.get('name')
+                else:
+                    adder['contents'] = x.text
+                if x.tail:
+                    adder['tail_text'] = x.tail
+                else:
+                    adder['tail_text'] = ''
+                components.append(adder)
+            choices.append((choice.get("name"), components))
+        return choices
+
+registry.register(ChoiceTextGroup)
