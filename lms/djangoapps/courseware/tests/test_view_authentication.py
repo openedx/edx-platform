@@ -16,7 +16,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from helpers import LoginEnrollmentTestCase, check_for_get_code
-from modulestore_config import TEST_DATA_MONGO_MODULESTORE
+from course_groups.tests.modulestore_config import TEST_DATA_MONGO_MODULESTORE
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)

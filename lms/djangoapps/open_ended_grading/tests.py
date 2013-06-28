@@ -29,7 +29,7 @@ from django.test.utils import override_settings
 from xmodule.tests import test_util_open_ended
 
 from courseware.tests import factories
-from courseware.tests.modulestore_config import TEST_DATA_XML_MODULESTORE
+from course_groups.tests.modulestore_config import TEST_DATA_XML_MODULESTORE
 from courseware.tests.helpers import LoginEnrollmentTestCase, check_for_get_code, check_for_post_code
 
 
