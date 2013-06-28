@@ -61,13 +61,6 @@ class @Hinter
       target.val('')
       target.data('cleared', true)
 
-  feedback_ui_change: =>
-    # Make all of the previous-answer divs hidden.
-    @$('.previous-answer').css('display', 'none')
-    # But, now find the selected div, and make it visible.
-    selector = '#previous-answer-' + @$('#feedback-select option:selected').attr('value')
-    @$(selector).css('display', 'inline')
-
   render: (content) ->
     if content
       # Trim leading and trailing whitespace
