@@ -102,7 +102,7 @@ def openid_login_complete(request,
         oid_backend = openid_auth.OpenIDBackend()
         details = oid_backend._extract_user_details(openid_response)
 
-        log.debug('openid success, details={0}'.format(details))
+        log.debug('openid success, details=%s', details)
 
         url = getattr(settings, 'OPENID_SSO_SERVER_URL', None)
         external_domain = "openid:%s" % url
@@ -132,7 +132,7 @@ def external_login_or_signup(request,
     try:
         eamap = ExternalAuthMap.objects.get(external_id=external_id,
                                             external_domain=external_domain)
-        log.debug('Found eamap={0}'.format(eamap))
+        log.debug('Found eamap=%s', eamap)
     except ExternalAuthMap.DoesNotExist:
         # go render form for creating edX user
         eamap = ExternalAuthMap(external_id=external_id,
@@ -141,11 +141,11 @@ def external_login_or_signup(request,
         eamap.external_email = email
         eamap.external_name = fullname
         eamap.internal_password = generate_password()
-        log.debug('Created eamap={0}'.format(eamap))
+        log.debug('Created eamap=%s', eamap)
 
         eamap.save()
 
-    log.info(u"External_Auth login_or_signup for {0} : {1} : {2} : {3}".format(external_domain, external_id, email, fullname))
+    log.info(u"External_Auth login_or_signup for %s : %s : %s : %s", external_domain, external_id, email, fullname)
     internal_user = eamap.user
     if internal_user is None:
         if settings.MITX_FEATURES.get('AUTH_USE_SHIB'):
@@ -157,7 +157,7 @@ def external_login_or_signup(request,
                     eamap.user = link_user
                     eamap.save()
                     internal_user = link_user
-                    log.info('SHIB: Linking existing account for {0}'.format(eamap.external_email))
+                    log.info('SHIB: Linking existing account for %s', eamap.external_email)
                     # now pass through to log in
                 else:
                     # otherwise, there must have been an error, b/c we've already linked a user with these external
@@ -168,10 +168,10 @@ def external_login_or_signup(request,
                                            % getattr(settings, 'TECH_SUPPORT_EMAIL', 'techsupport@class.stanford.edu')))
                     return default_render_failure(request, failure_msg)
             except User.DoesNotExist:
-                log.info('SHIB: No user for {0} yet, doing signup'.format(eamap.external_email))
+                log.info('SHIB: No user for %s yet, doing signup', eamap.external_email)
                 return signup(request, eamap)
         else:
-            log.info('No user for {0} yet.formatdoing signup'.format(eamap.external_email))
+            log.info('No user for %s yet. doing signup', eamap.external_email)
             return signup(request, eamap)
 
     # We trust shib's authentication, so no need to authenticate using the password again
@@ -183,17 +183,17 @@ def external_login_or_signup(request,
         else:
             auth_backend = 'django.contrib.auth.backends.ModelBackend'
         user.backend = auth_backend
-        log.info('SHIB: Logging in linked user {0}'.format(user.email))
+        log.info('SHIB: Logging in linked user %s', user.email)
     else:
         uname = internal_user.username
         user = authenticate(username=uname, password=eamap.internal_password)
     if user is None:
-        log.warning("External Auth Login failed for {0} / {1}".format(
-                    uname, eamap.internal_password))
+        log.warning("External Auth Login failed for %s / %s",
+                    uname, eamap.internal_password)
         return signup(request, eamap)
 
     if not user.is_active:
-        log.warning("User {0} is not active".format(uname))
+        log.warning("User %s is not active", uname)
         # TODO: improve error page
         msg = 'Account not yet activated: please look for link in your email'
         return default_render_failure(request, msg)
@@ -208,7 +208,7 @@ def external_login_or_signup(request,
         student_views.try_change_enrollment(enroll_request)
     else:
         student_views.try_change_enrollment(request)
-    log.info("Login success - {0} ({1})".format(user.username, user.email))
+    log.info("Login success - %s (%s)", user.username, user.email)
     if retfun is None:
         return redirect('/')
     return retfun()
@@ -261,7 +261,7 @@ def signup(request, eamap=None):
     except ValidationError:
         context['ask_for_email'] = True
 
-    log.info('EXTAUTH: Doing signup for {0}'.format(eamap.external_id))
+    log.info('EXTAUTH: Doing signup for %s', eamap.external_id)
 
     return student_views.register_user(request, extra_context=context)
 
@@ -405,7 +405,7 @@ def shib_login(request):
         shib['sn'] = shib['sn'].split(";")[0].strip().capitalize().decode('utf-8')
         shib['givenName'] = shib['givenName'].split(";")[0].strip().capitalize().decode('utf-8')
 
-    log.info("SHIB creds returned: {0}".format(shib))
+    log.info("SHIB creds returned: %r", shib)
 
     return external_login_or_signup(request,
                                     external_id=shib['REMOTE_USER'],
@@ -643,7 +643,7 @@ def provider_login(request):
         try:
             openid_request = server.decodeRequest(querydict)
         except (UntrustedReturnURL, ProtocolError):
-            return default_render_failure(request, "Invalid OpenID request")
+            openid_request = None
 
         if not openid_request:
             return default_render_failure(request, "Invalid OpenID request")
@@ -700,8 +700,8 @@ def provider_login(request):
             user = User.objects.get(email=email)
         except User.DoesNotExist:
             request.session['openid_error'] = True
-            msg = "OpenID login failed - Unknown user email: {0}".format(email)
-            log.warning(msg)
+            msg = "OpenID login failed - Unknown user email: %s"
+            log.warning(msg, email)
             return HttpResponseRedirect(openid_request_url)
 
         # attempt to authenticate user (but not actually log them in...)
@@ -711,9 +711,8 @@ def provider_login(request):
         user = authenticate(username=username, password=password)
         if user is None:
             request.session['openid_error'] = True
-            msg = "OpenID login failed - password for {0} is invalid"
-            msg = msg.format(email)
-            log.warning(msg)
+            msg = "OpenID login failed - password for %s is invalid"
+            log.warning(msg, email)
             return HttpResponseRedirect(openid_request_url)
 
         # authentication succeeded, so fetch user information
@@ -723,8 +722,8 @@ def provider_login(request):
             if 'openid_error' in request.session:
                 del request.session['openid_error']
 
-            log.info("OpenID login success - {0} ({1})".format(user.username,
-                                                               user.email))
+            log.info("OpenID login success - %s (%s)",
+                     user.username, user.email)
 
             # redirect user to return_to location
             url = endpoint + urlquote(user.username)
@@ -754,8 +753,8 @@ def provider_login(request):
 
         # the account is not active, so redirect back to the login page:
         request.session['openid_error'] = True
-        msg = "Login failed - Account not active for user {0}".format(username)
-        log.warning(msg)
+        msg = "Login failed - Account not active for user %s"
+        log.warning(msg, username)
         return HttpResponseRedirect(openid_request_url)
 
     # determine consumer domain if applicable
