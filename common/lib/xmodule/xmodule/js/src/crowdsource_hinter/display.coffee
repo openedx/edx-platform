@@ -70,7 +70,12 @@ class @Hinter
 
   render: (content) ->
     if content
+      # Trim leading and trailing whitespace
+      content = content.replace /^\s+|\s+$/g, ""
+
+    if content
       @el.html(content)
+      @el.show()
       JavascriptLoader.executeModuleScripts @el, () =>
         @bind()
       @$('#previous-answer-0').css('display', 'inline')
