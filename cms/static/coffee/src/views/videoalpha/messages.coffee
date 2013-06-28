@@ -54,3 +54,6 @@ class CMS.Views.SubtitlesMessages extends  Backbone.View
   hide: (event) ->
     event.preventDefault() if event
     @prompt.hide()
+
+  findEl: (selector) ->
+    @prompt.$el.find(selector) if @prompt

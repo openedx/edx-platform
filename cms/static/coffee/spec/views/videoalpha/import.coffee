@@ -1,27 +1,25 @@
 describe "CMS.Views.SubtitlesImport", ->
   beforeEach ->
-    # @stubModule = jasmine.createSpy("CMS.Models.Module")
-    # @stubModule.id = 'stub-id'
+    @html_id = "html_id"
+
     @message = jasmine.createSpy("CMS.Views.SubtitlesMessages")
     @importFile = jasmine.createSpy("CMS.Views.SubtitlesImportFile")
     @importYT = jasmine.createSpy("CMS.Views.SubtitlesImportYT")
 
-    @component_location = "component_location"
+    setFixtures """
+    <div class="component" data-id="#{@html_id}">
+      <div class="field comp-subtitles-entry" id="comp-subtitles-#{@html_id}">
+      </div>
+    </div>
+    """
 
     @options =
-      container: $("#comp-subtitles-#{@component_location}_html_id")
+      container: $("#comp-subtitles-#{@html_id}")
       msg: @message
       modules: [
         @importFile,
         @importYT
       ]
-
-    setFixtures """
-    <div class="component" data-id="#{@component_location}">
-      <div class="field comp-subtitles-entry" id="comp-subtitles-#{@component_location}_html_id">
-      </div>
-    </div>
-    """
 
     spyOn(CMS.Views.SubtitlesImport.prototype, 'render').andCallThrough()
     @SubtitlesImport = new CMS.Views.SubtitlesImport @options
@@ -42,14 +40,19 @@ describe "CMS.Views.SubtitlesImport", ->
         expect(@message).toHaveBeenCalled()
 
     describe "render", ->
+      it "element is added into the DOM", ->
+        expect(@options.container).toContain(@SubtitlesImport.$el)
+
+      it "element is added with correct className", ->
+        expect(@SubtitlesImport.$el).toHaveClass(@SubtitlesImport.className)
+
       it "submodules to be initialized", ->
         options = $.extend(true, {}, @options, {
-            component_id: @component_location
+            component_id: @html_id
+            msg: @SubtitlesImport.messages
             $container: @SubtitlesImport.$el
           }
         )
 
         $.each @options.modules, (index, module) ->
-          console.log options
-          expect(module).toHaveBeenCalled()
-          # expect(module).toHaveBeenCalledWith options
+          expect(module).toHaveBeenCalledWith options

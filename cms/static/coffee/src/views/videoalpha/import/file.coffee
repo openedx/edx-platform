@@ -16,7 +16,7 @@ class CMS.Views.SubtitlesImportFile extends Backbone.View
 
   render: ->
     container = @options.$container
-    tpl = @options.tpl.file
+    tpl = @options.tpl.file if @options.tpl
 
     if not tpl
         console.error("Couldn't load template for file uploader")
@@ -72,14 +72,14 @@ class CMS.Views.SubtitlesImportFile extends Backbone.View
     @messages.render(null,
       intent: 'warning'
       title: gettext("Uploading...")
-      message: "
+      message: """
         <span class=\"file-name\">#{@files[0].name}</span>
         <span class=\"progress-bar\">
             <span class=\"progress-fill\"></span>
         </span>
-      "
+      """
     )
-    @$progressFill = @messages.prompt.$el.find('.progress-fill')
+    @$progressFill = @messages.findEl('.progress-fill')
 
   xhrProgressHandler: (event, position, total, percentComplete) ->
     percentVal = percentComplete + '%'
