@@ -234,7 +234,7 @@ class ElasticDatabase:
             raise
 
     def index_directory_files(self, directory, index, type_, silent=False, **kwargs):
-        """Starts a DirectoryCrawler instance and indexes all files in the given directory
+        """Starts a pygrep instance and indexes all files in the given directory
 
         Available kwargs are file_ending, callback, and conserve_kwargs.
         Respectively these allow you to choose the file ending to be indexed, the
@@ -244,7 +244,7 @@ class ElasticDatabase:
         file_ending = kwargs.get("file_ending", ".srt.sjson")
         callback = kwargs.get("callback", self.index_transcript)
         conserve_kwargs = kwargs.get("conserve_kwargs", False)
-        directoryCrawler = DirectoryCrawler(directory)
+        directoryCrawler = PyGrep(directory)
         all_files = directoryCrawler.grab_all_files_with_ending(file_ending)
         responses = []
         for file_list in all_files:
@@ -320,12 +320,13 @@ class ElasticDatabase:
         return json.loads(requests.get(full_url)._content)
 
 
-class DirectoryCrawler:
+class PyGrep:
 
     def __init__(self, directory):
         self.directory = directory
 
     def grab_all_files_with_ending(self, file_ending):
+        """Will return absolute paths to all files with given file ending in self.directory"""
         walk_results = os.walk(self.directory)
         file_check = lambda walk: len(walk[2]) > 0
         ending_prelim = lambda walk: file_ending in " ".join(walk[2])
@@ -333,6 +334,7 @@ class DirectoryCrawler:
         return (self.grab_files_from_os_walk(result, file_ending) for result in relevant_results)
 
     def grab_files_from_os_walk(self, os_walk_tuple, file_ending):
+        """Made to interface with """
         format_check = lambda file_name: file_ending in file_name
         directory, subfolders, file_paths = os_walk_tuple
         return [os.path.join(directory, file_path) for file_path in file_paths if format_check(file_path)]
@@ -373,15 +375,15 @@ class EnchantDictionary:
                 dictionary.write(word+"\n")
 
 
-url = "http://localhost:9200"
-settings_file = "settings.json"
+#url = "http://localhost:9200"
+#settings_file = "settings.json"
 
 #mongo = MongoIndexer()
 
 
-test = ElasticDatabase(url, settings_file)
-dictionary = EnchantDictionary(test)
-dictionary.produce_dictionary("pyenchant_corpus.txt", max_results=500000)
+#test = ElasticDatabase(url, settings_file)
+#dictionary = EnchantDictionary(test)
+#dictionary.produce_dictionary("pyenchant_corpus.txt", max_results=500000)
 #print test.delete_index("transcript-index")
 #mongo.index_all_lecture_slides(test, "slide-index")
 #mongo.index_all_transcripts(test, "transcript-index")
