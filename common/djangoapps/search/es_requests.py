@@ -471,8 +471,8 @@ class EnchantDictionary:
                 dictionary.write(word+"\n")
 
 
-url = "http://localhost:9200"
-settings_file = "settings.json"
+#url = "http://localhost:9200"
+#settings_file = "settings.json"
 
 #mongo = MongoIndexer()
 
