@@ -96,7 +96,7 @@ class InstructorTaskTestCase(TestCase):
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
-class InstructorTaskCourseTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
+class InstructorTaskModuleTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Base test class for InstructorTask-related tests that require
     the setup of a course.

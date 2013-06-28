@@ -14,7 +14,7 @@ from celery.states import SUCCESS, FAILURE
 
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
-from courseware.models import StudentModule
+from courseware.models import StudentModule, OfflineComputedGrade
 from courseware.tests.factories import StudentModuleFactory
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 
@@ -132,8 +132,6 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
                                         grade=grade,
                                         max_grade=max_grade,
                                         state=state)
-            CourseEnrollmentFactory.create(course_id=self.course.id, user=student)
-
         return students
 
     def _assert_num_attempts(self, students, num_attempts):
@@ -531,15 +529,31 @@ class TestOfflineGradeInstructorTask(TestInstructorTasks):
             self._run_task_with_mock_celery(update_offline_grades, task_entry.id, task_entry.task_id)
 
     def test_grade_with_some_state(self):
-        input_state = json.dumps({'grade': 1, 'max_grade': 2})
+        input_state = json.dumps({'done': True})
         num_students = 10
-        students = self._create_students_with_state(num_students, input_state)
-        # TODO: check that students in the course were not yet graded
+        students = self._create_students_with_state(num_students, input_state, grade=1, max_grade=2)
+
+        # check that students in the course were not yet graded
+        for student in students:
+            with self.assertRaises(OfflineComputedGrade.DoesNotExist):
+                OfflineComputedGrade.objects.get(course_id=self.course.id,
+                                                 user=student)
 
         # Run the task.
         # The number of users graded should be one more than the students, since the
         # course instructor is also enrolled.
         self._test_run_with_task(update_offline_grades, 'graded', num_students + 1)
 
-        # TODO: check that students in the course were graded
-
+        # check that students in the course were graded
+        for student in students:
+            entry = OfflineComputedGrade.objects.get(course_id=self.course.id, user=student)
+            gradeset = json.loads(entry.gradeset)
+            self.assertTrue('grade' in gradeset)
+            self.assertEquals(gradeset['grade'], None)
+            self.assertEquals(gradeset['totaled_scores'], {u'Homework': [[1.0, 2.0, True, u'Problem']]})
+            # 50% on one homework, with a minimum (by default) of 12, and Homework treated as 15% of final grade,
+            # yields a pretty small percentage:
+            self.assertEquals(gradeset['percent'], 0.01)
+            self.assertEquals(gradeset['raw_scores'], [[1.0, 2.0, True, u'test_urlname']])
+            # self.assertEquals(gradeset.grade_breakdown, [])
+            # self.assertEquals(gradeset.section_breakdown, [])

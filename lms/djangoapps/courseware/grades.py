@@ -421,6 +421,9 @@ def _get_score(user, problem_descriptor, module_creator, field_data_cache):
         # If the problem was not in the cache, or hasn't been graded yet,
         # we need to instantiate the problem.
         # Otherwise, the max score (cached in student_module) won't be available
+
+        # TODO: optimization: if the problem has a weight, then we don't need to
+        # find the total here, we can just return (0, weight).
         problem = module_creator(problem_descriptor)
         if problem is None:
             return (None, None)
