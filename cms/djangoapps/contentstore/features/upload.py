@@ -90,6 +90,12 @@ def modify_upload(_step, file_name):
         cur_file.write(new_text)
 
 
+@step('I see a confirmation that the file was deleted')
+def i_see_a_delete_confirmation(step):
+    alert_css = '#alert-confirmation'
+    assert world.is_css_present(alert_css)
+
+
 def get_index(file_name):
     names_css = 'td.name-col > a.filename'
     all_names = world.css_find(names_css)
