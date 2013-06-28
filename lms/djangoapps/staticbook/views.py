@@ -1,3 +1,7 @@
+"""
+Views for serving static textbooks.
+"""
+
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from mitxmako.shortcuts import render_to_response
@@ -10,6 +14,9 @@ from static_replace import replace_static_urls
 
 @login_required
 def index(request, course_id, book_index, page=None):
+    """
+    Serve static image-based textbooks.
+    """
     course = get_course_with_access(request.user, course_id, 'load')
     staff_access = has_access(request.user, course, 'staff')
 
