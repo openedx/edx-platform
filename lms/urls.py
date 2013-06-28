@@ -3,8 +3,7 @@ from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from django.conf.urls.static import static
 
-# Not used, the work is done in the imported module.
-from . import one_time_startup      # pylint: disable=W0611
+from . import one_time_startup
 
 import django.contrib.auth.views
 
@@ -26,6 +25,7 @@ urlpatterns = ('',  # nopep8
     url(r'^change_email$', 'student.views.change_email_request', name="change_email"),
     url(r'^email_confirm/(?P<key>[^/]*)$', 'student.views.confirm_email_change'),
     url(r'^change_name$', 'student.views.change_name_request', name="change_name"),
+    url(r'^change_interest$','student.views.change_interest',name="change_interest"),
     url(r'^accept_name_change$', 'student.views.accept_name_change'),
     url(r'^reject_name_change$', 'student.views.reject_name_change'),
     url(r'^pending_name_changes$', 'student.views.pending_name_changes'),
@@ -37,7 +37,7 @@ urlpatterns = ('',  # nopep8
     url(r'^login_ajax$', 'student.views.login_user', name="login"),
     url(r'^login_ajax/(?P<error>[^/]*)$', 'student.views.login_user'),
     url(r'^logout$', 'student.views.logout_user', name='logout'),
-    url(r'^create_account$', 'student.views.create_account', name='create_account'),
+    url(r'^create_account$', 'student.views.create_account'),
     url(r'^activate/(?P<key>[^/]*)$', 'student.views.activate_account', name="activate"),
 
     url(r'^begin_exam_registration/(?P<course_id>[^/]+/[^/]+/[^/]+)$', 'student.views.begin_exam_registration', name="begin_exam_registration"),
@@ -51,7 +51,7 @@ urlpatterns = ('',  # nopep8
     url(r'^password_change_done/$', django.contrib.auth.views.password_change_done,
         name='auth_password_change_done'),
     url(r'^password_reset_confirm/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$',
-        'student.views.password_reset_confirm_wrapper',
+        django.contrib.auth.views.password_reset_confirm,
         name='auth_password_reset_confirm'),
     url(r'^password_reset_complete/$', django.contrib.auth.views.password_reset_complete,
         name='auth_password_reset_complete'),
@@ -116,6 +116,8 @@ if not settings.MITX_FEATURES["USE_CUSTOM_THEME"]:
 
         url(r'^submit_feedback$', 'util.views.submit_feedback'),
 
+        # TODO: These urls no longer work. They need to be updated before they are re-enabled
+        # url(r'^reactivate/(?P<key>[^/]*)$', 'student.views.reactivation_email'),
     )
 
 # Only enable URLs for those marketing links actually enabled in the
@@ -188,7 +190,7 @@ if settings.COURSEWARE_ENABLED:
         # into the database.
         url(r'^software-licenses$', 'licenses.views.user_software_license', name="user_software_license"),
 
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/xqueue/(?P<userid>[^/]*)/(?P<mod_id>.*?)/(?P<dispatch>[^/]*)$',
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/xqueue/(?P<userid>[^/]*)/(?P<id>.*?)/(?P<dispatch>[^/]*)$',
             'courseware.module_render.xqueue_callback',
             name='xqueue_callback'),
         url(r'^change_setting$', 'student.views.change_setting',
@@ -362,21 +364,6 @@ if settings.MITX_FEATURES.get('AUTH_USE_OPENID'):
         url(r'^openid/logo.gif$', 'django_openid_auth.views.logo', name='openid-logo'),
     )
 
-if settings.MITX_FEATURES.get('AUTH_USE_SHIB'):
-    urlpatterns += (
-        url(r'^shib-login/$', 'external_auth.views.shib_login', name='shib-login'),
-    )
-
-if settings.MITX_FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD'):
-    urlpatterns += (
-        url(r'^course_specific_login/(?P<course_id>[^/]+/[^/]+/[^/]+)/$',
-            'external_auth.views.course_specific_login', name='course-specific-login'),
-        url(r'^course_specific_register/(?P<course_id>[^/]+/[^/]+/[^/]+)/$',
-            'external_auth.views.course_specific_register', name='course-specific-register'),
-
-    )
-
-
 if settings.MITX_FEATURES.get('AUTH_USE_OPENID_PROVIDER'):
     urlpatterns += (
         url(r'^openid/provider/login/$', 'external_auth.views.provider_login', name='openid-provider-login'),
@@ -412,12 +399,6 @@ if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
     urlpatterns += (
         url(r'^instructor_task_status/$', 'instructor_task.views.instructor_task_status', name='instructor_task_status'),
     )
-
-if settings.MITX_FEATURES.get('RUN_AS_ANALYTICS_SERVER_ENABLED'):
-    urlpatterns += (
-        url(r'^edinsights_service/', include('edinsights.core.urls')),
-    )
-    import edinsights.core.registry
 
 # FoldIt views
 urlpatterns += (
