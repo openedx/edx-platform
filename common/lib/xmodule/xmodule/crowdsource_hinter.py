@@ -188,8 +188,8 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         Args:
         `data` -- not actually used.  (It is assumed that the answer is correct.)
         Output keys:
-            - 'index_to_hints' maps previous answer indices to hints that the user saw earlier.
-            - 'index_to_answer' maps previous answer indices to the actual answer submitted.
+            - 'answer_to_hints': a nested dictionary.
+              answer_to_hints[answer][hint_pk] returns the text of the hint.
         """
         # The student got it right.
         # Did he submit at least one wrong answer?
@@ -199,27 +199,24 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         # Make a hint-voting interface for each wrong answer.  The student will only
         # be allowed to make one vote / submission, but he can choose which wrong answer
         # he wants to look at.
-        # index_to_hints[previous answer #] = [(hint text, hint pk), + ]
-        index_to_hints = {}
-        # index_to_answer[previous answer #] = answer text
-        index_to_answer = {}
+        answer_to_hints = {}    #answer_to_hints[answer text][hint pk] -> hint text
 
         # Go through each previous answer, and populate index_to_hints and index_to_answer.
         for i in xrange(len(self.previous_answers)):
             answer, hints_offered = self.previous_answers[i]
-            index_to_hints[i] = []
-            index_to_answer[i] = answer
+            if answer not in answer_to_hints:
+                answer_to_hints[answer] = {}
             if answer in self.hints:
                 # Go through each hint, and add to index_to_hints
                 for hint_id in hints_offered:
-                    if hint_id is not None:
+                    if (hint_id is not None) and (hint_id not in answer_to_hints[answer]):
                         try:
-                            index_to_hints[i].append((self.hints[answer][str(hint_id)][0], hint_id))
+                            answer_to_hints[answer][hint_id] = self.hints[answer][str(hint_id)][0]
                         except KeyError:
                             # Sometimes, the hint that a user saw will have been deleted by the instructor.
                             continue
 
-        return {'index_to_hints': index_to_hints, 'index_to_answer': index_to_answer}
+        return {'answer_to_hints': answer_to_hints}
 
     def tally_vote(self, data):
         """
@@ -229,27 +226,29 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         `data` -- expected to have the following keys:
             'answer': ans_no (index in previous_answers)
             'hint': hint_pk
+            'pk_list': We will return a list of how many votes each hint has so far.
+                       It's up to the browser to specify which hints to return vote counts for.
+                       Every pk listed here will have a hint count returned.
         Returns key 'hint_and_votes', a list of (hint_text, #votes) pairs.
         """
         if self.user_voted:
-            return {}
-        ans_no = int(data['answer'])
-        hint_no = str(data['hint'])
-        answer = self.previous_answers[ans_no][0]
+            return json.dumps({'contents': 'Sorry, but you have already voted!'})
+        ans = data['answer']
+        hint_pk = str(data['hint'])
+        pk_list = json.loads(data['pk_list'])
         # We use temp_dict because we need to do a direct write for the database to update.
         temp_dict = self.hints
-        temp_dict[answer][hint_no][1] += 1
+        temp_dict[ans][hint_pk][1] += 1
         self.hints = temp_dict
         # Don't let the user vote again!
         self.user_voted = True
 
         # Return a list of how many votes each hint got.
         hint_and_votes = []
-        for hint_no in self.previous_answers[ans_no][1]:
-            if hint_no is None:
-                continue
-            hint_and_votes.append(temp_dict[answer][str(hint_no)])
+        for vote_pk in pk_list:
+            hint_and_votes.append(temp_dict[ans][vote_pk])
 
+        hint_and_votes.sort(key=lambda pair: pair[1], reverse=True)
         # Reset self.previous_answers.
         self.previous_answers = []
         return {'hint_and_votes': hint_and_votes}
@@ -266,7 +265,7 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         """
         # Do html escaping.  Perhaps in the future do profanity filtering, etc. as well.
         hint = escape(data['hint'])
-        answer = self.previous_answers[int(data['answer'])][0]
+        answer = data['answer']
         # Only allow a student to vote or submit a hint once.
         if self.user_voted:
             return {'message': 'Sorry, but you have already voted!'}

@@ -28,6 +28,10 @@ class @Hinter
   $: (selector) ->
     $(selector, @el)
 
+  jq_escape: (string) =>
+    # Escape a string for jquery selector use.
+    return string.replace(/[!"#$%&'()*+,.\/:;<=>?@\[\\\]^`{|}~]/g, '\\$&')
+
   bind: =>
     window.update_schematics()
     @$('input.vote').click @vote
@@ -44,14 +48,17 @@ class @Hinter
 
   vote: (eventObj) =>
     target = @$(eventObj.currentTarget)
-    post_json = {'answer': target.data('answer'), 'hint': target.data('hintno')}
+    parent_div_selector = '#previous-answer-' + @jq_escape(target.attr('data-answer'))
+    all_pks = @$(parent_div_selector).attr('data-all-pks')
+    console.debug(all_pks)
+    post_json = {'answer': target.attr('data-answer'), 'hint': target.data('hintno'), 'pk_list': all_pks}
     $.postWithPrefix "#{@url}/vote", post_json, (response) =>
       @render(response.contents)
 
   submit_hint: (eventObj) =>
     target = @$(eventObj.currentTarget)
-    textarea_id = '#custom-hint-' + target.data('answer')
-    post_json = {'answer': target.data('answer'), 'hint': @$(textarea_id).val()}
+    textarea_id = '#custom-hint-' + @jq_escape(target.attr('data-answer'))
+    post_json = {'answer': target.attr('data-answer'), 'hint': @$(textarea_id).val()}
     $.postWithPrefix "#{@url}/submit_hint",post_json, (response) =>
       @render(response.contents)
 

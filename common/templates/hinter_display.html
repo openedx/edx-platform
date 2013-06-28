@@ -25,21 +25,25 @@
 
     <div id="answer-tabs">
         <ul>
-        % for index, answer in index_to_answer.items():
-            <li><a href="#previous-answer-${index}"> ${answer} </a></li>
+        % for answer in answer_to_hints:
+            <li><a href="#previous-answer-${answer}"> ${answer} </a></li> 
         % endfor
         </ul>
 
-        % for index, answer in index_to_answer.items():
-        <div class = "previous-answer" id="previous-answer-${index}">
+        % for answer, pk_dict in answer_to_hints.items():
+        <%
+        import json
+        all_pks = json.dumps(pk_dict.keys())
+        %>
+        <div class = "previous-answer" id="previous-answer-${answer}" data-all-pks='${all_pks}'>
         <div class = "hint-inner-container">
-            % if index in index_to_hints and len(index_to_hints[index]) > 0:
+            % if len(pk_dict) > 0:
                 <p>
                 Which hint would be most effective to show a student who also got ${answer}?
                 </p>
-                % for hint_text, hint_pk in index_to_hints[index]:
+                % for hint_pk, hint_text in pk_dict.items():
                     <p>
-                    <input class="vote" data-answer="${index}" data-hintno="${hint_pk}" type="button" value="Vote"/>
+                    <input class="vote" data-answer="${answer}" data-hintno="${hint_pk}" type="button" value="Vote">
                     ${hint_text}
                     </p>
                 % endfor
@@ -50,12 +54,12 @@
             <p>
             What hint would you give a student who made the same mistake you did?  Please don't give away the answer.
             </p>
-            <textarea cols="50" class="custom-hint" id="custom-hint-${index}">
+            <textarea cols="50" class="custom-hint" id="custom-hint-${answer}">
 What would you say to help someone who got this wrong answer?
 (Don't give away the answer, please.)
             </textarea>
             <br/><br/>
-            <input class="submit-hint" data-answer="${index}" type="button" value="submit">
+            <input class="submit-hint" data-answer="${answer}" type="button" value="submit">
         </div></div>
         % endfor
     </div>
