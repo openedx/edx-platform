@@ -1,14 +1,9 @@
 from collections import defaultdict
 from fs.errors import ResourceNotFoundError
-from functools import wraps
 import logging
 import inspect
 
-from lxml.html import rewrite_links
-
 from path import path
-from django.conf import settings
-from django.core.urlresolvers import reverse
 from django.http import Http404
 
 from .module_render import get_module
@@ -18,7 +13,6 @@ from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.content import StaticContent
 from xmodule.modulestore.xml import XMLModuleStore
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.x_module import XModule
 from courseware.model_data import ModelDataCache
 from static_replace import replace_static_urls
 from courseware.access import has_access

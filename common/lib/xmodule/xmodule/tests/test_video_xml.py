@@ -18,9 +18,9 @@ import unittest
 from mock import Mock
 from lxml import etree
 
-from xmodule.video_module import VideoDescriptor, VideoModule
+from xmodule.video_module import VideoDescriptor, VideoModule, _parse_time, _parse_youtube
 from xmodule.modulestore import Location
-from xmodule.tests import test_system
+from xmodule.tests import get_test_system
 from xmodule.tests.test_logic import LogicTest
 
 
@@ -49,9 +49,9 @@ class VideoFactory(object):
                              "SampleProblem1"])
         model_data = {'data': VideoFactory.sample_problem_xml_youtube, 'location': location}
 
-        descriptor = Mock(weight="1")
+        descriptor = Mock(weight="1", url_name="SampleProblem1")
 
-        system = test_system()
+        system = get_test_system()
         system.render_template = lambda template, context: context
         module = VideoModule(system, descriptor, model_data)
 
@@ -67,69 +67,57 @@ class VideoModuleLogicTest(LogicTest):
         'data': '<video />'
     }
 
-    def test_get_timeframe_no_parameters(self):
-        """Make sure that timeframe() works correctly w/o parameters"""
-        xmltree = etree.fromstring('<video>test</video>')
-        output = self.xmodule.get_timeframe(xmltree)
-        self.assertEqual(output, ('', ''))
+    def test_parse_time(self):
+        """Ensure that times are parsed correctly into seconds."""
+        output = _parse_time('00:04:07')
+        self.assertEqual(output, 247)
 
-    def test_get_timeframe_with_one_parameter(self):
-        """Make sure that timeframe() works correctly with one parameter"""
-        xmltree = etree.fromstring(
-            '<video from="00:04:07">test</video>'
-        )
-        output = self.xmodule.get_timeframe(xmltree)
-        self.assertEqual(output, (247, ''))
+    def test_parse_time_none(self):
+        """Check parsing of None."""
+        output = _parse_time(None)
+        self.assertEqual(output, '')
 
-    def test_get_timeframe_with_two_parameters(self):
-        """Make sure that timeframe() works correctly with two parameters"""
-        xmltree = etree.fromstring(
-            '''<video
-                    from="00:04:07"
-                    to="13:04:39"
-                >test</video>'''
-        )
-        output = self.xmodule.get_timeframe(xmltree)
-        self.assertEqual(output, (247, 47079))
+    def test_parse_time_empty(self):
+        """Check parsing of the empty string."""
+        output = _parse_time('')
+        self.assertEqual(output, '')
 
+    def test_parse_youtube(self):
+        """Test parsing old-style Youtube ID strings into a dict."""
+        youtube_str = '0.75:jNCf2gIqpeE,1.00:ZwkTiUPN0mg,1.25:rsq9auxASqI,1.50:kMyNdzVHHgg'
+        output = _parse_youtube(youtube_str)
+        self.assertEqual(output, {'0.75': 'jNCf2gIqpeE',
+                                  '1.00': 'ZwkTiUPN0mg',
+                                  '1.25': 'rsq9auxASqI',
+                                  '1.50': 'kMyNdzVHHgg'})
 
-class VideoModuleUnitTest(unittest.TestCase):
-    """Unit tests for Video Xmodule."""
+    def test_parse_youtube_one_video(self):
+        """
+        Ensure that all keys are present and missing speeds map to the
+        empty string.
+        """
+        youtube_str = '0.75:jNCf2gIqpeE'
+        output = _parse_youtube(youtube_str)
+        self.assertEqual(output, {'0.75': 'jNCf2gIqpeE',
+                                  '1.00': '',
+                                  '1.25': '',
+                                  '1.50': ''})
 
-    def test_video_constructor(self):
-        """Make sure that all parameters extracted correclty from xml"""
-        module = VideoFactory.create()
+    def test_parse_youtube_key_format(self):
+        """
+        Make sure that inconsistent speed keys are parsed correctly.
+        """
+        youtube_str = '1.00:p2Q6BrNhdh8'
+        youtube_str_hack = '1.0:p2Q6BrNhdh8'
+        self.assertEqual(_parse_youtube(youtube_str), _parse_youtube(youtube_str_hack))
 
-        # `get_html` return only context, cause we
-        # overwrite `system.render_template`
-        context = module.get_html()
-        expected_context = {
-            'track': None,
-            'show_captions': 'true',
-            'display_name': 'SampleProblem1',
-            'id': module.location.html_id(),
-            'end': 3610.0,
-            'caption_asset_path': '/static/subs/',
-            'source': '.../mit-3091x/M-3091X-FA12-L21-3_100.mp4',
-            'streams': '0.75:jNCf2gIqpeE,1.0:ZwkTiUPN0mg,1.25:rsq9auxASqI,1.50:kMyNdzVHHgg',
-            'normal_speed_video_id': 'ZwkTiUPN0mg',
-            'position': 0,
-            'start': 3603.0
-        }
-        self.assertDictEqual(context, expected_context)
-
-        self.assertEqual(
-            module.youtube,
-            '0.75:jNCf2gIqpeE,1.0:ZwkTiUPN0mg,1.25:rsq9auxASqI,1.50:kMyNdzVHHgg')
-
-        self.assertEqual(
-            module.video_list(),
-            module.youtube)
-
-        self.assertEqual(
-            module.position,
-            0)
-
-        self.assertDictEqual(
-            json.loads(module.get_instance_state()),
-            {'position': 0})
+    def test_parse_youtube_empty(self):
+        """
+        Some courses have empty youtube attributes, so we should handle
+        that well.
+        """
+        self.assertEqual(_parse_youtube(''),
+                         {'0.75': '',
+                          '1.00': '',
+                          '1.25': '',
+                          '1.50': ''})

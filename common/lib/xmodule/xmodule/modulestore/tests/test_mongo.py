@@ -1,6 +1,5 @@
 import pymongo
 
-from mock import Mock
 from nose.tools import assert_equals, assert_raises, assert_not_equals, assert_false
 from pprint import pprint
 
@@ -14,11 +13,12 @@ from xmodule.templates import update_templates
 
 from .test_modulestore import check_path_to_location
 from . import DATA_DIR
+from uuid import uuid4
 
 
 HOST = 'localhost'
 PORT = 27017
-DB = 'test'
+DB = 'test_mongo_%s' % uuid4().hex
 COLLECTION = 'modulestore'
 FS_ROOT = DATA_DIR  # TODO (vshnayder): will need a real fs_root for testing load_item
 DEFAULT_CLASS = 'xmodule.raw_module.RawDescriptor'
@@ -40,7 +40,8 @@ class TestMongoModuleStore(object):
 
     @classmethod
     def teardownClass(cls):
-        pass
+        cls.connection = pymongo.connection.Connection(HOST, PORT)
+        cls.connection.drop_database(DB)
 
     @staticmethod
     def initdb():

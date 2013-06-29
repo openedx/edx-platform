@@ -3,14 +3,8 @@ import logging
 from lxml.html.clean import Cleaner, autolink_html
 import re
 
-from xmodule.capa_module import ComplexEncoder
 import open_ended_image_submission
-from xmodule.editing_module import EditingDescriptor
-from xmodule.html_checker import check_html
 from xmodule.progress import Progress
-from xmodule.stringify import stringify_children
-from xmodule.xml_module import XmlDescriptor
-from xmodule.modulestore import Location
 from capa.util import *
 from .peer_grading_service import PeerGradingService, MockPeerGradingService
 import controller_query_service
@@ -278,13 +272,13 @@ class OpenEndedChild(object):
                 return None
         return None
 
-    def out_of_sync_error(self, get, msg=''):
+    def out_of_sync_error(self, data, msg=''):
         """
         return dict out-of-sync error message, and also log.
         """
         # This is a dev_facing_error
-        log.warning("Open ended child state out sync. state: %r, get: %r. %s",
-                    self.child_state, get, msg)
+        log.warning("Open ended child state out sync. state: %r, data: %r. %s",
+                    self.child_state, data, msg)
         # This is a student_facing_error
         return {'success': False,
                 'error': 'The problem state got out-of-sync.  Please try reloading the page.'}
@@ -351,24 +345,24 @@ class OpenEndedChild(object):
 
         return success, image_ok, s3_public_url
 
-    def check_for_image_and_upload(self, get_data):
+    def check_for_image_and_upload(self, data):
         """
         Checks to see if an image was passed back in the AJAX query.  If so, it will upload it to S3
-        @param get_data: AJAX get data
-        @return: Success, whether or not a file was in the get dictionary,
+        @param data: AJAX data
+        @return: Success, whether or not a file was in the data dictionary,
         and the html corresponding to the uploaded image
         """
         has_file_to_upload = False
         uploaded_to_s3 = False
         image_tag = ""
         image_ok = False
-        if 'can_upload_files' in get_data:
-            if get_data['can_upload_files'] in ['true', '1']:
+        if 'can_upload_files' in data:
+            if data['can_upload_files'] in ['true', '1']:
                 has_file_to_upload = True
-                file = get_data['student_file'][0]
-                uploaded_to_s3, image_ok, s3_public_url = self.upload_image_to_s3(file)
+                student_file = data['student_file'][0]
+                uploaded_to_s3, image_ok, s3_public_url = self.upload_image_to_s3(student_file)
                 if uploaded_to_s3:
-                    image_tag = self.generate_image_tag_from_url(s3_public_url, file.name)
+                    image_tag = self.generate_image_tag_from_url(s3_public_url, student_file.name)
 
         return has_file_to_upload, uploaded_to_s3, image_ok, image_tag
 
@@ -377,27 +371,27 @@ class OpenEndedChild(object):
         Makes an image tag from a given URL
         @param s3_public_url: URL of the image
         @param image_name: Name of the image
-        @return: Boolean success, updated AJAX get data
+        @return: Boolean success, updated AJAX data
         """
         image_template = """
                         <a href="{0}" target="_blank">{1}</a>
                          """.format(s3_public_url, image_name)
         return image_template
 
-    def append_image_to_student_answer(self, get_data):
+    def append_image_to_student_answer(self, data):
         """
         Adds an image to a student answer after uploading it to S3
-        @param get_data: AJAx get data
-        @return: Boolean success, updated AJAX get data
+        @param data: AJAx data
+        @return: Boolean success, updated AJAX data
         """
         overall_success = False
         if not self.accept_file_upload:
             # If the question does not accept file uploads, do not do anything
-            return True, get_data
+            return True, data
 
-        has_file_to_upload, uploaded_to_s3, image_ok, image_tag = self.check_for_image_and_upload(get_data)
+        has_file_to_upload, uploaded_to_s3, image_ok, image_tag = self.check_for_image_and_upload(data)
         if uploaded_to_s3 and has_file_to_upload and image_ok:
-            get_data['student_answer'] += image_tag
+            data['student_answer'] += image_tag
             overall_success = True
         elif has_file_to_upload and not uploaded_to_s3 and image_ok:
             # In this case, an image was submitted by the student, but the image could not be uploaded to S3.  Likely
@@ -409,12 +403,12 @@ class OpenEndedChild(object):
             overall_success = True
         elif not has_file_to_upload:
             # If there is no file to upload, probably the student has embedded the link in the answer text
-            success, get_data['student_answer'] = self.check_for_url_in_text(get_data['student_answer'])
+            success, data['student_answer'] = self.check_for_url_in_text(data['student_answer'])
             overall_success = success
 
         # log.debug("Has file: {0} Uploaded: {1} Image Ok: {2}".format(has_file_to_upload, uploaded_to_s3, image_ok))
 
-        return overall_success, get_data
+        return overall_success, data
 
     def check_for_url_in_text(self, string):
         """

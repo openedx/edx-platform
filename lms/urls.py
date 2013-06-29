@@ -3,7 +3,8 @@ from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from django.conf.urls.static import static
 
-from . import one_time_startup
+# Not used, the work is done in the imported module.
+from . import one_time_startup      # pylint: disable=W0611
 
 import django.contrib.auth.views
 
@@ -50,7 +51,7 @@ urlpatterns = ('',  # nopep8
     url(r'^password_change_done/$', django.contrib.auth.views.password_change_done,
         name='auth_password_change_done'),
     url(r'^password_reset_confirm/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$',
-        django.contrib.auth.views.password_reset_confirm,
+        'student.views.password_reset_confirm_wrapper',
         name='auth_password_reset_confirm'),
     url(r'^password_reset_complete/$', django.contrib.auth.views.password_reset_complete,
         name='auth_password_reset_complete'),
@@ -115,8 +116,6 @@ if not settings.MITX_FEATURES["USE_CUSTOM_THEME"]:
 
         url(r'^submit_feedback$', 'util.views.submit_feedback'),
 
-        # TODO: These urls no longer work. They need to be updated before they are re-enabled
-        # url(r'^reactivate/(?P<key>[^/]*)$', 'student.views.reactivation_email'),
     )
 
 # Only enable URLs for those marketing links actually enabled in the
@@ -189,7 +188,7 @@ if settings.COURSEWARE_ENABLED:
         # into the database.
         url(r'^software-licenses$', 'licenses.views.user_software_license', name="user_software_license"),
 
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/xqueue/(?P<userid>[^/]*)/(?P<id>.*?)/(?P<dispatch>[^/]*)$',
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/xqueue/(?P<userid>[^/]*)/(?P<mod_id>.*?)/(?P<dispatch>[^/]*)$',
             'courseware.module_render.xqueue_callback',
             name='xqueue_callback'),
         url(r'^change_setting$', 'student.views.change_setting',
@@ -422,6 +421,12 @@ if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
     urlpatterns += (
         url(r'^instructor_task_status/$', 'instructor_task.views.instructor_task_status', name='instructor_task_status'),
     )
+
+if settings.MITX_FEATURES.get('RUN_AS_ANALYTICS_SERVER_ENABLED'):
+    urlpatterns += (
+        url(r'^edinsights_service/', include('edinsights.core.urls')),
+    )
+    import edinsights.core.registry
 
 # FoldIt views
 urlpatterns += (

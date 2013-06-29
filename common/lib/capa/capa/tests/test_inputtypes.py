@@ -467,8 +467,8 @@ class MatlabTest(unittest.TestCase):
         self.assertEqual(context, expected)
 
     def test_plot_data(self):
-        get = {'submission': 'x = 1234;'}
-        response = self.the_input.handle_ajax("plot", get)
+        data = {'submission': 'x = 1234;'}
+        response = self.the_input.handle_ajax("plot", data)
 
         test_system().xqueue['interface'].send_to_queue.assert_called_with(header=ANY, body=ANY)
 
@@ -477,10 +477,10 @@ class MatlabTest(unittest.TestCase):
         self.assertEqual(self.the_input.input_state['queuestate'], 'queued')
 
     def test_plot_data_failure(self):
-        get = {'submission': 'x = 1234;'}
+        data = {'submission': 'x = 1234;'}
         error_message = 'Error message!'
         test_system().xqueue['interface'].send_to_queue.return_value = (1, error_message)
-        response = self.the_input.handle_ajax("plot", get)
+        response = self.the_input.handle_ajax("plot", data)
         self.assertFalse(response['success'])
         self.assertEqual(response['message'], error_message)
         self.assertTrue('queuekey' not in self.the_input.input_state)

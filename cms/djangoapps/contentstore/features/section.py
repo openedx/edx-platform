@@ -1,5 +1,5 @@
-#pylint: disable=C0111
-#pylint: disable=W0621
+# pylint: disable=C0111
+# pylint: disable=W0621
 
 from lettuce import world, step
 from common import *
@@ -8,7 +8,7 @@ from nose.tools import assert_equal
 ############### ACTIONS ####################
 
 
-@step('I click the new section link$')
+@step('I click the New Section link$')
 def i_click_new_section_link(_step):
     link_css = 'a.new-courseware-section-button'
     world.css_click(link_css)

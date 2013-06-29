@@ -1,4 +1,4 @@
-from .utils import *
+from .utils import merge_dict, perform_request, CommentClientError
 
 import models
 import settings

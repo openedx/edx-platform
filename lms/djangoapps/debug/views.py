@@ -5,7 +5,7 @@ import traceback
 
 from django.http import Http404
 from django.contrib.auth.decorators import login_required
-from django_future.csrf import ensure_csrf_cookie, csrf_exempt
+from django_future.csrf import ensure_csrf_cookie
 from mitxmako.shortcuts import render_to_response
 
 from codejail.safe_exec import safe_exec

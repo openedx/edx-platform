@@ -5,7 +5,6 @@ describe 'Video', ->
     loadFixtures 'video.html'
     jasmine.stubRequests()
 
-    @videosDefinition = '0.75:slowerSpeedYoutubeId,1.0:normalSpeedYoutubeId'
     @slowerSpeedYoutubeId = 'slowerSpeedYoutubeId'
     @normalSpeedYoutubeId = 'normalSpeedYoutubeId'
     metadata =
@@ -30,7 +29,7 @@ describe 'Video', ->
       beforeEach ->
         spyOn(window.Video.prototype, 'fetchMetadata').andCallFake ->
           @metadata = metadata
-        @video = new Video '#example', @videosDefinition
+        @video = new Video '#example'
       it 'reset the current video player', ->
         expect(window.player).toBeNull()
 
@@ -60,7 +59,7 @@ describe 'Video', ->
         @originalYT = window.YT
         window.YT = { Player: true }
         spyOn(window, 'VideoPlayer').andReturn(@stubVideoPlayer)
-        @video = new Video '#example', @videosDefinition
+        @video = new Video '#example'
 
       afterEach ->
         window.YT = @originalYT
@@ -73,7 +72,7 @@ describe 'Video', ->
       beforeEach ->
         @originalYT = window.YT
         window.YT = {}
-        @video = new Video '#example', @videosDefinition
+        @video = new Video '#example'
 
       afterEach ->
         window.YT = @originalYT
@@ -86,7 +85,7 @@ describe 'Video', ->
         @originalYT = window.YT
         window.YT = {}
         spyOn(window, 'VideoPlayer').andReturn(@stubVideoPlayer)
-        @video = new Video '#example', @videosDefinition
+        @video = new Video '#example'
         window.onYouTubePlayerAPIReady()
 
       afterEach ->
@@ -99,7 +98,7 @@ describe 'Video', ->
   describe 'youtubeId', ->
     beforeEach ->
       $.cookie.andReturn '1.0'
-      @video = new Video '#example', @videosDefinition
+      @video = new Video '#example'
 
     describe 'with speed', ->
       it 'return the video id for given speed', ->
@@ -112,7 +111,7 @@ describe 'Video', ->
 
   describe 'setSpeed', ->
     beforeEach ->
-      @video = new Video '#example', @videosDefinition
+      @video = new Video '#example'
 
     describe 'when new speed is available', ->
       beforeEach ->
@@ -133,14 +132,14 @@ describe 'Video', ->
 
   describe 'getDuration', ->
     beforeEach ->
-      @video = new Video '#example', @videosDefinition
+      @video = new Video '#example'
 
     it 'return duration for current video', ->
       expect(@video.getDuration()).toEqual 200
 
   describe 'log', ->
     beforeEach ->
-      @video = new Video '#example', @videosDefinition
+      @video = new Video '#example'
       @video.setSpeed '1.0'
       spyOn Logger, 'log'
       @video.player = { currentTime: 25 }

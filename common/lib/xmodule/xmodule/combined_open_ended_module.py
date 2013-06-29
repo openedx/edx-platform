@@ -58,7 +58,7 @@ class CombinedOpenEndedFields(object):
     state = String(help="Which step within the current task that the student is on.", default="initial",
                    scope=Scope.user_state)
     student_attempts = Integer(help="Number of attempts taken by the student on this problem", default=0,
-                                      scope=Scope.user_state)
+                               scope=Scope.user_state)
     ready_to_reset = Boolean(
         help="If the problem is ready to be reset or not.", default=False,
         scope=Scope.user_state
@@ -66,7 +66,7 @@ class CombinedOpenEndedFields(object):
     attempts = Integer(
         display_name="Maximum Attempts",
         help="The number of times the student can try to answer this problem.", default=1,
-        scope=Scope.settings, values = {"min" : 1 }
+        scope=Scope.settings, values={"min" : 1 }
     )
     is_graded = Boolean(display_name="Graded", help="Whether or not the problem is graded.", default=False, scope=Scope.settings)
     accept_file_upload = Boolean(
@@ -89,7 +89,7 @@ class CombinedOpenEndedFields(object):
     weight = Float(
         display_name="Problem Weight",
         help="Defines the number of points each problem is worth. If the value is not set, each problem is worth one point.",
-        scope=Scope.settings, values = {"min" : 0 , "step": ".1"}
+        scope=Scope.settings, values={"min" : 0 , "step": ".1"}
     )
     markdown = String(help="Markdown source of this module", scope=Scope.settings)
 
@@ -204,9 +204,9 @@ class CombinedOpenEndedModule(CombinedOpenEndedFields, XModule):
         return_value = self.child_module.get_html()
         return return_value
 
-    def handle_ajax(self, dispatch, get):
+    def handle_ajax(self, dispatch, data):
         self.save_instance_data()
-        return_value = self.child_module.handle_ajax(dispatch, get)
+        return_value = self.child_module.handle_ajax(dispatch, data)
         self.save_instance_data()
         return return_value
 
@@ -266,4 +266,3 @@ class CombinedOpenEndedDescriptor(CombinedOpenEndedFields, RawDescriptor):
         non_editable_fields.extend([CombinedOpenEndedDescriptor.due, CombinedOpenEndedDescriptor.graceperiod,
                                     CombinedOpenEndedDescriptor.markdown, CombinedOpenEndedDescriptor.version])
         return non_editable_fields
-

@@ -1,9 +1,4 @@
-import os.path
-
-from lxml import etree
-
 from django.core.management.base import BaseCommand
-from django.conf import settings
 from django.contrib.auth.models import User
 
 import mitxmako.middleware as middleware

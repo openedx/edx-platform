@@ -27,6 +27,7 @@ class ModuleStoreTestCase(TestCase):
 
         # Remove everything except templates
         modulestore.collection.remove(query)
+        modulestore.collection.drop()
 
     @staticmethod
     def load_templates_if_necessary():

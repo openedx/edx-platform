@@ -73,7 +73,7 @@ change_git_push_defaults() {
     #Set git push defaults to upstream rather than master
     output "Changing git defaults"
     git config --global push.default upstream
-    
+
 }
 
 clone_repos() {
@@ -96,13 +96,31 @@ clone_repos() {
     fi
 }
 
+set_base_default() {  # if PROJECT_HOME not set
+    # 2 possibilities: this is from cloned repo, or not
+
+    # See if remote's url is named edx-platform (this works for forks too, but
+    # not if the name was changed).
+    cd "$( dirname "${BASH_SOURCE[0]}" )" 
+    this_repo=$(basename $(git ls-remote --get-url 2>/dev/null) 2>/dev/null) ||
+        echo -n ""
+
+    if [[ "x$this_repo" = "xedx-platform.git" ]]; then
+        # We are in the edx repo and already have git installed. Let git do the
+        # work of finding base dir:
+        echo "$(dirname $(git rev-parse --show-toplevel))"
+    else
+        echo "$HOME/edx_all"
+    fi
+}
+
 
 ### START
 
 PROG=${0##*/}
 
 # Adjust this to wherever you'd like to place the codebase
-BASE="${PROJECT_HOME:-$HOME}/edx_all"
+BASE="${PROJECT_HOME:-$(set_base_default)}"
 
 # Use a sensible default (~/.virtualenvs) for your Python virtualenvs
 # unless you've already got one set up with virtualenvwrapper.
@@ -206,10 +224,10 @@ case `uname -s` in
 
         distro=`lsb_release -cs`
         case $distro in
-            wheezy|jessie|maya|olivia|nadia|precise|quantal) 
+            wheezy|jessie|maya|olivia|nadia|precise|quantal)
                 warning "
                         Debian support is not fully debugged. Assuming you have standard
-                        development packages already working like scipy rvm, the 
+                        development packages already working like scipy rvm, the
                         installation should go fine, but this is still a work in progress.
 
                         Please report issues you have and let us know if you are able to figure
@@ -218,7 +236,7 @@ case `uname -s` in
                         Press return to continue or control-C to abort"
 
                 read dummy
-                sudo apt-get install git ;;  
+                sudo apt-get install git ;;
             squeeze|lisa|katya|oneiric|natty|raring)
                 warning "
                           It seems like you're using $distro which has been deprecated.
@@ -231,7 +249,7 @@ case `uname -s` in
                           Press return to continue or control-C to abort"
                 read dummy
                 sudo apt-get install git
-                ;; 
+                ;;
 
             *)
                 error "Unsupported distribution - $distro"
@@ -283,7 +301,7 @@ clone_repos
 if [[ -d $BASE/edx-platform/scripts ]]; then
     output "Installing system-level dependencies"
     bash $BASE/edx-platform/scripts/install-system-req.sh
-else 
+else
     error "It appears that our directory structure has changed and somebody failed to update this script.
             raise an issue on Github and someone should fix it."
     exit 1
@@ -314,14 +332,14 @@ case `uname -s` in
 
     [Ll]inux)
         warning "Setting up rvm on linux. This is a known pain point. If the script fails here
-                refer to the following stack overflow question: 
+                refer to the following stack overflow question:
                 http://stackoverflow.com/questions/9056008/installed-ruby-1-9-3-with-rvm-but-command-line-doesnt-show-ruby-v/9056395#9056395"
         sudo apt-get --purge remove ruby-rvm
         sudo rm -rf /usr/share/ruby-rvm /etc/rvmrc /etc/profile.d/rvm.sh
         curl -sL https://get.rvm.io | bash -s stable --ruby --autolibs=enable --auto-dotfiles
     ;;
 esac
-        
+
 
 # Ensure we have RVM available as a shell function so that it can mess
 # with the environment and set everything up properly. The RVM install
@@ -494,10 +512,11 @@ cd $BASE
 pip install argcomplete
 cd $BASE/edx-platform
 bundle install
+rake install_prereqs
 
-mkdir "$BASE/log" || true
-mkdir "$BASE/db" || true
-mkdir "$BASE/data" || true
+mkdir -p "$BASE/log"
+mkdir -p "$BASE/db"
+mkdir -p "$BASE/data"
 
 rake django-admin[syncdb]
 rake django-admin[migrate]

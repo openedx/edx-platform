@@ -1,5 +1,5 @@
 """
-Unit tests for LMS instructor-initiated background tasks, 
+Unit tests for LMS instructor-initiated background tasks.
 
 Runs tasks on answers to course problems to validate that code
 paths actually work.
@@ -7,6 +7,7 @@ paths actually work.
 """
 import json
 from uuid import uuid4
+from unittest import skip
 
 from mock import Mock, patch
 
@@ -19,7 +20,7 @@ from courseware.tests.factories import StudentModuleFactory
 from student.tests.factories import UserFactory
 
 from instructor_task.models import InstructorTask
-from instructor_task.tests.test_base import InstructorTaskModuleTestCase, TEST_COURSE_ORG, TEST_COURSE_NUMBER
+from instructor_task.tests.test_base import InstructorTaskModuleTestCase
 from instructor_task.tests.factories import InstructorTaskFactory
 from instructor_task.tasks import rescore_problem, reset_problem_attempts, delete_problem_state
 from instructor_task.tasks_helper import UpdateProblemModuleStateError, update_problem_module_state
@@ -62,6 +63,7 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
                 }
 
     def _run_task_with_mock_celery(self, task_function, entry_id, task_id, expected_failure_message=None):
+        """Submit a task and mock how celery provides a current_task."""
         self.current_task = Mock()
         self.current_task.request = Mock()
         self.current_task.request.id = task_id
@@ -73,7 +75,7 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
             return task_function(entry_id, self._get_xmodule_instance_args())
 
     def _test_missing_current_task(self, task_function):
-        # run without (mock) Celery running
+        """Check that a task_function fails when celery doesn't provide a current_task."""
         task_entry = self._create_input_entry()
         with self.assertRaises(UpdateProblemModuleStateError):
             task_function(task_entry.id, self._get_xmodule_instance_args())
@@ -88,7 +90,7 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
         self._test_missing_current_task(delete_problem_state)
 
     def _test_undefined_problem(self, task_function):
-        # run with celery, but no problem defined
+        """Run with celery, but no problem defined."""
         task_entry = self._create_input_entry()
         with self.assertRaises(ItemNotFoundError):
             self._run_task_with_mock_celery(task_function, task_entry.id, task_entry.task_id)
@@ -103,7 +105,7 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
         self._test_undefined_problem(delete_problem_state)
 
     def _test_run_with_task(self, task_function, action_name, expected_num_updated):
-        # run with some StudentModules for the problem
+        """Run a task and check the number of StudentModules processed."""
         task_entry = self._create_input_entry()
         status = self._run_task_with_mock_celery(task_function, task_entry.id, task_entry.task_id)
         # check return value
@@ -118,7 +120,7 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
         self.assertEquals(entry.task_state, SUCCESS)
 
     def _test_run_with_no_state(self, task_function, action_name):
-        # run with no StudentModules for the problem
+        """Run with no StudentModules defined for the current problem."""
         self.define_option_problem(PROBLEM_URL_NAME)
         self._test_run_with_task(task_function, action_name, 0)
 
@@ -185,7 +187,7 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
                                           module_state_key=self.problem_url)
 
     def _test_reset_with_student(self, use_email):
-        # run with some StudentModules for the problem
+        """Run a reset task for one student, with several StudentModules for the problem defined."""
         num_students = 10
         initial_attempts = 3
         input_state = json.dumps({'attempts': initial_attempts})
@@ -233,8 +235,7 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
         self._test_reset_with_student(True)
 
     def _test_run_with_failure(self, task_function, expected_message):
-        # run with no StudentModules for the problem,
-        # because we will fail before entering the loop.
+        """Run a task and trigger an artificial failure with give message."""
         task_entry = self._create_input_entry()
         self.define_option_problem(PROBLEM_URL_NAME)
         with self.assertRaises(TestTaskFailure):
@@ -256,8 +257,10 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
         self._test_run_with_failure(delete_problem_state, 'We expected this to fail')
 
     def _test_run_with_long_error_msg(self, task_function):
-        # run with an error message that is so long it will require
-        # truncation (as well as the jettisoning of the traceback).
+        """
+        Run with an error message that is so long it will require
+        truncation (as well as the jettisoning of the traceback).
+        """
         task_entry = self._create_input_entry()
         self.define_option_problem(PROBLEM_URL_NAME)
         expected_message = "x" * 1500
@@ -282,9 +285,11 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
         self._test_run_with_long_error_msg(delete_problem_state)
 
     def _test_run_with_short_error_msg(self, task_function):
-        # run with an error message that is short enough to fit
-        # in the output, but long enough that the traceback won't.
-        # Confirm that the traceback is truncated.
+        """
+        Run with an error message that is short enough to fit
+        in the output, but long enough that the traceback won't.
+        Confirm that the traceback is truncated.
+        """
         task_entry = self._create_input_entry()
         self.define_option_problem(PROBLEM_URL_NAME)
         expected_message = "x" * 900
@@ -330,3 +335,43 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
         self.assertEquals(output['exception'], 'ValueError')
         self.assertTrue("Length of task output is too long" in output['message'])
         self.assertTrue('traceback' not in output)
+
+    @skip
+    def test_rescoring_unrescorable(self):
+        # TODO: this test needs to have Mako templates initialized
+        # to make sure that the creation of an XModule works.
+        input_state = json.dumps({'done': True})
+        num_students = 1
+        self._create_students_with_state(num_students, input_state)
+        task_entry = self._create_input_entry()
+        with self.assertRaises(UpdateProblemModuleStateError):
+            self._run_task_with_mock_celery(rescore_problem, task_entry.id, task_entry.task_id)
+        # check values stored in table:
+        entry = InstructorTask.objects.get(id=task_entry.id)
+        output = json.loads(entry.task_output)
+        self.assertEquals(output['exception'], "UpdateProblemModuleStateError")
+        self.assertEquals(output['message'], "Specified problem does not support rescoring.")
+        self.assertGreater(len(output['traceback']), 0)
+
+    @skip
+    def test_rescoring_success(self):
+        # TODO: this test needs to have Mako templates initialized
+        # to make sure that the creation of an XModule works.
+        input_state = json.dumps({'done': True})
+        num_students = 10
+        self._create_students_with_state(num_students, input_state)
+        task_entry = self._create_input_entry()
+        mock_instance = Mock()
+        mock_instance.rescore_problem = Mock({'success': 'correct'})
+        # TODO: figure out why this mock is not working....
+        with patch('courseware.module_render.get_module_for_descriptor_internal') as mock_get_module:
+            mock_get_module.return_value = mock_instance
+            self._run_task_with_mock_celery(rescore_problem, task_entry.id, task_entry.task_id)
+        # check return value
+        entry = InstructorTask.objects.get(id=task_entry.id)
+        output = json.loads(entry.task_output)
+        self.assertEquals(output.get('attempted'), num_students)
+        self.assertEquals(output.get('updated'), num_students)
+        self.assertEquals(output.get('total'), num_students)
+        self.assertEquals(output.get('action_name'), 'rescored')
+        self.assertGreater('duration_ms', 0)

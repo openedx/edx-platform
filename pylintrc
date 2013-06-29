@@ -35,9 +35,15 @@ load-plugins=
 # it should appear only once).
 disable=
 # Never going to use these
+# I0011: Locally disabling W0232
 # C0301: Line too long
-# W0142: Used * or ** magic
 # W0141: Used builtin function 'map'
+# W0142: Used * or ** magic
+    I0011,C0301,W0141,W0142,
+
+# Django makes classes that trigger these
+# W0232: Class has no __init__ method
+    W0232,
 
 # Might use these when the code is in better shape
 # C0302: Too many lines in module
@@ -50,7 +56,7 @@ disable=
 # R0912: Too many branches
 # R0913: Too many arguments
 # R0914: Too many local variables
-    C0301,C0302,W0141,W0142,R0201,R0901,R0902,R0903,R0904,R0911,R0912,R0913,R0914
+    C0302,R0201,R0901,R0902,R0903,R0904,R0911,R0912,R0913,R0914
 
 
 [REPORTS]

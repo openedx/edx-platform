@@ -75,7 +75,7 @@ class StudentPrefsFactory(DjangoModelFactory):
     field_name = 'existing_field'
     value = json.dumps('old_value')
     student = SubFactory(UserFactory)
-    module_type = 'problem'
+    module_type = 'MockProblemModule'
 
 
 class StudentInfoFactory(DjangoModelFactory):

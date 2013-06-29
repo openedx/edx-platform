@@ -19,7 +19,6 @@ class ChecklistTestCase(CourseTestCase):
         modulestore = get_modulestore(self.course.location)
         return modulestore.get_item(self.course.location).checklists
 
-
     def compare_checklists(self, persisted, request):
         """
         Handles url expansion as possible difference and descends into guts

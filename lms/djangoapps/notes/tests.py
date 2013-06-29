@@ -9,9 +9,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 
 import collections
-import unittest
 import json
-import logging
 
 from . import utils, api, models
 

@@ -1,4 +1,3 @@
-import re
 import json
 import logging
 import static_replace

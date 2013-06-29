@@ -249,7 +249,7 @@ function goto( mode)
     <p>
       Then select an action:
       <input type="submit" name="action" value="Reset student's attempts">
-      %if settings.MITX_FEATURES.get('ENABLE_COURSE_BACKGROUND_TASKS'):
+      %if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
       <input type="submit" name="action" value="Rescore student's problem submission">
       %endif
     </p>
@@ -260,9 +260,9 @@ function goto( mode)
       <input type="submit" name="action" value="Delete student state for module">
     </p>
     %endif
-    %if settings.MITX_FEATURES.get('ENABLE_COURSE_BACKGROUND_TASKS'):
+    %if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
     <p>Rescoring runs in the background, and status for active tasks will appear in a table below.
-       To see status for all tasks submitted for this course and student, click on this button:
+       To see status for all tasks submitted for this problem and student, click on this button:
     </p>
     <p>
       <input type="submit" name="action" value="Show Background Task History for Student">

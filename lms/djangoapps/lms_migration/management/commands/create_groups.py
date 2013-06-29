@@ -5,13 +5,10 @@
 # Create all staff_* groups for classes in data directory.
 
 import os
-import sys
-import string
-import re
 
 from django.core.management.base import BaseCommand
 from django.conf import settings
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import Group
 from path import path
 from lxml import etree
 

@@ -3,7 +3,7 @@ import json
 import logging
 import random
 import re
-import string
+import string       # pylint: disable=W0402
 import fnmatch
 
 from textwrap import dedent
@@ -145,6 +145,7 @@ def external_login_or_signup(request,
 
         eamap.save()
 
+    log.info("External_Auth login_or_signup for %s : %s : %s : %s" % (external_domain, external_id, email, fullname))
     internal_user = eamap.user
     if internal_user is None:
         if settings.MITX_FEATURES.get('AUTH_USE_SHIB'):
@@ -156,24 +157,25 @@ def external_login_or_signup(request,
                     eamap.user = link_user
                     eamap.save()
                     internal_user = link_user
-                    log.debug('Linking existing account for %s' % eamap.external_email)
+                    log.info('SHIB: Linking existing account for %s' % eamap.external_email)
                     # now pass through to log in
                 else:
-                    # otherwise, set external_email to '' to ask for a new one at user signup
-                    eamap.external_email = ''
-                    eamap.save()
-                    log.debug('User with external login found for %s, asking for new email during signup' % email)
-                    return signup(request, eamap)
+                    # otherwise, there must have been an error, b/c we've already linked a user with these external
+                    # creds
+                    failure_msg = _(dedent("""
+                        You have already created an account using an external login like WebAuth or Shibboleth.
+                        Please contact %s for support """
+                                           % getattr(settings, 'TECH_SUPPORT_EMAIL', 'techsupport@class.stanford.edu')))
+                    return default_render_failure(request, failure_msg)
             except User.DoesNotExist:
-                log.debug('No user for %s yet, doing signup' % eamap.external_email)
+                log.info('SHIB: No user for %s yet, doing signup' % eamap.external_email)
                 return signup(request, eamap)
         else:
-            log.debug('No user for %s yet, doing signup' % eamap.external_email)
+            log.info('No user for %s yet, doing signup' % eamap.external_email)
             return signup(request, eamap)
 
     # We trust shib's authentication, so no need to authenticate using the password again
     if settings.MITX_FEATURES.get('AUTH_USE_SHIB'):
-        uname = internal_user.username
         user = internal_user
         # Assuming this 'AUTHENTICATION_BACKENDS' is set in settings, which I think is safe
         if settings.AUTHENTICATION_BACKENDS:
@@ -181,6 +183,7 @@ def external_login_or_signup(request,
         else:
             auth_backend = 'django.contrib.auth.backends.ModelBackend'
         user.backend = auth_backend
+        log.info('SHIB: Logging in linked user %s' % user.email)
     else:
         uname = internal_user.username
         user = authenticate(username=uname, password=eamap.internal_password)
@@ -194,14 +197,13 @@ def external_login_or_signup(request,
         # TODO: improve error page
         msg = 'Account not yet activated: please look for link in your email'
         return default_render_failure(request, msg)
-
     login(request, user)
     request.session.set_expiry(0)
 
     # Now to try enrollment
     # Need to special case Shibboleth here because it logs in via a GET.
     # testing request.method for extra paranoia
-    if 'shib:' in external_domain and request.method == 'GET':
+    if settings.MITX_FEATURES.get('AUTH_USE_SHIB') and 'shib:' in external_domain and request.method == 'GET':
         enroll_request = make_shib_enrollment_request(request)
         student_views.try_change_enrollment(enroll_request)
     else:
@@ -243,8 +245,10 @@ def signup(request, eamap=None):
                'ask_for_tos': True,
                }
 
-    # Can't have terms of service for Stanford users, according to Stanford's Office of General Counsel
-    if settings.MITX_FEATURES['AUTH_USE_SHIB'] and ('stanford' in eamap.external_domain):
+    # Some openEdX instances can't have terms of service for shib users, like
+    # according to Stanford's Office of General Counsel
+    if settings.MITX_FEATURES.get('AUTH_USE_SHIB') and settings.MITX_FEATURES.get('SHIB_DISABLE_TOS') and \
+       ('shib' in eamap.external_domain):
         context['ask_for_tos'] = False
 
     # detect if full name is blank and ask for it from user
@@ -257,7 +261,7 @@ def signup(request, eamap=None):
     except ValidationError:
         context['ask_for_email'] = True
 
-    log.debug('Doing signup for %s' % eamap.external_email)
+    log.info('EXTAUTH: Doing signup for %s' % eamap.external_id)
 
     return student_views.register_user(request, extra_context=context)
 
@@ -371,7 +375,7 @@ def ssl_login(request):
 # -----------------------------------------------------------------------------
 # Shibboleth (Stanford and others.  Uses *Apache* environment variables)
 # -----------------------------------------------------------------------------
-def shib_login(request, retfun=None):
+def shib_login(request):
     """
         Uses Apache's REMOTE_USER environment variable as the external id.
         This in turn typically uses EduPersonPrincipalName
@@ -385,29 +389,31 @@ def shib_login(request, retfun=None):
         """))
 
     if not request.META.get('REMOTE_USER'):
+        log.error("SHIB: no REMOTE_USER found in request.META")
+        return default_render_failure(request, shib_error_msg)
+    elif not request.META.get('Shib-Identity-Provider'):
+        log.error("SHIB: no Shib-Identity-Provider in request.META")
         return default_render_failure(request, shib_error_msg)
     else:
         #if we get here, the user has authenticated properly
-        attrs = ['REMOTE_USER', 'givenName', 'sn', 'mail',
-                 'Shib-Identity-Provider']
-        shib = {}
-
-        for attr in attrs:
-            shib[attr] = request.META.get(attr, '')
+        shib = {attr: request.META.get(attr, '')
+                for attr in ['REMOTE_USER', 'givenName', 'sn', 'mail', 'Shib-Identity-Provider']}
 
         #Clean up first name, last name, and email address
         #TODO: Make this less hardcoded re: format, but split will work
         #even if ";" is not present since we are accessing 1st element
-        shib['sn'] = shib['sn'].split(";")[0].strip().capitalize()
-        shib['givenName'] = shib['givenName'].split(";")[0].strip().capitalize()
+        shib['sn'] = shib['sn'].split(";")[0].strip().capitalize().decode('utf-8')
+        shib['givenName'] = shib['givenName'].split(";")[0].strip().capitalize().decode('utf-8')
+
+    log.info("SHIB creds returned: %r" % shib)
 
     return external_login_or_signup(request,
                                     external_id=shib['REMOTE_USER'],
                                     external_domain="shib:" + shib['Shib-Identity-Provider'],
                                     credentials=shib,
                                     email=shib['mail'],
-                                    fullname="%s %s" % (shib['givenName'], shib['sn']),
-                                    retfun=retfun)
+                                    fullname=u'%s %s' % (shib['givenName'], shib['sn']),
+                                    )
 
 
 def make_shib_enrollment_request(request):

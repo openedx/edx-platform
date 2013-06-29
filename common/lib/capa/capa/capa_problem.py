@@ -103,8 +103,8 @@ class LoncapaProblem(object):
         self.input_state = state.get('input_state', {})
 
         # Convert startouttext and endouttext to proper <text></text>
-        problem_text = re.sub("startouttext\s*/", "text", problem_text)
-        problem_text = re.sub("endouttext\s*/", "/text", problem_text)
+        problem_text = re.sub(r"startouttext\s*/", "text", problem_text)
+        problem_text = re.sub(r"endouttext\s*/", "/text", problem_text)
         self.problem_text = problem_text
 
         # parse problem XML file into an element tree
@@ -373,7 +373,7 @@ class LoncapaProblem(object):
         html = contextualize_text(etree.tostring(self._extract_html(self.tree)), self.context)
         return html
 
-    def handle_input_ajax(self, get):
+    def handle_input_ajax(self, data):
         '''
         InputTypes can support specialized AJAX calls. Find the correct input and pass along the correct data
 
@@ -381,10 +381,10 @@ class LoncapaProblem(object):
         '''
 
         # pull out the id
-        input_id = get['input_id']
+        input_id = data['input_id']
         if self.inputs[input_id]:
-            dispatch = get['dispatch']
-            return self.inputs[input_id].handle_ajax(dispatch, get)
+            dispatch = data['dispatch']
+            return self.inputs[input_id].handle_ajax(dispatch, data)
         else:
             log.warning("Could not find matching input for id: %s" % input_id)
             return {}

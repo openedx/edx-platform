@@ -1,5 +1,5 @@
 """
-Integration Tests for LMS instructor-initiated background tasks
+Integration Tests for LMS instructor-initiated background tasks.
 
 Runs tasks on answers to course problems to validate that code
 paths actually work.
@@ -17,7 +17,6 @@ from django.core.urlresolvers import reverse
 from capa.tests.response_xml_factory import (CodeResponseXMLFactory,
                                              CustomResponseXMLFactory)
 from xmodule.modulestore.tests.factories import ItemFactory
-from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from courseware.model_data import StudentModule
 
