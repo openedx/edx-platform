@@ -34,19 +34,16 @@
         choice.attr("checked", "checked");
         choice.change();
         //need to check it then trigger the change event
-        console.warn(parent_container);
     };
 
     imitate_label = function(event){
         var elt= $(event.target);
         var parent_container = elt.closest('section[id^="forinput"]');
         var choice = parent_container.find("input[type='checkbox'], input[type='radio']");
-    //    console.log(choice);
         if (choice.attr('type')==='radio'){
             choice.attr("checked", "checked");
         }else{
             if(choice.attr('checked')==="checked"){
-                console.log("I'm checked");
                 choice.removeAttr('checked');
             }else{
                 choice.attr("checked", "checked");
