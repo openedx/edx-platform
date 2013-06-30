@@ -334,7 +334,7 @@ body.course.textbooks {
 
           .action-close {
             @include transition(color 0.25s ease-in-out);
-            @include font-size(18);
+            @include font-size(22);
             display: inline-block;
             float: right;
             margin-top: ($baseline*2);
@@ -465,22 +465,43 @@ body.course.textbooks {
 
          }
 
-        .success {
-          color: $green;
+        .message-status {
+          @include border-top-radius(2px);
+          @include box-sizing(border-box);
+          @include font-size(14);
+          display: none;
+          border-bottom: 2px solid $yellow;
+          margin: 0 0 20px 0;
+          padding: 10px 20px;
+          font-weight: 500;
+          background: $paleYellow;
 
-          [class^="icon-"] {
-            @include font-size(20);
+          .text {
             display: inline-block;
-            margin-right: ($baseline/4);
-            vertical-align: text-bottom;
           }
 
+          &.error {
+            border-color: shade($red, 50%);
+            background: tint($red, 20%);
+            color: $white;
+          }
 
+          &.confirm {
+            border-color: shade($green, 50%);
+            background: tint($green, 20%);
+            color: $white;
+          }
+
+          &.is-shown {
+            display: block;
+          }
         }
       }
 
       .actions {
         padding: ($baseline*0.75) $baseline ($baseline/2) $baseline;
+
+
 
         .action-item {
           @extend .t-action4;
@@ -492,7 +513,7 @@ body.course.textbooks {
             margin-right: 0;
           }
         }
-
+/*
         .action-upload {
           @extend .btn-primary-blue;
           color: $white;
@@ -518,6 +539,22 @@ body.course.textbooks {
           }
 
         }
+*/
+
+           .action-primary {
+              @include blue-button();
+              @include font-size(12); // needed due to bad button mixins for now
+              border-color: $blue-d1;
+              color: $white;
+            }
+
+            a {
+              color: $blue;
+
+              &:hover {
+                color: $blue-s2;
+              }
+            }
 
       }
 

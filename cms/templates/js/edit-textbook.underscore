@@ -11,7 +11,7 @@
         <div class="input-wrap field text required add-textbook-name <% if(error && error.attributes && error.attributes.name) { print('error'); } %>">
           <label for="textbook-name-input"><%= gettext("Textbook Name") %></label>
           <input id="textbook-name-input" name="textbook-name" type="text" placeholder="<%= gettext("Introduction to Cookie Baking") %>" value="<%= name %>">
-          <span class="tip tip-stacked"><%= gettext("the title/name of the text book as you would like your students to see it.") %></span>
+          <span class="tip tip-stacked"><%= gettext("provide the title/name of the text book as you would like your students to see it") %></span>
         </div>
   </fieldset>
   <fieldset class="chapters-fields">

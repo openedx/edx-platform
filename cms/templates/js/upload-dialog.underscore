@@ -17,7 +17,6 @@
   <p id="dialog-assetupload-description" class="message"><%= message %></p>
   <input type="file" name="file" />
 
-
     <div class="status-upload">
 
     <% if(uploading) { %>
@@ -31,8 +30,11 @@
     <% } %>
 
     <% if(finished) { %>
-       <p class="success"><i class="icon-ok"></i><%= gettext("Success!") %></p>
+      <div id="upload_confirm" class="message message-status message-status confirm is-shown" name="upload_confirm">
+        <p><%= gettext("Success!") %></p>
+      </div>
     <% } %>
+
     </div>
   </div>
 
@@ -40,10 +42,10 @@
     <h3 class="sr"><%= gettext('Form Actions') %></h3>
   <ul>
   <li class="action-item">
-    <input type="button" class="button action-upload" value="<%= gettext('Upload') %>" <% if (!selectedFile) { %>disabled="disabled"<% } %> />
+    <a href="#" class="button action-primary action-upload <% if (!selectedFile) { %>disabled<% } %>"><%= gettext('Upload') %></a>
   </li>
   <li class="action-item">
-    <input type="button" class="button action-cancel" value="<%= gettext('Cancel') %>" />
+    <a href="#" class="button action-secondary action-cancel"><%= gettext('Cancel') %></a>
   </li>
   </ul>
   </div>
