@@ -860,3 +860,55 @@ class AnnotationInputTest(unittest.TestCase):
 
         self.maxDiff = None
         self.assertDictEqual(context, expected)
+
+
+class TestChoiceText(unittest.TestCase):
+
+    @staticmethod
+    def build_choice(node_type, contents, tail_text, value):
+        choice = {'type': node_type, 'contents': contents, 'tail_text': tail_text, 'value': value}
+        return choice
+
+    def check_group(self, tag, choice_tag, expected_input_type):
+        xml_str = """
+  <{tag}>
+      <{choice_tag} correct="false" name="choiceinput_0">this is<textinput name="choiceinput_0_textinput_0"/>false</{choice_tag}>
+      <choice correct="true" name="choiceinput_1">Is a number<text>!</text></choice>
+  </{tag}>
+        """.format(tag=tag, choice_tag=choice_tag)
+        element = etree.fromstring(xml_str)
+        state = {'value': '{}',
+                 'id': 'choicetext_input',
+                 'status': 'answered'}
+
+        first_input = self.build_choice('textinput', 'choiceinput_0_textinput_0', 'false', '')
+        first_choice_content = self.build_choice('text', 'this is', '', '')
+        second_choice_content = self.build_choice('text', 'Is a number', '', '')
+        second_choice_text = self.build_choice('text', "!", '', '')
+
+        choices = [('choiceinput_0', [first_choice_content, first_input]),
+                   ('choiceinput_1', [second_choice_content, second_choice_text])]
+
+        expected = {'msg': '',
+                    'input_type': expected_input_type,
+                    'choices': choices,
+                    'show_correctness': 'always',
+                    'submitted_message': 'Answer received.'}
+        expected.update(state)
+        the_input = lookup_tag(tag)(test_system(), element, state)
+        context = the_input._get_render_context()
+        self.assertEqual(context, expected)
+
+    def test_radiotextgroup(self):
+        self.check_group('radiotextgroup', 'choice', 'radio')
+
+    def test_checkboxtextgroup(self):
+        self.check_group('checkboxtextgroup', 'choice', 'checkbox')
+
+    def test_invalid_tag(self):
+        with self.assertRaises(Exception):
+            self.check_group('invalid', 'choice', 'checkbox')
+
+    def test_invalid_input_tag(self):
+        with self.assertRaisesRegexp(Exception, "Error in xml"):
+            self.check_group('checkboxtextgroup', 'invalid', 'checkbox')

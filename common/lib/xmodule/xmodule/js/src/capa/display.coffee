@@ -375,6 +375,17 @@ class @Problem
       answer = JSON.parse(answers[answer_id])
       display.showAnswer(answer)
 
+    choicetextgroup: (element, display, answers) =>
+      element = $(element)
+
+      element.find('input').not("[type=hidden]").attr('disabled', 'disabled')
+
+      input_id = element.attr('id').replace(/inputtype_/,'')
+      answer = answers[input_id]
+      for choice in answer
+        #element.find("label[for='#{choice}']").addClass 'choicetextgroup_show_correct'
+        element.find("section#forinput#{choice}").addClass 'choicetextgroup_show_correct'
+
   inputtypeHideAnswerMethods:
     choicegroup: (element, display) =>
       element = $(element)
@@ -382,3 +393,9 @@ class @Problem
 
     javascriptinput: (element, display) =>
       display.hideAnswer()
+
+    choicetextgroup: (element, display) =>
+      element = $(element)
+      element.find('input').not("[type=hidden]").attr('disabled', null)
+      #element.find('label').removeClass('choicetextgroup_show_correct')
+      element.find("section[id^='forinput']").removeClass('choicetextgroup_show_correct')

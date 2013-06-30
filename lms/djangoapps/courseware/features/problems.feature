@@ -21,6 +21,8 @@ Feature: Answer problems
         | formula           |
         | script            |
         | code              |
+        | radio_text        |
+        | checkbox_text     |
 
     Scenario: I can answer a problem incorrectly
         Given External graders respond "incorrect"
@@ -40,6 +42,8 @@ Feature: Answer problems
         | formula           |
         | script            |
         | code              |
+        | radio_text        |
+        | checkbox_text     |
 
     Scenario: I can submit a blank answer
         Given I am viewing a "<ProblemType>" problem
@@ -57,6 +61,8 @@ Feature: Answer problems
         | numerical         |
         | formula           |
         | script            |
+        | radio_text        |
+        | checkbox_text     |
 
 
     Scenario: I can reset a problem
@@ -84,6 +90,10 @@ Feature: Answer problems
         | formula           | incorrect     |
         | script            | correct       |
         | script            | incorrect     |
+        | radio_text        | correct       |
+        | radio_text        | incorrect     |
+        | checkbox_text     | correct       |
+        | checkbox_text     | incorrect     |
 
 
     Scenario: I can answer a problem with one attempt correctly and not reset

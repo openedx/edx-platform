@@ -2097,6 +2097,142 @@ class AnnotationResponse(LoncapaResponse):
             return option_ids[0]
         return None
 
+
+class ChoiceTextResponse(LoncapaResponse):
+
+    """
+    Allows for multiple choice responses with text inputs
+    Desired semantics match those of NumericalResponse and
+    choiceresponse.
+    #TODO allow this to work with scripts and randomization
+    """
+
+    response_tag = 'choicetextresponse'
+    max_inputfields = 1
+    allowed_inputfields = ['choicetextgroup', 'checkboxtextgroup', 'radiotextgroup']
+
+    def setup_response(self):
+        """
+        Sets up three dictionaries for use later:
+        correct_choices: These are the correct binary choices(radio/checkbox)
+        correct_inputs: These are the numerical/string answers for required inputs
+        answer_values: This is for use by show answer, it is a string with correct inputs
+            seperated by commas
+
+        """
+        context = self.context
+        self.correct_choices = {}
+        self.assign_choice_names()
+        self.correct_inputs = {}
+        self.answer_values = {self.answer_id: []}
+        correct_xml = self.xml.xpath('//*[@id=$id]//choice[@correct="true"]',
+                                     id=self.xml.get('id'))
+        for node in correct_xml:
+            parent_name = node.get('name')
+            parent_name = self.answer_id + "_" + parent_name + 'bc'
+            self.correct_choices[parent_name] = {'answer': ''}
+            self.answer_values[self.answer_id].append(parent_name)
+            answer_list = []
+            for child in node:
+                answer = child.get('answer', None)
+                answer = contextualize_text(answer, context)
+                input_name = child.get('name')
+                input_name = self.answer_id + "_" + input_name
+                tolerance = contextualize_text(child.get('tolerance', 0), context)
+                self.correct_inputs[input_name] = {'answer': answer, 'tolerance': tolerance}
+                answer_list.append(answer)
+            self.answer_values[parent_name] = ', '.join(answer_list)
+        self.correct_choices = set(self.correct_choices.keys())
+
+    def assign_choice_names(self):
+        '''
+        Initialize name attributes in <choice> tags for this response.
+        '''
+
+        for index, choice in enumerate(self.xml.xpath('//*[@id=$id]//choice',
+                                                      id=self.xml.get('id'))):
+            choice.set("name", "choiceinput_" + str(index))
+            for ind, child in enumerate(choice.findall('textinput')):
+                child.set("name", "choiceinput_" + str(index) + "_textinput_" + str(ind))
+
+    def get_score(self, student_answers):
+        """
+        Student_answers contains two types of keys, to represent which type of input they are
+        keys ending with bc are binary choice inputs (radiobutton, checkbox)
+        otherwise they are text fields, the input dictionary is split apart
+        and the two are handled seperately
+
+        student answers is a json serialized dict containing these
+        """
+        student_answer = student_answers.get(self.answer_id, "")
+
+        try:
+            answer_dict = json.loads(student_answer)
+        except (TypeError, ValueError):
+            raise StudentInputError("Could not parse answers")
+        binary_choices, text_inputs = self._split_answers_dict(answer_dict)
+
+        choices_correct = self._check_student_choices(binary_choices)
+        #don't bother checking text inputs doing this unless they made the right choice
+        inputs_correct = True
+        for answer_name, params in self.correct_inputs.iteritems():
+            student_answer = text_inputs.get(answer_name, '')
+
+            correct_ans = params['answer']
+            #assume zero tolerance if it isn't specified
+            tolerance = params.get('tolerance', 0)
+            #Here we do the same things as in grading a numerical response...
+            try:
+                correct_ans = complex(correct_ans)
+            except ValueError:
+                log.debug(
+                    "Content error--answer '{0}' is not a valid complex number".format(
+                    correct_ans))
+                raise StudentInputError(
+                    "There was a problem with the staff answer to this problem")
+
+            try:
+                partial_correct = compare_with_tolerance(
+                    evaluator(dict(), dict(), student_answer),
+                    correct_ans, tolerance)
+            except:
+                # Use the traceback-preserving version of re-raising with a
+                # different type
+                _, _, trace = sys.exc_info()
+
+                raise StudentInputError("Could not interpret '{0}' as a number {1}".format(
+                                        cgi.escape(student_answer), trace))
+
+            if not partial_correct:
+                inputs_correct = False
+
+        correct = choices_correct and inputs_correct
+        if correct:
+            return CorrectMap(self.answer_id, 'correct')
+        else:
+            return CorrectMap(self.answer_id, 'incorrect')
+
+    def get_answers(self):
+        return self.answer_values
+
+    def _split_answers_dict(self, a_dict):
+        binary_choices = {}
+        text_choices = {}
+        for k, v in a_dict.iteritems():
+            if(k[-2:] == 'bc'):
+                binary_choices[k] = v
+            else:
+                text_choices[k] = v
+        return (binary_choices, text_choices)
+
+    def _check_student_choices(self, choices):
+        student_choices = set(choices)
+        required_selected = len(self.correct_choices - student_choices) == 0
+        no_extra_selected = len(student_choices - self.correct_choices) == 0
+        correct = required_selected & no_extra_selected
+        return correct
+
+
 #-----------------------------------------------------------------------------
 
 # TEMPORARY: List of all response subclasses
@@ -2116,4 +2252,5 @@ __all__ = [CodeResponse,
            MultipleChoiceResponse,
            TrueFalseResponse,
            JavascriptResponse,
-           AnnotationResponse]
+           AnnotationResponse,
+           ChoiceTextResponse]
