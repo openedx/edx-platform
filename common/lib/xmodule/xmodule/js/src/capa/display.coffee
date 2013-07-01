@@ -223,6 +223,7 @@ class @Problem
             @el.removeClass 'showed'
         else
           @gentle_alert response.success
+      Logger.log 'problem_graded', [@answers, response.contents], @url
 
   reset: =>
     Logger.log 'problem_reset', @answers
