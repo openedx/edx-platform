@@ -1,5 +1,6 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 .searchwrapper {
 	width:45%;
 =======
@@ -19,6 +20,10 @@
 .searchwrapper {
 	width:45%;
 >>>>>>> Refactored some code and added full elasticsearch module test suite
+=======
+.searchwrapper {
+	width:45%;
+>>>>>>> cdffcf3e6beb0d169ffe747d8e5c369a0e11060c
 	padding: 0;
 	margin: 0;
 	position:relative;
@@ -27,10 +32,14 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> cdffcf3e6beb0d169ffe747d8e5c369a0e11060c
 .result-title{
 	text-align: center;
 	word-wrap: normal;
 	padding-top: 175px;
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
 .result-title{
@@ -39,11 +48,14 @@
 >>>>>>> Made prettier, added requirements, and included main edX page
 =======
 >>>>>>> Refactored ES code for readability and ease of testing. Trying to fix firefox svg error
+=======
+>>>>>>> cdffcf3e6beb0d169ffe747d8e5c369a0e11060c
 }
 .searchwrapper form { display: inline; }
 
 .search-results{
 	margin-left: 10%;
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 	margin-top: -150px;
@@ -76,13 +88,18 @@
 =======
 .searchwrapper form { display: inline; }
 =======
+=======
+>>>>>>> cdffcf3e6beb0d169ffe747d8e5c369a0e11060c
 	margin-top: -150px;
 }
 
 .result-content{
 	margin-top: -20px;
 }
+<<<<<<< HEAD
 >>>>>>> Refactored ES code for readability and ease of testing. Trying to fix firefox svg error
+=======
+>>>>>>> cdffcf3e6beb0d169ffe747d8e5c369a0e11060c
 
 .searchbox {
 	border:0;
@@ -93,7 +110,10 @@
 	background: -ms-linear-gradient(top,  #ffffff 0%,#ededed 49%,#fafafa 50%,#ededed 50%,#dcdcdc 100%); /* IE10+ */
 	background: linear-gradient(to bottom,  #ffffff 0%,#ededed 49%,#fafafa 50%,#ededed 50%,#dcdcdc 100%); /* W3C */
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#dcdcdc',GradientType=0 ); /* IE6-9 */
+<<<<<<< HEAD
 >>>>>>> Refactored some code and added full elasticsearch module test suite
+=======
+>>>>>>> cdffcf3e6beb0d169ffe747d8e5c369a0e11060c
 	position:absolute;
 	top:3px;
 	left:0;
@@ -104,6 +124,7 @@
 .searchbox_submit {
 	border: 0;
 	background-color: transparent;
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 	background-size: cover;
@@ -150,6 +171,13 @@
 	left: 210px;
 	/*width: 35px;*/
 >>>>>>> Made prettier, added requirements, and included main edX page
+=======
+	background-size: cover;
+	position: absolute;
+	top: 2.5px;
+	left: 210px;
+	/*width: 35px;*/
+>>>>>>> cdffcf3e6beb0d169ffe747d8e5c369a0e11060c
 }
 
 .searchbox_submit:before{
@@ -178,6 +206,7 @@
 .results_snippet{
 	color: #666666;
 	font-family: "Open Sans", "Arial";
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 	font-weight: 300;
@@ -209,6 +238,8 @@
 	font-weight: 300;
 >>>>>>> Search working, basic functionality and styling in place, as well as csrf protection, snippeting, results highlighting, and spell correction
 =======
+=======
+>>>>>>> cdffcf3e6beb0d169ffe747d8e5c369a0e11060c
 	font-weight: 300;
 	height: 155px;
 	width: 360px;
@@ -223,9 +254,12 @@
 	overflow: hidden;
 	height: 155px;
 <<<<<<< HEAD
+<<<<<<< HEAD
 	width: 400px;
 >>>>>>> Made prettier, added requirements, and included main edX page
 =======
+=======
+>>>>>>> cdffcf3e6beb0d169ffe747d8e5c369a0e11060c
 	width: 360px;
 	margin-left: 15px;
 }
@@ -237,5 +271,8 @@
 
 .columnate{
 	float:left;
+<<<<<<< HEAD
 >>>>>>> Refactored ES code for readability and ease of testing. Trying to fix firefox svg error
+=======
+>>>>>>> cdffcf3e6beb0d169ffe747d8e5c369a0e11060c
 }

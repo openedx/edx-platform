@@ -126,6 +126,10 @@ urlpatterns += (
 
     # Search
     url(r'^search$', 'search.views.search')
+<<<<<<< HEAD
+=======
+
+>>>>>>> cdffcf3e6beb0d169ffe747d8e5c369a0e11060c
 )
 
 # Semi-static views only used by edX, not by themes

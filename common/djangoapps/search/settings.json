@@ -2,6 +2,9 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> cdffcf3e6beb0d169ffe747d8e5c369a0e11060c
 	"mappings": {
 		"properties": {
 			"searchable_text": {
@@ -72,6 +75,9 @@
 				"thumbnail": {
 					"type": "binary"
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> cdffcf3e6beb0d169ffe747d8e5c369a0e11060c
 				}
 			}
 		}
@@ -146,6 +152,7 @@
 		            "name": "english"
 		        }
 		    }
+<<<<<<< HEAD
 =======
 	"settings": {
 		"index": {
@@ -312,3 +319,8 @@
 >>>>>>> Moved past difficulty in file integration and adding configurability to elasticsearch analyzers
 	}
 }
+=======
+		}
+	}
+}
+>>>>>>> cdffcf3e6beb0d169ffe747d8e5c369a0e11060c

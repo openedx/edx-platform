@@ -2,8 +2,11 @@
 	"mappings": {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> Refactored some code and added full elasticsearch module test suite
+=======
+>>>>>>> cdffcf3e6beb0d169ffe747d8e5c369a0e11060c
 		"test-string": {
 			"type": "string",
 			"store": "yes",
@@ -11,6 +14,9 @@
 			"term_vector": "with_positions_offsets"
 		},
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> cdffcf3e6beb0d169ffe747d8e5c369a0e11060c
 
 		"test-float": {
 			"type": "float",
@@ -18,6 +24,7 @@
 		}
 	}
 
+<<<<<<< HEAD
 =======
 		"properties": {
 			"test-string": {
@@ -39,4 +46,6 @@
 =======
 
 >>>>>>> Refactored some code and added full elasticsearch module test suite
+=======
+>>>>>>> cdffcf3e6beb0d169ffe747d8e5c369a0e11060c
 }
