@@ -8,6 +8,70 @@ import xmodule.modulestore.django
 from xmodule.templates import update_templates
 
 
+def mongo_store_config(data_dir):
+    """
+    Defines default module store using MongoModuleStore.
+
+    Use of this config requires mongo to be running.
+    """
+    store = {
+        'default': {
+            'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
+            'OPTIONS': {
+                'default_class': 'xmodule.raw_module.RawDescriptor',
+                'host': 'localhost',
+                'db': 'test_xmodule',
+                'collection': 'modulestore_%s' % uuid4().hex,
+                'fs_root': data_dir,
+                'render_template': 'mitxmako.shortcuts.render_to_string'
+            }
+        }
+    }
+    store['direct'] = store['default']
+    return store
+
+
+def draft_mongo_store_config(data_dir):
+    """
+    Defines default module store using DraftMongoModuleStore.
+    """
+
+    modulestore_options = {
+        'default_class': 'xmodule.raw_module.RawDescriptor',
+        'host': 'localhost',
+        'db': 'test_xmodule',
+        'collection': 'modulestore_%s' % uuid4().hex,
+        'fs_root': data_dir,
+        'render_template': 'mitxmako.shortcuts.render_to_string'
+    }
+
+    return {
+        'default': {
+            'ENGINE': 'xmodule.modulestore.mongo.DraftMongoModuleStore',
+            'OPTIONS': modulestore_options
+        },
+        'direct': {
+            'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
+            'OPTIONS': modulestore_options
+        }
+    }
+
+
+def xml_store_config(data_dir):
+    """
+    Defines default module store using XMLModuleStore.
+    """
+    return {
+        'default': {
+            'ENGINE': 'xmodule.modulestore.xml.XMLModuleStore',
+            'OPTIONS': {
+                'data_dir': data_dir,
+                'default_class': 'xmodule.hidden_module.HiddenDescriptor',
+            }
+        }
+    }
+
+
 class ModuleStoreTestCase(TestCase):
     """ Subclass for any test case that uses the mongodb
     module store. This populates a uniquely named modulestore

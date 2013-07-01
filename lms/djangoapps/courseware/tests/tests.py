@@ -16,7 +16,10 @@ from xmodule.modulestore.xml_importer import import_from_xml
 from xmodule.modulestore.xml import XMLModuleStore
 
 from helpers import LoginEnrollmentTestCase
-from modulestore_config import TEST_DATA_DIR, TEST_DATA_XML_MODULESTORE, TEST_DATA_MONGO_MODULESTORE, TEST_DATA_DRAFT_MONGO_MODULESTORE
+from modulestore_config import TEST_DATA_DIR,\
+    TEST_DATA_XML_MODULESTORE,\
+    TEST_DATA_MONGO_MODULESTORE,\
+    TEST_DATA_DRAFT_MONGO_MODULESTORE
 
 
 class ActivateLoginTest(LoginEnrollmentTestCase):

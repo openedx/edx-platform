@@ -8,12 +8,11 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from courseware.access import _course_staff_group_name
 from courseware.tests.helpers import LoginEnrollmentTestCase
-from courseware.tests.modulestore_config import TEST_DATA_XML_MODULESTORE
+from courseware.tests.modulestore_config import TEST_DATA_MONGO_MODULESTORE
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory
 from student.tests.factories import UserFactory, CourseEnrollmentFactory, AdminFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE, LoginEnrollmentTestCase
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from instructor.views import get_and_clean_student_list, send_mail_to_student
 from django.core import mail
