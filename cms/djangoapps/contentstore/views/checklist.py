@@ -67,7 +67,9 @@ def update_checklist(request, org, course, name, checklist_index=None):
         if checklist_index is not None and 0 <= int(checklist_index) < len(course_module.checklists):
             index = int(checklist_index)
             course_module.checklists[index] = json.loads(request.body)
-            checklists, modified = expand_checklist_action_urls(course_module)
+            # seeming noop which triggers kvs to record that the metadata is not default
+            course_module.checklists = course_module.checklists
+            checklists, _ = expand_checklist_action_urls(course_module)
             modulestore.update_metadata(location, own_metadata(course_module))
             return HttpResponse(json.dumps(checklists[index]), mimetype="application/json")
         else:

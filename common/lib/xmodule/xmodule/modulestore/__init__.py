@@ -16,16 +16,7 @@ log = logging.getLogger('mitx.' + 'modulestore')
 
 
 URL_RE = re.compile("""
-    (?P<tag>[^:]+)://
-    (?P<org>[^/]+)/
-    (?P<course>[^/]+)/
-    (?P<category>[^/]+)/
-    (?P<name>[^@]+)
-    (@(?P<revision>[^/]+))?
-    """, re.VERBOSE)
-
-MISSING_SLASH_URL_RE = re.compile("""
-    (?P<tag>[^:]+):/
+    (?P<tag>[^:]+)://?
     (?P<org>[^/]+)/
     (?P<course>[^/]+)/
     (?P<category>[^/]+)/
@@ -180,13 +171,8 @@ class Location(_LocationBase):
         if isinstance(location, basestring):
             match = URL_RE.match(location)
             if match is None:
-                # cdodge:
-                # check for a dropped slash near the i4x:// element of the location string. This can happen with some
-                # redirects (e.g. edx.org -> www.edx.org which I think happens in Nginx)
-                match = MISSING_SLASH_URL_RE.match(location)
-                if match is None:
-                    log.debug('location is instance of %s but no URL match' % basestring)
-                    raise InvalidLocationError(location)
+                log.debug('location is instance of %s but no URL match' % basestring)
+                raise InvalidLocationError(location)
             groups = match.groupdict()
             check_dict(groups)
             return _LocationBase.__new__(_cls, **groups)
