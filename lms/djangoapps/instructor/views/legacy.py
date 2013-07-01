@@ -34,7 +34,7 @@ from courseware import grades
 from courseware.access import (has_access, get_access_group_name,
                                course_beta_test_group_name)
 from courseware.courses import get_course_with_access, get_cms_course_link_by_id
-from courseware.models import StudentModule
+from courseware.models import StudentModule, OfflineComputedGrade
 from django_comment_common.models import (Role,
                                           FORUM_ROLE_ADMINISTRATOR,
                                           FORUM_ROLE_MODERATOR,
@@ -44,6 +44,7 @@ from instructor.offline_gradecalc import student_grades, offline_grades_availabl
 from instructor.views.tools import strip_if_string
 from instructor_task.api import (get_running_instructor_tasks,
                                  get_instructor_task_history,
+                                 submit_update_offline_grades,
                                  submit_rescore_problem_for_all_students,
                                  submit_rescore_problem_for_student,
                                  submit_reset_problem_attempts_for_all_students,
@@ -203,7 +204,7 @@ def instructor_dashboard(request, course_id):
 
     # process actions from form POST
     action = request.POST.get('action', '')
-    use_offline = request.POST.get('use_offline_grades', False)
+    use_offline = True  # request.POST.get('use_offline_grades', False)
 
     if settings.MITX_FEATURES['ENABLE_MANUAL_GIT_RELOAD']:
         if 'GIT pull' in action:
@@ -233,7 +234,20 @@ def instructor_dashboard(request, course_id):
             except Exception as err:
                 msg += '<br/><p>Error: {0}</p>'.format(escape(err))
 
-    if action == 'Dump list of enrolled students' or action == 'List enrolled students':
+    if action == 'Compute Grades for all Students':
+        log.debug(action)
+        try:
+            instructor_task = submit_update_offline_grades(request, course_id)
+            if instructor_task is None:
+                msg += '<font color="red">Failed to create a background task for grading.</font>'
+            else:
+                track_msg = 'grading all students in {course}'.format(course=course_id)
+                track.views.server_track(request, track_msg, {}, page='idashboard')
+        except Exception as e:
+            log.error("Encountered exception from grading: {0}".format(e))
+            msg += '<font color="red">Failed to create a background task for grading: {0}.</font>'.format(e.message)
+
+    elif action == 'Dump list of enrolled students' or action == 'List enrolled students':
         log.debug(action)
         datatable = get_student_grade_summary_data(request, course, course_id, get_grades=False, use_offline=use_offline)
         datatable['title'] = 'List of students enrolled in {0}'.format(course_id)
@@ -318,6 +332,10 @@ def instructor_dashboard(request, course_id):
         problem_urlname = request.POST.get('problem_for_all_students', '')
         problem_url = get_module_url(problem_urlname)
         message, datatable = get_background_task_table(course_id, problem_url)
+        msg += message
+
+    elif "Show Background Grading Task History" in action:
+        message, datatable = get_background_task_table(course_id, task_type='update_offline_grades')
         msg += message
 
     elif ("Reset student's attempts" in action or
@@ -1096,7 +1114,7 @@ def remove_user_from_group(request, username_or_email, group, group_title, event
     return _add_or_remove_user_group(request, username_or_email, group, group_title, event_name, False)
 
 
-def get_student_grade_summary_data(request, course, course_id, get_grades=True, get_raw_scores=False, use_offline=False):
+def get_student_grade_summary_data(request, course, course_id, get_grades=True, get_raw_scores=False, use_offline=True):
     '''
     Return data arrays with student identity and grades for specified course.
 
@@ -1123,7 +1141,7 @@ def get_student_grade_summary_data(request, course, course_id, get_grades=True, 
     assignments = []
     if get_grades and enrolled_students.count() > 0:
         # just to construct the header
-        gradeset = student_grades(enrolled_students[0], request, course, keep_raw_scores=get_raw_scores, use_offline=use_offline)
+        gradeset = student_grades(enrolled_students[0], request, course)
         # log.debug('student {0} gradeset {1}'.format(enrolled_students[0], gradeset))
         if get_raw_scores:
             assignments += [score.section for score in gradeset['raw_scores']]
@@ -1142,7 +1160,7 @@ def get_student_grade_summary_data(request, course, course_id, get_grades=True, 
             datarow.append('')
 
         if get_grades:
-            gradeset = student_grades(student, request, course, keep_raw_scores=get_raw_scores, use_offline=use_offline)
+            gradeset = student_grades(student, request, course)
             log.debug('student={0}, gradeset={1}'.format(student, gradeset))
             if get_raw_scores:
                 # TODO (ichuang) encode Score as dict instead of as list, so score[0] -> score['earned']
@@ -1611,3 +1629,30 @@ def get_background_task_table(course_id, problem_url=None, student=None, task_ty
             datatable['title'] = "{course_id} > {location}".format(course_id=course_id, location=problem_url)
 
     return msg, datatable
+
+
+def offline_grades_available(course_id):
+    '''
+    Returns None if no offline grades available for specified course.
+    Otherwise returns latest log field entry about the available pre-computed grades.
+    '''
+    history_entries = get_instructor_task_history(course_id, task_type='update_offline_grades')
+    # TODO: figure out what to do if the last history entry was not successful.
+    if not history_entries:
+        return None
+    return history_entries.latest('created')
+
+
+def student_grades(student, request, course):
+    '''
+    This is the main interface to get grades.
+
+    This will look for an offline computed gradeset in the DB.
+    '''
+    try:
+        ocg = OfflineComputedGrade.objects.get(user=student, course_id=course.id)
+    except OfflineComputedGrade.DoesNotExist:
+        return dict(raw_scores=[], section_breakdown=[],
+                    msg='Error: no offline gradeset available for %s, %s' % (student, course.id))
+    else:
+        return json.loads(ocg.gradeset)

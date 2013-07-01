@@ -150,14 +150,20 @@ function goto( mode)
 ##-----------------------------------------------------------------------------
 %if modeflag.get('Grades'):
 
-    %if offline_grade_log:
-      <p>
-        <span class="copy-warning">Pre-computed grades ${offline_grade_log} available: Use?
-          <input type='checkbox' name='use_offline_grades' value='${_("yes")}'>
-        </span>
-      </p>
-    %endif
+    <p>To pre-compute grades in the background, click this button.
+    Once computed, grades can be downloaded.  They also can be recomputed.</p>
+    <p>
+      <input type="submit" name="action" value="Compute Grades for all Students">
+    </p>
+    <p>These actions run in the background, and status for active tasks will appear in a table below.
+       To see status for all grading tasks submitted for this course, click on this button:
+    </p>
+    <p>
+      <input type="submit" name="action" value="Show Background Grading Task History">
+    </p>
 
+ %if offline_grade_log:
+      <p><font color='orange'>Pre-computed grades ${offline_grade_log} available.
 
     <hr width="40%" style="align:left">
     <h2>${_("Grade Downloads")}</h2>
@@ -240,6 +246,8 @@ function goto( mode)
     <hr width="40%" style="align:left">
 
   %endif
+ %endif
+
   %if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
     <H2>${_("Course-specific grade adjustment")}</h2>
 
