@@ -93,6 +93,11 @@ def reset_data(scenario):
 
 @after.each_scenario
 def reset_databases(scenario):
+    '''
+    After each scenario, all databases are cleared/dropped.  Contentstore data are stored in unique databases
+    whereas modulestore data is in unique collection names.  This data is created implicitly during the scenarios.
+    If no data is created during the test, these lines equivilently do nothing.
+    '''
     mongo = MongoClient()
     mongo.drop_database(settings.CONTENTSTORE['OPTIONS']['db'])
     _CONTENTSTORE.clear()
