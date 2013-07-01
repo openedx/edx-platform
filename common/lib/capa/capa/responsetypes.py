@@ -2175,36 +2175,37 @@ class ChoiceTextResponse(LoncapaResponse):
         choices_correct = self._check_student_choices(binary_choices)
         #don't bother checking text inputs doing this unless they made the right choice
         inputs_correct = True
-        for answer_name, params in self.correct_inputs.iteritems():
-            student_answer = text_inputs.get(answer_name, '')
+        if choices_correct:
+            for answer_name, params in self.correct_inputs.iteritems():
+                student_answer = text_inputs.get(answer_name, '')
 
-            correct_ans = params['answer']
-            #assume zero tolerance if it isn't specified
-            tolerance = params.get('tolerance', '0')
-            #Here we do the same things as in grading a numerical response...
-            try:
-                correct_ans = complex(correct_ans)
-            except ValueError:
-                log.debug(
-                    "Content error--answer '{0}' is not a valid complex number".format(
-                    correct_ans))
-                raise StudentInputError(
-                    "There was a problem with the staff answer to this problem")
+                correct_ans = params['answer']
+                #assume zero tolerance if it isn't specified
+                tolerance = params.get('tolerance', '0')
+                #Here we do the same things as in grading a numerical response...
+                try:
+                    correct_ans = complex(correct_ans)
+                except ValueError:
+                    log.debug(
+                        "Content error--answer '{0}' is not a valid complex number".format(
+                        correct_ans))
+                    raise StudentInputError(
+                        "There was a problem with the staff answer to this problem")
 
-            try:
-                partial_correct = compare_with_tolerance(
-                    evaluator(dict(), dict(), student_answer),
-                    correct_ans, tolerance)
-            except:
-                # Use the traceback-preserving version of re-raising with a
-                # different type
-                _, _, trace = sys.exc_info()
+                try:
+                    partial_correct = compare_with_tolerance(
+                        evaluator(dict(), dict(), student_answer),
+                        correct_ans, tolerance)
+                except:
+                    # Use the traceback-preserving version of re-raising with a
+                    # different type
+                    _, _, trace = sys.exc_info()
 
-                raise StudentInputError("Could not interpret '{0}' as a number {1}".format(
-                                        cgi.escape(student_answer), trace))
+                    raise StudentInputError("Could not interpret '{0}' as a number {1}".format(
+                                            cgi.escape(student_answer), trace))
 
-            if not partial_correct:
-                inputs_correct = False
+                if not partial_correct:
+                    inputs_correct = False
 
         correct = choices_correct and inputs_correct
         if correct:

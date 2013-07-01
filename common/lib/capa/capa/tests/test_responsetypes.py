@@ -1609,7 +1609,7 @@ class ChoiceTextResponseTest(ResponseTest):
         with self.assertRaisesRegexp(StudentInputError,
                                      "There was a problem with the staff answer to this problem"):
             self.assert_grade(broken_problem,
-                              make_answers(make_answer_dict([(True, ["1"]), (False, ["1"])])),
+                              make_answers(make_answer_dict([(True, ["1"]), (True, ["1"])])),
                               "correct")
 
         for name, inputs in test_inputs.iteritems():
