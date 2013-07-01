@@ -344,6 +344,21 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         err_cnt = perform_xlint('common/test/data', ['full'])
         self.assertGreater(err_cnt, 0)
 
+    def test_module_preview(self):
+        '''
+        Tests the ajax callback to render an XModule
+        '''
+        direct_store = modulestore('direct')
+        import_from_xml(direct_store, 'common/test/data/', ['full'])
+
+        html_module_location = Location(['i4x', 'edX', 'full', 'html', 'html_90', None])
+
+        url = reverse('preview_component', kwargs={'location': html_module_location.url()})
+
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn('Inline content', resp.content)
+
     def test_delete(self):
         direct_store = modulestore('direct')
         import_from_xml(direct_store, 'common/test/data/', ['full'])
