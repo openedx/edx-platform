@@ -119,7 +119,7 @@ class @Sequence
         current_sequential: @position
         target_sequential: new_position
 
-      # On Sequence chage, destroy any existing polling thread
+      # On Sequence change, destroy any existing polling thread
       #   for queued submissions, see ../capa/display.coffee
       if window.queuePollerID
         window.clearTimeout(window.queuePollerID)
