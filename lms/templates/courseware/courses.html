@@ -27,6 +27,14 @@
   <section class="container">
     ## I'm removing this for now since we aren't using it for the fall.
     ## <%include file="course_filter.html" />
+<br>
+    <section >
+	<form style="font-family:arial;color:#4A4A4A;font-size:20px;font-weight:bold" action="/search_course/" method="GET">
+	<input type="text" name="search">
+	<input type="submit" value="Search">
+	</form>
+	
+    </section>
     <section class="courses">
       <ul class="courses-listing">
         %for course in courses:
