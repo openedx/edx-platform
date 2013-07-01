@@ -4,12 +4,6 @@ Instructor Dashboard Views
 TODO add tracking
 """
 
-import csv
-import json
-import logging
-import os
-import re
-import requests
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
 from mitxmako.shortcuts import render_to_response
@@ -17,12 +11,13 @@ from django.core.urlresolvers import reverse
 from django.utils.html import escape
 from django.http import Http404
 
-from django.conf import settings
-from courseware.access import has_access, get_access_group_name, course_beta_test_group_name
+from courseware.access import has_access
 from courseware.courses import get_course_by_id
 from django_comment_client.utils import has_forum_access
-from instructor.offline_gradecalc import student_grades, offline_grades_available
-from django_comment_common.models import Role, FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA
+from django_comment_common.models import (Role,
+                                          FORUM_ROLE_ADMINISTRATOR,
+                                          FORUM_ROLE_MODERATOR,
+                                          FORUM_ROLE_COMMUNITY_TA)
 from xmodule.modulestore.django import modulestore
 from student.models import CourseEnrollment
 
@@ -36,9 +31,12 @@ def instructor_dashboard_2(request, course_id):
 
     access = {
         'admin': request.user.is_staff,
-        'instructor':  has_access(request.user, course, 'instructor'),  # an instructor can manage staff lists
-        'staff':       has_access(request.user, course, 'staff'),
-        'forum_admin': has_forum_access(request.user, course_id, FORUM_ROLE_ADMINISTRATOR),
+        # an instructor can manage staff lists
+        'instructor': has_access(request.user, course, 'instructor'),
+        'staff': has_access(request.user, course, 'staff'),
+        'forum_admin': has_forum_access(
+            request.user, course_id, FORUM_ROLE_ADMINISTRATOR
+        ),
     }
 
     if not access['staff']:
@@ -107,7 +105,7 @@ def _section_membership(course_id, access):
         'section_key': 'membership',
         'section_display_name': 'Membership',
         'access': access,
-        'enroll_button_url':   reverse('students_update_enrollment_email', kwargs={'course_id': course_id}),
+        'enroll_button_url': reverse('students_update_enrollment_email', kwargs={'course_id': course_id}),
         'unenroll_button_url': reverse('students_update_enrollment_email', kwargs={'course_id': course_id}),
         'list_course_role_members_url': reverse('list_course_role_members', kwargs={'course_id': course_id}),
         'access_allow_revoke_url': reverse('access_allow_revoke', kwargs={'course_id': course_id}),
@@ -136,7 +134,7 @@ def _section_data_download(course_id):
     section_data = {
         'section_key': 'data_download',
         'section_display_name': 'Data Download',
-        'grading_config_url':             reverse('grading_config', kwargs={'course_id': course_id}),
+        'grading_config_url': reverse('grading_config', kwargs={'course_id': course_id}),
         'enrolled_students_profiles_url': reverse('enrolled_students_profiles', kwargs={'course_id': course_id}),
     }
     return section_data

@@ -16,8 +16,14 @@ def create_csv_response(filename, header, datarows):
     datarows e.g. [['Jim', 'jim@edy.org'], ['Jake', 'jake@edy.org'], ...]
     """
     response = HttpResponse(mimetype='text/csv')
-    response['Content-Disposition'] = 'attachment; filename={0}'.format(filename)
-    csvwriter = csv.writer(response, dialect='excel', quotechar='"', quoting=csv.QUOTE_ALL)
+    response['Content-Disposition'] = 'attachment; filename={0}'\
+        .format(filename)
+    csvwriter = csv.writer(
+        response,
+        dialect='excel',
+        quotechar='"',
+        quoting=csv.QUOTE_ALL)
+
     csvwriter.writerow(header)
     for datarow in datarows:
         encoded_row = [unicode(s).encode('utf-8') for s in datarow]
@@ -56,14 +62,15 @@ def format_dictlist(dictlist):
     else:
         header = []
 
-    def dict_to_entry(d):
-        ordered = sorted(d.items(), key=lambda (k, v): header.index(k))
-        vals = map(lambda (k, v): v, ordered)
+    def dict_to_entry(dct):
+        """ Convert dictionary to list for a csv row """
+        ordered = sorted(dct.items(), key=lambda (k, v): header.index(k))
+        vals = [v for (_, v) in ordered]
         return vals
 
     datarows = map(dict_to_entry, dictlist)
 
     return {
-        'header':   header,
+        'header': header,
         'datarows': datarows,
     }

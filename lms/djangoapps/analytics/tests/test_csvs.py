@@ -1,3 +1,5 @@
+""" Tests for analytics.csvs """
+
 from django.test import TestCase
 
 from analytics.csvs import create_csv_response, format_dictlist
@@ -56,7 +58,6 @@ class TestAnalyticsCSVS(TestCase):
         }
 
         self.assertEqual(format_dictlist(data_in), data_out)
-
 
     def test_format_dictlist_empty(self):
         self.assertEqual(format_dictlist([]), {

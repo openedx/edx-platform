@@ -28,10 +28,10 @@ def enroll_emails(course_id, student_emails, auto_enroll=False):
     auto_string = {False: 'allowed', True: 'willautoenroll'}[auto_enroll]
 
     status_map = {
-        'user/ce/alreadyenrolled':   [],
-        'user/!ce/enrolled':         [],
-        'user/!ce/rejected':         [],
-        '!user/cea/' + auto_string:  [],
+        'user/ce/alreadyenrolled': [],
+        'user/!ce/enrolled': [],
+        'user/!ce/rejected': [],
+        '!user/cea/' + auto_string: [],
         '!user/!cea/' + auto_string: [],
     }
 
@@ -48,11 +48,11 @@ def enroll_emails(course_id, student_emails, auto_enroll=False):
             except CourseEnrollment.DoesNotExist:
                 # status: user/!ce/enrolled
                 try:
-                    ce = CourseEnrollment(user=user, course_id=course_id)
-                    ce.save()
+                    cenr = CourseEnrollment(user=user, course_id=course_id)
+                    cenr.save()
                     status_map['user/!ce/enrolled'].append(student_email)
                 # status: user/!ce/rejected
-                except:
+                except Exception:
                     status_map['user/!ce/rejected'].append(student_email)
         # status: !user
         except User.DoesNotExist:
@@ -106,9 +106,9 @@ def unenroll_emails(course_id, student_emails):
 
         # delete CourseEnrollment
         try:
-            ce = CourseEnrollment.objects.get(course_id=course_id, user__email=student_email)
+            cenr = CourseEnrollment.objects.get(course_id=course_id, user__email=student_email)
             try:
-                ce.delete()
+                cenr.delete()
                 status_map['ce/unenrolled'].append(student_email)
             except Exception:
                 status_map['ce/rejected'].append(student_email)

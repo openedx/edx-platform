@@ -3,7 +3,7 @@ Unit tests for instructor.enrollment methods.
 """
 
 import json
-from django.contrib.auth.models import Group, User
+from django.contrib.auth.models import User
 # from courseware.access import _course_staff_group_name
 from courseware.models import StudentModule
 from django.test import TestCase
@@ -25,13 +25,13 @@ class TestInstructorEnrollmentDB(TestCase):
         strings.append("Lorem@ipsum.dolor, sit@amet.consectetur\nadipiscing@elit.Aenean\r convallis@at.lacus\r, ut@lacinia.Sed")
         lists.append(['Lorem@ipsum.dolor', 'sit@amet.consectetur', 'adipiscing@elit.Aenean', 'convallis@at.lacus', 'ut@lacinia.Sed'])
 
-        for (s, l) in zip(strings, lists):
-            self.assertEqual(split_input_list(s), l)
+        for (stng, lst) in zip(strings, lists):
+            self.assertEqual(split_input_list(stng), lst)
 
     def test_enroll_emails_userexists_alreadyenrolled(self):
         user = UserFactory()
-        ce = CourseEnrollment(course_id=self.course_id, user=user)
-        ce.save()
+        cenr = CourseEnrollment(course_id=self.course_id, user=user)
+        cenr.save()
 
         self.assertEqual(CourseEnrollment.objects.filter(course_id=self.course_id, user__email=user.email).count(), 1)
 
@@ -49,7 +49,7 @@ class TestInstructorEnrollmentDB(TestCase):
         self.assertEqual(CourseEnrollment.objects.filter(course_id=self.course_id, user__email=user.email).count(), 1)
 
     def test_enroll_emails_nouser_alreadyallowed(self):
-        email_without_user = 'test_enroll_emails_nouser_alreadyallowed@test.org'
+        email_without_user = 'robot_enroll_emails_nouser_alreadyallowed@test.org'
 
         self.assertEqual(User.objects.filter(email=email_without_user).count(), 0)
         self.assertEqual(CourseEnrollment.objects.filter(course_id=self.course_id, user__email=email_without_user).count(), 0)
@@ -65,7 +65,7 @@ class TestInstructorEnrollmentDB(TestCase):
         self.assertEqual(CourseEnrollmentAllowed.objects.get(course_id=self.course_id, email=email_without_user).auto_enroll, False)
 
     def test_enroll_emails_nouser_suceedallow(self):
-        email_without_user = 'test_enroll_emails_nouser_suceedallow@test.org'
+        email_without_user = 'robot_enroll_emails_nouser_suceedallow@test.org'
 
         self.assertEqual(User.objects.filter(email=email_without_user).count(), 0)
         self.assertEqual(CourseEnrollment.objects.filter(course_id=self.course_id, user__email=email_without_user).count(), 0)
@@ -81,9 +81,9 @@ class TestInstructorEnrollmentDB(TestCase):
         user1 = UserFactory()
         user2 = UserFactory()
         user3 = UserFactory()
-        email_without_user1 = 'test_enroll_emails_nouser_suceedallow_1@test.org'
-        email_without_user2 = 'test_enroll_emails_nouser_suceedallow_2@test.org'
-        email_without_user3 = 'test_enroll_emails_nouser_suceedallow_3@test.org'
+        email_without_user1 = 'robot_enroll_emails_nouser_suceedallow_1@test.org'
+        email_without_user2 = 'robot_enroll_emails_nouser_suceedallow_2@test.org'
+        email_without_user3 = 'robot_enroll_emails_nouser_suceedallow_3@test.org'
 
         def test_db(auto_enroll):
             for user in [user1, user2, user3]:
@@ -101,7 +101,7 @@ class TestInstructorEnrollmentDB(TestCase):
         test_db(False)
 
     def test_unenroll_alreadyallowed(self):
-        email_without_user = 'test_unenroll_alreadyallowed@test.org'
+        email_without_user = 'robot_unenroll_alreadyallowed@test.org'
         cea = CourseEnrollmentAllowed(course_id=self.course_id, email=email_without_user, auto_enroll=False)
         cea.save()
 
@@ -113,8 +113,8 @@ class TestInstructorEnrollmentDB(TestCase):
 
     def test_unenroll_alreadyenrolled(self):
         user = UserFactory()
-        ce = CourseEnrollment(course_id=self.course_id, user=user)
-        ce.save()
+        cenr = CourseEnrollment(course_id=self.course_id, user=user)
+        cenr.save()
 
         unenroll_emails(self.course_id, [user.email])
 
@@ -130,7 +130,7 @@ class TestInstructorEnrollmentDB(TestCase):
         self.assertEqual(CourseEnrollmentAllowed.objects.filter(course_id=self.course_id, email=user.email).count(), 0)
 
     def test_unenroll_nosuchuser(self):
-        email_without_user = 'test_unenroll_nosuchuser@test.org'
+        email_without_user = 'robot_unenroll_nosuchuser@test.org'
 
         unenroll_emails(self.course_id, [email_without_user])
 

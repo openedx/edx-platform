@@ -1,8 +1,8 @@
+""" Tests for analytics.distributions """
+
 from django.test import TestCase
 from nose.tools import raises
-from django.contrib.auth.models import User, Group
 from student.models import CourseEnrollment
-from xmodule.modulestore.tests.factories import CourseFactory
 from student.tests.factories import UserFactory
 
 from analytics.distributions import profile_distribution, AVAILABLE_PROFILE_FEATURES

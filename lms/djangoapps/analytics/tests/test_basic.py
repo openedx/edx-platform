@@ -1,14 +1,16 @@
+"""
+Tests for instructor.basic
+"""
+
 from django.test import TestCase
-from django.contrib.auth.models import User, Group
 from student.models import CourseEnrollment
-from xmodule.modulestore.tests.factories import CourseFactory
 from student.tests.factories import UserFactory
 
 from analytics.basic import enrolled_students_profiles, AVAILABLE_FEATURES, STUDENT_FEATURES, PROFILE_FEATURES
 
 
 class TestAnalyticsBasic(TestCase):
-    '''Test basic analytics functions.'''
+    """ Test basic analytics functions. """
 
     def setUp(self):
         self.course_id = 'some/robot/course/id'

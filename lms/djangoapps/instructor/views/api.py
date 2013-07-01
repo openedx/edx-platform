@@ -52,7 +52,9 @@ def students_update_enrollment_email(request, course_id):
     - emails is string containing a list of emails separated by anything split_input_list can handle.
     - auto_enroll is a boolean (defaults to false)
     """
-    course = get_course_with_access(request.user, course_id, 'staff', depth=None)
+    course = get_course_with_access(
+        request.user, course_id, 'staff', depth=None
+    )
 
     action = request.GET.get('action')
     emails = split_input_list(request.GET.get('emails'))
@@ -66,11 +68,13 @@ def students_update_enrollment_email(request, course_id):
         raise ValueError("unrecognized action '{}'".format(action))
 
     response_payload = {
-        'action':      action,
-        'results':     results,
+        'action': action,
+        'results': results,
         'auto_enroll': auto_enroll,
     }
-    response = HttpResponse(json.dumps(response_payload), content_type="application/json")
+    response = HttpResponse(
+        json.dumps(response_payload), content_type="application/json"
+    )
     return response
 
 
@@ -87,7 +91,9 @@ def access_allow_revoke(request, course_id):
     rolename is one of ['instructor', 'staff', 'beta']
     mode is one of ['allow', 'revoke']
     """
-    course = get_course_with_access(request.user, course_id, 'instructor', depth=None)
+    course = get_course_with_access(
+        request.user, course_id, 'instructor', depth=None
+    )
 
     email = request.GET.get('email')
     rolename = request.GET.get('rolename')
@@ -105,7 +111,9 @@ def access_allow_revoke(request, course_id):
     response_payload = {
         'DONE': 'YES',
     }
-    response = HttpResponse(json.dumps(response_payload), content_type="application/json")
+    response = HttpResponse(
+        json.dumps(response_payload), content_type="application/json"
+    )
     return response
 
 
@@ -118,7 +126,9 @@ def list_course_role_members(request, course_id):
 
     rolename is one of ['instructor', 'staff', 'beta']
     """
-    course = get_course_with_access(request.user, course_id, 'staff', depth=None)
+    course = get_course_with_access(
+        request.user, course_id, 'staff', depth=None
+    )
 
     rolename = request.GET.get('rolename')
 
@@ -134,10 +144,14 @@ def list_course_role_members(request, course_id):
         }
 
     response_payload = {
-        'course_id':   course_id,
-        rolename:  map(extract_user_info, access.list_with_level(course, rolename)),
+        'course_id': course_id,
+        rolename: map(extract_user_info, access.list_with_level(
+            course, rolename
+        )),
     }
-    response = HttpResponse(json.dumps(response_payload), content_type="application/json")
+    response = HttpResponse(
+        json.dumps(response_payload), content_type="application/json"
+    )
     return response
 
 
@@ -149,14 +163,18 @@ def grading_config(request, course_id):
 
     TODO maybe this shouldn't be html already
     """
-    course = get_course_with_access(request.user, course_id, 'staff', depth=None)
+    course = get_course_with_access(
+        request.user, course_id, 'staff', depth=None
+    )
     grading_config_summary = analytics.basic.dump_grading_context(course)
 
     response_payload = {
         'course_id': course_id,
         'grading_config_summary': grading_config_summary,
     }
-    response = HttpResponse(json.dumps(response_payload), content_type="application/json")
+    response = HttpResponse(
+        json.dumps(response_payload), content_type="application/json"
+    )
     return response
 
 
@@ -170,7 +188,9 @@ def enrolled_students_profiles(request, course_id, csv=False):
 
     TODO accept requests for different attribute sets
     """
-    course = get_course_with_access(request.user, course_id, 'staff', depth=None)
+    course = get_course_with_access(
+        request.user, course_id, 'staff', depth=None
+    )
 
     available_features = analytics.basic.AVAILABLE_FEATURES
     query_features = ['username', 'name', 'email', 'language', 'location', 'year_of_birth', 'gender',
@@ -180,13 +200,15 @@ def enrolled_students_profiles(request, course_id, csv=False):
 
     if not csv:
         response_payload = {
-            'course_id':          course_id,
-            'students':           student_data,
-            'students_count':     len(student_data),
-            'queried_features':   query_features,
+            'course_id': course_id,
+            'students': student_data,
+            'students_count': len(student_data),
+            'queried_features': query_features,
             'available_features': available_features,
         }
-        response = HttpResponse(json.dumps(response_payload), content_type="application/json")
+        response = HttpResponse(
+            json.dumps(response_payload), content_type="application/json"
+        )
         return response
     else:
         formatted = analytics.csvs.format_dictlist(student_data)
@@ -213,7 +235,9 @@ def profile_distribution(request, course_id):
     TODO how should query parameter interpretation work?
     TODO respond to csv requests as well
     """
-    course = get_course_with_access(request.user, course_id, 'staff', depth=None)
+    course = get_course_with_access(
+        request.user, course_id, 'staff', depth=None
+    )
 
     try:
         features = json.loads(request.GET.get('features'))
@@ -230,17 +254,19 @@ def profile_distribution(request, course_id):
             raise e
 
     response_payload = {
-        'course_id':          course_id,
-        'queried_features':   features,
+        'course_id': course_id,
+        'queried_features': features,
         'available_features': analytics.distributions.AVAILABLE_PROFILE_FEATURES,
-        'display_names':      {
+        'display_names': {
             'gender': 'Gender',
             'level_of_education': 'Level of Education',
             'year_of_birth': 'Year Of Birth',
         },
-        'feature_results':    feature_results,
+        'feature_results': feature_results,
     }
-    response = HttpResponse(json.dumps(response_payload), content_type="application/json")
+    response = HttpResponse(
+        json.dumps(response_payload), content_type="application/json"
+    )
     return response
 
 
@@ -256,7 +282,9 @@ def get_student_progress_url(request, course_id):
         'progress_url': '/../...'
     }
     """
-    course = get_course_with_access(request.user, course_id, 'staff', depth=None)
+    course = get_course_with_access(
+        request.user, course_id, 'staff', depth=None
+    )
 
     student_email = request.GET.get('student_email')
     if not student_email:
@@ -267,10 +295,12 @@ def get_student_progress_url(request, course_id):
     progress_url = reverse('student_progress', kwargs={'course_id': course_id, 'student_id': user.id})
 
     response_payload = {
-        'course_id':    course_id,
+        'course_id': course_id,
         'progress_url': progress_url,
     }
-    response = HttpResponse(json.dumps(response_payload), content_type="application/json")
+    response = HttpResponse(
+        json.dumps(response_payload), content_type="application/json"
+    )
     return response
 
 
@@ -284,7 +314,9 @@ def redirect_to_student_progress(request, course_id):
 
     Takes query parameter student_email
     """
-    course = get_course_with_access(request.user, course_id, 'staff', depth=None)
+    course = get_course_with_access(
+        request.user, course_id, 'staff', depth=None
+    )
 
     student_email = request.GET.get('student_email')
     if not student_email:
@@ -295,10 +327,12 @@ def redirect_to_student_progress(request, course_id):
     progress_url = reverse('student_progress', kwargs={'course_id': course_id, 'student_id': user.id})
 
     response_payload = {
-        'course_id':    course_id,
+        'course_id': course_id,
         'progress_url': progress_url,
     }
-    response = HttpResponse(json.dumps(response_payload), content_type="application/json")
+    response = HttpResponse(
+        json.dumps(response_payload), content_type="application/json"
+    )
     return response
 
 
@@ -316,7 +350,9 @@ def reset_student_attempts(request, course_id):
         - all_students is a boolean
         - delete_module is a boolean
     """
-    course = get_course_with_access(request.user, course_id, 'staff', depth=None)
+    course = get_course_with_access(
+        request.user, course_id, 'staff', depth=None
+    )
 
     problem_to_reset = request.GET.get('problem_to_reset')
     student_email = request.GET.get('student_email')
@@ -345,7 +381,9 @@ def reset_student_attempts(request, course_id):
     else:
         return HttpResponseBadRequest()
 
-    response = HttpResponse(json.dumps(response_payload), content_type="application/json")
+    response = HttpResponse(
+        json.dumps(response_payload), content_type="application/json"
+    )
     return response
 
 
@@ -364,7 +402,9 @@ def rescore_problem(request, course_id):
 
     all_students will be ignored if student_email is present
     """
-    course = get_course_with_access(request.user, course_id, 'staff', depth=None)
+    course = get_course_with_access(
+        request.user, course_id, 'staff', depth=None
+    )
 
     problem_to_reset = request.GET.get('problem_to_reset')
     student_email = request.GET.get('student_email', False)
@@ -389,7 +429,9 @@ def rescore_problem(request, course_id):
     else:
         return HttpResponseBadRequest()
 
-    response = HttpResponse(json.dumps(response_payload), content_type="application/json")
+    response = HttpResponse(
+        json.dumps(response_payload), content_type="application/json"
+    )
     return response
 
 
@@ -404,7 +446,9 @@ def list_instructor_tasks(request, course_id):
         - (optional) problem_urlname (same format as problem_to_reset in other api methods)
         - (optional) student_email
     """
-    course = get_course_with_access(request.user, course_id, 'instructor', depth=None)
+    course = get_course_with_access(
+        request.user, course_id, 'instructor', depth=None
+    )
 
     problem_urlname = request.GET.get('problem_urlname', False)
     student_email = request.GET.get('student_email', False)
@@ -429,7 +473,9 @@ def list_instructor_tasks(request, course_id):
     response_payload = {
         'tasks': map(extract_task_features, tasks),
     }
-    response = HttpResponse(json.dumps(response_payload), content_type="application/json")
+    response = HttpResponse(
+        json.dumps(response_payload), content_type="application/json"
+    )
     return response
 
 
@@ -442,7 +488,9 @@ def list_forum_members(request, course_id):
 
     Takes query parameter rolename
     """
-    course = get_course_with_access(request.user, course_id, 'staff', depth=None)
+    course = get_course_with_access(
+        request.user, course_id, 'staff', depth=None
+    )
 
     rolename = request.GET.get('rolename')
 
@@ -465,9 +513,11 @@ def list_forum_members(request, course_id):
 
     response_payload = {
         'course_id': course_id,
-        rolename:   map(extract_user_info, users),
+        rolename: map(extract_user_info, users),
     }
-    response = HttpResponse(json.dumps(response_payload), content_type="application/json")
+    response = HttpResponse(
+        json.dumps(response_payload), content_type="application/json"
+    )
     return response
 
 
@@ -483,7 +533,9 @@ def update_forum_role_membership(request, course_id):
     rolename is one of [FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA]
     mode is one of ['allow', 'revoke']
     """
-    course = get_course_with_access(request.user, course_id, 'instructor', depth=None)
+    course = get_course_with_access(
+        request.user, course_id, 'instructor', depth=None
+    )
 
     email = request.GET.get('email')
     rolename = request.GET.get('rolename')
@@ -500,10 +552,12 @@ def update_forum_role_membership(request, course_id):
 
     response_payload = {
         'course_id': course_id,
-        'mode':      mode,
+        'mode': mode,
         'DONE': 'YES',
     }
-    response = HttpResponse(json.dumps(response_payload), content_type="application/json")
+    response = HttpResponse(
+        json.dumps(response_payload), content_type="application/json"
+    )
     return response
 
 

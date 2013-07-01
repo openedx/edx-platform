@@ -3,7 +3,6 @@ Profile Distributions
 """
 
 from django.db.models import Count
-from django.contrib.auth.models import User, Group
 from student.models import CourseEnrollment, UserProfile
 
 AVAILABLE_PROFILE_FEATURES = ['gender', 'level_of_education', 'year_of_birth']
