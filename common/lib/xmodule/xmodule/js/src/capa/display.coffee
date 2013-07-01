@@ -136,7 +136,7 @@ class @Problem
   # invalid. To do so, the callee must throw an exception named "Waitfor
   # Exception". This and any other errors or exceptions that arise from the
   # callee are rethrown and abort the submission.
-  # 
+  #
   # In order to use this feature, add a 'data-waitfor' attribute to the input,
   # and specify the function to be called by the check button before sending
   # off @answers
@@ -145,13 +145,13 @@ class @Problem
       if ($(inp).is("input[waitfor]"))
         try
           $(inp).data("waitfor")()
+          @refreshAnswers()
         catch e
           if e.name == "Waitfor Exception"
             alert e.message
           else
             alert "Could not grade your answer. The submission was aborted."
           throw e
-    @refreshAnswers()
 
 
   ###
@@ -163,7 +163,6 @@ class @Problem
   ###
   check_fd: =>
     Logger.log 'problem_check', @answers
-
 
     # If there are no file inputs in the problem, we can fall back on @check
     if $('input:file').length == 0
