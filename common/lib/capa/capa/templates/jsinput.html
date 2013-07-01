@@ -1,5 +1,5 @@
-<section id="inputtype_${id}" class="jsinput" 
-    data="${gradefn}" 
+<section id="inputtype_${id}" class="jsinput"
+    data="${gradefn}"
     % if saved_state:
     data-stored="${saved_state|x}"
     % endif
@@ -11,7 +11,7 @@
     % endif
     >
 
-     
+
   <div class="script_placeholder" data-src="${applet_loader}"/>
   % if status == 'unsubmitted':
   <div class="unanswered" id="status_${id}">
@@ -23,8 +23,8 @@
   <div class="incorrect" id="status_${id}">
   % endif
 
-  <iframe name="iframe_${id}" 
-      id="iframe_${id}" 
+  <iframe name="iframe_${id}"
+      id="iframe_${id}"
       sandbox="allow-scripts allow-popups allow-same-origin allow-forms allow-pointer-lock"
       seamless="seamless"
       frameborder="0"
@@ -32,7 +32,7 @@
       height="${height}"
       width="${width}"
       />
-  <input type="hidden" name="input_${id}" id="input_${id}" 
+  <input type="hidden" name="input_${id}" id="input_${id}"
     waitfor=""
     value="${value|h}"/>
 
@@ -57,7 +57,7 @@
   % if status in ['unsubmitted', 'correct', 'incorrect', 'incomplete']:
   </div>
   % endif
-   
+
   % if msg:
       <span class="message">${msg|n}</span>
   % endif
