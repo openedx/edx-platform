@@ -3,7 +3,6 @@ class CMS.Views.SubtitlesImportYT extends Backbone.View
   className: "import-youtube"
   link_id: "import-from-youtube"
   url: "/import_subtitles"
-  files: null
 
   events:
     "click #import-from-youtube": "clickHandler"
