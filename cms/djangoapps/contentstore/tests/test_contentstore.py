@@ -823,7 +823,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         # make sure we got a successful response
         self.assertEqual(resp.status_code, 200)
         # check that /static/ has been converted to the full path
-        # note, we know the link it should be because that's what in the 'full' course in the test data
+        # note, we know the link it should be because that's what in the 'toy' course in the test data
         self.assertContains(resp, '/c4x/edX/toy/asset/handouts_sample_handout.txt')
 
     def test_prefetch_children(self):
