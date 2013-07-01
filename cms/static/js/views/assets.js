@@ -23,7 +23,12 @@ function removeAsset(e){
                         { 'location': row.data('id') },
                         function() {
                             // show the post-commit confirmation
-                            $(".wrapper-alert-confirmation").addClass("is-shown").attr('aria-hidden','false');
+                            var deleted = new CMS.Views.Notification.Confirmation({
+                                title: gettext("Your file has been deleted."),
+                                closeIcon: false,
+                                maxShown: 2000
+                            });
+                            deleted.show();
                             row.remove();
                             analytics.track('Deleted Asset', {
                                 'course': course_location_analytics,
