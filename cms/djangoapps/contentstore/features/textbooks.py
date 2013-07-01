@@ -2,14 +2,9 @@
 #pylint: disable=W0621
 
 from lettuce import world, step
-from django.conf import settings
-import requests
-import string
-import random
 import os
 
 TEST_ROOT = settings.COMMON_TEST_DATA_ROOT
-HTTP_PREFIX = "http://localhost:8001"
 
 
 @step(u'I go to the textbooks page')
