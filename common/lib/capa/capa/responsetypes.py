@@ -2138,7 +2138,7 @@ class ChoiceTextResponse(LoncapaResponse):
                 answer = contextualize_text(answer, context)
                 input_name = child.get('name')
                 input_name = self.answer_id + "_" + input_name
-                tolerance = contextualize_text(child.get('tolerance', 0), context)
+                tolerance = contextualize_text(child.get('tolerance', '0'), context)
                 self.correct_inputs[input_name] = {'answer': answer, 'tolerance': tolerance}
                 answer_list.append(answer)
             self.answer_values[parent_name] = ', '.join(answer_list)
@@ -2180,7 +2180,7 @@ class ChoiceTextResponse(LoncapaResponse):
 
             correct_ans = params['answer']
             #assume zero tolerance if it isn't specified
-            tolerance = params.get('tolerance', 0)
+            tolerance = params.get('tolerance', '0')
             #Here we do the same things as in grading a numerical response...
             try:
                 correct_ans = complex(correct_ans)
