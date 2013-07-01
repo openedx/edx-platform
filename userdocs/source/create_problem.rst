@@ -46,7 +46,7 @@ Overview
  
     Some of the simpler problem templates, including multiple choice, open in the Simple Editor and allow you to switch to the Advanced Editor. The more complicated problem types, such as Circuit Response, open in the Advanced Editor.
 
-    *Note: You can switch at any time from the Simple Editor to the Advanced Editor by clicking **Advanced Editor** in the Simple Editor interface. However, there is no way to go back from the Advanced Editor to the Simple Editor without making a new component.*
+    *Note: You can switch at any time from the Simple Editor to the Advanced Editor by clicking "Advanced Editor" in the Simple Editor interface. However, there is no way to go back from the Advanced Editor to the Simple Editor without making a new component.*
    
     To open the Advanced Editor, click **Advanced Editor** in the top right corner of the Simple Editor.
 
@@ -59,6 +59,10 @@ Overview
     .. image:: images/image276.png
        :width: 400
 
+.. raw:: latex
+  
+      \newpage %
+
 
 Problem Type
 ************
@@ -69,11 +73,19 @@ Problem Type
     student to explain his or her response. You may also want a student to be able to check the answers to many problems at one time. To accomplish these
     tasks, you can include multiple problems inside a single Problem component. (LINK)
 
+.. raw:: latex
+  
+      \newpage %
+
 Randomizing
 ***********
 
     The **rerandomize** setting determines whether any random variable inputs for a problem are randomized each time a student loads the problem.
     (This is only applicable to problems with randomly generated numeric variables.)
+
+.. raw:: latex
+  
+      \newpage %
 
 Scoring and Weight
 ******************
@@ -89,12 +101,16 @@ Scoring and Weight
     Scores are stored for all problems, but they only contribute to a student's grade in the course if they are part of a subsection marked as graded. For more
     information, see the material on attempts and closing problems in 7B: Feedback and Grading.
 
+.. raw:: latex
+  
+      \newpage %
+
 **Computing Point Scores**
 
     The point score of a response for a problem reflects the correctness of the response and is recorded as the number of points earned out of the maximum
     possible score for the problem (also known as the problem weight). The formula used for computing the recorded point score is the following:
 
-    •  **point score of response = problem weight * ( # inputs correct / # total inputs)**
+    •  **point score of response = problem weight * (# inputs correct / # total inputs)**
 
     •  **point score of response** is the point score "earned" by this response for the problem.
    
@@ -103,6 +119,10 @@ Scoring and Weight
     • ** # inputs correct** is the number of values for this response that were evaluated as correct by the response type fields.
    
     • **# total inputs** is the total number of response type fields in the problem.
+
+.. raw:: latex
+  
+      \newpage %
    
 **Examples**
 
@@ -144,10 +164,14 @@ Scoring and Weight
     
     • If a response to this problem got one value right and the rest wrong, what score would it be assigned?
 
+.. raw:: latex
+  
+      \newpage %
+
 Close
 *****
 
-    To stop accepting responses and recording points, problems can be *closed.* Closed problems do not display a **Check** button. Students
+    To stop accepting responses and recording points, problems can be **closed.** Closed problems do not display a **Check** button. Students
     can still see questions, solutions, and revealed explanations in a closed problem, but they can no longer check their work, submit responses, or change their stored score.
 
     There are several ways that you can close problems:
@@ -159,6 +183,10 @@ Close
     • Set the number of attempts for the individual problem component. The attempts setting determines the number of times a student is allowed to check their answer by clicking Check before the problem closes. If this field is left blank, a student has unlimited attempts. If you specify a number for the attempts setting, the number of total allowed and remaining attempts appears next to the Check button for the problem. Problems with a limited number of attempts also always display a Save button that allows response values to be saved without being submitted. When there is only one submission left, the student will receive a warning, and the Check button will be replaced with a Final Check button. When no attempts are left, both the Save and Check button will disappear.For more information, see Problem Attributes.
 
     • Manually increase the number of attempts left for a given problem for a particular student from the Instructor tab in the live view of your course, when accessed in the Instructor view on Edge. This is recommended only for unusual situations, such as if you have to fix live problems during an exam.
+
+.. raw:: latex
+  
+      \newpage %
 
 Feedback
 ********
@@ -185,6 +213,7 @@ Studio includes several tools to provide feedback to students: the **Check** but
     Additionally, although you don't see it, a point score is also automatically stored for the response you submit.
 
     .. image:: images/image277.png
+       :width: 400
 
     **Show Answer button**
 
@@ -200,6 +229,12 @@ Studio includes several tools to provide feedback to students: the **Check** but
     Now, click **Show Answer** to view the correct answer and its explanation.
 
        .. image:: images/image279.png
+        :width: 400
+
+
+.. raw:: latex
+  
+      \newpage %
 
 
 
@@ -238,7 +273,7 @@ Create a Problem
 
     2. Click the problem type that you want.
 
-       *Note To create your own problem in XML, click **Empty** to open a blank XML editor.*
+       *Note To create your own problem in XML, click "Empty" to open a blank XML editor.*
 
        A new problem component with sample template text appears.
 
@@ -262,11 +297,15 @@ Create a Problem
    
         a. In the **weight** box, set a weight for the problem. If you want the problem to be a practice problem, set this to zero (0).
     
-        b. In the **rerandomize **box,
+        b. In the **rerandomize** box,
     
-        c.  In the **attempts **box, specify the number of attempts that you want to allow the student.
+        c.  In the **attempts** box, specify the number of attempts that you want to allow the student.
   
         d.  In the **showanswer** box, enter one of the following settings.
+
+.. raw:: latex
+  
+      \newpage %
 
     **Reference**
 
@@ -281,6 +320,10 @@ Create a Problem
 
     5. Modify the problem text, and then click **Save** to save and check your work. Make sure to publish the draft you are working on to view the problem live.
 
+.. raw:: latex
+  
+      \newpage %
+
 Modify a Released Problem
 *************************
 
@@ -294,7 +337,7 @@ Modify a Released Problem
 
         • The maximum point score for that problem.
 
-    This information is updated when a student submits a response to a problem. If the student refreshes the **Progress** page, solutions are not re-checked. If a student refreshes the page of a problem, the latest version of the problem statement is loaded, but their previous response is NOT reevaluated. Rather, the previous response is loaded on top of the current problem statement. That is **existing** student responses for a problem are not reevaluated if the problem statement or attributes are changed, until a student goes back and resubmits the problem. Furthermore, as of the time of writing, if the problem weight attribute is changed, stored scores are re-weighted (without rechecking the response) when the student reloads the **Progress page.**
+    This information is updated when a student submits a response to a problem. If the student refreshes the **Progress** page, solutions are not re-checked. If a student refreshes the page of a problem, the latest version of the problem statement is loaded, but their previous response is NOT reevaluated. Rather, the previous response is loaded on top of the current problem statement. That is **existing** student responses for a problem are not reevaluated if the problem statement or attributes are changed, until a student goes back and resubmits the problem. Furthermore, as of the time of writing, if the problem weight attribute is changed, stored scores are re-weighted (without rechecking the response) when the student reloads the **Progress** page.
 
     For example, you may release a problem that has two inputs. After some students have submitted answers, if you change the solution to one of the inputs, the existing student scores are not updated.
 
@@ -304,7 +347,13 @@ Modify a Released Problem
 
     Note that the behavior of re-grading in case of error is an edX Edge case. It is dependent on the implementation of grading, and may change. The goal in the future is to include re-grading that will allow some basic updates to live problems, whether or not students have submitted a response.
 
-    **Workarounds**
+    .. raw:: latex
+  
+      \newpage %
+
+
+    Workarounds
+    ===========
 
     If you have to modify a released problem in a way that affects grading, you have two options. Note that both options require you to ask your students to go back and resubmit a problem.
 
@@ -313,11 +362,8 @@ Modify a Released Problem
    
     2.  Delete the entire Problem component in Studio and create a new Problem component with the content and settings that you want. Then ask all the students in your course to go back to this assignment and complete problem.
 
-    Check your **Progress** view or the **Instructor** tab on Edge as described in the Viewing Scores unit to see if point scores are
-    being stored as you expect. If there are issues with stored scores that you do not understand or cannot fix, contact support on the Studio help page.
+    Check your **Progress** view or the **Instructor** tab on Edge as described in the Viewing Scores unit to see if point scores are being stored as you expect. If there are issues with stored scores that you do not understand or cannot fix, contact support on the Studio help page.
 
     For a discussion of some trade-offs and some suggestions for cleaner solutions in the future, see the following `discussion thread <http://help.edge.edx.org/discussions/questions/73-what-if-you-discover-that-a-live-problem-is-wrong">`_ on the Studio help desk.
         
-
-    You can include multiple problems of different types inside a single Problem component, even if you select a particular template when you create a problem.
-    A template is simply an XML editor with template text already filled in. You can add to or replace the template text.
+    You can include multiple problems of different types inside a single Problem component, even if you select a particular template when you create a problem. A template is simply an XML editor with template text already filled in. You can add to or replace the template text.

@@ -39,6 +39,11 @@ Add Collaborators
  
     3. In the **email** box, type the  mail address of the user, and then click **Add User**.
 
+
+.. raw:: latex
+  
+      \newpage %
+
  
 
 Add Manual Policy Data
@@ -70,6 +75,11 @@ Add Manual Policy Data
  
  
     4. In the **Policy Value** box, enter the value of the policy.
+
+
+.. raw:: latex
+  
+      \newpage %
  
  
 Add Course Catalog Information

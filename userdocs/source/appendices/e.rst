@@ -1,3 +1,8 @@
+.. raw:: latex
+  
+      \newpage %
+
+
 ==========================
 APPENDIX E: Problem Types
 ==========================
@@ -11,20 +16,14 @@ answer options, presented as a drop-down list.
 Option Response is structurally similar to Multiple Choice. Some conceptual
 differences between the two include the following.
 
-• The Multiple Choice radio button format makes it easier for students to read
-• very long response options.
+* The Multiple Choice radio button format makes it easier for students to read very long response options.
 
-• The Option Response drop-down input format makes it more likely for students
-to think of an answer and then search for it, rather than relying purely on
-recognition to answer the question. The Multiple Choice format is more explicit
-and visual. This makes it a more appropriate choice for presenting tricky or
-complicated answer options which are intended to get the student to pause and
-think.
+* The Option Response drop-down input format makes it more likely for students to think of an answer and then search for it, rather than relying purely on recognition to answer the question. The Multiple Choice format is more explicit and visual. This makes it a more appropriate choice for presenting tricky or complicated answer options which are intended to get the student to pause and think.
 
 Sample Problem:
 
 .. image:: ../images/image287.png
- :width: 600  
+    :width: 600  
 
 **Problem Code:**
 
@@ -39,7 +38,7 @@ Sample Problem:
        options="('Multiple Choice','String Response',
                 'Numerical Response','External Response',
                 'Image Response')"
-      correct="Multiple Choice"/>
+      correct="Multiple Choice"/>1
     </optionresponse>
 
    <solution>
@@ -78,12 +77,17 @@ Sample Problem:
 <optionresponse>
 
 
-.. image:: ../images/option_response1.png
+  .. image:: ../images/option_response1.png
 
 
 <optioninput>
 
-.. image:: ../images/optionresponse2.png
+  .. image:: ../images/optionresponse2.png
+
+
+.. raw:: latex
+  
+      \newpage %
 
 
 Multiple Choice 
@@ -100,16 +104,13 @@ marked as incorrect, there is no correct response.
 Multiple Choice is structurally similar to Option Response. Some conceptual
 differences between the two include the following.
 
-• The Multiple Choice radio button format makes it easier for students to read
-• very long response options.
+• The Multiple Choice radio button format makes it easier for students to read very long response options.
 
-• The Option Response drop-down input format makes it more likely for students
-• to think of an answer and then search for it, rather than relying purely on
-• recognition to answer the question.
+• The Option Response drop-down input format makes it more likely for students to think of an answer and then search for it, rather than relying purely on recognition to answer the question.
 
-• The Multiple Choice format is more explicit and visual. This makes it a more
-appropriate choice for presenting tricky or complicated answer options which are
-intended to get the student to pause and think. Sample Problem:
+• The Multiple Choice format is more explicit and visual. This makes it a more appropriate choice for presenting tricky or complicated answer options which areintended to get the student to pause and think. 
+
+Sample Problem:
 
 .. image:: ../images/image289.png
  :width: 600  
@@ -173,12 +174,17 @@ intended to get the student to pause and think. Sample Problem:
 
 <choicegroup>
 
-.. image:: ../images/multipleresponse2.png
+  .. image:: ../images/multipleresponse2.png
 
 
 <choice>
 
-.. image:: ../images/multipleresponse3.png
+  .. image:: ../images/multipleresponse3.png
+
+
+.. raw:: latex
+  
+      \newpage %
 
 
 Checkbox
@@ -234,6 +240,10 @@ Sample Problem:
   </checkboxgroup>
   </choiceresponse>
   </problem>
+
+.. raw:: latex
+  
+     \newpage %
 
 
 String Response
@@ -293,12 +303,16 @@ Sample Problem:
 
 <stringresponse>
 
-
-.. image:: ../images/stringresponse.png
+  .. image:: ../images/stringresponse.png
 
 <textline>
 
-.. image:: ../images/stringresponse2.png
+  .. image:: ../images/stringresponse2.png
+
+
+.. raw:: latex
+  
+      \newpage %
 
 
 Numerical Response
@@ -469,20 +483,25 @@ XML Attribute Information
 
 <script>
 
-.. image:: ../images/numericalresponse.png
+  .. image:: ../images/numericalresponse.png
 
 <numericalresponse>
 
 
-.. image:: ../images/numericalresponse2.png
+  .. image:: ../images/numericalresponse2.png
 
 <responseparam>
 
-.. image:: ../images/numericalresponse4.png
+  .. image:: ../images/numericalresponse4.png
 
 <textline>
 
-.. image:: ../images/numericalresponse5.png
+  .. image:: ../images/numericalresponse5.png
+
+
+.. raw:: latex
+  
+      \newpage %
 
 
 
@@ -573,18 +592,23 @@ XML Attribute Information
 <script>
 
 
-.. image:: ../images/formularesponse.png
+  .. image:: ../images/formularesponse.png
 
 
 <formularesponse>
 
 
-.. image:: ../images/formularesponse3.png
+  .. image:: ../images/formularesponse3.png
 
 <responseparam>
 
 
-.. image:: ../images/formularesponse6.png
+  .. image:: ../images/formularesponse6.png
+
+
+.. raw:: latex
+  
+      \newpage %
 
 
 Image Response
@@ -626,11 +650,15 @@ XML Attribute Information
 
 <imageresponse>
 
-.. image:: ../images/imageresponse1.png
+  .. image:: ../images/imageresponse1.png
 
 <imageinput>
 
-.. image:: ../images/imageresponse2.png
+  .. image:: ../images/imageresponse2.png
+
+.. raw:: latex
+  
+      \newpage %
 
 
 Custom Response
@@ -755,6 +783,11 @@ Sample Problem:
       </solution>
   </problem>
 
+
+.. raw:: latex
+  
+      \newpage %
+
 Chemical Equation Response
 ==========================
 
@@ -791,6 +824,11 @@ Sample Problem:
      So, you can enter "H2SO4 -> H^+ + HSO4^-".</p>
     <endouttext/>
   </problem> 
+
+h
+.. raw:: latex
+  
+      \newpage %
 
 Schematic Response
 ==================

@@ -15,7 +15,7 @@ might include your syllabus or information about your grading policy.
 When you create a static page, the name of that page appears in your course's
 navigation bar at the top of the page, along with **Courseware**, **Course
 Info**, and other tabs. For example, the following navigation bar includes a
-**Syllabus** static page and a    **Projects** static page.
+**Syllabus** static page and a  **Projects** static page.
 
 .. image:: images/image157.png
     
@@ -125,7 +125,7 @@ the code for the dynamic schedule template.
   
   
 Course Handouts  
-===============
+***************
   
  
 Your course handouts are available on Edge from the **Course Handouts** sidebar
@@ -171,7 +171,7 @@ course but change the dates in your handout, you can easily find the Word file
 on the **Files Uploads** page.
   
  
-Note that you should be careful when you name files that you add to the **>Files
+Note that you should be careful when you name files that you add to the **Files
 & Uploads** page. Because the file name becomes part of the URL, students can
 see the name of the file when they open it. Avoid using file names such as
 "AnswerKey.pdf."
@@ -189,7 +189,7 @@ To upload a file to the **Files & Uploads** page:
 Uploads**.
   
  
-2. On the **>Files & Uploads ** page, click **Upload New File**.
+2. On the **>Files & Uploads** page, click **Upload New File**.
   
  
 .. image:: images/image162.png
@@ -198,7 +198,7 @@ Uploads**.
 3. In the **Upload New File** dialog box, click **Choose File**.
   
  
-4. In the **Open **dialog box, locate the file that you want, and then click
+4. In the **Open** dialog box, locate the file that you want, and then click
 **Open**.
    
 To add another file, click **Load Another File**. To close the dialog box, click
@@ -264,14 +264,14 @@ Your Assets Tab**.
   
  
 Add an Announcement or Update  
-=============================
+*****************************
   
  
     You can add announcements or updates to welcome students to the class,
     remind students of exams, notify students of changes in the course schedule,
     and call out important steps students need to keep in mind. These updates
-    appear on the **Course Info **tab on edX or Edge. Because your course
-    automatically opens to the **Course Info **page, students will see the
+    appear on the **Course Info** tab on edX or Edge. Because your course
+    automatically opens to the **Course Info** page, students will see the
     update as soon as they sign in.
   
  

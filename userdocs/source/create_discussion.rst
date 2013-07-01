@@ -72,11 +72,16 @@ category and subcategory appear as follow in the category list in the discussion
 forum:
 
 .. image:: images/image065.png
+ :width: 300
 
 9. In the **display_name** box, type a name for the discussion. The display name
 appears when a student hovers the mouse over the ribbon.
 
 10. Click **Save.**
+
+.. raw:: latex
+  
+      \newpage %
 
 
 Seed a Discussion Space in Your Course 
