@@ -359,6 +359,12 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertIn('Inline content', resp.content)
 
+        # also try a custom response
+        problem_module_location = Location(['i4x', 'edX', 'full', 'problem', 'H1P1_Energy', None])
+        url = reverse('preview_component', kwargs={'location': problem_module_location.url()})
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+
     def test_delete(self):
         direct_store = modulestore('direct')
         import_from_xml(direct_store, 'common/test/data/', ['full'])
