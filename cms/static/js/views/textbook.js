@@ -12,7 +12,10 @@ CMS.Views.ShowTextbook = Backbone.View.extend({
         "click .hide-chapters": "hideChapters"
     },
     render: function() {
-        this.$el.html(this.template(this.model.attributes));
+        var attrs = $.extend({}, this.model.attributes);
+        attrs.bookindex = this.model.collection.indexOf(this.model);
+        attrs.course = window.section.attributes;
+        this.$el.html(this.template(attrs));
         return this;
     },
     editTextbook: function(e) {

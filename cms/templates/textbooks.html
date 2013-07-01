@@ -18,9 +18,14 @@
 <script type="text/javascript">
 CMS.URL.UPLOAD_ASSET = "${upload_asset_url}"
 CMS.URL.TEXTBOOKS = "${textbook_url}"
+CMS.URL.LMS_BASE = "${settings.LMS_BASE}"
 window.section = new CMS.Models.Section({
     id: "${course.id}",
-    name: "${course.display_name_with_default | h}"
+    name: "${course.display_name_with_default | h}",
+    url_name: "${course.location.name | h}",
+    org: "${course.location.org | h}",
+    num: "${course.location.course | h}",
+    revision: "${course.location.revision | h}"
 });
 var textbooks = new CMS.Collections.TextbookSet(${json.dumps(course.pdf_textbooks)}, {parse: true});
 var tbView = new CMS.Views.ListTextbooks({collection: textbooks});
