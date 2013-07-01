@@ -473,3 +473,109 @@ At the left we can see...
             srt_filedata,
             self.course)
         self.assertFalse(status)
+
+
+class TestGenerateSrtFromSjson(TestDownloadYoutubeSubs):
+    """Tests for `generate_srt_from_sjson` function."""
+
+    def test_success_generating_subs(self):
+        sjson_subs = {
+            'start': [100, 200, 240, 390, 54000],
+            'end': [200, 240, 380, 1000, 78400],
+            'text': [
+                'subs #1',
+                'subs #2',
+                'subs #3',
+                'subs #4',
+                'subs #5'
+            ]
+        }
+        srt_subs = utils.generate_srt_from_sjson(sjson_subs, 1)
+        self.assertIsNotNone(srt_subs)
+        self.assertIn(
+            '00:00:00,100 --> 00:00:00,200\nsubs #1',
+            srt_subs)
+        self.assertIn(
+            '00:00:00,200 --> 00:00:00,240\nsubs #2',
+            srt_subs)
+        self.assertIn(
+            '00:00:00,240 --> 00:00:00,380\nsubs #3',
+            srt_subs)
+        self.assertIn(
+            '00:00:00,390 --> 00:00:01,000\nsubs #4',
+            srt_subs)
+        self.assertIn(
+            '00:00:54,000 --> 00:01:18,400\nsubs #5',
+            srt_subs)
+
+    def test_success_generating_subs_speed_up(self):
+        sjson_subs = {
+            'start': [100, 200, 240, 390, 54000],
+            'end': [200, 240, 380, 1000, 78400],
+            'text': [
+                'subs #1',
+                'subs #2',
+                'subs #3',
+                'subs #4',
+                'subs #5'
+            ]
+        }
+        srt_subs = utils.generate_srt_from_sjson(sjson_subs, 0.5)
+        self.assertIsNotNone(srt_subs)
+        self.assertIn(
+            '00:00:00,050 --> 00:00:00,100\nsubs #1',
+            srt_subs)
+        self.assertIn(
+            '00:00:00,100 --> 00:00:00,120\nsubs #2',
+            srt_subs)
+        self.assertIn(
+            '00:00:00,120 --> 00:00:00,190\nsubs #3',
+            srt_subs)
+        self.assertIn(
+            '00:00:00,195 --> 00:00:00,500\nsubs #4',
+            srt_subs)
+        self.assertIn(
+            '00:00:27,000 --> 00:00:39,200\nsubs #5',
+            srt_subs)
+
+    def test_success_generating_subs_speed_down(self):
+        sjson_subs = {
+            'start': [100, 200, 240, 390, 54000],
+            'end': [200, 240, 380, 1000, 78400],
+            'text': [
+                'subs #1',
+                'subs #2',
+                'subs #3',
+                'subs #4',
+                'subs #5'
+            ]
+        }
+        srt_subs = utils.generate_srt_from_sjson(sjson_subs, 2)
+        self.assertIsNotNone(srt_subs)
+        self.assertIn(
+            '00:00:00,200 --> 00:00:00,400\nsubs #1',
+            srt_subs)
+        self.assertIn(
+            '00:00:00,400 --> 00:00:00,480\nsubs #2',
+            srt_subs)
+        self.assertIn(
+            '00:00:00,480 --> 00:00:00,760\nsubs #3',
+            srt_subs)
+        self.assertIn(
+            '00:00:00,780 --> 00:00:02,000\nsubs #4',
+            srt_subs)
+        self.assertIn(
+            '00:01:48,000 --> 00:02:36,800\nsubs #5',
+            srt_subs)
+
+    def test_fail_generating_subs(self):
+        sjson_subs = {
+            'start': [100, 200],
+            'end': [100],
+            'text': [
+                'subs #1',
+                'subs #2'
+            ]
+        }
+        srt_subs = utils.generate_srt_from_sjson(sjson_subs, 1)
+        self.assertIsNone(srt_subs)
