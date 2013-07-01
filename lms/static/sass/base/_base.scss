@@ -85,7 +85,11 @@ a:link, a:visited {
 }
 
 a:focus {
-  outline: 3px groove $black;
+  /**
+   *  Add general focus styling here
+   *  for example:
+   *      outline: 3px groove $black;
+   **/
 }
 
 .content-wrapper {
