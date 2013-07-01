@@ -169,5 +169,4 @@ class TestTOC(TestCase):
                       'url_name': 'secret:magic', 'display_name': 'secret:magic'}])
 
         actual = render.toc_for_course(self.portal_user, request, self.toy_course, chapter, section, model_data_cache)
-        #from nose.tools import set_trace; set_trace();
         assert reduce(lambda x, y: x and (y in actual), expected, True)
