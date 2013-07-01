@@ -29,7 +29,6 @@
 
   .wrapper-l {
     float: left;
-    margin-right: flex-gutter();
     width: flex-grid(7,12);
   }
 
@@ -45,11 +44,15 @@
     vertical-align: middle;
   }
 
+  .nav-account {
+    width: 100%;
+  }
+
   // basic layout - nav items
   nav {
 
     > ol > .nav-item {
-      @extend .t-action2;
+      @extend .t-action3;
       display: inline-block;
       vertical-align: middle;
       font-weight: 600;
@@ -193,11 +196,16 @@
 
     .nav-account-user {
 
-      .account-username {
-        width: 100%;
-        overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
+      .title {
+        max-width: ($baseline*6.5);
+
+        > .label {
+          display: inline-block;
+          max-width: 85%;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+        }
       }
     }
   }
