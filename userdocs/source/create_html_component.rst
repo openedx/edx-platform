@@ -21,6 +21,9 @@ Note Studio processes the HTML code entered when saving it and before rendering
 it. Make sure that the component you created looks the way you expect live if
 you go back and forth between Visual and HTML view.
 
+.. raw:: latex
+  
+      \newpage %
 
 Create a Basic HTML Component
 *****************************
@@ -40,12 +43,14 @@ following blank component appears.
 
 3. Enter the information that you want, and then click **Save.**
 
- *Note If you want to enter links to other pages or to images or to edit the
+*Note: If you want to enter links to other pages or to images or to edit the
 HTML  directly, switch to the HTML tab.*
 
+.. raw:: latex
+  
+      \newpage %
+
 **To create a basic HTML component that includes a template you can use:**
-
-
 
 1. Under **Add New Component,** click **html** and then click **Announcement.**
 
@@ -64,6 +69,11 @@ HTML  directly, switch to the HTML tab.*
 .. image:: images/image075.png
 
 3. Click **Save.**
+
+
+.. raw:: latex
+  
+    \newpage %
 
 
 Create Links
@@ -194,18 +204,21 @@ component appears.
 7. Next to the number 1, type the following. Replace relative course directory,
 location id of unit, and link text with your information. ::
 
-
   <a href = "[[relative course directory]]/jump_to/[[location id of
   <unit]]">[link text]</a>
 
 
- Forexample,alinktothe“CreatinganHTMLComponent”unitinedx101resemblesthefollowing
- .::
-
+For example, a link to the “Creating an HTML Component” unit in edx101
+resembles the following ::
 
   <a href = "courses/edX/edX101/How_to_Create_an_edX_Course/jump_to/i4x://edX/ed
   <X101/vertical/8713e94afd074e40991dcb675d1030b5">Creating an HTML
   <Component</a>
+
+  
+.. raw:: latex
+  
+    \newpage %
 
 
 Import from LaTeX

@@ -5,6 +5,10 @@ Export or Import a Course
  
 Studio has an Import tool and an Export tool that allow you to import and
 export courses.
+
+.. raw:: latex
+  
+      \newpage %
  
 Export a Course
 ***************
@@ -64,6 +68,11 @@ The exported file does not include the following data:
  
  
 5. Grading information
+
+
+.. raw:: latex
+  
+      \newpage %
  
 
 Import a Course

@@ -54,7 +54,6 @@ still creating it:
 * In Studio
 
 
-
 	Note that the way your course looks in Studio is
 	not the way it looks to students on edX or Edge.
  
@@ -70,7 +69,11 @@ still creating it:
 	the top of the screen.
  
  
-* On edX or Edge as a Studeny
+* On edX or Edge as a Student
+
+.. raw:: latex
+  
+      \newpage %
  
 
 Outline View
@@ -83,6 +86,11 @@ see the "macro" outline of your course, down to individual Units.
  
  
 .. image:: images/image193.png
+
+
+.. raw:: latex
+  
+      \newpage %
  
 Subsection View
 ===============
@@ -96,6 +104,11 @@ are set to Public or Private. Private Units appear in light gray text with
  
  
 .. image:: images/image195.png
+
+
+.. raw:: latex
+  
+      \newpage %
  
 Unit View
 =========
@@ -143,6 +156,12 @@ Private Unit
  
  
 .. image:: images/image203.png
+
+
+
+.. raw:: latex
+  
+      \newpage %
 
  
 Preview Mode
@@ -215,8 +234,8 @@ When you click Unit 2 in the course ribbon, you see the content in Unit 2:
 When you view your course on edX or Edge as an instructor:
  
  
-· You see all the Units of your course that you have set to Public. 
-· Release dates do not matter.
+* You see all the Units of your course that you have set to Public. 
+* Release dates do not matter.
  
  
 You do not see Units that are set to Private.
@@ -279,9 +298,9 @@ see material that meets all three publishing conditions:
 The course start date has passed.
  
  
-· The release dates for the Section and Subsection have passed.
+* The release dates for the Section and Subsection have passed.
  
-· The Unit that contains the material is set to Public.
+* The Unit that contains the material is set to Public.
  
  
 You can use this view to make sure that material does not appear in your

@@ -1,4 +1,3 @@
-
 ***************************
 Establish a Grading Policy  
 ***************************
@@ -140,6 +139,11 @@ If you have problems creating assignment types, try the following.
 In the **Weight of Total Grade** field, omit the % sign. Be sure that your **Weight of Total Grade** fields add up to 100.
     
 .. _Create-Graded-Subsections:  
+
+
+.. raw:: latex
+  
+      \newpage %
 
 Create Subsections Containing Graded Assignments
 **************************************************

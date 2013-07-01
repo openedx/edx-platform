@@ -51,10 +51,13 @@ down view of the example Progress page for the student in the example above:
 Again, note that point scores from graded sections are called "Problem
 Scores", while point scores from ungraded sections are called "Practice
 Scores".
- 
+
+.. raw:: latex
+  
+      \newpage %
  
 Checking Progress of Students as an Instructor
-==============================================
+**********************************************
  
  
 To check the progress of the student through the course, visit the
@@ -83,10 +86,14 @@ the weight of a live problem was changed during an assignment, and not
 everyone has yet resubmitted their answers for that problem.) Scores and grades
 are usually recomputed at the end of the semester before determining final
 grades and issuing Certificates.*
+
+.. raw:: latex
+  
+      \newpage %
  
  
 Assigning Final Grades and Issuing Certificates
-===============================================
+***********************************************
 
 The final grades of a student in the course and the grading
 rubric you have set are used to determine whether the student has earned a
