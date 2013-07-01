@@ -5,7 +5,6 @@ from lettuce import world, step
 from terrain.steps import reload_the_page
 from selenium.webdriver.common.keys import Keys
 from common import type_in_codemirror
-import time
 
 from nose.tools import assert_true, assert_false, assert_equal
 
@@ -52,16 +51,7 @@ def test_and_i_set_course_dates(step):
 @step('Then I see the set dates on refresh$')
 def test_then_i_see_the_set_dates_on_refresh(step):
     reload_the_page(step)
-    verify_date_or_time(COURSE_START_DATE_CSS, '12/20/2013')
-    verify_date_or_time(COURSE_END_DATE_CSS, '12/26/2013')
-    verify_date_or_time(ENROLLMENT_START_DATE_CSS, '12/01/2013')
-    verify_date_or_time(ENROLLMENT_END_DATE_CSS, '12/10/2013')
-
-    verify_date_or_time(COURSE_START_TIME_CSS, DUMMY_TIME)
-    # Unset times get set to 12 AM once the corresponding date has been set.
-    verify_date_or_time(COURSE_END_TIME_CSS, DEFAULT_TIME)
-    verify_date_or_time(ENROLLMENT_START_TIME_CSS, DEFAULT_TIME)
-    verify_date_or_time(ENROLLMENT_END_TIME_CSS, DUMMY_TIME)
+    i_see_the_set_dates()
 
 
 @step('And I clear all the dates except start$')
@@ -143,8 +133,18 @@ def test_i_change_fields(step):
 
 @step('I do not see the new changes persisted on refresh$')
 def test_changes_not_shown_on_refresh(step):
-    reload_the_page(step)
     step.then('Then I see the set dates on refresh')
+
+
+@step('I do not see the changes')
+def test_i_do_not_see_changes(_step):
+    i_see_the_set_dates()
+
+
+@step('I change the course overview')
+def test_change_course_overview(_step):
+    type_in_codemirror(0, "<h1>Overview</h1>")
+
 
 
 ############### HELPER METHODS ####################
@@ -163,3 +163,19 @@ def verify_date_or_time(css, date_or_time):
     Verifies date or time field.
     """
     assert_equal(date_or_time, world.css_find(css).first.value)
+
+
+def i_see_the_set_dates():
+    """
+    Ensure that each field has the value set in `test_and_i_set_course_dates`.
+    """
+    verify_date_or_time(COURSE_START_DATE_CSS, '12/20/2013')
+    verify_date_or_time(COURSE_END_DATE_CSS, '12/26/2013')
+    verify_date_or_time(ENROLLMENT_START_DATE_CSS, '12/01/2013')
+    verify_date_or_time(ENROLLMENT_END_DATE_CSS, '12/10/2013')
+
+    verify_date_or_time(COURSE_START_TIME_CSS, DUMMY_TIME)
+    # Unset times get set to 12 AM once the corresponding date has been set.
+    verify_date_or_time(COURSE_END_TIME_CSS, DEFAULT_TIME)
+    verify_date_or_time(ENROLLMENT_START_TIME_CSS, DEFAULT_TIME)
+    verify_date_or_time(ENROLLMENT_END_TIME_CSS, DUMMY_TIME)

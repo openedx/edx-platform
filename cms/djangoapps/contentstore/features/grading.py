@@ -112,6 +112,14 @@ def changes_not_persisted(step):
     assert(ele.value == 'Homework')
 
 
+@step(u'I see the assignment type "(.*)"$')
+def i_see_the_assignment_type(_step, name):
+      assignment_css = '#course-grading-assignment-name'
+      assignments = world.css_find(assignment_css)
+      types = [ele['value'] for ele in assignments]
+      assert name in types
+
+
 def get_type_index(name):
     name_id = '#course-grading-assignment-name'
     f = world.css_find(name_id)

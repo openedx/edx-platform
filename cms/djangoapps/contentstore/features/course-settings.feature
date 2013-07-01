@@ -32,8 +32,14 @@ Feature: Course Settings
     Given I have set course dates
     And I press the "Save" notification button
     When I change fields
-    And I press the "Cancel" notification button
     Then I do not see the new changes persisted on refresh
+
+  Scenario: Settings are reset on cancel
+    Given I have set course dates
+    And I press the "Save" notification button
+    When I change fields
+    And I press the "Cancel" notification button
+    Then I do not see the changes
 
   Scenario: Confirmation is shown on save
     Given I have opened a new course in Studio
@@ -49,6 +55,13 @@ Feature: Course Settings
   Examples:
     | field                     | value             |
     | Course Start Time         | 11:00             |
-    | Course Overview           | <h1>Overview</h1> |
     | Course Introduction Video | 4r7wHMg5Yjg       |
     | Course Effort             | 200:00            |
+
+  # Special case because we have to type in code mirror
+  Scenario: Changes in Course Overview show a confirmation
+    Given I have opened a new course in Studio
+    When I select Schedule and Details
+    And I change the course overview
+    And I press the "Save" notification button
+    Then I see a confirmation that my changes have been saved
