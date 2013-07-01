@@ -14,7 +14,12 @@ def profile_distribution(course_id, feature):
     Retrieve distribution of students over a given feature.
     feature is one of AVAILABLE_PROFILE_FEATURES.
 
-    Returna dictionary {'type': 'SOME_TYPE', 'data': {'key': 'val'}, 'display_names': {'key': 'displaynameval'}}
+    Return a dictionary {
+        'type': 'SOME_TYPE',
+        'data': {'key': 'val'},
+        'display_names': {'key': 'displaynameval'}
+    }
+
     display_names is only return for EASY_CHOICE type eatuers
     note no_data instead of None to be compatible with the json spec.
     data types e.g.

@@ -82,7 +82,7 @@ class Analytics
 
             grid_data = _.map feature_res.data, (value, key) ->
               datapoint = {}
-              datapoint[feature] = key
+              datapoint[feature] = feature_res.display_names[key]
               datapoint['count'] = value
               datapoint
 

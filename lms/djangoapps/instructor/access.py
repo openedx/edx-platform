@@ -80,7 +80,7 @@ def update_forum_role_membership(course_id, user, rolename, mode):
 
     rolename is one of [FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA]
 
-    mode is one of ['alow', 'revoke']
+    mode is one of ['allow', 'revoke']
     """
     role = Role.objects.get(course_id=course_id, name=rolename)
 

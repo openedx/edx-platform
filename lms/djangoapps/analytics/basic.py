@@ -15,7 +15,7 @@ AVAILABLE_FEATURES = STUDENT_FEATURES + PROFILE_FEATURES
 
 def enrolled_students_profiles(course_id, features):
     """
-    Return array of student features e.g. [{?}, ...]
+    Return list of student features e.g. [{?}, ...]
     """
     # enrollments = CourseEnrollment.objects.filter(course_id=course_id)
     # students = [enrollment.user for enrollment in enrollments]

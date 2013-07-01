@@ -33,18 +33,16 @@ def instructor_dashboard_2(request, course_id):
     """Display the instructor dashboard for a course."""
 
     course = get_course_by_id(course_id, depth=None)
-    instructor_access = has_access(request.user, course, 'instructor')   # an instructor can manage staff lists
-    staff_access = has_access(request.user, course, 'staff')
-    forum_admin_access = has_forum_access(request.user, course_id, FORUM_ROLE_ADMINISTRATOR)
-
-    if not staff_access:
-        raise Http404
 
     access = {
-        'instructor':  instructor_access,
-        'staff':       staff_access,
-        'forum_admin': forum_admin_access,
+        'admin': request.user.is_staff,
+        'instructor':  has_access(request.user, course, 'instructor'),  # an instructor can manage staff lists
+        'staff':       has_access(request.user, course, 'staff'),
+        'forum_admin': has_forum_access(request.user, course_id, FORUM_ROLE_ADMINISTRATOR),
     }
+
+    if not access['staff']:
+        raise Http404
 
     sections = [
         _section_course_info(course_id),
@@ -56,15 +54,9 @@ def instructor_dashboard_2(request, course_id):
 
     context = {
         'course': course,
-        'staff_access': True,
-        'admin_access': request.user.is_staff,
-        'instructor_access': instructor_access,
-        'forum_admin_access': forum_admin_access,
-        'djangopid': os.getpid(),
-        'mitx_version': getattr(settings, 'MITX_VERSION_STRING', ''),
-        'cohorts_ajax_url': reverse('cohorts', kwargs={'course_id': course_id}),
+        # 'cohorts_ajax_url': reverse('cohorts', kwargs={'course_id': course_id}),
         'old_dashboard_url': reverse('instructor_dashboard', kwargs={'course_id': course_id}),
-        'sections': sections
+        'sections': sections,
     }
 
     return render_to_response('courseware/instructor_dashboard_2/instructor_dashboard_2.html', context)
