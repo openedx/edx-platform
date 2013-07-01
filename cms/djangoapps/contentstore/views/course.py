@@ -511,7 +511,7 @@ def textbook_index(request, org, course, name):
 def create_textbook(request, org, course, name):
     location = get_location_and_verify_access(request, org, course, name)
     store = get_modulestore(location)
-    course_module = store.get_item(location, depth=3)
+    course_module = store.get_item(location, depth=0)
 
     try:
         textbook = validate_textbook_json(request.body)
@@ -520,7 +520,13 @@ def create_textbook(request, org, course, name):
     if not textbook.get("id"):
         tids = set(t["id"] for t in course_module.pdf_textbooks if "id" in t)
         textbook["id"] = assign_textbook_id(textbook, tids)
-    course_module.pdf_textbooks.append(textbook)
+    existing = course_module.pdf_textbooks
+    existing.append(textbook)
+    course_module.pdf_textbooks = existing
+    if not any(tab['type'] == 'pdf_textbooks' for tab in course_module.tabs):
+        tabs = course_module.tabs
+        tabs.append({"type": "pdf_textbooks"})
+        course_module.tabs = tabs
     store.update_metadata(course_module.location, own_metadata(course_module))
     resp = JsonResponse(textbook, status=201)
     resp["Location"] = reverse("textbook_by_id", kwargs={
