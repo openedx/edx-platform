@@ -3,7 +3,7 @@ Test the lms/staticbook views.
 """
 
 from django.test.utils import override_settings
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, NoReverseMatch
 
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
@@ -115,6 +115,20 @@ class StaticPdfBookTest(StaticBookTest):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
 
+    def test_chapter_xss(self):
+        # The chapter in the URL used to go right on the page.
+        course = self.make_course(pdf_textbooks=[PDF_BOOK])
+        # It's no longer possible to use a non-integer chapter.
+        with self.assertRaises(NoReverseMatch):
+            reverse('pdf_book', kwargs={'course_id': course.id, 'book_index': 0, 'chapter': 'xyzzy'})
+
+    def test_page_xss(self):
+        # The page in the URL used to go right on the page.
+        course = self.make_course(pdf_textbooks=[PDF_BOOK])
+        # It's no longer possible to use a non-integer page.
+        with self.assertRaises(NoReverseMatch):
+            reverse('pdf_book', kwargs={'course_id': course.id, 'book_index': 0, 'page': 'xyzzy'})
+
 
 class StaticHtmlBookTest(StaticBookTest):
     """
@@ -150,3 +164,10 @@ class StaticHtmlBookTest(StaticBookTest):
         url = self.make_url('html_book', book_index=0, chapter=1)
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
+
+    def test_chapter_xss(self):
+        # The chapter in the URL used to go right on the page.
+        course = self.make_course(pdf_textbooks=[HTML_BOOK])
+        # It's no longer possible to use a non-integer chapter.
+        with self.assertRaises(NoReverseMatch):
+            reverse('html_book', kwargs={'course_id': course.id, 'book_index': 0, 'chapter': 'xyzzy'})
