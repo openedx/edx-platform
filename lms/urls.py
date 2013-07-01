@@ -251,34 +251,7 @@ if settings.COURSEWARE_ENABLED:
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor$',
             'instructor.views.legacy.instructor_dashboard', name="instructor_dashboard"),
 
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard$',
-            'instructor.views.instructor_dashboard.instructor_dashboard_2', name="instructor_dashboard_2"),
-
-        # api endpoints for instructor
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/students_update_enrollment_email$',
-            'instructor.views.api.students_update_enrollment_email', name="students_update_enrollment_email"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/list_course_role_members$',
-            'instructor.views.api.list_course_role_members', name="list_course_role_members"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/access_allow_revoke$',
-            'instructor.views.api.access_allow_revoke', name="access_allow_revoke"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/grading_config$',
-            'instructor.views.api.grading_config', name="grading_config"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/enrolled_students_profiles(?P<csv>/csv)?$',
-            'instructor.views.api.enrolled_students_profiles', name="enrolled_students_profiles"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/profile_distribution$',
-            'instructor.views.api.profile_distribution', name="profile_distribution"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/get_student_progress_url$',
-            'instructor.views.api.get_student_progress_url', name="get_student_progress_url"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/reset_student_attempts$',
-            'instructor.views.api.reset_student_attempts', name="reset_student_attempts"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/rescore_problem$',
-            'instructor.views.api.rescore_problem', name="rescore_problem"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/list_instructor_tasks$',
-            'instructor.views.api.list_instructor_tasks', name="list_instructor_tasks"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/list_forum_members$',
-            'instructor.views.api.list_forum_members', name="list_forum_members"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/update_forum_role_membership$',
-            'instructor.views.api.update_forum_role_membership', name="update_forum_role_membership"),
+        # see ENABLE_INSTRUCTOR_BETA_DASHBOARD section for more urls
 
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/gradebook$',
             'instructor.views.legacy.gradebook', name='gradebook'),
@@ -367,6 +340,37 @@ if settings.COURSEWARE_ENABLED:
                 name='submission_history'),
         )
 
+if settings.COURSEWARE_ENABLED and settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BETA_DASHBOARD'):
+    urlpatterns += (
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard$',
+            'instructor.views.instructor_dashboard.instructor_dashboard_2', name="instructor_dashboard_2"),
+
+        # api endpoints for instructo_
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/students_update_enrollment_email$',
+            'instructor.views.api.students_update_enrollment_email', name="students_update_enrollment_email"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/list_course_role_members$',
+            'instructor.views.api.list_course_role_members', name="list_course_role_members"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/access_allow_revoke$',
+            'instructor.views.api.access_allow_revoke', name="access_allow_revoke"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/grading_config$',
+            'instructor.views.api.grading_config', name="grading_config"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/enrolled_students_profiles(?P<csv>/csv)?$',
+            'instructor.views.api.enrolled_students_profiles', name="enrolled_students_profiles"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/profile_distribution$',
+            'instructor.views.api.profile_distribution', name="profile_distribution"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/get_student_progress_url$',
+            'instructor.views.api.get_student_progress_url', name="get_student_progress_url"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/reset_student_attempts$',
+            'instructor.views.api.reset_student_attempts', name="reset_student_attempts"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/rescore_problem$',
+            'instructor.views.api.rescore_problem', name="rescore_problem"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/list_instructor_tasks$',
+            'instructor.views.api.list_instructor_tasks', name="list_instructor_tasks"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/list_forum_members$',
+            'instructor.views.api.list_forum_members', name="list_forum_members"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/update_forum_role_membership$',
+            'instructor.views.api.update_forum_role_membership', name="update_forum_role_membership"),
+    )
 
 if settings.ENABLE_JASMINE:
     urlpatterns += (url(r'^_jasmine/', include('django_jasmine.urls')),)
