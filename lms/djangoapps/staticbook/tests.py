@@ -1,5 +1,5 @@
 """
-Test the /staticbook views.
+Test the lms/staticbook views.
 """
 
 from django.test.utils import override_settings
@@ -35,15 +35,29 @@ class StaticBookTest(ModuleStoreTestCase):
     Helpers for the static book tests.
     """
 
+    def __init__(self, *args, **kwargs):
+        super(StaticBookTest, self).__init__(*args, **kwargs)
+        self.course = None
+
     def make_course(self, **kwargs):
         """
         Make a course with an enrolled logged-in student.
         """
-        course = CourseFactory.create(**kwargs)
+        self.course = CourseFactory.create(**kwargs)
         user = UserFactory.create()
-        CourseEnrollmentFactory.create(user=user, course_id=course.id)
+        CourseEnrollmentFactory.create(user=user, course_id=self.course.id)
         self.client.login(username=user.username, password='test')
-        return course
+
+    def make_url(self, url_name, **kwargs):
+        """
+        Make a URL for a `url_name` using keyword args for url slots.
+
+        Automatically provides the course id.
+
+        """
+        kwargs['course_id'] = self.course.id
+        url = reverse(url_name, kwargs=kwargs)
+        return url
 
 
 class StaticPdfBookTest(StaticBookTest):
@@ -53,8 +67,8 @@ class StaticPdfBookTest(StaticBookTest):
 
     def test_book(self):
         # We can access a book.
-        course = self.make_course(pdf_textbooks=[PDF_BOOK])
-        url = reverse('pdf_book', kwargs={'course_id': course.id, 'book_index': 0})
+        self.make_course(pdf_textbooks=[PDF_BOOK])
+        url = self.make_url('pdf_book', book_index=0)
         response = self.client.get(url)
         self.assertContains(response, "Chapter 1 for PDF")
         self.assertNotContains(response, "options.chapterNum =")
@@ -62,8 +76,8 @@ class StaticPdfBookTest(StaticBookTest):
 
     def test_book_chapter(self):
         # We can access a book at a particular chapter.
-        course = self.make_course(pdf_textbooks=[PDF_BOOK])
-        url = reverse('pdf_book', kwargs={'course_id': course.id, 'book_index': 0, 'chapter': 2})
+        self.make_course(pdf_textbooks=[PDF_BOOK])
+        url = self.make_url('pdf_book', book_index=0, chapter=2)
         response = self.client.get(url)
         self.assertContains(response, "Chapter 2 for PDF")
         self.assertContains(response, "options.chapterNum = 2;")
@@ -71,8 +85,8 @@ class StaticPdfBookTest(StaticBookTest):
 
     def test_book_page(self):
         # We can access a book at a particular page.
-        course = self.make_course(pdf_textbooks=[PDF_BOOK])
-        url = reverse('pdf_book', kwargs={'course_id': course.id, 'book_index': 0, 'page': 17})
+        self.make_course(pdf_textbooks=[PDF_BOOK])
+        url = self.make_url('pdf_book', book_index=0, page=17)
         response = self.client.get(url)
         self.assertContains(response, "Chapter 1 for PDF")
         self.assertNotContains(response, "options.chapterNum =")
@@ -80,8 +94,8 @@ class StaticPdfBookTest(StaticBookTest):
 
     def test_book_chapter_page(self):
         # We can access a book at a particular chapter and page.
-        course = self.make_course(pdf_textbooks=[PDF_BOOK])
-        url = reverse('pdf_book', kwargs={'course_id': course.id, 'book_index': 0, 'chapter': 2, 'page': 17})
+        self.make_course(pdf_textbooks=[PDF_BOOK])
+        url = self.make_url('pdf_book', book_index=0, chapter=2, page=17)
         response = self.client.get(url)
         self.assertContains(response, "Chapter 2 for PDF")
         self.assertContains(response, "options.chapterNum = 2;")
@@ -89,15 +103,15 @@ class StaticPdfBookTest(StaticBookTest):
 
     def test_bad_book_id(self):
         # If we have one book, asking for the second book will fail with a 404.
-        course = self.make_course(pdf_textbooks=[PDF_BOOK])
-        url = reverse('pdf_book', kwargs={'course_id': course.id, 'book_index': 1, 'chapter': 1})
+        self.make_course(pdf_textbooks=[PDF_BOOK])
+        url = self.make_url('pdf_book', book_index=1, chapter=1)
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
 
     def test_no_book(self):
         # If we have no books, asking for the first book will fail with a 404.
-        course = self.make_course()
-        url = reverse('pdf_book', kwargs={'course_id': course.id, 'book_index': 0, 'chapter': 1})
+        self.make_course()
+        url = self.make_url('pdf_book', book_index=0, chapter=1)
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
 
@@ -109,30 +123,30 @@ class StaticHtmlBookTest(StaticBookTest):
 
     def test_book(self):
         # We can access a book.
-        course = self.make_course(html_textbooks=[HTML_BOOK])
-        url = reverse('html_book', kwargs={'course_id': course.id, 'book_index': 0})
+        self.make_course(html_textbooks=[HTML_BOOK])
+        url = self.make_url('html_book', book_index=0)
         response = self.client.get(url)
         self.assertContains(response, "Chapter 1 for HTML")
         self.assertNotContains(response, "options.chapterNum =")
 
     def test_book_chapter(self):
         # We can access a book at a particular chapter.
-        course = self.make_course(html_textbooks=[HTML_BOOK])
-        url = reverse('html_book', kwargs={'course_id': course.id, 'book_index': 0, 'chapter': 2})
+        self.make_course(html_textbooks=[HTML_BOOK])
+        url = self.make_url('html_book', book_index=0, chapter=2)
         response = self.client.get(url)
         self.assertContains(response, "Chapter 2 for HTML")
         self.assertContains(response, "options.chapterNum = 2;")
 
     def test_bad_book_id(self):
         # If we have one book, asking for the second book will fail with a 404.
-        course = self.make_course(html_textbooks=[HTML_BOOK])
-        url = reverse('html_book', kwargs={'course_id': course.id, 'book_index': 1, 'chapter': 1})
+        self.make_course(html_textbooks=[HTML_BOOK])
+        url = self.make_url('html_book', book_index=1, chapter=1)
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
 
     def test_no_book(self):
         # If we have no books, asking for the first book will fail with a 404.
-        course = self.make_course()
-        url = reverse('html_book', kwargs={'course_id': course.id, 'book_index': 0, 'chapter': 1})
+        self.make_course()
+        url = self.make_url('html_book', book_index=0, chapter=1)
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
