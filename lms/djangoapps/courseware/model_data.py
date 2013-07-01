@@ -12,9 +12,14 @@ from .models import (
     XModuleStudentPrefsField,
     XModuleStudentInfoField
 )
+import logging
+
+from django.db import DatabaseError
 
 from xblock.runtime import KeyValueStore, InvalidScopeError
-from xblock.core import Scope
+from xblock.core import KeyValueMultiSaveError, Scope
+
+log = logging.getLogger(__name__)
 
 
 class InvalidWriteError(Exception):
@@ -244,7 +249,7 @@ class ModelDataCache(object):
                 module_state_key=key.block_scope_id.url(),
                 defaults={'state': json.dumps({}),
                           'module_type': key.block_scope_id.category,
-                         },
+                          },
             )
         elif key.scope == Scope.content:
             field_object, _ = XModuleContentField.objects.get_or_create(
@@ -344,6 +349,55 @@ class LmsKeyValueStore(KeyValueStore):
             field_object.value = json.dumps(value)
 
         field_object.save()
+
+    def set_many(self, kv_dict):
+        """
+        Provide a bulk save mechanism.
+
+        `kv_dict`: A dictionary of dirty fields that maps
+          xblock.DbModel._key : value
+
+        """
+        saved_fields = []
+        # field_objects maps a field_object to a list of associated fields
+        field_objects = dict()
+        for field in kv_dict:
+            # check field for validity
+            if field.field_name in self._descriptor_model_data:
+                raise InvalidWriteError("Not allowed to overwrite descriptor model data", field.field_name)
+
+            if field.scope not in self._allowed_scopes:
+                raise InvalidScopeError(field.scope)
+
+            # if the field is valid
+            field_object = self._model_data_cache.find_or_create(field)
+            # if this field_object isn't already in the dictionary
+            # add it
+            if field_object not in field_objects.keys():
+                field_objects[field_object] = []
+            # update the list of associated fields
+            field_objects[field_object].append(field)
+
+            # special case when scope is for the user state
+            if field.scope == Scope.user_state:
+                state = json.loads(field_object.state)
+                state[field.field_name] = kv_dict[field]
+                field_object.state = json.dumps(state)
+            else:
+            # The remaining scopes save fields on different rows, so
+            # we don't have to worry about conflicts
+                field_object.value = json.dumps(kv_dict[field])
+
+        for field_object in field_objects:
+            try:
+                # Save the field object that we made above
+                field_object.save()
+                # If save is successful on this scope, add the saved fields to
+                # the list of successful saves
+                saved_fields.extend([field.field_name for field in field_objects[field_object]])
+            except DatabaseError:
+                log.error('Error saving fields %r', field_objects[field_object])
+                raise KeyValueMultiSaveError(saved_fields)
 
     def delete(self, key):
         if key.field_name in self._descriptor_model_data:
