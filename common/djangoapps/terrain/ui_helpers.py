@@ -70,9 +70,7 @@ def css_click(css_selector, index=0, max_attempts=5, success_condition=lambda: T
     success_condition).
     """
     assert is_css_present(css_selector), "{} is not present".format(css_selector)
-    attempt = 0
-    result = False
-    for attempt in range(max_attempts):
+    for _ in range(max_attempts):
         try:
             world.css_find(css_selector)[index].click()
             if success_condition():
@@ -85,7 +83,7 @@ def css_click(css_selector, index=0, max_attempts=5, success_condition=lambda: T
         except:
             pass
     else:
-        # try once more, letting execptions raise
+        # try once more, letting exceptions raise
         world.css_find(css_selector)[index].click()
 
 
@@ -102,9 +100,7 @@ def css_check(css_selector, index=0, max_attempts=5, success_condition=lambda: T
     success_condition).
     """
     assert is_css_present(css_selector), "{} is not present".format(css_selector)
-    attempt = 0
-    result = False
-    for attempt in range(max_attempts):
+    for _ in range(max_attempts):
         try:
             world.css_find(css_selector)[index].check()
             if success_condition():
