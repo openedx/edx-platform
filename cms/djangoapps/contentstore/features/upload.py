@@ -91,7 +91,7 @@ def modify_upload(_step, file_name):
 
 
 @step('I see a confirmation that the file was deleted')
-def i_see_a_delete_confirmation(step):
+def i_see_a_delete_confirmation(_step):
     alert_css = '#notification-confirmation'
     assert world.is_css_present(alert_css)
 
