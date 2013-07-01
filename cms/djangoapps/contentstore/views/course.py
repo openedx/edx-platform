@@ -509,6 +509,9 @@ def textbook_index(request, org, course, name):
 @login_required
 @ensure_csrf_cookie
 def create_textbook(request, org, course, name):
+    """
+    JSON API endpoint for creating a textbook. Used by the Backbone application.
+    """
     location = get_location_and_verify_access(request, org, course, name)
     store = get_modulestore(location)
     course_module = store.get_item(location, depth=0)
@@ -542,6 +545,10 @@ def create_textbook(request, org, course, name):
 @ensure_csrf_cookie
 @require_http_methods(("GET", "POST", "DELETE"))
 def textbook_by_id(request, org, course, name, tid):
+    """
+    JSON API endpoint for manipulating a textbook via its internal ID.
+    Used by the Backbone application.
+    """
     location = get_location_and_verify_access(request, org, course, name)
     store = get_modulestore(location)
     course_module = store.get_item(location, depth=3)

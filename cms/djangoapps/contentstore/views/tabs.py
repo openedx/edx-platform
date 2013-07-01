@@ -17,11 +17,13 @@ __all__ = ['edit_tabs', 'reorder_static_tabs', 'static_pages', 'edit_static']
 
 
 def initialize_course_tabs(course):
-    # set up the default tabs
-    # I've added this because when we add static tabs, the LMS either expects a None for the tabs list or
-    # at least a list populated with the minimal times
-    # @TODO: I don't like the fact that the presentation tier is away of these data related constraints, let's find a better
-    # place for this. Also rather than using a simple list of dictionaries a nice class model would be helpful here
+    """
+    set up the default tabs
+    I've added this because when we add static tabs, the LMS either expects a None for the tabs list or
+    at least a list populated with the minimal times
+    @TODO: I don't like the fact that the presentation tier is away of these data related constraints, let's find a better
+    place for this. Also rather than using a simple list of dictionaries a nice class model would be helpful here
+    """
 
     # This logic is repeated in xmodule/modulestore/tests/factories.py
     # so if you change anything here, you need to also change it there.

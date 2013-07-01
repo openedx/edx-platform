@@ -38,6 +38,10 @@ __all__ = ['asset_index', 'upload_asset', 'import_course', 'generate_export_cour
 
 
 def assets_to_json_dict(assets):
+    """
+    Transform the results of a contentstore query into something appropriate
+    for output via JSON.
+    """
     ret = []
     for asset in assets:
         obj = {
