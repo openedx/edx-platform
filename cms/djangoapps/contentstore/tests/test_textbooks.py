@@ -36,6 +36,39 @@ class TextbookIndexTestCase(CourseTestCase):
         obj = json.loads(resp.content)
         self.assertEqual(self.course.pdf_textbooks, obj)
 
+    def test_view_index_xhr_content(self):
+        content = [
+            {
+                "tab_title": "my textbook",
+                "url": "/abc.pdf",
+                "id": "992"
+            }, {
+                "tab_title": "pineapple",
+                "id": "0pineapple",
+                "chapters": [
+                    {
+                        "title": "The Fruit",
+                        "url": "/a/b/fruit.pdf",
+                    }, {
+                        "title": "The Legend",
+                        "url": "/b/c/legend.pdf",
+                    }
+                ]
+            }
+        ]
+        self.course.pdf_textbooks = content
+        store = get_modulestore(self.course.location)
+        store.update_metadata(self.course.location, own_metadata(self.course))
+
+        resp = self.client.get(
+            self.url,
+            HTTP_ACCEPT="application/json",
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest'
+        )
+        self.assert2XX(resp.status_code)
+        obj = json.loads(resp.content)
+        self.assertEqual(content, obj)
+
     def test_view_index_xhr_post(self):
         textbooks = [
             {"tab_title": "Hi, mom!"},
