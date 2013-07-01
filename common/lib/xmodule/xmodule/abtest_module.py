@@ -129,9 +129,7 @@ class ABTestDescriptor(ABTestFields, RawDescriptor, XmlDescriptor):
             raise InvalidDefinitionError("ABTest portions must add up to less than or equal to 1")
 
         group_portions[DEFAULT] = default_portion
-        # I have no clue why the line of code below ever existed.
-        # It was scrambling the order of all the elements in abtest.
-        # children.sort()
+        children.sort()
 
         return {
             'group_portions': group_portions,
