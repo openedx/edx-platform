@@ -2,6 +2,7 @@
 #pylint: disable=W0621
 
 from lettuce import world, step
+from django.conf import settings
 import os
 
 TEST_ROOT = settings.COMMON_TEST_DATA_ROOT
