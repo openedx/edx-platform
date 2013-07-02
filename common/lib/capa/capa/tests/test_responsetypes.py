@@ -1436,193 +1436,196 @@ class ChoiceTextResponseTest(ResponseTest):
     from response_xml_factory import ChoiceTextResponseXMLFactory
     xml_factory_class = ChoiceTextResponseXMLFactory
 
+    #Problems(functions which take an inputtype{radio, or checkbox} and build a problem for))
+    one_choice_one_input = lambda itype, inst: inst._make_problem(("true", {"answer": "123", "tolerance": "1"}), itype)
+    one_choice_two_inputs = lambda itype, inst: inst._make_problem(
+        [("true", ({"answer": "123", "tolerance": "1"}, {"answer": "456", "tolerance": "10"}))], itype)
+    one_input_script = lambda itype, inst: inst._make_problem(("true", {"answer": "$computed_response", "tolerance": "1"}),
+                                                              itype, "computed_response = math.sqrt(4)")
+    one_choice_no_input = lambda itype, inst: inst._make_problem(("true", {}), itype)
+    two_choices_no_inputs = lambda itype, inst: inst._make_problem([("false", {}), ("true", {})], itype)
+    two_choices_one_input_1 = lambda itype, inst: inst._make_problem(
+        [("false", {}), ("true", {"answer": "123", "tolerance": "0"})], itype)
+    two_choices_one_input_2 = lambda itype, inst: inst._make_problem(
+        [("true", {}), ("false", {"answer": "123", "tolerance": "0"})], itype)
+    two_choices_two_inputs = lambda itype, inst: inst._make_problem(
+        [("true", {"answer": "123", "tolerance": "0"}), ("false", {"answer": "999", "tolerance": "0"})], itype)
+
+    TEST_INPUTS = {"one_choice_no_input_correct": [(True, [])],
+                   "one_choice_no_input_incorrect": [(False, [])],
+                   "one_choice_no_input_invalid_choice": [(False, []), (True, [])],
+                   "one_choice_one_input_correct": [(True, ["123"])],
+                   "one_input_script_correct": [(True, ["2"])],
+                   "one_input_script_incorrect": [(True, ["3.25"])],
+                   "one_choice_two_inputs_correct": [(True, ["123", "456"])],
+                   "one_choice_two_inputs_tolerance": [(True, ["123 + .5", "456 + 9"])],
+                   "one_choice_two_inputs_one_wrong": [(True, ["0", "456"])],
+                   "one_choice_two_inputs_both_wrong": [(True, ["0", "0"])],
+                   "one_choice_two_inputs_inputs_blank": [(True, ["", ""])],
+                   "one_choice_two_inputs_empty": [(False, [])],
+                   "one_choice_two_inputs_fail_tolerance": [(True, ["123 + 1.5", "456 + 9"])],
+                   "one_choice_one_input_within_tolerance": [(True, ["122.5"])],
+                   "one_choice_one_input_answer_incorrect": [(True, ["345"])],
+                   "one_choice_one_input_choice_incorrect": [(False, ["123"])],
+                   "two_choices_no_inputs_correct": [(False, []), (True, [])],
+                   "two_choices_no_inputs_incorrect": [(True, []), (False, [])],
+                   "two_choices_no_inputs_blank": [(False, []), (False, [])],
+                   "two_choices_one_input_1_correct": [(False, []), (True, ["123"])],
+                   "two_choices_one_input_1_incorrect": [(True, []), (False, ["123"])],
+                   "two_choices_one_input_1_input_wrong": [(False, []), (True, ["321"])],
+                   "two_choices_one_input_1_blank": [(False, []), (False, [])],
+                   "two_choices_one_input_2_correct": [(True, []), (False, ["123"])],
+                   "two_choices_one_input_2_incorrect": [(False, []), (True, ["123"])],
+                   "two_choices_two_inputs_correct": [(True, ["123"]), (False, [])],
+                   "two_choices_two_inputs_wrong_choice": [(False, ["123"]), (True, [])],
+                   "two_choices_two_inputs_wrong_input": [(True, ["321"]), (False, [])]
+                   }
+
+    TEST_SCENARIOS = {"one_choice_no_input_correct": ("one_choice_no_input", "correct"),
+                      "one_choice_no_input_incorrect": ("one_choice_no_input", "incorrect"),
+                      "one_choice_no_input_invalid_choice": ("one_choice_no_input", "incorrect"),
+                      "one_input_script_correct": ("one_input_script", "correct"),
+                      "one_input_script_incorrect": ("one_input_script", "incorrect"),
+                      "one_choice_two_inputs_correct": ("one_choice_two_inputs", "correct"),
+                      "one_choice_two_inputs_tolerance": ("one_choice_two_inputs", "correct"),
+                      "one_choice_two_inputs_one_wrong": ("one_choice_two_inputs", "incorrect"),
+                      "one_choice_two_inputs_both_wrong": ("one_choice_two_inputs", "incorrect"),
+                      "one_choice_two_inputs_inputs_blank": ("one_choice_two_inputs", "incorrect"),
+                      "one_choice_two_inputs_empty": ("one_choice_two_inputs", "incorrect"),
+                      "one_choice_two_inputs_fail_tolerance": ("one_choice_two_inputs", "incorrect"),
+                      "one_choice_one_input_correct": ("one_choice_one_input", "correct"),
+                      "one_choice_one_input_within_tolerance": ("one_choice_one_input", "correct"),
+                      "one_choice_one_input_answer_incorrect": ("one_choice_one_input", "incorrect"),
+                      "one_choice_one_input_choice_incorrect": ("one_choice_one_input", "incorrect"),
+                      "two_choices_no_inputs_correct": ("two_choices_no_inputs", "correct"),
+                      "two_choices_no_inputs_incorrect": ("two_choices_no_inputs", "incorrect"),
+                      "two_choices_no_inputs_blank": ("two_choices_no_inputs", "incorrect"),
+                      "two_choices_one_input_1_correct": ("two_choices_one_input_1", "correct"),
+                      "two_choices_one_input_1_incorrect": ("two_choices_one_input_1", "incorrect"),
+                      "two_choices_one_input_1_input_wrong": ("two_choices_one_input_1", "incorrect"),
+                      "two_choices_one_input_1_blank": ("two_choices_one_input_1", "incorrect"),
+                      "two_choices_one_input_2_correct": ("two_choices_one_input_2", "correct"),
+                      "two_choices_one_input_2_incorrect": ("two_choices_one_input_2", "incorrect"),
+                      "two_choices_two_inputs_correct": ("two_choices_two_inputs", "correct"),
+                      "two_choices_two_inputs_wrong_choice": ("two_choices_two_inputs", "incorrect"),
+                      "two_choices_two_inputs_wrong_input": ("two_choices_two_inputs", "incorrect")
+                      }
+    TEST_PROBLEMS = {"one_choice_no_input": one_choice_no_input,
+                     "one_choice_one_input": one_choice_one_input,
+                     "one_input_script": one_input_script,
+                     "one_choice_two_inputs": one_choice_two_inputs,
+                     "two_choices_no_inputs": two_choices_no_inputs,
+                     "two_choices_one_input_1": two_choices_one_input_1,
+                     "two_choices_one_input_2": two_choices_one_input_2,
+                     "two_choices_two_inputs": two_choices_two_inputs
+                     }
+
+    def _make_problem(self, choices, in_type='radiotextgroup', script=''):
+        """
+        True,[("answer": #,"tolerance": #),]]
+        Converts inputs to iterable types if they aren't for convenience
+        """
+        choice_inputs = []
+        if (not(type(choices[0]) == list or type(choices[0]) == tuple)):
+            choices = [choices]
+        for choice in choices:
+            correctness, answers = choice
+            textinputs = []
+            if answers:
+                if (not(type(answers) == list or type(answers) == tuple)):
+                    answers = [answers]
+
+                for answer in answers:
+                    textinputs.append(self.xml_factory_class.create_textinput_element(**answer))
+            choice_inputs.append(self.xml_factory_class.create_choice_element(
+                **{"correctness": correctness, "inputs": textinputs}))
+        return self.build_problem(choices=choice_inputs, type=in_type, script=script)
+
+    def _make_answer_dict(self, choice_list):
+        """
+        convenience method to make generation of answers less tedious,
+        pass in an iterable argument with elements of the form: [bool, [ans,]]
+        Will generate an answer dict for those options
+        """
+
+        answer_dict = {}
+        for index, choice_answers_pair in enumerate(choice_list):
+            choice, answers = choice_answers_pair
+
+            if choice:
+                choice_id = "1_2_1_choiceinput_{index}bc".format(index=index)
+                choice_value = "choiceinput_{index}".format(index=index)
+                answer_dict[choice_id] = choice_value
+
+            for ind, answer in enumerate(answers):
+                answer_id = "1_2_1_choiceinput_{index}_textinput_{ind}".format(index=index, ind=ind)
+                answer_dict[answer_id] = answer
+
+        return answer_dict
+
     def test_invalid_xml(self):
         with self.assertRaises(Exception):
             self.build_problem(type="invalidtextgroup")
 
     def test_valid_xml(self):
-        self.build_problem(**{"demo": "true"})
+        self.build_problem(demo="true")
         self.assertTrue(True)
 
-    def test_grade(self):
+    def test_interpret_error(self):
+        one_choice_one_input = lambda itype: self._make_problem(("true", {"answer": "123", "tolerance": "1"}), itype)
 
-        def make_answer_dict(choice_list):
-            """
-            convenience method to make generation of answers less tedious,
-            pass in an iterable argument with elements of the form: [bool, [ans,]]
-            Will generate an answer dict for those options
-            """
+        with self.assertRaisesRegexp(StudentInputError, "Could not interpret"):
+            self.assert_grade(one_choice_one_input('radiotextgroup'),
+                              self._make_answer_dict([(True, ["Platypus"])]), "correct")
 
-            answer_dict = {}
-            for index, choice_answers_pair in enumerate(choice_list):
-                choice, answers = choice_answers_pair
+    def test_staff_answer_error(self):
+        broken_problem = self._make_problem(
+            [("true", {"answer": "Platypus", "tolerance": "0"}), ("true", {"answer": "edX", "tolerance": "0"})],
+            "checkboxtextgroup")
+        with self.assertRaisesRegexp(StudentInputError,
+                                     "There was a problem with the staff answer to this problem"):
+            self.assert_grade(broken_problem,
+                              self._make_answer_dict([(True, ["1"]), (True, ["1"])]),
+                              "correct")
 
-                if choice:
-                    choice_id = "1_2_1_choiceinput_{index}bc".format(index=index)
-                    choice_value = "choiceinput_{index}".format(index=index)
-                    answer_dict[choice_id] = choice_value
+    def test_radio_grades(self):
 
-                for ind, answer in enumerate(answers):
-                    answer_id = "1_2_1_choiceinput_{index}_textinput_{ind}".format(index=index, ind=ind)
-                    answer_dict[answer_id] = answer
+        for name, inputs in self.TEST_INPUTS.iteritems():
+            submission = self._make_answer_dict(inputs)
+            problem_name, correctness = self.TEST_SCENARIOS[name]
+            problem = self.TEST_PROBLEMS[problem_name]
 
-            return answer_dict
+            self.assert_grade(problem('radiotextgroup', self), submission, correctness,
+                              msg="{0} should be {1}".format(name, correctness))
 
-        def make_answers(ans_dict):
-            return ans_dict
-
-        def make_problem(choices, in_type='radiotextgroup', script=''):
-            """
-            True,[("answer": #,"tolerance": #),]]
-            Converts inputs to iterable types if they aren't for convenience
-            """
-            choice_inputs = []
-            if (not(type(choices[0]) == list or type(choices[0]) == tuple)):
-                choices = [choices]
-            for choice in choices:
-                correctness, answers = choice
-                textinputs = []
-                if answers:
-                    if (not(type(answers) == list or type(answers) == tuple)):
-                        answers = [answers]
-
-                    for answer in answers:
-                        textinputs.append(self.xml_factory_class.create_textinput_element(**answer))
-                choice_inputs.append(self.xml_factory_class.create_choice_element(
-                    **{"correctness": correctness, "inputs": textinputs}))
-            return self.build_problem(**{'choices': choice_inputs, 'type': in_type, 'script': script})
-
-        test_inputs = {"one_choice_no_input_correct": [(True, [])],
-                       "one_choice_no_input_incorrect": [(False, [])],
-                       "one_choice_no_input_invalid_choice": [(False, []), (True, [])],
-                       "one_choice_one_input_correct": [(True, ["123"])],
-                       "one_input_script_correct": [(True, ["2"])],
-                       "one_input_script_incorrect": [(True, ["3.25"])],
-                       "one_choice_two_inputs_correct": [(True, ["123", "456"])],
-                       "one_choice_two_inputs_tolerance": [(True, ["123 + .5", "456 + 9"])],
-                       "one_choice_two_inputs_one_wrong": [(True, ["0", "456"])],
-                       "one_choice_two_inputs_both_wrong": [(True, ["0", "0"])],
-                       "one_choice_two_inputs_inputs_blank": [(True, ["", ""])],
-                       "one_choice_two_inputs_empty": [(False, [])],
-                       "one_choice_two_inputs_fail_tolerance": [(True, ["123 + 1.5", "456 + 9"])],
-                       "one_choice_one_input_within_tolerance": [(True, ["122.5"])],
-                       "one_choice_one_input_answer_incorrect": [(True, ["345"])],
-                       "one_choice_one_input_choice_incorrect": [(False, ["123"])],
-                       "two_choices_no_inputs_correct": [(False, []), (True, [])],
-                       "two_choices_no_inputs_incorrect": [(True, []), (False, [])],
-                       "two_choices_no_inputs_blank": [(False, []), (False, [])],
-                       "two_choices_one_input_1_correct": [(False, []), (True, ["123"])],
-                       "two_choices_one_input_1_incorrect": [(True, []), (False, ["123"])],
-                       "two_choices_one_input_1_input_wrong": [(False, []), (True, ["321"])],
-                       "two_choices_one_input_1_blank": [(False, []), (False, [])],
-                       "two_choices_one_input_2_correct": [(True, []), (False, ["123"])],
-                       "two_choices_one_input_2_incorrect": [(False, []), (True, ["123"])],
-                       "two_choices_two_inputs_correct": [(True, ["123"]), (False, [])],
-                       "two_choices_two_inputs_wrong_choice": [(False, ["123"]), (True, [])],
-                       "two_choices_two_inputs_wrong_input": [(True, ["321"]), (False, [])]
-                       }
-
-        test_scenarios = {"one_choice_no_input_correct": ("one_choice_no_input", "correct"),
-                          "one_choice_no_input_incorrect": ("one_choice_no_input", "incorrect"),
-                          "one_choice_no_input_invalid_choice": ("one_choice_no_input", "incorrect"),
-                          "one_input_script_correct": ("one_input_script", "correct"),
-                          "one_input_script_incorrect": ("one_input_script", "incorrect"),
-                          "one_choice_two_inputs_correct": ("one_choice_two_inputs", "correct"),
-                          "one_choice_two_inputs_tolerance": ("one_choice_two_inputs", "correct"),
-                          "one_choice_two_inputs_one_wrong": ("one_choice_two_inputs", "incorrect"),
-                          "one_choice_two_inputs_both_wrong": ("one_choice_two_inputs", "incorrect"),
-                          "one_choice_two_inputs_inputs_blank": ("one_choice_two_inputs", "incorrect"),
-                          "one_choice_two_inputs_empty": ("one_choice_two_inputs", "incorrect"),
-                          "one_choice_two_inputs_fail_tolerance": ("one_choice_two_inputs", "incorrect"),
-                          "one_choice_one_input_correct": ("one_choice_one_input", "correct"),
-                          "one_choice_one_input_within_tolerance": ("one_choice_one_input", "correct"),
-                          "one_choice_one_input_answer_incorrect": ("one_choice_one_input", "incorrect"),
-                          "one_choice_one_input_choice_incorrect": ("one_choice_one_input", "incorrect"),
-                          "two_choices_no_inputs_correct": ("two_choices_no_inputs", "correct"),
-                          "two_choices_no_inputs_incorrect": ("two_choices_no_inputs", "incorrect"),
-                          "two_choices_no_inputs_blank": ("two_choices_no_inputs", "incorrect"),
-                          "two_choices_one_input_1_correct": ("two_choices_one_input_1", "correct"),
-                          "two_choices_one_input_1_incorrect": ("two_choices_one_input_1", "incorrect"),
-                          "two_choices_one_input_1_input_wrong": ("two_choices_one_input_1", "incorrect"),
-                          "two_choices_one_input_1_blank": ("two_choices_one_input_1", "incorrect"),
-                          "two_choices_one_input_2_correct": ("two_choices_one_input_2", "correct"),
-                          "two_choices_one_input_2_incorrect": ("two_choices_one_input_2", "incorrect"),
-                          "two_choices_two_inputs_correct": ("two_choices_two_inputs", "correct"),
-                          "two_choices_two_inputs_wrong_choice": ("two_choices_two_inputs", "incorrect"),
-                          "two_choices_two_inputs_wrong_input": ("two_choices_two_inputs", "incorrect")
-                          }
-
-        checkbox_inputs = {"two_choices_correct": [(True, []), (True, [])],
-                           "two_choices_incorrect": [(True, []), (False, [])],
-                           "two_choices_two_inputs_correct": [(True, ["123"]), (True, ["456"])],
-                           "two_choices_two_inputs_missing_choice": [(True, ["123"]), (False, ["456"])],
-                           "two_choices_two_inputs_wrong_input": [(True, ["123"]), (True, ["654"])]
-                           }
+    def test_checkbox_grades(self):
         checkbox_scenarios = {"two_choices_correct": ("checkbox_two_choices", "correct"),
                               "two_choices_incorrect": ("checkbox_two_choices", "incorrect"),
                               "two_choices_two_inputs_correct": ("checkbox_two_choices_two_inputs", "correct"),
                               "two_choices_two_inputs_missing_choice": ("checkbox_two_choices_two_inputs", "incorrect"),
                               "two_choices_two_inputs_wrong_input": ("checkbox_two_choices_two_inputs", "incorrect")
                               }
+        checkbox_inputs = {"two_choices_correct": [(True, []), (True, [])],
+                           "two_choices_incorrect": [(True, []), (False, [])],
+                           "two_choices_two_inputs_correct": [(True, ["123"]), (True, ["456"])],
+                           "two_choices_two_inputs_missing_choice": [(True, ["123"]), (False, ["456"])],
+                           "two_choices_two_inputs_wrong_input": [(True, ["123"]), (True, ["654"])]
+                           }
 
-        one_choice_one_input = lambda itype: make_problem(("true", {"answer": "123", "tolerance": "1"}), itype)
-        one_choice_two_inputs = lambda itype: make_problem(
-            [("true", ({"answer": "123", "tolerance": "1"}, {"answer": "456", "tolerance": "10"}))], itype)
-        one_input_script = lambda itype: make_problem(("true", {"answer": "$computed_response", "tolerance": "1"}),
-                                                      itype, "computed_response = math.sqrt(4)")
-        one_choice_no_input = lambda itype: make_problem(("true", {}), itype)
-        two_choices_no_inputs = lambda itype: make_problem([("false", {}), ("true", {})], itype)
-        two_choices_one_input_1 = lambda itype: make_problem(
-            [("false", {}), ("true", {"answer": "123", "tolerance": "0"})], itype)
-        two_choices_one_input_2 = lambda itype: make_problem(
-            [("true", {}), ("false", {"answer": "123", "tolerance": "0"})], itype)
-        two_choices_two_inputs = lambda itype: make_problem(
-            [("true", {"answer": "123", "tolerance": "0"}), ("false", {"answer": "999", "tolerance": "0"})], itype)
-        checkbox_two_choices = make_problem(
+        checkbox_two_choices = self._make_problem(
             [("true", {}), ("true", {})], "checkboxtextgroup")
-        checkbox_two_choices_two_inputs = make_problem(
+        checkbox_two_choices_two_inputs = self._make_problem(
             [("true", {"answer": "123", "tolerance": "0"}), ("true", {"answer": "456", "tolerance": "0"})],
             "checkboxtextgroup")
-        broken_problem = make_problem(
-            [("true", {"answer": "Platypus", "tolerance": "0"}), ("true", {"answer": "edX", "tolerance": "0"})],
-            "checkboxtextgroup")
 
-        test_problems = {"one_choice_no_input": one_choice_no_input,
-                         "one_choice_one_input": one_choice_one_input,
-                         "one_input_script": one_input_script,
-                         "one_choice_two_inputs": one_choice_two_inputs,
-                         "two_choices_no_inputs": two_choices_no_inputs,
-                         "two_choices_one_input_1": two_choices_one_input_1,
-                         "two_choices_one_input_2": two_choices_one_input_2,
-                         "two_choices_two_inputs": two_choices_two_inputs,
-                         "checkbox_two_choices": checkbox_two_choices,
-                         "checkbox_two_choices_two_inputs": checkbox_two_choices_two_inputs
-                         }
-
-        with self.assertRaisesRegexp(StudentInputError, "Could not interpret"):
-            self.assert_grade(one_choice_one_input('radiotextgroup'),
-                              make_answers(make_answer_dict([(True, ["Platypus"])])), "correct")
-
-        with self.assertRaisesRegexp(StudentInputError,
-                                     "There was a problem with the staff answer to this problem"):
-            self.assert_grade(broken_problem,
-                              make_answers(make_answer_dict([(True, ["1"]), (True, ["1"])])),
-                              "correct")
-
-        for name, inputs in test_inputs.iteritems():
-            submission = make_answers(make_answer_dict(inputs))
-            problem_name, correctness = test_scenarios[name]
-            problem = test_problems[problem_name]
-
-            self.assert_grade(problem('radiotextgroup'), submission, correctness,
-                              msg="{0} should be {1}".format(name, correctness))
-            self.assert_grade(problem('checkboxtextgroup'), submission, correctness,
-                              msg="{0} should be {1}".format(name, correctness))
+        checkbox_problems = {"checkbox_two_choices": checkbox_two_choices,
+                             "checkbox_two_choices_two_inputs": checkbox_two_choices_two_inputs}
+        checkbox_problems.update(self.TEST_PROBLEMS)
 
         for name, inputs in checkbox_inputs.iteritems():
-            submission = make_answers(make_answer_dict(inputs))
+            submission = self._make_answer_dict(inputs)
             problem_name, correctness = checkbox_scenarios[name]
-            problem = test_problems[problem_name]
+            problem = checkbox_problems[problem_name]
 
             self.assert_grade(problem, submission, correctness,
                               msg="{0} should be {1}".format(name, correctness))
