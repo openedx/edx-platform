@@ -168,6 +168,21 @@ def css_text(css_selector):
 
 
 @world.absorb
+def css_html(css_selector, index=0, max_attempts=5):
+    """
+    Returns the HTML of a css_selector and will retry if there is a StaleElementReferenceException
+    """
+    assert is_css_present(css_selector)
+    attempt = 0
+    while attempt < max_attempts:
+        try:
+            return world.browser.find_by_css(css_selector)[index].html
+        except:
+            attempt += 1
+    return ''
+
+
+@world.absorb
 def css_visible(css_selector):
     assert is_css_present(css_selector)
     return world.browser.find_by_css(css_selector).visible

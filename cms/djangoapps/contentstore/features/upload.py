@@ -67,7 +67,7 @@ def no_duplicate(_step, file_name):
     all_names = world.css_find(names_css)
     only_one = False
     for i in range(len(all_names)):
-        if file_name == all_names[i].html:
+        if file_name == world.css_html(names_css, index=i):
             only_one = not only_one
     assert only_one
 
@@ -100,7 +100,7 @@ def get_index(file_name):
     names_css = 'td.name-col > a.filename'
     all_names = world.css_find(names_css)
     for i in range(len(all_names)):
-        if file_name == all_names[i].html:
+        if file_name == world.css_html(names_css, index=i):
             return i
     return -1
 

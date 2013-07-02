@@ -54,6 +54,6 @@ def get_index(name):
     page_name_css = 'section[data-type="HTMLModule"]'
     all_pages = world.css_find(page_name_css)
     for i in range(len(all_pages)):
-        if all_pages[i].html == '\n    {name}\n'.format(name=name):
+        if world.css_html(page_name_css, index=i) == '\n    {name}\n'.format(name=name):
             return i
     return -1
