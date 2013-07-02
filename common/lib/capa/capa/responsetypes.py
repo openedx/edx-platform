@@ -2129,7 +2129,7 @@ class ChoiceTextResponse(LoncapaResponse):
                                      id=self.xml.get('id'))
         for node in correct_xml:
             parent_name = node.get('name')
-            parent_name = self.answer_id + "_" + parent_name + 'bc'
+            #parent_name = self.answer_id + "_" + parent_name + 'bc'
             self.correct_choices[parent_name] = {'answer': ''}
             self.answer_values[self.answer_id].append(parent_name)
             answer_list = []
@@ -2151,7 +2151,7 @@ class ChoiceTextResponse(LoncapaResponse):
 
         for index, choice in enumerate(self.xml.xpath('//*[@id=$id]//choice',
                                                       id=self.xml.get('id'))):
-            choice.set("name", "choiceinput_" + str(index))
+            choice.set("name", self.answer_id + "_choiceinput_" + str(index) + "bc")
             for ind, child in enumerate(choice.findall('textinput')):
                 child.set("name", "choiceinput_" + str(index) + "_textinput_" + str(ind))
 
@@ -2230,7 +2230,7 @@ class ChoiceTextResponse(LoncapaResponse):
         student_choices = set(choices)
         required_selected = len(self.correct_choices - student_choices) == 0
         no_extra_selected = len(student_choices - self.correct_choices) == 0
-        correct = required_selected & no_extra_selected
+        correct = required_selected and no_extra_selected
         return correct
 
 

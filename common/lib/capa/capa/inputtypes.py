@@ -1313,6 +1313,29 @@ class ChoiceTextGroup(InputTypeBase):
     Groups of radiobutton/checkboxes with text inputs
 
     Example:
+    <problem>
+      <startouttext/>
+        You have a list of numbers [1,2,3] . If you remove the 3, the sum:
+      <endouttext/>
+      <choicetextresponse>
+        <radiotextgroup>
+          <choice correct="false">Goes up by
+            <textinput/></choice>
+          <choice correct="false">Three
+          <textinput tolerance=".3" answer="3"/>Four
+            <textinput tolerance=".3" answer="4"/>Five
+          <textinput/></choice>
+          <choice correct="true">Goes down</choice>
+        </radiotextgroup>
+      </choicetextresponse>
+      <solution>
+    <div class="detailed-solution">
+    <p>Explanation</p>
+
+    <p> The answer is goes down</p>
+    </div>
+    </solution>
+    </problem>
     """
     template = "choicetext.html"
     tags = ['radiotextgroup', 'checkboxtextgroup']
