@@ -40,13 +40,15 @@
         var elt= $(event.target);
         var parent_container = elt.closest('section[id^="forinput"]');
         var choice = parent_container.find("input[type='checkbox'], input[type='radio']");
-        if (choice.attr('type')==='radio'){
+        if (choice.attr("type") === "radio"){
             choice.attr("checked", "checked");
-        }else{
-            if(choice.attr('checked')==="checked"){
-                choice.removeAttr('checked');
-            }else{
-                choice.attr("checked", "checked");
+        } else {
+            if (choice.attr('checked')) {
+                choice.prop("checked", false);
+                choice.uncheck();
+            } else {
+                choice.prop("checked", true);
+                choice.check();
             }
 
         }

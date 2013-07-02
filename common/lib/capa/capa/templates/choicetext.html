@@ -1,9 +1,7 @@
-<%import json%>
-<%parsed_value = json.loads(value)%>
 <% element_checked = False %>
 % for choice_id, _ in choices:
     <%choice_id = choice_id %>
-    %if choice_id in parsed_value:
+    %if choice_id in value:
         <% element_checked = True %>
     %endif
 %endfor
@@ -28,7 +26,7 @@
         % for choice_id, choice_description in choices:
         <%choice_id= choice_id %>
         <section id="forinput${choice_id}"
-            % if input_type == 'radio' and choice_id in parsed_value :
+            % if input_type == 'radio' and choice_id in value :
             <%
                 if status == 'correct':
                     correctness = 'correct'
@@ -38,13 +36,13 @@
                     correctness = None
             %>
             % if correctness and not show_correctness=='never':
-            class="choicetextgroup_${correctness}"
+                class="choicetextgroup_${correctness}"
             % endif
             % endif
             >
             <input class="ctinput" type="${input_type}" name="choiceinput_${id}" id="${choice_id}" value="${choice_id}"
 
-            % if choice_id in parsed_value:
+            % if choice_id in value:
             checked="true"
             % endif
             />
@@ -56,7 +54,7 @@
                      </span>
                 % else:
                     <% my_id = id+ "_" + content_node.get('contents','') %>
-                    <% my_val = parsed_value.get(my_id,'') %>
+                    <% my_val = value.get(my_id,'') %>
                     <input class="ctinput" type="text" name="${content_node['contents']}" id="${id}_${content_node['contents']}" value="${my_val|h} "/>
                 %endif
                 <span class="mock_label">
@@ -70,7 +68,7 @@
         % endfor
         <span id="answer_${id}"></span>
     </fieldset>
-        <input class= "choicetextvalue" type="hidden"  name="input_${id}" id="input_${id}" value="${value|h}" />
+        <input class= "choicetextvalue" type="hidden"  name="input_${id}{}" id="input_${id}" value="${value|h}" />
     % if show_correctness == "never" and (value or status not in ['unsubmitted']):
     <div class="capa_alert">${submitted_message}</div>
     %endif

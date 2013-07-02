@@ -2164,11 +2164,15 @@ class ChoiceTextResponse(LoncapaResponse):
 
         student answers is a json serialized dict containing these
         """
-        student_answer = student_answers.get(self.answer_id, "")
-
+        answer_dict = student_answers.get(self.answer_id, "")
+        log.debug("GETTING SCORE FOR THE ANSWERS WHICH ARE {0}".format(student_answers))
+        """
         try:
             answer_dict = json.loads(student_answer)
         except (TypeError, ValueError):
+            raise StudentInputError("Could not parse answers")
+        """
+        if "errror" in answer_dict:
             raise StudentInputError("Could not parse answers")
         binary_choices, text_inputs = self._split_answers_dict(answer_dict)
 
@@ -2176,37 +2180,8 @@ class ChoiceTextResponse(LoncapaResponse):
         #don't bother checking text inputs doing this unless they made the right choice
         inputs_correct = True
         if choices_correct:
-            for answer_name, params in self.correct_inputs.iteritems():
-                student_answer = text_inputs.get(answer_name, '')
-
-                correct_ans = params['answer']
-                #assume zero tolerance if it isn't specified
-                tolerance = params.get('tolerance', '0')
-                #Here we do the same things as in grading a numerical response...
-                try:
-                    correct_ans = complex(correct_ans)
-                except ValueError:
-                    log.debug(
-                        "Content error--answer '{0}' is not a valid complex number".format(
-                        correct_ans))
-                    raise StudentInputError(
-                        "There was a problem with the staff answer to this problem")
-
-                try:
-                    partial_correct = compare_with_tolerance(
-                        evaluator(dict(), dict(), student_answer),
-                        correct_ans, tolerance)
-                except:
-                    # Use the traceback-preserving version of re-raising with a
-                    # different type
-                    _, _, trace = sys.exc_info()
-
-                    raise StudentInputError("Could not interpret '{0}' as a number {1}".format(
-                                            cgi.escape(student_answer), trace))
-
-                if not partial_correct:
-                    inputs_correct = False
-
+            inputs_correct = self._check_student_inputs(text_inputs)
+        log.debug("Inputs correct is {0} and choices correct is {1}".format(inputs_correct, choices_correct))
         correct = choices_correct and inputs_correct
         if correct:
             return CorrectMap(self.answer_id, 'correct')
@@ -2233,6 +2208,39 @@ class ChoiceTextResponse(LoncapaResponse):
         correct = required_selected and no_extra_selected
         return correct
 
+    def _check_student_inputs(self, text_inputs):
+        inputs_correct = True
+        for answer_name, params in self.correct_inputs.iteritems():
+            student_answer = text_inputs.get(answer_name, '')
+
+            correct_ans = params['answer']
+            #assume zero tolerance if it isn't specified
+            tolerance = params.get('tolerance', '0')
+            #Here we do the same things as in grading a numerical response...
+            try:
+                correct_ans = complex(correct_ans)
+            except ValueError:
+                log.debug(
+                    "Content error--answer '{0}' is not a valid complex number".format(
+                    correct_ans))
+                raise StudentInputError(
+                    "There was a problem with the staff answer to this problem")
+
+            try:
+                partial_correct = compare_with_tolerance(
+                    evaluator(dict(), dict(), student_answer),
+                    correct_ans, tolerance)
+            except:
+                # Use the traceback-preserving version of re-raising with a
+                # different type
+                _, _, trace = sys.exc_info()
+
+                raise StudentInputError("Could not interpret '{0}' as a number {1}".format(
+                                        cgi.escape(student_answer), trace))
+
+            if not partial_correct:
+                inputs_correct = False
+        return inputs_correct
 
 #-----------------------------------------------------------------------------
 

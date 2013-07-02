@@ -1351,7 +1351,7 @@ class ChoiceTextGroup(InputTypeBase):
 
         if self.value == '':
             #need an iterable json value to start with
-            self.value = '{}'
+            self.value = {}
         self.choices = self.extract_choices(self.xml)
 
     @classmethod

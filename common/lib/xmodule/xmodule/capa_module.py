@@ -776,10 +776,16 @@ class CapaModule(CapaFields, XModule):
                 # if the name ends with '[]' (which looks like an array), then the
                 # answer will be an array.
                 is_list_key = name.endswith('[]')
-                name = name[:-2] if is_list_key else name
+                is_dict_key = name.endswith('{}')
+                name = name[:-2] if is_list_key or is_dict_key else name
 
                 if is_list_key:
                     val = data.getlist(key)
+                elif is_dict_key:
+                    try:
+                        val = json.loads(data[key])
+                    except(KeyError, ValueError):
+                        val = {"error": "error"}
                 else:
                     val = data[key]
 
