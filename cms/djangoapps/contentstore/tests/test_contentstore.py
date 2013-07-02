@@ -344,6 +344,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         err_cnt = perform_xlint('common/test/data', ['full'])
         self.assertGreater(err_cnt, 0)
 
+    @override_settings(COURSES_WITH_UNSAFE_CODE=['edx/full/.*'])
     def test_module_preview(self):
         '''
         Tests the ajax callback to render an XModule
@@ -359,7 +360,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertIn('Inline content', resp.content)
 
-        # also try a custom response
+        # also try a custom response which will trigger the 'is this course in whitelist' logic
         problem_module_location = Location(['i4x', 'edX', 'full', 'problem', 'H1P1_Energy', None])
         url = reverse('preview_component', kwargs={'location': problem_module_location.url()})
         resp = self.client.get(url)
