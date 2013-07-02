@@ -1748,15 +1748,19 @@ class FormulaResponse(LoncapaResponse):
                 student_variables[str(var)] = value
             # log.debug('formula: instructor_vars=%s, expected=%s' %
             # (instructor_variables,expected))
-            instructor_result = evaluator(instructor_variables, dict(),
-                                          expected, cs=self.case_sensitive)
+            instructor_result = evaluator(
+                instructor_variables, dict(),
+                expected, case_sensitive=self.case_sensitive
+            )
             try:
                 # log.debug('formula: student_vars=%s, given=%s' %
                 # (student_variables,given))
-                student_result = evaluator(student_variables,
-                                           dict(),
-                                           given,
-                                           cs=self.case_sensitive)
+                student_result = evaluator(
+                    student_variables,
+                    dict(),
+                    given,
+                    case_sensitive=self.case_sensitive
+                )
             except UndefinedVariable as uv:
                 log.debug(
                     'formularesponse: undefined variable in given=%s' % given)

@@ -470,10 +470,15 @@ class EvaluatorTest(unittest.TestCase):
         variables = {'t': 1.0}
         self.assertEqual(calc.evaluator(variables, {}, "t"), 1.0)
         self.assertEqual(calc.evaluator(variables, {}, "T"), 1.0)
-        self.assertEqual(calc.evaluator(variables, {}, "t", cs=True), 1.0)
+        self.assertEqual(
+            calc.evaluator(variables, {}, "t", case_sensitive=True),
+            1.0
+        )
         # Recall 'T' is a default constant, with value 298.15
-        self.assertAlmostEqual(calc.evaluator(variables, {}, "T", cs=True),
-                               298, delta=0.2)
+        self.assertAlmostEqual(
+            calc.evaluator(variables, {}, "T", case_sensitive=True),
+            298, delta=0.2
+        )
 
     def test_simple_funcs(self):
         """
@@ -502,8 +507,10 @@ class EvaluatorTest(unittest.TestCase):
         self.assertEqual(calc.evaluator({}, functions, 'f(6)'),
                          calc.evaluator({}, functions, 'F(6)'))
         # Test case sensitive evaluation
-        self.assertNotEqual(calc.evaluator({}, functions, 'f(6)', cs=True),
-                            calc.evaluator({}, functions, 'F(6)', cs=True))
+        self.assertNotEqual(
+            calc.evaluator({}, functions, 'f(6)', case_sensitive=True),
+            calc.evaluator({}, functions, 'F(6)', case_sensitive=True)
+        )
 
     def test_undefined_vars(self):
         """
@@ -521,5 +528,5 @@ class EvaluatorTest(unittest.TestCase):
         )
         self.assertRaises(
             calc.UndefinedVariable, calc.evaluator,
-            variables, {}, "r1*r3", cs=True
+            variables, {}, "r1*r3", case_sensitive=True
         )

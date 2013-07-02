@@ -325,14 +325,13 @@ def add_defaults(variables, functions, case_sensitive):
     return (all_variables, all_functions)
 
 
-def evaluator(variables, functions, string, cs=False):
+def evaluator(variables, functions, string, case_sensitive=False):
     """
     Evaluate an expression; that is, take a string of math and return a float
 
     -Variables are passed as a dictionary from string to value. They must be
      python numbers
     -Unary functions are passed as a dictionary from string to function.
-    -cs: Case sensitive
     """
     # No need to go further
     if string.strip() == "":
@@ -342,13 +341,13 @@ def evaluator(variables, functions, string, cs=False):
     tree = parse_algebra(string)
 
     # Get our variables together
-    all_variables, all_functions = add_defaults(variables, functions, cs)
+    all_variables, all_functions = add_defaults(variables, functions, case_sensitive)
 
     # ...and check them
-    check_variables(tree, set(all_variables), set(all_functions), cs)
+    check_variables(tree, set(all_variables), set(all_functions), case_sensitive)
 
     # Create a recursion to evaluate the tree
-    casify = lambda x: x if cs else x.lower()  # Lowercase for case insens.
+    casify = lambda x: x if case_sensitive else x.lower()  # Lowercase for case insens.
     evaluate_action = {
         'number': eval_number,
         'variable': lambda x: all_variables[casify(x[0])],
