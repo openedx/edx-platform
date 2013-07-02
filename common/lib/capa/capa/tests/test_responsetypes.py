@@ -1469,7 +1469,7 @@ class ChoiceTextResponseTest(ResponseTest):
             return answer_dict
 
         def make_answers(ans_dict):
-            return json.dumps(ans_dict)
+            return ans_dict
 
         def make_problem(choices, in_type='radiotextgroup', script=''):
             """
@@ -1598,9 +1598,6 @@ class ChoiceTextResponseTest(ResponseTest):
                          "checkbox_two_choices": checkbox_two_choices,
                          "checkbox_two_choices_two_inputs": checkbox_two_choices_two_inputs
                          }
-
-        with self.assertRaisesRegexp(StudentInputError, "Could not parse answers"):
-            self.assert_grade(one_choice_one_input('radiotextgroup'), [(True, ["platypus"])], "correct")
 
         with self.assertRaisesRegexp(StudentInputError, "Could not interpret"):
             self.assert_grade(one_choice_one_input('radiotextgroup'),
