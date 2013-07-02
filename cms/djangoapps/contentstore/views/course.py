@@ -543,7 +543,7 @@ def create_textbook(request, org, course, name):
 
 @login_required
 @ensure_csrf_cookie
-@require_http_methods(("GET", "POST", "DELETE"))
+@require_http_methods(("GET", "POST", "PUT", "DELETE"))
 def textbook_by_id(request, org, course, name, tid):
     """
     JSON API endpoint for manipulating a textbook via its internal ID.
@@ -563,7 +563,7 @@ def textbook_by_id(request, org, course, name, tid):
         if not textbook:
             return JsonResponse(status=404)
         return JsonResponse(textbook)
-    elif request.method == 'POST':
+    elif request.method in ('POST', 'PUT'):
         try:
             new_textbook = validate_textbook_json(request.body)
         except TextbookValidationError as e:

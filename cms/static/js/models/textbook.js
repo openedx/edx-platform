@@ -85,7 +85,7 @@ CMS.Models.Textbook = Backbone.AssociatedModel.extend({
                     invalidChapters.push(chapter);
                 }
             });
-            if(invalidChapters) {
+            if(!_.isEmpty(invalidChapters)) {
                 return {
                     message: "All chapters must have a name and asset",
                     attributes: {chapters: invalidChapters}
