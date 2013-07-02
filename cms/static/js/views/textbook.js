@@ -35,9 +35,7 @@ CMS.Views.ShowTextbook = Backbone.View.extend({
                     click: function(view) {
                         view.hide();
                         var delmsg = new CMS.Views.Notification.Saving({
-                            title: gettext("Deleting&hellip;"),
-                            closeIcon: false,
-                            minShown: 1250
+                            title: gettext("Deleting&hellip;")
                         }).show();
                         textbook.destroy({
                             complete: function() {
