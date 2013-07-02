@@ -227,7 +227,7 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         Returns key 'hint_and_votes', a list of (hint_text, #votes) pairs.
         """
         if self.user_voted:
-            return json.dumps({'contents': 'Sorry, but you have already voted!'})
+            return {}
         ans_no = int(get['answer'])
         hint_no = str(get['hint'])
         answer = self.previous_answers[ans_no][0]
