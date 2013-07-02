@@ -29,7 +29,7 @@
   </p>
   <input type="button" name="reset-attempts-single" value="Reset Student Attempts" data-endpoint="${ section_data['reset_student_attempts_url'] }">
   <p> You may also delete the entire state of a student for the specified module: </p>
-  <input type="button" name="delete-state-single" value="Delete Student State for Module" data-endpoint="${ section_data['reset_student_attempts_url'] }">
+  <input type="button" class="molly-guard" name="delete-state-single" value="Delete Student State for Module" data-endpoint="${ section_data['reset_student_attempts_url'] }">
   <input type="button" name="rescore-problem-single" value="Rescore Student Submission" data-endpoint="${ section_data['rescore_problem_url'] }">
 
 
@@ -61,8 +61,8 @@
   </p>
   <p>
     Then select an action:
-    <input type="button" name="reset-attempts-all" value="Reset ALL students' attempts" data-endpoint="${ section_data['reset_student_attempts_url'] }">
-    <input type="button" name="rescore-problem-all" value="Rescore ALL students' problem submissions" data-endpoint="${ section_data['rescore_problem_url'] }">
+    <input type="button" class="molly-guard" name="reset-attempts-all" value="Reset ALL students' attempts" data-endpoint="${ section_data['reset_student_attempts_url'] }">
+    <input type="button" class="molly-guard" name="rescore-problem-all" value="Rescore ALL students' problem submissions" data-endpoint="${ section_data['rescore_problem_url'] }">
   </p>
   <p>
   <p>These actions run in the background, and status for active tasks will appear in a table below.

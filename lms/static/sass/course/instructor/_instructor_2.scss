@@ -1,3 +1,13 @@
+@mixin idashbutton ($color) {
+  @include button(simple, $color);
+  @extend .button-reset;
+  font-size: em(13);
+
+  margin-bottom: 1em;
+  line-height: 1.3em;
+  padding: 8px 17px 8px 17px;
+}
+
 .instructor-dashboard-wrapper-2 {
   // @extend .table-wrapper;
   // display: table;
@@ -21,7 +31,7 @@
     // }
 
     .request-response-error {
-      color: red;
+      color: $error-red;
       margin-top: 1em;
       margin-bottom: 1em;
     }
@@ -50,11 +60,12 @@
       padding-bottom: 0;
     }
 
-    input {
-      // display: block;
-      margin-bottom: 1em;
-      line-height: 1.3em;
-      padding: 8px 17px 8px 17px;
+    input[type="button"] {
+      @include idashbutton(#eee);
+
+      &.molly-guard {
+        @include idashbutton($red)
+      }
     }
 
     .instructor_dash_glob_info {
