@@ -354,3 +354,35 @@ class CourseMetadataEditingTest(CourseTestCase):
         # check for deletion effectiveness
         self.assertEqual('closed', test_model['showanswer'], 'showanswer field still in')
         self.assertEqual(None, test_model['xqa_key'], 'xqa_key field still in')
+
+
+class CourseGraderUpdatesTest(CourseTestCase):
+    def setUp(self):
+        super(CourseGraderUpdatesTest, self).setUp()
+        self.url = reverse("course_settings", kwargs={
+            'org': self.course.location.org,
+            'course': self.course.location.course,
+            'name': self.course.location.name,
+            'grader_index': 0,
+        })
+
+    def test_get(self):
+        resp = self.client.get(self.url)
+        self.assert2XX(resp.status_code)
+        obj = json.loads(resp.content)
+
+    def test_delete(self):
+        resp = self.client.delete(self.url)
+        self.assert2XX(resp.status_code)
+
+    def test_post(self):
+        grader = {
+            "type": "manual",
+            "min_count": 5,
+            "drop_count": 10,
+            "short_label": "yo momma",
+            "weight": 17.3,
+        }
+        resp = self.client.post(self.url, grader)
+        self.assert2XX(resp.status_code)
+        obj = json.loads(resp.content)
