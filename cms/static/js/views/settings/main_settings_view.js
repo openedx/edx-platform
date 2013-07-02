@@ -89,7 +89,6 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
         var timefield = $(div).find("input:.time");
         var cachethis = this;
         var setfield = function () {
-            cachethis.clearValidationErrors();
             var date = datefield.datepicker('getDate');
             if (date) {
                 var time = timefield.timepicker("getSecondsFromMidnight");
@@ -98,14 +97,16 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
                 }
                 var newVal = new Date(date.getTime() + time * 1000);
                 if (!cacheModel.has(fieldName) || cacheModel.get(fieldName).getTime() !== newVal.getTime()) {
-                    cacheModel.set(fieldName, newVal, {validate: true});
+                    cachethis.clearValidationErrors();
+                    cachethis.setAndValidate(fieldName, newVal);
                 }
             }
             else {
                 // Clear date (note that this clears the time as well, as date and time are linked).
                 // Note also that the validation logic prevents us from clearing the start date
                 // (start date is required by the back end).
-                cacheModel.set(fieldName, null, {validate: true});
+                cachethis.clearValidationErrors();
+                cachethis.setAndValidate(fieldName, null);
             }
         };
 
@@ -142,14 +143,13 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
         default: // Everything else is handled by datepickers and CodeMirror.
             break;
         }
-        var self = this;
         this.showNotificationBar(this.save_message,
                                  _.bind(this.saveView, this),
                                  _.bind(this.revertView, this));
     },
 
     removeSyllabus: function() {
-        if (this.model.has('syllabus'))	this.model.set({'syllabus': null});
+        if (this.model.has('syllabus'))	this.setAndValidate('syllabus', null);
     },
 
     assetSyllabus : function() {
@@ -184,7 +184,7 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
                     cachethis.clearValidationErrors();
                     var newVal = mirror.getValue();
                     if (cachethis.model.get(field) != newVal) {
-                        cachethis.model.set(field, newVal);
+                        cachethis.setAndValidate(field, newVal);
                         cachethis.showNotificationBar(cachethis.save_message,
                                                       _.bind(cachethis.saveView, cachethis),
                                                       _.bind(cachethis.revertView, cachethis));
@@ -209,6 +209,16 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
                        });
             },
             reset: true});
+    },
+    setAndValidate: function(attr, value) {
+        // If we call model.set() with {validate: true}, model fields
+        // will not be set if validation fails. This puts the UI and
+        // the model in an inconsistent state, and causes us to not
+        // see the right validation errors the next time validate() is
+        // called on the model. So we set *without* validating, then
+        // call validate ourselves.
+        this.model.set(attr, value);
+        this.model.isValid();
     }
 });
 

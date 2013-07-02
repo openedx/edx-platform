@@ -38,6 +38,7 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
         }
         );
         this.listenTo(this.model, 'invalid', this.handleValidationError);
+        this.listenTo(this.model, 'change', this.showNotificationBar);
         this.model.get('graders').on('reset', this.render, this);
         this.model.get('graders').on('add', this.render, this);
         this.selectorToField = _.invert(this.fieldToSelectorMap);
@@ -53,14 +54,18 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
         // Undo the double invocation error. At some point, fix the double invocation
         $(gradelist).empty();
         var gradeCollection = this.model.get('graders');
-        // We need to bind the 'remove' event here (rather than in
+        // We need to bind these events here (rather than in
         // initialize), or else we can only press the delete button
         // once due to the graders collection changing when we cancel
         // our changes.
-        gradeCollection.on('remove', function() {
-            this.showNotificationBar();
-            this.render();
-        }, this);
+        _.each(['change', 'remove', 'add'],
+               function (event) {
+                   gradeCollection.on(event, function() {
+                       this.showNotificationBar();
+                       this.render();
+                   }, this);
+               },
+               this);
         gradeCollection.each(function(gradeModel) {
             $(gradelist).append(self.template({model : gradeModel }));
             var newEle = gradelist.children().last();
@@ -69,9 +74,6 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
             // Listen in order to rerender when the 'cancel' button is
             // pressed
             self.listenTo(newView, 'revert', _.bind(self.render, self));
-            self.listenTo(gradeModel, 'change', function() {
-                self.showNotificationBar();
-            });
         });
 
         // render the grade cutoffs
@@ -89,7 +91,6 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
     addAssignmentType : function(e) {
         e.preventDefault();
         this.model.get('graders').push({});
-        this.showNotificationBar();
     },
     fieldToSelectorMap : {
         'grace_period' : 'course-grading-graceperiod'
@@ -99,7 +100,6 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
         self.clearValidationErrors();
         var newVal = self.model.dateToGracePeriod($(event.currentTarget).timepicker('getTime'));
         self.model.set('grace_period', newVal, {validate: true});
-        self.showNotificationBar();
     },
     updateModel : function(event) {
         if (!this.selectorToField[event.currentTarget.id]) return;
@@ -112,7 +112,6 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
             this.setField(event);
         break;
         }
-        this.showNotificationBar();
     },
 
     // Grade sliders attributes and methods
@@ -238,7 +237,6 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
                 },
                 {}),
                 {validate: true});
-        this.showNotificationBar();
     },
 
     addNewGrade: function(e) {
@@ -333,7 +331,8 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
                 self.render();
                 self.renderCutoffBar();
             },
-            reset: true});
+            reset: true,
+            silent: true});
     },
     showNotificationBar: function() {
         // We always call showNotificationBar with the same args, just

@@ -71,7 +71,7 @@ CMS.Models.Settings.CourseGrader = Backbone.Model.extend({
     },
     validate : function(attrs) {
         var errors = {};
-        if (attrs['type']) {
+        if (_.has(attrs, 'type')) {
             if (_.isEmpty(attrs['type'])) {
                 errors.type = "The assignment type must have a name.";
             }
@@ -83,7 +83,7 @@ CMS.Models.Settings.CourseGrader = Backbone.Model.extend({
                 }
             }
         }
-        if (attrs['weight']) {
+        if (_.has(attrs, 'weight')) {
             if (!isFinite(attrs.weight) || /\D+/.test(attrs.weight)) {
                 errors.weight = "Please enter an integer between 0 and 100.";
             }
@@ -97,19 +97,19 @@ CMS.Models.Settings.CourseGrader = Backbone.Model.extend({
 //                  errors.weight = "The weights cannot add to more than 100.";
                 }
             }}
-        if (attrs['min_count']) {
+        if (_.has(attrs, 'min_count')) {
             if (!isFinite(attrs.min_count) || /\D+/.test(attrs.min_count)) {
                 errors.min_count = "Please enter an integer.";
             }
             else attrs.min_count = parseInt(attrs.min_count);
         }
-        if (attrs['drop_count']) {
+        if (_.has(attrs, 'drop_count')) {
             if (!isFinite(attrs.drop_count) || /\D+/.test(attrs.drop_count)) {
                 errors.drop_count = "Please enter an integer.";
             }
             else attrs.drop_count = parseInt(attrs.drop_count);
         }
-        if (attrs['min_count'] && attrs['drop_count'] && attrs.drop_count > attrs.min_count) {
+        if (_.has(attrs, 'min_count') && _.has(attrs, 'drop_count') && attrs.drop_count > attrs.min_count) {
             errors.drop_count = "Cannot drop more " + attrs.type + " than will assigned.";
         }
         if (!_.isEmpty(errors)) return errors;

@@ -56,6 +56,7 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
         CodeMirror.fromTextArea(textarea, {
             mode: "application/json", lineNumbers: false, lineWrapping: false,
             onChange: function(instance, changeobj) {
+                instance.save()
                 // this event's being called even when there's no change :-(
                 if (instance.getValue() !== oldValue) {
                     var message = gettext("Your changes will not take effect until you save your progress. Take care with key and value formatting, as validation is not implemented.");
@@ -94,8 +95,7 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
                     }
                 }
                 if (JSONValue !== undefined) {
-                    self.clearValidationErrors();
-                    self.model.set(key, JSONValue, {validate: true});
+                    self.model.set(key, JSONValue);
                 }
             }
         });
@@ -115,7 +115,8 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
                 analytics.track('Saved Advanced Settings', {
                     'course': course_location_analytics
                 });
-            }
+            },
+            silent: true
         });
     },
     revertView: function() {

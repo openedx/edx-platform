@@ -45,7 +45,8 @@ CMS.Views.ValidatingView = Backbone.View.extend({
         this.clearValidationErrors();
         var field = this.selectorToField[event.currentTarget.id];
         var newVal = $(event.currentTarget).val();
-        this.model.set(field, newVal, {validate: true});
+        this.model.set(field, newVal);
+        this.model.isValid();
         return newVal;
     },
     // these should perhaps go into a superclass but lack of event hash inheritance demotivates me
@@ -68,8 +69,17 @@ CMS.Views.ValidatingView = Backbone.View.extend({
     },
 
     showNotificationBar: function(message, primaryClick, secondaryClick) {
+        // Show a notification with message. primaryClick is called on
+        // pressing the save button, and secondaryClick (if it's
+        // passed, which it may not be) will be called on
+        // cancel. Takes care of hiding the notification bar at the
+        // appropriate times.
         if(this.notificationBarShowing) {
             return;
+        }
+        // If we've already saved something, hide the alert.
+        if(this.saved) {
+            this.saved.hide();
         }
         var self = this;
         this.confirmation = new CMS.Views.Notification.Warning({
@@ -93,10 +103,6 @@ CMS.Views.ValidatingView = Backbone.View.extend({
                             secondaryClick();
                         }
                         self.model.clear({silent : true});
-                        /*self.model.fetch({
-                            success : function() { self.render(); },
-                            reset: true
-                        });*/
                         self.confirmation.hide();
                         self.notificationBarShowing = false;
                     }
@@ -114,13 +120,23 @@ CMS.Views.ValidatingView = Backbone.View.extend({
             closeIcon: false
         });
         this.saved.show();
+        $.smoothScroll({
+            offset: 0,
+            easing: 'swing',
+            speed: 1000
+        });
     },
 
     saveView: function() {
         var self = this;
-        this.model.save({},
-                        {success: function() {
-                            self.showSavedBar();
-                        }});
+        this.model.save(
+            {},
+            {
+                success: function() {
+                    self.showSavedBar();
+                },
+                silent: true
+            }
+        );
     }
 });
