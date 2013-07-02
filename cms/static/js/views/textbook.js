@@ -269,10 +269,9 @@ CMS.Views.UploadDialog = Backbone.View.extend({
     initialize: function() {
         this.template = _.template($("#upload-dialog-tpl").text());
         this.listenTo(this.model, "change", this.render);
-        this.listenTo(this.model, "invalid", this.handleInvalid);
     },
     render: function() {
-        if(!this.model.isValid()) {return this;}
+        var isValid = this.model.isValid()
         var selectedFile = this.model.get('selectedFile');
         var oldInput = this.$("input[type=file]").get(0);
         this.$el.html(this.template({
@@ -287,12 +286,15 @@ CMS.Views.UploadDialog = Backbone.View.extend({
             finished: this.model.get('finished'),
             error: this.model.validationError
         }));
-        // ideally, we'd like to tell the browser to pre-populate the
+        // Ideally, we'd like to tell the browser to pre-populate the
         // <input type="file"> with the selectedFile if we have one -- but
         // browser security prohibits that. So instead, we'll swap out the
         // new input (that has no file selected) with the old input (that
-        // already has the selectedFile selected).
-        if (selectedFile) {
+        // already has the selectedFile selected). However, we only want to do
+        // this if the selected file is valid: if it isn't, we want to render
+        // a blank input to prompt the user to upload a different (valid) file.
+        if (selectedFile && isValid) {
+            $(oldInput).removeClass("error");
             this.$('input[type=file]').replaceWith(oldInput);
         }
         return this;
@@ -322,11 +324,6 @@ CMS.Views.UploadDialog = Backbone.View.extend({
     hideAndRemove: function(e) {
         if(e && e.preventDefault) { e.preventDefault(); }
         return this.hide().remove();
-    },
-    handleInvalid: function(model, error, options) {
-        model.set({
-            selectedFile: null
-        });
     },
     upload: function(e) {
         this.model.set('uploading', true);

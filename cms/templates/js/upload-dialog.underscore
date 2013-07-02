@@ -11,11 +11,11 @@
   <h2 class="title"><%= title %></h2>
   <% if(error) {%>
   <div id="upload_error" class="message message-status message-status error is-shown" name="upload_error">
-      <p><%= error %></p>
+      <p><%= gettext(error.message) %></p>
     </div>
   <% } %>
   <p id="dialog-assetupload-description" class="message"><%= message %></p>
-  <input type="file" name="file" />
+  <input type="file" name="file" <% if(error && error.attributes && error.attributes.selectedFile) {%>class="error"<% } %> />
 
     <div class="status-upload">
 
