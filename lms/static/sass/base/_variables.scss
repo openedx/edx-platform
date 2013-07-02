@@ -61,6 +61,8 @@ $baseFontColor: rgb(60,60,60);
 $lighter-base-font-color: rgb(100,100,100);
 $text-color: $dark-gray;
 
+$dark-trans-bg: rgba(0, 0, 0, .75);
+
 $body-bg: rgb(250,250,250);
 $container-bg: $white;
 $header-image: linear-gradient(-90deg, rgba(255,255,255, 1), rgba(230,230,230, 0.9));
@@ -104,8 +106,6 @@ $border-color-4: rgb(252,252,252);
 $link-color: $blue;
 $link-color-d1: $m-blue;
 $link-hover: $pink;
-$selection-color-1: $pink;
-$selection-color-2: #444;
 $site-status-color: $pink;
 
 $button-color: $blue;
