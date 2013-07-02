@@ -3,7 +3,24 @@ from xmodule.modulestore import Location
 from xmodule.modulestore.inheritance import own_metadata
 from fs.osfs import OSFS
 from json import dumps
+import json
+from json.encoder import JSONEncoder
+import datetime
 
+class EdxJSONEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, Location):
+            return obj.url()
+        elif isinstance(obj, datetime.datetime):
+            if obj.tzinfo is not None:
+                if obj.utcoffset() is None:
+                    return obj.isoformat() + 'Z'
+                else:
+                    return obj.isoformat()
+            else:
+                return obj.isoformat()
+        else:
+            return super(EdxJSONEncoder, self).default(obj)
 
 def export_to_xml(modulestore, contentstore, course_location, root_dir, course_dir, draft_modulestore=None):
 
@@ -35,12 +52,12 @@ def export_to_xml(modulestore, contentstore, course_location, root_dir, course_d
     policies_dir = export_fs.makeopendir('policies')
     course_run_policy_dir = policies_dir.makeopendir(course.location.name)
     with course_run_policy_dir.open('grading_policy.json', 'w') as grading_policy:
-        grading_policy.write(dumps(course.grading_policy))
+        grading_policy.write(dumps(course.grading_policy, cls=EdxJSONEncoder))
 
     # export all of the course metadata in policy.json
     with course_run_policy_dir.open('policy.json', 'w') as course_policy:
         policy = {'course/' + course.location.name: own_metadata(course)}
-        course_policy.write(dumps(policy))
+        course_policy.write(dumps(policy, cls=EdxJSONEncoder))
 
     # export draft content
     # NOTE: this code assumes that verticals are the top most draftable container

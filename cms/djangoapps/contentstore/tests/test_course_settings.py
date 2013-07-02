@@ -105,7 +105,6 @@ class CourseDetailsTestCase(CourseTestCase):
         self.assertEqual(jsondetails['string'], 'string')
 
     def test_update_and_fetch(self):
-        # # NOTE: I couldn't figure out how to validly test time setting w/ all the conversions
         jsondetails = CourseDetails.fetch(self.course_location)
         jsondetails.syllabus = "<a href='foo'>bar</a>"
         # encode - decode to convert date fields and other data which changes form
@@ -127,6 +126,11 @@ class CourseDetailsTestCase(CourseTestCase):
         self.assertEqual(
             CourseDetails.update_from_json(jsondetails.__dict__).effort,
             jsondetails.effort, "After set effort"
+        )
+        jsondetails.start_date = datetime.datetime(2010, 10, 1, 0, tzinfo=UTC())
+        self.assertEqual(
+            CourseDetails.update_from_json(jsondetails.__dict__).start_date,
+            jsondetails.start_date
         )
 
     @override_settings(MKTG_URLS={'ROOT': 'dummy-root'})
@@ -235,8 +239,7 @@ class CourseDetailsViewTest(CourseTestCase):
                 dt1 = date.from_json(encoded[field])
                 dt2 = details[field]
 
-                expected_delta = datetime.timedelta(0)
-                self.assertEqual(dt1 - dt2, expected_delta, str(dt1) + "!=" + str(dt2) + " at " + context)
+                self.assertEqual(dt1, dt2, msg="{} != {} at {}".format(dt1, dt2, context))
             else:
                 self.fail(field + " missing from encoded but in details at " + context)
         elif field in encoded and encoded[field] is not None:
