@@ -720,22 +720,29 @@ class ChoiceTextGroupTemplateTest(TemplateTestCase):
     """Test mako template for `<choicetextgroup>` input"""
 
     TEMPLATE_NAME = 'choicetext.html'
+    VALUE_DICT = {'1_choiceinput_0bc': '1_choiceinput_0bc', '1_choiceinput_0_textinput_0': '0',
+                  '1_choiceinput_1_textinput_0': '0'}
+    EMPTY_DICT = {'1_choiceinput_0_textinput_0': '',
+                  '1_choiceinput_1_textinput_0': ''}
+    BOTH_CHOICE_CHECKBOX = {'1_choiceinput_0bc': 'choiceinput_0',
+                            '1_choiceinput_1bc': 'choiceinput_1',
+                            '1_choiceinput_0_textinput_0': '0',
+                            '1_choiceinput_1_textinput_0': '0'}
+    WRONG_CHOICE_CHECKBOX = {'1_choiceinput_1bc': 'choiceinput_1',
+                             '1_choiceinput_0_textinput_0': '0',
+                             '1_choiceinput_1_textinput_0': '0'}
 
     def setUp(self):
-        value_dict = {'1_choiceinput_0bc': 'choiceinput_0', '1_choiceinput_0_textinput_0': '0',
-                      '1_choiceinput_1_textinput_0': '0'}
-        value = json.dumps(value_dict)
-
-        choices = [('choiceinput_0',
+        choices = [('1_choiceinput_0bc',
                    [{'tail_text': '', 'type': 'text', 'value': '', 'contents': ''},
                    {'tail_text': '', 'type': 'textinput', 'value': '', 'contents': 'choiceinput_0_textinput_0'}]),
-                   ('choiceinput_1', [{'tail_text': '', 'type': 'text', 'value': '', 'contents': ''},
+                   ('1_choiceinput_1bc', [{'tail_text': '', 'type': 'text', 'value': '', 'contents': ''},
                    {'tail_text': '', 'type': 'textinput', 'value': '', 'contents': 'choiceinput_1_textinput_0'}])]
         self.context = {'id': '1',
                         'choices': choices,
                         'status': 'correct',
                         'input_type': 'radio',
-                        'value': value}
+                        'value': self.VALUE_DICT}
 
         super(ChoiceTextGroupTemplateTest, self).setUp()
 
@@ -748,7 +755,7 @@ class ChoiceTextGroupTemplateTest(TemplateTestCase):
         self.context['status'] = 'correct'
         xpath = "//section[@id='forinput1_choiceinput_0bc']"
 
-        self.context['value'] = '{}'
+        self.context['value'] = {}
         for input_type in input_tags:
             self.context['input_type'] = input_type
             xml = self.render_to_xml(self.context)
@@ -758,11 +765,9 @@ class ChoiceTextGroupTemplateTest(TemplateTestCase):
         """Test conditions under which the entire problem
         (not a particular option) is marked correct"""
 
-        value_dict = {'1_choiceinput_0bc': 'choiceinput_0', '1_choiceinput_0_textinput_0': '0',
-                      '1_choiceinput_1_textinput_0': '0'}
         self.context['status'] = 'correct'
         self.context['input_type'] = 'checkbox'
-        self.context['value'] = json.dumps(value_dict)
+        self.context['value'] = self.VALUE_DICT
 
         # Should mark the entire problem correct
         xml = self.render_to_xml(self.context)
@@ -780,24 +785,15 @@ class ChoiceTextGroupTemplateTest(TemplateTestCase):
         """Test all conditions under which the entire problem
         (not a particular option) is marked incorrect"""
         grouping_tags = {'radio': 'label', 'checkbox': 'section'}
-        empty_dict = json.dumps({'1_choiceinput_0_textinput_0': '',
-                                 '1_choiceinput_1_textinput_0': ''})
-        wrong_choice_checkbox = json.dumps({'1_choiceinput_1bc': 'choiceinput_1',
-                                            '1_choiceinput_0_textinput_0': '0',
-                                            '1_choiceinput_1_textinput_0': '0'})
-        both_choice_checkbox = json.dumps({'1_choiceinput_0bc': 'choiceinput_0',
-                                           '1_choiceinput_1bc': 'choiceinput_1',
-                                           '1_choiceinput_0_textinput_0': '0',
-                                           '1_choiceinput_1_textinput_0': '0'})
         conditions = [
-            {'status': 'incorrect', 'input_type': 'radio', 'value': json.dumps({})},
-            {'status': 'incorrect', 'input_type': 'checkbox', 'value': wrong_choice_checkbox},
-            {'status': 'incorrect', 'input_type': 'checkbox', 'value': both_choice_checkbox},
-            {'status': 'incorrect', 'input_type': 'checkbox', 'value': empty_dict},
-            {'status': 'incomplete', 'input_type': 'radio', 'value': json.dumps({})},
-            {'status': 'incomplete', 'input_type': 'checkbox', 'value': wrong_choice_checkbox},
-            {'status': 'incomplete', 'input_type': 'checkbox', 'value': both_choice_checkbox},
-            {'status': 'incomplete', 'input_type': 'checkbox', 'value': empty_dict}]
+            {'status': 'incorrect', 'input_type': 'radio', 'value': {}},
+            {'status': 'incorrect', 'input_type': 'checkbox', 'value': self.WRONG_CHOICE_CHECKBOX},
+            {'status': 'incorrect', 'input_type': 'checkbox', 'value': self.BOTH_CHOICE_CHECKBOX},
+            {'status': 'incorrect', 'input_type': 'checkbox', 'value': self.VALUE_DICT},
+            {'status': 'incomplete', 'input_type': 'radio', 'value': {}},
+            {'status': 'incomplete', 'input_type': 'checkbox', 'value': self.WRONG_CHOICE_CHECKBOX},
+            {'status': 'incomplete', 'input_type': 'checkbox', 'value': self.BOTH_CHOICE_CHECKBOX},
+            {'status': 'incomplete', 'input_type': 'checkbox', 'value': self.VALUE_DICT}]
 
         for test_conditions in conditions:
             self.context.update(test_conditions)
@@ -819,22 +815,14 @@ class ChoiceTextGroupTemplateTest(TemplateTestCase):
         """Test all conditions under which the entire problem
         (not a particular option) is marked unanswered"""
         grouping_tags = {'radio': 'label', 'checkbox': 'section'}
-        empty_dict = json.dumps({'1_choiceinput_0_textinput_0': '',
-                                 '1_choiceinput_1_textinput_0': ''})
-        value_dict = json.dumps({'1_choiceinput_0bc': 'choiceinput_0',
-                                 '1_choiceinput_0_textinput_0': '0',
-                                 '1_choiceinput_1_textinput_0': '0'})
-        both_choice_checkbox = json.dumps({'1_choiceinput_0bc': 'choiceinput_0',
-                                           '1_choiceinput_1bc': 'choiceinput_1',
-                                           '1_choiceinput_0_textinput_0': '0',
-                                           '1_choiceinput_1_textinput_0': '0'})
+
         conditions = [
-            {'status': 'unsubmitted', 'input_type': 'radio', 'value': '{}'},
-            {'status': 'unsubmitted', 'input_type': 'radio', 'value': empty_dict},
-            {'status': 'unsubmitted', 'input_type': 'checkbox', 'value': '{}'},
-            {'status': 'unsubmitted', 'input_type': 'checkbox', 'value': empty_dict},
-            {'status': 'unsubmitted', 'input_type': 'checkbox', 'value': value_dict},
-            {'status': 'unsubmitted', 'input_type': 'checkbox', 'value': both_choice_checkbox}]
+            {'status': 'unsubmitted', 'input_type': 'radio', 'value': {}},
+            {'status': 'unsubmitted', 'input_type': 'radio', 'value': self.EMPTY_DICT},
+            {'status': 'unsubmitted', 'input_type': 'checkbox', 'value': {}},
+            {'status': 'unsubmitted', 'input_type': 'checkbox', 'value': self.EMPTY_DICT},
+            {'status': 'unsubmitted', 'input_type': 'checkbox', 'value': self.VALUE_DICT},
+            {'status': 'unsubmitted', 'input_type': 'checkbox', 'value': self.BOTH_CHOICE_CHECKBOX}]
 
         self.context['status'] = 'unanswered'
 
@@ -857,11 +845,9 @@ class ChoiceTextGroupTemplateTest(TemplateTestCase):
     def test_option_marked_correct(self):
         """Test conditions under which a particular option
         (not the entire problem) is marked correct."""
-        value_dict = json.dumps({'1_choiceinput_0bc': 'choiceinput_0',
-                                 '1_choiceinput_0_textinput_0': '0',
-                                 '1_choiceinput_1_textinput_0': '0'})
+
         conditions = [
-            {'input_type': 'radio', 'value': value_dict}]
+            {'input_type': 'radio', 'value': self.VALUE_DICT}]
 
         self.context['status'] = 'correct'
 
@@ -879,11 +865,9 @@ class ChoiceTextGroupTemplateTest(TemplateTestCase):
     def test_option_marked_incorrect(self):
         """Test conditions under which a particular option
         (not the entire problem) is marked incorrect."""
-        value_dict = json.dumps({'1_choiceinput_0bc': 'choiceinput_0',
-                                 '1_choiceinput_0_textinput_0': '0',
-                                 '1_choiceinput_1_textinput_0': '0'})
+
         conditions = [
-            {'input_type': 'radio', 'value': value_dict}]
+            {'input_type': 'radio', 'value': self.VALUE_DICT}]
 
         self.context['status'] = 'incorrect'
 
