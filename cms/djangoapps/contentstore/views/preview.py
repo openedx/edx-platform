@@ -1,9 +1,7 @@
 import logging
 import sys
 from functools import partial
-import re
 
-from django.conf import settings
 from django.http import HttpResponse, Http404, HttpResponseBadRequest, HttpResponseForbidden
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
@@ -18,6 +16,8 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.mongo import MongoUsage
 from xmodule.x_module import ModuleSystem
 from xblock.runtime import DbModel
+
+from util.sandboxing import can_execute_unsafe_code
 
 import static_replace
 from .session_kv_store import SessionKeyValueStore
@@ -102,14 +102,6 @@ def preview_module_system(request, preview_id, descriptor):
     # access to the course_id
     course_id = get_course_for_item(descriptor.location).location.course_id
 
-    def can_execute_unsafe_code():
-        # To decide if we can run unsafe code, we check the course id against
-        # a list of regexes configured on the server.
-        for regex in settings.COURSES_WITH_UNSAFE_CODE:
-            if re.match(regex, course_id):
-                return True
-        return False
-
     return ModuleSystem(
         ajax_url=reverse('preview_dispatch', args=[preview_id, descriptor.location.url(), '']).rstrip('/'),
         # TODO (cpennington): Do we want to track how instructors are using the preview problems?
@@ -121,7 +113,7 @@ def preview_module_system(request, preview_id, descriptor):
         replace_urls=partial(static_replace.replace_static_urls, data_directory=None, course_namespace=descriptor.location),
         user=request.user,
         xblock_model_data=preview_model_data,
-        can_execute_unsafe_code=can_execute_unsafe_code,
+        can_execute_unsafe_code=(lambda: can_execute_unsafe_code(course_id)),
     )
 
 
