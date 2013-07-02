@@ -28,7 +28,7 @@ class @Logger
           callback(event_type, data, element)
 
     # Regardless of whether any callbacks were made, log this event.
-    $.getWithPrefix '/event',
+    $.postWithPrefix '/event',
       event_type: event_type
       event: JSON.stringify(data)
       page: window.location.href

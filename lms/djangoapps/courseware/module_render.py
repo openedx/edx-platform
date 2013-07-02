@@ -61,9 +61,9 @@ def make_track_function(request):
     '''
     import track.views
 
-    def f(event_type, event):
+    def function(event_type, event):
         return track.views.server_track(request, event_type, event, page='x_module')
-    return f
+    return function
 
 
 def toc_for_course(user, request, course, active_chapter, active_section, model_data_cache):
@@ -171,9 +171,9 @@ def get_xqueue_callback_url_prefix(request):
     should go back to the LMS, not to the worker.
     """
     prefix = '{proto}://{host}'.format(
-            proto=request.META.get('HTTP_X_FORWARDED_PROTO', 'https' if request.is_secure() else 'http'),
-            host=request.get_host()
-        )
+        proto=request.META.get('HTTP_X_FORWARDED_PROTO', 'https' if request.is_secure() else 'http'),
+        host=request.get_host()
+    )
     return settings.XQUEUE_INTERFACE.get('callback_url', prefix)
 
 
