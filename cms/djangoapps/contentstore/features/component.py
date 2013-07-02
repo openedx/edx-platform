@@ -2,6 +2,7 @@
 #pylint: disable=W0621
 
 from lettuce import world, step
+from nose.tools import assert_true
 
 DATA_LOCATION = 'i4x://edx/templates'
 
@@ -26,7 +27,7 @@ def add_components(step):
 def check_components(step):
     for component in [step_hash['Component'] for step_hash in step.hashes]:
         assert component in COMPONENT_DICTIONARY
-        assert COMPONENT_DICTIONARY[component]['found_func']()
+        assert_true(COMPONENT_DICTIONARY[component]['found_func'](), "{} couldn't be found".format(component))
 
 
 @step(u'I delete all components')
