@@ -3,7 +3,6 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-.. image:: images/image001.png
 
 
 Contents
@@ -13,6 +12,7 @@ Contents
 .. toctree::
    :maxdepth: 5
 
+   read_me
    get_started
    create_lesson
    create_section_sub_section
@@ -32,6 +32,8 @@ Contents
    create_seed_wiki
    invite_students_to_register
    checking_student_progress
+   change_log
+
    
 
   
@@ -46,6 +48,7 @@ Appendices
    :glob:
 
    appendices/*
+
 
 
 

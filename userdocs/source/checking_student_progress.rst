@@ -72,20 +72,25 @@ the Grades page of the Instructor dashboard for edX101:
  
 Here you see several options for viewing or downloading student grades,
 viewing individual progress through a course or resetting problem attempts.
-(Note: only the top part of the Grades page is shown. The page continues
-with some more information about course statistics.) The link to the
-student's progress page should give you a view of exactly what the student
-would see, including scores for graded and ungraded assignments.
+
+.. note::
+
+	Only the top part of the Grades page is shown. The page continues
+	with some more information about course statistics. The link to the
+	student's progress page should give you a view of exactly what the student
+	would see, including scores for graded and ungraded assignments.
  
  
-*Note: The stored scores visible to you on the Instructor tab and to
-the students from the Progress tab in the course on Edge are a snapshot of the
-current state of the problem score database. They may be slightly out of
-sync with actual problem scores. (Asynchronicities may happen if, for example,
-the weight of a live problem was changed during an assignment, and not
-everyone has yet resubmitted their answers for that problem.) Scores and grades
-are usually recomputed at the end of the semester before determining final
-grades and issuing Certificates.*
+.. note::
+
+	The stored scores visible to you on the Instructor tab and to
+	the students from the Progress tab in the course on Edge are a snapshot of the
+	current state of the problem score database. They may be slightly out of
+	sync with actual problem scores. (Asynchronicities may happen if, for example,
+	the weight of a live problem was changed during an assignment, and not
+	everyone has yet resubmitted their answers for that problem.) Scores and grades
+	are usually recomputed at the end of the semester before determining final
+	grades and issuing Certificates.
 
 .. raw:: latex
   

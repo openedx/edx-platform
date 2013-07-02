@@ -134,8 +134,9 @@ upload the file to the **>Files & Uploads** page. When you do this, a URL is
 created for that file. You then use this URL to create a link to the file on the
 **Handouts** sidebar. You create this link on the **Course Updates** page.
   
- 
-*Note: You cannot upload videos to the Files & Uploads page.
+.. note::
+
+    You cannot upload videos to the Files & Uploads page.
 
 
 Upload a File to the Files & Uploads page
@@ -177,9 +178,11 @@ see the name of the file when they open it. Avoid using file names such as
 "AnswerKey.pdf."
   
  
-**Warning** Uploading a file with the same name as a file that is already 
-uploaded will cause the original file to be overwritten. There is not currently 
-a warning when you try to upload a file that has the same name.
+.. warning::
+
+    Uploading a file with the same name as a file that is already 
+    uploaded will cause the original file to be overwritten. There is not currently 
+    a warning when you try to upload a file that has the same name.
         
  
 To upload a file to the **Files & Uploads** page:
@@ -215,9 +218,11 @@ hyperlink.
 .. image:: images/image164.png
   
  
-*Note: Currently, you cannot delete a file after you upload it to the **Files &
-Uploads** page. You can replace a file by uploading another file with the same
-name, but you cannot delete the file.
+.. note::
+
+    Currently, you cannot delete a file after you upload it to the **Files &
+    Uploads** page. You can replace a file by uploading another file with the same
+    name, but you cannot delete the file.
       
   
   
@@ -240,7 +245,7 @@ image:: images/image166.png
 3. In the XML box that appears, create links to your files.
   
  
-o To create a link to a document, enter the following syntax, where URL OF FILE
+* To create a link to a document, enter the following syntax, where URL OF FILE
 is the URL that you noted in step 5 of **Upload a File** on the **Files &
 Uploads Page** and LINK TEXT is the text that you want to appear in the
 **Handouts** sidebar.
@@ -250,8 +255,8 @@ Uploads Page** and LINK TEXT is the text that you want to appear in the
     <p><a href="[URL OF FILE]">[LINK TEXT]</a></p>
 
 
-o To create a link to an image that you've uploaded, enter the following syntax,
-where URL OF FILE is the URL that you noted in step 5 of    **Upload a File to
+* To create a link to an image that you've uploaded, enter the following syntax,
+where URL OF FILE is the URL that you noted in step 5 of **Upload a File to
 Your Assets Tab**.
 
 .. code-block:: html
