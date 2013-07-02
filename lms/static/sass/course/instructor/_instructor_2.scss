@@ -64,7 +64,7 @@
       @include idashbutton(#eee);
 
       &.molly-guard {
-        @include idashbutton($red)
+        @include idashbutton($danger-red)
       }
     }
 
@@ -181,6 +181,12 @@
 
   select {
     margin-bottom: 1em;
+  }
+
+  .revoke-link {
+    color: $danger-red;
+    text-decoration: underline;
+    cursor: pointer;
   }
 
   .batch-enrollment {
