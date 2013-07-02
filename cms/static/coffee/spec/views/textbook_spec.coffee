@@ -25,6 +25,17 @@ describe "CMS.Views.ShowTextbook", ->
 
         @promptSpies = spyOnConstructor(CMS.Views.Prompt, "Warning", ["show", "hide"])
         @promptSpies.show.andReturn(@promptSpies)
+        window.section = new CMS.Models.Section({
+            id: "5",
+            name: "Course Name",
+            url_name: "course_name",
+            org: "course_org",
+            num: "course_num",
+            revision: "course_rev"
+        });
+
+    afterEach ->
+        delete window.section
 
     describe "Basic", ->
         it "should render properly", ->
@@ -334,7 +345,8 @@ describe "CMS.Views.UploadDialog", ->
         it "should render without a file selected", ->
             @view.render()
             expect(@view.$el).toContain("input[type=file]")
-            expect(@view.$(".action-upload")).toBeDisabled()
+            # expect(@view.$(".action-upload")).toBeDisabled()
+            expect(@view.$(".action-upload")).toHaveClass("disabled")
 
         it "should render with a PDF selected", ->
             file = {name: "fake.pdf", "type": "application/pdf"}
@@ -342,8 +354,9 @@ describe "CMS.Views.UploadDialog", ->
             @model.set("selectedFile", file)
             @view.render()
             expect(@view.$el).toContain("input[type=file]")
-            expect(@view.$el).not.toContain("p.error")
-            expect(@view.$(".action-upload")).not.toBeDisabled()
+            expect(@view.$el).not.toContain("#upload_error")
+            # expect(@view.$(".action-upload")).not.toBeDisabled()
+            expect(@view.$(".action-upload")).not.toHaveClass("disabled")
 
         it "should render an error with an invalid file type selected", ->
             file = {name: "fake.png", "type": "image/png"}
@@ -351,8 +364,9 @@ describe "CMS.Views.UploadDialog", ->
             @model.set("selectedFile", file)
             @view.render()
             expect(@view.$el).toContain("input[type=file]")
-            expect(@view.$el).toContain("p.error")
-            expect(@view.$(".action-upload")).toBeDisabled()
+            expect(@view.$el).toContain("#upload_error")
+            # expect(@view.$(".action-upload")).toBeDisabled()
+            expect(@view.$(".action-upload")).toHaveClass("disabled")
 
 
         it "adds body class on show()", ->

@@ -42,7 +42,7 @@
     <h3 class="sr"><%= gettext('Form Actions') %></h3>
   <ul>
   <li class="action-item">
-    <a href="#" class="button action-primary action-upload <% if (!selectedFile) { %>disabled<% } %>"><%= gettext('Upload') %></a>
+    <a href="#" class="button action-primary action-upload <% if (!selectedFile || error) { %>disabled<% } %>"><%= gettext('Upload') %></a>
   </li>
   <li class="action-item">
     <a href="#" class="button action-secondary action-cancel"><%= gettext('Cancel') %></a>
