@@ -61,13 +61,7 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
                     var message = gettext("Your changes will not take effect until you save your progress. Take care with key and value formatting, as validation is not implemented.");
                     self.showNotificationBar(message,
                                              _.bind(self.saveView, self),
-                                             function() {
-                                                 self.model.deleteKeys = [];
-                                                 self.revertView();
-                                             });
-                    if(self.saved) {
-                        self.saved.hide();
-                    }
+                                             _.bind(self.revertView, self));
                 }
             },
             onFocus : function(mirror) {
