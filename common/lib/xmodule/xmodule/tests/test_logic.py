@@ -40,9 +40,9 @@ class LogicTest(unittest.TestCase):
             self.raw_model_data
         )
 
-    def ajax_request(self, dispatch, get):
+    def ajax_request(self, dispatch, data):
         """Call Xmodule.handle_ajax."""
-        return json.loads(self.xmodule.handle_ajax(dispatch, get))
+        return json.loads(self.xmodule.handle_ajax(dispatch, data))
 
 
 class PollModuleTest(LogicTest):

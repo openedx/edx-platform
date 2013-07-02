@@ -70,7 +70,10 @@ class VideoAlphaModule(VideoAlphaFields, XModule):
     def __init__(self, *args, **kwargs):
         XModule.__init__(self, *args, **kwargs)
         xmltree = etree.fromstring(self.data)
-        self.youtube_streams = xmltree.get('youtube')
+
+        # Front-end expects an empty string, or a properly formatted string with YouTube IDs.
+        self.youtube_streams = xmltree.get('youtube', '')
+
         self.sub = xmltree.get('sub')
         self.position = 0
         self.show_captions = xmltree.get('show_captions', 'true')
@@ -125,9 +128,9 @@ class VideoAlphaModule(VideoAlphaFields, XModule):
 
         return parse_time(xmltree.get('start_time')), parse_time(xmltree.get('end_time'))
 
-    def handle_ajax(self, dispatch, get):
+    def handle_ajax(self, dispatch, data):
         """This is not being called right now and we raise 404 error."""
-        log.debug(u"GET {0}".format(get))
+        log.debug(u"GET {0}".format(data))
         log.debug(u"DISPATCH {0}".format(dispatch))
         raise Http404()
 

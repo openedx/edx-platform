@@ -2,8 +2,6 @@ import json
 import logging
 import re
 import sys
-import static_replace
-
 from functools import partial
 
 from django.conf import settings
@@ -15,27 +13,31 @@ from django.http import Http404
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
 
+import pyparsing
 from requests.auth import HTTPBasicAuth
+from statsd import statsd
 
 from capa.xqueue_interface import XQueueInterface
-from courseware.masquerade import setup_masquerade
-from courseware.access import has_access
 from mitxmako.shortcuts import render_to_string
-from .models import StudentModule
-from psychometrics.psychoanalyze import make_psychometrics_data_update_handler
-from student.models import unique_id_for_user
+from xblock.runtime import DbModel
+from xmodule.error_module import ErrorDescriptor, NonStaffErrorDescriptor
 from xmodule.errortracker import exc_info_to_str
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
-from xmodule.x_module import ModuleSystem
-from xmodule.error_module import ErrorDescriptor, NonStaffErrorDescriptor
-from xblock.runtime import DbModel
-from xmodule_modifiers import replace_course_urls, replace_static_urls, add_histogram, wrap_xmodule
-from .model_data import LmsKeyValueStore, LmsUsage, ModelDataCache
-
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from statsd import statsd
+from xmodule.x_module import ModuleSystem
+from xmodule_modifiers import replace_course_urls, replace_static_urls, add_histogram, wrap_xmodule
+
+import static_replace
+from psychometrics.psychoanalyze import make_psychometrics_data_update_handler
+from student.models import unique_id_for_user
+
+from courseware.access import has_access
+from courseware.masquerade import setup_masquerade
+from courseware.model_data import LmsKeyValueStore, LmsUsage, ModelDataCache
+from courseware.models import StudentModule
+
 
 log = logging.getLogger(__name__)
 
@@ -59,9 +61,9 @@ def make_track_function(request):
     '''
     import track.views
 
-    def f(event_type, event):
+    def function(event_type, event):
         return track.views.server_track(request, event_type, event, page='x_module')
-    return f
+    return function
 
 
 def toc_for_course(user, request, course, active_chapter, active_section, model_data_cache):
@@ -169,9 +171,9 @@ def get_xqueue_callback_url_prefix(request):
     should go back to the LMS, not to the worker.
     """
     prefix = '{proto}://{host}'.format(
-            proto=request.META.get('HTTP_X_FORWARDED_PROTO', 'https' if request.is_secure() else 'http'),
-            host=request.get_host()
-        )
+        proto=request.META.get('HTTP_X_FORWARDED_PROTO', 'https' if request.is_secure() else 'http'),
+        host=request.get_host()
+    )
     return settings.XQUEUE_INTERFACE.get('callback_url', prefix)
 
 
@@ -221,7 +223,7 @@ def get_module_for_descriptor_internal(user, descriptor, model_data_cache, cours
         relative_xqueue_callback_url = reverse('xqueue_callback',
                                                kwargs=dict(course_id=course_id,
                                                            userid=str(user.id),
-                                                           id=descriptor.location.url(),
+                                                           mod_id=descriptor.location.url(),
                                                            dispatch=dispatch),
                                        )
         return xqueue_callback_url_prefix + relative_xqueue_callback_url
@@ -352,7 +354,7 @@ def get_module_for_descriptor_internal(user, descriptor, model_data_cache, cours
     system.set('position', position)
     system.set('DEBUG', settings.DEBUG)
     if settings.MITX_FEATURES.get('ENABLE_PSYCHOMETRICS'):
-        system.set('psychometrics_handler',		# set callback for updating PsychometricsData
+        system.set('psychometrics_handler',  # set callback for updating PsychometricsData
                    make_psychometrics_data_update_handler(course_id, user, descriptor.location.url()))
 
     try:
@@ -397,40 +399,47 @@ def get_module_for_descriptor_internal(user, descriptor, model_data_cache, cours
 
 
 @csrf_exempt
-def xqueue_callback(request, course_id, userid, id, dispatch):
+def xqueue_callback(request, course_id, userid, mod_id, dispatch):
     '''
     Entry point for graded results from the queueing system.
     '''
+    data = request.POST.copy()
+
     # Test xqueue package, which we expect to be:
     #   xpackage = {'xqueue_header': json.dumps({'lms_key':'secretkey',...}),
     #               'xqueue_body'  : 'Message from grader'}
-    get = request.POST.copy()
     for key in ['xqueue_header', 'xqueue_body']:
-        if not get.has_key(key):
+        if key not in data:
             raise Http404
-    header = json.loads(get['xqueue_header'])
-    if not isinstance(header, dict) or not header.has_key('lms_key'):
+
+    header = json.loads(data['xqueue_header'])
+    if not isinstance(header, dict) or 'lms_key' not in header:
         raise Http404
 
     # Retrieve target StudentModule
     user = User.objects.get(id=userid)
-
-    model_data_cache = ModelDataCache.cache_for_descriptor_descendents(course_id,
-        user, modulestore().get_instance(course_id, id), depth=0, select_for_update=True)
-    instance = get_module(user, request, id, model_data_cache, course_id, grade_bucket_type='xqueue')
+    model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
+        course_id,
+        user,
+        modulestore().get_instance(course_id, mod_id),
+        depth=0,
+        select_for_update=True
+    )
+    instance = get_module(user, request, mod_id, model_data_cache, course_id, grade_bucket_type='xqueue')
     if instance is None:
-        log.debug("No module {0} for user {1}--access denied?".format(id, user))
+        msg = "No module {0} for user {1}--access denied?".format(mod_id, user)
+        log.debug(msg)
         raise Http404
 
-    # Transfer 'queuekey' from xqueue response header to 'get'. This is required to
-    #   use the interface defined by 'handle_ajax'
-    get.update({'queuekey': header['lms_key']})
+    # Transfer 'queuekey' from xqueue response header to the data.
+    # This is required to use the interface defined by 'handle_ajax'
+    data.update({'queuekey': header['lms_key']})
 
     # We go through the "AJAX" path
-    #   So far, the only dispatch from xqueue will be 'score_update'
+    # So far, the only dispatch from xqueue will be 'score_update'
     try:
         # Can ignore the return value--not used for xqueue_callback
-        instance.handle_ajax(dispatch, get)
+        instance.handle_ajax(dispatch, data)
     except:
         log.exception("error processing ajax call")
         raise
@@ -464,23 +473,15 @@ def modx_dispatch(request, dispatch, location, course_id):
     if not request.user.is_authenticated():
         raise PermissionDenied
 
-    # Check for submitted files and basic file size checks
-    p = request.POST.copy()
-    if request.FILES:
-        for fileinput_id in request.FILES.keys():
-            inputfiles = request.FILES.getlist(fileinput_id)
+    # Get the submitted data
+    data = request.POST.copy()
 
-            if len(inputfiles) > settings.MAX_FILEUPLOADS_PER_INPUT:
-                too_many_files_msg = 'Submission aborted! Maximum %d files may be submitted at once' % \
-                    settings.MAX_FILEUPLOADS_PER_INPUT
-                return HttpResponse(json.dumps({'success': too_many_files_msg}))
-
-            for inputfile in inputfiles:
-                if inputfile.size > settings.STUDENT_FILEUPLOAD_MAX_SIZE:  # Bytes
-                    file_too_big_msg = 'Submission aborted! Your file "%s" is too large (max size: %d MB)' % \
-                                        (inputfile.name, settings.STUDENT_FILEUPLOAD_MAX_SIZE / (1000 ** 2))
-                    return HttpResponse(json.dumps({'success': file_too_big_msg}))
-            p[fileinput_id] = inputfiles
+    # Get and check submitted files
+    files = request.FILES or {}
+    error_msg = _check_files_limits(files)
+    if error_msg:
+        return HttpResponse(json.dumps({'success': error_msg}))
+    data.update(files)  # Merge files into data dictionary
 
     try:
         descriptor = modulestore().get_instance(course_id, location)
@@ -493,8 +494,11 @@ def modx_dispatch(request, dispatch, location, course_id):
         )
         raise Http404
 
-    model_data_cache = ModelDataCache.cache_for_descriptor_descendents(course_id,
-        request.user, descriptor)
+    model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
+        course_id,
+        request.user,
+        descriptor
+    )
 
     instance = get_module(request.user, request, location, model_data_cache, course_id, grade_bucket_type='ajax')
     if instance is None:
@@ -505,7 +509,7 @@ def modx_dispatch(request, dispatch, location, course_id):
 
     # Let the module handle the AJAX
     try:
-        ajax_return = instance.handle_ajax(dispatch, p)
+        ajax_return = instance.handle_ajax(dispatch, data)
 
     # If we can't find the module, respond with a 404
     except NotFoundError:
@@ -527,7 +531,6 @@ def modx_dispatch(request, dispatch, location, course_id):
     return HttpResponse(ajax_return)
 
 
-
 def get_score_bucket(grade, max_grade):
     """
     Function to split arbitrary score ranges into 3 buckets.
@@ -540,3 +543,30 @@ def get_score_bucket(grade, max_grade):
         score_bucket = "correct"
 
     return score_bucket
+
+
+def _check_files_limits(files):
+    """
+    Check if the files in a request are under the limits defined by
+    `settings.MAX_FILEUPLOADS_PER_INPUT` and
+    `settings.STUDENT_FILEUPLOAD_MAX_SIZE`.
+
+    Returns None if files are correct or an error messages otherwise.
+    """
+    for fileinput_id in files.keys():
+        inputfiles = files.getlist(fileinput_id)
+
+        # Check number of files submitted
+        if len(inputfiles) > settings.MAX_FILEUPLOADS_PER_INPUT:
+            msg = 'Submission aborted! Maximum %d files may be submitted at once' %\
+                  settings.MAX_FILEUPLOADS_PER_INPUT
+            return msg
+
+        # Check file sizes
+        for inputfile in inputfiles:
+            if inputfile.size > settings.STUDENT_FILEUPLOAD_MAX_SIZE:   # Bytes
+                msg = 'Submission aborted! Your file "%s" is too large (max size: %d MB)' %\
+                      (inputfile.name, settings.STUDENT_FILEUPLOAD_MAX_SIZE / (1000 ** 2))
+                return msg
+
+    return None

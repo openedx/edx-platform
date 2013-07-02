@@ -37,7 +37,7 @@ urlpatterns = ('',  # nopep8
     url(r'^login_ajax$', 'student.views.login_user', name="login"),
     url(r'^login_ajax/(?P<error>[^/]*)$', 'student.views.login_user'),
     url(r'^logout$', 'student.views.logout_user', name='logout'),
-    url(r'^create_account$', 'student.views.create_account'),
+    url(r'^create_account$', 'student.views.create_account', name='create_account'),
     url(r'^activate/(?P<key>[^/]*)$', 'student.views.activate_account', name="activate"),
 
     url(r'^begin_exam_registration/(?P<course_id>[^/]+/[^/]+/[^/]+)$', 'student.views.begin_exam_registration', name="begin_exam_registration"),
@@ -51,7 +51,7 @@ urlpatterns = ('',  # nopep8
     url(r'^password_change_done/$', django.contrib.auth.views.password_change_done,
         name='auth_password_change_done'),
     url(r'^password_reset_confirm/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$',
-        django.contrib.auth.views.password_reset_confirm,
+        'student.views.password_reset_confirm_wrapper',
         name='auth_password_reset_confirm'),
     url(r'^password_reset_complete/$', django.contrib.auth.views.password_reset_complete,
         name='auth_password_reset_complete'),
@@ -188,7 +188,7 @@ if settings.COURSEWARE_ENABLED:
         # into the database.
         url(r'^software-licenses$', 'licenses.views.user_software_license', name="user_software_license"),
 
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/xqueue/(?P<userid>[^/]*)/(?P<id>.*?)/(?P<dispatch>[^/]*)$',
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/xqueue/(?P<userid>[^/]*)/(?P<mod_id>.*?)/(?P<dispatch>[^/]*)$',
             'courseware.module_render.xqueue_callback',
             name='xqueue_callback'),
         url(r'^change_setting$', 'student.views.change_setting',
@@ -430,6 +430,13 @@ if settings.MITX_FEATURES.get('ENABLE_DEBUG_RUN_PYTHON'):
         url(r'^debug/run_python', 'debug.views.run_python'),
     )
 
+# Crowdsourced hinting instructor manager.
+if settings.MITX_FEATURES.get('ENABLE_HINTER_INSTRUCTOR_VIEW'):
+    urlpatterns += (
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/hint_manager$',
+            'instructor.hint_manager.hint_manager', name="hint_manager"),
+    )
+
 urlpatterns = patterns(*urlpatterns)
 
 if settings.DEBUG:
@@ -438,5 +445,3 @@ if settings.DEBUG:
 #Custom error pages
 handler404 = 'static_template_view.views.render_404'
 handler500 = 'static_template_view.views.render_500'
-
-

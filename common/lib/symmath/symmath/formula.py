@@ -10,7 +10,7 @@
 # Provides sympy representation.
 
 import os
-import string
+import string       # pylint: disable=W0402
 import re
 import logging
 import operator

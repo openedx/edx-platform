@@ -5,6 +5,24 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Common: Student information is now passed to the tracking log via POST instead of GET.
+
+Common: Add tests for documentation generation to test suite
+
+Blades: User answer now preserved (and changeable) after clicking "show answer" in choice problems
+
+LMS: Users are no longer auto-activated if they click "reset password"
+This is now done when they click on the link in the reset password
+email they receive (along with usual path through activation email).
+
+LMS: Problem rescoring.  Added options on the Grades tab of the
+Instructor Dashboard to allow a particular student's submission for a
+particular problem to be rescored.  Provides an option to see a
+history of background tasks for a given problem and student.
+
+Blades: Small UX fix on capa multiple-choice problems.  Make labels only
+as wide as the text to reduce accidental choice selections.
+
 Studio: Remove XML from the video component editor. All settings are
 moved to be edited as metadata.
 
@@ -47,6 +65,8 @@ LMS: Courses whose id matches a regex in the COURSES_WITH_UNSAFE_CODE Django
 setting now run entirely outside the Python sandbox.
 
 Blades: Added tests for Video Alpha player.
+
+Common: Have the capa module handle unicode better (especially errors)
 
 Blades: Video Alpha bug fix for speed changing to 1.0 in Firefox.
 
@@ -137,4 +157,6 @@ Common: Updated Django to version 1.4.5.
 Common: Updated CodeJail.
 
 Common: Allow setting of authentication session cookie name.
+
+LMS: Option to email students when enroll/un-enroll them.
 

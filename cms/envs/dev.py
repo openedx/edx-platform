@@ -22,12 +22,12 @@ modulestore_options = {
     'db': 'xmodule',
     'collection': 'modulestore',
     'fs_root': GITHUB_REPO_ROOT,
-    'render_template': 'mitxmako.shortcuts.render_to_string'
+    'render_template': 'mitxmako.shortcuts.render_to_string',
 }
 
 MODULESTORE = {
     'default': {
-        'ENGINE': 'xmodule.modulestore.mongo.DraftMongoModuleStore',
+        'ENGINE': 'xmodule.modulestore.draft.DraftModuleStore',
         'OPTIONS': modulestore_options
     },
     'direct': {
@@ -181,6 +181,6 @@ if SEGMENT_IO_KEY:
 #####################################################################
 # Lastly, see if the developer has any local overrides.
 try:
-    from .private import *
+    from .private import *      # pylint: disable=F0401
 except ImportError:
     pass

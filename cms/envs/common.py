@@ -54,7 +54,11 @@ MITX_FEATURES = {
     'ENABLE_SERVICE_STATUS': False,
 
     # Don't autoplay videos for course authors
-    'AUTOPLAY_VIDEOS': False
+    'AUTOPLAY_VIDEOS': False,
+
+    # If set to True, new Studio users won't be able to author courses unless
+    # edX has explicitly added them to the course creator group.
+    'ENABLE_CREATOR_GROUP': False
 }
 ENABLE_JASMINE = False
 

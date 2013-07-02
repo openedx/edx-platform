@@ -162,7 +162,8 @@ class @Problem
   #       maybe preferable to consolidate all dispatches to use FormData
   ###
   check_fd: =>
-    Logger.log 'problem_check', @answers
+    # Calling check from check_fd will result in firing the 'problem_check' event twice, since it is also called in the check function.
+    #Logger.log 'problem_check', @answers
 
     # If there are no file inputs in the problem, we can fall back on @check
     if $('input:file').length == 0
@@ -247,6 +248,7 @@ class @Problem
             @el.removeClass 'showed'
         else
           @gentle_alert response.success
+      Logger.log 'problem_graded', [@answers, response.contents], @url
 
   reset: =>
     Logger.log 'problem_reset', @answers
@@ -389,8 +391,6 @@ class @Problem
     choicegroup: (element, display, answers) =>
       element = $(element)
 
-      element.find('input').attr('disabled', 'disabled')
-
       input_id = element.attr('id').replace(/inputtype_/,'')
       answer = answers[input_id]
       for choice in answer
@@ -404,7 +404,6 @@ class @Problem
   inputtypeHideAnswerMethods:
     choicegroup: (element, display) =>
       element = $(element)
-      element.find('input').attr('disabled', null)
       element.find('label').removeClass('choicegroup_correct')
 
     javascriptinput: (element, display) =>

@@ -1,3 +1,4 @@
+import datetime
 def get_default_time_display(dt, show_timezone=True):
     """
     Converts a datetime to a string representation. This is the default
@@ -11,7 +12,7 @@ def get_default_time_display(dt, show_timezone=True):
     if dt is None:
         return ""
     timezone = ""
-    if dt is not None and show_timezone:
+    if show_timezone:
         if dt.tzinfo is not None:
             try:
                 timezone = " " + dt.tzinfo.tzname(dt)
@@ -20,3 +21,14 @@ def get_default_time_display(dt, show_timezone=True):
         else:
             timezone = " UTC"
     return dt.strftime("%b %d, %Y at %H:%M") + timezone
+
+
+def almost_same_datetime(dt1, dt2, allowed_delta=datetime.timedelta(minutes=1)):
+    """
+    Returns true if these are w/in a minute of each other. (in case secs saved to db
+    or timezone aren't same)
+
+    :param dt1:
+    :param dt2:
+    """
+    return abs(dt1 - dt2) < allowed_delta

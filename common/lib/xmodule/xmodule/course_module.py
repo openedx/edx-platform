@@ -212,6 +212,9 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
     template_dir_name = 'course'
 
     def __init__(self, *args, **kwargs):
+        """
+        Expects the same arguments as XModuleDescriptor.__init__
+        """
         super(CourseDescriptor, self).__init__(*args, **kwargs)
 
         if self.wiki_slug is None:

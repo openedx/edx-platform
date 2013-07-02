@@ -272,9 +272,9 @@ class XModule(XModuleFields, HTMLSnippet, XBlock):
         '''
         return None
 
-    def handle_ajax(self, _dispatch, _get):
+    def handle_ajax(self, _dispatch, _data):
         ''' dispatch is last part of the URL.
-            get is a dictionary-like object '''
+            data is a dictionary-like object with the content of the request'''
         return ""
 
 

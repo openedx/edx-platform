@@ -28,6 +28,7 @@ MITX_FEATURES['ENABLE_MANUAL_GIT_RELOAD'] = True
 MITX_FEATURES['ENABLE_PSYCHOMETRICS'] = False    # real-time psychometrics (eg item response theory analysis in instructor dashboard)
 MITX_FEATURES['ENABLE_INSTRUCTOR_ANALYTICS'] = True
 MITX_FEATURES['ENABLE_SERVICE_STATUS'] = True
+MITX_FEATURES['ENABLE_HINTER_INSTRUCTOR_VIEW'] = True
 
 WIKI_ENABLED = True
 
@@ -258,6 +259,6 @@ if SEGMENT_IO_LMS_KEY:
 #####################################################################
 # Lastly, see if the developer has any local overrides.
 try:
-    from .private import *
+    from .private import *      # pylint: disable=F0401
 except ImportError:
     pass

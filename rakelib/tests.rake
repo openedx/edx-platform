@@ -16,7 +16,7 @@ def run_tests(system, report_dir, test_id=nil, stop_on_failure=true)
     ENV['NOSE_XUNIT_FILE'] = File.join(report_dir, "nosetests.xml")
     dirs = Dir["common/djangoapps/*"] + Dir["#{system}/djangoapps/*"]
     test_id = dirs.join(' ') if test_id.nil? or test_id == ''
-    cmd = django_admin(system, :test, 'test', '--logging-clear-handlers', test_id)
+    cmd = django_admin(system, :test, 'test', '--logging-clear-handlers', '--liveserver=localhost:8000-9000', test_id)
     test_sh(run_under_coverage(cmd, system))
 end
 
@@ -53,7 +53,7 @@ task :clean_test_files do
     sh("git clean -fqdx test_root")
 end
 
-task :clean_reports_dir do
+task :clean_reports_dir => REPORT_DIR do
     desc "Clean coverage files, to ensure that we don't use stale data to generate reports."
 
     # We delete the files but preserve the directory structure
@@ -99,9 +99,10 @@ Dir["common/lib/*"].select{|lib| File.directory?(lib)}.each do |lib|
     report_dir = report_dir_path(lib)
 
     desc "Run tests for common lib #{lib}"
-    task "test_#{lib}"  => [report_dir, :clean_reports_dir] do
+    task "test_#{lib}", [:test_id] => [report_dir, :clean_reports_dir] do |t, args|
+        args.with_defaults(:test_id => lib)
         ENV['NOSE_XUNIT_FILE'] = File.join(report_dir, "nosetests.xml")
-        cmd = "nosetests #{lib}"
+        cmd = "nosetests #{args.test_id}"
         test_sh(run_under_coverage(cmd, lib))
     end
     TEST_TASK_DIRS << lib

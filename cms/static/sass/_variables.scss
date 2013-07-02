@@ -24,16 +24,16 @@ $f-monospace: 'Bitstream Vera Sans Mono', Consolas, Courier, monospace;
 
 // colors - new for re-org
 $black: rgb(0,0,0);
-$black-t0: rgba(0,0,0,0.125);
-$black-t1: rgba(0,0,0,0.25);
-$black-t2: rgba(0,0,0,0.50);
-$black-t3: rgba(0,0,0,0.75);
+$black-t0: rgba($black, 0.125);
+$black-t1: rgba($black, 0.25);
+$black-t2: rgba($black, 0.5);
+$black-t3: rgba($black, 0.75);
 
 $white: rgb(255,255,255);
-$white-t0: rgba(255,255,255,0.125);
-$white-t1: rgba(255,255,255,0.25);
-$white-t2: rgba(255,255,255,0.50);
-$white-t3: rgba(255,255,255,0.75);
+$white-t0: rgba($white, 0.125);
+$white-t1: rgba($white, 0.25);
+$white-t2: rgba($white, 0.5);
+$white-t3: rgba($white, 0.75);
 
 $gray: rgb(127,127,127);
 $gray-l1: tint($gray,20%);
@@ -63,10 +63,10 @@ $blue-s3: saturate($blue,45%);
 $blue-u1: desaturate($blue,15%);
 $blue-u2: desaturate($blue,30%);
 $blue-u3: desaturate($blue,45%);
-$blue-t0: rgba(85, 151, 221,0.125);
-$blue-t1: rgba(85, 151, 221,0.25);
-$blue-t2: rgba(85, 151, 221,0.50);
-$blue-t3: rgba(85, 151, 221,0.75);
+$blue-t0: rgba($blue, 0.125);
+$blue-t1: rgba($blue, 0.25);
+$blue-t2: rgba($blue, 0.50);
+$blue-t3: rgba($blue, 0.75);
 
 $pink: rgb(183, 37, 103);
 $pink-l1: tint($pink,20%);
@@ -153,10 +153,11 @@ $orange-u1: desaturate($orange,15%);
 $orange-u2: desaturate($orange,30%);
 $orange-u3: desaturate($orange,45%);
 
-$shadow: rgba(0,0,0,0.2);
-$shadow-l1: rgba(0,0,0,0.1);
-$shadow-l2: rgba(0,0,0,0.05);
-$shadow-d1: rgba(0,0,0,0.4);
+$shadow: rgba($black, 0.2);
+$shadow-l1: rgba($black, 0.1);
+$shadow-l2: rgba($black, 0.05);
+$shadow-d1: rgba($black, 0.4);
+$shadow-d2: rgba($black, 0.6);
 
 // ====================
 
@@ -186,4 +187,3 @@ $error-red: rgb(253, 87, 87);
 // type
 $sans-serif: $f-sans-serif;
 $body-line-height: golden-ratio(.875em, 1);
-

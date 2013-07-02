@@ -23,12 +23,12 @@ MODULESTORE_OPTIONS = {
     'db': 'test_xmodule',
     'collection': 'acceptance_modulestore',
     'fs_root': TEST_ROOT / "data",
-    'render_template': 'mitxmako.shortcuts.render_to_string'
+    'render_template': 'mitxmako.shortcuts.render_to_string',
 }
 
 MODULESTORE = {
     'default': {
-        'ENGINE': 'xmodule.modulestore.mongo.DraftMongoModuleStore',
+        'ENGINE': 'xmodule.modulestore.draft.DraftModuleStore',
         'OPTIONS': MODULESTORE_OPTIONS
     },
     'direct': {
@@ -36,10 +36,25 @@ MODULESTORE = {
         'OPTIONS': MODULESTORE_OPTIONS
     },
     'draft': {
-        'ENGINE': 'xmodule.modulestore.mongo.DraftMongoModuleStore',
+        'ENGINE': 'xmodule.modulestore.draft.DraftModuleStore',
         'OPTIONS': MODULESTORE_OPTIONS
     }
 }
+
+CONTENTSTORE = {
+    'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
+    'OPTIONS': {
+        'host': 'localhost',
+        'db': 'acceptance_xcontent',
+    },
+    # allow for additional options that can be keyed on a name, e.g. 'trashcan'
+    'ADDITIONAL_OPTIONS': {
+        'trashcan': {
+            'bucket': 'trash_fs'
+        }
+    }
+}
+
 # Set this up so that rake lms[acceptance] and running the
 # harvest command both use the same (test) database
 # which they can flush without messing up your dev db

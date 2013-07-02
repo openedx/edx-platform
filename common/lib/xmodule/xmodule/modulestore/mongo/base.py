@@ -18,11 +18,10 @@ from xmodule.error_module import ErrorDescriptor
 from xblock.runtime import DbModel, KeyValueStore, InvalidScopeError
 from xblock.core import Scope
 
-from . import ModuleStoreBase, Location, namedtuple_to_son
-from .draft import DraftModuleStore
-from .exceptions import (ItemNotFoundError,
+from xmodule.modulestore import ModuleStoreBase, Location, namedtuple_to_son
+from xmodule.modulestore.exceptions import (ItemNotFoundError,
                          DuplicateItemError)
-from .inheritance import own_metadata, INHERITABLE_METADATA, inherit_metadata
+from xmodule.modulestore.inheritance import own_metadata, INHERITABLE_METADATA, inherit_metadata
 
 log = logging.getLogger(__name__)
 
@@ -195,7 +194,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
                 if self.cached_metadata is not None:
                     # parent container pointers don't differentiate between draft and non-draft
                     # so when we do the lookup, we should do so with a non-draft location
-                    non_draft_loc = location._replace(revision=None)
+                    non_draft_loc = location.replace(revision=None)
                     metadata_to_inherit = self.cached_metadata.get(non_draft_loc.url(), {})
                     inherit_metadata(module, metadata_to_inherit)
                 return module
@@ -761,12 +760,3 @@ class MongoModuleStore(ModuleStoreBase):
         return {}
 
 
-# DraftModuleStore is first, because it needs to intercept calls to MongoModuleStore
-class DraftMongoModuleStore(DraftModuleStore, MongoModuleStore):
-    """
-    Version of MongoModuleStore with draft capability mixed in
-    """
-    """
-    Version of MongoModuleStore with draft capability mixed in
-    """
-    pass
