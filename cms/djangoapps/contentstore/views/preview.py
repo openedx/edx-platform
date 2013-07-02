@@ -96,10 +96,6 @@ def preview_module_system(request, preview_id, descriptor):
             MongoUsage(preview_id, descriptor.location.url()),
         )
 
-    # unfortunately this is duplicate code from module_render.py (LMS)
-    # refactoring this to be more DRY means having the change the call signature
-    # to pass along a course_id, however, deep in the code where the call is actually made, we don't always have
-    # access to the course_id
     course_id = get_course_for_item(descriptor.location).location.course_id
 
     return ModuleSystem(
