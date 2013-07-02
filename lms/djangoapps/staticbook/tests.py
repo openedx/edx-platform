@@ -120,14 +120,14 @@ class StaticPdfBookTest(StaticBookTest):
         course = self.make_course(pdf_textbooks=[PDF_BOOK])
         # It's no longer possible to use a non-integer chapter.
         with self.assertRaises(NoReverseMatch):
-            reverse('pdf_book', kwargs={'course_id': course.id, 'book_index': 0, 'chapter': 'xyzzy'})
+            self.make_url('pdf_book', book_index=0, chapter='xyzzy')
 
     def test_page_xss(self):
         # The page in the URL used to go right on the page.
         course = self.make_course(pdf_textbooks=[PDF_BOOK])
         # It's no longer possible to use a non-integer page.
         with self.assertRaises(NoReverseMatch):
-            reverse('pdf_book', kwargs={'course_id': course.id, 'book_index': 0, 'page': 'xyzzy'})
+            self.make_url('pdf_book', book_index=0, page='xyzzy')
 
 
 class StaticHtmlBookTest(StaticBookTest):
@@ -170,4 +170,4 @@ class StaticHtmlBookTest(StaticBookTest):
         course = self.make_course(pdf_textbooks=[HTML_BOOK])
         # It's no longer possible to use a non-integer chapter.
         with self.assertRaises(NoReverseMatch):
-            reverse('html_book', kwargs={'course_id': course.id, 'book_index': 0, 'chapter': 'xyzzy'})
+            self.make_url('html_book', book_index=0, chapter='xyzzy')
