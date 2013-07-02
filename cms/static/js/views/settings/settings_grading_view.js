@@ -3,6 +3,9 @@ if (!CMS.Views['Settings']) CMS.Views.Settings = {}; // ensure the pseudo pkg ex
 CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
     // Model class is CMS.Models.Settings.CourseGradingPolicy
     events : {
+        "input input" : "updateModel",
+        "input textarea" : "updateModel",
+        // Leaving change in as fallback for older browsers
         "change input" : "updateModel",
         "change textarea" : "updateModel",
         "change span[contenteditable=true]" : "updateDesignation",
@@ -62,7 +65,12 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
                function (event) {
                    gradeCollection.on(event, function() {
                        this.showNotificationBar();
-                       this.render();
+                       // Since the change event gets fired every time
+                       // we type in an input field, we don't need to
+                       // (and really shouldn't) rerender the whole view.
+                       if(event !== 'change') {
+                           this.render();
+                       }
                    }, this);
                },
                this);
@@ -110,7 +118,7 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
 
         default:
             this.setField(event);
-        break;
+            break;
         }
     },
 
@@ -347,6 +355,9 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
 CMS.Views.Settings.GraderView = CMS.Views.ValidatingView.extend({
     // Model class is CMS.Models.Settings.CourseGrader
     events : {
+        "input input" : "updateModel",
+        "input textarea" : "updateModel",
+        // Leaving change in as fallback for older browsers
         "change input" : "updateModel",
         "change textarea" : "updateModel",
         "click .remove-grading-data" : "deleteModel",
@@ -370,7 +381,7 @@ CMS.Views.Settings.GraderView = CMS.Views.ValidatingView.extend({
         'drop_count' : 'course-grading-assignment-droppable',
         'weight' : 'course-grading-assignment-gradeweight'
     },
-    updateModel : function(event) {
+    updateModel: function(event) {
         // HACK to fix model sometimes losing its pointer to the collection [I think I fixed this but leaving
         // this in out of paranoia. If this error ever happens, the user will get a warning that they cannot
         // give 2 assignments the same name.]
@@ -384,13 +395,14 @@ CMS.Views.Settings.GraderView = CMS.Views.ValidatingView.extend({
             this.setField(event);
             break;
         case 'course-grading-assignment-name':
-            var oldName = this.model.get('type');
+            // Keep the original name, until we save
+            this.oldName = this.oldName === undefined ? this.model.get('type') : this.oldName;
             // If the name has changed, alert the user to change all subsection names.
-            if (this.setField(event) != oldName && !_.isEmpty(oldName)) {
+            if (this.setField(event) != this.oldName && !_.isEmpty(this.oldName)) {
                 // overload the error display logic
                 this._cacheValidationErrors.push(event.currentTarget);
                 $(event.currentTarget).parent().append(
-                        this.errorTemplate({message : 'For grading to work, you must change all "' + oldName +
+                        this.errorTemplate({message : 'For grading to work, you must change all "' + this.oldName +
                             '" subsections to "' + this.model.get('type') + '".'}));
             }
             break;

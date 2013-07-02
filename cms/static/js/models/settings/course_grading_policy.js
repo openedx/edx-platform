@@ -77,18 +77,19 @@ CMS.Models.Settings.CourseGrader = Backbone.Model.extend({
             }
             else {
                 // FIXME somehow this.collection is unbound sometimes. I can't track down when
-                var existing = this.collection && this.collection.some(function(other) { return (other != this) && (other.get('type') == attrs['type']);}, this);
+                var existing = this.collection && this.collection.some(function(other) { return (other.cid != this.cid) && (other.get('type') == attrs['type']);}, this);
                 if (existing) {
                     errors.type = "There's already another assignment type with this name.";
                 }
             }
         }
         if (_.has(attrs, 'weight')) {
-            if (!isFinite(attrs.weight) || /\D+/.test(attrs.weight)) {
+            var intWeight = parseInt(attrs.weight); // see if this ensures value saved is int
+            if (!isFinite(intWeight) || /\D+/.test(attrs.weight) || intWeight < 0 || intWeight > 100) {
                 errors.weight = "Please enter an integer between 0 and 100.";
             }
             else {
-                attrs.weight = parseInt(attrs.weight); // see if this ensures value saved is int
+                attrs.weight = intWeight;
                 if (this.collection && attrs.weight > 0) {
                     // FIXME b/c saves don't update the models if validation fails, we should
                     // either revert the field value to the one in the model and make them make room

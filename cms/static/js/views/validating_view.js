@@ -9,7 +9,10 @@ CMS.Views.ValidatingView = Backbone.View.extend({
 
     errorTemplate : _.template('<span class="message-error"><%= message %></span>'),
 
+    save_title: gettext("You've made some changes"),
     save_message: gettext("Your changes will not take effect until you save your progress."),
+    error_title: gettext("You've made some changes, but there are some errors"),
+    error_message: gettext("Please address the errors on this page first, and then save your progress."),
 
     events : {
         "change input" : "clearValidationErrors",
@@ -22,6 +25,7 @@ CMS.Views.ValidatingView = Backbone.View.extend({
     _cacheValidationErrors : [],
 
     handleValidationError : function(model, error) {
+        this.clearValidationErrors();
         // error is object w/ fields and error strings
         for (var field in error) {
             var ele = this.$el.find('#' + this.fieldToSelectorMap[field]);
@@ -29,6 +33,11 @@ CMS.Views.ValidatingView = Backbone.View.extend({
             this.getInputElements(ele).addClass('error');
             $(ele).parent().append(this.errorTemplate({message : error[field]}));
         }
+        $('.wrapper-notification-warning').addClass('wrapper-notification-warning-w-errors');
+        $('.action-save').addClass('is-disabled');
+        // TODO: (pfogg) should this text fade in/out on change?
+        $('#notification-warning-title').text(this.error_title);
+        $('#notification-warning-description').text(this.error_message);
     },
 
     clearValidationErrors : function() {
@@ -38,6 +47,10 @@ CMS.Views.ValidatingView = Backbone.View.extend({
             this.getInputElements(ele).removeClass('error');
             $(ele).nextAll('.message-error').remove();
         }
+        $('.wrapper-notification-warning').removeClass('wrapper-notification-warning-w-errors');
+        $('.action-save').removeClass('is-disabled');
+        $('#notification-warning-title').text(this.save_title);
+        $('#notification-warning-description').text(this.save_message);
     },
 
     setField : function(event) {
@@ -83,7 +96,7 @@ CMS.Views.ValidatingView = Backbone.View.extend({
         }
         var self = this;
         this.confirmation = new CMS.Views.Notification.Warning({
-            title: gettext("You've made some changes"),
+            title: this.save_title,
             message: message,
             actions: {
                 primary: {
@@ -110,6 +123,8 @@ CMS.Views.ValidatingView = Backbone.View.extend({
             }});
         this.notificationBarShowing = true;
         this.confirmation.show();
+        // Make sure the bar is in the right state
+        this.model.isValid();
     },
 
     showSavedBar: function(title, message) {

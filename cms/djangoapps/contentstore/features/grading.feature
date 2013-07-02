@@ -77,3 +77,10 @@ Feature: Course Grading
         When I change assignment type "Homework" to "New Type"
         And I press the "Save" notification button
         Then I see a confirmation that my changes have been saved
+
+    Scenario: User cannot save invalid settings
+        Given I have opened a new course in Studio
+        And I have populated the course
+        And I am viewing the grading settings
+        When I change assignment type "Homework" to ""
+        Then the save button is disabled

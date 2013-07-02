@@ -68,7 +68,7 @@ def press_the_notification_button(_step, name):
         error_showing = world.is_css_present('.is-shown.wrapper-notification-error')
         return confirmation_dismissed or error_showing
 
-    assert_true(world.css_click(css, success_condition=button_clicked), '%s button not clicked after 5 attempts.' % name)
+    world.css_click(css, success_condition=button_clicked), '%s button not clicked after 5 attempts.' % name
 
 
 @step('I change the "(.*)" field to "(.*)"$')
@@ -226,6 +226,13 @@ def shows_captions(step, show_captions):
         assert world.css_find('.video')[0].has_class('closed')
     else:
         assert world.is_css_not_present('.video.closed')
+
+
+@step('the save button is disabled$')
+def save_button_disabled(step):
+    button_css = '.action-save'
+    disabled = 'is-disabled'
+    assert world.css_find(button_css)[0].has_class(disabled)
 
 
 def type_in_codemirror(index, text):

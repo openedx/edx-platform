@@ -60,8 +60,6 @@ def change_assignment_name(step, old_name, new_name):
     for count in range(len(old_name)):
         f._element.send_keys(Keys.END, Keys.BACK_SPACE)
     f._element.send_keys(new_name)
-    # Without this, the "you've made changes" notification won't pop up
-    f._element.send_keys(Keys.ENTER)
 
 
 @step(u'I go back to the main course page')
@@ -94,8 +92,6 @@ def add_assignment_type(step, new_name):
     name_id = '#course-grading-assignment-name'
     f = world.css_find(name_id)[4]
     f._element.send_keys(new_name)
-    # Without this, the "you've made changes" notification won't pop up
-    f._element.send_keys(Keys.ENTER)
 
 
 @step(u'I have populated the course')

@@ -3,10 +3,11 @@ if (!CMS.Views['Settings']) CMS.Views.Settings = {};
 CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
     // Model class is CMS.Models.Settings.CourseDetails
     events : {
+        "input input" : "updateModel",
+        "input textarea" : "updateModel",
+        // Leaving change in as fallback for older browsers
         "change input" : "updateModel",
         "change textarea" : "updateModel",
-        'click .remove-course-syllabus' : "removeSyllabus",
-        'click .new-course-syllabus' : 'assetSyllabus',
         'click .remove-course-introduction-video' : "removeVideo",
         'focus #course-overview' : "codeMirrorize",
         'mouseover #timezone' : "updateTime",
@@ -28,6 +29,7 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
         this.$el.find('#timezone').html("(" + dateIntrospect.getTimezone() + ")");
 
         this.listenTo(this.model, 'invalid', this.handleValidationError);
+        this.listenTo(this.model, 'change', this.showNotificationBar);
         this.selectorToField = _.invert(this.fieldToSelectorMap);
     },
 
@@ -37,25 +39,13 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
         this.setupDatePicker('enrollment_start');
         this.setupDatePicker('enrollment_end');
 
-        if (this.model.has('syllabus')) {
-            this.$el.find(this.fieldToSelectorMap['syllabus']).html(
-                    this.fileAnchorTemplate({
-                        fullpath : this.model.get('syllabus'),
-                        filename: 'syllabus'}));
-            this.$el.find('.remove-course-syllabus').show();
-        }
-        else {
-            this.$el.find('#' + this.fieldToSelectorMap['syllabus']).html("");
-            this.$el.find('.remove-course-syllabus').hide();
-        }
-
         this.$el.find('#' + this.fieldToSelectorMap['overview']).val(this.model.get('overview'));
         this.codeMirrorize(null, $('#course-overview')[0]);
 
         this.$el.find('.current-course-introduction-video iframe').attr('src', this.model.videosourceSample());
+        this.$el.find('#' + this.fieldToSelectorMap['intro_video']).val(this.model.get('intro_video') || '');
         if (this.model.has('intro_video')) {
             this.$el.find('.remove-course-introduction-video').show();
-            this.$el.find('#' + this.fieldToSelectorMap['intro_video']).val(this.model.get('intro_video'));
         }
         else this.$el.find('.remove-course-introduction-video').hide();
 
@@ -68,7 +58,6 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
         'end_date' : 'course-end',
         'enrollment_start' : 'enrollment-start',
         'enrollment_end' : 'enrollment-end',
-        'syllabus' : '.current-course-syllabus .doc-filename',
         'overview' : 'course-overview',
         'intro_video' : 'course-introduction-video',
         'effort' : "course-effort"
@@ -120,7 +109,13 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
         timefield.on('changeTime', setfield);
 
         datefield.datepicker('setDate', this.model.get(fieldName));
-        if (this.model.has(fieldName)) timefield.timepicker('setTime', this.model.get(fieldName));
+        // timepicker doesn't let us set null, so check that we have a time
+        if (this.model.has(fieldName)) {
+            timefield.timepicker('setTime', this.model.get(fieldName));
+        } // but reset the field either way
+        else {
+            timefield.val('');
+        }
     },
 
     updateModel: function(event) {
@@ -129,34 +124,28 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
             this.setField(event);
             break;
         // Don't make the user reload the page to check the Youtube ID.
+        // Wait for a second to load the video, avoiding egregious AJAX calls.
         case 'course-introduction-video':
             this.clearValidationErrors();
             var previewsource = this.model.set_videosource($(event.currentTarget).val());
-            this.$el.find(".current-course-introduction-video iframe").attr("src", previewsource);
-            if (this.model.has('intro_video')) {
-                this.$el.find('.remove-course-introduction-video').show();
-            }
-            else {
-                this.$el.find('.remove-course-introduction-video').hide();
-            }
+            clearTimeout(this.videoTimer);
+            this.videoTimer = setTimeout(_.bind(function() {
+                this.$el.find(".current-course-introduction-video iframe").attr("src", previewsource);
+                if (this.model.has('intro_video')) {
+                    this.$el.find('.remove-course-introduction-video').show();
+                }
+                else {
+                    this.$el.find('.remove-course-introduction-video').hide();
+                }
+            }, this), 1000);
             break;
         default: // Everything else is handled by datepickers and CodeMirror.
             break;
         }
-        this.showNotificationBar(this.save_message,
-                                 _.bind(this.saveView, this),
-                                 _.bind(this.revertView, this));
     },
 
-    removeSyllabus: function() {
-        if (this.model.has('syllabus'))	this.setAndValidate('syllabus', null);
-    },
-
-    assetSyllabus : function() {
-        // TODO implement
-    },
-
-    removeVideo: function() {
+    removeVideo: function(event) {
+        event.preventDefault();
         if (this.model.has('intro_video')) {
             this.model.set_videosource(null);
             this.$el.find(".current-course-introduction-video iframe").attr("src", "");
@@ -185,9 +174,6 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
                     var newVal = mirror.getValue();
                     if (cachethis.model.get(field) != newVal) {
                         cachethis.setAndValidate(field, newVal);
-                        cachethis.showNotificationBar(cachethis.save_message,
-                                                      _.bind(cachethis.saveView, cachethis),
-                                                      _.bind(cachethis.revertView, cachethis));
                     }
                 }
             });
@@ -208,7 +194,8 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
                            mirror.setValue(self.model.get(field));
                        });
             },
-            reset: true});
+            reset: true,
+            silent: true});
     },
     setAndValidate: function(attr, value) {
         // If we call model.set() with {validate: true}, model fields
@@ -219,6 +206,15 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
         // call validate ourselves.
         this.model.set(attr, value);
         this.model.isValid();
+    },
+
+    showNotificationBar: function() {
+        // We always call showNotificationBar with the same args, just
+        // delegate to superclass
+        CMS.Views.ValidatingView.prototype.showNotificationBar.call(this,
+                                                                    this.save_message,
+                                                                    _.bind(this.saveView, this),
+                                                                    _.bind(this.revertView, this));
     }
 });
 

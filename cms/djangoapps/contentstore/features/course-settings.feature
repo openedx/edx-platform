@@ -65,3 +65,9 @@ Feature: Course Settings
     And I change the course overview
     And I press the "Save" notification button
     Then I see a confirmation that my changes have been saved
+
+  Scenario: User cannot save invalid settings
+    Given I have opened a new course in Studio
+    When I select Schedule and Details
+    And I change the "Course Start Date" field to ""
+    Then the save button is disabled
