@@ -1,3 +1,4 @@
+"""Tests for student tracking"""
 from django.test import TestCase
 from django.core.urlresolvers import reverse, NoReverseMatch
 from track.models import TrackingLog

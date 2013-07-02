@@ -1,3 +1,4 @@
+"""Tests for CMS's requests to logs"""
 from django.test import TestCase
 from django.core.urlresolvers import reverse
 from contentstore.views.requests import event as cms_user_track
