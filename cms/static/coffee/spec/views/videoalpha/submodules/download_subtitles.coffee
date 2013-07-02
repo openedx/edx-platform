@@ -1,4 +1,4 @@
-describe "CMS.Views.DownloadSubtitles", ->
+describe "CMS.Views.SubtitlesDownload", ->
   beforeEach ->
     @html_id = "html_id"
 
@@ -13,7 +13,7 @@ describe "CMS.Views.DownloadSubtitles", ->
 
   describe "class definition", ->
     beforeEach ->
-      @view = new CMS.Views.DownloadSubtitles @options
+      @view = new CMS.Views.SubtitlesDownload @options
 
     it "sets the correct tagName", ->
       expect(@view.tagName).toEqual("li")
@@ -24,17 +24,17 @@ describe "CMS.Views.DownloadSubtitles", ->
   describe "methods", ->
     describe "initialize", ->
       beforeEach ->
-        spyOn(CMS.Views.DownloadSubtitles.prototype, 'render').andCallThrough()
-        @view = new CMS.Views.DownloadSubtitles @options
+        spyOn(CMS.Views.SubtitlesDownload.prototype, 'render').andCallThrough()
+        @view = new CMS.Views.SubtitlesDownload @options
 
       it "render the module", ->
-        expect(CMS.Views.DownloadSubtitles.prototype.render).toHaveBeenCalled()
+        expect(CMS.Views.SubtitlesDownload.prototype.render).toHaveBeenCalled()
 
     describe "render", ->
       describe "subtitles exist", ->
 
         beforeEach ->
-          @view = new CMS.Views.DownloadSubtitles @options
+          @view = new CMS.Views.SubtitlesDownload @options
 
         it "button is added", ->
           expect(@view.$el).toContain('a')
@@ -49,7 +49,7 @@ describe "CMS.Views.DownloadSubtitles", ->
           options = $.extend({}, @options, {
             subtitlesExist: false
           })
-          @view = new CMS.Views.DownloadSubtitles options
+          @view = new CMS.Views.SubtitlesDownload options
 
         it "button should not be shown", ->
           expect(@options.$container).not.toContain(@view.$el)

@@ -1,4 +1,4 @@
-class CMS.Views.DownloadSubtitles extends Backbone.View
+class CMS.Views.SubtitlesDownload extends Backbone.View
   tagName: "li"
   className: "download-file"
   link_id: "download-file"
