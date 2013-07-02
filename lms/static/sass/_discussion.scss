@@ -257,7 +257,6 @@ body.discussion {
         font-size: 11px;
         line-height: 16px;
         color: #333;
-        outline: 0;
       }
     }
 
@@ -932,7 +931,6 @@ body.discussion {
       font-size: 11px;
       line-height: 16px;
       color: #333;
-      outline: 0;
     }
 
     .post-search {
@@ -959,7 +957,6 @@ body.discussion {
       font-size: 13px;
       line-height: 20px;
       color: #333;
-      outline: 0;
       cursor: pointer;
       pointer-events: none;
       @include transition(all .2s ease-out);
@@ -1642,7 +1639,6 @@ body.discussion {
     border-radius: 3px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, .1) inset;
     @include transition(border-color .1s);
-    outline: 0;
 
     &:focus {
       border-color: #4697c1;
