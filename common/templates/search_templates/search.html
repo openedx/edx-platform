@@ -1,5 +1,6 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 <head>
 	${css_link("../static/css/search.css")}
 </head>
@@ -89,6 +90,9 @@
 <html lang="en">
 =======
 >>>>>>> Refactored some code and added full elasticsearch module test suite
+=======
+
+>>>>>>> search result vertical linking in place, mongo tree traversal also working
 <head>
 	${css_link("../static/css/search.css")}
 </head>
@@ -96,11 +100,12 @@
 <div class="searchwrapper">
 	<form action="/search" method="get">
 		<span>
-		<span class="searchbox-wrapper">
+		<div class="searchbox-wrapper">
 			% if old_query:
 			<input type="text" class="searchbox" name="s" value="${old_query}" />
 			% else:
 			<input type="text" class="searchbox" name="s" value="" />
+<<<<<<< HEAD
 <<<<<<< HEAD
 			<input type="image" src="static/images/search-icon.svg" class="searchbox_submit" value="" />
 		</form>
@@ -113,26 +118,28 @@
 >>>>>>> Search working, basic functionality and styling in place, as well as csrf protection, snippeting, results highlighting, and spell correction
 =======
 =======
+=======
+>>>>>>> search result vertical linking in place, mongo tree traversal also working
 			% endif
 			<div class="searchbox_submit">
 				<input type="submit" value="" />
 			</div>
-		</span>
-		<span class="content-select">
+		</div>
+		<div class="content-select">
 			% if previous_content == "transcript":
-				<input type="radio" name="content" value="transcript" checked>Videos
-				<input type="radio" name="content" value="problem">Problems
-				<input type="radio" name="content" value="slide">Slides
+				<input type="radio" class="content" name="content" value="transcript" checked>Videos
+				<input type="radio" class="content" name="content" value="problem">Problems
+				<input type="radio" class="content" name="content" value="pdf">PDFs
 			% elif previous_content == "problem":
-				<input type="radio" name="content" value="transcript">Videos
-				<input type="radio" name="content" value="problem" checked>Problems
-				<input type="radio" name="content" value="slide">Slides
+				<input type="radio" class="content" name="content" value="transcript">Videos
+				<input type="radio" class="content" name="content" value="problem" checked>Problems
+				<input type="radio" class="content" name="content" value="pdf">PDFs
 			% else:
-				<input type="radio" name="content" value="transcript">Videos
-				<input type="radio" name="content" value="problem">Problems
-				<input type="radio" name="content" value="slide" checked>Slides
+				<input type="radio" class="content" name="content" value="transcript">Videos
+				<input type="radio" class="content" name="content" value="problem">Problems
+				<input type="radio" class="content" name="content" value="pdf" checked>PDFs
 			% endif
-		</span>
+		</div>
 	</span>
 	</form>
 </div>
@@ -140,5 +147,8 @@
 <%def name="css_link(path, media='')">
 	<link rel="stylesheet" type="text/css" href="${path|h}" media="${media}"></link>
 </%def>
+<<<<<<< HEAD
 >>>>>>> Refactored some code and added full elasticsearch module test suite
 >>>>>>> Refactored some code and added full elasticsearch module test suite
+=======
+>>>>>>> search result vertical linking in place, mongo tree traversal also working

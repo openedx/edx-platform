@@ -2,11 +2,15 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 	"mappings": {
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
 >>>>>>> Integrated module data and improved settings file
+=======
+	"mappings": {
+>>>>>>> search result vertical linking in place, mongo tree traversal also working
 		"properties": {
 			"searchable_text": {
 				"type": "multi_field",
@@ -64,12 +68,16 @@
 					"store": "true"
 				},
 
+<<<<<<< HEAD
 				"course_id": {
 =======
 		"_all": {
 			"properties": {
 				"searchable_text": {
 >>>>>>> Added mongo integration with elasticsearch requests module
+=======
+				"course": {
+>>>>>>> search result vertical linking in place, mongo tree traversal also working
 					"type": "string",
 					"store":"true"
 =======
@@ -77,14 +85,19 @@
 				},
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 				"uuid": {
 =======
 				"org": {
 >>>>>>> Added mongo integration with elasticsearch requests module
+=======
+				"course_section": {
+>>>>>>> search result vertical linking in place, mongo tree traversal also working
 					"type": "string",
 					"store": "true"
 				},
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 				"thumbnail": {
 					"type": "binary"
@@ -248,20 +261,20 @@
 >>>>>>> Moved past difficulty in file integration and adding configurability to elasticsearch analyzers
 
 				"org": {
-					"type": "string",
-					"store": "true"
-				},
-
-				"course_id": {
-					"type": "string",
-					"store":"true"
-				},
-
-				"uuid": {
-					"type": "string",
-					"store": "true"
 =======
->>>>>>> Made prettier, added requirements, and included main edX page
+				"uuid": {
+>>>>>>> search result vertical linking in place, mongo tree traversal also working
+					"type": "string",
+					"store": "true"
+				},
+
+				"url": {
+					"type": "string",
+					"store": "true"
+				},
+				
+				"thumbnail": {
+					"type": "binary"
 				}
 			}
 		}
@@ -331,21 +344,15 @@
 		            "preserve_original": "true"
 		        },
 
-<<<<<<< HEAD
-	    "char_filter": {
-	        "custom_mapping": {
-	            "type": "mapping",
-	            "mappings": ["\n=>-"]
-	        }
-	    }
->>>>>>> Added sentence tokenizing for manual gensim lda
-=======
 		        "custom_stemmer": {
 		            "type": "stemmer",
 		            "name": "english"
 		        }
 		    }
 		}
+<<<<<<< HEAD
 >>>>>>> Moved past difficulty in file integration and adding configurability to elasticsearch analyzers
+=======
+>>>>>>> search result vertical linking in place, mongo tree traversal also working
 	}
 }
