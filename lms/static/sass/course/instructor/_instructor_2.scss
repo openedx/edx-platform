@@ -1,17 +1,16 @@
 @mixin idashbutton ($color) {
   @include button(simple, $color);
   @extend .button-reset;
-  font-size: em(13);
 
   margin-bottom: 1em;
-  line-height: 1.3em;
   padding: 8px 17px 8px 17px;
+  font-size: em(13);
+  line-height: 1.3em;
 }
 
 .instructor-dashboard-wrapper-2 {
-  // @extend .table-wrapper;
-  // display: table;
   position: relative;
+  // display: table;
 
   .olddash-button-wrapper {
     position: absolute;
@@ -22,60 +21,63 @@
 
   section.instructor-dashboard-content-2 {
     @extend .content;
+    // position: relative;
     padding: 40px;
     width: 100%;
-    // position: relative;
 
     // .has-event-handler-for-click {
     //   border: 1px solid blue;
     // }
 
     .request-response-error {
-      color: $error-red;
       margin-top: 1em;
       margin-bottom: 1em;
+      color: $error-red;
     }
 
     .slickgrid {
-      font-family: verdana,arial,sans-serif;
-      font-size:11px;
-      color:#333333;
       margin-left: 1px;
+      color:#333333;
+      font-size:11px;
+      font-family: verdana,arial,sans-serif;
 
       .slick-header-column {
-        // height: 100%;
+        // height: 100%
       }
 
       .slick-cell {
-        white-space: normal;
-        word-wrap: break-word;
         border: 1px dotted silver;
         border-collapse: collapse;
+        white-space: normal;
+        word-wrap: break-word;
       }
     }
 
     h1 {
       @extend .top-header;
-      border-bottom: 0;
       padding-bottom: 0;
+      border-bottom: 0;
     }
 
     input[type="button"] {
       @include idashbutton(#eee);
 
       &.molly-guard {
-        @include idashbutton($danger-red)
+        @include idashbutton($danger-red);
       }
     }
 
     .instructor_dash_glob_info {
-      text-align: right;
       position: absolute;
       top: 46px;
       right: 50px;
+      text-align: right;
     }
 
     .instructor-nav {
+      padding-bottom: 1em;
+
+      border-bottom: 1px solid #C8C8C8;
       a {
         margin-right: 1.2em;
       }
@@ -83,18 +85,15 @@
       .active-section {
         color: #551A8B;
       }
-
-      border-bottom: 1px solid #C8C8C8;
-      padding-bottom: 1em;
     }
 
     section.idash-section {
-      // background-color: #0f0;
       display: none;
+      // background-color: #0f0;
 
       &.active-section {
-        // background-color: #ff0;
         display: block;
+        // background-color: #ff0;
       }
 
       .basic-data {
@@ -102,6 +101,7 @@
       }
     }
   }
+  // @extend .table-wrapper;
 }
 
 
@@ -136,12 +136,12 @@
       }
 
       .triangle {
+        float: left;
         width: 20px;
         height: 20px;
-        float: left;
         background-image: url('/static/images/bullet-closed.png');
-        background-repeat: no-repeat;
         background-position: 8px 6px;
+        background-repeat: no-repeat;
       }
     }
 
@@ -194,12 +194,12 @@
   }
 
   .auto-enroll-hint {
-    display: none;
-    background-color: $white;
-    border: 1px solid $light-gray;
-    width: $baseline * 25;
-    padding: $baseline;
     position: absolute;
+    display: none;
+    padding: $baseline;
+    width: $baseline * 25;
+    border: 1px solid $light-gray;
+    background-color: $white;
 
     span.emph {
       font-weight: bold;
@@ -210,9 +210,9 @@
     textarea {
       margin-top: 0.2em;
       margin-bottom: 1em;
+      width: 500px;
 
       height: 100px;
-      width: 500px;
     }
 
     input {
@@ -227,11 +227,11 @@
       }
 
       ul {
-        padding: 0;
         margin: 0;
         margin-top: 0.5em;
-        line-height: 1.5em;
+        padding: 0;
         list-style-type: none;
+        line-height: 1.5em;
         li {
         }
       }
@@ -275,17 +275,17 @@
   .task-history-all-table    {
     margin-top: 1em;
     // height: 300px;
-    // overflow-y: scroll;
+    // overflow-y: scroll
   }
   .task-history-single-table {
     margin-top: 1em;
     // height: 300px;
-    // overflow-y: scroll;
+    // overflow-y: scroll
   }
   .running-tasks-table {
     margin-top: 1em;
     // height: 500px;
-    // overflow-y: scroll;
+    // overflow-y: scroll
   }
 }
 
