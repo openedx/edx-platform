@@ -137,7 +137,7 @@
 }
 
 // secondary button
-.btn-secondary {
+.ui-btn-secondary {
   @extend .ui-btn;
   @extend .ui-btn-pill;
   border-width: 1px;
@@ -250,7 +250,7 @@
   word-wrap: break-word;
 }
 
-// content - text overflow by ellipsis
+// extends - content - text overflow by ellipsis
 .cont-overflow-elip {
   @include box-sizing(border-box);
   display: block;
