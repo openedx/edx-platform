@@ -57,6 +57,8 @@ CMS.Models.Textbook = Backbone.AssociatedModel.extend({
             chapters: this.get('chapters').toJSON()
         };
     },
+    // NOTE: validation functions should return non-internationalized error
+    // messages. The messages will be passed through gettext in the template.
     validate: function(attrs, options) {
         if (!attrs.name) {
             return {
@@ -129,6 +131,8 @@ CMS.Models.Chapter = Backbone.AssociatedModel.extend({
             url: this.get('asset_path')
         };
     },
+    // NOTE: validation functions should return non-internationalized error
+    // messages. The messages will be passed through gettext in the template.
     validate: function(attrs, options) {
         if(!attrs.name && !attrs.asset_path) {
             return {
@@ -169,6 +173,8 @@ CMS.Models.FileUpload = Backbone.Model.extend({
         "totalBytes": 0,
         "finished": false
     },
+    // NOTE: validation functions should return non-internationalized error
+    // messages. The messages will be passed through gettext in the template.
     validate: function(attrs, options) {
         if(attrs.selectedFile && attrs.selectedFile.type !== "application/pdf") {
             return {
