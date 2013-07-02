@@ -234,7 +234,7 @@ def assignment_type_update(request, org, course, category, name):
     '''
     location = Location(['i4x', org, course, category, name])
     if not has_access(request.user, location):
-        raise HttpResponseForbidden()
+        return HttpResponseForbidden()
 
     if request.method == 'GET':
         return JsonResponse(CourseGradingModel.get_section_grader_type(location))

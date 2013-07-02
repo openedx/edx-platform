@@ -56,15 +56,15 @@ def assets_to_json_dict(assets):
         thumbnail = asset.get("thumbnail_location")
         if thumbnail:
             obj["thumbnail"] = thumbnail
-        idInfo = asset.get("_id")
-        if idInfo:
+        id_info = asset.get("_id")
+        if id_info:
             obj["id"] = "/{tag}/{org}/{course}/{revision}/{category}/{name}".format(
-                org=idInfo.get("org", ""),
-                course=idInfo.get("course", ""),
-                revision=idInfo.get("revision", ""),
-                tag=idInfo.get("tag", ""),
-                category=idInfo.get("category", ""),
-                name=idInfo.get("name", ""),
+                org=id_info.get("org", ""),
+                course=id_info.get("course", ""),
+                revision=id_info.get("revision", ""),
+                tag=id_info.get("tag", ""),
+                category=id_info.get("category", ""),
+                name=id_info.get("name", ""),
             )
         ret.append(obj)
     return ret

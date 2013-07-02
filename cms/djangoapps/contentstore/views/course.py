@@ -1,6 +1,7 @@
 """
 Views related to operations on course objects
 """
+#pylint: disable=W0402
 import json
 import random
 import string
@@ -91,7 +92,9 @@ def course_index(request, org, course, name):
 @login_required
 @expect_json
 def create_new_course(request):
-
+    """
+    Create a new course
+    """
     if not is_user_in_creator_group(request.user):
         raise PermissionDenied()
 
@@ -401,15 +404,19 @@ def course_advanced_updates(request, org, course, name):
             return JsonResponse(CourseMetadata.update_from_json(location,
                                                                 request_body,
                                                                 filter_tabs=filter_tabs))
-        except (TypeError, ValueError) as e:
-            return HttpResponseBadRequest("Incorrect setting format. " + str(e), content_type="text/plain")
+        except (TypeError, ValueError) as err:
+            return HttpResponseBadRequest("Incorrect setting format. " + str(err), content_type="text/plain")
 
 
 class TextbookValidationError(Exception):
+    "An error thrown when a textbook input is invalid"
     pass
 
 
 def validate_textbooks_json(text):
+    """
+    Validate the given text as representing a single PDF textbook
+    """
     try:
         textbooks = json.loads(text)
     except ValueError:
@@ -426,7 +433,10 @@ def validate_textbooks_json(text):
     return textbooks
 
 
-def validate_textbook_json(textbook, used_ids=()):
+def validate_textbook_json(textbook):
+    """
+    Validate the given text as representing a list of PDF textbooks
+    """
     if isinstance(textbook, basestring):
         try:
             textbook = json.loads(textbook)
@@ -443,6 +453,10 @@ def validate_textbook_json(textbook, used_ids=()):
 
 
 def assign_textbook_id(textbook, used_ids=()):
+    """
+    Return an ID that can be assigned to a textbook
+    and doesn't match the used_ids
+    """
     tid = Location.clean(textbook["tab_title"])
     if not tid[0].isdigit():
         # stick a random digit in front
@@ -471,8 +485,8 @@ def textbook_index(request, org, course, name):
         elif request.method == 'POST':
             try:
                 textbooks = validate_textbooks_json(request.body)
-            except TextbookValidationError as e:
-                return JsonResponse({"error": e.message}, status=400)
+            except TextbookValidationError as err:
+                return JsonResponse({"error": err.message}, status=400)
 
             tids = set(t["id"] for t in textbooks if "id" in t)
             for textbook in textbooks:
@@ -518,8 +532,8 @@ def create_textbook(request, org, course, name):
 
     try:
         textbook = validate_textbook_json(request.body)
-    except TextbookValidationError as e:
-        return JsonResponse({"error": e.message}, status=400)
+    except TextbookValidationError as err:
+        return JsonResponse({"error": err.message}, status=400)
     if not textbook.get("id"):
         tids = set(t["id"] for t in course_module.pdf_textbooks if "id" in t)
         textbook["id"] = assign_textbook_id(textbook, tids)
@@ -566,8 +580,8 @@ def textbook_by_id(request, org, course, name, tid):
     elif request.method in ('POST', 'PUT'):
         try:
             new_textbook = validate_textbook_json(request.body)
-        except TextbookValidationError as e:
-            return JsonResponse({"error": e.message}, status=400)
+        except TextbookValidationError as err:
+            return JsonResponse({"error": err.message}, status=400)
         new_textbook["id"] = tid
         if textbook:
             i = course_module.pdf_textbooks.index(textbook)

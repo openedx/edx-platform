@@ -23,13 +23,11 @@ def user_author_string(user):
     If the first and last names are blank, uses the username instead.
     Assumes that the email is not blank.
     '''
-    f = user.first_name
-    l = user.last_name
-    if f == '' and l == '':
-        f = user.username
-    return '{first} {last} <{email}>'.format(first=f,
-                                             last=l,
-                                             email=user.email)
+    if not user.first_name and not user.last_name:
+        name = user.username
+    else:
+        name = "{0} {1}".format(user.first_name, user.last_name)
+    return "{name} <{email}>".format(name=name, email=user.email)
 
 
 @login_required
