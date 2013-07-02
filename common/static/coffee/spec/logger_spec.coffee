@@ -3,16 +3,6 @@ describe 'Logger', ->
     expect(window.log_event).toBe Logger.log
 
   describe 'log', ->
-    it 'sends an event to Segment.io, if the event is whitelisted and the data is not a dictionary', ->
-      spyOn(analytics, 'track')
-      Logger.log 'seq_goto', 'data'
-      expect(analytics.track).toHaveBeenCalledWith 'seq_goto', value: 'data'
-
-    it 'sends an event to Segment.io, if the event is whitelisted and the data is a dictionary', ->
-      spyOn(analytics, 'track')
-      Logger.log 'seq_goto', value: 'data'
-      expect(analytics.track).toHaveBeenCalledWith 'seq_goto', value: 'data'
-
     it 'send a request to log event', ->
       spyOn $, 'postWithPrefix'
       Logger.log 'example', 'data'
