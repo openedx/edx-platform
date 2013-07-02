@@ -119,8 +119,6 @@ urlpatterns += (
     # Favicon
     (r'^favicon\.ico$', 'django.views.generic.simple.redirect_to', {'url': '/static/images/favicon.ico'}),
 
-    url(r'^submit_feedback$', 'util.views.submit_feedback_via_zendesk'),
-
     # TODO: These urls no longer work. They need to be updated before they are re-enabled
     # url(r'^reactivate/(?P<key>[^/]*)$', 'student.views.reactivation_email'),
 

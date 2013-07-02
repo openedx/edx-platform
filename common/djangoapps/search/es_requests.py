@@ -18,8 +18,10 @@ from xhtml2pdf import pisa as pisa
 
 class MongoIndexer:
 
-    def __init__(self, host='localhost', port=27017, content_database='xcontent', file_collection="fs.files",
-                 chunk_collection="fs.chunks", module_database='xmodule', module_collection='modulestore'):
+    def __init__(
+        self, host='localhost', port=27017, content_database='xcontent', file_collection="fs.files",
+        chunk_collection="fs.chunks", module_database='xmodule', module_collection='modulestore'
+    ):
         self.host = host
         self.port = port
         self.client = MongoClient(host, port)
@@ -55,6 +57,12 @@ class MongoIndexer:
     def find_modules_by_category(self, category):
         """Returns a cursor for all xmodules matching given category"""
         return self.module_collection.find({"_id.category": category})
+
+    def find_categories_with_regex(self, category, regex):
+        return self.module_collection.find({"_id.category": category, "definition.data": regex})
+
+    def find_asset_with_name(self, name):
+        return self.chunk_collection.find_one({"files_id.category": "asset", "files_id.name": name})
 
     def find_transcript_content(self, mongo_element):
         """Finds the corresponding chunk to the file element from a cursor similar to that from find_transcripts"""
@@ -100,9 +108,10 @@ class MongoIndexer:
 
     def uuid_from_file_name(self, file_name):
         """Returns a youtube uuid given the filename of a transcript"""
-        print file_name
-        if file_name[:5] == "subs_":
-            file_name = file_name[5:]
+        if "subs_" in file_name:
+            file_name = file_name[5+file_name.find("subs_"):]
+        elif file_name[:2] == "._":
+            file_name = file_name[2:]
         return file_name[:file_name.find(".")]
 
     def thumbnail_from_uuid(self, uuid):
@@ -121,27 +130,70 @@ class MongoIndexer:
         pisa.CreatePDF(IO(html), pseudo_dest)
         return self.thumbnail_from_pdf(pseudo_dest.getvalue())
 
-    def index_all_lecture_slides(self, es_instance, index):
-        cursor = self.find_chunks_with_type(".pdf")
+    def vertical_url_from_mongo_element(self, mongo_element):
+        """Given a mongo element, returns the url after courseware"""
+        name = lambda x: x["_id"]["name"]
+        element_name = name(mongo_element)
+        vertical = self.module_collection.find_one({"definition.children": re.compile(".*?"+element_name+".*?")})
+        if vertical:
+            index = next(i for i, entry in enumerate(vertical["definition"]["children"]) if element_name in entry)
+            sequential = self.module_collection.find_one({
+                "definition.children": re.compile(".*?"+name(vertical)+".*?"),
+                "_id.course": vertical["_id"]["course"]
+            })
+            if sequential and sequential["_id"]:
+                chapter = self.module_collection.find_one({
+                    "definition.children": re.compile(".*?"+name(sequential)+".*?"),
+                    "_id.course": sequential["_id"]["course"]
+                })
+                if chapter and chapter["_id"]:
+                    return "/".join([name(chapter), name(sequential), str(index+1)])
+                else:
+                    print "No Chapter for: " + sequential["metadata"]["display_name"]
+                    return None
+            else:
+                print "No Sequential for: " + vertical["metadata"]["display_name"]
+                return None
+        else:
+            return None
+
+    def course_name_from_mongo_element(self, mongo_element):
+        course_element = self.module_collection.find_one({
+            "_id.course": mongo_element["_id"]["course"],
+            "_id.category": "course"
+        })
+        return course_element["_id"]["name"]
+
+    def index_all_pdfs(self, es_instance, index):
+        cursor = self.find_categories_with_regex("html", re.compile(".*?/asset/.*?\.pdf.*?"))
         for i in range(0, cursor.count()):
             item = cursor.next()
-            # Not sure if this true is for every course, but it seems to
-            # be a sensible limitations for the courses on my local machine
-            if item["files_id"]["name"][:3] == "lec":
-                course = item["files_id"]["course"]
-                org = item["files_id"]["org"]
-                # The lecture slides don't seem to have any kind of uuid or guid
-                uuid = item["files_id"]["name"]
-                display_name = org + " " + course + " " + item["files_id"]["name"]
-                searchable_text = self.pdf_to_text(item)
-                try:
-                    thumbnail = self.thumbnail_from_pdf(item["data"].__str__())
-                except (DelegateError, MissingDelegateError, CorruptImageError):
-                    print "Slide with uuid: " + uuid + " is corrupt."
-                data = {"course": course, "org": org, "uuid": uuid, "searchable_text": searchable_text,
-                        "display_name": display_name, "thumbnail": thumbnail}
-                type_ = course.replace(".", "-")
-                print es_instance.index_data(index, type_, data)._content
+            course = item["_id"]["course"]
+            org = item["_id"]["org"]
+            uuid = item["_id"]["name"]
+            course_section = self.course_name_from_mongo_element(item)
+            if item["metadata"].get("display_name", False):
+                display_name = org + " " + course + " " + item["metadata"]["display_name"]
+            else:
+                display_name = org + " " + course
+            url = self.vertical_url_from_mongo_element(item)
+            if not url:
+                continue
+            name = re.sub(r'(.*?)(/asset/)(.*?)(\.pdf)(.*?)$', r'\3'+".pdf", item["definition"]["data"])
+            asset = self.find_asset_with_name(name)
+            if not asset:
+                continue
+            searchable_text = self.pdf_to_text(asset)
+            try:
+                thumbnail = self.thumbnail_from_pdf(asset["data"].__str__())
+            except (DelegateError, MissingDelegateError, CorruptImageError):
+                print "Slide: " + uuid + " is corrupt."
+                continue
+            data = {
+                "course": course, "org": org, "course_section": "/".join([org, course, course_section]), "uuid": uuid,
+                "searchable_text": searchable_text, "display_name": display_name, "url": url, "thumbnail": thumbnail
+            }
+            print es_instance.index_data(index, course, data)._content
 
     def index_all_problems(self, es_instance, index):
         cursor = self.find_modules_by_category("problem")
@@ -150,16 +202,21 @@ class MongoIndexer:
             course = item["_id"]["course"]
             org = item["_id"]["org"]
             uuid = item["_id"]["name"]
+            url = self.vertical_url_from_mongo_element(item)
+            course_section = self.course_name_from_mongo_element(item)
+            if not url:
+                continue
             try:
                 display_name = org + " " + course + " " + item["metadata"]["display_name"]
             except KeyError:
                 display_name = org + " " + course
             searchable_text = self.searchable_text_from_problem_data(item)
             thumbnail = self.thumbnail_from_html(item["definition"]["data"])
-            data = {"course": course, "org": org, "uuid": uuid, "searchable_text": searchable_text,
-                    "display_name": display_name, "thumbnail": thumbnail}
-            type_ = course.replace(".", "-")
-            print es_instance.index_data(index, type_, data)._content
+            data = {
+                "course": course, "course_section": "/".join([org, course, course_section]), "org": org, "uuid": uuid,
+                "searchable_text": searchable_text, "display_name": display_name, "url": url, "thumbnail": thumbnail
+            }
+            print es_instance.index_data(index, course, data)._content
 
     def index_all_transcripts(self, es_instance, index):
         cursor = self.find_files_with_type(".srt.sjson")
@@ -169,20 +226,21 @@ class MongoIndexer:
             org = item["_id"]["org"]
             uuid = self.uuid_from_file_name(item["_id"]["name"])
             video_module = self.module_for_uuid(uuid)
-            try:
-                display_name = org + " " + course + " " + video_module["metadata"]["display_name"]
-            except TypeError:
-                print "Could not find module for: " + uuid
-                display_name = org + " " + course
-            except KeyError:
-                print "Transcript for: " + uuid + " has no metadata"
-                display_name = org + " "+course
+            course_section = self.course_name_from_mongo_element(item)
+            if not video_module:
+                print "No module for: " + str(uuid)
+                continue
+            url = self.vertical_url_from_mongo_element(video_module)
+            if not url:
+                continue
+            display_name = org + " " + course + " " + video_module["metadata"].get("display_name", "")
             transcript = " ".join(self.find_transcript_content(item))
             thumbnail = self.thumbnail_from_uuid(uuid)
-            data = {"course": course, "org": org, "uuid": uuid, "searchable_text": transcript,
-                    "display_name": display_name, 'thumbnail': thumbnail}
-            type_ = course.replace(".", "-")
-            print es_instance.index_data(index, type_, data)._content
+            data = {
+                "course": course, "course_section": "/".join([org, course, course_section]), "org": org, "uuid": uuid,
+                "searchable_text": transcript, "display_name": display_name, 'url': url, 'thumbnail': thumbnail
+            }
+            print es_instance.index_data(index, course, data)._content
 
 
 class ElasticDatabase:
@@ -377,19 +435,21 @@ Set to 50k by default"""
                 dictionary.write(word+"\n")
 
 
-#url = "http://localhost:9200"
-#settings_file = "settings.json"
+url = "http://localhost:9200"
+settings_file = "settings.json"
 
-#mongo = MongoIndexer()
+mongo = MongoIndexer()
 
 
-#test = ElasticDatabase(url, settings_file)
-#dictionary = EnchantDictionary(test)
-#dictionary.produce_dictionary("pyenchant_corpus.txt", max_results=500000)
-#print test.delete_index("transcript-index")
-#mongo.index_all_lecture_slides(test, "slide-index")
-#mongo.index_all_transcripts(test, "transcript-index")
-#mongo.index_all_problems(test, "problem-index")
+test = ElasticDatabase(url, settings_file)
+dictionary = EnchantDictionary(test)
+print test.delete_index("pdf-index")
+print test.delete_index("transcript-index")
+print test.delete_index("problem-index")
+mongo.index_all_pdfs(test, "pdf-index")
+mongo.index_all_transcripts(test, "transcript-index")
+mongo.index_all_problems(test, "problem-index")
+dictionary.produce_dictionary("pyenchant_corpus.txt", max_results=500000)
 
 #print test.setup_type("transcript", "cleaning", mapping)._content
 #print test.get_type_mapping("transcript-index", "2-1x")
