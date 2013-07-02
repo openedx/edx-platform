@@ -102,8 +102,41 @@
       color: #D60000;
     }
 
+    &.open {
+      .toggle-wrapper {
+        .triangle {
+          background-image: url('/static/images/bullet-open.png');
+        }
+      }
+      .course-errors-visibility-wrapper {
+        display: block;
+      }
+    }
+
+    .toggle-wrapper {
+      width: 300px;
+      cursor: pointer;
+      div {
+        float:left;
+      }
+
+      h2 {
+        float: left;
+      }
+
+      .triangle {
+        width: 20px;
+        height: 20px;
+        float: left;
+        background-image: url('/static/images/bullet-closed.png');
+        background-repeat: no-repeat;
+        background-position: 8px 6px;
+      }
+    }
+
     .course-errors-visibility-wrapper {
       display: none;
+      clear: both;
 
       .course-error {
         margin-bottom: 1em;

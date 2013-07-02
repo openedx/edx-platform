@@ -39,7 +39,10 @@
 
 %if len(section_data['course_errors']):
   <div class="course-errors-wrapper">
-    <a href=""><h2 class="title">Course Warnings:</h2></a>
+    <div class="toggle-wrapper">
+      <h2 class="title">Course Warnings:</h2>
+      <div class="triangle"></div>
+    </div>
     <div class="course-errors-visibility-wrapper">
       %for error in section_data['course_errors']:
         <div class="course-error">
