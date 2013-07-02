@@ -1,10 +1,4 @@
 {
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> cdffcf3e6beb0d169ffe747d8e5c369a0e11060c
 	"mappings": {
 		"properties": {
 			"searchable_text": {
@@ -62,9 +56,14 @@
 					"store": "true"
 				},
 
-				"course_id": {
+				"course": {
 					"type": "string",
 					"store":"true"
+				},
+
+				"course_section": {
+					"type": "string",
+					"store": "true"
 				},
 
 				"uuid": {
@@ -72,12 +71,13 @@
 					"store": "true"
 				},
 
+				"url": {
+					"type": "string",
+					"store": "true"
+				},
+				
 				"thumbnail": {
 					"type": "binary"
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> cdffcf3e6beb0d169ffe747d8e5c369a0e11060c
 				}
 			}
 		}
@@ -152,175 +152,6 @@
 		            "name": "english"
 		        }
 		    }
-<<<<<<< HEAD
-=======
-	"settings": {
-		"index": {
-			"number_of_replicas": 2,
-			"number_of_shards": 3
->>>>>>> Storing current elasticsearch progress
-		}
-=======
-	"transcript": {
-	    "analyzer": {
-=======
-	"mappings": {
-		"properties": {
-			"searchable_text": {
-				"type": "multi_field",
-				"fields": {
-					"full_words": {
-						"type": "string",
-						"store": "yes",
-						"index": "analyzed",
-						"term_vector": "with_positions_offsets",
-						"analyzer": "transcript_analyzer",
-						"boost": 2.0,
-						"similarity": "BM25"
-					},
-
-					"ngrams": {
-						"type": "string",
-						"store": "yes",
-						"index": "analyzed",
-						"term_vector": "with_positions_offsets",
-						"analyzer": "ngram_analyzer",
-						"boost": 1.0,
-						"similarity": "BM25"
-					}
-				}
-			},
-
-			"display_name": {
-				"type": "multi_field",
-				"fields": {
-
-					"depth_search": {
-						"type": "string",
-						"store": "yes",
-						"index": "analyzed",
-						"term_vector": "with_positions_offsets",
-						"analyzer": "depth_analyzer",
-						"boost": 1.0,
-						"similarity": "BM25"
-					},
-
-					"breadth_search": {
-						"type": "string",
-						"store": "yes",
-						"index": "analyzed",
-						"term_vector": "with_positions_offsets",
-						"analyzer": "breadth_analyzer",
-						"boost": 2.0,
-						"similarity": "BM25"
-					}
-				},
->>>>>>> Moved past difficulty in file integration and adding configurability to elasticsearch analyzers
-
-				"org": {
-					"type": "string",
-					"store": "true"
-				},
-
-				"course_id": {
-					"type": "string",
-					"store":"true"
-				},
-
-				"uuid": {
-					"type": "string",
-					"store": "true"
-=======
->>>>>>> Made prettier, added requirements, and included main edX page
-				}
-			}
-		}
-	},
-
-	"settings": {
-		"analysis":{
-		    "analyzer": {
-
-		        "transcript_analyzer": {
-		            "type": "custom",
-		            "tokenizer": "standard",
-		            "filter": ["asciifolding", "custom_word_delimiter", "lowercase", "custom_stemmer", "shingle",
-		            		    "custom_phonetic"]
-		        },
-
-		        "ngram_analyzer": {
-		        	"type": "custom",
-		        	"tokenizer": "custom_ngram",
-		        	"filter": ["asciifolding", "word_delimiter", "lowercase", "custom_stemmer", "custom_phonetic"]
-		        },
-
-		        "depth_analyzer": {
-		        	"type": "custom",
-		        	"tokenizer": "full_ngram",
-		        	"filter": ["custom_word_delimiter", "lowercase", "shingle", "custom_phonetic"]
-		        },
-
-		        "breadth_analyzer": {
-		        	"type": "custom",
-		        	"tokenizer": "letter",
-		        	"filter": ["asciifolding", "lowercase", "simple_phonetic"]
-		        }
-		    },
-
-		    "tokenizer" : {
-
-		    	"custom_ngram": {
-		    		"type": "nGram",
-		    		"min_gram": 1,
-		    		"max_gram": 3
-		    	},
-
-		    	"full_ngram": {
-		    		"type": "nGram",
-		    		"min_gram": 1,
-		    		"max_gram": 5
-		    	}
-		    },
-
-		    "filter" : {
-
-		    	"simple_phonetic": {
-		    		"type": "phonetic",
-		    		"encoder": "nysiis",
-		    		"replace": true
-		    	},
-
-		    	"custom_phonetic": {
-		    		"type": "phonetic",
-		    		"encoder": "doublemetaphone",
-		    		"replace": false
-		    	},
-
-		        "custom_word_delimiter": {
-		            "type": "word_delimiter",
-		            "preserve_original": "true"
-		        },
-
-<<<<<<< HEAD
-	    "char_filter": {
-	        "custom_mapping": {
-	            "type": "mapping",
-	            "mappings": ["\n=>-"]
-	        }
-	    }
->>>>>>> Added sentence tokenizing for manual gensim lda
-=======
-		        "custom_stemmer": {
-		            "type": "stemmer",
-		            "name": "english"
-		        }
-		    }
-		}
->>>>>>> Moved past difficulty in file integration and adding configurability to elasticsearch analyzers
-	}
-}
-=======
 		}
 	}
 }
->>>>>>> cdffcf3e6beb0d169ffe747d8e5c369a0e11060c

@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> cdffcf3e6beb0d169ffe747d8e5c369a0e11060c
 <head>
 	${css_link("../static/css/search.css")}
 	${js_link("../static/js/div_sizing.js")}
@@ -18,32 +13,34 @@
 </div>
 % endif
 
-<section class="search-results">
+<div class="search-results">
 	% for datum in data:
-	<section class="result">
-		<div class="result_wrapper">
-			<h1 class="result-title">${datum[0]}</h1>
-			<div class="result-content">
-				<div class="columnate">
-					% if len(datum) >= 3:
-						<img class="thumbnail" src="${datum[2]}" alt="${datum[0]}">
-					%endif
-				</div>
-				<div class="columnate">
-					<div class="snippet_container">
-						<p  class="results_snippet scaled-text">
-							${datum[1]}
-						</p>
+		<a href=${datum[3]}>
+			<section class="result">
+				<div class="result_wrapper">
+					<h1 class="result-title">${datum[0]}</h1>
+					<div class="result-content">
+						<div class="columnate">
+							% if len(datum) >= 3:
+								<img class="thumbnail" src="${datum[2]}" alt="${datum[0]}">
+							% endif
+						</div>
+						<div class="columnate">
+							<div class="snippet_container">
+								<p  class="results_snippet scaled-text">
+									${datum[1]}
+								</p>
+							</div>
+						</div>
 					</div>
 				</div>
-			</div>
-		</div>
-	</section>
+			</section>
+		</a>
 	% endfor
-</section>
+</div>
 
 % if len(data) > 1:
-	<section class="pagination">
+	<div class="pagination">
 		<span class="step-links">
 			% if data.number > 1:
 				<a href="${ prev_page }">Prev</a>
@@ -57,117 +54,14 @@
 				<a href="${next_page}">Next</a>
 			%endif
 		</span>
-	</section>
-% endif
-
-
-<%def name="css_link(path, media='')">
-	<link rel="stylesheet" type="text/css" href="${path|h}" media="${media}"></link>
-</%def>
-
-<%def name="js_link(path)">
-	<script type="text/javascript" src="${path|h}"></script>
-<<<<<<< HEAD
-</%def>
-<%def name="js_link(path)">
-	<script type="text/javascript" src="${path|h}"></script>
-</%def>
-=======
-<!DOCTYPE html>
-<html lang="en">
-=======
->>>>>>> Coverted templates to use mako
-<head>
-	${css_link("../static/css/search.css")}
-	${js_link("../static/js/div_sizing.js")}
-</head>
-
-% if spelling_correction:
-<div class="correction_div">
-	<p class="search_correction">
-		<span>Did you mean </span>
-		<a href="${ search_correction_link }">${spelling_correction }</a>
-		<span>?</span>
-	</p>
-</div>
-% endif
-
-<<<<<<< HEAD
-% for datum in data:
-<section class="result">
-	<div class="result_wrapper">
-		<h1>${datum[0]}</h1>
-		<p class="results_snippet"> 
-			${datum[1]}
-		</p>
 	</div>
-<<<<<<< HEAD
-	{% endif %}
-	<ol>
-		{% for datum in data %}
-		<li>
-			<div>
-				<h1>{{ datum.0 }}</h1>
-				<!-- </h2>Score:</h2> -->
-				<p class="results_snippet"> 
-					{{ datum.1|safe }}
-				</p>
-			</div>
-		</li>
-		{% endfor %}
-	</ol>
-</body>
->>>>>>> Search working, basic functionality and styling in place, as well as csrf protection, snippeting, results highlighting, and spell correction
-=======
-=======
-<section class="search-results">
-	% for datum in data:
-	<section class="result">
-		<div class="result_wrapper">
-			<h1 class="result-title">${datum[0]}</h1>
-			<div class="result-content">
-				<div class="columnate">
-					% if len(datum) >= 3:
-						<img class="thumbnail" src="${datum[2]}" alt="${datum[0]}">
-					%endif
-				</div>
-				<div class="columnate">
-					<div class="snippet_container">
-						<p  class="results_snippet scaled-text">
-							${datum[1]}
-						</p>
-					</div>
-				</div>
-			</div>
-		</div>
-	</section>
-	% endfor
->>>>>>> Made prettier, added requirements, and included main edX page
-</section>
-
-% if len(data) > 1:
-	<section class="pagination">
-		<span class="step-links">
-			% if data.number > 1:
-				<a href="${ prev_page }">Prev</a>
-			% endif
-
-			<span class="current">
-				Page ${ data.number } of ${ data.paginator.num_pages }
-			</span> 
-
-			% if data.number < data.paginator.num_pages:
-				<a href="${next_page}">Next</a>
-			%endif
-		</span>
-	</section>
 % endif
 
 
 <%def name="css_link(path, media='')">
 	<link rel="stylesheet" type="text/css" href="${path|h}" media="${media}"></link>
 </%def>
->>>>>>> Coverted templates to use mako
-=======
+
+<%def name="js_link(path)">
+	<script type="text/javascript" src="${path|h}"></script>
 </%def>
->>>>>>> cdffcf3e6beb0d169ffe747d8e5c369a0e11060c

@@ -119,17 +119,11 @@ urlpatterns += (
     # Favicon
     (r'^favicon\.ico$', 'django.views.generic.simple.redirect_to', {'url': '/static/images/favicon.ico'}),
 
-    url(r'^submit_feedback$', 'util.views.submit_feedback_via_zendesk'),
-
     # TODO: These urls no longer work. They need to be updated before they are re-enabled
     # url(r'^reactivate/(?P<key>[^/]*)$', 'student.views.reactivation_email'),
 
     # Search
     url(r'^search$', 'search.views.search')
-<<<<<<< HEAD
-=======
-
->>>>>>> cdffcf3e6beb0d169ffe747d8e5c369a0e11060c
 )
 
 # Semi-static views only used by edX, not by themes
