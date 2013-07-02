@@ -7,7 +7,6 @@ Feature: Component Adding
         When I add the following components:
             | Component    |
             | Discussion   |
-            | Announcement |
             | Blank HTML   |
             | LaTex        |
             | Blank Problem|
@@ -26,7 +25,6 @@ Feature: Component Adding
         Then I see the following components:
             | Component    |
             | Discussion   |
-            | Announcement |
             | Blank HTML   |
             | LaTex        |
             | Blank Problem|
@@ -50,7 +48,6 @@ Feature: Component Adding
         And I add the following components:
             | Component    |
             | Discussion   |
-            | Announcement |
             | Blank HTML   |
             | LaTex        |
             | Blank Problem|

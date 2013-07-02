@@ -62,10 +62,6 @@ COMPONENT_DICTIONARY = {
         'steps': step_selector_list('discussion', None),
         'found_func': found_css_func('section.xmodule_DiscussionModule')
     },
-    'Announcement': {
-        'steps': step_selector_list('html', 'Announcement'),
-        'found_func': found_text_func('Heading of document')
-    },
     'Blank HTML': {
         'steps': step_selector_list('html', 'Blank_HTML_Page'),
         #this one is a blank html so a more refined search is being done
