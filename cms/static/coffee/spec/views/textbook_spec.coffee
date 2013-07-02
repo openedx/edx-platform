@@ -130,10 +130,13 @@ describe "CMS.Views.EditTextbook", ->
         it "should save properly", ->
             @view.render()
             @view.$("input[name=textbook-name]").val("starfish")
+            @view.$("input[name=chapter1-name]").val("wallflower")
             @view.$("input[name=chapter1-asset-path]").val("foobar")
             @view.$("form").submit()
             expect(@model.get("name")).toEqual("starfish")
-            expect(@model.get("chapters").at(0).get("asset_path")).toEqual("foobar")
+            chapter = @model.get("chapters").first()
+            expect(chapter.get("name")).toEqual("wallflower")
+            expect(chapter.get("asset_path")).toEqual("foobar")
             expect(@model.save).toHaveBeenCalled()
 
         it "should not save on invalid", ->
@@ -151,7 +154,8 @@ describe "CMS.Views.EditTextbook", ->
             @view.$("input[name=chapter1-asset-path]").val("foobar.pdf")
             @view.$(".action-cancel").click()
             expect(@model.get("name")).not.toEqual("starfish")
-            expect(@model.get("chapters").first().get("asset_path")).not.toEqual("foobar")
+            chapter = @model.get("chapters").first()
+            expect(chapter.get("asset_path")).not.toEqual("foobar")
             expect(@model.save).not.toHaveBeenCalled()
 
         it "should be possible to correct validation errors", ->

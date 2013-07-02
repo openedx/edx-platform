@@ -143,23 +143,12 @@ CMS.Views.EditTextbook = Backbone.View.extend({
     close: function() {
         var textbooks = this.model.collection;
         this.remove();
-        // if the textbook has no content, remove it from the collection
-        if(this.model.isEmpty()) {
+        if(this.model.isNew()) {
+            // if the textbook has never been saved, remove it
             textbooks.remove(this.model);
-        } else {
-            // remove empty chapters from textbook
-            var chapters = this.model.get("chapters");
-            var emptyChapters = chapters.filter(function(chapter) {
-                return chapter.isEmpty(); });
-            if (chapters.length === emptyChapters.length) {
-                // make sure that there's always at least one chapter remaining
-                // in the chapterset, even if it's empty
-                emptyChapters = _.tail(emptyChapters);
-            }
-            chapters.remove(emptyChapters);
-            // don't forget to tell the model that it's no longer being edited
-            this.model.set("editing", false);
         }
+        // don't forget to tell the model that it's no longer being edited
+        this.model.set("editing", false);
         return this;
     }
 });

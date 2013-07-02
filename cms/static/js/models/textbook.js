@@ -68,17 +68,9 @@ CMS.Models.Textbook = Backbone.AssociatedModel.extend({
         }
         if (attrs.chapters.length === 0) {
             return {
-                message: "Please add at least one asset",
+                message: "Please add at least one chapter",
                 attributes: {chapters: true}
             };
-        } else if (attrs.chapters.length === 1) {
-            // only asset_path is required: we don't need a name
-            if (!attrs.chapters.first().get('asset_path')) {
-                return {
-                    message: "Please add at least one asset",
-                    attributes: {chapters: true}
-                };
-            }
         } else {
             // validate all chapters
             var invalidChapters = [];
