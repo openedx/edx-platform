@@ -321,6 +321,8 @@ CMS.Views.UploadDialog = Backbone.View.extend({
             error: _.bind(this.error, this),
             uploadProgress: _.bind(this.progress, this),
             data: {
+                // don't show the generic error notification; we're in a modal,
+                // and we're better off modifying it instead.
                 notifyOnError: false
             }
         });
