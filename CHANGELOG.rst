@@ -15,6 +15,8 @@ LMS: Added *experimental* crowdsource hinting manager page.
 
 XModule: Added *experimental* crowdsource hinting module.
 
+Studio: Added support for uploading and managing PDF textbooks
+
 Common: Student information is now passed to the tracking log via POST instead of GET.
 
 Common: Add tests for documentation generation to test suite
