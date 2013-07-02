@@ -64,6 +64,12 @@ You should be familiar with the following.  If you're not, go read some docs...
            from a Location object, and the ModuleSystem knows how to render things,
            track events, and complain about 404s
 
+    - XModules and XModuleDescriptors are uniquely identified by a Location object, encoding the organization, course, category, name, and possibly revision of the module.
+
+    - XModule initialization: XModules are instantiated by the `XModuleDescriptor.xmodule` method, and given a ModuleSystem, the descriptor which instantiated it, and their relevant model data.
+
+    - XModuleDescriptor initialization: If an XModuleDescriptor is loaded from an XML-based course, the XML data is passed into its `from_xml` method, which is responsible for instantiating a descriptor with the correct attributes. If it's in Mongo, the descriptor is instantiated directly. The module's attributes will be present in the `model_data` dict.
+
     - `course.xml` format.  We use python setuptools to connect supported tags with the descriptors that handle them.  See `common/lib/xmodule/setup.py`.  There are checking and validation tools in `common/validate`.
 
          - the xml import+export functionality is in `xml_module.py:XmlDescriptor`, which is a mixin class that's used by the actual descriptor classes.

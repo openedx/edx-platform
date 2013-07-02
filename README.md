@@ -152,6 +152,12 @@ otherwise noted.
 
 Please see ``LICENSE.txt`` for details.
 
+Documentation
+------------
+
+High-level documentation of the code is located in the `doc` subdirectory. Start
+with `overview.md` to get an introduction to the architecture of the system.
+
 How to Contribute
 -----------------
 
