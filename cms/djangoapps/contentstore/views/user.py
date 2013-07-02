@@ -8,12 +8,11 @@ from mitxmako.shortcuts import render_to_response
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from contentstore.utils import get_url_reverse, get_lms_link_for_item
-from util.json_request import expect_json
+from util.json_request import expect_json, JsonResponse
 from auth.authz import STAFF_ROLE_NAME, INSTRUCTOR_ROLE_NAME, get_users_in_course_group_by_role
 from auth.authz import get_user_by_email, add_user_to_course_group, remove_user_from_course_group
 
 from .access import has_access
-from .requests import create_json_response
 
 
 def user_author_string(user):
@@ -90,8 +89,12 @@ def add_user(request, location):
     '''
     email = request.POST["email"]
 
-    if email == '':
-        return create_json_response('Please specify an email address.')
+    if not email:
+        msg = {
+            'Status': 'Failed',
+            'ErrMsg': 'Please specify an email address.',
+        }
+        return JsonResponse(msg, 400)
 
     # check that logged in user has admin permissions to this course
     if not has_access(request.user, location, role=INSTRUCTOR_ROLE_NAME):
@@ -101,16 +104,24 @@ def add_user(request, location):
 
     # user doesn't exist?!? Return error.
     if user is None:
-        return create_json_response('Could not find user by email address \'{0}\'.'.format(email))
+        msg = {
+            'Status': 'Failed',
+            'ErrMsg': "Could not find user by email address '{0}'.".format(email),
+        }
+        return JsonResponse(msg, 404)
 
     # user exists, but hasn't activated account?!?
     if not user.is_active:
-        return create_json_response('User {0} has registered but has not yet activated his/her account.'.format(email))
+        msg = {
+            'Status': 'Failed',
+            'ErrMsg': 'User {0} has registered but has not yet activated his/her account.'.format(email),
+        }
+        return JsonResponse(msg, 400)
 
     # ok, we're cool to add to the course group
     add_user_to_course_group(request.user, user, location, STAFF_ROLE_NAME)
 
-    return create_json_response()
+    return JsonResponse({"Status": "OK"})
 
 
 @expect_json
@@ -130,7 +141,11 @@ def remove_user(request, location):
 
     user = get_user_by_email(email)
     if user is None:
-        return create_json_response('Could not find user by email address \'{0}\'.'.format(email))
+        msg = {
+            'Status': 'Failed',
+            'ErrMsg': "Could not find user by email address '{0}'.".format(email),
+        }
+        return JsonResponse(msg, 404)
 
     # make sure we're not removing ourselves
     if user.id == request.user.id:
@@ -138,4 +153,4 @@ def remove_user(request, location):
 
     remove_user_from_course_group(request.user, user, location, STAFF_ROLE_NAME)
 
-    return create_json_response()
+    return JsonResponse({"Status": "OK"})
