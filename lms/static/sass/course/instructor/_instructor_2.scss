@@ -189,6 +189,23 @@
     cursor: pointer;
   }
 
+  label[for="auto-enroll"]:hover + .auto-enroll-hint {
+    display: block;
+  }
+
+  .auto-enroll-hint {
+    display: none;
+    background-color: $white;
+    border: 1px solid $light-gray;
+    width: $baseline * 25;
+    padding: $baseline;
+    position: absolute;
+
+    span.emph {
+      font-weight: bold;
+    }
+  }
+
   .batch-enrollment {
     textarea {
       margin-top: 0.2em;

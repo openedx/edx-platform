@@ -9,6 +9,12 @@
   <input type="button" name="unenroll" value="Unenroll" data-endpoint="${ section_data['unenroll_button_url'] }" >
   <input type="checkbox" name="auto-enroll" value="Auto-Enroll" style="margin-top: 1em;">
   <label for="auto-enroll">Auto Enroll</label>
+  <div class="auto-enroll-hint">
+    <p> If auto enroll is <span class="emph">checked</span>, students who have not yet registered for edX will be automatically enrolled.
+        If auto enroll is left <span class="emph">unchecked</span>, students who have not yet registered for edX will not be enrolled,
+        but will be allowed to enroll.
+    </p>
+  </div>
   <div class="request-response"></div>
   <div class="request-response-error"></div>
 </div>
