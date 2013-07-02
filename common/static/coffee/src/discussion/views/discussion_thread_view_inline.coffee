@@ -48,7 +48,7 @@ if Backbone?
         @editView.$el.empty()
         @editView = null
       @showView = new DiscussionThreadInlineShowView(model: @model)
-      @showView.bind "thread:delete", @delete
+      @showView.bind "thread:_delete", @_delete
       @showView.bind "thread:edit", @edit
 
     renderResponses: ->
