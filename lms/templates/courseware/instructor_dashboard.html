@@ -104,7 +104,7 @@ function goto( mode)
   <section class="instructor-dashboard-content">
     <h1>Instructor Dashboard</h1>
 
-    <h2>[ <a href="#" onclick="goto('Grades');" class="${modeflag.get('Grades')}">Grades</a> |
+    <h2 class="navbar">[ <a href="#" onclick="goto('Grades');" class="${modeflag.get('Grades')}">Grades</a> |
           %if settings.MITX_FEATURES.get('ENABLE_PSYCHOMETRICS'):
             <a href="#" onclick="goto('Psychometrics');" class="${modeflag.get('Psychometrics')}">Psychometrics</a> |
           %endif
