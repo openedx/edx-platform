@@ -251,10 +251,8 @@
 }
 
 // extends - content - text overflow by ellipsis
-.cont-overflow-elip {
+.cont-truncated {
   @include box-sizing(border-box);
-  display: block;
-  width: auto;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
