@@ -9,7 +9,7 @@ body.course.settings {
   }
 
   .content-primary {
-    @extend .window;
+    @extend .ui-window;
     width: flex-grid(9, 12);
     margin-right: flex-gutter();
     padding: $baseline ($baseline*1.5);
