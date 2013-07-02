@@ -1,64 +1,85 @@
 <%! from django.core.urlresolvers import reverse %>
-
 <div class="wrapper-header wrapper" id="view-top">
   <header class="primary" role="banner">
 
-    <div class="wrapper wrapper-left ">
-      <h1 class="branding"><a href="/">edX Studio</a></h1>
+    <div class="wrapper wrapper-l">
+      <h1 class="branding"><a href="/"><img src="/static/img/logo-edx-studio.png" alt="edX Studio" /></a></h1>
 
       % if context_course:
       <% ctx_loc = context_course.location %>
-      <div class="info-course">
-        <h2 class="sr">Current Course:</h2>
-        <a href="${reverse('course_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">
-        <span class="course-org">${ctx_loc.org}</span><span class="course-number">${ctx_loc.course}</span>
-        <span class="course-title" title="${context_course.display_name_with_default}">${context_course.display_name_with_default}</span>
+      <h2 class="info-course">
+        <span class="sr">Current Course:</span>
+        <a class="course-link" href="${reverse('course_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">
+          <span class="course-org">${ctx_loc.org}</span><span class="course-number">${ctx_loc.course}</span>
+          <span class="course-title" title="${context_course.display_name_with_default}">${context_course.display_name_with_default}</span>
         </a>
-      </div>
+      </h2>
 
-      <nav class="nav-course primary nav-dropdown" role="navigation">
+      <nav class="nav-course nav-dd ui-left">
         <h2 class="sr">${context_course.display_name_with_default}'s Navigation:</h2>
 
         <ol>
           <li class="nav-item nav-course-courseware">
-            <h3 class="title"><span class="label-prefix">Course </span>Content <i class="icon-caret-down"></i></h3>
+            <h3 class="title"><span class="label"><span class="label-prefix sr">Course </span>Content</span> <i class="icon-caret-down ui-toggle-dd"></i></h3>
 
             <div class="wrapper wrapper-nav-sub">
               <div class="nav-sub">
                 <ul>
-                  <li class="nav-item nav-course-courseware-outline"><a href="${reverse('course_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">Outline</a></li>
-                  <li class="nav-item nav-course-courseware-updates"><a href="${reverse('course_info', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">Updates</a></li>
-                  <li class="nav-item nav-course-courseware-pages"><a href="${reverse('edit_tabs', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, coursename=ctx_loc.name))}">Static Pages</a></li>
-                  <li class="nav-item nav-course-courseware-uploads"><a href="${reverse('asset_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">Files &amp; Uploads</a></li>
+                  <li class="nav-item nav-course-courseware-outline">
+                    <a href="${reverse('course_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">Outline</a>
+                  </li>
+                  <li class="nav-item nav-course-courseware-updates">
+                    <a href="${reverse('course_info', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">Updates</a>
+                  </li>
+                  <li class="nav-item nav-course-courseware-pages">
+                    <a href="${reverse('edit_tabs', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, coursename=ctx_loc.name))}">Static Pages</a>
+                  </li>
+                  <li class="nav-item nav-course-courseware-uploads">
+                    <a href="${reverse('asset_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">Files &amp; Uploads</a>
+                  </li>
                 </ul>
               </div>
             </div>
           </li>
 
           <li class="nav-item nav-course-settings">
-            <h3 class="title"><span class="label-prefix">Course </span>Settings <i class="icon-caret-down"></i></h3>
+            <h3 class="title"><span class="label"><span class="label-prefix sr">Course </span>Settings</span> <i class="icon-caret-down ui-toggle-dd"></i></h3>
 
             <div class="wrapper wrapper-nav-sub">
               <div class="nav-sub">
                 <ul>
-                  <li class="nav-item nav-course-settings-schedule"><a href="${reverse('contentstore.views.get_course_settings', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">Schedule &amp; Details</a></li>
-                  <li class="nav-item nav-course-settings-grading"><a href="${reverse('contentstore.views.course_config_graders_page', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">Grading</a></li>
-                  <li class="nav-item nav-course-settings-team"><a href="${reverse('manage_users', kwargs=dict(location=ctx_loc))}">Course Team</a></li>
-                  <li class="nav-item nav-course-settings-advanced"><a href="${reverse('course_advanced_settings', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">Advanced Settings</a></li>
+                  <li class="nav-item nav-course-settings-schedule">
+                    <a href="${reverse('contentstore.views.get_course_settings', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">Schedule &amp; Details</a>
+                  </li>
+                  <li class="nav-item nav-course-settings-grading">
+                    <a href="${reverse('contentstore.views.course_config_graders_page', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">Grading</a>
+                  </li>
+                  <li class="nav-item nav-course-settings-team">
+                    <a href="${reverse('manage_users', kwargs=dict(location=ctx_loc))}">Course Team</a>
+                  </li>
+                  <li class="nav-item nav-course-settings-advanced">
+                    <a href="${reverse('course_advanced_settings', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">Advanced Settings</a>
+                  </li>
                 </ul>
               </div>
             </div>
           </li>
 
           <li class="nav-item nav-course-tools">
-            <h3 class="title">Tools <i class="icon-caret-down"></i></h3>
+            <h3 class="title"><span class="label">Tools</span> <i class="icon-caret-down ui-toggle-dd"></i></h3>
 
             <div class="wrapper wrapper-nav-sub">
               <div class="nav-sub">
                 <ul>
-                  <li class="nav-item nav-course-tools-checklists"><a href="${reverse('checklists', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">Checklists</a></li>
-                  <li class="nav-item nav-course-tools-import"><a href="${reverse('import_course', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">Import</a></li>
-                  <li class="nav-item nav-course-tools-export"><a href="${reverse('export_course', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">Export</a></li>
+                  <li class="nav-item nav-course-tools-checklists">
+                    <a href="${reverse('checklists', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">Checklists</a>
+                  </li>
+                  <li class="nav-item nav-course-tools-import">
+                    <a href="${reverse('import_course', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">Import</a>
+                  </li>
+                  <li class="nav-item nav-course-tools-export">
+                    <a href="${reverse('export_course', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">Export</a>
+                  </li>
                 </ul>
               </div>
             </div>
@@ -68,34 +89,53 @@
       % endif
     </div>
 
-    <div class="wrapper wrapper-right">
+    <div class="wrapper wrapper-r">
       % if user.is_authenticated():
-      <nav class="nav-account nav-is-signedin nav-dropdown">
-        <h2 class="sr">Currently logged in as:</h2>
+      <nav class="nav-account nav-is-signedin nav-dd ui-right">
+        <h2 class="sr">Help &amp; Account Navigation</h2>
+
         <ol>
-          <li class="nav-item nav-account-username">
-            <a href="#" class="title">
-              <span class="account-username">
-                <i class="icon-user"></i>
-                ${ user.username }
-              </span>
-              <i class="icon-caret-down"></i>
-            </a>
+          <li class="nav-item nav-account-help">
+            <h3 class="title"><span class="label">Help</span> <i class="icon-caret-down ui-toggle-dd"></i></h3>
 
             <div class="wrapper wrapper-nav-sub">
               <div class="nav-sub">
                 <ul>
-                  <li class="nav-item nav-account-dashboard"><a href="/">My Courses</a></li>
-                  <li class="nav-item nav-account-help"><a href="http://help.edge.edx.org/" rel="external">Studio Help</a></li>
-                  <li class="nav-item nav-account-signout"><a class="action action-signout" href="${reverse('logout')}">Sign Out</a></li>
+                  <li class="nav-item nav-help-documentation">
+                    <a href="http://files.edx.org/Getting_Started_with_Studio.pdf" title="This is a PDF Document">Studio Documentation</a>
+                  </li>
+                  <li class="nav-item nav-help-helpcenter">
+                    <a href="http://help.edge.edx.org/" rel="external">Studio Help Center</a>
+                  </li>
+                  <li class="nav-item nav-help-feedback">
+                    <a href="http://help.edge.edx.org/discussion/new" class="show-tender" title="Use our feedback tool, Tender, to share your feedback">Contact Us</a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </li>
+
+          <li class="nav-item nav-account-user">
+            <h3 class="title"><span class="label"><span class="label-prefix sr">Currently signed in as:</span><span class="account-username" title="${ user.username }">${ user.username }</span></span> <i class="icon-caret-down ui-toggle-dd"></i></h3>
+
+            <div class="wrapper wrapper-nav-sub">
+              <div class="nav-sub">
+                <ul>
+                  <li class="nav-item nav-account-dashboard">
+                    <a href="/">My Courses</a>
+                  </li>
+                  <li class="nav-item nav-account-signout">
+                    <a class="action action-signout" href="${reverse('logout')}">Sign Out</a>
+                  </li>
                 </ul>
               </div>
             </div>
           </li>
         </ol>
       </nav>
+
       % else:
-      <nav class="nav-not-signedin">
+      <nav class="nav-not-signedin nav-pitch">
         <h2 class="sr">You're not currently signed in</h2>
         <ol>
           <li class="nav-item nav-not-signedin-hiw">
