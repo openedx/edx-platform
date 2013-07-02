@@ -159,8 +159,9 @@
     }
 
     // entire link
-    a {
+    .course-link {
       @include transition(color 0.25s ease-in-out);
+      display: block;
       color: $gray-d1;
 
       &:hover {
