@@ -13,16 +13,15 @@ from django.contrib.auth.models import Group
 from courseware.access import (get_access_group_name,
                                course_beta_test_group_name)
 from django_comment_common.models import Role
-                                          # FORUM_ROLE_ADMINISTRATOR,
-                                          # FORUM_ROLE_MODERATOR,
-                                          # FORUM_ROLE_COMMUNITY_TA)
 
 
 def list_with_level(course, level):
     """
     List users who have 'level' access.
 
-    level is in ['instructor', 'staff', 'beta']
+    level is in ['instructor', 'staff', 'beta'] for standard courses.
+    There could be other levels specific to the course.
+    If there is no Group for that course-level, returns an empty list
     """
     if level in ['beta']:
         grpname = course_beta_test_group_name(course.location)

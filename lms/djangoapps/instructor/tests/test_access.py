@@ -9,8 +9,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from django.test.utils import override_settings
-from django.conf import settings
-from uuid import uuid4
+from courseware.tests.modulestore_config import TEST_DATA_MONGO_MODULESTORE
 
 from courseware.access import get_access_group_name
 from django_comment_common.models import (Role,
@@ -19,46 +18,12 @@ from django_comment_common.models import (Role,
                                           FORUM_ROLE_COMMUNITY_TA)
 from instructor.access import allow_access, revoke_access, list_with_level, update_forum_role_membership
 
-# mock dependency
-# get_access_group_name = lambda course, role: '{0}_{1}'.format(course.course_id, role)
-
-
-# moved here from old courseware/tests/tests.py
-# when it disappeared this test broke.
-def mongo_store_config(data_dir):
-    """
-    Defines default module store using MongoModuleStore
-
-    Use of this config requires mongo to be running
-    """
-    store = {
-        'default': {
-            'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
-            'OPTIONS': {
-                'default_class': 'xmodule.raw_module.RawDescriptor',
-                'host': 'localhost',
-                'db': 'test_xmodule',
-                'collection': 'modulestore_%s' % uuid4().hex,
-                'fs_root': data_dir,
-                'render_template': 'mitxmako.shortcuts.render_to_string',
-            }
-        }
-    }
-    store['direct'] = store['default']
-    return store
-
-TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
-TEST_DATA_MONGO_MODULESTORE = mongo_store_config(TEST_DATA_DIR)
-# TEST_DATA_XML_MODULESTORE = xml_store_config(TEST_DATA_DIR)
-
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestInstructorAccessControlDB(ModuleStoreTestCase):
     """ Test instructor access administration against database effects """
 
     def setUp(self):
-        # self.course_id = 'jus:/a/fake/c::rse/id'
-        # self.course = MockCourse('jus:/a/fake/c::rse/id')
         self.course = CourseFactory.create()
 
     def test_allow(self):

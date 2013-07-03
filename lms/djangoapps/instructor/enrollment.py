@@ -25,7 +25,7 @@ def enroll_emails(course_id, student_emails, auto_enroll=False):
     return a mapping from status to emails.
     """
 
-    auto_string = {False: 'allowed', True: 'willautoenroll'}[auto_enroll]
+    auto_string = 'willautoenroll' if auto_enroll else 'allowed'
 
     status_map = {
         'user/ce/alreadyenrolled': [],
@@ -75,7 +75,7 @@ def unenroll_emails(course_id, student_emails):
     """
     Unenroll multiple students by email.
 
-    students is a list of student emails e.g. ["foo@bar.com", "bar@foo.com]
+    `students` is a list of student emails e.g. ["foo@bar.com", "bar@foo.com]
     each of whom possibly does not exist in db.
 
     Fail quietly on student emails that do not match any users or allowed enrollments.
@@ -126,15 +126,12 @@ def split_input_list(str_list):
     in: "Lorem@ipsum.dolor, sit@amet.consectetur\nadipiscing@elit.Aenean\r convallis@at.lacus\r, ut@lacinia.Sed"
     out: ['Lorem@ipsum.dolor', 'sit@amet.consectetur', 'adipiscing@elit.Aenean', 'convallis@at.lacus', 'ut@lacinia.Sed']
 
-    In:
-    students: string coming from the input text area
-    Return:
-    students: list of cleaned student emails
-    students_lc: list of lower case cleaned student emails
+    `str_list` is a string coming from an input text area
+    returns a list of separated values
     """
 
     new_list = re.split(r'[\n\r\s,]', str_list)
-    new_list = [str(s.strip()) for s in new_list]
+    new_list = [s.strip() for s in new_list]
     new_list = [s for s in new_list if s != '']
 
     return new_list
@@ -147,9 +144,11 @@ def reset_student_attempts(course_id, student, module_state_key, delete_module=F
     In the previous instructor dashboard it was possible to modify/delete
     modules that were not problems. That has been disabled for safety.
 
-    student is a User
-    problem_to_reset is the name of a problem e.g. 'L2Node1'.
-    To build the module_state_key 'problem/' and course information will be appended to problem_to_reset.
+    `student` is a User
+    `problem_to_reset` is the name of a problem e.g. 'L2Node1'.
+    To build the module_state_key 'problem/' and course information will be appended to `problem_to_reset`.
+
+    Throws ValueError if `problem_state` is invalid JSON.
     """
     module_to_reset = StudentModule.objects.get(student_id=student.id,
                                                 course_id=course_id,
@@ -162,7 +161,11 @@ def reset_student_attempts(course_id, student, module_state_key, delete_module=F
 
 
 def _reset_module_attempts(studentmodule):
-    """ Reset the number of attempts on a studentmodule. """
+    """
+    Reset the number of attempts on a studentmodule.
+
+    Throws ValueError if `problem_state` is invalid JSON.
+    """
     # load the state json
     problem_state = json.loads(studentmodule.state)
     # old_number_of_attempts = problem_state["attempts"]

@@ -4,7 +4,6 @@ Unit tests for instructor.enrollment methods.
 
 import json
 from django.contrib.auth.models import User
-# from courseware.access import _course_staff_group_name
 from courseware.models import StudentModule
 from django.test import TestCase
 from student.tests.factories import UserFactory

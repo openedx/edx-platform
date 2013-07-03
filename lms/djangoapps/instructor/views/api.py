@@ -14,7 +14,7 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseBadRequest
 
 from courseware.courses import get_course_with_access
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User
 from django_comment_common.models import (Role,
                                           FORUM_ROLE_ADMINISTRATOR,
                                           FORUM_ROLE_MODERATOR,
@@ -30,11 +30,11 @@ import analytics.distributions
 import analytics.csvs
 
 
-def common_exceptions_400(fn):
+def common_exceptions_400(func):
     """ Catches common exceptions and renders matching 400 errors. (decorator) """
     def wrapped(*args, **kwargs):
         try:
-            return fn(*args, **kwargs)
+            return func(*args, **kwargs)
         except User.DoesNotExist:
             return HttpResponseBadRequest("User does not exist.")
     return wrapped

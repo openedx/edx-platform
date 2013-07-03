@@ -28,7 +28,7 @@ def enrolled_students_profiles(course_id, features):
     students = User.objects.filter(courseenrollment__course_id=course_id)\
         .order_by('username').select_related('profile')
 
-    def extract_student(student):
+    def extract_student(student, features):
         """ convert student to dictionary """
         student_features = [x for x in STUDENT_FEATURES if x in features]
         profile_features = [x for x in PROFILE_FEATURES if x in features]
@@ -41,7 +41,7 @@ def enrolled_students_profiles(course_id, features):
         student_dict.update(profile_dict)
         return student_dict
 
-    return [extract_student(student) for student in students]
+    return [extract_student(student, features) for student in students]
 
 
 def dump_grading_context(course):
