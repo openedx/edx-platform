@@ -26,7 +26,7 @@ def upload_file(_step, file_name):
     world.css_click(upload_css)
 
     file_css = 'input.file-input'
-    upload = world.css_click(file_css)
+    upload = world.css_find(file_css)
     #uploading the file itself
     path = os.path.join(TEST_ROOT, 'uploads/', file_name)
     upload._element.send_keys(os.path.abspath(path))
