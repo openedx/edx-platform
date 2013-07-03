@@ -51,17 +51,13 @@ class XModuleCourseFactory(Factory):
             ]
         )
 
-        data = kwargs.pop('data', None)
-        if data is not None:
-            store.update_item(new_course.location, data)
-
         # The rest of kwargs become attributes on the course:
         for k, v in kwargs.iteritems():
             setattr(new_course, k, v)
 
         # Update the data in the mongo datastore
-        store.update_metadata(new_course.location.url(), own_metadata(new_course))
-        store.update_item(new_course.location.url(), new_course._model_data._kvs._data)
+        store.update_metadata(new_course.location, own_metadata(new_course))
+        store.update_item(new_course.location, new_course._model_data._kvs._data)
 
         # update_item updates the the course as it exists in the modulestore, but doesn't
         # update the instance we are working with, so have to refetch the course after updating it.
