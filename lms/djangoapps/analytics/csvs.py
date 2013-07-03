@@ -74,3 +74,23 @@ def format_dictlist(dictlist):
         'header': header,
         'datarows': datarows,
     }
+
+
+def format_instances(instances, features):
+    """
+    Convert a list of instances into a header list and datarows list.
+
+    `header` is just `features` e.g. ['username', 'email']
+    `datarows` is a list of lists, each sublist representing a row in a table
+        e.g. [['username1', 'email1@email.com'], ['username2', 'email2@email.com']]
+        for `instances` of length 2.
+
+    `instances` is a list of instances, e.g. list of User's
+    `features` is a list of features
+        a feature is a string for which getattr(obj, feature) is valid
+
+    Returns header and datarows, formatted for input in create_csv_response
+    """
+    header = features
+    datarows = [[getattr(x, f) for f in features] for x in instances]
+    return header, datarows
