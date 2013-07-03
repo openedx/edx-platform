@@ -73,8 +73,9 @@ def css_click(css_selector, index=0, max_attempts=5, success_condition=lambda: T
     for _ in range(max_attempts):
         try:
             world.css_find(css_selector)[index].click()
-            if success_condition():
-                return
+            if not success_condition():
+                raise Exception("unsuccessful click")
+            return
         except WebDriverException:
             # Occasionally, MathJax or other JavaScript can cover up
             # an element temporarily.
@@ -85,6 +86,8 @@ def css_click(css_selector, index=0, max_attempts=5, success_condition=lambda: T
     else:
         # try once more, letting exceptions raise
         world.css_find(css_selector)[index].click()
+        if not success_condition():
+            raise Exception("unsuccessful click")
 
 
 @world.absorb
