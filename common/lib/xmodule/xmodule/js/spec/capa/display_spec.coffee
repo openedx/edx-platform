@@ -224,10 +224,7 @@ describe 'Problem', ->
           expect($('label[for="input_1_2_1"]')).not.toHaveAttr 'correct_answer', 'true'
 
       describe 'radio text question', ->
-
-        beforeEach ->
-        # Unfortunately this is necessary to get the right show answer method
-          @problem.el.prepend '''
+        radio_text_xml='''
 <section class="problem">
   <div><p></p><span><section id="choicetextinput_1_2_1" class="choicetextinput">
 
@@ -254,6 +251,10 @@ describe 'Problem', ->
 </section></span></div>
 </section>
 '''
+        beforeEach ->
+          # Append a radiotextresponse problem to the problem, so we can check it's javascript functionality
+          @problem.el.prepend(radio_text_xml)
+
         it 'sets the correct class on the section for the correct choice', ->
           spyOn($, 'postWithPrefix').andCallFake (url, callback) ->
             callback answers: "1_2_1": ["1_2_1_choiceinput_0bc"], "1_2_1_choiceinput_0bc": "3"
