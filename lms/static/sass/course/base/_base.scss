@@ -101,12 +101,6 @@ img {
   max-width: 100%;
 }
 
-::selection, ::-moz-selection, ::-webkit-selection {
-  background: $selection-color-2;
-  color: #fff;
-}
-
-
 .tooltip {
   position: absolute;
   top: 0;
