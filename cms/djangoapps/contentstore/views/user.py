@@ -15,20 +15,6 @@ from auth.authz import get_user_by_email, add_user_to_course_group, remove_user_
 from .access import has_access
 
 
-def user_author_string(user):
-    '''Get an author string for commits by this user.  Format:
-    first last <email@email.com>.
-
-    If the first and last names are blank, uses the username instead.
-    Assumes that the email is not blank.
-    '''
-    if not user.first_name and not user.last_name:
-        name = user.username
-    else:
-        name = "{0} {1}".format(user.first_name, user.last_name)
-    return "{name} <{email}>".format(name=name, email=user.email)
-
-
 @login_required
 @ensure_csrf_cookie
 def index(request):
