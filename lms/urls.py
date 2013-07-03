@@ -2,6 +2,8 @@ from django.conf import settings
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from django.conf.urls.static import static
+from rest_framework import routers
+from user_api import views as user_api_views
 
 # Not used, the work is done in the imported module.
 from . import one_time_startup      # pylint: disable=W0611
@@ -59,6 +61,14 @@ urlpatterns = ('',  # nopep8
         name='auth_password_reset_done'),
 
     url(r'^heartbeat$', include('heartbeat.urls')),
+)
+
+user_api_router = routers.DefaultRouter()
+user_api_router.register(r'users', user_api_views.UserViewSet)
+user_api_router.register(r'user_prefs', user_api_views.UserPreferenceViewSet)
+
+urlpatterns += (
+    url(r'^user_api/v1/', include(user_api_router.urls)),
 )
 
 # University profiles only make sense in the default edX context
