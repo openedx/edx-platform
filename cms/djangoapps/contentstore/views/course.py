@@ -1,10 +1,9 @@
 """
 Views related to operations on course objects
 """
-#pylint: disable=W0402
 import json
 import random
-import string
+import string  # pylint: disable=W0402
 
 from django.contrib.auth.decorators import login_required
 from django_future.csrf import ensure_csrf_cookie
@@ -496,6 +495,9 @@ def textbook_index(request, org, course, name):
             if not any(tab['type'] == 'pdf_textbooks' for tab in course_module.tabs):
                 course_module.tabs.append({"type": "pdf_textbooks"})
             course_module.pdf_textbooks = textbooks
+            # Save the data that we've just changed to the underlying
+            # MongoKeyValueStore before we update the mongo datastore.
+            course_module.save()
             store.update_metadata(course_module.location, own_metadata(course_module))
             return JsonResponse(course_module.pdf_textbooks)
     else:
@@ -542,6 +544,9 @@ def create_textbook(request, org, course, name):
         tabs = course_module.tabs
         tabs.append({"type": "pdf_textbooks"})
         course_module.tabs = tabs
+    # Save the data that we've just changed to the underlying
+    # MongoKeyValueStore before we update the mongo datastore.
+    course_module.save()
     store.update_metadata(course_module.location, own_metadata(course_module))
     resp = JsonResponse(textbook, status=201)
     resp["Location"] = reverse("textbook_by_id", kwargs={
@@ -585,10 +590,13 @@ def textbook_by_id(request, org, course, name, tid):
             i = course_module.pdf_textbooks.index(textbook)
             new_textbooks = course_module.pdf_textbooks[0:i]
             new_textbooks.append(new_textbook)
-            new_textbooks.extend(course_module.pdf_textbooks[i+1:])
+            new_textbooks.extend(course_module.pdf_textbooks[i + 1:])
             course_module.pdf_textbooks = new_textbooks
         else:
             course_module.pdf_textbooks.append(new_textbook)
+        # Save the data that we've just changed to the underlying
+        # MongoKeyValueStore before we update the mongo datastore.
+        course_module.save()
         store.update_metadata(course_module.location, own_metadata(course_module))
         return JsonResponse(new_textbook, status=201)
     elif request.method == 'DELETE':
@@ -596,7 +604,8 @@ def textbook_by_id(request, org, course, name, tid):
             return JsonResponse(status=404)
         i = course_module.pdf_textbooks.index(textbook)
         new_textbooks = course_module.pdf_textbooks[0:i]
-        new_textbooks.extend(course_module.pdf_textbooks[i+1:])
+        new_textbooks.extend(course_module.pdf_textbooks[i + 1:])
         course_module.pdf_textbooks = new_textbooks
+        course_module.save()
         store.update_metadata(course_module.location, own_metadata(course_module))
         return JsonResponse()

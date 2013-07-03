@@ -247,9 +247,10 @@ class ModelDataCache(object):
                 course_id=self.course_id,
                 student=self.user,
                 module_state_key=key.block_scope_id.url(),
-                defaults={'state': json.dumps({}),
-                          'module_type': key.block_scope_id.category,
-                          },
+                defaults={
+                    'state': json.dumps({}),
+                    'module_type': key.block_scope_id.category,
+                },
             )
         elif key.scope == Scope.content:
             field_object, _ = XModuleContentField.objects.get_or_create(
@@ -333,22 +334,10 @@ class LmsKeyValueStore(KeyValueStore):
             return json.loads(field_object.value)
 
     def set(self, key, value):
-        if key.field_name in self._descriptor_model_data:
-            raise InvalidWriteError("Not allowed to overwrite descriptor model data", key.field_name)
-
-        field_object = self._model_data_cache.find_or_create(key)
-
-        if key.scope not in self._allowed_scopes:
-            raise InvalidScopeError(key.scope)
-
-        if key.scope == Scope.user_state:
-            state = json.loads(field_object.state)
-            state[key.field_name] = value
-            field_object.state = json.dumps(state)
-        else:
-            field_object.value = json.dumps(value)
-
-        field_object.save()
+        """
+        Set a single value in the KeyValueStore
+        """
+        self.set_many({key: value})
 
     def set_many(self, kv_dict):
         """
@@ -362,23 +351,21 @@ class LmsKeyValueStore(KeyValueStore):
         # field_objects maps a field_object to a list of associated fields
         field_objects = dict()
         for field in kv_dict:
-            # check field for validity
+            # Check field for validity
             if field.field_name in self._descriptor_model_data:
                 raise InvalidWriteError("Not allowed to overwrite descriptor model data", field.field_name)
 
             if field.scope not in self._allowed_scopes:
                 raise InvalidScopeError(field.scope)
 
-            # if the field is valid
+            # If the field is valid and isn't already in the dictionary, add it.
             field_object = self._model_data_cache.find_or_create(field)
-            # if this field_object isn't already in the dictionary
-            # add it
             if field_object not in field_objects.keys():
                 field_objects[field_object] = []
-            # update the list of associated fields
+            # Update the list of associated fields
             field_objects[field_object].append(field)
 
-            # special case when scope is for the user state
+            # Special case when scope is for the user state, because this scope saves fields in a single row
             if field.scope == Scope.user_state:
                 state = json.loads(field_object.state)
                 state[field.field_name] = kv_dict[field]

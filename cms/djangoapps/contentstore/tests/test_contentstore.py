@@ -87,6 +87,8 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.user.is_active = True
         # Staff has access to view all courses
         self.user.is_staff = True
+
+        # Save the data that we've just changed to the db.
         self.user.save()
 
         self.client = Client()
@@ -116,6 +118,10 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
                                           'course', '2012_Fall', None]), depth=None)
 
         course.advanced_modules = component_types
+
+        # Save the data that we've just changed to the underlying
+        # MongoKeyValueStore before we update the mongo datastore.
+        course.save()
 
         store.update_metadata(course.location, own_metadata(course))
 
@@ -239,6 +245,9 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         self.assertNotIn('graceperiod', own_metadata(html_module))
         html_module.lms.graceperiod = new_graceperiod
+        # Save the data that we've just changed to the underlying
+        # MongoKeyValueStore before we update the mongo datastore.
+        html_module.save()
         self.assertIn('graceperiod', own_metadata(html_module))
         self.assertEqual(html_module.lms.graceperiod, new_graceperiod)
 
@@ -883,6 +892,9 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         # add a bool piece of unknown metadata so we can verify we don't throw an exception
         metadata['new_metadata'] = True
 
+        # Save the data that we've just changed to the underlying
+        # MongoKeyValueStore before we update the mongo datastore.
+        course.save()
         module_store.update_metadata(location, metadata)
 
         print 'Exporting to tempdir = {0}'.format(root_dir)
@@ -1299,6 +1311,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         # now let's define an override at the leaf node level
         #
         new_module.lms.graceperiod = timedelta(1)
+        new_module.save()
         module_store.update_metadata(new_module.location, own_metadata(new_module))
 
         # flush the cache and refetch

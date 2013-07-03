@@ -1,3 +1,6 @@
+"""
+Test for lms courseware app, module data (runtime data storage for XBlocks)
+"""
 import json
 from mock import Mock, patch
 from functools import partial
@@ -68,10 +71,15 @@ class TestDescriptorFallback(TestCase):
         self.assertRaises(InvalidWriteError, self.kvs.set, settings_key('field_b'), 'foo')
         self.assertEquals('settings', self.desc_md['field_b'])
 
+        self.assertRaises(InvalidWriteError, self.kvs.set_many, {content_key('field_a'): 'foo'})
+        self.assertEquals('content', self.desc_md['field_a'])
+
         self.assertRaises(InvalidWriteError, self.kvs.delete, content_key('field_a'))
         self.assertEquals('content', self.desc_md['field_a'])
         self.assertRaises(InvalidWriteError, self.kvs.delete, settings_key('field_b'))
         self.assertEquals('settings', self.desc_md['field_b'])
+
+
 
 
 class TestInvalidScopes(TestCase):
@@ -85,10 +93,13 @@ class TestInvalidScopes(TestCase):
         for scope in (Scope(user=True, block=BlockScope.DEFINITION),
                       Scope(user=False, block=BlockScope.TYPE),
                       Scope(user=False, block=BlockScope.ALL)):
-            self.assertRaises(InvalidScopeError, self.kvs.get, LmsKeyValueStore.Key(scope, None, None, 'field'))
-            self.assertRaises(InvalidScopeError, self.kvs.set, LmsKeyValueStore.Key(scope, None, None, 'field'), 'value')
-            self.assertRaises(InvalidScopeError, self.kvs.delete, LmsKeyValueStore.Key(scope, None, None, 'field'))
-            self.assertRaises(InvalidScopeError, self.kvs.has, LmsKeyValueStore.Key(scope, None, None, 'field'))
+            key = LmsKeyValueStore.Key(scope, None, None, 'field')
+
+            self.assertRaises(InvalidScopeError, self.kvs.get, key)
+            self.assertRaises(InvalidScopeError, self.kvs.set, key, 'value')
+            self.assertRaises(InvalidScopeError, self.kvs.delete, key)
+            self.assertRaises(InvalidScopeError, self.kvs.has, key)
+            self.assertRaises(InvalidScopeError, self.kvs.set_many, {key: 'value'})
 
 
 class TestStudentModuleStorage(TestCase):
@@ -141,7 +152,7 @@ class TestStudentModuleStorage(TestCase):
         self.assertFalse(self.kvs.has(user_state_key('not_a_field')))
 
     def construct_kv_dict(self):
-        """ construct a kv_dict that can be passed to set_many """
+        """Construct a kv_dict that can be passed to set_many"""
         key1 = user_state_key('field_a')
         key2 = user_state_key('field_b')
         new_value = 'new value'
@@ -149,7 +160,7 @@ class TestStudentModuleStorage(TestCase):
         return {key1: new_value, key2: newer_value}
 
     def test_set_many(self):
-        """Test setting many fields that are scoped to Scope.user_state """
+        "Test setting many fields that are scoped to Scope.user_state"
         kv_dict = self.construct_kv_dict()
         self.kvs.set_many(kv_dict)
 
@@ -157,7 +168,7 @@ class TestStudentModuleStorage(TestCase):
             self.assertEquals(self.kvs.get(key), kv_dict[key])
 
     def test_set_many_failure(self):
-        """Test failures when setting many fields that are scoped to Scope.user_state """
+        "Test failures when setting many fields that are scoped to Scope.user_state"
         kv_dict = self.construct_kv_dict()
         # because we're patching the underlying save, we need to ensure the
         # fields are in the cache
@@ -211,6 +222,10 @@ class StorageTestBase(object):
     A base class for that gets subclassed when testing each of the scopes.
 
     """
+    # Disable pylint warnings that arise because of the way the child classes call
+    # this base class -- pylint's static analysis can't keep up with it.
+    # pylint: disable=E1101, E1102
+
     factory = None
     scope = None
     key_factory = None
@@ -273,6 +288,7 @@ class StorageTestBase(object):
         self.assertFalse(self.kvs.has(self.key_factory('missing_field')))
 
     def construct_kv_dict(self):
+        """Construct a kv_dict that can be passed to set_many"""
         key1 = self.key_factory('existing_field')
         key2 = self.key_factory('other_existing_field')
         new_value = 'new value'

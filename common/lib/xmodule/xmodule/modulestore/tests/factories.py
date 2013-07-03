@@ -53,9 +53,6 @@ class XModuleCourseFactory(Factory):
         for k, v in kwargs.iteritems():
             setattr(new_course, k, v)
 
-        # Save the data we've just created before we update mongo datastore
-        new_course.save()
-
         # Update the data in the mongo datastore
         store.save_xmodule(new_course)
         return new_course
@@ -138,7 +135,6 @@ class XModuleItemFactory(Factory):
         # replace the display name with an optional parameter passed in from the caller
         if display_name is not None:
             metadata['display_name'] = display_name
-        # note that location comes from above lazy_attribute
         store.create_and_save_xmodule(location, metadata=metadata, definition_data=data)
 
         if location.category not in DETACHED_CATEGORIES:
