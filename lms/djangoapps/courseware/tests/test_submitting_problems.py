@@ -26,7 +26,7 @@ from courseware.tests.modulestore_config import TEST_DATA_MONGO_MODULESTORE
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
-        Check that a course gets graded properly
+        Check that a course gets graded properly.
     """
 
     # arbitrary constant
@@ -49,7 +49,7 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
     def refresh_course(self):
         """
-        re-fetch the course from the database so that the object being dealt with has everything added to it
+        Re-fetch the course from the database so that the object being dealt with has everything added to it.
         """
         self.course = modulestore().get_instance(self.course.id, self.course.location)
 
@@ -62,12 +62,12 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
     def modx_url(self, problem_location, dispatch):
         """
-        Return the url needed for the desired action
+        Return the url needed for the desired action.
 
         problem_location: location of the problem on which we want some action
 
         dispatch: the the action string that gets passed to the view as a kwarg
-            ex. 'check_problem' for having responses processed
+            example: 'check_problem' for having responses processed
         """
         return reverse(
             'modx_dispatch',
@@ -99,7 +99,7 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
     def reset_question_answer(self, problem_url_name):
         """
-        resets specified problem for current user
+        Reset specified problem for current user.
         """
         problem_location = self.problem_location(problem_url_name)
         modx_url = self.modx_url(problem_location, 'problem_reset')
@@ -108,7 +108,7 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
     def add_dropdown_to_section(self, section_location, name, num_inputs=2):
         """
-        create and return a dropdown problem
+        Create and return a dropdown problem.
 
         section_location: location object of section in which to create the problem
             (problems must live in a section to be graded properly)
@@ -141,7 +141,7 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
     def add_graded_section_to_course(self, name, section_format='Homework'):
         """
-        Creates a graded homework section within a chapter and returns the section
+        Creates a graded homework section within a chapter and returns the section.
         """
 
         # if we don't already have a chapter create a new one
@@ -167,12 +167,12 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
 class TestCourseGrader(TestSubmittingProblems):
     """
-    Check that a course gets graded properly
+    Suite of tests for the course grader.
     """
 
     def add_grading_policy(self, grading_policy):
         """
-        add a grading policy to the course
+        Add a grading policy to the course.
         """
 
         course_data = {'grading_policy': grading_policy}
@@ -181,7 +181,7 @@ class TestCourseGrader(TestSubmittingProblems):
 
     def get_grade_summary(self):
         """
-        calls grades.grade for current user and course
+        calls grades.grade for current user and course.
 
         the keywords for the returned object are
         - grade : A final letter grade.
@@ -203,7 +203,7 @@ class TestCourseGrader(TestSubmittingProblems):
 
     def get_progress_summary(self):
         """
-        return progress summary structure for current user and course
+        Return progress summary structure for current user and course.
 
         Returns
         - courseware_summary is a summary of all sections with problems in the course.
@@ -227,21 +227,22 @@ class TestCourseGrader(TestSubmittingProblems):
 
     def check_grade_percent(self, percent):
         """
-        assert that percent grade is as expected
+        Assert that percent grade is as expected.
         """
         grade_summary = self.get_grade_summary()
         self.assertEqual(grade_summary['percent'], percent)
 
     def earned_hw_scores(self):
         """
-        Global scores, each Score is a Problem Set
+        Global scores, each Score is a Problem Set.
 
         Returns list of scores: [<points on hw_1>, <poinst on hw_2>, ..., <poinst on hw_n>]
         """
         return [s.earned for s in self.get_grade_summary()['totaled_scores']['Homework']]
 
     def score_for_hw(self, hw_url_name):
-        """returns list of scores for a given url
+        """
+        Returns list of scores for a given url.
 
         Returns list of scores for the given homework:
             [<points on problem_1>, <poinst on problem_2>, ..., <poinst on problem_n>]
@@ -258,7 +259,7 @@ class TestCourseGrader(TestSubmittingProblems):
 
     def basic_setup(self):
         """
-        set up a simple course for testing basic grading functionality
+        Set up a simple course for testing basic grading functionality.
         """
 
         grading_policy = {
@@ -285,7 +286,7 @@ class TestCourseGrader(TestSubmittingProblems):
 
     def weighted_setup(self):
         """
-        Set up a simple course for testing weighted grading functionality
+        Set up a simple course for testing weighted grading functionality.
         """
 
         grading_policy = {
@@ -312,7 +313,7 @@ class TestCourseGrader(TestSubmittingProblems):
 
     def dropping_setup(self):
         """
-        Set up a simple course for testing the dropping grading functionality
+        Set up a simple course for testing the dropping grading functionality.
         """
 
         grading_policy = {
@@ -347,7 +348,7 @@ class TestCourseGrader(TestSubmittingProblems):
 
     def test_none_grade(self):
         """
-        check grade is 0 to begin
+        Check grade is 0 to begin with.
         """
         self.basic_setup()
         self.check_grade_percent(0)
@@ -355,7 +356,7 @@ class TestCourseGrader(TestSubmittingProblems):
 
     def test_b_grade_exact(self):
         """
-        check that at exactly the cutoff, the grade is B
+        Check that at exactly the cutoff, the grade is B.
         """
         self.basic_setup()
         self.submit_question_answer('p1', {'2_1': 'Correct'})
@@ -364,7 +365,7 @@ class TestCourseGrader(TestSubmittingProblems):
 
     def test_b_grade_above(self):
         """
-        check grade between cutoffs
+        Check grade between cutoffs.
         """
         self.basic_setup()
         self.submit_question_answer('p1', {'2_1': 'Correct'})
@@ -374,7 +375,7 @@ class TestCourseGrader(TestSubmittingProblems):
 
     def test_a_grade(self):
         """
-        check that 100 percent completion gets an A
+        Check that 100 percent completion gets an A
         """
         self.basic_setup()
         self.submit_question_answer('p1', {'2_1': 'Correct'})
@@ -385,7 +386,7 @@ class TestCourseGrader(TestSubmittingProblems):
 
     def test_wrong_asnwers(self):
         """
-        check that answering incorrectly is graded properly
+        Check that answering incorrectly is graded properly.
         """
         self.basic_setup()
         self.submit_question_answer('p1', {'2_1': 'Correct'})
@@ -396,7 +397,7 @@ class TestCourseGrader(TestSubmittingProblems):
 
     def test_weighted_homework(self):
         """
-        test that the homework section has proper weight
+        Test that the homework section has proper weight.
         """
         self.weighted_setup()
 
@@ -408,7 +409,7 @@ class TestCourseGrader(TestSubmittingProblems):
 
     def test_weighted_exam(self):
         """
-        test that the exam section has the proper weight
+        Test that the exam section has the proper weight.
         """
         self.weighted_setup()
         self.submit_question_answer('FinalQuestion', {'2_1': 'Correct', '2_2': 'Correct'})
@@ -416,7 +417,7 @@ class TestCourseGrader(TestSubmittingProblems):
 
     def test_weighted_total(self):
         """
-        test that the weighted total adds to 100
+        Test that the weighted total adds to 100.
         """
         self.weighted_setup()
         self.submit_question_answer('H1P1', {'2_1': 'Correct', '2_2': 'Correct'})
@@ -434,7 +435,7 @@ class TestCourseGrader(TestSubmittingProblems):
 
     def test_dropping_grades_normally(self):
         """
-        test that the dropping policy does not change things before it should
+        Test that the dropping policy does not change things before it should.
         """
         self.dropping_setup()
         self.dropping_homework_stage1()
@@ -446,7 +447,7 @@ class TestCourseGrader(TestSubmittingProblems):
 
     def test_dropping_nochange(self):
         """
-        tests that grade does not change when making the global homework grade minimum not unique
+        Tests that grade does not change when making the global homework grade minimum not unique.
         """
         self.dropping_setup()
         self.dropping_homework_stage1()
@@ -460,7 +461,7 @@ class TestCourseGrader(TestSubmittingProblems):
 
     def test_dropping_all_correct(self):
         """
-        test that the lowest is dropped for a perfect score
+        Test that the lowest is dropped for a perfect score.
         """
         self.dropping_setup()
 
@@ -555,16 +556,16 @@ class TestPythonGradedResponse(TestSubmittingProblems):
             return strip_q(expect) == strip_q(ans)""").strip()
 
     CUSTOM_RESPONSE_CORRECT = "0, 1, 2, 3, 4, 5, 'Outside of loop', 6"
-    CUSTOM_RESPONSE_INCORRECT = "coursera"  # :P
+    CUSTOM_RESPONSE_INCORRECT = "Reading my code I see.  I hope you like it :)"
 
     COMPUTED_ANSWER_SCRIPT = dedent("""
-        if submission[0] == "Xyzzy":
+        if submission[0] == "a shout in the street":
             correct = ['correct']
         else:
             correct = ['incorrect']""").strip()
 
-    COMPUTED_ANSWER_CORRECT = "Xyzzy"
-    COMPUTED_ANSWER_INCORRECT = "axyxa"
+    COMPUTED_ANSWER_CORRECT = "a shout in the street"
+    COMPUTED_ANSWER_INCORRECT = "because we never let them in"
 
     def setUp(self):
         super(TestPythonGradedResponse, self).setUp()
