@@ -1613,47 +1613,37 @@ class ChoiceTextResponseTest(ResponseTest):
 
     def _make_problem(self, choices, in_type='radiotextgroup', script=''):
         """
-        True,[("answer": #,"tolerance": #),]]
-        Converts inputs to iterable types if they aren't for convenience
+        Convenience method to fill in default values for script and
+        type if needed, then call self.build_problem
         """
-        choice_inputs = []
-        if (not(type(choices[0]) == list or type(choices[0]) == tuple)):
-            choices = [choices]
-        for choice in choices:
-            correctness, answers = choice
-            textinputs = []
-            if answers:
-                if (not(type(answers) == list or type(answers) == tuple)):
-                    answers = [answers]
-
-                for answer in answers:
-                    textinputs.append(
-                        self.xml_factory_class.create_textinput_element(
-                            **answer
-                        )
-                    )
-            choice_inputs.append(self.xml_factory_class.create_choice_element(
-                **{"correctness": correctness, "inputs": textinputs}))
-        return self.build_problem(choices=choice_inputs, type=in_type,
+        return self.build_problem(choices=choices, type=in_type,
                                   script=script)
 
     def _make_answer_dict(self, choice_list):
         """
-        convenience method to make generation of answers less tedious,
+        Convenience method to make generation of answers less tedious,
         pass in an iterable argument with elements of the form: [bool, [ans,]]
         Will generate an answer dict for those options
         """
 
         answer_dict = {}
         for index, choice_answers_pair in enumerate(choice_list):
+            # Choice is whether this choice is correct
+            # Answers contains a list of answers to textinpts for the choice
             choice, answers = choice_answers_pair
 
             if choice:
+                # Radio/Checkbox inputs in choicetext problems follow
+                # a naming convention that gives them names ending with "bc"
                 choice_id = "1_2_1_choiceinput_{index}bc".format(index=index)
                 choice_value = "choiceinput_{index}".format(index=index)
                 answer_dict[choice_id] = choice_value
-
+            # Build the names for the textinputs and add their answers
+            # to `answer_dict`.
             for ind, answer in enumerate(answers):
+                # In `answer_id` `index` represents the ordinality of the
+                # choice and `ind` represents the ordinality of the
+                # textinput inside the parent choice.
                 answer_id = "1_2_1_choiceinput_{index}_textinput_{ind}".format(
                     index=index, ind=ind)
                 answer_dict[answer_id] = answer
@@ -1665,7 +1655,7 @@ class ChoiceTextResponseTest(ResponseTest):
             self.build_problem(type="invalidtextgroup")
 
     def test_valid_xml(self):
-        self.build_problem(demo="true")
+        self.build_problem()
         self.assertTrue(True)
 
     def test_interpret_error(self):
@@ -1684,8 +1674,8 @@ class ChoiceTextResponseTest(ResponseTest):
              ],
             "checkboxtextgroup")
         with self.assertRaisesRegexp(StudentInputError,
-                                     "There was a problem with the staff" +
-                                     " answer to this problem"):
+                                     "The Staff answer could not be " +
+                                     "interpreted as a number."):
             self.assert_grade(broken_problem,
                               self._make_answer_dict([(True, ["1"]),
                                                       (True, ["1"])
@@ -1753,4 +1743,5 @@ class ChoiceTextResponseTest(ResponseTest):
 
             self.assert_grade(problem, submission, correctness,
                               msg="{0} should be {1}".format(name,
-                                                             correctness))
+                                                             correctness)
+                              )

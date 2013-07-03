@@ -1378,7 +1378,8 @@ class ChoiceTextGroup(InputTypeBase):
     @classmethod
     def get_attributes(cls):
         return [Attribute("show_correctness", "always"),
-                Attribute("submitted_message", "Answer received.")]
+                Attribute("submitted_message", "Answer received.")
+                ]
 
     def _extra_context(self):
         return {'input_type': self.html_input_type,
@@ -1433,6 +1434,7 @@ class ChoiceTextGroup(InputTypeBase):
                 raise Exception(
                     "[capa.inputtypes.extract_choices] Expected a <choice>" +
                     "tag; got {0} instead".format(choice.tag))
+
             components = []
             choice_text = ''
             if choice.text is not None:

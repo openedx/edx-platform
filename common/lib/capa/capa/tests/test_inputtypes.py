@@ -879,7 +879,8 @@ class TestChoiceText(unittest.TestCase):
         element = etree.fromstring(xml_str)
         state = {'value': '{}',
                  'id': 'choicetext_input',
-                 'status': 'answered'}
+                 'status': 'answered'
+                 }
 
         first_input = self.build_choice('textinput', 'choiceinput_0_textinput_0', 'false', '')
         first_choice_content = self.build_choice('text', 'this is', '', '')
@@ -887,13 +888,15 @@ class TestChoiceText(unittest.TestCase):
         second_choice_text = self.build_choice('text', "!", '', '')
 
         choices = [('choiceinput_0', [first_choice_content, first_input]),
-                   ('choiceinput_1', [second_choice_content, second_choice_text])]
+                   ('choiceinput_1', [second_choice_content, second_choice_text])
+                   ]
 
         expected = {'msg': '',
                     'input_type': expected_input_type,
                     'choices': choices,
                     'show_correctness': 'always',
-                    'submitted_message': 'Answer received.'}
+                    'submitted_message': 'Answer received.'
+                    }
         expected.update(state)
         the_input = lookup_tag(tag)(test_system(), element, state)
         context = the_input._get_render_context()

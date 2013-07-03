@@ -136,7 +136,10 @@ PROBLEM_DICT = {
         'kwargs': {
             'question_text': 'The correct answer is Choice 0 and input 8',
             'type': 'radiotextgroup',
-            'demo': "true"},
+            'choices': [("true", {"answer": "8", "tolerance": "1"}),
+                        ("false", {"answer": "8", "tolerance": "1"})
+                        ]
+        },
         'correct': ['section.choicetextgroup_correct'],
         'incorrect': ['span.incorrect', 'section.choicetextgroup_incorrect'],
         'unanswered': ['span.unanswered']},
@@ -146,7 +149,10 @@ PROBLEM_DICT = {
         'kwargs': {
             'question_text': 'The correct answer is Choice 0 and input 8',
             'type': 'checkboxtextgroup',
-            'demo': "true"},
+            'choices': [("true", {"answer": "8", "tolerance": "1"}),
+                        ("false", {"answer": "8", "tolerance": "1"})
+                        ]
+        },
         'correct': ['span.correct'],
         'incorrect': ['span.incorrect'],
         'unanswered': ['span.unanswered']}
@@ -216,12 +222,14 @@ def answer_problem(problem_type, correctness):
 
     elif problem_type == 'radio_text' or problem_type == 'checkbox_text':
 
-        input_value = "8" if correctness == 'correct' \
-            else "5"
-        choice = "choiceinput_0bc" if correctness == 'correct' \
-            else "choiceinput_1bc"
+        input_value = "8" if correctness == 'correct' else "5"
+        choice = "choiceinput_0bc" if correctness == 'correct' else "choiceinput_1bc"
         world.css_check(inputfield(problem_type, choice=choice))
-        world.css_fill(inputfield(problem_type, choice="choiceinput_0_textinput_0"), input_value)
+        world.css_fill(inputfield(problem_type,
+                                  choice="choiceinput_0_textinput_0"
+                                  ),
+                       input_value
+                       )
 
 
 def problem_has_answer(problem_type, answer_class):
@@ -371,10 +379,10 @@ def assert_textfield(problem_type, expected_text, input_num=1):
 
 
 def assert_choicetext_values(problem_type, choices, expected_values):
-    '''
+    """
     Asserts that only the given choices are checked, and given
     text fields have a desired value
-    '''
+    """
 
     all_choices = ['choiceinput_0bc', 'choiceinput_1bc']
     all_inputs = ["choiceinput_0_textinput_0", "choiceinput_1_textinput_0"]
@@ -388,5 +396,5 @@ def assert_choicetext_values(problem_type, choices, expected_values):
 
     for (name, expected) in zip(all_inputs, expected_values):
         element = world.css_find(inputfield(problem_type, name))
-        #values end up with a trailing space somehow
+        # Remove any trailing spaces that may have been added
         assert element.value.strip() == expected

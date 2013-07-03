@@ -2175,18 +2175,25 @@ class ChoiceTextResponse(LoncapaResponse):
 
         for index, choice in enumerate(self.xml.xpath('//*[@id=$id]//choice',
                                                       id=self.xml.get('id'))):
+            # Set the name attribute for <choices>
+            # "bc" is appended at the end to indicate that this is a
+            # binary choice as opposed to a textinput, this convention
+            # is used when grading the problem
             choice.set("name", self.answer_id + "_choiceinput_" + str(index) +
-                       "bc")
+                       "bc"
+                       )
+            # Set Name attributes for <textinput> elements
             for ind, child in enumerate(choice.findall('textinput')):
                 child.set("name", self.answer_id + "_choiceinput_" +
-                          str(index) + "_textinput_" + str(ind))
+                          str(index) + "_textinput_" + str(ind)
+                          )
 
     def get_score(self, student_answers):
         """
-        Student_answers contains keys for binary inputs(radiobutton, checkbox)
+        `student_answers` contains keys for binary inputs(radiobutton, checkbox)
         and numerical inputs. Keys ending with 'bc' are binary choice inputs
         otherwise they are text fields. This method first seperates the two
-        answers and then grades them in seperate methods.
+        types answers and then grades them in seperate methods.
 
         The student is only correct if they have both the binary inputs and
         numerical inputs correct.
@@ -2211,7 +2218,8 @@ class ChoiceTextResponse(LoncapaResponse):
         correct = choices_correct and inputs_correct
 
         return CorrectMap(self.answer_id, 'correct' if correct
-                          else 'incorrect')
+                          else 'incorrect'
+                          )
 
     def get_answers(self):
         """
@@ -2271,8 +2279,8 @@ class ChoiceTextResponse(LoncapaResponse):
                     "Content error--answer" +
                     "'{0}' is not a valid complexnumber".format(correct_ans))
                 raise StudentInputError(
-                    "There was a problem with the staff answer "
-                    "to this problem")
+                    "The Staff answer could not be interpreted as a number."
+                )
 
             try:
                 partial_correct = compare_with_tolerance(
@@ -2285,7 +2293,8 @@ class ChoiceTextResponse(LoncapaResponse):
 
                 raise StudentInputError(
                     "Could not interpret '{0}' as a number{1}".format(
-                        cgi.escape(student_answer), trace))
+                        cgi.escape(student_answer), trace)
+                )
 
             if not partial_correct:
                 # If any input is not correct, set the return value to False
