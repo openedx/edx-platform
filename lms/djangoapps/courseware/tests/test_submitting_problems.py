@@ -51,7 +51,9 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.factory = RequestFactory()
 
     def refresh_course(self):
-        """re-fetch the course from the database so that the object being dealt with has everything added to it"""
+        """
+        re-fetch the course from the database so that the object being dealt with has everything added to it
+        """
         self.course = modulestore().get_instance(self.course.id, self.course.location)
 
     def problem_location(self, problem_url_name):
@@ -136,6 +138,7 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
             display_name=name
         )
 
+        # re-fetch the course from the database so the object is up to date
         self.refresh_course()
         return problem
 
@@ -330,7 +333,7 @@ class TestCourseGrader(TestSubmittingProblems):
         # Set up a course structure that just consists of 3 homeworks.
         # Since the grading policy drops 1 entire homework, each problem is worth 25%
 
-        #names for the problem in the homeworks
+        # names for the problem in the homeworks
         self.hw1_names = ['h1p1', 'h1p2']
         self.hw2_names = ['h2p1', 'h2p2']
         self.hw3_names = ['h3p1', 'h3p2']
