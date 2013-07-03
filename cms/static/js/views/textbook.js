@@ -123,7 +123,7 @@ CMS.Views.EditTextbook = Backbone.View.extend({
         if(!this.model.isValid()) { return; }
         var saving = new CMS.Views.Notification.Saving({
             title: gettext("Saving&hellip;")
-        });
+        }).show();
         var that = this;
         this.model.save({}, {
             success: function() {
