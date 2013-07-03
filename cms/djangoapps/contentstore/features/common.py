@@ -223,7 +223,13 @@ def shows_captions(step, show_captions):
     # Prevent cookies from overriding course settings
     world.browser.cookies.delete('hide_captions')
     if show_captions == 'does not':
-        assert world.css_find('.video')[0].has_class('closed')
+        attempt = 0
+        while attempt < 5:
+            try:
+                assert world.css_find('.video')[0].has_class('closed')
+            except:
+                attempt += 1
+        assert_true(attempt < 5, "There was a stale reference exception in accessing the class of the video")
     else:
         assert world.is_css_not_present('.video.closed')
 
