@@ -39,7 +39,7 @@ class TabsEditingDescriptor(EditingFields, MakoModuleDescriptor):
     js_module_name = "TabsEditorDescriptor"
 
     def get_context(self):
-        _context = MakoModuleDescriptor.get_context(self)
+        _context = super(TabsEditingDescriptor, self).get_context()
         # Add our specific template information (the raw data body)
         _context.update({
             'tabs': self.tabs,

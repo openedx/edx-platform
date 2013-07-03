@@ -23,7 +23,9 @@ from xmodule.x_module import XModule
 from xmodule.editing_module import TabsEditingDescriptor
 from xmodule.modulestore.mongo import MongoModuleStore
 from xmodule.modulestore.django import modulestore
+from xmodule.contentstore.django import contentstore
 from xmodule.contentstore.content import StaticContent
+from xmodule.exceptions import NotFoundError
 from xblock.core import Integer, Scope, String
 
 import datetime
@@ -180,3 +182,43 @@ class VideoAlphaDescriptor(VideoAlphaFields, TabsEditingDescriptor):
             'template': "videoalpha/subtitles.html",
         }
     ]
+
+    def get_context(self):
+        """Extend context and add two additional flags:
+        'is_youtube' and 'has_subs_content'.VideoAlphaDescriptor
+
+        This context variables we use for CMS subtitles feature, where
+        we try to understand, must we show some buttons or not.
+        """
+        _context = super(VideoAlphaDescriptor, self).get_context()
+
+        xmltree = etree.fromstring(self.data)
+        youtube_attr = xmltree.get('youtube')
+        sub_attr = xmltree.get('sub')
+
+        content = None
+        if youtube_attr:
+            youtube_ids = [i.split(':')[1] for i in youtube_attr.split(',')]
+            for subs in youtube_ids:
+                filename = 'subs_{0}.srt.sjson'.format(subs)
+                content_location = StaticContent.compute_location(
+                    self.location.org, self.location.course, filename)
+                try:
+                    content = contentstore().find(content_location)
+                    break
+                except NotFoundError:
+                    continue
+        elif sub_attr:
+            filename = 'subs_{0}.srt.sjson'.format(sub_attr)
+            content_location = StaticContent.compute_location(
+                self.location.org, self.location.course, filename)
+            try:
+                content = contentstore().find(content_location)
+            except NotFoundError:
+                pass
+
+        _context.update({
+            'is_youtube': bool(youtube_attr),
+            'has_subs_content': bool(content)
+        })
+        return _context
