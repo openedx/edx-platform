@@ -140,7 +140,11 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
             - 'rand_hint_1' and 'rand_hint_2' are two random hints to the answer in `get`.
             - 'answer' is the parsed answer that was submitted.
         """
-        answer = self.capa_answer_to_str(get)
+        try:
+            answer = self.capa_answer_to_str(get)
+        except ValueError:
+            # Sometimes, we get an answer that's just not parsable.  Do nothing.
+            return
         # Look for a hint to give.
         # Make a local copy of self.hints - this means we only need to do one json unpacking.
         # (This is because xblocks storage makes the following command a deep copy.)
