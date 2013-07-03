@@ -3,6 +3,7 @@ from django.core.exceptions import PermissionDenied
 from django.conf import settings
 
 from xmodule.modulestore import Location
+from course_creators import views
 
 '''
 This code is somewhat duplicative of access.py in the LMS. We will unify the code as a separate story
@@ -221,3 +222,6 @@ def _grant_instructors_creator_access(caller):
         if group.name.startswith(INSTRUCTOR_ROLE_NAME + "_"):
             for user in group.user_set.all():
                 add_user_to_creator_group(caller, user)
+                views.add_user_with_status_granted(user)
+        elif group.name.startswith(STAFF_ROLE_NAME + "_"):
+            views.add_user_with_status_unrequested(user)
