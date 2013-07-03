@@ -22,6 +22,7 @@ class XModuleCourseFactory(Factory):
     def _create(cls, target_class, **kwargs):
 
         template = Location('i4x', 'edx', 'templates', 'course', 'Empty')
+        kwargs.pop('template', None)
         org = kwargs.pop('org', None)
         number = kwargs.pop('number', None)
         display_name = kwargs.pop('display_name', None)
@@ -51,9 +52,13 @@ class XModuleCourseFactory(Factory):
             ]
         )
 
-        data = kwargs.pop('data', None)
-        if data is not None:
-            store.update_item(new_course.location, data)
+        data = kwargs.pop('data', {})
+        if data:
+            if isinstance(data, dict):
+                for k, v in data.iteritems():
+                    setattr(new_course, k, v)
+            else:
+                store.update_item(new_course.location, data)
 
         # The rest of kwargs become attributes on the course:
         for k, v in kwargs.iteritems():
