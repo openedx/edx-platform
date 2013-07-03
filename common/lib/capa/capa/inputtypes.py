@@ -1317,15 +1317,18 @@ class ChoiceTextGroup(InputTypeBase):
     RadioButton problem
     <problem>
       <startouttext/>
-        You have a list of numbers [1,2,3] . If you remove the 3, the sum:
+        You have a list of numbers [1,2,3] . If you remove the 3:
       <endouttext/>
       <choicetextresponse>
         <radiotextgroup>
-          <choice correct="false">Increases by
-            <textinput/></choice>
-          <choice correct="false">Stays the same</choice>
-          <choice correct="true">Goes down by
+          <choice correct="false"><The sum decreases by
+            <textinput/>
+            and the mean stays the same</choice>
+          <choice correct="false">The mean and the sum stay the same</choice>
+          <choice correct="true">The sum goes down by
             <textinput tolerance=".3" answer="3"/>
+            and the mean goes down by
+            <textinput tolerance =".3" answer="0.5"/>
           </choice>
         </radiotextgroup>
       </choicetextresponse>
@@ -1368,7 +1371,7 @@ class ChoiceTextGroup(InputTypeBase):
             raise Exception("ChoiceGroup: unexpected tag {0}".format(self.tag))
 
         if self.value == '':
-            #need an iterable json value to start with
+            # Make `value` an empty dict, if it currently has an empty value
             self.value = {}
         self.choices = self.extract_choices(self.xml)
 
@@ -1409,8 +1412,8 @@ class ChoiceTextGroup(InputTypeBase):
                   {'type': 'textinput',
                    'contents': "1_2_1_choiceinput0_textinput_0",
                    'tail_text': 'Is the mean of the list',
-                  'value': ''
-                  }
+                   'value': ''
+                   }
                 ]
              ),
             ("1_2_1_choiceinput_1bc",
@@ -1454,13 +1457,7 @@ class ChoiceTextGroup(InputTypeBase):
                 else:
                     adder['contents'] = elt.text
 
-                # If there is tail text("is the mean" in the example") add it
-
-                """ if elt.tail:
-                    adder['tail_text'] = elt.tail
-                else:
-                    adder['tail_text'] = ''
-                """
+                # Add any tail text("is the mean" in the example)
                 adder['tail_text'] = elt.tail if elt.tail else ''
                 components.append(adder)
 
