@@ -10,7 +10,7 @@ class CMS.Views.SubtitlesDownload extends Backbone.View
     @render()
 
   render: ->
-    if @options.subtitlesExist is true
+    if @options.subtitlesExist is 'True'
       id = encodeURIComponent(@options.component_id)
       html = @$el.append(
           $('<a></a>',

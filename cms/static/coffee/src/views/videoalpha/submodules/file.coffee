@@ -90,6 +90,22 @@ class CMS.Views.SubtitlesImportFile extends Backbone.View
   xhrCompleteHandler: (xhr) ->
     resp = JSON.parse(xhr.responseText)
     if xhr.status is 200 and resp.success is true
+        @updateData(resp.xml)
         @messages.render('success')
     else
         @messages.render('error')
+
+  updateData: (xml) ->
+    if xml
+      editBox = @options
+        .$container
+        .closest('.tabs-wrapper')
+        .find('.edit-box').first()
+      editBox.val(xml)
+      advanced_editor = editBox.data('CodeMirror')
+
+      if advanced_editor
+        advanced_editor.setValue(xml)
+        advanced_editor.refresh()
+
+

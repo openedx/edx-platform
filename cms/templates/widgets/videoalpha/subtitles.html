@@ -17,7 +17,8 @@
             tpl: {
                 file: _.template($('#subtitles-import-from-file-${html_id}-tpl').text())
             },
-            subtitlesExist: true,
+            isYoutube: '${is_youtube}',
+            subtitlesExist: '${has_subs_content}',
             msg: CMS.Views.SubtitlesMessages,
             modules: [
                 CMS.Views.SubtitlesImportFile,

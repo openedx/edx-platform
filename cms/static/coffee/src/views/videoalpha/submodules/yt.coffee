@@ -13,15 +13,16 @@ class CMS.Views.SubtitlesImportYT extends Backbone.View
     @render()
 
   render: ->
-    html = @$el.append(
-        $('<a></a>',
-            class: "blue-button"
-            id: @link_id
-            href: "#"
-        )
-        .text(gettext("Import from Youtube"))
-    )
-    .appendTo(@options.$container)
+    if @options.isYoutube is 'True'
+      html = @$el.append(
+          $('<a></a>',
+              class: "blue-button"
+              id: @link_id
+              href: "#"
+          )
+          .text(gettext("Import from Youtube"))
+      )
+      .appendTo(@options.$container)
 
   clickHandler: (event) ->
     event.preventDefault()
