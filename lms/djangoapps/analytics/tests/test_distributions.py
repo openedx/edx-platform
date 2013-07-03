@@ -14,10 +14,10 @@ class TestAnalyticsDistributions(TestCase):
     def setUp(self):
         self.course_id = 'some/robot/course/id'
 
-        self.users = tuple(UserFactory(
+        self.users = [UserFactory(
             profile__gender=['m', 'f', 'o'][i % 3],
             profile__year_of_birth=i + 1930
-        ) for i in xrange(30))
+        ) for i in xrange(30)]
 
         self.ces = tuple(CourseEnrollment.objects.create(course_id=self.course_id, user=user) for user in self.users)
 
@@ -25,13 +25,6 @@ class TestAnalyticsDistributions(TestCase):
     def test_profile_distribution_bad_feature(self):
         feature = 'robot-not-a-real-feature'
         self.assertNotIn(feature, AVAILABLE_PROFILE_FEATURES)
-        profile_distribution(self.course_id, feature)
-
-    @raises(NotImplementedError)
-    def test_profile_distribution_not_implemented_feature(self):
-        feature = 'ROBOT_DO_NOT_USE_FEATURE'
-        AVAILABLE_PROFILE_FEATURES.append(feature)
-        self.assertIn(feature, AVAILABLE_PROFILE_FEATURES)
         profile_distribution(self.course_id, feature)
 
     def test_profile_distribution_easy_choice(self):
