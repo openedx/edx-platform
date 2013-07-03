@@ -11,6 +11,7 @@ class Migration(SchemaMigration):
         # Adding model 'CourseCreator'
         db.create_table('course_creators_coursecreator', (
             ('username', self.gf('django.db.models.fields.CharField')(unique=True, max_length=64, primary_key=True)),
+            ('email', self.gf('django.db.models.fields.CharField')(max_length=128)),
             ('state_changed', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
             ('state', self.gf('django.db.models.fields.CharField')(default='u', max_length=1)),
             ('note', self.gf('django.db.models.fields.CharField')(max_length=512, blank=True)),
@@ -26,6 +27,7 @@ class Migration(SchemaMigration):
     models = {
         'course_creators.coursecreator': {
             'Meta': {'object_name': 'CourseCreator'},
+            'email': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
             'note': ('django.db.models.fields.CharField', [], {'max_length': '512', 'blank': 'True'}),
             'state': ('django.db.models.fields.CharField', [], {'default': "'u'", 'max_length': '1'}),
             'state_changed': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),

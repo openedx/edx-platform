@@ -4,7 +4,7 @@ Table for storing information about whether or not Studio users have course crea
 from django.db import models
 from django.db.models.signals import post_init, post_save
 from django.dispatch import receiver
-from auth.authz import add_user_to_creator_group, remove_user_from_creator_group
+from auth.authz import add_user_to_creator_group, remove_user_from_creator_group, get_user_by_email
 
 import datetime
 
@@ -21,6 +21,7 @@ class CourseCreator(models.Model):
         )
 
     username = models.CharField(max_length=64, blank=False, help_text="Studio username", primary_key=True, unique=True)
+    email = models.CharField(max_length=128, blank=False, help_text="Registered e-mail address")
     state_changed = models.DateTimeField('state last updated', auto_now_add=True,
                                          help_text='The date when state was last updated')
     state = models.CharField(max_length=1, blank=False, choices=STATES, default='u',
@@ -30,14 +31,20 @@ class CourseCreator(models.Model):
 
 
     def __unicode__(self):
-        s = "%s | %s [%s] | %s" % (self.username, self.state, self.state_changed, self.note)
+        s = "%s %s | %s [%s] | %s" % (self.username, self.email, self.state, self.state_changed, self.note)
         return s
 
 
 @receiver(post_init, sender=CourseCreator)
 def post_init_callback(sender, **kwargs):
     instance = kwargs['instance']
-    instance.orig_state = instance.state
+    user = get_user_by_email(instance.email)
+    if user is None:
+        # User has been removed, delete from this table.
+        instance.delete()
+    else:
+        instance.orig_state = instance.state
+
 
 @receiver(post_save, sender=CourseCreator)
 def post_save_callback(sender, **kwargs):
@@ -46,12 +53,13 @@ def post_save_callback(sender, **kwargs):
     # modify it for changes to the notes field.
     if instance.state != instance.orig_state:
         instance.state_changed = datetime.datetime.now()
+        # We removed bad users in post_init.
+        user = get_user_by_email(instance.email)
         if instance.state == 'g':
-            # add to course group
-            instance.state = 'g'
+            # We have granted access, add to course group
+            add_user_to_creator_group(instance.admin, user)
         else:
-            # remove from course group
-            instance.state = instance.state
+            remove_user_from_creator_group(instance.admin, user)
 
         instance.orig_state = instance.state
         instance.save()

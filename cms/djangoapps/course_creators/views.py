@@ -1,3 +1,6 @@
+"""
+Methods for interacting programmatically with the user creator table.
+"""
 from course_creators.models import CourseCreator
 
 
@@ -14,7 +17,11 @@ def add_user_with_status_granted(user):
     """
     _add_user(user, 'g')
 
+
 def _add_user(user, state):
+    """
+    Adds a user to the course creator table with the specified state.
+    """
     if CourseCreator.objects.filter(username=user.username).count() == 0:
-        entry = CourseCreator(username=user.username, state=state)
+        entry = CourseCreator(username=user.username, email=user.email, state=state)
         entry.save()

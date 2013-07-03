@@ -3,7 +3,6 @@ from django.core.exceptions import PermissionDenied
 from django.conf import settings
 
 from xmodule.modulestore import Location
-from course_creators import views
 
 '''
 This code is somewhat duplicative of access.py in the LMS. We will unify the code as a separate story
@@ -215,13 +214,30 @@ def _grant_instructors_creator_access(caller):
     This is to be called only by either a command line code path or through an app which has already
     asserted permissions to do this action.
 
-    Gives all users with instructor role course creator rights.
+    Gives all users with instructor role course creator rights, and returns the set of
+    such users.
     This is only intended to be run once on a given environment.
     """
+    instructors = _get_users_with_role(INSTRUCTOR_ROLE_NAME)
+    for user in instructors:
+        add_user_to_creator_group(caller, user)
+    return instructors
+
+
+def get_users_with_staff_role():
+    """
+    Returns all users with the role 'staff'
+    """
+    return _get_users_with_role(STAFF_ROLE_NAME)
+
+
+def _get_users_with_role(role):
+    """
+    Returns all users with the specified role.
+    """
+    users = set()
     for group in Group.objects.all():
-        if group.name.startswith(INSTRUCTOR_ROLE_NAME + "_"):
+        if group.name.startswith(role + "_"):
             for user in group.user_set.all():
-                add_user_to_creator_group(caller, user)
-                views.add_user_with_status_granted(user)
-        elif group.name.startswith(STAFF_ROLE_NAME + "_"):
-            views.add_user_with_status_unrequested(user)
+                users.add(user)
+    return users

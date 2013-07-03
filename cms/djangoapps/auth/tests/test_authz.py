@@ -9,7 +9,8 @@ from django.core.exceptions import PermissionDenied
 
 from auth.authz import add_user_to_creator_group, remove_user_from_creator_group, is_user_in_creator_group,\
     create_all_course_groups, add_user_to_course_group, STAFF_ROLE_NAME, INSTRUCTOR_ROLE_NAME,\
-    is_user_in_course_group_role, remove_user_from_course_group, _grant_instructors_creator_access
+    is_user_in_course_group_role, remove_user_from_course_group, _grant_instructors_creator_access,\
+    get_users_with_staff_role
 
 
 class CreatorGroupTest(TestCase):
@@ -175,6 +176,18 @@ class CourseGroupTest(TestCase):
         with self.assertRaises(PermissionDenied):
             remove_user_from_course_group(self.staff, self.staff, self.location, STAFF_ROLE_NAME)
 
+    def test_get_staff(self):
+        # Do this test with staff in 2 different classes.
+        create_all_course_groups(self.creator, self.location)
+        add_user_to_course_group(self.creator, self.staff, self.location, STAFF_ROLE_NAME)
+
+        location2 = 'i4x', 'mitX', '103', 'course2', 'test2'
+        staff2 = User.objects.create_user('teststaff2', 'teststaff+courses@edx.org', 'foo')
+        create_all_course_groups(self.creator, location2)
+        add_user_to_course_group(self.creator, staff2, location2, STAFF_ROLE_NAME)
+
+        self.assertSetEqual({self.staff, staff2, self.creator}, get_users_with_staff_role())
+
 
 class GrantInstructorsCreatorAccessTest(TestCase):
     """
@@ -206,7 +219,8 @@ class GrantInstructorsCreatorAccessTest(TestCase):
 
             admin = User.objects.create_user('populate_creators_command', 'grant+creator+access@edx.org', 'foo')
             admin.is_staff = True
-            _grant_instructors_creator_access(admin)
+            instructors = _grant_instructors_creator_access(admin)
+            self.assertSetEqual({creator1, creator2}, instructors)
 
             # Now instructors only are creators.
             self.assertTrue(is_user_in_creator_group(creator1))
