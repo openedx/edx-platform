@@ -1,9 +1,12 @@
+"""
+Tests of XML export
+"""
+
 import unittest
 import pytz
 
 from datetime import datetime, timedelta, tzinfo
 from fs.osfs import OSFS
-from mock import Mock
 from path import path
 from tempfile import mkdtemp
 import shutil
@@ -136,19 +139,22 @@ class RoundTripTestCase(unittest.TestCase):
 
 
 class TestEdxJsonEncoder(unittest.TestCase):
+    """
+    Tests for xml_exporter.EdxJSONEncoder
+    """
     def setUp(self):
         self.encoder = EdxJSONEncoder()
 
         class OffsetTZ(tzinfo):
             """A timezone with non-None utcoffset"""
-            def utcoffset(self, dt):
+            def utcoffset(self, _dt):
                 return timedelta(hours=4)
 
         self.offset_tz = OffsetTZ()
 
         class NullTZ(tzinfo):
             """A timezone with None as its utcoffset"""
-            def utcoffset(self, dt):
+            def utcoffset(self, _dt):
                 return None
         self.null_utc_tz = NullTZ()
 
