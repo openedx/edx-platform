@@ -13,6 +13,7 @@ describe "CMS.Views.SubtitlesImportYT", ->
     @options =
       component_id: @html_id
       msg: @message
+      isYoutube: 'True'
       $container: $(".comp-subtitles-import-list")
 
   describe "class definition", ->
@@ -34,14 +35,25 @@ describe "CMS.Views.SubtitlesImportYT", ->
         expect(CMS.Views.SubtitlesImportYT.prototype.render).toHaveBeenCalled()
 
     describe "render", ->
-      beforeEach ->
-        @view = new CMS.Views.SubtitlesImportYT @options
+      describe "if video is youtube", ->
+        beforeEach ->
+          @view = new CMS.Views.SubtitlesImportYT @options
 
-      it "element is added into the DOM", ->
-          expect(@options.$container).toContain(@view.$el)
+        it "element is added into the DOM", ->
+            expect(@options.$container).toContain(@view.$el)
 
-      it "button is added", ->
-        expect(@view.$el).toContain('a')
+        it "button is added", ->
+          expect(@view.$el).toContain('a')
+
+      describe "if video is html5", ->
+        beforeEach ->
+          options = $.extend({}, @options, {
+            isYoutube: 'False'
+          })
+          @view = new CMS.Views.SubtitlesImportYT options
+
+        it "button should not be shown", ->
+          expect(@options.$container).not.toContain(@view.$el)
 
     describe "import", ->
       beforeEach ->

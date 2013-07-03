@@ -9,7 +9,10 @@ describe "CMS.Views.SubtitlesImportFile", ->
     ])
 
     setFixtures """
-    <ul class="comp-subtitles-import-list"></ul>
+    <div class="tabs-wrapper">
+      <ul class="comp-subtitles-import-list"></ul>
+      <textarea class="edit-box"></textarea>
+    </div>
     """
     @options =
       component_id: @html_id
@@ -175,3 +178,32 @@ describe "CMS.Views.SubtitlesImportFile", ->
                 click: @view.importHandler
           expect(@message.render).toHaveBeenCalledWith("warn", options)
 
+      describe "updateData", ->
+        beforeEach ->
+          @CodeMirrorStub = jasmine.createSpyObj('CodeMirror',
+            [
+              "setValue",
+              "refresh"
+            ]
+          )
+          $('.edit-box').data('CodeMirror', @CodeMirrorStub)
+
+          @view = new CMS.Views.SubtitlesImportFile @options
+
+        it "advanced editor is updated", ->
+          data = 'Test Data'
+          @view.updateData(data)
+          expect(@CodeMirrorStub.setValue).toHaveBeenCalledWith(data)
+          expect(@CodeMirrorStub.refresh).toHaveBeenCalled()
+
+        it "if data absent anything should happens", ->
+          @view.updateData()
+          expect(@CodeMirrorStub.setValue).not.toHaveBeenCalled()
+          expect(@CodeMirrorStub.refresh).not.toHaveBeenCalled()
+
+        it "if CodeMirror absent anything should happens", ->
+          data = 'Test Data'
+          $('.edit-box').removeData('CodeMirror')
+          @view.updateData(data)
+          expect(@CodeMirrorStub.setValue).not.toHaveBeenCalled()
+          expect(@CodeMirrorStub.refresh).not.toHaveBeenCalled()

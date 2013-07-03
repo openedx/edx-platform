@@ -9,7 +9,7 @@ describe "CMS.Views.SubtitlesDownload", ->
       component_id: @html_id
       msg: @message
       $container: $(".comp-subtitles-import-list")
-      subtitlesExist: true
+      subtitlesExist: 'True'
 
   describe "class definition", ->
     beforeEach ->
@@ -47,7 +47,7 @@ describe "CMS.Views.SubtitlesDownload", ->
 
         beforeEach ->
           options = $.extend({}, @options, {
-            subtitlesExist: false
+            subtitlesExist: 'False'
           })
           @view = new CMS.Views.SubtitlesDownload options
 
