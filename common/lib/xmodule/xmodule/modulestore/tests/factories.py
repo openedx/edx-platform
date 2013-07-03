@@ -51,8 +51,8 @@ class XModuleCourseFactory(Factory):
             ]
         )
 
-        data = kwargs.pop('data', None)
-        if data is not None:
+        data = kwargs.pop('data', {})
+        if data:
             store.update_item(new_course.location, data)
 
         # The rest of kwargs become attributes on the course:
