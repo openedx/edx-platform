@@ -115,7 +115,7 @@ def clickActionLink(checklist, task, actionText):
 
     # text will be empty initially, wait for it to populate
     def verify_action_link_text(driver):
-        return action_link.text == actionText
+        return world.css_text('#course-checklist' + str(checklist) + ' a', index=task) == actionText
 
     world.wait_for(verify_action_link_text)
-    action_link.click()
+    world.css_click('#course-checklist' + str(checklist) + ' a', index=task)
