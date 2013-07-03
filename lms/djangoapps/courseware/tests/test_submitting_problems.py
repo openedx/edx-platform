@@ -1,17 +1,10 @@
 """Integration tests for submitting problem responses and getting grades."""
 
-import logging
 import json
-import time
-import random
+from textwrap import dedent
 
-from urlparse import urlsplit, urlunsplit
-from uuid import uuid4
-
-from django.contrib.auth.models import User, Group
-from django.test import TestCase
+from django.contrib.auth.models import User
 from django.test.client import RequestFactory
-from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 
@@ -20,8 +13,6 @@ import xmodule.modulestore.django
 # Need access to internal func to put users in the right group
 from courseware import grades
 from courseware.model_data import ModelDataCache
-from courseware.access import (has_access, _course_staff_group_name,
-                               course_beta_test_group_name)
 
 from student.models import Registration
 from xmodule.error_module import ErrorDescriptor
@@ -32,27 +23,22 @@ from helpers import LoginEnrollmentTestCase
 #import factories for testing
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from capa.tests.response_xml_factory import OptionResponseXMLFactory
+from capa.tests.response_xml_factory import OptionResponseXMLFactory, CustomResponseXMLFactory, SchematicResponseXMLFactory
 
 from modulestore_config import TEST_DATA_MONGO_MODULESTORE
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
-    """Check that a course gets graded properly"""
-
-    # Subclasses should specify the course slug
-    course_slug = "UNKNOWN"
-    course_when = "UNKNOWN"
+    """
+        Check that a course gets graded properly
+    """
 
     def setUp(self):
-        xmodule.modulestore.django._MODULESTORES = {}
 
         # Create course
-        number = self.course_slug
-        course_name = 'course_name'
-
-        self.course = CourseFactory.create(display_name=course_name, number=number)
+        self.course_slug = "100"
+        self.course = CourseFactory.create(display_name="course_name", number=self.course_slug)
         assert self.course, "Couldn't load course %r" % course_name
 
         # create a test student
@@ -69,9 +55,18 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.course = modulestore().get_instance(self.course.id, self.course.location)
 
     def problem_location(self, problem_url_name):
+        """ Returns the url of the problem given the problem's name"""
         return "i4x://"+self.course.org+"/{}/problem/{}".format(self.course_slug, problem_url_name)
 
     def modx_url(self, problem_location, dispatch):
+        """
+        Return the url needed for the desired action
+
+        problem_location: location of the problem on which we want some action
+
+        dispatch: the the action string that gets passed to the view as a kwarg
+            ex. 'check_problem' for having responses processed
+        """
         return reverse(
             'modx_dispatch',
             kwargs={
@@ -85,37 +80,50 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         Submit answers to a question.
 
-        Responses is a dict mapping problem ids (not sure of the right term)
-        to answers:
+        Responses is a dict mapping problem ids to answers:
             {'2_1': 'Correct', '2_2': 'Incorrect'}
-
         """
+
         problem_location = self.problem_location(problem_url_name)
         modx_url = self.modx_url(problem_location, 'problem_check')
 
         answer_key_prefix = 'input_i4x-'+self.course.org+'-{}-problem-{}_'.format(self.course_slug, problem_url_name)
-        print modx_url
-        resp = self.client.post(modx_url, {(answer_key_prefix + k): v for k, v in responses.items()})
+
+        # format the response dictionary to be sent in the post request by adding the above prefix to each key
+        response_dict = {(answer_key_prefix + k): v for k, v in responses.items()}
+        resp = self.client.post(modx_url, response_dict)
 
         return resp
 
     def reset_question_answer(self, problem_url_name):
-        '''resets specified problem for current user'''
+        """
+        resets specified problem for current user
+        """
         problem_location = self.problem_location(problem_url_name)
         modx_url = self.modx_url(problem_location, 'problem_reset')
         resp = self.client.post(modx_url)
         return resp
 
     def add_dropdown_to_section(self, section_location, name, num_inputs=2):
-        """create and return problem with two option response inputs (dropdown)"""
+        """
+        create and return a dropdown problem
+
+        section_location: location object of section in which to create the problem
+            (problems must live in a section to be graded properly)
+
+        name: string name of the problem
+
+        num_input: the number of input fields to create in the problem
+        """
 
         problem_template = "i4x://edx/templates/problem/Blank_Common_Problem"
         prob_xml = OptionResponseXMLFactory().build_xml(
-            **{'question_text': 'The correct answer is Correct',
-                'num_inputs': num_inputs,
-                'weight': num_inputs,
-                'options': ['Correct', 'Incorrect'],
-                'correct_option': 'Correct'})
+            question_text='The correct answer is Correct',
+            num_inputs=num_inputs,
+            weight=num_inputs,
+            options=['Correct', 'Incorrect'],
+            correct_option='Correct'
+        )
 
         problem = ItemFactory.create(
             parent_location=section_location,
@@ -129,9 +137,11 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
         return problem
 
     def add_graded_section_to_course(self, name, format='Homework'):
-        """Creates a graded homework section within a chapter and returns the section"""
+        """
+        Creates a graded homework section within a chapter and returns the section
+        """
 
-        #if we don't already have a chapter create a new one
+        # if we don't already have a chapter create a new one
         if not(hasattr(self, 'chapter')):
             self.chapter = ItemFactory.create(
                 parent_location=self.course.location,
@@ -144,24 +154,41 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
             template="i4x://edx/templates/sequential/Empty",
             metadata={'graded': True, 'format': format}
         )
+
+        # now that we've added the problem and section to the course
+        # we fetch the course from the database so the object we are
+        # dealing with has these additions
         self.refresh_course()
         return section
 
 
 class TestCourseGrader(TestSubmittingProblems):
-    """Check that a course gets graded properly"""
-
-    course_slug = "graded"
-    course_when = "2012_Fall"
+    """
+    Check that a course gets graded properly
+    """
 
     def add_grading_policy(self, grading_policy):
-        '''add a grading policy to the course'''
+        """
+        add a grading policy to the course
+        """
+
         course_data = {'grading_policy': grading_policy}
         modulestore().update_item(self.course.location, course_data)
         self.refresh_course()
 
     def get_grade_summary(self):
-        '''calls grades.grade for current user and course'''
+        """
+        calls grades.grade for current user and course
+
+        the keywords for the returned object are
+        - grade : A final letter grade.
+        - percent : The final percent for the class (rounded up).
+        - section_breakdown : A breakdown of each section that makes
+            up the grade. (For display)
+        - grade_breakdown : A breakdown of the major components that
+            make up the final grade. (For display)
+        """
+
         model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
             self.course.id, self.student_user, self.course)
 
@@ -172,7 +199,17 @@ class TestCourseGrader(TestSubmittingProblems):
                             self.course, model_data_cache)
 
     def get_progress_summary(self):
-        '''return progress summary structure for current user and course'''
+        """
+        return progress summary structure for current user and course
+
+        Returns
+        - courseware_summary is a summary of all sections with problems in the course.
+        It is organized as an array of chapters, each containing an array of sections,
+        each containing an array of scores. This contains information for graded and
+        ungraded problems, and is good for displaying a course summary with due dates,
+        etc.
+        """
+
         model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
             self.course.id, self.student_user, self.course)
 
@@ -186,27 +223,41 @@ class TestCourseGrader(TestSubmittingProblems):
         return progress_summary
 
     def check_grade_percent(self, percent):
-        '''assert that percent grade is as expected'''
+        """
+        assert that percent grade is as expected
+        """
         grade_summary = self.get_grade_summary()
         self.assertEqual(grade_summary['percent'], percent)
 
-    # def check_letter_grade(self, letter):
-    #     '''assert letter grade is as expected'''
-    #     self.assertEqual(self.get_grade_summary()['grade'], letter)
-
     def earned_hw_scores(self):
-        """Global scores, each Score is a Problem Set"""
+        """
+        Global scores, each Score is a Problem Set
+
+        Returns list of scores: [<points on hw_1>, <poinst on hw_2>, ..., <poinst on hw_n>]
+        """
         return [s.earned for s in self.get_grade_summary()['totaled_scores']['Homework']]
 
     def score_for_hw(self, hw_url_name):
-        """returns list of scores for a given url"""
-        hw_section = [section for section
-                      in self.get_progress_summary()[0]['sections']
-                      if section.get('url_name') == hw_url_name][0]
+        """returns list of scores for a given url
+
+        Returns list of scores for the given homework:
+            [<points on problem_1>, <poinst on problem_2>, ..., <poinst on problem_n>]
+        """
+
+        # list of grade summaries for each section
+        sections_list = []
+        for chapter in self.get_progress_summary():
+            sections_list.extend(chapter['sections'])
+
+        # get the first section that matches the url (there should only be one)
+        hw_section = next(section for section in sections_list if section.get('url_name') == hw_url_name)
         return [s.earned for s in hw_section['scores']]
 
     def basic_setup(self):
-        '''set up a simple course for testing basic grading functionality'''
+        """
+        set up a simple course for testing basic grading functionality
+        """
+
         grading_policy = {
             "GRADER": [{
                 "type": "Homework",
@@ -222,7 +273,7 @@ class TestCourseGrader(TestSubmittingProblems):
         }
         self.add_grading_policy(grading_policy)
 
-        #set up a simple course with four problems
+        # set up a simple course with four problems
         self.homework = self.add_graded_section_to_course('homework')
         self.p1 = self.add_dropdown_to_section(self.homework.location, 'p1', 1)
         self.p2 = self.add_dropdown_to_section(self.homework.location, 'p2', 1)
@@ -230,33 +281,37 @@ class TestCourseGrader(TestSubmittingProblems):
         self.refresh_course()
 
     def weighted_setup(self):
-        '''Set up a simple course for testing weighted grading functionality'''
+        """
+        Set up a simple course for testing weighted grading functionality
+        """
+
         grading_policy = {
-            "GRADER": [
-            {
+            "GRADER": [{
                 "type": "Homework",
                 "min_count": 1,
                 "drop_count": 0,
                 "short_label": "HW",
                 "weight": 0.25
-            },
-                {
-                    "type": "Final",
-                    "name": "Final Section",
-                    "short_label": "Final",
-                    "weight": 0.75
-                }]
+            }, {
+                "type": "Final",
+                "name": "Final Section",
+                "short_label": "Final",
+                "weight": 0.75
+            }]
         }
         self.add_grading_policy(grading_policy)
 
-        #set up a structure of 1 homework and 1 final
+        # set up a structure of 1 homework and 1 final
         self.homework = self.add_graded_section_to_course('homework')
         self.problem = self.add_dropdown_to_section(self.homework.location, 'H1P1')
         self.final = self.add_graded_section_to_course('Final Section', 'Final')
         self.final_question = self.add_dropdown_to_section(self.final.location, 'FinalQuestion')
 
     def dropping_setup(self):
-        '''Set up a simple course for testing the dropping grading functionality'''
+        """
+        Set up a simple course for testing the dropping grading functionality
+        """
+
         grading_policy = {
             "GRADER": [
             {
@@ -270,32 +325,44 @@ class TestCourseGrader(TestSubmittingProblems):
         self.add_grading_policy(grading_policy)
 
         # Set up a course structure that just consists of 3 homeworks.
-        # Since the grading policy drops 1, each problem is worth 25%
+        # Since the grading policy drops 1 entire homework, each problem is worth 25%
+
+        #names for the problem in the homeworks
+        self.hw1_names = ['h1p1', 'h1p2']
+        self.hw2_names = ['h2p1', 'h2p2']
+        self.hw3_names = ['h3p1', 'h3p2']
+
         self.homework1 = self.add_graded_section_to_course('homework1')
-        self.h1p1 = self.add_dropdown_to_section(self.homework1.location, 'H1P1', 1)
-        self.h1p2 = self.add_dropdown_to_section(self.homework1.location, 'H1P2', 1)
+        self.add_dropdown_to_section(self.homework1.location, self.hw1_names[0], 1)
+        self.add_dropdown_to_section(self.homework1.location, self.hw1_names[1], 1)
         self.homework2 = self.add_graded_section_to_course('homework2')
-        self.h1p1 = self.add_dropdown_to_section(self.homework2.location, 'H2P1', 1)
-        self.h1p2 = self.add_dropdown_to_section(self.homework2.location, 'H2P2', 1)
+        self.add_dropdown_to_section(self.homework2.location, self.hw2_names[0], 1)
+        self.add_dropdown_to_section(self.homework2.location, self.hw2_names[1], 1)
         self.homework3 = self.add_graded_section_to_course('homework3')
-        self.h3p1 = self.add_dropdown_to_section(self.homework3.location, 'H3P1', 1)
-        self.h3p2 = self.add_dropdown_to_section(self.homework3.location, 'H3P2', 1)
+        self.add_dropdown_to_section(self.homework3.location, self.hw3_names[0], 1)
+        self.add_dropdown_to_section(self.homework3.location, self.hw3_names[1], 1)
 
     def test_None_grade(self):
-        '''check grade is 0 to begin'''
+        """
+        check grade is 0 to begin
+        """
         self.basic_setup()
         self.check_grade_percent(0)
         self.assertEqual(self.get_grade_summary()['grade'], None)
 
     def test_B_grade_exact(self):
-        '''check that at exactly the cutoff, the grade is B'''
+        """
+        check that at exactly the cutoff, the grade is B
+        """
         self.basic_setup()
         self.submit_question_answer('p1', {'2_1': 'Correct'})
         self.check_grade_percent(0.33)
         self.assertEqual(self.get_grade_summary()['grade'], 'B')
 
     def test_B_grade_above(self):
-        '''check grade between cutoffs'''
+        """
+        check grade between cutoffs
+        """
         self.basic_setup()
         self.submit_question_answer('p1', {'2_1': 'Correct'})
         self.submit_question_answer('p2', {'2_1': 'Correct'})
@@ -303,7 +370,9 @@ class TestCourseGrader(TestSubmittingProblems):
         self.assertEqual(self.get_grade_summary()['grade'], 'B')
 
     def test_A_grade(self):
-        '''check that 100 percent completion gets an A'''
+        """
+        check that 100 percent completion gets an A
+        """
         self.basic_setup()
         self.submit_question_answer('p1', {'2_1': 'Correct'})
         self.submit_question_answer('p2', {'2_1': 'Correct'})
@@ -312,7 +381,9 @@ class TestCourseGrader(TestSubmittingProblems):
         self.assertEqual(self.get_grade_summary()['grade'], 'A')
 
     def test_wrong_asnwers(self):
-        '''check that answering incorrectly is graded properly'''
+        """
+        check that answering incorrectly is graded properly
+        """
         self.basic_setup()
         self.submit_question_answer('p1', {'2_1': 'Correct'})
         self.submit_question_answer('p2', {'2_1': 'Correct'})
@@ -321,7 +392,9 @@ class TestCourseGrader(TestSubmittingProblems):
         self.assertEqual(self.get_grade_summary()['grade'], 'B')
 
     def test_weighted_homework(self):
-        '''test that the homework section has proper weight'''
+        """
+        test that the homework section has proper weight
+        """
         self.weighted_setup()
 
         # Get both parts correct
@@ -331,33 +404,37 @@ class TestCourseGrader(TestSubmittingProblems):
         self.assertEqual(self.score_for_hw('homework'), [2.0])
 
     def test_weighted_exam(self):
-        '''test that the exam section has the proper weight'''
+        """
+        test that the exam section has the proper weight
+        """
         self.weighted_setup()
         self.submit_question_answer('FinalQuestion', {'2_1': 'Correct', '2_2': 'Correct'})
         self.check_grade_percent(0.75)
 
     def test_weighted_total(self):
-        '''test that the weighted total adds to 100'''
+        """
+        test that the weighted total adds to 100
+        """
         self.weighted_setup()
         self.submit_question_answer('H1P1', {'2_1': 'Correct', '2_2': 'Correct'})
         self.submit_question_answer('FinalQuestion', {'2_1': 'Correct', '2_2': 'Correct'})
         self.check_grade_percent(1.0)
 
     def dropping_homework_stage1(self):
-        '''helper function for dropping tests'''
-        self.submit_question_answer('H1P1', {'2_1': 'Correct'})
-        self.submit_question_answer('H1P2', {'2_1': 'Incorrect'})
-        self.submit_question_answer('H2P1', {'2_1': 'Correct'})
-        self.submit_question_answer('H2P2', {'2_1': 'Correct'})
+        """
+        Get half the first homework correct and all of the second
+        """
+        self.submit_question_answer(self.hw1_names[0], {'2_1': 'Correct'})
+        self.submit_question_answer(self.hw1_names[1], {'2_1': 'Incorrect'})
+        for name in  self.hw2_names:
+            self.submit_question_answer(name, {'2_1': 'Correct'})
 
     def test_dropping_grades_normally(self):
-        '''test that the dropping policy does not change things before it should'''
+        """
+        test that the dropping policy does not change things before it should
+        """
         self.dropping_setup()
-        # get half the first homework correct and all of homework2
-        self.submit_question_answer('H1P1', {'2_1': 'Correct'})
-        self.submit_question_answer('H1P2', {'2_1': 'Incorrect'})
-        self.submit_question_answer('H2P1', {'2_1': 'Correct'})
-        self.submit_question_answer('H2P2', {'2_1': 'Correct'})
+        self.dropping_homework_stage1()
 
         self.assertEqual(self.score_for_hw('homework1'), [1.0, 0.0])
         self.assertEqual(self.score_for_hw('homework2'), [1.0, 1.0])
@@ -365,12 +442,12 @@ class TestCourseGrader(TestSubmittingProblems):
         self.check_grade_percent(0.75)
 
     def test_dropping_nochange(self):
-        '''tests that grade does not change when making the global homework grade minimum not unique'''
+        """
+        tests that grade does not change when making the global homework grade minimum not unique
+        """
         self.dropping_setup()
-
-        # get half the first homework correct and all of homework2
         self.dropping_homework_stage1()
-        self.submit_question_answer('H3P1', {'2_1': 'Correct'})
+        self.submit_question_answer(self.hw3_names[0], {'2_1': 'Correct'})
 
         self.assertEqual(self.score_for_hw('homework1'), [1.0, 0.0])
         self.assertEqual(self.score_for_hw('homework2'), [1.0, 1.0])
@@ -379,12 +456,14 @@ class TestCourseGrader(TestSubmittingProblems):
         self.check_grade_percent(0.75)
 
     def test_dropping_all_correct(self):
-        '''test that the lowest is dropped for a perfect score'''
+        """
+        test that the lowest is dropped for a perfect score
+        """
         self.dropping_setup()
 
         self.dropping_homework_stage1()
-        self.submit_question_answer('H3P1', {'2_1': 'Correct'})
-        self.submit_question_answer('H3P2', {'2_1': 'Correct'})
+        for name in self.hw3_names:
+            self.submit_question_answer(name, {'2_1': 'Correct'})
 
         self.check_grade_percent(1.0)
         self.assertEqual(self.earned_hw_scores(), [1.0, 2.0, 2.0])   # Order matters
@@ -392,10 +471,97 @@ class TestCourseGrader(TestSubmittingProblems):
 
 
 class TestPythonGradedResponse(TestSubmittingProblems):
-    """Check that we can submit a schematic response and custom response, and it answers properly."""
+    """
+    Check that we can submit a schematic and custom response, and it answers properly.
+    """
 
-    course_slug = "embedded_python"
-    course_when = "2013_Spring"
+    SCHEMATIC_SCRIPT = dedent("""
+        # for a schematic response, submission[i] is the json representation
+        # of the diagram and analysis results for the i-th schematic tag
+
+        def get_tran(json,signal):
+          for element in json:
+            if element[0] == 'transient':
+              return element[1].get(signal,[])
+          return []
+
+        def get_value(at,output):
+          for (t,v) in output:
+            if at == t: return v
+          return None
+
+        output = get_tran(submission[0],'Z')
+        okay = True
+
+        # output should be 1, 1, 1, 1, 1, 0, 0, 0
+        if get_value(0.0000004, output) < 2.7: okay = False;
+        if get_value(0.0000009, output) < 2.7: okay = False;
+        if get_value(0.0000014, output) < 2.7: okay = False;
+        if get_value(0.0000019, output) < 2.7: okay = False;
+        if get_value(0.0000024, output) < 2.7: okay = False;
+        if get_value(0.0000029, output) > 0.25: okay = False;
+        if get_value(0.0000034, output) > 0.25: okay = False;
+        if get_value(0.0000039, output) > 0.25: okay = False;
+
+        correct = ['correct' if okay else 'incorrect']""").strip()
+
+    SCHEMATIC_CORRECT = json.dumps(
+        [['transient', {'Z': [
+            [0.0000004, 2.8],
+            [0.0000009, 2.8],
+            [0.0000014, 2.8],
+            [0.0000019, 2.8],
+            [0.0000024, 2.8],
+            [0.0000029, 0.2],
+            [0.0000034, 0.2],
+            [0.0000039, 0.2]
+        ]}]]
+    )
+
+    SCHEMATIC_INCORRECT = json.dumps(
+        [['transient', {'Z': [
+            [0.0000004, 2.8],
+            [0.0000009, 0.0],  # wrong.
+            [0.0000014, 2.8],
+            [0.0000019, 2.8],
+            [0.0000024, 2.8],
+            [0.0000029, 0.2],
+            [0.0000034, 0.2],
+            [0.0000039, 0.2]
+        ]}]]
+    )
+
+    CUSTOM_RESPONSE_SCRIPT = dedent("""
+        def test_csv(expect, ans):
+            # Take out all spaces in expected answer
+            expect = [i.strip(' ') for i in str(expect).split(',')]
+            # Take out all spaces in student solution
+            ans = [i.strip(' ') for i in str(ans).split(',')]
+
+            def strip_q(x):
+                # Strip quotes around strings if students have entered them
+                stripped_ans = []
+                for item in x:
+                    if item[0] == "'" and item[-1]=="'":
+                        item = item.strip("'")
+                    elif item[0] == '"' and item[-1] == '"':
+                        item = item.strip('"')
+                    stripped_ans.append(item)
+                return stripped_ans
+
+            return strip_q(expect) == strip_q(ans)""").strip()
+
+    CUSTOM_RESPONSE_CORRECT = "0, 1, 2, 3, 4, 5, 'Outside of loop', 6"
+    CUSTOM_RESPONSE_INCORRECT = "coursera"  # :P
+
+    COMPUTED_ANSWER_SCRIPT = dedent("""
+        if submission[0] == "Xyzzy":
+            correct = ['correct']
+        else:
+            correct = ['incorrect']""").strip()
+
+    COMPUTED_ANSWER_CORRECT = "Xyzzy"
+    COMPUTED_ANSWER_INCORRECT = "axyxa"
 
     def setUp(self):
         super(TestPythonGradedResponse, self).setUp()
@@ -404,38 +570,13 @@ class TestPythonGradedResponse(TestSubmittingProblems):
         self.incorrect_responses = {}
 
     def schematic_setup(self, name):
-        '''set up an example Circuit_Schematic_Builder problem'''
+        """
+        set up an example Circuit_Schematic_Builder problem
+        """
 
-        from capa.tests.response_xml_factory import SchematicResponseXMLFactory
         schematic_template = "i4x://edx/templates/problem/Circuit_Schematic_Builder"
-        script = """# for a schematic response, submission[i] is the json representation
-# of the diagram and analysis results for the i-th schematic tag
+        script = self.SCHEMATIC_SCRIPT
 
-def get_tran(json,signal):
-  for element in json:
-    if element[0] == 'transient':
-      return element[1].get(signal,[])
-  return []
-
-def get_value(at,output):
-  for (t,v) in output:
-    if at == t: return v
-  return None
-
-output = get_tran(submission[0],'Z')
-okay = True
-
-# output should be 1, 1, 1, 1, 1, 0, 0, 0
-if get_value(0.0000004, output) < 2.7: okay = False;
-if get_value(0.0000009, output) < 2.7: okay = False;
-if get_value(0.0000014, output) < 2.7: okay = False;
-if get_value(0.0000019, output) < 2.7: okay = False;
-if get_value(0.0000024, output) < 2.7: okay = False;
-if get_value(0.0000029, output) > 0.25: okay = False;
-if get_value(0.0000034, output) > 0.25: okay = False;
-if get_value(0.0000039, output) > 0.25: okay = False;
-
-correct = ['correct' if okay else 'incorrect']"""
         xmldata = SchematicResponseXMLFactory().build_xml(answer=script)
         problem = ItemFactory.create(
             parent_location=self.section.location,
@@ -445,58 +586,20 @@ correct = ['correct' if okay else 'incorrect']"""
         )
 
                 #define the correct and incorrect responses to this problem
-        self.correct_responses[name] = json.dumps(
-            [['transient', {'Z': [
-                [0.0000004, 2.8],
-                [0.0000009, 2.8],
-                [0.0000014, 2.8],
-                [0.0000019, 2.8],
-                [0.0000024, 2.8],
-                [0.0000029, 0.2],
-                [0.0000034, 0.2],
-                [0.0000039, 0.2]
-            ]}]]
-        )
+        self.correct_responses[name] = self.SCHEMATIC_CORRECT
+        self.incorrect_responses[name] = self.SCHEMATIC_INCORRECT
 
-        self.incorrect_responses[name] = json.dumps(
-            [['transient', {'Z': [
-                [0.0000004, 2.8],
-                [0.0000009, 0.0],  # wrong.
-                [0.0000014, 2.8],
-                [0.0000019, 2.8],
-                [0.0000024, 2.8],
-                [0.0000029, 0.2],
-                [0.0000034, 0.2],
-                [0.0000039, 0.2]
-            ]}]]
-        )
-
+        # re-fetch the course from the database so the object is up to date
         self.refresh_course()
 
-    def costum_response_setup(self, name):
-        '''set up an example custom response problem using a check function'''
+    def custom_response_setup(self, name):
+        """
+        set up an example custom response problem using a check function
+        """
 
-        from capa.tests.response_xml_factory import CustomResponseXMLFactory
         custom_template = "i4x://edx/templates/problem/Custom_Python-Evaluated_Input"
-        test_csv = """def test_csv(expect, ans):
-   # Take out all spaces in expected answer
-   expect = [i.strip(' ') for i in str(expect).split(',')]
-   # Take out all spaces in student solution
-   ans = [i.strip(' ') for i in str(ans).split(',')]
-
-   def strip_q(x):
-      # Strip quotes around strings if students have entered them
-      stripped_ans = []
-      for item in x:
-         if item[0] == "'" and item[-1]=="'":
-            item = item.strip("'")
-         elif item[0] == '"' and item[-1] == '"':
-            item = item.strip('"')
-         stripped_ans.append(item)
-      return stripped_ans
-
-   return strip_q(expect) == strip_q(ans)"""
-        expect = "0, 1, 2, 3, 4, 5, 'Outside of loop', 6"
+        test_csv = self.CUSTOM_RESPONSE_SCRIPT
+        expect = self.CUSTOM_RESPONSE_CORRECT
         cfn_problem_xml = CustomResponseXMLFactory().build_xml(script=test_csv, cfn='test_csv', expect=expect)
 
         problem = ItemFactory.create(
@@ -507,20 +610,18 @@ correct = ['correct' if okay else 'incorrect']"""
         )
 
         self.correct_responses[name] = expect
-        self.incorrect_responses[name] = 'Xyzzy'
+        self.incorrect_responses[name] = self.CUSTOM_RESPONSE_INCORRECT
 
         self.refresh_course()
         return problem
 
     def computed_answer_setup(self, name):
-        '''set up an example problem using an answer script'''
+        """
+        set up an example problem using an answer script'''
+        """
 
-        script = """if submission[0] == "Xyzzy":
-    correct = ['correct']
-else:
-    correct = ['incorrect']"""
+        script = self.COMPUTED_ANSWER_SCRIPT
 
-        from capa.tests.response_xml_factory import CustomResponseXMLFactory
         custom_template = "i4x://edx/templates/problem/Custom_Python-Evaluated_Input"
 
         computed_xml = CustomResponseXMLFactory().build_xml(answer=script)
@@ -532,33 +633,39 @@ else:
             display_name=name
         )
 
-        self.correct_responses[name] = 'Xyzzy'
-        self.incorrect_responses[name] = "No!"
+        self.correct_responses[name] = self.COMPUTED_ANSWER_CORRECT
+        self.incorrect_responses[name] = self.COMPUTED_ANSWER_INCORRECT
 
         self.refresh_course()
         return problem
 
     def check_correct(self, name):
-        '''check that problem named "name" gets evaluated correctly correctly'''
+        """
+        check that problem named "name" gets evaluated correctly correctly
+        """
         resp = self.submit_question_answer(name, {'2_1': self.correct_responses[name]})
 
         respdata = json.loads(resp.content)
         self.assertEqual(respdata['success'], 'correct')
 
     def check_incorrect(self, name):
-        '''check that problem named "name" gets evaluated incorrectly correctly'''
+        """
+        check that problem named "name" gets evaluated incorrectly correctly
+        """
         resp = self.submit_question_answer(name, {'2_1': self.incorrect_responses[name]})
 
         respdata = json.loads(resp.content)
         self.assertEqual(respdata['success'], 'incorrect')
 
     def check_reset(self, name):
-        '''check that the problem can be reset'''
-        #first, get the question wrong
+        """
+        Check that the problem can be reset
+        """
+        # first, get the question wrong
         resp = self.submit_question_answer(name, {'2_1': self.incorrect_responses[name]})
-        #reset the question
+        # reset the question
         self.reset_question_answer(name)
-        #then get it right
+        # then get it right
         resp = self.submit_question_answer(name, {'2_1': self.correct_responses[name]})
 
         respdata = json.loads(resp.content)
@@ -581,17 +688,17 @@ else:
 
     def test_check_function_correct(self):
         name = 'cfn_problem'
-        self.costum_response_setup(name)
+        self.custom_response_setup(name)
         self.check_correct(name)
 
     def test_check_function_incorrect(self):
         name = 'cfn_problem'
-        self.costum_response_setup(name)
+        self.custom_response_setup(name)
         self.check_incorrect(name)
 
     def test_check_function_reset(self):
         name = 'cfn_problem'
-        self.costum_response_setup(name)
+        self.custom_response_setup(name)
         self.check_reset(name)
 
     def test_computed_correct(self):
