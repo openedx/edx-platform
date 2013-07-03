@@ -3,7 +3,7 @@ from django.conf import settings
 
 
 def can_execute_unsafe_code(course_id):
-    '''
+    """
     Determine if this course is allowed to run unsafe code.
 
     For use from the ModuleStore.  Checks the `course_id` against a list of whitelisted
@@ -11,7 +11,7 @@ def can_execute_unsafe_code(course_id):
 
     Returns a boolean, true if the course can run outside the sandbox.
 
-    '''
+    """
     # To decide if we can run unsafe code, we check the course id against
     # a list of regexes configured on the server.
     for regex in settings.COURSES_WITH_UNSAFE_CODE:
