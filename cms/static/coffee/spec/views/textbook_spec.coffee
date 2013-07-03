@@ -349,7 +349,6 @@ describe "CMS.Views.UploadDialog", ->
         it "should render without a file selected", ->
             @view.render()
             expect(@view.$el).toContain("input[type=file]")
-            # expect(@view.$(".action-upload")).toBeDisabled()
             expect(@view.$(".action-upload")).toHaveClass("disabled")
 
         it "should render with a PDF selected", ->
@@ -359,7 +358,6 @@ describe "CMS.Views.UploadDialog", ->
             @view.render()
             expect(@view.$el).toContain("input[type=file]")
             expect(@view.$el).not.toContain("#upload_error")
-            # expect(@view.$(".action-upload")).not.toBeDisabled()
             expect(@view.$(".action-upload")).not.toHaveClass("disabled")
 
         it "should render an error with an invalid file type selected", ->
@@ -369,7 +367,6 @@ describe "CMS.Views.UploadDialog", ->
             @view.render()
             expect(@view.$el).toContain("input[type=file]")
             expect(@view.$el).toContain("#upload_error")
-            # expect(@view.$(".action-upload")).toBeDisabled()
             expect(@view.$(".action-upload")).toHaveClass("disabled")
 
 
