@@ -366,25 +366,6 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
 
-    @override_settings(COURSES_WITH_UNSAFE_CODE=['edX/dummycourse/.*'])
-    def test_module_preview_not_in_whitelist(self):
-        '''
-        Tests the ajax callback to render an XModule problem but we don't have the course listed in
-        our whitelist.
-        '''
-        direct_store = modulestore('direct')
-        import_from_xml(direct_store, 'common/test/data/', ['full'])
-
-        html_module_location = Location(['i4x', 'edX', 'full', 'html', 'html_90', None])
-
-        url = reverse('preview_component', kwargs={'location': html_module_location.url()})
-
-        # also try a custom response which will trigger the 'is this course in whitelist' logic
-        problem_module_location = Location(['i4x', 'edX', 'full', 'problem', 'H1P1_Energy', None])
-        url = reverse('preview_component', kwargs={'location': problem_module_location.url()})
-        resp = self.client.get(url)
-        self.assertEqual(resp.status_code, 200)
-
     def test_delete(self):
         direct_store = modulestore('direct')
         import_from_xml(direct_store, 'common/test/data/', ['full'])
