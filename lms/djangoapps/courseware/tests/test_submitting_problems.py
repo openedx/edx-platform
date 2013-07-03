@@ -642,7 +642,7 @@ class TestPythonGradedResponse(TestSubmittingProblems):
         self.refresh_course()
         return problem
 
-    def check_correct(self, name):
+    def _check_correct(self, name):
         """
         check that problem named "name" gets evaluated correctly correctly
         """
@@ -651,7 +651,7 @@ class TestPythonGradedResponse(TestSubmittingProblems):
         respdata = json.loads(resp.content)
         self.assertEqual(respdata['success'], 'correct')
 
-    def check_incorrect(self, name):
+    def _check_incorrect(self, name):
         """
         check that problem named "name" gets evaluated incorrectly correctly
         """
@@ -660,7 +660,7 @@ class TestPythonGradedResponse(TestSubmittingProblems):
         respdata = json.loads(resp.content)
         self.assertEqual(respdata['success'], 'incorrect')
 
-    def check_reset(self, name):
+    def _check_ireset(self, name):
         """
         Check that the problem can be reset
         """
@@ -677,44 +677,44 @@ class TestPythonGradedResponse(TestSubmittingProblems):
     def test_schematic_correct(self):
         name = "schematic_problem"
         self.schematic_setup(name)
-        self.check_correct(name)
+        self._check_correct(name)
 
     def test_schematic_incorrect(self):
         name = "schematic_problem"
         self.schematic_setup(name)
-        self.check_incorrect(name)
+        self._check_incorrect(name)
 
     def test_schematic_reset(self):
         name = "schematic_problem"
         self.schematic_setup(name)
-        self.check_reset(name)
+        self._check_ireset(name)
 
     def test_check_function_correct(self):
         name = 'cfn_problem'
         self.custom_response_setup(name)
-        self.check_correct(name)
+        self._check_correct(name)
 
     def test_check_function_incorrect(self):
         name = 'cfn_problem'
         self.custom_response_setup(name)
-        self.check_incorrect(name)
+        self._check_incorrect(name)
 
     def test_check_function_reset(self):
         name = 'cfn_problem'
         self.custom_response_setup(name)
-        self.check_reset(name)
+        self._check_ireset(name)
 
     def test_computed_correct(self):
         name = 'computed_answer'
         self.computed_answer_setup(name)
-        self.check_correct(name)
+        self._check_correct(name)
 
     def test_computed_incorrect(self):
         name = 'computed_answer'
         self.computed_answer_setup(name)
-        self.check_incorrect(name)
+        self._check_incorrect(name)
 
     def test_computed_reset(self):
         name = 'computed_answer'
         self.computed_answer_setup(name)
-        self.check_reset(name)
+        self._check_ireset(name)
