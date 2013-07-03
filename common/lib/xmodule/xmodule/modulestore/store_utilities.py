@@ -137,10 +137,6 @@ def delete_course(modulestore, contentstore, source_location, commit=False):
     courseware store. BE VERY CAREFUL, this is not reversable.
     """
 
-    # first check to see if the modulestore is Mongo backed
-    if not isinstance(modulestore, MongoModuleStore):
-        raise Exception("Expected a MongoModuleStore in the runtime. Aborting....")
-
     # check to see if the source course is actually there
     if not modulestore.has_item(source_location):
         raise Exception("Cannot find a course at {0}. Aborting".format(source_location))
