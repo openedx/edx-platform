@@ -588,7 +588,7 @@ class TestPythonGradedResponse(TestSubmittingProblems):
             data=xmldata
         )
 
-                #define the correct and incorrect responses to this problem
+        # define the correct and incorrect responses to this problem
         self.correct_responses[name] = self.SCHEMATIC_CORRECT
         self.incorrect_responses[name] = self.SCHEMATIC_INCORRECT
 
@@ -612,9 +612,11 @@ class TestPythonGradedResponse(TestSubmittingProblems):
             display_name=name
         )
 
+        # define the correct and incorrect responses to this problem
         self.correct_responses[name] = expect
         self.incorrect_responses[name] = self.CUSTOM_RESPONSE_INCORRECT
 
+        # re-fetch the course from the database so the object is up to date
         self.refresh_course()
 
     def computed_answer_setup(self, name):
@@ -635,9 +637,11 @@ class TestPythonGradedResponse(TestSubmittingProblems):
             display_name=name
         )
 
+        # define the correct and incorrect responses to this problem
         self.correct_responses[name] = self.COMPUTED_ANSWER_CORRECT
         self.incorrect_responses[name] = self.COMPUTED_ANSWER_INCORRECT
 
+        # re-fetch the course from the database so the object is up to date
         self.refresh_course()
 
     def _check_correct(self, name):
