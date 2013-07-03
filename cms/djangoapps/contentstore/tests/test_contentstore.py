@@ -612,17 +612,41 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.assertEqual(resp.status_code, 400)
 
     def test_delete_course(self):
+        """
+        This test will import a course, make a draft item, and delete it. This will also assert that the
+        draft content is also deleted
+        """
         module_store = modulestore('direct')
-        import_from_xml(module_store, 'common/test/data/', ['full'])
-
         content_store = contentstore()
+        draft_store = modulestore('draft')
+
+        import_from_xml(module_store, 'common/test/data/', ['full'], static_content_store=content_store)
 
         location = CourseDescriptor.id_to_location('edX/full/6.002_Spring_2012')
 
+        # verify that we actually have assets
+        assets = content_store.get_all_content_for_course(location)
+        self.assertNotEquals(len(assets), 0)
+
+        # get a vertical (and components in it) to put into 'draft'
+        vertical = module_store.get_item(Location(['i4x', 'edX', 'full',
+                                         'vertical', 'vertical_66', None]), depth=1)
+
+        draft_store.clone_item(vertical.location, vertical.location)
+        for child in vertical.get_children():
+            draft_store.clone_item(child.location, child.location)
+
+        # delete the course
         delete_course(module_store, content_store, location, commit=True)
 
-        items = module_store.get_items(Location(['i4x', 'edX', 'full', 'vertical', None]))
+        # assert that there's absolutely no non-draft modules in the course
+        # this should also include all draft items
+        items = draft_store.get_items(Location(['i4x', 'edX', 'full', None, None]))
         self.assertEqual(len(items), 0)
+
+        # assert that all content in the asset library is also deleted
+        assets = content_store.get_all_content_for_course(location)
+        self.assertEqual(len(assets), 0)
 
     def verify_content_existence(self, store, root_dir, location, dirname, category_name, filename_suffix=''):
         filesystem = OSFS(root_dir / 'test_export')
