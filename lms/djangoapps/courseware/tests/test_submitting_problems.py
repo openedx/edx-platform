@@ -55,7 +55,10 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.course = modulestore().get_instance(self.course.id, self.course.location)
 
     def problem_location(self, problem_url_name):
-        """ Returns the url of the problem given the problem's name"""
+        """
+        Returns the url of the problem given the problem's name
+        """
+
         return "i4x://"+self.course.org+"/{}/problem/{}".format(self.course_slug, problem_url_name)
 
     def modx_url(self, problem_location, dispatch):
