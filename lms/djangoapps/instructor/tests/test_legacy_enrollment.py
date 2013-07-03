@@ -49,16 +49,16 @@ class TestInstructorEnrollsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
 
         course = self.course
 
-        #Run the Un-enroll students command
+        # Run the Un-enroll students command
         url = reverse('instructor_dashboard', kwargs={'course_id': course.id})
         response = self.client.post(url, {'action': 'Unenroll multiple students', 'multiple_students': 'student0@test.com student1@test.com'})
 
-        #Check the page output
+        # Check the page output
         self.assertContains(response, '<td>student0@test.com</td>')
         self.assertContains(response, '<td>student1@test.com</td>')
         self.assertContains(response, '<td>un-enrolled</td>')
 
-        #Check the enrollment table
+        # Check the enrollment table
         user = User.objects.get(email='student0@test.com')
         ce = CourseEnrollment.objects.filter(course_id=course.id, user=user)
         self.assertEqual(0, len(ce))
@@ -67,7 +67,7 @@ class TestInstructorEnrollsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
         ce = CourseEnrollment.objects.filter(course_id=course.id, user=user)
         self.assertEqual(0, len(ce))
 
-        #Check the outbox
+        # Check the outbox
         self.assertEqual(len(mail.outbox), 0)
 
     def test_enrollment_new_student_autoenroll_on_email_off(self):
@@ -77,29 +77,29 @@ class TestInstructorEnrollsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
 
         course = self.course
 
-        #Run the Enroll students command
+        # Run the Enroll students command
         url = reverse('instructor_dashboard', kwargs={'course_id': course.id})
         response = self.client.post(url, {'action': 'Enroll multiple students', 'multiple_students': 'student1_1@test.com, student1_2@test.com', 'auto_enroll': 'on'})
 
-        #Check the page output
+        # Check the page output
         self.assertContains(response, '<td>student1_1@test.com</td>')
         self.assertContains(response, '<td>student1_2@test.com</td>')
         self.assertContains(response, '<td>user does not exist, enrollment allowed, pending with auto enrollment on</td>')
 
-        #Check the outbox
+        # Check the outbox
         self.assertEqual(len(mail.outbox), 0)
 
-        #Check the enrollmentallowed db entries
+        # Check the enrollmentallowed db entries
         cea = CourseEnrollmentAllowed.objects.filter(email='student1_1@test.com', course_id=course.id)
         self.assertEqual(1, cea[0].auto_enroll)
         cea = CourseEnrollmentAllowed.objects.filter(email='student1_2@test.com', course_id=course.id)
         self.assertEqual(1, cea[0].auto_enroll)
 
-        #Check there is no enrollment db entry other than for the other students
+        # Check there is no enrollment db entry other than for the other students
         ce = CourseEnrollment.objects.filter(course_id=course.id)
         self.assertEqual(4, len(ce))
 
-        #Create and activate student accounts with same email
+        # Create and activate student accounts with same email
         self.student1 = 'student1_1@test.com'
         self.password = 'bar'
         self.create_account('s1_1', self.student1, self.password)
@@ -109,7 +109,7 @@ class TestInstructorEnrollsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
         self.create_account('s1_2', self.student2, self.password)
         self.activate_user(self.student2)
 
-        #Check students are enrolled
+        # Check students are enrolled
         user = User.objects.get(email='student1_1@test.com')
         ce = CourseEnrollment.objects.filter(course_id=course.id, user=user)
         self.assertEqual(1, len(ce))
@@ -137,29 +137,29 @@ class TestInstructorEnrollsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
 
         course = self.course
 
-        #Run the Enroll students command
+        # Run the Enroll students command
         url = reverse('instructor_dashboard', kwargs={'course_id': course.id})
         response = self.client.post(url, {'action': 'Enroll multiple students', 'multiple_students': 'student2_1@test.com, student2_2@test.com'})
 
-        #Check the page output
+        # Check the page output
         self.assertContains(response, '<td>student2_1@test.com</td>')
         self.assertContains(response, '<td>student2_2@test.com</td>')
         self.assertContains(response, '<td>user does not exist, enrollment allowed, pending with auto enrollment off</td>')
 
-        #Check the outbox
+        # Check the outbox
         self.assertEqual(len(mail.outbox), 0)
 
-        #Check the enrollmentallowed db entries
+        # Check the enrollmentallowed db entries
         cea = CourseEnrollmentAllowed.objects.filter(email='student2_1@test.com', course_id=course.id)
         self.assertEqual(0, cea[0].auto_enroll)
         cea = CourseEnrollmentAllowed.objects.filter(email='student2_2@test.com', course_id=course.id)
         self.assertEqual(0, cea[0].auto_enroll)
 
-        #Check there is no enrollment db entry other than for the setup instructor and students
+        # Check there is no enrollment db entry other than for the setup instructor and students
         ce = CourseEnrollment.objects.filter(course_id=course.id)
         self.assertEqual(4, len(ce))
 
-        #Create and activate student accounts with same email
+        # Create and activate student accounts with same email
         self.student = 'student2_1@test.com'
         self.password = 'bar'
         self.create_account('s2_1', self.student, self.password)
@@ -169,7 +169,7 @@ class TestInstructorEnrollsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
         self.create_account('s2_2', self.student, self.password)
         self.activate_user(self.student)
 
-        #Check students are not enrolled
+        # Check students are not enrolled
         user = User.objects.get(email='student2_1@test.com')
         ce = CourseEnrollment.objects.filter(course_id=course.id, user=user)
         self.assertEqual(0, len(ce))
@@ -193,20 +193,20 @@ class TestInstructorEnrollsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
 
         course = self.course
 
-        #Create activated, but not enrolled, user
+        # Create activated, but not enrolled, user
         UserFactory.create(username="student3_0", email="student3_0@test.com", first_name="Jim", last_name="Tester")
 
         url = reverse('instructor_dashboard', kwargs={'course_id': course.id})
         response = self.client.post(url, {'action': 'Enroll multiple students', 'multiple_students': 'student3_0@test.com, student3_1@test.com, student3_2@test.com', 'auto_enroll': 'on', 'email_students': 'on'})
 
-        #Check the page output
+        # Check the page output
         self.assertContains(response, '<td>student3_0@test.com</td>')
         self.assertContains(response, '<td>student3_1@test.com</td>')
         self.assertContains(response, '<td>student3_2@test.com</td>')
         self.assertContains(response, '<td>added, email sent</td>')
         self.assertContains(response, '<td>user does not exist, enrollment allowed, pending with auto enrollment on, email sent</td>')
 
-        #Check the outbox
+        # Check the outbox
         self.assertEqual(len(mail.outbox), 3)
         self.assertEqual(mail.outbox[0].subject, 'You have been enrolled in MITx/999/Robot_Super_Course')
         self.assertEqual(mail.outbox[0].body, "Dear Jim Tester\n\nYou have been enrolled in MITx/999/Robot_Super_Course at edx.org by a member of the course staff. " +
@@ -227,19 +227,19 @@ class TestInstructorEnrollsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
 
         course = self.course
 
-        #Create invited, but not registered, user
+        # Create invited, but not registered, user
         cea = CourseEnrollmentAllowed(email='student4_0@test.com', course_id=course.id)
         cea.save()
 
         url = reverse('instructor_dashboard', kwargs={'course_id': course.id})
         response = self.client.post(url, {'action': 'Unenroll multiple students', 'multiple_students': 'student4_0@test.com, student2@test.com, student3@test.com', 'email_students': 'on'})
 
-        #Check the page output
+        # Check the page output
         self.assertContains(response, '<td>student2@test.com</td>')
         self.assertContains(response, '<td>student3@test.com</td>')
         self.assertContains(response, '<td>un-enrolled, email sent</td>')
 
-        #Check the outbox
+        # Check the outbox
         self.assertEqual(len(mail.outbox), 3)
         self.assertEqual(mail.outbox[0].subject, 'You have been un-enrolled from MITx/999/Robot_Super_Course')
         self.assertEqual(mail.outbox[0].body, "Dear Student,\n\nYou have been un-enrolled from course MITx/999/Robot_Super_Course by a member of the course staff. " +

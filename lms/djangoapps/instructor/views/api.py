@@ -288,7 +288,6 @@ def get_student_progress_url(request, course_id):
 
     student_email = request.GET.get('student_email')
     if not student_email:
-        # TODO Is there a way to do a - say - 'raise Http400'?
         return HttpResponseBadRequest()
     user = User.objects.get(email=student_email)
 

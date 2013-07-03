@@ -16,10 +16,15 @@ AVAILABLE_FEATURES = STUDENT_FEATURES + PROFILE_FEATURES
 
 def enrolled_students_profiles(course_id, features):
     """
-    Return list of student features e.g. [{?}, ...]
+    Return list of student features as dictionaries.
+
+    enrolled_students_profiles(course_id, ['username, first_name'])
+    would return [
+        {'username': 'username1', 'first_name': 'firstname1'}
+        {'username': 'username2', 'first_name': 'firstname2'}
+        {'username': 'username3', 'first_name': 'firstname3'}
+    ]
     """
-    # enrollments = CourseEnrollment.objects.filter(course_id=course_id)
-    # students = [enrollment.user for enrollment in enrollments]
     students = User.objects.filter(courseenrollment__course_id=course_id)\
         .order_by('username').select_related('profile')
 
