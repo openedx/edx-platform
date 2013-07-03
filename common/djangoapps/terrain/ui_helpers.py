@@ -206,11 +206,13 @@ def save_the_html(path='/tmp'):
     with open(filename, "w") as f:
         f.write(html)
 
+
 @world.absorb
 def click_course_content():
     course_content_css = 'li.nav-course-courseware'
     if world.browser.is_element_present_by_css(course_content_css):
         world.css_click(course_content_css)
+
 
 @world.absorb
 def click_course_settings():

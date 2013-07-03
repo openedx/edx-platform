@@ -1,3 +1,7 @@
+"""
+Unit tests for the asset upload endpoint.
+"""
+
 import json
 from datetime import datetime
 from io import BytesIO
@@ -33,6 +37,9 @@ class AssetsTestCase(CourseTestCase):
 
 
 class UploadTestCase(CourseTestCase):
+    """
+    Unit tests for uploading a file
+    """
     def setUp(self):
         super(UploadTestCase, self).setUp()
         self.url = reverse("upload_asset", kwargs={
@@ -43,9 +50,9 @@ class UploadTestCase(CourseTestCase):
 
     @skip("CorruptGridFile error on continuous integration server")
     def test_happy_path(self):
-        f = BytesIO("sample content")
-        f.name = "sample.txt"
-        resp = self.client.post(self.url, {"name": "my-name", "file": f})
+        file = BytesIO("sample content")
+        file.name = "sample.txt"
+        resp = self.client.post(self.url, {"name": "my-name", "file": file})
         self.assert2XX(resp.status_code)
 
     def test_no_file(self):
@@ -58,6 +65,10 @@ class UploadTestCase(CourseTestCase):
 
 
 class AssetsToJsonTestCase(TestCase):
+    """
+    Unit tests for transforming the results of a database call into something
+    we can send out to the client via JSON.
+    """
     def test_basic(self):
         upload_date = datetime(2013, 6, 1, 10, 30, tzinfo=UTC)
         asset = {

@@ -154,5 +154,6 @@ urlpatterns += (url(r'^admin/', include(admin.site.urls)),)
 urlpatterns = patterns(*urlpatterns)
 
 # Custom error pages
+#pylint: disable=C0103
 handler404 = 'contentstore.views.render_404'
 handler500 = 'contentstore.views.render_500'

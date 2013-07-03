@@ -1,3 +1,5 @@
+#pylint: disable=E1101
+
 import json
 import shutil
 import mock
