@@ -1311,31 +1311,49 @@ registry.register(AnnotationInput)
 class ChoiceTextGroup(InputTypeBase):
     """
     Groups of radiobutton/checkboxes with text inputs
+    Requested for use in Stat2.3x
 
     Example:
+    RadioButton problem
     <problem>
       <startouttext/>
         You have a list of numbers [1,2,3] . If you remove the 3, the sum:
       <endouttext/>
       <choicetextresponse>
         <radiotextgroup>
-          <choice correct="false">Goes up by
+          <choice correct="false">Increases by
             <textinput/></choice>
-          <choice correct="false">Three
-          <textinput tolerance=".3" answer="3"/>Four
-            <textinput tolerance=".3" answer="4"/>Five
-          <textinput/></choice>
-          <choice correct="true">Goes down</choice>
+          <choice correct="false">Stays the same</choice>
+          <choice correct="true">Goes down by
+            <textinput tolerance=".3" answer="3"/>
+          </choice>
         </radiotextgroup>
       </choicetextresponse>
-      <solution>
-    <div class="detailed-solution">
-    <p>Explanation</p>
-
-    <p> The answer is goes down</p>
-    </div>
-    </solution>
     </problem>
+
+    CheckboxProblem:
+    <problem>
+      <startouttext/>
+        You have a list of numbers [1,2,3] . If you remove the 3:
+      <endouttext/>
+      <choicetextresponse>
+        <checkboxtextgroup>
+          <choice correct="false">The sum increases by:
+            <textinput/>
+          </choice>
+          <choice correct="false">The sum stays the same</choice>
+          <choice correct="true">The sum goes down by
+            <textinput tolerance=".3" answer="3"/>
+          </choice>
+          <choice correct = "true">The average goes down by:
+            <textinput tolerance="0.5" answer = "0.5"/>
+          </choice>
+          <choice correct ="false">The average stays the same
+          </choice>
+        </checkboxtextgroup>
+      </choicetextresponse>
+    </problem>
+
     """
     template = "choicetext.html"
     tags = ['radiotextgroup', 'checkboxtextgroup']
@@ -1366,41 +1384,87 @@ class ChoiceTextGroup(InputTypeBase):
 
     @staticmethod
     def extract_choices(element):
-        '''
-        Extracts choices for a few input types, such as ChoiceGroup, RadioGroup and
-        CheckboxGroup.
+        """
+        Extracts choices from the xml for this problem type.
+        If we have xml that is as follows(choice names will have been assigned
+        by now)
+        <radiotextgroup>
+        <choice correct = "true" name ="1_2_1_choiceinput_0bc">
+            The number
+                <textinput name = "1_2_1_choiceinput0_textinput_0" answer="5"/>
+            Is the mean of the list.
+        </choice>
+        <choice correct = "false" name = "1_2_1_choiceinput_1bc>
+            False demonstration choice
+        </choice>
+        </radiotextgroup>
 
-        returns list of (choice_name, choice_text) tuples
-        components gives list of what is returned, mixed text and tuple
-        '''
+        Choices are used for rendering the problem properly
+        The function will setup choices as follows:
+        choices =[
+            ("1_2_1_choiceinput_0bc",
+                [{'type': 'text', 'contents': "The number", 'tail_text': '',
+                  'value': ''
+                  },
+                  {'type': 'textinput',
+                   'contents': "1_2_1_choiceinput0_textinput_0",
+                   'tail_text': 'Is the mean of the list',
+                  'value': ''
+                  }
+                ]
+             ),
+            ("1_2_1_choiceinput_1bc",
+                [{'type': 'text', 'contents': "False demonstration choice",
+                 'tail_text': '',
+                  'value': ''
+                  }
+                ]
+            )
+        ]
+        """
 
         choices = []
 
         for choice in element:
+            if choice.tag != 'choice':
+                raise Exception(
+                    "[capa.inputtypes.extract_choices] Expected a <choice>" +
+                    "tag; got {0} instead".format(choice.tag))
             components = []
             choice_text = ''
             if choice.text is not None:
                 choice_text += choice.text
-            adder = {'type': 'text', 'contents': choice_text, 'tail_text': '', 'value': ''}
+            # Initialize our dict for the next content
+            adder = {'type': 'text', 'contents': choice_text, 'tail_text': '',
+                     'value': ''
+                     }
             components.append(adder)
-            if choice.tag != 'choice':
-                raise Exception(
-                    "[capa.inputtypes.extract_choices] Expected a <choice> tag; got %s instead"
-                    % choice.tag)
-            choice_text = ''.join([etree.tostring(x) for x in choice])
-            for x in choice:
-                adder = {'type': 'text', 'contents': '', 'tail_text': '', 'value': ''}
-                tag_type = x.tag
+
+            for elt in choice:
+                # for elements in the choice e.g. <text> <textinput>
+                adder = {'type': 'text', 'contents': '', 'tail_text': '',
+                         'value': ''
+                         }
+                tag_type = elt.tag
+                # If the current `elt` is a <textinput> set the `adder`
+                # type to 'textinput', and 'contents' to the elt's name
                 if tag_type == 'textinput':
                     adder['type'] = 'textinput'
-                    adder['contents'] = x.get('name')
+                    adder['contents'] = elt.get('name')
                 else:
-                    adder['contents'] = x.text
-                if x.tail:
-                    adder['tail_text'] = x.tail
+                    adder['contents'] = elt.text
+
+                # If there is tail text("is the mean" in the example") add it
+
+                """ if elt.tail:
+                    adder['tail_text'] = elt.tail
                 else:
                     adder['tail_text'] = ''
+                """
+                adder['tail_text'] = elt.tail if elt.tail else ''
                 components.append(adder)
+
+            # Add the tuple for the current choice to the list of choices
             choices.append((choice.get("name"), components))
         return choices
 

@@ -2103,21 +2103,25 @@ class ChoiceTextResponse(LoncapaResponse):
     """
     Allows for multiple choice responses with text inputs
     Desired semantics match those of NumericalResponse and
-    choiceresponse.
-    #TODO allow this to work with scripts and randomization
+    ChoiceResponse.
     """
 
     response_tag = 'choicetextresponse'
     max_inputfields = 1
-    allowed_inputfields = ['choicetextgroup', 'checkboxtextgroup', 'radiotextgroup']
+    allowed_inputfields = ['choicetextgroup',
+                           'checkboxtextgroup',
+                           'radiotextgroup'
+                           ]
 
     def setup_response(self):
         """
         Sets up three dictionaries for use later:
         correct_choices: These are the correct binary choices(radio/checkbox)
-        correct_inputs: These are the numerical/string answers for required inputs
-        answer_values: This is for use by show answer, it is a string with correct inputs
-            seperated by commas
+        correct_inputs: These are the numerical/string answers for required
+        inputs.
+        answer_values: This is a dict, keyed by the name of the binary choice
+            which contains the correct answers for the text inputs seperated by
+            commas e.g. "1, 0.5"
 
         """
         context = self.context
@@ -2128,80 +2132,118 @@ class ChoiceTextResponse(LoncapaResponse):
         correct_xml = self.xml.xpath('//*[@id=$id]//choice[@correct="true"]',
                                      id=self.xml.get('id'))
         for node in correct_xml:
+            # For each correct choice, set the `parent_name` to the
+            # current choice's name
             parent_name = node.get('name')
-            #parent_name = self.answer_id + "_" + parent_name + 'bc'
+            # Add the name of the correct binary choice to the
+            # correct choices list as a key. The value is not important.
             self.correct_choices[parent_name] = {'answer': ''}
+            # Add the name of the parent to the list of correct answers
             self.answer_values[self.answer_id].append(parent_name)
             answer_list = []
+            # Loop over <textinput> elements inside of the correct choices
             for child in node:
                 answer = child.get('answer', None)
+                if not answer:
+                    # If the question creator does not specify an answer for a
+                    # <textinput> inside of a correct choice, raise an error
+                    raise LoncapaProblemError(
+                        "Answer not provided for textinput")
+                # Contextualize the answer to allow script generated answers.
                 answer = contextualize_text(answer, context)
                 input_name = child.get('name')
-                input_name = self.answer_id + "_" + input_name
-                tolerance = contextualize_text(child.get('tolerance', '0'), context)
-                self.correct_inputs[input_name] = {'answer': answer, 'tolerance': tolerance}
+                # Contextualize the tolerance to value.
+                tolerance = contextualize_text(child.get('tolerance', '0'),
+                                               context)
+                # Add the answer and tolerance information for the current
+                # textinput to `correct_inputs`
+                self.correct_inputs[input_name] = {'answer': answer,
+                                                   'tolerance': tolerance
+                                                   }
+                # Add the correct answer for this input to the list for show
                 answer_list.append(answer)
+            # Turn the list of textinput answers into a comma seperated string.
             self.answer_values[parent_name] = ', '.join(answer_list)
+        # Turn correct choices into a set. Allows faster grading.
         self.correct_choices = set(self.correct_choices.keys())
 
     def assign_choice_names(self):
-        '''
-        Initialize name attributes in <choice> tags for this response.
-        '''
+        """
+        Initialize name attributes in <choice> and <textinput> tags
+        for this response.
+        """
 
         for index, choice in enumerate(self.xml.xpath('//*[@id=$id]//choice',
                                                       id=self.xml.get('id'))):
-            choice.set("name", self.answer_id + "_choiceinput_" + str(index) + "bc")
+            choice.set("name", self.answer_id + "_choiceinput_" + str(index) +
+                       "bc")
             for ind, child in enumerate(choice.findall('textinput')):
-                child.set("name", "choiceinput_" + str(index) + "_textinput_" + str(ind))
+                child.set("name", self.answer_id + "_choiceinput_" +
+                          str(index) + "_textinput_" + str(ind))
 
     def get_score(self, student_answers):
         """
-        Student_answers contains two types of keys, to represent which type of input they are
-        keys ending with bc are binary choice inputs (radiobutton, checkbox)
-        otherwise they are text fields, the input dictionary is split apart
-        and the two are handled seperately
+        Student_answers contains keys for binary inputs(radiobutton, checkbox)
+        and numerical inputs. Keys ending with 'bc' are binary choice inputs
+        otherwise they are text fields. This method first seperates the two
+        answers and then grades them in seperate methods.
 
-        student answers is a json serialized dict containing these
+        The student is only correct if they have both the binary inputs and
+        numerical inputs correct.
         """
         answer_dict = student_answers.get(self.answer_id, "")
-        log.debug("GETTING SCORE FOR THE ANSWERS WHICH ARE {0}".format(student_answers))
-        """
-        try:
-            answer_dict = json.loads(student_answer)
-        except (TypeError, ValueError):
-            raise StudentInputError("Could not parse answers")
-        """
-        if "errror" in answer_dict:
-            raise StudentInputError("Could not parse answers")
-        binary_choices, text_inputs = self._split_answers_dict(answer_dict)
 
+        # If `CapaModule` could not deserialize the answers, `answer_dict` will
+        # be {"error": "error"}
+        if "error" in answer_dict:
+            raise StudentInputError("Could not parse answers")
+
+        binary_choices, text_inputs = self._split_answers_dict(answer_dict)
+        # Check the binary choices first.
         choices_correct = self._check_student_choices(binary_choices)
-        #don't bother checking text inputs doing this unless they made the right choice
         inputs_correct = True
+        # If the student answers for binary choices were not correct
+        # skip the numerical checks.
         if choices_correct:
             inputs_correct = self._check_student_inputs(text_inputs)
-        log.debug("Inputs correct is {0} and choices correct is {1}".format(inputs_correct, choices_correct))
+        # Only return correct if the student got both the binary
+        # and textinputs are correct
         correct = choices_correct and inputs_correct
-        if correct:
-            return CorrectMap(self.answer_id, 'correct')
-        else:
-            return CorrectMap(self.answer_id, 'incorrect')
+
+        return CorrectMap(self.answer_id, 'correct' if correct
+                          else 'incorrect')
 
     def get_answers(self):
+        """
+        Returns self.answer_values
+        """
         return self.answer_values
 
     def _split_answers_dict(self, a_dict):
+        """
+        Returns two dicts:
+        `binary_choices` : contains the correct checkbox/radio inputs_correct
+        and
+        `text_choices` : contains the correct answers for required textinputs
+
+        """
         binary_choices = {}
         text_choices = {}
-        for k, v in a_dict.iteritems():
-            if(k[-2:] == 'bc'):
-                binary_choices[k] = v
+        for key, value in a_dict.iteritems():
+            # If the key ends with 'bc' it refers to a required
+            # radiobutton/checkbox
+            if(key[-2:] == 'bc'):
+                binary_choices[key] = value
             else:
-                text_choices[k] = v
+                # If the key does not end with 'bc', it refers to a textinput
+                text_choices[key] = value
         return (binary_choices, text_choices)
 
     def _check_student_choices(self, choices):
+        """
+        Compares student submitted checkbox/radiobutton answers against
+        the correct answers. Returns True or False
+        """
         student_choices = set(choices)
         required_selected = len(self.correct_choices - student_choices) == 0
         no_extra_selected = len(student_choices - self.correct_choices) == 0
@@ -2209,22 +2251,28 @@ class ChoiceTextResponse(LoncapaResponse):
         return correct
 
     def _check_student_inputs(self, text_inputs):
+        """
+        Compares student submitted numerical answers against the correct
+        answers and tolerances.
+        Returns True if and only if all student inputs are correct.
+        """
         inputs_correct = True
         for answer_name, params in self.correct_inputs.iteritems():
             student_answer = text_inputs.get(answer_name, '')
 
             correct_ans = params['answer']
-            #assume zero tolerance if it isn't specified
+            # Set the tolerance to '0' if it was not specified in the xml
             tolerance = params.get('tolerance', '0')
-            #Here we do the same things as in grading a numerical response...
+            # Make sure that the answer is a valid number
             try:
                 correct_ans = complex(correct_ans)
             except ValueError:
                 log.debug(
-                    "Content error--answer '{0}' is not a valid complex number".format(
-                    correct_ans))
+                    "Content error--answer" +
+                    "'{0}' is not a valid complexnumber".format(correct_ans))
                 raise StudentInputError(
-                    "There was a problem with the staff answer to this problem")
+                    "There was a problem with the staff answer "
+                    "to this problem")
 
             try:
                 partial_correct = compare_with_tolerance(
@@ -2235,10 +2283,12 @@ class ChoiceTextResponse(LoncapaResponse):
                 # different type
                 _, _, trace = sys.exc_info()
 
-                raise StudentInputError("Could not interpret '{0}' as a number {1}".format(
-                                        cgi.escape(student_answer), trace))
+                raise StudentInputError(
+                    "Could not interpret '{0}' as a number{1}".format(
+                        cgi.escape(student_answer), trace))
 
             if not partial_correct:
+                # If any input is not correct, set the return value to False
                 inputs_correct = False
         return inputs_correct
 
