@@ -1321,7 +1321,7 @@ class ChoiceTextGroup(InputTypeBase):
       <endouttext/>
       <choicetextresponse>
         <radiotextgroup>
-          <choice correct="false"><The sum decreases by
+          <choice correct="false">The sum decreases by
             <textinput/>
             and the mean stays the same</choice>
           <choice correct="false">The mean and the sum stay the same</choice>

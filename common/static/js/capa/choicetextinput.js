@@ -53,14 +53,13 @@
             } else {
                 if (choice.attr('checked')) {
                     choice.prop("checked", false);
-                    choice.uncheck();
                 } else {
                     choice.prop("checked", true);
-                    choice.check();
                 }
 
             }
             choice.change();
+            update();
         }
 
     };
