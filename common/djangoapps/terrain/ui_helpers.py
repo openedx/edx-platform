@@ -183,6 +183,19 @@ def css_html(css_selector, index=0, max_attempts=5):
 
 
 @world.absorb
+def css_has_class(css_selector, class_name, index=0, max_attempts=5):
+    attempt = 0
+    found = False
+    while attempt < max_attempts and not found:
+        try:
+            return world.css_find(css_selector)[index].has_class(class_name)
+            found = True
+        except:
+            attempt += 1
+    return False
+
+
+@world.absorb
 def css_visible(css_selector):
     assert is_css_present(css_selector), "{} is not present".format(css_selector)
     return world.browser.find_by_css(css_selector).visible
