@@ -73,7 +73,7 @@ def add_user(request, location):
     This POST-back view will add a user - specified by email - to the list of editors for
     the specified course
     '''
-    email = request.POST["email"]
+    email = request.POST.get("email")
 
     if not email:
         msg = {
