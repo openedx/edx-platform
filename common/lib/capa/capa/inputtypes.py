@@ -47,6 +47,7 @@ import pyparsing
 
 from .registry import TagRegistry
 from chem import chemcalc
+from preview import latex_preview
 import xqueue_interface
 from datetime import datetime
 
@@ -1055,6 +1056,82 @@ class ChemicalEquationInput(InputTypeBase):
         return result
 
 registry.register(ChemicalEquationInput)
+
+#-------------------------------------------------------------------------
+
+
+class FormulaEquationInput(InputTypeBase):
+    """
+    An input type for entering formula equations.  Supports live preview.
+
+    Example:
+
+    <formulaequationinput size="50"/>
+
+    options: size -- width of the textbox.
+    """
+
+    template = "formulaequationinput.html"
+    tags = ['formulaequationinput']
+
+    @classmethod
+    def get_attributes(cls):
+        """
+        Can set size of text field.
+        """
+        return [Attribute('size', '20'), ]
+
+    def _extra_context(self):
+        """
+        TODO (vshnayder): Get rid of this once we have a standard way of requiring js to be loaded.
+        """
+        return {'previewer': '/static/js/capa/formula_equation_preview.js', }
+
+    def handle_ajax(self, dispatch, get):
+        '''
+        Since we only have formcalc preview this input, check to see if it
+        matches the corresponding dispatch and send it through if it does
+        '''
+        if dispatch == 'preview_formcalc':
+            return self.preview_formcalc(get)
+        return {}
+
+    def preview_formcalc(self, get):
+        """
+        Render an html preview of a formula formula or equation.  get should
+        contain a key 'formula' and value 'some formula string'.
+
+        Returns a json dictionary:
+        {
+           'preview' : 'the-preview-html' or ''
+           'error' : 'the-error' or ''
+           'request-start' : <time sent with request>
+        }
+        """
+
+        result = {'preview': '',
+                  'error': ''}
+        formula = get['formula']
+        if formula is None:
+            result['error'] = "No formula specified."
+            return result
+
+        result['request-start'] = int(get['request-start'])
+
+        try:
+            result['preview'] = latex_preview(formula)  # TODO add references to variables, etc&
+        except pyparsing.ParseException as err:
+            result['error'] = u"Couldn't parse formula: {0}".format(err.message)
+        except Exception:
+            # this is unexpected, so log
+            log.warning(
+                "Error while previewing formula", exc_info=True
+            )
+            result['error'] = "Error while rendering preview"
+
+        return result
+
+registry.register(FormulaEquationInput)
 
 #-----------------------------------------------------------------------------
 

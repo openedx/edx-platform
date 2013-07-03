@@ -1692,7 +1692,7 @@ class FormulaResponse(LoncapaResponse):
 
     response_tag = 'formularesponse'
     hint_tag = 'formulahint'
-    allowed_inputfields = ['textline']
+    allowed_inputfields = ['textline', 'formulaequationinput']
     required_attributes = ['answer', 'samples']
     max_inputfields = 1
 

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Tests of input types.
 
@@ -23,7 +24,8 @@ import xml.sax.saxutils as saxutils
 
 from . import test_system
 from capa import inputtypes
-from mock import ANY
+from mock import ANY, patch
+from pyparsing import ParseException
 
 # just a handy shortcut
 lookup_tag = inputtypes.registry.get_class_for_tag
@@ -730,6 +732,97 @@ class ChemicalEquationTest(unittest.TestCase):
         self.assertTrue('preview' in response)
         self.assertNotEqual(response['preview'], '')
         self.assertEqual(response['error'], "")
+
+
+class FormulaEquationTest(unittest.TestCase):
+    """
+    Check that formula equation inputs work.
+    """
+    def setUp(self):
+        self.size = "42"
+        xml_str = """<formulaequationinput id="prob_1_2" size="{size}"/>""".format(size=self.size)
+
+        element = etree.fromstring(xml_str)
+
+        state = {'value': 'x^2+1/2', }
+        self.the_input = lookup_tag('formulaequationinput')(test_system(), element, state)
+
+    def test_rendering(self):
+        """
+        Verify that the render context matches the expected render context
+        """
+        context = self.the_input._get_render_context()
+
+        expected = {'id': 'prob_1_2',
+                    'value': 'x^2+1/2',
+                    'status': 'unanswered',
+                    'msg': '',
+                    'size': self.size,
+                    'previewer': '/static/js/capa/formula_equation_preview.js',
+                    }
+        self.assertEqual(context, expected)
+
+    def test_formcalc_ajax_sucess(self):
+        """
+        Verify that using the correct dispatch and valid data produces a valid response
+        """
+        data = {'formula': "x^2+1/2", 'request-start': 0}
+        response = self.the_input.handle_ajax("preview_formcalc", data)
+
+        self.assertTrue('preview' in response)
+        self.assertNotEqual(response['preview'], '')
+        self.assertEqual(response['error'], "")
+        self.assertEqual(response['request-start'], data['request-start'])
+
+    def test_ajax_bad_method(self):
+        """
+        With a bad dispatch, we shouldn't recieve anything
+        """
+        response = self.the_input.handle_ajax("obviously_not_real", {})
+        self.assertEqual(response, {})
+
+    def test_ajax_no_formula(self):
+        """
+        When we ask for a formula rendering, there should be an error if no formula
+        """
+        response = self.the_input.handle_ajax(
+            "preview_formcalc",
+            {'formula': None, 'request-start': 1, }
+        )
+        self.assertTrue('error' in response)
+        self.assertEqual(response['error'], "No formula specified.")
+
+    def test_ajax_parse_err(self):
+        """
+        With parse errors, FormulaEquationInput should give an error message
+        """
+        # Simulate answering a problem that raises the exception
+        with patch('capa.inputtypes.latex_preview') as mock_preview:
+            mock_preview.side_effect = ParseException(u"ȧƈƈḗƞŧḗḓ ŧḗẋŧ ƒǿř ŧḗşŧīƞɠ")
+            response = self.the_input.handle_ajax(
+                "preview_formcalc",
+                {'formula': 'x^2+1/2', 'request-start': 1, }
+            )
+
+        self.assertTrue('error' in response)
+        self.assertTrue("Couldn't parse formula" in response['error'])
+
+    @patch('capa.inputtypes.log')
+    def test_ajax_other_err(self, mock_log):
+        """
+        With other errors, test that FormulaEquationInput also logs it
+        """
+        with patch('capa.inputtypes.latex_preview') as mock_preview:
+            mock_preview.side_effect = Exception()
+            response = self.the_input.handle_ajax(
+                "preview_formcalc",
+                {'formula': 'x^2+1/2', 'request-start': 1, }
+            )
+        mock_log.warning.assert_called_once_with(
+            "Error while previewing formula", exc_info=True
+        )
+        self.assertTrue('error' in response)
+        self.assertEqual(response['error'], "Error while rendering preview")
 
 
 class DragAndDropTest(unittest.TestCase):

@@ -1,0 +1,39 @@
+<section id="formulaequationinput_${id}" class="formulaequationinput">
+    <div class="script_placeholder" data-src="${previewer}"/>
+
+    % if status == 'unsubmitted':
+    <div class="unanswered" id="status_${id}">
+    % elif status == 'correct':
+    <div class="correct" id="status_${id}">
+    % elif status == 'incorrect':
+    <div class="incorrect" id="status_${id}">
+    % elif status == 'incomplete':
+    <div class="incorrect" id="status_${id}">
+    % endif
+
+    <input type="text" name="input_${id}" id="input_${id}" data-input-id="${id}" value="${value|h}"
+   % if size:
+   size="${size}"
+   % endif
+   />
+
+      <p class="status">
+        % if status == 'unsubmitted':
+        unanswered
+        % elif status == 'correct':
+        correct
+        % elif status == 'incorrect':
+        incorrect
+        % elif status == 'incomplete':
+        incomplete
+        % endif
+      </p>
+
+      <div id="input_${id}_preview" class="equation">\[\]
+      </div>
+  <p id="answer_${id}" class="answer"></p>
+
+% if status in ['unsubmitted', 'correct', 'incorrect', 'incomplete']:
+</div>
+% endif
+</section>
