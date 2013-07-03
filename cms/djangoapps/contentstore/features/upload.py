@@ -16,23 +16,23 @@ HTTP_PREFIX = "http://localhost:8001"
 def go_to_uploads(_step):
     menu_css = 'li.nav-course-courseware'
     uploads_css = 'li.nav-course-courseware-uploads'
-    world.css_find(menu_css).click()
-    world.css_find(uploads_css).click()
+    world.css_click(menu_css)
+    world.css_click(uploads_css)
 
 
 @step(u'I upload the file "([^"]*)"$')
 def upload_file(_step, file_name):
     upload_css = 'a.upload-button'
-    world.css_find(upload_css).click()
+    world.css_click(upload_css)
 
     file_css = 'input.file-input'
-    upload = world.css_find(file_css)
+    upload = world.css_click(file_css)
     #uploading the file itself
     path = os.path.join(TEST_ROOT, 'uploads/', file_name)
     upload._element.send_keys(os.path.abspath(path))
 
     close_css = 'a.close-button'
-    world.css_find(close_css).click()
+    world.css_click(close_css)
 
 
 @step(u'I should( not)? see the file "([^"]*)" was uploaded$')
