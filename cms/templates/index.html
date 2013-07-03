@@ -67,7 +67,7 @@
           <h2 class="title">${_("Thanks for signing up, %(name)s!") % dict(name= user.username)}</h2>
         </div>
 
-        <div class="notice notice-incontext notice-instruction notice-instruction-authorshiprights">
+        <div class="notice notice-incontext notice-instruction notice-instruction-verification">
           <h3 class="title">${_('Next Steps to Authoring in Studio')}</h3>
           <div class="copy">
             <p>${_('Your on your way to authoring courses online using Studio. In order to complete your registration, we need you verify your registration by checking your $emailaddress email account. An activation message and next steps should be waiting for you there.')}</p>
@@ -97,10 +97,6 @@
     <!-- ==================== -->
     <section class="content">
       <article class="content-primary" role="main">
-        <div class="introduction">
-          <h2 class="title">${_("Welcome, %(name)s!") % dict(name= user.username)}</h2>
-        </div>
-
         <div class="notice notice-incontext notice-confirmation">
           <h3 class="title">${_('Your Account Has Been Verified')}</h3>
           <div class="copy">
@@ -108,23 +104,53 @@
           </div>
         </div>
 
-        <div class="notice notice-incontext notice-instruction notice-instruction-authorshiprights">
-          <h3 class="title">${_('Creating Your Own Courses in Studio')}</h3>
+        <div class="introduction">
+          <h2 class="title">${_("Welcome, %(name)s!") % dict(name= user.username)}</h2>
+
           <div class="copy">
-            <p>${_('Vestibulum id ligula porta felis euismod semper. Sed posuere consectetur est at lobortis. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Nullam quis risus eget urna mollis ornare vel eu leo. Donec id elit non mi porta gravida at eget metus.')}</p>
+            <p>${_("You don't have any courses you're working on in Studio yet.")}</p>
           </div>
+        </div>
 
-          <div class="status status-authorship has-actions">
-            <h4 class="title">${_('Your Authorship Request Status')}</h4>
+        <div class="course-list no-courses">
+          <!-- if authorship rights not enabled - anyone with an account can author -->
+          <div class="notice notice-incontext notice-instruction notice-instruction-authorshiprights">
+            <h3 class="title">${_('Create Your First Course')}</h3>
             <div class="copy">
-
+              <p>${_('Vestibulum id ligula porta felis euismod semper. Sed posuere consectetur est at lobortis. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Nullam quis risus eget urna mollis ornare vel eu leo. Donec id elit non mi porta gravida at eget metus.')}</p>
             </div>
 
             <ul class="list-actions">
               <li class="action-item">
-                <a href="#" class="action-primary action-request">${_('Request Authorship Rights')}</a>
+                <a href="#" class="action-primary action-create action-create-course new-course-button">${_('Create Your First Course')}</a>
               </li>
             </ul>
+          </div>
+
+          <!-- if authorship rights enabled -->
+          <div class="wrapper wrapper-authorshiprights">
+            <h3 class="title ui-toggle-visibility ">
+              <a href="#instruction-authorshiprights" class="ui-toggle-control"><span class="label">${_('Becoming a Course Author in Studio')}</span> <i class="icon-plus"></i></a>
+            </h3>
+
+            <div class="notice notice-incontext notice-instruction notice-instruction-authorshiprights ui-toggle-target" id="instruction-authorshiprights">
+              <div class="copy">
+                <p>${_('Vestibulum id ligula porta felis euismod semper. Sed posuere consectetur est at lobortis. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Nullam quis risus eget urna mollis ornare vel eu leo. Donec id elit non mi porta gravida at eget metus.')}</p>
+              </div>
+
+              <div class="status status-authorship has-actions">
+                <h4 class="title sr">${_('Request the Ability to Author Courses in Studio')}</h4>
+                <div class="copy">
+
+                </div>
+
+                <ul class="list-actions">
+                  <li class="action-item">
+                    <a href="#" class="action-primary action-request">${_('Request the Ability to Author Courses')}</a>
+                  </li>
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
       </article>
@@ -150,27 +176,36 @@
       <article class="content-primary" role="main">
         <div class="introduction">
           <h2 class="title">${_("Welcome, %(name)s !") % dict(name= user.username)}</h2>
+
+          <div class="copy">
+            <p>${_("You don't have any courses you're working on in Studio yet.")}</p>
+          </div>
         </div>
 
-        <div class="notice notice-incontext notice-instruction notice-instruction-authorshiprights">
-          <h3 class="title">${_('Creating Your Own Courses in Studio')}</h3>
-          <div class="copy">
-            <p>${_('Vestibulum id ligula porta felis euismod semper. Sed posuere consectetur est at lobortis. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Nullam quis risus eget urna mollis ornare vel eu leo. Donec id elit non mi porta gravida at eget metus.')}</p>
-          </div>
+        <div class="course-list no-courses">
+          <!-- if authorship rights enabled -->
+          <div class="wrapper wrapper-authorshiprights">
+            <h3 class="title ui-toggle-visibility ">
+              <a href="#instruction-authorshiprights" class="ui-toggle-control"><span class="label">${_('Becoming a Course Author in Studio')}</span> <i class="icon-plus"></i></a>
+            </h3>
 
-          <div class="status status-authorship has-status is-pending">
-            <h4 class="title">${_('Your Authorship Request Status')}</h4>
-            <div class="copy">
+            <div class="notice notice-incontext notice-instruction notice-instruction-authorshiprights ui-toggle-target" id="instruction-authorshiprights">
+              <div class="copy">
+                <p>${_('Vestibulum id ligula porta felis euismod semper. Sed posuere consectetur est at lobortis. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Nullam quis risus eget urna mollis ornare vel eu leo. Donec id elit non mi porta gravida at eget metus.')}</p>
+              </div>
 
+              <div class="status status-authorship has-status is-pending">
+                <h4 class="title">${_('Your Authorship Request Status')}</h4>
+
+                <dl class="status-update">
+                  <dt class="label">${_('Your authorship request is:')}</dt>
+                  <dd class="value">
+                    <span class="value-formal">${_('Pending')}</span>
+                    <span class="value-description">${_('Your request is currently being reviewed by edX staff and should be updated shortly.')}</span>
+                  </dd>
+                </dl>
+              </div>
             </div>
-
-            <dl class="status-update">
-              <dt class="label">${_('Your authorship request is:')}</dt>
-              <dd class="value">
-                <span class="value-formal">${_('Pending')}</span>
-                <span class="value-description">${_('Your request is currently being reviewed by edX staff and should be updated shortly.')}</span>
-              </dd>
-            </dl>
           </div>
         </div>
       </article>
@@ -188,34 +223,42 @@
       <article class="content-primary" role="main">
         <div class="introduction">
           <h2 class="title">${_("Welcome, %(name)s !") % dict(name= user.username)}</h2>
-        </div>
 
-        <div class="notice notice-incontext notice-instruction notice-instruction-authorshiprights">
-          <h3 class="title">${_('Creating Your Own Courses in Studio')}</h3>
           <div class="copy">
-            <p>${_('Vestibulum id ligula porta felis euismod semper. Sed posuere consectetur est at lobortis. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Nullam quis risus eget urna mollis ornare vel eu leo. Donec id elit non mi porta gravida at eget metus.')}</p>
+            <p>${_("You don't have any courses you're working on in Studio yet.")}</p>
           </div>
+        </div>
 
-          <div class="status status-authorship has-status is-rejected">
-            <h4 class="title">${_('Your Authorship Request Status')}</h4>
-            <div class="copy">
+        <div class="course-list no-courses">
+          <!-- if authorship rights enabled -->
+          <div class="wrapper wrapper-authorshiprights">
+            <h3 class="title ui-toggle-visibility ">
+              <a href="#instruction-authorshiprights" class="ui-toggle-control"><span class="label">${_('Becoming a Course Author in Studio')}</span> <i class="icon-plus"></i></a>
+            </h3>
 
-            </div>
-
-            <dl class="status-update">
-              <dt class="label">${_('Your authorship request is:')}</dt>
-              <dd class="value">
-                <span class="value-formal">${_('Rejected')}</span>
-                <span class="value-description">${_('Your request did not meet the criteria/guidelines specified by edX Staff.')}</span>
-              </dd>
-            </dl>
-
-           <dl class="status-details">
-              <dt class="label">${_('The following feedback was given by edX staff when making this decision')}</dt>
-              <dd class="value">
+            <div class="notice notice-incontext notice-instruction notice-instruction-authorshiprights ui-toggle-target" id="instruction-authorshiprights">
+              <div class="copy">
                 <p>${_('Vestibulum id ligula porta felis euismod semper. Sed posuere consectetur est at lobortis. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Nullam quis risus eget urna mollis ornare vel eu leo. Donec id elit non mi porta gravida at eget metus.')}</p>
-              </dd>
-            </dl>
+              </div>
+
+              <div class="status status-authorship has-status is-rejected">
+                <h4 class="title">${_('Your Authorship Request Status')}</h4>
+
+                <dl class="status-update">
+                  <dt class="label">${_('Your authorship request is:')}</dt>
+                  <dd class="value">
+                    <span class="value-formal">${_('Rejected')}</span>
+                    <span class="value-description">${_('Your request did not meet the criteria/guidelines specified by edX Staff.')}</span>
+                  </dd>
+                </dl>
+
+               <dl class="status-details">
+                  <dt class="label">${_('The following feedback was given by edX staff when making this decision')}</dt>
+                  <dd class="value">
+                    <p>${_('Vestibulum id ligula porta felis euismod semper. Sed posuere consectetur est at lobortis. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Nullam quis risus eget urna mollis ornare vel eu leo. Donec id elit non mi porta gravida at eget metus.')}</p>
+                  </dd>
+                </dl>
+              </div>
           </div>
         </div>
       </article>
@@ -226,91 +269,93 @@
     </section>
 
 
-
-    <!-- CASE 5: User Logged In + Verified + w/ Authorship Rights + Request Rejected -->
-    <!-- ==================== -->
-    <section class="content">
-      <article class="content-primary" role="main">
-
-      </article>
-
-      <aside class="content-supplementary" role="complimentary">
-
-      </aside>
-    </section>
-
-
-
-    <!-- CASE 6: User Logged In + Verified + w/o Authorship Rights +  Classes (as Staff Access) -->
+    <!-- CASE 5: User Logged In + Verified + w/o Authorship Rights +  Classes (as Staff Access) -->
     <!-- ==================== -->
     <section class="content">
       <article class="content-primary" role="main">
         <div class="introduction">
-          <h2 class="title">${_("Welcome, %(name)s") % dict(name= user.username)}!</h2>
+          <h2 class="title">${_("Welcome, %(name)s !") % dict(name= user.username)}</h2>
+
           <div class="copy">
             <p>${_("Here are all of the courses you currently have access to in Studio:")}</p>
           </div>
         </div>
 
-        <div class="my-classes">
-          <ul class="class-list">
-            <li>
-              <a class="class-link" href="/VeryLongORGNameCanBePlacedHere/102941451/course/A_very_very_long_course_name_could_be_placed_here_and_take_up_a_lot_of_room">
-                <span class="class-name">A very very long course could be placed here and take up a lot of room</span>
-              </a>
+        <div class="course-list">
+          <div class="my-classes">
+            <ul class="class-list">
+              %for course, url, lms_link in sorted(courses, key=lambda s: s[0].lower() if s[0] is not None else ''):
+              <li>
+                <a class="class-link" href="${url}" class="class-name">
+                  <span class="class-name">${course}</span>
+                </a>
 
-              <a href="//localhost:8000/courses/VeryLongORGNameCanBePlacedHere/102941451/A_very_very_long_course_name_could_be_placed_here_and_take_up_a_lot_of_room/jump_to/i4x://VeryLongORGNameCanBePlacedHere/102941451/course/A_very_very_long_course_name_could_be_placed_here_and_take_up_a_lot_of_room" rel="external" class="button view-button view-live-button" title="This link will open in a new browser window/tab">View Live</a>
-            </li>
-            <li>
-              <a class="class-link" href="/MITx/t101/course/Test_Course_1">
-                <span class="class-name">Test Course #1</span>
-              </a>
-
-              <a href="//localhost:8000/courses/MITx/t101/Test_Course_1/jump_to/i4x://MITx/t101/course/Test_Course_1" rel="external" class="button view-button view-live-button" title="This link will open in a new browser window/tab">View Live</a>
-            </li>
-            <li>
-              <a class="class-link" href="/testU/tc001/course/Test_Course_1">
-                <span class="class-name">Test Course #1</span>
-              </a>
-
-              <a href="//localhost:8000/courses/testU/tc001/Test_Course_1/jump_to/i4x://testU/tc001/course/Test_Course_1" rel="external" class="button view-button view-live-button" title="This link will open in a new browser window/tab">View Live</a>
-            </li>
-            <li>
-              <a class="class-link" href="/MITx/t102/course/Test_Course_-_Import_1">
-                <span class="class-name">Test Course - Import #1</span>
-              </a>
-
-              <a href="//localhost:8000/courses/MITx/t102/Test_Course_-_Import_1/jump_to/i4x://MITx/t102/course/Test_Course_-_Import_1" rel="external" class="button view-button view-live-button" title="This link will open in a new browser window/tab">View Live</a>
-            </li>
-          </ul>
-        </div>
-
-        <div class="notice notice-incontext notice-instruction notice-instruction-authorshiprights">
-          <h3 class="title">${_('Creating Your Own Courses in Studio')}</h3>
-          <div class="copy">
-            <p>${_('Vestibulum id ligula porta felis euismod semper. Sed posuere consectetur est at lobortis. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Nullam quis risus eget urna mollis ornare vel eu leo. Donec id elit non mi porta gravida at eget metus.')}</p>
+                <a href="${lms_link}" rel="external" class="button view-button view-live-button">View Live</a>
+              </li>
+              %endfor
+            </ul>
           </div>
 
-          <div class="status status-authorship has-status is-rejected">
-            <h4 class="title">${_('Your Authorship Request Status')}</h4>
-            <div class="copy">
+          <!-- if authorship rights enabled -->
+          <div class="wrapper wrapper-authorshiprights">
+            <h3 class="title ui-toggle-visibility ">
+              <a href="#instruction-authorshiprights" class="ui-toggle-control"><span class="label">${_('Becoming a Course Author in Studio')}</span> <i class="icon-plus"></i></a>
+            </h3>
 
-            </div>
-
-            <dl class="status-update">
-              <dt class="label">${_('Your authorship request is:')}</dt>
-              <dd class="value">
-                <span class="value-formal">${_('Rejected')}</span>
-                <span class="value-description">${_('Your request did not meet the criteria/guidelines specified by edX Staff.')}</span>
-              </dd>
-            </dl>
-
-           <dl class="status-details">
-              <dt class="label">${_('The following feedback was given by edX staff when making this decision')}</dt>
-              <dd class="value">
+            <div class="notice notice-incontext notice-instruction notice-instruction-authorshiprights ui-toggle-target" id="instruction-authorshiprights">
+              <div class="copy">
                 <p>${_('Vestibulum id ligula porta felis euismod semper. Sed posuere consectetur est at lobortis. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Nullam quis risus eget urna mollis ornare vel eu leo. Donec id elit non mi porta gravida at eget metus.')}</p>
-              </dd>
-            </dl>
+              </div>
+
+              <div class="status status-authorship has-status is-rejected">
+                <h4 class="title">${_('Your Authorship Request Status')}</h4>
+
+                <dl class="status-update">
+                  <dt class="label">${_('Your authorship request is:')}</dt>
+                  <dd class="value">
+                    <span class="value-formal">${_('Rejected')}</span>
+                    <span class="value-description">${_('Your request did not meet the criteria/guidelines specified by edX Staff.')}</span>
+                  </dd>
+                </dl>
+
+               <dl class="status-details">
+                  <dt class="label">${_('The following feedback was given by edX staff when making this decision')}</dt>
+                  <dd class="value">
+                    <p>${_('Vestibulum id ligula porta felis euismod semper. Sed posuere consectetur est at lobortis. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Nullam quis risus eget urna mollis ornare vel eu leo. Donec id elit non mi porta gravida at eget metus.')}</p>
+                  </dd>
+                </dl>
+              </div>
+          </div>
+
+          <!-- if authorship rights enabled -->
+          <div class="wrapper wrapper-authorshiprights">
+            <h3 class="title ui-toggle-visibility ">
+              <a href="#instruction-authorshiprights" class="ui-toggle-control"><span class="label">${_('Becoming a Course Author in Studio')}</span> <i class="icon-plus"></i></a>
+            </h3>
+
+            <div class="notice notice-incontext notice-instruction notice-instruction-authorshiprights ui-toggle-target is-shown" id="instruction-authorshiprights">
+              <div class="copy">
+                <p>${_('Vestibulum id ligula porta felis euismod semper. Sed posuere consectetur est at lobortis. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Nullam quis risus eget urna mollis ornare vel eu leo. Donec id elit non mi porta gravida at eget metus.')}</p>
+              </div>
+
+              <div class="status status-authorship has-status is-rejected">
+                <h4 class="title">${_('Your Authorship Request Status')}</h4>
+
+                <dl class="status-update">
+                  <dt class="label">${_('Your authorship request is:')}</dt>
+                  <dd class="value">
+                    <span class="value-formal">${_('Rejected')}</span>
+                    <span class="value-description">${_('Your request did not meet the criteria/guidelines specified by edX Staff.')}</span>
+                  </dd>
+                </dl>
+
+               <dl class="status-details">
+                  <dt class="label">${_('The following feedback was given by edX staff when making this decision')}</dt>
+                  <dd class="value">
+                    <p>${_('Vestibulum id ligula porta felis euismod semper. Sed posuere consectetur est at lobortis. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Nullam quis risus eget urna mollis ornare vel eu leo. Donec id elit non mi porta gravida at eget metus.')}</p>
+                  </dd>
+                </dl>
+              </div>
           </div>
         </div>
       </article>
@@ -329,8 +374,7 @@
     </section>
 
 
-
-    <!-- CASE 7: User Logged In + Verified + w Authorship Rights +  Classes (as Author + Staff Access) -->
+    <!-- CASE 6: User Logged In + Verified + w Authorship Rights +  Classes (as Author + Staff Access) -->
     <!-- ==================== -->
     <section class="content">
       <article class="content-primary" role="main">
@@ -343,34 +387,15 @@
 
         <div class="my-classes">
           <ul class="class-list">
+            %for course, url, lms_link in sorted(courses, key=lambda s: s[0].lower() if s[0] is not None else ''):
             <li>
-              <a class="class-link" href="/VeryLongORGNameCanBePlacedHere/102941451/course/A_very_very_long_course_name_could_be_placed_here_and_take_up_a_lot_of_room">
-                <span class="class-name">A very very long course could be placed here and take up a lot of room</span>
+              <a class="class-link" href="${url}" class="class-name">
+                <span class="class-name">${course}</span>
               </a>
 
-              <a href="//localhost:8000/courses/VeryLongORGNameCanBePlacedHere/102941451/A_very_very_long_course_name_could_be_placed_here_and_take_up_a_lot_of_room/jump_to/i4x://VeryLongORGNameCanBePlacedHere/102941451/course/A_very_very_long_course_name_could_be_placed_here_and_take_up_a_lot_of_room" rel="external" class="button view-button view-live-button" title="This link will open in a new browser window/tab">View Live</a>
+              <a href="${lms_link}" rel="external" class="button view-button view-live-button">View Live</a>
             </li>
-            <li>
-              <a class="class-link" href="/MITx/t101/course/Test_Course_1">
-                <span class="class-name">Test Course #1</span>
-              </a>
-
-              <a href="//localhost:8000/courses/MITx/t101/Test_Course_1/jump_to/i4x://MITx/t101/course/Test_Course_1" rel="external" class="button view-button view-live-button" title="This link will open in a new browser window/tab">View Live</a>
-            </li>
-            <li>
-              <a class="class-link" href="/testU/tc001/course/Test_Course_1">
-                <span class="class-name">Test Course #1</span>
-              </a>
-
-              <a href="//localhost:8000/courses/testU/tc001/Test_Course_1/jump_to/i4x://testU/tc001/course/Test_Course_1" rel="external" class="button view-button view-live-button" title="This link will open in a new browser window/tab">View Live</a>
-            </li>
-            <li>
-              <a class="class-link" href="/MITx/t102/course/Test_Course_-_Import_1">
-                <span class="class-name">Test Course - Import #1</span>
-              </a>
-
-              <a href="//localhost:8000/courses/MITx/t102/Test_Course_-_Import_1/jump_to/i4x://MITx/t102/course/Test_Course_-_Import_1" rel="external" class="button view-button view-live-button" title="This link will open in a new browser window/tab">View Live</a>
-            </li>
+            %endfor
           </ul>
         </div>
       </article>
@@ -390,23 +415,6 @@
   </div>
 </%block>
 
-# <div class="my-classes">
-#   % if user.is_active:
-#   <ul class="class-list">
-#     %for course, url, lms_link in sorted(courses, key=lambda s: s[0].lower() if s[0] is not None else ''):
-#     <li>
-#       <a class="class-link" href="${url}" class="class-name">
-#         <span class="class-name">${course}</span>
-#       </a>
-
-#       <a href="${lms_link}" rel="external" class="button view-button view-live-button">View Live</a>
-#     </li>
-#     %endfor
-#   </ul>
-
-#   % else:
-#     <div class='warn-msg'>
-#       <p>${_("In order to start authoring courses using edX Studio, please click on the activation link in your email.")}</p>
-#     </div>
-#   % endif
-# </div>
+# % if user.is_active:
+# % else:
+# % endif
