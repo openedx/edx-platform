@@ -5,6 +5,8 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Common: Student information is now passed to the tracking log via POST instead of GET.
+
 Common: Add tests for documentation generation to test suite
 
 Blades: User answer now preserved (and changeable) after clicking "show answer" in choice problems

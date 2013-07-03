@@ -54,7 +54,7 @@
           $('.message.submission-error').removeClass('is-shown');
           location.href="${reverse('dashboard')}";
        } else {
-         $('.status.message.submission-error').addClass('is-shown');
+         $('.status.message.submission-error').addClass('is-shown').focus();
          $('.status.message.submission-error .message-copy').html(json.value).stop().css("display", "block");
          $(".field-error").removeClass('field-error');
          $("[data-field='"+json.field+"']").addClass('field-error')
@@ -97,7 +97,7 @@
         <p class="message-copy">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Lorem ipsum dolor sit amet, consectetuer adipiscing elit.</p>
       </div>
 
-      <div role="alert" class="status message submission-error">
+      <div role="alert" class="status message submission-error" tabindex="-1">
         <h3 class="message-title">The following errors occured while processing your registration: </h3>
         <ul class="message-copy"> </ul>
       </div>

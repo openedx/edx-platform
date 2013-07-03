@@ -2,7 +2,8 @@ from pymongo import Connection
 import gridfs
 from gridfs.errors import NoFile
 
-from xmodule.modulestore.mongo import location_to_query, Location
+from xmodule.modulestore import Location
+from xmodule.modulestore.mongo.base import location_to_query
 from xmodule.contentstore.content import XASSET_LOCATION_TAG
 
 import logging

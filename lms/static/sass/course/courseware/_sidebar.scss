@@ -23,7 +23,7 @@ section.course-index {
     h3 {
       @include border-radius(0);
       margin: 0;
-      overflow: hidden;
+      overflow: visible;
 
       &:first-child {
         border: none;

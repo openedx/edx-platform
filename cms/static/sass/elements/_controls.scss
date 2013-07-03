@@ -135,7 +135,48 @@
 
 // ====================
 
-// layout-based buttons
+// simple dropdown button styling - should we move this elsewhere?
+.btn-dd {
+  @extend .btn;
+  @extend .btn-pill;
+  padding:($baseline/4) ($baseline/2);
+  border-width: 1px;
+  border-style: solid;
+  border-color: transparent;
+  text-align: center;
+
+  &:hover, &:active {
+    @extend .fake-link;
+    border-color: $gray-l3;
+  }
+
+  &.current, &.active, &.is-selected {
+    @include box-shadow(inset 0 1px 2px 1px $shadow-l1);
+    border-color: $gray-l3;
+  }
+}
+
+// layout-based buttons - nav dd
+.btn-dd-nav-primary {
+  @extend .btn-dd;
+  background: $white;
+  border-color: $white;
+  color: $gray-d1;
+
+  &:hover, &:active {
+    background: $white;
+    color: $blue-s1;
+  }
+
+  &.current, &.active {
+    background: $white;
+    color: $gray-d4;
+
+    &:hover, &:active {
+      color: $blue-s1;
+    }
+  }
+}
 
 // ====================
 

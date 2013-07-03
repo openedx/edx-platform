@@ -4,7 +4,10 @@ import sys
 
 from django.conf import settings
 from django.core.validators import ValidationError, validate_email
-from django.http import Http404, HttpResponse, HttpResponseNotAllowed
+from django.views.decorators.csrf import requires_csrf_token
+from django.views.defaults import server_error
+from django.http import (Http404, HttpResponse, HttpResponseNotAllowed,
+                         HttpResponseServerError)
 from dogapi import dog_stats_api
 from mitxmako.shortcuts import render_to_response
 import zendesk
@@ -14,6 +17,19 @@ import track.views
 
 
 log = logging.getLogger(__name__)
+
+
+@requires_csrf_token
+def jsonable_server_error(request, template_name='500.html'):
+    """
+    500 error handler that serves JSON on an AJAX request, and proxies
+    to the Django default `server_error` view otherwise.
+    """
+    if request.is_ajax():
+        msg = {"error": "The edX servers encountered an error"}
+        return HttpResponseServerError(json.dumps(msg))
+    else:
+        return server_error(request, template_name=template_name)
 
 
 def calculate(request):
@@ -228,4 +244,3 @@ def accepts(request, media_type):
     """Return whether this request has an Accept header that matches type"""
     accept = parse_accept_header(request.META.get("HTTP_ACCEPT", ""))
     return media_type in [t for (t, p, q) in accept]
-
