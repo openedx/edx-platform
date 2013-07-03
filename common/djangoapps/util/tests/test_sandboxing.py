@@ -25,4 +25,3 @@ class SandboxingTest(TestCase):
         """
         self.assertTrue(can_execute_unsafe_code('edX/full/2012_Fall'))
         self.assertTrue(can_execute_unsafe_code('edX/full/2013_Spring'))
-
