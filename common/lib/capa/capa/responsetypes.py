@@ -2099,7 +2099,6 @@ class AnnotationResponse(LoncapaResponse):
 
 
 class ChoiceTextResponse(LoncapaResponse):
-
     """
     Allows for multiple choice responses with text inputs
     Desired semantics match those of NumericalResponse and
@@ -2116,10 +2115,10 @@ class ChoiceTextResponse(LoncapaResponse):
     def setup_response(self):
         """
         Sets up three dictionaries for use later:
-        correct_choices: These are the correct binary choices(radio/checkbox)
-        correct_inputs: These are the numerical/string answers for required
+        `correct_choices`: These are the correct binary choices(radio/checkbox)
+        `correct_inputs`: These are the numerical/string answers for required
         inputs.
-        answer_values: This is a dict, keyed by the name of the binary choice
+        `answer_values`: This is a dict, keyed by the name of the binary choice
             which contains the correct answers for the text inputs seperated by
             commas e.g. "1, 0.5"
 
@@ -2141,58 +2140,80 @@ class ChoiceTextResponse(LoncapaResponse):
             # Add the name of the parent to the list of correct answers
             self.answer_values[self.answer_id].append(parent_name)
             answer_list = []
-            # Loop over <textinput> elements inside of the correct choices
+            # Loop over <numtolerance_input> elements inside of the correct choices
             for child in node:
                 answer = child.get('answer', None)
                 if not answer:
                     # If the question creator does not specify an answer for a
-                    # <textinput> inside of a correct choice, raise an error
+                    # <numtolerance_input> inside of a correct choice, raise an error
                     raise LoncapaProblemError(
-                        "Answer not provided for textinput")
+                        "Answer not provided for numtolerance_input"
+                    )
                 # Contextualize the answer to allow script generated answers.
                 answer = contextualize_text(answer, context)
                 input_name = child.get('name')
                 # Contextualize the tolerance to value.
-                tolerance = contextualize_text(child.get('tolerance', '0'),
-                                               context)
+                tolerance = contextualize_text(
+                    child.get('tolerance', '0'),
+                    context
+                )
                 # Add the answer and tolerance information for the current
-                # textinput to `correct_inputs`
-                self.correct_inputs[input_name] = {'answer': answer,
-                                                   'tolerance': tolerance
-                                                   }
+                # numtolerance_input to `correct_inputs`
+                self.correct_inputs[input_name] = {
+                    'answer': answer,
+                    'tolerance': tolerance
+                }
                 # Add the correct answer for this input to the list for show
                 answer_list.append(answer)
-            # Turn the list of textinput answers into a comma seperated string.
+            # Turn the list of numtolerance_input answers into a comma seperated string.
             self.answer_values[parent_name] = ', '.join(answer_list)
         # Turn correct choices into a set. Allows faster grading.
         self.correct_choices = set(self.correct_choices.keys())
 
     def assign_choice_names(self):
         """
-        Initialize name attributes in <choice> and <textinput> tags
+        Initialize name attributes in <choice> and <numtolerance_input> tags
         for this response.
         """
 
-        for index, choice in enumerate(self.xml.xpath('//*[@id=$id]//choice',
-                                                      id=self.xml.get('id'))):
+        for index, choice in enumerate(
+            self.xml.xpath('//*[@id=$id]//choice', id=self.xml.get('id'))
+        ):
             # Set the name attribute for <choices>
             # "bc" is appended at the end to indicate that this is a
-            # binary choice as opposed to a textinput, this convention
+            # binary choice as opposed to a numtolerance_input, this convention
             # is used when grading the problem
-            choice.set("name", self.answer_id + "_choiceinput_" + str(index) +
-                       "bc"
-                       )
-            # Set Name attributes for <textinput> elements
-            for ind, child in enumerate(choice.findall('textinput')):
-                child.set("name", self.answer_id + "_choiceinput_" +
-                          str(index) + "_textinput_" + str(ind)
-                          )
+            choice.set(
+                "name",
+                self.answer_id + "_choiceinput_" + str(index) + "bc"
+            )
+            # Set Name attributes for <numtolerance_input> elements
+            # Look for all <numtolerance_inputs> inside this choice.
+            numtolerance_inputs = choice.findall('numtolerance_input')
+            # Look for all <decoy_input> inside this choice
+            decoys = choice.findall('decoy_input')
+            # <decoy_input> would only be used in choices which do not contain
+            # <numtolerance_input>
+            inputs = numtolerance_inputs if numtolerance_inputs else decoys
+            # Give each input inside of the choice a name combining
+            # The ordinality of the choice, and the ordinality of the input
+            # within that choice e.g. 1_2_1_choiceinput_0_numtolerance_input_1
+            for ind, child in enumerate(inputs):
+                child.set(
+                    "name",
+                    self.answer_id + "_choiceinput_" + str(index) +
+                    "_numtolerance_input_" + str(ind)
+                )
 
     def get_score(self, student_answers):
         """
-        `student_answers` contains keys for binary inputs(radiobutton, checkbox)
-        and numerical inputs. Keys ending with 'bc' are binary choice inputs
-        otherwise they are text fields. This method first seperates the two
+        Returns a `CorrectMap` showing whether `student_answers` are correct.
+
+        `student_answers` contains keys for binary inputs(radiobutton,
+        checkbox) and numerical inputs. Keys ending with 'bc' are binary
+        choice inputs otherwise they are text fields.
+
+        This method first seperates the two
         types answers and then grades them in seperate methods.
 
         The student is only correct if they have both the binary inputs and
@@ -2214,16 +2235,19 @@ class ChoiceTextResponse(LoncapaResponse):
         if choices_correct:
             inputs_correct = self._check_student_inputs(text_inputs)
         # Only return correct if the student got both the binary
-        # and textinputs are correct
+        # and numtolerance_inputs are correct
         correct = choices_correct and inputs_correct
 
-        return CorrectMap(self.answer_id, 'correct' if correct
-                          else 'incorrect'
-                          )
+        return CorrectMap(
+            self.answer_id,
+            'correct' if correct else 'incorrect'
+        )
 
     def get_answers(self):
         """
-        Returns self.answer_values
+        Returns a dictionary containing the names of binary choices as keys
+        and a string of answers to any numtolerance_inputs which they may have
+        e.g {choice_1bc : "answer1, answer2", choice_2bc : ""}
         """
         return self.answer_values
 
@@ -2232,7 +2256,7 @@ class ChoiceTextResponse(LoncapaResponse):
         Returns two dicts:
         `binary_choices` : contains the correct checkbox/radio inputs_correct
         and
-        `text_choices` : contains the correct answers for required textinputs
+        `text_choices` : contains the correct answers for required numtolerance_inputs
 
         """
         binary_choices = {}
@@ -2243,14 +2267,17 @@ class ChoiceTextResponse(LoncapaResponse):
             if(key[-2:] == 'bc'):
                 binary_choices[key] = value
             else:
-                # If the key does not end with 'bc', it refers to a textinput
+                # If the key does not end with 'bc', it refers to a numtolerance_input
                 text_choices[key] = value
         return (binary_choices, text_choices)
 
     def _check_student_choices(self, choices):
         """
         Compares student submitted checkbox/radiobutton answers against
-        the correct answers. Returns True or False
+        the correct answers. Returns True or False.
+
+        True if all of the correct choices are selected and no incorrect
+        choices are selected.
         """
         student_choices = set(choices)
         required_selected = len(self.correct_choices - student_choices) == 0
@@ -2277,7 +2304,8 @@ class ChoiceTextResponse(LoncapaResponse):
             except ValueError:
                 log.debug(
                     "Content error--answer" +
-                    "'{0}' is not a valid complexnumber".format(correct_ans))
+                    "'{0}' is not a valid complexnumber".format(correct_ans)
+                )
                 raise StudentInputError(
                     "The Staff answer could not be interpreted as a number."
                 )
@@ -2285,7 +2313,9 @@ class ChoiceTextResponse(LoncapaResponse):
             try:
                 partial_correct = compare_with_tolerance(
                     evaluator(dict(), dict(), student_answer),
-                    correct_ans, tolerance)
+                    correct_ans,
+                    tolerance
+                )
             except:
                 # Use the traceback-preserving version of re-raising with a
                 # different type
@@ -2293,7 +2323,9 @@ class ChoiceTextResponse(LoncapaResponse):
 
                 raise StudentInputError(
                     "Could not interpret '{0}' as a number{1}".format(
-                        cgi.escape(student_answer), trace)
+                        cgi.escape(student_answer),
+                        trace
+                    )
                 )
 
             if not partial_correct:

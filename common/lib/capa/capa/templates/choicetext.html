@@ -10,7 +10,7 @@
     <div class="script_placeholder" data-src="/static/js/capa/choicetextinput.js"/>
     <div class="indicator_container">
     % if input_type == 'checkbox' or not element_checked:
-        % if status == 'unsubmitted' or show_correctness == 'never':
+        % if status == 'unsubmitted':
         <span class="unanswered" style="display:inline-block;" id="status_${id}"></span>
         % elif status == 'correct':
         <span class="correct" id="status_${id}"></span>
@@ -35,7 +35,7 @@
                 else:
                     correctness = None
             %>
-            % if correctness and not show_correctness=='never':
+            % if correctness:
                 class="choicetextgroup_${correctness}"
             % endif
             % endif

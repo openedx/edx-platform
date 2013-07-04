@@ -796,53 +796,59 @@ class ChoiceTextResponseXMLFactory(ResponseXMLFactory):
         ]
 
         This indicates that the first checkbox/radio is correct and it
-        contains a textinput with an answer of 5 and a tolerance of 0
+        contains a numtolerance_input with an answer of 5 and a tolerance of 0
 
         It also indicates that the second has a second incorrect radiobutton
-        or checkbox with a textinput.
+        or checkbox with a numtolerance_input.
         """
         choices = kwargs.get('choices', [("true", {})])
         choice_inputs = []
-        #  Ensure that the first element of choices is iterable
-        if (not(type(choices[0]) == list or type(choices[0]) == tuple)):
+        # Ensure that the first element of choices is an ordered
+        # collection. It will start as a list, a tuple, or not a Container.
+        if type(choices[0]) not in [list, tuple]:
             choices = [choices]
 
         for choice in choices:
             correctness, answers = choice
-            textinputs = []
+            numtolerance_inputs = []
             # If the current `choice` contains any("answer": number)
-            # elemnt, turn those into textinputs
+            # elements, turn those into numtolerance_inputs
             if answers:
-                # Make sure that `answers` is iterable for convenience.
-                if (not(type(answers) == list or type(answers) == tuple)):
+                # `answers` will be a list or tuple of answers or a single
+                # answer, representing the answers for numtolerance_inputs
+                # inside of this specific choice.
+
+                # Make sure that `answers` is an ordered collection for
+                # convenience.
+                if type(answers) not in [list, tuple]:
                     answers = [answers]
 
-                for answer in answers:
-                    # Create and add a textinput_element for the current
-                    # answer.
-                    textinputs.append(
-                        self._create_textinput_element(
-                            **answer
-                        )
-                    )
-            choice_inputs.append(self._create_choice_element(
-                correctness=correctness, inputs=textinputs)
+                numtolerance_inputs = [
+                    self._create_numtolerance_input_element(answer)
+                    for answer in answers
+                ]
+
+            choice_inputs.append(
+                self._create_choice_element(
+                    correctness=correctness,
+                    inputs=numtolerance_inputs
+                )
             )
         # Default type is 'radiotextgroup'
         input_type = kwargs.get('type', 'radiotextgroup')
         input_element = etree.Element(input_type)
 
-        for ind, c in enumerate(choice_inputs):
+        for ind, choice in enumerate(choice_inputs):
             # Give each choice text equal to it's position(0,1,2...)
-            c.text = "choice_{0}".format(ind)
-            input_element.append(c)
+            choice.text = "choice_{0}".format(ind)
+            input_element.append(choice)
 
         return input_element
 
     def _create_choice_element(self, **kwargs):
         """
         Creates a choice element for a choictextproblem.
-        Defaults to a correct choice with no textinput
+        Defaults to a correct choice with no numtolerance_input
         """
         text = kwargs.get('text', '')
         correct = kwargs.get('correctness', "true")
@@ -850,21 +856,24 @@ class ChoiceTextResponseXMLFactory(ResponseXMLFactory):
         choice_element = etree.Element("choice")
         choice_element.set("correct", correct)
         choice_element.text = text
-        for i in inputs:
+        for inp in inputs:
             # Add all of the inputs as children of this element
-            choice_element.append(i)
+            choice_element.append(inp)
 
         return choice_element
 
-    def _create_textinput_element(self, **kwargs):
+    def _create_numtolerance_input_element(self, params):
         """
-        Creates a <textinput/> element with optionally
+        Creates a <numtolerance_input/> element with optionally
         specified tolerance and answer.
         """
-        answer = kwargs['answer'] if 'answer' in kwargs else None
-        tolerance = kwargs['tolerance'] if 'tolerance' in kwargs else None
-        text_input = etree.Element("textinput")
-        # If there isn't an answer specified, then just return <textinput/>
+        answer = params['answer'] if 'answer' in params else None
+        tolerance = params['tolerance'] if 'tolerance' in params else None
+        text_input = etree.Element("numtolerance_input")
+        # If there is not an answer specified,
+        # then just return <numtolerance_input/>
+        # This works because <numtolerance_input/> in incorrect choices do not
+        # need to have an answer.
         if answer:
             text_input.set('answer', answer)
             if tolerance:

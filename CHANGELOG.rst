@@ -8,7 +8,7 @@ the top.  Include a label indicating the component affected.
 
 
 
-Common, LMS: Added support for choicetextresponse problems.
+Blades: Added functionality and tests for new capa input type: choicetextresponse.
 
 Common: Add tests for documentation generation to test suite
 

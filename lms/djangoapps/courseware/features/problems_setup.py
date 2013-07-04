@@ -225,11 +225,13 @@ def answer_problem(problem_type, correctness):
         input_value = "8" if correctness == 'correct' else "5"
         choice = "choiceinput_0bc" if correctness == 'correct' else "choiceinput_1bc"
         world.css_check(inputfield(problem_type, choice=choice))
-        world.css_fill(inputfield(problem_type,
-                                  choice="choiceinput_0_textinput_0"
-                                  ),
-                       input_value
-                       )
+        world.css_fill(
+            inputfield(
+                problem_type,
+                choice="choiceinput_0_numtolerance_input_0"
+            ),
+            input_value
+        )
 
 
 def problem_has_answer(problem_type, answer_class):
@@ -340,9 +342,9 @@ def inputfield(problem_type, choice=None, input_num=1):
 
    # this is necessary due to naming requirement for this problem type
     if problem_type in ("radio_text", "checkbox_text"):
-        sel = ("input#i4x-edx-model_course-problem-%s_2_%s" %
-               (problem_type.replace(" ", "_"), str(input_num)))
-
+        sel = "input#i4x-edx-model_course-problem-{0}_2_{1}".format(
+            problem_type.replace(" ", "_"), str(input_num)
+        )
 
     if choice is not None:
         base = "_choice_" if problem_type == "multiple choice" else "_"
@@ -385,7 +387,10 @@ def assert_choicetext_values(problem_type, choices, expected_values):
     """
 
     all_choices = ['choiceinput_0bc', 'choiceinput_1bc']
-    all_inputs = ["choiceinput_0_textinput_0", "choiceinput_1_textinput_0"]
+    all_inputs = [
+        "choiceinput_0_numtolerance_input_0",
+        "choiceinput_1_numtolerance_input_0"
+    ]
     for this_choice in all_choices:
         element = world.css_find(inputfield(problem_type, choice=this_choice))
 
