@@ -1,20 +1,20 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%namespace name='static' file='../../static_content.html'/>
 
-<div class="field comp-subtitles-entry" id="comp-subtitles-${component_location_html_id}"></div>
+<div class="field comp-subtitles-entry" id="comp-subtitles-${html_id}"></div>
 
 <script type="text/javascript" src="${static.url('coffee/src/views/videoalpha/subtitles_import.js')}"></script>
 
-<script id="subtitles-import-from-file-${component_location_html_id}-tpl" type="text/template">
+<script id="subtitles-import-from-file-${html_id}-tpl" type="text/template">
     <%static:include path="js/videoalpha/subtitles-import-file.underscore" />
 </script>
 
 <script type='text/javascript'>
     $(document).ready(function(){
         new CMS.Views.SubtitlesImport({
-            container: $('#comp-subtitles-${component_location_html_id}'),
+            container: $('#comp-subtitles-${html_id}'),
             tpl: {
-                file: _.template($('#subtitles-import-from-file-${component_location_html_id}-tpl').text())
+                file: _.template($('#subtitles-import-from-file-${html_id}-tpl').text())
 
             },
             msg: CMS.Views.SubtitlesMessages,

@@ -1,13 +1,13 @@
 class CMS.Views.SubtitlesImport extends Backbone.View
-  tagName: 'ul'
-  className: 'comp-subtitles-import-list'
+  tagName: "ul"
+  className: "comp-subtitles-import-list"
 
   initialize: ->
     _.bindAll(@)
     @component_id = @options.container
-      .closest('.component')
+      .closest(".component")
       .data('id')
-    @messages = new @options['msg']()
+    @messages = new @options["msg"]()
 
     @render()
 
@@ -19,7 +19,6 @@ class CMS.Views.SubtitlesImport extends Backbone.View
       msg: @messages
       $container: @$el
     )
-
     modules = @options.modules
     $.each modules, (index) ->
       new modules[index](options)
