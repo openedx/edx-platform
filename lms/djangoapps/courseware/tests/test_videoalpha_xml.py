@@ -120,6 +120,7 @@ class VideoAlphaModuleUnitTest(unittest.TestCase):
             'sources': module.sources,
             'youtube_streams': module.youtube_streams,
             'track': module.track,
+            'component_location': module.location,
             'autoplay': settings.MITX_FEATURES.get('AUTOPLAY_VIDEOS', True)
         }
         self.assertDictEqual(context, expected_context)

@@ -49,6 +49,7 @@ class TestVideo(BaseTestXmodule):
             'sub': self.item_module.sub,
             'track': self.item_module.track,
             'youtube_streams': self.item_module.youtube_streams,
+            'component_location': self.item_module.location,
             'autoplay': settings.MITX_FEATURES.get('AUTOPLAY_VIDEOS', True)
         }
         self.assertDictEqual(context, expected_context)
@@ -93,6 +94,7 @@ class TestVideoNonYouTube(TestVideo):
             'sub': self.item_module.sub,
             'track': self.item_module.track,
             'youtube_streams': '',
+            'component_location': self.item_module.location,
             'autoplay': settings.MITX_FEATURES.get('AUTOPLAY_VIDEOS', True)
         }
         self.assertDictEqual(context, expected_context)
