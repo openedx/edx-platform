@@ -39,17 +39,16 @@ class TabsEditingDescriptor(EditingFields, MakoModuleDescriptor):
 
     This class is intended to be used as a mixin.
     """
-    mako_template = "widgets/tabs-edit.html"
+    mako_template = "widgets/tabs-aggregator.html"
     css = {'scss': [resource_string(__name__, 'css/tabs/display.scss')]}
     js = {'coffee': [resource_string(__name__, 'js/src/tabs/edit.coffee')]}
     js_module_name = "TabsEditorDescriptor"
     tabs = []
 
     def get_context(self):
-        _context = super(TabsEditingDescriptor, self).get_context(self)
+        _context = super(TabsEditingDescriptor, self).get_context()
         _context.update({
             'tabs': self.tabs,
-
             'html_id': self.location.html_id(),  # element_id
             'data': self.data
         })

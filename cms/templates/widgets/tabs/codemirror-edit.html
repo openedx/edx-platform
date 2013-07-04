@@ -7,6 +7,7 @@
 <script type='text/javascript'>
     $(document).ready(function(){
       (function(){
+        ## Init CodeMirror editor
         var
           $el = $("#advanced-${html_id}"),
           advanced_editor = CodeMirror.fromTextArea(
@@ -20,7 +21,9 @@
         ## TabsEditorDescriptor for save data
         $el.data('CodeMirror', advanced_editor);
 
+
         TabsEditorDescriptor.registerTabCallback('${html_id}', '${tabName}', function(){
+          ## CodeMirror should get focus when tab is active
            advanced_editor.refresh();
            advanced_editor.focus();
         })
