@@ -1,0 +1,131 @@
+// This is shared CSS between the xmodule problem editor and the xmodule HTML editor.
+.editor {
+  position: relative;
+
+  .row {
+    position: relative;
+  }
+
+  .editor-bar {
+    position: relative;
+    @include linear-gradient(top, #d4dee8, #c9d5e2);
+    padding: 5px;
+    border-bottom-color: #a5aaaf;
+    @include clearfix;
+
+    a {
+      display: block;
+      float: left;
+      padding: 3px 10px 7px;
+      margin-left: 7px;
+      border-radius: 2px;
+
+      &:hover {
+        background: rgba(255, 255, 255, .5);
+      }
+    }
+  }
+
+  .editor-tabs {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+
+    li {
+      float: left;
+      margin-right: 5px;
+
+      &:last-child {
+        margin-right: 0;
+      }
+    }
+
+    .tab {
+      display: block;
+      height: 24px;
+      padding: 7px 20px 3px;
+      border: 1px solid #a5aaaf;
+      border-radius: 3px 3px 0 0;
+      @include linear-gradient(top, rgba(0, 0, 0, 0) 87%, rgba(0, 0, 0, .06));
+      background-color: #e5ecf3;
+      font-size: 13px;
+      color: #3c3c3c;
+      box-shadow: 1px -1px 1px rgba(0, 0, 0, .05);
+
+      &.current {
+        background: #fff;
+        border-bottom-color: #fff;
+      }
+    }
+  }
+}
+
+.component-tab{
+  background: $white;
+  padding: 20px;
+  position: relative;
+  border-top: 1px solid #8891a1;
+
+  &#advanced{
+    padding: 0;
+    border: none;
+  }
+    .blue-button{
+      @include blue-button;
+    }
+}
+
+.editor{
+  @include clearfix();
+
+  .CodeMirror {
+    @include box-sizing(border-box);
+    width: 100%;
+    position: relative;
+    height: 379px;
+    border: 1px solid #3c3c3c;
+    border-top: 1px solid #8891a1;
+    background: $white;
+    color: #3c3c3c;
+  }
+
+  .CodeMirror-scroll {
+    height: 100%;
+  }
+
+  .editor-tabs {
+    top: 11px !important;
+    right: 10px;
+    z-index: 99;
+  }
+
+  .is-inactive {
+    display: none;
+  }
+
+  .comp-subtitles-entry{
+    text-align: center;
+    .file-upload{
+      display: none;
+    }
+    .comp-subtitles-import-list{
+      > li{
+        display: block;
+        margin: $baseline/2 0px $baseline/2 0;
+      }
+
+      .blue-button{
+        font-size: 1em;
+        display: block;
+        width: 70%;
+        margin: 0 auto;
+        text-align: center;
+      }
+    }
+  }
+}
+
+.tabs-wrapper{
+  padding-top: 46px;
+  position: relative;
+}

@@ -1,0 +1,22 @@
+<%! from django.utils.translation import ugettext as _ %>
+<div class="wrapper-comp-editor" id="editor-tab-${html_id}">
+    <section class="editor">
+  % if tabs:
+      <ul class="editor-tabs">
+    % for tab in tabs:
+        <li><a href="#tab-${html_id}-${loop.index}" class="tab ${'current' if('current' in tab and tab['current'] is True) else ''}">${tab['name']}</a></li>
+    % endfor
+      </ul>
+      <div class="tabs-wrapper">
+  % else:
+      <div>
+  % endif
+       % for tab in tabs:
+        <div class="wrapper-comp-${tab['name'].lower() | entity} component-edit-tab component-tab ${'is-inactive' if(not 'current' in tab or tab['current'] is not True) else ''}" id="tab-${html_id}-${loop.index}">
+            <%include file="${tab['template']}" args="tabName=tab['name']"/>
+        </div>
+        % endfor
+      </div>
+    </section>
+</div>
+<%include file="metadata-edit.html" />

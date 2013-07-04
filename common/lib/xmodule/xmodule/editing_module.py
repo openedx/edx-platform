@@ -29,6 +29,34 @@ class EditingDescriptor(EditingFields, MakoModuleDescriptor):
         return _context
 
 
+
+class TabsEditingDescriptor(EditingFields, MakoModuleDescriptor):
+    """
+    Module that provides a raw editing view of its data and children.  It does not
+    perform any validation on its definition---just passes it along to the browser.
+
+    This class is intended to be used as a mixin.
+    """
+    mako_template = "widgets/tabs-edit.html"
+    css = {'scss': [resource_string(__name__, 'css/tabs/display.scss')]}
+    js = {'coffee': [resource_string(__name__, 'js/src/tabs/edit.coffee')]}
+    js_module_name = "TabsEditorDescriptor"
+
+    def get_context(self):
+        _context = MakoModuleDescriptor.get_context(self)
+        # Add our specific template information (the raw data body)
+        _context.update({
+            'tabs': self.tabs,
+            'id': self.location,
+            'html_id': self.location.html_id(),
+            'data': self.data
+
+        })
+        return _context
+
+
+
+
 class XMLEditingDescriptor(EditingDescriptor):
     """
     Module that provides a raw editing view of its data as XML. It does not perform
