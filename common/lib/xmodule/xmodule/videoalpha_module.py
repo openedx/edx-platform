@@ -20,7 +20,7 @@ from django.http import Http404
 from django.conf import settings
 
 from xmodule.x_module import XModule
-from xmodule.editing_module import EditingDescriptor
+from xmodule.editing_module import TabsEditingDescriptor
 from xmodule.modulestore.mongo import MongoModuleStore
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.content import StaticContent
@@ -165,24 +165,18 @@ class VideoAlphaModule(VideoAlphaFields, XModule):
         })
 
 
-class VideoAlphaDescriptor(VideoAlphaFields, EditingDescriptor):
+class VideoAlphaDescriptor(VideoAlphaFields, TabsEditingDescriptor):
     """Descriptor for `VideoAlphaModule`."""
     module_class = VideoAlphaModule
     template_dir_name = "videoalpha"
-    mako_template = "widgets/edit.html"
-    js = {'coffee': [resource_string(__name__, 'js/src/videoalpha/edit.coffee')]}
-    js_module_name = "VideoAlphaEditorTabs"
-    css = {'scss': [resource_string(__name__, 'css/editor/edit.scss'), resource_string(__name__, 'css/videoalpha/edit.scss')]}
-
-    def get_context(self):
-        context = super(VideoAlphaDescriptor, self).get_context()
-        tabs = {
-            'Subtitles': "videoalpha/subtitles.html"
+    tabs = [
+        {
+            'name': "XML",
+            'template': "edit.html",
+            'current': True,
+        },
+        {
+            'name': "Subtitles",
+            'template': "videoalpha/subtitles.html",
         }
-        context.update({
-            'tabs': tabs,
-            'id': self.location,
-            'html_id': self.location.html_id()
-
-        })
-        return context
+    ]
