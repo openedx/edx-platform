@@ -22,11 +22,19 @@
         $el.data('CodeMirror', advanced_editor);
 
 
+
         TabsEditorDescriptor.registerTabCallback('${html_id}', '${tabName}', function(){
+          var $tinymce = $("#visual-${html_id}").data('TinyMCE');
+          if ($tinymce && $tinymce.isDirty()){
+            advanced_editor.setValue($tinymce.getContent({no_events: 1}))
+            advanced_editor.setCursor(0)
+          }
+
           ## CodeMirror should get focus when tab is active
-           advanced_editor.refresh();
-           advanced_editor.focus();
+          advanced_editor.refresh();
+          advanced_editor.focus();
         })
+
       }());
     });
 </script>

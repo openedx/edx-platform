@@ -8,7 +8,8 @@ from path import path
 
 from pkg_resources import resource_string
 from xblock.core import Scope, String
-from xmodule.editing_module import EditingDescriptor
+# from xmodule.editing_module import EditingDescriptor
+from xmodule.editing_module import TabsEditingDescriptor
 from xmodule.html_checker import check_html
 from xmodule.stringify import stringify_children
 from xmodule.x_module import XModule
@@ -32,23 +33,35 @@ class HtmlModule(HtmlFields, XModule):
     css = {'scss': [resource_string(__name__, 'css/html/display.scss')]}
 
     def get_html(self):
-        if self.system.anonymous_student_id: 
+        if self.system.anonymous_student_id:
             return self.data.replace("%%USER_ID%%", self.system.anonymous_student_id)
         return self.data
 
 
-class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):
+class HtmlDescriptor(HtmlFields, XmlDescriptor, TabsEditingDescriptor):
     """
     Module for putting raw html in a course
     """
-    mako_template = "widgets/html-edit.html"
+    # mako_template = "widgets/html-edit.html"
     module_class = HtmlModule
     filename_extension = "xml"
     template_dir_name = "html"
 
-    js = {'coffee': [resource_string(__name__, 'js/src/html/edit.coffee')]}
-    js_module_name = "HTMLEditingDescriptor"
-    css = {'scss': [resource_string(__name__, 'css/editor/edit.scss'), resource_string(__name__, 'css/html/edit.scss')]}
+    # js = {'coffee': [resource_string(__name__, 'js/src/html/edit.coffee')]}
+    # js_module_name = "HTMLEditingDescriptor"
+    # css = {'scss': [resource_string(__name__, 'css/editor/edit.scss'), resource_string(__name__, 'css/html/edit.scss')]}
+
+    tabs = [
+        {
+            'name': "Visual1",
+            'template': "tabs/tiny-mce-edit.html",
+            'current': True,
+        },
+        {
+            'name': "HTML1",
+            'template': "tabs/codemirror-edit.html",
+        }
+    ]
 
     # VS[compat] TODO (cpennington): Delete this method once all fall 2012 course
     # are being edited in the cms

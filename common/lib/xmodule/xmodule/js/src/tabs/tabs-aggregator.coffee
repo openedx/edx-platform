@@ -47,9 +47,13 @@ class @TabsEditorDescriptor
     # Link to instance of CodeMirror is stored in data attribute of DOM element
     # If it exist we retreive the data from CodeMirror
     advanced_editor = $('.edit-box', @element).first().data('CodeMirror')
-    if advanced_editor
+    visual_editor = $('.tiny-mce', @element).first().data('TinyMCE')
+    if advanced_editor && $('.edit-box', @element).first().closest('.component-tab').is(':visible')
       text = advanced_editor.getValue()
-      data: text
+      return data: text
+    else if visual_editor && $('.tiny-mce', @element).first().closest('.component-tab').is(':visible')
+      text = visual_editor.getContent({no_events: 1})
+      return data: text
 
 window.TabsEditorDescriptor = window.TabsEditorDescriptor || {};
 TabsEditorDescriptor.registerTabCallback = (id, name, callback) ->
