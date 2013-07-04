@@ -1,3 +1,5 @@
+"""Descriptors for XBlocks/Xmodules, that provide editing of atrributes"""
+
 from pkg_resources import resource_string
 from xmodule.mako_module import MakoModuleDescriptor
 from xblock.core import Scope, String
@@ -7,6 +9,7 @@ log = logging.getLogger(__name__)
 
 
 class EditingFields(object):
+    """Contains specific template information (the raw data body)"""
     data = String(scope=Scope.content, default='')
 
 
@@ -29,7 +32,6 @@ class EditingDescriptor(EditingFields, MakoModuleDescriptor):
         return _context
 
 
-
 class TabsEditingDescriptor(EditingFields, MakoModuleDescriptor):
     """
     Module that provides a raw editing view of its data and children.  It does not
@@ -41,16 +43,15 @@ class TabsEditingDescriptor(EditingFields, MakoModuleDescriptor):
     css = {'scss': [resource_string(__name__, 'css/tabs/display.scss')]}
     js = {'coffee': [resource_string(__name__, 'js/src/tabs/edit.coffee')]}
     js_module_name = "TabsEditorDescriptor"
+    tabs = []
 
     def get_context(self):
-        _context = MakoModuleDescriptor.get_context(self)
-        # Add our specific template information (the raw data body)
+        _context = super(TabsEditingDescriptor, self).get_context(self)
         _context.update({
             'tabs': self.tabs,
-            'id': self.location,
-            'html_id': self.location.html_id(),
-            'data': self.data
 
+            'html_id': self.location.html_id(),  # element_id
+            'data': self.data
         })
         return _context
 
