@@ -868,17 +868,20 @@ class ChoiceTextResponseXMLFactory(ResponseXMLFactory):
         specified tolerance and answer.
         """
         answer = params['answer'] if 'answer' in params else None
-        tolerance = params['tolerance'] if 'tolerance' in params else None
-        text_input = etree.Element("numtolerance_input")
-        # If there is not an answer specified,
-        # then just return <numtolerance_input/>
-        # This works because <numtolerance_input/> in incorrect choices do not
-        # need to have an answer.
+        # If there is not an answer specified, Then create a <decoy_input/>
+        # otherwise create a <numtolerance_input/> and set its tolerance
+        # and answer attributes.
         if answer:
+            text_input = etree.Element("numtolerance_input")
             text_input.set('answer', answer)
-            if tolerance:
-                text_input.set('tolerance', tolerance)
-            else:
-                # If there is not a tolerance specified, set it to 0
-                text_input.set('tolerance', 0)
+            # If tolerance was specified, was specified use it, otherwise
+            # Set the tolerance to "0"
+            text_input.set(
+                'tolerance',
+                params['tolerance'] if 'tolerance' in params else "0"
+            )
+
+        else:
+            text_input = etree.Element("decoy_input")
+
         return text_input
