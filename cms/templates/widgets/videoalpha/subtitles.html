@@ -1,0 +1,26 @@
+<%! from django.utils.translation import ugettext as _ %>
+<div class="field comp-subtitles-entry" id="comp-subtitles-${component_location}"></div>
+
+<script type="text/javascript" src="/static/coffee/src/views/videoalpha/subtitles_import.js"></script>
+
+<script id="subtitles-import-variants-${component_location}-tpl" type="text/template">
+    <ul class="comp-import-variants">
+        <li>
+            <a href="#" class="blue-button">${_("Upload from file")}</a>
+        </li>
+        <li>
+           <a href="#" id="import-from-youtube" class="blue-button">${_("Import from Youtube")}</a>
+        </li>
+    </ul>
+</script>
+
+<script type='text/javascript'>
+    $(document).ready(function(){
+        new CMS.Views.SubtitlesImport({
+            el: $('#comp-subtitles-${component_location}'),
+            tpl: {
+                variants: _.template($('#subtitles-import-variants-${component_location}-tpl').text())
+            }
+        });
+    });
+</script>
