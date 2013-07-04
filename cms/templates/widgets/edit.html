@@ -1,27 +1,29 @@
 <%! from django.utils.translation import ugettext as _ %>
-<div class="wrapper-comp-editor" id="editor-tab">
-    <section class="editor">
-  % if tabs.items():
-      <ul class="editor-tabs">
-        <li><a href="#advanced" class="tab current" data-tab="advanced">${_("HTML")}</a></li>
-    % for tab_name, tab_content in tabs.items():
-        <li><a href="#tab-${loop.index}" class="tab">${tab_name}</a></li>
-    % endfor
-      </ul>
-      <div class="tabs-wrapper">
-  % else:
-    <div>
-  % endif
-        <div class="component-tab" id="advanced">
-          <textarea class="edit-box">${data | h}</textarea>
-        </div>
-       % for tab_name, tab_content in tabs.items():
-        <div class="wrapper-comp-${tab_name.lower() | entity} component-edit-tab component-tab is-inactive" id="tab-${loop.index}">
-            <%include file="${tab_content}"/>
-        </div>
-        % endfor
-      </div>
-    </section>
+<%page args="tabName"/>
+<div style="margin: -20px;">
+  <textarea id="advanced-${html_id}" class="edit-box">${data | h}</textarea>
 </div>
 
-<%include file="metadata-edit.html" />
+<script type='text/javascript'>
+    $(document).ready(function(){
+      (function(){
+        var
+          $el = $("#advanced-${html_id}"),
+          advanced_editor = CodeMirror.fromTextArea(
+            $el.get(0), {
+              mode: "text/html",
+              lineNumbers: true,
+              lineWrapping: true
+            }
+          );
+        ## Save link to CodeMirror in data attribute CodeMirror for further using in
+        ## TabsEditorDescriptor for save data
+        $el.data('CodeMirror', advanced_editor);
+
+        TabsEditorDescriptor.registerTabCallback('${html_id}', '${tabName}', function(){
+           advanced_editor.refresh();
+           advanced_editor.focus();
+        })
+      }());
+    });
+</script>

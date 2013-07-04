@@ -11,12 +11,19 @@
 
 <script type='text/javascript'>
     $(document).ready(function(){
+
+        $('#editor-tab-${html_id}').on('TabsEditor', function(e, tab_name, tab_id){
+            if (tab_name.toLowerCase() === 'subtitles'){
+                // do something if tab_name is subtitles
+            }
+        })
+
         new CMS.Views.SubtitlesImport({
             container: $('#comp-subtitles-${html_id}'),
             tpl: {
                 file: _.template($('#subtitles-import-from-file-${html_id}-tpl').text())
-
             },
+            subtitlesExist: true,
             msg: CMS.Views.SubtitlesMessages,
             modules: [
                 CMS.Views.SubtitlesImportFile,
