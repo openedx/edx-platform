@@ -1,26 +1,27 @@
 <%! from django.utils.translation import ugettext as _ %>
-<div class="field comp-subtitles-entry" id="comp-subtitles-${component_location}"></div>
+<%namespace name='static' file='../../static_content.html'/>
 
-<script type="text/javascript" src="/static/coffee/src/views/videoalpha/subtitles_import.js"></script>
+<div class="field comp-subtitles-entry" id="comp-subtitles-${component_location_html_id}"></div>
 
-<script id="subtitles-import-variants-${component_location}-tpl" type="text/template">
-    <ul class="comp-import-variants">
-        <li>
-            <a href="#" class="blue-button">${_("Upload from file")}</a>
-        </li>
-        <li>
-           <a href="#" id="import-from-youtube" class="blue-button">${_("Import from Youtube")}</a>
-        </li>
-    </ul>
+<script type="text/javascript" src="${static.url('coffee/src/views/videoalpha/subtitles_import.js')}"></script>
+
+<script id="subtitles-import-from-file-${component_location_html_id}-tpl" type="text/template">
+    <%static:include path="js/videoalpha/subtitles-import-file.underscore" />
 </script>
 
 <script type='text/javascript'>
     $(document).ready(function(){
         new CMS.Views.SubtitlesImport({
-            el: $('#comp-subtitles-${component_location}'),
+            container: $('#comp-subtitles-${component_location_html_id}'),
             tpl: {
-                variants: _.template($('#subtitles-import-variants-${component_location}-tpl').text())
-            }
+                file: _.template($('#subtitles-import-from-file-${component_location_html_id}-tpl').text())
+
+            },
+            msg: CMS.Views.SubtitlesMessages,
+            modules: [
+                CMS.Views.SubtitlesImportFile,
+                CMS.Views.SubtitlesImportYT
+            ]
         });
     });
 </script>
