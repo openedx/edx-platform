@@ -965,3 +965,65 @@ body.unit {
 div.wrapper-comp-editor.is-inactive ~ div.launch-latex-compiler{
  display: none;
 }
+
+#circle-preloader{
+  display: block;
+  width:70px;
+  padding: 20px 0;
+  margin: 0 auto;
+}
+
+.circle-preloader{
+  display: block;
+  background-color:#EDBD45;
+  float:left;
+  height:15px;
+  margin-left:8px;
+  width:15px;
+  @include anim-opacityHider(1.8s, linear, infinite);
+  border-radius:10px;
+}
+
+#circle-preloader_1{
+  @include animation-delay(0.4s);
+}
+
+#circle-preloader_2{
+  @include animation-delay(0.7s);
+}
+
+#circle-preloader_3{
+  @include animation-delay(1.0s);
+}
+
+.prompt{
+  &.warning{
+    .file-name{
+      word-break: break-all;
+    }
+    .progress-bar{
+      display: block;
+      height: 50px;
+      margin: 30px auto 10px;
+      border: 1px solid $blue;
+      text-align: center;
+      font-size: 1.14em;
+
+      &.loaded {
+        border-color: #66b93d;
+
+        .progress-fill {
+          background: #66b93d;
+        }
+      }
+      .progress-fill {
+        display: block;
+        width: 0%;
+        height: 50px;
+        background: $blue;
+        color: #fff;
+        line-height: 48px;
+      }
+    }
+  }
+}

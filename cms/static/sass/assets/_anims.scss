@@ -169,3 +169,32 @@
   @include animation-iteration-count($count);
   @include animation-fill-mode(both);
 }
+
+
+// =================
+
+// Subtitles Preloading animation
+
+@mixin opacityHider {
+  0% {
+    opacity: 1.0;
+  }
+
+  50% {
+    opacity: 0.0;
+  }
+}
+
+@-moz-keyframes anim-opacityHider { @include opacityHider(); }
+@-webkit-keyframes anim-opacityHider { @include opacityHider(); }
+@-o-keyframes anim-opacityHider { @include opacityHider(); }
+@keyframes anim-opacityHider { @include opacityHider(); }
+
+@mixin anim-opacityHider($duration, $timing: ease-in-out, $count: 1, $delay: 0) {
+  @include animation-name(anim-opacityHider);
+  @include animation-duration($duration);
+  @include animation-delay($delay);
+  @include animation-timing-function($timing);
+  @include animation-iteration-count($count);
+  @include animation-fill-mode(both);
+}

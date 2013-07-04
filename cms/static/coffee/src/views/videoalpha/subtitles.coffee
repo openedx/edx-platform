@@ -1,1 +1,0 @@
-class CMS.Views.Subtitles extends Backbone.View
