@@ -12,7 +12,7 @@
       <div>
   % endif
        % for tab in tabs:
-        <div class="wrapper-comp-${tab['name'].lower() | entity} component-edit-tab component-tab ${'is-inactive' if(not 'current' in tab or tab['current'] is not True) else ''}" id="tab-${html_id}-${loop.index}">
+        <div class="component-tab ${'is-inactive' if(not 'current' in tab or tab['current'] is not True) else ''}" id="tab-${html_id}-${loop.index}">
             <%include file="${tab['template']}" args="tabName=tab['name']"/>
         </div>
         % endfor
