@@ -1311,6 +1311,8 @@ registry.register(AnnotationInput)
 class ChoiceTextGroup(InputTypeBase):
     """
     Groups of radiobutton/checkboxes with text inputs.
+    Allows for a "not enough information" option to be added
+    to problems with numerical answers.
 
     Examples:
     RadioButton problem
@@ -1318,19 +1320,19 @@ class ChoiceTextGroup(InputTypeBase):
       <startouttext/>
         A person rolls a standard die 100 times and records the results.
         On the first roll they received a "1". Given this information
-        Select the correct choice and fill in numbers to make it accurate.
+        select the correct choice and fill in numbers to make it accurate.
       <endouttext/>
       <choicetextresponse>
         <radiotextgroup>
           <choice correct="false">The lowest number rolled was:
             <decoy_input/> and the highest number rolled was:
-            <decoy_input/></choice>
+            <decoy_input/> .</choice>
           <choice correct="true">The lowest number rolled was <numtolerance_input answer="1"/>
             and there is not enough information to determine the highest number rolled.
           </choice>
           <choice correct="false">There is not enough information to determine the lowest
           number rolled, and the highest number rolled was:
-          <decoy_input/>.
+          <decoy_input/> .
           </choice>
         </radiotextgroup>
       </choicetextresponse>
@@ -1341,7 +1343,7 @@ class ChoiceTextGroup(InputTypeBase):
       <startouttext/>
         A person randomly selects 100 times, with replacement, from the list of numbers \(\sqrt{2}\) , 2, 3, 4 ,5 ,6
         and records the results. The first number they pick is \(\sqrt{2}\) Given this information
-        Select the correct choices and fill in numbers to make them accurate.
+        select the correct choices and fill in numbers to make them accurate.
       <endouttext/>
       <choicetextresponse>
         <checkboxtextgroup>
@@ -1349,10 +1351,10 @@ class ChoiceTextGroup(InputTypeBase):
                 The lowest number selected was <numtolerance_input answer="1.4142" tolerance="0.01"/>
              </choice>
              <choice correct="false">
-                The highest number selected was <decoy_input/>
+                The highest number selected was <decoy_input/> .
             </choice>
             <choice correct="true">There is not enough information given to determine the highest number
-                which was selected
+                which was selected.
             </choice>
             <choice correct="false">There is not enough information given to determine the lowest number
                 selected.
@@ -1404,7 +1406,7 @@ class ChoiceTextGroup(InputTypeBase):
 
     def _extra_context(self):
         """
-        Returns a dictionary of extra content necessarry for rendering this InputType.
+        Returns a dictionary of extra content necessary for rendering this InputType.
 
         `input_type` is either 'radio' or 'checkbox' indicating whether the choices for
         this problem will have radiobuttons or checkboxes.
