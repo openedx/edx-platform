@@ -1,14 +1,17 @@
 from django.core.mail import EmailMultiAlternatives, get_connection
 from subprocess import Popen, PIPE
-from celery import task
+from celery import task, current_task
+from time import sleep
 from django.conf import settings
 from mitxmako.shortcuts import render_to_string
 from django.contrib.auth.models import User, Group
-from celery.task import current
+from smtplib import SMTPServerDisconnected, SMTPDataError, SMTPConnectError
 from bulk_email.models import *
 
 from courseware.courses import get_course_by_id
 from courseware.access import _course_staff_group_name, _course_instructor_group_name
+
+from django.http import Http404
 
 import math
 import time
@@ -28,7 +31,11 @@ def delegate_email_batches(hash_for_msg, recipient, course_id, course_url, user_
 
     Returns the number of batches (workers) kicked off.
     '''
-    course = get_course_by_id(course_id)
+    try:
+        course = get_course_by_id(course_id)
+    except Http404 as exc:
+        log.error("get_course_by_id failed: " + exc.args[0])
+        raise Exception("get_course_by_id failed: " + exc.args[0])
 
     if recipient == "myself":
         recipient_qset = User.objects.filter(id=user_id).values('profile__name', 'email')
@@ -68,8 +75,12 @@ def course_email(hash_for_msg, to_list, course_title, course_url, throttle=False
     being the only "to".  Emails are sent multipart, in both plain
     text and html.  
     """
+    try:
+        msg = CourseEmail.objects.get(hash=hash_for_msg)
+    except CourseEmail.DoesNotExist as exc:
+        log.exception(exc.args[0])
+        raise exc
 
-    msg = CourseEmail.objects.get(hash=hash_for_msg)
     subject = "[" + course_title + "] " + msg.subject
 
     p = Popen(['lynx','-stdin','-display_charset=UTF-8','-assume_charset=UTF-8','-dump'], stdin=PIPE, stdout=PIPE)
@@ -103,17 +114,21 @@ def course_email(hash_for_msg, to_list, course_title, course_url, throttle=False
             email_msg = EmailMultiAlternatives(subject, plaintext+plain_footer.encode('utf-8'), from_addr, [email], connection=connection)
             email_msg.attach_alternative(msg.html_message+html_footer.encode('utf-8'), 'text/html')
 
-            if throttle or current.request.retries > 0: #throttle if we tried a few times and got the rate limiter
+            if throttle or current_task.request.retries > 0: #throttle if we tried a few times and got the rate limiter
                 time.sleep(0.2)
 
             try:
                 connection.send_messages([email_msg])
                 log.info('Email with hash ' + hash_for_msg + ' sent to ' + email)
                 num_sent += 1
-            except STMPDataError as exc:
-                log.warn('Email with hash ' + hash_for_msg + ' not delivered to ' + email + ' due to error: ' + exc.smtp_error)
-                num_error += 1
-                connection.open() #reopen connection, in case.
+            except SMTPDataError as exc:
+                #According to SMTP spec, we'll retry error codes in the 4xx range.  5xx range indicates hard failure
+                if exc.smtp_code >= 400 and exc.smtp_code < 500:
+                    raise exc # this will cause the outer handler to catch the exception and retry the entire task
+                else:
+                    #this will fall through and not retry the message, since it will be popped
+                    log.warn('Email with hash ' + hash_for_msg + ' not delivered to ' + email + ' due to error: ' + exc.smtp_error)
+                    num_error += 1
 
             to_list.pop()
 
@@ -121,4 +136,5 @@ def course_email(hash_for_msg, to_list, course_title, course_url, throttle=False
         return "Sent %d, Fail %d" % (num_sent, num_error)
 
     except (SMTPDataError, SMTPConnectError, SMTPServerDisconnected) as exc:
-        raise course_email.retry(arg=[hash_for_msg, to_list, course_title, course_url, current.request.retries>0], exc=exc, countdown=(2 ** current.request.retries)*15)
+        #error caught here cause the email to be retried.  The entire task is actually retried without popping the list
+        raise course_email.retry(arg=[hash_for_msg, to_list, course_title, course_url, current_task.request.retries>0], exc=exc, countdown=(2 ** current_task.request.retries)*15)
