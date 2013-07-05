@@ -750,6 +750,9 @@ INSTALLED_APPS = (
 
     # Notification preferences setting
     'notification_prefs',
+
+    # Mailgun webhook
+    'mailgun_webhook',
 )
 
 ######################### MARKETING SITE ###############################
