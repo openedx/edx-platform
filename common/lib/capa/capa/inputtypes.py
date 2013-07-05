@@ -460,10 +460,10 @@ class JSInput(InputTypeBase):
     DO NOT USE! HAS NOT BEEN TESTED BEYOND 700X PROBLEMS, AND MAY CHANGE IN
     BACKWARDS-INCOMPATIBLE WAYS.
       Inputtype for general javascript inputs. Intended to be used with
-    customresponse.  
+    customresponse.
       Loads in a sandboxed iframe to help prevent css and js conflicts between
-    frame and top-level window. 
-    
+    frame and top-level window.
+
     iframe sandbox whitelist:
         - allow-scripts
         - allow-popups
@@ -474,9 +474,9 @@ class JSInput(InputTypeBase):
     window elements.
       Example:
 
-        <jsinput html_file="/static/test.html" 
-                 gradefn="grade" 
-                 height="500" 
+        <jsinput html_file="/static/test.html"
+                 gradefn="grade"
+                 height="500"
                  width="400"/>
 
      See the documentation in the /doc/public folder for more information.
@@ -500,7 +500,7 @@ class JSInput(InputTypeBase):
                 Attribute('width', "400"),       # iframe width
                 Attribute('height', "300")]      # iframe height
 
-        
+
 
     def _extra_context(self):
         context = {
@@ -510,10 +510,11 @@ class JSInput(InputTypeBase):
 
         return context
 
-        
+
 
 registry.register(JSInput)
 #-----------------------------------------------------------------------------
+
 
 class TextLine(InputTypeBase):
     """
@@ -1373,8 +1374,6 @@ registry.register(AnnotationInput)
 class ChoiceTextGroup(InputTypeBase):
     """
     Groups of radiobutton/checkboxes with text inputs.
-    Allows for a "not enough information" option to be added
-    to problems with numerical answers.
 
     Examples:
     RadioButton problem

@@ -2256,7 +2256,6 @@ class ChoiceTextResponse(LoncapaResponse):
         binary_choices, numtolerance_inputs = self._split_answers_dict(answer_dict)
         # Check the binary choices first.
         choices_correct = self._check_student_choices(binary_choices)
-        inputs_correct = True
         inputs_correct = self._check_student_inputs(numtolerance_inputs)
         # Only return correct if the student got both the binary
         # and numtolerance_inputs are correct
@@ -2376,7 +2375,6 @@ class ChoiceTextResponse(LoncapaResponse):
 
         Returns True if and only if all student inputs are correct.
         """
-
         inputs_correct = True
         for answer_name, answer_value in numtolerance_inputs.iteritems():
             # If `self.corrrect_inputs` does not contain an entry for

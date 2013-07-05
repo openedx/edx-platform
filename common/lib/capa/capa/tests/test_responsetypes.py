@@ -1432,54 +1432,15 @@ class AnnotationResponseTest(ResponseTest):
 
 
 class ChoiceTextResponseTest(ResponseTest):
+    """
+    Class containing setup and tests for ChoiceText responsetype.
+    """
 
     from response_xml_factory import ChoiceTextResponseXMLFactory
     xml_factory_class = ChoiceTextResponseXMLFactory
 
-    one_choice_one_input = lambda itype, inst: inst._make_problem(
-        ("true", {"answer": "123", "tolerance": "1"}),
-        itype
-    )
-
-    one_choice_two_inputs = lambda itype, inst: inst._make_problem(
-        [("true", ({"answer": "123", "tolerance": "1"},
-         {"answer": "456", "tolerance": "10"}))
-         ],
-        itype
-    )
-
-    one_input_script = lambda itype, inst: inst._make_problem(
-        ("true", {"answer": "$computed_response", "tolerance": "1"}),
-        itype,
-        "computed_response = math.sqrt(4)"
-    )
-
-    one_choice_no_input = lambda itype, inst: inst._make_problem(
-        ("true", {}),
-        itype
-    )
-
-    two_choices_no_inputs = lambda itype, inst: inst._make_problem(
-        [("false", {}), ("true", {})],
-        itype
-    )
-
-    two_choices_one_input_1 = lambda itype, inst: inst._make_problem(
-        [("false", {}), ("true", {"answer": "123", "tolerance": "0"})],
-        itype
-    )
-
-    two_choices_one_input_2 = lambda itype, inst: inst._make_problem(
-        [("true", {}), ("false", {"answer": "123", "tolerance": "0"})],
-        itype
-    )
-
-    two_choices_two_inputs = lambda itype, inst: inst._make_problem(
-        [("true", {"answer": "123", "tolerance": "0"}),
-         ("false", {"answer": "999", "tolerance": "0"})],
-        itype
-    )
-
+    # `TEST_INPUTS` is a dictionary mapping from
+    # test_name to a representation of inputs for a test problem.
     TEST_INPUTS = {
         "1_choice_0_input_correct": [(True, [])],
         "1_choice_0_input_incorrect": [(False, [])],
@@ -1511,6 +1472,10 @@ class ChoiceTextResponseTest(ResponseTest):
         "2_choices_2_inputs_wrong_input": [(True, ["321"]), (False, [])]
     }
 
+    # `TEST_SCENARIOS` is a dictionary of the form
+    # {Test_Name" : (Test_Problem_name, correctness)}
+    # correctness represents whether the problem should be graded as
+    # correct or incorrect when the test is run.
     TEST_SCENARIOS = {
         "1_choice_0_input_correct": ("1_choice_0_input", "correct"),
         "1_choice_0_input_incorrect": ("1_choice_0_input", "incorrect"),
@@ -1542,15 +1507,53 @@ class ChoiceTextResponseTest(ResponseTest):
         "2_choices_2_inputs_wrong_input": ("2_choices_2_inputs", "incorrect")
     }
 
-    TEST_PROBLEMS = {
-        "1_choice_0_input": one_choice_no_input,
-        "1_choice_1_input": one_choice_one_input,
-        "1_input_script": one_input_script,
-        "1_choice_2_inputs": one_choice_two_inputs,
-        "2_choices_0_inputs": two_choices_no_inputs,
-        "2_choices_1_input_1": two_choices_one_input_1,
-        "2_choices_1_input_2": two_choices_one_input_2,
-        "2_choices_2_inputs": two_choices_two_inputs
+    # Dictionary that maps from problem_name to arguments for
+    # _make_problem, that will create the problem.
+    TEST_PROBLEM_ARGS = {
+        "1_choice_0_input": {"choices": ("true", {}), "script": ''},
+        "1_choice_1_input": {
+            "choices": ("true", {"answer": "123", "tolerance": "1"}),
+            "script": ''
+        },
+
+        "1_input_script": {
+            "choices": ("true", {"answer": "$computed_response", "tolerance": "1"}),
+            "script": "computed_response = math.sqrt(4)"
+        },
+
+        "1_choice_2_inputs": {
+            "choices": [
+                (
+                    "true", (
+                        {"answer": "123", "tolerance": "1"},
+                        {"answer": "456", "tolerance": "10"}
+                    )
+                )
+            ],
+            "script": ''
+        },
+        "2_choices_0_inputs": {
+            "choices": [("false", {}), ("true", {})],
+            "script": ''
+
+        },
+        "2_choices_1_input_1": {
+            "choices": [
+                ("false", {}), ("true", {"answer": "123", "tolerance": "0"})
+            ],
+            "script": ''
+        },
+        "2_choices_1_input_2": {
+            "choices": [("true", {}), ("false", {"answer": "123", "tolerance": "0"})],
+            "script": ''
+        },
+        "2_choices_2_inputs": {
+            "choices": [
+                ("true", {"answer": "123", "tolerance": "0"}),
+                ("false", {"answer": "999", "tolerance": "0"})
+            ],
+            "script": ''
+        }
     }
 
     def _make_problem(self, choices, in_type='radiotextgroup', script=''):
@@ -1598,23 +1601,66 @@ class ChoiceTextResponseTest(ResponseTest):
         return answer_dict
 
     def test_invalid_xml(self):
+        """
+        Test that build problem raises errors for invalid options
+        """
         with self.assertRaises(Exception):
             self.build_problem(type="invalidtextgroup")
 
     def test_valid_xml(self):
+        """
+        Test that `build_problem` builds valid xml
+        """
         self.build_problem()
         self.assertTrue(True)
 
+    def test_unchecked_input_not_validated(self):
+        """
+        Test that a student can have a non numeric answer in an unselected
+        choice without causing an error to be raised when the problem is
+        checked.
+        """
+
+        two_choice_two_input = self._make_problem(
+            [
+                ("true", {"answer": "123", "tolerance": "1"}),
+                ("false", {})
+            ],
+            "checkboxtextgroup"
+        )
+
+        self.assert_grade(
+            two_choice_two_input,
+            self._make_answer_dict([(True, ["1"]), (False, ["Platypus"])]),
+            "incorrect"
+        )
+
     def test_interpret_error(self):
-        one_choice_one_input = lambda itype: self._make_problem(
-            ("true", {"answer": "123", "tolerance": "1"}),
-            itype
+        """
+        Test that student answers that cannot be interpeted as numbers
+        cause the response type to raise an error.
+        """
+        two_choice_two_input = self._make_problem(
+            [
+                ("true", {"answer": "123", "tolerance": "1"}),
+                ("false", {})
+            ],
+            "checkboxtextgroup"
         )
 
         with self.assertRaisesRegexp(StudentInputError, "Could not interpret"):
+            # Test that error is raised for input in selected correct choice.
             self.assert_grade(
-                one_choice_one_input('radiotextgroup'),
+                two_choice_two_input,
                 self._make_answer_dict([(True, ["Platypus"])]),
+                "correct"
+            )
+
+        with self.assertRaisesRegexp(StudentInputError, "Could not interpret"):
+            # Test that error is raised for input in selected incorrect choice.
+            self.assert_grade(
+                two_choice_two_input,
+                self._make_answer_dict([(True, ["1"]), (True, ["Platypus"])]),
                 "correct"
             )
 
@@ -1638,14 +1684,26 @@ class ChoiceTextResponseTest(ResponseTest):
             )
 
     def test_radio_grades(self):
+        """
+        Test that confirms correct operation of grading when the inputtag is
+        radiotextgroup.
+        """
 
         for name, inputs in self.TEST_INPUTS.iteritems():
+            # Turn submission into the form expected when grading this problem.
             submission = self._make_answer_dict(inputs)
+            # Lookup the problem_name, and the whether this test problem
+            # and inputs should be graded as correct or incorrect.
             problem_name, correctness = self.TEST_SCENARIOS[name]
-            problem = self.TEST_PROBLEMS[problem_name]
-
+            # Load the args needed to build the problem for this test.
+            problem_args = self.TEST_PROBLEM_ARGS[problem_name]
+            test_choices = problem_args["choices"]
+            test_script = problem_args["script"]
+            # Build the actual problem for the test.
+            test_problem = self._make_problem(test_choices, 'radiotextgroup', test_script)
+            # Make sure the actual grade matches the expected grade.
             self.assert_grade(
-                problem('radiotextgroup', self),
+                test_problem,
                 submission,
                 correctness,
                 msg="{0} should be {1}".format(
@@ -1655,9 +1713,16 @@ class ChoiceTextResponseTest(ResponseTest):
             )
 
     def test_checkbox_grades(self):
+        """
+        Test that confirms correct operation of grading when the inputtag is
+        checkboxtextgroup.
+        """
+        # Dictionary from name of test_scenario to (problem_name, correctness)
+        # Correctness is used to test whether the problem was graded properly
         scenarios = {
             "2_choices_correct": ("checkbox_two_choices", "correct"),
             "2_choices_incorrect": ("checkbox_two_choices", "incorrect"),
+
             "2_choices_2_inputs_correct": (
                 "checkbox_2_choices_2_inputs",
                 "correct"
@@ -1673,6 +1738,7 @@ class ChoiceTextResponseTest(ResponseTest):
                 "incorrect"
             )
         }
+        # Dictionary scenario_name: test_inputs
         inputs = {
             "2_choices_correct": [(True, []), (True, [])],
             "2_choices_incorrect": [(True, []), (False, [])],
@@ -1685,9 +1751,11 @@ class ChoiceTextResponseTest(ResponseTest):
             ]
         }
 
+        # Two choice zero input problem with both choices being correct.
         checkbox_two_choices = self._make_problem(
             [("true", {}), ("true", {})], "checkboxtextgroup"
         )
+        # Two choice two input problem with both choices correct.
         checkbox_two_choices_two_inputs = self._make_problem(
             [("true", {"answer": "123", "tolerance": "0"}),
              ("true", {"answer": "456", "tolerance": "0"})
@@ -1695,17 +1763,20 @@ class ChoiceTextResponseTest(ResponseTest):
             "checkboxtextgroup"
         )
 
+        # Dictionary problem_name: problem
         problems = {
             "checkbox_two_choices": checkbox_two_choices,
             "checkbox_2_choices_2_inputs": checkbox_two_choices_two_inputs
         }
-        problems.update(self.TEST_PROBLEMS)
 
         for name, inputs in inputs.iteritems():
             submission = self._make_answer_dict(inputs)
+            # Load the test problem's name and desired correctness
             problem_name, correctness = scenarios[name]
+            # Load the problem
             problem = problems[problem_name]
 
+            # Make sure the actual grade matches the expected grade
             self.assert_grade(
                 problem,
                 submission,

@@ -388,8 +388,9 @@ def assert_choicetext_values(problem_type, choices, expected_values):
     Asserts that only the given choices are checked, and given
     text fields have a desired value
     """
-
+    # Names of the radio buttons or checkboxes
     all_choices = ['choiceinput_0bc', 'choiceinput_1bc']
+    # Names of the numtolerance_inputs
     all_inputs = [
         "choiceinput_0_numtolerance_input_0",
         "choiceinput_1_numtolerance_input_0"

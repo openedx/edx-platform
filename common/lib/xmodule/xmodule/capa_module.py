@@ -820,10 +820,11 @@ class CapaModule(CapaFields, XModule):
                 elif is_dict_key:
                     try:
                         val = json.loads(data[key])
+                    # If the submission wasn't deserializable, raise an error.
                     except(KeyError, ValueError):
-                        # Send this information along to be reported by
-                        # The grading method
-                        val = {"error": "error"}
+                        raise ValueError(
+                            u"Invalid submission: {val} for {key}".format(val=data[key], key=key)
+                        )
                 else:
                     val = data[key]
 
