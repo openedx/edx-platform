@@ -17,10 +17,13 @@ from xmodule.modulestore.mongo import MongoUsage
 from xmodule.x_module import ModuleSystem
 from xblock.runtime import DbModel
 
+from util.sandboxing import can_execute_unsafe_code
+
 import static_replace
 from .session_kv_store import SessionKeyValueStore
 from .requests import render_from_lms
 from .access import has_access
+from ..utils import get_course_for_item
 
 __all__ = ['preview_dispatch', 'preview_component']
 
@@ -93,6 +96,8 @@ def preview_module_system(request, preview_id, descriptor):
             MongoUsage(preview_id, descriptor.location.url()),
         )
 
+    course_id = get_course_for_item(descriptor.location).location.course_id
+
     return ModuleSystem(
         ajax_url=reverse('preview_dispatch', args=[preview_id, descriptor.location.url(), '']).rstrip('/'),
         # TODO (cpennington): Do we want to track how instructors are using the preview problems?
@@ -104,6 +109,7 @@ def preview_module_system(request, preview_id, descriptor):
         replace_urls=partial(static_replace.replace_static_urls, data_directory=None, course_namespace=descriptor.location),
         user=request.user,
         xblock_model_data=preview_model_data,
+        can_execute_unsafe_code=(lambda: can_execute_unsafe_code(course_id)),
     )
 
 

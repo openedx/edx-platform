@@ -1,13 +1,23 @@
+"""
+Methods for exporting course data to XML
+"""
+
 import logging
 from xmodule.modulestore import Location
 from xmodule.modulestore.inheritance import own_metadata
 from fs.osfs import OSFS
 from json import dumps
 import json
-from json.encoder import JSONEncoder
 import datetime
 
+
 class EdxJSONEncoder(json.JSONEncoder):
+    """
+    Custom JSONEncoder that handles `Location` and `datetime.datetime` objects.
+
+    `Location`s are encoded as their url string form, and `datetime`s as
+    ISO date strings
+    """
     def default(self, obj):
         if isinstance(obj, Location):
             return obj.url()
@@ -22,7 +32,19 @@ class EdxJSONEncoder(json.JSONEncoder):
         else:
             return super(EdxJSONEncoder, self).default(obj)
 
+
 def export_to_xml(modulestore, contentstore, course_location, root_dir, course_dir, draft_modulestore=None):
+    """
+    Export all modules from `modulestore` and content from `contentstore` as xml to `root_dir`.
+
+    `modulestore`: A `ModuleStore` object that is the source of the modules to export
+    `contentstore`: A `ContentStore` object that is the source of the content to export
+    `course_location`: The `Location` of the `CourseModuleDescriptor` to export
+    `root_dir`: The directory to write the exported xml to
+    `course_dir`: The name of the directory inside `root_dir` to write the course content to
+    `draft_modulestore`: An optional `DraftModuleStore` that contains draft content, which will be exported
+        alongside the public content in the course.
+    """
 
     course = modulestore.get_item(course_location)
 

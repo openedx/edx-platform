@@ -1,6 +1,7 @@
 Feature: Component Adding
     As a course author, I want to be able to add a wide variety of components
 
+    @skip
     Scenario: I can add components
         Given I have opened a new course in studio
         And I am editing a new unit
@@ -41,7 +42,7 @@ Feature: Component Adding
             | Adaptive Hint|
             | Video        |
 
-
+    @skip
     Scenario: I can delete Components
         Given I have opened a new course in studio
         And I am editing a new unit
