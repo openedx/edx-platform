@@ -340,7 +340,9 @@ if settings.COURSEWARE_ENABLED:
             url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/news$',
                 'courseware.views.news', name="news"),
             url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/discussion/',
-                include('django_comment_client.urls'))
+                include('django_comment_client.urls')),
+            url(r'^notification_prefs/enable/', 'notification_prefs.views.enable'),
+            url(r'^notification_prefs/disable/', 'notification_prefs.views.disable'),
         )
     urlpatterns += (
         # This MUST be the last view in the courseware--it's a catch-all for custom tabs.
