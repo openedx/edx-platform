@@ -2,11 +2,14 @@
     describe('VideoAlpha HTML5Video', function () {
         var state, player, playbackRates = [0.75, 1.0, 1.25, 1.5];
 
-        beforeEach(function () {
+        function initialize() {
             loadFixtures('videoalpha_html5.html');
             state = new VideoAlpha('#example');
             player = state.videoPlayer.player;
+        }
 
+        beforeEach(function () {
+            initialize();
             player.config.events.onReady = jasmine.createSpy('onReady');
         });
 

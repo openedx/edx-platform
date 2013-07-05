@@ -26,7 +26,7 @@ function (VideoPlayer) {
      */
     return function (state, element) {
         makeFunctionsPublic(state);
-        renderElements(state, element);
+        state.renderElements(element);
     };
 
     // ***************************************************************
@@ -46,6 +46,14 @@ function (VideoPlayer) {
         state.youtubeId   = youtubeId.bind(state);
         state.getDuration = getDuration.bind(state);
         state.trigger     = trigger.bind(state);
+
+        // Old private functions. Now also public so that can be
+        // tested by Jasmine.
+        state.renderElements = renderElements.bind(state);
+        state.parseSpeed = parseSpeed.bind(state);
+        state.fetchMetadata = fetchMetadata.bind(state);
+        state.parseYoutubeStreams = parseYoutubeStreams.bind(state);
+        state.parseVideoSources = parseVideoSources.bind(state);
     }
 
     // function renderElements(state)
@@ -53,33 +61,34 @@ function (VideoPlayer) {
     //     Create any necessary DOM elements, attach them, and set their initial configuration. Also
     //     make the created DOM elements available via the 'state' object. Much easier to work this
     //     way - you don't have to do repeated jQuery element selects.
-    function renderElements(state, element) {
-        var onPlayerReadyFunc;
+    function renderElements(element) {
+        var onPlayerReadyFunc,
+            _this = this;
 
         // This is used in places where we instead would have to check if an element has a CSS class 'fullscreen'.
-        state.isFullScreen = false;
+        this.isFullScreen = false;
 
         // The parent element of the video, and the ID.
-        state.el = $(element).find('.videoalpha');
-        state.id = state.el.attr('id').replace(/video_/, '');
+        this.el = $(element).find('.videoalpha');
+        this.id = this.el.attr('id').replace(/video_/, '');
 
         // We store all settings passed to us by the server in one place. These are "read only", so don't
         // modify them. All variable content lives in 'state' object.
-        state.config = {
+        this.config = {
             element: element,
 
-            start:              state.el.data('start'),
-            end:                state.el.data('end'),
+            start:              this.el.data('start'),
+            end:                this.el.data('end'),
 
-            caption_data_dir:   state.el.data('caption-data-dir'),
-            caption_asset_path: state.el.data('caption-asset-path'),
-            show_captions:      (state.el.data('show-captions').toString().toLowerCase() === 'true'),
-            youtubeStreams:     state.el.data('streams'),
+            caption_data_dir:   this.el.data('caption-data-dir'),
+            caption_asset_path: this.el.data('caption-asset-path'),
+            show_captions:      (this.el.data('show-captions').toString().toLowerCase() === 'true'),
+            youtubeStreams:     this.el.data('streams'),
 
-            sub:                state.el.data('sub'),
-            mp4Source:          state.el.data('mp4-source'),
-            webmSource:         state.el.data('webm-source'),
-            oggSource:          state.el.data('ogg-source'),
+            sub:                this.el.data('sub'),
+            mp4Source:          this.el.data('mp4-source'),
+            webmSource:         this.el.data('webm-source'),
+            oggSource:          this.el.data('ogg-source'),
 
             fadeOutTimeout:     1400,
 
@@ -94,66 +103,65 @@ function (VideoPlayer) {
         };
 
         // Try to parse YouTube stream ID's. If
-        if (parseYoutubeStreams(state, state.config.youtubeStreams)) {
-            state.videoType = 'youtube';
+        if (this.parseYoutubeStreams(this.config.youtubeStreams)) {
+            this.videoType = 'youtube';
 
-            fetchMetadata(state);
-            parseSpeed(state);
+            this.fetchMetadata();
+            this.parseSpeed();
         }
 
         // If we do not have YouTube ID's, try parsing HTML5 video sources.
         else {
-            state.videoType = 'html5';
+            this.videoType = 'html5';
 
-            parseVideoSources(
-                state,
+            this.parseVideoSources(
                 {
-                    mp4: state.config.mp4Source,
-                    webm: state.config.webmSource,
-                    ogg: state.config.oggSource
+                    mp4: this.config.mp4Source,
+                    webm: this.config.webmSource,
+                    ogg: this.config.oggSource
                 }
             );
 
-            if (!state.config.sub || !state.config.sub.length) {
-                state.config.sub = '';
-                state.config.show_captions = false;
+            if (!this.config.sub || !this.config.sub.length) {
+                this.config.sub = '';
+                this.config.show_captions = false;
             }
 
-            state.speeds = ['0.75', '1.0', '1.25', '1.50'];
-            state.videos = {
-                '0.75': state.config.sub,
-                '1.0':  state.config.sub,
-                '1.25': state.config.sub,
-                '1.5':  state.config.sub
+            this.speeds = ['0.75', '1.0', '1.25', '1.50'];
+            this.videos = {
+                '0.75': this.config.sub,
+                '1.0':  this.config.sub,
+                '1.25': this.config.sub,
+                '1.5':  this.config.sub
             };
 
-            state.setSpeed($.cookie('video_speed'));
+            this.setSpeed($.cookie('video_speed'));
         }
 
         // Configure displaying of captions.
         //
         // Option
         //
-        //     state.config.show_captions = true | false
+        //     this.config.show_captions = true | false
         //
         // defines whether to turn off/on the captions altogether. User will not have the ability to turn them on/off.
         //
         // Option
         //
-        //     state.hide_captions = true | false
+        //     this.hide_captions = true | false
         //
         // represents the user's choice of having the subtitles shown or hidden. This choice is stored in cookies.
-        if (state.config.show_captions) {
-            state.hide_captions = ($.cookie('hide_captions') === 'true');
+        if (this.config.show_captions) {
+            this.hide_captions = ($.cookie('hide_captions') === 'true');
         } else {
-            state.hide_captions = true;
+            this.hide_captions = true;
 
-            $.cookie('hide_captions', state.hide_captions, {
+            $.cookie('hide_captions', this.hide_captions, {
                 expires: 3650,
                 path: '/'
             });
 
-            state.el.addClass('closed');
+            this.el.addClass('closed');
         }
 
         // By default we will be forcing HTML5 player mode. Only in the case when, after initializtion, we will
@@ -163,21 +171,21 @@ function (VideoPlayer) {
         // the proper mode from the start (not having to change mode later on).
         (function (currentPlayerMode) {
             if ((currentPlayerMode === 'html5') || (currentPlayerMode === 'flash')) {
-                state.currentPlayerMode = currentPlayerMode;
+                _this.currentPlayerMode = currentPlayerMode;
             } else {
                 $.cookie('current_player_mode', 'html5', {
                     expires: 3650,
                     path: '/'
                 });
-                state.currentPlayerMode = 'html5';
+                _this.currentPlayerMode = 'html5';
             }
         }($.cookie('current_player_mode')));
 
         // Possible value are: 'visible', 'hiding', and 'invisible'.
-        state.controlState = 'visible';
-        state.controlHideTimeout = null;
-        state.captionState = 'visible';
-        state.captionHideTimeout = null;
+        this.controlState = 'visible';
+        this.controlHideTimeout = null;
+        this.captionState = 'visible';
+        this.captionHideTimeout = null;
 
         // Launch embedding of actual video content, or set it up so that it will be done as soon as the
         // appropriate video player (YouTube or stand alone HTML5) is loaded, and can handle embedding.
@@ -186,13 +194,13 @@ function (VideoPlayer) {
         // when we reach this code, the stand alone HTML5 player is already loaded, so no further testing
         // in that case is required.
         if (
-            ((state.videoType === 'youtube') && (window.YT) && (window.YT.Player)) ||
-            (state.videoType === 'html5')
+            ((this.videoType === 'youtube') && (window.YT) && (window.YT.Player)) ||
+            (this.videoType === 'html5')
         ) {
-            VideoPlayer(state);
+            VideoPlayer(this);
         } else {
-            onPlayerReadyFunc = (state.videoType === 'youtube') ? 'onYouTubePlayerAPIReady' : 'onHTML5PlayerAPIReady';
-            window[onPlayerReadyFunc] = VideoPlayer.bind(window, state);
+            onPlayerReadyFunc = (this.videoType === 'youtube') ? 'onYouTubePlayerAPIReady' : 'onHTML5PlayerAPIReady';
+            window[onPlayerReadyFunc] = VideoPlayer.bind(window, this);
         }
     }
 
@@ -206,14 +214,15 @@ function (VideoPlayer) {
     //     @return
     //         false: We don't have YouTube video IDs to work with; most likely we have HTML5 video sources.
     //         true: Parsing of YouTube video IDs went OK, and we can proceed onwards to play YouTube videos.
+    function parseYoutubeStreams(youtubeStreams) {
+        var _this;
 
-
-    function parseYoutubeStreams(state, youtubeStreams) {
         if (typeof youtubeStreams === 'undefined' || youtubeStreams.length === 0) {
             return false;
         }
 
-        state.videos = {};
+        _this = this;
+        this.videos = {};
 
         $.each(youtubeStreams.split(/,/), function(index, video) {
             var speed;
@@ -221,18 +230,20 @@ function (VideoPlayer) {
             video = video.split(/:/);
             speed = parseFloat(video[0]).toFixed(2).replace(/\.00$/, '.0');
 
-            state.videos[speed] = video[1];
+            _this.videos[speed] = video[1];
         });
 
         return true;
     }
 
-    // function parseVideoSources(state, mp4Source, webmSource, oggSource)
+    // function parseVideoSources(, mp4Source, webmSource, oggSource)
     //
     //     Take the HTML5 sources (URLs of videos), and make them available explictly for each type
     //     of video format (mp4, webm, ogg).
-    function parseVideoSources(state, sources) {
-        state.html5Sources = {
+    function parseVideoSources(sources) {
+        var _this = this;
+
+        this.html5Sources = {
             mp4: null,
             webm: null,
             ogg: null
@@ -240,35 +251,37 @@ function (VideoPlayer) {
 
         $.each(sources, function (name, source) {
             if (source && source.length) {
-                state.html5Sources[name] = source;
+                _this.html5Sources[name] = source;
             }
         });
     }
 
-    // function fetchMetadata(state)
+    // function fetchMetadata()
     //
     //     When dealing with YouTube videos, we must fetch meta data that has certain key facts
     //     not available while the video is loading. For example the length of the video can be
     //     determined from the meta data.
-    function fetchMetadata(state) {
-        state.metadata = {};
+    function fetchMetadata() {
+        var _this = this;
 
-        $.each(state.videos, function (speed, url) {
+        this.metadata = {};
+
+        $.each(this.videos, function (speed, url) {
             $.get('https://gdata.youtube.com/feeds/api/videos/' + url + '?v=2&alt=jsonc', (function(data) {
-                state.metadata[data.data.id] = data.data;
+                _this.metadata[data.data.id] = data.data;
             }), 'jsonp');
         });
     }
 
-    // function parseSpeed(state)
+    // function parseSpeed()
     //
     //     Create a separate array of available speeds.
-    function parseSpeed(state) {
-        state.speeds = ($.map(state.videos, function(url, speed) {
+    function parseSpeed() {
+        this.speeds = ($.map(this.videos, function(url, speed) {
             return speed;
         })).sort();
 
-        state.setSpeed($.cookie('video_speed'));
+        this.setSpeed($.cookie('video_speed'));
     }
 
     // ***************************************************************

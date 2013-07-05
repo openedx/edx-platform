@@ -226,26 +226,26 @@ function (HTML5Video) {
         }
     }
 
-    function onSeek(event, time) {
+    function onSeek(params) {
         this.videoPlayer.log(
             'seek_video',
             {
                 old_time: this.videoPlayer.currentTime,
-                new_time: time,
-                type: event.type
+                new_time: params.time,
+                type: params.type
             }
         );
 
-        this.videoPlayer.player.seekTo(time, true);
+        this.videoPlayer.player.seekTo(params.time, true);
 
         if (this.videoPlayer.isPlaying()) {
             clearInterval(this.videoPlayer.updateInterval);
             this.videoPlayer.updateInterval = setInterval(this.videoPlayer.update, 200);
         } else {
-            this.videoPlayer.currentTime = time;
+            this.videoPlayer.currentTime = params.time;
         }
 
-        this.videoPlayer.updatePlayTime(time);
+        this.videoPlayer.updatePlayTime(params.time);
     }
 
     function onEnded() {
@@ -368,14 +368,14 @@ function (HTML5Video) {
     }
 
     function duration() {
-        var duration;
+        var dur;
 
-        duration = this.videoPlayer.player.getDuration();
-        if (!isFinite(duration)) {
-            duration = this.getDuration();
+        dur = this.videoPlayer.player.getDuration();
+        if (!isFinite(dur)) {
+            dur = this.getDuration();
         }
 
-        return duration;
+        return dur;
     }
 
     function log(eventName, data) {

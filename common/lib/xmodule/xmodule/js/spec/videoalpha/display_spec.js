@@ -30,7 +30,6 @@
       describe('YT', function () {
         beforeEach(function () {
           loadFixtures('videoalpha.html');
-          // TO DO??? this.stubbedVideoPlayer = jasmine.createSpy('StubbedVideoPlayer');
           $.cookie.andReturn('0.75');
         });
 
