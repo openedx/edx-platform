@@ -22,7 +22,7 @@
         $el.data('CodeMirror', advanced_editor);
 
 
-
+        ## Callback that ensures data sync between tabs
         TabsEditorDescriptor.registerTabCallback('${html_id}', '${tabName}', function(){
           var $tinymce = $("#visual-${html_id}").data('TinyMCE');
           if ($tinymce && $tinymce.isDirty()){
@@ -35,6 +35,15 @@
           advanced_editor.focus();
         })
 
+
+        ## Save function - executes when pressing save - to get information from nested editor,
+
+        ## should be set, as templates executes before tabs-aggregator coffee executes
+        TabsEditorDescriptor['tabs_save_functions']['${html_id}'] = TabsEditorDescriptor['tabs_save_functions']['${html_id}']  || {}
+
+        TabsEditorDescriptor['tabs_save_functions']['${html_id}']['${tabName}'] = function(){
+          return function(){  return advanced_editor.getValue();}
+        }();
       }());
     });
 </script>

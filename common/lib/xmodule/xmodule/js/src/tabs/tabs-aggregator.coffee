@@ -1,5 +1,6 @@
 class @TabsEditorDescriptor
   @isInactiveClass : "is-inactive"
+  @tabs_save_functions = {}
 
   constructor: (element) ->
     @element = element;
@@ -13,6 +14,7 @@ class @TabsEditorDescriptor
     currentTab = @$tabs.filter('.current')
     currentTab = @$tabs.first() if currentTab.length isnt 1
     currentTab.trigger("click", [true])
+    @html_id = @$tabs.closest('.wrapper-comp-editor').data('html_id')
 
    onSwitchEditor: (e, reset) =>
     e.preventDefault();
@@ -42,22 +44,15 @@ class @TabsEditorDescriptor
         ]
       )
 
+
   save: ->
     @element.off('click', '.editor-tabs .tab', @onSwitchEditor)
-    # Link to instance of CodeMirror is stored in data attribute of DOM element
-    # If it exist we retreive the data from CodeMirror
-    advanced_editor = $('.edit-box', @element).first().data('CodeMirror')
-    visual_editor = $('.tiny-mce', @element).first().data('TinyMCE')
-    if advanced_editor && $('.edit-box', @element).first().closest('.component-tab').is(':visible')
-      text = advanced_editor.getValue()
-      return data: text
-    else if visual_editor && $('.tiny-mce', @element).first().closest('.component-tab').is(':visible')
-      text = visual_editor.getContent({no_events: 1})
-      return data: text
+    tabName = this.$tabs.filter('.current').html()
+    if $.isFunction(window.TabsEditorDescriptor['tabs_save_functions'][@html_id][tabName])
+      return data: window.TabsEditorDescriptor['tabs_save_functions'][@html_id][tabName]()
+    data: null
 
-window.TabsEditorDescriptor = window.TabsEditorDescriptor || {};
 TabsEditorDescriptor.registerTabCallback = (id, name, callback) ->
   $('#editor-tab-' + id).on 'TabsEditor:changeTab', (e, tab_name, tab_id) ->
     e.stopPropagation()
     callback() if typeof callback is "function" and tab_name is name
-

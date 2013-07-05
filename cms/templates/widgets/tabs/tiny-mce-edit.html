@@ -76,7 +76,7 @@
   
         
 
-
+        ## Callback that ensures data sync between tabs
         TabsEditorDescriptor.registerTabCallback('${html_id}', '${tabName}', function(){
           var $codemirror = $("#advanced-${html_id}").data('CodeMirror');
           visualEditor.setContent($codemirror.getValue())
@@ -85,6 +85,20 @@
           visualEditor.startContent = visualEditor.getContent({format: "raw", no_events: 1});
           focusVisualEditor(visualEditor)
         })
+
+         ## Save function - executes when pressing save - to get information from nested editor,
+
+        ## should be set, as templates executes before tabs-aggregator coffee executes
+        TabsEditorDescriptor['tabs_save_functions']['${html_id}'] = TabsEditorDescriptor['tabs_save_functions']['${html_id}']  || {}
+
+        TabsEditorDescriptor['tabs_save_functions']['${html_id}']['${tabName}'] = function(){
+          var _this = visualEditor;
+          return function(){ 
+            return _this.getContent({no_events: 1})
+          }
+        }();
+
       }());
+
     });
 </script>
