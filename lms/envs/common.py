@@ -753,6 +753,9 @@ INSTALLED_APPS = (
     # User API
     'rest_framework',
     'user_api',
+
+    # Notification preferences setting
+    'notification_prefs',
 )
 
 ######################### MARKETING SITE ###############################

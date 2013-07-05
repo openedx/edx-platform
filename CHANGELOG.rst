@@ -11,6 +11,9 @@ preferences. Access to the REST API is restricted by use of the
 X-Edx-Api-Key HTTP header (which must match settings.EDX_API_KEY; if
 the setting is not present, the API is disabled).
 
+LMS: Added endpoints for AJAX requests to enable/disable notifications
+(which are not yet implemented) and a one-click unsubscribe page.
+
 Common: Added *experimental* support for jsinput type.
 
 Common: Added setting to specify Celery Broker vhost
