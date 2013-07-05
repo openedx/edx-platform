@@ -2230,10 +2230,7 @@ class ChoiceTextResponse(LoncapaResponse):
         # Check the binary choices first.
         choices_correct = self._check_student_choices(binary_choices)
         inputs_correct = True
-        # If the student answers for binary choices were not correct
-        # skip the numerical checks.
-        if choices_correct:
-            inputs_correct = self._check_student_inputs(text_inputs)
+        inputs_correct = self._check_student_inputs(text_inputs)
         # Only return correct if the student got both the binary
         # and numtolerance_inputs are correct
         correct = choices_correct and inputs_correct
@@ -2261,6 +2258,8 @@ class ChoiceTextResponse(LoncapaResponse):
         """
         binary_choices = {}
         text_choices = {}
+        binary_choices1 = {}
+        numtolerance_choices = {}
         for key, value in a_dict.iteritems():
             # If the key ends with 'bc' it refers to a required
             # radiobutton/checkbox
@@ -2269,7 +2268,23 @@ class ChoiceTextResponse(LoncapaResponse):
             else:
                 # If the key does not end with 'bc', it refers to a numtolerance_input
                 text_choices[key] = value
-        return (binary_choices, text_choices)
+
+        selected_choices = [key for key in a_dict if key.endswith("bc")]
+        binary_choices = {}
+        for key in selected_choices:
+            binary_choices[key] = a_dict[key]
+
+        selected_numtolerance_inputs = [
+            key for key in a_dict if key.partition("_numtolerance_input_")[0] + "bc"
+            in selected_choices
+        ]
+
+        for key in selected_numtolerance_inputs:
+            numtolerance_choices[key] = a_dict[key]
+
+        log.debug("\n\nTHE SELECTED BC's are {0}\n\n\n".format(binary_choices1))
+        log.debug("\n\nTHE SELECTED TI's are {0}\n\n\n".format(numtolerance_choices))
+        return (binary_choices, numtolerance_choices)
 
     def _check_student_choices(self, choices):
         """
@@ -2292,7 +2307,24 @@ class ChoiceTextResponse(LoncapaResponse):
         Returns True if and only if all student inputs are correct.
         """
         inputs_correct = True
+
+        for answer_name, answer_value in text_inputs.iteritems():
+            log.debug("\n\nValidating {0}".format(answer_value))
+
+            try:
+                correct_ans = complex(answer_value)
+
+            except ValueError:
+                _, _, trace = sys.exc_info()
+                raise StudentInputError(
+                    "Could not interpret '{0}' as a number{1}".format(
+                        cgi.escape(answer_value),
+                        trace
+                    )
+                )
+
         for answer_name, params in self.correct_inputs.iteritems():
+
             student_answer = text_inputs.get(answer_name, '')
 
             correct_ans = params['answer']
