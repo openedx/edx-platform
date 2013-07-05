@@ -53,12 +53,12 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, TabsEditingDescriptor):
 
     tabs = [
         {
-            'name': "Visual1",
+            'name': "Visual",
             'template': "tabs/tiny-mce-edit.html",
             'current': True,
         },
         {
-            'name': "HTML1",
+            'name': "HTML",
             'template': "tabs/codemirror-edit.html",
         }
     ]
