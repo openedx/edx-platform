@@ -343,6 +343,7 @@ if settings.COURSEWARE_ENABLED:
                 include('django_comment_client.urls')),
             url(r'^notification_prefs/enable/', 'notification_prefs.views.enable'),
             url(r'^notification_prefs/disable/', 'notification_prefs.views.disable'),
+            url(r'^mailgun/unsubscribe/', 'mailgun_webhook.views.unsubscribe'),
         )
     urlpatterns += (
         # This MUST be the last view in the courseware--it's a catch-all for custom tabs.
