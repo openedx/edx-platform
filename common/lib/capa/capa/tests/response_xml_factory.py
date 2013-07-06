@@ -857,15 +857,15 @@ class ChoiceTextResponseXMLFactory(ResponseXMLFactory):
         choice_element.set("correct", correct)
         choice_element.text = text
         for inp in inputs:
-            # Add all of the inputs as children of this element
+            # Add all of the inputs as children of this choice
             choice_element.append(inp)
 
         return choice_element
 
     def _create_numtolerance_input_element(self, params):
         """
-        Creates a <numtolerance_input/> element with optionally
-        specified tolerance and answer.
+        Creates a <numtolerance_input/>  or <decoy_input/> element with
+        optionally specified tolerance and answer.
         """
         answer = params['answer'] if 'answer' in params else None
         # If there is not an answer specified, Then create a <decoy_input/>

@@ -1598,23 +1598,66 @@ class ChoiceTextResponseTest(ResponseTest):
         return answer_dict
 
     def test_invalid_xml(self):
+        """
+        Test that build problem raises errors for invalid options
+        """
         with self.assertRaises(Exception):
             self.build_problem(type="invalidtextgroup")
 
     def test_valid_xml(self):
+        """
+        Test that `build_problem` builds valid xml
+        """
         self.build_problem()
         self.assertTrue(True)
 
+    def unchecked_input_not_validated(self):
+        """
+        Test that a student can have a non numeric answer in an unselected
+        choice without causing an error to be raised when the problem is
+        checked.
+        """
+
+        two_choice_two_input = lambda itype: self._make_problem(
+            [
+                ("true", {"answer": "123", "tolerance": "1"}),
+                ("false", {})
+            ],
+            itype
+        )
+
+        self.assert_grade(
+            two_choice_two_input('checkboxtextgroup'),
+            self._make_answer_dict([(True, ["1"]), (False, ["Platypus"])]),
+            "incorrect"
+        )
+
     def test_interpret_error(self):
-        one_choice_one_input = lambda itype: self._make_problem(
-            ("true", {"answer": "123", "tolerance": "1"}),
+        """
+        Test that student answers that cannot be interpeted as numbers
+        cause the response type to raise an error.
+        """
+        two_choice_two_input = lambda itype: self._make_problem(
+            [
+                ("true", {"answer": "123", "tolerance": "1"}),
+                ("false", {})
+            ],
             itype
         )
 
         with self.assertRaisesRegexp(StudentInputError, "Could not interpret"):
+            # Test that error is raised for input in selected correct choice.
             self.assert_grade(
-                one_choice_one_input('radiotextgroup'),
+                two_choice_two_input('checkboxtextgroup'),
                 self._make_answer_dict([(True, ["Platypus"])]),
+                "correct"
+            )
+
+        with self.assertRaisesRegexp(StudentInputError, "Could not interpret"):
+            # Test that error is raised for input in selected incorrect choice
+            self.assert_grade(
+                two_choice_two_input('checkboxtextgroup'),
+                self._make_answer_dict([(True, ["1"]), (True, ["Platypus"])]),
                 "correct"
             )
 
