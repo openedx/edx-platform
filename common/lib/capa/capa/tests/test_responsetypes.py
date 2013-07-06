@@ -1611,7 +1611,7 @@ class ChoiceTextResponseTest(ResponseTest):
         self.build_problem()
         self.assertTrue(True)
 
-    def unchecked_input_not_validated(self):
+    def test_unchecked_input_not_validated(self):
         """
         Test that a student can have a non numeric answer in an unselected
         choice without causing an error to be raised when the problem is
