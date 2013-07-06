@@ -2226,11 +2226,11 @@ class ChoiceTextResponse(LoncapaResponse):
         if "error" in answer_dict:
             raise StudentInputError("Could not parse answers")
 
-        binary_choices, text_inputs = self._split_answers_dict(answer_dict)
+        binary_choices, numtolerance_inputs = self._split_answers_dict(answer_dict)
         # Check the binary choices first.
         choices_correct = self._check_student_choices(binary_choices)
         inputs_correct = True
-        inputs_correct = self._check_student_inputs(text_inputs)
+        inputs_correct = self._check_student_inputs(numtolerance_inputs)
         # Only return correct if the student got both the binary
         # and numtolerance_inputs are correct
         correct = choices_correct and inputs_correct
@@ -2251,29 +2251,64 @@ class ChoiceTextResponse(LoncapaResponse):
     def _split_answers_dict(self, a_dict):
         """
         Returns two dicts:
-        `binary_choices` : contains the correct checkbox/radio inputs_correct
+        `binary_choices` : dictionary {input_name: input_value} for
+        the binary choices which the student selected.
         and
-        `text_choices` : contains the correct answers for required numtolerance_inputs
+        `numtolerance_choices` : a dictionary {input_name: input_value}
+        for the numtolerance_inputs inside of choices which were selected
 
+        Determines if an input is inside of a binary input by looking at
+        the beginning of it's name.
+
+        For example. If a binary_choice was named '1_2_1_choiceinput_0bc'
+        All of the numtolerance_inputs in it would have an idea that begins
+        with '1_2_1_choice_input_0_numtolerance_input'
+
+        Splits the name of the numtolerance_input at the occurence of
+        '_numtolerance_input_' and appends 'bc' to the end to get the name
+        of the choice it is contained in.
+
+        Example:
+        `a_dict` = {
+            '1_2_1_choiceinput_0bc': '1_2_1_choiceinput_0bc',
+            '1_2_1_choiceinput_0_numtolerance_input_0': '1',
+            '1_2_1_choiceinput_0_numtolerance_input_1': '2'
+            '1_2_1_choiceinput_1_numtolerance_input_0': '3'
+        }
+
+        In this case, the binary choice is '1_2_1_choiceinput_0bc', and
+        the numtolerance_inputs associated with it are
+        '1_2_1_choiceinput_0_numtolerance_input_0', and
+        '1_2_1_choiceinput_0_numtolerance_input_1'.
+
+        so the two return dictionaries would be
+        `binary_choices` = {'1_2_1_choiceinput_0bc': '1_2_1_choiceinput_0bc'}
+        and
+        `numtolerance_choices` ={
+            '1_2_1_choiceinput_0_numtolerance_input_0': '1',
+            '1_2_1_choiceinput_0_numtolerance_input_1': '2'
+        }
+
+        The entry '1_2_1_choiceinput_1_numtolerance_input_0': '3' is discarded
+        because it was not inside of a selcted binary choice, and no validation
+        should be performed on numtolerance_inputs inside of non-selected choices.
         """
-        binary_choices = {}
-        text_choices = {}
-        binary_choices1 = {}
-        numtolerance_choices = {}
-        for key, value in a_dict.iteritems():
-            # If the key ends with 'bc' it refers to a required
-            # radiobutton/checkbox
-            if(key[-2:] == 'bc'):
-                binary_choices[key] = value
-            else:
-                # If the key does not end with 'bc', it refers to a numtolerance_input
-                text_choices[key] = value
 
-        selected_choices = [key for key in a_dict if key.endswith("bc")]
+        # Initialize the two dictionaries that are returned
+        numtolerance_choices = {}
         binary_choices = {}
+
+        # `selected_choices` is a list of binary choices which were "checked/selected"
+        # when the student submitted the problem.
+        # Keys in a_dict ending with 'bc' refer to binary choices.
+        selected_choices = [key for key in a_dict if key.endswith("bc")]
         for key in selected_choices:
             binary_choices[key] = a_dict[key]
 
+        # Convert the name of a numtolerance_input into the name of the binary
+        # choice that it is contained within, and append it to the list if
+        # the numtolerance_input's parent binary_choice is contained in
+        # `selected_choices`.
         selected_numtolerance_inputs = [
             key for key in a_dict if key.partition("_numtolerance_input_")[0] + "bc"
             in selected_choices
@@ -2282,8 +2317,6 @@ class ChoiceTextResponse(LoncapaResponse):
         for key in selected_numtolerance_inputs:
             numtolerance_choices[key] = a_dict[key]
 
-        log.debug("\n\nTHE SELECTED BC's are {0}\n\n\n".format(binary_choices1))
-        log.debug("\n\nTHE SELECTED TI's are {0}\n\n\n".format(numtolerance_choices))
         return (binary_choices, numtolerance_choices)
 
     def _check_student_choices(self, choices):
@@ -2300,37 +2333,32 @@ class ChoiceTextResponse(LoncapaResponse):
         correct = required_selected and no_extra_selected
         return correct
 
-    def _check_student_inputs(self, text_inputs):
+    def _check_student_inputs(self, numtolerance_inputs):
         """
         Compares student submitted numerical answers against the correct
         answers and tolerances.
+
+        `numtolerance_inputs` is a dictionary {answer_name : answer_value}
+
+        Performs numerical validation by means of calling
+        `compare_with_tolerance()` on all of `numtolerance_inputs`
+
         Returns True if and only if all student inputs are correct.
         """
+
         inputs_correct = True
-
-        for answer_name, answer_value in text_inputs.iteritems():
-            log.debug("\n\nValidating {0}".format(answer_value))
-
-            try:
-                correct_ans = complex(answer_value)
-
-            except ValueError:
-                _, _, trace = sys.exc_info()
-                raise StudentInputError(
-                    "Could not interpret '{0}' as a number{1}".format(
-                        cgi.escape(answer_value),
-                        trace
-                    )
-                )
-
-        for answer_name, params in self.correct_inputs.iteritems():
-
-            student_answer = text_inputs.get(answer_name, '')
+        for answer_name, answer_value in numtolerance_inputs.iteritems():
+            # If `self.corrrect_inputs` does not contain an entry for
+            # `answer_name`, this means that answer_name is a decoy
+            # input's value, and validation of its numericality is the
+            # only thing of interest from the later call to
+            # `compare_with_tolerance`.
+            params = self.correct_inputs.get(answer_name, {'answer': 0})
 
             correct_ans = params['answer']
             # Set the tolerance to '0' if it was not specified in the xml
             tolerance = params.get('tolerance', '0')
-            # Make sure that the answer is a valid number
+            # Make sure that the staff answer is a valid number
             try:
                 correct_ans = complex(correct_ans)
             except ValueError:
@@ -2341,10 +2369,11 @@ class ChoiceTextResponse(LoncapaResponse):
                 raise StudentInputError(
                     "The Staff answer could not be interpreted as a number."
                 )
-
+            # Compare the student answer to the staff answer/ or to 0
+            # if all that is important is verifying numericality
             try:
                 partial_correct = compare_with_tolerance(
-                    evaluator(dict(), dict(), student_answer),
+                    evaluator(dict(), dict(), answer_value),
                     correct_ans,
                     tolerance
                 )
@@ -2355,12 +2384,13 @@ class ChoiceTextResponse(LoncapaResponse):
 
                 raise StudentInputError(
                     "Could not interpret '{0}' as a number{1}".format(
-                        cgi.escape(student_answer),
+                        cgi.escape(answer_value),
                         trace
                     )
                 )
-
-            if not partial_correct:
+            # Ignore the results of the comparisons which were just for
+            # Numerical Validation.
+            if answer_name in self.correct_inputs and not partial_correct:
                 # If any input is not correct, set the return value to False
                 inputs_correct = False
         return inputs_correct
