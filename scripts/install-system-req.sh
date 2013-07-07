@@ -39,7 +39,7 @@ case `uname -s` in
                 cat $APT_REPOS_FILE | xargs -n 1 sudo add-apt-repository -y
                 sudo apt-get -yq update
                 sudo DEBIAN_FRONTEND=noninteractive apt-get -yq install gfortran graphviz \
-                            libgraphviz-dev graphviz-dev libatlas-dev libblas-dev ruby-rvm
+                            libgraphviz-dev graphviz-dev libatlas-dev libblas-dev
                 # install packages listed in APT_PKGS_FILE
                 cat $APT_PKGS_FILE | xargs sudo DEBIAN_FRONTEND=noninteractive apt-get -yq install
                 ;;
