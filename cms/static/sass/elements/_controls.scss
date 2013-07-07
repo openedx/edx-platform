@@ -26,13 +26,13 @@
 // blue primary button
 .btn-primary-blue {
   @extend .btn-primary;
-  background: $blue;
-  border-color: $blue-s1;
+  background: $blue-u1;
+  border-color: $blue-u1;
   color: $white;
 
   &:hover, &:active {
-    background: $blue-s2;
-    border-color: $blue-s2;
+    background: $blue-s1;
+    border-color: $blue-s1;
   }
 
   &.current, &.active {
