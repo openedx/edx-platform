@@ -1,1 +1,4 @@
 *.sh text eol=lf
+*.txt text eol=lf
+*.py text eol=lf
+*.rb text eol=lf
