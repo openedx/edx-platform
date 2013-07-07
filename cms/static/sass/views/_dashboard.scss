@@ -3,8 +3,254 @@
 
 body.dashboard {
 
+	// temp
+	.content {
+		margin-bottom: ($baseline*5);
+
+		&:last-child {
+			margin-bottom: 0;
+		}
+	}
+
+	// ====================
+
+	// basic layout
+	.content-primary, .content-supplementary {
+	  @include box-sizing(border-box);
+	  float: left;
+	}
+
+	.content-primary {
+	  width: flex-grid(9, 12);
+	  margin-right: flex-gutter();
+	}
+
+	.content-supplementary {
+	  width: flex-grid(3, 12);
+	}
+
+	// ====================
+
+	// elements - notices
+	.content .notice-incontext {
+		width: flexgrid(9, 9);
+
+	  // CASE: notice has actions {
+	  &.has-actions {
+
+	    .msg, .list-actions {
+	      display: inline-block;
+	      vertical-align: middle;
+	    }
+
+	    .msg {
+	      width: flex-grid(6, 9);
+	      margin-right: flex-gutter();
+	    }
+
+	    .list-actions {
+	      width: flex-grid(3, 9);
+	      text-align: right;
+	      margin-top: 0;
+
+	      .action-item {
+
+	      }
+
+	      .action-create-course {
+	      	@extend .btn-primary-green;
+	      }
+	    }
+	  }
+	}
+
+
+
+	// elements - authorship controls
+	.wrapper-authorshiprights {
+		overflow: hidden;
+
+		.ui-toggle-control {
+			@extend .depth2;
+			@extend .btn-secondary-gray;
+			@include clearfix();
+			display: block;
+			text-align: left;
+
+			// STATE: hover - syncing up colors with current so transition is smoother
+			&:hover {
+				background: $gray-d1;
+				color: $white;
+			}
+
+			.label {
+				@extend .t-action3;
+				float: left;
+				width: flex-grid(8, 9);
+				margin: 3px flex-gutter() 0 0;
+			}
+
+			.icon-remove-sign {
+				@extend .t-action1;
+				@include transition(rotate 10.0s ease-in-out 0s);
+				@include transform(rotate(45deg));
+				@include transform-origin(center center);
+				float: right;
+				text-align: right;
+			}
+		}
+
+		.ui-toggle-target {
+			@extend .depth1;
+			@include transition(opacity 0.50s ease-in-out 0s);
+			position: relative;
+			top: -2px;
+			display: none;
+			opacity: 0;
+		}
+
+		// CASE: when the content area is shown
+		&.is-shown {
+
+			.ui-toggle-control {
+				@include border-bottom-radius(0);
+
+				.icon-remove-sign {
+					@include transform(rotate(90deg));
+					@include transform-origin(center center);
+				}
+			}
+
+			.ui-toggle-target {
+				display: block;
+				opacity: 1.0;
+			}
+		}
+
+
+	}
+
+	// elements - authorship controls
+	.status-authorship {
+		margin-top: $baseline;
+
+		.title {
+			@extend .t-title7;
+			margin-bottom: ($baseline/4);
+			font-weight: 700;
+			color: $gray-d1;
+		}
+
+		.copy {
+
+		}
+
+		.list-actions {
+      margin-top: ($baseline*0.75);
+
+      .action-item {
+
+      }
+
+      .action-primary {
+        @extend .btn-primary-blue;
+        @extend .t-action3;
+      }
+    }
+
+    .status-update {
+
+    	.label {
+				@extend .text-sr;
+    	}
+
+    	.value {
+    		@include border-radius(($baseline/4));
+    		position: relative;
+    		overflow: hidden;
+    		padding: ($baseline/5) ($baseline/2);
+    		background: $gray;
+
+    		.status-indicator {
+    		  position: absolute;
+    		  top: 0;
+    		  left: 0;
+    		  display: block;
+    		  width: 100%;
+    		  height: ($baseline/4);
+    		  opacity: 0.40;
+    		}
+    	}
+
+			.value-formal, .value-description {
+				@include border-radius(($baseline/10));
+				display: inline-block;
+				vertical-align: middle;
+				color: $white;
+			}
+
+    	.value-formal {
+    		@extend .t-title5;
+    		margin: ($baseline/2);
+    		font-weight: 700;
+
+    		[class^="icon-"] {
+    			margin-right: ($baseline/4);
+    		}
+    	}
+
+    	.value-description {
+    		@extend .t-copy-sub1;
+    		position: relative;
+    		color: $white;
+				opacity: 0.65;
+    	}
+    }
+
+		// CASE: rights are not requested yet
+		&.is-unrequested {
+
+			.title {
+				@extend .text-sr;
+			}
+		}
+
+		// CASE: status is pending
+		&.is-pending {
+
+			.status-update {
+
+				.value {
+					background: $orange;
+				}
+
+				.status-indicator {
+					background: $orange-d1;
+				}
+			}
+		}
+
+
+    // CASE: status is rejected
+    &.is-rejected {
+
+    	.status-update {
+
+    		.value {
+    			background: $red-l1;
+    		}
+
+    		.status-indicator {
+    			background: $red-s1;
+    		}
+    	}
+    }
+	}
+
+	// ====================
+
 	.my-classes {
-	  margin-top: $baseline;
+	  margin: $baseline 0;
 	}
 
 	.class-list {
