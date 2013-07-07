@@ -7,6 +7,7 @@ from lxml import etree
 from pkg_resources import resource_string
 
 from django.conf import settings
+from django.contrib.auth.models import User
 
 from xmodule.x_module import XModule
 from xmodule.seq_module import SequenceDescriptor
@@ -29,6 +30,7 @@ class ProctorPanel(object):
         self.user_id = user_id
         self.procset_name = procset_name
         self.ses = requests.session()
+        self.user = User.objects.get(pk=user_id)
 
     def is_released(self):
         url = '{2}/cmd/status/{0}/{1}'.format(self.user_id, self.procset_name, self.ProctorPanelServer)
@@ -101,21 +103,25 @@ class ProctorModule(ProctorFields, XModule):
         return [self.child_descriptor]
 
 
+    def not_released_html(self):
+        return self.system.render_template('proctor_release.html', {
+                'element_id': self.location.html_id(),
+                'id': self.id,
+                'name': self.display_name or self.procset_name,
+                'pp': self.pp,
+        })
+
+
     def get_html(self):
         if not self.pp.is_released():	# check for release each time we do get_html()
             log.info('is_released False')
-            return self.system.render_template('proctor_release.html', {
-                'element_id': self.location.html_id(),
-                'id': self.id,
-                'name': self.display_name,
-                'pp': self.pp,
-            })
+            return self.not_released_html()
             # return "<div>%s not yet released</div>" % self.display_name
 
         log.info('is_released True')
 
         # for sequential module, just return HTML (no ajax container)
-        if self.child.category in ['sequential', 'videosequence']:
+        if self.child.category in ['sequential', 'videosequence', 'problemset']:
             return self.child.get_html()
 
         # return ajax container, so that we can dynamically check for is_released changing
@@ -131,7 +137,8 @@ class ProctorModule(ProctorFields, XModule):
     def handle_ajax(self, _dispatch, _data):
         if not self.pp.is_released():	# check for release each time we do get_html()
             log.info('is_released False')
-            html = "<div>%s not yet released</div>" % self.display_name
+            # html = "<div>%s not yet released</div>" % self.display_name
+            html = self.not_released_html()
             return json.dumps({'html': [html], 'message': bool(True)})
         html = [child.get_html() for child in self.get_display_items()]
 

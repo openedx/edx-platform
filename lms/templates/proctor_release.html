@@ -1,4 +1,6 @@
 <div id="proctor_${element_id}">
+    <p>Welcome ${pp.user.profile.name or pp.user}</p>
+
     <p>${name} not yet released</p>
 
     <p><a href="#" id="proctor_${element_id}">Request Access</a></p>
@@ -10,27 +12,65 @@
 <script type="text/javascript">
 procrel = (function(){
     var el = $('#proctor_${element_id}');
-    var ppurl = "${pp.ProctorPanelServer}/cmd/request/${pp.user_id}/${pp.procset_name}";
+
+    var mkurl = function(cmd) {
+        ps = encodeURIComponent("${pp.procset_name}");
+        return "${pp.ProctorPanelServer}/cmd/" + cmd + "/${pp.user_id}/" + ps;
+    }
 
     var statel = $('#proctor_stat_${element_id}');
 
     var setstat = function(status){
-        el.html('<font color="green">' + status + '</font>');
+        statel.html('<font color="green">' + status + '</font>');
     }
 
-    el.click(function(){
-        $.ajax({ url: ppurl,
-                 type: 'POST',
-		 data: "",
-                 success: function(result){
-                     setstat(result.status);
+    var check_access = function(){
+        $.get(mkurl('status'), function(data){
+	    console.log(data);
+	    if (data.enabled) {
+	        alert ("Access Granted!");
+		location.reload();
+	    }
+	});
+    }
+
+    var check_count = 0;
+
+    var periodic_check = function() {
+        check_count = check_count + 1;
+	if (check_count < 100){			// >
+            setTimeout(periodic_check, 2000);
+	}
+	check_access();
+    }
+
+    var make_request = function(){
+        check_count = 0;
+
+        $.ajax({ url: mkurl('request'),
+                 type: 'GET',
+		 data: { "uname": "${pp.user.username}",
+		         "name": "${pp.user.profile.name}"
+		       },
+                 success: function(result, status, xhr){
+                     //setstat(result.status);
+		     setstat(result.status);
+		     //alert(result);
                      // location.reload();
+		     periodic_check();
                  },
-                 crossDomain: true,
-                 error: function() {
-                     alert('Error: cannot connect to server');
+		 //dataType: "text",
+		 dataType: "json",
+                 // crossDomain: true,
+                 error: function(xhr, status, error) {
+                     alert('Error: cannot connect to server' + status + "error:" + error);
                  }
                });
-    });
+    }
+
+    el.click(make_request);
+
+    return { "check": check_access, "make": make_request, "mkurl": mkurl };
+
 }() );
 </script>
