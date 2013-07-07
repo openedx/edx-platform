@@ -19,11 +19,21 @@ log = logging.getLogger('mitx.' + __name__)
 class ProctorPanel(object):
     '''
     Interface to proctor panel system, which determines if a given proctored item
-    (specified by its procset_name) is released to a given student (specified by the
-    user_id).
+    (specified by its procset_name) is released to a given student.
+
+    The LMS configuration should come with a dict which specifies the proctor panel
+    server information, eg:
+
+        PROCTOR_PANEL_INTERFACE = {
+            'url' : "http://192.168.42.6",
+            'username' : 'lms',
+            'password' : 'abcd',
+        }
+
     '''
 
-    ProctorPanelServer = getattr(settings, 'PROCTOR_PANEL_SERVER_URL', 'https://proctor.mitx.mit.edu')
+    ProctorPanelInterface = getattr(settings, 'PROCTOR_PANEL_INTERFACE', {})
+    ProctorPanelServer = ProctorPanelInterface.get('url', "")
 
     def __init__(self, user_id, procset_name):
 
@@ -36,7 +46,8 @@ class ProctorPanel(object):
         url = '{2}/cmd/status/{0}/{1}'.format(self.user_id, self.procset_name, self.ProctorPanelServer)
         log.info('ProctorPanel url={0}'.format(url))
         #ret = self.ses.post(url, data={'userid' : self.user_id, 'urlname': self.procset_name}, verify=False)
-        ret = self.ses.get(url, verify=False)
+        auth = (self.ProctorPanelInterface.get('username'), self.ProctorPanelInterface.get('password'))
+        ret = self.ses.get(url, verify=False, auth=auth)
         try:
             retdat = json.loads(ret.content)
         except Exception as err:
@@ -49,7 +60,6 @@ class ProctorPanel(object):
 
 
 class ProctorFields(object):
-    username = String(help="username of student", scope=Scope.user_state)
     procset_name = String(help="Name of this proctored set", scope=Scope.settings)
 
 
@@ -66,7 +76,7 @@ class ProctorModule(ProctorFields, XModule):
     runs out, exam access closes.
 
      Example:
-     <proctor procset_name="proctorset1">
+     <proctor procset_name="Proctored Exam 1">
      <sequential url_name="exam1" />
      </proctor>
 

@@ -24,8 +24,27 @@ procrel = (function(){
         statel.html('<font color="green">' + status + '</font>');
     }
 
+    var do_pp_get = function(cmd, gfun){
+        $.ajax({ url: mkurl(cmd),
+                 type: 'GET',
+		 data: { "uname": "${pp.user.username}",
+		         "name": "${pp.user.profile.name}"
+		       },
+		 xhrFields: {
+		      withCredentials: true
+		 },
+		 username: "${pp.ProctorPanelInterface.get('username')}",
+		 password: "${pp.ProctorPanelInterface.get('password')}",
+                 success: gfun,
+		 dataType: "json",
+                 error: function(xhr, status, error) {
+                     alert('Error: cannot connect to server' + status + "error:" + error);
+                 }
+               });
+    }
+
     var check_access = function(){
-        $.get(mkurl('status'), function(data){
+        do_pp_get('status', function(data){
 	    console.log(data);
 	    if (data.enabled) {
 	        alert ("Access Granted!");
@@ -46,31 +65,15 @@ procrel = (function(){
 
     var make_request = function(){
         check_count = 0;
-
-        $.ajax({ url: mkurl('request'),
-                 type: 'GET',
-		 data: { "uname": "${pp.user.username}",
-		         "name": "${pp.user.profile.name}"
-		       },
-                 success: function(result, status, xhr){
-                     //setstat(result.status);
+	do_pp_get('request', function(result, status, xhr){
 		     setstat(result.status);
-		     //alert(result);
-                     // location.reload();
 		     periodic_check();
-                 },
-		 //dataType: "text",
-		 dataType: "json",
-                 // crossDomain: true,
-                 error: function(xhr, status, error) {
-                     alert('Error: cannot connect to server' + status + "error:" + error);
-                 }
-               });
+                 });
     }
 
     el.click(make_request);
 
-    return { "check": check_access, "make": make_request, "mkurl": mkurl };
+    return { "check": check_access, "make": make_request, "mkurl": mkurl, "do_pp_get": do_pp_get };
 
 }() );
 </script>
