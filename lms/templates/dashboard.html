@@ -204,8 +204,12 @@
 
         <article class="my-course">
           <%
-            course_target = reverse('info', args=[course.id])
+	    try:
+	        course_target = reverse('info', args=[course.id])
+	    except Exception as err:
+	        continue
           %>
+
 
 
 
