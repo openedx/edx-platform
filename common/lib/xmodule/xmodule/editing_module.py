@@ -43,7 +43,7 @@ class TabsEditingDescriptor(EditingFields, MakoModuleDescriptor):
     you should have only one CodeMirror among tabs, one Tiny MCE, etc.
     """
     mako_template = "widgets/tabs-aggregator.html"
-    css = {'scss': [resource_string(__name__, 'css/tabs/display.scss')]}
+    css = {'scss': [resource_string(__name__, 'css/tabs/edit.scss')]}
     js = {'coffee': [resource_string(__name__, 'js/src/tabs/tabs-aggregator.coffee')]}
     js_module_name = "TabsEditorDescriptor"
     tabs = []
