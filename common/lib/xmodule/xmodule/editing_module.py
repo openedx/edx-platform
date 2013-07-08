@@ -54,7 +54,16 @@ class TabsEditingDescriptor(EditingFields, MakoModuleDescriptor):
         })
         return _context
 
-
+    @classmethod
+    def get_css(cls):
+        for tab in cls.tabs:
+            tab_styles = tab.get('css', {})
+            for css_type, css_content in tab_styles.items():
+                if css_type in cls.css:
+                    cls.css[css_type].extend(css_content)
+                else:
+                    cls.css[css_type] = css_content
+        return cls.css
 
 
 class XMLEditingDescriptor(EditingDescriptor):
