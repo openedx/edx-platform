@@ -145,12 +145,12 @@ def grade(student, request, course, model_data_cache=None, keep_raw_scores=False
         model_data_cache = ModelDataCache(grading_context['all_descriptors'], course.id, student)
 
     totaled_scores = {}
-    attempted_totaled_scores = {}
+    projected_totaled_scores = {}
     # This next complicated loop is just to collect the totaled_scores, which is
     # passed to the grader
     for section_format, sections in grading_context['graded_sections'].iteritems():
         format_scores = []
-        attempted_format_scores = []
+        projected_format_scores = []
         for section in sections:
             section_descriptor = section['section_descriptor']
             section_name = section_descriptor.display_name_with_default
@@ -179,7 +179,7 @@ def grade(student, request, course, model_data_cache=None, keep_raw_scores=False
 
             if should_grade_section:
                 scores = []
-                attempted_scores = []
+                projected_scores = []
 
                 def create_module(descriptor):
                     '''creates an XModule instance given a descriptor'''
@@ -199,7 +199,6 @@ def grade(student, request, course, model_data_cache=None, keep_raw_scores=False
                         #We simply cannot grade a problem that is 12/0, because we might need it as a percentage
                         graded = False
 
-                    #if create_module(module_descriptor).attempts != 0:
                     key = LmsKeyValueStore.Key(
                         Scope.user_state,
                         student.id,
@@ -210,8 +209,6 @@ def grade(student, request, course, model_data_cache=None, keep_raw_scores=False
                     if model_data_cache.find(key):
                         if model_data_cache.find(key).grade is not None:
                             attempted = True
-                            #(attempted_correct, attempted_total) = (correct, total)
-                            #attempted_scores.append(Score(attempted_correct, attempted_total, graded, module_descriptor.display_name_with_default))
 
                     if settings.GENERATE_PROFILE_SCORES:  	# for debugging!
                         if total > 1:
@@ -222,7 +219,6 @@ def grade(student, request, course, model_data_cache=None, keep_raw_scores=False
                     scores.append(Score(correct, total, graded, module_descriptor.display_name_with_default, attempted))
 
                 _, graded_total = graders.aggregate_scores(scores, section_name)
-                #_, attempted_graded_total = graders.aggregate_scores(attempted_scores, section_name)
 
                 if keep_raw_scores:
                     raw_scores += scores
@@ -232,17 +228,13 @@ def grade(student, request, course, model_data_cache=None, keep_raw_scores=False
             #Add the graded total to totaled_scores
             if graded_total.possible > 0:
                 format_scores.append(graded_total)
-            #if attempted_graded_total.possible > 0:
-            #    attempted_format_scores.append(attempted_graded_total)
             else:
                 log.exception("Unable to grade a section with a total possible score of zero. " +
                               str(section_descriptor.location))
 
         totaled_scores[section_format] = format_scores
-        #attempted_totaled_scores[section_format] = attempted_format_scores
 
     grade_summary = course.grader.grade(totaled_scores, generate_random_scores=settings.GENERATE_PROFILE_SCORES)
-    #attempted_grade_summary = course.grader.grade(attempted_totaled_scores, compute_in_progress=True)
 
     # We round the grade here, to make sure that the grade is an whole percentage and
     # doesn't get displayed differently than it gets grades
@@ -254,12 +246,6 @@ def grade(student, request, course, model_data_cache=None, keep_raw_scores=False
     if keep_raw_scores:
         grade_summary['raw_scores'] = raw_scores        # way to get all RAW scores out to instructor
                                                         # so grader can be double-checked
-    #grade_summary['attempted_grade'] = attempted_grade_summary['percent']
-    #print attempted_grade_summary['in_progress_percent']
-    #print attempted_totaled_scores
-    #print totaled_scores
-    #print attempted_grade_summary
-    print grade_summary
     return grade_summary
 
 
