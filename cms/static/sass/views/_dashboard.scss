@@ -92,7 +92,6 @@ body.dashboard {
 
 			.icon-remove-sign {
 				@extend .t-action1;
-				@include transition(rotate 10.0s ease-in-out 0s);
 				@include transform(rotate(45deg));
 				@include transform-origin(center center);
 				float: right;
