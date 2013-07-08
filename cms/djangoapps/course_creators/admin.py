@@ -7,6 +7,10 @@ from django.contrib import admin
 
 
 class CourseCreatorAdmin(admin.ModelAdmin):
+    """
+    Admin for the course creator table.
+    """
+
     # Fields to display on the overview page.
     list_display = ('username', 'email', 'state', 'state_changed')
     readonly_fields = ('username', 'email', 'state_changed')
