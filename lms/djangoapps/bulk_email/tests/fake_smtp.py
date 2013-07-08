@@ -5,23 +5,25 @@ import smtplib
 
 class FakeSMTPServer(smtpd.SMTPServer):
     """A fake SMTP server"""
-    def __init__(*args, **kwargs):
+    def __init__(self, *args, **kwargs):
         print "Running fake smtp server on port 1025"
-        smtpd.SMTPServer.__init__(*args, **kwargs)
+        self.errtype = "SUCCESS"
+        self.code = 0
+        smtpd.SMTPServer.__init__(self, *args, **kwargs)
     
     def set_errtype(self, e, c):
         self.errtype = e
         self.code = c
 
-    def process_message(*args, **kwargs):
-        if errtype == "DATA":
-            raise SMTPDataError(code, "Data Error")
-        elif errtype == "CONNECT":
-            raise SMTPConnectError(code, "Connect Error")
-        elif errtype == "SERVERDISCONNECT":
-            raise SMTPServerDisconnected(code, "Server Disconnected")
+    def process_message(self, *args, **kwargs):
+        if self.errtype == "DATA":
+            raise smtplib.SMTPDataError(self.code, "Data Error")
+        elif self.errtype == "CONNECT":
+            raise smtplib.SMTPConnectError(self.code, "Connect Error")
+        elif self.errtype == "SERVERDISCONNECT":
+            raise smtplib.SMTPServerDisconnected(self.code, "Server Disconnected")
         else:
-            print "Success!"
+            print "SUCCESS"
         pass
 
 if __name__ == "__main__":
