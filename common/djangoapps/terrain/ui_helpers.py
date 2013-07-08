@@ -191,7 +191,7 @@ def css_text(css_selector, index=0, max_attempts=5):
         attempt = 0
         while attempt < max_attempts:
             try:
-                return world.browser.find_by_css(css_selector)[index].text
+                return world.css_find(css_selector, index=index).text
                 break
             except:
                 attempt += 1
