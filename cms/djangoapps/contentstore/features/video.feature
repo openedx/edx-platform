@@ -18,6 +18,7 @@ Feature: Video Component
     Given I have created a Video component
     Then when I view the video it does show the captions
 
+  @skip
   Scenario: Captions are toggled correctly
     Given I have created a Video component
     And I have toggled captions
