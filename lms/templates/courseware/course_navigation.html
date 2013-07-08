@@ -17,6 +17,7 @@ def url_class(is_active):
   <div class="inner-wrapper">
     <ol class="course-tabs">
       % for tab in get_course_tabs(user, course, active_page):
+        % if tab.name != "Hide Tab":
           <li>
              <a href="${tab.link | h}" class="${url_class(tab.is_active)}">
                  ${tab.name | h}
@@ -28,6 +29,7 @@ def url_class(is_active):
                  %endif
              </a>
           </li>
+        % endif
       % endfor
     <%block name="extratabs" />
         % if masquerade is not UNDEFINED:
