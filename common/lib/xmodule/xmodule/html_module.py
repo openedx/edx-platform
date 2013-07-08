@@ -57,7 +57,6 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, TabsEditingDescriptor):
             'name': "Visual",
             'template': "tabs/tiny-mce-edit.html",
             'current': True,
-            # 'css':  {'scss': [resource_string(__name__, 'css/html/test.scss')]}
         },
         {
             'name': "HTML",

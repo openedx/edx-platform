@@ -7,6 +7,9 @@
 <script type='text/javascript'>
     $(document).ready(function(){
       (function(){
+        ##Only one inner editor in tabs is supported in front-end. It means that
+        ##you should have only one CodeMirror among tabs, one Tiny MCE, etc.
+
         ## Init Tiny-mce editor
         var $el = $("#visual-${html_id}"),
             visualEditor;
@@ -79,7 +82,9 @@
         ## Callback that ensures data sync between tabs
         TabsEditorDescriptor.registerTabCallback('${html_id}', '${tabName}', function(){
           var $codemirror = $("#advanced-${html_id}").data('CodeMirror');
-          visualEditor.setContent($codemirror.getValue())
+          if ($codemirror){
+            visualEditor.setContent($codemirror.getValue())
+          }
           ## In order for isDirty() to return true ONLY if edits have been made after setting the text,
           ## both the startContent must be sync'ed up and the dirty flag set to false.
           visualEditor.startContent = visualEditor.getContent({format: "raw", no_events: 1});
@@ -92,10 +97,7 @@
         TabsEditorDescriptor['tabs_save_functions']['${html_id}'] = TabsEditorDescriptor['tabs_save_functions']['${html_id}']  || {}
 
         TabsEditorDescriptor['tabs_save_functions']['${html_id}']['${tabName}'] = function(){
-          var _this = visualEditor;
-          return function(){ 
-            return _this.getContent({no_events: 1})
-          }
+          return function(){  return visualEditor.getContent({no_events: 1}) }
         }();
 
       }());
