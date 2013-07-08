@@ -97,7 +97,26 @@
         TabsEditorDescriptor['tabs_save_functions']['${html_id}'] = TabsEditorDescriptor['tabs_save_functions']['${html_id}']  || {}
 
         TabsEditorDescriptor['tabs_save_functions']['${html_id}']['${tabName}'] = function(){
-          return function(){  return visualEditor.getContent({no_events: 1}) }
+          return function(){  
+
+            ## if visualEditor is edited and active
+            if (visualEditor.isDirty()){
+              return visualEditor.getContent({no_events: 1}) 
+            }
+            else {
+              ## visualEditor is active, but not edits are in there.
+              ## Still save occurs - beacuse "E-text latex" is rendered to xml and saved.
+              ## Latex pastes data to Codemirror. 
+              ## So get data from there.
+              var $codemirror = $("#advanced-${html_id}").data('CodeMirror');
+              if ($codemirror){
+                return $codemirror.getValue();
+              } 
+              else {
+                return null;
+              }
+            }
+          }
         }();
 
       }());

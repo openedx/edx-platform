@@ -47,6 +47,7 @@ class @TabsEditorDescriptor
 
   save: ->
     @element.off('click', '.editor-tabs .tab', @onSwitchEditor)
+    # get data from active tab
     tabName = this.$tabs.filter('.current').html()
     if $.isFunction(window.TabsEditorDescriptor['tabs_save_functions'][@html_id][tabName])
       return data: window.TabsEditorDescriptor['tabs_save_functions'][@html_id][tabName]()
