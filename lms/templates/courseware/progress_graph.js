@@ -29,9 +29,12 @@ $(function () {
   sectionSpacer = 0.25
   sectionIndex = 0
 
+  inProgressData = []
+
   ticks = [] #These are the indices and x-axis labels for the data
   bottomTicks = [] #Labels on the bottom
   detail_tooltips = {} #This an dictionary mapping from 'section' -> array of detail_tooltips
+  detail_tooltips['Projected'] = []
   droppedScores = [] #These are the datapoints to indicate assignments which are not factored into the total score
   dropped_score_tooltips = []
 
@@ -48,6 +51,19 @@ $(function () {
       categoryData = categories[ section['category'] ]
     
       categoryData['data'].append( [tickIndex, section['percent']] )
+      if 'attempted_percent' in section:
+          print 'Adding gray bar. ' + section['category'] 
+          print str(section['attempted_percent']) + ', ' + str(section['percent'])
+          inProgressData.append([
+              tickIndex,
+              section['attempted_percent']
+          ])
+          # Make tooltips for projected bars.
+          try:
+              detail_tooltips['Projected'].append(section['projected_detail'])
+          except KeyError:
+              detail_tooltips['Projected'].append('')
+
       ticks.append( [tickIndex, section['label'] ] )
     
       if section['category'] in detail_tooltips:
@@ -66,11 +82,25 @@ $(function () {
           
   ## ----------------------------- Grade overviewew bar ------------------------- ##
   tickIndex += sectionSpacer
-  
-  series = categories.values()
+  # Add attempted bar for the total grade.
+  inProgressData.append([tickIndex, grade_summary['attempted_percent']])
+  detail_tooltips['Projected'].append('Projected Total Grade: {percent:.0%}'.format( 
+      percent=grade_summary['attempted_percent']))
+
+  series = []
+  # Add the list of projected scores to the series.
+  series.append({
+      'label': 'Projected',
+      'color': '#AAAAAA',
+      'data': inProgressData,
+      'stack': False,
+  })
+
+  series += categories.values()
   overviewBarX = tickIndex
   extraColorIndex = len(categories) #Keeping track of the next color to use for categories not in categories[]
   
+
   if show_grade_breakdown:    
     for section in grade_summary['grade_breakdown']:
         if section['percent'] > 0:
@@ -83,16 +113,17 @@ $(function () {
             series.append({
                 'label' : section['category'] + "-grade_breakdown",
                 'data' : [ [overviewBarX, section['percent']] ],
-                'color' : color
+                'color' : color,
             })
             
             detail_tooltips[section['category'] + "-grade_breakdown"] = [ section['detail'] ]
-  
+
     ticks += [ [overviewBarX, "Total"] ]
     tickIndex += 1 + sectionSpacer
   
   totalScore = grade_summary['percent']
   detail_tooltips['Dropped Scores'] = dropped_score_tooltips
+
   
   
   ## ----------------------------- Grade cutoffs ------------------------- ##

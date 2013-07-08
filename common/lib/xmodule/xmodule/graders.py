@@ -217,9 +217,6 @@ class WeightedSubsectionsGrader(CourseGrader):
                 'attempted_percent': weighted_attempted_percent,
             })
 
-        #import pdb
-        #pdb.set_trace()
-
         return {
             'percent': total_percent,
             'section_breakdown': section_breakdown,
@@ -258,10 +255,6 @@ class SingleSectionGrader(CourseGrader):
                 earned = found_score.earned
                 possible = found_score.possible
                 attempted = found_score.attempted
-
-            if attempted:
-                import pdb
-                pdb.set_trace()
 
             percent = earned / float(possible)
             detail = "{name} - {percent:.0%} ({earned:.3n}/{possible:.3n})".format(
@@ -380,10 +373,6 @@ class AssignmentFormatGrader(CourseGrader):
                     section_name = scores[i].section
                     attempted = scores[i].attempted
 
-                if attempted:
-                    import pdb
-                    pdb.set_trace()
-
                 percentage = earned / float(possible)
                 summary_format = "{section_type} {index} - {name} - {percent:.0%} ({earned:.3n}/{possible:.3n})"
                 summary = summary_format.format(index=i + self.starting_index,
@@ -427,11 +416,14 @@ class AssignmentFormatGrader(CourseGrader):
             # SingleSectionGrader.
             total_detail = "{section_type} = {percent:.0%}".format(percent=total_percent,
                                                                    section_type=self.section_type)
+            projected_detail = total_detail
             total_label = "{short_label}".format(short_label=self.short_label)
             breakdown = [{'percent': total_percent, 'label': total_label,
                           'detail': total_detail, 'category': self.category, 'prominent': True}, ]
         else:
             total_detail = "{section_type} Average = {percent:.0%}".format(percent=total_percent,
+                                                                           section_type=self.section_type)
+            projected_detail = "Projected {section_type} Average = {percent:.0%}".format(percent=attempted_total_percent,
                                                                            section_type=self.section_type)
             total_label = "{short_label} Avg".format(short_label=self.short_label)
 
@@ -440,7 +432,8 @@ class AssignmentFormatGrader(CourseGrader):
 
             if not self.hide_average:
                 breakdown.append({'percent': total_percent, 'label': total_label,
-                                  'detail': total_detail, 'category': self.category, 'prominent': True,
+                                  'detail': total_detail, 'projected_detail': projected_detail,
+                                  'category': self.category, 'prominent': True,
                                   'attempted_percent': attempted_total_percent})
 
         return {
