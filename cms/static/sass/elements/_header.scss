@@ -75,7 +75,7 @@
 
     .title {
       @extend .t-action2;
-      @extend .btn-dd-nav-primary;
+      @extend .ui-btn-dd-nav-primary;
       @include transition(all $tmg-f2 ease-in-out 0s);
 
       .label, .icon-caret-down {
