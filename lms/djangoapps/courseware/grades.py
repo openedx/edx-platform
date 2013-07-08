@@ -158,8 +158,6 @@ def grade(student, request, course, model_data_cache=None, keep_raw_scores=False
             should_grade_section = False
             # If we haven't seen a single problem in the section, we don't have to grade it at all! We can assume 0%
             for moduledescriptor in section['xmoduledescriptors']:
-                #import pdb
-                #pdb.set_trace()
 
                 # some problems have state that is updated independently of interaction
                 # with the LMS, so they need to always be scored. (E.g. foldit.)
@@ -176,10 +174,6 @@ def grade(student, request, course, model_data_cache=None, keep_raw_scores=False
                     None
                 )
                 if model_data_cache.find(key):
-                    if model_data_cache.find(key).grade is None:
-                        print "Grade is none!"
-                    else:
-                        print "{"+str(model_data_cache.find(key).grade)+"}"
                     should_grade_section = True
                     break
 
@@ -200,9 +194,6 @@ def grade(student, request, course, model_data_cache=None, keep_raw_scores=False
                     if correct is None and total is None:
                         continue
 
-                    #import pdb
-                    #pdb.set_trace()
-
                     graded = module_descriptor.lms.graded
                     if not total > 0:
                         #We simply cannot grade a problem that is 12/0, because we might need it as a percentage
@@ -215,11 +206,12 @@ def grade(student, request, course, model_data_cache=None, keep_raw_scores=False
                         module_descriptor.location,
                         None
                     )
+                    attempted = False
                     if model_data_cache.find(key):
                         if model_data_cache.find(key).grade is not None:
-                            print "Attempted -- adding to grade..."
-                            (attempted_correct, attempted_total) = (correct, total)
-                            attempted_scores.append(Score(attempted_correct, attempted_total, graded, module_descriptor.display_name_with_default))
+                            attempted = True
+                            #(attempted_correct, attempted_total) = (correct, total)
+                            #attempted_scores.append(Score(attempted_correct, attempted_total, graded, module_descriptor.display_name_with_default))
 
                     if settings.GENERATE_PROFILE_SCORES:  	# for debugging!
                         if total > 1:
@@ -227,33 +219,30 @@ def grade(student, request, course, model_data_cache=None, keep_raw_scores=False
                         else:
                             correct = total
 
-                    scores.append(Score(correct, total, graded, module_descriptor.display_name_with_default))
+                    scores.append(Score(correct, total, graded, module_descriptor.display_name_with_default, attempted))
 
                 _, graded_total = graders.aggregate_scores(scores, section_name)
-                _, attempted_graded_total = graders.aggregate_scores(attempted_scores, section_name)
+                #_, attempted_graded_total = graders.aggregate_scores(attempted_scores, section_name)
 
                 if keep_raw_scores:
                     raw_scores += scores
             else:
-                graded_total = Score(0.0, 1.0, True, section_name)
+                graded_total = Score(0.0, 1.0, True, section_name, False)
 
             #Add the graded total to totaled_scores
             if graded_total.possible > 0:
                 format_scores.append(graded_total)
-            if attempted_graded_total.possible > 0:
-                attempted_format_scores.append(attempted_graded_total)
+            #if attempted_graded_total.possible > 0:
+            #    attempted_format_scores.append(attempted_graded_total)
             else:
                 log.exception("Unable to grade a section with a total possible score of zero. " +
                               str(section_descriptor.location))
 
         totaled_scores[section_format] = format_scores
-        attempted_totaled_scores[section_format] = attempted_format_scores
-
-    import pdb
-    pdb.set_trace()
+        #attempted_totaled_scores[section_format] = attempted_format_scores
 
     grade_summary = course.grader.grade(totaled_scores, generate_random_scores=settings.GENERATE_PROFILE_SCORES)
-    attempted_grade_summary = course.grader.grade(attempted_totaled_scores, compute_in_progress=True)
+    #attempted_grade_summary = course.grader.grade(attempted_totaled_scores, compute_in_progress=True)
 
     # We round the grade here, to make sure that the grade is an whole percentage and
     # doesn't get displayed differently than it gets grades
@@ -265,8 +254,12 @@ def grade(student, request, course, model_data_cache=None, keep_raw_scores=False
     if keep_raw_scores:
         grade_summary['raw_scores'] = raw_scores        # way to get all RAW scores out to instructor
                                                         # so grader can be double-checked
-    grade_summary['attempted_grade'] = attempted_grade_summary['percent']
-    print attempted_grade_summary['percent']
+    #grade_summary['attempted_grade'] = attempted_grade_summary['percent']
+    #print attempted_grade_summary['in_progress_percent']
+    #print attempted_totaled_scores
+    #print totaled_scores
+    #print attempted_grade_summary
+    print grade_summary
     return grade_summary
 
 
