@@ -10,7 +10,7 @@
   <div class="form-content">
   <h2 class="title"><%= title %></h2>
   <% if(error) {%>
-  <div id="upload_error" class="message message-status message-status error is-shown" name="upload_error">
+    <div id="upload_error" class="message message-status message-status error is-shown" name="upload_error">
       <p><%= gettext(error.message) %></p>
     </div>
   <% } %>
