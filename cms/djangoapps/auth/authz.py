@@ -209,19 +209,11 @@ def is_user_in_creator_group(user):
     return True
 
 
-def _grant_instructors_creator_access(caller):
+def get_users_with_instructor_role():
     """
-    This is to be called only by either a command line code path or through an app which has already
-    asserted permissions to do this action.
-
-    Gives all users with instructor role course creator rights, and returns the set of
-    such users.
-    This is only intended to be run once on a given environment.
+    Returns all users with the role 'instructor'
     """
-    instructors = _get_users_with_role(INSTRUCTOR_ROLE_NAME)
-    for user in instructors:
-        add_user_to_creator_group(caller, user)
-    return instructors
+    return _get_users_with_role(INSTRUCTOR_ROLE_NAME)
 
 
 def get_users_with_staff_role():
