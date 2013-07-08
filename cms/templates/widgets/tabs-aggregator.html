@@ -2,17 +2,17 @@
 <div class="wrapper-comp-editor" id="editor-tab-${html_id}" data-html_id="${html_id}">
     <section class="editor">
   % if tabs:
-      <ul class="editor-tabs">
+      <ul class="${'editor-tabs' if (len(tabs) != 1) else 'editor-single-tab-name' }">
     % for tab in tabs:
         <li><a href="#tab-${html_id}-${loop.index}" class="tab ${'current' if('current' in tab and tab['current'] is True) else ''}">${tab['name']}</a></li>
     % endfor
       </ul>
-      <div class="tabs-wrapper">
+      <div class="${'tabs-wrapper' if (len(tabs) != 1) else 'editor-single-tab' }">
   % else:
       <div>
   % endif
        % for tab in tabs:
-        <div class="component-tab ${'is-inactive' if(not 'current' in tab or tab['current'] is not True) else ''}" id="tab-${html_id}-${loop.index}">
+        <div class="component-tab ${'is-inactive' if(not 'current' in tab or tab['current'] is not True) else ''}" id="tab-${html_id}-${loop.index}" >
             <%include file="${tab['template']}" args="tabName=tab['name']"/>
         </div>
         % endfor
