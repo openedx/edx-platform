@@ -119,7 +119,7 @@ def answer_distributions(request, course):
     return counts
 
 
-def grade(student, request, course, model_data_cache=None, keep_raw_scores=False):
+def grade(student, request, course, model_data_cache=None, keep_raw_scores=False, include_in_progress_grade=True):
     """
     This grades a student as quickly as possible. It returns the
     output from the course grader, augmented with the final letter
@@ -177,12 +177,13 @@ def grade(student, request, course, model_data_cache=None, keep_raw_scores=False
                     if model_data_cache.find(key).grade is None:
                         print "Grade is none!"
                     else:
-                        print model_data_cache.find(key).grade
+                        print "{"+model_data_cache.find(key).grade+"}"
                     should_grade_section = True
                     #break
 
             if should_grade_section:
                 scores = []
+                attempted_scores = []
 
                 def create_module(descriptor):
                     '''creates an XModule instance given a descriptor'''
@@ -193,8 +194,17 @@ def grade(student, request, course, model_data_cache=None, keep_raw_scores=False
                 for module_descriptor in yield_dynamic_descriptor_descendents(section_descriptor, create_module):
 
                     (correct, total) = get_score(course.id, student, module_descriptor, create_module, model_data_cache)
+
                     if correct is None and total is None:
                         continue
+
+                    #import pdb
+                    #pdb.set_trace()
+
+                    if create_module(module_descriptor).attempts == 0:
+                        (attempted_correct, attempted_total) = (0, 0)
+                    else:
+                        (attempted_correct, attempted_total) = (correct, total)
 
                     if settings.GENERATE_PROFILE_SCORES:  	# for debugging!
                         if total > 1:
@@ -208,8 +218,11 @@ def grade(student, request, course, model_data_cache=None, keep_raw_scores=False
                         graded = False
 
                     scores.append(Score(correct, total, graded, module_descriptor.display_name_with_default))
+                    attempted_scores.append(Score(attempted_correct, attempted_total, graded, module_descriptor.display_name_with_default))
 
                 _, graded_total = graders.aggregate_scores(scores, section_name)
+                _, attempted_graded_total = graders.aggregate_scores(attempted_scores, section_name)
+
                 if keep_raw_scores:
                     raw_scores += scores
             else:
@@ -218,13 +231,17 @@ def grade(student, request, course, model_data_cache=None, keep_raw_scores=False
             #Add the graded total to totaled_scores
             if graded_total.possible > 0:
                 format_scores.append(graded_total)
+            if attempted_graded_total.possible > 0:
+                attempted_format_scores.append(attempted_graded_total)
             else:
                 log.exception("Unable to grade a section with a total possible score of zero. " +
                               str(section_descriptor.location))
 
         totaled_scores[section_format] = format_scores
+        attempted_totaled_scores[section_format] = attempted_format_scores
 
     grade_summary = course.grader.grade(totaled_scores, generate_random_scores=settings.GENERATE_PROFILE_SCORES)
+    attempted_grade_summary = course.grader.grade(attempted_totaled_scores, generate_random_scores=settings.GENERATE_PROFILE_SCORES)
 
     # We round the grade here, to make sure that the grade is an whole percentage and
     # doesn't get displayed differently than it gets grades
@@ -236,6 +253,10 @@ def grade(student, request, course, model_data_cache=None, keep_raw_scores=False
     if keep_raw_scores:
         grade_summary['raw_scores'] = raw_scores        # way to get all RAW scores out to instructor
                                                         # so grader can be double-checked
+    grade_summary['attempted_grade'] = attempted_grade_summary['percent']
+    import pdb
+    pdb.set_trace()
+    print attempted_grade_summary['percent']
     return grade_summary
 
 
