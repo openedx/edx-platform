@@ -12,21 +12,15 @@ class FakeSMTPServer(smtpd.SMTPServer):
         smtpd.SMTPServer.__init__(*args, **kwargs)
     
     def process_message(*args, **kwargs):
-        randnum = random.randint(0,6)
-        print randnum
-        print "test"
-        if randnum == 0:
-            raise SMTPResponseException(235, "Auth Successful")
-        elif randnum == 1:
-            raise SMTPResponseException(250, "Successful Delivery")
-        elif randnum == 2:
-            raise SMTPResponseException(535, "Auth Cred Invalid")
-        elif randnum == 3:
-            raise SMTPResponseException(530, "Auth required")
-        elif randnum == 4:
-            raise SMTPResponseException(554, "Message rejection")
-        elif randnum == 5:
-            raise SMTPResponseException(454, "Max Send Rate exceeded")
+        errtype = raw_input("Enter DATA, CONNECT, or SERVERDISCONNECT: ")
+        code = raw_input("Enter the error code: ")
+        print "You entered", errtype, code
+        if errtype == "DATA":
+            raise SMTPDataError(code, "Data Error")
+        elif errtype == "CONNECT":
+            raise SMTPConnectError(code, "Connect Error")
+        elif errtype == "SERVERDISCONNECT":
+            raise SMTPServerDisconnected(code, "Server Disconnected")
         else:
             print "Success!"
         pass
