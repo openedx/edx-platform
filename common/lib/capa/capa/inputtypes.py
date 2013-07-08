@@ -504,7 +504,7 @@ class JSInput(InputTypeBase):
 
     def _extra_context(self):
         context = {
-            'applet_loader': '/static/js/capa/jsinput.js',
+            'applet_loader': '/static/js/capa/src/jsinput.js',
             'saved_state': self.value
         }
 

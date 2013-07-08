@@ -11,38 +11,15 @@ describe("A jsinput has:", function () {
         });
     });
 
-    describe("The ctxCall function", function() {
-        it("Evaluatates nested-object functions", function() {
-            var ctxTest = {
-                ctxFn : function () {
-                    return this.name ;
-                }
-            };
-            var fnString = "nest.ctxFn";
-            var holder = {};
-            holder.nest = ctxTest;
-            var fn = _ctxCall(holder, fnString);
-            expect(fnString).toBe(holder.nest.ctxFn());
-        });
 
-        it("Throws an exception when the object does not exits", function () {
-            var notObj = _ctxCall("twas", "brilling");
-            expect(notObj).toThrow();
-        });
-
-        it("Throws an exception when the function does not exist", function () {
-            var anobj = {};
-            var notFn = _ctxCall("anobj", "brillig");
-            expect(notFn).toThrow();
-        });
-
-
-    });
 
     describe("The jsinput constructor", function(){
+
+        var iframe1 = $(document).find('iframe')[0];
+
         var testJsElem = jsinputConstructor({
-            id: 3781,
-            elem: "<div id='abc'> a div </div>",
+            id: 1,
+            elem: iframe1,
             passive: false
         });
 
@@ -51,7 +28,7 @@ describe("A jsinput has:", function () {
         });
 
         it("Adds the object to the jsinput array", function() {
-            expect(jsinput.jsinputarr.exists(3781)).toBe(true);
+            expect(jsinput.exists(1)).toBe(true);
         });
 
         describe("The returned object", function() {
@@ -60,12 +37,34 @@ describe("A jsinput has:", function () {
                 expect(testJsElem.update).toBeDefined();  
             });
 
-            it("Changes the parent's inputfield", function() {
-              
-            })
+            it("Returns an 'update' that is idempotent", function(){
+                var orig = testJsElem.update();
+                for (var i = 0; i++; i < 5) {
+                    expect(testJsElem.update()).toEqual(orig);
+                }
+            });
 
+            it("Changes the parent's inputfield", function() {
+                testJsElem.update();
+              
+            });
+        });
+    });
+
+
+    describe("The walkDOM functions", function() {
+
+        walkDOM();
+
+        it("Creates (at least) one object per iframe", function() {
+            jsinput.arr.length >= 2; 
         });
 
+        it("Does not create multiple objects with the same id", function() {
+            while (jsinput.arr.length > 0) {
+                var elem = jsinput.arr.pop();
+                expect(jsinput.exists(elem.id)).toBe(false);
+            }
+        });
     });
-}
-        )
+})

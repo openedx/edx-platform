@@ -12,7 +12,6 @@
     // submitted), the constructor is called again.
 
     if (!jsinput) {
-        console.log("hi");
         jsinput = {
             runs : 1,
             arr : [],
@@ -27,27 +26,7 @@
     jsinput.runs++;
 
 
-    if ($(document).find('section[class="jsinput"]').length > jsinput.runs) {
-        return;
-    }
-
-
     /*                      Utils                               */
-
-
-    jsinput._DEBUG = jsinput._DEBUG || true;
-
-    var debuglog = function(text) { if (jsinput._DEBUG) { console.log(text);}};
-
-    var eqTimeout = function(fn, pred, time, max) {
-        var i = 0;
-        while (pred(fn) && i < max) {
-            setTimeout(fn, time);
-        }
-        return fn;
-    };
-
-    var isUndef = function (e) { return (typeof(e) === 'undefined'); };
 
 
     // Take a string and find the nested object that corresponds to it. E.g.:
@@ -76,64 +55,50 @@
         /*                      Private methods                          */
 
         var sect = $(spec.elem).parent().find('section[class="jsinput"]');
-        var sectattr = function (e) { return $(sect).attr(e); };
+        var sectAttr = function (e) { return $(sect).attr(e); };
         var thisIFrame = $(spec.elem).
                         find('iframe[name^="iframe_"]').
                         get(0);
         var cWindow = thisIFrame.contentWindow;
 
         // Get the hidden input field to pass to customresponse
-        function _inputfield() {
+        function _inputField() {
             var parent = $(spec.elem).parent();
             return parent.find('input[id^="input_"]');
         }
-        var inputfield = _inputfield();
+        var inputField = _inputField();
 
         // Get the grade function name
-        var getgradefn = sectattr("data");
+        var getGradeFn = sectAttr("data");
         // Get state getter
-        var getgetstate = sectattr("data-getstate");
+        var getStateGetter = sectAttr("data-getstate");
         // Get state setter
-        var getsetstate = sectattr("data-setstate");
+        var getStateSetter = sectAttr("data-setstate");
         // Get stored state
-        var getstoredstate = sectattr("data-stored");
+        var getStoredState = sectAttr("data-stored");
 
 
 
-        // Put the return value of gradefn in the hidden inputfield.
-        // If passed an argument, does not call gradefn, and instead directly
-        // updates the inputfield with the passed value.
-        var update = function (answer) {
-
+        // Put the return value of gradeFn in the hidden inputField.
+        var update = function () {
             var ans;
-            ans = _deepKey(cWindow, gradefn);
+
+            ans = _deepKey(cWindow, gradeFn)();
             // setstate presumes getstate, so don't getstate unless setstate is
             // defined.
-            if (getgetstate && getsetstate) {
+            if (getStateGetter && getStateSetter) {
                 var state, store;
-                state = _deepKey(cWindow, getgetstate);
+                state = unescape(_deepKey(cWindow, getStateGetter)());
                 store = {
                     answer: ans,
                     state:  state
                 };
-
-                debuglog("Store: " + store);
-                inputfield.val(JSON.stringify(store));
+                inputField.val(JSON.stringify(store));
             } else {
-                inputfield.val(ans);
-                debuglog("Answer: " + ans);
+                inputField.val(ans);
             }
             return;
         };
-
-        // Find the update button, and bind the update function to its click
-        // event.
-        function bindUpdate() {
-            var updatebutton = $(spec.elem).
-                    find('button[class="update"]').
-                    get(0);
-            $(updatebutton).click(update);
-        }
 
         /*                       Public methods                     */
 
@@ -145,53 +110,53 @@
 
         jsinput.arr.push(that);
 
-        // Put the update function as the value of the inputfield's "waitfor"
+        // Put the update function as the value of the inputField's "waitfor"
         // attribute so that it is called when the check button is clicked.
         function bindCheck() {
-            debuglog("Update function: " + that.update);
-            inputfield.data('waitfor', that.update);
+            inputField.data('waitfor', that.update);
             return;
         }
 
-        var gradefn = getgradefn;
-        debuglog("Gradefn: " + gradefn);
+        var gradeFn = getGradeFn;
 
-        if (spec.passive === false) {
-            // If there is a separate "Update" button, bind update to it.
-            bindUpdate();
-        } else {
-            // Otherwise, bind update to the check button.
-            bindCheck();
-        }
 
         bindCheck();
 
         // Check whether application takes in state and there is a saved
-        // state to give it. If getsetstate is specified but calling it
+        // state to give it. If getStateSetter is specified but calling it
         // fails, wait and try again, since the iframe might still be
         // loading.
-        if (getsetstate && getstoredstate) {
-            var sval;
-            if (typeof(getstoredstate) === "object") {
-                sval = getstoredstate["state"];
-            } else {
-                sval = getstoredstate;
+        if (getStateSetter && getStoredState) {
+            var sval, jsonVal;
+
+            try {
+              jsonVal = JSON.parse(getStoredState);
+            } catch (err) {
+              jsonVal = getStoredState;
             }
 
-            debuglog("Stored state: "+ sval);
-            debuglog("Set_statefn: " + getsetstate);
+            if (typeof(jsonVal) === "object") {
+                sval = jsonVal["state"];
+            } else {
+                sval = jsonVal;
+            }
 
+
+            // Try calling setstate every 200ms while it throws an exception,
+            // up to five times; give up after that.
+            // (Functions in the iframe may not be ready when we first try
+            // calling it, but might just need more time. Give the functions
+            // more time.)
             function whileloop(n) {
-                if (n < 10){
+                if (n < 5){
                     try {
-                        _deepKey(cWindow, getsetstate)(sval);
+                        _deepKey(cWindow, getStateSetter)(sval);
                     } catch (err) {
                         setTimeout(whileloop(n+1), 200);
                     }
                 }
                 else {
-                    debuglog("Error: could not set state");
-                    _deepKey(cWindow, getsetstate)(sval);
+                    console.debug("Error: could not set state");
                 }
             }
             whileloop(0);
@@ -218,7 +183,6 @@
                 var newJsElem = jsinputConstructor({
                     id: newid,
                     elem: value,
-                    passive: true
                 });
             }
         });
@@ -227,9 +191,9 @@
     // This is ugly, but without a timeout pages with multiple/heavy jsinputs
     // don't load properly.
     if ($.isReady) {
-        setTimeout(walkDOM, 1000);
+        setTimeout(walkDOM, 300);
     } else {
-        $(document).ready(setTimeout(walkDOM, 1000));
+        $(document).ready(setTimeout(walkDOM, 300));
     }
 
 })(window.jsinput = window.jsinput || false);
