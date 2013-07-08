@@ -156,11 +156,14 @@ def grade(student, request, course, model_data_cache=None, keep_raw_scores=False
             should_grade_section = False
             # If we haven't seen a single problem in the section, we don't have to grade it at all! We can assume 0%
             for moduledescriptor in section['xmoduledescriptors']:
+                #import pdb
+                #pdb.set_trace()
+
                 # some problems have state that is updated independently of interaction
                 # with the LMS, so they need to always be scored. (E.g. foldit.)
                 if moduledescriptor.always_recalculate_grades:
                     should_grade_section = True
-                    break
+                    #break
 
                 # Create a fake key to pull out a StudentModule object from the ModelDataCache
 
@@ -171,8 +174,12 @@ def grade(student, request, course, model_data_cache=None, keep_raw_scores=False
                     None
                 )
                 if model_data_cache.find(key):
+                    if model_data_cache.find(key).grade is None:
+                        print "Grade is none!"
+                    else:
+                        print model_data_cache.find(key).grade
                     should_grade_section = True
-                    break
+                    #break
 
             if should_grade_section:
                 scores = []
