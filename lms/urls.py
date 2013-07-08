@@ -346,8 +346,8 @@ if settings.COURSEWARE_ENABLED and settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR
             'instructor.views.instructor_dashboard.instructor_dashboard_2', name="instructor_dashboard_2"),
 
         # api endpoints for instructor
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/students_update_enrollment_email$',
-            'instructor.views.api.students_update_enrollment_email', name="students_update_enrollment_email"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/students_update_enrollment$',
+            'instructor.views.api.students_update_enrollment', name="students_update_enrollment"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/list_course_role_members$',
             'instructor.views.api.list_course_role_members', name="list_course_role_members"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/access_allow_revoke$',

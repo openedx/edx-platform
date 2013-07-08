@@ -7,6 +7,7 @@ TODO add tracking
 TODO a lot of these GETs should be PUTs
 """
 
+import re
 import json
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
@@ -23,7 +24,7 @@ from django_comment_common.models import (Role,
 from courseware.models import StudentModule
 import instructor_task.api
 import instructor.enrollment as enrollment
-from instructor.enrollment import split_input_list, enroll_emails, unenroll_emails
+from instructor.enrollment import enroll_email, unenroll_email
 import instructor.access as access
 import analytics.basic
 import analytics.distributions
@@ -40,9 +41,49 @@ def common_exceptions_400(func):
     return wrapped
 
 
+def require_query_params(*args, **kwargs):
+    """
+    Checks for required paremters or renders a 400 error.
+    `args` is a *list of required GET parameter names.
+    `kwargs` is a **dict of required GET parameter names
+        to string explanations of the parameter
+    """
+    required_params = []
+    required_params += [(arg, None) for arg in args]
+    required_params += [(key, kwargs[key]) for key in kwargs]
+    # required_params = e.g. [('action', 'enroll or unenroll'), ['emails', None]]
+
+    def decorator(func):
+        def wrapped(*args, **kwargs):
+            request = args[0]
+
+            error_response_data = {
+                'error': 'Missing required query parameter(s)',
+                'parameters': [],
+                'info': {},
+            }
+
+            for (param, extra) in required_params:
+                default = object()
+                if request.GET.get(param, default) == default:
+                    error_response_data['parameters'] += [param]
+                    error_response_data['info'][param] = extra
+
+            if len(error_response_data['parameters']) > 0:
+                return HttpResponseBadRequest(
+                    json.dumps(error_response_data),
+                    mimetype="application/json",
+                )
+            else:
+                return func(*args, **kwargs)
+        return wrapped
+    return decorator
+
+
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-def students_update_enrollment_email(request, course_id):
+@require_query_params(action="enroll or unenroll", emails="stringified list of emails")
+def students_update_enrollment(request, course_id):
     """
     Enroll or unenroll students by email.
     Requires staff access.
@@ -57,15 +98,36 @@ def students_update_enrollment_email(request, course_id):
     )
 
     action = request.GET.get('action')
-    emails = split_input_list(request.GET.get('emails'))
+    emails = _split_input_list(request.GET.get('emails'))
     auto_enroll = request.GET.get('auto_enroll') in ['true', 'True', True]
 
+    def format_result(func, email):
+        """ Act on a single email and format response or errors. """
+        try:
+            before, after = func()
+            return {
+                'email': email,
+                'before': before.to_dict(),
+                'after': after.to_dict(),
+            }
+        except Exception:
+            return {
+                'email': email,
+                'error': True,
+            }
+
     if action == 'enroll':
-        results = enroll_emails(course_id, emails, auto_enroll=auto_enroll)
+        results = [format_result(
+            lambda: enroll_email(course_id, email, auto_enroll),
+            email
+        ) for email in emails]
     elif action == 'unenroll':
-        results = unenroll_emails(course_id, emails)
+        results = [format_result(
+            lambda: unenroll_email(course_id, email),
+            email
+        ) for email in emails]
     else:
-        raise ValueError("unrecognized action '{}'".format(action))
+        return HttpResponseBadRequest("Unrecognized action '{}'".format(action))
 
     response_payload = {
         'action': action,
@@ -81,6 +143,11 @@ def students_update_enrollment_email(request, course_id):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @common_exceptions_400
+@require_query_params(
+    email="user email",
+    rolename="'instructor', 'staff', or 'beta'",
+    mode="'allow' or 'revoke'"
+)
 def access_allow_revoke(request, course_id):
     """
     Modify staff/instructor access.
@@ -119,6 +186,7 @@ def access_allow_revoke(request, course_id):
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_query_params(rolename="'instructor', 'staff', or 'beta'")
 def list_course_role_members(request, course_id):
     """
     List instructors and staff.
@@ -306,6 +374,7 @@ def get_student_progress_url(request, course_id):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @common_exceptions_400
+@require_query_params(student_email="student email")
 def redirect_to_student_progress(request, course_id):
     """
     Redirects to the specified students progress page
@@ -318,9 +387,6 @@ def redirect_to_student_progress(request, course_id):
     )
 
     student_email = request.GET.get('student_email')
-    if not student_email:
-        return HttpResponseBadRequest("Must provide an email.")
-
     user = User.objects.get(email=student_email)
 
     progress_url = reverse('student_progress', kwargs={'course_id': course_id, 'student_id': user.id})
@@ -363,7 +429,7 @@ def reset_student_attempts(request, course_id):
     if will_delete_module and all_students:
         return HttpResponseBadRequest()
 
-    module_state_key = _module_state_key_from_problem_urlname(course_id, problem_to_reset)
+    module_state_key = _msk_from_problem_urlname(course_id, problem_to_reset)
 
     response_payload = {}
     response_payload['problem_to_reset'] = problem_to_reset
@@ -412,7 +478,7 @@ def rescore_problem(request, course_id):
     if not (problem_to_reset and (all_students or student_email)):
         return HttpResponseBadRequest()
 
-    module_state_key = _module_state_key_from_problem_urlname(course_id, problem_to_reset)
+    module_state_key = _msk_from_problem_urlname(course_id, problem_to_reset)
 
     response_payload = {}
     response_payload['problem_to_reset'] = problem_to_reset
@@ -456,7 +522,7 @@ def list_instructor_tasks(request, course_id):
         return HttpResponseBadRequest()
 
     if problem_urlname:
-        module_state_key = _module_state_key_from_problem_urlname(course_id, problem_urlname)
+        module_state_key = _msk_from_problem_urlname(course_id, problem_urlname)
         if student_email:
             student = User.objects.get(email=student_email)
             tasks = instructor_task.api.get_instructor_task_history(course_id, module_state_key, student)
@@ -540,7 +606,7 @@ def update_forum_role_membership(request, course_id):
     rolename = request.GET.get('rolename')
     mode = request.GET.get('mode')
 
-    if not rolename in [access.FORUM_ROLE_ADMINISTRATOR, access.FORUM_ROLE_MODERATOR, access.FORUM_ROLE_COMMUNITY_TA]:
+    if not rolename in [FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA]:
         return HttpResponseBadRequest()
 
     try:
@@ -560,7 +626,30 @@ def update_forum_role_membership(request, course_id):
     return response
 
 
-def _module_state_key_from_problem_urlname(course_id, urlname):
+def _split_input_list(str_list):
+    """
+    Separate out individual student email from the comma, or space separated string.
+
+    e.g.
+    in: "Lorem@ipsum.dolor, sit@amet.consectetur\nadipiscing@elit.Aenean\r convallis@at.lacus\r, ut@lacinia.Sed"
+    out: ['Lorem@ipsum.dolor', 'sit@amet.consectetur', 'adipiscing@elit.Aenean', 'convallis@at.lacus', 'ut@lacinia.Sed']
+
+    `str_list` is a string coming from an input text area
+    returns a list of separated values
+    """
+
+    new_list = re.split(r'[\n\r\s,]', str_list)
+    new_list = [s.strip() for s in new_list]
+    new_list = [s for s in new_list if s != '']
+
+    return new_list
+
+
+def _msk_from_problem_urlname(course_id, urlname):
+    """
+    Convert a 'problem urlname' (instructor input name)
+    to a module state key (db field)
+    """
     if urlname[-4:] == ".xml":
         urlname = urlname[:-4]
 

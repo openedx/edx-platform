@@ -3,139 +3,291 @@ Unit tests for instructor.enrollment methods.
 """
 
 import json
+from abc import ABCMeta
 from django.contrib.auth.models import User
 from courseware.models import StudentModule
 from django.test import TestCase
 from student.tests.factories import UserFactory
 
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
-from instructor.enrollment import (enroll_emails, unenroll_emails,
-                                   split_input_list, reset_student_attempts)
+from instructor.enrollment import (EmailEnrollmentState,
+                                   enroll_email, unenroll_email,
+                                   reset_student_attempts)
 
 
-class TestInstructorEnrollmentDB(TestCase):
-    '''Test instructor enrollment administration against database effects'''
+class TestMockEnrollmentState(TestCase):
+    """ Test the basis class for enrollment tests. """
     def setUp(self):
         self.course_id = 'robot:/a/fake/c::rse/id'
 
-    def test_split_input_list(self):
-        strings = []
-        lists = []
-        strings.append("Lorem@ipsum.dolor, sit@amet.consectetur\nadipiscing@elit.Aenean\r convallis@at.lacus\r, ut@lacinia.Sed")
-        lists.append(['Lorem@ipsum.dolor', 'sit@amet.consectetur', 'adipiscing@elit.Aenean', 'convallis@at.lacus', 'ut@lacinia.Sed'])
+    def test_mes_create(self):
+        """
+        Test MockEnrollmentState creation of user.
+        """
+        mes = MockEnrollmentState(
+            user=True,
+            enrollment=True,
+            allowed=False,
+            auto_enroll=False
+        )
+        email, user, cenr, cea = mes.create_user(self.course_id)
+        ees = EmailEnrollmentState(self.course_id, email)
+        self.assertEqual(mes, ees)
 
-        for (stng, lst) in zip(strings, lists):
-            self.assertEqual(split_input_list(stng), lst)
 
-    def test_enroll_emails_userexists_alreadyenrolled(self):
-        user = UserFactory()
-        cenr = CourseEnrollment(course_id=self.course_id, user=user)
-        cenr.save()
+class TestEnrollmentChangeBase(TestCase):
+    """
+    Test instructor enrollment administration against database effects.
 
-        self.assertEqual(CourseEnrollment.objects.filter(course_id=self.course_id, user__email=user.email).count(), 1)
+    Test methods in derived classes follow a strict format.
+    `action` is a function which is run
+    the test will pass if `action` mutates state from `before_ideal` to `after_ideal`
+    """
 
-        enroll_emails(self.course_id, [user.email])
+    __metaclass__ = ABCMeta
 
-        self.assertEqual(CourseEnrollment.objects.filter(course_id=self.course_id, user__email=user.email).count(), 1)
+    def setUp(self):
+        self.course_id = 'robot:/a/fake/c::rse/id'
 
-    def test_enroll_emails_userexists_succeedenrolling(self):
-        user = UserFactory()
+    def _run_state_change_test(self, before_ideal, after_ideal, action):
+        """
+        Runs a state change test.
 
-        self.assertEqual(CourseEnrollment.objects.filter(course_id=self.course_id, user__email=user.email).count(), 0)
+        `before_ideal` and `after_ideal` are MockEnrollmentState's
+        `action` is a function which will be run in the middle.
+            `action` should transition the world from before_ideal to after_ideal
+            `action` will be supplied the following arguments (None-able arguments)
+                `email` is an email string
+                `user` is a User
+                `cenr` is a CourseEnrollment
+                `cea` is a CourseEnrollmentAllowed
+        """
+        # initialize & check before
+        print "checking initialization..."
+        email, user, cenr, cea = before_ideal.create_user(self.course_id)
+        before = EmailEnrollmentState(self.course_id, email)
+        self.assertEqual(before, before_ideal)
 
-        enroll_emails(self.course_id, [user.email])
+        # do action
+        print "running action..."
+        action(email, user, cenr, cea)
 
-        self.assertEqual(CourseEnrollment.objects.filter(course_id=self.course_id, user__email=user.email).count(), 1)
+        # check after
+        print "checking effects..."
+        after = EmailEnrollmentState(self.course_id, email)
+        self.assertEqual(after, after_ideal)
 
-    def test_enroll_emails_nouser_alreadyallowed(self):
-        email_without_user = 'robot_enroll_emails_nouser_alreadyallowed@test.org'
 
-        self.assertEqual(User.objects.filter(email=email_without_user).count(), 0)
-        self.assertEqual(CourseEnrollment.objects.filter(course_id=self.course_id, user__email=email_without_user).count(), 0)
-        self.assertEqual(CourseEnrollmentAllowed.objects.filter(course_id=self.course_id, email=email_without_user).count(), 0)
+class TestInstructorEnrollDB(TestEnrollmentChangeBase):
+    """ Test instructor.enrollment.enroll_email """
+    def test_enroll(self):
+        before_ideal = MockEnrollmentState(
+            user=True,
+            enrollment=False,
+            allowed=False,
+            auto_enroll=False
+        )
 
-        cea = CourseEnrollmentAllowed(course_id=self.course_id, email=email_without_user, auto_enroll=False)
-        cea.save()
+        after_ideal = MockEnrollmentState(
+            user=True,
+            enrollment=True,
+            allowed=False,
+            auto_enroll=False
+        )
 
-        enroll_emails(self.course_id, [email_without_user])
+        def action(email, user, cenr, cea):
+            enroll_email(self.course_id, email)
 
-        self.assertEqual(CourseEnrollment.objects.filter(course_id=self.course_id, user__email=email_without_user).count(), 0)
-        self.assertEqual(CourseEnrollmentAllowed.objects.filter(course_id=self.course_id, email=email_without_user).count(), 1)
-        self.assertEqual(CourseEnrollmentAllowed.objects.get(course_id=self.course_id, email=email_without_user).auto_enroll, False)
+        return self._run_state_change_test(before_ideal, after_ideal, action)
 
-    def test_enroll_emails_nouser_suceedallow(self):
-        email_without_user = 'robot_enroll_emails_nouser_suceedallow@test.org'
+    def test_enroll_again(self):
+        before_ideal = MockEnrollmentState(
+            user=True,
+            enrollment=True,
+            allowed=False,
+            auto_enroll=False,
+        )
 
-        self.assertEqual(User.objects.filter(email=email_without_user).count(), 0)
-        self.assertEqual(CourseEnrollment.objects.filter(course_id=self.course_id, user__email=email_without_user).count(), 0)
-        self.assertEqual(CourseEnrollmentAllowed.objects.filter(course_id=self.course_id, email=email_without_user).count(), 0)
+        after_ideal = MockEnrollmentState(
+            user=True,
+            enrollment=True,
+            allowed=False,
+            auto_enroll=False,
+        )
 
-        enroll_emails(self.course_id, [email_without_user])
+        def action(email, user, cenr, cea):
+            enroll_email(self.course_id, email)
 
-        self.assertEqual(CourseEnrollment.objects.filter(course_id=self.course_id, user__email=email_without_user).count(), 0)
-        self.assertEqual(CourseEnrollmentAllowed.objects.filter(course_id=self.course_id, email=email_without_user).count(), 1)
-        self.assertEqual(CourseEnrollmentAllowed.objects.get(course_id=self.course_id, email=email_without_user).auto_enroll, False)
+        return self._run_state_change_test(before_ideal, after_ideal, action)
 
-    def test_enroll_multiple(self):
-        user1 = UserFactory()
-        user2 = UserFactory()
-        user3 = UserFactory()
-        email_without_user1 = 'robot_enroll_emails_nouser_suceedallow_1@test.org'
-        email_without_user2 = 'robot_enroll_emails_nouser_suceedallow_2@test.org'
-        email_without_user3 = 'robot_enroll_emails_nouser_suceedallow_3@test.org'
+    def test_enroll_nouser(self):
+        before_ideal = MockEnrollmentState(
+            user=False,
+            enrollment=False,
+            allowed=False,
+            auto_enroll=False,
+        )
 
-        def test_db(auto_enroll):
-            for user in [user1, user2, user3]:
-                self.assertEqual(CourseEnrollment.objects.filter(course_id=self.course_id, user=user).count(), 1)
-                self.assertEqual(CourseEnrollmentAllowed.objects.filter(course_id=self.course_id, email=user.email).count(), 0)
+        after_ideal = MockEnrollmentState(
+            user=False,
+            enrollment=False,
+            allowed=True,
+            auto_enroll=False,
+        )
 
-            for email in [email_without_user1, email_without_user2, email_without_user3]:
-                self.assertEqual(CourseEnrollment.objects.filter(course_id=self.course_id, user__email=email).count(), 0)
-                self.assertEqual(CourseEnrollmentAllowed.objects.filter(course_id=self.course_id, email=email).count(), 1)
-                self.assertEqual(CourseEnrollmentAllowed.objects.get(course_id=self.course_id, email=email).auto_enroll, auto_enroll)
+        def action(email, user, cenr, cea):
+            enroll_email(self.course_id, email)
 
-        enroll_emails(self.course_id, [user1.email, user2.email, user3.email, email_without_user1, email_without_user2, email_without_user3], auto_enroll=True)
-        test_db(True)
-        enroll_emails(self.course_id, [user1.email, user2.email, user3.email, email_without_user1, email_without_user2, email_without_user3], auto_enroll=False)
-        test_db(False)
+        return self._run_state_change_test(before_ideal, after_ideal, action)
 
-    def test_unenroll_alreadyallowed(self):
-        email_without_user = 'robot_unenroll_alreadyallowed@test.org'
-        cea = CourseEnrollmentAllowed(course_id=self.course_id, email=email_without_user, auto_enroll=False)
-        cea.save()
+    def test_enroll_nouser_again(self):
+        before_ideal = MockEnrollmentState(
+            user=False,
+            enrollment=False,
+            allowed=True,
+            auto_enroll=False
+        )
 
-        unenroll_emails(self.course_id, [email_without_user])
+        after_ideal = MockEnrollmentState(
+            user=False,
+            enrollment=False,
+            allowed=True,
+            auto_enroll=False,
+        )
 
-        self.assertEqual(User.objects.filter(email=email_without_user).count(), 0)
-        self.assertEqual(CourseEnrollment.objects.filter(course_id=self.course_id, user__email=email_without_user).count(), 0)
-        self.assertEqual(CourseEnrollmentAllowed.objects.filter(course_id=self.course_id, email=email_without_user).count(), 0)
+        def action(email, user, cenr, cea):
+            enroll_email(self.course_id, email)
 
-    def test_unenroll_alreadyenrolled(self):
-        user = UserFactory()
-        cenr = CourseEnrollment(course_id=self.course_id, user=user)
-        cenr.save()
+        return self._run_state_change_test(before_ideal, after_ideal, action)
 
-        unenroll_emails(self.course_id, [user.email])
+    def test_enroll_nouser_autoenroll(self):
+        before_ideal = MockEnrollmentState(
+            user=False,
+            enrollment=False,
+            allowed=False,
+            auto_enroll=False,
+        )
 
-        self.assertEqual(CourseEnrollment.objects.filter(course_id=self.course_id, user=user).count(), 0)
-        self.assertEqual(CourseEnrollmentAllowed.objects.filter(course_id=self.course_id, email=user.email).count(), 0)
+        after_ideal = MockEnrollmentState(
+            user=False,
+            enrollment=False,
+            allowed=True,
+            auto_enroll=True,
+        )
+
+        def action(email, user, cenr, cea):
+            enroll_email(self.course_id, email, auto_enroll=True)
+
+        return self._run_state_change_test(before_ideal, after_ideal, action)
+
+    def test_enroll_nouser_change_autoenroll(self):
+        before_ideal = MockEnrollmentState(
+            user=False,
+            enrollment=False,
+            allowed=True,
+            auto_enroll=True,
+        )
+
+        after_ideal = MockEnrollmentState(
+            user=False,
+            enrollment=False,
+            allowed=True,
+            auto_enroll=False,
+        )
+
+        def action(email, user, cenr, cea):
+            enroll_email(self.course_id, email, auto_enroll=False)
+
+        return self._run_state_change_test(before_ideal, after_ideal, action)
+
+
+class TestInstructorUnenrollDB(TestEnrollmentChangeBase):
+    """ Test instructor.enrollment.unenroll_email """
+    def test_unenroll(self):
+        before_ideal = MockEnrollmentState(
+            user=True,
+            enrollment=True,
+            allowed=False,
+            auto_enroll=False
+        )
+
+        after_ideal = MockEnrollmentState(
+            user=True,
+            enrollment=False,
+            allowed=False,
+            auto_enroll=False
+        )
+
+        def action(email, user, cenr, cea):
+            unenroll_email(self.course_id, email)
+
+        return self._run_state_change_test(before_ideal, after_ideal, action)
 
     def test_unenroll_notenrolled(self):
-        user = UserFactory()
+        before_ideal = MockEnrollmentState(
+            user=True,
+            enrollment=False,
+            allowed=False,
+            auto_enroll=False
+        )
 
-        unenroll_emails(self.course_id, [user.email])
+        after_ideal = MockEnrollmentState(
+            user=True,
+            enrollment=False,
+            allowed=False,
+            auto_enroll=False
+        )
 
-        self.assertEqual(CourseEnrollment.objects.filter(course_id=self.course_id, user=user).count(), 0)
-        self.assertEqual(CourseEnrollmentAllowed.objects.filter(course_id=self.course_id, email=user.email).count(), 0)
+        def action(email, user, cenr, cea):
+            unenroll_email(self.course_id, email)
 
-    def test_unenroll_nosuchuser(self):
-        email_without_user = 'robot_unenroll_nosuchuser@test.org'
+        return self._run_state_change_test(before_ideal, after_ideal, action)
 
-        unenroll_emails(self.course_id, [email_without_user])
+    def test_unenroll_disallow(self):
+        before_ideal = MockEnrollmentState(
+            user=False,
+            enrollment=False,
+            allowed=True,
+            auto_enroll=True
+        )
 
-        self.assertEqual(User.objects.filter(email=email_without_user).count(), 0)
-        self.assertEqual(CourseEnrollment.objects.filter(course_id=self.course_id, user__email=email_without_user).count(), 0)
-        self.assertEqual(CourseEnrollmentAllowed.objects.filter(course_id=self.course_id, email=email_without_user).count(), 0)
+        after_ideal = MockEnrollmentState(
+            user=False,
+            enrollment=False,
+            allowed=False,
+            auto_enroll=False
+        )
+
+        def action(email, user, cenr, cea):
+            unenroll_email(self.course_id, email)
+
+        return self._run_state_change_test(before_ideal, after_ideal, action)
+
+    def test_unenroll_norecord(self):
+        before_ideal = MockEnrollmentState(
+            user=False,
+            enrollment=False,
+            allowed=False,
+            auto_enroll=False
+        )
+
+        after_ideal = MockEnrollmentState(
+            user=False,
+            enrollment=False,
+            allowed=False,
+            auto_enroll=False
+        )
+
+        def action(email, user, cenr, cea):
+            unenroll_email(self.course_id, email)
+
+        return self._run_state_change_test(before_ideal, after_ideal, action)
+
+
+class TestInstructorEnrollmentStudentModule(TestCase):
+    """ Test student module manipulations. """
+    def setUp(self):
+        self.course_id = 'robot:/a/fake/c::rse/id'
 
     def test_reset_student_attempts(self):
         user = UserFactory()
@@ -156,3 +308,55 @@ class TestInstructorEnrollmentDB(TestCase):
         self.assertEqual(StudentModule.objects.filter(student=user, course_id=self.course_id, module_state_key=msk).count(), 1)
         reset_student_attempts(self.course_id, user, msk, delete_module=True)
         self.assertEqual(StudentModule.objects.filter(student=user, course_id=self.course_id, module_state_key=msk).count(), 0)
+
+
+class MockEnrollmentState(EmailEnrollmentState):
+    """
+    Settable enrollment state.
+    Used for tests
+    """
+    def __init__(self, user=False, enrollment=False, allowed=False, auto_enroll=False):
+        self.user = user
+        self.enrollment = enrollment
+        self.allowed = allowed
+        self.auto_enroll = auto_enroll
+
+    def __eq__(self, other):
+        return self.to_dict() == other.to_dict()
+
+    def __neq__(self, other):
+        return not self == other
+
+    def create_user(self, course_id=None):
+        """
+        Utility method to possibly create and possibly enroll a user.
+        Creates a state matching the MockEnrollmentState properties.
+        Returns a tuple of (
+            email,
+            User, (optionally None)
+            CourseEnrollment, (optionally None)
+            CourseEnrollmentAllowed, (optionally None)
+        )
+        """
+        # if self.user=False, then this will just be used to generate an email.
+        email = "robot_no_user_exists_with_this_email@edx.org"
+        if self.user:
+            user = UserFactory()
+            email = user.email
+            if self.enrollment:
+                cenr = CourseEnrollment.objects.create(
+                    user=user,
+                    course_id=course_id
+                )
+                return (email, user, cenr, None)
+            else:
+                return (email, user, None, None)
+        elif self.allowed:
+            cea = CourseEnrollmentAllowed.objects.create(
+                email=email,
+                course_id=course_id,
+                auto_enroll=self.auto_enroll,
+            )
+            return (email, None, None, cea)
+        else:
+            return (email, None, None, None)

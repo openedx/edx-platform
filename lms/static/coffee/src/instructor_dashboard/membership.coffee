@@ -60,65 +60,100 @@ class BatchEnrollment
       $task_response.empty()
       $request_response_error.empty()
 
-      response_code_dict = _.extend {}, data_from_server.results
-      # response_code_dict e.g. {'code': ['email1', 'email2'], ...}
-      message_ordering = [
-        'msg_error_enroll'
-        'msg_error_unenroll'
-        'msg_enrolled'
-        'msg_unenrolled'
-        'msg_willautoenroll'
-        'msg_allowed'
-        'msg_disallowed'
-        'msg_already_enrolled'
-        'msg_notenrolled'
-      ]
+      # these results arrays contain student_results
+      # only populated arrays will be rendered
+      #
+      # students for which there was an error during the action
+      errors = []
+      # students who are now enrolled in the course
+      enrolled = []
+      # students who are now allowed to enroll in the course
+      allowed = []
+      # students who will be autoenrolled on registration
+      autoenrolled = []
+      # students who are now not enrolled in the course
+      notenrolled = []
 
-      msg_to_txt = {
-        msg_already_enrolled: "Already enrolled:"
-        msg_enrolled:         "Enrolled:"
-        msg_error_enroll:     "There was an error enrolling these students:"
-        msg_allowed:          "These students will be allowed to enroll once they register:"
-        msg_willautoenroll:   "These students will be enrolled once they register:"
-        msg_unenrolled:       "Unenrolled:"
-        msg_error_unenroll:   "There was an error unenrolling these students:"
-        msg_disallowed:       "These students were removed from those who can enroll once they register:"
-        msg_notenrolled:      "These students were not enrolled:"
-      }
+      # categorize student results into the above arrays.
+      for student_results in data_from_server.results
+        # for a successful action.
+        # student_results is of the form {
+        #   "email": "jd405@edx.org",
+        #   "before": {
+        #     "enrollment": true,
+        #     "auto_enroll": false,
+        #     "user": true,
+        #     "allowed": false
+        #   }
+        #   "after": {
+        #     "enrollment": true,
+        #     "auto_enroll": false,
+        #     "user": true,
+        #     "allowed": false
+        #   },
+        # }
+        #
+        # for an action error.
+        # student_results is of the form {
+        #   'email': email,
+        #   'error': True,
+        # }
 
-      msg_to_codes = {
-        msg_already_enrolled: ['user/ce/alreadyenrolled']
-        msg_enrolled:         ['user/!ce/enrolled']
-        msg_error_enroll:     ['user/!ce/rejected']
-        msg_allowed:          ['!user/cea/allowed', '!user/!cea/allowed']
-        msg_willautoenroll:   ['!user/cea/willautoenroll', '!user/!cea/willautoenroll']
-        msg_unenrolled:       ['ce/unenrolled']
-        msg_error_unenroll:   ['ce/rejected']
-        msg_disallowed:       ['cea/disallowed']
-        msg_notenrolled:      ['!ce/notenrolled']
-      }
+        if student_results.error != undefined
+          errors.push student_results
+        else if student_results.after.enrollment
+          enrolled.push student_results
+        else if student_results.after.allowed
+          if student_results.after.auto_enroll
+            autoenrolled.push student_results
+          else
+            allowed.push student_results
+        else if not student_results.after.enrollment
+          notenrolled.push student_results
+        else
+          console.warn 'student results not reported to user'
+          console.warn student_results
 
-      for msg_symbol in message_ordering
-        # $task_response.text JSON.stringify(data)
-        msg_txt = msg_to_txt[msg_symbol]
+      # render populated result arrays
+      render_list = (label, emails) ->
+        log emails
         task_res_section = $ '<div/>', class: 'request-res-section'
-        task_res_section.append $ '<h3/>', text: msg_txt
+        task_res_section.append $ '<h3/>', text: label
         email_list = $ '<ul/>'
         task_res_section.append email_list
-        will_attach = false
 
-        for code in msg_to_codes[msg_symbol]
-          emails = response_code_dict[code]
+        for email in emails
+          email_list.append $ '<li/>', text: email
 
-          if emails and emails.length
-            for email in emails
-              email_list.append $ '<li/>', text: email
-              will_attach = true
+        $task_response.append task_res_section
 
-        if will_attach
-          $task_response.append task_res_section
-        else
-          task_res_section.remove()
+      if errors.length
+        errors_label = do ->
+          if data_from_server.action is 'enroll'
+            "There was an error enrolling:"
+          else if data_from_server.action is 'unenroll'
+            "There was an error unenrolling:"
+          else
+            console.warn "unknown action from server '#{data_from_server.action}'"
+            "There was an error processing:"
+
+        for student_results in errors
+          console.log 'error with': student_results.email
+
+      if enrolled.length
+        render_list "Students Enrolled:", (sr.email for sr in enrolled)
+
+      if allowed.length
+        render_list "These students will be allowed to enroll once they register:",
+          (sr.email for sr in allowed)
+
+      if autoenrolled.length
+        render_list "These students will be enrolled once they register:",
+          (sr.email for sr in autoenrolled)
+
+      if notenrolled.length
+        render_list "These students are now not enrolled:",
+          (sr.email for sr in notenrolled)
 
 
 # manages a list of instructors or staff and the control of their access.

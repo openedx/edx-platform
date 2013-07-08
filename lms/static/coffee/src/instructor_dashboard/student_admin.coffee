@@ -128,7 +128,6 @@ class StudentAdmin
       send_data =
         action: 'unenroll'
         emails: @$field_student_select.val()
-        auto_enroll: false
 
       $.ajax
         dataType: 'json'

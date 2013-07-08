@@ -4,137 +4,101 @@ Enrollment operations for use by instructor APIs.
 Does not include any access control, be sure to check access before calling.
 """
 
-import re
 import json
 from django.contrib.auth.models import User
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from courseware.models import StudentModule
 
 
-def enroll_emails(course_id, student_emails, auto_enroll=False):
+class EmailEnrollmentState(object):
+    """ Store the complete enrollment state of an email in a class """
+    def __init__(self, course_id, email):
+        exists_user = User.objects.filter(email=email).exists()
+        exists_ce = CourseEnrollment.objects.filter(course_id=course_id, user__email=email).exists()
+        ceas = CourseEnrollmentAllowed.objects.filter(course_id=course_id, email=email).all()
+        exists_allowed = len(ceas) > 0
+        state_auto_enroll = exists_allowed and ceas[0].auto_enroll
+
+        self.user = exists_user
+        self.enrollment = exists_ce
+        self.allowed = exists_allowed
+        self.auto_enroll = bool(state_auto_enroll)
+
+    def __repr__(self):
+        return "{}(user={}, enrollment={}, allowed={}, auto_enroll={})".format(
+            self.__class__.__name__,
+            self.user,
+            self.enrollment,
+            self.allowed,
+            self.auto_enroll,
+        )
+
+    def to_dict(self):
+        """
+        example: {
+            'user': False,
+            'enrollment': False,
+            'allowed': True,
+            'auto_enroll': True,
+        }
+        """
+        return {
+            'user': self.user,
+            'enrollment': self.enrollment,
+            'allowed': self.allowed,
+            'auto_enroll': self.auto_enroll,
+        }
+
+
+def enroll_email(course_id, student_email, auto_enroll=False):
     """
-    Enroll multiple students by email.
+    Enroll a student by email.
 
-    students is a list of student emails e.g. ["foo@bar.com", "bar@foo.com]
-    each of whom possibly does not exist in db.
+    `student_email` is student's emails e.g. "foo@bar.com"
+    `auto_enroll` determines what is put in CourseEnrollmentAllowed.auto_enroll
+        if auto_enroll is set, then when the email registers, they will be
+        enrolled in the course automatically.
 
-    status contains the relevant prior state and action performed on the user.
-    ce stands for CourseEnrollment
-    cea stands for CourseEnrollmentAllowed
-    ! stands for the object not existing prior to the action
-    return a mapping from status to emails.
-    """
-
-    auto_string = 'willautoenroll' if auto_enroll else 'allowed'
-
-    status_map = {
-        'user/ce/alreadyenrolled': [],
-        'user/!ce/enrolled': [],
-        'user/!ce/rejected': [],
-        '!user/cea/' + auto_string: [],
-        '!user/!cea/' + auto_string: [],
-    }
-
-    for student_email in student_emails:
-        # status: user
-        try:
-            user = User.objects.get(email=student_email)
-
-            # status: user/ce
-            try:
-                CourseEnrollment.objects.get(user=user, course_id=course_id)
-                status_map['user/ce/alreadyenrolled'].append(student_email)
-            # status: user/!ce
-            except CourseEnrollment.DoesNotExist:
-                # status: user/!ce/enrolled
-                try:
-                    cenr = CourseEnrollment(user=user, course_id=course_id)
-                    cenr.save()
-                    status_map['user/!ce/enrolled'].append(student_email)
-                # status: user/!ce/rejected
-                except Exception:
-                    status_map['user/!ce/rejected'].append(student_email)
-        # status: !user
-        except User.DoesNotExist:
-            # status: !user/cea
-            try:
-                cea = CourseEnrollmentAllowed.objects.get(course_id=course_id, email=student_email)
-                cea.auto_enroll = auto_enroll
-                cea.save()
-                status_map['!user/cea/' + auto_string].append(student_email)
-            # status: !user/!cea
-            except CourseEnrollmentAllowed.DoesNotExist:
-                cea = CourseEnrollmentAllowed(course_id=course_id, email=student_email, auto_enroll=auto_enroll)
-                cea.save()
-                status_map['!user/!cea/' + auto_string].append(student_email)
-
-    return status_map
-
-
-def unenroll_emails(course_id, student_emails):
-    """
-    Unenroll multiple students by email.
-
-    `students` is a list of student emails e.g. ["foo@bar.com", "bar@foo.com]
-    each of whom possibly does not exist in db.
-
-    Fail quietly on student emails that do not match any users or allowed enrollments.
-
-    status contains the relevant prior state and action performed on the user.
-    ce stands for CourseEnrollment
-    cea stands for CourseEnrollmentAllowed
-    ! stands for the object not existing prior to the action
-    return a mapping from status to emails.
+    returns two EmailEnrollmentState's
+        representing state before and after the action.
     """
 
-    # NOTE these are not mutually exclusive
-    status_map = {
-        'cea/disallowed': [],
-        'ce/unenrolled': [],
-        'ce/rejected': [],
-        '!ce/notenrolled': [],
-    }
+    previous_state = EmailEnrollmentState(course_id, student_email)
 
-    for student_email in student_emails:
-        # delete CourseEnrollmentAllowed
-        try:
-            cea = CourseEnrollmentAllowed.objects.get(course_id=course_id, email=student_email)
-            cea.delete()
-            status_map['cea/disallowed'].append(student_email)
-        except CourseEnrollmentAllowed.DoesNotExist:
-            pass
+    if previous_state.user:
+        user = User.objects.get(email=student_email)
+        CourseEnrollment.objects.get_or_create(course_id=course_id, user=user)
+    else:
+        cea, _ = CourseEnrollmentAllowed.objects.get_or_create(course_id=course_id, email=student_email)
+        cea.auto_enroll = auto_enroll
+        cea.save()
 
-        # delete CourseEnrollment
-        try:
-            cenr = CourseEnrollment.objects.get(course_id=course_id, user__email=student_email)
-            try:
-                cenr.delete()
-                status_map['ce/unenrolled'].append(student_email)
-            except Exception:
-                status_map['ce/rejected'].append(student_email)
-        except CourseEnrollment.DoesNotExist:
-            status_map['!ce/notenrolled'].append(student_email)
+    after_state = EmailEnrollmentState(course_id, student_email)
 
-    return status_map
+    return previous_state, after_state
 
 
-def split_input_list(str_list):
+def unenroll_email(course_id, student_email):
     """
-    Separate out individual student email from the comma, or space separated string.
+    Unenroll a student by email.
 
-    e.g.
-    in: "Lorem@ipsum.dolor, sit@amet.consectetur\nadipiscing@elit.Aenean\r convallis@at.lacus\r, ut@lacinia.Sed"
-    out: ['Lorem@ipsum.dolor', 'sit@amet.consectetur', 'adipiscing@elit.Aenean', 'convallis@at.lacus', 'ut@lacinia.Sed']
+    `student_email` is student's emails e.g. "foo@bar.com"
 
-    `str_list` is a string coming from an input text area
-    returns a list of separated values
+    returns two EmailEnrollmentState's
+        representing state before and after the action.
     """
 
-    new_list = re.split(r'[\n\r\s,]', str_list)
-    new_list = [s.strip() for s in new_list]
-    new_list = [s for s in new_list if s != '']
+    previous_state = EmailEnrollmentState(course_id, student_email)
 
-    return new_list
+    if previous_state.enrollment:
+        CourseEnrollment.objects.get(course_id=course_id, user__email=student_email).delete()
+
+    if previous_state.allowed:
+        CourseEnrollmentAllowed.objects.get(course_id=course_id, email=student_email).delete()
+
+    after_state = EmailEnrollmentState(course_id, student_email)
+
+    return previous_state, after_state
 
 
 def reset_student_attempts(course_id, student, module_state_key, delete_module=False):
