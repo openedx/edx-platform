@@ -43,7 +43,6 @@ def sass_cmd(watch=false, debug=false)
 
     "sass #{debug ? '--debug-info' : '--style compressed'} " +
           "--load-path #{sass_load_paths.join(' ')} " +
-          "--require ./common/static/sass/bourbon/lib/bourbon.rb " +
           "#{watch ? '--watch' : '--update'} -E utf-8 #{sass_watch_paths.join(' ')}"
 end
 
