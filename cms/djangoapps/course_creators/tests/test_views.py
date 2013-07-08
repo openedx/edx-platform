@@ -60,15 +60,3 @@ class CourseCreatorView(TestCase):
 
             self.assertTrue(is_user_in_creator_group(self.user))
 
-    def test_delete_bad_user(self):
-        """
-        Tests that users who no longer exist are deleted from the table.
-        """
-        add_user_with_status_unrequested(self.admin, self.user)
-        self.user.delete()
-        # Ensure that the post-init callback runs (removes the entry from the table).
-        users = CourseCreator.objects.filter(username=self.user.username)
-        if users.count() == 1:
-            users[0].__init__()
-        with self.assertRaises(AssertionError):
-            get_course_creator_status(self.user)
