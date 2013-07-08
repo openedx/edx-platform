@@ -140,11 +140,11 @@
 
 // pill button
 .btn-pill {
-  @include border-radius($baseline/5);
+  border-radius: ($baseline/5);
 }
 
 .btn-rounded {
-  @include border-radius($baseline/2);
+  border-radius: ($baseline/2);
 }
 
 // primary button

@@ -162,7 +162,7 @@
   }
 
   .prompt {
-    @include border-radius(($baseline/5));
+    border-radius: ($baseline/5);
     @include box-shadow(0 0 3px $shadow-d1);
     display: inline-block;
     vertical-align: middle;

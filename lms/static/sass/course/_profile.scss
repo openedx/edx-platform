@@ -5,7 +5,7 @@ div.profile-wrapper {
   section.user-info {
     @extend .sidebar;
     border-left: 1px solid #d3d3d3;
-    @include border-radius(0px 4px 4px 0);
+    border-radius: 0px 4px 4px 0;
     border-right: 0;
 
     &:after {

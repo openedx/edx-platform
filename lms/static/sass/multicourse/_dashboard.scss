@@ -33,7 +33,7 @@
       @include background-image($dashboard-profile-header-image);
       background-color: $dashboard-profile-header-color;
       border: 1px solid $border-color-2;
-      @include border-radius(4px);
+      border-radius: 4px;
       @include box-sizing(border-box);
       width: flex-grid(12);
 
@@ -250,7 +250,7 @@
         @include background-image($button-bg-image);
         background-color: $button-bg-color;
         border: 1px solid $border-color-2;
-        @include border-radius(4px);
+        border-radius: 4px;
         @include box-shadow(0 1px 8px 0 rgba(0,0,0, 0.1));
         @include box-sizing(border-box);
         color: $base-font-color;
@@ -284,7 +284,7 @@
         margin-bottom: none;
       }
 
-      .cover {        
+      .cover {
         @include box-sizing(border-box);
         float: left;
         height: 100%;
@@ -378,7 +378,7 @@
         .enter-course {
           @include button(simple, $button-color);
           @include box-sizing(border-box);
-          @include border-radius(3px);
+          border-radius: 3px;
           display: block;
           float: left;
           font: normal 15px/1.6rem $sans-serif;
@@ -406,7 +406,7 @@
 
     .message-status {
       @include clearfix;
-      @include border-radius(3px);
+      border-radius: 3px;
       display: none;
       z-index: 10;
       margin: 20px 0 10px;
@@ -431,7 +431,7 @@
 
         strong {
           font-weight: 700;
-        
+
           a {
             font-weight: 700;
           }
@@ -454,7 +454,7 @@
 
           .btn {
             @include box-sizing(border-box);
-            @include border-radius(3px);
+            border-radius: 3px;
             float: left;
             font: normal 0.8rem/1.2rem $sans-serif;
             letter-spacing: 1px;

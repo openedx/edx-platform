@@ -74,7 +74,7 @@ nav {
   }
 
   .nav-sub {
-    @include border-radius(2px);
+    border-radius: 2px;
     @include box-sizing(border-box);
     @include box-shadow(0 1px 1px $shadow-l1);
     position: relative;

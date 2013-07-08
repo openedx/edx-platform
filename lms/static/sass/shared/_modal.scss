@@ -13,7 +13,7 @@
 .modal {
   background: rgba(0,0,0, 0.6);
   border: 1px solid rgba(0, 0, 0, 0.9);
-  @include border-radius(0px);
+  border-radius: 0px;
   @include box-shadow(0 15px 80px 15px rgba(0,0,0, 0.5));
   color: #fff;
   display: none;
@@ -53,7 +53,7 @@
 
   .inner-wrapper {
     background: $modal-bg-color;
-    @include border-radius(0px);
+    border-radius: 0px;
     border: 1px solid rgba(0, 0, 0, 0.9);
     @include box-shadow(inset 0 1px 0 0 rgba(255, 255, 255, 0.7));
     overflow: hidden;
@@ -189,7 +189,7 @@
       label.honor-code {
         background: rgb(233,233,233);
         border: 1px solid rgb(200,200,200);
-        @include border-radius(3px);
+        border-radius: 3px;
         @include box-shadow(0 1px 0 0 rgba(255,255,255, 0.6));
         display: block;
         margin-bottom: 20px;
@@ -274,7 +274,7 @@
     }
 
     .close-modal {
-      @include border-radius(2px);
+      border-radius: 2px;
       cursor: pointer;
       @include inline-block;
       padding: 10px;

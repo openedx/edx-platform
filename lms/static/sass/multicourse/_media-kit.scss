@@ -9,7 +9,7 @@ $white: rgb(255,255,255);
   width: 980px;
 
   .wrapper-mediakit {
-    @include border-radius(4px);
+    border-radius: 4px;
     @include box-sizing(border-box);
     @include box-shadow(0 1px 10px 0 rgba(0,0,0, 0.1));
     margin: ($baseline*3) 0 0 0;
@@ -24,7 +24,7 @@ $white: rgb(255,255,255);
       }
 
       header {
-        
+
       }
     }
   }
@@ -113,7 +113,7 @@ $white: rgb(255,255,255);
     }
 
     aside {
-      @include border-radius(2px);
+      border-radius: 2px;
       @include box-sizing(border-box);
       @include box-shadow(0 1px 4px 0 rgba(0,0,0, 0.2));
       width: 330px;
@@ -142,7 +142,7 @@ $white: rgb(255,255,255);
         .note {
           width: 100%;
           display: inline-block;
-          text-align: center;        
+          text-align: center;
         }
       }
 
@@ -171,7 +171,7 @@ $white: rgb(255,255,255);
 
   // library section
   .library {
-    @include border-radius(2px);
+    border-radius: 2px;
     @include box-sizing(border-box);
     @include box-shadow(0 1px 4px 0 rgba(0,0,0, 0.2));
     border: 3px solid tint($light-gray,50%);
@@ -220,7 +220,7 @@ $white: rgb(255,255,255);
       figure {
 
         a {
-          @include border-radius(2px);
+          border-radius: 2px;
           @include box-sizing(border-box);
           @include box-shadow(0 1px 2px 0 rgba(0,0,0, 0.1));
           display: block;

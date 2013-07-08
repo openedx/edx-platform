@@ -62,7 +62,7 @@
 
   // specific examples - buttons
   .button-primary {
-    @include border-radius(0);
+    border-radius: 0;
     @include linear-gradient(saturate($link-color-d1,15%) 5%, shade($link-color-d1,15%) 95%);
     display: inline-block;
     padding: $baseline/2 $baseline*2.5;
@@ -249,7 +249,7 @@
 
       // elements
       label, input, textarea {
-        @include border-radius(0);
+        border-radius: 0;
         display: block;
         height: auto;
         font-family: $sans-serif;
@@ -539,11 +539,11 @@
 
 // modal password reset form
 #forgot-password-modal {
-  @include border-radius(2px);
+  border-radius: 2px;
 
 
   .inner-wrapper {
-    @include border-radius(2px);
+    border-radius: 2px;
     background: $body-bg;
     padding-bottom: 0 !important;
   }
@@ -579,7 +579,7 @@
     }
 
     form {
-      @include border-radius(0);
+      border-radius: 0;
       @include box-shadow(none);
       margin: 0;
       border: none;

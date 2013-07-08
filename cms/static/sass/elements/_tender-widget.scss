@@ -7,7 +7,7 @@
 }
 
 #tender_window {
-  @include border-radius(3px);
+  border-radius: 3px;
   @include box-shadow(0 2px 3px $shadow);
   height: ($baseline*35) !important;
   background: $white !important;

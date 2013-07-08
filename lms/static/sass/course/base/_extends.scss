@@ -143,7 +143,7 @@ h1.top-header {
     a {
       background: #f6f6f6 url('../images/slide-left-icon.png') center center no-repeat;
       border: 1px solid #D3D3D3;
-      @include border-radius(3px 0 0 3px);
+      border-radius: 3px 0 0 3px;
       height: 16px;
       padding: 6px;
       position: absolute;

@@ -20,7 +20,7 @@ section.tool-wrapper {
     .ui-widget-content {
       background: none;
       border: none;
-      @include border-radius(0);
+      border-radius: 0;
     }
 
     canvas {
@@ -30,7 +30,7 @@ section.tool-wrapper {
     ul.ui-tabs-nav {
       background: darken(#073642, 2%);
       border-bottom: 1px solid darken(#073642, 8%);
-      @include border-radius(0);
+      border-radius: 0;
       margin: (-(lh())) (-(lh())) 0;
       padding: 0;
       position: relative;
@@ -39,7 +39,7 @@ section.tool-wrapper {
       li {
         background: none;
         border: none;
-        @include border-radius(0);
+        border-radius: 0;
         color: #fff;
         margin-bottom: 0;
 
@@ -159,7 +159,7 @@ section.tool-wrapper {
     }
 
     label {
-      @include border-radius(2px);
+      border-radius: 2px;
       color: #fff;
       font-weight: bold;
       padding: 3px;

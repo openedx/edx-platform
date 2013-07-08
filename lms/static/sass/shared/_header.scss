@@ -79,7 +79,7 @@ header.global {
         @include background-image($button-bg-image);
         background-color: $button-bg-color;
         border: 1px solid $border-color-2;
-        @include border-radius(3px);
+        border-radius: 3px;
         @include box-sizing(border-box);
         @include box-shadow(0 1px 0 0 rgba(255,255,255, 0.6));
         color: $base-font-color;
@@ -120,7 +120,7 @@ header.global {
 
         &:last-child {
           > a {
-            @include border-radius(0 4px 4px 0);
+            border-radius: 0 4px 4px 0;
             border-left: none;
             padding: 5px 8px 7px 8px;
           }
@@ -158,7 +158,7 @@ header.global {
 
       ul.dropdown-menu {
         background: $border-color-4;
-        @include border-radius(4px);
+        border-radius: 4px;
         @include box-shadow(0 2px 24px 0 rgba(0,0,0, 0.3));
         border: 1px solid $border-color-3;
         display: none;
@@ -204,7 +204,7 @@ header.global {
 
           > a {
             border: 1px solid transparent;
-            @include border-radius(3px);
+            border-radius: 3px;
             @include box-sizing(border-box);
             color: $link-color;
             cursor: pointer;
@@ -279,7 +279,7 @@ header.global {
       display: inline-block;
 
       a {
-        @include border-radius(0);
+        border-radius: 0;
         @include linear-gradient(saturate($link-color-d1,15%) 5%, shade($link-color-d1,15%) 95%);
         display: inline-block;
         padding: $baseline/2 $baseline*2.5;

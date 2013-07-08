@@ -214,7 +214,7 @@ body.course.settings {
 
         .field-group {
           @include box-sizing(border-box);
-          @include border-radius(3px);
+          border-radius: 3px;
           background: $gray-l5;
           padding: $baseline;
 
@@ -295,7 +295,7 @@ body.course.settings {
       // course link note
       .note-promotion-courseURL {
         @include box-shadow(0 2px 1px $shadow-l1);
-        @include border-radius(($baseline/5));
+        border-radius: ($baseline/5);
         margin-top: ($baseline*1.5);
         border: 1px solid $gray-l2;
         padding: ($baseline/2) 0 0 0;
@@ -410,7 +410,7 @@ body.course.settings {
 
       .input-existing {
         @include box-sizing(border-box);
-        @include border-radius(3px);
+        border-radius: 3px;
         background: $gray-l5;
         padding: ($baseline/2);
 
@@ -555,7 +555,7 @@ body.course.settings {
               top: 0;
               height: 50px;
               text-align: right;
-              @include border-radius(2px);
+              border-radius: 2px;
 
               &:hover,
               &.is-dragging {

@@ -1,7 +1,7 @@
 section.course-index {
   @extend .sidebar;
   @extend .tran;
-  @include border-radius(3px 0 0 3px);
+  border-radius: 3px 0 0 3px;
   border-right: 1px solid $border-color-2;
 
   #open_close_accordion {
@@ -21,7 +21,7 @@ section.course-index {
     font-size: 14px;
 
     h3 {
-      @include border-radius(0);
+      border-radius: 0;
       margin: 0;
       overflow: visible;
 
@@ -44,7 +44,7 @@ section.course-index {
         color: #000;
 
         a {
-          @include border-radius(0);
+          border-radius: 0;
           @include box-shadow(none);
           padding-left: 19px;
         }
@@ -96,7 +96,7 @@ section.course-index {
     ul.ui-accordion-content {
       background: transparent;
       border: none;
-      @include border-radius(0);
+      border-radius: 0;
       margin: 0;
       padding: 9px 0 9px 9px;
       overflow: auto;
@@ -104,12 +104,12 @@ section.course-index {
 
       li {
         border-bottom: 0;
-        @include border-radius(0);
+        border-radius: 0;
         margin-bottom: 4px;
 
         a {
           background: transparent;
-          @include border-radius(4px);
+          border-radius: 4px;
           display: block;
           padding: 5px 36px 5px 10px;
           position: relative;

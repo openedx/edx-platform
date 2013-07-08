@@ -58,7 +58,7 @@ body.signup, body.signin {
     form {
       @include box-sizing(border-box);
       @include box-shadow(0 1px 2px $shadow-l1);
-      @include border-radius(2px);
+      border-radius: 2px;
       width: 100%;
       border: 1px solid $gray-l2;
       padding: $baseline ($baseline*1.5);

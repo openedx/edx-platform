@@ -214,8 +214,8 @@ body.index {
 
             .proofpoint {
               @include box-sizing(border-box);
-              @include border-radius(($baseline/4));
               @include transition(color .50s ease-in-out);
+              border-radius: ($baseline/4);
               position: relative;
               top: 0;
               float: left;
