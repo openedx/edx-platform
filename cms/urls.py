@@ -5,7 +5,7 @@ from django.conf.urls import patterns, include, url
 # pylint: disable=W0611
 from . import one_time_startup
 
-# Uncomment the next two lines to enable the admin:
+# There is a course creators admin table.
 from django.contrib import admin
 admin.autodiscover()
 
