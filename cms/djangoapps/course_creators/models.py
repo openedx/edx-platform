@@ -34,7 +34,7 @@ class CourseCreator(models.Model):
 
 
 @receiver(post_init, sender=CourseCreator)
-def post_init_callback(_sender, **kwargs):
+def post_init_callback(sender, **kwargs):
     """
     Extend to remove deleted users and store previous state.
     """
@@ -48,7 +48,7 @@ def post_init_callback(_sender, **kwargs):
 
 
 @receiver(post_save, sender=CourseCreator)
-def post_save_callback(_sender, **kwargs):
+def post_save_callback(sender, **kwargs):
     """
     Extend to remove deleted users, update state_changed time,
     and modify the course creator group in authz.py.
