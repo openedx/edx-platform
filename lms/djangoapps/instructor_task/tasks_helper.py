@@ -463,6 +463,9 @@ def run_update_task(entry_id, visit_fcn, update_fcn, action_name, filter_fcn):
         entry.save_now()
         raise
 
+    # Release any queries that the connection has been hanging onto:
+    reset_queries()
+
     # log and exit, returning task_progress info as task result:
     TASK_LOG.info('Finishing %s: final: %s', task_info_string, task_progress)
     return task_progress
@@ -806,7 +809,10 @@ def update_offline_grade(xmodule_instance_args, course_descriptor, student):
     offline_grade_entry.gradeset = json_grades
     offline_grade_entry.save()
 
-    # get request-related tracking information from args passthrough,
+    # Get request-related tracking information from args passthrough,
     # and supplement with task-specific information:
     track_function('offline_grade', {'created': created})
+
+    # Release any queries that the connection has been hanging onto:
+    reset_queries()
     return True
