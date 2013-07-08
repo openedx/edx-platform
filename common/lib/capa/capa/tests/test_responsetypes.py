@@ -1548,7 +1548,7 @@ class ChoiceTextResponseTest(ResponseTest):
             "script": ''
         },
         "2_choices_2_inputs": {
-            "choices":  [
+            "choices": [
                 ("true", {"answer": "123", "tolerance": "0"}),
                 ("false", {"answer": "999", "tolerance": "0"})
             ],
