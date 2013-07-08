@@ -102,7 +102,7 @@
         overflow: hidden;
         position: relative;
         background: url($video-thumb-url) center no-repeat;
-        @include background-size(cover);
+        background-size: cover;
 
         .play-intro {
           @include background-image(linear-gradient(-90deg, rgba(0,0,0, 0.65), rgba(0,0,0, 0.75)));
