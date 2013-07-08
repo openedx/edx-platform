@@ -184,31 +184,35 @@ def click_link(partial_text, index=0, max_attempts=5):
 
 
 @world.absorb
-def css_text(css_selector, index=0):
+def css_text(css_selector, index=0, max_attempts=5):
 
     # Wait for the css selector to appear
     if world.is_css_present(css_selector):
-        try:
-            return world.browser.find_by_css(css_selector)[index].text
-        except StaleElementReferenceException:
-            # The DOM was still redrawing. Wait a second and try again.
-            world.wait(1)
-            return world.browser.find_by_css(css_selector)[index].text
+        attempt = 0
+        while attempt < max_attempts:
+            try:
+                return world.browser.find_by_css(css_selector)[index].text
+                break
+            except:
+                attempt += 1
+        assert_true(attempt < max_attempts, 'Could not access {}'.format(css_selector))
     else:
         return ""
 
 
 @world.absorb
-def css_value(css_selector, index=0):
+def css_value(css_selector, index=0, max_attempts=5):
 
     # Wait for the css selector to appear
     if world.is_css_present(css_selector):
-        try:
-            return world.browser.find_by_css(css_selector)[index].value
-        except StaleElementReferenceException:
-            # The DOM was still redrawing. Wait a second and try again.
-            world.wait(1)
-            return world.browser.find_by_css(css_selector)[index].value
+        attempt = 0
+        while attempt < max_attempts:
+            try:
+                return world.browser.find_by_css(css_selector)[index].value
+                break
+            except:
+                attempt += 1
+        assert_true(attempt < max_attempts, 'Could not access {}'.format(css_selector))
     else:
         return ""
 
