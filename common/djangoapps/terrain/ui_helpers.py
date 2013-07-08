@@ -10,6 +10,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from lettuce.django import django_url
+from nose.tools import assert_true
 
 
 @world.absorb
@@ -142,14 +143,44 @@ def id_click(elem_id):
 
 
 @world.absorb
-def css_fill(css_selector, text):
-    assert is_css_present(css_selector), "{} is not present".format(css_selector)
-    world.browser.find_by_css(css_selector).first.fill(text)
+def css_fill(css_selector, text, index=0, max_attempts=5):
+    assert is_css_present(css_selector)
+    attempt = 0
+    result = False
+    while attempt < max_attempts:
+        try:
+            world.browser.find_by_css(css_selector)[index].fill(text)
+            result = True
+            break
+        except WebDriverException:
+            # Occasionally, MathJax or other JavaScript can cover up
+            # an element temporarily.
+            # If this happens, wait a second, then try again
+            world.wait(1)
+            attempt += 1
+        except:
+            attempt += 1
+    assert_true(result, 'Filling {} did not work as expected'.format(css_selector))
 
 
 @world.absorb
-def click_link(partial_text):
-    world.browser.find_link_by_partial_text(partial_text).first.click()
+def click_link(partial_text, index=0, max_attempts=5):
+    attempt = 0
+    result = False
+    while attempt < max_attempts:
+        try:
+            world.browser.find_link_by_partial_text(partial_text)[index].click()
+            result = True
+            break
+        except WebDriverException:
+            # Occasionally, MathJax or other JavaScript can cover up
+            # an element temporarily.
+            # If this happens, wait a second, then try again
+            world.wait(1)
+            attempt += 1
+        except:
+            attempt += 1
+    assert_true(result, 'Clicking {} did not work as expected'.format(partial_text))
 
 
 @world.absorb
@@ -168,6 +199,21 @@ def css_text(css_selector, index=0):
 
 
 @world.absorb
+def css_value(css_selector, index=0):
+
+    # Wait for the css selector to appear
+    if world.is_css_present(css_selector):
+        try:
+            return world.browser.find_by_css(css_selector)[index].value
+        except StaleElementReferenceException:
+            # The DOM was still redrawing. Wait a second and try again.
+            world.wait(1)
+            return world.browser.find_by_css(css_selector)[index].value
+    else:
+        return ""
+
+
+@world.absorb
 def css_html(css_selector, index=0, max_attempts=5):
     """
     Returns the HTML of a css_selector and will retry if there is a StaleElementReferenceException
@@ -179,26 +225,30 @@ def css_html(css_selector, index=0, max_attempts=5):
             return world.browser.find_by_css(css_selector)[index].html
         except:
             attempt += 1
-    return ''
+    assert_true(attempt < max_attempts, 'Ran out of attempts to access {}'.format(css_selector))
 
 
 @world.absorb
 def css_has_class(css_selector, class_name, index=0, max_attempts=5):
     attempt = 0
-    found = False
-    while attempt < max_attempts and not found:
+    while attempt < max_attempts:
         try:
             return world.css_find(css_selector)[index].has_class(class_name)
-            found = True
         except:
             attempt += 1
-    return False
+    assert_true(attempt < max_attempts, 'Ran out of attempts to access {}'.format(css_selector))
 
 
 @world.absorb
-def css_visible(css_selector):
-    assert is_css_present(css_selector), "{} is not present".format(css_selector)
-    return world.browser.find_by_css(css_selector).visible
+def css_visible(css_selector, index=0, max_attempts=5):
+    assert is_css_present(css_selector)
+    attempt = 0
+    while attempt < max_attempts:
+        try:
+            return world.browser.find_by_css(css_selector)[index].visible
+        except:
+            attempt += 1
+    assert_true(attempt < max_attempts, 'Ran out of attempts to access {}'.format(css_selector))
 
 
 @world.absorb

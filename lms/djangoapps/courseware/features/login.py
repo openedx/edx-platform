@@ -3,6 +3,7 @@
 
 from lettuce import step, world
 from django.contrib.auth.models import User
+from nose.tools import assert_true
 
 
 @step('I am an unactivated user$')
@@ -19,8 +20,15 @@ def i_am_an_activated_user(step):
 def i_submit_my_credentials_on_the_login_form(step):
     fill_in_the_login_form('email', 'robot@edx.org')
     fill_in_the_login_form('password', 'test')
-    login_form = world.browser.find_by_css('form#login-form')
-    login_form.find_by_name('submit').click()
+    attempt = 0
+    while attempt < 5:
+        try:
+            login_form = world.browser.find_by_css('form#login-form')
+            login_form.find_by_name('submit').click()
+            break
+        except:
+            attempt += 1
+    assert_true(attempt < 5, 'Login form could not be clicked')
 
 
 @step(u'I should see the login error message "([^"]*)"$')
@@ -49,6 +57,13 @@ def user_is_an_activated_user(uname):
 
 
 def fill_in_the_login_form(field, value):
-    login_form = world.browser.find_by_css('form#login-form')
-    form_field = login_form.find_by_name(field)
-    form_field.fill(value)
+    attempt = 0
+    while attempt < 5:
+        try:
+            login_form = world.browser.find_by_css('form#login-form')
+            form_field = login_form.find_by_name(field)
+            form_field.fill(value)
+            break
+        except:
+            attempt += 1
+    assert_true(attempt < 5, 'Login form could not be filled')
