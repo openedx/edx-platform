@@ -12,8 +12,8 @@ class CourseCreatorAdmin(admin.ModelAdmin):
     """
 
     # Fields to display on the overview page.
-    list_display = ('username', 'email', 'state', 'state_changed')
-    readonly_fields = ('username', 'email', 'state_changed')
+    list_display = ['username', 'email', 'state', 'state_changed', 'note']
+    readonly_fields = ['username', 'email', 'state_changed']
     # Controls the order on the edit form (without this, read-only fields appear at the end).
     fieldsets = (
         (None, {
@@ -21,10 +21,10 @@ class CourseCreatorAdmin(admin.ModelAdmin):
         }),
     )
     # Fields that filtering support
-    list_filter = list_display
+    list_filter = ['state', 'state_changed']
     # Fields that search supports. Note that the search term for state has to be
     # its key (ie, 'g' instead of 'granted').
-    search_fields = ['username', 'email', 'state']
+    search_fields = ['username', 'email', 'state', 'note']
     # Turn off the action bar (we have no bulk actions)
     actions = None
 
