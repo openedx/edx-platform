@@ -44,3 +44,4 @@ node_modules
 .prereqs_cache
 autodeploy.properties
 .ws_migrations_complete
+.vagrant/
