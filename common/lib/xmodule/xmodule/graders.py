@@ -183,6 +183,7 @@ class WeightedSubsectionsGrader(CourseGrader):
             subgrade_result = subgrader.grade(grade_sheet, generate_random_scores)
 
             weighted_percent = subgrade_result['percent'] * weight
+            print category + ": " + weighted_percent
             section_detail = "{0} = {1:.1%} of a possible {2:.0%}".format(category, weighted_percent, weight)
 
             total_percent += weighted_percent
