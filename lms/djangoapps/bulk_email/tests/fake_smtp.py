@@ -7,6 +7,8 @@ class FakeSMTPServer(smtpd.SMTPServer):
     """A fake SMTP server"""
     def __init__(*args, **kwargs):
         print "Running fake smtp server on port 1025"
+        self.errtype = "SUCCESS"
+        self.code = 0
         smtpd.SMTPServer.__init__(*args, **kwargs)
     
     def set_errtype(self, e, c):
@@ -21,7 +23,7 @@ class FakeSMTPServer(smtpd.SMTPServer):
         elif errtype == "SERVERDISCONNECT":
             raise SMTPServerDisconnected(code, "Server Disconnected")
         else:
-            print "Success!"
+            print "SUCCESS"
         pass
 
 if __name__ == "__main__":
