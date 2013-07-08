@@ -10,7 +10,7 @@ def i_fill_in_the_registration_form(step):
     attempt = 0
     while attempt < 5:
         try:
-            register_form = world.browser.find_by_css('form#register_form')
+            register_form = world.css_find('form#register_form')
             register_form.find_by_name('email').fill('robot+studio@edx.org')
             register_form.find_by_name('password').fill('test')
             register_form.find_by_name('username').fill('robot-studio')
