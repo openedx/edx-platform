@@ -273,20 +273,21 @@ class SingleSectionGrader(CourseGrader):
             detail = "{name} - 0% (?/?)".format(name=self.name)
             attempted_percent = None
 
-        breakdown = [{'percent': percent, 'label': self.short_label,
-                      'detail': detail, 'category': self.category, 'prominent': True}]
-
-        attempted_breakdown = [{
-            'percent': attempted_percent, 'label': self.short_label,
-            'detail': detail, 'category': self.category, 'prominent': True
+        breakdown = [{
+            'percent': percent,
+            'label': self.short_label,
+            'detail': detail,
+            'category': self.category,
+            'prominent': True,
+            'attempted_percent': attempted_percent,
         }]
 
-        return {'percent': percent,
-                'section_breakdown': breakdown,
-                #No grade_breakdown here
-                'attempted_percent': attempted_percent,
-                'attempted_section_breakdown': attempted_breakdown,
-                }
+        return {
+            'percent': percent,
+            'section_breakdown': breakdown,
+            #No grade_breakdown here
+            'attempted_percent': attempted_percent,
+        }
 
 
 class AssignmentFormatGrader(CourseGrader):
@@ -395,10 +396,6 @@ class AssignmentFormatGrader(CourseGrader):
             short_label = "{short_label} {index:02d}".format(index=i + self.starting_index,
                                                              short_label=self.short_label)
 
-            if attempted_percentage is not None:
-                attempted_breakdown.append({'percent': percentage, 'label': short_label,
-                                              'detail': summary, 'category': self.category})
-
             breakdown.append({'percent': percentage, 'label': short_label,
                               'detail': summary, 'category': self.category})
 
@@ -429,12 +426,12 @@ class AssignmentFormatGrader(CourseGrader):
 
             if not self.hide_average:
                 breakdown.append({'percent': total_percent, 'label': total_label,
-                                  'detail': total_detail, 'category': self.category, 'prominent': True})
+                                  'detail': total_detail, 'category': self.category, 'prominent': True,
+                                  'attempted_percent': attempted_total_percent})
 
         return {
             'percent': total_percent,
             'section_breakdown': breakdown,
             #No grade_breakdown here
             'attempted_percent': attempted_total_percent,
-            'attempted_section_breakdown': attempted_breakdown,
         }
