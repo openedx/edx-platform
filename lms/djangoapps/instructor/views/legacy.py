@@ -15,7 +15,7 @@ from StringIO import StringIO
 
 from django.conf import settings
 from django.contrib.auth.models import User, Group
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
 from django.core.urlresolvers import reverse
@@ -40,7 +40,8 @@ from django_comment_common.models import (Role,
                                           FORUM_ROLE_MODERATOR,
                                           FORUM_ROLE_COMMUNITY_TA)
 from django_comment_client.utils import has_forum_access
-from instructor.offline_gradecalc import student_grades, offline_grades_available
+
+from instructor.offline_gradecalc import student_grades
 from instructor.views.tools import strip_if_string
 from instructor_task.api import (get_running_instructor_tasks,
                                  get_instructor_task_history,
@@ -249,32 +250,42 @@ def instructor_dashboard(request, course_id):
 
     elif action == 'Dump list of enrolled students' or action == 'List enrolled students':
         log.debug(action)
-        datatable = get_student_grade_summary_data(request, course, course_id, get_grades=False, use_offline=use_offline)
+        datatable = get_student_grade_summary_data(request, course, course_id, get_grades=False)
+        if datatable is None:
+            return Http404("Grades not found.")
         datatable['title'] = 'List of students enrolled in {0}'.format(course_id)
         track.views.server_track(request, "list-students", {}, page="idashboard")
 
     elif 'Dump Grades' in action:
         log.debug(action)
-        datatable = get_student_grade_summary_data(request, course, course_id, get_grades=True, use_offline=use_offline)
+        datatable = get_student_grade_summary_data(request, course, course_id, get_grades=True)
+        if datatable is None:
+            return Http404("Grades not found.")
         datatable['title'] = 'Summary Grades of students enrolled in {0}'.format(course_id)
         track.views.server_track(request, "dump-grades", {}, page="idashboard")
 
     elif 'Dump all RAW grades' in action:
         log.debug(action)
         datatable = get_student_grade_summary_data(request, course, course_id, get_grades=True,
-                                                   get_raw_scores=True, use_offline=use_offline)
+                                                   get_raw_scores=True)
+        if datatable is None:
+            return Http404("Grades not found.")
         datatable['title'] = 'Raw Grades of students enrolled in {0}'.format(course_id)
         track.views.server_track(request, "dump-grades-raw", {}, page="idashboard")
 
     elif 'Download CSV of all student grades' in action:
         track.views.server_track(request, "dump-grades-csv", {}, page="idashboard")
-        return return_csv('grades_{0}.csv'.format(course_id),
-                          get_student_grade_summary_data(request, course, course_id, use_offline=use_offline))
+        grades = get_student_grade_summary_data(request, course, course_id)
+        if grades is None:
+            return Http404("Grades not found.")
+        return return_csv('grades_{0}.csv'.format(course_id), grades)
 
     elif 'Download CSV of all RAW grades' in action:
         track.views.server_track(request, "dump-grades-csv-raw", {}, page="idashboard")
-        return return_csv('grades_{0}_raw.csv'.format(course_id),
-                          get_student_grade_summary_data(request, course, course_id, get_raw_scores=True, use_offline=use_offline))
+        grades = get_student_grade_summary_data(request, course, course_id, get_raw_scores=True)
+        if grades is None:
+            return Http404("Grades not found.")
+        return return_csv('grades_{0}_raw.csv'.format(course_id), grades)
 
     elif 'Download CSV of answer distributions' in action:
         track.views.server_track(request, "dump-answer-dist-csv", {}, page="idashboard")
@@ -451,7 +462,9 @@ def instructor_dashboard(request, course_id):
 
     elif action == 'List assignments available for this course':
         log.debug(action)
-        allgrades = get_student_grade_summary_data(request, course, course_id, get_grades=True, use_offline=use_offline)
+        allgrades = get_student_grade_summary_data(request, course, course_id, get_grades=True)
+        if allgrades is None:
+            return Http404("Grades not found.")
 
         assignments = [[x] for x in allgrades['assignments']]
         datatable = {'header': ['Assignment Name']}
@@ -461,7 +474,9 @@ def instructor_dashboard(request, course_id):
         msg += 'assignments=<pre>%s</pre>' % assignments
 
     elif action == 'List enrolled students matching remote gradebook':
-        stud_data = get_student_grade_summary_data(request, course, course_id, get_grades=False, use_offline=use_offline)
+        stud_data = get_student_grade_summary_data(request, course, course_id, get_grades=False)
+        if stud_data is None:
+            return Http404("Grades not found.")
         msg2, rg_stud_data = _do_remote_gradebook(request.user, course, 'get-membership')
         datatable = {'header': ['Student  email', 'Match?']}
         rg_students = [x['email'] for x in rg_stud_data['retdata']]
@@ -480,7 +495,9 @@ def instructor_dashboard(request, course_id):
         if not aname:
             msg += "<font color='red'>Please enter an assignment name</font>"
         else:
-            allgrades = get_student_grade_summary_data(request, course, course_id, get_grades=True, use_offline=use_offline)
+            allgrades = get_student_grade_summary_data(request, course, course_id, get_grades=True)
+            if allgrades is None:
+                return Http404("Grades not found.")
             if aname not in allgrades['assignments']:
                 msg += "<font color='red'>Invalid assignment name '%s'</font>" % aname
             else:
@@ -827,10 +844,6 @@ def instructor_dashboard(request, course_id):
             analytics_results[analytic_name] = get_analytics_result(analytic_name)
 
     #----------------------------------------
-    # offline grades?
-
-    if use_offline:
-        msg += "<br/><font color='orange'>Grades from %s</font>" % offline_grades_available(course_id)
 
     # generate list of pending background tasks
     if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
@@ -1114,7 +1127,7 @@ def remove_user_from_group(request, username_or_email, group, group_title, event
     return _add_or_remove_user_group(request, username_or_email, group, group_title, event_name, False)
 
 
-def get_student_grade_summary_data(request, course, course_id, get_grades=True, get_raw_scores=False, use_offline=True):
+def get_student_grade_summary_data(request, course, course_id, get_grades=True, get_raw_scores=False):
     '''
     Return data arrays with student identity and grades for specified course.
 
@@ -1132,15 +1145,19 @@ def get_student_grade_summary_data(request, course, course_id, get_grades=True, 
     If get_raw_scores=True, then instead of grade summaries, the raw grades for all graded modules are returned.
 
     '''
+    # add check that grades exist
+    if get_grades and not offline_grades_available(course_id):
+        return None
+
     enrolled_students = User.objects.filter(
         courseenrollment__course_id=course_id,
         courseenrollment__is_active=1,
     ).prefetch_related("groups").order_by('username')
 
-    header = ['ID', 'Username', 'Full Name', 'edX email', 'External email']
+    header = ['ID', 'Username', 'Full Name', 'edX email', 'External email', 'Updated']
     assignments = []
     if get_grades and enrolled_students.count() > 0:
-        # just to construct the header
+        # get grades for the first student, just to construct the header
         gradeset = student_grades(enrolled_students[0], request, course)
         # log.debug('student {0} gradeset {1}'.format(enrolled_students[0], gradeset))
         if get_raw_scores:
@@ -1162,6 +1179,10 @@ def get_student_grade_summary_data(request, course, course_id, get_grades=True, 
         if get_grades:
             gradeset = student_grades(student, request, course)
             log.debug('student={0}, gradeset={1}'.format(student, gradeset))
+            # add date when grade was fetched:
+            # TODO: figure out if this needs formatting, particularly for csv
+            # datarow.append(gradeset['updated'].isoformat())
+            datarow.append('updated-goes-here')
             if get_raw_scores:
                 # TODO (ichuang) encode Score as dict instead of as list, so score[0] -> score['earned']
                 sgrades = [(getattr(score, 'earned', '') or score[0]) for score in gradeset['raw_scores']]
@@ -1185,6 +1206,10 @@ def gradebook(request, course_id):
     - shows students who are enrolled.
     """
     course = get_course_with_access(request.user, course_id, 'staff', depth=None)
+
+    # add check that grades exist
+    if not offline_grades_available(course_id):
+        return Http404("Grades not found.")
 
     enrolled_students = User.objects.filter(
         courseenrollment__course_id=course_id,
@@ -1403,7 +1428,6 @@ def send_mail_to_student(student, param_dict):
     """
     Construct the email using templates and then send it.
     `student` is the student's email address (a `str`),
-
     `param_dict` is a `dict` with keys [
     `site_name`: name given to edX instance (a `str`)
     `registration_url`: url for registration (a `str`)
@@ -1638,6 +1662,10 @@ def offline_grades_available(course_id):
     '''
     history_entries = get_instructor_task_history(course_id, task_type='update_offline_grades')
     # TODO: figure out what to do if the last history entry was not successful.
+    # Also must make sure that something has ever succeeded.  For example, as soon as the
+    # task is queued, this will return the currently-running task.  That's clearly not
+    # ready for display.
+    history_entries.filter(task_state='SUCCESS')
     if not history_entries:
         return None
     return history_entries.latest('created')
@@ -1655,4 +1683,8 @@ def student_grades(student, request, course):
         return dict(raw_scores=[], section_breakdown=[],
                     msg='Error: no offline gradeset available for %s, %s' % (student, course.id))
     else:
-        return json.loads(ocg.gradeset)
+        gradedict = json.loads(ocg.gradeset)
+        gradedict['created'] = ocg.created
+        gradedict['updated'] = ocg.updated
+        return gradedict
+

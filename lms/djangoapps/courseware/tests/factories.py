@@ -8,8 +8,9 @@ from student.tests.factories import GroupFactory as StudentGroupFactory
 from student.tests.factories import UserProfileFactory as StudentUserProfileFactory
 from student.tests.factories import CourseEnrollmentAllowedFactory as StudentCourseEnrollmentAllowedFactory
 from student.tests.factories import RegistrationFactory as StudentRegistrationFactory
+
 from courseware.models import StudentModule, XModuleUserStateSummaryField
-from courseware.models import XModuleStudentInfoField, XModuleStudentPrefsField
+from courseware.models import XModuleStudentInfoField, XModuleStudentPrefsField, OfflineComputedGrade
 
 from xmodule.modulestore import Location
 from pytz import UTC
@@ -76,3 +77,11 @@ class StudentInfoFactory(DjangoModelFactory):
     field_name = 'existing_field'
     value = json.dumps('old_value')
     student = SubFactory(UserFactory)
+
+
+class OfflineComputedGradeFactory(DjangoModelFactory):
+    FACTORY_FOR = OfflineComputedGrade
+
+    user = SubFactory(UserFactory)
+    course_id = "MITx/999/Robot_Super_Course"
+    gradeset = json.dumps({})

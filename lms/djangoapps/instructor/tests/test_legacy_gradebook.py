@@ -12,6 +12,8 @@ from capa.tests.response_xml_factory import StringResponseXMLFactory
 from courseware.tests.factories import StudentModuleFactory
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
+from instructor_task.api import submit_update_offline_grades
+from django.test.client import RequestFactory
 
 
 USER_COUNT = 11
@@ -67,6 +69,13 @@ class TestGradebook(ModuleStoreTestCase):
                     module_state_key=Location(item.location).url()
                 )
 
+        # gradebook call doesn't work until grades have been first calculated,
+        # so do that first.
+        # TODO: fix this so that the grade blobs are actually loaded into their
+        # table rows via factories, rather than by submitting a task.
+        request = RequestFactory().request()
+        request.user = instructor
+        submit_update_offline_grades(request, self.course.id)
         self.response = self.client.get(reverse('gradebook', args=(self.course.id,)))
 
     def test_response_code(self):

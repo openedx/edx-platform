@@ -53,7 +53,6 @@ class PageLoaderTestCase(LoginEnrollmentTestCase):
         Assert that all pages in the course load correctly.
         `course_id` is the ID of the course to check.
         """
-
         store = modulestore()
 
         # Enroll in the course before trying to access pages
