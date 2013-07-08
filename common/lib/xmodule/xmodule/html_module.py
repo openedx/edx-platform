@@ -49,6 +49,7 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, TabsEditingDescriptor):
 
     # js = {'coffee': [resource_string(__name__, 'js/src/html/edit.coffee')]}
     # js_module_name = "HTMLEditingDescriptor"
+    # js_module_name = "TabsEditorDescriptor"
     # css = {'scss': [resource_string(__name__, 'css/editor/edit.scss'), resource_string(__name__, 'css/html/edit.scss')]}
 
     tabs = [
@@ -56,6 +57,7 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, TabsEditingDescriptor):
             'name': "Visual",
             'template': "tabs/tiny-mce-edit.html",
             'current': True,
+            # 'css':  {'scss': [resource_string(__name__, 'css/html/test.scss')]}
         },
         {
             'name': "HTML",
