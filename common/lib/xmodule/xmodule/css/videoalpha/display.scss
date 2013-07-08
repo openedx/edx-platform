@@ -51,7 +51,7 @@ div.video {
         border: 1px solid #000;
         border-radius: 0;
         border-top: 1px solid #000;
-        @include box-shadow(inset 0 1px 0 #eee, 0 1px 0 #555);
+        box-shadow: inset 0 1px 0 #eee, 0 1px 0 #555;
         height: 7px;
         margin-left: -1px;
         margin-right: -1px;
@@ -59,7 +59,7 @@ div.video {
 
         div.ui-widget-header {
           background: #777;
-          @include box-shadow(inset 0 1px 0 #999);
+          box-shadow: inset 0 1px 0 #999;
         }
 
         a.ui-slider-handle {
@@ -67,7 +67,7 @@ div.video {
           @include background-size(50%);
           border: 1px solid darken($pink, 20%);
           border-radius: 15px;
-          @include box-shadow(inset 0 1px 0 lighten($pink, 10%));
+          box-shadow: inset 0 1px 0 lighten($pink, 10%);
           cursor: pointer;
           height: 15px;
           margin-left: -7px;
@@ -96,7 +96,7 @@ div.video {
           a {
             border-bottom: none;
             border-right: 1px solid #000;
-            @include box-shadow(1px 0 0 #555);
+            box-shadow: 1px 0 0 #555;
             cursor: pointer;
             display: block;
             line-height: 46px;
@@ -169,7 +169,7 @@ div.video {
             background: url('../images/closed-arrow.png') 10px center no-repeat;
             border-left: 1px solid #000;
             border-right: 1px solid #000;
-            @include box-shadow(1px 0 0 #555, inset 1px 0 0 #555);
+            box-shadow: 1px 0 0 #555, inset 1px 0 0 #555;
             @include clearfix();
             color: #fff;
             cursor: pointer;
@@ -215,7 +215,7 @@ div.video {
 
           // fix for now
           ol.video_speeds {
-            @include box-shadow(inset 1px 0 0 #555, 0 3px 0 #444);
+            box-shadow: inset 1px 0 0 #555, 0 3px 0 #444;
             @include transition();
             background-color: #444;
             border: 1px solid #000;
@@ -227,7 +227,7 @@ div.video {
             z-index: 10;
 
             li {
-              @include box-shadow( 0 1px 0 #555);
+              box-shadow:  0 1px 0 #555;
               border-bottom: 1px solid #000;
               color: #fff;
               cursor: pointer;
@@ -249,7 +249,7 @@ div.video {
               }
 
               &:last-child {
-                @include box-shadow(none);
+                box-shadow: none;
                 border-bottom: 0;
                 margin-top: 0;
               }
@@ -277,7 +277,7 @@ div.video {
           > a {
             background: url('../images/volume.png') 10px center no-repeat;
             border-right: 1px solid #000;
-            @include box-shadow(1px 0 0 #555, inset 1px 0 0 #555);
+            box-shadow: 1px 0 0 #555, inset 1px 0 0 #555;
             @include clearfix();
             color: #fff;
             cursor: pointer;
@@ -296,7 +296,7 @@ div.video {
           }
 
           .volume-slider-container {
-            @include box-shadow(inset 1px 0 0 #555, 0 3px 0 #444);
+            box-shadow: inset 1px 0 0 #555, 0 3px 0 #444;
             @include transition();
             background-color: #444;
             border: 1px solid #000;
@@ -316,14 +316,14 @@ div.video {
               margin: 14px auto;
               background: #666;
               border: 1px solid #000;
-              @include box-shadow(0 1px 0 #333);
+              box-shadow: 0 1px 0 #333;
 
               a.ui-slider-handle {
                 background: $pink url(../images/slider-handle.png) center center no-repeat;
                 @include background-size(50%);
                 border: 1px solid darken($pink, 20%);
                 border-radius: 15px;
-                @include box-shadow(inset 0 1px 0 lighten($pink, 10%));
+                box-shadow: inset 0 1px 0 lighten($pink, 10%);
                 cursor: pointer;
                 height: 15px;
                 left: -6px;
@@ -341,7 +341,7 @@ div.video {
         a.add-fullscreen {
           background: url(../images/fullscreen.png) center no-repeat;
           border-right: 1px solid #000;
-          @include box-shadow(1px 0 0 #555, inset 1px 0 0 #555);
+          box-shadow: 1px 0 0 #555, inset 1px 0 0 #555;
           color: #797979;
           display: block;
           float: left;
@@ -362,7 +362,7 @@ div.video {
         a.quality_control {
           background: url(../images/hd.png) center no-repeat;
           border-right: 1px solid #000;
-          @include box-shadow(1px 0 0 #555, inset 1px 0 0 #555);
+          box-shadow: 1px 0 0 #555, inset 1px 0 0 #555;
           color: #797979;
           display: block;
           float: left;

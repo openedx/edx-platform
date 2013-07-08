@@ -266,7 +266,7 @@ body.course.settings {
 
         input, textarea {
           @extend .t-copy-lead1;
-          @include box-shadow(none);
+          box-shadow: none;
           border: none;
           background: none;
           padding: 0;
@@ -294,7 +294,7 @@ body.course.settings {
 
       // course link note
       .note-promotion-courseURL {
-        @include box-shadow(0 2px 1px $shadow-l1);
+        box-shadow: 0 2px 1px $shadow-l1;
         border-radius: ($baseline/5);
         margin-top: ($baseline*1.5);
         border: 1px solid $gray-l2;
@@ -330,7 +330,7 @@ body.course.settings {
         }
 
         .list-actions {
-          @include box-shadow(inset 0 1px 1px $shadow-l1);
+          box-shadow: inset 0 1px 1px $shadow-l1;
           border-top: 1px solid $gray-l2;
           padding:  ($baseline/2);
           background: $gray-l5;
@@ -453,7 +453,7 @@ body.course.settings {
       .new-grade-button {
         @include box-sizing(border-box);
         @include linear-gradient(top, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0));
-        @include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset);
+        box-shadow: 0 1px 0 rgba(255, 255, 255, .3) inset;
         width: flex-grid(1,9);
         height: ($baseline*2);
         position: relative;
@@ -620,7 +620,7 @@ body.course.settings {
                 height: 50px;
                 width: 2px;
                 background-color: #fff;
-                @include box-shadow(-1px 0 3px rgba(0,0,0,0.1));
+                box-shadow: -1px 0 3px rgba(0,0,0,0.1);
 
                 cursor: ew-resize;
                 @include transition(none);
@@ -768,7 +768,7 @@ body.course.settings {
       .CodeMirror {
         @extend .t-copy-base;
         @include box-sizing(border-box);
-        @include box-shadow(0 1px 2px rgba(0, 0, 0, .1) inset);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, .1) inset;
         @include linear-gradient($lightGrey, tint($lightGrey, 90%));
         padding: 5px 8px;
         border: 1px solid $mediumGrey;

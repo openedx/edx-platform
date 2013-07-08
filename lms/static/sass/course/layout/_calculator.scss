@@ -52,7 +52,7 @@ div.calc-main {
         background: #111;
         border: 1px solid #000;
         border-radius: 0;
-        @include box-shadow(none);
+        box-shadow: none;
         @include box-sizing(border-box);
         color: #fff;
         float: left;
@@ -73,7 +73,7 @@ div.calc-main {
       input#calculator_output {
         background: #111;
         border: 0;
-        @include box-shadow(none);
+        box-shadow: none;
         @include box-sizing(border-box);
         color: #fff;
         float: left;
@@ -94,7 +94,7 @@ div.calc-main {
 
         input#calculator_input {
           border: none;
-          @include box-shadow(none);
+          box-shadow: none;
           @include box-sizing(border-box);
           font-size: 16px;
           padding: 10px;
@@ -122,7 +122,7 @@ div.calc-main {
           dl {
             background: #fff;
             border-radius: 3px;
-            @include box-shadow(0 0 3px #999);
+            box-shadow: 0 0 3px #999;
             color: #333;
             display: none;
             line-height: lh();

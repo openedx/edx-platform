@@ -31,7 +31,7 @@ div.profile-wrapper {
 
       li {
         border-bottom: 1px solid #d3d3d3;
-        @include box-shadow(0 1px 0 #eee);
+        box-shadow: 0 1px 0 #eee;
         color: lighten($text-color, 10%);
         display: block;
         padding: lh(.5) 0 lh(.5) lh(.5);
@@ -100,7 +100,7 @@ div.profile-wrapper {
         input#pwd_reset_button {
           background: none;
           border: none;
-          @include box-shadow(none);
+          box-shadow: none;
           color: #999;
           font-size: 12px;
           font-weight: normal;
@@ -120,7 +120,7 @@ div.profile-wrapper {
 
     div#change_password_pop {
       border-bottom: 1px solid #d3d3d3;
-      @include box-shadow(0 1px 0 #eee);
+      box-shadow: 0 1px 0 #eee;
       color: #4D4D4D;
       padding: 7px lh();
 

@@ -292,7 +292,7 @@ section.open-ended-child {
       padding: 9px 15px 20px;
       background: #FFF;
       position: relative;
-      @include box-shadow(inset 0 0 0 1px #eee);
+      box-shadow: inset 0 0 0 1px #eee;
       border-radius: 3px;
 
       &:empty {

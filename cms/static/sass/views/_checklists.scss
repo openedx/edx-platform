@@ -49,7 +49,7 @@ body.course.checklists {
     // header/title
     header {
       @include clearfix();
-      @include box-shadow(inset 0 -1px 1px $shadow-l1);
+      box-shadow: inset 0 -1px 1px $shadow-l1;
       margin-bottom: 0;
       border-bottom: 1px solid $gray-l3;
       padding: $baseline ($baseline*1.5);
@@ -118,7 +118,7 @@ body.course.checklists {
     // checklist actions
     .course-checklist-actions {
       @include clearfix();
-      @include box-shadow(inset 0 1px 1px $shadow-l1);
+      box-shadow: inset 0 1px 1px $shadow-l1;
       @include transition(border .15s ease-in-out .25s);
       border-top: 1px solid $gray-l2;
       padding: $baseline ($baseline*1.5);
@@ -155,7 +155,7 @@ body.course.checklists {
     &.is-collapsed {
 
       header {
-        @include box-shadow(none);
+        box-shadow: none;
 
         .checklist-title {
 

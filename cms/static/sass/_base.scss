@@ -592,7 +592,7 @@ hr.divide {
 
 .window {
   // border-radius: 3px;
-  // @include box-shadow(0 1px 1px $shadow-l1);
+  // box-shadow: 0 1px 1px $shadow-l1;
   // margin-bottom: $baseline;
   // border: 1px solid $gray-l2;
   // background: $white;
@@ -607,7 +607,7 @@ hr.divide {
     border-radius: 2px 2px 0 0;
     @include linear-gradient(top, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0));
     background-color: $lightBluishGrey;
-    @include box-shadow(0 1px 0 rgba(255, 255, 255, 0.2) inset);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2) inset;
     font-size: 14px;
     text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
   }
@@ -653,7 +653,7 @@ hr.divide {
   border: 1px solid #333;
   @include linear-gradient(top, rgba(255, 255, 255, .1), rgba(255, 255, 255, 0));
   background-color: rgba(30, 30, 30, .92);
-  @include box-shadow(0 1px 3px rgba(0, 0, 0, .3), 0 1px 0 rgba(255, 255, 255, .1) inset);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .3), 0 1px 0 rgba(255, 255, 255, .1) inset;
   font-size: 13px;
   text-align: center;
   color: #fff;
@@ -857,7 +857,7 @@ body.js {
   .content-modal {
     @include border-bottom-radius(2px);
     @include box-sizing(border-box);
-    @include box-shadow(0 2px 4px $shadow-d1);
+    box-shadow: 0 2px 4px $shadow-d1;
     position: relative;
     display: none;
     width: 700px;

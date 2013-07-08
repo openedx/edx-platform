@@ -163,7 +163,7 @@
   }
 
   &.current, &.active, &.is-selected {
-    @include box-shadow(inset 0 1px 2px 1px $shadow-l1);
+    box-shadow: inset 0 1px 2px 1px $shadow-l1;
     border-color: $gray-l3;
   }
 }

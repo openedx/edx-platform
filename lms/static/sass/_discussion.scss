@@ -105,7 +105,7 @@ body.discussion {
     color: #fff;
     line-height: 1.6;
     border-radius: 3px;
-    @include box-shadow(0 1px 2px rgba(0, 0, 0, 0.3) inset, 0 1px 0 rgba(255, 255, 255, .2));
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) inset, 0 1px 0 rgba(255, 255, 255, .2);
 
     li {
       padding: 10px 20px 12px 45px;
@@ -492,7 +492,7 @@ body.discussion {
     display: table-cell;
     border-radius: 3px 0 0 3px;
     border-right: 1px solid #ddd;
-    @include box-shadow(none);
+    box-shadow: none;
     background-color: $sidebar-color;
 
     .user-profile {
@@ -847,7 +847,7 @@ body.discussion {
       border: 1px solid #4b4b4b;
       border-left: none;
       border-radius: 0 0 3px 3px;
-      @include box-shadow(1px 0 0 #4b4b4b inset);
+      box-shadow: 1px 0 0 #4b4b4b inset;
 
       .browse-topic-drop-menu {
         max-height: 400px;

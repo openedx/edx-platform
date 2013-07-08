@@ -7,9 +7,9 @@
     background: $course-profile-bg;
     @include background-image(url($homepage-bg-image));
     background-size: cover;
-    @include box-shadow(0 1px 80px 0 rgba(0,0,0, 0.5));
+    box-shadow: 0 1px 80px 0 rgba(0,0,0, 0.5);
     border-bottom: 1px solid $border-color-3;
-    @include box-shadow(inset 0 1px 5px 0 rgba(0,0,0, 0.1));
+    box-shadow: inset 0 1px 5px 0 rgba(0,0,0, 0.1);
     height: 280px;
     margin-top: $header_image_margin;
     padding-top: 150px;
@@ -20,7 +20,7 @@
     .intro-inner-wrapper {
       background: $course-header-bg;
       border: 1px solid $border-color-3;
-      @include box-shadow(0 4px 25px 0 rgba(0,0,0, 0.5));
+      box-shadow: 0 4px 25px 0 rgba(0,0,0, 0.5);
       @include box-sizing(border-box);
       @include clearfix;
       margin: 0 auto;
@@ -45,7 +45,7 @@
 
         > hgroup {
           border-bottom: 1px solid $border-color-2;
-          @include box-shadow(0 1px 0 0 rgba(255,255,255, 0.6));
+          box-shadow: 0 1px 0 0 rgba(255,255,255, 0.6);
           margin-bottom: 20px;
           padding-bottom: 20px;
           width: 100%;
@@ -184,7 +184,7 @@
           .play-intro {
             @include background-image(linear-gradient(-90deg, rgba(0,0,0, 0.65), rgba(0,0,0, 0.75)));
             border-radius: 4px;
-            @include box-shadow(0 1px 12px 0 rgba(0,0,0, 0.4));
+            box-shadow: 0 1px 12px 0 rgba(0,0,0, 0.4);
             border: 2px solid rgba(255,255,255, 0.8);
             height: 80px;
             left: 50%;
@@ -219,7 +219,7 @@
 
           .play-intro {
             @include background-image(linear-gradient(-90deg, rgba(0,0,0, 0.75), rgba(0,0,0, 0.8)));
-            @include box-shadow(0 1px 12px 0 rgba(0,0,0, 0.5));
+            box-shadow: 0 1px 12px 0 rgba(0,0,0, 0.5);
             border-color: rgba(255,255,255, 0.9);
 
             &::after {
@@ -350,7 +350,7 @@
     width: flex-grid(4);
 
     > section {
-      @include box-shadow(inset 0 0 3px 0 rgba(0,0,0, 0.15));
+      box-shadow: inset 0 0 3px 0 rgba(0,0,0, 0.15);
       border: 1px solid $border-color-2;
 
       &.course-summary {
@@ -439,7 +439,7 @@
                                                             rgba(0,0,0, 0.7) 100%));
           border: 1px solid rgba(0,0,0, 0.5);
           border-radius: 4px;
-          @include box-shadow(0 4px 25px 0 rgba(0,0,0, 0.5));
+          box-shadow: 0 4px 25px 0 rgba(0,0,0, 0.5);
           @include box-sizing(border-box);
           color: rgb(255,255,255);
           float: right;

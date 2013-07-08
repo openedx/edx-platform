@@ -108,7 +108,7 @@
 // inherited - ui
 .window {
   @include clearfix();
-  @include box-shadow(0 1px 1px $shadow-l1);
+  box-shadow: 0 1px 1px $shadow-l1;
   border-radius: 3px;
   margin-bottom: $baseline;
   border: 1px solid $gray-l2;
@@ -120,7 +120,7 @@
 // mixins - grandfathered
 @mixin button {
   @include font-size(14);
-  @include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset, 0 0 0 rgba(0, 0, 0, 0));
+  box-shadow: 0 1px 0 rgba(255, 255, 255, .3) inset, 0 0 0 rgba(0, 0, 0, 0);
   @include transition(background-color .15s, box-shadow .15s);
   display: inline-block;
   padding: ($baseline/5) $baseline ($baseline/4);
@@ -139,14 +139,14 @@
   }
 
   &:hover, &.active {
-    @include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset, 0 1px 1px rgba(0, 0, 0, .15));
+    box-shadow: 0 1px 0 rgba(255, 255, 255, .3) inset, 0 1px 1px rgba(0, 0, 0, .15);
   }
 }
 
 @mixin green-button {
   @include button;
   @include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
-  @include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, .3) inset;
   border: 1px solid $green-d1;
   border-radius: 3px;
   background-color: $green;
@@ -161,7 +161,7 @@
     border: 1px solid $green-l3 !important;
     background: $green-l3 !important;
     color: $white !important;
-    @include box-shadow(none);
+    box-shadow: none;
   }
 }
 
@@ -179,7 +179,7 @@
   }
 
   &.disabled {
-    @include box-shadow(none);
+    box-shadow: none;
     border: 1px solid $blue-l3 !important;
     background: $blue-l3 !important;
     color: $white !important;
@@ -200,7 +200,7 @@
   }
 
   &.disabled {
-    @include box-shadow(none);
+    box-shadow: none;
     border: 1px solid $red-l3 !important;
     background: $red-l3 !important;
     color: $white !important;
@@ -221,7 +221,7 @@
   }
 
   &.disabled {
-    @include box-shadow(none);
+    box-shadow: none;
     border: 1px solid $pink-l3 !important;
     background: $pink-l3 !important;
     color: $white !important;
@@ -231,7 +231,7 @@
 @mixin orange-button {
   @include button;
   @include linear-gradient(top, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0) 60%);
-  @include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, .3) inset;
   border: 1px solid $orange-d1;
   border-radius: 3px;
   background-color: $orange;
@@ -246,14 +246,14 @@
     border: 1px solid $orange-l3 !important;
     background: $orange-l2 !important;
     color: $gray-l1 !important;
-    @include box-shadow(none);
+    box-shadow: none;
   }
 }
 
 @mixin white-button {
   @include button;
   @include linear-gradient(top, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0));
-  @include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, .3) inset;
   border: 1px solid $mediumGrey;
   border-radius: 3px;
   background-color: #dfe5eb;
@@ -269,7 +269,7 @@
 @mixin grey-button {
   @include button;
   @include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
-  @include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, .3) inset;
   border: 1px solid $gray-d2;
   border-radius: 3px;
   background-color: #d1dae3;
@@ -284,7 +284,7 @@
 @mixin gray-button {
   @include button;
   @include linear-gradient(top, $white-t1, rgba(255, 255, 255, 0));
-  @include box-shadow(0 1px 0 $white-t1 inset);
+  box-shadow: 0 1px 0 $white-t1 inset;
   border: 1px solid $gray-d1;
   border-radius: 3px;
   background-color: $gray-d2;
@@ -311,7 +311,7 @@
 }
 
 @mixin edit-box {
-  @include box-shadow(0 1px 0 rgba(255, 255, 255, .2) inset);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, .2) inset;
   padding: 15px 20px;
   border-radius: 3px;
   background-color: $lightBluishGrey2;
@@ -448,7 +448,7 @@
 // sunsetted mixins
 @mixin active {
   @include linear-gradient(top, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0));
-  @include box-shadow(0 -1px 0 rgba(0, 0, 0, .2) inset, 0 1px 0 #fff inset);
+  box-shadow: 0 -1px 0 rgba(0, 0, 0, .2) inset, 0 1px 0 #fff inset;
   background-color: rgba(255, 255, 255, .3);
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
 }

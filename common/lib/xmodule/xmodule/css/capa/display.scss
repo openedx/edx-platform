@@ -110,7 +110,7 @@ section.problem {
       padding: 9px 15px 20px;
       background: #FFF;
       position: relative;
-      @include box-shadow(inset 0 0 0 1px #eee);
+      box-shadow: inset 0 0 0 1px #eee;
       border-radius: 3px;
 
       &:empty {
@@ -658,7 +658,7 @@ section.problem {
           display: block;
           padding: 9px;
           background: #F6F6F6;
-          @include box-shadow(inset 0 0 0 1px #fff);
+          box-shadow: inset 0 0 0 1px #fff;
         }
       }
 
@@ -689,7 +689,7 @@ section.problem {
       margin-bottom: 10px;
       background: #FFF;
       position: relative;
-      @include box-shadow(inset 0 0 0 1px #eee);
+      box-shadow: inset 0 0 0 1px #eee;
       border-radius: 3px;
 
       p:last-of-type {

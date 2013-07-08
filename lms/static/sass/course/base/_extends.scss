@@ -42,7 +42,7 @@ h1.top-header {
   width: flex-grid(9) + flex-gutter();
 
   @media print {
-    @include box-shadow(none);
+    box-shadow: none;
   }
 }
 

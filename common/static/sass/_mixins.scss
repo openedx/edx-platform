@@ -158,14 +158,14 @@
   text-align: center;
 
   &:hover, &:active {
-    @include box-shadow(0 2px 1px $shadow-l1);
+    box-shadow: 0 2px 1px $shadow-l1;
   }
 
   &.current, &.active {
-    @include box-shadow(inset 1px 1px 2px $shadow-d1);
+    box-shadow: inset 1px 1px 2px $shadow-d1;
 
     &:hover, &:active {
-      @include box-shadow(inset 1px 1px 1px $shadow-d1);
+      box-shadow: inset 1px 1px 1px $shadow-d1;
     }
   }
 }
@@ -238,6 +238,6 @@
 
 // UI archetypes - well
 .ui-well {
-  @include box-shadow(inset 0 1px 2px 1px $shadow);
+  box-shadow: inset 0 1px 2px 1px $shadow;
   padding: ($baseline*0.75);
 }

@@ -11,7 +11,7 @@
     @include background-image(url($homepage-bg-image));
     background-size: cover;
     border-bottom: 1px solid $border-color-3;
-    @include box-shadow(0 1px 0 0 $course-header-bg, inset 0 -1px 5px 0 rgba(0,0,0, 0.1));
+    box-shadow: 0 1px 0 0 $course-header-bg, inset 0 -1px 5px 0 rgba(0,0,0, 0.1);
     @include clearfix;
     height: 460px;
     overflow: hidden;
@@ -33,7 +33,7 @@
       background: #FFF;
       background: $course-header-bg;
       border: 1px solid $border-color-3;
-      @include box-shadow(0 4px 25px 0 rgba(0,0,0, 0.5));
+      box-shadow: 0 4px 25px 0 rgba(0,0,0, 0.5);
       @include box-sizing(border-box);
       min-height: 120px;
       margin-left: grid-width(2) + $gw-gutter;
@@ -84,7 +84,7 @@
       border: 1px solid $border-color-3;
       border-left: 0;
       @include box-sizing(border-box);
-      // @include box-shadow(0 4px 25px 0 rgba(0,0,0, 0.5));
+      // box-shadow: 0 4px 25px 0 rgba(0,0,0, 0.5);
       height: 120px;
       float: left;
       padding: 4px;
@@ -107,7 +107,7 @@
         .play-intro {
           @include background-image(linear-gradient(-90deg, rgba(0,0,0, 0.65), rgba(0,0,0, 0.75)));
           border-radius: 4px;
-          @include box-shadow(0 1px 12px 0 rgba(0,0,0, 0.4));
+          box-shadow: 0 1px 12px 0 rgba(0,0,0, 0.4);
           @include box-sizing(border-box);
           border: 2px solid rgba(255,255,255, 0.8);
           height: 60px;
@@ -143,7 +143,7 @@
       &:hover {
         .play-intro {
           @include background-image(linear-gradient(-90deg, rgba(0,0,0, 0.75), rgba(0,0,0, 0.8)));
-          @include box-shadow(0 1px 12px 0 rgba(0,0,0, 0.5));
+          box-shadow: 0 1px 12px 0 rgba(0,0,0, 0.5);
           border-color: rgba(255,255,255, 0.9);
 
           &::after {
@@ -167,7 +167,7 @@
       border: 1px solid $border-color-2;
       border-radius: 4px;
       border-top-color: $border-color-1;
-      @include box-shadow(inset 0 0 0 1px rgba(255,255,255, 0.4), 0 0px 12px 0 rgba(0,0,0, 0.2));
+      box-shadow: inset 0 0 0 1px rgba(255,255,255, 0.4), 0 0px 12px 0 rgba(0,0,0, 0.2);
       color: $lighter-base-font-color;
       letter-spacing: 1px;
       margin-bottom: 0px;
@@ -410,7 +410,7 @@
 
     .news {
       @include box-sizing(border-box);
-      @include box-shadow(inset 0 0 3px 0 rgba(0,0,0, 0.15));
+      box-shadow: inset 0 0 3px 0 rgba(0,0,0, 0.15);
       padding: 20px;
       width: flex-grid(12);
 
@@ -434,7 +434,7 @@
           &:hover {
             background: $body-bg;
             border: 1px solid $border-color-2;
-            @include box-shadow(inset 0 0 3px 0 rgba(0,0,0, 0.1));
+            box-shadow: inset 0 0 3px 0 rgba(0,0,0, 0.1);
           }
 
           &:last-child {

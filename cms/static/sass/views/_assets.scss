@@ -81,7 +81,7 @@ body.course.uploads {
       }
 
       .embeddable-xml-input {
-        @include box-shadow(none);
+        box-shadow: none;
         width: 100%;
       }
 
@@ -194,7 +194,7 @@ body.course.uploads {
   }
 
   .embeddable-xml-input {
-    @include box-shadow(none);
+    box-shadow: none;
     width: 400px;
   }
 
