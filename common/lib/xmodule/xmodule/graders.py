@@ -217,6 +217,9 @@ class WeightedSubsectionsGrader(CourseGrader):
                 'attempted_percent': weighted_attempted_percent,
             })
 
+        #import pdb
+        #pdb.set_trace()
+
         return {
             'percent': total_percent,
             'section_breakdown': section_breakdown,
@@ -255,6 +258,10 @@ class SingleSectionGrader(CourseGrader):
                 earned = found_score.earned
                 possible = found_score.possible
                 attempted = found_score.attempted
+
+            if attempted:
+                import pdb
+                pdb.set_trace()
 
             percent = earned / float(possible)
             detail = "{name} - {percent:.0%} ({earned:.3n}/{possible:.3n})".format(
@@ -373,6 +380,10 @@ class AssignmentFormatGrader(CourseGrader):
                     section_name = scores[i].section
                     attempted = scores[i].attempted
 
+                if attempted:
+                    import pdb
+                    pdb.set_trace()
+
                 percentage = earned / float(possible)
                 summary_format = "{section_type} {index} - {name} - {percent:.0%} ({earned:.3n}/{possible:.3n})"
                 summary = summary_format.format(index=i + self.starting_index,
@@ -397,7 +408,10 @@ class AssignmentFormatGrader(CourseGrader):
                                                              short_label=self.short_label)
 
             breakdown.append({'percent': percentage, 'label': short_label,
-                              'detail': summary, 'category': self.category})
+                              'detail': summary, 'category': self.category,})
+            if attempted_percentage is not None:
+                attempted_breakdown.append({'percent': attempted_percentage, 'label': short_label,
+                              'detail': summary, 'category': self.category,})
 
         attempted_total_percent, _ = total_with_drops(attempted_breakdown, 0)
 
