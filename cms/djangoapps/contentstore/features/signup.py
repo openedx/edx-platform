@@ -7,12 +7,18 @@ from common import *
 
 @step('I fill in the registration form$')
 def i_fill_in_the_registration_form(step):
-    register_form = world.browser.find_by_css('form#register_form')
-    register_form.find_by_name('email').fill('robot+studio@edx.org')
-    register_form.find_by_name('password').fill('test')
-    register_form.find_by_name('username').fill('robot-studio')
-    register_form.find_by_name('name').fill('Robot Studio')
-    register_form.find_by_name('terms_of_service').check()
+    attempt = 0
+    while attempt < 5:
+        try:
+            register_form = world.browser.find_by_css('form#register_form')
+            register_form.find_by_name('email').fill('robot+studio@edx.org')
+            register_form.find_by_name('password').fill('test')
+            register_form.find_by_name('username').fill('robot-studio')
+            register_form.find_by_name('name').fill('Robot Studio')
+            register_form.find_by_name('terms_of_service').check()
+            break
+        except:
+            attempt += 1
 
 
 @step('I press the Create My Account button on the registration form$')

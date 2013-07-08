@@ -144,10 +144,16 @@ def log_into_studio(
     world.is_css_present(signin_css)
     world.css_click(signin_css)
 
-    login_form = world.browser.find_by_css('form#login_form')
-    login_form.find_by_name('email').fill(email)
-    login_form.find_by_name('password').fill(password)
-    login_form.find_by_name('submit').click()
+    attempt = 0
+    while attempt < 5:
+        try:
+            login_form = world.browser.find_by_css('form#login_form')
+            login_form.find_by_name('email').fill(email)
+            login_form.find_by_name('password').fill(password)
+            login_form.find_by_name('submit').click()
+            break
+        except:
+            attempt += 1
 
     assert_true(world.is_css_present('.new-course-button'))
 

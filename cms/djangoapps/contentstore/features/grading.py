@@ -90,8 +90,8 @@ def add_assignment_type(step, new_name):
     add_button_css = '.add-grading-data'
     world.css_click(add_button_css)
     name_id = '#course-grading-assignment-name'
-    f = world.css_find(name_id)[4]
-    f._element.send_keys(new_name)
+    new_assignment = world.css_find(name_id)[-1]
+    new_assignment._element.send_keys(new_name)
 
 
 @step(u'I have populated the course')
@@ -118,8 +118,8 @@ def i_see_the_assignment_type(_step, name):
 
 def get_type_index(name):
     name_id = '#course-grading-assignment-name'
-    f = world.css_find(name_id)
-    for i in range(len(f)):
-        if f[i].value == name:
-            return i
+    all_types = world.css_find(name_id)
+    for index in range(len(all_types)):
+        if world.css_value(name_id, index=index) == name:
+            return index
     return -1
