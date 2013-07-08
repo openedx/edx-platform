@@ -99,9 +99,10 @@ Dir["common/lib/*"].select{|lib| File.directory?(lib)}.each do |lib|
     report_dir = report_dir_path(lib)
 
     desc "Run tests for common lib #{lib}"
-    task "test_#{lib}"  => [report_dir, :clean_reports_dir] do
+    task "test_#{lib}", [:test_id] => [report_dir, :clean_reports_dir] do |t, args|
+        args.with_defaults(:test_id => lib)
         ENV['NOSE_XUNIT_FILE'] = File.join(report_dir, "nosetests.xml")
-        cmd = "nosetests #{lib}"
+        cmd = "nosetests #{args.test_id}"
         test_sh(run_under_coverage(cmd, lib))
     end
     TEST_TASK_DIRS << lib

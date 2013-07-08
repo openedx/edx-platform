@@ -16,14 +16,14 @@ HTTP_PREFIX = "http://localhost:8001"
 def go_to_uploads(_step):
     menu_css = 'li.nav-course-courseware'
     uploads_css = 'li.nav-course-courseware-uploads'
-    world.css_find(menu_css).click()
-    world.css_find(uploads_css).click()
+    world.css_click(menu_css)
+    world.css_click(uploads_css)
 
 
 @step(u'I upload the file "([^"]*)"$')
 def upload_file(_step, file_name):
     upload_css = 'a.upload-button'
-    world.css_find(upload_css).click()
+    world.css_click(upload_css)
 
     file_css = 'input.file-input'
     upload = world.css_find(file_css)
@@ -32,7 +32,7 @@ def upload_file(_step, file_name):
     upload._element.send_keys(os.path.abspath(path))
 
     close_css = 'a.close-button'
-    world.css_find(close_css).click()
+    world.css_click(close_css)
 
 
 @step(u'I should( not)? see the file "([^"]*)" was uploaded$')
@@ -67,7 +67,7 @@ def no_duplicate(_step, file_name):
     all_names = world.css_find(names_css)
     only_one = False
     for i in range(len(all_names)):
-        if file_name == all_names[i].html:
+        if file_name == world.css_html(names_css, index=i):
             only_one = not only_one
     assert only_one
 
@@ -90,11 +90,17 @@ def modify_upload(_step, file_name):
         cur_file.write(new_text)
 
 
+@step('I see a confirmation that the file was deleted')
+def i_see_a_delete_confirmation(_step):
+    alert_css = '#notification-confirmation'
+    assert world.is_css_present(alert_css)
+
+
 def get_index(file_name):
     names_css = 'td.name-col > a.filename'
     all_names = world.css_find(names_css)
     for i in range(len(all_names)):
-        if file_name == all_names[i].html:
+        if file_name == world.css_html(names_css, index=i):
             return i
     return -1
 

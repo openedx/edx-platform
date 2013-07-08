@@ -1,3 +1,17 @@
+"""
+Modulestore backed by Mongodb.
+
+Stores individual XModules as single documents with the following
+structure:
+
+{
+    '_id': <location.as_dict>,
+    'metadata': <dict containing all Scope.settings fields>
+    'definition': <dict containing all Scope.content fields>
+    'definition.children': <list of all child location.url()s>
+}
+"""
+
 import pymongo
 import sys
 import logging
@@ -18,11 +32,9 @@ from xmodule.error_module import ErrorDescriptor
 from xblock.runtime import DbModel, KeyValueStore, InvalidScopeError
 from xblock.core import Scope
 
-from . import ModuleStoreBase, Location, namedtuple_to_son
-from .draft import DraftModuleStore
-from .exceptions import (ItemNotFoundError,
-                         DuplicateItemError)
-from .inheritance import own_metadata, INHERITABLE_METADATA, inherit_metadata
+from xmodule.modulestore import ModuleStoreBase, Location, namedtuple_to_son
+from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateItemError
+from xmodule.modulestore.inheritance import own_metadata, INHERITABLE_METADATA, inherit_metadata
 
 log = logging.getLogger(__name__)
 
@@ -33,6 +45,7 @@ log = logging.getLogger(__name__)
 
 def get_course_id_no_run(location):
     '''
+    Return the first two components of the course_id for this location (org/course)
     '''
     return "/".join([location.org, location.course])
 
@@ -616,6 +629,9 @@ class MongoModuleStore(ModuleStoreBase):
         return item
 
     def fire_updated_modulestore_signal(self, course_id, location):
+        """
+        Send a signal using `self.modulestore_update_signal`, if that has been set
+        """
         if self.modulestore_update_signal is not None:
             self.modulestore_update_signal.send(self, modulestore=self, course_id=course_id,
                                                 location=location)
@@ -759,14 +775,3 @@ class MongoModuleStore(ModuleStoreBase):
         are loaded on demand, rather than up front
         """
         return {}
-
-
-# DraftModuleStore is first, because it needs to intercept calls to MongoModuleStore
-class DraftMongoModuleStore(DraftModuleStore, MongoModuleStore):
-    """
-    Version of MongoModuleStore with draft capability mixed in
-    """
-    """
-    Version of MongoModuleStore with draft capability mixed in
-    """
-    pass

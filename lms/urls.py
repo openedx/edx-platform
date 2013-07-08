@@ -214,8 +214,6 @@ if settings.COURSEWARE_ENABLED:
         url(r'^mktg/(?P<course_id>.*)$',
             'courseware.views.mktg_course_about', name="mktg_about_course"),
 
-
-
         #Inside the course
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/$',
             'courseware.views.course_info', name="course_root"),
@@ -223,27 +221,26 @@ if settings.COURSEWARE_ENABLED:
             'courseware.views.course_info', name="info"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/syllabus$',
             'courseware.views.syllabus', name="syllabus"),   # TODO arjun remove when custom tabs in place, see courseware/courses.py
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/book/(?P<book_index>[^/]*)/$',
+
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/book/(?P<book_index>\d+)/$',
             'staticbook.views.index', name="book"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/book/(?P<book_index>[^/]*)/(?P<page>[^/]*)$',
-            'staticbook.views.index'),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/book-shifted/(?P<page>[^/]*)$',
-            'staticbook.views.index_shifted'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/book/(?P<book_index>\d+)/(?P<page>\d+)$',
+            'staticbook.views.index', name="book"),
 
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/pdfbook/(?P<book_index>[^/]*)/$',
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/pdfbook/(?P<book_index>\d+)/$',
             'staticbook.views.pdf_index', name="pdf_book"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/pdfbook/(?P<book_index>[^/]*)/(?P<page>[^/]*)$',
-            'staticbook.views.pdf_index'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/pdfbook/(?P<book_index>\d+)/(?P<page>\d+)$',
+            'staticbook.views.pdf_index', name="pdf_book"),
 
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/pdfbook/(?P<book_index>[^/]*)/chapter/(?P<chapter>[^/]*)/$',
-            'staticbook.views.pdf_index'),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/pdfbook/(?P<book_index>[^/]*)/chapter/(?P<chapter>[^/]*)/(?P<page>[^/]*)$',
-            'staticbook.views.pdf_index'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/pdfbook/(?P<book_index>\d+)/chapter/(?P<chapter>\d+)/$',
+            'staticbook.views.pdf_index', name="pdf_book"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/pdfbook/(?P<book_index>\d+)/chapter/(?P<chapter>\d+)/(?P<page>\d+)$',
+            'staticbook.views.pdf_index', name="pdf_book"),
 
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/htmlbook/(?P<book_index>[^/]*)/$',
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/htmlbook/(?P<book_index>\d+)/$',
             'staticbook.views.html_index', name="html_book"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/htmlbook/(?P<book_index>[^/]*)/chapter/(?P<chapter>[^/]*)/$',
-            'staticbook.views.html_index'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/htmlbook/(?P<book_index>\d+)/chapter/(?P<chapter>\d+)/$',
+            'staticbook.views.html_index', name="html_book"),
 
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/courseware/?$',
             'courseware.views.index', name="courseware"),
@@ -428,6 +425,13 @@ urlpatterns += (
 if settings.MITX_FEATURES.get('ENABLE_DEBUG_RUN_PYTHON'):
     urlpatterns += (
         url(r'^debug/run_python', 'debug.views.run_python'),
+    )
+
+# Crowdsourced hinting instructor manager.
+if settings.MITX_FEATURES.get('ENABLE_HINTER_INSTRUCTOR_VIEW'):
+    urlpatterns += (
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/hint_manager$',
+            'instructor.hint_manager.hint_manager', name="hint_manager"),
     )
 
 urlpatterns = patterns(*urlpatterns)

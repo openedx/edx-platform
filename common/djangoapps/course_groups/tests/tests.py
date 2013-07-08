@@ -10,21 +10,11 @@ from course_groups.cohorts import (get_cohort, get_course_cohorts,
 
 from xmodule.modulestore.django import modulestore, _MODULESTORES
 
+from xmodule.modulestore.tests.django_utils import xml_store_config
+
 # NOTE: running this with the lms.envs.test config works without
 # manually overriding the modulestore.  However, running with
 # cms.envs.test doesn't.
-
-
-def xml_store_config(data_dir):
-    return {
-    'default': {
-        'ENGINE': 'xmodule.modulestore.xml.XMLModuleStore',
-        'OPTIONS': {
-            'data_dir': data_dir,
-            'default_class': 'xmodule.hidden_module.HiddenDescriptor',
-        }
-    }
-}
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 TEST_DATA_XML_MODULESTORE = xml_store_config(TEST_DATA_DIR)
@@ -32,7 +22,6 @@ TEST_DATA_XML_MODULESTORE = xml_store_config(TEST_DATA_DIR)
 
 @override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
 class TestCohorts(django.test.TestCase):
-
 
     @staticmethod
     def topic_name_to_id(course, name):
@@ -43,7 +32,6 @@ class TestCohorts(django.test.TestCase):
         return "{course}_{run}_{name}".format(course=course.location.course,
                                               run=course.url_name,
                                               name=name)
-
 
     @staticmethod
     def config_course_cohorts(course, discussions,
@@ -90,7 +78,6 @@ class TestCohorts(django.test.TestCase):
 
         course.cohort_config = d
 
-
     def setUp(self):
         """
         Make sure that course is reloaded every time--clear out the modulestore.
@@ -98,7 +85,6 @@ class TestCohorts(django.test.TestCase):
         # don't like this, but don't know a better way to undo all changes made
         # to course.  We don't have a course.clone() method.
         _MODULESTORES.clear()
-
 
     def test_get_cohort(self):
         """
@@ -115,7 +101,7 @@ class TestCohorts(django.test.TestCase):
 
         cohort = CourseUserGroup.objects.create(name="TestCohort",
                                                 course_id=course.id,
-                               group_type=CourseUserGroup.COHORT)
+                                                group_type=CourseUserGroup.COHORT)
 
         cohort.users.add(user)
 
@@ -145,7 +131,7 @@ class TestCohorts(django.test.TestCase):
 
         cohort = CourseUserGroup.objects.create(name="TestCohort",
                                                 course_id=course.id,
-                               group_type=CourseUserGroup.COHORT)
+                                                group_type=CourseUserGroup.COHORT)
 
         # user1 manually added to a cohort
         cohort.users.add(user1)
@@ -179,7 +165,6 @@ class TestCohorts(django.test.TestCase):
         self.assertEquals(get_cohort(user2, course.id).name, "AutoGroup",
                           "user2 should still be in originally placed cohort")
 
-
     def test_auto_cohorting_randomization(self):
         """
         Make sure get_cohort() randomizes properly.
@@ -209,8 +194,6 @@ class TestCohorts(django.test.TestCase):
             self.assertGreater(num_users, 1)
             self.assertLess(num_users, 50)
 
-
-
     def test_get_course_cohorts(self):
         course1_id = 'a/b/c'
         course2_id = 'e/f/g'
@@ -224,13 +207,11 @@ class TestCohorts(django.test.TestCase):
                                                 course_id=course1_id,
                                                 group_type=CourseUserGroup.COHORT)
 
-
         # second course should have no cohorts
         self.assertEqual(get_course_cohorts(course2_id), [])
 
         cohorts = sorted([c.name for c in get_course_cohorts(course1_id)])
         self.assertEqual(cohorts, ['TestCohort', 'TestCohort2'])
-
 
     def test_is_commentable_cohorted(self):
         course = modulestore().get_course("edX/toy/2012_Fall")

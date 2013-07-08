@@ -141,6 +141,9 @@ MITX_FEATURES = {
 
     # Enable instructor dash to submit background tasks
     'ENABLE_INSTRUCTOR_BACKGROUND_TASKS': True,
+
+    # Allow use of the hint managment instructor view.
+    'ENABLE_HINTER_INSTRUCTOR_VIEW': False,
 }
 
 # Used for A/B testing

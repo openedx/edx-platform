@@ -49,7 +49,7 @@ class CustomTagDescriptor(RawDescriptor):
             else:
                 # TODO (vshnayder): better exception type
                 raise Exception("Could not find impl attribute in customtag {0}"
-                                .format(location))
+                                .format(self.location))
 
         params = dict(xmltree.items())
 
