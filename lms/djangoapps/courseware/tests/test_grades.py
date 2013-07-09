@@ -252,12 +252,11 @@ class TestFindShouldGradeSection(unittest.TestCase):
 
     def setUp(self):
 
-        def fake_find_key(fake_key):
-            self.assertIsInstance(fake_key, LmsKeyValueStore.Key)
-            print fake_key
-            if fake_key.block_scope_id:
+        def fake_find_key(key):
+            self.assertIsInstance(key, LmsKeyValueStore.Key)
+            if key.block_scope_id:
                 fake_found = MagicMock()
-                fake_found.grade = fake_key.student_id
+                fake_found.grade = key.student_id
                 return fake_found
             else:
                 return None
@@ -315,12 +314,11 @@ class TestFindAttempted(unittest.TestCase):
 
     def setUp(self):
 
-        def fake_find_key(fake_key):
-            self.assertIsInstance(fake_key, LmsKeyValueStore.Key)
-            print fake_key
-            if fake_key.block_scope_id:
+        def fake_find_key(key):
+            self.assertIsInstance(key, LmsKeyValueStore.Key)
+            if key.block_scope_id:
                 fake_found = MagicMock()
-                fake_found.grade = fake_key.student_id
+                fake_found.grade = key.student_id
                 return fake_found
             else:
                 return None
@@ -350,3 +348,112 @@ class TestFindAttempted(unittest.TestCase):
         fake_module = self.fake_module(True)
         result = grades.find_attempted(fake_module, self.fake_model_data_cache, 3.0)
         self.assertTrue(result)
+
+
+class TestGetScore(unittest.TestCase):
+
+    """
+    Tests the get_score method.
+
+    get_score should:
+        return (None, None):
+            if the problem doesn't have a score
+            if the problem couldn't be loaded
+            if the user is not authenticated
+        return (correct, total) otherwise
+        reweight the problem correctly if specified
+        not reweight a problem with zero total points
+    """
+
+    def setUp(self):
+
+        def fake_find_key(key):
+            self.assertIsInstance(key, LmsKeyValueStore.Key)
+            if key.block_scope_id:
+                fake_found = MagicMock()
+                fake_found.grade = key.student_id[0]
+                fake_found.max_grade = key.student_id[1]
+                return fake_found
+            else:
+                return None
+
+        self.fake_model_data_cache = MagicMock()
+        self.fake_model_data_cache.find = fake_find_key
+
+        self.course_id = None
+
+    def test_correct(self):
+
+        user = MagicMock()
+        user.id = (5.0, 7.0)  # fed into fake_find_key(key)'s output
+        user.is_authenticated = lambda: True
+
+        problem_descriptor = MagicMock()
+        problem_descriptor.always_recalculate_grades = False
+        problem_descriptor.has_score = True
+        problem_descriptor.location = "problem location"  # if not None, problem descriptor is "found" by fake_find_key
+        problem_descriptor.weight = None
+
+        def module_creator(descriptor):
+            #Returns a problem mock
+            output = MagicMock()
+            output.get_score = lambda: {'score': 8.0, 'total': 9.0}
+            output.max_score = lambda: 9.0
+            return output
+
+        model_data_cache = self.fake_model_data_cache
+
+        result = grades.get_score(self.course_id, user, problem_descriptor, module_creator, model_data_cache)
+
+        self.assertEquals(result, (5.0, 7.0))
+
+    def test_not_in_cache(self):
+
+        user = MagicMock()
+        user.id = (5.0, 7.0)  # fed into fake_find_key(key)'s output
+        user.is_authenticated = lambda: True
+
+        problem_descriptor = MagicMock()
+        problem_descriptor.always_recalculate_grades = False
+        problem_descriptor.has_score = True
+        problem_descriptor.location = None  # if not None, problem descriptor is "found" by fake_find_key
+        problem_descriptor.weight = None
+
+        def module_creator(descriptor):
+            #Returns a problem mock
+            output = MagicMock()
+            output.get_score = lambda: {'score': 8.0, 'total': 9.0}
+            output.max_score = lambda: 9.0
+            return output
+
+        model_data_cache = self.fake_model_data_cache
+
+        result = grades.get_score(self.course_id, user, problem_descriptor, module_creator, model_data_cache)
+
+        #0/9 instead of 8/9 because if the problem is not in the cache, we assume it is ungraded.
+        self.assertEquals(result, (0.0, 9.0))
+
+    def test_always_recalculate(self):
+
+        user = MagicMock()
+        user.id = (5.0, 7.0)  # fed into fake_find_key(key)'s output
+        user.is_authenticated = lambda: True
+
+        problem_descriptor = MagicMock()
+        problem_descriptor.always_recalculate_grades = True
+        problem_descriptor.has_score = True
+        problem_descriptor.location = "something"  # if not None, problem descriptor is "found" by fake_find_key
+        problem_descriptor.weight = None
+
+        def module_creator(descriptor):
+            #Returns a problem mock
+            output = MagicMock()
+            output.get_score = lambda: {'score': 8.0, 'total': 9.0}
+            output.max_score = lambda: 9.0
+            return output
+
+        model_data_cache = self.fake_model_data_cache
+
+        result = grades.get_score(self.course_id, user, problem_descriptor, module_creator, model_data_cache)
+
+        self.assertEquals(result, (8.0, 9.0))
