@@ -33,7 +33,7 @@ nav {
     }
 
     .ui-toggle-dd {
-      @include transition(rotate .25s ease-in-out .25s);
+      @include transition(all 0.25s ease-in-out 0);
       margin-left: ($baseline/10);
       display: inline-block;
       vertical-align: middle;
@@ -44,7 +44,6 @@ nav {
 
       .ui-toggle-dd {
         @include transform(rotate(-180deg));
-        @include transform-origin(50% 50%);
       }
     }
   }
@@ -58,7 +57,7 @@ nav {
   }
 
   .wrapper-nav-sub {
-    @include transition (opacity 1.0s ease-in-out 0s);
+    @include transition (opacity 0.25s ease-in-out 0s);
     position: absolute;
     top: ($baseline*2.5);
     opacity: 0.0;

@@ -1,6 +1,93 @@
 // studio animations & keyframes
 // ====================
 
+// fade in
+@include keyframes(fadeIn) {
+  0% {
+    opacity: 0.0;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+
+  100% {
+    opacity: 1.0;
+  }
+}
+
+// canned animation - use if you want out of the box/non-customized anim
+.anim-fadeIn {
+  @include animation(fadeIn 0.25s linear 1);
+}
+
+
+// fade out
+@include keyframes(fadeOut) {
+  0% {
+    opacity: 1.0;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+
+  100% {
+    opacity: 0.0;
+  }
+}
+
+// canned animation - use if you want out of the box/non-customized anim
+.anim-fadeOut {
+  @include animation(fadeOut 0.25s linear 1);
+}
+
+
+// ====================
+
+
+// rotate up
+@include keyframes(rotateUp) {
+  0% {
+    @include transform(rotate(0deg));
+  }
+
+  50% {
+    @include transform(rotate(-90deg));
+  }
+
+  100% {
+    @include transform(rotate(-180deg));
+  }
+}
+
+// canned animation - use if you want out of the box/non-customized anim
+.anim-rotateUp {
+  @include animation(rotateUp 0.25s ease-in-out 1);
+}
+
+
+// rotate up
+@include keyframes(rotateDown) {
+  0% {
+    @include transform(rotate(0deg));
+  }
+
+  50% {
+    @include transform(rotate(90deg));
+  }
+
+  100% {
+    @include transform(rotate(180deg));
+  }
+}
+
+// canned animation - use if you want out of the box/non-customized anim
+.anim-rotateDown {
+  @include animation(rotateDown 0.25s ease-in-out 1);
+}
+
+
 // rotate clockwise
 @include keyframes(rotateCW) {
   0% {
@@ -16,12 +103,11 @@
   }
 }
 
-// ====================
-
-// canned rotate clockwise animation - use if you want out of the box/non-customized anim
+// canned animation - use if you want out of the box/non-customized anim
 .anim-rotateCW {
-  @include animation(rotateCW 1.0s linear inifinte);
+  @include animation(rotateCW 1.0s linear infinite);
 }
+
 
 // rotate counter-clockwise
 @include keyframes(rotateCCW) {
@@ -38,12 +124,14 @@
   }
 }
 
-// canned rotate counter-clockwise animation - use if you want out of the box/non-customized anim
+// canned  animation - use if you want out of the box/non-customized anim
 .anim-rotateCCW {
-  @include animation(rotateCCW 1.0s linear inifinte);
+  @include animation(rotateCCW 1.0s linear infinite);
 }
 
+
 // ====================
+
 
 // notifications slide up
 @include keyframes(notificationSlideUp) {
@@ -60,8 +148,6 @@
   }
 }
 
-// ====================
-
 // notifications slide down
 @include keyframes(notificationSlideDown) {
   0% {
@@ -77,7 +163,9 @@
   }
 }
 
+
 // ====================
+
 
 // bounce in
 @include keyframes(bounceIn) {
@@ -96,12 +184,11 @@
   }
 }
 
-// canned bounce in animation - use if you want out of the box/non-customized anim
+// canned animation - use if you want out of the box/non-customized anim
 .anim-bounceIn {
   @include animation(bounceIn 0.5s ease-in-out 1);
 }
 
-// ====================
 
 // bounce out
 @include keyframes(bounceOut) {
@@ -120,7 +207,7 @@
   }
 }
 
-// canned bounce in animation - use if you want out of the box/non-customized anim
+// canned animation - use if you want out of the box/non-customized anim
 .anim-bounceOut {
   @include animation(bounceOut 0.5s ease-in-out 1);
 }
