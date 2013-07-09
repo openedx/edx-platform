@@ -62,7 +62,7 @@ info() {
     cat<<EO
     edX base dir : $BASE
     Python virtualenv dir : $PYTHON_DIR
-    Ruby rbenv dir : $RUBY_DIR
+    Ruby rbenv dir : $RBENV_ROOT
     Ruby ver : $RUBY_VER
 
 EO
@@ -126,9 +126,16 @@ BASE="${PROJECT_HOME:-$(set_base_default)}"
 # unless you've already got one set up with virtualenvwrapper.
 PYTHON_DIR=${WORKON_HOME:-"$HOME/.virtualenvs"}
 
-# RVM defaults its install to ~/.rvm, but use the overridden rvm_path
-# if that's what's preferred.
-RUBY_DIR=${rbenv_path:-"$HOME/.rbenv"}
+# Find rbenv root (~/.rbenv by default)
+if [ -z "${RBENV_ROOT}" ]; then
+  RBENV_ROOT="${HOME}/.rbenv"
+else
+  RBENV_ROOT="${RBENV_ROOT%/}"
+fi
+# Let the repo override the version of Ruby to install
+if [[ -r $BASE/edx-platform/.ruby-version ]]; then
+  RUBY_VER=`cat $BASE/edx-platform/.ruby-version`
+fi
 
 LOG="/var/tmp/install-$(date +%Y%m%d-%H%M%S).log"
 
@@ -227,7 +234,7 @@ case `uname -s` in
             wheezy|jessie|maya|olivia|nadia|precise|quantal)
                 warning "
                         Debian support is not fully debugged. Assuming you have standard
-                        development packages already working like scipy rvm, the
+                        development packages already working like scipy, the
                         installation should go fine, but this is still a work in progress.
 
                         Please report issues you have and let us know if you are able to figure
@@ -242,9 +249,6 @@ case `uname -s` in
                           It seems like you're using $distro which has been deprecated.
                           While we don't technically support this release, the install
                           script will probably still work.
-
-                          Raring requires an install of rvm to work correctly as the raring
-                          package manager does not yet include a package for rvm
 
                           Press return to continue or control-C to abort"
                 read dummy
@@ -308,18 +312,6 @@ else
 fi
 
 # Install system-level dependencies
-
-# Find rbenv root (~/.rbenv by default)
-if [ -z "${RBENV_ROOT}" ]; then
-  RBENV_ROOT="${HOME}/.rbenv"
-else
-  RBENV_ROOT="${RBENV_ROOT%/}"
-fi
-# Let the repo override the version of Ruby to install
-if [[ -r $BASE/edx-platform/.ruby-version ]]; then
-  RUBY_VER=`cat $BASE/edx-platform/.ruby-version`
-fi
-
 if [[ ! -d $RBENV_ROOT ]]; then
     output "Installing rbenv"
     git clone https://github.com/sstephenson/rbenv.git $RBENV_ROOT
@@ -494,11 +486,10 @@ cat<<END
    Success!!
 
    To start using Django you will need to activate the local Python
-   and Ruby environments. Ensure the following lines are added to your
+   environment. Ensure the following lines are added to your
    login script, and source your login script if needed:
 
         source `which virtualenvwrapper.sh`
-        source $RUBY_DIR/scripts/rvm
 
    Then, every time you're ready to work on the project, just run
 
