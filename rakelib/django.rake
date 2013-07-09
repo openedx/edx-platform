@@ -57,18 +57,20 @@ task :resetdb, [:env] do |t, args|
     sh(django_admin(:lms, args.env, 'migrate'))
 end
 
-desc "Update the relational database to the latest migration"
-task :migrate, [:env] do |t, args|
-    args.with_defaults(:env => 'dev')
-    sh(django_admin(:lms, args.env, 'migrate'))
-end
-
 task :runserver => :lms
 
 desc "Run django-admin <action> against the specified system and environment"
 task "django-admin", [:action, :system, :env, :options] do |t, args|
+    # If no system was explicitly set, we want to run both CMS and LMS for migrate and syncdb.
+    no_system_set = true
+    if args.system
+       no_system_set = false
+    end
     args.with_defaults(:env => 'dev', :system => 'lms', :options => '')
     sh(django_admin(args.system, args.env, args.action, args.options))
+    if no_system_set and (args.action == 'migrate' or args.action == 'syncdb')
+      sh(django_admin('cms', args.env, args.action, args.options))
+    end
 end
 
 desc "Set the staff bit for a user"
