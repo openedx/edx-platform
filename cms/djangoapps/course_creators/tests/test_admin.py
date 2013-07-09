@@ -58,20 +58,17 @@ class CourseCreatorAdminTest(TestCase):
 
             change_state(CourseCreator.UNREQUESTED, False)
 
-
     def test_add_permission(self):
         """
         Tests that staff cannot add entries
         """
         self.assertFalse(self.creator_admin.has_add_permission(self.request))
 
-
     def test_delete_permission(self):
         """
         Tests that staff cannot delete entries
         """
         self.assertFalse(self.creator_admin.has_delete_permission(self.request))
-
 
     def test_change_permission(self):
         """
