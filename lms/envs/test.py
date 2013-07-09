@@ -195,3 +195,11 @@ PASSWORD_HASHERS = (
     'django.contrib.auth.hashers.MD5PasswordHasher',
     # 'django.contrib.auth.hashers.CryptPasswordHasher',
 )
+
+################### Make tests quieter
+
+# OpenID spews messages like this to stderr, we don't need to see them:
+#   Generated checkid_setup request to http://testserver/openid/provider/login/ with assocication {HMAC-SHA1}{51d49995}{s/kRmA==}
+
+import openid.oidutil
+openid.oidutil.log = lambda message, level=0: None
