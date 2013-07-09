@@ -1,5 +1,6 @@
 """Tests for Django management commands"""
 
+import json
 from StringIO import StringIO
 
 from django.core.management import call_command
@@ -43,3 +44,30 @@ class CommandsTestCase(CommandTestCase):
         output = self.call_command('dump_course_ids', **kwargs)
         dumped_courses = output.strip().split('\n')
         self.assertEqual(self.loaded_courses, dumped_courses)
+
+    def test_dump_course_structure(self):
+
+        args = ['edX/simple/2012_Fall']
+        kwargs = {'modulestore': 'default'}
+        output = self.call_command('dump_course_structure', *args, **kwargs)
+
+        dump = json.loads(output)
+
+        # Check a few elements in the course dump
+
+        parent_id = 'i4x://edX/simple/chapter/Overview'
+        self.assertEqual(dump[parent_id]['category'], 'chapter')
+        self.assertEqual(len(dump[parent_id]['children']), 3)
+
+        child_id = dump[parent_id]['children'][1]
+        self.assertEqual(dump[child_id]['category'], 'videosequence')
+        self.assertEqual(len(dump[child_id]['children']), 2)
+
+        video_id = 'i4x://edX/simple/video/Welcome'
+        self.assertEqual(dump[video_id]['category'], 'video')
+        self.assertEqual(len(dump[video_id]['metadata']), 4)
+        self.assertIn('youtube_id_1_0', dump[video_id]['metadata'])
+
+        # Check if there is the right number of elements
+
+        self.assertEqual(len(dump), 16)
