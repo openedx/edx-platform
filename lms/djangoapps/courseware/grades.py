@@ -329,10 +329,12 @@ def progress_summary(student, request, course, model_data_cache):
                 'graded': graded,
             })
 
-        chapters.append({'course': course.display_name_with_default,
-                         'display_name': chapter_module.display_name_with_default,
-                         'url_name': chapter_module.url_name,
-                         'sections': sections})
+        chapters.append({
+            'course': course.display_name_with_default,
+            'display_name': chapter_module.display_name_with_default,
+            'url_name': chapter_module.url_name,
+            'sections': sections
+        })
 
     return chapters
 
