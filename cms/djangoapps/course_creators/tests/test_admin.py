@@ -46,23 +46,17 @@ class CourseCreatorAdminTest(TestCase):
             # User is initially unrequested.
             self.assertFalse(is_user_in_creator_group(self.user))
 
-            # change state to 'g' (granted)
-            change_state('g', True)
+            change_state(CourseCreator.GRANTED, True)
 
-            # change state to 'd' (denied)
-            change_state('d', False)
+            change_state(CourseCreator.DENIED, False)
 
-            # and change state back to 'g' (granted)
-            change_state('g', True)
+            change_state(CourseCreator.GRANTED, True)
 
-            # change state to 'p' (pending)
-            change_state('p', False)
+            change_state(CourseCreator.PENDING, False)
 
-            # and change state back to 'g' (granted)
-            change_state('g', True)
+            change_state(CourseCreator.GRANTED, True)
 
-            # and change state back to 'u' (unrequested)
-            change_state('u', False)
+            change_state(CourseCreator.UNREQUESTED, False)
 
 
     def test_add_permission(self):

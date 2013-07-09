@@ -42,11 +42,11 @@ class CourseCreatorView(TestCase):
 
     def test_add_unrequested(self):
         add_user_with_status_unrequested(self.admin, self.user)
-        self.assertEqual('u', get_course_creator_status(self.user))
+        self.assertEqual('unrequested', get_course_creator_status(self.user))
 
         # Calling add again will be a no-op (even if state is different).
         add_user_with_status_granted(self.admin, self.user)
-        self.assertEqual('u', get_course_creator_status(self.user))
+        self.assertEqual('unrequested', get_course_creator_status(self.user))
 
     def test_add_granted(self):
         with mock.patch.dict('django.conf.settings.MITX_FEATURES', {"ENABLE_CREATOR_GROUP": True}):
@@ -54,11 +54,11 @@ class CourseCreatorView(TestCase):
             self.assertFalse(is_user_in_creator_group(self.user))
 
             add_user_with_status_granted(self.admin, self.user)
-            self.assertEqual('g', get_course_creator_status(self.user))
+            self.assertEqual('granted', get_course_creator_status(self.user))
 
             # Calling add again will be a no-op (even if state is different).
             add_user_with_status_unrequested(self.admin, self.user)
-            self.assertEqual('g', get_course_creator_status(self.user))
+            self.assertEqual('granted', get_course_creator_status(self.user))
 
             self.assertTrue(is_user_in_creator_group(self.user))
 

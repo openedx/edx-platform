@@ -14,7 +14,7 @@ def add_user_with_status_unrequested(caller, user):
     If the user is already in the table, this method is a no-op
     (state will not be changed). Caller must have staff permissions.
     """
-    _add_user(caller, user, 'u')
+    _add_user(caller, user, CourseCreator.UNREQUESTED)
 
 
 def add_user_with_status_granted(caller, user):
@@ -26,7 +26,7 @@ def add_user_with_status_granted(caller, user):
 
     This method also adds the user to the course creator group maintained by authz.py.
     """
-    _add_user(caller, user, 'g')
+    _add_user(caller, user, CourseCreator.GRANTED)
     update_course_creator_group(caller, user, True)
 
 
@@ -47,10 +47,10 @@ def get_course_creator_status(user):
     Returns the status for a particular user, or None if user is not in the table.
 
     Possible return values are:
-        'g' = 'granted'
-        'u' = 'unrequested'
-        'p' = 'pending'
-        'd' = 'denied'
+        'unrequested' = user has not requested course creation rights
+        'pending' = user has requested course creation rights
+        'granted' = user has been granted course creation rights
+        'denied' = user has been denied course creation rights
         None = user does not exist in the table
     """
     user = CourseCreator.objects.filter(user=user)

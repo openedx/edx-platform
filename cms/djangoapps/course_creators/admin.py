@@ -32,8 +32,7 @@ class CourseCreatorAdmin(admin.ModelAdmin):
     )
     # Fields that filtering support
     list_filter = ['state', 'state_changed']
-    # Fields that search supports. Note that the search term for state has to be
-    # its key (ie, 'g' instead of 'granted').
+    # Fields that search supports.
     search_fields = ['user__username', 'user__email', 'state', 'note']
     # Turn off the action bar (we have no bulk actions)
     actions = None

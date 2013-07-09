@@ -13,7 +13,7 @@ class Migration(SchemaMigration):
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'], unique=True)),
             ('state_changed', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('state', self.gf('django.db.models.fields.CharField')(default='u', max_length=1)),
+            ('state', self.gf('django.db.models.fields.CharField')(default='unrequested', max_length=24)),
             ('note', self.gf('django.db.models.fields.CharField')(max_length=512, blank=True)),
         ))
         db.send_create_signal('course_creators', ['CourseCreator'])
@@ -65,7 +65,7 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'CourseCreator'},
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'note': ('django.db.models.fields.CharField', [], {'max_length': '512', 'blank': 'True'}),
-            'state': ('django.db.models.fields.CharField', [], {'default': "'u'", 'max_length': '1'}),
+            'state': ('django.db.models.fields.CharField', [], {'default': "'unrequested'", 'max_length': '24'}),
             'state_changed': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']", 'unique': 'True'})
         }
