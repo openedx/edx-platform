@@ -19,14 +19,13 @@ class XModuleCourseFactory(Factory):
     ABSTRACT_FACTORY = True
 
     @classmethod
-    def _create(cls, target_class, *args, **kwargs):
+    def _create(cls, target_class, **kwargs):
 
         template = Location('i4x', 'edx', 'templates', 'course', 'Empty')
-        org = kwargs.get('org')
-        number = kwargs.get('number')
-        display_name = kwargs.get('display_name')
-        location = Location('i4x', org, number,
-                            'course', Location.clean(display_name))
+        org = kwargs.pop('org', None)
+        number = kwargs.pop('number', None)
+        display_name = kwargs.pop('display_name', None)
+        location = Location('i4x', org, number, 'course', Location.clean(display_name))
 
         try:
             store = modulestore('direct')
@@ -41,7 +40,7 @@ class XModuleCourseFactory(Factory):
             new_course.display_name = display_name
 
         new_course.lms.start = datetime.datetime.now(UTC)
-        new_course.tabs = kwargs.get(
+        new_course.tabs = kwargs.pop(
             'tabs',
             [
                 {"type": "courseware"},
@@ -51,14 +50,14 @@ class XModuleCourseFactory(Factory):
                 {"type": "progress", "name": "Progress"}
             ]
         )
-        new_course.discussion_link = kwargs.get('discussion_link')
+
+        # The rest of kwargs become attributes on the course:
+        for k, v in kwargs.iteritems():
+            setattr(new_course, k, v)
 
         # Update the data in the mongo datastore
-        store.update_metadata(new_course.location.url(), own_metadata(new_course))
-
-        data = kwargs.get('data')
-        if data is not None:
-            store.update_item(new_course.location, data)
+        store.update_metadata(new_course.location, own_metadata(new_course))
+        store.update_item(new_course.location, new_course._model_data._kvs._data)
 
         # update_item updates the the course as it exists in the modulestore, but doesn't
         # update the instance we are working with, so have to refetch the course after updating it.
@@ -101,7 +100,7 @@ class XModuleItemFactory(Factory):
         return parent._replace(category=attr.category, name=dest_name)
 
     @classmethod
-    def _create(cls, target_class, *args, **kwargs):
+    def _create(cls, target_class, **kwargs):
         """
         Uses *kwargs*:
 

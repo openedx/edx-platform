@@ -3,7 +3,6 @@ import datetime
 
 from django.test import TestCase
 from django.http import Http404
-from django.conf import settings
 from django.test.utils import override_settings
 from django.contrib.auth.models import User
 from django.test.client import RequestFactory
@@ -52,8 +51,8 @@ class ViewsTestCase(TestCase):
         self.date = datetime.datetime(2013, 1, 22, tzinfo=UTC)
         self.course_id = 'edX/toy/2012_Fall'
         self.enrollment = CourseEnrollment.objects.get_or_create(user=self.user,
-                                                  course_id=self.course_id,
-                                                  created=self.date)[0]
+                                                                 course_id=self.course_id,
+                                                                 created=self.date)[0]
         self.location = ['tag', 'org', 'course', 'category', 'name']
         self._MODULESTORES = {}
         # This is a CourseDescriptor object

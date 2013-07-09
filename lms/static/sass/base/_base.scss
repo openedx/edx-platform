@@ -84,6 +84,14 @@ a:link, a:visited {
   }
 }
 
+a:focus {
+  /**
+   *  Add general focus styling here
+   *  for example:
+   *      outline: 3px groove $black;
+   **/
+}
+
 .content-wrapper {
   width: flex-grid(12);
   margin: 0 auto;

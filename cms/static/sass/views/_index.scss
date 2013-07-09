@@ -72,14 +72,7 @@ body.index {
       }
 
       .logo {
-        @extend .text-hide;
-        position: relative;
-        top: 3px;
-        display: inline-block;
-        vertical-align: baseline;
-        width: 282px;
-        height: 57px;
-        background: transparent url('../img/logo-edx-studio-white.png') 0 0 no-repeat;
+        font-weight: 600;
       }
 
       .tagline {

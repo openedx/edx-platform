@@ -27,11 +27,11 @@ class TestGradebook(ModuleStoreTestCase):
 
         modulestore().request_cache = modulestore().metadata_inheritance_cache_subsystem = None
 
-        course_data = {}
+        kwargs = {}
         if self.grading_policy is not None:
-            course_data['grading_policy'] = self.grading_policy
+            kwargs['grading_policy'] = self.grading_policy
 
-        self.course = CourseFactory.create(data=course_data)
+        self.course = CourseFactory.create(**kwargs)
         chapter = ItemFactory.create(
             parent_location=self.course.location,
             template="i4x://edx/templates/sequential/Empty",
