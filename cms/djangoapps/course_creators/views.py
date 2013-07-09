@@ -11,7 +11,8 @@ def add_user_with_status_unrequested(caller, user):
     """
     Adds a user to the course creator table with status 'unrequested'.
 
-    Caller must have staff permissions.
+    If the user is already in the table, this method is a no-op
+    (state will not be changed). Caller must have staff permissions.
     """
     _add_user(caller, user, 'u')
 
@@ -20,8 +21,10 @@ def add_user_with_status_granted(caller, user):
     """
     Adds a user to the course creator table with status 'granted'.
 
-    Caller must have staff permissions. This method also adds the user
-    to the course creator group maintained by authz.py.
+    If the user is already in the table, this method is a no-op
+    (state will not be changed). Caller must have staff permissions.
+
+    This method also adds the user to the course creator group maintained by authz.py.
     """
     _add_user(caller, user, 'g')
     add_user_to_creator_group(caller, user)
@@ -49,6 +52,9 @@ def get_course_creator_status(user):
 def _add_user(caller, user, state):
     """
     Adds a user to the course creator table with the specified state.
+
+    If the user is already in the table, this method is a no-op
+    (state will not be changed).
     """
     if not caller.is_active or not caller.is_authenticated or not caller.is_staff:
         raise PermissionDenied
