@@ -62,10 +62,7 @@ task :runserver => :lms
 desc "Run django-admin <action> against the specified system and environment"
 task "django-admin", [:action, :system, :env, :options] do |t, args|
     # If no system was explicitly set, we want to run both CMS and LMS for migrate and syncdb.
-    no_system_set = true
-    if args.system
-       no_system_set = false
-    end
+    no_system_set = !args.system
     args.with_defaults(:env => 'dev', :system => 'lms', :options => '')
     sh(django_admin(args.system, args.env, args.action, args.options))
     if no_system_set and (args.action == 'migrate' or args.action == 'syncdb')
