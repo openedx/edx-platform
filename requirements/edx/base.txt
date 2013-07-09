@@ -82,5 +82,6 @@ django_nose==1.1
 django-jasmine==0.3.2
 django_debug_toolbar
 django-debug-toolbar-mongo
+nose-ignore-docstring
 
 git+https://github.com/mfogel/django-settings-context-processor.git

@@ -11,6 +11,8 @@ Common: Add tests for documentation generation to test suite
 
 Blades: User answer now preserved (and changeable) after clicking "show answer" in choice problems
 
+LMS: Removed press releases
+
 LMS: Users are no longer auto-activated if they click "reset password"
 This is now done when they click on the link in the reset password
 email they receive (along with usual path through activation email).
