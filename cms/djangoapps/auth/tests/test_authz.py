@@ -200,4 +200,3 @@ class CourseGroupTest(TestCase):
         add_user_to_course_group(creator2, staff2, location2, STAFF_ROLE_NAME)
 
         self.assertSetEqual({self.creator, creator2}, get_users_with_instructor_role())
-

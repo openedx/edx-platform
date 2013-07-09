@@ -14,11 +14,12 @@ class CourseCreator(models.Model):
     """
     Creates the database table model.
     """
-    STATES = ((u'u', u'unrequested'),
-              (u'p', u'pending'),
-              (u'g', u'granted'),
-              (u'd', u'denied'),
-             )
+    STATES = (
+        (u'u', u'unrequested'),
+        (u'p', u'pending'),
+        (u'g', u'granted'),
+        (u'd', u'denied'),
+    )
 
     user = models.ForeignKey(User, help_text="Studio user", unique=True)
     state_changed = models.DateTimeField('state last updated', auto_now_add=True,
@@ -29,7 +30,7 @@ class CourseCreator(models.Model):
                                                                   'why course creation access was denied)')
 
     def __unicode__(self):
-        s = "%str %str | %str [%str] | %str" % (self.user.username, self.user.email, self.state, self.state_changed, self.note)
+        s = "%str | %str [%str] | %str" % (self.user, self.state, self.state_changed, self.note)
         return s
 
 

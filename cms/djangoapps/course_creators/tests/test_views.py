@@ -58,4 +58,3 @@ class CourseCreatorView(TestCase):
             self.assertEqual('g', get_course_creator_status(self.user))
 
             self.assertTrue(is_user_in_creator_group(self.user))
-

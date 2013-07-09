@@ -146,9 +146,7 @@ if settings.MITX_FEATURES.get('ENABLE_SERVICE_STATUS'):
         url(r'^status/', include('service_status.urls')),
     )
 
-urlpatterns += (
-               url(r'^admin/', include(admin.site.urls)),
-    )
+urlpatterns += (url(r'^admin/', include(admin.site.urls)),)
 
 urlpatterns = patterns(*urlpatterns)
 
