@@ -201,9 +201,10 @@ class WeightedSubsectionsGrader(CourseGrader):
             weighted_percent = subgrade_result['percent'] * weight
             section_detail = "{0} = {1:.1%} of a possible {2:.0%}".format(category, weighted_percent, weight)
 
-            attempted_overall = True in (score.attempted for score in grade_sheet[category])
-            if attempted_overall:
-                total_weight += weight
+            if category in grade_sheet:
+                attempted_overall = True in (score.attempted for score in grade_sheet[category])
+                if attempted_overall:
+                    total_weight += weight
 
             weighted_projected_percent = subgrade_result['projected_percent'] * weight
             total_projected_percent += weighted_projected_percent
