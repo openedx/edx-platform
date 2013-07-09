@@ -1,4 +1,3 @@
-<%! from django.utils.translation import ugettext as _ %>
 ## mako
 <%page args="active_page=None" />
 
@@ -13,6 +12,7 @@ def url_class(is_active):
   return ""
 %>
 <%! from courseware.tabs import get_course_tabs %>
+<%! from django.utils.translation import ugettext as _ %>
 
 <nav class="${active_page} course-material">
   <div class="inner-wrapper">
