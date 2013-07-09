@@ -20,34 +20,24 @@
 <head>
   <%block name="title">
     % if stanford_theme_enabled():
-      <title>${_("Home | class.stanford.edu")}</title>
+      <title>${_("Home")} | class.stanford.edu</title>
     % else:
       <title>${_("edX")}</title>
+    % endif
+  </%block>
 
-      <script type="text/javascript">
-        /* immediately break out of an iframe if coming from the marketing website */
-        (function(window) {
-          if (window.location !== window.top.location) {
-            window.top.location = window.location;
-          }
-        })(this);
-      </script>
-    % endif
-  </%block>
-      <title>${_("edX")}</title>
-    % endif
-  </%block>
   <script type="text/javascript" src="/jsi18n/"></script>
-  <script type="text/javascript">
 
-  /* immediately break out of an iframe if coming
-     from the marketing website */
-  (function(window) {
-    if (window.location !== window.top.location) {
-      window.top.location = window.location;
-    }
-  })(this);
+  % if not stanford_theme_enabled():
+  <script type="text/javascript">
+    /* immediately break out of an iframe if coming from the marketing website */
+    (function(window) {
+      if (window.location !== window.top.location) {
+        window.top.location = window.location;
+      }
+    })(this);
   </script>
+  % endif
 
   <link rel="icon" type="image/x-icon" href="${static.url(settings.FAVICON_PATH)}" />
 
