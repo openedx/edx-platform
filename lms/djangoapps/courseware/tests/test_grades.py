@@ -90,7 +90,7 @@ class TestFindShouldGradeSection(unittest.TestCase):
             print fake_key
             if fake_key.block_scope_id:
                 fake_found = MagicMock()
-                fake_found.grade = fake_key.block_scope_id
+                fake_found.grade = fake_key.student_id
                 return fake_found
             else:
                 return None
@@ -142,5 +142,40 @@ class TestFindShouldGradeSection(unittest.TestCase):
 
 class TestFindAttempted(unittest.TestCase):
 
-    def test_find_attempted(self):
-        pass
+    def setUp(self):
+
+        def fake_find_key(fake_key):
+            self.assertIsInstance(fake_key, LmsKeyValueStore.Key)
+            print fake_key
+            if fake_key.block_scope_id:
+                fake_found = MagicMock()
+                fake_found.grade = fake_key.student_id
+                return fake_found
+            else:
+                return None
+
+        self.fake_model_data_cache = MagicMock()
+        self.fake_model_data_cache.find = fake_find_key
+
+    def fake_module(self, is_in_cache):
+        output = MagicMock()
+        output.location = is_in_cache
+        return output
+
+    def test_not_attempted(self):
+        #Test returning false when student has not attempted problem
+        fake_module = self.fake_module(False)
+        result = grades.find_attempted(fake_module, self.fake_model_data_cache, None)
+        self.assertFalse(result)
+
+    def test_no_grade(self):
+        #Test returning false when student has attempted problem, but grade is None
+        fake_module = self.fake_module(True)
+        result = grades.find_attempted(fake_module, self.fake_model_data_cache, None)
+        self.assertFalse(result)
+
+    def test_has_grade(self):
+        #Test returning true when student has attempted problem and has a grade
+        fake_module = self.fake_module(True)
+        result = grades.find_attempted(fake_module, self.fake_model_data_cache, 3.0)
+        self.assertTrue(result)
