@@ -12,6 +12,7 @@ from django.utils.translation import ugettext as _
 # A signal that will be sent when users should be added or removed from the creator group
 update_creator_state = Signal(providing_args=["caller", "user", "add"])
 
+
 class CourseCreator(models.Model):
     """
     Creates the database table model.
@@ -38,8 +39,7 @@ class CourseCreator(models.Model):
                                                                     "why course creation access was denied)"))
 
     def __unicode__(self):
-        s = u'%str | %str [%str] | %str' % (self.user, self.state, self.state_changed, self.note)
-        return s
+        return u'%str | %str [%str] | %str' % (self.user, self.state, self.state_changed, self.note)
 
 
 @receiver(post_init, sender=CourseCreator)
