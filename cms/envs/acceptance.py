@@ -17,6 +17,7 @@ DEBUG = True
 import logging
 logging.disable(logging.ERROR)
 import os
+import random
 
 
 def seed():
@@ -74,5 +75,5 @@ DATABASES = {
 # Include the lettuce app for acceptance testing, including the 'harvest' django-admin command
 INSTALLED_APPS += ('lettuce.django',)
 LETTUCE_APPS = ('contentstore',)
-LETTUCE_SERVER_PORT = 8001
+LETTUCE_SERVER_PORT = random.randint(1024, 65535)
 LETTUCE_BROWSER = 'chrome'
