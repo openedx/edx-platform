@@ -266,6 +266,17 @@ def find_should_grade_section(xmoduledescriptors, model_data_cache, student_id):
 
 
 def find_attempted(module_descriptor, model_data_cache, student_id):
+
+    """
+    Determines whether a section has been attempted yet.
+
+    If the section is in the model data cache, AND if the grade is not null (an attempted problem
+        will have a grade of 0.0 or more), then it has been attempted.
+    This is for purposes of calculating the projected grade.
+
+    @return True or False
+    """
+
     key = LmsKeyValueStore.Key(
         Scope.user_state,
         student_id,
