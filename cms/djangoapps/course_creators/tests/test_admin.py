@@ -64,3 +64,26 @@ class CourseCreatorAdminTest(TestCase):
             # and change state back to 'u' (unrequested)
             change_state('u', False)
 
+
+    def test_add_permission(self):
+        """
+        Tests that staff cannot add entries
+        """
+        self.assertFalse(self.creator_admin.has_add_permission(self.request))
+
+
+    def test_delete_permission(self):
+        """
+        Tests that staff cannot delete entries
+        """
+        self.assertFalse(self.creator_admin.has_delete_permission(self.request))
+
+
+    def test_change_permission(self):
+        """
+        Tests that only staff can change entries
+        """
+        self.assertTrue(self.creator_admin.has_change_permission(self.request))
+
+        self.request.user = self.user
+        self.assertFalse(self.creator_admin.has_change_permission(self.request))
