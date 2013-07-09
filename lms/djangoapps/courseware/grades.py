@@ -182,6 +182,15 @@ def grade(student, request, course, model_data_cache=None, keep_raw_scores=False
 
 
 def compute_graded_total(section, student, course_id, model_data_cache, request):
+
+    """
+    Computes a total grade for a section.
+
+    @return a tuple: (graded_total, add_raw_scores)
+        - graded_total: a Score -- either the output of graders.aggregate_scores, or 0/1 if not should_grade_section
+        - add_raw_scores: a list of Score objects to be added to raw_scores within grade()
+    """
+
     section_descriptor = section['section_descriptor']
     section_name = section_descriptor.display_name_with_default
 
