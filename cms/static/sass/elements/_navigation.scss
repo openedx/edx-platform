@@ -33,7 +33,7 @@ nav {
     }
 
     .ui-toggle-dd {
-      @include transition(all 0.25s ease-in-out 0);
+      @include transition(all $tmg-f2 ease-in-out 0);
       margin-left: ($baseline/10);
       display: inline-block;
       vertical-align: middle;
@@ -58,7 +58,7 @@ nav {
   }
 
   .wrapper-nav-sub {
-    @include transition (opacity 0.25s ease-in-out 0s);
+    @include transition(opacity $tmg-f2 ease-in-out 0s);
     position: absolute;
     top: ($baseline*2.5);
     opacity: 0.0;

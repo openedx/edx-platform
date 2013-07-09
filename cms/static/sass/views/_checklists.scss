@@ -31,7 +31,7 @@ body.course.checklists {
       background: $gray-l4;
 
       .viz-checklist-status-value {
-        @include transition(width 2.0s ease-in-out .25s);
+        @include transition(width $tmg-s2 ease-in-out .25s);
         position: absolute;
         top: 0;
         left: 0;
@@ -55,13 +55,13 @@ body.course.checklists {
       padding: $baseline ($baseline*1.5);
 
       .checklist-title {
-        @include transition(color 0.15s ease-in-out 0);
+        @include transition(color $tmg-f2 ease-in-out 0);
         width: flex-grid(6, 9);
         margin: 0 flex-gutter() 0 0;
         float: left;
 
         .ui-toggle-expansion {
-          @include transition(all 0.15s ease-in-out 0);
+          @include transition(all $tmg-f2 ease-in-out 0);
           @include font-size(21);
           display: inline-block;
           vertical-align: middle;
@@ -118,7 +118,7 @@ body.course.checklists {
     // checklist actions
     .course-checklist-actions {
       @include clearfix();
-      @include transition(border 0.15s ease-in-out .25s);
+      @include transition(border $tmg-f2 ease-in-out .25s);
       box-shadow: inset 0 1px 1px $shadow-l1;
       border-top: 1px solid $gray-l2;
       padding: $baseline ($baseline*1.5);
@@ -208,8 +208,7 @@ body.course.checklists {
     overflow: hidden;
 
     .task {
-      @include transition(background 0.15s ease-in-out 0);
-      @include transition(border 0.15s ease-in-out 0);
+      @include transition(background $tmg-f2 ease-in-out 0, border $tmg-f3 ease-in-out 0);
       @include clearfix();
       position: relative;
       border-top: 1px solid $white;
@@ -239,7 +238,7 @@ body.course.checklists {
         font-weight: 500;
 
         .task-name {
-          @include transition(color 0.15s ease-in-out 0);
+          @include transition(color $tmg-f2 ease-in-out 0);
           vertical-align: baseline;
           cursor: pointer;
           margin-bottom: 0;
@@ -247,20 +246,20 @@ body.course.checklists {
 
         .task-description {
           @extend .t-copy-sub1;
-          @include transition(color 0.15s ease-in-out 0);
+          @include transition(color $tmg-f2 ease-in-out 0);
           color: $gray-l2;
         }
 
         .task-support {
           @extend .t-copy-sub2;
-          @include transition(opacity 0.15s ease-in-out 0);
+          @include transition(opacity $tmg-f2 ease-in-out 0);
           opacity: 0.0;
           pointer-events: none;
         }
       }
 
       .task-actions {
-        @include transition(opacity 0.15s ease-in-out 0.25s);
+        @include transition(opacity $tmg-f2 ease-in-out 0.25s);
         @include clearfix();
         display: inline-block;
         vertical-align: middle;

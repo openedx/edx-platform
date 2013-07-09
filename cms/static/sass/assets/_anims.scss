@@ -18,7 +18,7 @@
 
 // canned animation - use if you want out of the box/non-customized anim
 .anim-fadeIn {
-  @include animation(fadeIn 0.25s linear 1);
+  @include animation(fadeIn $tmg-f2 linear 1);
 }
 
 
@@ -39,7 +39,7 @@
 
 // canned animation - use if you want out of the box/non-customized anim
 .anim-fadeOut {
-  @include animation(fadeOut 0.25s linear 1);
+  @include animation(fadeOut $tmg-f2 linear 1);
 }
 
 
@@ -63,7 +63,7 @@
 
 // canned animation - use if you want out of the box/non-customized anim
 .anim-rotateUp {
-  @include animation(rotateUp 0.25s ease-in-out 1);
+  @include animation(rotateUp $tmg-f2 ease-in-out 1);
 }
 
 
@@ -84,7 +84,7 @@
 
 // canned animation - use if you want out of the box/non-customized anim
 .anim-rotateDown {
-  @include animation(rotateDown 0.25s ease-in-out 1);
+  @include animation(rotateDown $tmg-f2 ease-in-out 1);
 }
 
 
@@ -105,7 +105,7 @@
 
 // canned animation - use if you want out of the box/non-customized anim
 .anim-rotateCW {
-  @include animation(rotateCW 1.0s linear infinite);
+  @include animation(rotateCW $tmg-s1 linear infinite);
 }
 
 
@@ -126,7 +126,7 @@
 
 // canned  animation - use if you want out of the box/non-customized anim
 .anim-rotateCCW {
-  @include animation(rotateCCW 1.0s linear infinite);
+  @include animation(rotateCCW $tmg-s1 linear infinite);
 }
 
 
@@ -186,7 +186,7 @@
 
 // canned animation - use if you want out of the box/non-customized anim
 .anim-bounceIn {
-  @include animation(bounceIn 0.5s ease-in-out 1);
+  @include animation(bounceIn $tmg-f1 ease-in-out 1);
 }
 
 
@@ -209,5 +209,5 @@
 
 // canned animation - use if you want out of the box/non-customized anim
 .anim-bounceOut {
-  @include animation(bounceOut 0.5s ease-in-out 1);
+  @include animation(bounceOut $tmg-f1 ease-in-out 1);
 }

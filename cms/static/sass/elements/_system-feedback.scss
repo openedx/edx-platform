@@ -145,7 +145,7 @@
 // prompts
 .wrapper-prompt {
   @extend .depth5;
-  @include transition(all 0.05s ease-in-out 0);
+  @include transition(all $tmg-f3 ease-in-out 0);
   position: fixed;
   top: 0;
   background: $black-t0;
@@ -437,7 +437,7 @@
   &.saving {
 
     [class^="icon"] {
-      @include animation(rotateCW 3.0s linear infinite);
+      @include animation(rotateCW $tmg-s3 linear infinite);
       width: 25px;
       margin: -4px 10px 0 0;
       @include transform-origin(52% 60%);
@@ -644,7 +644,7 @@
       pointer-events: auto;
 
       .prompt {
-        @include animation(bounceIn 0.5s ease-in-out 1);
+        @include animation(bounceIn $tmg-f1 ease-in-out 1);
       }
     }
   }
@@ -660,7 +660,7 @@
     .wrapper-prompt {
 
       .prompt {
-        @include animation(bounceOut 0.5s ease-in-out 1);
+        @include animation(bounceOut $tmg-f1 ease-in-out 1);
       }
     }
   }
@@ -680,12 +680,12 @@
 
     // varying animations
     &.is-shown {
-      @include animation(notificationSlideUp 1.0s ease-in-out 1);
+      @include animation(notificationSlideUp $tmg-s1 ease-in-out 1);
       @include animation-fill-mode(forwards);
     }
 
     &.is-hiding {
-      @include animation(notificationSlideDown 1.0s ease-in-out 1);
+      @include animation(notificationSlideDown $tmg-s1 ease-in-out 1);
       @include animation-fill-mode(forwards);
     }
   }

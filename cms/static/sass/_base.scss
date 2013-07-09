@@ -19,7 +19,7 @@ body, input, button {
 }
 
 a {
-  @include transition(color 0.15s ease-in-out 0);
+  @include transition(color $tmg-f2 ease-in-out 0);
   text-decoration: none;
   color: $blue;
 
@@ -642,7 +642,7 @@ hr.divide {
 
 // system notifications
 .toast-notification {
-  @include transition(all 0.2s linear 0);
+  @include transition(all $tmg-f2 linear 0);
   display: none;
   position: fixed;
   top: 20px;
@@ -794,7 +794,7 @@ hr.divide {
 
 .tooltip {
   @include font-size(12);
-  @include transition(opacity 0.1s ease-out 0);
+  @include transition(opacity $tmg-f3 ease-out 0);
   position: absolute;
   top: 0;
   left: 0;
@@ -867,7 +867,7 @@ body.js {
     background: $white;
 
     .action-modal-close {
-      @include transition(top 0.15s ease-in-out 0);
+      @include transition(top $tmg-f3 ease-in-out 0);
       @include border-bottom-radius(3px);
       position: absolute;
       top: -3px;
