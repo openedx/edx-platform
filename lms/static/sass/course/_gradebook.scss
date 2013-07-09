@@ -2,7 +2,6 @@ $cell-border-color: #e1e1e1;
 $table-border-color: #c8c8c8;
 
 div.gradebook-wrapper {
-  @extend .table-wrapper;
 
   section.gradebook-content {
     @extend .content;

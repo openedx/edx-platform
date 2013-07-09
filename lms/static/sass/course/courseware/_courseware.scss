@@ -4,7 +4,6 @@ html {
 }
 
 div.course-wrapper {
-  @extend .table-wrapper;
 
   section.course-content {
     @extend .content;
@@ -47,7 +46,6 @@ div.course-wrapper {
 
       > li {
         @extend .clearfix;
-        @extend .problem-set;
         border-bottom: 1px solid #ddd;
         margin-bottom: 15px;
         padding: 0 0 15px;

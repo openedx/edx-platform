@@ -83,7 +83,6 @@ div.video {
       }
 
       ul.vcr {
-        @extend .dullify;
         float: left;
         list-style: none;
         margin: 0 lh() 0 0;
@@ -144,7 +143,6 @@ div.video {
       }
 
       div.secondary-controls {
-        @extend .dullify;
         float: right;
 
         div.speeds {
@@ -470,7 +468,6 @@ div.video {
   }
 
   &.closed {
-    @extend .trans;
 
     article.video-wrapper {
       width: flex-grid(9,9);

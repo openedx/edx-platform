@@ -1,8 +1,7 @@
 div.book-wrapper {
-  @extend .table-wrapper;
   display: table;
   table-layout:  fixed;
-  padding: 1em 8em; 
+  padding: 1em 8em;
 
 
   #open_close_accordion {
@@ -45,7 +44,7 @@ div.book-wrapper {
       li {
         background: none;
         border-bottom: 0;
-        padding-left: lh();       
+        padding-left: lh();
 
         a {
           padding: 0;
@@ -62,7 +61,7 @@ div.book-wrapper {
 
         div.hitarea {
           background-image: url('../images/treeview-default.gif');
-          
+
           position: relative;
           top: 4px;
 
@@ -175,10 +174,10 @@ div.book-wrapper {
         text-align: left;
       	line-height: 1.6em;
       	margin: 5px;
-	
+
 	.Paragraph, h2 {
 	   margin-top: 10px;
-	}	   
+	}
       }
     }
   }
