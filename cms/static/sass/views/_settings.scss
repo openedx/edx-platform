@@ -115,12 +115,12 @@ body.course.settings {
     // buttons
     .remove-item {
       @include white-button;
-      @extend .t-action-3;
+      @extend .t-action3;
       font-weight: 400;
     }
 
     .new-button {
-      // @extend .t-action-3; - bad buttons won't render this properly
+      // @extend .t-action3; - bad buttons won't render this properly
       @include font-size(14);
     }
 
@@ -337,12 +337,11 @@ body.course.settings {
 
           .action-primary {
             @include blue-button();
-            @extend .t-action-3;
+            @extend .t-action3;
             font-weight: 600;
 
             [class^="icon-"] {
-              @extend .t-icon;
-              @include font-size(16);
+              @extend .t-icon5;
               display: inline-block;
               vertical-align: middle;
               margin-top: -3px;
