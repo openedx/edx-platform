@@ -681,10 +681,12 @@
     // varying animations
     &.is-shown {
       @include animation(notificationSlideUp 1.0s ease-in-out 1);
+      @include animation-fill-mode(forwards);
     }
 
     &.is-hiding {
-      @include animation(notificationSlideDown 0.25s ease-in-out 1);
+      @include animation(notificationSlideDown 1.0s ease-in-out 1);
+      @include animation-fill-mode(forwards);
     }
   }
 }
