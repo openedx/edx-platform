@@ -77,7 +77,7 @@
     .title {
       @extend .t-action2;
       @extend .btn-dd-nav-primary;
-      @include transition(all $tmg-f2 ease-in-out 0);
+      @include transition(all $tmg-f2 ease-in-out 0s);
 
       .label, .icon-caret-down {
 
@@ -160,7 +160,7 @@
 
     // entire link
     .course-link {
-      @include transition(color $tmg-f2 ease-in-out 0);
+      @include transition(color $tmg-f2 ease-in-out 0s);
       display: block;
       color: $gray-d1;
 

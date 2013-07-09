@@ -95,7 +95,7 @@
           @include clearfix;
           float: left;
           margin-right: flex-gutter();
-          @include transition(all, 0.15s, linear);
+          @include transition(all 0.15s linear 0s);
           width: flex-grid(12);
 
           > a.find-courses, a.register {
@@ -151,7 +151,7 @@
             text-align: center;
             float: left;
             margin: 1px flex-gutter(8) 0 0;
-            @include transition();
+            @include transition(none);
             width: flex-grid(5, 8);
           }
 
@@ -452,7 +452,7 @@
           padding: 6px 10px;
           position: absolute;
           text-align: center;
-          @include transition(all, 0.15s, ease-out);
+          @include transition(all 0.15s ease-out 0s);
           top: 65px;
           width: 220px;
 
@@ -466,7 +466,7 @@
           @include inline-block;
           margin-right: 10px;
           opacity: 0.5;
-          @include transition(all, 0.15s, linear);
+          @include transition(all 0.15s linear 0s);
           width: 44px;
 
           &:hover {
@@ -530,7 +530,7 @@
           height: 19px;
           margin: 2px 10px 0 0;
           opacity: 0.6;
-          @include transition(all, 0.15s, linear);
+          @include transition(all 0.15s linear 0s);
           width: 19px;
 
           &.start {

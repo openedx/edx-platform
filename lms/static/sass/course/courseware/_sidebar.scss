@@ -73,7 +73,7 @@ section.course-index {
       @include linear-gradient(top, $sidebar-chapter-bg-top, $sidebar-chapter-bg-bottom);
       background-color: $sidebar-chapter-bg;
       box-shadow: 0 1px 0 #fff inset, 0 -1px 0 rgba(0, 0, 0, .1) inset;
-      @include transition(background-color .1s);
+      @include transition(background-color .1s linear 0s);
 
       &.is-open {
         background: #fff;
@@ -165,7 +165,7 @@ section.course-index {
             font-weight: normal;
             color: #333;
             opacity: 0;
-            @include transition();
+            @include transition(none);
           }
 
           > a {

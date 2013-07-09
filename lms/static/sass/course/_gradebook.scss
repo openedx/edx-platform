@@ -25,7 +25,7 @@ div.gradebook-wrapper {
     	font-size: 11px;
     	box-shadow: 0 1px 4px rgba(0, 0, 0, .12) inset;
     	outline: none;
-    	@include transition(border-color .15s);
+    	@include transition(border-color .15s linear 0s);
 
     	&::-webkit-input-placeholder,
     	&::-moz-input-placeholder {

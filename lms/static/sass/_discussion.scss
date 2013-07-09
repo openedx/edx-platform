@@ -565,7 +565,7 @@ body.discussion {
     border-top-width: 0;
     border-radius: 0 0 3px 3px;
     overflow: hidden;
-    @include transition(all, .2s, easeOut);
+    @include transition(all .2s ease-out 0s);
 
     &:before {
       content: 'PREVIEW';
@@ -591,7 +591,7 @@ body.discussion {
     padding: 0px;
     height: 20px;
     overflow: hidden;
-    @include transition(all, .2s, easeOut);
+    @include transition(all .2s ease-out 0s);
   }
 
   .wmd-spacer {
@@ -718,7 +718,7 @@ body.discussion {
       height: 100%;
       @include linear-gradient(top, rgba(255, 255, 255, .5), rgba(255, 255, 255, 0));
       background-color: #dcdcdc;
-      @include transition(all .2s ease-out);
+      @include transition(all .2s ease-out 0s);
 
       &:hover {
         background-color: #e9e9e9;
@@ -818,7 +818,7 @@ body.discussion {
         color: #333;
         text-shadow: 0 1px 0 rgba(255, 255, 255, .8);
         opacity: 0.0;
-        @include transition(opacity .2s);
+        @include transition(opacity .2s linear 0s);
       }
     }
 
@@ -938,7 +938,7 @@ body.discussion {
       max-width: 30px;
       margin: auto;
       @include box-sizing(border-box);
-      @include transition(all .2s);
+      @include transition(all .2s linear 0s);
     }
 
     .post-search-field {
@@ -959,13 +959,13 @@ body.discussion {
       color: #333;
       cursor: pointer;
       pointer-events: none;
-      @include transition(all .2s ease-out);
+      @include transition(all .2s ease-out 0s);
 
       &::-webkit-input-placeholder,
       &:-moz-placeholder,
       &:-ms-input-placeholder {
         opacity: 0.0;
-        @include transition(opacity .2s);
+        @include transition(opacity .2s linear 0s);
       }
 
       &:focus {
@@ -1618,7 +1618,7 @@ body.discussion {
     padding: 8px 20px;
 
     .wmd-input {
-      @include transition(all .2s);
+      @include transition(all .2s linear 0s);
     }
 
     .wmd-button {
@@ -1638,7 +1638,7 @@ body.discussion {
     border: 1px solid #b2b2b2;
     border-radius: 3px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, .1) inset;
-    @include transition(border-color .1s);
+    @include transition(border-color .1s linear 0s);
 
     &:focus {
       border-color: #4697c1;
@@ -1726,7 +1726,7 @@ body.discussion {
   .discussion-reply-new {
     padding: 20px;
     @include clearfix;
-    @include transition(opacity .2s);
+    @include transition(opacity .2s linear 0s);
 
     h4 {
       font-size: 16px;
@@ -1837,7 +1837,7 @@ body.discussion {
     /* Course content p has a default margin-bottom of 1.416em, this is just to reset that */
     .discussion-thread {
       padding: 0;
-      @include transition(all .25s);
+      @include transition(all .25s linear 0s);
 
       .dogear {
         display: none;
@@ -1868,7 +1868,7 @@ body.discussion {
         min-height: 0;
         padding: 10px 10px 15px 10px;
         box-shadow: 0 1px 0 #ddd;
-        @include transition(all .2s);
+        @include transition(all .2s linear 0s);
 
         .discussion-post {
           padding: 12px 20px 0 20px;
@@ -2223,7 +2223,7 @@ body.discussion {
       border-top-width: 0;
       border-radius: 0 0 3px 3px;
       overflow: hidden;
-      @include transition(all, .2s, easeOut);
+      @include transition(all .2s ease-out 0s);
 
       &:before {
         content: 'PREVIEW';
@@ -2249,7 +2249,7 @@ body.discussion {
       padding: 0px;
       height: 20px;
       overflow: hidden;
-      @include transition(all, .2s, easeOut);
+      @include transition(all .2s ease-out 0s);
     }
 
     .wmd-spacer {
@@ -2457,7 +2457,7 @@ body.discussion {
       }
 
       &:hover {
-        @include transition(opacity .2s);
+        @include transition(opacity .2s linear 0s);
         opacity: 1.0;
       }
     }
@@ -2522,7 +2522,7 @@ display:none;
       opacity: 0.8;
 
       &:hover {
-        @include transition(opacity .2s);
+        @include transition(opacity .2s linear 0s);
         opacity: 1.0;
       }
 

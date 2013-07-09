@@ -58,7 +58,7 @@ $white: rgb(255,255,255);
     color: $blue;
     font-family: $sans-serif;
     text-decoration: none;
-    @include transition(all, 0.1s, linear);
+    @include transition(all 0.1s linear 0s);
 
     .note {
       position: relative;
@@ -66,7 +66,7 @@ $white: rgb(255,255,255);
       font-family: $sans-serif;
       font-size: 13px;
       text-decoration: none;
-      @include transition(all, 0.1s, linear);
+      @include transition(all 0.1s linear 0s);
 
       &:before {
         position: relative;

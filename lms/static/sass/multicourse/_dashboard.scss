@@ -93,7 +93,7 @@
               height: 19px;
               margin: 0 6px 0 0;
               opacity: 0.6;
-              @include transition(all, 0.15s, linear);
+              @include transition(all 0.15s linear 0s);
               width: 19px;
 
               &.email-icon {
@@ -278,7 +278,7 @@
       position: relative;
       width: flex-grid(12);
       z-index: 20;
-      @include transition(all, 0.15s, linear);
+      @include transition(all 0.15s linear 0s);
 
       &:last-child {
         margin-bottom: none;
@@ -292,7 +292,7 @@
         margin: 0px;
         overflow: hidden;
         position: relative;
-        @include transition(all, 0.15s, linear);
+        @include transition(all 0.15s linear 0s);
         width: 200px;
         height: 120px;
 

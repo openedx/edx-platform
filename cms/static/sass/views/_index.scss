@@ -151,7 +151,7 @@ body.index {
             background: $white;
 
             .action-zoom {
-              @include transition(bottom $tmg-f2 ease-in-out 0);
+              @include transition(bottom $tmg-f2 ease-in-out 0s);
               position: absolute;
               bottom: -30px;
               right: ($baseline/2);
@@ -214,7 +214,7 @@ body.index {
 
             .proofpoint {
               @include box-sizing(border-box);
-              @include transition(all $tmg-f2 ease-in-out 0);
+              @include transition(all $tmg-f2 ease-in-out 0s);
               border-radius: ($baseline/4);
               position: relative;
               top: 0;

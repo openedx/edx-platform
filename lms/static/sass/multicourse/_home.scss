@@ -40,7 +40,7 @@
       width: flex-grid(6);
       float: left;
       position: relative;
-      @include transition(all, 0.2s, linear);
+      @include transition(all 0.2s linear 0s);
       vertical-align: top;
 
       &:hover {
@@ -56,7 +56,7 @@
         opacity: 1.0;
         padding: 20px 30px;
         top: 0px;
-        @include transition(all, 0.2s, linear);
+        @include transition(all 0.2s linear 0s);
         text-align: left;
 
         h1 {
@@ -116,7 +116,7 @@
           margin-left: -30px;
           position: absolute;
           top: 50%;
-          @include transition(all, 0.15s, linear);
+          @include transition(all 0.15s linear 0s);
           width: 60px;
 
           &::after {
@@ -262,7 +262,7 @@
       }
 
       a {
-        @include transition(all, 0.25s, ease-in-out);
+        @include transition(all 0.25s ease-in-out 0s);
 
         &::before {
           @include background-image(radial-gradient(50% 50%, circle closest-side, rgba(255,255,255, 1) 0%, rgba(255,255,255, 0) 100%));
@@ -275,7 +275,7 @@
           opacity: 0;
           width: 200px;
           position: absolute;
-          @include transition(all, 0.25s, ease-in-out);
+          @include transition(all 0.25s ease-in-out 0s);
           top: 50%;
           z-index: 1;
         }
@@ -285,7 +285,7 @@
           left: 0px;
           position: absolute;
           text-align: center;
-          @include transition(all, 0.25s, ease-in-out);
+          @include transition(all 0.25s ease-in-out 0s);
           width: 100%;
           z-index: 2;
 
@@ -293,7 +293,7 @@
             color: $base-font-color;
             font: 800 italic 1.4em/1.4em $sans-serif;
             text-shadow: 0 1px rgba(255,255,255, 0.6);
-            @include transition(all, 0.15s, ease-in-out);
+            @include transition(all 0.15s ease-in-out 0s);
 
             &:hover {
               color: $lighter-base-font-color;
@@ -303,7 +303,7 @@
 
         img {
           position: relative;
-          @include transition(all, 0.25s, ease-in-out);
+          @include transition(all 0.25s ease-in-out 0s);
           vertical-align: middle;
           z-index: 2;
         }
@@ -428,7 +428,7 @@
           float: left;
           margin-right: flex-gutter();
           padding: 10px;
-          @include transition(all, 0.15s, linear);
+          @include transition(all 0.15s linear 0s);
           width: flex-grid(4);
 
           &:hover {

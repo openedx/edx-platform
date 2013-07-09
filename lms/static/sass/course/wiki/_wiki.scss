@@ -106,7 +106,7 @@ section.wiki {
       font-family: $sans-serif;
       font-size: 12px;
       outline: none;
-      @include transition(border-color .1s);
+      @include transition(border-color .1s linear 0s);
 
       &:-webkit-input-placholder {
         font-style: italic;
@@ -1002,7 +1002,7 @@ section.wiki {
         color: #fff;
         font-weight: bold;
         font-size: em(18);
-        @include transition;
+        @include transition(none);
         text-align: center;
         -webkit-font-smoothing: antialiased;
 

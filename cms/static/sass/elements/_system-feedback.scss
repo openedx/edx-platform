@@ -145,7 +145,7 @@
 // prompts
 .wrapper-prompt {
   @extend .depth5;
-  @include transition(all $tmg-f3 ease-in-out 0);
+  @include transition(all $tmg-f3 ease-in-out 0s);
   position: fixed;
   top: 0;
   background: $black-t0;
@@ -364,7 +364,7 @@
   }
 
   [class^="icon"] {
-    @include transition (color 0.50s ease-in-out 0);
+    @include transition (color 0.50s ease-in-out 0s);
     @include font-size(22);
     width: flex-grid(1, 12);
     height: ($baseline*1.25);
@@ -531,7 +531,7 @@
   }
 
   [class^="icon"] {
-    @include transition (color 0.50s ease-in-out 0);
+    @include transition (color 0.50s ease-in-out 0s);
     @include font-size(22);
     width: flex-grid(1, 12);
     margin: ($baseline/4) flex-gutter() 0 0;

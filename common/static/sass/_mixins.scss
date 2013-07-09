@@ -117,7 +117,7 @@
 // extends - buttons
 .btn {
   @include box-sizing(border-box);
-  @include transition(color 0.25s ease-in-out 0, border-color 0.25s ease-in-out 0, background 0.25s ease-in-out 0, box-shadow 0.25s ease-in-out 0);
+  @include transition(color 0.25s ease-in-out 0s, border-color 0.25s ease-in-out 0s, background 0.25s ease-in-out 0s, box-shadow 0.25s ease-in-out 0s);
   display: inline-block;
   cursor: pointer;
 

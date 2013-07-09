@@ -256,7 +256,7 @@ body.course.unit {
               color: #3c3c3c;
 
               &:hover {
-                @include transition(background-color $tmg-f2 linear 0);
+                @include transition(background-color $tmg-f2 linear 0s);
                 background: tint($green,30%);
                 color: #fff;
               }
@@ -291,7 +291,7 @@ body.course.unit {
                 float: left;
 
                 [class^="icon-"] {
-                  @include transition(opacity $tmg-f2 linear 0);
+                  @include transition(opacity $tmg-f2 linear 0s);
                   display: inline-block;
                   top: 1px;
                   margin-right: 5px;
@@ -303,7 +303,7 @@ body.course.unit {
               }
 
               .editor-indicator {
-                @include transition(opacity $tmg-f2 linear 0);
+                @include transition(opacity $tmg-f2 linear 0s);
                 float: right;
                 position: relative;
                 top: 3px;
@@ -507,7 +507,6 @@ body.course.unit {
         @include blue-button;
 
         &.is-set {
-          @include transition(box-shadow $tmg-f1 ease-in-out 0);
           @include linear-gradient($blue, $blue);
           color: $blue-d1;
           box-shadow: inset 0 1px 2px 1px $shadow-l1;
@@ -587,7 +586,7 @@ body.course.unit {
       }
 
       &:hover {
-        @include transition(opacity $tmg-f2 ease-in-out);
+        @include transition(opacity $tmg-f2 ease-in-out 0s);
         opacity: 1.0;
       }
 
@@ -673,7 +672,7 @@ body.course.unit {
 
         &:focus {
           box-shadow: 0 0 1px $shadow;
-          @include transition(opacity $tmg-f2 ease-in-out 0);
+          @include transition(opacity $tmg-f2 ease-in-out 0s);
           background-color: $yellow;
         }
 
@@ -698,7 +697,7 @@ body.course.unit {
 
         &:hover {
           box-shadow: 0 1px 1px $shadow;
-          @include transition(opacity $tmg-f2 ease-in-out 0);
+          @include transition(opacity $tmg-f2 ease-in-out 0s);
           background-color: $blue-s3;
           border: 1px solid $blue-s3;
           color: $white;
@@ -956,7 +955,7 @@ body.unit {
 
 
   &:hover {
-    @include transition(opacity $tmg-f2 ease-in-out 0);
+    @include transition(opacity $tmg-f2 ease-in-out 0s);
     opacity: 1.0s;
   }
 }

@@ -36,7 +36,7 @@ div.profile-wrapper {
         padding: lh(.5) 0 lh(.5) lh(.5);
         position: relative;
         text-decoration: none;
-        @include transition();
+        @include transition(none);
 
         div#location_sub, div#language_sub {
           font-weight: bold;

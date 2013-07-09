@@ -289,7 +289,7 @@
           font: normal 1.2rem/1.2rem $sans-serif;
           text-align: center;
           text-shadow: 0 1px rgba(255,255,255, 0.8);
-          @include transition(all, 0.15s, ease-out);
+          @include transition(all 0.15s ease-out 0s);
         }
       }
 

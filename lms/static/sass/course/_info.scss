@@ -113,7 +113,7 @@ div.info-wrapper {
         &.expandable,
         &.collapsable {
           margin: 0 16px 14px 16px;
-          @include transition(all .2s);
+          @include transition(all .2s linear 0s);
 
           h4 {
             color: $link-color;

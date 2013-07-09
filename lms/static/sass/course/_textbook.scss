@@ -38,7 +38,7 @@ div.book-wrapper {
         text-align: right;
         color: #9a9a9a;
         opacity: 0.0;
-        @include transition(opacity .15s);
+        @include transition(opacity .15s linear 0s);
       }
 
       li {
@@ -121,7 +121,7 @@ div.book-wrapper {
             opacity: 0.0;
             filter: alpha(opacity=0);
             text-indent: -9999px;
-            @include transition;
+            @include transition(none);
             vertical-align: middle;
             width: 100%;
 

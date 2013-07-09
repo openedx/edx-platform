@@ -39,7 +39,7 @@
       margin-bottom: 30px;
       position: relative;
       width: 100%;
-      @include transition(all, 0.15s, linear);
+      @include transition(all 0.15s linear 0s);
 
       .status {
         background: $link-color;
@@ -84,7 +84,7 @@
         @include clearfix;
         position: absolute;
         right: -4px;
-        @include transition(all, 0.15s, linear);
+        @include transition(all 0.15s linear 0s);
 
         p {
           color: rgb(255,255,255);

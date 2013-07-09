@@ -14,7 +14,7 @@
 
   .copy {
     @extend .t-copy-sub1;
-    @include transition(opacity $tmg-f2 ease-in-out 0);
+    @include transition(opacity $tmg-f2 ease-in-out 0s);
     opacity: 0.75;
   }
 

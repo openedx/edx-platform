@@ -139,7 +139,7 @@
   }
 
   a {
-    @include transition(color 0.15s ease-in-out, border 0.15s ease-in-out);
+    @include transition(color 0.15s ease-in-out 0s, border 0.15s ease-in-out 0s);
 
     &:link, &:visited, &:hover, &:active {
       color: $link-color-d1;
@@ -259,13 +259,13 @@
       }
 
       label {
-        @include transition(color 0.15s ease-in-out);
+        @include transition(color 0.15s ease-in-out 0s);
         margin: 0 0 ($baseline/4) 0;
         color: tint($black, 20%);
       }
 
       .tip {
-        @include transition(color 0.15s ease-in-out);
+        @include transition(color 0.15s ease-in-out 0s);
         display: block;
         margin-top: ($baseline/4);
         color: $lighter-base-font-color;

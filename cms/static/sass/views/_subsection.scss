@@ -335,7 +335,7 @@ body.course.subsection {
       }
 
       .menu {
-        @include transition(opacity $tmg-f2 linear 0);
+        @include transition(opacity $tmg-f2 linear 0s);
         z-index: 1;
         position: absolute;
         top: -12px;

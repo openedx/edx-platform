@@ -2,7 +2,7 @@ div.calc-main {
   bottom: -126px;
   left: 0;
   position: fixed;
-  @include transition(bottom);
+  @include transition(bottom 0.75s linear 0s);
   -webkit-appearance: none;
   width: 100%;
   z-index: 99;
@@ -131,7 +131,7 @@ div.calc-main {
             position: absolute;
             right: -40px;
             top: -122px;
-            @include transition();
+            @include transition(none);
             width: 600px;
 
             &.shown {

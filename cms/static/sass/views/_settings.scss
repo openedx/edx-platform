@@ -98,7 +98,7 @@ body.course.settings {
 
     .tip {
       @extend .t-copy-sub2;
-      @include transition(color $tmg-f2 ease-in-out 0);
+      @include transition(color $tmg-f2 ease-in-out 0s);
       display: block;
       margin-top: ($baseline/4);
       color: $gray-l3;
@@ -155,7 +155,7 @@ body.course.settings {
 
         label {
           @extend .t-copy-sub1;
-          @include transition(color $tmg-f2 ease-in-out 0);
+          @include transition(color $tmg-f2 ease-in-out 0s);
           margin: 0 0 ($baseline/4) 0;
           font-weight: 400;
 

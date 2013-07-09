@@ -55,7 +55,7 @@ div.video {
         height: 7px;
         margin-left: -1px;
         margin-right: -1px;
-        @include transition(height 2.0s ease-in-out);
+        @include transition(height 2.0s ease-in-out 0s);
 
         div.ui-widget-header {
           background: #777;
@@ -72,7 +72,7 @@ div.video {
           height: 15px;
           margin-left: -7px;
           top: -4px;
-          @include transition(height 2.0s ease-in-out, width 2.0s ease-in-out);
+          @include transition(height 2.0s ease-in-out 0s, width 2.0s ease-in-out 0s);
           width: 15px;
 
           &:focus, &:hover {
@@ -101,7 +101,7 @@ div.video {
             line-height: 46px;
             padding: 0 lh(.75);
             text-indent: -9999px;
-            @include transition(background-color, opacity);
+            @include transition(background-color 0.75s linear 0s, opacity 0.75s linear 0s);
             width: 14px;
             background: url('../images/vcr.png') 15px 15px no-repeat;
             outline: 0;
@@ -176,7 +176,7 @@ div.video {
             margin-right: 0;
             padding-left: 15px;
             position: relative;
-            @include transition();
+            @include transition(none);
             -webkit-font-smoothing: antialiased;
             width: 116px;
             outline: 0;
@@ -214,7 +214,7 @@ div.video {
           // fix for now
           ol.video_speeds {
             box-shadow: inset 1px 0 0 #555, 0 3px 0 #444;
-            @include transition();
+            @include transition(none);
             background-color: #444;
             border: 1px solid #000;
             bottom: 46px;
@@ -284,7 +284,7 @@ div.video {
             margin-right: 0;
             padding-left: 15px;
             position: relative;
-            @include transition();
+            @include transition(none);
             -webkit-font-smoothing: antialiased;
             width: 30px;
 
@@ -295,7 +295,7 @@ div.video {
 
           .volume-slider-container {
             box-shadow: inset 1px 0 0 #555, 0 3px 0 #444;
-            @include transition();
+            @include transition(none);
             background-color: #444;
             border: 1px solid #000;
             bottom: 46px;
@@ -325,7 +325,7 @@ div.video {
                 cursor: pointer;
                 height: 15px;
                 left: -6px;
-                @include transition(height 2.0s ease-in-out, width 2.0s ease-in-out);
+                @include transition(height 2.0s ease-in-out 0s, width 2.0s ease-in-out 0s);
                 width: 15px;
               }
 
@@ -347,7 +347,7 @@ div.video {
           margin-left: 0;
           padding: 0 lh(.5);
           text-indent: -9999px;
-          @include transition();
+          @include transition(none);
           width: 30px;
 
           &:hover {
@@ -368,7 +368,7 @@ div.video {
           margin-left: 0;
           padding: 0 lh(.5);
           text-indent: -9999px;
-          @include transition();
+          @include transition(none);
           width: 30px;
 
           &:hover {
@@ -397,7 +397,7 @@ div.video {
           padding: 0 lh(.5);
           position: relative;
           text-indent: -9999px;
-          @include transition();
+          @include transition(none);
           -webkit-font-smoothing: antialiased;
           width: 30px;
 
@@ -542,7 +542,7 @@ div.video {
       position: fixed;
       right: 0;
       top: 0;
-      @include transition();
+      @include transition(none);
 
       li {
         color: #aaa;

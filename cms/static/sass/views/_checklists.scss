@@ -55,13 +55,13 @@ body.course.checklists {
       padding: $baseline ($baseline*1.5);
 
       .checklist-title {
-        @include transition(color $tmg-f2 ease-in-out 0);
+        @include transition(color $tmg-f2 ease-in-out 0s);
         width: flex-grid(6, 9);
         margin: 0 flex-gutter() 0 0;
         float: left;
 
         .ui-toggle-expansion {
-          @include transition(all $tmg-f2 ease-in-out 0);
+          @include transition(all $tmg-f2 ease-in-out 0s);
           @include font-size(21);
           display: inline-block;
           vertical-align: middle;
@@ -208,7 +208,7 @@ body.course.checklists {
     overflow: hidden;
 
     .task {
-      @include transition(background $tmg-f2 ease-in-out 0, border $tmg-f3 ease-in-out 0);
+      @include transition(background $tmg-f2 ease-in-out 0s, border $tmg-f3 ease-in-out 0s);
       @include clearfix();
       position: relative;
       border-top: 1px solid $white;
@@ -238,7 +238,7 @@ body.course.checklists {
         font-weight: 500;
 
         .task-name {
-          @include transition(color $tmg-f2 ease-in-out 0);
+          @include transition(color $tmg-f2 ease-in-out 0s);
           vertical-align: baseline;
           cursor: pointer;
           margin-bottom: 0;
@@ -246,13 +246,13 @@ body.course.checklists {
 
         .task-description {
           @extend .t-copy-sub1;
-          @include transition(color $tmg-f2 ease-in-out 0);
+          @include transition(color $tmg-f2 ease-in-out 0s);
           color: $gray-l2;
         }
 
         .task-support {
           @extend .t-copy-sub2;
-          @include transition(opacity $tmg-f2 ease-in-out 0);
+          @include transition(opacity $tmg-f2 ease-in-out 0s);
           opacity: 0.0;
           pointer-events: none;
         }

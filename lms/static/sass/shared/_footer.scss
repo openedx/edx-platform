@@ -16,7 +16,7 @@
     }
 
     a {
-      @include transition(link-color 0.15s ease-in-out, border 0.15s ease-in-out);
+      @include transition(link-color 0.15s ease-in-out 0s, border 0.15s ease-in-out 0s);
 
       &:link, &:visited, &:hover, &:active {
         border-bottom: none;

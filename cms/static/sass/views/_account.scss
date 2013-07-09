@@ -70,7 +70,7 @@ body.signup, body.signin {
         .action-primary {
           @include blue-button;
           @extend .t-action2;
-          @include transition(all $tmg-f3 linear 0);
+          @include transition(all $tmg-f3 linear 0s);
           display: block;
           width: 100%;
           padding: ($baseline*0.75) ($baseline/2);
@@ -109,7 +109,7 @@ body.signup, body.signin {
 
           label {
             @extend  .t-copy-sub1;
-            @include transition(color $tmg-f3 ease-in-out 0);
+            @include transition(color $tmg-f3 ease-in-out 0s);
             margin: 0 0 ($baseline/4) 0;
 
             &.is-focused {
@@ -172,7 +172,7 @@ body.signup, body.signin {
 
           .tip {
             @extend .t-copy-sub2;
-            @include transition(color $tmg-f3 ease-in-out 0);
+            @include transition(color $tmg-f3 ease-in-out 0s);
             display: block;
             margin-top: ($baseline/4);
             color: $gray-l3;

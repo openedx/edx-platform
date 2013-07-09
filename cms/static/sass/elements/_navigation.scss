@@ -33,7 +33,7 @@ nav {
     }
 
     .ui-toggle-dd {
-      @include transition(all $tmg-f2 ease-in-out 0);
+      @include transition(all $tmg-f2 ease-in-out 0s);
       margin-left: ($baseline/10);
       display: inline-block;
       vertical-align: middle;

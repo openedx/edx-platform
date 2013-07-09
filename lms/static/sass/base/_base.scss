@@ -64,7 +64,7 @@ p {
     color: $link-color;
     font: normal 1em/1em $serif;
     text-decoration: none;
-    @include transition(all, 0.1s, linear);
+    @include transition(all 0.1s linear 0s);
 
     &:hover {
       color: $link-color;
@@ -77,7 +77,7 @@ a:link, a:visited {
   color: $link-color;
   font: normal 1em/1em $sans-serif;
   text-decoration: none;
-  @include transition(all, 0.1s, linear);
+  @include transition(all 0.1s linear 0s);
 
   &:hover {
     text-decoration: underline;
