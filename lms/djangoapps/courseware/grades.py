@@ -120,6 +120,7 @@ def answer_distributions(request, course):
 
 
 def grade(student, request, course, model_data_cache=None, keep_raw_scores=False):
+
     """
     This grades a student as quickly as possible. It returns the
     output from the course grader, augmented with the final letter
@@ -337,7 +338,6 @@ def progress_summary(student, request, course, model_data_cache):
     will return None.
 
     """
-
     # TODO: We need the request to pass into here. If we could forego that, our arguments
     # would be simpler
     course_module = get_module(student, request, course.location, model_data_cache, course.id, depth=None)
@@ -394,6 +394,7 @@ def progress_summary(student, request, course, model_data_cache):
             'url_name': chapter_module.url_name,
             'sections': sections
         })
+        return chapters
 
 
 def get_score(course_id, user, problem_descriptor, module_creator, model_data_cache):
