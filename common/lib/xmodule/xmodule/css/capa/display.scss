@@ -566,7 +566,7 @@ section.problem {
     }
 
     .save {
-      @extend .blue-button;
+      @extend .blue-button !optional;
     }
 
     .show {

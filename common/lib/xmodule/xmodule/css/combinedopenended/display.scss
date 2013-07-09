@@ -577,7 +577,7 @@ section.open-ended-child {
     margin-top: 20px;
 
     input.save {
-      @extend .blue-button;
+      @extend .blue-button !optional;
     }
 
     .submission_feedback {
