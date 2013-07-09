@@ -1,9 +1,8 @@
 CMS.Views.SectionShow = Backbone.View.extend({
-template: _.template('<span data-tooltip="<%= sometext %>" class="section-name-span"><%= name %></span>'),
+    template: _.template('<span data-tooltip="<%= gettext("Edit this section\'s name") %>" class="section-name-span"><%= name %></span>'),
     render: function() {
         var attrs = {
-            name: gettext(this.model.escape('name')),
-            sometext: gettext("Edit this section\'s name") 
+            name: this.model.escape('name')
         };
         this.$el.html(this.template(attrs));
         this.delegateEvents();
