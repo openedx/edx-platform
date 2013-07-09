@@ -6,25 +6,32 @@ from course_creators.models import CourseCreator
 from django.contrib import admin
 
 
+def get_email(obj):
+    """ Returns the email address for a user """
+    return obj.user.email
+
+get_email.short_description = 'email'
+
+
 class CourseCreatorAdmin(admin.ModelAdmin):
     """
     Admin for the course creator table.
     """
 
     # Fields to display on the overview page.
-    list_display = ['username', 'email', 'state', 'state_changed', 'note']
-    readonly_fields = ['username', 'email', 'state_changed']
+    list_display = ['user', get_email, 'state', 'state_changed', 'note']
+    readonly_fields = ['user', 'state_changed']
     # Controls the order on the edit form (without this, read-only fields appear at the end).
     fieldsets = (
         (None, {
-            'fields': list_display
+            'fields': ['user', 'state', 'state_changed', 'note']
         }),
     )
     # Fields that filtering support
     list_filter = ['state', 'state_changed']
     # Fields that search supports. Note that the search term for state has to be
     # its key (ie, 'g' instead of 'granted').
-    search_fields = ['username', 'email', 'state', 'note']
+    search_fields = ['user__username', 'user__email', 'state', 'note']
     # Turn off the action bar (we have no bulk actions)
     actions = None
 

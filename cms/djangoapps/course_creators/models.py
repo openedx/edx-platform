@@ -4,7 +4,8 @@ Table for storing information about whether or not Studio users have course crea
 from django.db import models
 from django.db.models.signals import post_init, post_save
 from django.dispatch import receiver
-from auth.authz import add_user_to_creator_group, remove_user_from_creator_group, get_user_by_email
+from django.contrib.auth.models import User
+from auth.authz import add_user_to_creator_group, remove_user_from_creator_group
 
 from django.utils import timezone
 
@@ -19,8 +20,7 @@ class CourseCreator(models.Model):
               (u'd', u'denied'),
              )
 
-    username = models.CharField(max_length=64, blank=False, help_text="Studio username", primary_key=True, unique=True)
-    email = models.CharField(max_length=128, blank=False, help_text="Registered e-mail address")
+    user = models.ForeignKey(User, help_text="Studio user", unique=True)
     state_changed = models.DateTimeField('state last updated', auto_now_add=True,
                                          help_text='The date when state was last updated')
     state = models.CharField(max_length=1, blank=False, choices=STATES, default='u',
@@ -29,45 +29,34 @@ class CourseCreator(models.Model):
                                                                   'why course creation access was denied)')
 
     def __unicode__(self):
-        s = "%str %str | %str [%str] | %str" % (self.username, self.email, self.state, self.state_changed, self.note)
+        s = "%str %str | %str [%str] | %str" % (self.user.username, self.user.email, self.state, self.state_changed, self.note)
         return s
 
 
 @receiver(post_init, sender=CourseCreator)
 def post_init_callback(sender, **kwargs):
     """
-    Extend to remove deleted users and store previous state.
+    Extend to store previous state.
     """
     instance = kwargs['instance']
-    user = get_user_by_email(instance.email)
-    if user is None:
-        # User has been removed, delete from this table.
-        instance.delete()
-    else:
-        instance.orig_state = instance.state
+    instance.orig_state = instance.state
 
 
 @receiver(post_save, sender=CourseCreator)
 def post_save_callback(sender, **kwargs):
     """
-    Extend to remove deleted users, update state_changed time,
-    and modify the course creator group in authz.py.
+    Extend to update state_changed time and modify the course creator group in authz.py.
     """
     instance = kwargs['instance']
     # We only wish to modify the state_changed time if the state has been modified. We don't wish to
     # modify it for changes to the notes field.
     if instance.state != instance.orig_state:
-        user = get_user_by_email(instance.email)
-        if user is None:
-            # User has been removed, delete from this table.
-            instance.delete()
+        instance.state_changed = timezone.now()
+        if instance.state == 'g':
+            # We have granted access, add to course group
+            add_user_to_creator_group(instance.admin, instance.user)
         else:
-            instance.state_changed = timezone.now()
-            if instance.state == 'g':
-                # We have granted access, add to course group
-                add_user_to_creator_group(instance.admin, user)
-            else:
-                remove_user_from_creator_group(instance.admin, user)
+            remove_user_from_creator_group(instance.admin, instance.user)
 
-            instance.orig_state = instance.state
-            instance.save()
+        instance.orig_state = instance.state
+        instance.save()

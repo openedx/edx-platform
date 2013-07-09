@@ -29,17 +29,21 @@ def add_user_with_status_granted(caller, user):
 
 def get_course_creator_status(user):
     """
-    Returns the status for a particular user.
+    Returns the status for a particular user, or None if user is not in the table.
 
     Possible return values are:
         'g' = 'granted'
         'u' = 'unrequested'
         'p' = 'pending'
         'd' = 'denied'
+        None = user does not exist in the table
     """
-    user = CourseCreator.objects.filter(username=user.username)
-    assert user.count() == 1, "The user does not exist in the table."
-    return user[0].state
+    user = CourseCreator.objects.filter(user=user)
+    if user.count() == 0:
+        return None
+    else:
+        # User is defined to be unique, can assume a single entry.
+        return user[0].state
 
 
 def _add_user(caller, user, state):
@@ -49,6 +53,6 @@ def _add_user(caller, user, state):
     if not caller.is_active or not caller.is_authenticated or not caller.is_staff:
         raise PermissionDenied
 
-    if CourseCreator.objects.filter(username=user.username).count() == 0:
-        entry = CourseCreator(username=user.username, email=user.email, state=state)
+    if CourseCreator.objects.filter(user=user).count() == 0:
+        entry = CourseCreator(user=user, state=state)
         entry.save()

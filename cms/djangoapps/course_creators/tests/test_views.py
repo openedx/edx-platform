@@ -35,8 +35,7 @@ class CourseCreatorView(TestCase):
             add_user_with_status_unrequested(self.user, self.user)
 
     def test_table_initially_empty(self):
-        with self.assertRaises(AssertionError):
-            get_course_creator_status(self.user)
+        self.assertIsNone(get_course_creator_status(self.user))
 
     def test_add_unrequested(self):
         add_user_with_status_unrequested(self.admin, self.user)

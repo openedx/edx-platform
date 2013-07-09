@@ -21,7 +21,7 @@ class CourseCreatorAdminTest(TestCase):
     def setUp(self):
         """ Test case setup """
         self.user = User.objects.create_user('test_user', 'test_user+courses@edx.org', 'foo')
-        self.table_entry = CourseCreator(username=self.user.username, email=self.user.email)
+        self.table_entry = CourseCreator(user=self.user)
         self.table_entry.save()
 
         self.admin = User.objects.create_user('Mark', 'admin+courses@edx.org', 'foo')
@@ -64,15 +64,3 @@ class CourseCreatorAdminTest(TestCase):
             # and change state back to 'u' (unrequested)
             change_state('u', False)
 
-
-    def test_delete_bad_user(self):
-        """
-        Tests that users who no longer exist are deleted from the table.
-        """
-        with mock.patch.dict('django.conf.settings.MITX_FEATURES', {"ENABLE_CREATOR_GROUP": True}):
-            self.assertEqual('test_user', self.table_entry.username)
-            self.user.delete()
-            # Go through the post-save update, which will delete users who no longer exist.
-            self.table_entry.state = 'g'
-            self.creator_admin.save_model(self.request, self.table_entry, None, True)
-            self.assertEqual(None, self.table_entry.username)
