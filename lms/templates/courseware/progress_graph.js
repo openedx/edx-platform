@@ -52,8 +52,6 @@ $(function () {
 
       categoryData['data'].append( [tickIndex, section['percent']] )
       if 'projected_percent' in section:
-          print 'Adding gray bar. ' + section['category']
-          print str(section['projected_percent']) + ', ' + str(section['percent'])
           inProgressData.append([
               tickIndex,
               section['projected_percent']
