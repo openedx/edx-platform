@@ -230,6 +230,15 @@ def compute_graded_total(section, student, course_id, model_data_cache, request)
 
 def find_should_grade_section(xmoduledescriptors, model_data_cache, student_id):
 
+    """
+    Determines whether a section should be graded or not.
+
+    If the moduledescriptor is found in the model data cache, it should be graded.
+    Also, if any moduledescriptor in a section should be graded, the entire section should be.
+
+    @return True or False
+    """
+
     should_grade_section = False
 
     # If we haven't seen a single problem in the section, we don't have to grade it at all! We can assume 0%
