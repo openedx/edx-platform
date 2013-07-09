@@ -90,8 +90,8 @@ class WikiRedirectTestCase(LoginEnrollmentTestCase):
         """
         Ensure that the response has the course navigator.
         """
-        self.assertTrue("course info" in resp.content.lower())
-        self.assertTrue("courseware" in resp.content.lower())
+        self.assertIn("course info", resp.content.lower())
+        self.assertIn("courseware", resp.content.lower())
 
     def test_course_navigator(self):
         """"
