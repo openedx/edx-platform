@@ -3,5 +3,5 @@
 
 <section class="outside-app">
   <h1>${_("There has been a 500 error on the <em>%s</em> servers") % settings.PLATFORM_NAME}</h1>
-  <p>${_("Please wait a few seconds and then reload the page. If the problem persists, please email us at <a href=\"%s\">%s</a>.") % {settings.TECH_SUPPORT_EMAIL, settings.TECH_SUPPORT_EMAIL}}</p>
+  <p>${_('Please wait a few seconds and then reload the page. If the problem persists, please email us at <a href="{email}">{email}</a>.').format(email=settings.TECH_SUPPORT_EMAIL)}</p>
 </section>

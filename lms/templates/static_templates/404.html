@@ -5,5 +5,5 @@
 
 <section class="outside-app">
 <h1>${_("Page not found")}</h1>
-<p>${_('The page that you were looking for was not found. Go back to the <a href="/">homepage</a> or let us know about any pages that may have been moved at <a href="mailto:%s">%s</a>.') % {settings.TECH_SUPPORT_EMAIL, settings.TECH_SUPPORT_EMAIL}}</p>
+<p>${_('The page that you were looking for was not found. Go back to the <a href="/">homepage</a> or let us know about any pages that may have been moved at <a href="mailto:{email}">{email}</a>.').format(email=settings.TECH_SUPPORT_EMAIL)}</p>
 </section>
