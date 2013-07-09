@@ -26,7 +26,7 @@ def seed():
 modulestore_options = {
     'default_class': 'xmodule.raw_module.RawDescriptor',
     'host': 'localhost',
-    'db': 'test_xmodule',
+    'db': 'acceptance_xmodule',
     'collection': 'acceptance_modulestore_%s' % seed(),
     'fs_root': TEST_ROOT / "data",
     'render_template': 'mitxmako.shortcuts.render_to_string',
