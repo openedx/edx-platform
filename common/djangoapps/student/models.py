@@ -68,6 +68,18 @@ class UserProfile(models.Model):
     language = models.CharField(blank=True, max_length=255, db_index=True)
     location = models.CharField(blank=True, max_length=255, db_index=True)
 
+    # Area of Interest to provide recommended courses
+    COURSE_CATEGORIES = (('CS','Computer Science'),
+    		 ('HSS', 'Humanities'),
+			 ('MB','Medical'),
+			 ('EC','Electronics'),
+			 ('other','Other')
+			)
+    area_of_interest = models.CharField(
+			 blank=True, null= True, max_length=5, db_index=True,
+			choices=COURSE_CATEGORIES
+			)
+
     # Optional demographic data we started capturing from Fall 2012
     this_year = datetime.now().year
     VALID_YEARS = range(this_year, this_year - 120, -1)
@@ -111,6 +123,23 @@ class UserProfile(models.Model):
 
 TEST_CENTER_STATUS_ACCEPTED = "Accepted"
 TEST_CENTER_STATUS_ERROR = "Error"
+
+
+class CourseCategories(models.Model):
+    class Meta:
+	db_table="course_categories"	
+    courseName = models.TextField(blank=True, null=True)
+    organization = models.TextField(blank=True,null=True)
+    courseNumber = models.TextField(blank=True,null=True)
+    COURSE_CATEGORIES = (('CS','Computer Science'),
+			 ('HSS','Humanities'),
+			 ('MB','Medical'),
+			 ('EC','Electronics'),
+			 ('other','Other')
+			) 
+    courseCategory=models.CharField(blank=True, null=True, max_length=6, db_index=True,
+				      choices=COURSE_CATEGORIES)
+			 
 
 
 class TestCenterUser(models.Model):
@@ -650,7 +679,7 @@ class CourseEnrollment(models.Model):
         unique_together = (('user', 'course_id'),)
 
     def __unicode__(self):
-        return "[CourseEnrollment] %s: %s (%s)" % (self.user, self.course_id, self.created)
+        return "[CourseEnrollment] %s: %s (%s) " % (self.user, self.course_id, self.created)
 
 
 class CourseEnrollmentAllowed(models.Model):
@@ -717,7 +746,6 @@ def change_name(email, new_name):
     u, up = get_user(email)
     up.name = new_name
     up.save()
-
 
 def user_count():
     print "All users", User.objects.all().count()

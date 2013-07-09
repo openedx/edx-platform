@@ -21,7 +21,7 @@ from contentstore.utils import get_lms_link_for_item, add_extra_panel_tab, remov
 from models.settings.course_details import CourseDetails, CourseSettingsEncoder
 from models.settings.course_grading import CourseGradingModel
 from models.settings.course_metadata import CourseMetadata
-from auth.authz import create_all_course_groups, is_user_in_creator_group
+from auth.authz import create_all_course_groups
 from util.json_request import expect_json
 
 from .access import has_access, get_location_and_verify_access
@@ -33,6 +33,9 @@ from .component import OPEN_ENDED_COMPONENT_TYPES, \
 from django_comment_common.utils import seed_permissions_roles
 import datetime
 from django.utils.timezone import UTC
+
+from student.models import CourseCategories 
+
 __all__ = ['course_index', 'create_new_course', 'course_info',
            'course_info_updates', 'get_course_settings',
            'course_config_graders_page',
@@ -81,7 +84,7 @@ def course_index(request, org, course, name):
 @expect_json
 def create_new_course(request):
 
-    if not is_user_in_creator_group(request.user):
+    if settings.MITX_FEATURES.get('DISABLE_COURSE_CREATION', False) and not request.user.is_staff:
         raise PermissionDenied()
 
     # This logic is repeated in xmodule/modulestore/tests/factories.py
@@ -93,6 +96,9 @@ def create_new_course(request):
     org = request.POST.get('org')
     number = request.POST.get('number')
     display_name = request.POST.get('display_name')
+    course_category = request.POST.get('coursecategory')
+
+
 
     try:
         dest_location = Location('i4x', org, number, 'course', Location.clean(display_name))
@@ -116,6 +122,10 @@ def create_new_course(request):
     if len(courses) > 0:
         return HttpResponse(json.dumps({'ErrMsg': 'There is already a course defined with the same organization and course number.'}))
 
+
+    # Add the course in the course_categories additional table
+    p = CourseCategories(courseName=display_name,organization=org,courseNumber=number,courseCategory=course_category) 
+    p.save()
     new_course = modulestore('direct').clone_item(template, dest_location)
 
     # clone a default 'about' module as well

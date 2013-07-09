@@ -136,42 +136,37 @@
         % else:
 
         <div class="message">
-          <h3 class="message-title">Welcome ${extauth_id}</h3>
+          <h3 class="message-title">Welcome ${extauth_email}</h3>
           <p class="message-copy">Enter a public username:</p>
         </div>
 
         <ol class="list-input">
-          
-          % if ask_for_email:
-
-          <li class="field required text" id="field-email">
-            <label for="email">E-mail</label>
-            <input class="" id="email" type="email" name="email" value="" placeholder="example: username@domain.com" />
-          </li>
-          
-          % endif
-          
           <li class="field required text" id="field-username">
             <label for="username">Public Username</label>
             <input id="username" type="text" name="username" value="${extauth_username}" placeholder="example: JaneDoe" required aria-required="true" />
             <span class="tip tip-input">Will be shown in any discussions or forums you participate in</span>
           </li>
-          
-          % if ask_for_fullname:
-          
-          <li class="field required text" id="field-name">
-            <label for="name">Full Name</label>
-            <input id="name" type="text" name="name" value="" placeholder="example: Jane Doe" />
-            <span class="tip tip-input">Needed for any certificates you may earn <strong>(cannot be changed later)</strong></span>
-          </li>
-          
-          % endif
-          
         </ol>
 
         % endif
       </fieldset>
 
+<!-- Area of interest to provide recommended courses -->
+      <fieldset class="group group-form group-form-secondary group-form-personalinformation">
+  <legend class="sr">Area of Interest</legend>
+	<ol class="list-input">
+	  <li class="field-group">
+	    <div class="field select" id="field-interest">
+		<label for="interest">Area of Interest</label>
+		<select id="interest" name="area_of_interest">
+			<option value="">--<option>
+			%for code, category in UserProfile.COURSE_CATEGORIES:
+			<option value="${code}">${category}</option>
+			%endfor
+		</select>
+	    </div>
+      </fieldset>
+	
       <fieldset class="group group-form group-form-secondary group-form-personalinformation">
         <legend class="sr">Optional Personal Information</legend>
 
@@ -231,15 +226,10 @@
 
         <ol class="list-input">
           <li class="field-group">
-
-            % if has_extauth_info is UNDEFINED or ask_for_tos :
-
             <div class="field required checkbox" id="field-tos">
               <input id="tos-yes" type="checkbox" name="terms_of_service" value="true" required aria-required="true" />
               <label for="tos-yes">I agree to the <a href="${marketing_link('TOS')}" class="new-vp">Terms of Service</a></label>
             </div>
-
-            % endif
 
             <div class="field required checkbox" id="field-honorcode">
               <input id="honorcode-yes" type="checkbox" name="honor_code" value="true" />
@@ -272,8 +262,6 @@
       <h3 class="sr">Registration Help</h3>
     </header>
 
-    % if has_extauth_info is UNDEFINED:
-
     <div class="cta">
       <h3>Already registered?</h3>
       <p class="instructions">
@@ -282,8 +270,6 @@
         </a>
       </p>
     </div>
-      
-    % endif
 
     ## TODO: Use a %block tag or something to allow themes to
     ##       override in a more generalizable fashion.
