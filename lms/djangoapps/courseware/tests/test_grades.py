@@ -380,20 +380,6 @@ class TestGetScore(unittest.TestCase):
         self.fake_model_data_cache = MagicMock()
         self.fake_model_data_cache.find = fake_find_key
 
-        self.course_id = None
-
-    def test_correct(self):
-
-        user = MagicMock()
-        user.id = (5.0, 7.0)  # fed into fake_find_key(key)'s output
-        user.is_authenticated = lambda: True
-
-        problem_descriptor = MagicMock()
-        problem_descriptor.always_recalculate_grades = False
-        problem_descriptor.has_score = True
-        problem_descriptor.location = "problem location"  # if not None, problem descriptor is "found" by fake_find_key
-        problem_descriptor.weight = None
-
         def module_creator(descriptor):
             #Returns a problem mock
             output = MagicMock()
@@ -401,59 +387,108 @@ class TestGetScore(unittest.TestCase):
             output.max_score = lambda: 9.0
             return output
 
+        self.module_creator = module_creator
+
+        self.course_id = None
+
+        self.user = MagicMock()
+        self.user.id = (5.0, 7.0)  # fed into fake_find_key(key)'s output
+        self.user.is_authenticated = lambda: True
+
+        self.problem_descriptor = MagicMock()
+        self.problem_descriptor.always_recalculate_grades = False
+        self.problem_descriptor.has_score = True
+        # if .location is not None, problem descriptor is "found" by fake_find_key
+        self.problem_descriptor.location = "problem location"
+        self.problem_descriptor.weight = None
+
+        self.call_result = lambda: grades.get_score(
+            self.course_id, self.user, self.problem_descriptor, self.module_creator, self.fake_model_data_cache
+        )
+
+    def test_simple(self):
+
         model_data_cache = self.fake_model_data_cache
 
-        result = grades.get_score(self.course_id, user, problem_descriptor, module_creator, model_data_cache)
-
-        self.assertEquals(result, (5.0, 7.0))
+        self.assertEquals(self.call_result(), (5.0, 7.0))
 
     def test_not_in_cache(self):
 
-        user = MagicMock()
-        user.id = (5.0, 7.0)  # fed into fake_find_key(key)'s output
-        user.is_authenticated = lambda: True
-
-        problem_descriptor = MagicMock()
-        problem_descriptor.always_recalculate_grades = False
-        problem_descriptor.has_score = True
-        problem_descriptor.location = None  # if not None, problem descriptor is "found" by fake_find_key
-        problem_descriptor.weight = None
-
-        def module_creator(descriptor):
-            #Returns a problem mock
-            output = MagicMock()
-            output.get_score = lambda: {'score': 8.0, 'total': 9.0}
-            output.max_score = lambda: 9.0
-            return output
-
-        model_data_cache = self.fake_model_data_cache
-
-        result = grades.get_score(self.course_id, user, problem_descriptor, module_creator, model_data_cache)
+        self.problem_descriptor.location = None
 
         #0/9 instead of 8/9 because if the problem is not in the cache, we assume it is ungraded.
-        self.assertEquals(result, (0.0, 9.0))
+        self.assertEquals(self.call_result(), (0.0, 9.0))
 
     def test_always_recalculate(self):
 
-        user = MagicMock()
-        user.id = (5.0, 7.0)  # fed into fake_find_key(key)'s output
-        user.is_authenticated = lambda: True
+        self.problem_descriptor.always_recalculate_grades = True
 
-        problem_descriptor = MagicMock()
-        problem_descriptor.always_recalculate_grades = True
-        problem_descriptor.has_score = True
-        problem_descriptor.location = "something"  # if not None, problem descriptor is "found" by fake_find_key
-        problem_descriptor.weight = None
+        self.assertEquals(self.call_result(), (8.0, 9.0))
+
+    def test_reweight(self):
+
+        self.problem_descriptor.weight = 14.0
+
+        self.assertEquals(self.call_result(), (10.0, 14.0))
+
+    def test_failed_reweight(self):
+
+        self.user.id = (0.0, 0.0)
+        self.problem_descriptor.weight = 14.0
+
+        self.assertEquals(self.call_result(), (0.0, 0.0))
+
+    def test_unauthenticated(self):
+
+        self.user.is_authenticated = lambda: False
+
+        self.assertEquals(self.call_result(), (None, None))
+
+    def test_not_has_score(self):
+
+        self.problem_descriptor.has_score = False
+
+        self.assertEquals(self.call_result(), (None, None))
+
+    def test_student_module_grade_is_none(self):
+
+        def fake_find_key(key):
+            return None
+        self.fake_model_data_cache.find = fake_find_key
+
+        self.assertEquals(self.call_result(), (0.0, 9.0))
+
+    def test_always_recalculate_get_score_is_none(self):
 
         def module_creator(descriptor):
             #Returns a problem mock
             output = MagicMock()
-            output.get_score = lambda: {'score': 8.0, 'total': 9.0}
+            output.get_score = lambda: None
             output.max_score = lambda: 9.0
             return output
+        self.module_creator = module_creator
+        self.problem_descriptor.always_recalculate_grades = True
 
-        model_data_cache = self.fake_model_data_cache
+        self.assertEquals(self.call_result(), (None, None))
 
-        result = grades.get_score(self.course_id, user, problem_descriptor, module_creator, model_data_cache)
+    def test_not_in_cache_and_module_creator_returns_none(self):
 
-        self.assertEquals(result, (8.0, 9.0))
+        def module_creator(descriptor):
+            return None
+        self.module_creator = module_creator
+        self.problem_descriptor.location = None
+
+        self.assertEquals(self.call_result(), (None, None))
+
+    def test_not_in_cache_and_total_is_none(self):
+
+        def module_creator(descriptor):
+            #Returns a problem mock
+            output = MagicMock()
+            output.get_score = lambda: {'score': 8.0, 'total': None}
+            output.max_score = lambda: None
+            return output
+        self.module_creator = module_creator
+        self.problem_descriptor.location = None
+
+        self.assertEquals(self.call_result(), (None, None))
