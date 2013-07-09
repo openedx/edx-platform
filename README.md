@@ -19,9 +19,11 @@ installation process.
 5. Open a terminal
 6. Download the project: `git clone git://github.com/edx/edx-platform.git`
 7. Enter the project directory: `cd edx-platform/`
-8. Start: `vagrant up`
+8. (Windows only) Make sure files have the proper line ending: 
+   `git rm --cached -r . && git reset --hard`
+9. Start: `vagrant up`
 
-The last step might require your administrator password to setup NFS.
+The last step might require your host machine's administrator password to setup NFS.
 
 Afterwards, it will download an image, install all the dependencies and configure
 the VM. It will take a while, go grab a coffee.
@@ -30,11 +32,15 @@ Once completed, hopefully you should see a "Success!" message indicating that th
 installation went fine. (If not, refer to the 
 [troubleshooting section](https://github.com/edx/edx-platform/wiki/Simplified-install-with-vagrant#troubleshooting).)
 
+Note: by default, the VM will get the IP `192.168.20.40`. If you need to use a 
+different IP, you can edit the file `Vagrantfile`. If you have already started the 
+VM with `vagrant up`, see "Stopping and restarting the VM" below to take the change 
+into account.
+
 Accessing the VM
 ----------------
 
-Vagrant should automatically log you in the virtual machine once the installation
-is finished. You can also type, from another terminal:
+Once the installation is finished, to log into the virtual machine:
 
 ```
 $ vagrant ssh
@@ -70,6 +76,26 @@ Once started, open the following URLs in your browser:
 You can develop by editing the files directly in the `edx-platform/` directory you
 downloaded before, you don't need to connect to the VM to edit them (the VM uses
 those files to run edX, mirroring the folder in `/opt/edx/edx-platform`).
+
+You may also want to create a super-user with:
+
+```
+$ rake django-admin["createsuperuser"]
+```
+
+Also note that if you register a new user through the web interface,
+the activiation email will be posted to your VM's terminal window (search for
+lines similar to):
+
+```
+Subject: Your account for edX Studio
+From: registration@edx.org
+```
+
+and find the activation URL for the account you've created.
+
+See the [Frequently Asked Questions](https://github.com/edx/edx-platform/wiki/Frequently-Asked-Questions)
+for more usage tips.
 
 Stopping & starting
 -------------------
