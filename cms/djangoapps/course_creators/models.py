@@ -3,12 +3,13 @@ Table for storing information about whether or not Studio users have course crea
 """
 from django.db import models
 from django.db.models.signals import post_init, post_save
-from django.dispatch import receiver
+from django.dispatch import receiver, Signal
 from django.contrib.auth.models import User
-from auth.authz import add_user_to_creator_group, remove_user_from_creator_group
 
 from django.utils import timezone
 
+# A signal that will be sent when users should be added or removed from the creator group
+update_creator_state = Signal(providing_args=["caller", "user", "add"])
 
 class CourseCreator(models.Model):
     """
@@ -52,12 +53,12 @@ def post_save_callback(sender, **kwargs):
     # We only wish to modify the state_changed time if the state has been modified. We don't wish to
     # modify it for changes to the notes field.
     if instance.state != instance.orig_state:
+        update_creator_state.send(
+            sender=sender,
+            caller=instance.admin,
+            user=instance.user,
+            add=instance.state == 'g'
+        )
         instance.state_changed = timezone.now()
-        if instance.state == 'g':
-            # We have granted access, add to course group
-            add_user_to_creator_group(instance.admin, instance.user)
-        else:
-            remove_user_from_creator_group(instance.admin, instance.user)
-
         instance.orig_state = instance.state
         instance.save()

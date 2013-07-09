@@ -2,8 +2,11 @@
 django admin page for the course creators table
 """
 
-from course_creators.models import CourseCreator
+from course_creators.models import CourseCreator, update_creator_state
+from course_creators.views import update_course_creator_group
+
 from django.contrib import admin
+from django.dispatch import receiver
 
 
 def get_email(obj):
@@ -51,3 +54,11 @@ class CourseCreatorAdmin(admin.ModelAdmin):
 
 
 admin.site.register(CourseCreator, CourseCreatorAdmin)
+
+
+@receiver(update_creator_state, sender=CourseCreator)
+def update_creator_group_callback(sender, **kwargs):
+    """
+    Callback for when the model's creator status has changed.
+    """
+    update_course_creator_group(kwargs['caller'], kwargs['user'], kwargs['add'])

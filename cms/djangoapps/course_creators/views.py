@@ -4,7 +4,7 @@ Methods for interacting programmatically with the user creator table.
 from course_creators.models import CourseCreator
 from django.core.exceptions import PermissionDenied
 
-from auth.authz import add_user_to_creator_group
+from auth.authz import add_user_to_creator_group, remove_user_from_creator_group
 
 
 def add_user_with_status_unrequested(caller, user):
@@ -27,7 +27,19 @@ def add_user_with_status_granted(caller, user):
     This method also adds the user to the course creator group maintained by authz.py.
     """
     _add_user(caller, user, 'g')
-    add_user_to_creator_group(caller, user)
+    update_course_creator_group(caller, user, True)
+
+
+def update_course_creator_group(caller, user, add):
+    """
+    Method for adding and removing users from the creator group.
+
+    Caller must have staff permissions.
+    """
+    if add:
+        add_user_to_creator_group(caller, user)
+    else:
+        remove_user_from_creator_group(caller, user)
 
 
 def get_course_creator_status(user):

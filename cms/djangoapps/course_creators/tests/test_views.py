@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
 
 from course_creators.views import add_user_with_status_unrequested, add_user_with_status_granted
-from course_creators.views import get_course_creator_status
+from course_creators.views import get_course_creator_status, update_course_creator_group
 from course_creators.models import CourseCreator
 from auth.authz import is_user_in_creator_group
 import mock
@@ -26,13 +26,16 @@ class CourseCreatorView(TestCase):
 
     def test_staff_permission_required(self):
         """
-        Tests that add methods must be called with staff permissions.
+        Tests that add methods and course creator group method must be called with staff permissions.
         """
         with self.assertRaises(PermissionDenied):
             add_user_with_status_granted(self.user, self.user)
 
         with self.assertRaises(PermissionDenied):
             add_user_with_status_unrequested(self.user, self.user)
+
+        with self.assertRaises(PermissionDenied):
+            update_course_creator_group(self.user, self.user, True)
 
     def test_table_initially_empty(self):
         self.assertIsNone(get_course_creator_status(self.user))
@@ -58,3 +61,11 @@ class CourseCreatorView(TestCase):
             self.assertEqual('g', get_course_creator_status(self.user))
 
             self.assertTrue(is_user_in_creator_group(self.user))
+
+    def test_update_creator_group(self):
+        with mock.patch.dict('django.conf.settings.MITX_FEATURES', {"ENABLE_CREATOR_GROUP": True}):
+            self.assertFalse(is_user_in_creator_group(self.user))
+            update_course_creator_group(self.admin, self.user, True)
+            self.assertTrue(is_user_in_creator_group(self.user))
+            update_course_creator_group(self.admin, self.user, False)
+            self.assertFalse(is_user_in_creator_group(self.user))
