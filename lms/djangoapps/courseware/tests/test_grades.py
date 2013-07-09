@@ -3,8 +3,12 @@ This is the start of a test for grades.
 It is very incomplete - we're only testing one function
 right now.
 """
+
+from courseware.model_data import LmsKeyValueStore
 from courseware.grades import yield_dynamic_descriptor_descendents
+from courseware import grades
 from mock import MagicMock
+
 import unittest
 
 
@@ -67,3 +71,76 @@ class TestGrades(unittest.TestCase):
         self.assertTrue(child_a in regular_children)
         self.assertTrue(child_b in regular_children)
         self.assertTrue(child_c in regular_children)
+
+
+class TestFindShouldGradeSection(unittest.TestCase):
+    """
+    Test find_should_grade_section.
+
+    find_should_grade_section should:
+        return True when at least one problem in the section has been seen in cache
+        return True when a module's grades should always be recalculated
+        otherwise return False when no problem has been seen in cache
+    """
+
+    def setUp(self):
+
+        def fake_find_key(fake_key):
+            self.assertIsInstance(fake_key, LmsKeyValueStore.Key)
+            print fake_key
+            if fake_key.block_scope_id:
+                fake_found = MagicMock()
+                fake_found.grade = fake_key.block_scope_id
+                return fake_found
+            else:
+                return None
+
+        self.fake_model_data_cache = MagicMock()
+        self.fake_model_data_cache.find = fake_find_key
+
+    def fake_module(self, is_in_cache, recalculate):
+        output = MagicMock()
+        output.location = is_in_cache
+        output.always_recalculate_grades = recalculate
+        return output
+
+    def test_not_in_cache(self):
+        #Test returning false when not always-recalculating-grades and when no problem has been seen in cache
+        fake_xmoduledescriptors = [self.fake_module(False, False) for i in range(5)]
+        result = grades.find_should_grade_section(fake_xmoduledescriptors, self.fake_model_data_cache, 42)
+        self.assertFalse(result)
+
+    def test_first_in_cache(self):
+        #Test returning true when the first problem has been seen in cache
+        fake_xmoduledescriptors = [self.fake_module(True, False)] + [self.fake_module(False, False) for i in range(7)]
+        result = grades.find_should_grade_section(fake_xmoduledescriptors, self.fake_model_data_cache, 42)
+        self.assertTrue(result)
+
+    def test_last_in_cache(self):
+        #Test returning true when the last problem has been seen in cache
+        fake_xmoduledescriptors = [self.fake_module(False, False) for i in range(3)] + [self.fake_module(True, False)]
+        result = grades.find_should_grade_section(fake_xmoduledescriptors, self.fake_model_data_cache, 42)
+        self.assertTrue(result)
+
+    def test_all_in_cache(self):
+        #Test returning true when all problems have been seen in cache
+        fake_xmoduledescriptors = [self.fake_module(True, False) for i in range(9)]
+        result = grades.find_should_grade_section(fake_xmoduledescriptors, self.fake_model_data_cache, 42)
+        self.assertTrue(result)
+
+    def test_always_recalculate(self):
+        #Test returning true when a module's grades should always be recalculated, even if False otherwise
+        fake_xmoduledescriptors = [self.fake_module(False, True) for i in range(2)]
+        result = grades.find_should_grade_section(fake_xmoduledescriptors, self.fake_model_data_cache, 42)
+        self.assertTrue(result)
+
+    def test_empty_list(self):
+        #Test returning false when the list of xmodule descriptors is empty
+        result = grades.find_should_grade_section([], self.fake_model_data_cache, 42)
+        self.assertFalse(result)
+
+
+class TestFindAttempted(unittest.TestCase):
+
+    def test_find_attempted(self):
+        pass
