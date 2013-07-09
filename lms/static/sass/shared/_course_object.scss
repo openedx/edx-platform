@@ -186,7 +186,7 @@
         left: 0px;
         position: absolute;
         top: 0px;
-        @include transition(all, 0.15s, linear);
+        @include transition(all 0.15s linear 0s);
         width: 100%;
         overflow: hidden;
 
