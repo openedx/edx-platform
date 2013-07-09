@@ -48,6 +48,7 @@ sorl-thumbnail==11.12
 South==0.7.6
 sympy==0.7.1
 xmltodict==0.4.1
+pysrt==0.4.7
 
 # Used for debugging
 ipython==0.13.1

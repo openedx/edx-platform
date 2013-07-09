@@ -1,0 +1,29 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%page args="tabName"/>
+<div style="margin: -20px;">
+  <textarea id="advanced-${html_id}" class="edit-box">${data | h}</textarea>
+</div>
+
+<script type='text/javascript'>
+    $(document).ready(function(){
+      (function(){
+        var
+          $el = $("#advanced-${html_id}"),
+          advanced_editor = CodeMirror.fromTextArea(
+            $el.get(0), {
+              mode: "text/html",
+              lineNumbers: true,
+              lineWrapping: true
+            }
+          );
+        ## Save link to CodeMirror in data attribute CodeMirror for further using in
+        ## TabsEditorDescriptor for save data
+        $el.data('CodeMirror', advanced_editor);
+
+        TabsEditorDescriptor.registerTabCallback('${html_id}', '${tabName}', function(){
+           advanced_editor.refresh();
+           advanced_editor.focus();
+        })
+      }());
+    });
+</script>

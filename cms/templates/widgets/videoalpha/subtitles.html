@@ -1,0 +1,28 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%namespace name='static' file='../../static_content.html'/>
+<%page args="tabName"/>
+
+<div class="field comp-subtitles-entry" id="comp-subtitles-${html_id}"></div>
+
+<script id="subtitles-import-from-file-${html_id}-tpl" type="text/template">
+    <%static:include path="js/videoalpha/subtitles-import-file.underscore" />
+</script>
+
+<script type='text/javascript'>
+    $(document).ready(function(){
+        new CMS.Views.SubtitlesImport({
+            container: $('#comp-subtitles-${html_id}'),
+            tpl: {
+                file: _.template($('#subtitles-import-from-file-${html_id}-tpl').text())
+            },
+            isYoutube: '${is_youtube}',
+            subtitlesExist: '${has_subs_content}',
+            msg: CMS.Views.SubtitlesMessages,
+            modules: [
+                CMS.Views.SubtitlesImportFile,
+                CMS.Views.SubtitlesImportYT,
+                CMS.Views.SubtitlesDownload
+            ]
+        });
+    });
+</script>
