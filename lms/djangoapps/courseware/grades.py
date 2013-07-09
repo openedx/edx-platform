@@ -119,7 +119,7 @@ def answer_distributions(request, course):
     return counts
 
 
-def grade(student, request, course, model_data_cache=None, keep_raw_scores=False, include_in_progress_grade=True):
+def grade(student, request, course, model_data_cache=None, keep_raw_scores=False):
     """
     This grades a student as quickly as possible. It returns the
     output from the course grader, augmented with the final letter
@@ -395,8 +395,6 @@ def progress_summary(student, request, course, model_data_cache):
             'url_name': chapter_module.url_name,
             'sections': sections
         })
-
-    return chapters
 
 
 def get_score(course_id, user, problem_descriptor, module_creator, model_data_cache):
