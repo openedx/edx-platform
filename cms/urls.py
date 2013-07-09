@@ -5,9 +5,9 @@ from django.conf.urls import patterns, include, url
 # pylint: disable=W0611
 from . import one_time_startup
 
-# Uncomment the next two lines to enable the admin:
-# from django.contrib import admin
-# admin.autodiscover()
+# There is a course creators admin table.
+from django.contrib import admin
+admin.autodiscover()
 
 urlpatterns = ('',  # nopep8
     url(r'^$', 'contentstore.views.howitworks', name='homepage'),
@@ -145,6 +145,8 @@ if settings.MITX_FEATURES.get('ENABLE_SERVICE_STATUS'):
     urlpatterns += (
         url(r'^status/', include('service_status.urls')),
     )
+
+urlpatterns += (url(r'^admin/', include(admin.site.urls)),)
 
 urlpatterns = patterns(*urlpatterns)
 
