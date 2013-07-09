@@ -141,10 +141,10 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
             - 'answer' is the parsed answer that was submitted.
         """
         try:
-            answer = self.capa_answer_to_str(get)
+            answer = self.capa_answer_to_str(data)
         except ValueError:
             # Sometimes, we get an answer that's just not parsable.  Do nothing.
-            log.exception('Answer not parsable: ' + str(get))
+            log.exception('Answer not parsable: ' + str(data))
             return
         # Look for a hint to give.
         # Make a local copy of self.hints - this means we only need to do one json unpacking.
