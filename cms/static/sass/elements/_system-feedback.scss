@@ -437,7 +437,7 @@
   &.saving {
 
     [class^="icon"] {
-      @include anim-rotateClockwise(3s, linear, infinite);
+      @include animation(rotateCW 3.0s linear infinite);
       width: 25px;
       margin: -4px 10px 0 0;
       @include transform-origin(52% 60%);
@@ -627,16 +627,16 @@
     pointer-events: none;
 
     .prompt {
-      opacity: 0.0;
+
     }
   }
 
-  // prompt showing/hiding
+  // prompt showing
   &.prompt-is-shown {
 
     .wrapper-view {
-      -webkit-filter: blur(2px) grayscale(25%);
-      filter: blur(2px) grayscale(25%);
+      -webkit-filter: blur(($baseline/10)) grayscale(25%);
+      filter: blur(($baseline/10)) grayscale(25%);
     }
 
     .wrapper-prompt.is-shown {
@@ -644,8 +644,23 @@
       pointer-events: auto;
 
       .prompt {
-        @include anim-bounceIn(0.5s);
-        opacity: 1.0;
+        @include animation(bounceIn 0.5s ease-in-out 1);
+      }
+    }
+  }
+
+  // prompt hiding
+  &.prompt-is-hiding {
+
+    .wrapper-view {
+      -webkit-filter: blur(($baseline/10)) grayscale(25%);
+      filter: blur(($baseline/10)) grayscale(25%);
+    }
+
+    .wrapper-prompt {
+
+      .prompt {
+        @include animation(bounceOut 0.5s ease-in-out 1);
       }
     }
   }
@@ -665,11 +680,11 @@
 
     // varying animations
     &.is-shown {
-      @include anim-notificationsSlideUp(1s);
+      @include animation(notificationSlideUp 1.0s ease-in-out 1);
     }
 
     &.is-hiding {
-      @include anim-notificationsSlideDown(0.25s);
+      @include animation(notificationSlideDown 0.25s ease-in-out 1);
     }
   }
 }
