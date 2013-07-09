@@ -1,12 +1,11 @@
 """
 Convenience methods for working with datetime objects
 """
+from datetime import timedelta
+from django.utils.translation import ugettext as _
 
-from django.template.defaultfilters import date as _date
-from datetime import datetime, timedelta
 
-
-def get_default_time_display(dt, show_timezone=False):
+def get_default_time_display(dt, show_timezone=True):
     """
     Converts a datetime to a string representation. This is the default
     representation used in Studio and LMS.
@@ -27,7 +26,8 @@ def get_default_time_display(dt, show_timezone=False):
                 timezone = dt.strftime('%z')
         else:
             timezone = " UTC"
-    return _date(datetime.now(), "Y bd H:i") + timezone
+    return dt.strftime("%b %d, %Y {at} %H:%M{tz}").format(
+        at=_("at"), tz=timezone).strip()
 
 
 def almost_same_datetime(dt1, dt2, allowed_delta=timedelta(minutes=1)):
