@@ -57,7 +57,12 @@ chown vagrant.vagrant ~vagrant/.ssh/known_hosts
 
 # edX - Development environment ###############################################
 
-chown vagrant.vagrant /opt/edx
+# Node modules require a filesystem with symlinks (Windows support)
+mkdir -p /opt/edx/node_modules /opt/edx/edx-platform/node_modules
+mount -o bind /opt/edx/node_modules /opt/edx/edx-platform/node_modules
+
+# Permissions
+chown vagrant.vagrant /opt/edx /opt/edx/node_modules /opt/edx/edx-platform/node_modules
 
 # For convenience with `vagrant ssh`, the `edx-platform` virtualenv is always
 # loaded after the first run, so we need to deactivate that behavior to run
