@@ -153,26 +153,8 @@ def grade(student, request, course, model_data_cache=None, keep_raw_scores=False
             section_descriptor = section['section_descriptor']
             section_name = section_descriptor.display_name_with_default
 
-            should_grade_section = False
-            # If we haven't seen a single problem in the section, we don't have to grade it at all! We can assume 0%
-            for moduledescriptor in section['xmoduledescriptors']:
-                # some problems have state that is updated independently of interaction
-                # with the LMS, so they need to always be scored. (E.g. foldit.)
-                if moduledescriptor.always_recalculate_grades:
-                    should_grade_section = True
-                    break
-
-                # Create a fake key to pull out a StudentModule object from the ModelDataCache
-
-                key = LmsKeyValueStore.Key(
-                    Scope.user_state,
-                    student.id,
-                    moduledescriptor.location,
-                    None
-                )
-                if model_data_cache.find(key):
-                    should_grade_section = True
-                    break
+            #Moved to helper method
+            should_grade_section = find_should_grade_section(section['xmoduledescriptors'], model_data_cache, student.id)
 
             if should_grade_section:
                 scores = []
@@ -189,16 +171,16 @@ def grade(student, request, course, model_data_cache=None, keep_raw_scores=False
                     if correct is None and total is None:
                         continue
 
+                    graded = module_descriptor.lms.graded
+                    if not total > 0:
+                        #We simply cannot grade a problem that is 12/0, because we might need it as a percentage
+                        graded = False
+
                     if settings.GENERATE_PROFILE_SCORES:  	# for debugging!
                         if total > 1:
                             correct = random.randrange(max(total - 2, 1), total + 1)
                         else:
                             correct = total
-
-                    graded = module_descriptor.lms.graded
-                    if not total > 0:
-                        #We simply cannot grade a problem that is 12/0, because we might need it as a percentage
-                        graded = False
 
                     scores.append(Score(correct, total, graded, module_descriptor.display_name_with_default))
 
@@ -230,6 +212,49 @@ def grade(student, request, course, model_data_cache=None, keep_raw_scores=False
         grade_summary['raw_scores'] = raw_scores        # way to get all RAW scores out to instructor
                                                         # so grader can be double-checked
     return grade_summary
+
+
+def find_should_grade_section(xmoduledescriptors, model_data_cache, student_id):
+
+    should_grade_section = False
+
+    # If we haven't seen a single problem in the section, we don't have to grade it at all! We can assume 0%
+    for moduledescriptor in xmoduledescriptors:
+
+        # some problems have state that is updated independently of interaction
+        # with the LMS, so they need to always be scored. (E.g. foldit.)
+        if moduledescriptor.always_recalculate_grades:
+            should_grade_section = True
+            break
+
+        # Create a fake key to pull out a StudentModule object from the ModelDataCache
+
+        key = LmsKeyValueStore.Key(
+            Scope.user_state,
+            student_id,
+            moduledescriptor.location,
+            None
+        )
+        if model_data_cache.find(key):
+            should_grade_section = True
+            break
+
+    return should_grade_section
+
+
+def find_attempted(module_descriptor, model_data_cache, student_id):
+    key = LmsKeyValueStore.Key(
+        Scope.user_state,
+        student_id,
+        module_descriptor.location,
+        None
+    )
+    attempted = False
+    if model_data_cache.find(key):
+        if model_data_cache.find(key).grade is not None:
+            attempted = True
+
+    return attempted
 
 
 def grade_for_percentage(grade_cutoffs, percentage):
