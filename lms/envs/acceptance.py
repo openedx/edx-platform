@@ -16,14 +16,18 @@ DEBUG = True
 # Disable warnings for acceptance tests, to make the logs readable
 import logging
 logging.disable(logging.ERROR)
-from uuid import uuid4
+import os
+
+
+def seed():
+    return os.getppid()
 
 # Use the mongo store for acceptance tests
 modulestore_options = {
     'default_class': 'xmodule.raw_module.RawDescriptor',
     'host': 'localhost',
     'db': 'test_xmodule',
-    'collection': 'acceptance_modulestore_%s' % uuid4().hex,
+    'collection': 'acceptance_modulestore_%s' % seed(),
     'fs_root': TEST_ROOT / "data",
     'render_template': 'mitxmako.shortcuts.render_to_string',
 }
@@ -43,7 +47,7 @@ CONTENTSTORE = {
     'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
     'OPTIONS': {
         'host': 'localhost',
-        'db': 'acceptance_xcontent_%s' % uuid4().hex,
+        'db': 'acceptance_xcontent_%s' % seed(),
     }
 }
 
@@ -53,8 +57,8 @@ CONTENTSTORE = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': TEST_ROOT / "db" / "test_mitx.db",
-        'TEST_NAME': TEST_ROOT / "db" / "test_mitx.db",
+        'NAME': TEST_ROOT / "db" / "test_mitx_%s.db" % seed(),
+        'TEST_NAME': TEST_ROOT / "db" / "test_mitx_%s.db" % seed(),
     }
 }
 
