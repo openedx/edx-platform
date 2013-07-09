@@ -245,6 +245,10 @@ class TestFindShouldGradeSection(unittest.TestCase):
 
 class TestFindAttempted(unittest.TestCase):
 
+    """
+    Test the find_attempted method.
+    """
+
     def setUp(self):
 
         def fake_find_key(fake_key):
@@ -282,7 +286,3 @@ class TestFindAttempted(unittest.TestCase):
         fake_module = self.fake_module(True)
         result = grades.find_attempted(fake_module, self.fake_model_data_cache, 3.0)
         self.assertTrue(result)
-
-
-
-
