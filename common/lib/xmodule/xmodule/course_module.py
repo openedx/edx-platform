@@ -5,7 +5,6 @@ from lxml import etree
 from path import path  # NOTE (THK): Only used for detecting presence of syllabus
 import requests
 from datetime import datetime
-from django.utils.translation import ugettext as _
 import dateutil.parser
 
 from xmodule.modulestore import Location
@@ -259,27 +258,27 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         """
         return {"GRADER": [
                 {
-                    "type": _("Homework"),
+                    "type": "Homework",
                     "min_count": 12,
                     "drop_count": 2,
                     "short_label": "HW",
                     "weight": 0.15
                 },
                 {
-                    "type": _("Lab"),
+                    "type": "Lab",
                     "min_count": 12,
                     "drop_count": 2,
                     "weight": 0.15
                 },
                 {
-                    "type": _("Midterm Exam"),
+                    "type": "Midterm Exam",
                     "short_label": "Midterm",
                     "min_count": 1,
                     "drop_count": 0,
                     "weight": 0.3
                 },
                 {
-                    "type": _("Final Exam"),
+                    "type": "Final Exam",
                     "short_label": "Final",
                     "min_count": 1,
                     "drop_count": 0,
