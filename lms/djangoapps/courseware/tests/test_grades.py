@@ -10,6 +10,7 @@ import courseware.grades as grades
 import courseware.module_render as module_render
 from courseware.model_data import LmsKeyValueStore
 
+from xmodule.graders import Score
 
 
 class FakeChildFactory(object):
@@ -165,15 +166,78 @@ class TestGrades(unittest.TestCase):
     def test_grade(self):
         """
         Test the grade function.
-        grade(student, request, course, model_data_cache=None, keep_raw_scores=False, include_in_progress_grade=True)
+        grade(student, request, course, model_data_cache=None, keep_raw_scores=False)
         student - not used directly.
         request - not used directly.
         course:
             .grading_context['graded_sections']
             .id
-            .
+            .grader.grade - return a grade summary
+        model_data_cache - not used directly, but can't be None.
+        keep_raw_scores - True/False
+
+        Things to mock:
+        compute_graded_total(section, student, course_id, m_d_c, request)
+        grade_for_percentage(cutoffs, percent_summary)
         """
-        pass
+        student = MagicMock()
+        request = MagicMock()
+        course = MagicMock()
+        course.grading_context = {
+            'graded_sections': {
+                'HW': ['HW1', 'HW2'],
+                'Quiz': ['Quiz1'],
+            },
+        }
+        course.id = 'my id'
+        course.grader = MagicMock()
+
+        def fake_grade(totaled_scores, generate_random_scores=False):
+            """A fake course.grader.grade"""
+            return {
+                'percent': 64.5,
+            }
+        course.grader.grade = fake_grade
+        m_d_c = MagicMock()
+
+        def fake_compute_graded_total(section, student, course_id, m_d_c, request):
+            """
+            A fake compute_graded_total.  Expects a string for section, instead of
+            a real section.
+            """
+            if section == 'HW1':
+                return (
+                    Score(4.0, 10.0, True, 'HW1', attempted=True),
+                    ['RS1']
+                )
+            elif section == 'HW2':
+                return (
+                    Score(0.0, 10.0, True, 'HW2', attempted=False),
+                    ['RS2']
+                )
+            elif section == 'Quiz1':
+                return (
+                    Score(85.0, 100.0, True, 'Quiz1', attempted=True),
+                    ['RS3']
+                )
+        grades.compute_graded_total = fake_compute_graded_total
+
+        def fake_grade_for_percentage(cutoffs, percent_summary):
+            """A mock of grade_for_percentage"""
+            return 'A'
+        grades.grade_for_percentage = fake_grade_for_percentage
+
+        grade_summary = grades.grade(student, request, course, model_data_cache=m_d_c, keep_raw_scores=True)
+        reload(grades)
+
+        print grade_summary['totaled_scores']
+        self.assertTrue(grade_summary['percent'] == 64.5)
+        self.assertTrue('HW' in grade_summary['totaled_scores'])
+        self.assertTrue('HW' in grade_summary['totaled_scores'])
+        self.assertTrue('Quiz' in grade_summary['totaled_scores'])
+        self.assertTrue(grade_summary['raw_scores'] == ['RS1', 'RS2', 'RS3'])
+        self.assertTrue(grade_summary['grade'] == 'A')
+
 
 
 class TestFindShouldGradeSection(unittest.TestCase):
