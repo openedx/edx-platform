@@ -160,7 +160,7 @@
 
     // entire link
     .course-link {
-      @include transition(color 0.25s ease-in-out);
+      @include transition(color 0.25s ease-in-out 0);
       display: block;
       color: $gray-d1;
 
@@ -310,7 +310,6 @@
 
       .action-signup {
         @include blue-button;
-        @include transition(all .15s);
         @include font-size(14);
         padding: ($baseline/4) ($baseline/2);
         text-transform: uppercase;
@@ -319,7 +318,6 @@
 
       .action-signin {
         @include white-button;
-        @include transition(all .15s);
         @include font-size(14);
         padding: ($baseline/4) ($baseline/2);
         text-transform: uppercase;

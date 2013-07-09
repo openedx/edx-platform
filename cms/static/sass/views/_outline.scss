@@ -64,9 +64,9 @@ body.course.outline {
 
               .menu {
                 @include font-size(12);
+                @include transition(opacity 0.15s linear 0);
                 border-radius: 4px;
                 box-shadow: 0 1px 2px rgba(0, 0, 0, .2);
-                @include transition(opacity .15s);
                 z-index: 1;
                 display: none;
                 opacity: 0.0;
@@ -246,8 +246,8 @@ body.course.outline {
               }
 
               .section-name-span {
+                @include transition(color 0.15s linear 0);
                 cursor: pointer;
-                @include transition(color .15s);
 
                 &:hover {
                   color: $orange;
@@ -342,10 +342,9 @@ body.course.outline {
 
               .menu {
                 @include font-size(12);
+                @include transition(opacity 0.15s linear 0, display 0.15s linear 0);
                 border-radius: 4px;
                 box-shadow: 0 1px 2px rgba(0, 0, 0, .2);
-                @include transition(opacity .15s);
-                @include transition(display .15s);
                 z-index: 1;
                 display: none;
                 opacity: 0.0;
@@ -428,9 +427,9 @@ body.course.outline {
           }
 
           .expand-collapse-icon {
+              @include transition(none);
               float: left;
               margin: 25px 6px 16px 16px;
-              @include transition(none);
 
               &.expand {
                   background-position: 0 0;
@@ -453,8 +452,8 @@ body.course.outline {
       }
 
       .section-name-span {
+          @include transition(color 0.15s linear 0);
           cursor: pointer;
-          @include transition(color .15s);
 
           &:hover {
               color: $orange;

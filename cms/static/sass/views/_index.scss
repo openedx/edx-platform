@@ -151,7 +151,7 @@ body.index {
             background: $white;
 
             .action-zoom {
-              @include transition(bottom .50s ease-in-out);
+              @include transition(bottom 0.25s ease-in-out 0);
               position: absolute;
               bottom: -30px;
               right: ($baseline/2);
@@ -214,7 +214,7 @@ body.index {
 
             .proofpoint {
               @include box-sizing(border-box);
-              @include transition(color .50s ease-in-out);
+              @include transition(all 0.25s ease-in-out 0);
               border-radius: ($baseline/4);
               position: relative;
               top: 0;
@@ -233,6 +233,7 @@ body.index {
               }
 
               &:hover {
+                @extend .fake-link;
                 box-shadow: 0 1px ($baseline/10) $shadow-l1;
                 background: $blue-l5;
                 top: -($baseline/5);
@@ -319,7 +320,6 @@ body.index {
           &.action-primary {
             @extend .t-action1;
             @include blue-button;
-            @include transition(all .15s);
             padding: ($baseline*0.75) ($baseline/2);
             font-weight: 600;
             text-align: center;
