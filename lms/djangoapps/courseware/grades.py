@@ -395,8 +395,6 @@ def progress_summary(student, request, course, model_data_cache):
             'sections': sections
         })
 
-    return chapters
-
 
 def get_score(course_id, user, problem_descriptor, module_creator, model_data_cache):
     """
