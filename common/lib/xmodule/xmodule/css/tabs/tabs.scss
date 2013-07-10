@@ -1,5 +1,7 @@
 // This is shared CSS between the xmodule problem editor and the xmodule HTML editor.
 .editor {
+  @include clearfix();
+
   position: relative;
 
   .row {
@@ -28,8 +30,10 @@
 
   .editor-tabs {
     position: absolute;
-    top: 10px;
+
+    top: 11px !important;
     right: 10px;
+    z-index: 99;
 
     li {
       float: left;
@@ -58,63 +62,25 @@
       }
     }
   }
-}
-
-.component-tab{
-  background: $white;
-  padding: 20px;
-  position: relative;
-  border-top: 1px solid #8891a1;
-
-  &#advanced{
-    padding: 0;
-    border: none;
-  }
-    .blue-button{
-      @include blue-button;
-    }
-}
-
-.editor{
-  @include clearfix();
-
-  .CodeMirror {
-    @include box-sizing(border-box);
-    width: 100%;
-    position: relative;
-    height: 379px;
-    border: 1px solid #3c3c3c;
-    border-top: 1px solid #8891a1;
-    background: $white;
-    color: #3c3c3c;
-  }
-
-  .CodeMirror-scroll {
-    height: 100%;
-  }
-
-  .editor-tabs {
-    top: 11px !important;
-    right: 10px;
-    z-index: 99;
-  }
 
   .is-inactive {
     display: none;
   }
 
-  .comp-subtitles-entry{
+  .comp-subtitles-entry {
     text-align: center;
-    .file-upload{
+
+    .file-upload {
       display: none;
     }
-    .comp-subtitles-import-list{
-      > li{
+
+    .comp-subtitles-import-list {
+      > li {
         display: block;
         margin: $baseline/2 0px $baseline/2 0;
       }
 
-      .blue-button{
+      .blue-button {
         font-size: 1em;
         display: block;
         width: 70%;
@@ -125,6 +91,22 @@
   }
 }
 
+.component-tab {
+  background: $white;
+  padding: 20px;
+  position: relative;
+  border-top: 1px solid #8891a1;
+
+  &#advanced {
+    padding: 0;
+    border: none;
+  }
+
+  .blue-button {
+    @include blue-button;
+  }
+}
+
 .tabs-wrapper{
   padding-top: 46px;
   position: relative;
@@ -132,7 +114,4 @@
 
 .editor-single-tab-name {
   display: none;
-}
-
-.editor-single-tab{
 }

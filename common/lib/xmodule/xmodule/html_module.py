@@ -52,6 +52,8 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, TabsEditingDescriptor):
     # js_module_name = "TabsEditorDescriptor"
     # css = {'scss': [resource_string(__name__, 'css/editor/edit.scss'), resource_string(__name__, 'css/html/edit.scss')]}
 
+    css = {'scss': [resource_string(__name__, 'css/tabs/codemirror.scss'), resource_string(__name__, 'css/tabs/tabs.scss')]}
+
     tabs = [
         {
             'name': "Visual",
