@@ -10,14 +10,16 @@ import enchant
 import string
 
 
+CONTENT_TYPES = ("transcript", "problem", "pdf")
+
+
 def search(request):
     context = {}
     results_string = ""
-    content = request.GET.get("content", "transcript")
     if request.GET:
         results_string = find(request)
-        context.update({"old_query": request.GET['s']})
-    context.update({"previous_content": content})
+        context.update({"old_query": request.GET.get('s', "")})
+    context.update({"previous": request.GET})
     search_bar = render_to_string("search_templates/search.html", context)
     full_html = render_to_string("search_templates/wrapper.html", {"body": search_bar+results_string})
     return HttpResponse(full_html)
@@ -25,27 +27,28 @@ def search(request):
 
 def find(request, database="http://127.0.0.1:9200",
          field="searchable_text", max_result=100):
-    query = request.GET.get("s", "")
+    get_content = lambda request, content: content+"-index" if request.GET.get(content, False) else None
+    query = request.GET.get("s", "*.*")
     page = request.GET.get("page", 1)
     results_per_page = request.GET.get("results", 15)
-    index = request.GET.get("content", "transcript")+"-index"
+    index = ",".join(filter(None, [get_content(request, content) for content in CONTENT_TYPES]))
     full_url = "/".join([database, index, "_search?q="+field+":"])
     context = {}
-
-    try:
-        results = json.loads(requests.get(full_url+query+"&size="+str(max_result))._content)["hits"]["hits"]
-        data = [entry["_source"] for entry in results]
-        #titles = [entry["display_name"] for entry in data]
-        uuids = [entry["display_name"] for entry in data]
-        transcripts = [entry["searchable_text"] for entry in data]
-        snippets = [snippet_generator(transcript, query) for transcript in transcripts]
-        thumbnails = ["data:image/jpg;base64,"+entry["thumbnail"] for entry in data]
-        urls = [get_datum_url(request, datum) for datum in data]
-        data = zip(uuids, snippets, thumbnails, urls)
-    except KeyError:
-        data = [(data[0], "")]
+    response = requests.get(full_url+query+"&size="+str(max_result))
+    results = json.loads(response._content)["hits"]["hits"]
+    data = [entry["_source"] for entry in results]
+    #titles = [entry["display_name"] for entry in data]
+    uuids = [entry["display_name"] for entry in data]
+    transcripts = [entry["searchable_text"] for entry in data]
+    snippets = [snippet_generator(transcript, query) for transcript in transcripts]
+    thumbnails = ["data:image/jpg;base64,"+entry["thumbnail"] for entry in data]
+    urls = [get_datum_url(request, datum) for datum in data]
+    data = zip(uuids, snippets, thumbnails, urls)
     if len(data) == 0:
         data = [("No results found, please try again", "")]
+        context.update({"results": "false"})
+    else:
+        context.update({"results": "true"})
 
     correction = spell_check(query)
     results_pages = Paginator(data, results_per_page)
