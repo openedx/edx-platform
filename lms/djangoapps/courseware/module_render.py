@@ -473,7 +473,8 @@ def modx_dispatch(request, dispatch, location, course_id):
     error_msg = _check_files_limits(files)
     if error_msg:
         return HttpResponse(json.dumps({'success': error_msg}))
-    data.update(files)  # Merge files into data dictionary
+    for key in files:  # Merge files into to data dictionary
+        data[key] = files.getlist(key)
 
     try:
         descriptor = modulestore().get_instance(course_id, location)
