@@ -95,9 +95,11 @@
 >>>>>>> search result vertical linking in place, mongo tree traversal also working
 <head>
 	${css_link("../static/css/search.css")}
+    ${js_link("../static/js/search.js")}
 </head>
 
 <div class="searchwrapper">
+<<<<<<< HEAD
 	<form action="/search" method="get">
 		<span>
 		<div class="searchbox-wrapper">
@@ -140,15 +142,58 @@
 				<input type="radio" class="content" name="content" value="pdf" checked>PDFs
 			% endif
 		</div>
+=======
+	<span>
+        <form id="query_box" action="/search" method="get">
+    		<div class="searchbox-wrapper">
+    			% if old_query:
+    			<input type="text" class="searchbox" name="s" value="${old_query}" onkeydown="searchHandle(event, ['query_box', 'content-select'])"/>
+    			% else:
+    			<input type="text" class="searchbox" name="s" value="" onkeydown="searchHandle(event, ['query_box', 'content-select'])"/>
+    			% endif
+    			<div class="searchbox_submit" onclick="submitForms(['query_box', 'content-select'])">
+    				<input type="submit" value="" />
+    			</div>
+    		</div>
+        </form>
+
+        <form id="content-select" action="/search" method="get">
+    		<div class="content-select">
+    			% if previous.get("transcript", "false") == "true":
+    				<input type="checkbox" class="content" name="transcript" value="true" checked>Videos
+                % else:
+                    <input type="checkbox" class="content" name="transcript" value="true">Videos
+                % endif
+
+                % if previous.get("problem", "false") == "true":
+    				<input type="checkbox" class="content" name="problem" value="true" checked>Problems
+    			% else:
+                    <input type="checkbox" class="content" name="problem" value="true">Problems
+    			% endif
+
+                % if previous.get("pdf", "false") == "true":
+                    <input type="checkbox" class="content" name="pdf" value="true" checked>PDFs
+                % else:
+                    <input type="checkbox" class="content" name="pdf" value="true"> PDFs
+    			% endif
+    		</div>
+        </form>
+>>>>>>> Changed search across content to work on checkboxes instead of radio buttons and associated functionality
 	</span>
-	</form>
 </div>
 
 <%def name="css_link(path, media='')">
 	<link rel="stylesheet" type="text/css" href="${path|h}" media="${media}"></link>
 </%def>
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> Refactored some code and added full elasticsearch module test suite
 >>>>>>> Refactored some code and added full elasticsearch module test suite
 =======
 >>>>>>> search result vertical linking in place, mongo tree traversal also working
+=======
+
+<%def name="js_link(path)">
+    <script type="text/javascript" src="${path|h}"></script>
+</%def>
+>>>>>>> Changed search across content to work on checkboxes instead of radio buttons and associated functionality
