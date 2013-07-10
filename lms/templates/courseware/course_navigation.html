@@ -17,7 +17,7 @@ def url_class(is_active):
   <div class="inner-wrapper">
     <ol class="course-tabs">
       % for tab in get_course_tabs(user, course, active_page):
-        % if tab.name != "Hide Tab":
+        % if tab.name != "Grading Panel" or staff_access:
           <li>
              <a href="${tab.link | h}" class="${url_class(tab.is_active)}">
                  ${tab.name | h}
