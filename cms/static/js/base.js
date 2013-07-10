@@ -199,8 +199,10 @@ function toggleSections(e) {
     $section = $('.courseware-section');
     sectionCount = $section.length;
     $button = $(this);
-    $labelCollapsed = $(gettext('<i class="icon-arrow-up"></i> <span class="label">Collapse All Sections</span>'));
-    $labelExpanded = $(gettext('<i class="icon-arrow-down"></i> <span class="label">Expand All Sections</span>'));
+    $labelCollapsed = $('<i class="icon-arrow-up"></i> <span class="label">' +
+        gettext('Collapse All Sections') + '</span>');
+    $labelExpanded = $('<i class="icon-arrow-down"></i> <span class="label">' +
+        gettext('Expand All Sections') + '</span>');
 
     var buttonLabel = $button.hasClass('is-activated') ? $labelCollapsed : $labelExpanded;
     $button.toggleClass('is-activated').html(buttonLabel);
