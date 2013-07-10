@@ -61,7 +61,13 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, TabsEditingDescriptor):
         {
             'name': "HTML",
             'template': "tabs/codemirror-edit.html",
+        },
+        {
+            'name': "Settings",
+            'template': "metadata-edit.html"
+
         }
+
     ]
 
     # VS[compat] TODO (cpennington): Delete this method once all fall 2012 course
