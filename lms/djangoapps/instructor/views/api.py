@@ -98,7 +98,10 @@ def students_update_enrollment(request, course_id):
     )
 
     action = request.GET.get('action')
-    emails = _split_input_list(request.GET.get('emails'))
+    emails_raw = request.GET.get('emails')
+    print "@@@@"
+    print type(emails_raw)
+    emails = _split_input_list(emails_raw)
     auto_enroll = request.GET.get('auto_enroll') in ['true', 'True', True]
 
     def format_result(func, email):
@@ -340,6 +343,9 @@ def profile_distribution(request, course_id):
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_query_params(
+    student_email="email of student for whom to get progress url"
+)
 def get_student_progress_url(request, course_id):
     """
     Get the progress url of a student.
@@ -355,8 +361,6 @@ def get_student_progress_url(request, course_id):
     )
 
     student_email = request.GET.get('student_email')
-    if not student_email:
-        return HttpResponseBadRequest()
     user = User.objects.get(email=student_email)
 
     progress_url = reverse('student_progress', kwargs={'course_id': course_id, 'student_id': user.id})
@@ -650,7 +654,7 @@ def _msk_from_problem_urlname(course_id, urlname):
     Convert a 'problem urlname' (instructor input name)
     to a module state key (db field)
     """
-    if urlname[-4:] == ".xml":
+    if urlname.endswith(".xml"):
         urlname = urlname[:-4]
 
     urlname = "problem/" + urlname

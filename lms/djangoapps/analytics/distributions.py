@@ -31,7 +31,10 @@ def profile_distribution(course_id, feature):
     feature_results = {}
 
     if not feature in AVAILABLE_PROFILE_FEATURES:
-        raise ValueError("unsupported feature requested for distribution '{}'".format(feature))
+        raise ValueError(
+            "unsupported feature requested for distribution '{}'".format(
+                feature)
+        )
 
     if feature in _EASY_CHOICE_FEATURES:
         if feature == 'gender':
@@ -39,25 +42,34 @@ def profile_distribution(course_id, feature):
         elif feature == 'level_of_education':
             raw_choices = UserProfile.LEVEL_OF_EDUCATION_CHOICES
 
-        choices = [(short, full) for (short, full) in raw_choices] + [('no_data', 'No Data')]
+        choices = [(short, full)
+                   for (short, full) in raw_choices] + [('no_data', 'No Data')]
 
         data = {}
         for (short, full) in choices:
             if feature == 'gender':
-                count = CourseEnrollment.objects.filter(course_id=course_id, user__profile__gender=short).count()
+                count = CourseEnrollment.objects.filter(
+                    course_id=course_id, user__profile__gender=short
+                ).count()
             elif feature == 'level_of_education':
-                count = CourseEnrollment.objects.filter(course_id=course_id, user__profile__level_of_education=short).count()
+                count = CourseEnrollment.objects.filter(
+                    course_id=course_id, user__profile__level_of_education=short
+                ).count()
             data[short] = count
 
         feature_results['data'] = data
         feature_results['type'] = 'EASY_CHOICE'
         feature_results['display_names'] = dict(choices)
     elif feature in _OPEN_CHOICE_FEATURES:
-        profiles = UserProfile.objects.filter(user__courseenrollment__course_id=course_id)
-        query_distribution = profiles.values(feature).annotate(Count(feature)).order_by()
-        # query_distribution is of the form [{'featureval': 'value1', 'featureval__count': 4}, {'featureval': 'value2', 'featureval__count': 2}, ...]
+        profiles = UserProfile.objects.filter(
+            user__courseenrollment__course_id=course_id)
+        query_distribution = profiles.values(
+            feature).annotate(Count(feature)).order_by()
+        # query_distribution is of the form [{'featureval': 'value1', 'featureval__count': 4},
+        #    {'featureval': 'value2', 'featureval__count': 2}, ...]
 
-        distribution = dict((vald[feature], vald[feature + '__count']) for vald in query_distribution)
+        distribution = dict((vald[feature], vald[feature + '__count'])
+                            for vald in query_distribution)
         # distribution is of the form {'value1': 4, 'value2': 2, ...}
 
         # change none to no_data for valid json key
@@ -65,7 +77,9 @@ def profile_distribution(course_id, feature):
             distribution['no_data'] = distribution.pop(None)
             # django does not properly count NULL values, so the above will alwasy be 0.
             # this correctly counts null values
-            distribution['no_data'] = profiles.filter(**{feature: None}).count()
+            distribution['no_data'] = profiles.filter(
+                **{feature: None}
+            ).count()
 
         feature_results['data'] = distribution
         feature_results['type'] = 'OPEN_CHOICE'

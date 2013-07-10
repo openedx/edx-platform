@@ -17,3 +17,10 @@ class TestInstructorAPIHelpers(TestCase):
 
         for (stng, lst) in zip(strings, lists):
             self.assertEqual(_split_input_list(stng), lst)
+
+    def test_split_input_list_unicode(self):
+        self.assertEqual(_split_input_list('robot@robot.edu, robot2@robot.edu'), ['robot@robot.edu', 'robot2@robot.edu'])
+        self.assertEqual(_split_input_list(u'robot@robot.edu, robot2@robot.edu'), ['robot@robot.edu', 'robot2@robot.edu'])
+        self.assertEqual(_split_input_list(u'robot@robot.edu, robot2@robot.edu'), [u'robot@robot.edu', 'robot2@robot.edu'])
+        scary_unistuff = unichr(40960) + u'abcd' + unichr(1972)
+        self.assertEqual(_split_input_list(scary_unistuff), [scary_unistuff])
