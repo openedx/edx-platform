@@ -1,6 +1,8 @@
 """
 This config file extends the test environment configuration
 so that we can run the lettuce acceptance tests.
+This is used in the django-admin call as acceptance.py
+contains random seeding, causing django-admin to create a random collection
 """
 
 # We intentionally define lots of variables that aren't used, and
