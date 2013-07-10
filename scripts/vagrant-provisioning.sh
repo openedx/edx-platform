@@ -61,6 +61,9 @@ chown vagrant.vagrant ~vagrant/.ssh/known_hosts
 mkdir -p /opt/edx/node_modules /opt/edx/edx-platform/node_modules
 mount -o bind /opt/edx/node_modules /opt/edx/edx-platform/node_modules
 
+# Force rechecking all prerequisites (could have been fetched outside of the VM)
+rm -rf /opt/edx/edx-platform/.prereqs_cache
+
 # Permissions
 chown vagrant.vagrant /opt/edx /opt/edx/node_modules /opt/edx/edx-platform/node_modules
 
