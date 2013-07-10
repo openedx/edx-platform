@@ -29,7 +29,7 @@ end
         end
 
         desc "Run pylint on all #{system} code"
-        task system do
+        task system => [report_dir, :install_python_prereqs] do
             run_pylint(system, report_dir)
         end
     end
