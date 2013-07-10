@@ -659,3 +659,13 @@ specific requirements.
 if any, to sign a "copyright disclaimer" for the program, if necessary.
 For more information on this, and how to apply and follow the GNU AGPL, see
 <http://www.gnu.org/licenses/>.
+
+EdX Inc. wishes to state, in clarification of the above license terms, that
+any public, independently available web service offered over the network and
+communicating with edX's copyrighted works by any form of inter-service
+communication, including but not limited to Remote Procedure Call (RPC)
+interfaces, is not a work based on our copyrighted work within the meaning
+of the license. "Corresponding Source" of this work, or works based on this
+work, as defined by the terms of this license do not include source code
+files for programs used solely to provide those public, independently
+available web services.
