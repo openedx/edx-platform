@@ -248,7 +248,7 @@ def grading_config(request, course_id):
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-def enrolled_students_profiles(request, course_id, csv=False):
+def enrolled_students_features(request, course_id, csv=False):
     """
     Respond with json which contains a summary of all enrolled students profile information.
 
@@ -264,7 +264,7 @@ def enrolled_students_profiles(request, course_id, csv=False):
     query_features = ['username', 'name', 'email', 'language', 'location', 'year_of_birth', 'gender',
                       'level_of_education', 'mailing_address', 'goals']
 
-    student_data = analytics.basic.enrolled_students_profiles(course_id, query_features)
+    student_data = analytics.basic.enrolled_students_features(course_id, query_features)
 
     if not csv:
         response_payload = {

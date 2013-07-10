@@ -135,7 +135,7 @@ def _section_data_download(course_id):
         'section_key': 'data_download',
         'section_display_name': 'Data Download',
         'grading_config_url': reverse('grading_config', kwargs={'course_id': course_id}),
-        'enrolled_students_profiles_url': reverse('enrolled_students_profiles', kwargs={'course_id': course_id}),
+        'enrolled_students_features_url': reverse('enrolled_students_features', kwargs={'course_id': course_id}),
     }
     return section_data
 

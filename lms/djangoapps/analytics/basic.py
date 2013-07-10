@@ -14,11 +14,11 @@ PROFILE_FEATURES = ('name', 'language', 'location', 'year_of_birth', 'gender',
 AVAILABLE_FEATURES = STUDENT_FEATURES + PROFILE_FEATURES
 
 
-def enrolled_students_profiles(course_id, features):
+def enrolled_students_features(course_id, features):
     """
     Return list of student features as dictionaries.
 
-    enrolled_students_profiles(course_id, ['username, first_name'])
+    enrolled_students_features(course_id, ['username, first_name'])
     would return [
         {'username': 'username1', 'first_name': 'firstname1'}
         {'username': 'username2', 'first_name': 'firstname2'}

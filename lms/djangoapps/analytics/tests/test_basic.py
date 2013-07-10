@@ -6,7 +6,7 @@ from django.test import TestCase
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 
-from analytics.basic import enrolled_students_profiles, AVAILABLE_FEATURES, STUDENT_FEATURES, PROFILE_FEATURES
+from analytics.basic import enrolled_students_features, AVAILABLE_FEATURES, STUDENT_FEATURES, PROFILE_FEATURES
 
 
 class TestAnalyticsBasic(TestCase):
@@ -17,19 +17,19 @@ class TestAnalyticsBasic(TestCase):
         self.users = tuple(UserFactory() for _ in xrange(30))
         self.ces = tuple(CourseEnrollment.objects.create(course_id=self.course_id, user=user) for user in self.users)
 
-    def test_enrolled_students_profiles_username(self):
+    def test_enrolled_students_features_username(self):
         self.assertIn('username', AVAILABLE_FEATURES)
-        userreports = enrolled_students_profiles(self.course_id, ['username'])
+        userreports = enrolled_students_features(self.course_id, ['username'])
         self.assertEqual(len(userreports), len(self.users))
         for userreport in userreports:
             self.assertEqual(userreport.keys(), ['username'])
             self.assertIn(userreport['username'], [user.username for user in self.users])
 
-    def test_enrolled_students_profiles_keys(self):
+    def test_enrolled_students_features_keys(self):
         query_features = ('username', 'name', 'email')
         for feature in query_features:
             self.assertIn(feature, AVAILABLE_FEATURES)
-        userreports = enrolled_students_profiles(self.course_id, query_features)
+        userreports = enrolled_students_features(self.course_id, query_features)
         self.assertEqual(len(userreports), len(self.users))
         for userreport in userreports:
             self.assertEqual(set(userreport.keys()), set(query_features))
