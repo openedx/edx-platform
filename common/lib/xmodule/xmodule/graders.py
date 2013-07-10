@@ -390,6 +390,7 @@ class AssignmentFormatGrader(CourseGrader):
                 if attempted:
                     projected_percentage = percentage
                 else:
+                    #TODO -- if the deadline has passed, then projected_percentage should be 0 and not None; else None
                     projected_percentage = None
             else:
                 percentage = 0
@@ -403,12 +404,14 @@ class AssignmentFormatGrader(CourseGrader):
                                                              short_label=self.short_label)
 
             breakdown.append({'percent': percentage, 'label': short_label,
-                              'detail': summary, 'category': self.category,})
+                              'detail': summary, 'category': self.category, })
             if projected_percentage is not None:
                 projected_breakdown.append({'percent': projected_percentage, 'label': short_label,
-                              'detail': summary, 'category': self.category,})
+                                            'detail': summary, 'category': self.category, })
 
-        projected_total_percent, _ = total_with_drops(projected_breakdown, 0)
+        drop_for_projected = max(len(projected_breakdown) - len(breakdown) + self.drop_count, 0)
+
+        projected_total_percent, _ = total_with_drops(projected_breakdown, drop_for_projected)
 
         total_percent, dropped_indices = total_with_drops(breakdown, self.drop_count)
 

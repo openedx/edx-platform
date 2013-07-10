@@ -239,7 +239,6 @@ class TestGrades(unittest.TestCase):
         self.assertTrue(grade_summary['grade'] == 'A')
 
 
-
 class TestFindShouldGradeSection(unittest.TestCase):
     """
     Test find_should_grade_section.
