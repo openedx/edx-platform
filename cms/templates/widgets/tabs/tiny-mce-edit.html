@@ -33,7 +33,7 @@
           ## TabsEditorDescriptor for save data
           $el.data('TinyMCE', visualEditor);
         };
-          
+
         var focusVisualEditor = function (visualEditor){
           visualEditor.focus();
           ## Need to mark editor as not dirty both when it is initially created and when we  switch back to it.
@@ -76,15 +76,18 @@
           ## The tinyMCE callback passes in the editor as a paramter.
           init_instance_callback: focusVisualEditor
         });
-  
-        
+
+
 
         ## Callback that ensures data sync between tabs
-        TabsEditorDescriptor.registerTabCallback('${html_id}', '${tabName}', function(){
+        TabsEditorDescriptor.registerTabCallback('${html_id}', '${tabName}', function(previous_tab){
+
           var $codemirror = $("#advanced-${html_id}").data('CodeMirror');
+
           if ($codemirror){
             visualEditor.setContent($codemirror.getValue())
           }
+
           ## In order for isDirty() to return true ONLY if edits have been made after setting the text,
           ## both the startContent must be sync'ed up and the dirty flag set to false.
           visualEditor.startContent = visualEditor.getContent({format: "raw", no_events: 1});
@@ -97,21 +100,21 @@
         TabsEditorDescriptor['tabs_save_functions']['${html_id}'] = TabsEditorDescriptor['tabs_save_functions']['${html_id}']  || {}
 
         TabsEditorDescriptor['tabs_save_functions']['${html_id}']['${tabName}'] = function(){
-          return function(){  
+          return function(){
 
             ## if visualEditor is edited and active
             if (visualEditor.isDirty()){
-              return visualEditor.getContent({no_events: 1}) 
+              return visualEditor.getContent({no_events: 1})
             }
             else {
               ## visualEditor is active, but not edits are in there.
               ## Still save occurs - beacuse "E-text latex" is rendered to xml and saved.
-              ## Latex pastes data to Codemirror. 
+              ## Latex pastes data to Codemirror.
               ## So get data from there.
               var $codemirror = $("#advanced-${html_id}").data('CodeMirror');
               if ($codemirror){
                 return $codemirror.getValue();
-              } 
+              }
               else {
                 return null;
               }

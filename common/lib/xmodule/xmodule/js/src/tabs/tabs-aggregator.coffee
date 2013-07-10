@@ -7,6 +7,8 @@ class @TabsEditorDescriptor
 
     console.log @element
 
+    $('.component-edit-header').hide()
+
     # settingsEditor = @$el.find('.wrapper-comp-settings')
     # editorModeButton =  @$el.find('#editor-mode').find("a")
     # settingsModeButton = @$el.find('#settings-mode').find("a")
@@ -27,13 +29,22 @@ class @TabsEditorDescriptor
     currentTab.trigger("click", [true])
     @html_id = @$tabs.closest('.wrapper-comp-editor').data('html_id')
 
-   onSwitchEditor: (e, reset) =>
+   onSwitchEditor: (e, firstTime) =>
     e.preventDefault();
 
     isInactiveClass = TabsEditorDescriptor.isInactiveClass
     $currentTarget = $(e.currentTarget)
 
-    if not $currentTarget.hasClass('current') or reset is true
+    if not $currentTarget.hasClass('current') or firstTime is true
+
+      previousTab = null
+
+      @$tabs.each( (index, value) ->
+        if $(value).hasClass('current')
+          previousTab = $(value).html()
+      )
+
+      console.log 'previous tab: ' + previousTab
 
       @$tabs.removeClass('current')
       $currentTarget.addClass('current')
@@ -70,7 +81,8 @@ class @TabsEditorDescriptor
         'TabsEditor:changeTab',
         [
           $currentTarget.text(), # tab_name
-          content_id  # tab_id
+          content_id,  # tab_id
+          previousTab
         ]
       )
 
@@ -84,6 +96,7 @@ class @TabsEditorDescriptor
     data: null
 
 TabsEditorDescriptor.registerTabCallback = (id, name, callback) ->
-  $('#editor-tab-' + id).on 'TabsEditor:changeTab', (e, tab_name, tab_id) ->
+  $('#editor-tab-' + id).on 'TabsEditor:changeTab', (e, tab_name, tab_id, previous_tab) ->
     e.stopPropagation()
-    callback() if typeof callback is "function" and tab_name is name
+
+    callback(previous_tab) if typeof callback is "function" and tab_name is name
