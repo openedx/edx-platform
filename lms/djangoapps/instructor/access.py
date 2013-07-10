@@ -23,7 +23,7 @@ def list_with_level(course, level):
     There could be other levels specific to the course.
     If there is no Group for that course-level, returns an empty list
     """
-    if level in ['beta']:
+    if level is 'beta':
         grpname = course_beta_test_group_name(course.location)
     else:
         grpname = get_access_group_name(course, level)
@@ -60,10 +60,12 @@ def _change_access(course, user, level, mode):
     mode is one of ['allow', 'revoke']
     """
 
-    if level in ['beta']:
+    if level is 'beta':
         grpname = course_beta_test_group_name(course.location)
-    else:
+    elif level in ['instructor', 'staff']:
         grpname = get_access_group_name(course, level)
+    else:
+        raise ValueError("unrecognized level '{}'".format(level))
     group, _ = Group.objects.get_or_create(name=grpname)
 
     if mode == 'allow':
@@ -78,9 +80,11 @@ def update_forum_role_membership(course_id, user, rolename, mode):
     """
     Change forum access of user.
 
-    rolename is one of [FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA]
+    `rolename` is one of [FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA]
+    `mode` is one of ['allow', 'revoke']
 
-    mode is one of ['allow', 'revoke']
+    if `mode` is bad, raises ValueError
+    if `rolename` does not exist, raises Role.DoesNotExist
     """
     role = Role.objects.get(course_id=course_id, name=rolename)
 
