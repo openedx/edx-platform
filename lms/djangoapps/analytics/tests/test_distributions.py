@@ -19,7 +19,7 @@ class TestAnalyticsDistributions(TestCase):
             profile__year_of_birth=i + 1930
         ) for i in xrange(30)]
 
-        self.ces = tuple(CourseEnrollment.objects.create(course_id=self.course_id, user=user) for user in self.users)
+        self.ces = [CourseEnrollment.objects.create(course_id=self.course_id, user=user) for user in self.users]
 
     @raises(ValueError)
     def test_profile_distribution_bad_feature(self):
@@ -53,13 +53,13 @@ class TestAnalyticsDistributionsNoData(TestCase):
     def setUp(self):
         self.course_id = 'some/robot/course/id'
 
-        self.users = tuple(UserFactory(
+        self.users = [UserFactory(
             profile__year_of_birth=i + 1930,
-        ) for i in xrange(5))
+        ) for i in xrange(5)]
 
-        self.nodata_users = tuple(UserFactory(
+        self.nodata_users = [UserFactory(
             profile__year_of_birth=None,
-        ) for _ in xrange(4))
+        ) for _ in xrange(4)]
 
         self.users += self.nodata_users
 

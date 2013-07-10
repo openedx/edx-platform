@@ -41,7 +41,7 @@ class TestAnalyticsFormatDictlist(TestCase):
     """ Test format_dictlist method """
 
     def test_format_dictlist(self):
-        data_in = [
+        dictlist = [
             {
                 'label1': 'value-1,1',
                 'label2': 'value-1,2',
@@ -53,22 +53,23 @@ class TestAnalyticsFormatDictlist(TestCase):
                 'label2': 'value-2,2',
                 'label3': 'value-2,3',
                 'label4': 'value-2,4',
-            },
+            }
         ]
 
-        data_out = {
-            'header': ['label1', 'label2', 'label3', 'label4'],
-            'datarows': [['value-1,1', 'value-1,2', 'value-1,3', 'value-1,4'],
-                         ['value-2,1', 'value-2,2', 'value-2,3', 'value-2,4']],
-        }
+        features = ['label1', 'label4']
+        header, datarows = format_dictlist(dictlist, features)
 
-        self.assertEqual(format_dictlist(data_in), data_out)
+        ideal_header = ['label1', 'label4']
+        ideal_datarows = [['value-1,1', 'value-1,4'],
+                          ['value-2,1', 'value-2,4']]
+
+        self.assertEqual(header, ideal_header)
+        self.assertEqual(datarows, ideal_datarows)
 
     def test_format_dictlist_empty(self):
-        self.assertEqual(format_dictlist([]), {
-            'header': [],
-            'datarows': [],
-        })
+        header, datarows = format_dictlist([], [])
+        self.assertEqual(header, [])
+        self.assertEqual(datarows, [])
 
     def test_create_csv_response(self):
         header = ['Name', 'Email']

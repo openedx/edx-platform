@@ -279,8 +279,8 @@ def enrolled_students_features(request, course_id, csv=False):
         )
         return response
     else:
-        formatted = analytics.csvs.format_dictlist(student_data)
-        return analytics.csvs.create_csv_response("enrolled_profiles.csv", formatted['header'], formatted['datarows'])
+        header, datarows = analytics.csvs.format_dictlist(student_data)
+        return analytics.csvs.create_csv_response("enrolled_profiles.csv", header, datarows)
 
 
 @ensure_csrf_cookie

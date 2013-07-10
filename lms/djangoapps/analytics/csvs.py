@@ -31,9 +31,16 @@ def create_csv_response(filename, header, datarows):
     return response
 
 
-def format_dictlist(dictlist):
+def format_dictlist(dictlist, features):
     """
-    Convert FROM [
+    Convert a list of dictionaries to be compatible with create_csv_response
+
+    `dictlist` is a list of dictionaries
+        all dictionaries should have keys from features
+    `features` is a list of features
+
+    example code:
+    dictlist = [
         {
             'label1': 'value-1,1',
             'label2': 'value-1,2',
@@ -48,32 +55,26 @@ def format_dictlist(dictlist):
         }
     ]
 
-    TO {
-        'header': ['label1', 'label2', 'label3', 'label4'],
-        'datarows': [['value-1,1', 'value-1,2', 'value-1,3', 'value-1,4'],
-                     ['value-2,1', 'value-2,2', 'value-2,3', 'value-2,4']]
-    }
+    header, datarows = format_dictlist(dictlist, ['label1', 'label4'])
 
-    Assumes all keys for input dicts are the same.
+    # results in
+    header = ['label1', 'label4']
+    datarows = [['value-1,1', 'value-1,4'],
+                ['value-2,1', 'value-2,4']]
+    }
     """
 
-    if len(dictlist) > 0:
-        header = dictlist[0].keys()
-    else:
-        header = []
-
     def dict_to_entry(dct):
-        """ Convert dictionary to list for a csv row """
-        ordered = sorted(dct.items(), key=lambda (k, v): header.index(k))
+        """ Convert dictionary to a list for a csv row """
+        relevant_items = [(k, v) for (k, v) in dct.items() if k in features]
+        ordered = sorted(relevant_items, key=lambda (k, v): header.index(k))
         vals = [v for (_, v) in ordered]
         return vals
 
+    header = features
     datarows = map(dict_to_entry, dictlist)
 
-    return {
-        'header': header,
-        'datarows': datarows,
-    }
+    return header, datarows
 
 
 def format_instances(instances, features):
