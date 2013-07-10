@@ -1,6 +1,6 @@
 <head>
 	${css_link("../static/css/search.css")}
-	${js_link("../static/js/div_sizing.js")}
+	${js_link("../static/js/search.js")}
 </head>
 
 % if spelling_correction:
@@ -14,29 +14,33 @@
 % endif
 
 <div class="search-results">
-	% for datum in data:
-		<a href=${datum[3]}>
-			<section class="result">
-				<div class="result_wrapper">
-					<h1 class="result-title">${datum[0]}</h1>
-					<div class="result-content">
-						<div class="columnate">
-							% if len(datum) >= 3:
-								<img class="thumbnail" src="${datum[2]}" alt="${datum[0]}">
-							% endif
-						</div>
-						<div class="columnate">
-							<div class="snippet_container">
-								<p  class="results_snippet scaled-text">
-									${datum[1]}
-								</p>
-							</div>
-						</div>
-					</div>
-				</div>
-			</section>
-		</a>
-	% endfor
+    % if results == "true":
+    	% for datum in data:
+    		<a href=${datum[3]}>
+    			<section class="result">
+    				<div class="result_wrapper">
+    					<h1 class="result-title">${datum[0]}</h1>
+    					<div class="result-content">
+    						<div class="columnate">
+    							% if len(datum) >= 3:
+    								<img class="thumbnail" src="${datum[2]}" alt="${datum[0]}">
+    							% endif
+    						</div>
+    						<div class="columnate">
+    							<div class="snippet_container">
+    								<p  class="results_snippet scaled-text">
+    									${datum[1]}
+    								</p>
+    							</div>
+    						</div>
+    					</div>
+    				</div>
+    			</section>
+    		</a>
+    	% endfor
+    % else:
+        <h1 class="result-title no-results">${data[0][0]}</h1>
+    % endif
 </div>
 
 % if len(data) > 1:
