@@ -378,7 +378,7 @@ function _deleteItem($el) {
 
     var id = $el.data('id');
 
-    analytics.track(gettext('Deleted an Item'), {
+    analytics.track('Deleted an Item', {
         'course': course_location_analytics,
         'id': id
     });
@@ -554,7 +554,7 @@ function saveNewSection(e) {
     var template = $saveButton.data('template');
     var display_name = $(this).find('.new-section-name').val();
 
-    analytics.track(gettext('Created a Section'), {
+    analytics.track('Created a Section', {
         'course': course_location_analytics,
         'display_name': display_name
     });
@@ -605,7 +605,7 @@ function saveNewCourse(e) {
         return;
     }
 
-    analytics.track(gettext('Created a Course'), {
+    analytics.track('Created a Course', {
         'org': org,
         'number': number,
         'display_name': display_name
@@ -662,7 +662,7 @@ function saveNewSubsection(e) {
     var template = $(this).find('.new-subsection-name-save').data('template');
     var display_name = $(this).find('.new-subsection-name-input').val();
 
-    analytics.track(gettext('Created a Subsection'), {
+    analytics.track('Created a Subsection', {
         'course': course_location_analytics,
         'display_name': display_name
     });
@@ -708,7 +708,7 @@ function saveSetSectionScheduleDate(e) {
 
     var id = $modal.attr('data-id');
 
-    analytics.track(gettext('Edited Section Release Date'), {
+    analytics.track('Edited Section Release Date', {
         'course': course_location_analytics,
         'id': id,
         'start': start
