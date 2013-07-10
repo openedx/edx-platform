@@ -312,13 +312,6 @@ Static template view
     :members:
     :show-inheritance:
 
-Models
-------
-
-.. automodule:: static_template_view.models
-    :members:
-    :show-inheritance:
-
 Views
 -----
 
