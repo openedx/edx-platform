@@ -8,13 +8,14 @@
     id="<%= 'course-checklist' + checklistIndex %>">
     <% var widthPercentage = 'width:' + percentChecked + '%;'; %>
     <span class="viz viz-checklist-status"><span class="viz value viz-checklist-status-value" style="<%= widthPercentage %>">
-        <span class="int"><%= percentChecked %></span>${_("% of checklist completed")}</span></span>
+        <%= _.str.sprintf(gettext('<span class="int">%d</span>%% of checklist completed'), percentChecked) %>
+    </span></span>
     <header>
         <h3 class="checklist-title title-2 is-selectable" title="Collapse/Expand this Checklist">
             <i class="icon-caret-down ui-toggle-expansion"></i>
             <%= checklistShortDescription %></h3>
               <span class="checklist-status status">
-                ${_("Tasks Completed:")} <span class="status-count"><%= itemsChecked %></span>/<span class="status-amount"><%= items.length %></span>
+                <%= gettext("Tasks Completed:") %> <span class="status-count"><%= itemsChecked %></span>/<span class="status-amount"><%= items.length %></span>
                 <i class="icon-ok"></i>
               </span>
     </header>
@@ -47,7 +48,7 @@
                     <li class="action-item">
                         <a href="<%= item['action_url'] %>" class="action action-primary"
                         <% if (item['action_external']) { %>
-                        rel="external" title="This link will open in a new browser window/tab"
+                        rel="external" title="<%= gettext("This link will open in a new browser window/tab") %>"
                         <% } %>
                         ><%= item['action_text'] %></a>
                     </li>
