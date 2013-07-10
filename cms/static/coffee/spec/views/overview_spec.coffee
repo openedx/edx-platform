@@ -49,7 +49,6 @@ describe "Course Overview", ->
         sinon.useFakeXMLHttpRequest()
 
     afterEach ->
-        @xhr.restore()
         delete window.analytics
         delete window.course_location_analytics
 
