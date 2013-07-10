@@ -39,13 +39,6 @@ Views
     :members:
     :show-inheritance:
 
-Tests
------
-
-.. automodule:: certificates.tests
-    :members:
-    :show-inheritance:
-
 Circuit
 =======
 
@@ -64,13 +57,6 @@ Views
 -----
 
 .. automodule:: circuit.views
-    :members:
-    :show-inheritance:
-
-Tests
------
-
-.. automodule:: circuit.tests
     :members:
     :show-inheritance:
 
@@ -181,12 +167,6 @@ Views
     :members:
     :show-inheritance:
 
-Tests
------
-
-.. automodule:: dashboard.tests
-    :members:
-    :show-inheritance:
 
 Django comment client
 =====================
@@ -202,12 +182,6 @@ Models
     :members:
     :show-inheritance:
 
-Tests
------
-
-.. automodule:: django_comment_client.tests
-    :members:
-    :show-inheritance:
 
 Heartbeat
 =========
@@ -230,12 +204,6 @@ Views
     :members:
     :show-inheritance:
 
-Tests
------
-
-.. .. automodule:: instructor.tests
-..     :members:
-..     :show-inheritance:
 
 Lisenses
 ========
@@ -258,12 +226,6 @@ Views
     :members:
     :show-inheritance:
 
-Tests
------
-
-.. automodule:: licenses.tests
-    :members:
-    :show-inheritance:
 
 LMS migration
 =============
@@ -336,13 +298,6 @@ Views
     :members:
     :show-inheritance:
 
-Tests
------
-
-.. automodule:: static_template_view.tests
-    :members:
-    :show-inheritance:
-
 
 Static book
 ===========
@@ -362,12 +317,5 @@ Views
 -----
 
 .. automodule:: staticbook.views
-    :members:
-    :show-inheritance:
-
-Tests
------
-
-.. automodule:: staticbook.tests
     :members:
     :show-inheritance:
