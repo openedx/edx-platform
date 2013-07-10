@@ -1,4 +1,4 @@
-;(function($) {
+ ;(function($) {
     $.fn.textfill = function(options) {
         var fontSize = options.maxFont;
         var ourText = $('span:visible:first', this);
@@ -16,12 +16,17 @@
     };
 })(jQuery);
 
-function submitForms(id_array) {
+function correctionLink(event, spelling_correction){
+    $("#searchbox")[0].value = spelling_correction;
+    submitForms();
+}
+
+function submitForms() {
     var get_data = [];
-    for (var i=0;i<id_array.length;i++){
-        get_data.push.apply(get_data, $('#'+id_array[i]).serializeArray());
+    var form_list = $(".auto-submit");
+    for (var i in form_list){
+        get_data.push.apply(get_data, form_list.eq(i).serializeArray());
     }
-    console.log(get_data);
     var url = document.URL.split("?")[0]+"?";
     for (var o in get_data){
         url = url + (get_data[o].name + "=" +get_data[o].value + "&");
@@ -30,8 +35,8 @@ function submitForms(id_array) {
 }
 
 function searchHandle(e, id_array){
-    e.preventDefault();
     if(e.keyCode === 13){
+        e.preventDefault();
         submitForms(id_array);
     }
 }
