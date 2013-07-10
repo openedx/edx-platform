@@ -7,7 +7,7 @@
 <div class="correction_div">
 	<p class="search_correction">
 		<span>Did you mean </span>
-		<a href="${ search_correction_link }">${spelling_correction }</a>
+		<a onclick="correctionLink(event, '${spelling_correction}')">${spelling_correction}</a>
 		<span>?</span>
 	</p>
 </div>
@@ -47,15 +47,19 @@
 	<div class="pagination">
 		<span class="step-links">
 			% if data.number > 1:
-				<a href="${ prev_page }">Prev</a>
+				<a onclick="decrementPage()">Prev</a>
 			% endif
 
-			<span class="current">
-				Page ${ data.number } of ${ data.paginator.num_pages }
-			</span> 
+			<form id="current-page" class="auto-submit" action="/search" method="get">
+                <span class="current-page">
+				    Page 
+                    <input type="number" name="page" value="${ data.number }" onkeydown="searchHandle(event, true)" onchange="changeHandler(this, ${data.paginator.num_pages})"/> 
+                    of ${ data.paginator.num_pages }
+                </span>
+			</form> 
 
 			% if data.number < data.paginator.num_pages:
-				<a href="${next_page}">Next</a>
+				<a onclick="incrementPage()">Next</a>
 			%endif
 		</span>
 	</div>
