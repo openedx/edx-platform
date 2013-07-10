@@ -39,7 +39,7 @@ class CourseCreator(models.Model):
                                                                     "why course creation access was denied)"))
 
     def __unicode__(self):
-        return u'%str | %str [%str] | %str' % (self.user, self.state, self.state_changed, self.note)
+        return u'%s | %s [%s]' % (self.user, self.state, self.state_changed)
 
 
 @receiver(post_init, sender=CourseCreator)
