@@ -26,6 +26,7 @@ Feature: Create Section
     When I click the Edit link for the release date
     And I save a new section release date
     Then the section release date is updated
+    And I see a "saving" notification
 
   Scenario: Delete section
     Given I have opened a new course in Studio
