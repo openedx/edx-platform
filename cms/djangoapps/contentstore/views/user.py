@@ -8,28 +8,11 @@ from mitxmako.shortcuts import render_to_response
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from contentstore.utils import get_url_reverse, get_lms_link_for_item
-from util.json_request import expect_json
+from util.json_request import expect_json, JsonResponse
 from auth.authz import STAFF_ROLE_NAME, INSTRUCTOR_ROLE_NAME, get_users_in_course_group_by_role
 from auth.authz import get_user_by_email, add_user_to_course_group, remove_user_from_course_group
 
 from .access import has_access
-from .requests import create_json_response
-
-
-def user_author_string(user):
-    '''Get an author string for commits by this user.  Format:
-    first last <email@email.com>.
-
-    If the first and last names are blank, uses the username instead.
-    Assumes that the email is not blank.
-    '''
-    f = user.first_name
-    l = user.last_name
-    if f == '' and l == '':
-        f = user.username
-    return '{first} {last} <{email}>'.format(first=f,
-                                             last=l,
-                                             email=user.email)
 
 
 @login_required
@@ -73,7 +56,6 @@ def manage_users(request, location):
     course_module = modulestore().get_item(location)
 
     return render_to_response('manage_users.html', {
-        'active_tab': 'users',
         'context_course': course_module,
         'staff': get_users_in_course_group_by_role(location, STAFF_ROLE_NAME),
         'add_user_postback_url': reverse('add_user', args=[location]).rstrip('/'),
@@ -91,10 +73,14 @@ def add_user(request, location):
     This POST-back view will add a user - specified by email - to the list of editors for
     the specified course
     '''
-    email = request.POST["email"]
+    email = request.POST.get("email")
 
-    if email == '':
-        return create_json_response('Please specify an email address.')
+    if not email:
+        msg = {
+            'Status': 'Failed',
+            'ErrMsg': 'Please specify an email address.',
+        }
+        return JsonResponse(msg, 400)
 
     # check that logged in user has admin permissions to this course
     if not has_access(request.user, location, role=INSTRUCTOR_ROLE_NAME):
@@ -104,16 +90,24 @@ def add_user(request, location):
 
     # user doesn't exist?!? Return error.
     if user is None:
-        return create_json_response('Could not find user by email address \'{0}\'.'.format(email))
+        msg = {
+            'Status': 'Failed',
+            'ErrMsg': "Could not find user by email address '{0}'.".format(email),
+        }
+        return JsonResponse(msg, 404)
 
     # user exists, but hasn't activated account?!?
     if not user.is_active:
-        return create_json_response('User {0} has registered but has not yet activated his/her account.'.format(email))
+        msg = {
+            'Status': 'Failed',
+            'ErrMsg': 'User {0} has registered but has not yet activated his/her account.'.format(email),
+        }
+        return JsonResponse(msg, 400)
 
     # ok, we're cool to add to the course group
     add_user_to_course_group(request.user, user, location, STAFF_ROLE_NAME)
 
-    return create_json_response()
+    return JsonResponse({"Status": "OK"})
 
 
 @expect_json
@@ -133,7 +127,11 @@ def remove_user(request, location):
 
     user = get_user_by_email(email)
     if user is None:
-        return create_json_response('Could not find user by email address \'{0}\'.'.format(email))
+        msg = {
+            'Status': 'Failed',
+            'ErrMsg': "Could not find user by email address '{0}'.".format(email),
+        }
+        return JsonResponse(msg, 404)
 
     # make sure we're not removing ourselves
     if user.id == request.user.id:
@@ -141,4 +139,4 @@ def remove_user(request, location):
 
     remove_user_from_course_group(request.user, user, location, STAFF_ROLE_NAME)
 
-    return create_json_response()
+    return JsonResponse({"Status": "OK"})

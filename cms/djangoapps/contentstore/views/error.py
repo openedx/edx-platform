@@ -1,3 +1,5 @@
+#pylint: disable=C0111,W0613
+
 from django.http import (HttpResponse, HttpResponseServerError,
                          HttpResponseNotFound)
 from mitxmako.shortcuts import render_to_string, render_to_response

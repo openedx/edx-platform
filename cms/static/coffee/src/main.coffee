@@ -3,6 +3,8 @@ AjaxPrefix.addAjaxPrefix(jQuery, -> CMS.prefix)
 @CMS =
   Models: {}
   Views: {}
+  Collections: {}
+  URL: {}
 
   prefix: $("meta[name='path_prefix']").attr('content')
 
@@ -17,7 +19,7 @@ $ ->
 
   $(document).ajaxError (event, jqXHR, ajaxSettings, thrownError) ->
     if ajaxSettings.notifyOnError is false
-      return
+        return
     if jqXHR.responseText
       try
         message = JSON.parse(jqXHR.responseText).error
