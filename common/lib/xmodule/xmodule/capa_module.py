@@ -146,7 +146,7 @@ class CapaFields(object):
         values={"min": 0, "step": .1},
         scope=Scope.settings
     )
-    markdown = String(help="Markdown source of this module", default="", scope=Scope.settings)
+    markdown = String(help="Markdown source of this module", default=None, scope=Scope.settings)
     source_code = String(
         help="Source code for LaTeX and Word problems. This feature is not well-supported.",
         scope=Scope.settings
