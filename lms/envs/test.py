@@ -29,9 +29,6 @@ MITX_FEATURES['ENABLE_SERVICE_STATUS'] = True
 
 MITX_FEATURES['ENABLE_HINTER_INSTRUCTOR_VIEW'] = True
 
-# Enabling SQL tracking logs for testing on common/djangoapps/track
-MITX_FEATURES['ENABLE_SQL_TRACKING_LOGS'] = True
-
 # Need wiki for courseware views to work. TODO (vshnayder): shouldn't need it.
 WIKI_ENABLED = True
 
