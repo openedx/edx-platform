@@ -21,7 +21,17 @@ import os
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 # sys.path.insert(0, os.path.abspath('.'))
-sys.path.insert(0, os.path.abspath('../..'))  # mitx folder
+
+mitx = os.path.abspath('../..')
+
+sys.path.append(mitx)
+sys.path.append(os.path.join(mitx, "common/djangoapps"))
+sys.path.append(os.path.join(mitx, "common/lib"))
+sys.path.append(os.path.join(mitx, "common/lib/sandbox-packages"))
+sys.path.append(os.path.join(mitx, "lms/djangoapps"))
+sys.path.append(os.path.join(mitx, "lms/lib"))
+sys.path.append(os.path.join(mitx, "cms/djangoapps"))
+sys.path.append(os.path.join(mitx, "cms/lib"))
 
 #  django configuration  - careful here
 os.environ['DJANGO_SETTINGS_MODULE'] = 'lms.envs.test'
