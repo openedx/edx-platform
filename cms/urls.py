@@ -81,6 +81,12 @@ urlpatterns = ('',  # nopep8
         'contentstore.views.asset_index', name='asset_index'),
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/assets/(?P<name>[^/]+)/remove$',
         'contentstore.views.assets.remove_asset', name='remove_asset'),
+    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/textbooks/(?P<name>[^/]+)$',
+        'contentstore.views.textbook_index', name='textbook_index'),
+    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/textbooks/(?P<name>[^/]+)/new$',
+        'contentstore.views.create_textbook', name='create_textbook'),
+    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/textbooks/(?P<name>[^/]+)/(?P<tid>\d[^/]*)$',
+        'contentstore.views.textbook_by_id', name='textbook_by_id'),
 
     # this is a generic method to return the data/metadata associated with a xmodule
     url(r'^module_info/(?P<module_location>.*)$',
@@ -93,9 +99,6 @@ urlpatterns = ('',  # nopep8
 
     url(r'^not_found$', 'contentstore.views.not_found', name='not_found'),
     url(r'^server_error$', 'contentstore.views.server_error', name='server_error'),
-
-    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/assets/(?P<name>[^/]+)$',
-        'contentstore.views.asset_index', name='asset_index'),
 
     # temporary landing page for edge
     url(r'^edge$', 'contentstore.views.edge', name='edge'),
@@ -151,5 +154,6 @@ urlpatterns += (url(r'^admin/', include(admin.site.urls)),)
 urlpatterns = patterns(*urlpatterns)
 
 # Custom error pages
+#pylint: disable=C0103
 handler404 = 'contentstore.views.render_404'
 handler500 = 'contentstore.views.render_500'

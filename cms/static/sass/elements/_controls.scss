@@ -135,6 +135,18 @@
 
 // ====================
 
+// button elements
+.button {
+
+  [class^="icon-"] {
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: ($baseline/4);
+  }
+}
+
+// ====================
+
 // simple dropdown button styling - should we move this elsewhere?
 .btn-dd {
   @extend .btn;
