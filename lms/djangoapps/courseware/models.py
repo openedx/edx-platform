@@ -65,6 +65,8 @@ class StudentModule(models.Model):
             'student': self.student.username,
             'module_state_key': self.module_state_key,
             'state': str(self.state)[:20],
+            'grade': self.grade,
+            'max_grade': self.max_grade,
         },)
 
     def __unicode__(self):

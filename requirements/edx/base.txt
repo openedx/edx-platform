@@ -72,6 +72,7 @@ django-ratelimit-backend==0.6
 
 # Used for debugging
 ipython==0.13.1
+meliae==0.4.0
 
 # Used for development operation
 watchdog==0.6.0

@@ -6,11 +6,15 @@ running state of a course.
 import json
 from json import JSONEncoder
 from time import time
+from sys import exc_info
+from traceback import format_exc
+import meliae.scanner as scanner
 
 from celery import Task, current_task
 from celery.utils.log import get_task_logger
 from celery.states import SUCCESS, FAILURE
 
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import transaction, reset_queries
 from dogapi import dog_stats_api
@@ -20,7 +24,7 @@ from xmodule.modulestore.django import modulestore
 
 from track.views import task_track
 
-from courseware.grades import grade, grade_as_task
+from courseware.grades import grade_as_task, GradingModuleInstantiationException
 from courseware.models import StudentModule, OfflineComputedGrade
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module_for_descriptor_internal
@@ -274,6 +278,13 @@ def perform_enrolled_student_update(course_id, _module_state_key, student_identi
         # update task status:
         task_progress = get_task_progress()
         _get_current_task().update_state(state=PROGRESS, meta=task_progress)
+
+    # write out a dump of memory usage at the end of this, to see what is left
+    # around.  Enable it if it hasn't been explicitly disabled.
+    if getattr(settings, 'PERFORM_TASK_MEMORY_DUMP', True):
+        request_task_id = _get_current_task().request.id
+        filename = "meliae_dump_{}.dat".format(request_task_id)
+        scanner.dump_all_objects(filename)
 
     return task_progress
 
@@ -792,10 +803,11 @@ class GradingJSONEncoder(JSONEncoder):
 @transaction.autocommit
 def update_offline_grade(xmodule_instance_args, course_descriptor, student):
     """
-    Delete the StudentModule entry.
+    Update the grading information stored for a particular student in a course.
 
     Always returns true, indicating success, if it doesn't raise an exception due to database error.
     """
+    return_value = True
     # TODO: this could be made into a global?  Are there threading issues that
     # might arise if we did that?  Savings by pulling it out of this inner loop?
     json_encoder = GradingJSONEncoder()
@@ -803,16 +815,23 @@ def update_offline_grade(xmodule_instance_args, course_descriptor, student):
     # call the main grading function:
     track_function = _get_track_function_for_task(student, xmodule_instance_args)
     xqueue_callback_url_prefix = _get_xqueue_callback_url_prefix(xmodule_instance_args)
-    gradeset = grade_as_task(student, course_descriptor, track_function, xqueue_callback_url_prefix)
-    json_grades = json_encoder.encode(gradeset)
-    offline_grade_entry, created = OfflineComputedGrade.objects.get_or_create(user=student, course_id=course_descriptor.id)
-    offline_grade_entry.gradeset = json_grades
-    offline_grade_entry.save()
+    try:
+        gradeset = grade_as_task(student, course_descriptor, track_function, xqueue_callback_url_prefix)
+    except GradingModuleInstantiationException as exc:
+        # if we're unable to perform grading because we cannot load one of the student's
+        # modules, then just fail this particular student, not the entire grading run.
+        TASK_LOG.warning('failing to grade student id="%s" because of module failure: %s', student.id, exc.message)
+        return_value = False
+    else:
+        json_grades = json_encoder.encode(gradeset)
+        offline_grade_entry, created = OfflineComputedGrade.objects.get_or_create(user=student, course_id=course_descriptor.id)
+        offline_grade_entry.gradeset = json_grades
+        offline_grade_entry.save()
 
-    # Get request-related tracking information from args passthrough,
-    # and supplement with task-specific information:
-    track_function('offline_grade', {'created': created})
+        # Get request-related tracking information from args passthrough,
+        # and supplement with task-specific information:
+        track_function('offline_grade', {'created': created})
 
     # Release any queries that the connection has been hanging onto:
     reset_queries()
-    return True
+    return return_value

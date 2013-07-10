@@ -22,7 +22,17 @@ from courseware.module_render import get_module, get_module_for_descriptor, get_
 log = logging.getLogger("mitx.courseware")
 
 
+class GradingModuleInstantiationException(Exception):
+    """
+    Exception indicating that a module instance could not be instantiated during grading.
+    """
+    pass
+
+
 def _yield_module_descendents(module):
+    """
+    TODO:
+    """
     stack = module.get_display_items()
     stack.reverse()
 
@@ -194,16 +204,19 @@ def grade_as_task(student, course, track_function, xqueue_callback_url_prefix):
     field_data_cache = FieldDataCache(grading_context['all_descriptors'], course_id, student)
     keep_raw_scores = True
 
-    class ModuleInstantiationException(Exception):
-        pass
-
     def module_creator(descriptor):
         """creates an XModule instance given a descriptor"""
         module = get_module_for_descriptor_internal(
             student, descriptor, field_data_cache, course_id, track_function, xqueue_callback_url_prefix
         )
+        # TODO: fix this so that we are returning an error directly, rather than returning a
+        # module.  That way we wouldn't have to unpack the error in the first place.
         if isinstance(module, (ErrorModule, NonStaffErrorModule)):
-            raise ModuleInstantiationException("Unable to create module: %s".format(module.error_msg))
+            # try to get the original error message from the error module itself:
+            # TODO: Not sure that this works.  Needs tests put in place.
+            error_message = module.error_msg
+            msg = "Unable to create module: %s".format(error_message)
+            raise GradingModuleInstantiationException(msg)
 
     return _grade(student, course, grading_context, module_creator, field_data_cache, keep_raw_scores)
 

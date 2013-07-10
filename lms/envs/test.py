@@ -202,6 +202,8 @@ CC_PROCESSOR['CyberSource']['PURCHASE_ENDPOINT'] = "/shoppingcart/payment_fake"
 CELERY_ALWAYS_EAGER = True
 CELERY_RESULT_BACKEND = 'cache'
 BROKER_TRANSPORT = 'memory'
+# disable dumping memory
+PERFORM_TASK_MEMORY_DUMP = False
 
 ############################ STATIC FILES #############################
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
