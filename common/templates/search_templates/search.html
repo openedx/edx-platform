@@ -6,20 +6,20 @@
 
 <div class="searchwrapper">
 	<span>
-        <form id="query_box" action="/search" method="get">
+        <form id="query-box" class="auto-submit" action="/search" method="get">
     		<div class="searchbox-wrapper">
     			% if old_query:
-    			<input type="text" class="searchbox" name="s" value="${old_query}" onkeydown="searchHandle(event, ['query_box', 'content-select'])"/>
+    			<input type="text" id="searchbox" class="searchbox" name="s" value="${old_query}" onkeydown="searchHandle(event, false)"/>
     			% else:
-    			<input type="text" class="searchbox" name="s" value="" onkeydown="searchHandle(event, ['query_box', 'content-select'])"/>
+    			<input type="text" id="searchbox" class="searchbox" name="s" value="" onkeydown="searchHandle(event, false)"/>
     			% endif
-    			<div class="searchbox_submit" onclick="submitForms(['query_box', 'content-select'])">
-    				<input type="submit" value="" />
+    			<div class="searchbox_submit">
+    				<input type="submit" value="" onclick="clickHandle(event, false)"/>
     			</div>
     		</div>
         </form>
 
-        <form id="content-select" action="/search" method="get">
+        <form id="content-select" class="auto-submit" action="/search" method="get">
     		<div class="content-select">
     			% if previous.get("transcript", "false") == "true":
     				<input type="checkbox" class="content" name="transcript" value="true" checked>Videos

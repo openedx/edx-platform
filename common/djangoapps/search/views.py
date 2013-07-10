@@ -35,7 +35,7 @@ def find(request, database="http://127.0.0.1:9200",
     full_url = "/".join([database, index, "_search?q="+field+":"])
     context = {}
     response = requests.get(full_url+query+"&size="+str(max_result))
-    results = json.loads(response._content)["hits"]["hits"]
+    results = json.loads(response._content).get("hits", {"hits": ""})["hits"]
     data = [entry["_source"] for entry in results]
     #titles = [entry["display_name"] for entry in data]
     uuids = [entry["display_name"] for entry in data]
