@@ -111,7 +111,7 @@ def _delete_modules_except_course(modulestore, modules, source_location, commit)
     """
     for module in modules:
         if module.category != 'course':
-            logging.debug("Deleting {0}...".format(module.location))
+            logging.warning("Deleting {0}...".format(module.location))
             if commit:
                 # sanity check. Make sure we're not deleting a module in the incorrect course
                 if module.location.org != source_location.org or module.location.course != source_location.course:
@@ -126,7 +126,7 @@ def _delete_assets(contentstore, assets, commit):
     for asset in assets:
         asset_loc = Location(asset["_id"])
         id = StaticContent.get_id_from_location(asset_loc)
-        logging.debug("Deleting {0}...".format(id))
+        logging.warning("Deleting {0}...".format(id))
         if commit:
             contentstore.delete(id)
 
