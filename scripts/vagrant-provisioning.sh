@@ -75,6 +75,11 @@ chown vagrant.vagrant /opt/edx /opt/edx/node_modules /opt/edx/edx-platform/node_
 }
 sudo -u vagrant -i bash -c "cd /opt/edx/edx-platform && PROJECT_HOME=/opt/edx ./scripts/create-dev-env.sh -ynq"
 
+# Load .bashrc ################################################################
+([[ -f ~vagrant/.bash_profile ]] && grep ".bashrc" ~vagrant/.bash_profile) || {
+    echo -e "\n. /home/vagrant/.bashrc\n" >> ~vagrant/.bash_profile
+}
+
 
 # Virtualenv - Always load ####################################################
 
