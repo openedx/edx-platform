@@ -728,18 +728,16 @@ function saveSetSectionScheduleDate(e) {
         })
     }).success(function() {
         var $thisSection = $('.courseware-section[data-id="' + id + '"]');
-        var format = gettext('<strong>Will Release:</strong> %(date)s at %(time)s UTC');
-        var willReleaseAt = interpolate(format, {
-            'date': input_date,
-            'time': input_time
-        },
-        true);
-        $thisSection.find('.section-published-date').html(
-            '<span class="published-status">' + willReleaseAt + '</span>' +
-            '<a href="#" class="edit-button" ' +
-            '" data-date="' + input_date +
-            '" data-time="' + input_time +
-            '" data-id="' + id + '">' + gettext('Edit') + '</a>');
+        var html = _.template(
+            '<span class="published-status">' +
+                '<strong>' + gettext("Will Release:") + '</strong>' +
+                gettext("<%= date %> at <%= time %> UTC") +
+            '</span>' +
+            '<a href="#" class="edit-button" data-date="<%= date %>" data-time="<%= time %>" data-id="<%= id %>">' +
+                gettext("Edit") +
+            '</a>',
+            {date: input_date, time: input_time, id: id});
+        $thisSection.find('.section-published-date').html(html);
         $thisSection.find('.section-published-date').animate({
             'background-color': 'rgb(182,37,104)'
         }, 300).animate({

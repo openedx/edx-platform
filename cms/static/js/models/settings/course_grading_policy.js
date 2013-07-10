@@ -110,7 +110,9 @@ CMS.Models.Settings.CourseGrader = Backbone.Model.extend({
             else attrs.drop_count = parseInt(attrs.drop_count);
         }
         if (attrs['min_count'] && attrs['drop_count'] && attrs.drop_count > attrs.min_count) {
-            errors.drop_count = gettext("Cannot drop more %s than will assigned.").split("%s").join(attrs.type);
+            errors.drop_count = _.template(
+                gettext("Cannot drop more <%= attrs.type %> than will assigned."),
+                attrs, {variable: 'attrs'});
         }
         if (!_.isEmpty(errors)) return errors;
     }
