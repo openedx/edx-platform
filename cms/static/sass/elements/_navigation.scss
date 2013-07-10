@@ -33,7 +33,7 @@ nav {
     }
 
     .ui-toggle-dd {
-      @include transition(rotate .25s ease-in-out .25s);
+      @include transition(all $tmg-f2 ease-in-out 0s);
       margin-left: ($baseline/10);
       display: inline-block;
       vertical-align: middle;
@@ -58,7 +58,7 @@ nav {
   }
 
   .wrapper-nav-sub {
-    @include transition (opacity 1.0s ease-in-out 0s);
+    @include transition(opacity $tmg-f2 ease-in-out 0s);
     position: absolute;
     top: ($baseline*2.5);
     opacity: 0.0;
@@ -74,9 +74,9 @@ nav {
   }
 
   .nav-sub {
-    @include border-radius(2px);
+    border-radius: 2px;
     @include box-sizing(border-box);
-    @include box-shadow(0 1px 1px $shadow-l1);
+    box-shadow: 0 1px 1px $shadow-l1;
     position: relative;
     width: 100%;
     border: 1px solid $gray-l3;

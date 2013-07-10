@@ -42,7 +42,7 @@ h1.top-header {
   width: flex-grid(9) + flex-gutter();
 
   @media print {
-    @include box-shadow(none);
+    box-shadow: none;
   }
 }
 
@@ -96,7 +96,7 @@ h1.top-header {
     a {
       display: block;
       text-decoration: none;
-      @include transition();
+      @include transition(none);
     }
 
     &.active {
@@ -143,7 +143,7 @@ h1.top-header {
     a {
       background: #f6f6f6 url('../images/slide-left-icon.png') center center no-repeat;
       border: 1px solid #D3D3D3;
-      @include border-radius(3px 0 0 3px);
+      border-radius: 3px 0 0 3px;
       height: 16px;
       padding: 6px;
       position: absolute;
@@ -185,6 +185,6 @@ h1.top-header {
 }
 
 .tran {
-  @include transition( all, .2s, $ease-in-out-quad);
+  @include transition( all .2s $ease-in-out-quad 0s);
 }
 

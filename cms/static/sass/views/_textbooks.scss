@@ -129,7 +129,7 @@ body.course.textbooks {
 
     .edit-textbook {
         @include box-sizing(border-box);
-        @include border-radius(2px);
+        border-radius: 2px;
         width: 100%;
         background: $white;
 
@@ -143,7 +143,7 @@ body.course.textbooks {
       }
 
       .actions {
-        @include box-shadow(inset 0 1px 2px $shadow);
+        box-shadow: inset 0 1px 2px $shadow;
         border-top: 1px solid $gray-l1;
         padding: ($baseline*0.75) $baseline;
         background: $gray-l6;
@@ -383,9 +383,9 @@ body.course.textbooks {
   }
 
   .dialog  {
-    @include box-shadow(0px 0px 7px $shadow-d1);
     @include box-sizing(border-box);
-    @include border-radius(($baseline/5));
+    box-shadow: 0px 0px 7px $shadow-d1;
+    border-radius: ($baseline/5);
     background-color: $gray-l4;
     display: inline-block;
     vertical-align: middle;
@@ -413,7 +413,7 @@ body.course.textbooks {
       padding: 0;
 
       .form-content {
-        @include box-shadow(0 0 3px $shadow-d1);
+        box-shadow: 0 0 3px $shadow-d1;
         padding: ($baseline*1.5);
         background-color: $white;
       }
@@ -427,7 +427,7 @@ body.course.textbooks {
         margin-top: $baseline;
 
         .wrapper-progress {
-          @include box-shadow(inset 0 0 3px $shadow-d1);
+          box-shadow: inset 0 0 3px $shadow-d1;
           display: block;
           border-radius: ($baseline*0.75);
           background-color: $gray-l5;

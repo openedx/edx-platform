@@ -114,7 +114,7 @@ body.index {
 
     // feature content
     .wrapper-content-features {
-      @include box-shadow(0 -1px ($baseline/4) $shadow);
+      box-shadow: 0 -1px ($baseline/4) $shadow;
       padding-bottom: ($baseline*2);
       padding-top: ($baseline*3);
       background: $white;
@@ -141,7 +141,7 @@ body.index {
 
           a {
             @include box-sizing(border-box);
-            @include box-shadow(0 1px ($baseline/10) $shadow-l1);
+            box-shadow: 0 1px ($baseline/10) $shadow-l1;
             position: relative;
             top: 0;
             display: block;
@@ -151,7 +151,7 @@ body.index {
             background: $white;
 
             .action-zoom {
-              @include transition(bottom .50s ease-in-out);
+              @include transition(bottom $tmg-f2 ease-in-out 0s);
               position: absolute;
               bottom: -30px;
               right: ($baseline/2);
@@ -214,8 +214,8 @@ body.index {
 
             .proofpoint {
               @include box-sizing(border-box);
-              @include border-radius(($baseline/4));
-              @include transition(color .50s ease-in-out);
+              @include transition(all $tmg-f2 ease-in-out 0s);
+              border-radius: ($baseline/4);
               position: relative;
               top: 0;
               float: left;
@@ -233,7 +233,8 @@ body.index {
               }
 
               &:hover {
-                @include box-shadow(0 1px ($baseline/10) $shadow-l1);
+                @extend .fake-link;
+                box-shadow: 0 1px ($baseline/10) $shadow-l1;
                 background: $blue-l5;
                 top: -($baseline/5);
 
@@ -319,7 +320,6 @@ body.index {
           &.action-primary {
             @extend .t-action1;
             @include blue-button;
-            @include transition(all .15s);
             padding: ($baseline*0.75) ($baseline/2);
             font-weight: 600;
             text-align: center;
