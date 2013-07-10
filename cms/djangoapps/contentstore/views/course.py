@@ -45,6 +45,7 @@ from .component import (
 from django_comment_common.utils import seed_permissions_roles
 import datetime
 from django.utils.timezone import UTC
+from xmodule.html_module import AboutDescriptor
 __all__ = ['course_index', 'create_new_course', 'course_info',
            'course_info_updates', 'get_course_settings',
            'course_config_graders_page',
@@ -133,9 +134,14 @@ def create_new_course(request):
     modulestore('direct').create_and_save_xmodule(dest_location, metadata=metadata)
     new_course = modulestore('direct').get_item(dest_location)
 
-    # clone a default 'about' module as well
-    dest_about_location = dest_location._replace(category='about', name='overview')
-    modulestore('direct').create_and_save_xmodule(dest_about_location, system=new_course.system)
+    # clone a default 'about' overview module as well
+    dest_about_location = dest_location.replace(category='about', name='overview')
+    overview_template = AboutDescriptor.get_template('overview.yaml')
+    modulestore('direct').create_and_save_xmodule(
+        dest_about_location,
+        system=new_course.system,
+        definition_data=overview_template.get('data')
+    )
 
     initialize_course_tabs(new_course)
 
