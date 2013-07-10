@@ -49,30 +49,30 @@ div.video {
         @include clearfix();
         background: #c2c2c2;
         border: 1px solid #000;
-        @include border-radius(0);
+        border-radius: 0;
         border-top: 1px solid #000;
-        @include box-shadow(inset 0 1px 0 #eee, 0 1px 0 #555);
+        box-shadow: inset 0 1px 0 #eee, 0 1px 0 #555;
         height: 7px;
         margin-left: -1px;
         margin-right: -1px;
-        @include transition(height 2.0s ease-in-out);
+        @include transition(height 2.0s ease-in-out 0s);
 
         div.ui-widget-header {
           background: #777;
-          @include box-shadow(inset 0 1px 0 #999);
+          box-shadow: inset 0 1px 0 #999;
         }
 
         a.ui-slider-handle {
           background: $pink url(../images/slider-handle.png) center center no-repeat;
-          @include background-size(50%);
+          background-size: 50%;
           border: 1px solid darken($pink, 20%);
-          @include border-radius(15px);
-          @include box-shadow(inset 0 1px 0 lighten($pink, 10%));
+          border-radius: 15px;
+          box-shadow: inset 0 1px 0 lighten($pink, 10%);
           cursor: pointer;
           height: 15px;
           margin-left: -7px;
           top: -4px;
-          @include transition(height 2.0s ease-in-out, width 2.0s ease-in-out);
+          @include transition(height 2.0s ease-in-out 0s, width 2.0s ease-in-out 0s);
           width: 15px;
 
           &:focus, &:hover {
@@ -83,7 +83,6 @@ div.video {
       }
 
       ul.vcr {
-        @extend .dullify;
         float: left;
         list-style: none;
         margin: 0 lh() 0 0;
@@ -96,13 +95,13 @@ div.video {
           a {
             border-bottom: none;
             border-right: 1px solid #000;
-            @include box-shadow(1px 0 0 #555);
+            box-shadow: 1px 0 0 #555;
             cursor: pointer;
             display: block;
             line-height: 46px;
             padding: 0 lh(.75);
             text-indent: -9999px;
-            @include transition(background-color, opacity);
+            @include transition(background-color 0.75s linear 0s, opacity 0.75s linear 0s);
             width: 14px;
             background: url('../images/vcr.png') 15px 15px no-repeat;
             outline: 0;
@@ -144,7 +143,6 @@ div.video {
       }
 
       div.secondary-controls {
-        @extend .dullify;
         float: right;
 
         div.speeds {
@@ -169,7 +167,7 @@ div.video {
             background: url('../images/closed-arrow.png') 10px center no-repeat;
             border-left: 1px solid #000;
             border-right: 1px solid #000;
-            @include box-shadow(1px 0 0 #555, inset 1px 0 0 #555);
+            box-shadow: 1px 0 0 #555, inset 1px 0 0 #555;
             @include clearfix();
             color: #fff;
             cursor: pointer;
@@ -178,7 +176,7 @@ div.video {
             margin-right: 0;
             padding-left: 15px;
             position: relative;
-            @include transition();
+            @include transition(none);
             -webkit-font-smoothing: antialiased;
             width: 116px;
             outline: 0;
@@ -215,8 +213,8 @@ div.video {
 
           // fix for now
           ol.video_speeds {
-            @include box-shadow(inset 1px 0 0 #555, 0 3px 0 #444);
-            @include transition();
+            box-shadow: inset 1px 0 0 #555, 0 3px 0 #444;
+            @include transition(none);
             background-color: #444;
             border: 1px solid #000;
             bottom: 46px;
@@ -227,7 +225,7 @@ div.video {
             z-index: 10;
 
             li {
-              @include box-shadow( 0 1px 0 #555);
+              box-shadow:  0 1px 0 #555;
               border-bottom: 1px solid #000;
               color: #fff;
               cursor: pointer;
@@ -249,7 +247,7 @@ div.video {
               }
 
               &:last-child {
-                @include box-shadow(none);
+                box-shadow: none;
                 border-bottom: 0;
                 margin-top: 0;
               }
@@ -277,7 +275,7 @@ div.video {
           > a {
             background: url('../images/volume.png') 10px center no-repeat;
             border-right: 1px solid #000;
-            @include box-shadow(1px 0 0 #555, inset 1px 0 0 #555);
+            box-shadow: 1px 0 0 #555, inset 1px 0 0 #555;
             @include clearfix();
             color: #fff;
             cursor: pointer;
@@ -286,7 +284,7 @@ div.video {
             margin-right: 0;
             padding-left: 15px;
             position: relative;
-            @include transition();
+            @include transition(none);
             -webkit-font-smoothing: antialiased;
             width: 30px;
 
@@ -296,8 +294,8 @@ div.video {
           }
 
           .volume-slider-container {
-            @include box-shadow(inset 1px 0 0 #555, 0 3px 0 #444);
-            @include transition();
+            box-shadow: inset 1px 0 0 #555, 0 3px 0 #444;
+            @include transition(none);
             background-color: #444;
             border: 1px solid #000;
             bottom: 46px;
@@ -316,18 +314,18 @@ div.video {
               margin: 14px auto;
               background: #666;
               border: 1px solid #000;
-              @include box-shadow(0 1px 0 #333);
+              box-shadow: 0 1px 0 #333;
 
               a.ui-slider-handle {
                 background: $pink url(../images/slider-handle.png) center center no-repeat;
-                @include background-size(50%);
+                background-size: 50%;
                 border: 1px solid darken($pink, 20%);
-                @include border-radius(15px);
-                @include box-shadow(inset 0 1px 0 lighten($pink, 10%));
+                border-radius: 15px;
+                box-shadow: inset 0 1px 0 lighten($pink, 10%);
                 cursor: pointer;
                 height: 15px;
                 left: -6px;
-                @include transition(height 2.0s ease-in-out, width 2.0s ease-in-out);
+                @include transition(height 2.0s ease-in-out 0s, width 2.0s ease-in-out 0s);
                 width: 15px;
               }
 
@@ -341,7 +339,7 @@ div.video {
         a.add-fullscreen {
           background: url(../images/fullscreen.png) center no-repeat;
           border-right: 1px solid #000;
-          @include box-shadow(1px 0 0 #555, inset 1px 0 0 #555);
+          box-shadow: 1px 0 0 #555, inset 1px 0 0 #555;
           color: #797979;
           display: block;
           float: left;
@@ -349,7 +347,7 @@ div.video {
           margin-left: 0;
           padding: 0 lh(.5);
           text-indent: -9999px;
-          @include transition();
+          @include transition(none);
           width: 30px;
 
           &:hover {
@@ -362,7 +360,7 @@ div.video {
         a.quality_control {
           background: url(../images/hd.png) center no-repeat;
           border-right: 1px solid #000;
-          @include box-shadow(1px 0 0 #555, inset 1px 0 0 #555);
+          box-shadow: 1px 0 0 #555, inset 1px 0 0 #555;
           color: #797979;
           display: block;
           float: left;
@@ -370,7 +368,7 @@ div.video {
           margin-left: 0;
           padding: 0 lh(.5);
           text-indent: -9999px;
-          @include transition();
+          @include transition(none);
           width: 30px;
 
           &:hover {
@@ -399,7 +397,7 @@ div.video {
           padding: 0 lh(.5);
           position: relative;
           text-indent: -9999px;
-          @include transition();
+          @include transition(none);
           -webkit-font-smoothing: antialiased;
           width: 30px;
 
@@ -426,7 +424,7 @@ div.video {
         margin-top: -7px;
 
         a.ui-slider-handle {
-          @include border-radius(20px);
+          border-radius: 20px;
           height: 20px;
           margin-left: -10px;
           top: -4px;
@@ -470,7 +468,6 @@ div.video {
   }
 
   &.closed {
-    @extend .trans;
 
     article.video-wrapper {
       width: flex-grid(9,9);
@@ -545,7 +542,7 @@ div.video {
       position: fixed;
       right: 0;
       top: 0;
-      @include transition();
+      @include transition(none);
 
       li {
         color: #aaa;

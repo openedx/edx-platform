@@ -1,11 +1,11 @@
 .expand-collapse-icon {
+	@include transition(none);
 	position: relative;
 	display: inline-block;
 	width: 9px;
 	height: 11px;
 	margin-right: 10px;
 	background: url(../img/expand-collapse-icons.png) no-repeat;
-	@include transition(none);
 
 	&.expand {
 		top: 1px;
@@ -101,7 +101,7 @@
 	background: url(../img/edit-icon.png) no-repeat;
 
 	&.white {
-		background: url(../img/edit-icon-white.png) no-repeat;		
+		background: url(../img/edit-icon-white.png) no-repeat;
 	}
 }
 
@@ -132,7 +132,7 @@
 	background: url(../img/delete-icon.png) no-repeat;
 
 	&.white {
-		background: url(../img/delete-icon-white.png) no-repeat;		
+		background: url(../img/delete-icon-white.png) no-repeat;
 	}
 }
 

@@ -95,13 +95,17 @@ What would you say to help someone who got this wrong answer?
 </%def>
 
 <%def name="show_votes()">
-    Thank you for voting!
-    <br />
-    % for hint, votes in hint_and_votes:
-        <span style="color:green"> ${votes} votes. </span>
-        ${hint}
-        <br />
-    % endfor
+    % if hint_and_votes is UNDEFINED:
+      Sorry, but you've already voted!
+    % else:
+      Thank you for voting!
+      <br />
+      % for hint, votes in hint_and_votes:
+          <span style="color:green"> ${votes} votes. </span>
+          ${hint}
+          <br />
+      % endfor
+    % endif
 </%def>
 
 <%def name="simple_message()">
@@ -123,3 +127,4 @@ What would you say to help someone who got this wrong answer?
 % if op == "vote":
     ${show_votes()}
 % endif
+

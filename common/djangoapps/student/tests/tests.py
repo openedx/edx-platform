@@ -9,15 +9,12 @@ import json
 import re
 import unittest
 
-from django import forms
 from django.conf import settings
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import UNUSABLE_PASSWORD
 from django.contrib.auth.tokens import default_token_generator
-from django.template.loader import render_to_string, get_template, TemplateDoesNotExist
-from django.core.urlresolvers import is_valid_path
 from django.utils.http import int_to_base36
 
 
@@ -32,12 +29,6 @@ COURSE_1 = 'edX/toy/2012_Fall'
 COURSE_2 = 'edx/full/6.002_Spring_2012'
 
 log = logging.getLogger(__name__)
-
-try:
-    get_template('registration/password_reset_email.html')
-    project_uses_password_reset = True
-except TemplateDoesNotExist:
-    project_uses_password_reset = False
 
 
 class ResetPasswordTests(TestCase):
@@ -75,7 +66,7 @@ class ResetPasswordTests(TestCase):
         self.assertEquals(bad_email_resp.content, json.dumps({'success': False,
                                                               'error': 'Invalid e-mail or user'}))
 
-    @unittest.skipUnless(project_uses_password_reset,
+    @unittest.skipUnless(not settings.MITX_FEATURES.get('DISABLE_PASSWORD_RESET_EMAIL_TEST', False),
                          dedent("""Skipping Test because CMS has not provided necessary templates for password reset.
                                 If LMS tests print this message, that needs to be fixed."""))
     @patch('django.core.mail.send_mail')

@@ -161,6 +161,17 @@ $shadow-d2: rgba($black, 0.6);
 
 // ====================
 
+// timing - used for animation/transition mixin syncing
+$tmg-s3: 3.0s;
+$tmg-s2: 2.0s;
+$tmg-s1: 1.0s;
+$tmg-avg: 0.75s;
+$tmg-f1: 0.50s;
+$tmg-f2: 0.25s;
+$tmg-f3: 0.125s;
+
+// ====================
+
 // specific UI
 $notification-height: ($baseline*10);
 

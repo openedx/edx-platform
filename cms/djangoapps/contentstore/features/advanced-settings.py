@@ -2,7 +2,7 @@
 #pylint: disable=W0621
 
 from lettuce import world, step
-from nose.tools import assert_false, assert_equal, assert_regexp_matches, assert_true
+from nose.tools import assert_false, assert_equal, assert_regexp_matches
 from common import type_in_codemirror
 
 KEY_CSS = '.key input.policy-key'
@@ -36,7 +36,7 @@ def press_the_notification_button(step, name):
         error_showing = world.is_css_present('.is-shown.wrapper-notification-error')
         return confirmation_dismissed or error_showing
 
-    assert_true(world.css_click(css, success_condition=save_clicked), 'Save button not clicked after 5 attempts.')
+    world.css_click(css, success_condition=save_clicked)
 
 
 @step(u'I edit the value of a policy key$')

@@ -65,7 +65,7 @@ header.global {
 
 }
 
-.home .university-partners .partners { 
+.home .university-partners .partners {
   width: 660px;
 
   li.partner {
@@ -118,7 +118,7 @@ header.global {
   &:hover {
     background: rgb(245,245,245);
     border-color: rgb(170,170,170);
-    @include box-shadow(0 1px 16px 0 rgba($blue, 0.4));
+    box-shadow: 0 1px 16px 0 rgba($blue, 0.4);
 
     .info {
       top: 0;

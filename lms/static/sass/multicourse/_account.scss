@@ -62,7 +62,7 @@
 
   // specific examples - buttons
   .button-primary {
-    @include border-radius(0);
+    border-radius: 0;
     @include linear-gradient(saturate($link-color-d1,15%) 5%, shade($link-color-d1,15%) 95%);
     display: inline-block;
     padding: $baseline/2 $baseline*2.5;
@@ -139,7 +139,7 @@
   }
 
   a {
-    @include transition(color 0.15s ease-in-out, border 0.15s ease-in-out);
+    @include transition(color 0.15s ease-in-out 0s, border 0.15s ease-in-out 0s);
 
     &:link, &:visited, &:hover, &:active {
       color: $link-color-d1;
@@ -249,7 +249,7 @@
 
       // elements
       label, input, textarea {
-        @include border-radius(0);
+        border-radius: 0;
         display: block;
         height: auto;
         font-family: $sans-serif;
@@ -259,13 +259,13 @@
       }
 
       label {
-        @include transition(color 0.15s ease-in-out);
+        @include transition(color 0.15s ease-in-out 0s);
         margin: 0 0 ($baseline/4) 0;
         color: tint($black, 20%);
       }
 
       .tip {
-        @include transition(color 0.15s ease-in-out);
+        @include transition(color 0.15s ease-in-out 0s);
         display: block;
         margin-top: ($baseline/4);
         color: $lighter-base-font-color;
@@ -447,7 +447,7 @@
   }
 
   .submission-error, .system-error {
-    @include box-shadow(inset 0 -1px 2px 0 tint($red, 85%));
+    box-shadow: inset 0 -1px 2px 0 tint($red, 85%);
     border-bottom: 3px solid shade($red, 10%);
     background: tint($red,95%);
 
@@ -539,11 +539,11 @@
 
 // modal password reset form
 #forgot-password-modal {
-  @include border-radius(2px);
+  border-radius: 2px;
 
 
   .inner-wrapper {
-    @include border-radius(2px);
+    border-radius: 2px;
     background: $body-bg;
     padding-bottom: 0 !important;
   }
@@ -579,8 +579,8 @@
     }
 
     form {
-      @include border-radius(0);
-      @include box-shadow(none);
+      border-radius: 0;
+      box-shadow: none;
       margin: 0;
       border: none;
       padding: 0;
@@ -610,7 +610,7 @@
 
   .modal-form-error {
     @extend .body-text;
-    @include box-shadow(inset 0 -1px 2px 0 tint($red, 85%));
+    box-shadow: inset 0 -1px 2px 0 tint($red, 85%);
     @include box-sizing(border-box);
     margin: $baseline 0 ($baseline/2) 0 !important;
     padding: $baseline;

@@ -354,10 +354,10 @@ def instructor_dashboard(request, course_id):
                     # save
                     student_module.state = json.dumps(problem_state)
                     student_module.save()
-                    event = {"old_attempts": old_number_of_attempts, 
-                             "student": student, 
-                             "problem": student_module.module_state_key, 
-                             "instructor": request.user, 
+                    event = {"old_attempts": old_number_of_attempts,
+                             "student": student,
+                             "problem": student_module.module_state_key,
+                             "instructor": request.user,
                              "course": course_id}
                     track.views.server_track(request, "reset-student-attempts", event, page="idashboard")
                     msg += "<font color='green'>Module state successfully reset!</font>"
@@ -382,7 +382,7 @@ def instructor_dashboard(request, course_id):
         msg += message
         if student is not None:
             progress_url = reverse('student_progress', kwargs={'course_id': course_id, 'student_id': student.id})
-            track.views.server_track(request, "get-student-progress-page", {"student": student, "instructor": request.user, "course": course_id}, page="idashboard")
+            track.views.server_track(request, "get-student-progress-page", {"student": unicode(student), "instructor": unicode(request.user), "course": course_id}, page="idashboard")
             msg += "<a href='{0}' target='_blank'> Progress page for username: {1} with email address: {2}</a>.".format(progress_url, student.username, student.email)
 
     #----------------------------------------
@@ -480,7 +480,7 @@ def instructor_dashboard(request, course_id):
             msg += '<font color="green">Added {0} to instructor group = {1}</font>'.format(user, group.name)
             log.debug('staffgrp={0}'.format(group.name))
             user.groups.add(group)
-            track.views.server_track(request, "add-instructor", {"instructor": user}, page="idashboard")
+            track.views.server_track(request, "add-instructor", {"instructor": unicode(user)}, page="idashboard")
 
     elif action == 'Remove course staff':
         uname = request.POST['staffuser']
@@ -499,7 +499,7 @@ def instructor_dashboard(request, course_id):
             msg += '<font color="green">Removed {0} from instructor group = {1}</font>'.format(user, group.name)
             log.debug('instructorgrp={0}'.format(group.name))
             user.groups.remove(group)
-            track.views.server_track(request, "remove-instructor", {"instructor": user}, page="idashboard")
+            track.views.server_track(request, "remove-instructor", {"instructor": unicode(user)}, page="idashboard")
 
     #----------------------------------------
     # DataDump
@@ -687,7 +687,7 @@ s (~10k), it may take 1-2 hours to send all emails.</font>"
         problem = request.POST['Problem']
         nmsg, plots = psychoanalyze.generate_plots_for_problem(problem)
         msg += nmsg
-        track.views.server_track(request, "psychometrics-histogram-generation", {"problem": problem}, page="idashboard")
+        track.views.server_track(request, "psychometrics-histogram-generation", {"problem": unicode(problem)}, page="idashboard")
 
     if idash_mode == 'Psychometrics':
         problems = psychoanalyze.problems_with_psychometric_data(course_id)
@@ -943,7 +943,7 @@ def _add_or_remove_user_group(request, username_or_email, group, group_title, ev
         else:
             user.groups.remove(group)
         event = "add" if do_add else "remove"
-        track.views.server_track(request, "add-or-remove-user-group", {"event_name": event_name, "user": user, "event": event}, page="idashboard")
+        track.views.server_track(request, "add-or-remove-user-group", {"event_name": event_name, "user": unicode(user), "event": event}, page="idashboard")
 
     return msg
 
@@ -1123,7 +1123,7 @@ def _do_enroll_students(course, course_id, students, overload=False, auto_enroll
              'registration_url': registration_url,
              'course_id': course_id,
              'auto_enroll': auto_enroll,
-             'course_url': registration_url + '/courses/' + course_id,
+             'course_url': 'https://' + settings.SITE_NAME + '/courses/' + course_id,
              }
 
     for student in new_students:
@@ -1266,7 +1266,7 @@ def send_mail_to_student(student, param_dict):
     """
     Construct the email using templates and then send it.
     `student` is the student's email address (a `str`),
-    
+
     `param_dict` is a `dict` with keys [
     `site_name`: name given to edX instance (a `str`)
     `registration_url`: url for registration (a `str`)
