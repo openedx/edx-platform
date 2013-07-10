@@ -60,10 +60,6 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, TabsEditingDescriptor):
             'name': "HTML",
             'template': "tabs/codemirror-edit.html",
             'css': {'scss': [resource_string(__name__, 'css/tabs/codemirror.scss')]}
-        },
-        {
-            'name': "Settings",
-            'template': "metadata-edit-tab.html"
         }
     ]
 

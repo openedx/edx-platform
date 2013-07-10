@@ -1,8 +1,10 @@
 <%! from django.utils.translation import ugettext as _ %>
 <div class="wrapper-comp-editor" id="editor-tab-${html_id}" data-html_id="${html_id}">
-    <section class="editor">
+    <section data-hide-header="${hide_settings}" class="editor">
   % if tabs:
-      <span class="component-name"></span>
+      % if hide_settings:
+        <span class="component-name"></span>
+      % endif
       <ul class="${'editor-tabs' if (len(tabs) != 1) else 'editor-single-tab-name' }">
     % for tab in tabs:
         <li><a href="#tab-${html_id}-${loop.index}" class="tab ${'current' if tab.get('current', False) else ''}">${_(tab['name'])}</a></li>
@@ -20,5 +22,10 @@
       </div>
     </section>
 
-    <%include file="tabs/latex-source-compiler.html"/>
+    % if hide_settings:
+       <%include file="tabs/latex-source-compiler.html"/>
+    % endif
 </div>
+% if not hide_settings:
+<%include file="metadata-edit.html" />
+% endif

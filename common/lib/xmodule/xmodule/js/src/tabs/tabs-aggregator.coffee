@@ -5,9 +5,15 @@ class @TabsEditorDescriptor
   constructor: (element) ->
     @element = element;
 
-    console.log @element
-
-    $('.component-edit-header').hide()
+    console.log 'hide-settings = ' + @element.find('section.editor').data('hide-header')
+    console.log 'element = ', element
+    if typeof @element.find('section.editor').data('hide-header') is 'string'
+        console.log 'typeof is string'
+    if @element.find('section.editor').data('hide-header') is 'True'
+      console.log "HIDE ME"
+      $('.component-edit-header').hide()
+    else
+      $('.component-edit-header').show()
 
     # settingsEditor = @$el.find('.wrapper-comp-settings')
     # editorModeButton =  @$el.find('#editor-mode').find("a")

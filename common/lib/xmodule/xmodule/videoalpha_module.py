@@ -177,5 +177,10 @@ class VideoAlphaDescriptor(VideoAlphaFields, TabsEditingDescriptor):
         {
             'name': "Subtitles",
             'template': "videoalpha/subtitles.html",
+        },
+        {
+            'name': "Settings",
+            'template': "metadata-edit-tab.html"
         }
     ]
+    hide_settings = True

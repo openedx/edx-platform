@@ -48,12 +48,16 @@ class TabsEditingDescriptor(EditingFields, MakoModuleDescriptor):
     js_module_name = "TabsEditorDescriptor"
     tabs = []
 
+    # Include settings to tabs and hide setting main bar
+    hide_settings = False
+
     def get_context(self):
         _context = super(TabsEditingDescriptor, self).get_context()
         _context.update({
             'tabs': self.tabs,
             'html_id': self.location.html_id(),  # element_id
-            'data': self.data
+            'data': self.data,
+            'hide_settings': self.hide_settings
         })
         return _context
 
