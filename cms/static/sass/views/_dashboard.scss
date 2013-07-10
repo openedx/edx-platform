@@ -164,7 +164,7 @@ body.dashboard {
     	}
 
     	.value {
-    		@include border-radius(($baseline/4));
+    		border-radius: ($baseline/4);
     		position: relative;
     		overflow: hidden;
     		padding: ($baseline/5) ($baseline/2);
@@ -182,7 +182,7 @@ body.dashboard {
     	}
 
 			.value-formal, .value-description {
-				@include border-radius(($baseline/10));
+				border-radius: ($baseline/10);
 				display: inline-block;
 				vertical-align: middle;
 				color: $white;
