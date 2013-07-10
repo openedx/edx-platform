@@ -53,6 +53,7 @@ usage() {
             -s        give access to global site-packages for virtualenv
             -v        set -x + spew
             -h        this
+            -u        run update commands at the end of the script
 
 EO
     info
@@ -173,6 +174,10 @@ while true; do
         -h)
             usage
             exit 0
+            ;;
+        -u)
+            update=true
+            shift
             ;;
         --)
             shift
@@ -426,14 +431,14 @@ fi
 # Create edX virtualenv and link it to repo
 # virtualenvwrapper automatically sources the activation script
 if [[ $systempkgs ]]; then
-    mkvirtualenv -a "$HOME/.virtualenvs" --system-site-packages edx-platform || {
+    mkvirtualenv -a "$PYTHON_DIR" --system-site-packages edx-platform || {
       error "mkvirtualenv exited with a non-zero error"
       return 1
     }
 else
     # default behavior for virtualenv>1.7 is
     # --no-site-packages
-    mkvirtualenv -a "$HOME/.virtualenvs" edx-platform || {
+    mkvirtualenv -a "$PYTHON_DIR" edx-platform || {
       error "mkvirtualenv exited with a non-zero error"
       return 1
     }
@@ -465,7 +470,7 @@ fi
 # building correct version of distribute from source
 DISTRIBUTE_VER="0.6.28"
 output "Building Distribute"
-SITE_PACKAGES="$HOME/.virtualenvs/edx-platform/lib/python2.7/site-packages"
+SITE_PACKAGES="$PYTHON_DIR/edx-platform/lib/python2.7/site-packages"
 cd "$SITE_PACKAGES"
 curl -OL http://pypi.python.org/packages/source/d/distribute/distribute-${DISTRIBUTE_VER}.tar.gz
 tar -xzvf distribute-${DISTRIBUTE_VER}.tar.gz
@@ -510,6 +515,29 @@ rake install_prereqs
 output "Finishing Touches"
 cd $BASE
 pip install argcomplete
+
+CURRENT_RUBY=`ruby -v`
+
+CLEAN_RUBY_VER=`echo $RUBY_VER | tr -d '-'`
+
+if [[ "${CURRENT_RUBY#*$CLEAN_RUBY_VER}" != "$CURRENT_RUBY" ]]; then
+  warning "You're almost there, but it looks like your ruby version isn't quite correct.
+            We can use a quick fix here, but for a long term fix you want to add the following
+            line to your ~/.bash_profile file:
+
+            export PATH=$HOME/.rvm/rubies/ruby-$RUBY_VER/bin:\$PATH
+
+            Assuming you don't have a custom rvm installation, if you do have a custom rvm, 
+            then just make sure that the very of ruby you're using is $RUBY_VER.
+
+            Press enter to continue and try the quick fix, or press control-C to abort"
+
+  read dummy
+
+  export PATH=$HOME/.rvm/rubies/ruby-$RUBY_VER/bin:$PATH
+
+fi
+
 cd $BASE/edx-platform
 bundle install
 rake install_prereqs
@@ -518,9 +546,11 @@ mkdir -p "$BASE/log"
 mkdir -p "$BASE/db"
 mkdir -p "$BASE/data"
 
-rake django-admin[syncdb]
-rake django-admin[migrate]
-rake cms:update_templates
+if [[ $update ]]; then
+  rake django-admin[syncdb,lms,dev,--noinput]
+  rake django-admin[migrate]
+  rake cms:update_templates
+fi
 # Configure Git
 
 output "Fixing your git default settings"
@@ -541,7 +571,7 @@ cat<<END
 
    Then, every time you're ready to work on the project, just run
 
-        $ workon mitx
+        $ source ~/.virtualenvs/edx-platform/bin/activate
 
    To initialize Django
 
