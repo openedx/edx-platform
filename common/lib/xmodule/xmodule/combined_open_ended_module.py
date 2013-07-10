@@ -84,7 +84,8 @@ class CombinedOpenEndedFields(object):
     display_name = String(
         display_name="Display Name",
         help="This name appears in the horizontal navigation at the top of the page.",
-        default="Open Ended Grading", scope=Scope.settings
+        default="Open Ended Grading",
+        scope=Scope.settings
     )
     current_task_number = Integer(help="Current task that the student is on.", default=0, scope=Scope.user_state)
     task_states = List(help="List of state dictionaries of each task within this module.", scope=Scope.user_state)

@@ -167,9 +167,9 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):
                                                     pathname=pathname)
 
         resource_fs.makedir(os.path.dirname(filepath), recursive=True, allow_recreate=True)
-        with resource_fs.open(filepath, 'w') as file:
+        with resource_fs.open(filepath, 'w') as filestream:
             html_data = self.data.encode('utf-8')
-            file.write(html_data)
+            filestream.write(html_data)
 
         # write out the relative name
         relname = path(pathname).basename()
