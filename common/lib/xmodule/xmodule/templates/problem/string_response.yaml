@@ -1,8 +1,6 @@
 ---
 metadata:
     display_name: Text Input
-    rerandomize: never
-    showanswer: finished
     markdown: |
         A text input problem accepts a line of text from the 
         student, and evaluates the input for correctness based on an expected 

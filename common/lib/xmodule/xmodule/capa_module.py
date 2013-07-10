@@ -103,7 +103,7 @@ class CapaFields(object):
         help=("Defines when to show the answer to the problem. "
               "A default value can be set in Advanced Settings."),
         scope=Scope.settings,
-        default="closed",
+        default="finished",
         values=[
             {"display_name": "Always", "value": "always"},
             {"display_name": "Answered", "value": "answered"},
@@ -123,7 +123,7 @@ class CapaFields(object):
         help="Defines how often inputs are randomized when a student loads the problem. "
              "This setting only applies to problems that can have randomly generated numeric values. "
              "A default value can be set in Advanced Settings.",
-        default="always",
+        default="never",
         scope=Scope.settings,
         values=[
             {"display_name": "Always", "value": "always"},
@@ -1111,6 +1111,20 @@ class CapaDescriptor(CapaFields, RawDescriptor):
             'problems/' + path[8:],
             path[8:],
         ]
+
+    @classmethod
+    def from_xml(cls, xml_data, system, org=None, course=None):
+        """
+        Augment regular translation w/ setting the pre-Studio defaults.
+        """
+        problem = super(CapaDescriptor, cls).from_xml(xml_data, system, org, course)
+        # pylint: disable=W0212
+        if 'showanswer' not in problem._model_data:
+            problem.showanswer = "closed"
+        if 'rerandomize' not in problem._model_data:
+            problem.rerandomize = "always"
+        return problem
+
 
     @property
     def non_editable_metadata_fields(self):

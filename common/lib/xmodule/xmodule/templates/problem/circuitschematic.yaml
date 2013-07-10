@@ -1,8 +1,6 @@
 ---
 metadata:
     display_name: Circuit Schematic Builder
-    rerandomize: never
-    showanswer: finished
     markdown: !!null
 data: |
       <problem >

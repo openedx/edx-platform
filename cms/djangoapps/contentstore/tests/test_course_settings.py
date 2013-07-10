@@ -351,7 +351,7 @@ class CourseMetadataEditingTest(CourseTestCase):
         self.assertEqual(test_model['display_name'], 'Robot Super Course', "not expected value")
         self.assertIn('rerandomize', test_model, 'Missing rerandomize metadata field')
         # check for deletion effectiveness
-        self.assertEqual('closed', test_model['showanswer'], 'showanswer field still in')
+        self.assertEqual('finished', test_model['showanswer'], 'showanswer field still in')
         self.assertEqual(None, test_model['xqa_key'], 'xqa_key field still in')
 
 

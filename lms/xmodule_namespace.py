@@ -41,8 +41,16 @@ class LmsNamespace(Namespace):
         help="Amount of time after the due date that submissions will be accepted",
         scope=Scope.settings
     )
-    showanswer = String(help="When to show the problem answer to the student", scope=Scope.settings, default="closed")
-    rerandomize = String(help="When to rerandomize the problem", default="always", scope=Scope.settings)
+    showanswer = String(
+        help="When to show the problem answer to the student",
+        scope=Scope.settings,
+        default="finished"
+    )
+    rerandomize = String(
+        help="When to rerandomize the problem",
+        default="never",
+        scope=Scope.settings
+    )
     days_early_for_beta = Float(
         help="Number of days early to show content to beta users",
         default=None,
