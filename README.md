@@ -19,8 +19,8 @@ installation process.
 5. Open a terminal
 6. Download the project: `git clone git://github.com/edx/edx-platform.git`
 7. Enter the project directory: `cd edx-platform/`
-8. (Windows only) Make sure files have the proper line ending: 
-   `git rm --cached -r . && git reset --hard`
+8. (Windows only) Run the commands to 
+   [deal with line endings and symlinks under Windows](https://github.com/edx/edx-platform/wiki/Simplified-install-with-vagrant#dealing-with-line-endings-and-symlinks-under-windows)
 9. Start: `vagrant up`
 
 The last step might require your host machine's administrator password to setup NFS.
