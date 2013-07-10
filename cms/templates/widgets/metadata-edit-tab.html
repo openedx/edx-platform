@@ -1,6 +1,6 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%namespace name='static' file='../static_content.html'/>
-
+<%page args="tabName"/>
 <%
   import copy
   import json
@@ -29,5 +29,42 @@
     ## source-edit.html needs access to the 'source_code' value, so delete from a copy.
     <% del metadata_field_copy['source_code'] %>
 % endif
+
+
+<script type='text/javascript'>
+    $(document).ready(function(){
+      (function(){
+        ## Callback that ensures data sync between tabs
+        TabsEditorDescriptor.registerTabCallback('${html_id}', '${tabName}', function(previous_tab){
+          var $tinymce = $("#visual-${html_id}").data('TinyMCE');
+          var $codemirror = $("#advanced-${html_id}").data('CodeMirror');
+
+          if (previous_tab === 'Visual') {
+              if ($tinymce && $tinymce.isDirty()){
+                $codemirror.setValue($tinymce.getContent({no_events: 1}))
+              }
+          } else if (previous_tab === 'HTML') {
+              if ($codemirror){
+                $tinymce.setContent($codemirror.getValue())
+              }
+          }
+        })
+
+        ## Save function - executes when pressing save - to get information from nested editor,
+
+        ## should be set, as templates executes before tabs-aggregator coffee executes
+        TabsEditorDescriptor['tabs_save_functions']['${html_id}'] = TabsEditorDescriptor['tabs_save_functions']['${html_id}']  || {}
+
+        TabsEditorDescriptor['tabs_save_functions']['${html_id}']['${tabName}'] = function() {
+            var $codemirror = $("#advanced-${html_id}").data('CodeMirror');
+
+            return function(){
+              return $codemirror.getValue();
+            }
+        }();
+      }());
+    });
+</script>
+
 
 <div class="wrapper-comp-settings metadata_edit" id="settings-tab" data-metadata='${json.dumps(metadata_field_copy) | h}'/>
