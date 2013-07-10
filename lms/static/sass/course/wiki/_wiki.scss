@@ -41,10 +41,10 @@ section.wiki {
 
       a {
         float: left;
-        display: block;        
+        display: block;
         overflow: hidden;
-        height: 30px;        
-        line-height: 31px;    
+        height: 30px;
+        line-height: 31px;
         max-width: 200px;
         height: 100%;
         text-overflow: ellipsis;
@@ -56,7 +56,7 @@ section.wiki {
         display: inline;
         margin-left: 10px;
         color: $base-font-color;
-        height: 30px;        
+        height: 30px;
         line-height: 31px;
       }
     }
@@ -106,7 +106,7 @@ section.wiki {
       font-family: $sans-serif;
       font-size: 12px;
       outline: none;
-      @include transition(border-color .1s);
+      @include transition(border-color .1s linear 0s);
 
       &:-webkit-input-placholder {
         font-style: italic;
@@ -208,7 +208,7 @@ section.wiki {
       background-color: $sidebar-color;
       padding: 9px;
       margin: 10px 0;
-      @include border-radius(5px);
+      border-radius: 5px;
 
       ul {
         margin: 0;
@@ -234,7 +234,7 @@ section.wiki {
     .timestamp{
       margin-top: 15px;
       padding: 15px 0 0 10px;
-      border-top: 1px solid $light-gray;      
+      border-top: 1px solid $light-gray;
 
       .label {
         font-size: 0.7em;
@@ -406,7 +406,7 @@ section.wiki {
   .CodeMirror {
     background: #fafafa;
     border: 1px solid #c8c8c8;
-    @include box-shadow(0 1px 0 0 rgba(255, 255, 255, 0.6), inset 0 0 3px 0 rgba(0, 0, 0, 0.1));
+    box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.6), inset 0 0 3px 0 rgba(0, 0, 0, 0.1);
   }
 
   .CodeMirror-scroll {
@@ -417,7 +417,7 @@ section.wiki {
     position: relative;
 
     canvas {
-      @include box-shadow(0 0 1px 1px rgba(0, 0, 0, .1), 0 1px 6px rgba(0, 0, 0, .2));
+      box-shadow: 0 0 1px 1px rgba(0, 0, 0, .1), 0 1px 6px rgba(0, 0, 0, .2);
     }
 
     &:before {
@@ -536,13 +536,13 @@ section.wiki {
 
     .modal-header {
       h1, p {
-        color: #fff;  
+        color: #fff;
       }
 
       h1 {
         margin: 3px 12px 8px;
         font-size: 1.1em;
-      }      
+      }
 
       p {
         font-size: 0.9em;
@@ -610,10 +610,10 @@ section.wiki {
       border: 1px solid #ccc;
       @include linear-gradient(top, #eee, #d2d2d2);
       font-size: 22px;
-      line-height: 28px;    
+      line-height: 28px;
       color: #333;
       text-align: center;
-      @include box-shadow(0 1px 0 #fff inset, 0 1px 2px rgba(0, 0, 0, .2));
+      box-shadow: 0 1px 0 #fff inset, 0 1px 2px rgba(0, 0, 0, .2);
     }
   }
 
@@ -688,7 +688,7 @@ section.wiki {
     overflow-x: scroll;
 
     table {
-      min-width: 100%;      
+      min-width: 100%;
     }
 
     th {
@@ -798,7 +798,7 @@ section.wiki {
     background-color: $sidebar-color;
     padding: 9px;
     margin: 0 -9px 20px;
-    @include border-radius(5px);
+    border-radius: 5px;
 
     .well-small {
       @include clearfix;
@@ -837,7 +837,7 @@ section.wiki {
       padding: 8px;
       overflow: hidden;
     }
-    
+
     a.list-children {
       margin-left: 3px;
     }
@@ -858,7 +858,7 @@ section.wiki {
 
   .attachment-options {
     height: 40px;
-    margin: 40px 0 30px; 
+    margin: 40px 0 30px;
   }
 
   .attachment-list {
@@ -871,7 +871,7 @@ section.wiki {
       margin-bottom: 15px;
       border: 1px solid #DDD;
       background: #F9F9F9;
-      @include border-radius(5px);
+      border-radius: 5px;
     }
 
     header,
@@ -881,7 +881,7 @@ section.wiki {
 
     .attachment-details {
       background: #eee;
-      @include border-radius(0 0 5px 5px);
+      border-radius: 0 0 5px 5px;
     }
 
     h3 {
@@ -987,7 +987,7 @@ section.wiki {
     overflow: hidden;
     background: $pink;
     padding: lh();
-    @include box-shadow(inset 0 0 0 1px lighten($pink, 10%));
+    box-shadow: inset 0 0 0 1px lighten($pink, 10%);
     border: 1px solid darken($pink, 15%);
 
     p {
@@ -1002,7 +1002,7 @@ section.wiki {
         color: #fff;
         font-weight: bold;
         font-size: em(18);
-        @include transition;
+        @include transition(none);
         text-align: center;
         -webkit-font-smoothing: antialiased;
 
@@ -1046,13 +1046,13 @@ section.wiki {
 
   .modal-header {
     h1, p {
-      color: #fff;  
+      color: #fff;
     }
 
     h1 {
       margin: 3px 12px 8px;
       font-size: 1.1em;
-    }      
+    }
 
     p {
       font-size: 0.9em;
@@ -1086,7 +1086,7 @@ section.wiki {
       @include button;
       font-size: 0.8em;
     }
-    
+
     margin-right: 10px;
   }
 }

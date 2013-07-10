@@ -11,7 +11,7 @@
     @include background-image(url($homepage-bg-image));
     background-size: cover;
     border-bottom: 1px solid $border-color-3;
-    @include box-shadow(0 1px 0 0 $course-header-bg, inset 0 -1px 5px 0 rgba(0,0,0, 0.1));
+    box-shadow: 0 1px 0 0 $course-header-bg, inset 0 -1px 5px 0 rgba(0,0,0, 0.1);
     @include clearfix;
     height: 460px;
     overflow: hidden;
@@ -33,14 +33,14 @@
       background: #FFF;
       background: $course-header-bg;
       border: 1px solid $border-color-3;
-      @include box-shadow(0 4px 25px 0 rgba(0,0,0, 0.5));
+      box-shadow: 0 4px 25px 0 rgba(0,0,0, 0.5);
       @include box-sizing(border-box);
       min-height: 120px;
       margin-left: grid-width(2) + $gw-gutter;
       width: flex-grid(6);
       float: left;
       position: relative;
-      @include transition(all, 0.2s, linear);
+      @include transition(all 0.2s linear 0s);
       vertical-align: top;
 
       &:hover {
@@ -56,7 +56,7 @@
         opacity: 1.0;
         padding: 20px 30px;
         top: 0px;
-        @include transition(all, 0.2s, linear);
+        @include transition(all 0.2s linear 0s);
         text-align: left;
 
         h1 {
@@ -84,7 +84,7 @@
       border: 1px solid $border-color-3;
       border-left: 0;
       @include box-sizing(border-box);
-      // @include box-shadow(0 4px 25px 0 rgba(0,0,0, 0.5));
+      // box-shadow: 0 4px 25px 0 rgba(0,0,0, 0.5);
       height: 120px;
       float: left;
       padding: 4px;
@@ -102,12 +102,12 @@
         overflow: hidden;
         position: relative;
         background: url($video-thumb-url) center no-repeat;
-        @include background-size(cover);
+        background-size: cover;
 
         .play-intro {
           @include background-image(linear-gradient(-90deg, rgba(0,0,0, 0.65), rgba(0,0,0, 0.75)));
-          @include border-radius(4px);
-          @include box-shadow(0 1px 12px 0 rgba(0,0,0, 0.4));
+          border-radius: 4px;
+          box-shadow: 0 1px 12px 0 rgba(0,0,0, 0.4);
           @include box-sizing(border-box);
           border: 2px solid rgba(255,255,255, 0.8);
           height: 60px;
@@ -116,7 +116,7 @@
           margin-left: -30px;
           position: absolute;
           top: 50%;
-          @include transition(all, 0.15s, linear);
+          @include transition(all 0.15s linear 0s);
           width: 60px;
 
           &::after {
@@ -143,7 +143,7 @@
       &:hover {
         .play-intro {
           @include background-image(linear-gradient(-90deg, rgba(0,0,0, 0.75), rgba(0,0,0, 0.8)));
-          @include box-shadow(0 1px 12px 0 rgba(0,0,0, 0.5));
+          box-shadow: 0 1px 12px 0 rgba(0,0,0, 0.5);
           border-color: rgba(255,255,255, 0.9);
 
           &::after {
@@ -165,9 +165,9 @@
     > h2 {
       @include background-image(linear-gradient(-90deg, rgb(250,250,250), rgb(230,230,230)));
       border: 1px solid $border-color-2;
-      @include border-radius(4px);
+      border-radius: 4px;
       border-top-color: $border-color-1;
-      @include box-shadow(inset 0 0 0 1px rgba(255,255,255, 0.4), 0 0px 12px 0 rgba(0,0,0, 0.2));
+      box-shadow: inset 0 0 0 1px rgba(255,255,255, 0.4), 0 0px 12px 0 rgba(0,0,0, 0.2);
       color: $lighter-base-font-color;
       letter-spacing: 1px;
       margin-bottom: 0px;
@@ -262,7 +262,7 @@
       }
 
       a {
-        @include transition(all, 0.25s, ease-in-out);
+        @include transition(all 0.25s ease-in-out 0s);
 
         &::before {
           @include background-image(radial-gradient(50% 50%, circle closest-side, rgba(255,255,255, 1) 0%, rgba(255,255,255, 0) 100%));
@@ -275,7 +275,7 @@
           opacity: 0;
           width: 200px;
           position: absolute;
-          @include transition(all, 0.25s, ease-in-out);
+          @include transition(all 0.25s ease-in-out 0s);
           top: 50%;
           z-index: 1;
         }
@@ -285,7 +285,7 @@
           left: 0px;
           position: absolute;
           text-align: center;
-          @include transition(all, 0.25s, ease-in-out);
+          @include transition(all 0.25s ease-in-out 0s);
           width: 100%;
           z-index: 2;
 
@@ -293,7 +293,7 @@
             color: $base-font-color;
             font: 800 italic 1.4em/1.4em $sans-serif;
             text-shadow: 0 1px rgba(255,255,255, 0.6);
-            @include transition(all, 0.15s, ease-in-out);
+            @include transition(all 0.15s ease-in-out 0s);
 
             &:hover {
               color: $lighter-base-font-color;
@@ -303,7 +303,7 @@
 
         img {
           position: relative;
-          @include transition(all, 0.25s, ease-in-out);
+          @include transition(all 0.25s ease-in-out 0s);
           vertical-align: middle;
           z-index: 2;
         }
@@ -410,7 +410,7 @@
 
     .news {
       @include box-sizing(border-box);
-      @include box-shadow(inset 0 0 3px 0 rgba(0,0,0, 0.15));
+      box-shadow: inset 0 0 3px 0 rgba(0,0,0, 0.15);
       padding: 20px;
       width: flex-grid(12);
 
@@ -428,13 +428,13 @@
           float: left;
           margin-right: flex-gutter();
           padding: 10px;
-          @include transition(all, 0.15s, linear);
+          @include transition(all 0.15s linear 0s);
           width: flex-grid(4);
 
           &:hover {
             background: $body-bg;
             border: 1px solid $border-color-2;
-            @include box-shadow(inset 0 0 3px 0 rgba(0,0,0, 0.1));
+            box-shadow: inset 0 0 3px 0 rgba(0,0,0, 0.1);
           }
 
           &:last-child {

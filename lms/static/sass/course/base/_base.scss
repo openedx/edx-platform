@@ -36,7 +36,7 @@ a {
     border-radius: 3px;
     border: 1px solid $outer-border-color;
     background: $container-bg;
-    @include box-shadow(0 1px 2px rgba(0, 0, 0, 0.05));
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   }
 }
 
@@ -59,8 +59,8 @@ input[type="email"],
 input[type="password"] {
   background: $white;
   border: 1px solid $border-color-2;
-  @include border-radius(0);
-  @include box-shadow(0 1px 0 0 rgba(255,255,255, 0.6), inset 0 0 3px 0 rgba(0,0,0, 0.1));
+  border-radius: 0;
+  box-shadow: 0 1px 0 0 rgba(255,255,255, 0.6), inset 0 0 3px 0 rgba(0,0,0, 0.1);
   @include box-sizing(border-box);
   font: normal 1em $sans-serif;
   height: 35px;
@@ -74,7 +74,7 @@ input[type="password"] {
 
   &:focus {
     border-color: lighten($link-color, 20%);
-    @include box-shadow(0 0 6px 0 rgba($blue, 0.4), inset 0 0 4px 0 rgba(0,0,0, 0.15));
+    box-shadow: 0 0 6px 0 rgba($blue, 0.4), inset 0 0 4px 0 rgba(0,0,0, 0.15);
     outline: none;
   }
 }
@@ -115,7 +115,7 @@ img {
   color: #fff;
   pointer-events: none;
   opacity: 0;
-  @include transition(opacity .1s);
+  @include transition(opacity .1s linear 0s);
 
   &:after {
     content: '▾';

@@ -10,9 +10,9 @@ body.dashboard {
 	.class-list {
 		margin-top: 20px;
 		border-radius: 3px;
-		border: 1px solid $darkGrey;	
+		border: 1px solid $darkGrey;
 		background: #fff;
-		@include box-shadow(0 1px 2px rgba(0, 0, 0, .1));
+		box-shadow: 0 1px 2px rgba(0, 0, 0, .1);
 
 		li {
 			position: relative;
@@ -27,7 +27,7 @@ body.dashboard {
 				display: block;
 				padding: 20px 25px;
 				line-height: 1.3;
-				
+
 				&:hover {
 					background: $paleYellow;
 
@@ -57,7 +57,7 @@ body.dashboard {
 			z-index: 10000;
 			position: absolute;
 			top: 15px;
-			right: $baseline;		
+			right: $baseline;
 			padding: ($baseline/4) ($baseline/2);
 			opacity: 0.0;
 			pointer-events: none;
@@ -73,7 +73,7 @@ body.dashboard {
 		padding: 15px 25px;
 		margin-top: 20px;
 		border-radius: 3px;
-		border: 1px solid $darkGrey;	
+		border: 1px solid $darkGrey;
 		background: #fff;
 		box-shadow: 0 1px 2px rgba(0, 0, 0, .1);
 		@include clearfix;

@@ -49,7 +49,7 @@ body.course.unit {
       border-bottom: 1px solid #cbd1db;
       @include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0) 70%);
       background-color: #edf1f5;
-      @include box-shadow(0 1px 0 rgba(255, 255, 255, .7) inset);
+      box-shadow: 0 1px 0 rgba(255, 255, 255, .7) inset;
       @include clearfix;
 
       li {
@@ -140,7 +140,7 @@ body.course.unit {
               font-size: 15px;
               line-height: 14px;
               text-align: center;
-              @include box-shadow(0 1px 1px rgba(0, 0, 0, .2), 0 1px 0 rgba(255, 255, 255, .4) inset);
+              box-shadow: 0 1px 1px rgba(0, 0, 0, .2), 0 1px 0 rgba(255, 255, 255, .4) inset;
 
               .name {
                 position: absolute;
@@ -160,7 +160,7 @@ body.course.unit {
             border-radius: 3px;
             border: 1px solid $mediumGrey;
             background-color: #fff;
-            @include box-shadow(0 1px 1px rgba(0, 0, 0, .2), 0 1px 0 rgba(255, 255, 255, .4) inset);
+            box-shadow: 0 1px 1px rgba(0, 0, 0, .2), 0 1px 0 rgba(255, 255, 255, .4) inset;
             @include clearfix;
 
             .cancel-button {
@@ -208,7 +208,7 @@ body.course.unit {
             width: 100%;
             @include linear-gradient(top, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0));
             background-color: $lightBluishGrey;
-            @include box-shadow(0 1px 0 rgba(255, 255, 255, 0.2) inset, 0 -1px 0 rgba(0, 0, 0, 0.2) inset);
+            box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2) inset, 0 -1px 0 rgba(0, 0, 0, 0.2) inset;
 
             li:first-child {
               margin-left: $baseline;
@@ -221,7 +221,7 @@ body.course.unit {
               width: auto;
               @include linear-gradient(top, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0));
               background-color: tint($lightBluishGrey, 10%);
-              @include box-shadow(0 1px 0 rgba(255, 255, 255, 0.2) inset, 0 -1px 0 rgba(0, 0, 0, 0.2) inset);
+              box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2) inset, 0 -1px 0 rgba(0, 0, 0, 0.2) inset;
               opacity: 0.8;
 
               &:hover {
@@ -250,15 +250,15 @@ body.course.unit {
           .new-component-template {
 
             a {
+              @include transition(none);
               background: #fff;
               border: 0px;
               color: #3c3c3c;
-              @include transition (none);
 
               &:hover {
+                @include transition(background-color $tmg-f2 linear 0s);
                 background: tint($green,30%);
                 color: #fff;
-                @include transition(background-color .15s);
               }
             }
 
@@ -291,7 +291,7 @@ body.course.unit {
                 float: left;
 
                 [class^="icon-"] {
-                  @include transition(opacity .15s);
+                  @include transition(opacity $tmg-f2 linear 0s);
                   display: inline-block;
                   top: 1px;
                   margin-right: 5px;
@@ -303,7 +303,7 @@ body.course.unit {
               }
 
               .editor-indicator {
-                @include transition(opacity .15s);
+                @include transition(opacity $tmg-f2 linear 0s);
                 float: right;
                 position: relative;
                 top: 3px;
@@ -426,7 +426,7 @@ body.course.unit {
 
     .component-editor {
       @include edit-box;
-      @include box-shadow(none);
+      box-shadow: none;
       display: none;
       padding: 0;
       border-radius: 2px 2px 0 0;
@@ -449,7 +449,7 @@ body.course.unit {
 
       // Module Actions, also used for Static Pages
       .module-actions {
-        @include box-shadow(inset 0 1px 1px $shadow);
+        box-shadow: inset 0 1px 1px $shadow;
         padding: 0 0 $baseline $baseline;
         background-color: $gray-l6;
 
@@ -507,7 +507,6 @@ body.course.unit {
         @include blue-button;
 
         &.is-set {
-          @include transition(box-shadow 0.5 ease-in-out);
           @include linear-gradient($blue, $blue);
           color: $blue-d1;
           box-shadow: inset 0 1px 2px 1px $shadow-l1;
@@ -587,7 +586,7 @@ body.course.unit {
       }
 
       &:hover {
-        @include transition(opacity 0.25s ease-in-out);
+        @include transition(opacity $tmg-f2 ease-in-out 0s);
         opacity: 1.0;
       }
 
@@ -612,7 +611,7 @@ body.course.unit {
 
       label.setting-label {
         @extend .t-copy-sub1;
-        @include transition(color, 0.15s, ease-in-out);
+        @include transition(color $tmg-f2 ease-in-out 0s);
         font-weight: 400;
         vertical-align: middle;
         display: inline-block;
@@ -657,7 +656,7 @@ body.course.unit {
       input[type="number"] {
 
         width: 38.5%;
-        @include box-shadow(0 1px 2px $shadow-l1 inset);
+        box-shadow: 0 1px 2px $shadow-l1 inset;
         //For webkit browsers which render number fields differently, make input wider.
         -moz-column-width: {
           width: 32%;
@@ -669,11 +668,11 @@ body.course.unit {
       }
 
       select {
-        //@include box-shadow(0 1px 2px $shadow-l1 inset);
+        //box-shadow: 0 1px 2px $shadow-l1 inset;
 
         &:focus {
-          @include box-shadow(0 0 1px $shadow);
-          @include transition(opacity 0.25s ease-in-out);
+          box-shadow: 0 0 1px $shadow;
+          @include transition(opacity $tmg-f2 ease-in-out 0s);
           background-color: $yellow;
         }
 
@@ -697,8 +696,8 @@ body.course.unit {
         background-color: $gray-l4;
 
         &:hover {
-          @include box-shadow(0 1px 1px $shadow);
-          @include transition(opacity 0.15s ease-in-out);
+          box-shadow: 0 1px 1px $shadow;
+          @include transition(opacity $tmg-f2 ease-in-out 0s);
           background-color: $blue-s3;
           border: 1px solid $blue-s3;
           color: $white;
@@ -856,7 +855,7 @@ body.unit {
 
 .unit-location {
   .url {
-    @include box-shadow(none);
+    box-shadow: none;
     width: 100%;
     margin-bottom: $baseline/2;
   }
@@ -956,7 +955,7 @@ body.unit {
 
 
   &:hover {
-    @include transition(opacity 0.25s ease-in-out);
+    @include transition(opacity $tmg-f2 ease-in-out 0s);
     opacity: 1.0s;
   }
 }

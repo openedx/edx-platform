@@ -17,8 +17,8 @@ input[type="password"],
 input[type="tel"] {
   background: $form-bg-color;
   border: 1px solid $border-color-2;
-  @include border-radius(3px);
-  @include box-shadow(0 1px 0 0 rgba(255,255,255, 0.6), inset 0 0 3px 0 rgba(0,0,0, 0.1));
+  border-radius: 3px;
+  box-shadow: 0 1px 0 0 rgba(255,255,255, 0.6), inset 0 0 3px 0 rgba(0,0,0, 0.1);
   @include box-sizing(border-box);
   font: italic 300 1rem/1.6rem $serif;
   height: 35px;
@@ -32,7 +32,7 @@ input[type="tel"] {
 
   &:focus {
     border-color: darken($button-archive-color, 50%);
-    @include box-shadow(0 0 6px 0 darken($button-archive-color, 50%), inset 0 0 4px 0 rgba(0,0,0, 0.15));
+    box-shadow: 0 0 6px 0 darken($button-archive-color, 50%), inset 0 0 4px 0 rgba(0,0,0, 0.15);
     outline: none;
   }
 }
@@ -45,7 +45,7 @@ input[type="submit"],
 input[type="button"],
 button,
 .button {
-  @include border-radius(3px);
+  border-radius: 3px;
   @include button(shiny, $button-color);
   font: normal 1.2rem/1.6rem $sans-serif;
   letter-spacing: 1px;

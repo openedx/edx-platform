@@ -95,7 +95,7 @@
 
 
 body.discussion {
-  
+
   .new-post-form-errors {
     display: none;
     background: $error-red;
@@ -105,7 +105,7 @@ body.discussion {
     color: #fff;
     line-height: 1.6;
     border-radius: 3px;
-    @include box-shadow(0 1px 2px rgba(0, 0, 0, 0.3) inset, 0 1px 0 rgba(255, 255, 255, .2));
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) inset, 0 1px 0 rgba(255, 255, 255, .2);
 
     li {
       padding: 10px 20px 12px 45px;
@@ -490,9 +490,9 @@ body.discussion {
   section.user-profile {
     @extend .sidebar;
     display: table-cell;
-    @include border-radius(3px 0 0 3px);
+    border-radius: 3px 0 0 3px;
     border-right: 1px solid #ddd;
-    @include box-shadow(none);
+    box-shadow: none;
     background-color: $sidebar-color;
 
     .user-profile {
@@ -548,7 +548,7 @@ body.discussion {
     font-style: normal;
     font-size: 0.8em;
     line-height: 1.6em;
-    @include border-radius(3px 3px 0 0);
+    border-radius: 3px 3px 0 0;
 
     &::-webkit-input-placeholder {
       color: #888;
@@ -563,9 +563,9 @@ body.discussion {
     @include box-sizing(border-box);
     border: 1px solid #c8c8c8;
     border-top-width: 0;
-    @include border-radius(0 0 3px 3px);
+    border-radius: 0 0 3px 3px;
     overflow: hidden;
-    @include transition(all, .2s, easeOut);
+    @include transition(all .2s ease-out 0s);
 
     &:before {
       content: 'PREVIEW';
@@ -591,7 +591,7 @@ body.discussion {
     padding: 0px;
     height: 20px;
     overflow: hidden;
-    @include transition(all, .2s, easeOut);
+    @include transition(all .2s ease-out 0s);
   }
 
   .wmd-spacer {
@@ -718,7 +718,7 @@ body.discussion {
       height: 100%;
       @include linear-gradient(top, rgba(255, 255, 255, .5), rgba(255, 255, 255, 0));
       background-color: #dcdcdc;
-      @include transition(all .2s ease-out);
+      @include transition(all .2s ease-out 0s);
 
       &:hover {
         background-color: #e9e9e9;
@@ -818,7 +818,7 @@ body.discussion {
         color: #333;
         text-shadow: 0 1px 0 rgba(255, 255, 255, .8);
         opacity: 0.0;
-        @include transition(opacity .2s);
+        @include transition(opacity .2s linear 0s);
       }
     }
 
@@ -847,7 +847,7 @@ body.discussion {
       border: 1px solid #4b4b4b;
       border-left: none;
       border-radius: 0 0 3px 3px;
-      @include box-shadow(1px 0 0 #4b4b4b inset);
+      box-shadow: 1px 0 0 #4b4b4b inset;
 
       .browse-topic-drop-menu {
         max-height: 400px;
@@ -938,7 +938,7 @@ body.discussion {
       max-width: 30px;
       margin: auto;
       @include box-sizing(border-box);
-      @include transition(all .2s);
+      @include transition(all .2s linear 0s);
     }
 
     .post-search-field {
@@ -959,13 +959,13 @@ body.discussion {
       color: #333;
       cursor: pointer;
       pointer-events: none;
-      @include transition(all .2s ease-out);
+      @include transition(all .2s ease-out 0s);
 
       &::-webkit-input-placeholder,
       &:-moz-placeholder,
       &:-ms-input-placeholder {
         opacity: 0.0;
-        @include transition(opacity .2s);
+        @include transition(opacity .2s linear 0s);
       }
 
       &:focus {
@@ -1071,7 +1071,7 @@ body.discussion {
 
     a {
       display: block;
-      position: relative;      
+      position: relative;
       float: left;
       clear: both;
       width: 100%;
@@ -1278,8 +1278,8 @@ body.discussion {
   .discussion-article {
     position: relative;
     padding: 40px;
-    min-height: 468px;         
-    
+    min-height: 468px;
+
     a {
       word-wrap: break-word;
     }
@@ -1332,9 +1332,9 @@ body.discussion {
         background-position: 0 0;
       }
     }
-    
-    
-    
+
+
+
   }
 
   .discussion-post {
@@ -1379,7 +1379,7 @@ body.discussion {
     margin-bottom: 20px;
   }
 
-  
+
 
   .responses {
     list-style: none;
@@ -1609,8 +1609,8 @@ body.discussion {
     background: #449944;
     font-size: 9px;
     font-weight: 700;
-    font-style: normal;   
-    color: white;   
+    font-style: normal;
+    color: white;
     text-transform: uppercase;
   }
 
@@ -1618,7 +1618,7 @@ body.discussion {
     padding: 8px 20px;
 
     .wmd-input {
-      @include transition(all .2s);
+      @include transition(all .2s linear 0s);
     }
 
     .wmd-button {
@@ -1638,7 +1638,7 @@ body.discussion {
     border: 1px solid #b2b2b2;
     border-radius: 3px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, .1) inset;
-    @include transition(border-color .1s);
+    @include transition(border-color .1s linear 0s);
 
     &:focus {
       border-color: #4697c1;
@@ -1726,7 +1726,7 @@ body.discussion {
   .discussion-reply-new {
     padding: 20px;
     @include clearfix;
-    @include transition(opacity .2s);
+    @include transition(opacity .2s linear 0s);
 
     h4 {
       font-size: 16px;
@@ -1837,7 +1837,7 @@ body.discussion {
     /* Course content p has a default margin-bottom of 1.416em, this is just to reset that */
     .discussion-thread {
       padding: 0;
-      @include transition(all .25s);
+      @include transition(all .25s linear 0s);
 
       .dogear {
         display: none;
@@ -1868,7 +1868,7 @@ body.discussion {
         min-height: 0;
         padding: 10px 10px 15px 10px;
         box-shadow: 0 1px 0 #ddd;
-        @include transition(all .2s);
+        @include transition(all .2s linear 0s);
 
         .discussion-post {
           padding: 12px 20px 0 20px;
@@ -2206,7 +2206,7 @@ body.discussion {
       font-style: normal;
       font-size: 0.8em;
       line-height: 1.6em;
-      @include border-radius(3px 3px 0 0);
+      border-radius: 3px 3px 0 0;
 
       &::-webkit-input-placeholder {
         color: #888;
@@ -2221,9 +2221,9 @@ body.discussion {
       @include box-sizing(border-box);
       border: 1px solid #c8c8c8;
       border-top-width: 0;
-      @include border-radius(0 0 3px 3px);
+      border-radius: 0 0 3px 3px;
       overflow: hidden;
-      @include transition(all, .2s, easeOut);
+      @include transition(all .2s ease-out 0s);
 
       &:before {
         content: 'PREVIEW';
@@ -2249,7 +2249,7 @@ body.discussion {
       padding: 0px;
       height: 20px;
       overflow: hidden;
-      @include transition(all, .2s, easeOut);
+      @include transition(all .2s ease-out 0s);
     }
 
     .wmd-spacer {
@@ -2448,7 +2448,7 @@ body.discussion {
       float:right;
       padding-right: 5px;
       font-style: italic;
-      cursor:pointer; 
+      cursor:pointer;
       margin-right: 10px;
       opacity: 0.8;
 
@@ -2457,10 +2457,10 @@ body.discussion {
       }
 
       &:hover {
-        @include transition(opacity .2s);
+        @include transition(opacity .2s linear 0s);
         opacity: 1.0;
       }
-    }  
+    }
 
 .discussion-pin-inline {
       font-size: 12px;
@@ -2472,39 +2472,39 @@ body.discussion {
       margin-right:35px;
       margin-top:13px;
       opacity: 1.0;
-    }  
+    }
 
 .notpinned .icon {
-  display: block; 
+  display: block;
   float: left;
   margin: 3px;
-  width: 10px; 
+  width: 10px;
   height: 14px;
   padding-right: 3px;
-  background: transparent url('../images/unpinned.png') no-repeat 0 0; 
+  background: transparent url('../images/unpinned.png') no-repeat 0 0;
 }
 
 .pinned .icon {
-  display: block; 
+  display: block;
   float: left;
   margin: 3px;
-  width: 10px; 
-  height: 14px; 
+  width: 10px;
+  height: 14px;
   padding-right: 3px;
-  background: transparent url('../images/pinned.png') no-repeat 0 0; 
+  background: transparent url('../images/pinned.png') no-repeat 0 0;
 }
 
 .pinned span {
   color: #B82066;
   font-style: italic;
-  //cursor change is here since pins are read-only for inline discussions. 
+  //cursor change is here since pins are read-only for inline discussions.
   cursor: default;
 }
 
 .notpinned span {
   color: #888;
   font-style: italic;
-  //cursor change is here since pins are read-only for inline discussions. 
+  //cursor change is here since pins are read-only for inline discussions.
   cursor: default;
 }
 
@@ -2522,32 +2522,32 @@ display:none;
       opacity: 0.8;
 
       &:hover {
-        @include transition(opacity .2s);
+        @include transition(opacity .2s linear 0s);
         opacity: 1.0;
       }
 
-    }  
-    
+    }
+
 .notflagged .icon
 {
-  display: block; 
+  display: block;
   float: left;
   margin: 3px;
-  width: 10px; 
+  width: 10px;
   height: 14px;
   padding-right: 3px;
-  background: transparent url('../images/notflagged.png') no-repeat 0 0; 
+  background: transparent url('../images/notflagged.png') no-repeat 0 0;
 }
 
 .flagged .icon
 {
-  display: block; 
+  display: block;
   float: left;
   margin: 3px;
-  width: 10px; 
-  height: 14px; 
+  width: 10px;
+  height: 14px;
   padding-right: 3px;
-  background: transparent url('../images/flagged.png') no-repeat 0 0; 
+  background: transparent url('../images/flagged.png') no-repeat 0 0;
 }
 
 .flagged span {
