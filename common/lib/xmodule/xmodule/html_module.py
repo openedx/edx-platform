@@ -47,12 +47,8 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, TabsEditingDescriptor):
     filename_extension = "xml"
     template_dir_name = "html"
 
-    # js = {'coffee': [resource_string(__name__, 'js/src/html/edit.coffee')]}
     # js_module_name = "HTMLEditingDescriptor"
     # js_module_name = "TabsEditorDescriptor"
-    # css = {'scss': [resource_string(__name__, 'css/editor/edit.scss'), resource_string(__name__, 'css/html/edit.scss')]}
-
-    css = {'scss': [resource_string(__name__, 'css/tabs/codemirror.scss'), resource_string(__name__, 'css/tabs/tabs.scss')]}
 
     tabs = [
         {
@@ -63,13 +59,12 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, TabsEditingDescriptor):
         {
             'name': "HTML",
             'template': "tabs/codemirror-edit.html",
+            'css': {'scss': [resource_string(__name__, 'css/tabs/codemirror.scss')]}
         },
         {
             'name': "Settings",
             'template': "metadata-edit.html"
-
         }
-
     ]
 
     # VS[compat] TODO (cpennington): Delete this method once all fall 2012 course
