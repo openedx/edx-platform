@@ -523,10 +523,8 @@ def _adjust_start_date_for_beta_testers(user, descriptor):
     beta_group = course_beta_test_group_name(descriptor.location)
     if beta_group in user_groups:
         debug("Adjust start time: user in group %s", beta_group)
-        start_as_datetime = descriptor.lms.start
         delta = timedelta(descriptor.lms.days_early_for_beta)
-        effective = start_as_datetime - delta
-        # ...and back to time_struct
+        effective = descriptor.lms.start - delta
         return effective
 
     return descriptor.lms.start
@@ -588,7 +586,6 @@ def _has_access_to_location(user, location, access_level, course_context):
         debug("Deny: user not in groups %s", instructor_groups)
     else:
         log.debug("Error in access._has_access_to_location access_level=%s unknown" % access_level)
-
     return False
 
 

@@ -11,7 +11,7 @@
   @include box-shadow(0 2px 3px $shadow);
   height: ($baseline*35) !important;
   background: $white !important;
-  border: 1px solid $gray;
+  border: 2px solid $blue;
 }
 
 #tender_window {
@@ -23,11 +23,12 @@
 }
 
 #tender_closer {
-  color: $blue-l2 !important;
+  color: $white-t2 !important;
   text-transform: uppercase;
+  top: 16px !important;
 
   &:hover {
-    color: $blue-l4 !important;
+    color: $white !important;
   }
 }
 
@@ -42,15 +43,15 @@
   font-family: 'Open Sans', sans-serif;
 }
 
-.widget-layout .search, 
-.widget-layout .tabs, 
-.widget-layout .footer, 
+.widget-layout .search,
+.widget-layout .tabs,
+.widget-layout .footer,
 .widget-layout .header h1 a {
   display: none;
 }
 
 .widget-layout .header {
-  background: rgb(85, 151, 221);
+  background: rgb(0, 159, 230);
   padding: 10px 20px;
 }
 

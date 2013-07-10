@@ -5,10 +5,7 @@ from xmodule.modulestore import Location
 
 def get_module_info(store, location, parent_location=None, rewrite_static_links=False):
     try:
-        if location.revision is None:
-            module = store.get_item(location)
-        else:
-            module = store.get_item(location)
+        module = store.get_item(location)
     except ItemNotFoundError:
         # create a new one
         template_location = Location(['i4x', 'edx', 'templates', location.category, 'Empty'])

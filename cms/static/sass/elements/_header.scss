@@ -3,448 +3,310 @@
 
 .wrapper-header {
   @extend .depth3;
-  margin: 0;
-  padding: $baseline;
-  border-bottom: 1px solid $gray;
-  @include box-shadow(0 1px 5px 0 rgba(0,0,0, 0.2));
-  background: $white;
-  height: 76px;
+  @include box-shadow(0 1px 2px 0 $shadow-l1);
   position: relative;
   width: 100%;
-
-  a {
-    color: $baseFontColor;
-    display: block;
-
-    &:hover, &:active {
-      color: $blue;
-    }
-  }
+  margin: 0;
+  padding: 0 $baseline;
+  background: $white;
 
   header.primary {
+    @include box-sizing(border-box);
     @include clearfix();
     max-width: $fg-max-width;
     min-width: $fg-min-width;
     width: flex-grid(12);
     margin: 0 auto;
-    color: $gray-l1;
   }
 
-  nav .nav-item {
-    display: inline-block;
-  }
-}
+  // ====================
 
-// ====================
+  // basic layout
 
-// basic layout
-.wrapper-left, .wrapper-right {
-  @include box-sizing(border-box);
-}
-
-.wrapper-left {
-  width: flex-grid(10, 12);
-  float: left;
-  margin-right: flex-gutter();
-}
-
-.wrapper-right {
-  width: flex-grid(2, 12);
-  float: right;
-}
-
-// ====================
-
-// specific elements - branding
-.branding, .info-course, .nav-course, .nav-account, .nav-unauth, .nav-pitch {
-  display: inline-block;
-  vertical-align: top;
-}
-
-.branding {
-  position: relative;
-  margin: 0 ($baseline/2) 0 0;
-  padding-right: ($baseline*0.75);
-
-  a {
-    @extend .text-hide;
-    display: block;
-    width: 164px;
-    height: 32px;
-    background: transparent url('../img/logo-edx-studio.png') 0 0 no-repeat;
-  }
-}
-
-// ====================
-
-// specific elements - course name/info
-.info-course {
-  @include font-size(14);
-  position: relative;
-  margin: -3px ($baseline/2) 0 0;
-  padding-right: ($baseline*0.75);
-
-  &:before {
-    @extend .faded-vertical-divider;
-    content: "";
-    display: block;
-    height: 50px;
-    position: absolute;
-    right: 1px;
-    top: -8px;
-    width: 1px;
-  }
-
-  &:after {
-    @extend .faded-vertical-divider-light;
-    content: "";
-    display: block;
-    height: 50px;
-    position: absolute;
-    right: 0px;
-    top: -12px;
-    width: 1px;
-  }
-
-  .course-number, .course-org {
-    @include font-size(12);
-    display: inline-block;
-    max-width: 70px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    line-height: 1.3;
-  }
-
-  .course-org {
-    margin-right: ($baseline/4);
-    max-width: 140px;
-  }
-
-  .course-title {
-    display: block;
-    width: 100%;
-    max-width: 220px;
-    overflow: hidden;
-    margin-top: -4px;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    @include font-size(16);
-    font-weight: 600;
-  }
-}
-
-// ====================
-
-// specific elements - course nav
-.nav-course {
-  width: 290px;
-  @extend .t-copy-sub1;
-  margin-top: -($baseline/4);
-
-  > ol > .nav-item {
-    vertical-align: bottom;
-    margin: 0 ($baseline/2) 0 0;
-
-    &:last-child {
-      margin-right: 0;
-    }
-
-    .title {
-      display: block;
-      padding: 0 ($baseline/4);
-      text-transform: uppercase;
-      font-weight: 600;
-      color: $gray-d3;
-
-      .label-prefix {
-        @include font-size(11);
-        display: block;
-        font-weight: 400;
-      }
-    }
-
-    // specific nav items
-    &.nav-course-courseware {
-    }
-
-    &.nav-course-settings {
-    }
-
-    &.nav-course-tools {
-    }
-  }
-}
-
-// ====================
-
-// specific elements - account-based nav
-.nav-account {
-  width: 100%;
-  margin-top: ($baseline*0.75);
-  @include font-size(14);
-  text-align: right;
-
-  .nav-account-username {
-    width: 100%;
-
-    .icon-user {
-      display: inline-block;
-      vertical-align: middle;
-      margin-right: 3px;
-      @include font-size(12);
-    }
-
-    .account-username {
-      display: inline-block;
-      vertical-align: middle;
-      width: 80%;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-    }
-
-    .icon-expand {
-      display: inline-block;
-      vertical-align: middle;
-    }
-  }
-}
-
-// ====================
-
-// UI - dropdown
-.nav-dropdown {
-
-  .nav-item {
-    position: relative;
-
-    .icon-caret-down {
-      @include font-size(14);
-      @include transition (color 0.5s ease-in-out, opacity 0.5s ease-in-out);
-      display: inline-block;
-      vertical-align: middle;
-      margin-left: 2px;
-      opacity: 0.5;
-      color: $gray-l2;
-    }
-
-    &:hover {
-
-      .icon-caret-down {
-        color: $blue;
-        opacity: 1.0;
-      }
-    }
-  }
-
-  .wrapper-nav-sub {
-    position: absolute;
-    left: -7px;
-    top: 47px;
-    width: 140px;
-    opacity: 0.0;
-    pointer-events: none;
-  }
-
-  .nav-sub {
-    @include border-radius(2px);
-    @include box-sizing(border-box);
-    @include box-shadow(0 1px 5px 0 rgba(0,0,0, 0.1));
-    position: relative;
-    width: 100%;
-    border: 1px solid $gray-l2;
-    padding: ($baseline/4) ($baseline/2);
+  .wrapper-l, .wrapper-r {
     background: $white;
-
-    &:after, &:before {
-      bottom: 100%;
-      border: solid transparent;
-      content: " ";
-      height: 0;
-      width: 0;
-      position: absolute;
-      pointer-events: none;
-    }
-
-    &:after {
-      border-color: rgba(255, 255, 255, 0);
-      border-bottom-color: #fff;
-      border-width: 5px;
-      right: 3px;
-      margin-left: -5px;
-    }
-
-    &:before {
-      border-color: rgba(178, 178, 178, 0);
-      border-bottom-color: $gray-l2;
-      border-width: 6px;
-      right: 3px;
-      margin-left: -6px;
-    }
-
-    .nav-item {
-      display: block;
-      margin: 0 0 ($baseline/4) 0;
-      border-bottom: 1px solid $gray-l5;
-      padding: 0 0($baseline/4) 0;
-      @include font-size(13);
-
-      &:last-child {
-        margin-bottom: 0;
-        border-bottom: none;
-        padding-bottom: 0;
-      }
-
-      a {
-        display: block;
-      }
-    }
   }
 
-  // UI - dropdown - specific navs
-  &.nav-account {
-
-    .wrapper-nav-sub {
-      top: 27px;
-      left: auto;
-      right: -13px;
-      width: 110px;
-    }
-
-    .nav-sub {
-      text-align: left;
-
-      .icon-expand {
-        top: -2px;
-      }
-    }
-
-    .nav-sub:after {
-      left: auto;
-      right: 11px;
-    }
-
-    .nav-sub:before {
-      left: auto;
-      right: 10px;
-    }
+  .wrapper-l {
+    float: left;
+    width: flex-grid(7,12);
   }
 
-  &.nav-course {
-
-    .nav-course-courseware {
-
-      .nav-sub:after {
-        left: 88px;
-      }
-
-      .nav-sub:before {
-        left: 88px;
-      }
-    }
-
-    .nav-course-settings {
-
-      .nav-sub:after {
-        left: 88px;
-      }
-
-      .nav-sub:before {
-        left: 88px;
-      }
-    }
-
-    .nav-course-tools {
-
-      .wrapper-nav-sub {
-        top: ($baseline*1.5);
-        width: 100px;
-      }
-
-      .nav-sub:after {
-        left: 68px;
-      }
-
-      .nav-sub:before {
-        left: 68px;
-      }
-    }
-  }
-}
-
-// ====================
-
-// STATE: is-signed in
-.is-signedin {
-
-  &.course .branding {
-
-    &:before {
-      @extend .faded-vertical-divider;
-      content: "";
-      display: block;
-      height: 50px;
-      position: absolute;
-      right: 1px;
-      top: -8px;
-      width: 1px;
-    }
-
-    &:after {
-      @extend .faded-vertical-divider-light;
-      content: "";
-      display: block;
-      height: 50px;
-      position: absolute;
-      right: 0px;
-      top: -12px;
-      width: 1px;
-    }
-  }
-}
-
-// ====================
-
-// STATE: not signed in
-.not-signedin {
-
-  .wrapper-left {
-    width: flex-grid(4, 12);
-  }
-
-  .wrapper-right {
-    width: flex-grid(8, 12);
-  }
-
-  // STATE: not signed in - unauthenticated nav
-  .nav-not-signedin {
+  .wrapper-r {
     float: right;
-    margin-top: ($baseline/4);
+    width: flex-grid(4,12);
+    text-align: right;
+  }
 
-    .nav-item {
-      @include font-size(16);
+  .branding, .info-course, .nav-course, .nav-account, .nav-pitch {
+    @include box-sizing(border-box);
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  .nav-account {
+    width: 100%;
+  }
+
+  // basic layout - nav items
+  nav {
+
+    > ol > .nav-item {
+      @extend .t-action3;
+      display: inline-block;
       vertical-align: middle;
-      margin: 0 $baseline 0 0;
+      font-weight: 600;
 
       &:last-child {
         margin-right: 0;
       }
+    }
 
-      .action {
-        margin-top: -($baseline/4);
-        display: inline-block;
-        padding: ($baseline/4) ($baseline/2);
+    .nav-item a {
+      color: $gray-d1;
+
+      &:hover {
+        color: $blue-s1;
+      }
+    }
+  }
+
+  // basic layout - dropdowns
+  .nav-dd {
+
+    .title {
+      @extend .t-action2;
+      @extend .btn-dd-nav-primary;
+      @include transition(all 0.25s ease-in-out 0);
+
+      .label, .icon-caret-down {
+
+      }
+
+      .label {
+
+      }
+
+      .icon-caret-down {
+        opacity: 0.25;
+      }
+
+      &:hover {
+
+        .icon-caret-down {
+          opacity: 1.0;
+        }
+      }
+
+      .nav-sub .nav-item {
+
+        [class^="icon-"] {
+          display: inline-block;
+          vertical-align: middle;
+          margin-right: ($baseline/4);
+        }
+      }
+    }
+  }
+
+  // ====================
+
+  // specific elements - branding
+  .branding {
+    padding: ($baseline*0.75) 0;
+
+    a {
+      display: block;
+
+      img {
+        width: 100%;
+        display: block;
+      }
+    }
+  }
+
+  // ====================
+
+  // specific elements - course name/info
+  .info-course {
+    margin-right: flex-gutter();
+    border-right: 1px solid $gray-l4;
+    padding: ($baseline*0.75) flex-gutter() ($baseline*0.75) 0;
+
+    .course-org, .course-number {
+      @extend .t-action4;
+      display: inline-block;
+      vertical-align: middle;
+      max-width: 45%;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      opacity: 0.75;
+    }
+
+    .course-org {
+      margin-right: ($baseline/4);
+    }
+
+    .course-title {
+      @extend .t-action2;
+      display: block;
+      width: 100%;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      font-weight: 600;
+    }
+
+    // entire link
+    .course-link {
+      @include transition(color 0.25s ease-in-out);
+      display: block;
+      color: $gray-d1;
+
+      &:hover {
+        color: $blue-s1;
+      }
+    }
+  }
+
+  // ====================
+
+  // specific elements - course nav
+  .nav-course {
+    padding: ($baseline*0.75) 0;
+  }
+
+  // ====================
+
+  // specific elements - account-based nav
+  .nav-account {
+    position: relative;
+    padding: ($baseline*0.75) 0;
+
+    .nav-sub {
+      text-align: left;
+    }
+
+    .nav-account-help {
+
+      .wrapper-nav-sub {
+        width: ($baseline*10);
       }
     }
 
-    // STATE: not signed in - specific items
-    .nav-not-signedin-help {
+    .nav-account-user {
 
+      .title {
+        max-width: ($baseline*6.5);
+
+        > .label {
+          display: inline-block;
+          max-width: 85%;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+        }
+      }
+    }
+  }
+
+  // ====================
+
+  // specific elements - pitch/how it works nav
+  .nav-pitch {
+    position: relative;
+    padding: ($baseline*0.75) 0;
+
+    .nav-sub {
+      text-align: left;
+    }
+  }
+}
+
+// ====================
+
+// CASE: user signed in
+.is-signedin {
+
+  .wrapper-l {
+    width: flex-grid(9,12);
+  }
+
+  .wrapper-r {
+    width: flex-grid(3,12);
+  }
+
+  .branding {
+    width: 20%;
+    margin-right: 2%;
+  }
+
+  .nav-account {
+    top: ($baseline/4);
+  }
+}
+
+// ====================
+
+// CASE: in course {
+.is-signedin.course {
+
+  .wrapper-header {
+
+    .wrapper-l {
+      width: flex-grid(9,12);
     }
 
-    .nav-not-signedin-signup {
-      margin-right: ($baseline/2);
+    .wrapper-r {
+      width: flex-grid(3,12);
+    }
+
+    .branding {
+      width: 20%;
+      margin-right: 2%;
+    }
+
+    .info-course {
+      width: 25%;
+      margin-right: 2%;
+    }
+
+    .nav-course {
+      width: 45%;
+    }
+  }
+}
+
+// ====================
+
+// CASE: user not signed in
+.not-signedin {
+
+  .wrapper-header {
+
+    .wrapper-l {
+      width: flex-grid(2,12);
+    }
+
+    .wrapper-r {
+      width: flex-grid(10,12);
+    }
+
+    .branding {
+      width: 100%;
+    }
+
+    .nav-pitch {
+      top: ($baseline/4);
+
+      .nav-item {
+        margin-right: ($baseline/2);
+
+        &:last-child {
+          margin-right: 0;
+        }
+      }
 
       .action-signup {
         @include blue-button;
@@ -454,9 +316,6 @@
         text-transform: uppercase;
         font-weight: 600;
       }
-    }
-
-    .nav-not-signedin-signin {
 
       .action-signin {
         @include white-button;
@@ -505,65 +364,17 @@ body.course.advanced .nav-course-settings-advanced,
 // course tools
 body.course.import .nav-course-tools .title,
 body.course.export .nav-course-tools .title,
+body.course.checklists .nav-course-tools .title,
 
 body.course.import .nav-course-tools-import,
 body.course.export .nav-course-tools-export,
+body.course.checklists .nav-course-tools-checklists,
 
 {
-
   color: $blue;
 
   a {
     color: $blue;
     pointer-events: none;
-  }
-}
-
-body.signup .nav-not-signedin-signin {
-
-  a {
-    background-color: #d9e3ee;
-    color: #6d788b;
-  }
-}
-
-body.signin .nav-not-signedin-signup {
-
-  a {
-    background-color: #62aaf5;
-    color: #fff;
-  }
-}
-
-// ====================
-
-// STATE: js enabled
-.js {
-
-  .nav-dropdown {
-
-    .nav-item .title {
-      outline: 0;
-      cursor: pointer;
-
-      &:hover, &:active, &.is-selected {
-        color: $blue;
-
-        .icon-expand {
-          color: $blue;
-        }
-      }
-    }
-  }
-
-  .wrapper-nav-sub {
-    @include transition (opacity 1.0s ease-in-out 0s);
-    opacity: 0.0;
-    pointer-events: none;
-
-    &.is-shown {
-      opacity: 1.0;
-      pointer-events: auto;
-    }
   }
 }

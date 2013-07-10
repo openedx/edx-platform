@@ -56,11 +56,11 @@ $(document).ready(function() {
 
     // nav - dropdown related
     $body.click(function(e) {
-        $('.nav-dropdown .nav-item .wrapper-nav-sub').removeClass('is-shown');
-        $('.nav-dropdown .nav-item .title').removeClass('is-selected');
+        $('.nav-dd .nav-item .wrapper-nav-sub').removeClass('is-shown');
+        $('.nav-dd .nav-item .title').removeClass('is-selected');
     });
 
-    $('.nav-dropdown .nav-item .title').click(function(e) {
+    $('.nav-dd .nav-item .title').click(function(e) {
 
         $subnav = $(this).parent().find('.wrapper-nav-sub');
         $title = $(this).parent().find('.title');
@@ -71,8 +71,8 @@ $(document).ready(function() {
             $subnav.removeClass('is-shown');
             $title.removeClass('is-selected');
         } else {
-            $('.nav-dropdown .nav-item .title').removeClass('is-selected');
-            $('.nav-dropdown .nav-item .wrapper-nav-sub').removeClass('is-shown');
+            $('.nav-dd .nav-item .title').removeClass('is-selected');
+            $('.nav-dd .nav-item .wrapper-nav-sub').removeClass('is-shown');
             $title.addClass('is-selected');
             $subnav.addClass('is-shown');
         }

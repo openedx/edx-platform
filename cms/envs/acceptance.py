@@ -23,12 +23,12 @@ MODULESTORE_OPTIONS = {
     'db': 'test_xmodule',
     'collection': 'acceptance_modulestore',
     'fs_root': TEST_ROOT / "data",
-    'render_template': 'mitxmako.shortcuts.render_to_string'
+    'render_template': 'mitxmako.shortcuts.render_to_string',
 }
 
 MODULESTORE = {
     'default': {
-        'ENGINE': 'xmodule.modulestore.mongo.DraftMongoModuleStore',
+        'ENGINE': 'xmodule.modulestore.draft.DraftModuleStore',
         'OPTIONS': MODULESTORE_OPTIONS
     },
     'direct': {
@@ -36,7 +36,7 @@ MODULESTORE = {
         'OPTIONS': MODULESTORE_OPTIONS
     },
     'draft': {
-        'ENGINE': 'xmodule.modulestore.mongo.DraftMongoModuleStore',
+        'ENGINE': 'xmodule.modulestore.draft.DraftModuleStore',
         'OPTIONS': MODULESTORE_OPTIONS
     }
 }

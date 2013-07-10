@@ -104,7 +104,7 @@ function goto( mode)
   <section class="instructor-dashboard-content">
     <h1>Instructor Dashboard</h1>
 
-    <h2>[ <a href="#" onclick="goto('Grades');" class="${modeflag.get('Grades')}">Grades</a> |
+    <h2 class="navbar">[ <a href="#" onclick="goto('Grades');" class="${modeflag.get('Grades')}">Grades</a> |
           %if settings.MITX_FEATURES.get('ENABLE_PSYCHOMETRICS'):
             <a href="#" onclick="goto('Psychometrics');" class="${modeflag.get('Psychometrics')}">Psychometrics</a> |
           %endif
@@ -381,6 +381,8 @@ function goto( mode)
 
   <p>Enroll or un-enroll one or many students: enter emails, separated by new lines or commas;</p>
   <textarea rows="6" cols="70" name="multiple_students"></textarea>
+  <p>
+  <input type="checkbox" name="email_students"> Notify students by email
   <p>
   <input type="checkbox" name="auto_enroll"> Auto-enroll students when they activate
   <input type="submit" name="action" value="Enroll multiple students">

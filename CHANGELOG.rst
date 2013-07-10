@@ -5,9 +5,17 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Common: Student information is now passed to the tracking log via POST instead of GET.
+
+Common: Add tests for documentation generation to test suite
+
+Blades: User answer now preserved (and changeable) after clicking "show answer" in choice problems
+
 LMS: Users are no longer auto-activated if they click "reset password"
 This is now done when they click on the link in the reset password
 email they receive (along with usual path through activation email).
+
+LMS: Fixed a reflected XSS problem in the static textbook views.
 
 LMS: Problem rescoring.  Added options on the Grades tab of the
 Instructor Dashboard to allow a particular student's submission for a
@@ -151,4 +159,6 @@ Common: Updated Django to version 1.4.5.
 Common: Updated CodeJail.
 
 Common: Allow setting of authentication session cookie name.
+
+LMS: Option to email students when enroll/un-enroll them.
 

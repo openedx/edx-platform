@@ -9,7 +9,7 @@ from django.core.exceptions import PermissionDenied
 
 from auth.authz import add_user_to_creator_group, remove_user_from_creator_group, is_user_in_creator_group,\
     create_all_course_groups, add_user_to_course_group, STAFF_ROLE_NAME, INSTRUCTOR_ROLE_NAME,\
-    is_user_in_course_group_role, remove_user_from_course_group
+    is_user_in_course_group_role, remove_user_from_course_group, _grant_instructors_creator_access
 
 
 class CreatorGroupTest(TestCase):
@@ -174,3 +174,42 @@ class CourseGroupTest(TestCase):
         create_all_course_groups(self.creator, self.location)
         with self.assertRaises(PermissionDenied):
             remove_user_from_course_group(self.staff, self.staff, self.location, STAFF_ROLE_NAME)
+
+
+class GrantInstructorsCreatorAccessTest(TestCase):
+    """
+    Tests granting existing instructors course creator rights.
+    """
+    def create_course(self, index):
+        """
+        Creates a course with one instructor and one staff member.
+        """
+        creator = User.objects.create_user('testcreator' + str(index), 'testcreator+courses@edx.org', 'foo')
+        staff = User.objects.create_user('teststaff' + str(index), 'teststaff+courses@edx.org', 'foo')
+        location = 'i4x', 'mitX', str(index), 'course', 'test'
+        create_all_course_groups(creator, location)
+        add_user_to_course_group(creator, staff, location, STAFF_ROLE_NAME)
+        return [creator, staff]
+
+    def test_grant_creator_access(self):
+        """
+        Test for _grant_instructors_creator_access.
+        """
+        [creator1, staff1] = self.create_course(1)
+        [creator2, staff2] = self.create_course(2)
+        with mock.patch.dict('django.conf.settings.MITX_FEATURES', {"ENABLE_CREATOR_GROUP": True}):
+            # Initially no creators.
+            self.assertFalse(is_user_in_creator_group(creator1))
+            self.assertFalse(is_user_in_creator_group(creator2))
+            self.assertFalse(is_user_in_creator_group(staff1))
+            self.assertFalse(is_user_in_creator_group(staff2))
+
+            admin = User.objects.create_user('populate_creators_command', 'grant+creator+access@edx.org', 'foo')
+            admin.is_staff = True
+            _grant_instructors_creator_access(admin)
+
+            # Now instructors only are creators.
+            self.assertTrue(is_user_in_creator_group(creator1))
+            self.assertTrue(is_user_in_creator_group(creator2))
+            self.assertFalse(is_user_in_creator_group(staff1))
+            self.assertFalse(is_user_in_creator_group(staff2))

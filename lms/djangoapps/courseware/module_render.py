@@ -37,7 +37,7 @@ from courseware.access import has_access
 from courseware.masquerade import setup_masquerade
 from courseware.model_data import LmsKeyValueStore, LmsUsage, ModelDataCache
 from courseware.models import StudentModule
-
+from util.sandboxing import can_execute_unsafe_code
 
 log = logging.getLogger(__name__)
 
@@ -61,9 +61,9 @@ def make_track_function(request):
     '''
     import track.views
 
-    def f(event_type, event):
+    def function(event_type, event):
         return track.views.server_track(request, event_type, event, page='x_module')
-    return f
+    return function
 
 
 def toc_for_course(user, request, course, active_chapter, active_section, model_data_cache):
@@ -171,9 +171,9 @@ def get_xqueue_callback_url_prefix(request):
     should go back to the LMS, not to the worker.
     """
     prefix = '{proto}://{host}'.format(
-            proto=request.META.get('HTTP_X_FORWARDED_PROTO', 'https' if request.is_secure() else 'http'),
-            host=request.get_host()
-        )
+        proto=request.META.get('HTTP_X_FORWARDED_PROTO', 'https' if request.is_secure() else 'http'),
+        host=request.get_host()
+    )
     return settings.XQUEUE_INTERFACE.get('callback_url', prefix)
 
 
@@ -313,14 +313,6 @@ def get_module_for_descriptor_internal(user, descriptor, model_data_cache, cours
 
         statsd.increment("lms.courseware.question_answered", tags=tags)
 
-    def can_execute_unsafe_code():
-        # To decide if we can run unsafe code, we check the course id against
-        # a list of regexes configured on the server.
-        for regex in settings.COURSES_WITH_UNSAFE_CODE:
-            if re.match(regex, course_id):
-                return True
-        return False
-
     # TODO (cpennington): When modules are shared between courses, the static
     # prefix is going to have to be specific to the module, not the directory
     # that the xml was loaded from
@@ -348,13 +340,13 @@ def get_module_for_descriptor_internal(user, descriptor, model_data_cache, cours
                           open_ended_grading_interface=open_ended_grading_interface,
                           s3_interface=s3_interface,
                           cache=cache,
-                          can_execute_unsafe_code=can_execute_unsafe_code,
+                          can_execute_unsafe_code=(lambda: can_execute_unsafe_code(course_id)),
                           )
     # pass position specified in URL to module through ModuleSystem
     system.set('position', position)
     system.set('DEBUG', settings.DEBUG)
     if settings.MITX_FEATURES.get('ENABLE_PSYCHOMETRICS'):
-        system.set('psychometrics_handler',		# set callback for updating PsychometricsData
+        system.set('psychometrics_handler',  # set callback for updating PsychometricsData
                    make_psychometrics_data_update_handler(course_id, user, descriptor.location.url()))
 
     try:
@@ -481,7 +473,8 @@ def modx_dispatch(request, dispatch, location, course_id):
     error_msg = _check_files_limits(files)
     if error_msg:
         return HttpResponse(json.dumps({'success': error_msg}))
-    data.update(files)  # Merge files into data dictionary
+    for key in files:  # Merge files into to data dictionary
+        data[key] = files.getlist(key)
 
     try:
         descriptor = modulestore().get_instance(course_id, location)

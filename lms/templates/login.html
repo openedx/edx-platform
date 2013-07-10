@@ -53,7 +53,7 @@
             location.href="${reverse('dashboard')}";
           }
         } else {
-          $('.message.submission-error').addClass('is-shown');
+          $('.message.submission-error').addClass('is-shown').focus();
           $('.message.submission-error .message-copy').html(json.value);
         }
       });
@@ -94,7 +94,7 @@
         <p class="message-copy">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Lorem ipsum dolor sit amet, consectetuer adipiscing elit.</p>
       </div>
 
-      <div role="alert" class="status message submission-error">
+      <div role="alert" class="status message submission-error" tabindex="-1">
         <h3 class="message-title">The following errors occured while logging you in: </h3>
         <ul class="message-copy">
           <li>Your email or password is incorrect</li>

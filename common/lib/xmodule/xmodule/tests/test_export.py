@@ -1,11 +1,20 @@
-import unittest
+"""
+Tests of XML export
+"""
 
+import unittest
+import pytz
+
+from datetime import datetime, timedelta, tzinfo
 from fs.osfs import OSFS
 from path import path
 from tempfile import mkdtemp
 import shutil
 
 from xmodule.modulestore.xml import XMLModuleStore
+from xmodule.modulestore.xml_exporter import EdxJSONEncoder
+
+from xmodule.modulestore import Location
 
 # from ~/mitx_all/mitx/common/lib/xmodule/xmodule/tests/
 # to   ~/mitx_all/mitx/common/test
@@ -127,3 +136,64 @@ class RoundTripTestCase(unittest.TestCase):
 
     def test_word_cloud_roundtrip(self):
         self.check_export_roundtrip(DATA_DIR, "word_cloud")
+
+
+class TestEdxJsonEncoder(unittest.TestCase):
+    """
+    Tests for xml_exporter.EdxJSONEncoder
+    """
+    def setUp(self):
+        self.encoder = EdxJSONEncoder()
+
+        class OffsetTZ(tzinfo):
+            """A timezone with non-None utcoffset"""
+            def utcoffset(self, _dt):
+                return timedelta(hours=4)
+
+        self.offset_tz = OffsetTZ()
+
+        class NullTZ(tzinfo):
+            """A timezone with None as its utcoffset"""
+            def utcoffset(self, _dt):
+                return None
+        self.null_utc_tz = NullTZ()
+
+    def test_encode_location(self):
+        loc = Location('i4x', 'org', 'course', 'category', 'name')
+        self.assertEqual(loc.url(), self.encoder.default(loc))
+
+        loc = Location('i4x', 'org', 'course', 'category', 'name', 'version')
+        self.assertEqual(loc.url(), self.encoder.default(loc))
+
+    def test_encode_naive_datetime(self):
+        self.assertEqual(
+            "2013-05-03T10:20:30.000100",
+            self.encoder.default(datetime(2013, 5, 3, 10, 20, 30, 100))
+        )
+        self.assertEqual(
+            "2013-05-03T10:20:30",
+            self.encoder.default(datetime(2013, 5, 3, 10, 20, 30))
+        )
+
+    def test_encode_utc_datetime(self):
+        self.assertEqual(
+            "2013-05-03T10:20:30+00:00",
+            self.encoder.default(datetime(2013, 5, 3, 10, 20, 30, 0, pytz.UTC))
+        )
+
+        self.assertEqual(
+            "2013-05-03T10:20:30+04:00",
+            self.encoder.default(datetime(2013, 5, 3, 10, 20, 30, 0, self.offset_tz))
+        )
+
+        self.assertEqual(
+            "2013-05-03T10:20:30Z",
+            self.encoder.default(datetime(2013, 5, 3, 10, 20, 30, 0, self.null_utc_tz))
+        )
+
+    def test_fallthrough(self):
+        with self.assertRaises(TypeError):
+            self.encoder.default(None)
+
+        with self.assertRaises(TypeError):
+            self.encoder.default({})

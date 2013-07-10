@@ -1,7 +1,7 @@
 import sys
 
 from django.conf import settings
-from django.core.urlresolvers import clear_url_caches
+from django.core.urlresolvers import clear_url_caches, resolve
 
 
 class UrlResetMixin(object):
@@ -26,6 +26,9 @@ class UrlResetMixin(object):
         if urlconf in sys.modules:
             reload(sys.modules[urlconf])
         clear_url_caches()
+
+        # Resolve a URL so that the new urlconf gets loaded
+        resolve('/')
 
     def setUp(self):
         """Reset django default urlconf before tests and after tests"""
