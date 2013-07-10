@@ -63,7 +63,7 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, TabsEditingDescriptor):
         },
         {
             'name': "Settings",
-            'template': "metadata-edit.html"
+            'template': "metadata-edit-tab.html"
         }
     ]
 

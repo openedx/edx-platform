@@ -60,7 +60,7 @@ class CMS.Views.ModuleEdit extends Backbone.View
     $.post("/clone_item", {
       parent_location: parent
       template: template
-    }, (data) => 
+    }, (data) =>
       @model.set(id: data.id)
       @$el.data('id', data.id)
       @render()
@@ -123,6 +123,9 @@ class CMS.Views.ModuleEdit extends Backbone.View
     settingsEditor = @$el.find('.wrapper-comp-settings')
     editorModeButton =  @$el.find('#editor-mode').find("a")
     settingsModeButton = @$el.find('#settings-mode').find("a")
+
+    console.log dataEditor.length
+    console.log settingsEditor.length
 
     if mode == @editorMode
       # Because of CodeMirror editor, cannot hide the data editor when it is first loaded. Therefore

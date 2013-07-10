@@ -17,6 +17,23 @@
         </div>
         % endfor
       </div>
+
+
+
+
     </section>
+
+<%
+  import hashlib
+  hlskey = hashlib.md5(module.location.url()).hexdigest()
+%>
+
+<% showHighLevelSource='source_code' in editable_metadata_fields and editable_metadata_fields['source_code']['explicitly_set'] %>
+
+% if showHighLevelSource:
+    <div class="launch-latex-compiler">
+      <a href="#hls-modal-${hlskey}" id="hls-trig-${hlskey}">${_("Launch Latex Source Compiler")}</a>
+    </div>
+    <%include file="source-edit.html" />
+% endif
 </div>
-<%include file="metadata-edit.html" />
