@@ -16,18 +16,18 @@ def get_default_time_display(dt, show_timezone=True):
     The default value of show_timezone is True.
     """
     if dt is None:
-        return ""
-    timezone = ""
+        return u""
+    timezone = u""
     if show_timezone:
         if dt.tzinfo is not None:
             try:
-                timezone = " " + dt.tzinfo.tzname(dt)
+                timezone = u" " + dt.tzinfo.tzname(dt)
             except NotImplementedError:
                 timezone = dt.strftime('%z')
         else:
-            timezone = " UTC"
-    return dt.strftime("%b %d, %Y {at} %H:%M{tz}").format(
-        at=_("at"), tz=timezone).strip()
+            timezone = u" UTC"
+    return unicode(dt.strftime(u"%b %d, %Y {at} %H:%M{tz}")).format(
+        at=_(u"at"), tz=timezone).strip()
 
 
 def almost_same_datetime(dt1, dt2, allowed_delta=timedelta(minutes=1)):
