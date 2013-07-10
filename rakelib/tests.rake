@@ -80,7 +80,7 @@ TEST_TASK_DIRS = []
 
     # Run acceptance tests
     desc "Run acceptance tests"
-    task "test_acceptance_#{system}", [:harvest_args] => [:clean_test_files, "#{system}:gather_assets:acceptance", "fasttest_acceptance_#{system}"]
+    task "test_acceptance_#{system}", [:harvest_args] => [:clean_test_files, "#{system}:gather_assets:acceptance_static", "fasttest_acceptance_#{system}"]
 
     desc "Run acceptance tests without collectstatic"
     task "fasttest_acceptance_#{system}", [:harvest_args] => [report_dir, :clean_reports_dir, :predjango] do |t, args|
