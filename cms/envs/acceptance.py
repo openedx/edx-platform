@@ -16,12 +16,18 @@ DEBUG = True
 # Disable warnings for acceptance tests, to make the logs readable
 import logging
 logging.disable(logging.ERROR)
+import os
+import random
+
+
+def seed():
+    return os.getppid()
 
 MODULESTORE_OPTIONS = {
     'default_class': 'xmodule.raw_module.RawDescriptor',
     'host': 'localhost',
-    'db': 'test_xmodule',
-    'collection': 'acceptance_modulestore',
+    'db': 'acceptance_xmodule',
+    'collection': 'acceptance_modulestore_%s' % seed(),
     'fs_root': TEST_ROOT / "data",
     'render_template': 'mitxmako.shortcuts.render_to_string',
 }
@@ -45,7 +51,7 @@ CONTENTSTORE = {
     'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
     'OPTIONS': {
         'host': 'localhost',
-        'db': 'acceptance_xcontent',
+        'db': 'acceptance_xcontent_%s' % seed(),
     },
     # allow for additional options that can be keyed on a name, e.g. 'trashcan'
     'ADDITIONAL_OPTIONS': {
@@ -61,13 +67,13 @@ CONTENTSTORE = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': TEST_ROOT / "db" / "test_mitx.db",
-        'TEST_NAME': TEST_ROOT / "db" / "test_mitx.db",
+        'NAME': TEST_ROOT / "db" / "test_mitx_%s.db" % seed(),
+        'TEST_NAME': TEST_ROOT / "db" / "test_mitx_%s.db" % seed(),
     }
 }
 
 # Include the lettuce app for acceptance testing, including the 'harvest' django-admin command
 INSTALLED_APPS += ('lettuce.django',)
 LETTUCE_APPS = ('contentstore',)
-LETTUCE_SERVER_PORT = 8001
+LETTUCE_SERVER_PORT = random.randint(1024, 65535)
 LETTUCE_BROWSER = 'chrome'
