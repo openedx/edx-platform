@@ -11,6 +11,7 @@ from contentstore.utils import get_url_reverse, get_lms_link_for_item
 from util.json_request import expect_json, JsonResponse
 from auth.authz import STAFF_ROLE_NAME, INSTRUCTOR_ROLE_NAME, get_users_in_course_group_by_role
 from auth.authz import get_user_by_email, add_user_to_course_group, remove_user_from_course_group
+from course_creators.views import get_course_creator_status, add_user_with_status_unrequested
 
 from .access import has_access
 
@@ -32,6 +33,18 @@ def index(request):
                 and course.location.name != '')
     courses = filter(course_filter, courses)
 
+    if settings.MITX_FEATURES.get('DISABLE_COURSE_CREATION', False):
+        course_creator_status = 'granted' if request.user.is_staff else 'disallowed_for_this_site'
+    elif settings.MITX_FEATURES.get('ENABLE_CREATOR_GROUP', False):
+        course_creator_status = get_course_creator_status(request.user)
+        if course_creator_status is None:
+            # User not grandfathered in as an existing user, has not previously visited the dashboard page.
+            # Add the user to the course creator admin table with status 'unrequested'.
+            add_user_with_status_unrequested(request.user)
+            course_creator_status = get_course_creator_status(request.user)
+    else:
+        course_creator_status = 'granted'
+
     return render_to_response('index.html', {
         'new_course_template': Location('i4x', 'edx', 'templates', 'course', 'Empty'),
         'courses': [(course.display_name,
@@ -39,7 +52,7 @@ def index(request):
                     get_lms_link_for_item(course.location, course_id=course.location.course_id))
                     for course in courses],
         'user': request.user,
-        'disable_course_creation': settings.MITX_FEATURES.get('DISABLE_COURSE_CREATION', False) and not request.user.is_staff
+        'course_creator_status': course_creator_status
     })
 
 
