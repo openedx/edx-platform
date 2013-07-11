@@ -56,9 +56,13 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
         CodeMirror.fromTextArea(textarea, {
             mode: "application/json", lineNumbers: false, lineWrapping: false,
             onChange: function(instance, changeobj) {
+                instance.save()
                 // this event's being called even when there's no change :-(
-                if (instance.getValue() !== oldValue && !self.notificationBarShowing) {
-                    self.showNotificationBar();
+                if (instance.getValue() !== oldValue) {
+                    var message = gettext("Your changes will not take effect until you save your progress. Take care with key and value formatting, as validation is not implemented.");
+                    self.showNotificationBar(message,
+                                             _.bind(self.saveView, self),
+                                             _.bind(self.revertView, self));
                 }
             },
             onFocus : function(mirror) {
@@ -91,43 +95,10 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
                     }
                 }
                 if (JSONValue !== undefined) {
-                    self.clearValidationErrors();
-                    self.model.set(key, JSONValue, {validate: true});
+                    self.model.set(key, JSONValue);
                 }
             }
         });
-    },
-    showNotificationBar: function() {
-        var self = this;
-        var message = gettext("Your changes will not take effect until you save your progress. Take care with key and value formatting, as validation is not implemented.")
-        var confirm = new CMS.Views.Notification.Warning({
-            title: gettext("You've Made Some Changes"),
-            message: message,
-            actions: {
-                primary: {
-                    "text": gettext("Save Changes"),
-                    "class": "action-save",
-                    "click": function() {
-                        self.saveView();
-                        confirm.hide();
-                        self.notificationBarShowing = false;
-                    }
-                },
-                secondary: [{
-                    "text": gettext("Cancel"),
-                    "class": "action-cancel",
-                    "click": function() {
-                        self.revertView();
-                        confirm.hide();
-                        self.notificationBarShowing = false;
-                    }
-                }]
-            }});
-        this.notificationBarShowing = true;
-        confirm.show();
-        if(this.saved) {
-            this.saved.hide();
-        }
     },
     saveView : function() {
         // TODO one last verification scan:
@@ -138,25 +109,20 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
             {
             success : function() {
                 self.render();
+                var title = gettext("Your policy changes have been saved.");
                 var message = gettext("Please note that validation of your policy key and value pairs is not currently in place yet. If you are having difficulties, please review your policy pairs.");
-                self.saved = new CMS.Views.Alert.Confirmation({
-                    title: gettext("Your policy changes have been saved."),
-                    message: message,
-                    closeIcon: false
-                });
-                self.saved.show();
+                self.showSavedBar(title, message);
                 analytics.track('Saved Advanced Settings', {
                     'course': course_location_analytics
                 });
-            }
+            },
+            silent: true
         });
     },
-    revertView : function() {
+    revertView: function() {
         var self = this;
-        this.model.deleteKeys = [];
-        this.model.clear({silent : true});
         this.model.fetch({
-            success : function() { self.render(); },
+            success: function() { self.render(); },
             reset: true
         });
     },

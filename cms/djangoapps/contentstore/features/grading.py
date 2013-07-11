@@ -3,6 +3,7 @@
 
 from lettuce import world, step
 from common import *
+from terrain.steps import reload_the_page
 
 
 @step(u'I am viewing the grading settings')
@@ -97,6 +98,22 @@ def add_assignment_type(step, new_name):
 def populate_course(step):
     step.given('I have added a new section')
     step.given('I have added a new subsection')
+
+
+@step(u'I do not see the changes persisted on refresh$')
+def changes_not_persisted(step):
+    reload_the_page(step)
+    name_id = '#course-grading-assignment-name'
+    ele = world.css_find(name_id)[0]
+    assert(ele.value == 'Homework')
+
+
+@step(u'I see the assignment type "(.*)"$')
+def i_see_the_assignment_type(_step, name):
+      assignment_css = '#course-grading-assignment-name'
+      assignments = world.css_find(assignment_css)
+      types = [ele['value'] for ele in assignments]
+      assert name in types
 
 
 def get_type_index(name):

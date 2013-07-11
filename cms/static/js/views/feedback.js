@@ -140,7 +140,21 @@ CMS.Views.SystemFeedback = Backbone.View.extend({
 CMS.Views.Alert = CMS.Views.SystemFeedback.extend({
     options: $.extend({}, CMS.Views.SystemFeedback.prototype.options, {
         type: "alert"
-    })
+    }),
+    slide_speed: 900,
+    show: function() {
+        CMS.Views.SystemFeedback.prototype.show.apply(this, arguments);
+        this.$el.hide();
+        this.$el.slideDown(this.slide_speed);
+        return this;
+    },
+    hide: function () {
+        this.$el.slideUp({
+            duration: this.slide_speed
+        });
+        setTimeout(_.bind(CMS.Views.SystemFeedback.prototype.hide, this, arguments),
+                   this.slideSpeed);
+    }
 });
 CMS.Views.Notification = CMS.Views.SystemFeedback.extend({
     options: $.extend({}, CMS.Views.SystemFeedback.prototype.options, {

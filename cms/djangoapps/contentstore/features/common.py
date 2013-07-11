@@ -12,6 +12,8 @@ import time
 from logging import getLogger
 logger = getLogger(__name__)
 
+from terrain.browser import reset_data
+
 _COURSE_NAME = 'Robot Super Course'
 _COURSE_NUM = '999'
 _COURSE_ORG = 'MITx'
@@ -53,6 +55,48 @@ def i_press_the_category_delete_icon(_step, category):
 @step('I have opened a new course in Studio$')
 def i_have_opened_a_new_course(_step):
     open_new_course()
+
+
+@step(u'I press the "([^"]*)" notification button$')
+def press_the_notification_button(_step, name):
+    css = 'a.action-%s' % name.lower()
+
+    # The button was clicked if either the notification bar is gone,
+    # or we see an error overlaying it (expected for invalid inputs).
+    def button_clicked():
+        confirmation_dismissed = world.is_css_not_present('.is-shown.wrapper-notification-warning')
+        error_showing = world.is_css_present('.is-shown.wrapper-notification-error')
+        return confirmation_dismissed or error_showing
+
+    world.css_click(css, success_condition=button_clicked), '%s button not clicked after 5 attempts.' % name
+
+
+@step('I change the "(.*)" field to "(.*)"$')
+def i_change_field_to_value(_step, field, value):
+    field_css = '#%s' % '-'.join([s.lower() for s in field.split()])
+    ele = world.css_find(field_css).first
+    ele.fill(value)
+    ele._element.send_keys(Keys.ENTER)
+
+
+@step('I reset the database')
+def reset_the_db(_step):
+    """
+    When running Lettuce tests using examples (i.e. "Confirmation is
+    shown on save" in course-settings.feature), the normal hooks
+    aren't called between examples. reset_data should run before each
+    scenario to flush the test database. When this doesn't happen we
+    get errors due to trying to insert a non-unique entry. So instead,
+    we delete the database manually. This has the effect of removing
+    any users and courses that have been created during the test run.
+    """
+    reset_data(None)
+
+
+@step('I see a confirmation that my changes have been saved')
+def i_see_a_confirmation(step):
+    confirmation_css = '#alert-confirmation'
+    assert world.is_css_present(confirmation_css)
 
 
 ####### HELPER FUNCTIONS ##############
@@ -182,6 +226,13 @@ def shows_captions(step, show_captions):
         assert world.css_find('.video')[0].has_class('closed')
     else:
         assert world.is_css_not_present('.video.closed')
+
+
+@step('the save button is disabled$')
+def save_button_disabled(step):
+    button_css = '.action-save'
+    disabled = 'is-disabled'
+    assert world.css_find(button_css)[0].has_class(disabled)
 
 
 def type_in_codemirror(index, text):
