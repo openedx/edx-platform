@@ -15,16 +15,16 @@ from instructor.enrollment import (EmailEnrollmentState,
                                    reset_student_attempts)
 
 
-class TestMockEnrollmentState(TestCase):
+class TestSettableEnrollmentState(TestCase):
     """ Test the basis class for enrollment tests. """
     def setUp(self):
         self.course_id = 'robot:/a/fake/c::rse/id'
 
     def test_mes_create(self):
         """
-        Test MockEnrollmentState creation of user.
+        Test SettableEnrollmentState creation of user.
         """
-        mes = MockEnrollmentState(
+        mes = SettableEnrollmentState(
             user=True,
             enrollment=True,
             allowed=False,
@@ -53,7 +53,7 @@ class TestEnrollmentChangeBase(TestCase):
         """
         Runs a state change test.
 
-        `before_ideal` and `after_ideal` are MockEnrollmentState's
+        `before_ideal` and `after_ideal` are SettableEnrollmentState's
         `action` is a function which will be run in the middle.
             `action` should transition the world from before_ideal to after_ideal
             `action` will be supplied the following arguments (None-able arguments)
@@ -81,14 +81,14 @@ class TestEnrollmentChangeBase(TestCase):
 class TestInstructorEnrollDB(TestEnrollmentChangeBase):
     """ Test instructor.enrollment.enroll_email """
     def test_enroll(self):
-        before_ideal = MockEnrollmentState(
+        before_ideal = SettableEnrollmentState(
             user=True,
             enrollment=False,
             allowed=False,
             auto_enroll=False
         )
 
-        after_ideal = MockEnrollmentState(
+        after_ideal = SettableEnrollmentState(
             user=True,
             enrollment=True,
             allowed=False,
@@ -101,14 +101,14 @@ class TestInstructorEnrollDB(TestEnrollmentChangeBase):
         return self._run_state_change_test(before_ideal, after_ideal, action)
 
     def test_enroll_again(self):
-        before_ideal = MockEnrollmentState(
+        before_ideal = SettableEnrollmentState(
             user=True,
             enrollment=True,
             allowed=False,
             auto_enroll=False,
         )
 
-        after_ideal = MockEnrollmentState(
+        after_ideal = SettableEnrollmentState(
             user=True,
             enrollment=True,
             allowed=False,
@@ -121,14 +121,14 @@ class TestInstructorEnrollDB(TestEnrollmentChangeBase):
         return self._run_state_change_test(before_ideal, after_ideal, action)
 
     def test_enroll_nouser(self):
-        before_ideal = MockEnrollmentState(
+        before_ideal = SettableEnrollmentState(
             user=False,
             enrollment=False,
             allowed=False,
             auto_enroll=False,
         )
 
-        after_ideal = MockEnrollmentState(
+        after_ideal = SettableEnrollmentState(
             user=False,
             enrollment=False,
             allowed=True,
@@ -141,14 +141,14 @@ class TestInstructorEnrollDB(TestEnrollmentChangeBase):
         return self._run_state_change_test(before_ideal, after_ideal, action)
 
     def test_enroll_nouser_again(self):
-        before_ideal = MockEnrollmentState(
+        before_ideal = SettableEnrollmentState(
             user=False,
             enrollment=False,
             allowed=True,
             auto_enroll=False
         )
 
-        after_ideal = MockEnrollmentState(
+        after_ideal = SettableEnrollmentState(
             user=False,
             enrollment=False,
             allowed=True,
@@ -161,14 +161,14 @@ class TestInstructorEnrollDB(TestEnrollmentChangeBase):
         return self._run_state_change_test(before_ideal, after_ideal, action)
 
     def test_enroll_nouser_autoenroll(self):
-        before_ideal = MockEnrollmentState(
+        before_ideal = SettableEnrollmentState(
             user=False,
             enrollment=False,
             allowed=False,
             auto_enroll=False,
         )
 
-        after_ideal = MockEnrollmentState(
+        after_ideal = SettableEnrollmentState(
             user=False,
             enrollment=False,
             allowed=True,
@@ -181,14 +181,14 @@ class TestInstructorEnrollDB(TestEnrollmentChangeBase):
         return self._run_state_change_test(before_ideal, after_ideal, action)
 
     def test_enroll_nouser_change_autoenroll(self):
-        before_ideal = MockEnrollmentState(
+        before_ideal = SettableEnrollmentState(
             user=False,
             enrollment=False,
             allowed=True,
             auto_enroll=True,
         )
 
-        after_ideal = MockEnrollmentState(
+        after_ideal = SettableEnrollmentState(
             user=False,
             enrollment=False,
             allowed=True,
@@ -204,14 +204,14 @@ class TestInstructorEnrollDB(TestEnrollmentChangeBase):
 class TestInstructorUnenrollDB(TestEnrollmentChangeBase):
     """ Test instructor.enrollment.unenroll_email """
     def test_unenroll(self):
-        before_ideal = MockEnrollmentState(
+        before_ideal = SettableEnrollmentState(
             user=True,
             enrollment=True,
             allowed=False,
             auto_enroll=False
         )
 
-        after_ideal = MockEnrollmentState(
+        after_ideal = SettableEnrollmentState(
             user=True,
             enrollment=False,
             allowed=False,
@@ -224,14 +224,14 @@ class TestInstructorUnenrollDB(TestEnrollmentChangeBase):
         return self._run_state_change_test(before_ideal, after_ideal, action)
 
     def test_unenroll_notenrolled(self):
-        before_ideal = MockEnrollmentState(
+        before_ideal = SettableEnrollmentState(
             user=True,
             enrollment=False,
             allowed=False,
             auto_enroll=False
         )
 
-        after_ideal = MockEnrollmentState(
+        after_ideal = SettableEnrollmentState(
             user=True,
             enrollment=False,
             allowed=False,
@@ -244,14 +244,14 @@ class TestInstructorUnenrollDB(TestEnrollmentChangeBase):
         return self._run_state_change_test(before_ideal, after_ideal, action)
 
     def test_unenroll_disallow(self):
-        before_ideal = MockEnrollmentState(
+        before_ideal = SettableEnrollmentState(
             user=False,
             enrollment=False,
             allowed=True,
             auto_enroll=True
         )
 
-        after_ideal = MockEnrollmentState(
+        after_ideal = SettableEnrollmentState(
             user=False,
             enrollment=False,
             allowed=False,
@@ -264,14 +264,14 @@ class TestInstructorUnenrollDB(TestEnrollmentChangeBase):
         return self._run_state_change_test(before_ideal, after_ideal, action)
 
     def test_unenroll_norecord(self):
-        before_ideal = MockEnrollmentState(
+        before_ideal = SettableEnrollmentState(
             user=False,
             enrollment=False,
             allowed=False,
             auto_enroll=False
         )
 
-        after_ideal = MockEnrollmentState(
+        after_ideal = SettableEnrollmentState(
             user=False,
             enrollment=False,
             allowed=False,
@@ -310,10 +310,13 @@ class TestInstructorEnrollmentStudentModule(TestCase):
         self.assertEqual(StudentModule.objects.filter(student=user, course_id=self.course_id, module_state_key=msk).count(), 0)
 
 
-class MockEnrollmentState(EmailEnrollmentState):
+class SettableEnrollmentState(EmailEnrollmentState):
     """
     Settable enrollment state.
-    Used for tests
+    Used for testing state changes.
+    SettableEnrollmentState can be constructed and then
+        a call to create_user will make objects which
+        correspond to the state represented in the SettableEnrollmentState.
     """
     def __init__(self, user=False, enrollment=False, allowed=False, auto_enroll=False):
         self.user = user
@@ -330,7 +333,7 @@ class MockEnrollmentState(EmailEnrollmentState):
     def create_user(self, course_id=None):
         """
         Utility method to possibly create and possibly enroll a user.
-        Creates a state matching the MockEnrollmentState properties.
+        Creates a state matching the SettableEnrollmentState properties.
         Returns a tuple of (
             email,
             User, (optionally None)
