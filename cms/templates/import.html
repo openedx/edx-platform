@@ -23,7 +23,7 @@
         <p><strong>${_("Importing a new course will delete all content currently associated with your course and replace it with the contents of the uploaded file.")}</strong></p>
         ## Translators: ".tar.gz" is a file extension, and files with that extension are called "gzipped tar files": these terms should not be translated
         <p>${_("File uploads must be gzipped tar files (.tar.gz) containing, at a minimum, a {filename} file.").format(filename='<code>course.xml</code>')}</p>
-        <p>${_("Please note that if your course has any problems with auto-generated <code>url_name</code> nodes, re-importing your course could cause the loss of student data associated with those problems.")}</p>
+        <p>${_("Please note that if your course has any problems with auto-generated {nodename} nodes, re-importing your course could cause the loss of student data associated with those problems.").format(nodename='<code>url_name</code>')}</p>
       </div>
       <form action="${reverse('import_course', kwargs=dict(org=context_course.location.org, course=context_course.location.course, name=context_course.location.name))}" method="post" enctype="multipart/form-data" class="import-form">
         <h2>${_("Course to import:")}</h2>
