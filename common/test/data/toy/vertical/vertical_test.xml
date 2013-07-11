@@ -4,13 +4,4 @@
         <answer id="yes">Yes</answer>
         <answer id="no">No</answer>
     </poll_question>
-    <problem><script type="loncapa/python">
-        a=5
-    </script><startouttext/>
-        Answer the question
-        <endouttext/>
-        <startouttext/>
-        <endouttext/>
-        <numericalresponse answer="$a"><responseparam type="tolerance" default="5%" name="tol" description="Numerical Tolerance"/><textline/></numericalresponse>
-    </problem>
 </sequential>

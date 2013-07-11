@@ -359,13 +359,6 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         direct_store = modulestore('direct')
         import_from_xml(direct_store, 'common/test/data/', ['toy'])
 
-        html_module_location = Location(['i4x', 'edX', 'toy', 'html', 'toylab', None])
-
-        url = reverse('preview_component', kwargs={'location': html_module_location.url()})
-
-        resp = self.client.get(url)
-        self.assertEqual(resp.status_code, 200)
-
         # also try a custom response which will trigger the 'is this course in whitelist' logic
         problem_module_location = Location(['i4x', 'edX', 'toy', 'vertical', 'vertical_test', None])
         url = reverse('preview_component', kwargs={'location': problem_module_location.url()})
