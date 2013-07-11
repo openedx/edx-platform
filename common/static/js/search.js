@@ -23,7 +23,7 @@ function correctionLink(event, spelling_correction){
 
 function submitForms(retain_page) {
     var get_data = [];
-    var form_list = $(".auto-submit input");
+    var form_list = $(".auto-submit .parameter");
     for (var i in form_list){
         get_data.push.apply(get_data, form_list.eq(i).serializeArray());
     }

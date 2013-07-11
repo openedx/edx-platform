@@ -1,43 +1,43 @@
 <head>
-${css_link("../static/css/search.css")}
+	${css_link("../static/css/search.css")}
     ${js_link("../static/js/search.js")}
 </head>
 
 <div class="searchwrapper">
-<span>
+	<span>
         <form id="query-box" class="auto-submit" action="/search" method="get">
-     <div class="searchbox-wrapper">
-     % if old_query:
-     <input type="text" id="searchbox" class="searchbox parameter" name="s" value="${old_query}" onkeydown="searchHandle(event, false)"/>
-     % else:
-     <input type="text" id="searchbox" class="searchbox parameter" name="s" value="" onkeydown="searchHandle(event, false)"/>
-     % endif
-     <div class="searchbox_submit">
-     <input type="submit" value="" onclick="clickHandle(event, false)"/>
-     </div>
-     </div>
+    		<div class="searchbox-wrapper">
+    			% if old_query:
+    			<input type="text" id="searchbox" class="searchbox parameter" name="s" value="${old_query}" onkeydown="searchHandle(event, false)"/>
+    			% else:
+    			<input type="text" id="searchbox" class="searchbox parameter" name="s" value="" onkeydown="searchHandle(event, false)"/>
+    			% endif
+    			<div class="searchbox_submit">
+    				<input type="submit" value="" onclick="clickHandle(event, false)"/>
+    			</div>
+    		</div>
         </form>
 
         <form id="content-select" class="auto-submit" action="/search" method="get">
-     <div class="content-select">
-     % if previous.get("transcript", "false") == "true":
-     <input type="checkbox" class="parameter" name="transcript" value="true" checked>Videos
+    		<div class="content-select">
+    			% if previous.get("transcript", "false") == "true":
+    				<input type="checkbox" class="parameter" name="transcript" value="true" checked>Videos
                 % else:
                     <input type="checkbox" class="parameter" name="transcript" value="true">Videos
                 % endif
 
                 % if previous.get("problem", "false") == "true":
-     <input type="checkbox" class="parameter" name="problem" value="true" checked>Problems
-     % else:
+    				<input type="checkbox" class="parameter" name="problem" value="true" checked>Problems
+    			% else:
                     <input type="checkbox" class="parameter" name="problem" value="true">Problems
-     % endif
+    			% endif
 
                 % if previous.get("pdf", "false") == "true":
                     <input type="checkbox" class="parameter" name="pdf" value="true" checked>PDFs
                 % else:
                     <input type="checkbox" class="parameter" name="pdf" value="true"> PDFs
-     % endif
-     </div>
+    			% endif
+    		</div>
         </form>
 
         <form id="sorting" class="auto-submit" action="/search" method="get">
@@ -54,12 +54,11 @@ ${css_link("../static/css/search.css")}
                 % endif
             </select>
         </form>
-
-</span>
+	</span>
 </div>
 
 <%def name="css_link(path, media='')">
-<link rel="stylesheet" type="text/css" href="${path|h}" media="${media}"></link>
+	<link rel="stylesheet" type="text/css" href="${path|h}" media="${media}"></link>
 </%def>
 
 <%def name="js_link(path)">
