@@ -100,7 +100,7 @@ select {
 .toolbar {
 /*  position: absolute; */
   left: 0;
-  right: 0; 
+  right: 0;
   height: 32px;
   z-index: 9999;
   cursor: default;
@@ -185,6 +185,7 @@ select {
   margin: 0;
 }
 
+.splitToolbarButton > .toolbarButton, /*added */
 .splitToolbarButton:hover > .toolbarButton,
 .splitToolbarButton:focus > .toolbarButton,
 .splitToolbarButton.toggled > .toolbarButton,
