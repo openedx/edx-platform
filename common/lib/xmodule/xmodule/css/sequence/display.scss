@@ -2,7 +2,7 @@ nav.sequence-nav {
   // TODO (cpennington): This doesn't work anymore. XModules aren't able to
   // import from external sources.
   @extend .topbar;
-  margin: -4px 0 30px;
+  margin: -4px 30px 30px 30px;
   position: relative;
   border-bottom: none;
 
@@ -35,7 +35,7 @@ nav.sequence-nav {
     z-index: 99;
     border: 1px solid #ccc;
     height: 44px;
-    margin: 0 30px;
+    margin: 0;
     @include linear-gradient(top, #ddd, #eee);
     @include box-shadow(0 1px 3px rgba(0, 0, 0, .1) inset);
   }
@@ -259,9 +259,8 @@ nav.sequence-nav {
       }
 
       &.prev {
-        left: -10px;
+        left: -40px;
         border-radius: 35px 0 0 35px;
-
         a {
           background-image: url('../images/sequence-nav/previous-icon.png');
           background-position: center 15px;
@@ -269,7 +268,7 @@ nav.sequence-nav {
       }
 
       &.next {
-        right: -10px;
+        right: -40px;
         border-radius: 0 35px 35px 0;
 
         a {
