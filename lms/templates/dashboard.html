@@ -91,7 +91,7 @@
                function(data) {
                  if (data.success) {
                    $("#change_email_title").html(gettext("Please verify your new email"));
-                   $("#change_email_form").html(gettext("<p>You'll receive a confirmation in your in-box. Please click the link in the email to confirm the email change.</p>"));
+                   $("#change_email_form").html("<p>" + gettext("You'll receive a confirmation in your in-box. Please click the link in the email to confirm the email change.") + "</p>");
                  } else {
                    $("#change_email_error").html(data.error).stop().css("display", "block");
                  }
@@ -211,11 +211,11 @@
 
           % if course.id in show_courseware_links_for:
             <a href="${course_target}" class="cover">
-              <img src="${course_image_url(course)}" alt="${course.number} ${course.display_name_with_default} Cover Image" />
+              <img src="${course_image_url(course)}" alt="${_("{course_number} {course_name} Cover Image").format(course_number=course.number, course_name=course.display_name_with_default)}" />
             </a>
           % else:
             <div class="cover">
-              <img src="${course_image_url(course)}" alt="${course.number} ${course.display_name_with_default} Cover Image" />
+              <img src="${course_image_url(course)}" alt="${_("{course_number} {course_name} Cover Image").format(course_number=course.number, course_name=course.display_name_with_default)}" />
             </div>
           % endif
 
