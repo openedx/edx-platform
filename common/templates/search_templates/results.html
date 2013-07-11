@@ -5,6 +5,10 @@
 	${js_link("../static/js/div_sizing.js")}
 </head>
 
+% if debug:
+    <p>"${debug}"</p>
+% endif
+
 % if spelling_correction:
 <div class="correction_div">
 	<p class="search_correction">
@@ -49,7 +53,7 @@
 			<form id="current-page" class="auto-submit" action="/search" method="get">
                 <span class="current-page">
 				    Page 
-                    <input type="number" name="page" value="${ data.number }" onkeydown="searchHandle(event, true)" onchange="changeHandler(this, ${data.paginator.num_pages})"/> 
+                    <input type="number" class="parameter" name="page" value="${ data.number }" onkeydown="searchHandle(event, true)" onchange="changeHandler(this, ${data.paginator.num_pages})"/> 
                     of ${ data.paginator.num_pages }
                 </span>
 			</form> 
