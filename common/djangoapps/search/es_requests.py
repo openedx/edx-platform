@@ -172,10 +172,7 @@ class MongoIndexer:
             org = item["_id"]["org"]
             uuid = item["_id"]["name"]
             course_section = self.course_name_from_mongo_element(item)
-            if item["metadata"].get("display_name", False):
-                display_name = org + " " + course + " " + item["metadata"]["display_name"]
-            else:
-                display_name = org + " " + course
+            display_name = item.get("metadata", {"display_name": ""}).get("display_name", "") + " (" + course + ")"
             url = self.vertical_url_from_mongo_element(item)
             if not url:
                 continue
@@ -206,10 +203,7 @@ class MongoIndexer:
             course_section = self.course_name_from_mongo_element(item)
             if not url:
                 continue
-            try:
-                display_name = org + " " + course + " " + item["metadata"]["display_name"]
-            except KeyError:
-                display_name = org + " " + course
+            display_name = item.get("metadata", {"display_name": ""}).get("display_name", "") + " (" + course + ")"
             searchable_text = self.searchable_text_from_problem_data(item)
             thumbnail = self.thumbnail_from_html(item["definition"]["data"])
             data = {
@@ -233,7 +227,7 @@ class MongoIndexer:
             url = self.vertical_url_from_mongo_element(video_module)
             if not url:
                 continue
-            display_name = org + " " + course + " " + video_module["metadata"].get("display_name", "")
+            display_name = item.get("metadata", {"display_name": ""}).get("display_name", "") + " (" + course + ")"
             transcript = " ".join(self.find_transcript_content(item))
             thumbnail = self.thumbnail_from_uuid(uuid)
             data = {
