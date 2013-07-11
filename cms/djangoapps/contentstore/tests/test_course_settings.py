@@ -14,6 +14,7 @@ from xmodule.modulestore import Location
 from models.settings.course_details import (CourseDetails, CourseSettingsEncoder)
 from models.settings.course_grading import CourseGradingModel
 from contentstore.utils import get_modulestore
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 from models.settings.course_metadata import CourseMetadata

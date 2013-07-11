@@ -351,6 +351,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         err_cnt = perform_xlint('common/test/data', ['toy'])
         self.assertGreater(err_cnt, 0)
 
+#FIX
     @override_settings(COURSES_WITH_UNSAFE_CODE=['edX/full/.*'])
     def test_module_preview_in_whitelist(self):
         '''
@@ -373,7 +374,6 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
 
-#FIX
     def test_delete(self):
         direct_store = modulestore('direct')
         CourseFactory.create(org='edX', course='999', display_name='Robot Super Course')
@@ -643,6 +643,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         resp = self.client.get('http://localhost:8001/c4x/CDX/123123/asset/&images_circuits_Lab7Solution2.png')
         self.assertEqual(resp.status_code, 400)
 
+#FIX
     def test_delete_course(self):
         """
         This test will import a course, make a draft item, and delete it. This will also assert that the
@@ -653,17 +654,13 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         content_store = contentstore()
         draft_store = modulestore('draft')
 
-        import_from_xml(module_store, 'common/test/data/', ['full'], static_content_store=content_store)
+        import_from_xml(module_store, 'common/test/data/', ['toy'], static_content_store=content_store)
 
         location = CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course').location
 
-        # verify that we actually have assets
-        assets = content_store.get_all_content_for_course(location)
-        self.assertNotEquals(len(assets), 0)
-
         # get a vertical (and components in it) to put into 'draft'
-        vertical = module_store.get_item(Location(['i4x', 'edX', 'full',
-                                         'vertical', 'vertical_66', None]), depth=1)
+        vertical = module_store.get_item(Location(['i4x', 'edX', 'toy',
+                                         'vertical', 'vertical_test', None]), depth=1)
 
         draft_store.clone_item(vertical.location, vertical.location)
         for child in vertical.get_children():
@@ -672,13 +669,9 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         # delete the course
         delete_course(module_store, content_store, location, commit=True)
 
-<<<<<<< HEAD
         # assert that there's absolutely no non-draft modules in the course
         # this should also include all draft items
-        items = draft_store.get_items(Location(['i4x', 'edX', 'full', None, None]))
-=======
         items = module_store.get_items(Location(['i4x', 'edX', '999', 'course', None]))
->>>>>>> 69dc373... All cms unit test no longer rely on the full course.
         self.assertEqual(len(items), 0)
 
         # assert that all content in the asset library is also deleted
