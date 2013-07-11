@@ -1,6 +1,8 @@
 """
 This config file extends the test environment configuration
 so that we can run the lettuce acceptance tests.
+This is used in the django-admin call as acceptance.py
+contains random seeding, causing django-admin to create a random collection
 """
 
 # We intentionally define lots of variables that aren't used, and
@@ -19,28 +21,27 @@ logging.disable(logging.ERROR)
 import os
 import random
 
-
-def seed():
-    return os.getppid()
-
-# Use the mongo store for acceptance tests
-modulestore_options = {
+MODULESTORE_OPTIONS = {
     'default_class': 'xmodule.raw_module.RawDescriptor',
     'host': 'localhost',
     'db': 'acceptance_xmodule',
-    'collection': 'acceptance_modulestore_%s' % seed(),
+    'collection': 'acceptance_modulestore',
     'fs_root': TEST_ROOT / "data",
     'render_template': 'mitxmako.shortcuts.render_to_string',
 }
 
 MODULESTORE = {
     'default': {
-        'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
-        'OPTIONS': modulestore_options
+        'ENGINE': 'xmodule.modulestore.draft.DraftModuleStore',
+        'OPTIONS': MODULESTORE_OPTIONS
     },
     'direct': {
         'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
-        'OPTIONS': modulestore_options
+        'OPTIONS': MODULESTORE_OPTIONS
+    },
+    'draft': {
+        'ENGINE': 'xmodule.modulestore.draft.DraftModuleStore',
+        'OPTIONS': MODULESTORE_OPTIONS
     }
 }
 
@@ -48,7 +49,13 @@ CONTENTSTORE = {
     'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
     'OPTIONS': {
         'host': 'localhost',
-        'db': 'acceptance_xcontent_%s' % seed(),
+        'db': 'acceptance_xcontent',
+    },
+    # allow for additional options that can be keyed on a name, e.g. 'trashcan'
+    'ADDITIONAL_OPTIONS': {
+        'trashcan': {
+            'bucket': 'trash_fs'
+        }
     }
 }
 
@@ -58,29 +65,13 @@ CONTENTSTORE = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': TEST_ROOT / "db" / "test_mitx_%s.db" % seed(),
-        'TEST_NAME': TEST_ROOT / "db" / "test_mitx_%s.db" % seed(),
+        'NAME': TEST_ROOT / "db" / "test_mitx.db",
+        'TEST_NAME': TEST_ROOT / "db" / "test_mitx.db",
     }
 }
 
-# Set up XQueue information so that the lms will send
-# requests to a mock XQueue server running locally
-XQUEUE_PORT = random.randint(1024, 65535)
-XQUEUE_INTERFACE = {
-    "url": "http://127.0.0.1:%d" % XQUEUE_PORT,
-    "django_auth": {
-        "username": "lms",
-        "password": "***REMOVED***"
-    },
-    "basic_auth": ('anant', 'agarwal'),
-}
-
-# Do not display the YouTube videos in the browser while running the
-# acceptance tests. This makes them faster and more reliable
-MITX_FEATURES['STUB_VIDEO_FOR_TESTING'] = True
-
 # Include the lettuce app for acceptance testing, including the 'harvest' django-admin command
 INSTALLED_APPS += ('lettuce.django',)
-LETTUCE_APPS = ('courseware',)
+LETTUCE_APPS = ('contentstore',)
 LETTUCE_SERVER_PORT = random.randint(1024, 65535)
 LETTUCE_BROWSER = 'chrome'

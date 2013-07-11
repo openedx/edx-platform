@@ -93,13 +93,13 @@ if Backbone?
           comment.set(response.content)
           view.render() # This is just to update the id for the most part, but might be useful in general
 
-    delete: (event) =>
+    _delete: (event) =>
       event.preventDefault()
       if not @model.can('can_delete')
         return
       if not confirm "Are you sure to delete this response? "
         return
-      url = @model.urlFor('delete')
+      url = @model.urlFor('_delete')
       @model.remove()
       @$el.remove()
       $elem = $(event.target)
@@ -141,7 +141,7 @@ if Backbone?
         @editView = null
 
       @showView = new ThreadResponseShowView(model: @model)
-      @showView.bind "response:delete", @delete
+      @showView.bind "response:_delete", @_delete
       @showView.bind "response:edit", @edit
 
     renderShowView: () ->

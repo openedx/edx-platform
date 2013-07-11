@@ -2,8 +2,136 @@ This is the main edX platform which consists of LMS and Studio.
 
 See [code.edx.org](http://code.edx.org/) for other parts of the edX code base.
 
-Installation
-============
+Installation - The first time
+=============================
+
+The following instructions will help you to download and setup a virtual machine
+with a minimal amount of steps, using Vagrant. It is recommended for a first
+installation, as it will save you from many of the common pitfalls of the
+installation process.
+
+1. Make sure you have plenty of available disk space, >5GB
+2. Install Git: http://git-scm.com/downloads
+3. Install VirtualBox: https://www.virtualbox.org/wiki/Download_Old_Builds_4_2
+   (you need version 4.2.12, as later/earlier versions might not work well with 
+   Vagrant)
+4. Install Vagrant: http://www.vagrantup.com/ (Vagrant 1.2.2 or later)
+5. Open a terminal
+6. Download the project: `git clone git://github.com/edx/edx-platform.git`
+7. Enter the project directory: `cd edx-platform/`
+8. (Windows only) Run the commands to 
+   [deal with line endings and symlinks under Windows](https://github.com/edx/edx-platform/wiki/Simplified-install-with-vagrant#dealing-with-line-endings-and-symlinks-under-windows)
+9. Start: `vagrant up`
+
+The last step might require your host machine's administrator password to setup NFS.
+
+Afterwards, it will download an image, install all the dependencies and configure
+the VM. It will take a while, go grab a coffee.
+
+Once completed, hopefully you should see a "Success!" message indicating that the
+installation went fine. (If not, refer to the 
+[troubleshooting section](https://github.com/edx/edx-platform/wiki/Simplified-install-with-vagrant#troubleshooting).)
+
+Note: by default, the VM will get the IP `192.168.20.40`. If you need to use a 
+different IP, you can edit the file `Vagrantfile`. If you have already started the 
+VM with `vagrant up`, see "Stopping and restarting the VM" below to take the change 
+into account.
+
+Accessing the VM
+----------------
+
+Once the installation is finished, to log into the virtual machine:
+
+```
+$ vagrant ssh
+```
+
+Note: This won't work from Windows, install install PuTTY from
+http://www.chiark.greenend.org.uk/%7Esgtatham/putty/download.html instead. Then
+connect to 127.0.0.1, port 2222, using vagrant/vagrant as a user/password.
+
+Using edX
+---------
+
+Once inside the VM, you can start Studio and LMS with the following commands
+(from the `/opt/edx/edx-platform` folder):
+
+Learning management system (LMS):
+
+```
+$ rake lms[cms.dev,0.0.0.0:8000]
+```
+
+Studio:
+
+```
+$ rake cms[dev,0.0.0.0:8001]
+```
+
+Once started, open the following URLs in your browser:
+
+* Learning management system (LMS): http://192.168.20.40:8000/
+* Studio (CMS): http://192.168.20.40:8001/
+
+You can develop by editing the files directly in the `edx-platform/` directory you
+downloaded before, you don't need to connect to the VM to edit them (the VM uses
+those files to run edX, mirroring the folder in `/opt/edx/edx-platform`).
+
+You may also want to create a super-user with:
+
+```
+$ rake django-admin["createsuperuser"]
+```
+
+Also note that if you register a new user through the web interface,
+the activiation email will be posted to your VM's terminal window (search for
+lines similar to):
+
+```
+Subject: Your account for edX Studio
+From: registration@edx.org
+```
+
+and find the activation URL for the account you've created.
+
+See the [Frequently Asked Questions](https://github.com/edx/edx-platform/wiki/Frequently-Asked-Questions)
+for more usage tips.
+
+Stopping & starting
+-------------------
+
+To stop the VM (from your `edx-platform/` directory):
+
+```
+$ vagrant halt
+```
+
+To restart:
+
+```
+$ vagrant up
+```
+
+or, to start without attempting to update the dependencies:
+
+```
+$ vagrant up --no-provision
+```
+
+Troubleshooting
+---------------
+
+If anything doesn't work as expected, see the 
+[troubleshooting section](https://github.com/edx/edx-platform/wiki/Simplified-install-with-vagrant#troubleshooting).
+
+Installation - Advanced
+=======================
+
+Note: The following installation instructions are for advanced users & developers
+who are familiar with setting up Python, Ruby & node.js virtual environments.
+Even if you know what you are doing, edX has a large code base with multiple
+dependencies, so you might still want to use the method described above the
+first time, as Vagrant helps avoiding issues due to the different environments.
 
 There is a `scripts/create-dev-env.sh` that will attempt to set up a development
 environment.
