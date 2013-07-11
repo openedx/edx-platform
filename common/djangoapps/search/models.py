@@ -3,6 +3,7 @@ import nltk
 import nltk.corpus as word_filter
 import string
 import sorting
+from collections import Counter
 
 
 class SearchResults:
@@ -19,6 +20,10 @@ class SearchResults:
 
     def sort_results(self):
         self.entries = sorting.sort(self.entries, self.request.GET.get("sort", None))
+
+    def get_counter(self, field):
+        master_list = [entry["field"].lower() for entry in self.entries]
+        return Counter(master_list)
 
 
 class SearchResult:
