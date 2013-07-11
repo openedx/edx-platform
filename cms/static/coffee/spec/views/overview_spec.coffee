@@ -43,7 +43,7 @@ describe "Course Overview", ->
         spyOn(window, 'saveSetSectionScheduleDate').andCallThrough()
         # Have to do this here, as it normally gets bound in document.ready()
         $('a.save-button').click(saveSetSectionScheduleDate)
-        @notificationSpy = spyOn(CMS.Views.Notification.Saving.prototype, 'show').andCallThrough()
+        @notificationSpy = spyOn(CMS.Views.Notification.Mini.prototype, 'show').andCallThrough()
         window.analytics = jasmine.createSpyObj('analytics', ['track'])
         window.course_location_analytics = jasmine.createSpy()
         sinon.useFakeXMLHttpRequest()

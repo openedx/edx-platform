@@ -102,9 +102,9 @@ describe "CMS.Views.Prompt", ->
         view.hide()
         # expect($("body")).not.toHaveClass("prompt-is-shown")
 
-describe "CMS.Views.Notification.Saving", ->
+describe "CMS.Views.Notification.Mini", ->
     beforeEach ->
-        @view = new CMS.Views.Notification.Saving()
+        @view = new CMS.Views.Notification.Mini()
 
     it "should have minShown set to 1250 by default", ->
         expect(@view.options.minShown).toEqual(1250)
