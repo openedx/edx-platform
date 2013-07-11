@@ -38,7 +38,7 @@
       <div class="alert editing-draft-alert">
         <p class="alert-message"><strong>${_("You are editing a draft.")}</strong>
         % if published_date:
-        ${_("This unit was originally published on {date}.".format(date=published_date)}
+        ${_("This unit was originally published on {date}.").format(date=published_date)}
         % endif
         </p>
         <a href="${published_preview_link}" target="_blank" class="alert-action secondary">${_("View the Live Version")}</a>
