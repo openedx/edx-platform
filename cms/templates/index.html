@@ -8,6 +8,7 @@
 <%block name="header_extras">
   <script type="text/template" id="new-course-template">
     <section class="new-course">
+      <h3 class="title">Create a New Course:</h3>
       <div class="item-details">
         <form class="course-info">
           <div class="row">
@@ -91,19 +92,17 @@
       </div>
 
       %if len(courses) > 0:
-      <div class="list-courses">
-        <div class="my-classes">
-          <ul class="class-list">
-            %for course, url, lms_link in sorted(courses, key=lambda s: s[0].lower() if s[0] is not None else ''):
-            <li>
-              <a class="class-link" href="${url}" class="class-name">
-                <span class="class-name">${course}</span>
-              </a>
-              <a href="${lms_link}" rel="external" class="button view-button view-live-button">View Live</a>
-            </li>
-            %endfor
-          </ul>
-        </div>
+      <div class="courses">
+        <ul class="list-courses">
+          %for course, url, lms_link in sorted(courses, key=lambda s: s[0].lower() if s[0] is not None else ''):
+          <li class="course-item">
+            <a class="class-link" href="${url}" class="class-name">
+              <span class="class-name">${course}</span>
+            </a>
+            <a href="${lms_link}" rel="external" class="button view-button view-live-button">View Live</a>
+          </li>
+          %endfor
+        </ul>
       </div>
 
       %else:

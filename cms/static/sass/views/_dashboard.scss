@@ -203,7 +203,7 @@ body.dashboard {
     		@extend .t-copy-sub1;
     		position: relative;
     		color: $white;
-				opacity: 0.65;
+				opacity: 0.85;
     	}
     }
 
@@ -249,20 +249,21 @@ body.dashboard {
 
 	// ====================
 
-	.my-classes {
+	// course listings
+	.courses {
 	  margin: $baseline 0;
 	}
 
-	.class-list {
+	.list-courses {
 		margin-top: $baseline;
 		border-radius: 3px;
-		border: 1px solid $gray-d2;
+		border: 1px solid $gray;
 		background: $white;
-		box-shadow: 0 1px 2px rgba(0, 0, 0, .1);
+		box-shadow: 0 1px 2px $shadow-l1;
 
-		li {
+		.course-item {
 			position: relative;
-			border-bottom: 1px solid $mediumGrey;
+			border-bottom: 1px solid $gray-l1;
 
 			&:last-child {
 				border-bottom: none;
@@ -302,7 +303,7 @@ body.dashboard {
 		.view-live-button {
 			z-index: 10000;
 			position: absolute;
-			top: 15px;
+			top: ($baseline*0.75);
 			right: $baseline;
 			padding: ($baseline/4) ($baseline/2);
 			opacity: 0.0;
@@ -316,17 +317,25 @@ body.dashboard {
 	}
 
 	.new-course {
-		padding: 15px 25px;
-		margin-top: 20px;
+		@include clearfix();
+		padding: ($baseline*0.75) ($baseline*1.25);
+		margin-top: $baseline;
 		border-radius: 3px;
-		border: 1px solid $darkGrey;
-		background: #fff;
+		border: 1px solid $gray;
+		background: $white;
 		box-shadow: 0 1px 2px rgba(0, 0, 0, .1);
-		@include clearfix;
+
+		.title {
+			@extend .t-title4;
+			font-weight: 600;
+			margin-bottom: ($baseline/2);
+			border-bottom: 1px solid $gray-l3;
+			padding-bottom: ($baseline/2);
+		}
 
 		.row {
-			margin-bottom: 15px;
-			@include clearfix;
+			@include clearfix();
+			margin-bottom: ($baseline*0.75);
 		}
 
 		.column {
@@ -343,8 +352,8 @@ body.dashboard {
 		}
 
 		label {
+			@extend .t-title7;
 			display: block;
-			font-size: 13px;
 			font-weight: 700;
 		}
 
@@ -355,7 +364,7 @@ body.dashboard {
 		}
 
 		.new-course-name {
-			font-size: 19px;
+			@extend .t-title5;
 			font-weight: 300;
 		}
 

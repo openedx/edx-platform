@@ -577,10 +577,10 @@ function cancelNewSection(e) {
 function addNewCourse(e) {
     e.preventDefault();
 
-    $(e.target).hide();
+    $(e.target).addClass('disabled');
     var $newCourse = $($('#new-course-template').html());
     var $cancelButton = $newCourse.find('.new-course-cancel');
-    $('.inner-wrapper').prepend($newCourse);
+    $('.courses').prepend($newCourse);
     $newCourse.find('.new-course-name').focus().select();
     $newCourse.find('form').bind('submit', saveNewCourse);
     $cancelButton.bind('click', cancelNewCourse);
@@ -627,7 +627,7 @@ function saveNewCourse(e) {
 
 function cancelNewCourse(e) {
     e.preventDefault();
-    $('.new-course-button').show();
+    $('.new-course-button').removeClass('disabled');
     $(this).parents('section.new-course').remove();
 }
 
