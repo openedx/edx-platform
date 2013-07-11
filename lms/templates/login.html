@@ -7,7 +7,7 @@
 <%! from django.core.urlresolvers import reverse %>
 <%! from django.utils.translation import ugettext as _ %>
 
-<%block name="title"><title>${_("Log into your %s Account") % settings.PLATFORM_NAME}</title></%block>
+<%block name="title"><title>${_("Log into your edX Account")}</title></%block>
 
 <%block name="js_extra">
   <script type="text/javascript">
@@ -68,7 +68,8 @@
         $submitButton.
           removeClass('is-disabled').
           removeProp('disabled').
-          html(gettext('Log into My ${settings.PLATFORM_NAME} Account <span class="orn-plus">+</span> Access My Courses'));
+          html(gettext('Log into My edX Account') + '<span class="orn-plus">+</span>' +
+            gettext('Access My Courses'));
       }
       else {
         $submitButton.
@@ -92,8 +93,8 @@
 
       <!-- status messages -->
       <div role="alert" class="status message">
-        <h3 class="message-title">${_("We're Sorry, %s accounts are unavailable currently") % settings.PLATFORM_NAME}</h3>
-        <p class="message-copy">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Lorem ipsum dolor sit amet, consectetuer adipiscing elit.' % settings.PLATFORM_NAME)}</p>
+        <h3 class="message-title">${_("We're Sorry, edX accounts are unavailable currently")}</h3>
+        <p class="message-copy">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Lorem ipsum dolor sit amet, consectetuer adipiscing elit.</p>
       </div>
 
       <div role="alert" class="status message submission-error" tabindex="-1">
@@ -104,7 +105,7 @@
       </div>
 
       <p class="instructions sr">
-        ${_('Please provide the following information to log into your %s account. Required fields are noted by <strong class="indicator">bold text and an asterisk (*)</strong>.') % settings.PLATFORM_NAME}
+        ${_('Please provide the following information to log into your edX account. Required fields are noted by <strong class="indicator">bold text and an asterisk (*)</strong>.')}
       </p>
 
       <fieldset class="group group-form group-form-requiredinformation">
@@ -162,12 +163,12 @@
 
     <div class="cta cta-help">
       <h3>${_("Not Enrolled?")}</h3>
-      <p><a href="${reverse('register_user')}">${_("Sign up for %s today!") % settings.PLATFORM_NAME}</a></p>
+      <p><a href="${reverse('register_user')}">${_("Sign up for edX today!")}</a></p>
 
       ## Disable help unless the FAQ marketing link is enabled
       % if settings.MKTG_URL_LINK_MAP.get('FAQ'):
         <h3>${_("Need Help?")}</h3>
-        <p>${_("Looking for help in logging in or with your %s account?") % settings.PLATFORM_NAME}
+        <p>${_("Looking for help in logging in or with your edX account?")}
         <a href="${marketing_link('FAQ')}">
             ${_("View our help section for answers to commonly asked questions.")}
         </a></p>

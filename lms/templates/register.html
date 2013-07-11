@@ -13,7 +13,7 @@
 <%! from datetime import date %>
 <%! import calendar %>
 
-<%block name="title"><title>${_("Register for %s") % settings.PLATFORM_NAME}</title></%block>
+<%block name="title"><title>${_("Register for edX")}</title></%block>
 
 <%block name="js_extra">
   <script type="text/javascript">
@@ -71,7 +71,7 @@
         $submitButton.
           removeClass('is-disabled').
           removeProp('disabled').
-          html(gettext('Create my ${settings.PLATFORM_NAME} Account'));
+          html(gettext('Create my edX Account'));
       }
       else {
         $submitButton.
@@ -95,7 +95,7 @@
 
       <!-- status messages -->
       <div role="alert" class="status message">
-        <h3 class="message-title">${_("We're sorry, %s enrollment is not available in your region") % settings.PLATFORM_NAME}</h3>
+        <h3 class="message-title">${_("We're sorry, edX enrollment is not available in your region")}</h3>
         <p class="message-copy">${_("Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Lorem ipsum dolor sit amet, consectetuer adipiscing elit.")}</p>
       </div>
 
@@ -138,7 +138,7 @@
         % else:
 
         <div class="message">
-          <h3 class="message-title">${_("Welcome %s") % extauth_id}</h3>
+          <h3 class="message-title">${_("Welcome {username}").format(username=extauth_id)}</h3>
           <p class="message-copy">${_("Enter a public username:")}</p>
         </div>
 
@@ -222,7 +222,7 @@
           </li>
 
           <li class="field text" id="field-goals">
-            <label for="goals">${_("Please share with us your reasons for registering with %s") % settings.PLATFORM_NAME}</label>
+            <label for="goals">${_("Please share with us your reasons for registering with edX")}</label>
             <textarea id="goals" name="goals" value=""></textarea>
           </li>
         </ol>
@@ -238,7 +238,9 @@
 
             <div class="field required checkbox" id="field-tos">
               <input id="tos-yes" type="checkbox" name="terms_of_service" value="true" required aria-required="true" />
-              <label for="tos-yes">${_('I agree to the <a href="%s" class="new-vp">Terms of Service</a>') % marketing_link('TOS')}</label>
+              <label for="tos-yes">${_('I agree to the {link_start}Terms of Service{link_end}').format(
+                link_start='<a href="{url}" class="new-vp">'.format(url=marketing_link('TOS')),
+                link_end='</a>')}</label>
             </div>
 
             % endif
@@ -252,7 +254,9 @@
                 else:
                   honor_code_path = marketing_link('HONOR')
               %>
-              <label for="honorcode-yes">${_('I agree to the <a href="%s" class="new-vp">Honor Code</a>') % honor_code_path}</label>
+              <label for="honorcode-yes">${_('I agree to the {link_start}Honor Code{link_end}').format(
+                link_start='<a href="{url}" class="new-vp">'.format(url=honor_code_path),
+                link_end='</a>')}</label>
             </div>
           </li>
         </ol>
@@ -264,7 +268,7 @@
 % endif
 
       <div class="form-actions">
-        <button name="submit" type="submit" id="submit" class="action action-primary action-update">${_('Register <span class="orn-plus">+</span> Create My Account')}</button>
+        <button name="submit" type="submit" id="submit" class="action action-primary action-update">${_('Register')} <span class="orn-plus">+</span> ${_('Create My Account')}</button>
       </div>
     </form>
   </section>
@@ -291,8 +295,8 @@
     ##       override in a more generalizable fashion.
     % if not self.stanford_theme_enabled():
       <div class="cta cta-welcome">
-        <h3>${_("Welcome to %s") % settings.PLATFORM_NAME}</h3>
-        <p>${_("Registering with %s gives you access to all of our current and future free courses. Not ready to take a course just yet? Registering puts you on our mailing list - we will update you as courses are added.") % settings.PLATFORM_NAME}</p>
+        <h3>${_("Welcome to edX")}</h3>
+        <p>${_("Registering with edX gives you access to all of our current and future free courses. Not ready to take a course just yet? Registering puts you on our mailing list - we will update you as courses are added.")}</p>
       </div>
     % endif
 
@@ -301,14 +305,14 @@
       % if self.stanford_theme_enabled():
         <p>${_("You will receive an activation email.  You must click on the activation link to complete the process.  Don't see the email?  Check your spam folder and mark emails from class.stanford.edu as 'not spam', since you'll want to be able to receive email from your courses.")}</p>
       % else:
-      <p>${_("As part of joining %s, you will receive an activation email.  You must click on the activation link to complete the process.  Don't see the email?  Check your spam folder and mark %s emails as 'not spam'.  At %s, we communicate mostly through email.") % (settings.PLATFORM_NAME, settings.PLATFORM_NAME, settings.PLATFORM_NAME)}</p>
+      <p>${_("As part of joining edX, you will receive an activation email.  You must click on the activation link to complete the process.  Don't see the email?  Check your spam folder and mark edX emails as 'not spam'.  At edX, we communicate mostly through email.")}</p>
       % endif
     </div>
 
     % if settings.MKTG_URL_LINK_MAP.get('FAQ'):
       <div class="cta cta-help">
         <h3>${_("Need Help?")}</h3>
-        <p>${_("Need help in registering with %s?") % settings.PLATFORM_NAME}
+        <p>${_("Need help in registering with edX?")}
           <a href="${marketing_link('FAQ')}">
               ${_("View our FAQs for answers to commonly asked questions.")}
           </a>

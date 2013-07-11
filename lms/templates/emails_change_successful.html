@@ -9,6 +9,9 @@
     <h1 class="invalid">${_("E-mail change successful!")}</h1>
     <hr class="horizontal-divider">
 
-    <p>${_('You should see your new email in your <a href="%s">dashboard</a>.') % reverse('dashboard')}</p>
+    <p>${_('You should see your new email in your {link_start}dashboard{link_end}.').format(
+        link_start='<a href="{url}">'.format(url=reverse('dashboard')),
+        link_end='</a>',
+      )}</p>
   </section>
 </section>

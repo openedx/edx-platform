@@ -9,9 +9,9 @@ from xmodule.util.date_utils import get_default_time_display
 <p>
   <strong>${_("Status:")}</strong>
   % if success:
-  ${_('You have successfully gotten to level %s.') % goal_level}'
+  ${_('You have successfully gotten to level {goal_level}.').format(goal_level=goal_level)}'
   % else:
-  ${_('You have not yet gotten to level %s.') % goal_level}
+  ${_('You have not yet gotten to level {goal_level}.').format(goal_level=goal_level)}
   % endif
 </p>
 

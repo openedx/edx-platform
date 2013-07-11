@@ -7,7 +7,7 @@
 <%static:css group='course'/>
 </%block>
 
-<%block name="title"><title>${_("%s Open Ended Problems") % course.number}</title></%block>
+<%block name="title"><title>${_("{course_number} Open Ended Problems").format(course_number=course.number)}</title></%block>
 
 <%include file="/courseware/course_navigation.html" args="active_page='open_ended_problems'" />
 
@@ -34,12 +34,12 @@
             %for problem in problem_list:
             <tr>
                 <td>
-                  <a href="${problem['actual_url']}">${problem['problem_name']}</a> 
+                  <a href="${problem['actual_url']}">${problem['problem_name']}</a>
                 </td>
                 <td>
-                    ${problem['state']} 
+                    ${problem['state']}
                 </td>
-                <td> 
+                <td>
                     ${problem['grader_type']}
                 </td>
                 <td>

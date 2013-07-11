@@ -56,7 +56,7 @@
     <section class="highlighted-courses">
       ## Disable university partner logos and sites for non-edX sites
       % if not self.theme_enabled():
-        <h2>${_('Explore free courses from <span class="edx">edX</span> universities')}</h2>
+        <h2>${_('Explore free courses from {span_start}edX{span_end} universities').format(span_start='<span class="edx">', span_end='</span>')}</h2>
 
         <section class="university-partners university-partners2x6">
           <ol class="partners">
@@ -182,8 +182,8 @@
     <section class="container">
       <section class="more-info">
         <header>
-          <h2>${_('<span class="edx">edX</span> News &amp; Announcements')}</h2>
-          <a class="action action-mediakit" href="${reverse('media-kit')}"> ${_('<span class="org-name">edX</span> MEDIA KIT')}</a>
+          <h2>${_('{span_start}edX{span_end} News &amp; Announcements').format(span_start='<span class="edx">', span_end='</span>')}</h2>
+          <a class="action action-mediakit" href="${reverse('media-kit')}"> ${_('{span_start}edX{span_end} MEDIA KIT').format(span_start='<span class="org-name">', span_end='</span>')}</a>
         </header>
         <section class="news">
           <section class="blog-posts">
@@ -209,7 +209,7 @@
             <a target="_blank" href="http://www.washingtonpost.com/local/education/stanford-to-help-build-edx-mooc-platform/2013/04/02/5b53bb3e-9bbe-11e2-9a79-eb5280c81c63_story.html">${_("The Washington Post")}</a>,
             <a target="_blank" href="http://www.cbsnews.com/video/watch/?id=50143164n">${_("CBS Television")}</a>,
             <a target="_blank" href="http://bostonglobe.com/2012/12/04/edx/AqnQ808q4IEcaUa8KuZuBO/story.html">${_("The Boston Globe")}</a>
-            <a href="${reverse('press')}" class="read-more">${_("Read More &rarr;")}</a>
+            <a href="${reverse('press')}" class="read-more">${_("Read More")} &rarr;</a>
           </section>
         </section>
       </section>

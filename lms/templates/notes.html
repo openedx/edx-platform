@@ -64,11 +64,11 @@
             <div class="text">${note.text.replace("\n", "<br />") | n,h}</div>
             <ul class="meta">
                 % if note.tags:
-                <li class="tags">${_("Tags: %s") % note.tags|h}</li>
+                <li class="tags">${_("Tags: {tags}").format(tags=note.tags) | h}</li>
                 % endif
-                <li class="user">${_('Author: %s') % note.user.username}</li>
-                <li class="time">${_('Created: %s') % note.created.strftime('%m/%d/%Y %H:%m')}</li>
-                <li class="uri">${_('Source: <a href="%s"> % note.uri')}${note.uri|h}</a></li>
+                <li class="user">${_('Author: {username}').format(username=note.user.username)}</li>
+                <li class="time">${_('Created: {datetime}').format(datetime=note.created.strftime('%m/%d/%Y %H:%m'))}</li>
+                <li class="uri">${_('Source: {link}').format(link='<a href="{url}">{url}</a>'.format(url=note.uri))}</li>
                 </ul>
         </div>
         % endfor
@@ -77,7 +77,4 @@
         % endif
     </div>
 </section>
-
-
-
 

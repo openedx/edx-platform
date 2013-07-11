@@ -15,7 +15,7 @@
 <section id="help-modal" class="modal">
   <div class="inner-wrapper" id="help_wrapper">
     <header>
-      <h2>${_('<span class="edx">edX</span> Help')}</h2>
+      <h2>${_('{span_start}edX{span_end} Help').format(span_start='<span class="edx">', span_end='</span>')}</h2>
       <hr>
     </header>
 
@@ -24,11 +24,14 @@ discussion_link = get_discussion_link(course) if course else None
 %>
 
 % if discussion_link:
-    <p>${_('For <strong>questions on course lectures, homework, tools, or materials for this course</strong>, post in the <a href="%s" target="_blank"/>course discussion forum</a>.') % discussion_link}
+    <p>${_('For <strong>questions on course lectures, homework, tools, or materials for this course</strong>, post in the {link_start}course discussion forum{link_end}.').format(
+      link_start='<a href="{url}" target="_blank">'.format(url=discussion_link),
+      link_end='</a>',
+      )}
     </p>
 % endif
-    
-    <p>${_('Have <strong>general questions about edX</strong>? You can find lots of helpful information in the edX <a href="/help" target="_blank">FAQ</a>.')}</p>
+
+    <p>${_('Have <strong>general questions about edX</strong>? You can find lots of helpful information in the edX {link_start}FAQ{link_end}.').format(link_start='<a href="/help" target="_blank">', link_end='</a>')}</p>
 
     <p>${_('Have a <strong>question about something specific</strong>? You can contact the edX general support team directly:')}</p>
     <hr>
@@ -87,13 +90,19 @@ discussion_link = get_discussion_link(course) if course else None
 
     <%
       dst = datetime.now(pytz.utc).astimezone(pytz.timezone("America/New_York")).dst()
-      business_hours = "13:00 UTC to 21:00 UTC" if dst else "14:00 UTC to 22:00 UTC"
+      if dst:
+        open_time = "13:00"
+        close_time = "21:00"
+      else:
+        open_time = "14:00"
+        close_time = "22:00"
     %>
     <p>
     ${_('Thank you for your inquiry or feedback.  We typically respond to a request \
-    within one business day (Monday to Friday, %s.) In the meantime, please \
-    review our <a href="/help" target="_blank">detailed FAQs</a> where most questions have \
-    already been answered.') % bussiness_hours}
+    within one business day (Monday to Friday, {open_time} UTC to {close_time} UTC.) In the meantime, please \
+    review our {link_start}detailed FAQs{link_end} where most questions have \
+    already been answered.').format(open_time=open_time, close_time=close_time,
+    link_start='<a href="/help" target="_blank">', link_end='</a>')}
     </p>
 
     <div class="close-modal">
@@ -130,7 +139,8 @@ discussion_link = get_discussion_link(course) if course else None
             gettext("problem"),
             gettext("Report a Problem"),
             gettext("Brief description of the problem*"),
-            gettext("Details of the problem you are encountering* <span class='tip'>Include error messages, steps which lead to the issue, etc.</span>")
+            gettext("Details of the problem you are encountering*") + "<span class='tip'>" +
+              gettext("Include error messages, steps which lead to the issue, etc.") + "</span>"
         );
     });
     $("#feedback_link_suggestion").click(function(event) {
@@ -175,7 +185,10 @@ discussion_link = get_discussion_link(course) if course else None
             // If no data (or malformed data) is returned, a server error occurred
             htmlStr = gettext("An error has occurred.");
 % if settings.FEEDBACK_SUBMISSION_EMAIL:
-            htmlStr += gettext(" Please <a href='#' id='feedback_email'>send us e-mail</a>.");
+            htmlStr += " " + _.template(
+              gettext("Please {link_start}send us e-mail{link_end}."),
+              {link_start: '<a href="#" id="feedback_email">', link_end='</a>'},
+              {interpolate: /\{(.+?)\}/g})
 % else:
             // If no email is configured, we can't do much other than
             // ask the user to try again later
