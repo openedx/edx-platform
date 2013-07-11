@@ -9,6 +9,11 @@ CMS.Views.ValidatingView = Backbone.View.extend({
 
     errorTemplate : _.template('<span class="message-error"><%= message %></span>'),
 
+    save_title: gettext("You've made some changes"),
+    save_message: gettext("Your changes will not take effect until you save your progress."),
+    error_title: gettext("You've made some changes, but there are some errors"),
+    error_message: gettext("Please address the errors on this page first, and then save your progress."),
+
     events : {
         "change input" : "clearValidationErrors",
         "change textarea" : "clearValidationErrors"
@@ -20,6 +25,7 @@ CMS.Views.ValidatingView = Backbone.View.extend({
     _cacheValidationErrors : [],
 
     handleValidationError : function(model, error) {
+        this.clearValidationErrors();
         // error is object w/ fields and error strings
         for (var field in error) {
             var ele = this.$el.find('#' + this.fieldToSelectorMap[field]);
@@ -27,6 +33,11 @@ CMS.Views.ValidatingView = Backbone.View.extend({
             this.getInputElements(ele).addClass('error');
             $(ele).parent().append(this.errorTemplate({message : error[field]}));
         }
+        $('.wrapper-notification-warning').addClass('wrapper-notification-warning-w-errors');
+        $('.action-save').addClass('is-disabled');
+        // TODO: (pfogg) should this text fade in/out on change?
+        $('#notification-warning-title').text(this.error_title);
+        $('#notification-warning-description').text(this.error_message);
     },
 
     clearValidationErrors : function() {
@@ -36,19 +47,20 @@ CMS.Views.ValidatingView = Backbone.View.extend({
             this.getInputElements(ele).removeClass('error');
             $(ele).nextAll('.message-error').remove();
         }
+        $('.wrapper-notification-warning').removeClass('wrapper-notification-warning-w-errors');
+        $('.action-save').removeClass('is-disabled');
+        $('#notification-warning-title').text(this.save_title);
+        $('#notification-warning-description').text(this.save_message);
     },
 
-    saveIfChanged : function(event) {
-        // returns true if the value changed and was thus sent to server
+    setField : function(event) {
+        // Set model field and return the new value.
+        this.clearValidationErrors();
         var field = this.selectorToField[event.currentTarget.id];
-        var currentVal = this.model.get(field);
         var newVal = $(event.currentTarget).val();
-        this.clearValidationErrors(); // curr = new if user reverts manually
-        if (currentVal != newVal) {
-            this.model.save(field, newVal);
-            return true;
-        }
-        else return false;
+        this.model.set(field, newVal);
+        this.model.isValid();
+        return newVal;
     },
     // these should perhaps go into a superclass but lack of event hash inheritance demotivates me
     inputFocus : function(event) {
@@ -67,5 +79,79 @@ CMS.Views.ValidatingView = Backbone.View.extend({
             // put error on the contained inputs
             return $(ele).find(inputElements);
         }
+    },
+
+    showNotificationBar: function(message, primaryClick, secondaryClick) {
+        // Show a notification with message. primaryClick is called on
+        // pressing the save button, and secondaryClick (if it's
+        // passed, which it may not be) will be called on
+        // cancel. Takes care of hiding the notification bar at the
+        // appropriate times.
+        if(this.notificationBarShowing) {
+            return;
+        }
+        // If we've already saved something, hide the alert.
+        if(this.saved) {
+            this.saved.hide();
+        }
+        var self = this;
+        this.confirmation = new CMS.Views.Notification.Warning({
+            title: this.save_title,
+            message: message,
+            actions: {
+                primary: {
+                    "text": gettext("Save Changes"),
+                    "class": "action-save",
+                    "click": function() {
+                        primaryClick();
+                        self.confirmation.hide();
+                        self.notificationBarShowing = false;
+                    }
+                },
+                secondary: [{
+                    "text": gettext("Cancel"),
+                    "class": "action-cancel",
+                    "click": function() {
+                        if(secondaryClick) {
+                            secondaryClick();
+                        }
+                        self.model.clear({silent : true});
+                        self.confirmation.hide();
+                        self.notificationBarShowing = false;
+                    }
+                }]
+            }});
+        this.notificationBarShowing = true;
+        this.confirmation.show();
+        // Make sure the bar is in the right state
+        this.model.isValid();
+    },
+
+    showSavedBar: function(title, message) {
+        var defaultTitle = gettext('Your changes have been saved.');
+        this.saved = new CMS.Views.Alert.Confirmation({
+            title: title || defaultTitle,
+            message: message,
+            closeIcon: false
+        });
+        this.saved.show();
+        $.smoothScroll({
+            offset: 0,
+            easing: 'swing',
+            speed: 1000
+        });
+    },
+
+    saveView: function() {
+        var self = this;
+        this.model.save(
+            {},
+            {
+                success: function() {
+                    self.showSavedBar();
+                },
+                silent: true
+            }
+        );
     }
 });

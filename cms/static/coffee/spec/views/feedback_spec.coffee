@@ -37,6 +37,10 @@ describe "CMS.Views.SystemFeedback", ->
         @renderSpy = spyOn(CMS.Views.Alert.Confirmation.prototype, 'render').andCallThrough()
         @showSpy = spyOn(CMS.Views.Alert.Confirmation.prototype, 'show').andCallThrough()
         @hideSpy = spyOn(CMS.Views.Alert.Confirmation.prototype, 'hide').andCallThrough()
+        @clock = sinon.useFakeTimers()
+
+    afterEach ->
+        @clock.restore()
 
     it "requires a type and an intent", ->
         neither = =>
@@ -80,8 +84,8 @@ describe "CMS.Views.SystemFeedback", ->
     it "close button sends a .hide() message", ->
         view = new CMS.Views.Alert.Confirmation(@options).show()
         view.$(".action-close").click()
-
         expect(@hideSpy).toHaveBeenCalled()
+        @clock.tick(900)
         expect(view.$('.wrapper')).toBeHiding()
 
 describe "CMS.Views.Prompt", ->

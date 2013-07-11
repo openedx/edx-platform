@@ -48,6 +48,8 @@ moved to be edited as metadata.
 
 XModule: Only write out assets files if the contents have changed.
 
+Studio: Course settings are now saved explicitly.
+
 XModule: Don't delete generated xmodule asset files when compiling (for
 instance, when XModule provides a coffeescript file, don't delete
 the associated javascript)

@@ -665,14 +665,8 @@
     }
   }
 
-  // alert showing/hiding
-  .wrapper-alert {
-    display: none;
-
-    &.is-shown {
-      display: block;
-    }
-  }
+  // alert showing/hiding done by jQuery
+  .wrapper-alert { }
 
   // notification showing/hiding
   .wrapper-notification {
