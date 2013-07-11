@@ -630,10 +630,6 @@ class MongoModuleStore(ModuleStoreBase):
                 definition_data = {}
         dbmodel = self._create_new_model_data(location.category, location, definition_data, metadata)
         xmodule = xblock_class(system, dbmodel)
-        # force inherited fields w/ defaults to take the defaults so the children can inherit
-        for attr in INHERITABLE_METADATA:
-            if hasattr(xmodule, attr):
-                xmodule._model_data[attr] = getattr(xmodule, attr)
         return xmodule
 
     def save_xmodule(self, xmodule):
