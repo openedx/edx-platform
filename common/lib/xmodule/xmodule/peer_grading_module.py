@@ -177,9 +177,10 @@ class PeerGradingModule(PeerGradingFields, XModule):
 
         return json.dumps(d, cls=ComplexEncoder)
 
-    def query_data_for_location(self):
+    def query_data_for_location(self, location=None):
         student_id = self.system.anonymous_student_id
-        location = self.link_to_location
+        if not location:
+            location = self.link_to_location
         success = False
         response = {}
 
@@ -567,12 +568,24 @@ class PeerGradingModule(PeerGradingFields, XModule):
         elif data.get('location') is not None:
             problem_location = data.get('location')
 
+        success, response = self.query_data_for_location(location=problem_location)
+        if not success:
+            log.error(
+                "No instance data found and could not get data from controller for loc {0} student {1}".format(
+                    problem_location, self.system.anonymous_student_id
+                ))
+            return {'html': "", 'success': False}
+        count_graded = response['count_graded']
+        count_required = response['count_required']
+
         ajax_url = self.ajax_url
         html = self.system.render_template('peer_grading/peer_grading_problem.html', {
             'view_html': '',
             'problem_location': problem_location,
             'course_id': self.system.course_id,
             'ajax_url': ajax_url,
+            'count_graded': count_graded,
+            'count_required': count_required,
             # Checked above
             'staff_access': False,
             'use_single_location': self.use_for_single_location,
