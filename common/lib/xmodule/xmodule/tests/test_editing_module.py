@@ -25,8 +25,12 @@ class TabsEditingDescriptorTestCase(unittest.TestCase):
                 'name': "Test_css",
                 'template': "tabs/codemirror-edit.html",
                 'current': True,
-                'css': {'scss': [resource_string(__name__,
-                '../../test_files/test_tabseditingdescriptor.scss')]}
+                'css': {
+                    'scss': [resource_string(__name__,
+                    '../../test_files/test_tabseditingdescriptor.scss')],
+                    'css': [resource_string(__name__,
+                    '../../test_files/test_tabseditingdescriptor.css')]
+                }
             },
             {
                 'name': "Subtitles",
@@ -51,6 +55,7 @@ class TabsEditingDescriptorTestCase(unittest.TestCase):
         with open(test_css_file) as new_css:
             added_css = new_css.read()
         self.assertEqual(css['scss'].pop(), added_css)
+        self.assertEqual(css['css'].pop(), added_css)
 
     def test_get_context(self):
         """"test get_context"""
