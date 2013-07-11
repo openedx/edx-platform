@@ -2,7 +2,8 @@
 <%inherit file="/main.html" />
 <%namespace name='static' file='../static_content.html'/>
 <%block name="bodyclass">courseware</%block>
-<%block name="title"><title>${_("Courseware - edX")}</title></%block>
+## "edX" should *not* be translated
+<%block name="title"><title>${_("Courseware")} - edX</title></%block>
 
 <%block name="headextra">
   <%static:css group='course'/>
