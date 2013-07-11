@@ -4,15 +4,16 @@
 <h1> ${field_label} </h1>
 Switch to <a id="switch-fields" other-field="${other_field}">${other_field_label}</a>
 
+<p style="color:red"> ${error} </p>
 
 % for definition_id in all_hints:
     <h2> Problem: ${id_to_name[definition_id]} </h2>
-    % for answer, hint_dict in all_hints[definition_id]:
+    % for signature, answer, hint_dict in all_hints[definition_id]:
         % if len(hint_dict) > 0:
             <h4> Answer: ${answer} </h4><div style="background-color:#EEEEEE">
         % endif
         % for pk, hint in hint_dict.items():
-            <p data-problem="${definition_id}" data-pk="${pk}" data-answer="${answer}">
+            <p data-problem="${definition_id}" data-pk="${pk}" data-answer="${signature}">
                 <input class="hint-select" type="checkbox"/> ${hint[0]}
                 <br /> 
                 Votes: <input type="text" class="votes" value="${str(hint[1])}" style="font-size:12px; height:20px; width:50px"></input>
@@ -36,6 +37,7 @@ Switch to <a id="switch-fields" other-field="${other_field}">${other_field_label
     <br />
 % endfor
 
+<p style="color:red"> ${error} </p>
 <button id="hint-delete"> Delete selected </button> <button id="update-votes"> Update votes </button>
 
 % if field == 'mod_queue':

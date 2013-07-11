@@ -13,7 +13,7 @@ from pkg_resources import resource_string
 from lxml import etree
 
 from xmodule.x_module import XModule
-from xmodule.xml_module import XmlDescriptor
+from xmodule.raw_module import RawDescriptor
 from xblock.core import Scope, String, Integer, Boolean, Dict, List
 
 from capa.responsetypes import FormulaResponse, StudentInputError
@@ -150,10 +150,10 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
             # errors don't make a difference.
             out = str(responder.hash_answers(answer, self.formula_test_values))
         except StudentInputError:
-            # I'm not sure what's the best thing to do here.
-            # I'll return the empty string, for now.
-            # That way, all invalid hints are clustered together.
-            return ''
+            # I'm not sure what's the best thing to do here.  I'm returning
+            # None, for now, so that the calling function has a chance to catch
+            # the error without having to import StudentInputError.
+            return None
         return out
 
     def handle_ajax(self, dispatch, data):
@@ -197,6 +197,10 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
             return
         # Make a signature of the answer, for formula responses.
         signature = self.answer_signature(answer)
+        if signature == None:
+            # Sometimes, signature conversion may fail.
+            log.exception('Signature conversion failed: ' + str(answer))
+            return
         # Look for a hint to give.
         # Make a local copy of self.hints - this means we only need to do one json unpacking.
         # (This is because xblocks storage makes the following command a deep copy.)
@@ -261,7 +265,7 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
             if signature in self.hints:
                 # Go through each hint, and add to index_to_hints
                 for hint_id in hints_offered:
-                    if (hint_id is not None) and (hint_id not in answer_to_hints[signature]):
+                    if (hint_id is not None) and (hint_id not in answer_to_hints[answer]):
                         try:
                             answer_to_hints[answer][hint_id] = self.hints[signature][str(hint_id)][0]
                         except KeyError:
@@ -335,10 +339,7 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
             temp_dict[signature] = {str(self.hint_pk): [hint, 1]}
         # Add the signature to signature_to_ans, if it's not there yet.
         # This allows instructors to see a human-readable answer that corresponds to each signature.
-        if answer not in self.signature_to_ans:
-            local_sta = self.signature_to_ans
-            local_sta[signature] = answer
-            self.signature_to_ans = local_sta
+        self.add_signature(signature, answer)
         self.hint_pk += 1
         if self.moderate == 'True':
             self.mod_queue = temp_dict
@@ -349,8 +350,18 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         self.previous_answers = []
         return {'message': 'Thank you for your hint!'}
 
+    def add_signature(self, signature, answer):
+        """
+        Add a signature to self.signature_to_ans.  If the signature already
+        exists, do nothing.
+        """
+        if signature not in self.signature_to_ans:
+            local_sta = self.signature_to_ans
+            local_sta[signature] = answer
+            self.signature_to_ans = local_sta
 
-class CrowdsourceHinterDescriptor(CrowdsourceHinterFields, XmlDescriptor):
+
+class CrowdsourceHinterDescriptor(CrowdsourceHinterFields, RawDescriptor):
     module_class = CrowdsourceHinterModule
     stores_state = True
 

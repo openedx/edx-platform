@@ -23,10 +23,19 @@
     Help your classmates by writing hints for this problem. Start by picking one of your previous incorrect answers from below:
     </p>
 
+    <%
+    def unspace(string):
+        """
+        HTML id's can't have spaces in them.  This little function
+        removes spaces.
+        """
+        return ''.join(string.split())
+    %>
+
     <div id="answer-tabs">
         <ul>
         % for answer in answer_to_hints:
-            <li><a href="#previous-answer-${answer}"> ${answer} </a></li> 
+            <li><a href="#previous-answer-${unspace(answer)}"> ${answer} </a></li>
         % endfor
         </ul>
 
@@ -35,7 +44,7 @@
         import json
         all_pks = json.dumps(pk_dict.keys())
         %>
-        <div class = "previous-answer" id="previous-answer-${answer}" data-all-pks='${all_pks}'>
+        <div class = "previous-answer" id="previous-answer-${unspace(answer)}" data-answer="${answer}" data-all-pks='${all_pks}'>
         <div class = "hint-inner-container">
             % if len(pk_dict) > 0:
                 <p>
@@ -54,7 +63,7 @@
             <p>
             What hint would you give a student who made the same mistake you did?  Please don't give away the answer.
             </p>
-            <textarea cols="50" class="custom-hint" id="custom-hint-${answer}">
+            <textarea cols="50" class="custom-hint" data-answer="${answer}">
 What would you say to help someone who got this wrong answer?
 (Don't give away the answer, please.)
             </textarea>
