@@ -5,20 +5,9 @@ class @TabsEditorDescriptor
   constructor: (element) ->
     @element = element;
 
-    console.log 'element = ', element
-
-    if typeof @element.find('section.editor-with-tabs').data('hide-header') is 'string'
-      console.log 'type is string'
-    if typeof @element.find('section.editor-with-tabs').data('hide-header') is 'boolean'
-      console.log 'type is boolean'
-
-    console.log 'data hide-header = ', @element.find('section.editor-with-tabs').data('hide-header')
-
     if @element.find('section.editor-with-tabs').data('hide-header') is 'True'
-      console.log 'HIDING header'
       $('.component-edit-header').hide()
     else
-      console.log 'SHOWING header'
       $('.component-edit-header').show()
 
     @$tabs = $(".tab", @element)

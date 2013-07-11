@@ -56,7 +56,6 @@ describe "TabsEditorDescriptor", ->
 
       editBox.data('CodeMirror', CodeMirrorStub)
       data = @descriptor.save().data
-      console.log 'data=', data
       expect(data).toEqual('Advanced Editor Text')
 
     it "detach click event", ->
