@@ -446,6 +446,24 @@ p, ul, ol, dl {
       }
     }
 
+    // actions
+    .list-actions {
+      @extend .no-list;
+
+      .action-item {
+        margin-bottom: ($baseline/4);
+        border-bottom: 1px dotted $gray-l4;
+        padding-bottom: ($baseline/4);
+
+
+        &:last-child {
+          margin-bottom: 0;
+          border: none;
+          padding-bottom: 0;
+        }
+      }
+    }
+
     // navigation
     .nav-related, .nav-page {
 
