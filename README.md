@@ -12,30 +12,34 @@ installation process.
 
 1. Make sure you have plenty of available disk space, >5GB
 2. Install Git: http://git-scm.com/downloads
-3. Install VirtualBox: https://www.virtualbox.org/wiki/Download_Old_Builds_4_2
-   (you need version 4.2.12, as later/earlier versions might not work well with 
-   Vagrant)
+3. Install VirtualBox: https://www.virtualbox.org/wiki/Downloads
+   See http://docs.vagrantup.com/v2/providers/index.html for a list of supported
+   Providers.  You should use VirtualBox >= 4.2.12.
+   (Windows: later/earlier VirtualBox versions than 4.2.12 have been reported to not work well with 
+   Vagrant.  If this is still a problem, you can
+   install 4.2.12 from https://www.virtualbox.org/wiki/Download_Old_Builds_4_2).
 4. Install Vagrant: http://www.vagrantup.com/ (Vagrant 1.2.2 or later)
 5. Open a terminal
 6. Download the project: `git clone git://github.com/edx/edx-platform.git`
 7. Enter the project directory: `cd edx-platform/`
 8. (Windows only) Run the commands to 
    [deal with line endings and symlinks under Windows](https://github.com/edx/edx-platform/wiki/Simplified-install-with-vagrant#dealing-with-line-endings-and-symlinks-under-windows)
-9. Start: `vagrant up`
+9. Create the development environment and start it: `vagrant up`
 
 The last step might require your host machine's administrator password to setup NFS.
 
 Afterwards, it will download an image, install all the dependencies and configure
 the VM. It will take a while, go grab a coffee.
 
-Once completed, hopefully you should see a "Success!" message indicating that the
-installation went fine. (If not, refer to the 
-[troubleshooting section](https://github.com/edx/edx-platform/wiki/Simplified-install-with-vagrant#troubleshooting).)
+Once completed, you should see a "Success!" message.
+If not, refer to the 
+[troubleshooting section](https://github.com/edx/edx-platform/wiki/Simplified-install-with-vagrant#troubleshooting).
 
-Note: by default, the VM will get the IP `192.168.20.40`. If you need to use a 
-different IP, you can edit the file `Vagrantfile`. If you have already started the 
-VM with `vagrant up`, see "Stopping and restarting the VM" below to take the change 
-into account.
+Your development environment is initialized only on the first bring-up.
+Subsequently, you can boot your virtual machine normally using `vagrant up`.
+
+Note: by default, the VM will get the IP `192.168.20.40`.
+You can change this in your `Vagrantfile` (the startup message will reflect your VMs actual IP).
 
 Accessing the VM
 ----------------
@@ -46,15 +50,27 @@ Once the installation is finished, to log into the virtual machine:
 $ vagrant ssh
 ```
 
-Note: This won't work from Windows, install install PuTTY from
-http://www.chiark.greenend.org.uk/%7Esgtatham/putty/download.html instead. Then
-connect to 127.0.0.1, port 2222, using vagrant/vagrant as a user/password.
+Note: This won't work from Windows. Instead, install PuTTY from
+http://www.chiark.greenend.org.uk/%7Esgtatham/putty/download.html. Then
+connect to 192.168.20.40, port 2222, using vagrant/vagrant as a user/password.
+
 
 Using edX
 ---------
 
-Once inside the VM, you can start Studio and LMS with the following commands
-(from the `/opt/edx/edx-platform` folder):
+When you login to your VM, you are in
+the `/opt/edx/edx-platform` folder by default, which is NFS mounted from you host workspace.
+Your host computer contains the edx-project development code and repository.
+Your VM contains system dependencies, and runs development code mounted from your host.
+You can develop by editing from your host computer, in the `edx-platform/` directory
+which you cloned from github.
+
+After logging into your VM with `vagrant ssh`,
+you can start Studio and the
+Learning management system (LMS)
+with the commands such as the following
+
+(you need to be in the `/opt/edx/edx-platform` folder on the client VM):
 
 Learning management system (LMS):
 
@@ -62,7 +78,7 @@ Learning management system (LMS):
 $ rake lms[cms.dev,0.0.0.0:8000]
 ```
 
-Studio:
+Studio (CMS):
 
 ```
 $ rake cms[dev,0.0.0.0:8001]
@@ -70,38 +86,66 @@ $ rake cms[dev,0.0.0.0:8001]
 
 Once started, open the following URLs in your browser:
 
-* Learning management system (LMS): http://192.168.20.40:8000/
-* Studio (CMS): http://192.168.20.40:8001/
+* LMS: http://192.168.20.40:8000/
+* CMS: http://192.168.20.40:8001/
 
-You can develop by editing the files directly in the `edx-platform/` directory you
-downloaded before, you don't need to connect to the VM to edit them (the VM uses
-those files to run edX, mirroring the folder in `/opt/edx/edx-platform`).
+Your client VM's port 8000 is forwarded to host port 9000
+so you can also access the LMS with http://localhost:9000/.
+Similarly, client port 8001 is forwarded to host port 9001.
+These are set in your `Vagrantfile`.
 
-You may also want to create a super-user with:
-
-```
-$ rake django-admin["createsuperuser"]
-```
-
-Also note that if you register a new user through the web interface,
-the activiation email will be posted to your VM's terminal window (search for
-lines similar to):
+Note that when you register a new user through the web interface,
+by default the activiation email will be appear on your VM's terminal.
+Search for lines similar to:
 
 ```
 Subject: Your account for edX Studio
 From: registration@edx.org
 ```
 
-and find the activation URL for the account you've created.
+and find the activation URL.
 
 See the [Frequently Asked Questions](https://github.com/edx/edx-platform/wiki/Frequently-Asked-Questions)
 for more usage tips.
 
+Access to django debugging & admin
+-----------------------------------
+
+You may create a CMS super-user with:
+
+```
+$ rake django-admin["createsuperuser"]
+```
+
+Normally the django admin interface and the site's debug toolbar
+are only active during local operation.
+To use these, specifically forward one of client VM's localhost ports to your host.
+You cannot do this with `vagrant ssh`.
+Instead, login from a host terminal like this:
+
+```
+$ ssh -L 8080:127.0.0.1:8080 vagrant@192.168.20.40
+```
+
+with a password of `vagrant`.
+The specific host and client ports can be whatever you want,
+so long as they don't conflict with any ports in use.
+
+Now, start your LMS as a localhost instance:
+
+```
+$ rake lms[cms.dev,127.0.0.1:8080]
+```
+
+You should see the debug toolbar when you navigate to http:/localhost:8080.
+You should now also see a login if you navigate to http://localhost:8080/admin/.
+
+
 Stopping & starting
 -------------------
 
-To stop the VM (from your `edx-platform/` directory):
 
+To stop the VM (from your `edx-platform/` directory):
 ```
 $ vagrant halt
 ```
@@ -112,11 +156,22 @@ To restart:
 $ vagrant up
 ```
 
-or, to start without attempting to update the dependencies:
+To suspend and resume tasks in progress on your VM (such as tests):
+```
+$ vagrant suspend
+# and later...
+$ vagrant resume
+```
 
+Your development environment is normally created once, on first `vagrant up`.
+The usual development process from there would be to `git pull` any changes in edx-platform,
+and continue working with your configured box (VM).
+If you want to create a fresh development environment, you can:
 ```
-$ vagrant up --no-provision
+$ vagrant destroy
+$ vagrant up
 ```
+
 
 Troubleshooting
 ---------------
