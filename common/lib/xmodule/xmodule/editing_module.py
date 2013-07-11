@@ -48,8 +48,13 @@ class TabsEditingDescriptor(EditingFields, MakoModuleDescriptor):
     js_module_name = "TabsEditorDescriptor"
     tabs = []
 
-    # Include settings to tabs and hide setting main bar
+    # Include settings to tabs and hide setting main bar.
     hide_settings = False
+    # In order to enable, in xmodule desciptor (see videoalpha for ex.)
+    # 1. add to tabs:       {
+    #       'name': "Settings",  # Do not rename settings tab.
+    #       'template': "tabs/metadata-edit-tab.html'   }
+    # 2. set hide_settings = True
 
     def get_context(self):
         _context = super(TabsEditingDescriptor, self).get_context()
