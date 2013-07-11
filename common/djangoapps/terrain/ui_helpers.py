@@ -145,42 +145,12 @@ def id_click(elem_id):
 @world.absorb
 def css_fill(css_selector, text, index=0, max_attempts=5):
     assert is_css_present(css_selector)
-    attempt = 0
-    result = False
-    while attempt < max_attempts:
-        try:
-            world.browser.find_by_css(css_selector)[index].fill(text)
-            result = True
-            break
-        except WebDriverException:
-            # Occasionally, MathJax or other JavaScript can cover up
-            # an element temporarily.
-            # If this happens, wait a second, then try again
-            world.wait(1)
-            attempt += 1
-        except:
-            attempt += 1
-    assert_true(result, 'Filling {} did not work as expected'.format(css_selector))
+    return world.retry_on_exception(lambda: world.browser.find_by_css(css_selector)[index].fill(text), max_attempts=max_attempts)
 
 
 @world.absorb
 def click_link(partial_text, index=0, max_attempts=5):
-    attempt = 0
-    result = False
-    while attempt < max_attempts:
-        try:
-            world.browser.find_link_by_partial_text(partial_text)[index].click()
-            result = True
-            break
-        except WebDriverException:
-            # Occasionally, MathJax or other JavaScript can cover up
-            # an element temporarily.
-            # If this happens, wait a second, then try again
-            world.wait(1)
-            attempt += 1
-        except:
-            attempt += 1
-    assert_true(result, 'Clicking {} did not work as expected'.format(partial_text))
+    return world.retry_on_exception(lambda: world.browser.find_link_by_partial_text(partial_text)[index].click(), max_attempts=max_attempts)
 
 
 @world.absorb
@@ -188,14 +158,7 @@ def css_text(css_selector, index=0, max_attempts=5):
 
     # Wait for the css selector to appear
     if world.is_css_present(css_selector):
-        attempt = 0
-        while attempt < max_attempts:
-            try:
-                return world.browser.find_by_css(css_selector)[index].text
-                break
-            except:
-                attempt += 1
-        assert_true(attempt < max_attempts, 'Could not access {}'.format(css_selector))
+        return world.retry_on_exception(lambda: world.browser.find_by_css(css_selector)[index].text, max_attempts=max_attempts)
     else:
         return ""
 
@@ -205,14 +168,7 @@ def css_value(css_selector, index=0, max_attempts=5):
 
     # Wait for the css selector to appear
     if world.is_css_present(css_selector):
-        attempt = 0
-        while attempt < max_attempts:
-            try:
-                return world.browser.find_by_css(css_selector)[index].value
-                break
-            except:
-                attempt += 1
-        assert_true(attempt < max_attempts, 'Could not access {}'.format(css_selector))
+        return world.retry_on_exception(lambda: world.browser.find_by_css(css_selector)[index].value, max_attempts=max_attempts)
     else:
         return ""
 
@@ -223,36 +179,18 @@ def css_html(css_selector, index=0, max_attempts=5):
     Returns the HTML of a css_selector and will retry if there is a StaleElementReferenceException
     """
     assert is_css_present(css_selector)
-    attempt = 0
-    while attempt < max_attempts:
-        try:
-            return world.browser.find_by_css(css_selector)[index].html
-        except:
-            attempt += 1
-    assert_true(attempt < max_attempts, 'Ran out of attempts to access {}'.format(css_selector))
+    return world.retry_on_exception(lambda: world.browser.find_by_css(css_selector)[index].html, max_attempts=max_attempts)
 
 
 @world.absorb
 def css_has_class(css_selector, class_name, index=0, max_attempts=5):
-    attempt = 0
-    while attempt < max_attempts:
-        try:
-            return world.css_find(css_selector)[index].has_class(class_name)
-        except:
-            attempt += 1
-    assert_true(attempt < max_attempts, 'Ran out of attempts to access {}'.format(css_selector))
+    return world.retry_on_exception(lambda: world.css_find(css_selector)[index].has_class(class_name), max_attempts=max_attempts)
 
 
 @world.absorb
 def css_visible(css_selector, index=0, max_attempts=5):
     assert is_css_present(css_selector)
-    attempt = 0
-    while attempt < max_attempts:
-        try:
-            return
-        except:
-            attempt += 1
-    assert_true(attempt < max_attempts, 'Ran out of attempts to access {}'.format(css_selector))
+    return world.retry_on_exception(lambda: world.browser.find_by_css(css_selector)[index].visible, max_attempts=max_attempts)
 
 
 @world.absorb
@@ -303,10 +241,14 @@ def is_mac():
 
 @world.absorb
 def retry_on_exception(func, max_attempts=5):
-    attempts = 0
-    while attempts < max_attempts:
+    attempt = 0
+    while attempt < max_attempts:
         try:
             return func()
             break
+        except WebDriverException:
+            world.wait(1)
+            attempt += 1
         except:
-            attempts += 1
+            attempt += 1
+    assert_true(attempt < max_attempts, 'Ran out of attempts to execute {}'.format(func))

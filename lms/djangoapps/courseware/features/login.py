@@ -24,7 +24,7 @@ def i_submit_my_credentials_on_the_login_form(step):
     def submit_login_form():
         login_form = world.browser.find_by_css('form#login-form')
         login_form.find_by_name('submit').click()
-    world.retry_on_excetion(submit_login_form)
+    world.retry_on_exception(submit_login_form)
 
 
 @step(u'I should see the login error message "([^"]*)"$')
@@ -57,4 +57,4 @@ def fill_in_the_login_form(field, value):
         login_form = world.browser.find_by_css('form#login-form')
         form_field = login_form.find_by_name(field)
         form_field.fill(value)
-    world.retry_on_excetion(fill_login_form)
+    world.retry_on_exception(fill_login_form)
