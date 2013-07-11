@@ -38,7 +38,7 @@
       <div class="alert editing-draft-alert">
         <p class="alert-message"><strong>${_("You are editing a draft.")}</strong>
         % if published_date:
-        ${_("This unit was originally published on %s." % published_date)}
+        ${_("This unit was originally published on {date}.".format(date=published_date)}
         % endif
         </p>
         <a href="${published_preview_link}" target="_blank" class="alert-action secondary">${_("View the Live Version")}</a>
@@ -94,7 +94,7 @@
                                       </a>
                                     </li>
                                   % endif
-  
+
                                 %endfor
                             </ul>
                           </div>
@@ -141,9 +141,14 @@
             <div class="row status">
               <p>${_("This unit is scheduled to be released to <strong>students</strong>")}
               % if release_date is not None:
-                ${_("on <strong>%s</strong>") % release_date }
+                ${_("on <strong>{date}</strong>").format(date=release_date)}
               % endif
-              ${_("with the subsection")} <a href="${reverse('edit_subsection', kwargs={'location': subsection.location})}">"${subsection.display_name_with_default}"</a></p>
+              ${_("with the subsection {link_start}{name}{link_end}").format(
+                  name=subsection.display_name_with_default,
+                  link_start='<a href="{url}">'.format(url=reverse('edit_subsection', kwargs={'location': subsection.location})}),
+                  link_end='</a>'
+                )}
+              </p>
             </div>
             <div class="row unit-actions">
               <a href="#" class="delete-draft delete-button">${_("Delete Draft")}</a>

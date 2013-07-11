@@ -19,7 +19,7 @@
       </h2>
 
       <nav class="nav-course nav-dd ui-left">
-        <h2 class="sr">${_("{}'s Navigation:").format(context_course.display_name_with_default)}</h2>
+        <h2 class="sr">${_("{course_name}'s Navigation:").format(course_name=context_course.display_name_with_default)}</h2>
         <ol>
           <li class="nav-item nav-course-courseware">
             <h3 class="title"><span class="label"><span class="label-prefix sr">${_("Course")} </span>${_("Content")}</span> <i class="icon-caret-down ui-toggle-dd"></i></h3>
