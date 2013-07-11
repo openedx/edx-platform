@@ -180,7 +180,7 @@ class VideoAlphaDescriptor(VideoAlphaFields, TabsEditingDescriptor):
         },
         {
             'name': "Settings",  # Do not rename settings tab.
-            'template': "metadata-edit-tab.html"
+            'template': "tabs/metadata-edit-tab.html"
         }
     ]
     hide_settings = True
