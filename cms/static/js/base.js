@@ -714,7 +714,6 @@ function saveSetSectionScheduleDate(e) {
 
     var saving = new CMS.Views.Notification.Saving({
         title: gettext("Saving") + "&hellip;",
-        maxShown: 1250
     });
     saving.show();
     // call into server to commit the new order
@@ -744,5 +743,6 @@ function saveSetSectionScheduleDate(e) {
             '" data-time="' + input_time +
             '" data-id="' + id + '">' + gettext('Edit') + '</a>');
         hideModal();
+        saving.hide();
     });
 }
