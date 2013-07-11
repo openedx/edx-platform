@@ -3,11 +3,7 @@ require 'launchy'
 # --- Develop and public documentation ---
 desc "Invoke sphinx 'make build' to generate docs."
 task :builddocs, [:options] do |t, args|
-    if args.options == 'pub'
-        path = "doc/public"
-    else
-        path = "docs"
-    end
+    path = "docs"
 
     Dir.chdir(path) do
         sh('make html')
@@ -16,11 +12,7 @@ end
 
 desc "Show docs in browser (mac and ubuntu)."
 task :showdocs, [:options] do |t, args|
-    if args.options == 'pub'
-        path = "doc/public"
-    else
-        path = "docs"
-    end
+    path = "docs"
 
     Launchy.open("#{path}/build/html/index.html")
 end
