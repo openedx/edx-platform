@@ -45,7 +45,7 @@ def instructor_dashboard_2(request, course_id):
     sections = [
         _section_course_info(course_id),
         _section_membership(course_id, access),
-        _section_student_admin(course_id),
+        _section_student_admin(course_id, access),
         _section_data_download(course_id),
         _section_analytics(course_id),
     ]
@@ -115,11 +115,12 @@ def _section_membership(course_id, access):
     return section_data
 
 
-def _section_student_admin(course_id):
+def _section_student_admin(course_id, access):
     """ Provide data for the corresponding dashboard section """
     section_data = {
         'section_key': 'student_admin',
         'section_display_name': 'Student Admin',
+        'access': access,
         'get_student_progress_url': reverse('get_student_progress_url', kwargs={'course_id': course_id}),
         'enrollment_url': reverse('students_update_enrollment', kwargs={'course_id': course_id}),
         'reset_student_attempts_url': reverse('reset_student_attempts', kwargs={'course_id': course_id}),

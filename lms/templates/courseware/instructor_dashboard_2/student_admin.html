@@ -28,54 +28,63 @@
     provide <tt>notaproblem/someothername</tt>.)
   </p>
   <input type="button" name="reset-attempts-single" value="Reset Student Attempts" data-endpoint="${ section_data['reset_student_attempts_url'] }">
-  <p> You may also delete the entire state of a student for the specified module: </p>
-  <input type="button" class="molly-guard" name="delete-state-single" value="Delete Student State for Module" data-endpoint="${ section_data['reset_student_attempts_url'] }">
-  <input type="button" name="rescore-problem-single" value="Rescore Student Submission" data-endpoint="${ section_data['rescore_problem_url'] }">
 
+  %if section_data['access']['instructor']:
+    <p> You may also delete the entire state of a student for the specified module: </p>
+    <input type="button" class="molly-guard" name="delete-state-single" value="Delete Student State for Module" data-endpoint="${ section_data['reset_student_attempts_url'] }">
+  %endif
 
-  <p>
-    Rescoring runs in the background, and status for active tasks will appear in a table below.
-    To see status for all tasks submitted for this course and student, click on this button:
-  </p>
+  %if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS') and section_data['access']['instructor']:
+    <input type="button" name="rescore-problem-single" value="Rescore Student Submission" data-endpoint="${ section_data['rescore_problem_url'] }">
+  %endif
 
-  <input type="button" name="task-history-single" value="Show Background Task History for Student" data-endpoint="${ section_data['list_instructor_tasks_url'] }">
-  <div class="task-history-single-table"></div>
+  %if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS') and section_data['access']['instructor']:
+    <p>
+      Rescoring runs in the background, and status for active tasks will appear in a table below.
+      To see status for all tasks submitted for this course and student, click on this button:
+    </p>
+
+    <input type="button" name="task-history-single" value="Show Background Task History for Student" data-endpoint="${ section_data['list_instructor_tasks_url'] }">
+    <div class="task-history-single-table"></div>
+  %endif
 </div>
 
-<hr>
+%if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS') and section_data['access']['instructor']:
+  <hr>
 
-<div class="course-specific-container">
-  <H2>Course-specific grade adjustment</h2>
-  <div class="request-response-error"></div>
+  <div class="course-specific-container">
+    <H2>Course-specific grade adjustment</h2>
+    <div class="request-response-error"></div>
 
-  <p>
-    Specify a particular problem in the course here by its url:
-    <input type="text" name="problem-select-all" size="60">
-  </p>
-  <p>
-    You may use just the "urlname" if a problem, or "modulename/urlname" if not.
-    (For example, if the location is <tt>i4x://university/course/problem/problemname</tt>,
-    then just provide the <tt>problemname</tt>.
-    If the location is <tt>i4x://university/course/notaproblem/someothername</tt>, then
-    provide <tt>notaproblem/someothername</tt>.)
-  </p>
-  <p>
-    Then select an action:
-    <input type="button" class="molly-guard" name="reset-attempts-all" value="Reset ALL students' attempts" data-endpoint="${ section_data['reset_student_attempts_url'] }">
-    <input type="button" class="molly-guard" name="rescore-problem-all" value="Rescore ALL students' problem submissions" data-endpoint="${ section_data['rescore_problem_url'] }">
-  </p>
-  <p>
-  <p>These actions run in the background, and status for active tasks will appear in a table below.
-     To see status for all tasks submitted for this problem, click on this button:
-  </p>
-    <input type="button" name="task-history-all" value="Show Background Task History for Problem" data-endpoint="${ section_data['list_instructor_tasks_url'] }">
-    <div class="task-history-all-table"></div>
-  </p>
-</div>
+    <p>
+      Specify a particular problem in the course here by its url:
+      <input type="text" name="problem-select-all" size="60">
+    </p>
+    <p>
+      You may use just the "urlname" if a problem, or "modulename/urlname" if not.
+      (For example, if the location is <tt>i4x://university/course/problem/problemname</tt>,
+      then just provide the <tt>problemname</tt>.
+      If the location is <tt>i4x://university/course/notaproblem/someothername</tt>, then
+      provide <tt>notaproblem/someothername</tt>.)
+    </p>
+    <p>
+      Then select an action:
+      <input type="button" class="molly-guard" name="reset-attempts-all" value="Reset ALL students' attempts" data-endpoint="${ section_data['reset_student_attempts_url'] }">
+      <input type="button" class="molly-guard" name="rescore-problem-all" value="Rescore ALL students' problem submissions" data-endpoint="${ section_data['rescore_problem_url'] }">
+    </p>
+    <p>
+    <p>These actions run in the background, and status for active tasks will appear in a table below.
+       To see status for all tasks submitted for this problem, click on this button:
+    </p>
+      <input type="button" name="task-history-all" value="Show Background Task History for Problem" data-endpoint="${ section_data['list_instructor_tasks_url'] }">
+      <div class="task-history-all-table"></div>
+    </p>
+  </div>
 
-<hr>
+  <hr>
 
-<div class="running-tasks-container">
-  <h2> Pending Instructor Tasks </h2>
-  <div class="running-tasks-table" data-endpoint="${ section_data['list_instructor_tasks_url'] }"></div>
-</div>
+  <div class="running-tasks-container">
+    <h2> Pending Instructor Tasks </h2>
+    <div class="running-tasks-table" data-endpoint="${ section_data['list_instructor_tasks_url'] }"></div>
+  </div>
+%endif

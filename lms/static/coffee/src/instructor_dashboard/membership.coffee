@@ -272,6 +272,7 @@ class Membership
 
     @$list_selector.change =>
       $opt = @$list_selector.children('option:selected')
+      return unless $opt.length > 0
       for auth_list in @auth_lists
         auth_list.$container.removeClass 'active'
       auth_list = $opt.data('auth_list')

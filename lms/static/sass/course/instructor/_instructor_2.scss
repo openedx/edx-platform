@@ -169,14 +169,16 @@
 
 
 .instructor-dashboard-wrapper-2 section.idash-section#membership {
+  $half_width: $baseline * 20;
+
   .vert-left {
     float: left;
-    width: 47%;
+    width: $half_width;
   }
 
   .vert-right {
     float: right;
-    width: 47%;
+    width: $half_width;
   }
 
   select {
@@ -197,7 +199,7 @@
     position: absolute;
     display: none;
     padding: $baseline;
-    width: $baseline * 25;
+    width: $half_width;
     border: 1px solid $light-gray;
     background-color: $white;
 

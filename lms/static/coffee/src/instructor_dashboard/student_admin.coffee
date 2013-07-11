@@ -9,6 +9,14 @@ std_ajax_err = (handler) -> (jqXHR, textStatus, errorThrown) ->
                   errorThrown: #{errorThrown}"""
   handler.apply this, arguments
 
+# get jquery element and assert its existance
+find_and_assert = ($root, selector) ->
+  item = $root.find selector
+  if item.length != 1
+    console.error "element selection failed for '#{selector}' resulted in length #{item.length}"
+    throw "Failed Element Selection"
+  else
+    item
 
 create_task_list_table = ($table_tasks, tasks_data) ->
   $table_tasks.empty()
@@ -61,39 +69,32 @@ class StudentAdmin
     log "setting up instructor dashboard section - student admin"
     @$section.data 'wrapper', @
 
-    # get jquery element and assert its existance
-    # for debugging
-    find_and_assert = ($root, selector) ->
-      item = $root.find selector
-      if item.length != 1
-        console.error "element selection failed for '#{selector}' resulted in length #{item.length}"
-        throw "Failed Element Selection"
-      else
-        item
-
     # collect buttons
+    # some buttons are optional because they can be flipped by the instructor task feature switch
     @$field_student_select        = find_and_assert @$section, "input[name='student-select']"
     @$progress_link               = find_and_assert @$section, "a.progress-link"
     @$btn_enroll                  = find_and_assert @$section, "input[name='enroll']"
     @$btn_unenroll                = find_and_assert @$section, "input[name='unenroll']"
     @$field_problem_select_single = find_and_assert @$section, "input[name='problem-select-single']"
     @$btn_reset_attempts_single   = find_and_assert @$section, "input[name='reset-attempts-single']"
-    @$btn_delete_state_single     = find_and_assert @$section, "input[name='delete-state-single']"
-    @$btn_rescore_problem_single  = find_and_assert @$section, "input[name='rescore-problem-single']"
-    @$btn_task_history_single     = find_and_assert @$section, "input[name='task-history-single']"
-    @$table_task_history_single   = find_and_assert @$section, ".task-history-single-table"
+    @$btn_delete_state_single     = @$section.find "input[name='delete-state-single']"
+    @$btn_rescore_problem_single  = @$section.find "input[name='rescore-problem-single']"
+    @$btn_task_history_single     = @$section.find "input[name='task-history-single']"
+    @$table_task_history_single   = @$section.find ".task-history-single-table"
 
-    @$field_problem_select_all    = find_and_assert @$section, "input[name='problem-select-all']"
-    @$btn_reset_attempts_all      = find_and_assert @$section, "input[name='reset-attempts-all']"
-    @$btn_rescore_problem_all     = find_and_assert @$section, "input[name='rescore-problem-all']"
-    @$btn_task_history_all        = find_and_assert @$section, "input[name='task-history-all']"
-    @$table_task_history_all      = find_and_assert @$section, ".task-history-all-table"
-    @$table_running_tasks         = find_and_assert @$section, ".running-tasks-table"
+    # course-specific level buttons
+    @$field_problem_select_all    = @$section.find "input[name='problem-select-all']"
+    @$btn_reset_attempts_all      = @$section.find "input[name='reset-attempts-all']"
+    @$btn_rescore_problem_all     = @$section.find "input[name='rescore-problem-all']"
+    @$btn_task_history_all        = @$section.find "input[name='task-history-all']"
+    @$table_task_history_all      = @$section.find ".task-history-all-table"
+    @$table_running_tasks         = @$section.find ".running-tasks-table"
 
     @$request_response_error_single = find_and_assert @$section, ".student-specific-container .request-response-error"
-    @$request_response_error_all    = find_and_assert @$section, ".course-specific-container .request-response-error"
+    @$request_response_error_all    = @$section.find ".course-specific-container .request-response-error"
 
-    @start_refresh_running_task_poll_loop()
+    if @$table_running_tasks.length > 0
+      @start_refresh_running_task_poll_loop()
 
     # go to student progress page
     @$progress_link.click (e) =>
@@ -118,7 +119,7 @@ class StudentAdmin
 
       $.ajax
         dataType: 'json'
-        url: @$btn_unenroll.data 'endpoint'
+        url: @$btn_enroll.data 'endpoint'
         data: send_data
         success: @clear_errors_then -> console.log "student #{send_data.emails} enrolled"
         error: std_ajax_err => @$request_response_error_single.text "Error enrolling student '#{send_data.emails}'."
@@ -259,7 +260,8 @@ class StudentAdmin
       cb?.apply this, arguments
 
   onClickTitle: ->
-    @start_refresh_running_task_poll_loop()
+    if @$table_running_tasks.length > 0
+      @start_refresh_running_task_poll_loop()
 
   # onExit: ->
   #   clearInterval @reload_running_task_list_slot

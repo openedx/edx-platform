@@ -3,7 +3,6 @@ Instructor Dashboard API views
 
 Non-html views which the instructor dashboard requests.
 
-TODO add tracking
 TODO a lot of these GETs should be PUTs
 """
 
@@ -14,6 +13,7 @@ from django.views.decorators.cache import cache_control
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseBadRequest
 
+from courseware.access import has_access
 from courseware.courses import get_course_with_access
 from django.contrib.auth.models import User
 from django_comment_common.models import (Role,
@@ -32,7 +32,10 @@ import analytics.csvs
 
 
 def common_exceptions_400(func):
-    """ Catches common exceptions and renders matching 400 errors. (decorator) """
+    """
+    Catches common exceptions and renders matching 400 errors.
+    (decorator without arguments)
+    """
     def wrapped(*args, **kwargs):
         try:
             return func(*args, **kwargs)
@@ -44,6 +47,8 @@ def common_exceptions_400(func):
 def require_query_params(*args, **kwargs):
     """
     Checks for required paremters or renders a 400 error.
+    (decorator with arguments)
+
     `args` is a *list of required GET parameter names.
     `kwargs` is a **dict of required GET parameter names
         to string explanations of the parameter
@@ -193,12 +198,12 @@ def access_allow_revoke(request, course_id):
 def list_course_role_members(request, course_id):
     """
     List instructors and staff.
-    Requires staff access.
+    Requires instructor access.
 
     rolename is one of ['instructor', 'staff', 'beta']
     """
     course = get_course_with_access(
-        request.user, course_id, 'staff', depth=None
+        request.user, course_id, 'instructor', depth=None
     )
 
     rolename = request.GET.get('rolename')
@@ -232,7 +237,7 @@ def grading_config(request, course_id):
     """
     Respond with json which contains a html formatted grade summary.
 
-    TODO maybe this shouldn't be html already
+    TODO this shouldn't be html already
     """
     course = get_course_with_access(
         request.user, course_id, 'staff', depth=None
@@ -282,7 +287,7 @@ def enrolled_students_features(request, course_id, csv=False):
         )
         return response
     else:
-        header, datarows = analytics.csvs.format_dictlist(student_data)
+        header, datarows = analytics.csvs.format_dictlist(student_data, query_features)
         return analytics.csvs.create_csv_response("enrolled_profiles.csv", header, datarows)
 
 
@@ -378,46 +383,16 @@ def get_student_progress_url(request, course_id):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @common_exceptions_400
-@require_query_params(student_email="student email")
-def redirect_to_student_progress(request, course_id):
-    """
-    Redirects to the specified students progress page
-    Limited to staff access.
-
-    Takes query parameter student_email
-    """
-    course = get_course_with_access(
-        request.user, course_id, 'staff', depth=None
-    )
-
-    student_email = request.GET.get('student_email')
-    user = User.objects.get(email=student_email)
-
-    progress_url = reverse('student_progress', kwargs={'course_id': course_id, 'student_id': user.id})
-
-    response_payload = {
-        'course_id': course_id,
-        'progress_url': progress_url,
-    }
-    response = HttpResponse(
-        json.dumps(response_payload), content_type="application/json"
-    )
-    return response
-
-
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@common_exceptions_400
 def reset_student_attempts(request, course_id):
     """
     Resets a students attempts counter or starts a task to reset all students attempts counters. Optionally deletes student state for a problem.
-    Limited to staff access.
+    Limited to staff access. Some sub-methods limited to instructor access.
 
     Takes either of the following query paremeters
         - problem_to_reset is a urlname of a problem
         - student_email is an email
-        - all_students is a boolean
-        - delete_module is a boolean
+        - all_students is a boolean (requires instructor access) (mutually exclusive with delete_module)
+        - delete_module is a boolean (requires instructor access) (mutually exclusive with all_students)
     """
     course = get_course_with_access(
         request.user, course_id, 'staff', depth=None
@@ -426,12 +401,17 @@ def reset_student_attempts(request, course_id):
     problem_to_reset = request.GET.get('problem_to_reset')
     student_email = request.GET.get('student_email')
     all_students = request.GET.get('all_students', False) in ['true', 'True', True]
-    will_delete_module = request.GET.get('delete_module', False) in ['true', 'True', True]
+    delete_module = request.GET.get('delete_module', False) in ['true', 'True', True]
 
     if not (problem_to_reset and (all_students or student_email)):
         return HttpResponseBadRequest()
-    if will_delete_module and all_students:
+    if delete_module and all_students:
         return HttpResponseBadRequest()
+
+    # require instructor access for some queries
+    if all_students or delete_module:
+        if not has_access(request.user, course, 'instructor'):
+            HttpResponseBadRequest("requires instructor accesss.")
 
     module_state_key = _msk_from_problem_urlname(course_id, problem_to_reset)
 
@@ -441,7 +421,7 @@ def reset_student_attempts(request, course_id):
     if student_email:
         try:
             student = User.objects.get(email=student_email)
-            enrollment.reset_student_attempts(course_id, student, module_state_key, delete_module=will_delete_module)
+            enrollment.reset_student_attempts(course_id, student, module_state_key, delete_module=delete_module)
         except StudentModule.DoesNotExist:
             return HttpResponseBadRequest("Module does not exist.")
     elif all_students:
@@ -462,7 +442,7 @@ def reset_student_attempts(request, course_id):
 def rescore_problem(request, course_id):
     """
     Starts a background process a students attempts counter. Optionally deletes student state for a problem.
-    Limited to staff access.
+    Limited to instructor access.
 
     Takes either of the following query paremeters
         - problem_to_reset is a urlname of a problem
@@ -472,7 +452,7 @@ def rescore_problem(request, course_id):
     all_students will be ignored if student_email is present
     """
     course = get_course_with_access(
-        request.user, course_id, 'staff', depth=None
+        request.user, course_id, 'instructor', depth=None
     )
 
     problem_to_reset = request.GET.get('problem_to_reset')
