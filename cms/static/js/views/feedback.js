@@ -185,7 +185,7 @@ CMS.Views.Prompt = CMS.Views.SystemFeedback.extend({
 var capitalCamel, types, intents;
 capitalCamel = _.compose(_.str.capitalize, _.str.camelize);
 types = ["alert", "notification", "prompt"];
-intents = ["warning", "error", "confirmation", "announcement", "step-required", "help", "saving"];
+intents = ["warning", "error", "confirmation", "announcement", "step-required", "help", "mini"];
 _.each(types, function(type) {
     _.each(intents, function(intent) {
         // "class" is a reserved word in Javascript, so use "klass" instead
@@ -201,8 +201,7 @@ _.each(types, function(type) {
     });
 });
 
-// set more sensible defaults for Notification-Saving views
-var savingOptions = CMS.Views.Notification.Saving.prototype.options;
-savingOptions.minShown = 1250;
-savingOptions.closeIcon = false;
-
+// set more sensible defaults for Notification-Mini views
+var miniOptions = CMS.Views.Notification.Mini.prototype.options;
+miniOptions.minShown = 1250;
+miniOptions.closeIcon = false;

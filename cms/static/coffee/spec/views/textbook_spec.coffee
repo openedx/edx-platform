@@ -73,7 +73,7 @@ describe "CMS.Views.ShowTextbook", ->
             @xhr = sinon.useFakeXMLHttpRequest()
             @xhr.onCreate = (xhr) -> requests.push(xhr)
 
-            @savingSpies = spyOnConstructor(CMS.Views.Notification, "Saving",
+            @savingSpies = spyOnConstructor(CMS.Views.Notification, "Mini",
                 ["show", "hide"])
             @savingSpies.show.andReturn(@savingSpies)
 
