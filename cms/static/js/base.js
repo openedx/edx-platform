@@ -713,7 +713,7 @@ function saveSetSectionScheduleDate(e) {
     });
 
     var saving = new CMS.Views.Notification.Saving({
-        title: gettext("Saving&hellip;"),
+        title: gettext("Saving") + "&hellip;",
         maxShown: 1250
     });
     saving.show();
