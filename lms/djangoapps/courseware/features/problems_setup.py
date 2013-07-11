@@ -313,18 +313,13 @@ def assert_checked(problem_type, choices):
 
     all_choices = ['choice_0', 'choice_1', 'choice_2', 'choice_3']
     for this_choice in all_choices:
-        attempt = 0
-        while attempt < 5:
-            try:
-                element = world.css_find(inputfield(problem_type, choice=this_choice))
-                if this_choice in choices:
-                    assert element.checked
-                else:
-                    assert not element.checked
-                break
-            except:
-                attempt += 1
-        assert_true(attempt < 5, "Could not access {}".format(element))
+        def check_problem():
+            element = world.css_find(inputfield(problem_type, choice=this_choice))
+            if this_choice in choices:
+                assert element.checked
+            else:
+                assert not element.checked
+        world.retry_on_exception(check_problem)
 
 
 def assert_textfield(problem_type, expected_text, input_num=1):
