@@ -351,25 +351,23 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         err_cnt = perform_xlint('common/test/data', ['toy'])
         self.assertGreater(err_cnt, 0)
 
-#FIX
-    @override_settings(COURSES_WITH_UNSAFE_CODE=['edX/full/.*'])
+    @override_settings(COURSES_WITH_UNSAFE_CODE=['edX/toy/.*'])
     def test_module_preview_in_whitelist(self):
         '''
         Tests the ajax callback to render an XModule
         '''
         direct_store = modulestore('direct')
-        import_from_xml(direct_store, 'common/test/data/', ['full'])
+        import_from_xml(direct_store, 'common/test/data/', ['toy'])
 
-        html_module_location = Location(['i4x', 'edX', 'full', 'html', 'html_90', None])
+        html_module_location = Location(['i4x', 'edX', 'toy', 'html', 'toylab', None])
 
         url = reverse('preview_component', kwargs={'location': html_module_location.url()})
 
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
-        self.assertIn('Inline content', resp.content)
 
         # also try a custom response which will trigger the 'is this course in whitelist' logic
-        problem_module_location = Location(['i4x', 'edX', 'full', 'problem', 'H1P1_Energy', None])
+        problem_module_location = Location(['i4x', 'edX', 'toy', 'vertical', 'vertical_test', None])
         url = reverse('preview_component', kwargs={'location': problem_module_location.url()})
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
@@ -643,7 +641,6 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         resp = self.client.get('http://localhost:8001/c4x/CDX/123123/asset/&images_circuits_Lab7Solution2.png')
         self.assertEqual(resp.status_code, 400)
 
-#FIX
     def test_delete_course(self):
         """
         This test will import a course, make a draft item, and delete it. This will also assert that the
