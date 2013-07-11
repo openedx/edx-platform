@@ -104,6 +104,22 @@
       }
     }
   }
+
+  // list of notices all in one
+  &.list-notices {
+
+    .notice-item {
+      margin-bottom: $baseline;
+      border-bottom: 1px solid $gray-l3;
+      padding-bottom: $baseline;
+
+      &:last-child {
+        margin-bottom: 0;
+        border: none;
+        padding-bottom: 0;
+      }
+    }
+  }
 }
 
 // particular notice - warnings around a workflow for something
@@ -128,11 +144,11 @@
   background-color: $gray-l4;
 
   .title {
-    color: $gray-d1;
+    color: $gray-d3;
   }
 
   .copy {
-    color: $gray;
+    color: $gray-d2;
   }
 
   &.has-actions {

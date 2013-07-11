@@ -36,7 +36,7 @@ body.dashboard {
 		width: flexgrid(9, 9);
 
 	  // CASE: notice has actions {
-	  &.has-actions {
+	  &.has-actions, &.list-notices .notice-item.has-actions {
 
 	    .msg, .list-actions {
 	      display: inline-block;
@@ -59,6 +59,7 @@ body.dashboard {
 
 	      .action-create-course {
 	      	@extend .btn-primary-green;
+	      	@extend .t-action3;
 	      }
 	    }
 	  }
@@ -66,8 +67,8 @@ body.dashboard {
 
 
 
-	// elements - authorship controls
-	.wrapper-authorshiprights {
+	// elements - course creation rights controls
+	.wrapper-creationrights {
 		overflow: hidden;
 
 		.ui-toggle-control {
@@ -129,8 +130,8 @@ body.dashboard {
 
 	}
 
-	// elements - authorship controls
-	.status-authorship {
+	// elements - course creation rights controls
+	.status-creationrights {
 		margin-top: $baseline;
 
 		.title {
@@ -144,7 +145,7 @@ body.dashboard {
 
 		}
 
-		.list-actions {
+		.list-actions, .form-actions {
       margin-top: ($baseline*0.75);
 
       .action-item {
@@ -253,10 +254,10 @@ body.dashboard {
 	}
 
 	.class-list {
-		margin-top: 20px;
+		margin-top: $baseline;
 		border-radius: 3px;
-		border: 1px solid $darkGrey;
-		background: #fff;
+		border: 1px solid $gray-d2;
+		background: $white;
 		box-shadow: 0 1px 2px rgba(0, 0, 0, .1);
 
 		li {

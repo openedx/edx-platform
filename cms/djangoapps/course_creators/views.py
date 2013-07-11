@@ -2,19 +2,18 @@
 Methods for interacting programmatically with the user creator table.
 """
 from course_creators.models import CourseCreator
-from django.core.exceptions import PermissionDenied
 
 from auth.authz import add_user_to_creator_group, remove_user_from_creator_group
 
 
-def add_user_with_status_unrequested(caller, user):
+def add_user_with_status_unrequested(user):
     """
     Adds a user to the course creator table with status 'unrequested'.
 
     If the user is already in the table, this method is a no-op
-    (state will not be changed). Caller must have staff permissions.
+    (state will not be changed).
     """
-    _add_user(caller, user, CourseCreator.UNREQUESTED)
+    _add_user(user, CourseCreator.UNREQUESTED)
 
 
 def add_user_with_status_granted(caller, user):
@@ -26,7 +25,7 @@ def add_user_with_status_granted(caller, user):
 
     This method also adds the user to the course creator group maintained by authz.py.
     """
-    _add_user(caller, user, CourseCreator.GRANTED)
+    _add_user(user, CourseCreator.GRANTED)
     update_course_creator_group(caller, user, True)
 
 
@@ -61,16 +60,13 @@ def get_course_creator_status(user):
         return user[0].state
 
 
-def _add_user(caller, user, state):
+def _add_user(user, state):
     """
     Adds a user to the course creator table with the specified state.
 
     If the user is already in the table, this method is a no-op
     (state will not be changed).
     """
-    if not caller.is_active or not caller.is_authenticated or not caller.is_staff:
-        raise PermissionDenied
-
     if CourseCreator.objects.filter(user=user).count() == 0:
         entry = CourseCreator(user=user, state=state)
         entry.save()
