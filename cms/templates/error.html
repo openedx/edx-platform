@@ -13,12 +13,13 @@
 <%block name="content">
   <article class="error-prompt">
     % if error == '404':
-      <h1>${_("Hmm…")}</h1>
-      <p class="description">${_("we can't find that page.")}</p>
-    % elif error == '500': 
-      <h1>${_("Oops…")}</h1>
-      <p class="description">${_("there was a problem with the server.")}</p>
-    % endif 
+      <h1>${_("The Page You Requested Page Cannot be Found")}</h1>
+      <p class="description">${_('We're sorry. We couldn't find the Studio page you're looking for. You may want to return to the Studio Dashboard and try again. If you are still having problems accessing things, please feel free to')} <a href="http://help.edge.edx.org/discussion/new" class="show-tender" title="${_('Use our feedback tool, Tender, to share your feedback')}">${_('contact Studio support')}</a> ${_('for further help.')}</p>
+
+    % elif error == '500':
+      <h1>${_("The Server Encountered an Error")}</h1>
+      <p class="description">${_('We're sorry. There was a problem with the server will trying to process your last request. You may want to return to the Studio Dashboard or try this request again. If you are still having problems accessing things, please feel free to')} <a href="http://help.edge.edx.org/discussion/new" class="show-tender" title="${_('Use our feedback tool, Tender, to share your feedback')}">${_('contact Studio support')}</a> ${_('for further help.')}</p>
+    % endif
     <a href="/" class="back-button">${_("Back to dashboard")}</a>
   </article>
 </%block>
