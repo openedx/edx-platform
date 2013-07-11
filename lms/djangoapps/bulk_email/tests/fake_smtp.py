@@ -1,34 +1,60 @@
 import smtpd
+import socket
 import asyncore
-import random
+import asynchat
 import smtplib
+
+class FakeSMTPChannel(smtpd.SMTPChannel):
+    """A fake SMTPChannel for sending fake error response through socket"""
+    def __init__(self, server, conn, addr):
+        asynchat.async_chat.__init__(self, conn)
+        self.__server = server
+        self.__conn = conn
+        self.__addr = addr
+        self.__line = []
+        self.__state = self.COMMAND
+        self.__greeting = 0
+        self.__mailfrom = None
+        self.__rcpttos = []
+        self.__data = ''
+        self.__fqdn = socket.getfqdn()
+        try:
+            self.__peer = conn.getpeername()
+        except socket.error, err:
+            # a race condition  may occur if the other end is closing
+            # before we can get the peername
+            self.close()
+            if err[0] != errno.ENOTCONN:
+                raise
+            return
+        self.push('421 SMTP Server error: too many concurrent sessions, please try again later.')
+        self.set_terminator('\r\n')
 
 class FakeSMTPServer(smtpd.SMTPServer):
     """A fake SMTP server"""
     def __init__(self, *args, **kwargs):
-        print "Running fake smtp server on port 1025"
-        self.errtype = "SUCCESS"
-        self.code = 0
         smtpd.SMTPServer.__init__(self, *args, **kwargs)
     
-    def set_errtype(self, e, c):
+    def set_errtype(self, e, r=''):
         self.errtype = e
-        self.code = c
+        self.reply = r
+
+    def handle_accept(self):
+        if self.errtype == "DISCONN":
+            self.accept()            
+        elif self.errtype == "CONN":
+            pair = self.accept()
+            if pair is not None:
+                conn, addr = pair
+                channel = FakeSMTPChannel(self, conn, addr)
+        else:
+            smtpd.SMTPServer.handle_accept(self)
 
     def process_message(self, *args, **kwargs):
         if self.errtype == "DATA":
-            raise smtplib.SMTPDataError(self.code, "Data Error")
-        elif self.errtype == "CONNECT":
-            raise smtplib.SMTPConnectError(self.code, "Connect Error")
-        elif self.errtype == "SERVERDISCONNECT":
-            raise smtplib.SMTPServerDisconnected(self.code, "Server Disconnected")
+            return self.reply
         else:
-            print "SUCCESS"
-        pass
+            return None
 
-if __name__ == "__main__":
-    smtp_server = FakeSMTPServer(('localhost', 1025), None)
-    try:
+    def serve_forever(self):
         asyncore.loop()
-    except KeyboardInterrupt:
-        smtp_server.close()
