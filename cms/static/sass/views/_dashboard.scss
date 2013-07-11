@@ -375,5 +375,9 @@ body.dashboard {
 		.new-course-cancel {
 			@include white-button;
 		}
+
+		.item-details {
+			padding-bottom: 0;
+		}
 	}
 }
