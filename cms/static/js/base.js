@@ -712,7 +712,7 @@ function saveSetSectionScheduleDate(e) {
         'start': start
     });
 
-    var saving = new CMS.Views.Notification.Saving({
+    var saving = new CMS.Views.Notification.Mini({
         title: gettext("Saving") + "&hellip;",
         maxShown: 1250
     });
