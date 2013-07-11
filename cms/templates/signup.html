@@ -20,53 +20,53 @@
       <form id="register_form" method="post" action="register_post">
         <div id="register_error" name="register_error" class="message message-status message-status error">
         </div>
-        
+
         <fieldset>
           <legend class="sr">${_("Required Information to Sign Up for edX Studio")}</legend>
-          
+
           <ol class="list-input">
             <li class="field text required" id="field-email">
               <label for="email">${_("Email Address")}</label>
-              <input id="email" type="email" name="email" placeholder="e.g. jane.doe@gmail.com" />              
+              <input id="email" type="email" name="email" placeholder="e.g. jane.doe@gmail.com" />
             </li>
 
             <li class="field text required" id="field-password">
               <label for="password">${_("Password")}</label>
-              <input id="password" type="password" name="password" />              
+              <input id="password" type="password" name="password" />
             </li>
 
             <li class="field text required" id="field-username">
               <label for="username">${_("Public Username")}</label>
               <input id="username" type="text" name="username" placeholder="e.g. janedoe" />
-              <span class="tip tip-stacked">${_("This will be used in public discussions with your courses and in our edX101 support forums")}</span>      
+              <span class="tip tip-stacked">${_("This will be used in public discussions with your courses and in our edX101 support forums")}</span>
             </li>
 
             <li class="field text required" id="field-name">
               <label for="name">${_("Full Name")}</label>
-              <input id="name" type="text" name="name" placeholder="e.g. Jane Doe" />              
+              <input id="name" type="text" name="name" placeholder="e.g. Jane Doe" />
             </li>
 
             <li class="field-group">
               <div class="field text" id="field-location">
                 <label for="location">${_("Your Location")}</label>
-                <input class="short" id="location" type="text" name="location" />              
+                <input class="short" id="location" type="text" name="location" />
               </div>
 
               <div class="field text" id="field-language">
                 <label for="language">${_("Preferred Language")}</label>
-                <input class="short" id="language" type="text" name="language" />              
+                <input class="short" id="language" type="text" name="language" />
               </div>
             </li>
 
             <li class="field checkbox required" id="field-tos">
               <input id="tos" name="terms_of_service" type="checkbox" value="true" />
-              <label for="tos">${_("I agree to the Terms of Service")}</label>             
+              <label for="tos">${_("I agree to the Terms of Service")}</label>
             </li>
           </ol>
         </fieldset>
 
         <div class="form-actions">
-          <button type="submit" id="submit" name="submit" class="action action-primary">${_("Create My Account & Start Authoring Courses")}</button>
+          <button type="submit" id="submit" name="submit" class="action action-primary">${_("Create My Account &amp; Start Authoring Courses")}</button>
         </div>
 
         <!-- no honor code for CMS, but need it because we're using the lms student object -->
@@ -105,7 +105,7 @@
       }).blur(function() {
         $("label").removeClass("is-focused");
       });
-  
+
 
       function getCookie(name) {
         return $.cookie(name);
