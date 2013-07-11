@@ -60,7 +60,7 @@ fi
 
 export PIP_DOWNLOAD_CACHE=/mnt/pip-cache
 
-source /mnt/virtualenvs/"$JOB_NAME"/bin/activate
+source $VIRTUALENV_DIR/bin/activate
 
 bundle install
 

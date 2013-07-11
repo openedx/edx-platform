@@ -47,7 +47,7 @@ def confirm_change(step):
     range_css = '.range'
     all_ranges = world.css_find(range_css)
     for i in range(len(all_ranges)):
-        assert all_ranges[i].html != '0-50'
+        assert world.css_html(range_css, index=i) != '0-50'
 
 
 @step(u'I change assignment type "([^"]*)" to "([^"]*)"$')

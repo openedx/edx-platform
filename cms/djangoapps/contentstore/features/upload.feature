@@ -21,6 +21,7 @@ Feature: Upload Files
         When I upload the file "test"
         And I delete the file "test"
         Then I should not see the file "test" was uploaded
+        And I see a confirmation that the file was deleted
 
     Scenario: Users can download files
         Given I have opened a new course in studio

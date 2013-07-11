@@ -12,6 +12,7 @@ from xmodule.modulestore.django import modulestore
 import courseware.module_render as render
 from courseware.tests.tests import LoginEnrollmentTestCase
 from courseware.model_data import ModelDataCache
+from modulestore_config import TEST_DATA_XML_MODULESTORE
 
 from .factories import UserFactory
 
@@ -19,21 +20,6 @@ from .factories import UserFactory
 class Stub:
     def __init__(self):
         pass
-
-
-def xml_store_config(data_dir):
-    return {
-        'default': {
-            'ENGINE': 'xmodule.modulestore.xml.XMLModuleStore',
-            'OPTIONS': {
-                'data_dir': data_dir,
-                'default_class': 'xmodule.hidden_module.HiddenDescriptor',
-            }
-        }
-    }
-
-TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
-TEST_DATA_XML_MODULESTORE = xml_store_config(TEST_DATA_DIR)
 
 
 @override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)

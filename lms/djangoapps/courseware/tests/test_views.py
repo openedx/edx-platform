@@ -3,7 +3,6 @@ import datetime
 
 from django.test import TestCase
 from django.http import Http404
-from django.conf import settings
 from django.test.utils import override_settings
 from django.contrib.auth.models import User
 from django.test.client import RequestFactory
@@ -14,26 +13,11 @@ from xmodule.modulestore.django import modulestore
 import courseware.views as views
 from xmodule.modulestore import Location
 from pytz import UTC
+from modulestore_config import TEST_DATA_XML_MODULESTORE
 
 
 class Stub():
     pass
-
-
-# This part is required for modulestore() to work properly
-def xml_store_config(data_dir):
-    return {
-        'default': {
-            'ENGINE': 'xmodule.modulestore.xml.XMLModuleStore',
-            'OPTIONS': {
-                'data_dir': data_dir,
-                'default_class': 'xmodule.hidden_module.HiddenDescriptor',
-            }
-        }
-    }
-
-TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
-TEST_DATA_XML_MODULESTORE = xml_store_config(TEST_DATA_DIR)
 
 
 @override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
@@ -67,8 +51,8 @@ class ViewsTestCase(TestCase):
         self.date = datetime.datetime(2013, 1, 22, tzinfo=UTC)
         self.course_id = 'edX/toy/2012_Fall'
         self.enrollment = CourseEnrollment.objects.get_or_create(user=self.user,
-                                                  course_id=self.course_id,
-                                                  created=self.date)[0]
+                                                                 course_id=self.course_id,
+                                                                 created=self.date)[0]
         self.location = ['tag', 'org', 'course', 'category', 'name']
         self._MODULESTORES = {}
         # This is a CourseDescriptor object

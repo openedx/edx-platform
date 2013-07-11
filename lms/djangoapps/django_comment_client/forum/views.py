@@ -114,7 +114,7 @@ def inline_discussion(request, course_id, discussion_id):
         threads, query_params = get_threads(request, course_id, discussion_id, per_page=INLINE_THREADS_PER_PAGE)
         cc_user = cc.User.from_django_user(request.user)
         user_info = cc_user.to_dict()
-    except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError) as err:
+    except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError):
         # TODO (vshnayder): since none of this code seems to be aware of the fact that
         # sometimes things go wrong, I suspect that the js client is also not
         # checking for errors on request.  Check and fix as needed.
@@ -141,8 +141,8 @@ def inline_discussion(request, course_id, discussion_id):
 
         if is_moderator:
             cohorts = get_course_cohorts(course_id)
-            for c in cohorts:
-                cohorts_list.append({'name': c.name, 'id': c.id})
+            for cohort in cohorts:
+                cohorts_list.append({'name': cohort.name, 'id': cohort.id})
 
         else:
             #students don't get to choose
@@ -174,11 +174,11 @@ def forum_form_discussion(request, course_id):
     try:
         unsafethreads, query_params = get_threads(request, course_id)   # This might process a search query
         threads = [utils.safe_content(thread) for thread in unsafethreads]
-    except (cc.utils.CommentClientMaintenanceError) as err:
+    except cc.utils.CommentClientMaintenanceError:
         log.warning("Forum is in maintenance mode")
         return render_to_response('discussion/maintenance.html', {})
     except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError) as err:
-        log.error("Error loading forum discussion threads: %s" % str(err))
+        log.error("Error loading forum discussion threads: %s", str(err))
         raise Http404
 
     user = cc.User.from_django_user(request.user)
@@ -244,7 +244,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
 
     try:
         thread = cc.Thread.find(thread_id).retrieve(recursive=True, user_id=request.user.id)
-    except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError) as err:
+    except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError):
         log.error("Error loading single thread.")
         raise Http404
 
@@ -269,7 +269,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
         try:
             threads, query_params = get_threads(request, course_id)
             threads.append(thread.to_dict())
-        except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError) as err:
+        except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError):
             log.error("Error loading single thread.")
             raise Http404
 
@@ -369,7 +369,7 @@ def user_profile(request, course_id, user_id):
             }
 
             return render_to_response('discussion/user_profile.html', context)
-    except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError) as err:
+    except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError, User.DoesNotExist):
         raise Http404
 
 
@@ -412,5 +412,5 @@ def followed_threads(request, course_id, user_id):
             }
 
             return render_to_response('discussion/user_profile.html', context)
-    except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError):
+    except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError, User.DoesNotExist):
         raise Http404

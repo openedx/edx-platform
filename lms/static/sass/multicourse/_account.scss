@@ -268,7 +268,7 @@
         @include transition(color 0.15s ease-in-out);
         display: block;
         margin-top: ($baseline/4);
-        color: tint($outer-border-color, 50%);
+        color: $lighter-base-font-color;
         font-size: em(13);
       }
 

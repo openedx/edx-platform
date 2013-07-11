@@ -1,8 +1,12 @@
-from mock import MagicMock
+# -*- coding: utf-8 -*-
 import datetime
+
+from mock import MagicMock
+from pytz import UTC
 
 from django.test import TestCase
 from django.conf import settings
+from django.http import Http404
 from django.contrib.auth.models import User
 from django.test.client import RequestFactory
 
@@ -10,7 +14,7 @@ from student.models import CourseEnrollment
 from xmodule.modulestore.django import modulestore
 
 import courseware.views as views
-from pytz import UTC
+from courseware.courses import get_course_by_id
 
 
 class Stub():
@@ -58,3 +62,15 @@ class CoursesTestCase(TestCase):
         mock_course = MagicMock()
         mock_course.id = self.course_id
         self.assertTrue(views.registered_for_course(mock_course, self.user))
+
+class CoursesTest(TestCase):
+    def test_get_course_by_id_invalid_chars(self):
+        """
+        Test that `get_course_by_id` throws a 404, rather than
+        an exception, when faced with unexpected characters 
+        (such as unicode characters, and symbols such as = and ' ')
+        """
+        with self.assertRaises(Http404):
+            get_course_by_id('MITx/foobar/statistics=introduction')
+            get_course_by_id('MITx/foobar/business and management')
+            get_course_by_id('MITx/foobar/NiñøJoséMaríáßç')

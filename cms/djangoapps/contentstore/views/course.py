@@ -153,7 +153,7 @@ def course_info(request, org, course, name, provided_id=None):
     course_module = modulestore().get_item(location)
 
     # get current updates
-    location = ['i4x', org, course, 'course_info', "updates"]
+    location = Location(['i4x', org, course, 'course_info', "updates"])
 
     return render_to_response('course_info.html', {
         'active_tab': 'courseinfo-tab',
