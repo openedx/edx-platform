@@ -42,7 +42,7 @@
                 placeholder="MM/DD/YYYY" class="date" size='15' autocomplete="off"/>
           </div>
           <div class="field field-start-time">
-            <label for="start_time">${_("Release Time")} (<abbr title="Coordinated Universal Time">UTC</abbr>)</label>
+            <label for="start_time">${_("Release Time")} (<abbr title="${_("Coordinated Universal Time")}">${_("UTC")}</abbr>)</label>
             <input type="text" id="start_time" name="start_time"
                 value="${subsection.lms.start.strftime('%H:%M') if subsection.lms.start else ''}"
                 placeholder="HH:MM" class="time" size='10' autocomplete="off"/>
@@ -50,11 +50,11 @@
         </div>
         % if subsection.lms.start and not almost_same_datetime(subsection.lms.start, parent_item.lms.start):
             % if parent_item.lms.start is None:
-            <p class="notice">${_("The date above differs from the release date of %s, which is unset.") % parent_item.display_name_with_default}
+            <p class="notice">${_("The date above differs from the release date of {name}, which is unset.").format(name=parent_item.display_name_with_default)}
             % else:
-      <p class="notice">${_("The date above differs from the release date of %s - %s") % (parent_item.display_name_with_default, get_default_time_display(parent_item.lms.start))}.
+      <p class="notice">${_("The date above differs from the release date of {name} - {start_time}").format(name=parent_item.display_name_with_default, start_time=get_default_time_display(parent_item.lms.start))}.
             % endif
-      <a href="#" class="sync-date no-spinner">${_("Sync to %s.") % parent_item.display_name_with_default}</a></p>
+      <a href="#" class="sync-date no-spinner">${_("Sync to {name}.").format(name=parent_item.display_name_with_default)}</a></p>
         % endif
       </div>
 

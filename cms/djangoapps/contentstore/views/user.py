@@ -93,7 +93,7 @@ def add_user(request, location):
     if user is None:
         msg = {
             'Status': 'Failed',
-            'ErrMsg': _("Could not find user by email address '{0}'.").format(email),
+            'ErrMsg': _("Could not find user by email address '{email}'.").format(email=email),
         }
         return JsonResponse(msg, 404)
 
@@ -101,7 +101,7 @@ def add_user(request, location):
     if not user.is_active:
         msg = {
             'Status': 'Failed',
-            'ErrMsg': _('User {0} has registered but has not yet activated his/her account.').format(email),
+            'ErrMsg': _('User {email} has registered but has not yet activated his/her account.').format(email=email),
         }
         return JsonResponse(msg, 400)
 
@@ -130,7 +130,7 @@ def remove_user(request, location):
     if user is None:
         msg = {
             'Status': 'Failed',
-            'ErrMsg': _("Could not find user by email address '{0}'.").format(email),
+            'ErrMsg': _("Could not find user by email address '{email}'.").format(email=email),
         }
         return JsonResponse(msg, 404)
 
