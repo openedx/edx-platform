@@ -576,7 +576,7 @@ function cancelNewSection(e) {
 
 function addNewCourse(e) {
     e.preventDefault();
-
+    $('.new-course-button').addClass('disabled');
     $(e.target).addClass('disabled');
     var $newCourse = $($('#new-course-template').html());
     var $cancelButton = $newCourse.find('.new-course-cancel');

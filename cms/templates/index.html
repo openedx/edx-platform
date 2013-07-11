@@ -113,6 +113,9 @@
       </div>
 
       %else:
+      <div class="courses">
+      </div>
+
       <div class="notice notice-incontext notice-instruction notice-instruction-nocourses list-notices">
         <div class="notice-item">
           <div class="msg">
@@ -144,82 +147,82 @@
       % endif
 
 
-    %if course_creator_status == "unrequested":
-    <div class="wrapper wrapper-creationrights">
-      <h3 class="title">
-        <a href="#instruction-creationrights" class="ui-toggle-control show-creationrights"><span class="label">${_('Becoming a Course Creator in Studio')}</span> <i class="icon-remove-sign"></i></a>
-      </h3>
+      %if course_creator_status == "unrequested":
+      <div class="wrapper wrapper-creationrights">
+        <h3 class="title">
+          <a href="#instruction-creationrights" class="ui-toggle-control show-creationrights"><span class="label">${_('Becoming a Course Creator in Studio')}</span> <i class="icon-remove-sign"></i></a>
+        </h3>
 
-      <div class="notice notice-incontext notice-instruction notice-instruction-creationrights ui-toggle-target" id="instruction-creationrights">
-        <div class="copy">
-          <p>${_('edX Studio is a hosted solution for our xConsortium partners and selected guests. Courses for which you are a team member appear above for you to edit, while course creator privileges are granted by edX. Our team will evaluate your request and provide you feedback within 24 hours during the work week.')}</p>
-        </div>
+        <div class="notice notice-incontext notice-instruction notice-instruction-creationrights ui-toggle-target" id="instruction-creationrights">
+          <div class="copy">
+            <p>${_('edX Studio is a hosted solution for our xConsortium partners and selected guests. Courses for which you are a team member appear above for you to edit, while course creator privileges are granted by edX. Our team will evaluate your request and provide you feedback within 24 hours during the work week.')}</p>
+          </div>
 
-        <div class="status status-creationrights is-unrequested">
-          <h4 class="title">${_('Your Course Creator Request Status:')}</h4>
+          <div class="status status-creationrights is-unrequested">
+            <h4 class="title">${_('Your Course Creator Request Status:')}</h4>
 
-          <form id="request-coursecreator" action="${request_course_creator_url}" method="post" enctype="multipart/form-data">
-            <input type="hidden" name="csrfmiddlewaretoken" value="${csrf}">
-            <div class="form-actions">
-              <button type="submit" id="request-coursecreator-submit" name="request-coursecreator-submit" class="action-primary action-request">${_('Request the Ability to Create Courses')}</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-
-    %elif course_creator_status == "denied":
-    <div class="wrapper wrapper-creationrights is-shown">
-      <h3 class="title">
-        <a href="#instruction-creationrights" class="ui-toggle-control show-creationrights"><span class="label">${_('Your Course Creator Request Status')}</span> <i class="icon-remove-sign"></i></a>
-      </h3>
-
-      <div class="notice notice-incontext notice-instruction notice-instruction-creationrights ui-toggle-target" id="instruction-creationrights">
-        <div class="copy">
-          <p>${_('edX Studio is a hosted solution for our xConsortium partners and selected guests. Courses for which you are a team member appear above for you to edit, while course creator privileges are granted by edX. Our team is has completed evaluating your request.')}</p>
-        </div>
-
-        <div class="status status-creationrights has-status is-denied">
-          <h4 class="title">${_('Your Course Creator Request Status:')}</h4>
-
-          <dl class="status-update">
-            <dt class="label">${_('Your Course Creator request is:')}</dt>
-            <dd class="value">
-              <span class="status-indicator"></span>
-              <span class="value-formal">${_('Denied')}</span>
-              <span class="value-description">${_('Your request did not meet the criteria/guidelines specified by edX Staff.')}</span>
-            </dd>
-          </dl>
+            <form id="request-coursecreator" action="${request_course_creator_url}" method="post" enctype="multipart/form-data">
+              <input type="hidden" name="csrfmiddlewaretoken" value="${csrf}">
+              <div class="form-actions">
+                <button type="submit" id="request-coursecreator-submit" name="request-coursecreator-submit" class="action-primary action-request">${_('Request the Ability to Create Courses')}</button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
-    </div>
 
-    %elif course_creator_status == "pending":
-    <div class="wrapper wrapper-creationrights is-shown">
-      <h3 class="title">
-        <a href="#instruction-creationrights" class="ui-toggle-control show-creationrights"><span class="label">${_('Your Course Creator Request Status')}</span> <i class="icon-remove-sign"></i></a>
-      </h3>
+      %elif course_creator_status == "denied":
+      <div class="wrapper wrapper-creationrights is-shown">
+        <h3 class="title">
+          <a href="#instruction-creationrights" class="ui-toggle-control current show-creationrights"><span class="label">${_('Your Course Creator Request Status')}</span> <i class="icon-remove-sign"></i></a>
+        </h3>
 
-      <div class="notice notice-incontext notice-instruction notice-instruction-creationrights ui-toggle-target" id="instruction-creationrights">
-        <div class="copy">
-          <p>${_('edX Studio is a hosted solution for our xConsortium partners and selected guests. Courses for which you are a team member appear above for you to edit, while course creator privileges are granted by edX. Our team is currently  evaluating your request.')}</p>
-        </div>
+        <div class="notice notice-incontext notice-instruction notice-instruction-creationrights ui-toggle-target" id="instruction-creationrights">
+          <div class="copy">
+            <p>${_('edX Studio is a hosted solution for our xConsortium partners and selected guests. Courses for which you are a team member appear above for you to edit, while course creator privileges are granted by edX. Our team is has completed evaluating your request.')}</p>
+          </div>
 
-        <div class="status status-creationrights has-status is-pending">
-          <h4 class="title">${_('Your Course Creator Request Status:')}</h4>
+          <div class="status status-creationrights has-status is-denied">
+            <h4 class="title">${_('Your Course Creator Request Status:')}</h4>
 
-          <dl class="status-update">
-            <dt class="label">${_('Your Course Creator request is:')}</dt>
-            <dd class="value">
-              <span class="status-indicator"></span>
-              <span class="value-formal">${_('Pending')}</span>
-              <span class="value-description">${_('Your request is currently being reviewed by edX staff and should be updated shortly.')}</span>
-            </dd>
-          </dl>
+            <dl class="status-update">
+              <dt class="label">${_('Your Course Creator request is:')}</dt>
+              <dd class="value">
+                <span class="status-indicator"></span>
+                <span class="value-formal">${_('Denied')}</span>
+                <span class="value-description">${_('Your request did not meet the criteria/guidelines specified by edX Staff.')}</span>
+              </dd>
+            </dl>
+          </div>
         </div>
       </div>
-    </div>
-    % endif
+
+      %elif course_creator_status == "pending":
+      <div class="wrapper wrapper-creationrights is-shown">
+        <h3 class="title">
+          <a href="#instruction-creationrights" class="ui-toggle-control current show-creationrights"><span class="label">${_('Your Course Creator Request Status')}</span> <i class="icon-remove-sign"></i></a>
+        </h3>
+
+        <div class="notice notice-incontext notice-instruction notice-instruction-creationrights ui-toggle-target" id="instruction-creationrights">
+          <div class="copy">
+            <p>${_('edX Studio is a hosted solution for our xConsortium partners and selected guests. Courses for which you are a team member appear above for you to edit, while course creator privileges are granted by edX. Our team is currently  evaluating your request.')}</p>
+          </div>
+
+          <div class="status status-creationrights has-status is-pending">
+            <h4 class="title">${_('Your Course Creator Request Status:')}</h4>
+
+            <dl class="status-update">
+              <dt class="label">${_('Your Course Creator request is:')}</dt>
+              <dd class="value">
+                <span class="status-indicator"></span>
+                <span class="value-formal">${_('Pending')}</span>
+                <span class="value-description">${_('Your request is currently being reviewed by edX staff and should be updated shortly.')}</span>
+              </dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+      % endif
 
     </article>
 
