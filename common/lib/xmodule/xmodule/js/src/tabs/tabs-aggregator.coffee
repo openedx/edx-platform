@@ -45,6 +45,7 @@ class @TabsEditorDescriptor
       # corresponding content
       content_id = $currentTarget.attr('href')
 
+      # Settings tab name is hardcoded!
       if $currentTarget.html() is 'Settings'
         settingsEditor = @element.find('.wrapper-comp-settings')
         editorModeButton =  @element.find('#editor-mode').find("a")

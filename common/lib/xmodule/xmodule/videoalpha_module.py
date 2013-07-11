@@ -179,7 +179,7 @@ class VideoAlphaDescriptor(VideoAlphaFields, TabsEditingDescriptor):
             'template': "videoalpha/subtitles.html",
         },
         {
-            'name': "Settings",
+            'name': "Settings",  # Do not rename settings tab.
             'template': "metadata-edit-tab.html"
         }
     ]
