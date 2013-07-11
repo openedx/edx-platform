@@ -68,6 +68,18 @@ function changeHandler(input, max_pages){
     if (input.value > max_pages) {input.value=max_pages;}
 }
 
+function filterTrigger(input, type, retain_page){
+    if (type == "org"){
+        $("#selected-org").val($($(input).children(":first")).text());
+    }
+
+    if (type == "course"){
+        $("#selected-course").val($(input).children(":first").text());
+    }
+
+    submitForms(retain_page);
+}
+
 $(document).ready(function() {
     $('.scaled-text').textfill({ maxFont: 36 });
 });

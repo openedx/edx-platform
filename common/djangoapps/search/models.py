@@ -3,6 +3,8 @@ import nltk
 import nltk.corpus as word_filter
 import string
 import sorting
+import re
+from collections import Counter
 
 
 class SearchResults:
@@ -19,6 +21,17 @@ class SearchResults:
 
     def sort_results(self):
         self.entries = sorting.sort(self.entries, self.request.GET.get("sort", None))
+
+    def get_counter(self, field):
+        master_list = [entry.data[field].lower() for entry in self.entries]
+        return Counter(master_list)
+
+    def filter(self, field, value):
+        if value is None:
+            value = ""
+        punc = re.compile('[%s]' % re.escape(string.punctuation))
+        strip_punc = lambda s: punc.sub("", s)
+        self.entries = [entry for entry in self.entries if strip_punc(value.lower()) in strip_punc(entry.data.get(field, "").lower())]
 
 
 class SearchResult:
