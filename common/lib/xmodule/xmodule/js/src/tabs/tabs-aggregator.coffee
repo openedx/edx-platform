@@ -69,7 +69,7 @@ class @TabsEditorDescriptor
         [
           $currentTarget.text(), # tab_name
           content_id,  # tab_id
-          previousTab
+          previousTab, # previous Tab name
         ]
       )
 
