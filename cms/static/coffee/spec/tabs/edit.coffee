@@ -3,7 +3,7 @@ describe "TabsEditorDescriptor", ->
     @isInactiveClass = "is-inactive"
     @isCurrent = "current"
     loadFixtures 'tabs-edit.html'
-    @descriptor = new window.TabsEditorDescriptor($('.editor-with-tabs'))
+    @descriptor = new window.TabsEditorDescriptor($('.base_wrapper'))
     window.TabsEditorDescriptor['tabs_save_functions'] = {}
     @html_id = 'test_id'
     window.TabsEditorDescriptor['tabs_save_functions'][@html_id] = {}
@@ -82,14 +82,13 @@ describe "TabsEditorDescriptor", ->
   describe "edit header properly hidden", ->
     it "hide header is True", ->
       waitsFor () ->
-        if ($('.editor-with-tabs').data('hide-header') is 'True')
-          # expect($.fn.hide).toHaveBeenCalled()
-          if ($(".component-edit-header").css('display') is 'none')
+        if (@descriptor.element.find('section.editor-with-tabs').data('hide-header') is 'True')
+          if (@descriptor.element.find(".component-edit-header").css('display') is 'none')
             return true
         else
-          if ($(".component-edit-header").css('display') isnt 'none')
+          if (@descriptor.element.find(".component-edit-header").css('display') isnt 'none')
             return true;
         return false;
       , "Timeout for header show/hide", 750
-    
+
 
