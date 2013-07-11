@@ -90,4 +90,19 @@ describe "TabsEditorDescriptor", ->
         return false;
       , "Timeout for header show/hide", 750
 
+  describe "Settings tab", ->
+    it "Clicking on Settings tab switches to settings", ->
 
+      settingsEditor = @descriptor.element.find('.wrapper-comp-settings')
+      editorModeButton =  @descriptor.element.find('#editor-mode').find("a")
+      settingsModeButton = @descriptor.element.find('#settings-mode').find("a")
+
+      console.log @descriptor
+      @descriptor.element.find('#settings-mode').find('a').trigger('click')
+
+      expect(settingsEditor.hasClass('is-active')).toBe(true)
+
+      expect(settingsModeButton.hasClass('is-set')).toBe(true)
+      expect(editorModeButton.hasClass('is-set')).toBe(false)
+
+      expect(@descriptor.element.find('.launch-latex-compiler').css('display')).toBe('none')

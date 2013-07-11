@@ -23,7 +23,7 @@ class @TabsEditorDescriptor
     currentTab.trigger("click", [true])
     @html_id = @$tabs.closest('.wrapper-comp-editor').data('html_id')
 
-   onSwitchEditor: (e, firstTime) =>
+  onSwitchEditor: (e, firstTime) =>
     e.preventDefault();
 
     isInactiveClass = TabsEditorDescriptor.isInactiveClass
