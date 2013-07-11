@@ -6,9 +6,8 @@
     class="course-checklist"
     <% } %>
     id="<%= 'course-checklist' + checklistIndex %>">
-    <% var widthPercentage = 'width:' + percentChecked + '%;'; %>
-    <span class="viz viz-checklist-status"><span class="viz value viz-checklist-status-value" style="<%= widthPercentage %>">
-        <%= _.str.sprintf(gettext('<span class="int">%d</span>%% of checklist completed'), percentChecked) %>
+    <span class="viz viz-checklist-status"><span class="viz value viz-checklist-status-value" style="width: <%= percentChecked %>%;">
+        <%= _.template(gettext("{number}% of checklists completed"), {number: '<span class="int">' + percentChecked + '</span>'}, {interpolate: /\{(.+?)\}/g}) %>
     </span></span>
     <header>
         <h3 class="checklist-title title-2 is-selectable" title="Collapse/Expand this Checklist">
