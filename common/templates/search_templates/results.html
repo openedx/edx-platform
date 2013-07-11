@@ -5,8 +5,71 @@
 	${js_link("../static/js/div_sizing.js")}
 </head>
 
+<<<<<<< HEAD
 % if debug:
     <p>"${debug}"</p>
+=======
+% if spelling_correction:
+<div class="correction_div">
+	<p class="search_correction">
+		<span>Did you mean </span>
+		<a onclick="correctionLink(event, '${spelling_correction}')">${spelling_correction}</a>
+		<span>?</span>
+	</p>
+</div>
+% endif
+
+<div class="search-results">
+    % if results == "true":
+    	% for datum in data:
+    		<a href=${datum[3]}>
+    			<section class="result">
+    				<div class="result_wrapper">
+    					<h1 class="result-title">${datum[0]}</h1>
+    					<div class="result-content">
+    						<div class="columnate">
+    							% if len(datum) >= 3:
+    								<img class="thumbnail" src="${datum[2]}" alt="${datum[0]}">
+    							% endif
+    						</div>
+    						<div class="columnate">
+    							<div class="snippet_container">
+    								<p  class="results_snippet scaled-text">
+    									${datum[1]}
+    								</p>
+    							</div>
+    						</div>
+    					</div>
+    				</div>
+    			</section>
+    		</a>
+    	% endfor
+    % else:
+        <h1 class="result-title no-results">${data[0][0]}</h1>
+    % endif
+</div>
+
+% if len(data) > 1:
+	<div class="pagination">
+		<span class="step-links">
+			% if data.number > 1:
+				<a onclick="decrementPage()">Prev</a>
+			% endif
+
+			<form id="current-page" class="auto-submit" action="/search" method="get">
+                <span class="current-page">
+				    Page 
+                    <input type="number" name="page" value="${ data.number }" onkeydown="searchHandle(event, true)" onchange="changeHandler(this, ${data.paginator.num_pages})"/> 
+                    of ${ data.paginator.num_pages }
+                </span>
+			</form> 
+
+			% if data.number < data.paginator.num_pages:
+				<a onclick="incrementPage()">Next</a>
+			%endif
+		</span>
+	</div>
+>>>>>>> Added extra javascript for performant and smooth user interaction
 % endif
 
 % if spelling_correction:

@@ -84,7 +84,48 @@
 				<input type="radio" name="content" value="problem">Problems
 				<input type="radio" name="content" value="slide" checked>Slides
 			% endif
+<<<<<<< HEAD
 		</span>
+=======
+		</div>
+=======
+	<span>
+        <form id="query-box" class="auto-submit" action="/search" method="get">
+    		<div class="searchbox-wrapper">
+    			% if old_query:
+    			<input type="text" id="searchbox" class="searchbox" name="s" value="${old_query}" onkeydown="searchHandle(event, false)"/>
+    			% else:
+    			<input type="text" id="searchbox" class="searchbox" name="s" value="" onkeydown="searchHandle(event, false)"/>
+    			% endif
+    			<div class="searchbox_submit">
+    				<input type="submit" value="" onclick="clickHandle(event, false)"/>
+    			</div>
+    		</div>
+        </form>
+
+        <form id="content-select" class="auto-submit" action="/search" method="get">
+    		<div class="content-select">
+    			% if previous.get("transcript", "false") == "true":
+    				<input type="checkbox" class="content" name="transcript" value="true" checked>Videos
+                % else:
+                    <input type="checkbox" class="content" name="transcript" value="true">Videos
+                % endif
+
+                % if previous.get("problem", "false") == "true":
+    				<input type="checkbox" class="content" name="problem" value="true" checked>Problems
+    			% else:
+                    <input type="checkbox" class="content" name="problem" value="true">Problems
+    			% endif
+
+                % if previous.get("pdf", "false") == "true":
+                    <input type="checkbox" class="content" name="pdf" value="true" checked>PDFs
+                % else:
+                    <input type="checkbox" class="content" name="pdf" value="true"> PDFs
+    			% endif
+    		</div>
+        </form>
+>>>>>>> Changed search across content to work on checkboxes instead of radio buttons and associated functionality
+>>>>>>> Added extra javascript for performant and smooth user interaction
 	</span>
 	</form>
 </div>

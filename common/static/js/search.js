@@ -23,7 +23,11 @@ function correctionLink(event, spelling_correction){
 
 function submitForms(retain_page) {
     var get_data = [];
+<<<<<<< HEAD
     var form_list = $(".auto-submit .parameter");
+=======
+    var form_list = $(".auto-submit input");
+>>>>>>> Added extra javascript for performant and smooth user interaction
     for (var i in form_list){
         get_data.push.apply(get_data, form_list.eq(i).serializeArray());
     }
