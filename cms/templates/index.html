@@ -5,6 +5,9 @@
 <%block name="title">${_("My Courses")}</%block>
 <%block name="bodyclass">is-signedin index dashboard</%block>
 
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.js"></script>
+<script src="http://malsup.github.com/jquery.form.js"></script>
+
 <%block name="header_extras">
   <script type="text/template" id="new-course-template">
     <section class="new-course">
@@ -43,6 +46,10 @@
         $('.show-creationrights').click(function(e){
             (e).preventDefault();
             $(this).closest('.wrapper-creationrights').toggleClass('is-shown').find('.ui-toggle-control').toggleClass('current');
+        });
+
+        $('#request-coursecreator').ajaxForm(function() {
+            location.reload();
         });
     });
 </script>
@@ -151,10 +158,8 @@
         <div class="status status-creationrights is-unrequested">
           <h4 class="title">${_('Your Course Creator Request Status:')}</h4>
 
-          <form id="request-coursecreator" action="request_course_creator_post" method="post">
-            <input type="hidden" id="request-coursecreator-user" name="request-coursecreator-user" value="${ user.username }" />
-            <input type="hidden" id="request-coursecreator-status" name="request-coursecreator-status" value="Requested" />
-
+          <form id="request-coursecreator" action="${request_course_creator_url}" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="csrfmiddlewaretoken" value="${csrf}">
             <div class="form-actions">
               <button type="submit" id="request-coursecreator-submit" name="request-coursecreator-submit" class="action-primary action-request">${_('Request the Ability to Create Courses')}</button>
             </div>

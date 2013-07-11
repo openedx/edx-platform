@@ -60,12 +60,14 @@ def post_save_callback(sender, **kwargs):
     # We only wish to modify the state_changed time if the state has been modified. We don't wish to
     # modify it for changes to the notes field.
     if instance.state != instance.orig_state:
-        update_creator_state.send(
-            sender=sender,
-            caller=instance.admin,
-            user=instance.user,
-            add=instance.state == CourseCreator.GRANTED
-        )
+        if hasattr(instance, 'admin'):
+            update_creator_state.send(
+                sender=sender,
+                caller=instance.admin,
+                user=instance.user,
+                add=instance.state == CourseCreator.GRANTED
+            )
+        # TODO: Else must be sure that state change does not switch to or from granted
         instance.state_changed = timezone.now()
         instance.orig_state = instance.state
         instance.save()

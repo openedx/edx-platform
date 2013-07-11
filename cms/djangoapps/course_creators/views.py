@@ -60,6 +60,17 @@ def get_course_creator_status(user):
         return user[0].state
 
 
+def user_requested_access(user):
+    """
+    User has requested course creator access.
+
+    This changes the user state to CourseCreator.PENDING.
+    """
+    user = CourseCreator.objects.get(user=user)
+    user.state = CourseCreator.PENDING
+    user.save()
+
+
 def _add_user(user, state):
     """
     Adds a user to the course creator table with the specified state.
