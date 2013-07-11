@@ -343,8 +343,17 @@ class @PeerGradingProblem
   submission_callback: (response) =>
     if response.success
       @is_calibrated_check()
+      required = @grading_wrapper.data('required')
+      graded = @grading_wrapper.data('graded')+1
+      @grading_wrapper.data('graded', graded)
+      @grading_wrapper.attr('data-graded', graded) #just in case someone wants to read the DOM
+      message = "<p>Successfully saved your feedback. Fetched the next essay.</p>"
+      if graded >= required
+        message = "<p>Successfully saved your feedback. Fetched the next essay.
+          <b>You have completed the required number of peer evaluations, but may
+          choose to continue grading if you'd like.</b></p>"
       @grading_message.fadeIn()
-      @grading_message.html("<p>Successfully saved your feedback. Fetched the next essay.</p>")
+      @grading_message.html(message)
     else
       if response.error
         @render_error(response.error)
