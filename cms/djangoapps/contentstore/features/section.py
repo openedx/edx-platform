@@ -42,6 +42,12 @@ def i_save_a_new_section_release_date(_step):
     world.browser.click_link_by_text('Save')
 
 
+@step('I see a "saving" notification')
+def i_see_a_saving_notification(step):
+    saving_css = '.wrapper-notification-saving'
+    assert world.is_css_present(saving_css)
+
+
 ############ ASSERTIONS ###################
 
 

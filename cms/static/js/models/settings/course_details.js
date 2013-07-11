@@ -63,13 +63,13 @@ CMS.Models.Settings.CourseDetails = Backbone.Model.extend({
     },
 
     _videokey_illegal_chars : /[^a-zA-Z0-9_-]/g,
-    save_videosource: function(newsource) {
+    set_videosource: function(newsource) {
         // newsource either is <video youtube="speed:key, *"/> or just the "speed:key, *" string
         // returns the videosource for the preview which iss the key whose speed is closest to 1
-        if (_.isEmpty(newsource) && !_.isEmpty(this.get('intro_video'))) this.save({'intro_video': null});
+        if (_.isEmpty(newsource) && !_.isEmpty(this.get('intro_video'))) this.set({'intro_video': null}, {validate: true});
         // TODO remove all whitespace w/in string
         else {
-            if (this.get('intro_video') !== newsource) this.save('intro_video', newsource);
+            if (this.get('intro_video') !== newsource) this.set('intro_video', newsource, {validate: true});
         }
 
         return this.videosourceSample();

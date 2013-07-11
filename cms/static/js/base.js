@@ -712,6 +712,10 @@ function saveSetSectionScheduleDate(e) {
         'start': start
     });
 
+    var saving = new CMS.Views.Notification.Mini({
+        title: gettext("Saving") + "&hellip;",
+    });
+    saving.show();
     // call into server to commit the new order
     $.ajax({
         url: "/save_item",
@@ -738,16 +742,7 @@ function saveSetSectionScheduleDate(e) {
             '" data-date="' + input_date +
             '" data-time="' + input_time +
             '" data-id="' + id + '">' + gettext('Edit') + '</a>');
-        $thisSection.find('.section-published-date').animate({
-            'background-color': 'rgb(182,37,104)'
-        }, 300).animate({
-            'background-color': '#edf1f5'
-        }, 300).animate({
-            'background-color': 'rgb(182,37,104)'
-        }, 300).animate({
-            'background-color': '#edf1f5'
-        }, 300);
-
         hideModal();
+        saving.hide();
     });
 }
