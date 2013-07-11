@@ -6,38 +6,26 @@ from lettuce import world, step
 
 @step('I fill in "([^"]*)" on the registration form with "([^"]*)"$')
 def when_i_fill_in_field_on_the_registration_form_with_value(step, field, value):
-    attempt = 0
-    while attempt < 5:
-        try:
-            register_form = world.browser.find_by_css('form#register-form')
-            form_field = register_form.find_by_name(field)
-            form_field.fill(value)
-            break
-        except:
-            attempt += 1
+    def fill_in_registration():
+        register_form = world.browser.find_by_css('form#register-form')
+        form_field = register_form.find_by_name(field)
+        form_field.fill(value)
+    world.retry_on_exception(fill_in_registration)
 
 
 @step('I submit the registration form$')
 def i_press_the_button_on_the_registration_form(step):
-    attempt = 0
-    while attempt < 5:
-        try:
-            register_form = world.browser.find_by_css('form#register-form')
-            register_form.find_by_name('submit').click()
-            break
-        except:
-            attempt += 1
+    def submit_registration():
+        register_form = world.browser.find_by_css('form#register-form')
+        register_form.find_by_name('submit').click()
+    world.retry_on_exception(submit_registration)
 
 
 @step('I check the checkbox named "([^"]*)"$')
 def i_check_checkbox(step, checkbox):
-    attempt = 0
-    while attempt < 5:
-        try:
-            world.browser.find_by_name(checkbox).check()
-            break
-        except:
-            attempt += 1
+    def check_box():
+        world.browser.find_by_name(checkbox).check()
+    world.retry_on_exception(check_box)
 
 
 @step('I should see "([^"]*)" in the dashboard banner$')

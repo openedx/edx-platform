@@ -249,7 +249,7 @@ def css_visible(css_selector, index=0, max_attempts=5):
     attempt = 0
     while attempt < max_attempts:
         try:
-            return world.browser.find_by_css(css_selector)[index].visible
+            return
         except:
             attempt += 1
     assert_true(attempt < max_attempts, 'Ran out of attempts to access {}'.format(css_selector))
@@ -299,3 +299,14 @@ def click_tools():
 @world.absorb
 def is_mac():
     return platform.mac_ver()[0] is not ''
+
+
+@world.absorb
+def retry_on_exception(func, max_attempts=5):
+    attempts = 0
+    while attempts < max_attempts:
+        try:
+            return func()
+            break
+        except:
+            attempts += 1
