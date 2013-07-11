@@ -43,15 +43,19 @@
 	<section class="pagination">
 		<span class="step-links">
 			% if data.number > 1:
-				<a href="${ prev_page }">Prev</a>
+				<a onclick="decrementPage()">Prev</a>
 			% endif
 
-			<span class="current">
-				Page ${ data.number } of ${ data.paginator.num_pages }
-			</span> 
+			<form id="current-page" class="auto-submit" action="/search" method="get">
+                <span class="current-page">
+				    Page 
+                    <input type="number" name="page" value="${ data.number }" onkeydown="searchHandle(event, true)" onchange="changeHandler(this, ${data.paginator.num_pages})"/> 
+                    of ${ data.paginator.num_pages }
+                </span>
+			</form> 
 
 			% if data.number < data.paginator.num_pages:
-				<a href="${next_page}">Next</a>
+				<a onclick="incrementPage()">Next</a>
 			%endif
 		</span>
 	</section>
