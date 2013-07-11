@@ -1824,7 +1824,7 @@ class FormulaResponse(LoncapaResponse):
                 log.debug('formularesponse: error %s in formula', err)
                 raise StudentInputError("Invalid input: Could not parse '%s' as a formula" %
                                         cgi.escape(answer))
-        return tuple(out)
+        return out
 
     def randomize_variables(self, samples):
         """
