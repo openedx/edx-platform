@@ -87,13 +87,13 @@
 	              %if show_courseware_link:
                     <a href="${course_target}">
                 %endif
-                <span class="register disabled">${_("You are registered for this course %s") % course.number}</span>
+                <span class="register disabled">${_("You are registered for this course {course_number}").format(course_number=course.number)}</span>
                 %if show_courseware_link:
                     <strong>${_("View Courseware")}</strong>
                     </a>
                 %endif
         %else:
-            <a href="#" class="register">${_("Register for %s") % course.number}</a>
+            <a href="#" class="register">${_("Register for {course_number}").format(course_number=course.number)}</a>
             <div id="register_error"></div>
         %endif
         </div>
