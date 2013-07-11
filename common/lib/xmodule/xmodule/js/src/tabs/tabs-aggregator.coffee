@@ -5,7 +5,7 @@ class @TabsEditorDescriptor
   constructor: (element) ->
     @element = element;
 
-    if @element.find('section.editor').data('hide-header') is 'True'
+    if @element.find('section.editor-with-tabs').data('hide-header') is 'True'
       $('.component-edit-header').hide()
     else
       $('.component-edit-header').show()
