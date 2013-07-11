@@ -20,22 +20,20 @@
 % endif
 
 <div class="search-results">
-    % if results == "true":
+    % if results == True:
     	% for datum in data:
-    		<a href=${datum[3]}>
+    		<a href=${datum.data["url"]}>
     			<section class="result">
     				<div class="result_wrapper">
-    					<h1 class="result-title">${datum[0]}</h1>
+    					<h1 class="result-title">${datum.data['display_name']}</h1>
     					<div class="result-content">
     						<div class="columnate">
-    							% if len(datum) >= 3:
-    								<img class="thumbnail" src="${datum[2]}" alt="${datum[0]}">
-    							% endif
+    							<img class="thumbnail" src="${datum.data['thumbnail']}" alt="${datum.data['display_name']}">
     						</div>
     						<div class="columnate">
     							<div class="snippet_container">
     								<p  class="results_snippet scaled-text">
-    									${datum[1]}
+    									${datum.data['snippets']}
     								</p>
     							</div>
     						</div>
@@ -45,7 +43,7 @@
     		</a>
     	% endfor
     % else:
-        <h1 class="result-title no-results">${data[0][0]}</h1>
+        <h1 class="result-title no-results">"No results found, please try again"</h1>
     % endif
 </div>
 
