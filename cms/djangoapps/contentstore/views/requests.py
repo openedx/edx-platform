@@ -1,5 +1,3 @@
-import json
-
 from django.http import HttpResponse
 from mitxmako.shortcuts import render_to_string, render_to_response
 
@@ -22,28 +20,6 @@ def event(request):
     console logs don't get distracted :-)
     '''
     return HttpResponse(status=204)
-
-
-def get_request_method(request):
-    """
-    Using HTTP_X_HTTP_METHOD_OVERRIDE, in the request metadata, determine
-    what type of request came from the client, and return it.
-    """
-    # NB: we're setting Backbone.emulateHTTP to true on the client so everything comes as a post!!!
-    if request.method == 'POST' and 'HTTP_X_HTTP_METHOD_OVERRIDE' in request.META:
-        real_method = request.META['HTTP_X_HTTP_METHOD_OVERRIDE']
-    else:
-        real_method = request.method
-
-    return real_method
-
-
-def create_json_response(errmsg=None):
-    if errmsg is not None:
-        resp = HttpResponse(json.dumps({'Status': 'Failed', 'ErrMsg': errmsg}))
-    else:
-        resp = HttpResponse(json.dumps({'Status': 'OK'}))
-    return resp
 
 
 def render_from_lms(template_name, dictionary, context=None, namespace='main'):

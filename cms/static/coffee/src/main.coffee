@@ -3,6 +3,8 @@ AjaxPrefix.addAjaxPrefix(jQuery, -> CMS.prefix)
 @CMS =
   Models: {}
   Views: {}
+  Collections: {}
+  URL: {}
 
   prefix: $("meta[name='path_prefix']").attr('content')
 
@@ -17,14 +19,17 @@ $ ->
 
   $(document).ajaxError (event, jqXHR, ajaxSettings, thrownError) ->
     if ajaxSettings.notifyOnError is false
-      return
+        return
     if jqXHR.responseText
+      try
+        message = JSON.parse(jqXHR.responseText).error
+      catch error
         message = _.str.truncate(jqXHR.responseText, 300)
     else
-        message = gettext("This may be happening because of an error with our server or your internet connection. Try refreshing the page or making sure you are online.")
+      message = gettext("This may be happening because of an error with our server or your internet connection. Try refreshing the page or making sure you are online.")
     msg = new CMS.Views.Notification.Error(
-        "title": gettext("Studio's having trouble saving your work")
-        "message": message
+      "title": gettext("Studio's having trouble saving your work")
+      "message": message
     )
     msg.show()
 

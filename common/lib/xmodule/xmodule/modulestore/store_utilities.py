@@ -2,6 +2,8 @@ from xmodule.contentstore.content import StaticContent
 from xmodule.modulestore import Location
 from xmodule.modulestore.mongo import MongoModuleStore
 
+import logging
+
 
 def clone_course(modulestore, contentstore, source_location, dest_location, delete_original=False):
     # first check to see if the modulestore is Mongo backed
@@ -102,10 +104,38 @@ def clone_course(modulestore, contentstore, source_location, dest_location, dele
     return True
 
 
+def _delete_modules_except_course(modulestore, modules, source_location, commit):
+    """
+    This helper method will just enumerate through a list of modules and delete them, except for the
+    top-level course module
+    """
+    for module in modules:
+        if module.category != 'course':
+            logging.warning("Deleting {0}...".format(module.location))
+            if commit:
+                # sanity check. Make sure we're not deleting a module in the incorrect course
+                if module.location.org != source_location.org or module.location.course != source_location.course:
+                    raise Exception('Module {0} is not in same namespace as {1}. This should not happen! Aborting...'.format(module.location, source_location))
+                modulestore.delete_item(module.location)
+
+
+def _delete_assets(contentstore, assets, commit):
+    """
+    This helper method will enumerate through a list of assets and delete them
+    """
+    for asset in assets:
+        asset_loc = Location(asset["_id"])
+        id = StaticContent.get_id_from_location(asset_loc)
+        logging.warning("Deleting {0}...".format(id))
+        if commit:
+            contentstore.delete(id)
+
+
 def delete_course(modulestore, contentstore, source_location, commit=False):
-    # first check to see if the modulestore is Mongo backed
-    if not isinstance(modulestore, MongoModuleStore):
-        raise Exception("Expected a MongoModuleStore in the runtime. Aborting....")
+    """
+    This method will actually do the work to delete all content in a course in a MongoDB backed
+    courseware store. BE VERY CAREFUL, this is not reversable.
+    """
 
     # check to see if the source course is actually there
     if not modulestore.has_item(source_location):
@@ -113,30 +143,19 @@ def delete_course(modulestore, contentstore, source_location, commit=False):
 
     # first delete all of the thumbnails
     thumbs = contentstore.get_all_content_thumbnails_for_course(source_location)
-    for thumb in thumbs:
-        thumb_loc = Location(thumb["_id"])
-        id = StaticContent.get_id_from_location(thumb_loc)
-        print "Deleting {0}...".format(id)
-        if commit:
-            contentstore.delete(id)
+    _delete_assets(contentstore, thumbs, commit)
 
     # then delete all of the assets
     assets = contentstore.get_all_content_for_course(source_location)
-    for asset in assets:
-        asset_loc = Location(asset["_id"])
-        id = StaticContent.get_id_from_location(asset_loc)
-        print "Deleting {0}...".format(id)
-        if commit:
-            contentstore.delete(id)
+    _delete_assets(contentstore, assets, commit)
 
     # then delete all course modules
     modules = modulestore.get_items([source_location.tag, source_location.org, source_location.course, None, None, None])
+    _delete_modules_except_course(modulestore, modules, source_location, commit)
 
-    for module in modules:
-        if module.category != 'course':   # save deleting the course module for last
-            print "Deleting {0}...".format(module.location)
-            if commit:
-                modulestore.delete_item(module.location)
+    # then delete all draft course modules
+    modules = modulestore.get_items([source_location.tag, source_location.org, source_location.course, None, None, 'draft'])
+    _delete_modules_except_course(modulestore, modules, source_location, commit)
 
     # finally delete the top-level course module itself
     print "Deleting {0}...".format(source_location)
@@ -144,4 +163,3 @@ def delete_course(modulestore, contentstore, source_location, commit=False):
         modulestore.delete_item(source_location)
 
     return True
-

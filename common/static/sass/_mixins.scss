@@ -117,7 +117,7 @@
 // extends - buttons
 .btn {
   @include box-sizing(border-box);
-  @include transition(color 0.25s ease-in-out, border-color 0.25s ease-in-out, background 0.25s ease-in-out, box-shadow 0.25s ease-in-out);
+  @include transition(color 0.25s ease-in-out 0s, border-color 0.25s ease-in-out 0s, background 0.25s ease-in-out 0s, box-shadow 0.25s ease-in-out 0s);
   display: inline-block;
   cursor: pointer;
 
@@ -140,11 +140,11 @@
 
 // pill button
 .btn-pill {
-  @include border-radius($baseline/5);
+  border-radius: ($baseline/5);
 }
 
 .btn-rounded {
-  @include border-radius($baseline/2);
+  border-radius: ($baseline/2);
 }
 
 // primary button
@@ -158,14 +158,14 @@
   text-align: center;
 
   &:hover, &:active {
-    @include box-shadow(0 2px 1px $shadow-l1);
+    box-shadow: 0 2px 1px $shadow-l1;
   }
 
   &.current, &.active {
-    @include box-shadow(inset 1px 1px 2px $shadow-d1);
+    box-shadow: inset 1px 1px 2px $shadow-d1;
 
     &:hover, &:active {
-      @include box-shadow(inset 1px 1px 1px $shadow-d1);
+      box-shadow: inset 1px 1px 1px $shadow-d1;
     }
   }
 }
@@ -190,9 +190,54 @@
   }
 }
 
-// UI archetypes - well
-.ui-well {
-  @include box-shadow(inset 0 1px 2px 1px $shadow);
-  padding: ($baseline*0.75);
+.btn-flat-outline {
+  @extend .t-action4;
+  @include transition(all .15s);
+  font-weight: 600;
+  text-align: center;
+  border-radius: ($baseline/4);
+  border: 1px solid $blue-l2;
+  padding: 1px ($baseline/2) 2px ($baseline/2);
+  background-color: $white;
+  color: $blue-l2;
+
+  &:hover {
+    border: 1px solid $blue;
+    background-color: $blue;
+    color: $white;
+  }
+
+  &.is-disabled,
+  &[disabled="disabled"]{
+   border: 1px solid $gray-l2;
+   background-color: $gray-l4;
+   color: $gray-l2;
+   pointer-events: none;
+  }
 }
 
+// button with no button shell until hover for understated actions
+.btn-non {
+  @include transition(all .15s);
+  border: none;
+  border-radius: ($baseline/4);
+  background: none;
+  padding: 3px ($baseline/2);
+  vertical-align: middle;
+  color: $gray-l1;
+
+  &:hover {
+    background-color: $gray-l1;
+    color: $white;
+  }
+
+  span {
+    @extend .text-sr;
+  }
+}
+
+// UI archetypes - well
+.ui-well {
+  box-shadow: inset 0 1px 2px 1px $shadow;
+  padding: ($baseline*0.75);
+}

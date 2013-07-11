@@ -292,8 +292,8 @@ section.open-ended-child {
       padding: 9px 15px 20px;
       background: #FFF;
       position: relative;
-      @include box-shadow(inset 0 0 0 1px #eee);
-      @include border-radius(3px);
+      box-shadow: inset 0 0 0 1px #eee;
+      border-radius: 3px;
 
       &:empty {
         display: none;
@@ -577,7 +577,7 @@ section.open-ended-child {
     margin-top: 20px;
 
     input.save {
-      @extend .blue-button;
+      @extend .blue-button !optional;
     }
 
     .submission_feedback {
@@ -649,7 +649,7 @@ section.open-ended-child {
 
           input[type=radio]:checked + label {
               background: #666;
-              color: white; 
+              color: white;
           }
           input[class='grade-selection'] {
               display: none;

@@ -36,7 +36,7 @@ def get_course_groupname_for_role(location, role):
 
 def get_users_in_course_group_by_role(location, role):
     groupname = get_course_groupname_for_role(location, role)
-    (group, created) = Group.objects.get_or_create(name=groupname)
+    (group, _created) = Group.objects.get_or_create(name=groupname)
     return group.user_set.all()
 
 
@@ -59,6 +59,7 @@ def create_new_course_group(creator, location, role):
 
     return
 
+
 def _delete_course_group(location):
     """
     This is to be called only by either a command line code path or through a app which has already
@@ -74,6 +75,7 @@ def _delete_course_group(location):
     for user in staff.user_set.all():
         user.groups.remove(staff)
         user.save()
+
 
 def _copy_course_group(source, dest):
     """
@@ -205,3 +207,29 @@ def is_user_in_creator_group(user):
         return user.groups.filter(name=COURSE_CREATOR_GROUP_NAME).count() > 0
 
     return True
+
+
+def get_users_with_instructor_role():
+    """
+    Returns all users with the role 'instructor'
+    """
+    return _get_users_with_role(INSTRUCTOR_ROLE_NAME)
+
+
+def get_users_with_staff_role():
+    """
+    Returns all users with the role 'staff'
+    """
+    return _get_users_with_role(STAFF_ROLE_NAME)
+
+
+def _get_users_with_role(role):
+    """
+    Returns all users with the specified role.
+    """
+    users = set()
+    for group in Group.objects.all():
+        if group.name.startswith(role + "_"):
+            for user in group.user_set.all():
+                users.add(user)
+    return users

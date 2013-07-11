@@ -16,13 +16,19 @@ DEBUG = True
 # Disable warnings for acceptance tests, to make the logs readable
 import logging
 logging.disable(logging.ERROR)
+import os
+import random
+
+
+def seed():
+    return os.getppid()
 
 # Use the mongo store for acceptance tests
 modulestore_options = {
     'default_class': 'xmodule.raw_module.RawDescriptor',
     'host': 'localhost',
-    'db': 'test_xmodule',
-    'collection': 'acceptance_modulestore',
+    'db': 'acceptance_xmodule',
+    'collection': 'acceptance_modulestore_%s' % seed(),
     'fs_root': TEST_ROOT / "data",
     'render_template': 'mitxmako.shortcuts.render_to_string',
 }
@@ -42,7 +48,7 @@ CONTENTSTORE = {
     'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
     'OPTIONS': {
         'host': 'localhost',
-        'db': 'test_xmodule',
+        'db': 'acceptance_xcontent_%s' % seed(),
     }
 }
 
@@ -52,14 +58,14 @@ CONTENTSTORE = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': TEST_ROOT / "db" / "test_mitx.db",
-        'TEST_NAME': TEST_ROOT / "db" / "test_mitx.db",
+        'NAME': TEST_ROOT / "db" / "test_mitx_%s.db" % seed(),
+        'TEST_NAME': TEST_ROOT / "db" / "test_mitx_%s.db" % seed(),
     }
 }
 
 # Set up XQueue information so that the lms will send
 # requests to a mock XQueue server running locally
-XQUEUE_PORT = 8027
+XQUEUE_PORT = random.randint(1024, 65535)
 XQUEUE_INTERFACE = {
     "url": "http://127.0.0.1:%d" % XQUEUE_PORT,
     "django_auth": {
@@ -76,4 +82,5 @@ MITX_FEATURES['STUB_VIDEO_FOR_TESTING'] = True
 # Include the lettuce app for acceptance testing, including the 'harvest' django-admin command
 INSTALLED_APPS += ('lettuce.django',)
 LETTUCE_APPS = ('courseware',)
+LETTUCE_SERVER_PORT = random.randint(1024, 65535)
 LETTUCE_BROWSER = 'chrome'

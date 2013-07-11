@@ -200,7 +200,7 @@ def instructor_dashboard(request, course_id):
                 cmd = "cd {0}; git reset --hard HEAD; git clean -f -d; git pull origin; chmod g+w course.xml".format(gdir)
                 msg += "git pull on {0}:<p>".format(data_dir)
                 msg += "<pre>{0}</pre></p>".format(escape(os.popen(cmd).read()))
-                track.views.server_track(request, 'git pull {0}'.format(data_dir), {}, page='idashboard')
+                track.views.server_track(request, "git-pull", {"directory": data_dir}, page="idashboard")
 
         if 'Reload course' in action:
             log.debug('reloading {0} ({1})'.format(course_id, course))
@@ -208,7 +208,7 @@ def instructor_dashboard(request, course_id):
                 data_dir = getattr(course, 'data_dir')
                 modulestore().try_load_course(data_dir)
                 msg += "<br/><p>Course reloaded from {0}</p>".format(data_dir)
-                track.views.server_track(request, 'reload {0}'.format(data_dir), {}, page='idashboard')
+                track.views.server_track(request, "reload", {"directory": data_dir}, page="idashboard")
                 course_errors = modulestore().get_item_errors(course.location)
                 msg += '<ul>'
                 for cmsg, cerr in course_errors:
@@ -221,37 +221,38 @@ def instructor_dashboard(request, course_id):
         log.debug(action)
         datatable = get_student_grade_summary_data(request, course, course_id, get_grades=False, use_offline=use_offline)
         datatable['title'] = 'List of students enrolled in {0}'.format(course_id)
-        track.views.server_track(request, 'list-students', {}, page='idashboard')
+        track.views.server_track(request, "list-students", {}, page="idashboard")
 
     elif 'Dump Grades' in action:
         log.debug(action)
         datatable = get_student_grade_summary_data(request, course, course_id, get_grades=True, use_offline=use_offline)
         datatable['title'] = 'Summary Grades of students enrolled in {0}'.format(course_id)
-        track.views.server_track(request, 'dump-grades', {}, page='idashboard')
+        track.views.server_track(request, "dump-grades", {}, page="idashboard")
 
     elif 'Dump all RAW grades' in action:
         log.debug(action)
         datatable = get_student_grade_summary_data(request, course, course_id, get_grades=True,
                                                    get_raw_scores=True, use_offline=use_offline)
         datatable['title'] = 'Raw Grades of students enrolled in {0}'.format(course_id)
-        track.views.server_track(request, 'dump-grades-raw', {}, page='idashboard')
+        track.views.server_track(request, "dump-grades-raw", {}, page="idashboard")
 
     elif 'Download CSV of all student grades' in action:
-        track.views.server_track(request, 'dump-grades-csv', {}, page='idashboard')
+        track.views.server_track(request, "dump-grades-csv", {}, page="idashboard")
         return return_csv('grades_{0}.csv'.format(course_id),
                           get_student_grade_summary_data(request, course, course_id, use_offline=use_offline))
 
     elif 'Download CSV of all RAW grades' in action:
-        track.views.server_track(request, 'dump-grades-csv-raw', {}, page='idashboard')
+        track.views.server_track(request, "dump-grades-csv-raw", {}, page="idashboard")
         return return_csv('grades_{0}_raw.csv'.format(course_id),
                           get_student_grade_summary_data(request, course, course_id, get_raw_scores=True, use_offline=use_offline))
 
     elif 'Download CSV of answer distributions' in action:
-        track.views.server_track(request, 'dump-answer-dist-csv', {}, page='idashboard')
+        track.views.server_track(request, "dump-answer-dist-csv", {}, page="idashboard")
         return return_csv('answer_dist_{0}.csv'.format(course_id), get_answers_distribution(request, course_id))
 
     elif 'Dump description of graded assignments configuration' in action:
-        track.views.server_track(request, action, {}, page='idashboard')
+        # what is "graded assignments configuration"?
+        track.views.server_track(request, "dump-graded-assignments-config", {}, page="idashboard")
         msg += dump_grading_context(course)
 
     elif "Rescore ALL students' problem submissions" in action:
@@ -262,8 +263,7 @@ def instructor_dashboard(request, course_id):
             if instructor_task is None:
                 msg += '<font color="red">Failed to create a background task for rescoring "{0}".</font>'.format(problem_url)
             else:
-                track_msg = 'rescore problem {problem} for all students in {course}'.format(problem=problem_url, course=course_id)
-                track.views.server_track(request, track_msg, {}, page='idashboard')
+                track.views.server_track(request, "rescore-all-submissions", {"problem": problem_url, "course": course_id}, page="idashboard")
         except ItemNotFoundError as e:
             msg += '<font color="red">Failed to create a background task for rescoring "{0}": problem not found.</font>'.format(problem_url)
         except Exception as e:
@@ -278,8 +278,7 @@ def instructor_dashboard(request, course_id):
             if instructor_task is None:
                 msg += '<font color="red">Failed to create a background task for resetting "{0}".</font>'.format(problem_url)
             else:
-                track_msg = 'reset problem {problem} for all students in {course}'.format(problem=problem_url, course=course_id)
-                track.views.server_track(request, track_msg, {}, page='idashboard')
+                track.views.server_track(request, "reset-all-attempts", {"problem": problem_url, "course": course_id}, page="idashboard")
         except ItemNotFoundError as e:
             log.error('Failure to reset: unknown problem "{0}"'.format(e))
             msg += '<font color="red">Failed to create a background task for resetting "{0}": problem not found.</font>'.format(problem_url)
@@ -332,9 +331,8 @@ def instructor_dashboard(request, course_id):
                 try:
                     student_module.delete()
                     msg += "<font color='red'>Deleted student module state for %s!</font>" % module_state_key
-                    track_format = 'delete student module state for problem {problem} for student {student} in {course}'
-                    track_msg = track_format.format(problem=problem_url, student=unique_student_identifier, course=course_id)
-                    track.views.server_track(request, track_msg, {}, page='idashboard')
+                    event = {"problem": problem_url, "student": unique_student_identifier, "course": course_id}
+                    track.views.server_track(request, "delete-student-module-state", event, page="idashboard")
                 except:
                     msg += "Failed to delete module state for %s/%s" % (unique_student_identifier, problem_urlname)
             elif "Reset student's attempts" in action:
@@ -348,13 +346,12 @@ def instructor_dashboard(request, course_id):
                     # save
                     student_module.state = json.dumps(problem_state)
                     student_module.save()
-                    track_format = '{instructor} reset attempts from {old_attempts} to 0 for {student} on problem {problem} in {course}'
-                    track_msg = track_format.format(old_attempts=old_number_of_attempts,
-                                                    student=student,
-                                                    problem=student_module.module_state_key,
-                                                    instructor=request.user,
-                                                    course=course_id)
-                    track.views.server_track(request, track_msg, {}, page='idashboard')
+                    event = {"old_attempts": old_number_of_attempts,
+                             "student": student,
+                             "problem": student_module.module_state_key,
+                             "instructor": request.user,
+                             "course": course_id}
+                    track.views.server_track(request, "reset-student-attempts", event, page="idashboard")
                     msg += "<font color='green'>Module state successfully reset!</font>"
                 except:
                     msg += "<font color='red'>Couldn't reset module state.  </font>"
@@ -365,8 +362,7 @@ def instructor_dashboard(request, course_id):
                     if instructor_task is None:
                         msg += '<font color="red">Failed to create a background task for rescoring "{0}" for student {1}.</font>'.format(module_state_key, unique_student_identifier)
                     else:
-                        track_msg = 'rescore problem {problem} for student {student} in {course}'.format(problem=module_state_key, student=unique_student_identifier, course=course_id)
-                        track.views.server_track(request, track_msg, {}, page='idashboard')
+                        track.views.server_track(request, "rescore-student-submission", {"problem": module_state_key, "student": unique_student_identifier, "course": course_id}, page="idashboard")
                 except Exception as e:
                     log.exception("Encountered exception from rescore: {0}")
                     msg += '<font color="red">Failed to create a background task for rescoring "{0}": {1}.</font>'.format(module_state_key, e.message)
@@ -378,13 +374,7 @@ def instructor_dashboard(request, course_id):
         msg += message
         if student is not None:
             progress_url = reverse('student_progress', kwargs={'course_id': course_id, 'student_id': student.id})
-            track.views.server_track(request,
-                                     '{instructor} requested progress page for {student} in {course}'.format(
-                                         student=student,
-                                         instructor=request.user,
-                                         course=course_id),
-                                     {},
-                                     page='idashboard')
+            track.views.server_track(request, "get-student-progress-page", {"student": unicode(student), "instructor": unicode(request.user), "course": course_id}, page="idashboard")
             msg += "<a href='{0}' target='_blank'> Progress page for username: {1} with email address: {2}</a>.".format(progress_url, student.username, student.email)
 
     #----------------------------------------
@@ -453,7 +443,7 @@ def instructor_dashboard(request, course_id):
         group = get_staff_group(course)
         msg += 'Staff group = {0}'.format(group.name)
         datatable = _group_members_table(group, "List of Staff", course_id)
-        track.views.server_track(request, 'list-staff', {}, page='idashboard')
+        track.views.server_track(request, "list-staff", {}, page="idashboard")
 
     elif 'List course instructors' in action and request.user.is_staff:
         group = get_instructor_group(course)
@@ -463,7 +453,7 @@ def instructor_dashboard(request, course_id):
         datatable = {'header': ['Username', 'Full name']}
         datatable['data'] = [[x.username, x.profile.name] for x in uset]
         datatable['title'] = 'List of Instructors in course {0}'.format(course_id)
-        track.views.server_track(request, 'list-instructors', {}, page='idashboard')
+        track.views.server_track(request, "list-instructors", {}, page="idashboard")
 
     elif action == 'Add course staff':
         uname = request.POST['staffuser']
@@ -482,7 +472,7 @@ def instructor_dashboard(request, course_id):
             msg += '<font color="green">Added {0} to instructor group = {1}</font>'.format(user, group.name)
             log.debug('staffgrp={0}'.format(group.name))
             user.groups.add(group)
-            track.views.server_track(request, 'add-instructor {0}'.format(user), {}, page='idashboard')
+            track.views.server_track(request, "add-instructor", {"instructor": unicode(user)}, page="idashboard")
 
     elif action == 'Remove course staff':
         uname = request.POST['staffuser']
@@ -501,7 +491,7 @@ def instructor_dashboard(request, course_id):
             msg += '<font color="green">Removed {0} from instructor group = {1}</font>'.format(user, group.name)
             log.debug('instructorgrp={0}'.format(group.name))
             user.groups.remove(group)
-            track.views.server_track(request, 'remove-instructor {0}'.format(user), {}, page='idashboard')
+            track.views.server_track(request, "remove-instructor", {"instructor": unicode(user)}, page="idashboard")
 
     #----------------------------------------
     # DataDump
@@ -550,7 +540,7 @@ def instructor_dashboard(request, course_id):
         group = get_beta_group(course)
         msg += 'Beta test group = {0}'.format(group.name)
         datatable = _group_members_table(group, "List of beta_testers", course_id)
-        track.views.server_track(request, 'list-beta-testers', {}, page='idashboard')
+        track.views.server_track(request, "list-beta-testers", {}, page="idashboard")
 
     elif action == 'Add beta testers':
         users = request.POST['betausers']
@@ -574,55 +564,49 @@ def instructor_dashboard(request, course_id):
         rolename = FORUM_ROLE_ADMINISTRATOR
         datatable = {}
         msg += _list_course_forum_members(course_id, rolename, datatable)
-        track.views.server_track(request, 'list-{0}'.format(rolename), {}, page='idashboard')
+        track.views.server_track(request, "list-forum-admins", {"course": course_id}, page="idashboard")
 
     elif action == 'Remove forum admin':
         uname = request.POST['forumadmin']
         msg += _update_forum_role_membership(uname, course, FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_REMOVE)
-        track.views.server_track(request, '{0} {1} as {2} for {3}'.format(FORUM_ROLE_REMOVE, uname, FORUM_ROLE_ADMINISTRATOR, course_id),
-                                 {}, page='idashboard')
+        track.views.server_track(request, "remove-forum-admin", {"username": uname, "course": course_id}, page="idashboard")
 
     elif action == 'Add forum admin':
         uname = request.POST['forumadmin']
         msg += _update_forum_role_membership(uname, course, FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_ADD)
-        track.views.server_track(request, '{0} {1} as {2} for {3}'.format(FORUM_ROLE_ADD, uname, FORUM_ROLE_ADMINISTRATOR, course_id),
-                                 {}, page='idashboard')
+        track.views.server_track(request, "add-forum-admin", {"username": uname, "course": course_id}, page="idashboard")
 
     elif action == 'List course forum moderators':
         rolename = FORUM_ROLE_MODERATOR
         datatable = {}
         msg += _list_course_forum_members(course_id, rolename, datatable)
-        track.views.server_track(request, 'list-{0}'.format(rolename), {}, page='idashboard')
+        track.views.server_track(request, "list-forum-mods", {"course": course_id}, page="idashboard")
 
     elif action == 'Remove forum moderator':
         uname = request.POST['forummoderator']
         msg += _update_forum_role_membership(uname, course, FORUM_ROLE_MODERATOR, FORUM_ROLE_REMOVE)
-        track.views.server_track(request, '{0} {1} as {2} for {3}'.format(FORUM_ROLE_REMOVE, uname, FORUM_ROLE_MODERATOR, course_id),
-                                 {}, page='idashboard')
+        track.views.server_track(request, "remove-forum-mod", {"username": uname, "course": course_id}, page="idashboard")
 
     elif action == 'Add forum moderator':
         uname = request.POST['forummoderator']
         msg += _update_forum_role_membership(uname, course, FORUM_ROLE_MODERATOR, FORUM_ROLE_ADD)
-        track.views.server_track(request, '{0} {1} as {2} for {3}'.format(FORUM_ROLE_ADD, uname, FORUM_ROLE_MODERATOR, course_id),
-                                 {}, page='idashboard')
+        track.views.server_track(request, "add-forum-mod", {"username": uname, "course": course_id}, page="idashboard")
 
     elif action == 'List course forum community TAs':
         rolename = FORUM_ROLE_COMMUNITY_TA
         datatable = {}
         msg += _list_course_forum_members(course_id, rolename, datatable)
-        track.views.server_track(request, 'list-{0}'.format(rolename), {}, page='idashboard')
+        track.views.server_track(request, "list-forum-community-TAs", {"course": course_id}, page="idashboard")
 
     elif action == 'Remove forum community TA':
         uname = request.POST['forummoderator']
         msg += _update_forum_role_membership(uname, course, FORUM_ROLE_COMMUNITY_TA, FORUM_ROLE_REMOVE)
-        track.views.server_track(request, '{0} {1} as {2} for {3}'.format(FORUM_ROLE_REMOVE, uname, FORUM_ROLE_COMMUNITY_TA, course_id),
-                                 {}, page='idashboard')
+        track.views.server_track(request, "remove-forum-community-TA", {"username": uname, "course": course_id}, page="idashboard")
 
     elif action == 'Add forum community TA':
         uname = request.POST['forummoderator']
         msg += _update_forum_role_membership(uname, course, FORUM_ROLE_COMMUNITY_TA, FORUM_ROLE_ADD)
-        track.views.server_track(request, '{0} {1} as {2} for {3}'.format(FORUM_ROLE_ADD, uname, FORUM_ROLE_COMMUNITY_TA, course_id),
-                                 {}, page='idashboard')
+        track.views.server_track(request, "add-forum-community-TA", {"username": uname, "course": course_id}, page="idashboard")
 
     #----------------------------------------
     # enrollment
@@ -674,7 +658,7 @@ def instructor_dashboard(request, course_id):
         problem = request.POST['Problem']
         nmsg, plots = psychoanalyze.generate_plots_for_problem(problem)
         msg += nmsg
-        track.views.server_track(request, 'psychometrics {0}'.format(problem), {}, page='idashboard')
+        track.views.server_track(request, "psychometrics-histogram-generation", {"problem": unicode(problem)}, page="idashboard")
 
     if idash_mode == 'Psychometrics':
         problems = psychoanalyze.problems_with_psychometric_data(course_id)
@@ -927,8 +911,7 @@ def _add_or_remove_user_group(request, username_or_email, group, group_title, ev
         else:
             user.groups.remove(group)
         event = "add" if do_add else "remove"
-        track.views.server_track(request, '{event}-{0} {1}'.format(event_name, user, event=event),
-                                 {}, page='idashboard')
+        track.views.server_track(request, "add-or-remove-user-group", {"event_name": event_name, "user": unicode(user), "event": event}, page="idashboard")
 
     return msg
 
@@ -1108,7 +1091,7 @@ def _do_enroll_students(course, course_id, students, overload=False, auto_enroll
              'registration_url': registration_url,
              'course_id': course_id,
              'auto_enroll': auto_enroll,
-             'course_url': registration_url + '/courses/' + course_id,
+             'course_url': 'https://' + settings.SITE_NAME + '/courses/' + course_id,
              }
 
     for student in new_students:
@@ -1251,7 +1234,7 @@ def send_mail_to_student(student, param_dict):
     """
     Construct the email using templates and then send it.
     `student` is the student's email address (a `str`),
-    
+
     `param_dict` is a `dict` with keys [
     `site_name`: name given to edX instance (a `str`)
     `registration_url`: url for registration (a `str`)

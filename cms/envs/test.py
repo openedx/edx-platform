@@ -53,7 +53,7 @@ MODULESTORE_OPTIONS = {
 
 MODULESTORE = {
     'default': {
-        'ENGINE': 'xmodule.modulestore.mongo.DraftMongoModuleStore',
+        'ENGINE': 'xmodule.modulestore.draft.DraftModuleStore',
         'OPTIONS': MODULESTORE_OPTIONS
     },
     'direct': {
@@ -61,7 +61,7 @@ MODULESTORE = {
         'OPTIONS': MODULESTORE_OPTIONS
     },
     'draft': {
-        'ENGINE': 'xmodule.modulestore.mongo.DraftMongoModuleStore',
+        'ENGINE': 'xmodule.modulestore.draft.DraftModuleStore',
         'OPTIONS': MODULESTORE_OPTIONS
     }
 }
@@ -140,3 +140,6 @@ SEGMENT_IO_KEY = '***REMOVED***'
 MITX_FEATURES['STUDIO_NPS_SURVEY'] = False
 
 MITX_FEATURES['ENABLE_SERVICE_STATUS'] = True
+
+# This is to disable a test under the common directory that will not pass when run under CMS
+MITX_FEATURES['DISABLE_PASSWORD_RESET_EMAIL_TEST'] = True

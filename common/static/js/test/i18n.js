@@ -1,1 +1,1 @@
-window.gettext = window.ngettext = function(){};
+window.gettext = window.ngettext = function(s){return s;};

@@ -145,7 +145,7 @@
 // prompts
 .wrapper-prompt {
   @extend .depth5;
-  @include transition(all 0.05s ease-in-out);
+  @include transition(all $tmg-f3 ease-in-out 0s);
   position: fixed;
   top: 0;
   background: $black-t0;
@@ -162,8 +162,8 @@
   }
 
   .prompt {
-    @include border-radius(($baseline/5));
-    @include box-shadow(0 0 3px $shadow-d1);
+    border-radius: ($baseline/5);
+    box-shadow: 0 0 3px $shadow-d1;
     display: inline-block;
     vertical-align: middle;
     width: $baseline*17.5;
@@ -176,7 +176,7 @@
     }
 
     .nav-actions {
-      @include box-shadow(inset 0 1px 2px $shadow-d1);
+      box-shadow: inset 0 1px 2px $shadow-d1;
       border-top: 1px solid $black-t1;
       padding: ($baseline*0.75) $baseline;
       background: $gray-d4;
@@ -244,14 +244,14 @@
 .wrapper-notification {
   @extend .depth5;
   @include clearfix();
-  @include box-shadow(0 -1px 3px $shadow, inset 0 3px 1px $blue);
+  box-shadow: 0 -1px 3px $shadow, inset 0 3px 1px $blue;
   position: fixed;
   bottom: 0;
   width: 100%;
   padding: $baseline ($baseline*2);
 
   &.wrapper-notification-warning {
-    @include box-shadow(0 -1px 3px $shadow, inset 0 3px 1px $orange);
+    box-shadow: 0 -1px 3px $shadow, inset 0 3px 1px $orange;
 
     [class^="icon"] {
       color: $orange;
@@ -259,7 +259,7 @@
   }
 
   &.wrapper-notification-error {
-    @include box-shadow(0 -1px 3px $shadow, inset 0 3px 1px $red-l1);
+    box-shadow: 0 -1px 3px $shadow, inset 0 3px 1px $red-l1;
 
     [class^="icon"] {
       color: $red-l1;
@@ -267,7 +267,7 @@
   }
 
   &.wrapper-notification-confirmation {
-    @include box-shadow(0 -1px 3px $shadow, inset 0 3px 1px $green);
+    box-shadow: 0 -1px 3px $shadow, inset 0 3px 1px $green;
 
     [class^="icon"] {
       color: $green;
@@ -275,7 +275,7 @@
   }
 
   &.wrapper-notification-saving {
-    @include box-shadow(0 -1px 3px $shadow, inset 0 3px 1px $pink);
+    box-shadow: 0 -1px 3px $shadow, inset 0 3px 1px $pink;
   }
 
   // shorter/status notifications
@@ -364,7 +364,7 @@
   }
 
   [class^="icon"] {
-    @include transition (color 0.5s ease-in-out);
+    @include transition (color 0.50s ease-in-out 0s);
     @include font-size(22);
     width: flex-grid(1, 12);
     height: ($baseline*1.25);
@@ -437,7 +437,7 @@
   &.saving {
 
     [class^="icon"] {
-      @include anim-rotateClockwise(3s, linear, infinite);
+      @include animation(rotateCW $tmg-s3 linear infinite);
       width: 25px;
       margin: -4px 10px 0 0;
       @include transform-origin(52% 60%);
@@ -455,7 +455,7 @@
 .wrapper-alert {
   @extend .depth2;
   @include box-sizing(border-box);
-  @include box-shadow(0 1px 1px $white, inset 0 2px 2px $shadow-d1, inset 0 -4px 1px $blue);
+  box-shadow: 0 1px 1px $white, inset 0 2px 2px $shadow-d1, inset 0 -4px 1px $blue;
   position: relative;
   overflow: hidden;
   width: 100%;
@@ -472,7 +472,7 @@
   }
 
   &.wrapper-alert-warning {
-    @include box-shadow(0 1px 1px $white, inset 0 2px 2px $shadow-d1, inset 0 -4px 1px $orange);
+    box-shadow: 0 1px 1px $white, inset 0 2px 2px $shadow-d1, inset 0 -4px 1px $orange;
 
     [class^="icon"] {
       color: $orange;
@@ -480,7 +480,7 @@
   }
 
   &.wrapper-alert-error {
-    @include box-shadow(0 1px 1px $white, inset 0 2px 2px $shadow-d1, inset 0 -4px 1px $red-l1);
+    box-shadow: 0 1px 1px $white, inset 0 2px 2px $shadow-d1, inset 0 -4px 1px $red-l1;
 
     [class^="icon"] {
       color: $red-l1;
@@ -488,7 +488,7 @@
   }
 
   &.wrapper-alert-confirmation {
-    @include box-shadow(0 1px 1px $white, inset 0 2px 2px $shadow-d1, inset 0 -4px 1px $green);
+    box-shadow: 0 1px 1px $white, inset 0 2px 2px $shadow-d1, inset 0 -4px 1px $green;
 
     [class^="icon"] {
       color: $green;
@@ -496,7 +496,7 @@
   }
 
   &.wrapper-alert-announcement {
-    @include box-shadow(0 1px 1px $white, inset 0 2px 2px $shadow-d1, inset 0 -4px 1px $blue);
+    box-shadow: 0 1px 1px $white, inset 0 2px 2px $shadow-d1, inset 0 -4px 1px $blue;
 
     [class^="icon"] {
       color: $blue;
@@ -504,7 +504,7 @@
   }
 
   &.wrapper-alert-step-required {
-    @include box-shadow(0 1px 1px $white, inset 0 2px 2px $shadow-d1, inset 0 -4px 1px $pink);
+    box-shadow: 0 1px 1px $white, inset 0 2px 2px $shadow-d1, inset 0 -4px 1px $pink;
 
     [class^="icon"] {
       color: $pink;
@@ -531,7 +531,7 @@
   }
 
   [class^="icon"] {
-    @include transition (color 0.5s ease-in-out);
+    @include transition (color 0.50s ease-in-out 0s);
     @include font-size(22);
     width: flex-grid(1, 12);
     margin: ($baseline/4) flex-gutter() 0 0;
@@ -627,16 +627,16 @@
     pointer-events: none;
 
     .prompt {
-      opacity: 0.0;
+
     }
   }
 
-  // prompt showing/hiding
+  // prompt showing
   &.prompt-is-shown {
 
     .wrapper-view {
-      -webkit-filter: blur(2px) grayscale(25%);
-      filter: blur(2px) grayscale(25%);
+      -webkit-filter: blur(($baseline/10)) grayscale(25%);
+      filter: blur(($baseline/10)) grayscale(25%);
     }
 
     .wrapper-prompt.is-shown {
@@ -644,8 +644,23 @@
       pointer-events: auto;
 
       .prompt {
-        @include anim-bounceIn(0.5s);
-        opacity: 1.0;
+        @include animation(bounceIn $tmg-f1 ease-in-out 1);
+      }
+    }
+  }
+
+  // prompt hiding
+  &.prompt-is-hiding {
+
+    .wrapper-view {
+      -webkit-filter: blur(($baseline/10)) grayscale(25%);
+      filter: blur(($baseline/10)) grayscale(25%);
+    }
+
+    .wrapper-prompt {
+
+      .prompt {
+        @include animation(bounceOut $tmg-f1 ease-in-out 1);
       }
     }
   }
@@ -665,11 +680,13 @@
 
     // varying animations
     &.is-shown {
-      @include anim-notificationsSlideUp(1s);
+      @include animation(notificationSlideUp $tmg-s1 ease-in-out 1);
+      @include animation-fill-mode(forwards);
     }
 
     &.is-hiding {
-      @include anim-notificationsSlideDown(0.25s);
+      @include animation(notificationSlideDown $tmg-s1 ease-in-out 1);
+      @include animation-fill-mode(forwards);
     }
   }
 }

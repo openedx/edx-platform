@@ -143,7 +143,7 @@ abbr[title] {
 	width: 100%;
 	@include linear-gradient(top, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0));
 	//background-color: $lightBluishGrey;
-	@include box-shadow(0 1px 0 rgba(255, 255, 255, 0.2) inset, 0 -1px 0 rgba(0, 0, 0, 0.2) inset);
+	box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2) inset, 0 -1px 0 rgba(0, 0, 0, 0.2) inset;
 
 	li:first-child {
 		margin-left: 20px;

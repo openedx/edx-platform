@@ -98,6 +98,16 @@ describe "CMS.Views.Prompt", ->
         view.hide()
         # expect($("body")).not.toHaveClass("prompt-is-shown")
 
+describe "CMS.Views.Notification.Saving", ->
+    beforeEach ->
+        @view = new CMS.Views.Notification.Saving()
+
+    it "should have minShown set to 1250 by default", ->
+        expect(@view.options.minShown).toEqual(1250)
+
+    it "should have closeIcon set to false by default", ->
+        expect(@view.options.closeIcon).toBeFalsy()
+
 describe "CMS.Views.SystemFeedback click events", ->
     beforeEach ->
         @primaryClickSpy = jasmine.createSpy('primaryClick')
@@ -204,17 +214,22 @@ describe "CMS.Views.SystemFeedback multiple secondary actions", ->
 
 describe "CMS.Views.Notification minShown and maxShown", ->
     beforeEach ->
-        @showSpy = spyOn(CMS.Views.Notification.Saving.prototype, 'show')
+        @showSpy = spyOn(CMS.Views.Notification.Confirmation.prototype, 'show')
         @showSpy.andCallThrough()
-        @hideSpy = spyOn(CMS.Views.Notification.Saving.prototype, 'hide')
+        @hideSpy = spyOn(CMS.Views.Notification.Confirmation.prototype, 'hide')
         @hideSpy.andCallThrough()
         @clock = sinon.useFakeTimers()
 
     afterEach ->
         @clock.restore()
 
+    it "should not have minShown or maxShown by default", ->
+        view = new CMS.Views.Notification.Confirmation()
+        expect(view.options.minShown).toEqual(0)
+        expect(view.options.maxShown).toEqual(Infinity)
+
     it "a minShown view should not hide too quickly", ->
-        view = new CMS.Views.Notification.Saving({minShown: 1000})
+        view = new CMS.Views.Notification.Confirmation({minShown: 1000})
         view.show()
         expect(view.$('.wrapper')).toBeShown()
 
@@ -227,7 +242,7 @@ describe "CMS.Views.Notification minShown and maxShown", ->
         expect(view.$('.wrapper')).toBeHiding()
 
     it "a maxShown view should hide by itself", ->
-        view = new CMS.Views.Notification.Saving({maxShown: 1000})
+        view = new CMS.Views.Notification.Confirmation({maxShown: 1000})
         view.show()
         expect(view.$('.wrapper')).toBeShown()
 
@@ -236,7 +251,7 @@ describe "CMS.Views.Notification minShown and maxShown", ->
         expect(view.$('.wrapper')).toBeHiding()
 
     it "a minShown view can stay visible longer", ->
-        view = new CMS.Views.Notification.Saving({minShown: 1000})
+        view = new CMS.Views.Notification.Confirmation({minShown: 1000})
         view.show()
         expect(view.$('.wrapper')).toBeShown()
 
@@ -250,7 +265,7 @@ describe "CMS.Views.Notification minShown and maxShown", ->
         expect(view.$('.wrapper')).toBeHiding()
 
     it "a maxShown view can hide early", ->
-        view = new CMS.Views.Notification.Saving({maxShown: 1000})
+        view = new CMS.Views.Notification.Confirmation({maxShown: 1000})
         view.show()
         expect(view.$('.wrapper')).toBeShown()
 
@@ -264,7 +279,7 @@ describe "CMS.Views.Notification minShown and maxShown", ->
         expect(view.$('.wrapper')).toBeHiding()
 
     it "a view can have both maxShown and minShown", ->
-        view = new CMS.Views.Notification.Saving({minShown: 1000, maxShown: 2000})
+        view = new CMS.Views.Notification.Confirmation({minShown: 1000, maxShown: 2000})
         view.show()
 
         # can't hide early

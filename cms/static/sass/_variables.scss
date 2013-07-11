@@ -47,7 +47,7 @@ $gray-d2: shade($gray,40%);
 $gray-d3: shade($gray,60%);
 $gray-d4: shade($gray,80%);
 
-$blue: rgb(85, 151, 221);
+$blue: rgb(0, 159, 230);
 $blue-l1: tint($blue,20%);
 $blue-l2: tint($blue,40%);
 $blue-l3: tint($blue,60%);
@@ -158,6 +158,17 @@ $shadow-l1: rgba($black, 0.1);
 $shadow-l2: rgba($black, 0.05);
 $shadow-d1: rgba($black, 0.4);
 $shadow-d2: rgba($black, 0.6);
+
+// ====================
+
+// timing - used for animation/transition mixin syncing
+$tmg-s3: 3.0s;
+$tmg-s2: 2.0s;
+$tmg-s1: 1.0s;
+$tmg-avg: 0.75s;
+$tmg-f1: 0.50s;
+$tmg-f2: 0.25s;
+$tmg-f3: 0.125s;
 
 // ====================
 

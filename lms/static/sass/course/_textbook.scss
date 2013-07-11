@@ -1,8 +1,7 @@
 div.book-wrapper {
-  @extend .table-wrapper;
   display: table;
   table-layout:  fixed;
-  padding: 1em 8em; 
+  padding: 1em 8em;
 
 
   #open_close_accordion {
@@ -39,13 +38,13 @@ div.book-wrapper {
         text-align: right;
         color: #9a9a9a;
         opacity: 0.0;
-        @include transition(opacity .15s);
+        @include transition(opacity .15s linear 0s);
       }
 
       li {
         background: none;
         border-bottom: 0;
-        padding-left: lh();       
+        padding-left: lh();
 
         a {
           padding: 0;
@@ -62,7 +61,7 @@ div.book-wrapper {
 
         div.hitarea {
           background-image: url('../images/treeview-default.gif');
-          
+
           position: relative;
           top: 4px;
 
@@ -122,7 +121,7 @@ div.book-wrapper {
             opacity: 0.0;
             filter: alpha(opacity=0);
             text-indent: -9999px;
-            @include transition;
+            @include transition(none);
             vertical-align: middle;
             width: 100%;
 
@@ -175,10 +174,10 @@ div.book-wrapper {
         text-align: left;
       	line-height: 1.6em;
       	margin: 5px;
-	
+
 	.Paragraph, h2 {
 	   margin-top: 10px;
-	}	   
+	}
       }
     }
   }

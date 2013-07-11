@@ -21,7 +21,7 @@
       letter-spacing: 1px;
       margin: 0px 15px;
       padding: 20px 10px;
-      @include transition(all, 0.15s, linear);
+      @include transition(all 0.15s linear 0s);
       text-transform: lowercase;
 
       &:hover, &.active {

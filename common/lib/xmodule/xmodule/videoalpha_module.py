@@ -70,7 +70,10 @@ class VideoAlphaModule(VideoAlphaFields, XModule):
     def __init__(self, *args, **kwargs):
         XModule.__init__(self, *args, **kwargs)
         xmltree = etree.fromstring(self.data)
-        self.youtube_streams = xmltree.get('youtube')
+
+        # Front-end expects an empty string, or a properly formatted string with YouTube IDs.
+        self.youtube_streams = xmltree.get('youtube', '')
+
         self.sub = xmltree.get('sub')
         self.position = 0
         self.show_captions = xmltree.get('show_captions', 'true')

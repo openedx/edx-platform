@@ -1,3 +1,5 @@
+#pylint: disable=E1103, E1101
+
 from django.conf import settings
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore

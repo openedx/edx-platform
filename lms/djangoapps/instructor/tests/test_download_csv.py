@@ -11,12 +11,13 @@ django-admin.py test --settings=lms.envs.test --pythonpath=. lms/djangoapps/inst
 from django.test.utils import override_settings
 
 # Need access to internal func to put users in the right group
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, User
 
 from django.core.urlresolvers import reverse
 
 from courseware.access import _course_staff_group_name
-from courseware.tests.tests import LoginEnrollmentTestCase, TEST_DATA_XML_MODULESTORE, get_user
+from courseware.tests.helpers import LoginEnrollmentTestCase
+from courseware.tests.modulestore_config import TEST_DATA_XML_MODULESTORE
 from xmodule.modulestore.django import modulestore
 import xmodule.modulestore.django
 
@@ -45,7 +46,7 @@ class TestInstructorDashboardGradeDownloadCSV(LoginEnrollmentTestCase):
         def make_instructor(course):
             group_name = _course_staff_group_name(course.location)
             g = Group.objects.create(name=group_name)
-            g.user_set.add(get_user(self.instructor))
+            g.user_set.add(User.objects.get(email=self.instructor))
 
         make_instructor(self.toy)
 
@@ -72,7 +73,7 @@ class TestInstructorDashboardGradeDownloadCSV(LoginEnrollmentTestCase):
         # All the not-actually-in-the-course hw and labs come from the
         # default grading policy string in graders.py
         expected_body = '''"ID","Username","Full Name","edX email","External email","HW 01","HW 02","HW 03","HW 04","HW 05","HW 06","HW 07","HW 08","HW 09","HW 10","HW 11","HW 12","HW Avg","Lab 01","Lab 02","Lab 03","Lab 04","Lab 05","Lab 06","Lab 07","Lab 08","Lab 09","Lab 10","Lab 11","Lab 12","Lab Avg","Midterm","Final"
-"2","u2","Fred Weasley","view2@test.com","","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"
+"2","u2","username","view2@test.com","","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"
 '''
 
         self.assertEqual(body, expected_body, msg)

@@ -451,6 +451,68 @@ class JavascriptInput(InputTypeBase):
 registry.register(JavascriptInput)
 
 
+
+#-----------------------------------------------------------------------------
+
+
+class JSInput(InputTypeBase):
+    """
+    DO NOT USE! HAS NOT BEEN TESTED BEYOND 700X PROBLEMS, AND MAY CHANGE IN
+    BACKWARDS-INCOMPATIBLE WAYS.
+      Inputtype for general javascript inputs. Intended to be used with
+    customresponse.  
+      Loads in a sandboxed iframe to help prevent css and js conflicts between
+    frame and top-level window. 
+    
+    iframe sandbox whitelist:
+        - allow-scripts
+        - allow-popups
+        - allow-forms
+        - allow-pointer-lock
+
+    This in turn means that the iframe cannot directly access the top-level
+    window elements.
+      Example:
+
+        <jsinput html_file="/static/test.html" 
+                 gradefn="grade" 
+                 height="500" 
+                 width="400"/>
+
+     See the documentation in the /doc/public folder for more information.
+    """
+
+    template = "jsinput.html"
+    tags = ['jsinput']
+
+    @classmethod
+    def get_attributes(cls):
+        """
+        Register the attributes.
+        """
+        return [Attribute('params', None),       # extra iframe params
+                Attribute('html_file', None),
+                Attribute('gradefn', "gradefn"),
+                Attribute('get_statefn', None), # Function to call in iframe
+                                                 #   to get current state.
+                Attribute('set_statefn', None), # Function to call iframe to
+                                                 #   set state
+                Attribute('width', "400"),       # iframe width
+                Attribute('height', "300")]      # iframe height
+
+        
+
+    def _extra_context(self):
+        context = {
+            'applet_loader': '/static/js/capa/src/jsinput.js',
+            'saved_state': self.value
+        }
+
+        return context
+
+        
+
+registry.register(JSInput)
 #-----------------------------------------------------------------------------
 
 class TextLine(InputTypeBase):

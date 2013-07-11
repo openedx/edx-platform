@@ -27,7 +27,7 @@ modulestore_options = {
 
 MODULESTORE = {
     'default': {
-        'ENGINE': 'xmodule.modulestore.mongo.DraftMongoModuleStore',
+        'ENGINE': 'xmodule.modulestore.draft.DraftModuleStore',
         'OPTIONS': modulestore_options
     },
     'direct': {
@@ -35,6 +35,7 @@ MODULESTORE = {
         'OPTIONS': modulestore_options
     }
 }
+
 
 # cdodge: This is the specifier for the MongoDB (using GridFS) backed static content store
 # This is for static content for courseware, not system static content (e.g. javascript, css, edX branding, etc)

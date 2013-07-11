@@ -265,7 +265,7 @@ class XMLModuleStore(ModuleStoreBase):
         course_dirs: If specified, the list of course_dirs to load. Otherwise,
             load all course dirs
         """
-        ModuleStoreBase.__init__(self)
+        super(XMLModuleStore, self).__init__()
 
         self.data_dir = path(data_dir)
         self.modules = defaultdict(dict)  # course_id -> dict(location -> XModuleDescriptor)

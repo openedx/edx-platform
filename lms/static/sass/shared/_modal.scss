@@ -13,8 +13,8 @@
 .modal {
   background: rgba(0,0,0, 0.6);
   border: 1px solid rgba(0, 0, 0, 0.9);
-  @include border-radius(0px);
-  @include box-shadow(0 15px 80px 15px rgba(0,0,0, 0.5));
+  border-radius: 0px;
+  box-shadow: 0 15px 80px 15px rgba(0,0,0, 0.5);
   color: #fff;
   display: none;
   left: 50%;
@@ -30,7 +30,7 @@
 
     .inner-wrapper {
       background: #000;
-      @include box-shadow(none);
+      box-shadow: none;
       height: 315px;
       padding: 10px;
       width: 560px;
@@ -44,7 +44,7 @@
 
     .inner-wrapper {
       background: #000;
-      @include box-shadow(none);
+      box-shadow: none;
       height: 360px;
       padding: 10px;
       width: 640px;
@@ -53,9 +53,9 @@
 
   .inner-wrapper {
     background: $modal-bg-color;
-    @include border-radius(0px);
+    border-radius: 0px;
     border: 1px solid rgba(0, 0, 0, 0.9);
-    @include box-shadow(inset 0 1px 0 0 rgba(255, 255, 255, 0.7));
+    box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.7);
     overflow: hidden;
     padding-left: 10px;
     padding-right: 10px;
@@ -143,7 +143,7 @@
       .input-group {
         @include clearfix;
         border-bottom: 1px solid rgb(210,210,210);
-        @include box-shadow(0 1px 0 0 rgba(255,255,255, 0.6));
+        box-shadow: 0 1px 0 0 rgba(255,255,255, 0.6);
         margin-bottom: 30px;
         padding-bottom: 10px;
       }
@@ -189,8 +189,8 @@
       label.honor-code {
         background: rgb(233,233,233);
         border: 1px solid rgb(200,200,200);
-        @include border-radius(3px);
-        @include box-shadow(0 1px 0 0 rgba(255,255,255, 0.6));
+        border-radius: 3px;
+        box-shadow: 0 1px 0 0 rgba(255,255,255, 0.6);
         display: block;
         margin-bottom: 20px;
         padding: 8px 10px;
@@ -274,7 +274,7 @@
     }
 
     .close-modal {
-      @include border-radius(2px);
+      border-radius: 2px;
       cursor: pointer;
       @include inline-block;
       padding: 10px;
@@ -289,7 +289,7 @@
           font: normal 1.2rem/1.2rem $sans-serif;
           text-align: center;
           text-shadow: 0 1px rgba(255,255,255, 0.8);
-          @include transition(all, 0.15s, ease-out);
+          @include transition(all 0.15s ease-out 0s);
         }
       }
 

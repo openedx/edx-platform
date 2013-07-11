@@ -19,9 +19,9 @@ body, input, button {
 }
 
 a {
+  @include transition(color $tmg-f2 ease-in-out 0s);
   text-decoration: none;
   color: $blue;
-  @include transition(color 0.25s ease-in-out);
 
   &:hover {
     color: $orange-d1;
@@ -313,11 +313,6 @@ p, ul, ol, dl {
         .view-button {
 
         }
-
-        .upload-button .icon-plus {
-          @extend .t-action2;
-          line-height: 0 !important;
-        }
       }
     }
 
@@ -596,8 +591,8 @@ hr.divide {
 }
 
 .window {
-  // @include border-radius(3px);
-  // @include box-shadow(0 1px 1px $shadow-l1);
+  // border-radius: 3px;
+  // box-shadow: 0 1px 1px $shadow-l1;
   // margin-bottom: $baseline;
   // border: 1px solid $gray-l2;
   // background: $white;
@@ -612,7 +607,7 @@ hr.divide {
     border-radius: 2px 2px 0 0;
     @include linear-gradient(top, rgba(255, 255, 255, .4), rgba(255, 255, 255, 0));
     background-color: $lightBluishGrey;
-    @include box-shadow(0 1px 0 rgba(255, 255, 255, 0.2) inset);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2) inset;
     font-size: 14px;
     text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
   }
@@ -647,6 +642,7 @@ hr.divide {
 
 // system notifications
 .toast-notification {
+  @include transition(all $tmg-f2 linear 0s);
   display: none;
   position: fixed;
   top: 20px;
@@ -658,11 +654,10 @@ hr.divide {
   border: 1px solid #333;
   @include linear-gradient(top, rgba(255, 255, 255, .1), rgba(255, 255, 255, 0));
   background-color: rgba(30, 30, 30, .92);
-  @include box-shadow(0 1px 3px rgba(0, 0, 0, .3), 0 1px 0 rgba(255, 255, 255, .1) inset);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .3), 0 1px 0 rgba(255, 255, 255, .1) inset;
   font-size: 13px;
   text-align: center;
   color: #fff;
-  @include transition(all .2s);
 
   p, span {
     color: #fff;
@@ -751,9 +746,6 @@ hr.divide {
   }
 
   .icon-plus {
-    display: inline-block;
-    vertical-align: middle;
-    margin-right: ($baseline/4);
     margin-top: -2px;
     line-height: 0;
   }
@@ -802,7 +794,7 @@ hr.divide {
 
 .tooltip {
   @include font-size(12);
-  @include transition(opacity 0.1s ease-out);
+  @include transition(opacity $tmg-f3 ease-out 0s);
   position: absolute;
   top: 0;
   left: 0;
@@ -865,7 +857,7 @@ body.js {
   .content-modal {
     @include border-bottom-radius(2px);
     @include box-sizing(border-box);
-    @include box-shadow(0 2px 4px $shadow-d1);
+    box-shadow: 0 2px 4px $shadow-d1;
     position: relative;
     display: none;
     width: 700px;
@@ -875,7 +867,7 @@ body.js {
     background: $white;
 
     .action-modal-close {
-      @include transition(top .25s ease-in-out);
+      @include transition(top $tmg-f3 ease-in-out 0s);
       @include border-bottom-radius(3px);
       position: absolute;
       top: -3px;

@@ -1,5 +1,4 @@
 div.info-wrapper {
-  @extend .table-wrapper;
 
   section.updates {
     @extend .content;
@@ -67,7 +66,7 @@ div.info-wrapper {
 
           > ol {
             list-style: decimal outside none;
-            padding: 0 0 0 1em; 
+            padding: 0 0 0 1em;
           }
 
           li {
@@ -80,9 +79,9 @@ div.info-wrapper {
 
   section.handouts {
     @extend .sidebar;
-    @include border-radius(0 4px 4px 0);
+    border-radius: 0 4px 4px 0;
     border-left: 1px solid #ddd;
-    @include box-shadow(none);
+    box-shadow: none;
     font-size: 14px;
 
     &:after {
@@ -114,7 +113,7 @@ div.info-wrapper {
         &.expandable,
         &.collapsable {
           margin: 0 16px 14px 16px;
-          @include transition(all .2s);
+          @include transition(all .2s linear 0s);
 
           h4 {
             color: $link-color;
@@ -128,7 +127,7 @@ div.info-wrapper {
           background: #fff;
           border-radius: 3px;
           padding: 14px 0;
-          @include box-shadow(0 0 1px 1px rgba(0, 0, 0, .1), 0 1px 3px rgba(0, 0, 0, .25));
+          box-shadow: 0 0 1px 1px rgba(0, 0, 0, .1), 0 1px 3px rgba(0, 0, 0, .25);
 
           h4 {
             margin-bottom: 16px;
@@ -199,7 +198,7 @@ div.info-wrapper {
 
         h3 {
           border-bottom: 0;
-          @include box-shadow(none);
+          box-shadow: none;
           color: #888;
           font-size: 1em;
           margin-bottom: 0;

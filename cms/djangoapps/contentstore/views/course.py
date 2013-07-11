@@ -1,34 +1,46 @@
 """
 Views related to operations on course objects
 """
+#pylint: disable=W0402
 import json
+import random
+import string
 
 from django.contrib.auth.decorators import login_required
 from django_future.csrf import ensure_csrf_cookie
 from django.conf import settings
+from django.views.decorators.http import require_http_methods, require_POST
 from django.core.exceptions import PermissionDenied
-from django.http import HttpResponse, HttpResponseBadRequest
 from django.core.urlresolvers import reverse
+from django.http import HttpResponseBadRequest
+from util.json_request import JsonResponse
 from mitxmako.shortcuts import render_to_response
 
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError, \
-     InvalidLocationError
+from xmodule.modulestore.inheritance import own_metadata
+
+from xmodule.modulestore.exceptions import (
+    ItemNotFoundError, InvalidLocationError)
 from xmodule.modulestore import Location
 
-from contentstore.course_info_model import get_course_updates, update_course_updates, delete_course_update
-from contentstore.utils import get_lms_link_for_item, add_extra_panel_tab, remove_extra_panel_tab
-from models.settings.course_details import CourseDetails, CourseSettingsEncoder
+from contentstore.course_info_model import (
+    get_course_updates, update_course_updates, delete_course_update)
+from contentstore.utils import (
+    get_lms_link_for_item, add_extra_panel_tab, remove_extra_panel_tab,
+    get_modulestore)
+from models.settings.course_details import (
+    CourseDetails, CourseSettingsEncoder)
+
 from models.settings.course_grading import CourseGradingModel
 from models.settings.course_metadata import CourseMetadata
 from auth.authz import create_all_course_groups, is_user_in_creator_group
 from util.json_request import expect_json
 
 from .access import has_access, get_location_and_verify_access
-from .requests import get_request_method
 from .tabs import initialize_course_tabs
-from .component import OPEN_ENDED_COMPONENT_TYPES, \
-     NOTE_COMPONENT_TYPES, ADVANCED_COMPONENT_POLICY_KEY
+from .component import (
+    OPEN_ENDED_COMPONENT_TYPES, NOTE_COMPONENT_TYPES,
+    ADVANCED_COMPONENT_POLICY_KEY)
 
 from django_comment_common.utils import seed_permissions_roles
 import datetime
@@ -39,7 +51,8 @@ __all__ = ['course_index', 'create_new_course', 'course_info',
            'course_config_advanced_page',
            'course_settings_updates',
            'course_grader_updates',
-           'course_advanced_updates']
+           'course_advanced_updates', 'textbook_index', 'textbook_by_id',
+           'create_textbook']
 
 
 @login_required
@@ -64,7 +77,6 @@ def course_index(request, org, course, name):
     sections = course.get_children()
 
     return render_to_response('overview.html', {
-        'active_tab': 'courseware',
         'context_course': course,
         'lms_link': lms_link,
         'sections': sections,
@@ -80,7 +92,9 @@ def course_index(request, org, course, name):
 @login_required
 @expect_json
 def create_new_course(request):
-
+    """
+    Create a new course
+    """
     if not is_user_in_creator_group(request.user):
         raise PermissionDenied()
 
@@ -97,8 +111,9 @@ def create_new_course(request):
     try:
         dest_location = Location('i4x', org, number, 'course', Location.clean(display_name))
     except InvalidLocationError as error:
-        return HttpResponse(json.dumps({'ErrMsg': "Unable to create course '" +
-                                        display_name + "'.\n\n" + error.message}))
+        return JsonResponse({
+            "ErrMsg": "Unable to create course '{name}'.\n\n{err}".format(
+                name=display_name, err=error.message)})
 
     # see if the course already exists
     existing_course = None
@@ -108,13 +123,13 @@ def create_new_course(request):
         pass
 
     if existing_course is not None:
-        return HttpResponse(json.dumps({'ErrMsg': 'There is already a course defined with this name.'}))
+        return JsonResponse({'ErrMsg': 'There is already a course defined with this name.'})
 
     course_search_location = ['i4x', dest_location.org, dest_location.course, 'course', None]
     courses = modulestore().get_items(course_search_location)
 
     if len(courses) > 0:
-        return HttpResponse(json.dumps({'ErrMsg': 'There is already a course defined with the same organization and course number.'}))
+        return JsonResponse({'ErrMsg': 'There is already a course defined with the same organization and course number.'})
 
     new_course = modulestore('direct').clone_item(template, dest_location)
 
@@ -137,7 +152,7 @@ def create_new_course(request):
     # seed the forums
     seed_permissions_roles(new_course.location.course_id)
 
-    return HttpResponse(json.dumps({'id': new_course.location.url()}))
+    return JsonResponse({'id': new_course.location.url()})
 
 
 @login_required
@@ -153,10 +168,9 @@ def course_info(request, org, course, name, provided_id=None):
     course_module = modulestore().get_item(location)
 
     # get current updates
-    location = ['i4x', org, course, 'course_info', "updates"]
+    location = Location(['i4x', org, course, 'course_info', "updates"])
 
     return render_to_response('course_info.html', {
-        'active_tab': 'courseinfo-tab',
         'context_course': course_module,
         'url_base': "/" + org + "/" + course + "/",
         'course_updates': json.dumps(get_course_updates(location)),
@@ -187,22 +201,17 @@ def course_info_updates(request, org, course, provided_id=None):
     if not has_access(request.user, location):
         raise PermissionDenied()
 
-    real_method = get_request_method(request)
-
     if request.method == 'GET':
-        return HttpResponse(json.dumps(get_course_updates(location)),
-                            mimetype="application/json")
-    elif real_method == 'DELETE':
+        return JsonResponse(get_course_updates(location))
+    elif request.method == 'DELETE':
         try:
-            return HttpResponse(json.dumps(delete_course_update(location,
-                                request.POST, provided_id)), mimetype="application/json")
+            return JsonResponse(delete_course_update(location, request.POST, provided_id))
         except:
             return HttpResponseBadRequest("Failed to delete",
                                           content_type="text/plain")
     elif request.method == 'POST':
         try:
-            return HttpResponse(json.dumps(update_course_updates(location,
-                                request.POST, provided_id)), mimetype="application/json")
+            return JsonResponse(update_course_updates(location, request.POST, provided_id))
         except:
             return HttpResponseBadRequest("Failed to save",
                                           content_type="text/plain")
@@ -293,14 +302,13 @@ def course_settings_updates(request, org, course, name, section):
 
     if request.method == 'GET':
         # Cannot just do a get w/o knowing the course name :-(
-        return HttpResponse(json.dumps(manager.fetch(Location(['i4x', org, course, 'course', name])), cls=CourseSettingsEncoder),
-                            mimetype="application/json")
+        return JsonResponse(manager.fetch(Location(['i4x', org, course, 'course', name])), encoder=CourseSettingsEncoder)
     elif request.method == 'POST':  # post or put, doesn't matter.
-        return HttpResponse(json.dumps(manager.update_from_json(request.POST), cls=CourseSettingsEncoder),
-                            mimetype="application/json")
+        return JsonResponse(manager.update_from_json(request.POST), encoder=CourseSettingsEncoder)
 
 
 @expect_json
+@require_http_methods(("GET", "POST", "PUT", "DELETE"))
 @login_required
 @ensure_csrf_cookie
 def course_grader_updates(request, org, course, name, grader_index=None):
@@ -313,22 +321,19 @@ def course_grader_updates(request, org, course, name, grader_index=None):
 
     location = get_location_and_verify_access(request, org, course, name)
 
-    real_method = get_request_method(request)
-
-    if real_method == 'GET':
+    if request.method == 'GET':
         # Cannot just do a get w/o knowing the course name :-(
-        return HttpResponse(json.dumps(CourseGradingModel.fetch_grader(Location(location), grader_index)),
-                            mimetype="application/json")
-    elif real_method == "DELETE":
+        return JsonResponse(CourseGradingModel.fetch_grader(Location(location), grader_index))
+    elif request.method == "DELETE":
         # ??? Should this return anything? Perhaps success fail?
         CourseGradingModel.delete_grader(Location(location), grader_index)
-        return HttpResponse()
-    elif request.method == 'POST':  # post or put, doesn't matter.
-        return HttpResponse(json.dumps(CourseGradingModel.update_grader_from_json(Location(location), request.POST)),
-                            mimetype="application/json")
+        return JsonResponse()
+    else:  # post or put, doesn't matter.
+        return JsonResponse(CourseGradingModel.update_grader_from_json(Location(location), request.POST))
 
 
 # # NB: expect_json failed on ["key", "key2"] and json payload
+@require_http_methods(("GET", "POST", "PUT", "DELETE"))
 @login_required
 @ensure_csrf_cookie
 def course_advanced_updates(request, org, course, name):
@@ -340,16 +345,11 @@ def course_advanced_updates(request, org, course, name):
     """
     location = get_location_and_verify_access(request, org, course, name)
 
-    real_method = get_request_method(request)
-
-    if real_method == 'GET':
-        return HttpResponse(json.dumps(CourseMetadata.fetch(location)),
-                            mimetype="application/json")
-    elif real_method == 'DELETE':
-        return HttpResponse(json.dumps(CourseMetadata.delete_key(location,
-                                                                 json.loads(request.body))),
-                            mimetype="application/json")
-    elif real_method == 'POST' or real_method == 'PUT':
+    if request.method == 'GET':
+        return JsonResponse(CourseMetadata.fetch(location))
+    elif request.method == 'DELETE':
+        return JsonResponse(CourseMetadata.delete_key(location, json.loads(request.body)))
+    else:
         # NOTE: request.POST is messed up because expect_json
         # cloned_request.POST.copy() is creating a defective entry w/ the whole payload as the key
         request_body = json.loads(request.body)
@@ -401,10 +401,204 @@ def course_advanced_updates(request, org, course, name):
                         # Indicate that tabs should *not* be filtered out of the metadata
                         filter_tabs = False
         try:
-            response_json = json.dumps(CourseMetadata.update_from_json(location,
-                                                                   request_body,
-                                                                   filter_tabs=filter_tabs))
-        except (TypeError, ValueError), e:
-            return HttpResponseBadRequest("Incorrect setting format. " + str(e), content_type="text/plain")
+            return JsonResponse(CourseMetadata.update_from_json(location,
+                                                                request_body,
+                                                                filter_tabs=filter_tabs))
+        except (TypeError, ValueError) as err:
+            return HttpResponseBadRequest("Incorrect setting format. " + str(err), content_type="text/plain")
 
-        return HttpResponse(response_json, mimetype="application/json")
+
+class TextbookValidationError(Exception):
+    "An error thrown when a textbook input is invalid"
+    pass
+
+
+def validate_textbooks_json(text):
+    """
+    Validate the given text as representing a single PDF textbook
+    """
+    try:
+        textbooks = json.loads(text)
+    except ValueError:
+        raise TextbookValidationError("invalid JSON")
+    if not isinstance(textbooks, (list, tuple)):
+        raise TextbookValidationError("must be JSON list")
+    for textbook in textbooks:
+        validate_textbook_json(textbook)
+    # check specified IDs for uniqueness
+    all_ids = [textbook["id"] for textbook in textbooks if "id" in textbook]
+    unique_ids = set(all_ids)
+    if len(all_ids) > len(unique_ids):
+        raise TextbookValidationError("IDs must be unique")
+    return textbooks
+
+
+def validate_textbook_json(textbook):
+    """
+    Validate the given text as representing a list of PDF textbooks
+    """
+    if isinstance(textbook, basestring):
+        try:
+            textbook = json.loads(textbook)
+        except ValueError:
+            raise TextbookValidationError("invalid JSON")
+    if not isinstance(textbook, dict):
+        raise TextbookValidationError("must be JSON object")
+    if not textbook.get("tab_title"):
+        raise TextbookValidationError("must have tab_title")
+    tid = str(textbook.get("id", ""))
+    if tid and not tid[0].isdigit():
+        raise TextbookValidationError("textbook ID must start with a digit")
+    return textbook
+
+
+def assign_textbook_id(textbook, used_ids=()):
+    """
+    Return an ID that can be assigned to a textbook
+    and doesn't match the used_ids
+    """
+    tid = Location.clean(textbook["tab_title"])
+    if not tid[0].isdigit():
+        # stick a random digit in front
+        tid = random.choice(string.digits) + tid
+    while tid in used_ids:
+        # add a random ASCII character to the end
+        tid = tid + random.choice(string.ascii_lowercase)
+    return tid
+
+
+@login_required
+@ensure_csrf_cookie
+def textbook_index(request, org, course, name):
+    """
+    Display an editable textbook overview.
+
+    org, course, name: Attributes of the Location for the item to edit
+    """
+    location = get_location_and_verify_access(request, org, course, name)
+    store = get_modulestore(location)
+    course_module = store.get_item(location, depth=3)
+
+    if request.is_ajax():
+        if request.method == 'GET':
+            return JsonResponse(course_module.pdf_textbooks)
+        elif request.method == 'POST':
+            try:
+                textbooks = validate_textbooks_json(request.body)
+            except TextbookValidationError as err:
+                return JsonResponse({"error": err.message}, status=400)
+
+            tids = set(t["id"] for t in textbooks if "id" in t)
+            for textbook in textbooks:
+                if not "id" in textbook:
+                    tid = assign_textbook_id(textbook, tids)
+                    textbook["id"] = tid
+                    tids.add(tid)
+
+            if not any(tab['type'] == 'pdf_textbooks' for tab in course_module.tabs):
+                course_module.tabs.append({"type": "pdf_textbooks"})
+            course_module.pdf_textbooks = textbooks
+            store.update_metadata(course_module.location, own_metadata(course_module))
+            return JsonResponse(course_module.pdf_textbooks)
+    else:
+        upload_asset_url = reverse('upload_asset', kwargs={
+            'org': org,
+            'course': course,
+            'coursename': name,
+        })
+        textbook_url = reverse('textbook_index', kwargs={
+            'org': org,
+            'course': course,
+            'name': name,
+        })
+        return render_to_response('textbooks.html', {
+            'context_course': course_module,
+            'course': course_module,
+            'upload_asset_url': upload_asset_url,
+            'textbook_url': textbook_url,
+        })
+
+
+@require_POST
+@login_required
+@ensure_csrf_cookie
+def create_textbook(request, org, course, name):
+    """
+    JSON API endpoint for creating a textbook. Used by the Backbone application.
+    """
+    location = get_location_and_verify_access(request, org, course, name)
+    store = get_modulestore(location)
+    course_module = store.get_item(location, depth=0)
+
+    try:
+        textbook = validate_textbook_json(request.body)
+    except TextbookValidationError as err:
+        return JsonResponse({"error": err.message}, status=400)
+    if not textbook.get("id"):
+        tids = set(t["id"] for t in course_module.pdf_textbooks if "id" in t)
+        textbook["id"] = assign_textbook_id(textbook, tids)
+    existing = course_module.pdf_textbooks
+    existing.append(textbook)
+    course_module.pdf_textbooks = existing
+    if not any(tab['type'] == 'pdf_textbooks' for tab in course_module.tabs):
+        tabs = course_module.tabs
+        tabs.append({"type": "pdf_textbooks"})
+        course_module.tabs = tabs
+    store.update_metadata(course_module.location, own_metadata(course_module))
+    resp = JsonResponse(textbook, status=201)
+    resp["Location"] = reverse("textbook_by_id", kwargs={
+        'org': org,
+        'course': course,
+        'name': name,
+        'tid': textbook["id"],
+    })
+    return resp
+
+
+@login_required
+@ensure_csrf_cookie
+@require_http_methods(("GET", "POST", "PUT", "DELETE"))
+def textbook_by_id(request, org, course, name, tid):
+    """
+    JSON API endpoint for manipulating a textbook via its internal ID.
+    Used by the Backbone application.
+    """
+    location = get_location_and_verify_access(request, org, course, name)
+    store = get_modulestore(location)
+    course_module = store.get_item(location, depth=3)
+    matching_id = [tb for tb in course_module.pdf_textbooks
+                   if str(tb.get("id")) == str(tid)]
+    if matching_id:
+        textbook = matching_id[0]
+    else:
+        textbook = None
+
+    if request.method == 'GET':
+        if not textbook:
+            return JsonResponse(status=404)
+        return JsonResponse(textbook)
+    elif request.method in ('POST', 'PUT'):
+        try:
+            new_textbook = validate_textbook_json(request.body)
+        except TextbookValidationError as err:
+            return JsonResponse({"error": err.message}, status=400)
+        new_textbook["id"] = tid
+        if textbook:
+            i = course_module.pdf_textbooks.index(textbook)
+            new_textbooks = course_module.pdf_textbooks[0:i]
+            new_textbooks.append(new_textbook)
+            new_textbooks.extend(course_module.pdf_textbooks[i+1:])
+            course_module.pdf_textbooks = new_textbooks
+        else:
+            course_module.pdf_textbooks.append(new_textbook)
+        store.update_metadata(course_module.location, own_metadata(course_module))
+        return JsonResponse(new_textbook, status=201)
+    elif request.method == 'DELETE':
+        if not textbook:
+            return JsonResponse(status=404)
+        i = course_module.pdf_textbooks.index(textbook)
+        new_textbooks = course_module.pdf_textbooks[0:i]
+        new_textbooks.extend(course_module.pdf_textbooks[i+1:])
+        course_module.pdf_textbooks = new_textbooks
+        store.update_metadata(course_module.location, own_metadata(course_module))
+        return JsonResponse()

@@ -32,21 +32,21 @@ from path import path
 
 MITX_FEATURES = {
     'USE_DJANGO_PIPELINE': True,
-    
+
     'GITHUB_PUSH': False,
-    
+
     'ENABLE_DISCUSSION_SERVICE': False,
-    
+
     'AUTH_USE_MIT_CERTIFICATES': False,
-    
+
     # do not display video when running automated acceptance tests
     'STUB_VIDEO_FOR_TESTING': False,
-    
+
     # email address for staff (eg to request course creation)
     'STAFF_EMAIL': '',
-    
+
     'STUDIO_NPS_SURVEY': True,
-    
+
     # Segment.io - must explicitly turn it on for production
     'SEGMENT_IO': False,
 
@@ -54,7 +54,11 @@ MITX_FEATURES = {
     'ENABLE_SERVICE_STATUS': False,
 
     # Don't autoplay videos for course authors
-    'AUTOPLAY_VIDEOS': False
+    'AUTOPLAY_VIDEOS': False,
+
+    # If set to True, new Studio users won't be able to author courses unless
+    # edX has explicitly added them to the course creator group.
+    'ENABLE_CREATOR_GROUP': False
 }
 ENABLE_JASMINE = False
 
@@ -139,6 +143,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'method_override.middleware.MethodOverrideMiddleware',
 
     # Instead of AuthenticationMiddleware, we use a cache-backed version
     'cache_toolbox.middleware.CacheBackedAuthenticationMiddleware',
@@ -238,6 +243,7 @@ PIPELINE_JS = {
         ) + ['js/hesitate.js', 'js/base.js', 'js/views/feedback.js',
              'js/models/section.js', 'js/views/section.js',
              'js/models/metadata_model.js', 'js/views/metadata_editor_view.js',
+             'js/models/textbook.js', 'js/views/textbook.js',
              'js/views/assets.js'],
         'output_filename': 'js/cms-application.js',
         'test_order': 0
@@ -320,6 +326,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'djcelery',
     'south',
+    'method_override',
 
     # Monitor the status of services
     'service_status',
@@ -327,6 +334,7 @@ INSTALLED_APPS = (
     # For CMS
     'contentstore',
     'auth',
+    'course_creators',
     'student',  # misleading name due to sharing with lms
     'course_groups',  # not used in cms (yet), but tests run
 
@@ -341,6 +349,9 @@ INSTALLED_APPS = (
 
     # comment common
     'django_comment_common',
+
+    # for course creator table
+    'django.contrib.admin'
 )
 
 ################# EDX MARKETING SITE ##################################

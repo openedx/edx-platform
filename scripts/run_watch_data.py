@@ -25,7 +25,7 @@ WATCH_DIRS = [os.path.abspath(os.path.normpath(dir)) for dir in WATCH_DIRS]
 class DjangoEventHandler(FileSystemEventHandler):
 
     def __init__(self, process):
-        FileSystemEventHandler.__init__(self)
+        super(DjangoEventHandler, self).__init__()
 
         self.process = process
 

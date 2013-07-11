@@ -5,13 +5,35 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Common: Added *experimental* support for jsinput type.
+
+Common: Added setting to specify Celery Broker vhost
+
+Studio: Add table for tracking course creator permissions (not yet used).
+Update rake django-admin[syncdb] and rake django-admin[migrate] so they
+run for both LMS and CMS.
+
+LMS: Added *experimental* crowdsource hinting manager page.
+
+XModule: Added *experimental* crowdsource hinting module.
+
+Studio: Added support for uploading and managing PDF textbooks
+
+Common: Student information is now passed to the tracking log via POST instead of GET.
+
 Common: Add tests for documentation generation to test suite
 
 Blades: User answer now preserved (and changeable) after clicking "show answer" in choice problems
 
+LMS: Removed press releases
+
+Common: Updated Sass and Bourbon libraries, added Neat library
+
 LMS: Users are no longer auto-activated if they click "reset password"
 This is now done when they click on the link in the reset password
 email they receive (along with usual path through activation email).
+
+LMS: Fixed a reflected XSS problem in the static textbook views.
 
 LMS: Problem rescoring.  Added options on the Grades tab of the
 Instructor Dashboard to allow a particular student's submission for a
