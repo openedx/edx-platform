@@ -1,8 +1,9 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%inherit file="../main.html" />
 
 <%namespace name='static' file='../static_content.html'/>
 
-<%block name="title"><title>Courses</title></%block>
+<%block name="title"><title>${_("Courses")}</title></%block>
 
 <section class="find-courses">
   <header class="search">
@@ -16,9 +17,9 @@
           % endif
         </div>
         % if self.stanford_theme_enabled():
-          <h2>Explore free courses from Stanford University.</h2>
+          <h2>${_("Explore free courses from Stanford University.")}</h2>
         % else:
-          <h2>Explore free courses from leading universities.</h2>
+          <h2>${_("Explore free courses from leading universities.")}</h2>
         % endif
       </hgroup>
     </div>

@@ -1,12 +1,14 @@
+<%! from django.utils.translation import ugettext as _ %>
+
 <%inherit file="main.html" />
 <script>
 function name_confirm(id) {
   postJSON('/accept_name_change',{"id":id},
             function(data){
           if(data.success){
-            $("#div"+id).html("Accepted");
+            $("#div"+id).html(gettext("Accepted"));
           } else {
-            alert('Error');
+            alert(gettext('Error'));
           }
      });
 }
@@ -15,9 +17,9 @@ function name_deny(id) {
   postJSON('/reject_name_change',{"id":id},
             function(data){
           if(data.success){
-            $("#div"+id).html("Rejected");
+            $("#div"+id).html(gettext("Rejected"));
           } else {
-            alert('Error');
+            alert(gettext('Error'));
           }
      });
 }
@@ -26,7 +28,7 @@ function name_deny(id) {
 <section class="container">
 <div class="gradebook-wrapper">
   <section class="gradebook-content">
-  <h1>Pending name changes</h1>
+  <h1>${_("Pending name changes")}</h1>
   <table>
   % for s in students:
   <tr>
@@ -34,8 +36,8 @@ function name_deny(id) {
     <td>${s['new_name']|h}</td>
     <td>${s['email']|h}</td>
     <td>${s['rationale']|h}</td>
-    <td><span id="div${s['cid']}"><span onclick="name_confirm(${s['cid']});">[Confirm]</span>
-    <span onclick="name_deny(${s['cid']});">[Reject]</span></span></td></tr>
+    <td><span id="div${s['cid']}"><span onclick="name_confirm(${s['cid']});">${_("[Confirm]")}</span>
+    <span onclick="name_deny(${s['cid']});">${_("[Reject]")}</span></span></td></tr>
   % endfor
   </table>
   </section>

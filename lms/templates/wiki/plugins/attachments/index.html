@@ -1,3 +1,4 @@
+<%! from django.utils.translation import ugettext as _ %>
 {% extends "wiki/article.html" %}
 {% load wiki_tags i18n humanize %}
 {% load url from future %}
@@ -20,7 +21,7 @@
 
   <div class="modal upload-modal hide fade" id="upload-modal">
     <div class="modal-inner-wrapper">
-      <h4>Upload File</h4>
+      <h4>${_("Upload File")}</h4>
       <form method="POST" class="form-vertical" id="attachment_form" enctype="multipart/form-data">        
         {% wiki_form form %}
         <button type="submit" name="save" value="1" class="btn btn-primary">
@@ -32,7 +33,7 @@
 
   <div class="modal search-file-modal hide fade" id="search-file-modal">
     <div class="modal-inner-wrapper">
-      <h4>Search files and articles</h4>
+      <h4>${_("Search files and articles")}</h4>
       <p>{% trans "You can reuse files from other articles. These files are subject to updates on other articles which may or may not be a good thing." %}</p>
       <form method="GET" action="{% url 'wiki:attachments_search' path=urlpath.path article_id=article.id %}" class="form-search">
         {{ search_form.query }}
@@ -127,7 +128,7 @@
           </div>
         </li>
       {% empty %}
-        <p style="margin-bottom: 20px;"><em>{% trans "There are no attachments for this article." %}</em></p>
+      <p style="margin-bottom: 20px;"><em>{% trans "There are no attachments for this article." %}</em></p>
       {% endfor %}
     </ul>
   </div>

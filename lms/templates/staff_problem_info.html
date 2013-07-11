@@ -1,3 +1,5 @@
+<%! from django.utils.translation import ugettext as _ %>
+
 ## The JS for this is defined in xqa_interface.html
 ${module_content}
 %if location.category in ['problem','video','html','combinedopenended','graphical_slider_tool']:
@@ -14,27 +16,27 @@ ${module_content}
     % endif
 </div>
 %  endif
-<div><a href="#${element_id}_debug" id="${element_id}_trig">Staff Debug Info</a></div>
+<div><a href="#${element_id}_debug" id="${element_id}_trig">${_("Staff Debug Info")}</a></div>
 
 %  if settings.MITX_FEATURES.get('ENABLE_STUDENT_HISTORY_VIEW') and \
       location.category == 'problem':
-<div><a href="#${element_id}_history" id="${element_id}_history_trig">Submission history</a></div>
+<div><a href="#${element_id}_history" id="${element_id}_history_trig">${_("Submission history")}</a></div>
 %  endif
 
 <section id="${element_id}_xqa-modal" class="modal xqa-modal" style="width:80%; left:20%; height:80%; overflow:auto" >
   <div class="inner-wrapper">
     <header>
-      <h2>edX Content Quality Assessment</h2>
+      <h2>${_("edX Content Quality Assessment")}</h2>
     </header>
 
     <form id="${element_id}_xqa_form" class="xqa_form">
-      <label>Comment</label>
-      <input id="${element_id}_xqa_entry" type="text" placeholder="comment">
-      <label>Tag</label>
-      <span style="color:black;vertical-align: -10pt">Optional tag (eg "done" or "broken"):&nbsp;       </span>
-      <input id="${element_id}_xqa_tag" type="text" placeholder="tag" style="width:80px;display:inline">
+      <label>${_("Comment")}</label>
+      <input id="${element_id}_xqa_entry" type="text" placeholder="${_('comment')}">
+      <label>${_("Tag")}</label>
+      <span style="color:black;vertical-align: -10pt">${_('Optional tag (eg "done" or "broken"):&nbsp; ')}      </span>
+      <input id="${element_id}_xqa_tag" type="text" placeholder="${_('tag')}" style="width:80px;display:inline">
       <div class="submit">
-        <button name="submit" type="submit">Add comment</button>
+        <button name="submit" type="submit">${_('Add comment')}</button>
       </div>
       <hr>
       <div id="${element_id}_xqa_log_data"></div>
@@ -46,25 +48,25 @@ ${module_content}
 <section class="modal staff-modal" id="${element_id}_debug" style="width:80%; left:20%; height:80%; overflow:auto;" >
   <div class="inner-wrapper" style="color:black">
     <header>
-      <h2>Staff Debug</h2>
+      <h2>${_('Staff Debug')}</h2>
     </header>
     <div class="staff_info" style="display:block">
 is_released = ${is_released}
 location = ${location | h}
 <table>
-  <tr><th>Module Fields</th></tr>
+  <tr><th>${_('Module Fields')}</th></tr>
   %for name, field in fields:
   <tr><td>${name}</td><td><pre style="display:inline-block; margin: 0;">${field | h}</pre></td></tr>
   %endfor
 </table>
 <table>
-  <tr><th>edX Fields</th></tr>
+  <tr><th>${_('edX Fields')}</th></tr>
   %for name, field in lms_fields:
   <tr><td>${name}</td><td><pre style="display:inline-block; margin: 0;">${field | h}</pre></td></tr>
   %endfor
 </table>
 <table>
-  <tr><th>XML attributes</th></tr>
+  <tr><th>${_('XML attributes')}</th></tr>
   %for name, field in xml_attributes.items():
   <tr><td>${name}</td><td><pre style="display:inline-block; margin: 0;">${field | h}</pre></td></tr>
   %endfor
@@ -80,14 +82,14 @@ category = ${category | h}
 <section class="modal history-modal" id="${element_id}_history" style="width:80%; left:20%; height:80%; overflow:auto;" >
   <div class="inner-wrapper" style="color:black">
     <header>
-      <h2>Submission History Viewer</h2>
+      <h2>${_("Submission History Viewer")}</h2>
     </header>
     <form id="${element_id}_history_form">
-      <label for="${element_id}_history_student_username">User:</label>
+      <label for="${element_id}_history_student_username">${_("User:")}</label>
       <input id="${element_id}_history_student_username" type="text" placeholder=""/>
       <input type="hidden" id="${element_id}_history_location" value="${location}"/>
       <div class="submit">
-        <button name="submit" type="submit">View History</button>
+        <button name="submit" type="submit">${_("View History")}</button>
       </div>
     </form>
 

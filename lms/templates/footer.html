@@ -1,5 +1,6 @@
 ## mako
 <%! from django.core.urlresolvers import reverse %>
+<%! from django.utils.translation import ugettext as _ %>
 <%namespace name='static' file='static_content.html'/>
 
 <div class="wrapper wrapper-footer">
@@ -9,27 +10,27 @@
       <ol>
           <li class="nav-colophon-01">
           <a id="about" href="${marketing_link('ABOUT')}">
-              About
+              ${_("About")}
           </a>
           </li>
           <li class="nav-colophon-02">
           <a id="jobs" href="${marketing_link('JOBS')}">
-              Jobs
+              ${_("Jobs")}
           </a>
           </li>
           <li class="nav-colophon-03">
           <a id="press" href="${marketing_link('PRESS')}">
-              Press
+              ${_("Press")}
           </a>
           </li>
           <li class="nav-colophon-04">
           <a id="faq" href="${marketing_link('FAQ')}">
-              FAQ
+              ${_("FAQ")}
           </a>
           </li>
           <li class="nav-colophon-05">
           <a id="contact" href="${marketing_link('CONTACT')}">
-              Contact
+              ${_("Contact")}
           </a>
           </li>
       </ol>
@@ -38,7 +39,7 @@
       <div class="colophon-about">
         <img src="${MITX_ROOT_URL}/static/images/header-logo.png" />
 
-        <p>EdX is a non-profit created by founding partners Harvard and MIT whose mission is to bring the best of higher education to students of all ages anywhere in the world, wherever there is Internet access. EdX’s free online MOOCs are interactive and subjects include computer science, public health, and artificial intelligence.</p>
+        <p>${_("EdX is a non-profit created by founding partners Harvard and MIT whose mission is to bring the best of higher education to students of all ages anywhere in the world, wherever there is Internet access. EdX's free online MOOCs are interactive and subjects include computer science, public health, and artificial intelligence.")}</p>
       </div>
     </div>
 
@@ -73,15 +74,15 @@
         </ul>
       </nav>
 
-      <p class="copyright">&copy; 2013 edX, some rights reserved.</p>
+      <p class="copyright">${_("&copy; 2013 edX, some rights reserved.")}</p>
 
       <nav class="nav-legal">
         <ul>
           <li class="nav-legal-01">
-            <a href="${marketing_link('TOS')}">Terms of Service and Honor Code</a>
+            <a href="${marketing_link('TOS')}">${_("Terms of Service and Honor Code")}</a>
           </li>
           <li class="nav-legal-02">
-            <a href="${marketing_link('PRIVACY')}">Privacy Policy</a>
+            <a href="${marketing_link('PRIVACY')}">${_("Privacy Policy")}</a>
           </li>
         </ul>
       </nav>

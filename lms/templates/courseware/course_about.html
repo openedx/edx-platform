@@ -1,3 +1,4 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%!
   from django.core.urlresolvers import reverse
   from courseware.courses import course_image_url, get_course_about_section
@@ -41,9 +42,9 @@
         ).css("display", "block");
       }
     });
-   
+
     %else:
-   
+
     $('#class_enroll_form').on('ajax:complete', function(event, xhr) {
       if(xhr.status == 200) {
         location.href = "${reverse('dashboard')}";
@@ -51,21 +52,21 @@
         location.href = "${reverse('register_user')}?course_id=${course.id}&enrollment_action=enroll";
       } else {
         $('#register_error').html(
-            (xhr.responseText ? xhr.responseText : 'An error occurred. Please try again later.')
+            (xhr.responseText ? xhr.responseText : ${_('An error occurred. Please try again later.')})
         ).css("display", "block");
       }
     });
 
     %endif
-   
-   
+
+
   })(this)
   </script>
 
   <script src="${static.url('js/course_info.js')}"></script>
 </%block>
 
-<%block name="title"><title>About ${course.number}</title></%block>
+<%block name="title"><title>${_("About {course_number}").format(course_number=course.number)}</title></%block>
 
 <section class="course-info">
   <header class="course-profile">
@@ -86,13 +87,13 @@
 	              %if show_courseware_link:
                     <a href="${course_target}">
                 %endif
-                <span class="register disabled">You are registered for this course (${course.number})</span>
+                <span class="register disabled">${_("You are registered for this course {course_number}").format(course_number=course.number)}</span>
                 %if show_courseware_link:
-                    <strong>View Courseware</strong>
+                    <strong>${_("View Courseware")}</strong>
                     </a>
                 %endif
         %else:
-            <a href="#" class="register">Register for ${course.number}</a>
+            <a href="#" class="register">${_("Register for {course_number}").format(course_number=course.number)}</a>
             <div id="register_error"></div>
         %endif
         </div>
@@ -115,16 +116,16 @@
     </div>
       </div>
   </header>
-    
+
   <section class="container">
     <section class="details">
       <nav>
-        <a href="#" class="active">Overview</a>
-      ##  <a href="#">FAQ</a>
-      ##  <a href="#">Requirements</a>
-      ##  <a href="#">Text-book</a>
-      ##  <a href="#">Syllabus</a>
-      ##  <a href="#">Reviews</a>
+        <a href="#" class="active">${_("Overview")}</a>
+      ##  <a href="#">${_("FAQ")}</a>
+      ##  <a href="#">${_("Requirements")}</a>
+      ##  <a href="#">${_("Text-book")}</a>
+      ##  <a href="#">${_("Syllabus")}</a>
+      ##  <a href="#">${_("Reviews")}</a>
       </nav>
 
       <div class="inner-wrapper">
@@ -136,7 +137,7 @@
       <section class="course-summary">
         <header>
           <div class="social-sharing">
-            <div class="sharing-message">Share with friends and family!</div>
+            <div class="sharing-message">${_("Share with friends and family!")}</div>
             ## TODO: this should probably be an overrideable block,
             ##       or something allowing themes to do whatever they
             ##       want here (and on this whole page, really).
@@ -161,15 +162,15 @@
         </header>
 
         <ol class="important-dates">
-          <li><div class="icon course-number"></div><p>Course Number</p><span class="course-number">${course.number}</span></li>
-          <li><div class="icon start"></div><p>Classes Start</p><span class="start-date">${course.start_date_text}</span></li>
+          <li><div class="icon course-number"></div><p>${_("Course Number")}</p><span class="course-number">${course.number}</span></li>
+          <li><div class="icon start"></div><p>${_("Classes Start")}</p><span class="start-date">${course.start_date_text}</span></li>
 
             ## We plan to ditch end_date (which is not stored in course metadata),
             ## but for backwards compatibility, show about/end_date blob if it exists.
             % if get_course_about_section(course, "end_date") or course.end:
             <li>
                 <div class="icon end"></div>
-                <p>Classes End</p><span class="final-date">
+                <p>${_("Classes End")}</p><span class="final-date">
                 % if get_course_about_section(course, "end_date"):
                     ${get_course_about_section(course, "end_date")}
                 % else:
@@ -180,13 +181,13 @@
             % endif
 
           % if get_course_about_section(course, "effort"):
-            <li><div class="icon effort"></div><p>Estimated Effort</p><span class="start-date">${get_course_about_section(course, "effort")}</span></li>
+            <li><div class="icon effort"></div><p>${_("Estimated Effort")}</p><span class="start-date">${get_course_about_section(course, "effort")}</span></li>
           % endif
 
-          ##<li><div class="icon length"></div><p>Course Length</p><span class="course-length">15 weeks</span></li>
+          ##<li><div class="icon length"></div><p>${_('Course Length')}</p><span class="course-length">${_('{number} weeks').format(number=15)}</span></li>
 
           % if get_course_about_section(course, "prerequisites"):
-            <li class="prerequisites"><div class="icon prereq"></div><p>Prerequisites</p><span class="start-date">${get_course_about_section(course, "prerequisites")}</span></li>
+            <li class="prerequisites"><div class="icon prereq"></div><p>${_("Prerequisites")}</p><span class="start-date">${get_course_about_section(course, "prerequisites")}</span></li>
           % endif
         </ol>
       </section>
@@ -196,10 +197,11 @@
       % if get_course_about_section(course, "ocw_links"):
       <section class="additional-resources">
         <header>
-          <h1>Additional Resources</h1>
+          <h1>${_("Additional Resources")}</h1>
         </header>
 
         <section>
+          ## "MITOpenCourseware" should *not* be translated
           <h2 class="opencourseware">MITOpenCourseware</h2>
              ${get_course_about_section(course, "ocw_links")}
         </section>
@@ -215,10 +217,10 @@
     <form id="class_enroll_form" method="post" data-remote="true" action="${reverse('change_enrollment')}">
       <fieldset class="enroll_fieldset">
         <input name="course_id" type="hidden" value="${course.id}">
-        <input name="enrollment_action" type="hidden" value="enroll">
+        <input name="enrollment_action" type="hidden" value="${_("enroll")}">
       </fieldset>
       <div class="submit">
-        <input name="submit" type="submit" value="enroll">
+        <input name="submit" type="submit" value="${_("enroll")}">
       </div>
     </form>
   </div>
