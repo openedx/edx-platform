@@ -344,7 +344,7 @@ class @PeerGradingProblem
     if response.success
       @is_calibrated_check()
       @grading_message.fadeIn()
-      @grading_message.html("<p>Successfully saved your feedback. Fetched the next essay.</p>")
+      @grading_message.html("<p>Successfully saved your feedback. Fetched the next essay.</p>").focus()
     else
       if response.error
         @render_error(response.error)
@@ -516,7 +516,7 @@ class @PeerGradingProblem
 
   gentle_alert: (msg) =>
     @grading_message.fadeIn()
-    @grading_message.html("<p>" + msg + "</p>")
+    @grading_message.html("<p>" + msg + "</p>").focus()
 
   collapse_question: () =>
     @prompt_container.slideToggle()
