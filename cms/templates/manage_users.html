@@ -67,6 +67,7 @@
 <%block name="jsextra">
 <script type="text/javascript">
   var $newUserForm;
+  var addUserPostbackUrl = "${add_user_postback_url}";
 
   function showNewUserForm(e) {
     e.preventDefault();
@@ -91,16 +92,19 @@
     e.preventDefault();
 
     $.ajax({
-      url: '${add_user_postback_url}',
+      url: addUserPostbackUrl,
       type: 'POST',
       dataType: 'json',
       contentType: 'application/json',
-      data:JSON.stringify({ 'email': $('#email').val()}),
-    }).done(function(data) {
-      if (data.ErrMsg != undefined)
-        $('#result').show().empty().append(data.ErrMsg);
-      else
+      data: JSON.stringify({ 'email': $('#email').val()}),
+      success: function(data) {
         location.reload();
+      },
+      notifyOnError: false,
+      error: function(jqXHR, textStatus, errorThrown) {
+        data = JSON.parse(jqXHR.responseText);
+        $('#result').show().empty().append(data.ErrMsg);
+      }
     });
   }
 
