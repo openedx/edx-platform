@@ -13,8 +13,8 @@ div.book-wrapper {
 
     .outerCenter {
       display: inline-block;
-      float: right !important;
-      right: auto;
+      position: absolute;
+      right: ($baseline/2);
 
       .innerCenter {
         right: auto;
