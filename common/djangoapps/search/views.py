@@ -5,8 +5,6 @@ from models import SearchResults
 
 import requests
 import enchant
-import string
-
 
 CONTENT_TYPES = ("transcript", "problem", "pdf")
 
@@ -33,26 +31,17 @@ def find(request, database="http://127.0.0.1:9200",
     full_url = "/".join([database, index, "_search?q="+field+":"])
     context = {}
     response = requests.get(full_url+query+"&size="+str(max_result))
-    results = json.loads(response._content).get("hits", {"hits": ""})["hits"]
-    data = [entry["_source"] for entry in results]
-    #titles = [entry["display_name"] for entry in data]
-    uuids = [entry["display_name"] for entry in data]
-    transcripts = [entry["searchable_text"] for entry in data]
-    snippets = [snippet_generator(transcript, query) for transcript in transcripts]
-    thumbnails = ["data:image/jpg;base64,"+entry["thumbnail"] for entry in data]
-    urls = [get_datum_url(request, datum) for datum in data]
-    data = zip(uuids, snippets, thumbnails, urls)
-    if len(data) == 0:
-        data = [("No results found, please try again", "")]
-    context.update({"data": data})
+    data = SearchResults(request, response)
+    data.sort_results()
+    context.update({"results": data.has_results})
     correction = spell_check(query)
     results_pages = Paginator(data.entries, results_per_page)
 
     data = proper_page(results_pages, page)
-    context.update({"data": data})
-    context.update({"next_page": next_link(request, data), "prev_page": prev_link(request, data)})
-    context.update({"search_correction_link": search_correction_link(request, correction)})
-    context.update({"spelling_correction": correction})
+    context.update({
+        "data": data, "next_page": next_link(request, data), "prev_page": prev_link(request, data),
+        "search_correction_link": search_correction_link(request, correction),
+        "spelling_correction": correction})
     return render_to_string("search_templates/results.html", context)
 
 

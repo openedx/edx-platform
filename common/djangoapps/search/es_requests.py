@@ -212,6 +212,30 @@ class MongoIndexer:
             }
             print es_instance.index_data(index, course, data)._content
 
+    def index_all_transcripts(self, es_instance, index):
+        cursor = self.find_files_with_type(".srt.sjson")
+        for i in range(0, cursor.count()):
+            item = cursor.next()
+            course = item["_id"]["course"]
+            org = item["_id"]["org"]
+            uuid = self.uuid_from_file_name(item["_id"]["name"])
+            video_module = self.module_for_uuid(uuid)
+            course_section = self.course_name_from_mongo_element(item)
+            if not video_module:
+                print "No module for: " + str(uuid)
+                continue
+            url = self.vertical_url_from_mongo_element(video_module)
+            if not url:
+                continue
+            display_name = item.get("metadata", {"display_name": ""}).get("display_name", "") + " (" + course + ")"
+            transcript = " ".join(self.find_transcript_content(item))
+            thumbnail = self.thumbnail_from_uuid(uuid)
+            data = {
+                "course": course, "course_section": "/".join([org, course, course_section]), "org": org, "uuid": uuid,
+                "searchable_text": transcript, "display_name": display_name, 'url': url, 'thumbnail': thumbnail
+            }
+            print es_instance.index_data(index, course, data)._content
+
 
 class ElasticDatabase:
 
@@ -226,17 +250,19 @@ importantly do not include a slash at the end of the url name."""
 
     def setup_type(self, index, type_, json_mapping):
         """
-        json_mapping should be a dictionary starting at the properties level of a mapping.
-        The type level will be added, so if you include it things will break. The purpose of this
-        is to encourage loose coupling between types and mappings for better code
-        """
-        full_url = "/".join([self.url, index, type_, "_mapping"])
-        json_put_body = {type_: json_mapping}
-        requests.put(full_url, data=json_put_body)
+json_mapping should be a dictionary starting at the properties level of a mapping.
+
+The type level will be added, so if you include it things will break. The purpose of this
+is to encourage loose coupling between types and mappings for better code
+"""
+
+        full_url = "/".join([self.url, index, type_]) + "/"
+        dictionary = json.loads(open(json_mapping).read())
+        print dictionary
+        return requests.post(full_url, data=json.dumps(dictionary))
 
     def has_index(self, index):
         """Checks to see if a given index exists in the database returns existance boolean,
-
 If this returns something other than a 200 or a 404 something is wrong and so we error"""
         full_url = "/".join([self.url, index])
         status = requests.head(full_url).status_code
@@ -262,7 +288,6 @@ If this returns something other than a 200 or a 404 something is wrong and so we
 
     def index_directory_files(self, directory, index, type_, silent=False, **kwargs):
         """Starts a pygrep instance and indexes all files in the given directory
-
 Available kwargs are file_ending, callback, and conserve_kwargs.
 Respectively these allow you to choose the file ending to be indexed, the
 callback used to do the indexing, and whether or not you would like to pass
@@ -298,7 +323,6 @@ additional kwargs to the callback function."""
             return self.index_data(index, type_, data)._content
         else:
             return self.index_data(index, type_, data, id_=id_)
-        return self.index_data(index, type_, id_, data)._content
 
     def setup_index(self, index):
         """Creates a new elasticsearch index, returns the response it gets"""
@@ -375,7 +399,6 @@ class EnchantDictionary:
 
     def produce_dictionary(self, output_file, **kwargs):
         """Produces a dictionary or updates it depending on kwargs
-
 If no kwargs are given then this method will write a full dictionary including all
 entries in all indices and types and output it in an enchant-friendly way to the output file.
 
@@ -408,13 +431,17 @@ settings_file = "settings.json"
 
 mongo = MongoIndexer()
 
-#test = ElasticDatabase(url, settings_file)
-#dictionary = EnchantDictionary(test)
-#dictionary.produce_dictionary("pyenchant_corpus.txt", max_results=500000)
-#print test.delete_index("transcript-index")
-#mongo.index_all_lecture_slides(test, "slide-index")
-#mongo.index_all_transcripts(test, "transcript-index")
-#mongo.index_all_problems(test, "problem-index")
+
+# test = ElasticDatabase(url, settings_file)
+# dictionary = EnchantDictionary(test)
+# print test.delete_index("pdf-index")
+# print test.delete_index("transcript-index")
+# print test.delete_index("problem-index")
+# mongo.index_all_pdfs(test, "pdf-index")
+# mongo.index_all_transcripts(test, "transcript-index")
+# mongo.index_all_problems(test, "problem-index")
+# dictionary.produce_dictionary("pyenchant_corpus.txt", max_results=500000)
+
 #print test.setup_type("transcript", "cleaning", mapping)._content
 #print test.get_type_mapping("transcript-index", "2-1x")
 #print test.index_directory_transcripts("/home/slater/edx_all/data", "transcript-index", "transcript")

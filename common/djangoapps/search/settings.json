@@ -1,358 +1,157 @@
 {
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-	"mappings": {
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> Integrated module data and improved settings file
-=======
-	"mappings": {
->>>>>>> search result vertical linking in place, mongo tree traversal also working
-		"properties": {
-			"searchable_text": {
-				"type": "multi_field",
-				"fields": {
-					"full_words": {
-						"type": "string",
-						"store": "yes",
-						"index": "analyzed",
-						"term_vector": "with_positions_offsets",
-						"analyzer": "transcript_analyzer",
-						"boost": 2.0,
-						"similarity": "BM25"
-					},
+"mappings": {
+"properties": {
+"searchable_text": {
+"type": "multi_field",
+"fields": {
+"full_words": {
+"type": "string",
+"store": "yes",
+"index": "analyzed",
+"term_vector": "with_positions_offsets",
+"analyzer": "transcript_analyzer",
+"boost": 2.0,
+"similarity": "BM25"
+},
 
-					"ngrams": {
-						"type": "string",
-						"store": "yes",
-						"index": "analyzed",
-						"term_vector": "with_positions_offsets",
-						"analyzer": "ngram_analyzer",
-						"boost": 1.0,
-						"similarity": "BM25"
-					}
-				}
-			},
+"ngrams": {
+"type": "string",
+"store": "yes",
+"index": "analyzed",
+"term_vector": "with_positions_offsets",
+"analyzer": "ngram_analyzer",
+"boost": 1.0,
+"similarity": "BM25"
+}
+}
+},
 
-			"display_name": {
-				"type": "multi_field",
-				"fields": {
+"display_name": {
+"type": "multi_field",
+"fields": {
 
-					"depth_search": {
-						"type": "string",
-						"store": "yes",
-						"index": "analyzed",
-						"term_vector": "with_positions_offsets",
-						"analyzer": "depth_analyzer",
-						"boost": 1.0,
-						"similarity": "BM25"
-					},
+"depth_search": {
+"type": "string",
+"store": "yes",
+"index": "analyzed",
+"term_vector": "with_positions_offsets",
+"analyzer": "depth_analyzer",
+"boost": 1.0,
+"similarity": "BM25"
+},
 
-					"breadth_search": {
-						"type": "string",
-						"store": "yes",
-						"index": "analyzed",
-						"term_vector": "with_positions_offsets",
-						"analyzer": "breadth_analyzer",
-						"boost": 2.0,
-						"similarity": "BM25"
-					}
-<<<<<<< HEAD
-				},
+"breadth_search": {
+"type": "string",
+"store": "yes",
+"index": "analyzed",
+"term_vector": "with_positions_offsets",
+"analyzer": "breadth_analyzer",
+"boost": 2.0,
+"similarity": "BM25"
+}
+},
 
-				"org": {
-					"type": "string",
-					"store": "true"
-				},
+"org": {
+"type": "string",
+"store": "true"
+},
 
-<<<<<<< HEAD
-				"course_id": {
-=======
-		"_all": {
-			"properties": {
-				"searchable_text": {
->>>>>>> Added mongo integration with elasticsearch requests module
-=======
-				"course": {
->>>>>>> search result vertical linking in place, mongo tree traversal also working
-					"type": "string",
-					"store":"true"
-=======
->>>>>>> Integrated module data and improved settings file
-				},
+"course": {
+"type": "string",
+"store":"true"
+},
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-				"uuid": {
-=======
-				"org": {
->>>>>>> Added mongo integration with elasticsearch requests module
-=======
-				"course_section": {
->>>>>>> search result vertical linking in place, mongo tree traversal also working
-					"type": "string",
-					"store": "true"
-				},
+"course_section": {
+"type": "string",
+"store": "true"
+},
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-				"thumbnail": {
-					"type": "binary"
-=======
-				"course_id": {
-					"type": "string",
-					"store":"true"
-				},
+"uuid": {
+"type": "string",
+"store": "true"
+},
 
-				"uuid": {
-					"type": "string",
-					"store": "true"
-<<<<<<< HEAD
->>>>>>> Added mongo integration with elasticsearch requests module
-=======
-				},
+"url": {
+"type": "string",
+"store": "true"
+},
 
-				"thumbnail": {
-					"type": "binary"
-<<<<<<< HEAD
->>>>>>> Made prettier, added requirements, and included main edX page
-=======
-<<<<<<< HEAD
->>>>>>> Made prettier, added requirements, and included main edX page
-				}
-			}
-		}
-	},
+"thumbnail": {
+"type": "binary"
+}
+}
+}
+},
 
-	"settings": {
-		"analysis":{
-		    "analyzer": {
+"settings": {
+"analysis":{
+"analyzer": {
 
-		        "transcript_analyzer": {
-		            "type": "custom",
-		            "tokenizer": "standard",
-		            "filter": ["asciifolding", "custom_word_delimiter", "lowercase", "custom_stemmer", "shingle",
-		            		    "custom_phonetic"]
-		        },
+"transcript_analyzer": {
+"type": "custom",
+"tokenizer": "standard",
+"filter": ["asciifolding", "custom_word_delimiter", "lowercase", "custom_stemmer", "shingle",
+"custom_phonetic"]
+},
 
-		        "ngram_analyzer": {
-		        	"type": "custom",
-		        	"tokenizer": "custom_ngram",
-		        	"filter": ["asciifolding", "word_delimiter", "lowercase", "custom_stemmer", "custom_phonetic"]
-		        },
+"ngram_analyzer": {
+"type": "custom",
+"tokenizer": "custom_ngram",
+"filter": ["asciifolding", "word_delimiter", "lowercase", "custom_stemmer", "custom_phonetic"]
+},
 
-		        "depth_analyzer": {
-		        	"type": "custom",
-		        	"tokenizer": "full_ngram",
-		        	"filter": ["custom_word_delimiter", "lowercase", "shingle", "custom_phonetic"]
-		        },
+"depth_analyzer": {
+"type": "custom",
+"tokenizer": "full_ngram",
+"filter": ["custom_word_delimiter", "lowercase", "shingle", "custom_phonetic"]
+},
 
-		        "breadth_analyzer": {
-		        	"type": "custom",
-		        	"tokenizer": "letter",
-		        	"filter": ["asciifolding", "lowercase", "simple_phonetic"]
-		        }
-		    },
+"breadth_analyzer": {
+"type": "custom",
+"tokenizer": "letter",
+"filter": ["asciifolding", "lowercase", "simple_phonetic"]
+}
+},
 
-		    "tokenizer" : {
+"tokenizer" : {
 
-		    	"custom_ngram": {
-		    		"type": "nGram",
-		    		"min_gram": 1,
-		    		"max_gram": 3
-		    	},
+"custom_ngram": {
+"type": "nGram",
+"min_gram": 1,
+"max_gram": 3
+},
 
-		    	"full_ngram": {
-		    		"type": "nGram",
-		    		"min_gram": 1,
-		    		"max_gram": 5
-		    	}
-		    },
+"full_ngram": {
+"type": "nGram",
+"min_gram": 1,
+"max_gram": 5
+}
+},
 
-		    "filter" : {
+"filter" : {
 
-		    	"simple_phonetic": {
-		    		"type": "phonetic",
-		    		"encoder": "nysiis",
-		    		"replace": true
-		    	},
+"simple_phonetic": {
+"type": "phonetic",
+"encoder": "nysiis",
+"replace": true
+},
 
-		    	"custom_phonetic": {
-		    		"type": "phonetic",
-		    		"encoder": "doublemetaphone",
-		    		"replace": false
-		    	},
+"custom_phonetic": {
+"type": "phonetic",
+"encoder": "doublemetaphone",
+"replace": false
+},
 
-		        "custom_word_delimiter": {
-		            "type": "word_delimiter",
-		            "preserve_original": "true"
-		        },
+"custom_word_delimiter": {
+"type": "word_delimiter",
+"preserve_original": "true"
+},
 
-		        "custom_stemmer": {
-		            "type": "stemmer",
-		            "name": "english"
-		        }
-		    }
-=======
-	"settings": {
-		"index": {
-			"number_of_replicas": 2,
-			"number_of_shards": 3
->>>>>>> Storing current elasticsearch progress
-		}
-=======
-	"transcript": {
-	    "analyzer": {
-=======
-	"mappings": {
-		"properties": {
-			"searchable_text": {
-				"type": "multi_field",
-				"fields": {
-					"full_words": {
-						"type": "string",
-						"store": "yes",
-						"index": "analyzed",
-						"term_vector": "with_positions_offsets",
-						"analyzer": "transcript_analyzer",
-						"boost": 2.0,
-						"similarity": "BM25"
-					},
-
-					"ngrams": {
-						"type": "string",
-						"store": "yes",
-						"index": "analyzed",
-						"term_vector": "with_positions_offsets",
-						"analyzer": "ngram_analyzer",
-						"boost": 1.0,
-						"similarity": "BM25"
-					}
-				}
-			},
-
-			"display_name": {
-				"type": "multi_field",
-				"fields": {
-
-					"depth_search": {
-						"type": "string",
-						"store": "yes",
-						"index": "analyzed",
-						"term_vector": "with_positions_offsets",
-						"analyzer": "depth_analyzer",
-						"boost": 1.0,
-						"similarity": "BM25"
-					},
-
-					"breadth_search": {
-						"type": "string",
-						"store": "yes",
-						"index": "analyzed",
-						"term_vector": "with_positions_offsets",
-						"analyzer": "breadth_analyzer",
-						"boost": 2.0,
-						"similarity": "BM25"
-					}
-				},
->>>>>>> Moved past difficulty in file integration and adding configurability to elasticsearch analyzers
-
-				"org": {
-=======
-				"uuid": {
->>>>>>> search result vertical linking in place, mongo tree traversal also working
-					"type": "string",
-					"store": "true"
-				},
-
-				"url": {
-					"type": "string",
-					"store": "true"
-				},
-				
-				"thumbnail": {
-					"type": "binary"
-				}
-			}
-		}
-	},
-
-	"settings": {
-		"analysis":{
-		    "analyzer": {
-
-		        "transcript_analyzer": {
-		            "type": "custom",
-		            "tokenizer": "standard",
-		            "filter": ["asciifolding", "custom_word_delimiter", "lowercase", "custom_stemmer", "shingle",
-		            		    "custom_phonetic"]
-		        },
-
-		        "ngram_analyzer": {
-		        	"type": "custom",
-		        	"tokenizer": "custom_ngram",
-		        	"filter": ["asciifolding", "word_delimiter", "lowercase", "custom_stemmer", "custom_phonetic"]
-		        },
-
-		        "depth_analyzer": {
-		        	"type": "custom",
-		        	"tokenizer": "full_ngram",
-		        	"filter": ["custom_word_delimiter", "lowercase", "shingle", "custom_phonetic"]
-		        },
-
-		        "breadth_analyzer": {
-		        	"type": "custom",
-		        	"tokenizer": "letter",
-		        	"filter": ["asciifolding", "lowercase", "simple_phonetic"]
-		        }
-		    },
-
-		    "tokenizer" : {
-
-		    	"custom_ngram": {
-		    		"type": "nGram",
-		    		"min_gram": 1,
-		    		"max_gram": 3
-		    	},
-
-		    	"full_ngram": {
-		    		"type": "nGram",
-		    		"min_gram": 1,
-		    		"max_gram": 5
-		    	}
-		    },
-
-		    "filter" : {
-
-		    	"simple_phonetic": {
-		    		"type": "phonetic",
-		    		"encoder": "nysiis",
-		    		"replace": true
-		    	},
-
-		    	"custom_phonetic": {
-		    		"type": "phonetic",
-		    		"encoder": "doublemetaphone",
-		    		"replace": false
-		    	},
-
-		        "custom_word_delimiter": {
-		            "type": "word_delimiter",
-		            "preserve_original": "true"
-		        },
-
-		        "custom_stemmer": {
-		            "type": "stemmer",
-		            "name": "english"
-		        }
-		    }
-		}
-<<<<<<< HEAD
->>>>>>> Moved past difficulty in file integration and adding configurability to elasticsearch analyzers
-=======
->>>>>>> search result vertical linking in place, mongo tree traversal also working
-	}
+"custom_stemmer": {
+"type": "stemmer",
+"name": "english"
+}
+}
+}
+}
 }

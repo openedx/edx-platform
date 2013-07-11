@@ -7,33 +7,10 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> search result vertical linking in place, mongo tree traversal also working
    version="1.1"
    width="15"
    height="15"
    id="svg3039">
-<<<<<<< HEAD
-=======
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   id="svg3039"
-=======
->>>>>>> Refactored ES code for readability and ease of testing. Trying to fix firefox svg error
-   version="1.1"
-   width="15"
-   height="15"
-<<<<<<< HEAD
-   sodipodi:docname="search-icon.svg">
->>>>>>> Search working, basic functionality and styling in place, as well as csrf protection, snippeting, results highlighting, and spell correction
-=======
-   id="svg3039">
->>>>>>> Refactored ES code for readability and ease of testing. Trying to fix firefox svg error
-=======
->>>>>>> search result vertical linking in place, mongo tree traversal also working
   <metadata
      id="metadata3045">
     <rdf:RDF>
@@ -42,19 +19,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
         <dc:title></dc:title>
-=======
-        <dc:title />
->>>>>>> Search working, basic functionality and styling in place, as well as csrf protection, snippeting, results highlighting, and spell correction
-=======
-        <dc:title></dc:title>
->>>>>>> Refactored ES code for readability and ease of testing. Trying to fix firefox svg error
-=======
-        <dc:title></dc:title>
->>>>>>> search result vertical linking in place, mongo tree traversal also working
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -64,43 +29,16 @@
        id="linearGradient3962">
       <stop
          id="stop3970"
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
          style="stop-color:#ffffff;stop-opacity:0.79824561"
          offset="0" />
       <stop
          id="stop3966"
          style="stop-color:#ffffff;stop-opacity:0.56140351"
          offset="1" />
-=======
-         offset="0"
-         style="stop-color:#ffffff;stop-opacity:0.79824561;" />
-      <stop
-         style="stop-color:#ffffff;stop-opacity:0.56140351;"
-         offset="1"
-         id="stop3966" />
->>>>>>> Search working, basic functionality and styling in place, as well as csrf protection, snippeting, results highlighting, and spell correction
-=======
-=======
->>>>>>> search result vertical linking in place, mongo tree traversal also working
-         style="stop-color:#ffffff;stop-opacity:0.79824561"
-         offset="0" />
-      <stop
-         id="stop3966"
-         style="stop-color:#ffffff;stop-opacity:0.56140351"
-         offset="1" />
-<<<<<<< HEAD
->>>>>>> Refactored ES code for readability and ease of testing. Trying to fix firefox svg error
-=======
->>>>>>> search result vertical linking in place, mongo tree traversal also working
     </linearGradient>
     <linearGradient
        id="linearGradient3942">
       <stop
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
          id="stop3944"
          style="stop-color:#ffffff;stop-opacity:1"
          offset="0" />
@@ -132,57 +70,4 @@
      d="m 8.5182482,10.313869 c 0,0 2.1590598,1.881089 2.9343068,2.540146 0.775247,0.659057 1.315147,1.217617 2.102189,1.116788 0.363811,-0.04661 0.706204,-0.3928 0.81022,-0.744526 0.132545,-0.448193 -0.0219,-1.007299 -0.350365,-1.357664 C 13.686132,11.518248 10.40146,8.5182482 10.40146,8.5182482 z"
      id="path3950"
      style="fill:#adadad;fill-opacity:1;stroke:#adadad;stroke-width:0.1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:0.88627451;stroke-dasharray:none;filter:url(#filter3785)" />
-=======
-         style="stop-color:#ffffff;stop-opacity:1;"
-         offset="0"
-         id="stop3944" />
-=======
-         id="stop3944"
-         style="stop-color:#ffffff;stop-opacity:1"
-         offset="0" />
->>>>>>> Refactored ES code for readability and ease of testing. Trying to fix firefox svg error
-=======
-         id="stop3944"
-         style="stop-color:#ffffff;stop-opacity:1"
-         offset="0" />
->>>>>>> search result vertical linking in place, mongo tree traversal also working
-      <stop
-         id="stop3946"
-         style="stop-color:#ffffff;stop-opacity:0"
-         offset="1" />
-    </linearGradient>
-    <filter
-       color-interpolation-filters="sRGB"
-       id="filter3781">
-      <feGaussianBlur
-         id="feGaussianBlur3783"
-         stdDeviation="0.1674635" />
-    </filter>
-    <filter
-       color-interpolation-filters="sRGB"
-       id="filter3785">
-      <feGaussianBlur
-         id="feGaussianBlur3787"
-         stdDeviation="0.09938691" />
-    </filter>
-  </defs>
-  <path
-     d="m 10.839416,5.7481751 a 4.7846713,4.7846713 0 1 1 -9.5693426,0 4.7846713,4.7846713 0 1 1 9.5693426,0 z"
-     id="path3055"
-     style="fill:#000000;fill-opacity:0;fill-rule:evenodd;stroke:#adadad;stroke-width:1.89999998;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;filter:url(#filter3781)" />
-  <path
-     d="m 8.5182482,10.313869 c 0,0 2.1590598,1.881089 2.9343068,2.540146 0.775247,0.659057 1.315147,1.217617 2.102189,1.116788 0.363811,-0.04661 0.706204,-0.3928 0.81022,-0.744526 0.132545,-0.448193 -0.0219,-1.007299 -0.350365,-1.357664 C 13.686132,11.518248 10.40146,8.5182482 10.40146,8.5182482 z"
-     id="path3950"
-<<<<<<< HEAD
-<<<<<<< HEAD
-     inkscape:connector-curvature="0"
-     sodipodi:nodetypes="czaazcc" />
->>>>>>> Search working, basic functionality and styling in place, as well as csrf protection, snippeting, results highlighting, and spell correction
-=======
-     style="fill:#adadad;fill-opacity:1;stroke:#adadad;stroke-width:0.1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:0.88627451;stroke-dasharray:none;filter:url(#filter3785)" />
->>>>>>> Refactored ES code for readability and ease of testing. Trying to fix firefox svg error
 </svg>
-=======
-     style="fill:#adadad;fill-opacity:1;stroke:#adadad;stroke-width:0.1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:0.88627451;stroke-dasharray:none;filter:url(#filter3785)" />
-</svg>
->>>>>>> search result vertical linking in place, mongo tree traversal also working

@@ -1,238 +1,61 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 .searchwrapper {
-	width:45%;
-=======
-#searchwrapper {
-	width: 250px;
-	height: 30px;
-	background: -moz-linear-gradient(top,  #ffffff 0%, #ededed 49%, #fafafa 50%, #ededed 50%, #dcdcdc 100%); /* FF3.6+ */
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(49%,#ededed), color-stop(50%,#fafafa), color-stop(50%,#ededed), color-stop(100%,#dcdcdc)); /* Chrome,Safari4+ */
-	background: -webkit-linear-gradient(top,  #ffffff 0%,#ededed 49%,#fafafa 50%,#ededed 50%,#dcdcdc 100%); /* Chrome10+,Safari5.1+ */
-	background: -o-linear-gradient(top,  #ffffff 0%,#ededed 49%,#fafafa 50%,#ededed 50%,#dcdcdc 100%); /* Opera 11.10+ */
-	background: -ms-linear-gradient(top,  #ffffff 0%,#ededed 49%,#fafafa 50%,#ededed 50%,#dcdcdc 100%); /* IE10+ */
-	background: linear-gradient(to bottom,  #ffffff 0%,#ededed 49%,#fafafa 50%,#ededed 50%,#dcdcdc 100%); /* W3C */
-	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#dcdcdc',GradientType=0 ); /* IE6-9 */
-
->>>>>>> Search working, basic functionality and styling in place, as well as csrf protection, snippeting, results highlighting, and spell correction
-=======
-.searchwrapper {
-	width:45%;
->>>>>>> Refactored some code and added full elasticsearch module test suite
-	padding: 0;
-=======
-.searchwrapper {
-	width:45%;
-	left: 30px;
->>>>>>> search result vertical linking in place, mongo tree traversal also working
-	margin: 0;
-	position:relative;
+width:45%;
+left: 30px;
+margin: 0;
+position:relative;
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> Search working, basic functionality and styling in place, as well as csrf protection, snippeting, results highlighting, and spell correction
-=======
->>>>>>> Refactored some code and added full elasticsearch module test suite
-=======
->>>>>>> Made prettier, added requirements, and included main edX page
-=======
 
->>>>>>> search result vertical linking in place, mongo tree traversal also working
 .result-title{
-	text-align: center;
-	word-wrap: normal;
-	padding-top: 175px;
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-.result-title{
-	text-align: center;
-	word-wrap: normal;
->>>>>>> Made prettier, added requirements, and included main edX page
-=======
->>>>>>> Refactored ES code for readability and ease of testing. Trying to fix firefox svg error
-=======
->>>>>>> search result vertical linking in place, mongo tree traversal also working
+text-align: center;
+word-wrap: normal;
+padding-top: 175px;
 }
 
 .searchwrapper form { display: inline; }
 
 .search-results{
-	margin-left: 10%;
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-	margin-top: -150px;
-<<<<<<< HEAD
+margin-left: 10%;
+margin-top: -100px;
 }
 
 .result-content{
-	margin-top: -20px;
-}
-=======
-=======
-.result-title{
-	text-align: center;
-	word-wrap: normal;
-}
->>>>>>> Made prettier, added requirements, and included main edX page
-.searchwrapper form { display: inline; }
->>>>>>> Refactored some code and added full elasticsearch module test suite
-
-.search-results{
-	margin-left: 10%;
-	margin-top: 20px;
-=======
->>>>>>> Refactored ES code for readability and ease of testing. Trying to fix firefox svg error
-=======
-	margin-top: -100px;
->>>>>>> search result vertical linking in place, mongo tree traversal also working
+margin-top: -20px;
 }
 
 .result-content{
-	margin-top: -20px;
+margin-top: -20px;
 }
-
-<<<<<<< HEAD
-=======
-	margin-top: 20px;
-}
->>>>>>> Made prettier, added requirements, and included main edX page
-.searchbox {
-	border:0;
-	background: -moz-linear-gradient(top,  #ffffff 0%, #ededed 49%, #fafafa 50%, #ededed 50%, #dcdcdc 100%); /* FF3.6+ */
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(49%,#ededed), color-stop(50%,#fafafa), color-stop(50%,#ededed), color-stop(100%,#dcdcdc)); /* Chrome,Safari4+ */
-	background: -webkit-linear-gradient(top,  #ffffff 0%,#ededed 49%,#fafafa 50%,#ededed 50%,#dcdcdc 100%); /* Chrome10+,Safari5.1+ */
-	background: -o-linear-gradient(top,  #ffffff 0%,#ededed 49%,#fafafa 50%,#ededed 50%,#dcdcdc 100%); /* Opera 11.10+ */
-	background: -ms-linear-gradient(top,  #ffffff 0%,#ededed 49%,#fafafa 50%,#ededed 50%,#dcdcdc 100%); /* IE10+ */
-	background: linear-gradient(to bottom,  #ffffff 0%,#ededed 49%,#fafafa 50%,#ededed 50%,#dcdcdc 100%); /* W3C */
-	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#dcdcdc',GradientType=0 ); /* IE6-9 */
-=======
-#searchwrapper form { display: inline; }
 
 .searchbox {
-	border:0;
-	background-color:transparent;
->>>>>>> Search working, basic functionality and styling in place, as well as csrf protection, snippeting, results highlighting, and spell correction
-=======
-.searchwrapper form { display: inline; }
-=======
-	margin-top: -150px;
-}
-
-.result-content{
-	margin-top: -20px;
-}
->>>>>>> Refactored ES code for readability and ease of testing. Trying to fix firefox svg error
-=======
-.result-content{
-	margin-top: -20px;
-}
->>>>>>> search result vertical linking in place, mongo tree traversal also working
-
-.searchbox {
-	border:0;
-	background: -moz-linear-gradient(top,  #ffffff 0%, #ededed 49%, #fafafa 50%, #ededed 50%, #dcdcdc 100%); /* FF3.6+ */
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(49%,#ededed), color-stop(50%,#fafafa), color-stop(50%,#ededed), color-stop(100%,#dcdcdc)); /* Chrome,Safari4+ */
-	background: -webkit-linear-gradient(top,  #ffffff 0%,#ededed 49%,#fafafa 50%,#ededed 50%,#dcdcdc 100%); /* Chrome10+,Safari5.1+ */
-	background: -o-linear-gradient(top,  #ffffff 0%,#ededed 49%,#fafafa 50%,#ededed 50%,#dcdcdc 100%); /* Opera 11.10+ */
-	background: -ms-linear-gradient(top,  #ffffff 0%,#ededed 49%,#fafafa 50%,#ededed 50%,#dcdcdc 100%); /* IE10+ */
-	background: linear-gradient(to bottom,  #ffffff 0%,#ededed 49%,#fafafa 50%,#ededed 50%,#dcdcdc 100%); /* W3C */
-	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#dcdcdc',GradientType=0 ); /* IE6-9 */
-<<<<<<< HEAD
->>>>>>> Refactored some code and added full elasticsearch module test suite
-=======
->>>>>>> search result vertical linking in place, mongo tree traversal also working
-	position:absolute;
-	top:3px;
-	left:0;
-	width:249px;
-	height:25px;
+border:0;
+background: -moz-linear-gradient(top, #ffffff 0%, #ededed 49%, #fafafa 50%, #ededed 50%, #dcdcdc 100%); /* FF3.6+ */
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(49%,#ededed), color-stop(50%,#fafafa), color-stop(50%,#ededed), color-stop(100%,#dcdcdc)); /* Chrome,Safari4+ */
+background: -webkit-linear-gradient(top, #ffffff 0%,#ededed 49%,#fafafa 50%,#ededed 50%,#dcdcdc 100%); /* Chrome10+,Safari5.1+ */
+background: -o-linear-gradient(top, #ffffff 0%,#ededed 49%,#fafafa 50%,#ededed 50%,#dcdcdc 100%); /* Opera 11.10+ */
+background: -ms-linear-gradient(top, #ffffff 0%,#ededed 49%,#fafafa 50%,#ededed 50%,#dcdcdc 100%); /* IE10+ */
+background: linear-gradient(to bottom, #ffffff 0%,#ededed 49%,#fafafa 50%,#ededed 50%,#dcdcdc 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#dcdcdc',GradientType=0 ); /* IE6-9 */
+position:absolute;
+top:3px;
+left:0;
+width:249px;
+height:25px;
 }
 
 .searchbox_submit {
-	border: 0;
-<<<<<<< HEAD
-	background-color: transparent;
-<<<<<<< HEAD
-<<<<<<< HEAD
-	background-size: cover;
-	position: absolute;
-	top: 2.5px;
-	left: 210px;
-	/*width: 35px;*/
-<<<<<<< HEAD
-}
-
-.searchbox_submit:before{
-	position: absolute;
-    content: '';
-    background-image: url("../images/search-icon.svg");
-    background-size: cover;
-    background-color: transparent;
-    margin-left: 6px;
-    margin-top: 4px;
-    width:30px;
-    height:30px;
-    pointer-events: none;
-}
-.searchbox_submit:hover {
-	cursor:pointer;
-	cursor: hand;
-}
-
-.content-select{
-	display: block;
-	text-align: right;
-	padding-top: 10px;
-=======
->>>>>>> Made prettier, added requirements, and included main edX page
-=======
-	position: relative;
-	width: 40px;
-	left: 210px;
-	top: 3.5px;
->>>>>>> search result vertical linking in place, mongo tree traversal also working
+border: 0;
+position: relative;
+width: 40px;
+left: 210px;
+top: 3.5px;
 }
 
 .content{
-	margin-left: 10px;
+margin-left: 10px;
 }
-<<<<<<< HEAD
-
-.content-select{
-	display: block;
-	text-align: right;
-	padding-top: 10px;
-=======
-=======
-	background-size: cover;
->>>>>>> Coverted templates to use mako
-	position: absolute;
-<<<<<<< HEAD
-	top: 4px;
-	left: 225px;
-	width:25px;
-	height:25px;
->>>>>>> Search working, basic functionality and styling in place, as well as csrf protection, snippeting, results highlighting, and spell correction
-=======
-	top: 2.5px;
-	left: 210px;
-	/*width: 35px;*/
->>>>>>> Made prettier, added requirements, and included main edX page
-}
-
-=======
->>>>>>> search result vertical linking in place, mongo tree traversal also working
 .searchbox_submit:before{
-	position: absolute;
+position: absolute;
     content: '';
     background-image: url("../images/search-icon.svg");
     background-size: cover;
@@ -244,132 +67,62 @@
 }
 
 .searchbox_submit:hover {
-	cursor:pointer;
-	cursor: hand;
+cursor:pointer;
+cursor: hand;
 }
 
 .content-select{
-	float: left;
-	padding-top: 10px;
+float: left;
+padding-top: 10px;
 }
 
 .results_snippet{
-	color: #666666;
-	font-family: "Open Sans", "Arial";
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> search result vertical linking in place, mongo tree traversal also working
-	font-weight: 300;
-	height: 155px;
-	width: 360px;
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-	padding-left: 10%;
->>>>>>> Made prettier, added requirements, and included main edX page
-=======
->>>>>>> Refactored ES code for readability and ease of testing. Trying to fix firefox svg error
-	text-align: justify;
+color: #666666;
+font-family: "Open Sans", "Arial";
+font-weight: 300;
+height: 155px;
+width: 360px;
+text-align: justify;
 }
 
 .result_wrapper{
-<<<<<<< HEAD
-<<<<<<< HEAD
-	width: 705px;
-=======
-	width: 520px;
->>>>>>> Made prettier, added requirements, and included main edX page
-=======
-	width: 705px;
->>>>>>> Refactored ES code for readability and ease of testing. Trying to fix firefox svg error
+width: 705px;
 }
 
 .snippet_container{
-	overflow: hidden;
-	height: 155px;
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> Refactored ES code for readability and ease of testing. Trying to fix firefox svg error
-	width: 360px;
-	margin-left: 15px;
+overflow: hidden;
+height: 155px;
+width: 360px;
+margin-left: 15px;
 }
 
 .thumbnail{
-	width: 190px;
-	height: 155px;
+width: 190px;
+height: 155px;
 }
 
 .columnate{
-	float:left;
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-}
-=======
-	width: 400px;
-}
->>>>>>> Made prettier, added requirements, and included main edX page
-=======
-}
->>>>>>> Refactored ES code for readability and ease of testing. Trying to fix firefox svg error
-=======
-=======
-	font-size: 14px;
-	font-weight: 300;
->>>>>>> Search working, basic functionality and styling in place, as well as csrf protection, snippeting, results highlighting, and spell correction
-<<<<<<< HEAD
-}
->>>>>>> Search working, basic functionality and styling in place, as well as csrf protection, snippeting, results highlighting, and spell correction
-=======
-=======
-	font-weight: 300;
-	height: 155px;
-	width: 360px;
-	text-align: justify;
-=======
->>>>>>> search result vertical linking in place, mongo tree traversal also working
+float:left;
 }
 
 .result_wrapper{
-	width: 705px;
+width: 705px;
 }
 
 .snippet_container{
-	overflow: hidden;
-	height: 155px;
-<<<<<<< HEAD
-<<<<<<< HEAD
-	width: 400px;
->>>>>>> Made prettier, added requirements, and included main edX page
-<<<<<<< HEAD
-}
->>>>>>> Made prettier, added requirements, and included main edX page
-=======
-=======
-=======
->>>>>>> search result vertical linking in place, mongo tree traversal also working
-	width: 360px;
-	margin-left: 15px;
+overflow: hidden;
+height: 155px;
+width: 360px;
+margin-left: 15px;
 }
 
 .thumbnail{
-	width: 190px;
-	height: 155px;
+width: 190px;
+height: 155px;
 }
 
-<<<<<<< HEAD
-.columnate{
-	float:left;
->>>>>>> Refactored ES code for readability and ease of testing. Trying to fix firefox svg error
-}
->>>>>>> Refactored ES code for readability and ease of testing. Trying to fix firefox svg error
-=======
 .pagination{
-	position: relative;
-	margin-top: 200px;
-	margin-left: 10%;
+position: relative;
+margin-top: 200px;
+margin-left: 10%;
 }
->>>>>>> search result vertical linking in place, mongo tree traversal also working
