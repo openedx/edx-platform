@@ -5,28 +5,16 @@ class @TabsEditorDescriptor
   constructor: (element) ->
     @element = element;
 
-    console.log 'hide-settings = ' + @element.find('section.editor').data('hide-header')
-    console.log 'element = ', element
-    if typeof @element.find('section.editor').data('hide-header') is 'string'
-        console.log 'typeof is string'
     if @element.find('section.editor').data('hide-header') is 'True'
-      console.log "HIDE ME"
       $('.component-edit-header').hide()
     else
       $('.component-edit-header').show()
 
-    # settingsEditor = @$el.find('.wrapper-comp-settings')
-    # editorModeButton =  @$el.find('#editor-mode').find("a")
-    # settingsModeButton = @$el.find('#settings-mode').find("a")
-
-    # editorModeButton.removeClass('is-set')
-    # settingsEditor.addClass('is-active')
-    # settingsModeButton.addClass('is-set')
-
     @$tabs = $(".tab", @element)
     @$content = $(".component-tab", @element)
 
-    @element.on('click', '.editor-tabs .tab', @onSwitchEditor)
+    @element.find('.editor-tabs .tab').each (index, value) =>
+      $(value).on('click', @onSwitchEditor)
 
     # If default visible tab is not setted or if were marked as current
     # more than 1 tab just first tab will be shown
@@ -50,21 +38,14 @@ class @TabsEditorDescriptor
           previousTab = $(value).html()
       )
 
-      console.log 'previous tab: ' + previousTab
-
       @$tabs.removeClass('current')
       $currentTarget.addClass('current')
-
-      console.log '$currentTarget = ', $currentTarget
 
       # Tabs are implemeted like anchors. Therefore we can use hash to find
       # corresponding content
       content_id = $currentTarget.attr('href')
 
-      console.log 'a'
-
       if $currentTarget.html() is 'Settings'
-        console.log 'b'
         settingsEditor = @element.find('.wrapper-comp-settings')
         editorModeButton =  @element.find('#editor-mode').find("a")
         settingsModeButton = @element.find('#settings-mode').find("a")
@@ -77,7 +58,6 @@ class @TabsEditorDescriptor
       else
         @element.find('.launch-latex-compiler').show()
 
-      console.log 'c'
       @$content
         .addClass(isInactiveClass)
         .filter(content_id)
@@ -96,7 +76,7 @@ class @TabsEditorDescriptor
   save: ->
     @element.off('click', '.editor-tabs .tab', @onSwitchEditor)
     # get data from active tab
-    tabName = this.$tabs.filter('.current').html()
+    tabName = @$tabs.filter('.current').html()
     if $.isFunction(window.TabsEditorDescriptor['tabs_save_functions'][@html_id][tabName])
       return data: window.TabsEditorDescriptor['tabs_save_functions'][@html_id][tabName]()
     data: null

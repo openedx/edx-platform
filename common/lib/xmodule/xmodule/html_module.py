@@ -42,13 +42,9 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, TabsEditingDescriptor):
     """
     Module for putting raw html in a course
     """
-    # mako_template = "widgets/html-edit.html"
     module_class = HtmlModule
     filename_extension = "xml"
     template_dir_name = "html"
-
-    # js_module_name = "HTMLEditingDescriptor"
-    # js_module_name = "TabsEditorDescriptor"
 
     tabs = [
         {
