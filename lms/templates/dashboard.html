@@ -223,11 +223,11 @@
             <hgroup>
               <p class="date-block">
               % if course.has_ended():
-              ${_("Course Completed - %s") % course.end_date_text}
+              ${_("Course Completed - {end_date}").format(end_date=course.end_date_text)}
               % elif course.has_started():
-              ${_("Course Started - %s") % course.start_date_text}
+              ${_("Course Started - {start_date}").format(start_date=course.start_date_text)}
               % else:   # hasn't started yet
-              ${_("Course Starts - %s") % course.start_date_text}
+              ${_("Course Starts - {start_date}").format(start_date=course.start_date_text)}
               % endif
               </p>
               <h2 class="university">${get_course_about_section(course, 'university')}</h2>
@@ -250,7 +250,7 @@
                 % if registration is None and testcenter_exam_info.is_registering():
                 <div class="message message-status is-shown exam-register">
                   <a href="${testcenter_register_target}" class="button exam-button" id="exam_register_button">${_("Register for Pearson exam")}</a>
-                  <p class="message-copy">${_("Registration for the Pearson exam is now open and will close on <strong>%s</strong>") % testcenter_exam_info.registration_end_date_text}</p>
+                  <p class="message-copy">${_("Registration for the Pearson exam is now open and will close on {end_date}").format(end_date="<strong>{}</strong>".format(testcenter_exam_info.registration_end_date_text))}</p>
                 </div>
                 % endif
                 <!-- display a registration for a current exam, even if the registration period is over -->
@@ -258,18 +258,32 @@
                     % if registration.is_accepted:
                 <div class="message message-status is-shown exam-schedule">
                    <a href="${registration.registration_signup_url}" class="button exam-button">${_("Schedule Pearson exam")}</a>
-                   <p class="exam-registration-number">${_('<a href="%s" id="exam_register_link">Registration</a> number: <strong>%s</strong>' % (testcenter_register_target, registration.client_candidate_id))}</p>
-                   <p class="message-copy">${_("Write this down! You\'ll need it to schedule your exam.")}</p>
+                   <p class="exam-registration-number">${_("{link_start}Registration{link_end} number: {number}").format(
+                      link_start='<a href="{url}" id="exam_register_link">'.format(url=testcenter_register_target),
+                      link_end='</a>',
+                      number=registration.client_candidate_id,
+                    )}</p>
+                   <p class="message-copy">${_("Write this down! You'll need it to schedule your exam.")}</p>
                 </div>
                     % endif
                     % if  registration.is_rejected:
                 <div class="message message-status is-shown exam-schedule">
-                  <p class="message-copy">${_('<strong>Your registration for the Pearson exam has been rejected. Please <a href="" id="exam_register_link">see your registration status details</a></strong>. Otherwise <a class="contact-link" href="mailto:exam-help@edx.org?subject=Pearson VUE Exam - %s %s">contact edX at exam-help@edx.org</a> for further help.') % (testcenter_register_target, get_course_about_section(course, 'university'), course.number)}</p>
+                  <p class="message-copy">
+                    <strong>${_("Your registration for the Pearson exam has been rejected. Please {link_start}see your registration status details{link_end}.").format(
+                      link_start='<a href="{url}" id="exam_register_link">'.format(url=testcenter_register_target),
+                      link_end='</a>')}</strong>
+                    ${_("Otherwise {link_start}contact edX at {email}{link_end} for further help.').format(
+                      link_start='<a class="contact-link" href="mailto:{email}?subject=Pearson VUE Exam - {about} {number}">'.format(email="exam-help@edx.org", about=get_course_about_section(course, 'university'), number=course.number),
+                      link_end='</a>',
+                      email="exam-help@edx.org",
+                     )}
                 </div>
                     % endif
                    	% if not registration.is_accepted and not registration.is_rejected:
 	            <div class="message message-status is-shown">
-    	              <p class="message-copy">${_('<strong>Your <a href="%s" id="exam_register_link">registration for the Pearson exam</a> is pending</strong>. Within a few days, you should see a confirmation number here, which can be used to schedule your exam.') % testcenter_register_target}</p>
+                  <p class="message-copy"><strong>${_("Your {link_start}registration for the Pearson exam{link_end} is pending.").format(link_start='<a href="{url}" id="exam_register_link">'.format(url=testcenter_register_target), link_end='</a>')}</strong>
+                  ${_("Within a few days, you should see a confirmation number here, which can be used to schedule your exam.")}
+                  </p>
                 </div>
                     % endif
                 % endif
@@ -301,7 +315,7 @@
                            ${"{0:.0f}%".format(float(course.lowest_passing_grade)*100)}</span>.
                       % elif cert_status['status'] == 'restricted':
                           <p class="message-copy">
-                          ${_('Your certificate is being held pending confirmation that the issuance of your certificate is in compliance with strict U.S. embargoes on Iran, Cuba, Syria and Sudan. If you think our system has mistakenly identified you as being connected with one of those countries, please let us know by contacting <a class="contact-link" href="mailto:"></a>.') % (settings.CONTACT_EMAIL, settings.CONTACT_EMAIL)}
+                          ${_("Your certificate is being held pending confirmation that the issuance of your certificate is in compliance with strict U.S. embargoes on Iran, Cuba, Syria and Sudan. If you think our system has mistakenly identified you as being connected with one of those countries, please let us know by contacting {email}.").format(email='<a class="contact-link" href="mailto:{email}">{email}</a>.'.format(email=settings.CONTACT_EMAIL))}
                           </p>
                       % endif
                       </p>
@@ -404,7 +418,7 @@
     <div>
       <form> <!-- Here for styling reasons -->
         <section>
-          <p>${_('An email has been sent to %s. Follow the link in the email to change your password.') % user.email}</p>
+          <p>${_('An email has been sent to {email}. Follow the link in the email to change your password.').format(email=user.email)}</p>
         </section>
       </form>
     </div>
@@ -433,7 +447,7 @@
             <input id="new_email_password" value="" type="password" />
           </div>
           <section>
-            <p>${_('We will send a confirmation to both %s and your new email as part of the process.') % user.email}</p>
+            <p>${_('We will send a confirmation to both {email} and your new email as part of the process.').format(email=user.email)}</p>
           </section>
           <div class="submit">
             <input type="submit" id="submit_email_change" value="${_('Change Email')}"/>
@@ -458,11 +472,11 @@
     <div id="change_name_body">
       <form id="change_name_form">
         <div id="change_name_error" class="modal-form-error"> </div>
-        <p>${_("To uphold the credibility of %s certificates, all name changes will be logged and recorded.") % settings.PLATFORM_NAME}</p>
+        <p>${_("To uphold the credibility of {platform} certificates, all name changes will be logged and recorded.".format(platform=settings.PLATFORM_NAME)}</p>
         <br/>
         <fieldset>
           <div class="input-group">
-            <label>${_("Enter your desired full name, as it will appear on the %s certificates: ") % settings.PLATFORM_NAME}</label>
+            <label>${_("Enter your desired full name, as it will appear on the {platform} certificates:").format(platform=settings.PLATFORM_NAME)}</label>
             <input id="new_name_field" value="" type="text" />
             <label>${_("Reason for name change:")}</label>
             <textarea id="name_rationale_field" value=""></textarea>
