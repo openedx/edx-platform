@@ -68,6 +68,7 @@
 <script type="text/javascript">
   var $newUserForm;
   var addUserPostbackUrl = "${add_user_postback_url}";
+  var removeUserPostbackUrl = "${remove_user_postback_url}";
 
   function showNewUserForm(e) {
     e.preventDefault();
@@ -119,7 +120,7 @@
 
     $('.remove-user').click(function() {
       $.ajax({
-        url: '${remove_user_postback_url}',
+        url: removeUserPostbackUrl,
         type: 'POST',
         dataType: 'json',
         contentType: 'application/json',
