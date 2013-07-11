@@ -8,7 +8,7 @@ import nltk.data
 import nltk.corpus as word_filter
 import enchant
 import string
-
+import sorting
 
 CONTENT_TYPES = ("transcript", "problem", "pdf")
 
@@ -36,14 +36,16 @@ def find(request, database="http://127.0.0.1:9200",
     context = {}
     response = requests.get(full_url+query+"&size="+str(max_result))
     results = json.loads(response._content).get("hits", {"hits": ""})["hits"]
+    scores = [entry["_score"] for entry in results]
     data = [entry["_source"] for entry in results]
     #titles = [entry["display_name"] for entry in data]
-    uuids = [entry["display_name"] for entry in data]
+    titles = [entry["display_name"] for entry in data]
     transcripts = [entry["searchable_text"] for entry in data]
     snippets = [snippet_generator(transcript, query) for transcript in transcripts]
     thumbnails = ["data:image/jpg;base64,"+entry["thumbnail"] for entry in data]
     urls = [get_datum_url(request, datum) for datum in data]
-    data = zip(uuids, snippets, thumbnails, urls)
+    data = zip(titles, snippets, thumbnails, urls, scores)
+    data = sorting.sort(data, request.GET.get("sort", None))
     if len(data) == 0:
         data = [("No results found, please try again", "")]
         context.update({"results": "false"})
@@ -54,10 +56,10 @@ def find(request, database="http://127.0.0.1:9200",
     results_pages = Paginator(data, results_per_page)
 
     data = proper_page(results_pages, page)
-    context.update({"data": data})
-    context.update({"next_page": next_link(request, data), "prev_page": prev_link(request, data)})
-    context.update({"search_correction_link": search_correction_link(request, correction)})
-    context.update({"spelling_correction": correction})
+    context.update({
+        "data": data, "next_page": next_link(request, data), "prev_page": prev_link(request, data),
+        "search_correction_link": search_correction_link(request, correction),
+        "spelling_correction": correction})
     return render_to_string("search_templates/results.html", context)
 
 
