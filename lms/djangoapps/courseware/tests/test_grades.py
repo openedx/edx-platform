@@ -207,17 +207,17 @@ class TestGrades(unittest.TestCase):
             """
             if section == 'HW1':
                 return (
-                    Score(4.0, 10.0, True, 'HW1', attempted=True),
+                    Score(4.0, 10.0, True, 'HW1', ),  # attempted=True
                     ['RS1']
                 )
             elif section == 'HW2':
                 return (
-                    Score(0.0, 10.0, True, 'HW2', attempted=False),
+                    Score(0.0, 10.0, True, 'HW2', ),  # attempted=False
                     ['RS2']
                 )
             elif section == 'Quiz1':
                 return (
-                    Score(85.0, 100.0, True, 'Quiz1', attempted=True),
+                    Score(85.0, 100.0, True, 'Quiz1', ),  # attempted=True
                     ['RS3']
                 )
         grades.compute_graded_total = fake_compute_graded_total
