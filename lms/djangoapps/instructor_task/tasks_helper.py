@@ -207,6 +207,18 @@ def run_main_task(entry_id, task_fcn, action_name):
     # Release any queries that the connection has been hanging onto:
     reset_queries()
 
+    # write out a dump of memory usage at the end of this, to see what is left
+    # around.  Enable it if it hasn't been explicitly disabled.
+    if action_name == 'graded' and getattr(settings, 'PERFORM_TASK_MEMORY_DUMP', True):
+        filename = "meliae_dump_{}.dat".format(task_id)
+        # Hardcode the name of a dump directory to try to use.
+        # If if doesn't exist, just continue to use the "local" directory.
+        dirname = '/mnt/memdump/'
+        if exists(dirname):
+            filename = dirname + filename
+        TASK_LOG.info('Dumping memory information to %s', filename)
+        scanner.dump_all_objects(filename)
+
     # log and exit, returning task_progress info as task result:
     TASK_LOG.info('Finishing %s: final: %s', task_info_string, task_progress)
     return task_progress
@@ -280,17 +292,10 @@ def perform_enrolled_student_update(course_id, _module_state_key, student_identi
         task_progress = get_task_progress()
         _get_current_task().update_state(state=PROGRESS, meta=task_progress)
 
-    # write out a dump of memory usage at the end of this, to see what is left
-    # around.  Enable it if it hasn't been explicitly disabled.
-    if getattr(settings, 'PERFORM_TASK_MEMORY_DUMP', True):
-        request_task_id = _get_current_task().request.id
-        filename = "meliae_dump_{}.dat".format(request_task_id)
-        # Hardcode the name of a dump directory to try to use.
-        # If if doesn't exist, just continue to use the "local" directory.
-        dirname = '/mnt/memdump/'
-        if exists(dirname):
-            filename = dirname + filename
-        scanner.dump_all_objects(filename)
+       # add temporary hack to make grading tasks finish more quickly!
+       # TODO: REMOVE THIS when done with debugging
+       if num_attempted == 1000:
+           break;
 
     return task_progress
 
