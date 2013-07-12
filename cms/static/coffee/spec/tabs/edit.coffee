@@ -97,7 +97,6 @@ describe "TabsEditorDescriptor", ->
       editorModeButton =  @descriptor.element.find('#editor-mode').find("a")
       settingsModeButton = @descriptor.element.find('#settings-mode').find("a")
 
-      console.log @descriptor
       @descriptor.element.find('#settings-mode').find('a').trigger('click')
 
       expect(settingsEditor.hasClass('is-active')).toBe(true)
