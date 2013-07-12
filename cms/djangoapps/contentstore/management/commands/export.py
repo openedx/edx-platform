@@ -14,7 +14,7 @@ unnamed_modules = 0
 
 
 class Command(BaseCommand):
-    help = 'Import the specified data directory into the default ModuleStore'
+    help = 'Export the specified data directory into the default ModuleStore'
 
     def handle(self, *args, **options):
         if len(args) != 2:
