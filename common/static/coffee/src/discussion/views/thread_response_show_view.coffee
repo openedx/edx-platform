@@ -3,7 +3,7 @@ if Backbone?
     events:
         "click .vote-btn": "toggleVote"
         "click .action-endorse": "toggleEndorse"
-        "click .action-delete": "delete"
+        "click .action-delete": "_delete"
         "click .action-edit": "edit"
         "click .discussion-flag-abuse": "toggleFlagAbuse"
 
@@ -77,8 +77,8 @@ if Backbone?
     edit: (event) ->
         @trigger "response:edit", event
 
-    delete: (event) ->
-        @trigger "response:delete", event
+    _delete: (event) ->
+        @trigger "response:_delete", event
 
     toggleEndorse: (event) ->
       event.preventDefault()

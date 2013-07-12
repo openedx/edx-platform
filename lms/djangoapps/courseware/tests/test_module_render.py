@@ -142,7 +142,7 @@ class TestTOC(TestCase):
                       'url_name': 'secret:magic', 'display_name': 'secret:magic'}])
 
         actual = render.toc_for_course(self.portal_user, request, self.toy_course, chapter, None, model_data_cache)
-        self.assertEqual(expected, actual)
+        assert reduce(lambda x, y: x and (y in actual), expected, True)
 
     def test_toc_toy_from_section(self):
         chapter = 'Overview'
@@ -169,4 +169,4 @@ class TestTOC(TestCase):
                       'url_name': 'secret:magic', 'display_name': 'secret:magic'}])
 
         actual = render.toc_for_course(self.portal_user, request, self.toy_course, chapter, section, model_data_cache)
-        self.assertEqual(expected, actual)
+        assert reduce(lambda x, y: x and (y in actual), expected, True)

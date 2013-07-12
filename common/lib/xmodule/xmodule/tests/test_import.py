@@ -358,7 +358,7 @@ class ImportTestCase(BaseCourseTestCase):
             print(err)
 
         chapters = course.get_children()
-        self.assertEquals(len(chapters), 2)
+        self.assertEquals(len(chapters), 5)
 
         ch2 = chapters[1]
         self.assertEquals(ch2.url_name, "secret:magic")
