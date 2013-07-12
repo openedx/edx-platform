@@ -40,17 +40,9 @@ class PeerGradingService(GradingService):
             {'location': problem_location, 'grader_id': grader_id})
         return self.try_to_decode(self._render_rubric(response))
 
-    def save_grade(self, location, grader_id, submission_id, score, feedback, submission_key, rubric_scores,
-                   submission_flagged):
-        data = {'grader_id': grader_id,
-                'submission_id': submission_id,
-                'score': score,
-                'feedback': feedback,
-                'submission_key': submission_key,
-                'location': location,
-                'rubric_scores': rubric_scores,
-                'rubric_scores_complete': True,
-                'submission_flagged': submission_flagged}
+    def save_grade(self, **kwargs):
+        data = kwargs
+        data.update({'rubric_scores_complete' : True})
         return self.try_to_decode(self.post(self.save_grade_url, data))
 
     def is_student_calibrated(self, problem_location, grader_id):
@@ -108,8 +100,7 @@ class MockPeerGradingService(object):
                 'rubric': 'fake rubric',
                 'max_score': 4}
 
-    def save_grade(self, location, grader_id, submission_id,
-                   score, feedback, submission_key, rubric_scores, submission_flagged):
+    def save_grade(self,**kwargs):
         return {'success': True}
 
     def is_student_calibrated(self, problem_location, grader_id):

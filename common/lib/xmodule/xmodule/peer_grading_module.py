@@ -308,31 +308,22 @@ class PeerGradingModule(PeerGradingFields, XModule):
             error: if there was an error in the submission, this is the error message
         """
 
-        required = set(['location', 'submission_id', 'submission_key', 'score', 'feedback', 'rubric_scores[]',
-                        'submission_flagged'])
+        required = set(['location', 'submission_id', 'submission_key', 'score', 'feedback', 'rubric_scores[]', 'submission_flagged', 'answer_unknown'])
         success, message = self._check_required(data, required)
         if not success:
             return self._err_response(message)
-        grader_id = self.system.anonymous_student_id
 
-        location = data.get('location')
-        submission_id = data.get('submission_id')
-        score = data.get('score')
-        feedback = data.get('feedback')
-        submission_key = data.get('submission_key')
-        rubric_scores = data.getlist('rubric_scores[]')
-        submission_flagged = data.get('submission_flagged')
+        data_dict = {k:data.get(k) for k in required}
+        data_dict['rubric_scores'] = data_dict['rubric_scores[]']
+        data_dict['grader_id'] = self.system.anonymous_student_id
 
         try:
-            response = self.peer_gs.save_grade(location, grader_id, submission_id,
-                                               score, feedback, submission_key, rubric_scores, submission_flagged)
+            response = self.peer_gs.save_grade(**data_dict)
             return response
         except GradingServiceError:
             # This is a dev_facing_error
-            log.exception("""Error saving grade to open ended grading service.  server url: {0}, location: {1}, submission_id:{2},
-                            submission_key: {3}, score: {4}"""
-            .format(self.peer_gs.url,
-                    location, submission_id, submission_key, score)
+            log.exception("""Error saving grade to open ended grading service.  server url: {0}"""
+            .format(self.peer_gs.url)
             )
             # This is a student_facing_error
             return {
