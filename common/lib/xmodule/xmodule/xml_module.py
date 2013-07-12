@@ -83,19 +83,13 @@ def serialize_field(value):
     """
     Return a string version of the value (where value is the JSON-formatted, internally stored value).
 
-    By default, this is the result of calling json.dumps on the input value.
+    If the value is a string, then we simply return what was passed in.
+    Otherwise, we return json.dumps on the input value.
     """
+    if isinstance(value, basestring):
+        return value
+
     return json.dumps(value, cls=EdxJSONEncoder)
-
-
-def serialize_string_literal(value):
-    """
-    Assert that the value is a base string and - if it is - simply return it
-    """
-    if not isinstance(value, basestring):
-        raise TypeError('Value {0} is not of type basestring!'.format(value))
-
-    return value
 
 
 def deserialize_field(field, value):
@@ -176,7 +170,7 @@ class XmlDescriptor(XModuleDescriptor):
         for field in set(cls.fields + cls.lms.fields):
             if field.name == attr:
                 from_xml = lambda val: deserialize_field(field, val)
-                to_xml = lambda val: serialize_string_literal(val) if isinstance(val, basestring) else serialize_field(val)
+                to_xml = lambda val: serialize_field(val)
                 return AttrMap(from_xml, to_xml)
 
         return AttrMap()
