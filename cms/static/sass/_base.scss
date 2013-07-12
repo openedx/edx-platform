@@ -877,7 +877,7 @@ body.js {
       text-align: center;
 
       .label {
-        @extend .text-sr;
+        @extend .cont-text-sr;
       }
 
       [class^="icon-"] {

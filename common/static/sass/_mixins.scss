@@ -53,8 +53,8 @@
 // extends - UI - window
 .ui-window {
   @include clearfix();
-  @include border-radius(3px);
-  @include box-shadow(0 1px 1px $shadow-l1);
+  border-radius: 3px;
+  box-shadow: 0 1px 1px $shadow-l1;
   margin-bottom: $baseline;
   border: 1px solid $gray-l2;
   background: $white;
@@ -198,7 +198,7 @@
   }
 
   span {
-    @extend .text-sr;
+    @extend .cont-text-sr;
   }
 }
 
@@ -257,4 +257,3 @@
   white-space: nowrap;
   text-overflow: ellipsis;
 }
->>>>>>> Studio: renames and re-orgs app-wide Sass extends

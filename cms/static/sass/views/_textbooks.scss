@@ -188,7 +188,7 @@ body.course.textbooks {
 
       .chapters-fields,
       .textbook-fields {
-        @extend .no-list;
+        @extend .cont-no-list;
 
         .field {
           margin: 0 0 ($baseline*0.75) 0;
@@ -365,7 +365,7 @@ body.course.textbooks {
 
  // dialog
 .wrapper-dialog {
-  @extend .depth5;
+  @extend .ui-depth5;
   @include transition(all 0.05s ease-in-out);
   position: fixed;
   top: 0;
