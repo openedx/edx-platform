@@ -18,7 +18,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if len(args) != 2:
-            raise CommandError("import requires two arguments: <course location> <output path>")
+            raise CommandError("export requires two arguments: <course location> <output path>")
 
         course_id = args[0]
         output_path = args[1]

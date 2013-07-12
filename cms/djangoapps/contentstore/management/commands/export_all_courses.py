@@ -18,7 +18,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if len(args) != 1:
-            raise CommandError("import requires one argument: <output path>")
+            raise CommandError("export requires one argument: <output path>")
 
         output_path = args[0]
 
