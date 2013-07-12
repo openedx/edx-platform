@@ -310,10 +310,11 @@ class PeerGradingModule(PeerGradingFields, XModule):
         submission_key = data.get('submission_key')
         rubric_scores = data.getlist('rubric_scores[]')
         submission_flagged = data.get('submission_flagged')
+        answer_unknown = data.get('answer_unknown', False)
 
         try:
             response = self.peer_gs.save_grade(location, grader_id, submission_id,
-                                               score, feedback, submission_key, rubric_scores, submission_flagged)
+                                               score, feedback, submission_key, rubric_scores, submission_flagged, answer_unknown)
             return response
         except GradingServiceError:
             # This is a dev_facing_error

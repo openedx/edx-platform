@@ -108,6 +108,12 @@ section.combined-open-ended-status {
           float: right;
         }
     }
+
+    .icon-caret-right {
+      display: inline-block;
+      vertical-align: baseline;
+      margin-right: ($baseline/4);
+    }
 }
 
 div.combined-rubric-container {

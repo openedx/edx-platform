@@ -41,7 +41,7 @@ class PeerGradingService(GradingService):
         return self.try_to_decode(self._render_rubric(response))
 
     def save_grade(self, location, grader_id, submission_id, score, feedback, submission_key, rubric_scores,
-                   submission_flagged):
+                   submission_flagged, answer_unknown):
         data = {'grader_id': grader_id,
                 'submission_id': submission_id,
                 'score': score,
@@ -50,7 +50,9 @@ class PeerGradingService(GradingService):
                 'location': location,
                 'rubric_scores': rubric_scores,
                 'rubric_scores_complete': True,
-                'submission_flagged': submission_flagged}
+                'submission_flagged': submission_flagged,
+                'answer_unknown' : answer_unknown,
+        }
         return self.try_to_decode(self.post(self.save_grade_url, data))
 
     def is_student_calibrated(self, problem_location, grader_id):
