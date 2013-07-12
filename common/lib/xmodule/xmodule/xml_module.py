@@ -93,7 +93,7 @@ def serialize_string_literal(value):
     Assert that the value is a base string and - if it is - simply return it
     """
     if not isinstance(value, basestring):
-        raise Exception('Value {0} is not of type basestring!'.format(value))
+        raise TypeError('Value {0} is not of type basestring!'.format(value))
 
     return value
 
