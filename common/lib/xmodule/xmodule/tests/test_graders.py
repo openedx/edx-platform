@@ -13,20 +13,20 @@ class GradesheetTest(unittest.TestCase):
         Score.__sub__ = lambda me, other: (me.earned - other.earned) + (me.possible - other.possible)
 
         all_total, graded_total = aggregate_scores(scores)
-        self.assertEqual(all_total, Score(earned=0, possible=0, graded=False, section="summary", attempted=False))
-        self.assertEqual(graded_total, Score(earned=0, possible=0, graded=True, section="summary", attempted=False))
+        self.assertEqual(all_total, Score(earned=0, possible=0, graded=False, section="summary"))
+        self.assertEqual(graded_total, Score(earned=0, possible=0, graded=True, section="summary"))
 
-        scores.append(Score(earned=0, possible=5, graded=False, section="summary", attempted=False))
+        scores.append(Score(earned=0, possible=5, graded=False, section="summary"))
         all_total, graded_total = aggregate_scores(scores)
-        self.assertEqual(all_total, Score(earned=0, possible=5, graded=False, section="summary", attempted=False))
-        self.assertEqual(graded_total, Score(earned=0, possible=0, graded=True, section="summary", attempted=False))
+        self.assertEqual(all_total, Score(earned=0, possible=5, graded=False, section="summary"))
+        self.assertEqual(graded_total, Score(earned=0, possible=0, graded=True, section="summary"))
 
-        scores.append(Score(earned=3, possible=5, graded=True, section="summary", attempted=True))
+        scores.append(Score(earned=3, possible=5, graded=True, section="summary"))
         all_total, graded_total = aggregate_scores(scores)
         self.assertAlmostEqual(all_total, Score(earned=3, possible=10, graded=False, section="summary"))
         self.assertAlmostEqual(graded_total, Score(earned=3, possible=5, graded=True, section="summary"))
 
-        scores.append(Score(earned=2, possible=5, graded=True, section="summary", attempted=True))
+        scores.append(Score(earned=2, possible=5, graded=True, section="summary"))
         all_total, graded_total = aggregate_scores(scores)
         self.assertAlmostEqual(all_total, Score(earned=5, possible=15, graded=False, section="summary"))
         self.assertAlmostEqual(graded_total, Score(earned=5, possible=10, graded=True, section="summary"))
