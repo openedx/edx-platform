@@ -66,6 +66,9 @@ on_create()
     # Force rechecking all prerequisites (could have been fetched outside of the VM)
     rm -rf /opt/edx/edx-platform/.prereqs_cache
 
+    # Permissions
+    chown vagrant.vagrant /opt/edx /opt/edx/node_modules /opt/edx/edx-platform/node_modules
+
     # For convenience with `vagrant ssh`, the `edx-platform` virtualenv is always
     # loaded after the first run, so we need to deactivate that behavior to run
     # `create-dev-env.sh`.
@@ -93,8 +96,8 @@ on_create()
 	echo "cd /opt/edx/edx-platform" >> ~vagrant/.bash_profile
     }
 
-    # fix up Permissions
-    chown vagrant.vagrant ~vagrant/.bash_profile /opt/edx /opt/edx/node_modules /opt/edx/edx-platform/node_modules
+    # Permissions
+    chown vagrant.vagrant ~vagrant/.bash_profile
 
     cat << EOF
 ==============================================================================
