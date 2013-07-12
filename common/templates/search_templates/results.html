@@ -19,28 +19,55 @@
 </div>
 % endif
 
+<div class="filter">
+    <p class="filter-title">Organizations</p>
+    <ul class="filter-menu">
+    % for org in org_histogram.most_common():
+        <li class="filter-item" onclick="filterTrigger(this, 'org', false)">
+            <span class="filter-option">${org[0].title()}</span> 
+            <span class="count">${org[1]}</span>
+        </li>
+    % endfor
+    </ul>
+
+    <p class="filter-title">Courses</p>
+    <ul class="filter-menu">
+    % for course in course_histogram.most_common():
+        <li class="filter-item" onclick="filterTrigger(this, 'course', false)">
+            <span class="filter-option">${course[0].title()}</span> 
+            <span class="count">${course[1]}</span>
+        </li>
+    % endfor
+    </ul>
+</div>
+
+<form id="filter-select" class="auto-submit" action="/search" method="get">
+    <input type="hidden" class="parameter" id="selected-org" name="selected_org" value=""></input>
+    <input type="hidden" class="parameter" id="selected-course" name="selected_course" value=""></input>
+</form>
+
 <div class="search-results">
     % if results == True:
     	% for datum in data:
-    		<a href=${datum.data["url"]}>
-    			<section class="result">
-    				<div class="result_wrapper">
-    					<h1 class="result-title">${datum.data['display_name']}</h1>
-    					<div class="result-content">
-    						<div class="columnate">
-    							<img class="thumbnail" src="${datum.data['thumbnail']}" alt="${datum.data['display_name']}">
-    						</div>
-    						<div class="columnate">
-    							<div class="snippet_container">
-    								<p  class="results_snippet scaled-text">
-    									${datum.data['snippets']}
-    								</p>
-    							</div>
-    						</div>
-    					</div>
-    				</div>
-    			</section>
-    		</a>
+        	<a href=${datum.data["url"]}>
+        		<section class="result">
+        			<div class="result_wrapper">
+        				<h1 class="result-title">${datum.data['display_name']}</h1>
+        				<div class="result-content">
+        					<div class="columnate">
+        						<img class="thumbnail" src="${datum.data['thumbnail']}" alt="${datum.data['display_name']}">
+        					</div>
+        					<div class="columnate">
+        						<div class="snippet_container">
+        							<p  class="results_snippet scaled-text">
+        								${datum.data['snippets']}
+        							</p>
+        						</div>
+        					</div>
+        				</div>
+        			</div>
+        		</section>
+        	</a>
     	% endfor
     % else:
         <h1 class="result-title no-results">"No results found, please try again"</h1>
