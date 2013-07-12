@@ -1,41 +1,41 @@
 <head>
-    ${css_link("../static/css/search.css")}
-    ${js_link("../static/js/search.js")}
+	${css_link("../static/css/search.css")}
+	${js_link("../static/js/search.js")}
 </head>
 
 % if debug:
-<p>"${debug}"</p>
+    <p>"${debug}"</p>
 % endif
 
 % if spelling_correction:
 <div class="correction_div">
-    <p class="search_correction">
-        <span>Did you mean </span>
-        <a onclick="correctionLink(event, '${spelling_correction}')">${spelling_correction}</a>
-        <span>?</span>
-    </p>
+	<p class="search_correction">
+		<span>Did you mean </span>
+		<a onclick="correctionLink(event, '${spelling_correction}')">${spelling_correction}</a>
+		<span>?</span>
+	</p>
 </div>
 % endif
 
 <div class="filter">
     <p class="filter-title">Organizations</p>
     <ul class="filter-menu">
-        % for org in org_histogram.most_common():
+    % for org in org_histogram.most_common():
         <li class="filter-item" onclick="filterTrigger(this, 'org', false)">
-            <span class="filter-option">${org[0].title()}</span>
+            <span class="filter-option">${org[0].title()}</span> 
             <span class="count">${org[1]}</span>
         </li>
-        % endfor
+    % endfor
     </ul>
 
     <p class="filter-title">Courses</p>
     <ul class="filter-menu">
-        % for course in course_histogram.most_common():
+    % for course in course_histogram.most_common():
         <li class="filter-item" onclick="filterTrigger(this, 'course', false)">
-            <span class="filter-option">${course[0].title()}</span>
+            <span class="filter-option">${course[0].title()}</span> 
             <span class="count">${course[1]}</span>
         </li>
-        % endfor
+    % endfor
     </ul>
 </div>
 
@@ -46,59 +46,59 @@
 
 <div class="search-results">
     % if results == True:
-    % for datum in data:
-    <a href=${datum.data["url"]}>
-       <section class="result">
-           <div class="result_wrapper">
-               <h1 class="result-title">${datum.data['display_name']}</h1>
-               <div class="result-content">
-                   <div class="columnate">
-                       <img class="thumbnail" src="${datum.data['thumbnail']}" alt="${datum.data['display_name']}">
-                   </div>
-                   <div class="columnate">
-                       <div class="snippet_container">
-                           <p class="results_snippet scaled-text">
-                               ${datum.data['snippets']}
-                           </p>
-                       </div>
-                   </div>
-               </div>
-           </div>
-       </section>
-   </a>
-   % endfor
-   % else:
-   <h1 class="result-title no-results">"No results found, please try again"</h1>
-   % endif
+    	% for datum in data:
+        	<a href=${datum.data["url"]}>
+        		<section class="result">
+        			<div class="result_wrapper">
+        				<h1 class="result-title">${datum.data['display_name']}</h1>
+        				<div class="result-content">
+        					<div class="columnate">
+        						<img class="thumbnail" src="${datum.data['thumbnail']}" alt="${datum.data['display_name']}">
+        					</div>
+        					<div class="columnate">
+        						<div class="snippet_container">
+        							<p  class="results_snippet scaled-text">
+        								${datum.data['snippets']}
+        							</p>
+        						</div>
+        					</div>
+        				</div>
+        			</div>
+        		</section>
+        	</a>
+    	% endfor
+    % else:
+        <h1 class="result-title no-results">"No results found, please try again"</h1>
+    % endif
 </div>
 
 % if len(data) > 1:
-<div class="pagination">
-    <span class="step-links">
-        % if data.number > 1:
-        <a onclick="decrementPage()">Prev</a>
-        % endif
+	<div class="pagination">
+		<span class="step-links">
+			% if data.number > 1:
+				<a onclick="decrementPage()">Prev</a>
+			% endif
 
-        <form id="current-page" class="auto-submit" action="/search" method="get">
-            <span class="current-page">
-                Page
-                <input type="number" class="parameter" name="page" value="${ data.number }" onkeydown="searchHandle(event, true)" onchange="changeHandler(this, ${data.paginator.num_pages})"/>
-                of ${ data.paginator.num_pages }
-            </span>
-        </form>
+			<form id="current-page" class="auto-submit" action="/search" method="get">
+                <span class="current-page">
+				    Page 
+                    <input type="number" class="parameter" name="page" value="${ data.number }" onkeydown="searchHandle(event, true)" onchange="changeHandler(this, ${data.paginator.num_pages})"/> 
+                    of ${ data.paginator.num_pages }
+                </span>
+			</form> 
 
-        % if data.number < data.paginator.num_pages:
-        <a onclick="incrementPage()">Next</a>
-        %endif
-    </span>
-</div>
+			% if data.number < data.paginator.num_pages:
+				<a onclick="incrementPage()">Next</a>
+			%endif
+		</span>
+	</div>
 % endif
 
 
 <%def name="css_link(path, media='')">
-<link rel="stylesheet" type="text/css" href="${path|h}" media="${media}"></link>
+	<link rel="stylesheet" type="text/css" href="${path|h}" media="${media}"></link>
 </%def>
 
 <%def name="js_link(path)">
-<script type="text/javascript" src="${path|h}"></script>
+	<script type="text/javascript" src="${path|h}"></script>
 </%def>

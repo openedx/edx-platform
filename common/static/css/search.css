@@ -1,61 +1,61 @@
 .searchwrapper {
-width:250px;
-left: 10px;
-margin: 0;
-position:relative;
+	width:250px;
+	left: 10px;
+	margin: 0;
+	position:relative;
 }
 
 
 .result-title{
-text-align: center;
-word-wrap: normal;
-padding-top: 175px;
+	text-align: center;
+	word-wrap: normal;
+	padding-top: 175px;
 }
 
 .searchwrapper form { display: inline; }
 
 .search-results{
-margin-left: 250px;
-margin-top: -125px;
+	margin-left: 250px;
+	margin-top: -125px;
 }
 
 .result-content{
-margin-top: -20px;
+	margin-top: -20px;
 }
 
 .result-content{
-margin-top: -20px;
+	margin-top: -20px;
 }
 
 .searchbox {
-border:0;
-background: -moz-linear-gradient(top, #ffffff 0%, #ededed 49%, #fafafa 50%, #ededed 50%, #dcdcdc 100%); /* FF3.6+ */
-background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(49%,#ededed), color-stop(50%,#fafafa), color-stop(50%,#ededed), color-stop(100%,#dcdcdc)); /* Chrome,Safari4+ */
-background: -webkit-linear-gradient(top, #ffffff 0%,#ededed 49%,#fafafa 50%,#ededed 50%,#dcdcdc 100%); /* Chrome10+,Safari5.1+ */
-background: -o-linear-gradient(top, #ffffff 0%,#ededed 49%,#fafafa 50%,#ededed 50%,#dcdcdc 100%); /* Opera 11.10+ */
-background: -ms-linear-gradient(top, #ffffff 0%,#ededed 49%,#fafafa 50%,#ededed 50%,#dcdcdc 100%); /* IE10+ */
-background: linear-gradient(to bottom, #ffffff 0%,#ededed 49%,#fafafa 50%,#ededed 50%,#dcdcdc 100%); /* W3C */
-filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#dcdcdc',GradientType=0 ); /* IE6-9 */
-position:absolute;
-top:3px;
-left:0;
-width:249px;
-height:25px;
+	border:0;
+	background: -moz-linear-gradient(top,  #ffffff 0%, #ededed 49%, #fafafa 50%, #ededed 50%, #dcdcdc 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(49%,#ededed), color-stop(50%,#fafafa), color-stop(50%,#ededed), color-stop(100%,#dcdcdc)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top,  #ffffff 0%,#ededed 49%,#fafafa 50%,#ededed 50%,#dcdcdc 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top,  #ffffff 0%,#ededed 49%,#fafafa 50%,#ededed 50%,#dcdcdc 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top,  #ffffff 0%,#ededed 49%,#fafafa 50%,#ededed 50%,#dcdcdc 100%); /* IE10+ */
+	background: linear-gradient(to bottom,  #ffffff 0%,#ededed 49%,#fafafa 50%,#ededed 50%,#dcdcdc 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#dcdcdc',GradientType=0 ); /* IE6-9 */
+	position:absolute;
+	top:3px;
+	left:0;
+	width:249px;
+	height:25px;
 }
 
 .searchbox_submit {
-border: 0;
-position: relative;
-width: 40px;
-left: 210px;
-top: 3.5px;
+	border: 0;
+	position: relative;
+	width: 40px;
+	left: 210px;
+	top: 3.5px;
 }
 
 .content{
-margin-left: 10px;
+	margin-left: 10px;
 }
 .searchbox_submit:before{
-position: absolute;
+	position: absolute;
     content: '';
     background-image: url("../images/search-icon.svg");
     background-size: cover;
@@ -67,64 +67,64 @@ position: absolute;
 }
 
 .searchbox_submit:hover {
-cursor:pointer;
-cursor: hand;
+	cursor:pointer;
+	cursor: hand;
 }
 
 .content-select{
-float: left;
-padding-top: 10px;
+	float: left;
+	padding-top: 10px;
 }
 
 .results_snippet{
-color: #666666;
-font-family: "Open Sans", "Arial";
-font-weight: 300;
-height: 155px;
-width: 360px;
-text-align: justify;
+	color: #666666;
+	font-family: "Open Sans", "Arial";
+	font-weight: 300;
+	height: 155px;
+	width: 360px;
+	text-align: justify;
 }
 
 .result_wrapper{
-width: 705px;
+	width: 705px;
 }
 
 .snippet_container{
-overflow: hidden;
-height: 155px;
-width: 360px;
-margin-left: 15px;
+	overflow: hidden;
+	height: 155px;
+	width: 360px;
+	margin-left: 15px;
 }
 
 .thumbnail{
-width: 190px;
-height: 155px;
+	width: 190px;
+	height: 155px;
 }
 
 .columnate{
-float:left;
+	float:left;
 }
 
 .result_wrapper{
-width: 705px;
+	width: 705px;
 }
 
 .snippet_container{
-overflow: hidden;
-height: 155px;
-width: 360px;
-margin-left: 15px;
+	overflow: hidden;
+	height: 155px;
+	width: 360px;
+	margin-left: 15px;
 }
 
 .thumbnail{
-width: 190px;
-height: 155px;
+	width: 190px;
+	height: 155px;
 }
 
 .pagination{
-position: relative;
-margin-top: 200px;
-margin-left: 10%;
+	position: relative;
+	margin-top: 200px;
+	margin-left: 10%;
 }
 
 .filter-menu{
