@@ -1,6 +1,7 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%inherit file="base.html" />
 <%! from django.core.urlresolvers import reverse %>
-<%block name="title">Advanced Settings</%block>
+<%block name="title">${_("Advanced Settings")}</%block>
 <%block name="bodyclass">is-signedin course advanced settings</%block>
 
 <%namespace name='static' file='static_content.html'/>
@@ -44,8 +45,8 @@ editor.render();
 <div class="wrapper-mast wrapper">
   <header class="mast has-subtitle">
     <h1 class="page-header">
-      <small class="subtitle">Settings</small>
-      <span class="sr">&gt; </span>Advanced Settings
+      <small class="subtitle">${_("Settings")}</small>
+      <span class="sr">&gt; </span>${_("Advanced Settings")}
     </h1>
   </header>
 </div>
@@ -56,20 +57,20 @@ editor.render();
       <form id="settings_advanced" class="settings-advanced" method="post" action="">
 
         <div class="message message-status confirm">
-          Your policy changes have been saved.
+          ${_("Your policy changes have been saved.")}
         </div>
 
         <div class="message message-status error">
-          There was an error saving your information. Please see below.
+          ${_("There was an error saving your information. Please see below.")}
         </div>
 
         <section class="group-settings advanced-policies">
           <header>
-            <h2 class="title-2">Manual Policy Definition</h2>
-            <span class="tip">Manually Edit Course Policy Values (JSON Key / Value pairs)</span>
+            <h2 class="title-2">${_("Manual Policy Definition")}</h2>
+            <span class="tip">${_("Manually Edit Course Policy Values (JSON Key / Value pairs)")}</span>
           </header>
 
-          <p class="instructions"><strong>Warning</strong>: Do not modify these policies unless you are familiar with their purpose.</p>
+          <p class="instructions">${_("<strong>Warning</strong>: Do not modify these policies unless you are familiar with their purpose.")}</p>
 
           <ul class="list-input course-advanced-policy-list enum">
 
@@ -80,22 +81,22 @@ editor.render();
 
     <aside class="content-supplementary" role="complimentary">
       <div class="bit">
-        <h3 class="title-3">How will these settings be used?</h3>
-        <p>Manual policies are JSON-based key and value pairs that give you control over specific course settings that edX Studio will use when displaying and running your course.</p>
+        <h3 class="title-3">${_("How will these settings be used?")}</h3>
+        <p>${_("Manual policies are JSON-based key and value pairs that give you control over specific course settings that edX Studio will use when displaying and running your course.")}</p>
 
-        <p>Any policies you modify here will override any other information you've defined elsewhere in Studio. With this in mind, please be very careful and do not edit policies that you are unfamiliar with (both their purpose and their syntax).</p>
+        <p>${_("Any policies you modify here will override any other information you've defined elsewhere in Studio. With this in mind, please be very careful and do not edit policies that you are unfamiliar with (both their purpose and their syntax)")}.</p>
       </div>
 
       <div class="bit">
       % if context_course:
       <% ctx_loc = context_course.location %>
       <%! from django.core.urlresolvers import reverse %>
-        <h3 class="title-3">Other Course Settings</h3>
+      <h3 class="title-3">${_("Other Course Settings")}</h3>
         <nav class="nav-related">
           <ul>
-            <li class="nav-item"><a href="${reverse('contentstore.views.get_course_settings', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">Details &amp; Schedule</a></li>
-            <li class="nav-item"><a href="${reverse('contentstore.views.course_config_graders_page', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">Grading</a></li>
-            <li class="nav-item"><a href="${reverse('manage_users', kwargs=dict(location=ctx_loc))}">Course Team</a></li>
+            <li class="nav-item"><a href="${reverse('contentstore.views.get_course_settings', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">${_("Details &amp; Schedule")}</a></li>
+            <li class="nav-item"><a href="${reverse('contentstore.views.course_config_graders_page', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">${_("Grading")}</a></li>
+            <li class="nav-item"><a href="${reverse('manage_users', kwargs=dict(location=ctx_loc))}">${_("Course Team")}</a></li>
           </ul>
         </nav>
       % endif
