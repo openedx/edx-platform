@@ -3,11 +3,11 @@
   <chapter url_name="Overview">
     <videosequence url_name="Toy_Videos">
       <html url_name="secret:toylab"/>
-      <video url_name="Video_Resources" youtube_id_1_0="&quot;1bK-WdDi6Qw&quot;"/>
+      <video url_name="Video_Resources" youtube_id_1_0="1bK-WdDi6Qw"/>
     </videosequence>
-    <video url_name="Welcome" youtube_id_1_0="&quot;p2Q6BrNhdh8&quot;"/>
-    <video url_name="video_123456789012" youtube_id_1_0="&quot;p2Q6BrNhdh8&quot;"/>
-    <video url_name="video_4f66f493ac8f" youtube_id_1_0="&quot;p2Q6BrNhdh8&quot;"/>
+    <video url_name="Welcome" youtube_id_1_0="p2Q6BrNhdh8"/>
+    <video url_name="video_123456789012" youtube_id_1_0="p2Q6BrNhdh8"/>
+    <video url_name="video_4f66f493ac8f" youtube_id_1_0="p2Q6BrNhdh8"/>
   </chapter>
   <chapter url_name="secret:magic"/>
   <chapter url_name="poll_test"/>
