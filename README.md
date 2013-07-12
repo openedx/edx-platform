@@ -62,9 +62,8 @@ Using edX
 When you login to your VM, you are in
 `/opt/edx/edx-platform` by default, which is shared from your host workspace.
 Your host computer contains the edx-project development code and repository.
-Your VM runs edx-platform code mounted from your host.
-You can develop by editing on your host computer, in the directory
-you cloned from github.
+Your VM runs edx-platform code mounted from your host, so 
+you can develop by editing on your host.
 
 After logging into your VM with `vagrant ssh`,
 start the _Studio_ and
