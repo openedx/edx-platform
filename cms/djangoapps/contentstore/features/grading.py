@@ -104,8 +104,7 @@ def populate_course(step):
 def changes_not_persisted(step):
     reload_the_page(step)
     name_id = '#course-grading-assignment-name'
-    ele = world.css_find(name_id)[0]
-    assert(ele.value == 'Homework')
+    assert(world.css_value(name_id) == 'Homework')
 
 
 @step(u'I see the assignment type "(.*)"$')

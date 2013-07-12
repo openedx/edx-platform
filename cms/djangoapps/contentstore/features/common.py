@@ -233,7 +233,7 @@ def shows_captions(step, show_captions):
 def save_button_disabled(step):
     button_css = '.action-save'
     disabled = 'is-disabled'
-    assert world.css_find(button_css)[0].has_class(disabled)
+    assert world.css_has_class(button_css, disabled)
 
 
 def type_in_codemirror(index, text):
