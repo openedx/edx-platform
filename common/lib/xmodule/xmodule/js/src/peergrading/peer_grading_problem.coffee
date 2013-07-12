@@ -221,7 +221,7 @@ class @PeerGradingProblem
     $(window).keydown @keydown_handler
     $(window).keyup @keyup_handler
 
-    @collapse_question()
+    #@collapse_question()
 
     Collapsible.setCollapsibles(@content_panel)
 
@@ -353,7 +353,8 @@ class @PeerGradingProblem
           <b>You have completed the required number of peer evaluations, but may
           choose to continue grading if you'd like.</b></p>"
       @grading_message.fadeIn()
-      @grading_message.html(message).focus()
+      @grading_message.html(message)
+      $.scrollTo(@grading_message)
     else
       if response.error
         @render_error(response.error)
@@ -464,6 +465,7 @@ class @PeerGradingProblem
 
     @submission_container.append(@make_paragraphs(response.student_response))
     @prompt_container.html(response.prompt)
+    
     @rubric_selection_container.html(response.rubric)
     @submission_key_input.val(response.submission_key)
     @essay_id_input.val(response.submission_id)
@@ -525,7 +527,8 @@ class @PeerGradingProblem
 
   gentle_alert: (msg) =>
     @grading_message.fadeIn()
-    @grading_message.html("<p>" + msg + "</p>").focus()
+    @grading_message.html("<p>" + msg + "</p>")
+    $.scrollTo(@grading_message)
 
   collapse_question: () =>
     @prompt_container.slideToggle()
