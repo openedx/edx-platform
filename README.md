@@ -60,7 +60,7 @@ Using edX
 ---------
 
 When you login to your VM, you are in
-the `/opt/edx/edx-platform` by default, which is shared from your host workspace.
+`/opt/edx/edx-platform` by default, which is shared from your host workspace.
 Your host computer contains the edx-project development code and repository.
 Your VM runs edx-platform code mounted from your host.
 You can develop by editing on your host computer, in the directory
@@ -69,7 +69,7 @@ you cloned from github.
 After logging into your VM with `vagrant ssh`,
 start the _Studio_ and
 _Learning management system (LMS)_
-servers (run these from the `/opt/edx/edx-platform`):
+servers (run these from `/opt/edx/edx-platform`):
 
 Learning management system (LMS):
 
@@ -83,14 +83,14 @@ Studio (CMS):
 $ rake cms[dev,0.0.0.0:8001]
 ```
 
-When the servers have come up, open their URLs:
+The servers will come up to these URLs:
 
 - LMS: http://192.168.20.40:8000/
 - CMS: http://192.168.20.40:8001/
 
 Your VM's port 8000 is forwarded to host port 9000
 so you can also access the LMS with [http://localhost:9000/]().
-Similarly, development VM port 8001 is forwarded to host port 9001.
+Similarly, VM port 8001 is forwarded to host port 9001.
 These are set in your `Vagrantfile`.
 
 Note that when you register a new user through the web interface,
@@ -108,7 +108,7 @@ See the [Frequently Asked Questions](https://github.com/edx/edx-platform/wiki/Fr
 for more usage tips.
 
 Django admin & debug toolbar
------------------------------------
+-----------------------------
 
 You can enable admin logins and the debug_toolbar by editing
 `lms/envs/common.py`:
@@ -125,18 +125,16 @@ You can enable admin logins and the debug_toolbar by editing
 ```
 
 These are also defined in `lms/envs/dev.py`,
-and usually active on local servers.
+and usually active on localhost.
 
-To use the `dev.py` settings, explicitly forward one of VM's localhost ports to your computer.
+To get at your VM's 127.0.0.1, explicitly forward one of VM's available localhost ports to your computer.
 Instead of `vagrant ssh`, login with:
 
 ```
-$ ssh -L 8080:127.0.0.1:8080 vagrant@192.168.20.40
+$ ssh -L 6080:127.0.0.1:8080 vagrant@192.168.20.40
 ```
 
 The password is _vagrant_.
-Chose host and client ports which
-don't conflict with any currently in use.
 
 From your VM, start the LMS as a localhost instance:
 
@@ -144,8 +142,8 @@ From your VM, start the LMS as a localhost instance:
 $ rake lms[cms.dev,127.0.0.1:8080]
 ```
 
-You should see the debug toolbar now on [http:/localhost:8080/]().
-You should now also see a login on [http://localhost:8080/admin/]()
+You should see the debug toolbar now on [http:/localhost:6080/]().
+You should now also see a login on [http://localhost:6080/admin/]()
 You will need a privileged user for the admin login.
 You can create a CMS/LMS super-user with:
 ```
@@ -178,10 +176,10 @@ $ vagrant resume
 Your development environment is normally created once, on first `vagrant up`.
 You can continue to fetch changes in edx-platform
 as you work with your VM.
-To re-initialize your VM and create a fresh development environment:
+To re-create your VM and create a fresh development environment:
 ```
 $ vagrant destroy
-$ vagrant up
+$ vagrant up  # will make a new VM
 ```
 
 
