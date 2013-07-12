@@ -107,6 +107,7 @@ EOF
 ## only initialize / setup the development environment once:
 #   we create node_modules, so that's a good test:
 [[ -d /opt/edx/node_modules ]] || on_create
+# on_create
 
 # grab what the Vagrantfile spec'd our IP to be:
 #  expecting:

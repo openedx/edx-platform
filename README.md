@@ -28,11 +28,11 @@ installation process.
 
 The initial `vagrant up` will download a Linux image, then boot and ask for your
 administrator password to setup NFS.
-Once NFS is up, edx-platform/scripts/create-dev-env.sh will
+Once NFS is up, `edx-platform/scripts/create-dev-env.sh` will
 run, and install all system dependencies and configure the VM.
 This will take a while.  Once this starts, go grab a coffee.
 
-When complete, you should see a **"Success!"** message.
+When complete, you should see a _"Success!"_ message.
 If not, refer to the 
 [troubleshooting section](https://github.com/edx/edx-platform/wiki/Simplified-install-with-vagrant#troubleshooting).
 
@@ -67,8 +67,8 @@ You can develop by editing from your host computer, in the `edx-platform/` direc
 which you cloned from github.
 
 After logging into your VM with `vagrant ssh`,
-you can start the **Studio** and
-**Learning management system (LMS)**
+you can start the _Studio_ and
+_Learning management system (LMS)_
 servers as follows
 (run these from the `/opt/edx/edx-platform` folder):
 
@@ -86,8 +86,8 @@ $ rake cms[dev,0.0.0.0:8001]
 
 Once started, open the following URLs in your browser:
 
-* LMS: http://192.168.20.40:8000/
-* CMS: http://192.168.20.40:8001/
+- LMS: http://192.168.20.40:8000/
+- CMS: http://192.168.20.40:8001/
 
 Your VM's port 8000 is forwarded to host port 9000
 so you can also access the LMS with [http://localhost:9000/]().
@@ -118,6 +118,7 @@ your edx-platfrom/lms/envs/common.py instance:
    - ```
      'ENABLE_DJANGO_ADMIN_SITE': True
 ```
+
  - enable debug toolbar by uncommenting:
    - ```
     # 'debug_toolbar.middleware.DebugToolbarMiddleware',
