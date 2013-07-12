@@ -294,6 +294,9 @@ class @PeerGradingProblem
   #  Callbacks for various events
   #
   ##########
+  
+  remove_answer_unknown: () =>
+    @answer_unknown_checkbox.removeAttr("checked")
 
   remove_flag: () =>
     @flag_student_checkbox.removeAttr("checked")
@@ -442,6 +445,8 @@ class @PeerGradingProblem
       @flag_student_container.show()
       @answer_unknown_container.show()
       @feedback_area.val("")
+      @remove_flag
+      @remove_answer_unknown
 
       @submit_button.unbind('click')
       @submit_button.click @submit_grade
