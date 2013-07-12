@@ -445,8 +445,8 @@ class @PeerGradingProblem
       @flag_student_container.show()
       @answer_unknown_container.show()
       @feedback_area.val("")
-      @remove_flag
-      @remove_answer_unknown
+      @answer_unknown_checkbox.removeAttr("checked")
+      @flag_student_checkbox.removeAttr("checked")
 
       @submit_button.unbind('click')
       @submit_button.click @submit_grade
