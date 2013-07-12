@@ -175,6 +175,8 @@ Use `rake -T` to get a list of all available subsystems
 **Troubleshooting**: If you get an error message while running the `rake` task,
 try running `bundle install` to install the required ruby gems.
 
+Unit tests can be run in parallel to each other and while acceptance tests are running
+
 ### Running Acceptance Tests
 
 We use [Lettuce](http://lettuce.it/) for acceptance testing.
@@ -203,6 +205,10 @@ To start the debugger on failure, add the `--pdb` option:
 To run tests faster by not collecting static files, you can use
 `rake fasttest_acceptance_lms` and `rake fasttest_acceptance_cms`.
 
+Acceptance tests will run on a randomized port and can be run in the background of rake cms and lms or unit tests.
+To specify the port, change the LETTUCE_SERVER_PORT constant in cms/envs/acceptance.py and lms/envs/acceptance.py
+as well as the port listed in cms/djangoapps/contentstore/feature/upload.py
+
 **Note**: The acceptance tests can *not* currently run in parallel.
 
 ## Viewing Test Coverage
@@ -230,3 +236,30 @@ When testing problems that use a queue server on AWS (e.g. sandbox-xqueue.edx.or
 `django-admin.py runserver --settings=lms.envs.dev --pythonpath=. 0.0.0.0:8000`
 
 When you connect to the LMS, you need to use the public ip.  Use `ifconfig` to figure out the number, and connect e.g. to `http://18.3.4.5:8000/`
+
+
+## Acceptance Test Techniques
+
+1. Do not assert not if possible for css.  Use world.is_css_present and is_css_not_present
+    Errors can arise if checks for the css are performed before the page finishes loading.
+    To get around this, there are functions that will wait a period of time for the css to appear
+    before returning and return immediately if they are there.  There is a reverse to this function as well.
+    It will wait for the css to not appear and returns if it isn't there.
+
+    All css functions can utilize this timeout to ensure that the page is fully loaded
+
+2. Dealing with alerts
+    Chrome can hang on javascripts alerts.  If a javascript alert/prompt/confirmation is expected, use the step
+    'I will confirm all alerts', 'I will cancel all alerts' or 'I will anser all prompts with "(.*)"' before the step
+    that causes the alert in order to properly deal with it.
+
+3. Dealing with stale element reference exceptions
+    These exceptions happen if any part of the page is refreshed in between finding an element and accessing the element.
+    When possible, use any of the css functions in common/djangoapps/terrain/ui_helpers.py as they will retry the action
+    in case of this exception.  If the functionality is not there, wrap the function with world.retry_on_exception.  This function takes in a function and will retry and return the result of the function if there was an exception
+
+4. Scenario Level Constants
+    If you want an object to be available for the entire scenario, it can be stored in world.scenario_dict.  This object
+    is a dictionary that gets refreshed at the beginning on the scenario.  Currently, the current logged in user and the current created course are stored under 'COURSE' and 'USER'.  This will help prevent strings from being hard coded so the
+    acceptance tests can become more flexible.
+
