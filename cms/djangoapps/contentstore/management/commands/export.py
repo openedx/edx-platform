@@ -30,4 +30,4 @@ class Command(BaseCommand):
         root_dir = os.path.dirname(output_path)
         course_dir = os.path.splitext(os.path.basename(output_path))[0]
 
-        export_to_xml(modulestore('direct'), contentstore(), location, root_dir, course_dir)
+        export_to_xml(modulestore('direct'), contentstore(), location, root_dir, course_dir, modulestore())
