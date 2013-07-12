@@ -32,7 +32,7 @@ TRUE_DICT = ["True", True, "TRUE", "true"]
 
 HUMAN_TASK_TYPE = {
     'selfassessment': "Self Assessment",
-    'openended': "edX Assessment",
+    'openended': "Reviewed Assessment",
 }
 
 # Default value that controls whether or not to skip basic spelling checks in the controller
