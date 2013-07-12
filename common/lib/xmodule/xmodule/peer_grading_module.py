@@ -442,27 +442,20 @@ class PeerGradingModule(PeerGradingFields, XModule):
         success, message = self._check_required(data, required)
         if not success:
             return self._err_response(message)
-        grader_id = self.system.anonymous_student_id
 
-        location = data.get('location')
-        calibration_essay_id = data.get('submission_id')
-        submission_key = data.get('submission_key')
-        score = data.get('score')
-        feedback = data.get('feedback')
-        rubric_scores = data.getlist('rubric_scores[]')
+        data_dict = {k:data.get(k) for k in required}
+        data_dict['rubric_scores'] = data_dict['rubric_scores[]']
+        data_dict['grader_id'] = self.system.anonymous_student_id
 
         try:
-            response = self.peer_gs.save_calibration_essay(location, grader_id, calibration_essay_id,
-                                                           submission_key, score, feedback, rubric_scores)
+            response = self.peer_gs.save_calibration_essay(**data_dict)
             if 'actual_rubric' in response:
                 rubric_renderer = combined_open_ended_rubric.CombinedOpenEndedRubric(self.system, True)
                 response['actual_rubric'] = rubric_renderer.render_rubric(response['actual_rubric'])['html']
             return response
         except GradingServiceError:
             # This is a dev_facing_error
-            log.exception(
-                "Error saving calibration grade, location: {0}, submission_key: {1}, grader_id: {2}".format(
-                    location, submission_key, grader_id))
+            log.exception("Error saving calibration grade")
             # This is a student_facing_error
             return self._err_response('There was an error saving your score.  Please notify course staff.')
 

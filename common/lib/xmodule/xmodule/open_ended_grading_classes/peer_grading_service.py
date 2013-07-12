@@ -54,16 +54,9 @@ class PeerGradingService(GradingService):
         response = self.get(self.show_calibration_essay_url, params)
         return self.try_to_decode(self._render_rubric(response))
 
-    def save_calibration_essay(self, problem_location, grader_id, calibration_essay_id, submission_key,
-                               score, feedback, rubric_scores):
-        data = {'location': problem_location,
-                'student_id': grader_id,
-                'calibration_essay_id': calibration_essay_id,
-                'submission_key': submission_key,
-                'score': score,
-                'feedback': feedback,
-                'rubric_scores[]': rubric_scores,
-                'rubric_scores_complete': True}
+    def save_calibration_essay(self, **kwargs):
+        data = kwargs
+        data.update({'rubric_scores_complete' : True})
         return self.try_to_decode(self.post(self.save_calibration_essay_url, data))
 
     def get_problem_list(self, course_id, grader_id):
@@ -115,9 +108,7 @@ class MockPeerGradingService(object):
                 'rubric': 'fake rubric',
                 'max_score': 4}
 
-    def save_calibration_essay(self, problem_location, grader_id,
-                               calibration_essay_id, submission_key, score,
-                               feedback, rubric_scores):
+    def save_calibration_essay(self, **kwargs):
         return {'success': True, 'actual_score': 2}
 
     def get_problem_list(self, course_id, grader_id):
