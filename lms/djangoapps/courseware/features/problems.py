@@ -121,7 +121,7 @@ def reset_problem(_step):
 def press_the_button_with_label(_step, buttonname):
     button_css = 'button span.show-label'
     elem = world.css_find(button_css).first
-    assert_equal(elem.text, buttonname)
+    world.css_has_text(button_css, elem)
     world.css_click(button_css)
 
 

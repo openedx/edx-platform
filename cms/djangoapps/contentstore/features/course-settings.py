@@ -162,7 +162,7 @@ def verify_date_or_time(css, date_or_time):
     """
     Verifies date or time field.
     """
-    assert_equal(date_or_time, world.css_find(css).first.value)
+    assert_equal(date_or_time, world.css_value(css))
 
 
 def i_see_the_set_dates():
