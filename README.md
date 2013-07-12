@@ -28,18 +28,18 @@ installation process.
 
 The last step might require your host machine's administrator password to setup NFS.
 
-Afterwards, it will download an image, install all the dependencies and configure
-the VM. It will take a while, go grab a coffee.
+The initial `vagrant up` will download a Linux image, install all dependencies and configure
+the VM. This will take a while - go grab a coffee.
 
-Once completed, you should see a "Success!" message.
+Once completed, you should see a *"Success!"* message.
 If not, refer to the 
 [troubleshooting section](https://github.com/edx/edx-platform/wiki/Simplified-install-with-vagrant#troubleshooting).
 
 Your development environment is initialized only on the first bring-up.
-Subsequently, you can boot your virtual machine normally using `vagrant up`.
+Subsequently `vagrant up` commands will boot your virtual machine normally.
 
 Note: by default, the VM will get the IP `192.168.20.40`.
-You can change this in your `Vagrantfile` (the startup message will reflect your VMs actual IP).
+You can change this in your `Vagrantfile` (the startup message will reflect your VM's actual IP).
 
 Accessing the VM
 ----------------
@@ -66,11 +66,10 @@ You can develop by editing from your host computer, in the `edx-platform/` direc
 which you cloned from github.
 
 After logging into your VM with `vagrant ssh`,
-you can start Studio and the
-Learning management system (LMS)
-with the commands such as the following
-
-(you need to be in the `/opt/edx/edx-platform` folder on the client VM):
+you can start the **Studio** and
+**Learning management system (LMS)**
+servers as follows
+(run these from the `/opt/edx/edx-platform` folder):
 
 Learning management system (LMS):
 
@@ -89,9 +88,9 @@ Once started, open the following URLs in your browser:
 * LMS: http://192.168.20.40:8000/
 * CMS: http://192.168.20.40:8001/
 
-Your client VM's port 8000 is forwarded to host port 9000
-so you can also access the LMS with http://localhost:9000/.
-Similarly, client port 8001 is forwarded to host port 9001.
+Your VM's port 8000 is forwarded to host port 9000
+so you can also access the LMS with [http://localhost:9000/]().
+Similarly, development VM port 8001 is forwarded to host port 9001.
 These are set in your `Vagrantfile`.
 
 Note that when you register a new user through the web interface,
@@ -119,9 +118,8 @@ $ rake django-admin["createsuperuser"]
 
 Normally the django admin interface and the site's debug toolbar
 are only active during local operation.
-To use these, specifically forward one of client VM's localhost ports to your host.
-You cannot do this with `vagrant ssh`.
-Instead, login from a host terminal like this:
+To use these, specifically forward one of VM's localhost ports to your computer.
+To do this, login to the VM like this:
 
 ```
 $ ssh -L 8080:127.0.0.1:8080 vagrant@192.168.20.40
@@ -131,14 +129,15 @@ with a password of `vagrant`.
 The specific host and client ports can be whatever you want,
 so long as they don't conflict with any ports in use.
 
-Now, start your LMS as a localhost instance:
+From your VM, start the LMS as a localhost instance:
 
 ```
 $ rake lms[cms.dev,127.0.0.1:8080]
 ```
 
-You should see the debug toolbar when you navigate to http:/localhost:8080.
-You should now also see a login if you navigate to http://localhost:8080/admin/.
+You should see the debug toolbar when you navigate to [http:/localhost:8080/]().
+You should now also see a login when you navigate to [http://localhost:8080/admin/]()
+(you can use the django super-user account for this).
 
 
 Stopping & starting
