@@ -35,21 +35,6 @@ def index(request):
                 and course.location.name != '')
     courses = filter(course_filter, courses)
 
-    if settings.MITX_FEATURES.get('DISABLE_COURSE_CREATION', False):
-        course_creator_status = 'granted' if request.user.is_staff else 'disallowed_for_this_site'
-    elif settings.MITX_FEATURES.get('ENABLE_CREATOR_GROUP', False):
-        course_creator_status = get_course_creator_status(request.user)
-        if course_creator_status is None:
-            # User not grandfathered in as an existing user, has not previously visited the dashboard page.
-            # Add the user to the course creator admin table with status 'unrequested'.
-            add_user_with_status_unrequested(request.user)
-            course_creator_status = get_course_creator_status(request.user)
-    else:
-        course_creator_status = 'granted'
-
-    request_course_creator_url = reverse('request_course_creator')
-    csrf_token = csrf(request)['csrf_token']
-
     return render_to_response('index.html', {
         'new_course_template': Location('i4x', 'edx', 'templates', 'course', 'Empty'),
         'courses': [(course.display_name,
@@ -57,9 +42,9 @@ def index(request):
                     get_lms_link_for_item(course.location, course_id=course.location.course_id))
                     for course in courses],
         'user': request.user,
-        'request_course_creator_url': request_course_creator_url,
-        'course_creator_status': course_creator_status,
-        'csrf': csrf_token
+        'request_course_creator_url': reverse('request_course_creator'),
+        'course_creator_status': _get_course_creator_status(request.user),
+        'csrf': csrf(request)['csrf_token']
     })
 
 
@@ -67,9 +52,11 @@ def index(request):
 @ensure_csrf_cookie
 @login_required
 def request_course_creator(request):
+    """
+    User has requested course creation access.
+    """
     user_requested_access(request.user)
     return JsonResponse({"Status": "OK"})
-
 
 
 @login_required
@@ -169,3 +156,28 @@ def remove_user(request, location):
     remove_user_from_course_group(request.user, user, location, STAFF_ROLE_NAME)
 
     return JsonResponse({"Status": "OK"})
+
+
+def _get_course_creator_status(user):
+    """
+    Helper method for returning the course creator status for a particular user,
+    taking into account the values of DISABLE_COURSE_CREATION and ENABLE_CREATOR_GROUP.
+
+    If the user passed in has not previously visited the index page, it will be
+    added with status 'unrequested' if the course creator group is in use.
+    """
+    if user.is_staff:
+        course_creator_status = 'granted'
+    elif settings.MITX_FEATURES.get('DISABLE_COURSE_CREATION', False):
+        course_creator_status = 'disallowed_for_this_site'
+    elif settings.MITX_FEATURES.get('ENABLE_CREATOR_GROUP', False):
+        course_creator_status = get_course_creator_status(user)
+        if course_creator_status is None:
+            # User not grandfathered in as an existing user, has not previously visited the dashboard page.
+            # Add the user to the course creator admin table with status 'unrequested'.
+            add_user_with_status_unrequested(user)
+            course_creator_status = get_course_creator_status(user)
+    else:
+        course_creator_status = 'granted'
+
+    return course_creator_status
