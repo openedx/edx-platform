@@ -14,10 +14,6 @@ logger = getLogger(__name__)
 
 from terrain.browser import reset_data
 
-_COURSE_NAME = 'Robot Super Course'
-_COURSE_NUM = '999'
-_COURSE_ORG = 'MITx'
-
 ###########  STEP HELPERS ##############
 
 
@@ -124,9 +120,9 @@ def create_studio_user(
 
 
 def fill_in_course_info(
-        name=_COURSE_NAME,
-        org=_COURSE_ORG,
-        num=_COURSE_NUM):
+        name='Robot Super Course',
+        org='MITx',
+        num='999'):
     world.css_fill('.new-course-name', name)
     world.css_fill('.new-course-org', org)
     world.css_fill('.new-course-number', num)
@@ -151,15 +147,21 @@ def log_into_studio(
         login_form.find_by_name('submit').click()
     world.retry_on_exception(fill_login_form)
     assert_true(world.is_css_present('.new-course-button'))
+    world.scenario_dict['USER'] = get_user_by_email(email)
 
 
 def create_a_course():
-    world.CourseFactory.create(org=_COURSE_ORG, course=_COURSE_NUM, display_name=_COURSE_NAME)
+    world.scenario_dict['COURSE'] = world.CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course')
 
     # Add the user to the instructor group of the course
     # so they will have the permissions to see it in studio
-    course = world.GroupFactory.create(name='instructor_MITx/{course_num}/{course_name}'.format(course_num=_COURSE_NUM, course_name=_COURSE_NAME.replace(" ", "_")))
-    user = get_user_by_email('robot+studio@edx.org')
+
+    course = world.GroupFactory.create(name='instructor_MITx/{}/{}'.format(world.scenario_dict['COURSE'].number,
+                                                                    world.scenario_dict['COURSE'].display_name.replace(" ", "_")))
+    if world.scenario_dict.get('USER') is None:
+        user = world.scenario_dict['USER']
+    else:
+        user = get_user_by_email('robot+studio@edx.org')
     user.groups.add(course)
     user.save()
     world.browser.reload()
