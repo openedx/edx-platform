@@ -107,12 +107,23 @@ and find the activation URL.
 See the [Frequently Asked Questions](https://github.com/edx/edx-platform/wiki/Frequently-Asked-Questions)
 for more usage tips.
 
-Django admin & debugging toolbar
+Django admin & debug toolbar
 -----------------------------------
 
-Normally the django admin interface and the site's debug toolbar
-are only active during local operation.
-To use these, explicitly forward one of VM's localhost ports to your computer.
+You can enable admin logins and the debug_toolbar by editing
+your edx-platfrom/lms/envs/common.py instance:
+
+ - enable ADMIN login page by setting: ```
+     'ENABLE_DJANGO_ADMIN_SITE': True
+```
+ - enable debug toolbar by uncommenting: ```
+    # 'debug_toolbar.middleware.DebugToolbarMiddleware',
+```
+
+Alternatively, these are defined in edx-platform/lms/envs/dev.py,
+and as such only active for local servers.
+
+To use the dev settings, explicitly forward one of VM's localhost ports to your computer.
 To do this, login to the VM like this:
 
 ```
