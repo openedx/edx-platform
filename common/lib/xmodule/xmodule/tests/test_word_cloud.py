@@ -6,6 +6,7 @@ from . import PostData, LogicTest
 
 
 class WordCloudModuleTest(LogicTest):
+    """Logic tests for Word Cloud Xmodule."""
     descriptor_class = WordCloudDescriptor
     raw_model_data = {
         'all_words': {'cat': 10, 'dog': 5, 'mom': 1, 'dad': 2},
@@ -15,7 +16,6 @@ class WordCloudModuleTest(LogicTest):
 
     def test_bad_ajax_request(self):
         "Make sure that answer for incorrect request is error json"
-        # TODO: move top global test. Formalize all our Xmodule errors.
         response = self.ajax_request('bad_dispatch', {})
         self.assertDictEqual(response, {
             'status': 'fail',
@@ -42,5 +42,7 @@ class WordCloudModuleTest(LogicTest):
              {'text': 'cat', 'size': 12, 'percent': 54.0}]
         )
 
-        self.assertEqual(100.0, sum(i['percent'] for i in response['top_words']) )
+        self.assertEqual(
+            100.0,
+            sum(i['percent'] for i in response['top_words']))
 

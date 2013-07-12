@@ -213,7 +213,10 @@ function (HTML5Video) {
 
         this.setSpeed(newSpeed, updateCookie);
 
-        if (this.currentPlayerMode === 'html5' && !(state.browserIsFirefox && newSpeed === '1.0')) {
+        if (
+            this.currentPlayerMode === 'html5' &&
+            !(this.browserIsFirefox && newSpeed === '1.0' && this.videoType === 'youtube')
+        ) {
             this.videoPlayer.player.setPlaybackRate(newSpeed);
         } else { // if (this.currentPlayerMode === 'flash') {
             if (this.videoPlayer.isPlaying()) {

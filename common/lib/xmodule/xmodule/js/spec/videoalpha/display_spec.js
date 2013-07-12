@@ -1,5 +1,5 @@
 (function () {
-  describe('VideoAlpha', function () {
+  xdescribe('VideoAlpha', function () {
     var metadata;
     metadata = {
       slowerSpeedYoutubeId: {
@@ -47,8 +47,6 @@
           });
 
           it('set the elements', function () {
-            console.log('We are in this function.');
-
             expect(this.state.el).toBe('#video_id');
           });
 
@@ -66,10 +64,6 @@
           it('set current video speed via cookie', function () {
             expect(this.state.speed).toEqual('0.75');
           });
-
-          //it('store a reference for this video player in the element', function () {
-            //expect($('.video').data('video')).toEqual(this.state);
-          //});
         });
 
         /*describe('when the Youtube API is already available', function () {

@@ -7,7 +7,7 @@
 <div
   id="video_${id}"
       class="videoalpha"
-  
+
   % if not settings.MITX_FEATURES['STUB_VIDEO_FOR_TESTING']:
   data-streams="${youtube_streams}"
   % endif
@@ -67,7 +67,7 @@
   </article>
 
       % if show_captions == 'true':
-      <ol class="subtitles"></ol>
+      <ol class="subtitles"><li></li></ol>
       % endif
 
 </div>

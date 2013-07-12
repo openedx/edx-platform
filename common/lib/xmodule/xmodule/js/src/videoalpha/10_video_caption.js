@@ -11,8 +11,8 @@ function () {
         state.videoCaption = {};
 
         makeFunctionsPublic(state);
-        renderElements(state);
-        bindHandlers(state);
+        state.videoCaption.renderElements();
+        state.videoCaption.bindHandlers();
     };
 
     // ***************************************************************
@@ -43,88 +43,93 @@ function () {
         state.videoCaption.hideCaptions        = hideCaptions.bind(state);
         state.videoCaption.calculateOffset     = calculateOffset.bind(state);
         state.videoCaption.updatePlayTime      = updatePlayTime.bind(state);
-        //Added for tests --> JM
+
+        state.videoCaption.renderElements      = renderElements.bind(state);
+        state.videoCaption.bindHandlers        = bindHandlers.bind(state);
         state.videoCaption.fetchCaption        = fetchCaption.bind(state);
+        state.videoCaption.captionURL          = captionURL.bind(state);
     }
 
-    // function renderElements(state)
+    // function renderElements()
     //
     //     Create any necessary DOM elements, attach them, and set their initial configuration. Also
     //     make the created DOM elements available via the 'state' object. Much easier to work this
     //     way - you don't have to do repeated jQuery element selects.
-    function renderElements(state) {
-        state.videoCaption.loaded = false;
+    function renderElements() {
+        this.videoCaption.loaded = false;
 
-        state.videoCaption.subtitlesEl = state.el.find('ol.subtitles');
-        state.videoCaption.hideSubtitlesEl = state.el.find('a.hide-subtitles');
+        this.videoCaption.subtitlesEl = this.el.find('ol.subtitles');
+        this.videoCaption.hideSubtitlesEl = this.el.find('a.hide-subtitles');
 
-        state.el.find('.video-wrapper').after(state.videoCaption.subtitlesEl);
-        state.el.find('.video-controls .secondary-controls').append(state.videoCaption.hideSubtitlesEl);
+        this.el.find('.video-wrapper').after(this.videoCaption.subtitlesEl);
+        this.el.find('.video-controls .secondary-controls').append(this.videoCaption.hideSubtitlesEl);
 
-        state.el.find('.subtitles').css({
-            maxHeight: state.el.find('.video-wrapper').height() - 5
+        this.el.find('.subtitles').css({
+            maxHeight: this.el.find('.video-wrapper').height() - 5
         });
 
-        fetchCaption(state);
+        this.videoCaption.fetchCaption();
 
-        if (state.videoType === 'html5') {
-            state.videoCaption.fadeOutTimeout = state.config.fadeOutTimeout;
+        if (this.videoType === 'html5') {
+            this.videoCaption.fadeOutTimeout = this.config.fadeOutTimeout;
 
-            state.videoCaption.subtitlesEl.addClass('html5');
-            state.captionHideTimeout = setTimeout(state.videoCaption.autoHideCaptions, state.videoCaption.fadeOutTimeout);
+            this.videoCaption.subtitlesEl.addClass('html5');
+            this.captionHideTimeout = setTimeout(this.videoCaption.autoHideCaptions, this.videoCaption.fadeOutTimeout);
         }
     }
 
-    // function bindHandlers(state)
+    // function bindHandlers()
     //
     //     Bind any necessary function callbacks to DOM events (click, mousemove, etc.).
-    function bindHandlers(state) {
-        $(window).bind('resize', state.videoCaption.resize);
-        state.videoCaption.hideSubtitlesEl.click(state.videoCaption.toggle);
+    function bindHandlers() {
+        $(window).bind('resize', this.videoCaption.resize);
+        this.videoCaption.hideSubtitlesEl.on('click', this.videoCaption.toggle);
 
-        state.videoCaption.subtitlesEl
+        this.videoCaption.subtitlesEl
             .on(
                 'mouseenter',
-                state.videoCaption.onMouseEnter
+                this.videoCaption.onMouseEnter
             ).on(
                 'mouseleave',
-                state.videoCaption.onMouseLeave
+                this.videoCaption.onMouseLeave
             ).on(
                 'mousemove',
-                state.videoCaption.onMovement
+                this.videoCaption.onMovement
             ).on(
                 'mousewheel',
-                state.videoCaption.onMovement
+                this.videoCaption.onMovement
             ).on(
                 'DOMMouseScroll',
-                state.videoCaption.onMovement
+                this.videoCaption.onMovement
             );
 
-        if (state.videoType === 'html5') {
-            state.el.on('mousemove', state.videoCaption.autoShowCaptions)
+        if (this.videoType === 'html5') {
+            this.el.on('mousemove', this.videoCaption.autoShowCaptions);
         }
     }
 
-    function fetchCaption(state) {
-        state.videoCaption.hideCaptions(state.hide_captions);
+    function fetchCaption() {
+        var _this = this;
 
-        $.getWithPrefix(captionURL(state), function(captions) {
-            state.videoCaption.captions = captions.text;
-            state.videoCaption.start = captions.start;
-            state.videoCaption.loaded = true;
+        this.videoCaption.hideCaptions(this.hide_captions);
+
+        $.getWithPrefix(this.videoCaption.captionURL(), function(captions) {
+            _this.videoCaption.captions = captions.text;
+            _this.videoCaption.start = captions.start;
+            _this.videoCaption.loaded = true;
 
             if (onTouchBasedDevice()) {
-                state.videoCaption.subtitlesEl.find('li').html(
+                _this.videoCaption.subtitlesEl.find('li').html(
                     'Caption will be displayed when you start playing the video.'
                 );
             } else {
-                state.videoCaption.renderCaption();
+                _this.videoCaption.renderCaption();
             }
         });
     }
 
-    function captionURL(state) {
-        return '' + state.config.caption_asset_path + state.youtubeId('1.0') + '.srt.sjson';
+    function captionURL() {
+        return '' + this.config.caption_asset_path + this.youtubeId('1.0') + '.srt.sjson';
     }
 
     // ***************************************************************
@@ -212,26 +217,29 @@ function () {
     }
 
     function renderCaption() {
-        var container, _this = this;
+        var container,
+            _this = this;
         container = $('<ol>');
 
         $.each(this.videoCaption.captions, function(index, text) {
-            container.append(
-                $('<li>').html(text)
-                    .data('index', index)
-                    .data('start', _this.videoCaption.start[index])
-            );
+            var liEl = $('<li>');
+
+            liEl.html(text);
+
+            liEl.attr({
+                'data-index': index,
+                'data-start': _this.videoCaption.start[index]
+            });
+
+            container.append(liEl);
         });
 
-        this.videoCaption.subtitlesEl
-            .html(container.html())
-            .find('li[data-index]').on('click', this.videoCaption.seekPlayer)
-            .prepend(
-                $('<li class="spacing">').height(this.videoCaption.topSpacingHeight())
-            )
-            .append(
-                $('<li class="spacing">').height(this.videoCaption.bottomSpacingHeight())
-            );
+        this.videoCaption.subtitlesEl.html(container.html());
+
+        this.videoCaption.subtitlesEl.find('li[data-index]').on('click', this.videoCaption.seekPlayer);
+
+        this.videoCaption.subtitlesEl.prepend($('<li class="spacing">').height(this.videoCaption.topSpacingHeight()));
+        this.videoCaption.subtitlesEl.append($('<li class="spacing">').height(this.videoCaption.bottomSpacingHeight()));
 
         this.videoCaption.rendered = true;
     }
@@ -343,15 +351,25 @@ function () {
     }
 
     function hideCaptions(hide_captions) {
+        var type;
+
         if (hide_captions) {
+            type = 'hide_transcript';
             this.captionsHidden = true;
             this.videoCaption.hideSubtitlesEl.attr('title', 'Turn on captions');
             this.el.addClass('closed');
         } else {
+            type = 'show_transcript';
             this.captionsHidden = false;
             this.videoCaption.hideSubtitlesEl.attr('title', 'Turn off captions');
             this.el.removeClass('closed');
             this.videoCaption.scrollCaption();
+        }
+
+        if (this.videoPlayer) {
+            this.videoPlayer.log(type, {
+                currentTime: this.videoPlayer.currentTime
+            });
         }
 
         $.cookie('hide_captions', hide_captions, {

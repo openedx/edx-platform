@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 """Test for Poll Xmodule functional logic."""
 from xmodule.poll_module import PollDescriptor
-from . import PostData, LogicTest
+from . import LogicTest
 
 
 class PollModuleTest(LogicTest):
+    """Logic tests for Poll Xmodule."""
     descriptor_class = PollDescriptor
     raw_model_data = {
         'poll_answers': {'Yes': 1, 'Dont_know': 0, 'No': 0},

@@ -44,7 +44,9 @@ function () {
         state.videoControl.secondaryControlsEl.prepend(state.videoSpeedControl.el);
 
         $.each(state.videoSpeedControl.speeds, function(index, speed) {
-            var link = $('<a href="#">' + speed + 'x</a>');
+            
+            //var link = $('<a href="#">' + speed + 'x</a>');
+            var link = '<a href="#">' + speed + 'x</a>';
 
             state.videoSpeedControl.videoSpeedsEl.prepend($('<li data-speed="' + speed + '">' + link + '</li>'));
         });
@@ -117,7 +119,8 @@ function () {
         $.each(this.videoSpeedControl.speeds, function(index, speed) {
             var link, listItem;
 
-            link = $('<a href="#">' + speed + 'x</a>');
+            //link = $('<a href="#">' + speed + 'x</a>');
+            link = '<a href="#">' + speed + 'x</a>';
 
             listItem = $('<li data-speed="' + speed + '">' + link + '</li>');
 

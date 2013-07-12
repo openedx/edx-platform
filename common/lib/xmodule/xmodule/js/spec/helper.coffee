@@ -25,6 +25,42 @@ window.STATUS = window.YT.PlayerState
 window.whatType = (o) ->
   TYPES[typeof o] || TYPES[TOSTRING.call(o)] || (o ? 'object' : 'null');
 
+oldGetWithPrefix = window.jQuery.getWithPrefix
+
+jasmine.stubbedCaption =
+      end: [3120, 6270, 8490, 21620, 24920, 25750, 27900, 34380, 35550, 40250]
+      start: [1180, 3120, 6270, 14910, 21620, 24920, 25750, 27900, 34380, 35550]
+      text: [
+        "MICHAEL CIMA: So let's do the first one here.",
+        "Vacancies, where do they come from?",
+        "Well, imagine a perfect crystal.",
+        "Now we know at any temperature other than absolute zero there's enough",
+        "energy going around that some atoms will have more energy",
+        "than others, right?",
+        "There's a distribution.",
+        "If I plot energy here and number, these atoms in the crystal will have a",
+        "distribution of energy.",
+        "And some will have quite a bit of energy, just for a moment."
+      ]
+
+# For our purposes, we need to make sure that the function $.getWithPrefix doe not fail
+# when during tests a captions file is requested. It is originally defined in
+#
+#     common/static/coffee/src/ajax_prefix.js
+#
+# We will replace it with a function that does:
+#
+#     1.) Return a hard coded captions object if the file name contains 'test_name_of_the_subtitles'.
+#     2.) Behaves the same a as the origianl in all other cases.
+window.jQuery.getWithPrefix = (url, data, callback, type) ->
+  if url.match(/test_name_of_the_subtitles/g) isnt null or url.match(/slowerSpeedYoutubeId/g) isnt null or url.match(/normalSpeedYoutubeId/g) isnt null
+    if window.jQuery.isFunction(callback) is true
+      callback jasmine.stubbedCaption
+    else if window.jQuery.isFunction(data) is true
+      data jasmine.stubbedCaption
+  else
+    oldGetWithPrefix.apply this, arguments
+
 # Time waitsFor() should wait for before failing a test.
 window.WAIT_TIMEOUT = 1000
 
@@ -52,10 +88,6 @@ jasmine.fireEvent = (el, eventName) ->
     el.dispatchEvent(event)
   else
     el.fireEvent("on" + event.eventType, event)
-
-jasmine.stubbedCaption =
-  start: [0, 10000, 20000, 30000]
-  text: ['Caption at 0', 'Caption at 10000', 'Caption at 20000', 'Caption at 30000']
 
 jasmine.stubbedHtml5Speeds = ['0.75', '1.0', '1.25', '1.50']
 
