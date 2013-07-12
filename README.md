@@ -26,12 +26,13 @@ installation process.
    [deal with line endings and symlinks under Windows](https://github.com/edx/edx-platform/wiki/Simplified-install-with-vagrant#dealing-with-line-endings-and-symlinks-under-windows)
 9. Create the development environment and start it: `vagrant up`
 
-The last step might require your host machine's administrator password to setup NFS.
+The initial `vagrant up` will download a Linux image, then boot and ask for your
+administrator password to setup NFS.
+Once NFS is up, edx-platform/scripts/create-dev-env.sh will
+run, and install all system dependencies and configure the VM.
+This will take a while.  Once this starts, go grab a coffee.
 
-The initial `vagrant up` will download a Linux image, install all dependencies and configure
-the VM. This will take a while - go grab a coffee.
-
-Once completed, you should see a *"Success!"* message.
+When complete, you should see a **"Success!"** message.
 If not, refer to the 
 [troubleshooting section](https://github.com/edx/edx-platform/wiki/Simplified-install-with-vagrant#troubleshooting).
 
