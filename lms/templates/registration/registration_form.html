@@ -10,7 +10,7 @@
   {% endif %}
 
   <h1>${_("Create an account")}</h1>
-  
+
   <form method="post" action="" class="wide">
 {% csrf_token %}
     <p>
@@ -41,9 +41,9 @@
       {% endif %}
       {{ form.password2 }}
     </p>
-    <p class="submit"><input type="submit" value="${_("Register &rarr;")}"></p>
+    <p class="submit"><input type="submit" value="${_("Register")} &rarr;"></p>
   </form>
-  
+
 {% endblock %}
 
 {% block content-related %}

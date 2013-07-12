@@ -51,7 +51,7 @@
         </article>
         <article class="response">
           <h3>${_("What will the scope of the online courses be? How many? Which faculty?")}</h3>
-          <p>${_('Our goal is to offer a wide variety of courses across disciplines. There are currently <a href="/courses">fifteen</a> offered on the edX platform.')}</p>
+          <p>${_('Our goal is to offer a wide variety of courses across disciplines. There are currently {link_start}fifteen{link_end} offered on the edX platform.').format(link_start='<a href="/courses">', link_end='</a>')}</p>
         </article>
         <article class="response">
           <h3>${_("Who is the learner? Domestic or international? Age range?")}</h3>
@@ -67,11 +67,11 @@
         </article>
         <article class="response">
           <h3>${_("How may I apply to study with edX?")}</h3>
-          <p>${_('Simply complete the online <a href="#signup-modal" rel="leanModal">signup form</a>.  Enrolling will create your unique student record in the edX database, allow you to register for classes, and to receive a certificate on successful completion.')}</p>
+          <p>${_('Simply complete the online {link_start}signup form{link_end}.  Enrolling will create your unique student record in the edX database, allow you to register for classes, and to receive a certificate on successful completion.').format(link_start='<a href="#signup-modal" rel="leanModal">', link_end='</a>')}</p>
         </article>
         <article class="response">
           <h3>${_("How may another university participate in edX? ")}</h3>
-          <p>${_('If you are from a university interested in discussing edX, please email <a href="mailto:university@edx.org">university@edx.org</a>')}</p>
+          <p>${_('If you are from a university interested in discussing edX, please email {email}').format(email='<a href="mailto:university@edx.org">university@edx.org</a>')}</p>
         </article>
       </section>
 

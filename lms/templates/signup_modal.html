@@ -11,7 +11,7 @@
   <div class="inner-wrapper">
     <div id="register">
       <header>
-        <h2>${_('Sign Up for <span class="edx">edX</span>')}</h2>
+        <h2>${_('Sign Up for {span_start}edX{span_end}').format(span_start='<span class="edx">', span_end='</span>')}</h2>
         <hr>
       </header>
 
@@ -24,19 +24,19 @@
 	  % if has_extauth_info is UNDEFINED:
           <label data-field="email" for="signup_email">${_('E-mail *')}</label>
 	    <input id="signup_email" type="email" name="email" placeholder="${_('e.g. yourname@domain.com')}" required />
-	  
+
           <label data-field="password" for="signup_password">${_('Password *')}</label>
 	    <input id="signup_password" type="password" name="password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" required />
-          
+
 	  <label data-field="username" for="signup_username">${_('Public Username *')}</label>
 	    <input id="signup_username" type="text" name="username" placeholder="${_('e.g. yourname (shown on forums)')}" required />
-	  
+
           <label data-field="name" for="signup_fullname">${_('Full Name *')}</label>
 	    <input id="signup_fullname" type="text" name="name" placeholder="${_('e.g. Your Name (for certificates)')}" required />
 	  % else:
 	  <p>${_('<i>Welcome</i> %s') % extauth_id}</p><br/>
 	  <p><i>${_('Enter a public username:')}</i></p>
-            
+
           <label data-field="username" for="signup_username">${_('Public Username *')}</label>
 	      <input id="signup_username" type="text" name="username" value="${extauth_username}" placeholder="${_('e.g. yourname (shown on forums)')}" required />
 
@@ -45,12 +45,12 @@
             <input id="signup_email" type="email" name="email" placeholder="${_('e.g. yourname@domain.com')}" required />
           % endif
 
-            
+
           % if ask_for_fullname:
             <label data-field="name" for="signup_fullname">${_("Full Name *")}</label>
             <input id="signup_fullname" type="text" name="name" placeholder="${_('e.g. Your Name (for certificates)')}" required />
           % endif
-            
+
 	  % endif
         </div>
 
@@ -94,7 +94,7 @@
 
           <label data-field="mailing_address" for="signup_mailing_address">${_("Mailing address")}</label>
 	    <textarea id="signup_mailing_address" name="mailing_address"></textarea>
-	  
+
           <label data-field="goals" for="signup_goals">${_("Goals in signing up for edX")}</label>
 	    <textarea name="goals" id="signup_goals"></textarea>
 
@@ -103,12 +103,16 @@
         <div class="input-group">
           <label data-field="terms_of_service" class="terms-of-service" for="signup_tos">
             <input id="signup_tos" name="terms_of_service" type="checkbox" value="true">
-            ${_('I agree to the <a href="%s" target="_blank">Terms of Service</a>*') % reverse('tos')}
+            ${_('I agree to the {link_start}Terms of Service{link_end}*').format(
+              link_start='<a href="{url}" target="_blank">'.format(url=reverse('tos')),
+              link_end='</a>')}
           </label>
 
           <label data-field="honor_code" class="honor-code" for="signup_honor">
             <input id="signup_honor" name="honor_code" type="checkbox" value="true">
-            ${_('I agree to the <a href="%s" target="_blank">Honor Code</a>*') % reverse('honor')}
+            ${_('I agree to the {link_start}Honor Code{link_end}*').format(
+              link_start='<a href="{url}" target="_blank">'.format(url=reverse('honor')),
+              link_end='</a>')}
           </label>
         </div>
 
@@ -146,7 +150,7 @@
        $("[data-field='"+json.field+"']").addClass('field-error')
      }
     });
-   
+
    // removing close link's default behavior
    $('#login-modal .close-modal').click(function(e) {
     e.preventDefault();
