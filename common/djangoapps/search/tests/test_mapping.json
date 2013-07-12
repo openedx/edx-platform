@@ -1,42 +1,15 @@
 {
-	"mappings": {
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> Refactored some code and added full elasticsearch module test suite
-		"test-string": {
-			"type": "string",
-			"store": "yes",
-			"index": "analyzed",
-			"term_vector": "with_positions_offsets"
-		},
-<<<<<<< HEAD
+"mappings": {
+"test-string": {
+"type": "string",
+"store": "yes",
+"index": "analyzed",
+"term_vector": "with_positions_offsets"
+},
 
-		"test-float": {
-			"type": "float",
-			"store": "yes"
-		}
-	}
-
-=======
-		"properties": {
-			"test-string": {
-				"type": "string",
-				"store": "yes",
-				"index": "analyzed",
-				"term_vector": "with_positions_offsets"
-			},
-=======
->>>>>>> Refactored some code and added full elasticsearch module test suite
-
-		"test-float": {
-			"type": "float",
-			"store": "yes"
-		}
-	}
-<<<<<<< HEAD
->>>>>>> Removed hackathon files, added some tests, included indexing of problems and pdfs
-=======
-
->>>>>>> Refactored some code and added full elasticsearch module test suite
+"test-float": {
+"type": "float",
+"store": "yes"
+}
+}
 }

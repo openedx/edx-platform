@@ -1,247 +1,195 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
 .searchwrapper {
-	width:45%;
-=======
-#searchwrapper {
-	width: 250px;
-	height: 30px;
-	background: -moz-linear-gradient(top,  #ffffff 0%, #ededed 49%, #fafafa 50%, #ededed 50%, #dcdcdc 100%); /* FF3.6+ */
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(49%,#ededed), color-stop(50%,#fafafa), color-stop(50%,#ededed), color-stop(100%,#dcdcdc)); /* Chrome,Safari4+ */
-	background: -webkit-linear-gradient(top,  #ffffff 0%,#ededed 49%,#fafafa 50%,#ededed 50%,#dcdcdc 100%); /* Chrome10+,Safari5.1+ */
-	background: -o-linear-gradient(top,  #ffffff 0%,#ededed 49%,#fafafa 50%,#ededed 50%,#dcdcdc 100%); /* Opera 11.10+ */
-	background: -ms-linear-gradient(top,  #ffffff 0%,#ededed 49%,#fafafa 50%,#ededed 50%,#dcdcdc 100%); /* IE10+ */
-	background: linear-gradient(to bottom,  #ffffff 0%,#ededed 49%,#fafafa 50%,#ededed 50%,#dcdcdc 100%); /* W3C */
-	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#dcdcdc',GradientType=0 ); /* IE6-9 */
-
->>>>>>> Search working, basic functionality and styling in place, as well as csrf protection, snippeting, results highlighting, and spell correction
-=======
-.searchwrapper {
-	width:45%;
->>>>>>> Refactored some code and added full elasticsearch module test suite
-	padding: 0;
-	margin: 0;
-	position:relative;
+width:250px;
+left: 10px;
+margin: 0;
+position:relative;
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
+
 .result-title{
-	text-align: center;
-	word-wrap: normal;
-	padding-top: 175px;
-<<<<<<< HEAD
-=======
-.result-title{
-	text-align: center;
-	word-wrap: normal;
->>>>>>> Made prettier, added requirements, and included main edX page
-=======
->>>>>>> Refactored ES code for readability and ease of testing. Trying to fix firefox svg error
+text-align: center;
+word-wrap: normal;
+padding-top: 175px;
 }
+
 .searchwrapper form { display: inline; }
 
 .search-results{
-	margin-left: 10%;
-<<<<<<< HEAD
-<<<<<<< HEAD
-	margin-top: -150px;
+margin-left: 250px;
+margin-top: -125px;
 }
 
 .result-content{
-	margin-top: -20px;
-}
-
-=======
-	margin-top: 20px;
-}
->>>>>>> Made prettier, added requirements, and included main edX page
-.searchbox {
-	border:0;
-	background: -moz-linear-gradient(top,  #ffffff 0%, #ededed 49%, #fafafa 50%, #ededed 50%, #dcdcdc 100%); /* FF3.6+ */
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(49%,#ededed), color-stop(50%,#fafafa), color-stop(50%,#ededed), color-stop(100%,#dcdcdc)); /* Chrome,Safari4+ */
-	background: -webkit-linear-gradient(top,  #ffffff 0%,#ededed 49%,#fafafa 50%,#ededed 50%,#dcdcdc 100%); /* Chrome10+,Safari5.1+ */
-	background: -o-linear-gradient(top,  #ffffff 0%,#ededed 49%,#fafafa 50%,#ededed 50%,#dcdcdc 100%); /* Opera 11.10+ */
-	background: -ms-linear-gradient(top,  #ffffff 0%,#ededed 49%,#fafafa 50%,#ededed 50%,#dcdcdc 100%); /* IE10+ */
-	background: linear-gradient(to bottom,  #ffffff 0%,#ededed 49%,#fafafa 50%,#ededed 50%,#dcdcdc 100%); /* W3C */
-	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#dcdcdc',GradientType=0 ); /* IE6-9 */
-=======
-#searchwrapper form { display: inline; }
-
-.searchbox {
-	border:0;
-	background-color:transparent;
->>>>>>> Search working, basic functionality and styling in place, as well as csrf protection, snippeting, results highlighting, and spell correction
-=======
-.searchwrapper form { display: inline; }
-=======
-	margin-top: -150px;
+margin-top: -20px;
 }
 
 .result-content{
-	margin-top: -20px;
+margin-top: -20px;
 }
->>>>>>> Refactored ES code for readability and ease of testing. Trying to fix firefox svg error
 
 .searchbox {
-	border:0;
-	background: -moz-linear-gradient(top,  #ffffff 0%, #ededed 49%, #fafafa 50%, #ededed 50%, #dcdcdc 100%); /* FF3.6+ */
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(49%,#ededed), color-stop(50%,#fafafa), color-stop(50%,#ededed), color-stop(100%,#dcdcdc)); /* Chrome,Safari4+ */
-	background: -webkit-linear-gradient(top,  #ffffff 0%,#ededed 49%,#fafafa 50%,#ededed 50%,#dcdcdc 100%); /* Chrome10+,Safari5.1+ */
-	background: -o-linear-gradient(top,  #ffffff 0%,#ededed 49%,#fafafa 50%,#ededed 50%,#dcdcdc 100%); /* Opera 11.10+ */
-	background: -ms-linear-gradient(top,  #ffffff 0%,#ededed 49%,#fafafa 50%,#ededed 50%,#dcdcdc 100%); /* IE10+ */
-	background: linear-gradient(to bottom,  #ffffff 0%,#ededed 49%,#fafafa 50%,#ededed 50%,#dcdcdc 100%); /* W3C */
-	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#dcdcdc',GradientType=0 ); /* IE6-9 */
->>>>>>> Refactored some code and added full elasticsearch module test suite
-	position:absolute;
-	top:3px;
-	left:0;
-	width:249px;
-	height:25px;
+border:0;
+background: -moz-linear-gradient(top, #ffffff 0%, #ededed 49%, #fafafa 50%, #ededed 50%, #dcdcdc 100%); /* FF3.6+ */
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(49%,#ededed), color-stop(50%,#fafafa), color-stop(50%,#ededed), color-stop(100%,#dcdcdc)); /* Chrome,Safari4+ */
+background: -webkit-linear-gradient(top, #ffffff 0%,#ededed 49%,#fafafa 50%,#ededed 50%,#dcdcdc 100%); /* Chrome10+,Safari5.1+ */
+background: -o-linear-gradient(top, #ffffff 0%,#ededed 49%,#fafafa 50%,#ededed 50%,#dcdcdc 100%); /* Opera 11.10+ */
+background: -ms-linear-gradient(top, #ffffff 0%,#ededed 49%,#fafafa 50%,#ededed 50%,#dcdcdc 100%); /* IE10+ */
+background: linear-gradient(to bottom, #ffffff 0%,#ededed 49%,#fafafa 50%,#ededed 50%,#dcdcdc 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#dcdcdc',GradientType=0 ); /* IE6-9 */
+position:absolute;
+top:3px;
+left:0;
+width:249px;
+height:25px;
 }
 
 .searchbox_submit {
-	border: 0;
-	background-image: url("../images/search-icon.svg");
-	background-color: transparent;
-<<<<<<< HEAD
-<<<<<<< HEAD
-	background-size: cover;
-	position: absolute;
-	top: 2.5px;
-	left: 210px;
-	/*width: 35px;*/
+border: 0;
+position: relative;
+width: 40px;
+left: 210px;
+top: 3.5px;
 }
 
+.content{
+margin-left: 10px;
+}
 .searchbox_submit:before{
-	position: absolute;
+position: absolute;
     content: '';
     background-image: url("../images/search-icon.svg");
     background-size: cover;
-    background-color: transparent;
     margin-left: 6px;
     margin-top: 4px;
     width:30px;
     height:30px;
     pointer-events: none;
 }
+
 .searchbox_submit:hover {
-	cursor:pointer;
-	cursor: hand;
+cursor:pointer;
+cursor: hand;
 }
 
 .content-select{
-	display: block;
-	text-align: right;
-	padding-top: 10px;
-=======
-=======
-	background-size: cover;
->>>>>>> Coverted templates to use mako
-	position: absolute;
-<<<<<<< HEAD
-	top: 4px;
-	left: 225px;
-	width:25px;
-	height:25px;
->>>>>>> Search working, basic functionality and styling in place, as well as csrf protection, snippeting, results highlighting, and spell correction
-=======
-	top: 2.5px;
-	left: 210px;
-	/*width: 35px;*/
->>>>>>> Made prettier, added requirements, and included main edX page
-}
-
-.searchbox_submit:before{
-	position: absolute;
-    content: '';
-    background-image: url("../images/search-icon.svg");
-    background-size: cover;
-    background-color: transparent;
-    margin-left: 6px;
-    margin-top: 4px;
-    width:30px;
-    height:30px;
-    pointer-events: none;
-}
-.searchbox_submit:hover {
-	cursor:pointer;
-	cursor: hand;
-}
-
-.content-select{
-	display: block;
-	text-align: right;
-	padding-top: 10px;
-}
-
-.searchbox_submit:hover {
-	cursor:pointer;
-	cursor: hand;
+float: left;
+padding-top: 10px;
 }
 
 .results_snippet{
-	color: #666666;
-	font-family: "Open Sans", "Arial";
-<<<<<<< HEAD
-<<<<<<< HEAD
-	font-weight: 300;
-	height: 155px;
-	width: 360px;
-	text-align: justify;
+color: #666666;
+font-family: "Open Sans", "Arial";
+font-weight: 300;
+height: 155px;
+width: 360px;
+text-align: justify;
 }
 
 .result_wrapper{
-	width: 705px;
+width: 705px;
 }
 
 .snippet_container{
-	overflow: hidden;
-	height: 155px;
-	width: 360px;
-	margin-left: 15px;
+overflow: hidden;
+height: 155px;
+width: 360px;
+margin-left: 15px;
 }
 
 .thumbnail{
-	width: 190px;
-	height: 155px;
+width: 190px;
+height: 155px;
 }
 
 .columnate{
-	float:left;
-=======
-	font-size: 14px;
-	font-weight: 300;
->>>>>>> Search working, basic functionality and styling in place, as well as csrf protection, snippeting, results highlighting, and spell correction
-=======
-	font-weight: 300;
-	height: 155px;
-	width: 360px;
-	text-align: justify;
+float:left;
 }
 
 .result_wrapper{
-	width: 705px;
+width: 705px;
 }
 
 .snippet_container{
-	overflow: hidden;
-	height: 155px;
-<<<<<<< HEAD
-	width: 400px;
->>>>>>> Made prettier, added requirements, and included main edX page
-=======
-	width: 360px;
-	margin-left: 15px;
+overflow: hidden;
+height: 155px;
+width: 360px;
+margin-left: 15px;
 }
 
 .thumbnail{
-	width: 190px;
-	height: 155px;
+width: 190px;
+height: 155px;
 }
 
-.columnate{
-	float:left;
->>>>>>> Refactored ES code for readability and ease of testing. Trying to fix firefox svg error
+.pagination{
+position: relative;
+margin-top: 200px;
+margin-left: 10%;
+}
+
+.filter-menu{
+    background: none repeat scroll 0 0 #FAFAFB;
+    border: 1px solid #D8D8D8;
+    border-radius: 2px 2px 2px 2px;
+    list-style: none outside none;
+    padding: 0 0 0 0;
+}
+
+.filter-item{
+    border-top: medium none;
+    border-bottom: 1px solid;
+}
+
+.count{
+    background: none repeat scroll 0 0 #EEEEEE;
+    border-radius: 2px 2px 2px 2px;
+    color: #999999;
+    float: right;
+    font-size: 11px;
+    font-weight: bold;
+    margin: 0 0 0 5px;
+    padding: 2px 5px;
+    margin-top: -25px;
+}
+
+.filter{
+    width: 200px;
+    background: none repeat scroll 0 0 #EFEFEF;
+    border-radius: 2px 2px 2px 2px;
+    position: absolute;
+    margin-top: 100px;
+    margin-left:10px;
+}
+
+.filter-title{
+    background: none repeat scroll 0 0 #EFEFEF;
+    margin-top: -20px;
+    margin-bottom: -20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 15px;
+}
+
+.filter-option{
+    border-left: 2px solid #FAFAFB;
+    display: block;
+    padding: 4px 10px 4px 4px;
+    text-shadow: 0 1px 0 #FFFFFF;
+    color: #4183C4;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.filter-option:hover{
+    background: #FFFFFF;
+}
+
+.sorting{
+    margin-left: 270px;
+    margin-top: -25px;
+    z-index: 10;
+}
+
+.media-check{
+    padding-left: 5px;
 }

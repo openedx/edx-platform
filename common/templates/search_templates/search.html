@@ -1,136 +1,68 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
 <head>
-	${css_link("../static/css/search.css")}
+${css_link("../static/css/search.css")}
+    ${js_link("../static/js/search.js")}
 </head>
 
 <div class="searchwrapper">
-	<form action="/search" method="get">
-		<span>
-		<span class="searchbox-wrapper">
-			% if old_query:
-			<input type="text" class="searchbox" name="s" value="${old_query}" />
-			% else:
-			<input type="text" class="searchbox" name="s" value="" />
-			% endif
-			<div class="searchbox_submit">
-				<input type="submit" value="" />
-			</div>
-		</span>
-		<span class="content-select">
-			% if previous_content == "transcript":
-				<input type="radio" name="content" value="transcript" checked>Videos
-				<input type="radio" name="content" value="problem">Problems
-				<input type="radio" name="content" value="slide">Slides
-			% elif previous_content == "problem":
-				<input type="radio" name="content" value="transcript">Videos
-				<input type="radio" name="content" value="problem" checked>Problems
-				<input type="radio" name="content" value="slide">Slides
-			% else:
-				<input type="radio" name="content" value="transcript">Videos
-				<input type="radio" name="content" value="problem">Problems
-				<input type="radio" name="content" value="slide" checked>Slides
-			% endif
-		</span>
-	</span>
-	</form>
-</div>
-
-<%def name="css_link(path, media='')">
-	<link rel="stylesheet" type="text/css" href="${path|h}" media="${media}"></link>
-</%def>
-=======
-<!DOCTYPE html>
-<html lang="en">
-=======
->>>>>>> Refactored some code and added full elasticsearch module test suite
-<head>
-	${css_link("../static/css/search.css")}
-</head>
-
-<div class="searchwrapper">
-	<form action="/search" method="get">
-		<span>
-		<span class="searchbox-wrapper">
-			% if old_query:
-			<input type="text" class="searchbox" name="s" value="${old_query}" />
-			% else:
-			<input type="text" class="searchbox" name="s" value="" />
-<<<<<<< HEAD
-			<input type="image" src="static/images/search-icon.svg" class="searchbox_submit" value="" />
-		</form>
-	</div>
-	
-</body>
-</html>
->>>>>>> Search working, basic functionality and styling in place, as well as csrf protection, snippeting, results highlighting, and spell correction
-=======
-			% endif
-			<div class="searchbox_submit">
-				<input type="submit" value="" />
-			</div>
-		</span>
-		<span class="content-select">
-			% if previous_content == "transcript":
-				<input type="radio" name="content" value="transcript" checked>Videos
-				<input type="radio" name="content" value="problem">Problems
-				<input type="radio" name="content" value="slide">Slides
-			% elif previous_content == "problem":
-				<input type="radio" name="content" value="transcript">Videos
-				<input type="radio" name="content" value="problem" checked>Problems
-				<input type="radio" name="content" value="slide">Slides
-			% else:
-				<input type="radio" name="content" value="transcript">Videos
-				<input type="radio" name="content" value="problem">Problems
-				<input type="radio" name="content" value="slide" checked>Slides
-			% endif
-<<<<<<< HEAD
-		</span>
-=======
-		</div>
-=======
-	<span>
+<span>
         <form id="query-box" class="auto-submit" action="/search" method="get">
-    		<div class="searchbox-wrapper">
-    			% if old_query:
-    			<input type="text" id="searchbox" class="searchbox" name="s" value="${old_query}" onkeydown="searchHandle(event, false)"/>
-    			% else:
-    			<input type="text" id="searchbox" class="searchbox" name="s" value="" onkeydown="searchHandle(event, false)"/>
-    			% endif
-    			<div class="searchbox_submit">
-    				<input type="submit" value="" onclick="clickHandle(event, false)"/>
-    			</div>
-    		</div>
+     <div class="searchbox-wrapper">
+     % if old_query:
+     <input type="text" id="searchbox" class="searchbox parameter" name="s" value="${old_query}" onkeydown="searchHandle(event, false)"/>
+     % else:
+     <input type="text" id="searchbox" class="searchbox parameter" name="s" value="" onkeydown="searchHandle(event, false)"/>
+     % endif
+     <div class="searchbox_submit">
+     <input type="submit" value="" onclick="clickHandle(event, false)"/>
+     </div>
+     </div>
         </form>
 
         <form id="content-select" class="auto-submit" action="/search" method="get">
-    		<div class="content-select">
-    			% if previous.get("transcript", "false") == "true":
-    				<input type="checkbox" class="content" name="transcript" value="true" checked>Videos
+     <div class="content-select">
+     % if previous.get("transcript", "false") == "true":
+     <input type="checkbox" class="parameter media-check" name="transcript" value="true" checked> Videos
                 % else:
-                    <input type="checkbox" class="content" name="transcript" value="true">Videos
+                    <input type="checkbox" class="parameter media-check" name="transcript" value="true"> Videos
                 % endif
 
                 % if previous.get("problem", "false") == "true":
-    				<input type="checkbox" class="content" name="problem" value="true" checked>Problems
-    			% else:
-                    <input type="checkbox" class="content" name="problem" value="true">Problems
-    			% endif
+     <input type="checkbox" class="parameter media-check" name="problem" value="true" checked> Problems
+     % else:
+                    <input type="checkbox" class="parameter media-check" name="problem" value="true"> Problems
+     % endif
 
                 % if previous.get("pdf", "false") == "true":
-                    <input type="checkbox" class="content" name="pdf" value="true" checked>PDFs
+                    <input type="checkbox" class="parameter media-check" name="pdf" value="true" checked> PDFs
                 % else:
-                    <input type="checkbox" class="content" name="pdf" value="true"> PDFs
-    			% endif
-    		</div>
+                    <input type="checkbox" class="parameter media-check" name="pdf" value="true"> PDFs
+     % endif
+     </div>
         </form>
->>>>>>> Changed search across content to work on checkboxes instead of radio buttons and associated functionality
->>>>>>> Added extra javascript for performant and smooth user interaction
-	</span>
-	</form>
+</span>
+</div>
+
+<div class="sorting">
+    <form id="sorting" class="auto-submit" action="/search" method="get">
+        <select name="sort" id="sorting" class="parameter" action="/search" method="get" onchange="submitForms(false)">
+            % if previous.get("sort", "false") == "relevance":
+                <option selected="selected" value="relevance">Relevance</option>
+                <option value="alphabetical">Alphabetical</option>
+            % elif previous.get("sort", "false") == "alphabetical":
+                <option value="relevance">Relevance</option>
+                <option selected="selected" value="alphabetical">Alphabetical</option>
+            % else:
+                <option value="relevance">Relevance</option>
+                <option value="alphabetical">Alphabetical</option>
+            % endif
+        </select>
+    </form>
 </div>
 
 <%def name="css_link(path, media='')">
-	<link rel="stylesheet" type="text/css" href="${path|h}" media="${media}"></link>
+<link rel="stylesheet" type="text/css" href="${path|h}" media="${media}"></link>
 </%def>
->>>>>>> Refactored some code and added full elasticsearch module test suite
+
+<%def name="js_link(path)">
+    <script type="text/javascript" src="${path|h}"></script>
+</%def>
