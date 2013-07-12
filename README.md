@@ -110,12 +110,6 @@ for more usage tips.
 Django admin & debugging toolbar
 -----------------------------------
 
-You may create a CMS/LMS super-user with:
-
-```
-$ rake django-admin["createsuperuser"]
-```
-
 Normally the django admin interface and the site's debug toolbar
 are only active during local operation.
 To use these, explicitly forward one of VM's localhost ports to your computer.
@@ -137,7 +131,11 @@ $ rake lms[cms.dev,127.0.0.1:8080]
 
 You should see the debug toolbar when you navigate to [http:/localhost:8080/]().
 You should now also see a login when you navigate to [http://localhost:8080/admin/]()
-(you can use the django super-user account you created).
+You will need a privileged user for the admin login.
+You can create a CMS/LMS super-user with:
+```
+$ rake django-admin["createsuperuser"]
+```
 
 
 Stopping & starting
