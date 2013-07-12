@@ -13,6 +13,8 @@ MITX_FEATURES['AUTH_USE_MIT_CERTIFICATES'] = False
 SUBDOMAIN_BRANDING['edge'] = 'edge'
 SUBDOMAIN_BRANDING['preview.edge'] = 'edge'
 VIRTUAL_UNIVERSITIES = ['edge']
+MITX_FEATURES['ENABLE_LMS_MIGRATION'] = False
+
 META_UNIVERSITIES = {}
 
 modulestore_options = {
