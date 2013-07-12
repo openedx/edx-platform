@@ -118,7 +118,7 @@ $ rake django-admin["createsuperuser"]
 
 Normally the django admin interface and the site's debug toolbar
 are only active during local operation.
-To use these, specifically forward one of VM's localhost ports to your computer.
+To use these, explicitly forward one of VM's localhost ports to your computer.
 To do this, login to the VM like this:
 
 ```
