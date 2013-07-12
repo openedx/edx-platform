@@ -54,20 +54,23 @@ def post_init_callback(sender, **kwargs):
 @receiver(post_save, sender=CourseCreator)
 def post_save_callback(sender, **kwargs):
     """
-    Extend to update state_changed time and modify the course creator group in authz.py.
+    Extend to update state_changed time and fire event to update course creator group, if appropriate.
     """
     instance = kwargs['instance']
     # We only wish to modify the state_changed time if the state has been modified. We don't wish to
     # modify it for changes to the notes field.
     if instance.state != instance.orig_state:
-        if hasattr(instance, 'admin'):
+        # If either old or new state is 'granted', we must manipulate the course creator
+        # group maintained by authz. That requires staff permissions (stored admin).
+        if instance.state == CourseCreator.GRANTED or instance.orig_state == CourseCreator.GRANTED:
+            assert hasattr(instance, 'admin'), 'Must have stored staff user to change course creator group'
             update_creator_state.send(
                 sender=sender,
                 caller=instance.admin,
                 user=instance.user,
                 add=instance.state == CourseCreator.GRANTED
             )
-        # TODO: Else must be sure that state change does not switch to or from granted
+
         instance.state_changed = timezone.now()
         instance.orig_state = instance.state
         instance.save()
