@@ -203,11 +203,9 @@ class TestSerialize(unittest.TestCase):
         assert_equals('1 day 12 hours 59 minutes 59 seconds',
                       serialize_string_literal("1 day 12 hours 59 minutes 59 seconds"))
 
-        try:
+        # make sure we can't call serialize_string_literal with a non basestring type
+        with self.assertRaises(TypeError):
             self.assertRaises(serialize_string_literal(2.31))
-        except Exception:
-            pass
-
 
 class TestDeserialize(unittest.TestCase):
     def assertDeserializeEqual(self, expected, arg):
