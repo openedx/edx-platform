@@ -1,70 +1,83 @@
 # Instructor Dashboard Tab Manager
+# The instructor dashboard is broken into sections.
+# Only one section is visible at a time,
+#   and is responsible for its own functionality.
+#
+# NOTE: plantTimeout (which is just setTimeout from util.coffee)
+#       is used frequently in the instructor dashboard to isolate
+#       failures. If one piece of code under a plantTimeout fails
+#       then it will not crash the rest of the dashboard.
+#
+# NOTE: The instructor dashboard currently does not
+#       use backbone. Just lots of jquery. This should be fixed.
+#
+# NOTE: Server endpoints in the dashboard are stored in
+#       the 'data-endpoint' attribute of relevant html elements.
+#       The urls are rendered there by a template.
+#
+# NOTE: For an example of what a section object should look like
+#       see course_info.coffee
 
-log = -> console.log.apply console, arguments
-plantTimeout = (ms, cb) -> setTimeout cb, ms
+# imports from other modules
+# wrap in (-> ... apply) to defer evaluation
+# such that the value can be defined later than this assignment (file load order).
+plantTimeout = -> window.InstructorDashboard.util.plantTimeout.apply this, arguments
+std_ajax_err = -> window.InstructorDashboard.util.std_ajax_err.apply this, arguments
 
-
-# # intercepts a jquery method
-# # calls the original method after callback
-# intercept_jquery_method = (method_name, callback) ->
-#   original = jQuery.fn[method_name]
-#   jQuery.fn[method_name] = ->
-#     callback.apply this, arguments
-#     original.apply this, arguments
-
-
-# intercept_jquery_method 'on', (event_name) ->
-#   this.addClass "has-event-handler-for-#{event_name}"
-
-
+# CSS classes
 CSS_INSTRUCTOR_CONTENT = 'instructor-dashboard-content-2'
 CSS_ACTIVE_SECTION = 'active-section'
 CSS_IDASH_SECTION = 'idash-section'
 CSS_INSTRUCTOR_NAV = 'instructor-nav'
 
+# prefix for deep-linking
 HASH_LINK_PREFIX = '#view-'
 
-
-# once we're ready, check if this page has the instructor dashboard
+# once we're ready, check if this page is the instructor dashboard
 $ =>
   instructor_dashboard_content = $ ".#{CSS_INSTRUCTOR_CONTENT}"
-  if instructor_dashboard_content.length != 0
-    log "setting up instructor dashboard"
+  console.log 'checking if we are on the instructor dashboard'
+  if instructor_dashboard_content.length > 0
+    console.log 'we are on the instructor dashboard'
     setup_instructor_dashboard          instructor_dashboard_content
     setup_instructor_dashboard_sections instructor_dashboard_content
 
 
-# enable links
+# enable navigation bar
+# handles hiding and showing sections
 setup_instructor_dashboard = (idash_content) =>
+  # clickable section titles
   links = idash_content.find(".#{CSS_INSTRUCTOR_NAV}").find('a')
-  # setup section header click handlers
+
   for link in ($ link for link in links)
     link.click (e) ->
       e.preventDefault()
-      # deactivate (styling) all sections
-      idash_content.find(".#{CSS_IDASH_SECTION}").removeClass CSS_ACTIVE_SECTION
-      idash_content.find(".#{CSS_INSTRUCTOR_NAV}").children().removeClass CSS_ACTIVE_SECTION
 
-      # find paired section
+      # deactivate all link & section styles
+      idash_content.find(".#{CSS_INSTRUCTOR_NAV}").children().removeClass CSS_ACTIVE_SECTION
+      idash_content.find(".#{CSS_IDASH_SECTION}").removeClass CSS_ACTIVE_SECTION
+
+      # discover section paired to link
       section_name = $(this).data 'section'
       section = idash_content.find "##{section_name}"
 
-      # activate (styling) active
-      section.addClass CSS_ACTIVE_SECTION
+      # activate link & section styling
       $(this).addClass CSS_ACTIVE_SECTION
+      section.addClass CSS_ACTIVE_SECTION
 
       # tracking
       # analytics.pageview "instructor_#{section_name}"
 
-      # write deep link
+      # deep linking
+      # write to url
       location.hash = "#{HASH_LINK_PREFIX}#{section_name}"
 
-      log "clicked section #{section_name}"
       plantTimeout 0, -> section.data('wrapper')?.onClickTitle?()
       # plantTimeout 0, -> section.data('wrapper')?.onExit?()
 
-  # recover deep link from url
-  # click default or go to section specified by hash
+
+  # activate an initial section by programmatically clicking on it.
+  # check for a deep-link, or click the first link.
   if (new RegExp "^#{HASH_LINK_PREFIX}").test location.hash
     rmatch = (new RegExp "^#{HASH_LINK_PREFIX}(.*)").exec location.hash
     section_name = rmatch[1]
@@ -78,11 +91,10 @@ setup_instructor_dashboard = (idash_content) =>
 
 
 
-# call setup handlers for each section
+# enable sections
 setup_instructor_dashboard_sections = (idash_content) ->
-  log "setting up instructor dashboard sections"
-  # fault isolation
-  # an error thrown in one section will not block other sections from exectuing
+  # see fault isolation NOTE at top of file.
+  # an error thrown in one section will not block other sections from exectuing.
   plantTimeout 0, -> new window.InstructorDashboard.sections.CourseInfo   idash_content.find ".#{CSS_IDASH_SECTION}#course_info"
   plantTimeout 0, -> new window.InstructorDashboard.sections.DataDownload idash_content.find ".#{CSS_IDASH_SECTION}#data_download"
   plantTimeout 0, -> new window.InstructorDashboard.sections.Membership   idash_content.find ".#{CSS_IDASH_SECTION}#membership"
