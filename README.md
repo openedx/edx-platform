@@ -107,10 +107,10 @@ and find the activation URL.
 See the [Frequently Asked Questions](https://github.com/edx/edx-platform/wiki/Frequently-Asked-Questions)
 for more usage tips.
 
-Access to django debugging & admin
+Django admin & debugging toolbar
 -----------------------------------
 
-You may create a CMS super-user with:
+You may create a CMS/LMS super-user with:
 
 ```
 $ rake django-admin["createsuperuser"]
@@ -137,7 +137,7 @@ $ rake lms[cms.dev,127.0.0.1:8080]
 
 You should see the debug toolbar when you navigate to [http:/localhost:8080/]().
 You should now also see a login when you navigate to [http://localhost:8080/admin/]()
-(you can use the django super-user account for this).
+(you can use the django super-user account you created).
 
 
 Stopping & starting
