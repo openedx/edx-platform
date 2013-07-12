@@ -32,6 +32,10 @@ def find(request, database="http://127.0.0.1:9200",
     context = {}
     response = requests.get(full_url+query+"&size="+str(max_result))
     data = SearchResults(request, response)
+    data.filter("course", request.GET.get("selected_course"))
+    data.filter("org", request.GET.get("selected_org"))
+    org_histogram = data.get_counter("org")
+    course_histogram = data.get_counter("course")
     data.sort_results()
     context.update({"results": data.has_results})
     correction = spell_check(query)
@@ -41,7 +45,9 @@ def find(request, database="http://127.0.0.1:9200",
     context.update({
         "data": data, "next_page": next_link(request, data), "prev_page": prev_link(request, data),
         "search_correction_link": search_correction_link(request, correction),
-        "spelling_correction": correction})
+        "spelling_correction": correction, "org_histogram": org_histogram,
+        "course_histogram": course_histogram, "selected_course": request.GET.get("selected_course", ""),
+        "selected_org": request.GET.get("selected_org", "")})
     return render_to_string("search_templates/results.html", context)
 
 
