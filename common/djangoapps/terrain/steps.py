@@ -93,7 +93,7 @@ def i_log_in(step):
 
 @step('I am a logged in user$')
 def i_am_logged_in_user(step):
-    world.create_user('robot')
+    world.create_user('robot', 'test')
     world.log_in('robot', 'test')
 
 
@@ -139,7 +139,7 @@ def should_see_in_the_page(step, doesnt_appear, text):
 
 @step('I am logged in$')
 def i_am_logged_in(step):
-    world.create_user('robot')
+    world.create_user('robot', 'test')
     world.log_in('robot', 'test')
     world.browser.visit(django_url('/'))
     # You should not see the login link
@@ -148,12 +148,12 @@ def i_am_logged_in(step):
 
 @step(u'I am an edX user$')
 def i_am_an_edx_user(step):
-    world.create_user('robot')
+    world.create_user('robot', 'test')
 
 
 @step(u'User "([^"]*)" is an edX user$')
 def registered_edx_user(step, uname):
-    world.create_user(uname)
+    world.create_user(uname, 'test')
 
 
 @step(u'All dialogs should be closed$')

@@ -99,7 +99,7 @@ def assert_policy_entries(expected_keys, expected_values):
 def get_index_of(expected_key):
     for counter in range(len(world.css_find(KEY_CSS))):
         #   Sometimes get stale reference if I hold on to the array of elements
-        key = world.css_find(KEY_CSS)[counter].value
+        key = world.css_value(KEY_CSS, index=counter)
         if key == expected_key:
             return counter
 
@@ -108,7 +108,7 @@ def get_index_of(expected_key):
 
 def get_display_name_value():
     index = get_index_of(DISPLAY_NAME_KEY)
-    return world.css_find(VALUE_CSS)[index].value
+    return world.css_value(VALUE_CSS, index=index)
 
 
 def change_display_name_value(step, new_value):

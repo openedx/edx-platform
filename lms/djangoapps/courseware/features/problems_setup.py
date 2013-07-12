@@ -19,6 +19,7 @@ from capa.tests.response_xml_factory import OptionResponseXMLFactory, \
     StringResponseXMLFactory, NumericalResponseXMLFactory, \
     FormulaResponseXMLFactory, CustomResponseXMLFactory, \
     CodeResponseXMLFactory
+from nose.tools import assert_true
 
 
 # Factories from capa.tests.response_xml_factory that we will use
@@ -312,14 +313,15 @@ def assert_checked(problem_type, choices):
 
     all_choices = ['choice_0', 'choice_1', 'choice_2', 'choice_3']
     for this_choice in all_choices:
-        element = world.css_find(inputfield(problem_type, choice=this_choice))
-
-        if this_choice in choices:
-            assert element.checked
-        else:
-            assert not element.checked
+        def check_problem():
+            element = world.css_find(inputfield(problem_type, choice=this_choice))
+            if this_choice in choices:
+                assert element.checked
+            else:
+                assert not element.checked
+        world.retry_on_exception(check_problem)
 
 
 def assert_textfield(problem_type, expected_text, input_num=1):
-    element = world.css_find(inputfield(problem_type, input_num=input_num))
-    assert element.value == expected_text
+    element_value = world.css_value(inputfield(problem_type, input_num=input_num))
+    assert element_value == expected_text

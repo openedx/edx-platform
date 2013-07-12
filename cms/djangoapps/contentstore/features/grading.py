@@ -64,7 +64,9 @@ def change_assignment_name(step, old_name, new_name):
 
 @step(u'I go back to the main course page')
 def main_course_page(step):
-    main_page_link_css = 'a[href="/MITx/999/course/Robot_Super_Course"]'
+    main_page_link_css = 'a[href="/%s/%s/course/%s"]' % (world.scenario_dict['COURSE'].org,
+                                                        world.scenario_dict['COURSE'].number,
+                                                        world.scenario_dict['COURSE'].display_name.replace(' ', '_'),)
     world.css_click(main_page_link_css)
 
 
@@ -90,8 +92,8 @@ def add_assignment_type(step, new_name):
     add_button_css = '.add-grading-data'
     world.css_click(add_button_css)
     name_id = '#course-grading-assignment-name'
-    f = world.css_find(name_id)[4]
-    f._element.send_keys(new_name)
+    new_assignment = world.css_find(name_id)[-1]
+    new_assignment._element.send_keys(new_name)
 
 
 @step(u'I have populated the course')
@@ -104,8 +106,7 @@ def populate_course(step):
 def changes_not_persisted(step):
     reload_the_page(step)
     name_id = '#course-grading-assignment-name'
-    ele = world.css_find(name_id)[0]
-    assert(ele.value == 'Homework')
+    assert(world.css_value(name_id) == 'Homework')
 
 
 @step(u'I see the assignment type "(.*)"$')
@@ -118,8 +119,8 @@ def i_see_the_assignment_type(_step, name):
 
 def get_type_index(name):
     name_id = '#course-grading-assignment-name'
-    f = world.css_find(name_id)
-    for i in range(len(f)):
-        if f[i].value == name:
-            return i
+    all_types = world.css_find(name_id)
+    for index in range(len(all_types)):
+        if world.css_value(name_id, index=index) == name:
+            return index
     return -1
