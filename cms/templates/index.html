@@ -8,6 +8,28 @@
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.js"></script>
 <script src="http://malsup.github.com/jquery.form.js"></script>
 
+<%block name="jsextra">
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        // showing/hiding creation rights UI
+        $('.show-creationrights').click(function(e){
+            (e).preventDefault();
+            $(this).closest('.wrapper-creationrights').toggleClass('is-shown').find('.ui-toggle-control').toggleClass('current');
+        });
+
+        $('#request-coursecreator').ajaxForm(function() {
+            location.reload();
+        });
+
+        $('#request-coursecreator-submit').click(function(e){
+          (e).preventDefault();
+          $(this).toggleClass('is-disabled is-submitting').find('.label').text('Submitting Your Request');
+        });
+    });
+</script>
+</%block>
+
 <%block name="header_extras">
   <script type="text/template" id="new-course-template">
     <section class="new-course">
@@ -36,23 +58,6 @@
       </div>
     </section>
   </script>
-</%block>
-
-<%block name="jsextra">
-<script type="text/javascript">
-    $(document).ready(function () {
-
-        // showing/hiding creation rights UI
-        $('.show-creationrights').click(function(e){
-            (e).preventDefault();
-            $(this).closest('.wrapper-creationrights').toggleClass('is-shown').find('.ui-toggle-control').toggleClass('current');
-        });
-
-        $('#request-coursecreator').ajaxForm(function() {
-            location.reload();
-        });
-    });
-</script>
 </%block>
 
 <%block name="content">
@@ -162,9 +167,14 @@
             <h4 class="title">${_('Your Course Creator Request Status:')}</h4>
 
             <form id="request-coursecreator" action="${request_course_creator_url}" method="post" enctype="multipart/form-data">
+
+              <div id="request-coursecreator-error" name="request-coursecreator-error" class="message message-status message-status error">
+                <p>There was a problem submitting your request</p>
+              </div>
+
               <input type="hidden" name="csrfmiddlewaretoken" value="${csrf}">
               <div class="form-actions">
-                <button type="submit" id="request-coursecreator-submit" name="request-coursecreator-submit" class="action-primary action-request">${_('Request the Ability to Create Courses')}</button>
+                <button type="submit" id="request-coursecreator-submit" name="request-coursecreator-submit" class="action-primary action-request"><i class="icon-cog icon-inline icon-spin"></i> <span class="label">${_('Request the Ability to Create Courses')}</span></button>
               </div>
             </form>
           </div>

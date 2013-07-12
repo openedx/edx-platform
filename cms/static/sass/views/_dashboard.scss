@@ -95,6 +95,7 @@ body.dashboard {
 				@extend .t-action1;
 				@include transform(rotate(45deg));
 				@include transform-origin(center center);
+				@include transition(all $tmg-f1 linear 0s);
 				float: right;
 				text-align: right;
 			}
@@ -102,7 +103,7 @@ body.dashboard {
 
 		.ui-toggle-target {
 			@extend .depth1;
-			@include transition(opacity 0.50s ease-in-out 0s);
+			@include transition(opacity $tmg-f1 ease-in-out 0s);
 			position: relative;
 			top: -2px;
 			display: none;
@@ -155,6 +156,32 @@ body.dashboard {
       .action-primary {
         @extend .btn-primary-blue;
         @extend .t-action3;
+      }
+
+      // specific - request button
+      .action-request {
+      	position: relative;
+      	overflow: hidden;
+
+      	.icon-cog {
+      		@include transition(all $tmg-f1 ease-in-out $tmg-f1);
+      		@include font-size(20);
+      		position: absolute;
+      		top: ($baseline/2);
+					left: -($baseline);
+      		visibility: hidden;
+      		opacity: 0.0;
+      	}
+
+      	&.is-submitting {
+      		padding-left: ($baseline*2);
+
+					.icon-cog {
+						left: ($baseline*0.75);
+						visibility: visible;
+						opacity: 1.0;
+					}
+      	}
       }
     }
 
