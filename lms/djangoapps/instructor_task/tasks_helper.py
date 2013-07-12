@@ -292,10 +292,10 @@ def perform_enrolled_student_update(course_id, _module_state_key, student_identi
         task_progress = get_task_progress()
         _get_current_task().update_state(state=PROGRESS, meta=task_progress)
 
-       # add temporary hack to make grading tasks finish more quickly!
-       # TODO: REMOVE THIS when done with debugging
-       if num_attempted == 1000:
-           break;
+        # add temporary hack to make grading tasks finish more quickly!
+        # TODO: REMOVE THIS when done with debugging
+        if num_attempted == 1000:
+            break
 
     return task_progress
 
