@@ -33,6 +33,8 @@ TRUE_DICT = ["True", True, "TRUE", "true"]
 HUMAN_TASK_TYPE = {
     'selfassessment': "Self Assessment",
     'openended': "edX Assessment",
+    'ml_grading.conf' : "AI Assessment",
+    'peer_grading.conf' : "Peer Assessment",
 }
 
 # Default value that controls whether or not to skip basic spelling checks in the controller
@@ -468,6 +470,19 @@ class CombinedOpenEndedV1Module():
         }
         return last_response_dict
 
+    def extract_human_name_from_task(self, task_xml):
+        tree = etree.fromstring(task_xml)
+        log.info(etree.tostring(tree))
+        payload = tree.xpath("/openended/openendedparam/grader_payload")
+        if len(payload)==0:
+            task_name = "selfassessment"
+        else:
+            inner_payload = json.loads(payload[0].text)
+            task_name = inner_payload['grader_settings']
+
+        human_task = HUMAN_TASK_TYPE[task_name]
+        return human_task
+
     def update_task_states(self):
         """
         Updates the task state of the combined open ended module with the task state of the current child module.
@@ -689,9 +704,10 @@ class CombinedOpenEndedV1Module():
         Output: The status html to be rendered
         """
         status = []
-        for i in xrange(0, self.current_task_number + 1):
-            task_data = self.get_last_response(i)
-            task_data.update({'task_number': i + 1})
+        for i in xrange(0, len(self.task_xml)):
+            human_task_name = self.extract_human_name_from_task(self.task_xml[i])
+
+            task_data = {'task_number': i + 1, 'human_task' : human_task_name, 'current' : self.current_task_number==i}
             status.append(task_data)
 
         context = {

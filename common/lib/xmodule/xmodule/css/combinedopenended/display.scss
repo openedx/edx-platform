@@ -56,13 +56,16 @@ section.legend-container {
 
 section.combined-open-ended-status {
 
+    padding: 20px 20px 20px 0px;
+
     .statusitem {
       color: #2C2C2C;
       background-color : #d4d4d4;
       font-size: .9em;
-      padding: 2px;
+      padding: 20px;
       display: inline;
       width: 20%;
+      margin-right: 20px;
       .show-results {
           margin-top: .3em;
           text-align:right;
