@@ -27,7 +27,7 @@ installation process.
 9. Create the development environment and start it: `vagrant up`
 
 The initial `vagrant up` will download a Linux image, then boot and ask for your
-administrator password to setup NFS.
+host machine's administrator password to setup NFS.
 Once NFS is up, edx-platform/scripts/create-dev-env.sh will
 run, and install all system dependencies and configure the VM.
 This will take a while.  Once this starts, go grab a coffee.
@@ -114,13 +114,14 @@ Django admin & debug toolbar
 You can enable admin logins and the debug_toolbar by editing
 your edx-platfrom/lms/envs/common.py instance:
 
- - enable ADMIN login page by setting:
-   - ```
+- enable ADMIN login page by setting:
+  - ```
      'ENABLE_DJANGO_ADMIN_SITE': True
 ```
 
- - enable debug toolbar by uncommenting:
-   - ```
+
+- enable debug toolbar by uncommenting:
+  - ```
     # 'debug_toolbar.middleware.DebugToolbarMiddleware',
 ```
 
