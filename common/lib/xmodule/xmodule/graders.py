@@ -10,7 +10,11 @@ log = logging.getLogger("mitx.courseware")
 
 # This is a tuple for holding scores, either from problems or sections.
 # Section either indicates the name of the problem or the name of the section
-Score = namedtuple("Score", "earned possible graded section")
+ScoreT = namedtuple("Score", "earned possible graded section attempted")
+
+
+def Score(earned, possible, graded, section, attempted=True):
+    return ScoreT(earned, possible, graded, section, attempted)
 
 
 def aggregate_scores(scores, section_name="summary"):
@@ -26,16 +30,25 @@ def aggregate_scores(scores, section_name="summary"):
     total_correct = sum(score.earned for score in scores)
     total_possible = sum(score.possible for score in scores)
 
+    any_attempted = True in (score.attempted for score in scores)
+    any_attempted_graded = True in (score.attempted for score in scores if score.graded)
+
     #regardless of whether or not it is graded
-    all_total = Score(total_correct,
-                      total_possible,
-                      False,
-                      section_name)
+    all_total = Score(
+        total_correct,
+        total_possible,
+        False,
+        section_name,
+        any_attempted
+    )
     #selecting only graded things
-    graded_total = Score(total_correct_graded,
-                         total_possible_graded,
-                         True,
-                         section_name)
+    graded_total = Score(
+        total_correct_graded,
+        total_possible_graded,
+        True,
+        section_name,
+        any_attempted_graded
+    )
 
     return all_total, graded_total
 
@@ -176,8 +189,11 @@ class WeightedSubsectionsGrader(CourseGrader):
 
     def grade(self, grade_sheet, generate_random_scores=False):
         total_percent = 0.0
+        total_weight = 0.0
         section_breakdown = []
         grade_breakdown = []
+
+        total_projected_percent = 0.0
 
         for subgrader, category, weight in self.sections:
             subgrade_result = subgrader.grade(grade_sheet, generate_random_scores)
@@ -185,13 +201,34 @@ class WeightedSubsectionsGrader(CourseGrader):
             weighted_percent = subgrade_result['percent'] * weight
             section_detail = "{0} = {1:.1%} of a possible {2:.0%}".format(category, weighted_percent, weight)
 
+            if category in grade_sheet:
+                attempted_overall = True in (score.attempted for score in grade_sheet[category])
+                if attempted_overall:
+                    total_weight += weight
+
+            weighted_projected_percent = subgrade_result['projected_percent'] * weight
+            total_projected_percent += weighted_projected_percent
+
             total_percent += weighted_percent
             section_breakdown += subgrade_result['section_breakdown']
-            grade_breakdown.append({'percent': weighted_percent, 'detail': section_detail, 'category': category})
+            grade_breakdown.append({
+                'percent': weighted_percent,
+                'detail': section_detail,
+                'category': category,
+                'projected_percent': weighted_projected_percent,
+            })
 
-        return {'percent': total_percent,
-                'section_breakdown': section_breakdown,
-                'grade_breakdown': grade_breakdown}
+        if total_weight == 0:
+            projected_percent = 0
+        else:
+            projected_percent = total_projected_percent / total_weight
+
+        return {
+            'percent': total_percent,
+            'section_breakdown': section_breakdown,
+            'grade_breakdown': grade_breakdown,
+            'projected_percent': projected_percent,
+        }
 
 
 class SingleSectionGrader(CourseGrader):
@@ -219,27 +256,44 @@ class SingleSectionGrader(CourseGrader):
             if generate_random_scores:  	# for debugging!
                 earned = random.randint(2, 15)
                 possible = random.randint(earned, 15)
+                attempted = True
             else:   # We found the score
                 earned = found_score.earned
                 possible = found_score.possible
+                attempted = found_score.attempted
 
             percent = earned / float(possible)
-            detail = "{name} - {percent:.0%} ({earned:.3n}/{possible:.3n})".format(name=self.name,
-                                                                                   percent=percent,
-                                                                                   earned=float(earned),
-                                                                                   possible=float(possible))
+            detail = "{name} - {percent:.0%} ({earned:.3n}/{possible:.3n})".format(
+                name=self.name,
+                percent=percent,
+                earned=float(earned),
+                possible=float(possible)
+            )
+            if attempted:
+                projected_percent = percent
+            else:
+                projected_percent = None
 
         else:
             percent = 0.0
             detail = "{name} - 0% (?/?)".format(name=self.name)
+            projected_percent = None
 
-        breakdown = [{'percent': percent, 'label': self.short_label,
-                      'detail': detail, 'category': self.category, 'prominent': True}]
+        breakdown = [{
+            'percent': percent,
+            'label': self.short_label,
+            'detail': detail,
+            'category': self.category,
+            'prominent': True,
+            'projected_percent': projected_percent,
+        }]
 
-        return {'percent': percent,
-                'section_breakdown': breakdown,
-                #No grade_breakdown here
-                }
+        return {
+            'percent': percent,
+            'section_breakdown': breakdown,
+            #No grade_breakdown here
+            'projected_percent': projected_percent,
+        }
 
 
 class AssignmentFormatGrader(CourseGrader):
@@ -310,17 +364,20 @@ class AssignmentFormatGrader(CourseGrader):
         #Figure the homework scores
         scores = grade_sheet.get(self.type, [])
         breakdown = []
+        projected_breakdown = []
         for i in range(max(self.min_count, len(scores))):
             if i < len(scores) or generate_random_scores:
                 if generate_random_scores:  	# for debugging!
                     earned = random.randint(2, 15)
                     possible = random.randint(earned, 15)
                     section_name = "Generated"
+                    attempted = True
 
                 else:
                     earned = scores[i].earned
                     possible = scores[i].possible
                     section_name = scores[i].section
+                    attempted = scores[i].attempted
 
                 percentage = earned / float(possible)
                 summary_format = "{section_type} {index} - {name} - {percent:.0%} ({earned:.3n}/{possible:.3n})"
@@ -330,16 +387,31 @@ class AssignmentFormatGrader(CourseGrader):
                                                 percent=percentage,
                                                 earned=float(earned),
                                                 possible=float(possible))
+                if attempted:
+                    projected_percentage = percentage
+                else:
+                    #TODO -- if the deadline has passed, then projected_percentage should be 0 and not None; else None
+                    projected_percentage = None
             else:
                 percentage = 0
-                summary = "{section_type} {index} Unreleased - 0% (?/?)".format(index=i + self.starting_index,
-                                                                                section_type=self.section_type)
+                summary = "{section_type} {index} Unreleased - 0% (?/?)".format(
+                    index=i + self.starting_index,
+                    section_type=self.section_type
+                )
+                projected_percentage = None
 
             short_label = "{short_label} {index:02d}".format(index=i + self.starting_index,
                                                              short_label=self.short_label)
 
             breakdown.append({'percent': percentage, 'label': short_label,
-                              'detail': summary, 'category': self.category})
+                              'detail': summary, 'category': self.category, })
+            if projected_percentage is not None:
+                projected_breakdown.append({'percent': projected_percentage, 'label': short_label,
+                                            'detail': summary, 'category': self.category, })
+
+        drop_for_projected = max(len(projected_breakdown) - len(breakdown) + self.drop_count, 0)
+
+        projected_total_percent, _ = total_with_drops(projected_breakdown, drop_for_projected)
 
         total_percent, dropped_indices = total_with_drops(breakdown, self.drop_count)
 
@@ -353,11 +425,14 @@ class AssignmentFormatGrader(CourseGrader):
             # SingleSectionGrader.
             total_detail = "{section_type} = {percent:.0%}".format(percent=total_percent,
                                                                    section_type=self.section_type)
+            projected_detail = total_detail
             total_label = "{short_label}".format(short_label=self.short_label)
             breakdown = [{'percent': total_percent, 'label': total_label,
                           'detail': total_detail, 'category': self.category, 'prominent': True}, ]
         else:
             total_detail = "{section_type} Average = {percent:.0%}".format(percent=total_percent,
+                                                                           section_type=self.section_type)
+            projected_detail = "Projected {section_type} Average = {percent:.0%}".format(percent=projected_total_percent,
                                                                            section_type=self.section_type)
             total_label = "{short_label} Avg".format(short_label=self.short_label)
 
@@ -366,9 +441,13 @@ class AssignmentFormatGrader(CourseGrader):
 
             if not self.hide_average:
                 breakdown.append({'percent': total_percent, 'label': total_label,
-                                  'detail': total_detail, 'category': self.category, 'prominent': True})
+                                  'detail': total_detail, 'projected_detail': projected_detail,
+                                  'category': self.category, 'prominent': True,
+                                  'projected_percent': projected_total_percent})
 
-        return {'percent': total_percent,
-                'section_breakdown': breakdown,
-                #No grade_breakdown here
-                }
+        return {
+            'percent': total_percent,
+            'section_breakdown': breakdown,
+            #No grade_breakdown here
+            'projected_percent': projected_total_percent,
+        }
