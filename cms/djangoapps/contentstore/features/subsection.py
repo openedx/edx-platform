@@ -50,7 +50,7 @@ def i_click_to_edit_subsection_name(step):
 def i_see_complete_subsection_name_with_quote_in_editor(step):
     css = '.subsection-display-name-input'
     assert world.is_css_present(css)
-    assert_equal(world.css_find(css).value, 'Subsection With "Quote"')
+    assert_equal(world.css_value(css), 'Subsection With "Quote"')
 
 
 @step('I have set a release date and due date in different years$')
@@ -69,7 +69,7 @@ def i_mark_it_as_homework(step):
 
 @step('I see it marked as Homework$')
 def i_see_it_marked__as_homework(step):
-    assert_equal(world.css_find(".status-label").value, 'Homework')
+    assert_equal(world.css_value(".status-label"), 'Homework')
 
 
 ############ ASSERTIONS ###################

@@ -70,7 +70,7 @@ def i_click_to_edit_section_name(_step):
 def i_see_complete_section_name_with_quote_in_editor(_step):
     css = '.section-name-edit input[type=text]'
     assert world.is_css_present(css)
-    assert_equal(world.browser.find_by_css(css).value, 'Section with "Quote"')
+    assert_equal(world.css_value(css), 'Section with "Quote"')
 
 
 @step('the section does not exist$')
@@ -85,7 +85,7 @@ def i_see_a_release_date_for_my_section(_step):
 
     css = 'span.published-status'
     assert world.is_css_present(css)
-    status_text = world.browser.find_by_css(css).text
+    status_text = world.css_text(css)
 
     # e.g. 11/06/2012 at 16:25
     msg = 'Will Release:'
