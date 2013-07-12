@@ -294,9 +294,6 @@ class @PeerGradingProblem
   #  Callbacks for various events
   #
   ##########
-  
-  remove_answer_unknown: () =>
-    @answer_unknown_checkbox.removeAttr("checked")
 
   remove_flag: () =>
     @flag_student_checkbox.removeAttr("checked")
@@ -352,9 +349,9 @@ class @PeerGradingProblem
       @grading_wrapper.attr('data-graded', graded) #just in case someone wants to read the DOM
       message = "<p>Successfully saved your feedback. Fetched the next essay.</p>"
       if graded >= required
-        message = "<p>Successfully saved your feedback. Fetched the next essay.
-          <b>You have completed the required number of peer evaluations, but may
-          choose to continue grading if you'd like.</b></p>"
+        message = "<p>Successfully saved your feedback. Fetched the next essay.</p>
+          <p><strong>You have completed the required number of peer evaluations, but may
+          choose to continue grading if you'd like.</strong></p>"
       @grading_message.fadeIn()
       @grading_message.html(message)
       $.scrollTo(@grading_message)
