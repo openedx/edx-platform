@@ -114,10 +114,12 @@ Django admin & debug toolbar
 You can enable admin logins and the debug_toolbar by editing
 your edx-platfrom/lms/envs/common.py instance:
 
- - enable ADMIN login page by setting: ```
+ - enable ADMIN login page by setting:
+   - ```
      'ENABLE_DJANGO_ADMIN_SITE': True
 ```
- - enable debug toolbar by uncommenting: ```
+ - enable debug toolbar by uncommenting:
+   - ```
     # 'debug_toolbar.middleware.DebugToolbarMiddleware',
 ```
 
@@ -168,7 +170,7 @@ $ vagrant up
 To suspend and resume tasks in progress on your VM (such as tests):
 ```
 $ vagrant suspend
-# and later...
+$ # and later...
 $ vagrant resume
 ```
 
