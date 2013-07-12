@@ -314,7 +314,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
             return self._err_response(message)
 
         data_dict = {k:data.get(k) for k in required}
-        data_dict['rubric_scores'] = data_dict['rubric_scores[]']
+        data_dict['rubric_scores'] = data.getlist('rubric_scores[]')
         data_dict['grader_id'] = self.system.anonymous_student_id
 
         try:
@@ -444,7 +444,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
             return self._err_response(message)
 
         data_dict = {k:data.get(k) for k in required}
-        data_dict['rubric_scores'] = data_dict['rubric_scores[]']
+        data_dict['rubric_scores'] = data.getlist('rubric_scores[]')
         data_dict['student_id'] = self.system.anonymous_student_id
         data_dict['calibration_essay_id'] = data_dict['submission_id']
 
