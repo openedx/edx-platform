@@ -27,10 +27,10 @@ installation process.
 9. Create the development environment and start it: `vagrant up`
 
 The initial `vagrant up` will download a Linux image, then boot and ask for your
-host machine's administrator password to setup NFS.
-Once NFS is up, edx-platform/scripts/create-dev-env.sh will
-run, and install all system dependencies and configure the VM.
-This will take a while.  Once this starts, go grab a coffee.
+host machine's administrator password to setup file sharing between your computer and the VM.
+Once file sharing is established, `edx-platform/scripts/create-dev-env.sh` will
+install dependencies and configure the VM.
+This will take a while; go grab a coffee.
 
 When complete, you should see a _"Success!"_ message.
 If not, refer to the 
@@ -60,17 +60,16 @@ Using edX
 ---------
 
 When you login to your VM, you are in
-the `/opt/edx/edx-platform` folder by default, which is NFS mounted from you host workspace.
+the `/opt/edx/edx-platform` by default, which is shared from your host workspace.
 Your host computer contains the edx-project development code and repository.
-Your VM contains system dependencies, and runs development code mounted from your host.
-You can develop by editing from your host computer, in the `edx-platform/` directory
-which you cloned from github.
+Your VM runs edx-platform code mounted from your host.
+You can develop by editing on your host computer, in the directory
+you cloned from github.
 
 After logging into your VM with `vagrant ssh`,
-you can start the _Studio_ and
+start the _Studio_ and
 _Learning management system (LMS)_
-servers as follows
-(run these from the `/opt/edx/edx-platform` folder):
+servers (run these from the `/opt/edx/edx-platform`):
 
 Learning management system (LMS):
 
@@ -84,7 +83,7 @@ Studio (CMS):
 $ rake cms[dev,0.0.0.0:8001]
 ```
 
-Once started, open the following URLs in your browser:
+When the servers have come up, open their URLs:
 
 - LMS: http://192.168.20.40:8000/
 - CMS: http://192.168.20.40:8001/
@@ -112,7 +111,7 @@ Django admin & debug toolbar
 -----------------------------------
 
 You can enable admin logins and the debug_toolbar by editing
-your edx-platfrom/lms/envs/common.py instance:
+`lms/envs/common.py`:
 
 - enable ADMIN login page by setting:
   - ```
@@ -125,19 +124,19 @@ your edx-platfrom/lms/envs/common.py instance:
     # 'debug_toolbar.middleware.DebugToolbarMiddleware',
 ```
 
-Alternatively, these are defined in edx-platform/lms/envs/dev.py,
-and as such only active for local servers.
+These are also defined in `lms/envs/dev.py`,
+and usually active on local servers.
 
-To use the dev settings, explicitly forward one of VM's localhost ports to your computer.
-To do this, login to the VM like this:
+To use the `dev.py` settings, explicitly forward one of VM's localhost ports to your computer.
+Instead of `vagrant ssh`, login with:
 
 ```
 $ ssh -L 8080:127.0.0.1:8080 vagrant@192.168.20.40
 ```
 
-with a password of `vagrant`.
-The specific host and client ports can be whatever you want,
-so long as they don't conflict with any ports in use.
+The password is _vagrant_.
+Chose host and client ports which
+don't conflict with any currently in use.
 
 From your VM, start the LMS as a localhost instance:
 
@@ -145,8 +144,8 @@ From your VM, start the LMS as a localhost instance:
 $ rake lms[cms.dev,127.0.0.1:8080]
 ```
 
-You should see the debug toolbar when you navigate to [http:/localhost:8080/]().
-You should now also see a login when you navigate to [http://localhost:8080/admin/]()
+You should see the debug toolbar now on [http:/localhost:8080/]().
+You should now also see a login on [http://localhost:8080/admin/]()
 You will need a privileged user for the admin login.
 You can create a CMS/LMS super-user with:
 ```
@@ -169,7 +168,7 @@ To restart:
 $ vagrant up
 ```
 
-To suspend and resume tasks in progress on your VM (such as tests):
+To suspend and resume tasks in progress on your VM:
 ```
 $ vagrant suspend
 $ # and later...
@@ -177,9 +176,9 @@ $ vagrant resume
 ```
 
 Your development environment is normally created once, on first `vagrant up`.
-The usual development process from there would be to `git pull` any changes in edx-platform,
-and continue working with your configured box (VM).
-If you want to create a fresh development environment, you can:
+You can continue to fetch changes in edx-platform
+as you work with your VM.
+To re-initialize your VM and create a fresh development environment:
 ```
 $ vagrant destroy
 $ vagrant up
