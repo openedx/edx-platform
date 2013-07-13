@@ -1,16 +1,17 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%inherit file="base.html" />
 <%namespace name='static' file='static_content.html'/>
 
 <%! from django.core.urlresolvers import reverse %>
-<%block name="title">Course Export</%block>
+<%block name="title">${_("Course Export")}</%block>
 <%block name="bodyclass">is-signedin course tools export</%block>
 
 <%block name="content">
 <div class="wrapper-mast wrapper">
   <header class="mast has-subtitle">
     <h1 class="page-header">
-      <small class="subtitle">Tools</small>
-      <span class="sr">&gt; </span>Course Export
+      <small class="subtitle">${_("Tools")}</small>
+      <span class="sr">&gt; </span>${_("Course Export")}
     </h1>
   </header>
 </div>
@@ -19,28 +20,29 @@
   <div class="inner-wrapper">
     <article class="export-overview">
       <div class="description">
-        <h2>About Exporting Courses</h2>
-        <p>When exporting your course, you will receive a .tar.gz formatted file that contains the following course data:</p>
+        <h2>${_("About Exporting Courses")}</h2>
+        ## Translators: ".tar.gz" is a file extension, and should not be translated
+        <p>${_("When exporting your course, you will receive a .tar.gz formatted file that contains the following course data:")}</p>
 
         <ul>
-          <li>Course Structure (Sections and sub-section ordering)</li>
-          <li>Individual Units</li>
-          <li>Individual Problems</li>
-          <li>Static Pages</li>
-          <li>Course Assets</li>
+          <li>${_("Course Structure (Sections and sub-section ordering)")}</li>
+          <li>${_("Individual Units")}</li>
+          <li>${_("Individual Problems")}</li>
+          <li>${_("Static Pages")}</li>
+          <li>${_("Course Assets")}</li>
         </ul>
 
-        <p>Your course export <strong>will not include</strong>: student data, forum/discussion data, course settings, certificates, grading information, or user data.</p>
+        <p>${_("Your course export <strong>will not include</strong>: student data, forum/discussion data, course settings, certificates, grading information, or user data.")}</p>
       </div>
 
       <!-- default state -->
       <div class="export-form-wrapper">
         <form action="${reverse('generate_export_course', kwargs=dict(org=context_course.location.org, course=context_course.location.course, name=context_course.location.name))}" method="post" enctype="multipart/form-data" class="export-form">
-          <h2>Export Course:</h2>
+          <h2>${_("Export Course:")}</h2>
 
           <p class="error-block"></p>
 
-          <a href="${reverse('generate_export_course', kwargs=dict(org=context_course.location.org, course=context_course.location.course, name=context_course.location.name))}" class="button-export">Download Files</a>
+          <a href="${reverse('generate_export_course', kwargs=dict(org=context_course.location.org, course=context_course.location.course, name=context_course.location.name))}" class="button-export">${_("Download Files")}</a>
         </form>
       </div>
 
@@ -48,12 +50,12 @@
       <%doc>
       <div class="export-form-wrapper is-downloading">
         <form action="${reverse('export_course', kwargs=dict(org=context_course.location.org, course=context_course.location.course, name=context_course.location.name))}" method="post" enctype="multipart/form-data" class="export-form">
-          <h2>Export Course:</h2>
+          <h2>${_("Export Course:")}</h2>
 
           <p class="error-block"></p>
 
           <a href="#" class="button-export disabled">Files Downloading</a>
-          <p class="message-status">Download not start? <a href="#" class="text-export">Try again</a></p>
+          <p class="message-status">${_("Download not start?")} <a href="#" class="text-export">${_("Try again")}</a></p>
         </form>
       </div>
       </%doc>

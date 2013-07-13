@@ -1,6 +1,7 @@
+<%! from django.utils.translation import ugettext as _ %>
 <!-- NOTE not used currently but retained b/c it's yet-to-be-wired functionality -->
 <%inherit file="base.html" />
-<%block name="title">Schedule and details</%block>
+<%block name="title">${_("Schedule and details")}</%block>
 <%block name="bodyclass">is-signedin course settings</%block>
 
 
@@ -26,17 +27,17 @@ from contentstore import utils
   <!-- -->
   <div class="main-wrapper">
     <div class="inner-wrapper">
-      <h1>Settings</h1>
+      <h1>${_("Settings")}</h1>
       <article class="settings-overview">
         <div class="settings-page-section main-column">
 
           <section class="settings-faculty">
-            <h2 class="title">Faculty</h2>
+            <h2 class="title">${_("Faculty")}</h2>
 
             <section class="settings-faculty-members">
               <header>
-                <h3>Faculty Members</h3>
-                <span class="detail">Individuals instructing and help with this course</span>
+                <h3>${_("Faculty Members")}</h3>
+                <span class="detail">${_("Individuals instructing and help with this course")}</span>
               </header>
 
               <div class="row">
@@ -44,74 +45,74 @@ from contentstore import utils
                   <ul class="input-list course-faculty-list">
                     <li class="input input-existing multi course-faculty-list-item">
                       <div class="row row-col2">
-                        <label for="course-faculty-1-firstname">Faculty First Name:</label>
+                        <label for="course-faculty-1-firstname">${_("Faculty First Name:")}</label>
                         <div class="field">
                           <input type="text" class="long" id="course-faculty-1-firstname">
                         </div>
                       </div>
 
                       <div class="row row-col2">
-                        <label for="course-faculty-1-lastname">Faculty Last Name:</label>
+                        <label for="course-faculty-1-lastname">${_("Faculty Last Name:")}</label>
                         <div class="field">
                           <input type="text" class="long" id="course-faculty-1-lastname">
                         </div>
                       </div>
 
                       <div class="row row-col2">
-                        <label for="course-faculty-1-photo">Faculty Photo</label>
+                        <label for="course-faculty-1-photo">${_("Faculty Photo")}</label>
                         <div class="field">
                           <div class="input input-existing">
                             <div class="current current-faculty-1-photo">
-                              <a href="#" class="remove-item remove-faculty-photo remove-video-data"><span class="delete-icon"></span> Delete Faculty Photo</a>
+                              <a href="#" class="remove-item remove-faculty-photo remove-video-data"><span class="delete-icon"></span> ${_("Delete Faculty Photo")}</a>
                             </div>
                           </div>
                         </div>
                       </div>
 
                       <div class="row">
-                        <label for="course-faculty-1-bio">Faculty Bio:</label>
+                        <label for="course-faculty-1-bio">${_("Faculty Bio:")}</label>
                         <div class="field">
                           <textarea class="long tall edit-box tinymce" id="course-faculty-1-bio"></textarea>
-                          <span class="tip tip-stacked">A brief description of your education, experience, and expertise</span>
+                          <span class="tip tip-stacked">${_("A brief description of your education, experience, and expertise")}</span>
                         </div>
                       </div>
 
-                      <a href="#" class="remove-item remove-faculty-data"><span class="delete-icon"></span> Delete Faculty Member</a>
+                      <a href="#" class="remove-item remove-faculty-data"><span class="delete-icon"></span> ${_("Delete Faculty Member")}</a>
                     </li>
 
                     <li class="input multi course-faculty-list-item">
                       <div class="row row-col2">
-                        <label for="course-faculty-2-firstname">Faculty First Name:</label>
+                        <label for="course-faculty-2-firstname">${_("Faculty First Name:")}</label>
                         <div class="field">
                           <input type="text" class="long" id="course-faculty-2-firstname">
                         </div>
                       </div>
 
                       <div class="row row-col2">
-                        <label for="course-faculty-2-lastname">Faculty Last Name:</label>
+                        <label for="course-faculty-2-lastname">${_("Faculty Last Name:")}</label>
                         <div class="field">
                           <input type="text" class="long" id="course-faculty-2-lastname">
                         </div>
                       </div>
 
                       <div class="row row-col2">
-                        <label for="course-faculty-2-photo">Faculty Photo</label>
+                        <label for="course-faculty-2-photo">${_("Faculty Photo")}</label>
                         <div class="field">
                           <div class="input">
                             <a href="#" class="new-item new-faculty-photo add-faculty-photo-data" id="course-faculty-2-photo">
-                              <span class="upload-icon"></span>Upload Faculty Photo
+                              <span class="upload-icon"></span>${_("Upload Faculty Photo")}
                             </a>
-                            <span class="tip tip-inline">Max size: 30KB</span>
+                            <span class="tip tip-inline">${_("Max size: 30KB")}</span>
                           </div>
                         </div>
                       </div>
 
                       <div class="row">
-                        <label for="course-faculty-2-bio">Faculty Bio:</label>
+                        <label for="course-faculty-2-bio">${_("Faculty Bio:")}</label>
                         <div class="field">
                           <div clas="input">
                             <textarea class="long tall edit-box tinymce" id="course-faculty-2-bio"></textarea>
-                            <span class="tip tip-stacked">A brief description of your education, experience, and expertise</span>
+                            <span class="tip tip-stacked">${_("A brief description of your education, experience, and expertise")}</span>
                           </div>
                         </div>
                       </div>
@@ -119,7 +120,7 @@ from contentstore import utils
                   </ul>
 
                   <a href="#" class="new-item new-course-faculty-item add-faculty-data">
-                    <span class="plus-icon"></span>New Faculty Member
+                    <span class="plus-icon"></span>${_("New Faculty Member")}
                   </a>
                 </div>
               </div>
@@ -128,78 +129,78 @@ from contentstore import utils
           </section><!-- .settings-staff -->
 
           <section class="settings-problems">
-            <h2 class="title">Problems</h2>
+            <h2 class="title">${_("Problems")}</h2>
 
             <section class="settings-problems-general">
               <header>
-                <h3>General Settings</h3>
-                <span class="detail">Course-wide settings for all problems</span>
+                <h3>${_("General Settings")}</h3>
+                <span class="detail">${_("Course-wide settings for all problems")}</span>
               </header>
 
               <div class="row row-col2">
-                <h4 class="label">Problem Randomization:</h4>
+                <h4 class="label">${_("Problem Randomization:")}</h4>
 
                 <div class="field">
                   <div class="input input-radio">
-                    <input checked="checked" type="radio" name="course-problems-general-randomization" id="course-problems-general-randomization-always" value="Always">
+                    <input checked="checked" type="radio" name="course-problems-general-randomization" id="course-problems-general-randomization-always" value="${_('Always')}">
 
                     <div class="copy">
-                      <label for="course-problems-general-randomization-always">Always</label>
-                    <span class="tip tip-stacked"><strong>randomize all</strong> problems</span>
+                      <label for="course-problems-general-randomization-always">${_("Always")}</label>
+                      <span class="tip tip-stacked">${_("<strong>randomize all</strong> problems")}</span>
                   </div>
                   </div>
 
                   <div class="input input-radio">
-                    <input type="radio" name="course-problems-general-randomization" id="course-problems-general-randomization-never" value="Never">
+                    <input type="radio" name="course-problems-general-randomization" id="course-problems-general-randomization-never" value="${_('Never')}">
 
                     <div class="copy">
-                      <label for="course-problems-general-randomization-never">Never</label>
-                    <span class="tip tip-stacked"><strong>do not randomize</strong> problems</span>
+                      <label for="course-problems-general-randomization-never">${_("Never")}</label>
+                      <span class="tip tip-stacked">${_("<strong>do not randomize</strong> problems")}</span>
                   </div>
                   </div>
 
                   <div class="input input-radio">
-                    <input type="radio" name="course-problems-general-randomization" id="course-problems-general-randomization-perstudent" value="Per Student">
+                    <input type="radio" name="course-problems-general-randomization" id="course-problems-general-randomization-perstudent" value="${_('Per Student')}">
 
                     <div class="copy">
-                      <label for="course-problems-general-randomization-perstudent">Per Student</label>
-                      <span class="tip tip-stacked">randomize problems <strong>per student</strong></span>
+                      <label for="course-problems-general-randomization-perstudent">${_("Per Student")}</label>
+                      <span class="tip tip-stacked">${_("randomize problems <strong>per student</strong>")}</span>
                   </div>
                   </div>
                 </div>
               </div>
 
               <div class="row row-col2">
-                <h4 class="label">Show Answers:</h4>
+                <h4 class="label">${_("Show Answers:")}</h4>
 
                 <div class="field">
                   <div class="input input-radio">
-                    <input checked="checked" type="radio" name="course-problems-general-showanswer" id="course-problems-general-showanswer-always" value="Always">
+                    <input checked="checked" type="radio" name="course-problems-general-showanswer" id="course-problems-general-showanswer-always" value="${_('Always')}">
 
                     <div class="copy">
-                      <label for="course-problems-general-showanswer-always">Always</label>
-                      <span class="tip tip-stacked">Answers will be shown after the number of attempts has been met</span>
+                      <label for="course-problems-general-showanswer-always">${_("Always")}</label>
+                      <span class="tip tip-stacked">${_("Answers will be shown after the number of attempts has been met")}</span>
                   </div>
                   </div>
 
                   <div class="input input-radio">
-                    <input type="radio" name="course-problems-general-showanswer" id="course-problems-general-showanswer-never" value="Never">
+                    <input type="radio" name="course-problems-general-showanswer" id="course-problems-general-showanswer-never" value="${_('Never')}">
 
                     <div class="copy">
-                      <label for="course-problems-general-showanswer-never">Never</label>
-                      <span class="tip tip-stacked">Answers will never be shown, regardless of attempts</span>
+                      <label for="course-problems-general-showanswer-never">${_("Never")}</label>
+                      <span class="tip tip-stacked">${_("Answers will never be shown, regardless of attempts")}</span>
                   </div>
                   </div>
                 </div>
               </div>
 
               <div class="row row-col2">
-                <label for="pcourse-roblems-general-attempts">Number of Attempts  <br /> Allowed on Problems: </label>
+                <label for="pcourse-roblems-general-attempts">${_("Number of Attempts  <br /> Allowed on Problems:")} </label>
 
                 <div class="field">
                   <div class="input">
                     <input type="text" class="short" id="course-problems-general-attempts" placeholder="0 or higher" value="0">
-                    <span class="tip tip-stacked">Students will this have this number of chances to answer a problem. To set infinite atttempts, use "0"</span>
+                    <span class="tip tip-stacked">${_('Students will this have this number of chances to answer a problem. To set infinite atttempts, use "0"')}</span>
                   </div>
                 </div>
               </div>
@@ -207,73 +208,73 @@ from contentstore import utils
 
             <section class="settings-problems-assignment-1 settings-extras">
               <header>
-                <h3>[Assignment Type Name]</h3>
+                <h3>[${_("Assignment Type Name")}]</h3>
               </header>
 
               <div class="row row-col2">
-                <h4 class="label">Problem Randomization:</h4>
+                <h4 class="label">${_("Problem Randomization:")}</h4>
 
                 <div class="field">
                   <div class="input input-radio">
-                    <input checked="checked" type="radio" name="course-problems-assignment-1-randomization" id="course-problems-assignment-1-randomization-always" value="Always">
+                    <input checked="checked" type="radio" name="course-problems-assignment-1-randomization" id="course-problems-assignment-1-randomization-always" value="${_('Always')}">
 
                     <div class="copy">
-                      <label for="course-problems-assignment-1-randomization-always">Always</label>
-                    <span class="tip tip-stacked"><strong>randomize all</strong> problems</span>
+                      <label for="course-problems-assignment-1-randomization-always">${_("Always")}</label>
+                      <span class="tip tip-stacked">${_("<strong>randomize all</strong> problems")}</span>
                   </div>
                   </div>
 
                   <div class="input input-radio">
-                    <input type="radio" name="course-problems-assignment-1-randomization" id="course-problems-assignment-1-randomization-never" value="Never">
+                    <input type="radio" name="course-problems-assignment-1-randomization" id="course-problems-assignment-1-randomization-never" value="${_('Never')}">
 
                     <div class="copy">
-                      <label for="course-problems-assignment-1-randomization-never">Never</label>
-                    <span class="tip tip-stacked"><strong>do not randomize</strong> problems</span>
+                      <label for="course-problems-assignment-1-randomization-never">${_("Never")}</label>
+                      <span class="tip tip-stacked">${_("<strong>do not randomize</strong> problems")}</span>
                   </div>
                 </div>
 
                   <div class="input input-radio">
-                    <input type="radio" name="course-problems-assignment-1-randomization" id="course-problems-assignment-1-randomization-perstudent" value="Per Student">
+                    <input type="radio" name="course-problems-assignment-1-randomization" id="course-problems-assignment-1-randomization-perstudent" value="${_('Per Student')}">
 
                     <div class="copy">
-                      <label for="course-problems-assignment-1-randomization-perstudent">Per Student</label>
-                      <span class="tip tip-stacked">randomize problems <strong>per student</strong></span>
+                      <label for="course-problems-assignment-1-randomization-perstudent">${_("Per Student")}</label>
+                      <span class="tip tip-stacked">${_("randomize problems <strong>per student</strong>")}</span>
                   </div>
                   </div>
                 </div>
               </div>
 
               <div class="row row-col2">
-                <h4 class="label">Show Answers:</h4>
+                <h4 class="label">${_("Show Answers:")}</h4>
 
                 <div class="field">
                   <div class="input input-radio">
-                    <input checked="checked" type="radio" name="course-problems-assignment-1-showanswer" id="course-problems-assignment-1-showanswer-always" value="Always">
+                    <input checked="checked" type="radio" name="course-problems-assignment-1-showanswer" id="course-problems-assignment-1-showanswer-always" value="${_('Always')}">
 
                     <div class="copy">
-                      <label for="course-problems-assignment-1-showanswer-always">Always</label>
-                      <span class="tip tip-stacked">Answers will be shown after the number of attempts has been met</span>
+                      <label for="course-problems-assignment-1-showanswer-always">${_("Always")}</label>
+                      <span class="tip tip-stacked">${_("Answers will be shown after the number of attempts has been met")}</span>
                   </div>
                 </div>
 
                   <div class="input input-radio">
-                    <input type="radio" name="course-problems-assignment-1-showanswer" id="course-problems-assignment-1-showanswer-never" value="Never">
+                    <input type="radio" name="course-problems-assignment-1-showanswer" id="course-problems-assignment-1-showanswer-never" value="${_('Never')}">
 
                     <div class="copy">
-                      <label for="pcourse-roblems-assignment-1-showanswer-never">Never</label>
-                      <span class="tip tip-stacked">Answers will never be shown, regardless of attempts</span>
+                      <label for="pcourse-roblems-assignment-1-showanswer-never">${_("Never")}</label>
+                      <span class="tip tip-stacked">${_("Answers will never be shown, regardless of attempts")}</span>
                   </div>
                   </div>
                 </div>
               </div>
 
               <div class="row row-col2">
-                <label for="course-problems-assignment-1-attempts">Number of Attempts <br /> Allowed on Problems: </label>
+                <label for="course-problems-assignment-1-attempts">${_("Number of Attempts <br /> Allowed on Problems: ")}</label>
 
                 <div class="field">
                   <div class="input">
-                    <input type="text" class="short" id="course-problems-assignment-1-attempts" placeholder="0 or higher" value="0">
-                    <span class="tip tip-stacked">Students will this have this number of chances to answer a problem. To set infinite atttempts, use "0"</span>
+                    <input type="text" class="short" id="course-problems-assignment-1-attempts" placeholder="${_('0 or higher')}" value="0">
+                    <span class="tip tip-stacked">${_('Students will this have this number of chances to answer a problem. To set infinite atttempts, use "0"')}</span>
                   </div>
                 </div>
               </div>
@@ -281,71 +282,71 @@ from contentstore import utils
           </section><!-- .settings-problems -->
 
           <section class="settings-discussions">
-            <h2 class="title">Discussions</h2>
+            <h2 class="title">${_("Discussions")}</h2>
 
             <section class="settings-discussions-general">
               <header>
-                <h3>General Settings</h3>
-                <span class="detail">Course-wide settings for online discussion</span>
+                <h3>${_("General Settings")}</h3>
+                <span class="detail">${_("Course-wide settings for online discussion")}</span>
               </header>
 
               <div class="row row-col2">
-                <h4 class="label">Anonymous Discussions:</h4>
+                <h4 class="label">${_("Anonymous Discussions:")}</h4>
 
                 <div class="field">
                   <div class="input input-radio">
-                    <input type="radio" name="course-discussions-anonymous" id="course-discussions-anonymous-allow" value="Allow">
+                    <input type="radio" name="course-discussions-anonymous" id="course-discussions-anonymous-allow" value="${_('Allow')}">
 
                     <div class="copy">
-                      <label for="course-discussions-anonymous-allow">Allow</label>
-                    <span class="tip tip-stacked">Students and faculty <strong>will be able to post anonymously</strong></span>
+                      <label for="course-discussions-anonymous-allow">${_("Allow")}</label>
+                      <span class="tip tip-stacked">${_("Students and faculty <strong>will be able to post anonymously</strong>")}</span>
                   </div>
                   </div>
 
                   <div class="input input-radio">
-                    <input checked="checked" type="radio" name="course-discussions-anonymous" id="course-discussions-anonymous-dontallow" value="Do Not Allow">
+                    <input checked="checked" type="radio" name="course-discussions-anonymous" id="course-discussions-anonymous-dontallow" value="${_('Do Not Allow')}">
 
                     <div class="copy">
-                      <label for="course-discussions-anonymous-dontallow">Do not allow</label>
-                    <span class="tip tip-stacked"><strong>Posting anonymously is not allowed</strong>. Any previous anonymous posts <strong>will be reverted to non-anonymous</strong></span>
+                      <label for="course-discussions-anonymous-dontallow">${_("Do not allow")}</label>
+                      <span class="tip tip-stacked">${_("<strong>Posting anonymously is not allowed</strong>. Any previous anonymous posts <strong>will be reverted to non-anonymous</strong>")}</span>
                   </div>
                 </div>
                 </div>
               </div>
 
               <div class="row row-col2">
-                <h4 class="label">Anonymous Discussions:</h4>
+                <h4 class="label">${_("Anonymous Discussions:")}</h4>
 
                 <div class="field">
                   <div class="input input-radio">
-                    <input checked="checked" type="radio" name="course-discussions-anonymous" id="course-discussions-anonymous-allow" value="Allow">
+                    <input checked="checked" type="radio" name="course-discussions-anonymous" id="course-discussions-anonymous-allow" value="${_('Allow')}">
 
                     <div class="copy">
-                      <label for="course-discussions-anonymous-allow">Allow</label>
-                      <span class="tip tip-stacked">Students and faculty <strong>will be able to post anonymously</strong></span>
+                      <label for="course-discussions-anonymous-allow">${_("Allow")}</label>
+                      <span class="tip tip-stacked">${_("Students and faculty <strong>will be able to post anonymously</strong>")}</span>
                     </div>
                   </div>
 
                   <div class="input input-radio">
-                    <input disabled="disabled" type="radio" name="course-discussions-anonymous" id="course-discussions-anonymous-dontallow" value="Do Not Allow">
+                    <input disabled="disabled" type="radio" name="course-discussions-anonymous" id="course-discussions-anonymous-dontallow" value="${_('Do Not Allow')}">
 
                     <div class="copy">
-                      <label for="course-discussions-anonymous-dontallow">Do not allow</label>
-                      <span class="tip tip-stacked">This option is disabled since there are previous discussions that are anonymous.</span>
+                      <label for="course-discussions-anonymous-dontallow">${_("Do not allow")}</label>
+                      <span class="tip tip-stacked">${_("This option is disabled since there are previous discussions that are anonymous.")}</span>
                     </div>
                   </div>
                 </div>
               </div>
 
               <div class="row row-col2">
-                <h4 class="label">Discussion Categories</h4>
+                <h4 class="label">${_("Discussion Categories")}</h4>
 
                 <div class="field enum">
                   <ul class="input-list course-discussions-categories-list sortable">
                     <li class="input input-existing input-default course-discussions-categories-list-item sortable-item">
                       <div class="group">
-                        <label for="course-discussions-categories-1-name">Category Name: </label>
-                        <input type="text" class="course-discussions-categories-name" id="course-discussions-categories-1-name" placeholder="" value="General" disabled="disabled">
+                        <label for="course-discussions-categories-1-name">${_("Category Name:")} </label>
+                        <input type="text" class="course-discussions-categories-name" id="course-discussions-categories-1-name" placeholder="" value="${_('General')}" disabled="disabled">
                       </div>
 
                       <a href="#" class="drag-handle"></a>
@@ -353,7 +354,7 @@ from contentstore import utils
 
                     <li class="input input-existing input-default course-discussions-categories-list-item sortable-item">
                       <div class="group">
-                        <label for="course-discussions-categories-2-name">Category Name: </label>
+                        <label for="course-discussions-categories-2-name">${_("Category Name:")} </label>
                         <input type="text" class="course-discussions-categories-name" id="course-discussions-categories-2-name" placeholder="" value="Feedback" disabled="disabled">
                       </div>
 
@@ -362,8 +363,8 @@ from contentstore import utils
 
                     <li class="input input-existing input-default course-discussions-categories-list-item sortable-item">
                       <div class="group">
-                        <label for="course-discussions-categories-3-name">Category Name: </label>
-                        <input type="text" class="course-discussions-categories-name" id="course-discussions-categories-3-name" placeholder="" value="Troubleshooting" disabled="disabled">
+                        <label for="course-discussions-categories-3-name">${_("Category Name:")} </label>
+                        <input type="text" class="course-discussions-categories-name" id="course-discussions-categories-3-name" placeholder="" value="${_('Troubleshooting')}" disabled="disabled">
                       </div>
 
                       <a href="#" class="drag-handle"></a>
@@ -371,10 +372,10 @@ from contentstore import utils
 
                     <li class="input input-existing course-discussions-categories-list-item sortable-item">
                       <div class="group">
-                        <label for="course-discussions-categories-4-name">Category Name: </label>
-                        <input type="text" class="course-discussions-categories-name" id="course-discussions-categories-4-name" placeholder="" value="Study Groups">
+                        <label for="course-discussions-categories-4-name">${_("Category Name:")} </label>
+                        <input type="text" class="course-discussions-categories-name" id="course-discussions-categories-4-name" placeholder="" value="${_('Study Groups')}">
 
-                        <a href="#" class="remove-item remove-course-discussions-categories-data"><span class="delete-icon"></span> Delete Category</a>
+                        <a href="#" class="remove-item remove-course-discussions-categories-data"><span class="delete-icon"></span> ${_("Delete Category")}</a>
                       </div>
 
                       <a href="#" class="drag-handle"></a>
@@ -382,40 +383,40 @@ from contentstore import utils
 
                     <li class="input input-existing course-discussions-categories-list-item sortable-item">
                       <div class="group">
-                        <label for="course-discussions-categories-5-name">Category Name: </label>
-                        <input type="text" class="course-discussions-categories-name" id="course-discussions-categories-5-name" placeholder="" value="Lectures">
+                        <label for="course-discussions-categories-5-name">${_("Category Name:")} </label>
+                        <input type="text" class="course-discussions-categories-name" id="course-discussions-categories-5-name" placeholder="" value="${_('Lectures')}">
                       </div>
 
-                      <a href="#" class="remove-item remove-course-discussions-categories-data"><span class="delete-icon"></span> Delete Category</a>
+                      <a href="#" class="remove-item remove-course-discussions-categories-data"><span class="delete-icon"></span> ${_("Delete Category")}</a>
 
                       <a href="#" class="drag-handle"></a>
                     </li>
 
                     <li class="input input-existing course-discussions-categories-list-item sortable-item">
                       <div class="group">
-                        <label for="course-discussions-categories-6-name">Category Name: </label>
-                        <input type="text" class="course-discussions-categories-name" id="course-discussions-categories-6-name" placeholder="" value="Labs">
+                        <label for="course-discussions-categories-6-name">${_("Category Name:")} </label>
+                        <input type="text" class="course-discussions-categories-name" id="course-discussions-categories-6-name" placeholder="" value="${_('Labs')}">
                       </div>
 
-                      <a href="#" class="remove-item remove-course-discussions-categories-data"><span class="delete-icon"></span> Delete Category</a>
+                      <a href="#" class="remove-item remove-course-discussions-categories-data"><span class="delete-icon"></span> ${_("Delete Category")}</a>
 
                       <a href="#" class="drag-handle"></a>
                     </li>
 
                     <li class="input input-existing course-discussions-categories-list-item sortable-item">
                       <div class="group">
-                        <label for="course-discussions-categories-6-name">Category Name: </label>
+                        <label for="course-discussions-categories-6-name">${_("Category Name:")} </label>
                         <input type="text" class="course-discussions-categories-name" id="course-discussions-categories-6-name" placeholder="" value="">
                       </div>
 
-                      <a href="#" class="remove-item remove-course-discussions-categories-data"><span class="delete-icon"></span> Delete Category</a>
+                      <a href="#" class="remove-item remove-course-discussions-categories-data"><span class="delete-icon"></span> ${_("Delete Category")}</a>
 
                       <a href="#" class="drag-handle"></a>
                     </li>
                   </ul>
 
                   <a href="#" class="new-item new-course-discussions-categories-item add-categories-data">
-                    <span class="plus-icon"></span>New Discussion Category
+                    <span class="plus-icon"></span>${_("New Discussion Category")}
                   </a>
                 </div>
               </div>

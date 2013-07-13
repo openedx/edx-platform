@@ -1,3 +1,4 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%inherit file="base.html" />
 <%!
    import logging
@@ -5,7 +6,7 @@
 %>
 
 <%! from django.core.urlresolvers import reverse %>
-<%block name="title">CMS Subsection</%block>
+<%block name="title">${_("CMS Subsection")}</%block>
 <%block name="bodyclass">is-signedin course subsection</%block>
 
 
@@ -18,11 +19,11 @@
     <div class="main-column">
       <article class="subsection-body window" data-id="${subsection.location}">
         <div class="subsection-name-input">
-          <label>Display Name:</label>
+        <label>${_("Display Name:")}</label>
           <input type="text" value="${subsection.display_name_with_default | h}" class="subsection-display-name-input" data-metadata-name="display_name"/>
         </div>
         <div class="sortable-unit-list">
-          <label>Units:</label>
+        <label>${_("Units:")}</label>
           ${units.enum_units(subsection, subsection_units=subsection_units)}
         </div>
       </article>
@@ -30,63 +31,61 @@
 
     <div class="sidebar">
       <div class="unit-settings window id-holder" data-id="${subsection.location}">
-    <h4 class="header">Subsection Settings</h4>
+    <h4 class="header">${_("Subsection Settings")}</h4>
     <div class="window-contents">
       <div class="scheduled-date-input row">
         <div class="datepair" data-language="javascript">
           <div class="field field-start-date">
-            <label for="start_date">Release Day</label>
-            <input type="text" id="start_date" name="start_date" 
-                value="${subsection.lms.start.strftime('%m/%d/%Y') if subsection.lms.start else ''}" 
+            <label for="start_date">${_("Release Day")}</label>
+            <input type="text" id="start_date" name="start_date"
+                value="${subsection.lms.start.strftime('%m/%d/%Y') if subsection.lms.start else ''}"
                 placeholder="MM/DD/YYYY" class="date" size='15' autocomplete="off"/>
           </div>
           <div class="field field-start-time">
-            <label for="start_time">Release Time (<abbr title="Coordinated Universal Time">UTC</abbr>)</label>
-            <input type="text" id="start_time" name="start_time" 
-                value="${subsection.lms.start.strftime('%H:%M') if subsection.lms.start else ''}" 
+            <label for="start_time">${_("Release Time")} (<abbr title="${_("Coordinated Universal Time")}">${_("UTC")}</abbr>)</label>
+            <input type="text" id="start_time" name="start_time"
+                value="${subsection.lms.start.strftime('%H:%M') if subsection.lms.start else ''}"
                 placeholder="HH:MM" class="time" size='10' autocomplete="off"/>
           </div>
         </div>
         % if subsection.lms.start and not almost_same_datetime(subsection.lms.start, parent_item.lms.start):
             % if parent_item.lms.start is None:
-            <p class="notice">The date above differs from the release date of 
-            ${parent_item.display_name_with_default}, which is unset.
+            <p class="notice">${_("The date above differs from the release date of {name}, which is unset.").format(name=parent_item.display_name_with_default)}
             % else:
-            <p class="notice">The date above differs from the release date of ${parent_item.display_name_with_default} –
-                ${get_default_time_display(parent_item.lms.start)}.
+      <p class="notice">${_("The date above differs from the release date of {name} - {start_time}").format(name=parent_item.display_name_with_default, start_time=get_default_time_display(parent_item.lms.start))}.
             % endif
-            <a href="#" class="sync-date no-spinner">Sync to ${parent_item.display_name_with_default}.</a></p>
+      <a href="#" class="sync-date no-spinner">${_("Sync to {name}.").format(name=parent_item.display_name_with_default)}</a></p>
         % endif
       </div>
 
     <div class="row gradable">
-      <label>Graded as:</label>
+      <label>${_("Graded as:")}</label>
 
-    <div class="gradable-status" data-initial-status="${subsection.lms.format if subsection.lms.format is not None else 'Not Graded'}">
+    <div class="gradable-status" data-initial-status="${subsection.lms.format if subsection.lms.format is not None else _('Not Graded')}">
     </div>
 
     <div class="due-date-input row">
-      <a href="#" class="set-date">Set a due date</a>
+      <a href="#" class="set-date">${_("Set a due date")}</a>
       <div class="datepair date-setter">
         <div class="field field-start-date">
-          <label for="due_date">Due Day</label>
-          <input type="text" id="due_date" name="due_date" 
-          value="${subsection.lms.due.strftime('%m/%d/%Y') if subsection.lms.due else ''}" 
+        <label for="due_date">${_("Due Day")}</label>
+          <input type="text" id="due_date" name="due_date"
+          value="${subsection.lms.due.strftime('%m/%d/%Y') if subsection.lms.due else ''}"
           placeholder="MM/DD/YYYY" class="date" size='15' autocomplete="off"/>
         </div>
         <div class="field field-start-time">
-          <label for="due_time">Due Time (<abbr title="Coordinated Universal Time">UTC</abbr>)</label>
-          <input type="text" id="due_time" name="due_time" 
-            value="${subsection.lms.due.strftime('%H:%M') if subsection.lms.due else ''}" 
+        <label for="due_time">${_("Due Time")} (<abbr title="${_('Coordinated Universal Time')}">UTC</abbr>)</label>
+          <input type="text" id="due_time" name="due_time"
+            value="${subsection.lms.due.strftime('%H:%M') if subsection.lms.due else ''}"
             placeholder="HH:MM" class="time" size='10' autocomplete="off"/>
         </div>
-        <a href="#" class="remove-date">Remove due date</a>
+        <a href="#" class="remove-date">${_("Remove due date")}</a>
       </div>
     </div>
     <div class="row unit-actions">
-      <a href="${preview_link}" target="_blank" class="preview-button">Preview Drafts</a>
+      <a href="${preview_link}" target="_blank" class="preview-button">${_("Preview Drafts")}</a>
       %if can_view_live:
-      <a href="${lms_link}" target="_blank" class="preview-button">View Live</a>
+      <a href="${lms_link}" target="_blank" class="preview-button">${_("View Live")}</a>
       %endif
     </div>
       </div>
@@ -119,19 +118,19 @@
         // TODO figure out whether these should be in window or someplace else or whether they're only needed as local vars
         // I believe that current (New Section/New Subsection) cause full page reloads which means these aren't needed globally
         // but we really should change that behavior.
-	    if (!window.graderTypes) {
-	        window.graderTypes = new CMS.Models.Settings.CourseGraderCollection();
-	        window.graderTypes.course_location = new CMS.Models.Location('${parent_location}');
-	        window.graderTypes.reset(${course_graders|n});
-	    }
+      if (!window.graderTypes) {
+          window.graderTypes = new CMS.Models.Settings.CourseGraderCollection();
+          window.graderTypes.course_location = new CMS.Models.Location('${parent_location}');
+          window.graderTypes.reset(${course_graders|n});
+      }
 
-	    $(".gradable-status").each(function(index, ele) {
-	        var gradeView = new CMS.Views.OverviewAssignmentGrader({
-	            el : ele,
-	            graders : window.graderTypes,
-	            hideSymbol : true
-	        });
-	    });
+      $(".gradable-status").each(function(index, ele) {
+          var gradeView = new CMS.Views.OverviewAssignmentGrader({
+              el : ele,
+              graders : window.graderTypes,
+              hideSymbol : true
+          });
+      });
     })
 
 </script>
