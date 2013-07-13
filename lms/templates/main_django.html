@@ -13,7 +13,9 @@
   <link rel="icon" type="image/x-icon" href="{% static FAVICON_PATH %}" />
   
   {% compressed_css 'application' %}
+  {% block main_vendor_js %}
   {% compressed_js 'main_vendor' %}
+  {% endblock %}
   {% block headextra %}{% endblock %}
   {% if MITX_FEATURES.USE_CUSTOM_THEME %}
     {% include "theme-head-extra.html" %}
