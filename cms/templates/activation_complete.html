@@ -1,11 +1,12 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%inherit file="base.html" />
 
 <%block name="content">
 
 <section class="tos">
 <div>
-  <h1>Activation Complete!</h1>
-  <p>Thanks for activating your account. <a href="/signin">Log in here</a>.</p>
+  <h1>${_("Activation Complete!")}</h1>
+  <p>${_('Thanks for activating your account.')}<a href="/signin">${_("Log in here.")}</a></p>
 </div>
 </section>
 

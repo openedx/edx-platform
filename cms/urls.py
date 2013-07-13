@@ -72,8 +72,6 @@ urlpatterns = ('',  # nopep8
     url(r'^pages/(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)$',
         'contentstore.views.static_pages',
         name='static_pages'),
-    url(r'^edit_static/(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)$',
-        'contentstore.views.edit_static', name='edit_static'),
     url(r'^edit_tabs/(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)$',
         'contentstore.views.edit_tabs', name='edit_tabs'),
 
