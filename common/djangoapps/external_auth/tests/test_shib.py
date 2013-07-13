@@ -98,7 +98,8 @@ class ShibSPTest(ModuleStoreTestCase):
     def test_shib_login(self):
         """
         Tests that:
-          * shib credentials that match an existing ExternalAuthMap with a linked user logs the user in
+          * shib credentials that match an existing ExternalAuthMap with a linked active user logs the user in
+          * shib credentials that match an existing ExternalAuthMap with a linked inactive user shows error page
           * shib credentials that match an existing ExternalAuthMap without a linked user and also match the email
             of an existing user without an existing ExternalAuthMap links the two and log the user in
           * shib credentials that match an existing ExternalAuthMap without a linked user and also match the email
@@ -117,8 +118,19 @@ class ShibSPTest(ModuleStoreTestCase):
         user_wo_map.save()
         extauth.save()
 
+        inactive_user = UserFactory.create(email='inactive@stanford.edu')
+        inactive_user.is_active = False
+        inactive_extauth = ExternalAuthMap(external_id='inactive@stanford.edu',
+                                           external_email='',
+                                           external_domain='shib:https://idp.stanford.edu/',
+                                           external_credentials="",
+                                           user=inactive_user)
+        inactive_user.save()
+        inactive_extauth.save()
+
         idps = ['https://idp.stanford.edu/', 'https://someother.idp.com/']
-        remote_users = ['withmap@stanford.edu', 'womap@stanford.edu', 'testuser2@someother_idp.com']
+        remote_users = ['withmap@stanford.edu', 'womap@stanford.edu',
+                        'testuser2@someother_idp.com', 'inactive@stanford.edu']
 
         for idp in idps:
             for remote_user in remote_users:
@@ -133,13 +145,16 @@ class ShibSPTest(ModuleStoreTestCase):
                     self.assertIsInstance(response, HttpResponseRedirect)
                     self.assertEqual(request.user, user_w_map)
                     self.assertEqual(response['Location'], '/')
+                elif idp == "https://idp.stanford.edu/" and remote_user == 'inactive@stanford.edu':
+                    self.assertEqual(response.status_code, 403)
+                    self.assertIn("Account not yet activated: please look for link in your email", response.content)
                 elif idp == "https://idp.stanford.edu/" and remote_user == 'womap@stanford.edu':
                     self.assertIsNotNone(ExternalAuthMap.objects.get(user=user_wo_map))
                     self.assertIsInstance(response, HttpResponseRedirect)
                     self.assertEqual(request.user, user_wo_map)
                     self.assertEqual(response['Location'], '/')
                 elif idp == "https://someother.idp.com/" and remote_user in \
-                            ['withmap@stanford.edu', 'womap@stanford.edu']:
+                            ['withmap@stanford.edu', 'womap@stanford.edu', 'inactive@stanford.edu']:
                     self.assertEqual(response.status_code, 403)
                     self.assertIn("You have already created an account using an external login", response.content)
                 else:

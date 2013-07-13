@@ -61,7 +61,7 @@ def i_select_a_link_to_the_course_outline(step):
 
 @step('I am brought to the course outline page$')
 def i_am_brought_to_course_outline(step):
-    assert_in('Course Outline', world.css_find('.outline .page-header')[0].text)
+    assert_in('Course Outline', world.css_text('.outline .page-header'))
     assert_equal(1, len(world.browser.windows))
 
 

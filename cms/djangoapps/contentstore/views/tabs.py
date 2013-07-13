@@ -13,7 +13,7 @@ from xmodule.modulestore.django import modulestore
 from ..utils import get_course_for_item, get_modulestore
 from .access import get_location_and_verify_access
 
-__all__ = ['edit_tabs', 'reorder_static_tabs', 'static_pages', 'edit_static']
+__all__ = ['edit_tabs', 'reorder_static_tabs', 'static_pages']
 
 
 def initialize_course_tabs(course):
@@ -127,7 +127,3 @@ def static_pages(request, org, course, coursename):
     return render_to_response('static-pages.html', {
         'context_course': course,
     })
-
-
-def edit_static(request, org, course, coursename):
-    return render_to_response('edit-static-page.html', {})

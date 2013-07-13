@@ -3,18 +3,14 @@
 
 from lettuce import world, step
 from lettuce.django import django_url
-from common import TEST_COURSE_ORG, TEST_COURSE_NAME
 
 
 @step('I register for the course "([^"]*)"$')
 def i_register_for_the_course(_step, course):
-    cleaned_name = TEST_COURSE_NAME.replace(' ', '_')
-    url = django_url('courses/%s/%s/%s/about' % (TEST_COURSE_ORG, course, cleaned_name))
+    cleaned_name = world.scenario_dict['COURSE'].display_name.replace(' ', '_')
+    url = django_url('courses/%s/%s/%s/about' % (world.scenario_dict['COURSE'].org, course, cleaned_name))
     world.browser.visit(url)
-
-    intro_section = world.browser.find_by_css('section.intro')
-    register_link = intro_section.find_by_css('a.register')
-    register_link.click()
+    world.css_click('section.intro a.register')
 
     assert world.is_css_present('section.container.dashboard')
 

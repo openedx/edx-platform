@@ -169,7 +169,7 @@ def edit_latex_source(step):
 @step('my change to the High Level Source is persisted')
 def high_level_source_persisted(step):
     def verify_text(driver):
-        return world.css_find('.problem').text == 'hi'
+        return world.css_text('.problem') == 'hi'
 
     world.wait_for(verify_text)
 
@@ -177,7 +177,7 @@ def high_level_source_persisted(step):
 @step('I view the High Level Source I see my changes')
 def high_level_source_in_editor(step):
     open_high_level_source()
-    assert_equal('hi', world.css_find('.source-edit-box').value)
+    assert_equal('hi', world.css_value('.source-edit-box'))
 
 
 def verify_high_level_source_links(step, visible):

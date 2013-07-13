@@ -2,6 +2,7 @@ from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
+from django.utils.translation import ugettext as _
 from django_future.csrf import ensure_csrf_cookie
 from mitxmako.shortcuts import render_to_response
 
@@ -78,7 +79,7 @@ def add_user(request, location):
     if not email:
         msg = {
             'Status': 'Failed',
-            'ErrMsg': 'Please specify an email address.',
+            'ErrMsg': _('Please specify an email address.'),
         }
         return JsonResponse(msg, 400)
 
@@ -92,7 +93,7 @@ def add_user(request, location):
     if user is None:
         msg = {
             'Status': 'Failed',
-            'ErrMsg': "Could not find user by email address '{0}'.".format(email),
+            'ErrMsg': _("Could not find user by email address '{email}'.").format(email=email),
         }
         return JsonResponse(msg, 404)
 
@@ -100,7 +101,7 @@ def add_user(request, location):
     if not user.is_active:
         msg = {
             'Status': 'Failed',
-            'ErrMsg': 'User {0} has registered but has not yet activated his/her account.'.format(email),
+            'ErrMsg': _('User {email} has registered but has not yet activated his/her account.').format(email=email),
         }
         return JsonResponse(msg, 400)
 
@@ -129,7 +130,7 @@ def remove_user(request, location):
     if user is None:
         msg = {
             'Status': 'Failed',
-            'ErrMsg': "Could not find user by email address '{0}'.".format(email),
+            'ErrMsg': _("Could not find user by email address '{email}'.").format(email=email),
         }
         return JsonResponse(msg, 404)
 

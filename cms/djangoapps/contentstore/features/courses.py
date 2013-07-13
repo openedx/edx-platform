@@ -45,7 +45,7 @@ def courseware_page_has_loaded_in_studio(step):
 @step('I see the course listed in My Courses$')
 def i_see_the_course_in_my_courses(step):
     course_css = 'span.class-name'
-    assert world.css_has_text(course_css, 'Robot Super Course')
+    assert world.css_has_text(course_css, world.scenario_dict['COURSE'].display_name)
 
 
 @step('I am on the "([^"]*)" tab$')

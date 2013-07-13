@@ -49,10 +49,10 @@ on_create()
 
     # Github
     ([[ -f ~vagrant/.ssh/known_hosts ]] && grep "zBX7bKA= ssh" ~vagrant/.ssh/known_hosts) || {
-	echo "|1|4DtBcMsTM4zgl/jTS7h3ZkmS/Vc=|XkRnn2xEhr8ixOxeskJAzBX7bKA= ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==" >> ~vagrant/.ssh/known_hosts
+        echo "|1|4DtBcMsTM4zgl/jTS7h3ZkmS/Vc=|XkRnn2xEhr8ixOxeskJAzBX7bKA= ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==" >> ~vagrant/.ssh/known_hosts
     }
     ([[ -f ~vagrant/.ssh/known_hosts ]] && grep "jO3J5bvw= ssh" ~vagrant/.ssh/known_hosts) || {
-	echo "|1|9rANf/qOAPgKH/TXpGuZCAgGxMs=|x9VYWEDI8kiotbhhNXqjO3J5bvw= ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==" >> ~vagrant/.ssh/known_hosts
+        echo "|1|9rANf/qOAPgKH/TXpGuZCAgGxMs=|x9VYWEDI8kiotbhhNXqjO3J5bvw= ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==" >> ~vagrant/.ssh/known_hosts
     }
     chown vagrant.vagrant ~vagrant/.ssh/known_hosts
 
@@ -62,6 +62,17 @@ on_create()
     # Node modules require a filesystem with symlinks (Windows support)
     mkdir -p /opt/edx/node_modules /opt/edx/edx-platform/node_modules
     mount -o bind /opt/edx/node_modules /opt/edx/edx-platform/node_modules
+
+    # Node modules require a filesystem with symlinks (Windows support)
+    mkdir -p /opt/edx/node_modules /opt/edx/edx-platform/node_modules
+    ([[ -f /etc/fstab ]] && grep '/opt/edx/node_modules' /etc/fstab) || {
+        echo '/opt/edx/node_modules /opt/edx/edx-platform/node_modules none bind,noauto 0 0' >> /etc/fstab
+        mount /opt/edx/node_modules
+    }
+    # Must be mounted *after* the NFS mount, made manually by Vagrant
+    ([[ -f /etc/cron.d/nodemodules ]] && grep '/opt/edx/node_modules' /etc/cron.d/nodemodules) || {
+        echo '@reboot root until [ -n "`mount |grep "/opt/edx/edx-platform type"`" ]; do sleep 1; done; mount /opt/edx/node_modules' > /etc/cron.d/nodemodules
+    }
 
     # Force rechecking all prerequisites (could have been fetched outside of the VM)
     rm -rf /opt/edx/edx-platform/.prereqs_cache
@@ -73,27 +84,27 @@ on_create()
     # loaded after the first run, so we need to deactivate that behavior to run
     # `create-dev-env.sh`.
     [[ -f ~vagrant/.bash_profile ]] && {
-	mv ~vagrant/.bash_profile ~vagrant/.bash_profile.bak
+        mv ~vagrant/.bash_profile ~vagrant/.bash_profile.bak
     }
     sudo -u vagrant -i bash -c "cd /opt/edx/edx-platform && PROJECT_HOME=/opt/edx ./scripts/create-dev-env.sh -ynq"
 
     # Load .bashrc ################################################################
     ([[ -f ~vagrant/.bash_profile ]] && grep ".bashrc" ~vagrant/.bash_profile) || {
-	echo ". /home/vagrant/.bashrc" >> ~vagrant/.bash_profile
+        echo ". /home/vagrant/.bashrc" >> ~vagrant/.bash_profile
     }
 
 
     # Virtualenv - Always load ####################################################
 
     ([[ -f ~vagrant/.bash_profile ]] && grep "edx-platform/bin/activate" ~vagrant/.bash_profile) || {
-	echo ". /home/vagrant/.virtualenvs/edx-platform/bin/activate" >> ~vagrant/.bash_profile
+        echo ". /home/vagrant/.virtualenvs/edx-platform/bin/activate" >> ~vagrant/.bash_profile
     }
 
 
     # Directory ###################################################################
 
     grep "cd /opt/edx/edx-platform" ~vagrant/.bash_profile || {
-	echo "cd /opt/edx/edx-platform" >> ~vagrant/.bash_profile
+        echo "cd /opt/edx/edx-platform" >> ~vagrant/.bash_profile
     }
 
     # Permissions
