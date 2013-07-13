@@ -9,6 +9,8 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from student.tests.factories import UserFactory, GroupFactory, CourseEnrollmentFactory
 from django.core import mail
+from bulk_email.tasks import delegate_email_batches, course_email
+from bulk_email.models import CourseEmail
 
 STAFF_COUNT = 3
 STUDENT_COUNT = 10
@@ -75,3 +77,17 @@ class TestEmail(ModuleStoreTestCase):
 
         self.assertEquals(len(mail.outbox), 1+len(self.staff)+len(self.students))
         self.assertItemsEqual([e.to[0] for e in mail.outbox], [self.instructor.email]+[s.email for s in self.staff]+[s.email for s in self.students])
+
+    def test_get_course_exc(self):
+        """
+        Make sure delegate_email_batches handles Http404 exception from get_course_by_id
+        """
+        with self.assertRaises(Exception):
+            delegate_email_batches("_", "_", "blah/blah/blah", "_", "_")
+
+    def test_no_course_email_obj(self):
+        """
+        Make sure course_email handles CourseEmail.DoesNotExist exception
+        """
+        with self.assertRaises(CourseEmail.DoesNotExist):
+            course_email("dummy hash", [], "_", "_", False)
