@@ -14,11 +14,11 @@ unnamed_modules = 0
 
 
 class Command(BaseCommand):
-    help = 'Import the specified data directory into the default ModuleStore'
+    help = 'Export the specified data directory into the default ModuleStore'
 
     def handle(self, *args, **options):
         if len(args) != 2:
-            raise CommandError("import requires two arguments: <course location> <output path>")
+            raise CommandError("export requires two arguments: <course location> <output path>")
 
         course_id = args[0]
         output_path = args[1]
@@ -30,4 +30,4 @@ class Command(BaseCommand):
         root_dir = os.path.dirname(output_path)
         course_dir = os.path.splitext(os.path.basename(output_path))[0]
 
-        export_to_xml(modulestore('direct'), contentstore(), location, root_dir, course_dir)
+        export_to_xml(modulestore('direct'), contentstore(), location, root_dir, course_dir, modulestore())
