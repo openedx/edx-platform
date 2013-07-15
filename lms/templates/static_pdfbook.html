@@ -1,3 +1,4 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%inherit file="main.html" />
 <%namespace name='static' file='static_content.html'/>
 <%block name="title">
@@ -116,10 +117,10 @@
       <nav>
         <ul>
           <li class="last">
-            <a id="previous">Previous page</a>
+            <a id="previous">${_("Previous page")}</a>
           </li>
           <li class="next">
-            <a id="next">Next page</a>
+            <a id="next">${_("Next page")}</a>
           </li>
         </ul>
       </nav>
