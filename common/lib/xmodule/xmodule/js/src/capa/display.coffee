@@ -22,7 +22,6 @@ class @Problem
 
     @$('section.action input:button').click @refreshAnswers
     @$('section.action input.check').click @check_fd
-    #@$('section.action input.check').click @check
     @$('section.action input.reset').click @reset
     @$('section.action button.show').click @show
     @$('section.action input.save').click @save
@@ -162,10 +161,6 @@ class @Problem
   #       maybe preferable to consolidate all dispatches to use FormData
   ###
   check_fd: =>
-    # Calling check from check_fd will result in firing the 'problem_check' event twice, 
-    # since it is also called in the check function.
-    # Logger.log 'problem_check', @answers
-
     # If there are no file inputs in the problem, we can fall back on @check
     if $('input:file').length == 0
       @check()
@@ -243,6 +238,7 @@ class @Problem
 
     # Segment.io
     analytics.track "Problem Checked",
+      problem_id: @id
       answers: @answers
 
     $.postWithPrefix "#{@url}/problem_check", @answers, (response) =>
