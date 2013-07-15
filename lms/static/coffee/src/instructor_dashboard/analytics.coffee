@@ -28,7 +28,8 @@ class Analytics
   # fetch and list available distributions
   # `cb` is a callback to be run after
   populate_selector: (cb) ->
-    @get_profile_distributions [],
+    # ask for no particular distribution to get list of available distribuitions.
+    @get_profile_distributions undefined,
       # on error, print to console and dom.
       error: std_ajax_err => @$request_response_error.text "Error getting available distributions."
       success: (data) =>
@@ -38,7 +39,7 @@ class Analytics
         # add all fetched available features to drop-down
         for feature in data.available_features
           opt = $ '<option/>',
-            text: data.display_names[feature]
+            text: data.feature_display_names[feature]
             data:
               feature: feature
 
@@ -53,64 +54,60 @@ class Analytics
     feature = opt.data 'feature'
 
     @reset_display()
+    # only proceed if there is a feature attached to the selected option.
     return unless feature
-    @get_profile_distributions [feature],
+    @get_profile_distributions feature,
       error: std_ajax_err => @$request_response_error.text "Error getting distribution for '#{feature}'."
       success: (data) =>
-        feature_res = data.feature_results[feature]
-        # feature response format: {'error': 'optional error string', 'type': 'SOME_TYPE', 'data': [stuff]}
-        if feature_res.error
-          console.warn(feature_res.error)
-          @$display_text.text 'Error fetching data'
+        feature_res = data.feature_results
+        if feature_res.type is 'EASY_CHOICE'
+          # display on SlickGrid
+          options =
+            enableCellNavigation: true
+            enableColumnReorder: false
+            forceFitColumns: true
+
+          columns = [
+            id: feature
+            field: feature
+            name: feature
+          ,
+            id: 'count'
+            field: 'count'
+            name: 'Count'
+          ]
+
+          grid_data = _.map feature_res.data, (value, key) ->
+            datapoint = {}
+            datapoint[feature] = feature_res.choices_display_names[key]
+            datapoint['count'] = value
+            datapoint
+
+          table_placeholder = $ '<div/>', class: 'slickgrid'
+          @$display_table.append table_placeholder
+          grid = new Slick.Grid(table_placeholder, grid_data, columns, options)
+        else if feature_res.feature is 'year_of_birth'
+          graph_placeholder = $ '<div/>', class: 'year-of-birth'
+          @$display_graph.append graph_placeholder
+
+          graph_data = _.map feature_res.data, (value, key) -> [parseInt(key), value]
+
+          $.plot graph_placeholder, [
+            data: graph_data
+          ]
         else
-          if feature_res.type is 'EASY_CHOICE'
-            # display on SlickGrid
-            options =
-              enableCellNavigation: true
-              enableColumnReorder: false
-              forceFitColumns: true
-
-            columns = [
-              id: feature
-              field: feature
-              name: feature
-            ,
-              id: 'count'
-              field: 'count'
-              name: 'Count'
-            ]
-
-            grid_data = _.map feature_res.data, (value, key) ->
-              datapoint = {}
-              datapoint[feature] = feature_res.display_names[key]
-              datapoint['count'] = value
-              datapoint
-
-            table_placeholder = $ '<div/>', class: 'slickgrid'
-            @$display_table.append table_placeholder
-            grid = new Slick.Grid(table_placeholder, grid_data, columns, options)
-          else if feature is 'year_of_birth'
-            graph_placeholder = $ '<div/>', class: 'year-of-birth'
-            @$display_graph.append graph_placeholder
-
-            graph_data = _.map feature_res.data, (value, key) -> [parseInt(key), value]
-
-            $.plot graph_placeholder, [
-              data: graph_data
-            ]
-          else
-            console.warn("don't know how to show #{feature_res.type}")
-            @$display_text.text 'Unavailable Metric\n' + JSON.stringify(feature_res)
+          console.warn("unable to show distribution #{feature_res.type}")
+          @$display_text.text 'Unavailable Metric Display\n' + JSON.stringify(feature_res)
 
 
   # fetch distribution data from server.
   # `handler` can be either a callback for success
   # or a mapping e.g. {success: ->, error: ->, complete: ->}
-  get_profile_distributions: (featurelist, handler) ->
+  get_profile_distributions: (feature, handler) ->
     settings =
       dataType: 'json'
       url: @$distribution_select.data 'endpoint'
-      data: features: JSON.stringify featurelist
+      data: feature: feature
 
     if typeof handler is 'function'
       _.extend settings, success: handler

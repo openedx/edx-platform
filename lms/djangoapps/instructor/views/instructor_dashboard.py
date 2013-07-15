@@ -108,7 +108,7 @@ def _section_membership(course_id, access):
         'enroll_button_url': reverse('students_update_enrollment', kwargs={'course_id': course_id}),
         'unenroll_button_url': reverse('students_update_enrollment', kwargs={'course_id': course_id}),
         'list_course_role_members_url': reverse('list_course_role_members', kwargs={'course_id': course_id}),
-        'access_allow_revoke_url': reverse('access_allow_revoke', kwargs={'course_id': course_id}),
+        'modify_access_url': reverse('modify_access', kwargs={'course_id': course_id}),
         'list_forum_members_url': reverse('list_forum_members', kwargs={'course_id': course_id}),
         'update_forum_role_membership_url': reverse('update_forum_role_membership', kwargs={'course_id': course_id}),
     }
@@ -121,7 +121,7 @@ def _section_student_admin(course_id, access):
         'section_key': 'student_admin',
         'section_display_name': 'Student Admin',
         'access': access,
-        'get_student_progress_url': reverse('get_student_progress_url', kwargs={'course_id': course_id}),
+        'get_student_progress_url_url': reverse('get_student_progress_url', kwargs={'course_id': course_id}),
         'enrollment_url': reverse('students_update_enrollment', kwargs={'course_id': course_id}),
         'reset_student_attempts_url': reverse('reset_student_attempts', kwargs={'course_id': course_id}),
         'rescore_problem_url': reverse('rescore_problem', kwargs={'course_id': course_id}),
@@ -135,8 +135,8 @@ def _section_data_download(course_id):
     section_data = {
         'section_key': 'data_download',
         'section_display_name': 'Data Download',
-        'grading_config_url': reverse('grading_config', kwargs={'course_id': course_id}),
-        'enrolled_students_features_url': reverse('enrolled_students_features', kwargs={'course_id': course_id}),
+        'get_grading_config_url': reverse('get_grading_config', kwargs={'course_id': course_id}),
+        'get_students_features_url': reverse('get_students_features', kwargs={'course_id': course_id}),
     }
     return section_data
 
@@ -146,6 +146,6 @@ def _section_analytics(course_id):
     section_data = {
         'section_key': 'analytics',
         'section_display_name': 'Analytics',
-        'profile_distributions_url': reverse('profile_distribution', kwargs={'course_id': course_id}),
+        'get_distribution_url': reverse('get_distribution', kwargs={'course_id': course_id}),
     }
     return section_data

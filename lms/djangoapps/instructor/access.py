@@ -58,6 +58,8 @@ def _change_access(course, user, level, mode):
 
     level is one of ['instructor', 'staff', 'beta']
     mode is one of ['allow', 'revoke']
+
+    NOTE: will NOT create a group that does not yet exist.
     """
 
     if level is 'beta':

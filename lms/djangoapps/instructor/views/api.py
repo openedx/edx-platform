@@ -1,20 +1,21 @@
 """
 Instructor Dashboard API views
 
-Non-html views which the instructor dashboard requests.
+JSON views which the instructor dashboard requests.
 
 TODO a lot of these GETs should be PUTs
 """
 
 import re
 import json
+import logging
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
 from django.core.urlresolvers import reverse
-from django.http import HttpResponse, HttpResponseBadRequest
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 
 from courseware.access import has_access
-from courseware.courses import get_course_with_access
+from courseware.courses import get_course_with_access, get_course_by_id
 from django.contrib.auth.models import User
 from django_comment_common.models import (Role,
                                           FORUM_ROLE_ADMINISTRATOR,
@@ -30,6 +31,7 @@ import analytics.basic
 import analytics.distributions
 import analytics.csvs
 
+log = logging.getLogger(__name__)
 
 def common_exceptions_400(func):
     """
@@ -85,8 +87,38 @@ def require_query_params(*args, **kwargs):
     return decorator
 
 
+def require_level(level):
+    """
+    Decorator with argument that requires an access level of the requesting
+    user. If the requirement is not satisfied, returns an
+    HttpResponseForbidden (403).
+
+    Assumes that request is in args[0].
+    Assumes that course_id is in kwargs['course_id'].
+
+    `level` is in ['instructor', 'staff']
+    if `level` is 'staff', instructors will also be allowed, even
+        if they are not int he staff group.
+    """
+    if level not in ['instructor', 'staff']:
+        raise ValueError("unrecognized level '{}'".format(level))
+
+    def decorator(func):
+        def wrapped(*args, **kwargs):
+            request = args[0]
+            course = get_course_by_id(kwargs['course_id'])
+
+            if has_access(request.user, course, level):
+                return func(*args, **kwargs)
+            else:
+                return HttpResponseForbidden()
+        return wrapped
+    return decorator
+
+
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
 @require_query_params(action="enroll or unenroll", emails="stringified list of emails")
 def students_update_enrollment(request, course_id):
     """
@@ -97,45 +129,60 @@ def students_update_enrollment(request, course_id):
     - action in ['enroll', 'unenroll']
     - emails is string containing a list of emails separated by anything split_input_list can handle.
     - auto_enroll is a boolean (defaults to false)
-    """
-    course = get_course_with_access(
-        request.user, course_id, 'staff', depth=None
-    )
+        If auto_enroll is false, students will be allowed to enroll.
+        If auto_enroll is true, students will be enroled as soon as they register.
 
+    Returns an analog to this JSON structure: {
+        "action": "enroll",
+        "auto_enroll": false
+        "results": [
+            {
+                "email": "testemail@test.org",
+                "before": {
+                    "enrollment": false,
+                    "auto_enroll": false,
+                    "user": true,
+                    "allowed": false
+                },
+                "after": {
+                    "enrollment": true,
+                    "auto_enroll": false,
+                    "user": true,
+                    "allowed": false
+                }
+            }
+        ]
+    }
+    """
     action = request.GET.get('action')
     emails_raw = request.GET.get('emails')
-    print "@@@@"
-    print type(emails_raw)
     emails = _split_input_list(emails_raw)
     auto_enroll = request.GET.get('auto_enroll') in ['true', 'True', True]
 
-    def format_result(func, email):
-        """ Act on a single email and format response or errors. """
+    results = []
+    for email in emails:
         try:
-            before, after = func()
-            return {
+            if action == 'enroll':
+                before, after = enroll_email(course_id, email, auto_enroll)
+            elif action == 'unenroll':
+                before, after = unenroll_email(course_id, email)
+            else:
+                return HttpResponseBadRequest("Unrecognized action '{}'".format(action))
+
+            results.append({
                 'email': email,
                 'before': before.to_dict(),
                 'after': after.to_dict(),
-            }
-        except Exception:
-            return {
+            })
+        # catch and log any exceptions
+        # so that one error doesn't cause a 500.
+        except Exception as exc:
+            log.exception("Error while #{}ing student")
+            log.exception(exc)
+            results.append({
                 'email': email,
                 'error': True,
-            }
-
-    if action == 'enroll':
-        results = [format_result(
-            lambda: enroll_email(course_id, email, auto_enroll),
-            email
-        ) for email in emails]
-    elif action == 'unenroll':
-        results = [format_result(
-            lambda: unenroll_email(course_id, email),
-            email
-        ) for email in emails]
-    else:
-        return HttpResponseBadRequest("Unrecognized action '{}'".format(action))
+            })
 
     response_payload = {
         'action': action,
@@ -150,13 +197,14 @@ def students_update_enrollment(request, course_id):
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('instructor')
 @common_exceptions_400
 @require_query_params(
     email="user email",
     rolename="'instructor', 'staff', or 'beta'",
     mode="'allow' or 'revoke'"
 )
-def access_allow_revoke(request, course_id):
+def modify_access(request, course_id):
     """
     Modify staff/instructor access.
     Requires instructor access.
@@ -174,6 +222,11 @@ def access_allow_revoke(request, course_id):
     rolename = request.GET.get('rolename')
     mode = request.GET.get('mode')
 
+    if not rolename in ['instructor', 'staff', 'beta']:
+        return HttpResponseBadRequest(
+            "unknown rolename '{}'".format(rolename)
+        )
+
     user = User.objects.get(email=email)
 
     if mode == 'allow':
@@ -184,7 +237,10 @@ def access_allow_revoke(request, course_id):
         raise ValueError("unrecognized mode '{}'".format(mode))
 
     response_payload = {
-        'DONE': 'YES',
+        'email': email,
+        'rolename': rolename,
+        'mode': mode,
+        'success': 'yes',
     }
     response = HttpResponse(
         json.dumps(response_payload), content_type="application/json"
@@ -194,6 +250,7 @@ def access_allow_revoke(request, course_id):
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('instructor')
 @require_query_params(rolename="'instructor', 'staff', or 'beta'")
 def list_course_role_members(request, course_id):
     """
@@ -212,6 +269,7 @@ def list_course_role_members(request, course_id):
         return HttpResponseBadRequest()
 
     def extract_user_info(user):
+        """ convert user into dicts for json view """
         return {
             'username': user.username,
             'email': user.email,
@@ -233,11 +291,10 @@ def list_course_role_members(request, course_id):
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-def grading_config(request, course_id):
+@require_level('staff')
+def get_grading_config(request, course_id):
     """
     Respond with json which contains a html formatted grade summary.
-
-    TODO this shouldn't be html already
     """
     course = get_course_with_access(
         request.user, course_id, 'staff', depth=None
@@ -256,18 +313,16 @@ def grading_config(request, course_id):
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-def enrolled_students_features(request, course_id, csv=False):
+@require_level('staff')
+def get_students_features(request, course_id, csv=False):
     """
     Respond with json which contains a summary of all enrolled students profile information.
 
-    Response {"students": [{-student-info-}, ...]}
+    Responds with JSON
+        {"students": [{-student-info-}, ...]}
 
-    TODO accept requests for different attribute sets
+    TODO accept requests for different attribute sets.
     """
-    course = get_course_with_access(
-        request.user, course_id, 'staff', depth=None
-    )
-
     available_features = analytics.basic.AVAILABLE_FEATURES
     query_features = ['username', 'name', 'email', 'language', 'location', 'year_of_birth', 'gender',
                       'level_of_education', 'mailing_address', 'goals']
@@ -293,53 +348,52 @@ def enrolled_students_features(request, course_id, csv=False):
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-def profile_distribution(request, course_id):
+@require_level('staff')
+def get_distribution(request, course_id):
     """
-    Respond with json of the distribution of students over selected fields which have choices.
+    Respond with json of the distribution of students over selected features which have choices.
 
-    Ask for features through the 'features' query parameter.
-    The features query parameter can be either a single feature name, or a json string of feature names.
-    e.g.
-        http://localhost:8000/courses/MITx/6.002x/2013_Spring/instructor_dashboard/api/profile_distribution?features=level_of_education
-        http://localhost:8000/courses/MITx/6.002x/2013_Spring/instructor_dashboard/api/profile_distribution?features=%5B%22year_of_birth%22%2C%22gender%22%5D
+    Ask for a feature through the `feature` query parameter.
+    If no `feature` is supplied, will return response with an
+        empty response['feature_results'] object.
+    A list of available will be available in the response['available_features']
 
-    Example js query:
-    $.get("http://localhost:8000/courses/MITx/6.002x/2013_Spring/instructor_dashboard/api/profile_distribution",
-          {'features': JSON.stringify(['year_of_birth', 'gender'])},
-          function(){console.log(arguments[0])})
-
-    TODO how should query parameter interpretation work?
     TODO respond to csv requests as well
     """
-    course = get_course_with_access(
-        request.user, course_id, 'staff', depth=None
-    )
+    feature = request.GET.get('feature')
+    # alternate notations of None
+    if feature in (None, 'null', ''):
+        feature = None
+    else:
+        feature = str(feature)
 
-    try:
-        features = json.loads(request.GET.get('features'))
-    except Exception:
-        features = [request.GET.get('features')]
-
-    feature_results = {}
-
-    for feature in features:
-        try:
-            feature_results[feature] = analytics.distributions.profile_distribution(course_id, feature)
-        except Exception as e:
-            feature_results[feature] = {'error': "Error finding distribution for distribution for '{}'.".format(feature)}
-            raise e
+    AVAILABLE_FEATURES = analytics.distributions.AVAILABLE_PROFILE_FEATURES
+    # allow None so that requests for no feature can list available features
+    if not feature in AVAILABLE_FEATURES + (None,):
+        return HttpResponseBadRequest(
+            "feature '{}' not available.".format(feature)
+        )
 
     response_payload = {
         'course_id': course_id,
-        'queried_features': features,
-        'available_features': analytics.distributions.AVAILABLE_PROFILE_FEATURES,
-        'display_names': {
-            'gender': 'Gender',
-            'level_of_education': 'Level of Education',
-            'year_of_birth': 'Year Of Birth',
-        },
-        'feature_results': feature_results,
+        'queried_feature': feature,
+        'available_features': AVAILABLE_FEATURES,
+        'feature_display_names': analytics.distributions.DISPLAY_NAMES,
     }
+
+    p_dist = None
+    if not feature is None:
+        p_dist = analytics.distributions.profile_distribution(course_id, feature)
+        response_payload['feature_results'] = {
+            'feature':  p_dist.feature,
+            'feature_display_name':  p_dist.feature_display_name,
+            'data':  p_dist.data,
+            'type':  p_dist.type,
+        }
+
+        if p_dist.type == 'EASY_CHOICE':
+            response_payload['feature_results']['choices_display_names'] = p_dist.choices_display_names
+
     response = HttpResponse(
         json.dumps(response_payload), content_type="application/json"
     )
@@ -348,6 +402,8 @@ def profile_distribution(request, course_id):
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@common_exceptions_400
+@require_level('staff')
 @require_query_params(
     student_email="email of student for whom to get progress url"
 )
@@ -361,10 +417,6 @@ def get_student_progress_url(request, course_id):
         'progress_url': '/../...'
     }
     """
-    course = get_course_with_access(
-        request.user, course_id, 'staff', depth=None
-    )
-
     student_email = request.GET.get('student_email')
     user = User.objects.get(email=student_email)
 
@@ -382,6 +434,10 @@ def get_student_progress_url(request, course_id):
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+@require_query_params(
+    student_email="email of student for whom to reset attempts"
+)
 @common_exceptions_400
 def reset_student_attempts(request, course_id):
     """
@@ -438,6 +494,8 @@ def reset_student_attempts(request, course_id):
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('instructor')
+@require_query_params(problem_to_reset="problem urlname to reset")
 @common_exceptions_400
 def rescore_problem(request, course_id):
     """
@@ -451,10 +509,6 @@ def rescore_problem(request, course_id):
 
     all_students will be ignored if student_email is present
     """
-    course = get_course_with_access(
-        request.user, course_id, 'instructor', depth=None
-    )
-
     problem_to_reset = request.GET.get('problem_to_reset')
     student_email = request.GET.get('student_email', False)
     all_students = request.GET.get('all_students') in ['true', 'True', True]
@@ -486,6 +540,7 @@ def rescore_problem(request, course_id):
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('instructor')
 def list_instructor_tasks(request, course_id):
     """
     List instructor tasks.
@@ -495,10 +550,6 @@ def list_instructor_tasks(request, course_id):
         - (optional) problem_urlname (same format as problem_to_reset in other api methods)
         - (optional) student_email
     """
-    course = get_course_with_access(
-        request.user, course_id, 'instructor', depth=None
-    )
-
     problem_urlname = request.GET.get('problem_urlname', False)
     student_email = request.GET.get('student_email', False)
 
@@ -516,6 +567,7 @@ def list_instructor_tasks(request, course_id):
         tasks = instructor_task.api.get_running_instructor_tasks(course_id)
 
     def extract_task_features(task):
+        """ Convert task to dict for json rendering """
         FEATURES = ['task_type', 'task_input', 'task_id', 'requester', 'created', 'task_state']
         return dict((feature, str(getattr(task, feature))) for feature in FEATURES)
 
@@ -530,17 +582,15 @@ def list_instructor_tasks(request, course_id):
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+@require_query_params('rolename')
 def list_forum_members(request, course_id):
     """
-    Resets a students attempts counter. Optionally deletes student state for a problem.
+    Lists forum members of a certain rolename.
     Limited to staff access.
 
-    Takes query parameter rolename
+    Takes query parameter `rolename`
     """
-    course = get_course_with_access(
-        request.user, course_id, 'staff', depth=None
-    )
-
     rolename = request.GET.get('rolename')
 
     if not rolename in [FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA]:
@@ -553,6 +603,7 @@ def list_forum_members(request, course_id):
         users = []
 
     def extract_user_info(user):
+        """ Convert user to dict for json rendering. """
         return {
             'username': user.username,
             'email': user.email,
@@ -572,20 +623,22 @@ def list_forum_members(request, course_id):
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('instructor')
+@require_query_params(
+    email="the target users email",
+    rolename="the forum role",
+    mode="'allow' or 'revoke'",
+)
 @common_exceptions_400
 def update_forum_role_membership(request, course_id):
     """
-    Modify forum role access.
+    Modify user's forum role.
 
     Query parameters:
     email is the target users email
     rolename is one of [FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA]
     mode is one of ['allow', 'revoke']
     """
-    course = get_course_with_access(
-        request.user, course_id, 'instructor', depth=None
-    )
-
     email = request.GET.get('email')
     rolename = request.GET.get('rolename')
     mode = request.GET.get('mode')
@@ -602,7 +655,6 @@ def update_forum_role_membership(request, course_id):
     response_payload = {
         'course_id': course_id,
         'mode': mode,
-        'DONE': 'YES',
     }
     response = HttpResponse(
         json.dumps(response_payload), content_type="application/json"
@@ -631,7 +683,7 @@ def _split_input_list(str_list):
 
 def _msk_from_problem_urlname(course_id, urlname):
     """
-    Convert a 'problem urlname' (instructor input name)
+    Convert a 'problem urlname' (name that instructor's input into dashboard)
     to a module state key (db field)
     """
     if urlname.endswith(".xml"):

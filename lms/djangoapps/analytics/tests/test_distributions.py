@@ -31,20 +31,20 @@ class TestAnalyticsDistributions(TestCase):
         feature = 'gender'
         self.assertIn(feature, AVAILABLE_PROFILE_FEATURES)
         distribution = profile_distribution(self.course_id, feature)
-        self.assertEqual(distribution['type'], 'EASY_CHOICE')
-        self.assertEqual(distribution['data']['no_data'], 0)
-        self.assertEqual(distribution['data']['m'], len(self.users) / 3)
-        self.assertEqual(distribution['display_names']['m'], 'Male')
+        self.assertEqual(distribution.type, 'EASY_CHOICE')
+        self.assertEqual(distribution.data['no_data'], 0)
+        self.assertEqual(distribution.data['m'], len(self.users) / 3)
+        self.assertEqual(distribution.choices_display_names['m'], 'Male')
 
     def test_profile_distribution_open_choice(self):
         feature = 'year_of_birth'
         self.assertIn(feature, AVAILABLE_PROFILE_FEATURES)
         distribution = profile_distribution(self.course_id, feature)
         print distribution
-        self.assertEqual(distribution['type'], 'OPEN_CHOICE')
-        self.assertNotIn('display_names', distribution)
-        self.assertNotIn('no_data', distribution['data'])
-        self.assertEqual(distribution['data'][1930], 1)
+        self.assertEqual(distribution.type, 'OPEN_CHOICE')
+        self.assertFalse(hasattr(distribution, 'choices_display_names'))
+        self.assertNotIn('no_data', distribution.data)
+        self.assertEqual(distribution.data[1930], 1)
 
 
 class TestAnalyticsDistributionsNoData(TestCase):
@@ -70,7 +70,7 @@ class TestAnalyticsDistributionsNoData(TestCase):
         self.assertIn(feature, AVAILABLE_PROFILE_FEATURES)
         distribution = profile_distribution(self.course_id, feature)
         print distribution
-        self.assertEqual(distribution['type'], 'OPEN_CHOICE')
-        self.assertNotIn('display_names', distribution)
-        self.assertIn('no_data', distribution['data'])
-        self.assertEqual(distribution['data']['no_data'], len(self.nodata_users))
+        self.assertEqual(distribution.type, 'OPEN_CHOICE')
+        self.assertFalse(hasattr(distribution, 'choices_display_names'))
+        self.assertIn('no_data', distribution.data)
+        self.assertEqual(distribution.data['no_data'], len(self.nodata_users))

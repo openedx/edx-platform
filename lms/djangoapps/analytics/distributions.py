@@ -1,5 +1,24 @@
 """
 Profile Distributions
+
+Aggregate sums for values of fields in students profiles.
+
+For example:
+The distribution in a course for gender might look like:
+'gender': {
+    'type': 'EASY_CHOICE',
+    'data': {
+        'no_data': 1234,
+        'm': 5678,
+        'o': 2134,
+        'f': 5678
+    },
+    'display_names': {
+        'no_data': 'No Data',
+        'm': 'Male',
+        'o': 'Other',
+        'f': 'Female'
+}
 """
 
 from django.db.models import Count
@@ -8,6 +27,48 @@ from student.models import CourseEnrollment, UserProfile
 _EASY_CHOICE_FEATURES = ('gender', 'level_of_education')
 _OPEN_CHOICE_FEATURES = ('year_of_birth',)
 AVAILABLE_PROFILE_FEATURES = _EASY_CHOICE_FEATURES + _OPEN_CHOICE_FEATURES
+DISPLAY_NAMES = {
+    'gender': 'Gender',
+    'level_of_education': 'Level of Education',
+    'year_of_birth': 'Year Of Birth',
+}
+
+
+class ProfileDistribution(object):
+    """
+    Container for profile distribution data
+
+    `feature` is the name of the distribution feature
+    `feature_display_name` is the display name of feature
+    `data` is a dictionary of the distribution
+    `type` is either 'EASY_CHOICE' or 'OPEN_CHOICE'
+    `choices_display_names` is a dict if the distribution is an 'EASY_CHOICE'
+    """
+
+    class ValidationError(ValueError):
+        """ Error thrown if validation fails. """
+        pass
+
+    def __init__(self, feature):
+        self.feature = feature
+        self.feature_display_name = DISPLAY_NAMES[feature]
+
+    def validate(self):
+        """
+        Validate this profile distribution.
+
+        Throws ProfileDistribution.ValidationError
+        """
+        def validation_assert(predicate):
+            if not predicate:
+                raise ProfileDistribution.ValidationError()
+
+        validation_assert(isinstance(self.feature, str))
+        validation_assert(isinstance(self.feature_display_name, str))
+        validation_assert(self.type in ['EASY_CHOICE', 'OPEN_CHOICE'])
+        validation_assert(isinstance(self.data, dict))
+        if self.type == 'EASY_CHOICE':
+            validation_assert(isinstance(self.choices_display_names, dict))
 
 
 def profile_distribution(course_id, feature):
@@ -15,20 +76,13 @@ def profile_distribution(course_id, feature):
     Retrieve distribution of students over a given feature.
     feature is one of AVAILABLE_PROFILE_FEATURES.
 
-    Return a dictionary {
-        'type': 'SOME_TYPE',
-        'data': {'key': 'val'},
-        'display_names': {'key': 'displaynameval'}
-    }
+    Returns a ProfileDistribution instance.
 
-    display_names is only return for EASY_CHOICE type eatuers
-    note no_data instead of None to be compatible with the json spec.
-    data types e.g.
+    NOTE: no_data will appear as a key instead of None to be compatible with the json spec.
+    data types are
         EASY_CHOICE - choices with a restricted domain, e.g. level_of_education
         OPEN_CHOICE - choices with a larger domain e.g. year_of_birth
     """
-
-    feature_results = {}
 
     if not feature in AVAILABLE_PROFILE_FEATURES:
         raise ValueError(
@@ -36,16 +90,21 @@ def profile_distribution(course_id, feature):
                 feature)
         )
 
+    prd = ProfileDistribution(feature)
+
     if feature in _EASY_CHOICE_FEATURES:
+        prd.type = 'EASY_CHOICE'
+
         if feature == 'gender':
             raw_choices = UserProfile.GENDER_CHOICES
         elif feature == 'level_of_education':
             raw_choices = UserProfile.LEVEL_OF_EDUCATION_CHOICES
 
+        # short name and display nae (full) of the choices.
         choices = [(short, full)
                    for (short, full) in raw_choices] + [('no_data', 'No Data')]
 
-        data = {}
+        distribution = {}
         for (short, full) in choices:
             if feature == 'gender':
                 count = CourseEnrollment.objects.filter(
@@ -55,12 +114,12 @@ def profile_distribution(course_id, feature):
                 count = CourseEnrollment.objects.filter(
                     course_id=course_id, user__profile__level_of_education=short
                 ).count()
-            data[short] = count
+            distribution[short] = count
 
-        feature_results['data'] = data
-        feature_results['type'] = 'EASY_CHOICE'
-        feature_results['display_names'] = dict(choices)
+        prd.data = distribution
+        prd.choices_display_names = dict(choices)
     elif feature in _OPEN_CHOICE_FEATURES:
+        prd.type = 'OPEN_CHOICE'
         profiles = UserProfile.objects.filter(
             user__courseenrollment__course_id=course_id)
         query_distribution = profiles.values(
@@ -81,7 +140,7 @@ def profile_distribution(course_id, feature):
                 **{feature: None}
             ).count()
 
-        feature_results['data'] = distribution
-        feature_results['type'] = 'OPEN_CHOICE'
+        prd.data = distribution
 
-    return feature_results
+    prd.validate()
+    return prd

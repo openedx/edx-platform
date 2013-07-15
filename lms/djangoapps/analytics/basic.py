@@ -36,9 +36,10 @@ def enrolled_students_features(course_id, features):
         student_dict = dict((feature, getattr(student, feature))
                             for feature in student_features)
         profile = student.profile
-        profile_dict = dict((feature, getattr(profile, feature))
-                            for feature in profile_features)
-        student_dict.update(profile_dict)
+        if not profile is None:
+            profile_dict = dict((feature, getattr(profile, feature))
+                                for feature in profile_features)
+            student_dict.update(profile_dict)
         return student_dict
 
     return [extract_student(student, features) for student in students]

@@ -36,9 +36,7 @@ HASH_LINK_PREFIX = '#view-'
 # once we're ready, check if this page is the instructor dashboard
 $ =>
   instructor_dashboard_content = $ ".#{CSS_INSTRUCTOR_CONTENT}"
-  console.log 'checking if we are on the instructor dashboard'
   if instructor_dashboard_content.length > 0
-    console.log 'we are on the instructor dashboard'
     setup_instructor_dashboard          instructor_dashboard_content
     setup_instructor_dashboard_sections instructor_dashboard_content
 
