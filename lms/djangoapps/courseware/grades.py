@@ -120,7 +120,6 @@ def answer_distributions(request, course):
 
 
 def grade(student, request, course, model_data_cache=None, keep_raw_scores=False):
-
     """
     This grades a student as quickly as possible. It returns the
     output from the course grader, augmented with the final letter
@@ -182,7 +181,6 @@ def grade(student, request, course, model_data_cache=None, keep_raw_scores=False
 
 
 def compute_graded_total(section, student, course_id, model_data_cache, request):
-
     """
     Computes a total grade for a section.
 
@@ -237,9 +235,7 @@ def compute_graded_total(section, student, course_id, model_data_cache, request)
     return graded_total, raw_scores
 
 
-
 def find_should_grade_section(xmoduledescriptors, model_data_cache, student_id):
-
     """
     Determines whether a section should be graded or not.
 
@@ -276,7 +272,6 @@ def find_should_grade_section(xmoduledescriptors, model_data_cache, student_id):
 
 
 def find_attempted(module_descriptor, model_data_cache, student_id):
-
     """
     Determines whether a section has been attempted yet.
 
@@ -403,7 +398,7 @@ def progress_summary(student, request, course, model_data_cache):
             'url_name': chapter_module.url_name,
             'sections': sections
         })
-        return chapters
+    return chapters
 
 
 def get_score(course_id, user, problem_descriptor, module_creator, model_data_cache):

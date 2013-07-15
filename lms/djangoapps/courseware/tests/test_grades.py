@@ -307,7 +307,6 @@ class TestFindShouldGradeSection(unittest.TestCase):
 
 
 class TestFindAttempted(unittest.TestCase):
-
     """
     Test the find_attempted method.
     """
@@ -351,7 +350,6 @@ class TestFindAttempted(unittest.TestCase):
 
 
 class TestGetScore(unittest.TestCase):
-
     """
     Tests the get_score method.
 
