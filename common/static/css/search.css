@@ -1,4 +1,4 @@
-.searchwrapper {
+.search-wrapper {
 	width:250px;
 	left: 10px;
 	margin: 0;
@@ -43,7 +43,7 @@
 	height:25px;
 }
 
-.searchbox_submit {
+.searchbox-submit {
 	border: 0;
 	position: relative;
 	width: 40px;

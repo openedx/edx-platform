@@ -1,4 +1,7 @@
 ## mako
+<%namespace name='static' file='../static_content.html'/>
+
+<script type="text/javascript" src="${static.url('js/search.js')}"></script>
 <%page args="active_page=None" />
 
 <%
@@ -69,3 +72,11 @@ masq = (function(){
 </script>
   % endif
 % endif
+
+<%def name="js_link(path)">
+    <script type="text/javascript" src="${path|h}"></script>
+</%def>
+
+<%def name="css_link(path, media='')">
+    <link rel="stylesheet" type="text/css" href="${path|h}" media="${media}"></link>
+</%def>

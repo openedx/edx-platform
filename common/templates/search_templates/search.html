@@ -3,7 +3,7 @@
     ${js_link("../static/js/search.js")}
 </head>
 
-<div class="searchwrapper">
+<div class="search-wrapper">
 	<span>
         <form id="query-box" class="auto-submit" action="/search" method="get">
     		<div class="searchbox-wrapper">
@@ -12,7 +12,7 @@
     			% else:
     			<input type="text" id="searchbox" class="searchbox parameter" name="s" value="" onkeydown="searchHandle(event, false)"/>
     			% endif
-    			<div class="searchbox_submit">
+    			<div class="searchbox-submit">
     				<input type="submit" value="" onclick="clickHandle(event, false)"/>
     			</div>
     		</div>
