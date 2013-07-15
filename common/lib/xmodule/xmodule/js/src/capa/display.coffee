@@ -162,8 +162,9 @@ class @Problem
   #       maybe preferable to consolidate all dispatches to use FormData
   ###
   check_fd: =>
-    # Calling check from check_fd will result in firing the 'problem_check' event twice, since it is also called in the check function.
-    #Logger.log 'problem_check', @answers
+    # Calling check from check_fd will result in firing the 'problem_check' event twice, 
+    # since it is also called in the check function.
+    # Logger.log 'problem_check', @answers
 
     # If there are no file inputs in the problem, we can fall back on @check
     if $('input:file').length == 0
@@ -239,6 +240,11 @@ class @Problem
   check: =>
     @check_waitfor()
     Logger.log 'problem_check', @answers
+
+    # Segment.io
+    analytics.track "Problem Checked",
+      answers: @answers
+
     $.postWithPrefix "#{@url}/problem_check", @answers, (response) =>
       switch response.success
         when 'incorrect', 'correct'
