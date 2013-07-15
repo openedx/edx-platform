@@ -356,39 +356,61 @@ function createNewUnit(e) {
 
 function deleteUnit(e) {
     e.preventDefault();
-    _deleteItem($(this).parents('li.leaf'));
+    _deleteItem($(this).parents('li.leaf'), 'Unit');
 }
 
 function deleteSubsection(e) {
     e.preventDefault();
-    _deleteItem($(this).parents('li.branch'));
+    _deleteItem($(this).parents('li.branch'), 'Subsection');
 }
 
 function deleteSection(e) {
     e.preventDefault();
-    _deleteItem($(this).parents('section.branch'));
+    _deleteItem($(this).parents('section.branch'), 'Section');
 }
 
-function _deleteItem($el) {
-    if (!confirm(gettext('Are you sure you wish to delete this item. It cannot be reversed!'))) return;
+function _deleteItem($el, type) {
+    var confirm = new CMS.Views.Prompt.Confirmation({
+        title: gettext('Are you sure you wish to delete this ' + type + '?'),
+        message: gettext('It cannot be reversed!'),
+        actions: {
+            primary: {
+                text: gettext('OK'),
+                click: function(view) {
+                    view.hide();
 
-    var id = $el.data('id');
+                    var id = $el.data('id');
 
-    analytics.track('Deleted an Item', {
-        'course': course_location_analytics,
-        'id': id
+                    analytics.track('Deleted an Item', {
+                        'course': course_location_analytics,
+                        'id': id
+                    });
+
+                    var deleting = new CMS.Views.Notification.Mini({
+                        title: gettext('Deleting') + '&hellip;'
+                    });
+                    deleting.show();
+
+                    $.post('/delete_item',
+                           {'id': id,
+                            'delete_children': true,
+                            'delete_all_versions': true},
+                           function(data) {
+                               $el.remove();
+                               deleting.hide();
+                           }
+                          );
+                }
+            },
+            secondary: {
+                text: gettext('Cancel'),
+                click: function(view) {
+                    view.hide();
+                }
+            }
+        }
     });
-
-
-    $.post('/delete_item', {
-        'id': id,
-        'delete_children': true,
-        'delete_all_versions': true
-    },
-
-    function(data) {
-        $el.remove();
-    });
+    confirm.show();
 }
 
 function markAsLoaded() {

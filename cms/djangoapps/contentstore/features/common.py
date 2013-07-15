@@ -239,6 +239,12 @@ def save_button_disabled(step):
     assert world.css_has_class(button_css, disabled)
 
 
+@step('I confirm the prompt')
+def confirm_the_prompt(step):
+    prompt_css = 'a.button.action-primary'
+    world.css_click(prompt_css)
+
+
 def type_in_codemirror(index, text):
     world.css_click(".CodeMirror", index=index)
     g = world.css_find("div.CodeMirror.CodeMirror-focused > div > textarea")
