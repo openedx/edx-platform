@@ -2,6 +2,9 @@ from mitxmako.shortcuts import render_to_string
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import HttpResponse
 from models import SearchResults
+from django_future.csrf import ensure_csrf_cookie
+from courseware.courses import get_course_with_access
+
 
 import requests
 import enchant
@@ -9,15 +12,14 @@ import enchant
 CONTENT_TYPES = ("transcript", "problem", "pdf")
 
 
-def search(request):
-    context = {}
+@ensure_csrf_cookie
+def search(request, course_id):
     results_string = ""
+    course = get_course_with_access(request.user, course_id, 'load')
     if request.GET:
         results_string = find(request)
-        context.update({"old_query": request.GET.get('s', "")})
-    context.update({"previous": request.GET})
-    search_bar = render_to_string("search_templates/search.html", context)
-    full_html = render_to_string("search_templates/wrapper.html", {"body": search_bar+results_string})
+    full_html = render_to_string("search_templates/wrapper.html", {
+        "body": results_string, "course": course})
     return HttpResponse(full_html)
 
 

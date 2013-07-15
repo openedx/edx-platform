@@ -1,21 +1,3 @@
- ;(function($) {
-    $.fn.textfill = function(options) {
-        var fontSize = options.maxFont;
-        var ourText = $('span:visible:first', this);
-        var maxHeight = $(this).height();
-        var maxWidth = $(this).width();
-        var textHeight;
-        var textWidth;
-        do {
-            ourText.css('font-size', fontSize);
-            textHeight = ourText.height();
-            textWidth = ourText.width();
-            fontSize = fontSize - 1;
-        } while ((textHeight > maxHeight || textWidth > maxWidth) && fontSize > 3);
-        return this;
-    };
-})(jQuery);
-
 function correctionLink(event, spelling_correction){
     $("#searchbox")[0].value = spelling_correction;
     submitForms(false);
@@ -80,6 +62,69 @@ function filterTrigger(input, type, retain_page){
     submitForms(retain_page);
 }
 
-$(document).ready(function() {
-    $('.scaled-text').textfill({ maxFont: 36 });
+function getParameters(){
+    var paramstr = window.location.search.substr(1);
+    var args = paramstr.split("&");
+    var params = {};
+
+    for (var i=0; i < args.length; i++){
+        var temparray = args[i].split("=");
+        params[temparray[0]] = temparray[1];
+    }
+
+    return params;
+}
+
+function constructSearchBox(value){
+    var searchWrapper = document.createElement("div");
+    searchWrapper.className = "search-wrapper";
+    searchWrapper.id = "search-wrapper";
+
+    var searchForm = document.createElement("form");
+    searchForm.className = "auto-submit";
+    searchForm.id = "query-box";
+    searchForm.action = "search";
+    searchForm.method = "get";
+
+    var searchBoxWrapper = document.createElement("div");
+    searchBoxWrapper.className = "searchbox-wrapper";
+
+    var searchBox = document.createElement("input");
+    searchBox.id = "searchbox";
+    searchBox.type = "text";
+    searchBox.className = "searchbox parameter";
+    searchBox.name = "s";
+    searchBox.value = value;
+
+    searchBoxWrapper.appendChild(searchBox);
+    searchForm.appendChild(searchBoxWrapper);
+    searchWrapper.appendChild(searchForm);
+
+    return searchWrapper;
+}
+
+function replaceWithSearch(){
+    var searchWrapper = constructSearchBox("");
+    this.parentNode.replaceChild(searchWrapper, this);
+    if (document.URL.indexOf("search?s=") == -1){
+        document.getElementById("searchbox").focus();
+    }
+}
+
+function updateOldSearch(){
+    var params = getParameters();
+    var newBox = constructSearchBox(params.s);
+    var courseTab = $("li a:contains('Search')").get(0);
+    if (typeof courseTab != 'undefined'){
+        courseTab.parentNode.replaceChild(newBox, courseTab);
+    }
+}
+
+$(document).ready(function(){
+    if (document.URL.indexOf("search?s=") !== -1){
+        updateOldSearch();
+    } else {
+        $("li a:contains('Search')").bind("click", replaceWithSearch);
+    }
 });
+

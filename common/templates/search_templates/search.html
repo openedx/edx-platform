@@ -1,62 +1,18 @@
 <head>
-	${css_link("../static/css/search.css")}
-    ${js_link("../static/js/search.js")}
 </head>
 
-<div class="searchwrapper">
+<div class="search-wrapper">
 	<span>
-        <form id="query-box" class="auto-submit" action="/search" method="get">
+        <form id="query-box" class="auto-submit" action="search" method="get">
     		<div class="searchbox-wrapper">
     			% if old_query:
     			<input type="text" id="searchbox" class="searchbox parameter" name="s" value="${old_query}" onkeydown="searchHandle(event, false)"/>
     			% else:
     			<input type="text" id="searchbox" class="searchbox parameter" name="s" value="" onkeydown="searchHandle(event, false)"/>
     			% endif
-    			<div class="searchbox_submit">
-    				<input type="submit" value="" onclick="clickHandle(event, false)"/>
-    			</div>
-    		</div>
-        </form>
-
-        <form id="content-select" class="auto-submit" action="/search" method="get">
-    		<div class="content-select">
-    			% if previous.get("transcript", "false") == "true":
-    				<input type="checkbox" class="parameter media-check" name="transcript" value="true" checked> Videos
-                % else:
-                    <input type="checkbox" class="parameter media-check" name="transcript" value="true"> Videos
-                % endif
-
-                % if previous.get("problem", "false") == "true":
-    				<input type="checkbox" class="parameter media-check" name="problem" value="true" checked> Problems
-    			% else:
-                    <input type="checkbox" class="parameter media-check" name="problem" value="true"> Problems
-    			% endif
-
-                % if previous.get("pdf", "false") == "true":
-                    <input type="checkbox" class="parameter media-check" name="pdf" value="true" checked> PDFs
-                % else:
-                    <input type="checkbox" class="parameter media-check" name="pdf" value="true"> PDFs
-    			% endif
     		</div>
         </form>
 	</span>
-</div>
-
-<div class="sorting">
-    <form id="sorting" class="auto-submit" action="/search" method="get">
-        <select name="sort" id="sorting" class="parameter" action="/search" method="get" onchange="submitForms(false)">
-            % if previous.get("sort", "false") == "relevance":
-                <option selected="selected" value="relevance">Relevance</option>
-                <option value="alphabetical">Alphabetical</option>
-            % elif previous.get("sort", "false") == "alphabetical":
-                <option value="relevance">Relevance</option>
-                <option selected="selected" value="alphabetical">Alphabetical</option>
-            % else:
-                <option value="relevance">Relevance</option>
-                <option value="alphabetical">Alphabetical</option>
-            % endif
-        </select>
-    </form>
 </div>
 
 <%def name="css_link(path, media='')">
