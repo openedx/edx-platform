@@ -288,6 +288,26 @@ class CrowdsourceHinterTest(unittest.TestCase):
         parsed = mock_module.formula_answer_to_str(get)
         self.assertTrue(parsed == 'x*y^2')
 
+    def test_numerical_answer_signature(self):
+        """
+        Tests answer signature generator for numerical responses.
+        """
+        mock_module = CHModuleFactory.create()
+        answer = '4*5+3'
+        signature = mock_module.numerical_answer_signature(answer)
+        print signature
+        self.assertTrue(signature == '23.0')
+
+    def test_numerical_answer_signature_failure(self):
+        """
+        Makes sure that unparsable numerical answers return None.
+        """
+        mock_module = CHModuleFactory.create()
+        answer = 'fish'
+        signature = mock_module.numerical_answer_signature(answer)
+        print signature
+        self.assertTrue(signature is None)
+
     def test_formula_answer_signature(self):
         """
         Tests the answer signature generator for formula responses.
@@ -406,7 +426,7 @@ class CrowdsourceHinterTest(unittest.TestCase):
         Should not change any vote tallies.
         """
         mock_module = CHModuleFactory.create(user_voted=True)
-        json_in = {'answer': '24.0', 'hint': 1, 'pk_list': json.dumps([1, 3])}
+        json_in = {'answer': '24.0', 'hint': 1, 'pk_list': json.dumps([['24.0', 1], ['24.0', 3]])}
         old_hints = copy.deepcopy(mock_module.hints)
         mock_module.tally_vote(json_in)
         self.assertTrue(mock_module.hints == old_hints)
@@ -418,7 +438,7 @@ class CrowdsourceHinterTest(unittest.TestCase):
         """
         mock_module = CHModuleFactory.create(
             previous_answers=[['24.0', [0, 3, None]]])
-        json_in = {'answer': '24.0', 'hint': 3, 'pk_list': json.dumps([0, 3])}
+        json_in = {'answer': '24.0', 'hint': 3, 'pk_list': json.dumps([['24.0', 0], ['24.0', 3]])}
         dict_out = mock_module.tally_vote(json_in)
         self.assertTrue(mock_module.hints['24.0']['0'][1] == 40)
         self.assertTrue(mock_module.hints['24.0']['3'][1] == 31)
@@ -457,7 +477,7 @@ class CrowdsourceHinterTest(unittest.TestCase):
         Should just skip those.
         """
         mock_module = CHModuleFactory.create()
-        json_in = {'answer': '24.0', 'hint': '0', 'pk_list': json.dumps([0, 12])}
+        json_in = {'answer': '24.0', 'hint': '0', 'pk_list': json.dumps([['24.0', 0], ['24.0', 12]])}
         hint_and_votes = mock_module.tally_vote(json_in)['hint_and_votes']
         self.assertTrue(['Best hint', 41] in hint_and_votes)
         self.assertTrue(len(hint_and_votes) == 1)

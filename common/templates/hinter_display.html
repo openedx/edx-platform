@@ -18,11 +18,6 @@
 </%def>
 
 <%def name="get_feedback()">
-    <p><em> Participation in the hinting system is strictly optional, and will not influence your grade. </em></p>
-    <p>
-    Help your classmates by writing hints for this problem. Start by picking one of your previous incorrect answers from below:
-    </p>
-
     <%
     def unspace(string):
         """
@@ -30,7 +25,44 @@
         removes spaces.
         """
         return ''.join(string.split())
+
+    # Make a list of all hints shown.  (This is fed back to the site as pk_list.)
+    # At the same time, determine whether any hints were shown at all.
+    # If the user never saw hints, don't ask him to vote.
+    import json
+    hints_exist = False
+    pk_list = []
+    for answer, pk_dict in answer_to_hints.items():
+        if len(pk_dict) > 0:
+            hints_exist = True
+        for pk, hint_text in pk_dict.items():
+            pk_list.append([answer, pk])
+    json_pk_list = json.dumps(pk_list)
     %>
+    % if hints_exist:
+        <p>
+        <em> Optional. </em> Help us improve our hints!  Which hint was most helpful to you?
+        </p>
+
+        <div id="pk-list" data-pk-list='${json_pk_list}' style="display:none"> </div>
+
+        % for answer, pk_dict in answer_to_hints.items():
+            % for hint_pk, hint_text in pk_dict.items():
+                <p>
+                <input class="vote" data-answer="${answer}" data-hintno="${hint_pk}" type="button" value="Vote">
+                ${answer}: ${hint_text}
+                </p>
+            % endfor
+        % endfor
+
+        <p>
+        Don't like any of the hints above?  Please write your own, for one of your previous incorrect answers below:
+        </p>
+    % else:
+        <p>
+        <em> Optional. </em> Help us write hints for this problem!  Select one of your incorrect answers below:
+        </p>
+    % endif
 
     <div id="answer-tabs">
         <ul>
@@ -40,36 +72,22 @@
         </ul>
 
         % for answer, pk_dict in answer_to_hints.items():
-        <%
-        import json
-        all_pks = json.dumps(pk_dict.keys())
-        %>
-        <div class = "previous-answer" id="previous-answer-${unspace(answer)}" data-answer="${answer}" data-all-pks='${all_pks}'>
-        <div class = "hint-inner-container">
-            % if len(pk_dict) > 0:
+            <%
+                import json
+                all_pks = json.dumps(pk_dict.keys())
+            %>
+            <div class = "previous-answer" id="previous-answer-${unspace(answer)}" data-answer="${answer}" data-all-pks='${all_pks}'>
+            <div class = "hint-inner-container">
                 <p>
-                Which hint would be most effective to show a student who also got ${answer}?
+                What hint would you give a student who made the same mistake you did?  Please don't give away the answer.
                 </p>
-                % for hint_pk, hint_text in pk_dict.items():
-                    <p>
-                    <input class="vote" data-answer="${answer}" data-hintno="${hint_pk}" type="button" value="Vote">
-                    ${hint_text}
-                    </p>
-                % endfor
-                <p>
-                Don't like any of the hints above?  You can also submit your own.
-                </p>
-            % endif
-            <p>
-            What hint would you give a student who made the same mistake you did?  Please don't give away the answer.
-            </p>
-            <textarea cols="50" class="custom-hint" data-answer="${answer}">
+                <textarea cols="50" class="custom-hint" data-answer="${answer}">
 What would you say to help someone who got this wrong answer?
 (Don't give away the answer, please.)
-            </textarea>
-            <br/><br/>
-            <input class="submit-hint" data-answer="${answer}" type="button" value="submit">
-        </div></div>
+                </textarea>
+                <br/><br/>
+                <input class="submit-hint" data-answer="${answer}" type="button" value="submit">
+            </div></div>
         % endfor
     </div>
 

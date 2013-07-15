@@ -48,9 +48,7 @@ class @Hinter
 
   vote: (eventObj) =>
     target = @$(eventObj.currentTarget)
-    parent_div = $('.previous-answer[data-answer="'+target.attr('data-answer')+'"]')
-    all_pks = parent_div.attr('data-all-pks')
-    console.debug(all_pks)
+    all_pks = @$('#pk-list').attr('data-pk-list')
     post_json = {'answer': target.attr('data-answer'), 'hint': target.data('hintno'), 'pk_list': all_pks}
     $.postWithPrefix "#{@url}/vote", post_json, (response) =>
       @render(response.contents)
@@ -58,7 +56,6 @@ class @Hinter
   submit_hint: (eventObj) =>
     target = @$(eventObj.currentTarget)
     textarea = $('.custom-hint[data-answer="'+target.attr('data-answer')+'"]')
-    console.debug(textarea)
     post_json = {'answer': target.attr('data-answer'), 'hint': @$(textarea).val()}
     $.postWithPrefix "#{@url}/submit_hint",post_json, (response) =>
       @render(response.contents)

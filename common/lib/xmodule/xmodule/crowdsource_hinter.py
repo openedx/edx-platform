@@ -18,6 +18,9 @@ from xblock.core import Scope, String, Integer, Boolean, Dict, List
 
 from capa.responsetypes import FormulaResponse, StudentInputError
 
+from calc import evaluator, UndefinedVariable
+from pyparsing import ParseException
+
 from django.utils.html import escape
 
 log = logging.getLogger(__name__)
@@ -85,8 +88,7 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
             self.answer_signature = self.formula_answer_signature
         else:
             self.answer_to_str = self.numerical_answer_to_str
-            # Right now, numerical problems don't need special answer signature treatment.
-            self.answer_signature = lambda x: x
+            self.answer_signature = self.numerical_answer_signature
 
     def get_html(self):
         """
@@ -133,6 +135,17 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         -Assumes that the problem only has one part.
         """
         return str(answer.values()[0])
+
+    def numerical_answer_signature(self, answer):
+        """
+        Runs the answer string through the evaluator.  (This is because
+        symbolic expressions like sin(pi/12)*3 are allowed.)
+        """
+        try:
+            out = str(evaluator(dict(), dict(), answer))
+        except (UndefinedVariable, ParseException):
+            out = None
+        return out
 
     def formula_answer_signature(self, answer):
         """
@@ -200,7 +213,7 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
             return
         # Make a signature of the answer, for formula responses.
         signature = self.answer_signature(answer)
-        if signature == None:
+        if signature is None:
             # Sometimes, signature conversion may fail.
             log.exception('Signature conversion failed: ' + str(answer))
             return
@@ -258,13 +271,21 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         # be allowed to make one vote / submission, but he can choose which wrong answer
         # he wants to look at.
         answer_to_hints = {}    # answer_to_hints[answer text][hint pk] -> hint text
+        signature_to_ans = {}   # Lets us combine equivalent answers
+                                # Same mapping as the field, but local.
 
         # Go through each previous answer, and populate index_to_hints and index_to_answer.
         for i in xrange(len(self.previous_answers)):
             answer, hints_offered = self.previous_answers[i]
+            # Does this answer equal one of the ones offered already?
+            signature = self.answer_signature(answer)
+            if signature in signature_to_ans:
+                # Re-assign this answer text to the one we've seen already.
+                answer = signature_to_ans[signature]
+            else:
+                signature_to_ans[signature] = answer
             if answer not in answer_to_hints:
                 answer_to_hints[answer] = {}
-            signature = self.answer_signature(answer)
             if signature in self.hints:
                 # Go through each hint, and add to index_to_hints
                 for hint_id in hints_offered:
@@ -285,9 +306,10 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         `data` -- expected to have the following keys:
             'answer': text of answer we're voting on
             'hint': hint_pk
-            'pk_list': We will return a list of how many votes each hint has so far.
+            'pk_list': A list of [answer, pk] pairs, each of which representing a hint.
+                       We will return a list of how many votes each hint in the list has so far.
                        It's up to the browser to specify which hints to return vote counts for.
-                       Every pk listed here will have a hint count returned.
+                       
         Returns key 'hint_and_votes', a list of (hint_text, #votes) pairs.
         """
         if self.user_voted:
@@ -299,7 +321,6 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
             log.exception('Failure in hinter tally_vote: Unable to parse answer: ' + ans)
             return {'error': 'Failure in voting!'}
         hint_pk = str(data['hint'])
-        pk_list = json.loads(data['pk_list'])
         # We use temp_dict because we need to do a direct write for the database to update.
         temp_dict = self.hints
         try:
@@ -313,12 +334,18 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         self.user_voted = True
 
         # Return a list of how many votes each hint got.
+        pk_list = json.loads(data['pk_list'])
         hint_and_votes = []
-        for vote_pk in pk_list:
+        for answer, vote_pk in pk_list:
+            signature = self.answer_signature(answer)
+            if signature is None:
+                log.exception('In hinter tally_vote, couldn\'t parse ' + answer)
+                continue
             try:
                 hint_and_votes.append(temp_dict[signature][str(vote_pk)])
             except KeyError:
-                log.exception('In hinter tally_vote: pk_list contains non-existant pk: ' + str(vote_pk))
+                log.exception('In hinter tally_vote, couldn\'t find: '
+                              + answer + ', ' + str(vote_pk))
 
         hint_and_votes.sort(key=lambda pair: pair[1], reverse=True)
         # Reset self.previous_answers.

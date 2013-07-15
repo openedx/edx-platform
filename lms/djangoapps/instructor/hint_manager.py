@@ -16,8 +16,8 @@ from mitxmako.shortcuts import render_to_response, render_to_string
 
 from courseware.courses import get_course_with_access
 from courseware.models import XModuleContentField
-from courseware.module_render import get_module
-from courseware.model_data import ModelDataCache
+import courseware.module_render as module_render
+import courseware.model_data as model_data
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 
@@ -232,8 +232,8 @@ def add_hint(request, course_id, field):
     # any alternative :(
     loc = Location(problem_id)
     descriptors = modulestore().get_items(loc)
-    m_d_c = ModelDataCache(descriptors, course_id, request.user)
-    hinter_module = get_module(request.user, request, loc, m_d_c, course_id)
+    m_d_c = model_data.ModelDataCache(descriptors, course_id, request.user)
+    hinter_module = module_render.get_module(request.user, request, loc, m_d_c, course_id)
     signature = hinter_module.answer_signature(answer)
     if signature is None:
         # Signature generation failed.

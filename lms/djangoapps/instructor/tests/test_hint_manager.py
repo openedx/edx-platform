@@ -2,6 +2,7 @@ import json
 
 from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
+from mock import MagicMock
 
 from courseware.models import XModuleContentField
 from courseware.tests.factories import ContentFactory
@@ -89,7 +90,7 @@ class HintManagerTest(ModuleStoreTestCase):
         out = view.get_hints(post, self.course_id, 'mod_queue')
         print out
         self.assertTrue(out['other_field'] == 'hints')
-        expected = {self.problem_id: [(u'2.0', {u'2': [u'Hint 2', 1]})]}
+        expected = {self.problem_id: [[u'2.0', u'2.0', {u'2': [u'Hint 2', 1]}]]}
         self.assertTrue(out['all_hints'] == expected)
 
     def test_gethints_other(self):
@@ -101,9 +102,9 @@ class HintManagerTest(ModuleStoreTestCase):
         out = view.get_hints(post, self.course_id, 'hints')
         print out
         self.assertTrue(out['other_field'] == 'mod_queue')
-        expected = {self.problem_id: [('1.0', {'1': ['Hint 1', 2],
-                                               '3': ['Hint 3', 12]}),
-                                      ('2.0', {'4': ['Hint 4', 3]})
+        expected = {self.problem_id: [['1.0', '1.0', {'1': ['Hint 1', 2],
+                                                      '3': ['Hint 3', 12]}],
+                                      ['2.0', '2.0', {'4': ['Hint 4', 3]}]
                                       ]}
         self.assertTrue(out['all_hints'] == expected)
 
@@ -137,15 +138,29 @@ class HintManagerTest(ModuleStoreTestCase):
         """
         Check that instructors can add new hints.
         """
+        # Because add_hint accesses the xmodule, this test requires a bunch
+        # of monkey patching.
+        import courseware.module_render as module_render
+        import courseware.model_data as model_data
+        hinter = MagicMock()
+        hinter.answer_signature = lambda string: string
+        module_render.get_module = MagicMock(return_value=hinter)
+        model_data.ModelDataCache = MagicMock(return_value=None)
+
         request = RequestFactory()
         post = request.post(self.url, {'field': 'mod_queue',
                                        'op': 'add hint',
                                        'problem': self.problem_id,
                                        'answer': '3.14',
                                        'hint': 'This is a new hint.'})
+        post.user = 'fake user'
         view.add_hint(post, self.course_id, 'mod_queue')
         problem_hints = XModuleContentField.objects.get(field_name='mod_queue', definition_id=self.problem_id).value
         self.assertTrue('3.14' in json.loads(problem_hints))
+
+        # Reload the things we monkey-patched.
+        reload(module_render)
+        reload(model_data)
 
     def test_approve(self):
         """
