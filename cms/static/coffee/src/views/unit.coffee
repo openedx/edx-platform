@@ -115,27 +115,43 @@ class CMS.Views.UnitEdit extends Backbone.View
     @model.save()
 
   deleteComponent: (event) =>
-    if not confirm 'Are you sure you want to delete this component? This action cannot be undone.'
-      return
-    $component = $(event.currentTarget).parents('.component')
-    $.post('/delete_item', {
-      id: $component.data('id')
-    }, =>
-      analytics.track "Deleted a Component",
-        course: course_location_analytics
-        unit_id: unit_location_analytics
-        id: $component.data('id')
+    msg = new CMS.Views.Prompt.Confirmation(
+      title: gettext('Are you sure you want to delete this component?'),
+      message: gettext('This action cannot be undone.'),
+      actions:
+        primary:
+          text: gettext('OK'),
+          click: (view) =>
+            view.hide()
+            deleting = new CMS.Views.Notification.Mini
+              title: gettext('Deleting') + '&hellip;',
+            deleting.show()
+            $component = $(event.currentTarget).parents('.component')
+            $.post('/delete_item', {
+              id: $component.data('id')
+            }, =>
+              deleting.hide()
+              analytics.track "Deleted a Component",
+                course: course_location_analytics
+                unit_id: unit_location_analytics
+                id: $component.data('id')
 
-      $component.remove()
-      # b/c we don't vigilantly keep children up to date
-      # get rid of it before it hurts someone
-      # sorry for the js, i couldn't figure out the coffee equivalent
-      `_this.model.save({children: _this.components()},
-          {success: function(model) {
-              model.unset('children');
-          }}
-      );`
+              $component.remove()
+              # b/c we don't vigilantly keep children up to date
+              # get rid of it before it hurts someone
+              # sorry for the js, i couldn't figure out the coffee equivalent
+              `_this.model.save({children: _this.components()},
+                {success: function(model) {
+                model.unset('children');
+                }}
+              );`
+            )
+        secondary:
+          text: gettext('Cancel'),
+          click: (view) ->
+            view.hide()
     )
+    msg.show()
 
   deleteDraft: (event) ->
     @wait(true)

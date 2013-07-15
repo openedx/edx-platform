@@ -41,6 +41,22 @@ def see_no_components(steps):
     assert world.is_css_not_present('li.component')
 
 
+@step(u'I delete a component')
+def delete_one_component(step):
+    world.css_click('a.delete-button')
+
+
+@step(u'I edit and save a component')
+def edit_and_save_component(step):
+    world.css_click('.edit-button')
+    world.css_click('.save-button')
+
+
+@step(u'I see a (.*)$')
+def i_see_a_notification(step, notification_type):
+    assert world.is_css_present('.wrapper-%s' % notification_type)
+
+
 def step_selector_list(data_type, path, index=1):
     selector_list = ['a[data-type="{}"]'.format(data_type)]
     if index != 1:
