@@ -60,7 +60,7 @@ class CMS.Views.ModuleEdit extends Backbone.View
     $.post("/clone_item", {
       parent_location: parent
       template: template
-    }, (data) => 
+    }, (data) =>
       @model.set(id: data.id)
       @$el.data('id', data.id)
       @render()

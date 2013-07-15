@@ -1,0 +1,31 @@
+<%! from django.utils.translation import ugettext as _ %>
+<div class="wrapper-comp-editor" id="editor-tab-${html_id}" data-html_id="${html_id}">
+    <section data-hide-header="${hide_settings}" class="editor-with-tabs">
+  % if tabs:
+      % if hide_settings:
+        <span class="component-name"></span>
+      % endif
+      <ul class="${'editor-tabs' if (len(tabs) != 1) else 'editor-single-tab-name' }">
+    % for tab in tabs:
+        <li><a href="#tab-${html_id}-${loop.index}" class="tab ${'current' if tab.get('current', False) else ''}">${_(tab['name'])}</a></li>
+    % endfor
+      </ul>
+      <div class="${'tabs-wrapper' if (len(tabs) != 1) else 'editor-single-tab' }">
+  % else:
+      <div>
+  % endif
+       % for tab in tabs:
+        <div class="component-tab ${'is-inactive' if not tab.get('current', False) else ''}" id="tab-${html_id}-${loop.index}" >
+            <%include file="${tab['template']}" args="tabName=tab['name']"/>
+        </div>
+        % endfor
+      </div>
+    </section>
+
+    % if hide_settings:
+       <%include file="tabs/latex-source-compiler.html"/>
+    % endif
+</div>
+% if not hide_settings:
+<%include file="metadata-edit.html" />
+% endif

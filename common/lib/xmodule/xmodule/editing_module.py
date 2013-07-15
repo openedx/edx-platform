@@ -1,3 +1,5 @@
+"""Descriptors for XBlocks/Xmodules, that provide editing of atrributes"""
+
 from pkg_resources import resource_string
 from xmodule.mako_module import MakoModuleDescriptor
 from xblock.core import Scope, String
@@ -7,6 +9,7 @@ log = logging.getLogger(__name__)
 
 
 class EditingFields(object):
+    """Contains specific template information (the raw data body)"""
     data = String(scope=Scope.content, default='')
 
 
@@ -27,6 +30,52 @@ class EditingDescriptor(EditingFields, MakoModuleDescriptor):
         # Add our specific template information (the raw data body)
         _context.update({'data': self.data})
         return _context
+
+
+class TabsEditingDescriptor(EditingFields, MakoModuleDescriptor):
+    """
+    Module that provides a raw editing view of its data and children.  It does not
+    perform any validation on its definition---just passes it along to the browser.
+
+    This class is intended to be used as a mixin.
+
+    Only one inner editor in tabs is supported in front-end. It means that
+    you should have only one CodeMirror among tabs, one Tiny MCE, etc.
+    """
+    mako_template = "widgets/tabs-aggregator.html"
+    css = {'scss': [resource_string(__name__, 'css/tabs/tabs.scss')]}
+    js = {'coffee': [resource_string(__name__, 'js/src/tabs/tabs-aggregator.coffee')]}
+    js_module_name = "TabsEditorDescriptor"
+    tabs = []
+
+    # Include settings to tabs and hide setting main bar.
+    hide_settings = False
+    # In order to enable, in xmodule desciptor (see videoalpha for ex.)
+    # 1. add to tabs:       {
+    #       'name': "Settings",  # Do not rename settings tab.
+    #       'template': "tabs/metadata-edit-tab.html'   }
+    # 2. set hide_settings = True
+
+    def get_context(self):
+        _context = super(TabsEditingDescriptor, self).get_context()
+        _context.update({
+            'tabs': self.tabs,
+            'html_id': self.location.html_id(),  # element_id
+            'data': self.data,
+            'hide_settings': self.hide_settings
+        })
+        return _context
+
+    @classmethod
+    def get_css(cls):
+        for tab in cls.tabs:
+            tab_styles = tab.get('css', {})
+            for css_type, css_content in tab_styles.items():
+                if css_type in cls.css:
+                    cls.css[css_type].extend(css_content)
+                else:
+                    cls.css[css_type] = css_content
+        return cls.css
 
 
 class XMLEditingDescriptor(EditingDescriptor):
