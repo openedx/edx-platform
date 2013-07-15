@@ -17,7 +17,10 @@ from django.core.urlresolvers import reverse
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 
-from student.models import TestCenterUser, TestCenterRegistration
+if settings.MITX_FEATURES.get('AUTH_USE_CAS'):
+    from django_cas.views import login as django_cas_login
+
+from student.models import UserProfile, TestCenterUser, TestCenterRegistration
 
 from django.http import HttpResponse, HttpResponseRedirect, HttpRequest, HttpResponseForbidden
 from django.utils.http import urlquote
@@ -379,6 +382,32 @@ def ssl_login(request):
         fullname=fullname,
         retfun=retfun
     )
+
+
+# -----------------------------------------------------------------------------
+# CAS (Central Authentication Service)
+# -----------------------------------------------------------------------------
+def cas_login(request, next_page=None, required=False):
+    """
+        Uses django_cas for authentication.
+        CAS is a common authentcation method pioneered by Yale.
+        See http://en.wikipedia.org/wiki/Central_Authentication_Service
+        
+        Does normal CAS login then generates user_profile if nonexistent,
+        and if login was successful.  We assume that user details are
+        maintained by the central service, and thus an empty user profile
+        is appropriate.
+    """
+
+    ret = django_cas_login(request, next_page, required)
+    
+    if request.user.is_authenticated():
+        user = request.user
+        if not UserProfile.objects.filter(user=user):
+            up = UserProfile(name=user.username, user=user)
+            up.save()
+
+    return ret
 
 
 # -----------------------------------------------------------------------------
