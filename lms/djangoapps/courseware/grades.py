@@ -151,7 +151,17 @@ def grade(student, request, course, model_data_cache=None, keep_raw_scores=False
         format_scores = []
         for section in sections:
 
-            graded_total, add_raw_scores = compute_graded_total(section, student, course.id, model_data_cache, request)
+            section_descriptor = section['section_descriptor']
+            xmoduledescriptors = section['xmoduledescriptors']
+
+            graded_total, add_raw_scores = compute_graded_total(
+                section_descriptor,
+                xmoduledescriptors,
+                student,
+                course.id,
+                model_data_cache,
+                request
+            )
 
             if keep_raw_scores:
                 raw_scores += add_raw_scores
@@ -161,7 +171,7 @@ def grade(student, request, course, model_data_cache=None, keep_raw_scores=False
                 format_scores.append(graded_total)
             else:
                 log.exception("Unable to grade a section with a total possible score of zero. " +
-                              str(section['section_descriptor'].location))
+                              str(section_descriptor.location))
 
         totaled_scores[section_format] = format_scores
 
@@ -180,22 +190,28 @@ def grade(student, request, course, model_data_cache=None, keep_raw_scores=False
     return grade_summary
 
 
-def compute_graded_total(section, student, course_id, model_data_cache, request):
+def compute_graded_total(section_descriptor, xmoduledescriptors, student, course_id, model_data_cache, request):
     """
     Computes a total grade for a section.
+
+    - section_descriptor: descriptor to pass into yield_dynamic_descriptor_descendents
+    - xmoduledescriptors: an iterable containing moduledescriptors
+    - student: a User, as passed into grade()
+    - course_id: is just course.id, where course is the relevant CourseDescriptor
+    - model_data_cache: is an output of ModelDataCache(...)
+    - request: the original HTTP request; needed to pass into get_module_for_descriptor
 
     @return a tuple: (graded_total, add_raw_scores)
         - graded_total: a Score -- either the output of graders.aggregate_scores, or 0/1 if not should_grade_section
         - add_raw_scores: a list of Score objects to be added to raw_scores within grade()
     """
 
-    section_descriptor = section['section_descriptor']
     section_name = section_descriptor.display_name_with_default
 
     raw_scores = []
 
     #Moved to helper method
-    should_grade_section = find_should_grade_section(section['xmoduledescriptors'], model_data_cache, student.id)
+    should_grade_section = find_should_grade_section(xmoduledescriptors, model_data_cache, student.id)
 
     if should_grade_section:
         scores = []
@@ -242,10 +258,12 @@ def find_should_grade_section(xmoduledescriptors, model_data_cache, student_id):
     If the moduledescriptor is found in the model data cache, it should be graded.
     Also, if any moduledescriptor in a section should be graded, the entire section should be.
 
+    - xmoduledescriptors: a list of moduledescriptors
+    - model_data_cache: is an output of ModelDataCache(...)
+    - student_id: student.id, where student is a User
+
     @return True or False
     """
-
-    should_grade_section = False
 
     # If we haven't seen a single problem in the section, we don't have to grade it at all! We can assume 0%
     for moduledescriptor in xmoduledescriptors:
@@ -253,8 +271,7 @@ def find_should_grade_section(xmoduledescriptors, model_data_cache, student_id):
         # some problems have state that is updated independently of interaction
         # with the LMS, so they need to always be scored. (E.g. foldit.)
         if moduledescriptor.always_recalculate_grades:
-            should_grade_section = True
-            break
+            return True
 
         # Create a fake key to pull out a StudentModule object from the ModelDataCache
 
@@ -265,10 +282,9 @@ def find_should_grade_section(xmoduledescriptors, model_data_cache, student_id):
             None
         )
         if model_data_cache.find(key):
-            should_grade_section = True
-            break
+            return True
 
-    return should_grade_section
+    return False
 
 
 def find_attempted(module_descriptor, model_data_cache, student_id):
@@ -288,12 +304,8 @@ def find_attempted(module_descriptor, model_data_cache, student_id):
         module_descriptor.location,
         None
     )
-    attempted = False
-    if model_data_cache.find(key):
-        if model_data_cache.find(key).grade is not None:
-            attempted = True
-
-    return attempted
+    found = model_data_cache.find(key)
+    return found and found.grade is not None
 
 
 def grade_for_percentage(grade_cutoffs, percentage):
