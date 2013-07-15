@@ -36,7 +36,7 @@ body.course.outline {
             display: none;
             width: 110px;
             padding: 5px 40px 5px 10px;
-            @include border-radius(3px);
+            border-radius: 3px;
             color: $lightGrey;
             text-align: right;
             font-weight: bold;
@@ -64,9 +64,9 @@ body.course.outline {
 
               .menu {
                 @include font-size(12);
-                @include border-radius(4px);
-                @include box-shadow(0 1px 2px rgba(0, 0, 0, .2));
-                @include transition(opacity .15s);
+                @include transition(opacity $tmg-f2 linear 0s);
+                border-radius: 4px;
+                box-shadow: 0 1px 2px rgba(0, 0, 0, .2);
                 z-index: 1;
                 display: none;
                 opacity: 0.0;
@@ -143,7 +143,7 @@ body.course.outline {
       border: 1px solid $mediumGrey;
       margin-top: 15px;
       padding-bottom: 12px;
-      @include box-shadow(0 1px 1px rgba(0, 0, 0, 0.1));
+      box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
 
       &:first-child {
           margin-top: 0;
@@ -199,7 +199,7 @@ body.course.outline {
       .datepair .date,
       .datepair .time {
           @include font-size(13);
-          @include box-shadow(none);
+          box-shadow: none;
           padding-left: 0;
           padding-right: 0;
           border: none;
@@ -246,8 +246,8 @@ body.course.outline {
               }
 
               .section-name-span {
+                @include transition(color $tmg-f2 linear 0s);
                 cursor: pointer;
-                @include transition(color .15s);
 
                 &:hover {
                   color: $orange;
@@ -277,7 +277,7 @@ body.course.outline {
 
           .section-published-date {
             float: right;
-            @include border-radius(3px);
+            border-radius: 3px;
             background: $lightGrey;
 
             .published-status {
@@ -312,7 +312,7 @@ body.course.outline {
 
               .status-label {
                 @include font-size(12);
-                @include border-radius(3px);
+                border-radius: 3px;
                 position: absolute;
                 top: 0;
                 right: 2px;
@@ -342,10 +342,9 @@ body.course.outline {
 
               .menu {
                 @include font-size(12);
-                @include border-radius(4px);
-                @include box-shadow(0 1px 2px rgba(0, 0, 0, .2));
-                @include transition(opacity .15s);
-                @include transition(display .15s);
+                @include transition(opacity $tmg-f2 linear 0s, display $tmg-f2 linear 0s);
+                border-radius: 4px;
+                box-shadow: 0 1px 2px rgba(0, 0, 0, .2);
                 z-index: 1;
                 display: none;
                 opacity: 0.0;
@@ -428,9 +427,9 @@ body.course.outline {
           }
 
           .expand-collapse-icon {
+              @include transition(none);
               float: left;
               margin: 25px 6px 16px 16px;
-              @include transition(none);
 
               &.expand {
                   background-position: 0 0;
@@ -453,8 +452,8 @@ body.course.outline {
       }
 
       .section-name-span {
+          @include transition(color $tmg-f2 linear 0s);
           cursor: pointer;
-          @include transition(color .15s);
 
           &:hover {
               color: $orange;
@@ -542,7 +541,7 @@ body.course.outline {
 
       [class^="icon-"] {
           @include font-size(11);
-          @include border-radius(20px);
+          border-radius: 20px;
           position: relative;
           top: -1px;
           display: inline-block;
@@ -582,7 +581,7 @@ body.course.outline {
       left: 110px;
       z-index: 9999;
       border: 1px solid #3C3C3C;
-      @include box-shadow(0 1px 15px rgba(0, 0, 0, .2));
+      box-shadow: 0 1px 15px rgba(0, 0, 0, .2);
   }
 
   .preview {
@@ -688,7 +687,7 @@ body.course.outline {
   }
 
   .ui-draggable-dragging {
-      @include box-shadow(0 1px 2px rgba(0, 0, 0, .3));
+      box-shadow: 0 1px 2px rgba(0, 0, 0, .3);
       border: 1px solid $darkGrey;
       opacity : 0.2;
       &:hover {

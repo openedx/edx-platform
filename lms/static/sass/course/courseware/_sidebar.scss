@@ -1,7 +1,7 @@
 section.course-index {
   @extend .sidebar;
   @extend .tran;
-  @include border-radius(3px 0 0 3px);
+  border-radius: 3px 0 0 3px;
   border-right: 1px solid $border-color-2;
 
   #open_close_accordion {
@@ -21,7 +21,7 @@ section.course-index {
     font-size: 14px;
 
     h3 {
-      @include border-radius(0);
+      border-radius: 0;
       margin: 0;
       overflow: visible;
 
@@ -44,8 +44,8 @@ section.course-index {
         color: #000;
 
         a {
-          @include border-radius(0);
-          @include box-shadow(none);
+          border-radius: 0;
+          box-shadow: none;
           padding-left: 19px;
         }
 
@@ -72,8 +72,8 @@ section.course-index {
       padding: 11px 14px;
       @include linear-gradient(top, $sidebar-chapter-bg-top, $sidebar-chapter-bg-bottom);
       background-color: $sidebar-chapter-bg;
-      @include box-shadow(0 1px 0 #fff inset, 0 -1px 0 rgba(0, 0, 0, .1) inset);
-      @include transition(background-color .1s);
+      box-shadow: 0 1px 0 #fff inset, 0 -1px 0 rgba(0, 0, 0, .1) inset;
+      @include transition(background-color .1s linear 0s);
 
       &.is-open {
         background: #fff;
@@ -85,7 +85,7 @@ section.course-index {
 
       &:last-child {
         border-radius: 0 0 0 3px;
-        @include box-shadow(0 1px 0 #fff inset);
+        box-shadow: 0 1px 0 #fff inset;
       }
 
       &:hover {
@@ -96,7 +96,7 @@ section.course-index {
     ul.ui-accordion-content {
       background: transparent;
       border: none;
-      @include border-radius(0);
+      border-radius: 0;
       margin: 0;
       padding: 9px 0 9px 9px;
       overflow: auto;
@@ -104,12 +104,12 @@ section.course-index {
 
       li {
         border-bottom: 0;
-        @include border-radius(0);
+        border-radius: 0;
         margin-bottom: 4px;
 
         a {
           background: transparent;
-          @include border-radius(4px);
+          border-radius: 4px;
           display: block;
           padding: 5px 36px 5px 10px;
           position: relative;
@@ -143,7 +143,7 @@ section.course-index {
           }
 
           &:active {
-            @include box-shadow(inset 0 1px 14px 0 rgba(0,0,0, 0.1));
+            box-shadow: inset 0 1px 14px 0 rgba(0,0,0, 0.1);
 
             &:after {
               opacity: 1.0;
@@ -165,12 +165,12 @@ section.course-index {
             font-weight: normal;
             color: #333;
             opacity: 0;
-            @include transition();
+            @include transition(none);
           }
 
           > a {
             border: 1px solid $border-color-1;
-            @include box-shadow(0 1px 0 rgba(255, 255, 255, .35) inset);
+            box-shadow: 0 1px 0 rgba(255, 255, 255, .35) inset;
             background: $sidebar-active-image;
 
             &:after {

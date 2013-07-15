@@ -10,9 +10,9 @@ class CourseUpdateTest(CourseTestCase):
         '''Go through each interface and ensure it works.'''
         # first get the update to force the creation
         url = reverse('course_info',
-                      kwargs={'org': self.course_location.org,
-                      'course': self.course_location.course,
-                      'name': self.course_location.name})
+                      kwargs={'org': self.course.location.org,
+                      'course': self.course.location.course,
+                      'name': self.course.location.name})
         self.client.get(url)
 
         init_content = '<iframe width="560" height="315" src="http://www.youtube.com/embed/RocY-Jd93XU" frameborder="0">'
@@ -20,8 +20,8 @@ class CourseUpdateTest(CourseTestCase):
         payload = {'content': content,
                    'date': 'January 8, 2013'}
         url = reverse('course_info_json',
-                      kwargs={'org': self.course_location.org,
-                              'course': self.course_location.course,
+                      kwargs={'org': self.course.location.org,
+                              'course': self.course.location.course,
                               'provided_id': ''})
 
         resp = self.client.post(url, json.dumps(payload), "application/json")
@@ -31,8 +31,8 @@ class CourseUpdateTest(CourseTestCase):
         self.assertHTMLEqual(payload['content'], content)
 
         first_update_url = reverse('course_info_json',
-                                   kwargs={'org': self.course_location.org,
-                                           'course': self.course_location.course,
+                                   kwargs={'org': self.course.location.org,
+                                           'course': self.course.location.course,
                                            'provided_id': payload['id']})
         content += '<div>div <p>p<br/></p></div>'
         payload['content'] = content
@@ -47,8 +47,8 @@ class CourseUpdateTest(CourseTestCase):
         payload = {'content': content,
                    'date': 'January 11, 2013'}
         url = reverse('course_info_json',
-                      kwargs={'org': self.course_location.org,
-                              'course': self.course_location.course,
+                      kwargs={'org': self.course.location.org,
+                              'course': self.course.location.course,
                               'provided_id': ''})
 
         resp = self.client.post(url, json.dumps(payload), "application/json")
@@ -58,8 +58,8 @@ class CourseUpdateTest(CourseTestCase):
         self.assertHTMLEqual(content, payload['content'], "self closing ol")
 
         url = reverse('course_info_json',
-                      kwargs={'org': self.course_location.org,
-                              'course': self.course_location.course,
+                      kwargs={'org': self.course.location.org,
+                              'course': self.course.location.course,
                               'provided_id': ''})
         resp = self.client.get(url)
         payload = json.loads(resp.content)
@@ -73,8 +73,8 @@ class CourseUpdateTest(CourseTestCase):
 
         # now try to update a non-existent update
         url = reverse('course_info_json',
-                      kwargs={'org': self.course_location.org,
-                              'course': self.course_location.course,
+                      kwargs={'org': self.course.location.org,
+                              'course': self.course.location.course,
                               'provided_id': '9'})
         content = 'blah blah'
         payload = {'content': content,
@@ -87,8 +87,8 @@ class CourseUpdateTest(CourseTestCase):
         content = '<garbage tag No closing brace to force <span>error</span>'
         payload = {'content': content,
                    'date': 'January 11, 2013'}
-        url = reverse('course_info_json', kwargs={'org': self.course_location.org,
-                                                  'course': self.course_location.course,
+        url = reverse('course_info_json', kwargs={'org': self.course.location.org,
+                                                  'course': self.course.location.course,
                                                   'provided_id': ''})
 
         self.assertContains(
@@ -99,8 +99,8 @@ class CourseUpdateTest(CourseTestCase):
         content = "<p><br><br></p>"
         payload = {'content': content,
                    'date': 'January 11, 2013'}
-        url = reverse('course_info_json', kwargs={'org': self.course_location.org,
-                                                  'course': self.course_location.course,
+        url = reverse('course_info_json', kwargs={'org': self.course.location.org,
+                                                  'course': self.course.location.course,
                                                   'provided_id': ''})
 
         resp = self.client.post(url, json.dumps(payload), "application/json")
@@ -108,8 +108,8 @@ class CourseUpdateTest(CourseTestCase):
         self.assertHTMLEqual(content, json.loads(resp.content)['content'])
 
         # now try to delete a non-existent update
-        url = reverse('course_info_json', kwargs={'org': self.course_location.org,
-                                                  'course': self.course_location.course,
+        url = reverse('course_info_json', kwargs={'org': self.course.location.org,
+                                                  'course': self.course.location.course,
                                                   'provided_id': '19'})
         payload = {'content': content,
                    'date': 'January 21, 2013'}
@@ -119,8 +119,8 @@ class CourseUpdateTest(CourseTestCase):
         content = 'blah blah'
         payload = {'content': content,
                    'date': 'January 28, 2013'}
-        url = reverse('course_info_json', kwargs={'org': self.course_location.org,
-                                                  'course': self.course_location.course,
+        url = reverse('course_info_json', kwargs={'org': self.course.location.org,
+                                                  'course': self.course.location.course,
                                                   'provided_id': ''})
         resp = self.client.post(url, json.dumps(payload), "application/json")
         payload = json.loads(resp.content)
@@ -128,16 +128,16 @@ class CourseUpdateTest(CourseTestCase):
         self.assertHTMLEqual(content, payload['content'], "single iframe")
         # first count the entries
         url = reverse('course_info_json',
-                      kwargs={'org': self.course_location.org,
-                              'course': self.course_location.course,
+                      kwargs={'org': self.course.location.org,
+                              'course': self.course.location.course,
                               'provided_id': ''})
         resp = self.client.get(url)
         payload = json.loads(resp.content)
         before_delete = len(payload)
 
         url = reverse('course_info_json',
-                      kwargs={'org': self.course_location.org,
-                              'course': self.course_location.course,
+                      kwargs={'org': self.course.location.org,
+                              'course': self.course.location.course,
                               'provided_id': this_id})
         resp = self.client.delete(url)
         payload = json.loads(resp.content)

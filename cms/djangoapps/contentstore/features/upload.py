@@ -9,7 +9,7 @@ import random
 import os
 
 TEST_ROOT = settings.COMMON_TEST_DATA_ROOT
-HTTP_PREFIX = "http://localhost:8001"
+HTTP_PREFIX = "http://localhost:%s" % settings.LETTUCE_SERVER_PORT
 
 
 @step(u'I go to the files and uploads page')

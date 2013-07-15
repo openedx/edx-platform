@@ -98,7 +98,7 @@ body.course.settings {
 
     .tip {
       @extend .t-copy-sub2;
-      @include transition(color, 0.15s, ease-in-out);
+      @include transition(color $tmg-f2 ease-in-out 0s);
       display: block;
       margin-top: ($baseline/4);
       color: $gray-l3;
@@ -115,12 +115,12 @@ body.course.settings {
     // buttons
     .remove-item {
       @include white-button;
-      @extend .t-action-3;
+      @extend .t-action3;
       font-weight: 400;
     }
 
     .new-button {
-      // @extend .t-action-3; - bad buttons won't render this properly
+      // @extend .t-action3; - bad buttons won't render this properly
       @include font-size(14);
     }
 
@@ -155,7 +155,7 @@ body.course.settings {
 
         label {
           @extend .t-copy-sub1;
-          @include transition(color, 0.15s, ease-in-out);
+          @include transition(color $tmg-f2 ease-in-out 0s);
           margin: 0 0 ($baseline/4) 0;
           font-weight: 400;
 
@@ -214,7 +214,7 @@ body.course.settings {
 
         .field-group {
           @include box-sizing(border-box);
-          @include border-radius(3px);
+          border-radius: 3px;
           background: $gray-l5;
           padding: $baseline;
 
@@ -266,7 +266,7 @@ body.course.settings {
 
         input, textarea {
           @extend .t-copy-lead1;
-          @include box-shadow(none);
+          box-shadow: none;
           border: none;
           background: none;
           padding: 0;
@@ -294,8 +294,8 @@ body.course.settings {
 
       // course link note
       .note-promotion-courseURL {
-        @include box-shadow(0 2px 1px $shadow-l1);
-        @include border-radius(($baseline/5));
+        box-shadow: 0 2px 1px $shadow-l1;
+        border-radius: ($baseline/5);
         margin-top: ($baseline*1.5);
         border: 1px solid $gray-l2;
         padding: ($baseline/2) 0 0 0;
@@ -330,19 +330,18 @@ body.course.settings {
         }
 
         .list-actions {
-          @include box-shadow(inset 0 1px 1px $shadow-l1);
+          box-shadow: inset 0 1px 1px $shadow-l1;
           border-top: 1px solid $gray-l2;
           padding:  ($baseline/2);
           background: $gray-l5;
 
           .action-primary {
             @include blue-button();
-            @extend .t-action-3;
+            @extend .t-action3;
             font-weight: 600;
 
             [class^="icon-"] {
-              @extend .t-icon;
-              @include font-size(16);
+              @extend .t-icon5;
               display: inline-block;
               vertical-align: middle;
               margin-top: -3px;
@@ -410,7 +409,7 @@ body.course.settings {
 
       .input-existing {
         @include box-sizing(border-box);
-        @include border-radius(3px);
+        border-radius: 3px;
         background: $gray-l5;
         padding: ($baseline/2);
 
@@ -453,7 +452,7 @@ body.course.settings {
       .new-grade-button {
         @include box-sizing(border-box);
         @include linear-gradient(top, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0));
-        @include box-shadow(0 1px 0 rgba(255, 255, 255, .3) inset);
+        box-shadow: 0 1px 0 rgba(255, 255, 255, .3) inset;
         width: flex-grid(1,9);
         height: ($baseline*2);
         position: relative;
@@ -555,7 +554,7 @@ body.course.settings {
               top: 0;
               height: 50px;
               text-align: right;
-              @include border-radius(2px);
+              border-radius: 2px;
 
               &:hover,
               &.is-dragging {
@@ -620,7 +619,7 @@ body.course.settings {
                 height: 50px;
                 width: 2px;
                 background-color: #fff;
-                @include box-shadow(-1px 0 3px rgba(0,0,0,0.1));
+                box-shadow: -1px 0 3px rgba(0,0,0,0.1);
 
                 cursor: ew-resize;
                 @include transition(none);
@@ -714,7 +713,7 @@ body.course.settings {
           }
 
           .tip {
-            @include transition (opacity 0.5s ease-in-out 0s);
+            @include transition(opacity $tmg-f1 ease-in-out 0s);
             opacity: 0.0;
             position: absolute;
             bottom: ($baseline*1.25);
@@ -768,7 +767,7 @@ body.course.settings {
       .CodeMirror {
         @extend .t-copy-base;
         @include box-sizing(border-box);
-        @include box-shadow(0 1px 2px rgba(0, 0, 0, .1) inset);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, .1) inset;
         @include linear-gradient($lightGrey, tint($lightGrey, 90%));
         padding: 5px 8px;
         border: 1px solid $mediumGrey;

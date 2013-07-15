@@ -44,12 +44,12 @@
         }
 
         a {
-          @include border-radius(2px);
+          border-radius: 2px;
           padding: ($baseline/2) ($baseline*0.75);
           background: transparent;
 
           [class^="icon-"] {
-            @include transition(top .25s ease-in-out .25s);
+            @include transition(top $tmg-f2 ease-in-out 0.25s);
             @include font-size(15);
             display: inline-block;
             vertical-align: middle;

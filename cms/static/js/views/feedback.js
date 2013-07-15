@@ -140,7 +140,21 @@ CMS.Views.SystemFeedback = Backbone.View.extend({
 CMS.Views.Alert = CMS.Views.SystemFeedback.extend({
     options: $.extend({}, CMS.Views.SystemFeedback.prototype.options, {
         type: "alert"
-    })
+    }),
+    slide_speed: 900,
+    show: function() {
+        CMS.Views.SystemFeedback.prototype.show.apply(this, arguments);
+        this.$el.hide();
+        this.$el.slideDown(this.slide_speed);
+        return this;
+    },
+    hide: function () {
+        this.$el.slideUp({
+            duration: this.slide_speed
+        });
+        setTimeout(_.bind(CMS.Views.SystemFeedback.prototype.hide, this, arguments),
+                   this.slideSpeed);
+    }
 });
 CMS.Views.Notification = CMS.Views.SystemFeedback.extend({
     options: $.extend({}, CMS.Views.SystemFeedback.prototype.options, {
@@ -171,7 +185,7 @@ CMS.Views.Prompt = CMS.Views.SystemFeedback.extend({
 var capitalCamel, types, intents;
 capitalCamel = _.compose(_.str.capitalize, _.str.camelize);
 types = ["alert", "notification", "prompt"];
-intents = ["warning", "error", "confirmation", "announcement", "step-required", "help", "saving"];
+intents = ["warning", "error", "confirmation", "announcement", "step-required", "help", "mini"];
 _.each(types, function(type) {
     _.each(intents, function(intent) {
         // "class" is a reserved word in Javascript, so use "klass" instead
@@ -186,3 +200,8 @@ _.each(types, function(type) {
         klass[capitalCamel(intent)] = subklass;
     });
 });
+
+// set more sensible defaults for Notification-Mini views
+var miniOptions = CMS.Views.Notification.Mini.prototype.options;
+miniOptions.minShown = 1250;
+miniOptions.closeIcon = false;

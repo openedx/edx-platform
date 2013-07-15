@@ -64,7 +64,7 @@ p {
     color: $link-color;
     font: normal 1em/1em $serif;
     text-decoration: none;
-    @include transition(all, 0.1s, linear);
+    @include transition(all 0.1s linear 0s);
 
     &:hover {
       color: $link-color;
@@ -77,7 +77,7 @@ a:link, a:visited {
   color: $link-color;
   font: normal 1em/1em $sans-serif;
   text-decoration: none;
-  @include transition(all, 0.1s, linear);
+  @include transition(all 0.1s linear 0s);
 
   &:hover {
     text-decoration: underline;
@@ -204,7 +204,7 @@ mark {
   max-width: 1140px;
   min-width: 720px;
   margin: auto;
-  @include border-radius(0 0 3px 3px);
+  border-radius: 0 0 3px 3px;
   background: #f4f4e0;
   color: #3c3c3c;
   padding: 5px 20px 8px;
@@ -232,7 +232,7 @@ mark {
     cursor: pointer;
     border: 1px solid #ccc;
     border-top-style: none;
-    @include border-radius(0px 0px 10px 10px);
+    border-radius: 0px 0px 10px 10px;
     background: transparentize(#fff, 0.25);
     color: transparentize(#333, 0.25);
     font-weight: bold;
@@ -261,12 +261,12 @@ mark {
 
     &#feedback_link_problem {
       border-bottom-style: none;
-      @include border-radius(10px 10px 0px 0px);
+      border-radius: 10px 10px 0px 0px;
     }
 
     &#feedback_link_question {
       border-top-style: none;
-      @include border-radius(0px 0px 10px 10px);
+      border-radius: 0px 0px 10px 10px;
     }
 
     &:hover {

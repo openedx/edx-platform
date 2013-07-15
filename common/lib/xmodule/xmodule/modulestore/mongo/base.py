@@ -256,7 +256,7 @@ class MongoModuleStore(ModuleStoreBase):
                  user=None, password=None, request_cache=None,
                  metadata_inheritance_cache_subsystem=None, **kwargs):
 
-        ModuleStoreBase.__init__(self)
+        super(MongoModuleStore, self).__init__()
 
         self.collection = pymongo.connection.Connection(
             host=host,

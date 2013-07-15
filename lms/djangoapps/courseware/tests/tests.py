@@ -163,14 +163,13 @@ class TestCoursesLoadTestCase_MongoModulestore(PageLoaderTestCase):
         import_from_xml(module_store, TEST_DATA_DIR, ['toy'])
         self.check_random_page_loads(module_store)
 
-    def test_full_textbooks_loads(self):
+    def test_toy_textbooks_loads(self):
         module_store = modulestore()
-        import_from_xml(module_store, TEST_DATA_DIR, ['full'])
+        import_from_xml(module_store, TEST_DATA_DIR, ['toy'])
 
-        course = module_store.get_item(Location(['i4x', 'edX', 'full', 'course', '6.002_Spring_2012', None]))
+        course = module_store.get_item(Location(['i4x', 'edX', 'toy', 'course', '2012_Fall', None]))
 
         self.assertGreater(len(course.textbooks), 0)
-
 
 @override_settings(MODULESTORE=TEST_DATA_DRAFT_MONGO_MODULESTORE)
 class TestDraftModuleStore(TestCase):

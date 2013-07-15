@@ -2,7 +2,6 @@ $cell-border-color: #e1e1e1;
 $table-border-color: #c8c8c8;
 
 div.gradebook-wrapper {
-  @extend .table-wrapper;
 
   section.gradebook-content {
     @extend .content;
@@ -24,9 +23,9 @@ div.gradebook-wrapper {
     	background: url(../images/search-icon.png) no-repeat 9px center #f6f6f6;
     	font-family: $sans-serif;
     	font-size: 11px;
-    	@include box-shadow(0 1px 4px rgba(0, 0, 0, .12) inset);
+    	box-shadow: 0 1px 4px rgba(0, 0, 0, .12) inset;
     	outline: none;
-    	@include transition(border-color .15s);
+    	@include transition(border-color .15s linear 0s);
 
     	&::-webkit-input-placeholder,
     	&::-moz-input-placeholder {

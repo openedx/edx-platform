@@ -4,6 +4,7 @@ from collections import defaultdict
 
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_http_methods
 from django.core.exceptions import PermissionDenied
 from django_future.csrf import ensure_csrf_cookie
 from django.conf import settings
@@ -15,7 +16,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.util.date_utils import get_default_time_display
 
 from xblock.core import Scope
-from util.json_request import expect_json
+from util.json_request import expect_json, JsonResponse
 
 from contentstore.module_info_model import get_module_info, set_module_info
 from contentstore.utils import get_modulestore, get_lms_link_for_item, \
@@ -23,7 +24,7 @@ from contentstore.utils import get_modulestore, get_lms_link_for_item, \
 
 from models.settings.course_grading import CourseGradingModel
 
-from .requests import get_request_method, _xmodule_recurse
+from .requests import _xmodule_recurse
 from .access import has_access
 
 __all__ = ['OPEN_ENDED_COMPONENT_TYPES',
@@ -209,7 +210,6 @@ def edit_unit(request, location):
 
     return render_to_response('unit.html', {
         'context_course': course,
-        'active_tab': 'courseware',
         'unit': item,
         'unit_location': location,
         'components': components,
@@ -234,14 +234,12 @@ def assignment_type_update(request, org, course, category, name):
     '''
     location = Location(['i4x', org, course, category, name])
     if not has_access(request.user, location):
-        raise HttpResponseForbidden()
+        return HttpResponseForbidden()
 
     if request.method == 'GET':
-        return HttpResponse(json.dumps(CourseGradingModel.get_section_grader_type(location)),
-                            mimetype="application/json")
+        return JsonResponse(CourseGradingModel.get_section_grader_type(location))
     elif request.method == 'POST':  # post or put, doesn't matter.
-        return HttpResponse(json.dumps(CourseGradingModel.update_section_grader_type(location, request.POST)),
-                            mimetype="application/json")
+        return JsonResponse(CourseGradingModel.update_section_grader_type(location, request.POST))
 
 
 @login_required
@@ -291,6 +289,7 @@ def unpublish_unit(request):
 
 
 @expect_json
+@require_http_methods(("GET", "POST", "PUT"))
 @login_required
 @ensure_csrf_cookie
 def module_info(request, module_location):
@@ -300,8 +299,6 @@ def module_info(request, module_location):
     if not has_access(request.user, location):
         raise PermissionDenied()
 
-    real_method = get_request_method(request)
-
     rewrite_static_links = request.GET.get('rewrite_url_links', 'True') in ['True', 'true']
     logging.debug('rewrite_static_links = {0} {1}'.format(request.GET.get('rewrite_url_links', 'False'), rewrite_static_links))
 
@@ -309,9 +306,7 @@ def module_info(request, module_location):
     if not has_access(request.user, location):
         raise PermissionDenied()
 
-    if real_method == 'GET':
-        return HttpResponse(json.dumps(get_module_info(get_modulestore(location), location, rewrite_static_links=rewrite_static_links)), mimetype="application/json")
-    elif real_method == 'POST' or real_method == 'PUT':
-        return HttpResponse(json.dumps(set_module_info(get_modulestore(location), location, request.POST)), mimetype="application/json")
-    else:
-        return HttpResponseBadRequest()
+    if request.method == 'GET':
+        return JsonResponse(get_module_info(get_modulestore(location), location, rewrite_static_links=rewrite_static_links))
+    elif request.method in ("POST", "PUT"):
+        return JsonResponse(set_module_info(get_modulestore(location), location, request.POST))

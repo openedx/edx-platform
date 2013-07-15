@@ -24,7 +24,7 @@ def add_update(_step, text):
 @step(u'I should( not)? see the update "([^"]*)"$')
 def check_update(_step, doesnt_see_update, text):
     update_css = 'div.update-contents'
-    update = world.css_find(update_css)
+    update = world.css_find(update_css, wait_time=1)
     if doesnt_see_update:
         assert len(update) == 0 or not text in update.html
     else:

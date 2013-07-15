@@ -1,7 +1,6 @@
 #! /bin/bash
 
-LOG_SPEC="$1..$2"
-LOG_CMD="git --no-pager log $LOG_SPEC"
+LOG_CMD="git --no-pager log $1..$2"
 
 RESPONSIBLE=$(sort -u <($LOG_CMD --format='tformat:%ae' && $LOG_CMD --format='tformat:%ce'))
 
