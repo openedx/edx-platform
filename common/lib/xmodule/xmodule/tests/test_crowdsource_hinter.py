@@ -2,12 +2,14 @@
 Tests the crowdsourced hinter xmodule.
 """
 
-from mock import Mock
+from mock import Mock, MagicMock
 import unittest
 import copy
 
 from xmodule.crowdsource_hinter import CrowdsourceHinterModule
 from xmodule.vertical_module import VerticalModule, VerticalDescriptor
+
+from capa.responsetypes import StudentInputError
 
 from . import get_test_system
 
@@ -94,10 +96,52 @@ class CHModuleFactory(object):
         if moderate is not None:
             model_data['moderate'] = moderate
 
-        descriptor = Mock(weight="1")
+        descriptor = Mock(weight='1')
+        # Make the descriptor have a capa problem child.
+        capa_descriptor = MagicMock()
+        capa_descriptor.name = 'capa'
+        descriptor.get_children = lambda: [capa_descriptor]
+
+        # Make a fake capa module.
+        capa_module = MagicMock()
+        capa_module.responders = {'responder0': MagicMock()}
+        capa_module.displayable_items = lambda: [capa_module]
+
         system = get_test_system()
+        # Make the system have a marginally-functional get_module
+
+        def fake_get_module(descriptor):
+            """
+            A fake module-maker.
+            """
+            if descriptor.name == 'capa':
+                return capa_module
+        system.get_module = fake_get_module
+
         module = CrowdsourceHinterModule(system, descriptor, model_data)
 
+        return module
+
+    @staticmethod
+    def setup_formula_response(module):
+        """
+        Adds additional mock methods to the module, so that we can test
+        formula responses.
+        """
+        # Do a bunch of monkey patching, to mock the lon-capa problem.
+        responder = MagicMock()
+        responder.randomize_variables = MagicMock(return_value=4)
+
+        def fake_hash_answers(answer, test_values):
+            """ A fake answer hasher """
+            if test_values == 4 and answer == 'x*y^2':
+                return 'good'
+            raise StudentInputError
+
+        responder.hash_answers = fake_hash_answers
+        lcp = MagicMock()
+        lcp.responders = {'responder0': responder}
+        module.get_display_items()[0].lcp = lcp
         return module
 
 
@@ -226,6 +270,44 @@ class CrowdsourceHinterTest(unittest.TestCase):
         self.assertTrue('Test numerical problem.' in out_html)
         self.assertTrue('Another test numerical problem.' in out_html)
 
+    def test_numerical_answer_to_str(self):
+        """
+        Tests the get request to string converter for numerical responses.
+        """
+        mock_module = CHModuleFactory.create()
+        get = {'response1': '4'}
+        parsed = mock_module.numerical_answer_to_str(get)
+        self.assertTrue(parsed == '4.0')
+
+    def test_formula_answer_to_str(self):
+        """
+        Tests the get request to string converter for formula responses.
+        """
+        mock_module = CHModuleFactory.create()
+        get = {'response1': 'x*y^2'}
+        parsed = mock_module.formula_answer_to_str(get)
+        self.assertTrue(parsed == 'x*y^2')
+
+    def test_formula_answer_signature(self):
+        """
+        Tests the answer signature generator for formula responses.
+        """
+        mock_module = CHModuleFactory.create()
+        mock_module = CHModuleFactory.setup_formula_response(mock_module)
+        answer = 'x*y^2'
+        out = mock_module.formula_answer_signature(answer)
+        self.assertTrue(out == 'good')
+
+    def test_formula_answer_signature_failure(self):
+        """
+        Makes sure that bad answer strings return None as a signature.
+        """
+        mock_module = CHModuleFactory.create()
+        mock_module = CHModuleFactory.setup_formula_response(mock_module)
+        answer = 'fish'
+        out = mock_module.formula_answer_signature(answer)
+        self.assertTrue(out is None)
+
     def test_gethint_0hint(self):
         """
         Someone asks for a hint, when there's no hint to give.
@@ -343,6 +425,44 @@ class CrowdsourceHinterTest(unittest.TestCase):
         self.assertTrue(['Best hint', 40] in dict_out['hint_and_votes'])
         self.assertTrue(['Another hint', 31] in dict_out['hint_and_votes'])
 
+    def test_vote_unparsable(self):
+        """
+        A user somehow votes for an unparsable answer.
+        Should return a friendly error.
+        (This is an unusual exception path - I don't know how it occurs,
+        except if you manually make a post request.  But, it seems to happen
+        occasionally.)
+        """
+        mock_module = CHModuleFactory.create()
+        # None means that the answer couldn't be parsed.
+        mock_module.answer_signature = lambda text: None
+        json_in = {'answer': 'fish', 'hint': 3, 'pk_list': '[]'}
+        dict_out = mock_module.tally_vote(json_in)
+        print dict_out
+        self.assertTrue(dict_out == {'error': 'Failure in voting!'})
+
+    def test_vote_nohint(self):
+        """
+        A user somehow votes for a hint that doesn't exist.
+        Should return a friendly error.
+        """
+        mock_module = CHModuleFactory.create()
+        json_in = {'answer': '24.0', 'hint': '25', 'pk_list': '[]'}
+        dict_out = mock_module.tally_vote(json_in)
+        self.assertTrue(dict_out == {'error': 'Failure in voting!'})
+
+    def test_vote_badpklist(self):
+        """
+        Some of the pk's specified in pk_list are invalid.
+        Should just skip those.
+        """
+        mock_module = CHModuleFactory.create()
+        json_in = {'answer': '24.0', 'hint': '0', 'pk_list': json.dumps([0, 12])}
+        hint_and_votes = mock_module.tally_vote(json_in)['hint_and_votes']
+        self.assertTrue(['Best hint', 41] in hint_and_votes)
+        self.assertTrue(len(hint_and_votes) == 1)
+
+
     def test_submithint_nopermission(self):
         """
         A user tries to submit a hint, but he has already voted.
@@ -398,6 +518,17 @@ class CrowdsourceHinterTest(unittest.TestCase):
         json_in = {'answer': '29.0', 'hint': '<script> alert("Trololo"); </script>'}
         mock_module.submit_hint(json_in)
         self.assertTrue(mock_module.hints['29.0']['0'][0] == u'&lt;script&gt; alert(&quot;Trololo&quot;); &lt;/script&gt;')
+
+    def test_submithint_unparsable(self):
+        mock_module = CHModuleFactory.create()
+        mock_module.answer_signature = lambda text: None
+        json_in = {'answer': 'fish', 'hint': 'A hint'}
+        dict_out = mock_module.submit_hint(json_in)
+        print dict_out
+        print mock_module.hints
+        self.assertTrue('error' in dict_out)
+        self.assertTrue(None not in mock_module.hints)
+        self.assertTrue('fish' not in mock_module.hints)
 
     def test_template_gethint(self):
         """

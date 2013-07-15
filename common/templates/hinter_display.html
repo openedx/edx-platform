@@ -137,6 +137,10 @@ What would you say to help someone who got this wrong answer?
     ${simple_message()}
 % endif
 
+% if op == "error":
+    ${error}
+% endif
+
 % if op == "vote":
     ${show_votes()}
 % endif

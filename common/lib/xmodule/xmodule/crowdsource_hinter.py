@@ -173,6 +173,9 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
 
         if out is None:
             out = {'op': 'empty'}
+        elif 'error' in out:
+            # Error in processing.
+            out.update({'op': 'error'})
         else:
             out.update({'op': dispatch})
         return json.dumps({'contents': self.system.render_template('hinter_display.html', out)})
@@ -288,14 +291,23 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         Returns key 'hint_and_votes', a list of (hint_text, #votes) pairs.
         """
         if self.user_voted:
-            return json.dumps({'contents': 'Sorry, but you have already voted!'})
+            return {'error': 'Sorry, but you have already voted!'}
         ans = data['answer']
         signature = self.answer_signature(ans)
+        if signature is None:
+            # Uh oh.  Invalid answer.
+            log.exception('Failure in hinter tally_vote: Unable to parse answer: ' + ans)
+            return {'error': 'Failure in voting!'}
         hint_pk = str(data['hint'])
         pk_list = json.loads(data['pk_list'])
         # We use temp_dict because we need to do a direct write for the database to update.
         temp_dict = self.hints
-        temp_dict[signature][hint_pk][1] += 1
+        try:
+            temp_dict[signature][hint_pk][1] += 1
+        except KeyError:
+            log.exception('Failure in hinter tally_vote: User voted for non-existant hint: Answer=' +
+                          ans + ' pk=' + hint_pk)
+            return {'error': 'Failure in voting!'}
         self.hints = temp_dict
         # Don't let the user vote again!
         self.user_voted = True
@@ -303,7 +315,10 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         # Return a list of how many votes each hint got.
         hint_and_votes = []
         for vote_pk in pk_list:
-            hint_and_votes.append(temp_dict[signature][str(vote_pk)])
+            try:
+                hint_and_votes.append(temp_dict[signature][str(vote_pk)])
+            except KeyError:
+                log.exception('In hinter tally_vote: pk_list contains non-existant pk: ' + str(vote_pk))
 
         hint_and_votes.sort(key=lambda pair: pair[1], reverse=True)
         # Reset self.previous_answers.
@@ -324,6 +339,9 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         hint = escape(data['hint'])
         answer = data['answer']
         signature = self.answer_signature(answer)
+        if signature is None:
+            log.exception('Failure in hinter submit_hint: Unable to parse answer: ' + answer)
+            return {'error': 'Could not submit answer'}
         # Only allow a student to vote or submit a hint once.
         if self.user_voted:
             return {'message': 'Sorry, but you have already voted!'}
