@@ -10,7 +10,8 @@ This command that does that.
 
 import datetime
 import json
-from optparse import make_option
+import logging
+import optparse
 import traceback
 
 from django.core.management.base import NoArgsCommand
@@ -23,7 +24,7 @@ class Command(NoArgsCommand):
     help = "Deletes unneeded rows from the StudentModuleHistory table."
 
     option_list = NoArgsCommand.option_list + (
-        make_option(
+        optparse.make_option(
             '--dry-run',
             action='store_true',
             default=False,
@@ -32,6 +33,9 @@ class Command(NoArgsCommand):
     )
 
     def handle_noargs(self, **options):
+        # We don't want to see the SQL output from the db layer.
+        logging.getLogger("").setLevel(logging.INFO)
+
         smhc = StudentModuleHistoryCleaner(
             dry_run=options["dry_run"],
         )
@@ -55,6 +59,8 @@ class StudentModuleHistoryCleaner(object):
 
         batch_size = batch_size or self.BATCH_SIZE
 
+        connection.enter_transaction_management()
+
         self.last_student_module_id = self.get_last_student_module_id()
         self.load_state()
 
@@ -65,7 +71,8 @@ class StudentModuleHistoryCleaner(object):
                 except Exception:       # pylint: disable=W0703
                     trace = traceback.format_exc()
                     self.say("Couldn't clean student_module_id {}:\n{}".format(smid, trace))
-            self.commit()
+            if not self.dry_run:
+                self.commit()
             self.save_state()
 
     def say(self, message):
