@@ -17,9 +17,9 @@ def i_created_discussion_tag(step):
 def i_see_only_the_settings_and_values(step):
     world.verify_all_setting_entries(
         [
-            ['Category', "Week 1", True],
-            ['Display Name', "Discussion Tag", True],
-            ['Subcategory', "Topic-Level Student-Visible Label", True]
+            ['Category', "Week 1", False],
+            ['Display Name', "Discussion Tag", False],
+            ['Subcategory', "Topic-Level Student-Visible Label", False]
         ])
 
 

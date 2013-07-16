@@ -18,8 +18,9 @@ def i_created_blank_common_problem(step):
     world.create_component_instance(
         step,
         '.large-problem-icon',
-        'i4x://edx/templates/problem/Blank_Common_Problem',
-        '.xmodule_CapaModule'
+        'problem',
+        '.xmodule_CapaModule',
+        'blank_common.yaml'
     )
 
 
@@ -32,11 +33,12 @@ def i_edit_and_select_settings(step):
 def i_see_five_settings_with_values(step):
     world.verify_all_setting_entries(
         [
-            [DISPLAY_NAME, "Blank Common Problem", True],
+            [DISPLAY_NAME, "New problem", True],
             [MAXIMUM_ATTEMPTS, "", False],
             [PROBLEM_WEIGHT, "", False],
-            [RANDOMIZATION, "Never", True],
-            [SHOW_ANSWER, "Finished", True]
+            # Not sure why these are True other than via inspection
+            [RANDOMIZATION, "Always", True],
+            [SHOW_ANSWER, "Closed", True]
         ])
 
 
@@ -203,7 +205,7 @@ def verify_modified_display_name_with_special_chars():
 
 
 def verify_unset_display_name():
-    world.verify_setting_entry(world.get_setting_entry(DISPLAY_NAME), DISPLAY_NAME, '', False)
+    world.verify_setting_entry(world.get_setting_entry(DISPLAY_NAME), DISPLAY_NAME, 'Blank Advanced Problem', False)
 
 
 def set_weight(weight):

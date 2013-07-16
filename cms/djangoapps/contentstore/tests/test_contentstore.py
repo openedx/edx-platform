@@ -135,7 +135,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.check_components_on_page(ADVANCED_COMPONENT_TYPES, ['Video Alpha',
                                                                  'Word cloud',
                                                                  'Annotation',
-                                                                 'Open Ended Response',
+                                                                 'Open Ended Grading',
                                                                  'Peer Grading Interface'])
 
     def test_advanced_components_require_two_clicks(self):
@@ -1271,6 +1271,28 @@ class ContentStoreTest(ModuleStoreTestCase):
 
         self.assertEqual(timedelta(1), new_module.lms.graceperiod)
 
+    def test_default_metadata_inheritance(self):
+        course = CourseFactory.create()
+        vertical = ItemFactory.create(parent_location=course.location)
+        course.children.append(vertical)
+        # in memory
+        self.assertIsNotNone(course.start)
+        self.assertEqual(course.start, vertical.lms.start)
+        self.assertEqual(course.textbooks, [])
+        self.assertIn('GRADER', course.grading_policy)
+        self.assertIn('GRADE_CUTOFFS', course.grading_policy)
+        self.assertGreaterEqual(len(course.checklists), 4)
+
+        # by fetching
+        module_store = modulestore('direct')
+        fetched_course = module_store.get_item(course.location)
+        fetched_item = module_store.get_item(vertical.location)
+        self.assertIsNotNone(fetched_course.start)
+        self.assertEqual(course.start, fetched_course.start)
+        self.assertEqual(fetched_course.start, fetched_item.lms.start)
+        self.assertEqual(course.textbooks, fetched_course.textbooks)
+        # is this test too strict? i.e., it requires the dicts to be ==
+        self.assertEqual(course.checklists, fetched_course.checklists)
 
 class TemplateTestCase(ModuleStoreTestCase):
 

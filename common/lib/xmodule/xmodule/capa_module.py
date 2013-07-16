@@ -77,6 +77,14 @@ class CapaFields(object):
     """
     Define the possible fields for a Capa problem
     """
+    display_name = String(
+        display_name="Display Name",
+        help="This name appears in the horizontal navigation at the top of the page.",
+        scope=Scope.settings,
+        # it'd be nice to have a useful default but it screws up other things; so,
+        # use display_name_with_default for those
+        default="Blank Advanced Problem"
+    )
     attempts = Integer(help="Number of attempts taken by the student on this problem",
                        default=0, scope=Scope.user_state)
     max_attempts = Integer(
@@ -94,7 +102,8 @@ class CapaFields(object):
         display_name="Show Answer",
         help=("Defines when to show the answer to the problem. "
               "A default value can be set in Advanced Settings."),
-        scope=Scope.settings, default="closed",
+        scope=Scope.settings,
+        default="closed",
         values=[
             {"display_name": "Always", "value": "always"},
             {"display_name": "Answered", "value": "answered"},
@@ -106,21 +115,24 @@ class CapaFields(object):
     )
     force_save_button = Boolean(
         help="Whether to force the save button to appear on the page",
-        scope=Scope.settings, default=False
+        scope=Scope.settings,
+        default=False
     )
     rerandomize = Randomization(
         display_name="Randomization",
         help="Defines how often inputs are randomized when a student loads the problem. "
-        "This setting only applies to problems that can have randomly generated numeric values. "
-        "A default value can be set in Advanced Settings.",
-        default="always", scope=Scope.settings, values=[
+             "This setting only applies to problems that can have randomly generated numeric values. "
+             "A default value can be set in Advanced Settings.",
+        default="always",
+        scope=Scope.settings,
+        values=[
             {"display_name": "Always", "value": "always"},
             {"display_name": "On Reset", "value": "onreset"},
             {"display_name": "Never", "value": "never"},
             {"display_name": "Per Student", "value": "per_student"}
         ]
     )
-    data = String(help="XML data for the problem", scope=Scope.content)
+    data = String(help="XML data for the problem", scope=Scope.content, default="<problem></problem>")
     correct_map = Dict(help="Dictionary with the correctness of current student answers",
                        scope=Scope.user_state, default={})
     input_state = Dict(help="Dictionary for maintaining the state of inputtypes", scope=Scope.user_state)
@@ -134,12 +146,11 @@ class CapaFields(object):
         values={"min": 0, "step": .1},
         scope=Scope.settings
     )
-    markdown = String(help="Markdown source of this module", scope=Scope.settings)
+    markdown = String(help="Markdown source of this module", default="", scope=Scope.settings)
     source_code = String(
         help="Source code for LaTeX and Word problems. This feature is not well-supported.",
         scope=Scope.settings
     )
-
 
 class CapaModule(CapaFields, XModule):
     """
