@@ -125,13 +125,21 @@
     });
 
     $("#email_settings_form").submit(function(){
-      $.post('${reverse("change_email_settings")}',
-             $(this).serializeArray(),
-             function(data) {
-               if(data.success) {
-                 location.href = "${reverse('dashboard')}";
-               }
-             });
+      $.ajax({
+        type: "POST",
+        url: '${reverse("change_email_settings")}',
+        data: $(this).serializeArray(),
+        success: function(data) {
+          if(data.success) {
+            location.href = "${reverse('dashboard')}";
+          }
+        },
+        error: function(xhr, textStatus, error) {
+          if (xhr.status == 403) {
+            location.href = "${reverse('signin_user')}";          
+          }
+        }
+      });
       return false;
     });
   })(this)

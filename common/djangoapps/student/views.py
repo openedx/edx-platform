@@ -1231,6 +1231,9 @@ def change_email_settings(request):
     if request.method != "POST":
         return HttpResponseNotAllowed(["POST"])
 
+    if not request.user.is_authenticated():
+        return HttpResponseForbidden()
+
     course_id = request.POST.get("course_id")
     receive_emails = request.POST.get("receive_emails")
     if receive_emails:
