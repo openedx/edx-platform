@@ -11,10 +11,12 @@ string of latex, store it in a custom class `LatexRendered`
 from pyparsing import ParseResults
 from calc import parse_algebra, add_defaults, SUFFIXES
 
-PREVIEW_DEBUG = False
+
 def PRINT(x):
+    PREVIEW_DEBUG = False
     if PREVIEW_DEBUG:
         print x
+
 
 class LatexRendered(object):
     """
@@ -41,7 +43,7 @@ class LatexRendered(object):
         self.tall = tall
 
         # generate parens and overwrite self.latex
-        if parens != None:
+        if parens is not None:
             left_parens = parens
             if left_parens == '{':
                 left_parens = r'\{'
@@ -65,12 +67,14 @@ class LatexRendered(object):
                 right=right_parens
             )
 
+
 def render_number(children):
     PRINT("rendering number ['{}']".format("', '".join(k.latex for k in children)))
     # TODO exponential notation
     if children[-1].latex in SUFFIXES:
         children[-1].latex = ur"\text{{{suffix}}}".format(suffix=children[-1].latex)
     return LatexRendered("".join(k.latex for k in children))
+
 
 def variable_closure(variables, casify):
     def render_variable(children):
@@ -87,6 +91,7 @@ def variable_closure(variables, casify):
         else:
             return LatexRendered(varname) #.replace("_", r"\_"))
     return render_variable
+
 
 def function_closure(functions, casify):
     def render_function(children):
@@ -123,16 +128,18 @@ def render_power(children):
     children_latex[-1] = children[-1].sans_parens
 
     PRINT("rendering power ['{}']".format("', '".join(children_latex)))
-    raise_power = lambda x,y: u"{}^{{{}}}".format(y, x)
+    raise_power = lambda x, y: u"{}^{{{}}}".format(y, x)
     latex = reduce(raise_power, reversed(children_latex))
     return LatexRendered(latex, tall=True)
+
 
 def render_parallel(children):
     children_latex = [k.latex for k in children if k.latex != "||"]
     PRINT("rendering parallel ['{}']".format("', '".join(children_latex)))
-    latex = r"\|".join(children)
+    latex = r"\|".join(children_latex)
     tall = any(k.tall for k in children)
     return LatexRendered(latex, tall=tall)
+
 
 def render_frac(numerator, denominator):
     # subtlety: avoid parens if there is only thing in that part
@@ -172,7 +179,7 @@ def render_product(children):
                 # render the current fraction and add it to the latex
                 latex += render_frac(numerator, denominator) + r"\cdot "
 
-                # reset back to 
+                # reset back to beginning state
                 position = "numerator"
                 numerator = []
                 denominator = []
@@ -190,12 +197,14 @@ def render_product(children):
     tall = fraction_mode_ever or any(k.tall for k in children)
     return LatexRendered(latex, tall=tall)
 
+
 def render_sum(children):
     children_latex = [k.latex for k in children]
     PRINT("rendering sum ['{}']".format("', '".join(children_latex)))
     latex = "".join(children_latex)
     tall = any(k.tall for k in children)
     return LatexRendered(latex, tall=tall)
+
 
 def render_atom(children):
     PRINT("rendering atom ['{}']".format("', '".join(k.latex for k in children)))
@@ -212,6 +221,7 @@ def render_atom(children):
         parens,
         tall
     )
+
 
 def latex_preview(string, variables=None, functions=None, case_sensitive=False):
     """
@@ -231,6 +241,7 @@ def latex_preview(string, variables=None, functions=None, case_sensitive=False):
         casify = lambda x: x
     else:
         casify = lambda x: x.lower()  # Lowercase for case insens.
+
     render_action = {
         'number': render_number,
         'variable': variable_closure(set(variables), casify),
@@ -250,7 +261,7 @@ def latex_preview(string, variables=None, functions=None, case_sensitive=False):
         name = branch.getName()
         if len(branch) == 1 and name not in ("number", "variable"):
             return render_branch(branch[0])
-        elif name not in render_action:
+        elif name not in render_action:  # pragma: no cover
             raise Exception(u"Unknown branch name '{}'".format(name))
         else:
             action = render_action[name]

@@ -50,7 +50,7 @@ class EvaluatorTest(unittest.TestCase):
         """
         try:
             self.assertEqual(4.0, calc.evaluator({}, {}, '4.'))
-        except ParseException:
+        except ParseException:  # pragma: no cover
             self.fail("'4.' is a valid input, but threw an exception")
 
     def test_exponential_answer(self):
