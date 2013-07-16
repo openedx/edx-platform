@@ -49,3 +49,21 @@ def courses(request):
         return courseware.views.courses(request)
 
     return courseware.views.university_profile(request, university)
+
+
+def auto_auth(request):
+    """
+    Automatically logs the anonymous user in with a generated random credentials
+    This view is only accessible when settings.AUTOMATIC_AUTH_FOR_LOAD_TESTING is
+    true.
+    """
+
+    # log the user in
+    student.views.create_account(request)
+
+    # activate account
+    request.user.is_active = True
+    request.user.save()
+
+    # redirect to home-page
+    return redirect('root')

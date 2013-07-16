@@ -439,6 +439,12 @@ urlpatterns = patterns(*urlpatterns)
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
+# enable automatic login
+if settings.AUTOMATIC_AUTH_FOR_LOAD_TESTING:
+    urlpatterns += (
+        url(r'^auto_auth$', 'branding.views.auto_auth'),
+    )
+
 #Custom error pages
 handler404 = 'static_template_view.views.render_404'
 handler500 = 'static_template_view.views.render_500'
