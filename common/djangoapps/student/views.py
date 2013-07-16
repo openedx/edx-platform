@@ -918,6 +918,21 @@ def get_random_post_override():
             'honor_code': u'true',
             'terms_of_service': u'true', }
 
+def get_planned_post_override(username, password):
+    """
+    Return a dictionary suitable for passing to post_vars of _do_create_account or post_override
+    of create_account, with specified username and password.
+    """
+    def id_generator(size=6, chars=string.ascii_uppercase + string.ascii_lowercase + string.digits):
+        return ''.join(random.choice(chars) for x in range(size))
+
+    return {'username': username,
+            'email': id_generator(size=10, chars=string.ascii_lowercase) + "_dummy_test@mitx.mit.edu",
+            'password': password,
+            'name': (id_generator(size=5, chars=string.ascii_lowercase) + " " +
+                     id_generator(size=7, chars=string.ascii_lowercase)),
+            'honor_code': u'true',
+            'terms_of_service': u'true', }
 
 def create_random_account(create_account_function):
     def inner_create_random_account(request):
@@ -929,6 +944,16 @@ def create_random_account(create_account_function):
 if settings.GENERATE_RANDOM_USER_CREDENTIALS:
     create_account = create_random_account(create_account)
 
+def create_random_account_with_name_and_password(create_account_function):
+    def inner_create_random_account(request, username, password):
+        return create_account_function(request, post_override=get_planned_post_override(username, password))
+
+    return inner_create_random_account
+
+# for load testing we want to create lots of accounts
+# with controlled username and password
+if settings.AUTOMATIC_AUTH_FOR_LOAD_TESTING:
+    create_account = create_random_account_with_name_and_password(create_account)
 
 @ensure_csrf_cookie
 def activate_account(request, key):

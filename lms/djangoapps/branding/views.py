@@ -58,12 +58,30 @@ def auto_auth(request):
     true.
     """
 
-    # log the user in
-    student.views.create_account(request)
+    from django.contrib.auth.models import User
+    from django.contrib.auth import login, authenticate
+    from random import randint
 
-    # activate account
-    request.user.is_active = True
-    request.user.save()
+    # generate random user ceredentials from a small name space
+    name_base = 'USER_'
+    pass_base = 'PASS_'
+
+    number = randint(1, settings.MAX_AUTO_AUTH_USERS)
+
+    username = name_base + str(number)
+    password = pass_base + str(number)
+
+    # if they already are a user, log in 
+    try:
+        user = User.objects.get(username=username)
+        user = authenticate(username=username, password=password)
+        login(request, user)
+
+    except:
+        # create and activate account info
+        student.views.create_account(request, username, password)
+        request.user.is_active = True
+        request.user.save()
 
     # redirect to home-page
     return redirect('root')
