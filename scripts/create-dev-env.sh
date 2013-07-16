@@ -497,6 +497,16 @@ mkdir -p "$BASE/data"
 
 rake django-admin[syncdb,lms,dev,--noinput]
 rake django-admin[migrate]
+
+case `uname -s` in Darwin)
+        output "This next step needs Mongo to run"
+        output "If you'd like Mongo automatically started up, press m"
+        output "Otherwise start up Mongo, then press enter to continue. Or to quit, press control-C."
+        read dummy
+        if [ "$dummy" = "m" ]; then mongod --fork; fi
+        ;;
+esac
+
 rake cms:update_templates
 # Configure Git
 
