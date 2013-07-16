@@ -16,7 +16,26 @@ class OpenEnded
     @ban_button = $('.ban-button')
     @unflag_button = $('.unflag-button')
     @ban_button.click @ban
-    @unflag_button.click @unflag
+    @unflag_button.click @confirm_unflag
+    
+    @unflag_submission_confirmation = $('.flag-submission-confirmation')
+    @unflag_submission_cancel_button = $('.flag-submission-confirmation-button')
+    @unflag_submission_confirmation_button = $('.flag-submission-removal-button')
+    
+    @unflag_submission_confirmation.hide()
+
+    @unflag_submission_cancel_button.click @close_dialog_box()
+    @unflag_submission_confirmation_button.click @remove_flag()
+    
+  remove_flag: () =>
+    @unflag()
+    @close_dialog_box()
+
+  close_dialog_box: () =>
+    $( ".flag-submission-confirmation" ).dialog('close')
+    
+  confirm_unflag: () =>
+    $( ".flag-submission-confirmation" ).dialog({ height: 275, width: 400 })
 
   unflag: (event) =>
     event.preventDefault()
