@@ -126,7 +126,7 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         -Lon-capa dependent.
         -Assumes that the problem only has one part.
         """
-        return str(float(answer.values()[0]))
+        return str(answer.values()[0])
 
     def formula_answer_to_str(self, answer):
         """
@@ -207,7 +207,7 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         """
         try:
             answer = self.answer_to_str(data)
-        except ValueError:
+        except (ValueError, AttributeError):
             # Sometimes, we get an answer that's just not parsable.  Do nothing.
             log.exception('Answer not parsable: ' + str(data))
             return

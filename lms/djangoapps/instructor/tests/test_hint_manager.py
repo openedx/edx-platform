@@ -2,7 +2,7 @@ import json
 
 from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
-from mock import MagicMock
+from mock import MagicMock, patch
 
 from courseware.models import XModuleContentField
 from courseware.tests.factories import ContentFactory
@@ -11,6 +11,8 @@ import instructor.hint_manager as view
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+
+import unittest
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
@@ -140,12 +142,8 @@ class HintManagerTest(ModuleStoreTestCase):
         """
         # Because add_hint accesses the xmodule, this test requires a bunch
         # of monkey patching.
-        import courseware.module_render as module_render
-        import courseware.model_data as model_data
         hinter = MagicMock()
         hinter.answer_signature = lambda string: string
-        module_render.get_module = MagicMock(return_value=hinter)
-        model_data.ModelDataCache = MagicMock(return_value=None)
 
         request = RequestFactory()
         post = request.post(self.url, {'field': 'mod_queue',
@@ -154,13 +152,11 @@ class HintManagerTest(ModuleStoreTestCase):
                                        'answer': '3.14',
                                        'hint': 'This is a new hint.'})
         post.user = 'fake user'
-        view.add_hint(post, self.course_id, 'mod_queue')
+        with patch('courseware.module_render.get_module', MagicMock(return_value=hinter)):
+            with patch('courseware.model_data.ModelDataCache', MagicMock(return_value=None)):
+                view.add_hint(post, self.course_id, 'mod_queue')
         problem_hints = XModuleContentField.objects.get(field_name='mod_queue', definition_id=self.problem_id).value
         self.assertTrue('3.14' in json.loads(problem_hints))
-
-        # Reload the things we monkey-patched.
-        reload(module_render)
-        reload(model_data)
 
     def test_approve(self):
         """

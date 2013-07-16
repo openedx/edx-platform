@@ -277,7 +277,7 @@ class CrowdsourceHinterTest(unittest.TestCase):
         mock_module = CHModuleFactory.create()
         get = {'response1': '4'}
         parsed = mock_module.numerical_answer_to_str(get)
-        self.assertTrue(parsed == '4.0')
+        self.assertTrue(parsed == '4')
 
     def test_formula_answer_to_str(self):
         """
@@ -342,12 +342,24 @@ class CrowdsourceHinterTest(unittest.TestCase):
 
     def test_gethint_unparsable(self):
         """
-        Someone submits a hint that cannot be parsed into a float.
+        Someone submits an answer that is in the wrong format.
         - The answer should not be added to previous_answers.
         """
         mock_module = CHModuleFactory.create()
         old_answers = copy.deepcopy(mock_module.previous_answers)
-        json_in = {'problem_name': 'fish'}
+        json_in = 'blah'
+        out = mock_module.get_hint(json_in)
+        self.assertTrue(out is None)
+        self.assertTrue(mock_module.previous_answers == old_answers)
+
+    def test_gethint_signature_error(self):
+        """
+        Someone submits an answer that cannot be calculated as a float.
+        Nothing should change.
+        """
+        mock_module = CHModuleFactory.create()
+        old_answers = copy.deepcopy(mock_module.previous_answers)
+        json_in = {'problem1': 'fish'}
         out = mock_module.get_hint(json_in)
         self.assertTrue(out is None)
         self.assertTrue(mock_module.previous_answers == old_answers)
