@@ -27,9 +27,11 @@
         				<h1 class="result-title">${datum.data['display_name']}</h1>
                     </div>
         			<div class="result-body">
-        				<div class="result-thumbnail">
-        					<img class="thumbnail" src="${datum.data['thumbnail']}" alt="${datum.data['display_name']}">
-        				</div>
+                        <div class="thumbnail-wrapper">
+        				    <div class="result-thumbnail">
+        					   <img class="thumbnail" src="${datum.data['thumbnail']}" alt="${datum.data['display_name']}">
+        				    </div>
+                        </div>
                         <div class="result-snippets">
         					<p class="snippet">
         						${datum.data['snippets']}
@@ -42,29 +44,29 @@
     % else:
         <h1 class="result-title no-results">"No results found, please try again"</h1>
     % endif
+
+    % if len(data) > 1:
+    	<div class="pagination">
+    		<span class="step-links">
+    			% if data.number > 1:
+    				<a onclick="decrementPage()">Prev</a>
+    			% endif
+
+    			<form id="current-page" class="auto-submit" action="/search" method="get">
+                    <span class="current-page">
+    				    Page 
+                        <input type="number" class="parameter page-number" name="page" value="${ data.number }" onkeydown="searchHandle(event, true)" onchange="changeHandler(this, ${data.paginator.num_pages})"/> 
+                        of ${ data.paginator.num_pages }
+                    </span>
+    			</form> 
+
+    			% if data.number < data.paginator.num_pages:
+    				<a onclick="incrementPage()">Next</a>
+    			%endif
+    		</span>
+    	</div>
+    % endif
 </div>
-
-% if len(data) > 1:
-	<div class="pagination">
-		<span class="step-links">
-			% if data.number > 1:
-				<a onclick="decrementPage()">Prev</a>
-			% endif
-
-			<form id="current-page" class="auto-submit" action="/search" method="get">
-                <span class="current-page">
-				    Page 
-                    <input type="number" class="parameter" name="page" value="${ data.number }" onkeydown="searchHandle(event, true)" onchange="changeHandler(this, ${data.paginator.num_pages})"/> 
-                    of ${ data.paginator.num_pages }
-                </span>
-			</form> 
-
-			% if data.number < data.paginator.num_pages:
-				<a onclick="incrementPage()">Next</a>
-			%endif
-		</span>
-	</div>
-% endif
 
 
 <%def name="css_link(path, media='')">

@@ -1,35 +1,48 @@
 .result-header{
 	text-align: center;
 	word-wrap: normal;
-	padding-top: 175px;
+	padding-top: 20px;
+}
+
+.result-container{
+    margin: 0 auto;
 }
 
 .snippet{
 	color: #666666;
 	font-family: "Open Sans", "Arial";
 	font-weight: 300;
-	height: 300px;
-	width: 400px;
-	text-align: justify;
+	height: 230px;
+	width: 300px;
+	text-align: center;
+    overflow-y: hidden;
 }
 
-.pagination{
-	position: relative;
-	margin-top: 200px;
-	margin-left: 10%;
+.thumbnail-wrapper{
+    width: 285px;
+    overflow:hidden;
+    float: left;
 }
-
 
 .result-thumbnail{
-    width: 400px;
-    margin-bottom: -400px;
-    margin-right: -150px;
+    width: 300px;
+    height: 200px;
+    overflow-x: hidden;
 }
 
 .result-container{
-    width: 900px;
+    width: 600px;
 }
 
 .result-snippets{
     float: left;
+}
+
+.result-title{
+    text-align: center;
+    font-size: 20px;
+}
+
+.page-number{
+    width: 30px;
 }

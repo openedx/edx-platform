@@ -8,8 +8,10 @@ from courseware.courses import get_course_with_access
 
 import requests
 import enchant
+import logging
 
 CONTENT_TYPES = ("transcript", "problem", "pdf")
+log = logging.getLogger("mitx.courseware")
 
 
 @ensure_csrf_cookie
@@ -17,20 +19,28 @@ def search(request, course_id):
     results_string = ""
     course = get_course_with_access(request.user, course_id, 'load')
     if request.GET:
-        results_string = find(request)
+        results_string = find(request, course_id)
     full_html = render_to_string("search_templates/wrapper.html", {
         "body": results_string, "course": course})
     return HttpResponse(full_html)
 
 
-def find(request, database="http://127.0.0.1:9200",
+def find(request, course_id, database="http://127.0.0.1:9200",
          field="searchable_text", max_result=100):
     get_content = lambda request, content: content+"-index" if request.GET.get(content, False) else None
     query = request.GET.get("s", "*.*")
     page = request.GET.get("page", 1)
     results_per_page = request.GET.get("results", 15)
     index = ",".join(filter(None, [get_content(request, content) for content in CONTENT_TYPES]))
-    full_url = "/".join([database, index, "_search?q="+field+":"])
+    if len(index) == 0:
+        index = ",".join([content+"-index" for content in CONTENT_TYPES])
+    if request.GET.get("all_courses" == "true", False):
+        base_url = "/".join([database, index])
+    else:
+        course_type = course_id.split("/")[1]
+        base_url = "/".join([database, index, course_type])
+    full_url = "/".join([base_url, "_search?q="+field+":"])
+    log.debug(full_url)
     context = {}
     response = requests.get(full_url+query+"&size="+str(max_result))
     data = SearchResults(request, response)
