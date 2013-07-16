@@ -14,7 +14,7 @@ class EvaluatorTest(unittest.TestCase):
     Go through all functionalities as specifically as possible--
     work from number input to functions and complex expressions
     Also test custom variable substitutions (i.e.
-      `evaluator({'x':3.0},{}, '3*x')`
+      `evaluator({'x':3.0}, {}, '3*x')`
     gives 9.0) and more.
     """
 
@@ -41,8 +41,10 @@ class EvaluatorTest(unittest.TestCase):
         """
         The string '.' should not evaluate to anything.
         """
-        self.assertRaises(ParseException, calc.evaluator, {}, {}, '.')
-        self.assertRaises(ParseException, calc.evaluator, {}, {}, '1+.')
+        with self.assertRaises(ParseException):
+            calc.evaluator({}, {}, '.')
+        with self.assertRaises(ParseException):
+            calc.evaluator({}, {}, '1+.')
 
     def test_trailing_period(self):
         """
@@ -120,18 +122,12 @@ class EvaluatorTest(unittest.TestCase):
         """
         Ensure division by zero gives an error
         """
-        self.assertRaises(
-            ZeroDivisionError, calc.evaluator,
-            {}, {}, '1/0'
-        )
-        self.assertRaises(
-            ZeroDivisionError, calc.evaluator,
-            {}, {}, '1/0.0'
-        )
-        self.assertRaises(
-            ZeroDivisionError, calc.evaluator,
-            {'x': 0.0}, {}, '1/x'
-        )
+        with self.assertRaises(ZeroDivisionError):
+            calc.evaluator({}, {}, '1/0')
+        with self.assertRaises(ZeroDivisionError):
+            calc.evaluator({}, {}, '1/0.0')
+        with self.assertRaises(ZeroDivisionError):
+            calc.evaluator({'x': 0.0}, {}, '1/x')
 
     def test_parallel_resistors(self):
         """
@@ -518,15 +514,9 @@ class EvaluatorTest(unittest.TestCase):
         """
         variables = {'R1': 2.0, 'R3': 4.0}
 
-        self.assertRaises(
-            calc.UndefinedVariable, calc.evaluator,
-            {}, {}, "5+7*QWSEKO"
-        )
-        self.assertRaises(
-            calc.UndefinedVariable, calc.evaluator,
-            {'r1': 5}, {}, "r1+r2"
-        )
-        self.assertRaises(
-            calc.UndefinedVariable, calc.evaluator,
-            variables, {}, "r1*r3", case_sensitive=True
-        )
+        with self.assertRaises(calc.UndefinedVariable):
+            calc.evaluator({}, {}, "5+7*QWSEKO")
+        with self.assertRaises(calc.UndefinedVariable):
+            calc.evaluator({'r1': 5}, {}, "r1+r2")
+        with self.assertRaises(calc.UndefinedVariable):
+            calc.evaluator(variables, {}, "r1*r3", case_sensitive=True)
