@@ -52,11 +52,6 @@ def edit_and_save_component(step):
     world.css_click('.save-button')
 
 
-@step(u'I see a (.*)$')
-def i_see_a_notification(step, notification_type):
-    assert world.is_css_present('.wrapper-%s' % notification_type)
-
-
 def step_selector_list(data_type, path, index=1):
     selector_list = ['a[data-type="{}"]'.format(data_type)]
     if index != 1:

@@ -62,4 +62,4 @@ Feature: Course Overview
         Given I have a course with 1 section
         When I navigate to the course overview page
         And I change an assignment's grading status
-        Then I see a notification
+        Then I am shown a notification

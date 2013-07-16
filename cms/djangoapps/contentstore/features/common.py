@@ -245,6 +245,11 @@ def confirm_the_prompt(step):
     world.css_click(prompt_css)
 
 
+@step(u'I am shown a (.*)$')
+def i_am_shown_a_notification(step, notification_type):
+    assert world.is_css_present('.wrapper-%s' % notification_type)
+
+
 def type_in_codemirror(index, text):
     world.css_click(".CodeMirror", index=index)
     g = world.css_find("div.CodeMirror.CodeMirror-focused > div > textarea")

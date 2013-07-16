@@ -75,7 +75,7 @@ Feature: Component Adding
             | Component    |
             | Discussion   |
        And I delete a component
-       Then I see a prompt
+       Then I am shown a prompt
 
    Scenario: I see a notification on save
         Given I have opened a new course in studio
@@ -84,4 +84,4 @@ Feature: Component Adding
             | Component    |
             | Discussion   |
         And I edit and save a component
-        Then I see a notification
+        Then I am shown a notification
