@@ -184,7 +184,6 @@ class FolditDescriptor(FolditFields, XmlDescriptor, EditingDescriptor):
     filename_extension = "xml"
 
     has_score = True
-    template_dir_name = "foldit"
 
     js = {'coffee': [resource_string(__name__, 'js/src/html/edit.coffee')]}
     js_module_name = "HTMLEditingDescriptor"
