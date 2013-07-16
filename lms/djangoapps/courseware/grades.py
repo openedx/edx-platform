@@ -151,8 +151,8 @@ def grade(student, request, course, model_data_cache=None, keep_raw_scores=False
         format_scores = []
         for section in sections:
 
-            section_descriptor = section['section_descriptor']
-            xmoduledescriptors = section['xmoduledescriptors']
+            section_descriptor = section.get('section_descriptor')
+            xmoduledescriptors = section.get('xmoduledescriptors')
 
             graded_total, add_raw_scores = compute_graded_total(
                 section_descriptor,

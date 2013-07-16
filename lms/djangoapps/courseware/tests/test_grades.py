@@ -150,7 +150,10 @@ class TestGrades(unittest.TestCase):
         grades.find_attempted = fake_find_attempted
 
         # Actually do the test.
-        graded_total, raw_scores = grades.compute_graded_total(section, student, course_id, m_d_c, request)
+        graded_total, raw_scores = grades.compute_graded_total(
+            section['section_descriptor'], section['xmoduledescriptors'],
+            student, course_id, m_d_c, request
+        )
         # Reset all of the monkey patching.
         # Do this before assertions, because if an assertion fails, the remaining code is not run.
         reload(grades)
@@ -185,8 +188,8 @@ class TestGrades(unittest.TestCase):
         course = MagicMock()
         course.grading_context = {
             'graded_sections': {
-                'HW': ['HW1', 'HW2'],
-                'Quiz': ['Quiz1'],
+                'HW': [{'section_descriptor': 'HW1'}, {'section_descriptor': 'HW2'}],
+                'Quiz': [{'section_descriptor': 'Quiz1'}],
             },
         }
         course.id = 'my id'
@@ -200,22 +203,22 @@ class TestGrades(unittest.TestCase):
         course.grader.grade = fake_grade
         m_d_c = MagicMock()
 
-        def fake_compute_graded_total(section, student, course_id, m_d_c, request):
+        def fake_compute_graded_total(section_descriptor, xmd, student, course_id, m_d_c, request):
             """
-            A fake compute_graded_total.  Expects a string for section, instead of
-            a real section.
+            A fake compute_graded_total.  Expects a string for section_descriptor,
+            instead of a real section descriptor.
             """
-            if section == 'HW1':
+            if section_descriptor == 'HW1':
                 return (
                     Score(4.0, 10.0, True, 'HW1', ),  # attempted=True
                     ['RS1']
                 )
-            elif section == 'HW2':
+            elif section_descriptor == 'HW2':
                 return (
                     Score(0.0, 10.0, True, 'HW2', ),  # attempted=False
                     ['RS2']
                 )
-            elif section == 'Quiz1':
+            elif section_descriptor == 'Quiz1':
                 return (
                     Score(85.0, 100.0, True, 'Quiz1', ),  # attempted=True
                     ['RS3']
