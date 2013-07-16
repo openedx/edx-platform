@@ -1,2 +1,10 @@
 <%inherit file="/main.html" />
-${body}
+<%block name="bodyclass">${course.css_class}</%block>
+<%include file="/courseware/course_navigation.html" args="active_page='search'" />
+<%namespace name='static' file='/static_content.html'/>
+<%block name="headextra">
+  <%static:css group='course'/>
+</%block>
+<section class="container">
+    ${body}
+</section>

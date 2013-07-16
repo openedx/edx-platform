@@ -121,9 +121,6 @@ urlpatterns += (
 
     # TODO: These urls no longer work. They need to be updated before they are re-enabled
     # url(r'^reactivate/(?P<key>[^/]*)$', 'student.views.reactivation_email'),
-
-    # Search
-    url(r'^search$', 'search.views.search')
 )
 
 # Semi-static views only used by edX, not by themes
@@ -280,6 +277,9 @@ if settings.COURSEWARE_ENABLED:
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/htmlbook/(?P<book_index>[^/]*)/chapter/(?P<chapter>[^/]*)/$',
             'staticbook.views.html_index'),
 
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)(/?[^/]*)*/search$',
+            'search.views.search', name='search'),
+        
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/courseware/?$',
             'courseware.views.index', name="courseware"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/courseware/(?P<chapter>[^/]*)/$',
@@ -291,6 +291,7 @@ if settings.COURSEWARE_ENABLED:
 
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/progress$',
             'courseware.views.progress', name="progress"),
+
         # Takes optional student_id for instructor use--shows profile as that student sees it.
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/progress/(?P<student_id>[^/]*)/$',
             'courseware.views.progress', name="student_progress"),
