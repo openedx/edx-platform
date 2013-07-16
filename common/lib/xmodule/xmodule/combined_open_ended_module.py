@@ -9,6 +9,7 @@ from xblock.core import Integer, Scope, String, List, Float, Boolean
 from xmodule.open_ended_grading_classes.combined_open_ended_modulev1 import CombinedOpenEndedV1Module, CombinedOpenEndedV1Descriptor
 from collections import namedtuple
 from .fields import Date
+import textwrap
 
 log = logging.getLogger("mitx.courseware")
 
@@ -27,6 +28,38 @@ VERSION_TUPLES = {
 }
 
 DEFAULT_VERSION = 1
+DEFAULT_DATA = textwrap.dedent("""\
+    <combinedopenended>
+        <rubric>
+            <rubric>
+                <category>
+                  <description>Category 1</description>
+                  <option>
+                      The response does not incorporate what is needed for a one response.
+                  </option>
+                  <option>
+                      The response is correct for category 1.
+                  </option>
+                </category>
+            </rubric>
+        </rubric>
+        <prompt>
+            <p>Why is the sky blue?</p>
+        </prompt>
+        <task>
+            <selfassessment/>
+        </task>
+        <task>
+            <openended min_score_to_attempt="1" max_score_to_attempt="2">
+                    <openendedparam>
+                        <initial_display>Enter essay here.</initial_display>
+                        <answer_display>This is the answer.</answer_display>
+                        <grader_payload>{"grader_settings" : "peer_grading.conf", "problem_id" : "700x/Demo"}</grader_payload>
+                    </openendedparam>
+            </openended>
+        </task>
+    </combinedopenended>
+""")
 
 
 class VersionInteger(Integer):
@@ -51,7 +84,8 @@ class CombinedOpenEndedFields(object):
     display_name = String(
         display_name="Display Name",
         help="This name appears in the horizontal navigation at the top of the page.",
-        default="Open Ended Grading", scope=Scope.settings
+        default="Open Ended Grading",
+        scope=Scope.settings
     )
     current_task_number = Integer(help="Current task that the student is on.", default=0, scope=Scope.user_state)
     task_states = List(help="List of state dictionaries of each task within this module.", scope=Scope.user_state)
@@ -85,13 +119,30 @@ class CombinedOpenEndedFields(object):
         scope=Scope.settings
     )
     version = VersionInteger(help="Current version number", default=DEFAULT_VERSION, scope=Scope.settings)
-    data = String(help="XML data for the problem", scope=Scope.content)
+    data = String(help="XML data for the problem", scope=Scope.content,
+        default=DEFAULT_DATA)
     weight = Float(
         display_name="Problem Weight",
         help="Defines the number of points each problem is worth. If the value is not set, each problem is worth one point.",
         scope=Scope.settings, values={"min" : 0 , "step": ".1"}
     )
-    markdown = String(help="Markdown source of this module", scope=Scope.settings)
+    markdown = String(
+        help="Markdown source of this module",
+        default=textwrap.dedent("""\
+            [rubric]
+            + Category 1
+            - The response does not incorporate what is needed for a one response.
+            - The response is correct for category 1.
+            [rubric]
+            [prompt]
+            <p>Why is the sky blue?</p>
+            [prompt]
+            [tasks]
+            (Self), ({1-2}AI)
+            [tasks]
+        """),
+        scope=Scope.settings
+    )
 
 
 class CombinedOpenEndedModule(CombinedOpenEndedFields, XModule):
@@ -240,7 +291,6 @@ class CombinedOpenEndedDescriptor(CombinedOpenEndedFields, RawDescriptor):
 
     has_score = True
     always_recalculate_grades = True
-    template_dir_name = "combinedopenended"
 
     #Specify whether or not to pass in S3 interface
     needs_s3_interface = True

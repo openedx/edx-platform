@@ -111,11 +111,6 @@ namespace :cms do
     end
   end
 
-  desc "Imports all the templates from the code pack"
-  task :update_templates do
-    sh(django_admin(:cms, :dev, :update_templates))
-  end
-
   desc "Import course data within the given DATA_DIR variable"
   task :xlint do
     if ENV['DATA_DIR'] and ENV['COURSE_DIR']

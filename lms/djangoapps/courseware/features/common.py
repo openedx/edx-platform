@@ -10,7 +10,6 @@ from django.contrib.auth.models import User
 from student.models import CourseEnrollment
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import _MODULESTORES, modulestore
-from xmodule.templates import update_templates
 from xmodule.course_module import CourseDescriptor
 from courseware.courses import get_course_by_id
 from xmodule import seq_module, vertical_module
@@ -39,7 +38,7 @@ def create_course(step, course):
                                        display_name='Test Section')
 
     problem_section = world.ItemFactory.create(parent_location=world.scenario_dict['SECTION'].location,
-                                               template='i4x://edx/templates/sequential/Empty',
+                                               category='sequential'
                                                display_name='Test Section')
 
 
@@ -62,7 +61,7 @@ def i_am_registered_for_the_course(step, course):
 @step(u'The course "([^"]*)" has extra tab "([^"]*)"$')
 def add_tab_to_course(step, course, extra_tab_name):
     section_item = world.ItemFactory.create(parent_location=course_location(course),
-                                            template="i4x://edx/templates/static_tab/Empty",
+                                            category="static_tab",
                                             display_name=str(extra_tab_name))
 
 
