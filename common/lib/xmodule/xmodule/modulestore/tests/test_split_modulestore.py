@@ -461,7 +461,7 @@ class TestItemCrud(SplitModuleTest):
         # grab link to course to ensure new versioning works
         locator = CourseLocator(course_id="GreekHero", revision='draft')
         premod_course = modulestore().get_course(locator)
-        premod_time = datetime.datetime.now(UTC)
+        premod_time = datetime.datetime.now(UTC) - datetime.timedelta(seconds=1)
         # add minimal one w/o a parent
         category = 'sequential'
         new_module = modulestore().create_item(locator, category, 'user123',
@@ -512,7 +512,7 @@ class TestItemCrud(SplitModuleTest):
         """
         locator = BlockUsageLocator(course_id="contender", usage_id="head345679", revision='draft')
         category = 'problem'
-        premod_time = datetime.datetime.now(UTC)
+        premod_time = datetime.datetime.now(UTC) - datetime.timedelta(seconds=1)
         new_payload = "<problem>empty</problem>"
         new_module = modulestore().create_item(locator, category, 'anotheruser',
             metadata={'display_name': 'problem 1'}, new_def_data=new_payload)
@@ -549,7 +549,7 @@ class TestItemCrud(SplitModuleTest):
         pre_version_guid = problem.location.version_guid
         self.assertIsNotNone(pre_def_id)
         self.assertIsNotNone(pre_version_guid)
-        premod_time = datetime.datetime.now(UTC)
+        premod_time = datetime.datetime.now(UTC) - datetime.timedelta(seconds=1)
         self.assertNotEqual(problem.max_attempts, 4, "Invalidates rest of test")
 
         problem.max_attempts = 4
