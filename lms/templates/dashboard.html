@@ -204,31 +204,31 @@
 
         <article class="my-course">
           <%
-	    try:
-	        course_target = reverse('info', args=[course.id])
-	    except Exception as err:
-	        course_target = "Error"
-		if not user.is_staff:
-		    continue
+            try:
+                course_target = reverse('info', args=[course.id])
+            except Exception as err:
+                course_target = "Error"
+                if not user.is_staff:
+                    continue
           %>
 
           % if course_target=="Error":
             <div class="cover">
-	       Error
+               Error
             </div>
           <section class="info">
             <hgroup>
               <h3>
                   <span>Error loading ${course.id}</span>
               </h3>
-	      <span>${course.error_msg}</span>
+              <span>${course.error_msg}</span>
             </hgroup>
-	  </section>
+          </section>
         </article>
-	    <%
-	        continue
-	    %>
-	  % endif
+            <%
+                continue
+            %>
+          % endif
 
           % if course.id in show_courseware_links_for:
             <a href="${course_target}" class="cover">
