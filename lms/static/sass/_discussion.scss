@@ -715,13 +715,8 @@ body.discussion {
       width: 20%;
       height: 100%;
       @include linear-gradient(top, rgba(255, 255, 255, .5), rgba(255, 255, 255, 0));
-<<<<<<< HEAD
-      background-color: #dcdcdc;
-      @include transition(all .2s ease-out 0s);
-=======
       background-color: $gray-l4;
       @include transition(all .2s ease-out);
->>>>>>> feature/marco/discussionhome
 
       &:hover {
         background-color: $gray-l3;
@@ -1432,15 +1427,9 @@ body.discussion {
 
   .discussion-article {
     position: relative;
-<<<<<<< HEAD
-    padding: 40px;
-    min-height: 468px;
-
-=======
     padding: $baseline*2;
     min-height: 468px;         
     
->>>>>>> feature/marco/discussionhome
     a {
       word-wrap: break-word;
     }
@@ -2612,13 +2601,8 @@ body.discussion {
       float:right;
       padding-right: 5px;
       font-style: italic;
-<<<<<<< HEAD
-      cursor:pointer;
-      margin-right: 10px;
-=======
       cursor:pointer; 
       margin-right: $baseline/2;
->>>>>>> feature/marco/discussionhome
       opacity: 0.8;
 
       span {
@@ -2650,11 +2634,7 @@ body.discussion {
   width: 10px;
   height: 14px;
   padding-right: 3px;
-<<<<<<< HEAD
-  background: transparent url('../images/unpinned.png') no-repeat 0 0;
-=======
   color: $gray-l2;
->>>>>>> feature/marco/discussionhome
 }
 
 .pinned .icon {
@@ -2664,11 +2644,7 @@ body.discussion {
   width: 10px;
   height: 14px;
   padding-right: 3px;
-<<<<<<< HEAD
-  background: transparent url('../images/pinned.png') no-repeat 0 0;
-=======
   color: $pink;
->>>>>>> feature/marco/discussionhome
 }
 
 .pinned span {
@@ -2703,47 +2679,26 @@ display:none;
         opacity: 1.0;
       }
 
-<<<<<<< HEAD
-    }
-
-.notflagged .icon
-{
-  display: block;
-=======
     }  
     
 .notflagged .icon {
   display: block; 
->>>>>>> feature/marco/discussionhome
   float: left;
   margin: 3px;
   width: 10px;
   height: 14px;
   padding-right: 3px;
-<<<<<<< HEAD
-  background: transparent url('../images/notflagged.png') no-repeat 0 0;
-}
-
-.flagged .icon
-{
-  display: block;
-=======
   color: $gray-l2;
 }
 
 .flagged .icon {
   display: block; 
->>>>>>> feature/marco/discussionhome
   float: left;
   margin: 3px;
   width: 10px;
   height: 14px;
   padding-right: 3px;
-<<<<<<< HEAD
-  background: transparent url('../images/flagged.png') no-repeat 0 0;
-=======
   color: $pink;
->>>>>>> feature/marco/discussionhome
 }
 
 .flagged span {
