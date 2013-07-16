@@ -37,8 +37,8 @@ PLATFORM_NAME = "edX"
 COURSEWARE_ENABLED = True
 ENABLE_JASMINE = False
 
-AUTOMATIC_AUTH_FOR_LOAD_TESTING = True
-MAX_AUTO_AUTH_USERS = 2
+# only relevant if MITX_FEATURES['AUTOMATIC_AUTH_FOR_LOAD_TESTING'] = True
+MAX_AUTO_AUTH_USERS = 20
 
 GENERATE_RANDOM_USER_CREDENTIALS = False
 PERFSTATS = False
@@ -150,6 +150,9 @@ MITX_FEATURES = {
 
     # Allow use of the hint managment instructor view.
     'ENABLE_HINTER_INSTRUCTOR_VIEW': False,
+
+    # for load testing
+    'AUTOMATIC_AUTH_FOR_LOAD_TESTING': False,
 }
 
 # Used for A/B testing
@@ -233,7 +236,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 )
 
 # add csrf support unless disabled for load testing
-if not AUTOMATIC_AUTH_FOR_LOAD_TESTING:
+if not MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_LOAD_TESTING'):
     TEMPLATE_CONTEXT_PROCESSORS += ('django.core.context_processors.csrf',)  # necessary for csrf protection
 
 STUDENT_FILEUPLOAD_MAX_SIZE = 4 * 1000 * 1000  # 4 MB
@@ -491,7 +494,7 @@ MIDDLEWARE_CLASSES = (
 )
 
 # add in csrf middleware unless disabled for load testing
-if not AUTOMATIC_AUTH_FOR_LOAD_TESTING:
+if not MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_LOAD_TESTING'):
     MIDDLEWARE_CLASSES = MIDDLEWARE_CLASSES + ('django.middleware.csrf.CsrfViewMiddleware',)
 
 ############################### Pipeline #######################################

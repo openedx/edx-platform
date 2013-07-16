@@ -952,7 +952,7 @@ def create_random_account_with_name_and_password(create_account_function):
 
 # for load testing we want to create lots of accounts
 # with controlled username and password
-if settings.AUTOMATIC_AUTH_FOR_LOAD_TESTING:
+if settings.MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_LOAD_TESTING'):
     create_account = create_random_account_with_name_and_password(create_account)
 
 @ensure_csrf_cookie

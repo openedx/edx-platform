@@ -53,7 +53,7 @@ def courses(request):
 
 def auto_auth(request):
     """
-    Automatically logs the anonymous user in with a generated random credentials
+    Automatically logs the user in with a generated random credentials
     This view is only accessible when settings.AUTOMATIC_AUTH_FOR_LOAD_TESTING is
     true.
     """
@@ -62,7 +62,7 @@ def auto_auth(request):
     from django.contrib.auth import login, authenticate
     from random import randint
 
-    # generate random user ceredentials from a small name space
+    # generate random user ceredentials from a small name space (determined by settings)
     name_base = 'USER_'
     pass_base = 'PASS_'
 
@@ -71,14 +71,14 @@ def auto_auth(request):
     username = name_base + str(number)
     password = pass_base + str(number)
 
-    # if they already are a user, log in 
+    # if they already are a user, log in
     try:
         user = User.objects.get(username=username)
         user = authenticate(username=username, password=password)
         login(request, user)
 
+    # else create and activate account info
     except:
-        # create and activate account info
         student.views.create_account(request, username, password)
         request.user.is_active = True
         request.user.save()

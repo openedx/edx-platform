@@ -440,7 +440,7 @@ if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 # enable automatic login
-if settings.AUTOMATIC_AUTH_FOR_LOAD_TESTING:
+if settings.MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_LOAD_TESTING'):
     urlpatterns += (
         url(r'^auto_auth$', 'branding.views.auto_auth'),
     )
