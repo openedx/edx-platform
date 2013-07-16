@@ -1,7 +1,7 @@
 ---
 metadata:
     display_name: Drag and Drop
-    markdown: !!null    
+    markdown: !!null
 data: |
     <problem>
         Here's an example of a "Drag and Drop" question set. Click and drag each word in the scrollbar below, up to the numbered bucket which matches the number of letters in the word. 

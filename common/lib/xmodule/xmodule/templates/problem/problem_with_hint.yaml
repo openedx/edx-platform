@@ -46,7 +46,7 @@ metadata:
         enter your answer in upper or lower case, with or without quotes.
         
         \edXabox{type="custom" cfn='test_str' expect='python' hintfn='hint_fn'}
-        
+    markdown: !!null
 data: |
     <?xml version="1.0"?>
     <problem>
@@ -92,4 +92,3 @@ data: |
         </p>
       </text>
     </problem>
-children: []

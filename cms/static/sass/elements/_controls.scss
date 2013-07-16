@@ -3,7 +3,7 @@
 
 // gray primary button
 .btn-primary-gray {
-  @extend .btn-primary;
+  @extend .ui-btn-primary;
   background: $gray-l1;
   border-color: $gray-l2;
   color: $white;
@@ -25,7 +25,7 @@
 
 // blue primary button
 .btn-primary-blue {
-  @extend .btn-primary;
+  @extend .ui-btn-primary;
   background: $blue;
   border-color: $blue-s1;
   color: $white;
@@ -48,7 +48,7 @@
 
 // green primary button
 .btn-primary-green {
-  @extend .btn-primary;
+  @extend .ui-btn-primary;
   background: $green;
   border-color: $green;
   color: $white;
@@ -71,7 +71,7 @@
 
 // gray secondary button
 .btn-secondary-gray {
-  @extend .btn-secondary;
+  @extend .ui-btn-secondary;
   border-color: $gray-l3;
   color: $gray-l1;
 
@@ -92,7 +92,7 @@
 
 // blue secondary button
 .btn-secondary-blue {
-  @extend .btn-secondary;
+  @extend .ui-btn-secondary;
   border-color: $blue-l3;
   color: $blue;
 
@@ -114,7 +114,7 @@
 
 // green secondary button
 .btn-secondary-green {
-  @extend .btn-secondary;
+  @extend .ui-btn-secondary;
   border-color: $green-l4;
   color: $green-l2;
 
@@ -148,9 +148,9 @@
 // ====================
 
 // simple dropdown button styling - should we move this elsewhere?
-.btn-dd {
-  @extend .btn;
-  @extend .btn-pill;
+.ui-btn-dd {
+  @extend .ui-btn;
+  @extend .ui-btn-pill;
   padding:($baseline/4) ($baseline/2);
   border-width: 1px;
   border-style: solid;
@@ -158,7 +158,7 @@
   text-align: center;
 
   &:hover, &:active {
-    @extend .fake-link;
+    @extend .ui-fake-link;
     border-color: $gray-l3;
   }
 
@@ -169,8 +169,8 @@
 }
 
 // layout-based buttons - nav dd
-.btn-dd-nav-primary {
-  @extend .btn-dd;
+.ui-btn-dd-nav-primary {
+  @extend .ui-btn-dd;
   background: $white;
   border-color: $white;
   color: $gray-d1;

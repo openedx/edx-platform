@@ -59,7 +59,7 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
         Returns the url of the problem given the problem's name
         """
 
-        return "i4x://"+self.course.org+"/{}/problem/{}".format(self.COURSE_SLUG, problem_url_name)
+        return "i4x://" + self.course.org + "/{}/problem/{}".format(self.COURSE_SLUG, problem_url_name)
 
     def modx_url(self, problem_location, dispatch):
         """
@@ -119,7 +119,6 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
         num_input: the number of input fields to create in the problem
         """
 
-        problem_template = "i4x://edx/templates/problem/Blank_Common_Problem"
         prob_xml = OptionResponseXMLFactory().build_xml(
             question_text='The correct answer is Correct',
             num_inputs=num_inputs,
@@ -130,7 +129,7 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
         problem = ItemFactory.create(
             parent_location=section_location,
-            template=problem_template,
+            category='problem',
             data=prob_xml,
             metadata={'randomize': 'always'},
             display_name=name
@@ -149,13 +148,13 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
         if not(hasattr(self, 'chapter')):
             self.chapter = ItemFactory.create(
                 parent_location=self.course.location,
-                template="i4x://edx/templates/chapter/Empty",
+                category='chapter'
             )
 
         section = ItemFactory.create(
             parent_location=self.chapter.location,
             display_name=name,
-            template="i4x://edx/templates/sequential/Empty",
+            category='sequential',
             metadata={'graded': True, 'format': section_format}
         )
 
@@ -405,7 +404,7 @@ class TestCourseGrader(TestSubmittingProblems):
         # Get both parts correct
         self.submit_question_answer('H1P1', {'2_1': 'Correct', '2_2': 'Correct'})
         self.check_grade_percent(0.25)
-        self.assertEqual(self.earned_hw_scores(), [2.0])   # Order matters
+        self.assertEqual(self.earned_hw_scores(), [2.0])  # Order matters
         self.assertEqual(self.score_for_hw('homework'), [2.0])
 
     def test_weighted_exam(self):
@@ -443,7 +442,7 @@ class TestCourseGrader(TestSubmittingProblems):
 
         self.assertEqual(self.score_for_hw('homework1'), [1.0, 0.0])
         self.assertEqual(self.score_for_hw('homework2'), [1.0, 1.0])
-        self.assertEqual(self.earned_hw_scores(), [1.0, 2.0, 0])   # Order matters
+        self.assertEqual(self.earned_hw_scores(), [1.0, 2.0, 0])  # Order matters
         self.check_grade_percent(0.75)
 
     def test_dropping_nochange(self):
@@ -457,7 +456,7 @@ class TestCourseGrader(TestSubmittingProblems):
         self.assertEqual(self.score_for_hw('homework1'), [1.0, 0.0])
         self.assertEqual(self.score_for_hw('homework2'), [1.0, 1.0])
         self.assertEqual(self.score_for_hw('homework3'), [1.0, 0.0])
-        self.assertEqual(self.earned_hw_scores(), [1.0, 2.0, 1.0])   # Order matters
+        self.assertEqual(self.earned_hw_scores(), [1.0, 2.0, 1.0])  # Order matters
         self.check_grade_percent(0.75)
 
     def test_dropping_all_correct(self):
@@ -471,7 +470,7 @@ class TestCourseGrader(TestSubmittingProblems):
             self.submit_question_answer(name, {'2_1': 'Correct'})
 
         self.check_grade_percent(1.0)
-        self.assertEqual(self.earned_hw_scores(), [1.0, 2.0, 2.0])   # Order matters
+        self.assertEqual(self.earned_hw_scores(), [1.0, 2.0, 2.0])  # Order matters
         self.assertEqual(self.score_for_hw('homework3'), [1.0, 1.0])
 
 
@@ -579,13 +578,13 @@ class TestPythonGradedResponse(TestSubmittingProblems):
         set up an example Circuit_Schematic_Builder problem
         """
 
-        schematic_template = "i4x://edx/templates/problem/Circuit_Schematic_Builder"
         script = self.SCHEMATIC_SCRIPT
 
         xmldata = SchematicResponseXMLFactory().build_xml(answer=script)
         ItemFactory.create(
             parent_location=self.section.location,
-            template=schematic_template,
+            category='problem',
+            boilerplate='circuitschematic.yaml',
             display_name=name,
             data=xmldata
         )
@@ -602,14 +601,14 @@ class TestPythonGradedResponse(TestSubmittingProblems):
         set up an example custom response problem using a check function
         """
 
-        custom_template = "i4x://edx/templates/problem/Custom_Python-Evaluated_Input"
         test_csv = self.CUSTOM_RESPONSE_SCRIPT
         expect = self.CUSTOM_RESPONSE_CORRECT
         cfn_problem_xml = CustomResponseXMLFactory().build_xml(script=test_csv, cfn='test_csv', expect=expect)
 
         ItemFactory.create(
             parent_location=self.section.location,
-            template=custom_template,
+            category='problem',
+            boilerplate='customgrader.yaml',
             data=cfn_problem_xml,
             display_name=name
         )
@@ -628,13 +627,12 @@ class TestPythonGradedResponse(TestSubmittingProblems):
 
         script = self.COMPUTED_ANSWER_SCRIPT
 
-        custom_template = "i4x://edx/templates/problem/Custom_Python-Evaluated_Input"
-
         computed_xml = CustomResponseXMLFactory().build_xml(answer=script)
 
         ItemFactory.create(
             parent_location=self.section.location,
-            template=custom_template,
+            category='problem',
+            boilerplate='customgrader.yaml',
             data=computed_xml,
             display_name=name
         )
