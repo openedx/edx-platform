@@ -241,7 +241,14 @@ def perform_enrolled_student_update(course_id, _module_state_key, student_identi
     course_loc = CourseDescriptor.id_to_location(course_id)
     course_descriptor = modulestore().get_instance(course_id, course_loc, depth=0)
 
-    enrolled_students = User.objects.filter(courseenrollment__course_id=course_id).prefetch_related("groups").order_by('username')
+    # The pre-fetching of groups is done to make auth checks not require an
+    # additional DB lookup (this kills the Progress page in particular).
+    # But when doing grading at this scale, the memory required to store the resulting
+    # enrolled_students is too large to fit comfortably in memory, and subsequent
+    # course grading requests lead to memory fragmentation.  So we will err here on the
+    # side of smaller memory allocations at the cost of additional lookups.
+    # enrolled_students = User.objects.filter(courseenrollment__course_id=course_id).prefetch_related("groups").order_by('username')
+    enrolled_students = User.objects.filter(courseenrollment__course_id=course_id)
 
     # Give the option of updating an individual student. If not specified,
     # then updates all students who have enrolled in the course
