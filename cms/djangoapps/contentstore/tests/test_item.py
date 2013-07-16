@@ -49,7 +49,7 @@ class TestCreateItem(CourseTestCase):
         resp = self.client.post(
             reverse('create_item'),
             json.dumps({
-                'parent_location': self.course_location.url(),
+                'parent_location': self.course.location.url(),
                 'display_name': display_name,
                 'category': 'chapter'
             }),
@@ -62,11 +62,11 @@ class TestCreateItem(CourseTestCase):
         new_obj = modulestore().get_item(chap_location)
         self.assertEqual(new_obj.category, 'chapter')
         self.assertEqual(new_obj.display_name, display_name)
-        self.assertEqual(new_obj.location.org, self.course_location.org)
-        self.assertEqual(new_obj.location.course, self.course_location.course)
+        self.assertEqual(new_obj.location.org, self.course.location.org)
+        self.assertEqual(new_obj.location.course, self.course.location.course)
 
         # get the course and ensure it now points to this one
-        course = modulestore().get_item(self.course_location)
+        course = modulestore().get_item(self.course.location)
         self.assertIn(chap_location, course.children)
 
         # use default display name
@@ -112,7 +112,7 @@ class TestCreateItem(CourseTestCase):
         resp = self.client.post(
             reverse('create_item'),
             json.dumps(
-                {'parent_location': self.course_location.url(),
+                {'parent_location': self.course.location.url(),
                  'category': 'problem',
                  'boilerplate': 'nosuchboilerplate.yaml'
                  }),
@@ -140,7 +140,7 @@ class TestEditItem(CourseTestCase):
         resp = self.client.post(
             reverse('create_item'),
             json.dumps(
-                {'parent_location': self.course_location.url(),
+                {'parent_location': self.course.location.url(),
                  'display_name': display_name,
                  'category': 'chapter'
                  }),
@@ -209,4 +209,4 @@ class TestEditItem(CourseTestCase):
             content_type="application/json"
         )
         problem = modulestore('draft').get_item(self.problems[0])
-        self.assertIsNo/ne(problem.markdown)
+        self.assertIsNone(problem.markdown)

@@ -8,6 +8,7 @@ from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.course_module import CourseDescriptor
 from xblock.core import Scope
+from xmodule.x_module import XModuleDescriptor
 
 class XModuleCourseFactory(Factory):
     """
@@ -36,7 +37,7 @@ class XModuleCourseFactory(Factory):
         if display_name is not None:
             new_course.display_name = display_name
 
-        new_course.lms.start = datetime.datetime.now(UTC)
+        new_course.lms.start = datetime.datetime.now(UTC).replace(microsecond=0)
         new_course.tabs = kwargs.pop(
             'tabs',
             [
@@ -88,21 +89,23 @@ class XModuleItemFactory(Factory):
     @classmethod
     def _create(cls, target_class, **kwargs):
         """
-        Uses *kwargs*:
+        Uses ``**kwargs``:
 
-        *parent_location* (required): the location of the parent module
+        :parent_location: (required): the location of the parent module
             (e.g. the parent course or section)
 
-        category: the category of the resulting item.
+        :category: the category of the resulting item.
 
-        *data* (optional): the data for the item
+        :data: (optional): the data for the item
             (e.g. XML problem definition for a problem item)
 
-        *display_name* (optional): the display name of the item
+        :display_name: (optional): the display name of the item
 
-        *metadata* (optional): dictionary of metadata attributes
+        :metadata: (optional): dictionary of metadata attributes
 
-        *target_class* is ignored
+        :boilerplate: (optional) the boilerplate for overriding field values
+
+        :target_class: is ignored
         """
 
         DETACHED_CATEGORIES = ['about', 'static_tab', 'course_info']
@@ -115,6 +118,14 @@ class XModuleItemFactory(Factory):
         metadata = kwargs.get('metadata', {})
         location = kwargs.get('location', XModuleItemFactory.location(parent_location, category, display_name))
         assert location != parent_location
+        if kwargs.get('boilerplate') is not None:
+            template_id = kwargs.get('boilerplate')
+            clz = XModuleDescriptor.load_class(category)
+            template = clz.get_template(template_id)
+            assert template is not None
+            metadata.update(template.get('metadata', {}))
+            if not isinstance(data, basestring):
+                data.update(template.get('data'))
 
         store = modulestore('direct')
 

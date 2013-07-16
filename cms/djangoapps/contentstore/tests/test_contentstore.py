@@ -308,12 +308,14 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         CourseFactory.create(org='edX', course='999', display_name='Robot Super Course')
         course_location = Location(['i4x', 'edX', '999', 'course', 'Robot_Super_Course', None])
 
-        ItemFactory.create(parent_location=course_location,
-                                            template="i4x://edx/templates/static_tab/Empty",
-                                            display_name="Static_1")
-        ItemFactory.create(parent_location=course_location,
-                                            template="i4x://edx/templates/static_tab/Empty",
-                                            display_name="Static_2")
+        ItemFactory.create(
+            parent_location=course_location,
+            category="static_tab",
+            display_name="Static_1")
+        ItemFactory.create(
+            parent_location=course_location,
+            category="static_tab",
+            display_name="Static_2")
 
         course = module_store.get_item(Location(['i4x', 'edX', '999', 'course', 'Robot_Super_Course', None]))
 
@@ -370,7 +372,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         course_location = Location(['i4x', 'edX', '999', 'course', 'Robot_Super_Course', None])
 
         chapterloc = ItemFactory.create(parent_location=course_location, display_name="Chapter").location
-        ItemFactory.create(parent_location=chapterloc, template='i4x://edx/templates/sequential/Empty', display_name="Sequential")
+        ItemFactory.create(parent_location=chapterloc, category='sequential', display_name="Sequential")
 
         sequential = direct_store.get_item(Location(['i4x', 'edX', '999', 'sequential', 'Sequential', None]))
         chapter = direct_store.get_item(Location(['i4x', 'edX', '999', 'chapter', 'Chapter', None]))
@@ -650,9 +652,9 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         vertical = module_store.get_item(Location(['i4x', 'edX', 'toy',
                                          'vertical', 'vertical_test', None]), depth=1)
 
-        draft_store.clone_item(vertical.location, vertical.location)
+        draft_store.convert_to_draft(vertical.location)
         for child in vertical.get_children():
-            draft_store.clone_item(child.location, child.location)
+            draft_store.convert_to_draft(child.location)
 
         # delete the course
         delete_course(module_store, content_store, location, commit=True)
