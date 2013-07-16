@@ -345,31 +345,8 @@ if settings.COURSEWARE_ENABLED and settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard$',
             'instructor.views.instructor_dashboard.instructor_dashboard_2', name="instructor_dashboard_2"),
 
-        # api endpoints for instructor
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/students_update_enrollment$',
-            'instructor.views.api.students_update_enrollment', name="students_update_enrollment"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/list_course_role_members$',
-            'instructor.views.api.list_course_role_members', name="list_course_role_members"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/modify_access$',
-            'instructor.views.api.modify_access', name="modify_access"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/get_grading_config$',
-            'instructor.views.api.get_grading_config', name="get_grading_config"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/get_students_features(?P<csv>/csv)?$',
-            'instructor.views.api.get_students_features', name="get_students_features"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/get_distribution$',
-            'instructor.views.api.get_distribution', name="get_distribution"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/get_student_progress_url$',
-            'instructor.views.api.get_student_progress_url', name="get_student_progress_url"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/reset_student_attempts$',
-            'instructor.views.api.reset_student_attempts', name="reset_student_attempts"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/rescore_problem$',
-            'instructor.views.api.rescore_problem', name="rescore_problem"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/list_instructor_tasks$',
-            'instructor.views.api.list_instructor_tasks', name="list_instructor_tasks"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/list_forum_members$',
-            'instructor.views.api.list_forum_members', name="list_forum_members"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/update_forum_role_membership$',
-            'instructor.views.api.update_forum_role_membership', name="update_forum_role_membership"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/',
+            include('instructor.views.api_urls'))
     )
 
 if settings.ENABLE_JASMINE:
