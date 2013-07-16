@@ -12,7 +12,7 @@ django_admin.py celery worker
 # want to import all variables from base settings files
 # pylint: disable=W0401, W0614
 
-from dev import *
+from cms.dev import *
 
 ################################# CELERY ######################################
 

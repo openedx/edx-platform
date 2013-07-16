@@ -13,6 +13,7 @@ from courseware.access import _course_staff_group_name, _course_instructor_group
 
 from django.http import Http404
 
+import re
 import math
 import time
 import logging
@@ -86,12 +87,9 @@ def course_email(hash_for_msg, to_list, course_title, course_url, throttle=False
     p = Popen(['lynx','-stdin','-display_charset=UTF-8','-assume_charset=UTF-8','-dump'], stdin=PIPE, stdout=PIPE)
     (plaintext, err_from_stderr) = p.communicate(input=msg.html_message.encode('utf-8')) #use lynx to get plaintext
 
-
-
-    staff_email = settings.DEFAULT_BULK_FROM_EMAIL
     course_title_no_quotes = re.sub(r'"', '', course_title)
-    from_addr = '"%s" Course Staff <%s>' % (course_title_no_quotes, staff_email)
-
+    from_addr = '"%s" Course Staff <%s>' % (course_title_no_quotes, settings.DEFAULT_BULK_FROM_EMAIL)
+    
     #TODO generate course-specific from address
 
     if err_from_stderr:
