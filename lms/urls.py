@@ -442,7 +442,7 @@ if settings.DEBUG:
 # enable automatic login
 if settings.MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_LOAD_TESTING'):
     urlpatterns += (
-        url(r'^auto_auth$', 'branding.views.auto_auth'),
+        url(r'^auto_auth$', 'student.views.auto_auth'),
     )
 
 #Custom error pages

@@ -49,39 +49,3 @@ def courses(request):
         return courseware.views.courses(request)
 
     return courseware.views.university_profile(request, university)
-
-
-def auto_auth(request):
-    """
-    Automatically logs the user in with a generated random credentials
-    This view is only accessible when settings.AUTOMATIC_AUTH_FOR_LOAD_TESTING is
-    true.
-    """
-
-    from django.contrib.auth.models import User
-    from django.contrib.auth import login, authenticate
-    from random import randint
-
-    # generate random user ceredentials from a small name space (determined by settings)
-    name_base = 'USER_'
-    pass_base = 'PASS_'
-
-    number = randint(1, settings.MAX_AUTO_AUTH_USERS)
-
-    username = name_base + str(number)
-    password = pass_base + str(number)
-
-    # if they already are a user, log in
-    try:
-        user = User.objects.get(username=username)
-        user = authenticate(username=username, password=password)
-        login(request, user)
-
-    # else create and activate account info
-    except:
-        student.views.create_account(request, username, password)
-        request.user.is_active = True
-        request.user.save()
-
-    # redirect to home-page
-    return redirect('root')
