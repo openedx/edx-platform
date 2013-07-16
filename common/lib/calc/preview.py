@@ -16,7 +16,7 @@ def PRINT(x):
     if PREVIEW_DEBUG:
         print x
 
-class LatexRendered:
+class LatexRendered(object):
     """
     Data structure to hold a typeset representation of some math.
 
@@ -42,18 +42,27 @@ class LatexRendered:
 
         # generate parens and overwrite self.latex
         if parens != None:
-            if parens == '{':
-                parens = r'\{'
+            left_parens = parens
+            if left_parens == '{':
+                left_parens = r'\{'
 
             pairs = {'(': ')',
                      '[': ']',
                      r'\{': r'\}'}
-            if parens not in pairs:
-                raise Exception(u"Unknown parenthesis '{}': coder error".format(parens))
+            if left_parens not in pairs:
+                raise Exception(
+                    u"Unknown parenthesis '{}': coder error".format(left_parens)
+                )
+            right_parens = pairs[left_parens]
+
+            if self.tall:
+                left_parens = r"\left" + left_parens
+                right_parens = r"\right" + right_parens
+
             self.latex = u"{left}{expr}{right}".format(
-                left=parens,
+                left=left_parens,
                 expr=latex,
-                right=pairs[parens]
+                right=right_parens
             )
 
 def render_number(children):
@@ -214,11 +223,14 @@ def latex_preview(string, variables=None, functions=None, case_sensitive=False):
     # Parse tree
     tree = parse_algebra(string)
 
-    # Get our variables together
+    # Get our variables together.
     variables, functions = add_defaults(variables or (), functions or (), case_sensitive)
 
-    # Create a recursion to evaluate the tree
-    casify = lambda x: x if case_sensitive else x.lower()  # Lowercase for case insens.
+    # Create a recursion to evaluate the tree.
+    if case_sensitive:
+        casify = lambda x: x
+    else:
+        casify = lambda x: x.lower()  # Lowercase for case insens.
     render_action = {
         'number': render_number,
         'variable': variable_closure(set(variables), casify),

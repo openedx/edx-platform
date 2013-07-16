@@ -114,7 +114,7 @@ def find_vars_funcs(tree):
 
 def check_variables(tree, all_variables, all_functions, case_sensitive):
     """
-    Confirm the only variables in the tree are defined.
+    Confirm that all the variables used in the tree are valid/defined.
 
     Otherwise, raise an UndefinedVariable containing all bad variables.
     """
@@ -347,7 +347,11 @@ def evaluator(variables, functions, string, case_sensitive=False):
     check_variables(tree, set(all_variables), set(all_functions), case_sensitive)
 
     # Create a recursion to evaluate the tree
-    casify = lambda x: x if case_sensitive else x.lower()  # Lowercase for case insens.
+    if case_sensitive:
+        casify = lambda x: x
+    else:
+        casify = lambda x: x.lower()  # Lowercase for case insens.
+
     evaluate_action = {
         'number': eval_number,
         'variable': lambda x: all_variables[casify(x[0])],

@@ -1737,7 +1737,7 @@ class FormulaResponse(LoncapaResponse):
                            samples.split('@')[1].split('#')[0].split(':')))
 
         ranges = dict(zip(variables, sranges))
-        for i in range(numsamples):
+        for _ in range(numsamples):
             instructor_variables = self.strip_dict(dict(self.context))
             student_variables = dict()
             # ranges give numerical ranges for testing
