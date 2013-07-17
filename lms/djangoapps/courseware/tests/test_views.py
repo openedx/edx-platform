@@ -6,6 +6,7 @@ from django.http import Http404
 from django.test.utils import override_settings
 from django.contrib.auth.models import User
 from django.test.client import RequestFactory
+from django.conf import settings
 
 from student.models import CourseEnrollment
 from xmodule.modulestore.django import modulestore
