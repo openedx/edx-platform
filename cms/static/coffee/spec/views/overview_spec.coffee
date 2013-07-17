@@ -63,7 +63,7 @@ describe "Course Overview", ->
     afterEach ->
         delete window.analytics
         delete window.course_location_analytics
-        @xhr.restore()
+        # @xhr.restore()
         @notificationSpy.reset()
 
     it "should save model when save is clicked", ->
