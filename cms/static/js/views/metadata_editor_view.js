@@ -27,6 +27,9 @@ CMS.Views.Metadata.Editor = Backbone.View.extend({
                     model.getType() === CMS.Models.Metadata.FLOAT_TYPE) {
                     new CMS.Views.Metadata.Number(data);
                 }
+                else if(model.getType() === CMS.Models.Metadata.LIST_TYPE) {
+                    new CMS.Views.Metadata.List(data);
+                }
                 else {
                     // Everything else is treated as GENERIC_TYPE, which uses String editor.
                     new CMS.Views.Metadata.String(data);
@@ -308,5 +311,25 @@ CMS.Views.Metadata.Option = CMS.Views.Metadata.AbstractEditor.extend({
         this.$el.find('#' + this.uniqueId + " option").filter(function() {
             return $(this).text() === value;
         }).prop('selected', true);
+    }
+});
+
+CMS.Views.Metadata.List = CMS.Views.Metadata.AbstractEditor.extend({
+
+    events : {
+        "click .setting-clear" : "clear",
+        "keypress .setting-input" : "showClearButton",
+        "change input" : "updateModel"
+    },
+
+    templateName: "metadata-list-entry",
+
+    getValueFromEditor: function () {
+        return _.map(this.$el.find('#' + this.uniqueId).val().split(/,/),
+                     function (url) { return url.trim(); });
+    },
+
+    setValueInEditor: function (value) {
+        this.$el.find('.input').val(value.join(', '));
     }
 });
