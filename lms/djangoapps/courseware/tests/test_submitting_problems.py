@@ -107,6 +107,15 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
         resp = self.client.post(modx_url)
         return resp
 
+    def show_question_answer(self, problem_url_name):
+        """
+        Shows the answer to the current student.
+        """
+        problem_location = self.problem_location(problem_url_name)
+        modx_url = self.modx_url(problem_location, 'problem_show')
+        resp = self.client.post(modx_url)
+        return resp
+
     def add_dropdown_to_section(self, section_location, name, num_inputs=2):
         """
         Create and return a dropdown problem.
@@ -131,7 +140,7 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
             parent_location=section_location,
             category='problem',
             data=prob_xml,
-            metadata={'randomize': 'always'},
+            metadata={'rerandomize': 'always'},
             display_name=name
         )
 
@@ -139,7 +148,7 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.refresh_course()
         return problem
 
-    def add_graded_section_to_course(self, name, section_format='Homework'):
+    def add_graded_section_to_course(self, name, section_format='Homework', late=False, reset=False, showanswer=False):
         """
         Creates a graded homework section within a chapter and returns the section.
         """
@@ -151,12 +160,44 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
                 category='chapter'
             )
 
-        section = ItemFactory.create(
-            parent_location=self.chapter.location,
-            display_name=name,
-            category='sequential',
-            metadata={'graded': True, 'format': section_format}
-        )
+        if late:
+            section = ItemFactory.create(
+                parent_location=self.chapter.location,
+                display_name=name,
+                category='sequential',
+                metadata={'graded': True, 'format': section_format, 'due': '2013-05-20T23:30'}
+            )
+        elif reset:
+            section = ItemFactory.create(
+                parent_location=self.chapter.location,
+                display_name=name,
+                category='sequential',
+                rerandomize='always',
+                metadata={
+                    'graded': True,
+                    'format': section_format,
+                }
+            )
+
+        elif showanswer:
+            section = ItemFactory.create(
+                parent_location=self.chapter.location,
+                display_name=name,
+                category='sequential',
+                showanswer='never',
+                metadata={
+                    'graded': True,
+                    'format': section_format,
+                }
+            )
+
+        else:
+            section = ItemFactory.create(
+                parent_location=self.chapter.location,
+                display_name=name,
+                category='sequential',
+                metadata={'graded': True, 'format': section_format}
+            )
 
         # now that we've added the problem and section to the course
         # we fetch the course from the database so the object we are
@@ -257,7 +298,7 @@ class TestCourseGrader(TestSubmittingProblems):
         hw_section = next(section for section in sections_list if section.get('url_name') == hw_url_name)
         return [s.earned for s in hw_section['scores']]
 
-    def basic_setup(self):
+    def basic_setup(self, late=False, reset=False, showanswer=False):
         """
         Set up a simple course for testing basic grading functionality.
         """
@@ -278,7 +319,7 @@ class TestCourseGrader(TestSubmittingProblems):
         self.add_grading_policy(grading_policy)
 
         # set up a simple course with four problems
-        self.homework = self.add_graded_section_to_course('homework')
+        self.homework = self.add_graded_section_to_course('homework', late=late, reset=reset, showanswer=showanswer)
         self.add_dropdown_to_section(self.homework.location, 'p1', 1)
         self.add_dropdown_to_section(self.homework.location, 'p2', 1)
         self.add_dropdown_to_section(self.homework.location, 'p3', 1)
@@ -345,6 +386,41 @@ class TestCourseGrader(TestSubmittingProblems):
         self.homework3 = self.add_graded_section_to_course('homework3')
         self.add_dropdown_to_section(self.homework3.location, self.hw3_names[0], 1)
         self.add_dropdown_to_section(self.homework3.location, self.hw3_names[1], 1)
+
+    def test_submission_late(self):
+        """Test problem for due date in the past"""
+        self.basic_setup(late=True)
+        resp = self.submit_question_answer('p1', {'2_1': 'Correct'})
+        self.assertEqual(resp.status_code, 200)
+        err_msg = (
+            "The state of this problem has changed since you loaded this page. "
+            "Please refresh your page."
+        )
+        self.assertEqual(json.loads(resp.content).get("success"), err_msg)
+
+    def test_submission_reset(self):
+        """Test problem ProcessingErrors due to resets"""
+        self.basic_setup(reset=True)
+        resp = self.submit_question_answer('p1', {'2_1': 'Correct'})
+        #  submit a second time to draw NotFoundError
+        resp = self.submit_question_answer('p1', {'2_1': 'Correct'})
+        self.assertEqual(resp.status_code, 200)
+        err_msg = (
+            "The state of this problem has changed since you loaded this page. "
+            "Please refresh your page."
+        )
+        self.assertEqual(json.loads(resp.content).get("success"), err_msg)
+
+    def test_submission_show_answer(self):
+        """Test problem for ProcessingErrors due to showing answer"""
+        self.basic_setup(showanswer=True)
+        resp = self.show_question_answer('p1')
+        self.assertEqual(resp.status_code, 200)
+        err_msg = (
+            "The state of this problem has changed since you loaded this page. "
+            "Please refresh your page."
+        )
+        self.assertEqual(json.loads(resp.content).get("success"), err_msg)
 
     def test_none_grade(self):
         """
