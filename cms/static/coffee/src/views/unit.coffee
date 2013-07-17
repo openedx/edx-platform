@@ -67,8 +67,8 @@ class CMS.Views.UnitEdit extends Backbone.View
     type = $(event.currentTarget).data('type')
     @$newComponentTypePicker.slideUp(250)
     @$(".new-component-#{type}").slideDown(250)
-    $('html, body').animate({ 
-      scrollTop: @$(".new-component-#{type}").offset().top 
+    $('html, body').animate({
+      scrollTop: @$(".new-component-#{type}").offset().top
     }, 500)
 
   closeNewComponent: (event) =>
@@ -115,12 +115,12 @@ class CMS.Views.UnitEdit extends Backbone.View
     @model.save()
 
   deleteComponent: (event) =>
-    msg = new CMS.Views.Prompt.Confirmation(
-      title: gettext('Are you sure you want to delete this component?'),
-      message: gettext('This action cannot be undone.'),
+    msg = new CMS.Views.Prompt.Warning(
+      title: gettext('Delete this component?'),
+      message: gettext('Deleting this component is permanent and cannot be undone.'),
       actions:
         primary:
-          text: gettext('OK'),
+          text: gettext('Yes, delete this component'),
           click: (view) =>
             view.hide()
             deleting = new CMS.Views.Notification.Mini
@@ -252,7 +252,7 @@ class CMS.Views.UnitEdit.NameEdit extends Backbone.View
 class CMS.Views.UnitEdit.LocationState extends Backbone.View
   initialize: =>
     @model.on('change:state', @render)
-  
+
   render: =>
     @$el.toggleClass("#{@model.previous('state')}-item #{@model.get('state')}-item")
 

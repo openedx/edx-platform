@@ -370,12 +370,12 @@ function deleteSection(e) {
 }
 
 function _deleteItem($el, type) {
-    var confirm = new CMS.Views.Prompt.Confirmation({
-        title: gettext('Are you sure you wish to delete this ' + type + '?'),
-        message: gettext('It cannot be reversed!'),
+    var confirm = new CMS.Views.Prompt.Warning({
+        title: gettext('Delete this ' + type + '?'),
+        message: gettext('Deleting this ' + type + ' is permanent and cannot be undone.'),
         actions: {
             primary: {
-                text: gettext('OK'),
+                text: gettext('Yes, delete this ' + type),
                 click: function(view) {
                     view.hide();
 
