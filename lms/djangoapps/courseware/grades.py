@@ -159,6 +159,13 @@ def _grade_section(section_descriptor, student, field_data_cache, module_creator
         scores.append(Score(correct, total, graded, module_descriptor.display_name_with_default))
 
     _, graded_total = graders.aggregate_scores(scores, section_descriptor.display_name_with_default)
+    # TODO: decide if this should be removed once debugging is done...
+    if not graded_total > 0:
+        num_scores = len(scores)
+        num_graded = sum(1 for score in scores if score.graded)
+        log.warning("Section '%s' contained %s graded modules out of %s scored modules",
+                    section_descriptor.display_name_with_default, num_graded, num_scores)
+
     return graded_total, scores
 
 
@@ -214,6 +221,12 @@ def grade_as_task(student, course, track_function, xqueue_callback_url_prefix):
         if isinstance(module, (ErrorModule, NonStaffErrorModule)):
             # try to get the original error message from the error module itself:
             # TODO: Not sure that this works.  Needs tests put in place.
+            # Well, it seems not to work.  We get the %s appearing, and not being replaced
+            # with an error message at all.
+            # TODO: decide if there's a way to determine severity here.  For example:
+            # "Error while executing script code: [Errno 12] Cannot allocate memory"
+            # might be an indication that we should just stop altogether.  In which case
+            # we would raise a FatalGradingModuleInstantiationException.
             error_message = module.error_msg
             msg = "Unable to create module: %s".format(error_message)
             raise GradingModuleInstantiationException(msg)
@@ -260,8 +273,8 @@ def _grade(student, course, grading_context, module_creator_fcn, field_data_cach
             if graded_total.possible > 0:
                 format_scores.append(graded_total)
             else:
-                log.exception("Unable to grade a section with a total possible score of zero. " +
-                              str(section_descriptor.location))
+                log.error("Unable to grade a section with a total possible score of zero. " +
+                          str(section_descriptor.location))
 
         totaled_scores[section_format] = format_scores
 
@@ -428,11 +441,14 @@ def _get_score(user, problem_descriptor, module_creator, field_data_cache):
     if problem_descriptor.always_recalculate_grades:
         problem = module_creator(problem_descriptor)
         if problem is None:
+            # This seems unexpected, so log at the very least:
+            log.warning("Unable to create a module for always_recalculate: problem '%s' and user '%s'", str(problem_descriptor), user.username)
             return (None, None)
         score = problem.get_score()
         if score is not None:
             return (score['score'], score['total'])
         else:
+            log.warning("Missing score for always_recalculate module: problem '%s' and user '%s'", str(problem_descriptor), user.username)
             return (None, None)
 
     student_module = _get_student_module_from_cache(field_data_cache, user, problem_descriptor)
@@ -460,12 +476,14 @@ def _get_score(user, problem_descriptor, module_creator, field_data_cache):
         # This will make the max score (cached in student_module) become available.
         problem = module_creator(problem_descriptor)
         if problem is None:
+            log.warning("Unable to create a new module: problem '%s' and user '%s'", str(problem_descriptor), user.username)
             return (None, None)
         total = problem.max_score()
 
         # Problem may be an error module (if something in the problem builder failed)
         # In which case total might be None
         if total is None:
+            log.warning("Missing max_score for new module: problem '%s' and user '%s'", str(problem_descriptor), user.username)
             return (None, None)
 
         return (0.0, total)

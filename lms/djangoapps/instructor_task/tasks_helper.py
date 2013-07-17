@@ -15,7 +15,6 @@ from celery import Task, current_task
 from celery.utils.log import get_task_logger
 from celery.states import SUCCESS, FAILURE
 
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import transaction, reset_queries
 from dogapi import dog_stats_api
@@ -247,7 +246,6 @@ def perform_enrolled_student_update(course_id, _module_state_key, student_identi
     # enrolled_students is too large to fit comfortably in memory, and subsequent
     # course grading requests lead to memory fragmentation.  So we will err here on the
     # side of smaller memory allocations at the cost of additional lookups.
-    # enrolled_students = User.objects.filter(courseenrollment__course_id=course_id).prefetch_related("groups").order_by('username')
     enrolled_students = User.objects.filter(courseenrollment__course_id=course_id)
 
     # Give the option of updating an individual student. If not specified,
@@ -298,11 +296,6 @@ def perform_enrolled_student_update(course_id, _module_state_key, student_identi
         # update task status:
         task_progress = get_task_progress()
         _get_current_task().update_state(state=PROGRESS, meta=task_progress)
-
-        # add temporary hack to make grading tasks finish more quickly!
-        # TODO: REMOVE THIS when done with debugging
-        if num_attempted == 1000:
-            break
 
     return task_progress
 
