@@ -5,6 +5,9 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+LMS: Added endpoints for AJAX requests to enable/disable notifications
+(which are not yet implemented) and a one-click unsubscribe page.
+
 Common: Added *experimental* support for jsinput type.
 
 Common: Added setting to specify Celery Broker vhost
