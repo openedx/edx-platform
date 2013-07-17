@@ -89,7 +89,7 @@ def variable_closure(variables, casify):
         if varname in greek:
             return LatexRendered(ur"\{letter} ".format(letter=varname))
         else:
-            return LatexRendered(varname) #.replace("_", r"\_"))
+            return LatexRendered(varname)  # .replace("_", r"\_"))
     return render_variable
 
 

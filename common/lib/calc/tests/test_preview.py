@@ -6,7 +6,7 @@ Unit tests for preview.py
 import unittest
 import preview
 import pyparsing
-from mock import MagicMock
+
 
 class PreviewTestUtility(unittest.TestCase):
     def assert_latex_rendered(self, to_be_tested, tall=False, latex=None, sans_parens=None):
@@ -198,7 +198,7 @@ class LatexPreviewTest(unittest.TestCase):
             '11*',
             'f((x)',
             'sqrt(x^)',
-            '3f(x)', # not 3*f(x)
+            '3f(x)',  # Not 3*f(x)
             '3|4',
             '3|||4'
         ]
