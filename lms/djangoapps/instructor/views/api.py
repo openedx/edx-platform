@@ -134,7 +134,7 @@ def students_update_enrollment(request, course_id):
 
     Returns an analog to this JSON structure: {
         "action": "enroll",
-        "auto_enroll": false
+        "auto_enroll": false,
         "results": [
             {
                 "email": "testemail@test.org",
@@ -202,17 +202,19 @@ def students_update_enrollment(request, course_id):
 @require_query_params(
     email="user email",
     rolename="'instructor', 'staff', or 'beta'",
-    mode="'allow' or 'revoke'"
+    action="'allow' or 'revoke'"
 )
 def modify_access(request, course_id):
     """
-    Modify staff/instructor access.
+    Modify staff/instructor access of other user.
     Requires instructor access.
+
+    NOTE: instructors cannot remove their own instructor access.
 
     Query parameters:
     email is the target users email
     rolename is one of ['instructor', 'staff', 'beta']
-    mode is one of ['allow', 'revoke']
+    action is one of ['allow', 'revoke']
     """
     course = get_course_with_access(
         request.user, course_id, 'instructor', depth=None
@@ -220,7 +222,7 @@ def modify_access(request, course_id):
 
     email = request.GET.get('email')
     rolename = request.GET.get('rolename')
-    mode = request.GET.get('mode')
+    action = request.GET.get('action')
 
     if not rolename in ['instructor', 'staff', 'beta']:
         return HttpResponseBadRequest(
@@ -229,17 +231,23 @@ def modify_access(request, course_id):
 
     user = User.objects.get(email=email)
 
-    if mode == 'allow':
+    # disallow instructors from removing their own instructor access.
+    if rolename == 'instructor' and user == request.user and action != 'allow':
+        return HttpResponseBadRequest(
+            "An instructor cannot remove their own instructor access."
+        )
+
+    if action == 'allow':
         access.allow_access(course, user, rolename)
-    elif mode == 'revoke':
+    elif action == 'revoke':
         access.revoke_access(course, user, rolename)
     else:
-        raise ValueError("unrecognized mode '{}'".format(mode))
+        return HttpResponseBadRequest("unrecognized action '{}'".format(action))
 
     response_payload = {
         'email': email,
         'rolename': rolename,
-        'mode': mode,
+        'action': action,
         'success': 'yes',
     }
     response = HttpResponse(
@@ -258,6 +266,18 @@ def list_course_role_members(request, course_id):
     Requires instructor access.
 
     rolename is one of ['instructor', 'staff', 'beta']
+
+    Returns JSON of the form {
+        "course_id": "some/course/id",
+        "staff": [
+            {
+                "username": "staff1",
+                "email": "staff1@example.org",
+                "first_name": "Joe",
+                "last_name": "Shmoe",
+            }
+        ]
+    }
     """
     course = get_course_with_access(
         request.user, course_id, 'instructor', depth=None
@@ -627,7 +647,7 @@ def list_forum_members(request, course_id):
 @require_query_params(
     email="the target users email",
     rolename="the forum role",
-    mode="'allow' or 'revoke'",
+    action="'allow' or 'revoke'",
 )
 @common_exceptions_400
 def update_forum_role_membership(request, course_id):
@@ -637,24 +657,24 @@ def update_forum_role_membership(request, course_id):
     Query parameters:
     email is the target users email
     rolename is one of [FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA]
-    mode is one of ['allow', 'revoke']
+    action is one of ['allow', 'revoke']
     """
     email = request.GET.get('email')
     rolename = request.GET.get('rolename')
-    mode = request.GET.get('mode')
+    action = request.GET.get('action')
 
     if not rolename in [FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA]:
         return HttpResponseBadRequest()
 
     try:
         user = User.objects.get(email=email)
-        access.update_forum_role_membership(course_id, user, rolename, mode)
+        access.update_forum_role_membership(course_id, user, rolename, action)
     except Role.DoesNotExist:
         return HttpResponseBadRequest("Role does not exist.")
 
     response_payload = {
         'course_id': course_id,
-        'mode': mode,
+        'action': action,
     }
     response = HttpResponse(
         json.dumps(response_payload), content_type="application/json"

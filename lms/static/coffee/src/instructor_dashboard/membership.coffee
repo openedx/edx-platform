@@ -251,15 +251,15 @@ class AuthList
 
   # update the access of a user.
   # (add or remove them from the list)
-  # mode should be one of ['allow', 'revoke']
-  access_change: (email, mode, cb) ->
+  # action should be one of ['allow', 'revoke']
+  access_change: (email, action, cb) ->
     $.ajax
       dataType: 'json'
       url: @$add_section.data 'endpoint'
       data:
         email: email
         rolename: @rolename
-        mode: mode
+        action: action
       success: (data) -> cb?(data)
       error: std_ajax_err => @$request_response_error.text "Error changing user's permissions."
 

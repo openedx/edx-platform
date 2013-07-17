@@ -52,12 +52,12 @@ def revoke_access(course, user, level):
     _change_access(course, user, level, 'revoke')
 
 
-def _change_access(course, user, level, mode):
+def _change_access(course, user, level, action):
     """
     Change access of user.
 
     level is one of ['instructor', 'staff', 'beta']
-    mode is one of ['allow', 'revoke']
+    action is one of ['allow', 'revoke']
 
     NOTE: will NOT create a group that does not yet exist.
     """
@@ -70,29 +70,29 @@ def _change_access(course, user, level, mode):
         raise ValueError("unrecognized level '{}'".format(level))
     group, _ = Group.objects.get_or_create(name=grpname)
 
-    if mode == 'allow':
+    if action == 'allow':
         user.groups.add(group)
-    elif mode == 'revoke':
+    elif action == 'revoke':
         user.groups.remove(group)
     else:
-        raise ValueError("unrecognized mode '{}'".format(mode))
+        raise ValueError("unrecognized action '{}'".format(action))
 
 
-def update_forum_role_membership(course_id, user, rolename, mode):
+def update_forum_role_membership(course_id, user, rolename, action):
     """
     Change forum access of user.
 
     `rolename` is one of [FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA]
-    `mode` is one of ['allow', 'revoke']
+    `action` is one of ['allow', 'revoke']
 
-    if `mode` is bad, raises ValueError
+    if `action` is bad, raises ValueError
     if `rolename` does not exist, raises Role.DoesNotExist
     """
     role = Role.objects.get(course_id=course_id, name=rolename)
 
-    if mode == 'allow':
+    if action == 'allow':
         role.users.add(user)
-    elif mode == 'revoke':
+    elif action == 'revoke':
         role.users.remove(user)
     else:
-        raise ValueError("unrecognized mode '{}'".format(mode))
+        raise ValueError("unrecognized action '{}'".format(action))
