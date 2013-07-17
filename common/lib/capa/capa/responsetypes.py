@@ -917,6 +917,27 @@ class NumericalResponse(LoncapaResponse):
 
     # TODO: add check_hint_condition(self, hxml_set, student_answers)
 
+    def answer_compare(self, a, b):
+        """
+        Outside-facing function that lets us compare two numerical answers,
+        with this problem's tolerance.
+        """
+        return compare_with_tolerance(
+            evaluator(dict(), dict(), a),
+            evaluator(dict(), dict(), b),
+            self.tolerance
+        )
+
+    def validate_answer(self, answer):
+        """
+        Returns whether this answer is in a valid form.
+        """
+        try:
+            evaluator(dict(), dict(), answer)
+            return True
+        except StudentInputError:
+            return False
+
     def get_answers(self):
         return {self.answer_id: self.correct_answer}
 
@@ -1857,6 +1878,24 @@ class FormulaResponse(LoncapaResponse):
             if not compare_with_tolerance(student_result[i], instructor_result[i], self.tolerance):
                 return "incorrect"
         return "correct"
+
+    def answer_compare(self, a, b):
+        """
+        An external interface for comparing whether a and b are equal.
+        """
+        internal_result = self.check_formula(a, b, self.samples)
+        return internal_result == "correct"
+
+    def validate_answer(self, answer):
+        """
+        Returns whether this answer is in a valid form.
+        """
+        var_dict_list = self.randomize_variables(self.samples)
+        try:
+            self.hash_answers(answer, var_dict_list)
+            return True
+        except StudentInputError:
+            return False
 
     def strip_dict(self, d):
         ''' Takes a dict. Returns an identical dict, with all non-word

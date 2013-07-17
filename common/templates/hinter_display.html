@@ -3,18 +3,14 @@
 
 
 <%def name="get_hint()">
-    % if best_hint != '':
+    % if len(hints) > 0:
         <h4> Hints from students who made similar mistakes: </h4>
         <ul>
-        <li> ${best_hint} </li>
+        % for hint in hints:
+            <li> ${hint} </li>
+        % endfor
+        </ul>
     % endif
-    % if rand_hint_1 != '':
-        <li> ${rand_hint_1} </li>
-    % endif
-    % if rand_hint_2 != '':
-        <li> ${rand_hint_2} </li>
-    % endif
-    </ul>
 </%def>
 
 <%def name="get_feedback()">
@@ -66,17 +62,13 @@
 
     <div id="answer-tabs">
         <ul>
-        % for answer in answer_to_hints:
+        % for answer in user_submissions:
             <li><a href="#previous-answer-${unspace(answer)}"> ${answer} </a></li>
         % endfor
         </ul>
 
-        % for answer, pk_dict in answer_to_hints.items():
-            <%
-                import json
-                all_pks = json.dumps(pk_dict.keys())
-            %>
-            <div class = "previous-answer" id="previous-answer-${unspace(answer)}" data-answer="${answer}" data-all-pks='${all_pks}'>
+        % for answer in user_submissions:
+            <div class = "previous-answer" id="previous-answer-${unspace(answer)}" data-answer="${answer}">
             <div class = "hint-inner-container">
                 <p>
                 What hint would you give a student who made the same mistake you did?  Please don't give away the answer.

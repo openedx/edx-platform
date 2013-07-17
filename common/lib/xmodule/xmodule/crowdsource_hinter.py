@@ -42,18 +42,11 @@ class CrowdsourceHinterFields(object):
     mod_queue = Dict(help='A dictionary containing hints still awaiting approval', scope=Scope.content,
                      default={})
     hint_pk = Integer(help='Used to index hints.', scope=Scope.content, default=0)
-    # signature_to_ans maps an answer signature to an answer string that shows that answer in a
-    # human-readable form.
-    signature_to_ans = Dict(help='Maps a signature to a representative formula.', scope=Scope.content,
-                            default={})
-    # A list of dictionaries, each of which represents an n-dimenstional point that we plug into
-    # formulas.  Each dictionary maps variables to values, eg {'x': 5.1}.
-    formula_test_values = List(help='The values that we plug into formula responses', scope=Scope.content,
-                               default=[])
+
     # A list of previous answers this student made to this problem.
-    # Of the form [answer, [hint_pk_1, hint_pk_2, hint_pk_3]] for each problem.  hint_pk's are
-    # None if the hint was not given.
-    previous_answers = List(help='A list of previous submissions.', scope=Scope.user_state, default=[])
+    # Of the form [answer, [hint_pk_1, ...]] for each problem.
+    previous_answers = List(help='A list of hints viewed.', scope=Scope.user_state, default=[])
+    user_submissions = List(help='A list of previous submissions', scope=Scope.user_state, default=[])
     user_voted = Boolean(help='Specifies if the user has voted on this problem or not.',
                          scope=Scope.user_state, default=False)
 
@@ -82,13 +75,20 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
     def __init__(self, *args, **kwargs):
         XModule.__init__(self, *args, **kwargs)
         # We need to know whether we are working with a FormulaResponse problem.
-        self.is_formula = (type(self.get_display_items()[0].lcp.responders.values()[0]) == FormulaResponse)
+        responder = self.get_display_items()[0].lcp.responders.values()[0]
+        self.is_formula = (type(responder) == FormulaResponse)
         if self.is_formula:
             self.answer_to_str = self.formula_answer_to_str
-            self.answer_signature = self.formula_answer_signature
         else:
             self.answer_to_str = self.numerical_answer_to_str
-            self.answer_signature = self.numerical_answer_signature
+        # answer_compare is expected to return whether its two inputs are close enough
+        # to be equal, or raise a StudentInputError if one of the inputs is malformatted.
+        try:
+            self.answer_compare = responder.answer_compare
+            self.validate_answer = responder.validate_answer
+        except AttributeError:
+            # This response type is not supported!
+            log.exception('Response type not supported for hinting: ' + str(responder))
 
     def get_html(self):
         """
@@ -136,38 +136,12 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         """
         return str(answer.values()[0])
 
-    def numerical_answer_signature(self, answer):
+    def get_matching_answers(self, answer):
         """
-        Runs the answer string through the evaluator.  (This is because
-        symbolic expressions like sin(pi/12)*3 are allowed.)
+        Look in self.hints, and find all answer keys that are "equal with tolerance"
+        to the input answer.
         """
-        try:
-            out = str(evaluator(dict(), dict(), answer))
-        except (UndefinedVariable, ParseException):
-            out = None
-        return out
-
-    def formula_answer_signature(self, answer):
-        """
-        Converts a capa answer string (output of formula_answer_to_str)
-        to a string unique to each formula equality class.
-        So, x^2 and x*x would have the same signature, which would differ
-        from the signature of 2*x^2.
-        """
-        responder = self.get_display_items()[0].lcp.responders.values()[0]
-        if self.formula_test_values == []:
-            # Make a set of test values, and save them.
-            self.formula_test_values = responder.randomize_variables(responder.samples)
-        try:
-            # TODO, maybe: add some rounding to signature generation, so that floating point
-            # errors don't make a difference.
-            out = str(responder.hash_answers(answer, self.formula_test_values))
-        except StudentInputError:
-            # I'm not sure what's the best thing to do here.  I'm returning
-            # None, for now, so that the calling function has a chance to catch
-            # the error without having to import StudentInputError.
-            return None
-        return out
+        return [key for key in self.hints if self.answer_compare(key, answer)]
 
     def handle_ajax(self, dispatch, data):
         """
@@ -211,46 +185,66 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
             # Sometimes, we get an answer that's just not parsable.  Do nothing.
             log.exception('Answer not parsable: ' + str(data))
             return
-        # Make a signature of the answer, for formula responses.
-        signature = self.answer_signature(answer)
-        if signature is None:
-            # Sometimes, signature conversion may fail.
-            log.exception('Signature conversion failed: ' + str(answer))
-            return
+        if not self.validate_answer(answer):
+            # Answer is not in the right form.
+            log.exception('Answer not valid: ' + str(answer))
+        if answer not in self.user_submissions:
+            self.user_submissions += [answer]
         # Look for a hint to give.
         # Make a local copy of self.hints - this means we only need to do one json unpacking.
         # (This is because xblocks storage makes the following command a deep copy.)
         local_hints = self.hints
-        if (signature not in local_hints) or (len(local_hints[signature]) == 0):
+        # For all answers similar enough to our own, accumulate all hints together.
+        # Also track the original answer of each hint.
+        matching_answers = self.get_matching_answers(answer)
+        matching_hints = {}
+        for matching_answer in matching_answers:
+            temp_dict = local_hints[matching_answer]
+            for key, value in temp_dict.items():
+                # Each value now has hint, votes, matching_answer.
+                temp_dict[key] = value + [matching_answer]
+            matching_hints.update(local_hints[matching_answer])
+        # matching_hints now maps pk's to lists of [hint, votes, matching_answer]
+        if len(matching_hints) == 0:
             # No hints to give.  Return.
-            self.previous_answers += [[answer, [None, None, None]]]
             return
         # Get the top hint, plus two random hints.
-        n_hints = len(local_hints[signature])
-        best_hint_index = max(local_hints[signature], key=lambda key: local_hints[signature][key][1])
-        best_hint = local_hints[signature][best_hint_index][0]
-        if len(local_hints[signature]) == 1:
-            rand_hint_1 = ''
-            rand_hint_2 = ''
-            self.previous_answers += [[answer, [best_hint_index, None, None]]]
-        elif n_hints == 2:
-            best_hint = local_hints[signature].values()[0][0]
-            best_hint_index = local_hints[signature].keys()[0]
-            rand_hint_1 = local_hints[signature].values()[1][0]
-            hint_index_1 = local_hints[signature].keys()[1]
-            rand_hint_2 = ''
-            self.previous_answers += [[answer, [best_hint_index, hint_index_1, None]]]
-        else:
-            (hint_index_1, rand_hint_1), (hint_index_2, rand_hint_2) =\
-                random.sample(local_hints[signature].items(), 2)
-            rand_hint_1 = rand_hint_1[0]
-            rand_hint_2 = rand_hint_2[0]
-            self.previous_answers += [[answer, [best_hint_index, hint_index_1, hint_index_2]]]
-
-        return {'best_hint': best_hint,
-                'rand_hint_1': rand_hint_1,
-                'rand_hint_2': rand_hint_2,
+        n_hints = len(matching_hints)
+        hints = []
+        best_hint_index = max(matching_hints, key=lambda key: matching_hints[key][1])
+        hints.append(matching_hints[best_hint_index][0])
+        best_hint_answer = matching_hints[best_hint_index][2]
+        # The brackets surrounding the index are for backwards compatability purposes.
+        # (It used to be that each answer was paired with multiple hints in a list.)
+        self.previous_answers += [[best_hint_answer, [best_hint_index]]]
+        for i in xrange(min(2, n_hints-1)):
+            # Keep making random hints until we hit a target, or run out.
+            (hint_index, (rand_hint, votes, hint_answer)) =\
+                random.choice(matching_hints.items())
+            if rand_hint in hints:
+                # Don't show the same hint twice.  Try again.
+                i -= 1
+                continue
+            hints.append(rand_hint)
+            self.previous_answers += [[hint_index, [hint_answer]]]
+        return {'hints': hints,
                 'answer': answer}
+
+        # rand_hint_1 = ''
+        # rand_hint_2 = ''
+        # if n_hints == 2:
+        #     best_hint = matching_hints.values()[0][0]
+        #     best_hint_index = matching_hints.keys()[0]
+        #     rand_hint_1 = matching_hints.values()[1][0]
+        #     hint_index_1 = matching_hints.keys()[1]
+        #     rand_hint_2 = ''
+        #     self.previous_answers += [[answer, [best_hint_index, hint_index_1]]]
+        # else:
+        #     (hint_index_1, rand_hint_1), (hint_index_2, rand_hint_2) =\
+        #         random.sample(matching_hints.items(), 2)
+        #     rand_hint_1 = rand_hint_1[0]
+        #     rand_hint_2 = rand_hint_2[0]
+        #     self.previous_answers += [[answer, [best_hint_index, hint_index_1, hint_index_2]]]
 
     def get_feedback(self, data):
         """
@@ -271,32 +265,24 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         # be allowed to make one vote / submission, but he can choose which wrong answer
         # he wants to look at.
         answer_to_hints = {}    # answer_to_hints[answer text][hint pk] -> hint text
-        signature_to_ans = {}   # Lets us combine equivalent answers
-                                # Same mapping as the field, but local.
 
         # Go through each previous answer, and populate index_to_hints and index_to_answer.
         for i in xrange(len(self.previous_answers)):
             answer, hints_offered = self.previous_answers[i]
-            # Does this answer equal one of the ones offered already?
-            signature = self.answer_signature(answer)
-            if signature in signature_to_ans:
-                # Re-assign this answer text to the one we've seen already.
-                answer = signature_to_ans[signature]
-            else:
-                signature_to_ans[signature] = answer
             if answer not in answer_to_hints:
                 answer_to_hints[answer] = {}
-            if signature in self.hints:
+            if answer in self.hints:
                 # Go through each hint, and add to index_to_hints
                 for hint_id in hints_offered:
                     if (hint_id is not None) and (hint_id not in answer_to_hints[answer]):
                         try:
-                            answer_to_hints[answer][hint_id] = self.hints[signature][str(hint_id)][0]
+                            answer_to_hints[answer][hint_id] = self.hints[answer][str(hint_id)][0]
                         except KeyError:
                             # Sometimes, the hint that a user saw will have been deleted by the instructor.
                             continue
 
-        return {'answer_to_hints': answer_to_hints}
+        return {'answer_to_hints': answer_to_hints,
+                'user_submissions': self.user_submissions}
 
     def tally_vote(self, data):
         """
@@ -315,8 +301,7 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         if self.user_voted:
             return {'error': 'Sorry, but you have already voted!'}
         ans = data['answer']
-        signature = self.answer_signature(ans)
-        if signature is None:
+        if not self.validate_answer(ans):
             # Uh oh.  Invalid answer.
             log.exception('Failure in hinter tally_vote: Unable to parse answer: ' + ans)
             return {'error': 'Failure in voting!'}
@@ -324,7 +309,7 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         # We use temp_dict because we need to do a direct write for the database to update.
         temp_dict = self.hints
         try:
-            temp_dict[signature][hint_pk][1] += 1
+            temp_dict[ans][hint_pk][1] += 1
         except KeyError:
             log.exception('Failure in hinter tally_vote: User voted for non-existant hint: Answer=' +
                           ans + ' pk=' + hint_pk)
@@ -337,19 +322,19 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         pk_list = json.loads(data['pk_list'])
         hint_and_votes = []
         for answer, vote_pk in pk_list:
-            signature = self.answer_signature(answer)
-            if signature is None:
+            if not self.validate_answer(answer):
                 log.exception('In hinter tally_vote, couldn\'t parse ' + answer)
                 continue
             try:
-                hint_and_votes.append(temp_dict[signature][str(vote_pk)])
+                hint_and_votes.append(temp_dict[answer][str(vote_pk)])
             except KeyError:
                 log.exception('In hinter tally_vote, couldn\'t find: '
                               + answer + ', ' + str(vote_pk))
 
         hint_and_votes.sort(key=lambda pair: pair[1], reverse=True)
-        # Reset self.previous_answers.
+        # Reset self.previous_answers and user_submissions.
         self.previous_answers = []
+        self.user_submissions = []
         return {'hint_and_votes': hint_and_votes}
 
     def submit_hint(self, data):
@@ -365,8 +350,7 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         # Do html escaping.  Perhaps in the future do profanity filtering, etc. as well.
         hint = escape(data['hint'])
         answer = data['answer']
-        signature = self.answer_signature(answer)
-        if signature is None:
+        if not self.validate_answer(answer):
             log.exception('Failure in hinter submit_hint: Unable to parse answer: ' + answer)
             return {'error': 'Could not submit answer'}
         # Only allow a student to vote or submit a hint once.
@@ -379,12 +363,9 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         else:
             temp_dict = self.hints
         if answer in temp_dict:
-            temp_dict[signature][str(self.hint_pk)] = [hint, 1]     # With one vote (the user himself).
+            temp_dict[answer][str(self.hint_pk)] = [hint, 1]     # With one vote (the user himself).
         else:
-            temp_dict[signature] = {str(self.hint_pk): [hint, 1]}
-        # Add the signature to signature_to_ans, if it's not there yet.
-        # This allows instructors to see a human-readable answer that corresponds to each signature.
-        self.add_signature(signature, answer)
+            temp_dict[answer] = {str(self.hint_pk): [hint, 1]}
         self.hint_pk += 1
         if self.moderate == 'True':
             self.mod_queue = temp_dict
@@ -393,17 +374,8 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         # Mark the user has having voted; reset previous_answers
         self.user_voted = True
         self.previous_answers = []
+        self.user_submissions = []
         return {'message': 'Thank you for your hint!'}
-
-    def add_signature(self, signature, answer):
-        """
-        Add a signature to self.signature_to_ans.  If the signature already
-        exists, do nothing.
-        """
-        if signature not in self.signature_to_ans:
-            local_sta = self.signature_to_ans
-            local_sta[signature] = answer
-            self.signature_to_ans = local_sta
 
 
 class CrowdsourceHinterDescriptor(CrowdsourceHinterFields, RawDescriptor):
