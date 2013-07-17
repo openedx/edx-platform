@@ -676,7 +676,7 @@ def create_account(request, post_override=None):
     message = render_to_string('emails/activation_email.txt', d)
 
     # dont send email if we are doing load testing or random user generation for some reason
-    if not (settings.GENERATE_RANDOM_USER_CREDENTIALS or settings.MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_LOAD_TESTING')):
+    if not (settings.MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_LOAD_TESTING')):
         try:
             if settings.MITX_FEATURES.get('REROUTE_ACTIVATION_EMAIL'):
                 dest_addr = settings.MITX_FEATURES['REROUTE_ACTIVATION_EMAIL']
@@ -903,43 +903,6 @@ def create_exam_registration(request, post_override=None):
 
     js = {'success': True}
     return HttpResponse(json.dumps(js), mimetype="application/json")
-
-
-def get_random_post_override():
-    """
-    Return a dictionary suitable for passing to post_vars of _do_create_account or post_override
-    of create_account, with random user info.
-    """
-    def id_generator(size=6, chars=string.ascii_uppercase + string.ascii_lowercase + string.digits):
-        return ''.join(random.choice(chars) for x in range(size))
-
-    return {'username': "random_" + id_generator(),
-            'email': id_generator(size=10, chars=string.ascii_lowercase) + "_dummy_test@mitx.mit.edu",
-            'password': id_generator(),
-            'name': (id_generator(size=5, chars=string.ascii_lowercase) + " " +
-                     id_generator(size=7, chars=string.ascii_lowercase)),
-            'honor_code': u'true',
-            'terms_of_service': u'true', }
-
-
-def create_random_account(create_account_function):
-    def inner_create_random_account(request, post_override=None):
-
-        # This logic ensures that even if we have both
-        # GENERATE_RANDOM_USER_CREDENTIALS and
-        # settings.MITX_FEATURES['AUTOMATIC_AUTH_FOR_LOAD_TESTING']
-        # set to true, then create_account will behave they way
-        # each feature for automated account generation expects
-        if post_override is None:
-            post_override = get_random_post_override()
-
-        return create_account_function(request, post_override)
-
-    return inner_create_random_account
-
-# TODO (vshnayder): do we need GENERATE_RANDOM_USER_CREDENTIALS for anything?
-if settings.GENERATE_RANDOM_USER_CREDENTIALS:
-    create_account = create_random_account(create_account)
 
 
 def auto_auth(request):

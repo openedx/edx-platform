@@ -62,9 +62,6 @@ MITX_FEATURES = {
 }
 ENABLE_JASMINE = False
 
-# needed to use lms student app
-GENERATE_RANDOM_USER_CREDENTIALS = False
-
 
 ############################# SET PATH INFORMATION #############################
 PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /mitx/cms
