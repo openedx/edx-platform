@@ -929,10 +929,7 @@ def auto_auth(request):
     name_base = 'USER_'
     pass_base = 'PASS_'
 
-    max_users = 200
-    if hasattr(settings, 'MAX_AUTO_AUTH_USERS'):
-        max_users = settings.MAX_AUTO_AUTH_USERS
-
+    max_users = settings.MITX_FEATURES.get('MAX_AUTO_AUTH_USERS', 200)
     number = random.randint(1, max_users)
 
     username = name_base + str(number)
