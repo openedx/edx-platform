@@ -13,7 +13,8 @@ the course, section, subsection, unit, etc.
 """
 
 from xmodule.videoalpha_module import VideoAlphaDescriptor
-from . import LogicTest, etree
+from . import LogicTest
+from lxml import etree
 
 
 class VideoAlphaModuleTest(LogicTest):

@@ -198,7 +198,7 @@
                     expect(player.callStateChangeCallback).toHaveBeenCalled();
                 });
             });
-        }); // End-of: describe('events:', function () {
+        });
 
         describe('methods', function () {
             var volume, seek, duration, playbackRate;
@@ -318,6 +318,6 @@
             it('getAvailablePlaybackRates', function () {
                 expect(player.getAvailablePlaybackRates()).toEqual(playbackRates);
             });
-        }); // End-of: describe('methods', function () {
+        });
     });
 }).call(this);

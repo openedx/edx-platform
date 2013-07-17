@@ -73,7 +73,7 @@
       });
 
       describe('when the slider was already built', function() {
-        var spy; 
+        var spy;
 
         beforeEach(function() {
           spy = spyOn(videoProgressSlider, 'buildSlider');
@@ -94,7 +94,7 @@
       //     videoProgressSlider.slider = null;
       //     videoPlayer.play();
       //   });
-
+      //
       //   it('build the slider', function() {
       //     expect(videoProgressSlider.slider).toBe('.slider');
       //     expect($.fn.slider).toHaveBeenCalledWith({
@@ -104,7 +104,7 @@
       //       stop: videoProgressSlider.onStop
       //     });
       //   });
-        
+      //
       //   it('build the seek handle', function() {
       //     expect(videoProgressSlider.handle).toBe('.ui-slider-handle');
       //     expect($.fn.qtip).toHaveBeenCalledWith({
@@ -142,7 +142,7 @@
           expect($.fn.slider).not.toHaveBeenCalled();
         });
       });
-      
+
       describe('when not frozen', function() {
         beforeEach(function() {
           spyOn($.fn, 'slider').andCallThrough();
@@ -160,7 +160,6 @@
       });
     });
 
-    //TODO Fails: Problem with data-sub
     describe('onSlide', function() {
       beforeEach(function() {
         initialize();
@@ -184,7 +183,6 @@
         expect(videoPlayer.currentTime).toEqual(20);
       });
     });
-    //End Fails
 
     describe('onChange', function() {
       beforeEach(function() {
@@ -199,7 +197,6 @@
       });
     });
 
-    //TODO Fails: Problem with data-sub
     describe('onStop', function() {
       beforeEach(function() {
         initialize();
@@ -224,15 +221,14 @@
         expect(videoProgressSlider.frozen).toBeFalsy();
       });
     });
-    //End Fails
-    
+
     describe('updateTooltip', function() {
       beforeEach(function() {
         initialize();
         spyOn($.fn, 'slider').andCallThrough();
         videoProgressSlider.updateTooltip(90);
       });
-      
+
       it('set the tooltip value', function() {
         expect($.fn.qtip).toHaveBeenCalledWith('option', 'content.text', '1:30');
       });

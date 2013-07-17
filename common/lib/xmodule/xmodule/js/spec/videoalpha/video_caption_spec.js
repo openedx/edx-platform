@@ -346,13 +346,13 @@
       });
 
       it('set the height of caption container', function() {
-        expect(parseInt($('.subtitles').css('maxHeight'))).toBeCloseTo($('.video-wrapper').height(), 2);
+        expect(parseInt($('.subtitles').css('maxHeight'), 10)).toBeCloseTo($('.video-wrapper').height(), 2);
       });
 
       it('set the height of caption spacing', function() {
         var firstSpacing, lastSpacing;
-        firstSpacing = Math.abs(parseInt($('.subtitles .spacing:first').css('height')));
-        lastSpacing = Math.abs(parseInt($('.subtitles .spacing:last').css('height')));
+        firstSpacing = Math.abs(parseInt($('.subtitles .spacing:first').css('height'), 10));
+        lastSpacing = Math.abs(parseInt($('.subtitles .spacing:last').css('height'), 10));
         expect(firstSpacing - videoCaption.topSpacingHeight()).toBeLessThan(1);
         expect(lastSpacing - videoCaption.bottomSpacingHeight()).toBeLessThan(1);
       });
@@ -404,7 +404,7 @@
             // Check for calledWith(parameters) for some reason fails...
             //
             // var offset = -0.5 * ($('.video-wrapper').height() - $('.subtitles .current:first').height());
-            // 
+            //
             // expect($.fn.scrollTo).toHaveBeenCalledWith(
             //   $('.subtitles .current:first', videoCaption.el),
             //   {

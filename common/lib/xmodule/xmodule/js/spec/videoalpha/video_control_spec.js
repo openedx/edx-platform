@@ -17,7 +17,7 @@
       it('render the video controls', function() {
         expect($('.video-controls')).toContain(
           ['.slider', 'ul.vcr', 'a.play', '.vidtime', '.add-fullscreen'].join(',')
-        ); //Should we add '.quality_control' and '.hide-subtitles'?
+        );
         expect($('.video-controls').find('.vidtime')).toHaveText('0:00 / 0:00');
       });
 

@@ -20,7 +20,7 @@
       });
 
       it('render the volume control', function() {
-        expect(videoControl.secondaryControlsEl.html()).toContain("<div class=\"volume\">\n"); //toContain("<div class=\"volume\">\n  <a href=\"#\"></a>\n  <div class=\"volume-slider-container\">\n    <div class=\"volume-slider\"></div>\n  </div>\n</div>");
+        expect(videoControl.secondaryControlsEl.html()).toContain("<div class=\"volume\">\n");
       });
 
       it('create the slider', function() {
@@ -29,7 +29,7 @@
           range: "min",
           min: 0,
           max: 100,
-          value: 100,
+          /* value: 100, */
           value: videoVolumeControl.currentVolume,
           change: videoVolumeControl.onChange,
           slide: videoVolumeControl.onChange
@@ -83,7 +83,7 @@
         });
       });
     });
-    
+
     describe('toggleMute', function() {
       beforeEach(function() {
         initialize();
@@ -103,14 +103,14 @@
           expect(videoVolumeControl.currentVolume).toEqual(0);
         });
       });
-      
+
       describe('when the current volume is 0', function() {
         beforeEach(function() {
           videoVolumeControl.currentVolume = 0;
           videoVolumeControl.previousVolume = 60;
           videoVolumeControl.buttonEl.trigger('click');
         });
-        
+
         it('set the player volume to previous volume', function() {
           expect(videoVolumeControl.currentVolume).toEqual(60);
         });

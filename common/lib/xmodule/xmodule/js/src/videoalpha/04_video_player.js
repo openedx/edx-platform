@@ -253,6 +253,10 @@ function (HTML5Video) {
 
     function onEnded() {
         this.trigger(['videoControl','pause'], null);
+
+        if (this.config.show_captions) {
+            this.trigger(['videoCaption','pause'], null);
+        }
     }
 
     function onPause() {
@@ -267,6 +271,10 @@ function (HTML5Video) {
         delete this.videoPlayer.updateInterval;
 
         this.trigger(['videoControl','pause'], null);
+
+        if (this.config.show_captions) {
+            this.trigger(['videoCaption','pause'], null);
+        }
     }
 
     function onPlay() {
@@ -282,6 +290,10 @@ function (HTML5Video) {
         }
 
         this.trigger(['videoControl','play'], null);
+
+        if (this.config.show_captions) {
+            this.trigger(['videoCaption','play'], null);
+        }
     }
 
     function onUnstarted() { }
@@ -334,7 +346,7 @@ function (HTML5Video) {
             this.videoPlayer.player.setPlaybackRate(this.speed);
         }
 
-        if (!onTouchBasedDevice() && $('.video:first').data('autoplay') === 'True') {
+        if (!onTouchBasedDevice() && $('.videoalpha:first').data('autoplay') === 'True') {
             this.videoPlayer.play();
         }
     }

@@ -53,7 +53,7 @@
           expect($('.speeds')).not.toHaveClass('open');
         });
       });
-      
+
       describe('when running on non-touch based device', function() {
         beforeEach(function() {
           initialize();
@@ -96,7 +96,7 @@
       //     expect(videoPlayer.onSpeedChange).not.toHaveBeenCalled();
       //   });
       // });
-      
+
       describe('when new speed is not the same', function() {
         beforeEach(function() {
           initialize();
@@ -112,14 +112,14 @@
         });
       });
     });
-    
+
     describe('onSpeedChange', function() {
       beforeEach(function() {
         initialize();
         $('li[data-speed="1.0"] a').addClass('active');
         videoSpeedControl.setSpeed(0.75);
       });
-      
+
       it('set the new speed as active', function() {
         expect($('.video_speeds li[data-speed="1.0"]')).not.toHaveClass('active');
         expect($('.video_speeds li[data-speed="0.75"]')).toHaveClass('active');

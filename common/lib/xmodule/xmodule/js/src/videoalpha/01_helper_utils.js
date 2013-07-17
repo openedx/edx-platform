@@ -72,3 +72,9 @@ if (!Array.prototype.indexOf) {
         return -1;
     }
 }
+
+if (!window.onTouchBasedDevice) {
+    window.onTouchBasedDevice = function() {
+        return navigator.userAgent.match(/iPhone|iPod|iPad/i);
+    };
+}
