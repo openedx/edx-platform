@@ -133,7 +133,7 @@ class VideoDescriptor(VideoFields,
         Override the base implementation. We don't actually have anything in the 'data' field
         (it's an empty string), so we just return a simple XML element
         """
-        return etree.fromstring('<video />')
+        return etree.Element('video')
 
 
 def _parse_video_xml(video, xml_data):
