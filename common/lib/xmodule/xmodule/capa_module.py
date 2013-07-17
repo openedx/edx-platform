@@ -152,6 +152,7 @@ class CapaFields(object):
         scope=Scope.settings
     )
 
+
 class CapaModule(CapaFields, XModule):
     """
     An XModule implementing LonCapa format problems, implemented by way of
@@ -552,6 +553,16 @@ class CapaModule(CapaFields, XModule):
             'ungraded_response': self.handle_ungraded_response
         }
 
+        generic_error_message = (
+            "We're sorry, there was an error with processing your request. "
+            "Please try reloading your page and trying again."
+        )
+
+        not_found_error_message = (
+            "The state of this problem has changed since you loaded this page. "
+            "Please refresh your page."
+        )
+
         if dispatch not in handlers:
             return 'Error'
 
@@ -559,9 +570,14 @@ class CapaModule(CapaFields, XModule):
 
         try:
             result = handlers[dispatch](data)
+
+        except NotFoundError as err:
+            _, _, traceback_obj = sys.exc_info()
+            raise ProcessingError, (not_found_error_message, err), traceback_obj
+
         except Exception as err:
             _, _, traceback_obj = sys.exc_info()
-            raise ProcessingError(err.message, traceback_obj)
+            raise ProcessingError, (generic_error_message, err), traceback_obj
 
         after = self.get_progress()
 
@@ -1124,7 +1140,6 @@ class CapaDescriptor(CapaFields, RawDescriptor):
         if 'rerandomize' not in problem._model_data:
             problem.rerandomize = "always"
         return problem
-
 
     @property
     def non_editable_metadata_fields(self):
