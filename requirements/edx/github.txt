@@ -3,7 +3,7 @@
 # Third-party:
 -e git://github.com/edx/django-staticfiles.git@6d2504e5c8#egg=django-staticfiles
 -e git://github.com/edx/django-pipeline.git#egg=django-pipeline
--e git://github.com/edx/django-wiki.git@ac906abe#egg=django-wiki
+-e git://github.com/edx/django-wiki.git@41815e2ef1b0323f92900f8e60711b0f0c37766b#egg=django-wiki
 -e git://github.com/dementrock/pystache_custom.git@776973740bdaad83a3b029f96e415a7d1e8bec2f#egg=pystache_custom-dev
 -e git://github.com/eventbrite/zendesk.git@d53fe0e81b623f084e91776bcf6369f8b7b63879#egg=zendesk
 
