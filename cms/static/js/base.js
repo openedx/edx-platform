@@ -728,7 +728,7 @@ function saveSetSectionScheduleDate(e) {
         var $thisSection = $('.courseware-section[data-id="' + id + '"]');
         var html = _.template(
             '<span class="published-status">' +
-                '<strong>' + gettext("Will Release: ") + '</strong>' +
+                '<strong>' + gettext("Will Release:") + '</strong>' +
                 gettext("<%= date %> at <%= time %> UTC") +
             '</span>' +
             '<a href="#" class="edit-button" data-date="<%= date %>" data-time="<%= time %>" data-id="<%= id %>">' +
