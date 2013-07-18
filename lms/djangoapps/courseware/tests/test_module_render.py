@@ -188,9 +188,9 @@ class TestTOC(TestCase):
                         'format': u'Lecture Sequence', 'due': None, 'active': False},
                        {'url_name': 'Welcome', 'display_name': u'Welcome', 'graded': True,
                         'format': '', 'due': None, 'active': False},
-                       {'url_name': 'video_123456789012', 'display_name': 'video 123456789012', 'graded': True,
+                       {'url_name': 'video_123456789012', 'display_name': 'Test Video', 'graded': True,
                         'format': '', 'due': None, 'active': False},
-                       {'url_name': 'video_4f66f493ac8f', 'display_name': 'video 4f66f493ac8f', 'graded': True,
+                       {'url_name': 'video_4f66f493ac8f', 'display_name': 'Video Title', 'graded': True,
                         'format': '', 'due': None, 'active': False}],
                       'url_name': 'Overview', 'display_name': u'Overview'},
                      {'active': False, 'sections':
@@ -199,6 +199,7 @@ class TestTOC(TestCase):
                       'url_name': 'secret:magic', 'display_name': 'secret:magic'}])
 
         actual = render.toc_for_course(self.portal_user, request, self.toy_course, chapter, None, model_data_cache)
+        print actual
         assert reduce(lambda x, y: x and (y in actual), expected, True)
 
     def test_toc_toy_from_section(self):
@@ -215,9 +216,9 @@ class TestTOC(TestCase):
                         'format': u'Lecture Sequence', 'due': None, 'active': False},
                        {'url_name': 'Welcome', 'display_name': u'Welcome', 'graded': True,
                         'format': '', 'due': None, 'active': True},
-                       {'url_name': 'video_123456789012', 'display_name': 'video 123456789012', 'graded': True,
+                       {'url_name': 'video_123456789012', 'display_name': 'Test Video', 'graded': True,
                         'format': '', 'due': None, 'active': False},
-                       {'url_name': 'video_4f66f493ac8f', 'display_name': 'video 4f66f493ac8f', 'graded': True,
+                       {'url_name': 'video_4f66f493ac8f', 'display_name': 'Video Title', 'graded': True,
                         'format': '', 'due': None, 'active': False}],
                       'url_name': 'Overview', 'display_name': u'Overview'},
                      {'active': False, 'sections':
