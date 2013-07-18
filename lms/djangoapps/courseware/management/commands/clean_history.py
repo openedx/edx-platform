@@ -47,7 +47,7 @@ class Command(NoArgsCommand):
 
     def handle_noargs(self, **options):
         # We don't want to see the SQL output from the db layer.
-        logging.getLogger("").setLevel(logging.INFO)
+        logging.getLogger("django.db.backends").setLevel(logging.INFO)
 
         smhc = StudentModuleHistoryCleaner(
             dry_run=options["dry_run"],
