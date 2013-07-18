@@ -19,13 +19,11 @@ import time
 import logging
 log = logging.getLogger(__name__)
 
-EMAILS_PER_WORKER=getattr(settings, 'EMAILS_PER_WORKER', 10)
-
 @task()
 def delegate_email_batches(hash_for_msg, recipient, course_id, course_url, user_id):
     '''
     Delegates emails by querying for the list of recipients who should
-    get the mail, chopping up into batches of EMAILS_PER_WORKER size,
+    get the mail, chopping up into batches of settings.EMAILS_PER_TASK size,
     and queueing up worker jobs.
 
     Recipient is {'students', 'staff', or 'all'}
@@ -59,7 +57,7 @@ def delegate_email_batches(hash_for_msg, recipient, course_id, course_url, user_
 
     recipient_list = list(recipient_qset)
     total_num_emails = recipient_qset.count()
-    num_workers=int(math.ceil(float(total_num_emails)/float(EMAILS_PER_WORKER)))
+    num_workers=int(math.ceil(float(total_num_emails)/float(settings.EMAILS_PER_TASK)))
     chunk=int(math.ceil(float(total_num_emails)/float(num_workers)))
 
     for i in range(num_workers):

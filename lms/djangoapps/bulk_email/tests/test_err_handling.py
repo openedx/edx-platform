@@ -3,6 +3,7 @@ Unit tests for handling email sending errors
 """
 
 from django.test.utils import override_settings
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -48,7 +49,7 @@ class TestEmailErrors(ModuleStoreTestCase):
         Test that celery handles permanent SMTPDataErrors by failing and not retrying
         """
         self.smtp_server_thread.server.set_errtype("DATA", "554 Message rejected: Email address is not verified.")
-        self.students = [UserFactory() for _ in xrange(10)]
+        self.students = [UserFactory() for _ in xrange(settings.EMAILS_PER_TASK)]
         for student in self.students:
             CourseEnrollmentFactory.create(user=student, course_id=self.course.id)
 
@@ -59,7 +60,7 @@ class TestEmailErrors(ModuleStoreTestCase):
         #test that after the failed email, the rest send successfully
         ((sent, fail),_) = result.call_args
         self.assertEquals(fail, 1)
-        self.assertEquals(sent, 9)
+        self.assertEquals(sent, settings.EMAILS_PER_TASK-1)
 
     @patch('bulk_email.tasks.course_email.retry')
     def test_disconn_err_retry(self, retry):
