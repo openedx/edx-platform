@@ -9,6 +9,7 @@ from .capa_module import ComplexEncoder
 from .x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import ItemNotFoundError
 from .timeinfo import TimeInfo
 from xblock.core import Dict, String, Scope, Boolean, Integer, Float
 from xmodule.fields import Date
@@ -100,7 +101,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
         if self.use_for_single_location:
             try:
                 self.linked_problem = modulestore().get_instance(self.system.course_id, self.link_to_location)
-            except Exception:
+            except ItemNotFoundError:
                 log.error("Linked location {0} for peer grading module {1} does not exist".format(
                     self.link_to_location, self.location))
                 raise
