@@ -107,18 +107,18 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         """
         return str(float(answer.values()[0]))
 
-    def handle_ajax(self, dispatch, get):
+    def handle_ajax(self, dispatch, data):
         """
         This is the landing method for AJAX calls.
         """
         if dispatch == 'get_hint':
-            out = self.get_hint(get)
+            out = self.get_hint(data)
         elif dispatch == 'get_feedback':
-            out = self.get_feedback(get)
+            out = self.get_feedback(data)
         elif dispatch == 'vote':
-            out = self.tally_vote(get)
+            out = self.tally_vote(data)
         elif dispatch == 'submit_hint':
-            out = self.submit_hint(get)
+            out = self.submit_hint(data)
         else:
             return json.dumps({'contents': 'Error - invalid operation.'})
 
@@ -128,19 +128,24 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
             out.update({'op': dispatch})
         return json.dumps({'contents': self.system.render_template('hinter_display.html', out)})
 
-    def get_hint(self, get):
+    def get_hint(self, data):
         """
-        The student got the incorrect answer found in get.  Give him a hint.
+        The student got the incorrect answer found in data.  Give him a hint.
 
         Called by hinter javascript after a problem is graded as incorrect.
         Args:
-        `get` -- must be interpretable by capa_answer_to_str.
+        `data` -- must be interpretable by capa_answer_to_str.
         Output keys:
             - 'best_hint' is the hint text with the most votes.
-            - 'rand_hint_1' and 'rand_hint_2' are two random hints to the answer in `get`.
+            - 'rand_hint_1' and 'rand_hint_2' are two random hints to the answer in `data`.
             - 'answer' is the parsed answer that was submitted.
         """
-        answer = self.capa_answer_to_str(get)
+        try:
+            answer = self.capa_answer_to_str(data)
+        except ValueError:
+            # Sometimes, we get an answer that's just not parsable.  Do nothing.
+            log.exception('Answer not parsable: ' + str(data))
+            return
         # Look for a hint to give.
         # Make a local copy of self.hints - this means we only need to do one json unpacking.
         # (This is because xblocks storage makes the following command a deep copy.)
@@ -176,12 +181,12 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
                 'rand_hint_2': rand_hint_2,
                 'answer': answer}
 
-    def get_feedback(self, get):
+    def get_feedback(self, data):
         """
         The student got it correct.  Ask him to vote on hints, or submit a hint.
 
         Args:
-        `get` -- not actually used.  (It is assumed that the answer is correct.)
+        `data` -- not actually used.  (It is assumed that the answer is correct.)
         Output keys:
             - 'index_to_hints' maps previous answer indices to hints that the user saw earlier.
             - 'index_to_answer' maps previous answer indices to the actual answer submitted.
@@ -216,20 +221,20 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
 
         return {'index_to_hints': index_to_hints, 'index_to_answer': index_to_answer}
 
-    def tally_vote(self, get):
+    def tally_vote(self, data):
         """
         Tally a user's vote on his favorite hint.
 
         Args:
-        `get` -- expected to have the following keys:
+        `data` -- expected to have the following keys:
             'answer': ans_no (index in previous_answers)
             'hint': hint_pk
         Returns key 'hint_and_votes', a list of (hint_text, #votes) pairs.
         """
         if self.user_voted:
             return {}
-        ans_no = int(get['answer'])
-        hint_no = str(get['hint'])
+        ans_no = int(data['answer'])
+        hint_no = str(data['hint'])
         answer = self.previous_answers[ans_no][0]
         # We use temp_dict because we need to do a direct write for the database to update.
         temp_dict = self.hints
@@ -249,19 +254,19 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         self.previous_answers = []
         return {'hint_and_votes': hint_and_votes}
 
-    def submit_hint(self, get):
+    def submit_hint(self, data):
         """
         Take a hint submission and add it to the database.
 
         Args:
-        `get` -- expected to have the following keys:
+        `data` -- expected to have the following keys:
             'answer': answer index in previous_answers
             'hint': text of the new hint that the user is adding
         Returns a thank-you message.
         """
         # Do html escaping.  Perhaps in the future do profanity filtering, etc. as well.
-        hint = escape(get['hint'])
-        answer = self.previous_answers[int(get['answer'])][0]
+        hint = escape(data['hint'])
+        answer = self.previous_answers[int(data['answer'])][0]
         # Only allow a student to vote or submit a hint once.
         if self.user_voted:
             return {'message': 'Sorry, but you have already voted!'}

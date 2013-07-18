@@ -346,10 +346,10 @@ def instructor_dashboard(request, course_id):
                     # save
                     student_module.state = json.dumps(problem_state)
                     student_module.save()
-                    event = {"old_attempts": old_number_of_attempts, 
-                             "student": student, 
-                             "problem": student_module.module_state_key, 
-                             "instructor": request.user, 
+                    event = {"old_attempts": old_number_of_attempts,
+                             "student": student,
+                             "problem": student_module.module_state_key,
+                             "instructor": request.user,
                              "course": course_id}
                     track.views.server_track(request, "reset-student-attempts", event, page="idashboard")
                     msg += "<font color='green'>Module state successfully reset!</font>"
@@ -1091,7 +1091,7 @@ def _do_enroll_students(course, course_id, students, overload=False, auto_enroll
              'registration_url': registration_url,
              'course_id': course_id,
              'auto_enroll': auto_enroll,
-             'course_url': registration_url + '/courses/' + course_id,
+             'course_url': 'https://' + settings.SITE_NAME + '/courses/' + course_id,
              }
 
     for student in new_students:
@@ -1234,7 +1234,7 @@ def send_mail_to_student(student, param_dict):
     """
     Construct the email using templates and then send it.
     `student` is the student's email address (a `str`),
-    
+
     `param_dict` is a `dict` with keys [
     `site_name`: name given to edX instance (a `str`)
     `registration_url`: url for registration (a `str`)

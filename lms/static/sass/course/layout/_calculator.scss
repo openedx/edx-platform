@@ -2,7 +2,7 @@ div.calc-main {
   bottom: -126px;
   left: 0;
   position: fixed;
-  @include transition(bottom);
+  @include transition(bottom 0.75s linear 0s);
   -webkit-appearance: none;
   width: 100%;
   z-index: 99;
@@ -14,7 +14,7 @@ div.calc-main {
   a.calc {
     background: url("../images/calc-icon.png") rgba(#111, .9) no-repeat center;
     border-bottom: 0;
-    @include border-radius(3px 3px 0 0);
+    border-radius: 3px 3px 0 0;
     color: #fff;
     float: right;
     height: 20px;
@@ -51,8 +51,8 @@ div.calc-main {
       input#calculator_button {
         background: #111;
         border: 1px solid #000;
-        @include border-radius(0);
-        @include box-shadow(none);
+        border-radius: 0;
+        box-shadow: none;
         @include box-sizing(border-box);
         color: #fff;
         float: left;
@@ -73,7 +73,7 @@ div.calc-main {
       input#calculator_output {
         background: #111;
         border: 0;
-        @include box-shadow(none);
+        box-shadow: none;
         @include box-sizing(border-box);
         color: #fff;
         float: left;
@@ -94,7 +94,7 @@ div.calc-main {
 
         input#calculator_input {
           border: none;
-          @include box-shadow(none);
+          box-shadow: none;
           @include box-sizing(border-box);
           font-size: 16px;
           padding: 10px;
@@ -121,8 +121,8 @@ div.calc-main {
 
           dl {
             background: #fff;
-            @include border-radius(3px);
-            @include box-shadow(0 0 3px #999);
+            border-radius: 3px;
+            box-shadow: 0 0 3px #999;
             color: #333;
             display: none;
             line-height: lh();
@@ -131,7 +131,7 @@ div.calc-main {
             position: absolute;
             right: -40px;
             top: -122px;
-            @include transition();
+            @include transition(none);
             width: 600px;
 
             &.shown {

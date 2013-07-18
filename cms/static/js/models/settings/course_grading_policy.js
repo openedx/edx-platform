@@ -71,24 +71,25 @@ CMS.Models.Settings.CourseGrader = Backbone.Model.extend({
     },
     validate : function(attrs) {
         var errors = {};
-        if (attrs['type']) {
+        if (_.has(attrs, 'type')) {
             if (_.isEmpty(attrs['type'])) {
                 errors.type = "The assignment type must have a name.";
             }
             else {
                 // FIXME somehow this.collection is unbound sometimes. I can't track down when
-                var existing = this.collection && this.collection.some(function(other) { return (other != this) && (other.get('type') == attrs['type']);}, this);
+                var existing = this.collection && this.collection.some(function(other) { return (other.cid != this.cid) && (other.get('type') == attrs['type']);}, this);
                 if (existing) {
-                    errors.type = "There's already another assignment type with this name.";
+                    errors.type = gettext("There's already another assignment type with this name.");
                 }
             }
         }
-        if (attrs['weight']) {
-            if (!isFinite(attrs.weight) || /\D+/.test(attrs.weight)) {
-                errors.weight = "Please enter an integer between 0 and 100.";
+        if (_.has(attrs, 'weight')) {
+            var intWeight = parseInt(attrs.weight); // see if this ensures value saved is int
+            if (!isFinite(intWeight) || /\D+/.test(attrs.weight) || intWeight < 0 || intWeight > 100) {
+                errors.weight = gettext("Please enter an integer between 0 and 100.");
             }
             else {
-                attrs.weight = parseInt(attrs.weight); // see if this ensures value saved is int
+                attrs.weight = intWeight;
                 if (this.collection && attrs.weight > 0) {
                     // FIXME b/c saves don't update the models if validation fails, we should
                     // either revert the field value to the one in the model and make them make room
@@ -97,20 +98,22 @@ CMS.Models.Settings.CourseGrader = Backbone.Model.extend({
 //                  errors.weight = "The weights cannot add to more than 100.";
                 }
             }}
-        if (attrs['min_count']) {
+        if (_.has(attrs, 'min_count')) {
             if (!isFinite(attrs.min_count) || /\D+/.test(attrs.min_count)) {
-                errors.min_count = "Please enter an integer.";
+                errors.min_count = gettext("Please enter an integer.");
             }
             else attrs.min_count = parseInt(attrs.min_count);
         }
-        if (attrs['drop_count']) {
+        if (_.has(attrs, 'drop_count')) {
             if (!isFinite(attrs.drop_count) || /\D+/.test(attrs.drop_count)) {
-                errors.drop_count = "Please enter an integer.";
+                errors.drop_count = gettext("Please enter an integer.");
             }
             else attrs.drop_count = parseInt(attrs.drop_count);
         }
-        if (attrs['min_count'] && attrs['drop_count'] && attrs.drop_count > attrs.min_count) {
-            errors.drop_count = "Cannot drop more " + attrs.type + " than will assigned.";
+        if (_.has(attrs, 'min_count') && _.has(attrs, 'drop_count') && attrs.drop_count > attrs.min_count) {
+            errors.drop_count = _.template(
+                gettext("Cannot drop more <% attrs.types %> than will assigned."),
+                attrs, {variable: 'attrs'});
         }
         if (!_.isEmpty(errors)) return errors;
     }

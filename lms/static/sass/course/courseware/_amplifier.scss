@@ -4,7 +4,7 @@ section.tool-wrapper {
   background: #073642;
   border-bottom: 1px solid darken(#002b36, 10%);
   border-top: 1px solid darken(#002b36, 10%);
-  @include box-shadow(inset 0 0 0 4px darken(#094959, 2%));
+  box-shadow: inset 0 0 0 4px darken(#094959, 2%);
   color: #839496;
   display: table;
   margin: lh() (-(lh())) 0;
@@ -20,7 +20,7 @@ section.tool-wrapper {
     .ui-widget-content {
       background: none;
       border: none;
-      @include border-radius(0);
+      border-radius: 0;
     }
 
     canvas {
@@ -30,7 +30,7 @@ section.tool-wrapper {
     ul.ui-tabs-nav {
       background: darken(#073642, 2%);
       border-bottom: 1px solid darken(#073642, 8%);
-      @include border-radius(0);
+      border-radius: 0;
       margin: (-(lh())) (-(lh())) 0;
       padding: 0;
       position: relative;
@@ -39,7 +39,7 @@ section.tool-wrapper {
       li {
         background: none;
         border: none;
-        @include border-radius(0);
+        border-radius: 0;
         color: #fff;
         margin-bottom: 0;
 
@@ -76,7 +76,7 @@ section.tool-wrapper {
     @extend .clearfix;
     background: darken(#073642, 2%);
     border-right: 1px solid darken(#002b36, 6%);
-    @include box-shadow(1px 0 0 lighten(#002b36, 6%), inset 0 0 0 4px darken(#094959, 6%));
+    box-shadow: 1px 0 0 lighten(#002b36, 6%), inset 0 0 0 4px darken(#094959, 6%);
     @include box-sizing(border-box);
     display: table-cell;
     padding: lh();
@@ -88,7 +88,7 @@ section.tool-wrapper {
       div.music-wrapper {
         @extend .clearfix;
         border-bottom: 1px solid darken(#073642, 10%);
-        @include box-shadow(0 1px 0 lighten(#073642, 2%));
+        box-shadow: 0 1px 0 lighten(#073642, 2%);
         margin-bottom: lh();
         padding: 0 0 lh();
 
@@ -101,7 +101,7 @@ section.tool-wrapper {
           margin-top: 19px;
 
           &:active {
-            @include box-shadow(none);
+            box-shadow: none;
           }
 
           &[value="Stop"] {
@@ -109,7 +109,7 @@ section.tool-wrapper {
             font: bold 14px $body-font-family;
 
             &:active {
-              @include box-shadow(none);
+              box-shadow: none;
             }
           }
         }
@@ -118,7 +118,7 @@ section.tool-wrapper {
       div.inputs-wrapper {
         @extend .clearfix;
         border-bottom: 1px solid darken(#073642, 10%);
-        @include box-shadow(0 1px 0 lighten(#073642, 2%));
+        box-shadow: 0 1px 0 lighten(#073642, 2%);
         @include clearfix;
         margin-bottom: lh();
         margin-bottom: lh();
@@ -159,7 +159,7 @@ section.tool-wrapper {
     }
 
     label {
-      @include border-radius(2px);
+      border-radius: 2px;
       color: #fff;
       font-weight: bold;
       padding: 3px;
@@ -193,7 +193,7 @@ section.tool-wrapper {
       div.top-sliders {
         @extend .clearfix;
         border-bottom: 1px solid darken(#073642, 10%);
-        @include box-shadow(0 1px 0 lighten(#073642, 2%));
+        box-shadow: 0 1px 0 lighten(#073642, 2%);
         margin-bottom: lh();
         padding: 0 0 lh();
 
@@ -226,14 +226,14 @@ section.tool-wrapper {
         &.ui-slider-horizontal {
           background: darken(#002b36, 2%);
           border: 1px solid darken(#002b36, 8%);
-          @include box-shadow(none);
+          box-shadow: none;
           height: 0.4em;
         }
 
         .ui-slider-handle {
           background: lighten( #586e75, 5% ) url('../images/amplifier-slider-handle.png') center no-repeat;
           border: 1px solid darken(#002b36, 8%);
-          @include box-shadow(inset 0 1px 0 lighten( #586e75, 20% ));
+          box-shadow: inset 0 1px 0 lighten( #586e75, 20% );
           margin-top: -.3em;
 
           &:hover, &:active {

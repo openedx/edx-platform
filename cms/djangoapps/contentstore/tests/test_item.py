@@ -22,7 +22,3 @@ class DeleteItem(CourseTestCase):
         # Now delete it. There was a bug that the delete was failing (static tabs do not exist in draft modulestore).
         resp = self.client.post(reverse('delete_item'), resp.content, "application/json")
         self.assertEqual(resp.status_code, 200)
-
-
-
-

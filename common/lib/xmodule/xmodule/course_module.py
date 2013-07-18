@@ -5,7 +5,6 @@ from lxml import etree
 from path import path  # NOTE (THK): Only used for detecting presence of syllabus
 import requests
 from datetime import datetime
-
 import dateutil.parser
 
 from xmodule.modulestore import Location

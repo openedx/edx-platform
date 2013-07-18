@@ -1,3 +1,4 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%inherit file="base.html" />
 
 <%block name="content">
@@ -6,8 +7,8 @@
 <div>
 
 <section class="activation">
-  <h1>Account already active!</h1>
-  <p> This account has already been activated. <a href="/signin">Log in here</a>.</p>
+  <h1>${_("Account already active!")}</h1>
+  <p>${_('This account has already been activated.')}<a href="/signin">${_("Log in here.")}</a></p>
 </div>
 </section>
 

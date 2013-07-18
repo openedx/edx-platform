@@ -3,6 +3,9 @@ if (!CMS.Views['Settings']) CMS.Views.Settings = {}; // ensure the pseudo pkg ex
 CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
     // Model class is CMS.Models.Settings.CourseGradingPolicy
     events : {
+        "input input" : "updateModel",
+        "input textarea" : "updateModel",
+        // Leaving change in as fallback for older browsers
         "change input" : "updateModel",
         "change textarea" : "updateModel",
         "change span[contenteditable=true]" : "updateDesignation",
@@ -23,14 +26,7 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
                 '<% if (removable) {%><a href="#" class="remove-button">remove</a><% ;} %>' +
         '</li>');
 
-        // Instrument grading scale
-        // convert cutoffs to inversely ordered list
-        var modelCutoffs = this.model.get('grade_cutoffs');
-        for (var cutoff in modelCutoffs) {
-            this.descendingCutoffs.push({designation: cutoff, cutoff: Math.round(modelCutoffs[cutoff] * 100)});
-        }
-        this.descendingCutoffs = _.sortBy(this.descendingCutoffs,
-                function (gradeEle) { return -gradeEle['cutoff']; });
+        this.setupCutoffs();
 
         // Instrument grace period
         this.$el.find('#course-grading-graceperiod').timepicker();
@@ -45,7 +41,7 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
         }
         );
         this.listenTo(this.model, 'invalid', this.handleValidationError);
-        this.model.get('graders').on('remove', this.render, this);
+        this.listenTo(this.model, 'change', this.showNotificationBar);
         this.model.get('graders').on('reset', this.render, this);
         this.model.get('graders').on('add', this.render, this);
         this.selectorToField = _.invert(this.fieldToSelectorMap);
@@ -61,11 +57,31 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
         // Undo the double invocation error. At some point, fix the double invocation
         $(gradelist).empty();
         var gradeCollection = this.model.get('graders');
+        // We need to bind these events here (rather than in
+        // initialize), or else we can only press the delete button
+        // once due to the graders collection changing when we cancel
+        // our changes.
+        _.each(['change', 'remove', 'add'],
+               function (event) {
+                   gradeCollection.on(event, function() {
+                       this.showNotificationBar();
+                       // Since the change event gets fired every time
+                       // we type in an input field, we don't need to
+                       // (and really shouldn't) rerender the whole view.
+                       if(event !== 'change') {
+                           this.render();
+                       }
+                   }, this);
+               },
+               this);
         gradeCollection.each(function(gradeModel) {
             $(gradelist).append(self.template({model : gradeModel }));
             var newEle = gradelist.children().last();
             var newView = new CMS.Views.Settings.GraderView({el: newEle,
                 model : gradeModel, collection : gradeCollection });
+            // Listen in order to rerender when the 'cancel' button is
+            // pressed
+            self.listenTo(newView, 'revert', _.bind(self.render, self));
         });
 
         // render the grade cutoffs
@@ -88,9 +104,10 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
         'grace_period' : 'course-grading-graceperiod'
     },
     setGracePeriod : function(event) {
-        event.data.clearValidationErrors();
-        var newVal = event.data.model.dateToGracePeriod($(event.currentTarget).timepicker('getTime'));
-        if (event.data.model.get('grace_period') != newVal) event.data.model.save('grace_period', newVal);
+        var self = event.data;
+        self.clearValidationErrors();
+        var newVal = self.model.dateToGracePeriod($(event.currentTarget).timepicker('getTime'));
+        self.model.set('grace_period', newVal, {validate: true});
     },
     updateModel : function(event) {
         if (!this.selectorToField[event.currentTarget.id]) return;
@@ -100,8 +117,8 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
             break;
 
         default:
-            this.saveIfChanged(event);
-        break;
+            this.setField(event);
+            break;
         }
     },
 
@@ -220,13 +237,14 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
     },
 
     saveCutoffs: function() {
-        this.model.save('grade_cutoffs',
+        this.model.set('grade_cutoffs',
                 _.reduce(this.descendingCutoffs,
                         function(object, cutoff) {
                     object[cutoff['designation']] = cutoff['cutoff'] / 100.0;
                     return object;
                 },
-                {}));
+                {}),
+                {validate: true});
     },
 
     addNewGrade: function(e) {
@@ -301,13 +319,45 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
     },
     setTopGradeLabel: function() {
         this.$el.find('.grades .letter-grade').first().html(this.descendingCutoffs[0]['designation']);
+    },
+    setupCutoffs: function() {
+        // Instrument grading scale
+        // convert cutoffs to inversely ordered list
+        var modelCutoffs = this.model.get('grade_cutoffs');
+        for (var cutoff in modelCutoffs) {
+            this.descendingCutoffs.push({designation: cutoff, cutoff: Math.round(modelCutoffs[cutoff] * 100)});
+        }
+        this.descendingCutoffs = _.sortBy(this.descendingCutoffs,
+                                          function (gradeEle) { return -gradeEle['cutoff']; });
+    },
+    revertView: function() {
+        var self = this;
+        this.model.fetch({
+            success: function() {
+                self.descendingCutoffs = [];
+                self.setupCutoffs();
+                self.render();
+                self.renderCutoffBar();
+            },
+            reset: true,
+            silent: true});
+    },
+    showNotificationBar: function() {
+        // We always call showNotificationBar with the same args, just
+        // delegate to superclass
+        CMS.Views.ValidatingView.prototype.showNotificationBar.call(this,
+                                                                    this.save_message,
+                                                                    _.bind(this.saveView, this),
+                                                                    _.bind(this.revertView, this));
     }
-
 });
 
 CMS.Views.Settings.GraderView = CMS.Views.ValidatingView.extend({
     // Model class is CMS.Models.Settings.CourseGrader
     events : {
+        "input input" : "updateModel",
+        "input textarea" : "updateModel",
+        // Leaving change in as fallback for older browsers
         "change input" : "updateModel",
         "change textarea" : "updateModel",
         "click .remove-grading-data" : "deleteModel",
@@ -331,7 +381,7 @@ CMS.Views.Settings.GraderView = CMS.Views.ValidatingView.extend({
         'drop_count' : 'course-grading-assignment-droppable',
         'weight' : 'course-grading-assignment-gradeweight'
     },
-    updateModel : function(event) {
+    updateModel: function(event) {
         // HACK to fix model sometimes losing its pointer to the collection [I think I fixed this but leaving
         // this in out of paranoia. If this error ever happens, the user will get a warning that they cannot
         // give 2 assignments the same name.]
@@ -342,26 +392,27 @@ CMS.Views.Settings.GraderView = CMS.Views.ValidatingView.extend({
         switch (event.currentTarget.id) {
         case 'course-grading-assignment-totalassignments':
             this.$el.find('#course-grading-assignment-droppable').attr('max', $(event.currentTarget).val());
-            this.saveIfChanged(event);
+            this.setField(event);
             break;
         case 'course-grading-assignment-name':
-            var oldName = this.model.get('type');
-            if (this.saveIfChanged(event) && !_.isEmpty(oldName)) {
+            // Keep the original name, until we save
+            this.oldName = this.oldName === undefined ? this.model.get('type') : this.oldName;
+            // If the name has changed, alert the user to change all subsection names.
+            if (this.setField(event) != this.oldName && !_.isEmpty(this.oldName)) {
                 // overload the error display logic
                 this._cacheValidationErrors.push(event.currentTarget);
                 $(event.currentTarget).parent().append(
-                        this.errorTemplate({message : 'For grading to work, you must change all "' + oldName +
+                        this.errorTemplate({message : 'For grading to work, you must change all "' + this.oldName +
                             '" subsections to "' + this.model.get('type') + '".'}));
             }
             break;
         default:
-            this.saveIfChanged(event);
+            this.setField(event);
         break;
         }
     },
     deleteModel : function(e) {
-        this.model.destroy();
         e.preventDefault();
+        this.collection.remove(this.model);
     }
-
 });

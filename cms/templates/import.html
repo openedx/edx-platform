@@ -1,16 +1,17 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%inherit file="base.html" />
 <%namespace name='static' file='static_content.html'/>
 
 <%! from django.core.urlresolvers import reverse %>
-<%block name="title">Course Import</%block>
+<%block name="title">${_("Course Import")}</%block>
 <%block name="bodyclass">is-signedin course tools import</%block>
 
 <%block name="content">
 <div class="wrapper-mast wrapper">
   <header class="mast has-subtitle">
     <h1 class="page-header">
-      <small class="subtitle">Tools</small>
-      <span class="sr">&gt; </span>Course Import
+      <small class="subtitle">${_("Tools")}</small>
+      <span class="sr">&gt; </span>${_("Course Import")}
     </h1>
   </header>
 </div>
@@ -19,19 +20,18 @@
   <div class="inner-wrapper">
     <article class="import-overview">
       <div class="description">
-        <p><strong>Importing a new course will delete all content currently associated with your course
-        and replace it with the contents of the uploaded file.</strong></p>
-        <p>File uploads must be gzipped tar files (.tar.gz) containing, at a minimum, a <code>course.xml</code> file.</p>
-        <p>Please note that if your course has any problems with auto-generated <code>url_name</code> nodes,
-        re-importing your course could cause the loss of student data associated with those problems.</p>
+        <p><strong>${_("Importing a new course will delete all content currently associated with your course and replace it with the contents of the uploaded file.")}</strong></p>
+        ## Translators: ".tar.gz" is a file extension, and files with that extension are called "gzipped tar files": these terms should not be translated
+        <p>${_("File uploads must be gzipped tar files (.tar.gz) containing, at a minimum, a {filename} file.").format(filename='<code>course.xml</code>')}</p>
+        <p>${_("Please note that if your course has any problems with auto-generated {nodename} nodes, re-importing your course could cause the loss of student data associated with those problems.").format(nodename='<code>url_name</code>')}</p>
       </div>
       <form action="${reverse('import_course', kwargs=dict(org=context_course.location.org, course=context_course.location.course, name=context_course.location.name))}" method="post" enctype="multipart/form-data" class="import-form">
-        <h2>Course to import:</h2>
+        <h2>${_("Course to import:")}</h2>
         <p class="error-block"></p>
-        <a href="#" class="choose-file-button">Choose File</a>
-        <p class="file-name-block"><span class="file-name"></span><a href="#" class="choose-file-button-inline">change</a></p>
+        <a href="#" class="choose-file-button">${_("Choose File")}</a>
+        <p class="file-name-block"><span class="file-name"></span><a href="#" class="choose-file-button-inline">${_("change")}</a></p>
         <input type="file" name="course-data" class="file-input">
-        <input type="submit" value="Replace my course with the one above" class="submit-button">
+        <input type="submit" value="${_('Replace my course with the one above')}" class="submit-button">
         <div class="progress-bar">
           <div class="progress-fill"></div>
           <div class="percent">0%</div>
@@ -68,11 +68,11 @@ $('form').ajaxForm({
     },
     complete: function(xhr) {
       if (xhr.status == 200) {
-        alert('Your import was successful.');
+        alert('${_("Your import was successful.")}');
         window.location = '${successful_import_redirect_url}';
       }
       else
-        alert('Your import has failed.\n\n' + xhr.responseText);
+        alert('${_("Your import has failed.")}\n\n' + xhr.responseText);
         submitBtn.show();
         bar.hide();
     }

@@ -7,7 +7,7 @@ if Backbone?
       "click .admin-pin": "togglePin"
       "click .action-follow": "toggleFollowing"
       "click .action-edit": "edit"
-      "click .action-delete": "delete"
+      "click .action-delete": "_delete"
       "click .action-openclose": "toggleClosed"
 
     $: (selector) ->
@@ -125,8 +125,8 @@ if Backbone?
     edit: (event) ->
       @trigger "thread:edit", event
 
-    delete: (event) ->
-      @trigger "thread:delete", event
+    _delete: (event) ->
+      @trigger "thread:_delete", event
 
     togglePin: (event) ->
       event.preventDefault()

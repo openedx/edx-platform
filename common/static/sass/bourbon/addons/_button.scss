@@ -34,6 +34,11 @@
       @include pill($base-color);
     }
   }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 }
 
 
@@ -59,18 +64,19 @@
   }
 
   border: 1px solid $border;
-  @include border-radius (3px);
-  @include box-shadow (inset 0 1px 0 0 $inset-shadow);
+  border-radius: 3px;
+  box-shadow: inset 0 1px 0 0 $inset-shadow;
   color: $color;
-  display: inline;
+  display: inline-block;
   font-size: 11px;
   font-weight: bold;
   @include linear-gradient ($base-color, $stop-gradient);
-  padding: 6px 18px 7px;
+  padding: 7px 18px;
+  text-decoration: none;
   text-shadow: 0 1px 0 $text-shadow;
-  -webkit-background-clip: padding-box;
+  background-clip: padding-box;
 
-  &:hover {
+  &:hover:not(:disabled) {
     $base-color-hover:    adjust-color($base-color, $saturation: -4%, $lightness: -5%);
     $inset-shadow-hover:  adjust-color($base-color, $saturation: -7%, $lightness:  5%);
     $stop-gradient-hover: adjust-color($base-color, $saturation:  8%, $lightness: -14%);
@@ -81,12 +87,12 @@
       $stop-gradient-hover: grayscale($stop-gradient-hover);
     }
 
-    @include box-shadow (inset 0 1px 0 0 $inset-shadow-hover);
+    box-shadow: inset 0 1px 0 0 $inset-shadow-hover;
     cursor: pointer;
     @include linear-gradient ($base-color-hover, $stop-gradient-hover);
   }
 
-  &:active {
+  &:active:not(:disabled) {
     $border-active:       adjust-color($base-color, $saturation: 9%, $lightness: -14%);
     $inset-shadow-active: adjust-color($base-color, $saturation: 7%, $lightness: -17%);
 
@@ -96,7 +102,7 @@
     }
 
     border: 1px solid $border-active;
-    @include box-shadow (inset 0 0 8px 4px $inset-shadow-active, inset 0 0 8px 4px $inset-shadow-active, 0 1px 1px 0 #eee);
+    box-shadow: inset 0 0 8px 4px $inset-shadow-active, inset 0 0 8px 4px $inset-shadow-active, 0 1px 1px 0 #eee;
   }
 }
 
@@ -130,19 +136,19 @@
 
   border: 1px solid $border;
   border-bottom: 1px solid $border-bottom;
-  @include border-radius(5px);
-  @include box-shadow(inset 0 1px 0 0 $inset-shadow);
+  border-radius: 5px;
+  box-shadow: inset 0 1px 0 0 $inset-shadow;
   color: $color;
-  display: inline;
+  display: inline-block;
   font-size: 14px;
   font-weight: bold;
   @include linear-gradient(top, $base-color 0%, $second-stop 50%, $third-stop 50%, $fourth-stop 100%);
-  padding: 7px 20px 8px;
+  padding: 8px 20px;
   text-align: center;
   text-decoration: none;
   text-shadow: 0 -1px 1px $text-shadow;
 
-  &:hover {
+  &:hover:not(:disabled) {
     $first-stop-hover:  adjust-color($base-color, $red: -13, $green: -15, $blue: -18);
     $second-stop-hover: adjust-color($base-color, $red: -66, $green: -62, $blue: -51);
     $third-stop-hover:  adjust-color($base-color, $red: -93, $green: -85, $blue: -66);
@@ -162,14 +168,14 @@
                                   $fourth-stop-hover 100%);
   }
 
-  &:active {
+  &:active:not(:disabled) {
     $inset-shadow-active: adjust-color($base-color, $red: -111, $green: -116, $blue: -122);
 
     @if $grayscale == true {
       $inset-shadow-active: grayscale($inset-shadow-active);
     }
 
-    @include box-shadow(inset 0 0 20px 0 $inset-shadow-active, 0 1px 0 #fff);
+    box-shadow: inset 0 0 20px 0 $inset-shadow-active, 0 1px 0 #fff;
   }
 }
 
@@ -201,20 +207,21 @@
 
   border: 1px solid $border-top;
   border-color: $border-top $border-sides $border-bottom;
-  @include border-radius(16px);
-  @include box-shadow(inset 0 1px 0 0 $inset-shadow, 0 1px 2px 0 #b3b3b3);
+  border-radius: 16px;
+  box-shadow: inset 0 1px 0 0 $inset-shadow, 0 1px 2px 0 #b3b3b3;
   color: $color;
-  display: inline;
+  display: inline-block;
   font-size: 11px;
   font-weight: normal;
   line-height: 1;
   @include linear-gradient ($base-color, $stop-gradient);
-  padding: 3px 16px 5px;
+  padding: 5px 16px;
   text-align: center;
+  text-decoration: none;
   text-shadow: 0 -1px 1px $text-shadow;
-  -webkit-background-clip: padding-box;
+  background-clip: padding-box;
 
-  &:hover {
+  &:hover:not(:disabled) {
     $base-color-hover:    adjust-color($base-color,                                $lightness: -4.5%);
     $border-bottom:       adjust-color($base-color, $hue:  8, $saturation:  13.5%, $lightness: -32%);
     $border-sides:        adjust-color($base-color, $hue:  4, $saturation: -2%,    $lightness: -27%);
@@ -235,14 +242,14 @@
 
     border: 1px solid $border-top;
     border-color: $border-top $border-sides $border-bottom;
-    @include box-shadow(inset 0 1px 0 0 $inset-shadow-hover);
+    box-shadow: inset 0 1px 0 0 $inset-shadow-hover;
     cursor: pointer;
     @include linear-gradient ($base-color-hover, $stop-gradient-hover);
     text-shadow: 0 -1px 1px $text-shadow-hover;
-    -webkit-background-clip: padding-box;
+    background-clip: padding-box;
   }
 
-  &:active {
+  &:active:not(:disabled) {
     $active-color:         adjust-color($base-color, $hue: 4,  $saturation: -12%,  $lightness: -10%);
     $border-active:        adjust-color($base-color, $hue: 6,  $saturation: -2.5%, $lightness: -30%);
     $border-bottom-active: adjust-color($base-color, $hue: 11, $saturation:  6%,   $lightness: -31%);
@@ -260,8 +267,7 @@
     background: $active-color;
     border: 1px solid $border-active;
     border-bottom: 1px solid $border-bottom-active;
-    @include box-shadow(inset 0 0 6px 3px $inset-shadow-active, 0 1px 0 0 #fff);
+    box-shadow: inset 0 0 6px 3px $inset-shadow-active, 0 1px 0 0 #fff;
     text-shadow: 0 -1px 1px $text-shadow-active;
   }
 }
-

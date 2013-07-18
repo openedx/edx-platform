@@ -46,3 +46,9 @@ Feature: Advanced (manual) course policy
     Then it is displayed as a string
     And I reload the page
     Then it is displayed as a string
+
+  Scenario: Confirmation is shown on save
+    Given I am on the Advanced Course Settings page in Studio
+    When I edit the value of a policy key
+    And I press the "Save" notification button
+    Then I see a confirmation that my changes have been saved

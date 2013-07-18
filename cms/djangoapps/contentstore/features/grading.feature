@@ -32,6 +32,7 @@ Feature: Course Grading
         And I have populated the course
         And I am viewing the grading settings
         When I change assignment type "Homework" to "New Type"
+        And I press the "Save" notification button
         And I go back to the main course page
         Then I do see the assignment name "New Type"
         And I do not see the assignment name "Homework"
@@ -41,6 +42,7 @@ Feature: Course Grading
         And I have populated the course
         And I am viewing the grading settings
         When I delete the assignment type "Homework"
+        And I press the "Save" notification button
         And I go back to the main course page
         Then I do not see the assignment name "Homework"
 
@@ -49,5 +51,36 @@ Feature: Course Grading
         And I have populated the course
         And I am viewing the grading settings
         When I add a new assignment type "New Type"
+        And I press the "Save" notification button
         And I go back to the main course page
         Then I do see the assignment name "New Type"
+
+    Scenario: Settings are only persisted when saved
+        Given I have opened a new course in Studio
+        And I have populated the course
+        And I am viewing the grading settings
+        When I change assignment type "Homework" to "New Type"
+        Then I do not see the changes persisted on refresh
+
+    Scenario: Settings are reset on cancel
+        Given I have opened a new course in Studio
+        And I have populated the course
+        And I am viewing the grading settings
+        When I change assignment type "Homework" to "New Type"
+        And I press the "Cancel" notification button
+        Then I see the assignment type "Homework"
+
+    Scenario: Confirmation is shown on save
+        Given I have opened a new course in Studio
+        And I have populated the course
+        And I am viewing the grading settings
+        When I change assignment type "Homework" to "New Type"
+        And I press the "Save" notification button
+        Then I see a confirmation that my changes have been saved
+
+    Scenario: User cannot save invalid settings
+        Given I have opened a new course in Studio
+        And I have populated the course
+        And I am viewing the grading settings
+        When I change assignment type "Homework" to ""
+        Then the save button is disabled

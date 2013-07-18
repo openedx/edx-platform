@@ -141,5 +141,5 @@ MITX_FEATURES['STUDIO_NPS_SURVEY'] = False
 
 MITX_FEATURES['ENABLE_SERVICE_STATUS'] = True
 
-# Enabling SQL tracking logs for testing on common/djangoapps/track
-MITX_FEATURES['ENABLE_SQL_TRACKING_LOGS'] = True
+# This is to disable a test under the common directory that will not pass when run under CMS
+MITX_FEATURES['DISABLE_PASSWORD_RESET_EMAIL_TEST'] = True
