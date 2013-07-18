@@ -614,14 +614,14 @@ class CombinedOpenEndedV1Module():
                 return self.out_of_sync_error(data)
 
         self.student_attempts +=1
-        if self.student_attempts >= self.attempts:
+        if self.student_attempts >= self.max_attempts:
             return {
                 'success': False,
                 # This is a student_facing_error
                 'error': (
                     'You have attempted this question {0} times.  '
                     'You are only allowed to attempt it {1} times.'
-                ).format(self.student_attempts, self.attempts)
+                ).format(self.student_attempts, self.max_attempts)
             }
         self.state = self.INITIAL
         self.ready_to_reset = False
