@@ -42,7 +42,7 @@ class PeerGradingFields(object):
         default=False,
         scope=Scope.settings
     )
-    due_date = Date(
+    due = Date(
         help="Due date that should be displayed.",
         default=None,
         scope=Scope.settings)
@@ -100,25 +100,25 @@ class PeerGradingModule(PeerGradingFields, XModule):
         if self.use_for_single_location:
             try:
                 self.linked_problem = modulestore().get_instance(self.system.course_id, self.link_to_location)
-            except:
+            except Exception:
                 log.error("Linked location {0} for peer grading module {1} does not exist".format(
                     self.link_to_location, self.location))
                 raise
-            due_date = self.linked_problem._model_data.get('peer_grading_due', None)
+            due_date = self.linked_problem._model_data.get('due', None)
             if due_date:
                 self._model_data['due'] = due_date
 
         try:
-            self.timeinfo = TimeInfo(self.due_date, self.grace_period_string)
-        except:
-            log.error("Error parsing due date information in location {0}".format(location))
+            self.timeinfo = TimeInfo(self.due, self.grace_period_string)
+        except Exception:
+            log.error("Error parsing due date information in location {0}".format(self.location))
             raise
 
         self.display_due_date = self.timeinfo.display_due_date
 
         try:
             self.student_data_for_location = json.loads(self.student_data_for_location)
-        except:
+        except Exception:
             pass
 
         self.ajax_url = self.system.ajax_url
@@ -532,7 +532,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
             problem_location = problem['location']
             descriptor = _find_corresponding_module_for_location(problem_location)
             if descriptor:
-                problem['due'] = descriptor._model_data.get('peer_grading_due', None)
+                problem['due'] = descriptor._model_data.get('due', None)
                 grace_period_string = descriptor._model_data.get('graceperiod', None)
                 try:
                     problem_timeinfo = TimeInfo(problem['due'], grace_period_string)
@@ -622,10 +622,11 @@ class PeerGradingDescriptor(PeerGradingFields, RawDescriptor):
     metadata_translations = {
         'is_graded': 'graded',
         'attempts': 'max_attempts',
+        'due_data' : 'due'
         }
 
     @property
     def non_editable_metadata_fields(self):
         non_editable_fields = super(PeerGradingDescriptor, self).non_editable_metadata_fields
-        non_editable_fields.extend([PeerGradingFields.due_date, PeerGradingFields.grace_period_string])
+        non_editable_fields.extend([PeerGradingFields.due, PeerGradingFields.grace_period_string])
         return non_editable_fields
