@@ -1,5 +1,5 @@
 (function() {
-  xdescribe('VideoPlayerAlpha', function() {
+  describe('VideoPlayerAlpha', function() {
     var state, videoPlayer, player, videoControl, videoCaption, videoProgressSlider, videoSpeedControl, videoVolumeControl;
 
     function initialize(fixture) {
@@ -22,6 +22,10 @@
     function initializeYouTube() {
         initialize('videoalpha.html');
     }
+
+    afterEach(function() {
+       $('source').remove();
+    });
 
     describe('constructor', function() {
       beforeEach(function() {
@@ -64,6 +68,7 @@
 
         it('create video progress slider', function() {
           expect(videoProgressSlider).toBeDefined();
+          console.log('videoProgressSlider', videoProgressSlider, state, state.videoControl.sliderEl)
           expect(videoProgressSlider.el).toHaveClass('slider');
         });
 
@@ -754,7 +759,7 @@
 
       it('set the player volume', function() {
         player.setVolume(60);
-        expect(player.getVolume()).toEqual(0.6);
+        expect(Number(player.getVolume().toFixed(1)).toEqual(0.6);
       });
     });
   });

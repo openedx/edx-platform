@@ -1,5 +1,5 @@
 (function() {
-  xdescribe('VideoSpeedControlAlpha', function() {
+  describe('VideoSpeedControlAlpha', function() {
     var state, videoPlayer, videoControl, videoSpeedControl;
 
     function initialize() {
@@ -12,6 +12,11 @@
 
     beforeEach(function() {
       window.onTouchBasedDevice = jasmine.createSpy('onTouchBasedDevice').andReturn(false);
+    });
+
+
+    afterEach(function() {
+        $('source').remove();
     });
 
     describe('constructor', function() {

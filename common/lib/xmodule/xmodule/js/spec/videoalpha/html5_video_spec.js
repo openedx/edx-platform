@@ -1,5 +1,5 @@
 (function () {
-    xdescribe('VideoAlpha HTML5Video', function () {
+    describe('VideoAlpha HTML5Video', function () {
         var state, player, playbackRates = [0.75, 1.0, 1.25, 1.5];
 
         function initialize() {
@@ -11,6 +11,13 @@
         beforeEach(function () {
             initialize();
             player.config.events.onReady = jasmine.createSpy('onReady');
+        });
+
+        afterEach(function() {
+            YT.Player = void 0;
+            $.fn.scrollTo.reset();
+            $('.subtitles').remove();
+            $('source').remove();
         });
 
         describe('events:', function () {

@@ -1,5 +1,5 @@
 (function() {
-  xdescribe('VideoProgressSliderAlpha', function() {
+  describe('VideoProgressSliderAlpha', function() {
     var state, videoPlayer, videoProgressSlider;
 
     function initialize() {
@@ -11,6 +11,11 @@
 
     beforeEach(function() {
       window.onTouchBasedDevice = jasmine.createSpy('onTouchBasedDevice').andReturn(false);
+    });
+
+
+    afterEach(function() {
+        $('source').remove();
     });
 
     describe('constructor', function() {

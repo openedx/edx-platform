@@ -1,5 +1,5 @@
 (function () {
-    xdescribe('VideoAlpha', function () {
+    describe('VideoAlpha', function () {
         beforeEach(function () {
             jasmine.stubRequests();
             window.onTouchBasedDevice = jasmine.createSpy('onTouchBasedDevice').andReturn(false);
@@ -12,6 +12,7 @@
             window.OldVideoPlayerAlpha = undefined;
             window.onYouTubePlayerAPIReady = undefined;
             window.onHTML5PlayerAPIReady = undefined;
+            $('source').remove();
         });
 
         describe('constructor', function () {

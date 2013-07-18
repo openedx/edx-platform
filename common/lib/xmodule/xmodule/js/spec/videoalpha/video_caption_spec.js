@@ -1,5 +1,5 @@
 (function() {
-  xdescribe('VideoCaptionAlpha', function() {
+  describe('VideoCaptionAlpha', function() {
     var state, videoPlayer, videoCaption, videoSpeedControl;
 
     function initialize() {
@@ -11,14 +11,15 @@
     }
 
     beforeEach(function() {
-      initialize();
       window.onTouchBasedDevice = jasmine.createSpy('onTouchBasedDevice').andReturn(false);
+      initialize();
     });
 
     afterEach(function() {
       YT.Player = void 0;
       $.fn.scrollTo.reset();
       $('.subtitles').remove();
+      $('source').remove();
     });
 
     describe('constructor', function() {
@@ -117,7 +118,7 @@
 
     describe('mouse movement', function() {
       beforeEach(function() {
-        initialize();
+        //initialize();
         window.setTimeout.andReturn(100);
         spyOn(window, 'clearTimeout');
       });
@@ -209,7 +210,7 @@
 
     describe('search', function() {
       beforeEach(function() {
-        initialize();
+        //initialize();
       });
 
       it('return a correct caption index', function() {
@@ -264,7 +265,7 @@
 
     describe('pause', function() {
       beforeEach(function() {
-        initialize();
+        //initialize();
         videoCaption.playing = true;
         videoCaption.pause();
       });
@@ -275,9 +276,9 @@
     });
 
     describe('updatePlayTime', function() {
-      beforeEach(function() {
+      /*beforeEach(function() {
         initialize();
-      });
+      });*/
 
       describe('when the video speed is 1.0x', function() {
         beforeEach(function() {
@@ -421,7 +422,7 @@
     describe('seekPlayer', function() {
       describe('when the video speed is 1.0x', function() {
         beforeEach(function() {
-          initialize();
+          //initialize();
           videoSpeedControl.currentSpeed = '1.0';
           $('.subtitles li[data-start="14910"]').trigger('click');
         });

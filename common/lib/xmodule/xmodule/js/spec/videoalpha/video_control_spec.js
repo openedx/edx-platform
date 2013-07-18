@@ -1,5 +1,5 @@
 (function() {
-  xdescribe('VideoControlAlpha', function() {
+  describe('VideoControlAlpha', function() {
     var state, videoControl;
 
     function initialize() {
@@ -7,6 +7,10 @@
       state = new VideoAlpha('#example');
       videoControl = state.videoControl;
     }
+
+    afterEach(function() {
+        $('source').remove();
+    });
 
     describe('constructor', function() {
       beforeEach(function() {
@@ -40,6 +44,10 @@
         beforeEach(function() {
           window.onTouchBasedDevice.andReturn(true);
           initialize();
+        });
+
+        afterEach(function(){
+          window.onTouchBasedDevice.andReturn(false);
         });
 
         it('does not add the play class to video control', function() {

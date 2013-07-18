@@ -125,7 +125,8 @@ function () {
             } else {
                 _this.videoCaption.renderCaption();
             }
-        });
+        })
+        .error(function(){console.error('Subtitles not found. Upload subtitles to server!');});
     }
 
     function captionURL() {

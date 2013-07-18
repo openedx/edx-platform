@@ -1,5 +1,5 @@
 (function() {
-  xdescribe('VideoQualityControlAlpha', function() {
+  describe('VideoQualityControlAlpha', function() {
     var state, videoControl, videoQualityControl;
 
     function initialize() {
@@ -8,6 +8,11 @@
       videoControl = state.videoControl;
       videoQualityControl = state.videoQualityControl;
     }
+
+
+    afterEach(function() {
+        $('source').remove();
+    });
 
     describe('constructor', function() {
       beforeEach(function() {
