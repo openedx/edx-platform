@@ -70,6 +70,9 @@ def save_item(request):
                 delattr(existing_item, metadata_key)
             else:
                 setattr(existing_item, metadata_key, value)
+        # Save the data that we've just changed to the underlying
+        # MongoKeyValueStore before we update the mongo datastore.
+        existing_item.save()
         # commit to datastore
         store.update_metadata(item_location, own_metadata(existing_item))
 

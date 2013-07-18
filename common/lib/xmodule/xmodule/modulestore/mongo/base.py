@@ -105,6 +105,15 @@ class MongoKeyValueStore(KeyValueStore):
         else:
             raise InvalidScopeError(key.scope)
 
+    def set_many(self, update_dict):
+        """set_many method. Implementations should accept an `update_dict` of
+        key-value pairs, and set all the `keys` to the given `value`s."""
+        # `set` simply updates an in-memory db, rather than calling down to a real db,
+        # as mongo bulk save is handled elsewhere. A future improvement would be to pull
+        # the mongo-specific bulk save logic into this method.
+        for key, value in update_dict.iteritems():
+            self.set(key, value)
+
     def delete(self, key):
         if key.scope == Scope.children:
             self._children = []
@@ -639,6 +648,8 @@ class MongoModuleStore(ModuleStoreBase):
 
         :param xmodule:
         """
+        # Save any changes to the xmodule to the MongoKeyValueStore
+        xmodule.save()
         # split mongo's persist_dag is more general and useful.
         self.collection.save({
                 '_id': xmodule.location.dict(),
@@ -683,6 +694,8 @@ class MongoModuleStore(ModuleStoreBase):
                 'url_slug': new_object.location.name
             })
             course.tabs = existing_tabs
+            # Save any changes to the course to the MongoKeyValueStore
+            course.save()
             self.update_metadata(course.location, course.xblock_kvs._metadata)
 
     def fire_updated_modulestore_signal(self, course_id, location):
@@ -789,6 +802,8 @@ class MongoModuleStore(ModuleStoreBase):
                     tab['name'] = metadata.get('display_name')
                     break
             course.tabs = existing_tabs
+            # Save the updates to the course to the MongoKeyValueStore
+            course.save()
             self.update_metadata(course.location, own_metadata(course))
 
         self._update_single_item(location, {'metadata': metadata})
@@ -811,6 +826,8 @@ class MongoModuleStore(ModuleStoreBase):
             course = self.get_course_for_item(item.location)
             existing_tabs = course.tabs or []
             course.tabs = [tab for tab in existing_tabs if tab.get('url_slug') != location.name]
+            # Save the updates to the course to the MongoKeyValueStore
+            course.save()
             self.update_metadata(course.location, own_metadata(course))
 
         # Must include this to avoid the django debug toolbar (which defines the deprecated "safe=False")

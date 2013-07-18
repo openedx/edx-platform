@@ -194,6 +194,10 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
             if hasattr(descriptor, 'children'):
                 for child in descriptor.get_children():
                     parent_tracker.add_parent(child.location, descriptor.location)
+
+            # After setting up the descriptor, save any changes that we have
+            # made to attributes on the descriptor to the underlying KeyValueStore.
+            descriptor.save()
             return descriptor
 
         render_template = lambda: ''
