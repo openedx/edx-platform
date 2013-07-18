@@ -215,6 +215,19 @@ class StudentAdmin
         error: std_ajax_err => @$request_response_error_all.text "Error starting a task to reset attempts for all students on this problem."
 
     # start task to rescore problem for all students
+    @$btn_reset_attempts_all.click =>
+      send_data =
+        all_students: true
+        problem_to_reset: @$field_problem_select_all.val()
+
+      $.ajax
+        dataType: 'json'
+        url: @$btn_reset_attempts_all.data 'endpoint'
+        data: send_data
+        success: @clear_errors_then -> console.log 'started reset attempts task'
+        error: std_ajax_err => @$request_response_error_all.text "Error starting a task to reset attempts on this problem for all students."
+
+    # start task to rescore problem for all students
     @$btn_rescore_problem_all.click =>
       send_data =
         all_students: true
@@ -255,7 +268,8 @@ class StudentAdmin
   start_refresh_running_task_poll_loop: ->
     @reload_running_tasks_list()
     if @$section.hasClass 'active-section'
-      plantTimeout 5000, => @start_refresh_running_task_poll_loop()
+      # poll every 20 seconds
+      plantTimeout 20000, => @start_refresh_running_task_poll_loop()
 
   # wraps a function, but first clear the error displays
   clear_errors_then: (cb) ->

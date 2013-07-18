@@ -9,6 +9,8 @@ std_ajax_err = -> window.InstructorDashboard.util.std_ajax_err.apply this, argum
 # Analytics Section
 class Analytics
   constructor: (@$section) ->
+    @$section.data 'wrapper', @
+
     # gather elements
     @$display                = @$section.find '.distribution-display'
     @$display_text           = @$display.find '.distribution-display-text'
@@ -99,7 +101,6 @@ class Analytics
           console.warn("unable to show distribution #{feature_res.type}")
           @$display_text.text 'Unavailable Metric Display\n' + JSON.stringify(feature_res)
 
-
   # fetch distribution data from server.
   # `handler` can be either a callback for success
   # or a mapping e.g. {success: ->, error: ->, complete: ->}
@@ -115,6 +116,16 @@ class Analytics
       _.extend settings, handler
 
     $.ajax settings
+
+  # slickgrid's layout collapses when rendered
+  # in an invisible div. use this method to reload
+  # the AuthList widget
+  refresh: ->
+    @on_selector_change()
+
+  # handler for when the section title is clicked.
+  onClickTitle: ->
+    @refresh()
 
 
 # export for use
