@@ -496,7 +496,9 @@ class @PeerGradingProblem
     if response.actual_rubric != undefined
       calibration_wrapper.append("<div>Instructor Scored Rubric: #{response.actual_rubric}</div>")
     if response.actual_feedback!=undefined
-      calibration_wrapper.append("<div>Instructor Feedback: #{response.actual_feedback['feedback']}</div>")
+      actual_feedback = JSON.parse(response.actual_feedback).feedback
+      calibration_wrapper.append("<div class='instructor_feedback'></div>")
+      calibration_wrapper.find('.instructor_feedback').text('Instructor Feedback: ' + actual_feedback)
 
     # disable score selection and submission from the grading interface
     $("input[name='score-selection']").attr('disabled', true)
