@@ -1,9 +1,11 @@
 class @Rubric
   constructor: () ->
 
-  @initialize: (location) ->
-    $('.rubric').data("location", location) 
-    $('input[class="score-selection"]').change @tracking_callback
+  @initialize: (location,el) ->
+    @el = el
+    @$el = $(el)
+    @$('.rubric').data("location", location)
+    @$('input[class="score-selection"]').change @tracking_callback
     # set up the hotkeys
     $(window).unbind('keydown', @keypress_callback)
     $(window).keydown @keypress_callback
@@ -12,8 +14,11 @@ class @Rubric
     @category = $(@categories.first())
     @category.prepend('> ')
     @category_index = 0
-    
-    
+
+  # locally scoped jquery.
+  $: (selector) ->
+    $(selector, @el)
+
   @keypress_callback: (event) =>
     # don't try to do this when user is typing in a text input
     if $(event.target).is('input, textarea')
@@ -86,34 +91,48 @@ class @Rubric
     return true
 
 class @CombinedOpenEnded
-  constructor: (element) ->
-    @element=element
-    @reinitialize(element)
+  constructor: (el) ->
+    @el=el
+    @$el = $(el)
+    @reinitialize(el)
     $(window).keydown @keydown_handler
     $(window).keyup @keyup_handler
 
+  # locally scoped jquery.
+  $: (selector) ->
+    $(selector, @el)
+
   reinitialize: (element) ->
-    @wrapper=$(element).find('section.xmodule_CombinedOpenEndedModule')
-    @el = $(element).find('section.combined-open-ended')
-    @combined_open_ended=$(element).find('section.combined-open-ended')
-    @id = @el.data('id')
-    @ajax_url = @el.data('ajax-url')
-    @state = @el.data('state')
-    @task_count = @el.data('task-count')
-    @task_number = @el.data('task-number')
-    @accept_file_upload = @el.data('accept-file-upload')
-    @location = @el.data('location')
+    @wrapper=@$('section.xmodule_CombinedOpenEndedModule')
+    @coe = @$('section.combined-open-ended')
+
+    #Get data from combinedopenended
+    @allow_reset = @coe.data('allow_reset')
+    @id = @coe.data('id')
+    @ajax_url = @coe.data('ajax-url')
+    @state = @coe.data('state')
+    @task_count = @coe.data('task-count')
+    @task_number = @coe.data('task-number')
+    @accept_file_upload = @coe.data('accept-file-upload')
+    @location = @coe.data('location')
+    @child_state = @coe.data('state')
+    @child_type = @coe.data('child-type')
+
     # set up handlers for click tracking
     Rubric.initialize(@location)
     @is_ctrl = false
 
-    @allow_reset = @el.data('allow_reset')
+    #Setup reset
     @reset_button = @$('.reset-button')
     @reset_button.click @reset
+
+    #Setup next problem
     @next_problem_button = @$('.next-step-button')
     @next_problem_button.click @next_problem
+
     @status_container = @$('.status-elements')
 
+    #setup show results
     @show_results_button=@$('.show-results-button')
     @show_results_button.click @show_results
 
@@ -122,33 +141,32 @@ class @CombinedOpenEnded
 
     # valid states: 'initial', 'assessing', 'post_assessment', 'done'
     Collapsible.setCollapsibles(@el)
-    @submit_evaluation_button = $('.submit-evaluation-button')
+    @submit_evaluation_button = @$('.submit-evaluation-button')
     @submit_evaluation_button.click @message_post
 
-    @results_container = $('.result-container')
-    @combined_rubric_container = $('.combined-rubric-container')
+    @results_container = @$('.result-container')
+    @combined_rubric_container = @$('.combined-rubric-container')
 
-    @legend_container= $('.legend-container')
+    @legend_container= @$('.legend-container')
     @show_legend_current()
 
     # Where to put the rubric once we load it
-    @el = $(element).find('section.open-ended-child')
-    @errors_area = @$('.error')
-    @answer_area = @$('textarea.answer')
-    @prompt_container = @$('.prompt')
-    @rubric_wrapper = @$('.rubric-wrapper')
-    @hint_wrapper = @$('.hint-wrapper')
-    @message_wrapper = @$('.message-wrapper')
-    @submit_button = @$('.submit-button')
-    @child_state = @el.data('state')
-    @child_type = @el.data('child-type')
+
+    @oe = @$('section.open-ended-child')
+    @errors_area = @$(@oe).find('.error')
+    @answer_area = @$(@oe).find('textarea.answer')
+    @prompt_container = @$(@oe).find('.prompt')
+    @rubric_wrapper = @$(@oe).find('.rubric-wrapper')
+    @hint_wrapper = @$(@oe).find('.hint-wrapper')
+    @message_wrapper = @$(@oe).find('.message-wrapper')
+    @submit_button = @$(@oe).find('.submit-button')
     if @child_type=="openended"
-      @skip_button = @$('.skip-button')
+      @skip_button = @$(@oe).find('.skip-button')
       @skip_button.click @skip_post_assessment
 
-    @file_upload_area = @$('.file-upload')
+    @file_upload_area = $(@oe).find('.file-upload')
     @can_upload_files = false
-    @open_ended_child= @$('.open-ended-child')
+    @open_ended_child= $(@oe).find('.open-ended-child')
 
     @out_of_sync_message = 'The problem state got out of sync.  Try reloading the page.'
 
@@ -165,10 +183,6 @@ class @CombinedOpenEnded
     if @task_number>1
       @show_combined_rubric_current()
       @show_results_current()
-
-  # locally scoped jquery.
-  $: (selector) ->
-    $(selector, @el)
 
   show_results_current: () =>
     data = {'task_number' : @task_number-1}
@@ -223,10 +237,10 @@ class @CombinedOpenEnded
     evaluation_scoring = $(event.target).parent()
 
     fd = new FormData()
-    feedback = evaluation_scoring.find('textarea.feedback-on-feedback')[0].value
-    submission_id = external_grader_message.find('input.submission_id')[0].value
-    grader_id = external_grader_message.find('input.grader_id')[0].value
-    score = evaluation_scoring.find("input:radio[name='evaluation-score']:checked").val()
+    feedback = @$(evaluation_scoring).find('textarea.feedback-on-feedback')[0].value
+    submission_id = @$(external_grader_message).find('input.submission_id')[0].value
+    grader_id = @$(external_grader_message).find('input.grader_id')[0].value
+    score = @$(evaluation_scoring).find("input:radio[name='evaluation-score']:checked").val()
 
     fd.append('feedback', feedback)
     fd.append('submission_id', submission_id)
@@ -474,11 +488,11 @@ class @CombinedOpenEnded
       @errors_area.html(@out_of_sync_message)
 
   gentle_alert: (msg) =>
-    if @el.find('.open-ended-alert').length
-      @el.find('.open-ended-alert').remove()
+    if @$el.find('.open-ended-alert').length
+      @$el.find('.open-ended-alert').remove()
     alert_elem = "<div class='open-ended-alert'>" + msg + "</div>"
-    @el.find('.open-ended-action').after(alert_elem)
-    @el.find('.open-ended-alert').css(opacity: 0).animate(opacity: 1, 700)
+    @$el.find('.open-ended-action').after(alert_elem)
+    @$el.find('.open-ended-alert').css(opacity: 0).animate(opacity: 1, 700)
 
   queueing: =>
     if @child_state=="assessing" and @child_type=="openended"
