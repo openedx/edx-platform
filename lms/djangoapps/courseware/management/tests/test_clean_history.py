@@ -7,7 +7,7 @@ import textwrap
 
 import dateutil.parser
 
-from django.test import TestCase
+from django.test import TransactionTestCase
 from django.db import connection
 
 from courseware.management.commands.clean_history import StudentModuleHistoryCleaner
@@ -43,7 +43,7 @@ class SmhcDbMocked(SmhcSayStubbed):
         self.get_history_for_student_modules.return_value = rows
 
 
-class HistoryCleanerTest(TestCase):
+class HistoryCleanerTest(TransactionTestCase):
     """Base class for all history cleaner tests."""
 
     maxDiff = None
