@@ -12,6 +12,7 @@ import datetime
 import json
 import logging
 import optparse
+import time
 import traceback
 
 from django.core.management.base import NoArgsCommand
@@ -25,10 +26,22 @@ class Command(NoArgsCommand):
 
     option_list = NoArgsCommand.option_list + (
         optparse.make_option(
+            '--batch',
+            type='int',
+            default=100,
+            help="Batch size, number of module_ids to examine in a transaction.",
+        ),
+        optparse.make_option(
             '--dry-run',
             action='store_true',
             default=False,
             help="Don't change the database, just show what would be done.",
+        ),
+        optparse.make_option(
+            '--sleep',
+            type='float',
+            default=0,
+            help="Seconds to sleep between batches.",
         ),
     )
 
@@ -39,7 +52,7 @@ class Command(NoArgsCommand):
         smhc = StudentModuleHistoryCleaner(
             dry_run=options["dry_run"],
         )
-        smhc.main()
+        smhc.main(batch_size=options["batch"], sleep=options["sleep"])
 
 
 class StudentModuleHistoryCleaner(object):
@@ -54,7 +67,7 @@ class StudentModuleHistoryCleaner(object):
         self.next_student_module_id = 0
         self.last_student_module_id = 0
 
-    def main(self, batch_size=None):
+    def main(self, batch_size=None, sleep=0):
         """Invoked from the management command to do all the work."""
 
         batch_size = batch_size or self.BATCH_SIZE
@@ -74,6 +87,8 @@ class StudentModuleHistoryCleaner(object):
             if not self.dry_run:
                 self.commit()
             self.save_state()
+            if sleep:
+                time.sleep(sleep)
 
     def say(self, message):
         """
