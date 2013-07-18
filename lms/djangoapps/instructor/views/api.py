@@ -456,19 +456,26 @@ def get_student_progress_url(request, course_id):
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 @require_query_params(
-    student_email="email of student for whom to reset attempts"
+    problem_to_reset="problem urlname to reset"
 )
 @common_exceptions_400
 def reset_student_attempts(request, course_id):
     """
-    Resets a students attempts counter or starts a task to reset all students attempts counters. Optionally deletes student state for a problem.
-    Limited to staff access. Some sub-methods limited to instructor access.
 
-    Takes either of the following query paremeters
+    Resets a students attempts counter or starts a task to reset all students
+    attempts counters. Optionally deletes student state for a problem. Limited
+    to staff access. Some sub-methods limited to instructor access.
+
+    Takes some of the following query paremeters
         - problem_to_reset is a urlname of a problem
         - student_email is an email
-        - all_students is a boolean (requires instructor access) (mutually exclusive with delete_module)
-        - delete_module is a boolean (requires instructor access) (mutually exclusive with all_students)
+        - all_students is a boolean
+            requires instructor access
+            mutually exclusive with delete_module
+            mutually exclusive with delete_module
+        - delete_module is a boolean
+            requires instructor access
+            mutually exclusive with all_students
     """
     course = get_course_with_access(
         request.user, course_id, 'staff', depth=None
@@ -479,15 +486,20 @@ def reset_student_attempts(request, course_id):
     all_students = request.GET.get('all_students', False) in ['true', 'True', True]
     delete_module = request.GET.get('delete_module', False) in ['true', 'True', True]
 
-    if not (problem_to_reset and (all_students or student_email)):
-        return HttpResponseBadRequest()
-    if delete_module and all_students:
-        return HttpResponseBadRequest()
+    # parameter combinations
+    if all_students and student_email:
+        return HttpResponseBadRequest(
+            "all_students and student_email are mutually exclusive."
+        )
+    if all_students and delete_module:
+        return HttpResponseBadRequest(
+            "all_students and delete_module are mutually exclusive."
+        )
 
-    # require instructor access for some queries
+    # instructor authorization
     if all_students or delete_module:
         if not has_access(request.user, course, 'instructor'):
-            HttpResponseBadRequest("requires instructor accesss.")
+            return HttpResponseForbidden("Requires instructor access.")
 
     module_state_key = _msk_from_problem_urlname(course_id, problem_to_reset)
 
@@ -527,14 +539,19 @@ def rescore_problem(request, course_id):
         - student_email is an email
         - all_students is a boolean
 
-    all_students will be ignored if student_email is present
+    all_students and student_email cannot both be present.
     """
     problem_to_reset = request.GET.get('problem_to_reset')
     student_email = request.GET.get('student_email', False)
     all_students = request.GET.get('all_students') in ['true', 'True', True]
 
     if not (problem_to_reset and (all_students or student_email)):
-        return HttpResponseBadRequest()
+        return HttpResponseBadRequest("Missing query parameters.")
+
+    if all_students and student_email:
+        return HttpResponseBadRequest(
+            "Cannot rescore with all_students and student_email."
+        )
 
     module_state_key = _msk_from_problem_urlname(course_id, problem_to_reset)
 
@@ -566,15 +583,19 @@ def list_instructor_tasks(request, course_id):
     List instructor tasks.
     Limited to instructor access.
 
-    Takes either of the following query paremeters
-        - (optional) problem_urlname (same format as problem_to_reset in other api methods)
-        - (optional) student_email
+    Takes optional query paremeters.
+        - With no arguments, lists running tasks.
+        - `problem_urlname` lists task history for problem
+        - `problem_urlname` and `student_email` lists task
+            history for problem AND student (intersection)
     """
     problem_urlname = request.GET.get('problem_urlname', False)
     student_email = request.GET.get('student_email', False)
 
     if student_email and not problem_urlname:
-        return HttpResponseBadRequest()
+        return HttpResponseBadRequest(
+            "student_email must accompany problem_urlname"
+        )
 
     if problem_urlname:
         module_state_key = _msk_from_problem_urlname(course_id, problem_urlname)

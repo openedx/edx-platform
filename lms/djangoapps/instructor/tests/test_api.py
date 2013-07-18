@@ -6,6 +6,7 @@ import json
 from urllib import quote
 from django.test import TestCase
 from nose.tools import raises
+from mock import Mock
 from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
 
@@ -17,6 +18,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from student.tests.factories import UserFactory, AdminFactory
 
 from student.models import CourseEnrollment
+from courseware.models import StudentModule
 
 from instructor.access import allow_access
 from instructor.views.api import _split_input_list, _msk_from_problem_urlname
@@ -238,6 +240,16 @@ class TestInstructorAPILevelsAccess(ModuleStoreTestCase, LoginEnrollmentTestCase
         })
         self.assertEqual(response.status_code, 400)
 
+    def test_modify_access_bad_role(self):
+        """ Test with an invalid action parameter. """
+        url = reverse('modify_access', kwargs={'course_id': self.course.id})
+        response = self.client.get(url, {
+            'email': self.other_staff.email,
+            'rolename': 'robot-not-a-roll',
+            'action': 'revoke',
+        })
+        self.assertEqual(response.status_code, 400)
+
     def test_modify_access_allow(self):
         url = reverse('modify_access', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {
@@ -439,14 +451,249 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         response = self.client.get(url)
         self.assertEqual(response.status_code, 400)
 
-# class TestInstructorAPILevelsGrade modification & tasks
-# # reset_student_attempts
-# # rescore_problem
-# # list_instructor_tasks
 
-# class TestInstructorAPILevelsForums
-# # list_forum_members
-# # update_forum_role_membership
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+class TestInstructorAPIRegradeTask(ModuleStoreTestCase, LoginEnrollmentTestCase):
+    """
+    Test endpoints whereby instructors can change student grades.
+    This includes resetting attempts and starting rescore tasks.
+
+    This test does NOT test whether the actions had an effect on the
+    database, that is the job of task tests and test_enrollment.
+    """
+    def setUp(self):
+        self.instructor = AdminFactory.create()
+        self.course = CourseFactory.create()
+        self.client.login(username=self.instructor.username, password='test')
+
+        self.student = UserFactory()
+        CourseEnrollment.objects.create(course_id=self.course.id, user=self.student)
+
+        self.problem_urlname = 'robot-some-problem-urlname'
+        self.module_to_reset = StudentModule.objects.create(
+            student=self.student,
+            course_id=self.course.id,
+            module_state_key=_msk_from_problem_urlname(
+                self.course.id,
+                self.problem_urlname
+            ),
+            state=json.dumps({'attempts': 10}),
+        )
+
+    def test_reset_student_attempts_deletall(self):
+        """ Make sure no one can delete all students state on a problem. """
+        url = reverse('reset_student_attempts', kwargs={'course_id': self.course.id})
+        response = self.client.get(url, {
+            'problem_to_reset': self.problem_urlname,
+            'all_students': True,
+            'delete_module': True,
+        })
+        print response.content
+        self.assertEqual(response.status_code, 400)
+
+    def test_reset_student_attempts_single(self):
+        """ Test reset single student attempts. """
+        url = reverse('reset_student_attempts', kwargs={'course_id': self.course.id})
+        response = self.client.get(url, {
+            'problem_to_reset': self.problem_urlname,
+            'student_email': self.student.email,
+        })
+        print response.content
+        self.assertEqual(response.status_code, 200)
+        # make sure problem attempts have been reset.
+        changed_module = StudentModule.objects.get(pk=self.module_to_reset.pk)
+        self.assertEqual(
+            json.loads(changed_module.state)['attempts'],
+            0
+        )
+
+    def test_reset_student_attempts_all(self):
+        """ Test reset all student attempts. """
+        # mock out the function which should be called to execute the action.
+        import instructor_task.api
+        act = Mock(return_value=None)
+        instructor_task.api.submit_reset_problem_attempts_for_all_students = act
+
+        url = reverse('reset_student_attempts', kwargs={'course_id': self.course.id})
+        response = self.client.get(url, {
+            'problem_to_reset': self.problem_urlname,
+            'all_students': True,
+        })
+        print response.content
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(act.called)
+
+    def test_reset_student_attempts_missingmodule(self):
+        """ Test reset for non-existant problem. """
+        url = reverse('reset_student_attempts', kwargs={'course_id': self.course.id})
+        response = self.client.get(url, {
+            'problem_to_reset': 'robot-not-a-real-module',
+            'student_email': self.student.email,
+        })
+        print response.content
+        self.assertEqual(response.status_code, 400)
+
+    def test_reset_student_attempts_delete(self):
+        """ Test delete single student state. """
+        url = reverse('reset_student_attempts', kwargs={'course_id': self.course.id})
+        response = self.client.get(url, {
+            'problem_to_reset': self.problem_urlname,
+            'student_email': self.student.email,
+            'delete_module': True,
+        })
+        print response.content
+        self.assertEqual(response.status_code, 200)
+        # make sure the module has been deleted
+        self.assertEqual(
+            StudentModule.objects.filter(
+                student=self.module_to_reset.student,
+                course_id=self.module_to_reset.course_id,
+                # module_state_key=self.module_to_reset.module_state_key,
+            ).count(),
+            0
+        )
+
+    def test_reset_student_attempts_nonsense(self):
+        """ Test failure with both student_email and all_students. """
+        url = reverse('reset_student_attempts', kwargs={'course_id': self.course.id})
+        response = self.client.get(url, {
+            'problem_to_reset': self.problem_urlname,
+            'student_email': self.student.email,
+            'all_students': True,
+        })
+        print response.content
+        self.assertEqual(response.status_code, 400)
+
+    def test_rescore_problem_single(self):
+        """ Test rescoring of a single student. """
+        import instructor_task.api
+        act = Mock(return_value=None)
+        instructor_task.api.submit_rescore_problem_for_student = act
+
+        url = reverse('rescore_problem', kwargs={'course_id': self.course.id})
+        response = self.client.get(url, {
+            'problem_to_reset': self.problem_urlname,
+            'student_email': self.student.email,
+        })
+        print response.content
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(act.called)
+
+    def test_rescore_problem_all(self):
+        """ Test rescoring for all students. """
+        import instructor_task.api
+        act = Mock(return_value=None)
+        instructor_task.api.submit_rescore_problem_for_all_students = act
+
+        url = reverse('rescore_problem', kwargs={'course_id': self.course.id})
+        response = self.client.get(url, {
+            'problem_to_reset': self.problem_urlname,
+            'all_students': True,
+        })
+        print response.content
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(act.called)
+
+
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+class TestInstructorAPITaskLists(ModuleStoreTestCase, LoginEnrollmentTestCase):
+    """
+    Test instructor task list endpoint.
+    """
+
+    class FakeTask(object):
+        """ Fake task object """
+        FEATURES = ['task_type', 'task_input', 'task_id', 'requester', 'created', 'task_state']
+
+        def __init__(self, i):
+            for feature in self.FEATURES:
+                setattr(self, feature, 'expected')
+
+        def to_dict(self):
+            return {key: 'expected' for key in self.FEATURES}
+
+    def setUp(self):
+        self.instructor = AdminFactory.create()
+        self.course = CourseFactory.create()
+        self.client.login(username=self.instructor.username, password='test')
+
+        self.student = UserFactory()
+        CourseEnrollment.objects.create(course_id=self.course.id, user=self.student)
+
+        self.problem_urlname = 'robot-some-problem-urlname'
+        self.module = StudentModule.objects.create(
+            student=self.student,
+            course_id=self.course.id,
+            module_state_key=_msk_from_problem_urlname(
+                self.course.id,
+                self.problem_urlname
+            ),
+            state=json.dumps({'attempts': 10}),
+        )
+
+        self.tasks = [self.FakeTask(i) for i in xrange(6)]
+
+    def test_list_instructor_tasks_running(self):
+        """ Test list of all running tasks. """
+        import instructor_task.api
+        act = Mock(return_value=self.tasks)
+        instructor_task.api.get_running_instructor_tasks = act
+
+        url = reverse('list_instructor_tasks', kwargs={'course_id': self.course.id})
+        response = self.client.get(url, {})
+        print response.content
+        self.assertEqual(response.status_code, 200)
+
+        # check response
+        self.assertTrue(act.called)
+        expected_tasks = [ftask.to_dict() for ftask in self.tasks]
+        expected_res = {'tasks': expected_tasks}
+        self.assertEqual(json.loads(response.content), expected_res)
+
+    def test_list_instructor_tasks_problem(self):
+        """ Test list task history for problem. """
+        import instructor_task.api
+        act = Mock(return_value=self.tasks)
+        instructor_task.api.get_instructor_task_history = act
+
+        url = reverse('list_instructor_tasks', kwargs={'course_id': self.course.id})
+        response = self.client.get(url, {
+            'problem_urlname': self.problem_urlname,
+        })
+        print response.content
+        self.assertEqual(response.status_code, 200)
+
+        # check response
+        self.assertTrue(act.called)
+        expected_tasks = [ftask.to_dict() for ftask in self.tasks]
+        expected_res = {'tasks': expected_tasks}
+        self.assertEqual(json.loads(response.content), expected_res)
+
+    def test_list_instructor_tasks_problem_student(self):
+        """ Test list task history for problem AND student. """
+        import instructor_task.api
+        act = Mock(return_value=self.tasks)
+        instructor_task.api.get_instructor_task_history = act
+
+        url = reverse('list_instructor_tasks', kwargs={'course_id': self.course.id})
+        response = self.client.get(url, {
+            'problem_urlname': self.problem_urlname,
+            'student_email': self.student.email,
+        })
+        print response.content
+        self.assertEqual(response.status_code, 200)
+
+        # check response
+        self.assertTrue(act.called)
+        expected_tasks = [ftask.to_dict() for ftask in self.tasks]
+        expected_res = {'tasks': expected_tasks}
+        self.assertEqual(json.loads(response.content), expected_res)
+
+
+
+    # class TestInstructorAPILevelsForums
+    # # list_forum_members
+    # # update_forum_role_membership
 
 
 class TestInstructorAPIHelpers(TestCase):
