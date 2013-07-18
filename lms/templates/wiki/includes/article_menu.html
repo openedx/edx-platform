@@ -1,6 +1,7 @@
 ## mako
-<%! 
+<%!
   from django.core.urlresolvers import reverse
+  from django.utils.translation import ugettext as _
   from wiki.core.permissions import can_change_permissions
 %>
 
@@ -40,14 +41,14 @@
 
 
 <%doc>
-This should be enabled for all non-anonymous users once the notifications app has been integrated and styled.
+${_("This should be enabled for all non-anonymous users once the notifications app has been integrated and styled.")}
 </%doc>
 
 %if can_change_permissions(article,user):
 <li class="${"active" if selected_tab == "settings" else ""}">
   <a href="${reverse('wiki:settings', kwargs={'article_id' : article.id, 'path' : urlpath.path})}">
     <span class="icon-settings icon"></span>
-    Settings
+    ${_("Settings")}
   </a>
 </li>
 %endif

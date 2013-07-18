@@ -1,6 +1,8 @@
+<%! from django.utils.translation import ugettext as _ %>
+
 <%inherit file="main.html" />
 <%namespace name='static' file='static_content.html'/>
-<%block name="title"><title>${course.number} Textbook</title></%block>
+<%block name="title"><title>${_("{course_number} Textbook").format(course_number=course.number)}</title></%block>
 
 <%block name="headextra">
 <%static:css group='course'/>
@@ -66,7 +68,7 @@ $("#open_close_accordion a").click(function(){
 <section class="container">
   <div class="book-wrapper">
 
-    <section aria-label="Textbook Navigation" class="book-sidebar">
+    <section aria-label="${_('Textbook Navigation')}" class="book-sidebar">
       <header id="open_close_accordion">
         <a href="#">close</a>
       </header>
@@ -97,10 +99,10 @@ $("#open_close_accordion a").click(function(){
           % for entry in table_of_contents:
             ${print_entry(entry)}
           % endfor
-        
+
         ## Don't delete this empty list item. Without it, Jquery.TreeView won't
         ## render the last list item as expandable.
-        <li></li> 
+        <li></li>
       </ul>
     </section>
 
@@ -109,10 +111,10 @@ $("#open_close_accordion a").click(function(){
         <nav>
           <ul>
             <li class="last">
-              <a href="javascript:prev_page()">Previous page</a>
+              <a href="javascript:prev_page()">${_('Previous page')}</a>
             </li>
             <li class="next">
-              <a href="javascript:next_page()">Next page</a>
+              <a href="javascript:next_page()">${_('Next page')}</a>
             </li>
           </ul>
         </nav>

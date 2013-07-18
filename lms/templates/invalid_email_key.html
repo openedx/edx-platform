@@ -1,16 +1,18 @@
+<%! from django.utils.translation import ugettext as _ %>
+
 <%inherit file="main.html" />
 
 <section class="container activation">
 
   <section class="message">
-    <h1 class="invalid">Invalid email change key</h1>
+    <h1 class="invalid">${_("Invalid email change key")}</h1>
     <hr class="horizontal-divider">
-    <p> This e-mail key is not valid. Please check:</p>
+    <p> ${_("This e-mail key is not valid. Please check:")}</p>
     <ul>
-      <li>Was this key already used? Check whether the e-mail change has already happened.
-      <li>Did your e-mail client break the URL into two lines?
-      <li>The keys are valid for a limited amount of time. Has the key expired?
+      <li>${_("Was this key already used? Check whether the e-mail change has already happened.")}
+      <li>${_("Did your e-mail client break the URL into two lines?")}
+      <li>${_("The keys are valid for a limited amount of time. Has the key expired?")}
     </ul>
-    <p>Go back to the <a href="/">home page</a>.</p>
+    <p>${_('Go back to the {link_start}home page{link_end}.').format(link_start='<a href="/">', link_end='</a>')}</p>
   </section>
 </section>

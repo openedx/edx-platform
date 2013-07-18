@@ -1,3 +1,5 @@
+<%! from django.utils.translation import ugettext as _ %>
+
 <%namespace name='static' file='static_content.html'/>
 <%! from django.core.urlresolvers import reverse %>
 <%! from django_countries.countries import COUNTRIES %>
@@ -9,7 +11,7 @@
   <div class="inner-wrapper">
     <div id="register">
       <header>
-        <h2>Sign Up for <span class="edx">edX</span></h2>
+        <h2>${_('Sign Up for {span_start}edX{span_end}').format(span_start='<span class="edx">', span_end='</span>')}</h2>
         <hr>
       </header>
 
@@ -20,41 +22,41 @@
 
         <div class="input-group">
 	  % if has_extauth_info is UNDEFINED:
-          <label data-field="email" for="signup_email">E-mail *</label>
-	    <input id="signup_email" type="email" name="email" placeholder="e.g. yourname@domain.com" required />
-	  
-          <label data-field="password" for="signup_password">Password *</label>
+          <label data-field="email" for="signup_email">${_('E-mail *')}</label>
+	    <input id="signup_email" type="email" name="email" placeholder="${_('e.g. yourname@domain.com')}" required />
+
+          <label data-field="password" for="signup_password">${_('Password *')}</label>
 	    <input id="signup_password" type="password" name="password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" required />
-          
-	  <label data-field="username" for="signup_username">Public Username *</label>
-	    <input id="signup_username" type="text" name="username" placeholder="e.g. yourname (shown on forums)" required />
-	  
-          <label data-field="name" for="signup_fullname">Full Name *</label>
-	    <input id="signup_fullname" type="text" name="name" placeholder="e.g. Your Name (for certificates)" required />
+
+	  <label data-field="username" for="signup_username">${_('Public Username *')}</label>
+	    <input id="signup_username" type="text" name="username" placeholder="${_('e.g. yourname (shown on forums)')}" required />
+
+          <label data-field="name" for="signup_fullname">${_('Full Name *')}</label>
+	    <input id="signup_fullname" type="text" name="name" placeholder="${_('e.g. Your Name (for certificates)')}" required />
 	  % else:
-	  <p><i>Welcome</i> ${extauth_id}</p><br/>
-	  <p><i>Enter a public username:</i></p>
-            
-          <label data-field="username" for="signup_username">Public Username *</label>
-	      <input id="signup_username" type="text" name="username" value="${extauth_username}" placeholder="e.g. yourname (shown on forums)" required />
+	  <p>${_('<i>Welcome</i> {name}').format(name=extauth_id)}</p><br/>
+	  <p><i>${_('Enter a public username:')}</i></p>
+
+          <label data-field="username" for="signup_username">${_('Public Username *')}</label>
+	      <input id="signup_username" type="text" name="username" value="${extauth_username}" placeholder="${_('e.g. yourname (shown on forums)')}" required />
 
           % if ask_for_email:
-            <label data-field="email" for="signup_email">E-mail *</label>
-            <input id="signup_email" type="email" name="email" placeholder="e.g. yourname@domain.com" required />
+            <label data-field="email" for="signup_email">${_('E-mail *')}</label>
+            <input id="signup_email" type="email" name="email" placeholder="${_('e.g. yourname@domain.com')}" required />
           % endif
 
-            
+
           % if ask_for_fullname:
-            <label data-field="name" for="signup_fullname">Full Name *</label>
-            <input id="signup_fullname" type="text" name="name" placeholder="e.g. Your Name (for certificates)" required />
+            <label data-field="name" for="signup_fullname">${_("Full Name *")}</label>
+            <input id="signup_fullname" type="text" name="name" placeholder="${_('e.g. Your Name (for certificates)')}" required />
           % endif
-            
+
 	  % endif
         </div>
 
         <div class="input-group">
           <section class="citizenship">
-            <label data-field="level_of_education" for="signup_ed_level">Ed. Completed</label>
+            <label data-field="level_of_education" for="signup_ed_level">${_("Ed. Completed")}</label>
             <div class="input-wrapper">
               <select id="signup_ed_level" name="level_of_education">
                   <option value="">--</option>
@@ -66,7 +68,7 @@
           </section>
 
           <section class="gender">
-            <label data-field="gender" for="signup_gender">Gender</label>
+            <label data-field="gender" for="signup_gender">${_("Gender")}</label>
             <div class="input-wrapper">
               <select id="signup_gender" name="gender">
                   <option value="">--</option>
@@ -78,7 +80,7 @@
           </section>
 
           <section class="date-of-birth">
-            <label data-field="date-of-birth" for="signup_birth_year">Year of birth</label>
+            <label data-field="date-of-birth" for="signup_birth_year">${_("Year of birth")}</label>
             <div class="input-wrapper">
               <select id="signup_birth_year" name="year_of_birth">
                 <option value="">--</option>
@@ -90,10 +92,10 @@
             </div>
           </section>
 
-          <label data-field="mailing_address" for="signup_mailing_address">Mailing address</label>
+          <label data-field="mailing_address" for="signup_mailing_address">${_("Mailing address")}</label>
 	    <textarea id="signup_mailing_address" name="mailing_address"></textarea>
-	  
-          <label data-field="goals" for="signup_goals">Goals in signing up for edX</label>
+
+          <label data-field="goals" for="signup_goals">${_("Goals in signing up for edX")}</label>
 	    <textarea name="goals" id="signup_goals"></textarea>
 
         </div>
@@ -101,33 +103,35 @@
         <div class="input-group">
           <label data-field="terms_of_service" class="terms-of-service" for="signup_tos">
             <input id="signup_tos" name="terms_of_service" type="checkbox" value="true">
-            I agree to the
-            <a href="${reverse('tos')}" target="_blank">Terms of Service</a>*
+            ${_('I agree to the {link_start}Terms of Service{link_end}*').format(
+              link_start='<a href="{url}" target="_blank">'.format(url=reverse('tos')),
+              link_end='</a>')}
           </label>
 
           <label data-field="honor_code" class="honor-code" for="signup_honor">
             <input id="signup_honor" name="honor_code" type="checkbox" value="true">
-            I agree to the
-            <a href="${reverse('honor')}" target="_blank">Honor Code</a>*
+            ${_('I agree to the {link_start}Honor Code{link_end}*').format(
+              link_start='<a href="{url}" target="_blank">'.format(url=reverse('honor')),
+              link_end='</a>')}
           </label>
         </div>
 
         <div class="submit">
-          <input name="submit" type="submit" value="Create My Account">
+          <input name="submit" type="submit" value="${_('Create My Account')}">
         </div>
       </form>
 
       % if has_extauth_info is UNDEFINED:
       <section class="login-extra">
         <p>
-          <span>Already have an account? <a href="#login-modal" class="close-signup" rel="leanModal">Login.</a></span>
+          <span>${_("Already have an account?")} <a href="#login-modal" class="close-signup" rel="leanModal">${_("Login.")}</a></span>
         </p>
       </section>
       % endif
 
     </div>
 
-    <a href="#" class="close-modal" title="Close Modal">
+    <a href="#" class="close-modal" title="${_('Close Modal')}">
       <div class="inner">
         <p>&#10005;</p>
       </div>
@@ -146,7 +150,7 @@
        $("[data-field='"+json.field+"']").addClass('field-error')
      }
     });
-   
+
    // removing close link's default behavior
    $('#login-modal .close-modal').click(function(e) {
     e.preventDefault();

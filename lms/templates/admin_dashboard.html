@@ -1,4 +1,5 @@
 <%namespace name='static' file='static_content.html'/>
+<%! from django.utils.translation import ugettext as _ %>
 
 <%inherit file="main.html" />
 
@@ -7,7 +8,7 @@
   <section class="basic_stats">
 
     <div class="edx_summary">
-      <h2>edX-wide Summary</h2>
+      <h2>${_("edX-wide Summary")}</h2>
       <table style="margin-left:auto;margin-right:auto;width:50%">
       % for key in results["scalars"]:
         <tr>

@@ -1,7 +1,8 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%inherit file="base.html" />
 <%namespace name='static' file='../static_content.html'/>
 
-<%block name="title"><title>BerkeleyX</title></%block>
+<%block name="title"><title>${_("BerkeleyX")}</title></%block>
 
 <%block name="university_header">
   <header class="search" style="background: url('/static/images/university/berkeley/berkeley_fountain_2025x550.jpg')">
@@ -10,7 +11,7 @@
         <div class="logo">
            <img src="${static.url('images/university/berkeley/berkeley.png')}" />
         </div>
-        <h1>BerkeleyX</h1>
+        <h1>${_("BerkeleyX")}</h1>
       </hgroup>
     </div>
   </header>
@@ -18,7 +19,7 @@
 </%block>
 
 <%block name="university_description">
-    <p>The University of California, Berkeley was chartered in 1868 and its flagship campus — envisioned as a "City of Learning" — was established at Berkeley, on San Francisco Bay. Berkeley Faculty consists of 1,582 fulltime and 500 part-time faculty members dispersed among more than 130 academic departments and more than 80 interdisciplinary research units.  28 Nobel prizes have been awarded to Berkeley Alumni. There are eight Nobel Laureates, 32 MacArthur Fellows, and four Pulitzer Prize winners among the current faculty.</p>
+    <p>${_("The University of California, Berkeley was chartered in 1868 and its flagship campus - envisioned as a \"City of Learning\" - was established at Berkeley, on San Francisco Bay. Berkeley Faculty consists of 1,582 fulltime and 500 part-time faculty members dispersed among more than 130 academic departments and more than 80 interdisciplinary research units.  28 Nobel prizes have been awarded to Berkeley Alumni. There are eight Nobel Laureates, 32 MacArthur Fellows, and four Pulitzer Prize winners among the current faculty.")}</p>
 </%block>
 
 ${parent.body()}

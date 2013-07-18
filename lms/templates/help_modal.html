@@ -1,3 +1,5 @@
+<%! from django.utils.translation import ugettext as _ %>
+
 <%namespace name='static' file='static_content.html'/>
 <%! from datetime import datetime %>
 <%! import pytz %>
@@ -7,13 +9,13 @@
 % if settings.MITX_FEATURES.get('ENABLE_FEEDBACK_SUBMISSION', False):
 
 <div class="help-tab">
-  <a href="#help-modal" rel="leanModal">Help</a>
+  <a href="#help-modal" rel="leanModal">${_("Help")}</a>
 </div>
 
 <section id="help-modal" class="modal">
   <div class="inner-wrapper" id="help_wrapper">
     <header>
-      <h2><span class="edx">edX</span> Help</h2>
+      <h2>${_('{span_start}edX{span_end} Help').format(span_start='<span class="edx">', span_end='</span>')}</h2>
       <hr>
     </header>
 
@@ -22,22 +24,22 @@ discussion_link = get_discussion_link(course) if course else None
 %>
 
 % if discussion_link:
-    <p>For <strong>questions on course lectures, homework, tools, or materials for this course</strong>, post in the
-       <a href="${discussion_link}" target="_blank"/>course discussion forum</a>.
+    <p>${_('For <strong>questions on course lectures, homework, tools, or materials for this course</strong>, post in the {link_start}course discussion forum{link_end}.').format(
+      link_start='<a href="{url}" target="_blank">'.format(url=discussion_link),
+      link_end='</a>',
+      )}
     </p>
 % endif
-    
-    <p>Have <strong>general questions about edX</strong>? You can find lots of helpful information in the edX
-       <a href="/help" target="_blank">FAQ</a>.</p>
 
-    <p>Have a <strong>question about something specific</strong>? You can contact the edX general
-       support team directly:</p>
+    <p>${_('Have <strong>general questions about edX</strong>? You can find lots of helpful information in the edX {link_start}FAQ{link_end}.').format(link_start='<a href="/help" target="_blank">', link_end='</a>')}</p>
+
+    <p>${_('Have a <strong>question about something specific</strong>? You can contact the edX general support team directly:')}</p>
     <hr>
 
     <div class="help-buttons">
-      <a href="#" id="feedback_link_problem">Report a problem</a>
-      <a href="#" id="feedback_link_suggestion">Make a suggestion</a>
-      <a href="#" id="feedback_link_question">Ask a question</a>
+      <a href="#" id="feedback_link_problem">${_('Report a problem')}</a>
+      <a href="#" id="feedback_link_suggestion">${_('Make a suggestion')}</a>
+      <a href="#" id="feedback_link_question">${_('Ask a question')}</a>
     </div>
 
 ## TODO: find a way to refactor this
@@ -54,15 +56,15 @@ discussion_link = get_discussion_link(course) if course else None
     <form id="feedback_form" class="feedback_form" method="post" data-remote="true" action="/submit_feedback">
       <div id="feedback_error" class="modal-form-error"></div>
 % if not user.is_authenticated():
-      <label data-field="name">Name*</label>
+      <label data-field="name">${_('Name*')}</label>
       <input name="name" type="text">
-      <label data-field="email">E-mail*</label>
+      <label data-field="email">${_('E-mail*')}</label>
       <input name="email" type="text">
 % endif
-      <label data-field="subject">Briefly describe your issue*</label>
+      <label data-field="subject">${_('Briefly describe your issue*')}</label>
       <input name="subject" type="text">
-      <label data-field="details">Tell us the details*
-<span class="tip">Include error messages, steps which lead to the issue, etc</span></label>
+      <label data-field="details">${_('Tell us the details*')}
+<span class="tip">${_('Include error messages, steps which lead to the issue, etc')}</span></label>
       <textarea name="details"></textarea>
       <input name="issue_type" type="hidden">
 % if course:
@@ -82,20 +84,31 @@ discussion_link = get_discussion_link(course) if course else None
 
   <div class="inner-wrapper" id="feedback_success_wrapper">
     <header>
-      <h2>Thank You!</h2>
+      <h2>${_('Thank You!')}</h2>
       <hr>
     </header>
 
     <%
       dst = datetime.now(pytz.utc).astimezone(pytz.timezone("America/New_York")).dst()
-      business_hours = "13:00 UTC to 21:00 UTC" if dst else "14:00 UTC to 22:00 UTC"
+      if dst:
+        open_time = "13:00"
+        close_time = "21:00"
+      else:
+        open_time = "14:00"
+        close_time = "22:00"
     %>
     <p>
-    Thank you for your inquiry or feedback.  We typically respond to a
-    request within one business day (Monday to Friday,
-    ${business_hours}.) In the meantime, please review our
-    <a href="/help" target="_blank">detailed FAQs</a>
-    where most questions have already been answered.
+    ${_(
+        'Thank you for your inquiry or feedback.  We typically respond to a request '
+        'within one business day (Monday to Friday, {open_time} UTC to {close_time} UTC.) In the meantime, please '
+        'review our {link_start}detailed FAQs{link_end} where most questions have '
+        'already been answered.'
+    ).format(
+        open_time=open_time,
+        close_time=close_time,
+        link_start='<a href="/help" target="_blank">',
+        link_end='</a>'
+    )}
     </p>
 
     <div class="close-modal">
@@ -129,28 +142,29 @@ discussion_link = get_discussion_link(course) if course else None
     $("#feedback_link_problem").click(function(event) {
         showFeedback(
             event,
-            "problem",
-            "Report a Problem",
-            "Brief description of the problem*",
-            "Details of the problem you are encountering* <span class='tip'>Include error messages, steps which lead to the issue, etc.</span>"
+            gettext("problem"),
+            gettext("Report a Problem"),
+            gettext("Brief description of the problem*"),
+            gettext("Details of the problem you are encountering*") + "<span class='tip'>" +
+              gettext("Include error messages, steps which lead to the issue, etc.") + "</span>"
         );
     });
     $("#feedback_link_suggestion").click(function(event) {
         showFeedback(
             event,
-            "suggestion",
-            "Make a Suggestion",
-            "Brief description of your suggestion*",
-            "Details*"
+            gettext("suggestion"),
+            gettext("Make a Suggestion"),
+            gettext("Brief description of your suggestion*"),
+            gettext("Details*")
         );
     });
     $("#feedback_link_question").click(function(event) {
         showFeedback(
             event,
-            "question",
-            "Ask a Question",
-            "Brief summary of your question*",
-            "Details*"
+            gettext("question"),
+            gettext("Ask a Question"),
+            gettext("Brief summary of your question*"),
+            gettext("Details*")
         );
     });
     $("#feedback_form").submit(function() {
@@ -175,13 +189,16 @@ discussion_link = get_discussion_link(course) if course else None
             $("#feedback_error").html(responseData.error).stop().css("display", "block");
         } else {
             // If no data (or malformed data) is returned, a server error occurred
-            htmlStr = "An error has occurred.";
+            htmlStr = gettext("An error has occurred.");
 % if settings.FEEDBACK_SUBMISSION_EMAIL:
-            htmlStr += " Please <a href='#' id='feedback_email'>send us e-mail</a>.";
+            htmlStr += " " + _.template(
+              gettext("Please {link_start}send us e-mail{link_end}."),
+              {link_start: '<a href="#" id="feedback_email">', link_end='</a>'},
+              {interpolate: /\{(.+?)\}/g})
 % else:
             // If no email is configured, we can't do much other than
             // ask the user to try again later
-            htmlStr += " Please try again later.";
+            htmlStr += gettext(" Please try again later.");
 % endif
             $("#feedback_error").html(htmlStr).stop().css("display", "block");
 % if settings.FEEDBACK_SUBMISSION_EMAIL:

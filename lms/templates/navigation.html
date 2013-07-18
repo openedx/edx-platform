@@ -3,6 +3,7 @@
 <%namespace file='main.html' import="login_query, stanford_theme_enabled"/>
 <%!
 from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
 
 # App that handles subdomain specific branding
 import branding
@@ -34,16 +35,16 @@ site_status_msg = get_site_status_msg(course_id)
 
 
 % if course:
-  <header class="global slim" aria-label="Global Navigation">
+  <header class="global slim" aria-label="${_('Global Navigation')}">
 % else:
-  <header class="global" aria-label="Global Navigation">
+  <header class="global" aria-label="${_('Global Navigation')}">
 % endif
   <nav>
 
   <h1 class="logo">
     <a href="${marketing_link('ROOT')}">
       <%block name="navigation_logo">
-        <img src="${static.url(branding.get_logo_url(request.META.get('HTTP_HOST')))}" alt="edX home" />
+        <img src="${static.url(branding.get_logo_url(request.META.get('HTTP_HOST')))}" alt="${_('edX home')}" />
       </%block>
     </a>
   </h1>
@@ -57,7 +58,7 @@ site_status_msg = get_site_status_msg(course_id)
     <ol class="left nav-global authenticated">
       <%block name="navigation_global_links_authenticated">
         <li class="nav-global-01">
-          <a href="${marketing_link('COURSES')}">Find Courses</a>
+          <a href="${marketing_link('COURSES')}">${_('Find Courses')}</a>
         </li>
       </%block>
     </ol>
@@ -65,16 +66,16 @@ site_status_msg = get_site_status_msg(course_id)
       <li class="primary">
         <a href="${reverse('dashboard')}" class="user-link">
           <span class="avatar"></span>
-          <span class="sr">Dashboard for: </span> ${user.username}
+          <span class="sr">${_("Dashboard for:")} </span> ${user.username}
         </a>
       </li>
       <li class="primary">
-        <a href="#" class="dropdown"><span class="sr">More options dropdown</span> &#9662</a>
+        <a href="#" class="dropdown"><span class="sr">${_("More options dropdown")}</span> &#9662</a>
         <ul class="dropdown-menu">
           <%block name="navigation_dropdown_menu_links" >
-            <li><a href="${marketing_link('FAQ')}">Help</a></li>
+            <li><a href="${marketing_link('FAQ')}">${_("Help")}</a></li>
           </%block>
-          <li><a href="${reverse('logout')}">Log Out</a></li>
+          <li><a href="${reverse('logout')}">${_("Log Out")}</a></li>
         </ul>
       </li>
     </ol>
@@ -84,24 +85,24 @@ site_status_msg = get_site_status_msg(course_id)
       <%block name="navigation_global_links">
         % if settings.MITX_FEATURES.get('ENABLE_MKTG_SITE'):
           <li class="nav-global-01">
-            <a href="${marketing_link('HOW_IT_WORKS')}">How it Works</a>
+            <a href="${marketing_link('HOW_IT_WORKS')}">${_("How it Works")}</a>
           </li>
           <li class="nav-global-02">
-            <a href="${marketing_link('COURSES')}">Courses</a>
+            <a href="${marketing_link('COURSES')}">${_("Courses")}</a>
           </li>
           <li class="nav-global-03">
-            <a href="${marketing_link('SCHOOLS')}">Schools</a>
+            <a href="${marketing_link('SCHOOLS')}">${_("Schools")}</a>
           </li>
         % endif
       </%block>
       % if not settings.MITX_FEATURES['DISABLE_LOGIN_BUTTON']:
           % if course and settings.MITX_FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
           <li class="nav-global-04">
-            <a class="cta cta-register" href="${reverse('course-specific-register', args=[course.id])}">Register Now</a>
+            <a class="cta cta-register" href="${reverse('course-specific-register', args=[course.id])}">${_("Register Now")}</a>
           </li>
           % else:
           <li class="nav-global-04">
-            <a class="cta cta-register" href="/register">Register Now</a>
+            <a class="cta cta-register" href="/register">${_("Register Now")}</a>
           </li>
           % endif
       % endif
@@ -111,9 +112,9 @@ site_status_msg = get_site_status_msg(course_id)
     <li class="nav-courseware-01">
       % if not settings.MITX_FEATURES['DISABLE_LOGIN_BUTTON']:
           % if course and settings.MITX_FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
-          <a class="cta cta-login" href="${reverse('course-specific-login', args=[course.id])}${login_query()}">Log in</a>
+          <a class="cta cta-login" href="${reverse('course-specific-login', args=[course.id])}${login_query()}">${_("Log in")}</a>
           % else:
-          <a class="cta cta-login" href="/login${login_query()}">Log in</a>
+          <a class="cta cta-login" href="/login${login_query()}">${_("Log in")}</a>
           % endif
       % endif
     </li>
@@ -122,7 +123,7 @@ site_status_msg = get_site_status_msg(course_id)
   </nav>
 </header>
 % if course:
-<div class="ie-banner"><strong>Warning:</strong> Your browser is not fully supported. We strongly recommend using <a href="https://www.google.com/intl/en/chrome/browser/" target="_blank">Chrome</a> or <a href="http://www.mozilla.org/en-US/firefox/new/" target="_blank">Firefox</a>.</div>
+<div class="ie-banner">${_('<strong>Warning:</strong> Your browser is not fully supported. We strongly recommend using {chrome_link_start}Chrome{chrome_link_end} or {ff_link_start}Firefox{ff_link_end}.').format(chrome_link_start='<a href="https://www.google.com/intl/en/chrome/browser/" target="_blank">', chrome_link_end='</a>', ff_link_start='<a href="http://www.mozilla.org/en-US/firefox/new/" target="_blank">', ff_link_end='</a>')}</div>
 % endif
 
 %if not user.is_authenticated():

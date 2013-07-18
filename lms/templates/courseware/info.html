@@ -1,3 +1,4 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%inherit file="/main.html" />
 <%block name="bodyclass">${course.css_class}</%block>
 <%namespace name='static' file='/static_content.html'/>
@@ -6,10 +7,10 @@
   <%static:css group='course'/>
 </%block>
 
-<%block name="title"><title>${course.number} Course Info</title></%block>
+<%block name="title"><title>${course.number} ${_("Course Info")}</title></%block>
 
 <%include file="/courseware/course_navigation.html" args="active_page='info'" />
-<%! 
+<%!
   from courseware.courses import get_course_info_section
 %>
 
@@ -26,7 +27,7 @@ $(document).ready(function(){
   <div class="info-wrapper">
     % if user.is_authenticated():
     <section class="updates">
-      <h1>Course Updates &amp; News</h1>
+      <h1>${_("Course Updates &amp; News")}</h1>
       ${get_course_info_section(request, course, 'updates')}
     </section>
     <section aria-label="Handout Navigation" class="handouts">
@@ -35,11 +36,11 @@ $(document).ready(function(){
     </section>
     % else:
     <section class="updates">
-      <h1>Course Updates &amp; News</h1>
+      <h1>${_("Course Updates &amp; News")}</h1>
       ${get_course_info_section(request, course, 'guest_updates')}
     </section>
-    <section aria-label="Handout Navigation" class="handouts">
-      <h1>Course Handouts</h1>
+    <section aria-label="${_('Handout Navigation')}" class="handouts">
+      <h1>${_("Course Handouts")}</h1>
       ${get_course_info_section(request, course, 'guest_handouts')}
     </section>
     % endif

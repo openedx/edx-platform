@@ -1,24 +1,25 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
 <%inherit file="../main.html" />
 
 <%namespace name='static' file='../static_content.html'/>
 
-<%block name="title"><title>Copyright</title></%block>
+<%block name="title"><title>${_("Copyright")}</title></%block>
 
 <section class="static-container copyright">
-  <h1> Licensing Information </h1>
+  <h1>${_(" Licensing Information ")}</h1>
   <hr class="horizontal-divider">
 
   <div class="inner-wrapper">
-    <h2>Videos and Exercises</h2>
-    <p> Copyright &copy; 2012 MIT. All rights reserved. In order to further MIT's goal of making education accessible and affordable to the world, MIT is planning to make <i>MITx</i> course content available under open source licenses.</p>
+    <h2>${_("Videos and Exercises")}</h2>
+    <p>${_(" Copyright &copy; 2012 MIT. All rights reserved. In order to further MIT's goal of making education accessible and affordable to the world, MIT is planning to make <i>MITx</i> course content available under open source licenses.")}</p>
 
-    <h2>Textbook</h2>
-    <p> Copyright &copy; 2005 Elsevier Inc. All Rights Reserved. Used with permission. While our goal is to build courses with as much free and open content as possible, we apologize that we do not have the ability to do so entirely. </p>
+    <h2>${_("Textbook")}</h2>
+    <p>${_(" Copyright &copy; 2005 Elsevier Inc. All Rights Reserved. Used with permission. While our goal is to build courses with as much free and open content as possible, we apologize that we do not have the ability to do so entirely. ")}</p>
 
-    <h2>Student-generated content</h2>
-    <p>Copyright &copy; 2012. All Rights Reserved. Due to privacy concerns, we do not know what portion of these will be released under open licenses.</p>
+    <h2>${_("Student-generated content")}</h2>
+    <p>${_("Copyright &copy; 2012. All Rights Reserved. Due to privacy concerns, we do not know what portion of these will be released under open licenses.")}</p>
 
-    <p>MIT and <i>MITx</i> are trademarks of the Massachusetts Institute of Technology, and may not be used without permission.</p>
+    <p>${_("MIT and <i>MITx</i> are trademarks of the Massachusetts Institute of Technology, and may not be used without permission.")}</p>
   </div>
 </section>

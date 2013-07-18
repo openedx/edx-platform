@@ -1,7 +1,8 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%inherit file="base.html" />
 <%namespace name='static' file='../static_content.html'/>
 
-<%block name="title"><title>HarvardX</title></%block>
+<%block name="title"><title>${_("HarvardX")}</title></%block>
 
 <%block name="university_header">
   <header class="search" style="background: url('/static/images/university/harvard/about_harvard_page_2025x550.jpg')">
@@ -10,7 +11,7 @@
         <div class="logo">
            <img src="${static.url('images/university/harvard/harvard.png')}" />
         </div>
-        <h1>HarvardX</h1>
+        <h1>${_("HarvardX")}</h1>
       </hgroup>
     </div>
   </header>
@@ -18,8 +19,8 @@
 </%block>
 
 <%block name="university_description">
-  <p>Harvard University is devoted to excellence in teaching, learning, and research, and to developing leaders in many disciplines who make a difference globally. Harvard faculty are engaged with teaching and research to push the boundaries of human knowledge.  The University has twelve degree-granting Schools in addition to the Radcliffe Institute for Advanced Study.</p>
-  <p>Established in 1636, Harvard is the oldest institution of higher education in the United States. The University, which is based in Cambridge and Boston, Massachusetts, has an enrollment of over 20,000 degree candidates, including undergraduate, graduate, and professional students. Harvard has more than 360,000 alumni around the world.</p>
+<p>${_("Harvard University is devoted to excellence in teaching, learning, and research, and to developing leaders in many disciplines who make a difference globally. Harvard faculty are engaged with teaching and research to push the boundaries of human knowledge.  The University has twelve degree-granting Schools in addition to the Radcliffe Institute for Advanced Study.")}</p>
+  <p>${_("Established in 1636, Harvard is the oldest institution of higher education in the United States. The University, which is based in Cambridge and Boston, Massachusetts, has an enrollment of over 20,000 degree candidates, including undergraduate, graduate, and professional students. Harvard has more than 360,000 alumni around the world.")}</p>
 </%block>
 
 ${parent.body()}

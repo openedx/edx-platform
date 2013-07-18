@@ -1,134 +1,135 @@
 <%! from django.utils.translation import ugettext as _ %>
+
 <%inherit file="main.html" />
 <%namespace name='static' file='static_content.html'/>
 <%block name="title">
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <title>${course.number} Textbook</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>${_('{course_number} Textbook').format(course_number=course.number)}</title>
 </%block>
 
 <%block name="headextra">
 <%static:css group='course'/>
 <%static:js group='courseware'/>
-    <link rel="stylesheet" href="/static/css/pdfviewer.css"/>
-    <script type="text/javascript" src="/static/js/vendor/pdfjs/pdf.js"></script>
-    <script type="text/javascript" src="/static/js/pdfviewer.js"></script>
+<link rel="stylesheet" href="/static/css/pdfviewer.css"/>
+<script type="text/javascript" src="/static/js/vendor/pdfjs/pdf.js"></script>
+<script type="text/javascript" src="/static/js/pdfviewer.js"></script>
 </%block>
 
 <%block name="js_extra">
-  <script type="text/javascript">
+<script type="text/javascript">
 
-    $(document).ready(function() {
-        var options = {};
-        %if 'url' in textbook:
-            options.url = "${textbook['url']}";
-        %endif
-        %if 'chapters' in textbook:
-            var chptrs = [];
-            %for chap in textbook['chapters']:
-                chptrs.push("${chap['url']}");
-            %endfor
-            options.chapters = chptrs;
-        %endif
-        %if chapter is not None:
-            options.chapterNum = ${chapter};
-        %endif
-        %if page is not None:
-            options.pageNum = ${page};
-        %endif
+$(document).ready(function() {
+  var options = {};
+  %if 'url' in textbook:
+  options.url = "${textbook['url']}";
+  %endif
+  %if 'chapters' in textbook:
+  var chptrs = [];
+  %for chap in textbook['chapters']:
+  chptrs.push("${chap['url']}");
+  %endfor
+  options.chapters = chptrs;
+  %endif
+  %if chapter is not None:
+  options.chapterNum = ${chapter};
+  %endif
+  %if page is not None:
+  options.pageNum = ${page};
+  %endif
 
-        $('#outerContainer').PDFViewer(options);
-    });
-  </script>
+  $('#outerContainer').PDFViewer(options);
+});
+</script>
 </%block>
 
 <%include file="/courseware/course_navigation.html" args="active_page='pdftextbook/{0}'.format(book_index)" />
 
-    <div id="outerContainer">
-      <div id="mainContainer" class="book-wrapper">
+<div id="outerContainer">
+  <div id="mainContainer" class="book-wrapper">
 
-        <div class="toolbar">
-          <div id="toolbarContainer">
-            <div id="toolbarViewer">
-              <div id="toolbarViewerLeft">
-                <label id="pageNumberLabel" class="toolbarLabel" for="pageNumber">Page: </label>
-                <input type="number" id="pageNumber" class="toolbarField pageNumber" value="1" size="4" min="1" tabindex="7">
-                </input>
-                <span id="numPages" class="toolbarLabel"></span>
-              </div>
+    <div class="toolbar">
+      <div id="toolbarContainer">
+        <div id="toolbarViewer">
+          <div id="toolbarViewerLeft">
+            <label id="pageNumberLabel" class="toolbarLabel" for="pageNumber">${_('Page:')} </label>
+            <input type="number" id="pageNumber" class="toolbarField pageNumber" value="1" size="4" min="1" tabindex="7">
+          </input>
+          <span id="numPages" class="toolbarLabel"></span>
+        </div>
 
-              <div class="outerCenter">
-                <div class="innerCenter" id="toolbarViewerMiddle">
-                  <div class="splitToolbarButton">
-                    <button class="toolbarButton zoomOut" id="zoom_out" title="Zoom Out" tabindex="8">
-                      <span>Zoom Out</span>
-                    </button>
-                    <div class="splitToolbarButtonSeparator"></div>
-                    <button class="toolbarButton zoomIn" id="zoom_in" title="Zoom In" tabindex="9">
-                      <span>Zoom In</span>
-                     </button>
-                  </div>
-                  <span id="scaleSelectContainer" class="dropdownToolbarButton">
-                     <select id="scaleSelect" title="Zoom" oncontextmenu="return false;" tabindex="10">
+        <div class="outerCenter">
+          <div class="innerCenter" id="toolbarViewerMiddle">
+            <div class="splitToolbarButton">
+              <button class="toolbarButton zoomOut" id="zoom_out" title="${_('Zoom Out')}" tabindex="8">
+                <span>${_('Zoom Out')}</span>
+              </button>
+              <div class="splitToolbarButtonSeparator"></div>
+              <button class="toolbarButton zoomIn" id="zoom_in" title="${_('Zoom In')}" tabindex="9">
+                <span>${_('Zoom In')}</span>
+              </button>
+            </div>
+            <span id="scaleSelectContainer" class="dropdownToolbarButton">
+             <select id="scaleSelect" title="${_('Zoom')}" oncontextmenu="return false;" tabindex="10">
 <!--
-                      <option id="pageAutoOption" value="auto" selected="selected">Automatic Zoom</option>
-                      <option id="pageActualOption" value="page-actual">Actual Size</option>
-                      <option id="pageFitOption" value="page-fit">Fit Page</option>
-                      <option id="pageWidthOption" value="page-width">Full Width</option>
--->
-                      <option id="customScaleOption" value="custom"></option>
-                      <option value="0.5">50%</option>
-                      <option value="0.75">75%</option>
-                      <option value="1">100%</option>
-                      <option value="1.25">125%</option>
-                      <option value="1.5">150%</option>
-                      <option value="2">200%</option>
-                    </select>
-                  </span>
-                </div>
-              </div>
+                    <option id="pageAutoOption" value="auto" selected="selected">${_('Automatic Zoom')}</option>
+                    <option id="pageActualOption" value="page-actual">${_('Actual Size')}</option>
+                    <option id="pageFitOption" value="page-fit">${_('Fit Page')}</option>
+                    <option id="pageWidthOption" value="page-width">${_('Full Width')}</option>
+                  -->
+                  <option id="customScaleOption" value="custom"></option>
+                  <option value="0.5">50%</option>
+                  <option value="0.75">75%</option>
+                  <option value="1">100%</option>
+                  <option value="1.25">125%</option>
+                  <option value="1.5">150%</option>
+                  <option value="2">200%</option>
+                </select>
+              </span>
             </div>
           </div>
         </div>
+      </div>
+    </div>
 
-        %if 'chapters' in textbook:
-  <div class="pdfbook-wrap">
-  <div class="pdfbook-wrap-inner">
-  	<section aria-label="Textbook Navigation" class="book-sidebar">
-  	  <ul id="booknav" class="treeview-booknav">
-  	      <%def name="print_entry(entry, index_value)">
-  		  <li id="pdfchapter-${index_value}">
-  		    <a class="chapter">
-  		      ${entry.get('title')}
-  		    </a>
-  		  </li>
-  	      </%def>
+    %if 'chapters' in textbook:
+    <div class="pdfbook-wrap">
+      <div class="pdfbook-wrap-inner">
+        <section aria-label="${_('Textbook Navigation')}" class="book-sidebar">
+          <ul id="booknav" class="treeview-booknav">
+            <%def name="print_entry(entry, index_value)">
+            <li id="pdfchapter-${index_value}">
+            <a class="chapter">
+            ${entry.get('title')}
+            </a>
+            </li>
+            </%def>
 
-  	      % for (index, entry) in enumerate(textbook['chapters']):
-  		${print_entry(entry, index+1)}
-  	      % endfor
-  	  </ul>
-  	</section>
-        %endif
+            % for (index, entry) in enumerate(textbook['chapters']):
+            ${print_entry(entry, index+1)}
+            % endfor
+          </ul>
+        </section>
 
-   <section id="viewerContainer" class="book">
-	  <section class="page">
-	    <!-- use same page-turning as used in image-based textbooks -->
-      <nav>
-        <ul>
-          <li class="last">
-            <a id="previous">${_("Previous page")}</a>
-          </li>
-          <li class="next">
-            <a id="next">${_("Next page")}</a>
-          </li>
-        </ul>
-      </nav>
-      <div id="viewer" contextmenu="viewerContextMenu"></div>
-    </section>
-  </section>
-  </div> <!-- pdfbook-wrap-inner -->
-  </div> <!-- pdfbook-wrap -->
-      </div> <!-- mainContainer -->
+        <section id="viewerContainer" class="book">
+          <section class="page">
+            <!-- use same page-turning as used in image-based textbooks -->
+            <nav>
+              <ul>
+                <li class="last">
+                  <a id="previous">${_('Previous page')}</a>
+                </li>
+                <li class="next">
+                  <a id="next">${_('Next page')}</a>
+                </li>
+              </ul>
+            </nav>
+            <div id="viewer" contextmenu="viewerContextMenu"></div>
+          </section>
+        </section>
+      </div> <!-- pdfbook-wrap-inner -->
+    </div> <!-- pdfbook-wrap -->
+    %endif
+  </div> <!-- mainContainer -->
 
-    </div> <!-- outerContainer -->
+</div> <!-- outerContainer -->

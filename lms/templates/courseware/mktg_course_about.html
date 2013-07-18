@@ -1,3 +1,4 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%!
   from django.core.urlresolvers import reverse
   from courseware.courses import course_image_url, get_course_about_section
@@ -7,7 +8,7 @@
 
 <%inherit file="../mktg_iframe.html" />
 
-<%block name="title"><title>About ${course.number}</title></%block>
+<%block name="title"><title>${_("About {course_number}").format(course_number=course.number)}</title></%block>
 
 <%block name="bodyclass">view-partial-mktgregister</%block>
 
@@ -31,7 +32,7 @@
         window.top.location.href = "${reverse('register_user')}?course_id=${course.id}&enrollment_action=enroll";
       } else {
         $('#register_error').html(
-            (xhr.responseText ? xhr.responseText : 'An error occurred. Please try again later.')
+            (xhr.responseText ? xhr.responseText : '${_("An error occurred. Please try again later.")}')
         ).css("display", "block");
       }
     });
@@ -46,14 +47,14 @@
     <li class="item">
         %if user.is_authenticated() and registered:
           %if show_courseware_link:
-            <a class="action access-courseware" href="${course_target}" target="_top">Access Courseware</a>
+            <a class="action access-courseware" href="${course_target}" target="_top">${_("Access Courseware")}</a>
           %else:
-            <div class="action is-registered">You Are Registered</div>
+            <div class="action is-registered">${_("You Are Registered")}</div>
           %endif
         %elif allow_registration:
-          <a class="action action-register register" href="#">Register for <strong>${course.number}</strong></a>
+          <a class="action action-register register" href="#">${_("Register for")} <strong>${course.number}</strong></a>
         %else:
-          <div class="action registration-closed is-disabled">Registration Is Closed</div>
+          <div class="action registration-closed is-disabled">${_("Registration Is Closed")}</div>
         %endif
     </li>
   </ul>
@@ -63,11 +64,11 @@
     <form id="class_enroll_form" method="post" data-remote="true" action="${reverse('change_enrollment')}">
       <fieldset class="enroll_fieldset">
         <input name="course_id" type="hidden" value="${course.id}">
-        <input name="enrollment_action" type="hidden" value="enroll">
+        <input name="enrollment_action" type="hidden" value="${_("enroll")}">
         <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
       </fieldset>
       <div class="submit">
-        <input name="enroll" type="submit" value="enroll">
+        <input name="enroll" type="submit" value="${_("enroll")}">
       </div>
     </form>
   </div>

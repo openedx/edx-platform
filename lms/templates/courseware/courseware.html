@@ -1,7 +1,8 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%inherit file="/main.html" />
 <%namespace name='static' file='/static_content.html'/>
 <%block name="bodyclass">courseware ${course.css_class}</%block>
-<%block name="title"><title>${course.number} Courseware</title></%block>
+<%block name="title"><title>${_("{course_number} Courseware").format(course_number=course.number)}</title></%block>
 
 <%block name="headextra">
   <%static:css group='course'/>
@@ -155,7 +156,7 @@
 <div class="timer-main">
   <div id="timer_wrapper">
     % if timer_navigation_return_url:
-    <a href="${timer_navigation_return_url}" class="timer_return_url">Return to Exam</a>
+    <a href="${timer_navigation_return_url}" class="timer_return_url">${_("Return to Exam")}</a>
     % endif
     <div class="timer_label">Time Remaining:</div> <div id="exam_timer" class="timer_value">&nbsp;</div>
   </div>
@@ -170,9 +171,9 @@
   <div class="course-wrapper">
 
 % if accordion:
-    <section aria-label="Course Navigation" class="course-index">
+    <section aria-label="${_('Course Navigation')}" class="course-index">
       <header id="open_close_accordion">
-        <a href="#">close</a>
+        <a href="#">${_("close")}</a>
       </header>
 
       <div id="accordion" style="display: none">
@@ -204,7 +205,7 @@
 
 % if course.show_calculator:
     <div class="calc-main">
-        <a aria-label="Open Calculator" href="#" class="calc">Calculator</a>
+        <a aria-label="${_('Open Calculator')}" href="#" class="calc">${_("Calculator")}</a>
 
         <div id="calculator_wrapper">
             <form id="calculator">
@@ -212,15 +213,15 @@
                     <input type="text" id="calculator_input" title="Calculator Input Field" />
 
                     <div class="help-wrapper">
-                        <a href="#">Hints</a>
+                        <a href="#">${_("Hints")}</a>
                         <dl class="help">
-                            <dt>Suffixes:</dt>
+                            <dt>${_("Suffixes:")}</dt>
                             <dd> %kMGTcmunp</dd>
-                            <dt>Operations:</dt>
+                            <dt>${_("Operations:")}</dt>
                             <dd>^ * / + - ()</dd>
-                            <dt>Functions:</dt>
+                            <dt>${_("Functions:")}</dt>
                             <dd>sin, cos, tan, sqrt, log10, log2, ln, arccos, arcsin, arctan, abs </dd>
-                            <dt>Constants</dt>
+                            <dt>${_("Constants")}</dt>
                             <dd>e, pi</dd>
 
                             <!-- Students won't know what parallel means at this time.  Complex numbers aren't well tested in the courseware, so we would prefer to not expose them.  If you read the comments in the source, feel free to use them. If you run into a bug, please let us know. But we can't officially support them right now.

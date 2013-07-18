@@ -1,3 +1,5 @@
+<%! from django.utils.translation import ugettext as _ %>
+
 <%inherit file="main.html" />
 
 <%namespace name='static' file='static_content.html'/>
@@ -5,7 +7,7 @@
 <%! from django.core.urlresolvers import reverse %>
 <%! from django.utils.translation import ugettext as _ %>
 
-<%block name="title"><title>Log into your ${settings.PLATFORM_NAME} Account</title></%block>
+<%block name="title"><title>${_("Log into your {platform_name} Account").format(platform_name=settings.PLATFORM_NAME)}</title></%block>
 
 <%block name="js_extra">
   <script type="text/javascript">
@@ -66,13 +68,13 @@
         $submitButton.
           removeClass('is-disabled').
           removeProp('disabled').
-          html('Log into My ${settings.PLATFORM_NAME} Account <span class="orn-plus">+</span> Access My Courses');
+          html("${_('Log into My {platform_name} Account').format(platform_name=settings.PLATFORM_NAME)} <span class='orn-plus'>+</span> ${_('Access My Courses')}");
       }
       else {
         $submitButton.
           addClass('is-disabled').
           prop('disabled', true).
-          html('Processing your account information &hellip;');
+          html(gettext('Processing your account information &hellip;'));
       }
     }
   </script>
@@ -90,46 +92,46 @@
 
       <!-- status messages -->
       <div role="alert" class="status message">
-        <h3 class="message-title">We're Sorry, ${settings.PLATFORM_NAME} accounts are unavailable currently</h3>
+        <h3 class="message-title">${_("We're Sorry, {platform_name} accounts are unavailable currently").format(platform_name=settings.PLATFORM_NAME)}</h3>
         <p class="message-copy">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Lorem ipsum dolor sit amet, consectetuer adipiscing elit.</p>
       </div>
 
       <div role="alert" class="status message submission-error" tabindex="-1">
-        <h3 class="message-title">The following errors occurred while logging you in: </h3>
+        <h3 class="message-title">${_("The following errors occured while logging you in:")} </h3>
         <ul class="message-copy">
-          <li>Your email or password is incorrect</li>
+          <li>${_("Your email or password is incorrect")}</li>
         </ul>
       </div>
 
       <p class="instructions sr">
-        Please provide the following information to log into your ${settings.PLATFORM_NAME} account. Required fields are noted by <strong class="indicator">bold text and an asterisk (*)</strong>.
+        ${_('Please provide the following information to log into your {platform_name} account. Required fields are noted by <strong class="indicator">bold text and an asterisk (*)</strong>.').format(platform_name=settings.PLATFORM_NAME)}
       </p>
 
       <fieldset class="group group-form group-form-requiredinformation">
-        <legend class="sr">Required Information</legend>
+        <legend class="sr">${_('Required Information')}</legend>
 
         <ol class="list-input">
           <li class="field required text" id="field-email">
-            <label for="email">E-mail</label>
+            <label for="email">${_('E-mail')}</label>
             <input class="" id="email" type="email" name="email" value="" placeholder="example: username@domain.com" required aria-required="true" />
           </li>
           <li class="field required password" id="field-password">
-            <label for="password">Password</label>
+            <label for="password">${_('Password')}</label>
             <input id="password" type="password" name="password" value="" required aria-required="true" />
             <span class="tip tip-input">
-              <a href="#forgot-password-modal" rel="leanModal" class="pwd-reset action action-forgotpw">Forgot password?</a>
+              <a href="#forgot-password-modal" rel="leanModal" class="pwd-reset action action-forgotpw">${_('Forgot password?')}</a>
             </span>
           </li>
         </ol>
       </fieldset>
 
       <fieldset class="group group-form group-form-secondary group-form-accountpreferences">
-        <legend class="sr">Account Preferences</legend>
+        <legend class="sr">${_('Account Preferences')}</legend>
 
         <ol class="list-input">
           <li class="field required checkbox" id="field-remember">
             <input id="remember-yes" type="checkbox" name="remember" value="true" />
-            <label for="remember-yes">Remember me</label>
+            <label for="remember-yes">${_('Remember me')}</label>
           </li>
         </ol>
       </fieldset>
@@ -147,27 +149,27 @@
 
   <aside role="complementary">
     <header>
-      <h2 class="sr">Helpful Information</h2>
+      <h2 class="sr">${_("Helpful Information")}</h2>
     </header>
 
     % if settings.MITX_FEATURES.get('AUTH_USE_OPENID'):
     <!-- <div class="cta cta-login-options-openid">
-      <h3>Login via OpenID</h3>
-      <p>You can now start learning with edX by logging in with your <a rel="external" href="http://openid.net/">OpenID account</a>.</p>
-      <a class="action action-login-openid" href="#">Login via OpenID</a>
+      <h3>${_("Login via OpenID")}</h3>
+      <p>${_('You can now start learning with edX by logging in with your <a rel="external" href="http://openid.net/">OpenID account</a>.')}</p>
+      <a class="action action-login-openid" href="#">${_("Login via OpenID")}</a>
     </div> -->
     % endif
 
     <div class="cta cta-help">
-      <h3>Not Enrolled?</h3>
-      <p><a href="${reverse('register_user')}">Sign up for ${settings.PLATFORM_NAME} today!</a></p>
+      <h3>${_("Not Enrolled?")}</h3>
+      <p><a href="${reverse('register_user')}">${_("Sign up for {platform_name} today!").format(platform_name=settings.PLATFORM_NAME)}</a></p>
 
       ## Disable help unless the FAQ marketing link is enabled
       % if settings.MKTG_URL_LINK_MAP.get('FAQ'):
-        <h3>Need Help?</h3>
-        <p>Looking for help in logging in or with your ${settings.PLATFORM_NAME} account?
+        <h3>${_("Need Help?")}</h3>
+        <p>${_("Looking for help in logging in or with your {platform_name} account?").format(platform_name=settings.PLATFORM_NAME)}
         <a href="${marketing_link('FAQ')}">
-            View our help section for answers to commonly asked questions.
+            ${_("View our help section for answers to commonly asked questions.")}
         </a></p>
       % endif
     </div>

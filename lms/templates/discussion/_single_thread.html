@@ -1,3 +1,4 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%namespace name="renderer" file="_content_renderer.html"/>
 <%! from django_comment_client.mustache_helpers import url_for_user %>
 
@@ -7,7 +8,7 @@
   
     <header>
     %if thread['group_id']:
-      <div class="group-visibility-label">This post visible only to group ${cohort_dictionary[thread['group_id']]}. </div>
+      <div class="group-visibility-label">${_("This post visible only to group %s.") % cohort_dictionary[thread['group_id']]} </div>
     %endif
       
         <a href="#" class="vote-btn discussion-vote discussion-vote-up"><span class="plus-icon">+</span> <span class='votes-count-number'>${thread['votes']['up_count']}</span></a>

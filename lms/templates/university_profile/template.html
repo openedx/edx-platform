@@ -1,7 +1,8 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%inherit file="base.html" />
 <%namespace name='static' file='../static_content.html'/>
 
-<%block name="title"><title>SCHOOLX</title></%block>
+<%block name="title"><title>${_("SCHOOLX")}</title></%block>
 
 <%block name="university_header">
   <header class="search" style="background: url('/static/images/university/SCHOOL/IMAGE.jpg')">
@@ -10,7 +11,7 @@
         <div class="logo">
            <img src="${static.url('images/university/SCHOOL/IMAGE.png')}" />
         </div>
-        <h1>SCHOOLX</h1>
+        <h1>${_("SCHOOLX")}</h1>
       </hgroup>
     </div>
   </header>
@@ -18,7 +19,7 @@
 </%block>
 
 <%block name="university_description">
-    <p></p>
+<p></p>
 </%block>
 
 ${parent.body()}

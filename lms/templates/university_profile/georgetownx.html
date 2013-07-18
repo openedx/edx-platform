@@ -1,7 +1,8 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%inherit file="base.html" />
 <%namespace name='static' file='../static_content.html'/>
 
-<%block name="title"><title>GeorgetownX</title></%block>
+<%block name="title"><title>${_("GeorgetownX")}</title></%block>
 
 <%block name="university_header">
   <header class="search" style="background: url('/static/images/university/georgetown/georgetown-cover_2025x550.jpg')">
@@ -10,7 +11,7 @@
         <div class="logo">
            <img src="${static.url('images/university/georgetown/georgetown.png')}" />
         </div>
-        <h1>GeorgetownX</h1>
+        <h1>${_("GeorgetownX")}</h1>
       </hgroup>
     </div>
   </header>
@@ -18,7 +19,7 @@
 </%block>
 
 <%block name="university_description">
-    <p>Georgetown University, the nation’s oldest Catholic and Jesuit university, is one of the world’s leading academic and research institutions, offering a unique educational experience that prepares the next generation of global citizens to lead and make a difference in the world.  Students receive a world-class learning experience focused on educating the whole person through exposure to different faiths, cultures and beliefs.</p>
+<p>${_("Georgetown University, the nation's oldest Catholic and Jesuit university, is one of the world's leading academic and research institutions, offering a unique educational experience that prepares the next generation of global citizens to lead and make a difference in the world. Students receive a world-class learning experience focused on educating the whole person through exposure to different faiths, cultures and beliefs.")}</p>
 </%block>
 
 ${parent.body()}

@@ -1,3 +1,5 @@
+<%! from django.utils.translation import ugettext as _ %>
+
 % if display_name is not UNDEFINED and display_name is not None:
   <h2> ${display_name} </h2>
 % endif
@@ -37,12 +39,12 @@
 
 % if sources.get('main'):
 <div class="video-sources">
-  <p>Download video <a href="${sources.get('main')}">here</a>.</p>
+  <p>${_('Download video <a href="%s">here</a>.') % sources.get('main')}</p>
 </div>
 % endif
 
 % if track:
 <div class="video-tracks">
-  <p>Download subtitles <a href="${track}">here</a>.</p>
+  <p>${_('Download subtitles <a href="%s">here</a>.') % track}</p>
 </div>
 % endif

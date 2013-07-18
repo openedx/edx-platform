@@ -1,33 +1,34 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%inherit file="../main.html" />
 
 <%! from django.core.urlresolvers import reverse %>
 
 <%namespace name='static' file='../static_content.html'/>
 
-<%block name="title"><title>Honor Code</title></%block>
+<%block name="title"><title>${_("Honor Code")}</title></%block>
 
 <section class="static-container honor-code">
-  <h1>Honor Code</h1>
+  <h1>${_("Honor Code")}</h1>
   <hr class="horizontal-divider">
 
   <div class="inner-wrapper">
-    <h2>Collaboration Policy</h2>
-    <p>By enrolling in a course on edX, you are joining a special worldwide community of learners. The aspiration of edX is to provide anyone in the world who has the motivation and ability to engage coursework from the Massachusetts Institute of Technology, Harvard University and the University of California, Berkeley the opportunity to attain the best MIT, Harvard and UC Berkeley-based educational experience that internet technology enables. You are part of the community who will help edX achieve this goal.</p>
-    <p>EdX depends upon your motivation to learn the material and to do so with honesty. In order to participate in edX, you must agree to the Honor Code below and any additional terms specific to a class. This Honor Code, and any additional terms, will be posted on each class website.</p>
+    <h2>${_("Collaboration Policy")}</h2>
+    <p>${_("By enrolling in a course on edX, you are joining a special worldwide community of learners. The aspiration of edX is to provide anyone in the world who has the motivation and ability to engage coursework from the Massachusetts Institute of Technology, Harvard University and the University of California, Berkeley the opportunity to attain the best MIT, Harvard and UC Berkeley-based educational experience that internet technology enables. You are part of the community who will help edX achieve this goal.")}</p>
+    <p>${_("EdX depends upon your motivation to learn the material and to do so with honesty. In order to participate in edX, you must agree to the Honor Code below and any additional terms specific to a class. This Honor Code, and any additional terms, will be posted on each class website.")}</p>
 
-    <h2>edX Honor Code Pledge</h2>
-    <p>By enrolling in an edX course, I agree that I will:</p>
+    <h2>${_("edX Honor Code Pledge")}</h2>
+    <p>${_("By enrolling in an edX course, I agree that I will:")}</p>
     <ul>
-      <li>Complete all mid-terms and final exams with my own work and only my own work. I will not submit the work of any other person.</li>
-      <li>Maintain only one user account and not let anyone else use my username and/or password.</li>
-      <li>Not engage in any activity that would dishonestly improve my results, or improve or hurt the results of others.</li>
-      <li>Not post answers to problems that are being used to assess student performance.</li>
+      <li>${_("Complete all mid-terms and final exams with my own work and only my own work. I will not submit the work of any other person.")}</li>
+      <li>${_("Maintain only one user account and not let anyone else use my username and/or password.")}</li>
+      <li>${_("Not engage in any activity that would dishonestly improve my results, or improve or hurt the results of others.")}</li>
+      <li>${_("Not post answers to problems that are being used to assess student performance.")}</li>
     </ul>
-    <p>Unless otherwise indicated by the instructor of an edX course, learners on edX are encouraged to:</p>
+    <p>${_("Unless otherwise indicated by the instructor of an edX course, learners on edX are encouraged to:")}</p>
     <ul>
-      <li>Collaborate with others on the lecture videos, exercises, homework and labs.</li>
-      <li>Discuss with others general concepts and materials in each course.</li>
-      <li>Present ideas and written work to fellow edX learners or others for comment or criticism.</li>
+      <li>${_("Collaborate with others on the lecture videos, exercises, homework and labs.")}</li>
+      <li>${_("Discuss with others general concepts and materials in each course.")}</li>
+      <li>${_("Present ideas and written work to fellow edX learners or others for comment or criticism.")}</li>
     </ul>
   </div>
 </section>

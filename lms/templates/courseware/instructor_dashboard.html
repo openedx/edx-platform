@@ -1,3 +1,4 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%inherit file="/main.html" />
 <%! from django.core.urlresolvers import reverse %>
 <%namespace name='static' file='/static_content.html'/>
@@ -102,19 +103,19 @@ function goto( mode)
 <div class="instructor-dashboard-wrapper">
 
   <section class="instructor-dashboard-content">
-    <h1>Instructor Dashboard</h1>
+    <h1>${_("Instructor Dashboard")}</h1>
 
     <h2 class="navbar">[ <a href="#" onclick="goto('Grades');" class="${modeflag.get('Grades')}">Grades</a> |
           %if settings.MITX_FEATURES.get('ENABLE_PSYCHOMETRICS'):
-            <a href="#" onclick="goto('Psychometrics');" class="${modeflag.get('Psychometrics')}">Psychometrics</a> |
+            <a href="#" onclick="goto('Psychometrics');" class="${modeflag.get('Psychometrics')}">${_("Psychometrics")}</a> |
           %endif
-          <a href="#" onclick="goto('Admin');" class="${modeflag.get('Admin')}">Admin</a> |
-          <a href="#" onclick="goto('Forum Admin');" class="${modeflag.get('Forum Admin')}">Forum Admin</a> |
-          <a href="#" onclick="goto('Enrollment');" class="${modeflag.get('Enrollment')}">Enrollment</a> |
-          <a href="#" onclick="goto('Data');" class="${modeflag.get('Data')}">DataDump</a> |
-          <a href="#" onclick="goto('Manage Groups');" class="${modeflag.get('Manage Groups')}">Manage Groups</a>
+          <a href="#" onclick="goto('Admin');" class="${modeflag.get('Admin')}">${_("Admin")}</a> |
+          <a href="#" onclick="goto('Forum Admin');" class="${modeflag.get('Forum Admin')}">${_("Forum Admin")}</a> |
+          <a href="#" onclick="goto('Enrollment');" class="${modeflag.get('Enrollment')}">${_("Enrollment")}</a> |
+          <a href="#" onclick="goto('Data');" class="${modeflag.get('Data')}">${_("DataDump")}</a> |
+          <a href="#" onclick="goto('Manage Groups');" class="${modeflag.get('Manage Groups')}">${_("Manage Groups")}</a>
           %if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_ANALYTICS'):
-             | <a href="#" onclick="goto('Analytics');" class="${modeflag.get('Analytics')}">Analytics</a>
+             | <a href="#" onclick="goto('Analytics');" class="${modeflag.get('Analytics')}">${_("Analytics")}</a>
           %endif
 	  ]
     </h2>
@@ -131,34 +132,34 @@ function goto( mode)
 
     %if offline_grade_log:
       <p><font color='orange'>Pre-computed grades ${offline_grade_log} available: Use?
-          <input type='checkbox' name='use_offline_grades' value='yes'></font> </p>
+          <input type='checkbox' name='use_offline_grades' value='${_("yes")}'></font> </p>
     %endif
 
     <p>
-    <a href="${reverse('gradebook', kwargs=dict(course_id=course.id))}">Gradebook</a>
+    <a href="${reverse('gradebook', kwargs=dict(course_id=course.id))}">${_("Gradebook")}</a>
     </p>
 
     <p>
-    <a href="${reverse('grade_summary', kwargs=dict(course_id=course.id))}">Grade summary</a>
+    <a href="${reverse('grade_summary', kwargs=dict(course_id=course.id))}">${_("Grade summary")}</a>
     </p>
 
     <p>
-    <input type="submit" name="action" value="Dump list of enrolled students">
+    <input type="submit" name="action" value="${_("Dump list of enrolled students")}">
     </p>
 
     <p>
-    <input type="submit" name="action" value="Dump Grades for all students in this course">
-    <input type="submit" name="action" value="Download CSV of all student grades for this course">
+    <input type="submit" name="action" value="${_("Dump Grades for all students in this course")}">
+    <input type="submit" name="action" value="${_("Download CSV of all student grades for this course")}">
     </p>
 
     <p>
-    <input type="submit" name="action" value="Dump all RAW grades for all students in this course">
-    <input type="submit" name="action" value="Download CSV of all RAW grades">
+    <input type="submit" name="action" value="${_("Dump all RAW grades for all students in this course")}">
+    <input type="submit" name="action" value="${_("Download CSV of all RAW grades")}">
     </p>
 
     <p>
-    <input type="submit" name="action" value="Download CSV of answer distributions">
-    <input type="submit" name="action" value="Dump description of graded assignments configuration">
+    <input type="submit" name="action" value="${_("Download CSV of answer distributions")}">
+    <input type="submit" name="action" value="${_("Dump description of graded assignments configuration")}">
     </p>
     <hr width="40%" style="align:left">
 
@@ -168,104 +169,102 @@ function goto( mode)
         rg = course.remote_gradebook
     %>
 
-    <h3>Export grades to remote gradebook</h3>
-    <p>The assignments defined for this course should match the ones
-    stored in the gradebook, for this to work properly!</p>
+    <h3>${_("Export grades to remote gradebook")}</h3>
+    <p>${_("The assignments defined for this course should match the ones stored in the gradebook, for this to work properly!")}</p>
 
     <ul>
-    <li>Gradebook name: <font color="green">${rg.get('name','None defined!')}</font>
+    <li>${_("Gradebook name:")} <font color="green">${rg.get('name','None defined!')}</font>
     <br/>
     <br/>
-    <input type="submit" name="action" value="List assignments available in remote gradebook">
-    <input type="submit" name="action" value="List enrolled students matching remote gradebook">
-    <br/>
-    <br/>
-    </li>
-    <li><input type="submit" name="action" value="List assignments available for this course">
+    <input type="submit" name="action" value="${_("List assignments available in remote gradebook")}">
+    <input type="submit" name="action" value="${_("List enrolled students matching remote gradebook")}">
     <br/>
     <br/>
     </li>
-    <li>Assignment name: <input type="text" name="assignment_name" size=40 >
+    <li><input type="submit" name="action" value="${_("List assignments available for this course")}">
     <br/>
     <br/>
-    <input type="submit" name="action" value="Display grades for assignment">
-    <input type="submit" name="action" value="Export grades for assignment to remote gradebook">
-    <input type="submit" name="action" value="Export CSV file of grades for assignment">
+    </li>
+    <li>${_("Assignment name:")} <input type="text" name="assignment_name" size=40 >
+    <br/>
+    <br/>
+    <input type="submit" name="action" value="${_("Display grades for assignment")}">
+    <input type="submit" name="action" value="${_("Export grades for assignment to remote gradebook")}">
+    <input type="submit" name="action" value="${_("Export CSV file of grades for assignment")}">
     </li>
     </ul>
     <hr width="40%" style="align:left">
 
   %endif
   %if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
-    <H2>Course-specific grade adjustment</h2>
+    <H2>${_("Course-specific grade adjustment")}</h2>
 
     <p>
-      Specify a particular problem in the course here by its url:
+      {_("Specify a particular problem in the course here by its url:")}
       <input type="text" name="problem_for_all_students" size="60">
     </p>
     <p>
-      You may use just the "urlname" if a problem, or "modulename/urlname" if not.
-      (For example, if the location is <tt>i4x://university/course/problem/problemname</tt>,
-      then just provide the <tt>problemname</tt>.
-      If the location is <tt>i4x://university/course/notaproblem/someothername</tt>, then
-      provide <tt>notaproblem/someothername</tt>.)
+      ${_('You may use just the "urlname" if a problem, or "modulename/urlname" if not. '
+          '(For example, if the location is <tt>i4x://university/course/problem/problemname</tt>, '
+          'then just provide the <tt>problemname</tt>. '
+          'If the location is <tt>i4x://university/course/notaproblem/someothername</tt>, then '
+          'provide <tt>notaproblem/someothername</tt>.)')}
     </p>
     <p>
-      Then select an action:
-      <input type="submit" name="action" value="Reset ALL students' attempts">
-      <input type="submit" name="action" value="Rescore ALL students' problem submissions">
+      ${_("Then select an action:")}
+      <input type="submit" name="action" value="${_("Reset ALL students' attempts")}">
+      <input type="submit" name="action" value="${_("Rescore ALL students' problem submissions")}">
     </p>
     <p>
-    <p>These actions run in the background, and status for active tasks will appear in a table below.
-       To see status for all tasks submitted for this problem, click on this button:
+    <p>${_("These actions run in the background, and status for active tasks will appear in a table below. To see status for all tasks submitted for this problem, click on this button:")}
     </p>
     <p>
-      <input type="submit" name="action" value="Show Background Task History">
+      <input type="submit" name="action" value="${_("Show Background Task History")}">
     </p>
 
     <hr width="40%" style="align:left">
   %endif
 
-    <H2>Student-specific grade inspection and adjustment</h2>
+    <H2>${_("Student-specific grade inspection and adjustment")}</h2>
     <p>
-      Specify the edX email address or username of a student here:
+      ${_("Specify the edX email address or username of a student here:")}
       <input type="text" name="unique_student_identifier">
     </p>
     <p>
-      Click this, and a link to student's progress page will appear below:
-      <input type="submit" name="action" value="Get link to student's progress page">
+      ${_("Click this, and a link to student's progress page will appear below:")}
+      <input type="submit" name="action" value="${_(\"Get link to student's progress page\")}">
     </p>
     <p>
-      Specify a particular problem in the course here by its url:
+      ${_("Specify a particular problem in the course here by its url:")}
       <input type="text" name="problem_for_student" size="60">
     </p>
     <p>
-      You may use just the "urlname" if a problem, or "modulename/urlname" if not.
-      (For example, if the location is <tt>i4x://university/course/problem/problemname</tt>,
-      then just provide the <tt>problemname</tt>.
-      If the location is <tt>i4x://university/course/notaproblem/someothername</tt>, then
-      provide <tt>notaproblem/someothername</tt>.)
+      ${_('You may use just the "urlname" if a problem, or "modulename/urlname" if not. '
+          '(For example, if the location is <tt>i4x://university/course/problem/problemname</tt>, '
+          'then just provide the <tt>problemname</tt>. '
+          'If the location is <tt>i4x://university/course/notaproblem/someothername</tt>, then '
+          'provide <tt>notaproblem/someothername</tt>.)')}
     </p>
     <p>
-      Then select an action:
-      <input type="submit" name="action" value="Reset student's attempts">
+      ${_("Then select an action:")}
+      <input type="submit" name="action" value="${_(\"Reset student's attempts\")}">
       %if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
-      <input type="submit" name="action" value="Rescore student's problem submission">
+      <input type="submit" name="action" value="${_(\"Rescore student's problem submission\")}">
       %endif
     </p>
 
     %if instructor_access:
     <p>
-      You may also delete the entire state of a student for the specified module:
-      <input type="submit" name="action" value="Delete student state for module">
+      ${_("You may also delete the entire state of a student for the specified module:")}
+      <input type="submit" name="action" value="${_("Delete student state for module")}">
     </p>
     %endif
     %if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
-    <p>Rescoring runs in the background, and status for active tasks will appear in a table below.
-       To see status for all tasks submitted for this problem and student, click on this button:
+    <p>${_("Rescoring runs in the background, and status for active tasks will appear in a table below. "
+           "To see status for all tasks submitted for this problem and student, click on this button:")}
     </p>
     <p>
-      <input type="submit" name="action" value="Show Background Task History for Student">
+      <input type="submit" name="action" value="${_("Show Background Task History for Student")}">
     </p>
     %endif
 
@@ -274,7 +273,7 @@ function goto( mode)
 ##-----------------------------------------------------------------------------
 %if modeflag.get('Psychometrics'):
 
-    <p>Select a problem and an action:
+    <p>${_("Select a problem and an action:")}
     </p>
 
     <p>
@@ -285,7 +284,7 @@ function goto( mode)
     </select>
     </p>
     <p>
-    <input type="submit" name="action" value="Generate Histogram and IRT Plot">
+    <input type="submit" name="action" value="${_("Generate Histogram and IRT Plot")}">
     </p>
 
     <p></p>
@@ -298,28 +297,28 @@ function goto( mode)
   %if instructor_access:
     <hr width="40%" style="align:left">
     <p>
-    <input type="submit" name="action" value="List course staff members">
+    <input type="submit" name="action" value="${_("List course staff members")}">
     <p>
     <input type="text" name="staffuser">
-    <input type="submit" name="action" value="Remove course staff">
-    <input type="submit" name="action" value="Add course staff">
+    <input type="submit" name="action" value="${_("Remove course staff")}">
+    <input type="submit" name="action" value="${_("Add course staff")}">
     <hr width="40%" style="align:left">
   %endif
 
   %if admin_access:
     <hr width="40%" style="align:left">
     <p>
-    <input type="submit" name="action" value="List course instructors">
+    <input type="submit" name="action" value="${_("List course instructors")}">
     <p>
-    <input type="text" name="instructor"> <input type="submit" name="action" value="Remove instructor">
-    <input type="submit" name="action" value="Add instructor">
+    <input type="text" name="instructor"> <input type="submit" name="action" value="${_("Remove instructor")}">
+    <input type="submit" name="action" value="${_("Add instructor")}">
     <hr width="40%" style="align:left">
   %endif
 
   %if settings.MITX_FEATURES['ENABLE_MANUAL_GIT_RELOAD'] and admin_access:
     <p>
-    <input type="submit" name="action" value="Reload course from XML files">
-    <input type="submit" name="action" value="GIT pull and Reload course">
+    <input type="submit" name="action" value="${_("Reload course from XML files")}">
+    <input type="submit" name="action" value="${_("GIT pull and Reload course")}">
   %endif
 %endif
 
@@ -328,26 +327,26 @@ function goto( mode)
   %if instructor_access:
     <hr width="40%" style="align:left">
     <p>
-    <input type="submit" name="action" value="List course forum admins">
+    <input type="submit" name="action" value="${_("List course forum admins")}">
     <p>
-    <input type="text" name="forumadmin"> <input type="submit" name="action" value="Remove forum admin">
-    <input type="submit" name="action" value="Add forum admin">
+    <input type="text" name="forumadmin"> <input type="submit" name="action" value="${_("Remove forum admin")}">
+    <input type="submit" name="action" value="${_("Add forum admin")}">
     <hr width="40%" style="align:left">
   %endif
 
   %if instructor_access or forum_admin_access:
     <p>
-    <input type="submit" name="action" value="List course forum moderators">
-    <input type="submit" name="action" value="List course forum community TAs">
+    <input type="submit" name="action" value="${_("List course forum moderators")}">
+    <input type="submit" name="action" value="${_("List course forum community TAs")}">
     <p>
     <input type="text" name="forummoderator">
-    <input type="submit" name="action" value="Remove forum moderator">
-    <input type="submit" name="action" value="Add forum moderator">
-    <input type="submit" name="action" value="Remove forum community TA">
-    <input type="submit" name="action" value="Add forum community TA">
+    <input type="submit" name="action" value="${_("Remove forum moderator")}">
+    <input type="submit" name="action" value="${_("Add forum moderator")}">
+    <input type="submit" name="action" value="${_("Remove forum community TA")}">
+    <input type="submit" name="action" value="${_("Add forum community TA")}">
     <hr width="40%" style="align:left">
   %else:
-  <p>User requires forum administrator privileges to perform administration tasks.  See instructor.</p>
+  <p>${_("User requires forum administrator privileges to perform administration tasks.  See instructor.")}</p>
   %endif
 %endif
 
@@ -356,8 +355,8 @@ function goto( mode)
 
     <hr width="40%" style="align:left">
     <p>
-    <input type="submit" name="action" value="List enrolled students">
-    <input type="submit" name="action" value="List students who may enroll but may not have yet signed up">
+    <input type="submit" name="action" value="${_("List enrolled students")}">
+    <input type="submit" name="action" value="${_("List students who may enroll but may not have yet signed up")}">
     <hr width="40%" style="align:left">
 
   %if settings.MITX_FEATURES.get('REMOTE_GRADEBOOK_URL','') and instructor_access:
@@ -366,28 +365,28 @@ function goto( mode)
         rg = course.remote_gradebook
     %>
 
-    <p>Pull enrollment from remote gradebook</p>
+    <p>${_("Pull enrollment from remote gradebook")}</p>
     <ul>
-    <li>Gradebook name: <font color="green">${rg.get('name','None defined!')}</font>
-    <li>Section: <input type="text" name="gradebook_section" size=40 value="${rg.get('section','')}"></li>
+    <li>${_("Gradebook name:")} <font color="green">${rg.get('name','None defined!')}</font>
+    <li>${_("Section:")} <input type="text" name="gradebook_section" size=40 value="${rg.get('section','')}"></li>
     </ul>
-    <input type="submit" name="action" value="List sections available in remote gradebook">
-    <input type="submit" name="action" value="List students in section in remote gradebook">
-    <input type="submit" name="action" value="Overload enrollment list using remote gradebook">
-    <input type="submit" name="action" value="Merge enrollment list with remote gradebook">
+    <input type="submit" name="action" value="${_("List sections available in remote gradebook")}">
+    <input type="submit" name="action" value="${_("List students in section in remote gradebook")}">
+    <input type="submit" name="action" value="${_("Overload enrollment list using remote gradebook")}">
+    <input type="submit" name="action" value="${_("Merge enrollment list with remote gradebook")}">
     <hr width="40%" style="align:left">
 
   %endif
 
-  <p>Enroll or un-enroll one or many students: enter emails, separated by new lines or commas;</p>
+  <p>${_("Enroll or un-enroll one or many students: enter emails, separated by new lines or commas;")}</p>
   <textarea rows="6" cols="70" name="multiple_students"></textarea>
   <p>
-  <input type="checkbox" name="email_students"> Notify students by email
+  <input type="checkbox" name="email_students"> ${_("Notify students by email")}
   <p>
-  <input type="checkbox" name="auto_enroll"> Auto-enroll students when they activate
-  <input type="submit" name="action" value="Enroll multiple students">
+  <input type="checkbox" name="auto_enroll"> ${_("Auto-enroll students when they activate")}
+  <input type="submit" name="action" value="$_("Enroll multiple students")}">
   <p>
-  <input type="submit" name="action" value="Unenroll multiple students">
+  <input type="submit" name="action" value="${_("Unenroll multiple students")}">
 
 %endif
 
@@ -396,11 +395,11 @@ function goto( mode)
 %if modeflag.get('Data'):
     <hr width="40%" style="align:left">
     <p>
-    <input type="submit" name="action" value="Download CSV of all student profile data">
+    <input type="submit" name="action" value="${_("Download CSV of all student profile data")}">
     </p>
-    <p> Problem urlname:
+    <p> ${_("Problem urlname:")}
         <input type="text" name="problem_to_dump" size="40">
-        <input type="submit" name="action" value="Download CSV of all responses to problem">
+        <input type="submit" name="action" value="${_("Download CSV of all responses to problem")}">
     </p>
     <hr width="40%" style="align:left">
 %endif
@@ -411,15 +410,16 @@ function goto( mode)
   %if instructor_access:
     <hr width="40%" style="align:left">
     <p>
-    <input type="submit" name="action" value="List beta testers">
+    <input type="submit" name="action" value="${_("List beta testers")}">
     <p>
-    Enter usernames or emails for students who should be beta-testers, one per line, or separated by commas.  They will get to
-    see course materials early, as configured via the <tt>days_early_for_beta</tt> option in the course policy.
+    ## Translators: days_early_for_beta should not be translated
+    ${_("Enter usernames or emails for students who should be beta-testers, one per line, or separated by commas.  They will get to "
+        "see course materials early, as configured via the <tt>days_early_for_beta</tt> option in the course policy.")}
     </p>
     <p>
     <textarea cols="50" row="30" name="betausers"></textarea>
-    <input type="submit" name="action" value="Remove beta testers">
-    <input type="submit" name="action" value="Add beta testers">
+    <input type="submit" name="action" value="${_("Remove beta testers")}">
+    <input type="submit" name="action" value="${_("Add beta testers")}">
     </p>
     <hr width="40%" style="align:left">
 
@@ -442,12 +442,12 @@ function goto( mode)
 %if modeflag.get('Analytics'):
 
   %if not any(analytics_results.values()):
-    <p>No Analytics are available at this time.</p>
+    <p>${_("No Analytics are available at this time.")}</p>
   %endif
 
   %if analytics_results.get("StudentsEnrolled"):
     <p>
-      Students enrolled:
+      ${_("Students enrolled:")}
       ${analytics_results["StudentsEnrolled"]['data'][0]['students']}
       (${analytics_results["StudentsEnrolled"]['time']})
     </p>
@@ -455,7 +455,7 @@ function goto( mode)
 
   %if analytics_results.get("StudentsActive"):
     <p>
-      Students active in the last week:
+      ${_("Students active in the last week:")}
       ${analytics_results["StudentsActive"]['data'][0]['active']}
       (${analytics_results["StudentsActive"]['time']})
     </p>
@@ -463,14 +463,14 @@ function goto( mode)
 
   %if analytics_results.get("StudentsDropoffPerDay"):
     <p>
-      Student activity day by day
+      ${_("Student activity day by day")} 
       (${analytics_results["StudentsDropoffPerDay"]['time']})
     </p>
     <div>
       <table class="stat_table">
         <tr>
-          <th>Day</th>
-          <th>Students</th>
+          <th>${_("Day")}</th>
+          <th>${_("Students")}</th>
         </tr>
       %for row in analytics_results['StudentsDropoffPerDay']['data']:
         <tr>
@@ -485,15 +485,15 @@ function goto( mode)
   <br/>
   %if analytics_results.get("ProblemGradeDistribution"):
     <p>
-      Answer distribution for problems
+      ${_("Answer distribution for problems")}
       (${analytics_results["ProblemGradeDistribution"]['time']})
     </p>
     <div>
       <table class="stat_table">
         <tr>
-          <th>Problem</th>
-          <th>Max</th>
-          <th colspan="99">Points Earned (Num Students)</th>
+          <th>${_("Problem")}</th>
+          <th>${_("Max")}</th>
+          <th colspan="99">${_("Points Earned (Num Students)")}</th>
         </tr>
       %for row in analytics_results['ProblemGradeDistribution']['data']:
         <tr>
@@ -522,14 +522,14 @@ function goto( mode)
   ##instead.
   %if analytics_results.get("StudentsPerProblemCorrect"):
     <p>
-      Students answering correctly
+      ${_("Students answering correctly")}
       (${analytics_results["StudentsPerProblemCorrect"]['time']})
     </p>
     <div class="divScroll">
       <table class="stat_table">
         <tr>
-          <th>Problem</th>
-          <th>Number of students</th>
+          <th>${_("Problem")}</th>
+          <th>${_("Number of students")}</th>
         </tr>
       %for row in analytics_results['StudentsPerProblemCorrect']['data']:
         <tr>
@@ -542,7 +542,7 @@ function goto( mode)
   %endif
 
    <p>
-     Student distribution per country, all courses, Sep-12 to Oct-17, 1 server (shown here as an example):
+     ${_("Student distribution per country, all courses, Sep-12 to Oct-17, 1 server (shown here as an example):")}
    </p>
 
 <div id="posts-list" class="clearfix">
@@ -638,18 +638,18 @@ function goto( mode)
 
 %if instructor_tasks is not None and len(instructor_tasks) > 0:
     <hr width="100%">
-    <h2>Pending Instructor Tasks</h2>
+    <h2>$_("Pending Instructor Tasks")}</h2>
     <div id="task-progress-wrapper">
       <table class="stat_table">
         <tr>
-          <th>Task Type</th>
-          <th>Task inputs</th>
-          <th>Task Id</th>
-          <th>Requester</th>
-          <th>Submitted</th>
-          <th>Task State</th>
-          <th>Duration (sec)</th>
-          <th>Task Progress</th>
+          <th>${_("Task Type")}</th>
+          <th>${_("Task inputs")}</th>
+          <th>${_("Task Id")}</th>
+          <th>${_("Requester")}</th>
+          <th>${_("Submitted")}</th>
+          <th>${_("Task State")}</th>
+          <th>${_("Duration (sec)")}</th>
+          <th>${_("Task Progress")}</th>
         </tr>
       %for tasknum, instructor_task in enumerate(instructor_tasks):
         <tr id="task-progress-entry-${tasknum}" class="task-progress-entry"
@@ -661,8 +661,8 @@ function goto( mode)
           <td>${instructor_task.requester}</td>
           <td>${instructor_task.created}</td>
           <td class="task-state">${instructor_task.task_state}</td>
-          <td class="task-duration">unknown</td>
-          <td class="task-progress">unknown</td>
+          <td class="task-duration">${_("unknown")}</td>
+          <td class="task-progress">${_("unknown")}</td>
         </tr>
       %endfor
       </table>
@@ -726,7 +726,7 @@ function goto( mode)
 ##-----------------------------------------------------------------------------
 %if modeflag.get('Admin'):
  % if course_errors is not UNDEFINED:
-    <h2>Course errors</h2>
+    <h2>${_("Course errors")}</h2>
     <div id="course-errors">
     %if not course_errors:
           None

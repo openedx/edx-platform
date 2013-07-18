@@ -1,3 +1,4 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%! from urllib import urlencode %>
 <%
 
@@ -14,5 +15,5 @@ def base_url_for_search():
   % else:
     <input class="search-input" type="text" value="${text | h}" id="keywords" autocomplete="off"/>
   % endif
-  <div class="discussion-link discussion-search-link" href="javascript:void(0)">Search posts</div>
+  <div class="discussion-link discussion-search-link" href="javascript:void(0)">${_("Search posts")}</div>
 </form>

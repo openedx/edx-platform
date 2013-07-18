@@ -1,8 +1,10 @@
+<%! from django.utils.translation import ugettext as _ %>
+
 <section class="filter">
   <nav>
     <div class="dropdown university">
       <div class="filter-heading">
-        All Universities
+        ${_("All Universities")}
       </div>
       <ul>
         <li>
@@ -16,34 +18,34 @@
 
     <div class="dropdown subject">
       <div class="filter-heading">
-        All Subjects
+        ${_("All Subjects")}
       </div>
       <ul>
         <li>
-          <a href="#">Computer Science</a>
+          <a href="#">${_("Computer Science")}</a>
         </li>
         <li>
-          <a href="#">History</a>
+          <a href="#">${_("History")}</a>
         </li>
       </ul>
     </div>
 
     <div class="dropdown featured">
       <div class="filter-heading">
-        Newest
+        ${_("Newest")}
       </div>
       <ul>
         <li>
-          <a href="#">Top Rated</a>
+          <a href="#">${_("Top Rated")}</a>
         </li>
         <li>
-          <a href="#">Starting soonest</a>
+          <a href="#">${_("Starting soonest")}</a>
         </li>
       </ul>
     </div>
 
     <form class="search">
-      <input type="text" placeholder="Search for courses">
+      <input type="text" placeholder="${_('Search for courses')}">
       <input type="submit">
     </form>
   </nav>

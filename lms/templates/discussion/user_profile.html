@@ -1,9 +1,10 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%! from django.template.defaultfilters import escapejs %>
 
 <%inherit file="../main.html" />
 <%namespace name='static' file='../static_content.html'/>
 <%block name="bodyclass">discussion</%block>
-<%block name="title"><title>Discussion – ${course.number | h}</title></%block>
+<%block name="title"><title>${_("Discussion - {course_number}").format(course_number=course.number) | h}</title></%block>
 
 <%block name="headextra">
 <%static:css group='course'/>
@@ -19,7 +20,7 @@
 
 <section class="container">
   <div class="course-wrapper">
-    <section aria-label="User Profile" class="user-profile">
+    <section aria-label="${_('User Profile')}" class="user-profile">
       <nav>
 
         <article class="sidebar-module discussion-sidebar">
@@ -30,7 +31,7 @@
     </section>
 
     <section class="course-content container discussion-user-threads" data-user-id="${django_user.id | escapejs}" data-course-id="${course.id | escapejs}" data-threads="${threads}" data-user-info="${user_info}">
-        <h2>Active Threads</h2>
+        <h2>${_("Active Threads")}</h2>
     </section>
   </div>
 </section>

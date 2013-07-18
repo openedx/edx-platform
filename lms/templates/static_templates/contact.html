@@ -1,16 +1,17 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
 <%namespace name='static' file='../static_content.html'/>
 
 <%inherit file="../main.html" />
 
-<%block name="title"><title>Contact edX</title></%block>
+<%block name="title"><title>${_("Contact edX")}</title></%block>
 
 <section class="container about">
   <nav>
-    <a href="${reverse('about_edx')}">Vision</a>
-    <a href="${reverse('faq_edx')}">Faq</a>
-    <a href="${reverse('press')}">Press</a>
-    <a href="${reverse('contact')}" class="active">Contact</a>
+    <a href="${reverse('about_edx')}">${_("Vision")}</a>
+    <a href="${reverse('faq_edx')}">${_("Faq")}</a>
+    <a href="${reverse('press')}">${_("Press")}</a>
+    <a href="${reverse('contact')}" class="active">${_("Contact")}</a>
   </nav>
 
   <section class="contact">
@@ -18,23 +19,36 @@
       <img src="${static.url('images/contact-page.jpg')}">
     </div>
     <div class="contacts">
-      <h2>Class Feedback</h2>
-      <p>We are always seeking feedback to improve our courses. If you are an enrolled student and have any questions, feedback, suggestions, or any other issues specific to a particular class, please post on the discussion forums of that&nbsp;class.</p>
+      <h2>${_("Class Feedback")}</h2>
+      <p>${_("We are always seeking feedback to improve our courses. If you are an enrolled student and have any questions, feedback, suggestions, or any other issues specific to a particular class, please post on the discussion forums of that&nbsp;class.")}</p>
 
-      <h2>General Inquiries and Feedback</h2>
-      <p>If you have a general question about edX please email <a href="mailto:info@edx.org">info@edx.org</a>. To see if your question has already been answered, visit our <a href="${reverse('faq_edx')}">FAQ page</a>. You can also join the discussion on our <a href="http://www.facebook.com/EdxOnline">Facebook page</a>. Though we may not have a chance to respond to every email, we take all feedback into consideration.</p>
+      <h2>${_("General Inquiries and Feedback")}</h2>
+      <p>${_('If you have a general question about edX please email {email}. To see if your question has already been answered, visit our {faq_link_start}FAQ page{faq_link_end}. You can also join the discussion on our {fb_link_start}facebook page{fb_link_end}. Though we may not have a chance to respond to every email, we take all feedback into consideration.').format(
+        email='<a href="mailto:info@edx.org">info@edx.org</a>',
+        faq_link_start='<a href="{url}">'.format(url=reverse('faq_edx')),
+        faq_link_end='</a>',
+        fb_link_start='<a href="http://www.facebook.com/EdxOnline">'.
+        fb_link_end='</a>'
+      )}</p>
 
-      <h2>Technical Inquiries and Feedback</h2>
-      <p>If you have suggestions/feedback about the overall edX platform, or are facing general technical issues with the platform (e.g., issues with email addresses and passwords), you can reach us at <a href="mailto:technical@edx.org">technical@edx.org</a>. For technical questions, please make sure you are using a current version of Firefox or Chrome, and include browser and version in your e-mail, as well as screenshots or other pertinent details. If you find a bug or other issues, you can reach us at the following: <a href="mailto:bugs@edx.org">bugs@edx.org</a>.</p>
+      <h2>${_("Technical Inquiries and Feedback")}</h2>
+      <p>${_('If you have suggestions/feedback about the overall edX platform, or are facing general technical issues with the platform (e.g., issues with email addresses and passwords), you can reach us at {tech_email}. For technical questions, please make sure you are using a current version of Firefox or Chrome, and include browser and version in your e-mail, as well as screenshots or other pertinent details. If you find a bug or other issues, you can reach us at the following: {bug_email}.').format(
+        tech_email='<a href="mailto:technical@edx.org">technical@edx.org</a>',
+        bug_email='<a href="mailto:bugs@edx.org">bugs@edx.org</a>'
+      )}</p>
 
-      <h2>Media</h2>
-      <p>Please visit our <a href="${reverse('press')}">media/press page</a> for more information. For any media or press enquiries, please email <a href="mailto:press@edx.org">press@edx.org</a>.</p>
+      <h2>${_("Media")}</h2>
+      <p>${_('Please visit our {link_start}media/press page{link_end} for more information. For any media or press inquiries, please email {email}.').format(
+        link_start='<a href="{url}">'.format(url=reverse('faq_edx')),
+        link_end='</a>',
+        email='<a href="mailto:{email}">{email}</a>'.format(email="press@edx.org"),
+        )}</p>
 
-      <h2>Universities</h2>
-      <p>If you are a university wishing to collaborate or with questions about edX, please email <a href="mailto:university@edx.org">university@edx.org</a>.</p>
+      <h2>${_("Universities")}</h2>
+      <p>${_('If you are a university wishing to Collaborate or with questions about edX, please email {email}.'.format(email='<a href="mailto:{email}">{email}</a>'.format(email="university@edx.org"))}</p>
 
-      <h2>Accessibility</h2>
-      <p>EdX strives to create an innovative online-learning platform that promotes accessibility for everyone, including students with disabilities. We are dedicated to improving the accessibility of the platform and welcome your comments or questions at <a href="mailto:accessibility@edx.org">accessibility@edx.org.</a></p>
+      <h2>${_("Accessibility")}</h2>
+      <p>${_('EdX strives to create an innovative online-learning platform that promotes accessibility for everyone, including students with disabilities. We are dedicated to improving the accessibility of the platform and welcome your comments or questions at {email}.'.format(email='<a href="mailto:{email}">{email}</a>'.format(email="accessibility@edx.org"))}</p>
 
     </div>
   </section>

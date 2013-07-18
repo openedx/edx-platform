@@ -1,13 +1,14 @@
 <%namespace name='static' file='static_content.html'/>
 <%namespace file='main.html' import="stanford_theme_enabled"/>
 <%!
-    from django.core.urlresolvers import reverse
-    from courseware.courses import course_image_url, get_course_about_section
+from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
+from courseware.courses import course_image_url, get_course_about_section
 %>
 <%page args="course" />
 <article id="${course.id}" class="course">
   %if course.is_newish:
-    <span class="status">New</span>
+    <span class="status">${_("New")}</span>
   %endif
   <a href="${reverse('about_course', args=[course.id])}">
   <div class="inner-wrapper">
