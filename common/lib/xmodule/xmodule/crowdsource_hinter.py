@@ -188,6 +188,7 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         if not self.validate_answer(answer):
             # Answer is not in the right form.
             log.exception('Answer not valid: ' + str(answer))
+            return
         if answer not in self.user_submissions:
             self.user_submissions += [answer]
         # Look for a hint to give.
@@ -219,12 +220,12 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         self.previous_answers += [[best_hint_answer, [best_hint_index]]]
         for i in xrange(min(2, n_hints-1)):
             # Keep making random hints until we hit a target, or run out.
-            (hint_index, (rand_hint, votes, hint_answer)) =\
-                random.choice(matching_hints.items())
-            if rand_hint in hints:
-                # Don't show the same hint twice.  Try again.
-                i -= 1
-                continue
+            go_on = False
+            while not go_on:
+                (hint_index, (rand_hint, votes, hint_answer)) =\
+                    random.choice(matching_hints.items())
+                if not rand_hint in hints:
+                    go_on = True
             hints.append(rand_hint)
             self.previous_answers += [[hint_index, [hint_answer]]]
         return {'hints': hints,

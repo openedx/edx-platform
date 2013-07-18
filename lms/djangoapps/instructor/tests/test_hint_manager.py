@@ -2,7 +2,7 @@ import json
 
 from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
-from mock import MagicMock, patch
+from mock import patch, MagicMock
 
 from courseware.models import XModuleContentField
 from courseware.tests.factories import ContentFactory
@@ -11,8 +11,6 @@ import instructor.hint_manager as view
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-
-import unittest
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
@@ -92,7 +90,7 @@ class HintManagerTest(ModuleStoreTestCase):
         out = view.get_hints(post, self.course_id, 'mod_queue')
         print out
         self.assertTrue(out['other_field'] == 'hints')
-        expected = {self.problem_id: [[u'2.0', u'2.0', {u'2': [u'Hint 2', 1]}]]}
+        expected = {self.problem_id: [(u'2.0', {u'2': [u'Hint 2', 1]})]}
         self.assertTrue(out['all_hints'] == expected)
 
     def test_gethints_other(self):
@@ -104,9 +102,9 @@ class HintManagerTest(ModuleStoreTestCase):
         out = view.get_hints(post, self.course_id, 'hints')
         print out
         self.assertTrue(out['other_field'] == 'mod_queue')
-        expected = {self.problem_id: [['1.0', '1.0', {'1': ['Hint 1', 2],
-                                                      '3': ['Hint 3', 12]}],
-                                      ['2.0', '2.0', {'4': ['Hint 4', 3]}]
+        expected = {self.problem_id: [('1.0', {'1': ['Hint 1', 2],
+                                               '3': ['Hint 3', 12]}),
+                                      ('2.0', {'4': ['Hint 4', 3]})
                                       ]}
         self.assertTrue(out['all_hints'] == expected)
 
@@ -143,7 +141,7 @@ class HintManagerTest(ModuleStoreTestCase):
         # Because add_hint accesses the xmodule, this test requires a bunch
         # of monkey patching.
         hinter = MagicMock()
-        hinter.answer_signature = lambda string: string
+        hinter.validate_answer = lambda string: True
 
         request = RequestFactory()
         post = request.post(self.url, {'field': 'mod_queue',
@@ -157,6 +155,27 @@ class HintManagerTest(ModuleStoreTestCase):
                 view.add_hint(post, self.course_id, 'mod_queue')
         problem_hints = XModuleContentField.objects.get(field_name='mod_queue', definition_id=self.problem_id).value
         self.assertTrue('3.14' in json.loads(problem_hints))
+
+    def test_addbadhint(self):
+        """
+        Check that instructors cannot add hints with unparsable answers.
+        """
+        # Patching.
+        hinter = MagicMock()
+        hinter.validate_answer = lambda string: False
+
+        request = RequestFactory()
+        post = request.post(self.url, {'field': 'mod_queue',
+                                       'op': 'add hint',
+                                       'problem': self.problem_id,
+                                       'answer': 'fish',
+                                       'hint': 'This is a new hint.'})
+        post.user = 'fake user'
+        with patch('courseware.module_render.get_module', MagicMock(return_value=hinter)):
+            with patch('courseware.model_data.ModelDataCache', MagicMock(return_value=None)):
+                view.add_hint(post, self.course_id, 'mod_queue')
+        problem_hints = XModuleContentField.objects.get(field_name='mod_queue', definition_id=self.problem_id).value
+        self.assertTrue('fish' not in json.loads(problem_hints))
 
     def test_approve(self):
         """

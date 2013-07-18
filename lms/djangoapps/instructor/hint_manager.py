@@ -10,7 +10,6 @@ import re
 
 from django.http import HttpResponse, Http404
 from django_future.csrf import ensure_csrf_cookie
-from django.core.exceptions import ObjectDoesNotExist
 
 from mitxmako.shortcuts import render_to_response, render_to_string
 
@@ -114,27 +113,8 @@ def get_hints(request, course_id, field):
                 # Put all non-numerical answers first.
                 return float('-inf')
 
-        # Find the signature to answer converter for this problem.  Sometimes,
-        # it doesn't exist; just assume that the signatures are the answers.
-        try:
-            signature_to_ans = XModuleContentField.objects.get(
-                field_name='signature_to_ans',
-                definition_id__regex=chopped_id
-            )
-            signature_to_ans = json.loads(signature_to_ans.value)
-        except ObjectDoesNotExist:
-            signature_to_ans = {}
-
-        signatures_dict = json.loads(hints_by_problem.value)
-        unsorted = []
-        for signature, dict_of_hints in signatures_dict.items():
-            if signature in signature_to_ans:
-                ans_txt = signature_to_ans[signature]
-            else:   
-                ans_txt = signature
-            unsorted.append([signature, ans_txt, dict_of_hints])
-        # Answer list contains [signature, answer, dict_of_hints] sub-lists.
-        answer_list = sorted(unsorted, key=answer_sorter)
+        # Answer list contains [answer, dict_of_hints] pairs.
+        answer_list = sorted(json.loads(hints_by_problem.value).items(), key=answer_sorter)
         big_out_dict[hints_by_problem.definition_id] = answer_list
 
     render_dict = {'field': field,
@@ -165,7 +145,7 @@ def delete_hints(request, course_id, field):
     Deletes the hints specified.
 
     `request.POST` contains some fields keyed by integers.  Each such field contains a
-    [problem_defn_id, signature, pk] tuple.  These tuples specify the hints to be deleted.
+    [problem_defn_id, answer, pk] tuple.  These tuples specify the hints to be deleted.
 
     Example `request.POST`:
     {'op': 'delete_hints',
@@ -177,12 +157,12 @@ def delete_hints(request, course_id, field):
     for key in request.POST:
         if key == 'op' or key == 'field':
             continue
-        problem_id, signature, pk = request.POST.getlist(key)
+        problem_id, answer, pk = request.POST.getlist(key)
         # Can be optimized - sort the delete list by problem_id, and load each problem
         # from the database only once.
         this_problem = XModuleContentField.objects.get(field_name=field, definition_id=problem_id)
         problem_dict = json.loads(this_problem.value)
-        del problem_dict[signature][pk]
+        del problem_dict[answer][pk]
         this_problem.value = json.dumps(problem_dict)
         this_problem.save()
 
@@ -191,18 +171,18 @@ def change_votes(request, course_id, field):
     """
     Updates the number of votes.
 
-    The numbered fields of `request.POST` contain [problem_id, signature, pk, new_votes] tuples.
+    The numbered fields of `request.POST` contain [problem_id, answer, pk, new_votes] tuples.
     - Very similar to `delete_hints`.  Is there a way to merge them?  Nah, too complicated.
     """
 
     for key in request.POST:
         if key == 'op' or key == 'field':
             continue
-        problem_id, signature, pk, new_votes = request.POST.getlist(key)
+        problem_id, answer, pk, new_votes = request.POST.getlist(key)
         this_problem = XModuleContentField.objects.get(field_name=field, definition_id=problem_id)
         problem_dict = json.loads(this_problem.value)
-        # problem_dict[signature][pk] points to a [hint_text, #votes] pair.
-        problem_dict[signature][pk][1] = int(new_votes)
+        # problem_dict[answer][pk] points to a [hint_text, #votes] pair.
+        problem_dict[answer][pk][1] = int(new_votes)
         this_problem.value = json.dumps(problem_dict)
         this_problem.save()
 
@@ -214,13 +194,24 @@ def add_hint(request, course_id, field):
     field
     problem - The problem id
     answer - The answer to which a hint will be added
-           - Needs to be converted into signature first.
     hint - The text of the hint
     """
 
     problem_id = request.POST['problem']
     answer = request.POST['answer']
     hint_text = request.POST['hint']
+
+    # Validate the answer.  This requires initializing the xmodules, which
+    # is annoying.
+    loc = Location(problem_id)
+    descriptors = modulestore().get_items(loc)
+    m_d_c = model_data.ModelDataCache(descriptors, course_id, request.user)
+    hinter_module = module_render.get_module(request.user, request, loc, m_d_c, course_id)
+    if not hinter_module.validate_answer(answer):
+        # Invalid answer.  Don't add it to the database, or else the
+        # hinter will crash when we encounter it.
+        return 'Error - the answer you specified is not properly formatted: ' + str(answer)
+
     this_problem = XModuleContentField.objects.get(field_name=field, definition_id=problem_id)
 
     hint_pk_entry = XModuleContentField.objects.get(field_name='hint_pk', definition_id=problem_id)
@@ -228,23 +219,10 @@ def add_hint(request, course_id, field):
     hint_pk_entry.value = this_pk + 1
     hint_pk_entry.save()
 
-    # Make signature.  This is really annoying, but I don't see
-    # any alternative :(
-    loc = Location(problem_id)
-    descriptors = modulestore().get_items(loc)
-    m_d_c = model_data.ModelDataCache(descriptors, course_id, request.user)
-    hinter_module = module_render.get_module(request.user, request, loc, m_d_c, course_id)
-    signature = hinter_module.answer_signature(answer)
-    if signature is None:
-        # Signature generation failed.
-        # We should probably return an error message, too... working on that.
-        return 'Error - your answer could not be parsed as a formula expression.'
-    hinter_module.add_signature(signature, answer)
-
     problem_dict = json.loads(this_problem.value)
-    if signature not in problem_dict:
-        problem_dict[signature] = {}
-    problem_dict[signature][this_pk] = [hint_text, 1]
+    if answer not in problem_dict:
+        problem_dict[answer] = {}
+    problem_dict[answer][this_pk] = [hint_text, 1]
     this_problem.value = json.dumps(problem_dict)
     this_problem.save()
 
@@ -254,26 +232,26 @@ def approve(request, course_id, field):
     Approve a list of hints, moving them from the mod_queue to the real
     hint list.  POST:
     op, field
-    (some number) -> [problem, signature, pk]
+    (some number) -> [problem, answer, pk]
     """
 
     for key in request.POST:
         if key == 'op' or key == 'field':
             continue
-        problem_id, signature, pk = request.POST.getlist(key)
+        problem_id, answer, pk = request.POST.getlist(key)
         # Can be optimized - sort the delete list by problem_id, and load each problem
         # from the database only once.
         problem_in_mod = XModuleContentField.objects.get(field_name=field, definition_id=problem_id)
         problem_dict = json.loads(problem_in_mod.value)
-        hint_to_move = problem_dict[signature][pk]
-        del problem_dict[signature][pk]
+        hint_to_move = problem_dict[answer][pk]
+        del problem_dict[answer][pk]
         problem_in_mod.value = json.dumps(problem_dict)
         problem_in_mod.save()
 
         problem_in_hints = XModuleContentField.objects.get(field_name='hints', definition_id=problem_id)
         problem_dict = json.loads(problem_in_hints.value)
-        if signature not in problem_dict:
-            problem_dict[signature] = {}
-        problem_dict[signature][pk] = hint_to_move
+        if answer not in problem_dict:
+            problem_dict[answer] = {}
+        problem_dict[answer][pk] = hint_to_move
         problem_in_hints.value = json.dumps(problem_dict)
         problem_in_hints.save()

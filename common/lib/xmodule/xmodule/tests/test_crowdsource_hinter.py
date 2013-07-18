@@ -55,6 +55,7 @@ class CHModuleFactory(object):
     @staticmethod
     def create(hints=None,
                previous_answers=None,
+               user_submissions=None,
                user_voted=None,
                moderate=None,
                mod_queue=None):
@@ -87,8 +88,13 @@ class CHModuleFactory(object):
         else:
             model_data['previous_answers'] = [
                 ['24.0', [0, 3, 4]],
-                ['29.0', [None, None, None]]
+                ['29.0', []]
             ]
+
+        if user_submissions is not None:
+            model_data['user_submissions'] = user_submissions
+        else:
+            model_data['user_submissions'] = ['24.0', '29.0']
 
         if user_voted is not None:
             model_data['user_voted'] = user_voted
@@ -104,7 +110,24 @@ class CHModuleFactory(object):
 
         # Make a fake capa module.
         capa_module = MagicMock()
-        capa_module.responders = {'responder0': MagicMock()}
+        capa_module.lcp = MagicMock()
+        responder = MagicMock()
+
+        def validate_answer(answer):
+            """ A mock answer validator - simulates a numerical response"""
+            try:
+                float(answer)
+                return True
+            except ValueError:
+                return False
+        responder.validate_answer = validate_answer
+
+        def answer_compare(a, b):
+            """ A fake answer comparer """
+            return a == b
+        responder.answer_compare = answer_compare
+
+        capa_module.lcp.responders = {'responder0': responder}
         capa_module.displayable_items = lambda: [capa_module]
 
         system = get_test_system()
@@ -120,28 +143,6 @@ class CHModuleFactory(object):
 
         module = CrowdsourceHinterModule(system, descriptor, model_data)
 
-        return module
-
-    @staticmethod
-    def setup_formula_response(module):
-        """
-        Adds additional mock methods to the module, so that we can test
-        formula responses.
-        """
-        # Do a bunch of monkey patching, to mock the lon-capa problem.
-        responder = MagicMock()
-        responder.randomize_variables = MagicMock(return_value=4)
-
-        def fake_hash_answers(answer, test_values):
-            """ A fake answer hasher """
-            if test_values == 4 and answer == 'x*y^2':
-                return 'good'
-            raise StudentInputError
-
-        responder.hash_answers = fake_hash_answers
-        lcp = MagicMock()
-        lcp.responders = {'responder0': responder}
-        module.get_display_items()[0].lcp = lcp
         return module
 
 
@@ -288,46 +289,6 @@ class CrowdsourceHinterTest(unittest.TestCase):
         parsed = mock_module.formula_answer_to_str(get)
         self.assertTrue(parsed == 'x*y^2')
 
-    def test_numerical_answer_signature(self):
-        """
-        Tests answer signature generator for numerical responses.
-        """
-        mock_module = CHModuleFactory.create()
-        answer = '4*5+3'
-        signature = mock_module.numerical_answer_signature(answer)
-        print signature
-        self.assertTrue(signature == '23.0')
-
-    def test_numerical_answer_signature_failure(self):
-        """
-        Makes sure that unparsable numerical answers return None.
-        """
-        mock_module = CHModuleFactory.create()
-        answer = 'fish'
-        signature = mock_module.numerical_answer_signature(answer)
-        print signature
-        self.assertTrue(signature is None)
-
-    def test_formula_answer_signature(self):
-        """
-        Tests the answer signature generator for formula responses.
-        """
-        mock_module = CHModuleFactory.create()
-        mock_module = CHModuleFactory.setup_formula_response(mock_module)
-        answer = 'x*y^2'
-        out = mock_module.formula_answer_signature(answer)
-        self.assertTrue(out == 'good')
-
-    def test_formula_answer_signature_failure(self):
-        """
-        Makes sure that bad answer strings return None as a signature.
-        """
-        mock_module = CHModuleFactory.create()
-        mock_module = CHModuleFactory.setup_formula_response(mock_module)
-        answer = 'fish'
-        out = mock_module.formula_answer_signature(answer)
-        self.assertTrue(out is None)
-
     def test_gethint_0hint(self):
         """
         Someone asks for a hint, when there's no hint to give.
@@ -337,8 +298,9 @@ class CrowdsourceHinterTest(unittest.TestCase):
         mock_module = CHModuleFactory.create()
         json_in = {'problem_name': '26.0'}
         out = mock_module.get_hint(json_in)
+        print mock_module.previous_answers
         self.assertTrue(out is None)
-        self.assertTrue(['26.0', [None, None, None]] in mock_module.previous_answers)
+        self.assertTrue('26.0' in mock_module.user_submissions)
 
     def test_gethint_unparsable(self):
         """
@@ -359,10 +321,13 @@ class CrowdsourceHinterTest(unittest.TestCase):
         """
         mock_module = CHModuleFactory.create()
         old_answers = copy.deepcopy(mock_module.previous_answers)
+        old_user_submissions = copy.deepcopy(mock_module.user_submissions)
         json_in = {'problem1': 'fish'}
         out = mock_module.get_hint(json_in)
         self.assertTrue(out is None)
         self.assertTrue(mock_module.previous_answers == old_answers)
+        self.assertTrue(mock_module.user_submissions == old_user_submissions)
+
 
     def test_gethint_1hint(self):
         """
@@ -372,7 +337,11 @@ class CrowdsourceHinterTest(unittest.TestCase):
         mock_module = CHModuleFactory.create()
         json_in = {'problem_name': '25.0'}
         out = mock_module.get_hint(json_in)
-        self.assertTrue(out['best_hint'] == 'Really popular hint')
+        self.assertTrue('Really popular hint' in out['hints'])
+        # Also make sure that the input gets added to user_submissions,
+        # and that the hint is logged in previous_answers.
+        self.assertTrue('25.0' in mock_module.user_submissions)
+        self.assertTrue(['25.0', ['1']] in mock_module.previous_answers)
 
     def test_gethint_manyhints(self):
         """
@@ -385,9 +354,8 @@ class CrowdsourceHinterTest(unittest.TestCase):
         mock_module = CHModuleFactory.create()
         json_in = {'problem_name': '24.0'}
         out = mock_module.get_hint(json_in)
-        self.assertTrue(out['best_hint'] == 'Best hint')
-        self.assertTrue('rand_hint_1' in out)
-        self.assertTrue('rand_hint_2' in out)
+        self.assertTrue('Best hint' in out['hints'])
+        self.assertTrue(len(out['hints']) == 3)
 
     def test_getfeedback_0wronganswers(self):
         """
@@ -527,8 +495,7 @@ class CrowdsourceHinterTest(unittest.TestCase):
         # Make a hint request.
         json_in = {'problem name': '25.0'}
         out = mock_module.get_hint(json_in)
-        self.assertTrue((out['best_hint'] == 'This is a new hint.')
-                        or (out['rand_hint_1'] == 'This is a new hint.'))
+        self.assertTrue('This is a new hint.' in out['hints'])
 
     def test_submithint_moderate(self):
         """
