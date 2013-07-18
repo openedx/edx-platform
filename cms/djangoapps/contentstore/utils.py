@@ -9,23 +9,24 @@ import copy
 import logging
 import re
 from xmodule.modulestore.draft import DIRECT_ONLY_CATEGORIES
+from django.utils.translation import ugettext as _
 
 log = logging.getLogger(__name__)
 
 # In order to instantiate an open ended tab automatically, need to have this data
-OPEN_ENDED_PANEL = {"name": "Open Ended Panel", "type": "open_ended"}
-NOTES_PANEL = {"name": "My Notes", "type": "notes"}
+OPEN_ENDED_PANEL = {"name": _("Open Ended Panel"), "type": "open_ended"}
+NOTES_PANEL = {"name": _("My Notes"), "type": "notes"}
 EXTRA_TAB_PANELS = dict([(p['type'], p) for p in [OPEN_ENDED_PANEL, NOTES_PANEL]])
 
 
-def get_modulestore(location):
+def get_modulestore(category_or_location):
     """
     Returns the correct modulestore to use for modifying the specified location
     """
-    if not isinstance(location, Location):
-        location = Location(location)
+    if isinstance(category_or_location, Location):
+        category_or_location = category_or_location.category
 
-    if location.category in DIRECT_ONLY_CATEGORIES:
+    if category_or_location in DIRECT_ONLY_CATEGORIES:
         return modulestore('direct')
     else:
         return modulestore()

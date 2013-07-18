@@ -19,6 +19,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 from models.settings.course_metadata import CourseMetadata
 from xmodule.modulestore.xml_importer import import_from_xml
+from xmodule.modulestore.django import modulestore
 from xmodule.fields import Date
 
 from .utils import CourseTestCase
@@ -36,7 +37,6 @@ class CourseDetailsTestCase(CourseTestCase):
         self.assertIsNone(details.enrollment_start, "enrollment_start date somehow initialized " + str(details.enrollment_start))
         self.assertIsNone(details.enrollment_end, "enrollment_end date somehow initialized " + str(details.enrollment_end))
         self.assertIsNone(details.syllabus, "syllabus somehow initialized" + str(details.syllabus))
-        self.assertEqual(details.overview, "", "overview somehow initialized" + details.overview)
         self.assertIsNone(details.intro_video, "intro_video somehow initialized" + str(details.intro_video))
         self.assertIsNone(details.effort, "effort somehow initialized" + str(details.effort))
 
@@ -49,7 +49,6 @@ class CourseDetailsTestCase(CourseTestCase):
         self.assertIsNone(jsondetails['enrollment_start'], "enrollment_start date somehow initialized ")
         self.assertIsNone(jsondetails['enrollment_end'], "enrollment_end date somehow initialized ")
         self.assertIsNone(jsondetails['syllabus'], "syllabus somehow initialized")
-        self.assertEqual(jsondetails['overview'], "", "overview somehow initialized")
         self.assertIsNone(jsondetails['intro_video'], "intro_video somehow initialized")
         self.assertIsNone(jsondetails['effort'], "effort somehow initialized")
 
@@ -352,7 +351,7 @@ class CourseMetadataEditingTest(CourseTestCase):
         self.assertEqual(test_model['display_name'], 'Robot Super Course', "not expected value")
         self.assertIn('rerandomize', test_model, 'Missing rerandomize metadata field')
         # check for deletion effectiveness
-        self.assertEqual('closed', test_model['showanswer'], 'showanswer field still in')
+        self.assertEqual('finished', test_model['showanswer'], 'showanswer field still in')
         self.assertEqual(None, test_model['xqa_key'], 'xqa_key field still in')
 
 

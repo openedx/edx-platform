@@ -59,7 +59,14 @@ chown vagrant.vagrant ~vagrant/.ssh/known_hosts
 
 # Node modules require a filesystem with symlinks (Windows support)
 mkdir -p /opt/edx/node_modules /opt/edx/edx-platform/node_modules
-mount -o bind /opt/edx/node_modules /opt/edx/edx-platform/node_modules
+([[ -f /etc/fstab ]] && grep '/opt/edx/node_modules' /etc/fstab) || {
+    echo '/opt/edx/node_modules /opt/edx/edx-platform/node_modules none bind,noauto 0 0' >> /etc/fstab
+    mount /opt/edx/node_modules
+}
+# Must be mounted *after* the NFS mount, made manually by Vagrant
+([[ -f /etc/cron.d/nodemodules ]] && grep '/opt/edx/node_modules' /etc/cron.d/nodemodules) || {
+    echo '@reboot root until [ -n "`mount |grep "/opt/edx/edx-platform type"`" ]; do sleep 1; done; mount /opt/edx/node_modules' > /etc/cron.d/nodemodules
+}
 
 # Force rechecking all prerequisites (could have been fetched outside of the VM)
 rm -rf /opt/edx/edx-platform/.prereqs_cache

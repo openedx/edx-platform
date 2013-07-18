@@ -7,8 +7,8 @@ from lxml import etree
 from collections import namedtuple
 from pkg_resources import resource_listdir, resource_string, resource_isdir
 
-from xmodule.modulestore import Location
-from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore import inheritance, Location
+from xmodule.modulestore.exceptions import ItemNotFoundError, InsufficientSpecificationError
 
 from xblock.core import XBlock, Scope, String, Integer, Float, ModelType
 
@@ -101,6 +101,8 @@ class XModuleFields(object):
         display_name="Display Name",
         help="This name appears in the horizontal navigation at the top of the page.",
         scope=Scope.settings,
+        # it'd be nice to have a useful default but it screws up other things; so,
+        # use display_name_with_default for those
         default=None
     )
 
@@ -112,6 +114,14 @@ class XModuleFields(object):
         help="This is the location id for the XModule.",
         scope=Scope.content,
         default=Location(None),
+    )
+    # Please note that in order to be compatible with XBlocks more generally,
+    # the LMS and CMS shouldn't be using this field. It's only for internal
+    # consumption by the XModules themselves
+    category = String(
+        display_name="xmodule category",
+        help="This is the category id for the XModule. It's for internal use only",
+        scope=Scope.content,
     )
 
 
@@ -148,8 +158,16 @@ class XModule(XModuleFields, HTMLSnippet, XBlock):
         self._model_data = model_data
         self.system = runtime
         self.descriptor = descriptor
-        self.url_name = self.location.name
-        self.category = self.location.category
+        # LMS tests don't require descriptor but really it's required
+        if descriptor:
+            self.url_name = descriptor.url_name
+            # don't need to set category as it will automatically get from descriptor
+        elif isinstance(self.location, Location):
+            self.url_name = self.location.name
+            if not hasattr(self, 'category'):
+                self.category = self.location.category
+        else:
+            raise InsufficientSpecificationError()
         self._loaded_children = None
 
     @property
@@ -290,35 +308,66 @@ Template = namedtuple("Template", "metadata data children")
 
 
 class ResourceTemplates(object):
+    """
+    Gets the templates associated w/ a containing cls. The cls must have a 'template_dir_name' attribute.
+    It finds the templates as directly in this directory under 'templates'.
+    """
     @classmethod
     def templates(cls):
         """
-        Returns a list of Template objects that describe possible templates that can be used
-        to create a module of this type.
-        If no templates are provided, there will be no way to create a module of
-        this type
+        Returns a list of dictionary field: value objects that describe possible templates that can be used
+        to seed a module of this type.
 
         Expects a class attribute template_dir_name that defines the directory
         inside the 'templates' resource directory to pull templates from
         """
         templates = []
-        dirname = os.path.join('templates', cls.template_dir_name)
-        if not resource_isdir(__name__, dirname):
-            log.warning("No resource directory {dir} found when loading {cls_name} templates".format(
-                dir=dirname,
-                cls_name=cls.__name__,
-            ))
-            return []
-
-        for template_file in resource_listdir(__name__, dirname):
-            if not template_file.endswith('.yaml'):
-                log.warning("Skipping unknown template file %s" % template_file)
-                continue
-            template_content = resource_string(__name__, os.path.join(dirname, template_file))
-            template = yaml.safe_load(template_content)
-            templates.append(Template(**template))
+        dirname = cls.get_template_dir()
+        if dirname is not None:
+            for template_file in resource_listdir(__name__, dirname):
+                if not template_file.endswith('.yaml'):
+                    log.warning("Skipping unknown template file %s", template_file)
+                    continue
+                template_content = resource_string(__name__, os.path.join(dirname, template_file))
+                template = yaml.safe_load(template_content)
+                template['template_id'] = template_file
+                templates.append(template)
 
         return templates
+
+    @classmethod
+    def get_template_dir(cls):
+        if getattr(cls, 'template_dir_name', None):
+            dirname = os.path.join('templates', getattr(cls, 'template_dir_name'))
+            if not resource_isdir(__name__, dirname):
+                log.warning("No resource directory {dir} found when loading {cls_name} templates".format(
+                    dir=dirname,
+                    cls_name=cls.__name__,
+                ))
+                return None
+            else:
+                return dirname
+        else:
+            return None
+
+    @classmethod
+    def get_template(cls, template_id):
+        """
+        Get a single template by the given id (which is the file name identifying it w/in the class's
+        template_dir_name)
+
+        """
+        dirname = cls.get_template_dir()
+        if dirname is not None:
+            try:
+                template_content = resource_string(__name__, os.path.join(dirname, template_id))
+            except IOError:
+                return None
+            template = yaml.safe_load(template_content)
+            template['template_id'] = template_id
+            return template
+        else:
+            return None
 
 
 class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
@@ -345,9 +394,6 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
     # A list of descriptor attributes that must be equal for the descriptors to
     # be equal
     equality_attributes = ('_model_data', 'location')
-
-    # Name of resource directory to load templates from
-    template_dir_name = "default"
 
     # Class level variable
 
@@ -386,8 +432,12 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         """
         super(XModuleDescriptor, self).__init__(*args, **kwargs)
         self.system = self.runtime
-        self.url_name = self.location.name
-        self.category = self.location.category
+        if isinstance(self.location, Location):
+            self.url_name = self.location.name
+            if not hasattr(self, 'category'):
+                self.category = self.location.category
+        else:
+            raise InsufficientSpecificationError()
         self._child_instances = None
 
     @property
@@ -419,11 +469,14 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         if self._child_instances is None:
             self._child_instances = []
             for child_loc in self.children:
-                try:
-                    child = self.system.load_item(child_loc)
-                except ItemNotFoundError:
-                    log.exception('Unable to load item {loc}, skipping'.format(loc=child_loc))
-                    continue
+                if isinstance(child_loc, XModuleDescriptor):
+                    child = child_loc
+                else:
+                    try:
+                        child = self.system.load_item(child_loc)
+                    except ItemNotFoundError:
+                        log.exception('Unable to load item {loc}, skipping'.format(loc=child_loc))
+                        continue
                 self._child_instances.append(child)
 
         return self._child_instances
@@ -590,6 +643,13 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         defines a sample case for this module
         """
         return [('{}', '{}')]
+
+    @property
+    def xblock_kvs(self):
+        """
+        Use w/ caution. Really intended for use by the persistence layer.
+        """
+        return self._model_data._kvs
 
     # =============================== BUILTIN METHODS ==========================
     def __eq__(self, other):

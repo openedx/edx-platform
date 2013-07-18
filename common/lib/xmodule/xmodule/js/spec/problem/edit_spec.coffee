@@ -11,13 +11,13 @@ describe 'MarkdownEditingDescriptor', ->
       @descriptor = new MarkdownEditingDescriptor($('.problem-editor'))
       @descriptor.createXMLEditor('replace with markdown')
       saveResult = @descriptor.save()
-      expect(saveResult.metadata.markdown).toEqual(null)
+      expect(saveResult.nullout).toEqual(['markdown'])
       expect(saveResult.data).toEqual('replace with markdown')
     it 'saves xml from the xml editor', ->
       loadFixtures 'problem-without-markdown.html'
       @descriptor = new MarkdownEditingDescriptor($('.problem-editor'))
       saveResult = @descriptor.save()
-      expect(saveResult.metadata.markdown).toEqual(null)
+      expect(saveResult.nullout).toEqual(['markdown'])
       expect(saveResult.data).toEqual('xml only')
 
   describe 'insertMultipleChoice', ->

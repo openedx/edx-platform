@@ -28,15 +28,27 @@ from xblock.core import Integer, Scope, String
 
 import datetime
 import time
+import textwrap
 
 log = logging.getLogger(__name__)
 
 
 class VideoAlphaFields(object):
     """Fields for `VideoAlphaModule` and `VideoAlphaDescriptor`."""
-    data = String(help="XML data for the problem", scope=Scope.content)
+    data = String(help="XML data for the problem",
+                  default=textwrap.dedent('''\
+                       <videoalpha show_captions="true" sub="name_of_file" youtube="0.75:JMD_ifUUfsU,1.0:OEoXaMPEzfM,1.25:AKqURZnYqpk,1.50:DYpADpL7jAY" >
+                           <source src="https://s3.amazonaws.com/edx-course-videos/edx-intro/edX-FA12-cware-1_100.mp4"/>
+                           <source src="https://s3.amazonaws.com/edx-course-videos/edx-intro/edX-FA12-cware-1_100.webm"/>
+                           <source src="https://s3.amazonaws.com/edx-course-videos/edx-intro/edX-FA12-cware-1_100.ogv"/>
+                       </videoalpha>'''),
+                  scope=Scope.content)
     position = Integer(help="Current position in the video", scope=Scope.user_state, default=0)
-    display_name = String(help="Display name for this module", scope=Scope.settings)
+    display_name = String(
+        display_name="Display Name", help="Display name for this module",
+        default="Video Alpha",
+        scope=Scope.settings
+    )
 
 
 class VideoAlphaModule(VideoAlphaFields, XModule):
@@ -167,4 +179,3 @@ class VideoAlphaModule(VideoAlphaFields, XModule):
 class VideoAlphaDescriptor(VideoAlphaFields, RawDescriptor):
     """Descriptor for `VideoAlphaModule`."""
     module_class = VideoAlphaModule
-    template_dir_name = "videoalpha"

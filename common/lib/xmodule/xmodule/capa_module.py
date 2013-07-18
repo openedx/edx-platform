@@ -77,6 +77,14 @@ class CapaFields(object):
     """
     Define the possible fields for a Capa problem
     """
+    display_name = String(
+        display_name="Display Name",
+        help="This name appears in the horizontal navigation at the top of the page.",
+        scope=Scope.settings,
+        # it'd be nice to have a useful default but it screws up other things; so,
+        # use display_name_with_default for those
+        default="Blank Advanced Problem"
+    )
     attempts = Integer(help="Number of attempts taken by the student on this problem",
                        default=0, scope=Scope.user_state)
     max_attempts = Integer(
@@ -94,7 +102,8 @@ class CapaFields(object):
         display_name="Show Answer",
         help=("Defines when to show the answer to the problem. "
               "A default value can be set in Advanced Settings."),
-        scope=Scope.settings, default="closed",
+        scope=Scope.settings,
+        default="finished",
         values=[
             {"display_name": "Always", "value": "always"},
             {"display_name": "Answered", "value": "answered"},
@@ -106,21 +115,24 @@ class CapaFields(object):
     )
     force_save_button = Boolean(
         help="Whether to force the save button to appear on the page",
-        scope=Scope.settings, default=False
+        scope=Scope.settings,
+        default=False
     )
     rerandomize = Randomization(
         display_name="Randomization",
         help="Defines how often inputs are randomized when a student loads the problem. "
-        "This setting only applies to problems that can have randomly generated numeric values. "
-        "A default value can be set in Advanced Settings.",
-        default="always", scope=Scope.settings, values=[
+             "This setting only applies to problems that can have randomly generated numeric values. "
+             "A default value can be set in Advanced Settings.",
+        default="never",
+        scope=Scope.settings,
+        values=[
             {"display_name": "Always", "value": "always"},
             {"display_name": "On Reset", "value": "onreset"},
             {"display_name": "Never", "value": "never"},
             {"display_name": "Per Student", "value": "per_student"}
         ]
     )
-    data = String(help="XML data for the problem", scope=Scope.content)
+    data = String(help="XML data for the problem", scope=Scope.content, default="<problem></problem>")
     correct_map = Dict(help="Dictionary with the correctness of current student answers",
                        scope=Scope.user_state, default={})
     input_state = Dict(help="Dictionary for maintaining the state of inputtypes", scope=Scope.user_state)
@@ -134,7 +146,7 @@ class CapaFields(object):
         values={"min": 0, "step": .1},
         scope=Scope.settings
     )
-    markdown = String(help="Markdown source of this module", scope=Scope.settings)
+    markdown = String(help="Markdown source of this module", default=None, scope=Scope.settings)
     source_code = String(
         help="Source code for LaTeX and Word problems. This feature is not well-supported.",
         scope=Scope.settings
@@ -541,6 +553,16 @@ class CapaModule(CapaFields, XModule):
             'ungraded_response': self.handle_ungraded_response
         }
 
+        generic_error_message = (
+            "We're sorry, there was an error with processing your request. "
+            "Please try reloading your page and trying again."
+        )
+
+        not_found_error_message = (
+            "The state of this problem has changed since you loaded this page. "
+            "Please refresh your page."
+        )
+
         if dispatch not in handlers:
             return 'Error'
 
@@ -548,9 +570,14 @@ class CapaModule(CapaFields, XModule):
 
         try:
             result = handlers[dispatch](data)
+
+        except NotFoundError as err:
+            _, _, traceback_obj = sys.exc_info()
+            raise ProcessingError, (not_found_error_message, err), traceback_obj
+
         except Exception as err:
             _, _, traceback_obj = sys.exc_info()
-            raise ProcessingError(err.message, traceback_obj)
+            raise ProcessingError, (generic_error_message, err), traceback_obj
 
         after = self.get_progress()
 
@@ -1100,6 +1127,19 @@ class CapaDescriptor(CapaFields, RawDescriptor):
             'problems/' + path[8:],
             path[8:],
         ]
+
+    @classmethod
+    def from_xml(cls, xml_data, system, org=None, course=None):
+        """
+        Augment regular translation w/ setting the pre-Studio defaults.
+        """
+        problem = super(CapaDescriptor, cls).from_xml(xml_data, system, org, course)
+        # pylint: disable=W0212
+        if 'showanswer' not in problem._model_data:
+            problem.showanswer = "closed"
+        if 'rerandomize' not in problem._model_data:
+            problem.rerandomize = "always"
+        return problem
 
     @property
     def non_editable_metadata_fields(self):
