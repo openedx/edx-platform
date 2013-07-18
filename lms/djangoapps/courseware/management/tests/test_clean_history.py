@@ -313,6 +313,30 @@ class HistoryCleanerWitDbTest(HistoryCleanerTest):
             (56, "2013-07-13 16:30:00.000", 11),    # keep
         ])
 
+    def test_a_bunch_of_rows_with_timestamp_ties(self):
+        # Sometimes rows are written with identical timestamps.  The one with
+        # the greater id is the winner in that case.
+        smhc = SmhcSayStubbed()
+        self.write_history([
+            (21, "2013-07-13 16:30:01.100", 11),
+            (24, "2013-07-13 16:30:01.100", 11),    # keep
+            (22, "2013-07-13 16:30:01.100", 11),
+            (23, "2013-07-13 16:30:01.100", 11),
+            (27, "2013-07-13 16:30:02.500", 11),
+            (30, "2013-07-13 16:30:01.350", 22),    # other student_module_id!
+            (32, "2013-07-13 16:30:59.000", 11),    # keep
+            (50, "2013-07-13 16:30:02.500", 11),    # keep
+        ])
+
+        smhc.clean_one_student_module(11)
+        self.assert_said(smhc, "Deleting 4 rows of 7 for student_module_id 11")
+        self.assert_history([
+            (24, "2013-07-13 16:30:01.100", 11),    # keep
+            (30, "2013-07-13 16:30:01.350", 22),    # other student_module_id!
+            (32, "2013-07-13 16:30:59.000", 11),    # keep
+            (50, "2013-07-13 16:30:02.500", 11),    # keep
+        ])
+
     def test_get_last_student_module(self):
         # Can we find the last student_module_id properly?
         smhc = SmhcSayStubbed()

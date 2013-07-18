@@ -180,7 +180,7 @@ class StudentModuleHistoryCleaner(object):
         cursor.execute("""
             SELECT id, created FROM courseware_studentmodulehistory
             WHERE student_module_id = %s
-            ORDER BY created
+            ORDER BY created, id
             """,
             [student_module_id]
         )
