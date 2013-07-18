@@ -101,14 +101,14 @@ class CombinedOpenEndedV1Module():
 
         # Allow reset is true if student has failed the criteria to move to the next child task
         self.ready_to_reset = instance_state.get('ready_to_reset', False)
-        self.max_attempts = self.instance_state.get('max_attempts', MAX_ATTEMPTS)
-        self.is_scored = self.instance_state.get('graded', IS_SCORED) in TRUE_DICT
-        self.accept_file_upload = self.instance_state.get('accept_file_upload', ACCEPT_FILE_UPLOAD) in TRUE_DICT
-        self.skip_basic_checks = self.instance_state.get('skip_spelling_checks', SKIP_BASIC_CHECKS) in TRUE_DICT
+        self.max_attempts = instance_state.get('max_attempts', MAX_ATTEMPTS)
+        self.is_scored = instance_state.get('graded', IS_SCORED) in TRUE_DICT
+        self.accept_file_upload = instance_state.get('accept_file_upload', ACCEPT_FILE_UPLOAD) in TRUE_DICT
+        self.skip_basic_checks = instance_state.get('skip_spelling_checks', SKIP_BASIC_CHECKS) in TRUE_DICT
 
-        due_date = self.instance_state.get('due', None)
+        due_date = instance_state.get('due', None)
 
-        grace_period_string = self.instance_state.get('graceperiod', None)
+        grace_period_string = instance_state.get('graceperiod', None)
         try:
             self.timeinfo = TimeInfo(due_date, grace_period_string)
         except Exception:
@@ -613,8 +613,9 @@ class CombinedOpenEndedV1Module():
             if not self.ready_to_reset:
                 return self.out_of_sync_error(data)
 
-        self.student_attempts +=1
-        if self.student_attempts >= self.max_attempts:
+        if self.student_attempts >= self.max_attempts-1:
+            if self.student_attempts==self.max_attempts-1:
+                self.student_attempts +=1
             return {
                 'success': False,
                 # This is a student_facing_error
@@ -623,6 +624,7 @@ class CombinedOpenEndedV1Module():
                     'You are only allowed to attempt it {1} times.'
                 ).format(self.student_attempts, self.max_attempts)
             }
+        self.student_attempts +=1
         self.state = self.INITIAL
         self.ready_to_reset = False
         for i in xrange(0, len(self.task_xml)):
