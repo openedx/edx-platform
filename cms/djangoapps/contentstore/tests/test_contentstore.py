@@ -816,12 +816,9 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         self.assertGreater(len(verticals), 0)
 
-        new_component_location = Location('i4x', 'edX', 'toy', 'video', 'new_component')
-        source_template_location = Location('i4x', 'edx', 'templates', 'video', 'default')
-
-        module_store.clone_item(source_template_location, new_component_location)
         parent = verticals[0]
-        module_store.update_children(parent.location, parent.children + [new_component_location.url()])
+
+        ItemFactory.create(parent_location=parent.location, category="video", display_name="untitled")
 
         root_dir = path(mkdtemp_clean())
 

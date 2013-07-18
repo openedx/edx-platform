@@ -497,7 +497,7 @@ mkdir -p "$BASE/data"
 
 rake django-admin[syncdb,lms,dev,--noinput]
 rake django-admin[migrate]
-rake cms:update_templates
+
 # Configure Git
 
 output "Fixing your git default settings"
