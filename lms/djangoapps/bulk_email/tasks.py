@@ -89,8 +89,6 @@ def course_email(hash_for_msg, to_list, course_title, course_url, throttle=False
 
     course_title_no_quotes = re.sub(r'"', '', course_title)
     from_addr = '"%s" Course Staff <%s>' % (course_title_no_quotes, settings.DEFAULT_BULK_FROM_EMAIL)
-    
-    #TODO generate course-specific from address
 
     if err_from_stderr:
         log.info(err_from_stderr)
@@ -136,8 +134,12 @@ def course_email(hash_for_msg, to_list, course_title, course_url, throttle=False
             to_list.pop()
 
         connection.close()
-        return "Sent %d, Fail %d" % (num_sent, num_error)
+        return course_email_result(num_sent, num_error)
 
     except (SMTPDataError, SMTPConnectError, SMTPServerDisconnected) as exc:
         #error caught here cause the email to be retried.  The entire task is actually retried without popping the list
         raise course_email.retry(arg=[hash_for_msg, to_list, course_title, course_url, current_task.request.retries>0], exc=exc, countdown=(2 ** current_task.request.retries)*15)
+
+#This string format code is wrapped in this function to allow mocking for a unit test
+def course_email_result(num_sent, num_error):
+    return "Sent %d, Fail %d" % (num_sent, num_error)

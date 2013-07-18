@@ -52,6 +52,8 @@ class FakeSMTPServer(smtpd.SMTPServer):
 
     def process_message(self, *args, **kwargs):
         if self.errtype == "DATA":
+            #after failing on the first email, succeed on rest
+            self.errtype = None
             return self.reply
         else:
             return None
