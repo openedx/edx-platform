@@ -104,7 +104,7 @@ class ViewsTestCase(TestCase):
 
     def test_no_end_on_about_page(self):
         # Toy course has no course end date or about/end_date blob
-        self.verify_end_date(self.course_id)
+        self.verify_end_date('edX/toy/TT_2012_Fall')
 
     def test_no_end_about_blob(self):
         # test_end has a course end date, no end_date HTML blob

@@ -5,12 +5,10 @@ from __future__ import absolute_import
 
 from lettuce import world, step
 from nose.tools import assert_equals, assert_in
-from lettuce.django import django_url
 from django.contrib.auth.models import User
 from student.models import CourseEnrollment
 from xmodule.modulestore import Location
-from xmodule.modulestore.django import _MODULESTORES, modulestore
-from xmodule.templates import update_templates
+from xmodule.modulestore.django import modulestore
 from xmodule.course_module import CourseDescriptor
 from courseware.courses import get_course_by_id
 from xmodule import seq_module, vertical_module
@@ -18,13 +16,9 @@ from xmodule import seq_module, vertical_module
 from logging import getLogger
 logger = getLogger(__name__)
 
-TEST_COURSE_ORG = 'edx'
-TEST_COURSE_NAME = 'Test Course'
-TEST_SECTION_NAME = 'Test Section'
-
 
 @step(u'The course "([^"]*)" exists$')
-def create_course(step, course):
+def create_course(_step, course):
 
     # First clear the modulestore so we don't try to recreate
     # the same course twice
@@ -34,17 +28,18 @@ def create_course(step, course):
     # Create the course
     # We always use the same org and display name,
     # but vary the course identifier (e.g. 600x or 191x)
-    course = world.CourseFactory.create(org=TEST_COURSE_ORG,
+    world.scenario_dict['COURSE'] = world.CourseFactory.create(org='edx',
                                         number=course,
-                                        display_name=TEST_COURSE_NAME)
+                                        display_name='Test Course')
 
     # Add a section to the course to contain problems
-    section = world.ItemFactory.create(parent_location=course.location,
-                                       display_name=TEST_SECTION_NAME)
+    world.scenario_dict['SECTION'] = world.ItemFactory.create(parent_location=world.scenario_dict['COURSE'].location,
+                                       display_name='Test Section')
 
-    problem_section = world.ItemFactory.create(parent_location=section.location,
-                                               template='i4x://edx/templates/sequential/Empty',
-                                               display_name=TEST_SECTION_NAME)
+    world.ItemFactory.create(
+        parent_location=world.scenario_dict['SECTION'].location,
+        category='sequential',
+        display_name='Test Section')
 
 
 @step(u'I am registered for the course "([^"]*)"$')
@@ -53,7 +48,7 @@ def i_am_registered_for_the_course(step, course):
     create_course(step, course)
 
     # Create the user
-    world.create_user('robot')
+    world.create_user('robot', 'test')
     u = User.objects.get(username='robot')
 
     # If the user is not already enrolled, enroll the user.
@@ -64,31 +59,32 @@ def i_am_registered_for_the_course(step, course):
 
 
 @step(u'The course "([^"]*)" has extra tab "([^"]*)"$')
-def add_tab_to_course(step, course, extra_tab_name):
-    section_item = world.ItemFactory.create(parent_location=course_location(course),
-                                            template="i4x://edx/templates/static_tab/Empty",
-                                            display_name=str(extra_tab_name))
+def add_tab_to_course(_step, course, extra_tab_name):
+    world.ItemFactory.create(
+        parent_location=course_location(course),
+        category="static_tab",
+        display_name=str(extra_tab_name))
 
 
 def course_id(course_num):
-    return "%s/%s/%s" % (TEST_COURSE_ORG, course_num,
-                         TEST_COURSE_NAME.replace(" ", "_"))
+    return "%s/%s/%s" % (world.scenario_dict['COURSE'].org, course_num,
+                         world.scenario_dict['COURSE'].display_name.replace(" ", "_"))
 
 
 def course_location(course_num):
     return Location(loc_or_tag="i4x",
-                    org=TEST_COURSE_ORG,
+                    org=world.scenario_dict['COURSE'].org,
                     course=course_num,
                     category='course',
-                    name=TEST_COURSE_NAME.replace(" ", "_"))
+                    name=world.scenario_dict['COURSE'].display_name.replace(" ", "_"))
 
 
 def section_location(course_num):
     return Location(loc_or_tag="i4x",
-                    org=TEST_COURSE_ORG,
+                    org=world.scenario_dict['COURSE'].org,
                     course=course_num,
                     category='sequential',
-                    name=TEST_SECTION_NAME.replace(" ", "_"))
+                    name=world.scenario_dict['SECTION'].display_name.replace(" ", "_"))
 
 
 def get_courses():

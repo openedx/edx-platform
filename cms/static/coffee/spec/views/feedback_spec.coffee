@@ -37,6 +37,10 @@ describe "CMS.Views.SystemFeedback", ->
         @renderSpy = spyOn(CMS.Views.Alert.Confirmation.prototype, 'render').andCallThrough()
         @showSpy = spyOn(CMS.Views.Alert.Confirmation.prototype, 'show').andCallThrough()
         @hideSpy = spyOn(CMS.Views.Alert.Confirmation.prototype, 'hide').andCallThrough()
+        @clock = sinon.useFakeTimers()
+
+    afterEach ->
+        @clock.restore()
 
     it "requires a type and an intent", ->
         neither = =>
@@ -80,8 +84,8 @@ describe "CMS.Views.SystemFeedback", ->
     it "close button sends a .hide() message", ->
         view = new CMS.Views.Alert.Confirmation(@options).show()
         view.$(".action-close").click()
-
         expect(@hideSpy).toHaveBeenCalled()
+        @clock.tick(900)
         expect(view.$('.wrapper')).toBeHiding()
 
 describe "CMS.Views.Prompt", ->
@@ -98,9 +102,9 @@ describe "CMS.Views.Prompt", ->
         view.hide()
         # expect($("body")).not.toHaveClass("prompt-is-shown")
 
-describe "CMS.Views.Notification.Saving", ->
+describe "CMS.Views.Notification.Mini", ->
     beforeEach ->
-        @view = new CMS.Views.Notification.Saving()
+        @view = new CMS.Views.Notification.Mini()
 
     it "should have minShown set to 1250 by default", ->
         expect(@view.options.minShown).toEqual(1250)

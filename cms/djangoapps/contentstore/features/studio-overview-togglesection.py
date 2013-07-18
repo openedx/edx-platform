@@ -22,7 +22,7 @@ def have_a_course_with_1_section(step):
     section = world.ItemFactory.create(parent_location=course.location)
     subsection1 = world.ItemFactory.create(
         parent_location=section.location,
-        template='i4x://edx/templates/sequential/Empty',
+        category='sequential',
         display_name='Subsection One',)
 
 
@@ -33,18 +33,18 @@ def have_a_course_with_two_sections(step):
     section = world.ItemFactory.create(parent_location=course.location)
     subsection1 = world.ItemFactory.create(
         parent_location=section.location,
-        template='i4x://edx/templates/sequential/Empty',
+        category='sequential',
         display_name='Subsection One',)
     section2 = world.ItemFactory.create(
         parent_location=course.location,
         display_name='Section Two',)
     subsection2 = world.ItemFactory.create(
         parent_location=section2.location,
-        template='i4x://edx/templates/sequential/Empty',
+        category='sequential',
         display_name='Subsection Alpha',)
     subsection3 = world.ItemFactory.create(
         parent_location=section2.location,
-        template='i4x://edx/templates/sequential/Empty',
+        category='sequential',
         display_name='Subsection Beta',)
 
 
@@ -92,7 +92,7 @@ def i_expand_a_section(step):
 def i_see_the_span_with_text(step, text):
     span_locator = '.toggle-button-sections span'
     assert_true(world.is_css_present(span_locator))
-    assert_equal(world.css_find(span_locator).value, text)
+    assert_equal(world.css_value(span_locator), text)
     assert_true(world.css_visible(span_locator))
 
 
@@ -108,13 +108,13 @@ def i_do_not_see_the_span_with_text(step, text):
 def all_sections_are_expanded(step):
     subsection_locator = 'div.subsection-list'
     subsections = world.css_find(subsection_locator)
-    for s in subsections:
-        assert_true(s.visible)
+    for index in range(len(subsections)):
+        assert_true(world.css_visible(subsection_locator, index=index))
 
 
 @step(u'all sections are collapsed$')
 def all_sections_are_collapsed(step):
     subsection_locator = 'div.subsection-list'
     subsections = world.css_find(subsection_locator)
-    for s in subsections:
-        assert_false(s.visible)
+    for index in range(len(subsections)):
+        assert_false(world.css_visible(subsection_locator, index=index))

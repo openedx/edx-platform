@@ -157,8 +157,7 @@ Write a persuasive essay to a newspaper reflecting your vies on censorship in li
     else
       {
       data: @xml_editor.getValue()
-      metadata:
-        markdown: null
+      nullout: ['markdown']
       }
 
   @insertRubric: (selectedText) ->

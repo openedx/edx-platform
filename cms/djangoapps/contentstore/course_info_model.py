@@ -20,8 +20,8 @@ def get_course_updates(location):
     try:
         course_updates = modulestore('direct').get_item(location)
     except ItemNotFoundError:
-        template = Location(['i4x', 'edx', "templates", 'course_info', "Empty"])
-        course_updates = modulestore('direct').clone_item(template, Location(location))
+        modulestore('direct').create_and_save_xmodule(location)
+        course_updates = modulestore('direct').get_item(location)
 
     # current db rep: {"_id" : locationjson, "definition" : { "data" : "<ol>[<li><h2>date</h2>content</li>]</ol>"} "metadata" : ignored}
     location_base = course_updates.location.url()

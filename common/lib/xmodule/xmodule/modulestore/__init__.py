@@ -310,14 +310,7 @@ class ModuleStore(object):
         """
         raise NotImplementedError
 
-    def clone_item(self, source, location):
-        """
-        Clone a new item that is a copy of the item at the location `source`
-        and writes it to `location`
-        """
-        raise NotImplementedError
-
-    def update_item(self, location, data):
+    def update_item(self, location, data, allow_not_found=False):
         """
         Set the data in the item specified by the location to
         data

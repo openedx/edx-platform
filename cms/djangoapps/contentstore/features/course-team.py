@@ -2,7 +2,7 @@
 #pylint: disable=W0621
 
 from lettuce import world, step
-from common import create_studio_user, log_into_studio, _COURSE_NAME
+from common import create_studio_user, log_into_studio
 
 PASSWORD = 'test'
 EMAIL_EXTENSION = '@edx.org'
@@ -47,12 +47,12 @@ def other_user_login(_step, name):
 @step(u's?he does( not)? see the course on (his|her) page')
 def see_course(_step, doesnt_see_course, gender):
     class_css = 'span.class-name'
-    all_courses = world.css_find(class_css)
+    all_courses = world.css_find(class_css, wait_time=1)
     all_names = [item.html for item in all_courses]
     if doesnt_see_course:
-        assert not _COURSE_NAME in all_names
+        assert not world.scenario_dict['COURSE'].display_name in all_names
     else:
-        assert _COURSE_NAME in all_names
+        assert world.scenario_dict['COURSE'].display_name in all_names
 
 
 @step(u's?he cannot delete users')

@@ -36,6 +36,7 @@ class MakoMiddleware(object):
                                 module_directory=module_directory,
                                 output_encoding='utf-8',
                                 input_encoding='utf-8',
+                                default_filters=['decode.utf8'],
                                 encoding_errors='replace',
                                 )
 

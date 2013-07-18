@@ -26,16 +26,16 @@ CMS.Views.ShowTextbook = Backbone.View.extend({
         if(e && e.preventDefault) { e.preventDefault(); }
         var textbook = this.model, collection = this.model.collection;
         var msg = new CMS.Views.Prompt.Warning({
-            title: _.str.sprintf(gettext("Delete “%s”?"),
-                textbook.escape('name')),
+            title: _.template(gettext("Delete “<%= name %>”?"),
+                {name: textbook.escape('name')}),
             message: gettext("Deleting a textbook cannot be undone and once deleted any reference to it in your courseware's navigation will also be removed."),
             actions: {
                 primary: {
                     text: gettext("Delete"),
                     click: function(view) {
                         view.hide();
-                        var delmsg = new CMS.Views.Notification.Saving({
-                            title: gettext("Deleting&hellip;")
+                        var delmsg = new CMS.Views.Notification.Mini({
+                            title: gettext("Deleting") + "&hellip;"
                         }).show();
                         textbook.destroy({
                             complete: function() {
@@ -121,8 +121,8 @@ CMS.Views.EditTextbook = Backbone.View.extend({
         if(e && e.preventDefault) { e.preventDefault(); }
         this.setValues();
         if(!this.model.isValid()) { return; }
-        var saving = new CMS.Views.Notification.Saving({
-            title: gettext("Saving&hellip;")
+        var saving = new CMS.Views.Notification.Mini({
+            title: gettext("Saving") + "&hellip;"
         }).show();
         var that = this;
         this.model.save({}, {
@@ -241,8 +241,8 @@ CMS.Views.EditChapter = Backbone.View.extend({
             asset_path: this.$("input.chapter-asset-path").val()
         });
         var msg = new CMS.Models.FileUpload({
-            title: _.str.sprintf(gettext("Upload a new asset to %s"),
-                section.escape('name')),
+            title: _.template(gettext("Upload a new asset to “<%= name %>”"),
+                {name: section.escape('name')}),
             message: "Files must be in PDF format."
         });
         var view = new CMS.Views.UploadDialog({model: msg, chapter: this.model});
@@ -260,7 +260,7 @@ CMS.Views.UploadDialog = Backbone.View.extend({
         this.listenTo(this.model, "change", this.render);
     },
     render: function() {
-        var isValid = this.model.isValid()
+        var isValid = this.model.isValid();
         var selectedFile = this.model.get('selectedFile');
         var oldInput = this.$("input[type=file]").get(0);
         this.$el.html(this.template({

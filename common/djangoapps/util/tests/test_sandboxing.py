@@ -25,3 +25,10 @@ class SandboxingTest(TestCase):
         """
         self.assertTrue(can_execute_unsafe_code('edX/full/2012_Fall'))
         self.assertTrue(can_execute_unsafe_code('edX/full/2013_Spring'))
+
+    def test_courses_with_unsafe_code_default(self):
+        """
+        Test that the default setting for COURSES_WITH_UNSAFE_CODE is an empty setting, e.g. we don't use @override_settings in these tests
+        """
+        self.assertFalse(can_execute_unsafe_code('edX/full/2012_Fall'))
+        self.assertFalse(can_execute_unsafe_code('edX/full/2013_Spring'))

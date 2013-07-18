@@ -79,10 +79,10 @@ $(document).ready(function() {
     });
 
     // general link management - new window/tab
-    $('a[rel="external"]').attr('title', 'This link will open in a new browser window/tab').bind('click', linkNewWindow);
+    $('a[rel="external"]').attr('title', gettext('This link will open in a new browser window/tab')).bind('click', linkNewWindow);
 
     // general link management - lean modal window
-    $('a[rel="modal"]').attr('title', 'This link will open in a modal window').leanModal({
+    $('a[rel="modal"]').attr('title', gettext('This link will open in a modal window')).leanModal({
         overlay: 0.50,
         closeButton: '.action-modal-close'
     });
@@ -199,8 +199,10 @@ function toggleSections(e) {
     $section = $('.courseware-section');
     sectionCount = $section.length;
     $button = $(this);
-    $labelCollapsed = $('<i class="icon-arrow-up"></i> <span class="label">Collapse All Sections</span>');
-    $labelExpanded = $('<i class="icon-arrow-down"></i> <span class="label">Expand All Sections</span>');
+    $labelCollapsed = $('<i class="icon-arrow-up"></i> <span class="label">' +
+        gettext('Collapse All Sections') + '</span>');
+    $labelExpanded = $('<i class="icon-arrow-down"></i> <span class="label">' +
+        gettext('Expand All Sections') + '</span>');
 
     var buttonLabel = $button.hasClass('is-activated') ? $labelCollapsed : $labelExpanded;
     $button.toggleClass('is-activated').html(buttonLabel);
@@ -326,7 +328,7 @@ function saveSubsection() {
             $changedInput = null;
         },
         error: function() {
-            showToastMessage('There has been an error while saving your changes.');
+            showToastMessage(gettext('There has been an error while saving your changes.'));
         }
     });
 }
@@ -336,7 +338,7 @@ function createNewUnit(e) {
     e.preventDefault();
 
     var parent = $(this).data('parent');
-    var template = $(this).data('template');
+    var category = $(this).data('category');
 
     analytics.track('Created a Unit', {
         'course': course_location_analytics,
@@ -344,9 +346,9 @@ function createNewUnit(e) {
     });
 
 
-    $.post('/clone_item', {
+    $.post('/create_item', {
         'parent_location': parent,
-        'template': template,
+        'category': category,
         'display_name': 'New Unit'
     },
 
@@ -372,7 +374,7 @@ function deleteSection(e) {
 }
 
 function _deleteItem($el) {
-    if (!confirm('Are you sure you wish to delete this item. It cannot be reversed!')) return;
+    if (!confirm(gettext('Are you sure you wish to delete this item. It cannot be reversed!'))) return;
 
     var id = $el.data('id');
 
@@ -549,7 +551,7 @@ function saveNewSection(e) {
 
     var $saveButton = $(this).find('.new-section-name-save');
     var parent = $saveButton.data('parent');
-    var template = $saveButton.data('template');
+    var category = $saveButton.data('category');
     var display_name = $(this).find('.new-section-name').val();
 
     analytics.track('Created a Section', {
@@ -557,9 +559,9 @@ function saveNewSection(e) {
         'display_name': display_name
     });
 
-    $.post('/clone_item', {
+    $.post('/create_item', {
         'parent_location': parent,
-        'template': template,
+        'category': category,
         'display_name': display_name,
     },
 
@@ -593,13 +595,12 @@ function saveNewCourse(e) {
     e.preventDefault();
 
     var $newCourse = $(this).closest('.new-course');
-    var template = $(this).find('.new-course-save').data('template');
     var org = $newCourse.find('.new-course-org').val();
     var number = $newCourse.find('.new-course-number').val();
     var display_name = $newCourse.find('.new-course-name').val();
 
     if (org == '' || number == '' || display_name == '') {
-        alert('You must specify all fields in order to create a new course.');
+        alert(gettext('You must specify all fields in order to create a new course.'));
         return;
     }
 
@@ -610,7 +611,6 @@ function saveNewCourse(e) {
     });
 
     $.post('/create_new_course', {
-        'template': template,
         'org': org,
         'number': number,
         'display_name': display_name
@@ -644,7 +644,7 @@ function addNewSubsection(e) {
     var parent = $(this).parents("section.branch").data("id");
 
     $saveButton.data('parent', parent);
-    $saveButton.data('template', $(this).data('template'));
+    $saveButton.data('category', $(this).data('category'));
 
     $newSubsection.find('.new-subsection-form').bind('submit', saveNewSubsection);
     $cancelButton.bind('click', cancelNewSubsection);
@@ -657,7 +657,7 @@ function saveNewSubsection(e) {
     e.preventDefault();
 
     var parent = $(this).find('.new-subsection-name-save').data('parent');
-    var template = $(this).find('.new-subsection-name-save').data('template');
+    var category = $(this).find('.new-subsection-name-save').data('category');
     var display_name = $(this).find('.new-subsection-name-input').val();
 
     analytics.track('Created a Subsection', {
@@ -666,9 +666,9 @@ function saveNewSubsection(e) {
     });
 
 
-    $.post('/clone_item', {
+    $.post('/create_item', {
         'parent_location': parent,
-        'template': template,
+        'category': category,
         'display_name': display_name
     },
 
@@ -712,6 +712,10 @@ function saveSetSectionScheduleDate(e) {
         'start': start
     });
 
+    var saving = new CMS.Views.Notification.Mini({
+        title: gettext("Saving") + "&hellip;",
+    });
+    saving.show();
     // call into server to commit the new order
     $.ajax({
         url: "/save_item",
@@ -726,28 +730,17 @@ function saveSetSectionScheduleDate(e) {
         })
     }).success(function() {
         var $thisSection = $('.courseware-section[data-id="' + id + '"]');
-        var format = gettext('<strong>Will Release:</strong> %(date)s at %(time)s UTC');
-        var willReleaseAt = interpolate(format, {
-            'date': input_date,
-            'time': input_time
-        },
-        true);
-        $thisSection.find('.section-published-date').html(
-            '<span class="published-status">' + willReleaseAt + '</span>' +
-            '<a href="#" class="edit-button" ' +
-            '" data-date="' + input_date +
-            '" data-time="' + input_time +
-            '" data-id="' + id + '">' + gettext('Edit') + '</a>');
-        $thisSection.find('.section-published-date').animate({
-            'background-color': 'rgb(182,37,104)'
-        }, 300).animate({
-            'background-color': '#edf1f5'
-        }, 300).animate({
-            'background-color': 'rgb(182,37,104)'
-        }, 300).animate({
-            'background-color': '#edf1f5'
-        }, 300);
-
+        var html = _.template(
+            '<span class="published-status">' +
+                '<strong>' + gettext("Will Release: ") + '</strong>' +
+                gettext("<%= date %> at <%= time %> UTC") +
+            '</span>' +
+            '<a href="#" class="edit-button" data-date="<%= date %>" data-time="<%= time %>" data-id="<%= id %>">' +
+                gettext("Edit") +
+            '</a>',
+            {date: input_date, time: input_time, id: id});
+        $thisSection.find('.section-published-date').html(html);
         hideModal();
+        saving.hide();
     });
 }

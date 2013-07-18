@@ -5,7 +5,7 @@
 nav {
 
   ol, ul {
-    @extend .no-list;
+    @extend .cont-no-list;
   }
 
   .nav-item {

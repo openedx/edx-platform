@@ -1,3 +1,4 @@
+## -*- coding: utf-8 -*-
 <%namespace name='static' file='static_content.html'/>
 
 <!doctype html>
@@ -17,6 +18,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="path_prefix" content="${MITX_ROOT_URL}">
 
+    <script type="text/javascript" src="/jsi18n/"></script>
     <%static:css group='base-style'/>
     <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/markitup/skins/simple/style.css')}" />
     <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/markitup/sets/wiki/style.css')}" />
@@ -35,7 +37,6 @@
     </script>
 
     ## javascript
-    <script type="text/javascript" src="/jsi18n/"></script>
     <script type="text/javascript" src="${static.url('js/vendor/json2.js')}"></script>
     <script type="text/javascript" src="${static.url('js/vendor/underscore-min.js')}"></script>
     <script type="text/javascript" src="${static.url('js/vendor/underscore.string.min.js')}"></script>

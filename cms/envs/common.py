@@ -368,3 +368,5 @@ MKTG_URL_LINK_MAP = {
     'HONOR': 'honor',
     'PRIVACY': 'privacy_edx',
 }
+
+COURSES_WITH_UNSAFE_CODE = []

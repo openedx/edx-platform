@@ -404,14 +404,14 @@ fi
 # Create edX virtualenv and link it to repo
 # virtualenvwrapper automatically sources the activation script
 if [[ $systempkgs ]]; then
-    mkvirtualenv -q -a "$HOME/.virtualenvs" --system-site-packages edx-platform || {
+    mkvirtualenv -q -a "$WORKON_HOME" --system-site-packages edx-platform || {
       error "mkvirtualenv exited with a non-zero error"
       return 1
     }
 else
     # default behavior for virtualenv>1.7 is
     # --no-site-packages
-    mkvirtualenv -q -a "$HOME/.virtualenvs" edx-platform || {
+    mkvirtualenv -q -a "$WORKON_HOME" edx-platform || {
       error "mkvirtualenv exited with a non-zero error"
       return 1
     }
@@ -443,7 +443,7 @@ fi
 # building correct version of distribute from source
 DISTRIBUTE_VER="0.6.28"
 output "Building Distribute"
-SITE_PACKAGES="$HOME/.virtualenvs/edx-platform/lib/python2.7/site-packages"
+SITE_PACKAGES="$WORKON_HOME/edx-platform/lib/python2.7/site-packages"
 cd "$SITE_PACKAGES"
 curl -sSLO http://pypi.python.org/packages/source/d/distribute/distribute-${DISTRIBUTE_VER}.tar.gz
 tar -xzvf distribute-${DISTRIBUTE_VER}.tar.gz
@@ -497,7 +497,7 @@ mkdir -p "$BASE/data"
 
 rake django-admin[syncdb,lms,dev,--noinput]
 rake django-admin[migrate]
-rake cms:update_templates
+
 # Configure Git
 
 output "Fixing your git default settings"

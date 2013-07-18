@@ -156,11 +156,7 @@ class ImportTestCase(BaseCourseTestCase):
         child = descriptor.get_children()[0]
         self.assertEqual(child.lms.due, ImportTestCase.date.from_json(v))
         self.assertEqual(child._inheritable_metadata, child._inherited_metadata)
-        self.assertEqual(2, len(child._inherited_metadata))
-        self.assertLessEqual(
-            ImportTestCase.date.from_json(child._inherited_metadata['start']),
-            datetime.datetime.now(UTC())
-        )
+        self.assertEqual(1, len(child._inherited_metadata))
         self.assertEqual(v, child._inherited_metadata['due'])
 
         # Now export and check things
@@ -218,10 +214,8 @@ class ImportTestCase(BaseCourseTestCase):
         self.assertEqual(child.lms.due, None)
         # pylint: disable=W0212
         self.assertEqual(child._inheritable_metadata, child._inherited_metadata)
-        self.assertEqual(1, len(child._inherited_metadata))
-        # why do these tests look in the internal structure v just calling child.start?
         self.assertLessEqual(
-            ImportTestCase.date.from_json(child._inherited_metadata['start']),
+            child.lms.start,
             datetime.datetime.now(UTC())
         )
 
@@ -249,12 +243,7 @@ class ImportTestCase(BaseCourseTestCase):
         self.assertEqual(descriptor.lms.due, ImportTestCase.date.from_json(course_due))
         self.assertEqual(child.lms.due, ImportTestCase.date.from_json(child_due))
         # Test inherited metadata. Due does not appear here (because explicitly set on child).
-        self.assertEqual(1, len(child._inherited_metadata))
-        self.assertLessEqual(
-            ImportTestCase.date.from_json(child._inherited_metadata['start']),
-            datetime.datetime.now(UTC()))
-        # Test inheritable metadata. This has the course inheritable value for due.
-        self.assertEqual(2, len(child._inheritable_metadata))
+        self.assertEqual(1, len(child._inheritable_metadata))
         self.assertEqual(course_due, child._inheritable_metadata['due'])
 
     def test_is_pointer_tag(self):
@@ -358,7 +347,7 @@ class ImportTestCase(BaseCourseTestCase):
             print(err)
 
         chapters = course.get_children()
-        self.assertEquals(len(chapters), 2)
+        self.assertEquals(len(chapters), 5)
 
         ch2 = chapters[1]
         self.assertEquals(ch2.url_name, "secret:magic")

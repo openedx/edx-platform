@@ -19,6 +19,7 @@ from capa.tests.response_xml_factory import OptionResponseXMLFactory, \
     StringResponseXMLFactory, NumericalResponseXMLFactory, \
     FormulaResponseXMLFactory, CustomResponseXMLFactory, \
     CodeResponseXMLFactory
+from nose.tools import assert_true
 
 
 # Factories from capa.tests.response_xml_factory that we will use
@@ -272,9 +273,9 @@ def add_problem_to_course(course, problem_type, extraMeta=None):
     # Create a problem item using our generated XML
     # We set rerandomize=always in the metadata so that the "Reset" button
     # will appear.
-    template_name = "i4x://edx/templates/problem/Blank_Common_Problem"
-    world.ItemFactory.create(parent_location=section_location(course),
-                            template=template_name,
+    category_name = "problem"
+    return world.ItemFactory.create(parent_location=section_location(course),
+                            category=category_name,
                             display_name=str(problem_type),
                             data=problem_xml,
                             metadata=metadata)
@@ -312,14 +313,15 @@ def assert_checked(problem_type, choices):
 
     all_choices = ['choice_0', 'choice_1', 'choice_2', 'choice_3']
     for this_choice in all_choices:
-        element = world.css_find(inputfield(problem_type, choice=this_choice))
-
-        if this_choice in choices:
-            assert element.checked
-        else:
-            assert not element.checked
+        def check_problem():
+            element = world.css_find(inputfield(problem_type, choice=this_choice))
+            if this_choice in choices:
+                assert element.checked
+            else:
+                assert not element.checked
+        world.retry_on_exception(check_problem)
 
 
 def assert_textfield(problem_type, expected_text, input_num=1):
-    element = world.css_find(inputfield(problem_type, input_num=input_num))
-    assert element.value == expected_text
+    element_value = world.css_value(inputfield(problem_type, input_num=input_num))
+    assert element_value == expected_text

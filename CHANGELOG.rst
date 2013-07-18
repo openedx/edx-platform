@@ -43,10 +43,19 @@ history of background tasks for a given problem and student.
 Blades: Small UX fix on capa multiple-choice problems.  Make labels only
 as wide as the text to reduce accidental choice selections.
 
+Studio: 
+- use xblock field defaults to initialize all new instances' fields and
+only use templates as override samples.
+- create new instances via in memory create_xmodule and related methods rather
+than cloning a db record.
+- have an explicit method for making a draft copy as distinct from making a new module.
+
 Studio: Remove XML from the video component editor. All settings are
 moved to be edited as metadata.
 
 XModule: Only write out assets files if the contents have changed.
+
+Studio: Course settings are now saved explicitly.
 
 XModule: Don't delete generated xmodule asset files when compiling (for
 instance, when XModule provides a coffeescript file, don't delete

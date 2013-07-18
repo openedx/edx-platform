@@ -137,11 +137,11 @@ class EditableMetadataFieldsTest(unittest.TestCase):
             type='Float', options={'min': 0, 'step': .3}
         )
 
-
     # Start of helper methods
     def get_xml_editable_fields(self, model_data):
         system = get_test_system()
         system.render_template = Mock(return_value="<div>Test Template HTML</div>")
+        model_data['category'] = 'test'
         return XmlDescriptor(runtime=system, model_data=model_data).editable_metadata_fields
 
     def get_descriptor(self, model_data):
@@ -179,19 +179,19 @@ class TestSerialize(unittest.TestCase):
     def test_serialize(self):
         assert_equals('null', serialize_field(None))
         assert_equals('-2', serialize_field(-2))
-        assert_equals('"2"', serialize_field('2'))
+        assert_equals('2', serialize_field('2'))
         assert_equals('-3.41', serialize_field(-3.41))
-        assert_equals('"2.589"', serialize_field('2.589'))
+        assert_equals('2.589', serialize_field('2.589'))
         assert_equals('false', serialize_field(False))
-        assert_equals('"false"', serialize_field('false'))
-        assert_equals('"fAlse"', serialize_field('fAlse'))
-        assert_equals('"hat box"', serialize_field('hat box'))
-        assert_equals('{"bar": "hat", "frog": "green"}', serialize_field({'bar': 'hat', 'frog' : 'green'}))
+        assert_equals('false', serialize_field('false'))
+        assert_equals('fAlse', serialize_field('fAlse'))
+        assert_equals('hat box', serialize_field('hat box'))
+        assert_equals('{"bar": "hat", "frog": "green"}', serialize_field({'bar': 'hat', 'frog': 'green'}))
         assert_equals('[3.5, 5.6]', serialize_field([3.5, 5.6]))
         assert_equals('["foo", "bar"]', serialize_field(['foo', 'bar']))
-        assert_equals('"2012-12-31T23:59:59Z"', serialize_field("2012-12-31T23:59:59Z"))
-        assert_equals('"1 day 12 hours 59 minutes 59 seconds"',
-            serialize_field("1 day 12 hours 59 minutes 59 seconds"))
+        assert_equals('2012-12-31T23:59:59Z', serialize_field("2012-12-31T23:59:59Z"))
+        assert_equals('1 day 12 hours 59 minutes 59 seconds',
+                      serialize_field("1 day 12 hours 59 minutes 59 seconds"))
 
 
 class TestDeserialize(unittest.TestCase):
@@ -200,7 +200,6 @@ class TestDeserialize(unittest.TestCase):
         Asserts the result of deserialize_field.
         """
         assert_equals(expected, deserialize_field(self.test_field(), arg))
-
 
     def assertDeserializeNonString(self):
         """

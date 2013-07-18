@@ -17,7 +17,7 @@ urlpatterns = ('',  # nopep8
     url(r'^preview_component/(?P<location>.*?)$', 'contentstore.views.preview_component', name='preview_component'),
     url(r'^save_item$', 'contentstore.views.save_item', name='save_item'),
     url(r'^delete_item$', 'contentstore.views.delete_item', name='delete_item'),
-    url(r'^clone_item$', 'contentstore.views.clone_item', name='clone_item'),
+    url(r'^create_item$', 'contentstore.views.create_item', name='create_item'),
     url(r'^create_draft$', 'contentstore.views.create_draft', name='create_draft'),
     url(r'^publish_draft$', 'contentstore.views.publish_draft', name='publish_draft'),
     url(r'^unpublish_unit$', 'contentstore.views.unpublish_unit', name='unpublish_unit'),
@@ -72,8 +72,6 @@ urlpatterns = ('',  # nopep8
     url(r'^pages/(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)$',
         'contentstore.views.static_pages',
         name='static_pages'),
-    url(r'^edit_static/(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)$',
-        'contentstore.views.edit_static', name='edit_static'),
     url(r'^edit_tabs/(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)$',
         'contentstore.views.edit_tabs', name='edit_tabs'),
 

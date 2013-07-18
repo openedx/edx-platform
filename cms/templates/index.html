@@ -11,22 +11,22 @@
       <div class="item-details">
         <form class="course-info">
           <div class="row">
-            <label>Course Name</label>
+	    <label>${_("Course Name")}</label>
             <input type="text" class="new-course-name" />
           </div>
           <div class="row">
             <div class="column">
-              <label>Organization</label>
+	      <label>${_("Organization")}</label>
               <input type="text" class="new-course-org" />
             </div>
             <div class="column">
-              <label>Course Number</label>
+	      <label>${_("Course Number")}</label>
               <input type="text" class="new-course-number" />
             </div>
           </div>
           <div class="row">
-            <input type="submit" value="Save" class="new-course-save" data-template="${new_course_template}" />
-            <input type="button" value="Cancel" class="new-course-cancel" />
+            <input type="submit" value="${_('Save')}" class="new-course-save"/>
+            <input type="button" value="${_('Cancel')}" class="new-course-cancel" />
           </div>
         </form>
       </div>
@@ -76,7 +76,7 @@
             <a class="class-link" href="${url}" class="class-name">
               <span class="class-name">${course}</span>
             </a>
-            <a href="${lms_link}" rel="external" class="button view-button view-live-button">View Live</a>
+            <a href="${lms_link}" rel="external" class="button view-button view-live-button">${_("View Live")}</a>
           </li>
             %endfor
         </ul>

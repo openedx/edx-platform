@@ -8,7 +8,6 @@ from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 
 import xmodule.modulestore.django
-
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import Location
@@ -16,10 +15,11 @@ from xmodule.modulestore.xml_importer import import_from_xml
 from xmodule.modulestore.xml import XMLModuleStore
 
 from helpers import LoginEnrollmentTestCase
-from modulestore_config import TEST_DATA_DIR,\
-    TEST_DATA_XML_MODULESTORE,\
-    TEST_DATA_MONGO_MODULESTORE,\
+from modulestore_config import TEST_DATA_DIR, \
+    TEST_DATA_XML_MODULESTORE, \
+    TEST_DATA_MONGO_MODULESTORE, \
     TEST_DATA_DRAFT_MONGO_MODULESTORE
+import xmodule
 
 
 class ActivateLoginTest(LoginEnrollmentTestCase):
@@ -51,7 +51,7 @@ class PageLoaderTestCase(LoginEnrollmentTestCase):
         """
         Choose a page in the course randomly, and assert that it loads.
         """
-       # enroll in the course before trying to access pages
+        # enroll in the course before trying to access pages
         courses = module_store.get_courses()
         self.assertEqual(len(courses), 1)
         course = courses[0]
@@ -134,7 +134,7 @@ class TestCoursesLoadTestCase_XmlModulestore(PageLoaderTestCase):
     def setUp(self):
         super(TestCoursesLoadTestCase_XmlModulestore, self).setUp()
         self.setup_user()
-        xmodule.modulestore.django._MODULESTORES = {}
+        xmodule.modulestore.django._MODULESTORES.clear()
 
     def test_toy_course_loads(self):
         module_class = 'xmodule.hidden_module.HiddenDescriptor'
@@ -155,7 +155,7 @@ class TestCoursesLoadTestCase_MongoModulestore(PageLoaderTestCase):
     def setUp(self):
         super(TestCoursesLoadTestCase_MongoModulestore, self).setUp()
         self.setup_user()
-        xmodule.modulestore.django._MODULESTORES = {}
+        xmodule.modulestore.django._MODULESTORES.clear()
         modulestore().collection.drop()
 
     def test_toy_course_loads(self):
@@ -163,14 +163,13 @@ class TestCoursesLoadTestCase_MongoModulestore(PageLoaderTestCase):
         import_from_xml(module_store, TEST_DATA_DIR, ['toy'])
         self.check_random_page_loads(module_store)
 
-    def test_full_textbooks_loads(self):
+    def test_toy_textbooks_loads(self):
         module_store = modulestore()
-        import_from_xml(module_store, TEST_DATA_DIR, ['full'])
+        import_from_xml(module_store, TEST_DATA_DIR, ['toy'])
 
-        course = module_store.get_item(Location(['i4x', 'edX', 'full', 'course', '6.002_Spring_2012', None]))
+        course = module_store.get_item(Location(['i4x', 'edX', 'toy', 'course', '2012_Fall', None]))
 
         self.assertGreater(len(course.textbooks), 0)
-
 
 @override_settings(MODULESTORE=TEST_DATA_DRAFT_MONGO_MODULESTORE)
 class TestDraftModuleStore(TestCase):

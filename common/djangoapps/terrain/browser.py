@@ -89,6 +89,13 @@ def reset_data(scenario):
     """
     LOGGER.debug("Flushing the test database...")
     call_command('flush', interactive=False)
+    world.absorb({}, 'scenario_dict')
+
+
+@after.each_scenario
+def clear_data(scenario):
+    world.spew('scenario_dict')
+
 
 
 @after.each_scenario
