@@ -29,36 +29,124 @@ VERSION_TUPLES = {
 
 DEFAULT_VERSION = 1
 DEFAULT_DATA = textwrap.dedent("""\
-    <combinedopenended>
+<combinedopenended>
+    <prompt>
+        <h3>Censorship in the Libraries</h3>
+
+        <p>'All of us can think of a book that we hope none of our children or any other children have taken off the shelf. But if I have the right to remove that book from the shelf -- that work I abhor -- then you also have exactly the same right and so does everyone else. And then we have no books left on the shelf for any of us.' --Katherine Paterson, Author
+        </p>
+
+        <p>
+        Write a persuasive essay to a newspaper reflecting your vies on censorship in libraries. Do you believe that certain materials, such as books, music, movies, magazines, etc., should be removed from the shelves if they are found offensive? Support your position with convincing arguments from your own experience, observations, and/or reading.
+        </p>
+
+    </prompt>
+    <rubric>
         <rubric>
-            <rubric>
-                <category>
-                  <description>Category 1</description>
-                  <option>
-                      The response does not incorporate what is needed for a one response.
-                  </option>
-                  <option>
-                      The response is correct for category 1.
-                  </option>
-                </category>
-            </rubric>
+            <category>
+                <description>
+                Ideas
+                </description>
+                <option>
+                Difficult for the reader to discern the main idea.  Too brief or too repetitive to establish or maintain a focus.
+                </option>
+                <option>
+                Attempts a main idea.  Sometimes loses focus or ineffectively displays focus.
+                </option>
+                <option>
+                Presents a unifying theme or main idea, but may include minor tangents.  Stays somewhat focused on topic and task.
+                </option>
+                <option>
+                Presents a unifying theme or main idea without going off on tangents.  Stays completely focused on topic and task.
+                </option>
+            </category>
+            <category>
+                <description>
+                Content
+                </description>
+                <option>
+                Includes little information with few or no details or unrelated details.  Unsuccessful in attempts to explore any facets of the topic.
+                </option>
+                <option>
+                Includes little information and few or no details.  Explores only one or two facets of the topic.
+                </option>
+                <option>
+                Includes sufficient information and supporting details. (Details may not be fully developed; ideas may be listed.)  Explores some facets of the topic.
+                </option>
+                <option>
+                Includes in-depth information and exceptional supporting details that are fully developed.  Explores all facets of the topic.
+                </option>
+            </category>
+            <category>
+            <description>
+                Organization
+                </description>
+                <option>
+                Ideas organized illogically, transitions weak, and response difficult to follow.
+                </option>
+                <option>
+                Attempts to logically organize ideas.  Attempts to progress in an order that enhances meaning, and demonstrates use of transitions.
+                </option>
+                <option>
+                Ideas organized logically.  Progresses in an order that enhances meaning.  Includes smooth transitions.
+                </option>
+            </category>
+            <category>
+                <description>
+                Style
+                </description>
+                <option>
+                Contains limited vocabulary, with many words used incorrectly.  Demonstrates problems with sentence patterns.
+                </option>
+                <option>
+                Contains basic vocabulary, with words that are predictable and common.  Contains mostly simple sentences (although there may be an attempt at more varied sentence patterns).
+                </option>
+                <option>
+                Includes vocabulary to make explanations detailed and precise.  Includes varied sentence patterns, including complex sentences.
+                </option>
+            </category>
+            <category>
+                <description>
+                Voice
+                </description>
+                <option>
+                Demonstrates language and tone that may be inappropriate to task and reader.
+                </option>
+                <option>
+                Demonstrates an attempt to adjust language and tone to task and reader.
+                </option>
+                <option>
+                Demonstrates effective adjustment of language and tone to task and reader.
+                </option>
+
+            </category>
         </rubric>
-        <prompt>
-            <p>Why is the sky blue?</p>
-        </prompt>
-        <task>
-            <selfassessment/>
-        </task>
-        <task>
-            <openended min_score_to_attempt="1" max_score_to_attempt="2">
-                    <openendedparam>
-                        <initial_display>Enter essay here.</initial_display>
-                        <answer_display>This is the answer.</answer_display>
-                        <grader_payload>{"grader_settings" : "peer_grading.conf", "problem_id" : "700x/Demo"}</grader_payload>
-                    </openendedparam>
-            </openended>
-        </task>
-    </combinedopenended>
+    </rubric>
+
+    <task>
+    <selfassessment/></task>
+    <task>
+
+        <openended min_score_to_attempt="4" max_score_to_attempt="12" >
+            <openendedparam>
+                <initial_display>Enter essay here.</initial_display>
+                <answer_display>This is the answer.</answer_display>
+                <grader_payload>{"grader_settings" : "ml_grading.conf", "problem_id" : "6.002x/Welcome/OETest"}</grader_payload>
+            </openendedparam>
+        </openended>
+    </task>
+    <task>
+
+        <openended min_score_to_attempt="9" max_score_to_attempt="12" >
+            <openendedparam>
+                <initial_display>Enter essay here.</initial_display>
+                <answer_display>This is the answer.</answer_display>
+                <grader_payload>{"grader_settings" : "peer_grading.conf", "problem_id" : "6.002x/Welcome/OETest"}</grader_payload>
+            </openendedparam>
+        </openended>
+    </task>
+
+</combinedopenended>
 """)
 
 
@@ -159,17 +247,44 @@ class CombinedOpenEndedFields(object):
     markdown = String(
         help="Markdown source of this module",
         default=textwrap.dedent("""\
-            [rubric]
-            + Category 1
-            - The response does not incorporate what is needed for a one response.
-            - The response is correct for category 1.
-            [rubric]
-            [prompt]
-            <p>Why is the sky blue?</p>
-            [prompt]
-            [tasks]
-            (Self), ({1-2}AI)
-            [tasks]
+                    [prompt]
+                        <h3>Censorship in the Libraries</h3>
+
+                        <p>'All of us can think of a book that we hope none of our children or any other children have taken off the shelf. But if I have the right to remove that book from the shelf -- that work I abhor -- then you also have exactly the same right and so does everyone else. And then we have no books left on the shelf for any of us.' --Katherine Paterson, Author
+                        </p>
+
+                        <p>
+                        Write a persuasive essay to a newspaper reflecting your vies on censorship in libraries. Do you believe that certain materials, such as books, music, movies, magazines, etc., should be removed from the shelves if they are found offensive? Support your position with convincing arguments from your own experience, observations, and/or reading.
+                        </p>
+                    [prompt]
+                    [rubric]
+                    + Ideas
+                    - Difficult for the reader to discern the main idea.  Too brief or too repetitive to establish or maintain a focus.
+                    - Attempts a main idea.  Sometimes loses focus or ineffectively displays focus.
+                    - Presents a unifying theme or main idea, but may include minor tangents.  Stays somewhat focused on topic and task.
+                    - Presents a unifying theme or main idea without going off on tangents.  Stays completely focused on topic and task.
+                    + Content
+                    - Includes little information with few or no details or unrelated details.  Unsuccessful in attempts to explore any facets of the topic.
+                    - Includes little information and few or no details.  Explores only one or two facets of the topic.
+                    - Includes sufficient information and supporting details. (Details may not be fully developed; ideas may be listed.)  Explores some facets of the topic.
+                    - Includes in-depth information and exceptional supporting details that are fully developed.  Explores all facets of the topic.
+                    + Organization
+                    - Ideas organized illogically, transitions weak, and response difficult to follow.
+                    - Attempts to logically organize ideas.  Attempts to progress in an order that enhances meaning, and demonstrates use of transitions.
+                    - Ideas organized logically.  Progresses in an order that enhances meaning.  Includes smooth transitions.
+                    + Style
+                    - Contains limited vocabulary, with many words used incorrectly.  Demonstrates problems with sentence patterns.
+                    - Contains basic vocabulary, with words that are predictable and common.  Contains mostly simple sentences (although there may be an attempt at more varied sentence patterns).
+                    - Includes vocabulary to make explanations detailed and precise.  Includes varied sentence patterns, including complex sentences.
+                    + Voice
+                    - Demonstrates language and tone that may be inappropriate to task and reader.
+                    - Demonstrates an attempt to adjust language and tone to task and reader.
+                    - Demonstrates effective adjustment of language and tone to task and reader.
+                    [rubric]
+                    [tasks]
+                    (Self), ({4-12}AI), ({9-12}Peer)
+                    [tasks]
+
         """),
         scope=Scope.settings
     )
