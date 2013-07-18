@@ -504,11 +504,13 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
         See if we can load the module and save an answer
         @return:
         """
-        #Load the module
+        # Load the module
         module = self.get_module_from_location(self.problem_location, COURSE)
 
-        #Try saving an answer
+        # Try saving an answer
         module.handle_ajax("save_answer", {"student_answer": self.answer})
+        # Save our modifications to the underlying KeyValueStore so they can be persisted
+        module.save()
         task_one_json = json.loads(module.task_states[0])
         self.assertEqual(task_one_json['child_history'][0]['answer'], self.answer)
 

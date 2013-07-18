@@ -253,17 +253,13 @@ function syncReleaseDate(e) {
 }
 
 function getEdxTimeFromDateTimeVals(date_val, time_val) {
-    var edxTimeStr = null;
-
     if (date_val != '') {
         if (time_val == '') time_val = '00:00';
 
-        // Note, we are using date.js utility which has better parsing abilities than the built in JS date parsing
-        var date = Date.parse(date_val + " " + time_val);
-        edxTimeStr = date.toString('yyyy-MM-ddTHH:mm');
+        return new Date(date_val + " " + time_val + "Z");
     }
 
-    return edxTimeStr;
+    else return null;
 }
 
 function getEdxTimeFromDateTimeInputs(date_id, time_id) {

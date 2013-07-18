@@ -135,7 +135,6 @@ class XModuleItemFactory(Factory):
         # replace the display name with an optional parameter passed in from the caller
         if display_name is not None:
             metadata['display_name'] = display_name
-        # note that location comes from above lazy_attribute
         store.create_and_save_xmodule(location, metadata=metadata, definition_data=data)
 
         if location.category not in DETACHED_CATEGORIES:

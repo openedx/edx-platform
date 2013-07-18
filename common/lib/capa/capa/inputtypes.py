@@ -460,10 +460,10 @@ class JSInput(InputTypeBase):
     DO NOT USE! HAS NOT BEEN TESTED BEYOND 700X PROBLEMS, AND MAY CHANGE IN
     BACKWARDS-INCOMPATIBLE WAYS.
       Inputtype for general javascript inputs. Intended to be used with
-    customresponse.  
+    customresponse.
       Loads in a sandboxed iframe to help prevent css and js conflicts between
-    frame and top-level window. 
-    
+    frame and top-level window.
+
     iframe sandbox whitelist:
         - allow-scripts
         - allow-popups
@@ -474,9 +474,9 @@ class JSInput(InputTypeBase):
     window elements.
       Example:
 
-        <jsinput html_file="/static/test.html" 
-                 gradefn="grade" 
-                 height="500" 
+        <jsinput html_file="/static/test.html"
+                 gradefn="grade"
+                 height="500"
                  width="400"/>
 
      See the documentation in the /doc/public folder for more information.
@@ -500,7 +500,7 @@ class JSInput(InputTypeBase):
                 Attribute('width', "400"),       # iframe width
                 Attribute('height', "300")]      # iframe height
 
-        
+
 
     def _extra_context(self):
         context = {
@@ -510,10 +510,11 @@ class JSInput(InputTypeBase):
 
         return context
 
-        
+
 
 registry.register(JSInput)
 #-----------------------------------------------------------------------------
+
 
 class TextLine(InputTypeBase):
     """
@@ -1368,3 +1369,209 @@ class AnnotationInput(InputTypeBase):
         return extra_context
 
 registry.register(AnnotationInput)
+
+
+class ChoiceTextGroup(InputTypeBase):
+    """
+    Groups of radiobutton/checkboxes with text inputs.
+
+    Examples:
+    RadioButton problem
+    <problem>
+      <startouttext/>
+        A person rolls a standard die 100 times and records the results.
+        On the first roll they received a "1". Given this information
+        select the correct choice and fill in numbers to make it accurate.
+      <endouttext/>
+      <choicetextresponse>
+        <radiotextgroup>
+          <choice correct="false">The lowest number rolled was:
+            <decoy_input/> and the highest number rolled was:
+            <decoy_input/> .</choice>
+          <choice correct="true">The lowest number rolled was <numtolerance_input answer="1"/>
+            and there is not enough information to determine the highest number rolled.
+          </choice>
+          <choice correct="false">There is not enough information to determine the lowest
+          number rolled, and the highest number rolled was:
+          <decoy_input/> .
+          </choice>
+        </radiotextgroup>
+      </choicetextresponse>
+    </problem>
+
+    CheckboxProblem:
+    <problem>
+      <startouttext/>
+        A person randomly selects 100 times, with replacement, from the list of numbers \(\sqrt{2}\) , 2, 3, 4 ,5 ,6
+        and records the results. The first number they pick is \(\sqrt{2}\) Given this information
+        select the correct choices and fill in numbers to make them accurate.
+      <endouttext/>
+      <choicetextresponse>
+        <checkboxtextgroup>
+             <choice correct="true">
+                The lowest number selected was <numtolerance_input answer="1.4142" tolerance="0.01"/>
+             </choice>
+             <choice correct="false">
+                The highest number selected was <decoy_input/> .
+            </choice>
+            <choice correct="true">There is not enough information given to determine the highest number
+                which was selected.
+            </choice>
+            <choice correct="false">There is not enough information given to determine the lowest number
+                selected.
+            </choice>
+        </checkboxtextgroup>
+      </choicetextresponse>
+    </problem>
+
+    In the preceding examples the <decoy_input/> is used to generate a textinput html element
+    in the problem's display. Since it is inside of an incorrect choice, no answer given
+    for it will be correct, and thus specifying an answer for it is not needed.
+    """
+    template = "choicetext.html"
+    tags = ['radiotextgroup', 'checkboxtextgroup']
+
+    def setup(self):
+        """
+        Performs setup for the initial rendering of the problem.
+        `self.html_input_type` determines whether this problem is displayed
+        with radiobuttons or checkboxes
+
+        If the initial value of `self.value` is '' change it to {} so that
+        the template has an empty dictionary to work with.
+
+        sets the value of self.choices to be equal to the return value of
+        `self.extract_choices`
+        """
+        self.text_input_values = {}
+        if self.tag == 'radiotextgroup':
+            self.html_input_type = "radio"
+        elif self.tag == 'checkboxtextgroup':
+            self.html_input_type = "checkbox"
+        else:
+            raise Exception("ChoiceGroup: unexpected tag {0}".format(self.tag))
+
+        if self.value == '':
+            # Make `value` an empty dictionary, if it currently has an empty
+            # value. This is necessary because the template expects a
+            # dictionary.
+            self.value = {}
+        self.choices = self.extract_choices(self.xml)
+
+    @classmethod
+    def get_attributes(cls):
+        """
+        Returns a list of `Attribute` for this problem type
+        """
+        return [
+            Attribute("show_correctness", "always"),
+            Attribute("submitted_message", "Answer received.")
+        ]
+
+    def _extra_context(self):
+        """
+        Returns a dictionary of extra content necessary for rendering this InputType.
+
+        `input_type` is either 'radio' or 'checkbox' indicating whether the choices for
+        this problem will have radiobuttons or checkboxes.
+        """
+        return {
+            'input_type': self.html_input_type,
+            'choices': self.choices
+        }
+
+    @staticmethod
+    def extract_choices(element):
+        """
+        Extracts choices from the xml for this problem type.
+        If we have xml that is as follows(choice names will have been assigned
+        by now)
+        <radiotextgroup>
+        <choice correct = "true" name ="1_2_1_choiceinput_0bc">
+            The number
+                <numtolerance_input name = "1_2_1_choiceinput0_numtolerance_input_0" answer="5"/>
+            Is the mean of the list.
+        </choice>
+        <choice correct = "false" name = "1_2_1_choiceinput_1bc>
+            False demonstration choice
+        </choice>
+        </radiotextgroup>
+
+        Choices are used for rendering the problem properly
+        The function will setup choices as follows:
+        choices =[
+            ("1_2_1_choiceinput_0bc",
+                [{'type': 'text', 'contents': "The number", 'tail_text': '',
+                  'value': ''
+                  },
+                  {'type': 'textinput',
+                   'contents': "1_2_1_choiceinput0_numtolerance_input_0",
+                   'tail_text': 'Is the mean of the list',
+                   'value': ''
+                   }
+                ]
+             ),
+            ("1_2_1_choiceinput_1bc",
+                [{'type': 'text', 'contents': "False demonstration choice",
+                 'tail_text': '',
+                  'value': ''
+                  }
+                ]
+            )
+        ]
+        """
+
+        choices = []
+
+        for choice in element:
+            if choice.tag != 'choice':
+                raise Exception(
+                    "[capa.inputtypes.extract_choices] Expected a <choice>" +
+                    "tag; got {0} instead".format(choice.tag)
+                )
+
+            components = []
+            choice_text = ''
+            if choice.text is not None:
+                choice_text += choice.text
+            # Initialize our dict for the next content
+            adder = {
+                'type': 'text',
+                'contents': choice_text,
+                'tail_text': '',
+                'value': ''
+            }
+            components.append(adder)
+
+            for elt in choice:
+                # for elements in the choice e.g. <text> <numtolerance_input>
+                adder = {
+                    'type': 'text',
+                    'contents': '',
+                    'tail_text': '',
+                    'value': ''
+                }
+                tag_type = elt.tag
+                # If the current `elt` is a <numtolerance_input> set the
+                # `adder`type to 'numtolerance_input', and 'contents' to
+                # the `elt`'s name.
+                # Treat decoy_inputs and numtolerance_inputs the same in order
+                # to prevent students from reading the Html and figuring out
+                # which inputs are valid
+                if tag_type in ('numtolerance_input', 'decoy_input'):
+                    # We set this to textinput, so that we get a textinput html
+                    # element.
+                    adder['type'] = 'textinput'
+                    adder['contents'] = elt.get('name')
+                else:
+                    adder['contents'] = elt.text
+
+                # Add any tail text("is the mean" in the example)
+                adder['tail_text'] = elt.tail if elt.tail else ''
+                components.append(adder)
+
+            # Add the tuple for the current choice to the list of choices
+            choices.append((choice.get("name"), components))
+        return choices
+
+registry.register(ChoiceTextGroup)

@@ -59,21 +59,55 @@ def save_item(request):
         # 'apply' the submitted metadata, so we don't end up deleting system metadata
         existing_item = modulestore().get_item(item_location)
         for metadata_key in request.POST.get('nullout', []):
-            setattr(existing_item, metadata_key, None)
+            # [dhm] see comment on _get_xblock_field
+            _get_xblock_field(existing_item, metadata_key).write_to(existing_item, None)
 
         # update existing metadata with submitted metadata (which can be partial)
         # IMPORTANT NOTE: if the client passed 'null' (None) for a piece of metadata that means 'remove it'. If
         # the intent is to make it None, use the nullout field
         for metadata_key, value in request.POST.get('metadata', {}).items():
+            # [dhm] see comment on _get_xblock_field
+            field = _get_xblock_field(existing_item, metadata_key)
 
             if value is None:
-                delattr(existing_item, metadata_key)
+                field.delete_from(existing_item)
             else:
-                setattr(existing_item, metadata_key, value)
+                value = field.from_json(value)
+                field.write_to(existing_item, value)
+        # Save the data that we've just changed to the underlying
+        # MongoKeyValueStore before we update the mongo datastore.
+        existing_item.save()
         # commit to datastore
         store.update_metadata(item_location, own_metadata(existing_item))
 
     return HttpResponse()
+
+
+# [DHM] A hack until we implement a permanent soln. Proposed perm solution is to make namespace fields also top level
+# fields in xblocks rather than requiring dereference through namespace but we'll need to consider whether there are
+# plausible use cases for distinct fields w/ same name in different namespaces on the same blocks.
+# The idea is that consumers of the xblock, and particularly the web client, shouldn't know about our internal
+# representation (namespaces as means of decorating all modules).
+# Given top-level access, the calls can simply be setattr(existing_item, field, value) ...
+# Really, this method should be elsewhere (e.g., xblock). We also need methods for has_value (v is_default)...
+def _get_xblock_field(xblock, field_name):
+    """
+    A temporary function to get the xblock field either from the xblock or one of its namespaces by name.
+    :param xblock:
+    :param field_name:
+    """
+    def find_field(fields):
+        for field in fields:
+            if field.name == field_name:
+                return field
+
+    found = find_field(xblock.fields)
+    if found:
+        return found
+    for namespace in xblock.namespaces:
+        found = find_field(getattr(xblock, namespace).fields)
+        if found:
+            return found
 
 
 @login_required

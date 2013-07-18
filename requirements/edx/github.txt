@@ -8,6 +8,6 @@
 -e git://github.com/eventbrite/zendesk.git@d53fe0e81b623f084e91776bcf6369f8b7b63879#egg=zendesk
 
 # Our libraries:
--e git+https://github.com/edx/XBlock.git@4d8735e883#egg=XBlock
--e git+https://github.com/edx/codejail.git@0a1b468#egg=codejail
+-e git+https://github.com/edx/XBlock.git@3974e999fe853a37dfa6fadf0611289434349409#egg=XBlock
+-e git+https://github.com/edx/codejail.git@c08967fb44d1bcdb259d3ec58812e3ac592539c2#egg=codejail
 -e git+https://github.com/edx/diff-cover.git@v0.1.3#egg=diff_cover

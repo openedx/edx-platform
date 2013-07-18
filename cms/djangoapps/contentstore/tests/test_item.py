@@ -4,6 +4,8 @@ from django.core.urlresolvers import reverse
 from xmodule.capa_module import CapaDescriptor
 import json
 from xmodule.modulestore.django import modulestore
+import datetime
+from pytz import UTC
 
 
 class DeleteItem(CourseTestCase):
@@ -151,16 +153,16 @@ class TestEditItem(CourseTestCase):
             reverse('create_item'),
             json.dumps(
                 {'parent_location': chap_location,
-                 'category': 'vertical'
+                 'category': 'sequential'
                 }),
             content_type="application/json"
         )
-        vert_location = self.response_id(resp)
+        self.seq_location = self.response_id(resp)
         # create problem w/ boilerplate
         template_id = 'multiplechoice.yaml'
         resp = self.client.post(
             reverse('create_item'),
-            json.dumps({'parent_location': vert_location,
+            json.dumps({'parent_location': self.seq_location,
              'category': 'problem',
              'boilerplate': template_id
             }),
@@ -210,3 +212,32 @@ class TestEditItem(CourseTestCase):
         )
         problem = modulestore('draft').get_item(self.problems[0])
         self.assertIsNone(problem.markdown)
+
+    def test_date_fields(self):
+        """
+        Test setting due & start dates on sequential
+        """
+        sequential = modulestore().get_item(self.seq_location)
+        self.assertIsNone(sequential.lms.due)
+        self.client.post(
+            reverse('save_item'),
+            json.dumps({
+                'id': self.seq_location,
+                'metadata': {'due': '2010-11-22T04:00Z'}
+            }),
+            content_type="application/json"
+        )
+        sequential = modulestore().get_item(self.seq_location)
+        self.assertEqual(sequential.lms.due, datetime.datetime(2010, 11, 22, 4, 0, tzinfo=UTC))
+        self.client.post(
+            reverse('save_item'),
+            json.dumps({
+                'id': self.seq_location,
+                'metadata': {'start': '2010-09-12T14:00Z'}
+            }),
+            content_type="application/json"
+        )
+        sequential = modulestore().get_item(self.seq_location)
+        self.assertEqual(sequential.lms.due, datetime.datetime(2010, 11, 22, 4, 0, tzinfo=UTC))
+        self.assertEqual(sequential.lms.start, datetime.datetime(2010, 9, 12, 14, 0, tzinfo=UTC))
+
