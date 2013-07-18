@@ -13,7 +13,7 @@ import textwrap
 
 log = logging.getLogger("mitx.courseware")
 
-V1_SETTINGS_ATTRIBUTES = ["display_name", "attempts", "is_graded", "accept_file_upload",
+V1_SETTINGS_ATTRIBUTES = ["display_name", "max_attempts", "graded", "accept_file_upload",
                           "skip_spelling_checks", "due", "graceperiod", "weight"]
 
 V1_STUDENT_ATTRIBUTES = ["current_task_number", "task_states", "state",
@@ -172,7 +172,7 @@ class CombinedOpenEndedFields(object):
     display_name = String(
         display_name="Display Name",
         help="This name appears in the horizontal navigation at the top of the page.",
-        default="Open Ended Grading",
+        default="Open Response Assessment",
         scope=Scope.settings
     )
     current_task_number = Integer(
@@ -189,6 +189,12 @@ class CombinedOpenEndedFields(object):
         default="initial",
         scope=Scope.user_state
     )
+    graded = Boolean(
+        display_name="Graded",
+        help='Defines whether the student gets credit for grading this problem.',
+        default=False,
+        scope=Scope.settings
+    )
     student_attempts = Integer(
         help="Number of attempts taken by the student on this problem",
         default=0,
@@ -199,18 +205,12 @@ class CombinedOpenEndedFields(object):
         default=False,
         scope=Scope.user_state
     )
-    attempts = Integer(
+    max_attempts = Integer(
         display_name="Maximum Attempts",
         help="The number of times the student can try to answer this problem.",
         default=1,
         scope=Scope.settings,
         values={"min" : 1 }
-    )
-    is_graded = Boolean(
-        display_name="Graded",
-        help="Whether or not the problem is graded.",
-        default=False,
-        scope=Scope.settings
     )
     accept_file_upload = Boolean(
         display_name="Allow File Uploads",
@@ -339,37 +339,9 @@ class CombinedOpenEndedModule(CombinedOpenEndedFields, XModule):
 
     def __init__(self, *args, **kwargs):
         """
-        Definition file should have one or many task blocks, a rubric block, and a prompt block:
+        Definition file should have one or many task blocks, a rubric block, and a prompt block.
 
-        Sample file:
-        <combinedopenended attempts="10000">
-            <rubric>
-                Blah blah rubric.
-            </rubric>
-            <prompt>
-                Some prompt.
-            </prompt>
-            <task>
-                <selfassessment>
-                    <hintprompt>
-                        What hint about this problem would you give to someone?
-                    </hintprompt>
-                    <submitmessage>
-                        Save Succcesful.  Thanks for participating!
-                    </submitmessage>
-                </selfassessment>
-            </task>
-            <task>
-                <openended min_score_to_attempt="1" max_score_to_attempt="1">
-                        <openendedparam>
-                            <initial_display>Enter essay here.</initial_display>
-                            <answer_display>This is the answer.</answer_display>
-                            <grader_payload>{"grader_settings" : "ml_grading.conf",
-                            "problem_id" : "6.002x/Welcome/OETest"}</grader_payload>
-                        </openendedparam>
-                </openended>
-            </task>
-        </combinedopenended>
+        See DEFAULT_DATA for a sample.
 
         """
         XModule.__init__(self, *args, **kwargs)
@@ -449,6 +421,11 @@ class CombinedOpenEndedDescriptor(CombinedOpenEndedFields, RawDescriptor):
     js = {'coffee': [resource_string(__name__, 'js/src/combinedopenended/edit.coffee')]}
     js_module_name = "OpenEndedMarkdownEditingDescriptor"
     css = {'scss': [resource_string(__name__, 'css/editor/edit.scss'), resource_string(__name__, 'css/combinedopenended/edit.scss')]}
+
+    metadata_translations = {
+        'is_graded': 'graded',
+        'attempts': 'max_attempts',
+        }
 
     def get_context(self):
         _context = RawDescriptor.get_context(self)

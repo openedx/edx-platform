@@ -19,32 +19,27 @@ from django.utils.timezone import UTC
 
 log = logging.getLogger(__name__)
 
-USE_FOR_SINGLE_LOCATION = False
-LINK_TO_LOCATION = ""
-MAX_SCORE = 1
-IS_GRADED = False
 
 EXTERNAL_GRADER_NO_CONTACT_ERROR = "Failed to contact external graders.  Please notify course staff."
-
 
 class PeerGradingFields(object):
     use_for_single_location = Boolean(
         display_name="Show Single Problem",
         help='When True, only the single problem specified by "Link to Problem Location" is shown. '
              'When False, a panel is displayed with all problems available for peer grading.',
-        default=USE_FOR_SINGLE_LOCATION,
+        default=False,
         scope=Scope.settings
     )
     link_to_location = String(
         display_name="Link to Problem Location",
         help='The location of the problem being graded. Only used when "Show Single Problem" is True.',
-        default=LINK_TO_LOCATION,
+        default="",
         scope=Scope.settings
     )
-    is_graded = Boolean(
+    graded = Boolean(
         display_name="Graded",
         help='Defines whether the student gets credit for grading this problem. Only used when "Show Single Problem" is True.',
-        default=IS_GRADED,
+        default=False,
         scope=Scope.settings
     )
     due_date = Date(
@@ -55,12 +50,6 @@ class PeerGradingFields(object):
         help="Amount of grace to give on the due date.",
         default=None,
         scope=Scope.settings
-    )
-    max_grade = Integer(
-        help="The maximum grade that a student can receive for this problem.",
-        default=MAX_SCORE,
-        scope=Scope.settings,
-        values={"min": 0}
     )
     student_data_for_location = Dict(
         help="Student data for a given peer grading problem.",
@@ -135,10 +124,6 @@ class PeerGradingModule(PeerGradingFields, XModule):
         self.ajax_url = self.system.ajax_url
         if not self.ajax_url.endswith("/"):
             self.ajax_url = self.ajax_url + "/"
-
-        # Integer could return None, so keep this check.
-        if not isinstance(self.max_grade, int):
-            raise TypeError("max_grade needs to be an integer.")
 
     def closed(self):
         return self._closed(self.timeinfo)
@@ -232,7 +217,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
             'score': score,
             'total': max_score,
         }
-        if not self.use_for_single_location or not self.is_graded:
+        if not self.use_for_single_location or not self.graded:
             return score_dict
 
         try:
@@ -253,7 +238,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
                 self.student_data_for_location = response
 
         score = int(count_graded >= count_required and count_graded > 0) * float(weight)
-        total = self.max_grade * float(weight)
+        total = float(weight)
         score_dict['score'] = score
         score_dict['total'] = total
 
@@ -266,8 +251,8 @@ class PeerGradingModule(PeerGradingFields, XModule):
               randomization, and 5/7 on another
         '''
         max_grade = None
-        if self.use_for_single_location and self.is_graded:
-            max_grade = self.max_grade
+        if self.use_for_single_location and self.graded:
+            max_grade = self.weight
         return max_grade
 
     def get_next_submission(self, data):
@@ -634,9 +619,13 @@ class PeerGradingDescriptor(PeerGradingFields, RawDescriptor):
     #Specify whether or not to pass in open ended interface
     needs_open_ended_interface = True
 
+    metadata_translations = {
+        'is_graded': 'graded',
+        'attempts': 'max_attempts',
+        }
+
     @property
     def non_editable_metadata_fields(self):
         non_editable_fields = super(PeerGradingDescriptor, self).non_editable_metadata_fields
-        non_editable_fields.extend([PeerGradingFields.due_date, PeerGradingFields.grace_period_string,
-                                    PeerGradingFields.max_grade])
+        non_editable_fields.extend([PeerGradingFields.due_date, PeerGradingFields.grace_period_string])
         return non_editable_fields

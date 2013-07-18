@@ -78,37 +78,7 @@ class CombinedOpenEndedV1Module():
                  instance_state=None, shared_state=None, metadata=None, static_data=None, **kwargs):
 
         """
-        Definition file should have one or many task blocks, a rubric block, and a prompt block:
-
-        Sample file:
-        <combinedopenended attempts="10000">
-            <rubric>
-                Blah blah rubric.
-            </rubric>
-            <prompt>
-                Some prompt.
-            </prompt>
-            <task>
-                <selfassessment>
-                    <hintprompt>
-                        What hint about this problem would you give to someone?
-                    </hintprompt>
-                    <submitmessage>
-                        Save Succcesful.  Thanks for participating!
-                    </submitmessage>
-                </selfassessment>
-            </task>
-            <task>
-                <openended min_score_to_attempt="1" max_score_to_attempt="1">
-                        <openendedparam>
-                            <initial_display>Enter essay here.</initial_display>
-                            <answer_display>This is the answer.</answer_display>
-                            <grader_payload>{"grader_settings" : "ml_grading.conf",
-                            "problem_id" : "6.002x/Welcome/OETest"}</grader_payload>
-                        </openendedparam>
-                </openended>
-            </task>
-        </combinedopenended>
+        Definition file should have one or many task blocks, a rubric block, and a prompt block.  See DEFAULT_DATA in combined_open_ended_module for a sample.
 
         """
 
@@ -131,8 +101,8 @@ class CombinedOpenEndedV1Module():
 
         # Allow reset is true if student has failed the criteria to move to the next child task
         self.ready_to_reset = instance_state.get('ready_to_reset', False)
-        self.attempts = self.instance_state.get('attempts', MAX_ATTEMPTS)
-        self.is_scored = self.instance_state.get('is_graded', IS_SCORED) in TRUE_DICT
+        self.max_attempts = self.instance_state.get('max_attempts', MAX_ATTEMPTS)
+        self.is_scored = self.instance_state.get('graded', IS_SCORED) in TRUE_DICT
         self.accept_file_upload = self.instance_state.get('accept_file_upload', ACCEPT_FILE_UPLOAD) in TRUE_DICT
         self.skip_basic_checks = self.instance_state.get('skip_spelling_checks', SKIP_BASIC_CHECKS) in TRUE_DICT
 
@@ -153,7 +123,7 @@ class CombinedOpenEndedV1Module():
         # Static data is passed to the child modules to render
         self.static_data = {
             'max_score': self._max_score,
-            'max_attempts': self.attempts,
+            'max_attempts': self.max_attempts,
             'prompt': definition['prompt'],
             'rubric': definition['rubric'],
             'display_name': self.display_name,
