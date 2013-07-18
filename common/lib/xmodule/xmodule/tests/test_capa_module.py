@@ -1248,20 +1248,6 @@ class CapaModuleTest(unittest.TestCase):
         other_module.get_progress()
         mock_progress.assert_called_with(1, 1)
 
-
-    @patch('xmodule.capa_module.Progress')
-    def test_get_progress_calculate_progress_fraction(self, mock_progress):
-        """
-        Check that score and total are calculated correctly for the progress fraction.
-        """
-        module = CapaFactory.create()
-        module.get_progress()
-        mock_progress.assert_called_with(0,1)
-
-        other_module = CapaFactory.create(correct=True)
-        other_module.get_progress()
-        mock_progress.assert_called_with(1,1)
-
     def test_get_html(self):
         """
         Check that get_html() calls get_progress() with no arguments.
@@ -1276,7 +1262,7 @@ class CapaModuleTest(unittest.TestCase):
         Check that get_problem() returns the expected dictionary.
         """
         module = CapaFactory.create()
-        self.assertEquals(module.get_problem("data"), {'html': module.get_problem_html()})
+        self.assertEquals(module.get_problem("data"), {'html': module.get_problem_html(encapsulate=False)})
 
 
 class ComplexEncoderTest(unittest.TestCase):

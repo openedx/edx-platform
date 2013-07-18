@@ -614,6 +614,13 @@ class CapaModule(CapaFields, XModule):
         return False
 
     def is_submitted(self):
+        """
+        Used to decide to show or hide RESET or CHECK buttons.
+
+        Means that student submitted problem and nothing more.
+        Problem can be completely wrong.
+        Pressing RESET button makes this function to return False.
+        """
         # used by conditional module
         return self.lcp.done
 
@@ -756,7 +763,7 @@ class CapaModule(CapaFields, XModule):
         Used if we want to reconfirm we have the right thing e.g. after
         several AJAX calls.
         """
-        return {'html': self.get_problem_html()}
+        return {'html': self.get_problem_html(encapsulate=False)}
 
 
     @staticmethod
@@ -936,7 +943,7 @@ class CapaModule(CapaFields, XModule):
             self.system.psychometrics_handler(self.get_state_for_lcp())
 
         # render problem into HTML
-        html = self.get_problem_html()
+        html = self.get_problem_html(encapsulate=False)
 
         return {'success': success,
                 'contents': html,
@@ -1103,7 +1110,7 @@ class CapaModule(CapaFields, XModule):
         self.system.track_function('reset_problem', event_info)
 
         return {'success': True,
-                'html': self.get_problem_html()}
+                'html': self.get_problem_html(encapsulate=False)}
 
 
 class CapaDescriptor(CapaFields, RawDescriptor):
