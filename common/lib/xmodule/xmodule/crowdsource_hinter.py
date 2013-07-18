@@ -227,7 +227,7 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
                 if not rand_hint in hints:
                     go_on = True
             hints.append(rand_hint)
-            self.previous_answers += [[hint_index, [hint_answer]]]
+            self.previous_answers += [[hint_answer, [hint_index]]]
         return {'hints': hints,
                 'answer': answer}
 
@@ -281,7 +281,6 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
                         except KeyError:
                             # Sometimes, the hint that a user saw will have been deleted by the instructor.
                             continue
-
         return {'answer_to_hints': answer_to_hints,
                 'user_submissions': self.user_submissions}
 

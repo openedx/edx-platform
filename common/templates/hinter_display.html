@@ -46,7 +46,7 @@
             % for hint_pk, hint_text in pk_dict.items():
                 <p>
                 <input class="vote" data-answer="${answer}" data-hintno="${hint_pk}" type="button" value="Vote">
-                ${answer}: ${hint_text}
+                ${hint_text}
                 </p>
             % endfor
         % endfor
@@ -71,7 +71,7 @@
             <div class = "previous-answer" id="previous-answer-${unspace(answer)}" data-answer="${answer}">
             <div class = "hint-inner-container">
                 <p>
-                What hint would you give a student who made the same mistake you did?  Please don't give away the answer.
+                What hint would you give a student who also arrived at an answer of ${answer}?  Please don't give away the correct answer.
                 </p>
                 <textarea cols="50" class="custom-hint" data-answer="${answer}">
 What would you say to help someone who got this wrong answer?
