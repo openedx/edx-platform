@@ -1,0 +1,60 @@
+// lms - views - badges
+// ====================
+
+// VIEW: general badges page
+.view-badges {
+
+  img.unlockable {
+    filter: url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\'><filter id=\'grayscale\'><feColorMatrix type=\'matrix\' values=\'0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0\'/></filter></svg>#grayscale"); /* Firefox 10+, Firefox on Android */
+    filter: grayscale( 100% );
+    filter: gray;
+    -webkit-filter: grayscale( 100% );
+    -moz-filter: grayscale( 100% );
+    -o-filter: grayscale( 100% );
+    -ms-filter: grayscale( 100% );
+    opacity: 0.5;
+    -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";
+    filter: alpha(opacity=50);
+  }
+
+  input.mozilla_export {
+    float: right;
+    width: auto;
+    margin-left: $baseline;
+  }
+
+  img.badge_image {
+    float: left;
+    width: ($baseline*5);
+    margin-right: $baseline;
+    margin-bottom: $baseline;
+    border-radius: 3px;
+  }
+
+  img.share_icon {
+    float: right;
+    width: $baseline;
+    padding: 3px;
+    border-radius: ($baseline/4);
+  }
+
+  .fakelink:hover {
+    cursor: pointer;
+  }
+
+  hr.badge_separator {
+    clear: both;
+  }
+
+  .badge_detail {
+    padding-left: ($baseline*6);
+  }
+
+  .openbadges_logo {
+    float: right;
+  }
+
+  .mozilla_info {
+    display: none;
+  }
+}
