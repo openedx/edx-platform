@@ -9,6 +9,8 @@ Common: Added *experimental* support for jsinput type.
 
 Common: Added setting to specify Celery Broker vhost
 
+Common: Utilize new XBlock bulk save API in LMS and CMS.
+
 Studio: Add table for tracking course creator permissions (not yet used).
 Update rake django-admin[syncdb] and rake django-admin[migrate] so they
 run for both LMS and CMS.
