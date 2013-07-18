@@ -18,8 +18,9 @@ def i_created_blank_common_problem(step):
     world.create_component_instance(
         step,
         '.large-problem-icon',
-        'i4x://edx/templates/problem/Blank_Common_Problem',
-        '.xmodule_CapaModule'
+        'problem',
+        '.xmodule_CapaModule',
+        'blank_common.yaml'
     )
 
 
@@ -35,8 +36,8 @@ def i_see_five_settings_with_values(step):
             [DISPLAY_NAME, "Blank Common Problem", True],
             [MAXIMUM_ATTEMPTS, "", False],
             [PROBLEM_WEIGHT, "", False],
-            [RANDOMIZATION, "Never", True],
-            [SHOW_ANSWER, "Finished", True]
+            [RANDOMIZATION, "Never", False],
+            [SHOW_ANSWER, "Finished", False]
         ])
 
 
@@ -94,7 +95,7 @@ def my_change_to_randomization_is_persisted(step):
 def i_can_revert_to_default_for_randomization(step):
     world.revert_setting_entry(RANDOMIZATION)
     world.save_component_and_reopen(step)
-    world.verify_setting_entry(world.get_setting_entry(RANDOMIZATION), RANDOMIZATION, "Always", False)
+    world.verify_setting_entry(world.get_setting_entry(RANDOMIZATION), RANDOMIZATION, "Never", False)
 
 
 @step('I can set the weight to "(.*)"?')
@@ -156,7 +157,7 @@ def create_latex_problem(step):
     world.click_new_component_button(step, '.large-problem-icon')
     # Go to advanced tab.
     world.css_click('#ui-id-2')
-    world.click_component_from_menu("i4x://edx/templates/problem/Problem_Written_in_LaTeX", '.xmodule_CapaModule')
+    world.click_component_from_menu("problem", "latex_problem.yaml", '.xmodule_CapaModule')
 
 
 @step('I edit and compile the High Level Source')
@@ -203,7 +204,7 @@ def verify_modified_display_name_with_special_chars():
 
 
 def verify_unset_display_name():
-    world.verify_setting_entry(world.get_setting_entry(DISPLAY_NAME), DISPLAY_NAME, '', False)
+    world.verify_setting_entry(world.get_setting_entry(DISPLAY_NAME), DISPLAY_NAME, 'Blank Advanced Problem', False)
 
 
 def set_weight(weight):

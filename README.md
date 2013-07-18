@@ -239,7 +239,6 @@ CMS templates. Fortunately, `rake` will do all of this for you! Just run:
 
     $ rake django-admin[syncdb]
     $ rake django-admin[migrate]
-    $ rake cms:update_templates
 
 If you are running these commands using the [`zsh`](http://www.zsh.org/) shell,
 zsh will assume that you are doing

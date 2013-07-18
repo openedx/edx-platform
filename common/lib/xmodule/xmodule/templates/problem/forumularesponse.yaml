@@ -1,8 +1,7 @@
 ---
 metadata:
     display_name: Math Expression Input
-    rerandomize: never
-    showanswer: finished
+    markdown: !!null
 data: |
   <problem>
   <p>
@@ -43,5 +42,3 @@ data: |
           </div>
       </solution>
   </problem>
-
-children: []
