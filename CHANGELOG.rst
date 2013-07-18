@@ -6,6 +6,9 @@ in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
 
+LMS: Added bulk email for course feature, with option to optout of individual
+course emails.
+
 Common: Added *experimental* support for jsinput type.
 
 Common: Added setting to specify Celery Broker vhost
