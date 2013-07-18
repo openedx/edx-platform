@@ -860,3 +860,94 @@ class AnnotationInputTest(unittest.TestCase):
 
         self.maxDiff = None
         self.assertDictEqual(context, expected)
+
+
+class TestChoiceText(unittest.TestCase):
+    """
+    Tests for checkboxtextgroup inputs
+    """
+    @staticmethod
+    def build_choice_element(node_type, contents, tail_text, value):
+        """
+        Builds a content node for a choice.
+        """
+        # When xml is being parsed numtolerance_input and decoy_input tags map to textinput type
+        # in order to provide the template with correct rendering information.
+        if node_type in ('numtolerance_input', 'decoy_input'):
+            node_type = 'textinput'
+        choice = {'type': node_type, 'contents': contents, 'tail_text': tail_text, 'value': value}
+        return choice
+
+    def check_group(self, tag, choice_tag, expected_input_type):
+        """
+        Build a radio or checkbox group, parse it and check the resuls against the
+        expected output.
+
+        `tag` should be 'checkboxtextgroup' or 'radiotextgroup'
+        `choice_tag` is either 'choice' for proper xml, or any other value to trigger an error.
+        `expected_input_type` is either 'radio' or 'checkbox'.
+        """
+        xml_str = """
+  <{tag}>
+      <{choice_tag} correct="false" name="choiceinput_0">this is<numtolerance_input name="choiceinput_0_textinput_0"/>false</{choice_tag}>
+      <choice correct="true" name="choiceinput_1">Is a number<decoy_input name="choiceinput_1_textinput_0"/><text>!</text></choice>
+  </{tag}>
+        """.format(tag=tag, choice_tag=choice_tag)
+        element = etree.fromstring(xml_str)
+        state = {
+            'value': '{}',
+            'id': 'choicetext_input',
+            'status': 'answered'
+        }
+
+        first_input = self.build_choice_element('numtolerance_input', 'choiceinput_0_textinput_0', 'false', '')
+        second_input = self.build_choice_element('decoy_input', 'choiceinput_1_textinput_0', '', '')
+        first_choice_content = self.build_choice_element('text', 'this is', '', '')
+        second_choice_content = self.build_choice_element('text', 'Is a number', '', '')
+        second_choice_text = self.build_choice_element('text', "!", '', '')
+
+        choices = [
+            ('choiceinput_0', [first_choice_content, first_input]),
+            ('choiceinput_1', [second_choice_content, second_input, second_choice_text])
+        ]
+
+        expected = {
+            'msg': '',
+            'input_type': expected_input_type,
+            'choices': choices,
+            'show_correctness': 'always',
+            'submitted_message': 'Answer received.'
+        }
+        expected.update(state)
+        the_input = lookup_tag(tag)(test_system(), element, state)
+        context = the_input._get_render_context()
+        self.assertEqual(context, expected)
+
+    def test_radiotextgroup(self):
+        """
+        Test that a properly formatted radiotextgroup problem generates
+        expected ouputs
+        """
+        self.check_group('radiotextgroup', 'choice', 'radio')
+
+    def test_checkboxtextgroup(self):
+        """
+        Test that a properly formatted checkboxtextgroup problem generates
+        expected ouput
+        """
+        self.check_group('checkboxtextgroup', 'choice', 'checkbox')
+
+    def test_invalid_tag(self):
+        """
+        Test to ensure that an unrecognized inputtype tag causes an error
+        """
+        with self.assertRaises(Exception):
+            self.check_group('invalid', 'choice', 'checkbox')
+
+    def test_invalid_input_tag(self):
+        """
+        Test to ensure having a tag other than <choice> inside of
+        a checkbox or radiotextgroup problem raises an error.
+        """
+        with self.assertRaisesRegexp(Exception, "Error in xml"):
+            self.check_group('checkboxtextgroup', 'invalid', 'checkbox')

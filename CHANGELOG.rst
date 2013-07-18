@@ -5,6 +5,7 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+
 Common: Added *experimental* support for jsinput type.
 
 Common: Added setting to specify Celery Broker vhost
@@ -22,6 +23,8 @@ XModule: Added *experimental* crowdsource hinting module.
 Studio: Added support for uploading and managing PDF textbooks
 
 Common: Student information is now passed to the tracking log via POST instead of GET.
+
+Blades: Added functionality and tests for new capa input type: choicetextresponse.
 
 Common: Add tests for documentation generation to test suite
 
@@ -45,7 +48,7 @@ history of background tasks for a given problem and student.
 Blades: Small UX fix on capa multiple-choice problems.  Make labels only
 as wide as the text to reduce accidental choice selections.
 
-Studio: 
+Studio:
 - use xblock field defaults to initialize all new instances' fields and
 only use templates as override samples.
 - create new instances via in memory create_xmodule and related methods rather
