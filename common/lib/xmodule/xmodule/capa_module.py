@@ -1152,10 +1152,11 @@ class CapaDescriptor(CapaFields, RawDescriptor):
         Augment regular translation w/ setting the pre-Studio defaults.
         """
         problem = super(CapaDescriptor, cls).from_xml(xml_data, system, org, course)
+        course_policy = system.policy.setdefault('course/{}'.format(system.url_name), {})
         # pylint: disable=W0212
-        if 'showanswer' not in problem._model_data:
+        if 'showanswer' not in problem._model_data and 'showanswer' not in course_policy:
             problem.showanswer = "closed"
-        if 'rerandomize' not in problem._model_data:
+        if 'rerandomize' not in problem._model_data and 'rerandomize' not in course_policy:
             problem.rerandomize = "always"
         return problem
 
