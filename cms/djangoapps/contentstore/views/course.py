@@ -42,8 +42,7 @@ from .component import (
     ADVANCED_COMPONENT_POLICY_KEY)
 
 from django_comment_common.utils import seed_permissions_roles
-import datetime
-from django.utils.timezone import UTC
+
 from xmodule.html_module import AboutDescriptor
 __all__ = ['course_index', 'create_new_course', 'course_info',
            'course_info_updates', 'get_course_settings',
@@ -176,6 +175,7 @@ def course_info(request, org, course, name, provided_id=None):
 
 
 @expect_json
+@require_http_methods(("GET", "POST", "PUT", "DELETE"))
 @login_required
 @ensure_csrf_cookie
 def course_info_updates(request, org, course, provided_id=None):
@@ -206,7 +206,7 @@ def course_info_updates(request, org, course, provided_id=None):
         except:
             return HttpResponseBadRequest("Failed to delete",
                                           content_type="text/plain")
-    elif request.method == 'POST':
+    elif request.method in ('POST', 'PUT'):  # can be either and sometimes django is rewriting one to the other
         try:
             return JsonResponse(update_course_updates(location, request.POST, provided_id))
         except:
@@ -300,7 +300,7 @@ def course_settings_updates(request, org, course, name, section):
     if request.method == 'GET':
         # Cannot just do a get w/o knowing the course name :-(
         return JsonResponse(manager.fetch(Location(['i4x', org, course, 'course', name])), encoder=CourseSettingsEncoder)
-    elif request.method == 'POST':  # post or put, doesn't matter.
+    elif request.method in ('POST', 'PUT'):  # post or put, doesn't matter.
         return JsonResponse(manager.update_from_json(request.POST), encoder=CourseSettingsEncoder)
 
 
@@ -479,7 +479,7 @@ def textbook_index(request, org, course, name):
     if request.is_ajax():
         if request.method == 'GET':
             return JsonResponse(course_module.pdf_textbooks)
-        elif request.method == 'POST':
+        elif request.method in ('POST', 'PUT'):  # can be either and sometimes django is rewriting one to the other
             try:
                 textbooks = validate_textbooks_json(request.body)
             except TextbookValidationError as err:
@@ -580,7 +580,7 @@ def textbook_by_id(request, org, course, name, tid):
         if not textbook:
             return JsonResponse(status=404)
         return JsonResponse(textbook)
-    elif request.method in ('POST', 'PUT'):
+    elif request.method in ('POST', 'PUT'):  # can be either and sometimes django is rewriting one to the other
         try:
             new_textbook = validate_textbook_json(request.body)
         except TextbookValidationError as err:
