@@ -16,10 +16,9 @@ from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xblock.core import Scope, String, Integer, Boolean, Dict, List
 
-from capa.responsetypes import FormulaResponse, StudentInputError
+from capa.responsetypes import FormulaResponse
 
-from calc import evaluator, UndefinedVariable
-from pyparsing import ParseException
+from calc import UndefinedVariable
 
 from django.utils.html import escape
 
@@ -43,9 +42,13 @@ class CrowdsourceHinterFields(object):
                      default={})
     hint_pk = Integer(help='Used to index hints.', scope=Scope.content, default=0)
 
-    # A list of previous answers this student made to this problem.
+    # A list of previous hints that a student viewed.
     # Of the form [answer, [hint_pk_1, ...]] for each problem.
+    # Sorry about the variable name - I know it's confusing.
     previous_answers = List(help='A list of hints viewed.', scope=Scope.user_state, default=[])
+
+    # user_submissions actually contains a list of previous answers submitted.
+    # (Originally, preivous_answers did this job, hence the name confusion.)
     user_submissions = List(help='A list of previous submissions', scope=Scope.user_state, default=[])
     user_voted = Boolean(help='Specifies if the user has voted on this problem or not.',
                          scope=Scope.user_state, default=False)
@@ -231,22 +234,6 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         return {'hints': hints,
                 'answer': answer}
 
-        # rand_hint_1 = ''
-        # rand_hint_2 = ''
-        # if n_hints == 2:
-        #     best_hint = matching_hints.values()[0][0]
-        #     best_hint_index = matching_hints.keys()[0]
-        #     rand_hint_1 = matching_hints.values()[1][0]
-        #     hint_index_1 = matching_hints.keys()[1]
-        #     rand_hint_2 = ''
-        #     self.previous_answers += [[answer, [best_hint_index, hint_index_1]]]
-        # else:
-        #     (hint_index_1, rand_hint_1), (hint_index_2, rand_hint_2) =\
-        #         random.sample(matching_hints.items(), 2)
-        #     rand_hint_1 = rand_hint_1[0]
-        #     rand_hint_2 = rand_hint_2[0]
-        #     self.previous_answers += [[answer, [best_hint_index, hint_index_1, hint_index_2]]]
-
     def get_feedback(self, data):
         """
         The student got it correct.  Ask him to vote on hints, or submit a hint.
@@ -295,7 +282,7 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
             'pk_list': A list of [answer, pk] pairs, each of which representing a hint.
                        We will return a list of how many votes each hint in the list has so far.
                        It's up to the browser to specify which hints to return vote counts for.
-                       
+
         Returns key 'hint_and_votes', a list of (hint_text, #votes) pairs.
         """
         if self.user_voted:

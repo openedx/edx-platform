@@ -9,8 +9,6 @@ import copy
 from xmodule.crowdsource_hinter import CrowdsourceHinterModule
 from xmodule.vertical_module import VerticalModule, VerticalDescriptor
 
-from capa.responsetypes import StudentInputError
-
 from . import get_test_system
 
 import json
@@ -328,7 +326,6 @@ class CrowdsourceHinterTest(unittest.TestCase):
         self.assertTrue(mock_module.previous_answers == old_answers)
         self.assertTrue(mock_module.user_submissions == old_user_submissions)
 
-
     def test_gethint_1hint(self):
         """
         Someone asks for a hint, with exactly one hint in the database.
@@ -462,7 +459,6 @@ class CrowdsourceHinterTest(unittest.TestCase):
         self.assertTrue(['Best hint', 41] in hint_and_votes)
         self.assertTrue(len(hint_and_votes) == 1)
 
-
     def test_submithint_nopermission(self):
         """
         A user tries to submit a hint, but he has already voted.
@@ -489,7 +485,7 @@ class CrowdsourceHinterTest(unittest.TestCase):
         A user submits a hint to an answer that has other hints
         already.
         """
-        mock_module = CHModuleFactory.create(previous_answers = [['25.0', [1, None, None]]])
+        mock_module = CHModuleFactory.create(previous_answers=[['25.0', [1, None, None]]])
         json_in = {'answer': '25.0', 'hint': 'This is a new hint.'}
         mock_module.submit_hint(json_in)
         # Make a hint request.
