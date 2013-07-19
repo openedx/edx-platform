@@ -3,6 +3,7 @@ h2 {
   margin-bottom: 15px;
 
   &.problem-header {
+    display: inline-block;
     section.staff {
       margin-top: 30px;
       font-size: 80%;
@@ -28,6 +29,13 @@ iframe[seamless]{
   color: darken($error-red, 11%);
 }
 
+section.problem-progress {
+  display: inline-block;
+  color: #999;
+  font-size: em(16);
+  font-weight: 100;
+  padding-left: 5px;
+}
 
 section.problem {
   @media print {

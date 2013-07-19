@@ -45,7 +45,7 @@ class @Sequence
     new_progress = "NA"
     _this = this
     $('.problems-wrapper').each (index) ->
-      progress = $(this).attr 'progress'
+      progress = $(this).data 'progress_status'
       new_progress = _this.mergeProgress progress, new_progress
 
     @progressTable[@position] = new_progress

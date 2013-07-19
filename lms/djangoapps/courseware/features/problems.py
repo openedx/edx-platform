@@ -142,6 +142,11 @@ def button_with_label_present(_step, buttonname, doesnt_appear):
         assert world.browser.is_text_present(buttonname, wait_time=5)
 
 
+@step(u'I should see a score of "([^"]*)"$')
+def see_score(_step, score):
+    assert world.browser.is_text_present(score)
+
+
 @step(u'My "([^"]*)" answer is marked "([^"]*)"')
 def assert_answer_mark(step, problem_type, correctness):
     """
