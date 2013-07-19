@@ -42,9 +42,9 @@
         ).css("display", "block");
       }
     });
-
+   
     %else:
-
+   
     $('#class_enroll_form').on('ajax:complete', function(event, xhr) {
       if(xhr.status == 200) {
         location.href = "${reverse('dashboard')}";
@@ -52,14 +52,14 @@
         location.href = "${reverse('register_user')}?course_id=${course.id}&enrollment_action=enroll";
       } else {
         $('#register_error').html(
-            (xhr.responseText ? xhr.responseText : ${_('An error occurred. Please try again later.')})
+            (xhr.responseText ? xhr.responseText : 'An error occurred. Please try again later.')
         ).css("display", "block");
       }
     });
 
     %endif
-
-
+   
+   
   })(this)
   </script>
 
@@ -77,7 +77,7 @@
           <h1>
             ${course.number}: ${get_course_about_section(course, "title")}
             % if not self.theme_enabled():
-              <a href="${reverse('university_profile', args=[course.org])}">${get_course_about_section(course, "university")}</a>
+              <a href="#">${get_course_about_section(course, "university")}</a>
             % endif
           </h1>
         </hgroup>

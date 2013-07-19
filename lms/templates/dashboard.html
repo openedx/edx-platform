@@ -16,46 +16,6 @@
   <script type="text/javascript">
   (function() {
 
-    var carouselPageHeight = 0;
-    var carouselIndex = 0;
-    var carouselDelay = 5000;
-    var carouselPages = $('.news-carousel .page').length;
-
-
-    $('.news-carousel .page').each(function() {
-      carouselPageHeight = Math.max($(this).outerHeight(), carouselPageHeight);
-    });
-    $('.news-carousel .pages').css('height', carouselPageHeight);
-    $('.news-carousel .page-dot').bind('click', setCarouselPage);
-    var carouselTimer = setInterval(nextCarouselPage, carouselDelay);
-
-    function nextCarouselPage() {
-      carouselIndex = carouselIndex + 1 < carouselPages ? carouselIndex + 1 : 0;
-      setCarouselPage(null, carouselIndex);
-    }
-
-    function setCarouselPage(event, index) {
-      var $pageToShow;
-      var transitionSpeed;
-      $('.news-carousel .page-dots').find('.current').removeClass('current');
-
-      if(event) {
-        clearInterval(carouselTimer);
-        carouselTimer = setInterval(nextCarouselPage, carouselDelay);
-        carouselIndex = $(this).closest('li').index();
-        transitionSpeed = 250;
-        $pageToShow = $('.news-carousel .page').eq(carouselIndex);
-        $(this).addClass('current');
-      } else {
-        transitionSpeed = 750;
-        $pageToShow = $('.news-carousel .page').eq(index);
-        $('.news-carousel .page-dot').eq(index).addClass('current');
-      }
-
-      $pageToShow.fadeIn(transitionSpeed);
-      $('.news-carousel .page').not($pageToShow).fadeOut(transitionSpeed);
-    }
-
     $(".unenroll").click(function(event) {
       $("#unenroll_course_id").val( $(event.target).data("course-id") );
       $("#unenroll_course_number").text( $(event.target).data("course-number") );
@@ -69,7 +29,7 @@
           $("#unenroll_course_id").val() + "&enrollment_action=unenroll";
       } else {
         $('#unenroll_error').html(
-          xhr.responseText ? xhr.responseText : "${_('An error occurred. Please try again later.')}")
+          xhr.responseText ? xhr.responseText : "An error occurred. Please try again later."
         ).stop().css("display", "block");
       }
     });
@@ -90,8 +50,15 @@
                {"new_email" : new_email, "password" : new_password},
                function(data) {
                  if (data.success) {
+<<<<<<< HEAD
                    $("#change_email_title").html("${_('Please verify your new email')}"));
                    $("#change_email_form").html("<p>${_('You'll receive a confirmation in your in-box. Please click the link in the email to confirm the email change.')}</p>");
+=======
+                   $("#change_email_title").html("Please verify your new email");
+                   $("#change_email_form").html("<p>You'll receive a confirmation in your " +
+                                                "in-box. Please click the link in the " +
+                                                "email to confirm the email change.</p>");
+>>>>>>> a187bc7... fix registration
                  } else {
                    $("#change_email_error").html(data.error).stop().css("display", "block");
                  }
@@ -108,7 +75,7 @@
              function(data) {
                if(data.success) {
                  location.reload();
-                 // $("#change_name_body").html("<p>${_('Name changed.')}</p>");
+                 // $("#change_name_body").html("<p>Name changed.</p>");
                } else {
                  $("#change_name_error").html(data.error).stop().css("display", "block");
                }
@@ -158,40 +125,6 @@
       </ul>
     </section>
 
-    ## `news` should be `None` whenever a non-edX theme is enabled:
-    ## see common/djangoapps/student/views.py#_get_news
-    %if news:
-    <article class="news-carousel">
-      <header>
-        <h4>${_("edX News")}</h4>
-        <nav class="page-dots">
-          <ol>
-            <li><a href="#" class="page-dot current"></a></li>
-            <li><a href="#" class="page-dot"></a></li>
-            <li><a href="#" class="page-dot"></a></li>
-          </ol>
-        </nav>
-      </header>
-      <div class="pages">
-        % for entry in news:
-        <section class="page">
-          %if entry.image:
-          <div class="news-image">
-            <a href="${entry.link}"><img src="${entry.image}" /></a>
-          </div>
-          %endif
-          <h5><a href="${entry.link}">${entry.title}</a></h5>
-          <div class="excerpt">
-            %if entry.summary:
-            <p>${entry.summary}</p>
-            %endif
-            <p><a href="${entry.link}">${_("Learn More >")}</a></p>
-          </div>
-        </section>
-        %endfor
-      </div>
-    </article>
-    %endif
   </section>
 
   <section class="my-courses">

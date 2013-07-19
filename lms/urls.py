@@ -73,32 +73,6 @@ urlpatterns += (
     url(r'^jsi18n/$', 'django.views.i18n.javascript_catalog', js_info_dict),
 )
 
-
-
-# University profiles only make sense in the default edX context
-if not settings.MITX_FEATURES["USE_CUSTOM_THEME"]:
-    urlpatterns += (
-        ##
-        ## Only universities without courses should be included here.  If
-        ## courses exist, the dynamic profile rule below should win.
-        ##
-        url(r'^(?i)university_profile/WellesleyX$', 'courseware.views.static_university_profile',
-            name="static_university_profile", kwargs={'org_id': 'WellesleyX'}),
-        url(r'^(?i)university_profile/McGillX$', 'courseware.views.static_university_profile',
-            name="static_university_profile", kwargs={'org_id': 'McGillX'}),
-        url(r'^(?i)university_profile/TorontoX$', 'courseware.views.static_university_profile',
-            name="static_university_profile", kwargs={'org_id': 'TorontoX'}),
-        url(r'^(?i)university_profile/RiceX$', 'courseware.views.static_university_profile',
-            name="static_university_profile", kwargs={'org_id': 'RiceX'}),
-        url(r'^(?i)university_profile/ANUx$', 'courseware.views.static_university_profile',
-            name="static_university_profile", kwargs={'org_id': 'ANUx'}),
-        url(r'^(?i)university_profile/EPFLx$', 'courseware.views.static_university_profile',
-            name="static_university_profile", kwargs={'org_id': 'EPFLx'}),
-
-        url(r'^university_profile/(?P<org_id>[^/]+)$', 'courseware.views.university_profile',
-            name="university_profile"),
-    )
-
 #Semi-static views (these need to be rendered and have the login bar, but don't change)
 urlpatterns += (
     url(r'^404$', 'static_template_view.views.render',

@@ -61,7 +61,7 @@
         <section class="university-partners university-partners2x6">
           <ol class="partners">
             <li class="partner mit">
-              <a href="${reverse('university_profile', args=['MITx'])}">
+              <a href="#">
                 <img src="${static.url('images/university/mit/mit.png')}" />
                 <div class="name">
                   <span>MITx</span>
@@ -69,7 +69,7 @@
               </a>
             </li>
             <li class="partner">
-              <a href="${reverse('university_profile', args=['HarvardX'])}">
+              <a href="#">
                 <img src="${static.url('images/university/harvard/harvard.png')}" />
                 <div class="name">
                   <span>HarvardX</span>
@@ -77,7 +77,7 @@
               </a>
             </li>
             <li class="partner">
-              <a href="${reverse('university_profile', args=['BerkeleyX'])}">
+              <a href="#">
                 <img src="${static.url('images/university/berkeley/berkeley.png')}" />
                 <div class="name">
                   <span>BerkeleyX</span>
@@ -85,7 +85,7 @@
               </a>
             </li>
             <li class="partner">
-              <a href="${reverse('university_profile', args=['UTx'])}">
+              <a href="#">
                 <img src="${static.url('images/university/ut/ut-rollover_350x150.png')}" />
                 <div class="name">
                   <span>UTx</span>
@@ -93,7 +93,7 @@
               </a>
             </li>
             <li class="partner">
-              <a href="${reverse('university_profile', args=['McGillX'])}">
+              <a href="#">
                 <img src="${static.url('images/university/mcgill/mcgill.png')}" />
                 <div class="name">
                   <span>McGillX</span>
@@ -101,7 +101,7 @@
               </a>
             </li>
             <li class="partner">
-              <a href="${reverse('university_profile', args=['ANUx'])}">
+              <a href="#">
                 <img src="${static.url('images/university/anu/anu.png')}" />
                 <div class="name">
                   <span>ANUx</span>
@@ -114,7 +114,7 @@
 
           <ol class="partners">
             <li class="partner">
-              <a href="${reverse('university_profile', args=['WellesleyX'])}">
+              <a href="#">
                 <img src="${static.url('images/university/wellesley/wellesley-rollover_350x150.png')}" />
                 <div class="name">
                   <span>WellesleyX</span>
@@ -122,7 +122,7 @@
               </a>
             </li>
             <li class="partner">
-              <a href="${reverse('university_profile', args=['GeorgetownX'])}">
+              <a href="#">
                 <img src="${static.url('images/university/georgetown/georgetown-rollover_350x150.png')}" />
                 <div class="name">
                   <span>GeorgetownX</span>
@@ -130,7 +130,7 @@
               </a>
             </li>
             <li class="partner">
-              <a href="${reverse('university_profile', args=['TorontoX'])}">
+              <a href="#">
                 <img src="${static.url('images/university/toronto/toronto.png')}" />
                 <div class="name">
                   <span>University of TorontoX</span>
@@ -138,7 +138,7 @@
               </a>
             </li>
             <li class="partner">
-              <a href="${reverse('university_profile', args=['EPFLx'])}">
+              <a href="#">
                 <img src="${static.url('images/university/epfl/epfl.png')}" />
                 <div class="name">
                   <span>EPFLx</span>
@@ -146,7 +146,7 @@
               </a>
             </li>
             <li class="partner">
-              <a href="${reverse('university_profile', args=['DelftX'])}">
+              <a href="#">
                 <img src="${static.url('images/university/delft/delft.png')}" />
                 <div class="name">
                   <span>DelftX</span>
@@ -154,7 +154,7 @@
               </a>
             </li>
             <li class="partner">
-              <a href="${reverse('university_profile', args=['RiceX'])}">
+              <a href="#">
                 <img src="${static.url('images/university/rice/rice.png')}" />
                 <div class="name">
                   <span>RiceX</span>
@@ -176,46 +176,6 @@
       </section>
     </section>
   </section>
-
-  ## Disable press and marketing for non-edX sites
-  % if not self.theme_enabled():
-    <section class="container">
-      <section class="more-info">
-        <header>
-          <h2>${_('{span_start}edX{span_end} News &amp; Announcements').format(span_start='<span class="edx">', span_end='</span>')}</h2>
-          <a class="action action-mediakit" href="${reverse('media-kit')}"> ${_('{span_start}edX{span_end} MEDIA KIT').format(span_start='<span class="org-name">', span_end='</span>')}</a>
-        </header>
-        <section class="news">
-          <section class="blog-posts">
-              %for entry in news:
-              <article>
-                  %if entry.image:
-                      <a href="${entry.link}" class="post-graphics" target="_blank"><img src="${entry.image}" /></a>
-                  %endif
-                  <div class="post-name">
-                      <a href="${entry.link}" target="_blank">${entry.title}</a>
-                      %if entry.summary:
-                          <p>${entry.summary}</p>
-                      %endif
-                      <p class="post-date">${strftime("%m/%d/%y", entry.published_parsed)}</p>
-                  </div>
-              </article>
-              %endfor
-          </section>
-          <section class="press-links">
-            <h3>${_("edX in the News:")}</h3>
-            <a target="_blank" href="http://www.nytimes.com/2013/04/30/education/adapting-to-blended-courses-and-finding-early-benefits.html?ref=education">${_("The New York Times")}</a>,
-            <a target="_blank" href="http://online.wsj.com/article/SB10001424127887323741004578414861572832182.html?mod=googlenews_wsj">${_("The Wall Street Journal")}</a>,
-            <a target="_blank" href="http://www.washingtonpost.com/local/education/stanford-to-help-build-edx-mooc-platform/2013/04/02/5b53bb3e-9bbe-11e2-9a79-eb5280c81c63_story.html">${_("The Washington Post")}</a>,
-            <a target="_blank" href="http://www.cbsnews.com/video/watch/?id=50143164n">${_("CBS Television")}</a>,
-            <a target="_blank" href="http://bostonglobe.com/2012/12/04/edx/AqnQ808q4IEcaUa8KuZuBO/story.html">${_("The Boston Globe")}</a>
-            <a href="${reverse('press')}" class="read-more">${_("Read More")} &rarr;</a>
-          </section>
-        </section>
-      </section>
-    </section>
-  % endif
-
 </section>
 
 <section id="video-modal" class="modal home-page-video-modal video-modal">

@@ -29,7 +29,7 @@ from courseware.courses import course_image_url, get_course_about_section
           % if stanford_theme_enabled():
             <span class="university">${get_course_about_section(course, 'university')}</span>
           % else:
-            <a href="${reverse('university_profile', args=[course.org])}" class="university">${get_course_about_section(course, 'university')}</a>
+            <a href="#" class="university">${get_course_about_section(course, 'university')}</a>
           % endif
           <span class="start-date">${course.start_date_text}</span>
         </div>
