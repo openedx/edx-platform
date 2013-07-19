@@ -36,13 +36,18 @@ class PeerGradingService(GradingService):
         return self.try_to_decode(response)
 
     def get_next_submission(self, problem_location, grader_id):
-        response = self.get(self.get_next_submission_url,
-            {'location': problem_location, 'grader_id': grader_id})
+        response = self.get(
+            self.get_next_submission_url,
+            {
+                'location': problem_location,
+                'grader_id': grader_id
+            }
+        )
         return self.try_to_decode(self._render_rubric(response))
 
     def save_grade(self, **kwargs):
         data = kwargs
-        data.update({'rubric_scores_complete' : True})
+        data.update({'rubric_scores_complete': True})
         return self.try_to_decode(self.post(self.save_grade_url, data))
 
     def is_student_calibrated(self, problem_location, grader_id):
@@ -56,7 +61,7 @@ class PeerGradingService(GradingService):
 
     def save_calibration_essay(self, **kwargs):
         data = kwargs
-        data.update({'rubric_scores_complete' : True})
+        data.update({'rubric_scores_complete': True})
         return self.try_to_decode(self.post(self.save_calibration_essay_url, data))
 
     def get_problem_list(self, course_id, grader_id):
@@ -85,15 +90,17 @@ without making actual service calls to the grading controller
 
 class MockPeerGradingService(object):
     def get_next_submission(self, problem_location, grader_id):
-        return {'success': True,
-                'submission_id': 1,
-                'submission_key': "",
-                'student_response': 'fake student response',
-                'prompt': 'fake submission prompt',
-                'rubric': 'fake rubric',
-                'max_score': 4}
+        return {
+            'success': True,
+            'submission_id': 1,
+            'submission_key': "",
+            'student_response': 'fake student response',
+            'prompt': 'fake submission prompt',
+            'rubric': 'fake rubric',
+            'max_score': 4
+        }
 
-    def save_grade(self,**kwargs):
+    def save_grade(self, **kwargs):
         return {'success': True}
 
     def is_student_calibrated(self, problem_location, grader_id):

@@ -23,6 +23,7 @@ log = logging.getLogger(__name__)
 
 EXTERNAL_GRADER_NO_CONTACT_ERROR = "Failed to contact external graders.  Please notify course staff."
 
+
 class PeerGradingFields(object):
     use_for_single_location = Boolean(
         display_name="Show Single Problem",
@@ -68,9 +69,11 @@ class PeerGradingFields(object):
         scope=Scope.settings,
         default="Peer Grading Interface"
     )
-    data = String(help="Html contents to display for this module",
+    data = String(
+        help="Html contents to display for this module",
         default='<peergrading></peergrading>',
-        scope=Scope.content)
+        scope=Scope.content
+    )
 
 
 class PeerGradingModule(PeerGradingFields, XModule):
@@ -79,11 +82,14 @@ class PeerGradingModule(PeerGradingFields, XModule):
     """
     _VERSION = 1
 
-    js = {'coffee': [resource_string(__name__, 'js/src/peergrading/peer_grading.coffee'),
-                     resource_string(__name__, 'js/src/peergrading/peer_grading_problem.coffee'),
-                     resource_string(__name__, 'js/src/collapsible.coffee'),
-                     resource_string(__name__, 'js/src/javascript_loader.coffee'),
-    ]}
+    js = {
+        'coffee': [
+            resource_string(__name__, 'js/src/peergrading/peer_grading.coffee'),
+            resource_string(__name__, 'js/src/peergrading/peer_grading_problem.coffee'),
+            resource_string(__name__, 'js/src/collapsible.coffee'),
+            resource_string(__name__, 'js/src/javascript_loader.coffee'),
+        ]
+    }
     js_module_name = "PeerGrading"
 
     css = {'scss': [resource_string(__name__, 'css/combinedopenended/display.scss')]}
@@ -133,7 +139,6 @@ class PeerGradingModule(PeerGradingFields, XModule):
         if timeinfo.close_date is not None and datetime.now(UTC()) > timeinfo.close_date:
             return True
         return False
-
 
     def _err_response(self, msg):
         """
