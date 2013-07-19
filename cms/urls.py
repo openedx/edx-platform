@@ -11,6 +11,7 @@ admin.autodiscover()
 
 urlpatterns = ('',  # nopep8
     url(r'^$', 'contentstore.views.howitworks', name='homepage'),
+    url(r'^index$', 'search.views.index_course', name="index_course"),
     url(r'^listing', 'contentstore.views.index', name='index'),
     url(r'^request_course_creator$', 'contentstore.views.request_course_creator', name='request_course_creator'),
     url(r'^edit/(?P<location>.*?)$', 'contentstore.views.edit_unit', name='edit_unit'),

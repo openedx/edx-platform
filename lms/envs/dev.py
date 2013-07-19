@@ -18,7 +18,6 @@ from logsettings import get_logger_config
 DEBUG = True
 TEMPLATE_DEBUG = True
 
-
 MITX_FEATURES['DISABLE_START_DATES'] = False
 MITX_FEATURES['ENABLE_SQL_TRACKING_LOGS'] = True
 MITX_FEATURES['SUBDOMAIN_COURSE_LISTINGS'] = False  # Enable to test subdomains--otherwise, want all courses to show up

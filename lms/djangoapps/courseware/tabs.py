@@ -219,12 +219,6 @@ def _notes_tab(tab, user, course, active_page, request):
     return []
 
 
-def _search_tab(tab, user, course, active_page):
-    """This is a stub meant to be updated through javascript immediately after being loaded"""
-    link = "#"
-    return [CourseTab("Search", link, False)]
-
-
 #### Validators
 def key_checker(expected_keys):
     """
@@ -298,9 +292,6 @@ def validate_tabs(course):
         raise InvalidTabsException(
             "Expected second tab to have type 'course_info'.  tabs: '{0}'".format(tabs))
 
-    # if tabs[-1]['type'] != "search":
-    #     raise InvalidTabsException(
-    #         "Expected last tab to have type 'search'. tabs: '{0}'".format(tabs))
     for t in tabs:
         if t['type'] not in VALID_TAB_TYPES:
             raise InvalidTabsException("Unknown tab type {0}. Known types: {1}"
@@ -336,7 +327,7 @@ def get_course_tabs(user, course, active_page, request):
         # via feature flags, and things like 'textbook' which might generate
         # multiple tabs.
         gen = VALID_TAB_TYPES[tab['type']].generator
-        tabs.extend(gen(tab, user, course, active_page, request))
+        tabs.extend(gen(tab, user, course, active_page))
 
     # Instructor tab is special--automatically added if user is staff for the course
     if has_access(user, course, 'staff'):
@@ -399,8 +390,6 @@ def get_default_tabs(user, course, active_page, request):
     if has_access(user, course, 'staff'):
         link = reverse('instructor_dashboard', args=[course.id])
         tabs.append(CourseTab('Instructor', link, active_page == 'instructor'))
-
-    tabs.extend(_search_tab({''}, user, course, active_page))
 
     return tabs
 

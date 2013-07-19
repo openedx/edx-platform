@@ -1,0 +1,140 @@
+// In order to avoid the wrath of elastic search the comments are here, but the real
+// file is in settings.py.
+
+{
+    "mappings": { // Defines the ES schema for a document
+        "properties": {
+            "searchable_text": {
+                // stores two copies of the field with different filters and whatnot to increase
+                // search relevancy
+                // boost defines the relative importance of each different indexing style
+                "type": "multi_field",
+                "fields": {
+                    "full_words": {
+                        "type": "string",
+                        "store": "yes",
+                        "index": "analyzed",
+                        "term_vector": "with_positions_offsets",
+                        "analyzer": "transcript_analyzer",
+                        "boost": 2.0,
+                        "similarity": "BM25"
+                    },
+
+                    "ngrams": {
+                        "type": "string",
+                        "store": "yes",
+                        "index": "analyzed",
+                        "term_vector": "with_positions_offsets",
+                        "analyzer": "ngram_analyzer",
+                        "boost": 1.0,
+                        "similarity": "BM25"
+                    }
+                }
+            },
+
+            "display_name": {
+                "type": "multi_field",
+                "fields": {
+
+                    "depth_search": {
+                        "type": "string",
+                        "store": "yes",
+                        "index": "analyzed",
+                        "term_vector": "with_positions_offsets",
+                        "analyzer": "depth_analyzer",
+                        "boost": 2.0,
+                        "similarity": "BM25"
+                    },
+
+                    "breadth_search": {
+                        "type": "string",
+                        "store": "yes",
+                        "index": "analyzed",
+                        "term_vector": "with_positions_offsets",
+                        "analyzer": "breadth_analyzer",
+                        "boost": 1.0,
+                        "similarity": "BM25"
+                    }
+                },
+
+                "id": {
+                    "type": "string",
+                    "store": "true"
+                },
+
+                "hash": {
+                    "type": "string",
+                    "store": "true"
+                },
+                
+                "thumbnail": {
+                    "type": "binary"
+                },
+
+                "course_id": {
+                    "type": "string",
+                    "store": "true"
+                }
+            }
+        }
+    },
+
+    "settings": {
+        "analysis":{
+            "analyzer": {
+                // Optimized for general search purposes. Stemming is minimal,
+                // Shingling gives extra weight to adjacent word matches.
+                // The double metaphone phonetic filter is a basic filter for mispellings
+                // that limits matches to a relatively small phonetic space around the term in question.
+                "transcript_analyzer": {
+                    "type": "custom",
+                    "tokenizer": "standard",
+                    "filter": ["word_delimiter", "lowercase", "custom_stemmer", "shingle",
+                                "precise_phonetic"]
+                },
+
+                // Uses a more general phonetic mapping that is more allowing of similar words
+                "ngram_analyzer": {
+                    "type": "custom",
+                    "tokenizer": "standard",
+                    "filter": ["word_delimiter", "lowercase", "custom_stemmer", "general_phonetic"]
+                },
+
+                // Similar to the transcript analyzer, without any stemming.
+                "depth_analyzer": {
+                    "type": "custom",
+                    "tokenizer": "standard",
+                    "filter": ["word_delimiter", "lowercase", "shingle", "precise_phonetic"]
+                },
+
+                // Scattershot matching, looking for any occurence of words that look similar to ones found
+                // in the title. Ensures that title searches will be at least decently effective
+                "breadth_analyzer": {
+                    "type": "custom",
+                    "tokenizer": "standard",
+                    "filter": ["lowercase", "general_phonetic"]
+                }
+            },
+
+            "filter" : {
+
+                "precise_phonetic": {
+                    "type": "phonetic",
+                    "encoder": "doublemetaphone",
+                    "replace": false
+                },
+
+                "general_phonetic": {
+                    "type": "phonetic",
+                    "encoder": "nysiis",
+                    "replace": false
+                }
+
+                "custom_stemmer": {
+                    "type": "stemmer",
+                    "name": "minimal_english"
+                }
+            }
+        }
+    }
+}

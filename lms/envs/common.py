@@ -428,6 +428,12 @@ BUGS_EMAIL = 'bugs@edx.org'
 ADMINS = ()
 MANAGERS = ADMINS
 
+# Search
+ES_DATABASE = "http://localhost:9200"
+# Tokenizer is for english here, but there are a number of alternate tokenizers for other languages
+SENTENCE_TOKENIZER = "tokenizers/punkt/english.pickle"
+# Same as SENTENCE_TOKENIZER, STEMMER is also currently for English, but allows for a detect value
+STEMMER = "english"
 # Static content
 STATIC_URL = '/static/'
 ADMIN_MEDIA_PREFIX = '/static/admin/'
@@ -883,6 +889,9 @@ INSTALLED_APPS = (
 
     # Student Identity Verification
     'verify_student',
+
+    # Search
+    'search',
 )
 
 ######################### MARKETING SITE ###############################

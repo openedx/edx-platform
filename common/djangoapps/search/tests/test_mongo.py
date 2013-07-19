@@ -1,22 +1,40 @@
-from ..es_requests import MongoIndexer
+"""
+Test suite for the MongoIndexer class in es_requests
+"""
+
+from StringIO import StringIO
+import json
+
 from django.test import TestCase
+from django.test.utils import override_settings
+
 from pymongo import MongoClient
-import random
-import string
+from pyfuzz.generator import random_item
+
+from search.es_requests import MongoIndexer, MalformedDataException
 
 
-def random_files(file_ending, test_files=10, filename_sizes=20,
-                 valid_chars=string.lowercase+string.uppercase+string.digits):
-    new_string = lambda: "".join(random.choice(valid_chars) for i in range(filename_sizes))+file_ending
-    return (new_string() for i in range(test_files))
+def dummy_document(key, values, data_type, **kwargs):
+    """
+    Returns a document matching the key to a dictionary mapping each value to a random string
+
+    kwargs is passed directly to the random_item method of pyfuzz
+    """
+
+    dummy_data = {}
+    dummy_data[key] = {value: random_item(data_type, **kwargs) for value in values}
+    return dummy_data
 
 
 class MongoTest(TestCase):
+    """
+    Test suite for the MongoIndexer class
+    """
 
-    def setUp(self, host="localhost", port=27017):
-        self.host = host
-        self.port = port
-        self.client = MongoClient(host, port)
+    @override_settings(CONTENTSTORE={'OPTIONS': {'db': 'test-content'}})
+    @override_settings(MODULESTORE={'default': {'OPTIONS': {'db': 'test-module', 'host': 'localhost'}}})
+    def setUp(self):
+        self.client = MongoClient('localhost', 27017)
         # Create test databases
         dummy = {"dummy": True}
         self.test_content = self.client["test-content"]
@@ -28,40 +46,130 @@ class MongoTest(TestCase):
         self.file_collection.insert(dummy)
         self.module_collection = self.test_module["modulestore"]
         self.module_collection.insert(dummy)
-        self.indexer = MongoIndexer(host, port, content_database="test-content", module_database="test-module")
+        self.indexer = MongoIndexer()
 
-    def test_incorrect_collection(self):
-        """Test to make sure that trying to create an indexer on a non-existent collection will error"""
+    def test_find_module_for_course(self):
+        id_ = dummy_document("_id", ["tag", "org", "course", "category", "name"], "ascii", length=20)
+        self.module_collection.insert(id_)
+        cursor = self.indexer._find_modules_for_course(id_["_id"]["course"])
+        self.assertEquals(cursor.next()["_id"], id_["_id"])
+
+    def test_find_module_transcript(self):
+        video_module = dummy_document("definition", ["data"], "ascii", length=200)
+        test_string = '<video youtube=\"0.75:-gKKUBQ2NWA,1.0:dJvsFg10JY,1.25:lm3IKbRE2VA,1.50:Pz0XiZ8wO9o\">'
+        video_module["definition"]["data"] += test_string
+        test_transcript = {"text": random_item("ascii", length=50)}
+        test_document = {"files_id": {"name": "dJvsFg10JY"}, "data": json.dumps(test_transcript)}
+        self.chunk_collection.insert(test_document)
+        transcript = self.indexer._find_transcript_for_video_module(video_module).encode("utf-8", "ignore")
+        self.assertEquals(transcript.replace(" ", ""), test_transcript["text"].replace(" ", ""))
+
+        test_bad_transcript = {"definition": {"data": 10}}
         success = False
         try:
-            MongoIndexer(self.host, self.port, chunk_collection="fake-collection")
-        except ValueError:
+            self.indexer._find_transcript_for_video_module(test_bad_transcript), [""]
+        except MalformedDataException:
             success = True
         self.assertTrue(success)
 
-    def test_find_files(self):
-        file_ending = ".test"
-        filenames = set(random_files(file_ending))
-        for filename in filenames:
-            self.file_collection.insert({"filename": filename})
-        found = set(element["filename"] for element in self.indexer.find_files_with_type(file_ending))
-        self.assertTrue(found == filenames)
+    def test_problem_text(self):
+        test_text = "<p>This is a test</p><text>and so is <a href='test.com'></a>this</text>"
+        document = {"definition": {"data": test_text}}
+        check = self.indexer._get_searchable_text_from_problem_data(document)
+        self.assertEquals(check, "This is a test and so is this")
 
-    def test_find_chunks(self):
-        file_ending = ".test"
-        filenames = set(random_files(file_ending))
-        for filename in filenames:
-            self.chunk_collection.insert({"files_id": {"name": filename}})
-        found = set(element["files_id"]["name"] for element in self.indexer.find_chunks_with_type(file_ending))
-        self.assertTrue(found == filenames)
+        bad_document = {"definition": {"data": "@#@%^%#$afsdkjjl@#!$%"}}
+        success = False
+        try:
+            bad_check = self.indexer._get_searchable_text_from_problem_data(bad_document)
+        except MalformedDataException:
+            success = True
+        self.assertTrue(success)
 
-    def test_find_modules(self):
-        category = "category"
-        content_strings = set(random_files(""))
-        for content_string in content_strings:
-            self.module_collection.insert({"_id": {"category": category, "content": content_string}})
-        found = set(element["_id"]["content"] for element in self.indexer.find_modules_by_category(category))
-        self.assertTrue(found == content_strings)
+    def test_youku_video(self):
+        document = {"definition": {"data": "player.youku.com"}}
+        image = self.indexer._get_thumbnail_from_video_module(document)
+        url = "https://lh6.ggpht.com/8_h5j6hiFXdSl5atSJDf8bJBy85b3IlzNWeRzOqRurfNVI_oiEG-dB3C0vHRclOG8A=w170"
+        self.assertEquals(image, url)
+
+    def test_bad_video(self):
+        document = {"definition": {"data": "<video asdfghjkl>"}}
+        success = False
+        try:
+            image = self.indexer._get_thumbnail_from_video_module(document)
+        except MalformedDataException:
+            success = True
+        self.assertTrue(success)
+
+    def test_good_thumbnail(self):
+        test_string = '<video youtube=\"0.75:-gKKUBQ2NWA,1.0:dJvsFg10JY,1.25:lm3IKbRE2VA,1.50:Pz0XiZ8wO9o\">'
+        document = {"definition": {"data": test_string}}
+        image = self.indexer._get_thumbnail_from_video_module(document)
+        url = "http://img.youtube.com/vi/dJvsFg10JY/0.jpg"
+        self.assertEquals(url, image)
+
+    def test_pdf_thumbnail(self):
+        bad_pseduo_file = StringIO()
+        bad_pdf = random_item("bytes", length=200)
+        bad_pseduo_file.write(bad_pdf)
+        try:
+            self.indexer._get_thumbnail_from_pdf({"data": bad_pseduo_file.getvalue()})
+        except:
+            success = False
+        self.assertFalse(success)
+
+    def test_html_thumbnail(self):
+        success = True
+        try:
+            self.indexer._get_thumbnail_from_html("<p>Test</p>")
+        except:
+            success = False
+        self.assertTrue(success)
+
+    def test_get_searchable_text(self):
+        problem_test_text = "<p>This is a test</p><text>and so is <a href='test.com'></a>this</text>"
+        problem_document = {"definition": {"data": problem_test_text}}
+        problem_test = self.indexer._get_searchable_text(problem_document, "problem")
+        self.assertEquals(problem_test, "This is a test and so is this")
+
+        video_module = dummy_document("definition", ["data"], "ascii", length=200)
+        test_string = '<video youtube=\"0.75:-gKKUBQ2NWA,1.0:dJvsFg10JY,1.25:lm3IKbRE2VA,1.50:Pz0XiZ8wO9o\">'
+        video_module["definition"]["data"] += test_string
+        test_transcript = {"text": random_item("ascii", length=50)}
+        test_document = {"files_id": {"name": "dJvsFg10JY"}, "data": json.dumps(test_transcript)}
+        self.chunk_collection.insert(test_document)
+        transcript = self.indexer._get_searchable_text(video_module, "transcript").encode("utf-8", "ignore")
+        self.assertEquals(transcript.replace(" ", ""), test_transcript["text"].replace(" ", ""))
+
+    def test_bulk_index_item(self):
+        data = {"type_hash": "test type hash", "hash": "test hash"}
+        bulk_index = self.indexer._get_bulk_index_item("test-index", data)
+        action = json.loads(bulk_index.split("\n")[0])
+        self.assertEquals(action["index"]["_index"], "test-index")
+        self.assertEquals(action["index"]["_type"], "test type hash")
+
+    def test_index_course_problem(self):
+        document = dummy_document("_id", ["org", "name"], "regex", regex="[a-zA-Z0-9]", length=50)
+        document["_id"].update({"category": "problem", "course": "test-course"})
+        asset_string = "<p>Test</p>"
+        document.update({"definition": {"data": asset_string}})
+        self.module_collection.insert(document)
+        course_document = {"_id": {"category": "course", "course": document["_id"]["course"], "name": "test_course"}}
+        self.module_collection.insert(course_document)
+        self.indexer.index_course("test-course")
+
+    def test_index_course_pdf(self):
+        document = dummy_document("_id", ["org"], "regex", regex="[a-zA-Z0-9]", length=50)
+        document["_id"].update({"category": "html", "course": "test-course"})
+        random_asset_name = random_item("regex", regex="[a-zA-Z0-9]", length=50)
+        asset_string = "/asset/%s.pdf" % random_asset_name
+        document.update({"definition": {"data": asset_string}})
+        self.module_collection.insert(document)
+
+        course_document = {"_id": {"category": "course", "course": document["_id"]["course"], "name": "test_course"}}
+        self.module_collection.insert(course_document)
+        check = self.indexer.index_course("test-course")
+        self.assertEquals(check, None)
 
     def tearDown(self):
         self.test_content.drop_collection("fs.chunks")

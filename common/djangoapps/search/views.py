@@ -1,109 +1,123 @@
-from mitxmako.shortcuts import render_to_string
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.http import HttpResponse
-from models import SearchResults
-from django_future.csrf import ensure_csrf_cookie
-from courseware.courses import get_course_with_access
+"""
+View functions and interface for search functionality
+"""
 
+import logging
+import hashlib
+import json
+import math
 
 import requests
-import enchant
-import logging
+from django.conf import settings
+from django.http import HttpResponseBadRequest, HttpResponse
+from mitxmako.shortcuts import render_to_response
+from django_future.csrf import ensure_csrf_cookie
 
-CONTENT_TYPES = ("transcript", "problem", "pdf")
-log = logging.getLogger("mitx.courseware")
+from courseware.courses import get_course_with_access
+from search.models import SearchResults
+from search.es_requests import MongoIndexer
+
+
+CONTENT_TYPES = set(["transcript", "problem"])
+FILTER_TYPES = set(["all", "video", "problem"])
+RESULTS_PER_PAGE = 10
+PAGE_PRELOAD_SPAN = 2
+log = logging.getLogger(__name__)
 
 
 @ensure_csrf_cookie
 def search(request, course_id):
-    results_string = ""
+    """
+    Returns search results within course_id from request.
+
+    Request should contain the query string in the "s" parameter.
+
+    If user doesn't have access to the course, get_course_with_access automatically 404s
+    """
+
+    page = int(request.GET.get("page", 1))
+    current_filter = request.GET.get("filter", "all")
     course = get_course_with_access(request.user, course_id, 'load')
-    if request.GET:
-        results_string = find(request, course_id)
-    full_html = render_to_string("search_templates/wrapper.html", {
-        "body": results_string, "course": course})
-    return HttpResponse(full_html)
+    search_results = _find(request, course_id)
+    full_context = {
+        "search_results": _construct_search_context(search_results, page, current_filter),
+        "course": course,
+        "old_query": request.GET.get("s", "*.*"),
+        "course_id": course_id,
+        "current_filter": current_filter,
+        "page": page
+    }
+    return render_to_response("search_templates/results.html", full_context)
 
 
-def find(request, course_id, database="http://127.0.0.1:9200",
-         field="searchable_text", max_result=100):
-    get_content = lambda request, content: content+"-index" if request.GET.get(content, False) else None
+@ensure_csrf_cookie
+def index_course(request):
+    """
+    Indexes the searchable material currently within the course
+
+    Is called via AJAX from Studio, and doesn't render any templates.
+    """
+
+    indexer = MongoIndexer()
+    if "course" in request.POST:
+        indexer.index_course(request.POST["course"])
+        return HttpResponse(status=204)
+    else:
+        return HttpResponseBadRequest()
+
+
+def _find(request, course_id):
+    """
+    Method in charge of getting search results and associated metadata
+    """
+
+    database = settings.ES_DATABASE
     query = request.GET.get("s", "*.*")
-    page = request.GET.get("page", 1)
-    results_per_page = request.GET.get("results", 15)
-    index = ",".join(filter(None, [get_content(request, content) for content in CONTENT_TYPES]))
-    if len(index) == 0:
-        index = ",".join([content+"-index" for content in CONTENT_TYPES])
-    if request.GET.get("all_courses" == "true", False):
-        base_url = "/".join([database, index])
-    else:
-        course_type = course_id.split("/")[1]
-        base_url = "/".join([database, index, course_type])
-    full_url = "/".join([base_url, "_search?q="+field+":"])
-    log.debug(full_url)
-    context = {}
-    response = requests.get(full_url+query+"&size="+str(max_result))
-    data = SearchResults(request, response)
-    data.filter("course", request.GET.get("selected_course"))
-    data.filter("org", request.GET.get("selected_org"))
-    org_histogram = data.get_counter("org")
-    course_histogram = data.get_counter("course")
-    data.sort_results()
-    context.update({"results": data.has_results})
-    correction = spell_check(query)
-    results_pages = Paginator(data.entries, results_per_page)
+    full_query_data = \
+        {
+            "query": {
+                "query_string": {
+                    "default_field": "searchable_text",
+                    "query": query,
+                    "analyzer": "standard"
+                },
+            },
+            "size": "1000"
+        }
+    index = ",".join([content + "-index" for content in CONTENT_TYPES])
 
-    data = proper_page(results_pages, page)
-    context.update({
-        "data": data, "next_page": next_link(request, data), "prev_page": prev_link(request, data),
-        "search_correction_link": search_correction_link(request, correction),
-        "spelling_correction": correction, "org_histogram": org_histogram,
-        "course_histogram": course_histogram, "selected_course": request.GET.get("selected_course", ""),
-        "selected_org": request.GET.get("selected_org", "")})
-    return render_to_string("search_templates/results.html", context)
+    course_hash = hashlib.sha1(course_id).hexdigest()
+    base_url = "/".join([database, index, course_hash])
+    base_url += "/_search"
+    response = requests.get(base_url, data=json.dumps(full_query_data))
+    return SearchResults(response, **request.GET)
 
 
-def query_reduction(query, stopwords):
-    return [word.lower() for word in query.split() if word not in stopwords]
+def _construct_search_context(search_results, page, this_filter):
+    """
+    Takes the entirety of the results from ElasticSearch and constructs the JSON needed by the template
 
+    Specifically, grabs two pages on either side of the current page within the current filter,
+    also associates the total number of results with all other filter types.
+    """
 
-def proper_page(pages, index):
-    correct_page = pages.page(1)
-    try:
-        correct_page = pages.page(index)
-    except PageNotAnInteger:
-        correct_page = pages.page(1)
-    except EmptyPage:
-        correct_page = pages.page(pages.num_pages)
-    return correct_page
+    total_results = {filter_: {} for filter_ in FILTER_TYPES}
+    functional_results_length = len(search_results.get_category(this_filter))
+    total_pages = int(math.ceil(float(functional_results_length) / RESULTS_PER_PAGE))
 
+    current_filter_pages = lambda range_generator: {
+        page: search_results.get_page(page, this_filter, RESULTS_PER_PAGE) for page in range_generator
+    }
 
-def next_link(request, paginator):
-    return request.path+"?s="+request.GET.get("s", "") + \
-        "&content=" + request.GET.get("content", "transcript") + "&page="+str(paginator.next_page_number())
+    page_span = xrange(max(1, page - PAGE_PRELOAD_SPAN), min(total_pages + 1, page + PAGE_PRELOAD_SPAN + 1))
+    total_results[this_filter]["results"] = current_filter_pages(page_span)
+    total_results[this_filter]["total"] = functional_results_length
 
+    results_total = lambda filter_: {
+        "total": len(search_results.get_category(filter_)),
+        "results": {}
+    }
 
-def prev_link(request, paginator):
-    return request.path+"?s="+request.GET.get("s", "") + \
-        "&content=" + request.GET.get("content", "transcript") + "&page="+str(paginator.previous_page_number())
-
-
-def search_correction_link(request, term, page="1"):
-    if term:
-        return request.path+"?s="+term+"&page="+page+"&content="+request.GET.get("content", "transcript")
-    else:
-        return request.path+"?s="+request.GET["s"]+"&page"+page+"&content="+request.GET.get("content", "transcript")
-
-
-def spell_check(query, pyenchant_dictionary_file="common/djangoapps/search/pyenchant_corpus.txt", stopwords=set()):
-    """Returns corrected version with attached html if there are suggested corrections."""
-    dictionary = enchant.request_pwl_dict(pyenchant_dictionary_file)
-    words = query_reduction(query, stopwords)
-    try:
-        possible_corrections = [dictionary.suggest(word)[0] for word in words]
-    except IndexError:
-        return False
-    if possible_corrections == words:
-        return None
-    else:
-        return " ".join(possible_corrections)
+    other_filters = FILTER_TYPES - set([this_filter])
+    total_results.update({filter_: results_total(filter_) for filter_ in other_filters})
+    return total_results

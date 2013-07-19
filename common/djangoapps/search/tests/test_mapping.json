@@ -1,16 +1,16 @@
 {
-	"mappings": {
-		"test-string": {
-			"type": "string",
-			"store": "yes",
-			"index": "analyzed",
-			"term_vector": "with_positions_offsets"
-		},
+    "mappings": {
+        "searchable_text": {
+            "type": "string",
+            "store": "yes",
+            "index": "analyzed",
+            "term_vector": "with_positions_offsets"
+        },
 
-		"test-float": {
-			"type": "float",
-			"store": "yes"
-		}
-	}
+        "test-float": {
+            "type": "float",
+            "store": "yes"
+        }
+    }
 
 }
