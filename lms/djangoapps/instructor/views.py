@@ -672,10 +672,10 @@ def instructor_dashboard(request, course_id):
                             to=to,
                             subject=subject,
                             html_message=html_message,
-                            hash=md5((html_message+subject+datetime.datetime.isoformat(datetime.datetime.now())).encode('utf-8')).hexdigest())
+                            hash=md5((html_message + subject + datetime.datetime.isoformat(datetime.datetime.now())).encode('utf-8')).hexdigest())
         email.save()
 
-        course_url = request.build_absolute_uri(reverse('course_root',  kwargs={'course_id': course_id}))
+        course_url = request.build_absolute_uri(reverse('course_root', kwargs={'course_id': course_id}))
         tasks.delegate_email_batches.delay(email.hash, email.to, course_id, course_url, request.user.id)
 
         if to == "all":
@@ -765,9 +765,9 @@ s (~10k), it may take 1-2 hours to send all emails.</font>"
                'course_stats': course_stats,
                'msg': msg,
                'modeflag': {idash_mode: 'selectedmode'},
-               'to': to,                #email
-               'subject': subject,      #email
-               'message': html_message, #email
+               'to': to,                 # email
+               'subject': subject,       # email
+               'message': html_message,  # email
                'problems': problems,		# psychometrics
                'plots': plots,			# psychometrics
                'course_errors': modulestore().get_item_errors(course.location),

@@ -1,6 +1,7 @@
 import threading
 from fake_smtp import FakeSMTPServer
 
+
 class FakeSMTPServerThread(threading.Thread):
     """
     Thread for running a fake SMTP server for testing email

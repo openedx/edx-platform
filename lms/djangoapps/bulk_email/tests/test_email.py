@@ -15,6 +15,7 @@ from bulk_email.models import CourseEmail
 STAFF_COUNT = 3
 STUDENT_COUNT = 10
 
+
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestEmail(ModuleStoreTestCase):
     def setUp(self):
@@ -39,7 +40,7 @@ class TestEmail(ModuleStoreTestCase):
             CourseEnrollmentFactory.create(user=student, course_id=self.course.id)
 
         self.client.login(username=self.instructor.username, password="test")
-        
+
     def test_send_to_self(self):
         """
         Make sure email send to myself goes to myself.
@@ -63,8 +64,8 @@ class TestEmail(ModuleStoreTestCase):
 
         self.assertContains(response, "Your email was successfully queued for sending.")
 
-        self.assertEquals(len(mail.outbox), 1+len(self.staff))
-        self.assertItemsEqual([e.to[0] for e in mail.outbox], [self.instructor.email]+[s.email for s in self.staff])
+        self.assertEquals(len(mail.outbox), 1 + len(self.staff))
+        self.assertItemsEqual([e.to[0] for e in mail.outbox], [self.instructor.email] + [s.email for s in self.staff])
 
     def test_send_to_all(self):
         """
@@ -75,8 +76,8 @@ class TestEmail(ModuleStoreTestCase):
 
         self.assertContains(response, "Your email was successfully queued for sending.")
 
-        self.assertEquals(len(mail.outbox), 1+len(self.staff)+len(self.students))
-        self.assertItemsEqual([e.to[0] for e in mail.outbox], [self.instructor.email]+[s.email for s in self.staff]+[s.email for s in self.students])
+        self.assertEquals(len(mail.outbox), 1 + len(self.staff) + len(self.students))
+        self.assertItemsEqual([e.to[0] for e in mail.outbox], [self.instructor.email] + [s.email for s in self.staff] + [s.email for s in self.students])
 
     def test_get_course_exc(self):
         """

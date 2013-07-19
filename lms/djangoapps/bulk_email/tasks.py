@@ -19,6 +19,7 @@ import time
 import logging
 log = logging.getLogger(__name__)
 
+
 @task()
 def delegate_email_batches(hash_for_msg, recipient, course_id, course_url, user_id):
     '''
@@ -57,22 +58,22 @@ def delegate_email_batches(hash_for_msg, recipient, course_id, course_url, user_
 
     recipient_list = list(recipient_qset)
     total_num_emails = recipient_qset.count()
-    num_workers=int(math.ceil(float(total_num_emails)/float(settings.EMAILS_PER_TASK)))
-    chunk=int(math.ceil(float(total_num_emails)/float(num_workers)))
+    num_workers = int(math.ceil(float(total_num_emails) / float(settings.EMAILS_PER_TASK)))
+    chunk = int(math.ceil(float(total_num_emails) / float(num_workers)))
 
     for i in range(num_workers):
-        to_list=recipient_list[i*chunk:i*chunk+chunk]
+        to_list = recipient_list[i * chunk:i * chunk + chunk]
         course_email.delay(hash_for_msg, to_list, course.display_name, course_url, False)
     return num_workers
 
 
 @task(default_retry_delay=15, max_retries=5)
 def course_email(hash_for_msg, to_list, course_title, course_url, throttle=False):
-    """                                                                                                   
+    """
     Takes a subject and an html formatted email and sends it from
     sender to all addresses in the to_list, with each recipient
     being the only "to".  Emails are sent multipart, in both plain
-    text and html.  
+    text and html.
     """
     try:
         msg = CourseEmail.objects.get(hash=hash_for_msg)
@@ -82,8 +83,8 @@ def course_email(hash_for_msg, to_list, course_title, course_url, throttle=False
 
     subject = "[" + course_title + "] " + msg.subject
 
-    p = Popen(['lynx','-stdin','-display_charset=UTF-8','-assume_charset=UTF-8','-dump'], stdin=PIPE, stdout=PIPE)
-    (plaintext, err_from_stderr) = p.communicate(input=msg.html_message.encode('utf-8')) #use lynx to get plaintext
+    p = Popen(['lynx', '-stdin', '-display_charset=UTF-8', '-assume_charset=UTF-8', '-dump'], stdin=PIPE, stdout=PIPE)
+    (plaintext, err_from_stderr) = p.communicate(input=msg.html_message.encode('utf-8'))  # use lynx to get plaintext
 
     course_title_no_quotes = re.sub(r'"', '', course_title)
     from_addr = '"%s" Course Staff <%s>' % (course_title_no_quotes, settings.DEFAULT_BULK_FROM_EMAIL)
@@ -92,7 +93,7 @@ def course_email(hash_for_msg, to_list, course_title, course_url, throttle=False
         log.info(err_from_stderr)
 
     try:
-        connection = get_connection() #get mail connection from settings
+        connection = get_connection()
         connection.open()
         num_sent = 0
         num_error = 0
@@ -100,20 +101,20 @@ def course_email(hash_for_msg, to_list, course_title, course_url, throttle=False
         while to_list:
             (name, email) = to_list[-1].values()
             html_footer = render_to_string('emails/email_footer.html',
-                                           {'name':name,
-                                            'email':email,
-                                            'course_title':course_title,
-                                            'course_url':course_url})
+                                           {'name': name,
+                                            'email': email,
+                                            'course_title': course_title,
+                                            'course_url': course_url})
             plain_footer = render_to_string('emails/email_footer.txt',
-                                            {'name':name,
-                                             'email':email,
-                                             'course_title':course_title,
-                                             'course_url':course_url})
-    
-            email_msg = EmailMultiAlternatives(subject, plaintext+plain_footer.encode('utf-8'), from_addr, [email], connection=connection)
-            email_msg.attach_alternative(msg.html_message+html_footer.encode('utf-8'), 'text/html')
+                                            {'name': name,
+                                             'email': email,
+                                             'course_title': course_title,
+                                             'course_url': course_url})
 
-            if throttle or current_task.request.retries > 0: #throttle if we tried a few times and got the rate limiter
+            email_msg = EmailMultiAlternatives(subject, plaintext + plain_footer.encode('utf-8'), from_addr, [email], connection=connection)
+            email_msg.attach_alternative(msg.html_message + html_footer.encode('utf-8'), 'text/html')
+
+            if throttle or current_task.request.retries > 0:  # throttle if we tried a few times and got the rate limiter
                 time.sleep(0.2)
 
             try:
@@ -123,7 +124,7 @@ def course_email(hash_for_msg, to_list, course_title, course_url, throttle=False
             except SMTPDataError as exc:
                 #According to SMTP spec, we'll retry error codes in the 4xx range.  5xx range indicates hard failure
                 if exc.smtp_code >= 400 and exc.smtp_code < 500:
-                    raise exc # this will cause the outer handler to catch the exception and retry the entire task
+                    raise exc  # this will cause the outer handler to catch the exception and retry the entire task
                 else:
                     #this will fall through and not retry the message, since it will be popped
                     log.warn('Email with hash ' + hash_for_msg + ' not delivered to ' + email + ' due to error: ' + exc.smtp_error)
@@ -136,7 +137,8 @@ def course_email(hash_for_msg, to_list, course_title, course_url, throttle=False
 
     except (SMTPDataError, SMTPConnectError, SMTPServerDisconnected) as exc:
         #error caught here cause the email to be retried.  The entire task is actually retried without popping the list
-        raise course_email.retry(arg=[hash_for_msg, to_list, course_title, course_url, current_task.request.retries>0], exc=exc, countdown=(2 ** current_task.request.retries)*15)
+        raise course_email.retry(arg=[hash_for_msg, to_list, course_title, course_url, current_task.request.retries > 0], exc=exc, countdown=(2 ** current_task.request.retries) * 15)
+
 
 #This string format code is wrapped in this function to allow mocking for a unit test
 def course_email_result(num_sent, num_error):

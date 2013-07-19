@@ -16,6 +16,7 @@ from smtplib import SMTPDataError, SMTPServerDisconnected, SMTPConnectError
 
 TEST_SMTP_PORT = 1025
 
+
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE, EMAIL_BACKEND='django.core.mail.backends.smtp.EmailBackend', EMAIL_HOST='localhost', EMAIL_PORT=TEST_SMTP_PORT)
 class TestEmailErrors(ModuleStoreTestCase):
     def setUp(self):
@@ -38,7 +39,7 @@ class TestEmailErrors(ModuleStoreTestCase):
         url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id})
         response = self.client.post(url, {'action': 'Send email', 'to': 'myself', 'subject': 'test subject for myself', 'message': 'test message for myself'})
         self.assertTrue(retry.called)
-        (_,kwargs) = retry.call_args
+        (_, kwargs) = retry.call_args
         exc = kwargs['exc']
         self.assertTrue(type(exc) == SMTPDataError)
 
@@ -58,9 +59,9 @@ class TestEmailErrors(ModuleStoreTestCase):
         self.assertFalse(retry.called)
 
         #test that after the failed email, the rest send successfully
-        ((sent, fail),_) = result.call_args
+        ((sent, fail), _) = result.call_args
         self.assertEquals(fail, 1)
-        self.assertEquals(sent, settings.EMAILS_PER_TASK-1)
+        self.assertEquals(sent, settings.EMAILS_PER_TASK - 1)
 
     @patch('bulk_email.tasks.course_email.retry')
     def test_disconn_err_retry(self, retry):
@@ -71,7 +72,7 @@ class TestEmailErrors(ModuleStoreTestCase):
         url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id})
         response = self.client.post(url, {'action': 'Send email', 'to': 'myself', 'subject': 'test subject for myself', 'message': 'test message for myself'})
         self.assertTrue(retry.called)
-        (_,kwargs) = retry.call_args
+        (_, kwargs) = retry.call_args
         exc = kwargs['exc']
         self.assertTrue(type(exc) == SMTPServerDisconnected)
 
@@ -85,6 +86,6 @@ class TestEmailErrors(ModuleStoreTestCase):
         url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id})
         response = self.client.post(url, {'action': 'Send email', 'to': 'myself', 'subject': 'test subject for myself', 'message': 'test message for myself'})
         self.assertTrue(retry.called)
-        (_,kwargs) = retry.call_args
+        (_, kwargs) = retry.call_args
         exc = kwargs['exc']
         self.assertTrue(type(exc) == SMTPConnectError)

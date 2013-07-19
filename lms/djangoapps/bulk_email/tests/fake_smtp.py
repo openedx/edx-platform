@@ -4,6 +4,7 @@ import asyncore
 import asynchat
 import smtplib
 
+
 class FakeSMTPChannel(smtpd.SMTPChannel):
     """A fake SMTPChannel for sending fake error response through socket"""
     def __init__(self, server, conn, addr):
@@ -30,18 +31,19 @@ class FakeSMTPChannel(smtpd.SMTPChannel):
         self.push('421 SMTP Server error: too many concurrent sessions, please try again later.')
         self.set_terminator('\r\n')
 
+
 class FakeSMTPServer(smtpd.SMTPServer):
     """A fake SMTP server"""
     def __init__(self, *args, **kwargs):
         smtpd.SMTPServer.__init__(self, *args, **kwargs)
-    
+
     def set_errtype(self, e, r=''):
         self.errtype = e
         self.reply = r
 
     def handle_accept(self):
         if self.errtype == "DISCONN":
-            self.accept()            
+            self.accept()
         elif self.errtype == "CONN":
             pair = self.accept()
             if pair is not None:

@@ -12,6 +12,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from student.tests.factories import UserFactory, AdminFactory, CourseEnrollmentFactory
 from student.views import change_email_settings
 
+
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestOptoutCourseEmails(ModuleStoreTestCase):
     def setUp(self):
@@ -27,8 +28,8 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
         Make sure student does not receive course email after opting out
         """
         url = reverse('change_email_settings')
-        response = self.client.post(url, {'course_id':self.course.id})
-        self.assertEquals(json.loads(response.content), {'success':True})
+        response = self.client.post(url, {'course_id': self.course.id})
+        self.assertEquals(json.loads(response.content), {'success': True})
 
         self.client.logout()
         self.client.login(username=self.instructor.username, password="test")
@@ -45,8 +46,8 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
         Make sure student receives course email after opting in
         """
         url = reverse('change_email_settings')
-        response = self.client.post(url, {'course_id':self.course.id, 'receive_emails':'on'})
-        self.assertEquals(json.loads(response.content), {'success':True})
+        response = self.client.post(url, {'course_id': self.course.id, 'receive_emails': 'on'})
+        self.assertEquals(json.loads(response.content), {'success': True})
 
         self.client.logout()
         self.client.login(username=self.instructor.username, password="test")

@@ -15,6 +15,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 from mock import patch
 
+
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestInstructorDashboardEmailView(ModuleStoreTestCase):
     '''
@@ -22,12 +23,12 @@ class TestInstructorDashboardEmailView(ModuleStoreTestCase):
     '''
     def setUp(self):
         self.course = CourseFactory.create()
-        
+
         # Create instructor account
         instructor = AdminFactory.create()
         self.client.login(username=instructor.username, password="test")
 
-    @patch.dict(settings.MITX_FEATURES, {'ENABLE_INSTRUCTOR_EMAIL':True})
+    @patch.dict(settings.MITX_FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True})
     def test_email_flag_true(self):
         response = self.client.get(reverse('instructor_dashboard',
                                    kwargs={'course_id': self.course.id}))
@@ -44,7 +45,7 @@ class TestInstructorDashboardEmailView(ModuleStoreTestCase):
         send_to_label = '<label for="id_to">Send to:</label>'
         self.assertTrue(send_to_label in response.content)
 
-    @patch.dict(settings.MITX_FEATURES, {'ENABLE_INSTRUCTOR_EMAIL':False})
+    @patch.dict(settings.MITX_FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': False})
     def test_email_flag_false(self):
         response = self.client.get(reverse('instructor_dashboard',
                                    kwargs={'course_id': self.course.id}))

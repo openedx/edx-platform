@@ -635,7 +635,7 @@ def create_account(request, post_override=None):
 
     required_post_vars = ['username', 'email', 'name', 'password', 'terms_of_service', 'honor_code']
     if tos_not_required:
-        required_post_vars =  ['username', 'email', 'name', 'password', 'honor_code']
+        required_post_vars = ['username', 'email', 'name', 'password', 'honor_code']
 
     for a in required_post_vars:
         if len(post_vars[a]) < 2:
@@ -1226,6 +1226,7 @@ def accept_name_change(request):
 
     return accept_name_change_by_id(int(request.POST['id']))
 
+
 @ensure_csrf_cookie
 def change_email_settings(request):
     if request.method != "POST":
@@ -1242,6 +1243,7 @@ def change_email_settings(request):
         Optout.objects.get_or_create(email=request.user.email, course_id=course_id)
 
     return HttpResponse(json.dumps({'success': True}))
+
 
 def _get_news(top=None):
     "Return the n top news items on settings.RSS_URL"
