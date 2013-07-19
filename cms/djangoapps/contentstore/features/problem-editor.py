@@ -170,7 +170,8 @@ def edit_latex_source(step):
 @step('my change to the High Level Source is persisted')
 def high_level_source_persisted(step):
     def verify_text(driver):
-        return world.css_text('.problem') == 'hi'
+        css_sel = '.problem div>span'
+        return world.css_text(css_sel) == 'hi'
 
     world.wait_for(verify_text)
 
