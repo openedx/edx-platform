@@ -20,22 +20,22 @@ data: |
                 <draggable id="11" label="few"/>
             </drag_and_drop_input>
             <answer type="loncapa/python">
-            correct_answer = {
-                    '1':      [[70, 150], 121],
-                    '6':      [[190, 150], 121],
-                    '8':      [[190, 150], 121],
-                    '2':      [[310, 150], 121],
-                    '9':      [[310, 150], 121],
-                    '11':     [[310, 150], 121],
-                    '4':      [[420, 150], 121],
-                    '7':      [[420, 150], 121],
-                    '3':      [[550, 150], 121],
-                    '5':      [[550, 150], 121],
-                    '10':     [[550, 150], 121]}
-            if draganddrop.grade(submission[0], correct_answer):
-                correct = ['correct']
-            else:
-                correct = ['incorrect']
+    correct_answer = {
+            '1':      [[70, 150], 121],
+            '6':      [[190, 150], 121],
+            '8':      [[190, 150], 121],
+            '2':      [[310, 150], 121],
+            '9':      [[310, 150], 121],
+            '11':     [[310, 150], 121],
+            '4':      [[420, 150], 121],
+            '7':      [[420, 150], 121],
+            '3':      [[550, 150], 121],
+            '5':      [[550, 150], 121],
+            '10':     [[550, 150], 121]}
+    if draganddrop.grade(submission[0], correct_answer):
+        correct = ['correct']
+    else:
+        correct = ['incorrect']
             </answer>
         </customresponse>
     </problem>
