@@ -674,6 +674,8 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         """
         Use w/ caution. Really intended for use by the persistence layer.
         """
+        # if caller wants kvs, caller's assuming it's up to date; so, decache it
+        self.save()
         return self._model_data._kvs
 
     # =============================== BUILTIN METHODS ==========================
