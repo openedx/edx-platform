@@ -77,6 +77,25 @@ describe 'Problem', ->
         [@problem.updateMathML, @stubbedJax, $('#input_example_1').get(0)]
       ]
 
+  describe 'renderProgressState', ->
+    beforeEach ->
+      @problem = new Problem($('.xmodule_display'))
+      #@renderProgressState = @problem.renderProgressState
+
+    describe 'with a status of "none"', ->
+      it 'reports the number of points possible', ->
+        @problem.el.data('progress_status', 'none')
+        @problem.el.data('progress_detail', '0/1')
+        @problem.renderProgressState()
+        expect(@problem.$('.problem-progress').html()).toEqual "(1 point possible)"
+
+    describe 'with any other valid status', ->
+      it 'reports the current score', ->
+        @problem.el.data('progress_status', 'foo')
+        @problem.el.data('progress_detail', '1/1')
+        @problem.renderProgressState()
+        expect(@problem.$('.problem-progress').html()).toEqual "(1/1 points)"
+
   describe 'render', ->
     beforeEach ->
       @problem = new Problem($('.xmodule_display'))

@@ -35,15 +35,34 @@ class @Problem
       @$('input.math').each (index, element) =>
         MathJax.Hub.Queue [@refreshMath, null, element]
 
+  renderProgressState: =>
+    detail = @el.data('progress_detail')
+    status = @el.data('progress_status')
+    # i18n
+    progress = "(#{detail} points)"
+    if status == 'none' and detail? and detail.indexOf('/') > 0
+        a = detail.split('/')
+        possible = parseInt(a[1])
+        if possible == 1
+            # i18n
+            progress = "(#{possible} point possible)"
+        else
+            # i18n
+            progress = "(#{possible} points possible)"
+    @$('.problem-progress').html(progress)
+
   updateProgress: (response) =>
     if response.progress_changed
-        @el.attr progress: response.progress_status
+        @el.data('progress_status', response.progress_status)
+        @el.data('progress_detail', response.progress_detail)
         @el.trigger('progressChanged')
+    @renderProgressState()
 
   forceUpdate: (response) =>
-    @el.attr progress: response.progress_status
+    @el.data('progress_status', response.progress_status)
+    @el.data('progress_detail', response.progress_detail)
     @el.trigger('progressChanged')
-
+    @renderProgressState()
 
   queueing: =>
     @queued_items = @$(".xqueue")
@@ -113,7 +132,7 @@ class @Problem
           @setupInputTypes()
           @bind()
           @queueing()
-
+          @forceUpdate response
 
   # TODO add hooks for problem types here by inspecting response.html and doing
   # stuff if a div w a class is found
