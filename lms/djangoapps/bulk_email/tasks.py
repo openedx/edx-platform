@@ -36,6 +36,7 @@ def delegate_email_batches(hash_for_msg, recipient, course_id, course_url, user_
         log.error("get_course_by_id failed: " + exc.args[0])
         raise Exception("get_course_by_id failed: " + exc.args[0])
 
+    print "COURSE: ", course
     if recipient == "myself":
         recipient_qset = User.objects.filter(id=user_id).values('profile__name', 'email')
     else:
@@ -56,6 +57,7 @@ def delegate_email_batches(hash_for_msg, recipient, course_id, course_url, user_
         recipient_qset = recipient_qset.distinct()
 
     recipient_list = list(recipient_qset)
+    print "RECIPIENT_LIST: ", recipient_list
     total_num_emails = recipient_qset.count()
     num_workers=int(math.ceil(float(total_num_emails)/float(settings.EMAILS_PER_TASK)))
     chunk=int(math.ceil(float(total_num_emails)/float(num_workers)))

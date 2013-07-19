@@ -3,7 +3,6 @@ Unit tests for sending course email
 """
 
 from django.test.utils import override_settings
-from django.conf import settings
 from django.core.urlresolvers import reverse
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -46,7 +45,6 @@ class TestEmail(ModuleStoreTestCase):
         Make sure email send to myself goes to myself.
         """
         url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id})
-        print settings.EMAIL_BACKEND
         response = self.client.post(url, {'action': 'Send email', 'to': 'myself', 'subject': 'test subject for myself', 'message': 'test message for myself'})
 
         self.assertContains(response, "Your email was successfully queued for sending.")
