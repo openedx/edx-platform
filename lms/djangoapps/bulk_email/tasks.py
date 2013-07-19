@@ -56,7 +56,6 @@ def delegate_email_batches(hash_for_msg, recipient, course_id, course_url, user_
         recipient_qset = recipient_qset.distinct()
 
     recipient_list = list(recipient_qset)
-    print "RECIPIENT_LIST: ", recipient_list
     total_num_emails = recipient_qset.count()
     num_workers=int(math.ceil(float(total_num_emails)/float(settings.EMAILS_PER_TASK)))
     chunk=int(math.ceil(float(total_num_emails)/float(num_workers)))
@@ -81,7 +80,6 @@ def course_email(hash_for_msg, to_list, course_title, course_url, throttle=False
         log.exception(exc.args[0])
         raise exc
 
-    print "COURSE EMAIL: ", msg
     subject = "[" + course_title + "] " + msg.subject
 
     p = Popen(['lynx','-stdin','-display_charset=UTF-8','-assume_charset=UTF-8','-dump'], stdin=PIPE, stdout=PIPE)
@@ -119,9 +117,7 @@ def course_email(hash_for_msg, to_list, course_title, course_url, throttle=False
                 time.sleep(0.2)
 
             try:
-                print "bout to send message for ", email
                 connection.send_messages([email_msg])
-                print "SENT!!!!!!!!!!!!"
                 log.info('Email with hash ' + hash_for_msg + ' sent to ' + email)
                 num_sent += 1
             except SMTPDataError as exc:
@@ -135,9 +131,7 @@ def course_email(hash_for_msg, to_list, course_title, course_url, throttle=False
 
             to_list.pop()
 
-        print "CLOSING CONNECTION"
         connection.close()
-        print "BOUT TO RETURN FORMATTED RESULT"
         return course_email_result(num_sent, num_error)
 
     except (SMTPDataError, SMTPConnectError, SMTPServerDisconnected) as exc:
