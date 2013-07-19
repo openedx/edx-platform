@@ -9,7 +9,7 @@
         % endfor
         </ul>
       </div>
-      <div class="${'tabs-wrapper' if (len(tabs) != 1) else 'editor-single-tab' }">
+      <div class="tabs-wrapper">
        % for tab in tabs:
         <div class="component-tab ${'is-inactive' if not tab.get('current', False) else ''}" id="tab-${html_id}-${loop.index}" >
             <%include file="${tab['template']}" args="tabName=tab['name']"/>

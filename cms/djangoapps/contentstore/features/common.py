@@ -228,6 +228,26 @@ def i_created_a_video_component(step):
     )
 
 
+@step('I have created a Video Alpha component$')
+def i_created_video_alpha(step):
+    step.given('I have enabled the videoalpha advanced module')
+    world.css_click('a.course-link')
+    step.given('I have added a new subsection')
+    step.given('I expand the first section')
+    world.css_click('a.new-unit-item')
+    world.css_click('.large-advanced-icon')
+    world.click_component_from_menu('videoalpha', None, '.xmodule_VideoAlphaModule')
+
+
+@step('I have enabled the (.*) advanced module$')
+def i_enabled_the_advanced_module(step, module):
+    step.given('I have opened a new course section in Studio')
+    world.css_click('.nav-course-settings')
+    world.css_click('.nav-course-settings-advanced')
+    type_in_codemirror(0, '["%s"]' % module)
+    press_the_notification_button(step, 'Save')
+
+
 @step('I have clicked the new unit button')
 def open_new_unit(step):
     step.given('I have opened a new course section in Studio')
