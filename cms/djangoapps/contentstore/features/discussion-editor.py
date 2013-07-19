@@ -9,7 +9,8 @@ def i_created_discussion_tag(step):
     world.create_component_instance(
         step, '.large-discussion-icon',
         'discussion',
-        '.xmodule_DiscussionModule'
+        '.xmodule_DiscussionModule',
+        has_multiple_templates=False
     )
 
 
