@@ -152,7 +152,7 @@ class @StaffGrading
     @backend = backend
 
     # all the jquery selectors
-
+    @el = $('.staff-grading')
     @problem_list_container = $('.problem-list-container')
     @problem_list = $('.problem-list')
 
@@ -224,7 +224,7 @@ class @StaffGrading
   setup_score_selection: =>
     @score_selection_container.html(@rubric)
     $('input[class="score-selection"]').change => @graded_callback()
-    Rubric.initialize(@location)
+    Rubric.initialize(@location, @el)
 
 
   graded_callback: () =>

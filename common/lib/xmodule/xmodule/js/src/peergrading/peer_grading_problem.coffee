@@ -162,7 +162,7 @@ class @PeerGradingProblem
     @prompt_wrapper = $('.prompt-wrapper')
     @backend = backend
     @is_ctrl = false
-
+    @el = $('.peer-grading-container')
 
     # get the location of the problem
     @location = $('.peer-grading').data('location')
@@ -463,7 +463,7 @@ class @PeerGradingProblem
     @submit_button.hide()
     @action_button.hide()
     @calibration_feedback_panel.hide()
-    Rubric.initialize(@location)
+    Rubric.initialize(@location,@el)
 
 
   render_calibration_feedback: (response) =>
