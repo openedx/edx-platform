@@ -303,6 +303,7 @@ class @CombinedOpenEnded
     @reset_button.hide()
     @next_problem_button.hide()
     @hide_file_upload()
+    @legend_container.show()
     @hint_area.attr('disabled', false)
     if @task_number>1 or @child_state!='initial'
       @show_status_current()
@@ -325,6 +326,7 @@ class @CombinedOpenEnded
       @submit_button.prop('value', 'Submit')
       @submit_button.click @save_answer
       @setup_file_upload()
+      @legend_container.hide()
     else if @child_state == 'assessing'
       @answer_area.attr("disabled", true)
       @replace_text_inputs()
