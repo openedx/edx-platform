@@ -139,8 +139,6 @@ class @CombinedOpenEnded
     @task_number = @coe.data('task-number')
     @accept_file_upload = @coe.data('accept-file-upload')
     @location = @coe.data('location')
-    @child_state = @coe.data('state')
-    @child_type = @coe.data('child-type')
 
     console.log(@child_state)
 
@@ -189,6 +187,8 @@ class @CombinedOpenEnded
     @hint_wrapper = @$(@oe).find(@hint_wrapper_sel)
     @message_wrapper = @$(@oe).find(@message_wrapper_sel)
     @submit_button = @$(@oe).find(@submit_button_sel)
+    @child_state = @oe.data('state')
+    @child_type = @oe.data('child-type')
     if @child_type=="openended"
       @skip_button = @$(@oe).find(@skip_button_sel)
       @skip_button.click @skip_post_assessment
