@@ -370,7 +370,6 @@ def change_enrollment(request):
 
         if not has_access(user, course, 'enroll'):
             return HttpResponseBadRequest(_("Enrollment is closed"))
-
         org, course_num, run = course_id.split("/")
         statsd.increment("common.student.enrollment",
                          tags=["org:{0}".format(org),

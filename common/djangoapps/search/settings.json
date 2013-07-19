@@ -51,34 +51,24 @@
 					}
 				},
 
-				"org": {
+				"id": {
 					"type": "string",
 					"store": "true"
 				},
 
-				"course": {
-					"type": "string",
-					"store":"true"
-				},
-
-				"course_section": {
-					"type": "string",
-					"store": "true"
-				},
-
-				"uuid": {
-					"type": "string",
-					"store": "true"
-				},
-
-				"url": {
+				"hash": {
 					"type": "string",
 					"store": "true"
 				},
 				
 				"thumbnail": {
 					"type": "binary"
-				}
+				},
+
+                "course_id": {
+                    "type": "string",
+                    "store": "true"
+                }
 			}
 		}
 	},
@@ -96,45 +86,24 @@
 
 		        "ngram_analyzer": {
 		        	"type": "custom",
-		        	"tokenizer": "custom_ngram",
+		        	"tokenizer": "standard",
 		        	"filter": ["asciifolding", "word_delimiter", "lowercase", "custom_stemmer", "custom_phonetic"]
 		        },
 
 		        "depth_analyzer": {
 		        	"type": "custom",
-		        	"tokenizer": "full_ngram",
+		        	"tokenizer": "standard",
 		        	"filter": ["custom_word_delimiter", "lowercase", "shingle", "custom_phonetic"]
 		        },
 
 		        "breadth_analyzer": {
 		        	"type": "custom",
-		        	"tokenizer": "letter",
-		        	"filter": ["asciifolding", "lowercase", "simple_phonetic"]
+		        	"tokenizer": "standard",
+		        	"filter": ["asciifolding", "lowercase", "custom_phonetic"]
 		        }
 		    },
 
-		    "tokenizer" : {
-
-		    	"custom_ngram": {
-		    		"type": "nGram",
-		    		"min_gram": 1,
-		    		"max_gram": 3
-		    	},
-
-		    	"full_ngram": {
-		    		"type": "nGram",
-		    		"min_gram": 1,
-		    		"max_gram": 5
-		    	}
-		    },
-
 		    "filter" : {
-
-		    	"simple_phonetic": {
-		    		"type": "phonetic",
-		    		"encoder": "nysiis",
-		    		"replace": true
-		    	},
 
 		    	"custom_phonetic": {
 		    		"type": "phonetic",
@@ -142,14 +111,9 @@
 		    		"replace": false
 		    	},
 
-		        "custom_word_delimiter": {
-		            "type": "word_delimiter",
-		            "preserve_original": "true"
-		        },
-
 		        "custom_stemmer": {
 		            "type": "stemmer",
-		            "name": "english"
+		            "name": "minimal_english"
 		        }
 		    }
 		}
