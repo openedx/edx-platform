@@ -24,6 +24,8 @@ if Backbone?
     setActiveThread: =>
       if @thread
         @nav.setActiveThread(@thread.get("id"))
+      else
+        @nav.goHome
 
     showThread: (forum_name, thread_id) ->
       @thread = @discussion.get(thread_id)

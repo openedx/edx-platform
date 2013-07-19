@@ -2,6 +2,7 @@ if Backbone?
   class @DiscussionThreadListView extends Backbone.View
     events:
       "click .search": "showSearch"
+      "click .home": "goHome"
       "click .browse": "toggleTopicDrop"
       "keydown .post-search-field": "performSearch"
       "click .sort-bar a": "sortThreads"
@@ -42,6 +43,7 @@ if Backbone?
       current_el.replaceWith(content)
       if active
         @setActiveThread(thread_id)
+
 
     #TODO fix this entire chain of events
     addAndSelectThread: (thread) =>
@@ -190,6 +192,12 @@ if Backbone?
       @$(".search").addClass('is-open')
       @$(".browse").removeClass('is-open')
       setTimeout (-> @$(".post-search-field").focus()), 200
+
+    goHome: ->
+      @template = _.template($("#discussion-home").html())
+      $(".discussion-column").html(@template)
+      $(".post-list a").removeClass("active")
+      thread_id = null
 
     toggleTopicDrop: (event) =>
       event.preventDefault()
