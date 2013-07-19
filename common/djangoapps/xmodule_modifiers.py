@@ -89,6 +89,21 @@ def grade_histogram(module_id):
     return grades
 
 
+def save_module(get_html, module):
+    """
+    Updates the given get_html function for the given module to save the fields
+    after rendering.
+    """
+    @wraps(get_html)
+    def _get_html():
+        """Cache the rendered output, save, then return the output."""
+        rendered_html = get_html()
+        module.save()
+        return rendered_html
+
+    return _get_html
+
+
 def add_histogram(get_html, module, user):
     """
     Updates the supplied module with a new get_html function that wraps

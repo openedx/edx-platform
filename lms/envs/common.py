@@ -308,6 +308,8 @@ CODE_JAIL = {
     'limits': {
         # How many CPU seconds can jailed code use?
         'CPU': 1,
+        # How large a file can jailed code write?
+        'FSIZE': 50000,
     },
 }
 

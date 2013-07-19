@@ -48,7 +48,6 @@ metadata:
         \edXabox{type="custom" cfn='test_str' expect='python' hintfn='hint_fn'}
     markdown: !!null
 data: |
-    <?xml version="1.0"?>
     <problem>
       <text>
         <p>
