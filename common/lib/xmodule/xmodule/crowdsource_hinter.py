@@ -16,6 +16,8 @@ from lxml import etree
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xblock.core import Scope, String, Integer, Boolean, Dict, List
+from xmodule.modulestore import Location
+from xmodule.modulestore.django import modulestore
 
 from capa.responsetypes import FormulaResponse
 
@@ -28,9 +30,11 @@ class CrowdsourceHinterFields(object):
     """Defines fields for the crowdsource hinter module."""
     has_children = True
 
-    moderate = String(help='String "True"/"False" - activates moderation', scope=Scope.content,
+    problem_id = String(help='The id of the problem we are hinting for.', scope=Scope.settings,
+                        default='')
+    moderate = String(help='String "True"/"False" - activates moderation', scope=Scope.settings,
                       default='False')
-    debug = String(help='String "True"/"False" - allows multiple voting', scope=Scope.content,
+    debug = String(help='String "True"/"False" - allows multiple voting', scope=Scope.settings,
                    default='False')
     # Usage: hints[answer] = {str(pk): [hint_text, #votes]}
     # hints is a dictionary that takes answer keys.
@@ -60,7 +64,7 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
     and no other parts.
 
     Example usage:
-    <crowdsource_hinter>
+    <crowdsource_hinter problem_id="i4x://my/problem/location">
         <problem blah blah />
     </crowdsource_hinter>
 
@@ -78,11 +82,14 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         XModule.__init__(self, *args, **kwargs)
         # We need to know whether we are working with a FormulaResponse problem.
         try:
-            responder = self.get_display_items()[0].lcp.responders.values()[0]
-        except (IndexError, AttributeError):
-            log.exception('Unable to find a capa problem child.')
+            problem_loc = Location(self.problem_id)
+            problem_descriptors = modulestore().get_items(problem_loc)
+            self.problem_module = self.system.get_module(problem_descriptors[0])
+        except IndexError:
+            # This will fail silently for now - sometimes, when editing a hinter module
+            # in studio, you have a problem-less module.
             return
-
+        responder = self.problem_module.lcp.responders.values()[0]
         self.is_formula = isinstance(self, FormulaResponse)
         if self.is_formula:
             self.answer_to_str = self.formula_answer_to_str
@@ -103,25 +110,26 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         hinter and of the problem.
         - Dependent on lon-capa problem.
         """
-        if self.debug == 'True':
-            # Reset the user vote, for debugging only!
-            self.user_voted = False
-        if self.hints == {}:
-            # Force self.hints to be written into the database.  (When an xmodule is initialized,
-            # fields are not added to the db until explicitly changed at least once.)
-            self.hints = {}
-
+        # This is a hack to make studio preview behave sanely.
         try:
-            child = self.get_display_items()[0]
-            out = child.get_html()
-            # The event listener uses the ajax url to find the child.
-            child_url = child.system.ajax_url
-        except IndexError:
-            out = 'Error in loading crowdsourced hinter - can\'t find child problem.'
-            child_url = ''
+            self.debug
+        except TypeError:
+            # We're in studio mode.
+            pass
+        else:
+            if self.debug == 'True':
+                # Reset the user vote, for debugging only!
+                self.user_voted = False
+            if self.hints == {}:
+                # Force self.hints to be written into the database.  (When an xmodule is initialized,
+                # fields are not added to the db until explicitly changed at least once.)
+                self.hints = {}
 
-        # Wrap the module in a <section>.  This lets us pass data attributes to the javascript.
-        out += '<section class="crowdsource-wrapper" data-url="' + self.system.ajax_url +\
+        # The event listener uses the ajax url to find the child.
+        child_url = self.problem_module.system.ajax_url
+
+        # Return a little section for displaying hints.
+        out = '<section class="crowdsource-wrapper" data-url="' + self.system.ajax_url +\
             '" data-child-url = "' + child_url + '"> </section>'
 
         return out
