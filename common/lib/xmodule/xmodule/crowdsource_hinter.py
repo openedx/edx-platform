@@ -246,7 +246,7 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         """
         # The student got it right.
         # Did he submit at least one wrong answer?
-        if len(self.previous_answers) == 0:
+        if len(self.user_submissions) == 0:
             # No.  Nothing to do here.
             return
         # Make a hint-voting interface for each wrong answer.  The student will only
