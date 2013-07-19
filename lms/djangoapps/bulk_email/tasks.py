@@ -36,7 +36,6 @@ def delegate_email_batches(hash_for_msg, recipient, course_id, course_url, user_
         log.error("get_course_by_id failed: " + exc.args[0])
         raise Exception("get_course_by_id failed: " + exc.args[0])
 
-    print "COURSE: ", course
     if recipient == "myself":
         recipient_qset = User.objects.filter(id=user_id).values('profile__name', 'email')
     else:
@@ -82,6 +81,7 @@ def course_email(hash_for_msg, to_list, course_title, course_url, throttle=False
         log.exception(exc.args[0])
         raise exc
 
+    print "COURSE EMAIL: ", msg
     subject = "[" + course_title + "] " + msg.subject
 
     p = Popen(['lynx','-stdin','-display_charset=UTF-8','-assume_charset=UTF-8','-dump'], stdin=PIPE, stdout=PIPE)
@@ -119,7 +119,9 @@ def course_email(hash_for_msg, to_list, course_title, course_url, throttle=False
                 time.sleep(0.2)
 
             try:
+                print "bout to send message for ", email
                 connection.send_messages([email_msg])
+                print "SENT!!!!!!!!!!!!"
                 log.info('Email with hash ' + hash_for_msg + ' sent to ' + email)
                 num_sent += 1
             except SMTPDataError as exc:
@@ -133,7 +135,9 @@ def course_email(hash_for_msg, to_list, course_title, course_url, throttle=False
 
             to_list.pop()
 
+        print "CLOSING CONNECTION"
         connection.close()
+        print "BOUT TO RETURN FORMATTED RESULT"
         return course_email_result(num_sent, num_error)
 
     except (SMTPDataError, SMTPConnectError, SMTPServerDisconnected) as exc:
