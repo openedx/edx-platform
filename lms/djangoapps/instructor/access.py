@@ -9,10 +9,13 @@ TODO sync instructor and staff flags
         {instructor: true, staff: true}
 """
 
+import logging
 from django.contrib.auth.models import Group
 from courseware.access import (get_access_group_name,
                                course_beta_test_group_name)
 from django_comment_common.models import Role
+
+log = logging.getLogger(__name__)
 
 
 def list_with_level(course, level):
@@ -23,7 +26,7 @@ def list_with_level(course, level):
     There could be other levels specific to the course.
     If there is no Group for that course-level, returns an empty list
     """
-    if level is 'beta':
+    if level == 'beta':
         grpname = course_beta_test_group_name(course.location)
     else:
         grpname = get_access_group_name(course, level)
@@ -31,6 +34,7 @@ def list_with_level(course, level):
     try:
         return Group.objects.get(name=grpname).user_set.all()
     except Group.DoesNotExist:
+        log.info("list_with_level called with non-existant group named {}".format(grpname))
         return []
 
 
@@ -59,10 +63,10 @@ def _change_access(course, user, level, action):
     level is one of ['instructor', 'staff', 'beta']
     action is one of ['allow', 'revoke']
 
-    NOTE: will NOT create a group that does not yet exist.
+    NOTE: will create a group if it does not yet exist.
     """
 
-    if level is 'beta':
+    if level == 'beta':
         grpname = course_beta_test_group_name(course.location)
     elif level in ['instructor', 'staff']:
         grpname = get_access_group_name(course, level)

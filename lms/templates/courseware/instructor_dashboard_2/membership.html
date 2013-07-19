@@ -57,16 +57,18 @@
     </div>
   %endif
 
-  %if section_data['access']['forum_admin']:
-    <div class="auth-list-container" data-rolename="Administrator" data-display-name="Forum Admins">
-      <div class="auth-list-table" data-endpoint="${ section_data['list_forum_members_url'] }"></div>
-      <div class="auth-list-add" data-endpoint="${ section_data['update_forum_role_membership_url'] }">
-        <input type="text" name="email" placeholder="Enter Email" spellcheck="false">
-        <input type="button" name="allow" value="Grant Forum Admin">
+  %if section_data['access']['instructor']:
+      <div class="auth-list-container" data-rolename="Administrator" data-display-name="Forum Admins">
+        <div class="auth-list-table" data-endpoint="${ section_data['list_forum_members_url'] }"></div>
+        <div class="auth-list-add" data-endpoint="${ section_data['update_forum_role_membership_url'] }">
+          <input type="text" name="email" placeholder="Enter Email" spellcheck="false">
+          <input type="button" name="allow" value="Grant Forum Admin">
+        </div>
+        <div class="request-response-error"></div>
       </div>
-      <div class="request-response-error"></div>
-    </div>
+  %endif
 
+  %if section_data['access']['instructor'] or section_data['access']['forum_admin']:
     <div class="auth-list-container" data-rolename="Moderator" data-display-name="Forum Moderators">
       <div class="auth-list-table" data-endpoint="${ section_data['list_forum_members_url'] }"></div>
       <div class="auth-list-add" data-endpoint="${ section_data['update_forum_role_membership_url'] }">

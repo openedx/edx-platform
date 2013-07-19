@@ -40,7 +40,7 @@ def instructor_dashboard_2(request, course_id):
     }
 
     if not access['staff']:
-        raise Http404
+        raise Http404()
 
     sections = [
         _section_course_info(course_id),

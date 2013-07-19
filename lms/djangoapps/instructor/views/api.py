@@ -17,6 +17,7 @@ from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbid
 from courseware.access import has_access
 from courseware.courses import get_course_with_access, get_course_by_id
 from django.contrib.auth.models import User
+from django_comment_client.utils import has_forum_access
 from django_comment_common.models import (Role,
                                           FORUM_ROLE_ADMINISTRATOR,
                                           FORUM_ROLE_MODERATOR,
@@ -32,6 +33,7 @@ import analytics.distributions
 import analytics.csvs
 
 log = logging.getLogger(__name__)
+
 
 def common_exceptions_400(func):
     """
@@ -630,12 +632,33 @@ def list_forum_members(request, course_id):
     Lists forum members of a certain rolename.
     Limited to staff access.
 
-    Takes query parameter `rolename`
+    The requesting user must be at least staff.
+    Staff forum admins can access all roles EXCEPT for FORUM_ROLE_ADMINISTRATOR
+        which is limited to instructors.
+
+    Takes query parameter `rolename`.
     """
+    course = get_course_by_id(course_id)
+    has_instructor_access = has_access(request.user, course, 'instructor')
+    has_forum_admin = has_forum_access(
+        request.user, course_id, FORUM_ROLE_ADMINISTRATOR
+    )
+
     rolename = request.GET.get('rolename')
 
+    # default roles require either (staff & forum admin) or (instructor)
+    if not (has_forum_admin or has_instructor_access):
+        return HttpResponseBadRequest(
+            "Operation requires staff & forum admin or instructor access"
+        )
+
+    # EXCEPT FORUM_ROLE_ADMINISTRATOR requires (instructor)
+    if rolename == FORUM_ROLE_ADMINISTRATOR and not has_instructor_access:
+        return HttpResponseBadRequest("Operation requires instructor access.")
+
+    # filter out unsupported for roles
     if not rolename in [FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA]:
-        return HttpResponseBadRequest()
+        return HttpResponseBadRequest("Unrecognized rolename '{}'.".format(rolename))
 
     try:
         role = Role.objects.get(name=rolename, course_id=course_id)
@@ -664,7 +687,7 @@ def list_forum_members(request, course_id):
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_level('instructor')
+@require_level('staff')
 @require_query_params(
     email="the target users email",
     rolename="the forum role",
@@ -675,20 +698,46 @@ def update_forum_role_membership(request, course_id):
     """
     Modify user's forum role.
 
+    The requesting user must be at least staff.
+    Staff forum admins can access all roles EXCEPT for FORUM_ROLE_ADMINISTRATOR
+        which is limited to instructors.
+    No one can revoke an instructors FORUM_ROLE_ADMINISTRATOR status.
+
     Query parameters:
-    email is the target users email
-    rolename is one of [FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA]
-    action is one of ['allow', 'revoke']
+    - `email` is the target users email
+    - `rolename` is one of [FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA]
+    - `action` is one of ['allow', 'revoke']
     """
+    course = get_course_by_id(course_id)
+    has_instructor_access = has_access(request.user, course, 'instructor')
+    has_forum_admin = has_forum_access(
+        request.user, course_id, FORUM_ROLE_ADMINISTRATOR
+    )
+
     email = request.GET.get('email')
     rolename = request.GET.get('rolename')
     action = request.GET.get('action')
 
+    # default roles require either (staff & forum admin) or (instructor)
+    if not (has_forum_admin or has_instructor_access):
+        return HttpResponseBadRequest(
+            "Operation requires staff & forum admin or instructor access"
+        )
+
+    # EXCEPT FORUM_ROLE_ADMINISTRATOR requires (instructor)
+    if rolename == FORUM_ROLE_ADMINISTRATOR and not has_instructor_access:
+        return HttpResponseBadRequest("Operation requires instructor access.")
+
     if not rolename in [FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA]:
-        return HttpResponseBadRequest()
+        return HttpResponseBadRequest("Unrecognized rolename '{}'.".format(rolename))
+
+    user = User.objects.get(email=email)
+    target_is_instructor = has_access(user, course, 'instructor')
+    # cannot revoke instructor
+    if target_is_instructor and action == 'revoke' and rolename == FORUM_ROLE_ADMINISTRATOR:
+        return HttpResponseBadRequest("Cannot revoke instructor forum admin privelages.")
 
     try:
-        user = User.objects.get(email=email)
         access.update_forum_role_membership(course_id, user, rolename, action)
     except Role.DoesNotExist:
         return HttpResponseBadRequest("Role does not exist.")

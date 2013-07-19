@@ -74,18 +74,24 @@ setup_instructor_dashboard = (idash_content) =>
       # plantTimeout 0, -> section.data('wrapper')?.onExit?()
 
 
-  # activate an initial section by programmatically clicking on it.
+  # activate an initial section by 'clicking' on it.
   # check for a deep-link, or click the first link.
+  click_first_link = ->
+    link = links.eq(0)
+    link.click()
+    link.data('wrapper')?.onClickTitle?()
+
   if (new RegExp "^#{HASH_LINK_PREFIX}").test location.hash
     rmatch = (new RegExp "^#{HASH_LINK_PREFIX}(.*)").exec location.hash
     section_name = rmatch[1]
     link = links.filter "[data-section='#{section_name}']"
-    link.click()
-    link.data('wrapper')?.onClickTitle?()
+    if link.length == 1
+      link.click()
+      link.data('wrapper')?.onClickTitle?()
+    else
+      click_first_link()
   else
-    link = links.eq(0)
-    link.click()
-    link.data('wrapper')?.onClickTitle?()
+    click_first_link()
 
 
 
