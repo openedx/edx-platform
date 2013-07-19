@@ -22,9 +22,20 @@ h2 {
 
 section.combined-open-ended {
   @include clearfix;
-  .status-container
+  .status-bar
   {
+
+    .status-container
+    {
       padding-bottom: 5px;
+      display: inline-block;
+      padding-right: 20px
+    }
+    .progress-container
+    {
+        padding-bottom: 5px;
+        display: inline-block;
+    }
   }
   .item-container
   {

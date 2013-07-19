@@ -37,6 +37,13 @@ HUMAN_TASK_TYPE = {
     'peer_grading.conf' : "Peer Assessment",
 }
 
+HUMAN_STATES = {
+    'intitial' : "Not started.",
+    'assessing' : "Being scored.",
+    'intermediate_done' : "Scoring finished.",
+    'done' : "Complete."
+}
+
 # Default value that controls whether or not to skip basic spelling checks in the controller
 # Metadata overrides this
 SKIP_BASIC_CHECKS = False
@@ -291,6 +298,7 @@ class CombinedOpenEndedV1Module():
             'accept_file_upload': self.accept_file_upload,
             'location': self.location,
             'legend_list': LEGEND_LIST,
+            'human_state': HUMAN_STATES.get(self.state,"Not started.")
         }
 
         return context
