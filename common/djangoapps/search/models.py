@@ -1,10 +1,12 @@
 import json
-import nltk
-import nltk.corpus as word_filter
 import string
-import sorting
 import re
 from collections import Counter
+
+import nltk
+import nltk.corpus as word_filter
+
+import sorting
 
 
 class SearchResults:

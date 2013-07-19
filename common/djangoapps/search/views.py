@@ -1,14 +1,15 @@
-from mitxmako.shortcuts import render_to_string
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.http import HttpResponse
-from models import SearchResults
-from django_future.csrf import ensure_csrf_cookie
-from courseware.courses import get_course_with_access
-
-
 import requests
-import enchant
 import logging
+
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from mitxmako.shortcuts import render_to_string
+from django_future.csrf import ensure_csrf_cookie, render_to_response
+import enchant
+
+from courseware.courses import get_course_with_access
+from models import SearchResults
+from es_requests import MongoIndexer
+
 
 CONTENT_TYPES = ("transcript", "problem", "pdf")
 log = logging.getLogger("mitx.courseware")
@@ -18,11 +19,20 @@ log = logging.getLogger("mitx.courseware")
 def search(request, course_id):
     results_string = ""
     course = get_course_with_access(request.user, course_id, 'load')
-    if request.GET:
-        results_string = find(request, course_id)
+    results_string = find(request, course_id)
     full_html = render_to_string("search_templates/wrapper.html", {
         "body": results_string, "course": course})
-    return HttpResponse(full_html)
+    return render_to_response(full_html)
+
+
+@ensure_csrf_cookie
+def index_course(request):
+    indexer = MongoIndexer()
+    try:
+        indexer.index_course(request.POST["course"])
+    except KeyError:
+        return render_to_response(status=204)
+    return render_to_response("")
 
 
 def find(request, course_id, database="http://127.0.0.1:9200",

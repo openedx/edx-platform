@@ -87,7 +87,7 @@ function constructSearchBox(value){
     searchForm.method = "get";
 
     var searchBoxWrapper = document.createElement("div");
-    searchBoxWrapper.className = "searchbox-wrapper";
+    searchBoxWrapper.className = "animate fadeInRight searchbox-wrapper";
 
     var searchBox = document.createElement("input");
     searchBox.id = "searchbox";

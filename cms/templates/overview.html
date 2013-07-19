@@ -20,6 +20,7 @@
   <script type="text/javascript" src="${static.url('js/views/grader-select-view.js')}"></script>
   <script type="text/javascript" src="${static.url('js/views/overview.js')}"></script>
   <script type="text/javascript" src="${static.url('js/models/settings/course_grading_policy.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/views/index_courses.js')}"></script>
 
   <script type="text/template" id="section-name-edit-tpl">
     <%static:include path="js/section-name-edit.underscore" />
@@ -139,6 +140,9 @@
           </li>
           <li class="nav-item">
             <a href="${lms_link}" rel="external" class="button view-button view-live-button">${_("View Live")}</a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="button new-button index-courses" id="index-courses">${_("Index Courseware for Search")}</a>
           </li>
         </ul>
       </nav>
