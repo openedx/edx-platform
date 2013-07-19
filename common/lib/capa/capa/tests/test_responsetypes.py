@@ -496,6 +496,20 @@ class FormulaResponseTest(ResponseTest):
         input_dict = {'1_2_1': '1/0'}
         self.assertRaises(StudentInputError, problem.grade_answers, input_dict)
 
+    def test_validate_answer(self):
+        """
+        Makes sure that validate_answer works.
+        """
+        sample_dict = {'x': (1, 2)}
+        problem = self.build_problem(
+            sample_dict=sample_dict,
+            num_samples=10,
+            tolerance="1%",
+            answer="x"
+        )
+        self.assertTrue(problem.responders.values()[0].validate_answer('14*x'))
+        self.assertFalse(problem.responders.values()[0].validate_answer('3*y+2*x'))
+
 
 class StringResponseTest(ResponseTest):
     from capa.tests.response_xml_factory import StringResponseXMLFactory
@@ -914,6 +928,20 @@ class NumericalResponseTest(ResponseTest):
 
                 with self.assertRaisesRegexp(StudentInputError, msg_regex):
                     problem.grade_answers({'1_2_1': 'foobar'})
+
+    def test_answer_compare(self):
+        """Tests the answer compare function."""
+        problem = self.build_problem(answer="42")
+        responder = problem.responders.values()[0]
+        self.assertTrue(responder.answer_compare('48', '8*6'))
+        self.assertFalse(responder.answer_compare('48', '9*5'))
+
+    def test_validate_answer(self):
+        """Tests the answer validation function."""
+        problem = self.build_problem(answer="42")
+        responder = problem.responders.values()[0]
+        self.assertTrue(responder.validate_answer('23.5'))
+        self.assertFalse(responder.validate_answer('fish'))
 
 
 class CustomResponseTest(ResponseTest):
