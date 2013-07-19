@@ -4,6 +4,7 @@ import os
 import re
 import urllib
 import base64
+import hashlib
 from pymongo import MongoClient
 from pdfminer.pdfinterp import PDFResourceManager, process_pdf
 from pdfminer.converter import TextConverter
@@ -64,6 +65,9 @@ class MongoIndexer:
     def find_asset_with_name(self, name):
         return self.chunk_collection.find_one({"files_id.category": "asset", "files_id.name": name})
 
+    def find_modules_for_course(self, course):
+        return self, module_collection.find({"_id.course": course})
+
     def find_transcript_content(self, mongo_element):
         """Finds the corresponding chunk to the file element from a cursor similar to that from find_transcripts"""
         filename = mongo_element["_id"]["name"]
@@ -72,6 +76,9 @@ class MongoIndexer:
             return filter(None, json.loads(database_object["data"].decode('utf-8', "ignore"))["text"])
         except ValueError:
             return ["n/a"]
+
+    def transcript_file_from_video_module(self, video_module):
+        uuid = re.sub(r"^.*?()()().*?$",r"")
 
     def pdf_to_text(self, mongo_element):
         onlyAscii = lambda s: "".join(c for c in s if ord(c) < 128)
@@ -164,91 +171,68 @@ class MongoIndexer:
         })
         return course_element["_id"]["name"]
 
+    def basic_dict(self, mongo_item):
+        """Returns the part of the es schema that is the same for every object."""
+        id = json.dumps(mongo_item["_id"])
+        hash = hashlib.sha1(id).hexdigest()
+        display_name = (
+            mongo_item.get("metadata", {"display_name": ""}).get("display_name", "") +
+            " (" + mongo_item["_id"]["course"] + ")"
+        )
+        return {"id": id, "hash": hash, "display_name": display_name}
+
     def index_all_pdfs(self, es_instance, index):
         cursor = self.find_categories_with_regex("html", re.compile(".*?/asset/.*?\.pdf.*?"))
         for i in range(0, cursor.count()):
             item = cursor.next()
-            course = item["_id"]["course"]
-            org = item["_id"]["org"]
-            uuid = item["_id"]["name"]
-            course_section = self.course_name_from_mongo_element(item)
-            display_name = item.get("metadata", {"display_name": ""}).get("display_name", "") + " (" + course + ")"
-            url = self.vertical_url_from_mongo_element(item)
-            if not url:
-                continue
+            data = self.basic_dict(item)
             name = re.sub(r'(.*?)(/asset/)(.*?)(\.pdf)(.*?)$', r'\3'+".pdf", item["definition"]["data"])
             asset = self.find_asset_with_name(name)
             if not asset:
                 continue
             searchable_text = self.pdf_to_text(asset)
+            if len(searchable_text) == 0:
+                continue
             try:
                 thumbnail = self.thumbnail_from_pdf(asset["data"].__str__())
             except (DelegateError, MissingDelegateError, CorruptImageError):
-                print "Slide: " + uuid + " is corrupt."
                 continue
-            data = {
-                "course": course, "org": org, "course_section": "/".join([org, course, course_section]), "uuid": uuid,
-                "searchable_text": searchable_text, "display_name": display_name, "url": url, "thumbnail": thumbnail
-            }
-            print es_instance.index_data(index, course, data)._content
+            data.update({"searchable_text": searchable_text, "thumbnail": thumbnail})
+            print es_instance.index_data(index, item["_id"]["course"], data, data["hash"])._content
 
     def index_all_problems(self, es_instance, index):
         cursor = self.find_modules_by_category("problem")
         for i in range(0, cursor.count()):
             item = cursor.next()
-            course = item["_id"]["course"]
-            org = item["_id"]["org"]
-            uuid = item["_id"]["name"]
-            url = self.vertical_url_from_mongo_element(item)
-            course_section = self.course_name_from_mongo_element(item)
-            if not url:
-                continue
-            display_name = item.get("metadata", {"display_name": ""}).get("display_name", "") + " (" + course + ")"
             searchable_text = self.searchable_text_from_problem_data(item)
+            if len(searchable_text) == 0:
+                continue
+            data = self.basic_dict(item)
             thumbnail = self.thumbnail_from_html(item["definition"]["data"])
-            data = {
-                "course": course, "course_section": "/".join([org, course, course_section]), "org": org, "uuid": uuid,
-                "searchable_text": searchable_text, "display_name": display_name, "url": url, "thumbnail": thumbnail
-            }
-            print es_instance.index_data(index, course, data)._content
-
-    def module_for_uuid(self, transcript_uuid):
-        """Given the transcript uuid found from the xcontent database, returns the mongo document for the video"""
-        regex_pattern = re.compile(".*?"+str(transcript_uuid)+".*?")
-        video_module = self.module_collection.find_one({"definition.data": regex_pattern})
-        return video_module
-
-    def uuid_from_file_name(self, file_name):
-        """Returns a youtube uuid given the filename of a transcript"""
-        print file_name
-        if file_name[:5] == "subs_":
-            file_name = file_name[5:]
-        return file_name[:file_name.find(".")]
+            data.update({"searchable_text": searchable_text, "thumbnail": thumbnail})
+            print es_instance.index_data(index, item["_id"]["course"], data, data["hash"])._content
 
     def index_all_transcripts(self, es_instance, index):
-        cursor = self.find_files_with_type(".srt.sjson")
+        cursor = self.find_modules_by_category("video")
         for i in range(0, cursor.count()):
             item = cursor.next()
-            course = item["_id"]["course"]
-            org = item["_id"]["org"]
+            searchable_text = " ".join(self.find_transcript_content(item))
+            if len(searchable_text) == 0:
+                continue
+            data = self.basic_dict(item)
             uuid = self.uuid_from_file_name(item["_id"]["name"])
             video_module = self.module_for_uuid(uuid)
-            course_section = self.course_name_from_mongo_element(item)
             if not video_module:
-                print "No module for: " + str(uuid)
                 continue
-            url = self.vertical_url_from_mongo_element(video_module)
-            if not url:
-                continue
-            display_name = item.get("metadata", {"display_name": ""}).get("display_name", "") + " (" + course + ")"
-            transcript = " ".join(self.find_transcript_content(item))
             thumbnail = self.thumbnail_from_uuid(uuid)
-            data = {
-                "course": course, "course_section": "/".join([org, course, course_section]), "org": org, "uuid": uuid,
-                "searchable_text": transcript, "display_name": display_name, 'url': url, 'thumbnail': thumbnail
-            }
-            print es_instance.index_data(index, course, data)._content
+            data.update({"searchable_text": searchable_text, 'thumbnail': thumbnail})
+            json.loads(json.dumps(data))
+            print es_instance.index_data(index, item["_id"]["course"], data, data["hash"])._content
 
+    def index_course(self, es_instance, course):
+        cursor = self.find_modules_for_course(course)
+        for i in range(0, cursor.count()):
+                        
 
 class ElasticDatabase:
 
@@ -430,32 +414,38 @@ class EnchantDictionary:
             words = set(open(kwargs["source_file"]).readlines())
         url = "/".join([self.es_instance.url, index, "_search?size="+str(max_results)+"&q=*.*"])
         response = requests.get(url)
+        misses = 0
+        hits = 0
         for entry in json.loads(response._content)['hits']['hits']:
-            if entry["_source"]["searchable_text"]:
+            if entry["_source"].get("searchable_text", False):
                 text = entry["_source"]["searchable_text"]
                 words |= set(re.findall(r'[a-z]+', text.lower()))
+                hits += 1
+                print "HITS:" + str(hits)
             else:
+                misses += 1
+                print misses
                 continue
         with open(output_file, 'wb') as dictionary:
             for word in words:
                 dictionary.write(word+"\n")
 
 
-#url = "http://localhost:9200"
-#settings_file = "settings.json"
+url = "http://localhost:9200"
+settings_file = "settings.json"
 
 mongo = MongoIndexer()
 
 
-# test = ElasticDatabase(url, settings_file)
-# dictionary = EnchantDictionary(test)
-# print test.delete_index("pdf-index")
-# print test.delete_index("transcript-index")
-# print test.delete_index("problem-index")
-# mongo.index_all_pdfs(test, "pdf-index")
-# mongo.index_all_transcripts(test, "transcript-index")
-# mongo.index_all_problems(test, "problem-index")
-# dictionary.produce_dictionary("pyenchant_corpus.txt", max_results=500000)
+test = ElasticDatabase(url, settings_file)
+dictionary = EnchantDictionary(test)
+print test.delete_index("pdf-index")
+#print test.delete_index("transcript-index")
+print test.delete_index("problem-index")
+mongo.index_all_pdfs(test, "pdf-index")
+#mongo.index_all_transcripts(test, "transcript-index")
+mongo.index_all_problems(test, "problem-index")
+dictionary.produce_dictionary("pyenchant_corpus.txt", max_results=500000)
 
 #print test.setup_type("transcript", "cleaning", mapping)._content
 #print test.get_type_mapping("transcript-index", "2-1x")
