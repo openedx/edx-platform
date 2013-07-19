@@ -46,6 +46,8 @@ class ChecklistTestCase(CourseTestCase):
         # Now delete the checklists from the course and verify they get repopulated (for courses
         # created before checklists were introduced).
         self.course.checklists = None
+        # Save the changed `checklists` to the underlying KeyValueStore before updating the modulestore
+        self.course.save()
         modulestore = get_modulestore(self.course.location)
         modulestore.update_metadata(self.course.location, own_metadata(self.course))
         self.assertEqual(self.get_persisted_checklists(), None)

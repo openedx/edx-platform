@@ -96,6 +96,7 @@ class ErrorDescriptor(ErrorFields, JSONEditingDescriptor):
             'contents': contents,
             'display_name': 'Error: ' + location.name,
             'location': location,
+            'category': 'error'
         }
         return cls(
             system,
@@ -109,12 +110,12 @@ class ErrorDescriptor(ErrorFields, JSONEditingDescriptor):
         }
 
     @classmethod
-    def from_json(cls, json_data, system, error_msg='Error not available'):
+    def from_json(cls, json_data, system, location, error_msg='Error not available'):
         return cls._construct(
             system,
-            json.dumps(json_data, indent=4),
+            json.dumps(json_data, skipkeys=False, indent=4),
             error_msg,
-            location=Location(json_data['location']),
+            location=location
         )
 
     @classmethod

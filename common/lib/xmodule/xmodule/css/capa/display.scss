@@ -929,4 +929,32 @@ section.problem {
         }
     }
   }
+  .choicetextgroup{
+    input[type="text"]{
+      margin-bottom: 0.5em;
+    }
+    @extend .choicegroup;
+
+    label.choicetextgroup_correct, section.choicetextgroup_correct{
+      @extend label.choicegroup_correct;
+
+      input[type="text"] {
+        border-color: green;
+      }
+    }
+
+    label.choicetextgroup_incorrect, section.choicetextgroup_incorrect{
+      @extend label.choicegroup_incorrect;
+    }
+
+    label.choicetextgroup_show_correct, section.choicetextgroup_show_correct{
+      &:after{
+        content: url('../images/correct-icon.png');
+        margin-left:15px;
+      }
+    }
+    span.mock_label{
+      cursor : default;
+    }
+  }
 }

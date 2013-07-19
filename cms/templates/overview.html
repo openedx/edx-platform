@@ -1,4 +1,4 @@
-<%! from django.utils.translation import ugettext as _ %>
+/<%! from django.utils.translation import ugettext as _ %>
 <%inherit file="base.html" />
 <%!
    import logging
@@ -66,7 +66,8 @@
           <h3 class="section-name">
           <form class="section-name-form">
             <input type="text" value="${_('New Section Name')}" class="new-section-name" />
-            <input type="submit" class="new-section-name-save" data-parent="${parent_location}" data-template="${new_section_template}" value="${_('Save')}" />
+            <input type="submit" class="new-section-name-save" data-parent="${parent_location}"
+                   data-category="${new_section_category}" value="${_('Save')}" />
             <input type="button" class="new-section-name-cancel" value="${_('Cancel')}" /></h3>
           </form>
         </div>
@@ -83,8 +84,9 @@
           <span class="section-name-span">Click here to set the section name</span>
           <form class="section-name-form">
             <input type="text" value="${_('New Section Name')}" class="new-section-name" />
-            <input type="submit" class="new-section-name-save" data-parent="${parent_location}" data-template="${new_section_template}" value="${_('Save')}" />
-            <input type="button" class="new-section-name-cancel" value="${_('Cancel')}" /></h3>
+            <input type="submit" class="new-section-name-save" data-parent="${parent_location}"
+                   data-category="${new_section_category}" value="${_('Save')}" />
+            <input type="button" class="new-section-name-cancel" value="$(_('Cancel')}" /></h3>
           </form>
         </div>
         <div class="item-actions">
@@ -181,7 +183,7 @@
           </header>
           <div class="subsection-list">
             <div class="list-header">
-              <a href="#" class="new-subsection-item" data-template="${new_subsection_template}">
+              <a href="#" class="new-subsection-item" data-category="${new_subsection_category}">
                 <span class="new-folder-icon"></span>${_("New Subsection")}
               </a>
             </div>

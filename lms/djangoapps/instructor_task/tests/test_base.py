@@ -119,7 +119,7 @@ class InstructorTaskModuleTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase)
 
         # add a sequence to the course to which the problems can be added
         self.problem_section = ItemFactory.create(parent_location=chapter.location,
-                                                  template='i4x://edx/templates/sequential/Empty',
+                                                  category='sequential',
                                                   display_name=TEST_SECTION_NAME)
 
     @staticmethod
@@ -169,7 +169,7 @@ class InstructorTaskModuleTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase)
                         'num_responses': 2}
         problem_xml = factory.build_xml(**factory_args)
         ItemFactory.create(parent_location=self.problem_section.location,
-                           template="i4x://edx/templates/problem/Blank_Common_Problem",
+                           category="problem",
                            display_name=str(problem_url_name),
                            data=problem_xml)
 

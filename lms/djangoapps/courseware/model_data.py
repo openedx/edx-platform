@@ -12,9 +12,14 @@ from .models import (
     XModuleStudentPrefsField,
     XModuleStudentInfoField
 )
+import logging
+
+from django.db import DatabaseError
 
 from xblock.runtime import KeyValueStore, InvalidScopeError
-from xblock.core import Scope
+from xblock.core import KeyValueMultiSaveError, Scope
+
+log = logging.getLogger(__name__)
 
 
 class InvalidWriteError(Exception):
@@ -242,9 +247,10 @@ class ModelDataCache(object):
                 course_id=self.course_id,
                 student=self.user,
                 module_state_key=key.block_scope_id.url(),
-                defaults={'state': json.dumps({}),
-                          'module_type': key.block_scope_id.category,
-                         },
+                defaults={
+                    'state': json.dumps({}),
+                    'module_type': key.block_scope_id.category,
+                },
             )
         elif key.scope == Scope.content:
             field_object, _ = XModuleContentField.objects.get_or_create(
@@ -328,22 +334,57 @@ class LmsKeyValueStore(KeyValueStore):
             return json.loads(field_object.value)
 
     def set(self, key, value):
-        if key.field_name in self._descriptor_model_data:
-            raise InvalidWriteError("Not allowed to overwrite descriptor model data", key.field_name)
+        """
+        Set a single value in the KeyValueStore
+        """
+        self.set_many({key: value})
 
-        field_object = self._model_data_cache.find_or_create(key)
+    def set_many(self, kv_dict):
+        """
+        Provide a bulk save mechanism.
 
-        if key.scope not in self._allowed_scopes:
-            raise InvalidScopeError(key.scope)
+        `kv_dict`: A dictionary of dirty fields that maps
+          xblock.DbModel._key : value
 
-        if key.scope == Scope.user_state:
-            state = json.loads(field_object.state)
-            state[key.field_name] = value
-            field_object.state = json.dumps(state)
-        else:
-            field_object.value = json.dumps(value)
+        """
+        saved_fields = []
+        # field_objects maps a field_object to a list of associated fields
+        field_objects = dict()
+        for field in kv_dict:
+            # Check field for validity
+            if field.field_name in self._descriptor_model_data:
+                raise InvalidWriteError("Not allowed to overwrite descriptor model data", field.field_name)
 
-        field_object.save()
+            if field.scope not in self._allowed_scopes:
+                raise InvalidScopeError(field.scope)
+
+            # If the field is valid and isn't already in the dictionary, add it.
+            field_object = self._model_data_cache.find_or_create(field)
+            if field_object not in field_objects.keys():
+                field_objects[field_object] = []
+            # Update the list of associated fields
+            field_objects[field_object].append(field)
+
+            # Special case when scope is for the user state, because this scope saves fields in a single row
+            if field.scope == Scope.user_state:
+                state = json.loads(field_object.state)
+                state[field.field_name] = kv_dict[field]
+                field_object.state = json.dumps(state)
+            else:
+            # The remaining scopes save fields on different rows, so
+            # we don't have to worry about conflicts
+                field_object.value = json.dumps(kv_dict[field])
+
+        for field_object in field_objects:
+            try:
+                # Save the field object that we made above
+                field_object.save()
+                # If save is successful on this scope, add the saved fields to
+                # the list of successful saves
+                saved_fields.extend([field.field_name for field in field_objects[field_object]])
+            except DatabaseError:
+                log.error('Error saving fields %r', field_objects[field_object])
+                raise KeyValueMultiSaveError(saved_fields)
 
     def delete(self, key):
         if key.field_name in self._descriptor_model_data:

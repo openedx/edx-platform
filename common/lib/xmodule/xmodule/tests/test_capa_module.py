@@ -636,10 +636,10 @@ class CapaModuleTest(unittest.TestCase):
 
         # Expect that the problem was reset
         module.new_lcp.assert_called_once_with(None)
-        module.choose_new_seed.assert_called_once_with()
 
     def test_reset_problem_closed(self):
-        module = CapaFactory.create()
+        # pre studio default
+        module = CapaFactory.create(rerandomize="always")
 
         # Simulate that the problem is closed
         with patch('xmodule.capa_module.CapaModule.closed') as mock_closed:
@@ -900,13 +900,13 @@ class CapaModuleTest(unittest.TestCase):
         module = CapaFactory.create(done=False)
         self.assertFalse(module.should_show_reset_button())
 
-        # Otherwise, DO show the reset button
-        module = CapaFactory.create(done=True)
+        # pre studio default value, DO show the reset button
+        module = CapaFactory.create(rerandomize="always", done=True)
         self.assertTrue(module.should_show_reset_button())
 
         # If survey question for capa (max_attempts = 0),
         # DO show the reset button
-        module = CapaFactory.create(max_attempts=0, done=True)
+        module = CapaFactory.create(rerandomize="always", max_attempts=0, done=True)
         self.assertTrue(module.should_show_reset_button())
 
     def test_should_show_save_button(self):
@@ -940,8 +940,8 @@ class CapaModuleTest(unittest.TestCase):
         module = CapaFactory.create(max_attempts=None, rerandomize="per_student", done=True)
         self.assertFalse(module.should_show_save_button())
 
-        # Otherwise, DO show the save button
-        module = CapaFactory.create(done=False)
+        # pre-studio default, DO show the save button
+        module = CapaFactory.create(rerandomize="always", done=False)
         self.assertTrue(module.should_show_save_button())
 
         # If we're not randomizing and we have limited attempts,  then we can save

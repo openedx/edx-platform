@@ -7,9 +7,9 @@ from terrain.steps import reload_the_page
 
 
 @world.absorb
-def create_component_instance(step, component_button_css, instance_id, expected_css):
+def create_component_instance(step, component_button_css, category, expected_css, boilerplate=None):
     click_new_component_button(step, component_button_css)
-    click_component_from_menu(instance_id, expected_css)
+    click_component_from_menu(category, boilerplate, expected_css)
 
 
 @world.absorb
@@ -19,7 +19,7 @@ def click_new_component_button(step, component_button_css):
 
 
 @world.absorb
-def click_component_from_menu(instance_id, expected_css):
+def click_component_from_menu(category, boilerplate, expected_css):
     """
     Creates a component from `instance_id`. For components with more
     than one template, clicks on `elem_css` to create the new
@@ -27,11 +27,13 @@ def click_component_from_menu(instance_id, expected_css):
     as the user clicks the appropriate button, so we assert that the
     expected component is present.
     """
-    elem_css = "a[data-location='%s']" % instance_id
+    if boilerplate:
+        elem_css = "a[data-category='{}'][data-boilerplate='{}']".format(category, boilerplate)
+    else:
+        elem_css = "a[data-category='{}']:not([data-boilerplate])".format(category)
     elements = world.css_find(elem_css)
-    assert(len(elements) == 1)
-    if elements[0]['id'] == instance_id:  # If this is a component with multiple templates
-        world.css_click(elem_css)
+    assert_equal(len(elements), 1)
+    world.css_click(elem_css)
     assert_equal(1, len(world.css_find(expected_css)))
 
 

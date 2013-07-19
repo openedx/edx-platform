@@ -3,13 +3,13 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore import Location
 
 
-def get_module_info(store, location, parent_location=None, rewrite_static_links=False):
+def get_module_info(store, location, rewrite_static_links=False):
     try:
         module = store.get_item(location)
     except ItemNotFoundError:
         # create a new one
-        template_location = Location(['i4x', 'edx', 'templates', location.category, 'Empty'])
-        module = store.clone_item(template_location, location)
+        store.create_and_save_xmodule(location)
+        module = store.get_item(location)
 
     data = module.data
     if rewrite_static_links:
@@ -29,7 +29,8 @@ def get_module_info(store, location, parent_location=None, rewrite_static_links=
         'id': module.location.url(),
         'data': data,
         # TODO (cpennington): This really shouldn't have to do this much reaching in to get the metadata
-        'metadata': module._model_data._kvs._metadata
+        # what's the intent here? all metadata incl inherited & namespaced?
+        'metadata': module.xblock_kvs._metadata
     }
 
 
@@ -37,14 +38,11 @@ def set_module_info(store, location, post_data):
     module = None
     try:
         module = store.get_item(location)
-    except:
-        pass
-
-    if module is None:
-        # new module at this location
-        # presume that we have an 'Empty' template
-        template_location = Location(['i4x', 'edx', 'templates', location.category, 'Empty'])
-        module = store.clone_item(template_location, location)
+    except ItemNotFoundError:
+        # new module at this location: almost always used for the course about pages; thus, no parent. (there
+        # are quite a handful of about page types available for a course and only the overview is pre-created)
+        store.create_and_save_xmodule(location)
+        module = store.get_item(location)
 
     if post_data.get('data') is not None:
         data = post_data['data']
@@ -79,4 +77,4 @@ def set_module_info(store, location, post_data):
 
         # commit to datastore
         # TODO (cpennington): This really shouldn't have to do this much reaching in to get the metadata
-        store.update_metadata(location, module._model_data._kvs._metadata)
+        store.update_metadata(location, module.xblock_kvs._metadata)

@@ -146,6 +146,10 @@ MITX_FEATURES = {
 
     # for load testing
     'AUTOMATIC_AUTH_FOR_LOAD_TESTING': False,
+
+    # Toggle to enable chat availability (configured on a per-course
+    # basis in Studio)
+    'ENABLE_CHAT': False
 }
 
 # Used for A/B testing
@@ -313,6 +317,8 @@ CODE_JAIL = {
     'limits': {
         # How many CPU seconds can jailed code use?
         'CPU': 1,
+        # How large a file can jailed code write?
+        'FSIZE': 50000,
     },
 }
 
