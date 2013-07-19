@@ -10,10 +10,6 @@
   <div class="grader-status">
     % if state == 'initial':
       <span class="unanswered" style="display:inline-block;" id="status_${id}">Unanswered</span>
-    % elif state in ['done', 'post_assessment'] and correct == 'correct':
-    <span class="correct" id="status_${id}"></span> <p>Correct</p>
-    % elif state in ['done', 'post_assessment'] and correct == 'incorrect':
-    <span class="incorrect" id="status_${id}"></span> <p>Incorrect. </p>
     % elif state == 'assessing':
       <span class="grading" id="status_${id}">Submitted for grading.
       % if eta_message is not None:

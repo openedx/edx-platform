@@ -50,6 +50,10 @@ Write a persuasive essay to a newspaper reflecting your vies on censorship in li
       mode: null
       })
       @setCurrentEditor(@markdown_editor)
+      selection = @markdown_editor.getSelection()
+      #Auto-add in the needed template if it isn't already in there.
+      if(@markdown_editor.getValue() == "")
+        @markdown_editor.setValue(OpenEndedMarkdownEditingDescriptor.promptTemplate + "\n" + OpenEndedMarkdownEditingDescriptor.rubricTemplate + "\n" + OpenEndedMarkdownEditingDescriptor.tasksTemplate)
       # Add listeners for toolbar buttons (only present for markdown editor)
       @element.on('click', '.xml-tab', @onShowXMLButton)
       @element.on('click', '.format-buttons a', @onToolbarButton)
