@@ -606,7 +606,7 @@ function saveNewCourse(e) {
     var display_name = $newCourse.find('.new-course-name').val();
     var courseCategory = $newCourse.find('.new-course-category').val();
 
-    alert("WORKING"+courseCategory+"hellow");
+    
     if (org == '' || number == '' || display_name == '') {
         alert('You must specify all fields in order to create a new course.');
         return;
