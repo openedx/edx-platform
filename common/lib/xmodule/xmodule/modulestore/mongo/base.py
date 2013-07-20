@@ -105,15 +105,6 @@ class MongoKeyValueStore(KeyValueStore):
         else:
             raise InvalidScopeError(key.scope)
 
-    def set_many(self, update_dict):
-        """set_many method. Implementations should accept an `update_dict` of
-        key-value pairs, and set all the `keys` to the given `value`s."""
-        # `set` simply updates an in-memory db, rather than calling down to a real db,
-        # as mongo bulk save is handled elsewhere. A future improvement would be to pull
-        # the mongo-specific bulk save logic into this method.
-        for key, value in update_dict.iteritems():
-            self.set(key, value)
-
     def delete(self, key):
         if key.scope == Scope.children:
             self._children = []

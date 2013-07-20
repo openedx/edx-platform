@@ -8,9 +8,10 @@ from collections import namedtuple
 from pkg_resources import resource_listdir, resource_string, resource_isdir
 
 from xmodule.modulestore import inheritance, Location
-from xmodule.modulestore.exceptions import ItemNotFoundError, InsufficientSpecificationError
+from xmodule.modulestore.exceptions import ItemNotFoundError, InsufficientSpecificationError, InvalidLocationError
 
 from xblock.core import XBlock, Scope, String, Integer, Float, ModelType
+from xmodule.modulestore.locator import BlockUsageLocator
 
 log = logging.getLogger(__name__)
 
@@ -27,7 +28,13 @@ class LocationField(ModelType):
         """
         Parse the json value as a Location
         """
-        return Location(value)
+        try:
+            return Location(value)
+        except InvalidLocationError:
+            if isinstance(value, BlockUsageLocator):
+                return value
+            else:
+                return BlockUsageLocator(value)
 
     def to_json(self, value):
         """
@@ -166,6 +173,10 @@ class XModule(XModuleFields, HTMLSnippet, XBlock):
             self.url_name = self.location.name
             if not hasattr(self, 'category'):
                 self.category = self.location.category
+        elif isinstance(self.location, BlockUsageLocator):
+            self.url_name = self.location.usage_id
+            if not hasattr(self, 'category'):
+                raise InsufficientSpecificationError()
         else:
             raise InsufficientSpecificationError()
         self._loaded_children = None
@@ -436,8 +447,17 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
             self.url_name = self.location.name
             if not hasattr(self, 'category'):
                 self.category = self.location.category
+        elif isinstance(self.location, BlockUsageLocator):
+            self.url_name = self.location.usage_id
+            if not hasattr(self, 'category'):
+                raise InsufficientSpecificationError()
         else:
             raise InsufficientSpecificationError()
+        # update_version is the version which last updated this xblock v prev being the penultimate updater
+        # leaving off original_version since it complicates creation w/o any obv value yet and is computable
+        # by following previous until None
+        # definition_locator is only used by mongostores which separate definitions from blocks
+        self.edited_by = self.edited_on = self.previous_version = self.update_version = self.definition_locator = None
         self._child_instances = None
 
     @property
@@ -514,22 +534,30 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
 
     # ================================= JSON PARSING ===========================
     @staticmethod
-    def load_from_json(json_data, system, default_class=None):
+    def load_from_json(json_data, system, default_class=None, parent_xblock=None):
         """
         This method instantiates the correct subclass of XModuleDescriptor based
-        on the contents of json_data.
+        on the contents of json_data. It does not persist it and can create one which
+        has no usage id.
 
-        json_data must contain a 'location' element, and must be suitable to be
-        passed into the subclasses `from_json` method as model_data
+        parent_xblock is used to compute inherited metadata as well as to append the new xblock.
+
+        json_data:
+        - 'location' : must have this field
+        - 'category': the xmodule category (required or location must be a Location)
+        - 'metadata': a dict of locally set metadata (not inherited)
+        - 'children': a list of children's usage_ids w/in this course
+        - 'definition':
+        - '_id' (optional): the usage_id of this. Will generate one if not given one.
         """
         class_ = XModuleDescriptor.load_class(
-            json_data['location']['category'],
+            json_data.get('category', json_data.get('location', {}).get('category')),
             default_class
         )
-        return class_.from_json(json_data, system)
+        return class_.from_json(json_data, system, parent_xblock)
 
     @classmethod
-    def from_json(cls, json_data, system):
+    def from_json(cls, json_data, system, parent_xblock=None):
         """
         Creates an instance of this descriptor from the supplied json_data.
         This may be overridden by subclasses
@@ -547,28 +575,25 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
                Otherwise, it contains the single field 'data'
             4) Any value later in this list overrides a value earlier in this list
 
-        system: A DescriptorSystem for interacting with external resources
+        json_data:
+        - 'category': the xmodule category (required)
+        - 'metadata': a dict of locally set metadata (not inherited)
+        - 'children': a list of children's usage_ids w/in this course
+        - 'definition':
+        - '_id' (optional): the usage_id of this. Will generate one if not given one.
         """
-        model_data = {}
+        usage_id = json_data.get('_id', None)
+        if not '_inherited_metadata' in json_data and parent_xblock is not None:
+            json_data['_inherited_metadata'] = parent_xblock.xblock_kvs.get_inherited_metadata().copy()
+            json_metadata = json_data.get('metadata', {})
+            for field in inheritance.INHERITABLE_METADATA:
+                if field in json_metadata:
+                    json_data['_inherited_metadata'][field] = json_metadata[field]
 
-        for key, value in json_data.get('metadata', {}).items():
-            model_data[cls._translate(key)] = value
-
-        model_data.update(json_data.get('metadata', {}))
-
-        definition = json_data.get('definition', {})
-        if 'children' in definition:
-            model_data['children'] = definition['children']
-
-        if 'data' in definition:
-            if isinstance(definition['data'], dict):
-                model_data.update(definition['data'])
-            else:
-                model_data['data'] = definition['data']
-
-        model_data['location'] = json_data['location']
-
-        return cls(system, model_data)
+        new_block = system.xblock_from_json(cls, usage_id, json_data)
+        if parent_xblock is not None:
+            parent_xblock.children.append(new_block)
+        return new_block
 
     @classmethod
     def _translate(cls, key):
@@ -649,6 +674,8 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         """
         Use w/ caution. Really intended for use by the persistence layer.
         """
+        # if caller wants kvs, caller's assuming it's up to date; so, decache it
+        self.save()
         return self._model_data._kvs
 
     # =============================== BUILTIN METHODS ==========================
