@@ -1,15 +1,7 @@
 from django.test import TestCase
 from util.testing import UrlResetMixin
 from django.contrib.auth.models import User
-from django.conf import settings
 from mock import patch
-# from copy import deepcopy, copy
-
-# NEW_SETTINGS = deepcopy(settings)
-
-# update just the auth flag
-# NEW_SETTINGS.MITX_FEATURES['AUTOMATIC_AUTH_FOR_LOAD_TESTING'] = True
-# NEW_SETTINGS.MITX_FEATURES['MAX_AUTO_AUTH_USERS'] = 1
 
 
 class TestAutoAuthEnabled(UrlResetMixin, TestCase):
@@ -29,7 +21,7 @@ class TestAutoAuthEnabled(UrlResetMixin, TestCase):
         """
         tests that user gets created when visiting the page
         """
-        print settings.MITX_FEATURES['AUTOMATIC_AUTH_FOR_LOAD_TESTING']
+
         url = '/auto_auth'
         self.client.get(url)
 
