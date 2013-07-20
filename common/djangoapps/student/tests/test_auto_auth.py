@@ -47,12 +47,9 @@ class TestAutoAuthEnabled(UrlResetMixin, TestCase):
 
         url = '/auto_auth'
 
-        # hit the url a few times
-        # mathematically, is much more efficient
-        # to hit the site many many times, and
-        # have a smaller MAX user count, but it is
-        # the GET request that actually takes a lot
-        # of time.
+        # hit the url a few times. Mathematically, is much more efficient
+        # to hit the site many many times, and have a smaller MAX user
+        # count, but it is the GET request that actually takes a lot of time.
         for i in range(200):
             self.client.get(url)
 
