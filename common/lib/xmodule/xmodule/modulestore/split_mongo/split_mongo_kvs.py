@@ -58,7 +58,7 @@ class SplitMongoKVS(KeyValueStore):
                 if isinstance(self._definition, DefinitionLazyLoader):
                     self._definition = self._definition.fetch()
                 if (key.field_name == 'data' and
-                    not isinstance(self._definition.get('data'), dict)):
+                        not isinstance(self._definition.get('data'), dict)):
                     return self._definition.get('data')
                 elif 'data' not in self._definition or key.field_name not in self._definition['data']:
                     raise KeyError()
@@ -85,7 +85,7 @@ class SplitMongoKVS(KeyValueStore):
                 if isinstance(self._definition, DefinitionLazyLoader):
                     self._definition = self._definition.fetch()
                 if (key.field_name == 'data' and
-                    not isinstance(self._definition.get('data'), dict)):
+                        not isinstance(self._definition.get('data'), dict)):
                     self._definition.get('data')
                 else:
                     self._definition.setdefault('data', {})[key.field_name] = value
@@ -111,7 +111,7 @@ class SplitMongoKVS(KeyValueStore):
                 if isinstance(self._definition, DefinitionLazyLoader):
                     self._definition = self._definition.fetch()
                 if (key.field_name == 'data' and
-                    not isinstance(self._definition.get('data'), dict)):
+                        not isinstance(self._definition.get('data'), dict)):
                     self._definition.setdefault('data', None)
                 else:
                     try:
@@ -135,7 +135,7 @@ class SplitMongoKVS(KeyValueStore):
                 if isinstance(self._definition, DefinitionLazyLoader):
                     self._definition = self._definition.fetch()
                 if (key.field_name == 'data' and
-                    not isinstance(self._definition.get('data'), dict)):
+                        not isinstance(self._definition.get('data'), dict)):
                     return self._definition.get('data') is not None
                 else:
                     return key.field_name in self._definition.get('data', {})
@@ -161,4 +161,3 @@ class SplitMongoKVS(KeyValueStore):
         Get the metadata set by the ancestors (which own metadata may override or not)
         """
         return self._inherited_metadata
-

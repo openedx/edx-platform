@@ -14,8 +14,10 @@ class ItemWriteConflictError(Exception):
 class InsufficientSpecificationError(Exception):
     pass
 
+
 class OverSpecificationError(Exception):
     pass
+
 
 class InvalidLocationError(Exception):
     pass
@@ -27,6 +29,7 @@ class NoPathToItem(Exception):
 
 class DuplicateItemError(Exception):
     pass
+
 
 class VersionConflictError(Exception):
     """

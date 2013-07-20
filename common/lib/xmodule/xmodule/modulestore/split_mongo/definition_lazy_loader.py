@@ -1,5 +1,6 @@
 from xmodule.modulestore.locator import DescriptionLocator
 
+
 class DefinitionLazyLoader(object):
     """
     A placeholder to put into an xblock in place of its definition which

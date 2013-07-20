@@ -2,6 +2,7 @@ import re
 
 URL_RE = re.compile(r'^edx://(.+)$', re.IGNORECASE)
 
+
 def parse_url(string):
     """
     A url must begin with 'edx://' (case-insensitive match),
@@ -33,8 +34,9 @@ def parse_url(string):
 
 BLOCK_RE = re.compile(r'^\w+$', re.IGNORECASE)
 
+
 def parse_block_ref(string):
-    """
+    r"""
     A block_ref is a string of word_chars.
 
     <word_chars> matches one or more Unicode word characters; this includes most
@@ -46,11 +48,12 @@ def parse_block_ref(string):
     otherwise returns None.
     """
     if len(string) > 0 and BLOCK_RE.match(string):
-        return {'block' : string}
+        return {'block': string}
     return None
 
 
 GUID_RE = re.compile(r'^(?P<version_guid>[A-F0-9]+)(#(?P<block>\w+))?$', re.IGNORECASE)
+
 
 def parse_guid(string):
     """
@@ -68,8 +71,9 @@ def parse_guid(string):
 
 COURSE_ID_RE = re.compile(r'^(?P<id>(\w+)(\.\w+\w*)*)(;(?P<revision>\w+))?(#(?P<block>\w+))?$', re.IGNORECASE)
 
+
 def parse_course_id(string):
-    """
+    r"""
 
     A course_id has a main id component.
     There may also be an optional revision (;published or ;draft).
