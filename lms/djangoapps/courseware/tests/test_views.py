@@ -53,7 +53,7 @@ class TestJumpTo(TestCase):
 
     def test_jumpto_id_invalid_location(self):
         location = Location('i4x', 'edX', 'toy', 'NoSuchPlace', None)
-        jumpto_url = '%s/%s/jump_to/%s' % ('/courses', self.course_name, location.name)
+        jumpto_url = '%s/%s/jump_to_id/%s' % ('/courses', self.course_name, location.name)
         response = self.client.get(jumpto_url)
         self.assertEqual(response.status_code, 404)
 

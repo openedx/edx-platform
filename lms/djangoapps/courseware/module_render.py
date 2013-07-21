@@ -398,6 +398,8 @@ def get_module_for_descriptor_internal(user, descriptor, model_data_cache, cours
     # for studio authored courses (compared to the /course/... format) since it is
     # is durable with respect to moves and the author doesn't need to
     # know the hierarchy
+    # NOTE: module_id is empty string here. The 'module_id' will get assigned in the replacement
+    # function, we just need to specify something to get the reverse() to work
     module.get_html = replace_jump_to_id_urls(module.get_html, course_id,
                                               reverse('jump_to_id',
                                               kwargs={'course_id': course_id, 'module_id': ''}))
