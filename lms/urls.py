@@ -177,6 +177,8 @@ if settings.COURSEWARE_ENABLED:
     urlpatterns += (
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/jump_to/(?P<location>.*)$',
             'courseware.views.jump_to', name="jump_to"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/jump_to_id/(?P<module_id>.*)$',
+            'courseware.views.jump_to_id', name="jump_to_id"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/modx/(?P<location>.*?)/(?P<dispatch>[^/]*)$',
             'courseware.module_render.modx_dispatch',
             name='modx_dispatch'),

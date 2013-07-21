@@ -44,6 +44,19 @@ class TestJumpTo(TestCase):
         response = self.client.get(jumpto_url)
         self.assertRedirects(response, expected, status_code=302, target_status_code=302)
 
+    def test_jumpto_id(self):
+        location = Location('i4x', 'edX', 'toy', 'chapter', 'Overview')
+        jumpto_url = '%s/%s/jump_to_id/%s' % ('/courses', self.course_name, location.name)
+        expected = 'courses/edX/toy/2012_Fall/courseware/Overview/'
+        response = self.client.get(jumpto_url)
+        self.assertRedirects(response, expected, status_code=302, target_status_code=302)
+
+    def test_jumpto_id_invalid_location(self):
+        location = Location('i4x', 'edX', 'toy', 'NoSuchPlace', None)
+        jumpto_url = '%s/%s/jump_to/%s' % ('/courses', self.course_name, location.name)
+        response = self.client.get(jumpto_url)
+        self.assertEqual(response.status_code, 404)
+
 
 class ViewsTestCase(TestCase):
     def setUp(self):

@@ -43,6 +43,26 @@ def try_staticfiles_lookup(path):
     return url
 
 
+def replace_jump_to_id_urls(text, course_id, jump_to_id_base_url):
+    """
+    This will replace a link to another piece of courseware to a 'jump_to'
+    URL that will redirect to the right place in the courseware
+
+    NOTE: This is similar to replace_course_urls in terms of functionality
+    but it is intended to be used when we only have a 'id' that the
+    course author provides. This is much more helpful when using
+    Studio authored courses since they don't need to know the path. This
+    is also durable with respect to item moves.
+    """
+
+    def replace_jump_to_id_url(match):
+        quote = match.group('quote')
+        rest = match.group('rest')
+        return "".join([quote, jump_to_id_base_url + rest, quote])
+
+    return re.sub(_url_replace_regex('/jump_to_id/'), replace_jump_to_id_url, text)
+
+
 def replace_course_urls(text, course_id):
     """
     Replace /course/$stuff urls with /courses/$course_id/$stuff urls
@@ -52,7 +72,6 @@ def replace_course_urls(text, course_id):
 
     returns: text with the links replaced
     """
-
 
     def replace_course_url(match):
         quote = match.group('quote')
