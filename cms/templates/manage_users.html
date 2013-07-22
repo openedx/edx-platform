@@ -1,5 +1,6 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
+<%! from auth.authz import is_user_in_course_group_role %>
 <%inherit file="base.html" />
 <%block name="title">${_("Course Team Settings")}</%block>
 <%block name="bodyclass">is-signedin course users settings team</%block>
@@ -55,13 +56,21 @@
             ))}">
             <span class="user-name">${user.username}</span>
             <span class="user-email">${user.email}</span>
-            %if allow_actions :
+            % if allow_actions:
             <div class="item-actions">
-              %if request.user.id != user.id:
+              % if request.user.id != user.id:
+                % if is_user_in_course_group_role(user, context_course.location, 'instructor'):
+                     <% admin_class = "remove-admin" %>
+                     <% admin_text = "Remove Admin" %>
+                % else:
+                     <% admin_class = "add-admin" %>
+                     <% admin_text = "Add Admin" %>
+                % endif
+              <a href="#" class="toggle-admin ${admin_class}">${admin_text}</a>
               <a href="#" class="delete-button remove-user" data-id="${user.email}"><span class="delete-icon"></span></a>
-              %endif
+              % endif
             </div>
-            %endif
+            % endif
           </li>
           % endfor
         </ol>
@@ -90,9 +99,9 @@
         type: 'POST',
         dataType: 'json',
         contentType: 'application/json',
-        data: {
+        data: JSON.stringify({
           role: 'staff',
-        },
+        }),
         success: function(data) {
           location.reload();
         },
@@ -131,14 +140,38 @@
         type: 'DELETE',
         dataType: 'json',
         contentType: 'application/json',
-        data: {
+        data: JSON.stringify({
           role: 'staff',
-        },
+        }),
         complete: function() {
           location.reload();
         }
       });
     });
+
+    $(".toggle-admin").click(function(e) {
+      e.preventDefault()
+      var type;
+      if($(this).hasClass("add-admin")) {
+        type = 'POST';
+      } else {
+        type = 'DELETE';
+      }
+      var url = $(this).closest("li").data("url");
+      $.ajax({
+        url: url,
+        type: type,
+        dataType: 'json',
+        contentType: 'application/json',
+        data: JSON.stringify({
+          role: 'instructor',
+        }),
+        complete: function() {
+          location.reload();
+        }
+      })
+    })
+
   });
 </script>
 </%block>
