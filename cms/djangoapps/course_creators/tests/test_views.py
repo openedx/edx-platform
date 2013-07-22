@@ -80,3 +80,13 @@ class CourseCreatorView(TestCase):
         # user from the authz course creator group (and that can only be done by an admin).
         user_requested_access(self.user)
         self.assertEqual('granted', get_course_creator_status(self.user))
+
+    def test_add_user_unrequested_staff(self):
+        # Users marked as is_staff will not be added to the course creator table.
+        add_user_with_status_unrequested(self.admin)
+        self.assertIsNone(get_course_creator_status(self.admin))
+
+    def test_add_user_granted_staff(self):
+        # Users marked as is_staff will not be added to the course creator table.
+        add_user_with_status_granted(self.admin, self.admin)
+        self.assertIsNone(get_course_creator_status(self.admin))

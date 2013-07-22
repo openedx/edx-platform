@@ -47,6 +47,9 @@ class IndexCourseCreatorTests(CourseTestCase):
 
         self.enable_creator_group = {"ENABLE_CREATOR_GROUP": True}
 
+        self.admin = User.objects.create_user('Mark', 'mark+courses@edx.org', 'foo')
+        self.admin.is_staff = True
+
     def test_get_course_creator_status_disable_creation(self):
         # DISABLE_COURSE_CREATION is True (this is the case on edx, where we have a marketing site).
         # Only edx staff can create courses.
@@ -80,17 +83,14 @@ class IndexCourseCreatorTests(CourseTestCase):
         # ENABLE_CREATOR_GROUP is True. This is the case on edge.
         # Check return value for a non-staff user who has been granted access.
         with mock.patch.dict('django.conf.settings.MITX_FEATURES', self.enable_creator_group):
-            # self.user has staff permissions, can call this method.
-            add_user_with_status_granted(self.user, self.user)
-            # now make self.user non-staff
             self._set_user_non_staff()
+            add_user_with_status_granted(self.admin, self.user)
             self.assertEquals('granted', _get_course_creator_status(self.user))
 
     def test_get_course_creator_status_creator_group_denied(self):
         # ENABLE_CREATOR_GROUP is True. This is the case on edge.
         # Check return value for a non-staff user who has been denied access.
         with mock.patch.dict('django.conf.settings.MITX_FEATURES', self.enable_creator_group):
-            # make self.user non-staff
             self._set_user_non_staff()
             self._set_user_denied()
             self.assertEquals('denied', _get_course_creator_status(self.user))
@@ -137,10 +137,8 @@ class IndexCourseCreatorTests(CourseTestCase):
     def test_course_creator_group_granted(self):
         # Test index page content with ENABLE_CREATOR_GROUP True, non-staff member with access granted.
         with mock.patch.dict('django.conf.settings.MITX_FEATURES', self.enable_creator_group):
-            # self.user has staff permissions, can call this method.
-            add_user_with_status_granted(self.user, self.user)
-            # now make self.user non-staff
             self._set_user_non_staff()
+            add_user_with_status_granted(self.admin, self.user)
             self._assert_can_create()
 
     def test_course_creator_group_denied(self):
@@ -188,9 +186,6 @@ class IndexCourseCreatorTests(CourseTestCase):
         self.table_entry = CourseCreator(user=self.user)
         self.table_entry.save()
 
-        self.admin = User.objects.create_user('Mark', 'admin+courses@edx.org', 'foo')
-        self.admin.is_staff = True
-
         self.deny_request = HttpRequest()
         self.deny_request.user = self.admin
 
@@ -198,4 +193,3 @@ class IndexCourseCreatorTests(CourseTestCase):
 
         self.table_entry.state = CourseCreator.DENIED
         self.creator_admin.save_model(self.deny_request, self.table_entry, None, True)
-

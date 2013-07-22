@@ -12,6 +12,9 @@ def add_user_with_status_unrequested(user):
 
     If the user is already in the table, this method is a no-op
     (state will not be changed).
+
+    If the user is marked as is_staff, this method is a no-op (user
+    will not be added to table).
     """
     _add_user(user, CourseCreator.UNREQUESTED)
 
@@ -20,14 +23,17 @@ def add_user_with_status_granted(caller, user):
     """
     Adds a user to the course creator table with status 'granted'.
 
-    This method also adds the user to the course creator group maintained by authz.py.
+    If appropriate, this method also adds the user to the course creator group maintained by authz.py.
     Caller must have staff permissions.
 
     If the user is already in the table, this method is a no-op
     (state will not be changed).
+
+    If the user is marked as is_staff, this method is a no-op (user
+    will not be added to table, nor added to authz.py group).
     """
-    _add_user(user, CourseCreator.GRANTED)
-    update_course_creator_group(caller, user, True)
+    if _add_user(user, CourseCreator.GRANTED):
+        update_course_creator_group(caller, user, True)
 
 
 def update_course_creator_group(caller, user, add):
@@ -78,9 +84,16 @@ def _add_user(user, state):
     """
     Adds a user to the course creator table with the specified state.
 
+    Returns True if user was added to table, else False.
+
     If the user is already in the table, this method is a no-op
-    (state will not be changed).
+    (state will not be changed, method will return False).
+
+    If the user is marked as is_staff, this method is a no-op (False will be returned).
     """
-    if CourseCreator.objects.filter(user=user).count() == 0:
+    if not user.is_staff and CourseCreator.objects.filter(user=user).count() == 0:
         entry = CourseCreator(user=user, state=state)
         entry.save()
+        return True
+
+    return False
