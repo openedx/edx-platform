@@ -4,7 +4,6 @@ Parser and evaluator for FormulaResponse and NumericalResponse
 Uses pyparsing to parse. Main function as of now is evaluator().
 """
 
-import copy
 import math
 import operator
 import numbers
@@ -84,50 +83,6 @@ class UndefinedVariable(Exception):
     Indicate the student input of a variable which was unused by the instructor
     """
     pass
-
-
-def find_vars_funcs(tree):
-    """
-    Aggregate a list of the variables and functions used in `tree`
-
-    variables and functions are nodes identified by `branch.getName()`.
-    As the tips of the branches are strings, avoid any possible AttributeErrors
-    by looking just at the nodes which are `ParseResults`.
-    """
-    variables = set()
-    functions = set()
-
-    def check_branch(branch):
-        """
-        Add variables and functions to their respective sets, using recursion.
-        """
-        if isinstance(branch, ParseResults):
-            if branch.getName() == "variable":
-                variables.add(branch[0])
-            elif branch.getName() == "function":
-                functions.add(branch[0])
-            for sub_branch in branch:
-                check_branch(sub_branch)
-    check_branch(tree)
-    return (variables, functions)
-
-
-def check_variables(tree, all_variables, all_functions, case_sensitive):
-    """
-    Confirm that all the variables used in the tree are valid/defined.
-
-    Otherwise, raise an UndefinedVariable containing all bad variables.
-    """
-    used_vars, used_funcs = find_vars_funcs(tree)
-    if not case_sensitive:
-        used_vars = set((k.lower() for k in used_vars))
-        used_funcs = set((k.lower() for k in used_funcs))
-
-    # Test that `used_vars` is a subset of `all_vars` and the same for functions
-    if not (used_vars <= all_variables and
-            used_funcs <= all_functions):
-        bad_vars = (used_vars - all_variables) & (used_funcs - all_functions)
-        raise UndefinedVariable(' '.join(bad_vars))
 
 
 def lower_dict(input_dict):
@@ -247,74 +202,12 @@ def eval_product(parse_result):
     return prod
 
 
-def parse_algebra(string):
-    """
-    Parse an algebraic expression into a tree.
-
-    Return a `pyparsing.ParseResult` with proper groupings to reflect
-    parenthesis and order of operations. Leave all operators in the tree and do
-    not parse any strings of numbers into their float versions.
-
-    Adding the groups and result names makes the string representation of the
-    result really gross. For debugging, use something like
-      print parse_algebra("1+1/2").asXML()
-    """
-    # 0.33 or 7 or .34 or 16.
-    number_part = Word(nums)
-    inner_number = (number_part + Optional("." + Optional(number_part))) | ("." + number_part)
-    # By default pyparsing allows spaces between tokens--`Combine` prevents that
-    inner_number = Combine(inner_number)
-
-    # SI suffixes and percent
-    number_suffix = MatchFirst((Literal(k) for k in SUFFIXES.keys()))
-
-    # 0.33k or 17
-    plus_minus = Literal('+') | Literal('-')
-    number = Group(
-        inner_number +
-        Optional(CaselessLiteral("E") + Optional(plus_minus) + number_part) +
-        Optional(number_suffix)
-    )
-    number = number("number")
-
-    # Predefine recursive variables
-    expr = Forward()
-
-    # Handle variables passed in. They must start with letters/underscores and
-    # may contain numbers afterward
-    inner_varname = Word(alphas + "_", alphanums + "_")
-    varname = Group(inner_varname)("variable")
-
-    # Same thing for functions.
-    function = Group(inner_varname + Suppress("(") + expr + Suppress(")"))("function")
-
-    atom = number | function | varname | "(" + expr + ")"
-    atom = Group(atom)("atom")
-
-    # Do the following in the correct order to preserve order of operation
-    pow_term = atom + ZeroOrMore("^" + atom)
-    pow_term = Group(pow_term)("power")
-
-    par_term = pow_term + ZeroOrMore('||' + pow_term)  # 5k || 4k
-    par_term = Group(par_term)("parallel")
-
-    prod_term = par_term + ZeroOrMore((Literal('*') | Literal('/')) + par_term)  # 7 * 5 / 4
-    prod_term = Group(prod_term)("product")
-
-    sum_term = Optional(plus_minus) + prod_term + ZeroOrMore(plus_minus + prod_term)  # -5 + 4 - 3
-    sum_term = Group(sum_term)("sum")
-
-    # Finish the recursion
-    expr << sum_term  # pylint: disable=W0104
-    return (expr + stringEnd).parseString(string)[0]
-
-
 def add_defaults(variables, functions, case_sensitive):
     """
     Create dictionaries with both the default and user-defined variables.
     """
-    all_variables = copy.copy(DEFAULT_VARIABLES)
-    all_functions = copy.copy(DEFAULT_FUNCTIONS)
+    all_variables = dict(DEFAULT_VARIABLES)
+    all_functions = dict(DEFAULT_FUNCTIONS)
     all_variables.update(variables)
     all_functions.update(functions)
 
@@ -325,7 +218,7 @@ def add_defaults(variables, functions, case_sensitive):
     return (all_variables, all_functions)
 
 
-def evaluator(variables, functions, string, case_sensitive=False):
+def evaluator(variables, functions, math_expr, case_sensitive=False):
     """
     Evaluate an expression; that is, take a string of math and return a float
 
@@ -334,17 +227,18 @@ def evaluator(variables, functions, string, case_sensitive=False):
     -Unary functions are passed as a dictionary from string to function.
     """
     # No need to go further
-    if string.strip() == "":
+    if math_expr.strip() == "":
         return float('nan')
 
     # Parse tree
-    tree = parse_algebra(string)
+    thing = ParseAugmenter(math_expr, case_sensitive)
+    thing.parse_algebra()
 
     # Get our variables together
     all_variables, all_functions = add_defaults(variables, functions, case_sensitive)
 
     # ...and check them
-    check_variables(tree, set(all_variables), set(all_functions), case_sensitive)
+    thing.check_variables(all_variables, all_functions)
 
     # Create a recursion to evaluate the tree
     if case_sensitive:
@@ -352,7 +246,7 @@ def evaluator(variables, functions, string, case_sensitive=False):
     else:
         casify = lambda x: x.lower()  # Lowercase for case insens.
 
-    evaluate_action = {
+    evaluate_actions = {
         'number': eval_number,
         'variable': lambda x: all_variables[casify(x[0])],
         'function': lambda x: all_functions[casify(x[0])](x[1]),
@@ -363,19 +257,125 @@ def evaluator(variables, functions, string, case_sensitive=False):
         'sum': eval_sum
     }
 
-    def evaluate_branch(branch):
+    return thing.handle_tree(evaluate_actions)
+
+class ParseAugmenter(object):
+
+    def __init__(self, math_expr, case_sensitive=False):
+        self.case_sensitive = case_sensitive
+        self.math_expr = math_expr
+        self.tree = None
+        self.variables_used = set()
+        self.functions_used = set()
+
+    def make_variable_parse_action(self):
+        def vpa(tokens):
+            if self.case_sensitive:
+                varname = tokens[0][0]
+            else:
+                varname = tokens[0][0].lower()
+            self.variables_used.add(varname)
+        return vpa
+
+    def make_function_parse_action(self):
+        def fpa(tokens):
+            if self.case_sensitive:
+                varname = tokens[0][0]
+            else:
+                varname = tokens[0][0].lower()
+            self.functions_used.add(varname)
+        return fpa
+
+    def parse_algebra(self):
         """
-        Return the float representing the branch, using recursion.
+        Parse an algebraic expression into a tree.
 
-        Call the appropriate `evaluate_action` for this branch. As its inputs,
-        feed it the output of `evaluate_branch` for each child branch.
+        Store a `pyparsing.ParseResult` in self.tree with proper groupings to
+        reflect parenthesis and order of operations. Leave all operators in the
+        tree and do not parse any strings of numbers into their float versions.
+
+        Adding the groups and result names makes the `repr()` of the result
+        really gross. For debugging, use something like
+          print OBJ.tree.asXML()
         """
-        if not isinstance(branch, ParseResults):
-            return branch
+        # 0.33 or 7 or .34 or 16.
+        number_part = Word(nums)
+        inner_number = (number_part + Optional("." + Optional(number_part))) | ("." + number_part)
+        # pyparsing allows spaces between tokens--`Combine` prevents that
+        inner_number = Combine(inner_number)
 
-        action = evaluate_action[branch.getName()]
-        evaluated_kids = [evaluate_branch(k) for k in branch]
-        return action(evaluated_kids)
+        # SI suffixes and percent
+        number_suffix = MatchFirst(Literal(k) for k in SUFFIXES.keys())
 
-    # Find the value of the entire tree
-    return evaluate_branch(tree)
+        # 0.33k or 17
+        plus_minus = Literal('+') | Literal('-')
+        number = Group(
+            inner_number +
+            Optional(CaselessLiteral("E") + Optional(plus_minus) + number_part) +
+            Optional(number_suffix)
+        )
+        number = number("number")
+
+        # Predefine recursive variables
+        expr = Forward()
+        
+        # Handle variables passed in. They must start with letters/underscores
+        # and may contain numbers afterward
+        inner_varname = Word(alphas + "_", alphanums + "_")
+        varname = Group(inner_varname)("variable")
+        varname.setParseAction(self.make_variable_parse_action())
+
+        # Same thing for functions.
+        function = Group(inner_varname + Suppress("(") + expr + Suppress(")"))("function")
+        function.setParseAction(self.make_function_parse_action())
+        
+        atom = number | function | varname | "(" + expr + ")"
+        atom = Group(atom)("atom")
+        
+        # Do the following in the correct order to preserve order of operation
+        pow_term = atom + ZeroOrMore("^" + atom)
+        pow_term = Group(pow_term)("power")
+        
+        par_term = pow_term + ZeroOrMore('||' + pow_term)  # 5k || 4k
+        par_term = Group(par_term)("parallel")
+        
+        prod_term = par_term + ZeroOrMore((Literal('*') | Literal('/')) + par_term)  # 7 * 5 / 4
+        prod_term = Group(prod_term)("product")
+        
+        sum_term = Optional(plus_minus) + prod_term + ZeroOrMore(plus_minus + prod_term)  # -5 + 4 - 3
+        sum_term = Group(sum_term)("sum")
+        
+        # Finish the recursion
+        expr << sum_term  # pylint: disable=W0104
+        self.tree = (expr + stringEnd).parseString(self.math_expr)[0]
+
+    def handle_tree(self, handle_actions):
+        def handle_node(node):
+            """
+            Return the float representing the node, using recursion.
+            
+            Call the appropriate `handle_action` for this node. As its inputs,
+            feed it the output of `handle_node` for each child node.
+            """
+            if not isinstance(node, ParseResults):
+                return node
+
+            action = handle_actions[node.getName()]
+            handled_kids = [handle_node(k) for k in node]
+            return action(handled_kids)
+
+        # Find the value of the entire tree
+        return handle_node(self.tree)
+
+    def check_variables(self, valid_variables, valid_functions):
+        """
+        Confirm that all the variables used in the tree are valid/defined.
+        
+        Otherwise, raise an UndefinedVariable containing all bad variables.
+        """
+        # Test that `used_vars` is a subset of `all_vars` and the same for functions
+        if not (self.variables_used.issubset(valid_variables) and
+                self.functions_used.issubset(valid_functions)):
+            bad_vars = self.variables_used.difference(valid_variables)
+            bad_vars &= self.functions_used.difference(valid_functions)
+            raise UndefinedVariable(' '.join(bad_vars))
