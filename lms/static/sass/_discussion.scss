@@ -727,7 +727,7 @@ body.discussion {
       display: block;
       position: absolute;
       padding: 15px 23px;
-      color: $gray-l1;
+      color: $gray;
       font-size: 28px;
       z-index: 100;
       opacity: 1;
@@ -2659,8 +2659,6 @@ body.discussion {
 .notpinned span {
   color: #888;
   font-style: italic;
-  //cursor change is here since pins are read-only for inline discussions.
-  cursor: default;
 }
 
 .pinned-false
