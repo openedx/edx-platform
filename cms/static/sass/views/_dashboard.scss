@@ -72,7 +72,7 @@ body.dashboard {
 		overflow: hidden;
 
 		.ui-toggle-control {
-			@extend .depth2;
+			@extend .ui-depth2;
 			@extend .btn-secondary-gray;
 			@include clearfix();
 			display: block;
@@ -102,7 +102,7 @@ body.dashboard {
 		}
 
 		.ui-toggle-target {
-			@extend .depth1;
+			@extend .ui-depth1;
 			@include transition(opacity $tmg-f1 ease-in-out 0s);
 			position: relative;
 			top: -2px;
@@ -188,7 +188,7 @@ body.dashboard {
     .status-update {
 
     	.label {
-				@extend .text-sr;
+				@extend .cont-text-sr;
     	}
 
     	.value {
@@ -238,7 +238,7 @@ body.dashboard {
 		&.is-unrequested {
 
 			.title {
-				@extend .text-sr;
+				@extend .cont-text-sr;
 			}
 		}
 
