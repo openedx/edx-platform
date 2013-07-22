@@ -70,13 +70,19 @@ body.dashboard {
 	}
 
 	.new-course {
-		padding: 15px 25px;
-		margin-top: 20px;
+		padding: 0;
+		margin-top: $baseline;
 		border-radius: 3px;
-		border: 1px solid $darkGrey;
+		border: 1px solid $gray;
 		background: #fff;
 		box-shadow: 0 1px 2px rgba(0, 0, 0, .1);
 		@include clearfix;
+
+    .title {
+      @extend .t-title4;
+      font-weight: 700;
+      margin-bottom: $baseline;
+    }
 
 		.row {
 			margin-bottom: 15px;
@@ -90,10 +96,6 @@ body.dashboard {
 
 		.column:first-child {
 			margin-right: 4%;
-		}
-
-		.course-info {
-			width: 600px;
 		}
 
 		label {
@@ -121,5 +123,23 @@ body.dashboard {
 		.new-course-cancel {
 			@include white-button;
 		}
+
+    .wrap-error {
+      @include transition(all $tmg-f2 ease 0s);
+      height: 0;
+      overflow: hidden;
+      opacity: 0;
+    }
+
+    .wrap-error.is-shown {
+      height: 45px;
+      opacity: 1;
+    }
+
+    .message-status {
+      display: block;
+      margin-bottom: 0;
+      padding-left: 30px;
+    }
 	}
 }
