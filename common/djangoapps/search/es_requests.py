@@ -17,226 +17,9 @@ from wand.exceptions import DelegateError, MissingDelegateError, CorruptImageErr
 from xhtml2pdf import pisa as pisa
 
 
-class MongoIndexer:
-
-    def __init__(
-        self, host='localhost', port=27017, content_database='xcontent', file_collection="fs.files",
-        chunk_collection="fs.chunks", module_database='xmodule', module_collection='modulestore'
-    ):
-        self.host = host
-        self.port = port
-        self.client = MongoClient(host, port)
-        self.content_db = self.client[content_database]
-        self.module_db = self.client[module_database]
-        try:
-            self.content_db.collection_names().index(file_collection)
-        except ValueError:
-            print "No collection named: " + file_collection
-            raise
-        try:
-            self.content_db.collection_names().index(chunk_collection)
-        except ValueError:
-            print "No collection named: " + chunk_collection
-            raise
-        try:
-            self.module_db.collection_names().index(module_collection)
-        except ValueError:
-            print "No collection named: " + module_collection
-            raise
-        self.file_collection = self.content_db[file_collection]
-        self.chunk_collection = self.content_db[chunk_collection]
-        self.module_collection = self.module_db[module_collection]
-
-    def find_files_with_type(self, file_ending):
-        """Returns a cursor for content files matching given type"""
-        return self.file_collection.find({"filename": re.compile(".*?"+re.escape(file_ending))})
-
-    def find_chunks_with_type(self, file_ending):
-        """Returns a chunk cursor for content files matching given type"""
-        return self.chunk_collection.find({"files_id.name": re.compile(".*?"+re.escape(file_ending))})
-
-    def find_modules_by_category(self, category):
-        """Returns a cursor for all xmodules matching given category"""
-        return self.module_collection.find({"_id.category": category})
-
-    def find_categories_with_regex(self, category, regex):
-        return self.module_collection.find({"_id.category": category, "definition.data": regex})
-
-    def find_asset_with_name(self, name):
-        return self.chunk_collection.find_one({"files_id.category": "asset", "files_id.name": name})
-
-    def find_modules_for_course(self, course):
-        return self, module_collection.find({"_id.course": course})
-
-    def find_transcript_content(self, mongo_element):
-        """Finds the corresponding chunk to the file element from a cursor similar to that from find_transcripts"""
-        filename = mongo_element["_id"]["name"]
-        database_object = self.chunk_collection.find_one({"files_id.name": filename})
-        try:
-            return filter(None, json.loads(database_object["data"].decode('utf-8', "ignore"))["text"])
-        except ValueError:
-            return ["n/a"]
-
-    def transcript_file_from_video_module(self, video_module):
-        uuid = re.sub(r"^.*?()()().*?$",r"")
-
-    def pdf_to_text(self, mongo_element):
-        onlyAscii = lambda s: "".join(c for c in s if ord(c) < 128)
-        resource = PDFResourceManager()
-        return_string = cIO()
-        params = LAParams()
-        converter = TextConverter(resource, return_string, codec='utf-8', laparams=params)
-        fake_file = IO(mongo_element["data"].__str__())
-        try:
-            process_pdf(resource, converter, fake_file)
-        except PDFSyntaxError:
-            print mongo_element["files_id"]["name"] + " cannot be read, moving on."
-            return ""
-        text_value = onlyAscii(return_string.getvalue()).replace("\n", " ")
-        return text_value
-
-    def searchable_text_from_problem_data(self, mongo_element):
-        """The data field from the problem is in weird xml, which is good for functionality, but bad for search"""
-        data = mongo_element["definition"]["data"]
-        try:
-            paragraphs = " ".join([text for text in re.findall("<p>(.*?)</p>", data) if text is not "Explanation"])
-        except TypeError:
-            paragraphs = "n/a"
-        cleaned_text = re.sub("\\(.*?\\)", "", paragraphs).replace("\\", "")
-        remove_tags = re.sub("<[a-zA-Z0-9/\.\= \"_-]+>", "", cleaned_text)
-        remove_repetitions = re.sub(r"(.)\1{4,}", "", remove_tags)
-        return remove_repetitions
-
-    def module_for_uuid(self, transcript_uuid):
-        """Given the transcript uuid found from the xcontent database, returns the mongo document for the video"""
-        regex_pattern = re.compile(".*?"+str(transcript_uuid)+".*?")
-        video_module = self.module_collection.find_one({"definition.data": regex_pattern})
-        return video_module
-
-    def uuid_from_file_name(self, file_name):
-        """Returns a youtube uuid given the filename of a transcript"""
-        if "subs_" in file_name:
-            file_name = file_name[5+file_name.find("subs_"):]
-        elif file_name[:2] == "._":
-            file_name = file_name[2:]
-        return file_name[:file_name.find(".")]
-
-    def thumbnail_from_uuid(self, uuid):
-        image = urllib.urlopen("http://img.youtube.com/vi/" + uuid + "/0.jpg")
-        return base64.b64encode(image.read())
-
-    def thumbnail_from_pdf(self, pdf):
-        try:
-            with Image(blob=pdf) as img:
-                return base64.b64encode(img.make_blob('jpg'))
-        except (DelegateError, MissingDelegateError, CorruptImageError):
-            raise
-
-    def thumbnail_from_html(self, html):
-        pseudo_dest = cIO()
-        pisa.CreatePDF(IO(html), pseudo_dest)
-        return self.thumbnail_from_pdf(pseudo_dest.getvalue())
-
-    def vertical_url_from_mongo_element(self, mongo_element):
-        """Given a mongo element, returns the url after courseware"""
-        name = lambda x: x["_id"]["name"]
-        element_name = name(mongo_element)
-        vertical = self.module_collection.find_one({"definition.children": re.compile(".*?"+element_name+".*?")})
-        if vertical:
-            index = next(i for i, entry in enumerate(vertical["definition"]["children"]) if element_name in entry)
-            sequential = self.module_collection.find_one({
-                "definition.children": re.compile(".*?"+name(vertical)+".*?"),
-                "_id.course": vertical["_id"]["course"]
-            })
-            if sequential and sequential["_id"]:
-                chapter = self.module_collection.find_one({
-                    "definition.children": re.compile(".*?"+name(sequential)+".*?"),
-                    "_id.course": sequential["_id"]["course"]
-                })
-                if chapter and chapter["_id"]:
-                    return "/".join([name(chapter), name(sequential), str(index+1)])
-                else:
-                    print "No Chapter for: " + sequential["metadata"]["display_name"]
-                    return None
-            else:
-                print "No Sequential for: " + vertical["metadata"]["display_name"]
-                return None
-        else:
-            return None
-
-    def course_name_from_mongo_element(self, mongo_element):
-        course_element = self.module_collection.find_one({
-            "_id.course": mongo_element["_id"]["course"],
-            "_id.category": "course"
-        })
-        return course_element["_id"]["name"]
-
-    def basic_dict(self, mongo_item):
-        """Returns the part of the es schema that is the same for every object."""
-        id = json.dumps(mongo_item["_id"])
-        hash = hashlib.sha1(id).hexdigest()
-        display_name = (
-            mongo_item.get("metadata", {"display_name": ""}).get("display_name", "") +
-            " (" + mongo_item["_id"]["course"] + ")"
-        )
-        return {"id": id, "hash": hash, "display_name": display_name}
-
-    def index_all_pdfs(self, es_instance, index):
-        cursor = self.find_categories_with_regex("html", re.compile(".*?/asset/.*?\.pdf.*?"))
-        for i in range(0, cursor.count()):
-            item = cursor.next()
-            data = self.basic_dict(item)
-            name = re.sub(r'(.*?)(/asset/)(.*?)(\.pdf)(.*?)$', r'\3'+".pdf", item["definition"]["data"])
-            asset = self.find_asset_with_name(name)
-            if not asset:
-                continue
-            searchable_text = self.pdf_to_text(asset)
-            if len(searchable_text) == 0:
-                continue
-            try:
-                thumbnail = self.thumbnail_from_pdf(asset["data"].__str__())
-            except (DelegateError, MissingDelegateError, CorruptImageError):
-                continue
-            data.update({"searchable_text": searchable_text, "thumbnail": thumbnail})
-            print es_instance.index_data(index, item["_id"]["course"], data, data["hash"])._content
-
-    def index_all_problems(self, es_instance, index):
-        cursor = self.find_modules_by_category("problem")
-        for i in range(0, cursor.count()):
-            item = cursor.next()
-            searchable_text = self.searchable_text_from_problem_data(item)
-            if len(searchable_text) == 0:
-                continue
-            data = self.basic_dict(item)
-            thumbnail = self.thumbnail_from_html(item["definition"]["data"])
-            data.update({"searchable_text": searchable_text, "thumbnail": thumbnail})
-            print es_instance.index_data(index, item["_id"]["course"], data, data["hash"])._content
-
-    def index_all_transcripts(self, es_instance, index):
-        cursor = self.find_modules_by_category("video")
-        for i in range(0, cursor.count()):
-            item = cursor.next()
-            searchable_text = " ".join(self.find_transcript_content(item))
-            if len(searchable_text) == 0:
-                continue
-            data = self.basic_dict(item)
-            uuid = self.uuid_from_file_name(item["_id"]["name"])
-            video_module = self.module_for_uuid(uuid)
-            if not video_module:
-                continue
-            thumbnail = self.thumbnail_from_uuid(uuid)
-            data.update({"searchable_text": searchable_text, 'thumbnail': thumbnail})
-            json.loads(json.dumps(data))
-            print es_instance.index_data(index, item["_id"]["course"], data, data["hash"])._content
-
-    def index_course(self, es_instance, course):
-        cursor = self.find_modules_for_course(course)
-        for i in range(0, cursor.count()):
-                        
-
 class ElasticDatabase:
 
-    def __init__(self, url, index_settings_file):
+    def __init__(self, url, index_settings_file=os.getcwd()+"/common/djangoapps/search/settings.json"):
         """
         Will initialize elastic search object with specified indices
         specifically the url should be something of the form `http://localhost:9200`
@@ -370,6 +153,247 @@ class ElasticDatabase:
         return json.loads(requests.get(full_url)._content)
 
 
+class MongoIndexer:
+
+    def __init__(
+        self, host='localhost', port=27017, content_database='xcontent', file_collection="fs.files",
+        chunk_collection="fs.chunks", module_database='xmodule', module_collection='modulestore',
+        es_instance=ElasticDatabase("http://localhost:9200")
+    ):
+        self.host = host
+        self.port = port
+        self.client = MongoClient(host, port)
+        self.content_db = self.client[content_database]
+        self.module_db = self.client[module_database]
+        try:
+            self.content_db.collection_names().index(file_collection)
+        except ValueError:
+            print "No collection named: " + file_collection
+            raise
+        try:
+            self.content_db.collection_names().index(chunk_collection)
+        except ValueError:
+            print "No collection named: " + chunk_collection
+            raise
+        try:
+            self.module_db.collection_names().index(module_collection)
+        except ValueError:
+            print "No collection named: " + module_collection
+            raise
+        self.file_collection = self.content_db[file_collection]
+        self.chunk_collection = self.content_db[chunk_collection]
+        self.module_collection = self.module_db[module_collection]
+        self.es_instance = es_instance
+
+    def find_files_with_type(self, file_ending):
+        """Returns a cursor for content files matching given type"""
+        return self.file_collection.find({"filename": re.compile(".*?"+re.escape(file_ending))})
+
+    def find_chunks_with_type(self, file_ending):
+        """Returns a chunk cursor for content files matching given type"""
+        return self.chunk_collection.find({"files_id.name": re.compile(".*?"+re.escape(file_ending))})
+
+    def find_modules_by_category(self, category):
+        """Returns a cursor for all xmodules matching given category"""
+        return self.module_collection.find({"_id.category": category})
+
+    def find_categories_with_regex(self, category, regex):
+        return self.module_collection.find({"_id.category": category, "definition.data": regex})
+
+    def find_asset_with_name(self, name):
+        return self.chunk_collection.find_one({"files_id.category": "asset", "files_id.name": name})
+
+    def find_modules_for_course(self, course):
+        return self.module_collection.find({"_id.course": course})
+
+    def find_transcript_for_video_module(self, video_module):
+        data = video_module.get("definition", {"data": ""}).get("data", "")
+        uuid = re.sub(r"(1\.0:)(.*?)(,1\.25)", r'\2', data)
+        name_pattern = re.compile(".*?"+uuid+".*?")
+        chunk = self.chunk_collection.find_one({"files_id.name": name_pattern})
+        try:
+            return filter(None, json.loads(chunk["data"].decode('utf-8', "ignore"))["text"])
+        except ValueError:
+            return [""]
+
+    def pdf_to_text(self, mongo_element):
+        onlyAscii = lambda s: "".join(c for c in s if ord(c) < 128)
+        resource = PDFResourceManager()
+        return_string = cIO()
+        params = LAParams()
+        converter = TextConverter(resource, return_string, codec='utf-8', laparams=params)
+        fake_file = IO(mongo_element["data"].__str__())
+        try:
+            process_pdf(resource, converter, fake_file)
+        except PDFSyntaxError:
+            print mongo_element["files_id"]["name"] + " cannot be read, moving on."
+            return ""
+        text_value = onlyAscii(return_string.getvalue()).replace("\n", " ")
+        return text_value
+
+    def searchable_text_from_problem_data(self, mongo_element):
+        """The data field from the problem is in weird xml, which is good for functionality, but bad for search"""
+        data = mongo_element["definition"]["data"]
+        try:
+            paragraphs = " ".join([text for text in re.findall("<p>(.*?)</p>", data) if text is not "Explanation"])
+        except TypeError:
+            paragraphs = ""
+        cleaned_text = re.sub("\\(.*?\\)", "", paragraphs).replace("\\", "")
+        remove_tags = re.sub("<[a-zA-Z0-9/\.\= \"_-]+>", "", cleaned_text)
+        remove_repetitions = re.sub(r"(.)\1{4,}", "", remove_tags)
+        return remove_repetitions
+
+    def uuid_from_file_name(self, file_name):
+        """Returns a youtube uuid given the filename of a transcript"""
+        if "subs_" in file_name:
+            file_name = file_name[5+file_name.find("subs_"):]
+        elif file_name[:2] == "._":
+            file_name = file_name[2:]
+        return file_name[:file_name.find(".")]
+
+    def thumbnail_from_video_module(self, video_module):
+        data = video_module.get("definition", {"data": ""}).get("data", "")
+        uuid = re.sub(r"(1\.0:)(.*?)(,1\.25)", r'\2', data)
+        image = urllib.urlopen("http://img.youtube.com/vi/" + uuid + "/0.jpg")
+        return base64.b64encode(image.read())
+
+    def thumbnail_from_pdf(self, pdf):
+        try:
+            with Image(blob=pdf) as img:
+                return base64.b64encode(img.make_blob('jpg'))
+        except (DelegateError, MissingDelegateError, CorruptImageError):
+            raise
+
+    def thumbnail_from_html(self, html):
+        pseudo_dest = cIO()
+        pisa.CreatePDF(IO(html), pseudo_dest)
+        return self.thumbnail_from_pdf(pseudo_dest.getvalue())
+
+    def vertical_url_from_mongo_element(self, mongo_element):
+        """Given a mongo element, returns the url after courseware"""
+        name = lambda x: x["_id"]["name"]
+        element_name = name(mongo_element)
+        vertical = self.module_collection.find_one({"definition.children": re.compile(".*?"+element_name+".*?")})
+        if vertical:
+            index = next(i for i, entry in enumerate(vertical["definition"]["children"]) if element_name in entry)
+            sequential = self.module_collection.find_one({
+                "definition.children": re.compile(".*?"+name(vertical)+".*?"),
+                "_id.course": vertical["_id"]["course"]
+            })
+            if sequential and sequential["_id"]:
+                chapter = self.module_collection.find_one({
+                    "definition.children": re.compile(".*?"+name(sequential)+".*?"),
+                    "_id.course": sequential["_id"]["course"]
+                })
+                if chapter and chapter["_id"]:
+                    return "/".join([name(chapter), name(sequential), str(index+1)])
+                else:
+                    print "No Chapter for: " + sequential["metadata"]["display_name"]
+                    return None
+            else:
+                print "No Sequential for: " + vertical["metadata"]["display_name"]
+                return None
+        else:
+            return None
+
+    def course_name_from_mongo_element(self, mongo_element):
+        course_element = self.module_collection.find_one({
+            "_id.course": mongo_element["_id"]["course"],
+            "_id.category": "course"
+        })
+        return course_element["_id"]["name"]
+
+    def basic_dict(self, mongo_module, type):
+        """Returns the part of the es schema that is the same for every object."""
+        id = json.dumps(mongo_module["_id"])
+        hash = hashlib.sha1(id).hexdigest()
+        display_name = (
+            mongo_module.get("metadata", {"display_name": ""}).get("display_name", "") +
+            " (" + mongo_module["_id"]["course"] + ")"
+        )
+        searchable_text = self.get_searchable_text(mongo_module, type)
+        thumbnail = self.get_thumbnail(mongo_module, type)
+        return {
+            "id": id, "hash": hash, "display_name": display_name,
+            "searchable_text": searchable_text, "thumbnail": thumbnail
+        }
+
+    def get_searchable_text(self, mongo_module, type):
+        """Returns searchable text for a module. Defined for a module only"""
+        if type.lower() == "pdf":
+            name = re.sub(r'(.*?)(/asset/)(.*?)(\.pdf)(.*?)$', r'\3'+".pdf", mongo_module["definition"]["data"])
+            asset = self.find_asset_with_name(name)
+            if not asset:
+                searchable_text = ""
+            else:
+                searchable_text = self.pdf_to_text(asset)
+        elif type.lower() == "problem":
+            searchable_text = self.searchable_text_from_problem_data(mongo_module)
+        elif type.lower() == "transcript":
+            searchable_text = self.find_transcript_for_video_module(mongo_module, type)
+        return searchable_text
+
+    def get_thumbnail(self, mongo_module, type):
+        if type.lower() == "pdf":
+            try:
+                name = re.sub(r'(.*?)(/asset/)(.*?)(\.pdf)(.*?)$', r'\3'+".pdf", mongo_module["definition"]["data"])
+                asset = self.find_asset_with_name(name)
+                thumbnail = self.thumbnail_from_pdf(asset["data"].__str__())
+            except (DelegateError, MissingDelegateError, CorruptImageError):
+                thumbnail = ""
+        elif type.lower() == "problem":
+            thumbnail = self.thumbnail_from_html(mongo_module["definition"]["data"])
+        elif type.lower() == "transcript":
+            thumbnail = self.thumbnail_from_video_module(mongo_module)
+        return thumbnail
+
+    def index_all_pdfs(self, index):
+        cursor = self.find_categories_with_regex("html", re.compile(".*?/asset/.*?\.pdf.*?"))
+        for i in range(cursor.count()):
+            item = cursor.next()
+            data = self.basic_dict(item, "pdf")
+            print self.es_instance.index_data(index, item["_id"]["course"], data, data["hash"])._content
+
+    def index_all_problems(self, index):
+        cursor = self.find_modules_by_category("problem")
+        for i in range(cursor.count()):
+            item = cursor.next()
+            data = self.basic_dict(item, "problem")
+            print self.es_instance.index_data(index, item["_id"]["course"], data, data["hash"])._content
+
+    def index_all_transcripts(self, index):
+        cursor = self.find_modules_by_category("video")
+        for i in range(cursor.count()):
+            item = cursor.next()
+            data = self.basic_dict(item, "transcript")
+            print self.es_instance.index_data(index, item["_id"]["course"], data, data["hash"])._content
+
+    def index_course(self, course):
+        cursor = self.find_modules_for_course(course)
+        for i in range(cursor.count()):
+            item = cursor.next()
+            category = item["_id"]["category"].lower().strip()
+            data = {}
+            index = ""
+            if category == "video":
+                data = self.basic_dict(item, "transcript")
+                index = "transcript-index"
+            elif category == "problem":
+                data = self.basic_dict(item, "problem")
+                index = "problem-index"
+            elif category == "html":
+                pattern = re.compile(".*?/asset/.*?\.pdf.*?")
+                if pattern.match(item["definition"]["data"]):
+                    data = self.basic_dict(item, "pdf")
+                else:
+                    data = {"test": ""}
+                index = "pdf-index"
+            else:
+                continue
+            if filter(None, data.values()) == data.values():
+                print self.es_instance.index_data(index, item["_id"]["course"], data, data["hash"])._content
+
+
 class PyGrep:
 
     def __init__(self, directory):
@@ -432,20 +456,21 @@ class EnchantDictionary:
 
 
 url = "http://localhost:9200"
-settings_file = "settings.json"
+settings_file = os.getcwd() + "/common/djangoapps/search/settings.json"
 
 mongo = MongoIndexer()
 
 
 test = ElasticDatabase(url, settings_file)
 dictionary = EnchantDictionary(test)
-print test.delete_index("pdf-index")
+
+#print test.delete_index("pdf-index")
 #print test.delete_index("transcript-index")
-print test.delete_index("problem-index")
-mongo.index_all_pdfs(test, "pdf-index")
+#print test.delete_index("problem-index")
+#mongo.index_all_pdfs(test, "pdf-index")
 #mongo.index_all_transcripts(test, "transcript-index")
-mongo.index_all_problems(test, "problem-index")
-dictionary.produce_dictionary("pyenchant_corpus.txt", max_results=500000)
+#mongo.index_all_problems(test, "problem-index")
+#dictionary.produce_dictionary("pyenchant_corpus.txt", max_results=500000)
 
 #print test.setup_type("transcript", "cleaning", mapping)._content
 #print test.get_type_mapping("transcript-index", "2-1x")

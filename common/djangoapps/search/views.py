@@ -4,7 +4,7 @@ from django.http import HttpResponse
 from models import SearchResults
 from django_future.csrf import ensure_csrf_cookie
 from courseware.courses import get_course_with_access
-
+from es_requests import MongoIndexer
 
 import requests
 import enchant
@@ -23,6 +23,13 @@ def search(request, course_id):
     full_html = render_to_string("search_templates/wrapper.html", {
         "body": results_string, "course": course})
     return HttpResponse(full_html)
+
+
+@ensure_csrf_cookie
+def index_course(request):
+    indexer = MongoIndexer()
+    indexer.index_course(request.POST.get("course", "2.1x"))
+    return HttpResponse("<p>Test</p>")
 
 
 def find(request, course_id, database="http://127.0.0.1:9200",
