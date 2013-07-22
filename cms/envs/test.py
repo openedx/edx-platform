@@ -63,6 +63,10 @@ MODULESTORE = {
     'draft': {
         'ENGINE': 'xmodule.modulestore.draft.DraftModuleStore',
         'OPTIONS': MODULESTORE_OPTIONS
+    },
+    'split': {
+        'ENGINE': 'xmodule.modulestore.split_mongo.SplitMongoModuleStore',
+        'OPTIONS': MODULESTORE_OPTIONS
     }
 }
 

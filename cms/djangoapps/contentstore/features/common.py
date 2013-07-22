@@ -209,7 +209,8 @@ def i_created_a_video_component(step):
     world.create_component_instance(
         step, '.large-video-icon',
         'video',
-        '.xmodule_VideoModule'
+        '.xmodule_VideoModule',
+        has_multiple_templates=False
     )
 
 

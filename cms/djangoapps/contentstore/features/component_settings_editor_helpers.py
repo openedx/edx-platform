@@ -7,10 +7,16 @@ from terrain.steps import reload_the_page
 
 
 @world.absorb
-def create_component_instance(step, component_button_css, category, expected_css, boilerplate=None):
-    click_new_component_button(step, component_button_css)
-    click_component_from_menu(category, boilerplate, expected_css)
+def create_component_instance(step, component_button_css, category,
+                              expected_css, boilerplate=None,
+                              has_multiple_templates=True):
 
+    click_new_component_button(step, component_button_css)
+
+    if has_multiple_templates:
+        click_component_from_menu(category, boilerplate, expected_css)
+
+    assert_equal(1, len(world.css_find(expected_css)))
 
 @world.absorb
 def click_new_component_button(step, component_button_css):
@@ -34,7 +40,6 @@ def click_component_from_menu(category, boilerplate, expected_css):
     elements = world.css_find(elem_css)
     assert_equal(len(elements), 1)
     world.css_click(elem_css)
-    assert_equal(1, len(world.css_find(expected_css)))
 
 
 @world.absorb

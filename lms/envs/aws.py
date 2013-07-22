@@ -108,6 +108,7 @@ EMAIL_USE_TLS = ENV_TOKENS.get('EMAIL_USE_TLS', False)  # django default is Fals
 EMAILS_PER_TASK = ENV_TOKENS.get('EMAILS_PER_TASK', 10)
 
 SITE_NAME = ENV_TOKENS['SITE_NAME']
+SESSION_ENGINE = ENV_TOKENS.get('SESSION_ENGINE', SESSION_ENGINE)
 SESSION_COOKIE_DOMAIN = ENV_TOKENS.get('SESSION_COOKIE_DOMAIN')
 
 # allow for environments to specify what cookie name our login subsystem should use
