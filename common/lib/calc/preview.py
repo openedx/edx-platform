@@ -8,14 +8,7 @@ Because intermediate values of the render contain more data than simply the
 string of latex, store it in a custom class `LatexRendered`
 """
 
-from pyparsing import ParseResults
-from calc import parse_algebra, add_defaults, SUFFIXES
-
-
-def PRINT(x):
-    PREVIEW_DEBUG = False
-    if PREVIEW_DEBUG:
-        print x
+from calc import ParseAugmenter, add_defaults, SUFFIXES
 
 
 class LatexRendered(object):
@@ -69,7 +62,6 @@ class LatexRendered(object):
 
 
 def render_number(children):
-    PRINT("rendering number ['{}']".format("', '".join(k.latex for k in children)))
     # TODO exponential notation
     if children[-1].latex in SUFFIXES:
         children[-1].latex = ur"\text{{{suffix}}}".format(suffix=children[-1].latex)
@@ -82,7 +74,6 @@ def variable_closure(variables, casify):
         # TODO check if valid and color accordingly
         greek = "alpha beta gamma delta epsilon varepsilon zeta eta theta vartheta iota kappa lambda mu nu xi pi rho sigma tau upsilon phi varphi chi psi omega".split(" ")
         varname = children[0].latex
-        PRINT("rendering variable {}".format(varname))
         if casify(varname) not in variables:
             pass
 
@@ -96,7 +87,6 @@ def variable_closure(variables, casify):
 def function_closure(functions, casify):
     def render_function(children):
         fname = children[0].latex
-        PRINT("rendering function {}".format(fname))
         if casify(fname) not in functions:
             pass
 
@@ -127,7 +117,6 @@ def render_power(children):
     children_latex = [k.latex for k in children if k.latex != "^"]
     children_latex[-1] = children[-1].sans_parens
 
-    PRINT("rendering power ['{}']".format("', '".join(children_latex)))
     raise_power = lambda x, y: u"{}^{{{}}}".format(y, x)
     latex = reduce(raise_power, reversed(children_latex))
     return LatexRendered(latex, tall=True)
@@ -135,7 +124,6 @@ def render_power(children):
 
 def render_parallel(children):
     children_latex = [k.latex for k in children if k.latex != "||"]
-    PRINT("rendering parallel ['{}']".format("', '".join(children_latex)))
     latex = r"\|".join(children_latex)
     tall = any(k.tall for k in children)
     return LatexRendered(latex, tall=tall)
@@ -158,7 +146,6 @@ def render_frac(numerator, denominator):
 
 
 def render_product(children):
-    PRINT("rendering product ['{}']".format("', '".join(k.latex for k in children)))
     position = "numerator"  # or denominator
     fraction_mode_ever = False
     numerator = []
@@ -200,22 +187,17 @@ def render_product(children):
 
 def render_sum(children):
     children_latex = [k.latex for k in children]
-    PRINT("rendering sum ['{}']".format("', '".join(children_latex)))
     latex = "".join(children_latex)
     tall = any(k.tall for k in children)
     return LatexRendered(latex, tall=tall)
 
 
 def render_atom(children):
-    PRINT("rendering atom ['{}']".format("', '".join(k.latex for k in children)))
     parens = None
     if children[0].latex in "([{":
         parens = children[0].latex
         children = children[1:-1]
     tall = any(k.tall for k in children)
-    PRINT("  -latex: '{}'".format("".join(k.latex for k in children)))
-    PRINT("  -parens: '{}'".format(parens))
-    PRINT("  -tall: '{}'".format(tall))
     return LatexRendered(
         "".join(k.latex for k in children),
         parens,
@@ -223,18 +205,17 @@ def render_atom(children):
     )
 
 
-def latex_preview(string, variables=None, functions=None, case_sensitive=False):
-    """
-    """
+def latex_preview(math_expr, variables=(), functions=(), case_sensitive=False):
     # No need to go further
-    if string.strip() == "":
+    if math_expr.strip() == "":
         return "<nada/>"
 
     # Parse tree
-    tree = parse_algebra(string)
+    thing = ParseAugmenter(math_expr, case_sensitive)
+    thing.parse_algebra()
 
     # Get our variables together.
-    variables, functions = add_defaults(variables or (), functions or (), case_sensitive)
+    variables, functions = add_defaults(variables, functions, case_sensitive)
 
     # Create a recursion to evaluate the tree.
     if case_sensitive:
@@ -242,7 +223,7 @@ def latex_preview(string, variables=None, functions=None, case_sensitive=False):
     else:
         casify = lambda x: x.lower()  # Lowercase for case insens.
 
-    render_action = {
+    render_actions = {
         'number': render_number,
         'variable': variable_closure(set(variables), casify),
         'function': function_closure(set(functions), casify),
@@ -253,20 +234,8 @@ def latex_preview(string, variables=None, functions=None, case_sensitive=False):
         'sum': render_sum
     }
 
-    def render_branch(branch):
-        if not isinstance(branch, ParseResults):
-            bs = "\\"
-            return LatexRendered(branch.replace(bs, bs * 2))
+    bs = "\\"
+    wrap_escaped_strings = lambda s: LatexRendered(s.replace(bs, bs * 2))
 
-        name = branch.getName()
-        if len(branch) == 1 and name not in ("number", "variable"):
-            return render_branch(branch[0])
-        elif name not in render_action:  # pragma: no cover
-            raise Exception(u"Unknown branch name '{}'".format(name))
-        else:
-            action = render_action[name]
-            evaluated_kids = [render_branch(k) for k in branch]
-            return action(evaluated_kids)
-
-    # Do it
-    return render_branch(tree).latex
+    output = thing.handle_tree(render_actions, wrap_escaped_strings)
+    return output.latex

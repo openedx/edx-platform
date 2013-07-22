@@ -373,16 +373,18 @@ class ParseAugmenter(object):
         expr << sum_term  # pylint: disable=W0104
         self.tree = (expr + stringEnd).parseString(self.math_expr)[0]
 
-    def handle_tree(self, handle_actions):
+    def handle_tree(self, handle_actions, handle_terminal=None):
         """
-        Call `handle_actions` recursively on `self.tree` and return result
+        Call `handle_actions` recursively on `self.tree` and return result.
 
         `handle_actions` is a dictionary of node names (e.g. 'product', 'sum',
         etc&) to functions. These functions are of the following form:
           -input: a list of processed child nodes. If it includes any terminal
-           nodes in the list, they will be given as their original strings
+           nodes in the list, they will be given as their processed forms also.
           -output: whatever to be passed to the level higher, and what to
            return for the final node.
+        `handle_terminal` is a function that takes in a token and returns a
+        processed form. Leaving it as `None` just keeps it as the identity.
         """
         def handle_node(node):
             """
@@ -392,10 +394,16 @@ class ParseAugmenter(object):
             feed it the output of `handle_node` for each child node.
             """
             if not isinstance(node, ParseResults):
-                return node
-            # TODO copy over from preview.py
+                if handle_terminal is None:
+                    return node
+                else:
+                    return handle_terminal(node)
 
-            action = handle_actions[node.getName()]
+            node_name = node.getName()
+            if node_name not in handle_actions:  # pragma: no cover
+                raise Exception(u"Unknown branch name '{}'".format(node_name))
+
+            action = handle_actions[node_name]
             handled_kids = [handle_node(k) for k in node]
             return action(handled_kids)
 
