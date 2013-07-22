@@ -63,7 +63,6 @@ describe "Course Overview", ->
     afterEach ->
         delete window.analytics
         delete window.course_location_analytics
-        # @xhr.restore()
         @notificationSpy.reset()
 
     it "should save model when save is clicked", ->
@@ -82,6 +81,12 @@ describe "Course Overview", ->
       $('a.action-primary').click()
       expect(deleteSpy).toHaveBeenCalled()
       expect(@requests[0].url).toEqual('/delete_item')
+
+    it "should not delete model when cancel is clicked", ->
+      deleteSpy = spyOn(window, '_deleteItem').andCallThrough()
+      $('a.delete-section-button').click()
+      $('a.action-secondary').click()
+      expect(@requests.length).toEqual(0)
 
     it "should show a confirmation on delete", ->
       $('a.delete-section-button').click()
