@@ -161,7 +161,10 @@ MITX_FEATURES = {
     'ENABLE_CHAT': False,
 
     # Toggle the availability of the shopping cart page
-    'ENABLE_SHOPPING_CART': False
+    'ENABLE_SHOPPING_CART': False,
+
+    #Toggle using CME registration instead of normal
+    'USE_CME_REGISTRATION': False
 }
 
 # Used for A/B testing
@@ -810,7 +813,10 @@ INSTALLED_APPS = (
     'notification_prefs',
 
     # Different Course Modes
-    'course_modes'
+    'course_modes',
+
+    # CME Registration
+    'cme_registration',
 )
 
 ######################### MARKETING SITE ###############################
