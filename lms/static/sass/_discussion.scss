@@ -719,26 +719,25 @@ body.discussion {
       @include transition(all .2s ease-out);
 
       &:hover {
-        background-color: $gray-l3;
+        background-color: $white;
       }
+    }
+
+    .icon {
+      display: block;
+      position: absolute;
+      padding: 15px 23px;
+      color: $gray-l1;
+      font-size: 28px;
+      z-index: 100;
+      opacity: 1;
+      @include transition(all .2s ease-out);
     }
 
     .home {
       border-radius: 3px 0 0 0;
       box-shadow: -1px 0 0 #aaa inset;
       cursor: pointer;
-
-      .home-icon {
-        display: block;
-        position: absolute;
-        top: 30%;
-        left: 30%;
-        color: $gray-l1;
-        font-size: 28px;
-        z-index: 100;
-        opacity: 1;
-        @include transition(all .2s ease-out);
-      }
     }
 
     .browse {
@@ -837,7 +836,7 @@ body.discussion {
         color: #333;
         text-shadow: 0 1px 0 $white-t3;
         opacity: 0.0;
-        @include transition(opacity .2s linear 0s);
+        @include transition(opacity .1s linear 0s);
       }
       .drop-arrow {
         font-size: 16px;
@@ -852,16 +851,13 @@ body.discussion {
 
     .browse-topic-drop-icon {
       display: block;
-      position: absolute;
-      top: 21px;
-      left: 50%;
       z-index: 100;
-      width: 29px;
-      height: 16px;
-      margin-left: -12px;
-      background: url(../images/browse-icon.png) no-repeat;
       opacity: 1.0;
       @include transition(none);
+
+      .icon{
+        padding: 15px 24px;
+      }
     }
 
     .browse-topic-drop-menu-wrapper {
@@ -2607,7 +2603,7 @@ body.discussion {
       float:right;
       padding-right: 5px;
       font-style: italic;
-      cursor:pointer; 
+      cursor: pointer; 
       margin-right: $baseline/2;
       opacity: 0.8;
 
@@ -2687,7 +2683,8 @@ display:none;
 }
     
 .notflagged .icon {
-  display: block; 
+  display: block;
+  color: $gray-l2;
   float: left;
   margin: 3px;
   width: 10px;
