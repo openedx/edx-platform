@@ -171,7 +171,12 @@
         <div class="window unit-location">
           <h4 class="header">${_("Unit Location")}</h4>
           <div class="window-contents">
-            <div>${_("Unit Identifier:")}&nbsp;<input type="text" class="url" value="${unit.location.name}" disabled /></div>
+            <div class="row wrapper-unit-id">
+              <p class="unit-id">
+                <span class="label">${_("Unit Identifier:")}</span>
+                <input type="text" class="url value" value="${unit.location.name}" disabled />
+              </p>
+            </div>
             <ol>
               <li>
                 <a href="#" class="section-item">${section.display_name_with_default}</a>
