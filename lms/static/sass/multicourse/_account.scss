@@ -172,12 +172,16 @@
         display: block;
         float: left;
         border-bottom: none;
-        margin: 0 ($baseline*1.5) 0 0;
+        margin: 0 $baseline 0 0;
         padding-bottom: 0;
 
         input, textarea {
           width: 100%;
           font-weight: 600;
+        }
+
+        &:last-child {
+          margin-right: 0;
         }
       }
 
@@ -192,7 +196,7 @@
 
       // elements
       label, input, textarea {
-        @extend .mktg-copy-base;
+        @include font-size(15);
         border-radius: 0;
         display: block;
         height: auto;
@@ -342,7 +346,7 @@
       text-transform: none !important;
       vertical-align: middle;
       letter-spacing: 0 !important;
-      font-weight: 600 !important;
+      font-weight: 500 !important;
       line-height: auto;
     }
 

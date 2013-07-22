@@ -213,7 +213,42 @@
     overflow: hidden;
   }
 
-  // button elements - not a better place to put these, sadly
+  // nav list
+  .list-actions {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    .item {
+      margin: 0;
+    }
+  }
+
+  .action {
+    @include font-size(16);
+    font-weight: 500;
+
+    // register or access courseware
+    &.action-register, &.access-courseware {
+      @extend .mktg-btn-primary-blue;
+      display: block;
+    }
+
+    // already registered but course not started or registration is closed
+    &.is-registered, &.registration-closed {
+      @extend .mktg-btn-primary-pink;
+      pointer-events: none !important;
+      display: block;
+    }
+
+    // coming soon
+    &.coming-soon {
+      @extend .mktg-btn-primary-pink;
+      pointer-events: none !important;
+      outline: none;
+      display: block;
+    }
+  }
 }
 
 
