@@ -77,6 +77,9 @@ rake pylint > pylint.log || cat pylint.log
 # Generate coverage reports
 rake coverage
 
+# Generate quality reports
+rake quality
+
 rake autodeploy_properties
 
 github_status state:success "passed"
