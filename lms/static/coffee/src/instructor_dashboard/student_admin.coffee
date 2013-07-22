@@ -7,6 +7,12 @@ plantTimeout = -> window.InstructorDashboard.util.plantTimeout.apply this, argum
 plantInterval = -> window.InstructorDashboard.util.plantInterval.apply this, arguments
 std_ajax_err = -> window.InstructorDashboard.util.std_ajax_err.apply this, arguments
 
+# wrap window.confirm
+# display `msg`
+# run `ok` or `cancel` depending on response
+confirm_then = ({msg, ok, cancel}) ->
+  if window.confirm msg then ok?() else cancel?()
+
 # get jquery element and assert its existance
 find_and_assert = ($root, selector) ->
   item = $root.find selector
@@ -156,18 +162,20 @@ class StudentAdmin
         error: std_ajax_err => @$request_response_error_single.text "Error resetting problem attempts."
 
     # delete state for student on problem
-    @$btn_delete_state_single.click =>
-      send_data =
-        student_email: @$field_student_select.val()
-        problem_to_reset: @$field_problem_select_single.val()
-        delete_module: true
+    @$btn_delete_state_single.click => confirm_then
+      msg: "Delete student '#{@$field_student_select.val()}'s state on problem '#{@$field_problem_select_single.val()}'?"
+      ok: =>
+        send_data =
+          student_email: @$field_student_select.val()
+          problem_to_reset: @$field_problem_select_single.val()
+          delete_module: true
 
-      $.ajax
-        dataType: 'json'
-        url: @$btn_delete_state_single.data 'endpoint'
-        data: send_data
-        success: @clear_errors_then -> console.log 'module state deleted'
-        error: std_ajax_err => @$request_response_error_single.text "Error deleting problem state."
+        $.ajax
+          dataType: 'json'
+          url: @$btn_delete_state_single.data 'endpoint'
+          data: send_data
+          success: @clear_errors_then -> console.log 'module state deleted'
+          error: std_ajax_err => @$request_response_error_single.text "Error deleting problem state."
 
     # start task to rescore problem for student
     @$btn_rescore_problem_single.click =>
@@ -202,43 +210,34 @@ class StudentAdmin
         error: std_ajax_err => @$request_response_error_single.text "Error getting task history for student+problem"
 
     # start task to reset attempts on problem for all students
-    @$btn_reset_attempts_all.click =>
-      send_data =
-        all_students: true
-        problem_to_reset: @$field_problem_select_all.val()
+    @$btn_reset_attempts_all.click => confirm_then
+      msg: "Reset attempts for all students on problem '#{@$field_problem_select_all.val()}'?"
+      ok: =>
+        send_data =
+          all_students: true
+          problem_to_reset: @$field_problem_select_all.val()
 
-      $.ajax
-        dataType: 'json'
-        url: @$btn_reset_attempts_all.data 'endpoint'
-        data: send_data
-        success: @clear_errors_then -> console.log 'started reset attempts task'
-        error: std_ajax_err => @$request_response_error_all.text "Error starting a task to reset attempts for all students on this problem."
-
-    # start task to rescore problem for all students
-    @$btn_reset_attempts_all.click =>
-      send_data =
-        all_students: true
-        problem_to_reset: @$field_problem_select_all.val()
-
-      $.ajax
-        dataType: 'json'
-        url: @$btn_reset_attempts_all.data 'endpoint'
-        data: send_data
-        success: @clear_errors_then -> console.log 'started reset attempts task'
-        error: std_ajax_err => @$request_response_error_all.text "Error starting a task to reset attempts on this problem for all students."
+        $.ajax
+          dataType: 'json'
+          url: @$btn_reset_attempts_all.data 'endpoint'
+          data: send_data
+          success: @clear_errors_then -> console.log 'started reset attempts task'
+          error: std_ajax_err => @$request_response_error_all.text "Error starting a task to reset attempts for all students on this problem."
 
     # start task to rescore problem for all students
-    @$btn_rescore_problem_all.click =>
-      send_data =
-        all_students: true
-        problem_to_reset: @$field_problem_select_all.val()
+    @$btn_rescore_problem_all.click => confirm_then
+      msg: "Rescore problem '#{@$field_problem_select_all.val()}' for all students?"
+      ok: =>
+        send_data =
+          all_students: true
+          problem_to_reset: @$field_problem_select_all.val()
 
-      $.ajax
-        dataType: 'json'
-        url: @$btn_rescore_problem_all.data 'endpoint'
-        data: send_data
-        success: @clear_errors_then -> console.log 'started rescore problem task'
-        error: std_ajax_err => @$request_response_error_all.text "Error starting a task to rescore this problem for all students."
+        $.ajax
+          dataType: 'json'
+          url: @$btn_rescore_problem_all.data 'endpoint'
+          data: send_data
+          success: @clear_errors_then -> console.log 'started rescore problem task'
+          error: std_ajax_err => @$request_response_error_all.text "Error starting a task to rescore this problem for all students."
 
     # list task history for problem
     @$btn_task_history_all.click =>

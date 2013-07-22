@@ -63,7 +63,9 @@
       @include idashbutton(#eee);
 
       &.molly-guard {
-        @include idashbutton($danger-red);
+        // @include idashbutton($danger-red);
+        // @include idashbutton($black);
+        // border: 2px solid $danger-red;
       }
     }
 
