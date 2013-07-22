@@ -79,6 +79,10 @@ XQUEUE_INTERFACE = {
 # acceptance tests. This makes them faster and more reliable
 MITX_FEATURES['STUB_VIDEO_FOR_TESTING'] = True
 
+# Forums are disabled in test.py to speed up unit tests, but we do not have
+# per-test control for acceptance tests
+MITX_FEATURES['ENABLE_DISCUSSION_SERVICE'] = True
+
 # Include the lettuce app for acceptance testing, including the 'harvest' django-admin command
 INSTALLED_APPS += ('lettuce.django',)
 LETTUCE_APPS = ('courseware',)

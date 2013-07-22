@@ -30,6 +30,7 @@
 @import 'shared/course_filter';
 @import 'shared/modal';
 @import 'shared/activation_messages';
+@import 'shared/unsubscribe';
 
 @import 'multicourse/home';
 @import 'multicourse/dashboard';
