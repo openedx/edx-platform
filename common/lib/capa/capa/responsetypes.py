@@ -1365,9 +1365,11 @@ class CodeResponse(LoncapaResponse):
             # Note that submission can be a file
             submission = student_answers[self.answer_id]
         except Exception as err:
-            log.error('Error in CodeResponse %s: cannot get student answer for %s;'
-                      ' student_answers=%s' %
-                     (err, self.answer_id, convert_files_to_filenames(student_answers)))
+            log.error(
+                'Error in CodeResponse %s: cannot get student answer for %s;'
+                ' student_answers=%s' %
+                (err, self.answer_id, convert_files_to_filenames(student_answers))
+            )
             raise Exception(err)
 
         # We do not support xqueue within Studio.
@@ -1386,14 +1388,15 @@ class CodeResponse(LoncapaResponse):
         anonymous_student_id = self.system.anonymous_student_id
 
         # Generate header
-        queuekey = xqueue_interface.make_hashkey(str(self.system.seed) + qtime +
-                                                 anonymous_student_id +
-                                                 self.answer_id)
+        queuekey = xqueue_interface.make_hashkey(
+            str(self.system.seed) + qtime + anonymous_student_id + self.answer_id
+        )
         callback_url = self.system.xqueue['construct_callback']()
         xheader = xqueue_interface.make_xheader(
             lms_callback_url=callback_url,
             lms_key=queuekey,
-            queue_name=self.queue_name)
+            queue_name=self.queue_name
+        )
 
         # Generate body
         if is_list_of_files(submission):
@@ -1406,9 +1409,10 @@ class CodeResponse(LoncapaResponse):
 
         # Metadata related to the student submission revealed to the external
         # grader
-        student_info = {'anonymous_student_id': anonymous_student_id,
-                        'submission_time': qtime,
-                        }
+        student_info = {
+            'anonymous_student_id': anonymous_student_id,
+            'submission_time': qtime,
+        }
         contents.update({'student_info': json.dumps(student_info)})
 
         # Submit request. When successful, 'msg' is the prior length of the
