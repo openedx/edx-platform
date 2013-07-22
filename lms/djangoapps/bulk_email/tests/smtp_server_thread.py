@@ -1,5 +1,5 @@
 import threading
-from fake_smtp import FakeSMTPServer
+from bulk_email.tests.fake_smtp import FakeSMTPServer
 
 
 class FakeSMTPServerThread(threading.Thread):

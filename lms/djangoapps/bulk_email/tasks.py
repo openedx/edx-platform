@@ -1,22 +1,22 @@
-from django.core.mail import EmailMultiAlternatives, get_connection
-from subprocess import Popen, PIPE
-from celery import task, current_task
-from time import sleep
-from django.conf import settings
-from mitxmako.shortcuts import render_to_string
-from django.contrib.auth.models import User, Group
-from smtplib import SMTPServerDisconnected, SMTPDataError, SMTPConnectError
-from bulk_email.models import *
-
-from courseware.courses import get_course_by_id
-from courseware.access import _course_staff_group_name, _course_instructor_group_name
-
-from django.http import Http404
-
-import re
-import math
-import time
 import logging
+import math
+import re
+import time
+
+from smtplib import SMTPServerDisconnected, SMTPDataError, SMTPConnectError
+from subprocess import Popen, PIPE
+
+from django.conf import settings
+from django.contrib.auth.models import User, Group
+from django.core.mail import EmailMultiAlternatives, get_connection
+from django.http import Http404
+from celery import task, current_task
+
+from bulk_email.models import *
+from courseware.access import _course_staff_group_name, _course_instructor_group_name
+from courseware.courses import get_course_by_id
+from mitxmako.shortcuts import render_to_string
+
 log = logging.getLogger(__name__)
 
 
@@ -83,8 +83,8 @@ def course_email(hash_for_msg, to_list, course_title, course_url, throttle=False
 
     subject = "[" + course_title + "] " + msg.subject
 
-    p = Popen(['lynx', '-stdin', '-display_charset=UTF-8', '-assume_charset=UTF-8', '-dump'], stdin=PIPE, stdout=PIPE)
-    (plaintext, err_from_stderr) = p.communicate(input=msg.html_message.encode('utf-8'))  # use lynx to get plaintext
+    process = Popen(['lynx', '-stdin', '-display_charset=UTF-8', '-assume_charset=UTF-8', '-dump'], stdin=PIPE, stdout=PIPE)
+    (plaintext, err_from_stderr) = process.communicate(input=msg.html_message.encode('utf-8'))  # use lynx to get plaintext
 
     course_title_no_quotes = re.sub(r'"', '', course_title)
     from_addr = '"%s" Course Staff <%s>' % (course_title_no_quotes, settings.DEFAULT_BULK_FROM_EMAIL)

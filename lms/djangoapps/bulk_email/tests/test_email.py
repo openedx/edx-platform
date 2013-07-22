@@ -22,14 +22,14 @@ class TestEmail(ModuleStoreTestCase):
         self.course = CourseFactory.create()
         self.instructor = UserFactory.create(username="instructor", email="robot+instructor@edx.org")
         #Create instructor group for course
-        g = GroupFactory.create(name="instructor_MITx/999/Robot_Super_Course")
-        g.user_set.add(self.instructor)
+        instructor_group = GroupFactory.create(name="instructor_MITx/999/Robot_Super_Course")
+        instructor_group.user_set.add(self.instructor)
 
         #create staff
         self.staff = [UserFactory() for _ in xrange(STAFF_COUNT)]
-        g = GroupFactory()
+        staff_group = GroupFactory()
         for staff in self.staff:
-            g.user_set.add(staff)
+            staff_group.user_set.add(staff)
 
         #create students
         self.students = [UserFactory() for _ in xrange(STUDENT_COUNT)]

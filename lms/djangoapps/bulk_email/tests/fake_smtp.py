@@ -1,8 +1,11 @@
+"""
+Fake SMTP Server used for testing error handling for sending email.
+"""
 import smtpd
 import socket
 import asyncore
 import asynchat
-import smtplib
+import errno
 
 
 class FakeSMTPChannel(smtpd.SMTPChannel):
@@ -37,9 +40,9 @@ class FakeSMTPServer(smtpd.SMTPServer):
     def __init__(self, *args, **kwargs):
         smtpd.SMTPServer.__init__(self, *args, **kwargs)
 
-    def set_errtype(self, e, r=''):
-        self.errtype = e
-        self.reply = r
+    def set_errtype(self, errtype, reply=''):
+        self.errtype = errtype
+        self.reply = reply
 
     def handle_accept(self):
         if self.errtype == "DISCONN":
