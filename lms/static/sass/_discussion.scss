@@ -2683,36 +2683,20 @@ display:none;
     opacity: 1.0;
   }
 }
-
-<<<<<<< HEAD
-.notflagged .icon
-{
-  display: block;
-=======
-    }  
     
 .notflagged .icon {
   display: block; 
->>>>>>> updated flag icons to be font-awesome based
   float: left;
   margin: 3px;
   width: 10px;
   height: 14px;
   padding-right: 3px;
-<<<<<<< HEAD
 }
 
 .flagged .icon
 {
   display: block;
   color: $gray-l2;
-=======
-  color: $gray-l2;
-}
-
-.flagged .icon {
-  display: block; 
->>>>>>> updated flag icons to be font-awesome based
   float: left;
   margin: 3px;
   width: 10px;
