@@ -25,6 +25,7 @@ from django_comment_common.models import (Role,
 
 from courseware.models import StudentModule
 import instructor_task.api
+from instructor_task.api_helper import AlreadyRunningError
 import instructor.enrollment as enrollment
 from instructor.enrollment import enroll_email, unenroll_email
 import instructor.access as access
@@ -45,6 +46,8 @@ def common_exceptions_400(func):
             return func(*args, **kwargs)
         except User.DoesNotExist:
             return HttpResponseBadRequest("User does not exist.")
+        except AlreadyRunningError:
+            return HttpResponseBadRequest("Task already running.")
     return wrapped
 
 
