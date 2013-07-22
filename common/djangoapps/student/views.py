@@ -291,35 +291,35 @@ def dashboard(request):
     cursor.execute(query_getuserid)
     row = cursor.fetchall()
     for a in row:
-	user_id = a[0]
+        user_id = a[0]
     query = "select user_id,area_of_interest from auth_userprofile where user_id='"+str(user_id)+"'"
     cursor.execute(query)
     area_interest = ""
     row = cursor.fetchall() 
     for a in row: 
-	area_interest = a[1]
+        area_interest = a[1]
     interested_category="" 
     for code,categ in UserProfile.COURSE_CATEGORIES:
-	if code == str(area_interest):
-		interested_category = categ
-		break
+        if code == str(area_interest):
+            interested_category = categ
+            break
     query_course_category = "select courseName,courseCategory from course_categories where courseCategory='"+area_interest+"'"
     cursor.execute(query_course_category)
     row = cursor.fetchall()
     similar_category_courses = []
     for a in row:
-	similar_category_courses.append(a[0])
+        similar_category_courses.append(a[0])
     
     recommended_courses = get_courses(request.user, request.META.get('HTTP_HOST'))
     recommend_courses = []
     for check_course in recommended_courses:
-	registered = registered_for_course(check_course,request.user)
-	loc = check_course.location
- 	reverse_loc = loc[::-1]
-	for simCourse in similar_category_courses:
-		if simCourse == str(reverse_loc[1]):
-			if not registered:
-				recommend_courses.append(check_course)
+        registered = registered_for_course(check_course,request.user)
+        loc = check_course.location
+        reverse_loc = loc[::-1]
+        for simCourse in similar_category_courses:
+            if simCourse == str(reverse_loc[1]):
+                if not registered:
+                    recommend_courses.append(check_course)
     recommended_courses = sort_by_announcement(recommended_courses)
     context = {'courses': courses,
 	       'recommended_courses': recommend_courses,
