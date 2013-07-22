@@ -444,6 +444,12 @@ if settings.MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_LOAD_TESTING'):
         url(r'^auto_auth$', 'student.views.auto_auth'),
     )
 
+#CME Registration
+if settings.MITX_FEATURES.get('USE_CME_REGISTRATION'):
+    urlpatterns += (
+        url(r'^register/', include('cme_registration.urls')),
+    )
+
 urlpatterns = patterns(*urlpatterns)
 
 if settings.DEBUG:

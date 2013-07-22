@@ -151,3 +151,6 @@ MITX_FEATURES['ENABLE_SERVICE_STATUS'] = True
 
 # This is to disable a test under the common directory that will not pass when run under CMS
 MITX_FEATURES['DISABLE_PASSWORD_RESET_EMAIL_TEST'] = True
+
+# This is to disable tests CME Registration tests, under common, that will not pass when run under CMS
+MITX_FEATURES['DISABLE_CME_REGISTRATION_TESTS'] = True
