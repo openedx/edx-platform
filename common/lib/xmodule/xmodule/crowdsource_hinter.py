@@ -18,6 +18,7 @@ from xmodule.raw_module import RawDescriptor
 from xblock.core import Scope, String, Integer, Boolean, Dict, List
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import InvalidLocationError
 
 from capa.responsetypes import FormulaResponse
 
@@ -80,15 +81,20 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
 
     def __init__(self, *args, **kwargs):
         XModule.__init__(self, *args, **kwargs)
-        # We need to know whether we are working with a FormulaResponse problem.
+        self.init_error = None
+        # Get the problem we are hinting for.
         try:
             problem_loc = Location(self.problem_id)
-            problem_descriptors = modulestore().get_items(problem_loc)
+        except InvalidLocationError:
+            self.init_error = 'Invalid problem ID!'
+            return
+        problem_descriptors = modulestore().get_items(problem_loc)
+        try:
             self.problem_module = self.system.get_module(problem_descriptors[0])
         except IndexError:
-            # This will fail silently for now - sometimes, when editing a hinter module
-            # in studio, you have a problem-less module.
+            self.init_error = 'The problem you specified could not be found!'
             return
+        # We need to know whether we are working with a FormulaResponse problem.
         responder = self.problem_module.lcp.responders.values()[0]
         self.is_formula = isinstance(self, FormulaResponse)
         if self.is_formula:
@@ -110,12 +116,18 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         hinter and of the problem.
         - Dependent on lon-capa problem.
         """
-        # This is a hack to make studio preview behave sanely.
+        # Display any errors generated in __init__.  This is mostly for instructors to
+        # see in Studio.
+        if self.init_error is not None:
+            return self.init_error
+
+        # Determine whether we are in Studio.  In Studio, accessing self.hints raises
+        # an exception.
         try:
-            self.debug
+            self.hints
         except TypeError:
             # We're in studio mode.
-            pass
+            return 'The crowdsourced hinting module appears to be set up correctly.'
         else:
             if self.debug == 'True':
                 # Reset the user vote, for debugging only!
