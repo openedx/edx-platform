@@ -251,7 +251,7 @@ class ModuleStore(object):
     An abstract interface for a database backend that stores XModuleDescriptor
     instances
     """
-    def has_item(self, location):
+    def has_item(self, course_id, location):
         """
         Returns True if location exists in this ModuleStore.
         """

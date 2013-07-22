@@ -279,7 +279,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
         '''
         return self.get_course(location)
 
-    def has_item(self, block_location):
+    def has_item(self, course_id, block_location):
         """
         Returns True if location exists in its course. Returns false if
         the course or the block w/in the course do not exist for the given version.

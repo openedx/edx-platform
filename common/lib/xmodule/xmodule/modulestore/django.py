@@ -25,24 +25,31 @@ def load_function(path):
     return getattr(import_module(module_path), name)
 
 
+def create_modulestore_instance(engine, options):
+    """
+    This will return a new instance of a modulestore given an engine and options
+    """
+    class_ = load_function(engine)
+
+    _options = {}
+    _options.update(options)
+
+    for key in FUNCTION_KEYS:
+        if key in _options:
+            _options[key] = load_function(_options[key])
+
+    return class_(
+        **_options
+    )
+
+
 def modulestore(name='default'):
+    """
+    This returns an instance of a modulestore of given name. This will wither return an existing
+    modulestore or create a new one
+    """
     if name not in _MODULESTORES:
-        class_ = load_function(settings.MODULESTORE[name]['ENGINE'])
-
-        options = {}
-
-        options.update(settings.MODULESTORE[name]['OPTIONS'])
-        for key in FUNCTION_KEYS:
-            if key in options:
-                options[key] = load_function(options[key])
-
-        _MODULESTORES[name] = class_(
-            **options
-        )
+        _MODULESTORES[name] = create_modulestore_instance(settings.MODULESTORE[name]['ENGINE'],
+                                                          settings.MODULESTORE[name]['OPTIONS'])
 
     return _MODULESTORES[name]
-
-# if 'DJANGO_SETTINGS_MODULE' in environ:
-#     # Initialize the modulestores immediately
-#     for store_name in settings.MODULESTORE:
-#         modulestore(store_name)
