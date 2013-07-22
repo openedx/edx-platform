@@ -13,87 +13,36 @@
   // edx.org - marketing typography
   .heading-1, .heading-2, .heading-3, .heading-4, .heading-5, .body-text-emphasized, .body-text, .button-primary, .button-secondary {
     display: block;
-    font-family: $sans-serif;
-    line-height: lh(1);
   }
 
   .heading-2 {
-    font-size: 25px;
-    margin: 0 0 $baseline 0;
-    font-weight: 300;
-    text-transform: uppercase;
-    color: $link-color-d1;
+    @extend .mktg-hd-lv2;
   }
 
   .heading-3 {
-    font-size: 21px;
-    margin: 0 0 $baseline 0;
-    font-weight: 300;
-    color: $base-font-color;
+    @extend .mktg-hd-lv3;
   }
 
   .heading-4 {
-    font-size: 14px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0 !important;
-    color: saturate($link-color-d1,15%);
-  }
-
-  .heading-5 {
+    @extend .mktg-hd-lv4;
   }
 
   // specific examples - body
   .body-text-emphasized {
-    font-size: 18px;
-    margin: 0 0 $baseline 0;
-    font-weight: 300;
-    color: $base-font-color;
-    font-family: 'Open Sans', sans-serif;
-    line-height: lh(1.1);
+
   }
 
   .body-text {
-    font-size: 15px;
-    margin: 0 0 $baseline 0;
-    color: $base-font-color;
-    line-height: lh(1);
+    @extend .mktg-copy-base;
   }
 
   // specific examples - buttons
   .button-primary {
-    border-radius: 0;
-    @include linear-gradient(saturate($link-color-d1,15%) 5%, shade($link-color-d1,15%) 95%);
-    display: inline-block;
-    padding: $baseline/2 $baseline*2.5;
-    text-transform: lowercase;
-    color: $very-light-text;
-    letter-spacing: 0.1rem;
-    font-weight: 500;
-    cursor: pointer;
-    text-align: center;
-    border: none !important;
-    text-shadow: none;
-    letter-spacing: 0;
-    font-size: 16px;
-    box-shadow: none !important;
+    @extend .mktg-btn-primary-blue;
   }
 
   .button-secondary {
-    @include linear-gradient($outer-border-color 5%, $lighter-base-font-color 95%);
-    display: inline-block;
-    padding: $baseline/2 $baseline*2.5;
-    text-transform: lowercase;
-    color: $very-light-text;
-    letter-spacing: 0.1rem;
-    font-weight: 600;
-    cursor: pointer;
-    text-align: center;
-    border: none !important;
-    text-shadow: none;
-    letter-spacing: 0;
-    font-size: 16px;
-    box-shadow: 0 !important;
+    @extend .mktg-btn-primary-pink;
   }
 
   // layout
@@ -139,19 +88,8 @@
   }
 
   a {
-    @include transition(color 0.15s ease-in-out 0s, border 0.15s ease-in-out 0s);
-
-    &:link, &:visited, &:hover, &:active {
-      color: $link-color-d1;
-      font-weight: 400;
-      text-decoration: none !important; // needed but nasty
-      font-family: $sans-serif;
-    }
-
-    &:hover, &:active {
-      text-decoration: none !important; // needed but nasty
-      border-bottom: 1px dotted $link-color-d1;
-    }
+    @extend .mktg-copy-link;
+    font-family: $sans-serif !important;
   }
 
   strong {
@@ -175,7 +113,7 @@
     float: left;
 
     p, ol, ul {
-      font-size: 14px !important;
+      @extend .mktg-copy-detail;
     }
   }
 
@@ -194,8 +132,13 @@
       }
 
       h3 {
-        @extend .heading-4;
-        margin: 0 0 ($baseline/4) 0;
+        @include font-size(16);
+        color: $mktg-gray-d4;
+        margin-bottom: ($baseline/4) !important;
+      }
+
+      p {
+        @extend .mktg-copy-detail;
       }
     }
   }
@@ -204,7 +147,7 @@
   form {
 
     .instructions {
-      @extend .body-text-emphasized;
+      @extend .mktg-copy-base;
       margin-bottom: $baseline;
     }
 
@@ -249,33 +192,35 @@
 
       // elements
       label, input, textarea {
+        @extend .mktg-copy-base;
         border-radius: 0;
         display: block;
         height: auto;
-        font-family: $sans-serif;
         font-style: normal;
-        font-weight: 500;
-        color: $base-font-color;
       }
 
       label {
         @include transition(color 0.15s ease-in-out 0s);
         margin: 0 0 ($baseline/4) 0;
-        color: tint($black, 20%);
+        color: $mktg-gray-d4 !important;
+        font-weight: 500;
       }
 
       .tip {
+        @include font-size(13);
+        @include line-height(13);
         @include transition(color 0.15s ease-in-out 0s);
         display: block;
         margin-top: ($baseline/4);
-        color: $lighter-base-font-color;
-        font-size: em(13);
+        color: $mktg-gray-l2;
       }
 
       input, textarea {
         width: 100%;
         margin: 0;
         padding: ($baseline/2) ($baseline*.75);
+        color: $mktg-gray-d4 !important;
+        font-weight: 500;
 
         &.long {
           width: 100%;
@@ -340,11 +285,11 @@
       &.is-focused {
 
         label {
-          color: saturate($link-color-d1,15%);
+          color: $mktg-blue !important;
         }
 
         .tip {
-          color: saturate($link-color-d1,15%);
+          color: $mktg-blue;
         }
       }
 
@@ -359,7 +304,7 @@
       &.error {
 
         label {
-          color: $red;
+          color: $red !important;
         }
 
         input, textarea {
@@ -390,12 +335,15 @@
     @include clearfix();
 
     button[type="submit"] {
-      @extend .button-primary;
-
-      &:disabled, &.is-disabled {
-        opacity: 0.3;
-        cursor: default !important;
-      }
+      @extend .mktg-btn-primary-blue;
+      float: none;
+      display: block !important;
+      width: 100%;
+      text-transform: none !important;
+      vertical-align: middle;
+      letter-spacing: 0 !important;
+      font-weight: 600 !important;
+      line-height: auto;
     }
 
     .action-primary {
@@ -409,8 +357,6 @@
       float: right;
       width: flex-grid(3,8);
       margin: $baseline $baseline 0 0;
-      font-size: em(14);
-      text-align: right;
     }
 
     &.error {
@@ -427,15 +373,12 @@
     background: tint($yellow,20%);
 
     .message-title {
-      @extend .heading-4;
+      @extend .mktg-hd-lv4;
       margin: 0 0 ($baseline/4) 0;
-      font-size: em(14);
-      font-weight: 600;
-      color: $m-gray-d2 !important;
     }
 
     .message-copy {
-      @extend .body-text;
+      @extend .mktg-copy-base;
       margin: 0 !important;
       padding: 0;
       list-style: none;
@@ -492,7 +435,7 @@
 
     header {
       height: 120px;
-      border-bottom: 1px solid $m-gray;
+      border-bottom: 1px solid $mktg-gray;
       background: transparent $login-banner-image 0 0 no-repeat;
     }
   }
@@ -506,7 +449,7 @@
 
     header {
       height: 120px;
-      border-bottom: 1px solid $m-gray;
+      border-bottom: 1px solid $mktg-gray;
       background: transparent $register-banner-image 0 0 no-repeat;
     }
   }
@@ -560,7 +503,7 @@
       }
 
       h2 {
-        @extend .heading-2;
+        @extend .mktg-hd-lv2;
         text-align: left;
       }
     }
@@ -603,13 +546,29 @@
           float: none;
           display: block !important;
           width: 100%;
+          text-transform: none !important;
+          vertical-align: middle;
+          letter-spacing: 0 !important;
+          font-weight: 600 !important;
+          line-height: auto;
+        }
+
+        button[type="submit"] {
+          float: none;
+          display: block !important;
+          width: 100%;
+          text-transform: none !important;
+          vertical-align: middle;
+          letter-spacing: 0 !important;
+          font-weight: 600 !important;
+          line-height: auto;
         }
       }
     }
   }
 
   .modal-form-error {
-    @extend .body-text;
+    @extend .mktg-copy-base;
     box-shadow: inset 0 -1px 2px 0 tint($red, 85%);
     @include box-sizing(border-box);
     margin: $baseline 0 ($baseline/2) 0 !important;

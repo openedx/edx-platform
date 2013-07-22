@@ -1,10 +1,11 @@
-@function em($pxval, $base: 16) {
-  @return #{$pxval / $base}em;
+
+@mixin font-size($sizeValue: 16){
+  font-size: $sizeValue + px;
 }
 
-// Line-height
-@function lh($amount: 1) {
-  @return $body-line-height * $amount;
+// line height
+@mixin line-height($fontSize: auto){
+  line-height: ($fontSize*1.48) + px;
 }
 
 // image-replacement hidden text
@@ -30,6 +31,19 @@
   overflow: hidden;
   display: block;
 }
+
+// older font mixins
+@function em($pxval, $base: 16) {
+  @return #{$pxval / $base}em;
+}
+
+// Line-height
+@function lh($amount: 1) {
+  @return $body-line-height * $amount;
+}
+
+
+// ====================
 
 
 //-----------------
