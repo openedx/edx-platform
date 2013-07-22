@@ -80,7 +80,7 @@ those files to run edX, mirroring the folder in `/opt/edx/edx-platform`).
 You may also want to create a super-user with:
 
 ```
-$ rake django-admin["createsuperuser"]
+$ ./manage.py lms createsuperuser
 ```
 
 Also note that if you register a new user through the web interface,
@@ -229,29 +229,22 @@ or any other process management tool.
 
 Configuring Your Project
 ------------------------
-We use [`rake`](http://rake.rubyforge.org/) to execute common tasks in our
-project. The `rake` tasks are defined in the `rakefile`, or you can run `rake -T`
-to view a summary.
-
 Before you run your project, you need to create a sqlite database, create
-tables in that database, run database migrations, and populate templates for
-CMS templates. Fortunately, `rake` will do all of this for you! Just run:
+tables in that database, and run database migrations. Fortunately, `django`
+will do all of this for you
 
-    $ rake django-admin[syncdb]
-    $ rake django-admin[migrate]
-
-If you are running these commands using the [`zsh`](http://www.zsh.org/) shell,
-zsh will assume that you are doing
-[shell globbing](https://en.wikipedia.org/wiki/Glob_%28programming%29), search for
-a file in your directory named `django-adminsyncdb` or `django-adminmigrate`,
-and fail. To fix this, just surround the argument with quotation marks, so that
-you're running `rake "django-admin[syncdb]"`.
+    $ ./manage.py lms syncdb --migrate
+    $ ./manage.py cms syncdb --migrate
 
 Run Your Project
 ----------------
 edX has two components: Studio, the course authoring system; and the LMS
 (learning management system) used by students. These two systems communicate
 through the MongoDB database, which stores course information.
+
+We use [`rake`](http://rake.rubyforge.org/) to execute common tasks in our
+project. The `rake` tasks are defined in the `rakefile`, or you can run `rake -T`
+to view a summary.
 
 To run Studio, run:
 
