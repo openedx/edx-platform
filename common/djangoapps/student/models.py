@@ -70,15 +70,15 @@ class UserProfile(models.Model):
 
     # Area of Interest to provide recommended courses
     COURSE_CATEGORIES = (('CS','Computer Science'),
-    		 ('HSS', 'Humanities'),
-			 ('MB','Medical'),
-			 ('EC','Electronics'),
-			 ('other','Other')
-			)
+                         ('HSS', 'Humanities'),
+                         ('MB','Medical'),
+                         ('EC','Electronics'),
+                         ('other','Other')
+                        )
     area_of_interest = models.CharField(
-			 blank=True, null= True, max_length=5, db_index=True,
-			choices=COURSE_CATEGORIES
-			)
+                        blank=True, null= True, max_length=5, db_index=True,
+                        choices=COURSE_CATEGORIES
+                        )
 
     # Optional demographic data we started capturing from Fall 2012
     this_year = datetime.now().year
@@ -127,16 +127,16 @@ TEST_CENTER_STATUS_ERROR = "Error"
 
 class CourseCategories(models.Model):
     class Meta:
-	db_table="course_categories"	
+        db_table="course_categories"	
     courseName = models.TextField(blank=True, null=True)
     organization = models.TextField(blank=True,null=True)
     courseNumber = models.TextField(blank=True,null=True)
     COURSE_CATEGORIES = (('CS','Computer Science'),
-			 ('HSS','Humanities'),
-			 ('MB','Medical'),
-			 ('EC','Electronics'),
-			 ('other','Other')
-			) 
+                         ('HSS','Humanities'),
+                         ('MB','Medical'),
+                         ('EC','Electronics'),
+                         ('other','Other')
+                        ) 
     courseCategory=models.CharField(blank=True, null=True, max_length=6, db_index=True,
 				      choices=COURSE_CATEGORIES)
 			 
