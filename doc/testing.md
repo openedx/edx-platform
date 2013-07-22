@@ -233,7 +233,7 @@ generates HTML and XML (Cobertura format) reports.
 
 When testing problems that use a queue server on AWS (e.g. sandbox-xqueue.edx.org), you'll need to run your server on your public IP, like so.
 
-`django-admin.py runserver --settings=lms.envs.dev --pythonpath=. 0.0.0.0:8000`
+`./manage.py lms runserver 0.0.0.0:8000`
 
 When you connect to the LMS, you need to use the public ip.  Use `ifconfig` to figure out the number, and connect e.g. to `http://18.3.4.5:8000/`
 

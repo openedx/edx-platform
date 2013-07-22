@@ -5,6 +5,7 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Common: Add a manage.py that knows about edx-platform specific settings and projects
 
 Common: Added *experimental* support for jsinput type.
 
