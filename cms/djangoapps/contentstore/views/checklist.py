@@ -37,6 +37,7 @@ def get_checklists(request, org, course, name):
 
     checklists, modified = expand_checklist_action_urls(course_module)
     if copied or modified:
+        course_module.save()
         modulestore.update_metadata(location, own_metadata(course_module))
     return render_to_response('checklists.html',
                               {
@@ -69,6 +70,7 @@ def update_checklist(request, org, course, name, checklist_index=None):
             # seeming noop which triggers kvs to record that the metadata is not default
             course_module.checklists = course_module.checklists
             checklists, _ = expand_checklist_action_urls(course_module)
+            course_module.save()
             modulestore.update_metadata(location, own_metadata(course_module))
             return JsonResponse(checklists[index])
         else:
@@ -79,6 +81,7 @@ def update_checklist(request, org, course, name, checklist_index=None):
         # In the JavaScript view initialize method, we do a fetch to get all the checklists.
         checklists, modified = expand_checklist_action_urls(course_module)
         if modified:
+            course_module.save()
             modulestore.update_metadata(location, own_metadata(course_module))
         return JsonResponse(checklists)
 
