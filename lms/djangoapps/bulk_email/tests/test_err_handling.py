@@ -33,7 +33,7 @@ class TestEmailErrors(ModuleStoreTestCase):
     @patch('bulk_email.tasks.course_email.retry')
     def test_data_err_retry(self, retry):
         """
-        Test that celery handles transient SMTPDataErrors by retrying
+        Test that celery handles transient SMTPDataErrors by retrying.
         """
         self.smtp_server_thread.server.set_errtype("DATA", "454 Throttling failure: Daily message quota exceeded.")
         url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id})
@@ -47,7 +47,7 @@ class TestEmailErrors(ModuleStoreTestCase):
     @patch('bulk_email.tasks.course_email.retry')
     def test_data_err_fail(self, retry, result):
         """
-        Test that celery handles permanent SMTPDataErrors by failing and not retrying
+        Test that celery handles permanent SMTPDataErrors by failing and not retrying.
         """
         self.smtp_server_thread.server.set_errtype("DATA", "554 Message rejected: Email address is not verified.")
         self.students = [UserFactory() for _ in xrange(settings.EMAILS_PER_TASK)]
@@ -66,7 +66,7 @@ class TestEmailErrors(ModuleStoreTestCase):
     @patch('bulk_email.tasks.course_email.retry')
     def test_disconn_err_retry(self, retry):
         """
-        Test that celery handles SMTPServerDisconnected by retrying
+        Test that celery handles SMTPServerDisconnected by retrying.
         """
         self.smtp_server_thread.server.set_errtype("DISCONN", "Server disconnected, please try again later.")
         url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id})
@@ -79,7 +79,7 @@ class TestEmailErrors(ModuleStoreTestCase):
     @patch('bulk_email.tasks.course_email.retry')
     def test_conn_err_retry(self, retry):
         """
-        Test that celery handles SMTPConnectError by retrying
+        Test that celery handles SMTPConnectError by retrying.
         """
         #SMTP reply is already specified in fake SMTP Channel created
         self.smtp_server_thread.server.set_errtype("CONN")

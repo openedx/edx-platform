@@ -3,6 +3,9 @@ from django.contrib.auth.models import User
 
 
 class Email(models.Model):
+    """
+    Abstract base class for common information for an email.
+    """
     sender = models.ForeignKey(User, default=1, blank=True, null=True)
     hash = models.CharField(max_length=128, db_index=True)
     subject = models.CharField(max_length=128, blank=True)
@@ -15,6 +18,9 @@ class Email(models.Model):
 
 
 class CourseEmail(Email, models.Model):
+    """
+    Stores information for an email to a course.
+    """
     TO_OPTIONS = (('myself', 'Myself'),
                   ('staff', 'Staff and instructors'),
                   ('all', 'All')
@@ -27,6 +33,9 @@ class CourseEmail(Email, models.Model):
 
 
 class Optout(models.Model):
+    """
+    Stores emails that have opted out of receiving emails from a course.
+    """
     email = models.CharField(max_length=255, db_index=True)
     course_id = models.CharField(max_length=255, db_index=True)
 

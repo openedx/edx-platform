@@ -1,5 +1,5 @@
 """
-Unit test for student optouts from course email
+Unit tests for student optouts from course email
 """
 import json
 
@@ -25,7 +25,7 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
 
     def test_optout_course(self):
         """
-        Make sure student does not receive course email after opting out
+        Make sure student does not receive course email after opting out.
         """
         url = reverse('change_email_settings')
         response = self.client.post(url, {'course_id': self.course.id})
@@ -43,7 +43,7 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
 
     def test_optin_course(self):
         """
-        Make sure student receives course email after opting in
+        Make sure student receives course email after opting in.
         """
         url = reverse('change_email_settings')
         response = self.client.post(url, {'course_id': self.course.id, 'receive_emails': 'on'})

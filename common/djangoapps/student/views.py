@@ -1229,6 +1229,7 @@ def accept_name_change(request):
 
 @ensure_csrf_cookie
 def change_email_settings(request):
+    """Modify logged-in user's setting for receiving emails from a course."""
     if request.method != "POST":
         return HttpResponseNotAllowed(["POST"])
 

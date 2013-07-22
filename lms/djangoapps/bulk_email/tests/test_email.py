@@ -19,9 +19,6 @@ STUDENT_COUNT = 10
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestEmail(ModuleStoreTestCase):
     def setUp(self):
-        """
-        Makes a course, which will be the same for all tests.
-        """
         self.course = CourseFactory.create()
         self.instructor = UserFactory.create(username="instructor", email="robot+instructor@edx.org")
         #Create instructor group for course
@@ -81,14 +78,14 @@ class TestEmail(ModuleStoreTestCase):
 
     def test_get_course_exc(self):
         """
-        Make sure delegate_email_batches handles Http404 exception from get_course_by_id
+        Make sure delegate_email_batches handles Http404 exception from get_course_by_id.
         """
         with self.assertRaises(Exception):
             delegate_email_batches("_", "_", "blah/blah/blah", "_", "_")
 
     def test_no_course_email_obj(self):
         """
-        Make sure course_email handles CourseEmail.DoesNotExist exception
+        Make sure course_email handles CourseEmail.DoesNotExist exception.
         """
         with self.assertRaises(CourseEmail.DoesNotExist):
             course_email("dummy hash", [], "_", "_", False)

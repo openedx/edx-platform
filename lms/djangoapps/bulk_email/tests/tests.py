@@ -1,7 +1,5 @@
 """
-Unit tests for email feature in instructor dashboard
-
-Based on (and depends on) unit tests for courseware.
+Unit tests for email feature flag in instructor dashboard
 """
 
 from django.test.utils import override_settings
@@ -18,9 +16,9 @@ from mock import patch
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestInstructorDashboardEmailView(ModuleStoreTestCase):
-    '''
+    """
     Check for email view displayed with flag
-    '''
+    """
     def setUp(self):
         self.course = CourseFactory.create()
 

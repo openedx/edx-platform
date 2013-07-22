@@ -6,7 +6,7 @@ import smtplib
 
 
 class FakeSMTPChannel(smtpd.SMTPChannel):
-    """A fake SMTPChannel for sending fake error response through socket"""
+    """A fake SMTPChannel for sending fake error response through socket."""
     def __init__(self, server, conn, addr):
         asynchat.async_chat.__init__(self, conn)
         self.__server = server
@@ -33,7 +33,7 @@ class FakeSMTPChannel(smtpd.SMTPChannel):
 
 
 class FakeSMTPServer(smtpd.SMTPServer):
-    """A fake SMTP server"""
+    """A fake SMTP server for generating different smptlib exceptions."""
     def __init__(self, *args, **kwargs):
         smtpd.SMTPServer.__init__(self, *args, **kwargs)
 
