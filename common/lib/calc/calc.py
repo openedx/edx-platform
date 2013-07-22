@@ -259,9 +259,21 @@ def evaluator(variables, functions, math_expr, case_sensitive=False):
 
     return thing.handle_tree(evaluate_actions)
 
-class ParseAugmenter(object):
 
+class ParseAugmenter(object):
+    """
+    Holds the data for a particular parse
+
+    Holds the `math_expr` and `case_sensitive` so they needn't be passed around
+    method to method.
+    Eventually holds the parse tree and sets of variables as well.
+    """
     def __init__(self, math_expr, case_sensitive=False):
+        """
+        Create the ParseAugmenter for a given math expression string.
+
+        Have the parsing done later, when called like OBJ.parse_algebra()
+        """
         self.case_sensitive = case_sensitive
         self.math_expr = math_expr
         self.tree = None
@@ -269,7 +281,13 @@ class ParseAugmenter(object):
         self.functions_used = set()
 
     def make_variable_parse_action(self):
+        """
+        Create a wrapper to store variables as they are parsed
+        """
         def vpa(tokens):
+            """
+            When a variable is recognized, store its correct form in `variables_used`
+            """
             if self.case_sensitive:
                 varname = tokens[0][0]
             else:
@@ -278,7 +296,13 @@ class ParseAugmenter(object):
         return vpa
 
     def make_function_parse_action(self):
+        """
+        Create a wrapper to store functions as they are parsed
+        """
         def fpa(tokens):
+            """
+            When a function is recognized, store its correct form in `variables_used`
+            """
             if self.case_sensitive:
                 varname = tokens[0][0]
             else:
@@ -318,7 +342,7 @@ class ParseAugmenter(object):
 
         # Predefine recursive variables
         expr = Forward()
-        
+
         # Handle variables passed in. They must start with letters/underscores
         # and may contain numbers afterward
         inner_varname = Word(alphas + "_", alphanums + "_")
@@ -328,37 +352,48 @@ class ParseAugmenter(object):
         # Same thing for functions.
         function = Group(inner_varname + Suppress("(") + expr + Suppress(")"))("function")
         function.setParseAction(self.make_function_parse_action())
-        
+
         atom = number | function | varname | "(" + expr + ")"
         atom = Group(atom)("atom")
-        
+
         # Do the following in the correct order to preserve order of operation
         pow_term = atom + ZeroOrMore("^" + atom)
         pow_term = Group(pow_term)("power")
-        
+
         par_term = pow_term + ZeroOrMore('||' + pow_term)  # 5k || 4k
         par_term = Group(par_term)("parallel")
-        
+
         prod_term = par_term + ZeroOrMore((Literal('*') | Literal('/')) + par_term)  # 7 * 5 / 4
         prod_term = Group(prod_term)("product")
-        
+
         sum_term = Optional(plus_minus) + prod_term + ZeroOrMore(plus_minus + prod_term)  # -5 + 4 - 3
         sum_term = Group(sum_term)("sum")
-        
+
         # Finish the recursion
         expr << sum_term  # pylint: disable=W0104
         self.tree = (expr + stringEnd).parseString(self.math_expr)[0]
 
     def handle_tree(self, handle_actions):
+        """
+        Call `handle_actions` recursively on `self.tree` and return result
+
+        `handle_actions` is a dictionary of node names (e.g. 'product', 'sum',
+        etc&) to functions. These functions are of the following form:
+          -input: a list of processed child nodes. If it includes any terminal
+           nodes in the list, they will be given as their original strings
+          -output: whatever to be passed to the level higher, and what to
+           return for the final node.
+        """
         def handle_node(node):
             """
-            Return the float representing the node, using recursion.
-            
+            Return the result representing the node, using recursion.
+
             Call the appropriate `handle_action` for this node. As its inputs,
             feed it the output of `handle_node` for each child node.
             """
             if not isinstance(node, ParseResults):
                 return node
+            # TODO copy over from preview.py
 
             action = handle_actions[node.getName()]
             handled_kids = [handle_node(k) for k in node]
@@ -370,10 +405,10 @@ class ParseAugmenter(object):
     def check_variables(self, valid_variables, valid_functions):
         """
         Confirm that all the variables used in the tree are valid/defined.
-        
+
         Otherwise, raise an UndefinedVariable containing all bad variables.
         """
-        # Test that `used_vars` is a subset of `all_vars` and the same for functions
+        # Test that `used_vars` is a subset of `all_vars`; also do functions
         if not (self.variables_used.issubset(valid_variables) and
                 self.functions_used.issubset(valid_functions)):
             bad_vars = self.variables_used.difference(valid_variables)
