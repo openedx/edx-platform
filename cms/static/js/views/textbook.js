@@ -241,7 +241,7 @@ CMS.Views.EditChapter = Backbone.View.extend({
             asset_path: this.$("input.chapter-asset-path").val()
         });
         var msg = new CMS.Models.FileUpload({
-            title: _.template(gettext("Upload a new asset to “<%= name %>”"),
+            title: _.template(gettext("Upload a new PDF to “<%= name %>”"),
                 {name: section.escape('name')}),
             message: "Files must be in PDF format."
         });
