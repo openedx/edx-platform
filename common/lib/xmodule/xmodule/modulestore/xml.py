@@ -505,12 +505,12 @@ class XMLModuleStore(ModuleStoreBase):
         except KeyError:
             raise ItemNotFoundError(location)
 
-    def has_item(self, location):
+    def has_item(self, course_id, location):
         """
         Returns True if location exists in this ModuleStore.
         """
         location = Location(location)
-        return any(location in course_modules for course_modules in self.modules.values())
+        return location in self.modules[course_id]
 
     def get_item(self, location, depth=0):
         """

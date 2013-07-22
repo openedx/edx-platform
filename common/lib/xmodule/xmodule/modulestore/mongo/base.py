@@ -545,7 +545,7 @@ class MongoModuleStore(ModuleStoreBase):
             raise ItemNotFoundError(location)
         return item
 
-    def has_item(self, location):
+    def has_item(self, course_id, location):
         """
         Returns True if location exists in this ModuleStore.
         """
