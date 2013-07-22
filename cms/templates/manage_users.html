@@ -67,57 +67,51 @@
 
 <%block name="jsextra">
 <script type="text/javascript">
-  var $newUserForm;
   var addUserPostbackUrl = "${add_user_postback_url}";
   var removeUserPostbackUrl = "${remove_user_postback_url}";
 
-  function showNewUserForm(e) {
-    e.preventDefault();
-    $newUserForm.slideDown(150);
-    $newUserForm.find('.email-input').focus();
-  }
+  $(document).ready(function() {
+    var $newUserForm = $('.new-user-form');
+    $newUserForm.bind('submit', function(e) {
+      e.preventDefault();
+      $.ajax({
+        url: addUserPostbackUrl,
+        type: 'POST',
+        dataType: 'json',
+        contentType: 'application/json',
+        data: {
+          email: $('#email').val()
+        },
+        success: function(data) {
+          location.reload();
+        },
+        notifyOnError: false,
+        error: function(jqXHR, textStatus, errorThrown) {
+          data = JSON.parse(jqXHR.responseText);
+          $('#result').show().empty().append(data.ErrMsg);
+        }
+      });
+    });
 
-  function hideNewUserForm(e) {
-    e.preventDefault();
-    $newUserForm.slideUp(150);
-    $('#result').hide();
-    $('#email').val('');
-  }
+    var $cancelButton = $newUserForm.find('.cancel-button');
+    $cancelButton.bind('click', function(e) {
+      e.preventDefault();
+      $newUserForm.slideUp(150);
+      $('#result').hide();
+      $('#email').val('');
+    });
 
-  function checkForCancel(e) {
-    if(e.which == 27) {
-      e.data.$cancelButton.click();
-    }
-  }
+    $('.new-user-button').bind('click', function(e) {
+      e.preventDefault();
+      $newUserForm.slideDown(150);
+      $newUserForm.find('.email-input').focus();
+    });
 
-  function addUser(e) {
-    e.preventDefault();
-
-    $.ajax({
-      url: addUserPostbackUrl,
-      type: 'POST',
-      dataType: 'json',
-      contentType: 'application/json',
-      data: JSON.stringify({ 'email': $('#email').val()}),
-      success: function(data) {
-        location.reload();
-      },
-      notifyOnError: false,
-      error: function(jqXHR, textStatus, errorThrown) {
-        data = JSON.parse(jqXHR.responseText);
-        $('#result').show().empty().append(data.ErrMsg);
+    $('body').bind('keyup', function(e) {
+      if(e.which == 27) {
+        $cancelButton.click();
       }
     });
-  }
-
-  $(document).ready(function() {
-    $newUserForm = $('.new-user-form');
-    var $cancelButton = $newUserForm.find('.cancel-button');
-    $newUserForm.bind('submit', addUser);
-    $cancelButton.bind('click', hideNewUserForm);
-
-    $('.new-user-button').bind('click', showNewUserForm);
-    $('body').bind('keyup', { $cancelButton: $cancelButton }, checkForCancel);
 
     $('.remove-user').click(function() {
       $.ajax({
@@ -125,10 +119,13 @@
         type: 'POST',
         dataType: 'json',
         contentType: 'application/json',
-        data:JSON.stringify({ 'email': $(this).data('id')}),
-        }).done(function() {
+        data: {
+          email: $(this).data('id')
+        },
+        complete: function() {
           location.reload();
-        })
+        }
+      });
     });
   });
 </script>
