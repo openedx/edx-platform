@@ -33,7 +33,6 @@ class @Hinter
     return string.replace(/[!"#$%&'()*+,.\/:;<=>?@\[\\\]^`{|}~]/g, '\\$&')
 
   bind: =>
-    window.update_schematics()
     @$('input.vote').click @vote
     @$('input.submit-hint').click @submit_hint
     @$('.custom-hint').click @clear_default_text

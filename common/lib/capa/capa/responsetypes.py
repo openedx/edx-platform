@@ -917,7 +917,7 @@ class NumericalResponse(LoncapaResponse):
 
     # TODO: add check_hint_condition(self, hxml_set, student_answers)
 
-    def answer_compare(self, a, b):
+    def compare_answer(self, a, b):
         """
         Outside-facing function that lets us compare two numerical answers,
         with this problem's tolerance.
@@ -1870,6 +1870,11 @@ class FormulaResponse(LoncapaResponse):
         return out
 
     def check_formula(self, expected, given, samples):
+        """
+        Given an expected answer string, a given (student-produced) answer
+        string, and a samples string, return whether the given answer is
+        "correct" or "incorrect".
+        """
         var_dict_list = self.randomize_variables(samples)
         student_result = self.hash_answers(given, var_dict_list)
         instructor_result = self.hash_answers(expected, var_dict_list)
@@ -1879,7 +1884,7 @@ class FormulaResponse(LoncapaResponse):
                 return "incorrect"
         return "correct"
 
-    def answer_compare(self, a, b):
+    def compare_answer(self, a, b):
         """
         An external interface for comparing whether a and b are equal.
         """

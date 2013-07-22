@@ -18,8 +18,6 @@ from xblock.core import Scope, String, Integer, Boolean, Dict, List
 
 from capa.responsetypes import FormulaResponse
 
-from calc import UndefinedVariable
-
 from django.utils.html import escape
 
 log = logging.getLogger(__name__)
@@ -84,10 +82,10 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
             self.answer_to_str = self.formula_answer_to_str
         else:
             self.answer_to_str = self.numerical_answer_to_str
-        # answer_compare is expected to return whether its two inputs are close enough
+        # compare_answer is expected to return whether its two inputs are close enough
         # to be equal, or raise a StudentInputError if one of the inputs is malformatted.
         try:
-            self.answer_compare = responder.answer_compare
+            self.compare_answer = responder.compare_answer
             self.validate_answer = responder.validate_answer
         except AttributeError:
             # This response type is not supported!
@@ -144,7 +142,7 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         Look in self.hints, and find all answer keys that are "equal with tolerance"
         to the input answer.
         """
-        return [key for key in self.hints if self.answer_compare(key, answer)]
+        return [key for key in self.hints if self.compare_answer(key, answer)]
 
     def handle_ajax(self, dispatch, data):
         """
@@ -182,6 +180,7 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
             - 'rand_hint_1' and 'rand_hint_2' are two random hints to the answer in `data`.
             - 'answer' is the parsed answer that was submitted.
         """
+        # First, validate our inputs.
         try:
             answer = self.answer_to_str(data)
         except (ValueError, AttributeError):
@@ -194,7 +193,8 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
             return
         if answer not in self.user_submissions:
             self.user_submissions += [answer]
-        # Look for a hint to give.
+
+        # Next, find all of the hints that could possibly go with this answer.
         # Make a local copy of self.hints - this means we only need to do one json unpacking.
         # (This is because xblocks storage makes the following command a deep copy.)
         local_hints = self.hints
@@ -209,6 +209,8 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
                 temp_dict[key] = value + [matching_answer]
             matching_hints.update(local_hints[matching_answer])
         # matching_hints now maps pk's to lists of [hint, votes, matching_answer]
+
+        # Finally, randomly choose a subset of matching_hints to actually show.
         if len(matching_hints) == 0:
             # No hints to give.  Return.
             return

@@ -929,12 +929,12 @@ class NumericalResponseTest(ResponseTest):
                 with self.assertRaisesRegexp(StudentInputError, msg_regex):
                     problem.grade_answers({'1_2_1': 'foobar'})
 
-    def test_answer_compare(self):
+    def test_compare_answer(self):
         """Tests the answer compare function."""
         problem = self.build_problem(answer="42")
         responder = problem.responders.values()[0]
-        self.assertTrue(responder.answer_compare('48', '8*6'))
-        self.assertFalse(responder.answer_compare('48', '9*5'))
+        self.assertTrue(responder.compare_answer('48', '8*6'))
+        self.assertFalse(responder.compare_answer('48', '9*5'))
 
     def test_validate_answer(self):
         """Tests the answer validation function."""

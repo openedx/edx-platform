@@ -120,10 +120,10 @@ class CHModuleFactory(object):
                 return False
         responder.validate_answer = validate_answer
 
-        def answer_compare(a, b):
+        def compare_answer(a, b):
             """ A fake answer comparer """
             return a == b
-        responder.answer_compare = answer_compare
+        responder.compare_answer = compare_answer
 
         capa_module.lcp.responders = {'responder0': responder}
         capa_module.displayable_items = lambda: [capa_module]
@@ -359,9 +359,10 @@ class CrowdsourceHinterTest(unittest.TestCase):
         Someone has gotten the problem correct on the first try.
         Output should be empty.
         """
-        mock_module = CHModuleFactory.create(previous_answers=[])
+        mock_module = CHModuleFactory.create(previous_answers=[], user_submissions=[])
         json_in = {'problem_name': '42.5'}
         out = mock_module.get_feedback(json_in)
+        print out
         self.assertTrue(out is None)
 
     def test_getfeedback_1wronganswer_nohints(self):

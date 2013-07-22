@@ -15,12 +15,12 @@
 
 <%def name="get_feedback()">
     <%
-    def unspace(string):
+    def unspace(in_str):
         """
         HTML id's can't have spaces in them.  This little function
         removes spaces.
         """
-        return ''.join(string.split())
+        return ''.join(in_str.split())
 
     # Make a list of all hints shown.  (This is fed back to the site as pk_list.)
     # At the same time, determine whether any hints were shown at all.
