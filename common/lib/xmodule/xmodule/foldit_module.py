@@ -24,6 +24,8 @@ class FolditFields(object):
     show_basic_score = String(scope=Scope.settings, default='false')
     show_leaderboard = String(scope=Scope.settings, default='false')
 
+    run = String(scope=Scope.settings)
+
 
 class FolditModule(FolditFields, XModule):
 
@@ -37,6 +39,7 @@ class FolditModule(FolditFields, XModule):
             required_sublevel="3"
             required_level_half_credit="2"
             required_sublevel_half_credit="3"
+            run="/MITx/7.00x/2013_Spring"
             show_leaderboard="false"/>
         """
         XModule.__init__(self, *args, **kwargs)
@@ -99,7 +102,7 @@ class FolditModule(FolditFields, XModule):
         from foldit.models import Score
 
         if courses is None:
-            courses = [self.location.course_id]
+            courses = [self.run] if self.run is not None else None
 
         leaders = [(leader['username'], leader['score']) for leader in Score.get_tops_n(10, course_list=courses)]
         leaders.sort(key=lambda x: -x[1])
