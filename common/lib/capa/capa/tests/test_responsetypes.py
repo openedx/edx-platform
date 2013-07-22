@@ -705,7 +705,7 @@ class CodeResponseTest(ResponseTest):
         # Now we queue the LCP
         cmap = CorrectMap()
         for i, answer_id in enumerate(answer_ids):
-            queuestate = CodeResponseTest.make_queuestate(i, datetime.now())
+            queuestate = CodeResponseTest.make_queuestate(i, datetime.now(UTC))
             cmap.update(CorrectMap(answer_id=answer_ids[i], queuestate=queuestate))
         self.problem.correct_map.update(cmap)
 
@@ -721,7 +721,7 @@ class CodeResponseTest(ResponseTest):
         old_cmap = CorrectMap()
         for i, answer_id in enumerate(answer_ids):
             queuekey = 1000 + i
-            queuestate = CodeResponseTest.make_queuestate(queuekey, datetime.now())
+            queuestate = CodeResponseTest.make_queuestate(queuekey, datetime.now(UTC))
             old_cmap.update(CorrectMap(answer_id=answer_ids[i], queuestate=queuestate))
 
         # Message format common to external graders

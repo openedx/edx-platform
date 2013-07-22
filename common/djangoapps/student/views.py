@@ -1100,7 +1100,7 @@ def confirm_email_change(request, key):
         meta = up.get_meta()
         if 'old_emails' not in meta:
             meta['old_emails'] = []
-        meta['old_emails'].append([user.email, datetime.datetime.now().isoformat()])
+        meta['old_emails'].append([user.email, datetime.datetime.now(UTC).isoformat()])
         up.set_meta(meta)
         up.save()
         # Send it to the old email...
@@ -1198,7 +1198,7 @@ def accept_name_change_by_id(id):
     meta = up.get_meta()
     if 'old_names' not in meta:
         meta['old_names'] = []
-    meta['old_names'].append([up.name, pnc.rationale, datetime.datetime.now().isoformat()])
+    meta['old_names'].append([up.name, pnc.rationale, datetime.datetime.now(UTC).isoformat()])
     up.set_meta(meta)
 
     up.name = pnc.new_name
