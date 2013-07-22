@@ -2,7 +2,7 @@
 
 // VideoCaption module.
 define(
-'videoalpha/display/video_caption.js',
+'videoalpha/10_video_caption.js',
 [],
 function () {
 
@@ -109,11 +109,11 @@ function () {
     }
 
     function fetchCaption() {
-        var _this = this;
+        var _this = this, jQueryObject;
 
         this.videoCaption.hideCaptions(this.hide_captions);
 
-        $.getWithPrefix(this.videoCaption.captionURL(), function(captions) {
+        jQueryObject = $.getWithPrefix(this.videoCaption.captionURL(), function(captions) {
             _this.videoCaption.captions = captions.text;
             _this.videoCaption.start = captions.start;
             _this.videoCaption.loaded = true;
@@ -125,8 +125,11 @@ function () {
             } else {
                 _this.videoCaption.renderCaption();
             }
-        })
-        .error(function(){console.error('Subtitles not found. Upload subtitles to server!');});
+        });
+
+        if (typeof jQueryObject === 'undefined') {
+            console.error('Subtitles not found. Upload subtitles to server!');
+        }
     }
 
     function captionURL() {

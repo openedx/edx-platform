@@ -1,6 +1,6 @@
 (function() {
   describe('VideoPlayerAlpha', function() {
-    var state, videoPlayer, player, videoControl, videoCaption, videoProgressSlider, videoSpeedControl, videoVolumeControl;
+    var state, videoPlayer, player, videoControl, videoCaption, videoProgressSlider, videoSpeedControl, videoVolumeControl, oldOTBD;
 
     function initialize(fixture) {
       if (typeof fixture === 'undefined') {
@@ -23,8 +23,14 @@
         initialize('videoalpha.html');
     }
 
+    beforeEach(function () {
+        oldOTBD = window.onTouchBasedDevice;
+        window.onTouchBasedDevice = jasmine.createSpy('onTouchBasedDevice').andReturn(false);
+    });
+
     afterEach(function() {
-       $('source').remove();
+        $('source').remove();
+        window.onTouchBasedDevice = oldOTBD;
     });
 
     describe('constructor', function() {
@@ -68,7 +74,6 @@
 
         it('create video progress slider', function() {
           expect(videoProgressSlider).toBeDefined();
-          console.log('videoProgressSlider', videoProgressSlider, state, state.videoControl.sliderEl)
           expect(videoProgressSlider.el).toHaveClass('slider');
         });
 
@@ -160,20 +165,9 @@
       // });
 
       describe('when not on a touch based device', function() {
-        var oldOTBD;
-
         beforeEach(function() {
-          oldOTBD = window.onTouchBasedDevice;
-
-          window.onTouchBasedDevice = function () {
-            return true;
-          };
-
+          window.onTouchBasedDevice.andReturn(true);
           initialize();
-        });
-
-        afterEach(function () {
-            window.onTouchBasedDevice = oldOTBD;
         });
 
         it('does not add the tooltip to fullscreen button', function() {
@@ -190,17 +184,7 @@
         var oldOTBD;
 
         beforeEach(function() {
-          oldOTBD = window.onTouchBasedDevice;
-
-          window.onTouchBasedDevice = function () {
-            return false;
-          };
-
           initialize();
-        });
-
-        afterEach(function () {
-            window.onTouchBasedDevice = oldOTBD;
         });
 
         it('add the tooltip to fullscreen button', function() {
@@ -759,7 +743,7 @@
 
       it('set the player volume', function() {
         player.setVolume(60);
-        expect(Number(player.getVolume().toFixed(1)).toEqual(0.6);
+        expect(player.getVolume()).toEqual(0.6);
       });
     });
   });

@@ -1,6 +1,6 @@
 (function() {
   describe('VideoControlAlpha', function() {
-    var state, videoControl;
+    var state, videoControl, oldOTBD;
 
     function initialize() {
       loadFixtures('videoalpha_all.html');
@@ -8,13 +8,18 @@
       videoControl = state.videoControl;
     }
 
+    beforeEach(function(){
+        oldOTBD = window.onTouchBasedDevice;
+        window.onTouchBasedDevice = jasmine.createSpy('onTouchBasedDevice').andReturn(false);
+    });
+
     afterEach(function() {
         $('source').remove();
+        window.onTouchBasedDevice = oldOTBD;
     });
 
     describe('constructor', function() {
       beforeEach(function() {
-        window.onTouchBasedDevice = jasmine.createSpy('onTouchBasedDevice').andReturn(false);
         initialize();
       });
 
@@ -44,10 +49,6 @@
         beforeEach(function() {
           window.onTouchBasedDevice.andReturn(true);
           initialize();
-        });
-
-        afterEach(function(){
-          window.onTouchBasedDevice.andReturn(false);
         });
 
         it('does not add the play class to video control', function() {

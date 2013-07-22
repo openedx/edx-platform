@@ -1,6 +1,6 @@
 (function () {
     describe('VideoAlpha HTML5Video', function () {
-        var state, player, playbackRates = [0.75, 1.0, 1.25, 1.5];
+        var state, player, oldOTBD, playbackRates = [0.75, 1.0, 1.25, 1.5];
 
         function initialize() {
             loadFixtures('videoalpha_html5.html');
@@ -9,6 +9,8 @@
         }
 
         beforeEach(function () {
+            oldOTBD = window.onTouchBasedDevice;
+            window.onTouchBasedDevice = jasmine.createSpy('onTouchBasedDevice').andReturn(false);
             initialize();
             player.config.events.onReady = jasmine.createSpy('onReady');
         });
@@ -18,6 +20,7 @@
             $.fn.scrollTo.reset();
             $('.subtitles').remove();
             $('source').remove();
+            window.onTouchBasedDevice = oldOTBD;
         });
 
         describe('events:', function () {

@@ -1,6 +1,6 @@
 (function() {
   describe('VideoQualityControlAlpha', function() {
-    var state, videoControl, videoQualityControl;
+    var state, videoControl, videoQualityControl, oldOTBD;
 
     function initialize() {
       loadFixtures('videoalpha.html');
@@ -9,9 +9,14 @@
       videoQualityControl = state.videoQualityControl;
     }
 
+    beforeEach(function() {
+      oldOTBD = window.onTouchBasedDevice;
+      window.onTouchBasedDevice = jasmine.createSpy('onTouchBasedDevice').andReturn(false);
+    });
 
     afterEach(function() {
-        $('source').remove();
+      $('source').remove();
+      window.onTouchBasedDevice = oldOTBD;
     });
 
     describe('constructor', function() {

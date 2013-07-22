@@ -2,7 +2,7 @@
 
 // VideoSpeedControl module.
 define(
-'videoalpha/display/video_speed_control.js',
+'videoalpha/09_video_speed_control.js',
 [],
 function () {
 
@@ -44,7 +44,7 @@ function () {
         state.videoControl.secondaryControlsEl.prepend(state.videoSpeedControl.el);
 
         $.each(state.videoSpeedControl.speeds, function(index, speed) {
-            
+
             //var link = $('<a href="#">' + speed + 'x</a>');
             var link = '<a href="#">' + speed + 'x</a>';
 

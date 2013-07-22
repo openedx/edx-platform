@@ -2,7 +2,7 @@
 
 // VideoControl module.
 define(
-'videoalpha/display/video_control.js',
+'videoalpha/05_video_control.js',
 [],
 function () {
 

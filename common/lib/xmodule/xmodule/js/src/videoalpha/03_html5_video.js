@@ -14,7 +14,7 @@
 (function (requirejs, require, define) {
 
 define(
-'videoalpha/display/html5_video.js',
+'videoalpha/03_html5_video.js',
 [],
 function () {
     var HTML5Video = {};
@@ -67,7 +67,7 @@ function () {
             if (isNaN(this.video.duration)) {
                 return 0;
             }
-            
+
             return this.video.duration;
         };
 

@@ -1,6 +1,6 @@
 (function() {
   describe('VideoCaptionAlpha', function() {
-    var state, videoPlayer, videoCaption, videoSpeedControl;
+    var state, videoPlayer, videoCaption, videoSpeedControl, oldOTBD;
 
     function initialize() {
       loadFixtures('videoalpha_all.html');
@@ -11,6 +11,7 @@
     }
 
     beforeEach(function() {
+      oldOTBD = window.onTouchBasedDevice;
       window.onTouchBasedDevice = jasmine.createSpy('onTouchBasedDevice').andReturn(false);
       initialize();
     });
@@ -20,6 +21,7 @@
       $.fn.scrollTo.reset();
       $('.subtitles').remove();
       $('source').remove();
+      window.onTouchBasedDevice = oldOTBD;
     });
 
     describe('constructor', function() {

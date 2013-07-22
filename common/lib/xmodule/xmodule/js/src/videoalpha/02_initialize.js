@@ -12,8 +12,8 @@
 (function (requirejs, require, define) {
 
 define(
-'videoalpha/display/initialize.js',
-['videoalpha/display/video_player.js'],
+'videoalpha/02_initialize.js',
+['videoalpha/04_video_player.js'],
 function (VideoPlayer) {
 
     /**

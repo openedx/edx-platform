@@ -1,6 +1,6 @@
 (function() {
   describe('VideoVolumeControlAlpha', function() {
-    var state, videoControl, videoVolumeControl;
+    var state, videoControl, videoVolumeControl, oldOTBD;
 
     function initialize() {
       loadFixtures('videoalpha_all.html');
@@ -9,10 +9,14 @@
       videoVolumeControl = state.videoVolumeControl;
     }
 
-
+    beforeEach(function() {
+      oldOTBD = window.onTouchBasedDevice;
+      window.onTouchBasedDevice = jasmine.createSpy('onTouchBasedDevice').andReturn(false);
+    });
 
     afterEach(function() {
         $('source').remove();
+        window.onTouchBasedDevice = oldOTBD;
     });
 
     describe('constructor', function() {

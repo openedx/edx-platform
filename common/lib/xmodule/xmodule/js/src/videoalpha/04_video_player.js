@@ -2,8 +2,8 @@
 
 // VideoPlayer module.
 define(
-'videoalpha/display/video_player.js',
-['videoalpha/display/html5_video.js'],
+'videoalpha/04_video_player.js',
+['videoalpha/03_html5_video.js'],
 function (HTML5Video) {
 
     // VideoPlayer() function - what this module "exports".

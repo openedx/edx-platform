@@ -11,12 +11,14 @@
     }
 
     beforeEach(function() {
+      oldOTBD = window.onTouchBasedDevice;
       window.onTouchBasedDevice = jasmine.createSpy('onTouchBasedDevice').andReturn(false);
     });
 
 
     afterEach(function() {
-        $('source').remove();
+      $('source').remove();
+      window.onTouchBasedDevice = oldOTBD;
     });
 
     describe('constructor', function() {

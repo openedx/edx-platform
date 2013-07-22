@@ -1,6 +1,6 @@
 (function() {
   describe('VideoProgressSliderAlpha', function() {
-    var state, videoPlayer, videoProgressSlider;
+    var state, videoPlayer, videoProgressSlider, oldOTBD;
 
     function initialize() {
       loadFixtures('videoalpha_all.html');
@@ -10,12 +10,14 @@
     }
 
     beforeEach(function() {
-      window.onTouchBasedDevice = jasmine.createSpy('onTouchBasedDevice').andReturn(false);
+        oldOTBD = window.onTouchBasedDevice;
+        window.onTouchBasedDevice = jasmine.createSpy('onTouchBasedDevice').andReturn(false);
     });
 
 
     afterEach(function() {
         $('source').remove();
+        window.onTouchBasedDevice = oldOTBD;
     });
 
     describe('constructor', function() {

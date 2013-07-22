@@ -1,7 +1,10 @@
 (function () {
     describe('VideoAlpha', function () {
+        var oldOTBD;
+
         beforeEach(function () {
             jasmine.stubRequests();
+            oldOTBD = window.onTouchBasedDevice;
             window.onTouchBasedDevice = jasmine.createSpy('onTouchBasedDevice').andReturn(false);
             this.videosDefinition = '0.75:slowerSpeedYoutubeId,1.0:normalSpeedYoutubeId';
             this.slowerSpeedYoutubeId = 'slowerSpeedYoutubeId';
@@ -13,6 +16,7 @@
             window.onYouTubePlayerAPIReady = undefined;
             window.onHTML5PlayerAPIReady = undefined;
             $('source').remove();
+            window.onTouchBasedDevice = oldOTBD;
         });
 
         describe('constructor', function () {
