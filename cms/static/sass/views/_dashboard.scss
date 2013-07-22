@@ -367,13 +367,11 @@ body.dashboard {
 		background: $white;
 		box-shadow: 0 1px 2px rgba(0, 0, 0, .1);
 
-		.title {
-			@extend .t-title4;
-			font-weight: 600;
-			margin-bottom: ($baseline/2);
-			border-bottom: 1px solid $gray-l3;
-			padding-bottom: ($baseline/2);
-		}
+	    .title {
+	      @extend .t-title4;
+	      font-weight: 700;
+	      margin-bottom: $baseline;
+	    }
 
 		.row {
 			@include clearfix();
@@ -387,10 +385,6 @@ body.dashboard {
 
 		.column:first-child {
 			margin-right: 4%;
-		}
-
-		.course-info {
-			width: 600px;
 		}
 
 		label {
@@ -422,5 +416,24 @@ body.dashboard {
 		.item-details {
 			padding-bottom: 0;
 		}
+
+	    .wrap-error {
+	      @include transition(all $tmg-f2 ease 0s);
+	      height: 0;
+	      overflow: hidden;
+	      opacity: 0;
+	    }
+
+	    .wrap-error.is-shown {
+	      height: 45px;
+	      opacity: 1;
+	    }
+
+	    .message-status {
+	      display: block;
+	      margin-bottom: 0;
+	      padding-left: 30px;
+    }
+
 	}
 }
