@@ -1,7 +1,9 @@
+import json
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
-from django.core.urlresolvers import reverse
+from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_http_methods
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST
 from django_future.csrf import ensure_csrf_cookie
@@ -10,9 +12,9 @@ from django.core.context_processors import csrf
 
 from xmodule.modulestore.django import modulestore
 from contentstore.utils import get_url_reverse, get_lms_link_for_item
-from util.json_request import expect_json, JsonResponse
+from util.json_request import JsonResponse
 from auth.authz import STAFF_ROLE_NAME, INSTRUCTOR_ROLE_NAME, get_users_in_course_group_by_role
-from auth.authz import get_user_by_email, add_user_to_course_group, remove_user_from_course_group
+from auth.authz import add_user_to_course_group, remove_user_from_course_group
 from course_creators.views import get_course_creator_status, add_user_with_status_unrequested, user_requested_access
 
 from .access import has_access
@@ -60,10 +62,11 @@ def request_course_creator(request):
 
 @login_required
 @ensure_csrf_cookie
-def manage_users(request, location):
+def manage_users(request, org, course, name):
     '''
     This view will return all CMS users who are editors for the specified course
     '''
+    location = Location('i4x', org, course, 'course', name)
     # check that logged in user has permissions to this item
     if not has_access(request.user, location, role=INSTRUCTOR_ROLE_NAME) and not has_access(request.user, location, role=STAFF_ROLE_NAME):
         raise PermissionDenied()
@@ -73,91 +76,72 @@ def manage_users(request, location):
     return render_to_response('manage_users.html', {
         'context_course': course_module,
         'staff': get_users_in_course_group_by_role(location, STAFF_ROLE_NAME),
-        'add_user_postback_url': reverse('add_user', args=[location]).rstrip('/'),
-        'remove_user_postback_url': reverse('remove_user', args=[location]).rstrip('/'),
         'allow_actions': has_access(request.user, location, role=INSTRUCTOR_ROLE_NAME),
-        'request_user_id': request.user.id
     })
 
 
-@expect_json
 @login_required
 @ensure_csrf_cookie
-def add_user(request, location):
-    '''
-    This POST-back view will add a user - specified by email - to the list of editors for
-    the specified course
-    '''
-    email = request.POST.get("email")
-
-    if not email:
-        msg = {
-            'Status': 'Failed',
-            'ErrMsg': _('Please specify an email address.'),
-        }
-        return JsonResponse(msg, 400)
-
-    # remove leading/trailing whitespace if necessary
-    email = email.strip()
-
-    # check that logged in user has admin permissions to this course
-    if not has_access(request.user, location, role=INSTRUCTOR_ROLE_NAME):
+@require_http_methods(("GET", "POST", "PUT", "DELETE"))
+def course_team_user(request, org, course, name, email):
+    location = Location('i4x', org, course, 'course', name)
+    # check that logged in user has permissions to this item
+    if not has_access(request.user, location, role=INSTRUCTOR_ROLE_NAME) and not has_access(request.user, location, role=STAFF_ROLE_NAME):
         raise PermissionDenied()
 
-    user = get_user_by_email(email)
-
-    # user doesn't exist?!? Return error.
-    if user is None:
+    try:
+        user = User.objects.get(email=email)
+    except:
         msg = {
-            'Status': 'Failed',
-            'ErrMsg': _("Could not find user by email address '{email}'.").format(email=email),
+            "error": _("Could not find user by email address '{email}'.").format(email=email),
         }
         return JsonResponse(msg, 404)
 
-    # user exists, but hasn't activated account?!?
+    if request.method == "GET":
+        # just return info about the user
+        roles = set()
+        for group in user.groups.all():
+            if not "_" in group.name:
+                continue
+            role, coursename = group.name.split("_", 1)
+            if coursename in (location.course, location.course_id):
+                roles.add(role)
+        msg = {
+            "email": user.email,
+            "active": user.is_active,
+            "roles": list(roles),
+        }
+        return JsonResponse(msg)
+
+    # can't modify an inactive user
     if not user.is_active:
         msg = {
-            'Status': 'Failed',
-            'ErrMsg': _('User {email} has registered but has not yet activated his/her account.').format(email=email),
+            "error": _('User {email} has registered but has not yet activated his/her account.').format(email=email),
         }
         return JsonResponse(msg, 400)
 
-    # ok, we're cool to add to the course group
-    add_user_to_course_group(request.user, user, location, STAFF_ROLE_NAME)
+    # all other operations require the requesting user to specify a role --
+    # or if no role is specified, default to "staff"
+    if "role" in request.POST:
+        role = request.POST["role"]
+    elif request.body:
+        try:
+            payload = json.loads(request.body)
+        except:
+            return JsonResponse({"error": _("malformed JSON")}, 400)
+        try:
+            role = payload["role"]
+        except KeyError:
+            return JsonResponse({"error": "`role` is required"}, 400)
+    else:
+        role = STAFF_ROLE_NAME
 
-    return JsonResponse({"Status": "OK"})
-
-
-@expect_json
-@login_required
-@ensure_csrf_cookie
-def remove_user(request, location):
-    '''
-    This POST-back view will remove a user - specified by email - from the list of editors for
-    the specified course
-    '''
-
-    email = request.POST["email"]
-
-    # check that logged in user has admin permissions on this course
-    if not has_access(request.user, location, role=INSTRUCTOR_ROLE_NAME):
-        raise PermissionDenied()
-
-    user = get_user_by_email(email)
-    if user is None:
-        msg = {
-            'Status': 'Failed',
-            'ErrMsg': _("Could not find user by email address '{email}'.").format(email=email),
-        }
-        return JsonResponse(msg, 404)
-
-    # make sure we're not removing ourselves
-    if user.id == request.user.id:
-        raise PermissionDenied()
-
-    remove_user_from_course_group(request.user, user, location, STAFF_ROLE_NAME)
-
-    return JsonResponse({"Status": "OK"})
+    if request.method in ("POST", "PUT"):
+        add_user_to_course_group(request.user, user, location, role)
+        return JsonResponse()
+    elif request.method == "DELETE":
+        remove_user_from_course_group(request.user, user, location, role)
+        return JsonResponse()
 
 
 def _get_course_creator_status(user):

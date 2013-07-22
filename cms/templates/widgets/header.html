@@ -60,7 +60,7 @@
                     <a href="${reverse('contentstore.views.course_config_graders_page', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">${_("Grading")}</a>
                   </li>
                   <li class="nav-item nav-course-settings-team">
-                    <a href="${reverse('manage_users', kwargs=dict(location=ctx_loc))}">${_("Course Team")}</a>
+                    <a href="${reverse('manage_users', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">${_("Course Team")}</a>
                   </li>
                   <li class="nav-item nav-course-settings-advanced">
                     <a href="${reverse('course_advanced_settings', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">${_("Advanced Settings")}</a>

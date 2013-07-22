@@ -1,4 +1,5 @@
 <%! from django.utils.translation import ugettext as _ %>
+<%! from django.core.urlresolvers import reverse %>
 <%inherit file="base.html" />
 <%block name="title">${_("Course Team Settings")}</%block>
 <%block name="bodyclass">is-signedin course users settings team</%block>
@@ -46,12 +47,17 @@
       <div>
         <ol class="user-list">
           % for user in staff:
-          <li>
+          <li data-url="${reverse('course_team_user', kwargs=dict(
+              org=context_course.location.org,
+              course=context_course.location.course,
+              name=context_course.location.name,
+              email=user.email,
+            ))}">
             <span class="user-name">${user.username}</span>
             <span class="user-email">${user.email}</span>
             %if allow_actions :
             <div class="item-actions">
-              %if request_user_id != user.id:
+              %if request.user.id != user.id:
               <a href="#" class="delete-button remove-user" data-id="${user.email}"><span class="delete-icon"></span></a>
               %endif
             </div>
@@ -67,20 +73,25 @@
 
 <%block name="jsextra">
 <script type="text/javascript">
-  var addUserPostbackUrl = "${add_user_postback_url}";
-  var removeUserPostbackUrl = "${remove_user_postback_url}";
+  var tplUserURL = "${reverse('course_team_user', kwargs=dict(
+      org=context_course.location.org,
+      course=context_course.location.course,
+      name=context_course.location.name,
+      email="@@EMAIL@@",
+    ))}"
 
   $(document).ready(function() {
     var $newUserForm = $('.new-user-form');
     $newUserForm.bind('submit', function(e) {
       e.preventDefault();
+      var url = tplUserURL.replace("@@EMAIL@@", $('#email').val())
       $.ajax({
-        url: addUserPostbackUrl,
+        url: url,
         type: 'POST',
         dataType: 'json',
         contentType: 'application/json',
         data: {
-          email: $('#email').val()
+          role: 'staff',
         },
         success: function(data) {
           location.reload();
@@ -88,7 +99,7 @@
         notifyOnError: false,
         error: function(jqXHR, textStatus, errorThrown) {
           data = JSON.parse(jqXHR.responseText);
-          $('#result').show().empty().append(data.ErrMsg);
+          $('#result').show().empty().append(data.error);
         }
       });
     });
@@ -114,13 +125,14 @@
     });
 
     $('.remove-user').click(function() {
+      var url = tplUserURL.replace("@@EMAIL@@", $(this).data('id'))
       $.ajax({
-        url: removeUserPostbackUrl,
-        type: 'POST',
+        url: url,
+        type: 'DELETE',
         dataType: 'json',
         contentType: 'application/json',
         data: {
-          email: $(this).data('id')
+          role: 'staff',
         },
         complete: function() {
           location.reload();
