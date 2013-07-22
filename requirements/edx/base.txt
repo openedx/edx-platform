@@ -7,6 +7,7 @@ celery==3.0.19
 distribute>=0.6.28
 django-celery==3.0.17
 django-countries==1.5
+django-filter==0.6.0
 django-followit==0.0.3
 django-keyedcache==1.4-6
 django-kombu==0.9.4
@@ -20,6 +21,7 @@ django-ses==0.4.1
 django-storages==1.1.5
 django-threaded-multihost==1.4-1
 django-method-override==0.1.0
+djangorestframework==2.3.5
 django==1.4.5
 feedparser==5.1.3
 fs==0.4.0

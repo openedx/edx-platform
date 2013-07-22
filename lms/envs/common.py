@@ -749,6 +749,10 @@ INSTALLED_APPS = (
     'django_comment_client',
     'django_comment_common',
     'notes',
+
+    # User API
+    'rest_framework',
+    'user_api',
 )
 
 ######################### MARKETING SITE ###############################

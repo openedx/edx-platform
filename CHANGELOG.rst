@@ -5,6 +5,11 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+LMS: Added user preferences (arbitrary user/key/value tuples, for which
+which user/key is unique) and a REST API for reading users and
+preferences. Access to the REST API is restricted by use of the
+X-Edx-Api-Key HTTP header (which must match settings.EDX_API_KEY; if
+the setting is not present, the API is disabled).
 
 Common: Added *experimental* support for jsinput type.
 
