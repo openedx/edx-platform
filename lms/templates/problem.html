@@ -1,10 +1,10 @@
 <%namespace name='static' file='static_content.html'/>
 <h2 class="problem-header">
   ${ problem['name'] }
-  % if problem['weight'] != 1 and problem['weight'] is not None:
-    : ${ problem['weight'] } points
-  % endif
 </h2>
+
+<section class="problem-progress">
+</section>
 
 <section class="problem">
   ${ problem['html'] }

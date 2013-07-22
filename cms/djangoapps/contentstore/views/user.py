@@ -2,12 +2,12 @@ from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
+from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST
 from django_future.csrf import ensure_csrf_cookie
 from mitxmako.shortcuts import render_to_response
 from django.core.context_processors import csrf
 
-from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from contentstore.utils import get_url_reverse, get_lms_link_for_item
 from util.json_request import expect_json, JsonResponse
@@ -29,6 +29,7 @@ def index(request):
     # filter out courses that we don't have access too
     def course_filter(course):
         return (has_access(request.user, course.location)
+                # TODO remove this condition when templates purged from db
                 and course.location.course != 'templates'
                 and course.location.org != ''
                 and course.location.course != ''
@@ -36,7 +37,6 @@ def index(request):
     courses = filter(course_filter, courses)
 
     return render_to_response('index.html', {
-        'new_course_template': Location('i4x', 'edx', 'templates', 'course', 'Empty'),
         'courses': [(course.display_name,
                     get_url_reverse('CourseOutline', course),
                     get_lms_link_for_item(course.location, course_id=course.location.course_id))
@@ -49,7 +49,6 @@ def index(request):
 
 
 @require_POST
-@ensure_csrf_cookie
 @login_required
 def request_course_creator(request):
     """
@@ -94,7 +93,7 @@ def add_user(request, location):
     if not email:
         msg = {
             'Status': 'Failed',
-            'ErrMsg': 'Please specify an email address.',
+            'ErrMsg': _('Please specify an email address.'),
         }
         return JsonResponse(msg, 400)
 
@@ -108,7 +107,7 @@ def add_user(request, location):
     if user is None:
         msg = {
             'Status': 'Failed',
-            'ErrMsg': "Could not find user by email address '{0}'.".format(email),
+            'ErrMsg': _("Could not find user by email address '{email}'.").format(email=email),
         }
         return JsonResponse(msg, 404)
 
@@ -116,7 +115,7 @@ def add_user(request, location):
     if not user.is_active:
         msg = {
             'Status': 'Failed',
-            'ErrMsg': 'User {0} has registered but has not yet activated his/her account.'.format(email),
+            'ErrMsg': _('User {email} has registered but has not yet activated his/her account.').format(email=email),
         }
         return JsonResponse(msg, 400)
 
@@ -145,7 +144,7 @@ def remove_user(request, location):
     if user is None:
         msg = {
             'Status': 'Failed',
-            'ErrMsg': "Could not find user by email address '{0}'.".format(email),
+            'ErrMsg': _("Could not find user by email address '{email}'.").format(email=email),
         }
         return JsonResponse(msg, 404)
 

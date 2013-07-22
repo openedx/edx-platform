@@ -45,15 +45,15 @@
         toggleSubmitButton(false);
       });
 
-      $('#register-form').on('ajax:complete', function() {
+      $('#register-form').on('ajax:error', function() {
         toggleSubmitButton(true);
       });
 
       $('#register-form').on('ajax:success', function(event, json, xhr) {
         if(json.success) {
-          $('.message.submission-error').removeClass('is-shown');
           location.href="${reverse('dashboard')}";
        } else {
+         toggleSubmitButton(true);
          $('.status.message.submission-error').addClass('is-shown').focus();
          $('.status.message.submission-error .message-copy').html(json.value).stop().css("display", "block");
          $(".field-error").removeClass('field-error');

@@ -144,6 +144,10 @@ MITX_FEATURES = {
 
     # Allow use of the hint managment instructor view.
     'ENABLE_HINTER_INSTRUCTOR_VIEW': False,
+
+    # Toggle to enable chat availability (configured on a per-course
+    # basis in Studio)
+    'ENABLE_CHAT': False
 }
 
 # Used for A/B testing
@@ -308,6 +312,8 @@ CODE_JAIL = {
     'limits': {
         # How many CPU seconds can jailed code use?
         'CPU': 1,
+        # How large a file can jailed code write?
+        'FSIZE': 50000,
     },
 }
 

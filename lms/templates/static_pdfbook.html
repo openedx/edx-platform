@@ -1,3 +1,4 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%inherit file="main.html" />
 <%namespace name='static' file='static_content.html'/>
 <%block name="title">
@@ -11,7 +12,7 @@
 <%static:js group='courseware'/>
     <link rel="stylesheet" href="/static/css/pdfviewer.css"/>
     <script type="text/javascript" src="/static/js/vendor/pdfjs/pdf.js"></script>
-    <script type="text/javascript" src="/static/js/pdfviewer.js"></script> 
+    <script type="text/javascript" src="/static/js/pdfviewer.js"></script>
 </%block>
 
 <%block name="js_extra">
@@ -35,10 +36,10 @@
         %if page is not None:
             options.pageNum = ${page};
         %endif
-    
+
         $('#outerContainer').PDFViewer(options);
     });
-  </script>  
+  </script>
 </%block>
 
 <%include file="/courseware/course_navigation.html" args="active_page='pdftextbook/{0}'.format(book_index)" />
@@ -91,40 +92,43 @@
         </div>
 
         %if 'chapters' in textbook:
-	<section aria-label="Textbook Navigation" class="book-sidebar">
-	  <ul id="booknav" class="treeview-booknav">
-	      <%def name="print_entry(entry, index_value)">
-		  <li id="pdfchapter-${index_value}">
-		    <a class="chapter">
-		      ${entry.get('title')}
-		    </a>
-		  </li>
-	      </%def>
+  <div class="pdfbook-wrap">
+  <div class="pdfbook-wrap-inner">
+  	<section aria-label="Textbook Navigation" class="book-sidebar">
+  	  <ul id="booknav" class="treeview-booknav">
+  	      <%def name="print_entry(entry, index_value)">
+  		  <li id="pdfchapter-${index_value}">
+  		    <a class="chapter">
+  		      ${entry.get('title')}
+  		    </a>
+  		  </li>
+  	      </%def>
 
-	      % for (index, entry) in enumerate(textbook['chapters']):
-		${print_entry(entry, index+1)}
-	      % endfor
-	  </ul>
-	</section>
+  	      % for (index, entry) in enumerate(textbook['chapters']):
+  		${print_entry(entry, index+1)}
+  	      % endfor
+  	  </ul>
+  	</section>
         %endif
 
-        <section id="viewerContainer" class="book">
+   <section id="viewerContainer" class="book">
 	  <section class="page">
 	    <!-- use same page-turning as used in image-based textbooks -->
-            <nav>
-              <ul>
-                <li class="last">
-                  <a id="previous">Previous page</a>
-                </li>
-                <li class="next">
-                  <a id="next">Next page</a>
-                </li>
-              </ul>
-            </nav>
-            <div id="viewer" contextmenu="viewerContextMenu"></div>
-          </section>
-        </section>
-
+      <nav>
+        <ul>
+          <li class="last">
+            <a id="previous">${_("Previous page")}</a>
+          </li>
+          <li class="next">
+            <a id="next">${_("Next page")}</a>
+          </li>
+        </ul>
+      </nav>
+      <div id="viewer" contextmenu="viewerContextMenu"></div>
+    </section>
+  </section>
+  </div> <!-- pdfbook-wrap-inner -->
+  </div> <!-- pdfbook-wrap -->
       </div> <!-- mainContainer -->
 
     </div> <!-- outerContainer -->

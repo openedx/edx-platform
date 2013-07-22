@@ -208,8 +208,9 @@ def set_date_and_time(date_css, desired_date, time_css, desired_time):
 def i_created_a_video_component(step):
     world.create_component_instance(
         step, '.large-video-icon',
-        'i4x://edx/templates/video/default',
-        '.xmodule_VideoModule'
+        'video',
+        '.xmodule_VideoModule',
+        has_multiple_templates=False
     )
 
 

@@ -28,7 +28,8 @@ class LogicTest(unittest.TestCase):
     def setUp(self):
         class EmptyClass:
             """Empty object."""
-            pass
+            url_name = ''
+            category = 'test'
 
         self.system = get_test_system()
         self.descriptor = EmptyClass()

@@ -10,7 +10,7 @@ from django.core.cache import cache
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.http import Http404
-from django.http import HttpResponse, HttpResponseBadRequest
+from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
 import pyparsing
@@ -27,7 +27,7 @@ from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.x_module import ModuleSystem
-from xmodule_modifiers import replace_course_urls, replace_static_urls, add_histogram, wrap_xmodule
+from xmodule_modifiers import replace_course_urls, replace_static_urls, add_histogram, wrap_xmodule, save_module  # pylint: disable=F0401
 
 import static_replace
 from psychometrics.psychoanalyze import make_psychometrics_data_update_handler
@@ -36,8 +36,11 @@ from student.models import unique_id_for_user
 from courseware.access import has_access
 from courseware.masquerade import setup_masquerade
 from courseware.model_data import LmsKeyValueStore, LmsUsage, ModelDataCache
+from xblock.runtime import KeyValueStore
+from xblock.core import Scope
 from courseware.models import StudentModule
 from util.sandboxing import can_execute_unsafe_code
+from util.json_request import JsonResponse
 
 log = logging.getLogger(__name__)
 
@@ -225,7 +228,7 @@ def get_module_for_descriptor_internal(user, descriptor, model_data_cache, cours
                                                            userid=str(user.id),
                                                            mod_id=descriptor.location.url(),
                                                            dispatch=dispatch),
-                                       )
+                                               )
         return xqueue_callback_url_prefix + relative_xqueue_callback_url
 
     # Default queuename is course-specific and is derived from the course that
@@ -233,11 +236,12 @@ def get_module_for_descriptor_internal(user, descriptor, model_data_cache, cours
     # TODO: Queuename should be derived from 'course_settings.json' of each course
     xqueue_default_queuename = descriptor.location.org + '-' + descriptor.location.course
 
-    xqueue = {'interface': xqueue_interface,
-              'construct_callback': make_xqueue_callback,
-              'default_queuename': xqueue_default_queuename.replace(' ', '_'),
-              'waittime': settings.XQUEUE_WAITTIME_BETWEEN_REQUESTS
-             }
+    xqueue = {
+        'interface': xqueue_interface,
+        'construct_callback': make_xqueue_callback,
+        'default_queuename': xqueue_default_queuename.replace(' ', '_'),
+        'waittime': settings.XQUEUE_WAITTIME_BETWEEN_REQUESTS
+    }
 
     # This is a hacky way to pass settings to the combined open ended xmodule
     # It needs an S3 interface to upload images to S3
@@ -285,18 +289,24 @@ def get_module_for_descriptor_internal(user, descriptor, model_data_cache, cours
         )
 
     def publish(event):
+        """A function that allows XModules to publish events. This only supports grade changes right now."""
         if event.get('event_name') != 'grade':
             return
 
-        student_module, created = StudentModule.objects.get_or_create(
-            course_id=course_id,
-            student=user,
-            module_type=descriptor.location.category,
-            module_state_key=descriptor.location.url(),
-            defaults={'state': '{}'},
+        usage = LmsUsage(descriptor.location, descriptor.location)
+        # Construct the key for the module
+        key = KeyValueStore.Key(
+            scope=Scope.user_state,
+            student_id=user.id,
+            block_scope_id=usage.id,
+            field_name='grade'
         )
+
+        student_module = model_data_cache.find_or_create(key)
+        # Update the grades
         student_module.grade = event.get('value')
         student_module.max_grade = event.get('max_value')
+        # Save all changes to the underlying KeyValueStore
         student_module.save()
 
         # Bin score into range and increment stats
@@ -387,7 +397,29 @@ def get_module_for_descriptor_internal(user, descriptor, model_data_cache, cours
         if has_access(user, module, 'staff', course_id):
             module.get_html = add_histogram(module.get_html, module, user)
 
+    # force the module to save after rendering
+    module.get_html = save_module(module.get_html, module)
     return module
+
+
+def find_target_student_module(request, user_id, course_id, mod_id):
+    """
+    Retrieve target StudentModule
+    """
+    user = User.objects.get(id=user_id)
+    model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
+        course_id,
+        user,
+        modulestore().get_instance(course_id, mod_id),
+        depth=0,
+        select_for_update=True
+    )
+    instance = get_module(user, request, mod_id, model_data_cache, course_id, grade_bucket_type='xqueue')
+    if instance is None:
+        msg = "No module {0} for user {1}--access denied?".format(mod_id, user)
+        log.debug(msg)
+        raise Http404
+    return instance
 
 
 @csrf_exempt
@@ -408,20 +440,7 @@ def xqueue_callback(request, course_id, userid, mod_id, dispatch):
     if not isinstance(header, dict) or 'lms_key' not in header:
         raise Http404
 
-    # Retrieve target StudentModule
-    user = User.objects.get(id=userid)
-    model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
-        course_id,
-        user,
-        modulestore().get_instance(course_id, mod_id),
-        depth=0,
-        select_for_update=True
-    )
-    instance = get_module(user, request, mod_id, model_data_cache, course_id, grade_bucket_type='xqueue')
-    if instance is None:
-        msg = "No module {0} for user {1}--access denied?".format(mod_id, user)
-        log.debug(msg)
-        raise Http404
+    instance = find_target_student_module(request, userid, course_id, mod_id)
 
     # Transfer 'queuekey' from xqueue response header to the data.
     # This is required to use the interface defined by 'handle_ajax'
@@ -432,6 +451,8 @@ def xqueue_callback(request, course_id, userid, mod_id, dispatch):
     try:
         # Can ignore the return value--not used for xqueue_callback
         instance.handle_ajax(dispatch, data)
+        # Save any state that has changed to the underlying KeyValueStore
+        instance.save()
     except:
         log.exception("error processing ajax call")
         raise
@@ -503,17 +524,19 @@ def modx_dispatch(request, dispatch, location, course_id):
     # Let the module handle the AJAX
     try:
         ajax_return = instance.handle_ajax(dispatch, data)
+        # Save any fields that have changed to the underlying KeyValueStore
+        instance.save()
 
     # If we can't find the module, respond with a 404
     except NotFoundError:
         log.exception("Module indicating to user that request doesn't exist")
         raise Http404
 
-    # For XModule-specific errors, we respond with 400
-    except ProcessingError:
-        log.warning("Module encountered an error while prcessing AJAX call",
+    # For XModule-specific errors, we log the error and respond with an error message
+    except ProcessingError as err:
+        log.warning("Module encountered an error while processing AJAX call",
                     exc_info=True)
-        return HttpResponseBadRequest()
+        return JsonResponse(object={'success': err.args[0]}, status=200)
 
     # If any other error occurred, re-raise it to trigger a 500 response
     except:
