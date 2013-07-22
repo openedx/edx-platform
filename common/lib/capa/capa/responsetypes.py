@@ -33,6 +33,7 @@ from shapely.geometry import Point, MultiPoint
 from calc import evaluator, UndefinedVariable
 from . import correctmap
 from datetime import datetime
+from pytz import UTC
 from .util import *
 from lxml import etree
 from lxml.html.soupparser import fromstring as fromstring_bs     # uses Beautiful Soup!!! FIXME?
@@ -1383,7 +1384,7 @@ class CodeResponse(LoncapaResponse):
         #------------------------------------------------------------
 
         qinterface = self.system.xqueue['interface']
-        qtime = datetime.strftime(datetime.now(), xqueue_interface.dateformat)
+        qtime = datetime.strftime(datetime.now(UTC), xqueue_interface.dateformat)
 
         anonymous_student_id = self.system.anonymous_student_id
 
