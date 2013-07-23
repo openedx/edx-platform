@@ -39,10 +39,10 @@ table.stat_table td {
 	border-color: #666666;
 	background-color: #ffffff;
 }
-.divScroll {  
-	height: 200px;  
-	overflow: scroll;  
-}  
+.divScroll {
+	height: 200px;
+	overflow: scroll;
+}
 
 a.selectedmode { background-color: yellow; }
 
@@ -114,7 +114,7 @@ function goto( mode)
           <a href="#" onclick="goto('Data');" class="${modeflag.get('Data')}">DataDump</a> |
           <a href="#" onclick="goto('Manage Groups');" class="${modeflag.get('Manage Groups')}">Manage Groups</a>
           %if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_ANALYTICS'):
-             | <a href="#" onclick="goto('Analytics');" class="${modeflag.get('Analytics')}">Analytics</a> 
+             | <a href="#" onclick="goto('Analytics');" class="${modeflag.get('Analytics')}">Analytics</a>
           %endif
 	  ]
     </h2>
@@ -449,6 +449,7 @@ function goto( mode)
     <p>
       Students enrolled:
       ${analytics_results["StudentsEnrolled"]['data'][0]['students']}
+      (${analytics_results["StudentsEnrolled"]['time']})
     </p>
   %endif
 
@@ -456,11 +457,15 @@ function goto( mode)
     <p>
       Students active in the last week:
       ${analytics_results["StudentsActive"]['data'][0]['active']}
+      (${analytics_results["StudentsActive"]['time']})
     </p>
   %endif
 
   %if analytics_results.get("StudentsDropoffPerDay"):
-    <p>Student activity day by day</p>
+    <p>
+      Student activity day by day
+      (${analytics_results["StudentsDropoffPerDay"]['time']})
+    </p>
     <div>
       <table class="stat_table">
         <tr>
@@ -479,7 +484,10 @@ function goto( mode)
   %endif
   <br/>
   %if analytics_results.get("ProblemGradeDistribution"):
-    <p>Answer distribution for problems</p>
+    <p>
+      Answer distribution for problems
+      (${analytics_results["ProblemGradeDistribution"]['time']})
+    </p>
     <div>
       <table class="stat_table">
         <tr>
@@ -513,7 +521,10 @@ function goto( mode)
   ##This is not as helpful as it could be -- let's give full point distribution
   ##instead.
   %if analytics_results.get("StudentsPerProblemCorrect"):
-    <p>Students answering correctly</p>
+    <p>
+      Students answering correctly
+      (${analytics_results["StudentsPerProblemCorrect"]['time']})
+    </p>
     <div class="divScroll">
       <table class="stat_table">
         <tr>
@@ -597,7 +608,7 @@ function goto( mode)
 
 %endif
 
-##----------------------------------------------------------------------------- 
+##-----------------------------------------------------------------------------
 
 %if datatable and modeflag.get('Psychometrics') is None:
 
