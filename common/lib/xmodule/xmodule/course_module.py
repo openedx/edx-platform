@@ -410,7 +410,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
                     continue
 
         # TODO check that this is still needed here and can't be by defaults.
-        if not self.tabs or (isinstance(self.tabs, list) and len(self.tabs) == 0):
+        if not self.tabs:
             # When calling the various _tab methods, can omit the 'type':'blah' from the
             # first arg, since that's only used for dispatch
             tabs = []
