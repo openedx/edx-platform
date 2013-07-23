@@ -3,6 +3,7 @@ from django.test.client import Client
 from django.contrib.auth.models import User
 from util.testing import UrlResetMixin
 from mock import patch
+from django.core.urlresolvers import reverse
 
 
 class AutoAuthEnabledTestCase(UrlResetMixin, TestCase):
@@ -68,8 +69,17 @@ class AutoAuthEnabledTestCase(UrlResetMixin, TestCase):
         # make sure it is the same user
         self.assertEqual(qset.count(), 1)
 
+    def test_csrf_disabled(self):
+        """
+        test that when load testing, csrf protection is off
+        """
+        self.client = Client(enforce_csrf_checks=True)
+        csrf_protected_url = reverse("signin_user")
+        response = self.client.get(csrf_protected_url)
+        self.assertEqual(response.status_code, 200)
 
-class AutoAuthDisabledTestCase(UrlResetMixin):
+
+class AutoAuthDisabledTestCase(UrlResetMixin, TestCase):
     """
     Test that the page is inaccessible with default settings
     """
@@ -90,3 +100,13 @@ class AutoAuthDisabledTestCase(UrlResetMixin):
         """
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 404)
+
+    def test_csrf_enabled(self):
+        """
+        test that when not load testing, csrf protection is on
+        """
+        self.client = Client(enforce_csrf_checks=True)
+        csrf_protected_url = reverse("signin_user")
+        response = self.client.post(csrf_protected_url)
+        self.assertEqual(response.status_code, 403)
+
