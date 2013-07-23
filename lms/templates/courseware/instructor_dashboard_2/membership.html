@@ -1,5 +1,31 @@
 <%page args="section_data"/>
 
+<script type="text/template" id="member-list-widget-template">
+  <div class="member-list-widget">
+    <div class="header">
+      <div class="title"> {{title}} </div>
+      <div class="info-badge"></div>
+    </div>
+    <div class="info"> {{info}} </div>
+    <div class="member-list">
+      <table>
+        <thead>
+          <tr>
+            {{#labels}}
+              <td class="label">{{.}}</td>
+            {{/labels}}
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="bottom-bar">
+      <input type="text" name="add-field" class="add-field" placeholder="{{add_placeholder}}">
+      <input type="button" name="add" class="add" value="{{add_btn_label}}">
+    </div>
+  </div>
+</script>
+
 <div class="vert-left batch-enrollment">
   <h2>Batch Enrollment</h2>
   <p>Enter student emails separated by new lines or commas.</p>
@@ -26,66 +52,75 @@
     <option> Getting available lists... </option>
   </select>
 
+  <div class="request-response-error"></div>
+
   %if section_data['access']['instructor']:
-    <div class="auth-list-container" data-rolename="staff" data-display-name="Staff">
-      <div class="auth-list-table" data-endpoint="${ section_data['list_course_role_members_url'] }"></div>
-      <div class="auth-list-add" data-endpoint="${ section_data['modify_access_url'] }">
-        <input type="text" name="email" placeholder="Enter Email" spellcheck="false">
-        <input type="button" name="allow" value="Grant Staff Access">
-      </div>
-      <div class="request-response-error"></div>
-    </div>
+    <div class="auth-list-container"
+      data-rolename="staff"
+      data-display-name="Course Staff"
+      data-info-text="
+        Course staff can help you manage limited aspects of your course. Staff can
+        enroll and unenroll students, as well as modify their grades and see all
+        course data. Course staff are not given access to Studio will not be able to
+        edit your course."
+      data-list-endpoint="${ section_data['list_course_role_members_url'] }"
+      data-modify-endpoint="${ section_data['modify_access_url'] }"
+      data-add-button-label="Add Staff"
+    ></div>
 
     %if section_data['access']['instructor']:
-      <div class="auth-list-container" data-rolename="instructor" data-display-name="Instructors">
-        <div class="auth-list-table" data-endpoint="${ section_data['list_course_role_members_url'] }"></div>
-        <div class="auth-list-add" data-endpoint="${ section_data['modify_access_url'] }">
-          <input type="text" name="email" placeholder="Enter Email" spellcheck="false">
-          <input type="button" name="allow" value="Grant Instructor Access">
-        </div>
-        <div class="request-response-error"></div>
-      </div>
+      <div class="auth-list-container"
+        data-rolename="instructor"
+        data-display-name="Instructors"
+        data-info-text="
+          Instructors are the core administration of your course. Instructors can
+          add and remove course staff, as well as administer forum access.
+          "
+        data-list-endpoint="${ section_data['list_course_role_members_url'] }"
+        data-modify-endpoint="${ section_data['modify_access_url'] }"
+        data-add-button-label="Add Instructor"
+      ></div>
     %endif
 
-    <div class="auth-list-container" data-rolename="beta" data-display-name="Beta Testers">
-      <div class="auth-list-table" data-endpoint="${ section_data['list_course_role_members_url'] }"></div>
-      <div class="auth-list-add" data-endpoint="${ section_data['modify_access_url'] }">
-        <input type="text" name="email" placeholder="Enter Email" spellcheck="false">
-        <input type="button" name="allow" value="Grant Beta Tester Access">
-      </div>
-      <div class="request-response-error"></div>
-    </div>
+    <div class="auth-list-container"
+      data-rolename="beta"
+      data-display-name="Beta Testers"
+      data-info-text="
+        Beta testers can see course content before the rest of the students.
+        They can make sure that the content works, but have no additional
+        privelages."
+      data-list-endpoint="${ section_data['list_course_role_members_url'] }"
+      data-modify-endpoint="${ section_data['modify_access_url'] }"
+      data-add-button-label="Add Beta Tester"
+    ></div>
   %endif
 
   %if section_data['access']['instructor']:
-      <div class="auth-list-container" data-rolename="Administrator" data-display-name="Forum Admins">
-        <div class="auth-list-table" data-endpoint="${ section_data['list_forum_members_url'] }"></div>
-        <div class="auth-list-add" data-endpoint="${ section_data['update_forum_role_membership_url'] }">
-          <input type="text" name="email" placeholder="Enter Email" spellcheck="false">
-          <input type="button" name="allow" value="Grant Forum Admin">
-        </div>
-        <div class="request-response-error"></div>
-      </div>
+      <div class="auth-list-container"
+        data-rolename="Administrator"
+        data-display-name="Forum Admins"
+        data-list-endpoint="${ section_data['list_forum_members_url'] }"
+        data-modify-endpoint="${ section_data['update_forum_role_membership_url'] }"
+        data-add-button-label="Add Forum Admin"
+      ></div>
   %endif
 
   %if section_data['access']['instructor'] or section_data['access']['forum_admin']:
-    <div class="auth-list-container" data-rolename="Moderator" data-display-name="Forum Moderators">
-      <div class="auth-list-table" data-endpoint="${ section_data['list_forum_members_url'] }"></div>
-      <div class="auth-list-add" data-endpoint="${ section_data['update_forum_role_membership_url'] }">
-        <input type="text" name="email" placeholder="Enter Email" spellcheck="false">
-        <input type="button" name="allow" value="Grant Forum Moderator">
-      </div>
-      <div class="request-response-error"></div>
-    </div>
+    <div class="auth-list-container"
+      data-rolename="Moderator"
+      data-display-name="Forum Moderators"
+      data-list-endpoint="${ section_data['list_forum_members_url'] }"
+      data-modify-endpoint="${ section_data['update_forum_role_membership_url'] }"
+      data-add-button-label="Add Moderator"
+    ></div>
 
-    <div class="auth-list-container" data-rolename="Community TA" data-display-name="Forum Community TAs">
-      <div class="auth-list-table" data-endpoint="${ section_data['list_forum_members_url'] }"></div>
-      <div class="auth-list-add" data-endpoint="${ section_data['update_forum_role_membership_url'] }">
-        <input type="text" name="email" placeholder="Enter Email" spellcheck="false">
-        <input type="button" name="allow" value="Grant Community TA">
-      </div>
-      <div class="request-response-error"></div>
-    </div>
+    <div class="auth-list-container"
+      data-rolename="Community TA"
+      data-display-name="Forum Community TAs"
+      data-list-endpoint="${ section_data['list_forum_members_url'] }"
+      data-modify-endpoint="${ section_data['update_forum_role_membership_url'] }"
+      data-add-button-label="Add Community TA"
+    ></div>
   %endif
 
 </div>

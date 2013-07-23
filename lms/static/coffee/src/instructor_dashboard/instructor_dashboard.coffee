@@ -64,7 +64,7 @@ setup_instructor_dashboard = (idash_content) =>
       section.addClass CSS_ACTIVE_SECTION
 
       # tracking
-      # analytics.pageview "instructor_#{section_name}"
+      analytics.pageview "instructor_section:#{section_name}"
 
       # deep linking
       # write to url

@@ -18,92 +18,91 @@
     right: 15px;
     font-size: 11pt;
   }
+}
 
-  section.instructor-dashboard-content-2 {
-    @extend .content;
-    // position: relative;
-    padding: 40px;
-    width: 100%;
+section.instructor-dashboard-content-2 {
+  @extend .content;
+  // position: relative;
+  padding: 40px;
+  width: 100%;
 
-    // .has-event-handler-for-click {
-    //   border: 1px solid blue;
-    // }
+  // .has-event-handler-for-click {
+  //   border: 1px solid blue;
+  // }
 
-    .request-response-error {
-      margin-top: 1em;
-      margin-bottom: 1em;
-      color: $error-red;
+  .request-response-error {
+    margin-top: 1em;
+    margin-bottom: 1em;
+    color: $error-red;
+  }
+
+  .slickgrid {
+    margin-left: 1px;
+    color:#333333;
+    font-size:11px;
+    font-family: verdana,arial,sans-serif;
+
+    .slick-header-column {
+      // height: 100%
     }
 
-    .slickgrid {
-      margin-left: 1px;
-      color:#333333;
-      font-size:11px;
-      font-family: verdana,arial,sans-serif;
-
-      .slick-header-column {
-        // height: 100%
-      }
-
-      .slick-cell {
-        border: 1px dotted silver;
-        border-collapse: collapse;
-        white-space: normal;
-        word-wrap: break-word;
-      }
-    }
-
-    h1 {
-      @extend .top-header;
-      padding-bottom: 0;
-      border-bottom: 0;
-    }
-
-    input[type="button"] {
-      @include idashbutton(#eee);
-
-      &.molly-guard {
-        // @include idashbutton($danger-red);
-        // @include idashbutton($black);
-        // border: 2px solid $danger-red;
-      }
-    }
-
-    .instructor_dash_glob_info {
-      position: absolute;
-      top: 46px;
-      right: 50px;
-      text-align: right;
-    }
-
-    .instructor-nav {
-      padding-bottom: 1em;
-
-      border-bottom: 1px solid #C8C8C8;
-      a {
-        margin-right: 1.2em;
-      }
-
-      .active-section {
-        color: #551A8B;
-      }
-    }
-
-    section.idash-section {
-      display: none;
-      // background-color: #0f0;
-
-      &.active-section {
-        display: block;
-        // background-color: #ff0;
-      }
-
-      .basic-data {
-        padding: 6px;
-      }
+    .slick-cell {
+      border: 1px dotted silver;
+      border-collapse: collapse;
+      white-space: normal;
+      word-wrap: break-word;
     }
   }
-  // @extend .table-wrapper;
+
+  h1 {
+    @extend .top-header;
+    padding-bottom: 0;
+    border-bottom: 0;
+  }
+
+  input[type="button"] {
+    @include idashbutton(#eee);
+
+    &.molly-guard {
+      // @include idashbutton($danger-red);
+      // @include idashbutton($black);
+      // border: 2px solid $danger-red;
+    }
+  }
+
+  .instructor_dash_glob_info {
+    position: absolute;
+    top: 46px;
+    right: 50px;
+    text-align: right;
+  }
+
+  .instructor-nav {
+    padding-bottom: 1em;
+
+    border-bottom: 1px solid #C8C8C8;
+    a {
+      margin-right: 1.2em;
+    }
+
+    .active-section {
+      color: #551A8B;
+    }
+  }
+
+  section.idash-section {
+    display: none;
+    // background-color: #0f0;
+
+    &.active-section {
+      display: block;
+      // background-color: #ff0;
+    }
+
+    .basic-data {
+      padding: 6px;
+    }
+  }
 }
 
 
@@ -250,14 +249,20 @@
       display: block;
     }
 
-    .auth-list-table {
-      .slickgrid {
-        height: 250px;
-      }
-    }
+    .revoke {
+      width: 10px;
+      height: 10px;
+      background: url('../images/moderator-delete-icon.png') left center no-repeat;
+      opacity: 0.7;
+      &:hover  { opacity: 0.8; }
+      &:active { opacity: 0.9; }
 
-    .auth-list-add {
-      margin-top: 0.5em;
+      // @include idashbutton($danger-red);
+      // line-height: 0.6em;
+      // margin-top: 5px;
+      // padding: 6px 9px;
+      // font-size: 9pt;
+      // border-radius: 10px;
     }
   }
 }
@@ -327,5 +332,117 @@
         height: 400px;
       }
     }
+  }
+}
+
+
+.member-list-widget {
+  $width: 20 * $baseline;
+  $height: 25 * $baseline;
+  $header-height: 3 * $baseline;
+  $bottom-bar-height: 3 * $baseline;
+  $content-height: $height - $header-height - $bottom-bar-height;
+  $border-radius: 3px;
+
+  width: $width;
+  height: $height;
+
+  .header {
+    @include box-sizing(border-box);
+    @include border-top-radius($border-radius);
+
+    position: relative;
+    padding: $baseline;
+    width: $width;
+    height: $header-height;
+
+    background-color: #efefef;
+    border: 1px solid $light-gray;
+  }
+
+  .title {
+    font-size: 16pt;
+  }
+
+  .label {
+    color: $lighter-base-font-color;
+    font-size: $body-font-size * 4/5;
+  }
+
+  .info-badge {
+    // float: right;
+    position: absolute;
+    top: $baseline / 2;
+    right: $baseline / 2;
+    width: 17px;
+    height: 17px;
+    background: url('../images/info-icon-dark.png') left center no-repeat;
+    opacity: 0.35;
+    &:hover  { opacity: 0.45; }
+    &:active { opacity: 0.5; }
+  }
+
+  .info {
+    display: none;
+
+    @include box-sizing(border-box);
+    max-height: $content-height;
+    padding: $baseline;
+
+    border: 1px solid $light-gray;
+    border-top: none;
+    color: $lighter-base-font-color;
+    line-height: 1.3em;
+  }
+
+  .member-list {
+    @include box-sizing(border-box);
+    overflow: auto;
+    padding-top: 0;
+    width: $width;
+    max-height: $content-height;
+
+    table {
+      width: 100%;
+    }
+
+    tr {
+      border-bottom: 1px solid $light-gray;
+    }
+
+    td {
+      table-layout: fixed;
+      vertical-align: middle;
+      word-wrap: break-word;
+      padding-left: 15px;
+      border-left:  1px solid $light-gray;
+      border-right: 1px solid $light-gray;
+
+      font-size: 3/4 *$body-font-size;
+    }
+  }
+
+  .bottom-bar {
+    @include box-sizing(border-box);
+    @include border-bottom-radius($border-radius);
+
+    position: relative;
+    width: $width;
+    height: $bottom-bar-height;
+    padding: $baseline / 2;
+
+    // border-top: none;
+    margin-top: -1px;
+    border: 1px solid $light-gray;
+    background-color: #efefef;
+    box-shadow: inset #bbb 0px 1px 1px 0px;
+  }
+
+  // .add-field
+
+  input[type="button"].add {
+    @include idashbutton($blue);
+    position: absolute;
+    right: $baseline;
   }
 }

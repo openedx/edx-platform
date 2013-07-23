@@ -7,6 +7,175 @@ plantTimeout = -> window.InstructorDashboard.util.plantTimeout.apply this, argum
 std_ajax_err = -> window.InstructorDashboard.util.std_ajax_err.apply this, arguments
 
 
+class MemberListWidget
+  # create a MemberListWidget `$container` is a jquery object to embody.
+  # `params` holds template parameters. `params` should look like the defaults below.
+  constructor: (@$container, params={}) ->
+    params = _.defaults params,
+      title: "Member List"
+      info: """
+        Use this list to manage members.
+      """
+      labels: ["field1", "field2", "field3"]
+      add_placeholder: "Enter name"
+      add_btn_label: "Add Member"
+      add_handler: (input) ->
+
+    template_html = $("#member-list-widget-template").html()
+    @$container.html Mustache.render template_html, params
+
+    # bind info toggle
+    @$('.info-badge').click => @toggle_info()
+
+    # bind add button
+    @$('input[type="button"].add').click =>
+      params.add_handler? @$('.add-field').val()
+
+  show_info: ->
+      @$('.info').show()
+      @$('.member-list').hide()
+
+  show_list: ->
+      @$('.info').hide()
+      @$('.member-list').show()
+
+  toggle_info: ->
+      @$('.info').toggle()
+      @$('.member-list').toggle()
+
+  # clear the input text field
+  clear_input: -> @$('.add-field').val ''
+
+  # clear all table rows
+  clear_rows: -> @$('table tbody').empty()
+
+  # takes a table row as an array items are inserted as text, unless detected
+  # as a jquery objects in which case they are inserted directly. if an
+  # element is a jquery object
+  add_row: (row_array) ->
+    $tbody = @$('table tbody')
+    $tr = $ '<tr>'
+    for item in row_array
+      $td = $ '<td>'
+      if item instanceof jQuery
+        $td.append item
+      else
+        $td.text item
+      $tr.append $td
+    $tbody.append $tr
+
+  # local selector
+  $: (selector) ->
+    if @debug?
+      s = @$container.find selector
+      if s?.length != 1
+        console.warn "local selector '#{selector}' found (#{s.length}) results"
+      s
+    else
+      @$container.find selector
+
+
+class AuthListWidget extends MemberListWidget
+  constructor: ($container, @rolename, @$error_section) ->
+    super $container,
+      title: $container.data 'display-name'
+      info: $container.data 'info-text'
+      labels: ["username", "email", "revoke access"]
+      add_placeholder: "Enter email"
+      add_btn_label: $container.data 'add-button-label'
+      add_handler: (input) => @add_handler input
+
+    @debug = true
+    @list_endpoint = $container.data 'list-endpoint'
+    @modify_endpoint = $container.data 'modify-endpoint'
+    unless @rolename?
+      throw "AuthListWidget missing @rolename"
+
+    @reload_list()
+
+  # action to do when is reintroduced into user's view
+  re_view: ->
+    @clear_errors()
+    @clear_input()
+    @reload_list()
+    @$('.info').hide()
+    @$('.member-list').show()
+
+  # handle clicks on the add button
+  add_handler: (input) ->
+    if input? and input isnt ''
+      @modify_member_access input, 'allow', (error) =>
+        # abort on error
+        return @show_errors error unless error is null
+        @clear_errors()
+        @clear_input()
+        @reload_list()
+    else
+      @show_errors "Enter an email."
+
+  # reload the list of members
+  reload_list: ->
+    # @clear_rows()
+    # @show_info()
+    @get_member_list (error, member_list) =>
+      # abort on error
+      return @show_errors error unless error is null
+
+      # only show the list of there are members
+      @clear_rows()
+      @show_info()
+      # @show_info()
+
+      # use _.each instead of 'for' so that member
+      # is bound in the button callback.
+      _.each member_list, (member) =>
+        # if there are members, show the list
+
+        # create revoke button and insert it into the row
+        $revoke_btn = $ '<div/>',
+          class: 'revoke'
+          click: =>
+            @modify_member_access member.email, 'revoke', (error) =>
+              # abort on error
+              return @show_errors error unless error is null
+              @clear_errors()
+              @reload_list()
+        @add_row [member.username, member.email, $revoke_btn]
+        # make sure the list is shown because there are members.
+        @show_list()
+
+  # clear error display
+  clear_errors: -> @$error_section?.text ''
+
+  # set error display
+  show_errors: (msg) -> @$error_section?.text msg
+
+  # send ajax request to list members
+  # `cb` is called with cb(error, member_list)
+  get_member_list: (cb) ->
+    $.ajax
+      dataType: 'json'
+      url: @list_endpoint
+      data: rolename: @rolename
+      success: (data) => cb? null, data[@rolename]
+      error: std_ajax_err => cb? "Error fetching list for role '#{@rolename}'"
+
+  # send ajax request to modify access
+  # (add or remove them from the list)
+  # `action` can be 'allow' or 'revoke'
+  # `cb` is called with cb(error, data)
+  modify_member_access: (email, action, cb) ->
+    $.ajax
+      dataType: 'json'
+      url: @modify_endpoint
+      data:
+        email: email
+        rolename: @rolename
+        action: action
+      success: (data) => cb? null, data
+      error: std_ajax_err => cb? "Error changing user's permissions."
+
+
 # Wrapper for the batch enrollment subsection.
 # This object handles buttons, success and failure reporting,
 # and server communication.
@@ -277,13 +446,15 @@ class Membership
     plantTimeout 0, => new BatchEnrollment @$section.find '.batch-enrollment'
 
     # gather elements
-    @$list_selector = @$section.find('select#member-lists-selector')
+    @$list_selector = @$section.find 'select#member-lists-selector'
+    @$auth_list_containers = @$section.find '.auth-list-container'
+    @$auth_list_errors = @$section.find '.member-lists-management .request-response-error'
 
     # initialize & store AuthList subsections
     # one for each .auth-list-container in the section.
-    @auth_lists = _.map (@$section.find '.auth-list-container'), (auth_list_container) ->
+    @auth_lists = _.map (@$auth_list_containers), (auth_list_container) =>
       rolename = $(auth_list_container).data 'rolename'
-      new AuthList $(auth_list_container), rolename
+      new AuthListWidget $(auth_list_container), rolename, @$auth_list_errors
 
     # populate selector
     @$list_selector.empty()
@@ -299,17 +470,14 @@ class Membership
       for auth_list in @auth_lists
         auth_list.$container.removeClass 'active'
       auth_list = $opt.data('auth_list')
-      auth_list.refresh()
       auth_list.$container.addClass 'active'
+      auth_list.re_view()
 
     # one-time first selection of top list.
     @$list_selector.change()
 
-
   # handler for when the section title is clicked.
   onClickTitle: ->
-    for auth_list in @auth_lists
-      auth_list.refresh()
 
 
 # export for use
