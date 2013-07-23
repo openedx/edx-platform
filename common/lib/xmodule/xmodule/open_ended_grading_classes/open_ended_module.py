@@ -19,6 +19,7 @@ import openendedchild
 from numpy import median
 
 from datetime import datetime
+from pytz import UTC
 
 from .combined_open_ended_rubric import CombinedOpenEndedRubric
 
@@ -170,7 +171,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         if xqueue is None:
             return {'success': False, 'msg': "Couldn't submit feedback."}
         qinterface = xqueue['interface']
-        qtime = datetime.strftime(datetime.now(), xqueue_interface.dateformat)
+        qtime = datetime.strftime(datetime.now(UTC), xqueue_interface.dateformat)
         anonymous_student_id = system.anonymous_student_id
         queuekey = xqueue_interface.make_hashkey(str(system.seed) + qtime +
                                                  anonymous_student_id +
@@ -224,7 +225,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         if xqueue is None:
             return False
         qinterface = xqueue['interface']
-        qtime = datetime.strftime(datetime.now(), xqueue_interface.dateformat)
+        qtime = datetime.strftime(datetime.now(UTC), xqueue_interface.dateformat)
 
         anonymous_student_id = system.anonymous_student_id
 

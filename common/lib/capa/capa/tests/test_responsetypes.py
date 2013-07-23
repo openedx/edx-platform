@@ -18,6 +18,8 @@ from capa.correctmap import CorrectMap
 from capa.util import convert_files_to_filenames
 from capa.xqueue_interface import dateformat
 
+from pytz import UTC
+
 
 class ResponseTest(unittest.TestCase):
     """ Base class for tests of capa responses."""
@@ -333,8 +335,9 @@ class SymbolicResponseTest(ResponseTest):
 
         correct_map = problem.grade_answers(input_dict)
 
-        self.assertEqual(correct_map.get_correctness('1_2_1'),
-                        expected_correctness)
+        self.assertEqual(
+            correct_map.get_correctness('1_2_1'), expected_correctness
+        )
 
 
 class OptionResponseTest(ResponseTest):
@@ -702,7 +705,7 @@ class CodeResponseTest(ResponseTest):
         # Now we queue the LCP
         cmap = CorrectMap()
         for i, answer_id in enumerate(answer_ids):
-            queuestate = CodeResponseTest.make_queuestate(i, datetime.now())
+            queuestate = CodeResponseTest.make_queuestate(i, datetime.now(UTC))
             cmap.update(CorrectMap(answer_id=answer_ids[i], queuestate=queuestate))
         self.problem.correct_map.update(cmap)
 
@@ -718,7 +721,7 @@ class CodeResponseTest(ResponseTest):
         old_cmap = CorrectMap()
         for i, answer_id in enumerate(answer_ids):
             queuekey = 1000 + i
-            queuestate = CodeResponseTest.make_queuestate(queuekey, datetime.now())
+            queuestate = CodeResponseTest.make_queuestate(queuekey, datetime.now(UTC))
             old_cmap.update(CorrectMap(answer_id=answer_ids[i], queuestate=queuestate))
 
         # Message format common to external graders
@@ -778,13 +781,15 @@ class CodeResponseTest(ResponseTest):
         cmap = CorrectMap()
         for i, answer_id in enumerate(answer_ids):
             queuekey = 1000 + i
-            latest_timestamp = datetime.now()
+            latest_timestamp = datetime.now(UTC)
             queuestate = CodeResponseTest.make_queuestate(queuekey, latest_timestamp)
             cmap.update(CorrectMap(answer_id=answer_id, queuestate=queuestate))
         self.problem.correct_map.update(cmap)
 
         # Queue state only tracks up to second
-        latest_timestamp = datetime.strptime(datetime.strftime(latest_timestamp, dateformat), dateformat)
+        latest_timestamp = datetime.strptime(
+            datetime.strftime(latest_timestamp, dateformat), dateformat
+        ).replace(tzinfo=UTC)
 
         self.assertEquals(self.problem.get_recentmost_queuetime(), latest_timestamp)
 

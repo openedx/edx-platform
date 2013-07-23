@@ -213,22 +213,28 @@ def get_module_for_descriptor_internal(user, descriptor, model_data_cache, cours
         return None
 
     # Setup system context for module instance
-    ajax_url = reverse('modx_dispatch',
-                       kwargs=dict(course_id=course_id,
-                                   location=descriptor.location.url(),
-                                   dispatch=''),
-                       )
+    ajax_url = reverse(
+        'modx_dispatch',
+        kwargs=dict(
+            course_id=course_id,
+            location=descriptor.location.url(),
+            dispatch=''
+        ),
+    )
     # Intended use is as {ajax_url}/{dispatch_command}, so get rid of the trailing slash.
     ajax_url = ajax_url.rstrip('/')
 
     def make_xqueue_callback(dispatch='score_update'):
         # Fully qualified callback URL for external queueing system
-        relative_xqueue_callback_url = reverse('xqueue_callback',
-                                               kwargs=dict(course_id=course_id,
-                                                           userid=str(user.id),
-                                                           mod_id=descriptor.location.url(),
-                                                           dispatch=dispatch),
-                                               )
+        relative_xqueue_callback_url = reverse(
+            'xqueue_callback',
+            kwargs=dict(
+                course_id=course_id,
+                userid=str(user.id),
+                mod_id=descriptor.location.url(),
+                dispatch=dispatch
+            ),
+        )
         return xqueue_callback_url_prefix + relative_xqueue_callback_url
 
     # Default queuename is course-specific and is derived from the course that
@@ -313,10 +319,12 @@ def get_module_for_descriptor_internal(user, descriptor, model_data_cache, cours
         score_bucket = get_score_bucket(student_module.grade, student_module.max_grade)
         org, course_num, run = course_id.split("/")
 
-        tags = ["org:{0}".format(org),
-                "course:{0}".format(course_num),
-                "run:{0}".format(run),
-                "score_bucket:{0}".format(score_bucket)]
+        tags = [
+            "org:{0}".format(org),
+            "course:{0}".format(course_num),
+            "run:{0}".format(run),
+            "score_bucket:{0}".format(score_bucket)
+        ]
 
         if grade_bucket_type is not None:
             tags.append('type:%s' % grade_bucket_type)
@@ -326,38 +334,41 @@ def get_module_for_descriptor_internal(user, descriptor, model_data_cache, cours
     # TODO (cpennington): When modules are shared between courses, the static
     # prefix is going to have to be specific to the module, not the directory
     # that the xml was loaded from
-    system = ModuleSystem(track_function=track_function,
-                          render_template=render_to_string,
-                          ajax_url=ajax_url,
-                          xqueue=xqueue,
-                          # TODO (cpennington): Figure out how to share info between systems
-                          filestore=descriptor.system.resources_fs,
-                          get_module=inner_get_module,
-                          user=user,
-                          # TODO (cpennington): This should be removed when all html from
-                          # a module is coming through get_html and is therefore covered
-                          # by the replace_static_urls code below
-                          replace_urls=partial(
-                              static_replace.replace_static_urls,
-                              data_directory=getattr(descriptor, 'data_dir', None),
-                              course_namespace=descriptor.location._replace(category=None, name=None),
-                          ),
-                          node_path=settings.NODE_PATH,
-                          xblock_model_data=xblock_model_data,
-                          publish=publish,
-                          anonymous_student_id=unique_id_for_user(user),
-                          course_id=course_id,
-                          open_ended_grading_interface=open_ended_grading_interface,
-                          s3_interface=s3_interface,
-                          cache=cache,
-                          can_execute_unsafe_code=(lambda: can_execute_unsafe_code(course_id)),
-                          )
+    system = ModuleSystem(
+        track_function=track_function,
+        render_template=render_to_string,
+        ajax_url=ajax_url,
+        xqueue=xqueue,
+        # TODO (cpennington): Figure out how to share info between systems
+        filestore=descriptor.system.resources_fs,
+        get_module=inner_get_module,
+        user=user,
+        # TODO (cpennington): This should be removed when all html from
+        # a module is coming through get_html and is therefore covered
+        # by the replace_static_urls code below
+        replace_urls=partial(
+            static_replace.replace_static_urls,
+            data_directory=getattr(descriptor, 'data_dir', None),
+            course_namespace=descriptor.location._replace(category=None, name=None),
+        ),
+        node_path=settings.NODE_PATH,
+        xblock_model_data=xblock_model_data,
+        publish=publish,
+        anonymous_student_id=unique_id_for_user(user),
+        course_id=course_id,
+        open_ended_grading_interface=open_ended_grading_interface,
+        s3_interface=s3_interface,
+        cache=cache,
+        can_execute_unsafe_code=(lambda: can_execute_unsafe_code(course_id)),
+    )
     # pass position specified in URL to module through ModuleSystem
     system.set('position', position)
     system.set('DEBUG', settings.DEBUG)
     if settings.MITX_FEATURES.get('ENABLE_PSYCHOMETRICS'):
-        system.set('psychometrics_handler',  # set callback for updating PsychometricsData
-                   make_psychometrics_data_update_handler(course_id, user, descriptor.location.url()))
+        system.set(
+            'psychometrics_handler',  # set callback for updating PsychometricsData
+            make_psychometrics_data_update_handler(course_id, user, descriptor.location.url())
+        )
 
     try:
         module = descriptor.xmodule(system)
@@ -381,13 +392,14 @@ def get_module_for_descriptor_internal(user, descriptor, model_data_cache, cours
     system.set('user_is_staff', has_access(user, descriptor.location, 'staff', course_id))
     _get_html = module.get_html
 
-    if wrap_xmodule_display == True:
+    if wrap_xmodule_display is True:
         _get_html = wrap_xmodule(module.get_html, module, 'xmodule_display.html')
 
     module.get_html = replace_static_urls(
         _get_html,
         getattr(descriptor, 'data_dir', None),
-        course_namespace=module.location._replace(category=None, name=None))
+        course_namespace=module.location._replace(category=None, name=None)
+    )
 
     # Allow URLs of the form '/course/' refer to the root of multicourse directory
     #   hierarchy of this course
