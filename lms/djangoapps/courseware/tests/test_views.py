@@ -6,9 +6,12 @@ from django.http import Http404
 from django.test.utils import override_settings
 from django.contrib.auth.models import User
 from django.test.client import RequestFactory
+
 from django.conf import settings
+from django.core.urlresolvers import reverse
 
 from student.models import CourseEnrollment
+from student.tests.factories import AdminFactory
 from xmodule.modulestore.django import modulestore
 
 import courseware.views as views
@@ -161,3 +164,26 @@ class ViewsTestCase(TestCase):
         #       generate/store a real password.
         self.assertEquals(chat_settings['password'], "johndoe@%s" % domain)
 
+    def test_submission_history_xss(self):
+        # log into a staff account
+        admin = AdminFactory()
+
+        self.client.login(username=admin.username, password='test')
+
+        # try it with an existing user and a malicious location
+        url = reverse('submission_history', kwargs={
+            'course_id': self.course_id,
+            'student_username': 'dummy',
+            'location': '<script>alert("hello");</script>'
+        })
+        response = self.client.get(url)
+        self.assertFalse('<script>' in response.content)
+
+        # try it with a malicious user and a non-existent location
+        url = reverse('submission_history', kwargs={
+            'course_id': self.course_id,
+            'student_username': '<script>alert("hello");</script>',
+            'location': 'dummy'
+        })
+        response = self.client.get(url)
+        self.assertFalse('<script>' in response.content)

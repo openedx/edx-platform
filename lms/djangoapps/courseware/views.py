@@ -14,6 +14,7 @@ from django.shortcuts import redirect
 from mitxmako.shortcuts import render_to_response, render_to_string
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
+from markupsafe import escape
 
 from courseware import grades
 from courseware.access import has_access
@@ -774,19 +775,16 @@ def submission_history(request, course_id, student_username, location):
                                                    module_state_key=location,
                                                    student_id=student.id)
     except User.DoesNotExist:
-        return HttpResponse("User {0} does not exist.".format(student_username))
+        return HttpResponse(escape("User {0} does not exist.".format(student_username)))
     except StudentModule.DoesNotExist:
-        return HttpResponse("{0} has never accessed problem {1}"
-                            .format(student_username, location))
+        return HttpResponse(escape("{0} has never accessed problem {1}".format(student_username, location)))
 
-    history_entries = StudentModuleHistory.objects \
-                      .filter(student_module=student_module).order_by('-id')
+    history_entries = StudentModuleHistory.objects.filter(student_module=student_module).order_by('-id')
 
     # If no history records exist, let's force a save to get history started.
     if not history_entries:
         student_module.save()
-        history_entries = StudentModuleHistory.objects \
-                          .filter(student_module=student_module).order_by('-id')
+        history_entries = StudentModuleHistory.objects.filter(student_module=student_module).order_by('-id')
 
     context = {
         'history_entries': history_entries,
