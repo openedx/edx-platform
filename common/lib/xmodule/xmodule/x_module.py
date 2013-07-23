@@ -202,6 +202,13 @@ class XModule(XModuleFields, HTMLSnippet, XBlock):
         '''
         if self._loaded_children is None:
             child_descriptors = self.get_child_descriptors()
+
+            # This deliberately uses system.get_module, rather than runtime.get_block,
+            # because we're looking at XModule children, rather than XModuleDescriptor children.
+            # That means it can use the deprecated XModule apis, rather than future XBlock apis
+
+            # TODO: Once we're in a system where this returns a mix of XModuleDescriptors
+            # and XBlocks, we're likely to have to change this more
             children = [self.system.get_module(descriptor) for descriptor in child_descriptors]
             # get_module returns None if the current user doesn't have access
             # to the location.
@@ -493,7 +500,7 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
                     child = child_loc
                 else:
                     try:
-                        child = self.system.load_item(child_loc)
+                        child = self.runtime.get_block(child_loc)
                     except ItemNotFoundError:
                         log.exception('Unable to load item {loc}, skipping'.format(loc=child_loc))
                         continue
@@ -806,6 +813,10 @@ class DescriptorSystem(object):
         self.load_item = load_item
         self.resources_fs = resources_fs
         self.error_tracker = error_tracker
+
+    def get_block(self, block_id):
+        """See documentation for `xblock.runtime:Runtime.get_block`"""
+        return self.load_item(block_id)
 
 
 class XMLParsingSystem(DescriptorSystem):
