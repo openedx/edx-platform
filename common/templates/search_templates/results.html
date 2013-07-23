@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+	<meta charset="utf-8" />
+	<title>Results</title>
+
+	<link rel="stylesheet" href="../static/css/results.css" type="text/css" />
+
+</head>
+
+<body>
+	{% if search_correction %}
+	<div class="correction_div">
+		<p class="search_correction">
+			Did you Mean: {{ search_correction }} ?
+		</p>
+	</div>
+	{% endif %}
+	<ol>
+		{% for datum in data %}
+		<li>
+			<div>
+				<h1>{{ datum.0 }}</h1>
+				<!-- </h2>Score:</h2> -->
+				<p class="results_snippet"> 
+					{{ datum.1|safe }}
+				</p>
+			</div>
+		</li>
+		{% endfor %}
+	</ol>
+</body>

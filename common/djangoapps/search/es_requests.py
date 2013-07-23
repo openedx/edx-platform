@@ -1,6 +1,7 @@
 import requests
 import json
 import os
+import re
 
 
 class ElasticDatabase:
@@ -80,21 +81,41 @@ class ElasticDatabase:
             print "Got an unexpected reponse code: " + str(status)
             raise
 
+    def os_walk_transcript(self, walk_results):
+        """Takes the results of os.walk on the data directory and returns a list of absolute paths"""
+        file_check = lambda walk: len(walk[2]) > 0
+        srt_prelim = lambda walk: ".srt.sjson" in " ".join(walk[2])
+        relevant_results = (entry for entry in walk_results if file_check(entry) and srt_prelim(entry))
+        return (self.os_path_tuple_srts(result) for result in relevant_results)
+
+    def os_path_tuple_srts(self, os_walk_tuple):
+        """Given the path tuples from the os.walk method, constructs absolute paths to transcripts"""
+        srt_check = lambda file_name: file_name[-10:] == ".srt.sjson"
+        directory, subfolders, file_paths = os_walk_tuple
+        return [os.path.join(directory, file_path) for file_path in file_paths if srt_check(file_path)]
+
     def index_directory_transcripts(self, directory, index, type_):
         """Indexes all transcripts that are present in a given directory
 
         Will recursively go through the directory and assume all .srt.sjson files are transcript"""
-        srt_check = lambda name: name[-10:] == ".srt.sjson"
-        # Needs to be lazily evaluated
-        transcripts = (name for name in os.walk(directory) if srt_check(name))
+        # Needs to be lazily evaluatedy
+        id_ = 1
+        transcripts = self.os_walk_transcript(os.walk(directory))
+        for transcript_list in transcripts:
+            for transcript in transcript_list:
+                print self.index_transcript(index, type_, str(id_), transcript)
+                id_ += 1
 
-    def index_transcript(self, transcript_file, index, type_):
-        file_uuid = transcript_file[transcript_file.find("/"):-10]
-        with open(transcript_file, 'rb') as transcript:
-            try:
-                string = " ".join(json.loads(transcript)["text"])
-            except:
-                return "INVALID JSON"
+    def index_transcript(self, index, type_, id_, transcript_file):
+        """opens and indexes the given transcript file as the given index, type, and id"""
+        file_uuid = transcript_file.rsplit("/")[-1][:-10]
+        transcript = open(transcript_file, 'rb').read()
+        #try:
+        searchable_text = " ".join(filter(None, json.loads(transcript)["text"])).replace("\n", " ")
+        data = {"searchable_text": searchable_text, "uuid": file_uuid}
+        #except:
+        #   return "INVALID JSON: " + file_uuid
+        return self.index_data(index, type_, id_, data)._content
 
     def setup_index(self, index):
         """Creates a new elasticsearch index, returns the response it gets"""
@@ -102,6 +123,7 @@ class ElasticDatabase:
         return requests.post(full_url, data=json.dumps(self.index_settings))
 
     def add_index_settings(self, index, index_settings=None):
+        """Allows the editing of an index's settings"""
         index_settings = index_settings or self.index_settings
         full_url = "/".join([self.url, index]) + "/"
         #closing the index so it can be changed
@@ -115,24 +137,45 @@ class ElasticDatabase:
         """Data should be passed in as a dictionary, assumes it matches the given mapping"""
         full_url = "/".join([self.url, index, type_, id_])
         response = requests.put(full_url, json.dumps(data))
-        return json.loads(response)['ok']
+        return response
 
     def get_index_settings(self, index):
-        """Returns the current settings of """
+        """Returns the current settings of a given index"""
         full_url = "/".join([self.url, index, "_settings"])
         return json.loads(requests.get(full_url)._content)
 
     def get_type_mapping(self, index, type_):
+        """Return the current mapping of the indicated type"""
         full_url = "/".join([self.url, index, type_, "_mapping"])
         return json.loads(requests.get(full_url)._content)
 
+    def generate_dictionary(self, index, type_, output_file):
+        """Generates a suitable pyenchant dictionary based on the current state of the database"""
+        base_url = "/".join([self.url, index, type_])
+        words = set()
+        id_ = 1
+        status_code = 200
+        while status_code == 200:
+            transcript = requests.get(base_url+"/"+str(id_))
+            status_code = transcript.status_code
+            try:
+                text = json.loads(transcript._content)["_source"]["searchable_text"]
+                words |= set(re.findall(r'[a-z]+', text.lower()))
+            except KeyError:
+                pass
+            id_ += 1
+            print id_
+        with open(output_file, 'wb') as dictionary:
+            for word in words:
+                dictionary.write(word + "\n")
+
 url = "https://localhost:9200"
 settings_file = "settings.json"
-mapping = json.loads(open("mapping.json", 'rb').read())
-analyzer = "analyzer.json"
 
-test = ElasticDatabase("http://localhost:9200", settings_file, analyzer)
-print test.setup_index("transcript")._content
-print test.get_index_settings("transcript")
-print test.setup_type("transcript", "cleaning", mapping)._content
-test.get_type_mapping("transcript", "cleaning")
+test = ElasticDatabase("http://localhost:9200", settings_file)
+#print test.setup_index("transcript-index")._content
+#print test.get_index_settings("transcript-index")
+#print test.setup_type("transcript", "cleaning", mapping)._content
+#print test.get_type_mapping("transcript-index", "transcript")
+#print test.index_directory_transcripts("/home/slater/edx_all/data", "transcript-index", "transcript")
+test.generate_dictionary("transcript-index", "transcript", "pyenchant_corpus.txt")
