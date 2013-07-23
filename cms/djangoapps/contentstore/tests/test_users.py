@@ -47,7 +47,17 @@ class UsersTestCase(CourseTestCase):
 
     def test_index(self):
         resp = self.client.get(self.index_url)
+        # ext_user is not currently a member of the course team, and so should
+        # not show up on the page.
         self.assertNotContains(resp, self.ext_user.email)
+
+    def test_index_member(self):
+        group, _ = Group.objects.get_or_create(name=self.staff_groupname)
+        self.ext_user.groups.add(group)
+        self.ext_user.save()
+
+        resp = self.client.get(self.index_url)
+        self.assertContains(resp, self.ext_user.email)
 
     def test_detail(self):
         resp = self.client.get(self.detail_url)
