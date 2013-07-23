@@ -70,7 +70,8 @@ class ModuleRenderTestCase(LoginEnrollmentTestCase):
             self.mock_user,
             mock_request,
             ['i4x', 'edX', 'toy', 'html', 'toyjumpto'],
-            model_data_cache, self.course_id
+            model_data_cache,
+            self.course_id
         )
 
         # get the rendered HTML output which should have the rewritten link
