@@ -11,6 +11,7 @@ from xmodule.modulestore import inheritance, Location
 from xmodule.modulestore.exceptions import ItemNotFoundError, InsufficientSpecificationError, InvalidLocationError
 
 from xblock.core import XBlock, Scope, String, Integer, Float, ModelType
+from xblock.fragment import Fragment
 from xmodule.modulestore.locator import BlockUsageLocator
 
 log = logging.getLogger(__name__)
@@ -312,6 +313,19 @@ class XModule(XModuleFields, HTMLSnippet, XBlock):
         ''' dispatch is last part of the URL.
             data is a dictionary-like object with the content of the request'''
         return ""
+
+
+    # ~~~~~~~~~~~~~~~ XBlock API Wrappers ~~~~~~~~~~~~~~~~
+    def student_view(self, context):
+        """
+        Return a fragment with the html from this XModule
+
+        Doesn't yet add any of the javascript to the fragment, nor the css.
+        Also doesn't expect any javascript binding, yet.
+
+        Makes no use of the context parameter
+        """
+        return Fragment(self.get_html())
 
 
 def policy_key(location):
@@ -906,8 +920,8 @@ class ModuleSystem(object):
 
         publish(event) - A function that allows XModules to publish events (such as grade changes)
 
-        xblock_model_data - A dict-like object containing the all data available to this
-            xblock
+        xblock_model_data - A function that constructs a model_data for an xblock from its
+            corresponding descriptor
 
         cache - A cache object with two methods:
             .get(key) returns an object from the cache or None.
