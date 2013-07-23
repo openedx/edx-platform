@@ -166,7 +166,10 @@ def course_team_user(request, org, course, name, email):
         add_user_to_course_group(request.user, user, location, role)
     elif role == "staff":
         add_user_to_course_group(request.user, user, location, role)
-        remove_user_from_course_group(request.user, user, location, "instructor")
+        # should *not* be an instructor
+        inst_groupname = get_course_groupname_for_role(location, "instructor")
+        if any(g.name == inst_groupname for g in user.groups.all()):
+            remove_user_from_course_group(request.user, user, location, "instructor")
     return JsonResponse()
 
 
