@@ -18,9 +18,15 @@
             $(this).closest('.wrapper-creationrights').toggleClass('is-shown').find('.ui-toggle-control').toggleClass('current');
         });
 
-        $('#request-coursecreator').ajaxForm(function() {
+        var reloadPage = function () {
             location.reload();
-        });
+        };
+
+        var showError = function ()  {
+
+        };
+
+        $('#request-coursecreator').ajaxForm({error: showError, success: reloadPage});
 
         $('#request-coursecreator-submit').click(function(e){
           $(this).toggleClass('is-disabled is-submitting').find('.label').text('Submitting Your Request');
@@ -168,7 +174,7 @@
             <form id="request-coursecreator" action="${request_course_creator_url}" method="post" enctype="multipart/form-data">
 
               <div id="request-coursecreator-error" name="request-coursecreator-error" class="message message-status message-status error">
-                <p>There was a problem submitting your request</p>
+                <p>${_('There was a problem submitting your request')}</p>
               </div>
 
               <input type="hidden" name="csrfmiddlewaretoken" value="${csrf}">
