@@ -93,7 +93,7 @@
     var $newUserForm = $('.new-user-form');
     $newUserForm.bind('submit', function(e) {
       e.preventDefault();
-      var url = tplUserURL.replace("@@EMAIL@@", $('#email').val())
+      var url = tplUserURL.replace("@@EMAIL@@", $('#email').val().trim())
       $.ajax({
         url: url,
         type: 'POST',
