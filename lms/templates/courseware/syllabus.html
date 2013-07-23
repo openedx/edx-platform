@@ -6,7 +6,7 @@
   <%static:css group='course'/>
 </%block>
 
-<%block name="title"><title>${_("{course_number} Course Info").format(course_number=course.number)}</title></%block>
+<%block name="title"><title>${_("{course.number} Course Info").format(course=course)}</title></%block>
 
 <%include file="/courseware/course_navigation.html" args="active_page='syllabus'" />
 <%!
@@ -16,7 +16,7 @@
 <section class="container">
   <div class="syllabus_wrapper">
     <div class="syllabus">
-        <h1> ${_("Syllabus ")}</h1>
+        <h1>${_("Syllabus")}</h1>
         % if user.is_authenticated():
         ${get_course_syllabus_section(course, 'syllabus')}
         % else:

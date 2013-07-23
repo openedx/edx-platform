@@ -26,15 +26,15 @@
         %else:
         <table class="problem-list">
             <tr>
-              <th>${_("Problem Name")}</th>
-              <th>${_("Status")}</th>
-              <th>${_("Grader Type")}</th>
-              <th>${_("ETA")}</th>
+                <th>${_("Problem Name")}</th>
+                <th>${_("Status")}</th>
+                <th>${_("Grader Type")}</th>
+                <th>${_("ETA")}</th>
             </tr>
             %for problem in problem_list:
             <tr>
                 <td>
-                  <a href="${problem['actual_url']}">${problem['problem_name']}</a>
+                    <a href="${problem['actual_url']}">${problem['problem_name']}</a>
                 </td>
                 <td>
                     ${problem['state']}

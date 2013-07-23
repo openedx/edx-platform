@@ -2,27 +2,27 @@
 <%namespace name='static' file='../static_content.html'/>
 <%inherit file="../main.html" />
 
-<%block name="title"><title>${_("edX Media Kit")}</title></%block>
+<%block name="title"><title>${_("{edX} Media Kit").format(edX="edX")}</title></%block>
 
 <section class="mediakit">
-  <h1>${_("edX Media Kit")}</h1>
+  <h1>${_("{edX} Media Kit").format(edX="edX")}</h1>
 
   <hr />
 
   <div class="wrapper wrapper-mediakit">
     <section class="introduction">
       <header>
-        <h2>${_("Welcome to the <span class=\"org-name\">edX</span> Media Kit")}</h2>
+        <h2>${_("Welcome to the <span class=\"org-name\">{edX}</span> Media Kit").format(edX="edX")}</h2>
       </header>
 
       <article>
-        <p>${_("Need images for a news story?  Feel free to download high-resolution versions of the photos below by clicking on the thumbnail.  Please credit edX in your use.")}</p>
-        <p>${_("We\'ve included visual guidelines on how to use the edX logo within the download zip which also includes Adobe Illustrator and eps versions of the logo. ")}</p>
-        <p>${_("For more information about edX, please contact <strong>Dan O&apos;Connell Associate Director of Communications</strong> via <a href=\"mailto:oconnell@edx.org?subject=edX Information Request (from Media Kit)\">oconnell@edx.org</a>.")}</p>
+        <p>${_("Need images for a news story?  Feel free to download high-resolution versions of the photos below by clicking on the thumbnail.  Please credit {edX} in your use.").format(edX="edX")}</p>
+        <p>${_("We\'ve included visual guidelines on how to use the {edX} logo within the download zip which also includes Adobe Illustrator and eps versions of the logo. ").format(edX="edX")}</p>
+        <p>${_("For more information about {edX}, please contact <strong>{dan_oconnell}, Associate Director of Communications</strong> via <a href=\"mailto:oconnell@edx.org?subject=edX Information Request (from Media Kit)\">oconnell@edx.org</a>.").format(dan_oconnell="Dan O'Connell", edX="edX")}</p>
       </article>
 
       <aside>
-        <h3>${_("The <span class=\"org-name\">edX</span> Logo")}</h3>
+        <h3>${_("The <span class=\"org-name\">{edX}</span> Logo").format(edX="edX")}</h3>
         <figure class="logo">
           <a rel="asset" class="action action-download" href="${static.url('files/edx-identity.zip')}">
             <img src="${static.url('images/edx.png')}" />
@@ -36,7 +36,7 @@
 
     <section class="library">
       <header>
-        <h2>${_("The <span class=\"org-name\">edX</span> Media Library")}</h2>
+        <h2>${_("The <span class=\"org-name\">{edX}</span> Media Library").format(edX="edX")}</h2>
       </header>
 
       <article>
@@ -45,7 +45,7 @@
             <figure>
               <a rel="asset" class="action action-download" href="${static.url('images/press-kit/anant-agarwal_high-res.jpg')}">
                 <img src="${static.url('images/press-kit/anant-agarwal_x200.jpg')}"/>
-                <figcaption>${_("Ananat Agarwal, President of edX, in his office in Cambridge, MA. The computer screen behind him shows a portion of a video lecture from 6.002x, Circuits &amp; Electronics, the MITx course taught by Agarwal.")}</figcaption>
+                <figcaption>${_("{anant}, President of {edX}, in his office in Cambridge, MA. The computer screen behind him shows a portion of a video lecture from 6.002x, Circuits &amp; Electronics, the MITx course taught by Agarwal.").format(edX="edX", anant="Anant Agarwal")}</figcaption>
                 <span class="note">${_("Download (High Resolution Photo)")}</span>
               </a>
             </figure>
@@ -54,7 +54,7 @@
             <figure>
               <a rel="asset" class="action action-download" href="${static.url('images/press-kit/anant-tablet_high-res.jpg')}">
                 <img src="${static.url('images/press-kit/anant-tablet_x200.jpg')}"/>
-                <figcaption>${_("Anant Agarwal creating a tablet-based lecture for 6.002x, Circuits & Electronics.")}</figcaption>
+                <figcaption>${_("{anant} creating a tablet-based lecture for 6.002x, Circuits & Electronics.").format(anant="Anant Agarwal")}</figcaption>
                 <span class="note">${_("Download (High Resolution Photo)")}</span>
               </a>
             </figure>
@@ -63,7 +63,7 @@
             <figure>
               <a rel="asset" class="action action-download" href="${static.url('images/press-kit/piotr-mitros_high-res.jpg')}">
                 <img src="${static.url('images/press-kit/piotr-mitros_x200.jpg')}"/>
-                <figcaption>${_("Piotr Mitros, Chief Scientist at edX, uses a Rostrum camera to create an overhead camera-based lecture. During this process, voice and video are recorded for an interactive tutorial.")}</figcaption>
+                <figcaption>${_("{piotr}, Chief Scientist at {edX}, uses a Rostrum camera to create an overhead camera-based lecture. During this process, voice and video are recorded for an interactive tutorial.").format(edX="edX", piotr="Piotr Mitros")}</figcaption>
                 <span class="note">${_("Download (High Resolution Photo)")}</span>
               </a>
             </figure>
@@ -72,7 +72,7 @@
             <figure>
               <a rel="asset" class="action action-download" href="${static.url('images/press-kit/edx-video-editing_high-res.jpg')}">
                 <img src="${static.url('images/press-kit/edx-video-editing_x200.jpg')}"/>
-                <figcaption>${_("One of edX\'s video editors edits a lecture in a video suite.")}</figcaption>
+                <figcaption>${_("One of {edX}\'s video editors edits a lecture in a video suite.").format(edX="edX")}</figcaption>
                 <span class="note">${_("Download (High Resolution Photo)")}</span>
               </a>
             </figure>

@@ -2,6 +2,6 @@
 <%inherit file="../main.html" />
 
 <section class="outside-app">
-  <h1>${_("Currently the <em>%s</em> servers are down") % settings.PLATFORM_NAME}</h1>
-  <p>${_("Our staff is currently working to get the site back up as soon as possible. Please email us at <a href=\"mailto:%s\">$s</a> to report any problems or downtime.") % {settings.TECH_SUPPORT_EMAIL, settings.TECH_SUPPORT_EMAIL}}</p>
+  <h1>${_("Currently the <em>{platform_name}</em> servers are down").format(platform_name=settings.PLATFORM_NAME)}</h1>
+  <p>${_("Our staff is currently working to get the site back up as soon as possible. Please email us at <a href=\"mailto:{tech_support_email}\">{tech_support_email}</a> to report any problems or downtime.").format(settings.TECH_SUPPORT_EMAIL)}</p>
 </section>

@@ -39,7 +39,7 @@
       <div class="colophon-about">
         <img src="${MITX_ROOT_URL}/static/images/header-logo.png" />
 
-        <p>${_("EdX is a non-profit created by founding partners Harvard and MIT whose mission is to bring the best of higher education to students of all ages anywhere in the world, wherever there is Internet access. EdX's free online MOOCs are interactive and subjects include computer science, public health, and artificial intelligence.")}</p>
+        <p>${_("{platform_name} is a non-profit created by founding partners {Harvard} and {MIT} whose mission is to bring the best of higher education to students of all ages anywhere in the world, wherever there is Internet access. {platform_name}'s free online MOOCs are interactive and subjects include computer science, public health, and artificial intelligence.").format(platform_name="EdX", Harvard="Harvard", MIT="MIT")}</p>
       </div>
     </div>
 
@@ -74,7 +74,7 @@
         </ul>
       </nav>
 
-      <p class="copyright">${_("&copy; 2013 edX, some rights reserved.")}</p>
+      <p class="copyright">${_("&copy; 2013 {platform_name}, some rights reserved.").format(platform_name=settings.PLATFORM_NAME)}</p>
 
       <nav class="nav-legal">
         <ul>

@@ -15,7 +15,7 @@
 <section id="help-modal" class="modal">
   <div class="inner-wrapper" id="help_wrapper">
     <header>
-      <h2>${_('{span_start}edX{span_end} Help').format(span_start='<span class="edx">', span_end='</span>')}</h2>
+      <h2>${_('{span_start}{platform_name}{span_end} Help').format(span_start='<span class="edx">', span_end='</span>').format(platform_name=settings.PLATFORM_NAME)}</h2>
       <hr>
     </header>
 
@@ -31,9 +31,9 @@ discussion_link = get_discussion_link(course) if course else None
     </p>
 % endif
 
-    <p>${_('Have <strong>general questions about edX</strong>? You can find lots of helpful information in the edX {link_start}FAQ{link_end}.').format(link_start='<a href="/help" target="_blank">', link_end='</a>')}</p>
+    <p>${_('Have <strong>general questions about {platform_name}</strong>? You can find lots of helpful information in the {platform_name} {link_start}FAQ{link_end}.').format(link_start='<a href="/help" target="_blank">', link_end='</a>').format(platform_name=settings.PLATFORM_NAME)}</p>
 
-    <p>${_('Have a <strong>question about something specific</strong>? You can contact the edX general support team directly:')}</p>
+    <p>${_('Have a <strong>question about something specific</strong>? You can contact the {platform_name} general support team directly:').format(platform_name=settings.PLATFORM_NAME)}</p>
     <hr>
 
     <div class="help-buttons">

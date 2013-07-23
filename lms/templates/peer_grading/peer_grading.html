@@ -14,12 +14,12 @@
             <div class="problem-list-container">
                 <table class="problem-list">
                     <tr>
-                      <th>${_("Problem Name")}</th>
-                      <th>${_("Due date")}</th>
-                      <th>${_("Graded")}</th>
-                      <th>${_("Available")}</th>
-                      <th>${_("Required")}</th>
-                      <th>${_("Progress")}</th>
+                        <th>${_("Problem Name")}</th>
+                        <th>${_("Due date")}</th>
+                        <th>${_("Graded")}</th>
+                        <th>${_("Available")}</th>
+                        <th>${_("Required")}</th>
+                        <th>${_("Progress")}</th>
                     </tr>
                 %for problem in problem_list:
                 <tr data-graded="${problem['num_graded']}" data-required="${problem['num_required']}">
@@ -34,7 +34,7 @@
                         % if problem['due']:
                             ${problem['due']}
                         % else:
-                        ${_("No due date")}
+                            ${_("No due date")}
                         % endif
                     </td>
                     <td>

@@ -405,7 +405,7 @@
           <h4 class="title">${_('Accommodations Request')}</h4>
           <p class="details">${_('Your requested accommodations have been reviewed and processed. You are allowed no accommodations.')}</p>
 
-          <p class="action">${_('Please {contact_link_start}contact edX at exam-help@edx.org{contact_link_end}.').format(contact_link_start='<a class="contact-link" href="{}"'.format(exam_help_href), contact_link_end='</a>')}</p>
+          <p class="action">${_('Please {contact_link_start}contact {edX} at ${exam_help}{contact_link_end}.').format(contact_link_start='<a class="contact-link" href="{}">'.format(exam_help_href), contact_link_end='</a>', edX="edX", exam_help="exam-help@edx.org")}</p>
         </li>
         % endif
 

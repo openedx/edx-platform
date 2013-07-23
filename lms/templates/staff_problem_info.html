@@ -26,7 +26,7 @@ ${module_content}
 <section id="${element_id}_xqa-modal" class="modal xqa-modal" style="width:80%; left:20%; height:80%; overflow:auto" >
   <div class="inner-wrapper">
     <header>
-      <h2>${_("edX Content Quality Assessment")}</h2>
+      <h2>${_("{platform_name} Content Quality Assessment").format(platform_name=settings.PLATFORM_NAME)}</h2>
     </header>
 
     <form id="${element_id}_xqa_form" class="xqa_form">
@@ -60,7 +60,7 @@ location = ${location | h}
   %endfor
 </table>
 <table>
-  <tr><th>${_('edX Fields')}</th></tr>
+  <tr><th>${_('{platform_name} Fields').format(platform_name=settings.PLATFORM_NAME)}</th></tr>
   %for name, field in lms_fields:
   <tr><td>${name}</td><td><pre style="display:inline-block; margin: 0;">${field | h}</pre></td></tr>
   %endfor

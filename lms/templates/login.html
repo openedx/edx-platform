@@ -155,7 +155,7 @@
     % if settings.MITX_FEATURES.get('AUTH_USE_OPENID'):
     <!-- <div class="cta cta-login-options-openid">
       <h3>${_("Login via OpenID")}</h3>
-      <p>${_('You can now start learning with edX by logging in with your <a rel="external" href="http://openid.net/">OpenID account</a>.')}</p>
+      <p>${_('You can now start learning with {platform_name} by logging in with your <a rel="external" href="http://openid.net/">OpenID account</a>.').format(platform_name=settings.PLATFORM_NAME)}</p>
       <a class="action action-login-openid" href="#">${_("Login via OpenID")}</a>
     </div> -->
     % endif

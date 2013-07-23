@@ -44,7 +44,7 @@ site_status_msg = get_site_status_msg(course_id)
   <h1 class="logo">
     <a href="${marketing_link('ROOT')}">
       <%block name="navigation_logo">
-        <img src="${static.url(branding.get_logo_url(request.META.get('HTTP_HOST')))}" alt="${_('edX home')}" />
+        <img src="${static.url(branding.get_logo_url(request.META.get('HTTP_HOST')))}" alt="${_('{settings.PLATFORM_NAME} home')}" />
       </%block>
     </a>
   </h1>
@@ -70,7 +70,7 @@ site_status_msg = get_site_status_msg(course_id)
         </a>
       </li>
       <li class="primary">
-        <a href="#" class="dropdown"><span class="sr">${_("More options dropdown")}</span> &#9662</a>
+        <a href="#" class="dropdown"><span class="sr">${_("More options dropdown")}</span> &#9662;</a>
         <ul class="dropdown-menu">
           <%block name="navigation_dropdown_menu_links" >
             <li><a href="${marketing_link('FAQ')}">${_("Help")}</a></li>

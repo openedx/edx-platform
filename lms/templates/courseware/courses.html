@@ -17,7 +17,7 @@
           % endif
         </div>
         % if self.stanford_theme_enabled():
-          <h2>${_("Explore free courses from Stanford University.")}</h2>
+          <h2>${_("Explore free courses from {university_name}.").format(university_name="Stanford University")}</h2>
         % else:
           <h2>${_("Explore free courses from leading universities.")}</h2>
         % endif

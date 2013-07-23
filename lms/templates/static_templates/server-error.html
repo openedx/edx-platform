@@ -2,6 +2,6 @@
 <%inherit file="../main.html" />
 
 <section class="outside-app">
-  <h1>${_("There has been a 500 error on the <em>%s</em> servers") % settings.PLATFORM_NAME}</h1>
+  <h1>${_("There has been a 500 error on the <em>{platform_name}</em> servers").format(platform_name=settings.PLATFORM_NAME)}</h1>
   <p>${_('Please wait a few seconds and then reload the page. If the problem persists, please email us at <a href="{email}">{email}</a>.').format(email=settings.TECH_SUPPORT_EMAIL)}</p>
 </section>

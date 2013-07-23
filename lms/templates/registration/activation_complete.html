@@ -16,15 +16,15 @@
 
     <p>
       %if not already_active:
-      ${_("Thanks for activating your account.")}
+        ${_("Thanks for activating your account.")}
       %else:
-      ${_("This account has already been activated.")}
+        ${_("This account has already been activated.")}
       %endif
 
       %if user_logged_in:
-      ${_("Visit your {link_start}dashboard{link_end} to see your courses.").format(link_start='<a href="{url}">'.format(url=reverse('dashboard')), link_end='</a>')}
+        ${_("Visit your {link_start}dashboard{link_end} to see your courses.").format(link_start='<a href="{url}">'.format(url=reverse('dashboard')), link_end='</a>')}
       %else:
-      ${_("You can now {link_start}log in{link_end}.").format(link_start='<a href="{url}">'.format(url=reverse('signin_user')), link_end='</a>')}
+        ${_("You can now {link_start}log in{link_end}.").format(link_start='<a href="{url}">'.format(url=reverse('signin_user')), link_end='</a>')}
       %endif
     </p>
   </section>

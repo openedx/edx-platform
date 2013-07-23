@@ -227,12 +227,12 @@ function goto( mode)
 
     <H2>${_("Student-specific grade inspection and adjustment")}</h2>
     <p>
-      ${_("Specify the edX email address or username of a student here:")}
+      ${_("Specify the {platform_name} email address or username of a student here:").format(platform_name=settings.PLATFORM_NAME)}
       <input type="text" name="unique_student_identifier">
     </p>
     <p>
       ${_("Click this, and a link to student's progress page will appear below:")}
-      <input type="submit" name="action" value="${_(\"Get link to student's progress page\")}">
+      <input type="submit" name="action" value="${_("Get link to student's progress page")}">
     </p>
     <p>
       ${_("Specify a particular problem in the course here by its url:")}
@@ -247,9 +247,9 @@ function goto( mode)
     </p>
     <p>
       ${_("Then select an action:")}
-      <input type="submit" name="action" value="${_(\"Reset student's attempts\")}">
+      <input type="submit" name="action" value="${_("Reset student's attempts")}">
       %if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
-      <input type="submit" name="action" value="${_(\"Rescore student's problem submission\")}">
+      <input type="submit" name="action" value="${_("Rescore student's problem submission")}">
       %endif
     </p>
 

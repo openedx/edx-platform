@@ -11,7 +11,7 @@
       <div class="title">
         <hgroup>
           % if self.stanford_theme_enabled():
-            <h1>${_("Free courses from <strong>Stanford</strong>")}</h1>
+            <h1>${_("Free courses from <strong>{university_name}</strong>").format(university_name="Stanford")}</h1>
           % else:
             <h1>${_("The Future of Online Education")}</h1>
           % endif
@@ -27,7 +27,7 @@
 
             <div class="secondary-actions">
               <div class="social-sharing">
-                <div class="sharing-message">${_("Stay up to date with all edX has to offer!")}</div>
+                <div class="sharing-message">${_("Stay up to date with all {platform_name} has to offer!").format(platform_name=settings.PLATFORM_NAME)}</div>
                 <a href="https://twitter.com/edXOnline" class="share">
                   <img src="${static.url('images/social/twitter-sharing.png')}">
                 </a>
@@ -56,7 +56,7 @@
     <section class="highlighted-courses">
       ## Disable university partner logos and sites for non-edX sites
       % if not self.theme_enabled():
-        <h2>${_('Explore free courses from {span_start}edX{span_end} universities').format(span_start='<span class="edx">', span_end='</span>')}</h2>
+        <h2>${_('Explore free courses from {span_start}{platform_name}{span_end} universities').format(platform_name="edX", span_start='<span class="edx">', span_end='</span>')}</h2>
 
         <section class="university-partners university-partners2x6">
           <ol class="partners">
@@ -191,7 +191,7 @@
 </section>
 
 <%block name="js_extra">
-   <script type="text/javascript"">
+   <script type="text/javascript">
       $(window).load(function() {
          if(getParameterByName('next')) {
               $('#login').trigger("click");

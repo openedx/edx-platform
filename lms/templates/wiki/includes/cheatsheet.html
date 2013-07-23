@@ -1,6 +1,6 @@
 <%! from django.utils.translation import ugettext as _ %>
 <div class="modal hide fade" id="cheatsheetModal">
-	<a href="#" class="close-btn">${_("×")}</a>
+	<a href="#" class="close-btn">×</a>
 	<div id="cheatsheet-body" class="modal-body">
 		<div class="left-column">
 			<section>
@@ -15,7 +15,7 @@
                                 <pre>${_("[Article Name](wiki:ArticleName)")}</pre>
 			</section>
 			<section>
-				<h3>${_("edX Additions:")}</h3>
+				<h3>${_("{edX} Additions:").format(edX="edX")}</h3>
 				<pre>
 circuit-schematic:</pre>
 				<pre>
@@ -28,8 +28,8 @@ $LaTeX Math Expression$</pre>
 				<h3>${_("Useful examples:")}</h3>
 				<pre>
 ${_("http://wikipedia.org\
-[Wikipedia](http://wikipedia.org)\
-[edX Wiki](wiki:/edx/)")}</pre>
+[{Wikipedia}](http://wikipedia.org)\
+[{edX} Wiki](wiki:/edx/)").format(edX="edX", Wikipedia="Wikipedia")}</pre>
 				<pre>
 ${_("Huge Header")}
 ===========</pre>

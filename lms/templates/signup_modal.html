@@ -11,7 +11,7 @@
   <div class="inner-wrapper">
     <div id="register">
       <header>
-        <h2>${_('Sign Up for {span_start}edX{span_end}').format(span_start='<span class="edx">', span_end='</span>')}</h2>
+        <h2>${_('Sign Up for {span_start}{platform_name}{span_end}').format(span_start='<span class="edx">', span_end='</span>', platform_name=settings.PLATFORM_NAME)}</h2>
         <hr>
       </header>
 
@@ -95,7 +95,7 @@
           <label data-field="mailing_address" for="signup_mailing_address">${_("Mailing address")}</label>
 	    <textarea id="signup_mailing_address" name="mailing_address"></textarea>
 
-          <label data-field="goals" for="signup_goals">${_("Goals in signing up for edX")}</label>
+          <label data-field="goals" for="signup_goals">${_("Goals in signing up for {platform_name}").format(platform_name=settings.PLATFORM_NAME)}</label>
 	    <textarea name="goals" id="signup_goals"></textarea>
 
         </div>

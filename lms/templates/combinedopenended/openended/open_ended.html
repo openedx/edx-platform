@@ -10,7 +10,7 @@
   <div class="message-wrapper"></div>
   <div class="grader-status">
     % if state == 'initial':
-      <span class="unanswered" style="display:inline-block;" id="status_${id}">${_(Unanswered)}</span>
+      <span class="unanswered" style="display:inline-block;" id="status_${id}">${_("Unanswered")}</span>
     % elif state == 'assessing':
       <span class="grading" id="status_${id}">${_("Submitted for grading.")}
       % if eta_message is not None:
