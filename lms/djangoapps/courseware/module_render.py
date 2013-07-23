@@ -27,7 +27,7 @@ from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.x_module import ModuleSystem
-from xmodule_modifiers import replace_course_urls, replace_static_urls, add_histogram, wrap_xmodule, save_module  # pylint: disable=F0401
+from xmodule_modifiers import replace_course_urls, replace_jump_to_id_urls, replace_static_urls, add_histogram, wrap_xmodule, save_module  # pylint: disable=F0401
 
 import static_replace
 from psychometrics.psychoanalyze import make_psychometrics_data_update_handler
@@ -392,6 +392,19 @@ def get_module_for_descriptor_internal(user, descriptor, model_data_cache, cours
     # Allow URLs of the form '/course/' refer to the root of multicourse directory
     #   hierarchy of this course
     module.get_html = replace_course_urls(module.get_html, course_id)
+
+    # this will rewrite intra-courseware links
+    # that use the shorthand /jump_to_id/<id>. This is very helpful
+    # for studio authored courses (compared to the /course/... format) since it is
+    # is durable with respect to moves and the author doesn't need to
+    # know the hierarchy
+    # NOTE: module_id is empty string here. The 'module_id' will get assigned in the replacement
+    # function, we just need to specify something to get the reverse() to work
+    module.get_html = replace_jump_to_id_urls(
+        module.get_html,
+        course_id,
+        reverse('jump_to_id', kwargs={'course_id': course_id, 'module_id': ''})
+    )
 
     if settings.MITX_FEATURES.get('DISPLAY_HISTOGRAMS_TO_STAFF'):
         if has_access(user, module, 'staff', course_id):

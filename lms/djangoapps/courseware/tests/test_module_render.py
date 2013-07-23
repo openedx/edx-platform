@@ -17,6 +17,8 @@ from courseware.tests.tests import LoginEnrollmentTestCase
 from courseware.model_data import ModelDataCache
 from modulestore_config import TEST_DATA_XML_MODULESTORE
 
+from courseware.courses import get_course_with_access
+
 from .factories import UserFactory
 
 
@@ -49,6 +51,35 @@ class ModuleRenderTestCase(LoginEnrollmentTestCase):
     def test_get_module(self):
         self.assertIsNone(render.get_module('dummyuser', None,
                                             'invalid location', None, None))
+
+    def test_module_render_with_jump_to_id(self):
+        """
+        This test validates that the /jump_to_id/<id> shorthand for intracourse linking works assertIn
+        expected. Note there's a HTML element in the 'toy' course with the url_name 'toyjumpto' which
+        defines this linkage
+        """
+        mock_request = MagicMock()
+        mock_request.user = self.mock_user
+
+        course = get_course_with_access(self.mock_user, self.course_id, 'load')
+
+        model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
+            self.course_id, self.mock_user, course, depth=2)
+
+        module = render.get_module(
+            self.mock_user,
+            mock_request,
+            ['i4x', 'edX', 'toy', 'html', 'toyjumpto'],
+            model_data_cache,
+            self.course_id
+        )
+
+        # get the rendered HTML output which should have the rewritten link
+        html = module.get_html()
+
+        # See if the url got rewritten to the target link
+        # note if the URL mapping changes then this assertion will break
+        self.assertIn('/courses/'+self.course_id+'/jump_to_id/vertical_test', html)
 
     def test_modx_dispatch(self):
         self.assertRaises(Http404, render.modx_dispatch, 'dummy', 'dummy',
