@@ -3,6 +3,12 @@ import json
 import os
 import re
 from pymongo import MongoClient
+from pdfminer.pdfinterp import PDFResourceManager, process_pdf
+from pdfminer.converter import TextConverter
+from pdfminer.layout import LAParams
+from pdfminer.pdfparser import PDFSyntaxError
+from cStringIO import StringIO as cIO
+from StringIO import StringIO as IO
 
 
 class MongoIndexer:
@@ -31,15 +37,47 @@ class MongoIndexer:
         self.chunk_collection = self.content_db[chunk_collection]
         self.module_collection = self.module_db[module_collection]
 
-    def find_transcripts(self, file_ending=".srt.sjson"):
-        """Returns a cursor that will lazily generate transcript objects when next() is called"""
+    def find_files_with_type(self, file_ending):
+        """Returns a cursor for content files matching given type"""
         return self.file_collection.find({"filename": re.compile(".*?"+re.escape(file_ending))})
+
+    def find_chunks_with_type(self, file_ending):
+        """Returns a chunk cursor for content files matching given type"""
+        return self.chunk_collection.find({"files_id.name": re.compile(".*?"+re.escape(file_ending))})
+
+    def find_modules_by_category(self, category):
+        """Returns a cursor for all xmodules matching given category"""
+        return self.module_collection.find({"_id.category": category})
 
     def find_transcript_content(self, mongo_element):
         """Finds the corresponding chunk to the file element from a cursor similar to that from find_transcripts"""
         filename = mongo_element["_id"]["name"]
         database_object = self.chunk_collection.find_one({"files_id.name": filename})
         return json.loads(database_object["data"].decode())["text"]
+
+    def pdf_to_text(self, mongo_element):
+        onlyAscii = lambda s: "".join(c for c in s if ord(c) < 128)
+        resource = PDFResourceManager()
+        return_string = cIO()
+        params = LAParams()
+        converter = TextConverter(resource, return_string, codec='utf-8', laparams=params)
+        fake_file = IO(mongo_element["data"].__str__())
+        try:
+            process_pdf(resource, converter, fake_file)
+        except PDFSyntaxError:
+            print mongo_element["files_id"]["name"] + " cannot be read, moving on."
+            return ""
+        text_value = onlyAscii(return_string.getvalue()).replace("\n", " ")
+        return text_value
+
+    def searchable_text_from_problem_data(self, mongo_element):
+        """The data field from the problem is in weird xml, which is good for functionality, but bad for search"""
+        data = mongo_element["definition"]["data"]
+        paragraphs = " ".join([text for text in re.findall("<p>(.*?)</p>", data) if text is not "Explanation"])
+        cleaned_text = re.sub("\\(.*?\\)", "", paragraphs).replace("\\", "")
+        remove_tags = re.sub("<[a-zA-Z0-9/\.\= \"_-]+>", "", cleaned_text)
+        remove_repetitions = re.sub(r"(.)\1{4,}", "", remove_tags)
+        print remove_repetitions
 
     def module_for_uuid(self, transcript_uuid):
         """Given the transcript uuid found from the xcontent database, returns the mongo document for the video"""
@@ -54,21 +92,52 @@ class MongoIndexer:
             file_name = file_name[5:]
         return file_name[:file_name.find(".")]
 
-    def index_all_transcripts(self, es_instance, index):
-        cursor = self.find_transcripts()
+    def index_all_lecture_slides(self, es_instance, index):
+        cursor = self.find_chunks_with_type(".pdf")
         for i in range(0, cursor.count()):
-            check = cursor.next()
-            print check.keys()
-            course = check["_id"]["course"]
-            org = check["_id"]["org"]
-            uuid = self.uuid_from_file_name(check["_id"]["name"])
+            item = cursor.next()
+            # Not sure if this true is for every course, but it seems to
+            # be a sensible limitations for the courses on my local machine
+            if item["files_id"]["name"][:3] == "lec":
+                course = item["files_id"]["course"]
+                org = item["files_id"]["org"]
+                # The lecture slides don't seem to have any kind of uuid or guid
+                uuid = item["files_id"]["name"]
+                display_name = org + " " + course + " " + item["files_id"]["name"]
+                searchable_text = self.pdf_to_text(item)
+                data = {"course": course, "org": org, "uuid": uuid, "searchable_text": searchable_text,
+                        "display_name": display_name}
+                type_ = course.replace(".", "-")
+                print es_instance.index_data(index, type_, data)._content
+
+    def index_all_problems(self, es_instance, index):
+        cursor = self.find_modules_by_category("problem")
+        for i in range(0, cursor.count()):
+            item = cursor.next()
+            course = item["_id"]["course"]
+            org = item["_id"]["org"]
+            uuid = item["_id"]["name"]
+            display_name = org + " " + course + " " + item["metadata"]["display_name"]
+            searchable_text = self.searchable_text_from_problem_data(item)
+            data = {"course": course, "org": org, "uuid": uuid, "searchable_text": searchable_text,
+                    "display_name": display_name}
+            type_ = course.replace(".", "-")
+            print es_instance.index_data(index, type_, data)._content
+
+    def index_all_transcripts(self, es_instance, index):
+        cursor = self.find_files_with_type(".srt.sjson")
+        for i in range(0, cursor.count()):
+            item = cursor.next()
+            course = item["_id"]["course"]
+            org = item["_id"]["org"]
+            uuid = self.uuid_from_file_name(item["_id"]["name"])
             video_module = self.module_for_uuid(uuid)
             try:
                 display_name = org + " " + course + " " + video_module["metadata"]["display_name"]
             except TypeError:
                 print "Could not find module for: " + uuid
                 display_name = org + " " + course
-            transcript = " ".join(self.find_transcript_content(check))
+            transcript = " ".join(self.find_transcript_content(item))
             data = {"course": course, "org": org, "uuid": uuid, "searchable_text": transcript,
                     "display_name": display_name}
             type_ = course.replace(".", "-")
@@ -213,6 +282,10 @@ class ElasticDatabase:
         full_url = "/".join([self.url, index])
         return requests.delete(full_url)
 
+    def delete_type(self, index, type_):
+        full_url = "/".join([self.url, index, type_])
+        return requests.delete(full_url)
+
     def get_type_mapping(self, index, type_):
         """Return the current mapping of the indicated type"""
         full_url = "/".join([self.url, index, type_, "_mapping"])
@@ -238,15 +311,16 @@ class ElasticDatabase:
             for word in words:
                 dictionary.write(word + "\n")
 
-url = "https://localhost:9200"
+url = "http://localhost:9200"
 settings_file = "settings.json"
 
 mongo = MongoIndexer()
-test = ElasticDatabase("http://localhost:9200", settings_file)
+
+test = ElasticDatabase(url, settings_file)
 #print test.delete_index("transcript-index")
-#print test.add_index_settings("transcript-index")._content
-#print test.get_index_settings("transcript-index")
-mongo.index_all_transcripts(test, "transcript-index")
+print test.add_index_settings("slides-index")._content
+print test.get_index_settings("slides-index")
+mongo.index_all_lecture_slides(test, "slides-index")
 
 #print test.setup_type("transcript", "cleaning", mapping)._content
 #print test.get_type_mapping("transcript-index", "2-1x")
