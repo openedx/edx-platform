@@ -459,10 +459,11 @@ def jump_to_id(request, course_id, module_id):
     items = modulestore().get_items(['i4x', course_location.org, course_location.course, None, module_id])
 
     if len(items) == 0:
-        raise Http404("Could not find id = {0} in course_id = {1}".format(module_id, course_id))
+        raise Http404("Could not find id = {0} in course_id = {1}. Referer = {2}".
+                      format(module_id, course_id, request.META.get("HTTP_REFERER", "")))
     if len(items) > 1:
-        logging.warning("Multiple items found with id = {0} in course_id = {1}. Using first found {2}...".
-                        format(module_id, course_id, items[0].location.url()))
+        log.warning("Multiple items found with id = {0} in course_id = {1}. Referer = {2}. Using first found {3}...".
+                    format(module_id, course_id, request.META.get("HTTP_REFERER", ""), items[0].location.url()))
 
     return jump_to(request, course_id, items[0].location.url())
 

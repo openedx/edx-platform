@@ -66,8 +66,12 @@ class ModuleRenderTestCase(LoginEnrollmentTestCase):
         model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
             self.course_id, self.mock_user, course, depth=2)
 
-        module = render.get_module(self.mock_user, mock_request, ['i4x', 'edX', 'toy', 'html', 'toyjumpto'],
-                                   model_data_cache, self.course_id)
+        module = render.get_module(
+            self.mock_user,
+            mock_request,
+            ['i4x', 'edX', 'toy', 'html', 'toyjumpto'],
+            model_data_cache, self.course_id
+        )
 
         # get the rendered HTML output which should have the rewritten link
         html = module.get_html()
