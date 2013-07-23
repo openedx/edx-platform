@@ -159,6 +159,7 @@ body.dashboard {
       }
 
       // specific - request button
+      // BT: should we abstract these states out for all buttons like this
       .action-request {
       	position: relative;
       	overflow: hidden;
@@ -173,6 +174,7 @@ body.dashboard {
       		opacity: 0.0;
       	}
 
+        // state: submitting
       	&.is-submitting {
       		padding-left: ($baseline*2);
 
@@ -182,6 +184,19 @@ body.dashboard {
 						opacity: 1.0;
 					}
       	}
+
+        // state: has an error
+        &.has-error {
+          padding-left: ($baseline*2);
+          background: $red;
+          border-color: $red-d1;
+
+          .icon-cog {
+            left: ($baseline*0.75);
+            visibility: visible;
+            opacity: 1.0;
+          }
+        }
       }
     }
 
