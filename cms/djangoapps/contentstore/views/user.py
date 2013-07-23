@@ -83,6 +83,9 @@ def add_user(request, location):
         }
         return JsonResponse(msg, 400)
 
+    # remove leading/trailing whitespace if necessary
+    email = email.strip()
+
     # check that logged in user has admin permissions to this course
     if not has_access(request.user, location, role=INSTRUCTOR_ROLE_NAME):
         raise PermissionDenied()
