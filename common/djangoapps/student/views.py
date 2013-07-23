@@ -369,8 +369,8 @@ def change_enrollment(request):
                         .format(user.username, course_id))
             return HttpResponseBadRequest("Course id is invalid")
 
-        if not has_access(user, course, 'enroll'):
-            return HttpResponseBadRequest("Enrollment is closed")
+        # if not has_access(user, course, 'enroll'):
+        #     return HttpResponseBadRequest("Enrollment is closed")
 
         org, course_num, run = course_id.split("/")
         statsd.increment("common.student.enrollment",

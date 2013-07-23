@@ -63,7 +63,12 @@
 				
 				"thumbnail": {
 					"type": "binary"
-				}
+				},
+
+                "course_id": {
+                    "type": "string",
+                    "store": "true"
+                }
 			}
 		}
 	},

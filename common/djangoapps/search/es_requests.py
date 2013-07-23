@@ -19,7 +19,7 @@ from xhtml2pdf import pisa as pisa
 
 class ElasticDatabase:
 
-    def __init__(self, url, index_settings_file=os.getcwd()+"/common/djangoapps/search/settings.json"):
+    def __init__(self, url, index_settings_file=os.path.dirname(os.path.realpath(__file__)) + "/settings.json"):
         """
         Will initialize elastic search object with specified indices
         specifically the url should be something of the form `http://localhost:9200`
@@ -213,7 +213,7 @@ class MongoIndexer:
         chunk = self.chunk_collection.find_one({"files_id.name": name_pattern})
         try:
             return filter(None, json.loads(chunk["data"].decode('utf-8', "ignore"))["text"])
-        except ValueError:
+        except (ValueError, TypeError):
             return [""]
 
     def pdf_to_text(self, mongo_element):
@@ -296,9 +296,9 @@ class MongoIndexer:
         else:
             return None
 
-    def course_name_from_mongo_element(self, mongo_element):
+    def course_name_from_mongo_module(self, mongo_module):
         course_element = self.module_collection.find_one({
-            "_id.course": mongo_element["_id"]["course"],
+            "_id.course": mongo_module["_id"]["course"],
             "_id.category": "course"
         })
         return course_element["_id"]["name"]
@@ -306,6 +306,9 @@ class MongoIndexer:
     def basic_dict(self, mongo_module, type):
         """Returns the part of the es schema that is the same for every object."""
         id = json.dumps(mongo_module["_id"])
+        org = mongo_module["_id"]["org"]
+        course = mongo_module["_id"]["course"]
+        course_id = "/".join([org, course, self.course_name_from_mongo_module(mongo_module)])
         hash = hashlib.sha1(id).hexdigest()
         display_name = (
             mongo_module.get("metadata", {"display_name": ""}).get("display_name", "") +
@@ -314,7 +317,7 @@ class MongoIndexer:
         searchable_text = self.get_searchable_text(mongo_module, type)
         thumbnail = self.get_thumbnail(mongo_module, type)
         return {
-            "id": id, "hash": hash, "display_name": display_name,
+            "id": id, "hash": hash, "display_name": display_name, "course_id": course_id,
             "searchable_text": searchable_text, "thumbnail": thumbnail
         }
 
@@ -330,7 +333,7 @@ class MongoIndexer:
         elif type.lower() == "problem":
             searchable_text = self.searchable_text_from_problem_data(mongo_module)
         elif type.lower() == "transcript":
-            searchable_text = self.find_transcript_for_video_module(mongo_module, type)
+            searchable_text = self.find_transcript_for_video_module(mongo_module)
         return searchable_text
 
     def get_thumbnail(self, mongo_module, type):
@@ -338,7 +341,9 @@ class MongoIndexer:
             try:
                 name = re.sub(r'(.*?)(/asset/)(.*?)(\.pdf)(.*?)$', r'\3'+".pdf", mongo_module["definition"]["data"])
                 asset = self.find_asset_with_name(name)
-                thumbnail = self.thumbnail_from_pdf(asset["data"].__str__())
+                if asset is None:
+                    raise DelegateError
+                thumbnail = self.thumbnail_from_pdf(asset.get("data", "").__str__())
             except (DelegateError, MissingDelegateError, CorruptImageError):
                 thumbnail = ""
         elif type.lower() == "problem":
@@ -443,6 +448,8 @@ class EnchantDictionary:
         for entry in json.loads(response._content)['hits']['hits']:
             if entry["_source"].get("searchable_text", False):
                 text = entry["_source"]["searchable_text"]
+                if isinstance(text, list):
+                    text = " ".join(text)
                 words |= set(re.findall(r'[a-z]+', text.lower()))
                 hits += 1
                 print "HITS:" + str(hits)
@@ -455,21 +462,19 @@ class EnchantDictionary:
                 dictionary.write(word+"\n")
 
 
-url = "http://localhost:9200"
-settings_file = os.getcwd() + "/common/djangoapps/search/settings.json"
+#url = "http://localhost:9200"
 
-mongo = MongoIndexer()
+#mongo = MongoIndexer()
 
-
-test = ElasticDatabase(url, settings_file)
-dictionary = EnchantDictionary(test)
+#test = ElasticDatabase(url)
+#dictionary = EnchantDictionary(test)
 
 #print test.delete_index("pdf-index")
 #print test.delete_index("transcript-index")
 #print test.delete_index("problem-index")
-#mongo.index_all_pdfs(test, "pdf-index")
-#mongo.index_all_transcripts(test, "transcript-index")
-#mongo.index_all_problems(test, "problem-index")
+#mongo.index_all_pdfs("pdf-index")
+#mongo.index_all_transcripts("transcript-index")
+#mongo.index_all_problems("problem-index")
 #dictionary.produce_dictionary("pyenchant_corpus.txt", max_results=500000)
 
 #print test.setup_type("transcript", "cleaning", mapping)._content
