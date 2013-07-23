@@ -1,6 +1,7 @@
 import json
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
+from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
@@ -11,7 +12,7 @@ from mitxmako.shortcuts import render_to_response
 from django.core.context_processors import csrf
 
 from xmodule.modulestore.django import modulestore
-from contentstore.utils import get_url_reverse, get_lms_link_for_item
+from contentstore.utils import get_lms_link_for_item
 from util.json_request import JsonResponse
 from auth.authz import (
     STAFF_ROLE_NAME, INSTRUCTOR_ROLE_NAME, get_users_in_course_group_by_role,
@@ -40,11 +41,22 @@ def index(request):
                 and course.location.name != '')
     courses = filter(course_filter, courses)
 
+    def format_course_for_view(course):
+        return (
+            course.display_name,
+            reverse("course_index", kwargs={
+                'org': course.location.org,
+                'course': course.location.course,
+                'name': course.location.name,
+            }),
+            get_lms_link_for_item(
+                course.location,
+                course_id=course.location.course_id,
+            ),
+        )
+
     return render_to_response('index.html', {
-        'courses': [(course.display_name,
-                    get_url_reverse('CourseOutline', course),
-                    get_lms_link_for_item(course.location, course_id=course.location.course_id))
-                    for course in courses],
+        'courses': [format_course_for_view(c) for c in courses],
         'user': request.user,
         'request_course_creator_url': reverse('request_course_creator'),
         'course_creator_status': _get_course_creator_status(request.user),
