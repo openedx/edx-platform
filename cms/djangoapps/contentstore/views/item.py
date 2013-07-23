@@ -13,16 +13,26 @@ from util.json_request import expect_json
 from ..utils import get_modulestore
 from .access import has_access
 from .requests import _xmodule_recurse
+from xmodule.x_module import XModuleDescriptor
 
-__all__ = ['save_item', 'clone_item', 'delete_item']
+__all__ = ['save_item', 'create_item', 'delete_item']
 
 # cdodge: these are categories which should not be parented, they are detached from the hierarchy
 DETACHED_CATEGORIES = ['about', 'static_tab', 'course_info']
 
-
 @login_required
 @expect_json
 def save_item(request):
+    """
+    Will carry a json payload with these possible fields
+    :id (required): the id
+    :data (optional): the new value for the data
+    :metadata (optional): new values for the metadata fields.
+        Any whose values are None will be deleted not set to None! Absent ones will be left alone
+    :nullout (optional): which metadata fields to set to None
+    """
+    # The nullout is a bit of a temporary copout until we can make module_edit.coffee and the metadata editors a
+    # little smarter and able to pass something more akin to {unset: [field, field]}
     item_location = request.POST['id']
 
     # check permissions for this user within this course
@@ -42,59 +52,98 @@ def save_item(request):
         children = request.POST['children']
         store.update_children(item_location, children)
 
-    # cdodge: also commit any metadata which might have been passed along in the
-    # POST from the client, if it is there
-    # NOTE, that the postback is not the complete metadata, as there's system metadata which is
-    # not presented to the end-user for editing. So let's fetch the original and
-    # 'apply' the submitted metadata, so we don't end up deleting system metadata
-    if request.POST.get('metadata') is not None:
-        posted_metadata = request.POST['metadata']
-        # fetch original
+    # cdodge: also commit any metadata which might have been passed along
+    if request.POST.get('nullout') is not None or request.POST.get('metadata') is not None:
+        # the postback is not the complete metadata, as there's system metadata which is
+        # not presented to the end-user for editing. So let's fetch the original and
+        # 'apply' the submitted metadata, so we don't end up deleting system metadata
         existing_item = modulestore().get_item(item_location)
+        for metadata_key in request.POST.get('nullout', []):
+            # [dhm] see comment on _get_xblock_field
+            _get_xblock_field(existing_item, metadata_key).write_to(existing_item, None)
 
         # update existing metadata with submitted metadata (which can be partial)
-        # IMPORTANT NOTE: if the client passed pack 'null' (None) for a piece of metadata that means 'remove it'
-        for metadata_key, value in posted_metadata.items():
+        # IMPORTANT NOTE: if the client passed 'null' (None) for a piece of metadata that means 'remove it'. If
+        # the intent is to make it None, use the nullout field
+        for metadata_key, value in request.POST.get('metadata', {}).items():
+            # [dhm] see comment on _get_xblock_field
+            field = _get_xblock_field(existing_item, metadata_key)
 
-            if posted_metadata[metadata_key] is None:
-                # remove both from passed in collection as well as the collection read in from the modulestore
-                if metadata_key in existing_item._model_data:
-                    del existing_item._model_data[metadata_key]
-                del posted_metadata[metadata_key]
+            if value is None:
+                field.delete_from(existing_item)
             else:
-                existing_item._model_data[metadata_key] = value
-
+                value = field.from_json(value)
+                field.write_to(existing_item, value)
+        # Save the data that we've just changed to the underlying
+        # MongoKeyValueStore before we update the mongo datastore.
+        existing_item.save()
         # commit to datastore
-        # TODO (cpennington): This really shouldn't have to do this much reaching in to get the metadata
         store.update_metadata(item_location, own_metadata(existing_item))
 
     return HttpResponse()
 
 
+# [DHM] A hack until we implement a permanent soln. Proposed perm solution is to make namespace fields also top level
+# fields in xblocks rather than requiring dereference through namespace but we'll need to consider whether there are
+# plausible use cases for distinct fields w/ same name in different namespaces on the same blocks.
+# The idea is that consumers of the xblock, and particularly the web client, shouldn't know about our internal
+# representation (namespaces as means of decorating all modules).
+# Given top-level access, the calls can simply be setattr(existing_item, field, value) ...
+# Really, this method should be elsewhere (e.g., xblock). We also need methods for has_value (v is_default)...
+def _get_xblock_field(xblock, field_name):
+    """
+    A temporary function to get the xblock field either from the xblock or one of its namespaces by name.
+    :param xblock:
+    :param field_name:
+    """
+    def find_field(fields):
+        for field in fields:
+            if field.name == field_name:
+                return field
+
+    found = find_field(xblock.fields)
+    if found:
+        return found
+    for namespace in xblock.namespaces:
+        found = find_field(getattr(xblock, namespace).fields)
+        if found:
+            return found
+
+
 @login_required
 @expect_json
-def clone_item(request):
+def create_item(request):
     parent_location = Location(request.POST['parent_location'])
-    template = Location(request.POST['template'])
+    category = request.POST['category']
 
     display_name = request.POST.get('display_name')
 
     if not has_access(request.user, parent_location):
         raise PermissionDenied()
 
-    parent = get_modulestore(template).get_item(parent_location)
-    dest_location = parent_location._replace(category=template.category, name=uuid4().hex)
+    parent = get_modulestore(category).get_item(parent_location)
+    dest_location = parent_location.replace(category=category, name=uuid4().hex)
 
-    new_item = get_modulestore(template).clone_item(template, dest_location)
+    # get the metadata, display_name, and definition from the request
+    metadata = {}
+    data = None
+    template_id = request.POST.get('boilerplate')
+    if template_id is not None:
+        clz = XModuleDescriptor.load_class(category)
+        if clz is not None:
+            template = clz.get_template(template_id)
+            if template is not None:
+                metadata = template.get('metadata', {})
+                data = template.get('data')
 
-    # replace the display name with an optional parameter passed in from the caller
     if display_name is not None:
-        new_item.display_name = display_name
+        metadata['display_name'] = display_name
 
-    get_modulestore(template).update_metadata(new_item.location.url(), own_metadata(new_item))
+    get_modulestore(category).create_and_save_xmodule(dest_location, definition_data=data,
+        metadata=metadata, system=parent.system)
 
-    if new_item.location.category not in DETACHED_CATEGORIES:
-        get_modulestore(parent.location).update_children(parent_location, parent.children + [new_item.location.url()])
+    if category not in DETACHED_CATEGORIES:
+        get_modulestore(parent.location).update_children(parent_location, parent.children + [dest_location.url()])
 
     return HttpResponse(json.dumps({'id': dest_location.url()}))
 

@@ -194,6 +194,10 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
             if hasattr(descriptor, 'children'):
                 for child in descriptor.get_children():
                     parent_tracker.add_parent(child.location, descriptor.location)
+
+            # After setting up the descriptor, save any changes that we have
+            # made to attributes on the descriptor to the underlying KeyValueStore.
+            descriptor.save()
             return descriptor
 
         render_template = lambda: ''
@@ -463,7 +467,10 @@ class XMLModuleStore(ModuleStoreBase):
                     # tabs are referenced in policy.json through a 'slug' which is just the filename without the .html suffix
                     slug = os.path.splitext(os.path.basename(filepath))[0]
                     loc = Location('i4x', course_descriptor.location.org, course_descriptor.location.course, category, slug)
-                    module = HtmlDescriptor(system, {'data': html, 'location': loc})
+                    module = HtmlDescriptor(
+                        system,
+                        {'data': html, 'location': loc, 'category': category}
+                    )
                     # VS[compat]:
                     # Hack because we need to pull in the 'display_name' for static tabs (because we need to edit them)
                     # from the course policy

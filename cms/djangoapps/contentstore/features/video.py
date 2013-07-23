@@ -14,7 +14,7 @@ def does_not_autoplay(_step):
 @step('creating a video takes a single click')
 def video_takes_a_single_click(_step):
     assert(not world.is_css_present('.xmodule_VideoModule'))
-    world.css_click("a[data-location='i4x://edx/templates/video/default']")
+    world.css_click("a[data-category='video']")
     assert(world.is_css_present('.xmodule_VideoModule'))
 
 

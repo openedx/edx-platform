@@ -8,7 +8,7 @@ Feature: Course checklists
   Scenario: A course author can mark tasks as complete
     Given I have opened Checklists
     Then I can check and uncheck tasks in a checklist
-    And They are correctly selected after I reload the page
+    And They are correctly selected after reloading the page
 
   Scenario: A task can link to a location within Studio
     Given I have opened Checklists

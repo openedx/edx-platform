@@ -3,6 +3,8 @@ Namespace that defines fields common to all blocks used in the LMS
 """
 from xblock.core import Namespace, Boolean, Scope, String, Float
 from xmodule.fields import Date, Timedelta
+from datetime import datetime
+from pytz import UTC
 
 
 class LmsNamespace(Namespace):
@@ -25,7 +27,11 @@ class LmsNamespace(Namespace):
         scope=Scope.settings,
     )
 
-    start = Date(help="Start time when this module is visible", scope=Scope.settings)
+    start = Date(
+        help="Start time when this module is visible",
+        default=datetime.fromtimestamp(0, UTC),
+        scope=Scope.settings
+    )
     due = Date(help="Date that this problem is due by", scope=Scope.settings)
     source_file = String(help="source file name (eg for latex)", scope=Scope.settings)
     giturl = String(help="url root for course data git repository", scope=Scope.settings)
@@ -35,8 +41,16 @@ class LmsNamespace(Namespace):
         help="Amount of time after the due date that submissions will be accepted",
         scope=Scope.settings
     )
-    showanswer = String(help="When to show the problem answer to the student", scope=Scope.settings, default="closed")
-    rerandomize = String(help="When to rerandomize the problem", default="always", scope=Scope.settings)
+    showanswer = String(
+        help="When to show the problem answer to the student",
+        scope=Scope.settings,
+        default="finished"
+    )
+    rerandomize = String(
+        help="When to rerandomize the problem",
+        default="never",
+        scope=Scope.settings
+    )
     days_early_for_beta = Float(
         help="Number of days early to show content to beta users",
         default=None,

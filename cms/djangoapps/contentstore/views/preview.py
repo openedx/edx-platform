@@ -7,7 +7,7 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from mitxmako.shortcuts import render_to_response
 
-from xmodule_modifiers import replace_static_urls, wrap_xmodule
+from xmodule_modifiers import replace_static_urls, wrap_xmodule, save_module  # pylint: disable=F0401
 from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import exc_info_to_str
 from xmodule.exceptions import NotFoundError, ProcessingError
@@ -47,6 +47,8 @@ def preview_dispatch(request, preview_id, location, dispatch=None):
     # Let the module handle the AJAX
     try:
         ajax_return = instance.handle_ajax(dispatch, request.POST)
+        # Save any module data that has changed to the underlying KeyValueStore
+        instance.save()
 
     except NotFoundError:
         log.exception("Module indicating to user that request doesn't exist")
@@ -164,6 +166,11 @@ def load_preview_module(request, preview_id, descriptor):
         module.get_html,
         getattr(module, 'data_dir', module.location.course),
         course_namespace=Location([module.location.tag, module.location.org, module.location.course, None, None])
+    )
+
+    module.get_html = save_module(
+        module.get_html,
+        module
     )
 
     return module

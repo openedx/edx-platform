@@ -89,6 +89,21 @@ def grade_histogram(module_id):
     return grades
 
 
+def save_module(get_html, module):
+    """
+    Updates the given get_html function for the given module to save the fields
+    after rendering.
+    """
+    @wraps(get_html)
+    def _get_html():
+        """Cache the rendered output, save, then return the output."""
+        rendered_html = get_html()
+        module.save()
+        return rendered_html
+
+    return _get_html
+
+
 def add_histogram(get_html, module, user):
     """
     Updates the supplied module with a new get_html function that wraps
@@ -120,7 +135,7 @@ def add_histogram(get_html, module, user):
                 # doesn't like symlinks)
                 filepath = filename
             data_dir = osfs.root_path.rsplit('/')[-1]
-            giturl = getattr(module.lms, 'giturl', '') or 'https://github.com/MITx'
+            giturl = module.lms.giturl or 'https://github.com/MITx'
             edit_link = "%s/%s/tree/master/%s" % (giturl, data_dir, filepath)
         else:
             edit_link = False

@@ -29,17 +29,17 @@ class BaseTestXmodule(ModuleStoreTestCase):
         2. create, enrol and login users for this course;
 
     Any xmodule should overwrite only next parameters for test:
-        1. TEMPLATE_NAME
+        1. CATEGORY
         2. DATA
         3. MODEL_DATA
 
-    This class should not contain any tests, because TEMPLATE_NAME
+    This class should not contain any tests, because CATEGORY
     should be defined in child class.
     """
     USER_COUNT = 2
 
     # Data from YAML common/lib/xmodule/xmodule/templates/NAME/default.yaml
-    TEMPLATE_NAME = ""
+    CATEGORY = ""
     DATA = ''
     MODEL_DATA = {'data': '<some_module></some_module>'}
 
@@ -53,11 +53,11 @@ class BaseTestXmodule(ModuleStoreTestCase):
 
         chapter = ItemFactory.create(
             parent_location=self.course.location,
-            template="i4x://edx/templates/sequential/Empty",
+            category="sequential",
         )
         section = ItemFactory.create(
             parent_location=chapter.location,
-            template="i4x://edx/templates/sequential/Empty"
+            category="sequential"
         )
 
         # username = robot{0}, password = 'test'
@@ -71,7 +71,7 @@ class BaseTestXmodule(ModuleStoreTestCase):
 
         self.item_descriptor = ItemFactory.create(
             parent_location=section.location,
-            template=self.TEMPLATE_NAME,
+            category=self.CATEGORY,
             data=self.DATA
         )
 

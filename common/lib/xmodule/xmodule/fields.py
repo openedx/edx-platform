@@ -58,8 +58,7 @@ class Date(ModelType):
         else:
             msg = "Field {0} has bad value '{1}'".format(
                 self._name, field)
-            log.warning(msg)
-            return None
+            raise TypeError(msg)
 
     def to_json(self, value):
         """
@@ -76,6 +75,8 @@ class Date(ModelType):
                 return value.strftime('%Y-%m-%dT%H:%M:%SZ')
             else:
                 return value.isoformat()
+        else:
+            raise TypeError("Cannot convert {} to json".format(value))
 
 TIMEDELTA_REGEX = re.compile(r'^((?P<days>\d+?) day(?:s?))?(\s)?((?P<hours>\d+?) hour(?:s?))?(\s)?((?P<minutes>\d+?) minute(?:s)?)?(\s)?((?P<seconds>\d+?) second(?:s)?)?$')
 
