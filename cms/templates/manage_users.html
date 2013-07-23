@@ -140,9 +140,6 @@
         type: 'DELETE',
         dataType: 'json',
         contentType: 'application/json',
-        data: JSON.stringify({
-          role: 'staff',
-        }),
         complete: function() {
           location.reload();
         }
@@ -153,18 +150,18 @@
       e.preventDefault()
       var type;
       if($(this).hasClass("add-admin")) {
-        type = 'POST';
+        role = 'instructor';
       } else {
-        type = 'DELETE';
+        role = 'staff';
       }
       var url = $(this).closest("li").data("url");
       $.ajax({
         url: url,
-        type: type,
+        type: 'POST',
         dataType: 'json',
         contentType: 'application/json',
         data: JSON.stringify({
-          role: 'instructor',
+          role: role
         }),
         complete: function() {
           location.reload();

@@ -111,20 +111,23 @@ def course_team_user(request, org, course, name, email):
         }
         return JsonResponse(msg, 404)
 
+    # role hierarchy: "instructor" has more permissions than "staff" (in a course)
+    roles = ["instructor", "staff"]
+
     if request.method == "GET":
         # just return info about the user
-        roles = set()
-        for group in user.groups.all():
-            if not "_" in group.name:
-                continue
-            role, coursename = group.name.split("_", 1)
-            if coursename in (location.course, location.course_id):
-                roles.add(role)
         msg = {
             "email": user.email,
             "active": user.is_active,
-            "roles": list(roles),
+            "role": None,
         }
+        # what's the highest role that this user has?
+        groupnames = set(g.name for g in user.groups.all())
+        for role in roles:
+            role_groupname = get_course_groupname_for_role(location, role)
+            if role_groupname in groupnames:
+                msg["role"] = role
+                break
         return JsonResponse(msg)
 
     # can't modify an inactive user
@@ -134,11 +137,14 @@ def course_team_user(request, org, course, name, email):
         }
         return JsonResponse(msg, 400)
 
-    # all other operations require the requesting user to specify a role --
-    # or if no role is specified, default to "staff"
-    if not request.body:
-        role = STAFF_ROLE_NAME
-    else:
+    if request.method == "DELETE":
+        # remove all roles in this course from this user
+        for role in roles:
+            remove_user_from_course_group(request.user, user, location, role)
+        return JsonResponse()
+
+    # all other operations require the requesting user to specify a role
+    if request.META.get("CONTENT_TYPE", "") == "application/json" and request.body:
         try:
             payload = json.loads(request.body)
         except:
@@ -147,15 +153,21 @@ def course_team_user(request, org, course, name, email):
             role = payload["role"]
         except KeyError:
             return JsonResponse({"error": "`role` is required"}, 400)
-    groupname = get_course_groupname_for_role(location, role)
-    group = Group.objects.get_or_create(name=groupname)
+    else:
+        if not "role" in request.POST:
+            return JsonResponse({"error": "`role` is required"}, 400)
+        role = request.POST["role"]
 
-    if request.method in ("POST", "PUT"):
+    # make sure that the role group exists
+    groupname = get_course_groupname_for_role(location, role)
+    Group.objects.get_or_create(name=groupname)
+
+    if role == "instructor":
         add_user_to_course_group(request.user, user, location, role)
-        return JsonResponse()
-    elif request.method == "DELETE":
-        remove_user_from_course_group(request.user, user, location, role)
-        return JsonResponse()
+    elif role == "staff":
+        add_user_to_course_group(request.user, user, location, role)
+        remove_user_from_course_group(request.user, user, location, "instructor")
+    return JsonResponse()
 
 
 def _get_course_creator_status(user):
