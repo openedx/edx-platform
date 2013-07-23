@@ -42,7 +42,12 @@ class LatexRenderedTest(PreviewTestUtility):
         Helper method to test the way parens are wrapped.
         """
         obj = preview.LatexRendered(math, parens=parens, tall=tall)
-        self.assert_latex_rendered(obj, tall=tall, latex=with_parens, sans_parens=math)
+        self.assert_latex_rendered(
+            obj,
+            tall=tall,
+            latex=with_parens,
+            sans_parens=math
+        )
 
     def test_parens(self):
         """ Test curvy parens. """
@@ -106,6 +111,18 @@ class RenderMethodsTest(PreviewTestUtility):
         render_variable = preview.variable_closure(['x', 'y'], lambda x: x.lower())
         out = _call_render_method(render_variable, ['x'])
         self.assert_latex_rendered(out, latex='x')
+
+    def test_variable_unicode(self):
+        """
+        Simple valid unicode variables should pass through as well.
+
+        Note: it isn't supported right now in the rest of the code (esp. the
+        way we have set up pyparsing), but when it is, this should work.
+        """
+        var = "✖"
+        render_variable = preview.variable_closure([var], lambda x: x.lower())
+        out = _call_render_method(render_variable, [var])
+        self.assert_latex_rendered(out, latex=var)
 
     def test_greek(self):
         """ Variable names that are greek should be formatted accordingly. """

@@ -136,6 +136,9 @@ def render_power(children):
 
     If you have 'a^(b+c)' don't include that last set of parens ('a^{b+c}').
     """
+    if len(children) == 1:
+        return children[0]
+
     children_latex = [k.latex for k in children if k.latex != "^"]
     children_latex[-1] = children[-1].sans_parens
 
@@ -237,13 +240,13 @@ def render_atom(children):
     """
     parens = None
     if children[0].latex in "([{":
+        # then len(children) == 3
         parens = children[0].latex
-        children = children[1:-1]
-    tall = any(k.tall for k in children)
+        children = [children[1]]
     return LatexRendered(
-        "".join(k.latex for k in children),
+        children[0].latex,
         parens,
-        tall
+        children[0].tall
     )
 
 
@@ -281,8 +284,8 @@ def latex_preview(math_expr, variables=(), functions=(), case_sensitive=False):
         'sum': render_sum
     }
 
-    bs = "\\"
-    wrap_escaped_strings = lambda s: LatexRendered(s.replace(bs, bs * 2))
+    bksh = "\\"
+    wrap_escaped_strings = lambda s: LatexRendered(s.replace(bksh, bksh * 2))
 
     output = thing.handle_tree(render_actions, wrap_escaped_strings)
     return output.latex
