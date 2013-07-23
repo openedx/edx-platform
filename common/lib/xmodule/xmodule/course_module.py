@@ -410,7 +410,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
                     continue
 
         # TODO check that this is still needed here and can't be by defaults.
-        if self.tabs is None:
+        if not self.tabs:
             # When calling the various _tab methods, can omit the 'type':'blah' from the
             # first arg, since that's only used for dispatch
             tabs = []
