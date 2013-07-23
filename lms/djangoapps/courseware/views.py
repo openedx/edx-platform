@@ -33,6 +33,7 @@ from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError, NoPathToItem
 from xmodule.modulestore.search import path_to_location
+from xmodule.course_module import CourseDescriptor
 
 import comment_client
 
@@ -444,6 +445,27 @@ def index(request, course_id, chapter=None, section=None,
                 raise
 
     return result
+
+
+@ensure_csrf_cookie
+def jump_to_id(request, course_id, module_id):
+    """
+    This entry point allows for a shorter version of a jump to where just the id of the element is
+    passed in. This assumes that id is unique within the course_id namespace
+    """
+
+    course_location = CourseDescriptor.id_to_location(course_id)
+
+    items = modulestore().get_items(['i4x', course_location.org, course_location.course, None, module_id])
+
+    if len(items) == 0:
+        raise Http404("Could not find id = {0} in course_id = {1}. Referer = {2}".
+                      format(module_id, course_id, request.META.get("HTTP_REFERER", "")))
+    if len(items) > 1:
+        log.warning("Multiple items found with id = {0} in course_id = {1}. Referer = {2}. Using first found {3}...".
+                    format(module_id, course_id, request.META.get("HTTP_REFERER", ""), items[0].location.url()))
+
+    return jump_to(request, course_id, items[0].location.url())
 
 
 @ensure_csrf_cookie
