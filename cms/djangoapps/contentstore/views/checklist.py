@@ -107,7 +107,10 @@ def expand_checklist_action_urls(course_module):
     for checklist in checklists:
         if not checklist.get('action_urls_expanded', False):
             for item in checklist.get('items'):
-                urlconf_name = urlconf_map.get(item.get('action_url'))
+                action_url = item.get('action_url')
+                if action_url not in urlconf_map:
+                    continue
+                urlconf_name = urlconf_map[action_url]
                 item['action_url'] = reverse(urlconf_name, kwargs={
                     'org': course_module.location.org,
                     'course': course_module.location.course,
