@@ -434,16 +434,16 @@ if settings.MITX_FEATURES.get('ENABLE_HINTER_INSTRUCTOR_VIEW'):
             'instructor.hint_manager.hint_manager', name="hint_manager"),
     )
 
-urlpatterns = patterns(*urlpatterns)
-
-if settings.DEBUG:
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-
 # enable automatic login
 if settings.MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_LOAD_TESTING'):
     urlpatterns += (
         url(r'^auto_auth$', 'student.views.auto_auth'),
     )
+
+urlpatterns = patterns(*urlpatterns)
+
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 #Custom error pages
 handler404 = 'static_template_view.views.render_404'

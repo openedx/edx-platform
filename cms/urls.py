@@ -149,6 +149,12 @@ if settings.MITX_FEATURES.get('ENABLE_SERVICE_STATUS'):
 
 urlpatterns += (url(r'^admin/', include(admin.site.urls)),)
 
+# enable automatic login
+if settings.MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_LOAD_TESTING'):
+    urlpatterns += (
+        url(r'^auto_auth$', 'student.views.auto_auth'),
+    )
+
 urlpatterns = patterns(*urlpatterns)
 
 # Custom error pages
