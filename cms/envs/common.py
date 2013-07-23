@@ -31,6 +31,8 @@ from path import path
 ############################ FEATURE CONFIGURATION #############################
 
 MITX_FEATURES = {
+    'IS_CMS': True,
+
     'USE_DJANGO_PIPELINE': True,
 
     'GITHUB_PUSH': False,

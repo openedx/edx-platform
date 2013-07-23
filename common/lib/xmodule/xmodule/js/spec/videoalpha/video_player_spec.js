@@ -356,9 +356,9 @@
 
         videoPlayer.updateInterval = 100;
 
-        spyOn(videoPlayer, 'updatePlayTime').andCallThrough();
-        spyOn(videoPlayer, 'log').andCallThrough();
-        spyOn(videoPlayer.player, 'seekTo').andCallThrough();
+        spyOn(videoPlayer, 'updatePlayTime');
+        spyOn(videoPlayer, 'log');
+        spyOn(videoPlayer.player, 'seekTo');
       });
 
       it('Slider event causes log update', function () {

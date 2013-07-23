@@ -46,6 +46,7 @@ DISCUSSION_SETTINGS = {
 
 # Features
 MITX_FEATURES = {
+    'IS_CMS': False,
     'SAMPLE': False,
     'USE_DJANGO_PIPELINE': True,
     'DISPLAY_HISTOGRAMS_TO_STAFF': True,
@@ -72,7 +73,7 @@ MITX_FEATURES = {
     'ENABLE_TEXTBOOK': True,
     'ENABLE_DISCUSSION_SERVICE': True,
     # discussion home panel, which includes a subscription on/off setting for discussion digest emails.
-    # this should remain off in production until digest notifications are online. 
+    # this should remain off in production until digest notifications are online.
     'ENABLE_DISCUSSION_HOME_PANEL': False,
 
     'ENABLE_PSYCHOMETRICS': False,  # real-time psychometrics (eg item response theory analysis in instructor dashboard)

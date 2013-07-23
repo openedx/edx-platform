@@ -12,6 +12,8 @@
   data-streams="${youtube_streams}"
   % endif
 
+  data-in-studio="${settings.MITX_FEATURES['IS_CMS']}"
+
   ${'data-sub="{}"'.format(sub) if sub else ''}
       ${'data-autoplay="{}"'.format(autoplay) if autoplay else ''}
   % if not settings.MITX_FEATURES['STUB_VIDEO_FOR_TESTING']:

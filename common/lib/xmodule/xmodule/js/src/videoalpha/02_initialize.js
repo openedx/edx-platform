@@ -99,7 +99,9 @@ function (VideoPlayer) {
                     my: 'top right',
                     at: 'top center'
                 }
-            }
+            },
+
+            inCms:              this.el.data('in-studio')
         };
 
         // Try to parse YouTube stream ID's. If

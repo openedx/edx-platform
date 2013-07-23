@@ -41,6 +41,7 @@ function () {
     function renderElements(state) {
         state.videoQualityControl.el = state.el.find('a.quality_control');
 
+        state.videoQualityControl.el.show();
         state.videoQualityControl.quality = null;
 
         if (!onTouchBasedDevice()) {
@@ -71,6 +72,12 @@ function () {
         }
     }
 
+    // This function change quality of video.
+    // Right now we haven't ability to choose quality of HD video,
+    // 'hd720' will be played by default as HD video(this thing is hardcoded).
+    // If suggested quality level is not available for the video,
+    // then the quality will be set to the next lowest level that is available.
+    // (large -> medium)
     function toggleQuality(event) {
         var newQuality,
             value = this.videoQualityControl.quality;

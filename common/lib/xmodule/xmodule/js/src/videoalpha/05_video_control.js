@@ -51,6 +51,10 @@ function () {
 
         state.videoControl.fullScreenState = false;
 
+        if (state.config.inCms === 'True') {
+            state.videoControl.fullScreenEl.hide();
+        }
+
         if (!onTouchBasedDevice()) {
             state.videoControl.pause();
 
