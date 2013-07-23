@@ -785,6 +785,18 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
 
         return metadata_fields
 
+    # ~~~~~~~~~~~~~~~ XBlock API Wrappers ~~~~~~~~~~~~~~~~
+    def studio_view(self, context):
+        """
+        Return a fragment with the html from this XModuleDescriptor's editing view
+
+        Doesn't yet add any of the javascript to the fragment, nor the css.
+        Also doesn't expect any javascript binding, yet.
+
+        Makes no use of the context parameter
+        """
+        return Fragment(self.get_html())
+
 
 class DescriptorSystem(object):
     def __init__(self, load_item, resources_fs, error_tracker, **kwargs):
