@@ -101,9 +101,10 @@ def create_new_course(request):
     org = request.POST.get('org')
     number = request.POST.get('number')
     display_name = request.POST.get('display_name')
+    run = request.POST.get('run')
 
     try:
-        dest_location = Location('i4x', org, number, 'course', Location.clean(display_name))
+        dest_location = Location('i4x', org, number, 'course', run)
     except InvalidLocationError as error:
         return JsonResponse({
             "ErrMsg": "Unable to create course '{name}'.\n\n{err}".format(
@@ -116,7 +117,7 @@ def create_new_course(request):
     except ItemNotFoundError:
         pass
     if existing_course is not None:
-        return JsonResponse({'ErrMsg': 'There is already a course defined with this name.'})
+        return JsonResponse({'ErrMsg': 'There is already a course defined with the same organization, course number, and course run.'})
 
     course_search_location = ['i4x', dest_location.org, dest_location.course, 'course', None]
     courses = modulestore().get_items(course_search_location)
