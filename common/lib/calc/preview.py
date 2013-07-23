@@ -62,6 +62,9 @@ class LatexRendered(object):
 
 
 def render_number(children):
+    """
+    Combine the elements forming the number, escaping the suffix if needed.
+    """
     # TODO exponential notation
     if children[-1].latex in SUFFIXES:
         children[-1].latex = ur"\text{{{suffix}}}".format(suffix=children[-1].latex)
@@ -69,7 +72,13 @@ def render_number(children):
 
 
 def variable_closure(variables, casify):
+    """
+    Wrap `render_variable` so it knows the variables allowed.
+    """
     def render_variable(children):
+        """
+        Replace greek letters, otherwise escape the variable names.
+        """
         # TODO epsilon_0
         # TODO check if valid and color accordingly
         greek = "alpha beta gamma delta epsilon varepsilon zeta eta theta vartheta iota kappa lambda mu nu xi pi rho sigma tau upsilon phi varphi chi psi omega".split(" ")
@@ -85,7 +94,15 @@ def variable_closure(variables, casify):
 
 
 def function_closure(functions, casify):
+    """
+    Wrap `render_function` so it knows the functions allowed.
+    """
     def render_function(children):
+        """
+        Escape function names and give proper formatting to exceptions.
+
+        The exceptions being 'sqrt', 'log2', and 'log10' as of now.
+        """
         fname = children[0].latex
         if casify(fname) not in functions:
             pass
@@ -114,6 +131,11 @@ def function_closure(functions, casify):
 
 
 def render_power(children):
+    """
+    Combine powers so that the latex is wrapped in curly braces correctly.
+
+    If you have 'a^(b+c)' don't include that last set of parens ('a^{b+c}').
+    """
     children_latex = [k.latex for k in children if k.latex != "^"]
     children_latex[-1] = children[-1].sans_parens
 
@@ -123,6 +145,9 @@ def render_power(children):
 
 
 def render_parallel(children):
+    """
+    Simply combine elements with a double vertical line.
+    """
     children_latex = [k.latex for k in children if k.latex != "||"]
     latex = r"\|".join(children_latex)
     tall = any(k.tall for k in children)
@@ -130,7 +155,11 @@ def render_parallel(children):
 
 
 def render_frac(numerator, denominator):
-    # subtlety: avoid parens if there is only thing in that part
+    r"""
+    Given a list of elements in the numerator and denominator, return a '\frac'
+
+    Avoid parens if there is only thing in that part
+    """
     if len(numerator) == 1:
         num_latex = numerator[0].sans_parens
     else:
@@ -146,6 +175,13 @@ def render_frac(numerator, denominator):
 
 
 def render_product(children):
+    r"""
+    Format products and division nicely.
+
+    That is, group bunches of adjacent, equal operators. For every time it
+    switches from numerator to denominator, call `render_frac`. Join these
+    groupings by '\cdot's.
+    """
     position = "numerator"  # or denominator
     fraction_mode_ever = False
     numerator = []
@@ -186,6 +222,9 @@ def render_product(children):
 
 
 def render_sum(children):
+    """
+    Combine elements, including their operators.
+    """
     children_latex = [k.latex for k in children]
     latex = "".join(children_latex)
     tall = any(k.tall for k in children)
@@ -193,6 +232,9 @@ def render_sum(children):
 
 
 def render_atom(children):
+    """
+    Properly handle parens, otherwise this is trivial.
+    """
     parens = None
     if children[0].latex in "([{":
         parens = children[0].latex
@@ -206,6 +248,11 @@ def render_atom(children):
 
 
 def latex_preview(math_expr, variables=(), functions=(), case_sensitive=False):
+    """
+    Convert `math_expr` into latex, guaranteeing its parse-ability.
+
+    Analagous to `evaluator`.
+    """
     # No need to go further
     if math_expr.strip() == "":
         return "<nada/>"
