@@ -105,8 +105,11 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.static',
     'django.contrib.messages.context_processors.messages',
     'django.contrib.auth.context_processors.auth',  # this is required for admin
-    'django.core.context_processors.csrf',  # necessary for csrf protection
 )
+
+# add csrf support unless disabled for load testing
+if not MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_LOAD_TESTING'):
+    TEMPLATE_CONTEXT_PROCESSORS += ('django.core.context_processors.csrf',)  # necessary for csrf protection
 
 LMS_BASE = None
 
@@ -139,7 +142,6 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
     'method_override.middleware.MethodOverrideMiddleware',
 
     # Instead of AuthenticationMiddleware, we use a cache-backed version
@@ -154,6 +156,10 @@ MIDDLEWARE_CLASSES = (
 
     'django.middleware.transaction.TransactionMiddleware'
 )
+
+# add in csrf middleware unless disabled for load testing
+if not MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_LOAD_TESTING'):
+    MIDDLEWARE_CLASSES = MIDDLEWARE_CLASSES + ('django.middleware.csrf.CsrfViewMiddleware',)
 
 ############################ SIGNAL HANDLERS ################################
 # This is imported to register the exception signal handling that logs exceptions
