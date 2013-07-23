@@ -1,7 +1,7 @@
-Feature: Overview Toggle Section
-    In order to quickly view the details of a course's section or to scan the inventory of sections
+Feature: Course Overview
+    In order to quickly view the details of a course's section and set release dates and grading
     As a course author
-    I want to toggle the visibility of each section's  subsection details in the overview listing
+    I want to use the course overview page
 
     Scenario: The default layout for the overview page is to show sections in expanded view
         Given I have a course with multiple sections
@@ -57,3 +57,9 @@ Feature: Overview Toggle Section
         And I click the "Expand All Sections" link
         Then I see the "Collapse All Sections" link
         And all sections are expanded
+
+   Scenario: Notification is shown on grading status changes
+        Given I have a course with 1 section
+        When I navigate to the course overview page
+        And I change an assignment's grading status
+        Then I am shown a notification
