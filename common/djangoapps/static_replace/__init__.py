@@ -53,6 +53,15 @@ def replace_jump_to_id_urls(text, course_id, jump_to_id_base_url):
     course author provides. This is much more helpful when using
     Studio authored courses since they don't need to know the path. This
     is also durable with respect to item moves.
+
+    text: The content over which to perform the subtitutions
+    course_id: The course_id in which this rewrite happens
+    jump_to_id_base_url: 
+        A app-tier (e.g. LMS) absolute path to the base of the handler that will perform the
+        redirect. e.g. /courses/<org>/<course>/<run>/jump_to_id. NOTE the <id> will be appended to
+        the end of this URL at re-write time
+
+    output: <text> after the link rewriting rules are applied
     """
 
     def replace_jump_to_id_url(match):

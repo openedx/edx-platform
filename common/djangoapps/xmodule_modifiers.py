@@ -48,6 +48,15 @@ def replace_jump_to_id_urls(get_html, course_id, jump_to_id_base_url):
     /jump_to/<id> with a URL for a page that will correctly redirect
     This is similar to replace_course_urls, but much more flexible and
     durable for Studio authored courses. See more comments in static_replace.replace_jump_to_urls
+
+    course_id: The course_id in which this rewrite happens
+    jump_to_id_base_url:
+        A app-tier (e.g. LMS) absolute path to the base of the handler that will perform the
+        redirect. e.g. /courses/<org>/<course>/<run>/jump_to_id. NOTE the <id> will be appended to
+        the end of this URL at re-write time
+
+    output: a wrapped get_html() function pointer, which, when called, will apply the
+        rewrite rules
     """
     @wraps(get_html)
     def _get_html():
