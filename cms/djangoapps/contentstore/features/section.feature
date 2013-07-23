@@ -33,4 +33,5 @@ Feature: Create Section
     And I have added a new section
     When I will confirm all alerts
     And I press the "section" delete icon
+    And I confirm the prompt
     Then the section does not exist
