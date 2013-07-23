@@ -111,9 +111,9 @@ def get_date_for_press(publish_date):
     # strip off extra months, and just use the first:
     date = re.sub(multimonth_pattern, ", ", publish_date)
     if re.search(day_pattern, date):
-        date = datetime.datetime.strptime(date, "%B %d, %Y")
+        date = datetime.datetime.strptime(date, "%B %d, %Y").replace(tzinfo=UTC)
     else:
-        date = datetime.datetime.strptime(date, "%B, %Y")
+        date = datetime.datetime.strptime(date, "%B, %Y").replace(tzinfo=UTC)
     return date
 
 
@@ -1100,7 +1100,7 @@ def confirm_email_change(request, key):
         meta = up.get_meta()
         if 'old_emails' not in meta:
             meta['old_emails'] = []
-        meta['old_emails'].append([user.email, datetime.datetime.now().isoformat()])
+        meta['old_emails'].append([user.email, datetime.datetime.now(UTC).isoformat()])
         up.set_meta(meta)
         up.save()
         # Send it to the old email...
@@ -1198,7 +1198,7 @@ def accept_name_change_by_id(id):
     meta = up.get_meta()
     if 'old_names' not in meta:
         meta['old_names'] = []
-    meta['old_names'].append([up.name, pnc.rationale, datetime.datetime.now().isoformat()])
+    meta['old_names'].append([up.name, pnc.rationale, datetime.datetime.now(UTC).isoformat()])
     up.set_meta(meta)
 
     up.name = pnc.new_name

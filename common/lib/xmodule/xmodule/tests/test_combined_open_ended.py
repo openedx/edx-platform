@@ -14,6 +14,7 @@ from xmodule.modulestore import Location
 from lxml import etree
 import capa.xqueue_interface as xqueue_interface
 from datetime import datetime
+from pytz import UTC
 import logging
 
 log = logging.getLogger(__name__)
@@ -212,7 +213,7 @@ class OpenEndedModuleTest(unittest.TestCase):
                'submission_id': '1',
                'grader_id': '1',
                'score': 3}
-        qtime = datetime.strftime(datetime.now(), xqueue_interface.dateformat)
+        qtime = datetime.strftime(datetime.now(UTC), xqueue_interface.dateformat)
         student_info = {'anonymous_student_id': self.test_system.anonymous_student_id,
                         'submission_time': qtime}
         contents = {
@@ -233,7 +234,7 @@ class OpenEndedModuleTest(unittest.TestCase):
 
     def test_send_to_grader(self):
         submission = "This is a student submission"
-        qtime = datetime.strftime(datetime.now(), xqueue_interface.dateformat)
+        qtime = datetime.strftime(datetime.now(UTC), xqueue_interface.dateformat)
         student_info = {'anonymous_student_id': self.test_system.anonymous_student_id,
                         'submission_time': qtime}
         contents = self.openendedmodule.payload.copy()
@@ -631,6 +632,7 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
         #reset the problem
         module.handle_ajax("reset", {})
         self.assertEqual(module.state, "initial")
+
 
 class OpenEndedModuleXmlAttemptTest(unittest.TestCase, DummyModulestore):
     """
