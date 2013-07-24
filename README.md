@@ -46,7 +46,7 @@ Note:
 
 * by default, the VM will get the IP `192.168.20.40`.
 You can change this in your `Vagrantfile` (the startup message will reflect your VM's actual IP).
-* if your network blocks git protocol, you also have to modify the github requirement file. Open edx-platform/requirements/edx/github.txt, change the Third party libraries links from "git:\\" to "git+https:\\"
+* if your network blocks git protocol, you also have to modify the github requirement file before running the 'vagrant up' command. Open edx-platform/requirements/edx/github.txt, change the Third party libraries links from "git:\\" to "git+https:\\"
 
 Accessing the VM
 ----------------
