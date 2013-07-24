@@ -12,8 +12,7 @@ def select_executable(*cmds)
 end
 
 def django_admin(system, env, command, *args)
-    django_admin = ENV['DJANGO_ADMIN_PATH'] || select_executable('django-admin.py', 'django-admin')
-    return "#{django_admin} #{command} --traceback --settings=#{system}.envs.#{env} --pythonpath=. #{args.join(' ')}"
+    return "./manage.py #{system} --settings #{env} #{command} --traceback #{args.join(' ')}"
 end
 
 def report_dir_path(dir)

@@ -14,6 +14,7 @@ from django.shortcuts import redirect
 from mitxmako.shortcuts import render_to_response, render_to_string
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
+from markupsafe import escape
 
 from courseware import grades
 from courseware.access import has_access
@@ -33,6 +34,7 @@ from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError, NoPathToItem
 from xmodule.modulestore.search import path_to_location
+from xmodule.course_module import CourseDescriptor
 
 import comment_client
 
@@ -447,6 +449,27 @@ def index(request, course_id, chapter=None, section=None,
 
 
 @ensure_csrf_cookie
+def jump_to_id(request, course_id, module_id):
+    """
+    This entry point allows for a shorter version of a jump to where just the id of the element is
+    passed in. This assumes that id is unique within the course_id namespace
+    """
+
+    course_location = CourseDescriptor.id_to_location(course_id)
+
+    items = modulestore().get_items(['i4x', course_location.org, course_location.course, None, module_id])
+
+    if len(items) == 0:
+        raise Http404("Could not find id = {0} in course_id = {1}. Referer = {2}".
+                      format(module_id, course_id, request.META.get("HTTP_REFERER", "")))
+    if len(items) > 1:
+        log.warning("Multiple items found with id = {0} in course_id = {1}. Referer = {2}. Using first found {3}...".
+                    format(module_id, course_id, request.META.get("HTTP_REFERER", ""), items[0].location.url()))
+
+    return jump_to(request, course_id, items[0].location.url())
+
+
+@ensure_csrf_cookie
 def jump_to(request, course_id, location):
     """
     Show the page that contains a specific location.
@@ -752,19 +775,16 @@ def submission_history(request, course_id, student_username, location):
                                                    module_state_key=location,
                                                    student_id=student.id)
     except User.DoesNotExist:
-        return HttpResponse("User {0} does not exist.".format(student_username))
+        return HttpResponse(escape("User {0} does not exist.".format(student_username)))
     except StudentModule.DoesNotExist:
-        return HttpResponse("{0} has never accessed problem {1}"
-                            .format(student_username, location))
+        return HttpResponse(escape("{0} has never accessed problem {1}".format(student_username, location)))
 
-    history_entries = StudentModuleHistory.objects \
-                      .filter(student_module=student_module).order_by('-id')
+    history_entries = StudentModuleHistory.objects.filter(student_module=student_module).order_by('-id')
 
     # If no history records exist, let's force a save to get history started.
     if not history_entries:
         student_module.save()
-        history_entries = StudentModuleHistory.objects \
-                          .filter(student_module=student_module).order_by('-id')
+        history_entries = StudentModuleHistory.objects.filter(student_module=student_module).order_by('-id')
 
     context = {
         'history_entries': history_entries,

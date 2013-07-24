@@ -1,7 +1,7 @@
 """
 Tests for open ended grading interfaces
 
-django-admin.py test --settings=lms.envs.test --pythonpath=. lms/djangoapps/open_ended_grading
+./manage.py lms --settings test test lms/djangoapps/open_ended_grading
 """
 
 import json

@@ -17,6 +17,8 @@ from courseware.tests.tests import LoginEnrollmentTestCase
 from courseware.model_data import ModelDataCache
 from modulestore_config import TEST_DATA_XML_MODULESTORE
 
+from courseware.courses import get_course_with_access
+
 from .factories import UserFactory
 
 
@@ -49,6 +51,35 @@ class ModuleRenderTestCase(LoginEnrollmentTestCase):
     def test_get_module(self):
         self.assertIsNone(render.get_module('dummyuser', None,
                                             'invalid location', None, None))
+
+    def test_module_render_with_jump_to_id(self):
+        """
+        This test validates that the /jump_to_id/<id> shorthand for intracourse linking works assertIn
+        expected. Note there's a HTML element in the 'toy' course with the url_name 'toyjumpto' which
+        defines this linkage
+        """
+        mock_request = MagicMock()
+        mock_request.user = self.mock_user
+
+        course = get_course_with_access(self.mock_user, self.course_id, 'load')
+
+        model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
+            self.course_id, self.mock_user, course, depth=2)
+
+        module = render.get_module(
+            self.mock_user,
+            mock_request,
+            ['i4x', 'edX', 'toy', 'html', 'toyjumpto'],
+            model_data_cache,
+            self.course_id
+        )
+
+        # get the rendered HTML output which should have the rewritten link
+        html = module.get_html()
+
+        # See if the url got rewritten to the target link
+        # note if the URL mapping changes then this assertion will break
+        self.assertIn('/courses/'+self.course_id+'/jump_to_id/vertical_test', html)
 
     def test_modx_dispatch(self):
         self.assertRaises(Http404, render.modx_dispatch, 'dummy', 'dummy',
@@ -188,9 +219,9 @@ class TestTOC(TestCase):
                         'format': u'Lecture Sequence', 'due': None, 'active': False},
                        {'url_name': 'Welcome', 'display_name': u'Welcome', 'graded': True,
                         'format': '', 'due': None, 'active': False},
-                       {'url_name': 'video_123456789012', 'display_name': 'video 123456789012', 'graded': True,
+                       {'url_name': 'video_123456789012', 'display_name': 'Test Video', 'graded': True,
                         'format': '', 'due': None, 'active': False},
-                       {'url_name': 'video_4f66f493ac8f', 'display_name': 'video 4f66f493ac8f', 'graded': True,
+                       {'url_name': 'video_4f66f493ac8f', 'display_name': 'Video Title', 'graded': True,
                         'format': '', 'due': None, 'active': False}],
                       'url_name': 'Overview', 'display_name': u'Overview'},
                      {'active': False, 'sections':
@@ -199,6 +230,7 @@ class TestTOC(TestCase):
                       'url_name': 'secret:magic', 'display_name': 'secret:magic'}])
 
         actual = render.toc_for_course(self.portal_user, request, self.toy_course, chapter, None, model_data_cache)
+        print actual
         assert reduce(lambda x, y: x and (y in actual), expected, True)
 
     def test_toc_toy_from_section(self):
@@ -215,9 +247,9 @@ class TestTOC(TestCase):
                         'format': u'Lecture Sequence', 'due': None, 'active': False},
                        {'url_name': 'Welcome', 'display_name': u'Welcome', 'graded': True,
                         'format': '', 'due': None, 'active': True},
-                       {'url_name': 'video_123456789012', 'display_name': 'video 123456789012', 'graded': True,
+                       {'url_name': 'video_123456789012', 'display_name': 'Test Video', 'graded': True,
                         'format': '', 'due': None, 'active': False},
-                       {'url_name': 'video_4f66f493ac8f', 'display_name': 'video 4f66f493ac8f', 'graded': True,
+                       {'url_name': 'video_4f66f493ac8f', 'display_name': 'Video Title', 'graded': True,
                         'format': '', 'due': None, 'active': False}],
                       'url_name': 'Overview', 'display_name': u'Overview'},
                      {'active': False, 'sections':
