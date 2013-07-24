@@ -42,8 +42,8 @@ MITX_FEATURES = {
     # do not display video when running automated acceptance tests
     'STUB_VIDEO_FOR_TESTING': False,
 
-    # email address for staff (eg to request course creation)
-    'STAFF_EMAIL': '',
+    # email address for studio staff (eg to request course creation)
+    'STUDIO_REQUEST_EMAIL': '',
 
     'STUDIO_NPS_SURVEY': True,
 
