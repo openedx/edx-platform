@@ -2,68 +2,132 @@
 // shame file - used for any bad-form/orphaned scss that knowingly violate edX FED architecture/standards (see - http://csswizardry.com/2013/04/shame-css/)
 // ====================
 
-// marketing site - registration iframe band-aid (poor form enough to isolate out)
+// edx.org marketing site - 7/2013 visual button revamp
+
+// extends btn
+.m-btn {
+  @include box-sizing(border-box);
+  @include transition(color 0.25s ease-in-out, background 0.25s ease-in-out, box-shadow 0.25s ease-in-out);
+  display: inline-block;
+  cursor: pointer;
+  text-decoration: none;
+
+  &:hover, &:active {
+
+  }
+
+  &.disabled, &[disabled] {
+    cursor: default;
+    pointer-events: none;
+  }
+}
+
+.m-btn-pill {
+  border-radius: ($baseline/5);
+}
+
+.m-btn-rounded {
+  border-radius: ($baseline/2);
+}
+
+.m-btn-edged {
+  border-radius: ($baseline/10);
+}
+
+// primary button
+.m-btn-primary {
+  @extend .m-btn;
+  @extend .m-btn-edged;
+  border: none;
+  padding:($baseline/2) ($baseline);
+  text-align: center;
+  text-shadow: none;
+  font-weight: 500;
+
+  &.disabled, &[disabled] {
+    background: $m-gray-d3;
+  }
+}
+
+// blue primary button
+.m-btn-primary-blue {
+  @extend .m-btn-primary;
+  box-shadow: 0 2px 1px 0 $m-blue-d4;
+  background: $m-blue-d3;
+  color: $white;
+
+  &:hover, &:active {
+    background: $m-blue-d1;
+  }
+
+  &.current, &.active {
+    box-shadow: inset 0 2px 1px 1px $m-blue-d2;
+    background: $m-blue;
+    color: $m-blue-d2;
+
+    &:hover, &:active {
+      box-shadow: inset 0 2px 1px 1px $m-blue-d3;
+      color: $m-blue-d3;
+    }
+  }
+
+  &.disabled, &[disabled] {
+    box-shadow: none;
+  }
+}
+
+// pink primary button
+.m-btn-primary-pink {
+  @extend .m-btn-primary;
+  box-shadow: 0 2px 1px 0 $m-pink-d2;
+  background: $m-pink;
+  color: $white;
+
+  &:hover, &:active {
+    background: $m-pink-l3;
+  }
+
+  &.current, &.active {
+    box-shadow: inset 0 2px 1px 1px $m-pink-d1;
+    background: $m-pink-l2;
+    color: $m-pink-d1;
+
+    &:hover, &:active {
+      box-shadow: inset 0 2px 1px 1px $m-pink-d2;
+      color: $m-pink-d3;
+    }
+  }
+
+  &.disabled, &[disabled] {
+    box-shadow: none;
+  }
+}
+
+
+// ====================
+
+// edx.org marketing site - needed, but bad overrides with importants
+.view-register, .view-login, .view-passwordreset {
+
+  .form-actions button[type="submit"] {
+    text-transform: none;
+    vertical-align: middle;
+    font-weight: 600 !important;
+    letter-spacing: 0 !important;
+  }
+}
+
+
+
+
+// ====================
+
+// edx.org marketing site - registration iframe band-aid (poor form enough to isolate out)
 .view-partial-mktgregister {
-  background: transparent;
 
   // dimensions needed for course about page on marketing site
   .wrapper-view {
     overflow: hidden;
-  }
-
-  // button elements - not a better place to put these, sadly
-  .btn {
-    @include box-sizing('border-box');
-    display: block;
-    padding: $baseline/2;
-    text-transform: lowercase;
-    color: $white;
-    letter-spacing: 0.1rem;
-    cursor: pointer;
-    text-align: center;
-    border: none !important;
-    text-decoration: none;
-    text-shadow: none;
-    letter-spacing: 0.1rem;
-    font-size: 17px;
-    font-weight: 300;
-    box-shadow: 0 !important;
-
-    strong {
-      font-weight: 400;
-      text-transform: none;
-    }
-  }
-
-  .btn-primary {
-    @extend .btn;
-    @include linear-gradient($m-blue-s1 5%, $m-blue-d1 95%);
-
-    // no hover state conventions to follow from marketing :/
-    &:hover, &:active {
-
-    }
-  }
-
-  .btn-secondary {
-    @extend .btn;
-    @include linear-gradient($m-gray 5%, $m-gray-d1 95%);
-
-    // no hover state conventions to follow from marketing :/
-    &:hover, &:active {
-
-    }
-  }
-
-  .btn-tertiary {
-    @extend .btn;
-    background: $m-blue-l1;
-    color: $m-blue;
-
-    // no hover state conventions to follow from marketing :/
-    &:hover, &:active {
-
-    }
   }
 
   // nav list
@@ -78,31 +142,37 @@
   }
 
   .action {
+    @include font-size(16);
+    font-weight: 500;
 
     // register or access courseware
     &.action-register, &.access-courseware {
-      @extend .btn-primary;
+      @extend .m-btn-primary-blue;
+      display: block;
     }
 
     // already registered but course not started or registration is closed
     &.is-registered, &.registration-closed {
-      @extend .btn-secondary;
+      @extend .m-btn-primary-pink;
       pointer-events: none !important;
+      display: block;
     }
 
     // coming soon
     &.coming-soon {
-      @extend .btn-tertiary;
+      @extend .m-btn-primary-pink;
       pointer-events: none !important;
       outline: none;
+      display: block;
     }
   }
 }
 
-//--------------------------------------
-//   The Following is to enable themes to
-//   display H1s on login and register pages
-//--------------------------------------
+
+// ====================
+
+
+// The Following is to enable themes to display H1s on login and register pages
 .view-login .introduction header h1,
 .view-register .introduction header h1 {
   @include login_register_h1_style;
