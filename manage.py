@@ -31,8 +31,7 @@ def parse_args():
     lms.add_argument('-h', '--help', action='store_true', help='show this help message and exit')
     lms.add_argument(
         '--settings',
-        help="Which django settings module to use. Will search for a submodule of lms.envs first, and "
-             "if that module doesn't exist, will search in sys.path. If not provided, the DJANGO_SETTINGS_MODULE "
+        help="Which django settings module to use from inside of lms.envs. If not provided, the DJANGO_SETTINGS_MODULE "
              "environment variable will be used if it is set, otherwise will default to lms.envs.dev")
     lms.add_argument(
         '-s', '--service-variant',
@@ -53,8 +52,7 @@ def parse_args():
     )
     cms.add_argument(
         '--settings',
-        help="Which django settings module to use. Will search for a submodule of cms.envs first, and "
-             "if that module doesn't exist, will search in sys.path. If not provided, the DJANGO_SETTINGS_MODULE "
+        help="Which django settings module to use from inside cms.envs. If not provided, the DJANGO_SETTINGS_MODULE "
              "environment variable will be used if it is set, otherwise will default to cms.envs.dev")
     cms.add_argument('-h', '--help', action='store_true', help='show this help message and exit')
     cms.set_defaults(
@@ -78,12 +76,7 @@ if __name__ == "__main__":
     edx_args, django_args = parse_args()
 
     if edx_args.settings:
-        try:
-            imp.find_module(edx_args.settings, [edx_args.settings_base])
-            os.environ["DJANGO_SETTINGS_MODULE"] = edx_args.settings_base.replace('/', '.') + "." + edx_args.settings
-        except ImportError:
-            imp.find_module(edx_args.settings)
-            os.environ["DJANGO_SETTINGS_MODULE"] = edx_args.settings
+        os.environ["DJANGO_SETTINGS_MODULE"] = edx_args.settings_base.replace('/', '.') + "." + edx_args.settings
     else:
         os.environ.setdefault("DJANGO_SETTINGS_MODULE", edx_args.default_settings)
     os.environ.setdefault("SERVICE_VARIANT", edx_args.service_variant)
