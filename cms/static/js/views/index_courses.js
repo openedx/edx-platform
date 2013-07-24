@@ -1,11 +1,10 @@
 function indexCourses(){
     var course = "";
-    course = document.URL.split("/")[4];
     var url = window.location.host + "/index";
     $.ajax({
         type: "POST",
         url: url,
-        data: {"course": course},
+        data: {"course": type_id},
         success: success
     });
 }

@@ -1,7 +1,10 @@
 ## mako
+<%! from django.utils.translation import ugettext as _ %>
 <%namespace name='static' file='../static_content.html'/>
 
 <script type="text/javascript" src="${static.url('js/search.js')}"></script>
+<link rel="stylesheet" type="text/css" href="${static.url('css/vendor/animate-custom.css')}"></link>
+<link rel="stylesheet" type="text/css" href="${static.url('css/search.css')}"></link>
 <%page args="active_page=None" />
 
 <%
@@ -39,6 +42,9 @@ def url_class(is_active):
           <li style="float:right"><a href="#" id="staffstatus">${_("Staff view")}</a></li>
           % endif
         % endif
+        <div class="search-icon">
+            <span id="search-bar">${_("Search this Course")}</span>
+        </div>
     </ol>
   </div>
 </nav>

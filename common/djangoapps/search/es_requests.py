@@ -122,12 +122,13 @@ class ElasticDatabase:
         requests.post(full_url+"/_open")
         return response
 
-    def index_data(self, index, type_, data, id_=None):
+    def index_data(self, index, data, type_=None, id_=None):
         """Data should be passed in as a dictionary, assumes it matches the given mapping"""
-        if not id_:
-            full_url = "/".join([self.url, index, type_]) + "/"
-        else:
-            full_url = "/".join([self.url, index, type_, id_])
+        if id_ is None:
+            id_ = data["hash"]
+        if type_ is None:
+            type_ = data["type_hash"]
+        full_url = "/".join([self.url, index, type_, id_])
         response = requests.post(full_url, json.dumps(data))
         return response
 
@@ -317,9 +318,15 @@ class MongoIndexer:
         )
         searchable_text = self.get_searchable_text(mongo_module, type)
         thumbnail = self.get_thumbnail(mongo_module, type)
+        type_hash = hashlib.sha1(course_id).hexdigest()
         return {
-            "id": id, "hash": hash, "display_name": display_name, "course_id": course_id,
-            "searchable_text": searchable_text, "thumbnail": thumbnail
+            "id": id,
+            "hash": hash,
+            "display_name": display_name,
+            "course_id": course_id,
+            "searchable_text": searchable_text,
+            "thumbnail": thumbnail,
+            "type_hash": type_hash
         }
 
     def get_searchable_text(self, mongo_module, type):
@@ -358,21 +365,21 @@ class MongoIndexer:
         for i in range(cursor.count()):
             item = cursor.next()
             data = self.basic_dict(item, "pdf")
-            print self.es_instance.index_data(index, item["_id"]["course"], data, data["hash"])._content
+            print self.es_instance.index_data(index, data)._content
 
     def index_all_problems(self, index):
         cursor = self.find_modules_by_category("problem")
         for i in range(cursor.count()):
             item = cursor.next()
             data = self.basic_dict(item, "problem")
-            print self.es_instance.index_data(index, item["_id"]["course"], data, data["hash"])._content
+            print self.es_instance.index_data(index, data)._content
 
     def index_all_transcripts(self, index):
         cursor = self.find_modules_by_category("video")
         for i in range(cursor.count()):
             item = cursor.next()
             data = self.basic_dict(item, "transcript")
-            print self.es_instance.index_data(index, item["_id"]["course"], data, data["hash"])._content
+            print self.es_instance.index_data(index, data)._content
 
     def index_course(self, course):
         cursor = self.find_modules_for_course(course)
