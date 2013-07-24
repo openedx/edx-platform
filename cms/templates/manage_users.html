@@ -59,7 +59,7 @@
             % if allow_actions:
             <div class="item-actions">
               % if request.user.id != user.id:
-                % if is_user_in_course_group_role(user, context_course.location, 'instructor'):
+                % if is_user_in_course_group_role(user, context_course.location, 'instructor', check_staff=False):
                      <% admin_class = "remove-admin" %>
                      <% admin_text = "Remove Admin" %>
                 % else:
