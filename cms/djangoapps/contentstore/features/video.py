@@ -5,9 +5,9 @@ from lettuce import world, step
 ############### ACTIONS ####################
 
 
-@step('when I view the video it does not have autoplay enabled')
-def does_not_autoplay(_step):
-    assert world.css_find('.video')[0]['data-autoplay'] == 'False'
+@step('when I view the (.*) it does not have autoplay enabled')
+def does_not_autoplay(_step, video_type):
+    assert world.css_find('.%s' % video_type)[0]['data-autoplay'] == 'False'
     assert world.css_has_class('.video_control', 'play')
 
 

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """Test for VideoAlpha Xmodule functional logic.
-These tests data readed from xml, not from mongo.
+These test data read from xml, not from mongo.
 
 We have a ModuleStoreTestCase class defined in
 common/lib/xmodule/xmodule/modulestore/tests/django_utils.py.
@@ -30,9 +30,9 @@ SOURCE_XML = """
     sub="a_sub_file.srt.sjson"
     start_time="01:00:03" end_time="01:00:10"
     >
-        <source src=".../mit-3091x/M-3091X-FA12-L21-3_100.mp4"/>
-        <source src=".../mit-3091x/M-3091X-FA12-L21-3_100.webm"/>
-        <source src=".../mit-3091x/M-3091X-FA12-L21-3_100.ogv"/>
+        <source src="example.mp4"/>
+        <source src="example.webm"/>
+        <source src="example.ogv"/>
     </videoalpha>
 """
 
@@ -72,10 +72,10 @@ class VideoAlphaModuleUnitTest(unittest.TestCase):
         module.runtime.render_template = lambda template, context: context
 
         sources = {
-            'main': '.../mit-3091x/M-3091X-FA12-L21-3_100.mp4',
-            'mp4': '.../mit-3091x/M-3091X-FA12-L21-3_100.mp4',
-            'ogv': '.../mit-3091x/M-3091X-FA12-L21-3_100.ogv',
-            'webm': '.../mit-3091x/M-3091X-FA12-L21-3_100.webm',
+            'main': 'example.mp4',
+            'mp4': 'example.mp4',
+            'webm': 'example.webm',
+            'ogv': 'example.ogv'
         }
 
         expected_context = {

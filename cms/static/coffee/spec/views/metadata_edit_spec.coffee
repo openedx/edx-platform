@@ -334,3 +334,13 @@ describe "Test Metadata Editor", ->
 
       it "has an update model method", ->
         assertUpdateModel(@listView, null, ['a new value'])
+
+      it "can add an entry", ->
+        expect(@listView.model.get('value').length).toEqual(2)
+        @listView.$el.find('.setting-add').click()
+        expect(@listView.$el.find('input.input').length).toEqual(3)
+
+      it "can remove an entry", ->
+        expect(@listView.model.get('value').length).toEqual(2)
+        @listView.$el.find('.setting-remove').first().click()
+        expect(@listView.model.get('value').length).toEqual(1)

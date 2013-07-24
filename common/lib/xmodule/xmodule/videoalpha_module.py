@@ -36,7 +36,7 @@ log = logging.getLogger(__name__)
 class VideoAlphaFields(object):
     """Fields for `VideoAlphaModule` and `VideoAlphaDescriptor`."""
     display_name = String(
-        display_name="Display Name", help="Display name for this module",
+        display_name="Display Name", help="Display name for this module.",
         default="Video Alpha",
         scope=Scope.settings
     )
@@ -51,28 +51,27 @@ class VideoAlphaFields(object):
         scope=Scope.settings,
         default=True
     )
-    #  TODO (pfogg): Do we want to show these to the user if HTML5 sources are preferred?
     youtube_id_1_0 = String(
         help="This is the Youtube ID reference for the normal speed video.",
-        display_name="Default Speed",
+        display_name="Youtube ID",
         scope=Scope.settings,
-        default=""
+        default="OEoXaMPEzfM"
     )
     youtube_id_0_75 = String(
         help="The Youtube ID for the .75x speed video.",
-        display_name="Speed: .75x",
+        display_name="Youtube ID for .75x speed",
         scope=Scope.settings,
         default=""
     )
     youtube_id_1_25 = String(
         help="The Youtube ID for the 1.25x speed video.",
-        display_name="Speed: 1.25x",
+        display_name="Youtube ID for 1.25x speed",
         scope=Scope.settings,
         default=""
     )
     youtube_id_1_5 = String(
         help="The Youtube ID for the 1.5x speed video.",
-        display_name="Speed: 1.5x",
+        display_name="Youtube ID for 1.5x speed",
         scope=Scope.settings,
         default=""
     )
@@ -95,7 +94,7 @@ class VideoAlphaFields(object):
         default=""
     )
     html5_sources = List(
-        help="A comma-separated list of filenames to be used with HTML5 video.",
+        help="A list of filenames to be used with HTML5 video.",
         display_name="Video Sources",
         scope=Scope.settings,
         default=[]
@@ -205,6 +204,8 @@ class VideoAlphaDescriptor(VideoAlphaFields, TabsEditingDescriptor, RawDescripto
 
     def __init__(self, *args, **kwargs):
         super(VideoAlphaDescriptor, self).__init__(*args, **kwargs)
+        # For backwards compatibility -- if we've got XML data, parse
+        # it out and set the metadata fields
         if self.data:
             model_data = VideoAlphaDescriptor._parse_video_xml(self.data)
             self._model_data.update(model_data)
@@ -213,9 +214,7 @@ class VideoAlphaDescriptor(VideoAlphaFields, TabsEditingDescriptor, RawDescripto
     @property
     def non_editable_metadata_fields(self):
         non_editable_fields = super(TabsEditingDescriptor, self).non_editable_metadata_fields
-        non_editable_fields.extend([VideoAlphaFields.start_time,
-                                    VideoAlphaFields.end_time])
-        return non_editable_fields
+        return non_editable_fields + [VideoAlphaFields.start_time, VideoAlphaFields.end_time]
 
     @classmethod
     def from_xml(cls, xml_data, system, org=None, course=None):

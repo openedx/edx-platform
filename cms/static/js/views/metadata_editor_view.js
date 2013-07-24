@@ -319,17 +319,46 @@ CMS.Views.Metadata.List = CMS.Views.Metadata.AbstractEditor.extend({
     events : {
         "click .setting-clear" : "clear",
         "keypress .setting-input" : "showClearButton",
-        "change input" : "updateModel"
+        "change input" : "updateModel",
+        "click .setting-add" : "addEntry",
+        "click .setting-remove" : "removeEntry"
     },
 
     templateName: "metadata-list-entry",
 
     getValueFromEditor: function () {
-        return _.map(this.$el.find('#' + this.uniqueId).val().split(/,/),
-                     function (url) { return url.trim(); });
+        return _.map(
+            this.$el.find('li input'),
+            function (ele) { return ele.value.trim(); }
+        ).filter(_.identity);
     },
 
     setValueInEditor: function (value) {
-        this.$el.find('.input').val(value.join(', '));
+        var list = this.$el.find('ol');
+        list.empty();
+        _.each(value, function(ele, index) {
+            var template = _.template(
+                '<li>' +
+                    '<input class="input" value="<%= ele %>">' +
+                    '<a href="#" class="setting-remove" data-index="<%= index %>">remove</a>' +
+                '</li>'
+            );
+            list.append($(template({'ele': ele, 'index': index})));
+        });
+    },
+
+    addEntry: function(event) {
+        event.preventDefault();
+        // We don't call updateModel here since it's bound to the
+        // change event
+        var list = this.model.get('value') || [];
+        this.setValueInEditor(list.concat(['']))
+    },
+
+    removeEntry: function(event) {
+        event.preventDefault();
+        var entry = $(event.currentTarget).siblings().val();
+        this.setValueInEditor(_.without(this.model.get('value'), entry));
+        this.updateModel();
     }
 });

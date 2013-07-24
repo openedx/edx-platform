@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 #pylint: disable=W0212
 """Test for Video Alpha Xmodule functional logic.
-These tests data readed from  xml or from mongo.
+These test data read from xml, not from mongo.
 
-we have a ModuleStoreTestCase class defined in
+We have a ModuleStoreTestCase class defined in
 common/lib/xmodule/xmodule/modulestore/tests/django_utils.py. You can
 search for usages of this in the cms and lms tests for examples. You use
 this so that it will do things like point the modulestore setting to mongo,
@@ -238,7 +238,7 @@ class VideoAlphaDescriptorImportTestCase(unittest.TestCase):
         xml_data = '<videoalpha></videoalpha>'
         output = VideoAlphaDescriptor.from_xml(xml_data, module_system)
         self.assertEquals(output.youtube_id_0_75, '')
-        self.assertEquals(output.youtube_id_1_0, '')
+        self.assertEquals(output.youtube_id_1_0, 'OEoXaMPEzfM')
         self.assertEquals(output.youtube_id_1_25, '')
         self.assertEquals(output.youtube_id_1_5, '')
         self.assertEquals(output.show_captions, True)
@@ -344,6 +344,6 @@ class VideoAlphaExportTestCase(unittest.TestCase):
         desc = VideoAlphaDescriptor(module_system, {'location': location})
 
         xml = desc.export_to_xml(None)
-        expected = '<videoalpha display_name="Video Alpha" show_captions="true"/>\n'
+        expected = '<videoalpha display_name="Video Alpha" youtube="1.00:OEoXaMPEzfM" show_captions="true"/>\n'
 
         self.assertEquals(expected, xml)

@@ -46,10 +46,10 @@ class TestVideo(BaseTestXmodule):
         context = self.item_module.get_html()
 
         sources = {
-            'main': '.../mit-3091x/M-3091X-FA12-L21-3_100.mp4',
-            'mp4': '.../mit-3091x/M-3091X-FA12-L21-3_100.mp4',
-            'webm': '.../mit-3091x/M-3091X-FA12-L21-3_100.webm',
-            'ogv': '.../mit-3091x/M-3091X-FA12-L21-3_100.ogv'
+            'main': 'example.mp4',
+            'mp4': 'example.mp4',
+            'webm': 'example.webm',
+            'ogv': 'example.ogv'
         }
 
         expected_context = {
@@ -79,9 +79,9 @@ class TestVideoNonYouTube(TestVideo):
         sub="a_sub_file.srt.sjson"
         start_time="01:00:03" end_time="01:00:10"
         >
-            <source src=".../mit-3091x/M-3091X-FA12-L21-3_100.mp4"/>
-            <source src=".../mit-3091x/M-3091X-FA12-L21-3_100.webm"/>
-            <source src=".../mit-3091x/M-3091X-FA12-L21-3_100.ogv"/>
+            <source src="example.mp4"/>
+            <source src="example.webm"/>
+            <source src="example.ogv"/>
         </videoalpha>
     """
     MODEL_DATA = {
@@ -93,10 +93,10 @@ class TestVideoNonYouTube(TestVideo):
             the template generates an empty string for the YouTube streams.
         """
         sources = {
-            u'main': u'.../mit-3091x/M-3091X-FA12-L21-3_100.mp4',
-            u'mp4': u'.../mit-3091x/M-3091X-FA12-L21-3_100.mp4',
-            u'webm': u'.../mit-3091x/M-3091X-FA12-L21-3_100.webm',
-            u'ogv': u'.../mit-3091x/M-3091X-FA12-L21-3_100.ogv'
+            u'main': u'example.mp4',
+            u'mp4': u'example.mp4',
+            u'webm': u'example.webm',
+            u'ogv': u'example.ogv'
         }
 
         context = self.item_module.get_html()
@@ -112,7 +112,7 @@ class TestVideoNonYouTube(TestVideo):
             'start': 3603.0,
             'sub': 'a_sub_file.srt.sjson',
             'track': '',
-            'youtube_streams': '',
+            'youtube_streams': '1.00:OEoXaMPEzfM',
             'autoplay': settings.MITX_FEATURES.get('AUTOPLAY_VIDEOS', True)
         }
 
