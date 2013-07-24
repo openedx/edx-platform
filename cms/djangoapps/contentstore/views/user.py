@@ -87,9 +87,15 @@ def manage_users(request, org, course, name):
 
     course_module = modulestore().get_item(location)
 
+    staff_groupname = get_course_groupname_for_role(location, "staff")
+    staff_group, __ = Group.objects.get_or_create(name=staff_groupname)
+    inst_groupname = get_course_groupname_for_role(location, "instructor")
+    inst_group, __ = Group.objects.get_or_create(name=inst_groupname)
+
     return render_to_response('manage_users.html', {
         'context_course': course_module,
-        'staff': get_users_in_course_group_by_role(location, STAFF_ROLE_NAME),
+        'staff': staff_group.user_set.all(),
+        'instructors': inst_group.user_set.all(),
         'allow_actions': has_access(request.user, location, role=INSTRUCTOR_ROLE_NAME),
     })
 
@@ -137,8 +143,22 @@ def course_team_user(request, org, course, name, email):
         }
         return JsonResponse(msg, 400)
 
+    # make sure that the role groups exist
+    staff_groupname = get_course_groupname_for_role(location, "staff")
+    staff_group, __ = Group.objects.get_or_create(name=staff_groupname)
+    inst_groupname = get_course_groupname_for_role(location, "instructor")
+    inst_group, __ = Group.objects.get_or_create(name=inst_groupname)
+
     if request.method == "DELETE":
-        # remove all roles in this course from this user
+        # remove all roles in this course from this user: but fail if the user
+        # is the last instructor in the course team
+        instructors = set(inst_group.user_set.all())
+        if user in instructors and len(instructors) == 1:
+            msg = {
+                "error": _("You may not remove the last instructor from a course")
+            }
+            return JsonResponse(msg, 400)
+
         for role in roles:
             remove_user_from_course_group(request.user, user, location, role)
         return JsonResponse()
@@ -152,24 +172,26 @@ def course_team_user(request, org, course, name, email):
         try:
             role = payload["role"]
         except KeyError:
-            return JsonResponse({"error": "`role` is required"}, 400)
+            return JsonResponse({"error": _("`role` is required")}, 400)
     else:
         if not "role" in request.POST:
-            return JsonResponse({"error": "`role` is required"}, 400)
+            return JsonResponse({"error": _("`role` is required")}, 400)
         role = request.POST["role"]
-
-    # make sure that the role group exists
-    groupname = get_course_groupname_for_role(location, role)
-    Group.objects.get_or_create(name=groupname)
 
     if role == "instructor":
         add_user_to_course_group(request.user, user, location, role)
     elif role == "staff":
-        add_user_to_course_group(request.user, user, location, role)
-        # should *not* be an instructor
-        inst_groupname = get_course_groupname_for_role(location, "instructor")
-        if any(g.name == inst_groupname for g in user.groups.all()):
+        # if we're trying to downgrade a user from "instructor" to "staff",
+        # make sure we have at least one other instructor in the course team.
+        instructors = set(inst_group.user_set.all())
+        if user in instructors:
+            if len(instructors) == 1:
+                msg = {
+                    "error": _("You may not remove the last instructor from a course")
+                }
+                return JsonResponse(msg, 400)
             remove_user_from_course_group(request.user, user, location, "instructor")
+        add_user_to_course_group(request.user, user, location, role)
     return JsonResponse()
 
 

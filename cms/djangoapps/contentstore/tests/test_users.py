@@ -105,6 +105,29 @@ class UsersTestCase(CourseTestCase):
         self.assertIn(self.staff_groupname, groups)
         self.assertNotIn(self.inst_groupname, groups)
 
+    def test_detail_post_staff_other_inst(self):
+        inst_group, _ = Group.objects.get_or_create(name=self.inst_groupname)
+        self.user.groups.add(inst_group)
+        self.user.save()
+
+        resp = self.client.post(
+            self.detail_url,
+            data=json.dumps({"role": "staff"}),
+            content_type="application/json",
+            HTTP_ACCEPT="application/json",
+        )
+        self.assert2XX(resp.status_code)
+        # reload user from DB
+        ext_user = User.objects.get(email=self.ext_user.email)
+        groups = [g.name for g in ext_user.groups.all()]
+        self.assertIn(self.staff_groupname, groups)
+        self.assertNotIn(self.inst_groupname, groups)
+        # check that other user is unchanged
+        user = User.objects.get(email=self.user.email)
+        groups = [g.name for g in user.groups.all()]
+        self.assertNotIn(self.staff_groupname, groups)
+        self.assertIn(self.inst_groupname, groups)
+
     def test_detail_post_instructor(self):
         resp = self.client.post(
             self.detail_url,
@@ -171,7 +194,9 @@ class UsersTestCase(CourseTestCase):
 
     def test_detail_delete_instructor(self):
         group, _ = Group.objects.get_or_create(name=self.inst_groupname)
+        self.user.groups.add(group)
         self.ext_user.groups.add(group)
+        self.user.save()
         self.ext_user.save()
 
         resp = self.client.delete(
@@ -183,3 +208,38 @@ class UsersTestCase(CourseTestCase):
         ext_user = User.objects.get(email=self.ext_user.email)
         groups = [g.name for g in ext_user.groups.all()]
         self.assertNotIn(self.inst_groupname, groups)
+
+    def test_delete_last_instructor(self):
+        group, _ = Group.objects.get_or_create(name=self.inst_groupname)
+        self.ext_user.groups.add(group)
+        self.ext_user.save()
+
+        resp = self.client.delete(
+            self.detail_url,
+            HTTP_ACCEPT="application/json",
+        )
+        self.assertEqual(resp.status_code, 400)
+        result = json.loads(resp.content)
+        self.assertIn("error", result)
+        # reload user from DB
+        ext_user = User.objects.get(email=self.ext_user.email)
+        groups = [g.name for g in ext_user.groups.all()]
+        self.assertIn(self.inst_groupname, groups)
+
+    def test_post_last_instructor(self):
+        group, _ = Group.objects.get_or_create(name=self.inst_groupname)
+        self.ext_user.groups.add(group)
+        self.ext_user.save()
+
+        resp = self.client.post(
+            self.detail_url,
+            data={"role": "staff"},
+            HTTP_ACCEPT="application/json",
+        )
+        self.assertEqual(resp.status_code, 400)
+        result = json.loads(resp.content)
+        self.assertIn("error", result)
+        # reload user from DB
+        ext_user = User.objects.get(email=self.ext_user.email)
+        groups = [g.name for g in ext_user.groups.all()]
+        self.assertIn(self.inst_groupname, groups)

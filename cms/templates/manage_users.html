@@ -39,9 +39,9 @@
       <form class="new-user-form">
         <div id="result"></div>
         <div class="form-elements">
-          <label>email: </label><input type="text" id="email" class="email-input" autocomplete="off" placeholder="email@example.com">
-          <input type="submit" value="Add User" id="add_user" class="add-button" />
-          <input type="button" value="Cancel" class="cancel-button" />
+          <label>${_("email: ")}</label><input type="text" id="email" class="email-input" autocomplete="off" placeholder="email@example.com">
+          <input type="submit" value="${_("Add User")}" id="add_user" class="add-button" />
+          <input type="button" value="${_("Cancel")}" class="cancel-button" />
         </div>
       </form>
       %endif
@@ -58,15 +58,13 @@
             <span class="user-email">${user.email}</span>
             % if allow_actions:
             <div class="item-actions">
-              % if request.user.id != user.id:
-                % if is_user_in_course_group_role(user, context_course.location, 'instructor', check_staff=False):
-                     <% admin_class = "remove-admin" %>
-                     <% admin_text = "Remove Admin" %>
-                % else:
-                     <% admin_class = "add-admin" %>
-                     <% admin_text = "Add Admin" %>
-                % endif
-              <a href="#" class="toggle-admin ${admin_class}">${admin_text}</a>
+              <% is_instuctor = is_user_in_course_group_role(user, context_course.location, 'instructor', check_staff=False) %>
+              % if is_instuctor and len(instructors) == 1:
+                <span class="admin-role">Admin</span>
+              % else:
+                <a href="#" class="admin-role toggle-admin-role ${'remove' if is_instuctor else 'add'}-admin-role">${_("Remove Admin") if is_instuctor else _("Add Admin")}</a>
+              % endif
+              % if request.user.id != user.id: ## can't remove yourself
               <a href="#" class="delete-button remove-user" data-id="${user.email}"><span class="delete-icon"></span></a>
               % endif
             </div>
@@ -146,10 +144,10 @@
       });
     });
 
-    $(".toggle-admin").click(function(e) {
+    $(".toggle-admin-role").click(function(e) {
       e.preventDefault()
       var type;
-      if($(this).hasClass("add-admin")) {
+      if($(this).hasClass("add-admin-role")) {
         role = 'instructor';
       } else {
         role = 'staff';
