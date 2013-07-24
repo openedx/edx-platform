@@ -66,7 +66,7 @@
         $submitButton.
           removeClass('is-disabled').
           removeProp('disabled').
-          html('Log into My ${settings.PLATFORM_NAME} Account <span class="orn-plus">+</span> Access My Courses');
+          html('Log into My ${settings.PLATFORM_NAME} Account');
       }
       else {
         $submitButton.
@@ -158,19 +158,21 @@
     </div> -->
     % endif
 
-    <div class="cta cta-help">
+    <div class="cta cta-sign up">
       <h3>Not Enrolled?</h3>
       <p><a href="${reverse('register_user')}">Sign up for ${settings.PLATFORM_NAME} today!</a></p>
-
-      ## Disable help unless the FAQ marketing link is enabled
-      % if settings.MKTG_URL_LINK_MAP.get('FAQ'):
-        <h3>Need Help?</h3>
-        <p>Looking for help in logging in or with your ${settings.PLATFORM_NAME} account?
-        <a href="${marketing_link('FAQ')}">
-            View our help section for answers to commonly asked questions.
-        </a></p>
-      % endif
     </div>
+
+    ## Disable help unless the FAQ marketing link is enabled
+    % if settings.MKTG_URL_LINK_MAP.get('FAQ'):
+    <div class="cta cta-help">
+      <h3>Need Help?</h3>
+      <p>Looking for help in logging in or with your ${settings.PLATFORM_NAME} account?
+      <a href="${marketing_link('FAQ')}">
+          View our help section for answers to commonly asked questions.
+      </a></p>
+    </div>
+    % endif
   </aside>
   </section>
 

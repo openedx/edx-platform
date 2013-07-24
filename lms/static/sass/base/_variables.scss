@@ -39,22 +39,33 @@ $outer-border-color: rgb(170, 170, 170);
 $light-gray: #ddd;
 $dark-gray: #333;
 
-// edx.org-related
-$m-gray-l1: rgb(203,203,203);
-$m-gray-l2: rgb(246,246,246);
-$m-gray: rgb(153,153,153);
-$m-gray-d1: rgb(102,102,102);
-$m-gray-d2: rgb(51,51,51);
-$m-gray-a1: rgb(80,80,80);
-$m-blue: rgb(65, 116, 170);
-// $m-blue: rgb(85, 151, 221); (used in marketing redesign)
-$m-blue-l1: rgb(85, 151, 221);
-$m-blue-d1: shade($m-blue,15%);
-$m-blue-s1: saturate($m-blue,15%);
-$m-pink: rgb(204,51,102);
+// edx.org marketing site variables
+$mktg-gray: #8A8C8F;
+$mktg-gray-l1: #97999B;
+$mktg-gray-l2: #A4A6A8;
+$mktg-gray-l3: #B1B2B4;
+$mktg-gray-l4: #F5F5F5;
+$mktg-gray-d1: #7D7F83;
+$mktg-gray-d2: #707276;
+$mktg-gray-d3: #646668;
+$mktg-gray-d4: #050505;
 
-$m-base-font-size: em(15);
+$mktg-blue: #1AA1DE;
+$mktg-blue-l1: #2BACE6;
+$mktg-blue-l2: #42B5E9;
+$mktg-blue-l3: #59BEEC;
+$mktg-blue-d1: #1790C7;
+$mktg-blue-d2: #1580B0;
+$mktg-blue-d3: #126F9A;
+$mktg-blue-d4: #0A4A67;
 
+$mktg-pink: #B52A67;
+$mktg-pink-l1: #CA2F73;
+$mktg-pink-l2: #D33F80;
+$mktg-pink-l3: #D7548E;
+$mktg-pink-d1: #A0255B;
+$mktg-pink-d2: #8C204F;
+$mktg-pink-d3: #771C44;
 
 $base-font-color: rgb(60,60,60);
 $baseFontColor: rgb(60,60,60);
@@ -103,10 +114,10 @@ $border-color-2: rgb(200,200,200);
 $border-color-3: rgb(100,100,100);
 $border-color-4: rgb(252,252,252);
 
-$link-color: $blue;
-$link-color-d1: $m-blue;
-$link-hover: $pink;
-$site-status-color: $pink;
+$link-color: $mktg-blue;
+$link-color-d1: $mktg-blue-d1;
+$link-hover: $mktg-pink;
+$site-status-color: $mktg-pink;
 
 $button-color: $blue;
 $button-archive-color: #eee;
