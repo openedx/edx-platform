@@ -1,5 +1,7 @@
 """
 Fake SMTP Server used for testing error handling for sending email.
+We could have mocked smptlib to raise connection errors, but this simulates
+connection errors from an SMTP server.
 """
 import smtpd
 import socket
@@ -9,7 +11,10 @@ import errno
 
 
 class FakeSMTPChannel(smtpd.SMTPChannel):
-    """A fake SMTPChannel for sending fake error response through socket."""
+    """
+    A fake SMTPChannel for sending fake error response through socket.
+    This causes smptlib to raise an SMTPConnectError.
+    """
     def __init__(self, server, conn, addr):
         asynchat.async_chat.__init__(self, conn)
         self.__server = server
