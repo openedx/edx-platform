@@ -9,6 +9,8 @@ If student have answered - words he entered and cloud.
 import json
 import logging
 
+from lxml import etree
+
 from pkg_resources import resource_string
 from xmodule.raw_module import RawDescriptor
 from xmodule.editing_module import MetadataOnlyEditingDescriptor
@@ -244,3 +246,9 @@ class WordCloudDescriptor(WordCloudFields, MetadataOnlyEditingDescriptor, RawDes
     """Descriptor for WordCloud Xmodule."""
     module_class = WordCloudModule
     template_dir_name = 'word_cloud'
+
+    def definition_to_xml(self, resource_fs):
+        """
+        Since there's no real data, just return an empty XML tag.
+        """
+        return etree.fromstring('<word_cloud />')
