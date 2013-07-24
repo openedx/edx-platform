@@ -1,9 +1,11 @@
 import requests
 import logging
 
+from django.conf import settings
+from django.http import HttpResponseBadRequest
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from mitxmako.shortcuts import render_to_string
-from django_future.csrf import ensure_csrf_cookie, render_to_response
+from mitxmako.shortcuts import render_to_string, render_to_response
+from django_future.csrf import ensure_csrf_cookie
 import enchant
 
 from courseware.courses import get_course_with_access
@@ -20,23 +22,22 @@ def search(request, course_id):
     results_string = ""
     course = get_course_with_access(request.user, course_id, 'load')
     results_string = find(request, course_id)
-    full_html = render_to_string("search_templates/wrapper.html", {
+    return render_to_response("search_templates/wrapper.html", {
         "body": results_string, "course": course})
-    return render_to_response(full_html)
 
 
 @ensure_csrf_cookie
 def index_course(request):
     indexer = MongoIndexer()
-    try:
-        indexer.index_course(request.POST["course"])
-    except KeyError:
+    if "type_id" in request.POST.keys():
+        indexer.index_course(request.POST["type_id"])
         return render_to_response(status=204)
-    return render_to_response("")
+    else:
+        return HttpResponseBadRequest()
 
 
-def find(request, course_id, database="http://127.0.0.1:9200",
-         field="searchable_text", max_result=100):
+def find(request, course_id):
+    database = settings.ES_DATABASE
     get_content = lambda request, content: content+"-index" if request.GET.get(content, False) else None
     query = request.GET.get("s", "*.*")
     page = request.GET.get("page", 1)
@@ -49,10 +50,10 @@ def find(request, course_id, database="http://127.0.0.1:9200",
     else:
         course_type = course_id.split("/")[1]
         base_url = "/".join([database, index, course_type])
-    full_url = "/".join([base_url, "_search?q="+field+":"])
+    full_url = "/".join([base_url, "_search?q=searchable_text:"])
     log.debug(full_url)
     context = {}
-    response = requests.get(full_url+query+"&size="+str(max_result))
+    response = requests.get(full_url+query+"&size=10000")
     data = SearchResults(request, response)
     data.filter("course", request.GET.get("selected_course"))
     data.filter("org", request.GET.get("selected_org"))
@@ -65,11 +66,15 @@ def find(request, course_id, database="http://127.0.0.1:9200",
 
     data = proper_page(results_pages, page)
     context.update({
-        "data": data, "next_page": next_link(request, data), "prev_page": prev_link(request, data),
+        "data": data, "next_page": next_link(request, data),
+        "prev_page": prev_link(request, data),
         "search_correction_link": search_correction_link(request, correction),
-        "spelling_correction": correction, "org_histogram": org_histogram,
-        "course_histogram": course_histogram, "selected_course": request.GET.get("selected_course", ""),
-        "selected_org": request.GET.get("selected_org", "")})
+        "spelling_correction": correction,
+        "org_histogram": org_histogram,
+        "course_histogram": course_histogram,
+        "selected_course": request.GET.get("selected_course", ""),
+        "selected_org": request.GET.get("selected_org", "")
+    })
     return render_to_string("search_templates/results.html", context)
 
 

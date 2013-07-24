@@ -880,7 +880,7 @@
 @-webkit-keyframes fadeInRight {
 	0% {
 		opacity: 0;
-		-webkit-transform: translateX(20px);
+		-webkit-transform: translateX(40px);
 	}
 	
 	100% {
@@ -892,7 +892,7 @@
 @-moz-keyframes fadeInRight {
 	0% {
 		opacity: 0;
-		-moz-transform: translateX(20px);
+		-moz-transform: translateX(40px);
 	}
 	
 	100% {
@@ -904,7 +904,7 @@
 @-o-keyframes fadeInRight {
 	0% {
 		opacity: 0;
-		-o-transform: translateX(20px);
+		-o-transform: translateX(40px);
 	}
 	
 	100% {
@@ -916,7 +916,7 @@
 @keyframes fadeInRight {
 	0% {
 		opacity: 0;
-		transform: translateX(20px);
+		transform: translateX(40px);
 	}
 	
 	100% {

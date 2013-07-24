@@ -8,9 +8,8 @@ def sort(data_list, sorting):
 
 
 def relevance_sort(data_list):
-    sorting = lambda entry: entry.data.get("score", 0)
-    ascending = sorted(data_list, key=sorting)
-    ascending.reverse()  # Now descending
+    sorting = lambda entry: entry.score
+    ascending = sorted(data_list, key=sorting, reverse=True)
     return ascending
 
 

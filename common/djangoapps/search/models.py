@@ -12,12 +12,12 @@ import sorting
 class SearchResults:
 
     def __init__(self, request, response):
-        self.results = json.loads(response._content).get("hits", {"hits": ""})["hits"]
-        self.scores = [entry["_score"] for entry in self.results]
+        raw_results = json.loads(response._content).get("hits", {"hits": ""})["hits"]
+        scores = [entry["_score"] for entry in raw_results]
         self.request = request
-        raw_data = [entry["_source"] for entry in self.results]
+        raw_data = [entry["_source"] for entry in raw_results]
         self.query = request.GET.get("s", "*.*")
-        results = zip(raw_data, self.scores)
+        results = zip(raw_data, scores)
         self.entries = [SearchResult(entry, score, self.query, request) for entry, score in results]
         self.has_results = len(self.entries) > 0
 
@@ -40,10 +40,10 @@ class SearchResult:
 
     def __init__(self, entry, score, query, request):
         self.data = entry
-        self.data.update({"score": score})
-        self.data.update({"thumbnail": "data:image/jpg;base64," + entry["thumbnail"]})
-        self.data.update({"snippets": snippet_generator(self.data["searchable_text"], query)})
-        self.data.update({"url": _update_url(request, self.data)})
+        self.score = score
+        self.thumbnail = "data:image/jpg;base64," + entry["thumbnail"]
+        self.snippets = snippet_generator(self.data["searchable_text"], query)
+        self.url = _update_url(request, self.data)
 
 
 def snippet_generator(transcript, query, soft_max=50, word_margin=25, bold=True):

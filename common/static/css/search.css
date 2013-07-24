@@ -46,3 +46,23 @@
 .page-number{
     width: 30px;
 }
+
+.search-icon{
+    text-align: right;
+}
+.text-wrapper{
+    border-radius: 3px;
+    color: #555;
+    display: block;
+    text-align: center;
+    padding: 10px 13px 12px;
+    font-size: 14px;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.text-wrapper:hover{
+    cursor: pointer;
+    color: #333;
+    background: rgba(255, 255, 255, 0.6);
+}
