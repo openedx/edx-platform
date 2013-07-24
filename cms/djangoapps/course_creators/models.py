@@ -68,7 +68,7 @@ def post_save_callback(sender, **kwargs):
                 sender=sender,
                 caller=instance.admin,
                 user=instance.user,
-                add=instance.state == CourseCreator.GRANTED
+                state=instance.state
             )
 
         instance.state_changed = timezone.now()
