@@ -12,6 +12,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError, InsufficientSpecif
 
 from xblock.core import XBlock, Scope, String, Integer, Float, ModelType
 from xblock.fragment import Fragment
+from xblock.runtime import Runtime
 from xmodule.modulestore.locator import BlockUsageLocator
 
 log = logging.getLogger(__name__)
@@ -870,7 +871,7 @@ class XMLParsingSystem(DescriptorSystem):
         self.policy = policy
 
 
-class ModuleSystem(object):
+class ModuleSystem(Runtime):
     '''
     This is an abstraction such that x_modules can function independent
     of the courseware (e.g. import into other types of courseware, LMS,

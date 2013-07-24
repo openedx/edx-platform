@@ -400,7 +400,7 @@ def index(request, course_id, chapter=None, section=None,
                 # add in the appropriate timer information to the rendering context:
                 context.update(check_for_active_timelimit_module(request, course_id, course))
 
-            context['content'] = section_module.get_html()
+            context['content'] = section_module.runtime.render(section_module, None, 'student_view').content
         else:
             # section is none, so display a message
             prev_section = get_current_child(chapter_module)

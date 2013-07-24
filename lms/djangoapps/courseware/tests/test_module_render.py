@@ -1,7 +1,7 @@
 """
 Test for lms courseware app, module render unit
 """
-from mock import MagicMock, patch
+from mock import MagicMock, patch, Mock
 import json
 
 from django.http import Http404, HttpResponse
@@ -12,8 +12,10 @@ from django.test.client import RequestFactory
 from django.test.utils import override_settings
 
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 import courseware.module_render as render
-from courseware.tests.tests import LoginEnrollmentTestCase
+from courseware.tests.tests import LoginEnrollmentTestCase, TEST_DATA_MONGO_MODULESTORE
 from courseware.model_data import ModelDataCache
 from modulestore_config import TEST_DATA_XML_MODULESTORE
 
@@ -49,8 +51,10 @@ class ModuleRenderTestCase(LoginEnrollmentTestCase):
                                                                    dispatch=self.dispatch))
 
     def test_get_module(self):
-        self.assertIsNone(render.get_module('dummyuser', None,
-                                            'invalid location', None, None))
+        self.assertEqual(
+            None,
+            render.get_module('dummyuser', None, 'invalid location', None, None)
+        )
 
     def test_module_render_with_jump_to_id(self):
         """
@@ -230,7 +234,8 @@ class TestTOC(TestCase):
                       'url_name': 'secret:magic', 'display_name': 'secret:magic'}])
 
         actual = render.toc_for_course(self.portal_user, request, self.toy_course, chapter, None, model_data_cache)
-        assert reduce(lambda x, y: x and (y in actual), expected, True)
+        for toc_section in expected:
+            self.assertIn(toc_section, actual)
 
     def test_toc_toy_from_section(self):
         chapter = 'Overview'
@@ -257,4 +262,109 @@ class TestTOC(TestCase):
                       'url_name': 'secret:magic', 'display_name': 'secret:magic'}])
 
         actual = render.toc_for_course(self.portal_user, request, self.toy_course, chapter, section, model_data_cache)
-        assert reduce(lambda x, y: x and (y in actual), expected, True)
+        for toc_section in expected:
+            self.assertIn(toc_section, actual)
+
+
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+class TestHtmlModifiers(ModuleStoreTestCase):
+    """
+    Tests to verify that standard modifications to the output of XModule/XBlock
+    student_view are taking place
+    """
+    def setUp(self):
+        self.user = UserFactory.create()
+        self.request = RequestFactory().get('/')
+        self.request.user = self.user
+        self.request.session = {}
+        self.course = CourseFactory.create()
+        self.content_string = '<p>This is the content<p>'
+        self.rewrite_link = '<a href="/static/foo/content">Test rewrite</a>'
+        self.course_link = '<a href="/course/bar/content">Test course rewrite</a>'
+        self.descriptor = ItemFactory.create(
+            category='html',
+            data=self.content_string + self.rewrite_link + self.course_link
+        )
+        self.location = self.descriptor.location
+        self.model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
+            self.course.id,
+            self.user,
+            self.descriptor
+        )
+
+    def test_xmodule_display_wrapper_enabled(self):
+        module = render.get_module(
+            self.user,
+            self.request,
+            self.location,
+            self.model_data_cache,
+            self.course.id,
+            wrap_xmodule_display=True,
+        )
+        result_fragment = module.runtime.render(module, None, 'student_view')
+
+        self.assertIn('section class="xmodule_display xmodule_HtmlModule"', result_fragment.content)
+
+    def test_xmodule_display_wrapper_disabled(self):
+        module = render.get_module(
+            self.user,
+            self.request,
+            self.location,
+            self.model_data_cache,
+            self.course.id,
+            wrap_xmodule_display=False,
+        )
+        result_fragment = module.runtime.render(module, None, 'student_view')
+
+        self.assertNotIn('section class="xmodule_display xmodule_HtmlModule"', result_fragment.content)
+
+    def test_static_link_rewrite(self):
+        module = render.get_module(
+            self.user,
+            self.request,
+            self.location,
+            self.model_data_cache,
+            self.course.id,
+        )
+        result_fragment = module.runtime.render(module, None, 'student_view')
+
+        self.assertIn(
+            '/c4x/{org}/{course}/asset/foo_content'.format(
+                org=self.course.location.org,
+                course=self.course.location.course,
+            ),
+            result_fragment.content
+        )
+
+    def test_course_link_rewrite(self):
+        module = render.get_module(
+            self.user,
+            self.request,
+            self.location,
+            self.model_data_cache,
+            self.course.id,
+        )
+        result_fragment = module.runtime.render(module, None, 'student_view')
+
+        self.assertIn(
+            '/courses/{course_id}/bar/content'.format(
+                course_id=self.course.id
+            ),
+            result_fragment.content
+        )
+
+    @patch('courseware.module_render.has_access', Mock(return_value=True))
+    def test_histogram(self):
+        module = render.get_module(
+            self.user,
+            self.request,
+            self.location,
+            self.model_data_cache,
+            self.course.id,
+        )
+        result_fragment = module.runtime.render(module, None, 'student_view')
+
+        self.assertIn(
+            'Staff Debug',
+            result_fragment.content
+        )
