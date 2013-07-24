@@ -12,7 +12,7 @@ from django.core.mail import EmailMultiAlternatives, get_connection
 from django.http import Http404
 from celery import task, current_task
 
-from bulk_email.models import *
+from bulk_email.models import CourseEmail, Optout
 from courseware.access import _course_staff_group_name, _course_instructor_group_name
 from courseware.courses import get_course_by_id
 from mitxmako.shortcuts import render_to_string
