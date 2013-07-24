@@ -43,9 +43,14 @@
   text-align: center;
   text-shadow: none;
   font-weight: 500;
+  letter-spacing: 0;
 
-  &.disabled, &[disabled] {
+  &.disabled, &[disabled], &.is-disabled {
     background: $m-gray-d3;
+
+    &:hover {
+      background: $m-gray-d3 !important; // needed for IE currently
+    }
   }
 }
 
@@ -73,6 +78,7 @@
 
   &.disabled, &[disabled] {
     box-shadow: none;
+    background: $m-gray-d3; // needed for IE currently
   }
 }
 
@@ -100,6 +106,7 @@
 
   &.disabled, &[disabled] {
     box-shadow: none;
+    background: $m-gray-d3; // needed for IE currently
   }
 }
 
@@ -142,7 +149,7 @@
   }
 
   .action {
-    @include font-size(16);
+    font-size: 16px;
     font-weight: 500;
 
     // register or access courseware
