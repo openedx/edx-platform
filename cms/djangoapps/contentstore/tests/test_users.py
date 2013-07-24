@@ -243,3 +243,77 @@ class UsersTestCase(CourseTestCase):
         ext_user = User.objects.get(email=self.ext_user.email)
         groups = [g.name for g in ext_user.groups.all()]
         self.assertIn(self.inst_groupname, groups)
+
+    def test_permission_denied_self(self):
+        group, _ = Group.objects.get_or_create(name=self.staff_groupname)
+        self.user.groups.add(group)
+        self.user.is_staff = False
+        self.user.save()
+
+        self_url = reverse("course_team_user", kwargs={
+            "org": self.course.location.org,
+            "course": self.course.location.course,
+            "name": self.course.location.name,
+            "email": self.user.email,
+        })
+
+        resp = self.client.post(
+            self_url,
+            data={"role": "instructor"},
+            HTTP_ACCEPT="application/json",
+        )
+        self.assert4XX(resp.status_code)
+        result = json.loads(resp.content)
+        self.assertIn("error", result)
+
+    def test_permission_denied_other(self):
+        group, _ = Group.objects.get_or_create(name=self.staff_groupname)
+        self.user.groups.add(group)
+        self.user.is_staff = False
+        self.user.save()
+
+        resp = self.client.post(
+            self.detail_url,
+            data={"role": "instructor"},
+            HTTP_ACCEPT="application/json",
+        )
+        self.assert4XX(resp.status_code)
+        result = json.loads(resp.content)
+        self.assertIn("error", result)
+
+    def test_staff_can_delete_self(self):
+        group, _ = Group.objects.get_or_create(name=self.staff_groupname)
+        self.user.groups.add(group)
+        self.user.is_staff = False
+        self.user.save()
+
+        self_url = reverse("course_team_user", kwargs={
+            "org": self.course.location.org,
+            "course": self.course.location.course,
+            "name": self.course.location.name,
+            "email": self.user.email,
+        })
+
+        resp = self.client.delete(self_url)
+        self.assert2XX(resp.status_code)
+        # reload user from DB
+        user = User.objects.get(email=self.user.email)
+        groups = [g.name for g in user.groups.all()]
+        self.assertNotIn(self.staff_groupname, groups)
+
+    def test_staff_cannot_delete_other(self):
+        group, _ = Group.objects.get_or_create(name=self.staff_groupname)
+        self.user.groups.add(group)
+        self.user.is_staff = False
+        self.user.save()
+        self.ext_user.groups.add(group)
+        self.ext_user.save()
+
+        resp = self.client.delete(self.detail_url)
+        self.assert4XX(resp.status_code)
+        result = json.loads(resp.content)
+        self.assertIn("error", result)
+        # reload user from DB
+        ext_user = User.objects.get(email=self.ext_user.email)
+        groups = [g.name for g in ext_user.groups.all()]
+        self.assertIn(self.staff_groupname, groups)

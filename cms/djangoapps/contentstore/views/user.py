@@ -106,8 +106,17 @@ def manage_users(request, org, course, name):
 def course_team_user(request, org, course, name, email):
     location = Location('i4x', org, course, 'course', name)
     # check that logged in user has permissions to this item
-    if not has_access(request.user, location, role=INSTRUCTOR_ROLE_NAME) and not has_access(request.user, location, role=STAFF_ROLE_NAME):
-        raise PermissionDenied()
+    if has_access(request.user, location, role=INSTRUCTOR_ROLE_NAME):
+        # instructors have full permissions
+        pass
+    elif has_access(request.user, location, role=STAFF_ROLE_NAME) and email == request.user.email:
+        # staff can only affect themselves
+        pass
+    else:
+        msg = {
+            "error": _("Insufficient permissions")
+        }
+        return JsonResponse(msg, 400)
 
     try:
         user = User.objects.get(email=email)
@@ -153,14 +162,18 @@ def course_team_user(request, org, course, name, email):
         # remove all roles in this course from this user: but fail if the user
         # is the last instructor in the course team
         instructors = set(inst_group.user_set.all())
+        staff = set(staff_group.user_set.all())
         if user in instructors and len(instructors) == 1:
             msg = {
                 "error": _("You may not remove the last instructor from a course")
             }
             return JsonResponse(msg, 400)
 
-        for role in roles:
-            remove_user_from_course_group(request.user, user, location, role)
+        if user in instructors:
+            user.groups.remove(inst_group)
+        if user in staff:
+            user.groups.remove(staff_group)
+        user.save()
         return JsonResponse()
 
     # all other operations require the requesting user to specify a role
@@ -179,6 +192,11 @@ def course_team_user(request, org, course, name, email):
         role = request.POST["role"]
 
     if role == "instructor":
+        if not has_access(request.user, location, role=INSTRUCTOR_ROLE_NAME):
+            msg = {
+                "error": _("Only instructors may create other instructors")
+            }
+            return JsonResponse(msg, 400)
         add_user_to_course_group(request.user, user, location, role)
     elif role == "staff":
         # if we're trying to downgrade a user from "instructor" to "staff",
