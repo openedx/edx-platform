@@ -69,7 +69,6 @@ $m-pink-d3: #771C44;
 
 $m-base-font-size: em(15);
 
-
 $base-font-color: rgb(60,60,60);
 $baseFontColor: rgb(60,60,60);
 $lighter-base-font-color: rgb(100,100,100);
@@ -88,9 +87,56 @@ $courseware-footer-border: none;
 $courseware-footer-shadow: none;
 $courseware-footer-margin: 0px;
 
+
+// actions
 $button-bg-image: linear-gradient(#fff 0%, rgb(250,250,250) 50%, rgb(237,237,237) 50%, rgb(220,220,220) 100%);
 $button-bg-color: transparent;
 $button-bg-hover-color: #fff;
+
+// actions - primary
+$action-primary-bg: $m-blue-d3;
+$action-primary-fg: $white;
+$action-primary-shadow: $m-blue-d4;
+
+// focused - hover/active pseudo states
+$action-primary-focused-bg: $m-blue-d1;
+$action-primary-focused-fg: $white;
+
+// current or active navigation item
+$action-primary-active-bg: $m-blue;
+$action-primary-active-fg: $m-blue-d3;
+$action-primary-active-shadow: $m-blue-d2;
+$action-primary-active-focused-fg: $m-blue-d4;
+$action-primary-active-focused-shadow: $m-blue-d3;
+
+// disabled
+$action-primary-disabled-bg: $m-gray-d3;
+$action-prmary-disabled-fg: $white;
+
+
+
+// actions - secondary
+$action-secondary-bg: $m-pink;
+$action-secondary-fg: $white;
+$action-secondary-shadow: $m-pink-d2;
+
+// focused - hover/active pseudo states
+$action-secondary-focused-bg: $m-pink-l3;
+$action-secondary-focused-fg: $white;
+
+// current or active navigation item
+$action-secondary-active-bg: $m-pink-l2;
+$action-secondary-active-fg: $m-pink-d1;
+$action-secondary-active-shadow: $m-pink-d1;
+$action-secondary-active-focused-fg: $m-pink-d3;
+$action-secondary-active-focused-shadow: $m-pink-d2;
+
+// disabled
+$action-secondary-disabled-bg: $m-gray-d3;
+$action-secondary-disabled-fg: $white;
+
+
+
 
 $faded-hr-image-1: linear-gradient(180deg, rgba(200,200,200, 0) 0%, rgba(200,200,200, 1) 50%, rgba(200,200,200, 0));
 $faded-hr-image-2: linear-gradient(180deg, rgba(200,200,200, 0) 0%, rgba(200,200,200, 1));

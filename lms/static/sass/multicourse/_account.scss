@@ -390,7 +390,7 @@
     @include clearfix();
 
     button[type="submit"] {
-      @extend .m-btn-primary-blue;
+      @extend .m-btn-primary;
 
       &:disabled, &.is-disabled {
         opacity: 0.3;
