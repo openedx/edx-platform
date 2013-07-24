@@ -391,10 +391,6 @@
 
     button[type="submit"] {
       @extend .m-btn-primary-blue;
-      // needed, but bad overrides
-      text-transform: none;
-      vertical-align: middle;
-      font-weight: 600;
 
       &:disabled, &.is-disabled {
         opacity: 0.3;
