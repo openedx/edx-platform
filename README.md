@@ -17,10 +17,13 @@ installation process.
    Providers.  You should use VirtualBox >= 4.2.12.
    (Windows: later/earlier VirtualBox versions than 4.2.12 have been reported to not work well with 
    Vagrant.  If this is still a problem, you can
-   install 4.2.12 from https://www.virtualbox.org/wiki/Download_Old_Builds_4_2).
+   install 4.2.12 from http://download.virtualbox.org/virtualbox/4.2.12/).
 4. Install Vagrant: http://www.vagrantup.com/ (Vagrant 1.2.2 or later)
 5. Open a terminal
-6. Download the project: `git clone git://github.com/edx/edx-platform.git`
+6. Download the project: 
+   `git clone git://github.com/edx/edx-platform.git`
+or if your network blocks git protocol, you can use https instead:
+   `git clone https://github.com/edx/edx-platform.git`	
 7. Enter the project directory: `cd edx-platform/`
 8. (Windows only) Run the commands to 
    [deal with line endings and symlinks under Windows](https://github.com/edx/edx-platform/wiki/Simplified-install-with-vagrant#dealing-with-line-endings-and-symlinks-under-windows)
@@ -39,8 +42,11 @@ If not, refer to the
 Your development environment is initialized only on the first bring-up.
 Subsequently `vagrant up` commands will boot your virtual machine normally.
 
-Note: by default, the VM will get the IP `192.168.20.40`.
+Note: 
+
+* by default, the VM will get the IP `192.168.20.40`.
 You can change this in your `Vagrantfile` (the startup message will reflect your VM's actual IP).
+* if your network blocks git protocol, you also have to modify the github requirement file. Open edx-platform/requirements/edx/github.txt, change the Third party libraries links from "git:\\" to "git+https:\\"
 
 Accessing the VM
 ----------------
