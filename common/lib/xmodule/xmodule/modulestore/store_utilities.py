@@ -146,10 +146,6 @@ def _clone_modules(modulestore, modules, source_location, dest_location):
 
 
 def clone_course(modulestore, contentstore, source_location, dest_location, delete_original=False):
-    # first check to see if the modulestore is Mongo backed
-    if not isinstance(modulestore, MongoModuleStore):
-        raise Exception("Expected a MongoModuleStore in the runtime. Aborting....")
-
     # check to see if the dest_location exists as an empty course
     # we need an empty course because the app layers manage the permissions and users
     if not modulestore.has_item(dest_location.course_id, dest_location):
