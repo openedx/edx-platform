@@ -384,6 +384,13 @@ class ModuleStore(object):
         """
         raise NotImplementedError
 
+    def set_modulestore_configuration(self, config_dict):
+        '''
+        Allows for runtime configuration of the modulestore. In particular this is how the
+        application (LMS/CMS) can pass down Django related configuration information, e.g. caches, etc.
+        '''
+        raise NotImplementedError
+
 
 class ModuleStoreBase(ModuleStore):
     '''
@@ -395,6 +402,7 @@ class ModuleStoreBase(ModuleStore):
         '''
         self._location_errors = {}  # location -> ErrorLog
         self.metadata_inheritance_cache = None
+        self.request_cache = None
         self.modulestore_update_signal = None  # can be set by runtime to route notifications of datastore changes
 
     def _get_errorlog(self, location):
@@ -438,6 +446,14 @@ class ModuleStoreBase(ModuleStore):
             if c.id == course_id:
                 return c
         return None
+
+    def set_modulestore_configuration(self, config_dict):
+        """
+        This is the base implementation of the interface, all we need to do is store
+        two possible configurations as attributes on the class
+        """
+        self.metadata_inheritance_cache = config_dict.get('metadata_inheritance_cache_subsystem', None)
+        self.request_cache = config_dict.get('request_cache', None)
 
 
 def namedtuple_to_son(namedtuple, prefix=''):

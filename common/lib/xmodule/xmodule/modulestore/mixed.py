@@ -100,7 +100,21 @@ class MixedModuleStore(ModuleStoreBase):
         return courses
 
     def get_course(self, course_id):
+        """
+        returns the course module associated with the course_id
+        """
         return self._get_modulestore_for_courseid(course_id).get_course(course_id)
 
     def get_parent_locations(self, location, course_id):
+        """
+        returns the parent locations for a given lcoation and course_id
+        """
         return self._get_modulestore_for_courseid(course_id).get_parent_locations(location, course_id)
+
+    def set_modulestore_configuration(self, config_dict):
+        """
+        This implementation of the interface method will pass along the configuration to all ModuleStore
+        instances
+        """
+        for store in self.modulestores.values():
+            store.set_modulestore_configuration(config_dict)
