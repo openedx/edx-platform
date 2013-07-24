@@ -14,6 +14,8 @@ the setting is not present, the API is disabled).
 LMS: Added endpoints for AJAX requests to enable/disable notifications
 (which are not yet implemented) and a one-click unsubscribe page.
 
+Common: Add a manage.py that knows about edx-platform specific settings and projects
+
 Common: Added *experimental* support for jsinput type.
 
 Common: Added setting to specify Celery Broker vhost

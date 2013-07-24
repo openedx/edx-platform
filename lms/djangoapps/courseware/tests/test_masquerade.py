@@ -5,7 +5,7 @@ Based on (and depends on) unit tests for courseware.
 
 Notes for running by hand:
 
-django-admin.py test --settings=lms.envs.test --pythonpath=. lms/djangoapps/courseware
+./manage.py lms --settings test test lms/djangoapps/courseware
 """
 
 from django.test.utils import override_settings

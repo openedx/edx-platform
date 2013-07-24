@@ -15,14 +15,14 @@ installation process.
 3. Install VirtualBox: https://www.virtualbox.org/wiki/Downloads
    See http://docs.vagrantup.com/v2/providers/index.html for a list of supported
    Providers.  You should use VirtualBox >= 4.2.12.
-   (Windows: later/earlier VirtualBox versions than 4.2.12 have been reported to not work well with 
+   (Windows: later/earlier VirtualBox versions than 4.2.12 have been reported to not work well with
    Vagrant.  If this is still a problem, you can
    install 4.2.12 from https://www.virtualbox.org/wiki/Download_Old_Builds_4_2).
 4. Install Vagrant: http://www.vagrantup.com/ (Vagrant 1.2.2 or later)
 5. Open a terminal
 6. Download the project: `git clone git://github.com/edx/edx-platform.git`
 7. Enter the project directory: `cd edx-platform/`
-8. (Windows only) Run the commands to 
+8. (Windows only) Run the commands to
    [deal with line endings and symlinks under Windows](https://github.com/edx/edx-platform/wiki/Simplified-install-with-vagrant#dealing-with-line-endings-and-symlinks-under-windows)
 9. Create the development environment and start it: `vagrant up`
 
@@ -33,7 +33,7 @@ install dependencies and configure the VM.
 This will take a while; go grab a coffee.
 
 When complete, you should see a _"Success!"_ message.
-If not, refer to the 
+If not, refer to the
 [troubleshooting section](https://github.com/edx/edx-platform/wiki/Simplified-install-with-vagrant#troubleshooting).
 
 Your development environment is initialized only on the first bring-up.
@@ -62,7 +62,7 @@ Using edX
 When you login to your VM, you are in
 `/opt/edx/edx-platform` by default, which is shared from your host workspace.
 Your host computer contains the edx-project development code and repository.
-Your VM runs edx-platform code mounted from your host, so 
+Your VM runs edx-platform code mounted from your host, so
 you can develop by editing on your host.
 
 After logging into your VM with `vagrant ssh`,
@@ -146,7 +146,7 @@ You should now also see a login on [http://localhost:6080/admin/]()
 You will need a privileged user for the admin login.
 You can create a CMS/LMS super-user with:
 ```
-$ rake django-admin["createsuperuser"]
+$ ./manage.py lms createsuperuser
 ```
 
 
@@ -185,7 +185,7 @@ $ vagrant up  # will make a new VM
 Troubleshooting
 ---------------
 
-If anything doesn't work as expected, see the 
+If anything doesn't work as expected, see the
 [troubleshooting section](https://github.com/edx/edx-platform/wiki/Simplified-install-with-vagrant#troubleshooting).
 
 Installation - Advanced
@@ -293,29 +293,22 @@ or any other process management tool.
 
 Configuring Your Project
 ------------------------
-We use [`rake`](http://rake.rubyforge.org/) to execute common tasks in our
-project. The `rake` tasks are defined in the `rakefile`, or you can run `rake -T`
-to view a summary.
-
 Before you run your project, you need to create a sqlite database, create
-tables in that database, run database migrations, and populate templates for
-CMS templates. Fortunately, `rake` will do all of this for you! Just run:
+tables in that database, and run database migrations. Fortunately, `django`
+will do all of this for you
 
-    $ rake django-admin[syncdb]
-    $ rake django-admin[migrate]
-
-If you are running these commands using the [`zsh`](http://www.zsh.org/) shell,
-zsh will assume that you are doing
-[shell globbing](https://en.wikipedia.org/wiki/Glob_%28programming%29), search for
-a file in your directory named `django-adminsyncdb` or `django-adminmigrate`,
-and fail. To fix this, just surround the argument with quotation marks, so that
-you're running `rake "django-admin[syncdb]"`.
+    $ ./manage.py lms syncdb --migrate
+    $ ./manage.py cms syncdb --migrate
 
 Run Your Project
 ----------------
 edX has two components: Studio, the course authoring system; and the LMS
 (learning management system) used by students. These two systems communicate
 through the MongoDB database, which stores course information.
+
+We use [`rake`](http://rake.rubyforge.org/) to execute common tasks in our
+project. The `rake` tasks are defined in the `rakefile`, or you can run `rake -T`
+to view a summary.
 
 To run Studio, run:
 

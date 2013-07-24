@@ -11,8 +11,7 @@ end
 
 task :fastlms do
     # this is >2 times faster that rake [lms], and does not need web, good for local dev
-    django_admin = ENV['DJANGO_ADMIN_PATH'] || select_executable('django-admin.py', 'django-admin')
-    sh("#{django_admin} runserver --traceback --settings=lms.envs.dev   --pythonpath=.")
+    sh("./manage.py lms runserver --traceback")
 end
 
 # Start :system locally with the specified :env and :options.
@@ -36,9 +35,8 @@ end
     desc "Start #{system} Celery worker"
     task "#{system}_worker", [:options] => [:predjango] do |t, args|
       args.with_defaults(:options => default_options[system])
-      django_admin = ENV['DJANGO_ADMIN_PATH'] || select_executable('django-admin.py', 'django-admin')
       command = 'celery worker'
-      sh("#{django_admin} #{command} --loglevel=INFO --settings=#{system}.envs.dev_with_worker --pythonpath=. #{args.join(' ')}")
+      sh("./manage.py #{system} --settings dev_with_worker #{command} --loglevel=INFO #{args.join(' ')}")
     end
 
     # Per environment tasks
