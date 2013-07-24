@@ -1159,20 +1159,6 @@ class CapaDescriptor(CapaFields, RawDescriptor):
             path[8:],
         ]
 
-    @classmethod
-    def from_xml(cls, xml_data, system, org=None, course=None):
-        """
-        Augment regular translation w/ setting the pre-Studio defaults.
-        """
-        problem = super(CapaDescriptor, cls).from_xml(xml_data, system, org, course)
-        course_policy = system.policy.setdefault('course/{}'.format(system.url_name), {})
-        # pylint: disable=W0212
-        if 'showanswer' not in problem._model_data and 'showanswer' not in course_policy:
-            problem.showanswer = "closed"
-        if 'rerandomize' not in problem._model_data and 'rerandomize' not in course_policy:
-            problem.rerandomize = "always"
-        return problem
-
     @property
     def non_editable_metadata_fields(self):
         non_editable_fields = super(CapaDescriptor, self).non_editable_metadata_fields

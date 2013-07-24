@@ -138,7 +138,7 @@ def import_module_from_xml(modulestore, static_content_store, course_data_path, 
             # For example, what I'm seeing is <img src='foo.jpg' />   ->   <img src='bar.jpg'>
             # Note the dropped element closing tag. This causes the LMS to fail when rendering modules - that's
             # no good, so we have to do this kludge
-            if isinstance(module.data, str) or isinstance(module.data, unicode):   # some module 'data' fields are non strings which blows up the link traversal code
+            if isinstance(module.data, str) or isinstance(module.data, unicode):  # some module 'data' fields are non strings which blows up the link traversal code
                 lxml_rewrite_links(module.data, lambda link: verify_content_links(module, course_data_path, static_content_store, link, remap_dict))
 
                 for key in remap_dict.keys():
@@ -315,7 +315,7 @@ def import_module(module, store, course_data_path, static_content_store, allow_n
             # For example, what I'm seeing is <img src='foo.jpg' />   ->   <img src='bar.jpg'>
             # Note the dropped element closing tag. This causes the LMS to fail when rendering modules - that's
             # no good, so we have to do this kludge
-            if isinstance(module_data, str) or isinstance(module_data, unicode):   # some module 'data' fields are non strings which blows up the link traversal code
+            if isinstance(module_data, str) or isinstance(module_data, unicode):  # some module 'data' fields are non strings which blows up the link traversal code
                 lxml_rewrite_links(module_data, lambda link: verify_content_links(module, course_data_path, static_content_store, link, remap_dict))
 
                 for key in remap_dict.keys():
@@ -523,6 +523,26 @@ def validate_data_source_paths(data_dir, course_dir):
     return err_cnt, warn_cnt
 
 
+def validate_course_policy(module_store, course_id):
+    """
+    Validate that the course explicitly sets values for any fields whose defaults may have changed between
+    the export and the import.
+
+    Does not add to error count as these are just warnings.
+    """
+    # is there a reliable way to get the module location just given the course_id?
+    warn_cnt = 0
+    for module in module_store.modules[course_id].itervalues():
+        if module.location.category == 'course':
+            if not 'rerandomize' in module._model_data:
+                warn_cnt += 1
+                print 'WARN: course policy does not specify value for "rerandomize" whose default is now "never". The behavior of your course may change.'
+            if not 'showanswer' in module._model_data:
+                warn_cnt += 1
+                print 'WARN: course policy does not specify value for "showanswer" whose default is now "finished". The behavior of your course may change.'
+    return warn_cnt
+
+
 def perform_xlint(data_dir, course_dirs,
                   default_class='xmodule.raw_module.RawDescriptor',
                   load_error_modules=True):
@@ -568,6 +588,8 @@ def perform_xlint(data_dir, course_dirs,
         err_cnt += validate_category_hierarchy(module_store, course_id, "chapter", "sequential")
         # constrain that sequentials only have 'verticals'
         err_cnt += validate_category_hierarchy(module_store, course_id, "sequential", "vertical")
+        # validate the course policy overrides any defaults which have changed over time
+        warn_cnt += validate_course_policy(module_store, course_id)
         # don't allow metadata on verticals, since we can't edit them in studio
         err_cnt += validate_no_non_editable_metadata(module_store, course_id, "vertical")
         # don't allow metadata on chapters, since we can't edit them in studio
