@@ -32,7 +32,7 @@ from xmodule.error_module import ErrorDescriptor
 from xblock.runtime import DbModel, KeyValueStore, InvalidScopeError
 from xblock.core import Scope
 
-from xmodule.modulestore import ModuleStoreBase, Location, namedtuple_to_son
+from xmodule.modulestore import ModuleStoreBase, Location, namedtuple_to_son, MONGO_MODULESTORE_TYPE
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.inheritance import own_metadata, INHERITABLE_METADATA, inherit_metadata
 
@@ -841,6 +841,13 @@ class MongoModuleStore(ModuleStoreBase):
                                      {'_id': True})
         return [i['_id'] for i in items]
 
+    def get_modulestore_type(self, course_id):
+        """
+        Returns a type which identifies which modulestore is servicing the given
+        course_id. The return can be either "xml" (for XML based courses) or "mongo" for MongoDB backed courses
+        """
+        return MONGO_MODULESTORE_TYPE
+
     def _create_new_model_data(self, category, location, definition_data, metadata):
         """
         To instantiate a new xmodule which will be saved latter, set up the dbModel and kvs
@@ -854,9 +861,9 @@ class MongoModuleStore(ModuleStoreBase):
         )
 
         class_ = XModuleDescriptor.load_class(
-                    category,
-                    self.default_class
-                )
+            category,
+            self.default_class
+        )
         model_data = DbModel(kvs, class_, None, MongoUsage(None, location))
         model_data['category'] = category
         model_data['location'] = location

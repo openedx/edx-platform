@@ -14,6 +14,8 @@ from bson.son import SON
 
 log = logging.getLogger('mitx.' + 'modulestore')
 
+MONGO_MODULESTORE_TYPE = 'mongo'
+XML_MODULESTORE_TYPE = 'xml'
 
 URL_RE = re.compile("""
     (?P<tag>[^:]+)://?
@@ -389,6 +391,13 @@ class ModuleStore(object):
         Allows for runtime configuration of the modulestore. In particular this is how the
         application (LMS/CMS) can pass down Django related configuration information, e.g. caches, etc.
         '''
+        raise NotImplementedError
+
+    def get_modulestore_type(self, course_id):
+        """
+        Returns a type which identifies which modulestore is servicing the given 
+        course_id. The return can be either "xml" (for XML based courses) or "mongo" for MongoDB backed courses
+        """
         raise NotImplementedError
 
 

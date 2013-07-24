@@ -118,3 +118,10 @@ class MixedModuleStore(ModuleStoreBase):
         """
         for store in self.modulestores.values():
             store.set_modulestore_configuration(config_dict)
+
+    def get_modulestore_type(self, course_id):
+        """
+        Returns a type which identifies which modulestore is servicing the given 
+        course_id. The return can be either "xml" (for XML based courses) or "mongo" for MongoDB backed courses
+        """
+        return self._get_modulestore_for_courseid(course_id).get_modulestore_type(course_id)
