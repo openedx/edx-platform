@@ -60,12 +60,10 @@ $(document).ready(function() {
         $('.nav-dd .nav-item .title').removeClass('is-selected');
     });
 
-    $('.nav-dd .nav-item .title').click(function(e) {
+    $('.nav-dd .nav-item').click(function(e) {
 
-        $subnav = $(this).parent().find('.wrapper-nav-sub');
-        $title = $(this).parent().find('.title');
-        e.preventDefault();
-        e.stopPropagation();
+        $subnav = $(this).find('.wrapper-nav-sub');
+        $title = $(this).find('.title');
 
         if ($subnav.hasClass('is-shown')) {
             $subnav.removeClass('is-shown');
@@ -75,6 +73,9 @@ $(document).ready(function() {
             $('.nav-dd .nav-item .wrapper-nav-sub').removeClass('is-shown');
             $title.addClass('is-selected');
             $subnav.addClass('is-shown');
+            // if propogation is not stopped, the event will bubble up to the
+            // body element, which will close the dropdown.
+            e.stopPropagation();
         }
     });
 
