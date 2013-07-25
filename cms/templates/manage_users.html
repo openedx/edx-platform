@@ -98,7 +98,7 @@
             <h3 class="user-name">
               <span class="user-username">${user.username}</span>
               <span class="user-email">
-                <a class="action action-email" href="mailto:${user.email}" title="send an email message to ${user.email}">${user.email}</a>
+                <a class="action action-email" href="mailto:${user.email}" title="${_("send an email message to {email}").format(email=user.email)}">${user.email}</a>
               </span>
             </h3>
           </div>
@@ -114,7 +114,7 @@
             </li>
             % if request.user.id != user.id: ## can't remove yourself
             <li class="action action-delete">
-                <a href="#" class="delete remove-user action-icon" data-id="${user.email}"><i class="icon-trash"></i><span class="sr">${_("Delete the user,")} ${user.username}</span></a>
+                <a href="#" class="delete remove-user action-icon" data-id="${user.email}"><i class="icon-trash"></i><span class="sr">${_("Delete the user, {username}").format(username=user.username)}</span></a>
             </li>
             % endif
           </ul>
