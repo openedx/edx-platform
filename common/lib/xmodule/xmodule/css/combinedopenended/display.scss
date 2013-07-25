@@ -16,6 +16,21 @@ h2 {
   }
 }
 
+div.name{
+    padding-bottom: 15px;
+    h2{
+        display: inline;
+    }
+
+    .progress-container
+        {
+            display: inline;
+            float: right;
+            padding-top: 3px;
+        }
+
+}
+
 .inline-error {
   color: darken($error-red, 10%);
 }
@@ -24,6 +39,13 @@ section.combined-open-ended {
   @include clearfix;
   .status-bar
   {
+    float: right;
+    display: inline-block;
+
+    .problemtype{
+        display: inline;
+        margin-right: 140px;
+    }
 
     .status-container
     {
@@ -31,15 +53,11 @@ section.combined-open-ended {
       display: inline-block;
       padding-right: 20px
     }
-    .progress-container
-    {
-        padding-bottom: 5px;
-        display: inline-block;
-    }
   }
   .item-container
   {
       padding-bottom: 10px;
+      display: inline-block;
   }
 
   .result-container
@@ -76,7 +94,6 @@ section.combined-open-ended-status {
       padding: 10px;
       display: inline;
       width: 20%;
-      margin-right: 20px;
       .show-results {
           margin-top: .3em;
           text-align:right;
