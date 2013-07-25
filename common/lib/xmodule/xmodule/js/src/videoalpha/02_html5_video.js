@@ -14,7 +14,7 @@
 (function (requirejs, require, define) {
 
 define(
-'videoalpha/03_html5_video.js',
+'videoalpha/02_html5_video.js',
 [],
 function () {
     var HTML5Video = {};
@@ -128,7 +128,7 @@ function () {
          *     }
          */
         function Player(el, config) {
-            var sourceStr, _this;
+            var sourceStr, _this, errorMessage;
 
             // Initially we assume that el is a DOM element. If jQuery selector fails to select something, we
             // assume that el is an ID of a DOM element. We try to select by ID. If jQuery fails this time,
@@ -139,6 +139,12 @@ function () {
                 this.el = $('#' + el);
 
                 if (this.el.length === 0) {
+                    errorMessage = 'VideoPlayer: Element corresponding to the given selector does not found.';
+                    if (window.console && console.log) {
+                        console.log(errorMessage);
+                    } else {
+                        throw new Error(errorMessage);
+                    }
                     return;
                 }
             }

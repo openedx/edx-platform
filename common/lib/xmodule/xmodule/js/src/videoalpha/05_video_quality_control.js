@@ -2,7 +2,7 @@
 
 // VideoQualityControl module.
 define(
-'videoalpha/06_video_quality_control.js',
+'videoalpha/05_video_quality_control.js',
 [],
 function () {
 
@@ -29,8 +29,8 @@ function () {
     //     Functions which will be accessible via 'state' object. When called, these functions will
     //     get the 'state' object as a context.
     function makeFunctionsPublic(state) {
-        state.videoQualityControl.onQualityChange = onQualityChange.bind(state);
-        state.videoQualityControl.toggleQuality   = toggleQuality.bind(state);
+        state.videoQualityControl.onQualityChange = _.bind(onQualityChange, state);
+        state.videoQualityControl.toggleQuality   = _.bind(toggleQuality, state);
     }
 
     // function renderElements(state)
@@ -65,7 +65,7 @@ function () {
     function onQualityChange(value) {
         this.videoQualityControl.quality = value;
 
-        if (this.config.availableQualities.indexOf(value) !== -1) {
+        if (_.indexOf(this.config.availableQualities, value) !== -1) {
             this.videoQualityControl.el.addClass('active');
         } else {
             this.videoQualityControl.el.removeClass('active');
@@ -84,7 +84,7 @@ function () {
 
         event.preventDefault();
 
-        if (this.config.availableQualities.indexOf(value) !== -1) {
+        if (_.indexOf(this.config.availableQualities, value) !== -1) {
             newQuality = 'large';
         } else {
             newQuality = 'hd720';

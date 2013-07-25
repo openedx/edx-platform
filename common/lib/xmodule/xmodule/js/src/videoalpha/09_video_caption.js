@@ -2,7 +2,7 @@
 
 // VideoCaption module.
 define(
-'videoalpha/10_video_caption.js',
+'videoalpha/09_video_caption.js',
 [],
 function () {
 
@@ -24,30 +24,30 @@ function () {
     //     Functions which will be accessible via 'state' object. When called, these functions will
     //     get the 'state' object as a context.
     function makeFunctionsPublic(state) {
-        state.videoCaption.autoShowCaptions    = autoShowCaptions.bind(state);
-        state.videoCaption.autoHideCaptions    = autoHideCaptions.bind(state);
-        state.videoCaption.resize              = resize.bind(state);
-        state.videoCaption.toggle              = toggle.bind(state);
-        state.videoCaption.onMouseEnter        = onMouseEnter.bind(state);
-        state.videoCaption.onMouseLeave        = onMouseLeave.bind(state);
-        state.videoCaption.onMovement          = onMovement.bind(state);
-        state.videoCaption.renderCaption       = renderCaption.bind(state);
-        state.videoCaption.captionHeight       = captionHeight.bind(state);
-        state.videoCaption.topSpacingHeight    = topSpacingHeight.bind(state);
-        state.videoCaption.bottomSpacingHeight = bottomSpacingHeight.bind(state);
-        state.videoCaption.scrollCaption       = scrollCaption.bind(state);
-        state.videoCaption.search              = search.bind(state);
-        state.videoCaption.play                = play.bind(state);
-        state.videoCaption.pause               = pause.bind(state);
-        state.videoCaption.seekPlayer          = seekPlayer.bind(state);
-        state.videoCaption.hideCaptions        = hideCaptions.bind(state);
-        state.videoCaption.calculateOffset     = calculateOffset.bind(state);
-        state.videoCaption.updatePlayTime      = updatePlayTime.bind(state);
+        state.videoCaption.autoShowCaptions    = _.bind(autoShowCaptions, state);
+        state.videoCaption.autoHideCaptions    = _.bind(autoHideCaptions, state);
+        state.videoCaption.resize              = _.bind(resize, state);
+        state.videoCaption.toggle              = _.bind(toggle, state);
+        state.videoCaption.onMouseEnter        = _.bind(onMouseEnter, state);
+        state.videoCaption.onMouseLeave        = _.bind(onMouseLeave, state);
+        state.videoCaption.onMovement          = _.bind(onMovement, state);
+        state.videoCaption.renderCaption       = _.bind(renderCaption, state);
+        state.videoCaption.captionHeight       = _.bind(captionHeight, state);
+        state.videoCaption.topSpacingHeight    = _.bind(topSpacingHeight, state);
+        state.videoCaption.bottomSpacingHeight = _.bind(bottomSpacingHeight, state);
+        state.videoCaption.scrollCaption       = _.bind(scrollCaption, state);
+        state.videoCaption.search              = _.bind(search, state);
+        state.videoCaption.play                = _.bind(play, state);
+        state.videoCaption.pause               = _.bind(pause, state);
+        state.videoCaption.seekPlayer          = _.bind(seekPlayer, state);
+        state.videoCaption.hideCaptions        = _.bind(hideCaptions, state);
+        state.videoCaption.calculateOffset     = _.bind(calculateOffset, state);
+        state.videoCaption.updatePlayTime      = _.bind(updatePlayTime, state);
 
-        state.videoCaption.renderElements      = renderElements.bind(state);
-        state.videoCaption.bindHandlers        = bindHandlers.bind(state);
-        state.videoCaption.fetchCaption        = fetchCaption.bind(state);
-        state.videoCaption.captionURL          = captionURL.bind(state);
+        state.videoCaption.renderElements      = _.bind(renderElements, state);
+        state.videoCaption.bindHandlers        = _.bind(bindHandlers, state);
+        state.videoCaption.fetchCaption        = _.bind(fetchCaption, state);
+        state.videoCaption.captionURL          = _.bind(captionURL, state);
     }
 
     // function renderElements()
@@ -109,27 +109,27 @@ function () {
     }
 
     function fetchCaption() {
-        var _this = this, jQueryObject;
+        var _this = this;
 
         this.videoCaption.hideCaptions(this.hide_captions);
 
-        jQueryObject = $.getWithPrefix(this.videoCaption.captionURL(), function(captions) {
-            _this.videoCaption.captions = captions.text;
-            _this.videoCaption.start = captions.start;
-            _this.videoCaption.loaded = true;
+        $.ajaxWithPrefix({
+            url: _this.videoCaption.captionURL(),
+            notifyOnError: false,
+            success: function(captions) {
+                _this.videoCaption.captions = captions.text;
+                _this.videoCaption.start = captions.start;
+                _this.videoCaption.loaded = true;
 
-            if (onTouchBasedDevice()) {
-                _this.videoCaption.subtitlesEl.find('li').html(
-                    'Caption will be displayed when you start playing the video.'
-                );
-            } else {
-                _this.videoCaption.renderCaption();
+                if (onTouchBasedDevice()) {
+                    _this.videoCaption.subtitlesEl.find('li').html(
+                        'Caption will be displayed when you start playing the video.'
+                    );
+                } else {
+                    _this.videoCaption.renderCaption();
+                }
             }
         });
-
-        if (typeof jQueryObject === 'undefined') {
-            console.error('Subtitles not found. Upload subtitles to server!');
-        }
     }
 
     function captionURL() {

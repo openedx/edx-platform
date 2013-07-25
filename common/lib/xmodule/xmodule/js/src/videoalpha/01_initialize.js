@@ -12,8 +12,8 @@
 (function (requirejs, require, define) {
 
 define(
-'videoalpha/02_initialize.js',
-['videoalpha/04_video_player.js'],
+'videoalpha/01_initialize.js',
+['videoalpha/03_video_player.js'],
 function (VideoPlayer) {
 
     /**
@@ -25,70 +25,66 @@ function (VideoPlayer) {
      * @param {DOM element} element Container of the entire Video Alpha DOM element.
      */
     return function (state, element) {
-        makeFunctionsPublic(state);
-        state.renderElements(element);
+        _makeFunctionsPublic(state);
+        _initialize(state, element);
+        _renderElements(state);
     };
 
     // ***************************************************************
-    // Private functions start here.
+    // Private functions start here. Private functions start with underscore.
     // ***************************************************************
 
     /**
-     * @function makeFunctionsPublic
+     * @function _makeFunctionsPublic
      *
      * Functions which will be accessible via 'state' object. When called, these functions will get the 'state'
      * object as a context.
      *
      * @param {Object} state A place for all properties, and methods of Video Alpha.
      */
-    function makeFunctionsPublic(state) {
-        state.setSpeed    = setSpeed.bind(state);
-        state.youtubeId   = youtubeId.bind(state);
-        state.getDuration = getDuration.bind(state);
-        state.trigger     = trigger.bind(state);
+    function _makeFunctionsPublic(state) {
+        state.setSpeed    = _.bind(setSpeed, state);
+        state.youtubeId   = _.bind(youtubeId, state);
+        state.getDuration = _.bind(getDuration, state);
+        state.trigger     = _.bind(trigger, state);
 
         // Old private functions. Now also public so that can be
         // tested by Jasmine.
-        state.renderElements = renderElements.bind(state);
-        state.parseSpeed = parseSpeed.bind(state);
-        state.fetchMetadata = fetchMetadata.bind(state);
-        state.parseYoutubeStreams = parseYoutubeStreams.bind(state);
-        state.parseVideoSources = parseVideoSources.bind(state);
+
+        state.parseSpeed = _.bind(parseSpeed, state);
+        state.fetchMetadata = _.bind(fetchMetadata, state);
+        state.parseYoutubeStreams = _.bind(parseYoutubeStreams, state);
+        state.parseVideoSources = _.bind(parseVideoSources, state);
     }
 
-    // function renderElements(state)
-    //
-    //     Create any necessary DOM elements, attach them, and set their initial configuration. Also
-    //     make the created DOM elements available via the 'state' object. Much easier to work this
-    //     way - you don't have to do repeated jQuery element selects.
-    function renderElements(element) {
-        var onPlayerReadyFunc,
-            _this = this;
+    // function _initialize(element)
+    // The function set initial configuration and preparation.
 
+    function _initialize(state, element) {
         // This is used in places where we instead would have to check if an element has a CSS class 'fullscreen'.
-        this.isFullScreen = false;
+        state.isFullScreen = false;
 
         // The parent element of the video, and the ID.
-        this.el = $(element).find('.videoalpha');
-        this.id = this.el.attr('id').replace(/video_/, '');
+        state.el = $(element).find('.videoalpha');
+        state.id = state.el.attr('id').replace(/video_/, '');
 
         // We store all settings passed to us by the server in one place. These are "read only", so don't
         // modify them. All variable content lives in 'state' object.
-        this.config = {
+        state.config = {
             element: element,
 
-            start:              this.el.data('start'),
-            end:                this.el.data('end'),
+            start:              state.el.data('start'),
+            end:                state.el.data('end'),
 
-            caption_data_dir:   this.el.data('caption-data-dir'),
-            caption_asset_path: this.el.data('caption-asset-path'),
-            show_captions:      (this.el.data('show-captions').toString().toLowerCase() === 'true'),
-            youtubeStreams:     this.el.data('streams'),
+            caption_data_dir:   state.el.data('caption-data-dir'),
+            caption_asset_path: state.el.data('caption-asset-path'),
+            show_captions:      (state.el.data('show-captions').toString().toLowerCase() === 'true'),
+            youtubeStreams:     state.el.data('streams'),
 
-            sub:                this.el.data('sub'),
-            mp4Source:          this.el.data('mp4-source'),
-            webmSource:         this.el.data('webm-source'),
-            oggSource:          this.el.data('ogg-source'),
+            sub:                state.el.data('sub'),
+            mp4Source:          state.el.data('mp4-source'),
+            webmSource:         state.el.data('webm-source'),
+            oggSource:          state.el.data('ogg-source'),
 
             fadeOutTimeout:     1400,
 
@@ -101,110 +97,146 @@ function (VideoPlayer) {
                 }
             },
 
-            inCms:              this.el.data('in-studio')
+            inCms:              state.el.data('in-studio')
         };
 
-        // Try to parse YouTube stream ID's. If
-        if (this.parseYoutubeStreams(this.config.youtubeStreams)) {
-            this.videoType = 'youtube';
-
-            this.fetchMetadata();
-            this.parseSpeed();
+        if (!(_parseYouTubeIDs(state))) {
+            // If we do not have YouTube ID's, try parsing HTML5 video sources.
+            _prepareHTML5Video(state);
         }
 
-        // If we do not have YouTube ID's, try parsing HTML5 video sources.
-        else {
-            this.videoType = 'html5';
-
-            this.parseVideoSources(
-                {
-                    mp4: this.config.mp4Source,
-                    webm: this.config.webmSource,
-                    ogg: this.config.oggSource
-                }
-            );
-
-            if (!this.config.sub || !this.config.sub.length) {
-                this.config.sub = '';
-                this.config.show_captions = false;
-            }
-
-            this.speeds = ['0.75', '1.0', '1.25', '1.50'];
-            this.videos = {
-                '0.75': this.config.sub,
-                '1.0':  this.config.sub,
-                '1.25': this.config.sub,
-                '1.5':  this.config.sub
-            };
-
-            this.setSpeed($.cookie('video_speed'));
-        }
-
-        // Configure displaying of captions.
-        //
-        // Option
-        //
-        //     this.config.show_captions = true | false
-        //
-        // defines whether to turn off/on the captions altogether. User will not have the ability to turn them on/off.
-        //
-        // Option
-        //
-        //     this.hide_captions = true | false
-        //
-        // represents the user's choice of having the subtitles shown or hidden. This choice is stored in cookies.
-        if (this.config.show_captions) {
-            this.hide_captions = ($.cookie('hide_captions') === 'true');
-        } else {
-            this.hide_captions = true;
-
-            $.cookie('hide_captions', this.hide_captions, {
-                expires: 3650,
-                path: '/'
-            });
-
-            this.el.addClass('closed');
-        }
-
-        // By default we will be forcing HTML5 player mode. Only in the case when, after initializtion, we will
-        // get one available playback rate, we will change to Flash player mode. There is a need to store this
-        // setting in cookies because otherwise we will have to change from HTML5 to Flash on every page load
-        // in a browser that doesn't fully support HTML5. When we have this setting in cookies, we can select
-        // the proper mode from the start (not having to change mode later on).
-        (function (currentPlayerMode) {
-            if ((currentPlayerMode === 'html5') || (currentPlayerMode === 'flash')) {
-                _this.currentPlayerMode = currentPlayerMode;
-            } else {
-                $.cookie('current_player_mode', 'html5', {
-                    expires: 3650,
-                    path: '/'
-                });
-                _this.currentPlayerMode = 'html5';
-            }
-        }($.cookie('current_player_mode')));
+        _configureCaptions(state);
+        _setPlayerMode(state);
 
         // Possible value are: 'visible', 'hiding', and 'invisible'.
-        this.controlState = 'visible';
-        this.controlHideTimeout = null;
-        this.captionState = 'visible';
-        this.captionHideTimeout = null;
+        state.controlState = 'visible';
+        state.controlHideTimeout = null;
+        state.captionState = 'visible';
+        state.captionHideTimeout = null;
+    }
 
+    // function _renderElements(state)
+    //
+    //     Create any necessary DOM elements, attach them, and set their initial configuration. Also
+    //     make the created DOM elements available via the 'state' object. Much easier to work this
+    //     way - you don't have to do repeated jQuery element selects.
+    function _renderElements(state) {
         // Launch embedding of actual video content, or set it up so that it will be done as soon as the
         // appropriate video player (YouTube or stand alone HTML5) is loaded, and can handle embedding.
         //
         // Note that the loading of stand alone HTML5 player API is handled by Require JS. At the time
         // when we reach this code, the stand alone HTML5 player is already loaded, so no further testing
         // in that case is required.
+        var onPlayerReadyFunc;
         if (
-            ((this.videoType === 'youtube') && (window.YT) && (window.YT.Player)) ||
-            (this.videoType === 'html5')
+            ((state.videoType === 'youtube') && (window.YT) && (window.YT.Player)) ||
+            (state.videoType === 'html5')
         ) {
-            VideoPlayer(this);
+            VideoPlayer(state);
         } else {
             onPlayerReadyFunc = (this.videoType === 'youtube') ? 'onYouTubePlayerAPIReady' : 'onHTML5PlayerAPIReady';
-            window[onPlayerReadyFunc] = VideoPlayer.bind(window, this);
+            window[onPlayerReadyFunc] = _.bind(window.VideoPlayer, state);
         }
     }
+
+    // function _configureCaptions(state)
+    //     Configure displaying of captions.
+    //
+    //     Option
+    //         this.config.show_captions = true | false
+    //
+    //     defines whether to turn off/on the captions altogether. User will not have the ability to turn them on/off.
+    //
+    //     Option
+    //          this.hide_captions = true | false
+    //
+    //     represents the user's choice of having the subtitles shown or hidden. This choice is stored in cookies.
+    function _configureCaptions(state) {
+        if (state.config.show_captions) {
+            state.hide_captions = ($.cookie('hide_captions') === 'true');
+        } else {
+            state.hide_captions = true;
+
+            $.cookie('hide_captions', state.hide_captions, {
+                expires: 3650,
+                path: '/'
+            });
+
+            state.el.addClass('closed');
+        }
+    }
+
+    // function _setPlayerMode(state)
+    //     By default we will be forcing HTML5 player mode. Only in the case when, after initializtion, we will
+    //     get one available playback rate, we will change to Flash player mode. There is a need to store this
+    //     setting in cookies because otherwise we will have to change from HTML5 to Flash on every page load
+    //     in a browser that doesn't fully support HTML5. When we have this setting in cookies, we can select
+    //     the proper mode from the start (not having to change mode later on).
+    function _setPlayerMode(state) {
+        (function (currentPlayerMode) {
+            if ((currentPlayerMode === 'html5') || (currentPlayerMode === 'flash')) {
+                state.currentPlayerMode = currentPlayerMode;
+            } else {
+                $.cookie('current_player_mode', 'html5', {
+                    expires: 3650,
+                    path: '/'
+                });
+                state.currentPlayerMode = 'html5';
+            }
+        }($.cookie('current_player_mode')));
+    }
+
+    // function _parseYouTubeIDs(state)
+    //     The function parse YouTube stream ID's.
+    //     @return
+    //         false: We don't have YouTube video IDs to work with; most likely we have HTML5 video sources.
+    //         true: Parsing of YouTube video IDs went OK, and we can proceed onwards to play YouTube videos.
+    function _parseYouTubeIDs(state) {
+        if (state.parseYoutubeStreams(state.config.youtubeStreams)) {
+            state.videoType = 'youtube';
+
+            state.fetchMetadata();
+            state.parseSpeed();
+            return true;
+        }
+        return false;
+    }
+
+    // function _prepareHTML5Video(state)
+    // The function prepare HTML5 video, parse HTML5
+    // video sources etc.
+    function _prepareHTML5Video(state) {
+        state.videoType = 'html5';
+
+        state.parseVideoSources(
+            {
+                mp4: state.config.mp4Source,
+                webm: state.config.webmSource,
+                ogg: state.config.oggSource
+            }
+        );
+
+        if (!state.config.sub || !state.config.sub.length) {
+            state.config.sub = '';
+            state.config.show_captions = false;
+        }
+
+        state.speeds = ['0.75', '1.0', '1.25', '1.50'];
+        state.videos = {
+            '0.75': state.config.sub,
+            '1.0':  state.config.sub,
+            '1.25': state.config.sub,
+            '1.5':  state.config.sub
+        };
+
+        state.setSpeed($.cookie('video_speed'));
+    }
+
+    // ***************************************************************
+    // Public functions start here.
+    // These are available via the 'state' object. Their context ('this' keyword) is the 'state' object.
+    // The magic private function that makes them available and sets up their context is makeFunctionsPublic().
+    // ***************************************************************
 
     // function parseYoutubeStreams(state, youtubeStreams)
     //
@@ -286,14 +318,8 @@ function (VideoPlayer) {
         this.setSpeed($.cookie('video_speed'));
     }
 
-    // ***************************************************************
-    // Public functions start here.
-    // These are available via the 'state' object. Their context ('this' keyword) is the 'state' object.
-    // The magic private function that makes them available and sets up their context is makeFunctionsPublic().
-    // ***************************************************************
-
     function setSpeed(newSpeed, updateCookie) {
-        if (this.speeds.indexOf(newSpeed) !== -1) {
+        if (_.indexOf(this.speeds, newSpeed) !== -1) {
             this.speed = newSpeed;
         } else {
             this.speed = '1.0';
@@ -315,7 +341,7 @@ function (VideoPlayer) {
         return this.metadata[this.youtubeId()].duration;
     }
 
-    /* he function .trigger() expects the parameter @callType one of
+    /* The function .trigger() expects the parameter @callType one of
      *
      *     'event'
      *     'method'

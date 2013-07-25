@@ -9,7 +9,7 @@ mind, or whether to act, and in acting, to live."
 
 // VideoProgressSlider module.
 define(
-'videoalpha/07_video_progress_slider.js',
+'videoalpha/06_video_progress_slider.js',
 [],
 function () {
 
@@ -31,13 +31,13 @@ function () {
     //     Functions which will be accessible via 'state' object. When called, these functions will
     //     get the 'state' object as a context.
     function makeFunctionsPublic(state) {
-        state.videoProgressSlider.onSlide        = onSlide.bind(state);
-        state.videoProgressSlider.onChange       = onChange.bind(state);
-        state.videoProgressSlider.onStop         = onStop.bind(state);
-        state.videoProgressSlider.updateTooltip  = updateTooltip.bind(state);
-        state.videoProgressSlider.updatePlayTime = updatePlayTime.bind(state);
+        state.videoProgressSlider.onSlide        = _.bind(onSlide, state);
+        state.videoProgressSlider.onChange       = _.bind(onChange, state);
+        state.videoProgressSlider.onStop         = _.bind(onStop, state);
+        state.videoProgressSlider.updateTooltip  = _.bind(updateTooltip, state);
+        state.videoProgressSlider.updatePlayTime = _.bind(updatePlayTime, state);
         //Added for tests -- JM
-        state.videoProgressSlider.buildSlider = buildSlider.bind(state);
+        state.videoProgressSlider.buildSlider = _.bind(buildSlider, state);
     }
 
     // function renderElements(state)

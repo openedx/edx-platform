@@ -2,8 +2,8 @@
 
 // VideoPlayer module.
 define(
-'videoalpha/04_video_player.js',
-['videoalpha/03_html5_video.js'],
+'videoalpha/03_video_player.js',
+['videoalpha/02_html5_video.js'],
 function (HTML5Video) {
 
     // VideoPlayer() function - what this module "exports".
@@ -12,7 +12,7 @@ function (HTML5Video) {
 
         makeFunctionsPublic(state);
         renderElements(state);
-        bindHandlers();
+        // No callbacks to DOM events (click, mousemove, etc.).
     };
 
     // ***************************************************************
@@ -24,25 +24,25 @@ function (HTML5Video) {
     //     Functions which will be accessible via 'state' object. When called, these functions will
     //     get the 'state' object as a context.
     function makeFunctionsPublic(state) {
-        state.videoPlayer.pause                       = pause.bind(state);
-        state.videoPlayer.play                        = play.bind(state);
-        state.videoPlayer.update                      = update.bind(state);
-        state.videoPlayer.onSpeedChange               = onSpeedChange.bind(state);
-        state.videoPlayer.onCaptionSeek               = onSeek.bind(state);
-        state.videoPlayer.onSlideSeek                 = onSeek.bind(state);
-        state.videoPlayer.onEnded                     = onEnded.bind(state);
-        state.videoPlayer.onPause                     = onPause.bind(state);
-        state.videoPlayer.onPlay                      = onPlay.bind(state);
-        state.videoPlayer.onUnstarted                 = onUnstarted.bind(state);
-        state.videoPlayer.handlePlaybackQualityChange = handlePlaybackQualityChange.bind(state);
-        state.videoPlayer.onPlaybackQualityChange     = onPlaybackQualityChange.bind(state);
-        state.videoPlayer.onStateChange               = onStateChange.bind(state);
-        state.videoPlayer.onReady                     = onReady.bind(state);
-        state.videoPlayer.updatePlayTime              = updatePlayTime.bind(state);
-        state.videoPlayer.isPlaying                   = isPlaying.bind(state);
-        state.videoPlayer.log                         = log.bind(state);
-        state.videoPlayer.duration                    = duration.bind(state);
-        state.videoPlayer.onVolumeChange              = onVolumeChange.bind(state);
+        state.videoPlayer.pause                       = _.bind(pause, state);
+        state.videoPlayer.play                        = _.bind(play, state);
+        state.videoPlayer.update                      = _.bind(update, state);
+        state.videoPlayer.onSpeedChange               = _.bind(onSpeedChange, state);
+        state.videoPlayer.onCaptionSeek               = _.bind(onSeek, state);
+        state.videoPlayer.onSlideSeek                 = _.bind(onSeek, state);
+        state.videoPlayer.onEnded                     = _.bind(onEnded, state);
+        state.videoPlayer.onPause                     = _.bind(onPause, state);
+        state.videoPlayer.onPlay                      = _.bind(onPlay, state);
+        state.videoPlayer.onUnstarted                 = _.bind(onUnstarted, state);
+        state.videoPlayer.handlePlaybackQualityChange = _.bind(handlePlaybackQualityChange, state);
+        state.videoPlayer.onPlaybackQualityChange     = _.bind(onPlaybackQualityChange, state);
+        state.videoPlayer.onStateChange               = _.bind(onStateChange, state);
+        state.videoPlayer.onReady                     = _.bind(onReady, state);
+        state.videoPlayer.updatePlayTime              = _.bind(updatePlayTime, state);
+        state.videoPlayer.isPlaying                   = _.bind(isPlaying, state);
+        state.videoPlayer.log                         = _.bind(log, state);
+        state.videoPlayer.duration                    = _.bind(duration, state);
+        state.videoPlayer.onVolumeChange              = _.bind(onVolumeChange, state);
     }
 
     // function renderElements(state)
@@ -123,19 +123,12 @@ function (HTML5Video) {
         }
     }
 
-    // function bindHandlers(state)
-    //
-    //     Bind any necessary function callbacks to DOM events (click, mousemove, etc.).
-    function bindHandlers() {
-
-    }
-
-    // function reinitAsFlash(state)
+    // function restartUsingFlash(state)
     //
     //     When we are about to play a YouTube video in HTML5 mode and discover that we only
     //     have one available playback rate, we will switch to Flash mode. In Flash speed
-    //     switching is done by reloading videos recorded at differtn frame rates.
-    function reinitAsFlash(state) {
+    //     switching is done by reloading videos recorded at different frame rates.
+    function restartUsingFlash(state) {
         // Remove from the page current iFrame with HTML5 video.
         state.videoPlayer.player.destroy();
 
@@ -149,7 +142,7 @@ function (HTML5Video) {
         // Removed configuration option that requests the HTML5 mode.
         delete state.videoPlayer.playerVars.html5;
 
-        // Reuqest for the creation of a new Flash player
+        // Request for the creation of a new Flash player
         state.videoPlayer.player = new YT.Player(state.id, {
             'playerVars': state.videoPlayer.playerVars,
             'videoId': state.youtubeId(),
@@ -179,6 +172,9 @@ function (HTML5Video) {
         }
     }
 
+    // This function gets the video's current play position in time
+    // (currentTime) and its duration.
+    // It is called at a regular interval when the video is playing (see below).
     function update() {
         this.videoPlayer.currentTime = this.videoPlayer.player.getCurrentTime();
 
@@ -187,11 +183,6 @@ function (HTML5Video) {
         }
     }
 
-    // We request the reloading of the video in the case when YouTube is in
-    // Flash player mode, or when we are in Firefox, and the new speed is 1.0.
-    // The second case is necessary to avoid the bug where in Firefox speed
-    // switching to 1.0 in HTML5 player mode is handled incorrectly by YouTube
-    // API.
     function onSpeedChange(newSpeed, updateCookie) {
         if (this.currentPlayerMode === 'flash') {
             this.videoPlayer.currentTime = Time.convert(
@@ -218,7 +209,12 @@ function (HTML5Video) {
             !(this.browserIsFirefox && newSpeed === '1.0' && this.videoType === 'youtube')
         ) {
             this.videoPlayer.player.setPlaybackRate(newSpeed);
-        } else { // if (this.currentPlayerMode === 'flash') {
+        } else {
+            // We request the reloading of the video in the case when YouTube is in
+            // Flash player mode, or when we are in Firefox, and the new speed is 1.0.
+            // The second case is necessary to avoid the bug where in Firefox speed
+            // switching to 1.0 in HTML5 player mode is handled incorrectly by YouTube
+            // API.
             if (this.videoPlayer.isPlaying()) {
                 this.videoPlayer.player.loadVideoById(this.youtubeId(), this.videoPlayer.currentTime);
             } else {
@@ -229,6 +225,10 @@ function (HTML5Video) {
         }
     }
 
+    // Every 200 ms, if the video is playing, we call the function update, via 
+    // clearInterval. This interval is called updateInterval.
+    // It is created on a onPlay event. Cleared on a onPause event.
+    // Reinitialized on a onSeek event.
     function onSeek(params) {
         this.videoPlayer.log(
             'seek_video',
@@ -318,18 +318,24 @@ function (HTML5Video) {
         availablePlaybackRates = this.videoPlayer.player.getAvailablePlaybackRates();
         if ((this.currentPlayerMode === 'html5') && (this.videoType === 'youtube')) {
             if (availablePlaybackRates.length === 1) {
-                reinitAsFlash(this);
+                restartUsingFlash(this);
 
                 return;
             } else if (availablePlaybackRates.length > 1) {
-                // We need to synchronize available frame rates with the ones that the user specified.
+                // We need to synchronize available frame rates with the ones
+                // that the user specified.
 
                 baseSpeedSubs = this.videos['1.0'];
                 _this = this;
+                // this.videos is a dictionary containing various frame rates 
+                // and their associated subs.
+
+                // First clear the dictionary.
                 $.each(this.videos, function(index, value) {
                     delete _this.videos[index];
                 });
                 this.speeds = [];
+                // Recreate it with the supplied frame rates.
                 $.each(availablePlaybackRates, function(index, value) {
                     _this.videos[value.toFixed(2).replace(/\.00$/, '.0')] = baseSpeedSubs;
 
@@ -411,10 +417,8 @@ function (HTML5Video) {
 
         if (this.videoType === 'youtube') {
             logInfo.code = this.youtubeId();
-        } else {
-            if (this.videoType === 'html5') {
+        } else  if (this.videoType === 'html5') {
                 logInfo.code = 'html5';
-            }
         }
 
         Logger.log(eventName, logInfo);

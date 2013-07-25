@@ -10,7 +10,7 @@ window.YT =
 
 window.STATUS = window.YT.PlayerState
 
-oldGetWithPrefix = window.jQuery.getWithPrefix
+oldAjaxWithPrefix = window.jQuery.ajaxWithPrefix
 
 jasmine.stubbedCaption =
       end: [3120, 6270, 8490, 21620, 24920, 25750, 27900, 34380, 35550, 40250]
@@ -28,8 +28,9 @@ jasmine.stubbedCaption =
         "And some will have quite a bit of energy, just for a moment."
       ]
 
-# For our purposes, we need to make sure that the function $.getWithPrefix doe not fail
-# when during tests a captions file is requested. It is originally defined in
+# For our purposes, we need to make sure that the function $.ajaxWithPrefix
+# does not fail when during tests a captions file is requested.
+# It is originally defined in
 #
 #     common/static/coffee/src/ajax_prefix.js
 #
@@ -37,14 +38,21 @@ jasmine.stubbedCaption =
 #
 #     1.) Return a hard coded captions object if the file name contains 'test_name_of_the_subtitles'.
 #     2.) Behaves the same a as the origianl in all other cases.
-window.jQuery.getWithPrefix = (url, data, callback, type) ->
+
+window.jQuery.ajaxWithPrefix = (url, settings) ->
+  if not settings
+      settings = url
+      url = settings.url
+      success = settings.success
+      data = settings.data
+
   if url.match(/test_name_of_the_subtitles/g) isnt null or url.match(/slowerSpeedYoutubeId/g) isnt null or url.match(/normalSpeedYoutubeId/g) isnt null
-    if window.jQuery.isFunction(callback) is true
-      callback jasmine.stubbedCaption
+    if window.jQuery.isFunction(success) is true
+      success jasmine.stubbedCaption
     else if window.jQuery.isFunction(data) is true
       data jasmine.stubbedCaption
   else
-    oldGetWithPrefix.apply this, arguments
+    oldAjaxWithPrefix.apply @, arguments
 
 # Time waitsFor() should wait for before failing a test.
 window.WAIT_TIMEOUT = 1000

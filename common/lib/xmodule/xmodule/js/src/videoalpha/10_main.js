@@ -3,13 +3,13 @@
 // Main module.
 require(
 [
-    'videoalpha/02_initialize.js',
-    'videoalpha/05_video_control.js',
-    'videoalpha/06_video_quality_control.js',
-    'videoalpha/07_video_progress_slider.js',
-    'videoalpha/08_video_volume_control.js',
-    'videoalpha/09_video_speed_control.js',
-    'videoalpha/10_video_caption.js'
+    'videoalpha/01_initialize.js',
+    'videoalpha/04_video_control.js',
+    'videoalpha/05_video_quality_control.js',
+    'videoalpha/06_video_progress_slider.js',
+    'videoalpha/07_video_volume_control.js',
+    'videoalpha/08_video_speed_control.js',
+    'videoalpha/09_video_caption.js'
 ],
 function (
     Initialize,

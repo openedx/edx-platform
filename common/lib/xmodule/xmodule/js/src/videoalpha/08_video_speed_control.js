@@ -2,7 +2,7 @@
 
 // VideoSpeedControl module.
 define(
-'videoalpha/09_video_speed_control.js',
+'videoalpha/08_video_speed_control.js',
 [],
 function () {
 
@@ -24,9 +24,9 @@ function () {
     //     Functions which will be accessible via 'state' object. When called, these functions will
     //     get the 'state' object as a context.
     function makeFunctionsPublic(state) {
-        state.videoSpeedControl.changeVideoSpeed = changeVideoSpeed.bind(state);
-        state.videoSpeedControl.setSpeed = setSpeed.bind(state);
-        state.videoSpeedControl.reRender = reRender.bind(state);
+        state.videoSpeedControl.changeVideoSpeed = _.bind(changeVideoSpeed, state);
+        state.videoSpeedControl.setSpeed = _.bind(setSpeed, state);
+        state.videoSpeedControl.reRender = _.bind(reRender, state);
     }
 
     // function renderElements(state)

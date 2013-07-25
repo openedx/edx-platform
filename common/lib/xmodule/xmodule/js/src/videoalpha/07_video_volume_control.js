@@ -2,7 +2,7 @@
 
 // VideoVolumeControl module.
 define(
-'videoalpha/08_video_volume_control.js',
+'videoalpha/07_video_volume_control.js',
 [],
 function () {
 
@@ -24,8 +24,8 @@ function () {
     //     Functions which will be accessible via 'state' object. When called, these functions will
     //     get the 'state' object as a context.
     function makeFunctionsPublic(state) {
-        state.videoVolumeControl.onChange = onChange.bind(state);
-        state.videoVolumeControl.toggleMute = toggleMute.bind(state);
+        state.videoVolumeControl.onChange = _.bind(onChange, state);
+        state.videoVolumeControl.toggleMute = _.bind(toggleMute, state);
     }
 
     // function renderElements(state)

@@ -27,7 +27,7 @@
     describe('constructor', function() {
       describe('always', function() {
         beforeEach(function() {
-          spyOn($, 'getWithPrefix').andCallThrough();
+          spyOn($, 'ajaxWithPrefix').andCallThrough();
           initialize();
         });
 
@@ -49,7 +49,11 @@
           }, 'Expect captions to be loaded.', 1000);
 
           runs(function () {
-              expect($.getWithPrefix).toHaveBeenCalledWith(videoCaption.captionURL(), jasmine.any(Function));
+              expect($.ajaxWithPrefix).toHaveBeenCalledWith({
+                url: videoCaption.captionURL(),
+                notifyOnError: false,
+                success: jasmine.any(Function)
+              });
           });
         });
 

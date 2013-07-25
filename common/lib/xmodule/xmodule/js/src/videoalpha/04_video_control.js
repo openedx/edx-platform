@@ -2,7 +2,7 @@
 
 // VideoControl module.
 define(
-'videoalpha/05_video_control.js',
+'videoalpha/04_video_control.js',
 [],
 function () {
 
@@ -24,14 +24,14 @@ function () {
     //     Functions which will be accessible via 'state' object. When called, these functions will
     //     get the 'state' object as a context.
     function makeFunctionsPublic(state) {
-        state.videoControl.showControls     = showControls.bind(state);
-        state.videoControl.hideControls     = hideControls.bind(state);
-        state.videoControl.play             = play.bind(state);
-        state.videoControl.pause            = pause.bind(state);
-        state.videoControl.togglePlayback   = togglePlayback.bind(state);
-        state.videoControl.toggleFullScreen = toggleFullScreen.bind(state);
-        state.videoControl.exitFullScreen   = exitFullScreen.bind(state);
-        state.videoControl.updateVcrVidTime = updateVcrVidTime.bind(state);
+        state.videoControl.showControls     = _.bind(showControls,state);
+        state.videoControl.hideControls     = _.bind(hideControls,state);
+        state.videoControl.play             = _.bind(play,state);
+        state.videoControl.pause            = _.bind(pause,state);
+        state.videoControl.togglePlayback   = _.bind(togglePlayback,state);
+        state.videoControl.toggleFullScreen = _.bind(toggleFullScreen,state);
+        state.videoControl.exitFullScreen   = _.bind(exitFullScreen,state);
+        state.videoControl.updateVcrVidTime = _.bind(updateVcrVidTime,state);
     }
 
     // function renderElements(state)
