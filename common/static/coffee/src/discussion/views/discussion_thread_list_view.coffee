@@ -197,6 +197,7 @@ if Backbone?
       @template = _.template($("#discussion-home").html())
       $(".discussion-column").html(@template)
       $(".post-list a").removeClass("active")
+      @retrieveUserStats()
       thread_id = null
 
     toggleTopicDrop: (event) =>
@@ -319,6 +320,16 @@ if Backbone?
           @displayedCollection.reset(@collection.models)# Don't think this is necessary because it's called on collection.reset
           if callback?
             callback()
+
+    retrieveUserStats: () ->
+      url = DiscussionUtil.urlFor("user_stats")
+      DiscussionUtil.safeAjax
+        url: url
+        type: "GET"
+        success: (response, textStatus) =>
+          alert('success')
+        error: (response) =>
+          alert('error')
 
     retrieveDiscussions: (discussion_ids) ->
       @discussionIds = discussion_ids.join(',')

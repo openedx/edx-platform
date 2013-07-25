@@ -75,6 +75,15 @@ class User(models.Model):
         response = perform_request('get', url, params)
         return response.get('collection', []), response.get('page', 1), response.get('num_pages', 1)
 
+    def stats(self, query_params={}):
+        if not self.course_id:
+            raise CommentClientError("Must provide course_id when retrieving stats for the user")
+        url = _url_for_user_stats(self.id,self.course_id)
+        params = {'course_id': self.course_id}
+        params = merge_dict(params, query_params)
+        response = perform_request('get', url, params)
+        return response.get('collection', []), response.get('page', 1), response.get('num_pages', 1)
+
     def _retrieve(self, *args, **kwargs):
         url = self.url(action='get', params=self.attributes)
         retrieve_params = self.default_retrieve_params
@@ -97,8 +106,15 @@ def _url_for_subscription(user_id):
 
 
 def _url_for_user_active_threads(user_id):
+    print("\n\n\n*********** ACTIVE THREADS **********\n\n\n")
     return "{prefix}/users/{user_id}/active_threads".format(prefix=settings.PREFIX, user_id=user_id)
 
 
 def _url_for_user_subscribed_threads(user_id):
     return "{prefix}/users/{user_id}/subscribed_threads".format(prefix=settings.PREFIX, user_id=user_id)
+
+def _url_for_user_stats(user_id,course_id):
+    print("\n\n\n*********** USER STATS **********\n\n\n")
+    return "{prefix}/users/{user_id}/stats?course_id={course_id}".format(prefix=settings.PREFIX, user_id=user_id,course_id=course_id)
+
+

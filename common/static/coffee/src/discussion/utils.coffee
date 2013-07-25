@@ -80,6 +80,9 @@ class @DiscussionUtil
       permanent_link_thread   : "/courses/#{$$course_id}/discussion/forum/#{param}/threads/#{param1}"
       permanent_link_comment  : "/courses/#{$$course_id}/discussion/forum/#{param}/threads/#{param1}##{param2}"
       user_profile            : "/courses/#{$$course_id}/discussion/forum/users/#{param}"
+
+      user_stats              : "/courses/#{$$course_id}/discussion/panel/stats"
+
       followed_threads        : "/courses/#{$$course_id}/discussion/forum/users/#{param}/followed"
       threads                 : "/courses/#{$$course_id}/discussion/forum"
     }[name]
