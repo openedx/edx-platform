@@ -2,7 +2,7 @@
 #pylint: disable=W0621
 
 from lettuce import world, step
-from nose.tools import assert_false, assert_equal, assert_regexp_matches, assert_true
+from nose.tools import assert_false, assert_equal, assert_regexp_matches
 from common import type_in_codemirror, press_the_notification_button
 
 KEY_CSS = '.key input.policy-key'
@@ -90,18 +90,18 @@ def the_policy_key_value_is_changed(step):
 
 ############# HELPERS ###############
 def assert_policy_entries(expected_keys, expected_values):
-    for counter in range(len(expected_keys)):
-        index = get_index_of(expected_keys[counter])
-        assert_false(index == -1, "Could not find key: " + expected_keys[counter])
-        assert_equal(expected_values[counter], world.css_find(VALUE_CSS)[index].value, "value is incorrect")
+    for key, value in zip(expected_keys, expected_values):
+        index = get_index_of(key)
+        assert_false(index == -1, "Could not find key: {key}".format(key=key))
+        assert_equal(value, world.css_find(VALUE_CSS)[index].value, "value is incorrect")
 
 
 def get_index_of(expected_key):
-    for counter in range(len(world.css_find(KEY_CSS))):
-        #   Sometimes get stale reference if I hold on to the array of elements
-        key = world.css_value(KEY_CSS, index=counter)
+    for i, element in enumerate(world.css_find(KEY_CSS)):
+        # Sometimes get stale reference if I hold on to the array of elements
+        key = world.css_value(KEY_CSS, index=i)
         if key == expected_key:
-            return counter
+            return i
 
     return -1
 
