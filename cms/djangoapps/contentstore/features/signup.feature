@@ -9,4 +9,4 @@ Feature: Sign in
     And I fill in the registration form
     And I press the Create My Account button on the registration form
     Then I should see be on the studio home page
-    And I should see the message "please click on the activation link in your email."
+    And I should see the message "complete your sign up we need you to verify your email address"

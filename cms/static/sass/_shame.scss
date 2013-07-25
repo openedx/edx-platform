@@ -2,10 +2,32 @@
 // // shame file - used for any bad-form/orphaned scss that knowingly violate edX FED architecture/standards (see - http://csswizardry.com/2013/04/shame-css/)
 // ====================
 
+// view - dashboard
+body.dashboard {
 
-// known things to do (paint the fence, sand the floor, wax on/off)
+  // elements - authorship controls
+  .wrapper-authorshiprights {
+
+    .ui-toggle-control {
+      // needed to override general a element transition properties - need to fix.
+      transition-duration: 0.25s;
+      transition-timing-function: ease-in-out;
+    }
+
+    .icon-remove-sign {
+      // needed to override general a element transition properties - need to fix.
+      transition-duration: 0.25s;
+      transition-timing-function: ease-in-out;
+    }
+  }
+}
+
+
 // ====================
+
+
+// known things to do (paint the fence, sand the floor, wax on/off):
+
 // * centralize and move form styling into forms.scss - cms/static/sass/views/_textbooks.scss and cms/static/sass/views/_settings.scss
 // * move dialogue styles into cms/static/sass/elements/_modal.scss
 // * use the @include placeholder Bourbon mixin (http://bourbon.io/docs/#placeholder) for any placeholder styling
-
