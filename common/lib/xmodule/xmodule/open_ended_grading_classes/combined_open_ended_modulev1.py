@@ -31,10 +31,10 @@ ACCEPT_FILE_UPLOAD = False
 TRUE_DICT = ["True", True, "TRUE", "true"]
 
 HUMAN_TASK_TYPE = {
-    'selfassessment': "Self Assessment",
-    'openended': "edX Assessment",
-    'ml_grading.conf' : "AI Assessment",
-    'peer_grading.conf' : "Peer Assessment",
+    'selfassessment': "Self",
+    'openended': "edX",
+    'ml_grading.conf' : "AI",
+    'peer_grading.conf' : "Peer",
 }
 
 HUMAN_STATES = {

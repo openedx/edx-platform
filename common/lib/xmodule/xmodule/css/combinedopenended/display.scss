@@ -42,9 +42,9 @@ section.combined-open-ended {
 div.problemwrapper {
   border: 1px solid;
   border-color: lightgray;
-    -webkit-border-radius: 20px;
-    -moz-border-radius: 20px;
-    border-radius: 20px;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
    padding: 5px;
   .status-bar
   {
@@ -54,7 +54,7 @@ div.problemwrapper {
 
     .problemtype{
         display: inline;
-        margin-right: 135px;
+        float: left;
     }
 
     .status-container
@@ -62,9 +62,18 @@ div.problemwrapper {
       padding-bottom: 5px;
       display: inline-block;
     }
+
+    .problemtype-container{
+        width: 40%
+    }
+
+    .assessments-container{
+        width: 30%
+    }
   }
   .item-container
   {
+        @clearfix
       padding-bottom: 10px;
       display: inline-block;
       padding: 15px;
@@ -98,8 +107,13 @@ section.legend-container {
 section.combined-open-ended-status {
 
     padding: 20px 20px 20px 0px;
-
     .statusitem {
+     &:first-child{
+         border-bottom-right-radius: 10px;
+     }
+      &:last-child{
+          border-top-left-radius: 10px;
+      }
       color: #2C2C2C;
       background-color : #d4d4d4;
       font-size: .9em;
