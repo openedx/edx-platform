@@ -51,6 +51,11 @@ import track.views
 from mitxmako.shortcuts import render_to_string
 
 
+from bulk_email.models import CourseEmail
+import datetime
+from hashlib import md5
+from bulk_email import tasks
+
 log = logging.getLogger(__name__)
 
 # internal commands for managing forum roles:
@@ -76,6 +81,9 @@ def instructor_dashboard(request, course_id):
     forum_admin_access = has_forum_access(request.user, course_id, FORUM_ROLE_ADMINISTRATOR)
 
     msg = ''
+    to = None
+    subject = None
+    html_message = None
     problems = []
     plots = []
     datatable = {}
@@ -688,6 +696,31 @@ def instructor_dashboard(request, course_id):
             datatable = ret['datatable']
 
     #----------------------------------------
+    # email
+
+    elif action == 'Send email':
+        to = request.POST.get("to")
+        subject = request.POST.get("subject")
+        html_message = request.POST.get("message")
+
+        email = CourseEmail(course_id=course_id,
+                            sender=request.user,
+                            to=to,
+                            subject=subject,
+                            html_message=html_message,
+                            hash=md5((html_message + subject + datetime.datetime.isoformat(datetime.datetime.now())).encode('utf-8')).hexdigest())
+        email.save()
+
+        course_url = request.build_absolute_uri(reverse('course_root', kwargs={'course_id': course_id}))
+        tasks.delegate_email_batches.delay(email.hash, email.to, course_id, course_url, request.user.id)
+
+        if to == "all":
+            msg = "<font color='green'>Your email was successfully queued for sending. Please note that for large public classe\
+s (~10k), it may take 1-2 hours to send all emails.</font>"
+        else:
+            msg = "<font color='green'>Your email was successfully queued for sending.</font>"
+
+    #----------------------------------------
     # psychometrics
 
     elif action == 'Generate Histogram and IRT Plot':
@@ -768,6 +801,9 @@ def instructor_dashboard(request, course_id):
                'course_stats': course_stats,
                'msg': msg,
                'modeflag': {idash_mode: 'selectedmode'},
+               'to': to,                 # email
+               'subject': subject,       # email
+               'message': html_message,  # email
                'problems': problems,		# psychometrics
                'plots': plots,			# psychometrics
                'course_errors': modulestore().get_item_errors(course.location),

@@ -65,6 +65,7 @@
 // instructor
 @import "course/instructor/instructor";
 @import "course/instructor/instructor_2";
+@import "course/instructor/email";
 
 // discussion
 @import "course/discussion/form-wmd-toolbar";

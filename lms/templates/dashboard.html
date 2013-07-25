@@ -16,6 +16,14 @@
   <script type="text/javascript">
   (function() {
 
+    $(".email-settings").click(function(event) {
+      $("#email_settings_course_id").val( $(event.target).data("course-id") );
+      $("#email_settings_course_number").text( $(event.target).data("course-number") );
+      if($(event.target).data("optout") == "False") {
+        $("#receive_emails").prop('checked', true);
+      }
+    });
+
     $(".unenroll").click(function(event) {
       $("#unenroll_course_id").val( $(event.target).data("course-id") );
       $("#unenroll_course_number").text( $(event.target).data("course-number") );
@@ -79,6 +87,24 @@
        return false;
     });
 
+    $("#email_settings_form").submit(function(){
+      $.ajax({
+        type: "POST",
+        url: '${reverse("change_email_settings")}',
+        data: $(this).serializeArray(),
+        success: function(data) {
+          if(data.success) {
+            location.href = "${reverse('dashboard')}";
+          }
+        },
+        error: function(xhr, textStatus, error) {
+          if (xhr.status == 403) {
+            location.href = "${reverse('signin_user')}";          
+          }
+        }
+      });
+      return false;
+    });
   })(this)
   </script>
 </%block>
@@ -280,6 +306,7 @@
               % endif
             % endif
             <a href="#unenroll-modal" class="unenroll" rel="leanModal" data-course-id="${course.id}" data-course-number="${course.number}">${_('Unregister')}</a>
+            <a href="#email-settings-modal" class="email-settings" rel="leanModal" data-course-id="${course.id}" data-course-number="${course.number}" data-optout="${course.id in course_optouts}">Email Settings</a>
           </section>
         </article>
 
@@ -311,6 +338,29 @@
       % endfor
     % endif
   </section>
+</section>
+
+<section id="email-settings-modal" class="modal">
+  <div class="inner-wrapper">
+    <header>
+      <h2>Email Settings for <span id="email_settings_course_number"></span></h2>
+      <hr/>
+    </header>
+
+    <form id="email_settings_form" method="post">
+      <input name="course_id" id="email_settings_course_id" type="hidden" />
+      <label>Receive course emails <input type="checkbox" id="receive_emails" name="receive_emails" /></label>
+      <div class="submit">
+        <input type="submit" id="submit" value="Save Settings" />
+      </div>
+    </form>
+
+    <div class="close-modal">
+      <div class="inner">
+        <p>&#10005;</p>
+      </div>
+    </div>
+  </div>
 </section>
 
 <section id="unenroll-modal" class="modal unenroll-modal">
