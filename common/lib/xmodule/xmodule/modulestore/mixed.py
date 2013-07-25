@@ -3,7 +3,7 @@ MixedModuleStore allows for aggregation between multiple modulestores.
 
 In this way, courses can be served up both - say - XMLModuleStore or MongoModuleStore
 
-IMPORTANT: This modulestore is experimental AND INCOMPLETE. Therefore this should only be used cautiously
+IMPORTANT: This modulestore only supports READONLY applications, e.g. LMS
 """
 
 from . import ModuleStoreBase
