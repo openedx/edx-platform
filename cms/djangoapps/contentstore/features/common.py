@@ -209,7 +209,8 @@ def i_created_a_video_component(step):
     world.create_component_instance(
         step, '.large-video-icon',
         'video',
-        '.xmodule_VideoModule'
+        '.xmodule_VideoModule',
+        has_multiple_templates=False
     )
 
 
@@ -236,6 +237,17 @@ def save_button_disabled(step):
     button_css = '.action-save'
     disabled = 'is-disabled'
     assert world.css_has_class(button_css, disabled)
+
+
+@step('I confirm the prompt')
+def confirm_the_prompt(step):
+    prompt_css = 'a.button.action-primary'
+    world.css_click(prompt_css)
+
+
+@step(u'I am shown a (.*)$')
+def i_am_shown_a_notification(step, notification_type):
+    assert world.is_css_present('.wrapper-%s' % notification_type)
 
 
 def type_in_codemirror(index, text):

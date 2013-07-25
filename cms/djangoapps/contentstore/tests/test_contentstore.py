@@ -312,6 +312,23 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         self.assertGreater(len(course.textbooks), 0)
 
+    def test_default_tabs_on_create_course(self):
+        module_store = modulestore('direct')
+        CourseFactory.create(org='edX', course='999', display_name='Robot Super Course')
+        course_location = Location(['i4x', 'edX', '999', 'course', 'Robot_Super_Course', None])
+
+        course = module_store.get_item(course_location)
+
+        expected_tabs = []
+        expected_tabs.append({u'type': u'courseware'})
+        expected_tabs.append({u'type': u'course_info', u'name': u'Course Info'})
+        expected_tabs.append({u'type': u'textbooks'})
+        expected_tabs.append({u'type': u'discussion', u'name': u'Discussion'})
+        expected_tabs.append({u'type': u'wiki', u'name': u'Wiki'})
+        expected_tabs.append({u'type': u'progress', u'name': u'Progress'})
+
+        self.assertEqual(course.tabs, expected_tabs)
+
     def test_static_tab_reordering(self):
         module_store = modulestore('direct')
         CourseFactory.create(org='edX', course='999', display_name='Robot Super Course')

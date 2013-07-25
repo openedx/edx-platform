@@ -211,6 +211,8 @@ nav.sequence-nav {
           @include transition(all .1s $ease-in-out-quart 0s);
           white-space: pre;
           z-index: 99;
+          visibility: hidden;
+          pointer-events: none;
 
           &:empty {
             background: none;
@@ -238,6 +240,7 @@ nav.sequence-nav {
             display: block;
             margin-top: 4px;
             opacity: 1.0;
+            visibility: visible;
           }
         }
       }

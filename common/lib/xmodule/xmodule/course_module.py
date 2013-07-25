@@ -15,6 +15,7 @@ import json
 
 from xblock.core import Scope, List, String, Dict, Boolean
 from .fields import Date
+from xmodule.modulestore.locator import CourseLocator
 from django.utils.timezone import UTC
 from xmodule.util import date_utils
 
@@ -192,9 +193,8 @@ class CourseFields(object):
             }},
             scope=Scope.content)
     show_calculator = Boolean(help="Whether to show the calculator in this course", default=False, scope=Scope.settings)
-    display_name = String(
-        help="Display name for this module", default="Empty",
-        display_name="Display Name", scope=Scope.settings)
+    display_name = String(help="Display name for this module", default="Empty", display_name="Display Name", scope=Scope.settings)
+    show_chat = Boolean(help="Whether to show the chat widget in this course", default=False, scope=Scope.settings)
     tabs = List(help="List of tabs to enable in this course", scope=Scope.settings)
     end_of_course_survey_url = String(help="Url for the end-of-course survey", scope=Scope.settings)
     discussion_blackouts = List(help="List of pairs of start/end dates for discussion blackouts", scope=Scope.settings)
@@ -373,7 +373,10 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         super(CourseDescriptor, self).__init__(*args, **kwargs)
 
         if self.wiki_slug is None:
-            self.wiki_slug = self.location.course
+            if isinstance(self.location, Location):
+                self.wiki_slug = self.location.course
+            elif isinstance(self.location, CourseLocator):
+                self.wiki_slug = self.location.course_id or self.display_name
 
         msg = None
 
@@ -407,7 +410,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
                     continue
 
         # TODO check that this is still needed here and can't be by defaults.
-        if self.tabs is None:
+        if not self.tabs:
             # When calling the various _tab methods, can omit the 'type':'blah' from the
             # first arg, since that's only used for dispatch
             tabs = []

@@ -48,14 +48,14 @@ Both the LMS and Studio can be started using the following shortcut tasks
     rake lms[cms.dev]  # Start LMS to run alongside Studio
     rake lms[cms.dev_preview]  # Start LMS to run alongside Studio in preview mode
 
-Under the hood, this executes `django-admin.py runserver --pythonpath=$WORKING_DIRECTORY --settings=lms.envs.dev`,
+Under the hood, this executes `./manage.py {lms|cms} --settings $ENV runserver`,
 which starts a local development server.
 
 Both of these commands take arguments to start the servers in different environments
 or with additional options:
 
     # Start the LMS using the test configuration, on port 5000
-    rake lms[test,5000]  # Executes django-admin.py runserver --pythonpath=$WORKING_DIRECTORY --setings=lms.envs.test 5000
+    rake lms[test,5000]  # Executes ./manage.py lms --settings test runserver 5000
 
 *N.B.* You may have to escape the `[` characters, depending on your shell: `rake "lms[test,5000]"`
 

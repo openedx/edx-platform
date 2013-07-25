@@ -118,3 +118,9 @@ def all_sections_are_collapsed(step):
     subsections = world.css_find(subsection_locator)
     for index in range(len(subsections)):
         assert_false(world.css_visible(subsection_locator, index=index))
+
+
+@step(u"I change an assignment's grading status")
+def change_grading_status(step):
+    world.css_find('a.menu-toggle').click()
+    world.css_find('.menu li').first.click()

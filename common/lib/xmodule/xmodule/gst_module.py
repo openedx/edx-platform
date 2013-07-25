@@ -19,10 +19,45 @@ from xblock.core import String, Scope
 
 log = logging.getLogger(__name__)
 
+DEFAULT_RENDER="""
+    <h2>Graphic slider tool: Dynamic range and implicit functions.</h2>
+
+    <p>You can make the range of the x axis (but not ticks of x axis) of
+      functions depend on a parameter value. This can be useful when the
+      function domain needs to be variable.</p>
+    <p>Implicit functions like a circle can be plotted as 2 separate
+        functions of the same color.</p>
+     <div style="height:50px;">
+     <slider var='r' style="width:400px;float:left;"/>
+     <textbox var='r' style="float:left;width:60px;margin-left:15px;"/>
+   </div>
+    <plot style="margin-top:15px;margin-bottom:15px;"/>
+"""
+DEFAULT_CONFIGURATION="""
+    <parameters>
+        <param var="r" min="5" max="25" step="0.5" initial="12.5" />
+    </parameters>
+    <functions>
+      <function color="red">Math.sqrt(r * r - x * x)</function>
+      <function color="red">-Math.sqrt(r * r - x * x)</function>
+    </functions>
+    <plot>
+      <xrange>
+        <!-- dynamic range -->
+          <min>-r</min>
+          <max>r</max>
+      </xrange>
+      <num_points>1000</num_points>
+      <xticks>-30, 6, 30</xticks>
+      <yticks>-30, 6, 30</yticks>
+    </plot>
+"""
+
+
 
 class GraphicalSliderToolFields(object):
-    render = String(scope=Scope.content)
-    configuration = String(scope=Scope.content)
+    render = String(scope=Scope.content, default=DEFAULT_RENDER)
+    configuration = String(scope=Scope.content, default=DEFAULT_CONFIGURATION)
 
 
 class GraphicalSliderToolModule(GraphicalSliderToolFields, XModule):

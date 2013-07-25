@@ -27,11 +27,13 @@ class VideoFields(object):
         scope=Scope.settings,
         # it'd be nice to have a useful default but it screws up other things; so,
         # use display_name_with_default for those
-        default="Video Title"
+        default="Video"
     )
-    data = String(help="XML data for the problem",
+    data = String(
+        help="XML data for the problem",
         default='',
-        scope=Scope.content)
+        scope=Scope.content
+    )
     position = Integer(help="Current position in the video", scope=Scope.user_state, default=0)
     show_captions = Boolean(help="This controls whether or not captions are shown by default.", display_name="Show Captions", scope=Scope.settings, default=True)
     youtube_id_1_0 = String(help="This is the Youtube ID reference for the normal speed video.", display_name="Default Speed", scope=Scope.settings, default="OEoXaMPEzfM")
@@ -125,7 +127,7 @@ class VideoDescriptor(VideoFields,
             url identifiers
         """
         video = super(VideoDescriptor, cls).from_xml(xml_data, system, org, course)
-        _parse_video_xml(video, xml_data)
+        _parse_video_xml(video, video.data)
         return video
 
     def definition_to_xml(self, resource_fs):
@@ -146,10 +148,6 @@ def _parse_video_xml(video, xml_data):
     display_name = xml.get('display_name')
     if display_name:
         video.display_name = display_name
-    elif video.url_name is not None:
-        # copies the logic of display_name_with_default in order that studio created videos will have an
-        # initial non guid name
-        video.display_name = video.url_name.replace('_', ' ')
 
     youtube = xml.get('youtube')
     if youtube:

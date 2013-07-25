@@ -495,8 +495,8 @@ mkdir -p "$BASE/log"
 mkdir -p "$BASE/db"
 mkdir -p "$BASE/data"
 
-rake django-admin[syncdb,lms,dev,--noinput]
-rake django-admin[migrate]
+./manage.py lms syncdb --noinput --migrate
+./manage.py cms syncdb --noinput --migrate
 
 # Configure Git
 
@@ -520,18 +520,13 @@ if [[ ! $quiet ]]; then
 
         $ workon mitx
 
-   To initialize Django
-
-        $ rake django-admin[syncdb]
-        $ rake django-admin[migrate]
-
    To start the Django on port 8000
 
         $ rake lms
 
    Or to start Django on a different <port#>
 
-        $ rake django-admin[runserver,lms,dev,<port#>]
+        $ ./manage.py lms runserver <port#>
 
   If the  Django development server starts properly you
   should see:

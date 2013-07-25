@@ -14,6 +14,7 @@ from django.shortcuts import redirect
 from mitxmako.shortcuts import render_to_response, render_to_string
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
+from markupsafe import escape
 
 from courseware import grades
 from courseware.access import has_access
@@ -33,13 +34,13 @@ from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError, NoPathToItem
 from xmodule.modulestore.search import path_to_location
+from xmodule.course_module import CourseDescriptor
 
 import comment_client
 
 log = logging.getLogger("mitx.courseware")
 
 template_imports = {'urllib': urllib}
-
 
 def user_groups(user):
     """
@@ -236,6 +237,36 @@ def update_timelimit_module(user, course_id, model_data_cache, timelimit_descrip
     return context
 
 
+def chat_settings(course, user):
+    """
+    Returns a dict containing the settings required to connect to a
+    Jabber chat server and room.
+    """
+    domain = getattr(settings, "JABBER_DOMAIN", None)
+    if domain is None:
+        log.warning('You must set JABBER_DOMAIN in the settings to '
+                    'enable the chat widget')
+        return None
+
+    return {
+        'domain': domain,
+
+        # Jabber doesn't like slashes, so replace with dashes
+        'room': "{ID}_class".format(ID=course.id.replace('/', '-')),
+
+        'username': "{USER}@{DOMAIN}".format(
+            USER=user.username, DOMAIN=domain
+        ),
+
+        # TODO: clearly this needs to be something other than the username
+        #       should also be something that's not necessarily tied to a
+        #       particular course
+        'password': "{USER}@{DOMAIN}".format(
+            USER=user.username, DOMAIN=domain
+        ),
+    }
+
+
 @login_required
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
@@ -299,6 +330,18 @@ def index(request, course_id, chapter=None, section=None,
             'masquerade': masq,
             'xqa_server': settings.MITX_FEATURES.get('USE_XQA_SERVER', 'http://xqa:server@content-qa.mitx.mit.edu/xqa')
             }
+
+        # Only show the chat if it's enabled by the course and in the
+        # settings.
+        show_chat = course.show_chat and settings.MITX_FEATURES['ENABLE_CHAT']
+        if show_chat:
+            context['chat'] = chat_settings(course, user)
+            # If we couldn't load the chat settings, then don't show
+            # the widget in the courseware.
+            if context['chat'] is None:
+                show_chat = False
+
+        context['show_chat'] = show_chat
 
         chapter_descriptor = course.get_child_by(lambda m: m.url_name == chapter)
         if chapter_descriptor is not None:
@@ -403,6 +446,27 @@ def index(request, course_id, chapter=None, section=None,
                 raise
 
     return result
+
+
+@ensure_csrf_cookie
+def jump_to_id(request, course_id, module_id):
+    """
+    This entry point allows for a shorter version of a jump to where just the id of the element is
+    passed in. This assumes that id is unique within the course_id namespace
+    """
+
+    course_location = CourseDescriptor.id_to_location(course_id)
+
+    items = modulestore().get_items(['i4x', course_location.org, course_location.course, None, module_id])
+
+    if len(items) == 0:
+        raise Http404("Could not find id = {0} in course_id = {1}. Referer = {2}".
+                      format(module_id, course_id, request.META.get("HTTP_REFERER", "")))
+    if len(items) > 1:
+        log.warning("Multiple items found with id = {0} in course_id = {1}. Referer = {2}. Using first found {3}...".
+                    format(module_id, course_id, request.META.get("HTTP_REFERER", ""), items[0].location.url()))
+
+    return jump_to(request, course_id, items[0].location.url())
 
 
 @ensure_csrf_cookie
@@ -711,19 +775,16 @@ def submission_history(request, course_id, student_username, location):
                                                    module_state_key=location,
                                                    student_id=student.id)
     except User.DoesNotExist:
-        return HttpResponse("User {0} does not exist.".format(student_username))
+        return HttpResponse(escape("User {0} does not exist.".format(student_username)))
     except StudentModule.DoesNotExist:
-        return HttpResponse("{0} has never accessed problem {1}"
-                            .format(student_username, location))
+        return HttpResponse(escape("{0} has never accessed problem {1}".format(student_username, location)))
 
-    history_entries = StudentModuleHistory.objects \
-                      .filter(student_module=student_module).order_by('-id')
+    history_entries = StudentModuleHistory.objects.filter(student_module=student_module).order_by('-id')
 
     # If no history records exist, let's force a save to get history started.
     if not history_entries:
         student_module.save()
-        history_entries = StudentModuleHistory.objects \
-                          .filter(student_module=student_module).order_by('-id')
+        history_entries = StudentModuleHistory.objects.filter(student_module=student_module).order_by('-id')
 
     context = {
         'history_entries': history_entries,
