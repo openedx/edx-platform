@@ -20,6 +20,8 @@ class RawDescriptor(XmlDescriptor, XMLEditingDescriptor):
         return {'data': etree.tostring(xml_object, pretty_print=True, encoding='unicode')}, []
 
     def definition_to_xml(self, resource_fs):
+        if not self.data:
+            return etree.fromstring('<{0} />'.format(self.category))
         try:
             return etree.fromstring(self.data)
         except etree.XMLSyntaxError as err:

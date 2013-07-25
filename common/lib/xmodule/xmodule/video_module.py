@@ -130,13 +130,6 @@ class VideoDescriptor(VideoFields,
         _parse_video_xml(video, video.data)
         return video
 
-    def definition_to_xml(self, resource_fs):
-        """
-        Override the base implementation. We don't actually have anything in the 'data' field
-        (it's an empty string), so we just return a simple XML element
-        """
-        return etree.Element('video')
-
 
 def _parse_video_xml(video, xml_data):
     """
