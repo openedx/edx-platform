@@ -610,19 +610,66 @@ function addNewCourse(e) {
     }, checkForCancel);
 }
 
+function setNewCourseFieldsInErr(display_name_errMsg, org_errMsg, number_errMsg, run_errMsg)
+{
+    if (display_name_errMsg !== null && display_name_errMsg !== '') {
+        $('#field-course-name').addClass('error');
+    } else {
+        $('#field-course-name').removeClass('error');
+    }
+
+    if (org_errMsg !== null && org_errMsg !== '') {
+        $('#field-organization').addClass('error');
+    } else {
+        $('#field-organization').removeClass('error');
+    }
+
+    if (number_errMsg !== null && number_errMsg !== '') {
+        $('#field-course-number').addClass('error');
+    } else {
+        $('#field-course-number').removeClass('error');
+    }
+
+    if (run_errMsg !== null && run_errMsg !== '') {
+        $('#field-course-run').addClass('error');
+    } else {
+        $('#field-course-run').removeClass('error');
+    }
+}
+
 function saveNewCourse(e) {
     e.preventDefault();
 
     var $newCourse = $(this).closest('.new-course');
+    var display_name = $newCourse.find('.new-course-name').val();
     var org = $newCourse.find('.new-course-org').val();
     var number = $newCourse.find('.new-course-number').val();
-    var display_name = $newCourse.find('.new-course-name').val();
     var run = $newCourse.find('.new-course-run').val();
 
-    if (org == '' || number == '' || display_name == '' || run == '') {
-        alert(gettext('You must specify all fields in order to create a new course.'));
-       return;
+    required_field_text = gettext('Required field');
+
+    display_name_errMsg = (display_name === '') ? required_field_text : null;
+    org_errMsg = (org === '') ? required_field_text : null;
+    number_errMsg = (number === '') ? required_field_text : null;
+    run_errMsg = (run === '') ? required_field_text : null;
+
+    bInErr = (display_name_errMsg || org_errMsg || number_errMsg || run_errMsg);
+
+    header_err_msg = (bInErr) ? gettext('Please correct the fields below.') : null;
+
+    if (header_err_msg) {
+        $('.wrap-error').addClass('is-shown');
+
+        if (header_err_msg)
+            $('#course_creation_error').html('<p>' + header_err_msg + '</p>');
+        else
+            $('#course_creation_error').html('');
     }
+
+    setNewCourseFieldsInErr(display_name_errMsg, org_errMsg, number_errMsg, run_errMsg);
+
+    if (bInErr)
+        return;
 
     analytics.track('Created a Course', {
         'org': org,
@@ -639,9 +686,9 @@ function saveNewCourse(e) {
     },
 
     function(data) {
-        if (data.id != undefined) {
+        if (data.id !== undefined) {
             window.location = '/' + data.id.replace(/.*:\/\//, '');
-        } else if (data.ErrMsg != undefined) {
+        } else if (data.ErrMsg !== undefined) {
             alert(data.ErrMsg);
         }
     });
