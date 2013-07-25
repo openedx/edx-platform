@@ -42,10 +42,6 @@
         <div class="wrapper-form">
           <h3 class="title">${_("Add a User to Your Course's Team")}</h3>
 
-          <div id="add-user-error" class="message message-status message-status error" name="add-user-error">
-
-          </div>
-
           <fieldset class="form-fields">
             <legend class="sr">${_("Textbook information")}</legend>
               <div class="field text required add-user-email">
@@ -173,8 +169,26 @@
         },
         notifyOnError: false,
         error: function(jqXHR, textStatus, errorThrown) {
-          data = JSON.parse(jqXHR.responseText);
-          $('#add-user-error').toggleClass('is-shown').empty().append(data.error);
+          var message;
+          try {
+            message = JSON.parse(jqXHR.responseText).error || "Unknown";
+          } catch (e) {
+            message = "Unknown";
+          }
+          var prompt = new CMS.Views.Prompt.Error({
+            title: gettext("Error adding user"),
+            message: message,
+            actions: {
+              primary: {
+                text: gettext("OK"),
+                click: function(view) {
+                  view.hide();
+                  $("#user-email-input").focus()
+                }
+              }
+            }
+          })
+          prompt.show();
         }
       });
     });
@@ -184,7 +198,6 @@
       e.preventDefault();
       $('.new-user-button').removeClass('is-disabled');
       $newUserForm.toggleClass('is-shown');
-      $('#add-user-error').removeClass('is-shown');
       $('#user-email-input').val('');
     });
 
@@ -208,8 +221,30 @@
         type: 'DELETE',
         dataType: 'json',
         contentType: 'application/json',
-        complete: function() {
+        success: function(data) {
           location.reload();
+        },
+        notifyOnError: false,
+        error: function(jqXHR, textStatus, errorThrown) {
+          var message;
+          try {
+            message = JSON.parse(jqXHR.responseText).error || "Unknown";
+          } catch (e) {
+            message = "Unknown";
+          }
+          var prompt = new CMS.Views.Prompt.Error({
+            title: gettext("Error removing user"),
+            message: message,
+            actions: {
+              primary: {
+                text: gettext("OK"),
+                click: function(view) {
+                  view.hide();
+                }
+              }
+            }
+          })
+          prompt.show();
         }
       });
     });
@@ -231,8 +266,30 @@
         data: JSON.stringify({
           role: role
         }),
-        complete: function() {
+        success: function(data) {
           location.reload();
+        },
+        notifyOnError: false,
+        error: function(jqXHR, textStatus, errorThrown) {
+          var message;
+          try {
+            message = JSON.parse(jqXHR.responseText).error || "Unknown";
+          } catch (e) {
+            message = "Unknown";
+          }
+          var prompt = new CMS.Views.Prompt.Error({
+            title: gettext("Error changing user"),
+            message: message,
+            actions: {
+              primary: {
+                text: gettext("OK"),
+                click: function(view) {
+                  view.hide();
+                }
+              }
+            }
+          })
+          prompt.show();
         }
       })
     })
