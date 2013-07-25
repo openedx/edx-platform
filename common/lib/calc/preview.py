@@ -253,16 +253,14 @@ def render_atom(children):
     """
     Properly handle parens, otherwise this is trivial.
     """
-    parens = None
-    if children[0].latex in "([{":
-        # then len(children) == 3
-        parens = children[0].latex
-        children = [children[1]]
-    return LatexRendered(
-        children[0].latex,
-        parens,
-        children[0].tall
-    )
+    if len(children) == 3:
+        return LatexRendered(
+            children[1].latex,
+            parens=children[0].latex,
+            tall=children[1].tall
+        )
+    else:
+        return children[0]
 
 
 def latex_preview(math_expr, variables=(), functions=(), case_sensitive=False):

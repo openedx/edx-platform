@@ -177,9 +177,9 @@ def eval_sum(parse_result):
     total = 0.0
     current_op = operator.add
     for token in parse_result:
-        if token is '+':
+        if token == '+':
             current_op = operator.add
-        elif token is '-':
+        elif token == '-':
             current_op = operator.sub
         else:
             total = current_op(total, token)
@@ -195,9 +195,9 @@ def eval_product(parse_result):
     prod = 1.0
     current_op = operator.mul
     for token in parse_result:
-        if token is '*':
+        if token == '*':
             current_op = operator.mul
-        elif token is '/':
+        elif token == '/':
             current_op = operator.truediv
         else:
             prod = current_op(prod, token)
