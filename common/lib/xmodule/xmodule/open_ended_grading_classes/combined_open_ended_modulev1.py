@@ -7,6 +7,7 @@ from xmodule.progress import Progress
 from xmodule.stringify import stringify_children
 import self_assessment_module
 import open_ended_module
+from functools import partial
 from .combined_open_ended_rubric import CombinedOpenEndedRubric, GRADER_TYPE_IMAGE_DICT, HUMAN_GRADER_TYPE, LEGEND_LIST
 
 log = logging.getLogger("mitx.courseware")
@@ -445,6 +446,7 @@ class CombinedOpenEndedV1Module():
             'feedback_dicts': feedback_dicts,
             'grader_ids': grader_ids,
             'submission_ids': submission_ids,
+            'success' : True
         }
         return last_response_dict
 
@@ -608,6 +610,7 @@ class CombinedOpenEndedV1Module():
             'get_combined_rubric': self.get_rubric,
             'get_status': self.get_status_ajax,
             'get_legend': self.get_legend,
+            'get_last_response': self.get_last_response_ajax,
         }
 
         if dispatch not in handlers:
@@ -616,6 +619,9 @@ class CombinedOpenEndedV1Module():
 
         d = handlers[dispatch](data)
         return json.dumps(d, cls=ComplexEncoder)
+
+    def get_last_response_ajax(self,data):
+        return self.get_last_response(self.current_task_number)
 
     def next_problem(self, _data):
         """

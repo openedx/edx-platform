@@ -196,6 +196,8 @@ class @CombinedOpenEnded
 
     @out_of_sync_message = 'The problem state got out of sync.  Try reloading the page.'
 
+    @get_last_response()
+
     if @task_number>1
       @prompt_hide()
     else if @task_number==1 and @child_state!='initial'
@@ -262,6 +264,13 @@ class @CombinedOpenEnded
       if response.success
         @legend_container.after(response.html).remove()
         @legend_container= $(@legend_sel)
+
+  get_last_response: () =>
+    data = {}
+    $.postWithPrefix "#{@ajax_url}/get_last_response", data, (response) =>
+      if response.success
+        console.log(response)
+        console.log(response.response)
 
   message_post: (event)=>
     external_grader_message=$(event.target).parent().parent().parent()
