@@ -464,9 +464,14 @@ function goto( mode)
       <textarea cols="100" id="id_message" name="message"></textarea>
     %endif
     </p>
-    <p>
-    <input type="submit" name="action" value="Send email">
-    </p>
+    <div class="submit-email-action">
+      Please try not to email students more than once a day. Important things to consider before sending:
+      <ul>
+        <li>Have you read over the email to make sure it says everything you want to say?</li>
+        <li>Have you sent the email to yourself first to make sure you're happy with how it's displayed?</li>
+      </ul>
+      <input type="submit" name="action" value="Send email">
+    </div>
 %endif
 
     </form>
