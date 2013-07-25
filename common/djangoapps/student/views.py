@@ -54,6 +54,10 @@ from courseware.access import has_access
 
 from external_auth.models import ExternalAuthMap
 
+from bulk_email.models import Optout
+
+import track.views
+
 from statsd import statsd
 from pytz import UTC
 
@@ -267,6 +271,8 @@ def dashboard(request):
             log.error("User {0} enrolled in non-existent course {1}"
                       .format(user.username, enrollment.course_id))
 
+    course_optouts = Optout.objects.filter(email=user.email).values_list('course_id', flat=True)
+
     message = ""
     if not user.is_active:
         message = render_to_string('registration/activate_account_notice.html', {'email': user.email})
@@ -294,6 +300,7 @@ def dashboard(request):
         pass
 
     context = {'courses': courses,
+               'course_optouts': course_optouts,
                'message': message,
                'external_auth_map': external_auth_map,
                'staff_access': staff_access,
@@ -1272,3 +1279,27 @@ def accept_name_change(request):
         raise Http404
 
     return accept_name_change_by_id(int(request.POST['id']))
+
+
+@ensure_csrf_cookie
+def change_email_settings(request):
+    """Modify logged-in user's setting for receiving emails from a course."""
+    if request.method != "POST":
+        return HttpResponseNotAllowed(["POST"])
+
+    user = request.user
+    if not user.is_authenticated():
+        return HttpResponseForbidden()
+
+    course_id = request.POST.get("course_id")
+    receive_emails = request.POST.get("receive_emails")
+    if receive_emails:
+        Optout.objects.filter(email=user.email, course_id=course_id).delete()
+        log.info(u"User {0} ({1}) opted to receive emails from course {2}".format(user.username, user.email, course_id))
+        track.views.server_track(request, "change-email-settings", {"receive_emails": "yes", "course": course_id}, page='dashboard')
+    else:
+        Optout.objects.get_or_create(email=request.user.email, course_id=course_id)
+        log.info(u"User {0} ({1}) opted out of receiving emails from course {2}".format(user.username, user.email, course_id))
+        track.views.server_track(request, "change-email-settings", {"receive_emails": "no", "course": course_id}, page='dashboard')
+
+    return HttpResponse(json.dumps({'success': True}))

@@ -103,6 +103,8 @@ MITX_FEATURES = {
     # analytics experiments
     'ENABLE_INSTRUCTOR_ANALYTICS': False,
 
+    'ENABLE_INSTRUCTOR_EMAIL': False,
+
     # enable analytics server.
     # WARNING: THIS SHOULD ALWAYS BE SET TO FALSE UNDER NORMAL
     # LMS OPERATION. See analytics.py for details about what
@@ -289,11 +291,11 @@ WIKI_ENABLED = False
 
 COURSE_DEFAULT = '6.002x_Fall_2012'
 COURSE_SETTINGS = {'6.002x_Fall_2012': {'number': '6.002x',
-                                          'title': 'Circuits and Electronics',
-                                          'xmlpath': '6002x/',
-                                          'location': 'i4x://edx/6002xs12/course/6.002x_Fall_2012',
-                                          }
-                    }
+                                        'title': 'Circuits and Electronics',
+                                        'xmlpath': '6002x/',
+                                        'location': 'i4x://edx/6002xs12/course/6.002x_Fall_2012',
+                                        }
+                   }
 
 # IP addresses that are allowed to reload the course, etc.
 # TODO (vshnayder): Will probably need to change as we get real access control in.
@@ -361,6 +363,8 @@ IGNORABLE_404_ENDS = ('favicon.ico')
 # Email
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'registration@edx.org'
+DEFAULT_BULK_FROM_EMAIL = 'course-updates@edx.org'
+EMAILS_PER_TASK = 10
 DEFAULT_FEEDBACK_EMAIL = 'feedback@edx.org'
 SERVER_EMAIL = 'devops@edx.org'
 TECH_SUPPORT_EMAIL = 'technical@edx.org'
@@ -538,17 +542,17 @@ courseware_js = (
 # 'js/vendor/RequireJS.js' - Require JS wrapper.
 # See https://edx-wiki.atlassian.net/wiki/display/LMS/Integration+of+Require+JS+into+the+system
 main_vendor_js = [
-  'js/vendor/RequireJS.js',
-  'js/vendor/json2.js',
-  'js/vendor/jquery.min.js',
-  'js/vendor/jquery-ui.min.js',
-  'js/vendor/jquery.cookie.js',
-  'js/vendor/jquery.qtip.min.js',
-  'js/vendor/swfobject/swfobject.js',
-  'js/vendor/jquery.ba-bbq.min.js',
-  'js/vendor/annotator.min.js',
-  'js/vendor/annotator.store.min.js',
-  'js/vendor/annotator.tags.min.js'
+    'js/vendor/RequireJS.js',
+    'js/vendor/json2.js',
+    'js/vendor/jquery.min.js',
+    'js/vendor/jquery-ui.min.js',
+    'js/vendor/jquery.cookie.js',
+    'js/vendor/jquery.qtip.min.js',
+    'js/vendor/swfobject/swfobject.js',
+    'js/vendor/jquery.ba-bbq.min.js',
+    'js/vendor/annotator.min.js',
+    'js/vendor/annotator.store.min.js',
+    'js/vendor/annotator.tags.min.js'
 ]
 
 discussion_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/discussion/**/*.js'))
@@ -756,6 +760,7 @@ INSTALLED_APPS = (
     'psychometrics',
     'licenses',
     'course_groups',
+    'bulk_email',
 
     # External auth (OpenID, shib)
     'external_auth',
@@ -812,6 +817,7 @@ MKTG_URL_LINK_MAP = {
     'HONOR': 'honor',
     'PRIVACY': 'privacy_edx',
 }
+
 
 ############################### THEME ################################
 def enable_theme(theme_name):
