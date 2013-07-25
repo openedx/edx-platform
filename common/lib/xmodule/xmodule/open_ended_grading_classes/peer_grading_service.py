@@ -111,7 +111,7 @@ class MockPeerGradingService(object):
                 'max_score': 4}
 
     def save_grade(self, location, grader_id, submission_id,
-                   score, feedback, submission_key, rubric_scores, submission_flagged):
+                   score, feedback, submission_key, rubric_scores, submission_flagged, answer_unknown):
         return {'success': True}
 
     def is_student_calibrated(self, problem_location, grader_id):
