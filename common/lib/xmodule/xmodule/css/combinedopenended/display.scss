@@ -87,7 +87,7 @@ div.problemwrapper {
         @clearfix
       padding-bottom: 10px;
       display: inline-block;
-      padding: 15px;
+      margin: 0px 15px 0px 15px;
 
       h4 {
           padding-top: 10px;
@@ -112,7 +112,7 @@ section.legend-container {
     display: inline;
     width: 20%;
   }
-  margin-bottom: 5px;
+  margin: 15px;
 }
 
 section.combined-open-ended-status {
@@ -182,10 +182,11 @@ section.combined-open-ended-status {
 }
 
 div.combined-rubric-container {
+    margin:15px;
   ul.rubric-list{
     list-style-type: none;
     padding:0;
-    margin:0;
+    margin:4px;
     li {
       &.rubric-list-item{
         margin-bottom: 2px;
@@ -193,6 +194,12 @@ div.combined-rubric-container {
       }
     }
   }
+
+    h4{
+      padding-top: 10px;
+      border-top: 1px solid;
+      border-color: lightgray;
+    }
 
   span.rubric-category {
     font-size: .9em;
