@@ -92,6 +92,7 @@ class @CombinedOpenEnded
     $(window).keydown @keydown_handler
     $(window).keyup @keyup_handler
 
+  
   reinitialize: (element) ->
     @wrapper=$(element).find('section.xmodule_CombinedOpenEndedModule')
     @el = $(element).find('section.combined-open-ended')
@@ -151,6 +152,8 @@ class @CombinedOpenEnded
     @open_ended_child= @$('.open-ended-child')
 
     @out_of_sync_message = 'The problem state got out of sync.  Try reloading the page.'
+    
+    @get_last_response(@answer_area)
 
 #   force show the prompt
     @prompt_show()
@@ -221,6 +224,12 @@ class @CombinedOpenEnded
         @legend_container.after(response.html).remove()
         @legend_container= $('.legend-container')
 
+  get_last_response: (@answer_area) =>
+    data = {}
+    $.postWithPrefix "#{@ajax_url}/get_last_response", data, (response) =>
+      if response.success
+        @answer_area.html(response.response).attr("disabled", true)
+
   message_post: (event)=>
     external_grader_message=$(event.target).parent().parent().parent()
     evaluation_scoring = $(event.target).parent()
@@ -267,6 +276,7 @@ class @CombinedOpenEnded
 
     if @task_number==1 and @child_state=='assessing'
       @prompt_hide()
+      
     if @child_state == 'done'
       @rubric_wrapper.hide()
     if @child_type=="openended"
