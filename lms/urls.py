@@ -441,6 +441,12 @@ if settings.MITX_FEATURES.get('ENABLE_HINTER_INSTRUCTOR_VIEW'):
             'instructor.hint_manager.hint_manager', name="hint_manager"),
     )
 
+# enable automatic login
+if settings.MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_LOAD_TESTING'):
+    urlpatterns += (
+        url(r'^auto_auth$', 'student.views.auto_auth'),
+    )
+
 urlpatterns = patterns(*urlpatterns)
 
 if settings.DEBUG:
