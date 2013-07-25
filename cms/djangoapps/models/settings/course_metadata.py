@@ -76,6 +76,9 @@ class CourseMetadata(object):
                 setattr(descriptor.lms, key, value)
 
         if dirty:
+            # Save the data that we've just changed to the underlying
+            # MongoKeyValueStore before we update the mongo datastore.
+            descriptor.save()
             get_modulestore(course_location).update_metadata(course_location,
                                                              own_metadata(descriptor))
 
@@ -96,6 +99,10 @@ class CourseMetadata(object):
                 delattr(descriptor, key)
             elif hasattr(descriptor.lms, key):
                 delattr(descriptor.lms, key)
+
+        # Save the data that we've just changed to the underlying
+        # MongoKeyValueStore before we update the mongo datastore.
+        descriptor.save()
 
         get_modulestore(course_location).update_metadata(course_location,
                                                          own_metadata(descriptor))

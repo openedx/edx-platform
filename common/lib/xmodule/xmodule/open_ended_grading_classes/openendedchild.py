@@ -5,6 +5,7 @@ import re
 
 import open_ended_image_submission
 from xmodule.progress import Progress
+import capa.xqueue_interface as xqueue_interface
 from capa.util import *
 from .peer_grading_service import PeerGradingService, MockPeerGradingService
 import controller_query_service
@@ -334,12 +335,15 @@ class OpenEndedChild(object):
             log.exception("Could not create image and check it.")
 
         if image_ok:
-            image_key = image_data.name + datetime.now().strftime("%Y%m%d%H%M%S")
+            image_key = image_data.name + datetime.now(UTC).strftime(
+                xqueue_interface.dateformat
+            )
 
             try:
                 image_data.seek(0)
-                success, s3_public_url = open_ended_image_submission.upload_to_s3(image_data, image_key,
-                                                                                  self.s3_interface)
+                success, s3_public_url = open_ended_image_submission.upload_to_s3(
+                    image_data, image_key, self.s3_interface
+                )
             except:
                 log.exception("Could not upload image to S3.")
 

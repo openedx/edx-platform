@@ -49,6 +49,7 @@
 @import 'shared/course_filter';
 @import 'shared/modal';
 @import 'shared/activation_messages';
+@import 'shared/unsubscribe';
 
 // shared - platform
 @import 'multicourse/home';

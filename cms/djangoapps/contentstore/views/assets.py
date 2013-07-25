@@ -13,7 +13,7 @@ from django_future.csrf import ensure_csrf_cookie
 from django.core.urlresolvers import reverse
 from django.core.servers.basehttp import FileWrapper
 from django.core.files.temp import NamedTemporaryFile
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_POST, require_http_methods
 
 from mitxmako.shortcuts import render_to_response
 from cache_toolbox.core import del_cached_content
@@ -249,6 +249,7 @@ def remove_asset(request, org, course, name):
 
 
 @ensure_csrf_cookie
+@require_http_methods(("GET", "POST", "PUT"))
 @login_required
 def import_course(request, org, course, name):
     """
@@ -256,7 +257,7 @@ def import_course(request, org, course, name):
     """
     location = get_location_and_verify_access(request, org, course, name)
 
-    if request.method == 'POST':
+    if request.method in ('POST', 'PUT'):
         filename = request.FILES['course-data'].name
 
         if not filename.endswith('.tar.gz'):

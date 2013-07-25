@@ -21,6 +21,17 @@ log = logging.getLogger(__name__)
 
 class VideoFields(object):
     """Fields for `VideoModule` and `VideoDescriptor`."""
+    display_name = String(
+        display_name="Display Name",
+        help="This name appears in the horizontal navigation at the top of the page.",
+        scope=Scope.settings,
+        # it'd be nice to have a useful default but it screws up other things; so,
+        # use display_name_with_default for those
+        default="Video Title"
+    )
+    data = String(help="XML data for the problem",
+        default='',
+        scope=Scope.content)
     position = Integer(help="Current position in the video", scope=Scope.user_state, default=0)
     show_captions = Boolean(help="This controls whether or not captions are shown by default.", display_name="Show Captions", scope=Scope.settings, default=True)
     youtube_id_1_0 = String(help="This is the Youtube ID reference for the normal speed video.", display_name="Default Speed", scope=Scope.settings, default="OEoXaMPEzfM")
@@ -86,7 +97,6 @@ class VideoDescriptor(VideoFields,
                       MetadataOnlyEditingDescriptor,
                       RawDescriptor):
     module_class = VideoModule
-    template_dir_name = "video"
 
     def __init__(self, *args, **kwargs):
         super(VideoDescriptor, self).__init__(*args, **kwargs)
@@ -115,8 +125,15 @@ class VideoDescriptor(VideoFields,
             url identifiers
         """
         video = super(VideoDescriptor, cls).from_xml(xml_data, system, org, course)
-        _parse_video_xml(video, xml_data)
+        _parse_video_xml(video, video.data)
         return video
+
+    def definition_to_xml(self, resource_fs):
+        """
+        Override the base implementation. We don't actually have anything in the 'data' field
+        (it's an empty string), so we just return a simple XML element
+        """
+        return etree.Element('video')
 
 
 def _parse_video_xml(video, xml_data):

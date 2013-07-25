@@ -253,17 +253,13 @@ function syncReleaseDate(e) {
 }
 
 function getEdxTimeFromDateTimeVals(date_val, time_val) {
-    var edxTimeStr = null;
-
     if (date_val != '') {
         if (time_val == '') time_val = '00:00';
 
-        // Note, we are using date.js utility which has better parsing abilities than the built in JS date parsing
-        var date = Date.parse(date_val + " " + time_val);
-        edxTimeStr = date.toString('yyyy-MM-ddTHH:mm');
+        return new Date(date_val + " " + time_val + "Z");
     }
 
-    return edxTimeStr;
+    else return null;
 }
 
 function getEdxTimeFromDateTimeInputs(date_id, time_id) {
@@ -338,7 +334,7 @@ function createNewUnit(e) {
     e.preventDefault();
 
     var parent = $(this).data('parent');
-    var template = $(this).data('template');
+    var category = $(this).data('category');
 
     analytics.track('Created a Unit', {
         'course': course_location_analytics,
@@ -346,9 +342,9 @@ function createNewUnit(e) {
     });
 
 
-    $.post('/clone_item', {
+    $.post('/create_item', {
         'parent_location': parent,
-        'template': template,
+        'category': category,
         'display_name': 'New Unit'
     },
 
@@ -360,39 +356,61 @@ function createNewUnit(e) {
 
 function deleteUnit(e) {
     e.preventDefault();
-    _deleteItem($(this).parents('li.leaf'));
+    _deleteItem($(this).parents('li.leaf'), 'Unit');
 }
 
 function deleteSubsection(e) {
     e.preventDefault();
-    _deleteItem($(this).parents('li.branch'));
+    _deleteItem($(this).parents('li.branch'), 'Subsection');
 }
 
 function deleteSection(e) {
     e.preventDefault();
-    _deleteItem($(this).parents('section.branch'));
+    _deleteItem($(this).parents('section.branch'), 'Section');
 }
 
-function _deleteItem($el) {
-    if (!confirm(gettext('Are you sure you wish to delete this item. It cannot be reversed!'))) return;
+function _deleteItem($el, type) {
+    var confirm = new CMS.Views.Prompt.Warning({
+        title: gettext('Delete this ' + type + '?'),
+        message: gettext('Deleting this ' + type + ' is permanent and cannot be undone.'),
+        actions: {
+            primary: {
+                text: gettext('Yes, delete this ' + type),
+                click: function(view) {
+                    view.hide();
 
-    var id = $el.data('id');
+                    var id = $el.data('id');
 
-    analytics.track('Deleted an Item', {
-        'course': course_location_analytics,
-        'id': id
+                    analytics.track('Deleted an Item', {
+                        'course': course_location_analytics,
+                        'id': id
+                    });
+
+                    var deleting = new CMS.Views.Notification.Mini({
+                        title: gettext('Deleting') + '&hellip;'
+                    });
+                    deleting.show();
+
+                    $.post('/delete_item',
+                           {'id': id,
+                            'delete_children': true,
+                            'delete_all_versions': true},
+                           function(data) {
+                               $el.remove();
+                               deleting.hide();
+                           }
+                          );
+                }
+            },
+            secondary: {
+                text: gettext('Cancel'),
+                click: function(view) {
+                    view.hide();
+                }
+            }
+        }
     });
-
-
-    $.post('/delete_item', {
-        'id': id,
-        'delete_children': true,
-        'delete_all_versions': true
-    },
-
-    function(data) {
-        $el.remove();
-    });
+    confirm.show();
 }
 
 function markAsLoaded() {
@@ -551,7 +569,7 @@ function saveNewSection(e) {
 
     var $saveButton = $(this).find('.new-section-name-save');
     var parent = $saveButton.data('parent');
-    var template = $saveButton.data('template');
+    var category = $saveButton.data('category');
     var display_name = $(this).find('.new-section-name').val();
 
     analytics.track('Created a Section', {
@@ -559,9 +577,9 @@ function saveNewSection(e) {
         'display_name': display_name
     });
 
-    $.post('/clone_item', {
+    $.post('/create_item', {
         'parent_location': parent,
-        'template': template,
+        'category': category,
         'display_name': display_name,
     },
 
@@ -595,7 +613,6 @@ function saveNewCourse(e) {
     e.preventDefault();
 
     var $newCourse = $(this).closest('.new-course');
-    var template = $(this).find('.new-course-save').data('template');
     var org = $newCourse.find('.new-course-org').val();
     var number = $newCourse.find('.new-course-number').val();
     var display_name = $newCourse.find('.new-course-name').val();
@@ -612,7 +629,6 @@ function saveNewCourse(e) {
     });
 
     $.post('/create_new_course', {
-        'template': template,
         'org': org,
         'number': number,
         'display_name': display_name
@@ -646,7 +662,7 @@ function addNewSubsection(e) {
     var parent = $(this).parents("section.branch").data("id");
 
     $saveButton.data('parent', parent);
-    $saveButton.data('template', $(this).data('template'));
+    $saveButton.data('category', $(this).data('category'));
 
     $newSubsection.find('.new-subsection-form').bind('submit', saveNewSubsection);
     $cancelButton.bind('click', cancelNewSubsection);
@@ -659,7 +675,7 @@ function saveNewSubsection(e) {
     e.preventDefault();
 
     var parent = $(this).find('.new-subsection-name-save').data('parent');
-    var template = $(this).find('.new-subsection-name-save').data('template');
+    var category = $(this).find('.new-subsection-name-save').data('category');
     var display_name = $(this).find('.new-subsection-name-input').val();
 
     analytics.track('Created a Subsection', {
@@ -668,9 +684,9 @@ function saveNewSubsection(e) {
     });
 
 
-    $.post('/clone_item', {
+    $.post('/create_item', {
         'parent_location': parent,
-        'template': template,
+        'category': category,
         'display_name': display_name
     },
 
@@ -734,7 +750,7 @@ function saveSetSectionScheduleDate(e) {
         var $thisSection = $('.courseware-section[data-id="' + id + '"]');
         var html = _.template(
             '<span class="published-status">' +
-                '<strong>' + gettext("Will Release: ") + '</strong>' +
+                '<strong>' + gettext("Will Release:") + '&nbsp;</strong>' +
                 gettext("<%= date %> at <%= time %> UTC") +
             '</span>' +
             '<a href="#" class="edit-button" data-date="<%= date %>" data-time="<%= time %>" data-id="<%= id %>">' +

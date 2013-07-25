@@ -68,24 +68,19 @@ First make sure that the database is up-to-date:
 
 If you have created users in the edx-platform django apps when the comment service was not running, you will need to one-way sync the users into the comment service back end database:
 
-    rake django-admin[sync_user_info]
-
-For convenience, add the following environment variables to the terminal (assuming that you're using configuration set lms.envs.dev):
-
-    export DJANGO_SETTINGS_MODULE=lms.envs.dev
-    export PYTHONPATH=.
+    ./manage.py lms sync_user_info
 
 Now initialize roles and permissions, providing a course id. See the example below. Note that you do not need to do this for Studio-created courses, as the Studio application does this for you.
 
-    django-admin.py seed_permissions_roles "MITx/6.002x/2012_Fall"
+    ./manage.py lms seed_permissions_roles "MITx/6.002x/2012_Fall"
 
 To assign yourself as a moderator, use the following command (assuming your username is "test", and the course id is "MITx/6.002x/2012_Fall"):
 
-    django-admin.py assign_role test Moderator "MITx/6.002x/2012_Fall"
+    ./manage.py lms assign_role test Moderator "MITx/6.002x/2012_Fall"
 
 To assign yourself as an administrator, use the following command
 
-    django-admin.py assign_role test Administrator "MITx/6.002x/2012_Fall"
+    ./manage.py lms assign_role test Administrator "MITx/6.002x/2012_Fall"
 
 ## Some other useful commands
 
@@ -155,8 +150,8 @@ You can use the following command to launch a console within the service environ
 
 Use the following command to see the roles and permissions of a user in a given course (assuming, again, that the username is "test"):
 
-    django-admin.py show_permissions moderator
+    ./manage.py lms show_permissions moderator
 
 You need to make sure that the environment variables are exported. Otherwise you would need to do
 
-    django-admin.py show_permissions moderator --settings=lms.envs.dev --pythonpath=.
+    ./manage.py lms show_permissions moderator

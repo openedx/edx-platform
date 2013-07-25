@@ -43,3 +43,17 @@ end
     end
     task :pep8 => :"pep8:#{system}"
 end
+
+dquality_dir = File.join(REPORT_DIR, "diff_quality")
+directory dquality_dir
+
+desc "Build the html diff quality reports, and print the reports to the console."
+task :quality => dquality_dir do
+    # Generage diff-quality html report for pep8, and print to console
+    sh("diff-quality --violations=pep8 --html-report #{dquality_dir}/diff_quality_pep8.html")
+    sh("diff-quality --violations=pep8")
+
+    # Generage diff-quality html report for pylint, and print to console
+    sh("diff-quality --violations=pylint --html-report #{dquality_dir}/diff_quality_pylint.html")
+    sh("diff-quality --violations=pylint")
+end

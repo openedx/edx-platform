@@ -1,0 +1,17 @@
+<%! from django.core.urlresolvers import reverse %>
+<%inherit file="main.html" />
+
+<%namespace name='static' file='static_content.html'/>
+
+<section class="container unsubscribe">
+
+  <section class="message">
+    <h1>Unsubscribe Successful!</h1>
+    <hr class="horizontal-divider">
+    
+    <p>
+      You will no longer receive notification emails from edX.
+      Click <a href="${reverse('dashboard')}">here</a> to return to your dashboard.
+    </p>
+  </section>
+</section>

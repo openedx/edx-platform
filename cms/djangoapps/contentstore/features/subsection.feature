@@ -38,4 +38,5 @@ Feature: Create Subsection
     And I see my subsection on the Courseware page
     When I will confirm all alerts
     And I press the "subsection" delete icon
+    And I confirm the prompt
     Then the subsection does not exist
