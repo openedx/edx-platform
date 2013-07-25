@@ -3,7 +3,7 @@
     <ul class="sequence-nav-buttons">
       <li class="prev"><a href="#">Previous</a></li>
     </ul>
-    
+
     <div class="sequence-list-wrapper">
       <ol id="sequence-list">
         % for idx, item in enumerate(items):
@@ -16,7 +16,7 @@
            data-id="${item['id']}"
            data-element="${idx+1}"
            href="javascript:void(0);">
-            <p class="sr">${item['title']}, ${item['type']}</p>
+            <p>${item['title']}<span class="sr">, ${item['type']}</span></p>
           </a>
         </li>
         % endfor
