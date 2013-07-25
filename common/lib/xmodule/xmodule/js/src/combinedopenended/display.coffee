@@ -143,11 +143,9 @@ class @CombinedOpenEnded
     # set up handlers for click tracking
     Rubric.initialize(@location,@coe)
     @is_ctrl = false
-    console.log("init rubric")
     #Setup reset
     @reset_button = @$(@reset_button_sel)
     @reset_button.click @reset
-    console.log("init reset")
     #Setup next problem
     @next_problem_button = @$(@next_step_sel)
     @next_problem_button.click @next_problem
@@ -162,19 +160,15 @@ class @CombinedOpenEnded
     @question_header.click @collapse_question
 
     # valid states: 'initial', 'assessing', 'post_assessment', 'done'
-    console.log("init collapse")
     Collapsible.setCollapsibles(@$el)
-    console.log("finish collapse")
     @submit_evaluation_button = @$(@submit_evaluation_sel)
     @submit_evaluation_button.click @message_post
 
     @results_container = @$(@result_container_sel)
-    console.log(@results_container)
     @combined_rubric_container = @$(@combined_rubric_sel)
 
 
     # Where to put the rubric once we load it
-    console.log("started child")
     @oe = @$(@open_ended_child_sel)
     @errors_area = @$(@oe).find(@error_sel)
     @answer_area = @$(@oe).find(@answer_area_sel)
@@ -192,7 +186,6 @@ class @CombinedOpenEnded
     @file_upload_area = $(@oe).find(@file_upload_sel)
     @can_upload_files = false
     @open_ended_child= $(@oe).find(@open_ended_child_sel)
-    console.log("Passed child")
 
     @out_of_sync_message = 'The problem state got out of sync.  Try reloading the page.'
 
@@ -436,7 +429,6 @@ class @CombinedOpenEnded
       @is_ctrl=false
 
   save_assessment: (event) =>
-    console.log("callback save assessment")
     event.preventDefault()
     if @child_state == 'assessing' && Rubric.check_complete()
       checked_assessment = Rubric.get_total_score()

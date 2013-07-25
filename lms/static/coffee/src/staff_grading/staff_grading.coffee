@@ -103,7 +103,6 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
           
 
     else if cmd == 'save_grade'
-      console.log("eval: #{data.score} pts,  Feedback: #{data.feedback}")
       response =
         @mock('get_next', {location: data.location})
     # get_problem_list
