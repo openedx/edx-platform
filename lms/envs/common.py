@@ -37,7 +37,6 @@ PLATFORM_NAME = "edX"
 COURSEWARE_ENABLED = True
 ENABLE_JASMINE = False
 
-GENERATE_RANDOM_USER_CREDENTIALS = False
 PERFSTATS = False
 
 DISCUSSION_SETTINGS = {
@@ -145,6 +144,9 @@ MITX_FEATURES = {
     # Allow use of the hint managment instructor view.
     'ENABLE_HINTER_INSTRUCTOR_VIEW': False,
 
+    # for load testing
+    'AUTOMATIC_AUTH_FOR_LOAD_TESTING': False,
+
     # Toggle to enable chat availability (configured on a per-course
     # basis in Studio)
     'ENABLE_CHAT': False
@@ -218,7 +220,6 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.messages.context_processors.messages',
     #'django.core.context_processors.i18n',
     'django.contrib.auth.context_processors.auth',  # this is required for admin
-    'django.core.context_processors.csrf',  # necessary for csrf protection
 
     # Added for django-wiki
     'django.core.context_processors.media',
@@ -230,6 +231,10 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     # Hack to get required link URLs to password reset templates
     'mitxmako.shortcuts.marketing_link_context_processor',
 )
+
+# add csrf support unless disabled for load testing
+if not MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_LOAD_TESTING'):
+    TEMPLATE_CONTEXT_PROCESSORS += ('django.core.context_processors.csrf',)  # necessary for csrf protection
 
 STUDENT_FILEUPLOAD_MAX_SIZE = 4 * 1000 * 1000  # 4 MB
 MAX_FILEUPLOADS_PER_INPUT = 20
@@ -469,7 +474,6 @@ MIDDLEWARE_CLASSES = (
     'django_comment_client.middleware.AjaxExceptionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
 
     # Instead of AuthenticationMiddleware, we use a cached backed version
     #'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -487,6 +491,10 @@ MIDDLEWARE_CLASSES = (
     'django_comment_client.utils.ViewNameMiddleware',
     'codejail.django_integration.ConfigureCodeJailMiddleware',
 )
+
+# add in csrf middleware unless disabled for load testing
+if not MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_LOAD_TESTING'):
+    MIDDLEWARE_CLASSES = MIDDLEWARE_CLASSES + ('django.middleware.csrf.CsrfViewMiddleware',)
 
 ############################### Pipeline #######################################
 
