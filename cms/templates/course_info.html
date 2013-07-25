@@ -6,6 +6,13 @@
 <%block name="title">${_("Course Updates")}</%block>
 <%block name="bodyclass">is-signedin course course-info updates</%block>
 
+<%block name="header_extras">
+% for template_name in ["course_info_update"]:
+  <script type="text/template" id="${template_name}-tpl">
+    <%static:include path="js/${template_name}.underscore" />
+  </script>
+% endfor
+</%block>
 
 <%block name="jsextra">
   <script type="text/javascript" src="${static.url('js/template_loader.js')}"></script>
