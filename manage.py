@@ -34,7 +34,7 @@ def parse_args():
         help="Which django settings module to use from inside of lms.envs. If not provided, the DJANGO_SETTINGS_MODULE "
              "environment variable will be used if it is set, otherwise will default to lms.envs.dev")
     lms.add_argument(
-        '-s', '--service-variant',
+        '--service-variant',
         choices=['lms', 'lms-xml', 'lms-preview'],
         default='lms',
         help='Which service variant to run, when using the aws environment')
