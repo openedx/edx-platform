@@ -55,6 +55,9 @@ div.problemwrapper {
     .problemtype{
         display: inline;
         float: left;
+        background-color: #d4d4d4;
+        padding: 10px;
+        border-radius: 5px;
     }
 
     .status-container
@@ -64,11 +67,15 @@ div.problemwrapper {
     }
 
     .problemtype-container{
-        width: 40%
+        width: 40%;
+        padding-top: 12px;
     }
 
     .assessments-container{
-        width: 30%
+        width: 30%;
+        .assessment-text{
+            display: inline-block;
+        }
     }
   }
   .item-container
@@ -109,10 +116,10 @@ section.combined-open-ended-status {
     padding: 20px 20px 20px 0px;
     .statusitem {
      &:first-child{
-         border-bottom-right-radius: 10px;
+         border-bottom-left-radius: 10px;
      }
       &:last-child{
-          border-top-left-radius: 10px;
+          border-top-right-radius: 10px;
       }
       color: #2C2C2C;
       background-color : #d4d4d4;
