@@ -262,6 +262,26 @@ class UserPreferenceViewSetTest(UserApiTestCase):
             self.assertPrefIsValid(pref)
             self.assertEqual(pref["key"], "key0")
 
+    def test_get_list_filter_user_empty(self):
+        def test_id(user_id):
+            result = self.get_json(self.LIST_URI, data={"user": user_id})
+            self.assertEqual(result["count"], 0)
+            self.assertEqual(result["results"], [])
+        test_id(self.users[2].id)
+        # TODO: If the given id does not match a user, then the filter is a no-op
+        # test_id(42)
+        # test_id("asdf")
+
+    def test_get_list_filter_user_nonempty(self):
+        user_id = self.users[0].id
+        result = self.get_json(self.LIST_URI, data={"user": user_id})
+        self.assertEqual(result["count"], 2)
+        prefs = result["results"]
+        self.assertEqual(len(prefs), 2)
+        for pref in prefs:
+            self.assertPrefIsValid(pref)
+            self.assertEqual(pref["user"]["id"], user_id)
+
     def test_get_list_pagination(self):
         first_page = self.get_json(self.LIST_URI, data={"page_size": 2})
         self.assertEqual(first_page["count"], 3)

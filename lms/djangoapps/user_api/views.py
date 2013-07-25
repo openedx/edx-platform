@@ -36,7 +36,7 @@ class UserPreferenceViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = (ApiKeyHeaderPermission,)
     queryset = UserPreference.objects.all()
     filter_backends = (filters.DjangoFilterBackend,)
-    filter_fields = ("key",)
+    filter_fields = ("key", "user")
     serializer_class = UserPreferenceSerializer
     paginate_by = 10
     paginate_by_param = "page_size"
