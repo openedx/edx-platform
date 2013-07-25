@@ -328,6 +328,12 @@ expected answer.
 The expected answer can be specified explicitly or precomputed by a Python
 script.
 
+Accepted input types include ``<formulaequationinput />`` and ``<textline />``.
+However, the math display on textline uses a different parser and has different
+capabilities than the response type--this may lead to student confusion. For
+this reason, we strongly urge the use of formulaequationinput, and the examples
+below show its use.
+
 Sample Problem:
 
 .. image:: ../Images/image292.png
@@ -343,14 +349,14 @@ Sample Problem:
 
   <p>What base is the decimal numeral system in?
       <numericalresponse answer="10">
-          <textline />
+          <formulaequationinput />
       </numericalresponse>
   </p>
 
     <p>What is the value of the standard gravity constant <i>g</i>, measured in m/s<sup>2</sup>? Give your answer to at least two decimal places.
     <numericalresponse answer="9.80665">
       <responseparam type="tolerance" default="0.01" />
-        <textline />
+      <formulaequationinput size="20"/>
     </numericalresponse>
   </p>
 
@@ -362,7 +368,7 @@ Sample Problem:
   <p>What is the distance in the plane between the points (pi, 0) and (0, e)? You can type math.
       <numericalresponse answer="$computed_response">
           <responseparam type="tolerance" default="0.0001" />
-          <textline math="1" />
+          <formulaequationinput />
       </numericalresponse>
   </p>
   <solution>
@@ -391,7 +397,7 @@ Exact values
   <problem>
 
     <numericalresponse answer="10">
-      <textline />
+      <formulaequationinput />
     </numericalresponse>
 
     <solution>
@@ -409,7 +415,7 @@ Answers with decimal precision
 
     <numericalresponse answer="9.80665">
       <responseparam type="tolerance" default="0.01" />
-        <textline />
+      <formulaequationinput />
     </numericalresponse>
 
     <solution>
@@ -427,25 +433,7 @@ Answers with percentage precision
 
     <numericalresponse answer="100">
       <responseparam type="tolerance" default="10%" />
-        <textline />
-    </numericalresponse>
-
-    <solution>
-    <div class="detailed-solution">
-
-    </div>
-  </solution>
-  </problem>
-
-Answers with a live math interpretation popup display
-
-.. code-block:: xml
-
-  <problem>
-
-    <numericalresponse answer="3.14159">
-      <responseparam type="tolerance" default="0.00001" />
-      <textline math="1" />
+      <formulaequationinput />
     </numericalresponse>
 
     <solution>
@@ -468,7 +456,7 @@ Answers with scripts
 
     <numericalresponse answer="$computed_response">
       <responseparam type="tolerance" default="0.0001" />
-      <textline math="1" />
+      <formulaequationinput />
     </numericalresponse>
 
     <solution>
@@ -479,7 +467,7 @@ Answers with scripts
   </problem>
 
 
-XML Attribute Information
+**XML Attribute Information**
 
 <script>
 
@@ -490,14 +478,98 @@ XML Attribute Information
 
   .. image:: ../Images/numericalresponse2.png
 
+Children may include ``<formulaequationinput/>``.
+
 <responseparam>
 
   .. image:: ../Images/numericalresponse4.png
 
-<textline>
+<formulaequationinput/>
+
+========= ============================================= =====
+Attribute                  Description                  Notes
+========= ============================================= =====
+size      (optional) defines the size (i.e. the width)
+          of the input box displayed to students for
+	  typing their math expression.
+========= ============================================= =====
+
+<textline> (see note above, we encourage <formulaequationinput>)
 
   .. image:: ../Images/numericalresponse5.png
 
+
+Math Expression Syntax
+----------------------
+
+In NumericalResponses, the student's input may be more complicated than a
+simple number. Expressions like ``sqrt(3)`` and even ``1+e^(sin(pi/2)+2*i)``
+are valid, and evaluate to 1.73 and -0.13 + 2.47i, respectively.
+
+A summary of the syntax follows:
+
+Numbers
+~~~~~~~
+
+Accepted number types:
+
+- Integers: '2520'
+- Normal floats: '3.14'
+- With no integer part: '.98'
+- Scientific notation: '1.2e-2' (=0.012)
+- More s.n.: '-4.4e+5' = '-4.4e5' (=-440,000)
+- Appending SI prefixes (??): '2.25k' (=2,250). The full list:
+
+  ====== ========== ===============
+  Prefix Stands for One of these is
+  ====== ========== ===============
+  %      percent    0.01 = 1e-2
+  k      kilo       1000 = 1e3
+  M      mega       1e6
+  G      giga       1e9
+  T      tera       1e12
+  c      centi      0.01 = 1e-2
+  m      milli      0.001 = 1e-3
+  u      micro      1e-6
+  n      nano       1e-9
+  p      pico       1e-12
+  ====== ========== ===============
+
+The largest possible number handled currently is exactly the largest float
+possible. This number is 1.7977e+308. Any expression containing larger values
+will have some problems, so it's best to avoid this situation.
+
+Default Constants
+~~~~~~~~~~~~~~~~~
+
+Simple and commonly used mathematical/scientific constants are included by
+default. These include:
+
+- ``i`` and ``j`` as ``sqrt(-1)``
+- ``e`` as Euler's number (2.718...)
+- ``pi``
+- ``k``: the Boltzmann constant (~1.38e-23 in Joules/Kelvin)
+- ``c``: the speed of light in m/s (2.998e8)
+- ``T``: the positive difference between 0K and 0°C (285.15)
+- ``q``: the fundamental charge (~1.602e-19 Coloumbs)
+
+Operators and Functions
+~~~~~~~~~~~~~~~~~~~~~~~
+
+As expected, the normal operators apply (with normal order of operations): 
+``+ - * / ^``. Also provided is a special "parallel resistors" operator given
+by ``||``. For example, an input of ``1 || 2`` would give the resistance of two
+parallel resistors (of resistance 1 and 2), evaluating to 2/3.
+
+At the time of writing, factorials written in the form '3!' are invalid, but there is a workaround, see below for a note.
+
+The default included functions are the following:
+- Trig functions: sin, cos, tan, sec, csc, cot
+- Their inverses: arcsin, arccos, arctan, arcsec, arccsc, arccot
+- Other common functions: sqrt, log10, log2, ln, exp, abs
+- Factorial: ``fact(3)`` or ``factorial(3)`` are valid. However, you must take
+  care to only input integers. For example, ``fact(1.5)`` would fail.
+- Hyperbolic trig functions and their inverses: sinh, cosh, tanh, sech, csch, coth, arcsinh, arccosh, arctanh, arcsech, arccsch, arccoth
 
 .. raw:: latex
   
@@ -522,6 +594,19 @@ an extra burden on the problem author to specify the allowed variables in the
 expression and the numerical ranges over which the variables must be sampled in
 order to test for correctness.
 
+The syntax of the problem is shared with that of the Numerical Response,
+including default variables and functions, the difference being that the grader
+may specify additional variables, as above.
+
+A further note about the variables: when the following greek letters are typed
+out, an appropriate character is substituted:
+
+  ``alpha beta gamma delta epsilon varepsilon zeta eta theta vartheta iota
+  kappa lambda mu nu xi pi rho sigma tau upsilon phi varphi chi psi omega``
+
+``epsilon`` is the lunate version, whereas ``varepsilon`` looks like a
+backward 3.
+
 Sample Problem:
 
 .. image:: ../Images/image293.png
@@ -538,7 +623,7 @@ Sample Problem:
     <p>Write an expression for the product of R_1, R_2, and the inverse of R_3.</p>
     <formularesponse type="ci" samples="R_1,R_2,R_3@1,2,3:3,4,5#10" answer="$VoVi">
       <responseparam type="tolerance" default="0.00001"/> 
-      <textline size="40" math="1" />
+      <formulaequationinput size="40" />
     </formularesponse>
 
     <p>Let <i>c</i> denote the speed of light. What is the relativistic energy <i>E</i> of an object of mass <i>m</i>?</p>
@@ -547,7 +632,7 @@ Sample Problem:
   </script>
   <formularesponse type="cs" samples="m,c@1,2:3,4#10" answer="m*c^2">
       <responseparam type="tolerance" default="0.00001"/> 
-    <text><i>E</i> =</text> <textline size="40" math="1" />    
+    <text><i>E</i> =</text> <formulaequationinput />
   </formularesponse>
 
     <p>Let <i>x</i> be a variable, and let <i>n</i> be an arbitrary constant. What is the derivative of <i>x<sup>n</sup></i>?</p>
@@ -556,7 +641,7 @@ Sample Problem:
   </script>
   <formularesponse type="ci" samples="x,n@1,2:3,4#10" answer="$derivative">
     <responseparam type="tolerance" default="0.00001"/> 
-    <textline size="40" math="1" />    
+    <formulaequationinput size="40" />
   </formularesponse>
 
     <solution>
@@ -600,11 +685,22 @@ XML Attribute Information
 
   .. image:: ../Images/formularesponse3.png
 
+Children may include ``<formulaequationinput/>``.
+
 <responseparam>
 
 
   .. image:: ../Images/formularesponse6.png
 
+<formulaequationinput/>
+
+========= ============================================= =====
+Attribute                  Description                  Notes
+========= ============================================= =====
+size      (optional) defines the size (i.e. the width)
+          of the input box displayed to students for
+	  typing their math expression.
+========= ============================================= =====
 
 .. raw:: latex
   
@@ -825,7 +921,6 @@ Sample Problem:
     <endouttext/>
   </problem> 
 
-h
 .. raw:: latex
   
       \newpage %
