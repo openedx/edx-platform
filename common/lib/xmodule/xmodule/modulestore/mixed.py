@@ -8,6 +8,9 @@ IMPORTANT: This modulestore is experimental AND INCOMPLETE. Therefore this shoul
 
 from . import ModuleStoreBase
 from django import create_modulestore_instance
+import logging
+
+log = logging.getLogger(__name__)
 
 
 class MixedModuleStore(ModuleStoreBase):
@@ -23,6 +26,9 @@ class MixedModuleStore(ModuleStoreBase):
 
         self.modulestores = {}
         self.mappings = mappings
+        if 'default' not in stores:
+            raise Exception('Missing a default modulestore in the MixedModuleStore __init__ method.')
+
         for key in stores:
             self.modulestores[key] = create_modulestore_instance(stores[key]['ENGINE'],
                                                                  stores[key]['OPTIONS'])
@@ -32,7 +38,8 @@ class MixedModuleStore(ModuleStoreBase):
         For a given course_id, look in the mapping table and see if it has been pinned
         to a particular modulestore
         """
-        return self.mappings.get(course_id, self.mappings['default'])
+        mapping = self.mappings.get(course_id, 'default')
+        return self.modulestores[mapping]
 
     def has_item(self, course_id, location):
         return self._get_modulestore_for_courseid(course_id).has_item(course_id, location)
@@ -96,7 +103,8 @@ class MixedModuleStore(ModuleStoreBase):
         '''
         courses = []
         for key in self.modulestores:
-            courses.append(self.modulestores[key].get_courses)
+            courses = courses + (self.modulestores[key].get_courses())
+
         return courses
 
     def get_course(self, course_id):
@@ -125,3 +133,12 @@ class MixedModuleStore(ModuleStoreBase):
         course_id. The return can be either "xml" (for XML based courses) or "mongo" for MongoDB backed courses
         """
         return self._get_modulestore_for_courseid(course_id).get_modulestore_type(course_id)
+
+    def get_errored_courses(self):
+        """
+        Return a dictionary of course_dir -> [(msg, exception_str)], for each
+        course_dir where course loading failed.
+        """
+        errs = {}
+        for store in self.modulestores.values():
+            errs.update(store.get_errored_courses())

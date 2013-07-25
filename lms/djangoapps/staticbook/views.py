@@ -50,7 +50,7 @@ def remap_static_url(original_url, course):
     output_url = replace_static_urls(
         input_url,
         getattr(course, 'data_dir', None),
-        course_namespace=course.location,
+        coures_id=course.location.course_id,
     )
     # strip off the quotes again...
     return output_url[1:-1]

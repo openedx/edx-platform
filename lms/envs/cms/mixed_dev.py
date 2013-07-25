@@ -9,8 +9,7 @@ MODULESTORE = {
         'ENGINE': 'xmodule.modulestore.mixed.MixedModuleStore',
         'OPTIONS': {
             'mappings': {
-                '6.002/a/a': 'xml',
-                '6.002/b/b': 'xml'
+                'MITx/2.01x/2013_Spring': 'xml'
             },
             'stores': {
                 'xml': {

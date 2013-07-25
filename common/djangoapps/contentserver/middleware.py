@@ -6,11 +6,14 @@ from xmodule.modulestore import InvalidLocationError
 from cache_toolbox.core import get_cached_content, set_cached_content
 from xmodule.exceptions import NotFoundError
 
+import logging
+
 
 class StaticContentServer(object):
     def process_request(self, request):
         # look to see if the request is prefixed with 'c4x' tag
         if request.path.startswith('/' + XASSET_LOCATION_TAG + '/'):
+            logging.debug('**** path = {0}'.format(request.path))
             try:
                 loc = StaticContent.get_location_from_path(request.path)
             except InvalidLocationError:
@@ -24,8 +27,10 @@ class StaticContentServer(object):
             if content is None:
                 # nope, not in cache, let's fetch from DB
                 try:
+                    logging.debug('!!!! loc = {0}'.format(loc))
                     content = contentstore().find(loc, as_stream=True)
                 except NotFoundError:
+                    logging.debug('**** NOT FOUND')
                     response = HttpResponse()
                     response.status_code = 404
                     return response

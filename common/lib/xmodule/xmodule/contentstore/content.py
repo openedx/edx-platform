@@ -100,6 +100,12 @@ class StaticContent(object):
         loc = StaticContent.compute_location(course_namespace.org, course_namespace.course, path)
         return StaticContent.get_url_path_from_location(loc)
 
+    @staticmethod
+    def convert_legacy_static_url_with_course_id(path, course_id):
+        org, course_num, run = course_id.split("/")
+        loc = StaticContent.compute_location(org, course_num, path)
+        return StaticContent.get_url_path_from_location(loc)
+
     def stream_data(self):
         yield self._data
 

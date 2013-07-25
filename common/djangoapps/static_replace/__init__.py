@@ -124,7 +124,7 @@ def replace_static_urls(text, data_directory, course_id=None):
             else:
                 # if not, then assume it's courseware specific content and then look in the
                 # Mongo-backed database
-                url = StaticContent.convert_legacy_static_url(rest, course_id)
+                url = StaticContent.convert_legacy_static_url_with_course_id(rest, course_id)
         # Otherwise, look the file up in staticfiles_storage, and append the data directory if needed
         else:
             course_path = "/".join((data_directory, rest))
