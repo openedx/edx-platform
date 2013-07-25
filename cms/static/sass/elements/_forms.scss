@@ -95,6 +95,171 @@ form {
 
 // ====================
 
+// forms - archetype - add a new X form
+.new-form {
+    @extend .ui-window;
+    @include box-sizing(border-box);
+    position: relative;
+    width: 100%;
+    margin-bottom: ($baseline*2);
+    border-radius: 2px;
+    background: $white;
+
+  .wrapper-form {
+    padding: $baseline ($baseline*1.5);
+  }
+
+  .title {
+    @extend .t-title4;
+    font-weight: 700;
+    margin-bottom: $baseline;
+    border-bottom: 1px solid $gray-l4;
+    padding-bottom: ($baseline/2);
+  }
+
+  fieldset {
+      margin-bottom: $baseline;
+  }
+
+  // form elements - need to make this more universal
+  .form-fields {
+    @extend .cont-no-list;
+
+    .field {
+      margin: 0 0 ($baseline*0.75) 0;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      &.required {
+
+        label {
+          font-weight: 600;
+        }
+
+        label:after {
+          margin-left: ($baseline/4);
+          content: "*";
+        }
+      }
+
+      label, input, textarea {
+        display: block;
+      }
+
+      label {
+        @extend  .t-copy-sub1;
+        @include transition(color, 0.15s, ease-in-out);
+        margin: 0 0 ($baseline/4) 0;
+
+        &.is-focused {
+          color: $blue;
+        }
+      }
+
+      //this section is borrowed from _account.scss - we should clean up and unify later
+      input, textarea {
+        @extend .t-copy-base;
+        height: 100%;
+        width: 100%;
+        padding: ($baseline/2);
+
+        &.long {
+          width: 100%;
+        }
+
+        &.short {
+          width: 25%;
+        }
+
+        ::-webkit-input-placeholder {
+           color: $gray-l4;
+        }
+
+        :-moz-placeholder {
+           color: $gray-l3;
+        }
+
+        ::-moz-placeholder {
+           color: $gray-l3;
+        }
+
+        :-ms-input-placeholder {
+           color: $gray-l3;
+        }
+
+        &:focus {
+          + .tip {
+            color: $gray;
+          }
+        }
+      }
+
+      textarea.long {
+        height: ($baseline*5);
+      }
+
+      input[type="checkbox"] {
+        display: inline-block;
+        margin-right: ($baseline/4);
+        width: auto;
+        height: auto;
+
+        & + label {
+          display: inline-block;
+        }
+      }
+
+      .tip {
+        @extend .t-copy-sub2;
+        @include transition(color, 0.15s, ease-in-out);
+        display: block;
+        margin-top: ($baseline/4);
+        color: $gray-l3;
+      }
+
+      &.error {
+
+        label {
+          color: $red;
+        }
+
+        input {
+          border-color: $red;
+        }
+      }
+    }
+  }
+
+  .actions {
+    border-top: 1px solid $gray-l1;
+    padding: ($baseline*0.75) $baseline;
+    box-shadow: inset 0 1px 2px $shadow;
+    background: $gray-l6;
+
+    .action-primary {
+      @include blue-button;
+      @extend .t-action2;
+      @include transition(all $tmg-f2 linear 0);
+      display: inline-block;
+      padding: ($baseline/5) $baseline;
+      font-weight: 600;
+    }
+
+    .action-secondary {
+      @include grey-button;
+      @extend .t-action2;
+      @include transition(all $tmg-f2 linear 0);
+      display: inline-block;
+      padding: ($baseline/5) $baseline;
+      font-weight: 600;
+    }
+  }
+}
+
+// ====================
+
 // forms - grandfathered
 input.search {
   padding: 6px 15px 8px 30px;

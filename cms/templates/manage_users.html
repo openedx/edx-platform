@@ -3,7 +3,7 @@
 <%! from auth.authz import is_user_in_course_group_role %>
 <%inherit file="base.html" />
 <%block name="title">${_("Course Team Settings")}</%block>
-<%block name="bodyclass">is-signedin course users settings team</%block>
+<%block name="bodyclass">is-signedin course users team</%block>
 
 
 <%block name="content">
@@ -27,54 +27,122 @@
   </header>
 </div>
 
-<div class="main-wrapper">
-  <div class="inner-wrapper">
-
-    <div class="details">
-      <p>${_("The following list of users have been designated as course staff. This means that these users will have permissions to modify course content. You may add additional course staff below, if you are the course instructor. Please note that they must have already registered and verified their account.")}</p>
+<div class="wrapper-content wrapper">
+  <section class="content">
+    <div class="introduction">
+      <h2 class="title sr">Managing Your Course Team</h2>
+      <div class="copy">
+        <p>${_("[Introduction Message - Mark to Provide Copy.] Maecenas faucibus mollis interdum. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla vitae elit libero, a pharetra augue.")}</p>
+      </div>
     </div>
 
-    <article class="user-overview">
+    <article class="content-primary" role="main">
       %if allow_actions:
-      <form class="new-user-form">
-        <div id="result"></div>
-        <div class="form-elements">
-          <label>${_("email: ")}</label><input type="text" id="email" class="email-input" autocomplete="off" placeholder="email@example.com">
-          <input type="submit" value="${_("Add User")}" id="add_user" class="add-button" />
-          <input type="button" value="${_("Cancel")}" class="cancel-button" />
+      <form class="new-form add-user" id="add-user-form" name="add-user-form">
+        <div class="wrapper-form">
+          <h3 class="title">${_("Add a User to Your Course's Team")}</h3>
+
+          <div id="add-user-error" class="message message-status message-status error" name="add-user-error">
+
+          </div>
+
+          <fieldset class="form-fields">
+            <legend class="sr">${_("Textbook information")}</legend>
+              <div class="field text required add-user-email">
+                <label for="user-email-input">${_("User's Email Address")}</label>
+                <input id="user-email-input" name="user-email" type="text" placeholder="${_('e.g. jane.doe@gmail.com')}" value="">
+                <span class="tip tip-stacked">${_("Please provide the email address of the course staff member you'd like to add")}</span>
+              </div>
+          </fieldset>
+        </div>
+        <div class="actions">
+          <button class="action action-primary" type="submit">${_("Add User")}</button>
+          <button class="action action-secondary action-cancel">${_("Cancel")}</button>
         </div>
       </form>
       %endif
-      <div>
-        <ol class="user-list">
-          % for user in staff:
-          <li data-url="${reverse('course_team_user', kwargs=dict(
-              org=context_course.location.org,
-              course=context_course.location.course,
-              name=context_course.location.name,
-              email=user.email,
-            ))}">
-            <span class="user-name">${user.username}</span>
-            <span class="user-email">${user.email}</span>
-            % if allow_actions:
-            <div class="item-actions">
-              <% is_instuctor = is_user_in_course_group_role(user, context_course.location, 'instructor', check_staff=False) %>
+
+      <ol class="user-list">
+        % for user in staff:
+        <li class="user-item" data-url="${reverse('course_team_user', kwargs=dict(
+            org=context_course.location.org,
+            course=context_course.location.course,
+            name=context_course.location.name,
+            email=user.email,
+          ))}">
+
+        <% is_instuctor = is_user_in_course_group_role(user, context_course.location, 'instructor', check_staff=False) %>
+          % if is_instuctor and len(instructors) == 1:
+          <span class="wrapper-ui-badge">
+            <span class="flag flag-role flag-role-admin is-hanging">
+              <span class="label sr">${_("Current Role:")}</span>
+              <span class="value">
+                ${_("Admin")}
+                % if request.user.id == user.id:
+                    <span class="msg-you">${_("You!")}</span>
+                % endif
+              </span>
+            </span>
+          </span>
+          % else:
+          <span class="wrapper-ui-badge">
+            <span class="flag flag-role flag-role-staff is-hanging">
+              <span class="label sr">${_("Current Role:")}</span>
+              <span class="value">
+                ${_("Staff")}
+                % if request.user.id == user.id:
+                    <span class="msg-you">${_("You!")}</span>
+                % endif
+              </span>
+            </span>
+          </span>
+          % endif
+
+          <div class="item-metadata">
+            <h3 class="user-name">
+              <span class="user-username">${user.username}</span>
+              <span class="user-email">
+                <a class="action action-email" href="mailto:${user.email}" title="send an email message to ${user.email}">${user.email}</a>
+              </span>
+            </h3>
+          </div>
+
+          % if allow_actions:
+          <ul  class="item-actions user-actions">
+            <li class="action action-role">
               % if is_instuctor and len(instructors) == 1:
-                <span class="admin-role">Admin</span>
+                <span class="admin-role sr">${_("Admin (Since you are the only team member, you cannot remove your admin status.)")}</span>
               % else:
-                <a href="#" class="admin-role toggle-admin-role ${'remove' if is_instuctor else 'add'}-admin-role">${_("Remove Admin") if is_instuctor else _("Add Admin")}</a>
+                <a href="#" class="admin-role toggle-admin-role ${'remove' if is_instuctor else 'add'}-admin-role">${_("Remove Admin Access") if is_instuctor else _("Add Admin Access")}</a>
               % endif
-              % if request.user.id != user.id: ## can't remove yourself
-              <a href="#" class="delete-button remove-user" data-id="${user.email}"><span class="delete-icon"></span></a>
-              % endif
-            </div>
+            </li>
+            % if request.user.id != user.id: ## can't remove yourself
+            <li class="action action-delete">
+                <a href="#" class="delete remove-user action-icon" data-id="${user.email}"><i class="icon-trash"></i><span class="sr">${_("Delete the user,")} ${user.username}</span></a>
+            </li>
             % endif
-          </li>
-          % endfor
-        </ol>
-      </div>
+          </ul>
+          % endif
+
+        </li>
+        % endfor
+      </ol>
     </article>
-  </div>
+
+    <aside class="content-supplementary" role="complimentary">
+      <div class="bit">
+        <h3 class="title-3">${_("About Roles within Your Course Team")}</h3>
+        <p>${_("[Mark to provide copy] Maecenas faucibus mollis interdum. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla vitae elit libero, a pharetra augue.")}</p>
+      </div>
+
+      % if is_instuctor and len(instructors) == 1:
+      <div class="bit">
+        <h3 class="title-3">${_("Tranferring Ownership")}</h3>
+        <p>${_("[Mark to provide copy] Maecenas faucibus mollis interdum. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.")}</p>
+      </div>
+      % endif
+    </aside>
+  </section>
 </div>
 </%block>
 
@@ -88,10 +156,10 @@
     ))}"
 
   $(document).ready(function() {
-    var $newUserForm = $('.new-user-form');
+    var $newUserForm = $('#add-user-form');
     $newUserForm.bind('submit', function(e) {
       e.preventDefault();
-      var url = tplUserURL.replace("@@EMAIL@@", $('#email').val().trim())
+      var url = tplUserURL.replace("@@EMAIL@@", $('#user-email-input').val().trim())
       $.ajax({
         url: url,
         type: 'POST',
@@ -106,23 +174,25 @@
         notifyOnError: false,
         error: function(jqXHR, textStatus, errorThrown) {
           data = JSON.parse(jqXHR.responseText);
-          $('#result').show().empty().append(data.error);
+          $('#add-user-error').toggleClass('is-shown').empty().append(data.error);
         }
       });
     });
 
-    var $cancelButton = $newUserForm.find('.cancel-button');
+    var $cancelButton = $newUserForm.find('.action-cancel');
     $cancelButton.bind('click', function(e) {
       e.preventDefault();
-      $newUserForm.slideUp(150);
-      $('#result').hide();
-      $('#email').val('');
+      $('.new-user-button').removeClass('is-disabled');
+      $newUserForm.toggleClass('is-shown');
+      $('#add-user-error').removeClass('is-shown');
+      $('#user-email-input').val('');
     });
 
     $('.new-user-button').bind('click', function(e) {
       e.preventDefault();
-      $newUserForm.slideDown(150);
-      $newUserForm.find('.email-input').focus();
+      $(this).addClass('is-disabled');
+      $newUserForm.toggleClass('is-shown');
+      $newUserForm.find('#user-email-input').focus();
     });
 
     $('body').bind('keyup', function(e) {

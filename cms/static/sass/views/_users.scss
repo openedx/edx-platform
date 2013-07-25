@@ -3,20 +3,56 @@
 
 body.course.users {
 
+  // page layout
+  .content-primary, .content-supplementary {
+    @include box-sizing(border-box);
+    float: left;
+  }
+
+  .content-primary {
+    width: flex-grid(9, 12);
+    margin-right: flex-gutter();
+  }
+
+  .content-supplementary {
+    width: flex-grid(3, 12);
+  }
+
+  // content
+  .content {
+
+    .introduction {
+      @extend .t-copy-sub1;
+      margin: 0 0 ($baseline*2) 0;
+    }
+  }
+
+
+  // new user form
+  .add-user {
+    @extend .new-form;
+    display: none;
+
+    &.is-shown {
+      display: block;
+    }
+  }
+
+  // new user form (old)
   .new-user-form {
     display: none;
-    padding: 15px 20px;
+    padding: ($baseline*0.75) $baseline;
     background-color: $lightBluishGrey2;
 
     #result {
       display: none;
       float: left;
-      margin-bottom: 15px;
-      padding: 3px 15px;
+      margin-bottom: ($baseline*0.75);
+      padding: 3px ($baseline*0.75);
       border-radius: 3px;
-      background: $error-red;
+      background: $red;
       font-size: 14px;
-      color: #fff;
+      color: $white;
     }
 
     .form-elements {
@@ -25,57 +61,164 @@ body.course.users {
 
     label {
       display: inline-block;
-      margin-right: 10px;
+      margin-right: ($baseline/2);
     }
 
     .email-input {
       width: 350px;
       padding: 8px 8px 10px;
-      border-color: $darkGrey;
+      border-color: $gray-d1;
     }
 
     .add-button {
       @include blue-button;
-      padding: 5px 20px 9px;
+      padding: ($baseline/4) $baseline 9px;
     }
 
     .cancel-button {
       @include white-button;
-      padding: 5px 20px 9px;
+      padding: ($baseline/4) $baseline 9px;
     }
   }
 
-  .user-list {
-    border: 1px solid $mediumGrey;
-    background: #fff;
+  // listing of users
+  .user-list, .user-item, .item-metadata, .item-actions {
+    @include box-sizing(border-box);
+  }
 
-    li {
+  .user-list {
+
+    .user-item {
+      @extend .ui-window;
+      @include clearfix();
       position: relative;
-      padding: 20px;
-      border-bottom: 1px solid $mediumGrey;
+      width: flex-grid(9, 9);
+      margin: 0 0 ($baseline/2) 0;
+      padding: $baseline ($baseline*1.5) $baseline ($baseline*1.5);
 
       &:last-child {
-        border-bottom: none;
+        margin-bottom: 0;
       }
 
-      span {
+      .item-metadata, .item-actions {
         display: inline-block;
+        vertical-align: middle;
       }
 
-      .user-name {
-        margin-right: 10px;
-        font-size: 24px;
-        font-weight: 300;
+      // item - flag
+      .flag-role {
+        @extend .ui-badge;
+        color: $white;
+
+        .msg-you {
+          margin-left: ($baseline/5);
+          opacity: 0.65;
+          text-transform: none;
+          font-weight: 500;
+        }
+
+        &:after {
+          border-bottom-color: $black-t1;
+        }
+
+        &.flag-role-staff {
+          background: $gray-l2;
+        }
+
+        &.flag-role-admin {
+          background: $gray-d1;
+        }
       }
 
-      .user-email {
-        font-size: 14px;
-        font-style: italic;
-        color: $mediumGrey;
+      // item - metadata
+      .item-metadata {
+        width: flex-grid(5, 9);
+        margin-right: flex-gutter();
+
+        .user-username, .user-email {
+          display: inline-block;
+          vertical-align: middle;
+        }
+
+        .user-username {
+          @extend .t-title4;
+          @include transition(color $tmg-f2 ease-in-out 0s);
+          margin: 0 ($baseline/2) ($baseline/10) 0;
+          color: $gray-d4;
+          font-weight: 600;
+        }
+
+        .user-email {
+          @extend .t-title6;
+        }
       }
 
+      // item - actions
       .item-actions {
-        top: 24px;
+        width: flex-grid(4, 9);
+        position: static; // nasty reset needed due to base.scss
+        text-align: right;
+
+        .action {
+          display: inline-block;
+          vertical-align: middle;
+        }
+
+        .action-role {
+          margin-right: ($baseline/2);
+        }
+
+        .action-delete {
+
+        }
+
+        .delete {
+          @extend .ui-btn-non;
+        }
+
+        // nasty reset needed due to base.scss
+        .delete-button {
+          margin-right: 0;
+          float: none;
+          color: inherit;
+        }
+
+        // admin role controls
+        .toggle-admin-role {
+
+          &.add-admin-role {
+            @include blue-button;
+            @extend .t-action2;
+            @include transition(all .15s);
+            display: inline-block;
+            padding: ($baseline/5) $baseline;
+            font-weight: 600;
+          }
+
+          &.remove-admin-role {
+            @include grey-button;
+            @extend .t-action2;
+            @include transition(all .15s);
+            display: inline-block;
+            padding: ($baseline/5) $baseline;
+            font-weight: 600;
+          }
+        }
+      }
+
+      // STATE: hover
+      &:hover {
+
+        .user-username {
+        }
+
+        .user-email {
+
+        }
+
+        .item-actions {
+
+        }
       }
     }
   }

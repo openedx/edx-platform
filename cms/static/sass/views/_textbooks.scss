@@ -30,7 +30,7 @@ body.course.textbooks {
     }
 
     .textbook {
-      @extend .window;
+      @extend .ui-window;
       position: relative;
 
       .view-textbook {
