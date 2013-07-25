@@ -702,8 +702,14 @@ section.open-ended-child {
 
       }
   }
+
   div.prompt{
-    padding: 10px;
     background-color:white;
+    border-bottom: 1px solid;
+    border-color: lightgray;
+  }
+
+  h4{
+    margin-top: 10px;
   }
 }
