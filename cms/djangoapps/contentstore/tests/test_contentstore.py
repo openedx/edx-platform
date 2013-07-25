@@ -967,23 +967,25 @@ class ContentStoreTest(ModuleStoreTestCase):
         """Test new course creation - happy path"""
         self.assert_created_course()
 
-    def assert_created_course(self):
+    def assert_created_course(self, number_suffix=None):
         """
         Checks that the course was created properly.
         """
-        resp = self.client.post(reverse('create_new_course'), self.course_data)
+        test_course_data = {}
+        test_course_data.update(self.course_data)
+        if number_suffix:
+            test_course_data['number'] = '{0}_{1}'.format(test_course_data['number'], number_suffix)
+        resp = self.client.post(reverse('create_new_course'), test_course_data)
         self.assertEqual(resp.status_code, 200)
         data = parse_json(resp)
-        self.assertEqual(data['id'], 'i4x://MITx/999/course/2013_Spring')
+        self.assertNotIn('ErrMsg', data)
+        self.assertEqual(data['id'], 'i4x://MITx/{0}/course/2013_Spring'.format(test_course_data['number']))
+        return test_course_data
 
     def test_create_course_check_forum_seeding(self):
         """Test new course creation and verify forum seeding """
-        self.assert_created_course()
-        resp = self.client.post(reverse('create_new_course'), self.course_data)
-        self.assertEqual(resp.status_code, 200)
-        data = parse_json(resp)
-        self.assertEqual(data['id'], 'i4x://MITx/999/course/2013_Spring')
-        self.assertTrue(are_permissions_roles_seeded('MITx/999/Robot_Super_Course'))
+        test_course_data = self.assert_created_course(number_suffix=uuid4().hex)
+        self.assertTrue(are_permissions_roles_seeded('MITx/{0}/Robot_Super_Course'.format(test_course_data['number'])))
 
     def test_create_course_duplicate_course(self):
         """Test new course creation - error path"""

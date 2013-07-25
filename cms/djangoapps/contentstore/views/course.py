@@ -3,6 +3,7 @@ Views related to operations on course objects
 """
 import json
 import random
+import logging
 import string  # pylint: disable=W0402
 
 from django.contrib.auth.decorators import login_required

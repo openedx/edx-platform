@@ -610,31 +610,23 @@ function addNewCourse(e) {
     }, checkForCancel);
 }
 
+function setNewCourseFieldInErr(el, msg)
+{
+    el.children('.tip-error').remove();
+    if (msg !== null && msg !== '') {
+        el.addClass('error');
+        el.append('<span class="tip tip-error">' + msg + '</span>');
+    } else {
+        el.removeClass('error');
+    }
+}
+
 function setNewCourseFieldsInErr(display_name_errMsg, org_errMsg, number_errMsg, run_errMsg)
 {
-    if (display_name_errMsg !== null && display_name_errMsg !== '') {
-        $('#field-course-name').addClass('error');
-    } else {
-        $('#field-course-name').removeClass('error');
-    }
-
-    if (org_errMsg !== null && org_errMsg !== '') {
-        $('#field-organization').addClass('error');
-    } else {
-        $('#field-organization').removeClass('error');
-    }
-
-    if (number_errMsg !== null && number_errMsg !== '') {
-        $('#field-course-number').addClass('error');
-    } else {
-        $('#field-course-number').removeClass('error');
-    }
-
-    if (run_errMsg !== null && run_errMsg !== '') {
-        $('#field-course-run').addClass('error');
-    } else {
-        $('#field-course-run').removeClass('error');
-    }
+    setNewCourseFieldInErr($('#field-course-name'), display_name_errMsg);
+    setNewCourseFieldInErr($('#field-organization'), org_errMsg);
+    setNewCourseFieldInErr($('#field-course-number'), number_errMsg);
+    setNewCourseFieldInErr($('#field-course-run'), run_errMsg);
 }
 
 function saveNewCourse(e) {
@@ -659,11 +651,10 @@ function saveNewCourse(e) {
 
     if (header_err_msg) {
         $('.wrap-error').addClass('is-shown');
-
-        if (header_err_msg)
-            $('#course_creation_error').html('<p>' + header_err_msg + '</p>');
-        else
-            $('#course_creation_error').html('');
+        $('#course_creation_error').html('<p>' + header_err_msg + '</p>');
+    } else {
+        $('.wrap-error').removeClass('is-shown');
+        $('#course_creation_error').html('');
     }
 
     setNewCourseFieldsInErr(display_name_errMsg, org_errMsg, number_errMsg, run_errMsg);
@@ -684,14 +675,14 @@ function saveNewCourse(e) {
         'display_name': display_name,
         'run': run
     },
-
     function(data) {
-        if (data.id !== undefined) {
-            window.location = '/' + data.id.replace(/.*:\/\//, '');
-        } else if (data.ErrMsg !== undefined) {
-            alert(data.ErrMsg);
+            if (data.id !== undefined) {
+                window.location = '/' + data.id.replace(/.*:\/\//, '');
+            } else if (data.ErrMsg !== undefined) {
+                alert(data.ErrMsg);
+            }
         }
-    });
+    );
 }
 
 function cancelNewCourse(e) {
