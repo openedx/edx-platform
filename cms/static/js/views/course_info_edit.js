@@ -232,16 +232,11 @@ CMS.Views.ClassInfoHandoutsView = Backbone.View.extend({
     },
 
     initialize: function() {
+        this.template = _.template($("#course_info_handouts-tpl").text());
         var self = this;
         this.model.fetch({
             complete: function() {
-                window.templateLoader.loadRemoteTemplate("course_info_handouts",
-                    "/static/client_templates/course_info_handouts.html",
-                    function (raw_template) {
-                        self.template = _.template(raw_template);
-                        self.render();
-                    }
-                );
+                self.render();
             },
             reset: true
         });
