@@ -257,7 +257,7 @@
       } else {
         role = 'staff';
       }
-      var url = $(this).closest("li").data("url");
+      var url = $(this).closest("li[data-url]").data("url");
       $.ajax({
         url: url,
         type: 'POST',
