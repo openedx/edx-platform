@@ -140,8 +140,6 @@ class @CombinedOpenEnded
     @accept_file_upload = @coe.data('accept-file-upload')
     @location = @coe.data('location')
 
-    console.log(@child_state)
-
     # set up handlers for click tracking
     Rubric.initialize(@location,@coe)
     @is_ctrl = false
@@ -174,8 +172,6 @@ class @CombinedOpenEnded
     console.log(@results_container)
     @combined_rubric_container = @$(@combined_rubric_sel)
 
-    @legend_container= @$(@legend_sel)
-    @show_legend_current()
 
     # Where to put the rubric once we load it
     console.log("started child")
@@ -204,6 +200,10 @@ class @CombinedOpenEnded
       @prompt_hide()
     else if @task_number==1 and @child_state!='initial'
       @prompt_hide()
+
+    if @child_state!="initial"
+      @show_legend_current()
+    @legend_container= @$(@legend_sel)
 
     @find_assessment_elements()
     @find_hint_elements()
@@ -339,6 +339,7 @@ class @CombinedOpenEnded
         if @task_number==1 and @task_count==1
           @grader_status = @$(@grader_status_sel)
           @grader_status.html("<p>Response submitted for scoring.</p>")
+      @legend_container.hide()
     else if @child_state == 'post_assessment'
       if @child_type=="openended"
         @skip_button.show()

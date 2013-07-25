@@ -36,28 +36,40 @@ div.name{
 }
 
 section.combined-open-ended {
-  @include clearfix;
+      @include clearfix;
+}
+
+div.problemwrapper {
+  border: 1px solid;
+  border-color: lightgray;
+    -webkit-border-radius: 20px;
+    -moz-border-radius: 20px;
+    border-radius: 20px;
+   padding: 5px;
   .status-bar
   {
     float: right;
     display: inline-block;
+    padding: 5px;
 
     .problemtype{
         display: inline;
-        margin-right: 140px;
+        margin-right: 135px;
     }
 
     .status-container
     {
       padding-bottom: 5px;
       display: inline-block;
-      padding-right: 20px
     }
+    border-bottom: 1px solid;
+    border-color: lightgray;
   }
   .item-container
   {
       padding-bottom: 10px;
       display: inline-block;
+      padding: 15px;
   }
 
   .result-container
@@ -65,10 +77,6 @@ section.combined-open-ended {
       float:left;
       width: 100%;
       position:relative;
-  }
-  h4
-  {
-      margin-bottom:10px;
   }
 }
 
@@ -693,5 +701,9 @@ section.open-ended-child {
           }
 
       }
+  }
+  div.prompt{
+    padding: 10px;
+    background-color:white;
   }
 }

@@ -5,34 +5,36 @@
             Progress: ${human_state}
         </div>
     </div>
-    <div class="status-bar">
-        <div class="problemtype">
-            Open Response Assessment
-        </div>
-        Assessments: <div class="status-container">
-            ${status|n}
-        </div>
-    </div>
-
-    <div class="item-container">
-        <h4>Prompt <a href="#" class="question-header">(Hide)</a> </h4>
-        <div class="problem-container">
-        % for item in items:
-            <div class="item">${item['content'] | n}</div>
-        % endfor
+    <div class="problemwrapper">
+        <div class="status-bar">
+            <div class="problemtype">
+                Open Response Assessment
+            </div>
+            Assessments: <div class="status-container">
+                ${status|n}
+            </div>
         </div>
 
-        <input type="button" value="Reset" class="reset-button" name="reset"/>
-        <input type="button" value="Next Step" class="next-step-button" name="reset"/>
-    </div>
+        <div class="item-container">
+            <h4>Prompt <a href="#" class="question-header">(Hide)</a> </h4>
+            <div class="problem-container">
+            % for item in items:
+                <div class="item">${item['content'] | n}</div>
+            % endfor
+            </div>
 
-    <div class="combined-rubric-container">
-    </div>
+            <input type="button" value="Reset" class="reset-button" name="reset"/>
+            <input type="button" value="Next Step" class="next-step-button" name="reset"/>
+        </div>
 
-    <section class="legend-container">
-    </section>
+        <div class="combined-rubric-container">
+        </div>
 
-    <div class="result-container">
+        <section class="legend-container">
+        </section>
+
+        <div class="result-container">
+        </div>
     </div>
 </section>
 
