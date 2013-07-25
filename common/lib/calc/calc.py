@@ -11,15 +11,15 @@ import numpy
 import scipy.constants
 import calcfunctions
 
-# Have numpy ignore errors on functions outside its domain
+# Have numpy ignore errors on functions outside its domain.
 # See http://docs.scipy.org/doc/numpy/reference/generated/numpy.seterr.html
+# TODO worry about thread safety/changing a global setting
 numpy.seterr(all='ignore')  # Also: 'ignore', 'warn' (default), 'raise'
 
-from pyparsing import (Word, nums, Literal,
-                       ZeroOrMore, MatchFirst,
-                       Optional, Forward,
-                       CaselessLiteral, Group, ParseResults,
-                       stringEnd, Suppress, Combine, alphas, alphanums)
+from pyparsing import (
+    Word, Literal, CaselessLiteral, ZeroOrMore, MatchFirst, Optional, Forward,
+    Group, ParseResults, stringEnd, Suppress, Combine, alphas, nums, alphanums
+)
 
 DEFAULT_FUNCTIONS = {
     'sin': numpy.sin,
@@ -67,11 +67,11 @@ DEFAULT_VARIABLES = {
 }
 
 # We eliminated the following extreme suffixes:
-# P (1e15), E (1e18), Z (1e21), Y (1e24),
-# f (1e-15), a (1e-18), z (1e-21), y (1e-24)
-# since they're rarely used, and potentially
-# confusing. They may also conflict with variables if we ever allow e.g.
-# 5R instead of 5*R
+#   P (1e15), E (1e18), Z (1e21), Y (1e24),
+#   f (1e-15), a (1e-18), z (1e-21), y (1e-24)
+# since they're rarely used, and potentially confusing.
+# They may also conflict with variables if we ever allow e.g.
+#   5R instead of 5*R
 SUFFIXES = {
     '%': 0.01, 'k': 1e3, 'M': 1e6, 'G': 1e9, 'T': 1e12,
     'c': 1e-2, 'm': 1e-3, 'u': 1e-6, 'n': 1e-9, 'p': 1e-12
@@ -80,14 +80,14 @@ SUFFIXES = {
 
 class UndefinedVariable(Exception):
     """
-    Indicate the student input of a variable which was unused by the instructor
+    Indicate when a student inputs a variable which was not expected.
     """
     pass
 
 
 def lower_dict(input_dict):
     """
-    Convert all keys in a dictionary to lowercase; keep their original values
+    Convert all keys in a dictionary to lowercase; keep their original values.
 
     Keep in mind that it is possible (but not useful?) to define different
     variables that have the same lowercase representation. It would be hard to
@@ -102,7 +102,7 @@ def lower_dict(input_dict):
 
 def super_float(text):
     """
-    Like float, but with si extensions. 1k goes to 1000
+    Like float, but with SI extensions. 1k goes to 1000.
     """
     if text[-1] in SUFFIXES:
         return float(text[:-1]) * SUFFIXES[text[-1]]
@@ -112,10 +112,10 @@ def super_float(text):
 
 def eval_number(parse_result):
     """
-    Create a float out of its string parts
+    Create a float out of its string parts.
 
-    e.g. [ '7', '.', '13' ] ->  7.13
-    Calls super_float above
+    e.g. [ '7.13', 'e', '3' ] ->  7130
+    Calls super_float above.
     """
     return super_float("".join(parse_result))
 
@@ -132,28 +132,30 @@ def eval_atom(parse_result):
 
 def eval_power(parse_result):
     """
-    Take a list of numbers and exponentiate them, right to left
+    Take a list of numbers and exponentiate them, right to left.
 
-    e.g. [ 3, 2, 3 ] (which is 3^2^3 = 3^(2^3)) -> 6561
+    e.g. [ 2, 3, 2 ] -> 2^3^2 = 2^(3^2) -> 512
+    (not to be interpreted (2^3)^2 = 64)
     """
+    # `reduce` will go from left to right; reverse the list.
     parse_result = reversed(
         [k for k in parse_result
-         if isinstance(k, numbers.Number)]
+         if isinstance(k, numbers.Number)]  # Ignore the '^' marks.
     )
-    # The result of an exponentiation is called a power
+    # Having reversed it, raise `b` to the power of `a`.
     power = reduce(lambda a, b: b ** a, parse_result)
     return power
 
 
 def eval_parallel(parse_result):
     """
-    Compute numbers according to the parallel resistors operator
+    Compute numbers according to the parallel resistors operator.
 
     BTW it is commutative. Its formula is given by
       out = 1 / (1/in1 + 1/in2 + ...)
     e.g. [ 1, 2 ] -> 2/3
 
-    Return NaN if there is a zero among the inputs
+    Return NaN if there is a zero among the inputs.
     """
     if len(parse_result) == 1:
         return parse_result[0]
@@ -166,11 +168,11 @@ def eval_parallel(parse_result):
 
 def eval_sum(parse_result):
     """
-    Add the inputs
+    Add the inputs, keeping in mind their sign.
 
     [ 1, '+', 2, '-', 3 ] -> 0
 
-    Allow a leading + or -
+    Allow a leading + or -.
     """
     total = 0.0
     current_op = operator.add
@@ -186,7 +188,7 @@ def eval_sum(parse_result):
 
 def eval_product(parse_result):
     """
-    Multiply the inputs
+    Multiply the inputs.
 
     [ 1, '*', 2, '/', 3 ] -> 0.66
     """
@@ -220,27 +222,27 @@ def add_defaults(variables, functions, case_sensitive):
 
 def evaluator(variables, functions, math_expr, case_sensitive=False):
     """
-    Evaluate an expression; that is, take a string of math and return a float
+    Evaluate an expression; that is, take a string of math and return a float.
 
     -Variables are passed as a dictionary from string to value. They must be
-     python numbers
+     python numbers.
     -Unary functions are passed as a dictionary from string to function.
     """
-    # No need to go further
+    # No need to go further.
     if math_expr.strip() == "":
         return float('nan')
 
-    # Parse tree
+    # Parse the tree.
     thing = ParseAugmenter(math_expr, case_sensitive)
     thing.parse_algebra()
 
-    # Get our variables together
+    # Get our variables together.
     all_variables, all_functions = add_defaults(variables, functions, case_sensitive)
 
     # ...and check them
     thing.check_variables(all_variables, all_functions)
 
-    # Create a recursion to evaluate the tree
+    # Create a recursion to evaluate the tree.
     if case_sensitive:
         casify = lambda x: x
     else:
@@ -262,17 +264,17 @@ def evaluator(variables, functions, math_expr, case_sensitive=False):
 
 class ParseAugmenter(object):
     """
-    Holds the data for a particular parse
+    Holds the data for a particular parse.
 
-    Holds the `math_expr` and `case_sensitive` so they needn't be passed around
-    method to method.
+    Retains the `math_expr` and `case_sensitive` so they needn't be passed
+    around method to method.
     Eventually holds the parse tree and sets of variables as well.
     """
     def __init__(self, math_expr, case_sensitive=False):
         """
         Create the ParseAugmenter for a given math expression string.
 
-        Have the parsing done later, when called like OBJ.parse_algebra()
+        Do the parsing later, when called like `OBJ.parse_algebra()`.
         """
         self.case_sensitive = case_sensitive
         self.math_expr = math_expr
@@ -282,11 +284,11 @@ class ParseAugmenter(object):
 
     def make_variable_parse_action(self):
         """
-        Create a wrapper to store variables as they are parsed
+        Create a wrapper to store variables as they are parsed.
         """
         def vpa(tokens):
             """
-            When a variable is recognized, store its correct form in `variables_used`
+            When a variable is recognized, store its correct form in `variables_used`.
             """
             if self.case_sensitive:
                 varname = tokens[0][0]
@@ -297,11 +299,11 @@ class ParseAugmenter(object):
 
     def make_function_parse_action(self):
         """
-        Create a wrapper to store functions as they are parsed
+        Create a wrapper to store functions as they are parsed.
         """
         def fpa(tokens):
             """
-            When a function is recognized, store its correct form in `variables_used`
+            When a function is recognized, store its correct form in `variables_used`.
             """
             if self.case_sensitive:
                 varname = tokens[0][0]
@@ -314,7 +316,7 @@ class ParseAugmenter(object):
         """
         Parse an algebraic expression into a tree.
 
-        Store a `pyparsing.ParseResult` in self.tree with proper groupings to
+        Store a `pyparsing.ParseResult` in `self.tree` with proper groupings to
         reflect parenthesis and order of operations. Leave all operators in the
         tree and do not parse any strings of numbers into their float versions.
 
@@ -325,10 +327,10 @@ class ParseAugmenter(object):
         # 0.33 or 7 or .34 or 16.
         number_part = Word(nums)
         inner_number = (number_part + Optional("." + Optional(number_part))) | ("." + number_part)
-        # pyparsing allows spaces between tokens--`Combine` prevents that
+        # pyparsing allows spaces between tokens--`Combine` prevents that.
         inner_number = Combine(inner_number)
 
-        # SI suffixes and percent
+        # SI suffixes and percent.
         number_suffix = MatchFirst(Literal(k) for k in SUFFIXES.keys())
 
         # 0.33k or 17
@@ -340,11 +342,11 @@ class ParseAugmenter(object):
         )
         number = number("number")
 
-        # Predefine recursive variables
+        # Predefine recursive variables.
         expr = Forward()
 
         # Handle variables passed in. They must start with letters/underscores
-        # and may contain numbers afterward
+        # and may contain numbers afterward.
         inner_varname = Word(alphas + "_", alphanums + "_")
         varname = Group(inner_varname)("variable")
         varname.setParseAction(self.make_variable_parse_action())
@@ -356,7 +358,7 @@ class ParseAugmenter(object):
         atom = number | function | varname | "(" + expr + ")"
         atom = Group(atom)("atom")
 
-        # Do the following in the correct order to preserve order of operation
+        # Do the following in the correct order to preserve order of operation.
         pow_term = atom + ZeroOrMore("^" + atom)
         pow_term = Group(pow_term)("power")
 
@@ -369,7 +371,7 @@ class ParseAugmenter(object):
         sum_term = Optional(plus_minus) + prod_term + ZeroOrMore(plus_minus + prod_term)  # -5 + 4 - 3
         sum_term = Group(sum_term)("sum")
 
-        # Finish the recursion
+        # Finish the recursion.
         expr << sum_term  # pylint: disable=W0104
         self.tree = (expr + stringEnd).parseString(self.math_expr)[0]
 
@@ -379,12 +381,12 @@ class ParseAugmenter(object):
 
         `handle_actions` is a dictionary of node names (e.g. 'product', 'sum',
         etc&) to functions. These functions are of the following form:
-          -input: a list of processed child nodes. If it includes any terminal
-           nodes in the list, they will be given as their processed forms also.
-          -output: whatever to be passed to the level higher, and what to
-           return for the final node.
+         -input: a list of processed child nodes. If it includes any terminal
+          nodes in the list, they will be given as their processed forms also.
+         -output: whatever to be passed to the level higher, and what to
+          return for the final node.
         `handle_terminal` is a function that takes in a token and returns a
-        processed form. Leaving it as `None` just keeps it as the identity.
+        processed form. Leaving it as `None` just leaves them as strings.
         """
         def handle_node(node):
             """
@@ -394,6 +396,7 @@ class ParseAugmenter(object):
             feed it the output of `handle_node` for each child node.
             """
             if not isinstance(node, ParseResults):
+                # Then it is a terminal node.
                 if handle_terminal is None:
                     return node
                 else:
@@ -407,7 +410,7 @@ class ParseAugmenter(object):
             handled_kids = [handle_node(k) for k in node]
             return action(handled_kids)
 
-        # Find the value of the entire tree
+        # Find the value of the entire tree.
         return handle_node(self.tree)
 
     def check_variables(self, valid_variables, valid_functions):
@@ -416,7 +419,7 @@ class ParseAugmenter(object):
 
         Otherwise, raise an UndefinedVariable containing all bad variables.
         """
-        # Test that `used_vars` is a subset of `all_vars`; also do functions
+        # Test that `used_vars` is a subset of `all_vars`; also do functions.
         if not (self.variables_used.issubset(valid_variables) and
                 self.functions_used.issubset(valid_functions)):
             bad_vars = self.variables_used.difference(valid_variables)

@@ -5,7 +5,7 @@ That is, given a math string, parse it and render each branch of the result,
 always returning valid latex.
 
 Because intermediate values of the render contain more data than simply the
-string of latex, store it in a custom class `LatexRendered`
+string of latex, store it in a custom class `LatexRendered`.
 """
 
 from calc import ParseAugmenter, add_defaults, SUFFIXES
@@ -16,26 +16,26 @@ class LatexRendered(object):
     Data structure to hold a typeset representation of some math.
 
     Fields:
-      -`latex` is a generated, valid latex string (as if it were standalone)
-      -`sans_parens` is usually the same as `latex` except without the outermost
-       parens (if applicable)
-      -`tall` is a boolean representing if the latex has any elements extending
-       above or below a normal height, specifically things of the form 'a^b' and
-       '\frac{a}{b}'. This affects the height of wrapping parenthesis.
+     -`latex` is a generated, valid latex string (as if it were standalone).
+     -`sans_parens` is usually the same as `latex` except without the outermost
+      parens (if applicable).
+     -`tall` is a boolean representing if the latex has any elements extending
+      above or below a normal height, specifically things of the form 'a^b' and
+      '\frac{a}{b}'. This affects the height of wrapping parenthesis.
     """
     def __init__(self, latex, parens=None, tall=False):
         """
-        Instantiate with the latex representing the math
+        Instantiate with the latex representing the math.
 
         Optionally include parenthesis to wrap around it and the height.
-        `parens` must be one of '(', '[' or '{'
-        `tall` is a boolean (see note above)
+        `parens` must be one of '(', '[' or '{'.
+        `tall` is a boolean (see note above).
         """
         self.latex = latex
         self.sans_parens = latex
         self.tall = tall
 
-        # generate parens and overwrite self.latex
+        # Generate parens and overwrite `self.latex`.
         if parens is not None:
             left_parens = parens
             if left_parens == '{':
@@ -107,6 +107,7 @@ def function_closure(functions, casify):
         if casify(fname) not in functions:
             pass
 
+        # Wrap the input of the function with parens or braces.
         inner = children[1].latex
         if fname == "sqrt":
             inner = u"{{{expr}}}".format(expr=inner)
@@ -116,6 +117,7 @@ def function_closure(functions, casify):
             else:
                 inner = u"({expr})".format(expr=inner)
 
+        # Correctly format the name of the function.
         if fname == "sqrt":
             fname = ur"\sqrt"
         elif fname == "log10":
@@ -125,8 +127,10 @@ def function_closure(functions, casify):
         else:
             fname = ur"\text{{{fname}}}".format(fname=fname)
 
+        # Put it together.
         latex = fname + inner
         return LatexRendered(latex, tall=children[1].tall)
+    # Return the function within the closure.
     return render_function
 
 
@@ -134,7 +138,8 @@ def render_power(children):
     """
     Combine powers so that the latex is wrapped in curly braces correctly.
 
-    If you have 'a^(b+c)' don't include that last set of parens ('a^{b+c}').
+    Also, if you have 'a^(b+c)' don't include that last set of parens:
+    'a^{b+c}' is correct, whereas 'a^{(b+c)}' is extraneous.
     """
     if len(children) == 1:
         return children[0]
@@ -149,7 +154,7 @@ def render_power(children):
 
 def render_parallel(children):
     """
-    Simply combine elements with a double vertical line.
+    Simply join the child nodes with a double vertical line.
     """
     children_latex = [k.latex for k in children if k.latex != "||"]
     latex = r"\|".join(children_latex)
@@ -161,7 +166,7 @@ def render_frac(numerator, denominator):
     r"""
     Given a list of elements in the numerator and denominator, return a '\frac'
 
-    Avoid parens if there is only thing in that part
+    Avoid parens if they are unnecessary (i.e. the only thing in that part).
     """
     if len(numerator) == 1:
         num_latex = numerator[0].sans_parens
@@ -181,9 +186,15 @@ def render_product(children):
     r"""
     Format products and division nicely.
 
-    That is, group bunches of adjacent, equal operators. For every time it
-    switches from numerator to denominator, call `render_frac`. Join these
-    groupings by '\cdot's.
+    Group bunches of adjacent, equal operators. Every time it switches from
+    denominator to the next numerator, call `render_frac`. Join these groupings
+    together with '\cdot's, ending on a numerator if needed.
+
+    Examples: (`children` is formed indirectly by the string on the left)
+      'a*b' -> 'a\cdot b'
+      'a/b' -> '\frac{a}{b}'
+      'a*b/c/d' -> '\frac{a\cdot b}{c\cdot d}'
+      'a/b*c/d*e' -> '\frac{a}{b}\cdot \frac{c}{d}\cdot e'
     """
     position = "numerator"  # or denominator
     fraction_mode_ever = False
@@ -194,29 +205,33 @@ def render_product(children):
     for kid in children:
         if position == "numerator":
             if kid.latex == "*":
-                pass
+                pass  # Don't explicitly add the '\cdot' yet.
             elif kid.latex == "/":
+                # Switch to denominator mode.
                 fraction_mode_ever = True
                 position = "denominator"
             else:
                 numerator.append(kid)
         else:
             if kid.latex == "*":
-                # render the current fraction and add it to the latex
+                # Switch back to numerator mode.
+                # First, render the current fraction and add it to the latex.
                 latex += render_frac(numerator, denominator) + r"\cdot "
 
-                # reset back to beginning state
+                # Reset back to beginning state
                 position = "numerator"
                 numerator = []
                 denominator = []
             elif kid.latex == "/":
-                pass
+                pass  # Don't explicitly add a '\frac' yet.
             else:
                 denominator.append(kid)
 
+    # Add the fraction/numerator that we ended on.
     if position == "denominator":
         latex += render_frac(numerator, denominator)
     else:
+        # We ended on a numerator--act like normal multiplication.
         num_latex = r"\cdot ".join(k.latex for k in numerator)
         latex += num_latex
 
@@ -226,7 +241,7 @@ def render_product(children):
 
 def render_sum(children):
     """
-    Combine elements, including their operators.
+    Concatenate elements, including the operators.
     """
     children_latex = [k.latex for k in children]
     latex = "".join(children_latex)
