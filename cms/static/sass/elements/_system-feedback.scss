@@ -31,8 +31,8 @@
   }
 
   &.error {
-    border-color: shade($red, 50%);
-    background: tint($red, 20%);
+    border-color: $red-d3;
+    background: $red-l1;
   }
 
   &.is-shown {
