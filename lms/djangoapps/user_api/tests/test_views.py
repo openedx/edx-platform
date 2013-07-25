@@ -122,6 +122,11 @@ class UserViewSetTest(UserApiTestCase):
     def test_list_unauthorized(self):
         self.assertHttpForbidden(self.client.get(self.LIST_URI))
 
+    @override_settings(DEBUG=True)
+    @override_settings(EDX_API_KEY=None)
+    def test_debug_auth(self):
+        self.assertHttpOK(self.client.get(self.LIST_URI))
+
     def test_get_list_empty(self):
         User.objects.all().delete()
         result = self.get_json(self.LIST_URI)
@@ -219,6 +224,11 @@ class UserPreferenceViewSetTest(UserApiTestCase):
 
     def test_list_unauthorized(self):
         self.assertHttpForbidden(self.client.get(self.LIST_URI))
+
+    @override_settings(DEBUG=True)
+    @override_settings(EDX_API_KEY=None)
+    def test_debug_auth(self):
+        self.assertHttpOK(self.client.get(self.LIST_URI))
 
     def test_get_list_empty(self):
         UserPreference.objects.all().delete()
