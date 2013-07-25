@@ -93,36 +93,47 @@ form {
   }
 }
 
-// ====================
 
-// forms - archetype - add a new X form
-.new-form {
-    @extend .ui-window;
-    @include box-sizing(border-box);
-    position: relative;
-    width: 100%;
-    margin-bottom: ($baseline*2);
-    border-radius: 2px;
-    background: $white;
+// ELEM: form wrapper
+.wrapper-create-element {
+  height: 0;
+  margin-bottom: $baseline;
+  opacity: 0.0;
+  pointer-events: none;
+  overflow: hidden;
 
-  .wrapper-form {
-    padding: $baseline ($baseline*1.5);
+  &.animate {
+    @include transition(opacity $tmg-f1 ease-in-out 0s, height $tmg-f1 ease-in-out 0s);
   }
+
+  &.is-shown {
+    height: auto; // define a specific height for the animating version of this UI to work properly
+    opacity: 1.0;
+    pointer-events: auto;
+  }
+}
+
+// ELEM: form
+// form styling for creating a new content item (course, user, textbook)
+form[class^="create-"] {
+  @extend .ui-window;
+  @include box-sizing(border-box);
+  border-radius: 2px;
+  width: 100%;
+  background: $white;
 
   .title {
     @extend .t-title4;
-    font-weight: 700;
-    margin-bottom: $baseline;
-    border-bottom: 1px solid $gray-l4;
-    padding-bottom: ($baseline/2);
+    font-weight: 600;
+    padding: $baseline ($baseline*1.5) 0 ($baseline*1.5);
   }
 
   fieldset {
-      margin-bottom: $baseline;
+    padding: $baseline ($baseline*1.5);
   }
 
-  // form elements - need to make this more universal
-  .form-fields {
+
+  .list-input {
     @extend .cont-no-list;
 
     .field {
@@ -150,7 +161,7 @@ form {
 
       label {
         @extend  .t-copy-sub1;
-        @include transition(color, 0.15s, ease-in-out);
+        @include transition(color $tmg-f3 ease-in-out 0s);
         margin: 0 0 ($baseline/4) 0;
 
         &.is-focused {
@@ -158,8 +169,9 @@ form {
         }
       }
 
-      //this section is borrowed from _account.scss - we should clean up and unify later
+
       input, textarea {
+        @include transition(all $tmg-f2 ease-in-out 0s);
         @extend .t-copy-base;
         height: 100%;
         width: 100%;
@@ -173,23 +185,8 @@ form {
           width: 25%;
         }
 
-        ::-webkit-input-placeholder {
-           color: $gray-l4;
-        }
-
-        :-moz-placeholder {
-           color: $gray-l3;
-        }
-
-        ::-moz-placeholder {
-           color: $gray-l3;
-        }
-
-        :-ms-input-placeholder {
-           color: $gray-l3;
-        }
-
         &:focus {
+
           + .tip {
             color: $gray;
           }
@@ -219,9 +216,19 @@ form {
         color: $gray-l3;
       }
 
-      &.error {
+      .tip-error {
+        display: none;
+        float: none;
+      }
 
+      &.error {
         label {
+          color: $red;
+        }
+
+        .tip-error {
+          @extend .anim-fadeIn;
+          display: block;
           color: $red;
         }
 
@@ -230,33 +237,89 @@ form {
         }
       }
     }
+
+    .field-inline {
+
+      input, textarea, select {
+        width: 62%;
+        display: inline-block;
+      }
+
+      .tip-stacked {
+        display: inline-block;
+        float: right;
+        width: 35%;
+        margin-top: 0;
+      }
+
+      &.error {
+        .tip-error {
+        }
+      }
+
+    }
+
+    .field-group {
+      @include clearfix();
+      margin: 0 0 ($baseline/2) 0;
+
+      .field {
+        display: block;
+        width: 47%;
+        border-bottom: none;
+        margin: 0 ($baseline*0.75) 0 0;
+        padding: ($baseline/4) 0 0 0;
+        float: left;
+        position: relative;
+
+        &:nth-child(odd) {
+          float: left;
+        }
+
+        &:nth-child(even) {
+          float: right;
+          margin-right: 0;
+        }
+
+        input, textarea {
+          width: 100%;
+        }
+      }
+    }
   }
 
   .actions {
-    border-top: 1px solid $gray-l1;
-    padding: ($baseline*0.75) $baseline;
     box-shadow: inset 0 1px 2px $shadow;
+    margin-top: ($baseline*0.75);
+    border-top: 1px solid $gray-l1;
+    padding: ($baseline*0.75) ($baseline*1.5);
     background: $gray-l6;
 
     .action-primary {
       @include blue-button;
       @extend .t-action2;
-      @include transition(all $tmg-f2 linear 0);
+      @include transition(all .15s);
       display: inline-block;
       padding: ($baseline/5) $baseline;
       font-weight: 600;
+      text-transform: uppercase;
     }
 
     .action-secondary {
       @include grey-button;
       @extend .t-action2;
-      @include transition(all $tmg-f2 linear 0);
+      @include transition(all .15s);
       display: inline-block;
       padding: ($baseline/5) $baseline;
       font-weight: 600;
+      text-transform: uppercase;
     }
   }
 }
+
+
+
+
 
 // ====================
 

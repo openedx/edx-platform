@@ -19,7 +19,7 @@
       <ul>
         %if allow_actions:
         <li class="nav-item">
-          <a href="#" class="button new-button new-user-button"><i class="icon-plus"></i> ${_("New User")}</a>
+          <a href="#" class="button new-button create-user-button"><i class="icon-plus"></i> ${_("New User")}</a>
         </li>
         %endif
       </ul>
@@ -38,24 +38,28 @@
 
     <article class="content-primary" role="main">
       %if allow_actions:
-      <form class="new-form add-user" id="add-user-form" name="add-user-form">
-        <div class="wrapper-form">
-          <h3 class="title">${_("Add a User to Your Course's Team")}</h3>
+      <div class="wrapper-create-element animate wrapper-create-user">
+        <form class="create-user" id="create-user-form" name="create-user-form">
+          <div class="wrapper-form">
+            <h3 class="title">${_("Add a User to Your Course's Team")}</h3>
 
-          <fieldset class="form-fields">
-            <legend class="sr">${_("Textbook information")}</legend>
-              <div class="field text required add-user-email">
-                <label for="user-email-input">${_("User's Email Address")}</label>
-                <input id="user-email-input" name="user-email" type="text" placeholder="${_('e.g. jane.doe@gmail.com')}" value="">
-                <span class="tip tip-stacked">${_("Please provide the email address of the course staff member you'd like to add")}</span>
-              </div>
-          </fieldset>
-        </div>
-        <div class="actions">
-          <button class="action action-primary" type="submit">${_("Add User")}</button>
-          <button class="action action-secondary action-cancel">${_("Cancel")}</button>
-        </div>
-      </form>
+            <fieldset class="form-fields">
+              <legend class="sr">${_("Textbook information")}</legend>
+                <ol class="list-input">
+                  <li class="field text required create-user-email">
+                    <label for="user-email-input">${_("User's Email Address")}</label>
+                    <input id="user-email-input" name="user-email" type="text" placeholder="${_('e.g. jane.doe@gmail.com')}" value="">
+                    <span class="tip tip-stacked">${_("Please provide the email address of the course staff member you'd like to add")}</span>
+                  </li>
+                </ol>
+            </fieldset>
+          </div>
+          <div class="actions">
+            <button class="action action-primary" type="submit">${_("Add User")}</button>
+            <button class="action action-secondary action-cancel">${_("Cancel")}</button>
+          </div>
+        </form>
+      </div>
       %endif
 
       <ol class="user-list">
@@ -107,7 +111,7 @@
           <ul  class="item-actions user-actions">
             <li class="action action-role">
               % if is_instuctor and len(instructors) == 1:
-                <span class="admin-role sr">${_("Admin (Since you are the only team member, you cannot remove your admin status.)")}</span>
+                <span class="admin-role notoggleforyou">${_("Promote another member to remove admin access")}</span>
               % else:
                 <a href="#" class="admin-role toggle-admin-role ${'remove' if is_instuctor else 'add'}-admin-role">${_("Remove Admin Access") if is_instuctor else _("Add Admin Access")}</a>
               % endif
@@ -150,8 +154,9 @@
     ))}"
 
   $(document).ready(function() {
-    var $newUserForm = $('#add-user-form');
-    $newUserForm.bind('submit', function(e) {
+    var $createUserForm = $('#create-user-form');
+    var $createUserFormWrapper = $createUserForm.closest('.wrapper-create-user');
+    $createUserForm.bind('submit', function(e) {
       e.preventDefault();
       var url = tplUserURL.replace("@@EMAIL@@", $('#user-email-input').val().trim())
       $.ajax({
@@ -191,19 +196,19 @@
       });
     });
 
-    var $cancelButton = $newUserForm.find('.action-cancel');
+    var $cancelButton = $createUserForm.find('.action-cancel');
     $cancelButton.bind('click', function(e) {
       e.preventDefault();
-      $('.new-user-button').removeClass('is-disabled');
-      $newUserForm.toggleClass('is-shown');
+      $('.create-user-button').removeClass('is-disabled');
+      $createUserFormWrapper.toggleClass('is-shown');
       $('#user-email-input').val('');
     });
 
-    $('.new-user-button').bind('click', function(e) {
+    $('.create-user-button').bind('click', function(e) {
       e.preventDefault();
       $(this).addClass('is-disabled');
-      $newUserForm.toggleClass('is-shown');
-      $newUserForm.find('#user-email-input').focus();
+      $createUserFormWrapper.toggleClass('is-shown');
+      $createUserForm.find('#user-email-input').focus();
     });
 
     $('body').bind('keyup', function(e) {

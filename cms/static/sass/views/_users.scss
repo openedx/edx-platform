@@ -3,7 +3,7 @@
 
 body.course.users {
 
-  // page layout
+  // LAYOUT: page
   .content-primary, .content-supplementary {
     @include box-sizing(border-box);
     float: left;
@@ -18,7 +18,7 @@ body.course.users {
     width: flex-grid(3, 12);
   }
 
-  // content
+  // ELEM: content
   .content {
 
     .introduction {
@@ -28,60 +28,15 @@ body.course.users {
   }
 
 
-  // new user form
-  .add-user {
-    @extend .new-form;
-    display: none;
+  // ELEM: new user form
+  .wrapper-create-user {
 
     &.is-shown {
-      display: block;
+      height: ($baseline*15);
     }
   }
 
-  // new user form (old)
-  .new-user-form {
-    display: none;
-    padding: ($baseline*0.75) $baseline;
-    background-color: $lightBluishGrey2;
-
-    #result {
-      display: none;
-      float: left;
-      margin-bottom: ($baseline*0.75);
-      padding: 3px ($baseline*0.75);
-      border-radius: 3px;
-      background: $red;
-      font-size: 14px;
-      color: $white;
-    }
-
-    .form-elements {
-      clear: both;
-    }
-
-    label {
-      display: inline-block;
-      margin-right: ($baseline/2);
-    }
-
-    .email-input {
-      width: 350px;
-      padding: 8px 8px 10px;
-      border-color: $gray-d1;
-    }
-
-    .add-button {
-      @include blue-button;
-      padding: ($baseline/4) $baseline 9px;
-    }
-
-    .cancel-button {
-      @include white-button;
-      padding: ($baseline/4) $baseline 9px;
-    }
-  }
-
-  // listing of users
+  // ELEM: listing of users
   .user-list, .user-item, .item-metadata, .item-actions {
     @include box-sizing(border-box);
   }
@@ -94,7 +49,7 @@ body.course.users {
       position: relative;
       width: flex-grid(9, 9);
       margin: 0 0 ($baseline/2) 0;
-      padding: $baseline ($baseline*1.5) $baseline ($baseline*1.5);
+      padding: ($baseline*1.25) ($baseline*1.5) $baseline ($baseline*1.5);
 
       &:last-child {
         margin-bottom: 0;
@@ -105,7 +60,7 @@ body.course.users {
         vertical-align: middle;
       }
 
-      // item - flag
+      // ELEM: item - flag
       .flag-role {
         @extend .ui-badge;
         color: $white;
@@ -130,7 +85,7 @@ body.course.users {
         }
       }
 
-      // item - metadata
+      // ELEM: item - metadata
       .item-metadata {
         width: flex-grid(5, 9);
         margin-right: flex-gutter();
@@ -153,7 +108,7 @@ body.course.users {
         }
       }
 
-      // item - actions
+      // ELEM: item - actions
       .item-actions {
         width: flex-grid(4, 9);
         position: static; // nasty reset needed due to base.scss
@@ -170,20 +125,26 @@ body.course.users {
 
         .action-delete {
 
+          // STATE: disabled
+          &.is-disabled {
+            opacity: 0.0;
+            visibility: hidden;
+            pointer-events: none;
+          }
         }
 
         .delete {
           @extend .ui-btn-non;
         }
 
-        // nasty reset needed due to base.scss
+        // HACK: nasty reset needed due to base.scss
         .delete-button {
           margin-right: 0;
           float: none;
           color: inherit;
         }
 
-        // admin role controls
+        // ELEM: admin role controls
         .toggle-admin-role {
 
           &.add-admin-role {
@@ -203,6 +164,11 @@ body.course.users {
             padding: ($baseline/5) $baseline;
             font-weight: 600;
           }
+        }
+
+        .notoggleforyou {
+          @extend .t-copy-sub2;
+          color: $gray-l2;
         }
       }
 
