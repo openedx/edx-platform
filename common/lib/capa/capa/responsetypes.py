@@ -822,7 +822,7 @@ class NumericalResponse(LoncapaResponse):
 
     response_tag = 'numericalresponse'
     hint_tag = 'numericalhint'
-    allowed_inputfields = ['textline']
+    allowed_inputfields = ['textline', 'formulaequationinput']
     required_attributes = ['answer']
     max_inputfields = 1
 
@@ -837,11 +837,6 @@ class NumericalResponse(LoncapaResponse):
             self.tolerance = contextualize_text(self.tolerance_xml, context)
         except IndexError:  # xpath found an empty list, so (...)[0] is the error
             self.tolerance = '0'
-        try:
-            self.answer_id = xml.xpath('//*[@id=$id]//textline/@id',
-                                       id=xml.get('id'))[0]
-        except IndexError:  # Same as above
-            self.answer_id = None
 
     def get_score(self, student_answers):
         '''Grade a numeric response '''
