@@ -62,14 +62,18 @@ div.problemwrapper {
       padding-bottom: 5px;
       display: inline-block;
     }
-    border-bottom: 1px solid;
-    border-color: lightgray;
   }
   .item-container
   {
       padding-bottom: 10px;
       display: inline-block;
       padding: 15px;
+
+      h4 {
+          padding-top: 10px;
+          border-top: 1px solid;
+          border-color: lightgray;
+      }
   }
 
   .result-container
@@ -705,11 +709,11 @@ section.open-ended-child {
 
   div.prompt{
     background-color:white;
-    border-bottom: 1px solid;
-    border-color: lightgray;
   }
 
   h4{
-    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid;
+    border-color: lightgray;
   }
 }
