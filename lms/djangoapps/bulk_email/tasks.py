@@ -41,10 +41,10 @@ def delegate_email_batches(hash_for_msg, recipient, course_id, course_url, user_
         recipient_qset = User.objects.filter(id=user_id).values('profile__name', 'email')
     else:
         staff_grpname = _course_staff_group_name(course.location)
-        staff_group, created = Group.objects.get_or_create(name=staff_grpname)
+        staff_group, _ = Group.objects.get_or_create(name=staff_grpname)
         staff_qset = staff_group.user_set.values('profile__name', 'email')
         instructor_grpname = _course_instructor_group_name(course.location)
-        instructor_group, created = Group.objects.get_or_create(name=instructor_grpname)
+        instructor_group, _ = Group.objects.get_or_create(name=instructor_grpname)
         instructor_qset = instructor_group.user_set.values('profile__name', 'email')
         recipient_qset = staff_qset | instructor_qset
 

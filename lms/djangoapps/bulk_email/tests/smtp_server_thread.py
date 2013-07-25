@@ -11,6 +11,7 @@ class FakeSMTPServerThread(threading.Thread):
         self.port = port
         self.is_ready = threading.Event()
         self.error = None
+        self.server = None
         super(FakeSMTPServerThread, self).__init__()
 
     def start(self):
