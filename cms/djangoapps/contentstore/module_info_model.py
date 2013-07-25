@@ -1,6 +1,5 @@
 from static_replace import replace_static_urls
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.modulestore import Location
 
 
 def get_module_info(store, location, rewrite_static_links=False):
@@ -16,13 +15,7 @@ def get_module_info(store, location, rewrite_static_links=False):
         data = replace_static_urls(
             module.data,
             None,
-            course_namespace=Location([
-                module.location.tag,
-                module.location.org,
-                module.location.course,
-                None,
-                None
-            ])
+            course_id=module.location.org + '/' + module.location.course + '/REPLACE_WITH_RUN_WHEN_IMPLEMENTED'
         )
 
     return {

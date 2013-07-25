@@ -54,7 +54,7 @@ class TestVideo(BaseTestXmodule):
 
         expected_context = {
             'data_dir': getattr(self, 'data_dir', None),
-            'caption_asset_path': '/c4x/MITx/999/asset/subs_',
+            'caption_asset_path': '/static/subs/',
             'show_captions': 'true',
             'display_name': 'A Name',
             'end': 3610.0,
@@ -104,10 +104,17 @@ class TestVideoNonYouTube(TestVideo):
 
         expected_context = {
             'data_dir': getattr(self, 'data_dir', None),
+<<<<<<< HEAD
             'caption_asset_path': '/c4x/MITx/999/asset/subs_',
             'show_captions': 'true',
             'display_name': 'A Name',
             'end': 3610.0,
+=======
+            'caption_asset_path': '/static/subs/',
+            'show_captions': self.item_module.show_captions,
+            'display_name': self.item_module.display_name_with_default,
+            'end': self.item_module.end_time,
+>>>>>>> fix tests
             'id': self.item_module.location.html_id(),
             'sources': sources,
             'start': 3603.0,

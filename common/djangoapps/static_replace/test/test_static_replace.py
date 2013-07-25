@@ -10,7 +10,6 @@ from xmodule.modulestore.xml import XMLModuleStore
 
 DATA_DIRECTORY = 'data_dir'
 COURSE_ID = 'org/course/run'
-NAMESPACE = Location('org', 'course', 'run', None, None)
 STATIC_SOURCE = '"/static/file.png"'
 
 
@@ -52,18 +51,18 @@ def test_storage_url_not_exists(mock_storage):
 def test_mongo_filestore(mock_modulestore, mock_static_content):
 
     mock_modulestore.return_value = Mock(MongoModuleStore)
-    mock_static_content.convert_legacy_static_url.return_value = "c4x://mock_url"
+    mock_static_content.convert_legacy_static_url_with_course_id.return_value = "c4x://mock_url"
 
     # No namespace => no change to path
     assert_equals('"/static/data_dir/file.png"', replace_static_urls(STATIC_SOURCE, DATA_DIRECTORY))
 
     # Namespace => content url
     assert_equals(
-        '"' + mock_static_content.convert_legacy_static_url.return_value + '"',
-        replace_static_urls(STATIC_SOURCE, DATA_DIRECTORY, NAMESPACE)
+        '"' + mock_static_content.convert_legacy_static_url_with_course_id.return_value + '"',
+        replace_static_urls(STATIC_SOURCE, DATA_DIRECTORY, course_id=COURSE_ID)
     )
 
-    mock_static_content.convert_legacy_static_url.assert_called_once_with('file.png', NAMESPACE)
+    mock_static_content.convert_legacy_static_url_with_course_id.assert_called_once_with('file.png', COURSE_ID)
 
 
 @patch('static_replace.settings')
