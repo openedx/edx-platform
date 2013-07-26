@@ -610,8 +610,7 @@ function addNewCourse(e) {
     }, checkForCancel);
 }
 
-function setNewCourseFieldInErr(el, msg)
-{
+function setNewCourseFieldInErr(el, msg) {
     el.children('.tip-error').remove();
     if (msg !== null && msg !== '') {
         el.addClass('error');
@@ -621,8 +620,15 @@ function setNewCourseFieldInErr(el, msg)
     }
 }
 
-function setNewCourseFieldsInErr(display_name_errMsg, org_errMsg, number_errMsg, run_errMsg)
-{
+function setNewCourseErrMsgs(header_err_msg, display_name_errMsg, org_errMsg, number_errMsg, run_errMsg) {
+    if (header_err_msg) {
+        $('.wrap-error').addClass('is-shown');
+        $('#course_creation_error').html('<p>' + header_err_msg + '</p>');
+    } else {
+        $('.wrap-error').removeClass('is-shown');
+        $('#course_creation_error').html('');
+    }
+
     setNewCourseFieldInErr($('#field-course-name'), display_name_errMsg);
     setNewCourseFieldInErr($('#field-organization'), org_errMsg);
     setNewCourseFieldInErr($('#field-course-number'), number_errMsg);
@@ -649,15 +655,7 @@ function saveNewCourse(e) {
 
     header_err_msg = (bInErr) ? gettext('Please correct the fields below.') : null;
 
-    if (header_err_msg) {
-        $('.wrap-error').addClass('is-shown');
-        $('#course_creation_error').html('<p>' + header_err_msg + '</p>');
-    } else {
-        $('.wrap-error').removeClass('is-shown');
-        $('#course_creation_error').html('');
-    }
-
-    setNewCourseFieldsInErr(display_name_errMsg, org_errMsg, number_errMsg, run_errMsg);
+    setNewCourseErrMsgs(header_err_msg, display_name_errMsg, org_errMsg, number_errMsg, run_errMsg);
 
     if (bInErr)
         return;
@@ -679,7 +677,7 @@ function saveNewCourse(e) {
             if (data.id !== undefined) {
                 window.location = '/' + data.id.replace(/.*:\/\//, '');
             } else if (data.ErrMsg !== undefined) {
-                alert(data.ErrMsg);
+                setNewCourseErrMsgs(data.ErrMsg, null, null, null, null);
             }
         }
     );

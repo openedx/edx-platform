@@ -990,7 +990,7 @@ class ContentStoreTest(ModuleStoreTestCase):
     def test_create_course_duplicate_course(self):
         """Test new course creation - error path"""
         self.client.post(reverse('create_new_course'), self.course_data)
-        self.assert_course_creation_failed('There is already a course defined with the same organization, course number, and course run.')
+        self.assert_course_creation_failed('There is already a course defined with the same organization, course number, and course run. Please change at least one field to be unique.')
 
     def assert_course_creation_failed(self, error_message):
         """
@@ -1007,7 +1007,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         self.course_data['display_name'] = 'Robot Super Course Two'
         self.course_data['run'] = '2013_Summer'
 
-        self.assert_course_creation_failed('There is already a course defined with the same organization and course number.')
+        self.assert_course_creation_failed('There is already a course defined with the same organization and course number. Please change at least one field to be unique.')
 
     def test_create_course_with_bad_organization(self):
         """Test new course creation - error path for bad organization name"""
