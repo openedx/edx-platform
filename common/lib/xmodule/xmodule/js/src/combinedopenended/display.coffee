@@ -228,7 +228,7 @@ class @CombinedOpenEnded
     data = {}
     $.postWithPrefix "#{@ajax_url}/get_last_response", data, (response) =>
       if response.success
-        @answer_area.html(response.response).attr("disabled", true)
+        @answer_area.html(response.response)
 
   message_post: (event)=>
     external_grader_message=$(event.target).parent().parent().parent()
