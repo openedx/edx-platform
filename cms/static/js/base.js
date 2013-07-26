@@ -677,7 +677,9 @@ function saveNewCourse(e) {
             if (data.id !== undefined) {
                 window.location = '/' + data.id.replace(/.*:\/\//, '');
             } else if (data.ErrMsg !== undefined) {
-                setNewCourseErrMsgs(data.ErrMsg, null, null, null, null);
+                orgErrMsg = (data.OrgErrMsg !== undefined) ? data.OrgErrMsg : null;
+                courseErrMsg = (data.CourseErrMsg !== undefined) ? data.CourseErrMsg : null;
+                setNewCourseErrMsgs(data.ErrMsg, null, orgErrMsg, courseErrMsg, null);
             }
         }
     );

@@ -121,13 +121,21 @@ def create_new_course(request):
         return JsonResponse(
             {
                 'ErrMsg': _('There is already a course defined with the same organization, course number, and course run. Please change at least one field to be unique.'),
+                'OrgErrMsg': _('Either of organization or course number must be unique.'),
+                'CourseErrMsg': _('Either of organization or course number must be unique.'),
             }
         )
 
     course_search_location = ['i4x', dest_location.org, dest_location.course, 'course', None]
     courses = modulestore().get_items(course_search_location)
     if len(courses) > 0:
-        return JsonResponse({'ErrMsg': _('There is already a course defined with the same organization and course number. Please change at least one field to be unique.')})
+        return JsonResponse(
+            {
+                'ErrMsg': _('There is already a course defined with the same organization and course number. Please change at least one field to be unique.'),
+                'OrgErrMsg': _('Either of organization or course number must be unique.'),
+                'CourseErrMsg': _('Either of organization or course number must be unique.'),
+            }
+        )
 
     # instantiate the CourseDescriptor and then persist it
     # note: no system to pass
