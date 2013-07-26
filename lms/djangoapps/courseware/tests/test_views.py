@@ -6,6 +6,8 @@ from django.http import Http404
 from django.test.utils import override_settings
 from django.contrib.auth.models import User
 from django.test.client import RequestFactory
+
+from django.conf import settings
 from django.core.urlresolvers import reverse
 
 from student.models import CourseEnrollment
@@ -34,16 +36,29 @@ class TestJumpTo(TestCase):
 
     def test_jumpto_invalid_location(self):
         location = Location('i4x', 'edX', 'toy', 'NoSuchPlace', None)
-        jumpto_url = '%s/%s/jump_to/%s' % ('/courses', self.course_name, location)
+        jumpto_url = '{0}/{1}/jump_to/{2}'.format('/courses', self.course_name, location)
         response = self.client.get(jumpto_url)
         self.assertEqual(response.status_code, 404)
 
     def test_jumpto_from_chapter(self):
         location = Location('i4x', 'edX', 'toy', 'chapter', 'Overview')
-        jumpto_url = '%s/%s/jump_to/%s' % ('/courses', self.course_name, location)
+        jumpto_url = '{0}/{1}/jump_to/{2}'.format('/courses', self.course_name, location)
         expected = 'courses/edX/toy/2012_Fall/courseware/Overview/'
         response = self.client.get(jumpto_url)
         self.assertRedirects(response, expected, status_code=302, target_status_code=302)
+
+    def test_jumpto_id(self):
+        location = Location('i4x', 'edX', 'toy', 'chapter', 'Overview')
+        jumpto_url = '{0}/{1}/jump_to_id/{2}'.format('/courses', self.course_name, location.name)
+        expected = 'courses/edX/toy/2012_Fall/courseware/Overview/'
+        response = self.client.get(jumpto_url)
+        self.assertRedirects(response, expected, status_code=302, target_status_code=302)
+
+    def test_jumpto_id_invalid_location(self):
+        location = Location('i4x', 'edX', 'toy', 'NoSuchPlace', None)
+        jumpto_url = '{0}/{1}/jump_to_id/{2}'.format('/courses', self.course_name, location.name)
+        response = self.client.get(jumpto_url)
+        self.assertEqual(response.status_code, 404)
 
 
 class ViewsTestCase(TestCase):
@@ -126,6 +141,28 @@ class ViewsTestCase(TestCase):
             self.assertContains(result, expected_end_text)
         else:
             self.assertNotContains(result, "Classes End")
+
+    def test_chat_settings(self):
+        mock_user = MagicMock()
+        mock_user.username = "johndoe"
+
+        mock_course = MagicMock()
+        mock_course.id = "a/b/c"
+
+        # Stub this out in the case that it's not in the settings
+        domain = "jabber.edx.org"
+        settings.JABBER_DOMAIN = domain
+
+        chat_settings = views.chat_settings(mock_course, mock_user)
+
+        # Test the proper format of all chat settings
+        self.assertEquals(chat_settings['domain'], domain)
+        self.assertEquals(chat_settings['room'], "a-b-c_class")
+        self.assertEquals(chat_settings['username'], "johndoe@%s" % domain)
+
+        # TODO: this needs to be changed once we figure out how to
+        #       generate/store a real password.
+        self.assertEquals(chat_settings['password'], "johndoe@%s" % domain)
 
     def test_submission_history_xss(self):
         # log into a staff account

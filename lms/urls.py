@@ -59,6 +59,8 @@ urlpatterns = ('',  # nopep8
         name='auth_password_reset_done'),
 
     url(r'^heartbeat$', include('heartbeat.urls')),
+
+    url(r'^user_api/', include('user_api.urls')),
 )
 
 # University profiles only make sense in the default edX context
@@ -175,6 +177,8 @@ if settings.COURSEWARE_ENABLED:
     urlpatterns += (
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/jump_to/(?P<location>.*)$',
             'courseware.views.jump_to', name="jump_to"),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/jump_to_id/(?P<module_id>.*)$',
+            'courseware.views.jump_to_id', name="jump_to_id"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/modx/(?P<location>.*?)/(?P<dispatch>[^/]*)$',
             'courseware.module_render.modx_dispatch',
             name='modx_dispatch'),
@@ -203,6 +207,7 @@ if settings.COURSEWARE_ENABLED:
         url(r'^courses/?$', 'branding.views.courses', name="courses"),
         url(r'^change_enrollment$',
             'student.views.change_enrollment', name="change_enrollment"),
+        url(r'^change_email_settings$', 'student.views.change_email_settings', name="change_email_settings"),
 
         #About the course
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/about$',
@@ -338,7 +343,10 @@ if settings.COURSEWARE_ENABLED:
             url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/news$',
                 'courseware.views.news', name="news"),
             url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/discussion/',
-                include('django_comment_client.urls'))
+                include('django_comment_client.urls')),
+            url(r'^notification_prefs/enable/', 'notification_prefs.views.ajax_enable'),
+            url(r'^notification_prefs/disable/', 'notification_prefs.views.ajax_disable'),
+            url(r'^notification_prefs/unsubscribe/(?P<token>[a-zA-Z0-9-_=]+)/', 'notification_prefs.views.unsubscribe'),
         )
     urlpatterns += (
         # This MUST be the last view in the courseware--it's a catch-all for custom tabs.
@@ -441,6 +449,12 @@ if settings.MITX_FEATURES.get('ENABLE_HINTER_INSTRUCTOR_VIEW'):
     urlpatterns += (
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/hint_manager$',
             'instructor.hint_manager.hint_manager', name="hint_manager"),
+    )
+
+# enable automatic login
+if settings.MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_LOAD_TESTING'):
+    urlpatterns += (
+        url(r'^auto_auth$', 'student.views.auto_auth'),
     )
 
 urlpatterns = patterns(*urlpatterns)

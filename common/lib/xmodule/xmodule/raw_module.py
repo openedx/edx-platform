@@ -13,7 +13,7 @@ class RawDescriptor(XmlDescriptor, XMLEditingDescriptor):
     Module that provides a raw editing view of its data and children.  It
     requires that the definition xml is valid.
     """
-    data = String(help="XML data for the module", scope=Scope.content)
+    data = String(help="XML data for the module", default="", scope=Scope.content)
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):

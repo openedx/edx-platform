@@ -75,7 +75,7 @@ def initial_setup(server):
     # If we were unable to get a valid session within the limit of attempts,
     # then we cannot run the tests.
     if not success:
-        raise IOError("Could not acquire valid ChromeDriver browser session.")
+        raise IOError("Could not acquire valid {driver} browser session.".format(driver=browser_driver))
 
     # Set the browser size to 1280x1024
     world.browser.driver.set_window_size(1280, 1024)

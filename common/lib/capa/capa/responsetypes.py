@@ -33,6 +33,7 @@ from shapely.geometry import Point, MultiPoint
 from calc import evaluator, UndefinedVariable
 from . import correctmap
 from datetime import datetime
+from pytz import UTC
 from .util import *
 from lxml import etree
 from lxml.html.soupparser import fromstring as fromstring_bs     # uses Beautiful Soup!!! FIXME?
@@ -1365,9 +1366,11 @@ class CodeResponse(LoncapaResponse):
             # Note that submission can be a file
             submission = student_answers[self.answer_id]
         except Exception as err:
-            log.error('Error in CodeResponse %s: cannot get student answer for %s;'
-                      ' student_answers=%s' %
-                     (err, self.answer_id, convert_files_to_filenames(student_answers)))
+            log.error(
+                'Error in CodeResponse %s: cannot get student answer for %s;'
+                ' student_answers=%s' %
+                (err, self.answer_id, convert_files_to_filenames(student_answers))
+            )
             raise Exception(err)
 
         # We do not support xqueue within Studio.
@@ -1381,19 +1384,20 @@ class CodeResponse(LoncapaResponse):
         #------------------------------------------------------------
 
         qinterface = self.system.xqueue['interface']
-        qtime = datetime.strftime(datetime.now(), xqueue_interface.dateformat)
+        qtime = datetime.strftime(datetime.now(UTC), xqueue_interface.dateformat)
 
         anonymous_student_id = self.system.anonymous_student_id
 
         # Generate header
-        queuekey = xqueue_interface.make_hashkey(str(self.system.seed) + qtime +
-                                                 anonymous_student_id +
-                                                 self.answer_id)
+        queuekey = xqueue_interface.make_hashkey(
+            str(self.system.seed) + qtime + anonymous_student_id + self.answer_id
+        )
         callback_url = self.system.xqueue['construct_callback']()
         xheader = xqueue_interface.make_xheader(
             lms_callback_url=callback_url,
             lms_key=queuekey,
-            queue_name=self.queue_name)
+            queue_name=self.queue_name
+        )
 
         # Generate body
         if is_list_of_files(submission):
@@ -1406,9 +1410,10 @@ class CodeResponse(LoncapaResponse):
 
         # Metadata related to the student submission revealed to the external
         # grader
-        student_info = {'anonymous_student_id': anonymous_student_id,
-                        'submission_time': qtime,
-                        }
+        student_info = {
+            'anonymous_student_id': anonymous_student_id,
+            'submission_time': qtime,
+        }
         contents.update({'student_info': json.dumps(student_info)})
 
         # Submit request. When successful, 'msg' is the prior length of the
@@ -2097,6 +2102,333 @@ class AnnotationResponse(LoncapaResponse):
             return option_ids[0]
         return None
 
+
+class ChoiceTextResponse(LoncapaResponse):
+    """
+    Allows for multiple choice responses with text inputs
+    Desired semantics match those of NumericalResponse and
+    ChoiceResponse.
+    """
+
+    response_tag = 'choicetextresponse'
+    max_inputfields = 1
+    allowed_inputfields = ['choicetextgroup',
+                           'checkboxtextgroup',
+                           'radiotextgroup'
+                           ]
+
+    def setup_response(self):
+        """
+        Sets up three dictionaries for use later:
+        `correct_choices`: These are the correct binary choices(radio/checkbox)
+        `correct_inputs`: These are the numerical/string answers for required
+        inputs.
+        `answer_values`: This is a dict, keyed by the name of the binary choice
+            which contains the correct answers for the text inputs separated by
+            commas e.g. "1, 0.5"
+
+        `correct_choices` and `correct_inputs` are used for grading the problem
+        and `answer_values` is used for displaying correct answers.
+
+        """
+        context = self.context
+        self.correct_choices = {}
+        self.assign_choice_names()
+        self.correct_inputs = {}
+        self.answer_values = {self.answer_id: []}
+        correct_xml = self.xml.xpath('//*[@id=$id]//choice[@correct="true"]',
+                                     id=self.xml.get('id'))
+        for node in correct_xml:
+            # For each correct choice, set the `parent_name` to the
+            # current choice's name
+            parent_name = node.get('name')
+            # Add the name of the correct binary choice to the
+            # correct choices list as a key. The value is not important.
+            self.correct_choices[parent_name] = {'answer': ''}
+            # Add the name of the parent to the list of correct answers
+            self.answer_values[self.answer_id].append(parent_name)
+            answer_list = []
+            # Loop over <numtolerance_input> elements inside of the correct choices
+            for child in node:
+                answer = child.get('answer', None)
+                if not answer:
+                    # If the question creator does not specify an answer for a
+                    # <numtolerance_input> inside of a correct choice, raise an error
+                    raise LoncapaProblemError(
+                        "Answer not provided for numtolerance_input"
+                    )
+                # Contextualize the answer to allow script generated answers.
+                answer = contextualize_text(answer, context)
+                input_name = child.get('name')
+                # Contextualize the tolerance to value.
+                tolerance = contextualize_text(
+                    child.get('tolerance', '0'),
+                    context
+                )
+                # Add the answer and tolerance information for the current
+                # numtolerance_input to `correct_inputs`
+                self.correct_inputs[input_name] = {
+                    'answer': answer,
+                    'tolerance': tolerance
+                }
+                # Add the correct answer for this input to the list for show
+                answer_list.append(answer)
+            # Turn the list of numtolerance_input answers into a comma separated string.
+            self.answer_values[parent_name] = ', '.join(answer_list)
+        # Turn correct choices into a set. Allows faster grading.
+        self.correct_choices = set(self.correct_choices.keys())
+
+    def assign_choice_names(self):
+        """
+        Initialize name attributes in <choice> and <numtolerance_input> tags
+        for this response.
+
+        Example:
+        Assuming for simplicity that `self.answer_id` = '1_2_1'
+
+        Before the function is called `self.xml` =
+        <radiotextgroup>
+            <choice correct = "true">
+                The number
+                    <numtolerance_input answer="5"/>
+                Is the mean of the list.
+            </choice>
+            <choice correct = "false">
+                False demonstration choice
+            </choice>
+        </radiotextgroup>
+
+        After this is called the choices and numtolerance_inputs will have a name
+        attribute initialized and self.xml will be:
+
+        <radiotextgroup>
+        <choice correct = "true" name ="1_2_1_choiceinput_0bc">
+            The number
+                <numtolerance_input name = "1_2_1_choiceinput0_numtolerance_input_0"
+                 answer="5"/>
+            Is the mean of the list.
+        </choice>
+        <choice correct = "false" name = "1_2_1_choiceinput_1bc>
+            False demonstration choice
+        </choice>
+        </radiotextgroup>
+        """
+
+        for index, choice in enumerate(
+            self.xml.xpath('//*[@id=$id]//choice', id=self.xml.get('id'))
+        ):
+            # Set the name attribute for <choices>
+            # "bc" is appended at the end to indicate that this is a
+            # binary choice as opposed to a numtolerance_input, this convention
+            # is used when grading the problem
+            choice.set(
+                "name",
+                self.answer_id + "_choiceinput_" + str(index) + "bc"
+            )
+            # Set Name attributes for <numtolerance_input> elements
+            # Look for all <numtolerance_inputs> inside this choice.
+            numtolerance_inputs = choice.findall('numtolerance_input')
+            # Look for all <decoy_input> inside this choice
+            decoys = choice.findall('decoy_input')
+            # <decoy_input> would only be used in choices which do not contain
+            # <numtolerance_input>
+            inputs = numtolerance_inputs if numtolerance_inputs else decoys
+            # Give each input inside of the choice a name combining
+            # The ordinality of the choice, and the ordinality of the input
+            # within that choice e.g. 1_2_1_choiceinput_0_numtolerance_input_1
+            for ind, child in enumerate(inputs):
+                child.set(
+                    "name",
+                    self.answer_id + "_choiceinput_" + str(index) +
+                    "_numtolerance_input_" + str(ind)
+                )
+
+    def get_score(self, student_answers):
+        """
+        Returns a `CorrectMap` showing whether `student_answers` are correct.
+
+        `student_answers` contains keys for binary inputs(radiobutton,
+        checkbox) and numerical inputs. Keys ending with 'bc' are binary
+        choice inputs otherwise they are text fields.
+
+        This method first separates the two
+        types of answers and then grades them in separate methods.
+
+        The student is only correct if they have both the binary inputs and
+        numerical inputs correct.
+        """
+        answer_dict = student_answers.get(self.answer_id, "")
+        binary_choices, numtolerance_inputs = self._split_answers_dict(answer_dict)
+        # Check the binary choices first.
+        choices_correct = self._check_student_choices(binary_choices)
+        inputs_correct = self._check_student_inputs(numtolerance_inputs)
+        # Only return correct if the student got both the binary
+        # and numtolerance_inputs are correct
+        correct = choices_correct and inputs_correct
+
+        return CorrectMap(
+            self.answer_id,
+            'correct' if correct else 'incorrect'
+        )
+
+    def get_answers(self):
+        """
+        Returns a dictionary containing the names of binary choices as keys
+        and a string of answers to any numtolerance_inputs which they may have
+        e.g {choice_1bc : "answer1, answer2", choice_2bc : ""}
+        """
+        return self.answer_values
+
+    def _split_answers_dict(self, a_dict):
+        """
+        Returns two dicts:
+        `binary_choices` : dictionary {input_name: input_value} for
+        the binary choices which the student selected.
+        and
+        `numtolerance_choices` : a dictionary {input_name: input_value}
+        for the numtolerance_inputs inside of choices which were selected
+
+        Determines if an input is inside of a binary input by looking at
+        the beginning of it's name.
+
+        For example. If a binary_choice was named '1_2_1_choiceinput_0bc'
+        All of the numtolerance_inputs in it would have an idea that begins
+        with '1_2_1_choice_input_0_numtolerance_input'
+
+        Splits the name of the numtolerance_input at the occurence of
+        '_numtolerance_input_' and appends 'bc' to the end to get the name
+        of the choice it is contained in.
+
+        Example:
+        `a_dict` = {
+            '1_2_1_choiceinput_0bc': '1_2_1_choiceinput_0bc',
+            '1_2_1_choiceinput_0_numtolerance_input_0': '1',
+            '1_2_1_choiceinput_0_numtolerance_input_1': '2'
+            '1_2_1_choiceinput_1_numtolerance_input_0': '3'
+        }
+
+        In this case, the binary choice is '1_2_1_choiceinput_0bc', and
+        the numtolerance_inputs associated with it are
+        '1_2_1_choiceinput_0_numtolerance_input_0', and
+        '1_2_1_choiceinput_0_numtolerance_input_1'.
+
+        so the two return dictionaries would be
+        `binary_choices` = {'1_2_1_choiceinput_0bc': '1_2_1_choiceinput_0bc'}
+        and
+        `numtolerance_choices` ={
+            '1_2_1_choiceinput_0_numtolerance_input_0': '1',
+            '1_2_1_choiceinput_0_numtolerance_input_1': '2'
+        }
+
+        The entry '1_2_1_choiceinput_1_numtolerance_input_0': '3' is discarded
+        because it was not inside of a selected binary choice, and no validation
+        should be performed on numtolerance_inputs inside of non-selected choices.
+        """
+
+        # Initialize the two dictionaries that are returned
+        numtolerance_choices = {}
+        binary_choices = {}
+
+        # `selected_choices` is a list of binary choices which were "checked/selected"
+        # when the student submitted the problem.
+        # Keys in a_dict ending with 'bc' refer to binary choices.
+        selected_choices = [key for key in a_dict if key.endswith("bc")]
+        for key in selected_choices:
+            binary_choices[key] = a_dict[key]
+
+        # Convert the name of a numtolerance_input into the name of the binary
+        # choice that it is contained within, and append it to the list if
+        # the numtolerance_input's parent binary_choice is contained in
+        # `selected_choices`.
+        selected_numtolerance_inputs = [
+            key for key in a_dict if key.partition("_numtolerance_input_")[0] + "bc"
+            in selected_choices
+        ]
+
+        for key in selected_numtolerance_inputs:
+            numtolerance_choices[key] = a_dict[key]
+
+        return (binary_choices, numtolerance_choices)
+
+    def _check_student_choices(self, choices):
+        """
+        Compares student submitted checkbox/radiobutton answers against
+        the correct answers. Returns True or False.
+
+        True if all of the correct choices are selected and no incorrect
+        choices are selected.
+        """
+        student_choices = set(choices)
+        required_selected = len(self.correct_choices - student_choices) == 0
+        no_extra_selected = len(student_choices - self.correct_choices) == 0
+        correct = required_selected and no_extra_selected
+        return correct
+
+    def _check_student_inputs(self, numtolerance_inputs):
+        """
+        Compares student submitted numerical answers against the correct
+        answers and tolerances.
+
+        `numtolerance_inputs` is a dictionary {answer_name : answer_value}
+
+        Performs numerical validation by means of calling
+        `compare_with_tolerance()` on all of `numtolerance_inputs`
+
+        Performs a call to `compare_with_tolerance` even on values for
+        decoy_inputs. This is used to validate their numericality and
+        raise an error if the student entered a non numerical expression.
+
+        Returns True if and only if all student inputs are correct.
+        """
+        inputs_correct = True
+        for answer_name, answer_value in numtolerance_inputs.iteritems():
+            # If `self.corrrect_inputs` does not contain an entry for
+            # `answer_name`, this means that answer_name is a decoy
+            # input's value, and validation of its numericality is the
+            # only thing of interest from the later call to
+            # `compare_with_tolerance`.
+            params = self.correct_inputs.get(answer_name, {'answer': 0})
+
+            correct_ans = params['answer']
+            # Set the tolerance to '0' if it was not specified in the xml
+            tolerance = params.get('tolerance', '0')
+            # Make sure that the staff answer is a valid number
+            try:
+                correct_ans = complex(correct_ans)
+            except ValueError:
+                log.debug(
+                    "Content error--answer" +
+                    "'{0}' is not a valid complex number".format(correct_ans)
+                )
+                raise StudentInputError(
+                    "The Staff answer could not be interpreted as a number."
+                )
+            # Compare the student answer to the staff answer/ or to 0
+            # if all that is important is verifying numericality
+            try:
+                partial_correct = compare_with_tolerance(
+                    evaluator(dict(), dict(), answer_value),
+                    correct_ans,
+                    tolerance
+                )
+            except:
+                # Use the traceback-preserving version of re-raising with a
+                # different type
+                _, _, trace = sys.exc_info()
+
+                raise StudentInputError(
+                    "Could not interpret '{0}' as a number{1}".format(
+                        cgi.escape(answer_value),
+                        trace
+                    )
+                )
+            # Ignore the results of the comparisons which were just for
+            # Numerical Validation.
+            if answer_name in self.correct_inputs and not partial_correct:
+                # If any input is not correct, set the return value to False
+                inputs_correct = False
+        return inputs_correct
+
 #-----------------------------------------------------------------------------
 
 # TEMPORARY: List of all response subclasses
@@ -2116,4 +2448,5 @@ __all__ = [CodeResponse,
            MultipleChoiceResponse,
            TrueFalseResponse,
            JavascriptResponse,
-           AnnotationResponse]
+           AnnotationResponse,
+           ChoiceTextResponse]

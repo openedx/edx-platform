@@ -570,5 +570,10 @@
         color: #333;
       }
     }
+
+    a.email-settings {
+      @extend a.unenroll;
+      margin-right: 10px;
+    }
   }
 }

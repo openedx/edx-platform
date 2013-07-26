@@ -107,6 +107,7 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
         // to pick up when the date is typed directly in the field.
         datefield.change(setfield);
         timefield.on('changeTime', setfield);
+        timefield.on('input', setfield);
 
         datefield.datepicker('setDate', this.model.get(fieldName));
         // timepicker doesn't let us set null, so check that we have a time

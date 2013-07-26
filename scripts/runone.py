@@ -41,18 +41,17 @@ def main(argv):
     test_py_path = find_full_path(test_py_path)
     test_spec = "%s:%s.%s" % (test_py_path, test_class, test_method)
 
-    settings = None
+    system = None
     if test_py_path.startswith('cms'):
-        settings = 'cms.envs.test'
+        system = 'cms'
     elif test_py_path.startswith('lms'):
-        settings = 'lms.envs.test'
+        system = 'lms'
 
-    if settings:
+    if system:
         # Run as a django test suite
         from django.core import management
 
-        django_args = ["django-admin.py", "test", "--pythonpath=."]
-        django_args.append("--settings=%s" % settings)
+        django_args = ["./manage.py", system, "--settings", "test", "test"]
         if args.nocapture:
             django_args.append("-s")
         django_args.append(test_spec)

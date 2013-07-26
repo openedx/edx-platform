@@ -37,7 +37,6 @@ PLATFORM_NAME = "edX"
 COURSEWARE_ENABLED = True
 ENABLE_JASMINE = False
 
-GENERATE_RANDOM_USER_CREDENTIALS = False
 PERFSTATS = False
 
 DISCUSSION_SETTINGS = {
@@ -96,19 +95,21 @@ MITX_FEATURES = {
     # This flag disables the requirement of having to agree to the TOS for users registering
     # with Shib.  Feature was requested by Stanford's office of general counsel
     'SHIB_DISABLE_TOS': False,
-    
+
     # Enables ability to restrict enrollment in specific courses by the user account login method
     'RESTRICT_ENROLL_BY_REG_METHOD': False,
 
     # analytics experiments
     'ENABLE_INSTRUCTOR_ANALYTICS': False,
 
-    # enable analytics server.  
+    'ENABLE_INSTRUCTOR_EMAIL': False,
+
+    # enable analytics server.
     # WARNING: THIS SHOULD ALWAYS BE SET TO FALSE UNDER NORMAL
     # LMS OPERATION. See analytics.py for details about what
-    # this does. 
+    # this does.
 
-    'RUN_AS_ANALYTICS_SERVER_ENABLED' : False, 
+    'RUN_AS_ANALYTICS_SERVER_ENABLED': False,
 
     # Flip to True when the YouTube iframe API breaks (again)
     'USE_YOUTUBE_OBJECT_API': False,
@@ -147,6 +148,13 @@ MITX_FEATURES = {
 
     # Allow use of the hint managment instructor view.
     'ENABLE_HINTER_INSTRUCTOR_VIEW': False,
+
+    # for load testing
+    'AUTOMATIC_AUTH_FOR_LOAD_TESTING': False,
+
+    # Toggle to enable chat availability (configured on a per-course
+    # basis in Studio)
+    'ENABLE_CHAT': False
 }
 
 # Used for A/B testing
@@ -217,7 +225,6 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.messages.context_processors.messages',
     #'django.core.context_processors.i18n',
     'django.contrib.auth.context_processors.auth',  # this is required for admin
-    'django.core.context_processors.csrf',  # necessary for csrf protection
 
     # Added for django-wiki
     'django.core.context_processors.media',
@@ -232,6 +239,10 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     # Include TEMPLATE_VISIBLE_SETTINGS in templates
     'settings_context_processor.context_processors.settings'
 )
+
+# add csrf support unless disabled for load testing
+if not MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_LOAD_TESTING'):
+    TEMPLATE_CONTEXT_PROCESSORS += ('django.core.context_processors.csrf',)  # necessary for csrf protection
 
 STUDENT_FILEUPLOAD_MAX_SIZE = 4 * 1000 * 1000  # 4 MB
 MAX_FILEUPLOADS_PER_INPUT = 20
@@ -275,11 +286,11 @@ WIKI_ENABLED = False
 
 COURSE_DEFAULT = '6.002x_Fall_2012'
 COURSE_SETTINGS = {'6.002x_Fall_2012': {'number': '6.002x',
-                                          'title': 'Circuits and Electronics',
-                                          'xmlpath': '6002x/',
-                                          'location': 'i4x://edx/6002xs12/course/6.002x_Fall_2012',
-                                          }
-                    }
+                                        'title': 'Circuits and Electronics',
+                                        'xmlpath': '6002x/',
+                                        'location': 'i4x://edx/6002xs12/course/6.002x_Fall_2012',
+                                        }
+                   }
 
 # IP addresses that are allowed to reload the course, etc.
 # TODO (vshnayder): Will probably need to change as we get real access control in.
@@ -314,6 +325,8 @@ CODE_JAIL = {
     'limits': {
         # How many CPU seconds can jailed code use?
         'CPU': 1,
+        # How large a file can jailed code write?
+        'FSIZE': 50000,
     },
 }
 
@@ -347,6 +360,8 @@ IGNORABLE_404_ENDS = ('favicon.ico')
 # Email
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'registration@edx.org'
+DEFAULT_BULK_FROM_EMAIL = 'course-updates@edx.org'
+EMAILS_PER_TASK = 10
 DEFAULT_FEEDBACK_EMAIL = 'feedback@edx.org'
 SERVER_EMAIL = 'devops@edx.org'
 TECH_SUPPORT_EMAIL = 'technical@edx.org'
@@ -431,10 +446,10 @@ OPEN_ENDED_GRADING_INTERFACE = {
     'url': 'http://sandbox-grader-001.m.edx.org/peer_grading',
     'username': 'incorrect_user',
     'password': 'incorrect_pass',
-    'staff_grading' : 'staff_grading',
-    'peer_grading' : 'peer_grading',
-    'grading_controller' : 'grading_controller'
-    }
+    'staff_grading': 'staff_grading',
+    'peer_grading': 'peer_grading',
+    'grading_controller': 'grading_controller'
+}
 
 # Used for testing, debugging peer grading
 MOCK_PEER_GRADING = False
@@ -469,7 +484,6 @@ MIDDLEWARE_CLASSES = (
     'django_comment_client.middleware.AjaxExceptionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
 
     # Instead of AuthenticationMiddleware, we use a cached backed version
     #'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -488,6 +502,10 @@ MIDDLEWARE_CLASSES = (
     'codejail.django_integration.ConfigureCodeJailMiddleware',
 )
 
+# add in csrf middleware unless disabled for load testing
+if not MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_LOAD_TESTING'):
+    MIDDLEWARE_CLASSES = MIDDLEWARE_CLASSES + ('django.middleware.csrf.CsrfViewMiddleware',)
+
 ############################### Pipeline #######################################
 
 STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
@@ -505,17 +523,17 @@ courseware_js = (
 # 'js/vendor/RequireJS.js' - Require JS wrapper.
 # See https://edx-wiki.atlassian.net/wiki/display/LMS/Integration+of+Require+JS+into+the+system
 main_vendor_js = [
-  'js/vendor/RequireJS.js',
-  'js/vendor/json2.js',
-  'js/vendor/jquery.min.js',
-  'js/vendor/jquery-ui.min.js',
-  'js/vendor/jquery.cookie.js',
-  'js/vendor/jquery.qtip.min.js',
-  'js/vendor/swfobject/swfobject.js',
-  'js/vendor/jquery.ba-bbq.min.js',
-  'js/vendor/annotator.min.js',
-  'js/vendor/annotator.store.min.js',
-  'js/vendor/annotator.tags.min.js'
+    'js/vendor/RequireJS.js',
+    'js/vendor/json2.js',
+    'js/vendor/jquery.min.js',
+    'js/vendor/jquery-ui.min.js',
+    'js/vendor/jquery.cookie.js',
+    'js/vendor/jquery.qtip.min.js',
+    'js/vendor/swfobject/swfobject.js',
+    'js/vendor/jquery.ba-bbq.min.js',
+    'js/vendor/annotator.min.js',
+    'js/vendor/annotator.store.min.js',
+    'js/vendor/annotator.tags.min.js'
 ]
 
 discussion_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/discussion/**/*.js'))
@@ -723,6 +741,7 @@ INSTALLED_APPS = (
     'psychometrics',
     'licenses',
     'course_groups',
+    'bulk_email',
 
     # External auth (OpenID, shib)
     'external_auth',
@@ -750,6 +769,13 @@ INSTALLED_APPS = (
     'django_comment_client',
     'django_comment_common',
     'notes',
+
+    # User API
+    'rest_framework',
+    'user_api',
+
+    # Notification preferences setting
+    'notification_prefs',
 )
 
 ######################### MARKETING SITE ###############################

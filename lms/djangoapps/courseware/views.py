@@ -5,7 +5,7 @@ from functools import partial
 
 from django.conf import settings
 from django.core.context_processors import csrf
-from django.core.exceptions import ImproperlyConfigured, PermissionDenied
+from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
@@ -19,9 +19,7 @@ from markupsafe import escape
 from courseware import grades
 from courseware.access import has_access
 from courseware.courses import (get_courses, get_course_with_access,
-                                get_courses_by_university,
-                                registered_for_course,
-                                sort_by_announcement)
+                                get_courses_by_university, sort_by_announcement)
 import courseware.tabs as tabs
 from courseware.masquerade import setup_masquerade
 from courseware.model_data import ModelDataCache
@@ -36,6 +34,7 @@ from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError, NoPathToItem
 from xmodule.modulestore.search import path_to_location
+from xmodule.course_module import CourseDescriptor
 
 import comment_client
 
@@ -169,6 +168,8 @@ def save_child_position(seq_module, child_name):
             # Only save if position changed
             if position != seq_module.position:
                 seq_module.position = position
+    # Save this new position to the underlying KeyValueStore
+    seq_module.save()
 
 
 def check_for_active_timelimit_module(request, course_id, course):
@@ -236,6 +237,36 @@ def update_timelimit_module(user, course_id, model_data_cache, timelimit_descrip
     return context
 
 
+def chat_settings(course, user):
+    """
+    Returns a dict containing the settings required to connect to a
+    Jabber chat server and room.
+    """
+    domain = getattr(settings, "JABBER_DOMAIN", None)
+    if domain is None:
+        log.warning('You must set JABBER_DOMAIN in the settings to '
+                    'enable the chat widget')
+        return None
+
+    return {
+        'domain': domain,
+
+        # Jabber doesn't like slashes, so replace with dashes
+        'room': "{ID}_class".format(ID=course.id.replace('/', '-')),
+
+        'username': "{USER}@{DOMAIN}".format(
+            USER=user.username, DOMAIN=domain
+        ),
+
+        # TODO: clearly this needs to be something other than the username
+        #       should also be something that's not necessarily tied to a
+        #       particular course
+        'password': "{USER}@{DOMAIN}".format(
+            USER=user.username, DOMAIN=domain
+        ),
+    }
+
+
 @login_required
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
@@ -300,6 +331,17 @@ def index(request, course_id, chapter=None, section=None,
             'xqa_server': settings.MITX_FEATURES.get('USE_XQA_SERVER', 'http://xqa:server@content-qa.mitx.mit.edu/xqa')
             }
 
+        # Only show the chat if it's enabled by the course and in the
+        # settings.
+        show_chat = course.show_chat and settings.MITX_FEATURES['ENABLE_CHAT']
+        if show_chat:
+            context['chat'] = chat_settings(course, user)
+            # If we couldn't load the chat settings, then don't show
+            # the widget in the courseware.
+            if context['chat'] is None:
+                show_chat = False
+
+        context['show_chat'] = show_chat
 
         chapter_descriptor = course.get_child_by(lambda m: m.url_name == chapter)
         if chapter_descriptor is not None:
@@ -407,6 +449,27 @@ def index(request, course_id, chapter=None, section=None,
 
 
 @ensure_csrf_cookie
+def jump_to_id(request, course_id, module_id):
+    """
+    This entry point allows for a shorter version of a jump to where just the id of the element is
+    passed in. This assumes that id is unique within the course_id namespace
+    """
+
+    course_location = CourseDescriptor.id_to_location(course_id)
+
+    items = modulestore().get_items(['i4x', course_location.org, course_location.course, None, module_id])
+
+    if len(items) == 0:
+        raise Http404("Could not find id = {0} in course_id = {1}. Referer = {2}".
+                      format(module_id, course_id, request.META.get("HTTP_REFERER", "")))
+    if len(items) > 1:
+        log.warning("Multiple items found with id = {0} in course_id = {1}. Referer = {2}. Using first found {3}...".
+                    format(module_id, course_id, request.META.get("HTTP_REFERER", ""), items[0].location.url()))
+
+    return jump_to(request, course_id, items[0].location.url())
+
+
+@ensure_csrf_cookie
 def jump_to(request, course_id, location):
     """
     Show the page that contains a specific location.
@@ -501,6 +564,18 @@ def syllabus(request, course_id):
 
     return render_to_response('courseware/syllabus.html', {'course': course,
                                             'staff_access': staff_access, })
+
+
+def registered_for_course(course, user):
+    """
+    Return CourseEnrollment if user is registered for course, else False
+    """
+    if user is None:
+        return False
+    if user.is_authenticated():
+        return CourseEnrollment.objects.filter(user=user, course_id=course.id).exists()
+    else:
+        return False
 
 
 @ensure_csrf_cookie

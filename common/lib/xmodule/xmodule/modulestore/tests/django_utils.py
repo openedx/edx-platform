@@ -5,7 +5,6 @@ from django.test import TestCase
 
 from django.conf import settings
 import xmodule.modulestore.django
-from xmodule.templates import update_templates
 from unittest.util import safe_repr
 
 
@@ -48,7 +47,7 @@ def draft_mongo_store_config(data_dir):
 
     return {
         'default': {
-            'ENGINE': 'xmodule.modulestore.mongo.DraftMongoModuleStore',
+            'ENGINE': 'xmodule.modulestore.mongo.draft.DraftModuleStore',
             'OPTIONS': modulestore_options
         },
         'direct': {
@@ -110,22 +109,6 @@ class ModuleStoreTestCase(TestCase):
         modulestore.collection.remove(query)
         modulestore.collection.drop()
 
-    @staticmethod
-    def load_templates_if_necessary():
-        """
-        Load templates into the direct modulestore only if they do not already exist.
-        We need the templates, because they are copied to create
-        XModules such as sections and problems.
-        """
-        modulestore = xmodule.modulestore.django.modulestore('direct')
-
-        # Count the number of templates
-        query = {"_id.course": "templates"}
-        num_templates = modulestore.collection.find(query).count()
-
-        if num_templates < 1:
-            update_templates(modulestore)
-
     @classmethod
     def setUpClass(cls):
         """
@@ -169,9 +152,6 @@ class ModuleStoreTestCase(TestCase):
         # Flush anything that is not a template
         ModuleStoreTestCase.flush_mongo_except_templates()
 
-        # Check that we have templates loaded; if not, load them
-        ModuleStoreTestCase.load_templates_if_necessary()
-
         # Call superclass implementation
         super(ModuleStoreTestCase, self)._pre_setup()
 
@@ -185,34 +165,31 @@ class ModuleStoreTestCase(TestCase):
         # Call superclass implementation
         super(ModuleStoreTestCase, self)._post_teardown()
 
+
     def assert2XX(self, status_code, msg=None):
         """
         Assert that the given value is a success status (between 200 and 299)
         """
-        if not 200 <= status_code < 300:
-            msg = self._formatMessage(msg, "%s is not a success status" % safe_repr(status_code))
-            raise self.failureExecption(msg)
+        msg = self._formatMessage(msg, "%s is not a success status" % safe_repr(status_code))
+        self.assertTrue(status_code >= 200 and status_code < 300, msg=msg)
 
     def assert3XX(self, status_code, msg=None):
         """
         Assert that the given value is a redirection status (between 300 and 399)
         """
-        if not 300 <= status_code < 400:
-            msg = self._formatMessage(msg, "%s is not a redirection status" % safe_repr(status_code))
-            raise self.failureExecption(msg)
+        msg = self._formatMessage(msg, "%s is not a redirection status" % safe_repr(status_code))
+        self.assertTrue(status_code >= 300 and status_code < 400, msg=msg)
 
     def assert4XX(self, status_code, msg=None):
         """
         Assert that the given value is a client error status (between 400 and 499)
         """
-        if not 400 <= status_code < 500:
-            msg = self._formatMessage(msg, "%s is not a client error status" % safe_repr(status_code))
-            raise self.failureExecption(msg)
+        msg = self._formatMessage(msg, "%s is not a client error status" % safe_repr(status_code))
+        self.assertTrue(status_code >= 400 and status_code < 500, msg=msg)
 
     def assert5XX(self, status_code, msg=None):
         """
         Assert that the given value is a server error status (between 500 and 599)
         """
-        if not 500 <= status_code < 600:
-            msg = self._formatMessage(msg, "%s is not a server error status" % safe_repr(status_code))
-            raise self.failureExecption(msg)
+        msg = self._formatMessage(msg, "%s is not a server error status" % safe_repr(status_code))
+        self.assertTrue(status_code >= 500 and status_code < 600, msg=msg)

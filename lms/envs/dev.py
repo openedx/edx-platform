@@ -28,6 +28,7 @@ MITX_FEATURES['ENABLE_MANUAL_GIT_RELOAD'] = True
 MITX_FEATURES['ENABLE_PSYCHOMETRICS'] = False    # real-time psychometrics (eg item response theory analysis in instructor dashboard)
 MITX_FEATURES['ENABLE_INSTRUCTOR_ANALYTICS'] = True
 MITX_FEATURES['ENABLE_SERVICE_STATUS'] = True
+MITX_FEATURES['ENABLE_INSTRUCTOR_EMAIL'] = True
 MITX_FEATURES['ENABLE_HINTER_INSTRUCTOR_VIEW'] = True
 
 WIKI_ENABLED = True
@@ -255,6 +256,9 @@ SEGMENT_IO_LMS_KEY = os.environ.get('SEGMENT_IO_LMS_KEY')
 if SEGMENT_IO_LMS_KEY:
     MITX_FEATURES['SEGMENT_IO_LMS'] = True
 
+
+########################## USER API ########################
+EDX_API_KEY = ''
 
 #####################################################################
 # Lastly, see if the developer has any local overrides.

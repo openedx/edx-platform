@@ -17,7 +17,7 @@ urlpatterns = ('',  # nopep8
     url(r'^preview_component/(?P<location>.*?)$', 'contentstore.views.preview_component', name='preview_component'),
     url(r'^save_item$', 'contentstore.views.save_item', name='save_item'),
     url(r'^delete_item$', 'contentstore.views.delete_item', name='delete_item'),
-    url(r'^clone_item$', 'contentstore.views.clone_item', name='clone_item'),
+    url(r'^create_item$', 'contentstore.views.create_item', name='create_item'),
     url(r'^create_draft$', 'contentstore.views.create_draft', name='create_draft'),
     url(r'^publish_draft$', 'contentstore.views.publish_draft', name='publish_draft'),
     url(r'^unpublish_unit$', 'contentstore.views.unpublish_unit', name='unpublish_unit'),
@@ -148,6 +148,12 @@ if settings.MITX_FEATURES.get('ENABLE_SERVICE_STATUS'):
     )
 
 urlpatterns += (url(r'^admin/', include(admin.site.urls)),)
+
+# enable automatic login
+if settings.MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_LOAD_TESTING'):
+    urlpatterns += (
+        url(r'^auto_auth$', 'student.views.auto_auth'),
+    )
 
 urlpatterns = patterns(*urlpatterns)
 
