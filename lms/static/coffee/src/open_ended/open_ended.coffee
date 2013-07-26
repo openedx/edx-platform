@@ -19,14 +19,15 @@ class OpenEnded
     @unflag_button.click @unflag
 
   unflag: (event) =>
-    event.preventDefault()
-    parent_tr = $(event.target).parent().parent()
-    tr_children = parent_tr.children()
-    action_type = "unflag"
-    submission_id = parent_tr.data('submission-id')
-    student_id = parent_tr.data('student-id')
-    callback_func = @after_action_wrapper($(event.target), action_type)
-    @post('take_action_on_flags', {'submission_id' : submission_id, 'student_id' : student_id, 'action_type' : action_type}, callback_func)
+    if confirm "Are you sure you want to unflag this submission?"
+        event.preventDefault()
+        parent_tr = $(event.target).parent().parent()
+        tr_children = parent_tr.children()
+        action_type = "unflag"
+        submission_id = parent_tr.data('submission-id')
+        student_id = parent_tr.data('student-id')
+        callback_func = @after_action_wrapper($(event.target), action_type)
+        @post('take_action_on_flags', {'submission_id' : submission_id, 'student_id' : student_id, 'action_type' : action_type}, callback_func)
 
   ban: (event) =>
     event.preventDefault()
