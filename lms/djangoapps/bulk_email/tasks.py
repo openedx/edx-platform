@@ -1,3 +1,7 @@
+"""
+This module contains celery task functions for handling the sending of bulk email
+to a course.
+"""
 import logging
 import math
 import re
@@ -20,24 +24,30 @@ from mitxmako.shortcuts import render_to_string
 log = logging.getLogger(__name__)
 
 
-@task()
-def delegate_email_batches(hash_for_msg, recipient, course_id, course_url, user_id):
-    '''
+@task(default_retry_delay=10, max_retries=5)  # pylint: disable=E1102
+def delegate_email_batches(hash_for_msg, to_option, course_id, course_url, user_id):
+    """
     Delegates emails by querying for the list of recipients who should
     get the mail, chopping up into batches of settings.EMAILS_PER_TASK size,
     and queueing up worker jobs.
 
-    Recipient is {'students', 'staff', or 'all'}
+    `to_option` is {'students', 'staff', or 'all'}
 
     Returns the number of batches (workers) kicked off.
-    '''
+    """
     try:
         course = get_course_by_id(course_id)
     except Http404 as exc:
         log.error("get_course_by_id failed: " + exc.args[0])
         raise Exception("get_course_by_id failed: " + exc.args[0])
 
-    if recipient == "myself":
+    try:
+        CourseEmail.objects.get(hash=hash_for_msg)
+    except CourseEmail.DoesNotExist as exc:
+        log.warning("Failed to get CourseEmail with hash %s, retry %d", hash_for_msg, current_task.request.retries)
+        raise delegate_email_batches.retry(arg=[hash_for_msg, to_option, course_id, course_url, user_id], exc=exc)
+
+    if to_option == "myself":
         recipient_qset = User.objects.filter(id=user_id).values('profile__name', 'email')
     else:
         staff_grpname = _course_staff_group_name(course.location)
@@ -48,9 +58,9 @@ def delegate_email_batches(hash_for_msg, recipient, course_id, course_url, user_
         instructor_qset = instructor_group.user_set.values('profile__name', 'email')
         recipient_qset = staff_qset | instructor_qset
 
-        if recipient == "all":
-            #Execute two queries per performance considerations for MySQL
-            #https://docs.djangoproject.com/en/1.2/ref/models/querysets/#in
+        if to_option == "all":
+            # Two queries are executed per performance considerations for MySQL.
+            # See https://docs.djangoproject.com/en/1.2/ref/models/querysets/#in.
             course_optouts = Optout.objects.filter(course_id=course_id).values_list('email', flat=True)
             enrollment_qset = User.objects.filter(courseenrollment__course_id=course_id).exclude(email__in=list(course_optouts)).values('profile__name', 'email')
             recipient_qset = recipient_qset | enrollment_qset
@@ -67,7 +77,7 @@ def delegate_email_batches(hash_for_msg, recipient, course_id, course_url, user_
     return num_workers
 
 
-@task(default_retry_delay=15, max_retries=5)
+@task(default_retry_delay=15, max_retries=5)  # pylint: disable=E1102
 def course_email(hash_for_msg, to_list, course_title, course_url, throttle=False):
     """
     Takes a subject and an html formatted email and sends it from
@@ -127,7 +137,7 @@ def course_email(hash_for_msg, to_list, course_title, course_url, throttle=False
                     raise exc  # this will cause the outer handler to catch the exception and retry the entire task
                 else:
                     #this will fall through and not retry the message, since it will be popped
-                    log.warn('Email with hash ' + hash_for_msg + ' not delivered to ' + email + ' due to error: ' + exc.smtp_error)
+                    log.warning('Email with hash ' + hash_for_msg + ' not delivered to ' + email + ' due to error: ' + exc.smtp_error)
                     num_error += 1
 
             to_list.pop()
@@ -140,6 +150,7 @@ def course_email(hash_for_msg, to_list, course_title, course_url, throttle=False
         raise course_email.retry(arg=[hash_for_msg, to_list, course_title, course_url, current_task.request.retries > 0], exc=exc, countdown=(2 ** current_task.request.retries) * 15)
 
 
-#This string format code is wrapped in this function to allow mocking for a unit test
+# This string format code is wrapped in this function to allow mocking for a unit test
 def course_email_result(num_sent, num_error):
-    return "Sent %d, Fail %d" % (num_sent, num_error)
+    """Return the formatted result of course_email sending."""
+    return "Sent {0}, Fail {1}".format(num_sent, num_error)

@@ -19,6 +19,11 @@ TEST_SMTP_PORT = 1025
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE, EMAIL_BACKEND='django.core.mail.backends.smtp.EmailBackend', EMAIL_HOST='localhost', EMAIL_PORT=TEST_SMTP_PORT)
 class TestEmailErrors(ModuleStoreTestCase):
+
+    """
+    Test that errors from sending email are handled properly.
+    """
+
     def setUp(self):
         self.course = CourseFactory.create()
         instructor = AdminFactory.create()
@@ -37,7 +42,7 @@ class TestEmailErrors(ModuleStoreTestCase):
         """
         self.smtp_server_thread.server.set_errtype("DATA", "454 Throttling failure: Daily message quota exceeded.")
         url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id})
-        self.client.post(url, {'action': 'Send email', 'to': 'myself', 'subject': 'test subject for myself', 'message': 'test message for myself'})
+        self.client.post(url, {'action': 'Send email', 'to_option': 'myself', 'subject': 'test subject for myself', 'message': 'test message for myself'})
         self.assertTrue(retry.called)
         (_, kwargs) = retry.call_args
         exc = kwargs['exc']
@@ -55,7 +60,7 @@ class TestEmailErrors(ModuleStoreTestCase):
             CourseEnrollmentFactory.create(user=student, course_id=self.course.id)
 
         url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id})
-        self.client.post(url, {'action': 'Send email', 'to': 'all', 'subject': 'test subject for all', 'message': 'test message for all'})
+        self.client.post(url, {'action': 'Send email', 'to_option': 'all', 'subject': 'test subject for all', 'message': 'test message for all'})
         self.assertFalse(retry.called)
 
         #test that after the failed email, the rest send successfully
@@ -70,7 +75,7 @@ class TestEmailErrors(ModuleStoreTestCase):
         """
         self.smtp_server_thread.server.set_errtype("DISCONN", "Server disconnected, please try again later.")
         url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id})
-        self.client.post(url, {'action': 'Send email', 'to': 'myself', 'subject': 'test subject for myself', 'message': 'test message for myself'})
+        self.client.post(url, {'action': 'Send email', 'to_option': 'myself', 'subject': 'test subject for myself', 'message': 'test message for myself'})
         self.assertTrue(retry.called)
         (_, kwargs) = retry.call_args
         exc = kwargs['exc']
@@ -84,7 +89,7 @@ class TestEmailErrors(ModuleStoreTestCase):
         #SMTP reply is already specified in fake SMTP Channel created
         self.smtp_server_thread.server.set_errtype("CONN")
         url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id})
-        self.client.post(url, {'action': 'Send email', 'to': 'myself', 'subject': 'test subject for myself', 'message': 'test message for myself'})
+        self.client.post(url, {'action': 'Send email', 'to_option': 'myself', 'subject': 'test subject for myself', 'message': 'test message for myself'})
         self.assertTrue(retry.called)
         (_, kwargs) = retry.call_args
         exc = kwargs['exc']

@@ -18,6 +18,11 @@ STUDENT_COUNT = 10
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestEmail(ModuleStoreTestCase):
+
+    """
+    Test that emails send correctly.
+    """
+
     def setUp(self):
         self.course = CourseFactory.create()
         self.instructor = UserFactory.create(username="instructor", email="robot+instructor@edx.org")
@@ -29,7 +34,7 @@ class TestEmail(ModuleStoreTestCase):
         self.staff = [UserFactory() for _ in xrange(STAFF_COUNT)]
         staff_group = GroupFactory()
         for staff in self.staff:
-            staff_group.user_set.add(staff)
+            staff_group.user_set.add(staff)  # pylint: disable=E1101
 
         #create students
         self.students = [UserFactory() for _ in xrange(STUDENT_COUNT)]
@@ -43,7 +48,7 @@ class TestEmail(ModuleStoreTestCase):
         Make sure email send to myself goes to myself.
         """
         url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id})
-        response = self.client.post(url, {'action': 'Send email', 'to': 'myself', 'subject': 'test subject for myself', 'message': 'test message for myself'})
+        response = self.client.post(url, {'action': 'Send email', 'to_option': 'myself', 'subject': 'test subject for myself', 'message': 'test message for myself'})
 
         self.assertContains(response, "Your email was successfully queued for sending.")
 
@@ -57,7 +62,7 @@ class TestEmail(ModuleStoreTestCase):
         Make sure email send to staff and instructors goes there.
         """
         url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id})
-        response = self.client.post(url, {'action': 'Send email', 'to': 'staff', 'subject': 'test subject for staff', 'message': 'test message for subject'})
+        response = self.client.post(url, {'action': 'Send email', 'to_option': 'staff', 'subject': 'test subject for staff', 'message': 'test message for subject'})
 
         self.assertContains(response, "Your email was successfully queued for sending.")
 
@@ -69,7 +74,7 @@ class TestEmail(ModuleStoreTestCase):
         Make sure email send to all goes there.
         """
         url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id})
-        response = self.client.post(url, {'action': 'Send email', 'to': 'all', 'subject': 'test subject for all', 'message': 'test message for all'})
+        response = self.client.post(url, {'action': 'Send email', 'to_option': 'all', 'subject': 'test subject for all', 'message': 'test message for all'})
 
         self.assertContains(response, "Your email was successfully queued for sending.")
 

@@ -14,6 +14,11 @@ from student.tests.factories import UserFactory, AdminFactory, CourseEnrollmentF
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestOptoutCourseEmails(ModuleStoreTestCase):
+
+    """
+    Test that optouts are referenced in sending course email.
+    """
+
     def setUp(self):
         self.course = CourseFactory.create()
         self.instructor = AdminFactory.create()
@@ -34,7 +39,7 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
         self.client.login(username=self.instructor.username, password="test")
 
         url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id})
-        response = self.client.post(url, {'action': 'Send email', 'to': 'all', 'subject': 'test subject for all', 'message': 'test message for all'})
+        response = self.client.post(url, {'action': 'Send email', 'to_option': 'all', 'subject': 'test subject for all', 'message': 'test message for all'})
         self.assertContains(response, "Your email was successfully queued for sending.")
 
         #assert that self.student.email not in mail.to, outbox should be empty
@@ -52,7 +57,7 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
         self.client.login(username=self.instructor.username, password="test")
 
         url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id})
-        response = self.client.post(url, {'action': 'Send email', 'to': 'all', 'subject': 'test subject for all', 'message': 'test message for all'})
+        response = self.client.post(url, {'action': 'Send email', 'to_option': 'all', 'subject': 'test subject for all', 'message': 'test message for all'})
         self.assertContains(response, "Your email was successfully queued for sending.")
 
         #assert that self.student.email in mail.to

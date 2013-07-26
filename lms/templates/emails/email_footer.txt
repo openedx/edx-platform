@@ -1,7 +1,7 @@
 <%! from django.core.urlresolvers import reverse %>
 
 ----
-This email was automatically sent from ${settings.PLATFORM_NAME} to ${name}.
+This email was automatically sent from ${settings.PLATFORM_NAME}.
 You are receiving this email at address ${ email } because you are enrolled in ${ course_title }
 (URL: ${course_url} ).
-To stop receiving email like this, update your account settings at https://${site}${reverse('dashboard')}.
+To stop receiving email like this, update your account settings at https://${settings.SITE_NAME}${reverse('dashboard')}.

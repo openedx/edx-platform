@@ -44,6 +44,11 @@ $dark-gray: #333;
 // used by descriptor css
 $lightGrey: #edf1f5;
 $darkGrey: #8891a1;
+$blue-d1: shade($blue,20%);
+$blue-d2: shade($blue,40%);
+$blue-d4: shade($blue,80%);
+$shadow: rgba($black, 0.2);
+$shadow-l1: rgba($black, 0.1);
 
 // edx.org marketing site variables
 $m-gray: #8A8C8F;

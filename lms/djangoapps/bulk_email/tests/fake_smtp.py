@@ -51,11 +51,18 @@ class FakeSMTPServer(smtpd.SMTPServer):
     def __init__(self, *args, **kwargs):
         smtpd.SMTPServer.__init__(self, *args, **kwargs)
         self.errtype = None
-        self.reply = None
+        self.response = None
 
-    def set_errtype(self, errtype, reply=''):
+    def set_errtype(self, errtype, response=''):
+        """Specify the type of error to cause smptlib to raise, with optional response string.
+
+        `errtype` -- "DATA": The server will cause smptlib to throw SMTPDataError.
+                     "CONN": The server will cause smptlib to throw SMTPConnectError.
+                     "DISCONN": The server will cause smptlib to throw SMTPServerDisconnected.
+
+        """
         self.errtype = errtype
-        self.reply = reply
+        self.response = response
 
     def handle_accept(self):
         if self.errtype == "DISCONN":
@@ -70,11 +77,12 @@ class FakeSMTPServer(smtpd.SMTPServer):
 
     def process_message(self, *_args, **_kwargs):
         if self.errtype == "DATA":
-            #after failing on the first email, succeed on rest
+            # After failing on the first email, succeed on the rest.
             self.errtype = None
-            return self.reply
+            return self.response
         else:
             return None
 
     def serve_forever(self):
+        """Start the server running until close() is called on the server."""
         asyncore.loop()
