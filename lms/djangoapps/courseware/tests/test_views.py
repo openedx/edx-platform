@@ -6,8 +6,10 @@ from django.http import Http404
 from django.test.utils import override_settings
 from django.contrib.auth.models import User
 from django.test.client import RequestFactory
+from django.core.urlresolvers import reverse
 
 from student.models import CourseEnrollment
+from student.tests.factories import AdminFactory
 from xmodule.modulestore.django import modulestore
 
 import courseware.views as views
@@ -86,6 +88,15 @@ class ViewsTestCase(TestCase):
         self.assertRaises(Http404, views.redirect_to_course_position,
                           mock_module)
 
+    def test_registered_for_course(self):
+        self.assertFalse(views.registered_for_course('Basketweaving', None))
+        mock_user = MagicMock()
+        mock_user.is_authenticated.return_value = False
+        self.assertFalse(views.registered_for_course('dummy', mock_user))
+        mock_course = MagicMock()
+        mock_course.id = self.course_id
+        self.assertTrue(views.registered_for_course(mock_course, self.user))
+
     def test_jump_to_invalid(self):
         request = self.request_factory.get(self.chapter_url)
         self.assertRaisesRegexp(Http404, 'Invalid location', views.jump_to,
@@ -116,3 +127,26 @@ class ViewsTestCase(TestCase):
         else:
             self.assertNotContains(result, "Classes End")
 
+    def test_submission_history_xss(self):
+        # log into a staff account
+        admin = AdminFactory()
+
+        self.client.login(username=admin.username, password='test')
+
+        # try it with an existing user and a malicious location
+        url = reverse('submission_history', kwargs={
+            'course_id': self.course_id,
+            'student_username': 'dummy',
+            'location': '<script>alert("hello");</script>'
+        })
+        response = self.client.get(url)
+        self.assertFalse('<script>' in response.content)
+
+        # try it with a malicious user and a non-existent location
+        url = reverse('submission_history', kwargs={
+            'course_id': self.course_id,
+            'student_username': '<script>alert("hello");</script>',
+            'location': 'dummy'
+        })
+        response = self.client.get(url)
+        self.assertFalse('<script>' in response.content)

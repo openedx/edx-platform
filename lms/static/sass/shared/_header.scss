@@ -278,26 +278,8 @@ header.global {
     li {
       display: inline-block;
 
-      a {
-        border-radius: 0;
-        @include linear-gradient(saturate($link-color-d1,15%) 5%, shade($link-color-d1,15%) 95%);
-        display: inline-block;
-        padding: $baseline/2 $baseline*2.5;
-        text-transform: lowercase;
-        color: $very-light-text;
-        letter-spacing: 0.1rem;
-        font-weight: 300;
-        cursor: pointer;
-        text-align: center;
-        border: none !important;
-        text-shadow: none;
-        letter-spacing: 0.1rem;
-        font-size: 14px;
-        box-shadow: none !important;
-
-        &:hover {
-          text-decoration: none;
-        }
+      .cta {
+        @extend .m-btn-primary;
       }
     }
 
