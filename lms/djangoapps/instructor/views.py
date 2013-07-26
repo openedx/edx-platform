@@ -751,8 +751,12 @@ s (~10k), it may take 1-2 hours to send all emails.</font>"
     else:
         instructor_tasks = None
 
-    # html module for email editor
-    html_module = HtmlDescriptor(course.system, {'data': html_message})
+    # HTML editor for email
+    if idash_mode == 'Email':
+        html_module = HtmlDescriptor(course.system, {'data': html_message})
+        editor = wrap_xmodule(html_module.get_html, html_module, 'xmodule_edit.html')()
+    else:
+        editor = None
 
     # display course stats only if there is no other table to display:
     course_stats = None
@@ -770,9 +774,9 @@ s (~10k), it may take 1-2 hours to send all emails.</font>"
                'course_stats': course_stats,
                'msg': msg,
                'modeflag': {idash_mode: 'selectedmode'},
-               'to': to,  # email
+               'to': to,            # email
                'subject': subject,  # email
-               'editor': wrap_xmodule(html_module.get_html, html_module, 'xmodule_edit.html')(),  # email
+               'editor': editor,    # email
                'problems': problems,		# psychometrics
                'plots': plots,			# psychometrics
                'course_errors': modulestore().get_item_errors(course.location),
