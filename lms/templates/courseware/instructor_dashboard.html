@@ -10,6 +10,12 @@
   <script type="text/javascript" src="${static.url('js/vendor/jquery-jvectormap-1.1.1/jquery-jvectormap-1.1.1.min.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/jquery-jvectormap-1.1.1/jquery-jvectormap-world-mill-en.js')}"></script>
   <script type="text/javascript" src="${static.url('js/course_groups/cohorts.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/codemirror-compressed.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/tiny_mce/tiny_mce.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/tiny_mce/jquery.tinymce.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/CodeMirror/htmlmixed.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/CodeMirror/css.js')}"></script>
+  <%static:js group='module-descriptor-js'/>
 %if instructor_tasks is not None:
   <script type="text/javascript" src="${static.url('js/pending_tasks.js')}"></script>
 %endif
@@ -458,12 +464,11 @@ function goto( mode)
     %else:
       <input type="text" id="id_subject" name="subject" maxlength="100" size="75">
     %endif
-    <label for="id_message">Message:</label>
-    %if message:
-      <textarea cols="100" id="id_message" name="message">${message}</textarea>
-    %else:
-      <textarea cols="100" id="id_message" name="message"></textarea>
-    %endif
+    <label>Message:</label>
+    <div class="email-editor">
+      ${editor}
+    </div>
+    <input type="hidden" name="message" value="">
     </p>
     <div class="submit-email-action">
       Please try not to email students more than once a day. Important things to consider before sending:
@@ -473,6 +478,13 @@ function goto( mode)
       </ul>
       <input type="submit" name="action" value="Send email">
     </div>
+    <script type="text/javascript">
+      var emailEditor = XModule.loadModule($('.xmodule_edit'));
+      document.idashform.onsubmit = function() {
+        this.message.value = emailEditor.save()['data'];
+        return true;
+      }
+    </script>
 %endif
 
     </form>
