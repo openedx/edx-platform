@@ -367,7 +367,13 @@ fi
 rbenv rehash
 
 output "Installing ruby packages"
-bundle install --gemfile $BASE/edx-platform/Gemfile
+if [ `date "+%:::z"` -eq 8 ]
+then
+	echo "OK,now I think you are in China .."
+	bundle install --gemfile $BASE/edx-platform/CNGemfile
+else
+	bundle install --gemfile $BASE/edx-platform/Gemfile
+fi
 
 # Install Python virtualenv
 output "Installing python virtualenv"
