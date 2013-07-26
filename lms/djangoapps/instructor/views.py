@@ -22,9 +22,11 @@ from django.views.decorators.cache import cache_control
 from django.core.urlresolvers import reverse
 from django.core.mail import send_mail
 
+from xmodule_modifiers import wrap_xmodule
 import xmodule.graders as xmgraders
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.html_module import HtmlDescriptor
 
 from courseware import grades
 from courseware.access import (has_access, get_access_group_name,
@@ -82,7 +84,7 @@ def instructor_dashboard(request, course_id):
     msg = ''
     to = None
     subject = None
-    html_message = None
+    html_message = ''
     problems = []
     plots = []
     datatable = {}
@@ -749,6 +751,9 @@ s (~10k), it may take 1-2 hours to send all emails.</font>"
     else:
         instructor_tasks = None
 
+    # html module for email editor
+    html_module = HtmlDescriptor(course.system, {'data': html_message})
+
     # display course stats only if there is no other table to display:
     course_stats = None
     if not datatable:
@@ -765,9 +770,9 @@ s (~10k), it may take 1-2 hours to send all emails.</font>"
                'course_stats': course_stats,
                'msg': msg,
                'modeflag': {idash_mode: 'selectedmode'},
-               'to': to,                 # email
-               'subject': subject,       # email
-               'message': html_message,  # email
+               'to': to,  # email
+               'subject': subject,  # email
+               'editor': wrap_xmodule(html_module.get_html, html_module, 'xmodule_edit.html')(),  # email
                'problems': problems,		# psychometrics
                'plots': plots,			# psychometrics
                'course_errors': modulestore().get_item_errors(course.location),
