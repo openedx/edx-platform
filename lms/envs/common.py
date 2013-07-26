@@ -616,6 +616,11 @@ PIPELINE_JS = {
         'output_filename': 'js/lms-main_vendor.js',
         'test_order': 0,
     },
+    'module-descriptor-js': {
+        'source_filenames': rooted_glob(COMMON_ROOT / 'static/', 'xmodule/descriptors/js/*.js'),
+        'output_filename': 'js/lms-module-descriptors.js',
+        'test_order': 8,
+    },
     'module-js': {
         'source_filenames': rooted_glob(COMMON_ROOT / 'static', 'xmodule/modules/js/*.js'),
         'output_filename': 'js/lms-modules.js',

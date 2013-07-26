@@ -66,6 +66,7 @@
 @import "course/instructor/instructor";
 @import "course/instructor/instructor_2";
 @import "course/instructor/email";
+@import "xmodule/descriptors/css/module-styles.scss";
 
 // discussion
 @import "course/discussion/form-wmd-toolbar";
