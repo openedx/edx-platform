@@ -63,7 +63,7 @@ def delegate_email_batches(hash_for_msg, recipient, course_id, course_url, user_
 
     for i in range(num_workers):
         to_list = recipient_list[i * chunk:i * chunk + chunk]
-        course_email.delay(hash_for_msg, to_list, course.display_name, course_url, False)
+        course_email.apply_async(args=[hash_for_msg, to_list, course.display_name, course_url, False], countdown=10)
     return num_workers
 
 
