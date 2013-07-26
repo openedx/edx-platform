@@ -3,20 +3,309 @@
 
 body.dashboard {
 
-	.my-classes {
-	  margin-top: $baseline;
+	// temp
+	.content {
+		margin-bottom: ($baseline*5);
+
+		&:last-child {
+			margin-bottom: 0;
+		}
 	}
 
-	.class-list {
-		margin-top: 20px;
-		border-radius: 3px;
-		border: 1px solid $darkGrey;
-		background: #fff;
-		box-shadow: 0 1px 2px rgba(0, 0, 0, .1);
+	// ====================
 
-		li {
+	// basic layout
+	.content-primary, .content-supplementary {
+	  @include box-sizing(border-box);
+	  float: left;
+	}
+
+	.content-primary {
+	  width: flex-grid(9, 12);
+	  margin-right: flex-gutter();
+	}
+
+	.content-supplementary {
+	  width: flex-grid(3, 12);
+	}
+
+	// ====================
+
+	// elements - notices
+	.content .notice-incontext {
+		width: flexgrid(9, 9);
+
+	  // CASE: notice has actions {
+	  &.has-actions, &.list-notices .notice-item.has-actions {
+
+	    .msg, .list-actions {
+	      display: inline-block;
+	      vertical-align: middle;
+	    }
+
+	    .msg {
+	      width: flex-grid(6, 9);
+	      margin-right: flex-gutter();
+	    }
+
+	    .list-actions {
+	      width: flex-grid(3, 9);
+	      text-align: right;
+	      margin-top: 0;
+
+	      .action-item {
+
+	      }
+
+	      .action-create-course {
+	      	@extend .btn-primary-green;
+	      	@extend .t-action3;
+	      }
+	    }
+	  }
+	}
+
+
+
+	// elements - course creation rights controls
+	.wrapper-creationrights {
+		overflow: hidden;
+
+		.ui-toggle-control {
+			@extend .ui-depth2;
+			@extend .btn-secondary-gray;
+			@include clearfix();
+			display: block;
+			text-align: left;
+
+			// STATE: hover - syncing up colors with current so transition is smoother
+			&:hover {
+				background: $gray-d1;
+				color: $white;
+			}
+
+			.label {
+				@extend .t-action3;
+				float: left;
+				width: flex-grid(8, 9);
+				margin: 3px flex-gutter() 0 0;
+			}
+
+			.icon-remove-sign {
+				@extend .t-action1;
+				@include transform(rotate(45deg));
+				@include transform-origin(center center);
+				@include transition(all $tmg-f1 linear 0s);
+				float: right;
+				text-align: right;
+			}
+		}
+
+		.ui-toggle-target {
+			@extend .ui-depth1;
+			@include transition(opacity $tmg-f1 ease-in-out 0s);
 			position: relative;
-			border-bottom: 1px solid $mediumGrey;
+			top: -2px;
+			display: none;
+			opacity: 0;
+		}
+
+		// CASE: when the content area is shown
+		&.is-shown {
+
+			.ui-toggle-control {
+				@include border-bottom-radius(0);
+
+				.icon-remove-sign {
+					@include transform(rotate(90deg));
+					@include transform-origin(center center);
+				}
+			}
+
+			.ui-toggle-target {
+				display: block;
+				opacity: 1.0;
+			}
+		}
+
+
+	}
+
+	// elements - course creation rights controls
+	.status-creationrights {
+		margin-top: $baseline;
+
+		.title {
+			@extend .t-title7;
+			margin-bottom: ($baseline/4);
+			font-weight: 700;
+			color: $gray-d1;
+		}
+
+		.copy {
+
+		}
+
+		.list-actions, .form-actions {
+      margin-top: ($baseline*0.75);
+
+      .action-item {
+
+      }
+
+      .action-primary {
+        @extend .btn-primary-blue;
+        @extend .t-action3;
+      }
+
+      // specific - request button
+      // BT: should we abstract these states out for all buttons like this
+      .action-request {
+      	position: relative;
+      	overflow: hidden;
+
+      	.icon-cog {
+      		@include transition(all $tmg-f1 ease-in-out $tmg-f1);
+      		@include font-size(20);
+      		position: absolute;
+      		top: ($baseline/2);
+					left: -($baseline);
+      		visibility: hidden;
+      		opacity: 0.0;
+      	}
+
+        // state: submitting
+      	&.is-submitting {
+      		padding-left: ($baseline*2);
+
+					.icon-cog {
+						left: ($baseline*0.75);
+						visibility: visible;
+						opacity: 1.0;
+					}
+      	}
+
+        // state: has an error
+        &.has-error {
+          padding-left: ($baseline*2);
+          background: $red;
+          border-color: $red-d1;
+
+          .icon-cog {
+            left: ($baseline*0.75);
+            visibility: visible;
+            opacity: 1.0;
+          }
+        }
+      }
+    }
+
+    .status-update {
+
+    	.label {
+				@extend .cont-text-sr;
+    	}
+
+    	.value {
+    		border-radius: ($baseline/4);
+    		position: relative;
+    		overflow: hidden;
+    		padding: ($baseline/5) ($baseline/2);
+    		background: $gray;
+
+    		.status-indicator {
+    		  position: absolute;
+    		  top: 0;
+    		  left: 0;
+    		  display: block;
+    		  width: 100%;
+    		  height: ($baseline/4);
+    		  opacity: 0.40;
+    		}
+    	}
+
+			.value-formal, .value-description {
+				border-radius: ($baseline/10);
+				display: inline-block;
+				vertical-align: middle;
+				color: $white;
+			}
+
+    	.value-formal {
+    		@extend .t-title5;
+    		margin: ($baseline/2);
+    		font-weight: 700;
+
+    		[class^="icon-"] {
+    			margin-right: ($baseline/4);
+    		}
+    	}
+
+    	.value-description {
+    		@extend .t-copy-sub1;
+    		position: relative;
+    		color: $white;
+				opacity: 0.85;
+    	}
+    }
+
+		// CASE: rights are not requested yet
+		&.is-unrequested {
+
+			.title {
+				@extend .cont-text-sr;
+			}
+		}
+
+		// CASE: status is pending
+		&.is-pending {
+
+			.status-update {
+
+				.value {
+					background: $orange;
+				}
+
+				.status-indicator {
+					background: $orange-d1;
+				}
+			}
+		}
+
+
+    // CASE: status is denied
+    &.is-denied {
+
+    	.status-update {
+
+    		.value {
+    			background: $red-l1;
+    		}
+
+    		.status-indicator {
+    			background: $red-s1;
+    		}
+    	}
+    }
+	}
+
+	// ====================
+
+	// course listings
+	.courses {
+	  margin: $baseline 0;
+	}
+
+	.list-courses {
+		margin-top: $baseline;
+		border-radius: 3px;
+		border: 1px solid $gray;
+		background: $white;
+		box-shadow: 0 1px 2px $shadow-l1;
+
+		.course-item {
+			position: relative;
+			border-bottom: 1px solid $gray-l1;
 
 			&:last-child {
 				border-bottom: none;
@@ -56,7 +345,7 @@ body.dashboard {
 		.view-live-button {
 			z-index: 10000;
 			position: absolute;
-			top: 15px;
+			top: ($baseline*0.75);
 			right: $baseline;
 			padding: ($baseline/4) ($baseline/2);
 			opacity: 0.0;
@@ -70,17 +359,25 @@ body.dashboard {
 	}
 
 	.new-course {
-		padding: 15px 25px;
-		margin-top: 20px;
+		@include clearfix();
+		padding: ($baseline*0.75) ($baseline*1.25);
+		margin-top: $baseline;
 		border-radius: 3px;
-		border: 1px solid $darkGrey;
-		background: #fff;
+		border: 1px solid $gray;
+		background: $white;
 		box-shadow: 0 1px 2px rgba(0, 0, 0, .1);
-		@include clearfix;
+
+		.title {
+			@extend .t-title4;
+			font-weight: 600;
+			margin-bottom: ($baseline/2);
+			border-bottom: 1px solid $gray-l3;
+			padding-bottom: ($baseline/2);
+		}
 
 		.row {
-			margin-bottom: 15px;
-			@include clearfix;
+			@include clearfix();
+			margin-bottom: ($baseline*0.75);
 		}
 
 		.column {
@@ -97,8 +394,8 @@ body.dashboard {
 		}
 
 		label {
+			@extend .t-title7;
 			display: block;
-			font-size: 13px;
 			font-weight: 700;
 		}
 
@@ -109,7 +406,7 @@ body.dashboard {
 		}
 
 		.new-course-name {
-			font-size: 19px;
+			@extend .t-title5;
 			font-weight: 300;
 		}
 
@@ -119,6 +416,10 @@ body.dashboard {
 
 		.new-course-cancel {
 			@include white-button;
+		}
+
+		.item-details {
+			padding-bottom: 0;
 		}
 	}
 }
