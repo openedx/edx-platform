@@ -83,7 +83,7 @@ def instructor_dashboard(request, course_id):
     forum_admin_access = has_forum_access(request.user, course_id, FORUM_ROLE_ADMINISTRATOR)
 
     msg = ''
-    to = None
+    to_option = None
     subject = None
     html_message = ''
     problems = []
@@ -701,13 +701,13 @@ def instructor_dashboard(request, course_id):
     # email
 
     elif action == 'Send email':
-        to = request.POST.get("to")
+        to_option = request.POST.get("to_option")
         subject = request.POST.get("subject")
         html_message = request.POST.get("message")
 
         email = CourseEmail(course_id=course_id,
                             sender=request.user,
-                            to=to,
+                            to=to_option,
                             subject=subject,
                             html_message=html_message,
                             hash=md5((html_message + subject + datetime.datetime.isoformat(datetime.datetime.now())).encode('utf-8')).hexdigest())
@@ -716,7 +716,7 @@ def instructor_dashboard(request, course_id):
         course_url = request.build_absolute_uri(reverse('course_root', kwargs={'course_id': course_id}))
         tasks.delegate_email_batches.delay(email.hash, email.to, course_id, course_url, request.user.id)
 
-        if to == "all":
+        if to_option == "all":
             msg = "<font color='green'>Your email was successfully queued for sending. Please note that for large public classe\
 s (~10k), it may take 1-2 hours to send all emails.</font>"
         else:
@@ -810,9 +810,9 @@ s (~10k), it may take 1-2 hours to send all emails.</font>"
                'course_stats': course_stats,
                'msg': msg,
                'modeflag': {idash_mode: 'selectedmode'},
-               'to': to,            # email
-               'subject': subject,  # email
-               'editor': editor,    # email
+               'to_option': to_option,  # email
+               'subject': subject,      # email
+               'editor': editor,        # email
                'problems': problems,		# psychometrics
                'plots': plots,			# psychometrics
                'course_errors': modulestore().get_item_errors(course.location),

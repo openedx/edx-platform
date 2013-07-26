@@ -445,14 +445,14 @@ function goto( mode)
 %if modeflag.get('Email'):
     <p>
     <label for="id_to">Send to:</label>
-    <select id="id_to" name="to">
+    <select id="id_to" name="to_option">
       <option value="myself">Myself</option>
-      %if to == "staff":
+      %if to_option == "staff":
         <option value="staff" selected="selected">Staff and instructors</option>
       %else:
 	<option value="staff">Staff and instructors</option>
       %endif
-      %if to == "all":
+      %if to_option == "all":
         <option value="all" selected="selected">All (students, staff and instructors)</option>
       %else:
 	<option value="all">All (students, staff and instructors)</option>
