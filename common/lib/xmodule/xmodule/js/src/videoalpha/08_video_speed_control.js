@@ -105,7 +105,7 @@ function () {
                 parseFloat(this.videoSpeedControl.currentSpeed).toFixed(2).replace(/\.00$/, '.0')
             );
 
-            this.trigger(['videoPlayer', 'onSpeedChange'], this.videoSpeedControl.currentSpeed);
+            this.trigger('videoPlayer.onSpeedChange', this.videoSpeedControl.currentSpeed);
         }
     }
 

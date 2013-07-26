@@ -12,6 +12,7 @@ div.videoalpha {
 
   div.tc-wrapper {
     position: relative;
+    @include clearfix;
   }
 
   article.video-wrapper {
@@ -82,7 +83,7 @@ div.videoalpha {
         -moz-transition: -moz-transform 0.7s ease-in-out;
         -ms-transition: -ms-transform 0.7s ease-in-out;
         transition: transform 0.7s ease-in-out;
-        @include transform(scaleY(0.5) translateY(50%));
+        @include transform(scaleY(0.5) translate3d(0, 50%, 0));
 
         div.ui-widget-header {
           background: #777;
@@ -244,7 +245,7 @@ div.videoalpha {
 
           // fix for now
           ol.video_speeds {
-            box-shadow: inset 1px 0 0 #555, 0 3px 0 #444;
+            box-shadow: inset 1px 0 0 #555, 0 4px 0 #444;
             @include transition(none);
             background-color: #444;
             border: 1px solid #000;
@@ -252,7 +253,7 @@ div.videoalpha {
             display: none;
             opacity: 0.0;
             position: absolute;
-            width: 133px;
+            width: 131px;
             z-index: 10;
 
             li {
@@ -454,7 +455,7 @@ div.videoalpha {
       }
 
       div.slider {
-        @include transform(scaleY(1) translateY(0));
+        @include transform(scaleY(1) translate3d(0, 0, 0));
 
         a.ui-slider-handle {
           @include transform(scale(1) translate3d(-50%, -15%, 0));
@@ -509,6 +510,7 @@ div.videoalpha {
       left: 0px;
       right: 0px;
       position: absolute;
+      z-index: 1;
     }
 
     article.video-wrapper section.video-controls div.secondary-controls a.hide-subtitles {
@@ -528,11 +530,14 @@ div.videoalpha {
 
     ol.subtitles.html5 {
         background-color: rgba(243, 243, 243, 0.8);
-        height: 380px;
+        height: 100%;
         position: absolute;
         right: 0;
+        bottom: 0;
+        top: 0;
         width: 275px;
-        margin-top: 20px;
+        padding: 0 20px;
+        z-index: 0;
     }
   }
 

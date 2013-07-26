@@ -146,9 +146,9 @@ function () {
         event.preventDefault();
 
         if (this.videoControl.isPlaying) {
-            this.trigger(['videoPlayer', 'pause'], null);
+            this.trigger('videoPlayer.pause', null);
         } else {
-            this.trigger(['videoPlayer', 'play'], null);
+            this.trigger('videoPlayer.play', null);
         }
     }
 
@@ -167,7 +167,7 @@ function () {
             this.videoControl.fullScreenEl.attr('title', 'Exit fullscreen');
         }
 
-        this.trigger(['videoCaption', 'resize'], null);
+        this.trigger('videoCaption.resize', null);
     }
 
     function exitFullScreen(event) {

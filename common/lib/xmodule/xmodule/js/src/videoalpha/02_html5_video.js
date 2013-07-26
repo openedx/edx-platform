@@ -218,6 +218,7 @@ function () {
             // The player state is used by other parts of the VideoPlayer to detrermine what the video is
             // currently doing.
             this.video = this.videoEl[0];
+            this.video.load();
             this.playerState = HTML5Video.PlayerState.UNSTARTED;
             // this.callStateChangeCallback();
 

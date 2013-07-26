@@ -65,7 +65,7 @@ function () {
         this.el.find('.video-controls .secondary-controls').append(this.videoCaption.hideSubtitlesEl);
 
         this.el.find('.subtitles').css({
-            maxHeight: this.el.find('.video-wrapper').height() - 5
+            maxHeight: this.el.find('.video-wrapper').height()
         });
 
         this.videoCaption.fetchCaption();
@@ -329,7 +329,7 @@ function () {
         event.preventDefault();
         time = Math.round(Time.convert($(event.target).data('start'), '1.0', this.speed) / 1000);
 
-        this.trigger(['videoPlayer', 'onCaptionSeek'], {'type': 'onCaptionSeek', 'time': time});
+        this.trigger('videoPlayer.onCaptionSeek', {'type': 'onCaptionSeek', 'time': time});
     }
 
     function calculateOffset(element) {

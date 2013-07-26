@@ -90,7 +90,7 @@ function () {
             newQuality = 'hd720';
         }
 
-        this.trigger(['videoPlayer', 'handlePlaybackQualityChange'], newQuality);
+        this.trigger('videoPlayer.handlePlaybackQualityChange', newQuality);
     }
 
 });

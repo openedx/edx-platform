@@ -94,7 +94,7 @@ function () {
             path: '/'
         });
 
-        this.trigger(['videoPlayer', 'onVolumeChange'], ui.value);
+        this.trigger('videoPlayer.onVolumeChange', ui.value);
     }
 
     function toggleMute(event) {

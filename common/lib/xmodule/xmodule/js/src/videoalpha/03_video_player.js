@@ -225,7 +225,7 @@ function (HTML5Video) {
         }
     }
 
-    // Every 200 ms, if the video is playing, we call the function update, via 
+    // Every 200 ms, if the video is playing, we call the function update, via
     // clearInterval. This interval is called updateInterval.
     // It is created on a onPlay event. Cleared on a onPause event.
     // Reinitialized on a onSeek event.
@@ -252,10 +252,10 @@ function (HTML5Video) {
     }
 
     function onEnded() {
-        this.trigger(['videoControl','pause'], null);
+        this.trigger('videoControl.pause', null);
 
         if (this.config.show_captions) {
-            this.trigger(['videoCaption','pause'], null);
+            this.trigger('videoCaption.pause', null);
         }
     }
 
@@ -270,10 +270,10 @@ function (HTML5Video) {
         clearInterval(this.videoPlayer.updateInterval);
         delete this.videoPlayer.updateInterval;
 
-        this.trigger(['videoControl','pause'], null);
+        this.trigger('videoControl.pause', null);
 
         if (this.config.show_captions) {
-            this.trigger(['videoCaption','pause'], null);
+            this.trigger('videoCaption.pause', null);
         }
     }
 
@@ -289,10 +289,10 @@ function (HTML5Video) {
             this.videoPlayer.updateInterval = setInterval(this.videoPlayer.update, 200);
         }
 
-        this.trigger(['videoControl','play'], null);
+        this.trigger('videoControl.play', null);
 
         if (this.config.show_captions) {
-            this.trigger(['videoCaption','play'], null);
+            this.trigger('videoCaption.play', null);
         }
     }
 
@@ -307,7 +307,7 @@ function (HTML5Video) {
 
         quality = this.videoPlayer.player.getPlaybackQuality();
 
-        this.trigger(['videoQualityControl', 'onQualityChange'], quality);
+        this.trigger('videoQualityControl.onQualityChange', quality);
     }
 
     function onReady() {
@@ -327,7 +327,7 @@ function (HTML5Video) {
 
                 baseSpeedSubs = this.videos['1.0'];
                 _this = this;
-                // this.videos is a dictionary containing various frame rates 
+                // this.videos is a dictionary containing various frame rates
                 // and their associated subs.
 
                 // First clear the dictionary.
@@ -342,7 +342,7 @@ function (HTML5Video) {
                     _this.speeds.push(value.toFixed(2).replace(/\.00$/, '.0'));
                 });
 
-                this.trigger(['videoSpeedControl', 'reRender'], {'newSpeeds': this.speeds, 'currentSpeed': this.speed});
+                this.trigger('videoSpeedControl.reRender', {'newSpeeds': this.speeds, 'currentSpeed': this.speed});
 
                 this.setSpeed($.cookie('video_speed'));
             }
@@ -379,9 +379,9 @@ function (HTML5Video) {
 
         duration = this.videoPlayer.duration();
 
-        this.trigger(['videoProgressSlider', 'updatePlayTime'], {'time': time, 'duration': duration});
-        this.trigger(['videoControl', 'updateVcrVidTime'], {'time': time, 'duration': duration});
-        this.trigger(['videoCaption', 'updatePlayTime'], time);
+        this.trigger('videoProgressSlider.updatePlayTime', {'time': time, 'duration': duration});
+        this.trigger('videoControl.updateVcrVidTime', {'time': time, 'duration': duration});
+        this.trigger('videoCaption.updatePlayTime', time);
     }
 
     function isPlaying() {

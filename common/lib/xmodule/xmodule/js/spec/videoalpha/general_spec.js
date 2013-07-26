@@ -117,9 +117,9 @@
 
                     it('parse Html5 sources', function () {
                         var html5Sources = {
-                            mp4: 'test.mp4',
-                            webm: 'test.webm',
-                            ogg: 'test.ogv'
+                            mp4: 'test_files/test.mp4',
+                            webm: 'test_files/test.webm',
+                            ogg: 'test_files/test.ogv'
                         };
 
                         expect(state.html5Sources).toEqual(html5Sources);
