@@ -985,12 +985,12 @@ class ContentStoreTest(ModuleStoreTestCase):
     def test_create_course_check_forum_seeding(self):
         """Test new course creation and verify forum seeding """
         test_course_data = self.assert_created_course(number_suffix=uuid4().hex)
-        self.assertTrue(are_permissions_roles_seeded('MITx/{0}/Robot_Super_Course'.format(test_course_data['number'])))
+        self.assertTrue(are_permissions_roles_seeded('MITx/{0}/2013_Spring'.format(test_course_data['number'])))
 
     def test_create_course_duplicate_course(self):
         """Test new course creation - error path"""
         self.client.post(reverse('create_new_course'), self.course_data)
-        self.assert_course_creation_failed('There is already a course defined with this name.')
+        self.assert_course_creation_failed('There is already a course defined with the same organization, course number, and course run.')
 
     def assert_course_creation_failed(self, error_message):
         """
@@ -999,7 +999,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         resp = self.client.post(reverse('create_new_course'), self.course_data)
         self.assertEqual(resp.status_code, 200)
         data = parse_json(resp)
-        self.assertEqual(data['ErrMsg'], 'There is already a course defined with the same organization, course number, and course run.')
+        self.assertEqual(data['ErrMsg'], error_message)
 
     def test_create_course_duplicate_number(self):
         """Test new course creation - error path"""
