@@ -49,7 +49,6 @@ def instructor_dashboard_2(request, course_id):
 
     context = {
         'course': course,
-        # 'cohorts_ajax_url': reverse('cohorts', kwargs={'course_id': course_id}),
         'old_dashboard_url': reverse('instructor_dashboard', kwargs={'course_id': course_id}),
         'sections': sections,
     }
@@ -83,7 +82,9 @@ def _section_course_info(course_id):
     section_data['has_started'] = course.has_started()
     section_data['has_ended'] = course.has_ended()
     try:
-        section_data['grade_cutoffs'] = "" + reduce(lambda memo, (letter, score): "{}: {}, ".format(letter, score) + memo, course.grade_cutoffs.items(), "")[:-2] + ""
+        def next(memo, (letter, score)):
+            return "{}: {}, ".format(letter, score) + memo
+        section_data['grade_cutoffs'] = reduce(next, course.grade_cutoffs.items(), "")[:-2]
     except:
         section_data['grade_cutoffs'] = "Not Available"
     # section_data['offline_grades'] = offline_grades_available(course_id)

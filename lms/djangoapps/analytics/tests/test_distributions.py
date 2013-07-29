@@ -19,7 +19,10 @@ class TestAnalyticsDistributions(TestCase):
             profile__year_of_birth=i + 1930
         ) for i in xrange(30)]
 
-        self.ces = [CourseEnrollment.objects.create(course_id=self.course_id, user=user) for user in self.users]
+        self.ces = [CourseEnrollment.objects.create(
+            course_id=self.course_id,
+            user=user
+        ) for user in self.users]
 
     @raises(ValueError)
     def test_profile_distribution_bad_feature(self):
@@ -59,11 +62,22 @@ class TestAnalyticsDistributionsNoData(TestCase):
 
         self.nodata_users = [UserFactory(
             profile__year_of_birth=None,
-        ) for _ in xrange(4)]
+            profile__gender=[None, ''][i % 2]
+        ) for i in xrange(4)]
 
         self.users += self.nodata_users
 
         self.ces = tuple(CourseEnrollment.objects.create(course_id=self.course_id, user=user) for user in self.users)
+
+    def test_profile_distribution_easy_choice_nodata(self):
+        feature = 'gender'
+        self.assertIn(feature, AVAILABLE_PROFILE_FEATURES)
+        distribution = profile_distribution(self.course_id, feature)
+        print distribution
+        self.assertEqual(distribution.type, 'EASY_CHOICE')
+        self.assertTrue(hasattr(distribution, 'choices_display_names'))
+        self.assertIn('no_data', distribution.data)
+        self.assertEqual(distribution.data['no_data'], len(self.nodata_users))
 
     def test_profile_distribution_open_choice_nodata(self):
         feature = 'year_of_birth'

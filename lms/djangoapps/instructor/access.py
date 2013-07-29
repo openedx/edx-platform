@@ -22,7 +22,7 @@ def list_with_level(course, level):
     """
     List users who have 'level' access.
 
-    level is in ['instructor', 'staff', 'beta'] for standard courses.
+    `level` is in ['instructor', 'staff', 'beta'] for standard courses.
     There could be other levels specific to the course.
     If there is no Group for that course-level, returns an empty list
     """
@@ -42,7 +42,7 @@ def allow_access(course, user, level):
     """
     Allow user access to course modification.
 
-    level is one of ['instructor', 'staff', 'beta']
+    `level` is one of ['instructor', 'staff', 'beta']
     """
     _change_access(course, user, level, 'allow')
 
@@ -51,7 +51,7 @@ def revoke_access(course, user, level):
     """
     Revoke access from user to course modification.
 
-    level is one of ['instructor', 'staff', 'beta']
+    `level` is one of ['instructor', 'staff', 'beta']
     """
     _change_access(course, user, level, 'revoke')
 
@@ -60,7 +60,7 @@ def _change_access(course, user, level, action):
     """
     Change access of user.
 
-    level is one of ['instructor', 'staff', 'beta']
+    `level` is one of ['instructor', 'staff', 'beta']
     action is one of ['allow', 'revoke']
 
     NOTE: will create a group if it does not yet exist.

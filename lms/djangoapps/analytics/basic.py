@@ -36,7 +36,7 @@ def enrolled_students_features(course_id, features):
         student_dict = dict((feature, getattr(student, feature))
                             for feature in student_features)
         profile = student.profile
-        if not profile is None:
+        if profile is not None:
             profile_dict = dict((feature, getattr(profile, feature))
                                 for feature in profile_features)
             student_dict.update(profile_dict)
