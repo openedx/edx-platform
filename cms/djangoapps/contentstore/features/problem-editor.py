@@ -156,7 +156,7 @@ def cancel_does_not_save_changes(step):
 def create_latex_problem(step):
     world.click_new_component_button(step, '.large-problem-icon')
     # Go to advanced tab.
-    world.css_click('#ui-id-2')
+    world.css_click('#ui-id-2', success_condition=lambda: world.css_has_class('div.ui-tabs li', 'ui-state-active', index=1))
     world.click_component_from_menu("problem", "latex_problem.yaml", '.xmodule_CapaModule')
 
 

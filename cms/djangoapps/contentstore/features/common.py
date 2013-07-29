@@ -242,9 +242,7 @@ def save_button_disabled(step):
 @step('I confirm the prompt')
 def confirm_the_prompt(step):
     prompt_css = 'a.button.action-primary'
-    world.wait_for(lambda _driver: world.css_visible(prompt_css))
-    world.css_click(prompt_css)
-    world.wait_for(lambda _driver: not world.css_visible(prompt_css))
+    world.css_click(prompt_css, success_condition=lambda: not world.css_visible(prompt_css))
 
 
 @step(u'I am shown a (.*)$')
