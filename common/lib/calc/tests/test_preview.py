@@ -249,9 +249,9 @@ class LatexPreviewTest(unittest.TestCase):
         """
         With no input (including just whitespace), see that no error is thrown.
         """
-        self.assertEquals('<nada/>', preview.latex_preview(''))
-        self.assertEquals('<nada/>', preview.latex_preview('  '))
-        self.assertEquals('<nada/>', preview.latex_preview(' \t '))
+        self.assertEquals('', preview.latex_preview(''))
+        self.assertEquals('', preview.latex_preview('  '))
+        self.assertEquals('', preview.latex_preview(' \t '))
 
     def test_complicated(self):
         """

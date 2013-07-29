@@ -271,7 +271,7 @@ def latex_preview(math_expr, variables=(), functions=(), case_sensitive=False):
     """
     # No need to go further
     if math_expr.strip() == "":
-        return "<nada/>"
+        return ""
 
     # Parse tree
     thing = ParseAugmenter(math_expr, case_sensitive)
