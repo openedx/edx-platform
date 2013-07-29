@@ -10,31 +10,31 @@ function () {
     return function (state) {
         state.videoSpeedControl = {};
 
-        makeFunctionsPublic(state);
-        renderElements(state);
-        bindHandlers(state);
+        _makeFunctionsPublic(state);
+        _renderElements(state);
+        _bindHandlers(state);
     };
 
     // ***************************************************************
     // Private functions start here.
     // ***************************************************************
 
-    // function makeFunctionsPublic(state)
+    // function _makeFunctionsPublic(state)
     //
     //     Functions which will be accessible via 'state' object. When called, these functions will
     //     get the 'state' object as a context.
-    function makeFunctionsPublic(state) {
+    function _makeFunctionsPublic(state) {
         state.videoSpeedControl.changeVideoSpeed = _.bind(changeVideoSpeed, state);
         state.videoSpeedControl.setSpeed = _.bind(setSpeed, state);
         state.videoSpeedControl.reRender = _.bind(reRender, state);
     }
 
-    // function renderElements(state)
+    // function _renderElements(state)
     //
     //     Create any necessary DOM elements, attach them, and set their initial configuration. Also
     //     make the created DOM elements available via the 'state' object. Much easier to work this
     //     way - you don't have to do repeated jQuery element selects.
-    function renderElements(state) {
+    function _renderElements(state) {
         state.videoSpeedControl.speeds = state.speeds;
 
         state.videoSpeedControl.el = state.el.find('div.speeds');
@@ -54,10 +54,10 @@ function () {
         state.videoSpeedControl.setSpeed(state.speed);
     }
 
-    // function bindHandlers(state)
+    // function _bindHandlers(state)
     //
     //     Bind any necessary function callbacks to DOM events (click, mousemove, etc.).
-    function bindHandlers(state) {
+    function _bindHandlers(state) {
         state.videoSpeedControl.videoSpeedsEl.find('a').on('click', state.videoSpeedControl.changeVideoSpeed);
 
         if (onTouchBasedDevice()) {

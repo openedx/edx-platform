@@ -17,8 +17,8 @@ function () {
     return function (state) {
         state.videoProgressSlider = {};
 
-        makeFunctionsPublic(state);
-        renderElements(state);
+        _makeFunctionsPublic(state);
+        _renderElements(state);
         // No callbacks to DOM events (click, mousemove, etc.).
     };
 
@@ -26,11 +26,11 @@ function () {
     // Private functions start here.
     // ***************************************************************
 
-    // function makeFunctionsPublic(state)
+    // function _makeFunctionsPublic(state)
     //
     //     Functions which will be accessible via 'state' object. When called, these functions will
     //     get the 'state' object as a context.
-    function makeFunctionsPublic(state) {
+    function _makeFunctionsPublic(state) {
         state.videoProgressSlider.onSlide        = _.bind(onSlide, state);
         state.videoProgressSlider.onChange       = _.bind(onChange, state);
         state.videoProgressSlider.onStop         = _.bind(onStop, state);
@@ -40,30 +40,21 @@ function () {
         state.videoProgressSlider.buildSlider = _.bind(buildSlider, state);
     }
 
-    // function renderElements(state)
+    // function _renderElements(state)
     //
     //     Create any necessary DOM elements, attach them, and set their initial configuration. Also
     //     make the created DOM elements available via the 'state' object. Much easier to work this
     //     way - you don't have to do repeated jQuery element selects.
-    function renderElements(state) {
+    function _renderElements(state) {
         if (!onTouchBasedDevice()) {
             state.videoProgressSlider.el = state.videoControl.sliderEl;
 
             buildSlider(state);
-            buildHandle(state);
+            _buildHandle(state);
         }
     }
 
-    function buildSlider(state) {
-        state.videoProgressSlider.slider = state.videoProgressSlider.el.slider({
-            range: 'min',
-            change: state.videoProgressSlider.onChange,
-            slide: state.videoProgressSlider.onSlide,
-            stop: state.videoProgressSlider.onStop
-        });
-    }
-
-    function buildHandle(state) {
+    function _buildHandle(state) {
         state.videoProgressSlider.handle = state.videoProgressSlider.el.find('.ui-slider-handle');
 
         state.videoProgressSlider.handle.qtip({
@@ -88,6 +79,15 @@ function () {
     // These are available via the 'state' object. Their context ('this' keyword) is the 'state' object.
     // The magic private function that makes them available and sets up their context is makeFunctionsPublic().
     // ***************************************************************
+
+    function buildSlider(state) {
+        state.videoProgressSlider.slider = state.videoProgressSlider.el.slider({
+            range: 'min',
+            change: state.videoProgressSlider.onChange,
+            slide: state.videoProgressSlider.onSlide,
+            stop: state.videoProgressSlider.onStop
+        });
+    }
 
     function onSlide(event, ui) {
         this.videoProgressSlider.frozen = true;

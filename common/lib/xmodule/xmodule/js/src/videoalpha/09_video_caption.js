@@ -10,7 +10,7 @@ function () {
     return function (state) {
         state.videoCaption = {};
 
-        makeFunctionsPublic(state);
+        _makeFunctionsPublic(state);
         state.videoCaption.renderElements();
         state.videoCaption.bindHandlers();
     };
@@ -19,11 +19,11 @@ function () {
     // Private functions start here.
     // ***************************************************************
 
-    // function makeFunctionsPublic(state)
+    // function _makeFunctionsPublic(state)
     //
     //     Functions which will be accessible via 'state' object. When called, these functions will
     //     get the 'state' object as a context.
-    function makeFunctionsPublic(state) {
+    function _makeFunctionsPublic(state) {
         state.videoCaption.autoShowCaptions    = _.bind(autoShowCaptions, state);
         state.videoCaption.autoHideCaptions    = _.bind(autoHideCaptions, state);
         state.videoCaption.resize              = _.bind(resize, state);
@@ -49,6 +49,12 @@ function () {
         state.videoCaption.fetchCaption        = _.bind(fetchCaption, state);
         state.videoCaption.captionURL          = _.bind(captionURL, state);
     }
+
+    // ***************************************************************
+    // Public functions start here.
+    // These are available via the 'state' object. Their context ('this' keyword) is the 'state' object.
+    // The magic private function that makes them available and sets up their context is makeFunctionsPublic().
+    // ***************************************************************
 
     // function renderElements()
     //
@@ -105,6 +111,9 @@ function () {
 
         if (this.videoType === 'html5') {
             this.el.on('mousemove', this.videoCaption.autoShowCaptions);
+
+            // Moving slider on subtitles is not a mouse move, but captions should be showed.
+            this.videoCaption.subtitlesEl.on('scroll', this.videoCaption.autoShowCaptions);
         }
     }
 
@@ -135,12 +144,6 @@ function () {
     function captionURL() {
         return '' + this.config.caption_asset_path + this.youtubeId('1.0') + '.srt.sjson';
     }
-
-    // ***************************************************************
-    // Public functions start here.
-    // These are available via the 'state' object. Their context ('this' keyword) is the 'state' object.
-    // The magic private function that makes them available and sets up their context is makeFunctionsPublic().
-    // ***************************************************************
 
     function autoShowCaptions(event) {
         if (!this.captionsShowLock) {

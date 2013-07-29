@@ -10,20 +10,20 @@ function () {
     return function (state) {
         state.videoControl = {};
 
-        makeFunctionsPublic(state);
-        renderElements(state);
-        bindHandlers(state);
+        _makeFunctionsPublic(state);
+        _renderElements(state);
+        _bindHandlers(state);
     };
 
     // ***************************************************************
     // Private functions start here.
     // ***************************************************************
 
-    // function makeFunctionsPublic(state)
+    // function _makeFunctionsPublic(state)
     //
     //     Functions which will be accessible via 'state' object. When called, these functions will
     //     get the 'state' object as a context.
-    function makeFunctionsPublic(state) {
+    function _makeFunctionsPublic(state) {
         state.videoControl.showControls     = _.bind(showControls,state);
         state.videoControl.hideControls     = _.bind(hideControls,state);
         state.videoControl.play             = _.bind(play,state);
@@ -34,12 +34,12 @@ function () {
         state.videoControl.updateVcrVidTime = _.bind(updateVcrVidTime,state);
     }
 
-    // function renderElements(state)
+    // function _renderElements(state)
     //
     //     Create any necessary DOM elements, attach them, and set their initial configuration. Also
     //     make the created DOM elements available via the 'state' object. Much easier to work this
     //     way - you don't have to do repeated jQuery element selects.
-    function renderElements(state) {
+    function _renderElements(state) {
         state.videoControl.el = state.el.find('.video-controls');
         // state.videoControl.el.append(el);
 
@@ -72,10 +72,10 @@ function () {
         }
     }
 
-    // function bindHandlers(state)
+    // function _bindHandlers(state)
     //
     //     Bind any necessary function callbacks to DOM events (click, mousemove, etc.).
-    function bindHandlers(state) {
+    function _bindHandlers(state) {
         state.videoControl.playPauseEl.on('click', state.videoControl.togglePlayback);
         state.videoControl.fullScreenEl.on('click', state.videoControl.toggleFullScreen);
         $(document).on('keyup', state.videoControl.exitFullScreen);

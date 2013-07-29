@@ -1,5 +1,5 @@
 (function() {
-  describe('VideoQualityControlAlpha', function() {
+  xdescribe('VideoQualityControlAlpha', function() {
     var state, videoControl, videoQualityControl, oldOTBD;
 
     function initialize() {

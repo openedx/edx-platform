@@ -206,19 +206,20 @@ function () {
             }
 
             // Create HTML markup for the <video> element, populating it with sources from previous step.
-            this.videoEl = $(
-                '<video style="width: 100%;">' +
-                    sourceStr.mp4 +
-                    sourceStr.webm +
-                    sourceStr.ogg +
-                '</video>'
-            );
+            // Because of problems with creating video element via jquery
+            // (http://bugs.jquery.com/ticket/9174) we create it using native JS.
+            this.video = document.createElement('video');
+            this.video.innerHTML = _.values(sourceStr).join('');
 
-            // Get the DOM element (to access the HTML5 video API), and set the player state to UNSTARTED.
+            // Get the jQuery object, and set the player state to UNSTARTED.
             // The player state is used by other parts of the VideoPlayer to detrermine what the video is
             // currently doing.
-            this.video = this.videoEl[0];
-            this.video.load();
+            this.videoEl = $(this.video);
+
+            this.videoEl.css({
+                'width': '100%'
+            });
+
             this.playerState = HTML5Video.PlayerState.UNSTARTED;
             // this.callStateChangeCallback();
 

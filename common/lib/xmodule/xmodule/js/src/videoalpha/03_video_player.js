@@ -10,8 +10,8 @@ function (HTML5Video) {
     return function (state) {
         state.videoPlayer = {};
 
-        makeFunctionsPublic(state);
-        renderElements(state);
+        _makeFunctionsPublic(state);
+        _initialize(state);
         // No callbacks to DOM events (click, mousemove, etc.).
     };
 
@@ -19,11 +19,11 @@ function (HTML5Video) {
     // Private functions start here.
     // ***************************************************************
 
-    // function makeFunctionsPublic(state)
+    // function _makeFunctionsPublic(state)
     //
     //     Functions which will be accessible via 'state' object. When called, these functions will
     //     get the 'state' object as a context.
-    function makeFunctionsPublic(state) {
+    function _makeFunctionsPublic(state) {
         state.videoPlayer.pause                       = _.bind(pause, state);
         state.videoPlayer.play                        = _.bind(play, state);
         state.videoPlayer.update                      = _.bind(update, state);
@@ -45,12 +45,12 @@ function (HTML5Video) {
         state.videoPlayer.onVolumeChange              = _.bind(onVolumeChange, state);
     }
 
-    // function renderElements(state)
+    // function _initialize(state)
     //
     //     Create any necessary DOM elements, attach them, and set their initial configuration. Also
     //     make the created DOM elements available via the 'state' object. Much easier to work this
     //     way - you don't have to do repeated jQuery element selects.
-    function renderElements(state) {
+    function _initialize(state) {
         var youTubeId;
 
         if (state.videoType === 'youtube') {
@@ -123,12 +123,12 @@ function (HTML5Video) {
         }
     }
 
-    // function restartUsingFlash(state)
+    // function _restartUsingFlash(state)
     //
     //     When we are about to play a YouTube video in HTML5 mode and discover that we only
     //     have one available playback rate, we will switch to Flash mode. In Flash speed
     //     switching is done by reloading videos recorded at different frame rates.
-    function restartUsingFlash(state) {
+    function _restartUsingFlash(state) {
         // Remove from the page current iFrame with HTML5 video.
         state.videoPlayer.player.destroy();
 
