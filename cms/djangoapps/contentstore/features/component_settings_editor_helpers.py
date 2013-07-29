@@ -12,15 +12,16 @@ def create_component_instance(step, component_button_css, category,
                               has_multiple_templates=True):
 
     click_new_component_button(step, component_button_css)
-
-    def animation_done(_driver):
-        return world.browser.evaluate_script("$('div.new-component').css('display')") == 'none'
-    world.wait_for(animation_done)
+    if category == 'problem' or category == 'html':
+        def animation_done(_driver):
+            return world.browser.evaluate_script("$('div.new-component').css('display')") == 'none'
+        world.wait_for(animation_done)
 
     if has_multiple_templates:
         click_component_from_menu(category, boilerplate, expected_css)
 
     assert_equal(1, len(world.css_find(expected_css)))
+
 
 @world.absorb
 def click_new_component_button(step, component_button_css):
