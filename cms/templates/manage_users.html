@@ -133,7 +133,8 @@
         <p>${_("[Mark to provide copy] Maecenas faucibus mollis interdum. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla vitae elit libero, a pharetra augue.")}</p>
       </div>
 
-      % if is_instuctor and len(instructors) == 1:
+      <% user_is_instuctor = is_user_in_course_group_role(request.user, context_course.location, 'instructor', check_staff=False) %>
+      % if user_is_instuctor and len(instructors) == 1:
       <div class="bit">
         <h3 class="title-3">${_("Tranferring Ownership")}</h3>
         <p>${_("[Mark to provide copy] Maecenas faucibus mollis interdum. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.")}</p>
