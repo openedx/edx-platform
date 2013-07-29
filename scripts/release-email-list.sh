@@ -1,8 +1,19 @@
 #! /bin/bash
+# Usage: release-email-list.sh [$PREVIOUS_COMMIT [$CURRENT_COMMIT]]
+#
+# Prints a list of email addresses and a Confluence style wiki table
+# that indicate all of the changes made between $PREVIOUS_COMMIT and $CURRENT_COMMIT
+#
+# PREVIOUS_COMMIT defaults to origin/release
+# CURRENT_COMMIT defaults to HEAD
 
-LOG_CMD="git --no-pager log $1..$2"
+BASE=${1:-origin/release}
+CURRENT=${2:-HEAD}
+LOG_CMD="git --no-pager log $BASE..$CURRENT"
 
 RESPONSIBLE=$(sort -u <($LOG_CMD --format='tformat:%ae' && $LOG_CMD --format='tformat:%ce'))
+
+echo "Comparing $BASE to $CURRENT"
 
 echo "~~~~ Email ~~~~~"
 
