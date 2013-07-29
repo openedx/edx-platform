@@ -197,7 +197,12 @@ if Backbone?
       @template = _.template($("#discussion-home").html())
       $(".discussion-column").html(@template)
       $(".post-list a").removeClass("active")
-      $(".email-notification").bind "click", @updateEmailNotifications
+      $("input.email-setting").bind "click", @updateEmailNotifications
+      url=DiscussionUtil.urlFor("get_notifications_state",window.user.get("id"))
+      DiscussionUtil.safeAjax
+          url: url
+          type: "POST"
+          dataType: 'json'
       thread_id = null
 
     toggleTopicDrop: (event) =>
@@ -432,20 +437,23 @@ if Backbone?
     updateEmailNotifications: () =>
       if $('input.email-notification').attr('checked')
         DiscussionUtil.safeAjax
-          url: '/notification_prefs/enable/'
+          url: DiscussionUtil.urlFor("enable_notifications")
           type: "POST"
           dataType: 'json'
           data:
-            username: window.user.get("username")
+            user: window.user.get("id")
           error: () =>
+            $('input.email-notification').removeAttr('checked')
+
             
       else
         DiscussionUtil.safeAjax
-          url: '/notification_prefs/disable/'
+          url: DiscussionUtil.urlFor("disable_notifications")
           type: "POST"
           dataType: 'json'
           data:
-            username: window.user.get("username")
+            user: window.user.get("id")
           error: () =>
+            $('input.email-notification').attr('checked','checked')
 
           

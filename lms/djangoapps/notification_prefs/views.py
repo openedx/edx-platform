@@ -131,7 +131,6 @@ def ajax_disable(request):
 
     return HttpResponse(status=204)
 
-
 @require_GET
 def unsubscribe(request, token):
     """
