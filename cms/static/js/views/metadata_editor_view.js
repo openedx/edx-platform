@@ -320,8 +320,8 @@ CMS.Views.Metadata.List = CMS.Views.Metadata.AbstractEditor.extend({
         "click .setting-clear" : "clear",
         "keypress .setting-input" : "showClearButton",
         "change input" : "updateModel",
-        "click .setting-add" : "addEntry",
-        "click .setting-remove" : "removeEntry"
+        "click .create-setting" : "addEntry",
+        "click .remove-setting" : "removeEntry"
     },
 
     templateName: "metadata-list-entry",
@@ -338,9 +338,9 @@ CMS.Views.Metadata.List = CMS.Views.Metadata.AbstractEditor.extend({
         list.empty();
         _.each(value, function(ele, index) {
             var template = _.template(
-                '<li>' +
+                '<li class="list-settings-item">' +
                     '<input class="input" value="<%= ele %>">' +
-                    '<a href="#" class="setting-remove" data-index="<%= index %>">remove</a>' +
+                    '<a href="#" class="remove-action remove-setting" data-index="<%= index %>"><i class="icon-remove-sign"></i><span class="sr">Remove</span></a>' +
                 '</li>'
             );
             list.append($(template({'ele': ele, 'index': index})));

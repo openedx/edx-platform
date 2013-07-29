@@ -449,12 +449,39 @@ body.course.unit {
 
       // Module Actions, also used for Static Pages
       .module-actions {
-        box-shadow: inset 0 1px 1px $shadow;
-        padding: 0 0 $baseline $baseline;
-        background-color: $gray-l6;
+        box-shadow: inset 0 1px 2px $shadow;
+        border-top: 1px solid $gray-l1;
+        padding: ($baseline*0.75) $baseline;
+        background: $gray-l6;
 
-        .save-button {
-        margin: ($baseline/2) 8px 0 0;
+        .action {
+          display: inline-block;
+          vertical-align: middle;
+          margin-right: ($baseline/4);
+
+          &:last-child {
+            margin-right: 0;
+          }
+        }
+
+        .action-primary {
+          @include blue-button;
+          @extend .t-action2;
+          @include transition(all .15s);
+          display: inline-block;
+          padding: ($baseline/5) $baseline;
+          font-weight: 600;
+          text-transform: uppercase;
+        }
+
+        .action-secondary {
+          @include grey-button;
+          @extend .t-action2;
+          @include transition(all .15s);
+          display: inline-block;
+          padding: ($baseline/5) $baseline;
+          font-weight: 600;
+          text-transform: uppercase;
         }
       }
     }
@@ -599,26 +626,27 @@ body.course.unit {
         }
       }
 
-      .wrapper-comp-setting{
+      .wrapper-comp-setting {
         display: inline-block;
         min-width: 300px;
-        width: 45%;
+        width: 55%;
         top: 0;
         vertical-align: top;
         margin-bottom:5px;
         position: relative;
       }
 
-      label.setting-label {
+      .setting-label {
         @extend .t-copy-sub1;
         @include transition(color $tmg-f2 ease-in-out 0s);
-        font-weight: 400;
         vertical-align: middle;
         display: inline-block;
         position: relative;
         left: 0;
+        width: 33%;
         min-width: 100px;
-        width: 35%;
+        margin-right: ($baseline/2);
+        font-weight: 600;
 
         &.is-focused {
           color: $blue;
@@ -708,13 +736,97 @@ body.course.unit {
         }
       }
 
-      .tip.setting-help {
+      .setting-help {
         @include font-size(12);
         display: inline-block;
         font-color: $gray-l6;
-        min-width: 260px;
-        width: 50%;
+        min-width: ($baseline*10);
+        width: 35%;
         vertical-align: top;
+      }
+
+
+
+      // TYPE: enumerated lists of metadata sets
+      .metadata-list-enum {
+
+        * {
+          @include box-sizing(border-box);
+        }
+
+        // label
+        .setting-label {
+          vertical-align: top;
+          margin-top: ($baseline/2);
+        }
+
+        // inputs and labels
+        .wrapper-list-settings {
+          @include size(45%,100%);
+          display: inline-block;
+          min-width: ($baseline*5);
+
+          // enumerated fields
+          .list-settings {
+            margin: 0;
+
+            .list-settings-item {
+              margin-bottom: ($baseline/4);
+            }
+
+            // inputs
+            .input {
+              width: 80%;
+              margin-right: ($baseline/2);
+              vertical-align: middle;
+            }
+          }
+        }
+
+        // actions
+        .create-action, .remove-action, .setting-clear {
+
+        }
+
+        .setting-clear {
+          vertical-align: top;
+          margin-top: ($baseline/4);
+        }
+
+        .create-setting {
+          @extend .ui-btn-flat-outline;
+          @extend .t-action3;
+          display: block;
+          width: 100%;
+          padding: ($baseline/2);
+          font-weight: 600;
+
+          *[class^="icon-"] {
+            margin-right: ($baseline/4);
+          }
+
+          // STATE: disabled
+          &.is-disabled {
+
+          }
+        }
+
+        .remove-setting {
+          @include transition(color 0.25s ease-in-out);
+          @include font-size(20);
+          display: inline-block;
+          background: transparent;
+          color: $blue-l3;
+
+          &:hover {
+            color: $blue;
+          }
+
+          // STATE: disabled
+          &.is-disabled {
+
+          }
+        }
       }
     }
   }
