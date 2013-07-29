@@ -242,7 +242,9 @@ def save_button_disabled(step):
 @step('I confirm the prompt')
 def confirm_the_prompt(step):
     prompt_css = 'a.button.action-primary'
+    world.wait_for(lambda _driver: world.css_visible(prompt_css))
     world.css_click(prompt_css)
+    world.wait_for(lambda _driver: not world.css_visible(prompt_css))
 
 
 @step(u'I am shown a (.*)$')
@@ -252,6 +254,7 @@ def i_am_shown_a_notification(step, notification_type):
 
 def type_in_codemirror(index, text):
     world.css_click(".CodeMirror", index=index)
+    world.browser.execute_script("$('div.CodeMirror.CodeMirror-focused > div').css('overflow', '')")
     g = world.css_find("div.CodeMirror.CodeMirror-focused > div > textarea")
     if world.is_mac():
         g._element.send_keys(Keys.COMMAND + 'a')
