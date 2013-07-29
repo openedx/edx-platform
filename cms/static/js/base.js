@@ -644,14 +644,14 @@ function saveNewCourse(e) {
     var number = $newCourse.find('.new-course-number').val();
     var run = $newCourse.find('.new-course-run').val();
 
-    required_field_text = gettext('Required field');
+    var required_field_text = gettext('Required field');
 
-    display_name_errMsg = (display_name === '') ? required_field_text : null;
-    org_errMsg = (org === '') ? required_field_text : null;
-    number_errMsg = (number === '') ? required_field_text : null;
-    run_errMsg = (run === '') ? required_field_text : null;
+    var display_name_errMsg = (display_name === '') ? required_field_text : null;
+    var org_errMsg = (org === '') ? required_field_text : null;
+    var number_errMsg = (number === '') ? required_field_text : null;
+    var run_errMsg = (run === '') ? required_field_text : null;
 
-    bInErr = (display_name_errMsg || org_errMsg || number_errMsg || run_errMsg);
+    var bInErr = (display_name_errMsg || org_errMsg || number_errMsg || run_errMsg);
 
     // check for suitable encoding
     if (!bInErr) {
@@ -664,10 +664,10 @@ function saveNewCourse(e) {
         if (encodeURIComponent(run) != run)
             run_errMsg = encoding_errMsg;
 
-        bInErr = (display_name_errMsg || org_errMsg || number_errMsg || run_errMsg);
+        bInErr = (org_errMsg || number_errMsg || run_errMsg);
     }
 
-    header_err_msg = (bInErr) ? gettext('Please correct the fields below.') : null;
+    var header_err_msg = (bInErr) ? gettext('Please correct the fields below.') : null;
 
     setNewCourseErrMsgs(header_err_msg, display_name_errMsg, org_errMsg, number_errMsg, run_errMsg);
 
@@ -691,8 +691,8 @@ function saveNewCourse(e) {
             if (data.id !== undefined) {
                 window.location = '/' + data.id.replace(/.*:\/\//, '');
             } else if (data.ErrMsg !== undefined) {
-                orgErrMsg = (data.OrgErrMsg !== undefined) ? data.OrgErrMsg : null;
-                courseErrMsg = (data.CourseErrMsg !== undefined) ? data.CourseErrMsg : null;
+                var orgErrMsg = (data.OrgErrMsg !== undefined) ? data.OrgErrMsg : null;
+                var courseErrMsg = (data.CourseErrMsg !== undefined) ? data.CourseErrMsg : null;
                 setNewCourseErrMsgs(data.ErrMsg, null, orgErrMsg, courseErrMsg, null);
             }
         }
