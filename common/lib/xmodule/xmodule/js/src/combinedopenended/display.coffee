@@ -152,8 +152,6 @@ class @CombinedOpenEnded
     @open_ended_child= @$('.open-ended-child')
 
     @out_of_sync_message = 'The problem state got out of sync.  Try reloading the page.'
-    
-    @get_last_response(@answer_area)
 
 #   force show the prompt
     @prompt_show()
@@ -225,10 +223,18 @@ class @CombinedOpenEnded
         @legend_container= $('.legend-container')
 
   get_last_response: (@answer_area) =>
+    @submit_button.hide()
+    @answer_area.attr("disabled", true)
+    @gentle_alert "Checking for a previous response..."
     data = {}
     $.postWithPrefix "#{@ajax_url}/get_last_response", data, (response) =>
-      if response.success
+      if response.success && response.response != ""
         @answer_area.html(response.response)
+        @gentle_alert "Thank you for submitting!"
+      else
+        @submit_button.show()
+        @answer_area.attr("disabled", false)
+        @el.find('.open-ended-alert').animate(opacity: 0, 700)
 
   message_post: (event)=>
     external_grader_message=$(event.target).parent().parent().parent()
@@ -293,6 +299,7 @@ class @CombinedOpenEnded
       @submit_button.prop('value', 'Submit')
       @submit_button.click @save_answer
       @setup_file_upload()
+      @get_last_response(@answer_area)
     else if @child_state == 'assessing'
       @answer_area.attr("disabled", true)
       @replace_text_inputs()
