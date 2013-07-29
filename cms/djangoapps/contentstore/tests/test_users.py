@@ -42,7 +42,7 @@ class IndexCourseCreatorTests(CourseTestCase):
         self.disable_course_creation = {
             "DISABLE_COURSE_CREATION": True,
             "ENABLE_CREATOR_GROUP": True,
-            'STAFF_EMAIL': 'mark@marky.mark',
+            'STUDIO_REQUEST_EMAIL': 'mark@marky.mark',
         }
 
         self.enable_creator_group = {"ENABLE_CREATOR_GROUP": True}
