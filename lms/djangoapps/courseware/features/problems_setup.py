@@ -226,7 +226,6 @@ def answer_problem(problem_type, correctness):
 
         input_value = "8" if correctness == 'correct' else "5"
         choice = "choiceinput_0bc" if correctness == 'correct' else "choiceinput_1bc"
-        world.css_check(inputfield(problem_type, choice=choice))
         world.css_fill(
             inputfield(
                 problem_type,
@@ -234,6 +233,7 @@ def answer_problem(problem_type, correctness):
             ),
             input_value
         )
+        world.css_check(inputfield(problem_type, choice=choice))
 
 
 def problem_has_answer(problem_type, answer_class):
