@@ -16,6 +16,8 @@ Module containing the problem elements which render into input objects
 - crystallography
 - vsepr_input
 - drag_and_drop
+- formulaequationinput
+- chemicalequationinput
 
 These are matched by *.html files templates/*.html which are mako templates with the
 actual html.

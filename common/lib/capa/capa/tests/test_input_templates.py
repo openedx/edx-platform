@@ -447,6 +447,7 @@ class TextlineTemplateTest(TemplateTestCase):
         xpath = "//span[@class='message']"
         self.assert_has_text(xml, xpath, self.context['msg'])
 
+# TODO formulaequationinput tests
 
 class AnnotationInputTemplateTest(TemplateTestCase):
     """

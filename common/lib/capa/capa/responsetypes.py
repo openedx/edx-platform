@@ -931,7 +931,7 @@ class CustomResponse(LoncapaResponse):
                            'chemicalequationinput', 'vsepr_input',
                            'drag_and_drop_input', 'editamoleculeinput',
                            'designprotein2dinput', 'editageneinput',
-                           'annotationinput', 'jsinput']
+                           'annotationinput', 'jsinput', 'formulaequationinput']
 
     def setup_response(self):
         xml = self.xml
