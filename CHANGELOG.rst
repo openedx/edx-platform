@@ -5,6 +5,9 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+LMS: Added bulk email for course feature, with option to optout of individual
+course emails.
+
 LMS: Added user preferences (arbitrary user/key/value tuples, for which
 which user/key is unique) and a REST API for reading users and
 preferences. Access to the REST API is restricted by use of the
