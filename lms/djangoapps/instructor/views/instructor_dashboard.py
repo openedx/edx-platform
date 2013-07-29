@@ -1,7 +1,5 @@
 """
 Instructor Dashboard Views
-
-TODO add tracking
 """
 
 from django_future.csrf import ensure_csrf_cookie
@@ -25,13 +23,12 @@ from student.models import CourseEnrollment
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def instructor_dashboard_2(request, course_id):
-    """Display the instructor dashboard for a course."""
+    """ Display the instructor dashboard for a course. """
 
     course = get_course_by_id(course_id, depth=None)
 
     access = {
         'admin': request.user.is_staff,
-        # an instructor can manage staff lists
         'instructor': has_access(request.user, course, 'instructor'),
         'staff': has_access(request.user, course, 'staff'),
         'forum_admin': has_forum_access(
@@ -57,7 +54,7 @@ def instructor_dashboard_2(request, course_id):
         'sections': sections,
     }
 
-    return render_to_response('courseware/instructor_dashboard_2/instructor_dashboard_2.html', context)
+    return render_to_response('instructor/instructor_dashboard_2/instructor_dashboard_2.html', context)
 
 
 """
