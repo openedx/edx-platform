@@ -47,18 +47,18 @@
       </header>
 
       <div class="post-body">${'<%- body %>'}</div>
-      <div class="discussion-flag-abuse notflagged" data-role="thread-flag" data-tooltip="Report Misuse">                
-      <i class="icon icon-flag"></i><span class="flag-label">Report Misuse</span></div>      
+      <div class="discussion-flag-abuse notflagged" data-role="thread-flag" data-tooltip="Report Misuse">
+      <i class="icon icon-flag"></i><span class="flag-label">Report Misuse</span></div>
         
         
       % if course and has_permission(user, 'openclose_thread', course.id):
-      <div class="admin-pin discussion-pin notpinned" data-role="thread-pin" data-tooltip="pin this thread">                
-      <i class="icon icon-pushpin"></i><span class="pin-label">Pin Thread</span></div> 
+      <div class="admin-pin discussion-pin notpinned" data-role="thread-pin" data-tooltip="pin this thread">
+      <i class="icon icon-pushpin"></i><span class="pin-label">Pin Thread</span></div>
 
       %else:
       ${"<% if (pinned) { %>"}
-      <div class="discussion-pin notpinned" data-role="thread-pin" data-tooltip="pin this thread">                
-      <i class="icon icon-pushpin"></i><span class="pin-label">Pin Thread</span></div> 
+      <div class="discussion-pin notpinned" data-role="thread-pin" data-tooltip="pin this thread">
+      <i class="icon icon-pushpin"></i><span class="pin-label">Pin Thread</span></div>
       ${"<% }  %>"}  
       % endif
       
