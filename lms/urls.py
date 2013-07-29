@@ -161,6 +161,7 @@ if settings.WIKI_ENABLED:
 
 if settings.COURSEWARE_ENABLED:
     urlpatterns += (
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/search$', 'search.views.search', name="search"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/jump_to/(?P<location>.*)$',
             'courseware.views.jump_to', name="jump_to"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/jump_to_id/(?P<module_id>.*)$',

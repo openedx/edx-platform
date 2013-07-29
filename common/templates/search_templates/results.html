@@ -1,73 +1,78 @@
+<%inherit file="/main.html" />
+<%block name="bodyclass">${course.css_class}</%block>
+<%include file="/courseware/course_navigation.html" args="active_page='search'" />
+<%namespace name='static' file='/static_content.html'/>
+<%block name="headextra">
+  <%static:css group='course'/>
+</%block>
+
 <head>
     <%namespace name='static' file='/static_content.html'/>
     <script type="text/javascript" src="${static.url('js/search.js')}"></script>
     <link href="${static.url('css/search.css')}" rel="stylesheet" type="text/css"></link>
 </head>
 
-% if debug:
-    <p>"${debug}"</p>
-% endif
+<section class="container">
+    % if spelling_correction:
+    <div class="correction_div">
+    	<p class="search_correction">
+    		<span>Did you mean </span>
+    		<a onclick="correctionLink(event, '${spelling_correction}')">${spelling_correction}</a>
+    		<span>?</span>
+    	</p>
+    </div>
+    % endif
 
-% if spelling_correction:
-<div class="correction_div">
-	<p class="search_correction">
-		<span>Did you mean </span>
-		<a onclick="correctionLink(event, '${spelling_correction}')">${spelling_correction}</a>
-		<span>?</span>
-	</p>
-</div>
-% endif
-
-<div class="search-results">
-    % if results == True:
-    	% for datum in data:
-        	<a href=${datum.data["url"]}>
-        		<div class="result-container">
-        			<div class="result-header">
-        				<h1 class="result-title">${datum.data['display_name']}</h1>
-                    </div>
-        			<div class="result-body">
-                        <div class="thumbnail-wrapper">
-        				    <div class="result-thumbnail">
-        					   <img class="thumbnail" src="${datum.data['thumbnail']}" alt="${datum.data['display_name']}">
-        				    </div>
+    <div class="search-results">
+        % if results == True:
+        	% for datum in data:
+            	<a href=${datum.data["url"]}>
+            		<div class="result-container">
+            			<div class="result-header">
+            				<h1 class="result-title">${datum.data['display_name']}</h1>
                         </div>
-                        <div class="result-snippets">
-        					<p class="snippet">
-        						${datum.data['snippets']}
-        					</p>
-        				</div>
-        			</div>
-        		</div>
-        	</a>
-    	% endfor
-    % else:
-        <h1 class="result-title no-results">"No results found, please try again"</h1>
-    % endif
+            			<div class="result-body">
+                            <div class="thumbnail-wrapper">
+            				    <div class="result-thumbnail">
+            					   <img class="thumbnail" src="${datum.data['thumbnail']}" alt="${datum.data['display_name']}">
+            				    </div>
+                            </div>
+                            <div class="result-snippets">
+            					<p class="snippet">
+            						${datum.data['snippets']}
+            					</p>
+            				</div>
+            			</div>
+            		</div>
+            	</a>
+        	% endfor
+        % else:
+            <h1 class="result-title no-results">"No results found, please try again"</h1>
+        % endif
 
-    % if len(data) > 1:
-    	<div class="pagination">
-    		<span class="step-links">
-    			% if data.number > 1:
-    				<a onclick="decrementPage()">Prev</a>
-    			% endif
+        % if len(data) > 1:
+        	<div class="pagination">
+        		<span class="step-links">
+        			% if data.number > 1:
+        				<a onclick="decrementPage()">Prev</a>
+        			% endif
 
-    			<form id="current-page" class="auto-submit" action="/search" method="get">
-                    <span class="current-page">
-    				    Page 
-                        <input type="number" class="parameter page-number" name="page" value="${ data.number }" onkeydown="searchHandle(event, true)" onchange="changeHandler(this, ${data.paginator.num_pages})"/> 
-                        of ${ data.paginator.num_pages }
-                    </span>
-    			</form> 
+        			<form id="current-page" class="auto-submit" action="/search" method="get">
+                        <span class="current-page">
+        				    Page 
+                            <input type="number" class="parameter page-number" name="page" value="${ data.number }" onkeydown="searchHandle(event, true)" onchange="changeHandler(this, ${data.paginator.num_pages})"/> 
+                            of ${ data.paginator.num_pages }
+                        </span>
+        			</form> 
 
-    			% if data.number < data.paginator.num_pages:
-    				<a onclick="incrementPage()">Next</a>
-    			%endif
-    		</span>
-    	</div>
-    % endif
-</div>
-
+        			% if data.number < data.paginator.num_pages:
+        				<a onclick="incrementPage()">Next</a>
+        			%endif
+        		</span>
+        	</div>
+        % endif
+    </div>
+</section>
 
 <%def name="css_link(path, media='')">
 	<link rel="stylesheet" type="text/css" href="${path|h}" media="${media}"></link>
