@@ -12,6 +12,7 @@ admin.autodiscover()
 urlpatterns = ('',  # nopep8
     url(r'^$', 'contentstore.views.howitworks', name='homepage'),
     url(r'^listing', 'contentstore.views.index', name='index'),
+    url(r'^request_course_creator$', 'contentstore.views.request_course_creator', name='request_course_creator'),
     url(r'^edit/(?P<location>.*?)$', 'contentstore.views.edit_unit', name='edit_unit'),
     url(r'^subsection/(?P<location>.*?)$', 'contentstore.views.edit_subsection', name='edit_subsection'),
     url(r'^preview_component/(?P<location>.*?)$', 'contentstore.views.preview_component', name='preview_component'),
@@ -148,6 +149,12 @@ if settings.MITX_FEATURES.get('ENABLE_SERVICE_STATUS'):
     )
 
 urlpatterns += (url(r'^admin/', include(admin.site.urls)),)
+
+# enable automatic login
+if settings.MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_LOAD_TESTING'):
+    urlpatterns += (
+        url(r'^auto_auth$', 'student.views.auto_auth'),
+    )
 
 urlpatterns = patterns(*urlpatterns)
 

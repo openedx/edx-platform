@@ -116,4 +116,6 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         module.previous_version = json_data.get('previous_version')
         module.update_version = json_data.get('update_version')
         module.definition_locator = self.modulestore.definition_locator(definition)
+        # decache any pending field settings
+        module.save()
         return module

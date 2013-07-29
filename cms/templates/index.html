@@ -5,9 +5,41 @@
 <%block name="title">${_("My Courses")}</%block>
 <%block name="bodyclass">is-signedin index dashboard</%block>
 
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.js"></script>
+<script src="http://malsup.github.com/jquery.form.js"></script>
+
+<%block name="jsextra">
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        // showing/hiding creation rights UI
+        $('.show-creationrights').click(function(e){
+            (e).preventDefault();
+            $(this).closest('.wrapper-creationrights').toggleClass('is-shown').find('.ui-toggle-control').toggleClass('current');
+        });
+
+        var reloadPage = function () {
+            location.reload();
+        };
+
+        var showError = function ()  {
+            $('#request-coursecreator-submit').toggleClass('has-error').find('.label').text('Sorry, there was error with your request');
+            $('#request-coursecreator-submit').find('.icon-cog').toggleClass('icon-spin');
+        };
+
+        $('#request-coursecreator').ajaxForm({error: showError, success: reloadPage});
+
+        $('#request-coursecreator-submit').click(function(e){
+          $(this).toggleClass('is-disabled is-submitting').find('.label').text('Submitting Your Request');
+        });
+    });
+</script>
+</%block>
+
 <%block name="header_extras">
   <script type="text/template" id="new-course-template">
     <section class="new-course">
+      <h3 class="title">${_("Create a New Course:")}</h3>
       <div class="item-details">
         <form class="course-info">
           <div class="row">
@@ -35,59 +67,246 @@
 </%block>
 
 <%block name="content">
-  <div class="wrapper-mast wrapper">
-    <header class="mast has-actions">
-      <h1 class="page-header">${_("My Courses")}</h1>
+<div class="wrapper-mast wrapper">
+  <header class="mast has-actions">
+    <h1 class="page-header">${_("My Courses")}</h1>
 
-      % if user.is_active:
-      <nav class="nav-actions">
-        <h3 class="sr">${_("Page Actions")}</h3>
-        <ul>
-          <li class="nav-item">
-            % if not disable_course_creation:
-              <a href="#" class="button new-button new-course-button"><i class="icon-plus"></i> ${_("New Course")}</a>
-	    % elif settings.MITX_FEATURES.get('STAFF_EMAIL',''):
-	      <a href="mailto:${settings.MITX_FEATURES.get('STAFF_EMAIL','')}">${_("Email staff to create course")}</a>
-            % endif
-          </li>
-        </ul>
-      </nav>
-      % endif
-    </header>
-  </div>
+    % if user.is_active:
+    <nav class="nav-actions">
+      <h3 class="sr">${_("Page Actions")}</h3>
+      <ul>
+        <li class="nav-item">
+          % if course_creator_status=='granted':
+          <a href="#" class="button new-button new-course-button"><i class="icon-plus icon-inline"></i>
+              ${_("New Course")}</a>
+          % elif course_creator_status=='disallowed_for_this_site' and settings.MITX_FEATURES.get('STUDIO_REQUEST_EMAIL',''):
+          <a href="mailto:${settings.MITX_FEATURES.get('STUDIO_REQUEST_EMAIL','')}">${_("Email staff to create course")}</a>
+          % endif
+        </li>
+      </ul>
+    </nav>
+    % endif
+  </header>
+</div>
 
-  <div class="wrapper-content wrapper">
-    <section class="content">
+<div class="wrapper-content wrapper">
+  % if user.is_active:
+  <section class="content">
+    <article class="content-primary" role="main">
+
       <div class="introduction">
-        <p class="copy">
-          <strong>${_("Welcome, %(name)s") % dict(name= user.username)}</strong>.
-          ${_("Here are all of the courses you are currently authoring in Studio:")}</p>
-      </div>
-    </section>
-  </div>
+        <h2 class="title">${_("Welcome, {0}!".format(user.username))}</h2>
 
-  <div class="main-wrapper">
-    <div class="inner-wrapper">
-      <article class="my-classes">
-        % if user.is_active:
-        <ul class="class-list">
+        %if len(courses) > 0:
+        <div class="copy">
+          <p>${_("Here are all of the courses you currently have access to in Studio:")}</p>
+        </div>
+
+        %else:
+        <div class="copy">
+          <p>${_("You currently aren't associated with any Studio Courses.")}</p>
+        </div>
+        %endif
+      </div>
+
+      %if len(courses) > 0:
+      <div class="courses">
+        <ul class="list-courses">
           %for course, url, lms_link in sorted(courses, key=lambda s: s[0].lower() if s[0] is not None else ''):
-          <li>
+          <li class="course-item">
             <a class="class-link" href="${url}" class="class-name">
               <span class="class-name">${course}</span>
             </a>
             <a href="${lms_link}" rel="external" class="button view-button view-live-button">${_("View Live")}</a>
           </li>
-            %endfor
+          %endfor
         </ul>
-        % else:
-          <div class='warn-msg'>
-            <p>
-            ${_("In order to start authoring courses using edX Studio, please click on the activation link in your email.")}
-            </p>
+      </div>
+
+      %else:
+      <div class="courses">
+      </div>
+
+      <div class="notice notice-incontext notice-instruction notice-instruction-nocourses list-notices">
+        <div class="notice-item">
+          <div class="msg">
+            <h3 class="title">${_("Are you staff on an existing Studio course?")}</h3>
+            <div class="copy">
+              <p>${_('You will need to be added to the course in Studio by the course creator. Please get in touch with the course creator or administrator for the specific course you are helping to author.')}</p>
+            </div>
           </div>
+        </div>
+
+        %if course_creator_status == "granted":
+        <div class="notice-item has-actions">
+          <div class="msg">
+            <h3 class="title">${_('Create Your First Course')}</h3>
+            <div class="copy">
+              <p>${_('Your new course is just a click away!')}</p>
+            </div>
+          </div>
+
+          <ul class="list-actions">
+            <li class="action-item">
+              <a href="#" class="action-primary action-create action-create-course new-course-button"><i class="icon-plus icon-inline"></i> ${_('Create Your First Course')}</a>
+            </li>
+          </ul>
+        </div>
         % endif
-      </article>
-    </div>
-  </div>
+
+      </div>
+      % endif
+
+
+      %if course_creator_status == "unrequested":
+      <div class="wrapper wrapper-creationrights">
+        <h3 class="title">
+          <a href="#instruction-creationrights" class="ui-toggle-control show-creationrights"><span class="label">${_('Becoming a Course Creator in Studio')}</span> <i class="icon-remove-sign"></i></a>
+        </h3>
+
+        <div class="notice notice-incontext notice-instruction notice-instruction-creationrights ui-toggle-target" id="instruction-creationrights">
+          <div class="copy">
+            <p>${_('edX Studio is a hosted solution for our xConsortium partners and selected guests. Courses for which you are a team member appear above for you to edit, while course creator privileges are granted by edX. Our team will evaluate your request and provide you feedback within 24 hours during the work week.')}</p>
+          </div>
+
+          <div class="status status-creationrights is-unrequested">
+            <h4 class="title">${_('Your Course Creator Request Status:')}</h4>
+
+            <form id="request-coursecreator" action="${request_course_creator_url}" method="post" enctype="multipart/form-data">
+              <input type="hidden" name="csrfmiddlewaretoken" value="${csrf}">
+              <div class="form-actions">
+                <button type="submit" id="request-coursecreator-submit" name="request-coursecreator-submit" class="action-primary action-request"><i class="icon-cog icon-inline icon-spin"></i> <span class="label">${_('Request the Ability to Create Courses')}</span></button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      %elif course_creator_status == "denied":
+      <div class="wrapper wrapper-creationrights is-shown">
+        <h3 class="title">
+          <a href="#instruction-creationrights" class="ui-toggle-control current show-creationrights"><span class="label">${_('Your Course Creator Request Status')}</span> <i class="icon-remove-sign"></i></a>
+        </h3>
+
+        <div class="notice notice-incontext notice-instruction notice-instruction-creationrights ui-toggle-target" id="instruction-creationrights">
+          <div class="copy">
+            <p>${_('edX Studio is a hosted solution for our xConsortium partners and selected guests. Courses for which you are a team member appear above for you to edit, while course creator privileges are granted by edX. Our team is has completed evaluating your request.')}</p>
+          </div>
+
+          <div class="status status-creationrights has-status is-denied">
+            <h4 class="title">${_('Your Course Creator Request Status:')}</h4>
+
+            <dl class="status-update">
+              <dt class="label">${_('Your Course Creator request is:')}</dt>
+              <dd class="value">
+                <span class="status-indicator"></span>
+                <span class="value-formal">${_('Denied')}</span>
+                <span class="value-description">${_('Your request did not meet the criteria/guidelines specified by edX Staff.')}</span>
+              </dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+
+      %elif course_creator_status == "pending":
+      <div class="wrapper wrapper-creationrights is-shown">
+        <h3 class="title">
+          <a href="#instruction-creationrights" class="ui-toggle-control current show-creationrights"><span class="label">${_('Your Course Creator Request Status')}</span> <i class="icon-remove-sign"></i></a>
+        </h3>
+
+        <div class="notice notice-incontext notice-instruction notice-instruction-creationrights ui-toggle-target" id="instruction-creationrights">
+          <div class="copy">
+            <p>${_('edX Studio is a hosted solution for our xConsortium partners and selected guests. Courses for which you are a team member appear above for you to edit, while course creator privileges are granted by edX. Our team is currently  evaluating your request.')}</p>
+          </div>
+
+          <div class="status status-creationrights has-status is-pending">
+            <h4 class="title">${_('Your Course Creator Request Status:')}</h4>
+
+            <dl class="status-update">
+              <dt class="label">${_('Your Course Creator request is:')}</dt>
+              <dd class="value">
+                <span class="status-indicator"></span>
+                <span class="value-formal">${_('Pending')}</span>
+                <span class="value-description">${_('Your request is currently being reviewed by edX staff and should be updated shortly.')}</span>
+              </dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+      % endif
+
+    </article>
+
+    <aside class="content-supplementary" role="complimentary">
+      <div class="bit">
+        <h3 class="title title-3">${_('Need help?')}</h3>
+        <p>${_('If you are new to Studio and having trouble getting started, there are a few things that may be of help:')}</p>
+
+        <ol class="list-actions">
+          <li class="action-item">
+            <a href="http://files.edx.org/Getting_Started_with_Studio.pdf" title="This is a PDF Document">${_('Get started by reading Studio\'s Documentation')}</a>
+          </li>
+          <li class="action-item">
+            <a href="http://help.edge.edx.org/discussion/new" class="show-tender" title="Use our feedback tool, Tender, to request help">${_('Request help with Studio')}</a>
+          </li>
+        </ol>
+      </div>
+
+      % if course_creator_status=='disallowed_for_this_site' and settings.MITX_FEATURES.get('STUDIO_REQUEST_EMAIL',''):
+      <div class="bit">
+        <h3 class="title title-3">${_('Can I create courses in Studio?')}</h3>
+        <p>${_('In order to create courses in Studio, you must')} <a href="mailto:${settings.MITX_FEATURES.get('STUDIO_REQUEST_EMAIL','')}">${_("contact edX staff to help you create a course")}</a></p>
+      </div>
+      % endif
+
+      % if course_creator_status == "unrequested":
+      <div class="bit">
+        <h3 class="title title-3">${_('Can I create courses in Studio?')}</h3>
+        <p>${_('In order to create courses in Studio, you must have course creator privileges to create your own course.')}</p>
+      </div>
+
+      % elif course_creator_status == "denied":
+      <div class="bit">
+        <h3 class="title title-3">${_('Can I create courses in Studio?')}</h3>
+        <p>${_('Your request to author courses in studio has been denied. Please')} <a href="http://help.edge.edx.org/discussion/new" class="show-tender">${_('contact edX Staff with further questions')}</a></p>
+      </div>
+
+      % endif
+    </aside>
+  </section>
+
+
+  % else:
+  <section class="content">
+    <article class="content-primary" role="main">
+      <div class="introduction">
+        <h2 class="title">${_("Thanks for signing up, %(name)s!") % dict(name= user.username)}</h2>
+      </div>
+
+      <div class="notice notice-incontext notice-instruction notice-instruction-verification">
+        <div class="msg">
+          <h3 class="title">${_('We need to verify your email address')}</h3>
+          <div class="copy">
+            <p>${_('Almost there! In order to complete your sign up we need you to verify your email address (%(email)s). An activation message and next steps should be waiting for you there.') % dict(email=user.email)}</p>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <aside class="content-supplementary" role="complimentary">
+      <div class="bit">
+        <h3 class="title title-3">${_('Need help?')}</h3>
+        <p>${_('Please check your Junk or Spam folders in case our email isn\'t in your INBOX. Still can\'t find the verification email? Request help via the link below.')}</p>
+
+        <ol class='list-actions'>
+          <li class="action-item">
+            <a href="http://help.edge.edx.org/discussion/new" class="show-tender" title="Use our feedback tool, Tender, to request help">Request help with your Studio account</a>
+          </li>
+        </ol>
+      </div>
+    </aside>
+  </section>
+
+  %endif
+</div>
 </%block>

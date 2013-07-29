@@ -60,12 +60,10 @@ $(document).ready(function() {
         $('.nav-dd .nav-item .title').removeClass('is-selected');
     });
 
-    $('.nav-dd .nav-item .title').click(function(e) {
+    $('.nav-dd .nav-item').click(function(e) {
 
-        $subnav = $(this).parent().find('.wrapper-nav-sub');
-        $title = $(this).parent().find('.title');
-        e.preventDefault();
-        e.stopPropagation();
+        $subnav = $(this).find('.wrapper-nav-sub');
+        $title = $(this).find('.title');
 
         if ($subnav.hasClass('is-shown')) {
             $subnav.removeClass('is-shown');
@@ -75,6 +73,9 @@ $(document).ready(function() {
             $('.nav-dd .nav-item .wrapper-nav-sub').removeClass('is-shown');
             $title.addClass('is-selected');
             $subnav.addClass('is-shown');
+            // if propogation is not stopped, the event will bubble up to the
+            // body element, which will close the dropdown.
+            e.stopPropagation();
         }
     });
 
@@ -596,11 +597,11 @@ function cancelNewSection(e) {
 
 function addNewCourse(e) {
     e.preventDefault();
-
-    $(e.target).hide();
+    $('.new-course-button').addClass('disabled');
+    $(e.target).addClass('disabled');
     var $newCourse = $($('#new-course-template').html());
     var $cancelButton = $newCourse.find('.new-course-cancel');
-    $('.inner-wrapper').prepend($newCourse);
+    $('.courses').prepend($newCourse);
     $newCourse.find('.new-course-name').focus().select();
     $newCourse.find('form').bind('submit', saveNewCourse);
     $cancelButton.bind('click', cancelNewCourse);
@@ -645,7 +646,7 @@ function saveNewCourse(e) {
 
 function cancelNewCourse(e) {
     e.preventDefault();
-    $('.new-course-button').show();
+    $('.new-course-button').removeClass('disabled');
     $(this).parents('section.new-course').remove();
 }
 

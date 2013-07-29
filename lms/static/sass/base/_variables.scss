@@ -1,9 +1,5 @@
-// lms - utilities - variables
-// ====================
-
 $baseline: 20px;
 
-// grid
 $gw-column: 80px;
 $gw-gutter: 20px;
 
@@ -13,9 +9,6 @@ $fg-max-columns: 12;
 $fg-max-width: 1400px;
 $fg-min-width: 810px;
 
-// ====================
-
-// fonts
 $sans-serif: 'Open Sans', $verdana;
 $monospace: Monaco, 'Bitstream Vera Sans Mono', 'Lucida Console', monospace;
 $body-font-family: $sans-serif;
@@ -29,115 +22,12 @@ $base-font-color: rgb(60,60,60);
 $lighter-base-font-color: rgb(100,100,100);
 $very-light-text: #fff;
 
-// ====================
-
-// colors - new reorganized colors
-
-$black: rgb(0,0,0);
-$black-t0: rgba(0,0,0,0.125);
-$black-t1: rgba(0,0,0,0.25);
-$black-t2: rgba(0,0,0,0.50);
-$black-t3: rgba(0,0,0,0.75);
-
 $white: rgb(255,255,255);
-$white-t0: rgba(255,255,255,0.125);
-$white-t1: rgba(255,255,255,0.25);
-$white-t2: rgba(255,255,255,0.50);
-$white-t3: rgba(255,255,255,0.75);
-
-$gray: rgb(127,127,127);
-$gray-l1: tint($gray,20%);
-$gray-l2: tint($gray,40%);
-$gray-l3: tint($gray,60%);
-$gray-l4: tint($gray,80%);
-$gray-l5: tint($gray,90%);
-$gray-l6: tint($gray,95%);
-$gray-d1: shade($gray,20%);
-$gray-d2: shade($gray,40%);
-$gray-d3: shade($gray,60%);
-$gray-d4: shade($gray,80%);
-
-//new blue
-$pink: rgb(183,37,103);
-$pink-l1: tint($pink,20%);
-$pink-l2: tint($pink,40%);
-$pink-l3: tint($pink,60%);
-$pink-l4: tint($pink,80%);
-$pink-l5: tint($pink,90%);
-$pink-d1: shade($pink,20%);
-$pink-d2: shade($pink,40%);
-$pink-d3: shade($pink,60%);
-$pink-d4: shade($pink,80%);
-$pink-s1: saturate($pink,15%);
-$pink-s2: saturate($pink,30%);
-$pink-s3: saturate($pink,45%);
-$pink-u1: desaturate($pink,15%);
-$pink-u2: desaturate($pink,30%);
-$pink-u3: desaturate($pink,45%);
-
+$black: rgb(0,0,0);
+$blue: rgb(29,157,217);
+$pink: rgb(182,37,104);
+$yellow: rgb(255, 252, 221);
 $red: rgb(178, 6, 16);
-$red-l1: tint($red,20%);
-$red-l2: tint($red,40%);
-$red-l3: tint($red,60%);
-$red-l4: tint($red,80%);
-$red-l5: tint($red,90%);
-$red-d1: shade($red,20%);
-$red-d2: shade($red,40%);
-$red-d3: shade($red,60%);
-$red-d4: shade($red,80%);
-$red-s1: saturate($red,15%);
-$red-s2: saturate($red,30%);
-$red-s3: saturate($red,45%);
-$red-u1: desaturate($red,15%);
-$red-u2: desaturate($red,30%);
-$red-u3: desaturate($red,45%);
-
-$green: rgb(37, 184, 90);
-$green-l1: tint($green,20%);
-$green-l2: tint($green,40%);
-$green-l3: tint($green,60%);
-$green-l4: tint($green,80%);
-$green-l5: tint($green,90%);
-$green-d1: shade($green,20%);
-$green-d2: shade($green,40%);
-$green-d3: shade($green,60%);
-$green-d4: shade($green,80%);
-$green-s1: saturate($green,15%);
-$green-s2: saturate($green,30%);
-$green-s3: saturate($green,45%);
-$green-u1: desaturate($green,15%);
-$green-u2: desaturate($green,30%);
-$green-u3: desaturate($green,45%);
-
-//new yellow
-
-$orange: rgb(237, 189, 60);
-$orange-l1: tint($orange,20%);
-$orange-l2: tint($orange,40%);
-$orange-l3: tint($orange,60%);
-$orange-l4: tint($orange,80%);
-$orange-l5: tint($orange,90%);
-$orange-d1: shade($orange,20%);
-$orange-d2: shade($orange,40%);
-$orange-d3: shade($orange,60%);
-$orange-d4: shade($orange,80%);
-$orange-s1: saturate($orange,15%);
-$orange-s2: saturate($orange,30%);
-$orange-s3: saturate($orange,45%);
-$orange-u1: desaturate($orange,15%);
-$orange-u2: desaturate($orange,30%);
-$orange-u3: desaturate($orange,45%);
-
-$shadow: rgba(0,0,0,0.2);
-$shadow-l1: rgba(0,0,0,0.1);
-$shadow-l2: rgba(0,0,0,0.05);
-$shadow-d1: rgba(0,0,0,0.4);
-
-// ====================
-
-// colors - old variables
-$blue: rgb(29,157,217); //old blue
-$yellow: rgb(255, 252, 221); //old yellow
 $error-red: rgb(253, 87, 87);
 $light-gray: rgb(221, 221, 221);
 $dark-gray: rgb(51, 51, 51);
@@ -149,22 +39,35 @@ $outer-border-color: rgb(170, 170, 170);
 $light-gray: #ddd;
 $dark-gray: #333;
 
-// edx.org-related
-$m-gray-l1: rgb(203,203,203);	
-$m-gray-l2: rgb(246,246,246);
-$m-gray: rgb(153,153,153);
-$m-gray-d1: rgb(102,102,102);
-$m-gray-d2: rgb(51,51,51);
-$m-gray-a1: rgb(80,80,80);
-$m-blue: rgb(65, 116, 170);
-// $m-blue: rgb(85, 151, 221); (used in marketing redesign)
-$m-blue-l1: rgb(85, 151, 221);
-$m-blue-d1: shade($m-blue,15%);
-$m-blue-s1: saturate($m-blue,15%);
-$m-pink: rgb(204,51,102);
+// edx.org marketing site variables
+$m-gray: #8A8C8F;
+$m-gray-l1: #97999B;
+$m-gray-l2: #A4A6A8;
+$m-gray-l3: #B1B2B4;
+$m-gray-l4: #F5F5F5;
+$m-gray-d1: #7D7F83;
+$m-gray-d2: #707276;
+$m-gray-d3: #646668;
+$m-gray-d4: #050505;
+
+$m-blue: #1AA1DE;
+$m-blue-l1: #2BACE6;
+$m-blue-l2: #42B5E9;
+$m-blue-l3: #59BEEC;
+$m-blue-d1: #1790C7;
+$m-blue-d2: #1580B0;
+$m-blue-d3: #126F9A;
+$m-blue-d4: #0A4A67;
+
+$m-pink: #B52A67;
+$m-pink-l1: #CA2F73;
+$m-pink-l2: #D33F80;
+$m-pink-l3: #D7548E;
+$m-pink-d1: #A0255B;
+$m-pink-d2: #8C204F;
+$m-pink-d3: #771C44;
 
 $m-base-font-size: em(15);
-
 
 $base-font-color: rgb(60,60,60);
 $baseFontColor: rgb(60,60,60);
@@ -184,9 +87,56 @@ $courseware-footer-border: none;
 $courseware-footer-shadow: none;
 $courseware-footer-margin: 0px;
 
+
+// actions
 $button-bg-image: linear-gradient(#fff 0%, rgb(250,250,250) 50%, rgb(237,237,237) 50%, rgb(220,220,220) 100%);
 $button-bg-color: transparent;
 $button-bg-hover-color: #fff;
+
+// actions - primary
+$action-primary-bg: $m-blue-d3;
+$action-primary-fg: $white;
+$action-primary-shadow: $m-blue-d4;
+
+// focused - hover/active pseudo states
+$action-primary-focused-bg: $m-blue-d1;
+$action-primary-focused-fg: $white;
+
+// current or active navigation item
+$action-primary-active-bg: $m-blue;
+$action-primary-active-fg: $m-blue-d3;
+$action-primary-active-shadow: $m-blue-d2;
+$action-primary-active-focused-fg: $m-blue-d4;
+$action-primary-active-focused-shadow: $m-blue-d3;
+
+// disabled
+$action-primary-disabled-bg: $m-gray-d3;
+$action-prmary-disabled-fg: $white;
+
+
+
+// actions - secondary
+$action-secondary-bg: $m-pink;
+$action-secondary-fg: $white;
+$action-secondary-shadow: $m-pink-d2;
+
+// focused - hover/active pseudo states
+$action-secondary-focused-bg: $m-pink-l3;
+$action-secondary-focused-fg: $white;
+
+// current or active navigation item
+$action-secondary-active-bg: $m-pink-l2;
+$action-secondary-active-fg: $m-pink-d1;
+$action-secondary-active-shadow: $m-pink-d1;
+$action-secondary-active-focused-fg: $m-pink-d3;
+$action-secondary-active-focused-shadow: $m-pink-d2;
+
+// disabled
+$action-secondary-disabled-bg: $m-gray-d3;
+$action-secondary-disabled-fg: $white;
+
+
+
 
 $faded-hr-image-1: linear-gradient(180deg, rgba(200,200,200, 0) 0%, rgba(200,200,200, 1) 50%, rgba(200,200,200, 0));
 $faded-hr-image-2: linear-gradient(180deg, rgba(200,200,200, 0) 0%, rgba(200,200,200, 1));
@@ -214,7 +164,7 @@ $border-color-3: rgb(100,100,100);
 $border-color-4: rgb(252,252,252);
 
 $link-color: $blue;
-$link-color-d1: $m-blue;
+$link-color-d1: $m-blue-d2;
 $link-hover: $pink;
 $site-status-color: $pink;
 
