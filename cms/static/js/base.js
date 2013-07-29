@@ -653,6 +653,20 @@ function saveNewCourse(e) {
 
     bInErr = (display_name_errMsg || org_errMsg || number_errMsg || run_errMsg);
 
+    // check for suitable encoding
+    if (!bInErr) {
+        encoding_errMsg = gettext('Please do not use any spaces or special characters in this field.');
+
+        if (encodeURIComponent(org) != org)
+            org_errMsg = encoding_errMsg;
+        if (encodeURIComponent(number) != number)
+            number_errMsg = encoding_errMsg;
+        if (encodeURIComponent(run) != run)
+            run_errMsg = encoding_errMsg;
+
+        bInErr = (display_name_errMsg || org_errMsg || number_errMsg || run_errMsg);
+    }
+
     header_err_msg = (bInErr) ? gettext('Please correct the fields below.') : null;
 
     setNewCourseErrMsgs(header_err_msg, display_name_errMsg, org_errMsg, number_errMsg, run_errMsg);
