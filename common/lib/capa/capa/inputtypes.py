@@ -534,7 +534,7 @@ class TextLine(InputTypeBase):
     is used e.g. for embedding simulations turned into questions.
 
     Example:
-        <texline math="1" trailing_text="m/s" />
+        <textline math="1" trailing_text="m/s" />
 
     This example will render out a text line with a math preview and the text 'm/s'
     after the end of the text line.

@@ -1743,6 +1743,8 @@ class FormulaResponse(LoncapaResponse):
                 student_variables[str(var)] = value
             # log.debug('formula: instructor_vars=%s, expected=%s' %
             # (instructor_variables,expected))
+
+            # Call `evaluator` on the instructor's answer and get a number
             instructor_result = evaluator(
                 instructor_variables, dict(),
                 expected, case_sensitive=self.case_sensitive
@@ -1750,6 +1752,8 @@ class FormulaResponse(LoncapaResponse):
             try:
                 # log.debug('formula: student_vars=%s, given=%s' %
                 # (student_variables,given))
+
+                # Call `evaluator` on the student's answer; look for exceptions
                 student_result = evaluator(
                     student_variables,
                     dict(),
@@ -1758,27 +1762,39 @@ class FormulaResponse(LoncapaResponse):
                 )
             except UndefinedVariable as uv:
                 log.debug(
-                    'formularesponse: undefined variable in given=%s' % given)
+                    'formularesponse: undefined variable in given=%s',
+                    given
+                )
                 raise StudentInputError(
-                    "Invalid input: " + uv.message + " not permitted in answer")
+                    "Invalid input: " + uv.message + " not permitted in answer"
+                )
             except ValueError as ve:
                 if 'factorial' in ve.message:
                     # This is thrown when fact() or factorial() is used in a formularesponse answer
                     #   that tests on negative and/or non-integer inputs
-                    # ve.message will be: `factorial() only accepts integral values` or `factorial() not defined for negative values`
+                    # ve.message will be: `factorial() only accepts integral values` or
+                    # `factorial() not defined for negative values`
                     log.debug(
-                        'formularesponse: factorial function used in response that tests negative and/or non-integer inputs. given={0}'.format(given))
+                        ('formularesponse: factorial function used in response '
+                         'that tests negative and/or non-integer inputs. '
+                         'given={0}').format(given)
+                    )
                     raise StudentInputError(
-                        "factorial function not permitted in answer for this problem. Provided answer was: {0}".format(given))
+                        ("factorial function not permitted in answer "
+                         "for this problem. Provided answer was: "
+                         "{0}").format(cgi.escape(given))
+                    )
                 # If non-factorial related ValueError thrown, handle it the same as any other Exception
                 log.debug('formularesponse: error {0} in formula'.format(ve))
                 raise StudentInputError("Invalid input: Could not parse '%s' as a formula" %
                                         cgi.escape(given))
             except Exception as err:
                 # traceback.print_exc()
-                log.debug('formularesponse: error %s in formula' % err)
+                log.debug('formularesponse: error %s in formula', err)
                 raise StudentInputError("Invalid input: Could not parse '%s' as a formula" %
                                         cgi.escape(given))
+
+            # No errors in student's response--actually test for correctness
             if not compare_with_tolerance(student_result, instructor_result, self.tolerance):
                 return "incorrect"
         return "correct"
