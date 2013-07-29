@@ -55,8 +55,8 @@
   margin-bottom: $baseline;
 
   .title {
-    @extend .t-title7;
-    margin-bottom: ($baseline/4);
+    @extend .t-title6;
+    margin-bottom: ($baseline/2);
     font-weight: 700;
   }
 
@@ -161,6 +161,34 @@
 
       .action-primary {
         @extend .btn-primary-blue;
+        @extend .t-action3;
+      }
+    }
+  }
+}
+
+// particular notice - create
+.notice-create {
+  background-color: $gray-l4;
+
+  .title {
+    color: $gray-d2;
+  }
+
+  .copy {
+    color: $gray-d2;
+  }
+
+  &.has-actions {
+
+    .list-actions {
+
+      .action-item {
+
+      }
+
+      .action-primary {
+        @extend .btn-primary-green;
         @extend .t-action3;
       }
     }

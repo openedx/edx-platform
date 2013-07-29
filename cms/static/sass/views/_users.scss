@@ -27,6 +27,36 @@ body.course.users {
     }
   }
 
+  // ELEM: no users notice
+  .content .notice-create {
+    width: flexgrid(9, 9);
+    margin-top: $baseline;
+
+    // CASE: notice has actions {
+    &.has-actions {
+
+      .msg, .list-actions {
+        display: inline-block;
+        vertical-align: middle;
+      }
+
+      .msg {
+        width: flex-grid(6, 9);
+        margin-right: flex-gutter();
+      }
+
+      .list-actions {
+        width: flex-grid(3, 9);
+        text-align: right;
+        margin-top: 0;
+
+        .action-item {
+
+        }
+      }
+    }
+  }
+
 
   // ELEM: new user form
   .wrapper-create-user {
