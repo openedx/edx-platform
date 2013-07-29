@@ -74,7 +74,7 @@ class UserApiTestCase(TestCase):
 
     def assertUserIsValid(self, user):
         """Assert that the given user result is valid"""
-        self.assertItemsEqual(user.keys(), ["email", "id", "name", "url"])
+        self.assertItemsEqual(user.keys(), ["email", "id", "name", "username", "url"])
         self.assertSelfReferential(user)
 
     def assertPrefIsValid(self, pref):
@@ -196,7 +196,8 @@ class UserViewSetTest(UserApiTestCase):
                 "email": user.email,
                 "id": user.id,
                 "name": user.profile.name,
-                "url": uri,
+                "username": user.username,
+                "url": uri
             }
         )
 
@@ -334,6 +335,7 @@ class UserPreferenceViewSetTest(UserApiTestCase):
                     "email": pref.user.email,
                     "id": pref.user.id,
                     "name": pref.user.profile.name,
+                    "username": pref.user.username,
                     "url": self.get_uri_for_user(pref.user),
                 },
                 "key": pref.key,

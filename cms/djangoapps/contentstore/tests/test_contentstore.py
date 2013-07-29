@@ -1359,3 +1359,63 @@ class ContentStoreTest(ModuleStoreTestCase):
         self.assertEqual(course.textbooks, fetched_course.textbooks)
         # is this test too strict? i.e., it requires the dicts to be ==
         self.assertEqual(course.checklists, fetched_course.checklists)
+
+
+class MetadataSaveTestCase(ModuleStoreTestCase):
+    """
+    Test that metadata is correctly decached.
+    """
+
+    def setUp(self):
+        sample_xml = '''
+        <video display_name="Test Video"
+                youtube="1.0:p2Q6BrNhdh8,0.75:izygArpw-Qo,1.25:1EeWXzPdhSA,1.5:rABDYkeK0x8"
+                show_captions="false"
+                from="00:00:01"
+                to="00:01:00">
+            <source src="http://www.example.com/file.mp4"/>
+            <track src="http://www.example.com/track"/>
+        </video>
+        '''
+        CourseFactory.create(org='edX', course='999', display_name='Robot Super Course')
+        course_location = Location(['i4x', 'edX', '999', 'course', 'Robot_Super_Course', None])
+
+        model_data = {'data': sample_xml}
+        self.descriptor = ItemFactory.create(parent_location=course_location, category='video', data=model_data)
+
+    def test_metadata_persistence(self):
+        """
+        Test that descriptors which set metadata fields in their
+        constructor are correctly persisted.
+        """
+        # We should start with a source field, from the XML's <source/> tag
+        self.assertIn('source', own_metadata(self.descriptor))
+        attrs_to_strip = {
+            'show_captions',
+            'youtube_id_1_0',
+            'youtube_id_0_75',
+            'youtube_id_1_25',
+            'youtube_id_1_5',
+            'start_time',
+            'end_time',
+            'source',
+            'track'
+        }
+        # We strip out all metadata fields to reproduce a bug where
+        # constructors which set their fields (e.g. Video) didn't have
+        # those changes persisted. So in the end we have the XML data
+        # in `descriptor.data`, but not in the individual fields
+        fields = self.descriptor.fields
+        for field in fields:
+            if field.name in attrs_to_strip:
+                field.delete_from(self.descriptor)
+
+        # Assert that we correctly stripped the field
+        self.assertNotIn('source', own_metadata(self.descriptor))
+        get_modulestore(self.descriptor.location).update_metadata(
+            self.descriptor.location,
+            own_metadata(self.descriptor)
+        )
+        module = get_modulestore(self.descriptor.location).get_item(self.descriptor.location)
+        # Assert that get_item correctly sets the metadata
+        self.assertIn('source', own_metadata(module))
