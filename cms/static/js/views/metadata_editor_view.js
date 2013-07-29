@@ -320,6 +320,7 @@ CMS.Views.Metadata.List = CMS.Views.Metadata.AbstractEditor.extend({
         "click .setting-clear" : "clear",
         "keypress .setting-input" : "showClearButton",
         "change input" : "updateModel",
+        "input input" : "enableAdd",
         "click .create-setting" : "addEntry",
         "click .remove-setting" : "removeEntry"
     },
@@ -353,6 +354,7 @@ CMS.Views.Metadata.List = CMS.Views.Metadata.AbstractEditor.extend({
         // change event
         var list = this.model.get('value') || [];
         this.setValueInEditor(list.concat(['']))
+        this.$el.find('.create-setting').addClass('is-disabled');
     },
 
     removeEntry: function(event) {
@@ -360,5 +362,10 @@ CMS.Views.Metadata.List = CMS.Views.Metadata.AbstractEditor.extend({
         var entry = $(event.currentTarget).siblings().val();
         this.setValueInEditor(_.without(this.model.get('value'), entry));
         this.updateModel();
+        this.$el.find('.create-setting').removeClass('is-disabled');
+    },
+
+    enableAdd: function() {
+        this.$el.find('.create-setting').removeClass('is-disabled');
     }
 });

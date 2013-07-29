@@ -148,6 +148,14 @@ class VideoAlphaDescriptorImportTestCase(unittest.TestCase):
     Make sure that VideoAlphaDescriptor can import an old XML-based video correctly.
     """
 
+    def assert_attributes_equal(self, video, attrs):
+        """
+        Assert that `video` has the correct attributes. `attrs` is a map
+        of {metadata_field: value}.
+        """
+        for key, value in attrs.items():
+            self.assertEquals(getattr(video, key), value)
+
     def test_constructor(self):
         sample_xml = '''
             <videoalpha display_name="Test Video"
@@ -166,17 +174,18 @@ class VideoAlphaDescriptorImportTestCase(unittest.TestCase):
                       'location': location}
         system = DummySystem(load_error_modules=True)
         descriptor = VideoAlphaDescriptor(system, model_data)
-        self.assertEquals(descriptor.youtube_id_0_75, 'izygArpw-Qo')
-        self.assertEquals(descriptor.youtube_id_1_0, 'p2Q6BrNhdh8')
-        self.assertEquals(descriptor.youtube_id_1_25, '1EeWXzPdhSA')
-        self.assertEquals(descriptor.youtube_id_1_5, 'rABDYkeK0x8')
-        self.assertEquals(descriptor.show_captions, False)
-        self.assertEquals(descriptor.start_time, 1.0)
-        self.assertEquals(descriptor.end_time, 60)
-        self.assertEquals(descriptor.track, 'http://www.example.com/track')
-        self.assertEquals(descriptor.source, 'http://www.example.com/source.mp4')
-        self.assertEquals(descriptor.html5_sources, ['http://www.example.com/source.mp4', 'http://www.example.com/source.ogg'])
-        self.assertEquals(descriptor.data, '')
+        self.assert_attributes_equal(descriptor, {
+            'youtube_id_0_75': 'izygArpw-Qo',
+            'youtube_id_1_0': 'p2Q6BrNhdh8',
+            'youtube_id_1_25': '1EeWXzPdhSA',
+            'youtube_id_1_5': 'rABDYkeK0x8',
+            'show_captions': False,
+            'start_time': 1.0,
+            'end_time': 60,
+            'track': 'http://www.example.com/track',
+            'html5_sources': ['http://www.example.com/source.mp4', 'http://www.example.com/source.ogg'],
+            'data': ''
+        })
 
     def test_from_xml(self):
         module_system = DummySystem(load_error_modules=True)
@@ -191,17 +200,19 @@ class VideoAlphaDescriptorImportTestCase(unittest.TestCase):
             </videoalpha>
         '''
         output = VideoAlphaDescriptor.from_xml(xml_data, module_system)
-        self.assertEquals(output.youtube_id_0_75, 'izygArpw-Qo')
-        self.assertEquals(output.youtube_id_1_0, 'p2Q6BrNhdh8')
-        self.assertEquals(output.youtube_id_1_25, '1EeWXzPdhSA')
-        self.assertEquals(output.youtube_id_1_5, 'rABDYkeK0x8')
-        self.assertEquals(output.show_captions, False)
-        self.assertEquals(output.start_time, 1.0)
-        self.assertEquals(output.end_time, 60)
-        self.assertEquals(output.track, 'http://www.example.com/track')
-        self.assertEquals(output.source, 'http://www.example.com/source.mp4')
-        self.assertEquals(output.html5_sources, ['http://www.example.com/source.mp4'])
-        self.assertEquals(output.data, '')
+        self.assert_attributes_equal(output, {
+            'youtube_id_0_75': 'izygArpw-Qo',
+            'youtube_id_1_0': 'p2Q6BrNhdh8',
+            'youtube_id_1_25': '1EeWXzPdhSA',
+            'youtube_id_1_5': 'rABDYkeK0x8',
+            'show_captions': False,
+            'start_time': 1.0,
+            'end_time': 60,
+            'track': 'http://www.example.com/track',
+            'source': 'http://www.example.com/source.mp4',
+            'html5_sources': ['http://www.example.com/source.mp4'],
+            'data': ''
+        })
 
     def test_from_xml_missing_attributes(self):
         """
@@ -218,17 +229,19 @@ class VideoAlphaDescriptorImportTestCase(unittest.TestCase):
             </videoalpha>
         '''
         output = VideoAlphaDescriptor.from_xml(xml_data, module_system)
-        self.assertEquals(output.youtube_id_0_75, '')
-        self.assertEquals(output.youtube_id_1_0, 'p2Q6BrNhdh8')
-        self.assertEquals(output.youtube_id_1_25, '1EeWXzPdhSA')
-        self.assertEquals(output.youtube_id_1_5, '')
-        self.assertEquals(output.show_captions, True)
-        self.assertEquals(output.start_time, 0.0)
-        self.assertEquals(output.end_time, 0.0)
-        self.assertEquals(output.track, 'http://www.example.com/track')
-        self.assertEquals(output.source, 'http://www.example.com/source.mp4')
-        self.assertEquals(output.html5_sources, ['http://www.example.com/source.mp4'])
-        self.assertEquals(output.data, '')
+        self.assert_attributes_equal(output, {
+            'youtube_id_0_75': '',
+            'youtube_id_1_0': 'p2Q6BrNhdh8',
+            'youtube_id_1_25': '1EeWXzPdhSA',
+            'youtube_id_1_5': '',
+            'show_captions': True,
+            'start_time': 0.0,
+            'end_time': 0.0,
+            'track': 'http://www.example.com/track',
+            'source': 'http://www.example.com/source.mp4',
+            'html5_sources': ['http://www.example.com/source.mp4'],
+            'data': ''
+        })
 
     def test_from_xml_no_attributes(self):
         """
@@ -237,17 +250,19 @@ class VideoAlphaDescriptorImportTestCase(unittest.TestCase):
         module_system = DummySystem(load_error_modules=True)
         xml_data = '<videoalpha></videoalpha>'
         output = VideoAlphaDescriptor.from_xml(xml_data, module_system)
-        self.assertEquals(output.youtube_id_0_75, '')
-        self.assertEquals(output.youtube_id_1_0, 'OEoXaMPEzfM')
-        self.assertEquals(output.youtube_id_1_25, '')
-        self.assertEquals(output.youtube_id_1_5, '')
-        self.assertEquals(output.show_captions, True)
-        self.assertEquals(output.start_time, 0.0)
-        self.assertEquals(output.end_time, 0.0)
-        self.assertEquals(output.track, '')
-        self.assertEquals(output.source, '')
-        self.assertEquals(output.html5_sources, [])
-        self.assertEquals(output.data, '')
+        self.assert_attributes_equal(output, {
+            'youtube_id_0_75': '',
+            'youtube_id_1_0': 'OEoXaMPEzfM',
+            'youtube_id_1_25': '',
+            'youtube_id_1_5': '',
+            'show_captions': True,
+            'start_time': 0.0,
+            'end_time': 0.0,
+            'track': '',
+            'source': '',
+            'html5_sources': [],
+            'data': ''
+        })
 
     def test_old_video_format(self):
         """
@@ -265,19 +280,23 @@ class VideoAlphaDescriptorImportTestCase(unittest.TestCase):
             </videoalpha>
         """
         output = VideoAlphaDescriptor.from_xml(xml_data, module_system)
-        self.assertEquals(output.youtube_id_0_75, 'izygArpw-Qo')
-        self.assertEquals(output.youtube_id_1_0, 'p2Q6BrNhdh8')
-        self.assertEquals(output.youtube_id_1_25, '1EeWXzPdhSA')
-        self.assertEquals(output.youtube_id_1_5, 'rABDYkeK0x8')
-        self.assertEquals(output.show_captions, False)
-        self.assertEquals(output.start_time, 1.0)
-        self.assertEquals(output.end_time, 60)
-        self.assertEquals(output.track, 'http://www.example.com/track')
-        self.assertEquals(output.source, 'http://www.example.com/source.mp4')
-        self.assertEquals(output.html5_sources, ['http://www.example.com/source.mp4'])
-        self.assertEquals(output.data, '')
+        self.assert_attributes_equal(output, {
+            'youtube_id_0_75': 'izygArpw-Qo',
+            'youtube_id_1_0': 'p2Q6BrNhdh8',
+            'youtube_id_1_25': '1EeWXzPdhSA',
+            'youtube_id_1_5': 'rABDYkeK0x8',
+            'show_captions': False,
+            'start_time': 1.0,
+            'end_time': 60,
+            'track': 'http://www.example.com/track',
+            'html5_sources': ['http://www.example.com/source.mp4'],
+            'data': ''
+        })
 
     def test_old_video_data(self):
+        """
+        Ensure that Video Alpha is able to read VideoModule's model data.
+        """
         module_system = DummySystem(load_error_modules=True)
         xml_data = """
             <video display_name="Test Video"
@@ -291,17 +310,18 @@ class VideoAlphaDescriptorImportTestCase(unittest.TestCase):
         """
         video = VideoDescriptor.from_xml(xml_data, module_system)
         video_alpha = VideoAlphaDescriptor(module_system, video._model_data)
-        self.assertEquals(video_alpha.youtube_id_0_75, 'izygArpw-Qo')
-        self.assertEquals(video_alpha.youtube_id_1_0, 'p2Q6BrNhdh8')
-        self.assertEquals(video_alpha.youtube_id_1_25, '1EeWXzPdhSA')
-        self.assertEquals(video_alpha.youtube_id_1_5, 'rABDYkeK0x8')
-        self.assertEquals(video_alpha.show_captions, False)
-        self.assertEquals(video_alpha.start_time, 1.0)
-        self.assertEquals(video_alpha.end_time, 60)
-        self.assertEquals(video_alpha.track, 'http://www.example.com/track')
-        self.assertEquals(video_alpha.source, 'http://www.example.com/source.mp4')
-        self.assertEquals(video_alpha.html5_sources, ['http://www.example.com/source.mp4'])
-        self.assertEquals(video_alpha.data, '')
+        self.assert_attributes_equal(video_alpha, {
+            'youtube_id_0_75': 'izygArpw-Qo',
+            'youtube_id_1_0': 'p2Q6BrNhdh8',
+            'youtube_id_1_25': '1EeWXzPdhSA',
+            'youtube_id_1_5': 'rABDYkeK0x8',
+            'show_captions': False,
+            'start_time': 1.0,
+            'end_time': 60,
+            'track': 'http://www.example.com/track',
+            'html5_sources': ['http://www.example.com/source.mp4'],
+            'data': ''
+        })
 
 
 class VideoAlphaExportTestCase(unittest.TestCase):

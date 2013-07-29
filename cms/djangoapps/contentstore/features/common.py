@@ -256,14 +256,14 @@ def open_new_unit(step):
     world.css_click('a.new-unit-item')
 
 
-@step('when I view the video it (.*) show the captions')
-def shows_captions(step, show_captions):
+@step('when I view the (video.*) it (.*) show the captions')
+def shows_captions(_step, video_type, show_captions):
     # Prevent cookies from overriding course settings
     world.browser.cookies.delete('hide_captions')
     if show_captions == 'does not':
-        assert world.css_has_class('.video', 'closed')
+        assert world.css_has_class('.%s' % video_type, 'closed')
     else:
-        assert world.is_css_not_present('.video.closed')
+        assert world.is_css_not_present('.%s.closed' % video_type)
 
 
 @step('the save button is disabled$')

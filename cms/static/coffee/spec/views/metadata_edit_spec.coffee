@@ -107,7 +107,8 @@ describe "Test Metadata Editor", ->
             view = new CMS.Views.Metadata.Editor({collection: @model})
             childModels = view.collection.models
             expect(childModels.length).toBe(6)
-            childViews = view.$el.find('.setting-input')
+            # Be sure to check list view as well as other input types
+            childViews = view.$el.find('.setting-input, .list-settings')
             expect(childViews.length).toBe(6)
 
             verifyEntry = (index, display_name, type) ->
@@ -116,7 +117,7 @@ describe "Test Metadata Editor", ->
 
             verifyEntry(0, 'Display Name', 'text')
             verifyEntry(1, 'Inputs', 'number')
-            verifyEntry(2, 'List', 'text')
+            verifyEntry(2, 'List', '')
             verifyEntry(3, 'Show Answer', 'select-one')
             verifyEntry(4, 'Unknown', 'text')
             verifyEntry(5, 'Weight', 'number')
@@ -319,9 +320,7 @@ describe "Test Metadata Editor", ->
       beforeEach ->
         listModel = new CMS.Models.Metadata(listEntry)
         @listView = new CMS.Views.Metadata.List({model: listModel})
-
-      it "uses a text input type", ->
-        assertInputType(@listView, 'text')
+        @el = @listView.$el
 
       it "returns the initial value upon initialization", ->
         assertValueInView(@listView, ['the first display value', 'the second'])
@@ -337,10 +336,24 @@ describe "Test Metadata Editor", ->
 
       it "can add an entry", ->
         expect(@listView.model.get('value').length).toEqual(2)
-        @listView.$el.find('.setting-add').click()
-        expect(@listView.$el.find('input.input').length).toEqual(3)
+        @el.find('.create-setting').click()
+        expect(@el.find('input.input').length).toEqual(3)
 
       it "can remove an entry", ->
         expect(@listView.model.get('value').length).toEqual(2)
-        @listView.$el.find('.setting-remove').first().click()
+        @el.find('.remove-setting').first().click()
         expect(@listView.model.get('value').length).toEqual(1)
+
+      it "only allows one blank entry at a time", ->
+        expect(@el.find('input').length).toEqual(2)
+        @el.find('.create-setting').click()
+        @el.find('.create-setting').click()
+        expect(@el.find('input').length).toEqual(3)
+
+      it "re-enables the add setting button after entering a new value", ->
+        expect(@el.find('input').length).toEqual(2)
+        @el.find('.create-setting').click()
+        expect(@el.find('.create-setting')).toHaveClass('is-disabled')
+        @el.find('input').last().val('third setting')
+        @el.find('input').last().trigger('input')
+        expect(@el.find('.create-setting')).not.toHaveClass('is-disabled')

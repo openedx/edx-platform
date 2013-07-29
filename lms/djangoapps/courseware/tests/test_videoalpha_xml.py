@@ -86,7 +86,7 @@ class VideoAlphaModuleUnitTest(unittest.TestCase):
             'end': 3610.0,
             'start': 3603.0,
             'id': module.location.html_id(),
-            'show_captions': True,
+            'show_captions': 'true',
             'sources': sources,
             'youtube_streams': _create_youtube_string(module),
             'track': '',
