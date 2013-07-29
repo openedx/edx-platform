@@ -294,31 +294,25 @@ form[class^="create-"] {
     padding: ($baseline*0.75) ($baseline*1.5);
     background: $gray-l6;
 
-    .action-primary {
-      @include blue-button;
-      @extend .t-action2;
-      @include transition(all .15s);
+    .action {
+      @include transition(all $tmg-f2 linear 0s);
       display: inline-block;
       padding: ($baseline/5) $baseline;
       font-weight: 600;
       text-transform: uppercase;
+    }
+
+    .action-primary {
+      @include blue-button;
+      @extend .t-action2;
     }
 
     .action-secondary {
       @include grey-button;
       @extend .t-action2;
-      @include transition(all .15s);
-      display: inline-block;
-      padding: ($baseline/5) $baseline;
-      font-weight: 600;
-      text-transform: uppercase;
     }
   }
 }
-
-
-
-
 
 // ====================
 
