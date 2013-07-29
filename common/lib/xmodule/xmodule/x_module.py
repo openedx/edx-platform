@@ -616,10 +616,13 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
 
         new_block = system.xblock_from_json(cls, usage_id, json_data)
         if parent_xblock is not None:
-            parent_xblock.children.append(new_block)
-        # decache pending children field settings (Note, truly persisting at this point would break b/c
-        # persistence assumes children is a list of ids not actual xblocks)
-        parent_xblock.save()
+            children = parent_xblock.children
+            children.append(new_block)
+            # trigger setter method by using top level field access
+            parent_xblock.children = children
+            # decache pending children field settings (Note, truly persisting at this point would break b/c
+            # persistence assumes children is a list of ids not actual xblocks)
+            parent_xblock.save()
         return new_block
 
     @classmethod
