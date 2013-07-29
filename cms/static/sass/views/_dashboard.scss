@@ -360,18 +360,18 @@ body.dashboard {
 
 	.new-course {
 		@include clearfix();
-		padding: ($baseline*0.75) ($baseline*1.25);
+		padding: 0;
 		margin-top: $baseline;
 		border-radius: 3px;
 		border: 1px solid $gray;
 		background: $white;
 		box-shadow: 0 1px 2px rgba(0, 0, 0, .1);
 
-	    .title {
-	      @extend .t-title4;
-	      font-weight: 700;
-	      margin-bottom: $baseline;
-	    }
+    .title {
+      @extend .t-title4;
+      font-weight: 700;
+      margin-bottom: $baseline;
+    }
 
 		.row {
 			@include clearfix();
