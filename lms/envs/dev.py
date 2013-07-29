@@ -257,7 +257,7 @@ if SEGMENT_IO_LMS_KEY:
 
 
 ########################## USER API ########################
-EDX_API_KEY = ''
+EDX_API_KEY = None
 
 #####################################################################
 # Lastly, see if the developer has any local overrides.
