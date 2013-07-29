@@ -682,12 +682,12 @@ function saveNewCourse(e) {
     });
 
     $.post('/create_new_course', {
-        'org': org,
-        'number': number,
-        'display_name': display_name,
-        'run': run
-    },
-    function(data) {
+            'org': org,
+            'number': number,
+            'display_name': display_name,
+            'run': run
+        },
+        function(data) {
             if (data.id !== undefined) {
                 window.location = '/' + data.id.replace(/.*:\/\//, '');
             } else if (data.ErrMsg !== undefined) {
