@@ -12,10 +12,11 @@ from mitxmako.shortcuts import render_to_response
 from django.core.context_processors import csrf
 
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore import Location
 from contentstore.utils import get_lms_link_for_item
 from util.json_request import JsonResponse
 from auth.authz import (
-    STAFF_ROLE_NAME, INSTRUCTOR_ROLE_NAME, get_users_in_course_group_by_role,
+    STAFF_ROLE_NAME, INSTRUCTOR_ROLE_NAME,
     add_user_to_course_group, remove_user_from_course_group,
     get_course_groupname_for_role)
 from course_creators.views import get_course_creator_status, add_user_with_status_unrequested, user_requested_access
