@@ -8,6 +8,7 @@ import hashlib
 from cStringIO import StringIO as cIO
 from StringIO import StringIO as IO
 
+from django.conf import settings
 from pymongo import MongoClient
 from pdfminer.pdfinterp import PDFResourceManager, process_pdf
 from pdfminer.converter import TextConverter
@@ -20,13 +21,13 @@ from xhtml2pdf import pisa as pisa
 
 class ElasticDatabase:
 
-    def __init__(self, url, index_settings_file=os.path.dirname(os.path.realpath(__file__)) + "/settings.json"):
+    def __init__(self, index_settings_file=os.path.dirname(os.path.realpath(__file__)) + "/settings.json"):
         """
         Will initialize elastic search object with specified indices
         specifically the url should be something of the form `http://localhost:9200`
         importantly do not include a slash at the end of the url name."""
 
-        self.url = url
+        self.url = "http://localhost:9200"  # settings.ES_DATABASE
         self.index_settings = json.loads(open(index_settings_file, 'rb').read())
 
     def setup_type(self, index, type_, json_mapping):
@@ -160,7 +161,7 @@ class MongoIndexer:
     def __init__(
         self, host='localhost', port=27017, content_database='xcontent', file_collection="fs.files",
         chunk_collection="fs.chunks", module_database='xmodule', module_collection='modulestore',
-        es_instance=ElasticDatabase("http://localhost:9200")
+        es_instance=ElasticDatabase()
     ):
         self.host = host
         self.port = port
@@ -189,27 +190,33 @@ class MongoIndexer:
 
     def find_files_with_type(self, file_ending):
         """Returns a cursor for content files matching given type"""
-        return self.file_collection.find({"filename": re.compile(".*?"+re.escape(file_ending))})
+        return self.file_collection.find({"filename": re.compile(".*?"+re.escape(file_ending))}, timeout=False)
 
     def find_chunks_with_type(self, file_ending):
         """Returns a chunk cursor for content files matching given type"""
-        return self.chunk_collection.find({"files_id.name": re.compile(".*?"+re.escape(file_ending))})
+        return self.chunk_collection.find({"files_id.name": re.compile(".*?"+re.escape(file_ending))}, timeout=False)
 
     def find_modules_by_category(self, category):
         """Returns a cursor for all xmodules matching given category"""
-        return self.module_collection.find({"_id.category": category})
+        return self.module_collection.find({"_id.category": category}, timeout=False)
 
     def find_categories_with_regex(self, category, regex):
-        return self.module_collection.find({"_id.category": category, "definition.data": regex})
+        return self.module_collection.find({"_id.category": category, "definition.data": regex}, timeout=False)
 
     def find_asset_with_name(self, name):
-        return self.chunk_collection.find_one({"files_id.category": "asset", "files_id.name": name})
+        return self.chunk_collection.find_one({"files_id.category": "asset", "files_id.name": name}, timeout=False)
 
     def find_modules_for_course(self, course):
-        return self.module_collection.find({"_id.course": course})
+        return self.module_collection.find({"_id.course": course}, timeout=False)
 
     def find_transcript_for_video_module(self, video_module):
         data = video_module.get("definition", {"data": ""}).get("data", "")
+        if isinstance(data, dict):  # For some reason there are nested versions
+            data = data.get("data", "")
+        if not isinstance(data, unicode):  # for example videos
+            print data
+            print type(data)
+            return [""]
         uuid = re.sub(r"(1\.0:)(.*?)(,1\.25)", r'\2', data)
         name_pattern = re.compile(".*?"+uuid+".*?")
         chunk = self.chunk_collection.find_one({"files_id.name": name_pattern})
@@ -255,7 +262,28 @@ class MongoIndexer:
 
     def thumbnail_from_video_module(self, video_module):
         data = video_module.get("definition", {"data": ""}).get("data", "")
-        uuid = re.sub(r"(1\.0:)(.*?)(,1\.25)", r'\2', data)
+        if "player.youku.com" in data:  # Some videos use the youku player
+            url = "https://lh6.ggpht.com/8_h5j6hiFXdSl5atSJDf8bJBy85b3IlzNWeRzOqRurfNVI_oiEG-dB3C0vHRclOG8A=w170"
+            image = urllib.urlopen(url)
+            return base64.b64encode(image.read())
+        if isinstance(data, dict):
+            data = data.get("data", "")
+        uuids = data.split(",")
+        if len(uuids) == 1:  # Some videos are just left over demos without links
+            url = "http://img.youtube.com/vi/Tt9g2se1LcM/4.jpg"
+            image = urllib.urlopen(url)
+            return base64.b64encode(image.read())
+        try:  # The colon is kind of a hack to make sure there will always be a second element since
+              # some entries don't have anything for the second entry
+            speed_map = {entry+":".split(":")[0]: entry+":".split(":")[1] for entry in uuids}
+        except IndexError:
+            print uuids
+        try:
+            uuid = [value for key, value in speed_map.items() if "1.0" in key][0]
+        except IndexError:
+            print data
+            print uuids
+            print speed_map
         image = urllib.urlopen("http://img.youtube.com/vi/" + uuid + "/0.jpg")
         return base64.b64encode(image.read())
 
@@ -470,19 +498,19 @@ class EnchantDictionary:
                 dictionary.write(word+"\n")
 
 
-#url = "http://localhost:9200"
+mongo = MongoIndexer(content_database="edge-xcontent", module_database="edge-xmodule")
+mongo2 = MongoIndexer()
 
-#mongo = MongoIndexer()
+test = ElasticDatabase()
 
-#test = ElasticDatabase(url)
-#dictionary = EnchantDictionary(test)
-
-#print test.delete_index("pdf-index")
-#print test.delete_index("transcript-index")
-#print test.delete_index("problem-index")
+print test.delete_index("pdf-index")
+print test.delete_index("transcript-index")
+print test.delete_index("problem-index")
 #mongo.index_all_pdfs("pdf-index")
-#mongo.index_all_transcripts("transcript-index")
-#mongo.index_all_problems("problem-index")
+mongo.index_all_transcripts("transcript-index")
+mongo2.index_all_transcripts("transcript-index")
+mongo.index_all_problems("problem-index")
+mongo2.index_all_problems("problem-index")
 #dictionary.produce_dictionary("pyenchant_corpus.txt", max_results=500000)
 
 #print test.setup_type("transcript", "cleaning", mapping)._content

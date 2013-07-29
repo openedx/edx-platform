@@ -11,18 +11,21 @@ import sorting
 
 class SearchResults:
 
-    def __init__(self, request, response):
+    def __init__(self, response, **kwargs):
+        """kwargs should be the GET parameters from the original search request
+        filters needs to be a dictionary that maps fields to allowed values"""
         raw_results = json.loads(response._content).get("hits", {"hits": ""})["hits"]
         scores = [entry["_score"] for entry in raw_results]
-        self.request = request
+        self.sort = kwargs.get("sort", None)
         raw_data = [entry["_source"] for entry in raw_results]
-        self.query = request.GET.get("s", "*.*")
+        self.query = kwargs.get("s", "*.*")
         results = zip(raw_data, scores)
-        self.entries = [SearchResult(entry, score, self.query, request) for entry, score in results]
+        self.entries = [SearchResult(entry, score, self.query, kwargs) for entry, score in results]
         self.has_results = len(self.entries) > 0
+        self.filters = kwargs.get("filters", {"": ""})
 
     def sort_results(self):
-        self.entries = sorting.sort(self.entries, self.request.GET.get("sort", None))
+        self.entries = sorting.sort(self.entries, self.sort)
 
     def get_counter(self, field):
         master_list = [entry.data[field].lower() for entry in self.entries]
@@ -32,18 +35,25 @@ class SearchResults:
         if value is None:
             value = ""
         punc = re.compile('[%s]' % re.escape(string.punctuation))
-        strip_punc = lambda s: punc.sub("", s)
-        self.entries = [entry for entry in self.entries if strip_punc(value.lower()) in strip_punc(entry.data.get(field, "").lower())]
+        strip_punc = lambda s: punc.sub("", s).lower()
+        to_filter = lambda value, entry, field: strip_punc(value) in strip_punc(entry.data.get(field,"")) 
+        return set(entry for entry in self.entries if to_filter(value, entry, field))
+
+    def filter_and_sort(self):
+        full_results = set()
+        for field, value in self.filters.items():
+            full_results |= self.filter(field, value)
+        self.entries = list(full_results)
+        self.sort_results()
 
 
 class SearchResult:
 
-    def __init__(self, entry, score, query, request):
+    def __init__(self, entry, score, query, **kwargs):
         self.data = entry
         self.score = score
         self.thumbnail = "data:image/jpg;base64," + entry["thumbnail"]
         self.snippets = snippet_generator(self.data["searchable_text"], query)
-        self.url = _update_url(request, self.data)
 
 
 def snippet_generator(transcript, query, soft_max=50, word_margin=25, bold=True):
@@ -104,12 +114,12 @@ def _match_highlighter(query, response, tag="b", css_class="highlight", highligh
     return bold_response
 
 
-def _update_url(request, datum):
-    url = request.environ.get('HTTP_REFERER', "")
-    host = request.environ.get("HTTP_HOST", "edx.org")
-    trigger = "courseware"
-    if trigger in url:
-        base = url[:url.find(trigger)+len(trigger)+1]
-        return base+datum["url"]
-    else:
-        return "http://" + host + "/courses/" + datum["course_section"]+"/courseware/" + datum["url"]
+# def _update_url(request, datum):
+#     url = request.environ.get('HTTP_REFERER', "")
+#     host = request.environ.get("HTTP_HOST", "edx.org")
+#     trigger = "courseware"
+#     if trigger in url:
+#         base = url[:url.find(trigger)+len(trigger)+1]
+#         return base+datum["url"]
+#     else:
+#         return "http://" + host + "/courses/" + datum["course_section"]+"/courseware/" + datum["url"]

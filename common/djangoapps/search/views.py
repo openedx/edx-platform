@@ -1,5 +1,6 @@
 import requests
 import logging
+import hashlib
 
 from django.conf import settings
 from django.http import HttpResponseBadRequest
@@ -19,11 +20,10 @@ log = logging.getLogger("mitx.courseware")
 
 @ensure_csrf_cookie
 def search(request, course_id):
-    results_string = ""
     course = get_course_with_access(request.user, course_id, 'load')
-    results_string = find(request, course_id)
-    return render_to_response("search_templates/wrapper.html", {
-        "body": results_string, "course": course})
+    context = find(request, course_id)
+    context.update({"course": course})
+    return render_to_response("search_templates/search.html", context)
 
 
 @ensure_csrf_cookie
@@ -38,44 +38,49 @@ def index_course(request):
 
 def find(request, course_id):
     database = settings.ES_DATABASE
+    full_query_data = {}
     get_content = lambda request, content: content+"-index" if request.GET.get(content, False) else None
     query = request.GET.get("s", "*.*")
-    page = request.GET.get("page", 1)
-    results_per_page = request.GET.get("results", 15)
+    full_query_data.update({"query": {"term": {"searchable_text": query}}})
     index = ",".join(filter(None, [get_content(request, content) for content in CONTENT_TYPES]))
     if len(index) == 0:
         index = ",".join([content+"-index" for content in CONTENT_TYPES])
     if request.GET.get("all_courses" == "true", False):
         base_url = "/".join([database, index])
     else:
-        course_type = course_id.split("/")[1]
-        base_url = "/".join([database, index, course_type])
-    full_url = "/".join([base_url, "_search?q=searchable_text:"])
-    log.debug(full_url)
+        course_hash = hashlib.sha1(course_id).hexdigest()
+        base_url = "/".join([database, index, course_hash])
+    log.debug(base_url)
+    full_query_data.update({"from": 0, "size": 10000})
+    full_query_data.update(
+        {"suggest":
+            {"searchable_text_suggestions":
+                {"text": query,
+                 "term": {
+                    "size": 2,
+                    "field": "searchable_text"
+                 }
+                }
+            }
+        }
+    )
     context = {}
-    response = requests.get(full_url+query+"&size=10000")
+    response = requests.get(base_url, data=full_query_data)
     data = SearchResults(request, response)
-    data.filter("course", request.GET.get("selected_course"))
-    data.filter("org", request.GET.get("selected_org"))
-    org_histogram = data.get_counter("org")
-    course_histogram = data.get_counter("course")
-    data.sort_results()
+    data.filter_and_sort()
     context.update({"results": data.has_results})
     correction = spell_check(query)
-    results_pages = Paginator(data.entries, results_per_page)
 
-    data = proper_page(results_pages, page)
     context.update({
-        "data": data, "next_page": next_link(request, data),
+        "data": data,
+        "next_page": next_link(request, data),
         "prev_page": prev_link(request, data),
         "search_correction_link": search_correction_link(request, correction),
         "spelling_correction": correction,
-        "org_histogram": org_histogram,
-        "course_histogram": course_histogram,
         "selected_course": request.GET.get("selected_course", ""),
         "selected_org": request.GET.get("selected_org", "")
     })
-    return render_to_string("search_templates/results.html", context)
+    return context
 
 
 def query_reduction(query, stopwords):
