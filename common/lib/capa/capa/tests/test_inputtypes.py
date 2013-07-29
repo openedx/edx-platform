@@ -766,13 +766,13 @@ class FormulaEquationTest(unittest.TestCase):
         """
         Verify that using the correct dispatch and valid data produces a valid response
         """
-        data = {'formula': "x^2+1/2", 'request-start': 0}
+        data = {'formula': "x^2+1/2", 'request_start': 0}
         response = self.the_input.handle_ajax("preview_formcalc", data)
 
         self.assertTrue('preview' in response)
         self.assertNotEqual(response['preview'], '')
         self.assertEqual(response['error'], "")
-        self.assertEqual(response['request-start'], data['request-start'])
+        self.assertEqual(response['request_start'], data['request_start'])
 
     def test_ajax_bad_method(self):
         """
@@ -787,7 +787,7 @@ class FormulaEquationTest(unittest.TestCase):
         """
         response = self.the_input.handle_ajax(
             "preview_formcalc",
-            {'formula': None, 'request-start': 1, }
+            {'formula': None, 'request_start': 1, }
         )
         self.assertTrue('error' in response)
         self.assertEqual(response['error'], "No formula specified.")
@@ -801,7 +801,7 @@ class FormulaEquationTest(unittest.TestCase):
             mock_preview.side_effect = ParseException(u"ȧƈƈḗƞŧḗḓ ŧḗẋŧ ƒǿř ŧḗşŧīƞɠ")
             response = self.the_input.handle_ajax(
                 "preview_formcalc",
-                {'formula': 'x^2+1/2', 'request-start': 1, }
+                {'formula': 'x^2+1/2', 'request_start': 1, }
             )
 
         self.assertTrue('error' in response)
@@ -816,7 +816,7 @@ class FormulaEquationTest(unittest.TestCase):
             mock_preview.side_effect = Exception()
             response = self.the_input.handle_ajax(
                 "preview_formcalc",
-                {'formula': 'x^2+1/2', 'request-start': 1, }
+                {'formula': 'x^2+1/2', 'request_start': 1, }
             )
         mock_log.warning.assert_called_once_with(
             "Error while previewing formula", exc_info=True

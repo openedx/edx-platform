@@ -1107,7 +1107,7 @@ class FormulaEquationInput(InputTypeBase):
         {
            'preview' : 'the-preview-html' or ''
            'error' : 'the-error' or ''
-           'request-start' : <time sent with request>
+           'request_start' : <time sent with request>
         }
         """
 
@@ -1118,7 +1118,7 @@ class FormulaEquationInput(InputTypeBase):
             result['error'] = "No formula specified."
             return result
 
-        result['request-start'] = int(get['request-start'])
+        result['request_start'] = int(get['request_start'])
 
         try:
             result['preview'] = latex_preview(formula)  # TODO add references to variables, etc&
