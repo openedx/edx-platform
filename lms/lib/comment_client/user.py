@@ -75,15 +75,6 @@ class User(models.Model):
         response = perform_request('get', url, params)
         return response.get('collection', []), response.get('page', 1), response.get('num_pages', 1)
 
-    def stats(self, query_params={}):
-        if not self.course_id:
-            raise CommentClientError("Must provide course_id when retrieving stats for the user")
-        url = _url_for_user_stats(self.id,self.course_id)
-        params = {'course_id': self.course_id}
-        params = merge_dict(params, query_params)
-        response = perform_request('get', url, params)
-        return response.get('collection', []), response.get('page', 1), response.get('num_pages', 1)
-
     def _retrieve(self, *args, **kwargs):
         url = self.url(action='get', params=self.attributes)
         retrieve_params = self.default_retrieve_params

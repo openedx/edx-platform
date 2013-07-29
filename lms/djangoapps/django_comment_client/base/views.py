@@ -649,20 +649,3 @@ def upload(request, course_id):  # ajax upload file to a question or answer
             'file_url': file_url,
         }
     })
-
-@login_required
-def user_stats(request, course_id):
-    try:
-        profiled_user = cc.User(id=request.user.id, course_id=course_id)
-        print "\n\n\n*******************\n\n\n"
-        print profiled_user.course_id
-        query_params = {}
-
-        user_stats_results = profiled_user.stats(query_params)
-
-        return utils.JsonResponse({
-            'stats': user_stats_results
-        })
-
-    except (cc.utils.CommentClientError, cc.utils.CommentClientUnknownError, User.DoesNotExist):
-        raise Http404

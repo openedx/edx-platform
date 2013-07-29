@@ -197,7 +197,7 @@ if Backbone?
       @template = _.template($("#discussion-home").html())
       $(".discussion-column").html(@template)
       $(".post-list a").removeClass("active")
-      @retrieveUserStats()
+      $(".email-notification").bind "click", @updateEmailNotifications
       thread_id = null
 
     toggleTopicDrop: (event) =>
@@ -321,16 +321,7 @@ if Backbone?
           if callback?
             callback()
 
-    retrieveUserStats: () ->
-      url = DiscussionUtil.urlFor("user_stats")
-      DiscussionUtil.safeAjax
-        url: url
-        type: "GET"
-        success: (response, textStatus) =>
-          alert('success')
-        error: (response) =>
-          alert('error')
-
+    
     retrieveDiscussions: (discussion_ids) ->
       @discussionIds = discussion_ids.join(',')
       @mode = 'commentables'
@@ -437,3 +428,9 @@ if Backbone?
     retrieveFollowed: (event)=>
       @mode = 'followed'
       @retrieveFirstPage(event)
+
+    updateEmailNotifications: () =>
+      if $('input.email-notification').attr('checked')
+        alert('checked')
+      else
+        alert('unchecked')
