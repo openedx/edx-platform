@@ -339,7 +339,7 @@ CMS.Views.Metadata.List = CMS.Views.Metadata.AbstractEditor.extend({
         _.each(value, function(ele, index) {
             var template = _.template(
                 '<li class="list-settings-item">' +
-                    '<input class="input" value="<%= ele %>">' +
+                    '<input type="text" class="input" value="<%= ele %>">' +
                     '<a href="#" class="remove-action remove-setting" data-index="<%= index %>"><i class="icon-remove-sign"></i><span class="sr">Remove</span></a>' +
                 '</li>'
             );
