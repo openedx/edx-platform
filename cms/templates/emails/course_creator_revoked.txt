@@ -1,5 +1,5 @@
 <%! from django.utils.translation import ugettext as _ %>
 
-${_("Your request for course creation rights to edX Studio have been revoked. If you believe this was in error, please contact: ")}
+${_("Your course creation rights to edX Studio have been revoked. If you believe this was in error, please contact: ")}
 
 ${ studio_request_email }
