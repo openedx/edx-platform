@@ -92,6 +92,7 @@ class @CombinedOpenEnded
     $(window).keydown @keydown_handler
     $(window).keyup @keyup_handler
 
+  
   reinitialize: (element) ->
     @wrapper=$(element).find('section.xmodule_CombinedOpenEndedModule')
     @el = $(element).find('section.combined-open-ended')
@@ -221,6 +222,20 @@ class @CombinedOpenEnded
         @legend_container.after(response.html).remove()
         @legend_container= $('.legend-container')
 
+  get_last_response: (@answer_area) =>
+    @submit_button.hide()
+    @answer_area.attr("disabled", true)
+    @gentle_alert "Checking for a previous response..."
+    data = {}
+    $.postWithPrefix "#{@ajax_url}/get_last_response", data, (response) =>
+      if response.success && response.response != ""
+        @answer_area.html(response.response)
+        @gentle_alert "Thank you for submitting!"
+      else
+        @submit_button.show()
+        @answer_area.attr("disabled", false)
+        @el.find('.open-ended-alert').animate(opacity: 0, 700)
+
   message_post: (event)=>
     external_grader_message=$(event.target).parent().parent().parent()
     evaluation_scoring = $(event.target).parent()
@@ -267,6 +282,7 @@ class @CombinedOpenEnded
 
     if @task_number==1 and @child_state=='assessing'
       @prompt_hide()
+      
     if @child_state == 'done'
       @rubric_wrapper.hide()
     if @child_type=="openended"
@@ -283,6 +299,7 @@ class @CombinedOpenEnded
       @submit_button.prop('value', 'Submit')
       @submit_button.click @save_answer
       @setup_file_upload()
+      @get_last_response(@answer_area)
     else if @child_state == 'assessing'
       @answer_area.attr("disabled", true)
       @replace_text_inputs()
