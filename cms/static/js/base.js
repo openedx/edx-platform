@@ -630,7 +630,7 @@ function saveNewCourse(e) {
 
     // check for suitable encoding
     if (!bInErr) {
-        encoding_errMsg = gettext('Please do not use any spaces or special characters in this field.');
+        var encoding_errMsg = gettext('Please do not use any spaces or special characters in this field.');
 
         if (encodeURIComponent(org) != org)
             org_errMsg = encoding_errMsg;
