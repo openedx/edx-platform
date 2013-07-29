@@ -69,7 +69,7 @@
         $submitButton.
           removeClass('is-disabled').
           removeProp('disabled').
-          html('Create my ${settings.PLATFORM_NAME} Account');
+          html('Create My ${settings.PLATFORM_NAME} Account');
       }
       else {
         $submitButton.
@@ -141,32 +141,32 @@
         </div>
 
         <ol class="list-input">
-          
+
           % if ask_for_email:
 
           <li class="field required text" id="field-email">
             <label for="email">E-mail</label>
             <input class="" id="email" type="email" name="email" value="" placeholder="example: username@domain.com" />
           </li>
-          
+
           % endif
-          
+
           <li class="field required text" id="field-username">
             <label for="username">Public Username</label>
             <input id="username" type="text" name="username" value="${extauth_username}" placeholder="example: JaneDoe" required aria-required="true" />
             <span class="tip tip-input">Will be shown in any discussions or forums you participate in</span>
           </li>
-          
+
           % if ask_for_fullname:
-          
+
           <li class="field required text" id="field-name">
             <label for="name">Full Name</label>
             <input id="name" type="text" name="name" value="" placeholder="example: Jane Doe" />
             <span class="tip tip-input">Needed for any certificates you may earn <strong>(cannot be changed later)</strong></span>
           </li>
-          
+
           % endif
-          
+
         </ol>
 
         % endif
@@ -282,7 +282,7 @@
         </a>
       </p>
     </div>
-      
+
     % endif
 
     ## TODO: Use a %block tag or something to allow themes to
