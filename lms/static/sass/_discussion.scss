@@ -43,11 +43,11 @@
   padding: 0 15px;
   border-radius: 3px;
   border: 1px solid #222;
-  background: -webkit-linear-gradient(top, $gray, #555);
+  background: -webkit-linear-gradient(top, #777, #555);
   font-size: 13px;
   font-weight: 700;
   line-height: 32px;
-  color: $white;
+  color: #fff;
   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.6);
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 1px 1px rgba(0, 0, 0, .15);
 
@@ -60,28 +60,28 @@
   width: 100%;
   height: 240px;
   margin-top: 0;
-  padding: $baseline/2;
+  padding: 10px;
   @include box-sizing(border-box);
   border: 1px solid #aaa;
   border-radius: 3px 3px 0 0;
-  background: $white;
+  background: #fff;
   font-family: 'Monaco', monospace;
   font-size: 13px;
   line-height: 1.6;
-  box-shadow: 0 1px 3px $black-t0 inset;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) inset;
 }
 
 @mixin discussion-wmd-preview {
   width: 100%;
   min-height: 40px;
-  padding: 25px $baseline $baseline/2 $baseline;
+  padding: 25px 20px 10px 20px;
   @include box-sizing(border-box);
   border: 1px solid #aaa;
   border-top: none;
   border-radius: 0 0 3px 3px;
   background: #eee;
   color: #333;
-  box-shadow: 0 1px 3px $black-t0 inset;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) inset;
 }
 
 @-webkit-keyframes fadeIn {
@@ -250,7 +250,7 @@ body.discussion {
         @include box-sizing(border-box);
         border-radius: 30px;
         border: 1px solid #333;
-        box-shadow: 0 1px 3px $black-t1 inset;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, .25) inset;
         background: -webkit-linear-gradient(top, #eee, $white);
         font-size: 11px;
         line-height: 16px;
@@ -307,28 +307,28 @@ body.discussion {
     }
 
     .edit-post-title, .edit-post-tags {
-      @include box-sizing(border-box);
-      padding: 0 $baseline/2;
       width: 100%;
       height: 40px;
-      border: 1px solid #aaa;
+      padding: 0 10px;
+      @include box-sizing(border-box);
       border-radius: 3px;
-      box-shadow: 0 1px 3px $black-t0 inset;
-      color: #333;
+      border: 1px solid #aaa;
       font-size: 16px;
       font-family: $sans-serif;
+      color: #333;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) inset;
     }
 
     .tagsinput {
+      padding: 10px;
       @include box-sizing(border-box);
-      padding: $baseline/2;
       border: 1px solid #aaa;
       border-radius: 3px;
-      background: $white;
-      box-shadow: 0 1px 3px $black-t1 inset;
-      font-size: 13px;
+      background: #fff;
       font-family: 'Monaco', monospace;
+      font-size: 13px;
       line-height: 1.6;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) inset;
 
       span.tag {
         margin-bottom: 0;
@@ -337,13 +337,13 @@ body.discussion {
   }
 
   .new-post-form {
-    @include clearfix;
-    margin-bottom: $baseline;
     width: 100%;
+    margin-bottom: 20px;
     border-radius: 3px;
     background: rgba(0, 0, 0, .55);
-    box-shadow: 0 1px 2px $black-t2 inset, 0 1px 0 $white-t2;
-    color: $white;
+    color: #fff;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .5) inset, 0 1px 0 rgba(255, 255, 255, .5);
+    @include clearfix;
 
     .form-row {
       margin-bottom: $baseline;
@@ -351,31 +351,31 @@ body.discussion {
 
     .new-post-body .wmd-input {
       @include discussion-wmd-input;
-      @include box-sizing(border-box);
       position: relative;
-      z-index: 1;
-      padding: $baseline/2;
       width: 100%;
       height: 200px;
+      z-index: 1;
+      padding: 10px;
+      @include box-sizing(border-box);
       border: 1px solid #333;
       border-radius: 3px 3px 0 0;
-      background: $white;
-      box-shadow: 0 1px 3px $black-t1 inset;
-      font-size: 13px;
+      background: #fff;
       font-family: 'Monaco', monospace;
+      font-size: 13px;
       line-height: 1.6;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) inset;
     }
 
     .tagsinput {
+      padding: 10px;
       @include box-sizing(border-box);
-      padding: $baseline/2;
       border: 1px solid #333;
       border-radius: 3px;
-      background: $white;
-      box-shadow: 0 1px 3px $black-t1 inset;
-      font-size: 13px;
+      background: #fff;
       font-family: 'Monaco', monospace;
+      font-size: 13px;
       line-height: 1.6;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) inset;
 
       span.tag {
         margin-bottom: 0;
@@ -384,17 +384,17 @@ body.discussion {
 
     .new-post-body .wmd-preview {
       @include discussion-wmd-preview;
-      @include box-sizing(border-box);
       position: relative;
-      margin-top: -1px;
-      padding: 25px $baseline $baseline/2 $baseline;
       width: 100%;
+      //height: 50px;
+      margin-top: -1px;
+      padding: 25px 20px 10px 20px;
+      @include box-sizing(border-box);
       border: 1px solid #333;
       border-radius: 0 0 3px 3px;
       background: #e6e6e6;
-      box-shadow: 0 1px 3px $black-t1 inset;
       color: #333;
-      //height: 50px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) inset;
     }
 
     .new-post-preview-label {
@@ -408,16 +408,16 @@ body.discussion {
 
     .new-post-title,
     .new-post-tags {
-      @include box-sizing(border-box);
-      padding: 0 $baseline/2;
       width: 100%;
       height: 40px;
-      border: 1px solid #333;
+      padding: 0 10px;
+      @include box-sizing(border-box);
       border-radius: 3px;
-      box-shadow: 0 1px 3px $black-t1 inset;
-      color: #333;
+      border: 1px solid #333;
       font-size: 16px;
       font-family: 'Open Sans', sans-serif;
+      color: #333;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) inset;
     }
 
     .new-post-title {
@@ -716,7 +716,7 @@ body.discussion {
       float: left;
       width: 20%;
       height: 100%;
-      background-color: $gray-l4;
+      background-color: #dedede;
 
       &:hover {
         background-color: $white;
@@ -728,7 +728,7 @@ body.discussion {
       z-index: 100;
       display: inline-block;
       width: 100%;
-      color: $gray-l2; 
+      color: #aeaeae; 
       text-align: center;
       font-size: 28px;
       line-height: 60px;
@@ -837,13 +837,13 @@ body.discussion {
       }
 
       span {
-        @include transition(opacity .1s linear 0s);
-        color: #333;
-        text-shadow: 0 1px 0 $white-t3;
-        font-weight: 400;
         font-size: 14px;
-        line-height: 1.2;
+        font-weight: 700;
+        line-height: 58px;
+        color: #333;
+        text-shadow: 0 1px 0 rgba(255, 255, 255, .8);
         opacity: 0.0;
+        @include transition(opacity .2s linear 0s);
       }
       .drop-arrow {
         font-size: 16px;
@@ -978,8 +978,8 @@ body.discussion {
       @include box-sizing(border-box);
       border: 1px solid #acacac;
       border-radius: 30px;
-      box-shadow: 0 1px 3px $white-t0 inset, 0 1px 0 $white-t2;
-      background: url(../images/search-icon.png) no-repeat 7px center $white;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, .1) inset, 0 1px 0 rgba(255, 255, 255, .5);
+      background: url(../images/search-icon.png) no-repeat 7px center #fff;
       font-family: 'Open Sans', sans-serif;
       font-weight: 400;
       font-size: 13px;
@@ -1005,17 +1005,17 @@ body.discussion {
   .sort-bar {
     height: auto;
     min-height: 27px;
-    border-bottom: 1px solid $gray-l3;
+    border-bottom: 1px solid #a3a3a3;
     @include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
-    background-color: $gray-l2;
-    box-shadow: 0 1px 0 $white-t1 inset;
+    background-color: #aeaeae;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, .2) inset;
 
     span,
     a {
       font-size: 9px;
       font-weight: bold;
       line-height: 25px;
-      color: $gray-d3;
+      color: #333;
       text-transform: uppercase;
       text-shadow: 0 1px 0 rgba(255, 255, 255, .4);
     }
@@ -1036,12 +1036,12 @@ body.discussion {
       height: 18px;
       padding: 0 9px;
       border-radius: 19px;
-      color: $gray-d3;
+      color: #333;
       line-height: 17px;
 
       &:hover {
         @include linear-gradient(top, rgba(255, 255, 255, .4), rgba(255, 255, 255, .2));
-        color: $gray-d3;
+        color: #333;
       }
 
       &.active {
@@ -1372,7 +1372,7 @@ body.discussion {
 
       .row-title {
         padding: 30px $baseline;
-        background-color: $gray-l6;
+        background-color: #dedede;
         font-size: 12px;
       }
 
@@ -2649,7 +2649,7 @@ body.discussion {
   width: 10px;
   height: 14px;
   padding-right: 3px;
-  color: $gray-l2;
+  color: #aeaeae;
 }
 
 .pinned .icon {
@@ -2687,7 +2687,6 @@ display:none;
   cursor:pointer;
   opacity: 0.8;
 
-
   &:hover {
     @include transition(opacity .2s linear 0s);
     opacity: 1.0;
@@ -2696,19 +2695,18 @@ display:none;
     
 .notflagged .icon {
   display: block;
-  color: $gray-l2;
+  color: #aeaeae;
   float: left;
   margin: 3px;
   width: 10px;
   height: 14px;
   padding-right: 3px;
-
 }
 
 .flagged .icon
 {
   display: block;
-  color: $gray-l2;
+  color: #aeaeae;
   float: left;
   margin: 3px;
   width: 10px;

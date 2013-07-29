@@ -431,6 +431,21 @@ if Backbone?
 
     updateEmailNotifications: () =>
       if $('input.email-notification').attr('checked')
-        alert('checked')
+        DiscussionUtil.safeAjax
+          url: '/notification_prefs/enable/'
+          type: "POST"
+          dataType: 'json'
+          data:
+            username: window.user.get("username")
+          error: () =>
+            
       else
-        alert('unchecked')
+        DiscussionUtil.safeAjax
+          url: '/notification_prefs/disable/'
+          type: "POST"
+          dataType: 'json'
+          data:
+            username: window.user.get("username")
+          error: () =>
+
+          
