@@ -22,20 +22,22 @@ def create_other_user(_step, name):
 
 @step(u'I add "([^"]*)" to the course team')
 def add_other_user(_step, name):
-    new_user_css = 'a.new-user-button'
+    new_user_css = 'a.create-user-button'
     world.css_click(new_user_css)
+    world.wait(0.5)
 
-    email_css = 'input.email-input'
+    email_css = 'input#user-email-input'
     f = world.css_find(email_css)
     f._element.send_keys(name, EMAIL_EXTENSION)
 
-    confirm_css = '#add_user'
+    confirm_css = 'form.create-user button.action-primary'
     world.css_click(confirm_css)
 
 
 @step(u'I delete "([^"]*)" from the course team')
 def delete_other_user(_step, name):
-    to_delete_css = 'a.remove-user[data-id="{name}{extension}"]'.format(name=name, extension=EMAIL_EXTENSION)
+    to_delete_css = '.user-item .item-actions a.remove-user[data-id="{email}"]'.format(
+        email="{0}{1}".format(name, EMAIL_EXTENSION))
     world.css_click(to_delete_css)
 
 
@@ -63,5 +65,5 @@ def cannot_delete(_step):
 
 @step(u's?he cannot add users')
 def cannot_add(_step):
-    add_css = 'a.new-user'
+    add_css = 'a.create-user-button'
     assert world.is_css_not_present(add_css)
