@@ -120,7 +120,7 @@ def create_new_course(request):
     if existing_course is not None:
         return JsonResponse(
             {
-                'ErrMsg': _('There is already a course defined with the same organization, course number, and course run. Please change at least one field to be unique.'),
+                'ErrMsg': _('There is already a course defined with the same organization, course number, and course run. Please change either organization or course number to be unique.'),
                 'OrgErrMsg': _('Either of organization or course number must be unique.'),
                 'CourseErrMsg': _('Either of organization or course number must be unique.'),
             }
