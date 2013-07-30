@@ -20,6 +20,7 @@
   position: absolute;
   top: -1px;
   left: ($baseline*1.5);
+  width: 100%;
 }
 
 .ui-badge {
@@ -37,6 +38,8 @@
 
   // OPTION: add this class for a visual hanging display
   &.is-hanging {
+    @include box-sizing(border-box);
+    @extend .ui-depth2;
     top: -($baseline/4);
 
     &:after {
