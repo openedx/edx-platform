@@ -131,6 +131,35 @@ def ajax_disable(request):
 
     return HttpResponse(status=204)
 
+@require_POST
+def ajax_status(request):
+    """
+    A view that sends notifications status for the authenticated user
+
+    This view should be invoked by an AJAX POST call. It returns status 204
+    (no content) or an error.
+    """
+    if not request.user.is_authenticated():
+        raise PermissionDenied
+
+   prefs UserPreference.objects.get(
+        user=request.user,
+        key=NOTIFICATION_PREF_KEY,
+        defaults={
+            "value": UsernameCipher.encrypt(request.user.username)
+        }
+    )
+
+    if prefs
+        answer = true
+    else
+        answer = false
+
+    return utils.JsonResponse({
+        'status': answer
+    })
+
+
 @require_GET
 def unsubscribe(request, token):
     """

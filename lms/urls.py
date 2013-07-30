@@ -336,6 +336,7 @@ if settings.COURSEWARE_ENABLED:
                 include('django_comment_client.urls')),
             url(r'^notification_prefs/enable/', 'notification_prefs.views.ajax_enable'),
             url(r'^notification_prefs/disable/', 'notification_prefs.views.ajax_disable'),
+            url(r'^notification_prefs/status/', 'notification_prefs.views.ajax_status'),
             url(r'^notification_prefs/unsubscribe/(?P<token>[a-zA-Z0-9-_=]+)/', 'notification_prefs.views.unsubscribe'),
         )
     urlpatterns += (
