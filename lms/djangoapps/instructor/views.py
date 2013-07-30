@@ -310,7 +310,9 @@ def instructor_dashboard(request, course_id):
           "Delete student state for module" in action or
           "Rescore student's problem submission" in action):
         # get the form data
-        unique_student_identifier = request.POST.get('unique_student_identifier', '')
+        unique_student_identifier = request.POST.get(
+            'unique_student_identifier', ''
+        )
         problem_urlname = request.POST.get('problem_for_student', '')
         module_state_key = get_module_url(problem_urlname)
         # try to uniquely id student by email address or username
@@ -327,22 +329,35 @@ def instructor_dashboard(request, course_id):
                 )
                 msg += "Found module.  "
             except StudentModule.DoesNotExist as err:
-                msg += "<font color='red'>Couldn't find module with that urlname.  </font>"
-                msg += "<font color='red'>Error: {0}  </font>".format(err.message)
-                log.exception(msg)
+                error_msg = "Couldn't find module with that urlname: {0}. ".format(
+                    problem_urlname
+                )
+                msg += "<font color='red'>" + error_msg + "({0}) ".format(err) + "</font>"
+                log.debug(error_msg)
 
         if student_module is not None:
             if "Delete student state for module" in action:
                 # delete the state
                 try:
                     student_module.delete()
-                    msg += "<font color='red'>Deleted student module state for %s!</font>" % module_state_key
-                    event = {"problem": problem_url, "student": unique_student_identifier, "course": course_id}
-                    track.views.server_track(request, "delete-student-module-state", event, page="idashboard")
+                    msg += "<font color='red'>Deleted student module state for {0}!</font>".format(module_state_key)
+                    event = {
+                        "problem": problem_url,
+                        "student": unique_student_identifier,
+                        "course": course_id
+                    }
+                    track.views.server_track(
+                        request,
+                        "delete-student-module-state",
+                        event,
+                        page="idashboard"
+                    )
                 except Exception as err:
-                    msg += "Failed to delete module state for {0}/{1} ".format(unique_student_identifier, problem_urlname)
-                    msg += "<font color='red'>Error: {0}  </font>".format(err.message)
-                    log.exception(msg)
+                    error_msg = "Failed to delete module state for {0}/{1}. ".format(
+                        unique_student_identifier, problem_urlname
+                    )
+                    msg += "<font color='red'>" + error_msg + "({0}) ".format(err) + "</font>"
+                    log.exception(error_msg)
             elif "Reset student's attempts" in action:
                 # modify the problem's state
                 try:
@@ -363,9 +378,11 @@ def instructor_dashboard(request, course_id):
                     track.views.server_track(request, "reset-student-attempts", event, page="idashboard")
                     msg += "<font color='green'>Module state successfully reset!</font>"
                 except Exception as err:
-                    msg += "<font color='red'>Couldn't reset module state.  </font>"
-                    msg += "<font color='red'>Error: {0}  </font>".format(err.message)
-                    log.exception(msg)
+                    error_msg = "Couldn't reset module state for {0}/{1}. ".format(
+                        unique_student_identifier, problem_urlname
+                    )
+                    msg += "<font color='red'>" + error_msg + "({0}) ".format(err) + "</font>"
+                    log.exception(error_msg)
             else:
                 # "Rescore student's problem submission" case
                 try:
@@ -375,8 +392,13 @@ def instructor_dashboard(request, course_id):
                     else:
                         track.views.server_track(request, "rescore-student-submission", {"problem": module_state_key, "student": unique_student_identifier, "course": course_id}, page="idashboard")
                 except Exception as err:
-                    msg += '<font color="red">Failed to create a background task for rescoring "{0}": {1}.</font>'.format(module_state_key, err.message)
-                    log.exception(msg)
+                    msg += '<font color="red">Failed to create a background task for rescoring "{0}": {1}.</font>'.format(
+                        module_state_key, err.message
+                    )
+                    log.exception("Encountered exception from rescore: student '{0}' problem '{1}'".format(
+                            unique_student_identifier, module_state_key
+                        )
+                    )
 
     elif "Get link to student's progress page" in action:
         unique_student_identifier = request.POST.get('unique_student_identifier', '')
