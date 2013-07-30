@@ -148,7 +148,7 @@ def external_login_or_signup(request,
     log.info(u"External_Auth login_or_signup for %s : %s : %s : %s", external_domain, external_id, email, fullname)
     internal_user = eamap.user
     if internal_user is None:
-        if settings.MITX_FEATURES.get('AUTH_USE_SHIB'):
+        if settings.MITX_FEATURES.get('AUTH_USE_SHIB') and 'shib:' in external_domain[0:5]:
             # if we are using shib, try to link accounts using email
             try:
                 link_user = User.objects.get(email=eamap.external_email)
@@ -175,7 +175,7 @@ def external_login_or_signup(request,
             return signup(request, eamap)
 
     # We trust shib's authentication, so no need to authenticate using the password again
-    if settings.MITX_FEATURES.get('AUTH_USE_SHIB'):
+    if settings.MITX_FEATURES.get('AUTH_USE_SHIB') and 'shib:' in external_domain[0:5]:
         uname = internal_user.username
         user = internal_user
         # Assuming this 'AUTHENTICATION_BACKENDS' is set in settings, which I think is safe
@@ -204,7 +204,7 @@ def external_login_or_signup(request,
     # Now to try enrollment
     # Need to special case Shibboleth here because it logs in via a GET.
     # testing request.method for extra paranoia
-    if settings.MITX_FEATURES.get('AUTH_USE_SHIB') and 'shib:' in external_domain and request.method == 'GET':
+    if settings.MITX_FEATURES.get('AUTH_USE_SHIB') and 'shib:' in external_domain[0:5] and request.method == 'GET':
         enroll_request = make_shib_enrollment_request(request)
         student_views.try_change_enrollment(enroll_request)
     else:
