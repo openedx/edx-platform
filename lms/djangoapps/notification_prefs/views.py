@@ -1,5 +1,6 @@
 from base64 import urlsafe_b64encode, urlsafe_b64decode
 from hashlib import sha256
+import json
 
 from Crypto.Cipher import AES
 from Crypto import Random
@@ -131,7 +132,7 @@ def ajax_disable(request):
 
     return HttpResponse(status=204)
 
-@require_POST
+@require_GET
 def ajax_status(request):
     """
     A view that sends notifications status for the authenticated user
@@ -142,22 +143,12 @@ def ajax_status(request):
     if not request.user.is_authenticated():
         raise PermissionDenied
 
-   prefs UserPreference.objects.get(
+    qs = UserPreference.objects.filter(
         user=request.user,
-        key=NOTIFICATION_PREF_KEY,
-        defaults={
-            "value": UsernameCipher.encrypt(request.user.username)
-        }
+        key=NOTIFICATION_PREF_KEY
     )
 
-    if prefs
-        answer = true
-    else
-        answer = false
-
-    return utils.JsonResponse({
-        'status': answer
-    })
+    return HttpResponse(json.dumps({"status":len(qs)}), content_type="application/json")
 
 
 @require_GET
