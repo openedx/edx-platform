@@ -4,12 +4,13 @@ from util.json_request import JsonResponse
 from django.http import HttpResponseBadRequest
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
+from django.core.urlresolvers import reverse
 from django_future.csrf import ensure_csrf_cookie
 from mitxmako.shortcuts import render_to_response
 
 from xmodule.modulestore.inheritance import own_metadata
 
-from ..utils import get_modulestore, get_url_reverse
+from ..utils import get_modulestore
 from .access import get_location_and_verify_access
 from xmodule.course_module import CourseDescriptor
 
@@ -96,10 +97,25 @@ def expand_checklist_action_urls(course_module):
     """
     checklists = course_module.checklists
     modified = False
+    urlconf_map = {
+        "ManageUsers": "manage_users",
+        "SettingsDetails": "settings_details",
+        "SettingsGrading": "settings_grading",
+        "CourseOutline": "course_index",
+        "Checklists": "checklists",
+    }
     for checklist in checklists:
         if not checklist.get('action_urls_expanded', False):
             for item in checklist.get('items'):
-                item['action_url'] = get_url_reverse(item.get('action_url'), course_module)
+                action_url = item.get('action_url')
+                if action_url not in urlconf_map:
+                    continue
+                urlconf_name = urlconf_map[action_url]
+                item['action_url'] = reverse(urlconf_name, kwargs={
+                    'org': course_module.location.org,
+                    'course': course_module.location.course,
+                    'name': course_module.location.name,
+                })
             checklist['action_urls_expanded'] = True
             modified = True
 

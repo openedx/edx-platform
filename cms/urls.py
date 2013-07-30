@@ -40,14 +40,12 @@ urlpatterns = ('',  # nopep8
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)/upload_asset$',
         'contentstore.views.upload_asset', name='upload_asset'),
 
+    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/team/(?P<name>[^/]+)$',
+        'contentstore.views.manage_users', name='manage_users'),
+    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/team/(?P<name>[^/]+)/(?P<email>[^/]+)$',
+        'contentstore.views.course_team_user', name='course_team_user'),
 
-    url(r'^manage_users/(?P<location>.*?)$', 'contentstore.views.manage_users', name='manage_users'),
-    url(r'^add_user/(?P<location>.*?)$',
-        'contentstore.views.add_user', name='add_user'),
-    url(r'^remove_user/(?P<location>.*?)$',
-        'contentstore.views.remove_user', name='remove_user'),
-    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<name>[^/]+)/remove_user$',
-        'contentstore.views.remove_user', name='remove_user'),
+
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/info/(?P<name>[^/]+)$',
         'contentstore.views.course_info', name='course_info'),
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/course_info/updates/(?P<provided_id>.*)$',

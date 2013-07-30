@@ -53,6 +53,14 @@ def i_have_opened_a_new_course(_step):
     open_new_course()
 
 
+@step('(I select|s?he selects) the new course')
+def select_new_course(_step, whom):
+    course_link_xpath = '//div[contains(@class, "courses")]//a[contains(@class, "class-link")]//span[contains(., "{name}")]/..'.format(
+        name="Robot Super Course")
+    element = world.browser.find_by_xpath(course_link_xpath)
+    element.click()
+
+
 @step(u'I press the "([^"]*)" notification button$')
 def press_the_notification_button(_step, name):
     css = 'a.action-%s' % name.lower()
@@ -117,6 +125,8 @@ def create_studio_user(
     registration = world.RegistrationFactory(user=studio_user)
     registration.register(studio_user)
     registration.activate()
+
+    return studio_user
 
 
 def fill_in_course_info(
