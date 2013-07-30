@@ -53,6 +53,12 @@ body.course.users {
         .action-item {
 
         }
+
+        .action-primary {
+          @include green-button(); // overwriting for the sake of syncing older green button styles for now
+          @extend .t-action3;
+          padding: ($baseline/2) $baseline;
+        }
       }
     }
   }
@@ -97,21 +103,21 @@ body.course.users {
 
         .msg-you {
           margin-left: ($baseline/5);
-          opacity: 0.65;
           text-transform: none;
           font-weight: 500;
+          color: $pink-l3;
         }
 
         &:after {
-          border-bottom-color: $black-t1;
+          border-bottom-color: $pink-d4;
         }
 
         &.flag-role-staff {
-          background: $gray-l2;
+          background: $pink-u3;
         }
 
         &.flag-role-admin {
-          background: $gray-d1;
+          background: $pink;
         }
       }
 
