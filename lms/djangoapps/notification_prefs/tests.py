@@ -1,3 +1,5 @@
+import json
+
 from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import PermissionDenied
 from django.http import Http404
@@ -7,7 +9,7 @@ from django.test.utils import override_settings
 from mock import Mock, patch
 
 from notification_prefs import NOTIFICATION_PREF_KEY
-from notification_prefs.views import ajax_enable, ajax_disable, unsubscribe
+from notification_prefs.views import ajax_enable, ajax_disable, ajax_status, unsubscribe
 from student.tests.factories import UserFactory
 from user_api.models import UserPreference
 
@@ -56,6 +58,34 @@ class NotificationPrefViewTest(TestCase):
         self.assertFalse(
             UserPreference.objects.filter(user=user, key=NOTIFICATION_PREF_KEY).exists()
         )
+
+    # AJAX status view
+
+    def test_ajax_status_get_0(self):
+        request = self.request_factory.get("dummy")
+        request.user = self.user
+        response = ajax_status(request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(json.loads(response.content), {"status":0})
+
+    def test_ajax_status_get_1(self):
+        self.create_prefs()
+        request = self.request_factory.get("dummy")
+        request.user = self.user
+        response = ajax_status(request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(json.loads(response.content), {"status":1})
+
+    def test_ajax_status_post(self):
+        request = self.request_factory.post("dummy")
+        request.user = self.user
+        response = ajax_status(request)
+        self.assertEqual(response.status_code, 405)
+
+    def test_ajax_status_anon_user(self):
+        request = self.request_factory.get("dummy")
+        request.user = AnonymousUser()
+        self.assertRaises(PermissionDenied, ajax_status, request)
 
     # AJAX enable view
 
