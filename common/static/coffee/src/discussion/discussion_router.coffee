@@ -20,6 +20,7 @@ if Backbone?
 
     allThreads: ->
       @nav.updateSidebar()
+      @nav.goHome()
 
     setActiveThread: =>
       if @thread

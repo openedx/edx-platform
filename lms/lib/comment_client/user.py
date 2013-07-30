@@ -97,7 +97,6 @@ def _url_for_subscription(user_id):
 
 
 def _url_for_user_active_threads(user_id):
-    print("\n\n\n*********** ACTIVE THREADS **********\n\n\n")
     return "{prefix}/users/{user_id}/active_threads".format(prefix=settings.PREFIX, user_id=user_id)
 
 
@@ -105,7 +104,6 @@ def _url_for_user_subscribed_threads(user_id):
     return "{prefix}/users/{user_id}/subscribed_threads".format(prefix=settings.PREFIX, user_id=user_id)
 
 def _url_for_user_stats(user_id,course_id):
-    print("\n\n\n*********** USER STATS **********\n\n\n")
     return "{prefix}/users/{user_id}/stats?course_id={course_id}".format(prefix=settings.PREFIX, user_id=user_id,course_id=course_id)
 
 
