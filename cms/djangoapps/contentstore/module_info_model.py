@@ -12,10 +12,12 @@ def get_module_info(store, location, rewrite_static_links=False):
 
     data = module.data
     if rewrite_static_links:
+        # we pass a partially bogus course_id as we don't have the RUN information passed yet
+        # through the CMS. Also the contentstore is also not RUN-aware at this point in time.
         data = replace_static_urls(
             module.data,
             None,
-            course_id=module.location.org + '/' + module.location.course + '/REPLACE_WITH_RUN_WHEN_IMPLEMENTED'
+            course_id=module.location.org + '/' + module.location.course + '/BOGUS_RUN_REPLACE_WHEN_AVAILABLE'
         )
 
     return {
