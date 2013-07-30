@@ -20,7 +20,7 @@ from mitxmako.shortcuts import render_to_string
 log = logging.getLogger(__name__)
 
 
-@task()
+@task(default_retry_delay=10, max_retries=5)
 def delegate_email_batches(hash_for_msg, recipient, course_id, course_url, user_id):
     '''
     Delegates emails by querying for the list of recipients who should
@@ -37,18 +37,11 @@ def delegate_email_batches(hash_for_msg, recipient, course_id, course_url, user_
         log.error("get_course_by_id failed: " + exc.args[0])
         raise Exception("get_course_by_id failed: " + exc.args[0])
 
-    email = None
-    retries = 0
-    while email is None:
-        try:
-            email = CourseEmail.objects.get(hash=hash_for_msg)        
-        except CourseEmail.DoesNotExist as exc:
-            if retries < 3:
-                retries += 1
-                time.sleep(5)
-            else:
-                log.error("Failed to get CourseEmail with hash " + hash_for_msg + ", no workers fired.")
-                return 0
+    try:
+        email = CourseEmail.objects.get(hash=hash_for_msg)        
+    except CourseEmail.DoesNotExist as exc:
+        log.warning("Failed to get CourseEmail with hash %s, retry %d" % (hash_for_msg, current_task.request.retries))
+        raise delegate_email_batches.retry(arg=[hash_for_msg, recipient, course_id, course_url, user_id], exc=exc)
 
     if recipient == "myself":
         recipient_qset = User.objects.filter(id=user_id).values('profile__name', 'email')
@@ -140,7 +133,7 @@ def course_email(hash_for_msg, to_list, course_title, course_url, throttle=False
                     raise exc  # this will cause the outer handler to catch the exception and retry the entire task
                 else:
                     #this will fall through and not retry the message, since it will be popped
-                    log.warn('Email with hash ' + hash_for_msg + ' not delivered to ' + email + ' due to error: ' + exc.smtp_error)
+                    log.warning('Email with hash ' + hash_for_msg + ' not delivered to ' + email + ' due to error: ' + exc.smtp_error)
                     num_error += 1
 
             to_list.pop()
