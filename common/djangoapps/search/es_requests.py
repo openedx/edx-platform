@@ -5,6 +5,7 @@ import re
 import urllib
 import base64
 import hashlib
+import sys
 from cStringIO import StringIO as cIO
 from StringIO import StringIO as IO
 
@@ -132,6 +133,20 @@ class ElasticDatabase:
         full_url = "/".join([self.url, index, type_, id_])
         response = requests.post(full_url, json.dumps(data))
         return response
+
+    def bulk_index(self, all_data):
+        """
+        Allows for bulk indexing of properly formatted json strings.
+        Example: 
+        {"index": {"_index": "transcript-index", "_type": "course_hash", "_id": "id_hash"}}
+        {"field1": "value1"...}
+
+        Important: Bulk indexing is newline delimited, make sure the newlines are properly used
+        """
+        url = self.url + "/_bulk"
+        response = requests.post(url, data=all_data)
+        return response
+
 
     def get_data(self, index, type_, id_):
         full_url = "/".join([self.url, index, type_, id_])
@@ -388,26 +403,35 @@ class MongoIndexer:
             thumbnail = self.thumbnail_from_video_module(mongo_module)
         return thumbnail
 
-    def index_all_pdfs(self, index):
+    def index_all_pdfs(self, index, bulk_chunk=100):
         cursor = self.find_categories_with_regex("html", re.compile(".*?/asset/.*?\.pdf.*?"))
         for i in range(cursor.count()):
             item = cursor.next()
             data = self.basic_dict(item, "pdf")
             print self.es_instance.index_data(index, data)._content
 
-    def index_all_problems(self, index):
+    def index_all_problems(self, index, bulk_chunk=100):
         cursor = self.find_modules_by_category("problem")
         for i in range(cursor.count()):
             item = cursor.next()
             data = self.basic_dict(item, "problem")
             print self.es_instance.index_data(index, data)._content
 
-    def index_all_transcripts(self, index):
+    def index_all_transcripts(self, index, bulk_chunk=100):
         cursor = self.find_modules_by_category("video")
+        bulk_string = ""
         for i in range(cursor.count()):
+            print i
             item = cursor.next()
             data = self.basic_dict(item, "transcript")
-            print self.es_instance.index_data(index, data)._content
+            bulk_string += json.dumps({"index": {"_index": index, "_type": data["type_hash"], "_id": data["hash"]}})
+            bulk_string += "\n"
+            bulk_string += json.dumps(data)
+            bulk_string += "\n"
+            if i % bulk_chunk == 0:
+                print self.es_instance.bulk_index(bulk_string)._content
+                bulk_string = ""
+        print self.es_instance.bulk_index(bulk_string)._content
 
     def index_course(self, course):
         cursor = self.find_modules_for_course(course)
@@ -498,22 +522,27 @@ class EnchantDictionary:
                 dictionary.write(word+"\n")
 
 
-mongo = MongoIndexer(content_database="edge-xcontent", module_database="edge-xmodule")
-mongo2 = MongoIndexer()
+if sys.argv[1] == "regenerate":
+    mongo = MongoIndexer(content_database="edge-xcontent", module_database="edge-xmodule")
+    mongo2 = MongoIndexer()
 
-test = ElasticDatabase()
+    edb = ElasticDatabase()
 
-print test.delete_index("pdf-index")
-print test.delete_index("transcript-index")
-print test.delete_index("problem-index")
-#mongo.index_all_pdfs("pdf-index")
-mongo.index_all_transcripts("transcript-index")
-mongo2.index_all_transcripts("transcript-index")
-mongo.index_all_problems("problem-index")
-mongo2.index_all_problems("problem-index")
-#dictionary.produce_dictionary("pyenchant_corpus.txt", max_results=500000)
+    if "pdf" in sys.argv[2:]:
+        print edb.delete_index("pdf-index")
+        mongo.index_all_pdfs("pdf-index")
+        mongo2.index_all_pdfs("pdf-index")
 
-#print test.setup_type("transcript", "cleaning", mapping)._content
-#print test.get_type_mapping("transcript-index", "2-1x")
-#print test.index_directory_transcripts("/home/slater/edx_all/data", "transcript-index", "transcript")
-#test.generate_dictionary("transcript-index", "transcript", "pyenchant_corpus.txt")
+    if "transcript" in sys.argv[2:]:
+        print edb.delete_index("transcript-index")
+        mongo.index_all_transcripts("transcript-index")
+        mongo2.index_all_transcripts("transcript-index")
+    
+    if "problem" in sys.argv[2:]:
+        print edb.delete_index("problem-index")
+        mongo.index_all_problems("problem-index")
+        mongo2.index_all_problems("problem-index")
+    
+    #print test.setup_type("transcript", "cleaning", mapping)._content
+    #print test.get_type_mapping("transcript-index", "2-1x")
+    #print test.index_directory_transcripts("/home/slater/edx_all/data", "transcript-index", "transcript")
