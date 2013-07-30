@@ -230,7 +230,7 @@ class @CombinedOpenEnded
     $.postWithPrefix "#{@ajax_url}/get_last_response", data, (response) =>
       if response.success && response.response != ""
         @answer_area.html(response.response)
-        @gentle_alert "Thank you for submitting!"
+        @gentle_alert "This has been submitted"
       else
         @submit_button.show()
         @answer_area.attr("disabled", false)
