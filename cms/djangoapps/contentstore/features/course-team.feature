@@ -45,3 +45,15 @@ Feature: Course Team
         Then "emily" should be marked as an admin
         And she can add users
         And she can delete users
+
+    Scenario: Admins should be able to remove other admins
+        Given I have opened a new course in Studio
+        And the user "frank" exists as a course admin
+        And I am viewing the course team settings
+        When I remove admin rights from "frank"
+        And "frank" logs in
+        And he selects the new course
+        And he views the course team settings
+        Then "frank" should not be marked as an admin
+        And he cannot add users
+        And he cannot delete users

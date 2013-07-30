@@ -126,6 +126,8 @@ def create_studio_user(
     registration.register(studio_user)
     registration.activate()
 
+    return studio_user
+
 
 def fill_in_course_info(
         name='Robot Super Course',

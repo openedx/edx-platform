@@ -3,6 +3,8 @@
 
 from lettuce import world, step
 from common import create_studio_user, log_into_studio
+from django.contrib.auth.models import Group
+from auth.authz import get_course_groupname_for_role
 
 PASSWORD = 'test'
 EMAIL_EXTENSION = '@edx.org'
@@ -15,9 +17,15 @@ def view_grading_settings(_step, whom):
     world.css_click(link_css)
 
 
-@step(u'the user "([^"]*)" exists$')
-def create_other_user(_step, name):
-    create_studio_user(uname=name, password=PASSWORD, email=(name + EMAIL_EXTENSION))
+@step(u'the user "([^"]*)" exists( as a course admin)?$')
+def create_other_user(_step, name, course_admin):
+    user = create_studio_user(uname=name, password=PASSWORD, email=(name + EMAIL_EXTENSION))
+    if course_admin:
+        location = world.scenario_dict["COURSE"].location
+        for role in ("staff", "instructor"):
+            group, __ = Group.objects.get_or_create(name=get_course_groupname_for_role(location, role))
+            user.groups.add(group)
+        user.save()
 
 
 @step(u'I add "([^"]*)" to the course team')
@@ -44,6 +52,13 @@ def delete_other_user(_step, name):
 @step(u'I make "([^"]*)" a course team admin')
 def make_course_team_admin(_step, name):
     admin_btn_css = '.user-item[data-email="{email}"] .user-actions .add-admin-role'.format(
+        email=name+EMAIL_EXTENSION)
+    world.css_click(admin_btn_css)
+
+
+@step(u'I remove admin rights from "([^"]*)"')
+def remove_course_team_admin(_step, name):
+    admin_btn_css = '.user-item[data-email="{email}"] .user-actions .remove-admin-role'.format(
         email=name+EMAIL_EXTENSION)
     world.css_click(admin_btn_css)
 
