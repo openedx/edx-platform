@@ -6,9 +6,6 @@ Export or Import a Course
 Studio has an Import tool and an Export tool that allow you to import and
 export courses.
 
-.. raw:: latex
-  
-      \newpage %
  
 Export a Course
 ***************
@@ -77,11 +74,15 @@ The exported file does not include the following data:
 
 Import a Course
 ***************
+
+
  
-*Note:  This feature should be used with caution!
-Importing a new course will delete all course content currently associated with
-your course and replace it with the contents of the uploaded file.
-**Importing a course cannot be undone.*
+.. warning::
+
+	This feature should be used with caution!
+	Importing a new course will delete all course content currently associated
+	with your course and replace it with the contents of the uploaded file. 
+	Importing a course cannot be undone.
  
  
 You can import courses that have already been created in Studio. These can

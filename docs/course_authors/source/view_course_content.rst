@@ -54,8 +54,10 @@ still creating it:
 * In Studio
 
 
-	Note that the way your course looks in Studio is
-	not the way it looks to students on edX or Edge.
+.. note::
+
+	The way your course looks in Studio is not the way it looks to students on
+	edX or Edge.
  
  
 * On edX or Edge in Preview mode

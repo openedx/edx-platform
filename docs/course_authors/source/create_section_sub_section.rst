@@ -1,5 +1,4 @@
 
-
 *******************************
 Create a Section and Subsection
 *******************************
@@ -19,8 +18,10 @@ Create a Section and Subsection
 3. In the **New Section** Name box, type a section name, and then click
 **Save**. 
 
-*Note: In most courses, the name of the first section is Week 1. 
-The section that you have created appears on the **Course Outline** page.
+.. note::
+
+	In most courses, the name of the first section is Week 1. 
+	The section that you have created appears on the **Course Outline** page.
 
 .. image:: images/image041.png  
  :width: 800

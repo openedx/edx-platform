@@ -5,14 +5,16 @@ Create a Lesson in Studio
 
 Once you have created a course, you are ready to create content for that course.
 
-**CAUTION**  *The alpha version of Studio does not have versioning or automatic
-updating of your browser between refreshes. Versioning is planned for future
-releases, but, in the meantime, only one author should edit a unit, in one
-browser, on only one tab.  If a unit is open for editing in multiple browser
-sessions, the session that saves last will overwrite any previously saved
-content without displaying a warning. Also, older browser sessions can overwrite
-more recent content, so refresh your browser before you start working every time
-you work with a private unit or edit a draft of a public unit.*
+.. warning::
+
+	The alpha version of Studio does not have versioning or automatic
+	updating of your browser between refreshes. Versioning is planned for future
+	refresheseleases, but, in the meantime, only one author should edit a unit, in one
+	browser, on only one tab.  If a unit is open for editing in multiple browser
+	sessions, the session that saves last will overwrite any previously saved
+	content without displaying a warning. Also, older browser sessions can overwrite
+	more recent content, so refresh your browser before you start working every time
+	you work with a private unit or edit a draft of a public unit.
 
 
 Introduction
@@ -40,7 +42,9 @@ or private.
     .. image:: images/image031.png
        :width: 800
 
-
+.. raw:: latex
+  
+	\newpage %
 
 Section
 *******
@@ -55,6 +59,10 @@ the content in the section is visible until its release date has passed.
 
 For more information about how to create a section, see
 :doc:`create_section_sub_section`.
+
+.. raw:: latex
+  
+	\newpage %
 
 Subsection
 **********
@@ -77,6 +85,10 @@ its section.
 For more information about how to create a subsection, see
 :doc:`create_section_sub_section`.
 
+.. raw:: latex
+  
+	\newpage %
+
 Unit
 ****
 
@@ -91,6 +103,10 @@ your course on Edge. The following page shows a subsection that has two Units.
 Note that by default, all units are set to **Private.** To make a unit visible
 to students, you have to explicitly change the unit’s visibility to **Public.**
 For more information see :doc:`set_content_releasedates` .
+
+.. raw:: latex
+  
+	\newpage %
 
 
 Component 

@@ -55,7 +55,9 @@ but you will not change the text in the large box.
 
 .. image:: images/image063.png
 
-*Note: In the future, these boxes may be filled in for you with a default value.*
+.. note::
+
+	In the future, these boxes may be filled in for you with a default value.
 
 7. In the **discussion_category** box, type the name of the category that you
 want to create for the discussion. You can include spaces.
@@ -63,8 +65,9 @@ want to create for the discussion. You can include spaces.
 8. In the **discussion_target** box, type the name of the subcategory that you
 want to create for the discussion. You can include spaces.
 
-*Note: The category and subcategory names only appear in the discussion forum for
-*your course. They do not appear in the discussion space inside the Unit.*
+.. note::
+	The category and subcategory names only appear in the discussion forum for
+	your course. They do not appear in the discussion space inside the Unit.
 
 For example, if you set **discussion_category** to be “The Discussion Component”
 and you set **discussion_target** to be “Online Instruction Methods,” the

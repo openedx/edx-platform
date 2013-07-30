@@ -35,7 +35,9 @@ Create assignment types for the course and determine the weight of the student's
 Each subsection in your course can be designated as one of the assignment types that you have specified in the grading policy. You can also specify a release date and a due date.
   
   
- *Note: You can create problems in Studio without specifying that the subsection is an assignment type. However, problems do not count toward a student's grade unless you set the subsection as a graded assignment type.*
+.. note::
+	
+		You can create problems in Studio without specifying that the subsection is an assignment type. However, problems do not count toward a student's grade unless you set the subsection as a graded assignment type.
 
 For more information on creating problems, see `Create a Problem <Create_Problem.html>`_ . 
  
@@ -62,7 +64,9 @@ To set the thresholds for course grades:
   
 2. Under **Overall Grade Range**, click and drag the dividing line between grade divisions to move each threshold up or down.
   
-  *Note: The default grade divisions are Pass and Fail. To add more grade divisions (such as A, B, C, or D), click the plus sign (+).*
+.. note::
+
+	The default grade divisions are Pass and Fail. To add more grade divisions (such as A, B, C, or D), click the plus sign (+).
     
   
 .. image:: images/image133.png    
@@ -151,7 +155,9 @@ Create Subsections Containing Graded Assignments
 After you establish your grading rubric, you can create a graded assignment or a test for your students. To do this, you must first create a subsections and then set up grading for the subsection. This includes setting the assignment type, the assignment release date, and the due date.
   
 
-  *Note: When you set a due date, keep in mind that students will be in different time zones across the world. By default, the time zone appears as UTC-not the student's local time. If you tell your students an assignment is due at 5:00 PM, make sure to specify that the time is 5:00 PM UTC and point them to a time converter.*
+.. note::
+
+	When you set a due date, keep in mind that students will be in different time zones across the world. By default, the time zone appears as UTC-not the student's local time. If you tell your students an assignment is due at 5:00 PM, make sure to specify that the time is 5:00 PM UTC and point them to a time converter.
       
   
 Alternatively, you can :ref:`set a grace period<Set-Grace-Period>` for your assignments to cover any misunderstandings about time. For example, some classes have set a grace period of 1 day, 6 hours, and 1 minute. This grace period applies to the entire course. 
@@ -205,4 +211,6 @@ To set the assignment type for a subsection:
   
 .. image:: images/image153.png   
 
-*Note: If you change an assignment type name in the Grading page, make sure the assignment type names on the Course Outline still match.*
+.. note::
+
+	If you change an assignment type name in the Grading page, make sure the assignment type names on the Course Outline still match.

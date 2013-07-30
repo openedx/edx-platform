@@ -44,8 +44,10 @@ Individual units inherit the release date of the subsection they are in, but
 have an additional **Visibility** setting that can be set to **Public** or
 **Private**. Private units are never visible to students.
 
-*Note: You can modify private units directly. To modify a unit that is marked
-Public you must create a draft.*
+.. note::
+
+You can modify private units directly. To modify a unit that is marked
+Public you must create a draft.
 
 For more information, see :doc:`modify_published_content` .
 

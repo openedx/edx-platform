@@ -106,7 +106,9 @@ Schedule and Details Page
 2. In the **Course Schedule** section, enter the date you want your course to start in the **Course Start Date** box, and then enter the time you want your course to start in the **Course** **Start Time** box.
  
  
-*Note: The Course Start Time on this screen will reflect the current time zone in your browser, depending on your geography. Course start times for students will show as UTC on Edge.*
+.. note::
+    
+    The Course Start Time on this screen will reflect the current time zone in your browser, depending on your geography. Course start times for students will show as UTC on Edge.
         
  
 3. In the **Course Schedule** section, enter the date you want your course to end in the **Course** **End Date **
@@ -127,7 +129,9 @@ Add Enrollment Information
 box, and then enter the time you want enrollment for your course to end in the **Enrollment End Time** box.
  
  
-*Note: The Enrollment dates on this screen will reflect the current time zone in your browser, depending on your geography. Enrollment times for students will show as UTC on Edge.*
+.. note::
+
+    The Enrollment dates on this screen will reflect the current time zone in your browser, depending on your geography. Enrollment times for students will show as UTC on Edge.
         
 
   
@@ -156,7 +160,9 @@ can use that includes placeholders, see :doc:`appendices/a`.
 If your course has prerequisites, you can include that information in the course overview.
  
  
-*Note: There is no save button. Studio automatically saves your changes.*
+.. note::
+
+    There is no save button. Studio automatically saves your changes.
  
  
 The following is example content for the **Course Overview** box:
@@ -191,7 +197,9 @@ You can create an About video that will appear on the **About** page for your co
 4. In the **your YouTube video's ID**  box, enter your video code. When you add the code, the video automatically appears in the field above the   **your YouTube video's ID**  box.
  
  
-*Note: There is no save button. Studio automatically saves your changes.*
+.. note::
+
+    There is no save button. Studio automatically saves your changes.
  
  
 For example, your course introduction video appears as follows.

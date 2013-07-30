@@ -2,11 +2,9 @@
 .. image:: images/image001.png
 
 
-
 ###########################
 Getting Started with Studio
 ###########################
-
 
   
 ************
@@ -27,7 +25,7 @@ Studio (http://studio.edge.edx.org) is our web-based course authoring tool. It i
 
 
 
-**There is a workflow to getting started.**
+**There is a workflow to getting started.** Here is a quick summary:
 
 
 
@@ -56,6 +54,10 @@ Studio (http://studio.edge.edx.org) is our web-based course authoring tool. It i
 
 .. image:: images/image027.png
  :width: 800
+
+.. raw:: latex
+  
+	\newpage %
 
 
 *****************
@@ -115,6 +117,10 @@ e.  Click to select I agree to the Terms of Service.
 .. image:: images/image017.png
  :width: 800
 
+ .. raw:: latex
+  
+	\newpage %
+
 *******************
 Create a New Course
 *******************
@@ -137,7 +143,9 @@ To create a new course:
 1. Click **New Course.** A screen opens.
 
 
-   *Note: Enter your new course information carefully. This information becomes part of the URL for your course. To change the URL after the course is created, you must contact edX through the Help site (http://help.edge.edx.org). Additionally, because this information becomes part of your course URL, the total number of characters in the following three fields must be 65 or fewer.*
+.. note::
+
+	Enter your new course information carefully. This information becomes part of the URL for your course. To change the URL after the course is created, you must contact edX through the Help site (http://help.edge.edx.org).Additionally, because this information becomes part of your course URL, the total number of characters in the following three fields must be 65 or fewer.
 
 
 2. For **Course Name**, enter the title of your course. For example, the name may be “Sets, Maps and Symmetry Groups". Use title capitalization for the course title.
