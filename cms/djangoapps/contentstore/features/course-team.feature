@@ -32,3 +32,16 @@ Feature: Course Team
         And I am viewing the course team settings
         When I add "dennis" to the course team
         Then I should see "Could not find user by email address" somewhere on the page
+
+    Scenario: Admins should be able to make other people into admins
+        Given I have opened a new course in Studio
+        And the user "emily" exists
+        And I am viewing the course team settings
+        And I add "emily" to the course team
+        When I make "emily" a course team admin
+        And "emily" logs in
+        And she selects the new course
+        And she views the course team settings
+        Then "emily" should be marked as an admin
+        And she can add users
+        And she can delete users

@@ -8,8 +8,8 @@ PASSWORD = 'test'
 EMAIL_EXTENSION = '@edx.org'
 
 
-@step(u'I am viewing the course team settings')
-def view_grading_settings(_step):
+@step(u'(I am viewing|s?he views) the course team settings')
+def view_grading_settings(_step, whom):
     world.click_course_settings()
     link_css = 'li.nav-course-settings-team a'
     world.css_click(link_css)
@@ -41,29 +41,52 @@ def delete_other_user(_step, name):
     world.css_click(to_delete_css)
 
 
+@step(u'I make "([^"]*)" a course team admin')
+def make_course_team_admin(_step, name):
+    admin_btn_css = '.user-item[data-email="{email}"] .user-actions .add-admin-role'.format(
+        email=name+EMAIL_EXTENSION)
+    world.css_click(admin_btn_css)
+
+
 @step(u'"([^"]*)" logs in$')
 def other_user_login(_step, name):
     log_into_studio(uname=name, password=PASSWORD, email=name + EMAIL_EXTENSION)
 
 
 @step(u's?he does( not)? see the course on (his|her) page')
-def see_course(_step, doesnt_see_course, gender):
+def see_course(_step, inverted, gender):
     class_css = 'span.class-name'
     all_courses = world.css_find(class_css, wait_time=1)
     all_names = [item.html for item in all_courses]
-    if doesnt_see_course:
+    if inverted:
         assert not world.scenario_dict['COURSE'].display_name in all_names
     else:
         assert world.scenario_dict['COURSE'].display_name in all_names
 
 
-@step(u's?he cannot delete users')
-def cannot_delete(_step):
+@step(u'"([^"]*)" should( not)? be marked as an admin')
+def marked_as_admin(_step, name, inverted):
+    flag_css = '.user-item[data-email="{email}"] .flag-role.flag-role-admin'.format(
+        email=name+EMAIL_EXTENSION)
+    if inverted:
+        assert world.is_css_not_present(flag_css)
+    else:
+        assert world.is_css_present(flag_css)
+
+
+@step(u's?he can(not)? delete users')
+def can_delete_users(_step, inverted):
     to_delete_css = 'a.remove-user'
-    assert world.is_css_not_present(to_delete_css)
+    if inverted:
+        assert world.is_css_not_present(to_delete_css)
+    else:
+        assert world.is_css_present(to_delete_css)
 
 
-@step(u's?he cannot add users')
-def cannot_add(_step):
+@step(u's?he can(not)? add users')
+def can_add_users(_step, inverted):
     add_css = 'a.create-user-button'
-    assert world.is_css_not_present(add_css)
+    if inverted:
+        assert world.is_css_not_present(add_css)
+    else:
+        assert world.is_css_present(add_css)
