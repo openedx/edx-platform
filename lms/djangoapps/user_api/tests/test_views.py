@@ -1,3 +1,5 @@
+import base64
+
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -30,6 +32,9 @@ class UserApiTestCase(TestCase):
             UserPreferenceFactory.create(user=self.users[0], key="key1"),
             UserPreferenceFactory.create(user=self.users[1], key="key0")
         ]
+
+    def basic_auth(self, username, password):
+        return {'HTTP_AUTHORIZATION': 'Basic ' + base64.b64encode('%s:%s' % (username, password))}
 
     def request_with_auth(self, method, *args, **kwargs):
         """Issue a get request to the given URI with the API key header"""
@@ -126,6 +131,15 @@ class UserViewSetTest(UserApiTestCase):
     @override_settings(EDX_API_KEY=None)
     def test_debug_auth(self):
         self.assertHttpOK(self.client.get(self.LIST_URI))
+
+    @override_settings(DEBUG=False)
+    @override_settings(EDX_API_KEY=TEST_API_KEY)
+    def test_basic_auth(self):
+        # ensure that having basic auth headers in the mix does not break anything
+        self.assertHttpOK(
+                self.request_with_auth("get", self.LIST_URI, **self.basic_auth('someuser', 'somepass')))
+        self.assertHttpForbidden(
+                self.client.get(self.LIST_URI, **self.basic_auth('someuser', 'somepass')))
 
     def test_get_list_empty(self):
         User.objects.all().delete()
