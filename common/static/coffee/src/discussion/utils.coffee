@@ -84,7 +84,7 @@ class @DiscussionUtil
       threads                 : "/courses/#{$$course_id}/discussion/forum"
       "enable_notifications"  : "/notification_prefs/enable/"
       "disable_notifications" : "/notification_prefs/disable/"
-      "notifications_status" : "notification_prefs/status/user_prefs/?key=notification_pref&use=#{param}"
+      "notifications_status" : "/notification_prefs/status"
     }[name]
 
   @safeAjax: (params) ->
