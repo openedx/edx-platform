@@ -71,6 +71,9 @@ MITX_FEATURES = {
 
     'ENABLE_TEXTBOOK': True,
     'ENABLE_DISCUSSION_SERVICE': True,
+    # discussion home panel, which includes a subscription on/off setting for discussion digest emails.
+    # this should remain off in production until digest notifications are online. 
+    'ENABLE_DISCUSSION_HOME_PANEL': True,
 
     'ENABLE_PSYCHOMETRICS': False,  # real-time psychometrics (eg item response theory analysis in instructor dashboard)
 

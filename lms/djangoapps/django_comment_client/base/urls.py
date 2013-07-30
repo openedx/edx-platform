@@ -17,7 +17,6 @@ urlpatterns = patterns('django_comment_client.base.views',  # nopep8
     url(r'threads/(?P<thread_id>[\w\-]+)/follow$', 'follow_thread', name='follow_thread'),
     url(r'threads/(?P<thread_id>[\w\-]+)/unfollow$', 'unfollow_thread', name='unfollow_thread'),
     url(r'threads/(?P<thread_id>[\w\-]+)/close$', 'openclose_thread', name='openclose_thread'),
-
     url(r'comments/(?P<comment_id>[\w\-]+)/update$', 'update_comment', name='update_comment'),
     url(r'comments/(?P<comment_id>[\w\-]+)/endorse$', 'endorse_comment', name='endorse_comment'),
     url(r'comments/(?P<comment_id>[\w\-]+)/reply$', 'create_sub_comment', name='create_sub_comment'),
