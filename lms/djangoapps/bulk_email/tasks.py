@@ -37,6 +37,19 @@ def delegate_email_batches(hash_for_msg, recipient, course_id, course_url, user_
         log.error("get_course_by_id failed: " + exc.args[0])
         raise Exception("get_course_by_id failed: " + exc.args[0])
 
+    email = None
+    retries = 0
+    while email is None:
+        try:
+            email = CourseEmail.objects.get(hash=hash_for_msg)        
+        except CourseEmail.DoesNotExist as exc:
+            if retries < 3:
+                retries += 1
+                time.sleep(5)
+            else:
+                log.error("Failed to get CourseEmail with hash " + hash_for_msg + ", no workers fired.")
+                return 0
+
     if recipient == "myself":
         recipient_qset = User.objects.filter(id=user_id).values('profile__name', 'email')
     else:

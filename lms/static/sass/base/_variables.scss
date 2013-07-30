@@ -39,6 +39,23 @@ $outer-border-color: rgb(170, 170, 170);
 $light-gray: #ddd;
 $dark-gray: #333;
 
+// used by descriptor css
+$lightGrey: #edf1f5;
+$darkGrey: #8891a1;
+
+// edx.org-related
+$m-gray-l1: rgb(203,203,203);
+$m-gray-l2: rgb(246,246,246);
+$m-gray: rgb(153,153,153);
+$m-gray-d1: rgb(102,102,102);
+$m-gray-d2: rgb(51,51,51);
+$m-gray-a1: rgb(80,80,80);
+$m-blue: rgb(65, 116, 170);
+// $m-blue: rgb(85, 151, 221); (used in marketing redesign)
+$m-blue-l1: rgb(85, 151, 221);
+$m-blue-d1: shade($m-blue,15%);
+$m-blue-s1: saturate($m-blue,15%);
+$m-pink: rgb(204,51,102);
 // edx.org marketing site variables
 $m-gray: #8A8C8F;
 $m-gray-l1: #97999B;
