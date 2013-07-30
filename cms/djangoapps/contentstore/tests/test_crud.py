@@ -127,7 +127,7 @@ class TemplateTests(unittest.TestCase):
         persistent_factories.ItemFactory.create(display_name='chapter 1',
             parent_location=test_course.location)
 
-        id_locator = CourseLocator(course_id=test_course.location.course_id, revision='draft')
+        id_locator = CourseLocator(course_id=test_course.location.course_id, branch='draft')
         guid_locator = CourseLocator(version_guid=test_course.location.version_guid)
         # verify it can be retireved by id
         self.assertIsInstance(modulestore('split').get_course(id_locator), CourseDescriptor)

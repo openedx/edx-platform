@@ -23,7 +23,7 @@ class LocatorTest(TestCase):
             CourseLocator,
             url='edx://edu.mit.eecs.6002x',
             course_id='edu.harvard.history',
-            revision='published',
+            branch='published',
             version_guid=ObjectId())
         self.assertRaises(
             OverSpecificationError,
@@ -35,16 +35,16 @@ class LocatorTest(TestCase):
             OverSpecificationError,
             CourseLocator,
             url='edx://edu.mit.eecs.6002x;published',
-            revision='draft')
+            branch='draft')
         self.assertRaises(
             OverSpecificationError,
             CourseLocator,
             course_id='edu.mit.eecs.6002x;published',
-            revision='draft')
+            branch='draft')
 
     def test_course_constructor_underspecified(self):
         self.assertRaises(InsufficientSpecificationError, CourseLocator)
-        self.assertRaises(InsufficientSpecificationError, CourseLocator, revision='published')
+        self.assertRaises(InsufficientSpecificationError, CourseLocator, branch='published')
 
     def test_course_constructor_bad_version_guid(self):
         self.assertRaises(ValueError, CourseLocator, version_guid="012345")
@@ -114,9 +114,9 @@ class LocatorTest(TestCase):
         testobj = CourseLocator(course_id=testurn, url='edx://' + testurn)
         self.check_course_locn_fields(testobj, 'course_id',
                                       course_id=expected_urn,
-                                      revision=expected_rev)
+                                      branch=expected_rev)
 
-    def test_course_constructor_course_id_no_revision(self):
+    def test_course_constructor_course_id_no_branch(self):
         testurn = 'edu.mit.eecs.6002x'
         testobj = CourseLocator(course_id=testurn)
         self.check_course_locn_fields(testobj, 'course_id', course_id=testurn)
@@ -124,61 +124,61 @@ class LocatorTest(TestCase):
         self.assertEqual(str(testobj), testurn)
         self.assertEqual(testobj.url(), 'edx://' + testurn)
 
-    def test_course_constructor_course_id_with_revision(self):
+    def test_course_constructor_course_id_with_branch(self):
         testurn = 'edu.mit.eecs.6002x;published'
         expected_id = 'edu.mit.eecs.6002x'
-        expected_revision = 'published'
+        expected_branch = 'published'
         testobj = CourseLocator(course_id=testurn)
-        self.check_course_locn_fields(testobj, 'course_id with revision',
+        self.check_course_locn_fields(testobj, 'course_id with branch',
                                       course_id=expected_id,
-                                      revision=expected_revision,
+                                      branch=expected_branch,
                                       )
         self.assertEqual(testobj.course_id, expected_id)
-        self.assertEqual(testobj.revision, expected_revision)
+        self.assertEqual(testobj.branch, expected_branch)
         self.assertEqual(str(testobj), testurn)
         self.assertEqual(testobj.url(), 'edx://' + testurn)
 
-    def test_course_constructor_course_id_separate_revision(self):
+    def test_course_constructor_course_id_separate_branch(self):
         test_id = 'edu.mit.eecs.6002x'
-        test_revision = 'published'
+        test_branch = 'published'
         expected_urn = 'edu.mit.eecs.6002x;published'
-        testobj = CourseLocator(course_id=test_id, revision=test_revision)
-        self.check_course_locn_fields(testobj, 'course_id with separate revision',
+        testobj = CourseLocator(course_id=test_id, branch=test_branch)
+        self.check_course_locn_fields(testobj, 'course_id with separate branch',
                                       course_id=test_id,
-                                      revision=test_revision,
+                                      branch=test_branch,
                                       )
         self.assertEqual(testobj.course_id, test_id)
-        self.assertEqual(testobj.revision, test_revision)
+        self.assertEqual(testobj.branch, test_branch)
         self.assertEqual(str(testobj), expected_urn)
         self.assertEqual(testobj.url(), 'edx://' + expected_urn)
 
-    def test_course_constructor_course_id_repeated_revision(self):
+    def test_course_constructor_course_id_repeated_branch(self):
         """
-        The same revision appears in the course_id and the revision field.
+        The same branch appears in the course_id and the branch field.
         """
         test_id = 'edu.mit.eecs.6002x;published'
-        test_revision = 'published'
+        test_branch = 'published'
         expected_id = 'edu.mit.eecs.6002x'
         expected_urn = 'edu.mit.eecs.6002x;published'
-        testobj = CourseLocator(course_id=test_id, revision=test_revision)
-        self.check_course_locn_fields(testobj, 'course_id with repeated revision',
+        testobj = CourseLocator(course_id=test_id, branch=test_branch)
+        self.check_course_locn_fields(testobj, 'course_id with repeated branch',
                                       course_id=expected_id,
-                                      revision=test_revision,
+                                      branch=test_branch,
                                       )
         self.assertEqual(testobj.course_id, expected_id)
-        self.assertEqual(testobj.revision, test_revision)
+        self.assertEqual(testobj.branch, test_branch)
         self.assertEqual(str(testobj), expected_urn)
         self.assertEqual(testobj.url(), 'edx://' + expected_urn)
 
     def test_block_constructor(self):
         testurn = 'edu.mit.eecs.6002x;published#HW3'
         expected_id = 'edu.mit.eecs.6002x'
-        expected_revision = 'published'
+        expected_branch = 'published'
         expected_block_ref = 'HW3'
         testobj = BlockUsageLocator(course_id=testurn)
         self.check_block_locn_fields(testobj, 'test_block constructor',
                                      course_id=expected_id,
-                                     revision=expected_revision,
+                                     branch=expected_branch,
                                      block=expected_block_ref)
         self.assertEqual(str(testobj), testurn)
         self.assertEqual(testobj.url(), 'edx://' + testurn)
@@ -225,10 +225,10 @@ class LocatorTest(TestCase):
         testobj = CourseLocator(testurn)
         self.check_course_locn_fields(testobj, testurn, course_id='courseid')
 
-        testurn = 'crx/courseid@revision/blockid'
+        testurn = 'crx/courseid@branch/blockid'
         testobj = CourseLocator(testurn)
         self.check_course_locn_fields(testobj, testurn, course_id='courseid',
-                                      revision='revision')
+                                      branch='branch')
         self.assertEqual(testobj, CourseLocator(testobj),
                          'run initialization from another instance')
 
@@ -242,23 +242,23 @@ class LocatorTest(TestCase):
         self.check_course_locn_fields(testobj, 'courseid arg',
                                       course_id='courseid')
 
-        testobj = CourseLocator(course_id='courseid', revision='rev')
+        testobj = CourseLocator(course_id='courseid', branch='rev')
         self.check_course_locn_fields(testobj, 'rev arg',
                                       course_id='courseid',
-                                      revision='rev')
+                                      branch='rev')
         # ignores garbage
-        testobj = CourseLocator(course_id='courseid', revision='rev',
+        testobj = CourseLocator(course_id='courseid', branch='rev',
                                 potato='spud')
         self.check_course_locn_fields(testobj, 'extra keyword arg',
                                       course_id='courseid',
-                                      revision='rev')
+                                      branch='rev')
 
         # url w/ keyword override
-        testurn = 'crx/courseid@revision/blockid'
-        testobj = CourseLocator(testurn, revision='rev')
+        testurn = 'crx/courseid@branch/blockid'
+        testobj = CourseLocator(testurn, branch='rev')
         self.check_course_locn_fields(testobj, 'rev override',
                                       course_id='courseid',
-                                      revision='rev')
+                                      branch='rev')
 
     def test_course_dict(self):
         raise SkipTest()
@@ -270,29 +270,29 @@ class LocatorTest(TestCase):
         self.check_course_locn_fields(testobj, 'courseid dict',
                                       course_id='courseid')
 
-        testobj = CourseLocator({"course_id": 'courseid', "revision": 'rev'})
+        testobj = CourseLocator({"course_id": 'courseid', "branch": 'rev'})
         self.check_course_locn_fields(testobj, 'rev dict',
                                       course_id='courseid',
-                                      revision='rev')
+                                      branch='rev')
         # ignores garbage
-        testobj = CourseLocator({"course_id": 'courseid', "revision": 'rev',
+        testobj = CourseLocator({"course_id": 'courseid', "branch": 'rev',
                                  "potato": 'spud'})
         self.check_course_locn_fields(testobj, 'extra keyword dict',
                                       course_id='courseid',
-                                      revision='rev')
-        testobj = CourseLocator({"course_id": 'courseid', "revision": 'rev'},
-                                revision='alt')
+                                      branch='rev')
+        testobj = CourseLocator({"course_id": 'courseid', "branch": 'rev'},
+                                branch='alt')
         self.check_course_locn_fields(testobj, 'rev dict',
                                       course_id='courseid',
-                                      revision='alt')
+                                      branch='alt')
 
         # urn init w/ dict & keyword overwrites
         testobj = CourseLocator('crx/notcourse@notthis',
                                 {"course_id": 'courseid'},
-                                revision='alt')
+                                branch='alt')
         self.check_course_locn_fields(testobj, 'rev dict',
                                       course_id='courseid',
-                                      revision='alt')
+                                      branch='alt')
 
     def test_url(self):
         '''
@@ -310,7 +310,7 @@ class LocatorTest(TestCase):
         self.assertEqual(testobj, CourseLocator(testobj.url()),
                          'courseid conversion through url')
 
-        testobj = CourseLocator(course_id='courseid', revision='rev')
+        testobj = CourseLocator(course_id='courseid', branch='rev')
         self.assertEqual(testobj.url(), 'crx/courseid@rev', 'rev')
         self.assertEqual(testobj, CourseLocator(testobj.url()),
                          'rev conversion through url')
@@ -330,7 +330,7 @@ class LocatorTest(TestCase):
         self.assertEqual(testobj, CourseLocator(testobj.html_id()),
                          'courseid conversion through html_id')
 
-        testobj = CourseLocator(course_id='courseid', revision='rev')
+        testobj = CourseLocator(course_id='courseid', branch='rev')
         self.assertEqual(testobj.html_id(), 'crx/courseid%40rev', 'rev')
         self.assertEqual(testobj, CourseLocator(testobj.html_id()),
                          'rev conversion through html_id')
@@ -379,10 +379,10 @@ class LocatorTest(TestCase):
         self.check_block_locn_fields(testobj, testurn, course_id='courseid',
                                      block='blockid')
 
-        testurn = 'crx/courseid@revision/blockid'
+        testurn = 'crx/courseid@branch/blockid'
         testobj = BlockUsageLocator(testurn)
         self.check_block_locn_fields(testobj, testurn, course_id='courseid',
-                                     revision='revision', block='blockid')
+                                     branch='branch', block='blockid')
         self.assertEqual(testobj, BlockUsageLocator(testobj),
                          'run initialization from another instance')
 
@@ -400,22 +400,22 @@ class LocatorTest(TestCase):
         self.check_block_locn_fields(testobj, 'courseid arg',
                                      course_id='courseid')
 
-        testobj = BlockUsageLocator(course_id='courseid', revision='rev')
+        testobj = BlockUsageLocator(course_id='courseid', branch='rev')
         self.check_block_locn_fields(testobj, 'rev arg',
                                      course_id='courseid',
-                                     revision='rev')
+                                     branch='rev')
         # ignores garbage
-        testobj = BlockUsageLocator(course_id='courseid', revision='rev',
+        testobj = BlockUsageLocator(course_id='courseid', branch='rev',
                                     usage_id='this_block', potato='spud')
         self.check_block_locn_fields(testobj, 'extra keyword arg',
-                                     course_id='courseid', block='this_block', revision='rev')
+                                     course_id='courseid', block='this_block', branch='rev')
 
         # url w/ keyword override
-        testurn = 'crx/courseid@revision/blockid'
-        testobj = BlockUsageLocator(testurn, revision='rev')
+        testurn = 'crx/courseid@branch/blockid'
+        testobj = BlockUsageLocator(testurn, branch='rev')
         self.check_block_locn_fields(testobj, 'rev override',
                                      course_id='courseid', block='blockid',
-                                     revision='rev')
+                                     branch='rev')
 
     def test_block_keywords(self):
         # dict init w/ keyword overwrites
@@ -430,29 +430,29 @@ class LocatorTest(TestCase):
         self.check_block_locn_fields(testobj, 'courseid dict',
                                      block='dictblock', course_id='courseid')
 
-        testobj = BlockUsageLocator({"course_id": 'courseid', "revision": 'rev',
+        testobj = BlockUsageLocator({"course_id": 'courseid', "branch": 'rev',
                                      'usage_id': 'dictblock'})
         self.check_block_locn_fields(testobj, 'rev dict',
                                      course_id='courseid', block='dictblock',
-                                     revision='rev')
+                                     branch='rev')
         # ignores garbage
-        testobj = BlockUsageLocator({"course_id": 'courseid', "revision": 'rev',
+        testobj = BlockUsageLocator({"course_id": 'courseid', "branch": 'rev',
                                      'usage_id': 'dictblock', "potato": 'spud'})
         self.check_block_locn_fields(testobj, 'extra keyword dict',
                                      course_id='courseid', block='dictblock',
-                                     revision='rev')
-        testobj = BlockUsageLocator({"course_id": 'courseid', "revision": 'rev',
-                                     'usage_id': 'dictblock'}, revision='alt', usage_id='anotherblock')
+                                     branch='rev')
+        testobj = BlockUsageLocator({"course_id": 'courseid', "branch": 'rev',
+                                     'usage_id': 'dictblock'}, branch='alt', usage_id='anotherblock')
         self.check_block_locn_fields(testobj, 'rev dict',
                                      course_id='courseid', block='anotherblock',
-                                     revision='alt')
+                                     branch='alt')
 
         # urn init w/ dict & keyword overwrites
         testobj = BlockUsageLocator('crx/notcourse@notthis/northis',
-                                    {"course_id": 'courseid'}, revision='alt', usage_id='anotherblock')
+                                    {"course_id": 'courseid'}, branch='alt', usage_id='anotherblock')
         self.check_block_locn_fields(testobj, 'rev dict',
                                      course_id='courseid', block='anotherblock',
-                                     revision='alt')
+                                     branch='alt')
 
     def test_ensure_fully_specd(self):
         '''
@@ -494,7 +494,7 @@ class LocatorTest(TestCase):
         self.assertIsInstance(BlockUsageLocator.ensure_fully_specified(testurn),
                               BlockUsageLocator, testurn)
 
-        testurn = 'crx/courseid@revision/blockid'
+        testurn = 'crx/courseid@branch/blockid'
         self.assertIsInstance(BlockUsageLocator.ensure_fully_specified(testurn),
                               BlockUsageLocator, testurn)
 
@@ -505,7 +505,7 @@ class LocatorTest(TestCase):
         self.assertRaises(InsufficientSpecificationError,
                           BlockUsageLocator.ensure_fully_specified, testobj)
 
-        testurn = 'crx/courseid@revision/blockid'
+        testurn = 'crx/courseid@branch/blockid'
         testobj = BlockUsageLocator(version_guid='versionid', usage_id='myblock')
         self.assertIsInstance(BlockUsageLocator.ensure_fully_specified(testurn),
                               BlockUsageLocator, testurn)
@@ -514,11 +514,11 @@ class LocatorTest(TestCase):
         self.assertRaises(InsufficientSpecificationError,
                           BlockUsageLocator.ensure_fully_specified, testobj)
 
-        testobj = BlockUsageLocator(course_id='courseid', revision='rev')
+        testobj = BlockUsageLocator(course_id='courseid', branch='rev')
         self.assertRaises(InsufficientSpecificationError,
                           BlockUsageLocator.ensure_fully_specified, testobj)
 
-        testobj = BlockUsageLocator(course_id='courseid', revision='rev',
+        testobj = BlockUsageLocator(course_id='courseid', branch='rev',
                                     usage_id='this_block')
         self.assertIsInstance(BlockUsageLocator.ensure_fully_specified(testurn),
                               BlockUsageLocator, testurn)
@@ -527,13 +527,13 @@ class LocatorTest(TestCase):
     # Utilities
 
     def check_course_locn_fields(self, testobj, msg, version_guid=None,
-                                 course_id=None, revision=None):
+                                 course_id=None, branch=None):
         self.assertEqual(testobj.version_guid, version_guid, msg)
         self.assertEqual(testobj.course_id, course_id, msg)
-        self.assertEqual(testobj.revision, revision, msg)
+        self.assertEqual(testobj.branch, branch, msg)
 
     def check_block_locn_fields(self, testobj, msg, version_guid=None,
-                                course_id=None, revision=None, block=None):
+                                course_id=None, branch=None, block=None):
         self.check_course_locn_fields(testobj, msg, version_guid, course_id,
-                                      revision)
+                                      branch)
         self.assertEqual(testobj.usage_id, block)

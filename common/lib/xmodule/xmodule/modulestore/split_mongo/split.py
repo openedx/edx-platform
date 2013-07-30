@@ -186,8 +186,8 @@ class SplitMongoModuleStore(ModuleStoreBase):
         return the CourseDescriptor! It returns the actual db json from
         structures.
 
-        Semantics: if course_id and revision given, then it will get that revision. If
-        also give a version_guid, it will see if the current head of that revision == that guid. If not
+        Semantics: if course_id and branch given, then it will get that branch. If
+        also give a version_guid, it will see if the current head of that branch == that guid. If not
         it raises VersionConflictError (the version now differs from what it was when you got your
         reference)
 
@@ -198,19 +198,19 @@ class SplitMongoModuleStore(ModuleStoreBase):
         if not course_locator.is_fully_specified():
             raise InsufficientSpecificationError('Not fully specified: %s' % course_locator)
 
-        if course_locator.course_id is not None and course_locator.revision is not None:
+        if course_locator.course_id is not None and course_locator.branch is not None:
             # use the course_id
             index = self.course_index.find_one({'_id': course_locator.course_id})
             if index is None:
                 raise ItemNotFoundError(course_locator)
-            if course_locator.revision not in index['versions']:
+            if course_locator.branch not in index['versions']:
                 raise ItemNotFoundError(course_locator)
-            version_guid = index['versions'][course_locator.revision]
+            version_guid = index['versions'][course_locator.branch]
             if course_locator.version_guid is not None and version_guid != course_locator.version_guid:
                 # This may be a bit too touchy but it's hard to infer intent
                 raise VersionConflictError(course_locator, CourseLocator(course_locator, version_guid=version_guid))
         else:
-            # TODO should this raise an exception if revision was provided?
+            # TODO should this raise an exception if branch was provided?
             version_guid = course_locator.version_guid
 
         # cast string to ObjectId if necessary
@@ -223,29 +223,29 @@ class SplitMongoModuleStore(ModuleStoreBase):
 
         if course_locator.course_id:
             entry['course_id'] = course_locator.course_id
-            entry['revision'] = course_locator.revision
+            entry['branch'] = course_locator.branch
         return entry
 
-    def get_courses(self, revision, qualifiers=None):
+    def get_courses(self, branch, qualifiers=None):
         '''
         Returns a list of course descriptors matching any given qualifiers.
 
         qualifiers should be a dict of keywords matching the db fields or any
         legal query for mongo to use against the active_versions collection.
 
-        Note, this is to find the current head of the named revision type
+        Note, this is to find the current head of the named branch type
         (e.g., 'draft'). To get specific versions via guid use get_course.
         '''
         if qualifiers is None:
             qualifiers = {}
-        qualifiers.update({"versions.{}".format(revision): {"$exists": True}})
+        qualifiers.update({"versions.{}".format(branch): {"$exists": True}})
         matching = self.course_index.find(qualifiers)
 
         # collect ids and then query for those
         version_guids = []
         id_version_map = {}
         for course_entry in matching:
-            version_guid = course_entry['versions'][revision]
+            version_guid = course_entry['versions'][branch]
             version_guids.append(version_guid)
             id_version_map[version_guid] = course_entry['_id']
 
@@ -667,7 +667,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
 
         # update the index entry if appropriate
         if index_entry is not None:
-            self._update_head(index_entry, course_or_parent_locator.revision, new_id)
+            self._update_head(index_entry, course_or_parent_locator.branch, new_id)
             course_parent = course_or_parent_locator.as_course_locator()
         else:
             course_parent = None
@@ -786,7 +786,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
             'edited_on': datetime.datetime.utcnow(),
             'versions': versions_dict}
         new_id = self.course_index.insert(index_entry)
-        return self.get_course(CourseLocator(course_id=new_id, revision=master_version))
+        return self.get_course(CourseLocator(course_id=new_id, branch=master_version))
 
     def update_item(self, descriptor, user_id, force=False):
         """
@@ -835,7 +835,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
 
             # update the index entry if appropriate
             if index_entry is not None:
-                self._update_head(index_entry, descriptor.location.revision, new_id)
+                self._update_head(index_entry, descriptor.location.branch, new_id)
 
             # fetch and return the new item--fetching is unnecessary but a good qc step
             return self.get_item(BlockUsageLocator(descriptor.location, version_guid=new_id))
@@ -876,7 +876,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
 
             # update the index entry if appropriate
             if index_entry is not None:
-                self._update_head(index_entry, xblock.location.revision, new_id)
+                self._update_head(index_entry, xblock.location.branch, new_id)
 
             # fetch and return the new item--fetching is unnecessary but a good qc step
             return self.get_item(BlockUsageLocator(xblock.location, version_guid=new_id))
@@ -1028,9 +1028,9 @@ class SplitMongoModuleStore(ModuleStoreBase):
 
         # update the index entry if appropriate
         if index_entry is not None:
-            self._update_head(index_entry, usage_locator.revision, new_id)
+            self._update_head(index_entry, usage_locator.branch, new_id)
             result.course_id = usage_locator.course_id
-            result.revision = usage_locator.revision
+            result.branch = usage_locator.branch
 
         return result
 
@@ -1186,19 +1186,19 @@ class SplitMongoModuleStore(ModuleStoreBase):
 
         :param locator:
         """
-        if locator.course_id is None or locator.revision is None:
+        if locator.course_id is None or locator.branch is None:
             return None
         else:
             index_entry = self.course_index.find_one({'_id': locator.course_id})
             if (locator.version_guid is not None
-                and index_entry['versions'][locator.revision] != locator.version_guid
+                and index_entry['versions'][locator.branch] != locator.version_guid
                 and not force):
                 raise VersionConflictError(
                     locator,
                     CourseLocator(
                         course_id=index_entry['_id'],
-                        version_guid=index_entry['versions'][locator.revision],
-                        revision=locator.revision))
+                        version_guid=index_entry['versions'][locator.branch],
+                        branch=locator.branch))
             else:
                 return index_entry
 
@@ -1227,9 +1227,9 @@ class SplitMongoModuleStore(ModuleStoreBase):
         return False
 
 
-    def _update_head(self, index_entry, revision, new_id):
+    def _update_head(self, index_entry, branch, new_id):
         """
-        Update the active index for the given course's revision to point to new_id
+        Update the active index for the given course's branch to point to new_id
 
         :param index_entry:
         :param course_locator:
@@ -1237,4 +1237,4 @@ class SplitMongoModuleStore(ModuleStoreBase):
         """
         self.course_index.update(
             {"_id": index_entry["_id"]},
-            {"$set": {"versions.{}".format(revision): new_id}})
+            {"$set": {"versions.{}".format(branch): new_id}})
