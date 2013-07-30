@@ -175,6 +175,7 @@
   <div class="discussion-article blank-slate">
   <section class="home-header">
   <span class="label">DISCUSSION HOME:</span>
+  % if course and course.display_name_with_default:
   <h1 class="home-title">${course.display_name_with_default}</h1>
   </section>
   
@@ -220,6 +221,7 @@
   </td>
   </tr>
   </table>
+  % endif
   % endif
 
   </div>    
