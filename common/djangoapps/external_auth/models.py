@@ -4,9 +4,9 @@ WE'RE USING MIGRATIONS!
 If you make changes to this model, be sure to create an appropriate migration
 file and check it in at the same time as your model changes. To do that,
 
-1. Go to the mitx dir
-2. django-admin.py schemamigration student --auto --settings=lms.envs.dev --pythonpath=. description_of_your_change
-3. Add the migration file created in mitx/common/djangoapps/external_auth/migrations/
+1. Go to the edx-platform dir
+2. ./manage.py lms schemamigration student --auto description_of_your_change
+3. Add the migration file created in edx-platform/common/djangoapps/external_auth/migrations/
 """
 
 from django.db import models

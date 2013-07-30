@@ -9,7 +9,7 @@ function removeAsset(e){
     e.preventDefault();
 
     var that = this;
-    var msg = new CMS.Views.Prompt.Confirmation({
+    var msg = new CMS.Views.Prompt.Warning({
         title: gettext("Delete File Confirmation"),
         message: gettext("Are you sure you wish to delete this item. It cannot be reversed!\n\nAlso any content that links/refers to this item will no longer work (e.g. broken images and/or links)"),
         actions: {

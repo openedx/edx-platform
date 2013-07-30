@@ -39,7 +39,7 @@ class Command(BaseCommand):
         # added with status granted above, and add_user_with_status_unrequested
         # will not try to add them again if they already exist in the course creator database.
         for user in get_users_with_staff_role():
-            add_user_with_status_unrequested(admin, user)
+            add_user_with_status_unrequested(user)
 
         # There could be users who are not in either staff or instructor (they've
         # never actually done anything in Studio). I plan to add those as unrequested

@@ -306,6 +306,7 @@ class XmlDescriptor(XModuleDescriptor):
         org and course are optional strings that will be used in the generated modules
             url identifiers
         """
+
         xml_object = etree.fromstring(xml_data)
         # VS[compat] -- just have the url_name lookup, once translation is done
         url_name = xml_object.get('url_name', xml_object.get('slug'))
@@ -318,7 +319,8 @@ class XmlDescriptor(XModuleDescriptor):
             filepath = cls._format_filepath(xml_object.tag, name_to_pathname(url_name))
             definition_xml = cls.load_file(filepath, system.resources_fs, location)
         else:
-            definition_xml = xml_object  # this is just a pointer, not the real definition content
+            definition_xml = xml_object
+            filepath = None
 
         definition, children = cls.load_definition(definition_xml, system, location)  # note this removes metadata
 
@@ -356,6 +358,7 @@ class XmlDescriptor(XModuleDescriptor):
             if key not in set(f.name for f in cls.fields + cls.lms.fields):
                 model_data['xml_attributes'][key] = value
         model_data['location'] = location
+        model_data['category'] = xml_object.tag
 
         return cls(
             system,

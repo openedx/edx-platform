@@ -129,6 +129,13 @@ def should_have_link_with_id_and_text(step, link_id, text):
     assert_equals(link.text, text)
 
 
+@step(r'should see a link to "([^"]*)" with the text "([^"]*)"$')
+def should_have_link_with_path_and_text(step, path, text):
+    link = world.browser.find_link_by_text(text)
+    assert len(link) > 0
+    assert_equals(link.first["href"], django_url(path))
+
+
 @step(r'should( not)? see "(.*)" (?:somewhere|anywhere) (?:in|on) (?:the|this) page')
 def should_see_in_the_page(step, doesnt_appear, text):
     if doesnt_appear:
@@ -159,6 +166,11 @@ def registered_edx_user(step, uname):
 @step(u'All dialogs should be closed$')
 def dialogs_are_closed(step):
     assert world.dialogs_closed()
+
+
+@step(u'visit the url "([^"]*)"')
+def visit_url(step, url):
+    world.browser.visit(django_url(url))
 
 
 @step('I will confirm all alerts')

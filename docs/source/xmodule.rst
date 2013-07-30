@@ -109,13 +109,6 @@ Progress
     :members:
     :show-inheritance:
 
-Schematic
-=========
-
-.. automodule:: xmodule.schematic_module
-    :members:
-    :show-inheritance:
-
 Sequence
 ========
 

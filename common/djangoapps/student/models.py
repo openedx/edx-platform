@@ -6,9 +6,9 @@ Migration Notes
 If you make changes to this model, be sure to create an appropriate migration
 file and check it in at the same time as your model changes. To do that,
 
-1. Go to the mitx dir
-2. django-admin.py schemamigration student --auto --settings=lms.envs.dev --pythonpath=. description_of_your_change
-3. Add the migration file created in mitx/common/djangoapps/student/migrations/
+1. Go to the edx-platform dir
+2. ./manage.py lms schemamigration student --auto description_of_your_change
+3. Add the migration file created in edx-platform/common/djangoapps/student/migrations/
 """
 from datetime import datetime
 import hashlib
@@ -69,30 +69,33 @@ class UserProfile(models.Model):
     location = models.CharField(blank=True, max_length=255, db_index=True)
 
     # Optional demographic data we started capturing from Fall 2012
-    this_year = datetime.now().year
+    this_year = datetime.now(UTC).year
     VALID_YEARS = range(this_year, this_year - 120, -1)
     year_of_birth = models.IntegerField(blank=True, null=True, db_index=True)
     GENDER_CHOICES = (('m', 'Male'), ('f', 'Female'), ('o', 'Other'))
-    gender = models.CharField(blank=True, null=True, max_length=6, db_index=True,
-                              choices=GENDER_CHOICES)
+    gender = models.CharField(
+        blank=True, null=True, max_length=6, db_index=True, choices=GENDER_CHOICES
+    )
 
     # [03/21/2013] removed these, but leaving comment since there'll still be
     # p_se and p_oth in the existing data in db.
     # ('p_se', 'Doctorate in science or engineering'),
     # ('p_oth', 'Doctorate in another field'),
-    LEVEL_OF_EDUCATION_CHOICES = (('p', 'Doctorate'),
-                                  ('m', "Master's or professional degree"),
-                                  ('b', "Bachelor's degree"),
-                                  ('a', "Associate's degree"),
-                                  ('hs', "Secondary/high school"),
-                                  ('jhs', "Junior secondary/junior high/middle school"),
-                                  ('el', "Elementary/primary school"),
-                                  ('none', "None"),
-                                  ('other', "Other"))
+    LEVEL_OF_EDUCATION_CHOICES = (
+        ('p', 'Doctorate'),
+        ('m', "Master's or professional degree"),
+        ('b', "Bachelor's degree"),
+        ('a', "Associate's degree"),
+        ('hs', "Secondary/high school"),
+        ('jhs', "Junior secondary/junior high/middle school"),
+        ('el', "Elementary/primary school"),
+        ('none', "None"),
+        ('other', "Other")
+    )
     level_of_education = models.CharField(
-                            blank=True, null=True, max_length=6, db_index=True,
-                            choices=LEVEL_OF_EDUCATION_CHOICES
-                         )
+        blank=True, null=True, max_length=6, db_index=True,
+        choices=LEVEL_OF_EDUCATION_CHOICES
+    )
     mailing_address = models.TextField(blank=True, null=True)
     goals = models.TextField(blank=True, null=True)
     allow_certificate = models.BooleanField(default=1)
@@ -307,18 +310,18 @@ class TestCenterUserForm(ModelForm):
 ACCOMMODATION_REJECTED_CODE = 'NONE'
 
 ACCOMMODATION_CODES = (
-                      (ACCOMMODATION_REJECTED_CODE, 'No Accommodation Granted'),
-                      ('EQPMNT', 'Equipment'),
-                      ('ET12ET', 'Extra Time - 1/2 Exam Time'),
-                      ('ET30MN', 'Extra Time - 30 Minutes'),
-                      ('ETDBTM', 'Extra Time - Double Time'),
-                      ('SEPRMM', 'Separate Room'),
-                      ('SRREAD', 'Separate Room and Reader'),
-                      ('SRRERC', 'Separate Room and Reader/Recorder'),
-                      ('SRRECR', 'Separate Room and Recorder'),
-                      ('SRSEAN', 'Separate Room and Service Animal'),
-                      ('SRSGNR', 'Separate Room and Sign Language Interpreter'),
-                      )
+    (ACCOMMODATION_REJECTED_CODE, 'No Accommodation Granted'),
+    ('EQPMNT', 'Equipment'),
+    ('ET12ET', 'Extra Time - 1/2 Exam Time'),
+    ('ET30MN', 'Extra Time - 30 Minutes'),
+    ('ETDBTM', 'Extra Time - Double Time'),
+    ('SEPRMM', 'Separate Room'),
+    ('SRREAD', 'Separate Room and Reader'),
+    ('SRRERC', 'Separate Room and Reader/Recorder'),
+    ('SRRECR', 'Separate Room and Recorder'),
+    ('SRSEAN', 'Separate Room and Service Animal'),
+    ('SRSGNR', 'Separate Room and Sign Language Interpreter'),
+)
 
 ACCOMMODATION_CODE_DICT = {code: name for (code, name) in ACCOMMODATION_CODES}
 
@@ -570,7 +573,6 @@ class TestCenterRegistrationForm(ModelForm):
                 if codeval not in ACCOMMODATION_CODE_DICT:
                     raise forms.ValidationError(u'Invalid accommodation code specified: "{}"'.format(codeval))
         return code
-
 
 
 def get_testcenter_registration(user, course_id, exam_series_code):

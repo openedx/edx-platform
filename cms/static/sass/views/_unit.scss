@@ -747,6 +747,7 @@ body.unit {
 
 // Unit Page Sidebar
 .unit-settings {
+
   .window-contents {
     padding: $baseline/2 $baseline;
   }
@@ -854,6 +855,24 @@ body.unit {
 }
 
 .unit-location {
+
+  // unit id
+  .wrapper-unit-id {
+
+    .unit-id {
+
+      .label {
+        @extend .t-title7;
+        margin-bottom: ($baseline/4);
+        color: $gray-d1;
+      }
+
+      .value {
+        margin-bottom: 0;
+      }
+    }
+  }
+
   .url {
     box-shadow: none;
     width: 100%;

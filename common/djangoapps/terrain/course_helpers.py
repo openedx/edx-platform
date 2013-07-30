@@ -12,7 +12,6 @@ from django.contrib.sessions.middleware import SessionMiddleware
 from student.models import CourseEnrollment
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.django import contentstore
-from xmodule.templates import update_templates
 from urllib import quote_plus
 
 
@@ -66,7 +65,7 @@ def log_in(username, password):
 
 @world.absorb
 def register_by_course_id(course_id, is_staff=False):
-    create_user('robot')
+    create_user('robot', 'password')
     u = User.objects.get(username='robot')
     if is_staff:
         u.is_staff = True
@@ -84,5 +83,4 @@ def clear_courses():
     # from the bash shell to drop it:
     # $ mongo test_xmodule --eval "db.dropDatabase()"
     modulestore().collection.drop()
-    update_templates(modulestore('direct'))
     contentstore().fs_files.drop()

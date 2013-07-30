@@ -256,6 +256,9 @@ if SEGMENT_IO_LMS_KEY:
     MITX_FEATURES['SEGMENT_IO_LMS'] = True
 
 
+########################## USER API ########################
+EDX_API_KEY = None
+
 #####################################################################
 # Lastly, see if the developer has any local overrides.
 try:

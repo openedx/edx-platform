@@ -92,6 +92,7 @@ LOG_DIR = ENV_TOKENS['LOG_DIR']
 CACHES = ENV_TOKENS['CACHES']
 
 SESSION_COOKIE_DOMAIN = ENV_TOKENS.get('SESSION_COOKIE_DOMAIN')
+SESSION_ENGINE = ENV_TOKENS.get('SESSION_ENGINE', SESSION_ENGINE)
 
 # allow for environments to specify what cookie name our login subsystem should use
 # this is to fix a bug regarding simultaneous logins between edx.org and edge.edx.org which can
@@ -121,6 +122,10 @@ LOGGING = get_logger_config(LOG_DIR,
                             syslog_addr=(ENV_TOKENS['SYSLOG_SERVER'], 514),
                             debug=False,
                             service_variant=SERVICE_VARIANT)
+
+#theming start:
+PLATFORM_NAME = ENV_TOKENS.get('PLATFORM_NAME', 'edX')
+
 
 ################ SECURE AUTH ITEMS ###############################
 # Secret things: passwords, access keys, etc.

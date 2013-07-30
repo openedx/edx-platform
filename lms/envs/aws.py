@@ -102,8 +102,8 @@ with open(ENV_ROOT / CONFIG_PREFIX + "env.json") as env_file:
 PLATFORM_NAME = ENV_TOKENS.get('PLATFORM_NAME', PLATFORM_NAME)
 EMAIL_BACKEND = ENV_TOKENS.get('EMAIL_BACKEND', EMAIL_BACKEND)
 EMAIL_FILE_PATH = ENV_TOKENS.get('EMAIL_FILE_PATH', None)
-
 SITE_NAME = ENV_TOKENS['SITE_NAME']
+SESSION_ENGINE = ENV_TOKENS.get('SESSION_ENGINE', SESSION_ENGINE)
 SESSION_COOKIE_DOMAIN = ENV_TOKENS.get('SESSION_COOKIE_DOMAIN')
 
 # allow for environments to specify what cookie name our login subsystem should use
@@ -178,6 +178,10 @@ for name, value in ENV_TOKENS.get("CODE_JAIL", {}).items():
 
 COURSES_WITH_UNSAFE_CODE = ENV_TOKENS.get("COURSES_WITH_UNSAFE_CODE", [])
 
+# automatic log in for load testing
+MITX_FEATURES['AUTOMATIC_AUTH_FOR_LOAD_TESTING'] = ENV_TOKENS.get('AUTOMATIC_AUTH_FOR_LOAD_TESTING')
+MITX_FEATURES['MAX_AUTO_AUTH_USERS'] = ENV_TOKENS.get('MAX_AUTO_AUTH_USERS')
+
 ############################## SECURE AUTH ITEMS ###############
 # Secret things: passwords, access keys, etc.
 
@@ -225,6 +229,9 @@ ANALYTICS_API_KEY = AUTH_TOKENS.get("ANALYTICS_API_KEY", "")
 # Zendesk
 ZENDESK_USER = AUTH_TOKENS.get("ZENDESK_USER")
 ZENDESK_API_KEY = AUTH_TOKENS.get("ZENDESK_API_KEY")
+
+# API Key for inbound requests from Notifier service
+EDX_API_KEY = AUTH_TOKENS.get("EDX_API_KEY")
 
 # Celery Broker
 CELERY_BROKER_TRANSPORT = ENV_TOKENS.get("CELERY_BROKER_TRANSPORT", "")
