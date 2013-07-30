@@ -27,12 +27,38 @@ from django.utils.html import escape
 log = logging.getLogger(__name__)
 
 
+class ProblemIdChoices(object):
+    """
+    Stores a dict of possible problem id's, for Studio to display.
+    The problem is, XModule and XBlock need to access the same instance
+    of this dict.  This class provides the common scope for this to
+    happen.
+
+    Usage:
+    a = ProblemIdChoices
+    ProblemIdChoices.set_choices([1, 3])
+    a() -> [1, 3]
+    """
+
+    choices = []
+    def __new__(self):
+        """
+        Apologies for this extremely hacky 'class'.
+        """
+        return self.choices
+
+    @classmethod
+    def set_choices(cls, choices):
+        cls.choices = choices
+
+
 class CrowdsourceHinterFields(object):
     """Defines fields for the crowdsource hinter module."""
     has_children = True
 
-    problem_id = String(help='The id of the problem we are hinting for.', scope=Scope.settings,
-                        default='')
+    display_name = String(scope=Scope.settings, default='Crowdsourced Hinter')
+    target_problem = String(help='The id of the problem we are hinting for.', scope=Scope.settings,
+                            default='', values=ProblemIdChoices)
     moderate = String(help='String "True"/"False" - activates moderation', scope=Scope.settings,
                       default='False')
     debug = String(help='String "True"/"False" - allows multiple voting', scope=Scope.settings,
@@ -65,7 +91,7 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
     and no other parts.
 
     Example usage:
-    <crowdsource_hinter problem_id="i4x://my/problem/location">
+    <crowdsource_hinter target_problem="i4x://my/problem/location">
         <problem blah blah />
     </crowdsource_hinter>
 
@@ -82,11 +108,21 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
     def __init__(self, *args, **kwargs):
         XModule.__init__(self, *args, **kwargs)
         self.init_error = None
+        # Set ProblemIdChoices.  (This is for Studio.)
+        # choices_list contains dictionaries of {'display_name': readable name,
+        # 'value': system name}, each representing a choice.
+        choices_dict = []
+        all_problems = modulestore().get_items(Location(course=self.location.course, category='problem'))
+        for problem_descriptor in all_problems:
+            choices_dict.append({'display_name': problem_descriptor.display_name_with_default,
+                                 'value': str(problem_descriptor.location)})
+        ProblemIdChoices.set_choices(choices_dict)
+
         # Get the problem we are hinting for.
         try:
-            problem_loc = Location(self.problem_id)
+            problem_loc = Location(self.target_problem)
         except InvalidLocationError:
-            self.init_error = 'Invalid problem ID!'
+            self.init_error = 'Choose a target problem under Edit -> Settings.'
             return
         problem_descriptors = modulestore().get_items(problem_loc)
         try:
@@ -94,8 +130,15 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         except IndexError:
             self.init_error = 'The problem you specified could not be found!'
             return
+
+        # Find the responder for this problem,
+        try:
+            responder = self.problem_module.lcp.responders.values()[0]
+        except IndexError:
+            self.init_error = 'The problem you specified does not have any response blanks!'
+            return
+
         # We need to know whether we are working with a FormulaResponse problem.
-        responder = self.problem_module.lcp.responders.values()[0]
         self.is_formula = isinstance(self, FormulaResponse)
         if self.is_formula:
             self.answer_to_str = self.formula_answer_to_str
@@ -108,7 +151,8 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
             self.validate_answer = responder.validate_answer
         else:
             # This response type is not supported!
-            log.exception('Response type not supported for hinting: ' + str(responder))
+            self.init_error = 'Response type not supported for hinting.'
+            log.exception(self.init_error)
 
     def get_html(self):
         """
@@ -127,7 +171,9 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
             self.hints
         except TypeError:
             # We're in studio mode.
-            return 'The crowdsourced hinting module appears to be set up correctly.'
+            return '''This is a crowdsourced hinting module for {name}.  This message is only
+                visible in Studio - your students will see the actual hinting module.'''.format(
+                name=self.problem_module.display_name_with_default)
         else:
             if self.debug == 'True':
                 # Reset the user vote, for debugging only!

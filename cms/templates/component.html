@@ -4,16 +4,6 @@
 <script type="text/javascript" src="${static.url('js/models/metadata_model.js')}"></script>
 <script type="text/javascript" src="${static.url('js/views/metadata_editor_view.js')}"></script>
 <script src="${static.url('js/vendor/html5-input-polyfills/number-polyfill.js')}"></script>
-<script type="text/javascript">
-    $(document).ready(function() {
-        // Print out the problem url.  We will need a less obtuse way
-        // to do this eventually.
-        $('.component-id-display').each(function(idx, element){
-            var id = $(element).parent().parent().data('id');
-            $(element).html(' ' + id);
-        });
-    });
-</script>
 <link rel="stylesheet" type="text/css" href="${static.url('css/vendor/html5-input-polyfills/number-polyfill.css')}" />
 
 <div class="wrapper wrapper-component-editor">
@@ -45,7 +35,6 @@
 <div class="component-actions">
   <a href="#" class="edit-button standard"><span class="edit-icon"></span>${_("Edit")}</a>
   <a href="#" class="delete-button standard"><span class="delete-icon"></span>${_("Delete")}</a>
-  <span class="component-id-display"> </span>
 </div>
 <a data-tooltip='${_("Drag to reorder")}' href="#" class="drag-handle"></a>
 ${preview}
