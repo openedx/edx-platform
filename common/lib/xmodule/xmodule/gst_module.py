@@ -92,18 +92,22 @@ class GraphicalSliderToolModule(GraphicalSliderToolFields, XModule):
     css = {'scss': [resource_string(__name__, 'css/gst/display.scss')]}
     js_module_name = "GraphicalSliderTool"
 
+    @property
+    def configuration(self):
+        return stringify_children(
+            html.fromstring(self.data).xpath('configuration')[0])
+
+    @property
+    def render(self):
+        return stringify_children(
+            html.fromstring(self.data).xpath('render')[0])
+
     def get_html(self):
         """ Renders parameters to template. """
 
         # these 3 will be used in class methods
         self.html_id = self.location.html_id()
         self.html_class = self.location.category
-
-        self.configuration = html.fromstring(self.data).xpath('configuration')[0]
-        self.configuration = stringify_children(self.configuration)
-
-        self.render = html.fromstring(self.data).xpath('render')[0]
-        self.render = stringify_children(self.render)
 
         self.configuration_json = self.build_configuration_json()
         params = {
