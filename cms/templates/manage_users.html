@@ -10,7 +10,7 @@
 <div class="wrapper-mast wrapper">
   <header class="mast has-actions has-subtitle">
     <h1 class="page-header">
-      <small class="subtitle">${_("Course Settings")}</small>
+      <small class="subtitle">${_("Settings")}</small>
       <span class="sr">&gt; </span>${_("Course Team")}
     </h1>
 
@@ -29,13 +29,6 @@
 
 <div class="wrapper-content wrapper">
   <section class="content">
-    <div class="introduction">
-      <h2 class="title sr">Managing Your Course Team</h2>
-      <div class="copy">
-        <p>${_("[Introduction Message - Mark to Provide Copy.] Maecenas faucibus mollis interdum. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla vitae elit libero, a pharetra augue.")}</p>
-      </div>
-    </div>
-
     <article class="content-primary" role="main">
       %if allow_actions:
       <div class="wrapper-create-element animate wrapper-create-user">
@@ -111,7 +104,7 @@
           <ul  class="item-actions user-actions">
             <li class="action action-role">
               % if is_instuctor and len(instructors) == 1:
-                <span class="admin-role notoggleforyou">${_("Promote another member to remove admin access")}</span>
+                <span class="admin-role notoggleforyou">${_("Promote another member to Admin to remove your admin rights")}</span>
               % else:
                 <a href="#" class="admin-role toggle-admin-role ${'remove' if is_instuctor else 'add'}-admin-role">${_("Remove Admin Access") if is_instuctor else _("Add Admin Access")}</a>
               % endif
@@ -131,7 +124,7 @@
         <div class="msg">
           <h3 class="title">${_('Add Team Members to This Course')}</h3>
           <div class="copy">
-            <p>${_('[Mark to provide copy] Adding team members helps you author and maintain your course. Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.')}</p>
+            <p>${_('Adding team members makes course authoring collaborative. Users must be signed up for Studio and have an active account. ')}</p>
           </div>
         </div>
 
@@ -147,14 +140,14 @@
     <aside class="content-supplementary" role="complimentary">
       <div class="bit">
         <h3 class="title-3">${_("About Roles within Your Course Team")}</h3>
-        <p>${_("[Mark to provide copy] Maecenas faucibus mollis interdum. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla vitae elit libero, a pharetra augue.")}</p>
+        <p>${_("Course team members are co-authors (staff). They have full access to all the content in the course and all the same editing privileges. Admins have the unique ability to add and remove course team members.")}</p>
       </div>
 
       <% user_is_instuctor = is_user_in_course_group_role(request.user, context_course.location, 'instructor', check_staff=False) %>
       % if user_is_instuctor and len(instructors) == 1:
       <div class="bit">
         <h3 class="title-3">${_("Tranferring Ownership")}</h3>
-        <p>${_("[Mark to provide copy] Maecenas faucibus mollis interdum. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.")}</p>
+        <p>${_("There must always be an Admin assigned to every course. To transfer your ownership of the course, add Admin access to another user and request they remove you from the Course Team list.")}</p>
       </div>
       % endif
     </aside>
