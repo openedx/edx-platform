@@ -92,9 +92,10 @@ def render_to_string(template_name, dictionary, context=None, namespace='main'):
     return template.render_unicode(**context_dictionary)
 
 
-def render_to_response(template_name, dictionary, context_instance=None, namespace='main', **kwargs):
+def render_to_response(template_name, dictionary=None, context_instance=None, namespace='main', **kwargs):
     """
     Returns a HttpResponse whose content is filled with the result of calling
     lookup.get_template(args[0]).render with the passed arguments.
     """
+    dictionary = dictionary or {}
     return HttpResponse(render_to_string(template_name, dictionary, context_instance, namespace), **kwargs)
