@@ -18,6 +18,9 @@ the setting is not present, the API is disabled).
 LMS: Added endpoints for AJAX requests to enable/disable notifications
 (which are not yet implemented) and a one-click unsubscribe page.
 
+Studio: Allow instructors of a course to designate other staff as instructors;
+this allows instructors to hand off management of a course to someone else.
+
 Common: Add a manage.py that knows about edx-platform specific settings and projects
 
 Common: Added *experimental* support for jsinput type.

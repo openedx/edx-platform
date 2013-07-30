@@ -16,7 +16,11 @@ def create_component_instance(step, component_button_css, category,
     if has_multiple_templates:
         click_component_from_menu(category, boilerplate, expected_css)
 
-    assert_equal(1, len(world.css_find(expected_css)))
+    assert_equal(
+        1,
+        len(world.css_find(expected_css)),
+        "Component instance with css {css} was not created successfully".format(css=expected_css))
+
 
 @world.absorb
 def click_new_component_button(step, component_button_css):

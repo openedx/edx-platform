@@ -1167,7 +1167,9 @@ class ContentStoreTest(ModuleStoreTestCase):
 
         # manage users
         resp = self.client.get(reverse('manage_users',
-                                       kwargs={'location': loc.url()}))
+                                       kwargs={'org': loc.org,
+                                               'course': loc.course,
+                                               'name': loc.name}))
         self.assertEqual(200, resp.status_code)
 
         # course info
