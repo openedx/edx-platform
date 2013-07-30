@@ -3,7 +3,7 @@ Access control operations for use by instructor APIs.
 
 Does not include any access control, be sure to check access before calling.
 
-TODO sync instructor and staff flags
+TO DO sync instructor and staff flags
     e.g. should these be possible?
         {instructor: true, staff: false}
         {instructor: true, staff: true}

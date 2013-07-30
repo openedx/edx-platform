@@ -103,9 +103,10 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.notregistered_email = 'robot-not-an-email-yet@robot.org'
         self.assertEqual(User.objects.filter(email=self.notregistered_email).count(), 0)
 
-        # enable printing of large diffs
+        # uncomment to enable enable printing of large diffs
         # from failed assertions in the event of a test failure.
-        self.maxDiff = None
+        # (comment because pylint C0103)
+        # self.maxDiff = None
 
     def test_missing_params(self):
         """ Test missing all query parameters. """
@@ -605,11 +606,12 @@ class TestInstructorAPITaskLists(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """ Fake task object """
         FEATURES = ['task_type', 'task_input', 'task_id', 'requester', 'created', 'task_state']
 
-        def __init__(self, i):
+        def __init__(self):
             for feature in self.FEATURES:
                 setattr(self, feature, 'expected')
 
         def to_dict(self):
+            """ Convert fake task to dictionary representation. """
             return {key: 'expected' for key in self.FEATURES}
 
     def setUp(self):
@@ -631,7 +633,7 @@ class TestInstructorAPITaskLists(ModuleStoreTestCase, LoginEnrollmentTestCase):
             state=json.dumps({'attempts': 10}),
         )
 
-        self.tasks = [self.FakeTask(i) for i in xrange(6)]
+        self.tasks = [self.FakeTask() for _ in xrange(6)]
 
     def test_list_instructor_tasks_running(self):
         """ Test list of all running tasks. """

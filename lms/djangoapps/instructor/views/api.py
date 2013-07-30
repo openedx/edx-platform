@@ -3,7 +3,7 @@ Instructor Dashboard API views
 
 JSON views which the instructor dashboard requests.
 
-TODO a lot of these GETs should be PUTs
+Many of these GETs may become PUTs in the future.
 """
 
 import re
@@ -41,7 +41,7 @@ def common_exceptions_400(func):
     Catches common exceptions and renders matching 400 errors.
     (decorator without arguments)
     """
-    def wrapped(*args, **kwargs):
+    def wrapped(*args, **kwargs):  # pylint: disable=C0111
         try:
             return func(*args, **kwargs)
         except User.DoesNotExist:
@@ -65,8 +65,8 @@ def require_query_params(*args, **kwargs):
     required_params += [(key, kwargs[key]) for key in kwargs]
     # required_params = e.g. [('action', 'enroll or unenroll'), ['emails', None]]
 
-    def decorator(func):
-        def wrapped(*args, **kwargs):
+    def decorator(func):  # pylint: disable=C0111
+        def wrapped(*args, **kwargs):  # pylint: disable=C0111
             request = args[0]
 
             error_response_data = {
@@ -108,8 +108,8 @@ def require_level(level):
     if level not in ['instructor', 'staff']:
         raise ValueError("unrecognized level '{}'".format(level))
 
-    def decorator(func):
-        def wrapped(*args, **kwargs):
+    def decorator(func):  # pylint: disable=C0111
+        def wrapped(*args, **kwargs):  # pylint: disable=C0111
             request = args[0]
             course = get_course_by_id(kwargs['course_id'])
 
@@ -339,14 +339,14 @@ def get_grading_config(request, course_id):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-def get_students_features(request, course_id, csv=False):
+def get_students_features(request, course_id, csv=False):  # pylint: disable=W0613
     """
     Respond with json which contains a summary of all enrolled students profile information.
 
     Responds with JSON
         {"students": [{-student-info-}, ...]}
 
-    TODO accept requests for different attribute sets.
+    TO DO accept requests for different attribute sets.
     """
     available_features = analytics.basic.AVAILABLE_FEATURES
     query_features = ['username', 'name', 'email', 'language', 'location', 'year_of_birth', 'gender',
@@ -382,8 +382,6 @@ def get_distribution(request, course_id):
     If no `feature` is supplied, will return response with an
         empty response['feature_results'] object.
     A list of available will be available in the response['available_features']
-
-    TODO respond to csv requests as well
     """
     feature = request.GET.get('feature')
     # alternate notations of None
@@ -392,9 +390,9 @@ def get_distribution(request, course_id):
     else:
         feature = str(feature)
 
-    AVAILABLE_FEATURES = analytics.distributions.AVAILABLE_PROFILE_FEATURES
+    available_features = analytics.distributions.AVAILABLE_PROFILE_FEATURES
     # allow None so that requests for no feature can list available features
-    if not feature in AVAILABLE_FEATURES + (None,):
+    if not feature in available_features + (None,):
         return HttpResponseBadRequest(
             "feature '{}' not available.".format(feature)
         )
@@ -402,7 +400,7 @@ def get_distribution(request, course_id):
     response_payload = {
         'course_id': course_id,
         'queried_feature': feature,
-        'available_features': AVAILABLE_FEATURES,
+        'available_features': available_features,
         'feature_display_names': analytics.distributions.DISPLAY_NAMES,
     }
 
@@ -518,7 +516,7 @@ def reset_student_attempts(request, course_id):
         except StudentModule.DoesNotExist:
             return HttpResponseBadRequest("Module does not exist.")
     elif all_students:
-        task = instructor_task.api.submit_reset_problem_attempts_for_all_students(request, course_id, module_state_key)
+        instructor_task.api.submit_reset_problem_attempts_for_all_students(request, course_id, module_state_key)
         response_payload['task'] = 'created'
     else:
         return HttpResponseBadRequest()
@@ -566,10 +564,10 @@ def rescore_problem(request, course_id):
     if student_email:
         response_payload['student_email'] = student_email
         student = User.objects.get(email=student_email)
-        task = instructor_task.api.submit_rescore_problem_for_student(request, course_id, module_state_key, student)
+        instructor_task.api.submit_rescore_problem_for_student(request, course_id, module_state_key, student)
         response_payload['task'] = 'created'
     elif all_students:
-        task = instructor_task.api.submit_rescore_problem_for_all_students(request, course_id, module_state_key)
+        instructor_task.api.submit_rescore_problem_for_all_students(request, course_id, module_state_key)
         response_payload['task'] = 'created'
     else:
         return HttpResponseBadRequest()
@@ -614,8 +612,8 @@ def list_instructor_tasks(request, course_id):
 
     def extract_task_features(task):
         """ Convert task to dict for json rendering """
-        FEATURES = ['task_type', 'task_input', 'task_id', 'requester', 'created', 'task_state']
-        return dict((feature, str(getattr(task, feature))) for feature in FEATURES)
+        features = ['task_type', 'task_input', 'task_id', 'requester', 'created', 'task_state']
+        return dict((feature, str(getattr(task, feature))) for feature in features)
 
     response_payload = {
         'tasks': map(extract_task_features, tasks),

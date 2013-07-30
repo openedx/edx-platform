@@ -12,10 +12,7 @@ from django.http import Http404
 from courseware.access import has_access
 from courseware.courses import get_course_by_id
 from django_comment_client.utils import has_forum_access
-from django_comment_common.models import (Role,
-                                          FORUM_ROLE_ADMINISTRATOR,
-                                          FORUM_ROLE_MODERATOR,
-                                          FORUM_ROLE_COMMUNITY_TA)
+from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
 from xmodule.modulestore.django import modulestore
 from student.models import CourseEnrollment
 
@@ -64,9 +61,9 @@ The dictionary must include at least {
     'section_display_name': 'Circus Expo'
 }
 
+section_key will be used as a css attribute, javascript tie-in, and template import filename.
 section_display_name will be used to generate link titles in the nav bar.
-sek will be used as a css attribute, javascript tie-in, and template import filename.
-"""
+"""  # pylint: disable=W0105
 
 
 def _section_course_info(course_id):
@@ -81,16 +78,16 @@ def _section_course_info(course_id):
     section_data['enrollment_count'] = CourseEnrollment.objects.filter(course_id=course_id).count()
     section_data['has_started'] = course.has_started()
     section_data['has_ended'] = course.has_ended()
+
     try:
-        def next(memo, (letter, score)):
-            return "{}: {}, ".format(letter, score) + memo
-        section_data['grade_cutoffs'] = reduce(next, course.grade_cutoffs.items(), "")[:-2]
-    except:
+        advance = lambda memo, (letter, score): "{}: {}, ".format(letter, score) + memo
+        section_data['grade_cutoffs'] = reduce(advance, course.grade_cutoffs.items(), "")[:-2]
+    except Exception:
         section_data['grade_cutoffs'] = "Not Available"
     # section_data['offline_grades'] = offline_grades_available(course_id)
 
     try:
-        section_data['course_errors'] = [(escape(a), '') for (a, b) in modulestore().get_item_errors(course.location)]
+        section_data['course_errors'] = [(escape(a), '') for (a, _) in modulestore().get_item_errors(course.location)]
     except Exception:
         section_data['course_errors'] = [('Error fetching errors', '')]
 

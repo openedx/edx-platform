@@ -56,6 +56,11 @@ class ProfileDistribution(object):
         self.feature = feature
         self.feature_display_name = DISPLAY_NAMES.get(feature, feature)
 
+        # to be set later
+        self.type = None
+        self.data = None
+        self.choices_display_names = None
+
     def validate(self):
         """
         Validate this profile distribution.
@@ -63,6 +68,7 @@ class ProfileDistribution(object):
         Throws ProfileDistribution.ValidationError
         """
         def validation_assert(predicate):
+            """ Throw a ValidationError if false. """
             if not predicate:
                 raise ProfileDistribution.ValidationError()
 

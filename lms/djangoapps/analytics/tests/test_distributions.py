@@ -45,7 +45,8 @@ class TestAnalyticsDistributions(TestCase):
         distribution = profile_distribution(self.course_id, feature)
         print distribution
         self.assertEqual(distribution.type, 'OPEN_CHOICE')
-        self.assertFalse(hasattr(distribution, 'choices_display_names'))
+        self.assertTrue(hasattr(distribution, 'choices_display_names'))
+        self.assertEqual(distribution.choices_display_names, None)
         self.assertNotIn('no_data', distribution.data)
         self.assertEqual(distribution.data[1930], 1)
 
@@ -76,6 +77,7 @@ class TestAnalyticsDistributionsNoData(TestCase):
         print distribution
         self.assertEqual(distribution.type, 'EASY_CHOICE')
         self.assertTrue(hasattr(distribution, 'choices_display_names'))
+        self.assertNotEqual(distribution.choices_display_names, None)
         self.assertIn('no_data', distribution.data)
         self.assertEqual(distribution.data['no_data'], len(self.nodata_users))
 
@@ -85,6 +87,7 @@ class TestAnalyticsDistributionsNoData(TestCase):
         distribution = profile_distribution(self.course_id, feature)
         print distribution
         self.assertEqual(distribution.type, 'OPEN_CHOICE')
-        self.assertFalse(hasattr(distribution, 'choices_display_names'))
+        self.assertTrue(hasattr(distribution, 'choices_display_names'))
+        self.assertEqual(distribution.choices_display_names, None)
         self.assertIn('no_data', distribution.data)
         self.assertEqual(distribution.data['no_data'], len(self.nodata_users))

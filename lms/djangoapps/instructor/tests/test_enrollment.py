@@ -30,8 +30,9 @@ class TestSettableEnrollmentState(TestCase):
             allowed=False,
             auto_enroll=False
         )
-        email, user, cenr, cea = mes.create_user(self.course_id)
-        ees = EmailEnrollmentState(self.course_id, email)
+        # enrollment objects
+        eobjs = mes.create_user(self.course_id)
+        ees = EmailEnrollmentState(self.course_id, eobjs.email)
         self.assertEqual(mes, ees)
 
 
@@ -58,23 +59,20 @@ class TestEnrollmentChangeBase(TestCase):
             `action` should transition the world from before_ideal to after_ideal
             `action` will be supplied the following arguments (None-able arguments)
                 `email` is an email string
-                `user` is a User
-                `cenr` is a CourseEnrollment
-                `cea` is a CourseEnrollmentAllowed
         """
         # initialize & check before
         print "checking initialization..."
-        email, user, cenr, cea = before_ideal.create_user(self.course_id)
-        before = EmailEnrollmentState(self.course_id, email)
+        eobjs = before_ideal.create_user(self.course_id)
+        before = EmailEnrollmentState(self.course_id, eobjs.email)
         self.assertEqual(before, before_ideal)
 
         # do action
         print "running action..."
-        action(email, user, cenr, cea)
+        action(eobjs.email)
 
         # check after
         print "checking effects..."
-        after = EmailEnrollmentState(self.course_id, email)
+        after = EmailEnrollmentState(self.course_id, eobjs.email)
         self.assertEqual(after, after_ideal)
 
 
@@ -95,8 +93,7 @@ class TestInstructorEnrollDB(TestEnrollmentChangeBase):
             auto_enroll=False
         )
 
-        def action(email, user, cenr, cea):
-            enroll_email(self.course_id, email)
+        action = lambda email: enroll_email(self.course_id, email)
 
         return self._run_state_change_test(before_ideal, after_ideal, action)
 
@@ -115,8 +112,7 @@ class TestInstructorEnrollDB(TestEnrollmentChangeBase):
             auto_enroll=False,
         )
 
-        def action(email, user, cenr, cea):
-            enroll_email(self.course_id, email)
+        action = lambda email: enroll_email(self.course_id, email)
 
         return self._run_state_change_test(before_ideal, after_ideal, action)
 
@@ -135,8 +131,7 @@ class TestInstructorEnrollDB(TestEnrollmentChangeBase):
             auto_enroll=False,
         )
 
-        def action(email, user, cenr, cea):
-            enroll_email(self.course_id, email)
+        action = lambda email: enroll_email(self.course_id, email)
 
         return self._run_state_change_test(before_ideal, after_ideal, action)
 
@@ -155,8 +150,7 @@ class TestInstructorEnrollDB(TestEnrollmentChangeBase):
             auto_enroll=False,
         )
 
-        def action(email, user, cenr, cea):
-            enroll_email(self.course_id, email)
+        action = lambda email: enroll_email(self.course_id, email)
 
         return self._run_state_change_test(before_ideal, after_ideal, action)
 
@@ -175,8 +169,7 @@ class TestInstructorEnrollDB(TestEnrollmentChangeBase):
             auto_enroll=True,
         )
 
-        def action(email, user, cenr, cea):
-            enroll_email(self.course_id, email, auto_enroll=True)
+        action = lambda email: enroll_email(self.course_id, email, auto_enroll=True)
 
         return self._run_state_change_test(before_ideal, after_ideal, action)
 
@@ -195,8 +188,7 @@ class TestInstructorEnrollDB(TestEnrollmentChangeBase):
             auto_enroll=False,
         )
 
-        def action(email, user, cenr, cea):
-            enroll_email(self.course_id, email, auto_enroll=False)
+        action = lambda email: enroll_email(self.course_id, email, auto_enroll=False)
 
         return self._run_state_change_test(before_ideal, after_ideal, action)
 
@@ -218,8 +210,7 @@ class TestInstructorUnenrollDB(TestEnrollmentChangeBase):
             auto_enroll=False
         )
 
-        def action(email, user, cenr, cea):
-            unenroll_email(self.course_id, email)
+        action = lambda email: unenroll_email(self.course_id, email)
 
         return self._run_state_change_test(before_ideal, after_ideal, action)
 
@@ -238,8 +229,7 @@ class TestInstructorUnenrollDB(TestEnrollmentChangeBase):
             auto_enroll=False
         )
 
-        def action(email, user, cenr, cea):
-            unenroll_email(self.course_id, email)
+        action = lambda email: unenroll_email(self.course_id, email)
 
         return self._run_state_change_test(before_ideal, after_ideal, action)
 
@@ -258,8 +248,7 @@ class TestInstructorUnenrollDB(TestEnrollmentChangeBase):
             auto_enroll=False
         )
 
-        def action(email, user, cenr, cea):
-            unenroll_email(self.course_id, email)
+        action = lambda email: unenroll_email(self.course_id, email)
 
         return self._run_state_change_test(before_ideal, after_ideal, action)
 
@@ -278,8 +267,7 @@ class TestInstructorUnenrollDB(TestEnrollmentChangeBase):
             auto_enroll=False
         )
 
-        def action(email, user, cenr, cea):
-            unenroll_email(self.course_id, email)
+        action = lambda email: unenroll_email(self.course_id, email)
 
         return self._run_state_change_test(before_ideal, after_ideal, action)
 
@@ -310,6 +298,24 @@ class TestInstructorEnrollmentStudentModule(TestCase):
         self.assertEqual(StudentModule.objects.filter(student=user, course_id=self.course_id, module_state_key=msk).count(), 0)
 
 
+class EnrollmentObjects(object):
+    """
+    Container for enrollment objects.
+
+    `email` - student email
+    `user` - student User object
+    `cenr` - CourseEnrollment object
+    `cea` - CourseEnrollmentAllowed object
+
+    Any of the objects except email can be None.
+    """
+    def __init__(self, email, user, cenr, cea):
+        self.email = email
+        self.user = user
+        self.cenr = cenr
+        self.cea = cea
+
+
 class SettableEnrollmentState(EmailEnrollmentState):
     """
     Settable enrollment state.
@@ -318,7 +324,7 @@ class SettableEnrollmentState(EmailEnrollmentState):
         a call to create_user will make objects which
         correspond to the state represented in the SettableEnrollmentState.
     """
-    def __init__(self, user=False, enrollment=False, allowed=False, auto_enroll=False):
+    def __init__(self, user=False, enrollment=False, allowed=False, auto_enroll=False):  # pylint: disable=W0231
         self.user = user
         self.enrollment = enrollment
         self.allowed = allowed
@@ -351,15 +357,15 @@ class SettableEnrollmentState(EmailEnrollmentState):
                     user=user,
                     course_id=course_id
                 )
-                return (email, user, cenr, None)
+                return EnrollmentObjects(email, user, cenr, None)
             else:
-                return (email, user, None, None)
+                return EnrollmentObjects(email, user, None, None)
         elif self.allowed:
             cea = CourseEnrollmentAllowed.objects.create(
                 email=email,
                 course_id=course_id,
                 auto_enroll=self.auto_enroll,
             )
-            return (email, None, None, cea)
+            return EnrollmentObjects(email, None, None, cea)
         else:
-            return (email, None, None, None)
+            return EnrollmentObjects(email, None, None, None)

@@ -11,8 +11,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from django.test.utils import override_settings
 from courseware.tests.modulestore_config import TEST_DATA_MONGO_MODULESTORE
 
-from courseware.access import (get_access_group_name,
-                               course_beta_test_group_name)
+from courseware.access import get_access_group_name
 from django_comment_common.models import (Role,
                                           FORUM_ROLE_MODERATOR)
 from instructor.access import (allow_access,
