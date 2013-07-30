@@ -13,7 +13,6 @@ For most subclassing needs, you should only need to reimplement
 frac() and __str__().
 '''
 
-from collections import namedtuple
 import numbers
 
 
@@ -147,7 +146,7 @@ class Progress(object):
         sending Progress objects to js to limit dependencies.
         '''
         if progress is None:
-            return "NA"
+            return "0"
         return progress.ternary_str()
 
     @staticmethod
@@ -158,5 +157,5 @@ class Progress(object):
         passing Progress objects to js to limit dependencies.
         '''
         if progress is None:
-            return "NA"
+            return "0"
         return str(progress)

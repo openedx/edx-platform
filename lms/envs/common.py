@@ -21,7 +21,7 @@ Longer TODO:
 
 # We intentionally define lots of variables that aren't used, and
 # want to import all variables from base settings files
-# pylint: disable=W0401, W0614
+# pylint: disable=W0401, W0611, W0614
 
 import sys
 import os
@@ -37,7 +37,6 @@ PLATFORM_NAME = "edX"
 COURSEWARE_ENABLED = True
 ENABLE_JASMINE = False
 
-GENERATE_RANDOM_USER_CREDENTIALS = False
 PERFSTATS = False
 
 DISCUSSION_SETTINGS = {
@@ -72,6 +71,9 @@ MITX_FEATURES = {
 
     'ENABLE_TEXTBOOK': True,
     'ENABLE_DISCUSSION_SERVICE': True,
+    # discussion home panel, which includes a subscription on/off setting for discussion digest emails.
+    # this should remain off in production until digest notifications are online. 
+    'ENABLE_DISCUSSION_HOME_PANEL': True,
 
     'ENABLE_PSYCHOMETRICS': False,  # real-time psychometrics (eg item response theory analysis in instructor dashboard)
 
@@ -91,9 +93,24 @@ MITX_FEATURES = {
     'AUTH_USE_OPENID': False,
     'AUTH_USE_MIT_CERTIFICATES': False,
     'AUTH_USE_OPENID_PROVIDER': False,
+    'AUTH_USE_SHIB': False,
+
+    # This flag disables the requirement of having to agree to the TOS for users registering
+    # with Shib.  Feature was requested by Stanford's office of general counsel
+    'SHIB_DISABLE_TOS': False,
+
+    # Enables ability to restrict enrollment in specific courses by the user account login method
+    'RESTRICT_ENROLL_BY_REG_METHOD': False,
 
     # analytics experiments
     'ENABLE_INSTRUCTOR_ANALYTICS': False,
+
+    # enable analytics server.
+    # WARNING: THIS SHOULD ALWAYS BE SET TO FALSE UNDER NORMAL
+    # LMS OPERATION. See analytics.py for details about what
+    # this does.
+
+    'RUN_AS_ANALYTICS_SERVER_ENABLED': False,
 
     # Flip to True when the YouTube iframe API breaks (again)
     'USE_YOUTUBE_OBJECT_API': False,
@@ -126,6 +143,16 @@ MITX_FEATURES = {
 
     # Enable instructor dash to submit background tasks
     'ENABLE_INSTRUCTOR_BACKGROUND_TASKS': True,
+
+    # Allow use of the hint managment instructor view.
+    'ENABLE_HINTER_INSTRUCTOR_VIEW': False,
+
+    # for load testing
+    'AUTOMATIC_AUTH_FOR_LOAD_TESTING': False,
+
+    # Toggle to enable chat availability (configured on a per-course
+    # basis in Studio)
+    'ENABLE_CHAT': False
 }
 
 # Used for A/B testing
@@ -196,7 +223,6 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.messages.context_processors.messages',
     #'django.core.context_processors.i18n',
     'django.contrib.auth.context_processors.auth',  # this is required for admin
-    'django.core.context_processors.csrf',  # necessary for csrf protection
 
     # Added for django-wiki
     'django.core.context_processors.media',
@@ -208,6 +234,10 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     # Hack to get required link URLs to password reset templates
     'mitxmako.shortcuts.marketing_link_context_processor',
 )
+
+# add csrf support unless disabled for load testing
+if not MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_LOAD_TESTING'):
+    TEMPLATE_CONTEXT_PROCESSORS += ('django.core.context_processors.csrf',)  # necessary for csrf protection
 
 STUDENT_FILEUPLOAD_MAX_SIZE = 4 * 1000 * 1000  # 4 MB
 MAX_FILEUPLOADS_PER_INPUT = 20
@@ -290,6 +320,8 @@ CODE_JAIL = {
     'limits': {
         # How many CPU seconds can jailed code use?
         'CPU': 1,
+        # How large a file can jailed code write?
+        'FSIZE': 50000,
     },
 }
 
@@ -445,7 +477,6 @@ MIDDLEWARE_CLASSES = (
     'django_comment_client.middleware.AjaxExceptionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
 
     # Instead of AuthenticationMiddleware, we use a cached backed version
     #'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -463,6 +494,10 @@ MIDDLEWARE_CLASSES = (
     'django_comment_client.utils.ViewNameMiddleware',
     'codejail.django_integration.ConfigureCodeJailMiddleware',
 )
+
+# add in csrf middleware unless disabled for load testing
+if not MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_LOAD_TESTING'):
+    MIDDLEWARE_CLASSES = MIDDLEWARE_CLASSES + ('django.middleware.csrf.CsrfViewMiddleware',)
 
 ############################### Pipeline #######################################
 
@@ -539,6 +574,7 @@ PIPELINE_JS = {
             'js/toggle_login_modal.js',
             'js/sticky_filter.js',
             'js/query-params.js',
+            'js/utility.js',
         ],
         'output_filename': 'js/lms-application.js',
 
@@ -689,7 +725,6 @@ INSTALLED_APPS = (
     'student',
     'static_template_view',
     'staticbook',
-    'simplewiki',
     'track',
     'util',
     'certificates',
@@ -699,6 +734,10 @@ INSTALLED_APPS = (
     'psychometrics',
     'licenses',
     'course_groups',
+
+    # External auth (OpenID, shib)
+    'external_auth',
+    'django_openid_auth',
 
     #For the wiki
     'wiki',  # The new django-wiki from benjaoming
@@ -722,6 +761,13 @@ INSTALLED_APPS = (
     'django_comment_client',
     'django_comment_common',
     'notes',
+
+    # User API
+    'rest_framework',
+    'user_api',
+
+    # Notification preferences setting
+    'notification_prefs',
 )
 
 ######################### MARKETING SITE ###############################

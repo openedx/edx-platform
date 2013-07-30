@@ -1,6 +1,5 @@
 from xmodule.modulestore import Location
 from contentstore.utils import get_modulestore
-from xmodule.x_module import XModuleDescriptor
 from xmodule.modulestore.inheritance import own_metadata
 from xblock.core import Scope
 from xmodule.course_module import CourseDescriptor
@@ -62,21 +61,24 @@ class CourseMetadata(object):
         if not filter_tabs:
             filtered_list.remove("tabs")
 
-        for k, v in jsondict.iteritems():
+        for key, val in jsondict.iteritems():
             # should it be an error if one of the filtered list items is in the payload?
-            if k in filtered_list:
+            if key in filtered_list:
                 continue
 
-            if hasattr(descriptor, k) and getattr(descriptor, k) != v:
+            if hasattr(descriptor, key) and getattr(descriptor, key) != val:
                 dirty = True
-                value = getattr(CourseDescriptor, k).from_json(v)
-                setattr(descriptor, k, value)
-            elif hasattr(descriptor.lms, k) and getattr(descriptor.lms, k) != k:
+                value = getattr(CourseDescriptor, key).from_json(val)
+                setattr(descriptor, key, value)
+            elif hasattr(descriptor.lms, key) and getattr(descriptor.lms, key) != key:
                 dirty = True
-                value = getattr(CourseDescriptor.lms, k).from_json(v)
-                setattr(descriptor.lms, k, value)
+                value = getattr(CourseDescriptor.lms, key).from_json(val)
+                setattr(descriptor.lms, key, value)
 
         if dirty:
+            # Save the data that we've just changed to the underlying
+            # MongoKeyValueStore before we update the mongo datastore.
+            descriptor.save()
             get_modulestore(course_location).update_metadata(course_location,
                                                              own_metadata(descriptor))
 
@@ -97,6 +99,10 @@ class CourseMetadata(object):
                 delattr(descriptor, key)
             elif hasattr(descriptor.lms, key):
                 delattr(descriptor.lms, key)
+
+        # Save the data that we've just changed to the underlying
+        # MongoKeyValueStore before we update the mongo datastore.
+        descriptor.save()
 
         get_modulestore(course_location).update_metadata(course_location,
                                                          own_metadata(descriptor))

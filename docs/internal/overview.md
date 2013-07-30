@@ -64,6 +64,12 @@ You should be familiar with the following.  If you're not, go read some docs...
            from a Location object, and the ModuleSystem knows how to render things,
            track events, and complain about 404s
 
+    - XModules and XModuleDescriptors are uniquely identified by a Location object, encoding the organization, course, category, name, and possibly revision of the module.
+
+    - XModule initialization: XModules are instantiated by the `XModuleDescriptor.xmodule` method, and given a ModuleSystem, the descriptor which instantiated it, and their relevant model data.
+
+    - XModuleDescriptor initialization: If an XModuleDescriptor is loaded from an XML-based course, the XML data is passed into its `from_xml` method, which is responsible for instantiating a descriptor with the correct attributes. If it's in Mongo, the descriptor is instantiated directly. The module's attributes will be present in the `model_data` dict.
+
     - `course.xml` format.  We use python setuptools to connect supported tags with the descriptors that handle them.  See `common/lib/xmodule/setup.py`.  There are checking and validation tools in `common/validate`.
 
          - the xml import+export functionality is in `xml_module.py:XmlDescriptor`, which is a mixin class that's used by the actual descriptor classes.
@@ -121,11 +127,6 @@ We use a fork of django-pipeline to make sure that the js and css always reflect
 In production, the django `collectstatic` command recompiles everything and puts all the generated static files in a static/ dir.  A starting point in the code is `django-pipeline/pipeline/packager.py:pack`.
 
 In development, we don't use collectstatic, instead accessing the files in place.  The auto-compilation is run via `common/djangoapps/pipeline_mako/templates/static_content.html`.  Details: templates include `<%namespace name='static' file='static_content.html'/>`, then something like `<%static:css group='application'/>` to call the functions in `common/djangoapps/pipeline_mako/__init__.py`, which call the `django-pipeline` compilers.
-
-### Other modules
-
-- Wiki -- in `lms/djangoapps/simplewiki`.  Has some markdown extentions for embedding circuits, videos, etc.
-
 
 ## Testing
 

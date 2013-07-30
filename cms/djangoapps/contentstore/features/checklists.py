@@ -45,7 +45,7 @@ def i_can_check_and_uncheck_tasks(step):
     verifyChecklist2Status(2, 7, 29)
 
 
-@step('They are correctly selected after I reload the page$')
+@step('They are correctly selected after reloading the page$')
 def tasks_correctly_selected_after_reload(step):
     reload_the_page(step)
     verifyChecklist2Status(2, 7, 29)
@@ -61,7 +61,7 @@ def i_select_a_link_to_the_course_outline(step):
 
 @step('I am brought to the course outline page$')
 def i_am_brought_to_course_outline(step):
-    assert_in('Course Outline', world.css_find('.outline .page-header')[0].text)
+    assert_in('Course Outline', world.css_text('.outline .page-header'))
     assert_equal(1, len(world.browser.windows))
 
 
@@ -115,7 +115,7 @@ def clickActionLink(checklist, task, actionText):
 
     # text will be empty initially, wait for it to populate
     def verify_action_link_text(driver):
-        return action_link.text == actionText
+        return world.css_text('#course-checklist' + str(checklist) + ' a', index=task) == actionText
 
     world.wait_for(verify_action_link_text)
-    action_link.click()
+    world.css_click('#course-checklist' + str(checklist) + ' a', index=task)

@@ -3,7 +3,6 @@
 
 from lettuce import world, step
 from nose.tools import assert_true
-from nose.tools import assert_equal
 
 from auth.authz import get_user_by_email
 
@@ -13,7 +12,10 @@ import time
 from logging import getLogger
 logger = getLogger(__name__)
 
+from terrain.browser import reset_data
+
 ###########  STEP HELPERS ##############
+
 
 @step('I (?:visit|access|open) the Studio homepage$')
 def i_visit_the_studio_homepage(_step):
@@ -51,9 +53,52 @@ def i_have_opened_a_new_course(_step):
     open_new_course()
 
 
+@step(u'I press the "([^"]*)" notification button$')
+def press_the_notification_button(_step, name):
+    css = 'a.action-%s' % name.lower()
+
+    # The button was clicked if either the notification bar is gone,
+    # or we see an error overlaying it (expected for invalid inputs).
+    def button_clicked():
+        confirmation_dismissed = world.is_css_not_present('.is-shown.wrapper-notification-warning')
+        error_showing = world.is_css_present('.is-shown.wrapper-notification-error')
+        return confirmation_dismissed or error_showing
+
+    world.css_click(css, success_condition=button_clicked), '%s button not clicked after 5 attempts.' % name
+
+
+@step('I change the "(.*)" field to "(.*)"$')
+def i_change_field_to_value(_step, field, value):
+    field_css = '#%s' % '-'.join([s.lower() for s in field.split()])
+    ele = world.css_find(field_css).first
+    ele.fill(value)
+    ele._element.send_keys(Keys.ENTER)
+
+
+@step('I reset the database')
+def reset_the_db(_step):
+    """
+    When running Lettuce tests using examples (i.e. "Confirmation is
+    shown on save" in course-settings.feature), the normal hooks
+    aren't called between examples. reset_data should run before each
+    scenario to flush the test database. When this doesn't happen we
+    get errors due to trying to insert a non-unique entry. So instead,
+    we delete the database manually. This has the effect of removing
+    any users and courses that have been created during the test run.
+    """
+    reset_data(None)
+
+
+@step('I see a confirmation that my changes have been saved')
+def i_see_a_confirmation(step):
+    confirmation_css = '#alert-confirmation'
+    assert world.is_css_present(confirmation_css)
+
+
 ####### HELPER FUNCTIONS ##############
 def open_new_course():
     world.clear_courses()
+    create_studio_user()
     log_into_studio()
     create_a_course()
 
@@ -73,10 +118,11 @@ def create_studio_user(
     registration.register(studio_user)
     registration.activate()
 
+
 def fill_in_course_info(
         name='Robot Super Course',
         org='MITx',
-        num='101'):
+        num='999'):
     world.css_fill('.new-course-name', name)
     world.css_fill('.new-course-org', org)
     world.css_fill('.new-course-number', num)
@@ -85,10 +131,7 @@ def fill_in_course_info(
 def log_into_studio(
         uname='robot',
         email='robot+studio@edx.org',
-        password='test',
-        is_staff=False):
-
-    create_studio_user(uname=uname, email=email, is_staff=is_staff)
+        password='test'):
 
     world.browser.cookies.delete()
     world.visit('/')
@@ -97,23 +140,30 @@ def log_into_studio(
     world.is_css_present(signin_css)
     world.css_click(signin_css)
 
-    login_form = world.browser.find_by_css('form#login_form')
-    login_form.find_by_name('email').fill(email)
-    login_form.find_by_name('password').fill(password)
-    login_form.find_by_name('submit').click()
-
+    def fill_login_form():
+        login_form = world.browser.find_by_css('form#login_form')
+        login_form.find_by_name('email').fill(email)
+        login_form.find_by_name('password').fill(password)
+        login_form.find_by_name('submit').click()
+    world.retry_on_exception(fill_login_form)
     assert_true(world.is_css_present('.new-course-button'))
+    world.scenario_dict['USER'] = get_user_by_email(email)
 
 
 def create_a_course():
-    world.CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course')
+    world.scenario_dict['COURSE'] = world.CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course')
 
     # Add the user to the instructor group of the course
     # so they will have the permissions to see it in studio
-    g = world.GroupFactory.create(name='instructor_MITx/999/Robot_Super_Course')
-    u = get_user_by_email('robot+studio@edx.org')
-    u.groups.add(g)
-    u.save()
+
+    course = world.GroupFactory.create(name='instructor_MITx/{}/{}'.format(world.scenario_dict['COURSE'].number,
+                                                                    world.scenario_dict['COURSE'].display_name.replace(" ", "_")))
+    if world.scenario_dict.get('USER') is None:
+        user = world.scenario_dict['USER']
+    else:
+        user = get_user_by_email('robot+studio@edx.org')
+    user.groups.add(course)
+    user.save()
     world.browser.reload()
 
     course_link_css = 'span.class-name'
@@ -158,8 +208,9 @@ def set_date_and_time(date_css, desired_date, time_css, desired_time):
 def i_created_a_video_component(step):
     world.create_component_instance(
         step, '.large-video-icon',
-        'i4x://edx/templates/video/default',
-        '.xmodule_VideoModule'
+        'video',
+        '.xmodule_VideoModule',
+        has_multiple_templates=False
     )
 
 
@@ -169,6 +220,34 @@ def open_new_unit(step):
     step.given('I have added a new subsection')
     step.given('I expand the first section')
     world.css_click('a.new-unit-item')
+
+
+@step('when I view the video it (.*) show the captions')
+def shows_captions(step, show_captions):
+    # Prevent cookies from overriding course settings
+    world.browser.cookies.delete('hide_captions')
+    if show_captions == 'does not':
+        assert world.css_has_class('.video', 'closed')
+    else:
+        assert world.is_css_not_present('.video.closed')
+
+
+@step('the save button is disabled$')
+def save_button_disabled(step):
+    button_css = '.action-save'
+    disabled = 'is-disabled'
+    assert world.css_has_class(button_css, disabled)
+
+
+@step('I confirm the prompt')
+def confirm_the_prompt(step):
+    prompt_css = 'a.button.action-primary'
+    world.css_click(prompt_css)
+
+
+@step(u'I am shown a (.*)$')
+def i_am_shown_a_notification(step, notification_type):
+    assert world.is_css_present('.wrapper-%s' % notification_type)
 
 
 def type_in_codemirror(index, text):

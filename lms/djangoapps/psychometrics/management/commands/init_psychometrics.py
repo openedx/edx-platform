@@ -2,15 +2,11 @@
 #
 # generate pyschometrics data from tracking logs and student module data
 
-import os
-import sys
-import string
-import datetime
 import json
 
-from courseware.models import *
-from track.models import *
-from psychometrics.models import *
+from courseware.models import StudentModule
+from track.models import TrackingLog
+from psychometrics.models import PsychometricData
 from xmodule.modulestore import Location
 
 from django.conf import settings

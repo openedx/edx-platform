@@ -1,6 +1,6 @@
 <div class="wrapper wrapper-<%= type %> wrapper-<%= type %>-<%= intent %>
             <% if(obj.shown) { %>is-shown<% } else { %>is-hiding<% } %>
-            <% if(_.contains(['help', 'saving'], intent)) { %>wrapper-<%= type %>-status<% } %>"
+            <% if(_.contains(['help', 'mini'], intent)) { %>wrapper-<%= type %>-status<% } %>"
      id="<%= type %>-<%= intent %>"
      aria-hidden="<% if(obj.shown) { %>false<% } else { %>true<% } %>"
      aria-labelledby="<%= type %>-<%= intent %>-title"
@@ -9,7 +9,7 @@
   >
   <div class="<%= type %> <%= intent %> <% if(obj.actions) { %>has-actions<% } %>">
     <% if(obj.icon) { %>
-      <% var iconClass = {"warning": "warning-sign", "confirmation": "ok", "error": "warning-sign", "announcement": "bullhorn", "step-required": "exclamation-sign", "help": "question-sign", "saving": "cog"} %>
+      <% var iconClass = {"warning": "warning-sign", "confirmation": "ok", "error": "warning-sign", "announcement": "bullhorn", "step-required": "exclamation-sign", "help": "question-sign", "mini": "cog"} %>
       <i class="icon-<%= iconClass[intent] %>"></i>
     <% } %>
 

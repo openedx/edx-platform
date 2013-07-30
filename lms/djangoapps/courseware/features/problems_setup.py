@@ -18,7 +18,8 @@ from capa.tests.response_xml_factory import OptionResponseXMLFactory, \
     ChoiceResponseXMLFactory, MultipleChoiceResponseXMLFactory, \
     StringResponseXMLFactory, NumericalResponseXMLFactory, \
     FormulaResponseXMLFactory, CustomResponseXMLFactory, \
-    CodeResponseXMLFactory
+    CodeResponseXMLFactory, ChoiceTextResponseXMLFactory
+from nose.tools import assert_true
 
 
 # Factories from capa.tests.response_xml_factory that we will use
@@ -130,6 +131,32 @@ PROBLEM_DICT = {
             'grader_payload': '{"grader": "ps1/Spring2013/test_grader.py"}', },
         'correct': ['span.correct'],
         'incorrect': ['span.incorrect'],
+        'unanswered': ['span.unanswered']},
+
+    'radio_text': {
+        'factory': ChoiceTextResponseXMLFactory(),
+        'kwargs': {
+            'question_text': 'The correct answer is Choice 0 and input 8',
+            'type': 'radiotextgroup',
+            'choices': [("true", {"answer": "8", "tolerance": "1"}),
+                        ("false", {"answer": "8", "tolerance": "1"})
+                        ]
+        },
+        'correct': ['section.choicetextgroup_correct'],
+        'incorrect': ['span.incorrect', 'section.choicetextgroup_incorrect'],
+        'unanswered': ['span.unanswered']},
+
+    'checkbox_text': {
+        'factory': ChoiceTextResponseXMLFactory(),
+        'kwargs': {
+            'question_text': 'The correct answer is Choice 0 and input 8',
+            'type': 'checkboxtextgroup',
+            'choices': [("true", {"answer": "8", "tolerance": "1"}),
+                        ("false", {"answer": "8", "tolerance": "1"})
+                        ]
+        },
+        'correct': ['span.correct'],
+        'incorrect': ['span.incorrect'],
         'unanswered': ['span.unanswered']}
 }
 
@@ -142,34 +169,34 @@ def answer_problem(problem_type, correctness):
 
     elif problem_type == "multiple choice":
         if correctness == 'correct':
-            inputfield('multiple choice', choice='choice_2').check()
+            world.css_check(inputfield('multiple choice', choice='choice_2'))
         else:
-            inputfield('multiple choice', choice='choice_1').check()
+            world.css_check(inputfield('multiple choice', choice='choice_1'))
 
     elif problem_type == "checkbox":
         if correctness == 'correct':
-            inputfield('checkbox', choice='choice_0').check()
-            inputfield('checkbox', choice='choice_2').check()
+            world.css_check(inputfield('checkbox', choice='choice_0'))
+            world.css_check(inputfield('checkbox', choice='choice_2'))
         else:
-            inputfield('checkbox', choice='choice_3').check()
+            world.css_check(inputfield('checkbox', choice='choice_3'))
 
     elif problem_type == 'radio':
         if correctness == 'correct':
-            inputfield('radio', choice='choice_2').check()
+            world.css_check(inputfield('radio', choice='choice_2'))
         else:
-            inputfield('radio', choice='choice_1').check()
+            world.css_check(inputfield('radio', choice='choice_1'))
 
     elif problem_type == 'string':
         textvalue = 'correct string' if correctness == 'correct' else 'incorrect'
-        inputfield('string').fill(textvalue)
+        world.css_fill(inputfield('string'), textvalue)
 
     elif problem_type == 'numerical':
         textvalue = "pi + 1" if correctness == 'correct' else str(random.randint(-2, 2))
-        inputfield('numerical').fill(textvalue)
+        world.css_fill(inputfield('numerical'), textvalue)
 
     elif problem_type == 'formula':
         textvalue = "x^2+2*x+y" if correctness == 'correct' else 'x^2'
-        inputfield('formula').fill(textvalue)
+        world.css_fill(inputfield('formula'), textvalue)
 
     elif problem_type == 'script':
         # Correct answer is any two integers that sum to 10
@@ -181,8 +208,8 @@ def answer_problem(problem_type, correctness):
         if correctness == 'incorrect':
             second_addend += random.randint(1, 10)
 
-        inputfield('script', input_num=1).fill(str(first_addend))
-        inputfield('script', input_num=2).fill(str(second_addend))
+        world.css_fill(inputfield('script', input_num=1), str(first_addend))
+        world.css_fill(inputfield('script', input_num=2), str(second_addend))
 
     elif problem_type == 'code':
         # The fake xqueue server is configured to respond
@@ -194,6 +221,19 @@ def answer_problem(problem_type, correctness):
         # For this reason, we submit the initial code in the response
         # (configured in the problem XML above)
         pass
+
+    elif problem_type == 'radio_text' or problem_type == 'checkbox_text':
+
+        input_value = "8" if correctness == 'correct' else "5"
+        choice = "choiceinput_0bc" if correctness == 'correct' else "choiceinput_1bc"
+        world.css_check(inputfield(problem_type, choice=choice))
+        world.css_fill(
+            inputfield(
+                problem_type,
+                choice="choiceinput_0_numtolerance_input_0"
+            ),
+            input_value
+        )
 
 
 def problem_has_answer(problem_type, answer_class):
@@ -243,6 +283,17 @@ def problem_has_answer(problem_type, answer_class):
             expected = "x^2+2*x+y" if answer_class == 'correct' else 'x^2'
         assert_textfield('formula', expected)
 
+    elif problem_type in ("radio_text", "checkbox_text"):
+        if answer_class == 'blank':
+            expected = ('', '')
+            assert_choicetext_values(problem_type, (), expected)
+        elif answer_class == 'incorrect':
+            expected = ('5', '')
+            assert_choicetext_values(problem_type, ["choiceinput_1bc"], expected)
+        else:
+            expected = ('8', '')
+            assert_choicetext_values(problem_type, ["choiceinput_0bc"], expected)
+
     else:
         # The other response types use random data,
         # which would be difficult to check
@@ -272,24 +323,30 @@ def add_problem_to_course(course, problem_type, extraMeta=None):
     # Create a problem item using our generated XML
     # We set rerandomize=always in the metadata so that the "Reset" button
     # will appear.
-    template_name = "i4x://edx/templates/problem/Blank_Common_Problem"
-    world.ItemFactory.create(parent_location=section_location(course),
-                            template=template_name,
+    category_name = "problem"
+    return world.ItemFactory.create(parent_location=section_location(course),
+                            category=category_name,
                             display_name=str(problem_type),
                             data=problem_xml,
                             metadata=metadata)
 
 
 def inputfield(problem_type, choice=None, input_num=1):
-    """ Return the <input> element for *problem_type*.
+    """ Return the css selector for `problem_type`.
     For example, if problem_type is 'string', return
     the text field for the string problem in the test course.
 
-    *choice* is the name of the checkbox input in a group
+    `choice` is the name of the checkbox input in a group
     of checkboxes. """
 
     sel = ("input#input_i4x-edx-model_course-problem-%s_2_%s" %
            (problem_type.replace(" ", "_"), str(input_num)))
+
+   # this is necessary due to naming requirement for this problem type
+    if problem_type in ("radio_text", "checkbox_text"):
+        sel = "input#i4x-edx-model_course-problem-{0}_2_{1}".format(
+            problem_type.replace(" ", "_"), str(input_num)
+        )
 
     if choice is not None:
         base = "_choice_" if problem_type == "multiple choice" else "_"
@@ -299,7 +356,7 @@ def inputfield(problem_type, choice=None, input_num=1):
     assert world.is_css_present(sel)
 
     # Retrieve the input element
-    return world.browser.find_by_css(sel)
+    return sel
 
 
 def assert_checked(problem_type, choices):
@@ -312,14 +369,41 @@ def assert_checked(problem_type, choices):
 
     all_choices = ['choice_0', 'choice_1', 'choice_2', 'choice_3']
     for this_choice in all_choices:
-        element = inputfield(problem_type, choice=this_choice)
+        def check_problem():
+            element = world.css_find(inputfield(problem_type, choice=this_choice))
+            if this_choice in choices:
+                assert element.checked
+            else:
+                assert not element.checked
+        world.retry_on_exception(check_problem)
+
+
+def assert_textfield(problem_type, expected_text, input_num=1):
+    element_value = world.css_value(inputfield(problem_type, input_num=input_num))
+    assert element_value == expected_text
+
+
+def assert_choicetext_values(problem_type, choices, expected_values):
+    """
+    Asserts that only the given choices are checked, and given
+    text fields have a desired value
+    """
+    # Names of the radio buttons or checkboxes
+    all_choices = ['choiceinput_0bc', 'choiceinput_1bc']
+    # Names of the numtolerance_inputs
+    all_inputs = [
+        "choiceinput_0_numtolerance_input_0",
+        "choiceinput_1_numtolerance_input_0"
+    ]
+    for this_choice in all_choices:
+        element = world.css_find(inputfield(problem_type, choice=this_choice))
 
         if this_choice in choices:
             assert element.checked
         else:
             assert not element.checked
 
-
-def assert_textfield(problem_type, expected_text, input_num=1):
-    element = inputfield(problem_type, input_num=input_num)
-    assert element.value == expected_text
+    for (name, expected) in zip(all_inputs, expected_values):
+        element = world.css_find(inputfield(problem_type, name))
+        # Remove any trailing spaces that may have been added
+        assert element.value.strip() == expected

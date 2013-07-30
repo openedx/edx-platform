@@ -48,7 +48,7 @@
   @include linear-gradient(left, rgba(0, 0, 0, .1), rgba(0, 0, 0, 0) 4px);
   background-color: #fff;
   overflow: hidden;
-  @include transition(width .3s);
+  @include transition(width .3s linear 0s);
 
   &.shown {
     width: 300px;

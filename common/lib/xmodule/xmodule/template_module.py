@@ -3,7 +3,6 @@ from xmodule.raw_module import RawDescriptor
 from lxml import etree
 from mako.template import Template
 from xmodule.modulestore.django import modulestore
-import logging
 
 
 class CustomTagModule(XModule):
@@ -50,7 +49,7 @@ class CustomTagDescriptor(RawDescriptor):
             else:
                 # TODO (vshnayder): better exception type
                 raise Exception("Could not find impl attribute in customtag {0}"
-                                .format(location))
+                                .format(self.location))
 
         params = dict(xmltree.items())
 

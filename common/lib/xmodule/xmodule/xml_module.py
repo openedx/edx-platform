@@ -10,6 +10,7 @@ from xblock.core import Dict, Scope
 from xmodule.x_module import (XModuleDescriptor, policy_key)
 from xmodule.modulestore import Location
 from xmodule.modulestore.inheritance import own_metadata
+from xmodule.modulestore.xml_exporter import EdxJSONEncoder
 
 log = logging.getLogger(__name__)
 
@@ -80,11 +81,15 @@ class AttrMap(_AttrMapBase):
 
 def serialize_field(value):
     """
-        Return a string version of the value (where value is the JSON-formatted, internally stored value).
+    Return a string version of the value (where value is the JSON-formatted, internally stored value).
 
-        By default, this is the result of calling json.dumps on the input value.
-        """
-    return json.dumps(value)
+    If the value is a string, then we simply return what was passed in.
+    Otherwise, we return json.dumps on the input value.
+    """
+    if isinstance(value, basestring):
+        return value
+
+    return json.dumps(value, cls=EdxJSONEncoder)
 
 
 def deserialize_field(field, value):
@@ -125,7 +130,7 @@ class XmlDescriptor(XModuleDescriptor):
     """
 
     xml_attributes = Dict(help="Map of unhandled xml attributes, used only for storage between import and export",
-        default={}, scope=Scope.settings)
+                          default={}, scope=Scope.settings)
 
     # Extension to append to filename paths
     filename_extension = 'xml'
@@ -140,23 +145,23 @@ class XmlDescriptor(XModuleDescriptor):
     # understand?  And if we do, is this the place?
     # Related: What's the right behavior for clean_metadata?
     metadata_attributes = ('format', 'graceperiod', 'showanswer', 'rerandomize',
-        'start', 'due', 'graded', 'display_name', 'url_name', 'hide_from_toc',
-        'ispublic', 	# if True, then course is listed for all users; see
-        'xqa_key',  	# for xqaa server access
-        'giturl',	# url of git server for origin of file
-        # information about testcenter exams is a dict (of dicts), not a string,
-        # so it cannot be easily exportable as a course element's attribute.
-        'testcenter_info',
-        # VS[compat] Remove once unused.
-        'name', 'slug')
+                           'start', 'due', 'graded', 'display_name', 'url_name', 'hide_from_toc',
+                           'ispublic',  # if True, then course is listed for all users; see
+                           'xqa_key',  # for xqaa server access
+                           'giturl',  # url of git server for origin of file
+                           # information about testcenter exams is a dict (of dicts), not a string,
+                           # so it cannot be easily exportable as a course element's attribute.
+                           'testcenter_info',
+                           # VS[compat] Remove once unused.
+                           'name', 'slug')
 
     metadata_to_strip = ('data_dir',
-            'tabs', 'grading_policy', 'published_by', 'published_date',
-            'discussion_blackouts', 'testcenter_info',
-           # VS[compat] -- remove the below attrs once everything is in the CMS
-           'course', 'org', 'url_name', 'filename',
-           # Used for storing xml attributes between import and export, for roundtrips
-           'xml_attributes')
+                         'tabs', 'grading_policy', 'published_by', 'published_date',
+                         'discussion_blackouts', 'testcenter_info',
+                         # VS[compat] -- remove the below attrs once everything is in the CMS
+                         'course', 'org', 'url_name', 'filename',
+                         # Used for storing xml attributes between import and export, for roundtrips
+                         'xml_attributes')
 
     metadata_to_export_to_policy = ('discussion_topics')
 
@@ -165,7 +170,7 @@ class XmlDescriptor(XModuleDescriptor):
         for field in set(cls.fields + cls.lms.fields):
             if field.name == attr:
                 from_xml = lambda val: deserialize_field(field, val)
-                to_xml = lambda val : serialize_field(val)
+                to_xml = lambda val: serialize_field(val)
                 return AttrMap(from_xml, to_xml)
 
         return AttrMap()
@@ -253,7 +258,7 @@ class XmlDescriptor(XModuleDescriptor):
         definition, children = cls.definition_from_xml(definition_xml, system)
         if definition_metadata:
             definition['definition_metadata'] = definition_metadata
-        definition['filename'] = [ filepath, filename ]
+        definition['filename'] = [filepath, filename]
 
         return definition, children
 
@@ -279,7 +284,6 @@ class XmlDescriptor(XModuleDescriptor):
                 metadata[attr] = attr_map.from_xml(val)
         return metadata
 
-
     @classmethod
     def apply_policy(cls, metadata, policy):
         """
@@ -302,6 +306,7 @@ class XmlDescriptor(XModuleDescriptor):
         org and course are optional strings that will be used in the generated modules
             url identifiers
         """
+
         xml_object = etree.fromstring(xml_data)
         # VS[compat] -- just have the url_name lookup, once translation is done
         url_name = xml_object.get('url_name', xml_object.get('slug'))
@@ -314,7 +319,8 @@ class XmlDescriptor(XModuleDescriptor):
             filepath = cls._format_filepath(xml_object.tag, name_to_pathname(url_name))
             definition_xml = cls.load_file(filepath, system.resources_fs, location)
         else:
-            definition_xml = xml_object  # this is just a pointer, not the real definition content
+            definition_xml = xml_object
+            filepath = None
 
         definition, children = cls.load_definition(definition_xml, system, location)  # note this removes metadata
 
@@ -347,11 +353,12 @@ class XmlDescriptor(XModuleDescriptor):
         model_data['children'] = children
 
         model_data['xml_attributes'] = {}
-        model_data['xml_attributes']['filename'] = definition.get('filename', ['', None]) # for git link
+        model_data['xml_attributes']['filename'] = definition.get('filename', ['', None])  # for git link
         for key, value in metadata.items():
             if key not in set(f.name for f in cls.fields + cls.lms.fields):
                 model_data['xml_attributes'][key] = value
         model_data['location'] = location
+        model_data['category'] = xml_object.tag
 
         return cls(
             system,
@@ -372,7 +379,6 @@ class XmlDescriptor(XModuleDescriptor):
         specifically for customtag...
         """
         return True
-
 
     def export_to_xml(self, resource_fs):
         """
@@ -409,7 +415,6 @@ class XmlDescriptor(XModuleDescriptor):
             # don't want e.g. data_dir
             if attr not in self.metadata_to_strip and attr not in self.metadata_to_export_to_policy:
                 val = val_for_xml(attr)
-                #logging.debug('location.category = {0}, attr = {1}'.format(self.location.category, attr))
                 try:
                     xml_object.set(attr, val)
                 except Exception, e:

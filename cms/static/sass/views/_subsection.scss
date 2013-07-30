@@ -144,7 +144,7 @@ body.course.subsection {
     .url {
       width: 100%;
       margin-bottom: 10px;
-      @include box-shadow(none);
+      box-shadow: none;
     }
 
     .draft-tag,
@@ -335,6 +335,7 @@ body.course.subsection {
       }
 
       .menu {
+        @include transition(opacity $tmg-f2 linear 0s);
         z-index: 1;
         position: absolute;
         top: -12px;
@@ -347,9 +348,8 @@ body.course.subsection {
         background: $white;
         border: 1px solid $mediumGrey;
         font-size: 12px;
-        @include border-radius(4px);
-        @include box-shadow(0 1px 2px rgba(0, 0, 0, .2));
-        @include transition(opacity .15s);
+        border-radius: 4px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, .2);
 
 
         li {

@@ -11,8 +11,7 @@ end
 
 task :fastlms do
     # this is >2 times faster that rake [lms], and does not need web, good for local dev
-    django_admin = ENV['DJANGO_ADMIN_PATH'] || select_executable('django-admin.py', 'django-admin')
-    sh("#{django_admin} runserver --traceback --settings=lms.envs.dev   --pythonpath=.")
+    sh("./manage.py lms runserver --traceback")
 end
 
 # Start :system locally with the specified :env and :options.
@@ -36,9 +35,8 @@ end
     desc "Start #{system} Celery worker"
     task "#{system}_worker", [:options] => [:predjango] do |t, args|
       args.with_defaults(:options => default_options[system])
-      django_admin = ENV['DJANGO_ADMIN_PATH'] || select_executable('django-admin.py', 'django-admin')
       command = 'celery worker'
-      sh("#{django_admin} #{command} --loglevel=INFO --settings=#{system}.envs.dev_with_worker --pythonpath=. #{args.join(' ')}")
+      sh("./manage.py #{system} --settings dev_with_worker #{command} --loglevel=INFO #{args.join(' ')}")
     end
 
     # Per environment tasks
@@ -57,18 +55,17 @@ task :resetdb, [:env] do |t, args|
     sh(django_admin(:lms, args.env, 'migrate'))
 end
 
-desc "Update the relational database to the latest migration"
-task :migrate, [:env] do |t, args|
-    args.with_defaults(:env => 'dev')
-    sh(django_admin(:lms, args.env, 'migrate'))
-end
-
 task :runserver => :lms
 
 desc "Run django-admin <action> against the specified system and environment"
 task "django-admin", [:action, :system, :env, :options] do |t, args|
+    # If no system was explicitly set, we want to run both CMS and LMS for migrate and syncdb.
+    no_system_set = !args.system
     args.with_defaults(:env => 'dev', :system => 'lms', :options => '')
     sh(django_admin(args.system, args.env, args.action, args.options))
+    if no_system_set and (args.action == 'migrate' or args.action == 'syncdb')
+      sh(django_admin('cms', args.env, args.action, args.options))
+    end
 end
 
 desc "Set the staff bit for a user"
@@ -110,11 +107,6 @@ namespace :cms do
       raise "Please specify a DATA_DIR variable that point to your data directory.\n" +
         "Example: \`rake cms:import DATA_DIR=../data\`"
     end
-  end
-
-  desc "Imports all the templates from the code pack"
-  task :update_templates do
-    sh(django_admin(:cms, :dev, :update_templates))
   end
 
   desc "Import course data within the given DATA_DIR variable"

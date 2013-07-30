@@ -1,19 +1,11 @@
 import unittest
-from time import strptime
-from fs.memoryfs import MemoryFS
 
-from mock import Mock, patch
-
-from xmodule.modulestore.xml import ImportSystem, XMLModuleStore
-
+from .test_course_module import DummySystem as DummyImportSystem
 
 ORG = 'test_org'
 COURSE = 'test_course'
 
 START = '2013-01-01T01:00:00'
-
-
-from .test_course_module import DummySystem as DummyImportSystem
 
 
 class RandomizeModuleTestCase(unittest.TestCase):

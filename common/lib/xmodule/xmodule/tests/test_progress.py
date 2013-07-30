@@ -90,15 +90,15 @@ class ProgressTest(unittest.TestCase):
         self.assertEqual(Progress.to_js_status_str(self.not_started), "none")
         self.assertEqual(Progress.to_js_status_str(self.half_done), "in_progress")
         self.assertEqual(Progress.to_js_status_str(self.done), "done")
-        self.assertEqual(Progress.to_js_status_str(None), "NA")
+        self.assertEqual(Progress.to_js_status_str(None), "0")
 
     def test_to_js_detail_str(self):
         '''Test the Progress.to_js_detail_str() method'''
         f = Progress.to_js_detail_str
         for p in (self.not_started, self.half_done, self.done):
             self.assertEqual(f(p), str(p))
-        # But None should be encoded as NA
-        self.assertEqual(f(None), "NA")
+        # But None should be encoded as 0
+        self.assertEqual(f(None), "0")
 
     def test_add(self):
         '''Test the Progress.add_counts() method'''

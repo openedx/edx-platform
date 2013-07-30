@@ -30,7 +30,7 @@
         $("label").parent().removeClass("is-focused");
       });
     });
-
+    
     (function() {
       toggleSubmitButton(true);
 
@@ -38,22 +38,22 @@
         toggleSubmitButton(false);
       });
 
-      $('#login-form').on('ajax:complete', function() {
+      $('#login-form').on('ajax:error', function() {
         toggleSubmitButton(true);
       });
 
       $('#login-form').on('ajax:success', function(event, json, xhr) {
         if(json.success) {
-          $('.message.submission-error').removeClass('is-shown');
           var u=decodeURI(window.location.search);
           next=u.split("next=")[1];
-          if (next) {
+          if (next && !isExternal(next)) {
             location.href=next;
           }  else {
             location.href="${reverse('dashboard')}";
           }
         } else {
-          $('.message.submission-error').addClass('is-shown');
+          toggleSubmitButton(true);
+          $('.message.submission-error').addClass('is-shown').focus();
           $('.message.submission-error .message-copy').html(json.value);
         }
       });
@@ -80,7 +80,7 @@
 
 <section class="introduction">
   <header>
-    <h1 class="sr">${_("Log Into Your Account")}</h1>
+    <h1 class="sr">${_("PLEASE LOG IN to access your account and courses")}</h1>
   </header>
 </section>
 
@@ -94,8 +94,8 @@
         <p class="message-copy">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Lorem ipsum dolor sit amet, consectetuer adipiscing elit.</p>
       </div>
 
-      <div role="alert" class="status message submission-error">
-        <h3 class="message-title">The following errors occured while logging you in: </h3>
+      <div role="alert" class="status message submission-error" tabindex="-1">
+        <h3 class="message-title">The following errors occurred while logging you in: </h3>
         <ul class="message-copy">
           <li>Your email or password is incorrect</li>
         </ul>

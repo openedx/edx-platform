@@ -2,8 +2,8 @@
 #pylint: disable=W0621
 
 from lettuce import world, step
-from nose.tools import assert_false, assert_equal, assert_regexp_matches, assert_true
-from common import type_in_codemirror
+from nose.tools import assert_false, assert_equal, assert_regexp_matches
+from common import type_in_codemirror, press_the_notification_button
 
 KEY_CSS = '.key input.policy-key'
 VALUE_CSS = 'textarea.json'
@@ -23,18 +23,6 @@ def i_select_advanced_settings(step):
 def i_am_on_advanced_course_settings(step):
     step.given('I have opened a new course in Studio')
     step.given('I select the Advanced Settings')
-
-
-@step(u'I press the "([^"]*)" notification button$')
-def press_the_notification_button(step, name):
-    css = 'a.%s-button' % name.lower()
-
-    # Save was clicked if either the save notification bar is gone, or we have a error notification
-    # overlaying it (expected in the case of typing Object into display_name).
-    save_clicked = lambda: world.is_css_not_present('.is-shown.wrapper-notification-warning') or\
-                           world.is_css_present('.is-shown.wrapper-notification-error')
-
-    assert_true(world.css_click(css, success_condition=save_clicked), 'Save button not clicked after 5 attempts.')
 
 
 @step(u'I edit the value of a policy key$')
@@ -102,25 +90,25 @@ def the_policy_key_value_is_changed(step):
 
 ############# HELPERS ###############
 def assert_policy_entries(expected_keys, expected_values):
-    for counter in range(len(expected_keys)):
-        index = get_index_of(expected_keys[counter])
-        assert_false(index == -1, "Could not find key: " + expected_keys[counter])
-        assert_equal(expected_values[counter], world.css_find(VALUE_CSS)[index].value, "value is incorrect")
+    for key, value in zip(expected_keys, expected_values):
+        index = get_index_of(key)
+        assert_false(index == -1, "Could not find key: {key}".format(key=key))
+        assert_equal(value, world.css_find(VALUE_CSS)[index].value, "value is incorrect")
 
 
 def get_index_of(expected_key):
-    for counter in range(len(world.css_find(KEY_CSS))):
-        #   Sometimes get stale reference if I hold on to the array of elements
-        key = world.css_find(KEY_CSS)[counter].value
+    for i, element in enumerate(world.css_find(KEY_CSS)):
+        # Sometimes get stale reference if I hold on to the array of elements
+        key = world.css_value(KEY_CSS, index=i)
         if key == expected_key:
-            return counter
+            return i
 
     return -1
 
 
 def get_display_name_value():
     index = get_index_of(DISPLAY_NAME_KEY)
-    return world.css_find(VALUE_CSS)[index].value
+    return world.css_value(VALUE_CSS, index=index)
 
 
 def change_display_name_value(step, new_value):

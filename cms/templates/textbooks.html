@@ -1,0 +1,84 @@
+<%inherit file="base.html" />
+<%namespace name='static' file='static_content.html'/>
+<%! import json %>
+<%! from django.utils.translation import ugettext as _ %>
+
+<%block name="title">${_("Textbooks")}</%block>
+<%block name="bodyclass">is-signedin course textbooks</%block>
+
+<%block name="header_extras">
+% for template_name in ["edit-textbook", "show-textbook", "edit-chapter", "no-textbooks", "upload-dialog"]:
+  <script type="text/template" id="${template_name}-tpl">
+    <%static:include path="js/${template_name}.underscore" />
+  </script>
+% endfor
+</%block>
+
+<%block name="jsextra">
+<script type="text/javascript">
+CMS.URL.UPLOAD_ASSET = "${upload_asset_url}"
+CMS.URL.TEXTBOOKS = "${textbook_url}"
+CMS.URL.LMS_BASE = "${settings.LMS_BASE}"
+window.section = new CMS.Models.Section({
+    id: "${course.id}",
+    name: "${course.display_name_with_default | h}",
+    url_name: "${course.location.name | h}",
+    org: "${course.location.org | h}",
+    num: "${course.location.course | h}",
+    revision: "${course.location.revision | h}"
+});
+var textbooks = new CMS.Collections.TextbookSet(${json.dumps(course.pdf_textbooks)}, {parse: true});
+var tbView = new CMS.Views.ListTextbooks({collection: textbooks});
+
+$(function() {
+    $(".content-primary").append(tbView.render().el);
+    $(".nav-actions .new-button").click(function(e) {
+        tbView.addOne(e);
+    })
+    $(window).on("beforeunload", function() {
+        var dirty = textbooks.find(function(textbook) { return textbook.isDirty(); });
+        if(dirty) {
+            return gettext("You have unsaved changes. Do you really want to leave this page?");
+        }
+    })
+})
+</script>
+</%block>
+
+<%block name="content">
+  <div class="wrapper-mast wrapper">
+    <header class="mast has-actions has-subtitle">
+      <h1 class="page-header">
+        <small class="subtitle">${_("Content")}</small>
+        <span class="sr">&gt; </span>${_("Textbooks")}
+      </h1>
+
+      <nav class="nav-actions">
+        <h3 class="sr">${_("Page Actions")}</h3>
+        <ul>
+          <li class="nav-item">
+            <a href="#" class="button new-button"><i class="icon-plus"></i> ${_("New Textbook")}</a>
+          </li>
+        </ul>
+      </nav>
+    </header>
+  </div>
+
+  <div class="wrapper-content wrapper">
+    <section class="content">
+      <article class="content-primary" role="main">
+
+      </article>
+      <aside class="content-supplementary" role="complimentary">
+        <div class="bit">
+          <h3 class="title-3">${_("Why should I break my text into chapters?")}</h3>
+          <p>${_("It's best practice to break your course's textbook into multiple chapters to reduce loading times for students. Breaking up textbooks into chapters can also help students more easily find topic-based information.")}</p>
+        </div>
+        <div class="bit">
+          <h3 class="title-3">${_("What if my book isn't divided into chapters?")}</h3>
+          <p>${_("If you haven't broken your textbook into chapters, you can upload the entire text as Chapter 1.")}</p>
+        </div>
+      </aside>
+    </section>
+  </div>
+</%block>

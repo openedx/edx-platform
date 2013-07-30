@@ -28,7 +28,8 @@ class LogicTest(unittest.TestCase):
     def setUp(self):
         class EmptyClass:
             """Empty object."""
-            pass
+            url_name = ''
+            category = 'test'
 
         self.system = get_test_system()
         self.descriptor = EmptyClass()
@@ -40,9 +41,9 @@ class LogicTest(unittest.TestCase):
             self.raw_model_data
         )
 
-    def ajax_request(self, dispatch, get):
+    def ajax_request(self, dispatch, data):
         """Call Xmodule.handle_ajax."""
-        return json.loads(self.xmodule.handle_ajax(dispatch, get))
+        return json.loads(self.xmodule.handle_ajax(dispatch, data))
 
 
 class PollModuleTest(LogicTest):

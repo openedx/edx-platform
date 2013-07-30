@@ -73,21 +73,17 @@ def get_discussion_id_map(course):
     """
         return a dict of the form {category: modules}
     """
-    global _DISCUSSIONINFO
     initialize_discussion_info(course)
     return _DISCUSSIONINFO[course.id]['id_map']
 
 
 def get_discussion_title(course, discussion_id):
-    global _DISCUSSIONINFO
     initialize_discussion_info(course)
     title = _DISCUSSIONINFO[course.id]['id_map'].get(discussion_id, {}).get('title', '(no title)')
     return title
 
 
 def get_discussion_category_map(course):
-
-    global _DISCUSSIONINFO
     initialize_discussion_info(course)
     return filter_unstarted_categories(_DISCUSSIONINFO[course.id]['category_map'])
 
@@ -141,8 +137,6 @@ def sort_map_entries(category_map):
 
 
 def initialize_discussion_info(course):
-    global _DISCUSSIONINFO
-
     course_id = course.id
 
     discussion_id_map = {}
@@ -393,7 +387,8 @@ def safe_content(content):
         'updated_at', 'depth', 'type', 'commentable_id', 'comments_count',
         'at_position_list', 'children', 'highlighted_title', 'highlighted_body',
         'courseware_title', 'courseware_url', 'tags', 'unread_comments_count',
-        'read', 'group_id', 'group_name', 'group_string', 'pinned', 'abuse_flaggers'
+        'read', 'group_id', 'group_name', 'group_string', 'pinned', 'abuse_flaggers',
+        'stats'
 
     ]
 

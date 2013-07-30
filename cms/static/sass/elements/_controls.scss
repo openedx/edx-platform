@@ -3,7 +3,7 @@
 
 // gray primary button
 .btn-primary-gray {
-  @extend .btn-primary;
+  @extend .ui-btn-primary;
   background: $gray-l1;
   border-color: $gray-l2;
   color: $white;
@@ -25,7 +25,7 @@
 
 // blue primary button
 .btn-primary-blue {
-  @extend .btn-primary;
+  @extend .ui-btn-primary;
   background: $blue;
   border-color: $blue-s1;
   color: $white;
@@ -48,7 +48,7 @@
 
 // green primary button
 .btn-primary-green {
-  @extend .btn-primary;
+  @extend .ui-btn-primary;
   background: $green;
   border-color: $green;
   color: $white;
@@ -71,7 +71,7 @@
 
 // gray secondary button
 .btn-secondary-gray {
-  @extend .btn-secondary;
+  @extend .ui-btn-secondary;
   border-color: $gray-l3;
   color: $gray-l1;
 
@@ -92,7 +92,7 @@
 
 // blue secondary button
 .btn-secondary-blue {
-  @extend .btn-secondary;
+  @extend .ui-btn-secondary;
   border-color: $blue-l3;
   color: $blue;
 
@@ -114,7 +114,7 @@
 
 // green secondary button
 .btn-secondary-green {
-  @extend .btn-secondary;
+  @extend .ui-btn-secondary;
   border-color: $green-l4;
   color: $green-l2;
 
@@ -135,7 +135,60 @@
 
 // ====================
 
-// layout-based buttons
+// button elements
+.button {
+
+  [class^="icon-"] {
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: ($baseline/4);
+  }
+}
+
+// ====================
+
+// simple dropdown button styling - should we move this elsewhere?
+.ui-btn-dd {
+  @extend .ui-btn;
+  @extend .ui-btn-pill;
+  padding:($baseline/4) ($baseline/2);
+  border-width: 1px;
+  border-style: solid;
+  border-color: transparent;
+  text-align: center;
+
+  &:hover, &:active {
+    @extend .ui-fake-link;
+    border-color: $gray-l3;
+  }
+
+  &.current, &.active, &.is-selected {
+    box-shadow: inset 0 1px 2px 1px $shadow-l1;
+    border-color: $gray-l3;
+  }
+}
+
+// layout-based buttons - nav dd
+.ui-btn-dd-nav-primary {
+  @extend .ui-btn-dd;
+  background: $white;
+  border-color: $white;
+  color: $gray-d1;
+
+  &:hover, &:active {
+    background: $white;
+    color: $blue-s1;
+  }
+
+  &.current, &.active {
+    background: $white;
+    color: $gray-d4;
+
+    &:hover, &:active {
+      color: $blue-s1;
+    }
+  }
+}
 
 // ====================
 

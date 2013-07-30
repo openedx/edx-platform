@@ -5,7 +5,6 @@
 import json
 import logging
 import os
-from pprint import pprint
 import xmodule.modulestore.django as xmodule_django
 from xmodule.modulestore.django import modulestore
 
@@ -118,10 +117,12 @@ def manage_modulestores(request, reload_dir=None, commit_id=None):
     html += '<h2>Courses loaded in the modulestore</h2>'
     html += '<ol>'
     for cdir, course in def_ms.courses.items():
-        html += '<li><a href="%s/migrate/reload/%s">%s</a> (%s)</li>' % (settings.MITX_ROOT_URL,
-                                                            escape(cdir),
-                                                            escape(cdir),
-                                                            course.location.url())
+        html += '<li><a href="%s/migrate/reload/%s">%s</a> (%s)</li>' % (
+            settings.MITX_ROOT_URL,
+            escape(cdir),
+            escape(cdir),
+            course.location.url()
+        )
     html += '</ol>'
 
     #----------------------------------------

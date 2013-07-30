@@ -29,6 +29,7 @@ Specific Problem Types
    course_data_formats/word_cloud/word_cloud.rst
    course_data_formats/custom_response.rst
    course_data_formats/symbolic_response.rst
+   course_data_formats/jsinput.rst
 
 
 Internal Data Formats

@@ -3,6 +3,7 @@ h2 {
   margin-bottom: 15px;
 
   &.problem-header {
+    display: inline-block;
     section.staff {
       margin-top: 30px;
       font-size: 80%;
@@ -16,10 +17,25 @@ h2 {
   }
 }
 
-.inline-error {
-  color: darken($error-red, 10%);
+
+iframe[seamless]{
+    background-color: transparent;
+    border: 0px none transparent;
+    padding: 0px;
+    overflow: hidden;
 }
 
+.inline-error {
+  color: darken($error-red, 11%);
+}
+
+section.problem-progress {
+  display: inline-block;
+  color: #999;
+  font-size: em(16);
+  font-weight: 100;
+  padding-left: 5px;
+}
 
 section.problem {
   @media print {
@@ -102,8 +118,8 @@ section.problem {
       padding: 9px 15px 20px;
       background: #FFF;
       position: relative;
-      @include box-shadow(inset 0 0 0 1px #eee);
-      @include border-radius(3px);
+      box-shadow: inset 0 0 0 1px #eee;
+      border-radius: 3px;
 
       &:empty {
         display: none;
@@ -206,7 +222,7 @@ section.problem {
           background: #f1f1f1;
           border: 1px solid #e3e3e3;
           @include inline-block;
-          @include border-radius(4px);
+          border-radius: 4px;
           min-width: 30px;
         }
       }
@@ -456,7 +472,7 @@ section.problem {
     white-space: nowrap;
     border: 1px solid #EAEAEA;
     background-color: #F8F8F8;
-    @include border-radius(3px);
+    border-radius: 3px;
     font-size: .9em;
   }
 
@@ -467,7 +483,7 @@ section.problem {
     line-height: 1.4;
     overflow: auto;
     padding: 6px 10px;
-    @include border-radius(3px);
+    border-radius: 3px;
 
     > code {
       margin: 0;
@@ -491,7 +507,7 @@ section.problem {
     }
 
     pre {
-      @include border-radius(0);
+      border-radius: 0;
       border-radius: 0;
       border-width: 0;
       margin: 0;
@@ -558,7 +574,7 @@ section.problem {
     }
 
     .save {
-      @extend .blue-button;
+      @extend .blue-button !optional;
     }
 
     .show {
@@ -572,7 +588,7 @@ section.problem {
     .submission_feedback {
       // background: #F3F3F3;
       // border: 1px solid #ddd;
-      // @include border-radius(3px);
+      // border-radius: 3px;
       // padding: 8px 12px;
       // margin-top: 10px;
       @include inline-block;
@@ -650,7 +666,7 @@ section.problem {
           display: block;
           padding: 9px;
           background: #F6F6F6;
-          @include box-shadow(inset 0 0 0 1px #fff);
+          box-shadow: inset 0 0 0 1px #fff;
         }
       }
 
@@ -681,8 +697,8 @@ section.problem {
       margin-bottom: 10px;
       background: #FFF;
       position: relative;
-      @include box-shadow(inset 0 0 0 1px #eee);
-      @include border-radius(3px);
+      box-shadow: inset 0 0 0 1px #eee;
+      border-radius: 3px;
 
       p:last-of-type {
         margin-bottom: 0;
@@ -919,6 +935,34 @@ section.problem {
           font-weight: bold;
           font-size: 1.5em;
         }
+    }
+  }
+  .choicetextgroup{
+    input[type="text"]{
+      margin-bottom: 0.5em;
+    }
+    @extend .choicegroup;
+
+    label.choicetextgroup_correct, section.choicetextgroup_correct{
+      @extend label.choicegroup_correct;
+
+      input[type="text"] {
+        border-color: green;
+      }
+    }
+
+    label.choicetextgroup_incorrect, section.choicetextgroup_incorrect{
+      @extend label.choicegroup_incorrect;
+    }
+
+    label.choicetextgroup_show_correct, section.choicetextgroup_show_correct{
+      &:after{
+        content: url('../images/correct-icon.png');
+        margin-left:15px;
+      }
+    }
+    span.mock_label{
+      cursor : default;
     }
   }
 }

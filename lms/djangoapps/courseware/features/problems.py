@@ -2,29 +2,30 @@
 Steps for problem.feature lettuce tests
 '''
 
-#pylint: disable=C0111
-#pylint: disable=W0621
+# pylint: disable=C0111
+# pylint: disable=W0621
 
 from lettuce import world, step
 from lettuce.django import django_url
-from common import i_am_registered_for_the_course, TEST_SECTION_NAME
+from common import i_am_registered_for_the_course
 from problems_setup import PROBLEM_DICT, answer_problem, problem_has_answer, add_problem_to_course
-from nose.tools import assert_equal, assert_not_equal
+from nose.tools import assert_equal
+
 
 @step(u'I am viewing a "([^"]*)" problem with "([^"]*)" attempt')
 def view_problem_with_attempts(step, problem_type, attempts):
     i_am_registered_for_the_course(step, 'model_course')
 
     # Ensure that the course has this problem type
-    add_problem_to_course('model_course', problem_type, {'attempts': attempts})
+    add_problem_to_course(world.scenario_dict['COURSE'].number, problem_type, {'max_attempts': attempts})
 
     # Go to the one section in the factory-created course
     # which should be loaded with the correct problem
-    chapter_name = TEST_SECTION_NAME.replace(" ", "_")
+    chapter_name = world.scenario_dict['SECTION'].display_name.replace(" ", "_")
     section_name = chapter_name
-    url = django_url('/courses/edx/model_course/Test_Course/courseware/%s/%s' %
-                    (chapter_name, section_name))
-
+    url = django_url('/courses/%s/%s/%s/courseware/%s/%s' %
+                    (world.scenario_dict['COURSE'].org, world.scenario_dict['COURSE'].number, world.scenario_dict['COURSE'].display_name.replace(' ', '_'),
+                        chapter_name, section_name,))
     world.browser.visit(url)
 
 
@@ -37,11 +38,11 @@ def view_problem_with_show_answer(step, problem_type, answer):
 
     # Go to the one section in the factory-created course
     # which should be loaded with the correct problem
-    chapter_name = TEST_SECTION_NAME.replace(" ", "_")
+    chapter_name = world.scenario_dict['SECTION'].display_name.replace(" ", "_")
     section_name = chapter_name
-    url = django_url('/courses/edx/model_course/Test_Course/courseware/%s/%s' %
-                    (chapter_name, section_name))
-
+    url = django_url('/courses/%s/%s/%s/courseware/%s/%s' %
+                    (world.scenario_dict['COURSE'].org, world.scenario_dict['COURSE'].number, world.scenario_dict['COURSE'].display_name.replace(' ', '_'),
+                        chapter_name, section_name,))
     world.browser.visit(url)
 
 
@@ -54,11 +55,11 @@ def view_problem(step, problem_type):
 
     # Go to the one section in the factory-created course
     # which should be loaded with the correct problem
-    chapter_name = TEST_SECTION_NAME.replace(" ", "_")
+    chapter_name = world.scenario_dict['SECTION'].display_name.replace(" ", "_")
     section_name = chapter_name
-    url = django_url('/courses/edx/model_course/Test_Course/courseware/%s/%s' %
-                    (chapter_name, section_name))
-
+    url = django_url('/courses/%s/%s/%s/courseware/%s/%s' %
+                    (world.scenario_dict['COURSE'].org, world.scenario_dict['COURSE'].number, world.scenario_dict['COURSE'].display_name.replace(' ', '_'),
+                        chapter_name, section_name,))
     world.browser.visit(url)
 
 
@@ -120,8 +121,8 @@ def reset_problem(_step):
 def press_the_button_with_label(_step, buttonname):
     button_css = 'button span.show-label'
     elem = world.css_find(button_css).first
-    assert_equal(elem.text, buttonname)
-    elem.click()
+    world.css_has_text(button_css, elem)
+    world.css_click(button_css)
 
 
 @step(u'The "([^"]*)" button does( not)? appear')
@@ -134,13 +135,16 @@ def action_button_present(_step, buttonname, doesnt_appear):
 
 
 @step(u'the button with the label "([^"]*)" does( not)? appear')
-def button_with_label_present(step, buttonname, doesnt_appear):
-    button_css = 'button span.show-label'
-    elem = world.css_find(button_css).first
+def button_with_label_present(_step, buttonname, doesnt_appear):
     if doesnt_appear:
-        assert_not_equal(elem.text, buttonname)
+        assert world.browser.is_text_not_present(buttonname, wait_time=5)
     else:
-        assert_equal(elem.text, buttonname)
+        assert world.browser.is_text_present(buttonname, wait_time=5)
+
+
+@step(u'I should see a score of "([^"]*)"$')
+def see_score(_step, score):
+    assert world.browser.is_text_present(score)
 
 
 @step(u'My "([^"]*)" answer is marked "([^"]*)"')

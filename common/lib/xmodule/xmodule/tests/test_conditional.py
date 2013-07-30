@@ -217,8 +217,11 @@ class ConditionalModuleXmlTest(unittest.TestCase):
         html = ajax['html']
         self.assertFalse(any(['This is a secret' in item for item in html]))
 
-        # now change state of the capa problem to make it completed
-        inner_get_module(Location('i4x://HarvardX/ER22x/problem/choiceprob')).attempts = 1
+        # Now change state of the capa problem to make it completed
+        inner_module = inner_get_module(Location('i4x://HarvardX/ER22x/problem/choiceprob'))
+        inner_module.attempts = 1
+        # Save our modifications to the underlying KeyValueStore so they can be persisted
+        inner_module.save()
 
         ajax = json.loads(module.handle_ajax('', ''))
         print "post-attempt ajax: ", ajax

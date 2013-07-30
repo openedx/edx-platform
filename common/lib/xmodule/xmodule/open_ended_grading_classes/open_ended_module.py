@@ -11,16 +11,15 @@ from lxml import etree
 import capa.xqueue_interface as xqueue_interface
 
 from xmodule.capa_module import ComplexEncoder
-from xmodule.editing_module import EditingDescriptor
 from xmodule.progress import Progress
 from xmodule.stringify import stringify_children
-from xmodule.xml_module import XmlDescriptor
 from capa.util import *
 import openendedchild
 
 from numpy import median
 
 from datetime import datetime
+from pytz import UTC
 
 from .combined_open_ended_rubric import CombinedOpenEndedRubric
 
@@ -124,17 +123,17 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
 
         self.payload = {'grader_payload': updated_grader_payload}
 
-    def skip_post_assessment(self, get, system):
+    def skip_post_assessment(self, _data, system):
         """
         Ajax function that allows one to skip the post assessment phase
-        @param get: AJAX dictionary
+        @param data: AJAX dictionary
         @param system: ModuleSystem
         @return: Success indicator
         """
         self.child_state = self.DONE
         return {'success': True}
 
-    def message_post(self, get, system):
+    def message_post(self, data, system):
         """
         Handles a student message post (a reaction to the grade they received from an open ended grader type)
         Returns a boolean success/fail and an error message
@@ -143,7 +142,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         event_info = dict()
         event_info['problem_id'] = self.location_string
         event_info['student_id'] = system.anonymous_student_id
-        event_info['survey_responses'] = get
+        event_info['survey_responses'] = data
 
         survey_responses = event_info['survey_responses']
         for tag in ['feedback', 'submission_id', 'grader_id', 'score']:
@@ -172,7 +171,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         if xqueue is None:
             return {'success': False, 'msg': "Couldn't submit feedback."}
         qinterface = xqueue['interface']
-        qtime = datetime.strftime(datetime.now(), xqueue_interface.dateformat)
+        qtime = datetime.strftime(datetime.now(UTC), xqueue_interface.dateformat)
         anonymous_student_id = system.anonymous_student_id
         queuekey = xqueue_interface.make_hashkey(str(system.seed) + qtime +
                                                  anonymous_student_id +
@@ -226,7 +225,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         if xqueue is None:
             return False
         qinterface = xqueue['interface']
-        qtime = datetime.strftime(datetime.now(), xqueue_interface.dateformat)
+        qtime = datetime.strftime(datetime.now(UTC), xqueue_interface.dateformat)
 
         anonymous_student_id = system.anonymous_student_id
 
@@ -589,10 +588,10 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         html = system.render_template('{0}/open_ended_evaluation.html'.format(self.TEMPLATE_DIR), context)
         return html
 
-    def handle_ajax(self, dispatch, get, system):
+    def handle_ajax(self, dispatch, data, system):
         '''
         This is called by courseware.module_render, to handle an AJAX call.
-        "get" is request.POST.
+        "data" is request.POST.
 
         Returns a json dictionary:
         { 'progress_changed' : True/False,
@@ -614,7 +613,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             return json.dumps({'error': 'Error handling action.  Please try again.', 'success': False})
 
         before = self.get_progress()
-        d = handlers[dispatch](get, system)
+        d = handlers[dispatch](data, system)
         after = self.get_progress()
         d.update({
             'progress_changed': after != before,
@@ -622,20 +621,20 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         })
         return json.dumps(d, cls=ComplexEncoder)
 
-    def check_for_score(self, get, system):
+    def check_for_score(self, _data, system):
         """
         Checks to see if a score has been received yet.
-        @param get: AJAX get dictionary
+        @param data: AJAX dictionary
         @param system: Modulesystem (needed to align with other ajax functions)
         @return: Returns the current state
         """
         state = self.child_state
         return {'state': state}
 
-    def save_answer(self, get, system):
+    def save_answer(self, data, system):
         """
         Saves a student answer
-        @param get: AJAX get dictionary
+        @param data: AJAX dictionary
         @param system: modulesystem
         @return: Success indicator
         """
@@ -646,17 +645,17 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             return msg
 
         if self.child_state != self.INITIAL:
-            return self.out_of_sync_error(get)
+            return self.out_of_sync_error(data)
 
         # add new history element with answer and empty score and hint.
-        success, get = self.append_image_to_student_answer(get)
+        success, data = self.append_image_to_student_answer(data)
         error_message = ""
         if success:
             success, allowed_to_submit, error_message = self.check_if_student_can_submit()
             if allowed_to_submit:
-                get['student_answer'] = OpenEndedModule.sanitize_html(get['student_answer'])
-                self.new_history_entry(get['student_answer'])
-                self.send_to_grader(get['student_answer'], system)
+                data['student_answer'] = OpenEndedModule.sanitize_html(data['student_answer'])
+                self.new_history_entry(data['student_answer'])
+                self.send_to_grader(data['student_answer'], system)
                 self.change_state(self.ASSESSING)
             else:
                 # Error message already defined
@@ -668,17 +667,17 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         return {
             'success': success,
             'error': error_message,
-            'student_response': get['student_answer']
+            'student_response': data['student_answer']
         }
 
-    def update_score(self, get, system):
+    def update_score(self, data, system):
         """
         Updates the current score via ajax.  Called by xqueue.
-        Input: AJAX get dictionary, modulesystem
+        Input: AJAX data dictionary, modulesystem
         Output: None
         """
-        queuekey = get['queuekey']
-        score_msg = get['xqueue_body']
+        queuekey = data['queuekey']
+        score_msg = data['xqueue_body']
         # TODO: Remove need for cmap
         self._update_score(score_msg, queuekey, system)
 
@@ -732,7 +731,6 @@ class OpenEndedDescriptor():
     filename_extension = "xml"
 
     has_score = True
-    template_dir_name = "openended"
 
     def __init__(self, system):
         self.system = system

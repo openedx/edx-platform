@@ -28,6 +28,7 @@ MITX_FEATURES['ENABLE_MANUAL_GIT_RELOAD'] = True
 MITX_FEATURES['ENABLE_PSYCHOMETRICS'] = False    # real-time psychometrics (eg item response theory analysis in instructor dashboard)
 MITX_FEATURES['ENABLE_INSTRUCTOR_ANALYTICS'] = True
 MITX_FEATURES['ENABLE_SERVICE_STATUS'] = True
+MITX_FEATURES['ENABLE_HINTER_INSTRUCTOR_VIEW'] = True
 
 WIKI_ENABLED = True
 
@@ -232,6 +233,9 @@ FILE_UPLOAD_HANDLERS = (
     'django.core.files.uploadhandler.TemporaryFileUploadHandler',
 )
 
+MITX_FEATURES['AUTH_USE_SHIB'] = True
+MITX_FEATURES['RESTRICT_ENROLL_BY_REG_METHOD'] = True
+
 ########################### PIPELINE #################################
 
 PIPELINE_SASS_ARGUMENTS = '--debug-info --require {proj_dir}/static/sass/bourbon/lib/bourbon.rb'.format(proj_dir=PROJECT_ROOT)
@@ -252,9 +256,12 @@ if SEGMENT_IO_LMS_KEY:
     MITX_FEATURES['SEGMENT_IO_LMS'] = True
 
 
+########################## USER API ########################
+EDX_API_KEY = None
+
 #####################################################################
 # Lastly, see if the developer has any local overrides.
 try:
-    from .private import *
+    from .private import *      # pylint: disable=F0401
 except ImportError:
     pass

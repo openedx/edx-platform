@@ -6,8 +6,7 @@
 
 import os
 import sys
-import string
-import re
+import string       # pylint: disable=W0402
 import datetime
 from getpass import getpass
 import json

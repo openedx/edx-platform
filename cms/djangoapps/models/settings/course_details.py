@@ -74,7 +74,7 @@ class CourseDetails(object):
         Decode the json into CourseDetails and save any changed attrs to the db
         """
         # TODO make it an error for this to be undefined & for it to not be retrievable from modulestore
-        course_location = jsondict['course_location']
+        course_location = Location(jsondict['course_location'])
         # Will probably want to cache the inflight courses because every blur generates an update
         descriptor = get_modulestore(course_location).get_item(course_location)
 
@@ -122,6 +122,10 @@ class CourseDetails(object):
             descriptor.enrollment_end = converted
 
         if dirty:
+            # Save the data that we've just changed to the underlying
+            # MongoKeyValueStore before we update the mongo datastore.
+            descriptor.save()
+
             get_modulestore(course_location).update_metadata(course_location, own_metadata(descriptor))
 
         # NOTE: below auto writes to the db w/o verifying that any of the fields actually changed
@@ -153,9 +157,9 @@ class CourseDetails(object):
         if not raw_video:
             return None
 
-        keystring_matcher = re.search('(?<=embed/)[a-zA-Z0-9_-]+', raw_video)
+        keystring_matcher = re.search(r'(?<=embed/)[a-zA-Z0-9_-]+', raw_video)
         if keystring_matcher is None:
-            keystring_matcher = re.search('<?=\d+:[a-zA-Z0-9_-]+', raw_video)
+            keystring_matcher = re.search(r'<?=\d+:[a-zA-Z0-9_-]+', raw_video)
 
         if keystring_matcher:
             return keystring_matcher.group(0)

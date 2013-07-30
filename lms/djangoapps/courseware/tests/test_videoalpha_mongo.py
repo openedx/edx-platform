@@ -9,7 +9,7 @@ from django.conf import settings
 class TestVideo(BaseTestXmodule):
     """Integration tests: web client + mongo."""
 
-    TEMPLATE_NAME = "i4x://edx/templates/videoalpha/Video_Alpha"
+    CATEGORY = "videoalpha"
     DATA = SOURCE_XML
     MODEL_DATA = {
         'data': DATA
@@ -49,6 +49,50 @@ class TestVideo(BaseTestXmodule):
             'sub': self.item_module.sub,
             'track': self.item_module.track,
             'youtube_streams': self.item_module.youtube_streams,
+            'autoplay': settings.MITX_FEATURES.get('AUTOPLAY_VIDEOS', True)
+        }
+        self.assertDictEqual(context, expected_context)
+
+
+class TestVideoNonYouTube(TestVideo):
+    """Integration tests: web client + mongo."""
+
+    DATA = """
+        <videoalpha show_captions="true"
+        data_dir=""
+        caption_asset_path=""
+        autoplay="true"
+        start_time="01:00:03" end_time="01:00:10"
+        >
+            <source src=".../mit-3091x/M-3091X-FA12-L21-3_100.mp4"/>
+            <source src=".../mit-3091x/M-3091X-FA12-L21-3_100.webm"/>
+            <source src=".../mit-3091x/M-3091X-FA12-L21-3_100.ogv"/>
+        </videoalpha>
+    """
+    MODEL_DATA = {
+        'data': DATA
+    }
+
+    def test_videoalpha_constructor(self):
+        """Make sure that if the 'youtube' attribute is omitted in XML, then
+            the template generates an empty string for the YouTube streams.
+        """
+
+        # `get_html` return only context, cause we
+        # overwrite `system.render_template`
+        context = self.item_module.get_html()
+        expected_context = {
+            'data_dir': getattr(self, 'data_dir', None),
+            'caption_asset_path': '/c4x/MITx/999/asset/subs_',
+            'show_captions': self.item_module.show_captions,
+            'display_name': self.item_module.display_name_with_default,
+            'end': self.item_module.end_time,
+            'id': self.item_module.location.html_id(),
+            'sources': self.item_module.sources,
+            'start': self.item_module.start_time,
+            'sub': self.item_module.sub,
+            'track': self.item_module.track,
+            'youtube_streams': '',
             'autoplay': settings.MITX_FEATURES.get('AUTOPLAY_VIDEOS', True)
         }
         self.assertDictEqual(context, expected_context)

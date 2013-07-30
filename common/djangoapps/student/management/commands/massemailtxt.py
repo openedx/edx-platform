@@ -1,11 +1,8 @@
 import os.path
 import time
 
-from lxml import etree
-
 from django.core.management.base import BaseCommand
 from django.conf import settings
-from django.contrib.auth.models import User
 
 import mitxmako.middleware as middleware
 
@@ -40,7 +37,6 @@ rate -- messages per second
         self.log_file.write(datetime.datetime.utcnow().isoformat() + ' -- ' + text + '\n')
 
     def handle(self, *args, **options):
-        global log_file
         (user_file, message_base, logfilename, ratestr) = args
 
         users = [u.strip() for u in open(user_file).readlines()]

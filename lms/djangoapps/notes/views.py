@@ -4,7 +4,6 @@ from mitxmako.shortcuts import render_to_response
 from courseware.courses import get_course_with_access
 from notes.models import Note
 from notes.utils import notes_enabled_for_course
-import json
 
 
 @login_required

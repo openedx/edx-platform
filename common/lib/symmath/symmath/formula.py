@@ -10,8 +10,7 @@
 # Provides sympy representation.
 
 import os
-import sys
-import string
+import string       # pylint: disable=W0402
 import re
 import logging
 import operator
@@ -25,8 +24,7 @@ from sympy.physics.quantum.state import *
 # from sympy.core.operations import LatticeOp
 # import sympy.physics.quantum.qubit
 
-import urllib
-from xml.sax.saxutils import escape, unescape
+from xml.sax.saxutils import unescape
 import sympy
 import unicodedata
 from lxml import etree
@@ -52,7 +50,7 @@ class dot(sympy.operations.LatticeOp):	 # my dot product
 
 
 def _print_dot(self, expr):
-    return '{((%s) \cdot (%s))}' % (expr.args[0], expr.args[1])
+    return r'{((%s) \cdot (%s))}' % (expr.args[0], expr.args[1])
 
 LatexPrinter._print_dot = _print_dot
 
@@ -204,7 +202,7 @@ class formula(object):
         return xml
 
     def preprocess_pmathml(self, xml):
-        '''
+        r'''
         Pre-process presentation MathML from ASCIIMathML to make it more
         acceptable for SnuggleTeX, and also to accomodate some sympy
         conventions (eg hat(i) for \hat{i}).

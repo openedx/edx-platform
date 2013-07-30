@@ -185,7 +185,7 @@ if Backbone?
         @editView = null
 
       @showView = new DiscussionThreadShowView(model: @model)
-      @showView.bind "thread:delete", @delete
+      @showView.bind "thread:_delete", @_delete
       @showView.bind "thread:edit", @edit
 
     renderShowView: () ->
@@ -196,9 +196,11 @@ if Backbone?
       @createShowView()
       @renderShowView()
 
-
-    delete: (event) =>
-      url = @model.urlFor('delete')
+    # If you use "delete" here, it will compile down into JS that includes the
+    # use of DiscussionThreadView.prototype.delete, and that will break IE8
+    # because "delete" is a keyword. So, using an underscore to prevent that.
+    _delete: (event) =>
+      url = @model.urlFor('_delete')
       if not @model.can('can_delete')
         return
       if not confirm "Are you sure to delete thread \"#{@model.get('title')}\"?"

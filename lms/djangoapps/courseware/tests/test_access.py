@@ -1,4 +1,4 @@
-from mock import Mock, patch
+from mock import Mock
 
 from django.test import TestCase
 
@@ -81,7 +81,7 @@ class AccessTestCase(TestCase):
         u = Mock()
         yesterday = datetime.datetime.now(UTC()) - datetime.timedelta(days=1)
         tomorrow = datetime.datetime.now(UTC()) + datetime.timedelta(days=1)
-        c = Mock(enrollment_start=yesterday, enrollment_end=tomorrow)
+        c = Mock(enrollment_start=yesterday, enrollment_end=tomorrow, enrollment_domain='')
 
         # User can enroll if it is between the start and end dates
         self.assertTrue(access._has_access_course_desc(u, c, 'enroll'))
@@ -91,7 +91,7 @@ class AccessTestCase(TestCase):
         u = Mock(email='test@edx.org', is_staff=False)
         u.is_authenticated.return_value = True
 
-        c = Mock(enrollment_start=tomorrow, enrollment_end=tomorrow, id='edX/test/2012_Fall')
+        c = Mock(enrollment_start=tomorrow, enrollment_end=tomorrow, id='edX/test/2012_Fall', enrollment_domain='')
 
         allowed = CourseEnrollmentAllowedFactory(email=u.email, course_id=c.id)
 
@@ -101,7 +101,7 @@ class AccessTestCase(TestCase):
         u = Mock(email='test@edx.org', is_staff=True)
         u.is_authenticated.return_value = True
 
-        c = Mock(enrollment_start=tomorrow, enrollment_end=tomorrow, id='edX/test/Whenever')
+        c = Mock(enrollment_start=tomorrow, enrollment_end=tomorrow, id='edX/test/Whenever', enrollment_domain='')
         self.assertTrue(access._has_access_course_desc(u, c, 'enroll'))
 
         # TODO:

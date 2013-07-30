@@ -2,7 +2,7 @@
 
 from lettuce import world, step
 from lettuce.django import django_url
-from common import TEST_COURSE_NAME, TEST_SECTION_NAME, i_am_registered_for_the_course, section_location
+from common import i_am_registered_for_the_course, section_location
 
 ############### ACTIONS ####################
 
@@ -14,43 +14,42 @@ def does_autoplay(_step):
 
 @step('the course has a Video component')
 def view_video(_step):
-    coursename = TEST_COURSE_NAME.replace(' ', '_')
-    i_am_registered_for_the_course(step, coursename)
+    coursenum = 'test_course'
+    i_am_registered_for_the_course(step, coursenum)
 
     # Make sure we have a video
-    add_video_to_course(coursename)
-    chapter_name = TEST_SECTION_NAME.replace(" ", "_")
+    add_video_to_course(coursenum)
+    chapter_name = world.scenario_dict['SECTION'].display_name.replace(" ", "_")
     section_name = chapter_name
-    url = django_url('/courses/edx/Test_Course/Test_Course/courseware/%s/%s' %
-                     (chapter_name, section_name))
-
+    url = django_url('/courses/%s/%s/%s/courseware/%s/%s' %
+                    (world.scenario_dict['COURSE'].org, world.scenario_dict['COURSE'].number, world.scenario_dict['COURSE'].display_name.replace(' ', '_'),
+                        chapter_name, section_name,))
     world.browser.visit(url)
 
 
 @step('the course has a VideoAlpha component')
 def view_videoalpha(step):
-    coursename = TEST_COURSE_NAME.replace(' ', '_')
-    i_am_registered_for_the_course(step, coursename)
+    coursenum = 'test_course'
+    i_am_registered_for_the_course(step, coursenum)
 
     # Make sure we have a videoalpha
-    add_videoalpha_to_course(coursename)
-    chapter_name = TEST_SECTION_NAME.replace(" ", "_")
+    add_videoalpha_to_course(coursenum)
+    chapter_name = world.scenario_dict['SECTION'].display_name.replace(" ", "_")
     section_name = chapter_name
-    url = django_url('/courses/edx/Test_Course/Test_Course/courseware/%s/%s' %
-                     (chapter_name, section_name))
-
+    url = django_url('/courses/%s/%s/%s/courseware/%s/%s' %
+                    (world.scenario_dict['COURSE'].org, world.scenario_dict['COURSE'].number, world.scenario_dict['COURSE'].display_name.replace(' ', '_'),
+                        chapter_name, section_name,))
     world.browser.visit(url)
 
 
 def add_video_to_course(course):
-    template_name = 'i4x://edx/templates/video/default'
     world.ItemFactory.create(parent_location=section_location(course),
-                             template=template_name,
+                             category='video',
                              display_name='Video')
 
 
 def add_videoalpha_to_course(course):
-    template_name = 'i4x://edx/templates/videoalpha/Video_Alpha'
+    category = 'videoalpha'
     world.ItemFactory.create(parent_location=section_location(course),
-                             template=template_name,
+                             category=category,
                              display_name='Video Alpha')

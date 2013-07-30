@@ -14,9 +14,7 @@ from urlparse import urlparse
 import requests
 from boto.s3.connection import S3Connection
 from boto.s3.key import Key
-import pickle
 import logging
-import re
 
 log = logging.getLogger(__name__)
 

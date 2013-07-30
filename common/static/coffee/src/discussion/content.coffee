@@ -109,7 +109,7 @@ if Backbone?
       'downvote'    : -> DiscussionUtil.urlFor("downvote_#{@get('type')}", @id)
       'close'       : -> DiscussionUtil.urlFor('openclose_thread', @id)
       'update'      : -> DiscussionUtil.urlFor('update_thread', @id)
-      'delete'      : -> DiscussionUtil.urlFor('delete_thread', @id)
+      '_delete'      : -> DiscussionUtil.urlFor('delete_thread', @id)
       'follow'      : -> DiscussionUtil.urlFor('follow_thread', @id)
       'unfollow'    : -> DiscussionUtil.urlFor('unfollow_thread', @id)
       'flagAbuse'   : -> DiscussionUtil.urlFor("flagAbuse_#{@get('type')}", @id)
@@ -168,7 +168,7 @@ if Backbone?
       'downvote': -> DiscussionUtil.urlFor("downvote_#{@get('type')}", @id)
       'endorse': -> DiscussionUtil.urlFor('endorse_comment', @id)
       'update': -> DiscussionUtil.urlFor('update_comment', @id)
-      'delete': -> DiscussionUtil.urlFor('delete_comment', @id)
+      '_delete': -> DiscussionUtil.urlFor('delete_comment', @id)
       'flagAbuse'   : -> DiscussionUtil.urlFor("flagAbuse_#{@get('type')}", @id)
       'unFlagAbuse' : -> DiscussionUtil.urlFor("unFlagAbuse_#{@get('type')}", @id)
 

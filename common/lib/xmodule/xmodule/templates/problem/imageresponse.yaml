@@ -1,26 +1,22 @@
 ---
 metadata:
     display_name: Image Mapped Input
-    rerandomize: never
-    showanswer: finished
+    markdown: !!null
 data: |
   <problem>
-  <p>
-  An image mapped input problem presents an image for the student.  Input is
-  given by the location of mouse clicks on the image. Correctness of input can be evaluated based on expected dimensions of a rectangle.
-  </p>
-
-  <p>Which object in this image is required by the fire code?</p>
-      <imageresponse>
-        <imageinput src="/static/images/firecode.jpg" width="640" height="480" rectangle="(365,42)-(423,66)" />
-      </imageresponse>
-      <solution>
-          <div class="detailed-solution">
-              <p>Explanation</p>
-              <p>The fire code requires that all exits be clearly marked, so the red exit sign is the correct answer.</p>
-          </div>
-      </solution>
+    <p>
+      An image mapped input problem presents an image for the student.
+      Input is given by the location of mouse clicks on the image.
+      Correctness of input can be evaluated based on expected dimensions of a rectangle.
+    </p>
+    <p>Which animal shown below is a kitten?</p>
+    <imageresponse>
+      <imageinput src="https://studio.edx.org/c4x/edX/DemoX/asset/Dog-and-Cat.jpg" width="640" height="400" rectangle="(385,98)-(600,337)"/>
+    </imageresponse>
+    <solution>
+      <div class="detailed-solution">
+        <p>Explanation</p>
+        <p>The animal on the right is a kitten. The animal on the left is a puppy, not a kitten.</p>
+      </div>
+    </solution>
   </problem>
-
-    
-children: []

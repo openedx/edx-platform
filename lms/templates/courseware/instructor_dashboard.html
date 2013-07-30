@@ -10,7 +10,7 @@
   <script type="text/javascript" src="${static.url('js/vendor/jquery-jvectormap-1.1.1/jquery-jvectormap-world-mill-en.js')}"></script>
   <script type="text/javascript" src="${static.url('js/course_groups/cohorts.js')}"></script>
 %if instructor_tasks is not None:
-  <script type="text/javascript" src="${static.url('js/pending_tasks.js')}"></script>>
+  <script type="text/javascript" src="${static.url('js/pending_tasks.js')}"></script>
 %endif
 </%block>
 
@@ -104,7 +104,7 @@ function goto( mode)
   <section class="instructor-dashboard-content">
     <h1>Instructor Dashboard</h1>
 
-    <h2>[ <a href="#" onclick="goto('Grades');" class="${modeflag.get('Grades')}">Grades</a> |
+    <h2 class="navbar">[ <a href="#" onclick="goto('Grades');" class="${modeflag.get('Grades')}">Grades</a> |
           %if settings.MITX_FEATURES.get('ENABLE_PSYCHOMETRICS'):
             <a href="#" onclick="goto('Psychometrics');" class="${modeflag.get('Psychometrics')}">Psychometrics</a> |
           %endif
@@ -249,7 +249,7 @@ function goto( mode)
     <p>
       Then select an action:
       <input type="submit" name="action" value="Reset student's attempts">
-      %if settings.MITX_FEATURES.get('ENABLE_COURSE_BACKGROUND_TASKS'):
+      %if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
       <input type="submit" name="action" value="Rescore student's problem submission">
       %endif
     </p>
@@ -260,9 +260,9 @@ function goto( mode)
       <input type="submit" name="action" value="Delete student state for module">
     </p>
     %endif
-    %if settings.MITX_FEATURES.get('ENABLE_COURSE_BACKGROUND_TASKS'):
+    %if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
     <p>Rescoring runs in the background, and status for active tasks will appear in a table below.
-       To see status for all tasks submitted for this course and student, click on this button:
+       To see status for all tasks submitted for this problem and student, click on this button:
     </p>
     <p>
       <input type="submit" name="action" value="Show Background Task History for Student">
@@ -381,6 +381,8 @@ function goto( mode)
 
   <p>Enroll or un-enroll one or many students: enter emails, separated by new lines or commas;</p>
   <textarea rows="6" cols="70" name="multiple_students"></textarea>
+  <p>
+  <input type="checkbox" name="email_students"> Notify students by email
   <p>
   <input type="checkbox" name="auto_enroll"> Auto-enroll students when they activate
   <input type="submit" name="action" value="Enroll multiple students">

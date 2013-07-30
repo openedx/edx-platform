@@ -2,7 +2,6 @@
 Ideally, it will be the only place that needs to know about any special settings
 like DISABLE_START_DATES"""
 import logging
-import time
 from datetime import datetime, timedelta
 from functools import partial
 
@@ -15,6 +14,7 @@ from xmodule.modulestore import Location
 from xmodule.x_module import XModule, XModuleDescriptor
 
 from student.models import CourseEnrollmentAllowed
+from external_auth.models import ExternalAuthMap
 from courseware.masquerade import is_masquerading_as_student
 from django.utils.timezone import UTC
 
@@ -130,15 +130,33 @@ def _has_access_course_desc(user, course, action):
 
     def can_enroll():
         """
-        If the course has an enrollment period, check whether we are in it.
+        First check if restriction of enrollment by login method is enabled, both
+            globally and by the course.
+        If it is, then the user must pass the criterion set by the course, e.g. that ExternalAuthMap 
+            was set by 'shib:https://idp.stanford.edu/", in addition to requirements below.
+        Rest of requirements:
+        Enrollment can only happen in the course enrollment period, if one exists.
+            or
+        
+        (CourseEnrollmentAllowed always overrides)
         (staff can always enroll)
         """
+        # if using registration method to restrict (say shibboleth)
+        if settings.MITX_FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
+            if user is not None and user.is_authenticated() and \
+                ExternalAuthMap.objects.filter(user=user, external_domain=course.enrollment_domain):
+                debug("Allow: external_auth of " + course.enrollment_domain)
+                reg_method_ok = True
+            else:
+                reg_method_ok = False
+        else:
+            reg_method_ok = True #if not using this access check, it's always OK.
 
         now = datetime.now(UTC())
         start = course.enrollment_start
         end = course.enrollment_end
 
-        if (start is None or now > start) and (end is None or now < end):
+        if reg_method_ok and (start is None or now > start) and (end is None or now < end):
             # in enrollment period, so any user is allowed to enroll.
             debug("Allow: in enrollment period")
             return True
@@ -505,10 +523,8 @@ def _adjust_start_date_for_beta_testers(user, descriptor):
     beta_group = course_beta_test_group_name(descriptor.location)
     if beta_group in user_groups:
         debug("Adjust start time: user in group %s", beta_group)
-        start_as_datetime = descriptor.lms.start
         delta = timedelta(descriptor.lms.days_early_for_beta)
-        effective = start_as_datetime - delta
-        # ...and back to time_struct
+        effective = descriptor.lms.start - delta
         return effective
 
     return descriptor.lms.start
@@ -570,7 +586,6 @@ def _has_access_to_location(user, location, access_level, course_context):
         debug("Deny: user not in groups %s", instructor_groups)
     else:
         log.debug("Error in access._has_access_to_location access_level=%s unknown" % access_level)
-
     return False
 
 

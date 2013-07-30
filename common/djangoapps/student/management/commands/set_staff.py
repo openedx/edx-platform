@@ -26,7 +26,7 @@ class Command(BaseCommand):
             raise CommandError('Usage is set_staff {0}'.format(self.args))
 
         for user in args:
-            if re.match('[^@]+@[^@]+\.[^@]+', user):
+            if re.match(r'[^@]+@[^@]+\.[^@]+', user):
                 try:
                     v = User.objects.get(email=user)
                 except:

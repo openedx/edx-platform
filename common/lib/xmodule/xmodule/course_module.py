@@ -5,7 +5,6 @@ from lxml import etree
 from path import path  # NOTE (THK): Only used for detecting presence of syllabus
 import requests
 from datetime import datetime
-
 import dateutil.parser
 
 from xmodule.modulestore import Location
@@ -16,6 +15,7 @@ import json
 
 from xblock.core import Scope, List, String, Dict, Boolean
 from .fields import Date
+from xmodule.modulestore.locator import CourseLocator
 from django.utils.timezone import UTC
 from xmodule.util import date_utils
 
@@ -146,113 +146,20 @@ class TextbookList(List):
 
 
 class CourseFields(object):
-    textbooks = TextbookList(help="List of pairs of (title, url) for textbooks used in this course", scope=Scope.content)
+    textbooks = TextbookList(help="List of pairs of (title, url) for textbooks used in this course",
+        default=[], scope=Scope.content)
     wiki_slug = String(help="Slug that points to the wiki for this course", scope=Scope.content)
     enrollment_start = Date(help="Date that enrollment for this class is opened", scope=Scope.settings)
     enrollment_end = Date(help="Date that enrollment for this class is closed", scope=Scope.settings)
-    start = Date(help="Start time when this module is visible", scope=Scope.settings)
+    start = Date(help="Start time when this module is visible",
+        # using now(UTC()) resulted in fractional seconds which screwed up comparisons and anyway w/b the
+        # time of first invocation of this stmt on the server
+        default=datetime.fromtimestamp(0, UTC()),
+        scope=Scope.settings)
     end = Date(help="Date that this class ends", scope=Scope.settings)
     advertised_start = String(help="Date that this course is advertised to start", scope=Scope.settings)
-    grading_policy = Dict(help="Grading policy definition for this class", scope=Scope.content)
-    show_calculator = Boolean(help="Whether to show the calculator in this course", default=False, scope=Scope.settings)
-    display_name = String(help="Display name for this module", scope=Scope.settings)
-    tabs = List(help="List of tabs to enable in this course", scope=Scope.settings)
-    end_of_course_survey_url = String(help="Url for the end-of-course survey", scope=Scope.settings)
-    discussion_blackouts = List(help="List of pairs of start/end dates for discussion blackouts", scope=Scope.settings)
-    discussion_topics = Dict(
-        help="Map of topics names to ids",
-        scope=Scope.settings
-        )
-    testcenter_info = Dict(help="Dictionary of Test Center info", scope=Scope.settings)
-    announcement = Date(help="Date this course is announced", scope=Scope.settings)
-    cohort_config = Dict(help="Dictionary defining cohort configuration", scope=Scope.settings)
-    is_new = Boolean(help="Whether this course should be flagged as new", scope=Scope.settings)
-    no_grade = Boolean(help="True if this course isn't graded", default=False, scope=Scope.settings)
-    disable_progress_graph = Boolean(help="True if this course shouldn't display the progress graph", default=False, scope=Scope.settings)
-    pdf_textbooks = List(help="List of dictionaries containing pdf_textbook configuration", scope=Scope.settings)
-    html_textbooks = List(help="List of dictionaries containing html_textbook configuration", scope=Scope.settings)
-    remote_gradebook = Dict(scope=Scope.settings)
-    allow_anonymous = Boolean(scope=Scope.settings, default=True)
-    allow_anonymous_to_peers = Boolean(scope=Scope.settings, default=False)
-    advanced_modules = List(help="Beta modules used in your course", scope=Scope.settings)
-    has_children = True
-    checklists = List(scope=Scope.settings)
-    info_sidebar_name = String(scope=Scope.settings, default='Course Handouts')
-    show_timezone = Boolean(help="True if timezones should be shown on dates in the courseware", scope=Scope.settings, default=True)
-
-    # An extra property is used rather than the wiki_slug/number because
-    # there are courses that change the number for different runs. This allows
-    # courses to share the same css_class across runs even if they have
-    # different numbers.
-    #
-    # TODO get rid of this as soon as possible or potentially build in a robust
-    # way to add in course-specific styling. There needs to be a discussion
-    # about the right way to do this, but arjun will address this ASAP. Also
-    # note that the courseware template needs to change when this is removed.
-    css_class = String(help="DO NOT USE THIS", scope=Scope.settings)
-
-    # TODO: This is a quick kludge to allow CS50 (and other courses) to
-    # specify their own discussion forums as external links by specifying a
-    # "discussion_link" in their policy JSON file. This should later get
-    # folded in with Syllabus, Course Info, and additional Custom tabs in a
-    # more sensible framework later.
-    discussion_link = String(help="DO NOT USE THIS", scope=Scope.settings)
-
-    # TODO: same as above, intended to let internal CS50 hide the progress tab
-    # until we get grade integration set up.
-    # Explicit comparison to True because we always want to return a bool.
-    hide_progress_tab = Boolean(help="DO NOT USE THIS", scope=Scope.settings)
-
-
-class CourseDescriptor(CourseFields, SequenceDescriptor):
-    module_class = SequenceModule
-
-    template_dir_name = 'course'
-
-    def __init__(self, *args, **kwargs):
-        super(CourseDescriptor, self).__init__(*args, **kwargs)
-
-        if self.wiki_slug is None:
-            self.wiki_slug = self.location.course
-
-        msg = None
-        if self.start is None:
-            msg = "Course loaded without a valid start date. id = %s" % self.id
-            self.start = datetime.now(UTC())
-            log.critical(msg)
-            self.system.error_tracker(msg)
-
-        # NOTE: relies on the modulestore to call set_grading_policy() right after
-        # init.  (Modulestore is in charge of figuring out where to load the policy from)
-
-        # NOTE (THK): This is a last-minute addition for Fall 2012 launch to dynamically
-        #   disable the syllabus content for courses that do not provide a syllabus
-        self.syllabus_present = self.system.resources_fs.exists(path('syllabus'))
-        self._grading_policy = {}
-
-        self.set_grading_policy(self.grading_policy)
-        if self.discussion_topics == {}:
-            self.discussion_topics = {'General': {'id': self.location.html_id()}}
-
-        self.test_center_exams = []
-        test_center_info = self.testcenter_info
-        if test_center_info is not None:
-            for exam_name in test_center_info:
-                try:
-                    exam_info = test_center_info[exam_name]
-                    self.test_center_exams.append(self.TestCenterExam(self.id, exam_name, exam_info))
-                except Exception as err:
-                    # If we can't parse the test center exam info, don't break
-                    # the rest of the courseware.
-                    msg = 'Error %s: Unable to load test-center exam info for exam "%s" of course "%s"' % (err, exam_name, self.id)
-                    log.error(msg)
-                    continue
-
-    def default_grading_policy(self):
-        """
-        Return a dict which is a copy of the default grading policy
-        """
-        return {"GRADER": [
+    grading_policy = Dict(help="Grading policy definition for this class",
+        default={"GRADER": [
                 {
                     "type": "Homework",
                     "min_count": 12,
@@ -283,7 +190,252 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
             ],
             "GRADE_CUTOFFS": {
                 "Pass": 0.5
-            }}
+            }},
+            scope=Scope.content)
+    show_calculator = Boolean(help="Whether to show the calculator in this course", default=False, scope=Scope.settings)
+    display_name = String(help="Display name for this module", default="Empty", display_name="Display Name", scope=Scope.settings)
+    show_chat = Boolean(help="Whether to show the chat widget in this course", default=False, scope=Scope.settings)
+    tabs = List(help="List of tabs to enable in this course", scope=Scope.settings)
+    end_of_course_survey_url = String(help="Url for the end-of-course survey", scope=Scope.settings)
+    discussion_blackouts = List(help="List of pairs of start/end dates for discussion blackouts", scope=Scope.settings)
+    discussion_topics = Dict(
+        help="Map of topics names to ids",
+        scope=Scope.settings
+        )
+    testcenter_info = Dict(help="Dictionary of Test Center info", scope=Scope.settings)
+    announcement = Date(help="Date this course is announced", scope=Scope.settings)
+    cohort_config = Dict(help="Dictionary defining cohort configuration", scope=Scope.settings)
+    is_new = Boolean(help="Whether this course should be flagged as new", scope=Scope.settings)
+    no_grade = Boolean(help="True if this course isn't graded", default=False, scope=Scope.settings)
+    disable_progress_graph = Boolean(help="True if this course shouldn't display the progress graph", default=False, scope=Scope.settings)
+    pdf_textbooks = List(help="List of dictionaries containing pdf_textbook configuration", scope=Scope.settings)
+    html_textbooks = List(help="List of dictionaries containing html_textbook configuration", scope=Scope.settings)
+    remote_gradebook = Dict(scope=Scope.settings)
+    allow_anonymous = Boolean(scope=Scope.settings, default=True)
+    allow_anonymous_to_peers = Boolean(scope=Scope.settings, default=False)
+    advanced_modules = List(help="Beta modules used in your course", scope=Scope.settings)
+    has_children = True
+    checklists = List(scope=Scope.settings,
+        default=[
+            {"short_description" : "Getting Started With Studio",
+             "items" : [{"short_description": "Add Course Team Members",
+                         "long_description": "Grant your collaborators permission to edit your course so you can work together.",
+                         "is_checked": False,
+                         "action_url": "ManageUsers",
+                         "action_text": "Edit Course Team",
+                         "action_external": False},
+                        {"short_description": "Set Important Dates for Your Course",
+                         "long_description": "Establish your course's student enrollment and launch dates on the Schedule and Details page.",
+                         "is_checked": False,
+                         "action_url": "SettingsDetails",
+                         "action_text": "Edit Course Details &amp; Schedule",
+                         "action_external": False},
+                         {"short_description": "Draft Your Course's Grading Policy",
+                         "long_description": "Set up your assignment types and grading policy even if you haven't created all your assignments.",
+                         "is_checked": False,
+                         "action_url": "SettingsGrading",
+                         "action_text": "Edit Grading Settings",
+                         "action_external": False},
+                         {"short_description": "Explore the Other Studio Checklists",
+                         "long_description": "Discover other available course authoring tools, and find help when you need it.",
+                         "is_checked": False,
+                         "action_url": "",
+                         "action_text": "",
+                         "action_external": False}]
+            },
+            {"short_description" : "Draft a Rough Course Outline",
+             "items" : [{"short_description": "Create Your First Section and Subsection",
+                          "long_description": "Use your course outline to build your first Section and Subsection.",
+                          "is_checked": False,
+                          "action_url": "CourseOutline",
+                          "action_text": "Edit Course Outline",
+                          "action_external": False},
+                         {"short_description": "Set Section Release Dates",
+                          "long_description": "Specify the release dates for each Section in your course. Sections become visible to students on their release dates.",
+                          "is_checked": False,
+                          "action_url": "CourseOutline",
+                          "action_text": "Edit Course Outline",
+                          "action_external": False},
+                          {"short_description": "Designate a Subsection as Graded",
+                          "long_description": "Set a Subsection to be graded as a specific assignment type. Assignments within graded Subsections count toward a student's final grade.",
+                          "is_checked": False,
+                          "action_url": "CourseOutline",
+                          "action_text": "Edit Course Outline",
+                          "action_external": False},
+                          {"short_description": "Reordering Course Content",
+                          "long_description": "Use drag and drop to reorder the content in your course.",
+                          "is_checked": False,
+                          "action_url": "CourseOutline",
+                          "action_text": "Edit Course Outline",
+                          "action_external": False},
+                          {"short_description": "Renaming Sections",
+                          "long_description": "Rename Sections by clicking the Section name from the Course Outline.",
+                          "is_checked": False,
+                          "action_url": "CourseOutline",
+                          "action_text": "Edit Course Outline",
+                          "action_external": False},
+                          {"short_description": "Deleting Course Content",
+                          "long_description": "Delete Sections, Subsections, or Units you don't need anymore. Be careful, as there is no Undo function.",
+                          "is_checked": False,
+                          "action_url": "CourseOutline",
+                          "action_text": "Edit Course Outline",
+                          "action_external": False},
+                          {"short_description": "Add an Instructor-Only Section to Your Outline",
+                          "long_description": "Some course authors find using a section for unsorted, in-progress work useful. To do this, create a section and set the release date to the distant future.",
+                          "is_checked": False,
+                          "action_url": "CourseOutline",
+                          "action_text": "Edit Course Outline",
+                          "action_external": False}]
+            },
+            {"short_description" : "Explore edX's Support Tools",
+             "items" : [{"short_description": "Explore the Studio Help Forum",
+                          "long_description": "Access the Studio Help forum from the menu that appears when you click your user name in the top right corner of Studio.",
+                          "is_checked": False,
+                          "action_url": "http://help.edge.edx.org/",
+                          "action_text": "Visit Studio Help",
+                          "action_external": True},
+                         {"short_description": "Enroll in edX 101",
+                          "long_description": "Register for edX 101, edX's primer for course creation.",
+                          "is_checked": False,
+                          "action_url": "https://edge.edx.org/courses/edX/edX101/How_to_Create_an_edX_Course/about",
+                          "action_text": "Register for edX 101",
+                          "action_external": True},
+                          {"short_description": "Download the Studio Documentation",
+                          "long_description": "Download the searchable Studio reference documentation in PDF form.",
+                          "is_checked": False,
+                          "action_url": "http://files.edx.org/Getting_Started_with_Studio.pdf",
+                          "action_text": "Download Documentation",
+                          "action_external": True}]
+            },
+            {"short_description" : "Draft Your Course About Page",
+             "items" : [{"short_description": "Draft a Course Description",
+                          "long_description": "Courses on edX have an About page that includes a course video, description, and more. Draft the text students will read before deciding to enroll in your course.",
+                          "is_checked": False,
+                          "action_url": "SettingsDetails",
+                          "action_text": "Edit Course Schedule &amp; Details",
+                          "action_external": False},
+                         {"short_description": "Add Staff Bios",
+                          "long_description": "Showing prospective students who their instructor will be is helpful. Include staff bios on the course About page.",
+                          "is_checked": False,
+                          "action_url": "SettingsDetails",
+                          "action_text": "Edit Course Schedule &amp; Details",
+                          "action_external": False},
+                          {"short_description": "Add Course FAQs",
+                          "long_description": "Include a short list of frequently asked questions about your course.",
+                          "is_checked": False,
+                          "action_url": "SettingsDetails",
+                          "action_text": "Edit Course Schedule &amp; Details",
+                          "action_external": False},
+                          {"short_description": "Add Course Prerequisites",
+                          "long_description": "Let students know what knowledge and/or skills they should have before they enroll in your course.",
+                          "is_checked": False,
+                          "action_url": "SettingsDetails",
+                          "action_text": "Edit Course Schedule &amp; Details",
+                          "action_external": False}]
+            }
+        ])
+    info_sidebar_name = String(scope=Scope.settings, default='Course Handouts')
+    show_timezone = Boolean(help="True if timezones should be shown on dates in the courseware", scope=Scope.settings, default=True)
+    enrollment_domain = String(help="External login method associated with user accounts allowed to register in course",
+                        scope=Scope.settings)
+
+    # An extra property is used rather than the wiki_slug/number because
+    # there are courses that change the number for different runs. This allows
+    # courses to share the same css_class across runs even if they have
+    # different numbers.
+    #
+    # TODO get rid of this as soon as possible or potentially build in a robust
+    # way to add in course-specific styling. There needs to be a discussion
+    # about the right way to do this, but arjun will address this ASAP. Also
+    # note that the courseware template needs to change when this is removed.
+    css_class = String(help="DO NOT USE THIS", scope=Scope.settings)
+
+    # TODO: This is a quick kludge to allow CS50 (and other courses) to
+    # specify their own discussion forums as external links by specifying a
+    # "discussion_link" in their policy JSON file. This should later get
+    # folded in with Syllabus, Course Info, and additional Custom tabs in a
+    # more sensible framework later.
+    discussion_link = String(help="DO NOT USE THIS", scope=Scope.settings)
+
+    # TODO: same as above, intended to let internal CS50 hide the progress tab
+    # until we get grade integration set up.
+    # Explicit comparison to True because we always want to return a bool.
+    hide_progress_tab = Boolean(help="DO NOT USE THIS", scope=Scope.settings)
+
+
+class CourseDescriptor(CourseFields, SequenceDescriptor):
+    module_class = SequenceModule
+
+    def __init__(self, *args, **kwargs):
+        """
+        Expects the same arguments as XModuleDescriptor.__init__
+        """
+        super(CourseDescriptor, self).__init__(*args, **kwargs)
+
+        if self.wiki_slug is None:
+            if isinstance(self.location, Location):
+                self.wiki_slug = self.location.course
+            elif isinstance(self.location, CourseLocator):
+                self.wiki_slug = self.location.course_id or self.display_name
+
+        msg = None
+
+        # NOTE: relies on the modulestore to call set_grading_policy() right after
+        # init.  (Modulestore is in charge of figuring out where to load the policy from)
+
+        # NOTE (THK): This is a last-minute addition for Fall 2012 launch to dynamically
+        #   disable the syllabus content for courses that do not provide a syllabus
+        if self.system.resources_fs is None:
+            self.syllabus_present = False
+        else:
+            self.syllabus_present = self.system.resources_fs.exists(path('syllabus'))
+        self._grading_policy = {}
+
+        self.set_grading_policy(self.grading_policy)
+        if self.discussion_topics == {}:
+            self.discussion_topics = {'General': {'id': self.location.html_id()}}
+
+        self.test_center_exams = []
+        test_center_info = self.testcenter_info
+        if test_center_info is not None:
+            for exam_name in test_center_info:
+                try:
+                    exam_info = test_center_info[exam_name]
+                    self.test_center_exams.append(self.TestCenterExam(self.id, exam_name, exam_info))
+                except Exception as err:
+                    # If we can't parse the test center exam info, don't break
+                    # the rest of the courseware.
+                    msg = 'Error %s: Unable to load test-center exam info for exam "%s" of course "%s"' % (err, exam_name, self.id)
+                    log.error(msg)
+                    continue
+
+        # TODO check that this is still needed here and can't be by defaults.
+        if not self.tabs:
+            # When calling the various _tab methods, can omit the 'type':'blah' from the
+            # first arg, since that's only used for dispatch
+            tabs = []
+            tabs.append({'type': 'courseware'})
+            tabs.append({'type': 'course_info', 'name': 'Course Info'})
+
+            if self.syllabus_present:
+                tabs.append({'type': 'syllabus'})
+
+            tabs.append({'type': 'textbooks'})
+
+            # # If they have a discussion link specified, use that even if we feature
+            # # flag discussions off. Disabling that is mostly a server safety feature
+            # # at this point, and we don't need to worry about external sites.
+            if self.discussion_link:
+                tabs.append({'type': 'external_discussion', 'link': self.discussion_link})
+            else:
+                tabs.append({'type': 'discussion', 'name': 'Discussion'})
+
+            tabs.append({'type': 'wiki', 'name': 'Wiki'})
+
+            if not self.hide_progress_tab:
+                tabs.append({'type': 'progress', 'name': 'Progress'})
+
+            self.tabs = tabs
 
     def set_grading_policy(self, course_policy):
         """
@@ -294,7 +446,13 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
             course_policy = {}
 
         # Load the global settings as a dictionary
-        grading_policy = self.default_grading_policy()
+        grading_policy = self.grading_policy
+        # BOY DO I HATE THIS grading_policy CODE ACROBATICS YET HERE I ADD MORE (dhm)--this fixes things persisted w/
+        # defective grading policy values (but not None)
+        if 'GRADER' not in grading_policy:
+            grading_policy['GRADER'] = CourseFields.grading_policy.default['GRADER']
+        if 'GRADE_CUTOFFS' not in grading_policy:
+            grading_policy['GRADE_CUTOFFS'] = CourseFields.grading_policy.default['GRADE_CUTOFFS']
 
         # Override any global settings with the course settings
         grading_policy.update(course_policy)
@@ -349,10 +507,6 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         except ValueError:
             system.error_tracker("Unable to decode grading policy as json")
             policy = {}
-
-        # cdodge: import the grading policy information that is on disk and put into the
-        # descriptor 'definition' bucket as a dictionary so that it is persisted in the DB
-        instance.grading_policy = policy
 
         # now set the current instance. set_grading_policy() will apply some inheritance rules
         instance.set_grading_policy(policy)
@@ -657,6 +811,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         if isinstance(self.advertised_start, basestring):
             return try_parse_iso_8601(self.advertised_start)
         elif self.advertised_start is None and self.start is None:
+            # TODO this is an impossible state since the init function forces start to have a value
             return 'TBD'
         else:
             return (self.advertised_start or self.start).strftime("%b %d, %Y")

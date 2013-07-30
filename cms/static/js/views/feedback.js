@@ -10,8 +10,12 @@ CMS.Views.SystemFeedback = Backbone.View.extend({
         minShown: 0,  // length of time after this view has been shown before it can be hidden (milliseconds)
         maxShown: Infinity  // length of time after this view has been shown before it will be automatically hidden (milliseconds)
 
-        /* could also have an "actions" hash: here is an example demonstrating
-           the expected structure
+        /* Could also have an "actions" hash: here is an example demonstrating
+           the expected structure. For each action, by default the framework
+           will call preventDefault on the click event before the function is
+           run; to make it not do that, just pass `preventDefault: false` in
+           the action object.
+
         actions: {
             primary: {
                 "text": "Save",
@@ -49,6 +53,11 @@ CMS.Views.SystemFeedback = Backbone.View.extend({
         }
         this.template = _.template(tpl);
         this.setElement($("#page-"+this.options.type));
+        // handle single "secondary" action
+        if (this.options.actions && this.options.actions.secondary &&
+            !_.isArray(this.options.actions.secondary)) {
+            this.options.actions.secondary = [this.options.actions.secondary];
+        }
         return this;
     },
     // public API: show() and hide()
@@ -101,6 +110,9 @@ CMS.Views.SystemFeedback = Backbone.View.extend({
         if(!actions) { return; }
         var primary = actions.primary;
         if(!primary) { return; }
+        if(primary.preventDefault !== false) {
+            event.preventDefault();
+        }
         if(primary.click) {
             primary.click.call(event.target, this, event);
         }
@@ -116,6 +128,9 @@ CMS.Views.SystemFeedback = Backbone.View.extend({
             i = _.indexOf(this.$(".action-secondary"), event.target);
         }
         var secondary = secondaryList[i];
+        if(secondary.preventDefault !== false) {
+            event.preventDefault();
+        }
         if(secondary.click) {
             secondary.click.call(event.target, this, event);
         }
@@ -125,7 +140,21 @@ CMS.Views.SystemFeedback = Backbone.View.extend({
 CMS.Views.Alert = CMS.Views.SystemFeedback.extend({
     options: $.extend({}, CMS.Views.SystemFeedback.prototype.options, {
         type: "alert"
-    })
+    }),
+    slide_speed: 900,
+    show: function() {
+        CMS.Views.SystemFeedback.prototype.show.apply(this, arguments);
+        this.$el.hide();
+        this.$el.slideDown(this.slide_speed);
+        return this;
+    },
+    hide: function () {
+        this.$el.slideUp({
+            duration: this.slide_speed
+        });
+        setTimeout(_.bind(CMS.Views.SystemFeedback.prototype.hide, this, arguments),
+                   this.slideSpeed);
+    }
 });
 CMS.Views.Notification = CMS.Views.SystemFeedback.extend({
     options: $.extend({}, CMS.Views.SystemFeedback.prototype.options, {
@@ -156,7 +185,7 @@ CMS.Views.Prompt = CMS.Views.SystemFeedback.extend({
 var capitalCamel, types, intents;
 capitalCamel = _.compose(_.str.capitalize, _.str.camelize);
 types = ["alert", "notification", "prompt"];
-intents = ["warning", "error", "confirmation", "announcement", "step-required", "help", "saving"];
+intents = ["warning", "error", "confirmation", "announcement", "step-required", "help", "mini"];
 _.each(types, function(type) {
     _.each(intents, function(intent) {
         // "class" is a reserved word in Javascript, so use "klass" instead
@@ -171,3 +200,8 @@ _.each(types, function(type) {
         klass[capitalCamel(intent)] = subklass;
     });
 });
+
+// set more sensible defaults for Notification-Mini views
+var miniOptions = CMS.Views.Notification.Mini.prototype.options;
+miniOptions.minShown = 1250;
+miniOptions.closeIcon = false;

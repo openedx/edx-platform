@@ -3,10 +3,11 @@ if (!CMS.Views['Settings']) CMS.Views.Settings = {};
 CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
     // Model class is CMS.Models.Settings.CourseDetails
     events : {
+        "input input" : "updateModel",
+        "input textarea" : "updateModel",
+        // Leaving change in as fallback for older browsers
         "change input" : "updateModel",
         "change textarea" : "updateModel",
-        'click .remove-course-syllabus' : "removeSyllabus",
-        'click .new-course-syllabus' : 'assetSyllabus',
         'click .remove-course-introduction-video' : "removeVideo",
         'focus #course-overview' : "codeMirrorize",
         'mouseover #timezone' : "updateTime",
@@ -15,6 +16,7 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
         'blur :input' : "inputUnfocus"
 
     },
+
     initialize : function() {
         this.fileAnchorTemplate = _.template('<a href="<%= fullpath %>"> <i class="icon-file"></i><%= filename %></a>');
         // fill in fields
@@ -27,6 +29,7 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
         this.$el.find('#timezone').html("(" + dateIntrospect.getTimezone() + ")");
 
         this.listenTo(this.model, 'invalid', this.handleValidationError);
+        this.listenTo(this.model, 'change', this.showNotificationBar);
         this.selectorToField = _.invert(this.fieldToSelectorMap);
     },
 
@@ -36,25 +39,13 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
         this.setupDatePicker('enrollment_start');
         this.setupDatePicker('enrollment_end');
 
-        if (this.model.has('syllabus')) {
-            this.$el.find(this.fieldToSelectorMap['syllabus']).html(
-                    this.fileAnchorTemplate({
-                        fullpath : this.model.get('syllabus'),
-                        filename: 'syllabus'}));
-            this.$el.find('.remove-course-syllabus').show();
-        }
-        else {
-            this.$el.find('#' + this.fieldToSelectorMap['syllabus']).html("");
-            this.$el.find('.remove-course-syllabus').hide();
-        }
-
         this.$el.find('#' + this.fieldToSelectorMap['overview']).val(this.model.get('overview'));
         this.codeMirrorize(null, $('#course-overview')[0]);
 
         this.$el.find('.current-course-introduction-video iframe').attr('src', this.model.videosourceSample());
+        this.$el.find('#' + this.fieldToSelectorMap['intro_video']).val(this.model.get('intro_video') || '');
         if (this.model.has('intro_video')) {
             this.$el.find('.remove-course-introduction-video').show();
-            this.$el.find('#' + this.fieldToSelectorMap['intro_video']).val(this.model.get('intro_video'));
         }
         else this.$el.find('.remove-course-introduction-video').hide();
 
@@ -67,7 +58,6 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
         'end_date' : 'course-end',
         'enrollment_start' : 'enrollment-start',
         'enrollment_end' : 'enrollment-end',
-        'syllabus' : '.current-course-syllabus .doc-filename',
         'overview' : 'course-overview',
         'intro_video' : 'course-introduction-video',
         'effort' : "course-effort"
@@ -87,8 +77,7 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
         var datefield = $(div).find("input:.date");
         var timefield = $(div).find("input:.time");
         var cachethis = this;
-        var savefield = function () {
-            cachethis.clearValidationErrors();
+        var setfield = function () {
             var date = datefield.datepicker('getDate');
             if (date) {
                 var time = timefield.timepicker("getSecondsFromMidnight");
@@ -97,14 +86,16 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
                 }
                 var newVal = new Date(date.getTime() + time * 1000);
                 if (!cacheModel.has(fieldName) || cacheModel.get(fieldName).getTime() !== newVal.getTime()) {
-                    cacheModel.save(fieldName, newVal);
+                    cachethis.clearValidationErrors();
+                    cachethis.setAndValidate(fieldName, newVal);
                 }
             }
             else {
                 // Clear date (note that this clears the time as well, as date and time are linked).
                 // Note also that the validation logic prevents us from clearing the start date
                 // (start date is required by the back end).
-                cacheModel.save(fieldName, null);
+                cachethis.clearValidationErrors();
+                cachethis.setAndValidate(fieldName, null);
             }
         };
 
@@ -112,59 +103,52 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
         timefield.timepicker({'timeFormat' : 'H:i'});
         datefield.datepicker();
 
-        // Using the change event causes savefield to be triggered twice, but it is necessary
+        // Using the change event causes setfield to be triggered twice, but it is necessary
         // to pick up when the date is typed directly in the field.
-        datefield.change(savefield);
-        timefield.on('changeTime', savefield);
+        datefield.change(setfield);
+        timefield.on('changeTime', setfield);
+        timefield.on('input', setfield);
 
         datefield.datepicker('setDate', this.model.get(fieldName));
-        if (this.model.has(fieldName)) timefield.timepicker('setTime', this.model.get(fieldName));
+        // timepicker doesn't let us set null, so check that we have a time
+        if (this.model.has(fieldName)) {
+            timefield.timepicker('setTime', this.model.get(fieldName));
+        } // but reset the field either way
+        else {
+            timefield.val('');
+        }
     },
 
     updateModel: function(event) {
         switch (event.currentTarget.id) {
-        case 'course-start-date': // handled via onSelect method
-        case 'course-end-date':
-        case 'course-enrollment-start-date':
-        case 'course-enrollment-end-date':
-            break;
-
-        case 'course-overview':
-            // handled via code mirror
-            break;
-
         case 'course-effort':
-            this.saveIfChanged(event);
+            this.setField(event);
             break;
+        // Don't make the user reload the page to check the Youtube ID.
+        // Wait for a second to load the video, avoiding egregious AJAX calls.
         case 'course-introduction-video':
             this.clearValidationErrors();
-            var previewsource = this.model.save_videosource($(event.currentTarget).val());
-            this.$el.find(".current-course-introduction-video iframe").attr("src", previewsource);
-            if (this.model.has('intro_video')) {
-                this.$el.find('.remove-course-introduction-video').show();
-            }
-            else {
-                this.$el.find('.remove-course-introduction-video').hide();
-            }
+            var previewsource = this.model.set_videosource($(event.currentTarget).val());
+            clearTimeout(this.videoTimer);
+            this.videoTimer = setTimeout(_.bind(function() {
+                this.$el.find(".current-course-introduction-video iframe").attr("src", previewsource);
+                if (this.model.has('intro_video')) {
+                    this.$el.find('.remove-course-introduction-video').show();
+                }
+                else {
+                    this.$el.find('.remove-course-introduction-video').hide();
+                }
+            }, this), 1000);
             break;
-
-        default:
+        default: // Everything else is handled by datepickers and CodeMirror.
             break;
         }
-
     },
 
-    removeSyllabus: function() {
-        if (this.model.has('syllabus'))	this.model.save({'syllabus': null});
-    },
-
-    assetSyllabus : function() {
-        // TODO implement
-    },
-
-    removeVideo: function() {
+    removeVideo: function(event) {
+        event.preventDefault();
         if (this.model.has('intro_video')) {
-            this.model.save_videosource(null);
+            this.model.set_videosource(null);
             this.$el.find(".current-course-introduction-video iframe").attr("src", "");
             this.$el.find('#' + this.fieldToSelectorMap['intro_video']).val("");
             this.$el.find('.remove-course-introduction-video').hide();
@@ -185,15 +169,53 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
             var field = this.selectorToField[thisTarget.id];
             this.codeMirrors[thisTarget.id] = CodeMirror.fromTextArea(thisTarget, {
                 mode: "text/html", lineNumbers: true, lineWrapping: true,
-                onBlur: function (mirror) {
+                onChange: function (mirror) {
                     mirror.save();
                     cachethis.clearValidationErrors();
                     var newVal = mirror.getValue();
-                    if (cachethis.model.get(field) != newVal) cachethis.model.save(field, newVal);
+                    if (cachethis.model.get(field) != newVal) {
+                        cachethis.setAndValidate(field, newVal);
+                    }
                 }
             });
         }
-    }
+    },
 
+    revertView: function() {
+        // Make sure that the CodeMirror instance has the correct
+        // data from its corresponding textarea
+        var self = this;
+        this.model.fetch({
+            success: function() {
+                self.render();
+                _.each(self.codeMirrors,
+                       function(mirror) {
+                           var ele = mirror.getTextArea();
+                           var field = self.selectorToField[ele.id];
+                           mirror.setValue(self.model.get(field));
+                       });
+            },
+            reset: true,
+            silent: true});
+    },
+    setAndValidate: function(attr, value) {
+        // If we call model.set() with {validate: true}, model fields
+        // will not be set if validation fails. This puts the UI and
+        // the model in an inconsistent state, and causes us to not
+        // see the right validation errors the next time validate() is
+        // called on the model. So we set *without* validating, then
+        // call validate ourselves.
+        this.model.set(attr, value);
+        this.model.isValid();
+    },
+
+    showNotificationBar: function() {
+        // We always call showNotificationBar with the same args, just
+        // delegate to superclass
+        CMS.Views.ValidatingView.prototype.showNotificationBar.call(this,
+                                                                    this.save_message,
+                                                                    _.bind(this.saveView, this),
+                                                                    _.bind(this.revertView, this));
+    }
 });
 

@@ -2,15 +2,12 @@ import os
 import sys
 import traceback
 
-from filecmp import dircmp
 from fs.osfs import OSFS
 from path import path
-from lxml import etree
 
 from django.core.management.base import BaseCommand
 
 from xmodule.modulestore.xml import XMLModuleStore
-from xmodule.errortracker import make_error_tracker
 
 
 def traverse_tree(course):

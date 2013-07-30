@@ -1,6 +1,5 @@
 import pymongo
 
-from mock import Mock
 from nose.tools import assert_equals, assert_raises, assert_not_equals, assert_false
 from pprint import pprint
 
@@ -10,15 +9,15 @@ from xblock.runtime import KeyValueStore, InvalidScopeError
 from xmodule.modulestore import Location
 from xmodule.modulestore.mongo import MongoModuleStore, MongoKeyValueStore
 from xmodule.modulestore.xml_importer import import_from_xml
-from xmodule.templates import update_templates
 
 from .test_modulestore import check_path_to_location
 from . import DATA_DIR
+from uuid import uuid4
 
 
 HOST = 'localhost'
 PORT = 27017
-DB = 'test'
+DB = 'test_mongo_%s' % uuid4().hex
 COLLECTION = 'modulestore'
 FS_ROOT = DATA_DIR  # TODO (vshnayder): will need a real fs_root for testing load_item
 DEFAULT_CLASS = 'xmodule.raw_module.RawDescriptor'
@@ -40,7 +39,8 @@ class TestMongoModuleStore(object):
 
     @classmethod
     def teardownClass(cls):
-        pass
+        cls.connection = pymongo.connection.Connection(HOST, PORT)
+        cls.connection.drop_database(DB)
 
     @staticmethod
     def initdb():
@@ -50,7 +50,6 @@ class TestMongoModuleStore(object):
         # Explicitly list the courses to load (don't want the big one)
         courses = ['toy', 'simple']
         import_from_xml(store, DATA_DIR, courses)
-        update_templates(store)
         return store
 
     @staticmethod
@@ -125,7 +124,7 @@ class TestMongoKeyValueStore(object):
         self.location = Location('i4x://org/course/category/name@version')
         self.children = ['i4x://org/course/child/a', 'i4x://org/course/child/b']
         self.metadata = {'meta': 'meta_val'}
-        self.kvs = MongoKeyValueStore(self.data, self.children, self.metadata, self.location)
+        self.kvs = MongoKeyValueStore(self.data, self.children, self.metadata, self.location, 'category')
 
     def _check_read(self, key, expected_value):
         assert_equals(expected_value, self.kvs.get(key))

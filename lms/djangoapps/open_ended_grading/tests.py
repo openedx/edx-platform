@@ -1,15 +1,14 @@
 """
 Tests for open ended grading interfaces
 
-django-admin.py test --settings=lms.envs.test --pythonpath=. lms/djangoapps/open_ended_grading
+./manage.py lms --settings test test lms/djangoapps/open_ended_grading
 """
 
 import json
 from mock import MagicMock, patch, Mock
 
 from django.core.urlresolvers import reverse
-from django.contrib.auth.models import Group
-from django.http import HttpResponse
+from django.contrib.auth.models import Group, User
 from django.conf import settings
 from mitxmako.shortcuts import render_to_string
 
@@ -21,7 +20,6 @@ from xmodule.x_module import ModuleSystem
 
 from open_ended_grading import staff_grading_service, views
 from courseware.access import _course_staff_group_name
-from courseware.tests.tests import LoginEnrollmentTestCase, TEST_DATA_XML_MODULESTORE, get_user
 
 import logging
 
@@ -31,6 +29,9 @@ from django.test.utils import override_settings
 from xmodule.tests import test_util_open_ended
 
 from courseware.tests import factories
+from courseware.tests.modulestore_config import TEST_DATA_XML_MODULESTORE
+from courseware.tests.helpers import LoginEnrollmentTestCase, check_for_get_code, check_for_post_code
+
 
 @override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
 class TestStaffGradingService(LoginEnrollmentTestCase):
@@ -58,7 +59,7 @@ class TestStaffGradingService(LoginEnrollmentTestCase):
         def make_instructor(course):
             group_name = _course_staff_group_name(course.location)
             group = Group.objects.create(name=group_name)
-            group.user_set.add(get_user(self.instructor))
+            group.user_set.add(User.objects.get(email=self.instructor))
 
         make_instructor(self.toy)
 
@@ -75,8 +76,8 @@ class TestStaffGradingService(LoginEnrollmentTestCase):
         # both get and post should return 404
         for view_name in ('staff_grading_get_next', 'staff_grading_save_grade'):
             url = reverse(view_name, kwargs={'course_id': self.course_id})
-            self.check_for_get_code(404, url)
-            self.check_for_post_code(404, url)
+            check_for_get_code(self, 404, url)
+            check_for_post_code(self, 404, url)
 
     def test_get_next(self):
         self.login(self.instructor, self.password)
@@ -84,7 +85,7 @@ class TestStaffGradingService(LoginEnrollmentTestCase):
         url = reverse('staff_grading_get_next', kwargs={'course_id': self.course_id})
         data = {'location': self.location}
 
-        response = self.check_for_post_code(200, url, data)
+        response = check_for_post_code(self, 200, url, data)
 
         content = json.loads(response.content)
 
@@ -113,7 +114,7 @@ class TestStaffGradingService(LoginEnrollmentTestCase):
         if skip:
             data.update({'skipped': True})
 
-        response = self.check_for_post_code(200, url, data)
+        response = check_for_post_code(self, 200, url, data)
         content = json.loads(response.content)
         self.assertTrue(content['success'], str(content))
         self.assertEquals(content['submission_id'], self.mock_service.cnt)
@@ -130,7 +131,7 @@ class TestStaffGradingService(LoginEnrollmentTestCase):
         url = reverse('staff_grading_get_problem_list', kwargs={'course_id': self.course_id})
         data = {}
 
-        response = self.check_for_post_code(200, url, data)
+        response = check_for_post_code(self, 200, url, data)
         content = json.loads(response.content)
 
         self.assertTrue(content['success'], str(content))
@@ -160,7 +161,7 @@ class TestPeerGradingService(LoginEnrollmentTestCase):
         self.course_id = "edX/toy/2012_Fall"
         self.toy = modulestore().get_course(self.course_id)
         location = "i4x://edX/toy/peergrading/init"
-        model_data = {'data': "<peergrading/>", 'location': location}
+        model_data = {'data': "<peergrading/>", 'location': location, 'category':'peergrading'}
         self.mock_service = peer_grading_service.MockPeerGradingService()
         self.system = ModuleSystem(
             ajax_url=location,

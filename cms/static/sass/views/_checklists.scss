@@ -14,7 +14,7 @@ body.course.checklists {
 
   // checklists - general
   .course-checklist {
-    @extend .window;
+    @extend .ui-window;
     margin: 0 0 ($baseline*2) 0;
 
     &:last-child {
@@ -23,7 +23,7 @@ body.course.checklists {
 
     // visual status
     .viz-checklist-status {
-      @extend .text-hide;
+      @extend .cont-text-hide;
       @include size(100%,($baseline/4));
       position: relative;
       display: block;
@@ -31,7 +31,7 @@ body.course.checklists {
       background: $gray-l4;
 
       .viz-checklist-status-value {
-        @include transition(width 2s ease-in-out .25s);
+        @include transition(width $tmg-s2 ease-in-out .25s);
         position: absolute;
         top: 0;
         left: 0;
@@ -40,7 +40,7 @@ body.course.checklists {
         background: $green;
 
         .int {
-          @extend .text-sr;
+          @extend .cont-text-sr;
         }
       }
     }
@@ -49,19 +49,19 @@ body.course.checklists {
     // header/title
     header {
       @include clearfix();
-      @include box-shadow(inset 0 -1px 1px $shadow-l1);
+      box-shadow: inset 0 -1px 1px $shadow-l1;
       margin-bottom: 0;
       border-bottom: 1px solid $gray-l3;
       padding: $baseline ($baseline*1.5);
 
       .checklist-title {
-        @include transition(color .15s .25s ease-in-out);
+        @include transition(color $tmg-f2 ease-in-out 0s);
         width: flex-grid(6, 9);
         margin: 0 flex-gutter() 0 0;
         float: left;
 
         .ui-toggle-expansion {
-          @include transition(rotate .15s ease-in-out .25s);
+          @include transition(all $tmg-f2 ease-in-out 0s);
           @include font-size(21);
           display: inline-block;
           vertical-align: middle;
@@ -118,8 +118,8 @@ body.course.checklists {
     // checklist actions
     .course-checklist-actions {
       @include clearfix();
-      @include box-shadow(inset 0 1px 1px $shadow-l1);
-      @include transition(border .15s ease-in-out .25s);
+      @include transition(border $tmg-f2 ease-in-out .25s);
+      box-shadow: inset 0 1px 1px $shadow-l1;
       border-top: 1px solid $gray-l2;
       padding: $baseline ($baseline*1.5);
       background: $gray-l4;
@@ -155,7 +155,7 @@ body.course.checklists {
     &.is-collapsed {
 
       header {
-        @include box-shadow(none);
+        box-shadow: none;
 
         .checklist-title {
 
@@ -208,8 +208,7 @@ body.course.checklists {
     overflow: hidden;
 
     .task {
-      @include transition(background .15s ease-in-out .25s);
-      @include transition(border .15s ease-in-out .25s);
+      @include transition(background $tmg-f2 ease-in-out 0s, border $tmg-f3 ease-in-out 0s);
       @include clearfix();
       position: relative;
       border-top: 1px solid $white;
@@ -239,7 +238,7 @@ body.course.checklists {
         font-weight: 500;
 
         .task-name {
-          @include transition(color .15s .25s ease-in-out);
+          @include transition(color $tmg-f2 ease-in-out 0s);
           vertical-align: baseline;
           cursor: pointer;
           margin-bottom: 0;
@@ -247,20 +246,20 @@ body.course.checklists {
 
         .task-description {
           @extend .t-copy-sub1;
-          @include transition(color .15s .25s ease-in-out);
+          @include transition(color $tmg-f2 ease-in-out 0s);
           color: $gray-l2;
         }
 
         .task-support {
           @extend .t-copy-sub2;
-          @include transition(opacity .15s .25s ease-in-out);
+          @include transition(opacity $tmg-f2 ease-in-out 0s);
           opacity: 0.0;
           pointer-events: none;
         }
       }
 
       .task-actions {
-        @include transition(opacity .15s .25s ease-in-out);
+        @include transition(opacity $tmg-f2 ease-in-out 0.25s);
         @include clearfix();
         display: inline-block;
         vertical-align: middle;
@@ -274,7 +273,6 @@ body.course.checklists {
         .action-primary {
           @include blue-button;
           @extend .t-action4;
-          @include transition(all .15s);
           font-weight: 600;
           text-align: center;
         }

@@ -1,12 +1,12 @@
 <a href="#" class="edit-button"><span class="edit-icon"></span>Edit</a>
 
-<h2>Course Handouts</h2>
+<h2 class="title">Course Handouts</h2>
 <%if (model.get('data') != null) { %>
   <div class="handouts-content">
     <%= model.get('data') %>
   </div>
 <% } else {%>
-  <p>You have no handouts defined</p>
+  <p>${_("You have no handouts defined")}</p>
 <% } %>
 <form class="edit-handouts-form" style="display: block;">
   <div class="row">

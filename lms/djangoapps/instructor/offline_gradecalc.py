@@ -6,16 +6,12 @@
 # The grades are stored in the OfflineComputedGrade table of the courseware model.
 
 import json
-import logging
 import time
 
-import courseware.models
-
-from collections import namedtuple
 from json import JSONEncoder
 from courseware import grades, models
 from courseware.courses import get_course_by_id
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User
 
 
 class MyEncoder(JSONEncoder):

@@ -17,6 +17,16 @@ beforeEach ->
                 return text.test(trimmedText)
             else
                 return trimmedText.indexOf(text) != -1;
+        toHaveBeenPrevented: ->
+            # remove this when we upgrade jasmine-jquery
+            eventName = @actual.eventName
+            selector = @actual.selector
+            @message = ->
+                [
+                  "Expected event #{eventName} to have been prevented on #{selector}",
+                  "Expected event #{eventName} not to have been prevented on #{selector}"
+                ]
+            return jasmine.JQuery.events.wasPrevented(selector, eventName)
 
 describe "CMS.Views.SystemFeedback", ->
     beforeEach ->
@@ -27,6 +37,10 @@ describe "CMS.Views.SystemFeedback", ->
         @renderSpy = spyOn(CMS.Views.Alert.Confirmation.prototype, 'render').andCallThrough()
         @showSpy = spyOn(CMS.Views.Alert.Confirmation.prototype, 'show').andCallThrough()
         @hideSpy = spyOn(CMS.Views.Alert.Confirmation.prototype, 'hide').andCallThrough()
+        @clock = sinon.useFakeTimers()
+
+    afterEach ->
+        @clock.restore()
 
     it "requires a type and an intent", ->
         neither = =>
@@ -70,8 +84,8 @@ describe "CMS.Views.SystemFeedback", ->
     it "close button sends a .hide() message", ->
         view = new CMS.Views.Alert.Confirmation(@options).show()
         view.$(".action-close").click()
-
         expect(@hideSpy).toHaveBeenCalled()
+        @clock.tick(900)
         expect(view.$('.wrapper')).toBeHiding()
 
 describe "CMS.Views.Prompt", ->
@@ -88,6 +102,16 @@ describe "CMS.Views.Prompt", ->
         view.hide()
         # expect($("body")).not.toHaveClass("prompt-is-shown")
 
+describe "CMS.Views.Notification.Mini", ->
+    beforeEach ->
+        @view = new CMS.Views.Notification.Mini()
+
+    it "should have minShown set to 1250 by default", ->
+        expect(@view.options.minShown).toEqual(1250)
+
+    it "should have closeIcon set to false by default", ->
+        expect(@view.options.closeIcon).toBeFalsy()
+
 describe "CMS.Views.SystemFeedback click events", ->
     beforeEach ->
         @primaryClickSpy = jasmine.createSpy('primaryClick')
@@ -100,11 +124,10 @@ describe "CMS.Views.SystemFeedback click events", ->
                     text: "Save",
                     class: "save-button",
                     click: @primaryClickSpy
-                secondary: [{
+                secondary:
                     text: "Revert",
                     class: "cancel-button",
                     click: @secondaryClickSpy
-                }]
         )
         @view.show()
 
@@ -124,19 +147,93 @@ describe "CMS.Views.SystemFeedback click events", ->
     it "should apply class to secondary action", ->
         expect(@view.$(".action-secondary")).toHaveClass("cancel-button")
 
+    it "should preventDefault on primary action", ->
+        spyOnEvent(".action-primary", "click")
+        @view.$(".action-primary").click()
+        expect("click").toHaveBeenPreventedOn(".action-primary")
+
+    it "should preventDefault on secondary action", ->
+        spyOnEvent(".action-secondary", "click")
+        @view.$(".action-secondary").click()
+        expect("click").toHaveBeenPreventedOn(".action-secondary")
+
+describe "CMS.Views.SystemFeedback not preventing events", ->
+    beforeEach ->
+        @clickSpy = jasmine.createSpy('clickSpy')
+        @view = new CMS.Views.Alert.Confirmation(
+            title: "It's all good"
+            message: "No reason for this alert"
+            actions:
+                primary:
+                    text: "Whatever"
+                    click: @clickSpy
+                    preventDefault: false
+        )
+        @view.show()
+
+    it "should not preventDefault", ->
+        spyOnEvent(".action-primary", "click")
+        @view.$(".action-primary").click()
+        expect("click").not.toHaveBeenPreventedOn(".action-primary")
+        expect(@clickSpy).toHaveBeenCalled()
+
+describe "CMS.Views.SystemFeedback multiple secondary actions", ->
+    beforeEach ->
+        @secondarySpyOne = jasmine.createSpy('secondarySpyOne')
+        @secondarySpyTwo = jasmine.createSpy('secondarySpyTwo')
+        @view = new CMS.Views.Notification.Warning(
+            title: "No Primary",
+            message: "Pick a secondary action",
+            actions:
+                secondary: [
+                    {
+                        text: "Option One"
+                        class: "option-one"
+                        click: @secondarySpyOne
+                    }, {
+                        text: "Option Two"
+                        class: "option-two"
+                        click: @secondarySpyTwo
+                    }
+                ]
+        )
+        @view.show()
+
+    it "should render both", ->
+        expect(@view.el).toContain(".action-secondary.option-one")
+        expect(@view.el).toContain(".action-secondary.option-two")
+        expect(@view.el).not.toContain(".action-secondary.option-one.option-two")
+        expect(@view.$(".action-secondary.option-one")).toContainText("Option One")
+        expect(@view.$(".action-secondary.option-two")).toContainText("Option Two")
+
+    it "should differentiate clicks (1)", ->
+        @view.$(".option-one").click()
+        expect(@secondarySpyOne).toHaveBeenCalled()
+        expect(@secondarySpyTwo).not.toHaveBeenCalled()
+
+    it "should differentiate clicks (2)", ->
+        @view.$(".option-two").click()
+        expect(@secondarySpyOne).not.toHaveBeenCalled()
+        expect(@secondarySpyTwo).toHaveBeenCalled()
+
 describe "CMS.Views.Notification minShown and maxShown", ->
     beforeEach ->
-        @showSpy = spyOn(CMS.Views.Notification.Saving.prototype, 'show')
+        @showSpy = spyOn(CMS.Views.Notification.Confirmation.prototype, 'show')
         @showSpy.andCallThrough()
-        @hideSpy = spyOn(CMS.Views.Notification.Saving.prototype, 'hide')
+        @hideSpy = spyOn(CMS.Views.Notification.Confirmation.prototype, 'hide')
         @hideSpy.andCallThrough()
         @clock = sinon.useFakeTimers()
 
     afterEach ->
         @clock.restore()
 
+    it "should not have minShown or maxShown by default", ->
+        view = new CMS.Views.Notification.Confirmation()
+        expect(view.options.minShown).toEqual(0)
+        expect(view.options.maxShown).toEqual(Infinity)
+
     it "a minShown view should not hide too quickly", ->
-        view = new CMS.Views.Notification.Saving({minShown: 1000})
+        view = new CMS.Views.Notification.Confirmation({minShown: 1000})
         view.show()
         expect(view.$('.wrapper')).toBeShown()
 
@@ -149,7 +246,7 @@ describe "CMS.Views.Notification minShown and maxShown", ->
         expect(view.$('.wrapper')).toBeHiding()
 
     it "a maxShown view should hide by itself", ->
-        view = new CMS.Views.Notification.Saving({maxShown: 1000})
+        view = new CMS.Views.Notification.Confirmation({maxShown: 1000})
         view.show()
         expect(view.$('.wrapper')).toBeShown()
 
@@ -158,7 +255,7 @@ describe "CMS.Views.Notification minShown and maxShown", ->
         expect(view.$('.wrapper')).toBeHiding()
 
     it "a minShown view can stay visible longer", ->
-        view = new CMS.Views.Notification.Saving({minShown: 1000})
+        view = new CMS.Views.Notification.Confirmation({minShown: 1000})
         view.show()
         expect(view.$('.wrapper')).toBeShown()
 
@@ -172,7 +269,7 @@ describe "CMS.Views.Notification minShown and maxShown", ->
         expect(view.$('.wrapper')).toBeHiding()
 
     it "a maxShown view can hide early", ->
-        view = new CMS.Views.Notification.Saving({maxShown: 1000})
+        view = new CMS.Views.Notification.Confirmation({maxShown: 1000})
         view.show()
         expect(view.$('.wrapper')).toBeShown()
 
@@ -186,7 +283,7 @@ describe "CMS.Views.Notification minShown and maxShown", ->
         expect(view.$('.wrapper')).toBeHiding()
 
     it "a view can have both maxShown and minShown", ->
-        view = new CMS.Views.Notification.Saving({minShown: 1000, maxShown: 2000})
+        view = new CMS.Views.Notification.Confirmation({minShown: 1000, maxShown: 2000})
         view.show()
 
         # can't hide early

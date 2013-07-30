@@ -16,16 +16,7 @@ log = logging.getLogger('mitx.' + 'modulestore')
 
 
 URL_RE = re.compile("""
-    (?P<tag>[^:]+)://
-    (?P<org>[^/]+)/
-    (?P<course>[^/]+)/
-    (?P<category>[^/]+)/
-    (?P<name>[^@]+)
-    (@(?P<revision>[^/]+))?
-    """, re.VERBOSE)
-
-MISSING_SLASH_URL_RE = re.compile("""
-    (?P<tag>[^:]+):/
+    (?P<tag>[^:]+)://?
     (?P<org>[^/]+)/
     (?P<course>[^/]+)/
     (?P<category>[^/]+)/
@@ -52,8 +43,8 @@ class Location(_LocationBase):
     Locations representations of URLs of the
     form {tag}://{org}/{course}/{category}/{name}[@{revision}]
 
-    However, they can also be represented a dictionaries (specifying each component),
-    tuples or list (specified in order), or as strings of the url
+    However, they can also be represented as dictionaries (specifying each component),
+    tuples or lists (specified in order), or as strings of the url
     '''
     __slots__ = ()
 
@@ -180,13 +171,8 @@ class Location(_LocationBase):
         if isinstance(location, basestring):
             match = URL_RE.match(location)
             if match is None:
-                # cdodge:
-                # check for a dropped slash near the i4x:// element of the location string. This can happen with some
-                # redirects (e.g. edx.org -> www.edx.org which I think happens in Nginx)
-                match = MISSING_SLASH_URL_RE.match(location)
-                if match is None:
-                    log.debug('location is instance of %s but no URL match' % basestring)
-                    raise InvalidLocationError(location)
+                log.debug('location is instance of %s but no URL match' % basestring)
+                raise InvalidLocationError(location)
             groups = match.groupdict()
             check_dict(groups)
             return _LocationBase.__new__(_cls, **groups)
@@ -324,14 +310,7 @@ class ModuleStore(object):
         """
         raise NotImplementedError
 
-    def clone_item(self, source, location):
-        """
-        Clone a new item that is a copy of the item at the location `source`
-        and writes it to `location`
-        """
-        raise NotImplementedError
-
-    def update_item(self, location, data):
+    def update_item(self, location, data, allow_not_found=False):
         """
         Set the data in the item specified by the location to
         data

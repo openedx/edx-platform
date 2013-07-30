@@ -9,7 +9,7 @@ function removeAsset(e){
     e.preventDefault();
 
     var that = this;
-    var msg = new CMS.Views.Prompt.Confirmation({
+    var msg = new CMS.Views.Prompt.Warning({
         title: gettext("Delete File Confirmation"),
         message: gettext("Are you sure you wish to delete this item. It cannot be reversed!\n\nAlso any content that links/refers to this item will no longer work (e.g. broken images and/or links)"),
         actions: {
@@ -23,7 +23,12 @@ function removeAsset(e){
                         { 'location': row.data('id') },
                         function() {
                             // show the post-commit confirmation
-                            $(".wrapper-alert-confirmation").addClass("is-shown").attr('aria-hidden','false');
+                            var deleted = new CMS.Views.Notification.Confirmation({
+                                title: gettext("Your file has been deleted."),
+                                closeIcon: false,
+                                maxShown: 2000
+                            });
+                            deleted.show();
                             row.remove();
                             analytics.track('Deleted Asset', {
                                 'course': course_location_analytics,

@@ -1,13 +1,10 @@
 import json
 import logging
 from lxml import etree
-from lxml.html import rewrite_links
 from xmodule.timeinfo import TimeInfo
 from xmodule.capa_module import ComplexEncoder
-from xmodule.editing_module import EditingDescriptor
 from xmodule.progress import Progress
 from xmodule.stringify import stringify_children
-from xmodule.xml_module import XmlDescriptor
 import self_assessment_module
 import open_ended_module
 from .combined_open_ended_rubric import CombinedOpenEndedRubric, GRADER_TYPE_IMAGE_DICT, HUMAN_GRADER_TYPE, LEGEND_LIST
@@ -81,37 +78,7 @@ class CombinedOpenEndedV1Module():
                  instance_state=None, shared_state=None, metadata=None, static_data=None, **kwargs):
 
         """
-        Definition file should have one or many task blocks, a rubric block, and a prompt block:
-
-        Sample file:
-        <combinedopenended attempts="10000">
-            <rubric>
-                Blah blah rubric.
-            </rubric>
-            <prompt>
-                Some prompt.
-            </prompt>
-            <task>
-                <selfassessment>
-                    <hintprompt>
-                        What hint about this problem would you give to someone?
-                    </hintprompt>
-                    <submitmessage>
-                        Save Succcesful.  Thanks for participating!
-                    </submitmessage>
-                </selfassessment>
-            </task>
-            <task>
-                <openended min_score_to_attempt="1" max_score_to_attempt="1">
-                        <openendedparam>
-                            <initial_display>Enter essay here.</initial_display>
-                            <answer_display>This is the answer.</answer_display>
-                            <grader_payload>{"grader_settings" : "ml_grading.conf",
-                            "problem_id" : "6.002x/Welcome/OETest"}</grader_payload>
-                        </openendedparam>
-                </openended>
-            </task>
-        </combinedopenended>
+        Definition file should have one or many task blocks, a rubric block, and a prompt block.  See DEFAULT_DATA in combined_open_ended_module for a sample.
 
         """
 
@@ -134,14 +101,14 @@ class CombinedOpenEndedV1Module():
 
         # Allow reset is true if student has failed the criteria to move to the next child task
         self.ready_to_reset = instance_state.get('ready_to_reset', False)
-        self.attempts = self.instance_state.get('attempts', MAX_ATTEMPTS)
-        self.is_scored = self.instance_state.get('is_graded', IS_SCORED) in TRUE_DICT
-        self.accept_file_upload = self.instance_state.get('accept_file_upload', ACCEPT_FILE_UPLOAD) in TRUE_DICT
-        self.skip_basic_checks = self.instance_state.get('skip_spelling_checks', SKIP_BASIC_CHECKS) in TRUE_DICT
+        self.max_attempts = instance_state.get('max_attempts', MAX_ATTEMPTS)
+        self.is_scored = instance_state.get('graded', IS_SCORED) in TRUE_DICT
+        self.accept_file_upload = instance_state.get('accept_file_upload', ACCEPT_FILE_UPLOAD) in TRUE_DICT
+        self.skip_basic_checks = instance_state.get('skip_spelling_checks', SKIP_BASIC_CHECKS) in TRUE_DICT
 
-        due_date = self.instance_state.get('due', None)
+        due_date = instance_state.get('due', None)
 
-        grace_period_string = self.instance_state.get('graceperiod', None)
+        grace_period_string = instance_state.get('graceperiod', None)
         try:
             self.timeinfo = TimeInfo(due_date, grace_period_string)
         except Exception:
@@ -156,7 +123,7 @@ class CombinedOpenEndedV1Module():
         # Static data is passed to the child modules to render
         self.static_data = {
             'max_score': self._max_score,
-            'max_attempts': self.attempts,
+            'max_attempts': self.max_attempts,
             'prompt': definition['prompt'],
             'rubric': definition['rubric'],
             'display_name': self.display_name,
@@ -503,10 +470,10 @@ class CombinedOpenEndedV1Module():
             pass
         return return_html
 
-    def get_rubric(self, get):
+    def get_rubric(self, _data):
         """
         Gets the results of a given grader via ajax.
-        Input: AJAX get dictionary
+        Input: AJAX data dictionary
         Output: Dictionary to be rendered via ajax that contains the result html.
         """
         all_responses = []
@@ -535,10 +502,10 @@ class CombinedOpenEndedV1Module():
         html = self.system.render_template('{0}/combined_open_ended_results.html'.format(self.TEMPLATE_DIR), context)
         return {'html': html, 'success': True}
 
-    def get_legend(self, get):
+    def get_legend(self, _data):
         """
         Gets the results of a given grader via ajax.
-        Input: AJAX get dictionary
+        Input: AJAX data dictionary
         Output: Dictionary to be rendered via ajax that contains the result html.
         """
         context = {
@@ -547,10 +514,10 @@ class CombinedOpenEndedV1Module():
         html = self.system.render_template('{0}/combined_open_ended_legend.html'.format(self.TEMPLATE_DIR), context)
         return {'html': html, 'success': True}
 
-    def get_results(self, get):
+    def get_results(self, _data):
         """
         Gets the results of a given grader via ajax.
-        Input: AJAX get dictionary
+        Input: AJAX data dictionary
         Output: Dictionary to be rendered via ajax that contains the result html.
         """
         self.update_task_states()
@@ -591,19 +558,19 @@ class CombinedOpenEndedV1Module():
         html = self.system.render_template('{0}/combined_open_ended_results.html'.format(self.TEMPLATE_DIR), context)
         return {'html': html, 'success': True}
 
-    def get_status_ajax(self, get):
+    def get_status_ajax(self, _data):
         """
         Gets the results of a given grader via ajax.
-        Input: AJAX get dictionary
+        Input: AJAX data dictionary
         Output: Dictionary to be rendered via ajax that contains the result html.
         """
         html = self.get_status(True)
         return {'html': html, 'success': True}
 
-    def handle_ajax(self, dispatch, get):
+    def handle_ajax(self, dispatch, data):
         """
         This is called by courseware.module_render, to handle an AJAX call.
-        "get" is request.POST.
+        "data" is request.POST.
 
         Returns a json dictionary:
         { 'progress_changed' : True/False,
@@ -621,40 +588,43 @@ class CombinedOpenEndedV1Module():
         }
 
         if dispatch not in handlers:
-            return_html = self.current_task.handle_ajax(dispatch, get, self.system)
+            return_html = self.current_task.handle_ajax(dispatch, data, self.system)
             return self.update_task_states_ajax(return_html)
 
-        d = handlers[dispatch](get)
+        d = handlers[dispatch](data)
         return json.dumps(d, cls=ComplexEncoder)
 
-    def next_problem(self, get):
+    def next_problem(self, _data):
         """
         Called via ajax to advance to the next problem.
-        Input: AJAX get request.
+        Input: AJAX data request.
         Output: Dictionary to be rendered
         """
         self.update_task_states()
         return {'success': True, 'html': self.get_html_nonsystem(), 'allow_reset': self.ready_to_reset}
 
-    def reset(self, get):
+    def reset(self, data):
         """
         If resetting is allowed, reset the state of the combined open ended module.
-        Input: AJAX get dictionary
+        Input: AJAX data dictionary
         Output: AJAX dictionary to tbe rendered
         """
         if self.state != self.DONE:
             if not self.ready_to_reset:
-                return self.out_of_sync_error(get)
+                return self.out_of_sync_error(data)
 
-        if self.student_attempts > self.attempts:
+        if self.student_attempts >= self.max_attempts-1:
+            if self.student_attempts==self.max_attempts-1:
+                self.student_attempts +=1
             return {
                 'success': False,
-                #This is a student_facing_error
+                # This is a student_facing_error
                 'error': (
                     'You have attempted this question {0} times.  '
                     'You are only allowed to attempt it {1} times.'
-                ).format(self.student_attempts, self.attempts)
+                ).format(self.student_attempts, self.max_attempts)
             }
+        self.student_attempts +=1
         self.state = self.INITIAL
         self.ready_to_reset = False
         for i in xrange(0, len(self.task_xml)):
@@ -729,7 +699,12 @@ class CombinedOpenEndedV1Module():
         """
         max_score = None
         score = None
-        if self.is_scored and self.weight is not None:
+
+        #The old default was None, so set to 1 if it is the old default weight
+        weight = self.weight
+        if weight is None:
+            weight = 1
+        if self.is_scored:
             # Finds the maximum score of all student attempts and keeps it.
             score_mat = []
             for i in xrange(0, len(self.task_states)):
@@ -742,7 +717,7 @@ class CombinedOpenEndedV1Module():
                     for z in xrange(0, len(score)):
                         if score[z] is None:
                             score[z] = 0
-                        score[z] *= float(self.weight)
+                        score[z] *= float(weight)
                     score_mat.append(score)
 
             if len(score_mat) > 0:
@@ -756,7 +731,7 @@ class CombinedOpenEndedV1Module():
 
             if max_score is not None:
                 # Weight the max score if it is not None
-                max_score *= float(self.weight)
+                max_score *= float(weight)
             else:
                 # Without a max_score, we cannot have a score!
                 score = None
@@ -792,13 +767,13 @@ class CombinedOpenEndedV1Module():
 
         return progress_object
 
-    def out_of_sync_error(self, get, msg=''):
+    def out_of_sync_error(self, data, msg=''):
         """
         return dict out-of-sync error message, and also log.
         """
         #This is a dev_facing_error
-        log.warning("Combined module state out sync. state: %r, get: %r. %s",
-                    self.state, get, msg)
+        log.warning("Combined module state out sync. state: %r, data: %r. %s",
+                    self.state, data, msg)
         #This is a student_facing_error
         return {'success': False,
                 'error': 'The problem state got out-of-sync.  Please try reloading the page.'}
@@ -813,7 +788,6 @@ class CombinedOpenEndedV1Descriptor():
     filename_extension = "xml"
 
     has_score = True
-    template_dir_name = "combinedopenended"
 
     def __init__(self, system):
         self.system = system

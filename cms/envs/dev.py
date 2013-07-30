@@ -22,19 +22,24 @@ modulestore_options = {
     'db': 'xmodule',
     'collection': 'modulestore',
     'fs_root': GITHUB_REPO_ROOT,
-    'render_template': 'mitxmako.shortcuts.render_to_string'
+    'render_template': 'mitxmako.shortcuts.render_to_string',
 }
 
 MODULESTORE = {
     'default': {
-        'ENGINE': 'xmodule.modulestore.mongo.DraftMongoModuleStore',
+        'ENGINE': 'xmodule.modulestore.draft.DraftModuleStore',
         'OPTIONS': modulestore_options
     },
     'direct': {
         'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
         'OPTIONS': modulestore_options
+    },
+    'split': {
+        'ENGINE': 'xmodule.modulestore.split_mongo.SplitMongoModuleStore',
+        'OPTIONS': modulestore_options
     }
 }
+
 
 # cdodge: This is the specifier for the MongoDB (using GridFS) backed static content store
 # This is for static content for courseware, not system static content (e.g. javascript, css, edX branding, etc)
@@ -181,6 +186,6 @@ if SEGMENT_IO_KEY:
 #####################################################################
 # Lastly, see if the developer has any local overrides.
 try:
-    from .private import *
+    from .private import *      # pylint: disable=F0401
 except ImportError:
     pass

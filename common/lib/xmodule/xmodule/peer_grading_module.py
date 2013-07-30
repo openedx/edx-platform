@@ -9,6 +9,7 @@ from .capa_module import ComplexEncoder
 from .x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import ItemNotFoundError
 from .timeinfo import TimeInfo
 from xblock.core import Dict, String, Scope, Boolean, Integer, Float
 from xmodule.fields import Date
@@ -19,36 +20,37 @@ from django.utils.timezone import UTC
 
 log = logging.getLogger(__name__)
 
-USE_FOR_SINGLE_LOCATION = False
-LINK_TO_LOCATION = ""
-MAX_SCORE = 1
-IS_GRADED = False
 
 EXTERNAL_GRADER_NO_CONTACT_ERROR = "Failed to contact external graders.  Please notify course staff."
-
 
 class PeerGradingFields(object):
     use_for_single_location = Boolean(
         display_name="Show Single Problem",
         help='When True, only the single problem specified by "Link to Problem Location" is shown. '
              'When False, a panel is displayed with all problems available for peer grading.',
-        default=USE_FOR_SINGLE_LOCATION, scope=Scope.settings
+        default=False,
+        scope=Scope.settings
     )
     link_to_location = String(
         display_name="Link to Problem Location",
         help='The location of the problem being graded. Only used when "Show Single Problem" is True.',
-        default=LINK_TO_LOCATION, scope=Scope.settings
+        default="",
+        scope=Scope.settings
     )
-    is_graded = Boolean(
+    graded = Boolean(
         display_name="Graded",
         help='Defines whether the student gets credit for grading this problem. Only used when "Show Single Problem" is True.',
-        default=IS_GRADED, scope=Scope.settings
+        default=False,
+        scope=Scope.settings
     )
-    due_date = Date(help="Due date that should be displayed.", default=None, scope=Scope.settings)
-    grace_period_string = String(help="Amount of grace to give on the due date.", default=None, scope=Scope.settings)
-    max_grade = Integer(
-        help="The maximum grade that a student can receive for this problem.", default=MAX_SCORE,
-        scope=Scope.settings, values={"min": 0}
+    due = Date(
+        help="Due date that should be displayed.",
+        default=None,
+        scope=Scope.settings)
+    grace_period_string = String(
+        help="Amount of grace to give on the due date.",
+        default=None,
+        scope=Scope.settings
     )
     student_data_for_location = Dict(
         help="Student data for a given peer grading problem.",
@@ -57,8 +59,18 @@ class PeerGradingFields(object):
     weight = Float(
         display_name="Problem Weight",
         help="Defines the number of points each problem is worth. If the value is not set, each problem is worth one point.",
-        scope=Scope.settings, values={"min": 0, "step": ".1"}
+        scope=Scope.settings, values={"min": 0, "step": ".1"},
+        default=1
     )
+    display_name = String(
+        display_name="Display Name",
+        help="Display name for this module",
+        scope=Scope.settings,
+        default="Peer Grading Interface"
+    )
+    data = String(help="Html contents to display for this module",
+        default='<peergrading></peergrading>',
+        scope=Scope.content)
 
 
 class PeerGradingModule(PeerGradingFields, XModule):
@@ -89,34 +101,30 @@ class PeerGradingModule(PeerGradingFields, XModule):
         if self.use_for_single_location:
             try:
                 self.linked_problem = modulestore().get_instance(self.system.course_id, self.link_to_location)
-            except:
+            except ItemNotFoundError:
                 log.error("Linked location {0} for peer grading module {1} does not exist".format(
                     self.link_to_location, self.location))
                 raise
-            due_date = self.linked_problem._model_data.get('peer_grading_due', None)
+            due_date = self.linked_problem._model_data.get('due', None)
             if due_date:
                 self._model_data['due'] = due_date
 
         try:
-            self.timeinfo = TimeInfo(self.due_date, self.grace_period_string)
-        except:
-            log.error("Error parsing due date information in location {0}".format(location))
+            self.timeinfo = TimeInfo(self.due, self.grace_period_string)
+        except Exception:
+            log.error("Error parsing due date information in location {0}".format(self.location))
             raise
 
         self.display_due_date = self.timeinfo.display_due_date
 
         try:
             self.student_data_for_location = json.loads(self.student_data_for_location)
-        except:
+        except Exception:
             pass
 
         self.ajax_url = self.system.ajax_url
         if not self.ajax_url.endswith("/"):
             self.ajax_url = self.ajax_url + "/"
-
-        # Integer could return None, so keep this check.
-        if not isinstance(self.max_grade, int):
-            raise TypeError("max_grade needs to be an integer.")
 
     def closed(self):
         return self._closed(self.timeinfo)
@@ -133,8 +141,8 @@ class PeerGradingModule(PeerGradingFields, XModule):
         """
         return {'success': False, 'error': msg}
 
-    def _check_required(self, get, required):
-        actual = set(get.keys())
+    def _check_required(self, data, required):
+        actual = set(data.keys())
         missing = required - actual
         if len(missing) > 0:
             return False, "Missing required keys: {0}".format(', '.join(missing))
@@ -153,7 +161,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
         else:
             return self.peer_grading_problem({'location': self.link_to_location})['html']
 
-    def handle_ajax(self, dispatch, get):
+    def handle_ajax(self, dispatch, data):
         """
         Needs to be implemented by child modules.  Handles AJAX events.
         @return:
@@ -173,7 +181,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
             # This is a dev_facing_error
             return json.dumps({'error': 'Error handling action.  Please try again.', 'success': False})
 
-        d = handlers[dispatch](get)
+        d = handlers[dispatch](data)
 
         return json.dumps(d, cls=ComplexEncoder)
 
@@ -201,11 +209,16 @@ class PeerGradingModule(PeerGradingFields, XModule):
     def get_score(self):
         max_score = None
         score = None
+        weight = self.weight
+
+        #The old default was None, so set to 1 if it is the old default weight
+        if weight is None:
+            weight = 1
         score_dict = {
             'score': score,
             'total': max_score,
         }
-        if not self.use_for_single_location or not self.is_graded:
+        if not self.use_for_single_location or not self.graded:
             return score_dict
 
         try:
@@ -225,11 +238,10 @@ class PeerGradingModule(PeerGradingFields, XModule):
                 # Ensures that once a student receives a final score for peer grading, that it does not change.
                 self.student_data_for_location = response
 
-        if self.weight is not None:
-            score = int(count_graded >= count_required and count_graded > 0) * float(self.weight)
-            total = self.max_grade * float(self.weight)
-            score_dict['score'] = score
-            score_dict['total'] = total
+        score = int(count_graded >= count_required and count_graded > 0) * float(weight)
+        total = float(weight)
+        score_dict['score'] = score
+        score_dict['total'] = total
 
         return score_dict
 
@@ -240,11 +252,11 @@ class PeerGradingModule(PeerGradingFields, XModule):
               randomization, and 5/7 on another
         '''
         max_grade = None
-        if self.use_for_single_location and self.is_graded:
-            max_grade = self.max_grade
+        if self.use_for_single_location and self.graded:
+            max_grade = self.weight
         return max_grade
 
-    def get_next_submission(self, get):
+    def get_next_submission(self, data):
         """
         Makes a call to the grading controller for the next essay that should be graded
         Returns a json dict with the following keys:
@@ -263,11 +275,11 @@ class PeerGradingModule(PeerGradingFields, XModule):
         'error': if success is False, will have an error message with more info.
         """
         required = set(['location'])
-        success, message = self._check_required(get, required)
+        success, message = self._check_required(data, required)
         if not success:
             return self._err_response(message)
         grader_id = self.system.anonymous_student_id
-        location = get['location']
+        location = data['location']
 
         try:
             response = self.peer_gs.get_next_submission(location, grader_id)
@@ -280,7 +292,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
             return {'success': False,
                     'error': EXTERNAL_GRADER_NO_CONTACT_ERROR}
 
-    def save_grade(self, get):
+    def save_grade(self, data):
         """
         Saves the grade of a given submission.
         Input:
@@ -298,18 +310,18 @@ class PeerGradingModule(PeerGradingFields, XModule):
 
         required = set(['location', 'submission_id', 'submission_key', 'score', 'feedback', 'rubric_scores[]',
                         'submission_flagged'])
-        success, message = self._check_required(get, required)
+        success, message = self._check_required(data, required)
         if not success:
             return self._err_response(message)
         grader_id = self.system.anonymous_student_id
 
-        location = get.get('location')
-        submission_id = get.get('submission_id')
-        score = get.get('score')
-        feedback = get.get('feedback')
-        submission_key = get.get('submission_key')
-        rubric_scores = get.getlist('rubric_scores[]')
-        submission_flagged = get.get('submission_flagged')
+        location = data.get('location')
+        submission_id = data.get('submission_id')
+        score = data.get('score')
+        feedback = data.get('feedback')
+        submission_key = data.get('submission_key')
+        rubric_scores = data.getlist('rubric_scores[]')
+        submission_flagged = data.get('submission_flagged')
 
         try:
             response = self.peer_gs.save_grade(location, grader_id, submission_id,
@@ -328,7 +340,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
                 'error': EXTERNAL_GRADER_NO_CONTACT_ERROR
             }
 
-    def is_student_calibrated(self, get):
+    def is_student_calibrated(self, data):
         """
         Calls the grading controller to see if the given student is calibrated
         on the given problem
@@ -347,12 +359,12 @@ class PeerGradingModule(PeerGradingFields, XModule):
         """
 
         required = set(['location'])
-        success, message = self._check_required(get, required)
+        success, message = self._check_required(data, required)
         if not success:
             return self._err_response(message)
         grader_id = self.system.anonymous_student_id
 
-        location = get['location']
+        location = data['location']
 
         try:
             response = self.peer_gs.is_student_calibrated(location, grader_id)
@@ -367,7 +379,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
                 'error': EXTERNAL_GRADER_NO_CONTACT_ERROR
             }
 
-    def show_calibration_essay(self, get):
+    def show_calibration_essay(self, data):
         """
         Fetch the next calibration essay from the grading controller and return it
         Inputs:
@@ -392,13 +404,13 @@ class PeerGradingModule(PeerGradingFields, XModule):
         """
 
         required = set(['location'])
-        success, message = self._check_required(get, required)
+        success, message = self._check_required(data, required)
         if not success:
             return self._err_response(message)
 
         grader_id = self.system.anonymous_student_id
 
-        location = get['location']
+        location = data['location']
         try:
             response = self.peer_gs.show_calibration_essay(location, grader_id)
             return response
@@ -417,8 +429,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
             return {'success': False,
                     'error': 'Error displaying submission.  Please notify course staff.'}
 
-
-    def save_calibration_essay(self, get):
+    def save_calibration_essay(self, data):
         """
         Saves the grader's grade of a given calibration.
         Input:
@@ -437,17 +448,17 @@ class PeerGradingModule(PeerGradingFields, XModule):
         """
 
         required = set(['location', 'submission_id', 'submission_key', 'score', 'feedback', 'rubric_scores[]'])
-        success, message = self._check_required(get, required)
+        success, message = self._check_required(data, required)
         if not success:
             return self._err_response(message)
         grader_id = self.system.anonymous_student_id
 
-        location = get.get('location')
-        calibration_essay_id = get.get('submission_id')
-        submission_key = get.get('submission_key')
-        score = get.get('score')
-        feedback = get.get('feedback')
-        rubric_scores = get.getlist('rubric_scores[]')
+        location = data.get('location')
+        calibration_essay_id = data.get('submission_id')
+        submission_key = data.get('submission_key')
+        score = data.get('score')
+        feedback = data.get('feedback')
+        rubric_scores = data.getlist('rubric_scores[]')
 
         try:
             response = self.peer_gs.save_calibration_essay(location, grader_id, calibration_essay_id,
@@ -473,8 +484,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
         })
         return html
 
-
-    def peer_grading(self, get=None):
+    def peer_grading(self, _data=None):
         '''
         Show a peer grading interface
         '''
@@ -523,7 +533,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
             problem_location = problem['location']
             descriptor = _find_corresponding_module_for_location(problem_location)
             if descriptor:
-                problem['due'] = descriptor._model_data.get('peer_grading_due', None)
+                problem['due'] = descriptor._model_data.get('due', None)
                 grace_period_string = descriptor._model_data.get('graceperiod', None)
                 try:
                     problem_timeinfo = TimeInfo(problem['due'], grace_period_string)
@@ -553,11 +563,11 @@ class PeerGradingModule(PeerGradingFields, XModule):
 
         return html
 
-    def peer_grading_problem(self, get=None):
+    def peer_grading_problem(self, data=None):
         '''
         Show individual problem interface
         '''
-        if get is None or get.get('location') is None:
+        if data is None or data.get('location') is None:
             if not self.use_for_single_location:
                 # This is an error case, because it must be set to use a single location to be called without get parameters
                 # This is a dev_facing_error
@@ -566,8 +576,8 @@ class PeerGradingModule(PeerGradingFields, XModule):
                 return {'html': "", 'success': False}
             problem_location = self.link_to_location
 
-        elif get.get('location') is not None:
-            problem_location = get.get('location')
+        elif data.get('location') is not None:
+            problem_location = data.get('location')
 
         ajax_url = self.ajax_url
         html = self.system.render_template('peer_grading/peer_grading_problem.html', {
@@ -606,15 +616,18 @@ class PeerGradingDescriptor(PeerGradingFields, RawDescriptor):
 
     has_score = True
     always_recalculate_grades = True
-    template_dir_name = "peer_grading"
 
     #Specify whether or not to pass in open ended interface
     needs_open_ended_interface = True
 
+    metadata_translations = {
+        'is_graded': 'graded',
+        'attempts': 'max_attempts',
+        'due_data' : 'due'
+        }
+
     @property
     def non_editable_metadata_fields(self):
         non_editable_fields = super(PeerGradingDescriptor, self).non_editable_metadata_fields
-        non_editable_fields.extend([PeerGradingFields.due_date, PeerGradingFields.grace_period_string,
-                                    PeerGradingFields.max_grade])
+        non_editable_fields.extend([PeerGradingFields.due, PeerGradingFields.grace_period_string])
         return non_editable_fields
-

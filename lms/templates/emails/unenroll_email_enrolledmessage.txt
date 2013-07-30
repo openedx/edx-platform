@@ -1,0 +1,8 @@
+Dear ${first_name} ${last_name}
+
+You have been un-enrolled in ${course_id} at ${site_name} by a member of the course staff. The course will no longer appear on your ${site_name} dashboard.
+
+Your other courses have not been affected.
+
+----
+This email was automatically sent from  ${site_name} to ${first_name} ${last_name}

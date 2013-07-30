@@ -25,7 +25,6 @@ $(document).ready(function() {
     $newComponentTemplatePickers = $('.new-component-templates');
     $newComponentButton = $('.new-component-button');
     $spinner = $('<span class="spinner-in-field-icon"></span>');
-    $body.bind('keyup', onKeyUp);
 
     $('.expand-collapse-icon').bind('click', toggleSubmodules);
     $('.visibility-options').bind('change', setVisibility);
@@ -57,33 +56,34 @@ $(document).ready(function() {
 
     // nav - dropdown related
     $body.click(function(e) {
-        $('.nav-dropdown .nav-item .wrapper-nav-sub').removeClass('is-shown');
-        $('.nav-dropdown .nav-item .title').removeClass('is-selected');
+        $('.nav-dd .nav-item .wrapper-nav-sub').removeClass('is-shown');
+        $('.nav-dd .nav-item .title').removeClass('is-selected');
     });
 
-    $('.nav-dropdown .nav-item .title').click(function(e) {
+    $('.nav-dd .nav-item').click(function(e) {
 
-        $subnav = $(this).parent().find('.wrapper-nav-sub');
-        $title = $(this).parent().find('.title');
-        e.preventDefault();
-        e.stopPropagation();
+        $subnav = $(this).find('.wrapper-nav-sub');
+        $title = $(this).find('.title');
 
         if ($subnav.hasClass('is-shown')) {
             $subnav.removeClass('is-shown');
             $title.removeClass('is-selected');
         } else {
-            $('.nav-dropdown .nav-item .title').removeClass('is-selected');
-            $('.nav-dropdown .nav-item .wrapper-nav-sub').removeClass('is-shown');
+            $('.nav-dd .nav-item .title').removeClass('is-selected');
+            $('.nav-dd .nav-item .wrapper-nav-sub').removeClass('is-shown');
             $title.addClass('is-selected');
             $subnav.addClass('is-shown');
+            // if propogation is not stopped, the event will bubble up to the
+            // body element, which will close the dropdown.
+            e.stopPropagation();
         }
     });
 
     // general link management - new window/tab
-    $('a[rel="external"]').attr('title', 'This link will open in a new browser window/tab').bind('click', linkNewWindow);
+    $('a[rel="external"]').attr('title', gettext('This link will open in a new browser window/tab')).bind('click', linkNewWindow);
 
     // general link management - lean modal window
-    $('a[rel="modal"]').attr('title', 'This link will open in a modal window').leanModal({
+    $('a[rel="modal"]').attr('title', gettext('This link will open in a modal window')).leanModal({
         overlay: 0.50,
         closeButton: '.action-modal-close'
     });
@@ -200,8 +200,10 @@ function toggleSections(e) {
     $section = $('.courseware-section');
     sectionCount = $section.length;
     $button = $(this);
-    $labelCollapsed = $('<i class="icon-arrow-up"></i> <span class="label">Collapse All Sections</span>');
-    $labelExpanded = $('<i class="icon-arrow-down"></i> <span class="label">Expand All Sections</span>');
+    $labelCollapsed = $('<i class="icon-arrow-up"></i> <span class="label">' +
+        gettext('Collapse All Sections') + '</span>');
+    $labelExpanded = $('<i class="icon-arrow-down"></i> <span class="label">' +
+        gettext('Expand All Sections') + '</span>');
 
     var buttonLabel = $button.hasClass('is-activated') ? $labelCollapsed : $labelExpanded;
     $button.toggleClass('is-activated').html(buttonLabel);
@@ -252,17 +254,13 @@ function syncReleaseDate(e) {
 }
 
 function getEdxTimeFromDateTimeVals(date_val, time_val) {
-    var edxTimeStr = null;
-
     if (date_val != '') {
         if (time_val == '') time_val = '00:00';
 
-        // Note, we are using date.js utility which has better parsing abilities than the built in JS date parsing
-        var date = Date.parse(date_val + " " + time_val);
-        edxTimeStr = date.toString('yyyy-MM-ddTHH:mm');
+        return new Date(date_val + " " + time_val + "Z");
     }
 
-    return edxTimeStr;
+    else return null;
 }
 
 function getEdxTimeFromDateTimeInputs(date_id, time_id) {
@@ -327,7 +325,7 @@ function saveSubsection() {
             $changedInput = null;
         },
         error: function() {
-            showToastMessage('There has been an error while saving your changes.');
+            showToastMessage(gettext('There has been an error while saving your changes.'));
         }
     });
 }
@@ -337,7 +335,7 @@ function createNewUnit(e) {
     e.preventDefault();
 
     var parent = $(this).data('parent');
-    var template = $(this).data('template');
+    var category = $(this).data('category');
 
     analytics.track('Created a Unit', {
         'course': course_location_analytics,
@@ -345,9 +343,9 @@ function createNewUnit(e) {
     });
 
 
-    $.post('/clone_item', {
+    $.post('/create_item', {
         'parent_location': parent,
-        'template': template,
+        'category': category,
         'display_name': 'New Unit'
     },
 
@@ -359,39 +357,61 @@ function createNewUnit(e) {
 
 function deleteUnit(e) {
     e.preventDefault();
-    _deleteItem($(this).parents('li.leaf'));
+    _deleteItem($(this).parents('li.leaf'), 'Unit');
 }
 
 function deleteSubsection(e) {
     e.preventDefault();
-    _deleteItem($(this).parents('li.branch'));
+    _deleteItem($(this).parents('li.branch'), 'Subsection');
 }
 
 function deleteSection(e) {
     e.preventDefault();
-    _deleteItem($(this).parents('section.branch'));
+    _deleteItem($(this).parents('section.branch'), 'Section');
 }
 
-function _deleteItem($el) {
-    if (!confirm('Are you sure you wish to delete this item. It cannot be reversed!')) return;
+function _deleteItem($el, type) {
+    var confirm = new CMS.Views.Prompt.Warning({
+        title: gettext('Delete this ' + type + '?'),
+        message: gettext('Deleting this ' + type + ' is permanent and cannot be undone.'),
+        actions: {
+            primary: {
+                text: gettext('Yes, delete this ' + type),
+                click: function(view) {
+                    view.hide();
 
-    var id = $el.data('id');
+                    var id = $el.data('id');
 
-    analytics.track('Deleted an Item', {
-        'course': course_location_analytics,
-        'id': id
+                    analytics.track('Deleted an Item', {
+                        'course': course_location_analytics,
+                        'id': id
+                    });
+
+                    var deleting = new CMS.Views.Notification.Mini({
+                        title: gettext('Deleting') + '&hellip;'
+                    });
+                    deleting.show();
+
+                    $.post('/delete_item',
+                           {'id': id,
+                            'delete_children': true,
+                            'delete_all_versions': true},
+                           function(data) {
+                               $el.remove();
+                               deleting.hide();
+                           }
+                          );
+                }
+            },
+            secondary: {
+                text: gettext('Cancel'),
+                click: function(view) {
+                    view.hide();
+                }
+            }
+        }
     });
-
-
-    $.post('/delete_item', {
-        'id': id,
-        'delete_children': true,
-        'delete_all_versions': true
-    },
-
-    function(data) {
-        $el.remove();
-    });
+    confirm.show();
 }
 
 function markAsLoaded() {
@@ -410,12 +430,6 @@ function hideModal(e) {
         $('.file-input').unbind('change', startUpload);
         $modal.hide();
         $modalCover.hide();
-    }
-}
-
-function onKeyUp(e) {
-    if (e.which == 87) {
-        $body.toggleClass('show-wip hide-wip');
     }
 }
 
@@ -556,7 +570,7 @@ function saveNewSection(e) {
 
     var $saveButton = $(this).find('.new-section-name-save');
     var parent = $saveButton.data('parent');
-    var template = $saveButton.data('template');
+    var category = $saveButton.data('category');
     var display_name = $(this).find('.new-section-name').val();
 
     analytics.track('Created a Section', {
@@ -564,9 +578,9 @@ function saveNewSection(e) {
         'display_name': display_name
     });
 
-    $.post('/clone_item', {
+    $.post('/create_item', {
         'parent_location': parent,
-        'template': template,
+        'category': category,
         'display_name': display_name,
     },
 
@@ -583,11 +597,11 @@ function cancelNewSection(e) {
 
 function addNewCourse(e) {
     e.preventDefault();
-
-    $(e.target).hide();
+    $('.new-course-button').addClass('disabled');
+    $(e.target).addClass('disabled');
     var $newCourse = $($('#new-course-template').html());
     var $cancelButton = $newCourse.find('.new-course-cancel');
-    $('.inner-wrapper').prepend($newCourse);
+    $('.courses').prepend($newCourse);
     $newCourse.find('.new-course-name').focus().select();
     $newCourse.find('form').bind('submit', saveNewCourse);
     $cancelButton.bind('click', cancelNewCourse);
@@ -600,13 +614,12 @@ function saveNewCourse(e) {
     e.preventDefault();
 
     var $newCourse = $(this).closest('.new-course');
-    var template = $(this).find('.new-course-save').data('template');
     var org = $newCourse.find('.new-course-org').val();
     var number = $newCourse.find('.new-course-number').val();
     var display_name = $newCourse.find('.new-course-name').val();
 
     if (org == '' || number == '' || display_name == '') {
-        alert('You must specify all fields in order to create a new course.');
+        alert(gettext('You must specify all fields in order to create a new course.'));
         return;
     }
 
@@ -617,7 +630,6 @@ function saveNewCourse(e) {
     });
 
     $.post('/create_new_course', {
-        'template': template,
         'org': org,
         'number': number,
         'display_name': display_name
@@ -634,7 +646,7 @@ function saveNewCourse(e) {
 
 function cancelNewCourse(e) {
     e.preventDefault();
-    $('.new-course-button').show();
+    $('.new-course-button').removeClass('disabled');
     $(this).parents('section.new-course').remove();
 }
 
@@ -651,7 +663,7 @@ function addNewSubsection(e) {
     var parent = $(this).parents("section.branch").data("id");
 
     $saveButton.data('parent', parent);
-    $saveButton.data('template', $(this).data('template'));
+    $saveButton.data('category', $(this).data('category'));
 
     $newSubsection.find('.new-subsection-form').bind('submit', saveNewSubsection);
     $cancelButton.bind('click', cancelNewSubsection);
@@ -664,7 +676,7 @@ function saveNewSubsection(e) {
     e.preventDefault();
 
     var parent = $(this).find('.new-subsection-name-save').data('parent');
-    var template = $(this).find('.new-subsection-name-save').data('template');
+    var category = $(this).find('.new-subsection-name-save').data('category');
     var display_name = $(this).find('.new-subsection-name-input').val();
 
     analytics.track('Created a Subsection', {
@@ -673,9 +685,9 @@ function saveNewSubsection(e) {
     });
 
 
-    $.post('/clone_item', {
+    $.post('/create_item', {
         'parent_location': parent,
-        'template': template,
+        'category': category,
         'display_name': display_name
     },
 
@@ -719,6 +731,10 @@ function saveSetSectionScheduleDate(e) {
         'start': start
     });
 
+    var saving = new CMS.Views.Notification.Mini({
+        title: gettext("Saving") + "&hellip;",
+    });
+    saving.show();
     // call into server to commit the new order
     $.ajax({
         url: "/save_item",
@@ -733,28 +749,17 @@ function saveSetSectionScheduleDate(e) {
         })
     }).success(function() {
         var $thisSection = $('.courseware-section[data-id="' + id + '"]');
-        var format = gettext('<strong>Will Release:</strong> %(date)s at %(time)s UTC');
-        var willReleaseAt = interpolate(format, {
-            'date': input_date,
-            'time': input_time
-        },
-        true);
-        $thisSection.find('.section-published-date').html(
-            '<span class="published-status">' + willReleaseAt + '</span>' +
-            '<a href="#" class="edit-button" ' +
-            '" data-date="' + input_date +
-            '" data-time="' + input_time +
-            '" data-id="' + id + '">' + gettext('Edit') + '</a>');
-        $thisSection.find('.section-published-date').animate({
-            'background-color': 'rgb(182,37,104)'
-        }, 300).animate({
-            'background-color': '#edf1f5'
-        }, 300).animate({
-            'background-color': 'rgb(182,37,104)'
-        }, 300).animate({
-            'background-color': '#edf1f5'
-        }, 300);
-
+        var html = _.template(
+            '<span class="published-status">' +
+                '<strong>' + gettext("Will Release:") + '&nbsp;</strong>' +
+                gettext("<%= date %> at <%= time %> UTC") +
+            '</span>' +
+            '<a href="#" class="edit-button" data-date="<%= date %>" data-time="<%= time %>" data-id="<%= id %>">' +
+                gettext("Edit") +
+            '</a>',
+            {date: input_date, time: input_time, id: id});
+        $thisSection.find('.section-published-date').html(html);
         hideModal();
+        saving.hide();
     });
 }
