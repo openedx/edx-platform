@@ -154,15 +154,16 @@ function () {
 
     function toggleFullScreen(event) {
         event.preventDefault();
+        var fullScreenClassNameEl = this.el.add(document.documentElement);
 
         if (this.videoControl.fullScreenState) {
             this.videoControl.fullScreenState = false;
-            this.el.removeClass('fullscreen');
+            fullScreenClassNameEl.removeClass('video-fullscreen');
             this.isFullScreen = false;
             this.videoControl.fullScreenEl.attr('title', 'Fullscreen');
         } else {
             this.videoControl.fullScreenState = true;
-            this.el.addClass('fullscreen');
+            fullScreenClassNameEl.addClass('video-fullscreen');
             this.isFullScreen = true;
             this.videoControl.fullScreenEl.attr('title', 'Exit fullscreen');
         }

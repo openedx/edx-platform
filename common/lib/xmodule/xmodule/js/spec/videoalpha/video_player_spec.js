@@ -609,8 +609,8 @@
           expect($('.add-fullscreen')).toHaveAttr('title', 'Exit fullscreen');
         });
 
-        it('add the fullscreen class', function() {
-          expect(state.el).toHaveClass('fullscreen');
+        it('add the video-fullscreen class', function() {
+          expect(state.el).toHaveClass('video-fullscreen');
         });
 
         it('tell VideoCaption to resize', function() {
@@ -623,7 +623,7 @@
           initialize();
           spyOn(videoCaption, 'resize').andCallThrough();
 
-          state.el.addClass('fullscreen');
+          state.el.addClass('video-fullscreen');
           videoControl.fullScreenState = true;
           isFullScreen = true;
           videoControl.fullScreenEl.attr('title', 'Exit-fullscreen');
@@ -635,8 +635,8 @@
           expect($('.add-fullscreen')).toHaveAttr('title', 'Fullscreen');
         });
 
-        it('remove the fullscreen class', function() {
-          expect(state.el).not.toHaveClass('fullscreen');
+        it('remove the video-fullscreen class', function() {
+          expect(state.el).not.toHaveClass('video-fullscreen');
         });
 
         it('tell VideoCaption to resize', function() {
