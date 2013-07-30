@@ -26,30 +26,13 @@ from django.utils.html import escape
 
 log = logging.getLogger(__name__)
 
+# A global variable that tracks what problems can have hinting.
+problem_choices = []
 
-class ProblemIdChoices(object):
-    """
-    Stores a dict of possible problem id's, for Studio to display.
-    The problem is, XModule and XBlock need to access the same instance
-    of this dict.  This class provides the common scope for this to
-    happen.
 
-    Usage:
-    a = ProblemIdChoices
-    ProblemIdChoices.set_choices([1, 3])
-    a() -> [1, 3]
-    """
-
-    choices = []
-    def __new__(self):
-        """
-        Apologies for this extremely hacky 'class'.
-        """
-        return self.choices
-
-    @classmethod
-    def set_choices(cls, choices):
-        cls.choices = choices
+def get_problem_choices():
+    global problem_choices
+    return problem_choices
 
 
 class CrowdsourceHinterFields(object):
@@ -58,7 +41,7 @@ class CrowdsourceHinterFields(object):
 
     display_name = String(scope=Scope.settings, default='Crowdsourced Hinter')
     target_problem = String(help='The id of the problem we are hinting for.', scope=Scope.settings,
-                            default='', values=ProblemIdChoices)
+                            default='', values=get_problem_choices)
     moderate = String(help='String "True"/"False" - activates moderation', scope=Scope.settings,
                       default='False')
     debug = String(help='String "True"/"False" - allows multiple voting', scope=Scope.settings,
@@ -106,6 +89,7 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
     js_module_name = "Hinter"
 
     def __init__(self, *args, **kwargs):
+        global problem_choices
         XModule.__init__(self, *args, **kwargs)
         self.init_error = None
         # Set ProblemIdChoices.  (This is for Studio.)
@@ -116,13 +100,16 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         for problem_descriptor in all_problems:
             choices_dict.append({'display_name': problem_descriptor.display_name_with_default,
                                  'value': str(problem_descriptor.location)})
-        ProblemIdChoices.set_choices(choices_dict)
+        problem_choices = choices_dict
 
         # Get the problem we are hinting for.
         try:
             problem_loc = Location(self.target_problem)
         except InvalidLocationError:
-            self.init_error = 'Choose a target problem under Edit -> Settings.'
+            # This means the location wasn't chosen at all.
+            self.init_error = '''Choose a target problem under Edit -> Settings.  Hinting will
+                be enabled on the first response blank of the problem you choose.  Right now,
+                hinting only works on numerical and formula response blanks.'''
             return
         problem_descriptors = modulestore().get_items(problem_loc)
         try:
