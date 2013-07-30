@@ -449,8 +449,6 @@ if Backbone?
           type: "POST"
           error: () =>
             $('input.email-setting').removeAttr('checked')
-
-            
       else
         DiscussionUtil.safeAjax
           url: DiscussionUtil.urlFor("disable_notifications")
