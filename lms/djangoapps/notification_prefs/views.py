@@ -135,10 +135,10 @@ def ajax_disable(request):
 @require_GET
 def ajax_status(request):
     """
-    A view that sends notifications status for the authenticated user
+    A view that retrieves notifications status for the authenticated user.
 
-    This view should be invoked by an AJAX POST call. It returns status 204
-    (no content) or an error.
+    This view should be invoked by an AJAX GET call. It returns status 200,
+    with a JSON-formatted payload, or an error.
     """
     if not request.user.is_authenticated():
         raise PermissionDenied
