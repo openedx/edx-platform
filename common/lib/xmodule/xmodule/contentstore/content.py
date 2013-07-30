@@ -59,6 +59,13 @@ class StaticContent(object):
             return None
 
     @staticmethod
+    def get_static_path_from_location(location):
+        if location is not None:
+            return "/static/{name}".format(**location.dict())
+        else:
+            return None
+
+    @staticmethod
     def get_base_url_path_for_course_assets(loc):
         if loc is not None:
             return "/c4x/{org}/{course}/asset".format(**loc.dict())

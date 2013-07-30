@@ -105,6 +105,7 @@ def asset_index(request, org, course, name):
 
         asset_location = StaticContent.compute_location(asset_id['org'], asset_id['course'], asset_id['name'])
         display_info['url'] = StaticContent.get_url_path_from_location(asset_location)
+        display_info['portable_url'] = StaticContent.get_static_path_from_location(asset_location)
 
         # note, due to the schema change we may not have a 'thumbnail_location' in the result set
         _thumbnail_location = asset.get('thumbnail_location', None)
@@ -187,12 +188,13 @@ def upload_asset(request, org, course, coursename):
     response_payload = {'displayname': content.name,
                         'uploadDate': get_default_time_display(readback.last_modified_at),
                         'url': StaticContent.get_url_path_from_location(content.location),
+                        'portable_url': StaticContent.get_static_path_from_location(content.location),
                         'thumb_url': StaticContent.get_url_path_from_location(thumbnail_location) if thumbnail_content is not None else None,
                         'msg': 'Upload completed'
                         }
 
     response = JsonResponse(response_payload)
-    response['asset_url'] = StaticContent.get_url_path_from_location(content.location)
+    response['asset_url'] = StaticContent.get_static_path_from_location(content.location)
     return response
 
 
