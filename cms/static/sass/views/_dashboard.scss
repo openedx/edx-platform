@@ -358,20 +358,30 @@ body.dashboard {
 		}
 	}
 
-	.new-course {
-		@include clearfix();
-		padding: 0;
-		margin-top: $baseline;
-		border-radius: 3px;
-		border: 1px solid $gray;
-		background: $white;
-		box-shadow: 0 1px 2px rgba(0, 0, 0, .1);
 
-    .title {
-      @extend .t-title4;
-      font-weight: 700;
-      margin-bottom: $baseline;
+  // ELEM: new user form
+  .wrapper-create-course {
+
+    // CASE: when form is animating
+    &.animate {
+
+      // STATE: shown
+      &.is-shown {
+        height: ($baseline*26);
+
+        // STATE: errors
+        &.has-errors {
+          height: ($baseline*33);
+        }
+      }
     }
+  }
+
+  // ====================
+
+  // course listings
+
+	.create-course {
 
 		.row {
 			@include clearfix();

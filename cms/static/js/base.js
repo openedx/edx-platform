@@ -597,11 +597,9 @@ function cancelNewSection(e) {
 
 function addNewCourse(e) {
     e.preventDefault();
-    $('.new-course-button').addClass('disabled');
-    $(e.target).addClass('disabled');
-    var $newCourse = $($('#new-course-template').html());
+    $('.new-course-button').addClass('is-disabled');
+    var $newCourse = $('.wrapper-create-course').addClass('is-shown');
     var $cancelButton = $newCourse.find('.new-course-cancel');
-    $('.courses').prepend($newCourse);
     $newCourse.find('.new-course-name').focus().select();
     $newCourse.find('form').bind('submit', saveNewCourse);
     $cancelButton.bind('click', cancelNewCourse);
@@ -613,11 +611,11 @@ function addNewCourse(e) {
 function saveNewCourse(e) {
     e.preventDefault();
 
-    var $newCourse = $(this).closest('.new-course');
-    var display_name = $newCourse.find('.new-course-name').val();
-    var org = $newCourse.find('.new-course-org').val();
-    var number = $newCourse.find('.new-course-number').val();
-    var run = $newCourse.find('.new-course-run').val();
+    var $newCourseForm = $(this).closest('#create-course-form');
+    var display_name = $newCourseForm.find('.new-course-name').val();
+    var org = $newCourseForm.find('.new-course-org').val();
+    var number = $newCourseForm.find('.new-course-number').val();
+    var run = $newCourseForm.find('.new-course-run').val();
 
     var required_field_text = gettext('Required field');
 
@@ -646,6 +644,7 @@ function saveNewCourse(e) {
 
     var setNewCourseErrMsgs = function(header_err_msg, display_name_errMsg, org_errMsg, number_errMsg, run_errMsg) {
         if (header_err_msg) {
+            $('.wrapper-create-course').addClass('has-errors');
             $('.wrap-error').addClass('is-shown');
             $('#course_creation_error').html('<p>' + header_err_msg + '</p>');
         } else {
@@ -701,8 +700,8 @@ function saveNewCourse(e) {
 
 function cancelNewCourse(e) {
     e.preventDefault();
-    $('.new-course-button').removeClass('disabled');
-    $(this).parents('section.new-course').remove();
+    $('.new-course-button').removeClass('is-disabled');
+    $('.wrapper-create-course').removeClass('is-shown');
 }
 
 function addNewSubsection(e) {
