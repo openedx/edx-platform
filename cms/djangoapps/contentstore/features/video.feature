@@ -47,3 +47,7 @@ Feature: Video Component
     Given I have created a Video Alpha component
     And I have set "show captions" to True
     Then when I view the videoalpha it does show the captions
+
+  Scenario: Video data is shown correctly
+    Given I have created a video with only XML data
+    Then the correct Youtube video is shown
