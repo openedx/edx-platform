@@ -33,7 +33,8 @@ def hide_or_show_captions(step, shown):
         # click the button rather than the tooltip, so move the mouse
         # away to make it disappear.
         button = world.css_find(button_css)
-        button.mouse_out()
+        if world.browser.driver_name != 'Firefox':
+            button.mouse_out()
         world.css_click(button_css)
 
 @step('I edit the component')
