@@ -157,7 +157,7 @@ def create_latex_problem(step):
     world.click_new_component_button(step, '.large-problem-icon')
 
     def animation_done(_driver):
-            return world.browser.evaluate_script("$('div.new-component').css('display')") == 'none'
+        return world.browser.evaluate_script("$('div.new-component').css('display')") == 'none'
     world.wait_for(animation_done)
     # Go to advanced tab.
     world.css_click('#ui-id-2')

@@ -12,7 +12,7 @@ def create_component_instance(step, component_button_css, category,
                               has_multiple_templates=True):
 
     click_new_component_button(step, component_button_css)
-    if category == 'problem' or category == 'html':
+    if category in ('problem', 'html'):
         def animation_done(_driver):
             return world.browser.evaluate_script("$('div.new-component').css('display')") == 'none'
         world.wait_for(animation_done)
