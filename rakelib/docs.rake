@@ -25,7 +25,6 @@ end
 
 desc "Show docs in browser (mac and ubuntu)."
 task :showdocs, [:options] do |t, args|
-    path = "docs"
     if args.options == 'dev'
         path = "docs/developer"
     elsif args.options == 'author'
