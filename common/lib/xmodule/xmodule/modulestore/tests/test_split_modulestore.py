@@ -69,10 +69,17 @@ class SplitModuleTest(unittest.TestCase):
                 collection_prefix + collection, '--jsonArray',
                 '--file',
                 SplitModuleTest.COMMON_ROOT + '/test/data/splitmongo_json/' + collection + '.json'
-            ])
+                ],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
             for collection in ('active_versions', 'structures', 'definitions')]
         for p in processes:
-            if p.wait() != 0:
+            stdout, stderr = p.communicate()
+            if p.returncode != 0:
+                print "Couldn't run mongoimport:"
+                print stdout
+                print stderr
                 raise Exception("DB did not init correctly")
 
     @classmethod
