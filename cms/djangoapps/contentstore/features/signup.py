@@ -30,3 +30,13 @@ def i_should_see_be_on_the_studio_home_page(step):
 @step(u'I should see the message "([^"]*)"$')
 def i_should_see_the_message(step, msg):
     assert world.browser.is_text_present(msg, 5)
+
+
+@step(u'I fill in and submit the signin form$')
+def i_fill_in_the_signin_form(step):
+    def fill_login_form():
+        login_form = world.browser.find_by_css('form#login_form')
+        login_form.find_by_name('email').fill('robot+studio@edx.org')
+        login_form.find_by_name('password').fill('test')
+        login_form.find_by_name('submit').click()
+    world.retry_on_exception(fill_login_form)

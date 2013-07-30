@@ -65,7 +65,7 @@ def log_in(username, password):
 
 @world.absorb
 def register_by_course_id(course_id, is_staff=False):
-    create_user('robot')
+    create_user('robot', 'password')
     u = User.objects.get(username='robot')
     if is_staff:
         u.is_staff = True

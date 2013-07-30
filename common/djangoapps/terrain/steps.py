@@ -168,6 +168,11 @@ def dialogs_are_closed(step):
     assert world.dialogs_closed()
 
 
+@step(u'visit the url "([^"]*)"')
+def visit_url(step, url):
+    world.browser.visit(django_url(url))
+
+
 @step('I will confirm all alerts')
 def i_confirm_all_alerts(step):
     """
