@@ -121,8 +121,8 @@ def create_new_course(request):
         return JsonResponse(
             {
                 'ErrMsg': _('There is already a course defined with the same organization, course number, and course run. Please change either organization or course number to be unique.'),
-                'OrgErrMsg': _('Either of organization or course number must be unique.'),
-                'CourseErrMsg': _('Either of organization or course number must be unique.'),
+                'OrgErrMsg': _('Please change either the organization or course number so that it is unique.'),
+                'CourseErrMsg': _('Please change either the organization or course number so that it is unique.'),
             }
         )
 
@@ -132,8 +132,8 @@ def create_new_course(request):
         return JsonResponse(
             {
                 'ErrMsg': _('There is already a course defined with the same organization and course number. Please change at least one field to be unique.'),
-                'OrgErrMsg': _('Either of organization or course number must be unique.'),
-                'CourseErrMsg': _('Either of organization or course number must be unique.'),
+                'OrgErrMsg': _('Please change either the organization or course number so that it is unique.'),
+                'CourseErrMsg': _('Please change either the organization or course number so that it is unique.'),
             }
         )
 
