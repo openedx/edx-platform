@@ -202,9 +202,8 @@ if Backbone?
       DiscussionUtil.safeAjax
           url: url
           type: "GET"
-          dataType: 'json'
           success: (response, textStatus) =>
-            if response.count==1
+            if response.status
               $('input.email-setting').attr('checked','checked')
             else
               $('input.email-setting').removeAttr('checked')

@@ -142,7 +142,7 @@ def ajax_status(request):
     if not request.user.is_authenticated():
         raise PermissionDenied
 
-   prefs UserPreference.objects.get(
+    prefs = UserPreference.objects.get(
         user=request.user,
         key=NOTIFICATION_PREF_KEY,
         defaults={
