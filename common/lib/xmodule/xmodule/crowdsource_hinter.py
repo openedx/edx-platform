@@ -76,7 +76,12 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
     def __init__(self, *args, **kwargs):
         XModule.__init__(self, *args, **kwargs)
         # We need to know whether we are working with a FormulaResponse problem.
-        responder = self.get_display_items()[0].lcp.responders.values()[0]
+        try:
+            responder = self.get_display_items()[0].lcp.responders.values()[0]
+        except (IndexError, AttributeError):
+            log.exception('Unable to find a capa problem child.')
+            return
+
         self.is_formula = (type(responder) == FormulaResponse)
         if self.is_formula:
             self.answer_to_str = self.formula_answer_to_str

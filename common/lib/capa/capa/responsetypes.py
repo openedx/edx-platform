@@ -1799,7 +1799,7 @@ class FormulaResponse(LoncapaResponse):
             self.correct_answer, given, self.samples)
         return CorrectMap(self.answer_id, correctness)
 
-    def hash_answers(self, answer, var_dict_list):
+    def tupleize_answers(self, answer, var_dict_list):
         """
         Takes in an answer and a list of dictionaries mapping variables to values.
         Each dictionary represents a test case for the answer.
@@ -1850,7 +1850,7 @@ class FormulaResponse(LoncapaResponse):
     def randomize_variables(self, samples):
         """
         Returns a list of dictionaries mapping variables to random values in range,
-        as expected by hash_answers.
+        as expected by tupleize_answers.
         """
         variables = samples.split('@')[0].split(',')
         numsamples = int(samples.split('@')[1].split('#')[1])
@@ -1876,13 +1876,15 @@ class FormulaResponse(LoncapaResponse):
         "correct" or "incorrect".
         """
         var_dict_list = self.randomize_variables(samples)
-        student_result = self.hash_answers(given, var_dict_list)
-        instructor_result = self.hash_answers(expected, var_dict_list)
+        student_result = self.tupleize_answers(given, var_dict_list)
+        instructor_result = self.tupleize_answers(expected, var_dict_list)
 
-        for i in xrange(len(instructor_result)):
-            if not compare_with_tolerance(student_result[i], instructor_result[i], self.tolerance):
-                return "incorrect"
-        return "correct"
+        correct = all(compare_with_tolerance(student, instructor, self.tolerance)
+                      for student, instructor in zip(student_result, instructor_result))
+        if correct:
+            return "correct"
+        else:
+            return "incorrect"
 
     def compare_answer(self, a, b):
         """
@@ -1897,7 +1899,7 @@ class FormulaResponse(LoncapaResponse):
         """
         var_dict_list = self.randomize_variables(self.samples)
         try:
-            self.hash_answers(answer, var_dict_list)
+            self.tupleize_answers(answer, var_dict_list)
             return True
         except StudentInputError:
             return False
