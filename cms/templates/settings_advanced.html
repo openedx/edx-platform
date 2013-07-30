@@ -1,15 +1,17 @@
-<%! from django.utils.translation import ugettext as _ %>
 <%inherit file="base.html" />
+<%namespace name='static' file='static_content.html'/>
 <%! from django.core.urlresolvers import reverse %>
+<%! from django.utils.translation import ugettext as _ %>
+<%! from contentstore import utils %>
 <%block name="title">${_("Advanced Settings")}</%block>
 <%block name="bodyclass">is-signedin course advanced settings</%block>
 
-<%namespace name='static' file='static_content.html'/>
-<%!
-from contentstore import utils
-%>
-
 <%block name="jsextra">
+% for template_name in ["advanced_entry"]:
+  <script type="text/template" id="${template_name}-tpl">
+    <%static:include path="js/${template_name}.underscore" />
+  </script>
+% endfor
 
 <script type="text/javascript" src="${static.url('js/template_loader.js')}"></script>
 <script type="text/javascript" src="${static.url('js/views/validating_view.js')}"></script>
