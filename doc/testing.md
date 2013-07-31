@@ -186,8 +186,8 @@ uses [Selenium](http://docs.seleniumhq.org/) to control the Chrome browser.
 
 **Prerequisite**: You must have [ChromeDriver](https://code.google.com/p/selenium/wiki/ChromeDriver)
 installed to run the tests in Chrome.  The tests are confirmed to run
-with Chrome (not Chromium) version 26.0.0.1410.63 with ChromeDriver
-version r195636.
+with Chrome (not Chromium) version 28.0.1500.71 with ChromeDriver
+version 2.1.210398.
 
 To run all the acceptance tests:
 

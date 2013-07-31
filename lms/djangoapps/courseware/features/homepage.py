@@ -8,7 +8,7 @@ from nose.tools import assert_in, assert_equals
 @step(u'I should see the following Partners in the Partners section')
 def i_should_see_partner(step):
     partners = world.browser.find_by_css(".partner .name span")
-    names = set(span.text for span in partners)
+    names = set(span.html for span in partners)
     for partner in step.hashes:
         assert_in(partner['Partner'], names)
 
