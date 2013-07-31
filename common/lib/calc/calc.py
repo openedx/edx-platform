@@ -233,14 +233,14 @@ def evaluator(variables, functions, math_expr, case_sensitive=False):
         return float('nan')
 
     # Parse the tree.
-    thing = ParseAugmenter(math_expr, case_sensitive)
-    thing.parse_algebra()
+    math_interpreter = ParseAugmenter(math_expr, case_sensitive)
+    math_interpreter.parse_algebra()
 
     # Get our variables together.
     all_variables, all_functions = add_defaults(variables, functions, case_sensitive)
 
     # ...and check them
-    thing.check_variables(all_variables, all_functions)
+    math_interpreter.check_variables(all_variables, all_functions)
 
     # Create a recursion to evaluate the tree.
     if case_sensitive:
@@ -259,7 +259,7 @@ def evaluator(variables, functions, math_expr, case_sensitive=False):
         'sum': eval_sum
     }
 
-    return thing.handle_tree(evaluate_actions)
+    return math_interpreter.reduce_tree(evaluate_actions)
 
 
 class ParseAugmenter(object):
@@ -375,7 +375,7 @@ class ParseAugmenter(object):
         expr << sum_term  # pylint: disable=W0104
         self.tree = (expr + stringEnd).parseString(self.math_expr)[0]
 
-    def handle_tree(self, handle_actions, handle_terminal=None):
+    def reduce_tree(self, handle_actions, terminal_converter=None):
         """
         Call `handle_actions` recursively on `self.tree` and return result.
 
@@ -385,8 +385,8 @@ class ParseAugmenter(object):
           nodes in the list, they will be given as their processed forms also.
          -output: whatever to be passed to the level higher, and what to
           return for the final node.
-        `handle_terminal` is a function that takes in a token and returns a
-        processed form. Leaving it as `None` just leaves them as strings.
+        `terminal_converter` is a function that takes in a token and returns a
+        processed form. The default of `None` just leaves them as strings.
         """
         def handle_node(node):
             """
@@ -396,11 +396,11 @@ class ParseAugmenter(object):
             feed it the output of `handle_node` for each child node.
             """
             if not isinstance(node, ParseResults):
-                # Then it is a terminal node.
-                if handle_terminal is None:
+                # Then treat it as a terminal node.
+                if terminal_converter is None:
                     return node
                 else:
-                    return handle_terminal(node)
+                    return terminal_converter(node)
 
             node_name = node.getName()
             if node_name not in handle_actions:  # pragma: no cover

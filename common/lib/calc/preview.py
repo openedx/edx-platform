@@ -274,8 +274,8 @@ def latex_preview(math_expr, variables=(), functions=(), case_sensitive=False):
         return ""
 
     # Parse tree
-    thing = ParseAugmenter(math_expr, case_sensitive)
-    thing.parse_algebra()
+    latex_interpreter = ParseAugmenter(math_expr, case_sensitive)
+    latex_interpreter.parse_algebra()
 
     # Get our variables together.
     variables, functions = add_defaults(variables, functions, case_sensitive)
@@ -297,8 +297,13 @@ def latex_preview(math_expr, variables=(), functions=(), case_sensitive=False):
         'sum': render_sum
     }
 
-    bksh = "\\"
-    wrap_escaped_strings = lambda s: LatexRendered(s.replace(bksh, bksh * 2))
+    backslash = "\\"
+    wrap_escaped_strings = lambda s: LatexRendered(
+        s.replace(backslash, backslash * 2)
+    )
 
-    output = thing.handle_tree(render_actions, wrap_escaped_strings)
+    output = latex_interpreter.reduce_tree(
+        render_actions,
+        terminal_converter=wrap_escaped_strings
+    )
     return output.latex
