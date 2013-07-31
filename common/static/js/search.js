@@ -75,6 +75,14 @@ function getParameters(){
     return params;
 }
 
+function getSearchAction(){
+    var urlSplit = document.URL.split("/");
+    var courseIndex = urlSplit.indexOf("courses")
+    var searchAction = urlSplit.slice(courseIndex, courseIndex+4)
+    searchAction.push("search")
+    return searchAction.join("/");
+}
+
 function constructSearchBox(value){
     var searchWrapper = document.createElement("div");
     searchWrapper.className = "animated fadeInRight search-wrapper";
@@ -83,7 +91,7 @@ function constructSearchBox(value){
     var searchForm = document.createElement("form");
     searchForm.className = "auto-submit";
     searchForm.id = "query-box";
-    searchForm.action = "search";
+    searchForm.action = "/"+getSearchAction();
     searchForm.method = "get";
 
     var searchBoxWrapper = document.createElement("div");
@@ -104,11 +112,16 @@ function constructSearchBox(value){
 }
 
 function replaceWithSearch(){
-    var searchWrapper = constructSearchBox("");
     $(this).addClass("animated fadeOut");
+    var searchWrapper = constructSearchBox("");
+    var width = $("div.search-icon").width()
+    var height = $("div.search-icon").height()
     $(this).on('webkitAnimationEnd oanimationend oAnimationEnd msAnimationEnd animationend',
         function (e){
             $(this).parent().replaceWith(searchWrapper);
+            $("#searchbox").css("width", width)
+            $("#searchbox").css("height", height)
+            // $('#search-bar').remove()
             if (document.URL.indexOf("search?s=") == -1){
                 document.getElementById("searchbox").focus();
         }
@@ -117,24 +130,18 @@ function replaceWithSearch(){
 
 function updateOldSearch(){
     var params = getParameters();
-    var newBox = constructSearchBox(params.s);
-    var courseTab = $("#search-bar").get(0);
+    var newBox = constructSearchBox(old_query);
+    var courseTab = $("a.search-bar").get(0);
     if (typeof courseTab != 'undefined'){
         courseTab.parentNode.replaceChild(newBox, courseTab);
     }
 }
 
-function wrapText(element){
-    $(element).wrapInner("<span id=text-wrapper />");
-    $("#text-wrapper").className="search-wrapper";
-}
-
 $(document).ready(function(){
-    wrapText($("#search-bar"));
     if (document.URL.indexOf("search?s=") !== -1){
         updateOldSearch();
     } else {
-        $("#text-wrapper").bind("click", replaceWithSearch);
+        $("a.search-bar").bind("click", replaceWithSearch);
     }
 });
 
