@@ -93,7 +93,6 @@ form {
   }
 }
 
-
 // ELEM: form wrapper
 .wrapper-create-element {
   height: 0;
@@ -117,10 +116,6 @@ form {
 // form styling for creating a new content item (course, user, textbook)
 form[class^="create-"] {
   @extend .ui-window;
-  @include box-sizing(border-box);
-  border-radius: 2px;
-  width: 100%;
-  background: $white;
 
   .title {
     @extend .t-title4;
@@ -171,8 +166,8 @@ form[class^="create-"] {
 
 
       input, textarea {
-        @include transition(all $tmg-f2 ease-in-out 0s);
         @extend .t-copy-base;
+        @include transition(all $tmg-f2 ease-in-out 0s);
         height: 100%;
         width: 100%;
         padding: ($baseline/2);
@@ -184,6 +179,10 @@ form[class^="create-"] {
         &.short {
           width: 25%;
         }
+
+        /*@include placeholder {
+          color: $gray-l3;
+        }*/
 
         &:focus {
 
@@ -295,31 +294,25 @@ form[class^="create-"] {
     padding: ($baseline*0.75) ($baseline*1.5);
     background: $gray-l6;
 
-    .action-primary {
-      @include blue-button;
-      @extend .t-action2;
-      @include transition(all .15s);
+    .action {
+      @include transition(all $tmg-f2 linear 0s);
       display: inline-block;
       padding: ($baseline/5) $baseline;
       font-weight: 600;
       text-transform: uppercase;
+    }
+
+    .action-primary {
+      @include blue-button;
+      @extend .t-action2;
     }
 
     .action-secondary {
       @include grey-button;
       @extend .t-action2;
-      @include transition(all .15s);
-      display: inline-block;
-      padding: ($baseline/5) $baseline;
-      font-weight: 600;
-      text-transform: uppercase;
     }
   }
 }
-
-
-
-
 
 // ====================
 
