@@ -194,7 +194,6 @@ def upload_asset(request, org, course, coursename):
                         }
 
     response = JsonResponse(response_payload)
-    response['asset_url'] = StaticContent.get_static_path_from_location(content.location)
     return response
 
 
