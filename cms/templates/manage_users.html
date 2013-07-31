@@ -162,6 +162,14 @@
 
 <%block name="jsextra">
 <script type="text/javascript">
+  window.section = new CMS.Models.Section({
+    id: "${context_course.id}",
+    name: "${context_course.display_name_with_default | h}",
+    url_name: "${context_course.location.name | h}",
+    org: "${context_course.location.org | h}",
+    num: "${context_course.location.course | h}",
+    revision: "${context_course.location.revision | h}"
+  });
   var staffEmails = ${json.dumps([user.email for user in staff])};
   var tplUserURL = "${reverse('course_team_user', kwargs=dict(
       org=context_course.location.org,
@@ -270,38 +278,58 @@
     });
 
     $('.remove-user').click(function() {
-      var url = tplUserURL.replace("@@EMAIL@@", $(this).data('id'))
-      $.ajax({
-        url: url,
-        type: 'DELETE',
-        dataType: 'json',
-        contentType: 'application/json',
-        success: function(data) {
-          location.reload();
-        },
-        notifyOnError: false,
-        error: function(jqXHR, textStatus, errorThrown) {
-          var message;
-          try {
-            message = JSON.parse(jqXHR.responseText).error || "Unknown";
-          } catch (e) {
-            message = "Unknown";
-          }
-          var prompt = new CMS.Views.Prompt.Error({
-            title: gettext("Error removing user"),
-            message: message,
-            actions: {
-              primary: {
-                text: gettext("OK"),
-                click: function(view) {
-                  view.hide();
+      var email = $(this).data('id');
+      var msg = new CMS.Views.Prompt.Warning({
+        title: gettext("Are you sure?"),
+        message: _.template(gettext("Are you sure you want to delete {email} from the course team for {course}?"), {email: email, course: section.get('name')}, {interpolate: /\{(.+?)\}/g}),
+        actions: {
+          primary: {
+            text: gettext("Delete"),
+            click: function(view) {
+              view.hide();
+              var url = tplUserURL.replace("@@EMAIL@@", email)
+              $.ajax({
+                url: url,
+                type: 'DELETE',
+                dataType: 'json',
+                contentType: 'application/json',
+                success: function(data) {
+                  location.reload();
+                },
+                notifyOnError: false,
+                error: function(jqXHR, textStatus, errorThrown) {
+                  var message;
+                  try {
+                    message = JSON.parse(jqXHR.responseText).error || "Unknown";
+                  } catch (e) {
+                    message = "Unknown";
+                  }
+                  var prompt = new CMS.Views.Prompt.Error({
+                    title: gettext("Error removing user"),
+                    message: message,
+                    actions: {
+                      primary: {
+                        text: gettext("OK"),
+                        click: function(view) {
+                          view.hide();
+                        }
+                      }
+                    }
+                  })
+                  prompt.show();
                 }
-              }
+              });
             }
-          })
-          prompt.show();
+          },
+          secondary: {
+            text: gettext("Cancel"),
+            click: function(view) {
+              view.hide();
+            }
+          }
         }
       });
+      msg.show();
     });
 
     $(".toggle-admin-role").click(function(e) {
