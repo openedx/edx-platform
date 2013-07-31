@@ -73,7 +73,7 @@ MITX_FEATURES = {
     'ENABLE_DISCUSSION_SERVICE': True,
     # discussion home panel, which includes a subscription on/off setting for discussion digest emails.
     # this should remain off in production until digest notifications are online. 
-    'ENABLE_DISCUSSION_HOME_PANEL': True,
+    'ENABLE_DISCUSSION_HOME_PANEL': False,
 
     'ENABLE_PSYCHOMETRICS': False,  # real-time psychometrics (eg item response theory analysis in instructor dashboard)
 
@@ -320,8 +320,6 @@ CODE_JAIL = {
     'limits': {
         # How many CPU seconds can jailed code use?
         'CPU': 1,
-        # How large a file can jailed code write?
-        'FSIZE': 50000,
     },
 }
 
