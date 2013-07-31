@@ -15,14 +15,16 @@ class ContentStoreTestCase(ModuleStoreTestCase):
         Login.  View should always return 200.  The success/fail is in the
         returned json
         """
-        resp = self.client.post(reverse('login_post'),
-                                {'email': email, 'password': password})
+        resp = self.client.post(
+            reverse('login_post'),
+            {'email': email, 'password': password}
+        )
         self.assertEqual(resp.status_code, 200)
         return resp
 
-    def login(self, email, pw):
+    def login(self, email, password):
         """Login, check that it worked."""
-        resp = self._login(email, pw)
+        resp = self._login(email, password)
         data = parse_json(resp)
         self.assertTrue(data['success'])
         return resp
@@ -178,11 +180,15 @@ class ForumTestCase(CourseTestCase):
 
     def test_blackouts(self):
         now = datetime.datetime.now(UTC)
-        self.course.discussion_blackouts = [(t.isoformat(), t2.isoformat()) for t, t2 in
-            [(now - datetime.timedelta(days=14), now - datetime.timedelta(days=11)),
-                (now + datetime.timedelta(days=24), now + datetime.timedelta(days=30))]]
+        times1 = [
+            (now - datetime.timedelta(days=14), now - datetime.timedelta(days=11)),
+            (now + datetime.timedelta(days=24), now + datetime.timedelta(days=30))
+        ]
+        self.course.discussion_blackouts = [(t.isoformat(), t2.isoformat()) for t, t2 in times1]
         self.assertTrue(self.course.forum_posts_allowed)
-        self.course.discussion_blackouts = [(t.isoformat(), t2.isoformat()) for t, t2 in
-            [(now - datetime.timedelta(days=14), now + datetime.timedelta(days=2)),
-                (now + datetime.timedelta(days=24), now + datetime.timedelta(days=30))]]
+        times2 = [
+            (now - datetime.timedelta(days=14), now + datetime.timedelta(days=2)),
+            (now + datetime.timedelta(days=24), now + datetime.timedelta(days=30))
+        ]
+        self.course.discussion_blackouts = [(t.isoformat(), t2.isoformat()) for t, t2 in times2]
         self.assertFalse(self.course.forum_posts_allowed)

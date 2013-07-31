@@ -95,8 +95,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.client.login(username=uname, password=password)
 
     def tearDown(self):
-        mongo = MongoClient()
-        mongo.drop_database(TEST_DATA_CONTENTSTORE['OPTIONS']['db'])
+        MongoClient().drop_database(TEST_DATA_CONTENTSTORE['OPTIONS']['db'])
         _CONTENTSTORE.clear()
 
     def check_components_on_page(self, component_types, expected_types):

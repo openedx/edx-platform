@@ -283,7 +283,7 @@ def import_course(request, org, course, name):
         tar_file.extractall(course_dir + '/')
 
         # find the 'course.xml' file
-
+        dirpath = None
         for dirpath, _dirnames, filenames in os.walk(course_dir):
             for filename in filenames:
                 if filename == 'course.xml':

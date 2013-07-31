@@ -27,6 +27,7 @@ class ChecklistTestCase(CourseTestCase):
         """
         self.assertEqual(persisted['short_description'], request['short_description'])
         compare_urls = (persisted.get('action_urls_expanded') == request.get('action_urls_expanded'))
+        pers, req = None, None
         for pers, req in zip(persisted['items'], request['items']):
             self.assertEqual(pers['short_description'], req['short_description'])
         self.assertEqual(pers['long_description'], req['long_description'])
