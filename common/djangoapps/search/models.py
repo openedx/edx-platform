@@ -14,13 +14,14 @@ class SearchResults:
     def __init__(self, response, **kwargs):
         """kwargs should be the GET parameters from the original search request
         filters needs to be a dictionary that maps fields to allowed values"""
+        test = response._content
         raw_results = json.loads(response._content).get("hits", {"hits": ""})["hits"]
         scores = [entry["_score"] for entry in raw_results]
         self.sort = kwargs.get("sort", None)
         raw_data = [entry["_source"] for entry in raw_results]
-        self.query = kwargs.get("s", "*.*")
+        self.query = " ".join(kwargs.get("s", "*.*"))
         results = zip(raw_data, scores)
-        self.entries = [SearchResult(entry, score, self.query, kwargs) for entry, score in results]
+        self.entries = [SearchResult(entry, score, self.query, **kwargs) for entry, score in results]
         self.has_results = len(self.entries) > 0
         self.filters = kwargs.get("filters", {"": ""})
 
@@ -45,6 +46,9 @@ class SearchResults:
             full_results |= self.filter(field, value)
         self.entries = list(full_results)
         self.sort_results()
+
+    def __len__(self):
+        return len(self.entries)
 
 
 class SearchResult:

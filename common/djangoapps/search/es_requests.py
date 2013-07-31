@@ -8,6 +8,7 @@ import hashlib
 import sys
 from cStringIO import StringIO as cIO
 from StringIO import StringIO as IO
+from multiprocessing import Pool
 
 from django.conf import settings
 from pymongo import MongoClient
@@ -19,6 +20,8 @@ from wand.image import Image
 from wand.exceptions import DelegateError, MissingDelegateError, CorruptImageError
 from xhtml2pdf import pisa as pisa
 
+
+MONGO_COURSE_CACHE = {}
 
 class ElasticDatabase:
 
@@ -232,13 +235,21 @@ class MongoIndexer:
             print data
             print type(data)
             return [""]
-        uuid = re.sub(r"(1\.0:)(.*?)(,1\.25)", r'\2', data)
+        uuid = self.uuid_from_video_module(video_module)
+        if uuid == False:
+            return [""]
         name_pattern = re.compile(".*?"+uuid+".*?")
         chunk = self.chunk_collection.find_one({"files_id.name": name_pattern})
-        try:
-            return filter(None, json.loads(chunk["data"].decode('utf-8', "ignore"))["text"])
-        except (ValueError, TypeError):
+        if chunk == None:
             return [""]
+        elif "com.apple.quar" in chunk["data"].decode('utf-8', "ignore"):
+            # This seemingly arbitrary error check brought to you by apple. 
+            # This is an obscure, barely documented occurance where apple broke tarballs
+            # and decided to shove error messages into tar metadata which causes this.
+            # https://discussions.apple.com/thread/3145071?start=0&tstart=0
+            return [""]
+        else:
+            return " ".join(filter(None, json.loads(chunk["data"].decode('utf-8', "ignore"))["text"]))
 
     def pdf_to_text(self, mongo_element):
         onlyAscii = lambda s: "".join(c for c in s if ord(c) < 128)
@@ -281,16 +292,24 @@ class MongoIndexer:
             url = "https://lh6.ggpht.com/8_h5j6hiFXdSl5atSJDf8bJBy85b3IlzNWeRzOqRurfNVI_oiEG-dB3C0vHRclOG8A=w170"
             image = urllib.urlopen(url)
             return base64.b64encode(image.read())
+        uuid = self.uuid_from_video_module(video_module)
+        if uuid == False:
+            url = "http://img.youtube.com/vi/Tt9g2se1LcM/4.jpg"
+            image = urllib.urlopen(url)
+            return base64.b64encode(image.read())
+        image = urllib.urlopen("http://img.youtube.com/vi/" + uuid + "/0.jpg")
+        return base64.b64encode(image.read())
+
+    def uuid_from_video_module(self, video_module):
+        data = video_module.get("definition", {"data": ""}).get("data", "")
         if isinstance(data, dict):
             data = data.get("data", "")
         uuids = data.split(",")
         if len(uuids) == 1:  # Some videos are just left over demos without links
-            url = "http://img.youtube.com/vi/Tt9g2se1LcM/4.jpg"
-            image = urllib.urlopen(url)
-            return base64.b64encode(image.read())
+            return False
         try:  # The colon is kind of a hack to make sure there will always be a second element since
               # some entries don't have anything for the second entry
-            speed_map = {entry+":".split(":")[0]: entry+":".split(":")[1] for entry in uuids}
+            speed_map = {(entry+":").split(":")[0]: (entry+":").split(":")[1] for entry in uuids}
         except IndexError:
             print uuids
         try:
@@ -299,8 +318,7 @@ class MongoIndexer:
             print data
             print uuids
             print speed_map
-        image = urllib.urlopen("http://img.youtube.com/vi/" + uuid + "/0.jpg")
-        return base64.b64encode(image.read())
+        return uuid
 
     def thumbnail_from_pdf(self, pdf):
         try:
@@ -353,7 +371,12 @@ class MongoIndexer:
         id = json.dumps(mongo_module["_id"])
         org = mongo_module["_id"]["org"]
         course = mongo_module["_id"]["course"]
-        course_id = "/".join([org, course, self.course_name_from_mongo_module(mongo_module)])
+        
+        if not MONGO_COURSE_CACHE.get(course, False):
+            MONGO_COURSE_CACHE[course] = self.course_name_from_mongo_module(mongo_module)
+        offering = MONGO_COURSE_CACHE[course]
+
+        course_id = "/".join([org, course, offering])
         hash = hashlib.sha1(id).hexdigest()
         display_name = (
             mongo_module.get("metadata", {"display_name": ""}).get("display_name", "") +
@@ -412,10 +435,22 @@ class MongoIndexer:
 
     def index_all_problems(self, index, bulk_chunk=100):
         cursor = self.find_modules_by_category("problem")
+        bulk_string = ""
         for i in range(cursor.count()):
+            print i
             item = cursor.next()
-            data = self.basic_dict(item, "problem")
-            print self.es_instance.index_data(index, data)._content
+            try:
+                data = self.basic_dict(item, "problem")
+            except IOError:  # In case the connection is refused for whatever reason, try again
+                data = self.basic_dict(item, "problem")
+            bulk_string += json.dumps({"index": {"_index": index, "_type": data["type_hash"], "_id": data["hash"]}})
+            bulk_string += "\n"
+            bulk_string += json.dumps(data)
+            bulk_string += "\n"
+            if i % bulk_chunk == 0:
+                print self.es_instance.bulk_index(bulk_string)._content
+                bulk_string = ""
+        print self.es_instance.bulk_index(bulk_string)._content
 
     def index_all_transcripts(self, index, bulk_chunk=100):
         cursor = self.find_modules_by_category("video")
@@ -423,7 +458,12 @@ class MongoIndexer:
         for i in range(cursor.count()):
             print i
             item = cursor.next()
-            data = self.basic_dict(item, "transcript")
+            if i == 1274:
+                print json.dumps(item["_id"])
+            try:
+                data = self.basic_dict(item, "transcript")
+            except IOError:  # In case the connection is refused for whatever reason, try again
+                data = self.basic_dict(item, "transcript")
             bulk_string += json.dumps({"index": {"_index": index, "_type": data["type_hash"], "_id": data["hash"]}})
             bulk_string += "\n"
             bulk_string += json.dumps(data)
@@ -528,6 +568,7 @@ if sys.argv[1] == "regenerate":
 
     edb = ElasticDatabase()
 
+    mongo2.index_all_transcripts("transcript-index")
     if "pdf" in sys.argv[2:]:
         print edb.delete_index("pdf-index")
         mongo.index_all_pdfs("pdf-index")
