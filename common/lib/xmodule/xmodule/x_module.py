@@ -711,20 +711,20 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
 
     # =============================== BUILTIN METHODS ==========================
     def __eq__(self, other):
-        eq = (self.__class__ == other.__class__ and
+        return (self.__class__ == other.__class__ and
                 all(getattr(self, attr, None) == getattr(other, attr, None)
                     for attr in self.equality_attributes))
 
-        return eq
-
     def __repr__(self):
-        return ("{class_}({system!r}, location={location!r},"
-                " model_data={model_data!r})".format(
-            class_=self.__class__.__name__,
-            system=self.system,
-            location=self.location,
-            model_data=self._model_data,
-        ))
+        return (
+            "{class_}({system!r}, location={location!r},"
+            " model_data={model_data!r})".format(
+                class_=self.__class__.__name__,
+                system=self.system,
+                location=self.location,
+                model_data=self._model_data,
+            )
+        )
 
     @property
     def non_editable_metadata_fields(self):
@@ -783,15 +783,17 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
                 editor_type = "Integer"
             elif isinstance(field, Float):
                 editor_type = "Float"
-            metadata_fields[field.name] = {'field_name': field.name,
-                                           'type': editor_type,
-                                           'display_name': field.display_name,
-                                           'value': field.to_json(value),
-                                           'options': values,
-                                           'default_value': field.to_json(default_value),
-                                           'inheritable': inheritable,
-                                           'explicitly_set': explicitly_set,
-                                           'help': field.help}
+            metadata_fields[field.name] = {
+                'field_name': field.name,
+                'type': editor_type,
+                'display_name': field.display_name,
+                'value': field.to_json(value),
+                'options': values,
+                'default_value': field.to_json(default_value),
+                'inheritable': inheritable,
+                'explicitly_set': explicitly_set,
+                'help': field.help,
+            }
 
         return metadata_fields
 
@@ -902,7 +904,7 @@ class ModuleSystem(Runtime):
                  s3_interface=None,
                  cache=None,
                  can_execute_unsafe_code=None,
-    ):
+        ):
         '''
         Create a closure around the system environment.
 
