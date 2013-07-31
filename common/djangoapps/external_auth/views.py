@@ -39,6 +39,7 @@ from openid.consumer.consumer import SUCCESS
 from openid.server.server import Server, ProtocolError, UntrustedReturnURL
 from openid.server.trustroot import TrustRoot
 from openid.extensions import ax, sreg
+from ratelimitbackend.exceptions import RateLimitException
 
 import student.views as student_views
 # Required for Pearson
@@ -191,7 +192,7 @@ def _external_login_or_signup(request,
         user.backend = auth_backend
         AUDIT_LOG.info('Linked user "%s" logged in via Shibboleth', user.email)
     else:
-        user = authenticate(username=uname, password=eamap.internal_password)
+        user = authenticate(username=uname, password=eamap.internal_password, request=request)
     if user is None:
         # we want to log the failure, but don't want to log the password attempted:
         AUDIT_LOG.warning('External Auth Login failed for "%s"', uname)
@@ -718,7 +719,12 @@ def provider_login(request):
         # Failure is again redirected to the login dialog.
         username = user.username
         password = request.POST.get('password', None)
-        user = authenticate(username=username, password=password)
+        try:
+            user = authenticate(username=username, password=password, request=request)
+        except RateLimitException:
+            AUDIT_LOG.warning('OpenID - Too many failed login attempts.')
+            return HttpResponseRedirect(openid_request_url)
+
         if user is None:
             request.session['openid_error'] = True
             msg = "OpenID login failed - password for %s is invalid"

@@ -108,6 +108,11 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.csrf'
 )
 
+# use the ratelimit backend to prevent brute force attacks
+AUTHENTICATION_BACKENDS = (
+    'ratelimitbackend.backends.RateLimitModelBackend',
+)
+
 LMS_BASE = None
 
 #################### CAPA External Code Evaluation #############################
@@ -152,7 +157,10 @@ MIDDLEWARE_CLASSES = (
     # Detects user-requested locale from 'accept-language' header in http request
     'django.middleware.locale.LocaleMiddleware',
 
-    'django.middleware.transaction.TransactionMiddleware'
+    'django.middleware.transaction.TransactionMiddleware',
+
+    # catches any uncaught RateLimitExceptions and returns a 403 instead of a 500
+    'ratelimitbackend.middleware.RateLimitMiddleware',
 )
 
 ############################ SIGNAL HANDLERS ################################
@@ -188,8 +196,8 @@ STATICFILES_DIRS = [
     COMMON_ROOT / "static",
     PROJECT_ROOT / "static",
 
-# This is how you would use the textbook images locally
-# ("book", ENV_ROOT / "book_images")
+    # This is how you would use the textbook images locally
+    # ("book", ENV_ROOT / "book_images")
 ]
 
 # Locale/Internationalization

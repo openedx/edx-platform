@@ -9,11 +9,14 @@ from urlparse import parse_qs
 
 from django.conf import settings
 from django.test import TestCase, LiveServerTestCase
+from django.core.cache import cache
 from django.test.utils import override_settings
-# from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.test.client import RequestFactory
 from unittest import skipUnless
+
+from student.tests.factories import UserFactory
+from external_auth.views import provider_login
 
 
 class MyFetcher(HTTPFetcher):
@@ -198,6 +201,49 @@ class OpenIdProviderTest(TestCase):
     def test_invalid_return_url(self):
         """ Test for 403 error code when the url"""
         self.attempt_login(403, return_to="http://apps.cs50.edx.or")
+
+    def _send_bad_redirection_login(self):
+        """
+        Attempt to log in to the provider with setup parameters
+
+        Intentionally fail the login to force a redirect
+        """
+        user = UserFactory()
+
+        factory = RequestFactory()
+        post_params = {'email': user.email, 'password': 'password'}
+        fake_url = 'fake url'
+        request = factory.post(reverse('openid-provider-login'), post_params)
+        openid_setup = {
+            'request': factory.request(),
+            'url': fake_url
+        }
+        request.session = {
+            'openid_setup': openid_setup
+        }
+        response = provider_login(request)
+        return response
+
+    @skipUnless(settings.MITX_FEATURES.get('AUTH_USE_OPENID') or
+                settings.MITX_FEATURES.get('AUTH_USE_OPENID_PROVIDER'), True)
+    def test_login_openid_handle_redirection(self):
+        """ Test to see that we can handle login redirection properly"""
+        response = self._send_bad_redirection_login()
+        self.assertEquals(response.status_code, 302)
+
+    @skipUnless(settings.MITX_FEATURES.get('AUTH_USE_OPENID') or
+                settings.MITX_FEATURES.get('AUTH_USE_OPENID_PROVIDER'), True)
+    def test_login_openid_handle_redirection_ratelimited(self):
+        # try logging in 30 times, the default limit in the number of failed
+        # log in attempts before the rate gets limited
+        for _ in xrange(30):
+            self._send_bad_redirection_login()
+
+        response = self._send_bad_redirection_login()
+        # verify that we are not returning the default 403
+        self.assertEquals(response.status_code, 302)
+        # clear the ratelimit cache so that we don't fail other logins
+        cache.clear()
 
 
 class OpenIdProviderLiveServerTest(LiveServerTestCase):

@@ -3,7 +3,7 @@ django admin pages for courseware model
 '''
 
 from courseware.models import StudentModule, OfflineComputedGrade, OfflineComputedGradeLog
-from django.contrib import admin
+from ratelimitbackend import admin
 from django.contrib.auth.models import User
 
 admin.site.register(StudentModule)

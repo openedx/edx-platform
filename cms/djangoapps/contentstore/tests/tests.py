@@ -1,4 +1,5 @@
 from django.test.client import Client
+from django.core.cache import cache
 from django.core.urlresolvers import reverse
 
 from .utils import parse_json, user, registration
@@ -79,6 +80,8 @@ class AuthTestCase(ContentStoreTestCase):
         self.pw = 'xyz'
         self.username = 'testuser'
         self.client = Client()
+        # clear the cache so ratelimiting won't affect these tests
+        cache.clear()
 
     def check_page_get(self, url, expected):
         resp = self.client.get(url)
@@ -118,6 +121,18 @@ class AuthTestCase(ContentStoreTestCase):
 
         # Now login should work
         self.login(self.email, self.pw)
+
+    def test_login_ratelimited(self):
+        # try logging in 30 times, the default limit in the number of failed
+        # login attempts in one 5 minute period before the rate gets limited
+        for i in xrange(30):
+            resp = self._login(self.email, 'wrong_password{0}'.format(i))
+            self.assertEqual(resp.status_code, 200)
+        resp = self._login(self.email, 'wrong_password')
+        self.assertEqual(resp.status_code, 200)
+        data = parse_json(resp)
+        self.assertFalse(data['success'])
+        self.assertIn('Too many failed login attempts.', data['value'])
 
     def test_login_link_on_activation_age(self):
         self.create_account(self.username, self.email, self.pw)

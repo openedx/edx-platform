@@ -28,6 +28,8 @@ from django.utils.http import cookie_date
 from django.utils.http import base36_to_int
 from django.utils.translation import ugettext as _
 
+from ratelimitbackend.exceptions import RateLimitException
+
 from mitxmako.shortcuts import render_to_response, render_to_string
 from bs4 import BeautifulSoup
 
@@ -421,13 +423,23 @@ def login_user(request, error=""):
         user = User.objects.get(email=email)
     except User.DoesNotExist:
         AUDIT_LOG.warning(u"Login failed - Unknown user email: {0}".format(email))
-        return HttpResponse(json.dumps({'success': False,
-                                        'value': _('Email or password is incorrect.')}))  # TODO: User error message
+        user = None
 
-    username = user.username
-    user = authenticate(username=username, password=password)
+    # if the user doesn't exist, we want to set the username to an invalid
+    # username so that authentication is guaranteed to fail and we can take
+    # advantage of the ratelimited backend
+    username = user.username if user else ""
+    try:
+        user = authenticate(username=username, password=password, request=request)
+    # this occurs when there are too many attempts from the same IP address
+    except RateLimitException:
+        return HttpResponse(json.dumps({'success': False,
+                                        'value': _('Too many failed login attempts. Try again later.')}))
     if user is None:
-        AUDIT_LOG.warning(u"Login failed - password for {0} is invalid".format(email))
+        # if we didn't find this username earlier, the account for this email
+        # doesn't exist, and doesn't have a corresponding password
+        if username != "":
+            AUDIT_LOG.warning(u"Login failed - password for {0} is invalid".format(email))
         return HttpResponse(json.dumps({'success': False,
                                         'value': _('Email or password is incorrect.')}))
 
@@ -942,7 +954,7 @@ def auto_auth(request):
     # if they already are a user, log in
     try:
         user = User.objects.get(username=username)
-        user = authenticate(username=username, password=password)
+        user = authenticate(username=username, password=password, request=request)
         login(request, user)
 
     # else create and activate account info

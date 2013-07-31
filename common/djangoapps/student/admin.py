@@ -4,7 +4,7 @@ django admin pages for courseware model
 
 from student.models import UserProfile, UserTestGroup, CourseEnrollmentAllowed
 from student.models import CourseEnrollment, Registration, PendingNameChange
-from django.contrib import admin
+from ratelimitbackend import admin
 
 admin.site.register(UserProfile)
 

@@ -6,6 +6,7 @@ from mock import patch
 
 from django.test import TestCase
 from django.test.client import Client
+from django.core.cache import cache
 from django.core.urlresolvers import reverse, NoReverseMatch
 from student.tests.factories import UserFactory, RegistrationFactory, UserProfileFactory
 
@@ -29,6 +30,7 @@ class LoginTest(TestCase):
 
         # Create the test client
         self.client = Client()
+        cache.clear()
 
         # Store the login url
         try:
@@ -94,6 +96,27 @@ class LoginTest(TestCase):
             response = self.client.post(logout_url)
         self.assertEqual(response.status_code, 302)
         self._assert_audit_log(mock_audit_log, 'info', [u'Logout', u'test'])
+
+    def test_login_ratelimited_success(self):
+        # Try (and fail) logging in with fewer attempts than the limit of 30
+        # and verify that you can still successfully log in afterwards.
+        for i in xrange(20):
+            password = u'test_password{0}'.format(i)
+            response, _audit_log = self._login_response('test@edx.org', password)
+            self._assert_response(response, success=False)
+        # now try logging in with a valid password
+        response, _audit_log = self._login_response('test@edx.org', 'test_password')
+        self._assert_response(response, success=True)
+
+    def test_login_ratelimited(self):
+        # try logging in 30 times, the default limit in the number of failed
+        # login attempts in one 5 minute period before the rate gets limited
+        for i in xrange(30):
+            password = u'test_password{0}'.format(i)
+            self._login_response('test@edx.org', password)
+        # check to see if this response indicates that this was ratelimited
+        response, _audit_log = self._login_response('test@edx.org', 'wrong_password')
+        self._assert_response(response, success=False, value='Too many failed login attempts')
 
     def _login_response(self, email, password, patched_audit_log='student.views.AUDIT_LOG'):
         ''' Post the login info '''
