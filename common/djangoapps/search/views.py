@@ -44,15 +44,19 @@ def find(request, course_id):
     query = request.GET.get("s", "*.*")
     full_query_data.update({"query": {"term": {"searchable_text": query}}})
     index = ",".join(filter(None, [get_content(request, content) for content in CONTENT_TYPES]))
+    log.debug(index)
     if len(index) == 0:
+        log.debug("Here")
         index = ",".join([content+"-index" for content in CONTENT_TYPES])
     if request.GET.get("all_courses" == "true", False):
+        log.debug("no, here")
         base_url = "/".join([database, index])
     else:
         course_hash = hashlib.sha1(course_id).hexdigest()
         base_url = "/".join([database, index, course_hash])
     base_url += "/_search"
     log.debug(base_url)
+    log.debug(query)
     # full_query_data.update({"from": 0, "size": 10000})
     full_query_data.update(
         {"suggest":
@@ -69,6 +73,7 @@ def find(request, course_id):
     log.debug(full_query_data)
     context = {}
     response = requests.get(base_url, data=json.dumps(full_query_data))
+    log.debug(response._content)
     data = SearchResults(response, **request.GET)
     data.filter_and_sort()
     context.update({"results": data.has_results})
@@ -76,6 +81,7 @@ def find(request, course_id):
 
     context.update({
         "data": data,
+        "old_query": query,
         "search_correction_link": search_correction_link(request, correction),
         "spelling_correction": correction,
         "selected_course": request.GET.get("selected_course", ""),
