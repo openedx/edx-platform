@@ -16,6 +16,7 @@ from .. import ModuleStoreBase
 from ..exceptions import ItemNotFoundError
 from .definition_lazy_loader import DefinitionLazyLoader
 from .caching_descriptor_system import CachingDescriptorSystem
+from random import randint
 
 log = logging.getLogger(__name__)
 #==============================================================================
@@ -59,11 +60,10 @@ class SplitMongoModuleStore(ModuleStoreBase):
             **kwargs
         ), db)
 
-        # TODO add caching of structures to thread_cache to prevent repeated fetches (but not index b/c
-        # it changes w/o having a change in id)
         self.course_index = self.db[collection + '.active_versions']
         self.structures = self.db[collection + '.structures']
         self.definitions = self.db[collection + '.definitions']
+        self.location_map = self.db[collection + '.location_map']
 
         # ??? Code review question: those familiar w/ python threading. Should I instead
         # use django cache? How should I expire entries?
@@ -80,6 +80,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
         self.course_index.write_concern = {'w': 1}
         self.structures.write_concern = {'w': 1}
         self.definitions.write_concern = {'w': 1}
+        self.location_map.write_concern = {'w': 1}
 
         if default_class is not None:
             module_path, _, class_name = default_class.rpartition('.')
@@ -1118,6 +1119,112 @@ class SplitMongoModuleStore(ModuleStoreBase):
         else:
             return DescriptionLocator(definition['_id'])
 
+    # location_map functions
+    def create_map_entry(self, course_location, course_id=None, draft_branch='draft', prod_branch='published',
+        block_map=None):
+        """
+        Add a new entry to map this course_location to the new style CourseLocator.course_id. If course_id is not
+        provided, it creates the default map of using org.course.name from the location (just like course_id) if
+        the location.cateogry = 'course'; otherwise, it uses org.course.
+
+        You can create more than one mapping to the
+        same course_id target. In that case, the reverse translate will be arbitrary (no guarantee of which wins).
+        The use
+        case for more than one mapping is to map both org/course/run and org/course to the same new course_id thus
+        making a default for org/course. When querying for just org/course, the translator will prefer any entry
+        which does not have a name in the _id; otherwise, it will return an arbitrary match.
+
+        Note: the opposite is not true. That is, it never makes sense to use 2 different CourseLocator.course_id
+        keys to index the same old Locator org/course/.. pattern.
+
+        NOTE: if there's already an entry w the given course_location, this may either overwrite that entry or
+        throw an error depending on how mongo is configured.
+
+        :param course_location: a Location preferably whose category is 'course'. Unlike the other
+        map methods, this one doesn't take the old-style course_id because it's assumed to be called with
+        a course location not a block location.
+        :param course_id: the CourseLocator style course_id
+        :param draft_branch: the branch name to assign for drafts. This is hardcoded because old mongo had
+        a fixed notion that there was 2 and only 2 versions for modules: draft and production. The old mongo
+        did not, however, require that a draft version exist. The new one, however, does require a draft to
+        exist.
+        :param prod_branch: the branch name to assign for the production (live) copy. In old mongo, every course
+        had to have a production version (whereas new split mongo does not require that until the author's ready
+        to publish).
+        :param block_map: an optional map to specify preferred names for blocks where the keys are the
+        Location block names and the values are the BlockUsageLocator.block_id.
+        """
+        if course_id is None:
+            if course_location.category == 'course':
+                course_id = "{0.org}.{0.course}.{0.name}".format(course_location)
+            else:
+                course_id = "{0.org}.{0.course}".format(course_location)
+        # very like _interpret_location_id but w/o the _id
+        location_id = {'org': course_location.org, 'course': course_location.course}
+        if course_location.category == 'course':
+            location_id['name'] = course_location.name
+
+        self.location_map.insert({
+                '_id': location_id,
+                'course_id': course_id,
+                'draft_branch': draft_branch,
+                'prod_branch': prod_branch,
+                'block_map': block_map or {},
+            })
+
+
+    def translate_location(self, course_id, location, published=False):
+        """
+        Translate the given module location to a Locator. If the mapping has the run id in it, then you
+        should provide course_id with that run id in it to disambiguate the mapping if there exists more
+        than one entry in the mapping table for the org.course.
+
+        :param course_id: the course_id used in old mongo not the new one (optional, will use location)
+        :param location:  a Location pointing to a module
+        :param published: a boolean to indicate whether the caller wants the draft or published branch.
+
+        NOTE: unlike old mongo, draft branches contain the whole course; so, it applies to all category
+        of locations including course.
+        """
+        location_id = self._interpret_location_course_id(course_id, location)
+
+        maps = self.location_map.find(location_id)
+        if maps.count() == 0:
+            # create a new map
+            course_location = location.replace(category='course', name=location_id['_id.name'])
+            self.create_map_entry(course_location)
+            entry = self.location_map.find_one(location_id)
+        elif maps.count() > 1:
+            # if more than one, prefer the one w/o a name if that exists. Otherwise, choose the first (arbitrary)
+            # a bit odd b/c maps is a cursor and doesn't allow multitraversal w/o requerying db
+            entry = None
+            for candidate in maps:
+                if entry is None:
+                    entry = candidate  # pick off first ele in case we don't find one w/o a name
+                # pylint: disable=W0212
+                if not hasattr(candidate._id, 'name'):
+                    entry = candidate
+                    break
+        else:
+            entry = maps[0]
+
+        if published:
+            branch = entry.prod_branch
+        else:
+            branch = entry.draft_branch
+
+        usage_id = getattr(entry.block_map, location.name, None)
+        if usage_id is None:
+            usage_id = self._add_to_block_map(location, location_id, entry.block_map)
+        elif isinstance(usage_id, dict):
+            # name is not unique, look through for the right category
+            if hasattr(usage_id, location.category):
+                usage_id = usage_id[location.category]
+            else:
+                usage_id = self._add_to_block_map(location, location_id, entry.block_map)
+
+        return BlockUsageLocator(course_id=entry.course_id, branch=branch, usage_id=usage_id)
+
     def _block_matches(self, value, qualifiers):
         '''
         Return True or False depending on whether the value (block contents)
@@ -1238,3 +1345,51 @@ class SplitMongoModuleStore(ModuleStoreBase):
         self.course_index.update(
             {"_id": index_entry["_id"]},
             {"$set": {"versions.{}".format(branch): new_id}})
+
+    def _interpret_location_course_id(self, course_id, location):
+        """
+        Take the old style course id (org/course/run) and return a dict for querying the mapping table.
+        If the course_id is empty, it uses location, but this may result in an inadequate id.
+
+        :param course_id: old style 'org/course/run' id from Location.course_id where Location.category = 'course'
+        :param location: a Location object which may be to a module or a course. Provides partial info
+        if course_id is omitted.
+        """
+        if course_id:
+            # re doesn't allow ?P<_id.org> and ilk
+            m = re.match(r'([^/]+)/([^/]+)/([^/]+)', course_id)
+            return dict(zip(['_id.org', '_id.course', '_id.name'], m.groups()))
+
+        location_id = {'_id.org': location.org, '_id.course': location.course}
+        if location.category == 'course':
+            location_id['_id.name'] = location.name
+        return location_id
+
+    @staticmethod
+    def _block_id_is_guid(name):
+        return len(name) == 32 and re.search(r'[^0-9A-Fa-f]', name) is None
+
+    @staticmethod
+    def _verify_uniqueness(name, block_map):
+        '''
+        Verify that the name doesn't occur elsewhere in block_map. If it does, keep adding to it until
+        it's unique.
+        '''
+        for targets in block_map.itervalues():
+            if isinstance(targets, dict):
+                for values in targets.itervalues():
+                    if values == name:
+                        name += str(randint(0, 9))
+                        return SplitMongoModuleStore._verify_uniqueness(name, block_map)
+
+            elif targets == name:
+                name += str(randint(0, 9))
+                return SplitMongoModuleStore._verify_uniqueness(name, block_map)
+
+    def _add_to_block_map(self, location, location_id, block_map):
+        '''add the given location to the block_map and persist it'''
+        if self._block_id_is_guid(location.name):
+            usage_id = self._verify_uniqueness(location.category + location.name[:3], block_map)
+        block_map.setdefault(location.name, {})[location.category] = usage_id
+        self.location_map.update(location_id, {'$set': {'block_map': block_map}})
+        return usage_id
