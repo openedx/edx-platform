@@ -141,6 +141,7 @@
           % if course.id in show_courseware_links_for:
             <a href="${course_target}" class="cover">
 <<<<<<< HEAD
+<<<<<<< HEAD
               <img src="${course_image_url(course)}" alt="${_('{course_number} {course_name} Cover Image').format(course_number='${course.number}', course_name='${course.display_name_with_default}')}" />
             </a>
           % else:
@@ -153,6 +154,13 @@
             <div class="cover">
               <img src="${course_image_url(course)}" alt="${course.display_number_with_default} ${course.display_name_with_default} Cover Image" />
 >>>>>>> add display_coursenumber and display_organization fields on the CourseModule, with some property accessors. Update LMS/CMS pages to use those display strings as appropraite.
+=======
+              <img src="${course_image_url(course)}" alt="${course.display_number_with_default | h} ${course.display_name_with_default} Cover Image" />
+            </a>
+          % else:
+            <div class="cover">
+              <img src="${course_image_url(course)}" alt="${course.display_number_with_default | h} ${course.display_name_with_default} Cover Image" />
+>>>>>>> add escaping
             </div>
           % endif
 
@@ -170,9 +178,9 @@
               <h2 class="university">${get_course_about_section(course, 'university')}</h2>
               <h3>
                 % if course.id in show_courseware_links_for:
-                  <a href="${course_target}">${course.display_number_with_default} ${course.display_name_with_default}</a>
+                  <a href="${course_target}">${course.display_number_with_default | h} ${course.display_name_with_default}</a>
                 % else:
-                  <span>${course.display_number_with_default} ${course.display_name_with_default}</span>
+                  <span>${course.display_number_with_default | h} ${course.display_name_with_default}</span>
                 % endif
               </h3>
             </hgroup>
@@ -206,6 +214,7 @@
                     % if  registration.is_rejected:
                 <div class="message message-status is-shown exam-schedule">
 <<<<<<< HEAD
+<<<<<<< HEAD
                   <p class="message-copy">
                     <strong>${_("Your registration for the Pearson exam has been rejected. Please {link_start}see your registration status details{link_end}.").format(
                       link_start='<a href="{url}" id="exam_register_link">'.format(url=testcenter_register_target),
@@ -218,6 +227,9 @@
 =======
                   <p class="message-copy"><strong>Your registration for the Pearson exam has been rejected. Please <a href="${testcenter_register_target}" id="exam_register_link">see your registration status details</a></strong>. Otherwise <a class="contact-link" href="mailto:exam-help@edx.org?subject=Pearson VUE Exam - ${get_course_about_section(course, 'university')} ${course.display_number_with_default}">contact edX at exam-help@edx.org</a> for further help.</p>
 >>>>>>> add display_coursenumber and display_organization fields on the CourseModule, with some property accessors. Update LMS/CMS pages to use those display strings as appropraite.
+=======
+                  <p class="message-copy"><strong>Your registration for the Pearson exam has been rejected. Please <a href="${testcenter_register_target}" id="exam_register_link">see your registration status details</a></strong>. Otherwise <a class="contact-link" href="mailto:exam-help@edx.org?subject=Pearson VUE Exam - ${get_course_about_section(course, 'university')} ${course.display_number_with_default | h}">contact edX at exam-help@edx.org</a> for further help.</p>
+>>>>>>> add escaping
                 </div>
                     % endif
                    	% if not registration.is_accepted and not registration.is_rejected:

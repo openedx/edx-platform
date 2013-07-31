@@ -3,10 +3,16 @@
 <%inherit file="main.html" />
 <%namespace name='static' file='static_content.html'/>
 <%block name="title">
+<<<<<<< HEAD
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>${_('{course_number} Textbook').format(course_number=course.display_number_with_default)}</title>
 
+=======
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>${course.display_number_with_default | h} Textbook</title>
+>>>>>>> add escaping
 </%block>
 
 <%block name="headextra">

@@ -67,10 +67,14 @@
 </%block>
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 <%block name="title"><title>${_("About {course.number}").format(course=course)}</title></%block>
 =======
 <%block name="title"><title>About ${course.display_number_with_default}</title></%block>
 >>>>>>> add display_coursenumber and display_organization fields on the CourseModule, with some property accessors. Update LMS/CMS pages to use those display strings as appropraite.
+=======
+<%block name="title"><title>About ${course.display_number_with_default | h}</title></%block>
+>>>>>>> add escaping
 
 <section class="course-info">
   <header class="course-profile">
@@ -79,7 +83,7 @@
       <section class="intro">
         <hgroup>
           <h1>
-            ${course.display_number_with_default}: ${get_course_about_section(course, "title")}
+            ${course.display_number_with_default | h}: ${get_course_about_section(course, "title")}
             % if not self.theme_enabled():
               <a href="#">${get_course_about_section(course, "university")}</a>
             % endif
@@ -102,10 +106,14 @@
                 %endif
         %else:
 <<<<<<< HEAD
+<<<<<<< HEAD
             <a href="#" class="register">${_("Register for {course.number}").format(course=course)}</a>
 =======
             <a href="#" class="register">Register for ${course.display_number_with_default}</a>
 >>>>>>> add display_coursenumber and display_organization fields on the CourseModule, with some property accessors. Update LMS/CMS pages to use those display strings as appropraite.
+=======
+            <a href="#" class="register">Register for ${course.display_number_with_default | h}</a>
+>>>>>>> add escaping
             <div id="register_error"></div>
         %endif
         </div>
@@ -175,10 +183,14 @@
 
         <ol class="important-dates">
 <<<<<<< HEAD
+<<<<<<< HEAD
           <li><div class="icon course-number"></div><p>${_("Course Number")}</p><span class="course-number">${course.number}</span></li>
           <li><div class="icon start"></div><p>${_("Classes Start")}</p><span class="start-date">${course.start_date_text}</span></li>
 =======
           <li><div class="icon course-number"></div><p>Course Number</p><span class="course-number">${course.display_number_with_default}</span></li>
+=======
+          <li><div class="icon course-number"></div><p>Course Number</p><span class="course-number">${course.display_number_with_default | h}</span></li>
+>>>>>>> add escaping
           <li><div class="icon start"></div><p>Classes Start</p><span class="start-date">${course.start_date_text}</span></li>
 >>>>>>> add display_coursenumber and display_organization fields on the CourseModule, with some property accessors. Update LMS/CMS pages to use those display strings as appropraite.
 
