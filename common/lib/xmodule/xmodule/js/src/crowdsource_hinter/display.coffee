@@ -36,8 +36,9 @@ class @Hinter
     @$('input.vote').click @vote
     @$('input.submit-hint').click @submit_hint
     @$('.custom-hint').click @clear_default_text
-    @$('#answer-tabs').tabs({active: 0})
     @$('.expand').click @expand
+    @$('.wizard-link').click @wizard_link_handle
+    @$('.answer-choice').click @answer_choice_handle
 
   expand: (eventObj) =>
     target = @$('#' + @$(eventObj.currentTarget).data('target'))
@@ -55,11 +56,10 @@ class @Hinter
 
   submit_hint: (eventObj) =>
     textarea = $('.custom-hint')
-    answer = $('input:radio[name=answer-select]:checked').val()
-    if answer == undefined
-      # The user didn't choose an answer.  Do nothing.
+    if @answer == ''
+      # The user didn't choose an answer, somehow.  Do nothing.
       return
-    post_json = {'answer': answer, 'hint': textarea.val()}
+    post_json = {'answer': @answer, 'hint': textarea.val()}
     $.postWithPrefix "#{@url}/submit_hint",post_json, (response) =>
       @render(response.contents)
 
@@ -68,6 +68,15 @@ class @Hinter
     if target.data('cleared') == undefined
       target.val('')
       target.data('cleared', true)
+
+  wizard_link_handle: (eventObj) =>
+    target = @$(eventObj.currentTarget)
+    @go_to(target.attr('dest'))
+
+  answer_choice_handle: (eventObj) =>
+    @answer = @$(eventObj.target).attr('value')
+    @$('#blank-answer').html(@answer)
+    @go_to('p3')
 
   render: (content) ->
     if content
@@ -82,3 +91,16 @@ class @Hinter
       @$('#previous-answer-0').css('display', 'inline')
     else
       @el.hide()
+    # Initialize the answer choice - remembers which answer the user picked on
+    # p2 when he submits a hint on p3.
+    @answer = ''
+    # Make the correct wizard view show up.
+    hints_exist = @$('#hints-exist').html() == 'True'
+    if hints_exist
+      @go_to('p1')
+    else
+      @go_to('p2')
+
+  go_to: (view_id) ->
+    $('.wizard-view').css('display', 'none')
+    $('#' + view_id).css('display', 'block')

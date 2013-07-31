@@ -34,50 +34,71 @@
         for pk, hint_text in pk_dict.items():
             pk_list.append([answer, pk])
     json_pk_list = json.dumps(pk_list)
-    %>
-    % if hints_exist:
-        <p>
-        <em> Optional. </em> Help us improve our hints!  Which hint was most helpful to you?
-        </p>
+  %>
 
-        <div id="pk-list" data-pk-list='${json_pk_list}' style="display:none"> </div>
+  <!-- Tells coffeescript whether there are hints to show. -->
+  <span id="hints-exist" style="display:none">${hints_exist}</span>
 
-        % for answer, pk_dict in answer_to_hints.items():
-            % for hint_pk, hint_text in pk_dict.items():
-                <p>
-                <input class="vote" data-answer="${answer}" data-hintno="${hint_pk}" type="button" value="Vote">
-                ${hint_text}
-                </p>
-            % endfor
-        % endfor
-
-        <p>
-        Don't like any of the hints above? 
-        <a class="expand" data-target="hint-submission-div" href="javascript:void(0);">
-          Write your own!
-        </a></p>
-
-        <div id="hint-submission-div" style="display:none">
-    % else:
-        <p>
-          <em> Optional. </em> Help us write hints for this problem!  Think about how you would help
-          another student who made the same mistake that you did.
-        </p>
-    % endif
-
+  <div class="wizard-view" id="p1">
     <p>
-      Choose the incorrect answer for which you want to write a hint:
-      <br />
-      % for answer in user_submissions:
-          <input type="radio" name="answer-select" value="${answer}"> ${answer} </input><br />
-      % endfor
+    <em> Optional. </em> Help us improve our hints!  Which hint was most helpful to you?
     </p>
 
+    <div id="pk-list" data-pk-list='${json_pk_list}' style="display:none"> </div>
+
+    % for answer, pk_dict in answer_to_hints.items():
+        % for hint_pk, hint_text in pk_dict.items():
+            <p>
+            <input class="vote" data-answer="${answer}" data-hintno="${hint_pk}" type="button" value="Vote">
+            ${hint_text}
+            </p>
+        % endfor
+    % endfor
+
+    <p>
+    Don't like any of the hints above? 
+    <a class="wizard-link" dest="p2" href="javascript: void(0);">
+      Write your own!
+    </a></p>
+  </div>
+
+  <div class="wizard-view" id="p2">
+    % if hints_exist:
+      <p>
+      Choose the incorrect answer for which you want to write a hint:
+      </p>
+    % else:
+    <p>
+      <em>Optional.</em>  Help other students by submitting a hint!  Pick one of your previous
+      answers for which you would like to write a hint:
+    </p>
+    % endif
+    % for answer in user_submissions:
+        <a class="answer-choice" href="javascript: void(0)" value="${answer}">${answer}</a><br />
+    % endfor
+    % if hints_exist:
+      <br />
+      <p><a class="wizard-link" dest="p1" href="javascript: void(0);">
+        Back to voting.
+      </a></p>
+    % endif
+
+  </div>
+
+  <div class="wizard-view" id="p3">
+
+    <p>
+      Write a hint for other students who get the wrong answer of <span id="blank-answer"></span>.
+      <br />
+      <a class="wizard-link" dest="p2" href="javascript: void(0);">
+        Choose a different answer.
+      </a>
+    </p>
     <textarea cols="50" class="custom-hint" data-answer="${answer}" style="height: 200px">
 Write your hint here.  Please don't give away the correct answer.
     </textarea>
     <br/><br/>
-    <input class="submit-hint" data-answer="${answer}" type="button" value="submit">
+    <input class="submit-hint" data-answer="${answer}" type="button" value="Submit">
 
     <p>Read about <a class="expand" data-target="goodhint" href="javascript:void(0);">what makes a good hint</a>.</p>
     <div id="goodhint" style="display:none">
@@ -109,12 +130,10 @@ Write your hint here.  Please don't give away the correct answer.
 
       <p>
         <a href="http://www.apa.org/education/k12/misconceptions.aspx?item=2" target="_blank">Learn even more</a>
-      </p>    </div>
-    ## Close out the text-hiding div.  The text-hiding div only exists if there
-    ## were hints for the student to vote on.
-    % if hints_exist:
-      </div>
-    % endif
+      </p>
+    </div>
+  </div>
+
 
 
 </%def>
