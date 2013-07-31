@@ -186,11 +186,11 @@
       var email = $('#user-email-input').val().trim();
       if(!email) {
         var msg = new CMS.Views.Prompt.Error({
-          title: gettext("Email required"),
-          message: gettext("You must enter an email address"),
+          title: gettext("A valid email address is required"),
+          message: gettext("You must enter a valid email address in order to add a new team member"),
           actions: {
             primary: {
-              text: gettext("OK"),
+              text: gettext("Return and add email address"),
               click: function(view) {
                 view.hide();
                 $("#user-email-input").focus();
@@ -203,11 +203,11 @@
       }
       if(_.contains(staffEmails, email)) {
         var msg = new CMS.Views.Prompt.Warning({
-          title: gettext("User is already on team"),
-          message: gettext("This user is already on the course team"),
+          title: gettext("Already a course team member"),
+          message: _.template(gettext("{email} is already on the {course} team. If you're trying to add a new member, please double-check the email address you provided."), {email: email, course: section.get('name')}, {interpolate: /\{(.+?)\}/g}),
           actions: {
             primary: {
-              text: gettext("OK"),
+              text: gettext("Return to team listing"),
               click: function(view) {
                 view.hide();
                 $("#user-email-input").focus();
@@ -361,11 +361,11 @@
             message = "Unknown";
           }
           var prompt = new CMS.Views.Prompt.Error({
-            title: gettext("Error changing user"),
+            title: gettext("There was an error changing the user's role"),
             message: message,
             actions: {
               primary: {
-                text: gettext("OK"),
+                text: gettext("Try Again"),
                 click: function(view) {
                   view.hide();
                 }
