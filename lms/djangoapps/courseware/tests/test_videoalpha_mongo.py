@@ -34,9 +34,7 @@ class TestVideo(BaseTestXmodule):
     def test_videoalpha_constructor(self):
         """Make sure that all parameters extracted correclty from xml"""
 
-        # `get_html` return only context, cause we
-        # overwrite `system.render_template`
-        context = self.item_module.get_html()
+        fragment = self.runtime.render(self.item_module, None, 'student_view')
         expected_context = {
             'data_dir': getattr(self, 'data_dir', None),
             'caption_asset_path': '/c4x/MITx/999/asset/subs_',
@@ -51,7 +49,7 @@ class TestVideo(BaseTestXmodule):
             'youtube_streams': self.item_module.youtube_streams,
             'autoplay': settings.MITX_FEATURES.get('AUTOPLAY_VIDEOS', True)
         }
-        self.assertDictEqual(context, expected_context)
+        self.assertEqual(fragment.content, self.runtime.render_template('videoalpha.html', expected_context))
 
 
 class TestVideoNonYouTube(TestVideo):
@@ -78,9 +76,7 @@ class TestVideoNonYouTube(TestVideo):
             the template generates an empty string for the YouTube streams.
         """
 
-        # `get_html` return only context, cause we
-        # overwrite `system.render_template`
-        context = self.item_module.get_html()
+        fragment = self.runtime.render(self.item_module, None, 'student_view')
         expected_context = {
             'data_dir': getattr(self, 'data_dir', None),
             'caption_asset_path': '/c4x/MITx/999/asset/subs_',
@@ -95,4 +91,4 @@ class TestVideoNonYouTube(TestVideo):
             'youtube_streams': '',
             'autoplay': settings.MITX_FEATURES.get('AUTOPLAY_VIDEOS', True)
         }
-        self.assertDictEqual(context, expected_context)
+        self.assertEqual(fragment.content, self.runtime.render_template('videoalpha.html', expected_context))

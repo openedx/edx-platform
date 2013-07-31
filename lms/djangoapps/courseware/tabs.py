@@ -371,6 +371,6 @@ def get_static_tab_contents(request, course, tab):
     html = ''
 
     if tab_module is not None:
-        html = tab_module.get_html()
+        html = tab_module.runtime.render(tab_module, None, 'student_view').content
 
     return html

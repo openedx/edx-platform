@@ -104,10 +104,9 @@ class VideoAlphaModuleUnitTest(unittest.TestCase):
     def test_videoalpha_constructor(self):
         """Make sure that all parameters extracted correclty from xml"""
         module = VideoAlphaFactory.create()
+        module.runtime.render_template = lambda template, context: unicode((template, sorted(context.items())))
 
-        # `get_html` return only context, cause we
-        # overwrite `system.render_template`
-        context = module.get_html()
+        fragment = module.runtime.render(module, None, 'student_view')
         expected_context = {
             'caption_asset_path': '/static/subs/',
             'sub': module.sub,
@@ -122,7 +121,7 @@ class VideoAlphaModuleUnitTest(unittest.TestCase):
             'track': module.track,
             'autoplay': settings.MITX_FEATURES.get('AUTOPLAY_VIDEOS', True)
         }
-        self.assertDictEqual(context, expected_context)
+        self.assertEqual(fragment.content, module.runtime.render_template('videoalpha.html', expected_context))
 
         self.assertDictEqual(
             json.loads(module.get_instance_state()),

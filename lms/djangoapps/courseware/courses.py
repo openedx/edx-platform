@@ -163,7 +163,7 @@ def get_course_about_section(course, section_key):
             html = ''
 
             if about_module is not None:
-                html = about_module.get_html()
+                html = about_module.runtime.render(about_module, None, 'student_view').content
 
             return html
 
@@ -211,7 +211,7 @@ def get_course_info_section(request, course, section_key):
     html = ''
 
     if info_module is not None:
-        html = info_module.get_html()
+        html = info_module.runtime.render(info_module, None, 'student_view').content
 
     return html
 
