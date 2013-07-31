@@ -1,18 +1,22 @@
 import re
 
-URL_RE = re.compile(r'^edx://(.+)$', re.IGNORECASE)
+URL_RE = re.compile(r'^(?:edx://)?(.+)$', re.IGNORECASE)
 
 
 def parse_url(string):
     """
-    A url must begin with 'edx://' (case-insensitive match),
+    A url can begin with 'edx://' (case-insensitive match),
     followed by either a version_guid or a course_id.
 
     Examples:
+        '@0123FFFF'
+        'mit.eecs.6002x'
+        'mit.eecs.6002x;published'
+        'mit.eecs.6002x;published#HW3'
         'edx://@0123FFFF'
-        'edx://edu.mit.eecs.6002x'
-        'edx://edu.mit.eecs.6002x;published'
-        'edx://edu.mit.eecs.6002x;published#HW3'
+        'edx://mit.eecs.6002x'
+        'edx://mit.eecs.6002x;published'
+        'edx://mit.eecs.6002x;published#HW3'
 
     This returns None if string cannot be parsed.
 
@@ -81,10 +85,10 @@ def parse_course_id(string):
 
     Examples of valid course_ids:
 
-      'edu.mit.eecs.6002x'
-      'edu.mit.eecs.6002x;published'
-      'edu.mit.eecs.6002x#HW3'
-      'edu.mit.eecs.6002x;published#HW3'
+      'mit.eecs.6002x'
+      'mit.eecs.6002x;published'
+      'mit.eecs.6002x#HW3'
+      'mit.eecs.6002x;published#HW3'
 
 
     Syntax:
