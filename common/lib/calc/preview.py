@@ -60,15 +60,47 @@ class LatexRendered(object):
                 right=right_parens
             )
 
+    def __repr__(self):  # pragma: no cover
+        """
+        Give a sensible representation of the object.
+
+        If `sans_parens` is different, include both.
+        If `tall` then have '<[]>' around the code, otherwise '<>'.
+        """
+        if self.latex == self.sans_parens:
+            latex_repr = u'"{}"'.format(self.latex)
+        else:
+            latex_repr = u'"{}" or "{}"'.format(self.latex, self.sans_parens)
+
+        if self.tall:
+            wrap = u'<[{}]>'
+        else:
+            wrap = u'<{}>'
+
+        return wrap.format(latex_repr)
+
 
 def render_number(children):
     """
     Combine the elements forming the number, escaping the suffix if needed.
     """
-    # TODO exponential notation
     if children[-1].latex in SUFFIXES:
-        children[-1].latex = ur"\text{{{suffix}}}".format(suffix=children[-1].latex)
-    return LatexRendered("".join(k.latex for k in children))
+        suffix = ur"\text{{{suffix}}}".format(suffix=children[-1].latex)
+        children = children[:-1]
+    else:
+        suffix = ""
+
+    # Exponential notation always has an "e" after the mantissa
+    if len(children) > 1 and children[1].latex == "E":
+        mantissa = children[0].latex
+        exponent = "".join(k.latex for k in children[2:])
+        latex = ur"{m}\!\times\!10^{{{e}}}{s}".format(
+            m=mantissa, e=exponent, s=suffix
+        )
+        return LatexRendered(latex, tall=True)
+    else:
+        easy_number = "".join(k.latex for k in children)
+        return LatexRendered(easy_number + suffix)
 
 
 def variable_closure(variables, casify):

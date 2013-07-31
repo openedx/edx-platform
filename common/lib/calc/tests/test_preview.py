@@ -106,6 +106,28 @@ class RenderMethodsTest(PreviewTestUtility):
         out = _call_render_method(preview.render_number, ['1.618', 'k'])
         self.assert_latex_rendered(out, latex=r'1.618\text{k}')
 
+    def test_number_sci_notation(self):
+        """ Numbers with scientific notation should display nicely """
+        out = _call_render_method(
+            preview.render_number,
+            ['6.0221413', 'E', '+', '23']
+        )
+        self.assert_latex_rendered(
+            out,
+            latex=r'6.0221413\!\times\!10^{+23}', tall=True
+        )
+
+    def test_number_sci_notation_suffix(self):
+        """ Test numbers with both """
+        out = _call_render_method(
+            preview.render_number,
+            ['6.0221413', 'E', '+', '23', 'k']
+        )
+        self.assert_latex_rendered(
+            out,
+            latex=r'6.0221413\!\times\!10^{+23}\text{k}', tall=True
+        )
+
     def test_variable_simple(self):
         """ Simple valid variables should pass through `render_variable`. """
         render_variable = preview.variable_closure(['x', 'y'], lambda x: x.lower())
