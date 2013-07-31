@@ -223,6 +223,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.messages.context_processors.messages',
     #'django.core.context_processors.i18n',
     'django.contrib.auth.context_processors.auth',  # this is required for admin
+    'django.core.context_processors.csrf',
 
     # Added for django-wiki
     'django.core.context_processors.media',
@@ -234,10 +235,6 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     # Hack to get required link URLs to password reset templates
     'mitxmako.shortcuts.marketing_link_context_processor',
 )
-
-# add csrf support unless disabled for load testing
-if not MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_LOAD_TESTING'):
-    TEMPLATE_CONTEXT_PROCESSORS += ('django.core.context_processors.csrf',)  # necessary for csrf protection
 
 STUDENT_FILEUPLOAD_MAX_SIZE = 4 * 1000 * 1000  # 4 MB
 MAX_FILEUPLOADS_PER_INPUT = 20
@@ -483,6 +480,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'track.middleware.TrackMiddleware',
     'mitxmako.middleware.MakoMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
 
     'course_wiki.course_nav.Middleware',
 
@@ -492,10 +490,6 @@ MIDDLEWARE_CLASSES = (
     'django_comment_client.utils.ViewNameMiddleware',
     'codejail.django_integration.ConfigureCodeJailMiddleware',
 )
-
-# add in csrf middleware unless disabled for load testing
-if not MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_LOAD_TESTING'):
-    MIDDLEWARE_CLASSES = MIDDLEWARE_CLASSES + ('django.middleware.csrf.CsrfViewMiddleware',)
 
 ############################### Pipeline #######################################
 

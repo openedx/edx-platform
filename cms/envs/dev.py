@@ -182,6 +182,15 @@ SEGMENT_IO_KEY = os.environ.get('SEGMENT_IO_KEY')
 if SEGMENT_IO_KEY:
     MITX_FEATURES['SEGMENT_IO'] = True
 
+########################## LOAD TESTING ########################
+
+# Disable CSRF for load testing
+if MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_LOAD_TESTING'):
+    exclude_csrf = lambda elem: not elem in \
+                   ['django.core.context_processors.csrf',
+                    'django.middleware.csrf.CsrfViewMiddleware']
+    TEMPLATE_CONTEXT_PROCESSORS = filter(exclude_csrf, TEMPLATE_CONTEXT_PROCESSORS)
+    MIDDLEWARE_CLASSES = filter(exclude_csrf, MIDDLEWARE_CLASSES)
 
 #####################################################################
 # Lastly, see if the developer has any local overrides.
