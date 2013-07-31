@@ -303,6 +303,16 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         num_drafts = self._get_draft_counts(course)
         self.assertEqual(num_drafts, 1)
 
+    def test_no_static_link_rewrites_on_import(self):
+        module_store = modulestore('direct')
+        import_from_xml(module_store, 'common/test/data/', ['toy'])
+
+        handouts = module_store.get_item(Location(['i4x', 'edX', 'toy', 'course_info', 'handouts', None]))
+        self.assertIn('/static/', handouts.data)
+
+        handouts = module_store.get_item(Location(['i4x', 'edX', 'toy', 'html', 'toyhtml', None]))
+        self.assertIn('/static/', handouts.data)
+
     def test_import_textbook_as_content_element(self):
         module_store = modulestore('direct')
         import_from_xml(module_store, 'common/test/data/', ['toy'])
