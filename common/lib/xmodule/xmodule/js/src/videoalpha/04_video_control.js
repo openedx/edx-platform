@@ -51,10 +51,6 @@ function () {
 
         state.videoControl.fullScreenState = false;
 
-        if (state.config.inCms === 'True') {
-            state.videoControl.fullScreenEl.hide();
-        }
-
         if (!onTouchBasedDevice()) {
             state.videoControl.pause();
 
@@ -133,12 +129,12 @@ function () {
     }
 
     function play() {
-        this.videoControl.playPauseEl.removeClass('play').addClass('pause').attr('title', 'Pause');
+        this.videoControl.playPauseEl.removeClass('play').addClass('pause').attr('title', gettext('Pause'));
         this.videoControl.isPlaying = true;
     }
 
     function pause() {
-        this.videoControl.playPauseEl.removeClass('pause').addClass('play').attr('title', 'Play');
+        this.videoControl.playPauseEl.removeClass('pause').addClass('play').attr('title', gettext('Play'));
         this.videoControl.isPlaying = false;
     }
 
@@ -160,12 +156,12 @@ function () {
             this.videoControl.fullScreenState = false;
             fullScreenClassNameEl.removeClass('video-fullscreen');
             this.isFullScreen = false;
-            this.videoControl.fullScreenEl.attr('title', 'Fullscreen');
+            this.videoControl.fullScreenEl.attr('title', gettext('Fullscreen'));
         } else {
             this.videoControl.fullScreenState = true;
             fullScreenClassNameEl.addClass('video-fullscreen');
             this.isFullScreen = true;
-            this.videoControl.fullScreenEl.attr('title', 'Exit fullscreen');
+            this.videoControl.fullScreenEl.attr('title', gettext('Exit fullscreen'));
         }
 
         this.trigger('videoCaption.resize', null);

@@ -12,8 +12,6 @@
   data-streams="${youtube_streams}"
   % endif
 
-  data-in-studio="${settings.MITX_FEATURES['IS_CMS']}"
-
   ${'data-sub="{}"'.format(sub) if sub else ''}
       ${'data-autoplay="{}"'.format(autoplay) if autoplay else ''}
   % if not settings.MITX_FEATURES['STUB_VIDEO_FOR_TESTING']:
@@ -40,13 +38,13 @@
           <div class="slider"></div>
             <div>
                 <ul class="vcr">
-                    <li><a class="video_control" href="#" title="Play"></a></li>
+                    <li><a class="video_control" href="#" title="${_('Play')}"></a></li>
                     <li><div class="vidtime">0:00 / 0:00</div></li>
                 </ul>
                 <div class="secondary-controls">
                     <div class="speeds">
                         <a href="#">
-                            <h3>Speed</h3>
+                            <h3>${_('Speed')}</h3>
                             <p class="active"></p>
                         </a>
                         <ol class="video_speeds"></ol>
@@ -57,11 +55,11 @@
                             <div class="volume-slider"></div>
                         </div>
                     </div>
-                    <a href="#" class="add-fullscreen" title="Fill browser">Fill Browser</a>
-                    <a href="#" class="quality_control" title="HD">HD</a>
+                    <a href="#" class="add-fullscreen" title="${_('Fill browser')}">${_('Fill browser')}</a>
+                    <a href="#" class="quality_control" title="${_('HD')}">${_('HD')}</a>
 
                     % if show_captions == 'true':
-                    <a href="#" class="hide-subtitles" title="Turn off captions">Captions</a>
+                    <a href="#" class="hide-subtitles" title="${_('Turn off captions')}">${_('Captions')}</a>
                     % endif
                 </div>
             </div>

@@ -43,7 +43,7 @@ function () {
         state.videoCaption.hideCaptions        = _.bind(hideCaptions, state);
         state.videoCaption.calculateOffset     = _.bind(calculateOffset, state);
         state.videoCaption.updatePlayTime      = _.bind(updatePlayTime, state);
-        state.videoCaption.setSubtitlesHeight      = _.bind(setSubtitlesHeight, state);
+        state.videoCaption.setSubtitlesHeight  = _.bind(setSubtitlesHeight, state);
 
         state.videoCaption.renderElements      = _.bind(renderElements, state);
         state.videoCaption.bindHandlers        = _.bind(bindHandlers, state);
@@ -71,9 +71,8 @@ function () {
         this.el.find('.video-wrapper').after(this.videoCaption.subtitlesEl);
         this.el.find('.video-controls .secondary-controls').append(this.videoCaption.hideSubtitlesEl);
 
-        this.videoCaption.setSubtitlesHeight();
-
         this.videoCaption.fetchCaption();
+        this.videoCaption.setSubtitlesHeight();
 
         if (this.videoType === 'html5') {
             this.videoCaption.fadeOutTimeout = this.config.fadeOutTimeout;
@@ -133,7 +132,7 @@ function () {
 
                 if (onTouchBasedDevice()) {
                     _this.videoCaption.subtitlesEl.find('li').html(
-                        'Caption will be displayed when you start playing the video.'
+                        gettext('Caption will be displayed when you start playing the video.')
                     );
                 } else {
                     _this.videoCaption.renderCaption();
@@ -189,14 +188,13 @@ function () {
     }
 
     function resize() {
-
-        this.videoCaption.setSubtitlesHeight();
-
         this.videoCaption.subtitlesEl
             .find('.spacing:first').height(this.videoCaption.topSpacingHeight())
             .find('.spacing:last').height(this.videoCaption.bottomSpacingHeight());
 
         this.videoCaption.scrollCaption();
+
+        this.videoCaption.setSubtitlesHeight();
     }
 
     function onMouseEnter() {
@@ -363,12 +361,12 @@ function () {
         if (hide_captions) {
             type = 'hide_transcript';
             this.captionsHidden = true;
-            this.videoCaption.hideSubtitlesEl.attr('title', 'Turn on captions');
+            this.videoCaption.hideSubtitlesEl.attr('title', gettext('Turn on captions'));
             this.el.addClass('closed');
         } else {
             type = 'show_transcript';
             this.captionsHidden = false;
-            this.videoCaption.hideSubtitlesEl.attr('title', 'Turn off captions');
+            this.videoCaption.hideSubtitlesEl.attr('title', gettext('Turn off captions'));
             this.el.removeClass('closed');
             this.videoCaption.scrollCaption();
         }
@@ -379,6 +377,8 @@ function () {
             });
         }
 
+        this.videoCaption.setSubtitlesHeight();
+
         $.cookie('hide_captions', hide_captions, {
             expires: 3650,
             path: '/'
@@ -387,7 +387,9 @@ function () {
 
     function captionHeight() {
         if (this.isFullScreen) {
-            return $(window).height() - this.el.find('.video-controls').height();
+            return $(window).height() - this.el.find('.video-controls').height() -
+                    0.5 * this.videoControl.sliderEl.height() -
+                    2 * parseInt(this.videoCaption.subtitlesEl.css('padding-top'), 10);
         } else {
             return this.el.find('.video-wrapper').height();
         }
@@ -395,15 +397,18 @@ function () {
 
     function setSubtitlesHeight() {
         var height = 0;
-         if (this.videoType === 'html5')
-            if  ( (this.captionsHidden === undefined && this.hide_captions === true ) ||
-                  (this.captionsHidden === true) ) {
-            // In case of html5 autoshowing subtitles,
-            // we ajdust height of subs, by height of scrollbar
-            height = this.videoControl.el.height() + this.videoControl.sliderEl.height() / 2;
-            // height of videoControl does not contain height of slider.
-            // (css is set to absolute, to avoid yanking when slider autochanges its height) 
-         }
+        if (this.videoType === 'html5'){
+            // on page load captionHidden = undefined
+            if  (
+                (this.captionsHidden === undefined && this.hide_captions === true ) ||
+                (this.captionsHidden === true) ) {
+                // In case of html5 autoshowing subtitles,
+                // we ajdust height of subs, by height of scrollbar
+                height = this.videoControl.el.height() + 0.5 * this.videoControl.sliderEl.height();
+                // height of videoControl does not contain height of slider.
+                // (css is set to absolute, to avoid yanking when slider autochanges its height)
+            }
+        }
         this.videoCaption.subtitlesEl.css({
             maxHeight: this.videoCaption.captionHeight() - height
         });

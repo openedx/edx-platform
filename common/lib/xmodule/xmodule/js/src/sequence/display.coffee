@@ -87,6 +87,9 @@ class @Sequence
         modx_full_url = @modx_url + '/' + @id + '/goto_position'
         $.postWithPrefix modx_full_url, position: new_position
 
+      # On Sequence change, fire custom event "sequence:change" on element.
+      # Added for aborting video bufferization, see ../videoalpha/10_main.js
+      @el.trigger "sequence:change"
       @mark_active new_position
       @$('#seq_content').html @contents.eq(new_position - 1).text()
       XModule.loadModules(@$('#seq_content'))
@@ -140,7 +143,7 @@ class @Sequence
     analytics.track "Accessed Next Sequential",
       sequence_id: @id
       current_sequential: @position
-      target_sequential: new_position 
+      target_sequential: new_position
 
     @render new_position
 

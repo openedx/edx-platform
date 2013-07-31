@@ -141,11 +141,11 @@ class VideoAlphaModule(VideoAlphaFields, XModule):
             if str_time is None:
                 return ''
             else:
-                x = time.strptime(str_time, '%H:%M:%S')
+                obj_time = time.strptime(str_time, '%H:%M:%S')
                 return datetime.timedelta(
-                    hours=x.tm_hour,
-                    minutes=x.tm_min,
-                    seconds=x.tm_sec
+                    hours=obj_time.tm_hour,
+                    minutes=obj_time.tm_min,
+                    seconds=obj_time.tm_sec
                 ).total_seconds()
 
         return parse_time(xmltree.get('start_time')), parse_time(xmltree.get('end_time'))

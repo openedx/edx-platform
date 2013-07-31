@@ -16,6 +16,10 @@ define(
 ['videoalpha/03_video_player.js'],
 function (VideoPlayer) {
 
+    if (typeof(window.gettext) == "undefined") {
+        window.gettext = function(s){return s;};
+    }
+
     /**
      * @function
      *
@@ -47,6 +51,7 @@ function (VideoPlayer) {
         state.youtubeId   = _.bind(youtubeId, state);
         state.getDuration = _.bind(getDuration, state);
         state.trigger     = _.bind(trigger, state);
+        state.stopBuffering = _.bind(stopBuffering, state);
 
         // Old private functions. Now also public so that can be
         // tested by Jasmine.
@@ -95,9 +100,7 @@ function (VideoPlayer) {
                     my: 'top right',
                     at: 'top center'
                 }
-            },
-
-            inCms:              state.el.data('in-studio')
+            }
         };
 
         if (!(_parseYouTubeIDs(state))) {
@@ -330,6 +333,18 @@ function (VideoPlayer) {
                 expires: 3650,
                 path: '/'
             });
+        }
+    }
+
+    function stopBuffering() {
+        var video;
+
+        if (this.videoType === 'html5'){
+            // HTML5 player haven't default way to abort bufferization.
+            // In this case we simply resetting source and call load().
+            video = this.videoPlayer.player.video;
+            video.src = '';
+            video.load();
         }
     }
 

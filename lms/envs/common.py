@@ -46,7 +46,6 @@ DISCUSSION_SETTINGS = {
 
 # Features
 MITX_FEATURES = {
-    'IS_CMS': False,
     'SAMPLE': False,
     'USE_DJANGO_PIPELINE': True,
     'DISPLAY_HISTOGRAMS_TO_STAFF': True,

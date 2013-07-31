@@ -14,12 +14,12 @@ class PollModuleTest(LogicTest):
     }
 
     def test_bad_ajax_request(self):
-        "Make sure that answer for incorrect request is error json"
+        # Make sure that answer for incorrect request is error json.
         response = self.ajax_request('bad_answer', {})
         self.assertDictEqual(response, {'error': 'Unknown Command!'})
 
     def test_good_ajax_request(self):
-        "Make shure that ajax request works correctly"
+        # Make sure that ajax request works correctly.
         response = self.ajax_request('No', {})
 
         poll_answers = response['poll_answers']

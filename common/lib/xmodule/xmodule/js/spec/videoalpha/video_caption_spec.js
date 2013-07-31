@@ -8,6 +8,7 @@
       videoPlayer = state.videoPlayer;
       videoCaption = state.videoCaption;
       videoSpeedControl = state.videoSpeedControl;
+      videoControl = state.videoControl;
     }
 
     beforeEach(function() {
@@ -71,6 +72,11 @@
           expect($('.subtitles')).toHandleWith('mousemove', videoCaption.onMovement);
           expect($('.subtitles')).toHandleWith('mousewheel', videoCaption.onMovement);
           expect($('.subtitles')).toHandleWith('DOMMouseScroll', videoCaption.onMovement);
+        });
+
+        it('bind the scroll', function() {
+          expect($('.subtitles')).toHandleWith('scroll', videoCaption.autoShowCaptions);
+          expect($('.subtitles')).toHandleWith('scroll', videoControl.showControls);
         });
       });
 
@@ -352,8 +358,28 @@
         videoCaption.resize();
       });
 
-      it('set the height of caption container', function() {
-        expect(parseInt($('.subtitles').css('maxHeight'), 10)).toBeCloseTo($('.video-wrapper').height(), 2);
+      describe('set the height of caption container', function(){
+        it('when CC button is enabled', function() {
+          var realHeight = parseInt($('.subtitles').css('maxHeight'), 10),
+              shouldBeHeight = $('.video-wrapper').height();
+
+          // Because of some problems with rounding on different enviroments:
+          // Linux * Mac * FF * Chrome
+          expect(realHeight).toBeCloseTo(shouldBeHeight, 2);
+        });
+
+        it('when CC button is disabled ', function() {
+          var realHeight = parseInt($('.subtitles').css('maxHeight'), 10),
+              videoWrapperHeight = $('.video-wrapper').height(),
+              controlsHeight = videoControl.el.height(),
+              progressSliderHeight = videoControl.sliderEl.height(),
+              shouldBeHeight = videoWrapperHeight - controlsHeight \
+                                - 0.5 * controlsHeight;
+
+          state.captionsHidden = true;
+          videoCaption.setSubtitlesHeight();
+          expect(realHeight).toBeCloseTo($('.video-wrapper').height(shouldBeHeight, 2));
+        });
       });
 
       it('set the height of caption spacing', function() {
