@@ -19,5 +19,6 @@ def i_see_the_correct_settings_and_values(step):
 @step('I have set "show captions" to (.*)')
 def set_show_captions(step, setting):
     world.css_click('a.edit-button')
+    world.wait_for(lambda _driver: world.css_visible('a.save-button'))
     world.browser.select('Show Captions', setting)
     world.css_click('a.save-button')
