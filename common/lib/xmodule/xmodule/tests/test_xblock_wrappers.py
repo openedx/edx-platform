@@ -66,7 +66,7 @@ class TestXBlockWrapper(object):
     @property
     def leaf_module_runtime(self):
         runtime = Mock()
-        runtime.render_template = lambda *args, **kwargs: unicode((args, kwargs))
+        runtime.render_template = lambda *args, **kwargs: u'{!r}, {!r}'.format(args, kwargs)
         runtime.anonymous_student_id = 'dummy_anonymous_student_id'
         runtime.open_ended_grading_interface = {}
         runtime.seed = 5
@@ -78,7 +78,7 @@ class TestXBlockWrapper(object):
     @property
     def leaf_descriptor_runtime(self):
         runtime = Mock()
-        runtime.render_template = lambda *args, **kwargs: unicode((args, kwargs))
+        runtime.render_template = lambda *args, **kwargs: u'{!r}, {!r}'.format(args, kwargs)
         return runtime
 
     def leaf_descriptor(self, descriptor_cls):
@@ -102,7 +102,7 @@ class TestXBlockWrapper(object):
     @property
     def container_descriptor_runtime(self):
         runtime = Mock()
-        runtime.render_template = lambda *args, **kwargs: unicode((args, kwargs))
+        runtime.render_template = lambda *args, **kwargs: u'{!r}, {!r}'.format(args, kwargs)
         return runtime
 
     def container_descriptor(self, descriptor_cls):

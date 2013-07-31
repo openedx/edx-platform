@@ -80,7 +80,7 @@ class BaseTestXmodule(ModuleStoreTestCase):
         self.runtime = get_test_system()
         # Allow us to assert that the template was called in the same way from
         # different code paths while maintaining the type returned by render_template
-        self.runtime.render_template = lambda template, context: unicode((template, sorted(context.items())))
+        self.runtime.render_template = lambda template, context: u'{!r}, {!r}'.format(template, sorted(context.items()))
         model_data = {'location': self.item_descriptor.location}
         model_data.update(self.MODEL_DATA)
 
