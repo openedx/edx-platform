@@ -79,7 +79,8 @@
         %endif
       </div>
 
-      <div class="wrapper-create-element wrapper-create-course">
+      % if course_creator_status=='granted':
+      <div class="wrapper-create-element animate wrapper-create-course">
         <form class="create-course course-info" id="create-course-form" name="create-course-form">
           <div class="wrap-error">
             <div id="course_creation_error" name="course_creation_error" class="message message-status message-status error" role="alert">
@@ -125,9 +126,9 @@
             <input type="submit" value="${_('Save')}" class="action action-primary new-course-save" />
             <input type="button" value="${_('Cancel')}" class="action action-secondary action-cancel new-course-cancel" />
           </div>
-
         </form>
       </div>
+      % endif
 
       %if len(courses) > 0:
       <div class="courses">
