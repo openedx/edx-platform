@@ -15,3 +15,7 @@ from .public import *
 from .user import *
 from .tabs import *
 from .requests import *
+try:
+    from .dev import *
+except ImportError:
+    pass
