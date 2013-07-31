@@ -331,7 +331,7 @@ class SplitModuleItemTests(SplitModuleTest):
             block.grade_cutoffs, {"Pass": 0.45},
         )
 
-        # try to look up other branchs
+        # try to look up other branches
         self.assertRaises(ItemNotFoundError,
                           modulestore().get_item,
                           BlockUsageLocator(course_id=locator.as_course_locator(),

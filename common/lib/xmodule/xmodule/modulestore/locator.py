@@ -45,7 +45,7 @@ class Locator(object):
 
     def __repr__(self):
         '''
-        repr(self) returns something like this: CourseLocator("edu.mit.eecs.6002x")
+        repr(self) returns something like this: CourseLocator("mit.eecs.6002x")
         '''
         classname = self.__class__.__name__
         if classname.find('.') != -1:
@@ -54,13 +54,13 @@ class Locator(object):
 
     def __str__(self):
         '''
-        str(self) returns something like this: "edu.mit.eecs.6002x"
+        str(self) returns something like this: "mit.eecs.6002x"
         '''
         return unicode(self).encode('utf8')
 
     def __unicode__(self):
         '''
-        unicode(self) returns something like this: "edu.mit.eecs.6002x"
+        unicode(self) returns something like this: "mit.eecs.6002x"
         '''
         return self.url()
 
@@ -89,12 +89,12 @@ class CourseLocator(Locator):
     """
     Examples of valid CourseLocator specifications:
      CourseLocator(version_guid=ObjectId('519665f6223ebd6980884f2b'))
-     CourseLocator(course_id='edu.mit.eecs.6002x')
-     CourseLocator(course_id='edu.mit.eecs.6002x;published')
-     CourseLocator(course_id='edu.mit.eecs.6002x', branch='published')
+     CourseLocator(course_id='mit.eecs.6002x')
+     CourseLocator(course_id='mit.eecs.6002x;published')
+     CourseLocator(course_id='mit.eecs.6002x', branch='published')
      CourseLocator(url='edx://@519665f6223ebd6980884f2b')
-     CourseLocator(url='edx://edu.mit.eecs.6002x')
-     CourseLocator(url='edx://edu.mit.eecs.6002x;published')
+     CourseLocator(url='edx://mit.eecs.6002x')
+     CourseLocator(url='edx://mit.eecs.6002x;published')
 
     Should have at lease a specific course_id (id for the course as if it were a project w/
     versions) with optional 'branch',
@@ -253,7 +253,7 @@ class CourseLocator(Locator):
 
     def init_from_course_id(self, course_id, explicit_branch=None):
         """
-        Course_id is a string like 'edu.mit.eecs.6002x' or 'edu.mit.eecs.6002x;published'.
+        Course_id is a string like 'mit.eecs.6002x' or 'mit.eecs.6002x;published'.
 
         Revision (optional) is a string like 'published'.
         It may be provided explicitly (explicit_branch) or embedded into course_id.
