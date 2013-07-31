@@ -211,6 +211,7 @@ class @PeerGradingProblem
     @calibration = null
 
     @submit_button = $('.submit-button')
+    @submit_button.attr('disabled', false)
     @action_button = $('.action-button')
     @calibration_feedback_button = $('.calibration-feedback-button')
     @interstitial_page_button = $('.interstitial-page-button')
@@ -281,10 +282,12 @@ class @PeerGradingProblem
 
 
   submit_calibration_essay: ()=>
+    @submit_button.attr('disabled', true)
     data = @construct_data()
     @backend.post('save_calibration_essay', data, @calibration_callback)
 
   submit_grade: () =>
+    @submit_button.attr('disabled', true)
     data = @construct_data()
     @backend.post('save_grade', data, @submission_callback)
 
