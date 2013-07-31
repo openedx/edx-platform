@@ -52,39 +52,35 @@
         % endfor
 
         <p>
-        Don't like any of the hints above?  Please write your own, for one of your previous incorrect answers below:
-        </p>
+        Don't like any of the hints above? 
+        <a class="expand" data-target="hint-submission-div" href="javascript:void(0);">
+          Write your own!
+        </a></p>
+
+        <div id="hint-submission-div" style="display:none">
     % else:
         <p>
-        <em> Optional. </em> Help us write hints for this problem!  Select one of your incorrect answers below:
+          <em> Optional. </em> Help us write hints for this problem!  Think about how you would help
+          another student who made the same mistake that you did.
         </p>
     % endif
 
-    <div id="answer-tabs">
-        <ul>
-        % for answer in user_submissions:
-            <li><a href="#previous-answer-${unspace(answer)}"> ${answer} </a></li>
-        % endfor
-        </ul>
+    <p>
+      Choose the incorrect answer for which you want to write a hint:
+      <br />
+      % for answer in user_submissions:
+          <input type="radio" name="answer-select" value="${answer}"> ${answer} </input><br />
+      % endfor
+    </p>
 
-        % for answer in user_submissions:
-            <div class = "previous-answer" id="previous-answer-${unspace(answer)}" data-answer="${answer}">
-            <div class = "hint-inner-container">
-                <p>
-                What hint would you give a student who also arrived at an answer of ${answer}?  Please don't give away the correct answer.
-                </p>
-                <textarea cols="50" class="custom-hint" data-answer="${answer}">
-What would you say to help someone who got this wrong answer?
-(Don't give away the answer, please.)
-                </textarea>
-                <br/><br/>
-                <input class="submit-hint" data-answer="${answer}" type="button" value="submit">
-            </div></div>
-        % endfor
-    </div>
+    <textarea cols="50" class="custom-hint" data-answer="${answer}" style="height: 200px">
+Write your hint here.  Please don't give away the correct answer.
+    </textarea>
+    <br/><br/>
+    <input class="submit-hint" data-answer="${answer}" type="button" value="submit">
 
-    <p>Read about <a class="expand-goodhint" href="javascript:void(0);">what makes a good hint</a>.</p>
-    <div class="goodhint" style="display:none">
+    <p>Read about <a class="expand" data-target="goodhint" href="javascript:void(0);">what makes a good hint</a>.</p>
+    <div id="goodhint" style="display:none">
       <h4>What makes a good hint?</h4>
 
       <p>It depends on the type of problem you ran into. For stupid errors --
@@ -114,6 +110,12 @@ What would you say to help someone who got this wrong answer?
       <p>
         <a href="http://www.apa.org/education/k12/misconceptions.aspx?item=2" target="_blank">Learn even more</a>
       </p>    </div>
+    ## Close out the text-hiding div.  The text-hiding div only exists if there
+    ## were hints for the student to vote on.
+    % if hints_exist:
+      </div>
+    % endif
+
 
 </%def>
 

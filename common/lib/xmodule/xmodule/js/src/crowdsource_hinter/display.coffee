@@ -37,13 +37,14 @@ class @Hinter
     @$('input.submit-hint').click @submit_hint
     @$('.custom-hint').click @clear_default_text
     @$('#answer-tabs').tabs({active: 0})
-    @$('.expand-goodhint').click @expand_goodhint
+    @$('.expand').click @expand
 
-  expand_goodhint: =>
-    if @$('.goodhint').css('display') == 'none'
-      @$('.goodhint').css('display', 'block')
+  expand: (eventObj) =>
+    target = @$('#' + @$(eventObj.currentTarget).data('target'))
+    if @$(target).css('display') == 'none'
+      @$(target).css('display', 'block')
     else
-      @$('.goodhint').css('display', 'none')
+      @$(target).css('display', 'none')
 
   vote: (eventObj) =>
     target = @$(eventObj.currentTarget)
@@ -53,9 +54,12 @@ class @Hinter
       @render(response.contents)
 
   submit_hint: (eventObj) =>
-    target = @$(eventObj.currentTarget)
-    textarea = $('.custom-hint[data-answer="'+target.attr('data-answer')+'"]')
-    post_json = {'answer': target.attr('data-answer'), 'hint': @$(textarea).val()}
+    textarea = $('.custom-hint')
+    answer = $('input:radio[name=answer-select]:checked').val()
+    if answer == undefined
+      # The user didn't choose an answer.  Do nothing.
+      return
+    post_json = {'answer': answer, 'hint': textarea.val()}
     $.postWithPrefix "#{@url}/submit_hint",post_json, (response) =>
       @render(response.contents)
 
