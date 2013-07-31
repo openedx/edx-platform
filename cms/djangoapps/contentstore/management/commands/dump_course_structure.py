@@ -1,3 +1,6 @@
+"""
+Script for dumping course dumping the course structure
+"""
 from django.core.management.base import BaseCommand, CommandError
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.django import modulestore
@@ -9,10 +12,14 @@ filter_list = ['xml_attributes', 'checklists']
 
 
 class Command(BaseCommand):
+    """
+    The Django command for dumping course structure
+    """
     help = '''Write out to stdout a structural and metadata information about a course in a flat dictionary serialized
               in a JSON format. This can be used for analytics.'''
 
     def handle(self, *args, **options):
+        "Execute the command"
         if len(args) < 2 or len(args) > 3:
             raise CommandError("dump_course_structure requires two or more arguments: <location> <outfile> |<db>|")
 
@@ -32,7 +39,7 @@ class Command(BaseCommand):
         try:
             course = store.get_item(loc, depth=4)
         except:
-            print 'Could not find course at {0}'.format(course_id)
+            print('Could not find course at {0}'.format(course_id))
             return
 
         info = {}

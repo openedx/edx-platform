@@ -85,9 +85,11 @@ class InternationalizationTest(ModuleStoreTestCase):
                                HTTP_ACCEPT_LANGUAGE='fr'
                                )
 
-        TEST_STRING = u'<h1 class="title-1">' \
-                      + u'My \xc7\xf6\xfcrs\xe9s L#' \
-                      + u'</h1>'
+        TEST_STRING = (
+            u'<h1 class="title-1">'
+            u'My \xc7\xf6\xfcrs\xe9s L#'
+            u'</h1>'
+        )
 
         self.assertContains(resp,
                             TEST_STRING,

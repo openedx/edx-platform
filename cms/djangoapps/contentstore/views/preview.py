@@ -68,6 +68,7 @@ def preview_dispatch(request, preview_id, location, dispatch=None):
 
 @login_required
 def preview_component(request, location):
+    "Return the HTML preview of a component"
     # TODO (vshnayder): change name from id to location in coffee+html as well.
     if not has_access(request.user, location):
         return HttpResponseForbidden()
@@ -91,6 +92,7 @@ def preview_module_system(request, preview_id, descriptor):
     """
 
     def preview_model_data(descriptor):
+        "Helper method to create a DbModel from a descriptor"
         return DbModel(
             SessionKeyValueStore(request, descriptor._model_data),
             descriptor.module_class,

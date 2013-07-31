@@ -50,9 +50,9 @@ class UploadTestCase(CourseTestCase):
 
     @skip("CorruptGridFile error on continuous integration server")
     def test_happy_path(self):
-        file = BytesIO("sample content")
-        file.name = "sample.txt"
-        resp = self.client.post(self.url, {"name": "my-name", "file": file})
+        f = BytesIO("sample content")
+        f.name = "sample.txt"
+        resp = self.client.post(self.url, {"name": "my-name", "file": f})
         self.assert2XX(resp.status_code)
 
     def test_no_file(self):
