@@ -211,7 +211,6 @@ class @PeerGradingProblem
     @calibration = null
 
     @submit_button = $('.submit-button')
-    @submit_button.attr('disabled', false)
     @action_button = $('.action-button')
     @calibration_feedback_button = $('.calibration-feedback-button')
     @interstitial_page_button = $('.interstitial-page-button')
@@ -526,6 +525,7 @@ class @PeerGradingProblem
       @action_button.show()
 
   show_submit_button: () =>
+    @submit_button.attr('disabled', false)
     @submit_button.show()
 
   setup_score_selection: (max_score) =>
