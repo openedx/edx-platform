@@ -225,12 +225,19 @@ function _handleReorder(event, ui, parentIdField, childrenSelector) {
                 ui.draggable.attr("style", "position:relative;"); // STYLE hack too
                 children.push(ui.draggable.data('id'));
         }
+        var saving = new CMS.Views.Notification.Mini({
+            title: gettext('Saving') + '&hellip;'
+        });
+        saving.show();
         $.ajax({
                 url: "/save_item",
                 type: "POST",
                 dataType: "json",
                 contentType: "application/json",
-                data:JSON.stringify({ 'id' : subsection_id, 'children' : children})
+                data:JSON.stringify({ 'id' : subsection_id, 'children' : children}),
+                success: function() {
+                    saving.hide();
+                }
         });
 
 }
