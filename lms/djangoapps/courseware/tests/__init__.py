@@ -77,13 +77,15 @@ class BaseTestXmodule(ModuleStoreTestCase):
             data=self.DATA
         )
 
-        system = get_test_system()
-        system.render_template = lambda template, context: context
+        self.runtime = get_test_system()
+        # Allow us to assert that the template was called in the same way from
+        # different code paths while maintaining the type returned by render_template
+        self.runtime.render_template = lambda template, context: unicode((template, sorted(context.items())))
         model_data = {'location': self.item_descriptor.location}
         model_data.update(self.MODEL_DATA)
 
         self.item_module = self.item_descriptor.module_class(
-            system, self.item_descriptor, model_data
+            self.runtime, self.item_descriptor, model_data
         )
         self.item_url = Location(self.item_module.location).url()
 
