@@ -294,7 +294,6 @@ def index(request, course_id, chapter=None, section=None,
 
      - HTTPresponse
     """
-    import pydb; pydb.debugger()
     user = User.objects.prefetch_related("groups").get(id=request.user.id)
     request.user = user	 # keep just one instance of User
     course = get_course_with_access(user, course_id, 'load', depth=2)

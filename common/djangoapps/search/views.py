@@ -1,6 +1,7 @@
 import requests
 import logging
 import hashlib
+import json
 
 from django.conf import settings
 from django.http import HttpResponseBadRequest
@@ -23,7 +24,7 @@ def search(request, course_id):
     course = get_course_with_access(request.user, course_id, 'load')
     context = find(request, course_id)
     context.update({"course": course})
-    return render_to_response("search_templates/search.html", context)
+    return render_to_response("search_templates/results.html", context)
 
 
 @ensure_csrf_cookie
@@ -37,7 +38,7 @@ def index_course(request):
 
 
 def find(request, course_id):
-    database = settings.ES_DATABASE
+    database = "http://localhost:9200"  # settings.ES_DATABASE
     full_query_data = {}
     get_content = lambda request, content: content+"-index" if request.GET.get(content, False) else None
     query = request.GET.get("s", "*.*")
@@ -50,8 +51,9 @@ def find(request, course_id):
     else:
         course_hash = hashlib.sha1(course_id).hexdigest()
         base_url = "/".join([database, index, course_hash])
+    base_url += "/_search"
     log.debug(base_url)
-    full_query_data.update({"from": 0, "size": 10000})
+    # full_query_data.update({"from": 0, "size": 10000})
     full_query_data.update(
         {"suggest":
             {"searchable_text_suggestions":
@@ -64,17 +66,16 @@ def find(request, course_id):
             }
         }
     )
+    log.debug(full_query_data)
     context = {}
-    response = requests.get(base_url, data=full_query_data)
-    data = SearchResults(request, response)
+    response = requests.get(base_url, data=json.dumps(full_query_data))
+    data = SearchResults(response, **request.GET)
     data.filter_and_sort()
     context.update({"results": data.has_results})
     correction = spell_check(query)
 
     context.update({
         "data": data,
-        "next_page": next_link(request, data),
-        "prev_page": prev_link(request, data),
         "search_correction_link": search_correction_link(request, correction),
         "spelling_correction": correction,
         "selected_course": request.GET.get("selected_course", ""),
@@ -96,16 +97,6 @@ def proper_page(pages, index):
     except EmptyPage:
         correct_page = pages.page(pages.num_pages)
     return correct_page
-
-
-def next_link(request, paginator):
-    return request.path+"?s="+request.GET.get("s", "") + \
-        "&content=" + request.GET.get("content", "transcript") + "&page="+str(paginator.next_page_number())
-
-
-def prev_link(request, paginator):
-    return request.path+"?s="+request.GET.get("s", "") + \
-        "&content=" + request.GET.get("content", "transcript") + "&page="+str(paginator.previous_page_number())
 
 
 def search_correction_link(request, term, page="1"):
