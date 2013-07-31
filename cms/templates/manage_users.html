@@ -1,6 +1,7 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
 <%! from auth.authz import is_user_in_course_group_role %>
+<%! import json %>
 <%inherit file="base.html" />
 <%block name="title">${_("Course Team Settings")}</%block>
 <%block name="bodyclass">is-signedin course users team</%block>
@@ -161,18 +162,54 @@
 
 <%block name="jsextra">
 <script type="text/javascript">
+  var staffEmails = ${json.dumps([user.email for user in staff])};
   var tplUserURL = "${reverse('course_team_user', kwargs=dict(
       org=context_course.location.org,
       course=context_course.location.course,
       name=context_course.location.name,
       email="@@EMAIL@@",
-    ))}"
+    ))}";
 
   $(document).ready(function() {
     var $createUserForm = $('#create-user-form');
     var $createUserFormWrapper = $createUserForm.closest('.wrapper-create-user');
     $createUserForm.bind('submit', function(e) {
       e.preventDefault();
+      var email = $('#user-email-input').val().trim();
+      if(!email) {
+        var msg = new CMS.Views.Prompt.Error({
+          title: gettext("Email required"),
+          message: gettext("You must enter an email address"),
+          actions: {
+            primary: {
+              text: gettext("OK"),
+              click: function(view) {
+                view.hide();
+                $("#user-email-input").focus();
+              }
+            }
+          }
+        })
+        msg.show();
+        return;
+      }
+      if(_.contains(staffEmails, email)) {
+        var msg = new CMS.Views.Prompt.Warning({
+          title: gettext("User is already on team"),
+          message: gettext("This user is already on the course team"),
+          actions: {
+            primary: {
+              text: gettext("OK"),
+              click: function(view) {
+                view.hide();
+                $("#user-email-input").focus();
+              }
+            }
+          }
+        })
+        msg.show();
+        return;
+      }
       var url = tplUserURL.replace("@@EMAIL@@", $('#user-email-input').val().trim())
       $.ajax({
         url: url,
