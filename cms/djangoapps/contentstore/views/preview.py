@@ -163,6 +163,11 @@ def load_preview_module(request, preview_id, descriptor):
     return module
 
 
+def get_preview_html(request, descriptor, idx):
+    module = load_preview_module(request, str(idx), descriptor)
+    return module.get_html()
+
+
 def get_module_previews(request, descriptor):
     """
     Returns a list of preview XModule html contents. One preview is returned for each
@@ -170,8 +175,5 @@ def get_module_previews(request, descriptor):
 
     descriptor: An XModuleDescriptor
     """
-    preview_html = []
-    for idx, (_instance_state, _shared_state) in enumerate(descriptor.get_sample_state()):
-        module = load_preview_module(request, str(idx), descriptor)
-        preview_html.append(module.get_html())
-    return preview_html
+    return tuple(get_preview_html(request, descriptor, idx)
+                 for idx in range(len(descriptor.get_sample_state())))
