@@ -81,7 +81,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
             version_guid=course_entry_override['_id'],
             usage_id=usage_id,
             course_id=course_entry_override.get('course_id'),
-            revision=course_entry_override.get('revision')
+            branch=course_entry_override.get('branch')
         )
 
         kvs = SplitMongoKVS(
