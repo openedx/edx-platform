@@ -1,7 +1,6 @@
 import logging
 import os
 import mimetypes
-from lxml.html import rewrite_links as lxml_rewrite_links
 from path import path
 
 from xblock.core import Scope
@@ -61,45 +60,6 @@ def import_static_content(modules, course_loc, course_data_path, static_content_
     return remap_dict
 
 
-def verify_content_links(module, base_dir, static_content_store, link, remap_dict=None):
-    if link.startswith('/static/'):
-        # yes, then parse out the name
-        path = link[len('/static/'):]
-
-        static_pathname = base_dir / path
-
-        if os.path.exists(static_pathname):
-            try:
-                content_loc = StaticContent.compute_location(module.location.org, module.location.course, path)
-                filename = os.path.basename(path)
-                mime_type = mimetypes.guess_type(filename)[0]
-
-                with open(static_pathname, 'rb') as f:
-                    data = f.read()
-
-                content = StaticContent(content_loc, filename, mime_type, data, import_path=path)
-
-                # first let's save a thumbnail so we can get back a thumbnail location
-                (thumbnail_content, thumbnail_location) = static_content_store.generate_thumbnail(content)
-
-                if thumbnail_content is not None:
-                    content.thumbnail_location = thumbnail_location
-
-                #then commit the content
-                static_content_store.save(content)
-
-                new_link = StaticContent.get_url_path_from_location(content_loc)
-
-                if remap_dict is not None:
-                    remap_dict[link] = new_link
-
-                return new_link
-            except Exception, e:
-                logging.exception('Skipping failed content load from {0}. Exception: {1}'.format(path, e))
-
-    return link
-
-
 def import_module_from_xml(modulestore, static_content_store, course_data_path, module, target_location_namespace=None, verbose=False):
     # remap module to the new namespace
     if target_location_namespace is not None:
@@ -126,27 +86,6 @@ def import_module_from_xml(modulestore, static_content_store, course_data_path, 
             module.children = new_locs
 
     if hasattr(module, 'data'):
-        # cdodge: now go through any link references to '/static/' and make sure we've imported
-        # it as a StaticContent asset
-        try:
-            remap_dict = {}
-
-            # use the rewrite_links as a utility means to enumerate through all links
-            # in the module data. We use that to load that reference into our asset store
-            # IMPORTANT: There appears to be a bug in lxml.rewrite_link which makes us not be able to
-            # do the rewrites natively in that code.
-            # For example, what I'm seeing is <img src='foo.jpg' />   ->   <img src='bar.jpg'>
-            # Note the dropped element closing tag. This causes the LMS to fail when rendering modules - that's
-            # no good, so we have to do this kludge
-            if isinstance(module.data, str) or isinstance(module.data, unicode):  # some module 'data' fields are non strings which blows up the link traversal code
-                lxml_rewrite_links(module.data, lambda link: verify_content_links(module, course_data_path, static_content_store, link, remap_dict))
-
-                for key in remap_dict.keys():
-                    module.data = module.data.replace(key, remap_dict[key])
-
-        except Exception:
-            logging.exception("failed to rewrite links on {0}. Continuing...".format(module.location))
-
         modulestore.update_item(module.location, module.data)
 
     if module.has_children:
@@ -166,9 +105,6 @@ def import_course_from_xml(modulestore, static_content_store, course_data_path, 
                        {"type": "discussion", "name": "Discussion"},
                        {"type": "wiki", "name": "Wiki"}]  # note, add 'progress' when we can support it on Edge
 
-    # a bit of a hack, but typically the "course image" which is shown on marketing pages is hard coded to /images/course_image.jpg
-    # so let's make sure we import in case there are no other references to it in the modules
-    verify_content_links(module, course_data_path, static_content_store, '/static/images/course_image.jpg')
     import_module_from_xml(modulestore, static_content_store, course_data_path, module, target_location_namespace, verbose=verbose)
 
 
@@ -241,10 +177,6 @@ def import_from_xml(store, data_dir, course_dirs=None,
 
                     import_module(module, store, course_data_path, static_content_store)
 
-                    # a bit of a hack, but typically the "course image" which is shown on marketing pages is hard coded to /images/course_image.jpg
-                    # so let's make sure we import in case there are no other references to it in the modules
-                    verify_content_links(module, course_data_path, static_content_store, '/static/images/course_image.jpg')
-
                     course_items.append(module)
 
             # then import all the static content
@@ -302,27 +234,6 @@ def import_module(module, store, course_data_path, static_content_store, allow_n
     module_data = {}
     if 'data' in content:
         module_data = content['data']
-
-        # cdodge: now go through any link references to '/static/' and make sure we've imported
-        # it as a StaticContent asset
-        try:
-            remap_dict = {}
-
-            # use the rewrite_links as a utility means to enumerate through all links
-            # in the module data. We use that to load that reference into our asset store
-            # IMPORTANT: There appears to be a bug in lxml.rewrite_link which makes us not be able to
-            # do the rewrites natively in that code.
-            # For example, what I'm seeing is <img src='foo.jpg' />   ->   <img src='bar.jpg'>
-            # Note the dropped element closing tag. This causes the LMS to fail when rendering modules - that's
-            # no good, so we have to do this kludge
-            if isinstance(module_data, str) or isinstance(module_data, unicode):  # some module 'data' fields are non strings which blows up the link traversal code
-                lxml_rewrite_links(module_data, lambda link: verify_content_links(module, course_data_path, static_content_store, link, remap_dict))
-
-                for key in remap_dict.keys():
-                    module_data = module_data.replace(key, remap_dict[key])
-
-        except Exception:
-            logging.exception("failed to rewrite links on {0}. Continuing...".format(module.location))
     else:
         module_data = content
 
