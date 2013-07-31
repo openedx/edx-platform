@@ -95,12 +95,14 @@ class GraphicalSliderToolModule(GraphicalSliderToolFields, XModule):
     @property
     def configuration(self):
         return stringify_children(
-            html.fromstring(self.data).xpath('configuration')[0])
+            html.fromstring(self.data).xpath('configuration')[0]
+        )
 
     @property
     def render(self):
         return stringify_children(
-            html.fromstring(self.data).xpath('render')[0])
+            html.fromstring(self.data).xpath('render')[0]
+        )
 
     def get_html(self):
         """ Renders parameters to template. """
