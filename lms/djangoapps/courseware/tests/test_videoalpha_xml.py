@@ -104,7 +104,7 @@ class VideoAlphaModuleUnitTest(unittest.TestCase):
     def test_videoalpha_constructor(self):
         """Make sure that all parameters extracted correclty from xml"""
         module = VideoAlphaFactory.create()
-        module.runtime.render_template = lambda template, context: unicode((template, sorted(context.items())))
+        module.runtime.render_template = lambda template, context: u'{!r}, {!r}'.format(template, sorted(context.items()))
 
         fragment = module.runtime.render(module, None, 'student_view')
         expected_context = {
