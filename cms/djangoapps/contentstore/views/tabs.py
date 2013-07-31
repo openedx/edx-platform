@@ -1,3 +1,6 @@
+"""
+Views related to course tabs
+"""
 from access import has_access
 from util.json_request import expect_json
 
@@ -39,6 +42,7 @@ def initialize_course_tabs(course):
 @login_required
 @expect_json
 def reorder_static_tabs(request):
+    "Order the static tabs in the requested order"
     tabs = request.POST['tabs']
     course = get_course_for_item(tabs[0])
 
@@ -86,6 +90,7 @@ def reorder_static_tabs(request):
 @login_required
 @ensure_csrf_cookie
 def edit_tabs(request, org, course, coursename):
+    "Edit tabs"
     location = ['i4x', org, course, 'course', coursename]
     store = get_modulestore(location)
     course_item = store.get_item(location)
@@ -122,6 +127,7 @@ def edit_tabs(request, org, course, coursename):
 @login_required
 @ensure_csrf_cookie
 def static_pages(request, org, course, coursename):
+    "Static pages view"
 
     location = get_location_and_verify_access(request, org, course, coursename)
 
