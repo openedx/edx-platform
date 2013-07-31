@@ -79,12 +79,11 @@ class LatexRenderedTest(PreviewTestUtility):
             preview.LatexRendered('x^2', parens='not parens')
 
 
-def _call_render_method(render_method, string_children):
+def _latex_rendered_list(string_children):
     """
-    Call `render_method` with LatexRendered version of `string_children`
+    Helper method to wrap `LatexRendered` objects around each child.
     """
-    children = [preview.LatexRendered(k) for k in string_children]
-    return render_method(children)
+    return [preview.LatexRendered(k) for k in string_children]
 
 
 class RenderMethodsTest(PreviewTestUtility):
@@ -93,25 +92,23 @@ class RenderMethodsTest(PreviewTestUtility):
 
     They take a list of `LatexRendered`s and, depending on the type of node,
     combine them all together into one `LatexRendered`.
-
-    For the simplest of cases, call them with `_call_render_method` above.
     """
     def test_number_simple(self):
         """ Simple numbers should pass through `render_number`. """
-        out = _call_render_method(preview.render_number, ['3.1415'])
+        kids = [preview.LatexRendered('3.1415')]
+        out = preview.render_number(kids)
         self.assert_latex_rendered(out, latex='3.1415')
 
     def test_number_suffix(self):
         """ Suffixes should be escaped in `render_number`. """
-        out = _call_render_method(preview.render_number, ['1.618', 'k'])
+        kids = _latex_rendered_list(['1.618', 'k'])
+        out = preview.render_number(kids)
         self.assert_latex_rendered(out, latex=r'1.618\text{k}')
 
     def test_number_sci_notation(self):
         """ Numbers with scientific notation should display nicely """
-        out = _call_render_method(
-            preview.render_number,
-            ['6.0221413', 'E', '+', '23']
-        )
+        kids = _latex_rendered_list(['6.0221413', 'E', '+', '23'])
+        out = preview.render_number(kids)
         self.assert_latex_rendered(
             out,
             latex=r'6.0221413\!\times\!10^{+23}', tall=True
@@ -119,10 +116,8 @@ class RenderMethodsTest(PreviewTestUtility):
 
     def test_number_sci_notation_suffix(self):
         """ Test numbers with both """
-        out = _call_render_method(
-            preview.render_number,
-            ['6.0221413', 'E', '+', '23', 'k']
-        )
+        kids = _latex_rendered_list(['6.0221413', 'E', '+', '23', 'k'])
+        out = preview.render_number(kids)
         self.assert_latex_rendered(
             out,
             latex=r'6.0221413\!\times\!10^{+23}\text{k}', tall=True
@@ -131,7 +126,8 @@ class RenderMethodsTest(PreviewTestUtility):
     def test_variable_simple(self):
         """ Simple valid variables should pass through `render_variable`. """
         render_variable = preview.variable_closure(['x', 'y'], lambda x: x.lower())
-        out = _call_render_method(render_variable, ['x'])
+        kids = [preview.LatexRendered('x')]
+        out = render_variable(kids)
         self.assert_latex_rendered(out, latex='x')
 
     def test_variable_unicode(self):
@@ -141,21 +137,22 @@ class RenderMethodsTest(PreviewTestUtility):
         Note: it isn't supported right now in the rest of the code (esp. the
         way we have set up pyparsing), but when it is, this should work.
         """
-        var = "✖"
+        var = u"✖"
         render_variable = preview.variable_closure([var], lambda x: x.lower())
-        out = _call_render_method(render_variable, [var])
+        out = render_variable([preview.LatexRendered(var)])
         self.assert_latex_rendered(out, latex=var)
 
     def test_greek(self):
         """ Variable names that are greek should be formatted accordingly. """
         render_variable = preview.variable_closure(['pi'], lambda x: x.lower())
-        out = _call_render_method(render_variable, ['pi'])
+        out = render_variable([preview.LatexRendered('pi')])
         self.assert_latex_rendered(out, latex=r'\pi ')
 
     def test_function_simple(self):
         """ Valid function names should be escaped in `render_function`. """
         render_function = preview.function_closure(['f'], lambda x: x.lower())
-        out = _call_render_method(render_function, ['f', 'x'])
+        kids = _latex_rendered_list(['f', 'x'])
+        out = render_function(kids)
         self.assert_latex_rendered(out, latex=r'\text{f}(x)')
 
     def test_function_tall(self):
@@ -170,53 +167,54 @@ class RenderMethodsTest(PreviewTestUtility):
     def test_function_sqrt(self):
         """ Sqrt function should be handled specially. """
         render_function = preview.function_closure(['sqrt'], lambda x: x.lower())
-        out = _call_render_method(render_function, ['sqrt', 'x'])
+        kids = _latex_rendered_list(['sqrt', 'x'])
+        out = render_function(kids)
         self.assert_latex_rendered(out, latex=r'\sqrt{x}')
 
     def test_function_log10(self):
         """ log10 function should be handled specially. """
         render_function = preview.function_closure(['log10'], lambda x: x.lower())
-        out = _call_render_method(render_function, ['log10', 'x'])
+        kids = _latex_rendered_list(['log10', 'x'])
+        out = render_function(kids)
         self.assert_latex_rendered(out, latex=r'\log_{10}(x)')
 
     def test_function_log2(self):
         """ log2 function should be handled specially. """
         render_function = preview.function_closure(['log2'], lambda x: x.lower())
-        out = _call_render_method(render_function, ['log2', 'x'])
+        kids = _latex_rendered_list(['log2', 'x'])
+        out = render_function(kids)
         self.assert_latex_rendered(out, latex=r'\log_2(x)')
 
     def test_power_simple(self):
         """ `render_power` should wrap the elements with braces correctly. """
-        out = _call_render_method(
-            preview.render_power,
-            ['x', '^', 'y', '^', '2']
-        )
+        kids = _latex_rendered_list(['x', '^', 'y', '^', '2'])
+        out = preview.render_power(kids)
         self.assert_latex_rendered(out, latex='x^{y^{2}}', tall=True)
 
     def test_power_parens(self):
         """ `render_power` should ignore the parenthesis of the last math. """
-        children = ['x', '^', 'y', '^']  # (x+y)
-        children = [preview.LatexRendered(k) for k in children]
-        children.append(preview.LatexRendered('x+y', parens='('))
+        kids = _latex_rendered_list(['x', '^', 'y', '^'])  # (x+y)
+        kids.append(preview.LatexRendered('x+y', parens='('))
 
-        out = preview.render_power(children)
+        out = preview.render_power(kids)
         self.assert_latex_rendered(out, latex='x^{y^{x+y}}', tall=True)
 
     def test_parallel(self):
         r""" `render_power` should combine its elements with '\|'. """
-        out = _call_render_method(preview.render_parallel, ['x', '||', 'y'])
+        kids = _latex_rendered_list(['x', '||', 'y'])
+        out = preview.render_parallel(kids)
         self.assert_latex_rendered(out, latex=r'x\|y')
 
     def test_product_mult_only(self):
         r""" `render_product` should combine a product with a '\cdot'. """
-        out = _call_render_method(preview.render_product, ['x', '*', 'y'])
+        kids = _latex_rendered_list(['x', '*', 'y'])
+        out = preview.render_product(kids)
         self.assert_latex_rendered(out, latex=r'x\cdot y')
 
     def test_product_big_frac(self):
         """ `render_product` should combine a fraction with '\frac'. """
-        out = _call_render_method(
-            preview.render_product, list('w*x/y/z')
-        )
+        kids = _latex_rendered_list(list('w*x/y/z'))
+        out = preview.render_product(kids)
         self.assert_latex_rendered(out, latex=r'\frac{w\cdot x}{y\cdot z}', tall=True)
 
     def test_product_single_frac(self):
@@ -230,14 +228,14 @@ class RenderMethodsTest(PreviewTestUtility):
 
     def test_product_keep_going(self):
         """ `render_product` should split into many '\frac's when needed. """
-        out = _call_render_method(
-            preview.render_product, list('p/q*r/s*t')
-        )
+        kids = _latex_rendered_list(list('p/q*r/s*t'))
+        out = preview.render_product(kids)
         self.assert_latex_rendered(out, latex=r'\frac{p}{q}\cdot \frac{r}{s}\cdot t', tall=True)
 
     def test_sum(self):
         """ `render_sum` should combine its elements. """
-        out = _call_render_method(preview.render_sum, list('-a+b-c+d'))
+        kids = _latex_rendered_list(list('-a+b-c+d'))
+        out = preview.render_sum(kids)
         self.assert_latex_rendered(out, latex=r'-a+b-c+d')
 
     def test_sum_tall(self):
@@ -251,12 +249,13 @@ class RenderMethodsTest(PreviewTestUtility):
 
     def test_atom_simple(self):
         """ `render_atom` should pass through items without parens. """
-        out = _call_render_method(preview.render_atom, list('x'))
+        out = preview.render_atom([preview.LatexRendered('x')])
         self.assert_latex_rendered(out, latex='x')
 
     def test_atom_parens(self):
         """ Items wrapped in parens should have a `sans_parens` value. """
-        out = _call_render_method(preview.render_atom, list('(x)'))
+        kids = _latex_rendered_list(list('(x)'))
+        out = preview.render_atom(kids)
         self.assert_latex_rendered(out, latex='(x)', sans_parens='x')
 
 
