@@ -66,15 +66,7 @@
   <script src="${static.url('js/course_info.js')}"></script>
 </%block>
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<%block name="title"><title>${_("About {course.number}").format(course=course)}</title></%block>
-=======
-<%block name="title"><title>About ${course.display_number_with_default}</title></%block>
->>>>>>> add display_coursenumber and display_organization fields on the CourseModule, with some property accessors. Update LMS/CMS pages to use those display strings as appropraite.
-=======
-<%block name="title"><title>About ${course.display_number_with_default | h}</title></%block>
->>>>>>> add escaping
+<%block name="title"><title>${_("About {course.display_number_with_default}").format(course=course) | h}</title></%block>
 
 <section class="course-info">
   <header class="course-profile">
@@ -95,25 +87,15 @@
 	              %if show_courseware_link:
                     <a href="${course_target}">
                 %endif
-<<<<<<< HEAD
-                <span class="register disabled">${_("You are registered for this course {course.number}").format(course=course)}</span>
-=======
-                <span class="register disabled">You are registered for this course (${course.display_number_with_default})</span>
->>>>>>> add display_coursenumber and display_organization fields on the CourseModule, with some property accessors. Update LMS/CMS pages to use those display strings as appropraite.
+
+                <span class="register disabled">${_("You are registered for this course {course.display_number_with_default}").
                 %if show_courseware_link:
                     <strong>${_("View Courseware")}</strong>
                     </a>
                 %endif
         %else:
-<<<<<<< HEAD
-<<<<<<< HEAD
-            <a href="#" class="register">${_("Register for {course.number}").format(course=course)}</a>
-=======
-            <a href="#" class="register">Register for ${course.display_number_with_default}</a>
->>>>>>> add display_coursenumber and display_organization fields on the CourseModule, with some property accessors. Update LMS/CMS pages to use those display strings as appropraite.
-=======
-            <a href="#" class="register">Register for ${course.display_number_with_default | h}</a>
->>>>>>> add escaping
+            <a href="#" class="register">${_("Register for {course.display_number_with_default}").format(course=course)}</a>
+
             <div id="register_error"></div>
         %endif
         </div>
@@ -182,17 +164,8 @@
         </header>
 
         <ol class="important-dates">
-<<<<<<< HEAD
-<<<<<<< HEAD
-          <li><div class="icon course-number"></div><p>${_("Course Number")}</p><span class="course-number">${course.number}</span></li>
+          <li><div class="icon course-number"></div><p>${_("Course Number")}</p><span class="course-number">${course.display_number_with_default | h}</span></li>
           <li><div class="icon start"></div><p>${_("Classes Start")}</p><span class="start-date">${course.start_date_text}</span></li>
-=======
-          <li><div class="icon course-number"></div><p>Course Number</p><span class="course-number">${course.display_number_with_default}</span></li>
-=======
-          <li><div class="icon course-number"></div><p>Course Number</p><span class="course-number">${course.display_number_with_default | h}</span></li>
->>>>>>> add escaping
-          <li><div class="icon start"></div><p>Classes Start</p><span class="start-date">${course.start_date_text}</span></li>
->>>>>>> add display_coursenumber and display_organization fields on the CourseModule, with some property accessors. Update LMS/CMS pages to use those display strings as appropraite.
 
             ## We plan to ditch end_date (which is not stored in course metadata),
             ## but for backwards compatibility, show about/end_date blob if it exists.
