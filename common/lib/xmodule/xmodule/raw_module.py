@@ -32,3 +32,22 @@ class RawDescriptor(XmlDescriptor, XMLEditingDescriptor):
                    context=lines[line - 1][offset - 40:offset + 40],
                    loc=self.location))
             raise Exception, msg, sys.exc_info()[2]
+
+
+class EmptyDataRawDescriptor(XmlDescriptor, XMLEditingDescriptor):
+    """
+    Version of RawDescriptor for modules which may have no XML data,
+    but use XMLEditingDescriptor for import/export handling.
+    """
+    data = String(default='', scope=Scope.content)
+
+    @classmethod
+    def definition_from_xml(cls, xml_object, system):
+        if len(xml_object) == 0 and len(xml_object.items()) == 0:
+            return {'data': ''}, []
+        return {'data': etree.tostring(xml_object, pretty_print=True, encoding='unicode')}, []
+
+    def definition_to_xml(self, resource_fs):
+        if self.data:
+            return etree.fromstring(self.data)
+        return etree.Element(self.category)

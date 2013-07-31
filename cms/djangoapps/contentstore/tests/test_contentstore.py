@@ -855,6 +855,68 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         shutil.rmtree(root_dir)
 
+    def test_export_course_with_metadata_only_word_cloud(self):
+        """
+        Similar to `test_export_course_with_metadata_only_video`.
+        """
+        module_store = modulestore('direct')
+        draft_store = modulestore('draft')
+        content_store = contentstore()
+
+        import_from_xml(module_store, 'common/test/data/', ['word_cloud'])
+        location = CourseDescriptor.id_to_location('HarvardX/ER22x/2013_Spring')
+
+        verticals = module_store.get_items(['i4x', 'HarvardX', 'ER22x', 'vertical', None, None])
+
+        self.assertGreater(len(verticals), 0)
+
+        parent = verticals[0]
+
+        ItemFactory.create(parent_location=parent.location, category="word_cloud", display_name="untitled")
+
+        root_dir = path(mkdtemp_clean())
+
+        print 'Exporting to tempdir = {0}'.format(root_dir)
+
+        # export out to a tempdir
+        export_to_xml(module_store, content_store, location, root_dir, 'test_export', draft_modulestore=draft_store)
+
+        shutil.rmtree(root_dir)
+
+    def test_empty_data_roundtrip(self):
+        """
+        Test that an empty `data` field is preserved through
+        export/import.
+        """
+        module_store = modulestore('direct')
+        draft_store = modulestore('draft')
+        content_store = contentstore()
+
+        import_from_xml(module_store, 'common/test/data/', ['toy'])
+        location = CourseDescriptor.id_to_location('edX/toy/2012_Fall')
+
+        verticals = module_store.get_items(['i4x', 'edX', 'toy', 'vertical', None, None])
+
+        self.assertGreater(len(verticals), 0)
+
+        parent = verticals[0]
+
+        # Create a module, and ensure that its `data` field is empty
+        word_cloud = ItemFactory.create(parent_location=parent.location, category="word_cloud", display_name="untitled")
+        del word_cloud.data
+        self.assertEquals(word_cloud.data, '')
+
+        # Export the course
+        root_dir = path(mkdtemp_clean())
+        export_to_xml(module_store, content_store, location, root_dir, 'test_roundtrip', draft_modulestore=draft_store)
+
+        # Reimport and get the video back
+        import_from_xml(module_store, root_dir)
+        imported_word_cloud = module_store.get_item(Location(['i4x', 'edX', 'toy', 'word_cloud', 'untitled', None]))
+
+        # It should now contain empty data
+        self.assertEquals(imported_word_cloud.data, '')
+
     def test_course_handouts_rewrites(self):
         module_store = modulestore('direct')
 
