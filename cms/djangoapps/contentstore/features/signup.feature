@@ -8,8 +8,7 @@ Feature: Sign in
     When I click the link with the text "Sign Up"
     And I fill in the registration form
     And I press the Create My Account button on the registration form
-    Then I should see be on the studio home page
-    And I should see the message "complete your sign up we need you to verify your email address"
+    Then I should see an email verification prompt
 
   Scenario: Login with a valid redirect
     Given I have opened a new course in Studio
