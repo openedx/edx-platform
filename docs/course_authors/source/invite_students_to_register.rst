@@ -23,7 +23,7 @@ c. Click "**Invite Your Students**" link. Clicking the link creates an email
 template.
  
  
-.. image:: images/image286.png
+.. image:: Images/image286.png
  
  
 d. Email this to your chosen mail list.

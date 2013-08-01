@@ -10,14 +10,14 @@ you want students to be able to access easily. Static pages usually apply to the
 whole course rather than a particular sequence. For example, your static pages
 might include your syllabus or information about your grading policy.
 
-.. image:: images/image155.png
+.. image:: Images/image155.png
 
 When you create a static page, the name of that page appears in your course's
 navigation bar at the top of the page, along with **Courseware**, **Course
 Info**, and other tabs. For example, the following navigation bar includes a
 **Syllabus** static page and a  **Projects** static page.
 
-.. image:: images/image157.png
+.. image:: Images/image157.png
     
 
 To add a static page:
@@ -25,17 +25,17 @@ To add a static page:
 1. On the navigation bar, click **Course Content**, and then click **Static
 Pages**.
 
-.. image:: images/image159.png
+.. image:: Images/image159.png
 
 
 2. In the top right corner, click **New Page**. The following entry appears.
 
-.. image:: images/image161.png
+.. image:: Images/image161.png
 
 
 3. On the right side of the box, click **Edit**. The following dialog box opens.
 
-.. image:: images/image163.png
+.. image:: Images/image163.png
 
 4. In the **display_name** box, type the name that you want to appear in the
 navigation bar for your course.
@@ -66,7 +66,7 @@ click
 https://www.google.com/calendar/embed?src=edx.org_mcjhp2tv3ul2etfpb43hd388p4@group.calendar.g
 oogle.com&amp;ctz=America/New_York_
 
-.. image:: images/image165.png
+.. image:: Images/image165.png
 
 
 To create a Google calendar, access your Google account, and then click
@@ -92,7 +92,7 @@ on Wednesdays, and are due on Sunday of the following week. 3. All quizzes are
 released on Fridays and due on Sunday of the following week (9 days later).
 
 
-.. image:: images/image285.png
+.. image:: Images/image285.png
 
 
 To create a dynamic HTML schedule:
@@ -100,11 +100,11 @@ To create a dynamic HTML schedule:
 1. On the navigation bar, click **Course Content**, and then click **Static
 Pages**.
 
-.. image:: images/image159.png
+.. image:: Images/image159.png
 
 2. In the top right corner, click **New Page**. The following entry appears.
 
-.. image:: images/image161.png
+.. image:: Images/image161.png
 
 3. On the right side of the box, click **Edit**. The following dialog box opens.
 
@@ -113,7 +113,7 @@ Pages**.
 5. Click the **HTML** tab.
   
  
-.. image:: images/image163.png
+.. image:: Images/image163.png
   
  
 6. Go to `Appendix B <appendices/b.html>`_ and copy the code for the dynamic
@@ -147,7 +147,7 @@ The **Files & Uploads** page lists handouts, images, and other content that you
 want to integrate into your course.
 
   
-.. image:: images/image160.png
+.. image:: Images/image160.png
   
  
 For example, if you want to include a cartoon in one of your weekly updates, you
@@ -195,7 +195,7 @@ Uploads**.
 2. On the **>Files & Uploads** page, click **Upload New File**.
   
  
-.. image:: images/image162.png
+.. image:: Images/image162.png
   
  
 3. In the **Upload New File** dialog box, click **Choose File**.
@@ -215,7 +215,7 @@ you can see the URL you will need to use to display an image or create a
 hyperlink.
   
  
-.. image:: images/image164.png
+.. image:: Images/image164.png
   
  
 .. note::
@@ -233,13 +233,13 @@ Add Items to the Handouts Sidebar
 1. On the navigation bar, click **Course Content**, and then click **Updates**.
   
  
-image:: images/image166.png
+image:: Images/image166.png
   
  
 2. Locate the **Course Handouts** sidebar on the right, and then click **Edit**.
   
  
-.. image:: images/image168.png
+.. image:: Images/image168.png
   
  
 3. In the XML box that appears, create links to your files.
@@ -284,14 +284,14 @@ Add an Announcement or Update
     page opens.
   
  
-    .. image:: images/image185.png
+    .. image:: Images/image185.png
 
   
  
     2. Click **New Update**. The following dialog box opens.
   
  
-    .. image:: images/image187.png
+    .. image:: Images/image187.png
   
  
     The content for this box must be formatted in HTML. For a template that you

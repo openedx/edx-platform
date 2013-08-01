@@ -16,7 +16,7 @@ To create a draft, open the Unit that you want. Note that no **Edit** button
 appears on the page for that Unit, and you cannot make changes to the Unit.
  
  
-.. image:: images/image231.png
+.. image:: Images/image231.png
   :width: 600 
  
  
@@ -24,7 +24,7 @@ In the right pane, click the blue **edit a draft** link in the **Unit
 Settings** box.
  
  
-.. image:: images/image233.png
+.. image:: Images/image233.png
   :width: 600 
  
  
@@ -32,7 +32,7 @@ After you click **edit a draft**, you can make changes to the Unit. You can
 edit existing content or add new content.
  
  
-.. image:: images/image235.png
+.. image:: Images/image235.png
   :width: 600 
  
  
@@ -41,7 +41,7 @@ click **Preview the published version **in the yellow banner at the top of
 the page.
  
  
-.. image:: images/image237.png
+.. image:: Images/image237.png
   :width: 600 
  
  
@@ -50,7 +50,7 @@ If you want to view the draft version that you are working on, click
 mode.****
  
  
-.. image:: images/image239.png
+.. image:: Images/image239.png
   :width: 600 
  
  
@@ -58,5 +58,5 @@ When you are done making changes to the Unit, click the blue **replace it
 with this draft** link under **Unit Settings**.
  
  
-.. image:: images/image241.png
+.. image:: Images/image241.png
   :width: 600 

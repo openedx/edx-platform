@@ -106,7 +106,7 @@ To import a course:
 1. On the navigation bar, click **Tools**, and then click **Import**.
  
  
-.. image:: images/image243.png
+.. image:: Images/image243.png
  
  
 2. Under **Course to Import**, click **Choose File**.

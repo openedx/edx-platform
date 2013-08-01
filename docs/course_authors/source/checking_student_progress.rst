@@ -25,7 +25,7 @@ percent needed for each grade cutoff. Here is an example of a student's
 progress through edX101.
  
  
-.. image:: images/image245.png
+.. image:: Images/image245.png
 
  
  
@@ -45,7 +45,7 @@ recorded for the student for all problems in the course. Here is a scrolled
 down view of the example Progress page for the student in the example above:
  
  
-.. image:: images/image247.png
+.. image:: Images/image247.png
  
  
 Again, note that point scores from graded sections are called "Problem
@@ -67,7 +67,7 @@ more course-specific tools get added. Here is the current view of the top of
 the Grades page of the Instructor dashboard for edX101:
  
  
-.. image:: images/image249.png
+.. image:: Images/image249.png
 
  
 Here you see several options for viewing or downloading student grades,

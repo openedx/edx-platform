@@ -19,7 +19,7 @@ You can include videos that run at 0.75 speed, 1.25 speed, and 1.50 speed as wel
 1. Upload the video that you want to YouTube. Make note of the code that appears between **watch?v**
 = and **&feature** in the URL. This code appears in the green box below.
 
-.. image:: images/image053.png
+.. image:: Images/image053.png
   :width: 800 px
 
 2. In Studio, go to the unit that you want.
@@ -38,7 +38,7 @@ the mouse over the icon in the bar at the top of the page. This text also appear
 code (immediately to the right of "0.75:") corresponds to the video at 0.75 speed, the next
 corresponds to 1.0 speed, etc.
 
-.. image:: images/image055.png
+.. image:: Images/image055.png
   :width: 800
 
 8. Click **Save.**

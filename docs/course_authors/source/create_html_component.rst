@@ -3,7 +3,7 @@
 Create an HTML Component
 ************************
 
-    .. image:: images/image067.png
+    .. image:: Images/image067.png
 
 The HTML component is the most basic component type. These components are the
 building blocks of text-based courses. They are used to add information such as
@@ -34,11 +34,11 @@ Create a Basic HTML Component
 1. Under Add New Component, click **html**, and then click **Empty.** The
 following blank component appears.
 
-.. image:: images/image069.png
+.. image:: Images/image069.png
 
 2. In the blank component, click **Edit.** The HTML editor opens.
 
-.. image:: images/image071.png
+.. image:: Images/image071.png
 
 3. Enter the information that you want, and then click **Save.**
 
@@ -56,7 +56,7 @@ following blank component appears.
 1. Under **Add New Component,** click **html** and then click **Announcement.** 
 The following screen opens.
 
-.. image:: images/image073.png
+.. image:: Images/image073.png
 
 2. Click **Edit.**
 
@@ -68,7 +68,7 @@ The following screen opens.
   If you want to enter links to other pages or to images or to edit the
   HTML directly, switch to the HTML tab.
 
-.. image:: images/image075.png
+.. image:: Images/image075.png
 
 3. Click **Save.**
 
@@ -115,7 +115,7 @@ For example, to create a link to the CourseImage.jpg file whose URL is
 
 When you use this code, the following image appears.
 
-.. image:: images/image078.png
+.. image:: Images/image078.png
   :width: 800
 
 3. Click **Save.** Your files or images appear in the component.
@@ -137,7 +137,7 @@ HTML link to that unit. To do this:
 a. On the Course Settings tab, click the blue your course URL link under Basic
   Information.
 
-.. image:: images/image079.png
+.. image:: Images/image079.png
   :width: 800
 
 The registration page for your course opens.
@@ -170,7 +170,7 @@ syntax. ::
   to in Studio and look at the URL in the browser’s address bar. The location ID
   is the text in the URL after edit, as in the following example.
 
-.. image:: images/image081.png  
+.. image:: Images/image081.png  
 
 
 3. Open the unit that you want to link from.
@@ -178,7 +178,7 @@ syntax. ::
 4. Under Add New Component, click html, and then click Empty. A  new, blank
 component appears.
 
-.. image:: images/image083.png
+.. image:: Images/image083.png
   :width: 800
 
 5. Click **edit**.
@@ -215,24 +215,24 @@ You can create an HTML component from imported LaTeX code.
 1. Under **Add New Component**, click **html**, and then click **E-text Written
 in LaTeX.**
 
-.. image:: images/image067.png
+.. image:: Images/image067.png
   :width: 800
 
 2. In the component that appears, click Edit.
 
-.. image:: images/image083.png
+.. image:: Images/image083.png
   :width: 800
 
 3. The component editor opens. In the top left corner of the editor, click the
 yellow **Edit High Level Source** text.
 
-.. image:: images/image085.png
+.. image:: Images/image085.png
   :width: 800
 
 4. In the **High Level Source Editing** screen that opens, replace the sample
 code with your LaTeX code.
 
-.. image:: images/image087.png
+.. image:: Images/image087.png
   :width: 800
 
 5. Click **Save and compile to edX XML** to convert the LaTeX code into edX XML

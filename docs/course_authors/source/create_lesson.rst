@@ -36,10 +36,10 @@ units in your course at a glance, as well as whether the subsections are public
 or private.
 
 
-    .. image:: images/image029.png
+    .. image:: Images/image029.png
        :width: 800
 
-    .. image:: images/image031.png
+    .. image:: Images/image031.png
        :width: 800
 
 .. raw:: latex
@@ -71,7 +71,7 @@ A subsection is a subcategory of a section. Many instructors name subsections
 according to the topics in their courses. Subsection names appear along with
 section names in the left pane when you view your course on Edge.
 
-    .. image:: images/image033.png
+    .. image:: Images/image033.png
 
 You can set subsections to be one of the assignment types that you created when
 you set up grading. You can then include assignments in the body of that
@@ -98,7 +98,7 @@ appear in the left pane with section and subsection headings. Instead, each unit
 appears as a part of the course accordion at the top of the page when you view
 your course on Edge. The following page shows a subsection that has two Units.
 
-    .. image:: images/image035.png
+    .. image:: Images/image035.png
 
 Note that by default, all units are set to **Private.** To make a unit visible
 to students, you have to explicitly change the unit’s visibility to **Public.**
@@ -116,7 +116,7 @@ A component is the part of a unit that contains your actual course content. The
 names of all components in a unit appear when you hover over the unit in the
 course accordion at the top of the page.
 
-.. image:: images/image037.png    
+.. image:: Images/image037.png    
  :width: 800
 
 There are four types of components: Discussion components, HTML components,

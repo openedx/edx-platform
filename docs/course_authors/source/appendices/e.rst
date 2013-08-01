@@ -22,7 +22,7 @@ differences between the two include the following.
 
 Sample Problem:
 
-.. image:: ../images/image287.png
+.. image:: ../Images/image287.png
     :width: 600  
 
 **Problem Code:**
@@ -77,12 +77,12 @@ Sample Problem:
 <optionresponse>
 
 
-  .. image:: ../images/option_response1.png
+  .. image:: ../Images/option_response1.png
 
 
 <optioninput>
 
-  .. image:: ../images/optionresponse2.png
+  .. image:: ../Images/optionresponse2.png
 
 
 .. raw:: latex
@@ -112,7 +112,7 @@ differences between the two include the following.
 
 Sample Problem:
 
-.. image:: ../images/image289.png
+.. image:: ../Images/image289.png
  :width: 600  
 
 **Problem Code:** 
@@ -169,17 +169,17 @@ Sample Problem:
 
 <multiplechoiceresponse>
 
-.. image:: ../images/multipleresponse.png
+.. image:: ../Images/multipleresponse.png
 
 
 <choicegroup>
 
-  .. image:: ../images/multipleresponse2.png
+  .. image:: ../Images/multipleresponse2.png
 
 
 <choice>
 
-  .. image:: ../images/multipleresponse3.png
+  .. image:: ../Images/multipleresponse3.png
 
 
 .. raw:: latex
@@ -203,7 +203,7 @@ have zero correct responses.
 
 Sample Problem:
 
-.. image:: ../images/image290.png
+.. image:: ../Images/image290.png
  :width: 600  
 
 
@@ -263,7 +263,7 @@ clear.
 
 Sample Problem:
 
-.. image:: ../images/image291.png
+.. image:: ../Images/image291.png
  :width: 600   
 
 **Problem Code:**
@@ -303,11 +303,11 @@ Sample Problem:
 
 <stringresponse>
 
-  .. image:: ../images/stringresponse.png
+  .. image:: ../Images/stringresponse.png
 
 <textline>
 
-  .. image:: ../images/stringresponse2.png
+  .. image:: ../Images/stringresponse2.png
 
 
 .. raw:: latex
@@ -330,7 +330,7 @@ script.
 
 Sample Problem:
 
-.. image:: ../images/image292.png
+.. image:: ../Images/image292.png
  :width: 600   
 
 
@@ -483,20 +483,20 @@ XML Attribute Information
 
 <script>
 
-  .. image:: ../images/numericalresponse.png
+  .. image:: ../Images/numericalresponse.png
 
 <numericalresponse>
 
 
-  .. image:: ../images/numericalresponse2.png
+  .. image:: ../Images/numericalresponse2.png
 
 <responseparam>
 
-  .. image:: ../images/numericalresponse4.png
+  .. image:: ../Images/numericalresponse4.png
 
 <textline>
 
-  .. image:: ../images/numericalresponse5.png
+  .. image:: ../Images/numericalresponse5.png
 
 
 .. raw:: latex
@@ -524,7 +524,7 @@ order to test for correctness.
 
 Sample Problem:
 
-.. image:: ../images/image293.png
+.. image:: ../Images/image293.png
  :width: 600   
 
 **Problem Code**:
@@ -592,18 +592,18 @@ XML Attribute Information
 <script>
 
 
-  .. image:: ../images/formularesponse.png
+  .. image:: ../Images/formularesponse.png
 
 
 <formularesponse>
 
 
-  .. image:: ../images/formularesponse3.png
+  .. image:: ../Images/formularesponse3.png
 
 <responseparam>
 
 
-  .. image:: ../images/formularesponse6.png
+  .. image:: ../Images/formularesponse6.png
 
 
 .. raw:: latex
@@ -621,7 +621,7 @@ Images have to be uploaded to the courseware Assets directory. Response clicks a
 
 Sample Problem:
 
-.. image:: ../images/image294.png
+.. image:: ../Images/image294.png
  :width: 600   
 
 
@@ -650,11 +650,11 @@ XML Attribute Information
 
 <imageresponse>
 
-  .. image:: ../images/imageresponse1.png
+  .. image:: ../Images/imageresponse1.png
 
 <imageinput>
 
-  .. image:: ../images/imageresponse2.png
+  .. image:: ../Images/imageresponse2.png
 
 .. raw:: latex
   
@@ -668,7 +668,7 @@ A Custom Response input type accepts one or more lines of text input from the st
 
 Sample Problem:
 
-.. image:: ../images/image295.png
+.. image:: ../Images/image295.png
  :width: 600  
 
 
@@ -796,7 +796,7 @@ that allows the student to enter chemical equations as answers.
 
 Sample Problem:
 
-.. image:: ../images/image296.png
+.. image:: ../Images/image296.png
  :width: 600   
 
 **Problem Code**:
@@ -838,13 +838,13 @@ student can construct a schematic answer, such as a circuit.
 
 Sample Problem:
 
-.. image:: ../images/image297.png
+.. image:: ../Images/image297.png
  :width: 600 
 
-.. image:: ../images/image298.png
+.. image:: ../Images/image298.png
  :width: 600   
 
-.. image:: ../images/image299.png
+.. image:: ../Images/image299.png
  :width: 600   
 
 **Problem Code**:

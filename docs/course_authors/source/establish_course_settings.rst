@@ -27,14 +27,14 @@ Add Collaborators
     1. On the navigation bar, click **Course Settings**, and then click **Course Team**.
  
  
-    .. image:: images/image115.png
+    .. image:: Images/image115.png
   
  
  
     2. Click **New User**.
  
  
-    .. image:: images/image117.png
+    .. image:: Images/image117.png
  
  
     3. In the **email** box, type the  mail address of the user, and then click **Add User**.
@@ -68,7 +68,7 @@ Add Manual Policy Data
     2. Click **New Manual Policy** .
  
  
-      .. image:: images/image119.png  
+      .. image:: Images/image119.png  
  
  
     3. In the **Policy Key** box, enter the policy key.
@@ -89,7 +89,7 @@ Add Course Catalog Information
     To add scheduling information, a description, and other information for your course, use the **Course Settings** menu.
  
  
-     .. image:: images/image121.png  
+     .. image:: Images/image121.png  
  
  
     This takes you to the 
@@ -100,7 +100,7 @@ Schedule and Details Page
  
 1. At the top of this page, you will find a section with the **Basic Information** for your course. It is here that you can locate the title of your course and find the URL for your course, which you can  mail to students to invite students to enroll in your course. 
 
- .. image:: images/image281.png   
+ .. image:: Images/image281.png   
  
  
 2. In the **Course Schedule** section, enter the date you want your course to start in the **Course Start Date** box, and then enter the time you want your course to start in the **Course** **Start Time** box.
@@ -144,7 +144,7 @@ Add a Course Overview
  
 2. Scroll down to the **Introducing Your Course** section, and then locate the **Course Overview** box.
 
-.. image:: images/image123.png
+.. image:: Images/image123.png
    
 
  
@@ -168,7 +168,7 @@ If your course has prerequisites, you can include that information in the course
 The following is example content for the **Course Overview** box:
  
  
-.. image:: images/image125.png   
+.. image:: Images/image125.png   
 
   
 Add an About Video
@@ -181,7 +181,7 @@ You can create an About video that will appear on the **About** page for your co
 1. Upload the video that you want to YouTube. Make note of the code that appears between   ** watch?v =**  and   ** &feature**  in the URL. This code appears in the green box below.
 
 
-.. image:: images/image127.png      
+.. image:: Images/image127.png      
  
  
 2. On the navigation bar, click **Course Settings**, and then click **Schedule & Details** .
@@ -191,7 +191,7 @@ You can create an About video that will appear on the **About** page for your co
     field. If you have not already added a video, you see a blank field above an **id** box.
  
  
-.. image:: images/image129.png    
+.. image:: Images/image129.png    
  
  
 4. In the **your YouTube video's ID**  box, enter your video code. When you add the code, the video automatically appears in the field above the   **your YouTube video's ID**  box.
@@ -205,7 +205,7 @@ You can create an About video that will appear on the **About** page for your co
 For example, your course introduction video appears as follows.
  
  
-.. image:: images/image131.png 
+.. image:: Images/image131.png 
  
   
 Add Weekly Time Requirements Information

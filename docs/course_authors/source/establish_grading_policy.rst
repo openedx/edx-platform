@@ -15,7 +15,7 @@ Setting up grading in edX Studio has several steps. These steps will be explaine
 
 1. Establish an overall grading policy, also see :ref:`Set Grade Brackets<Set-Grade-Brackets>`.
           
-.. image:: images/image139.png
+.. image:: Images/image139.png
   
 This is done at the course level in the **Course Settings** menu.
   
@@ -29,7 +29,7 @@ Create assignment types for the course and determine the weight of the student's
 2. Create subsections that contain graded assignments in the body of the course, see :ref:`Create Subsections that Contain Graded Assignments<Create-Graded-Subsections>`.
               
 
-.. image:: images/image135.png
+.. image:: Images/image135.png
 
   
 Each subsection in your course can be designated as one of the assignment types that you have specified in the grading policy. You can also specify a release date and a due date.
@@ -43,7 +43,7 @@ For more information on creating problems, see `Create a Problem <Create_Problem
  
 3. In the assignment subsections, create individual problems 
 
-.. image:: images/image137.png
+.. image:: Images/image137.png
   
   
 You can then establish the settings for these problems (including the number of attempts a student has and the problem's point value, or weight).  
@@ -69,7 +69,7 @@ To set the thresholds for course grades:
 	The default grade divisions are Pass and Fail. To add more grade divisions (such as A, B, C, or D), click the plus sign (+).
     
   
-.. image:: images/image133.png    
+.. image:: Images/image133.png    
 
 To remove a grade division, hover the mouse over the grade division (shown above) and then click the **Remove** link that appears above the grade division.
 
@@ -116,7 +116,7 @@ This is a general category of assessment (homework, exam, exercise). All assignm
 **Abbreviation:** 
 This is the short name that will appear next to an assignment on every student's **Progress** tab (see below).
   
-.. image:: images/image141.png
+.. image:: Images/image141.png
       
   
 **Weight of Total Grade:** 
@@ -133,7 +133,7 @@ The number of assignments of that type that you plan to present in your course.
   
 For example, the following course has two types of assignments. The overall course grade is broken down as 40% Homework and 60% Final Exam. There are eight Homework assignments, and the grader will omit the lowest-scored assignment from the final grade. Thus, the seven remaining Homework assignments are each worth 40 7 = 5.8% of the final grade.
   
-.. image:: images/image143.png
+.. image:: Images/image143.png
           
 Troubleshooting
 +++++++++++++++
@@ -171,7 +171,7 @@ All assignments of a particular type are automatically worth the same amount. Th
 1. On the navigation bar, click **Course Content**, and then click **Outline**.
   
   
-.. image:: images/image145.png
+.. image:: Images/image145.png
 
       
 2. Under **Course Outline**, locate the section where you want to add an assignment.
@@ -183,16 +183,16 @@ All assignments of a particular type are automatically worth the same amount. Th
 Click the subsection you want. The edit page for the subsection opens. In the top right corner of the page, locate the **Subsection Settings** box.
 
 
-.. image:: images/image147.png     
+.. image:: Images/image147.png     
       
 Set the assignment type. To do this, locate the blue link next to **Graded as**. Because all subsections are set to  **Not Graded** by default, the text for this link is **NOT GRADED**.
 
-.. image:: images/image149.png  
+.. image:: Images/image149.png  
     
 Click this link to open a list of the assignment types that you specified in your grading rubric, and then click the assignment type that you want.
   
   
-.. image:: images/image151.png   
+.. image:: Images/image151.png   
 
 Set the assignment's release date and time. To set the date, click inside the **Release date** field, and then select the date that you want in the calendar that appears. To set the release time, click inside the time input field, and then specify the time you want.
        
@@ -209,7 +209,7 @@ To set the assignment type for a subsection:
   
 3. On the right side of the screen, click the blue check mark for the subsection, and then select the assignment type.
   
-.. image:: images/image153.png   
+.. image:: Images/image153.png   
 
 .. note::
 

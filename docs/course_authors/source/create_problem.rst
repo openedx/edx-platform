@@ -52,13 +52,13 @@ Some of the simpler problem templates, including multiple choice, open in the Si
    
 To open the Advanced Editor, click **Advanced Editor** in the top right corner of the Simple Editor.
 
-.. image:: images/image275.png
+.. image:: Images/image275.png
     :width: 600px
    
 
 The following is a multiple choice problem in the Advanced Editor.
 
-.. image:: images/image276.png
+.. image:: Images/image276.png
     :width: 600px
 
 .. raw:: latex
@@ -214,7 +214,7 @@ If a student wants to save but not submit a response, the student can click **Sa
 In the following problem, enter a response, and then click **Check**. The problem tells you if your response is correct or incorrect.
 Additionally, although you don't see it, a point score is also automatically stored for the response you submit.
 
-.. image:: images/image277.png
+.. image:: Images/image277.png
     :width: 600px
 
 **Show Answer button**
@@ -225,12 +225,12 @@ editor. It can be set to be never visible, always visible, or visible only when 
 
 In the following problem, the **Show Answer ** button appears after the student has made at least one attempt to answer. Enter a response that you know is wrong, and then click **Check**.
 
-.. image:: images/image278.png
+.. image:: Images/image278.png
     :width: 600px
 
 Now, click **Show Answer** to view the correct answer and its explanation.
 
-.. image:: images/image279.png
+.. image:: Images/image279.png
     :width: 600px
 
 
@@ -257,20 +257,20 @@ that the student can see when the student clicks **Show Answer**.
 
 1. Under **Add New Component**, click **Problem**.
 
-.. image:: images/image096.png
+.. image:: Images/image096.png
     :width: 600px
 
 
 The **Select Problem Component Type** screen appears. By default, the **Common Problem Types** tab is selected.
 
-.. image:: images/image097.png
+.. image:: Images/image097.png
     :width: 600px
 
 
 To see a list of more complex problem types, click the **Advanced** tab.
 
 
-.. image:: images/image099.png
+.. image:: Images/image099.png
     :width: 600px
 
 
@@ -284,7 +284,7 @@ A new problem component with sample template text appears.
 
 For example, if you click **Multiple Choice**, the following problem component appears.
 
-.. image:: images/image101.png
+.. image:: Images/image101.png
     :width: 600px
 
 
@@ -292,7 +292,7 @@ For example, if you click **Multiple Choice**, the following problem component a
 3. Click **Edit**. This opens the Simple Editor for the problem component. The following example shows this view for a multiple choice
 problem.
 
-.. image:: images/image103.jpg
+.. image:: Images/image103.jpg
     :width: 600px
 
 

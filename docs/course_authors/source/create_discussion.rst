@@ -40,20 +40,20 @@ that contains the  question you want students to discuss.
 4. Directly under this new HTML component, click **Discussion** under **Add New
 Component.**
 
-.. image:: images/image057.png
+.. image:: Images/image057.png
 
 5. When the following box appears, click **Discussion Tag.**
 
-.. image:: images/image059.png
+.. image:: Images/image059.png
 
 6. When the following box appears, click **Edit.**
 
-.. image:: images/image061.png
+.. image:: Images/image061.png
 
 The following editing box opens. You will change the values in the small boxes,
 but you will not change the text in the large box.
 
-.. image:: images/image063.png
+.. image:: Images/image063.png
 
 .. note::
 
@@ -74,7 +74,7 @@ and you set **discussion_target** to be “Online Instruction Methods,” the
 category and subcategory appear as follow in the category list in the discussion
 forum:
 
-.. image:: images/image065.png
+.. image:: Images/image065.png
  :width: 300
 
 9. In the **display_name** box, type a name for the discussion. The display name

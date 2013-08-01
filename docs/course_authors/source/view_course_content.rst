@@ -37,10 +37,10 @@ can change this date so that individual Subsections are released at different
 times after the Section has been released.
  
  
-.. image:: images/image189.png
+.. image:: Images/image189.png
  
  
-.. image:: images/image191.png
+.. image:: Images/image191.png
 
  
 3. You set the Unit that contains the content to Public.** By default, all
@@ -87,7 +87,7 @@ go to the **Course Outline **page. On the**Course Outline **page, you can
 see the "macro" outline of your course, down to individual Units.
  
  
-.. image:: images/image193.png
+.. image:: Images/image193.png
 
 
 .. raw:: latex
@@ -105,7 +105,7 @@ are set to Public or Private. Private Units appear in light gray text with
 "PRIVATE" next to the Unit name. All other Units are Public.
  
  
-.. image:: images/image195.png
+.. image:: Images/image195.png
 
 
 .. raw:: latex
@@ -129,14 +129,14 @@ The following Unit is set to Public. The release date for the Subsection has
 passed.
  
  
-.. image:: images/image197.png
+.. image:: Images/image197.png
  
  
 The following Unit is set to Private. The release date for the Subsection
 has passed.
  
  
-.. image:: images/image199.png
+.. image:: Images/image199.png
  
  
 If you change the release date for the "What Does an edX Course Look Like?"
@@ -149,7 +149,7 @@ Public Unit
 
  
  
-.. image:: images/image201.png
+.. image:: Images/image201.png
  
  
 Private Unit
@@ -157,7 +157,7 @@ Private Unit
 
  
  
-.. image:: images/image203.png
+.. image:: Images/image203.png
 
 
 
@@ -184,7 +184,7 @@ You can enter Preview mode in two ways.
 1. On any Subsection page, click** Preview Drafts**.
  
  
-.. image:: images/image205.png
+.. image:: Images/image205.png
  
  
 2. On any Unit page, click **Preview**.
@@ -194,14 +194,14 @@ The following example shows the **Preview** button on a page for a Unit that
 is set to Public.
  
  
-.. image:: images/image207.png
+.. image:: Images/image207.png
  
  
 The following example shows the **Preview** button on a page for a Unit that
 is set to Private.
  
  
-.. image:: images/image209.png
+.. image:: Images/image209.png
  
 Example
 =======
@@ -210,7 +210,7 @@ The following example shows the first Unit of the "What Does an edX Course
 Look Like?" Subsection in Preview mode.
  
  
-.. image:: images/image211.png
+.. image:: Images/image211.png
  
  
 Remember that the release date for the Subsection is in the past. However,
@@ -224,12 +224,12 @@ edX 101") is set to Public, and Unit 2 ("New edX Information") is set to
 Private. Both Units appear in the course ribbon at the top of the screen.
  
  
-.. image:: images/image213.png
+.. image:: Images/image213.png
 
 When you click Unit 2 in the course ribbon, you see the content in Unit 2:
  
  
-.. image:: images/image215.png
+.. image:: Images/image215.png
  
 **On edX or Edge as an Instructor**
  
@@ -253,20 +253,20 @@ To view your course on edX or Edge as an instructor, click **View Live**. The
 The **Course Outline** page.
  
  
-.. image:: images/image217.png
+.. image:: Images/image217.png
  
  
 Any Subsection page.
  
  
-.. image:: images/image219.png
+.. image:: Images/image219.png
  
  
  
 The Unit page, if the Unit is Public.
  
  
-.. image:: images/image221.png
+.. image:: Images/image221.png
  
 Example
 =======
@@ -276,7 +276,7 @@ Look Like?" Subsection as if you were viewing it on edX or Edge as an
 instructor. Notice the **Instructor** tab at the top of the page.
  
  
-.. image:: images/image223.png
+.. image:: Images/image223.png
  
  
 The release date for the "What Does an edX Course Look Like?" Subsection is
@@ -289,7 +289,7 @@ to Private. Unit 2 does not appear in the course ribbon at the top of the
 screen. Instead, the next public unit, **Tabs**, appears.
  
  
-.. image:: images/image225.png
+.. image:: Images/image225.png
  
 **On edX or Edge as a Current Student**
  
@@ -322,7 +322,7 @@ student. Notice that the **Instructor** tab does not appear at the top of
 the page.
  
  
-.. image:: images/image227.png
+.. image:: Images/image227.png
  
  
 Remember that Unit 1 is set to Public, and Unit 2 is set to Private. Unit 2
@@ -330,7 +330,7 @@ does not appear in the course ribbon at the top of the screen. Instead, the
 next public unit, **Tabs**, appears.
  
  
-.. image:: images/image229.png
+.. image:: Images/image229.png
  
  
 If you change the release date of the Subsection to a future date (such as

@@ -7,7 +7,7 @@ Create a Unit
 
    2. Click **New Unit.** The following screen appears.
 
-    .. image:: images/image051.png
+    .. image:: Images/image051.png
        :width: 800
 
 

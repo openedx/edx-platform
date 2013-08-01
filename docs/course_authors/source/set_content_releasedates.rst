@@ -16,7 +16,7 @@ Section
     2. Find the section you are looking for in the course outline.
 
     3. Under **Will Release**, click **Edit**, and then change the date.
- .. image:: images/image280.png
+ .. image:: Images/image280.png
 
 Subsection
 **********

@@ -1,5 +1,5 @@
 
-.. image:: images/image001.png
+.. image:: Images/image001.png
 
 
 ###########################
@@ -32,7 +32,7 @@ Studio (http://studio.edge.edx.org) is our web-based course authoring tool. It i
 1. First, go to: https://studio.edge.edx.org. Sign up and create an account.
 
 
-.. image:: images/image009.png
+.. image:: Images/image009.png
  :width: 800  
 
 
@@ -42,7 +42,7 @@ Studio (http://studio.edge.edx.org) is our web-based course authoring tool. It i
 2. Create a course in Studio.
 
 
-.. image:: images/image021.png
+.. image:: Images/image021.png
  :width: 800
 
 
@@ -52,7 +52,7 @@ Studio (http://studio.edge.edx.org) is our web-based course authoring tool. It i
 3. View your course on Edge.
 
 
-.. image:: images/image027.png
+.. image:: Images/image027.png
  :width: 800
 
 .. raw:: latex
@@ -70,7 +70,7 @@ When you create your account on Studio, an account on Edge is automatically crea
 
 Edge has two views - an Instructor view and a Student view. When you view your course on Edge, you view your course as an instructor, and you see the **Instructor** tab at the top of the page.
 
-.. image:: images/image007.png
+.. image:: Images/image007.png
  :width: 800
     
 
@@ -80,20 +80,20 @@ To create an account:
 
 1. Go to http://studio.edge.edX.org. The Welcome to edX Studio page opens.
 
-.. image:: images/image009.png
+.. image:: Images/image009.png
  :width: 800
 
    
 2. Scroll to the bottom of the page and click **Sign Up & Start Making an edX Course.**
 
-.. image:: images/image011.png
+.. image:: Images/image011.png
  :width: 800
 
  
 3.  In the page that opens, fill in the fields. Required fields are marked with an asterisk (*).
 
 
-.. image:: images/image013.png
+.. image:: Images/image013.png
  :width: 800
 
  
@@ -104,17 +104,17 @@ d. In the **Full Name** box, type your full name. This name only appears in Stud
    Your students will not see this name.
 e.  Click to select I agree to the Terms of Service.
 
-.. image:: images/image017.png
+.. image:: Images/image017.png
  :width: 800
 
 4. Click **Create My Account & Start Authoring Courses,** After you click this button, the following page opens. 
 
-.. image:: images/image015.png
+.. image:: Images/image015.png
  :width: 800
 
 5. To finish creating your account, click the link that you receive in the activation e-mail. When you click this link, the following page opens.
 
-.. image:: images/image017.png
+.. image:: Images/image017.png
  :width: 800
 
  .. raw:: latex
@@ -127,12 +127,12 @@ Create a New Course
 
 The first time that you log in to Studio, the following page opens.
 
-.. image:: images/image017.png
+.. image:: Images/image017.png
  :width: 800
  
 Click the **dashboard** link, and the **My Courses** page opens. 
 
-.. image:: images/image021.png
+.. image:: Images/image021.png
  :width: 800
 
 Once you have created a course in Studio, it will be listed on this page. From here, you can start creating courses immediately by clicking the **New Course** button.
@@ -158,12 +158,12 @@ To create a new course:
 
 5. Click **Save.**
 
-.. image:: images/image025.png
+.. image:: Images/image025.png
  :width: 800
     
 If you click **View Live** your course appears as follows on Edge.
 
-.. image:: images/image027.png
+.. image:: Images/image027.png
  :width: 800
 
 *Note: Although the start date is set to the current date by default, your course will not be advertised, so it will not be visible to the general public. You can change the start date of your course in Studio.*
