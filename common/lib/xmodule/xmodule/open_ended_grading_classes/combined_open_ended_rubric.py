@@ -208,6 +208,7 @@ class CombinedOpenEndedRubric(object):
                                                                                       feedback_types)
         rubric_categories = self.extract_categories(rubric_xml)
         max_scores = map((lambda cat: cat['options'][-1]['points']), rubric_categories)
+        actual_scores = []
         max_score = max(max_scores)
         for i in xrange(0, len(rubric_categories)):
             category = rubric_categories[i]
@@ -217,9 +218,18 @@ class CombinedOpenEndedRubric(object):
                     if tuple[1] == i and tuple[2] == j:
                         for grader_type in tuple[3]:
                             rubric_categories[i]['options'][j]['grader_types'].append(grader_type)
+                            if len(actual_scores)<=i:
+                                actual_scores.append([j])
+                            else:
+                                actual_scores[i] += [j]
+
+        actual_scores = [sum(i)/len(i) for i in actual_scores]
+        correct = [int(a>.66) for a in actual_scores]
 
         html = self.system.render_template('{0}/open_ended_combined_rubric.html'.format(self.TEMPLATE_DIR),
                                            {'categories': rubric_categories,
+                                            'max_scores': max_scores,
+                                            'correct' : correct,
                                             'has_score': True,
                                             'view_only': True,
                                             'max_score': max_score,

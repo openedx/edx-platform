@@ -58,7 +58,7 @@ class OpenEndedChild(object):
         'assessing': 'In progress',
         'post_assessment': 'Done',
         'done': 'Done',
-    }
+        }
 
     def __init__(self, system, location, definition, descriptor, static_data,
                  instance_state=None, shared_state=None, **kwargs):
@@ -229,7 +229,7 @@ class OpenEndedChild(object):
             'max_score': self._max_score,
             'child_attempts': self.child_attempts,
             'child_created': False,
-        }
+            }
         return json.dumps(state)
 
     def _allow_reset(self):

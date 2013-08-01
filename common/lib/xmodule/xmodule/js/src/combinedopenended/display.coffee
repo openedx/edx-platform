@@ -55,7 +55,6 @@ class @Rubric
     data = {location: location, selection: target_selection, category: category}
     Logger.log 'rubric_select', data
 
-
   # finds the scores for each rubric category
   @get_score_list: () =>
     # find the number of categories:
@@ -97,7 +96,6 @@ class @CombinedOpenEnded
   submit_evaluation_sel: '.submit-evaluation-button'
   result_container_sel: 'div.result-container'
   combined_rubric_sel: '.combined-rubric-container'
-  legend_sel: '.legend-container'
   open_ended_child_sel: 'section.open-ended-child'
   error_sel: '.error'
   answer_area_sel: 'textarea.answer'
@@ -114,6 +112,8 @@ class @CombinedOpenEnded
   sub_id_sel: 'input.submission_id'
   grader_id_sel: 'input.grader_id'
   grader_status_sel: '.grader-status'
+  info_rubric_elements_sel: '.rubric-elements-info'
+  rubric_collapse_sel: '.rubric-collapse'
 
   constructor: (el) ->
     @el=el
@@ -194,10 +194,6 @@ class @CombinedOpenEnded
     else if @task_number==1 and @child_state!='initial'
       @prompt_hide()
 
-    if @child_state!="initial"
-      @show_legend_current()
-    @legend_container= @$(@legend_sel)
-
     @find_assessment_elements()
     @find_hint_elements()
 
@@ -240,7 +236,10 @@ class @CombinedOpenEnded
     $.postWithPrefix "#{@ajax_url}/get_combined_rubric", data, (response) =>
       if response.success
         @combined_rubric_container.after(response.html).remove()
-        @combined_rubric_container= $(@combined_rubric_sel)
+        @combined_rubric_container= @$(@combined_rubric_sel)
+        @toggle_rubric("")
+        @rubric_collapse = @$(@rubric_collapse_sel)
+        @rubric_collapse.click @toggle_rubric
 
   show_status_current: () =>
     data = {}
@@ -248,13 +247,6 @@ class @CombinedOpenEnded
       if response.success
         @status_container.after(response.html).remove()
         @status_container= $(@status_container_sel)
-
-  show_legend_current: () =>
-    data = {}
-    $.postWithPrefix "#{@ajax_url}/get_legend", data, (response) =>
-      if response.success
-        @legend_container.after(response.html).remove()
-        @legend_container= $(@legend_sel)
 
   get_last_response: () =>
     data = {}
@@ -302,7 +294,6 @@ class @CombinedOpenEnded
     @reset_button.hide()
     @next_problem_button.hide()
     @hide_file_upload()
-    @legend_container.show()
     @hint_area.attr('disabled', false)
     if @task_number>1 or @child_state!='initial'
       @show_status_current()
@@ -325,7 +316,6 @@ class @CombinedOpenEnded
       @submit_button.prop('value', 'Submit')
       @submit_button.click @save_answer
       @setup_file_upload()
-      @legend_container.hide()
     else if @child_state == 'assessing'
       @answer_area.attr("disabled", true)
       @replace_text_inputs()
@@ -338,7 +328,6 @@ class @CombinedOpenEnded
         if @task_number==1 and @task_count==1
           @grader_status = @$(@grader_status_sel)
           @grader_status.html("<p>Response submitted for scoring.</p>")
-      @legend_container.hide()
     else if @child_state == 'post_assessment'
       if @child_type=="openended"
         @skip_button.show()
@@ -568,7 +557,7 @@ class @CombinedOpenEnded
   reload: ->
     location.reload()
 
-  collapse_question: () =>
+  collapse_question: (event) =>
     @prompt_container.slideToggle()
     @prompt_container.toggleClass('open')
     if @question_header.text() == "(Hide)"
@@ -578,6 +567,7 @@ class @CombinedOpenEnded
       Logger.log 'oe_show_question', {location: @location}
       new_text = "(Hide)"
     @question_header.text(new_text)
+    return false
 
   prompt_show: () =>
     if @prompt_container.is(":hidden")==true
@@ -628,3 +618,8 @@ class @CombinedOpenEnded
         @$(@file_upload_preview_sel)[0].height = height_px/scale_factor
         @$(@file_upload_preview_sel).show()
       reader.readAsDataURL(@$(@file_upload_box_sel)[0].files[0])
+
+  toggle_rubric: (event) =>
+    info_rubric_elements = @$(@info_rubric_elements_sel)
+    info_rubric_elements.slideToggle()
+    return false
