@@ -315,8 +315,8 @@ jasmine.JQuery.matchersClass = {};
           || jasmine.isDomNode(this.actual))) {
             this.actual = $(this.actual)
             var result = jQueryMatchers[methodName].apply(this, arguments)
-            var element;      	
-            if (this.actual.get && (element = this.actual.get()[0]) && !$.isWindow(element) && element.tagName !== "HTML") 
+            var element;
+            if (this.actual.get && (element = this.actual.get()[0]) && !$.isWindow(element) && element.tagName !== "HTML")
               this.actual = jasmine.JQuery.elementToString(this.actual)
             return result
           }

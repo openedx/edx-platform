@@ -8,6 +8,55 @@ window.YT =
     BUFFERING: 3
     CUED: 5
 
+window.STATUS = window.YT.PlayerState
+
+oldAjaxWithPrefix = window.jQuery.ajaxWithPrefix
+
+jasmine.stubbedCaption =
+      end: [3120, 6270, 8490, 21620, 24920, 25750, 27900, 34380, 35550, 40250]
+      start: [1180, 3120, 6270, 14910, 21620, 24920, 25750, 27900, 34380, 35550]
+      text: [
+        "MICHAEL CIMA: So let's do the first one here.",
+        "Vacancies, where do they come from?",
+        "Well, imagine a perfect crystal.",
+        "Now we know at any temperature other than absolute zero there's enough",
+        "energy going around that some atoms will have more energy",
+        "than others, right?",
+        "There's a distribution.",
+        "If I plot energy here and number, these atoms in the crystal will have a",
+        "distribution of energy.",
+        "And some will have quite a bit of energy, just for a moment."
+      ]
+
+# For our purposes, we need to make sure that the function $.ajaxWithPrefix
+# does not fail when during tests a captions file is requested.
+# It is originally defined in
+#
+#     common/static/coffee/src/ajax_prefix.js
+#
+# We will replace it with a function that does:
+#
+#     1.) Return a hard coded captions object if the file name contains 'test_name_of_the_subtitles'.
+#     2.) Behaves the same a as the origianl in all other cases.
+
+window.jQuery.ajaxWithPrefix = (url, settings) ->
+  if not settings
+      settings = url
+      url = settings.url
+      success = settings.success
+      data = settings.data
+
+  if url.match(/test_name_of_the_subtitles/g) isnt null or url.match(/slowerSpeedYoutubeId/g) isnt null or url.match(/normalSpeedYoutubeId/g) isnt null
+    if window.jQuery.isFunction(success) is true
+      success jasmine.stubbedCaption
+    else if window.jQuery.isFunction(data) is true
+      data jasmine.stubbedCaption
+  else
+    oldAjaxWithPrefix.apply @, arguments
+
+# Time waitsFor() should wait for before failing a test.
+window.WAIT_TIMEOUT = 1000
+
 jasmine.getFixtures().fixturesPath = 'xmodule/js/fixtures'
 
 jasmine.stubbedMetadata =
@@ -32,10 +81,6 @@ jasmine.fireEvent = (el, eventName) ->
     el.dispatchEvent(event)
   else
     el.fireEvent("on" + event.eventType, event)
-
-jasmine.stubbedCaption =
-  start: [0, 10000, 20000, 30000]
-  text: ['Caption at 0', 'Caption at 10000', 'Caption at 20000', 'Caption at 30000']
 
 jasmine.stubbedHtml5Speeds = ['0.75', '1.0', '1.25', '1.50']
 
@@ -78,7 +123,8 @@ jasmine.stubVideoPlayer = (context, enableParts, createPlayer=true) ->
   if createPlayer
     return new VideoPlayer(video: context.video)
 
-jasmine.stubVideoPlayerAlpha = (context, enableParts, createPlayer=true, html5=false) ->
+jasmine.stubVideoPlayerAlpha = (context, enableParts, html5=false) ->
+  console.log('stubVideoPlayerAlpha called')
   suite = context.suite
   currentPartName = suite.description while suite = suite.parentSuite
   if html5 == false
@@ -88,10 +134,8 @@ jasmine.stubVideoPlayerAlpha = (context, enableParts, createPlayer=true, html5=f
   jasmine.stubRequests()
   YT.Player = undefined
   window.OldVideoPlayerAlpha = undefined
-  context.video = new VideoAlpha '#example', '.75:slowerSpeedYoutubeId,1.0:normalSpeedYoutubeId'
   jasmine.stubYoutubePlayer()
-  if createPlayer
-    return new VideoPlayerAlpha(video: context.video)
+  return new VideoAlpha '#example', '.75:slowerSpeedYoutubeId,1.0:normalSpeedYoutubeId'
 
 
 # Stub jQuery.cookie
