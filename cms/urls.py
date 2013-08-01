@@ -137,9 +137,7 @@ urlpatterns += (
 
 
 if settings.ENABLE_JASMINE:
-    # # Jasmine
-    urlpatterns = urlpatterns + (url(r'^_jasmine/', include('django_jasmine.urls')),)
-
+    urlpatterns += (url(r'^_jasmine/', include('django_jasmine.urls')),)
 
 if settings.MITX_FEATURES.get('ENABLE_SERVICE_STATUS'):
     urlpatterns += (
@@ -153,6 +151,13 @@ if settings.MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_LOAD_TESTING'):
     urlpatterns += (
         url(r'^auto_auth$', 'student.views.auto_auth'),
     )
+
+if settings.DEBUG:
+    try:
+        from .urls_dev import urlpatterns as dev_urlpatterns
+        urlpatterns += dev_urlpatterns
+    except ImportError:
+        pass
 
 urlpatterns = patterns(*urlpatterns)
 
