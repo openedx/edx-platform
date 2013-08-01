@@ -417,6 +417,28 @@ class EvaluatorTest(unittest.TestCase):
             -1, delta=1e-5
         )
 
+    def test_explicit_sci_notation(self):
+        """
+        Expressions like 1.6*10^-3 (not 1.6e-3) it should evaluate.
+        """
+        self.assertEqual(
+            calc.evaluator({}, {}, "-1.6*10^-3"),
+            -0.0016
+        )
+        self.assertEqual(
+            calc.evaluator({}, {}, "-1.6*10^(-3)"),
+            -0.0016
+        )
+
+        self.assertEqual(
+            calc.evaluator({}, {}, "-1.6*10^3"),
+            -1600
+        )
+        self.assertEqual(
+            calc.evaluator({}, {}, "-1.6*10^(3)"),
+            -1600
+        )
+
     def test_simple_vars(self):
         """
         Substitution of variables into simple equations

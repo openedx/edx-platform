@@ -114,6 +114,13 @@ class RenderMethodsTest(PreviewTestUtility):
             latex=r'6.0221413\!\times\!10^{+23}', tall=True
         )
 
+        kids = _latex_rendered_list(['-', '6.0221413', 'E', '+', '23'])
+        out = preview.render_number(kids)
+        self.assert_latex_rendered(
+            out,
+            latex=r'-6.0221413\!\times\!10^{+23}', tall=True
+        )
+
     def test_number_sci_notation_suffix(self):
         """ Test numbers with both """
         kids = _latex_rendered_list(['6.0221413', 'E', '+', '23', 'k'])

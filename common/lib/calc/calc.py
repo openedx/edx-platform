@@ -336,6 +336,7 @@ class ParseAugmenter(object):
         # 0.33k or 17
         plus_minus = Literal('+') | Literal('-')
         number = Group(
+            Optional(plus_minus) +
             inner_number +
             Optional(CaselessLiteral("E") + Optional(plus_minus) + number_part) +
             Optional(number_suffix)

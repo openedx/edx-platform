@@ -84,22 +84,24 @@ def render_number(children):
     """
     Combine the elements forming the number, escaping the suffix if needed.
     """
-    if children[-1].latex in SUFFIXES:
-        suffix = ur"\text{{{suffix}}}".format(suffix=children[-1].latex)
-        children = children[:-1]
-    else:
-        suffix = ""
+    children_latex = [k.latex for k in children]
 
-    # Exponential notation always has an "e" after the mantissa
-    if len(children) > 1 and children[1].latex == "E":
-        mantissa = children[0].latex
-        exponent = "".join(k.latex for k in children[2:])
+    suffix = ""
+    if children_latex[-1] in SUFFIXES:
+        suffix = children_latex.pop()
+        suffix = ur"\text{{{s}}}".format(s=suffix)
+
+    # Exponential notation-- the "E" splits the mantissa and exponent
+    if "E" in children_latex:
+        pos = children_latex.index("E")
+        mantissa = "".join(children_latex[:pos])
+        exponent = "".join(children_latex[pos + 1:])
         latex = ur"{m}\!\times\!10^{{{e}}}{s}".format(
             m=mantissa, e=exponent, s=suffix
         )
         return LatexRendered(latex, tall=True)
     else:
-        easy_number = "".join(k.latex for k in children)
+        easy_number = "".join(children_latex)
         return LatexRendered(easy_number + suffix)
 
 
