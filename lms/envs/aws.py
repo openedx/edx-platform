@@ -10,6 +10,7 @@ Common traits:
 # We intentionally define lots of variables that aren't used, and
 # want to import all variables from base settings files
 # pylint: disable=W0401, W0614
+
 import json
 
 from .common import *
@@ -176,15 +177,6 @@ for name, value in ENV_TOKENS.get("CODE_JAIL", {}).items():
         CODE_JAIL[name] = value
 
 COURSES_WITH_UNSAFE_CODE = ENV_TOKENS.get("COURSES_WITH_UNSAFE_CODE", [])
-
-# Disable CSRF for load testing
-if MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_LOAD_TESTING'):
-    exclude_csrf = lambda elem: not elem in \
-                   ['django.core.context_processors.csrf',
-                    'django.middleware.csrf.CsrfViewMiddleware']
-    TEMPLATE_CONTEXT_PROCESSORS = filter(exclude_csrf, TEMPLATE_CONTEXT_PROCESSORS)
-    MIDDLEWARE_CLASSES = filter(exclude_csrf, MIDDLEWARE_CLASSES)
-
 
 ############################## SECURE AUTH ITEMS ###############
 # Secret things: passwords, access keys, etc.
