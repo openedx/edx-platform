@@ -1,6 +1,7 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
 <%! from auth.authz import is_user_in_course_group_role %>
+<%! import json %>
 <%inherit file="base.html" />
 <%block name="title">${_("Course Team Settings")}</%block>
 <%block name="bodyclass">is-signedin course users team</%block>
@@ -161,18 +162,55 @@
 
 <%block name="jsextra">
 <script type="text/javascript">
+  var staffEmails = ${json.dumps([user.email for user in staff])};
   var tplUserURL = "${reverse('course_team_user', kwargs=dict(
       org=context_course.location.org,
       course=context_course.location.course,
       name=context_course.location.name,
       email="@@EMAIL@@",
-    ))}"
+    ))}";
+  var unknownErrorMessage = gettext("Unknown")
 
   $(document).ready(function() {
     var $createUserForm = $('#create-user-form');
     var $createUserFormWrapper = $createUserForm.closest('.wrapper-create-user');
     $createUserForm.bind('submit', function(e) {
       e.preventDefault();
+      var email = $('#user-email-input').val().trim();
+      if(!email) {
+        var msg = new CMS.Views.Prompt.Error({
+          title: gettext("A valid email address is required"),
+          message: gettext("You must enter a valid email address in order to add a new team member"),
+          actions: {
+            primary: {
+              text: gettext("Return and add email address"),
+              click: function(view) {
+                view.hide();
+                $("#user-email-input").focus();
+              }
+            }
+          }
+        })
+        msg.show();
+        return;
+      }
+      if(_.contains(staffEmails, email)) {
+        var msg = new CMS.Views.Prompt.Warning({
+          title: gettext("Already a course team member"),
+          message: _.template(gettext("{email} is already on the “{course}” team. If you're trying to add a new member, please double-check the email address you provided."), {email: email, course: course.escape('name')}, {interpolate: /\{(.+?)\}/g}),
+          actions: {
+            primary: {
+              text: gettext("Return to team listing"),
+              click: function(view) {
+                view.hide();
+                $("#user-email-input").focus();
+              }
+            }
+          }
+        })
+        msg.show();
+        return;
+      }
       var url = tplUserURL.replace("@@EMAIL@@", $('#user-email-input').val().trim())
       $.ajax({
         url: url,
@@ -189,9 +227,9 @@
         error: function(jqXHR, textStatus, errorThrown) {
           var message;
           try {
-            message = JSON.parse(jqXHR.responseText).error || "Unknown";
+            message = JSON.parse(jqXHR.responseText).error || unknownErrorMessage;
           } catch (e) {
-            message = "Unknown";
+            message = unknownErrorMessage
           }
           var prompt = new CMS.Views.Prompt.Error({
             title: gettext("Error adding user"),
@@ -233,38 +271,58 @@
     });
 
     $('.remove-user').click(function() {
-      var url = tplUserURL.replace("@@EMAIL@@", $(this).data('id'))
-      $.ajax({
-        url: url,
-        type: 'DELETE',
-        dataType: 'json',
-        contentType: 'application/json',
-        success: function(data) {
-          location.reload();
-        },
-        notifyOnError: false,
-        error: function(jqXHR, textStatus, errorThrown) {
-          var message;
-          try {
-            message = JSON.parse(jqXHR.responseText).error || "Unknown";
-          } catch (e) {
-            message = "Unknown";
-          }
-          var prompt = new CMS.Views.Prompt.Error({
-            title: gettext("Error removing user"),
-            message: message,
-            actions: {
-              primary: {
-                text: gettext("OK"),
-                click: function(view) {
-                  view.hide();
+      var email = $(this).data('id');
+      var msg = new CMS.Views.Prompt.Warning({
+        title: gettext("Are you sure?"),
+        message: _.template(gettext("Are you sure you want to delete {email} from the course team for “{course}”?"), {email: email, course: course.get('name')}, {interpolate: /\{(.+?)\}/g}),
+        actions: {
+          primary: {
+            text: gettext("Delete"),
+            click: function(view) {
+              view.hide();
+              var url = tplUserURL.replace("@@EMAIL@@", email)
+              $.ajax({
+                url: url,
+                type: 'DELETE',
+                dataType: 'json',
+                contentType: 'application/json',
+                success: function(data) {
+                  location.reload();
+                },
+                notifyOnError: false,
+                error: function(jqXHR, textStatus, errorThrown) {
+                  var message;
+                  try {
+                    message = JSON.parse(jqXHR.responseText).error || unknownErrorMessage;
+                  } catch (e) {
+                    message = unknownErrorMessage;
+                  }
+                  var prompt = new CMS.Views.Prompt.Error({
+                    title: gettext("Error removing user"),
+                    message: message,
+                    actions: {
+                      primary: {
+                        text: gettext("OK"),
+                        click: function(view) {
+                          view.hide();
+                        }
+                      }
+                    }
+                  })
+                  prompt.show();
                 }
-              }
+              });
             }
-          })
-          prompt.show();
+          },
+          secondary: {
+            text: gettext("Cancel"),
+            click: function(view) {
+              view.hide();
+            }
+          }
         }
       });
+      msg.show();
     });
 
     $(".toggle-admin-role").click(function(e) {
@@ -291,16 +349,16 @@
         error: function(jqXHR, textStatus, errorThrown) {
           var message;
           try {
-            message = JSON.parse(jqXHR.responseText).error || "Unknown";
+            message = JSON.parse(jqXHR.responseText).error || unknownErrorMessage;
           } catch (e) {
-            message = "Unknown";
+            message = unknownErrorMessage;
           }
           var prompt = new CMS.Views.Prompt.Error({
-            title: gettext("Error changing user"),
+            title: gettext("There was an error changing the user's role"),
             message: message,
             actions: {
               primary: {
-                text: gettext("OK"),
+                text: gettext("Try Again"),
                 click: function(view) {
                   view.hide();
                 }
