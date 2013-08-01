@@ -1,3 +1,6 @@
+"""
+Public views
+"""
 from django_future.csrf import ensure_csrf_cookie
 from django.core.context_processors import csrf
 from django.shortcuts import redirect
@@ -9,10 +12,6 @@ from external_auth.views import ssl_login_shortcut
 from .user import index
 
 __all__ = ['signup', 'old_login_redirect', 'login_page', 'howitworks']
-
-"""
-Public views
-"""
 
 
 @ensure_csrf_cookie
@@ -45,6 +44,7 @@ def login_page(request):
 
 
 def howitworks(request):
+    "Proxy view"
     if request.user.is_authenticated():
         return index(request)
     else:

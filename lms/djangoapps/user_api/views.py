@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.contrib.auth.models import User
+from rest_framework import authentication
 from rest_framework import filters
 from rest_framework import permissions
 from rest_framework import viewsets
@@ -25,6 +26,7 @@ class ApiKeyHeaderPermission(permissions.BasePermission):
 
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
+    authentication_classes = (authentication.SessionAuthentication,)
     permission_classes = (ApiKeyHeaderPermission,)
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -33,6 +35,7 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class UserPreferenceViewSet(viewsets.ReadOnlyModelViewSet):
+    authentication_classes = (authentication.SessionAuthentication,)
     permission_classes = (ApiKeyHeaderPermission,)
     queryset = UserPreference.objects.all()
     filter_backends = (filters.DjangoFilterBackend,)

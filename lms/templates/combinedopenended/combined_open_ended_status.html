@@ -1,7 +1,8 @@
+<%! from django.utils.translation import ugettext as _ %>
 <div class="status-elements">
     <section id="combined-open-ended-status" class="combined-open-ended-status">
         <div class="statusitem">
-            Status
+            ${_("Status")}
         </div>
         %for i in xrange(0,len(status_list)):
             <%status=status_list[i]%>

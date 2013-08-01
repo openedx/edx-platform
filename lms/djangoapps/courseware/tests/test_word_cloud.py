@@ -242,9 +242,7 @@ class TestWordCloud(BaseTestXmodule):
 
     def test_word_cloud_constructor(self):
         """Make sure that all parameters extracted correclty from xml"""
-        # `get_html` return only context, cause we
-        # overwrite `system.render_template`
-        context = self.item_module.get_html()
+        fragment = self.runtime.render(self.item_module, None, 'student_view')
 
         expected_context = {
             'ajax_url': self.item_module.system.ajax_url,
@@ -253,4 +251,4 @@ class TestWordCloud(BaseTestXmodule):
             'num_inputs': 5,  # default value
             'submitted': False  # default value
         }
-        self.assertDictEqual(context, expected_context)
+        self.assertEqual(fragment.content, self.runtime.render_template('word_cloud.html', expected_context))

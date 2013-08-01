@@ -120,9 +120,8 @@ class PageLoaderTestCase(LoginEnrollmentTestCase):
             self.assertEqual(response.redirect_chain[0][1], 302)
 
         if check_content:
-            unavailable_msg = "this module is temporarily unavailable"
-            self.assertEqual(response.content.find(unavailable_msg), -1)
-            self.assertFalse(isinstance(descriptor, ErrorDescriptor))
+            self.assertNotContains(response, "this module is temporarily unavailable")
+            self.assertNotIsInstance(descriptor, ErrorDescriptor)
 
 
 @override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)

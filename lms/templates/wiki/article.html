@@ -34,7 +34,7 @@
 
       {% if urlpath %}
       <div class="see-children">
-        <a href="{% url 'wiki:dir' path=urlpath.path %}">See all children</a>
+        <a href="{% url 'wiki:dir' path=urlpath.path %}">{% trans "See all children" %}</a>
       </div>
       {% endif %}
     </div>

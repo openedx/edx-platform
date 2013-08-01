@@ -1,0 +1,11 @@
+<li class="field-group course-advanced-policy-list-item">
+	<div class="field is-not-editable text key" id="<%= key %>">
+		<label for="<%= keyUniqueId %>">Policy Key:</label>
+		<input readonly title="This field is disabled: policy keys cannot be edited." type="text" class="short policy-key" id="<%= keyUniqueId %>" value="<%= key %>" />
+  </div>
+
+  <div class="field text value">
+    <label for="<%= valueUniqueId %>">Policy Value:</label>
+    <textarea class="json text" id="<%= valueUniqueId %>"><%= value %></textarea>
+  </div>
+</li>

@@ -358,22 +358,30 @@ body.dashboard {
 		}
 	}
 
-	.new-course {
-		@include clearfix();
-		padding: ($baseline*0.75) ($baseline*1.25);
-		margin-top: $baseline;
-		border-radius: 3px;
-		border: 1px solid $gray;
-		background: $white;
-		box-shadow: 0 1px 2px rgba(0, 0, 0, .1);
 
-		.title {
-			@extend .t-title4;
-			font-weight: 600;
-			margin-bottom: ($baseline/2);
-			border-bottom: 1px solid $gray-l3;
-			padding-bottom: ($baseline/2);
-		}
+  // ELEM: new user form
+  .wrapper-create-course {
+
+    // CASE: when form is animating
+    &.animate {
+
+      // STATE: shown
+      &.is-shown {
+        height: ($baseline*26);
+
+        // STATE: errors
+        &.has-errors {
+          height: ($baseline*33);
+        }
+      }
+    }
+  }
+
+  // ====================
+
+  // course listings
+
+	.create-course {
 
 		.row {
 			@include clearfix();
@@ -389,10 +397,6 @@ body.dashboard {
 			margin-right: 4%;
 		}
 
-		.course-info {
-			width: 600px;
-		}
-
 		label {
 			@extend .t-title7;
 			display: block;
@@ -401,7 +405,8 @@ body.dashboard {
 
 		.new-course-org,
 		.new-course-number,
-		.new-course-name {
+		.new-course-name,
+		.new-course-run {
 			width: 100%;
 		}
 
@@ -421,5 +426,25 @@ body.dashboard {
 		.item-details {
 			padding-bottom: 0;
 		}
+
+	    .wrap-error {
+	      @include transition(all $tmg-f2 ease 0s);
+	      height: 0;
+	      overflow: hidden;
+	      opacity: 0;
+	    }
+
+	    .wrap-error.is-shown {
+	      height: 65px;
+	      opacity: 1;
+	    }
+
+	    .message-status {
+	      display: block;
+	      margin-bottom: 0;
+	      padding: ($baseline*.5) ($baseline*1.5) 8px ($baseline*1.5);
+	      font-weight: bold;
+	    }
+
 	}
 }

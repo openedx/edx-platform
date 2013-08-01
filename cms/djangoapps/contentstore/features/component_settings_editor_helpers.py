@@ -12,11 +12,20 @@ def create_component_instance(step, component_button_css, category,
                               has_multiple_templates=True):
 
     click_new_component_button(step, component_button_css)
+    if category in ('problem', 'html'):
+        def animation_done(_driver):
+            return world.browser.evaluate_script("$('div.new-component').css('display')") == 'none'
+        world.wait_for(animation_done)
 
     if has_multiple_templates:
         click_component_from_menu(category, boilerplate, expected_css)
 
-    assert_equal(1, len(world.css_find(expected_css)))
+    assert_equal(
+        1,
+        len(world.css_find(expected_css)),
+        "Component instance with css {css} was not created successfully".format(css=expected_css))
+
+
 
 @world.absorb
 def click_new_component_button(step, component_button_css):
@@ -39,11 +48,13 @@ def click_component_from_menu(category, boilerplate, expected_css):
         elem_css = "a[data-category='{}']:not([data-boilerplate])".format(category)
     elements = world.css_find(elem_css)
     assert_equal(len(elements), 1)
-    world.css_click(elem_css)
+    world.wait_for(lambda _driver: world.css_visible(elem_css))
+    world.css_click(elem_css, success_condition=lambda: 1 == len(world.css_find(expected_css)))
 
 
 @world.absorb
 def edit_component_and_select_settings():
+    world.wait_for(lambda _driver: world.css_visible('a.edit-button'))
     world.css_click('a.edit-button')
     world.css_click('#settings-mode')
 

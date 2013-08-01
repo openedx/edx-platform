@@ -53,6 +53,14 @@ def i_have_opened_a_new_course(_step):
     open_new_course()
 
 
+@step('(I select|s?he selects) the new course')
+def select_new_course(_step, whom):
+    course_link_xpath = '//div[contains(@class, "courses")]//a[contains(@class, "class-link")]//span[contains(., "{name}")]/..'.format(
+        name="Robot Super Course")
+    element = world.browser.find_by_xpath(course_link_xpath)
+    element.click()
+
+
 @step(u'I press the "([^"]*)" notification button$')
 def press_the_notification_button(_step, name):
     css = 'a.action-%s' % name.lower()
@@ -118,14 +126,18 @@ def create_studio_user(
     registration.register(studio_user)
     registration.activate()
 
+    return studio_user
+
 
 def fill_in_course_info(
         name='Robot Super Course',
         org='MITx',
-        num='999'):
+        num='101',
+        run='2013_Spring'):
     world.css_fill('.new-course-name', name)
     world.css_fill('.new-course-org', org)
     world.css_fill('.new-course-number', num)
+    world.css_fill('.new-course-run', run)
 
 
 def log_into_studio(
@@ -242,7 +254,7 @@ def save_button_disabled(step):
 @step('I confirm the prompt')
 def confirm_the_prompt(step):
     prompt_css = 'a.button.action-primary'
-    world.css_click(prompt_css)
+    world.css_click(prompt_css, success_condition=lambda: not world.css_visible(prompt_css))
 
 
 @step(u'I am shown a (.*)$')
@@ -252,6 +264,7 @@ def i_am_shown_a_notification(step, notification_type):
 
 def type_in_codemirror(index, text):
     world.css_click(".CodeMirror", index=index)
+    world.browser.execute_script("$('div.CodeMirror.CodeMirror-focused > div').css('overflow', '')")
     g = world.css_find("div.CodeMirror.CodeMirror-focused > div > textarea")
     if world.is_mac():
         g._element.send_keys(Keys.COMMAND + 'a')

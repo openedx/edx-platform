@@ -46,13 +46,19 @@ COMPONENT_TYPES = ['discussion', 'html', 'problem', 'video']
 
 OPEN_ENDED_COMPONENT_TYPES = ["combinedopenended", "peergrading"]
 NOTE_COMPONENT_TYPES = ['notes']
-ADVANCED_COMPONENT_TYPES = ['annotatable', 'word_cloud', 'videoalpha'] + OPEN_ENDED_COMPONENT_TYPES + NOTE_COMPONENT_TYPES
+ADVANCED_COMPONENT_TYPES = [
+    'annotatable',
+    'word_cloud',
+    'videoalpha',
+    'graphical_slider_tool'
+] + OPEN_ENDED_COMPONENT_TYPES + NOTE_COMPONENT_TYPES
 ADVANCED_COMPONENT_CATEGORY = 'advanced'
 ADVANCED_COMPONENT_POLICY_KEY = 'advanced_modules'
 
 
 @login_required
 def edit_subsection(request, location):
+    "Edit the subsection of a course"
     # check that we have permissions to edit this item
     try:
         course = get_course_for_item(location)
@@ -264,6 +270,7 @@ def assignment_type_update(request, org, course, category, name):
 @login_required
 @expect_json
 def create_draft(request):
+    "Create a draft"
     location = request.POST['id']
 
     # check permissions for this user within this course
@@ -280,6 +287,7 @@ def create_draft(request):
 @login_required
 @expect_json
 def publish_draft(request):
+    "Publish a draft"
     location = request.POST['id']
 
     # check permissions for this user within this course
@@ -295,6 +303,7 @@ def publish_draft(request):
 @login_required
 @expect_json
 def unpublish_unit(request):
+    "Unpublish a unit"
     location = request.POST['id']
 
     # check permissions for this user within this course
@@ -312,6 +321,7 @@ def unpublish_unit(request):
 @login_required
 @ensure_csrf_cookie
 def module_info(request, module_location):
+    "Get or set information for a module in the modulestore"
     location = Location(module_location)
 
     # check that logged in user has permissions to this item

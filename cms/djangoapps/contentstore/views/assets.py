@@ -29,7 +29,6 @@ from xmodule.util.date_utils import get_default_time_display
 from xmodule.modulestore import InvalidLocationError
 from xmodule.exceptions import NotFoundError
 
-from ..utils import get_url_reverse
 from .access import get_location_and_verify_access
 from util.json_request import JsonResponse
 
@@ -284,7 +283,7 @@ def import_course(request, org, course, name):
         tar_file.extractall(course_dir + '/')
 
         # find the 'course.xml' file
-
+        dirpath = None
         for dirpath, _dirnames, filenames in os.walk(course_dir):
             for filename in filenames:
                 if filename == 'course.xml':
@@ -320,7 +319,11 @@ def import_course(request, org, course, name):
 
         return render_to_response('import.html', {
             'context_course': course_module,
-            'successful_import_redirect_url': get_url_reverse('CourseOutline', course_module)
+            'successful_import_redirect_url': reverse('course_index', kwargs={
+                'org': location.org,
+                'course': location.course,
+                'name': location.name,
+            })
         })
 
 

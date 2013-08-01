@@ -9,6 +9,9 @@ Studio: Send e-mails to new Studio users (on edge only) when their course creato
 status has changed. This will not be in use until the course creator table
 is enabled.
 
+Studio: Added improvements to Course Creation: richer error messaging, tip
+text, and fourth field for course run.
+
 LMS: Added user preferences (arbitrary user/key/value tuples, for which
 which user/key is unique) and a REST API for reading users and
 preferences. Access to the REST API is restricted by use of the
@@ -17,6 +20,9 @@ the setting is not present, the API is disabled).
 
 LMS: Added endpoints for AJAX requests to enable/disable notifications
 (which are not yet implemented) and a one-click unsubscribe page.
+
+Studio: Allow instructors of a course to designate other staff as instructors;
+this allows instructors to hand off management of a course to someone else.
 
 Common: Add a manage.py that knows about edx-platform specific settings and projects
 

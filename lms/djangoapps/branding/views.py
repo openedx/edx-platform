@@ -24,13 +24,13 @@ def index(request):
         from external_auth.views import ssl_login
         return ssl_login(request)
     if settings.MITX_FEATURES.get('ENABLE_MKTG_SITE'):
-         return redirect(settings.MKTG_URLS.get('ROOT'))
+        return redirect(settings.MKTG_URLS.get('ROOT'))
 
     university = branding.get_university(request.META.get('HTTP_HOST'))
     if university is None:
         return student.views.index(request, user=request.user)
 
-    return courseware.views.university_profile(request, university)
+    return redirect('/')
 
 
 @ensure_csrf_cookie
@@ -48,4 +48,4 @@ def courses(request):
     if university is None:
         return courseware.views.courses(request)
 
-    return courseware.views.university_profile(request, university)
+    return redirect('/')

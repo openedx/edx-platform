@@ -19,6 +19,8 @@ def find_full_path(path_to_file):
 def main(argv):
     parser = argparse.ArgumentParser(description="Run just one test")
     parser.add_argument('--nocapture', '-s', action='store_true', help="Don't capture stdout (any stdout output will be printed immediately)")
+    parser.add_argument('--pdb', action='store_true', help="Use pdb for test errors")
+    parser.add_argument('--pdb-fail', action='store_true', help="Use pdb for test failures")
     parser.add_argument('words', metavar="WORDS", nargs='+', help="The description of a test failure, like 'ERROR: test_set_missing_field (courseware.tests.test_model_data.TestStudentModuleStorage)'")
 
     args = parser.parse_args(argv)
@@ -54,6 +56,10 @@ def main(argv):
         django_args = ["./manage.py", system, "--settings", "test", "test"]
         if args.nocapture:
             django_args.append("-s")
+        if args.pdb:
+            django_args.append("--pdb")
+        if args.pdb_fail:
+            django_args.append("--pdb-fail")
         django_args.append(test_spec)
 
         print " ".join(django_args)

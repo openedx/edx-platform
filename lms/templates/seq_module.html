@@ -1,7 +1,9 @@
+<%! from django.utils.translation import ugettext as _ %>
+
 <div id="sequence_${element_id}" class="sequence" data-id="${item_id}" data-position="${position}" data-course_modx_root="/course/modx" >
-  <nav aria-label="Section Navigation" class="sequence-nav">
+  <nav aria-label="${_('Section Navigation')}" class="sequence-nav">
     <ul class="sequence-nav-buttons">
-      <li class="prev"><a href="#">Previous</a></li>
+      <li class="prev"><a href="#">${_('Previous')}</a></li>
     </ul>
 
     <div class="sequence-list-wrapper">
@@ -24,7 +26,7 @@
     </div>
 
     <ul class="sequence-nav-buttons">
-      <li class="next"><a href="#">Next</a></li>
+      <li class="next"><a href="#">${_("Next")}</a></li>
     </ul>
   </nav>
 
@@ -34,9 +36,9 @@
   <div id="seq_content"></div>
 
   <nav class="sequence-bottom">
-    <ul aria-label="Section Navigation" class="sequence-nav-buttons">
-      <li class="prev"><a href="#">Previous</a></li>
-      <li class="next"><a href="#">Next</a></li>
+    <ul aria-label="${_('Section Navigation')}" class="sequence-nav-buttons">
+      <li class="prev"><a href="#">${_("Previous")}</a></li>
+      <li class="next"><a href="#">${_("Next")}</a></li>
     </ul>
   </nav>
 </div>

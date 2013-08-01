@@ -95,8 +95,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.client.login(username=uname, password=password)
 
     def tearDown(self):
-        mongo = MongoClient()
-        mongo.drop_database(TEST_DATA_CONTENTSTORE['OPTIONS']['db'])
+        MongoClient().drop_database(TEST_DATA_CONTENTSTORE['OPTIONS']['db'])
         _CONTENTSTORE.clear()
 
     def check_components_on_page(self, component_types, expected_types):
@@ -604,6 +603,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             'org': 'MITx',
             'number': '999',
             'display_name': 'Robot Super Course',
+            'run': '2013_Spring'
         }
 
         module_store = modulestore('direct')
@@ -612,12 +612,12 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         resp = self.client.post(reverse('create_new_course'), course_data)
         self.assertEqual(resp.status_code, 200)
         data = parse_json(resp)
-        self.assertEqual(data['id'], 'i4x://MITx/999/course/Robot_Super_Course')
+        self.assertEqual(data['id'], 'i4x://MITx/999/course/2013_Spring')
 
         content_store = contentstore()
 
         source_location = CourseDescriptor.id_to_location('edX/toy/2012_Fall')
-        dest_location = CourseDescriptor.id_to_location('MITx/999/Robot_Super_Course')
+        dest_location = CourseDescriptor.id_to_location('MITx/999/2013_Spring')
 
         clone_course(module_store, content_store, source_location, dest_location)
 
@@ -855,6 +855,68 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         shutil.rmtree(root_dir)
 
+    def test_export_course_with_metadata_only_word_cloud(self):
+        """
+        Similar to `test_export_course_with_metadata_only_video`.
+        """
+        module_store = modulestore('direct')
+        draft_store = modulestore('draft')
+        content_store = contentstore()
+
+        import_from_xml(module_store, 'common/test/data/', ['word_cloud'])
+        location = CourseDescriptor.id_to_location('HarvardX/ER22x/2013_Spring')
+
+        verticals = module_store.get_items(['i4x', 'HarvardX', 'ER22x', 'vertical', None, None])
+
+        self.assertGreater(len(verticals), 0)
+
+        parent = verticals[0]
+
+        ItemFactory.create(parent_location=parent.location, category="word_cloud", display_name="untitled")
+
+        root_dir = path(mkdtemp_clean())
+
+        print 'Exporting to tempdir = {0}'.format(root_dir)
+
+        # export out to a tempdir
+        export_to_xml(module_store, content_store, location, root_dir, 'test_export', draft_modulestore=draft_store)
+
+        shutil.rmtree(root_dir)
+
+    def test_empty_data_roundtrip(self):
+        """
+        Test that an empty `data` field is preserved through
+        export/import.
+        """
+        module_store = modulestore('direct')
+        draft_store = modulestore('draft')
+        content_store = contentstore()
+
+        import_from_xml(module_store, 'common/test/data/', ['toy'])
+        location = CourseDescriptor.id_to_location('edX/toy/2012_Fall')
+
+        verticals = module_store.get_items(['i4x', 'edX', 'toy', 'vertical', None, None])
+
+        self.assertGreater(len(verticals), 0)
+
+        parent = verticals[0]
+
+        # Create a module, and ensure that its `data` field is empty
+        word_cloud = ItemFactory.create(parent_location=parent.location, category="word_cloud", display_name="untitled")
+        del word_cloud.data
+        self.assertEquals(word_cloud.data, '')
+
+        # Export the course
+        root_dir = path(mkdtemp_clean())
+        export_to_xml(module_store, content_store, location, root_dir, 'test_roundtrip', draft_modulestore=draft_store)
+
+        # Reimport and get the video back
+        import_from_xml(module_store, root_dir)
+        imported_word_cloud = module_store.get_item(Location(['i4x', 'edX', 'toy', 'word_cloud', 'untitled', None]))
+
+        # It should now contain empty data
+        self.assertEquals(imported_word_cloud.data, '')
+
     def test_course_handouts_rewrites(self):
         module_store = modulestore('direct')
 
@@ -954,6 +1016,7 @@ class ContentStoreTest(ModuleStoreTestCase):
             'org': 'MITx',
             'number': '999',
             'display_name': 'Robot Super Course',
+            'run': '2013_Spring'
         }
 
     def tearDown(self):
@@ -965,24 +1028,30 @@ class ContentStoreTest(ModuleStoreTestCase):
         """Test new course creation - happy path"""
         self.assert_created_course()
 
-    def assert_created_course(self):
+    def assert_created_course(self, number_suffix=None):
         """
         Checks that the course was created properly.
         """
-        resp = self.client.post(reverse('create_new_course'), self.course_data)
+        test_course_data = {}
+        test_course_data.update(self.course_data)
+        if number_suffix:
+            test_course_data['number'] = '{0}_{1}'.format(test_course_data['number'], number_suffix)
+        resp = self.client.post(reverse('create_new_course'), test_course_data)
         self.assertEqual(resp.status_code, 200)
         data = parse_json(resp)
-        self.assertEqual(data['id'], 'i4x://MITx/999/course/Robot_Super_Course')
+        self.assertNotIn('ErrMsg', data)
+        self.assertEqual(data['id'], 'i4x://MITx/{0}/course/2013_Spring'.format(test_course_data['number']))
+        return test_course_data
 
     def test_create_course_check_forum_seeding(self):
         """Test new course creation and verify forum seeding """
-        self.assert_created_course()
-        self.assertTrue(are_permissions_roles_seeded('MITx/999/Robot_Super_Course'))
+        test_course_data = self.assert_created_course(number_suffix=uuid4().hex)
+        self.assertTrue(are_permissions_roles_seeded('MITx/{0}/2013_Spring'.format(test_course_data['number'])))
 
     def test_create_course_duplicate_course(self):
         """Test new course creation - error path"""
         self.client.post(reverse('create_new_course'), self.course_data)
-        self.assert_course_creation_failed('There is already a course defined with this name.')
+        self.assert_course_creation_failed('There is already a course defined with the same organization, course number, and course run. Please change either organization or course number to be unique.')
 
     def assert_course_creation_failed(self, error_message):
         """
@@ -997,8 +1066,9 @@ class ContentStoreTest(ModuleStoreTestCase):
         """Test new course creation - error path"""
         self.client.post(reverse('create_new_course'), self.course_data)
         self.course_data['display_name'] = 'Robot Super Course Two'
+        self.course_data['run'] = '2013_Summer'
 
-        self.assert_course_creation_failed('There is already a course defined with the same organization and course number.')
+        self.assert_course_creation_failed('There is already a course defined with the same organization and course number. Please change at least one field to be unique.')
 
     def test_create_course_with_bad_organization(self):
         """Test new course creation - error path for bad organization name"""
@@ -1167,7 +1237,9 @@ class ContentStoreTest(ModuleStoreTestCase):
 
         # manage users
         resp = self.client.get(reverse('manage_users',
-                                       kwargs={'location': loc.url()}))
+                                       kwargs={'org': loc.org,
+                                               'course': loc.course,
+                                               'name': loc.name}))
         self.assertEqual(200, resp.status_code)
 
         # course info

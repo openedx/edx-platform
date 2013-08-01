@@ -21,6 +21,7 @@ from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
 from django.core.urlresolvers import reverse
 from django.core.mail import send_mail
+from django.utils import timezone
 
 import xmodule.graders as xmgraders
 from xmodule.modulestore.django import modulestore
@@ -93,6 +94,7 @@ def instructor_dashboard(request, course_id):
                      'title': 'Course Statistics At A Glance',
                      }
         data = [['# Enrolled', CourseEnrollment.objects.filter(course_id=course_id).count()]]
+        data += [['Date', timezone.now().isoformat()]]
         data += compute_course_stats(course).items()
         if request.user.is_staff:
             for field in course.fields:

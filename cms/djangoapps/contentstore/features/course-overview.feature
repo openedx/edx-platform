@@ -63,3 +63,10 @@ Feature: Course Overview
         When I navigate to the course overview page
         And I change an assignment's grading status
         Then I am shown a notification
+
+   Scenario: Notification is shown on subsection reorder
+        Given I have opened a new course section in Studio
+        And I have added a new subsection
+        And I have added a new subsection
+        When I reorder subsections
+        Then I am shown a notification

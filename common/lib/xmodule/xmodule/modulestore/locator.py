@@ -45,7 +45,7 @@ class Locator(object):
 
     def __repr__(self):
         '''
-        repr(self) returns something like this: CourseLocator("edu.mit.eecs.6002x")
+        repr(self) returns something like this: CourseLocator("mit.eecs.6002x")
         '''
         classname = self.__class__.__name__
         if classname.find('.') != -1:
@@ -54,13 +54,13 @@ class Locator(object):
 
     def __str__(self):
         '''
-        str(self) returns something like this: "edu.mit.eecs.6002x"
+        str(self) returns something like this: "mit.eecs.6002x"
         '''
         return unicode(self).encode('utf8')
 
     def __unicode__(self):
         '''
-        unicode(self) returns something like this: "edu.mit.eecs.6002x"
+        unicode(self) returns something like this: "mit.eecs.6002x"
         '''
         return self.url()
 
@@ -89,15 +89,15 @@ class CourseLocator(Locator):
     """
     Examples of valid CourseLocator specifications:
      CourseLocator(version_guid=ObjectId('519665f6223ebd6980884f2b'))
-     CourseLocator(course_id='edu.mit.eecs.6002x')
-     CourseLocator(course_id='edu.mit.eecs.6002x;published')
-     CourseLocator(course_id='edu.mit.eecs.6002x', revision='published')
+     CourseLocator(course_id='mit.eecs.6002x')
+     CourseLocator(course_id='mit.eecs.6002x;published')
+     CourseLocator(course_id='mit.eecs.6002x', branch='published')
      CourseLocator(url='edx://@519665f6223ebd6980884f2b')
-     CourseLocator(url='edx://edu.mit.eecs.6002x')
-     CourseLocator(url='edx://edu.mit.eecs.6002x;published')
+     CourseLocator(url='edx://mit.eecs.6002x')
+     CourseLocator(url='edx://mit.eecs.6002x;published')
 
     Should have at lease a specific course_id (id for the course as if it were a project w/
-    versions) with optional 'revision' (must be 'draft', 'published', or None),
+    versions) with optional 'branch',
     or version_guid (which points to a specific version). Can contain both in which case
     the persistence layer may raise exceptions if the given version != the current such version
     of the course.
@@ -106,7 +106,7 @@ class CourseLocator(Locator):
     # Default values
     version_guid = None
     course_id = None
-    revision = None
+    branch = None
 
     def __unicode__(self):
         """
@@ -114,8 +114,8 @@ class CourseLocator(Locator):
         """
         if self.course_id:
             result = self.course_id
-            if self.revision:
-                result += ';' + self.revision
+            if self.branch:
+                result += ';' + self.branch
             return result
         elif self.version_guid:
             return '@' + str(self.version_guid)
@@ -131,7 +131,7 @@ class CourseLocator(Locator):
 
     # -- unused args which are used via inspect
     # pylint: disable= W0613
-    def validate_args(self, url, version_guid, course_id, revision):
+    def validate_args(self, url, version_guid, course_id, branch):
         """
         Validate provided arguments.
         """
@@ -144,12 +144,12 @@ class CourseLocator(Locator):
 
     def is_fully_specified(self):
         """
-        Returns True if either version_guid is specified, or course_id+revision
+        Returns True if either version_guid is specified, or course_id+branch
         are specified.
         This should always return True, since this should be validated in the constructor.
         """
         return self.version_guid is not None \
-            or (self.course_id is not None and self.revision is not None)
+            or (self.course_id is not None and self.branch is not None)
 
     def set_course_id(self, new):
         """
@@ -158,12 +158,12 @@ class CourseLocator(Locator):
         """
         self.set_property('course_id', new)
 
-    def set_revision(self, new):
+    def set_branch(self, new):
         """
-        Initialize revision to new value.
-        If revision has already been initialized to a different value, raise an exception.
+        Initialize branch to new value.
+        If branch has already been initialized to a different value, raise an exception.
         """
-        self.set_property('revision', new)
+        self.set_property('branch', new)
 
     def set_version_guid(self, new):
         """
@@ -181,29 +181,29 @@ class CourseLocator(Locator):
         """
         return CourseLocator(course_id=self.course_id,
                              version_guid=self.version_guid,
-                             revision=self.revision)
+                             branch=self.branch)
 
-    def __init__(self, url=None, version_guid=None, course_id=None, revision=None):
+    def __init__(self, url=None, version_guid=None, course_id=None, branch=None):
         """
         Construct a CourseLocator
         Caller may provide url (but no other parameters).
         Caller may provide version_guid (but no other parameters).
-        Caller may provide course_id (optionally provide revision).
+        Caller may provide course_id (optionally provide branch).
 
         Resulting CourseLocator will have either a version_guid property
-        or a course_id (with optional revision) property, or both.
+        or a course_id (with optional branch) property, or both.
 
         version_guid must be an instance of bson.objectid.ObjectId or None
-        url, course_id, and revision must be strings or None
+        url, course_id, and branch must be strings or None
 
         """
-        self.validate_args(url, version_guid, course_id, revision)
+        self.validate_args(url, version_guid, course_id, branch)
         if url:
             self.init_from_url(url)
         if version_guid:
             self.init_from_version_guid(version_guid)
-        if course_id or revision:
-            self.init_from_course_id(course_id, revision)
+        if course_id or branch:
+            self.init_from_course_id(course_id, branch)
         assert self.version_guid or self.course_id, \
             "Either version_guid or course_id should be set."
 
@@ -223,7 +223,7 @@ class CourseLocator(Locator):
     def init_from_url(self, url):
         """
         url must be a string beginning with 'edx://' and containing
-        either a valid version_guid or course_id (with optional revision)
+        either a valid version_guid or course_id (with optional branch)
         If a block ('#HW3') is present, it is ignored.
         """
         if isinstance(url, Locator):
@@ -237,7 +237,7 @@ class CourseLocator(Locator):
             self.set_version_guid(self.as_object_id(new_guid))
         else:
             self.set_course_id(parse['id'])
-            self.set_revision(parse['revision'])
+            self.set_branch(parse['branch'])
 
     def init_from_version_guid(self, version_guid):
         """
@@ -251,14 +251,14 @@ class CourseLocator(Locator):
             '%s is not an instance of ObjectId' % version_guid
         self.set_version_guid(version_guid)
 
-    def init_from_course_id(self, course_id, explicit_revision=None):
+    def init_from_course_id(self, course_id, explicit_branch=None):
         """
-        Course_id is a string like 'edu.mit.eecs.6002x' or 'edu.mit.eecs.6002x;published'.
+        Course_id is a string like 'mit.eecs.6002x' or 'mit.eecs.6002x;published'.
 
         Revision (optional) is a string like 'published'.
-        It may be provided explicitly (explicit_revision) or embedded into course_id.
-        If revision is part of course_id ("...;published"), parse it out separately.
-        If revision is provided both ways, that's ok as long as they are the same value.
+        It may be provided explicitly (explicit_branch) or embedded into course_id.
+        If branch is part of course_id ("...;published"), parse it out separately.
+        If branch is provided both ways, that's ok as long as they are the same value.
 
         If a block ('#HW3') is a part of course_id, it is ignored.
 
@@ -272,11 +272,11 @@ class CourseLocator(Locator):
             parse = parse_course_id(course_id)
             assert parse, 'Could not parse "%s" as a course_id' % course_id
             self.set_course_id(parse['id'])
-            rev = parse['revision']
+            rev = parse['branch']
             if rev:
-                self.set_revision(rev)
-        if explicit_revision:
-            self.set_revision(explicit_revision)
+                self.set_branch(rev)
+        if explicit_branch:
+            self.set_branch(explicit_branch)
 
     def version(self):
         """
@@ -305,37 +305,37 @@ class BlockUsageLocator(CourseLocator):
     the defined element in the course. Courses can be a version of an offering, the
     current draft head, or the current production version.
 
-    Locators can contain both a version and a course_id w/ revision. The split mongo functions
-    may raise errors if these conflict w/ the current db state (i.e., the course's revision !=
+    Locators can contain both a version and a course_id w/ branch. The split mongo functions
+    may raise errors if these conflict w/ the current db state (i.e., the course's branch !=
     the version_guid)
 
     Locations can express as urls as well as dictionaries. They consist of
         course_identifier: course_guid | version_guid
         block : guid
-        revision : 'draft' | 'published' (optional)
+        branch : string
     """
 
     # Default value
     usage_id = None
 
     def __init__(self, url=None, version_guid=None, course_id=None,
-                 revision=None, usage_id=None):
+                 branch=None, usage_id=None):
         """
         Construct a BlockUsageLocator
-        Caller may provide url, version_guid, or course_id, and optionally provide revision.
+        Caller may provide url, version_guid, or course_id, and optionally provide branch.
 
         The usage_id may be specified, either explictly or as part of
         the url or course_id. If omitted, the locator is created but it
         has not yet been initialized.
 
         Resulting BlockUsageLocator will have a usage_id property.
-        It will have either a version_guid property or a course_id (with optional revision) property, or both.
+        It will have either a version_guid property or a course_id (with optional branch) property, or both.
 
         version_guid must be an instance of bson.objectid.ObjectId or None
-        url, course_id, revision, and usage_id must be strings or None
+        url, course_id, branch, and usage_id must be strings or None
 
         """
-        self.validate_args(url, version_guid, course_id, revision)
+        self.validate_args(url, version_guid, course_id, branch)
         if url:
             self.init_block_ref_from_url(url)
         if course_id:
@@ -346,7 +346,7 @@ class BlockUsageLocator(CourseLocator):
                                url=url,
                                version_guid=version_guid,
                                course_id=course_id,
-                               revision=revision)
+                               branch=branch)
 
     def is_initialized(self):
         """
@@ -366,11 +366,11 @@ class BlockUsageLocator(CourseLocator):
         """
         if self.course_id and self.version_guid:
             return BlockUsageLocator(version_guid=self.version_guid,
-                                     revision=self.revision,
+                                     branch=self.branch,
                                      usage_id=self.usage_id)
         else:
             return BlockUsageLocator(course_id=self.course_id,
-                                     revision=self.revision,
+                                     branch=self.branch,
                                      usage_id=self.usage_id)
 
     def set_usage_id(self, new):
