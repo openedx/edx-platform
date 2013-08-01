@@ -8,11 +8,15 @@ Many of these GETs may become PUTs in the future.
 
 import re
 import logging
+import requests
+from requests.status_codes import codes
+from collections import OrderedDict
+from django.conf import settings
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
-from django.http import HttpResponseBadRequest, HttpResponseForbidden
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from util.json_request import JsonResponse
 
 from courseware.access import has_access
@@ -723,6 +727,57 @@ def update_forum_role_membership(request, course_id):
         'action': action,
     }
     return JsonResponse(response_payload)
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+@require_query_params(
+    aname="name of analytic to query",
+)
+@common_exceptions_400
+def proxy_legacy_analytics(request, course_id):
+    """
+    Proxies to the analytics cron job server.
+
+    `aname` is a query parameter specifying which analytic to query.
+    """
+    analytics_name = request.GET.get('aname')
+
+    # abort if misconfigured
+    if not (hasattr(settings, 'ANALYTICS_SERVER_URL') and hasattr(settings, 'ANALYTICS_API_KEY')):
+        return HttpResponse("Analytics service not configured.", status=501)
+
+    url = "{}get?aname={}&course_id={}&apikey={}".format(
+        settings.ANALYTICS_SERVER_URL,
+        analytics_name,
+        course_id,
+        settings.ANALYTICS_API_KEY,
+    )
+
+    try:
+        res = requests.get(url)
+    except Exception:
+        log.exception("Error requesting from analytics server at %s", url)
+        return HttpResponse("Error requesting from analytics server.", status=500)
+
+    if res.status_code is 200:
+        # return the successful request content
+        return HttpResponse(res.content, content_type="application/json")
+    elif res.status_code is 404:
+        # forward the 404 and content
+        return HttpResponse(res.content, content_type="application/json", status=404)
+    else:
+        # 500 on all other unexpected status codes.
+        log.error(
+            "Error fetching {}, code: {}, msg: {}".format(
+                url, res.status_code, res.content
+            )
+        )
+        return HttpResponse(
+            "Error from analytics server ({}).".format(res.status_code),
+            status=500
+        )
 
 
 def _split_input_list(str_list):

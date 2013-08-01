@@ -5,6 +5,7 @@ Unit tests for instructor.api methods.
 import unittest
 import json
 from urllib import quote
+from django.conf import settings
 from django.test import TestCase
 from nose.tools import raises
 from mock import Mock
@@ -23,6 +24,7 @@ from student.models import CourseEnrollment
 from courseware.models import StudentModule
 
 from instructor.access import allow_access
+import instructor.views.api
 from instructor.views.api import (
     _split_input_list, _msk_from_problem_urlname, common_exceptions_400)
 from instructor_task.api_helper import AlreadyRunningError
@@ -118,6 +120,7 @@ class TestInstructorAPIDenyLevels(ModuleStoreTestCase, LoginEnrollmentTestCase):
             'list_instructor_tasks',
             'list_forum_members',
             'update_forum_role_membership',
+            'proxy_legacy_analytics',
         ]
         for endpoint in staff_level_endpoints:
             url = reverse(endpoint, kwargs={'course_id': self.course.id})
@@ -751,6 +754,95 @@ class TestInstructorAPITaskLists(ModuleStoreTestCase, LoginEnrollmentTestCase):
         expected_tasks = [ftask.to_dict() for ftask in self.tasks]
         expected_res = {'tasks': expected_tasks}
         self.assertEqual(json.loads(response.content), expected_res)
+
+
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@override_settings(ANALYTICS_SERVER_URL="http://robotanalyticsserver.netbot:900/")
+@override_settings(ANALYTICS_API_KEY="robot_api_key")
+class TestInstructorAPIAnalyticsProxy(ModuleStoreTestCase, LoginEnrollmentTestCase):
+    """
+    Test instructor analytics proxy endpoint.
+    """
+
+    class FakeProxyResponse(object):
+        """ Fake successful requests response object. """
+        def __init__(self):
+            self.status_code = instructor.views.api.codes.OK
+            self.content = '{"test_content": "robot test content"}'
+
+    class FakeBadProxyResponse(object):
+        """ Fake strange-failed requests response object. """
+        def __init__(self):
+            self.status_code = 'notok.'
+            self.content = '{"test_content": "robot test content"}'
+
+    def setUp(self):
+        self.instructor = AdminFactory.create()
+        self.course = CourseFactory.create()
+        self.client.login(username=self.instructor.username, password='test')
+
+    def test_analytics_proxy_url(self):
+        """ Test legacy analytics proxy url generation. """
+        act = Mock(return_value=self.FakeProxyResponse())
+        instructor.views.api.requests.get = act
+
+        url = reverse('proxy_legacy_analytics', kwargs={'course_id': self.course.id})
+        response = self.client.get(url, {
+            'aname': 'ProblemGradeDistribution'
+        })
+        print response.content
+        self.assertEqual(response.status_code, 200)
+
+        # check request url
+        expected_url = "{url}get?aname={aname}&course_id={course_id}&apikey={api_key}".format(
+            url="http://robotanalyticsserver.netbot:900/",
+            aname="ProblemGradeDistribution",
+            course_id=self.course.id,
+            api_key="robot_api_key",
+        )
+        act.assert_called_once_with(expected_url)
+
+    def test_analytics_proxy(self):
+        """
+        Test legacy analytics content proxying.
+        """
+        act = Mock(return_value=self.FakeProxyResponse())
+        instructor.views.api.requests.get = act
+
+        url = reverse('proxy_legacy_analytics', kwargs={'course_id': self.course.id})
+        response = self.client.get(url, {
+            'aname': 'ProblemGradeDistribution'
+        })
+        print response.content
+        self.assertEqual(response.status_code, 200)
+
+        # check response
+        self.assertTrue(act.called)
+        expected_res = {'test_content': "robot test content"}
+        self.assertEqual(json.loads(response.content), expected_res)
+
+    def test_analytics_proxy_reqfailed(self):
+        """ Test proxy when server reponds with failure. """
+        act = Mock(return_value=self.FakeBadProxyResponse())
+        instructor.views.api.requests.get = act
+
+        url = reverse('proxy_legacy_analytics', kwargs={'course_id': self.course.id})
+        response = self.client.get(url, {
+            'aname': 'ProblemGradeDistribution'
+        })
+        print response.content
+        self.assertEqual(response.status_code, 500)
+
+    def test_analytics_proxy_missing_param(self):
+        """ Test proxy when missing the aname query parameter. """
+        act = Mock(return_value=self.FakeProxyResponse())
+        instructor.views.api.requests.get = act
+
+        url = reverse('proxy_legacy_analytics', kwargs={'course_id': self.course.id})
+        response = self.client.get(url, {})
+        print response.content
+        self.assertEqual(response.status_code, 400)
+        self.assertFalse(act.called)
 
 
 class TestInstructorAPIHelpers(TestCase):
