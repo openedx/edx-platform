@@ -78,9 +78,7 @@
     % endfor
     % if hints_exist:
       <br />
-      <p><a class="wizard-link" dest="p1" href="javascript: void(0);">
-        Back to voting.
-      </a></p>
+      <a href="javascript: void(0);" class="wizard-link" dest="p1"> Back </a>
     % endif
 
   </div>
@@ -89,17 +87,7 @@
 
     <p>
       Write a hint for other students who get the wrong answer of <span id="blank-answer"></span>.
-      <br />
-      <a class="wizard-link" dest="p2" href="javascript: void(0);">
-        Choose a different answer.
-      </a>
     </p>
-    <textarea cols="50" class="custom-hint" data-answer="${answer}" style="height: 200px">
-Write your hint here.  Please don't give away the correct answer.
-    </textarea>
-    <br/><br/>
-    <input class="submit-hint" data-answer="${answer}" type="button" value="Submit">
-
     <p>Read about <a class="expand" data-target="goodhint" href="javascript:void(0);">what makes a good hint</a>.</p>
     <div id="goodhint" style="display:none">
       <h4>What makes a good hint?</h4>
@@ -132,6 +120,14 @@ Write your hint here.  Please don't give away the correct answer.
         <a href="http://www.apa.org/education/k12/misconceptions.aspx?item=2" target="_blank">Learn even more</a>
       </p>
     </div>
+
+    <textarea cols="50" class="custom-hint" data-answer="${answer}" style="height: 200px">
+Write your hint here.  Please don't give away the correct answer.
+    </textarea>
+    <br /><br />
+    <input class="submit-hint" data-answer="${answer}" type="button" value="Submit">
+    <br /><br />
+    <a href="javascript: void(0);" class="wizard-link" dest="p2"> Back </a>
   </div>
 
 
