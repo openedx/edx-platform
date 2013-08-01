@@ -8,8 +8,7 @@ import sys, os
 
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
-if on_rtd:   # Add to syspath so RTD will find the common conf file
-    sys.path.append('../../../')
+sys.path.append('../../../')
 
 from docs.shared.conf import *
 
@@ -24,14 +23,10 @@ templates_path.append('source/_templates')
 html_static_path.append('source/_static')
 
 
-
-import sys
-import os
-
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-sys.path.insert(0, os.path.abspath('.'))
+#sys.path.insert(0, os.path.abspath('../../..'))
 root = os.path.abspath('../../..')
 
 sys.path.append(root)
@@ -42,9 +37,15 @@ sys.path.append(os.path.join(root, "lms/djangoapps"))
 sys.path.append(os.path.join(root, "lms/lib"))
 sys.path.append(os.path.join(root, "cms/djangoapps"))
 sys.path.append(os.path.join(root, "cms/lib"))
+sys.path.insert(0, os.path.abspath(os.path.normpath(os.path.dirname(__file__)
+    + '/../../')))
+sys.path.append('.')
 
 #  django configuration  - careful here
-os.environ['DJANGO_SETTINGS_MODULE'] = 'lms.envs.test'
+if on_rtd:
+    os.environ['DJANGO_SETTINGS_MODULE'] = 'lms'
+else:
+    os.environ['DJANGO_SETTINGS_MODULE'] = 'lms.envs.test'
 
 
 # -- General configuration -----------------------------------------------------
@@ -68,9 +69,67 @@ htmlhelp_basename = 'edXDocs'
 # autogenerate models definitions
 
 import inspect
-from django.utils.html import strip_tags
-from django.utils.encoding import force_unicode
+import types
+from HTMLParser import HTMLParser
 
+
+def force_unicode(s, encoding='utf-8', strings_only=False, errors='strict'):
+    """
+    Similar to smart_unicode, except that lazy instances are resolved to
+    strings, rather than kept as lazy objects.
+
+    If strings_only is True, don't convert (some) non-string-like objects.
+    """
+    if strings_only and isinstance(s, (types.NoneType, int)):
+        return s
+    if not isinstance(s, basestring,):
+        if hasattr(s, '__unicode__'):
+            s = unicode(s)
+        else:
+            s = unicode(str(s), encoding, errors)
+    elif not isinstance(s, unicode):
+        s = unicode(s, encoding, errors)
+    return s
+
+
+class MLStripper(HTMLParser):
+    def __init__(self):
+        self.reset()
+        self.fed = []
+
+    def handle_data(self, d):
+        self.fed.append(d)
+
+    def get_data(self):
+        return ''.join(self.fed)
+
+
+def strip_tags(html):
+    s = MLStripper()
+    s.feed(html)
+    return s.get_data()
+
+class Mock(object):
+    def __init__(self, *args, **kwargs):
+        pass
+
+    def __call__(self, *args, **kwargs):
+        return Mock()
+
+    @classmethod
+    def __getattr__(cls, name):
+        if name in ('__file__', '__path__'):
+            return '/dev/null'
+        elif name[0] == name[0].upper():
+            mockType = type(name, (), {})
+            mockType.__module__ = __name__
+            return mockType
+        else:
+            return Mock()
+
+MOCK_MODULES = ['scipy', 'numpy']
+for mod_name in MOCK_MODULES:
+    sys.modules[mod_name] = Mock()
 
 def process_docstring(app, what, name, obj, options, lines):
     """Autodoc django models"""

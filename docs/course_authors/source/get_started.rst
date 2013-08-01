@@ -117,7 +117,7 @@ e.  Click to select I agree to the Terms of Service.
 .. image:: Images/image017.png
  :width: 800
 
- .. raw:: latex
+.. raw:: latex
   
 	\newpage %
 
