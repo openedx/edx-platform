@@ -146,7 +146,13 @@ class RenderMethodsTest(PreviewTestUtility):
         """ Variable names that are greek should be formatted accordingly. """
         render_variable = preview.variable_closure(['pi'], lambda x: x.lower())
         out = render_variable([preview.LatexRendered('pi')])
-        self.assert_latex_rendered(out, latex=r'\pi ')
+        self.assert_latex_rendered(out, latex=r'\pi')
+
+    def test_variable_subscript(self):
+        """ Things like 'epsilon_max' should display nicely """
+        render_variable = preview.variable_closure(['epsilon_max'], lambda x: x.lower())
+        out = render_variable([preview.LatexRendered('epsilon_max')])
+        self.assert_latex_rendered(out, latex=r'\epsilon_{max}')
 
     def test_function_simple(self):
         """ Valid function names should be escaped in `render_function`. """
@@ -280,7 +286,7 @@ class LatexPreviewTest(unittest.TestCase):
         """
         self.assertEquals(
             preview.latex_preview('11*f(x)+x^2*(3||4)/sqrt(pi)'),
-            r'11\cdot \text{f}(x)+\frac{x^{2}\cdot (3\|4)}{\sqrt{\pi }}'
+            r'11\cdot \text{f}(x)+\frac{x^{2}\cdot (3\|4)}{\sqrt{\pi}}'
         )
 
         self.assertEquals(

@@ -103,6 +103,20 @@ def render_number(children):
         return LatexRendered(easy_number + suffix)
 
 
+def enrich_varname(varname):
+    """
+    Prepend a backslash if we're given a greek character.
+    """
+    greek = ("alpha beta gamma delta epsilon varepsilon zeta eta theta "
+             "vartheta iota kappa lambda mu nu xi pi rho sigma tau upsilon "
+             "phi varphi chi psi omega").split()
+
+    if varname in greek:
+        return ur"\{letter}".format(letter=varname)
+    else:
+        return varname.replace("_", r"\_")
+
+
 def variable_closure(variables, casify):
     """
     Wrap `render_variable` so it knows the variables allowed.
@@ -111,17 +125,22 @@ def variable_closure(variables, casify):
         """
         Replace greek letters, otherwise escape the variable names.
         """
-        # TODO epsilon_0
-        # TODO check if valid and color accordingly
-        greek = "alpha beta gamma delta epsilon varepsilon zeta eta theta vartheta iota kappa lambda mu nu xi pi rho sigma tau upsilon phi varphi chi psi omega".split(" ")
         varname = children[0].latex
         if casify(varname) not in variables:
-            pass
+            pass  # TODO turn unknown variable red or give some kind of error
 
-        if varname in greek:
-            return LatexRendered(ur"\{letter} ".format(letter=varname))
+        first, _, second = varname.partition("_")
+
+        if second:
+            # Then 'a_b' must become 'a_{b}'
+            varname = ur"{a}_{{{b}}}".format(
+                a=enrich_varname(first),
+                b=enrich_varname(second)
+            )
         else:
-            return LatexRendered(varname)  # .replace("_", r"\_"))
+            varname = enrich_varname(varname)
+
+        return LatexRendered(varname)  # .replace("_", r"\_"))
     return render_variable
 
 
