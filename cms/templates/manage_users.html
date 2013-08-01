@@ -162,14 +162,6 @@
 
 <%block name="jsextra">
 <script type="text/javascript">
-  window.section = new CMS.Models.Section({
-    id: "${context_course.id}",
-    name: "${context_course.display_name_with_default | h}",
-    url_name: "${context_course.location.name | h}",
-    org: "${context_course.location.org | h}",
-    num: "${context_course.location.course | h}",
-    revision: "${context_course.location.revision | h}"
-  });
   var staffEmails = ${json.dumps([user.email for user in staff])};
   var tplUserURL = "${reverse('course_team_user', kwargs=dict(
       org=context_course.location.org,
@@ -204,7 +196,7 @@
       if(_.contains(staffEmails, email)) {
         var msg = new CMS.Views.Prompt.Warning({
           title: gettext("Already a course team member"),
-          message: _.template(gettext("{email} is already on the {course} team. If you're trying to add a new member, please double-check the email address you provided."), {email: email, course: section.get('name')}, {interpolate: /\{(.+?)\}/g}),
+          message: _.template(gettext("{email} is already on the {course} team. If you're trying to add a new member, please double-check the email address you provided."), {email: email, course: course.escape('name')}, {interpolate: /\{(.+?)\}/g}),
           actions: {
             primary: {
               text: gettext("Return to team listing"),
@@ -281,7 +273,7 @@
       var email = $(this).data('id');
       var msg = new CMS.Views.Prompt.Warning({
         title: gettext("Are you sure?"),
-        message: _.template(gettext("Are you sure you want to delete {email} from the course team for {course}?"), {email: email, course: section.get('name')}, {interpolate: /\{(.+?)\}/g}),
+        message: _.template(gettext("Are you sure you want to delete {email} from the course team for {course}?"), {email: email, course: course.get('name')}, {interpolate: /\{(.+?)\}/g}),
         actions: {
           primary: {
             text: gettext("Delete"),
