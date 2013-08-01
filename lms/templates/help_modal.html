@@ -106,7 +106,7 @@ discussion_link = get_discussion_link(course) if course else None
     ).format(
         open_time=open_time,
         close_time=close_time,
-        link_start='<a href="/help" target="_blank">',
+        link_start='<a href="{}" target="_blank">'.format(marketing_link('FAQ')),
         link_end='</a>'
     )}
     </p>
