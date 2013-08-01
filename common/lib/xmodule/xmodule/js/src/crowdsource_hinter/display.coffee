@@ -41,13 +41,17 @@ class @Hinter
     @$('.answer-choice').click @answer_choice_handle
 
   expand: (eventObj) =>
+    # Expand a hidden div.
     target = @$('#' + @$(eventObj.currentTarget).data('target'))
     if @$(target).css('display') == 'none'
       @$(target).css('display', 'block')
     else
       @$(target).css('display', 'none')
+    # Fix positioning errors with the bottom class.
+    @$('.bottom').removeClass('bottom').addClass('bottom')
 
   vote: (eventObj) =>
+    # Make an ajax request with the user's vote.
     target = @$(eventObj.currentTarget)
     all_pks = @$('#pk-list').attr('data-pk-list')
     post_json = {'answer': target.attr('data-answer'), 'hint': target.data('hintno'), 'pk_list': all_pks}
@@ -55,6 +59,7 @@ class @Hinter
       @render(response.contents)
 
   submit_hint: (eventObj) =>
+    # Make an ajax request with the user's new hint.
     textarea = $('.custom-hint')
     if @answer == ''
       # The user didn't choose an answer, somehow.  Do nothing.
@@ -64,21 +69,25 @@ class @Hinter
       @render(response.contents)
 
   clear_default_text: (eventObj) =>
+    # Remove placeholder text in the hint submission textbox.
     target = @$(eventObj.currentTarget)
     if target.data('cleared') == undefined
       target.val('')
       target.data('cleared', true)
 
   wizard_link_handle: (eventObj) =>
+    # Move to another wizard view, based on the link that the user clicked.
     target = @$(eventObj.currentTarget)
     @go_to(target.attr('dest'))
 
   answer_choice_handle: (eventObj) =>
+    # A special case of wizard_link_handle - we need to track a state variable,
+    # the answer that the user chose.
     @answer = @$(eventObj.target).attr('value')
     @$('#blank-answer').html(@answer)
     @go_to('p3')
 
-  render: (content) ->
+  render: (content) =>
     if content
       # Trim leading and trailing whitespace
       content = content.replace /^\s+|\s+$/g, ""
@@ -94,6 +103,13 @@ class @Hinter
     # Initialize the answer choice - remembers which answer the user picked on
     # p2 when he submits a hint on p3.
     @answer = ''
+    # Determine whether the browser supports CSS3 transforms.
+    styles = document.body.style
+    if styles.WebkitTransform == '' or styles.transform == ''
+      @go_to = @transform_go_to
+    else
+      @go_to = @legacy_go_to
+
     # Make the correct wizard view show up.
     hints_exist = @$('#hints-exist').html() == 'True'
     if hints_exist
@@ -101,6 +117,18 @@ class @Hinter
     else
       @go_to('p2')
 
-  go_to: (view_id) ->
-    $('.wizard-view').css('display', 'none')
-    $('#' + view_id).css('display', 'block')
+  transform_go_to: (view_id) ->
+    # Switch wizard views using sliding transitions.
+    id_to_index = {
+      'p1': 0,
+      'p2': 1,
+      'p3': 2,
+    }
+    translate_string = 'translateX(' +id_to_index[view_id] * -1 * parseInt($('#' + view_id).css('width'), 10) + 'px)'
+    @$('.wizard-container').css('transform', translate_string)
+    @$('.wizard-container').css('-webkit-transform', translate_string)
+
+  legacy_go_to: (view_id) ->
+    # For older browsers - switch wizard views by changing the screen.
+    @$('.wizard-view').css('display', 'none')
+    @$('#' + view_id).css('display', 'block')
