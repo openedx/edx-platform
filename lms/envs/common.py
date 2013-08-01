@@ -72,7 +72,7 @@ MITX_FEATURES = {
     'ENABLE_TEXTBOOK': True,
     'ENABLE_DISCUSSION_SERVICE': True,
     # discussion home panel, which includes a subscription on/off setting for discussion digest emails.
-    # this should remain off in production until digest notifications are online. 
+    # this should remain off in production until digest notifications are online.
     'ENABLE_DISCUSSION_HOME_PANEL': False,
 
     'ENABLE_PSYCHOMETRICS': False,  # real-time psychometrics (eg item response theory analysis in instructor dashboard)
@@ -355,9 +355,7 @@ SERVER_EMAIL = 'devops@edx.org'
 TECH_SUPPORT_EMAIL = 'technical@edx.org'
 CONTACT_EMAIL = 'info@edx.org'
 BUGS_EMAIL = 'bugs@edx.org'
-ADMINS = (
-    ('edX Admins', 'admin@edx.org'),
-)
+ADMINS = ()
 MANAGERS = ADMINS
 
 # Static content
