@@ -1,3 +1,5 @@
+<%! from django.utils.translation import ugettext as _ %>
+
 <%namespace name='static' file='static_content.html'/>
 <h2 class="problem-header">
   ${ problem['name'] }
@@ -16,17 +18,17 @@
     <input class="check ${ check_button }" type="button" value="${ check_button }" />
     % endif
     % if reset_button:
-    <input class="reset" type="button" value="Reset" />
+    <input class="reset" type="button" value="${_('Reset')}" />
     % endif
     % if save_button:
-    <input class="save" type="button" value="Save" />
+    <input class="save" type="button" value="${_('Save')}" />
     % endif
     % if answer_available:
-    <button class="show"><span class="show-label">Show Answer(s)</span> <span class="sr">(for question(s) above - adjacent to each field)</span></button>
+    <button class="show"><span class="show-label">${_('Show Answer(s)')}</span> <span class="sr">${_("(for question(s) above - adjacent to each field)")}</span></button>
     % endif
     % if attempts_allowed :
     <section class="submission_feedback">
-      You have used ${ attempts_used } of ${ attempts_allowed } submissions
+      ${_("You have used {num_used} of {num_total} submissions").format(num_used=attempts_used, num_total=attempts_allowed)}
     </section>
     % endif
   </section>

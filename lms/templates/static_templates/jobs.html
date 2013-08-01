@@ -1,10 +1,11 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%namespace name='static' file='../static_content.html'/>
 <%inherit file="../main.html" />
 
-<%block name="title"><title>Jobs</title></%block>
+<%block name="title"><title>${_("Jobs")}</title></%block>
 
 <section class="container jobs">
-  <h1>Do You Want to Change the Future of Education?</h1>
+  <h1>${_("Do You Want to Change the Future of Education?")}</h1>
 
   <hr class="horizontal-divider"/>
 
@@ -14,15 +15,15 @@
         <img src="${static.url('images/jobs.jpeg')}">
       </div>
       <header>
-        <h2>Our mission is to transform learning.</h2>
+        <h2>${_("Our mission is to transform learning.")}</h2>
 
         <blockquote>
-          <p>&ldquo;EdX represents a unique opportunity to improve education on our campuses through online learning, while simultaneously creating a bold new educational path for millions of learners worldwide.&rdquo;</p>
+          <p>${_("&ldquo;EdX represents a unique opportunity to improve education on our campuses through online learning, while simultaneously creating a bold new educational path for millions of learners worldwide.&rdquo;")}</p>
           <cite>&mdash;Rafael Reif, MIT President </cite>
         </blockquote>
 
         <blockquote>
-          <p>&ldquo;EdX gives Harvard and MIT an unprecedented opportunity to dramatically extend our collective reach by conducting groundbreaking research into effective education and by extending online access to quality higher education.&rdquo;</p>
+          <p>${_("&ldquo;EdX gives Harvard and MIT an unprecedented opportunity to dramatically extend our collective reach by conducting groundbreaking research into effective education and by extending online access to quality higher education.&rdquo;")}</p>
           <cite>&mdash;Drew Faust, Harvard President</cite>
         </blockquote>
       </header>
@@ -36,19 +37,19 @@
 
       <article id="intro" class="job">
         <div class="inner-wrapper">
-          <h3>EdX is looking to add new talent to our team! </h3>
-          <p align="center"><em>Our mission is to give a world-class education to everyone, everywhere, regardless of gender, income or social status</em></p>
-          <p>Today, EdX.org, a not-for-profit provides hundreds of thousands of people from around the globe with access to free education.&nbsp; We offer amazing quality classes by the best professors from the best schools. We enable our members to uncover a new passion that will transform their lives and their communities.</p>
-          <p>Around the world-from coast to coast, in over 192 countries, people are making the decision to take one or several of our courses. As we continue to grow our operations, we are looking for talented, passionate people with great ideas to join the edX team. We aim to create an environment that is supportive, diverse, and as fun as our brand. If you&rsquo;re results-oriented, dedicated, and ready to contribute to an unparalleled member experience for our community, we really want you to apply.</p>
-          <p>As part of the edX team, you&rsquo;ll receive:</p>
+          <h3>${_("EdX is looking to add new talent to our team! ")}</h3>
+          <p align="center"><em>${_("Our mission is to give a world-class education to everyone, everywhere, regardless of gender, income or social status")}</em></p>
+          <p>${_("Today, EdX.org, a not-for-profit provides hundreds of thousands of people from around the globe with access to free education.&nbsp; We offer amazing quality classes by the best professors from the best schools. We enable our members to uncover a new passion that will transform their lives and their communities.")}</p>
+          <p>${_("Around the world-from coast to coast, in over 192 countries, people are making the decision to take one or several of our courses. As we continue to grow our operations, we are looking for talented, passionate people with great ideas to join the edX team. We aim to create an environment that is supportive, diverse, and as fun as our brand. If you&rsquo;re results-oriented, dedicated, and ready to contribute to an unparalleled member experience for our community, we really want you to apply.")}</p>
+          <p>${_("As part of the edX team, you&rsquo;ll receive:")}</p>
           <ul>
-            <li>Competitive compensation</li>
-            <li>Generous benefits package</li>
-            <li>Free lunch every day</li>
-            <li>A great working experience where everyone cares and wants to change the world (no, we’re not kidding)</li>
+            <li>${_("Competitive compensation")}</li>
+            <li>${_("Generous benefits package")}</li>
+            <li>${_("Free lunch every day")}</li>
+            <li>${_("A great working experience where everyone cares and wants to change the world (no, we\'re not kidding)")}</li>
           </ul>
-          <p>While we appreciate every applicant&rsquo;s interest, only those under consideration will be contacted. We regret that phone calls will not be accepted.  Equal opportunity employer.</p>
-          <p>All positions are located in our Cambridge offices.</p>
+          <p>${_("While we appreciate every applicant&rsquo;s interest, only those under consideration will be contacted. We regret that phone calls will not be accepted.  Equal opportunity employer.")}</p>
+          <p>${_("All positions are located in our Cambridge offices.")}</p>
         </div>
       </article>
 
@@ -56,525 +57,524 @@
       <!-- Template
            <article id="SOME-JOB" class="job">
              <div class="inner-wrapper">
-               <h3><strong>TITLE</strong></h3>
-               <p>INTRO</p>
-               <p><strong>Responsibilities:</strong></p>
+               <h3>${_("<strong>TITLE</strong>")}</h3>
+               <p>${_("INTRO")}</p>
+               <p><strong>${_("Responsibilities:")}</strong></p>
                <ul>
-                 <li>A LIST</li>
+                 <li>${_("A LIST")}</li>
                </ul>
-               <p><strong>Qualifications:</strong></p>
+               <p><strong>${_("Qualifications:")}</strong></p>
                <ul>
-                 <li>A LIST</li>
+                 <li>${_("A LIST")}</li>
                </ul>
-               
-               <p>TEXT</p>
-               <p>If you are interested in this position, please send an email to <a href="mailto:jobs@edx.org">jobs@edx.org</a>.</p>
+
+               <p>${_("TEXT")}</p>
+               <p>${_("If you are interested in this position, please send an email to <a href=\"mailto:jobs@edx.org\">jobs@edx.org</a>.")}</p>
              </div>
            </article>
            -->
-      
+
       <article id="director-of-education-services" class="job">
         <div class="inner-wrapper">
-          <h3><strong>DIRECTOR OF EDUCATION SERVICES</strong></h3>
-          <p>The edX Director of Education Services reporting to the VP of Engineering and Education Services is responsible for:</p>
+          <h3><strong>${_("DIRECTOR OF EDUCATION SERVICES")}</strong></h3>
+          <p>${_("The edX Director of Education Services reporting to the VP of Engineering and Education Services is responsible for:")}</p>
           <ol>
-            <li>Delivering 20 new courses in 2013 in collaboration with the partner Universities
+            <li>${_("Delivering 20 new courses in 2013 in collaboration with the partner Universities")}
               <ul>
-                <li><p>Reporting to the Director of Education Services are the Video production team, responsible for post-production of Course Video.  The Director must understand how to balance artistic quality and learning objectives, and reduce production time so that video capabilities are readily accessible and at reasonable costs.</p>
-                <li>Reporting to the Director are a small team of Program Managers, who are responsible for managing the day to day of course production and operations.  The Director must be experienced in capacity planning and operations, understand how to deploy lean collaboration and able to build alliances inside edX and the University.  In conjunction with the Program Managers, the Director of Education Services will supervise the collection of research, the retrospectives with Professors and the assembly of best practices in course production and operations.  The three key deliverables are the use of a well-defined lean process for onboarding Professors, the development of tracking tools, and assessment of effectiveness of Best Practices.
-                <li> Also reporting to the Director of Education Services are content engineers and Course Fellows, skilled in the development of edX assessments.  The Director of Education Services will also be responsible for communicating to the VP of Engineering requirements for new types of course assessments.  Course Fellows are extremely talented Ph.D.’s who work directly with the Professors to define and develop assessments and course curriculum.</li>
+                <li><p>${_("Reporting to the Director of Education Services are the Video production team, responsible for post-production of Course Video.  The Director must understand how to balance artistic quality and learning objectives, and reduce production time so that video capabilities are readily accessible and at reasonable costs.")}</p>
+                <li>${_("Reporting to the Director are a small team of Program Managers, who are responsible for managing the day to day of course production and operations.  The Director must be experienced in capacity planning and operations, understand how to deploy lean collaboration and able to build alliances inside edX and the University.  In conjunction with the Program Managers, the Director of Education Services will supervise the collection of research, the retrospectives with Professors and the assembly of best practices in course production and operations.  The three key deliverables are the use of a well-defined lean process for onboarding Professors, the development of tracking tools, and assessment of effectiveness of Best Practices.")}</li>
+                <li>${_(" Also reporting to the Director of Education Services are content engineers and Course Fellows, skilled in the development of edX assessments.  The Director of Education Services will also be responsible for communicating to the VP of Engineering requirements for new types of course assessments.  Course Fellows are extremely talented Ph.D.\'s who work directly with the Professors to define and develop assessments and course curriculum.")}</li>
               </ul>
             </li>
-            <li>Training and Onboarding of 30 Partner Universities and Affiliates
+            <li>${_("Training and Onboarding of 30 Partner Universities and Affiliates")}
               <ul>
-                <li>The edX Director of Education Services is responsible for building out the Training capabilities and delivery mechanisms for onboarding Professors at partner Universities. The edX Director must build out both the Training Team and the curriculum.  Training will be delivered in both online courses, self-paced formats, and workshops.  The training must cover a curriculum that enables partner institutions to be completely independent.  Additionally, partner institutions should be engaged to contribute to the curriculum and partner with edX in the delivery of the material.  The curriculum must exemplify the best in online learning, so the Universities are inspired to offer the kind of learning they have experienced in their edX Training.</li>
-                <li>Expand and extend the education goals of the partner Universities by operationalizing best practices.</li>
-                <li>Engage with University Boards to design and define the success that the technology makes possible.</li>
+                <li>${_("The edX Director of Education Services is responsible for building out the Training capabilities and delivery mechanisms for onboarding Professors at partner Universities. The edX Director must build out both the Training Team and the curriculum.  Training will be delivered in both online courses, self-paced formats, and workshops.  The training must cover a curriculum that enables partner institutions to be completely independent.  Additionally, partner institutions should be engaged to contribute to the curriculum and partner with edX in the delivery of the material.  The curriculum must exemplify the best in online learning, so the Universities are inspired to offer the kind of learning they have experienced in their edX Training.")}</li>
+                <li>${_("Expand and extend the education goals of the partner Universities by operationalizing best practices.")}</li>
+                <li>${_("Engage with University Boards to design and define the success that the technology makes possible.")}</li>
               </ul>
             </li>
-            <li>Growing the Team, Growing the Business
+            <li>${_("Growing the Team, Growing the Business")}
               <ul>
-                <li>The edX Director will be responsible for working with Business Development to identify revenue opportunities and build profitable plans to grow the business and grow the team.</li>
-                <li>Maintain for-profit nimbleness in an organization committed to non-profit ideals.</li>
-                <li>Design scalable solutions to opportunities revealed by technical innovations</li>
+                <li>${_("The edX Director will be responsible for working with Business Development to identify revenue opportunities and build profitable plans to grow the business and grow the team.")}</li>
+                <li>${_("Maintain for-profit nimbleness in an organization committed to non-profit ideals.")}</li>
+                <li>${_("Design scalable solutions to opportunities revealed by technical innovations")}</li>
               </ul>
             </li>
-            <li>Integrating a Strong Team within Strong Organization
+            <li>${_("Integrating a Strong Team within Strong Organization")}
               <ul>
-                <li>Connect organization’s management and University leadership with consistent and high quality expectations and deployment</li>
-                <li>Integrate with a highly collaborative leadership team to maximize talents of the organization</li>
-                <li>Successfully escalate issues within and beyond the organization to ensure the best possible educational outcome for students and Universities</li>
+                <li>${_("Connect organization\'s management and University leadership with consistent and high quality expectations and deployment")}</li>
+                <li>${_("Integrate with a highly collaborative leadership team to maximize talents of the organization")}</li>
+                <li>${_("Successfully escalate issues within and beyond the organization to ensure the best possible educational outcome for students and Universities")}</li>
               </ul>
             </li>
           </ol>
-          <p><strong>Skills:</strong></p>
+          <p><strong>${_("Skills:")}</strong></p>
           <ul>
-            <li>Ability to lead simultaneous initiatives in an entrepreneurial culture</li>
-            <li>Self-starter, challenger, strategic planner, analytical thinker</li>
-            <li>Excellent written and verbal skills</li>
-            <li>Strong, proactive leadership</li>
-            <li>Experience with deploying educational technologies on a large scale</li>
-            <li>Develop team skills in a ferociously intelligent group</li>
-            <li>Fan the enthusiasm of the partner Universities when the enormity of the transition they are facing becomes intimidating</li>
-            <li>Encourage creativity to allow the technology to provoke pedagogical possibilities that brick and mortar classes have precluded.</li>
-            <li>Lean and Agile thinking and training.  Experienced in Scrum or Kanban.</li>
-            <li>Design and deliver hiring/development plans which meet rapidly changing skill needs.</li>
+            <li>${_("Ability to lead simultaneous initiatives in an entrepreneurial culture")}</li>
+            <li>${_("Self-starter, challenger, strategic planner, analytical thinker")}</li>
+            <li>${_("Excellent written and verbal skills")}</li>
+            <li>${_("Strong, proactive leadership")}</li>
+            <li>${_("Experience with deploying educational technologies on a large scale")}</li>
+            <li>${_("Develop team skills in a ferociously intelligent group")}</li>
+            <li>${_("Fan the enthusiasm of the partner Universities when the enormity of the transition they are facing becomes intimidating")}</li>
+            <li>${_("Encourage creativity to allow the technology to provoke pedagogical possibilities that brick and mortar classes have precluded.")}</li>
+            <li>${_("Lean and Agile thinking and training.  Experienced in Scrum or Kanban.")}</li>
+            <li>${_("Design and deliver hiring/development plans which meet rapidly changing skill needs.")}</li>
           </ul>
-          
-          <p>If you are interested in this position, please send an email to <a href="mailto:jobs@edx.org">jobs@edx.org</a>.</p>
+
+          <p>${_("If you are interested in this position, please send an email to <a href=\"mailto:jobs@edx.org\">jobs@edx.org</a>.")}</p>
         </div>
       </article>
 
       <article id="manager-of-training-services" class="job">
         <div class="inner-wrapper">
-          <h3><strong>MANAGER OF TRAINING SERVICES</strong></h3>
-          <p>The Manager of Training Services is an integral member of the edX team, a leader who is also a doer, working  hands-on in the development and delivery of edX&rsquo;s training portfolio. Reporting to the Director of Education Services, the manager will be a strategic thinker, providing leadership and vision in the development of world-class training solutions tailored to meet the diverse needs of edX Universities, partners and stakeholders</p>
-          <p><strong>Responsibilities:</strong></p>
+          <h3><strong>${_("MANAGER OF TRAINING SERVICES")}</strong></h3>
+          <p>${_("The Manager of Training Services is an integral member of the edX team, a leader who is also a doer, working  hands-on in the development and delivery of edX&rsquo;s training portfolio. Reporting to the Director of Education Services, the manager will be a strategic thinker, providing leadership and vision in the development of world-class training solutions tailored to meet the diverse needs of edX Universities, partners and stakeholders")}</p>
+          <p><strong>${_("Responsibilities:")}</strong></p>
           <ul>
-            <li>Working with the Director of Education Services, create and manage a world-class training program that includes in-person workshops and online formats such as self-paced courses, and webinars.</li>
-            <li>Work across a talented team of product developers, video producers and content experts to identify training needs and proactively develop training curricula for new products and services as they are deployed.</li>
-            <li>Develop the means for sharing and showcasing edX best practices for both internal and external audiences.</li>
-            <li>Apply sound instructional design theory and practice in the development of all edX training resources. </li>
-            <li>Work with program managers to develop training benchmarks and Key Performance Indicators. Monitor progress and proactively make adjustments as necessary.</li>
-            <li>Collaborate with product development on creating documentation and user guides. </li>
-            <li>Provide on-going evaluation of the effectiveness of edX training programs.</li>
-            <li>Assist in the revision/refinement of training curricula and resources. </li>
-            <li>Grow a train-the-trainer organization with edX partners, identifying expert edX users to provide on-site peer assistance. </li>
-            <li>Deliver internal and external trainings.</li>
-            <li>Coordinate with internal teams to ensure appropriate preparation for trainings, and follow-up after delivery.</li>
-            <li>Maintain training reporting database and training records.</li>
-            <li>Produce training evaluation reports, training support plans, and training improvement plans. </li>
-            <li>Quickly become an expert on edX’s standards, procedures and tools.</li>
-            <li>Stay current on emerging trends in eLearning, platform support and implementation strategy.</li>
+            <li>${_("Working with the Director of Education Services, create and manage a world-class training program that includes in-person workshops and online formats such as self-paced courses, and webinars.")}</li>
+            <li>${_("Work across a talented team of product developers, video producers and content experts to identify training needs and proactively develop training curricula for new products and services as they are deployed.")}</li>
+            <li>${_("Develop the means for sharing and showcasing edX best practices for both internal and external audiences.")}</li>
+            <li>${_("Apply sound instructional design theory and practice in the development of all edX training resources. ")}</li>
+            <li>${_("Work with program managers to develop training benchmarks and Key Performance Indicators. Monitor progress and proactively make adjustments as necessary.")}</li>
+            <li>${_("Collaborate with product development on creating documentation and user guides. ")}</li>
+            <li>${_("Provide on-going evaluation of the effectiveness of edX training programs.")}</li>
+            <li>${_("Assist in the revision/refinement of training curricula and resources. ")}</li>
+            <li>${_("Grow a train-the-trainer organization with edX partners, identifying expert edX users to provide on-site peer assistance. ")}</li>
+            <li>${_("Deliver internal and external trainings.")}</li>
+            <li>${_("Coordinate with internal teams to ensure appropriate preparation for trainings, and follow-up after delivery.")}</li>
+            <li>${_("Maintain training reporting database and training records.")}</li>
+            <li>${_("Produce training evaluation reports, training support plans, and training improvement plans. ")}</li>
+            <li>${_("Quickly become an expert on edX\'s standards, procedures and tools.")}</li>
+            <li>${_("Stay current on emerging trends in eLearning, platform support and implementation strategy.")}</li>
           </ul>
-          <p><strong>Requirements:</strong></p>
+          <p>${_("<strong>Requirements:</strong>")}</p>
           <ul>
-            <li>Minimum of 5-7 years experience developing and delivering educational training, preferably in an educational technology organization. </li>
-            <li>Lean and Agile thinking and training. Experienced in Scrum or Kanban.</li>
-            <li>Excellent interpersonal skills including proven presentation and facilitation skills.</li>
-            <li>Strong oral and written communication skills.</li>
-            <li>Proven experience with production and delivery of online training programs that utilize asychronous and synchronous delivery mechanisms. </li>
-            <li>Flexibility to work on a variety of initiatives; prior startup experience preferred.</li>
-            <li>Outstanding work ethic, results-oriented, and creative/innovative style.</li>
-            <li>Proactive, optimistic approach to problem solving.</li>
-            <li>Commitment to constant personal and organizational improvement.</li>
-            <li>Willingness to travel to partner sites as needed.   </li>
-            <li>Bachelor's or Master’s in Education, organizational learning, or other related field preferred.  But we're all about education, so let us know how you gained what you need to succeed in this role: projects after completing 6.00x or CS50x, Xbox cheevos, on-line guilds led, large scale innovations championed.</li>
+            <li>${_("Minimum of 5-7 years experience developing and delivering educational training, preferably in an educational technology organization. ")}</li>
+            <li>${_("Lean and Agile thinking and training. Experienced in Scrum or Kanban.")}</li>
+            <li>${_("Excellent interpersonal skills including proven presentation and facilitation skills.")}</li>
+            <li>${_("Strong oral and written communication skills.")}</li>
+            <li>${_("Proven experience with production and delivery of online training programs that utilize asychronous and synchronous delivery mechanisms. ")}</li>
+            <li>${_("Flexibility to work on a variety of initiatives; prior startup experience preferred.")}</li>
+            <li>${_("Outstanding work ethic, results-oriented, and creative/innovative style.")}</li>
+            <li>${_("Proactive, optimistic approach to problem solving.")}</li>
+            <li>${_("Commitment to constant personal and organizational improvement.")}</li>
+            <li>${_("Willingness to travel to partner sites as needed.   ")}</li>
+            <li>${_("Bachelor's or Master's in Education, organizational learning, or other related field preferred.  But we're all about education, so let us know how you gained what you need to succeed in this role: projects after completing 6.00x or CS50x, Xbox cheevos, on-line guilds led, large scale innovations championed.")}</li>
           </ul>
-          
-          <p>If you are interested in this position, please send an email to <a href="mailto:jobs@edx.org">jobs@edx.org</a>.</p>
+
+          <p>${_("If you are interested in this position, please send an email to <a href=\"mailto:jobs@edx.org\">jobs@edx.org</a>.")}</p>
         </div>
       </article>
 
 
       <article id="trainer" class="job">
         <div class="inner-wrapper">
-          <h3><strong>TRAINER</strong></h3>
-          <p>All those Universities on the edX homepage are full of incredible professors and teaching teams, designing on-line courses that will change the face of education.  The edX team is constantly training whole new university teams on how to make their visions shine using edX software.  We’re looking for some truly talented people to help train people on the tools that are enabling the future of education.</p>
-          <p><strong>Responsibilities:</strong></p>
+          <h3><strong>${_("TRAINER")}</strong></h3>
+          <p>${_("All those Universities on the edX homepage are full of incredible professors and teaching teams, designing on-line courses that will change the face of education.  The edX team is constantly training whole new university teams on how to make their visions shine using edX software.  We\'re looking for some truly talented people to help train people on the tools that are enabling the future of education.")}</p>
+          <p><strong>${_("Responsibilities:")}</strong></p>
           <ul>
-            <li>Facilitate training programs as required ensuring that best practices are incorporated in all learning environments.</li>
-            <li>Create and design learning materials for training curriculums, incorporate edX best practices into training curriculum.</li>
-            <li>Incorporate key performance metrics into training modules; participate in strategic initiatives</li>
-            <li>Measure, monitor and share training results with business units to identify future training opportunities.</li>
-            <li>Identify and leverage existing resources to maximize partner efficiency and productivity. </li>
-            <li>Work with both Universities and edX to provide strategic input based on future training needs.</li>
-            <li>Communicate effectively in oral and written presentations.</li>
-            <li>Analyze learners training needs and identify cross training opportunities.</li>
-            <li>Mentor and train others on training tools to expand training efficiency and uniformity.</li>
-            <li>Build relationships with universities to be viewed as a trusted training partner. </li>
+            <li>${_("Facilitate training programs as required ensuring that best practices are incorporated in all learning environments.")}</li>
+            <li>${_("Create and design learning materials for training curriculums, incorporate edX best practices into training curriculum.")}</li>
+            <li>${_("Incorporate key performance metrics into training modules; participate in strategic initiatives")}</li>
+            <li>${_("Measure, monitor and share training results with business units to identify future training opportunities.")}</li>
+            <li>${_("Identify and leverage existing resources to maximize partner efficiency and productivity. ")}</li>
+            <li>${_("Work with both Universities and edX to provide strategic input based on future training needs.")}</li>
+            <li>${_("Communicate effectively in oral and written presentations.")}</li>
+            <li>${_("Analyze learners training needs and identify cross training opportunities.")}</li>
+            <li>${_("Mentor and train others on training tools to expand training efficiency and uniformity.")}</li>
+            <li>${_("Build relationships with universities to be viewed as a trusted training partner. ")}</li>
           </ul>
-          <p><strong>Requirements:</strong></p>
+          <p>${_("<strong>Requirements:</strong>")}</p>
           <ul>
-            <li>Minimum of 1-3 years experience developing and delivering educational training, preferably in an educational technology organization. </li>
-            <li>Lean and Agile thinking and training. Experienced in Scrum or Kanban preferred.</li>
-            <li>Excellent interpersonal skills including proven presentation and facilitation skills.</li>
-            <li>Strong oral and written communication skills.</li>
-            <li>Flexibility to work on a variety of initiatives; prior startup experience preferred.</li>
-            <li>Outstanding work ethic, results-oriented, and creative/innovative style.</li>
-            <li>Proactive, optimistic approach to problem solving.</li>
-            <li>Commitment to constant personal and organizational improvement.</li>
-            <li>Willingness to travel to partner sites as needed.</li>
-            <li>Bachelors or Master’s in Education, organizational learning, instructional design or other related field preferred.  But we're all about education, so let us know how you gained what you need to succeed in this role: projects after completing 6.00x or CS50x, Xbox cheevos, on-line guilds led, large scale innovations championed.</li>
+            <li>${_("Minimum of 1-3 years experience developing and delivering educational training, preferably in an educational technology organization. ")}</li>
+            <li>${_("Lean and Agile thinking and training. Experienced in Scrum or Kanban preferred.")}</li>
+            <li>${_("Excellent interpersonal skills including proven presentation and facilitation skills.")}</li>
+            <li>${_("Strong oral and written communication skills.")}</li>
+            <li>${_("Flexibility to work on a variety of initiatives; prior startup experience preferred.")}</li>
+            <li>${_("Outstanding work ethic, results-oriented, and creative/innovative style.")}</li>
+            <li>${_("Proactive, optimistic approach to problem solving.")}</li>
+            <li>${_("Commitment to constant personal and organizational improvement.")}</li>
+            <li>${_("Willingness to travel to partner sites as needed.")}</li>
+            <li>${_("Bachelors or Master's in Education, organizational learning, instructional design or other related field preferred.  But we're all about education, so let us know how you gained what you need to succeed in this role: projects after completing 6.00x or CS50x, Xbox cheevos, on-line guilds led, large scale innovations championed.")}</li>
           </ul>
-          
-          <p>If you are interested in this position, please send an email to <a href="mailto:jobs@edx.org">jobs@edx.org</a>.</p>
+
+          <p>${_("If you are interested in this position, please send an email to <a href=\"mailto:jobs@edx.org\">jobs@edx.org</a>.")}</p>
         </div>
       </article>
 
 
       <article id="instructional-designer" class="job">
         <div class="inner-wrapper">
-          <h3><strong>INSTRUCTIONAL DESIGNER</strong></h3>
-          <p>The Instructional Designer will work collaboratively with the edX content and engineering teams to plan, develop and deliver highly engaging and media rich online courses. The Instructional Designer will be a flexible thinker, able to determine and apply sound pedagogical strategies to unique situations and a diverse set of academic disciplines.</p>
-          <p><strong>Responsibilities:</strong></p>
+          <h3><strong>${_("INSTRUCTIONAL DESIGNER")}</strong></h3>
+          <p>${_("The Instructional Designer will work collaboratively with the edX content and engineering teams to plan, develop and deliver highly engaging and media rich online courses. The Instructional Designer will be a flexible thinker, able to determine and apply sound pedagogical strategies to unique situations and a diverse set of academic disciplines.")}</p>
+          <p><strong>${_("Responsibilities:")}</strong>")}</p>
           <ul>
-            <li>Work with the video production team, product managers and course staff on the implementation of instructional design approaches in the development of media and other course materials.</li>
-            <li>Based on course staff and faculty input, articulate learning objectives and align them to design strategies and assessments.</li>
-            <li>Develop flipped classroom instructional strategies in coordination with community college faculty.</li>
-            <li>Produce clear and instructionally effective copy, instructional text, and audio and video scripts</li>
-            <li>Identify and deploy instructional design best practices for edX course staff and faculty as needed.</li>
-            <li>Create course communication style guides. Train and coach teaching staff on best practices for communication and discussion management.</li>
-            <li>Serve as a liaison to instructional design teams based at our partner Universities.</li>
-            <li>Consult on peer review processes to be used by learners in selected courses.</li>
-            <li>Ability to apply game-based learning theory and design into selected courses as appropriate.</li>
-            <li>Use learning analytics and metrics to inform course design and revision process.</li>
-            <li>Collaborate with key research and learning sciences stakeholders at edX and partner institutions for the development of best practices for MOOC teaching and learning and course design.</li>
-            <li>Support the development of pilot courses and modules used for sponsored research initiatives.</li>
+            <li>${_("Work with the video production team, product managers and course staff on the implementation of instructional design approaches in the development of media and other course materials.")}</li>
+            <li>${_("Based on course staff and faculty input, articulate learning objectives and align them to design strategies and assessments.")}</li>
+            <li>${_("Develop flipped classroom instructional strategies in coordination with community college faculty.")}</li>
+            <li>${_("Produce clear and instructionally effective copy, instructional text, and audio and video scripts")}</li>
+            <li>${_("Identify and deploy instructional design best practices for edX course staff and faculty as needed.")}</li>
+            <li>${_("Create course communication style guides. Train and coach teaching staff on best practices for communication and discussion management.")}</li>
+            <li>${_("Serve as a liaison to instructional design teams based at our partner Universities.")}</li>
+            <li>${_("Consult on peer review processes to be used by learners in selected courses.")}</li>
+            <li>${_("Ability to apply game-based learning theory and design into selected courses as appropriate.")}</li>
+            <li>${_("Use learning analytics and metrics to inform course design and revision process.")}</li>
+            <li>${_("Collaborate with key research and learning sciences stakeholders at edX and partner institutions for the development of best practices for MOOC teaching and learning and course design.")}</li>
+            <li>${_("Support the development of pilot courses and modules used for sponsored research initiatives.")}</li>
           </ul>
-          <p><strong>Qualifications:</strong></p>
+          <p>${_("<strong>Qualifications:</strong>")}</p>
           <ul>
-            <li>Master's Degree in Educational Technology, Instructional Design or related field. Experience in higher education with additional experience in a start-up or research environment preferable. But we're all about education, so let us know how you gained what you need to succeed in this role: projects after completing 6.00x or CS50x, Xbox cheevos, on-line guilds led, large scale innovations championed.</li>
-            <li>Experience in higher education with additional experience in a start-up or research environment preferable.</li>
-            <li>Excellent interpersonal and communication (written and verbal), project management, problem-solving and time management skills. The ability to be flexible with projects and to work on multiple courses essential.</li>
-            <li>Ability to meet deadlines and manage expectations of constituents.</li>
-            <li>Capacity to develop new and relevant technology skills. Experience using game theory design and learning analytics to inform instructional design decisions and strategy.</li>
-            <li>Technical Skills: Video and screencasting experience. LMS Platform experience, XML, HTML, CSS, Adobe Design Suite, Camtasia or Captivate experience. Experience with web 2.0 collaboration tools.</li>
+            <li>${_("Master's Degree in Educational Technology, Instructional Design or related field. Experience in higher education with additional experience in a start-up or research environment preferable. But we're all about education, so let us know how you gained what you need to succeed in this role: projects after completing 6.00x or CS50x, Xbox cheevos, on-line guilds led, large scale innovations championed.")}</li>
+            <li>${_("Experience in higher education with additional experience in a start-up or research environment preferable.")}</li>
+            <li>${_("Excellent interpersonal and communication (written and verbal), project management, problem-solving and time management skills. The ability to be flexible with projects and to work on multiple courses essential.")}</li>
+            <li>${_("Ability to meet deadlines and manage expectations of constituents.")}</li>
+            <li>${_("Capacity to develop new and relevant technology skills. Experience using game theory design and learning analytics to inform instructional design decisions and strategy.")}</li>
+            <li>${_("Technical Skills: Video and screencasting experience. LMS Platform experience, XML, HTML, CSS, Adobe Design Suite, Camtasia or Captivate experience. Experience with web 2.0 collaboration tools.")}</li>
           </ul>
-          
-          <p>Eligible candidates will be invited to respond to an Instructional Design task based on current or future edX course development needs.</p>
-          <p>If you are interested in this position, please send an email to <a href="mailto:jobs@edx.org">jobs@edx.org</a>.</p>
+
+          <p>${_("Eligible candidates will be invited to respond to an Instructional Design task based on current or future edX course development needs.")}</p>
+          <p>${_("If you are interested in this position, please send an email to <a href=\"mailto:jobs@edx.org\">jobs@edx.org</a>.")}</p>
         </div>
       </article>
 
 
       <article id="program-manager" class="job">
         <div class="inner-wrapper">
-          <h3><strong>PROGRAM MANAGER</strong></h3>
-          <p>EdX Program Managers (PM) lead the edX's course production process. They are systems thinkers who manage the creation of a course from start to finish. PMs work with University Professors and course staff to help them take advantage of edX services to create world class online learning offerings and encourage the exploration of an emerging form of higher education.</p>
-          <p><strong>Responsibilities:</strong></p>
+          <h3><strong>${_("PROGRAM MANAGER")}</strong></h3>
+          <p>${_("EdX Program Managers (PM) lead the edX's course production process. They are systems thinkers who manage the creation of a course from start to finish. PMs work with University Professors and course staff to help them take advantage of edX services to create world class online learning offerings and encourage the exploration of an emerging form of higher education.")}</p>
+          <p><strong>${_("Responsibilities:")}</strong></p>
           <ul>
-            <li>Create and execute the course production cycle. PMs are able to examine and explain what they do in great detail and able to think abstractly about people, time, and processes. They coordinate the efforts of multiple teams engaged in the production of the courses assigned to them.</li>
-            <li>Train partners and drive best practices adoption. PMs train course staff from partner institutions and help them adopt best practices for workflow and tools. </li>
-            <li>Build capacity. Mentor staff at partner institutions, train the trainers that help them scale their course production ability.</li>
-            <li>Create visibility. PMs are responsible for making the state of the course production system accessible and comprehensible to all stakeholders. They are capable of training Course development teams in Scrum and Kanban, and are Lean thinkers and educators.</li>
-            <li>Improve workflows. PMs are responsible for carefully assessing the methods and outputs of each course and adjusting them to take best advantage of available resources.</li>
-            <li>Encourage innovation. Spark creativity in course teams to build new courses that could never be produced in brick and mortar settings.</li>
+            <li>${_("Create and execute the course production cycle. PMs are able to examine and explain what they do in great detail and able to think abstractly about people, time, and processes. They coordinate the efforts of multiple teams engaged in the production of the courses assigned to them.")}</li>
+            <li>${_("Train partners and drive best practices adoption. PMs train course staff from partner institutions and help them adopt best practices for workflow and tools. ")}</li>
+            <li>${_("Build capacity. Mentor staff at partner institutions, train the trainers that help them scale their course production ability.")}</li>
+            <li>${_("Create visibility. PMs are responsible for making the state of the course production system accessible and comprehensible to all stakeholders. They are capable of training Course development teams in Scrum and Kanban, and are Lean thinkers and educators.")}</li>
+            <li>${_("Improve workflows. PMs are responsible for carefully assessing the methods and outputs of each course and adjusting them to take best advantage of available resources.")}</li>
+            <li>${_("Encourage innovation. Spark creativity in course teams to build new courses that could never be produced in brick and mortar settings.")}</li>
           </ul>
-          <p><strong>Qualifications:</strong></p>
+          <p><strong>${_("Qualifications:")}</strong></p>
           <ul>
-            <li>Bachelor's Degree. Master's Degree preferred. But we're all about education, so let us know how you gained what you need to succeed in this role: projects after completing 6.00x or CS50x, Xbox cheevos, on-line guilds led, large scale innovations championed.</li>
-            <li>At least 2 years of experience working with University faculty and administrators.</li>
-            <li>Proven record of successful Scrum or Kanban project management, including use of project management tools. </li>
-            <li>Ability to create processes that systematically provide solutions to open ended challenges.</li>
-            <li>Excellent interpersonal and communication (written and verbal) skills, the ability to define and solve technical, process and organizational problems, and time management skills.</li>
-            <li>Proactive, optimistic approach to problem solving.</li>
-            <li>Commitment to constant personal and organizational improvement.</li>
+            <li>${_("Bachelor's Degree. Master's Degree preferred. But we're all about education, so let us know how you gained what you need to succeed in this role: projects after completing 6.00x or CS50x, Xbox cheevos, on-line guilds led, large scale innovations championed.")}</li>
+            <li>${_("At least 2 years of experience working with University faculty and administrators.")}</li>
+            <li>${_("Proven record of successful Scrum or Kanban project management, including use of project management tools. ")}</li>
+            <li>${_("Ability to create processes that systematically provide solutions to open ended challenges.")}</li>
+            <li>${_("Excellent interpersonal and communication (written and verbal) skills, the ability to define and solve technical, process and organizational problems, and time management skills.")}</li>
+            <li>${_("Proactive, optimistic approach to problem solving.")}</li>
+            <li>${_("Commitment to constant personal and organizational improvement.")}</li>
           </ul>
 
-          <p><strong>Preferred qualifications</strong></p>          
+          <p><strong>${_("Preferred qualifications")}</strong></p>
           <ul>
-            <li>Some teaching experience, </li>
-            <li>Online course design and development experience.</li>
-            <li>Experience with Lean and Agile thinking and processes.</li>
-            <li>Experience with online collaboration tools</li>
-            <li>Familiarity with video production.</li>
-            <li>Basic HTML, XML, programming skills.</li>
+            <li>${("Some teaching experience, ")}</li>
+            <li>${_("Online course design and development experience.")}</li>
+            <li>${_("Experience with Lean and Agile thinking and processes.")}</li>
+            <li>${_("Experience with online collaboration tools")}</li>
+            <li>${_("Familiarity with video production.")}</li>
+            <li>${_("Basic HTML, XML, programming skills.")}</li>
 
           </ul>
-          <p>If you are interested in this position, please send an email to <a href="mailto:jobs@edx.org">jobs@edx.org</a>.</p>
+          <p>${_("If you are interested in this position, please send an email to <a href=\"mailto:jobs@edx.org\">jobs@edx.org</a>.")}</p>
         </div>
       </article>
 
 
       <article id="director-of-product-management" class="job">
         <div class="inner-wrapper">
-          <h3><strong>DIRECTOR, PRODUCT MANAGEMENT</strong></h3>
-          <p>When the power of edX is at its fullest, individuals become the students they had always hoped to be, Professors teach the courses they had always imagined and Universities offer educational opportunities never before seen.  None of that happens by accident, so edX is seeking a Product Manager who can keep their eyes on the future and their heart and hands with a team of ferociously intelligent and dedicated technologists.
+          <h3><strong>${_("DIRECTOR, PRODUCT MANAGEMENT")}</strong></h3>
+          <p>${_("When the power of edX is at its fullest, individuals become the students they had always hoped to be, Professors teach the courses they had always imagined and Universities offer educational opportunities never before seen.  None of that happens by accident, so edX is seeking a Product Manager who can keep their eyes on the future and their heart and hands with a team of ferociously intelligent and dedicated technologists.")}
           </p>
-          <p>The responsibility of a Product Manager is first and foremost to provide evidence to the development team that what they build will succeed in the marketplace. It is the responsibility of the Product Manager to define the product backlog and the team to build the backlog.  The Product Manager is one of the most highly leveraged individuals in the Engineering organization.  They work to bring a deep knowledge of the Customer – Students, Professors and Course Staff to the product roadmap.  The Product Manager is well-versed in the data and sets the KPI’s that drives the team, the Product Scorecard and the Company Scorecard.  They are expected to become experts in the business of online learning, familiar with blended models, MOOC’s and University and Industry needs and the competition.  The Product Manager must be able to understand the edX stakeholders.
+          <p>${_("The responsibility of a Product Manager is first and foremost to provide evidence to the development team that what they build will succeed in the marketplace. It is the responsibility of the Product Manager to define the product backlog and the team to build the backlog.  The Product Manager is one of the most highly leveraged individuals in the Engineering organization.  They work to bring a deep knowledge of the Customer - Students, Professors and Course Staff to the product roadmap.  The Product Manager is well-versed in the data and sets the KPI\'s that drives the team, the Product Scorecard and the Company Scorecard.  They are expected to become experts in the business of online learning, familiar with blended models, MOOC\'s and University and Industry needs and the competition.  The Product Manager must be able to understand the edX stakeholders.")}
           </p>
-          <p><strong>Responsibilities:</strong></p>
+          <p><strong>${_("Responsibilities:")}</strong></p>
           <ul>
-            <li>Assess users’ needs, whether students, Professors or Universities.</li>
-            <li>Research markets and competitors to provide data driven decisions.</li>
-            <li>Work with multiple engineering teams, through consensus and with data-backed arguments, in order to provide technology which defines the state of the art for online courses.</li>
-            <li>Repeatedly build and launch new products and services, complete with the training, documentation and metrics needed to enhance the already impressive brands of the edX partner institutions.</li>
-            <li>Establish the vision and future direction of the product with input from edX leadership and guidance from partner organizations.</li>
-            <li>Work in a lean organization, committed to Scrum and Kanban.</li>
+            <li>${_("Assess users\' needs, whether students, Professors or Universities.")}</li>
+            <li>${_("Research markets and competitors to provide data driven decisions.")}</li>
+            <li>${_("Work with multiple engineering teams, through consensus and with data-backed arguments, in order to provide technology which defines the state of the art for online courses.")}</li>
+            <li>${_("Repeatedly build and launch new products and services, complete with the training, documentation and metrics needed to enhance the already impressive brands of the edX partner institutions.")}</li>
+            <li>${_("Establish the vision and future direction of the product with input from edX leadership and guidance from partner organizations.")}</li>
+            <li>${_("Work in a lean organization, committed to Scrum and Kanban.")}</li>
           </ul>
-          <p><strong>Qualifications:</strong></p>
+          <p><strong>${_("Qualifications:")}</strong></p>
           <ul>
-            <li>Bachelor’s degree or higher in a Technical Area, MBA  or Masters in Design preferred. But we're all about education, so let us know how you gained what you need to succeed in this role: projects after completing 6.00x or CS50x, Xbox cheevos, on-line guilds led, large scale innovations championed.</li>
-            <li>Proven ability to develop and implement strategy</li>
-            <li>Exquisite organizational skills</li>
-            <li>Deep analytical skills</li>
-            <li>Social finesse and business sense</li>
-            <li>Scrum, Kanban</li>
-            <li>Infatuation with technology, in all its frustrating and fragile complexity</li>
-            <li>Top flight communication skills, oral and written, with teams which are centrally located and spread all over the world.</li>
-            <li>Personal commitment and experience of the transformational possibilities of higher education</li>
+            <li>${_("Bachelor\'s degree or higher in a Technical Area, MBA  or Masters in Design preferred. But we're all about education, so let us know how you gained what you need to succeed in this role: projects after completing 6.00x or CS50x, Xbox cheevos, on-line guilds led, large scale innovations championed.")}</li>
+            <li>${_("Proven ability to develop and implement strategy")}</li>
+            <li>${_("Exquisite organizational skills")}</li>
+            <li>${_("Deep analytical skills")}</li>
+            <li>${_("Social finesse and business sense")}</li>
+            <li>${_("Scrum, Kanban")}</li>
+            <li>${_("Infatuation with technology, in all its frustrating and fragile complexity")}</li>
+            <li>${_("Top flight communication skills, oral and written, with teams which are centrally located and spread all over the world.")}</li>
+            <li>${_("Personal commitment and experience of the transformational possibilities of higher education")}</li>
           </ul>
-          
-          <p>If you are interested in this position, please send an email to <a href="mailto:jobs@edx.org">jobs@edx.org</a>.</p>
+
+          <p>${_("If you are interested in this position, please send an email to <a href=\"mailto:jobs@edx.org\">jobs@edx.org</a>.")}</p>
         </div>
       </article>
 
 
       <article id="content-engineer" class="job">
         <div class="inner-wrapper">
-          <h3><strong>CONTENT ENGINEER</strong></h3>
-          <p>Content engineers help create the technology for specific courses. The tasks include:</p>
+          <h3>${_("<strong>CONTENT ENGINEER</strong>")}</h3>
+          <p>${_("Content engineers help create the technology for specific courses. The tasks include:")}</p>
           <ul>
-            <li>Developing of course-specific user-facing elements, such as the circuit editor and simulator. </li>
-            <li>Integrating course materials into courses.</li>
-            <li>Creating programs to grade questions designed with complex technical features.</li>
-            <li>Knowledge of Python, XML, and/or JavaScript is desired. Strong interest and background in pedagogy and education is desired as well.</li>
-            <li>Building course components in straight XML or through our course authoring tool, edX Studio.</li>
-            <li>Assisting University teams and in house staff take advantage of new course software, including designing and developing technical refinements for implementation.</li>
-            <li>Pushing content to production servers predictably and cleanly.</li>
-            <li>Sending high volumes of course email adhering to email engine protocols.</li>
+            <li>${_("Developing of course-specific user-facing elements, such as the circuit editor and simulator. ")}</li>
+            <li>${_("Integrating course materials into courses.")}</li>
+            <li>${_("Creating programs to grade questions designed with complex technical features.")}</li>
+            <li>${_("Knowledge of Python, XML, and/or JavaScript is desired. Strong interest and background in pedagogy and education is desired as well.")}</li>
+            <li>${_("Building course components in straight XML or through our course authoring tool, edX Studio.")}</li>
+            <li>${_("Assisting University teams and in house staff take advantage of new course software, including designing and developing technical refinements for implementation.")}</li>
+            <li>${_("Pushing content to production servers predictably and cleanly.")}</li>
+            <li>${_("Sending high volumes of course email adhering to email engine protocols.")}</li>
           </ul>
-          <p><strong>Qualifications:</strong></p>
+          <p><strong>${_("Qualifications:")}</strong></p>
           <ul>
-            <li>Bachelor’s degree or higher. But we're all about education, so let us know how you gained what you need to succeed in this role: projects after completing 6.00x or CS50x, Xbox cheevos, on-line guilds led, large scale innovations championed.</li>
-            <li>Thorough knowledge of Python, DJango, XML, HTML, CSS, JavaScript and backbone.js.</li>
-            <li>Ability to work on multiple projects simultaneously without splintering.</li>
-            <li>Tactfully escalate conflicting deadlines or priorities only when needed.  Otherwise help the team members negotiate a solution.</li>
-            <li>Unfailing attention to detail, especially the details the course teams have seen so often they don’t notice them anymore.</li>
-            <li>Readily zoom from the big picture to the smallest course component to notice when typos, inconsistencies or repetitions have unknowingly crept in.</li>
-            <li>Curiosity to step into the shoes of an online student working to master the course content.</li>
-            <li>Solid interpersonal skills, especially good listening.</li>
+            <li>${_("Bachelor's degree or higher. But we're all about education, so let us know how you gained what you need to succeed in this role: projects after completing 6.00x or CS50x, Xbox cheevos, on-line guilds led, large scale innovations championed.")}</li>
+            <li>${_("Thorough knowledge of Python, DJango, XML, HTML, CSS, JavaScript and backbone.js.")}</li>
+            <li>${_("Ability to work on multiple projects simultaneously without splintering.")}</li>
+            <li>${_("Tactfully escalate conflicting deadlines or priorities only when needed.  Otherwise help the team members negotiate a solution.")}</li>
+            <li>${_("Unfailing attention to detail, especially the details the course teams have seen so often they don't notice them anymore.")}</li>
+            <li>${_("Readily zoom from the big picture to the smallest course component to notice when typos, inconsistencies or repetitions have unknowingly crept in.")}</li>
+            <li>${_("Curiosity to step into the shoes of an online student working to master the course content.")}</li>
+            <li>${_("Solid interpersonal skills, especially good listening.")}</li>
           </ul>
-          
-          <p>If you are interested in this position, please send an email to <a href="mailto:jobs@edx.org">jobs@edx.org</a>.</p>
+
+          <p>${_("If you are interested in this position, please send an email to <a href=\"mailto:jobs@edx.org\">jobs@edx.org</a>.")}</p>
         </div>
       </article>
 
 
       <article id="software-engineer" class="job">
         <div class="inner-wrapper">
-          <h3><strong>SOFTWARE ENGINEER</strong></h3>
-          <p>EdX is looking for engineers who can contribute to its Open Source learning platform.  We are a small team with a startup, lean culture, committed to building open-source software that scales and dramatically changes the face of education.  Our ideal candidates are hands on developers who understand how to build scalable, service based systems, preferably in Python and have a proven track record of bringing their ideas to market.  We are looking for engineers with all levels of experience, but you must be a proven leader and outstanding developer to work at edX.</p>
+          <h3>${_("<strong>SOFTWARE ENGINEER</strong>")}</h3>
+          <p>${_("EdX is looking for engineers who can contribute to its Open Source learning platform.  We are a small team with a startup, lean culture, committed to building open-source software that scales and dramatically changes the face of education.  Our ideal candidates are hands on developers who understand how to build scalable, service based systems, preferably in Python and have a proven track record of bringing their ideas to market.  We are looking for engineers with all levels of experience, but you must be a proven leader and outstanding developer to work at edX.")}</p>
 
           <p>There are a number of projects for which we are recruiting engineers:<br>
 
-          <p><strong>Learning Management System</strong>: We are developing an Open Source Standard that allows for the creation of instructional plug-ins and assessments in our platform.  You must have a deep interest in semantics of learning, and able to build services at scale.</p>
+          <p>${_("<strong>Learning Management System</strong>: We are developing an Open Source Standard that allows for the creation of instructional plug-ins and assessments in our platform.  You must have a deep interest in semantics of learning, and able to build services at scale.")}</p>
 
-          <p><strong>Forums</strong>:  We are building our own Forums software because we believe that education requires a forums platform capable of supporting learning communities.  We are analytics driven.   The ideal Forums candidates are focused on metrics and key performance indicators, understand how to build on top of a service based architecture and are wedded to quick iterations and user feedback.
+          <p>${_("<strong>Forums</strong>:  We are building our own Forums software because we believe that education requires a forums platform capable of supporting learning communities.  We are analytics driven.   The ideal Forums candidates are focused on metrics and key performance indicators, understand how to build on top of a service based architecture and are wedded to quick iterations and user feedback.")}</p>
 
-          <p><strong>Analytics</strong>:  We are looking for a platform engineer who has deep MongoDB or no SQL database experience.  Our data infrastructure needs to scale to multiple terabytes.  Researchers from Harvard, MIT, Berkeley and edX Universities will use our analytics platform to research and examine the fundamentals of learning.  The analytics engineer will be responsible for both building out an analytics platform and a pub-sub and real-time pipeline processing architecture.  Together they will allow researchers, students and Professors access to never before seen analytics. 
+          <p>${_("<strong>Analytics</strong>:  We are looking for a platform engineer who has deep MongoDB or no SQL database experience.  Our data infrastructure needs to scale to multiple terabytes.  Researchers from Harvard, MIT, Berkeley and edX Universities will use our analytics platform to research and examine the fundamentals of learning.  The analytics engineer will be responsible for both building out an analytics platform and a pub-sub and real-time pipeline processing architecture.  Together they will allow researchers, students and Professors access to never before seen analytics.")}</p>
 
-          <p><strong>Course Development Authoring Tools</strong>:  We are committed to making it easy for Professors to develop and publish their courses online.  So we are building the tools that allow them to readily convert their vision to an online course ready for thousands of students. </p>
+          <p>${_("<strong>Course Development Authoring Tools</strong>:  We are committed to making it easy for Professors to develop and publish their courses online.  So we are building the tools that allow them to readily convert their vision to an online course ready for thousands of students. ")}</p>
 
-          <p><strong>Requirements:</strong></p>
+          <p>${_("<strong>Requirements:</strong>")}</p>
           <ul>
-            <li>Real-world experience with Python or other dynamic development languages.</li>
-            <li>Able to code front to back, including HTML, CSS, JavaScript, Django, Python.</li>
-            <li>You must be committed to an agile development practices, in Scrum or Kanban.</li>
-            <li>Demonstrated skills in building Service based architecture.</li>
-            <li>Test Driven Development.</li>
-            <li>Committed to Documentation best practices so your code can be consumed in an open source environment.</li>
-            <li>Contributor to or consumer of Open Source Frameworks.</li>
-            <li>BS in Computer Science from top-tier institution. But we're all about education, so let us know how you gained what you need to succeed in this role: projects after completing 6.00x or CS50x, Xbox cheevos, on-line guilds led, large scale innovations championed.</li>
-            <li>Acknowledged by peers as a technology leader. </li>
+            <li>${_("Real-world experience with Python or other dynamic development languages.")}</li>
+            <li>${_("Able to code front to back, including HTML, CSS, JavaScript, Django, Python.")}</li>
+            <li>${_("You must be committed to an agile development practices, in Scrum or Kanban.")}</li>
+            <li>${_("Demonstrated skills in building Service based architecture.")}</li>
+            <li>${_("Test Driven Development.")}</li>
+            <li>${_("Committed to Documentation best practices so your code can be consumed in an open source environment.")}</li>
+            <li>${_("Contributor to or consumer of Open Source Frameworks.")}</li>
+            <li>${_("BS in Computer Science from top-tier institution. But we're all about education, so let us know how you gained what you need to succeed in this role: projects after completing 6.00x or CS50x, Xbox cheevos, on-line guilds led, large scale innovations championed.")}</li>
+            <li>${_("Acknowledged by peers as a technology leader. ")}</li>
           </ul>
 
-          <p>If you are interested in this position, please send an email to <a href="mailto:jobs@edx.org">jobs@edx.org</a>.</p>
+          <p>${_("If you are interested in this position, please send an email to <a href=\"mailto:jobs@edx.org\">jobs@edx.org</a>.")}</p>
         </div>
       </article>
 
       <article id="learning-sciences-engineer" class="job">
         <div class="inner-wrapper">
-          <h3><strong>LEARNING SCIENCES ENGINEER</strong></h3>
-          <p>In 2012, edX reinvented education. In 2013, the edX learning sciences team is charged with reinventing education, again. The goal of the team is to prototype and develop technologies which will radically change the way students learn and instructors teach. We will engage in projects in learning analytics, crowdsourced content development, intelligent tutoring, as well as radical changes to the ways course content is structured. We are looking to opportunistically build a small (3 person), fast-moving team capable of rapidly bringing advanced development projects to prototype and to market. All members of the team must be spectacular software engineers capable of working in or adapting to dynamic, duck typed, functional languages (Python and JavaScript). In addition, we are looking for some combination of:</p>
+          <h3><strong>${_("LEARNING SCIENCES ENGINEER")}</strong></h3>
+          <p>${_("In 2012, edX reinvented education. In 2013, the edX learning sciences team is charged with reinventing education, again. The goal of the team is to prototype and develop technologies which will radically change the way students learn and instructors teach. We will engage in projects in learning analytics, crowdsourced content development, intelligent tutoring, as well as radical changes to the ways course content is structured. We are looking to opportunistically build a small (3 person), fast-moving team capable of rapidly bringing advanced development projects to prototype and to market. All members of the team must be spectacular software engineers capable of working in or adapting to dynamic, duck typed, functional languages (Python and JavaScript). In addition, we are looking for some combination of:")}</p>
           <ul>
-            <li>Deep expertise in mathematics, and in particular, advanced linear algebra, machine learning, big data, psychometrics, and probability. </li>
-            <li>UX design. Capable of envisioning user interface for software that does things that have never been done before, and bringing them through to market. Skills should be broad and range the full gamut: graphic design, UX, HTML5, basic JavaScript, and CSS. </li>
-            <li>Interest and experience in both research and practice of education, cognitive science, and related fields. </li>
-            <li>Core backend experience (Python, Django, MongoDB, SQL)</li>
-            <li>Background in social networks and social network analysis (both social science and mathematics) is desirable as well.</li>
+            <li>${_("Deep expertise in mathematics, and in particular, advanced linear algebra, machine learning, big data, psychometrics, and probability. ")}</li>
+            <li>${_("UX design. Capable of envisioning user interface for software that does things that have never been done before, and bringing them through to market. Skills should be broad and range the full gamut: graphic design, UX, HTML5, basic JavaScript, and CSS. ")}</li>
+            <li>${_("Interest and experience in both research and practice of education, cognitive science, and related fields. ")}</li>
+            <li>${_("Core backend experience (Python, Django, MongoDB, SQL)")}</li>
+            <li>${_("Background in social networks and social network analysis (both social science and mathematics) is desirable as well.")}</li>
           </ul>
-          <p>More than anything, we’re looking for spectacular people capable of very rapidly building things which have never been built before. We’re capable of providing both traditional employment, and potentially, in partnership with MIT, more academic opportunities.</p>
-          
-          <p>If you are interested in this position, please send an email to <a href="mailto:jobs@edx.org">jobs@edx.org</a>.</p>
+          <p>${_("More than anything, we're looking for spectacular people capable of very rapidly building things which have never been built before. We're capable of providing both traditional employment, and potentially, in partnership with MIT, more academic opportunities.")}</p>
+
+          <p>${_("If you are interested in this position, please send an email to <a href=\"mailto:jobs@edx.org\">jobs@edx.org</a>.")}</p>
         </div>
       </article>
-      
+
        <article id="sales-engineer" class="job">
          <div class="inner-wrapper">
-             <h3><strong>SALES ENGINEER, BUSINESS DEVELOPMENT TEAM</strong></h3>
-           <p>A great relationship with edX begins long before the first student signs up. We are
-looking for some talented, self-motivated people to help set a solid foundation for
-our emerging corporate customers, NGO’s, and governmental partners. As the Sales
-Engineer you will be expected to provide oversight if requested over more junior
-staff. This may include skills development, knowledge transfer, sharing technical
-expertise, and review of demos prior to presentation. The Sales Engineer should
-have familiarity with instructional design and competency in that area is a plus.</p>
+           <h3><strong>${_("SALES ENGINEER, BUSINESS DEVELOPMENT TEAM")}</strong></h3>
+           <p>${_("A great relationship with edX begins long before the first student signs up. We are "
+                  "looking for some talented, self-motivated people to help set a solid foundation for "
+                  "our emerging corporate customers, NGO's, and governmental partners. As the Sales "
+                  "Engineer you will be expected to provide oversight if requested over more junior "
+                  "staff. This may include skills development, knowledge transfer, sharing technical "
+                  "expertise, and review of demos prior to presentation. The Sales Engineer should "
+                  "have familiarity with instructional design and competency in that area is a plus.")}</p>
 
-<p>Experience teaching and mentoring, needs assessment and prior management
-responsibility, and LMS experience, also a plus. This is a team atmosphere with
-many constituencies working to develop a new global perspective regarding higher
-education and online learning. Respect and patience, along with knowledge and
-understanding of the development process is critical to success in order to maintain
-strong bonds between development teams, sales team, and prospect/client
-implementation teams. In addition the Sales Engineer may also work with our
-xUniversity partners and the affiliated professors joining the edX movement. This
-position requires customer facing skills, comfort in demonstrating the product, and
-ability to code ‘demos’ as required. Additionally you will be contributing to
-proposals, so clear documentation and writing skills are critical. The job will
-require travel to client sites around the US upon occasion, and possibly
-internationally as well. Job also requires good speaking skills, and a willingness and
-ability to communicate clearly and respond quickly to prospect and customer
-requests. This is a salaried position and will on occasion require work and
-responsiveness to both the edX team and customers ‘after hours’. This position
-reports to the VP, Business Development and will be dotted lined to the
-development and program management teams.</p>
-           <p><strong>Responsibilities:</strong></p>
-           <ul>
-               <li>Can code demos and evaluate demos of others</li>
-               <li>Prepare and deliver standard and custom demonstrations</li>
-               <li>Handle all pre-sales technical issues professionally and efficiently</li>
-               <li>Maintain in-depth knowledge of products and pending new releases</li>
-               <li>Maintain a working knowledge of documentation and training</li>
-               <li>Maintain a working knowledge of workflow systems</li>
-               <li>Respond to technical questions from universities looking to expand their on-line offerings</li>
-               <li>Provide feedback to Product Development regarding new features, improving product performance, and eliminating bugs in the product</li>
-               <li>Prepare Professional Services for efficient onboarding – professionally managing the transition from pre-sales to post-sales</li>
-               <li>Deliver high-level presentation and associated ‘click-thru’ demonstrations</li>
-               <li>and be able to customize to prospect’s requirements</li>
-               <li>Understand and articulate the underlying technology concepts</li>
-               <li>Understand and articulate how all products components fit together technically as well as how they integrate and work with external technologies and cross functional applications found within clients organizations.</li>
-               <li>Build relationships with our prospects and universities, to be viewed as a trusted training partner.</li>
+            <p>${_("Experience teaching and mentoring, needs assessment and prior management "
+                   "responsibility, and LMS experience, also a plus. This is a team atmosphere with "
+                   "many constituencies working to develop a new global perspective regarding higher "
+                   "education and online learning. Respect and patience, along with knowledge and "
+                   "understanding of the development process is critical to success in order to maintain "
+                   "strong bonds between development teams, sales team, and prospect/client "
+                   "implementation teams. In addition the Sales Engineer may also work with our "
+                   "xUniversity partners and the affiliated professors joining the edX movement. This "
+                   "position requires customer facing skills, comfort in demonstrating the product, and "
+                   "ability to code 'demos' as required. Additionally you will be contributing to "
+                   "proposals, so clear documentation and writing skills are critical. The job will "
+                   "require travel to client sites around the US upon occasion, and possibly "
+                   "internationally as well. Job also requires good speaking skills, and a willingness and "
+                   "ability to communicate clearly and respond quickly to prospect and customer "
+                   "requests. This is a salaried position and will on occasion require work and "
+                   "responsiveness to both the edX team and customers 'after hours'. This position "
+                   "reports to the VP, Business Development and will be dotted lined to the "
+                   "development and program management teams.")}</p>
+            <p><strong>${_("Responsibilities:")}</strong></p>
+            <ul>
+               <li>${_("Can code demos and evaluate demos of others")}</li>
+               <li>${_("Prepare and deliver standard and custom demonstrations")}</li>
+               <li>${_("Handle all pre-sales technical issues professionally and efficiently")}</li>
+               <li>${_("Maintain in-depth knowledge of products and pending new releases")}</li>
+               <li>${_("Maintain a working knowledge of documentation and training")}</li>
+               <li>${_("Maintain a working knowledge of workflow systems")}</li>
+               <li>${_("Respond to technical questions from universities looking to expand their on-line offerings")}</li>
+               <li>${_("Provide feedback to Product Development regarding new features, improving product performance, and eliminating bugs in the product")}</li>
+               <li>${_("Prepare Professional Services for efficient onboarding - professionally managing the transition from pre-sales to post-sales")}</li>
+               <li>${_("Deliver high-level presentation and associated 'click-thru' demonstrations")}</li>
+               <li>${_("and be able to customize to prospect's requirements")}</li>
+               <li>{(_"Understand and articulate the underlying technology concepts")}</li>
+               <li>${_("Understand and articulate how all products components fit together technically as well as how they integrate and work with external technologies and cross functional applications found within clients organizations.")}</li>
+               <li>${_("Build relationships with our prospects and universities, to be viewed as a trusted training partner.")}</li>
            </ul>
-           <p><strong>Qualifications:</strong></p>
+           <p><strong>${_("Qualifications:")}</strong></p>
            <ul>
-               <li>Minimum of 5 years of experience working closely with relationship based sales organizations, preferably in an educational technology organization.</li>
-               <li>Excellent interpersonal skills including proven presentation and facilitation skills.</li>
-               <li>Strong oral and written communication skills.</li>
-               <li>Flexibility to work on a variety of initiatives; prior startup experience preferred.</li>
-               <li>Outstanding work ethic, results-oriented, and creative/innovative style.</li>
-               <li>Proactive, optimistic approach to problem solving.</li>
-               <li>Commitment to constant personal and organizational improvement.</li>
-               <li>Willingness to travel to partner sites as needed.</li>
-               <li>Lean and Agile thinking and training. Experienced in Scrum or Kanban.</li>
-               <li>Bachelors or Master’s in Education, organizational learning, or other related field preferred. But we're all about education, so let us know how you gained what you need to succeed in this role: projects after completing 6.00x or CS50x, Xbox cheevos, on-line guilds led, large scale innovations championed.</li>
+               <li>${_("Minimum of 5 years of experience working closely with relationship based sales organizations, preferably in an educational technology organization.")}</li>
+               <li>${_("Excellent interpersonal skills including proven presentation and facilitation skills.")}</li>
+               <li>${_("Strong oral and written communication skills.")}</li>
+               <li>${_("Flexibility to work on a variety of initiatives; prior startup experience preferred.")}</li>
+               <li>${_("Outstanding work ethic, results-oriented, and creative/innovative style.")}</li>
+               <li>${_("Proactive, optimistic approach to problem solving.")}</li>
+               <li>${_("Commitment to constant personal and organizational improvement.")}</li>
+               <li>${_("Willingness to travel to partner sites as needed.")}</li>
+               <li>${_("Lean and Agile thinking and training. Experienced in Scrum or Kanban.")}</li>
+               <li>${_("Bachelors or Master's in Education, organizational learning, or other related field preferred. But we're all about education, so let us know how you gained what you need to succeed in this role: projects after completing 6.00x or CS50x, Xbox cheevos, on-line guilds led, large scale innovations championed.")}</li>
            </ul>
-           
-           <p>If you are interested in this position, please send an email to <a href="mailto:jobs@edx.org">jobs@edx.org</a>.</p>
+
+           <p>${_("If you are interested in this position, please send an email to <a href=\"mailto:jobs@edx.org\">jobs@edx.org</a>.")}</p>
          </div>
        </article>
        <article id="front-end-developer" class="job">
         <div class="inner-wrapper">
-          <h3><strong>FRONT END DEVELOPER</strong></h3>
-          <p>edX is looking for a Front End Developer to join our Product and Engineering Teams to shape the experience of all of edX's online learning tools. Thousands of students learn with us every day – the way they connect with their courses, their professors and edX is through our ever more powerful front end. Our ideal candidates not only know modern front end development best practices, but make organization standards and teach others with them; sweat the mechanical, visual, and transactional details when bring a design to life in the browser; can instinctually bring organization to their HTML/CSS/JavaScript, documentation, or project; and thrive on collaborating with both designers and developers throughout a project's lifecycle.</p>
-          <p><strong>As an edX Front End Developer, you:</strong></p>
+          <h3><strong>${_("FRONT END DEVELOPER")}</strong></h3>
+          <p>${_("edX is looking for a Front End Developer to join our Product and Engineering Teams to shape the experience of all of edX's online learning tools. Thousands of students learn with us every day - the way they connect with their courses, their professors and edX is through our ever more powerful front end. Our ideal candidates not only know modern front end development best practices, but make organization standards and teach others with them; sweat the mechanical, visual, and transactional details when bring a design to life in the browser; can instinctually bring organization to their HTML/CSS/JavaScript, documentation, or project; and thrive on collaborating with both designers and developers throughout a project's lifecycle.")}</p>
+          <p><strong>${_("As an edX Front End Developer, you:")}</strong></p>
           <ul>
-            <li>Translate flat design comps, wireframes, and prototypes to production-ready interactive interfaces with joy and passion.</li>
-            <li>Are very familiar with cutting-edge front-end development practices and technology (CSS3, media queries, responsive web design, HTML5, etc.).</li>
-            <li>Write JavaScript without the use of a library while still being familiar with popular libraries such as jQuery.</li>
-            <li>Can abstract layouts, design patterns, and UI components while building out the interface to a product or application.</li>
-            <li>Appreciate that web standards, accessibility, and usability are essential to uphold.</li>
-            <li>Generally have experience with server-side templating and data extraction code while enjoying learning more from the development team.</li>
-            <li>Maintain the sanctity of a project's information architecture, interaction design, and visual design details while contributing to the effort.</li>
-            <li>Know how to test and refactor your code across browsers and with QA teams.</li>
-            <li>Work well with designers, developers, and colleagues.</li>
-            <li>Take pride in your communicative and collaborative abilities.</li>
+            <li>${("Translate flat design comps, wireframes, and prototypes to production-ready interactive interfaces with joy and passion.")}</li>
+            <li>${("Are very familiar with cutting-edge front-end development practices and technology (CSS3, media queries, responsive web design, HTML5, etc.).")}</li>
+            <li>${("Write JavaScript without the use of a library while still being familiar with popular libraries such as jQuery.")}</li>
+            <li>${("Can abstract layouts, design patterns, and UI components while building out the interface to a product or application.")}</li>
+            <li>${("Appreciate that web standards, accessibility, and usability are essential to uphold.")}</li>
+            <li>${("Generally have experience with server-side templating and data extraction code while enjoying learning more from the development team.")}</li>
+            <li>${("Maintain the sanctity of a project's information architecture, interaction design, and visual design details while contributing to the effort.")}</li>
+            <li>${("Know how to test and refactor your code across browsers and with QA teams.")}</li>
+            <li>${("Work well with designers, developers, and colleagues.")}</li>
+            <li>${("Take pride in your communicative and collaborative abilities.")}</li>
           </ul>
 
-          <p><strong>Front End Developers must also:</strong></p>
+          <p><strong>${_("Front End Developers must also:")}</strong></p>
           <ul>
-            <li>Have at least two years of professional, post-collegiate experience.</li>
-            <li>Have a BS, BFA or equivalent work experience. But we're all about education, so let us know how you gained what you need to succeed in this role: projects after completing 6.00x or CS50x, Xbox cheevos, on-line guilds led, large scale innovations championed.</li>
+            <li>${_("Have at least two years of professional, post-collegiate experience.")}</li>
+            <li>${_("Have a BS, BFA or equivalent work experience. But we're all about education, so let us know how you gained what you need to succeed in this role: projects after completing 6.00x or CS50x, Xbox cheevos, on-line guilds led, large scale innovations championed.")}</li>
           </ul>
 
-          <p><strong>About the Product Design and Development Teams:</strong></p>
-          <p>We are a small team with a startup, lean culture, committed to building tools that help our users learn and teach online. Working alongside developers, course staff, product owners, and project stakeholders, our Designers shepherd the experience of an idea or tool through research and strategy phases and lead the Information Architecture, Interaction Design, Visual Design, and Front End Development efforts in bringing that experience to life.</p>
+          <p><strong>${_("About the Product Design and Development Teams:")}</strong></p>
+          <p>${_("We are a small team with a startup, lean culture, committed to building tools that help our users learn and teach online. Working alongside developers, course staff, product owners, and project stakeholders, our Designers shepherd the experience of an idea or tool through research and strategy phases and lead the Information Architecture, Interaction Design, Visual Design, and Front End Development efforts in bringing that experience to life.")}</p>
 
-          <p>If you wish to apply, please send your resume (PDF, text, or Word Doc), a thoughtful email that includes specifics about how your previous experience matches the Front End Developer role at edX, and online samples of your work to <a href="mailto:jobs@edx.org">jobs@edx.org</a>.  Candidates who do not provide these will not be considered.  EdX is open to considering candidates outside of the Boston/Cambridge, MA area who are willing to relocate.</p>
+          <p>${_("If you wish to apply, please send your resume (PDF, text, or Word Doc), a thoughtful email that includes specifics about how your previous experience matches the Front End Developer role at edX, and online samples of your work to <a href=\"mailto:jobs@edx.org\">jobs@edx.org</a>.  Candidates who do not provide these will not be considered.  EdX is open to considering candidates outside of the Boston/Cambridge, MA area who are willing to relocate.")}</p>
         </div>
       </article>
-       
+
 
        <article id="test-engineer" class="job">
          <div class="inner-wrapper">
-           <h3><strong>TEST ENGINEER</strong></h3>
-           <p>EdX is looking for a Software Engineer in Test to help architect and implement improvements to our testing infrastructure and write code to validate and verify development and deployment of our MOOC platform.</p>
-           <p>You are an experienced professional who is passionate about and current with cutting edge methodologies and practices for delivering high quality software. For example, you understand and can articulate the difference between BDD and TDD. You champion for developers to be confident in the quality of their code by giving them the tools they need to create and execute their own tests. You write unit tests that follow best practices for each layer of an MVC architecture. You work side by side with the DevOps team to define environments and automate their buildouts.</p>
-           <p><strong>Responsibilities:</strong></p>
+           <h3><strong>${_("TEST ENGINEER")}</strong></h3>
+           <p>${_("EdX is looking for a Software Engineer in Test to help architect and implement improvements to our testing infrastructure and write code to validate and verify development and deployment of our MOOC platform.")}</p>
+           <p>${_("You are an experienced professional who is passionate about and current with cutting edge methodologies and practices for delivering high quality software. For example, you understand and can articulate the difference between BDD and TDD. You champion for developers to be confident in the quality of their code by giving them the tools they need to create and execute their own tests. You write unit tests that follow best practices for each layer of an MVC architecture. You work side by side with the DevOps team to define environments and automate their buildouts.")}</p>
+           <p><strong>${_("Responsibilities:")}</strong></p>
            <ul>
-               <li>Review software designs with a focus on code quality, risk, and testability</li>
-               <li>Build tools and frameworks that enable fellow engineers be more productive, write better code and test it themselves</li>
-               <li>Code test automation at all levels including class library, web application framework, javascript, and end-to-end</li>
-               <li>Enable metrics collection to measure adoption and expand the reach of the delivered tools</li>
-               <li>Fix framework bugs and improve test architecture, including adding required unit tests</li>
-               <li>Train and mentor other team members</li>
+               <li>${_("Review software designs with a focus on code quality, risk, and testability")}</li>
+               <li>${_("Build tools and frameworks that enable fellow engineers be more productive, write better code and test it themselves")}</li>
+               <li>${_("Code test automation at all levels including class library, web application framework, javascript, and end-to-end")}</li>
+               <li>${_("Enable metrics collection to measure adoption and expand the reach of the delivered tools")}</li>
+               <li>${_("Fix framework bugs and improve test architecture, including adding required unit tests")}</li>
+               <li>${_("Train and mentor other team members")}</li>
            </ul>
-           <p><strong>Qualifications:</strong></p>
+           <p><strong>${_("Qualifications:")}</strong></p>
            <ul>
-               <li>Excellent coding skills across a number of languages: Python or other high level programming languages, Javascript, bash,  etc.</li>
-               <li>Experience in building test automation frameworks</li>
-               <li>Comfortable with source code in various languages (Python/Django, Ruby/Rails, Javascript/Backbone/JQuery, etc.)</li>
-               <li>Highly proficient in a Unix/Linux environment</li>
-               <li>Experience with database technologies from SQLite to MongoDB</li>
-               <li>Familiar with deployment automation (Puppet, Jenkins, AWS)</li>
-               <li>Open Source development experience preferred, extra points for sharing your GitHub / StackOverflow / etc. profile</li>
+               <li>${_("Excellent coding skills across a number of languages: Python or other high level programming languages, Javascript, bash,  etc.")}</li>
+               <li>${_("Experience in building test automation frameworks")}</li>
+               <li>${_("Comfortable with source code in various languages (Python/Django, Ruby/Rails, Javascript/Backbone/JQuery, etc.)")}</li>
+               <li>${_("Highly proficient in a Unix/Linux environment")}</li>
+               <li>${_("Experience with database technologies from SQLite to MongoDB")}</li>
+               <li>${_("Familiar with deployment automation (Puppet, Jenkins, AWS)")}</li>
+               <li>${_("Open Source development experience preferred, extra points for sharing your GitHub / StackOverflow / etc. profile")}</li>
            </ul>
-           
-           <p>If you are interested in this position, please send an email to <a href="mailto:jobs@edx.org">jobs@edx.org</a>.</p>
+
+           <p>${_("If you are interested in this position, please send an email to <a href=\"mailto:jobs@edx.org\">jobs@edx.org</a>.")}</p>
          </div>
        </article>
        <article id="coordinator-university-business-affairs" class="job">
          <div class="inner-wrapper">
-           <h3><strong>COORDINATOR OF UNIVERSITY AND BUSINESS AFFAIRS</strong></h3>
-           <p>EdX is looking for a Coordinator of External Affairs, to streamline, organize and maintain our efforts in Business Development and University Relations.</p>
-           <p><strong>There are 4 primary areas of responsibility:</strong></p>
+           <h3><strong>${_("COORDINATOR OF UNIVERSITY AND BUSINESS AFFAIRS")}</strong></h3>
+           <p>${_("EdX is looking for a Coordinator of External Affairs, to streamline, organize and maintain our efforts in Business Development and University Relations.")}</p>
+           <p><strong>${_("There are 4 primary areas of responsibility:")}</strong></p>
            <ol>
-               <li>To ensure all visits to and from the edX offices by any partners and affiliates are managed, coordinated, and documented.  This involves developing itineraries, booking flights and schedules, and managing meetings and events in concert with members of our executive team in University Relations and Business Development and our consortium of partners.</li>
-               <li>To maintain a database of partners and prospects and manage any data flows/reporting required.</li>
-               <li>To manage the information flow, recording activity on the edX Wiki page by synthesizing data and analysis from all visits and meetings and create updates on the edX Wiki page.</li>
-               <li>To act as a central point of contact for all relationship and event activity within this scope.</li>
+               <li>${_("To ensure all visits to and from the edX offices by any partners and affiliates are managed, coordinated, and documented.  This involves developing itineraries, booking flights and schedules, and managing meetings and events in concert with members of our executive team in University Relations and Business Development and our consortium of partners.")}</li>
+               <li>${_("To maintain a database of partners and prospects and manage any data flows/reporting required.")}</li>
+               <li>${_("To manage the information flow, recording activity on the edX Wiki page by synthesizing data and analysis from all visits and meetings and create updates on the edX Wiki page.")}</li>
+               <li>${_("To act as a central point of contact for all relationship and event activity within this scope.")}</li>
            </ol>
-           <p><strong>Detailed Responsibilities:</strong></p>
+           <p><strong>${_("Detailed Responsibilities:")}</strong></p>
            <ul>
-               <li>Provide support and coordinate activities for these 3 executives</li>
-               <li>Acquire strong user knowledge of related systems, processes and tools</li>
-               <li>Participate in the new partner on-boarding process</li>
-               <li>Provide an escalation point for Sales personnel for systems, procedures and policies</li>
-               <li>Maintain Salesforce database for client/partner set up and support information, generating reports as needed</li>
-               <li>Document proofreading, editing as directed for proposals, contracts, contact and call reports</li>
-               <li>Coordinate and manage travel, events and meetings, including invitations, RSVP’s,  hotel/meeting space contracts, and providing event materials to attendees</li>
+               <li>${_("Provide support and coordinate activities for these 3 executives")}</li>
+               <li>${_("Acquire strong user knowledge of related systems, processes and tools")}</li>
+               <li>${_("Participate in the new partner on-boarding process")}</li>
+               <li>${_("Provide an escalation point for Sales personnel for systems, procedures and policies")}</li>
+               <li>${_("Maintain Salesforce database for client/partner set up and support information, generating reports as needed")}</li>
+               <li>${_("Document proofreading, editing as directed for proposals, contracts, contact and call reports")}</li>
+               <li>${_("Coordinate and manage travel, events and meetings, including invitations, RSVP's,  hotel/meeting space contracts, and providing event materials to attendees")}</li>
            </ul>
-           <p><strong>Qualifications:</strong></p>
+           <p><strong>${_("Qualifications:")}</strong></p>
            <ul>
-               <li>5-7 years of experience in a similar project/coordinator type position with progressively responsible administrative experience</li>
-               <li>Self-starter, possessing tenacity and a desire for challenges, not afraid to take risks, and the initiative to get things done with little direction </li>
-               <li>Superior interpersonal and communications skills, including concise writing and editing skills</li>
-               <li>Strong organizational skills to manage multiple competing priorities and projects with attention to detail </li>
-               <li>Exceptional ability to effectively interact with multiple external and internal stakeholders </li>
-               <li>Adept at analyzing complex issues with the ability to synthesize data and perform gap analyses</li>
-               <li>Performs well with a variety of disciplines while remaining effective in a high-volume, fast-pace start-up environment with high workload</li>
-               <li>Must be proficient in:  MS PowerPoint, Word and Excel, Salesforce.com, and online tools such as Google docs and Wiki, and knowledge of Kanban is also helpful</li>
+               <li>${_("5-7 years of experience in a similar project/coordinator type position with progressively responsible administrative experience")}</li>
+               <li>${_("Self-starter, possessing tenacity and a desire for challenges, not afraid to take risks, and the initiative to get things done with little direction ")}</li>
+               <li>${_("Superior interpersonal and communications skills, including concise writing and editing skills")}</li>
+               <li>${_("Strong organizational skills to manage multiple competing priorities and projects with attention to detail ")}</li>
+               <li>${_("Exceptional ability to effectively interact with multiple external and internal stakeholders ")}</li>
+               <li>${_("Adept at analyzing complex issues with the ability to synthesize data and perform gap analyses")}</li>
+               <li>${_("Performs well with a variety of disciplines while remaining effective in a high-volume, fast-pace start-up environment with high workload")}</li>
+               <li>${_("Must be proficient in:  MS PowerPoint, Word and Excel, Salesforce.com, and online tools such as Google docs and Wiki, and knowledge of Kanban is also helpful")}</li>
            </ul>
-           
-           <p>If you are interested in this position, please send an email to <a href="mailto:jobs@edx.org">jobs@edx.org</a>.</p>
+
+           <p>${_("If you are interested in this position, please send an email to <a href=\"mailto:jobs@edx.org\">jobs@edx.org</a>.")}</p>
          </div>
        </article>
 
     </section>
 
     <section class="jobs-sidebar">
-      <h2>Positions</h2>
+      <h2>${_("Positions")}</h2>
       <nav>
-        <a href="#director-of-education-services">Director of Education Services</a>
-        <a href="#manager-of-training-services">Manager of Training Services</a>
-	<a href="#trainer">Trainer</a>
-        <a href="#instructional-designer">Instructional Designer</a>
-        <a href="#program-manager">Program Manager</a>
-        <a href="#director-of-product-management">Director, Product Management</a>
-        <a href="#content-engineer">Content Engineer</a>
-        <a href="#software-engineer">Software Engineer</a>
-        <a href="#learning-sciences-engineer">Learning Sciences Engineer</a>
-        <a href="#sales-engineer">Sales Engineer, Business Development Team</a>
-        <a href="#front-end-developer">Front End Developer</a>
-        <a href="#test-engineer">Test Engineer</a>
-        <a href="#coordinator-university-business-affairs">Coordinator of University and Business Affairs</a>
+      <a href="#director-of-education-services">${_("Director of Education Services")}</a>
+        <a href="#manager-of-training-services">${_("Manager of Training Services")}</a>
+	<a href="#trainer">${_("Trainer")}</a>
+        <a href="#instructional-designer">${_("Instructional Designer")}</a>
+        <a href="#program-manager">${_("Program Manager")}</a>
+        <a href="#director-of-product-management">${_("Director, Product Management")}</a>
+        <a href="#content-engineer">${_("Content Engineer")}</a>
+        <a href="#software-engineer">${_("Software Engineer")}</a>
+        <a href="#learning-sciences-engineer">${_("Learning Sciences Engineer")}</a>
+        <a href="#sales-engineer">${_("Sales Engineer, Business Development Team")}</a>
+        <a href="#front-end-developer">${_("Front End Developer")}</a>
+        <a href="#test-engineer">${_("Test Engineer")}</a>
+        <a href="#coordinator-university-business-affairs">${_("Coordinator of University and Business Affairs")}</a>
       </nav>
-      <h2>How to Apply</h2>
-      <p>E-mail your resume, cover letter and any other materials to <a href="mailto:jobs@edx.org">jobs@edx.org</a></p>
-      <h2>Our Location</h2>
-      <p>11 Cambridge Center <br>
-        Cambridge, MA 02142</p>
+      <h2>${_("How to Apply")}</h2>
+      <p>${_("E-mail your resume, cover letter and any other materials to <a href=\"mailto:jobs@edx.org\">jobs@edx.org</a>")}</p>
+      <h2>${_("Our Location")}</h2>
+      <p>${_("11 Cambridge Center <br>Cambridge, MA 02142")}</p>
     </section>
   </section>
 </section>

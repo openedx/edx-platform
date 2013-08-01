@@ -1,3 +1,4 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%! import django_comment_client.helpers as helpers %>
 <%! from django.template.defaultfilters import escapejs %>
 <%! from django.core.urlresolvers import reverse %>
@@ -6,7 +7,7 @@
 <%inherit file="../main.html" />
 <%namespace name='static' file='../static_content.html'/>
 <%block name="bodyclass">discussion</%block>
-<%block name="title"><title>Discussion – ${course.number}</title></%block>
+<%block name="title"><title>${_("Discussion - {course_number}").format(course_number=course.number) | h}</title></%block>
 
 <%block name="headextra">
 <%static:css group='course'/>

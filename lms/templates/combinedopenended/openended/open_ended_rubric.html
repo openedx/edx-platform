@@ -1,6 +1,7 @@
+<%! from django.utils.translation import ugettext as _ %>
 <form class="rubric-template" id="inputtype_${id}" xmlns="http://www.w3.org/1999/html">
-    <h3>Rubric</h3>
-    <p>Select the criteria you feel best represents this submission in each category.</p>
+    <h3>${_("Rubric")}</h3>
+    <p>${_("Select the criteria you feel best represents this submission in each category.")}</p>
     <div class="rubric">
         % for i in range(len(categories)):
         <% category = categories[i] %>
