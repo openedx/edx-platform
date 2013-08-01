@@ -1,3 +1,4 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%inherit file="/main.html" />
 <%namespace name='static' file='/static_content.html'/>
 
@@ -7,7 +8,7 @@
 
 <%namespace name="progress_graph" file="/courseware/progress_graph.js"/>
 
-<%block name="title"><title>${course.number} Progress</title></%block>
+<%block name="title"><title>${_("{course_number} Progress").format(course_number=course.number)}</title></%block>
 
 <%!
     from django.core.urlresolvers import reverse
@@ -31,7 +32,7 @@ ${progress_graph.body(grade_summary, course.grade_cutoffs, "grade-detail-graph",
 
     <section class="course-info">
       <header>
-        <h1>Course Progress for Student '${student.username}' (${student.email})</h1>
+      <h1>${_("Course Progress for Student '{username}' ({email})").format(username=student.username, email=student.email)}</h1>
       </header>
 
       %if not course.disable_progress_graph:
@@ -83,7 +84,7 @@ ${progress_graph.body(grade_summary, course.grade_cutoffs, "grade-detail-graph",
                     %endfor
                   </ol>
                 %else:
-                  <h3 class="no-scores"> No problem scores in this section </h3>
+                  <h3 class="no-scores"> ${_("No problem scores in this section")} </h3>
                 %endif
               </section>
 

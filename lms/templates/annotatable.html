@@ -1,3 +1,5 @@
+<%! from django.utils.translation import ugettext as _ %>
+
 <div class="annotatable-wrapper">
 	<div class="annotatable-header">
 		% if display_name is not UNDEFINED and display_name is not None:
@@ -8,8 +10,8 @@
     % if instructions_html is not UNDEFINED and instructions_html is not None:
     <div class="annotatable-section shaded">
         <div class="annotatable-section-title">
-            Instructions
-            <a class="annotatable-toggle annotatable-toggle-instructions expanded" href="javascript:void(0)">Collapse Instructions</a>
+            ${_("Instructions")}
+            <a class="annotatable-toggle annotatable-toggle-instructions expanded" href="javascript:void(0)">${_("Collapse Instructions")}</a>
         </div>
         <div class="annotatable-section-body annotatable-instructions">
             ${instructions_html}
@@ -19,8 +21,8 @@
 
     <div class="annotatable-section">
         <div class="annotatable-section-title">
-            Guided Discussion
-            <a class="annotatable-toggle annotatable-toggle-annotations" href="javascript:void(0)">Hide Annotations</a>
+            ${_("Guided Discussion")}
+            <a class="annotatable-toggle annotatable-toggle-annotations" href="javascript:void(0)">${_("Hide Annotations")}</a>
         </div>
         <div class="annotatable-section-body annotatable-content">
             ${content_html}

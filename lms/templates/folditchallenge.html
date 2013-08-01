@@ -1,10 +1,12 @@
+<%! from django.utils.translation import ugettext as _ %>
+
 <div class="folditchallenge">
-    <h3>Puzzle Leaderboard</h3>
+    <h3>${_("Puzzle Leaderboard")}</h3>
     
     <table>
         <tr>
-            <th>User</th>
-            <th>Score</th>
+            <th>${_("User")}</th>
+            <th>${_("Score")}</th>
         </tr>
         % for pair in top_scores:
         <tr>

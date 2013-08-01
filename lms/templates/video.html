@@ -1,3 +1,5 @@
+<%! from django.utils.translation import ugettext as _ %>
+
 % if display_name is not UNDEFINED and display_name is not None:
   <h2> ${display_name} </h2>
 % endif
@@ -10,7 +12,7 @@
     % endif
     </param>
     <param name="allowScriptAccess" value="always"></param>
-    <embed 
+    <embed
        % if not settings.MITX_FEATURES['STUB_VIDEO_FOR_TESTING']:
        src="https://www.youtube.com/v/${normal_speed_video_id}?version=3&amp;autoplay=1&amp;rel=0"
        % endif
@@ -43,12 +45,12 @@
 
 % if source:
 <div class="video-sources">
-  <p>Download video <a href="${source}">here</a>.</p>
+  <p>${_('Download video <a href="%s">here</a>.') % source}</p>
 </div>
 % endif
 
 % if track:
 <div class="video-tracks">
-  <p>Download subtitles <a href="${track}">here</a>.</p>
+  <p>${_('Download subtitles <a href="%s">here</a>.') % track}</p>
 </div>
 % endif

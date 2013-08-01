@@ -1,3 +1,5 @@
+<%! from django.utils.translation import ugettext as _ %>
+
 <%namespace name='static' file='static_content.html'/>
 <%inherit file="main.html" />
 <%!
@@ -55,27 +57,24 @@
 
 <section class="container">
     <div class="notes-wrapper">
-        <h1>My Notes</h1>
+        <h1>${_("My Notes")}</h1>
         % for note in notes:
         <div class="note">
             <blockquote>${note.quote|h}</blockquote>
             <div class="text">${note.text.replace("\n", "<br />") | n,h}</div>
             <ul class="meta">
                 % if note.tags:
-                    <li class="tags">Tags: ${note.tags|h}</li>
+                <li class="tags">${_("Tags: {tags}").format(tags=note.tags) | h}</li>
                 % endif
-                <li class="user">Author: ${note.user.username}</li>
-                <li class="time">Created: ${note.created.strftime('%m/%d/%Y %H:%m')}</li>
-                <li class="uri">Source: <a href="${note.uri}">${note.uri|h}</a></li>
+                <li class="user">${_('Author: {username}').format(username=note.user.username)}</li>
+                <li class="time">${_('Created: {datetime}').format(datetime=note.created.strftime('%m/%d/%Y %H:%m'))}</li>
+                <li class="uri">${_('Source: {link}').format(link='<a href="{url}">{url}</a>'.format(url=note.uri))}</li>
                 </ul>
         </div>
         % endfor
         % if notes is UNDEFINED or len(notes) == 0:
-            <p>You do not have any notes.</p>
+            <p>${_('You do not have any notes.')}</p>
         % endif
     </div>
 </section>
-
-
-
 

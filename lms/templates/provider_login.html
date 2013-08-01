@@ -1,3 +1,5 @@
+<%! from django.utils.translation import ugettext as _ %>
+
 <%inherit file="main.html" />
 <%namespace name='static' file='static_content.html'/>
 
@@ -32,19 +34,19 @@
 <section id="login-modal" class="modal login-modal openid-login">
   <div class="inner-wrapper">
     <header>
-      <h2>Log In</h2>
+      <h2>${_("Log In")}</h2>
       <hr>
     </header>
     <form id="login_form" class="login_form" method="post" action="/openid/provider/login/">
 %if error:
-      <div id="login_error" class="modal-form-error" style="display: block;">Email or password is incorrect.</div>
+      <div id="login_error" class="modal-form-error" style="display: block;">${_("Email or password is incorrect.")}</div>
 %endif
-      <label>E-mail</label>
-      <input type="text" name="email" placeholder="E-mail" tabindex="1" autofocus="autofocus" />
-      <label>Password</label>
-      <input type="password" name="password" placeholder="Password" tabindex="2" />
+      <label>${_("E-mail")}</label>
+      <input type="text" name="email" placeholder="${_('E-mail')}" tabindex="1" autofocus="autofocus" />
+      <label>${_("Password")}</label>
+      <input type="password" name="password" placeholder="${_('Password')}" tabindex="2" />
       <div class="submit">
-        <input name="submit" type="submit" value="Return To ${return_to}" tabindex="3" />
+        <input name="submit" type="submit" value="${_('Return To %s') % return_to}" tabindex="3" />
       </div>
     </form>
   </div>

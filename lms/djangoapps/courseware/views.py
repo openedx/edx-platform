@@ -632,57 +632,6 @@ def mktg_course_about(request, course_id):
                                'show_courseware_link': show_courseware_link})
 
 
-
-@ensure_csrf_cookie
-@cache_if_anonymous
-def static_university_profile(request, org_id):
-    """
-    Return the profile for the particular org_id that does not have any courses.
-    """
-    # Redirect to the properly capitalized org_id
-    last_path = request.path.split('/')[-1]
-    if last_path != org_id:
-        return redirect('static_university_profile', org_id=org_id)
-
-    # Render template
-    template_file = "university_profile/{0}.html".format(org_id).lower()
-    context = dict(courses=[], org_id=org_id)
-    return render_to_response(template_file, context)
-
-
-@ensure_csrf_cookie
-@cache_if_anonymous
-def university_profile(request, org_id):
-    """
-    Return the profile for the particular org_id.  404 if it's not valid.
-    """
-    virtual_orgs_ids = settings.VIRTUAL_UNIVERSITIES
-    meta_orgs = getattr(settings, 'META_UNIVERSITIES', {})
-
-    # Get all the ids associated with this organization
-    all_courses = modulestore().get_courses()
-    valid_orgs_ids = set(c.org for c in all_courses)
-    valid_orgs_ids.update(virtual_orgs_ids + meta_orgs.keys())
-
-    if org_id not in valid_orgs_ids:
-        raise Http404("University Profile not found for {0}".format(org_id))
-
-    # Grab all courses for this organization(s)
-    org_ids = set([org_id] + meta_orgs.get(org_id, []))
-    org_courses = []
-    domain = request.META.get('HTTP_HOST')
-    for key in org_ids:
-        cs = get_courses_by_university(request.user, domain=domain)[key]
-        org_courses.extend(cs)
-
-    org_courses = sort_by_announcement(org_courses)
-
-    context = dict(courses=org_courses, org_id=org_id)
-    template_file = "university_profile/{0}.html".format(org_id).lower()
-
-    return render_to_response(template_file, context)
-
-
 def render_notifications(request, course, notifications):
     context = {
         'notifications': notifications,
@@ -779,12 +728,16 @@ def submission_history(request, course_id, student_username, location):
     except StudentModule.DoesNotExist:
         return HttpResponse(escape("{0} has never accessed problem {1}".format(student_username, location)))
 
-    history_entries = StudentModuleHistory.objects.filter(student_module=student_module).order_by('-id')
+    history_entries = StudentModuleHistory.objects.filter(
+        student_module=student_module
+    ).order_by('-id')
 
     # If no history records exist, let's force a save to get history started.
     if not history_entries:
         student_module.save()
-        history_entries = StudentModuleHistory.objects.filter(student_module=student_module).order_by('-id')
+        history_entries = StudentModuleHistory.objects.filter(
+            student_module=student_module
+        ).order_by('-id')
 
     context = {
         'history_entries': history_entries,

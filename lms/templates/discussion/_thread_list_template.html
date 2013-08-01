@@ -1,3 +1,4 @@
+<%! from django.utils.translation import ugettext as _ %>
 <script type="text/template" id="thread-list-template">
     <div class="browse-search">
         <div class="home">
@@ -9,7 +10,7 @@
             <a href="#" class="browse-topic-drop-icon">
                 <i class="icon icon-reorder"></i>
             </a>
-            <a href="#" class="browse-topic-drop-btn"><span class="current-board">Show All Discussions</span> <span class="drop-arrow">▾</span></a>
+            <a href="#" class="browse-topic-drop-btn"><span class="current-board">${_("Show All Discussions")}</span> <span class="drop-arrow">▾</span></a>
         </div>
         <%include file="_filter_dropdown.html" />
         <div class="search">
@@ -19,22 +20,22 @@
         </div>
     </div>
     <div class="sort-bar">
-        <span class="sort-label">Sort by:</span>
+        <span class="sort-label">${_("Sort by:")}</span>
         <ul>
-            <li><a href="#" class="active" data-sort="date">date</a></li>
-            <li><a href="#" data-sort="votes">votes</a></li>
-            <li><a href="#" data-sort="comments">comments</a></li>
+            <li><a href="#" class="active" data-sort="date">${_("date")}</a></li>
+            <li><a href="#" data-sort="votes">${_("votes")}</a></li>
+            <li><a href="#" data-sort="comments">${_("comments")}</a></li>
         </ul>
-        
+
 
         %if is_course_cohorted and is_moderator:
-        <span class="group-filter-label cohort">Show:</span>
-            <select class="group-filter-select cohort-options cohort"> 
-                <option value="all">View All</option>
+        <span class="group-filter-label cohort">${_("Show:")}</span>
+            <select class="group-filter-select cohort-options cohort">
+                <option value="all">${_("View All")}</option>
                     %for c in cohorts:
-                        <option value="${c.id}">View as ${c.name}</option>
+                        <option value="${c.id}">${_("View as {name}").format(name=c.name)}</option>
                     %endfor
-            </select>        
+            </select>
         %endif
     </div>
     <div class="post-list-wrapper">

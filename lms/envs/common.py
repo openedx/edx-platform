@@ -166,7 +166,7 @@ XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5  # seconds
 
 
 ############################# SET PATH INFORMATION #############################
-PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /mitx/lms
+PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /edx-platform/lms
 REPO_ROOT = PROJECT_ROOT.dirname()
 COMMON_ROOT = REPO_ROOT / "common"
 ENV_ROOT = REPO_ROOT.dirname()  # virtualenv dir /mitx is in
@@ -381,6 +381,8 @@ LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
 USE_I18N = True
 USE_L10N = True
 
+# Localization strings (e.g. django.po) are under this directory
+LOCALE_PATHS = (REPO_ROOT + '/conf/locale',)  # edx-platform/conf/locale/
 # Messages
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
@@ -485,6 +487,9 @@ MIDDLEWARE_CLASSES = (
     'mitxmako.middleware.MakoMiddleware',
 
     'course_wiki.course_nav.Middleware',
+
+    # Detects user-requested locale from 'accept-language' header in http request
+    'django.middleware.locale.LocaleMiddleware',
 
     'django.middleware.transaction.TransactionMiddleware',
     # 'debug_toolbar.middleware.DebugToolbarMiddleware',

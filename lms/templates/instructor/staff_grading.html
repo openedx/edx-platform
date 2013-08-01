@@ -1,3 +1,4 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%inherit file="/main.html" />
 <%block name="bodyclass">${course.css_class}</%block>
 <%namespace name='static' file='/static_content.html'/>
@@ -6,7 +7,7 @@
   <%static:css group='course'/>
 </%block>
 
-<%block name="title"><title>${course.number} Staff Grading</title></%block>
+<%block name="title"><title>${_("{course_number} Staff Grading").format(course_number=course.number)}</title></%block>
 
 <%include file="/courseware/course_navigation.html" args="active_page='staff_grading'" />
 
@@ -17,7 +18,7 @@
 <section class="container">
 
 <div class="staff-grading" data-ajax_url="${ajax_url}">
-<h1>Staff grading</h1>
+<h1>${_("Staff grading")}</h1>
 <div class="breadcrumbs">
 </div>
 <div class="error-container">
@@ -27,12 +28,12 @@
 
 <! -- Problem List View -->
 <section class="problem-list-container">
-<h2>Instructions</h2>
+<h2>${_("Instructions")}</h2>
 <div class="instructions">
-<p>This is the list of problems that currently need to be graded in order to train the machine learning models. Each problem needs to be trained separately, and we have indicated the number of student submissions that need to be graded in order for a model to be generated. You can grade more than the minimum required number of submissions--this will improve the accuracy of machine learning, though with diminishing returns. You can see the current accuracy of machine learning while grading.</p>
+<p>${_("This is the list of problems that currently need to be graded in order to train the machine learning models. Each problem needs to be trained separately, and we have indicated the number of student submissions that need to be graded in order for a model to be generated. You can grade more than the minimum required number of submissions--this will improve the accuracy of machine learning, though with diminishing returns. You can see the current accuracy of machine learning while grading.")}</p>
 </div>
 
-<h2>Problem List</h2>
+<h2>${_("Problem List")}</h2>
     <table class="problem-list">
     </table>
 </section>
@@ -48,7 +49,7 @@
         </div>
     </div>
     <div class="prompt-information-container">
-    <h3>Prompt <a href="#" class="question-header">(Hide)</a> </h3>
+    <h3>${_('Prompt')} <a href="#" class="question-header">${_("(Hide)")}</a></h3>
         <div class="prompt-container">
         </div>
     </div>
@@ -56,14 +57,14 @@
 </section>
 
 <div class="action-button">
-    <input type=button value="Submit" class="action-button" name="show" />
+    <input type=button value="${_("Submit")}" class="action-button" name="show" />
 </div>
 
 <section class="grading-wrapper">
 
 <div class="grading-container">
 <div class="submission-wrapper">
-<h3>Student Response</h3>
+<h3>${_("Student Response")}</h3>
 <div class="submission-container">
 </div>
 </div>
@@ -72,18 +73,18 @@
   </p>
   <p class="grade-selection-container">
   </p>
-  <h3>Written Feedback</h3>
-  <textarea name="feedback" placeholder="Feedback for student (optional)"
+  <h3>${_("Written Feedback")}</h3>
+  <textarea name="feedback" placeholder="${_("Feedback for student (optional)")}"
             class="feedback-area" cols="70" ></textarea>
 <p>
-   Flag as inappropriate content for later review <input class="flag-checkbox" type="checkbox" />
+   ${_("Flag as inappropriate content for later review")} <input class="flag-checkbox" type="checkbox" />
 </p>
 </div>
-  
+
 
 <div class="submission">
-<input type="button" value="Submit" class="submit-button" name="show"/>
-<input type="button" value="Skip" class="skip-button" name="skip"/>
+<input type="button" value="${_("Submit")}" class="submit-button" name="show"/>
+<input type="button" value="${_("Skip")}" class="skip-button" name="skip"/>
 </div>
 
 </div>

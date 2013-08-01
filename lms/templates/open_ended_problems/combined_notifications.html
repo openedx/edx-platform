@@ -1,3 +1,4 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%inherit file="/main.html" />
 <%block name="bodyclass">${course.css_class}</%block>
 <%namespace name='static' file='/static_content.html'/>
@@ -6,7 +7,7 @@
 <%static:css group='course'/>
 </%block>
 
-<%block name="title"><title>${course.number} Combined Notifications</title></%block>
+<%block name="title"><title>${_("{course_number} Combined Notifications").format(course_number=course.number)}</title></%block>
 
 <%include file="/courseware/course_navigation.html" args="active_page='open_ended'" />
 
@@ -14,13 +15,13 @@
 <section class="container">
     <div class="combined-notifications" data-ajax_url="${ajax_url}">
         <div class="error-container">${error_text}</div>
-        <h1>Open Ended Console</h1>
-        <h2>Instructions</h2>
-        <p>Here are items that could potentially need your attention.</p>
+        <h1>${_("Open Ended Console")}</h1>
+        <h2>${_("Instructions")}</h2>
+        <p>${_("Here are items that could potentially need your attention.")}</p>
         % if success:
             % if len(notification_list) == 0:
             <div class="message-container">
-                No items require attention at the moment.
+              ${_("No items require attention at the moment.")}
             </div>
             %else:
             <div class="notification-container">
