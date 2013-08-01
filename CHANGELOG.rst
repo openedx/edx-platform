@@ -5,6 +5,8 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Common: Add configuration for separate audit log, to track login attempts.
+
 Studio: Send e-mails to new Studio users (on edge only) when their course creator
 status has changed. This will not be in use until the course creator table
 is enabled.

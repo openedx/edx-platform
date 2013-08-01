@@ -10,6 +10,7 @@ def get_logger_config(log_dir,
                       logging_env="no_env",
                       tracking_filename="tracking.log",
                       edx_filename="edx.log",
+                      audit_filename="audit.log",
                       dev_env=False,
                       syslog_addr=None,
                       debug=False,
@@ -92,6 +93,11 @@ def get_logger_config(log_dir,
                 'level': 'DEBUG',
                 'propagate': False,
             },
+            'audit': {
+                'handlers': ['audit'],
+                'level': 'DEBUG',
+                'propagate': False,
+            },
             '': {
                 'handlers': handlers,
                 'level': 'DEBUG',
@@ -103,6 +109,7 @@ def get_logger_config(log_dir,
     if dev_env:
         tracking_file_loc = os.path.join(log_dir, tracking_filename)
         edx_file_loc = os.path.join(log_dir, edx_filename)
+        audit_file_loc = os.path.join(log_dir, audit_filename)
         logger_config['handlers'].update({
             'local': {
                 'class': 'logging.handlers.RotatingFileHandler',
@@ -117,6 +124,14 @@ def get_logger_config(log_dir,
                 'class': 'logging.handlers.RotatingFileHandler',
                 'filename': tracking_file_loc,
                 'formatter': 'raw',
+                'maxBytes': 1024 * 1024 * 2,
+                'backupCount': 5,
+            },
+            'audit': {
+                'level': 'DEBUG',
+                'class': 'logging.handlers.RotatingFileHandler',
+                'filename': audit_file_loc,
+                'formatter': 'standard',
                 'maxBytes': 1024 * 1024 * 2,
                 'backupCount': 5,
             },
@@ -138,6 +153,13 @@ def get_logger_config(log_dir,
                 'class': 'logging.handlers.SysLogHandler',
                 'address': '/dev/log',
                 'facility': SysLogHandler.LOG_LOCAL1,
+                'formatter': 'raw',
+            },
+            'audit': {
+                'level': 'DEBUG',
+                'class': 'logging.handlers.SysLogHandler',
+                'address': '/dev/log',
+                'facility': SysLogHandler.LOG_LOCAL2,
                 'formatter': 'raw',
             },
         })
