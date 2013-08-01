@@ -112,6 +112,11 @@ def marked_as_admin(_step, name, inverted):
         assert world.is_css_present(flag_css)
 
 
+@step(u'I should( not)? be marked as an admin')
+def self_marked_as_admin(_step, inverted):
+    return marked_as_admin(_step, "robot+studio", inverted)
+
+
 @step(u'I can(not)? delete users')
 @step(u's?he can(not)? delete users')
 def can_delete_users(_step, inverted):
@@ -130,3 +135,17 @@ def can_add_users(_step, inverted):
         assert world.is_css_not_present(add_css)
     else:
         assert world.is_css_present(add_css)
+
+
+@step(u'I can(not)? make ("([^"]*)"|myself) a course team admin')
+@step(u's?he can(not)? make ("([^"]*)"|me) a course team admin')
+def can_make_course_admin(_step, inverted, outer_capture, name):
+    if outer_capture == "myself":
+        email = world.scenario_dict["USER"].email
+    else:
+        email = name + EMAIL_EXTENSION
+    add_button_css = '.user-item[data-email="{email}"] .add-admin-role'.format(email=email)
+    if inverted:
+        assert world.is_css_not_present(add_button_css)
+    else:
+        assert world.is_css_present(add_button_css)
