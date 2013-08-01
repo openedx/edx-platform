@@ -46,7 +46,7 @@ class TestGenerate(TestCase):
                 path = os.path.join(CONFIGURATION.get_messages_dir(locale), mofile)
                 exists = os.path.exists(path)
                 self.assertTrue(exists, msg='Missing file in locale %s: %s' % (locale, mofile))
-                self.assertTrue(datetime.fromtimestamp(os.path.getmtime(path)) >= self.start_time,
+                self.assertTrue(datetime.fromtimestamp(os.path.getmtime(path), UTC) >= self.start_time,
                                 msg='File not recently modified: %s' % path)
             self.assert_merge_headers(locale)
 
