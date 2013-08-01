@@ -169,6 +169,7 @@
       name=context_course.location.name,
       email="@@EMAIL@@",
     ))}";
+  var unknownErrorMessage = gettext("Unknown")
 
   $(document).ready(function() {
     var $createUserForm = $('#create-user-form');
@@ -226,9 +227,9 @@
         error: function(jqXHR, textStatus, errorThrown) {
           var message;
           try {
-            message = JSON.parse(jqXHR.responseText).error || "Unknown";
+            message = JSON.parse(jqXHR.responseText).error || unknownErrorMessage;
           } catch (e) {
-            message = "Unknown";
+            message = unknownErrorMessage
           }
           var prompt = new CMS.Views.Prompt.Error({
             title: gettext("Error adding user"),
@@ -292,9 +293,9 @@
                 error: function(jqXHR, textStatus, errorThrown) {
                   var message;
                   try {
-                    message = JSON.parse(jqXHR.responseText).error || "Unknown";
+                    message = JSON.parse(jqXHR.responseText).error || unknownErrorMessage;
                   } catch (e) {
-                    message = "Unknown";
+                    message = unknownErrorMessage;
                   }
                   var prompt = new CMS.Views.Prompt.Error({
                     title: gettext("Error removing user"),
@@ -348,9 +349,9 @@
         error: function(jqXHR, textStatus, errorThrown) {
           var message;
           try {
-            message = JSON.parse(jqXHR.responseText).error || "Unknown";
+            message = JSON.parse(jqXHR.responseText).error || unknownErrorMessage;
           } catch (e) {
-            message = "Unknown";
+            message = unknownErrorMessage;
           }
           var prompt = new CMS.Views.Prompt.Error({
             title: gettext("There was an error changing the user's role"),
