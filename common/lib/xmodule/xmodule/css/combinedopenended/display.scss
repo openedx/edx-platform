@@ -17,18 +17,17 @@ h2 {
 }
 
 div.name{
-    padding-bottom: 15px;
-    h2{
-        display: inline;
-    }
+  padding-bottom: 15px;
+  
+  h2{
+      display: inline;
+  }
 
-    .progress-container
-        {
-            display: inline;
-            float: right;
-            padding-top: 3px;
-        }
-
+  .progress-container {
+    display: inline;
+    float: right;
+    padding-top: 3px;
+  }
 }
 
 .inline-error {
@@ -36,177 +35,178 @@ div.name{
 }
 
 section.combined-open-ended {
-      @include clearfix;
+  @include clearfix;
 }
 
 div.problemwrapper {
+  padding: $baseline/4;
   border: 1px solid;
   border-color: lightgray;
-    -webkit-border-radius: 10px;
-    -moz-border-radius: 10px;
-    border-radius: 10px;
-   padding: 5px;
-  .status-bar
-  {
-    float: right;
+  border-radius: 10px;
+
+  .status-bar {
     display: inline-block;
+    float: right;
     padding: 5px;
 
     .problemtype{
-        display: inline;
-        float: left;
-        background-color: #d4d4d4;
-        padding: 10px;
-        border-radius: 5px;
+      display: inline;
+      float: left;
+      padding: $baseline/2;
+      border-radius: 5px;
+      background-color: #d4d4d4;
     }
 
-    .statustable{
-        width: 750px;
+    .statustable {
+      width: 750px;
     }
 
-    .status-container
-    {
-      padding-bottom: 5px;
+    .status-container {
       display: inline-block;
+      padding-bottom: $baseline/4;
     }
 
-    .problemtype-container{
-        width: 40%;
-        padding-top: 12px;
+    .problemtype-container {
+      width: 40%;
+      padding-top: 12px;
     }
 
-    .assessments-container{
-        width: 30%;
-        .assessment-text{
-            display: inline-block;
-        }
-    }
-  }
-  .item-container
-  {
-        @clearfix
-      padding-bottom: 10px;
-      display: inline-block;
-      margin: 0px 15px 0px 15px;
+    .assessments-container {
+      width: 30%;
 
-      h4 {
-          padding-top: 10px;
-          border-top: 1px solid;
-          border-color: lightgray;
+      .assessment-text {
+        display: inline-block;
       }
+    }
+  }
+  .item-container {
+    @clearfix
+    padding-bottom: 10px;
+    display: inline-block;
+    margin: 0px 15px 0px 15px;
+
+    h4 {
+      padding-top: $baseline/2;
+      border-top: 1px solid;
+      border-color: lightgray;
+    }
   }
 
-  .result-container
-  {
-      float:left;
-      width: 100%;
-      position:relative;
+  .result-container {
+    float:left;
+    width: 100%;
+    position:relative;
   }
 }
 
 section.legend-container {
+  margin: 15px;
+
   .legenditem {
+    display: inline;
+    padding: 2px;
+    width: 20%;
     background-color : #d4d4d4;
     font-size: .9em;
-    padding: 2px;
-    display: inline;
-    width: 20%;
   }
-  margin: 15px;
 }
 
 section.combined-open-ended-status {
+  padding: $baseline $baseline $baseline 0;
 
-    padding: 20px 20px 20px 0px;
-    .statusitem {
-     &:first-child{
-         border-bottom-left-radius: 10px;
-     }
-      &:last-child{
-          border-top-right-radius: 10px;
-      }
-      color: #2C2C2C;
-      background-color : #d4d4d4;
-      font-size: .9em;
-      padding: 10px;
-      display: inline;
-      width: 20%;
-      .show-results {
-          margin-top: .3em;
-          text-align:right;
-      }
-      .show-results-button {
-          font: 1em monospace;
-      }
+  .statusitem {
+    display: inline;
+    padding: $baseline/2;
+    width: 20%;
+    background-color : #d4d4d4;
+    color: #2c2c2c;
+    font-size: .9em;
+
+    &:first-child {
+      border-bottom-left-radius: 10px;
     }
 
-   .statusitem-current {
-     background-color: #B2B2B2;
-     color: #222;
-   }
-
-    span {
-        &.unanswered {
-          @include inline-block();
-          background: url('../images/unanswered-icon.png') center center no-repeat;
-          height: 14px;
-          position: relative;
-          width: 14px;
-          float: right;
-        }
-
-        &.correct {
-          @include inline-block();
-          background: url('../images/correct-icon.png') center center no-repeat;
-          height: 20px;
-          position: relative;
-          width: 25px;
-          float: right;
-        }
-
-        &.incorrect {
-          @include inline-block();
-          background: url('../images/incorrect-icon.png') center center no-repeat;
-          height: 20px;
-          width: 20px;
-          position: relative;
-          float: right;
-        }
+    &:last-child {
+      border-top-right-radius: 10px;
+    }
+  
+    .show-results {
+      margin-top: .3em;
+      text-align:right;
     }
 
-    .icon-caret-right {
-      display: inline-block;
-      vertical-align: baseline;
-      margin-right: ($baseline/4);
+    .show-results-button {
+      font: 1em monospace;
     }
+  }
+
+ .statusitem-current {
+    background-color: #B2B2B2;
+    color: #222;
+ }
+
+  span {
+    &.unanswered {
+      @include inline-block();
+      position: relative;
+      float: right;
+      width: 14px;
+      height: 14px;
+      background: url('../images/unanswered-icon.png') center center no-repeat;
+    }
+
+    &.correct {
+      @include inline-block();
+      position: relative;
+      float: right;
+      width: 25px;
+      height: 20px;
+      background: url('../images/correct-icon.png') center center no-repeat;
+    }
+
+    &.incorrect {
+      @include inline-block();
+      position: relative;
+      float: right;
+      width: 20px;
+      height: 20px;
+      background: url('../images/incorrect-icon.png') center center no-repeat;
+    }
+  }
+
+  .icon-caret-right {
+    display: inline-block;
+    vertical-align: baseline;
+    margin-right: ($baseline/4);
+  }
 }
 
 div.combined-rubric-container {
-    margin:15px;
-  ul.rubric-list{
+  margin: 15px;
+  padding-bottom: 5px;
+  padding-top: 10px;
+
+  ul.rubric-list {
+    margin: 4px;
+    padding: 0;
     list-style-type: none;
-    padding:0;
-    margin:4px;
     li {
-      &.rubric-list-item{
+      &.rubric-list-item {
         margin-bottom: 2px;
         padding: 0px;
       }
     }
   }
-
-    h4{
-      padding-top: 10px;
-      border-top: 1px solid;
-      border-color: lightgray;
-    }
+  h4 {
+    padding-top: 10px;
+    border-top: 1px solid;
+    border-color: lightgray;
+  }
 
   span.rubric-category {
     font-size: .9em;
     font-weight: bold;
   }
-  padding-bottom: 5px;
-  padding-top: 10px;
 }
 
 div.result-container {
@@ -342,8 +342,8 @@ div.result-container {
 section.open-ended-child {
   @media print {
     display: block;
-    width: auto;
     padding: 0;
+    width: auto;
 
     canvas, img {
       page-break-inside: avoid;
@@ -351,30 +351,30 @@ section.open-ended-child {
   }
 
   .inline {
-      display: inline;
+    display: inline;
   }
 
   ol.enumerate {
     li {
       &:before {
-        content: " ";
         display: block;
-        height: 0;
         visibility: hidden;
+        height: 0;
+        content: " ";
       }
     }
   }
 
   .solution-span {
     > span {
-      margin: 20px 0;
-      display: block;
-      border: 1px solid #ddd;
-      padding: 9px 15px 20px;
-      background: #FFF;
       position: relative;
-      box-shadow: inset 0 0 0 1px #eee;
+      display: block;
+      margin: $baseline 0;
+      padding: 9px 15px $baseline;
+      border: 1px solid #ddd;
       border-radius: 3px;
+      background: #fff;
+      box-shadow: inset 0 0 0 1px #eee;
 
       &:empty {
         display: none;
@@ -387,8 +387,8 @@ section.open-ended-child {
         margin-top: -2px;
       }
       &.status {
+        margin: 8px 0 0 $baseline/2;
         text-indent: -9999px;
-        margin: 8px 0 0 10px;
       }
     }
 
@@ -404,9 +404,9 @@ section.open-ended-child {
     div.correct, div.ui-icon-check {
       p.status {
         @include inline-block();
-        background: url('../images/correct-icon.png') center center no-repeat;
-        height: 20px;
         width: 25px;
+        height: 20px;
+        background: url('../images/correct-icon.png') center center no-repeat;
       }
 
       input {
@@ -417,9 +417,9 @@ section.open-ended-child {
     div.processing {
       p.status {
         @include inline-block();
-        background: url('../images/spinner.gif') center center no-repeat;
-        height: 20px;
         width: 20px;
+        height: 20px;
+        background: url('../images/spinner.gif') center center no-repeat;
       }
 
       input {
@@ -430,9 +430,9 @@ section.open-ended-child {
     div.incorrect, div.ui-icon-close {
       p.status {
         @include inline-block();
-        background: url('../images/incorrect-icon.png') center center no-repeat;
-        height: 20px;
         width: 20px;
+        height: 20px;
+        background: url('../images/incorrect-icon.png') center center no-repeat;
         text-indent: -9999px;
       }
 
@@ -467,96 +467,90 @@ section.open-ended-child {
     span {
       &.unanswered, &.ui-icon-bullet {
         @include inline-block();
-        background: url('../images/unanswered-icon.png') center center no-repeat;
-        height: 14px;
         position: relative;
         top: 4px;
         width: 14px;
+        height: 14px;
+        background: url('../images/unanswered-icon.png') center center no-repeat;
       }
 
       &.processing, &.ui-icon-processing {
         @include inline-block();
-        background: url('../images/spinner.gif') center center no-repeat;
-        height: 20px;
         position: relative;
         top: 6px;
         width: 25px;
+        height: 20px;
+        background: url('../images/spinner.gif') center center no-repeat;
       }
 
       &.correct, &.ui-icon-check {
         @include inline-block();
-        background: url('../images/correct-icon.png') center center no-repeat;
-        height: 20px;
         position: relative;
         top: 6px;
         width: 25px;
+        height: 20px;
+        background: url('../images/correct-icon.png') center center no-repeat;
       }
 
       &.incorrect, &.ui-icon-close {
         @include inline-block();
-        background: url('../images/incorrect-icon.png') center center no-repeat;
-        height: 20px;
-        width: 20px;
         position: relative;
         top: 6px;
+        width: 20px;
+        height: 20px;
+        background: url('../images/incorrect-icon.png') center center no-repeat;
       }
     }
 
-    .reload
-    {
+    .reload {
       float:right;
       margin: 10px;
     }
 
     div.short-form-response {
-          background: #F6F6F6;
-          border: 1px solid #ddd;
-          margin-bottom: 0px;
-          overflow-y: auto;
-          height: 200px;
-          @include clearfix;
-     }
+      @include clearfix;
+      overflow-y: auto;
+      margin-bottom: 0;
+      height: 200px;
+      border: 1px solid #ddd;
+      background: #f6f6f6;
+    }
 
     .grader-status {
-      padding: 9px;
-      background: #F6F6F6;
-      border: 1px solid #ddd;
-      border-top: 0;
-      margin-bottom: 20px;
       @include clearfix;
+      margin-bottom: $baseline;
+      padding: 9px;
+      border: 1px solid #ddd;
+      border-top: 0px;
+      background: #F6F6F6;
 
       span {
-        text-indent: -9999px;
-        overflow: hidden;
         display: block;
         float: left;
+        overflow: hidden;
         margin: -7px 7px 0 0;
+        text-indent: -9999px;
       }
 
       .grading {
-        background: url('../images/info-icon.png') left center no-repeat;
+        margin: 0 7px 0 0;
         padding-left: 25px;
-        text-indent: 0px;
-        margin: 0px 7px 0 0;
+        background: url('../images/info-icon.png') left center no-repeat;
+        text-indent: 0;
       }
 
       p {
-        line-height: 20px;
-        margin-bottom: 0;
         float: left;
+        margin-bottom: 0;
+        line-height: 20px;
       }
 
       &.file {
-        background: #FFF;
-        margin-top: 20px;
-        padding: 20px 0 0 0;
-
-        border: {
-          top: 1px solid #eee;
-          right: 0;
-          bottom: 0;
-          left: 0;
-        }
+        margin-top: $baseline;
+        padding: $baseline 0 0 0;
+        border: 0;
+        border-top: 1px solid #eee;
+        background: #fff;
 
         p.debug {
           display: none;
@@ -570,8 +564,8 @@ section.open-ended-child {
     }
 
   form.option-input {
-    margin: -10px 0 20px;
-    padding-bottom: 20px;
+    margin: -$baseline/2 0 $baseline;
+    padding-bottom: $baseline;
 
     select {
       margin-right: flex-gutter();
@@ -579,29 +573,30 @@ section.open-ended-child {
   }
 
   ul {
-    list-style: disc outside none;
     margin-bottom: lh();
     margin-left: .75em;
     margin-left: .75rem;
+    list-style: disc outside none;
   }
 
     ul.rubric-list{
-        list-style-type: none;
-        padding:0;
-        margin:0;
-        li {
-             &.rubric-list-item{
-                 margin-bottom: 0px;
-                 padding: 0px;
-             }
-        }
+      margin: 0;
+      padding: 0;
+      list-style-type: none;
+
+      li {
+        &.rubric-list-item {
+          margin-bottom: 0;
+          padding: 0;
+         }
+      }
     }
 
   ol {
-    list-style: decimal outside none;
     margin-bottom: lh();
     margin-left: .75em;
     margin-left: .75rem;
+    list-style: decimal outside none;
   }
 
   dl {
@@ -622,8 +617,9 @@ section.open-ended-child {
   }
 
   li {
-    margin-bottom: 0px;
-    padding: 0px;
+    margin-bottom: 0;
+    padding: 0;
+
     &:last-child {
       margin-bottom: 0;
     }
@@ -634,14 +630,14 @@ section.open-ended-child {
   }
 
   hr {
-    background: #ddd;
-    border: none;
-    clear: both;
-    color: #ddd;
     float: none;
-    height: 1px;
+    clear: both;
     margin: 0 0 .75rem;
     width: 100%;
+    height: 1px;
+    border: none;
+    background: #ddd;
+    color: #ddd;
   }
 
   .hidden {
@@ -655,7 +651,7 @@ section.open-ended-child {
   }
 
   section.action {
-    margin-top: 20px;
+    margin-top: $baseline;
 
     input.save {
       @extend .blue-button !optional;
@@ -663,20 +659,20 @@ section.open-ended-child {
 
     .submission_feedback {
       @include inline-block;
-      font-style: italic;
-      margin: 8px 0 0 10px;
+      margin: 8px 0 0 $baseline/2;
       color: #777;
+      font-style: italic;
       -webkit-font-smoothing: antialiased;
     }
   }
 
   .detailed-solution {
     > p:first-child {
-      font-size: 0.9em;
+      color: #aaa;
+      text-transform: uppercase;
       font-weight: bold;
       font-style: normal;
-      text-transform: uppercase;
-      color: #AAA;
+      font-size: 0.9em;
     }
 
     p:last-child {
@@ -686,66 +682,68 @@ section.open-ended-child {
 
   div.open-ended-alert,
   .save_message {
+    margin-top: $baseline/2;
+    margin-bottom: $baseline/4;
     padding: 8px 12px;
-    border: 1px solid #EBE8BF;
+    border: 1px solid #ebe8bf;
     border-radius: 3px;
-    background: #FFFCDD;
+    background: #fffcdd;
     font-size: 0.9em;
-    margin-top: 10px;
-    margin-bottom:5px;
   }
 
   div.capa_reset {
+    margin-top: $baseline/2;
+    margin-bottom: $baseline/2;
     padding: 25px;
     border: 1px solid $error-red;
-    background-color: lighten($error-red, 25%);
     border-radius: 3px;
+    background-color: lighten($error-red, 25%);
     font-size: 1em;
-    margin-top: 10px;
-    margin-bottom: 10px;
   }
-  .capa_reset>h2 {
-    color: #AA0000;
+
+  .capa_reset > h2 {
+    color: #aa0000;
   }
+
   .capa_reset li {
     font-size: 0.9em;
   }
 
   .assessment-container {
-      margin: 40px 0px 30px 0px;
-      .scoring-container
-      {
-          p
-          {
-              margin-bottom: 1em;
-          }
-          label {
-              margin: 10px;
-              padding: 5px;
-              display: inline-block;
-              min-width: 50px;
-              background-color: #CCC;
-              text-size: 1.5em;
-          }
+    margin: $baseline*2 0px 30px 0px;
 
-          input[type=radio]:checked + label {
-              background: #666;
-              color: white;
-          }
-          input[class='grade-selection'] {
-              display: none;
-          }
-
+    .scoring-container {
+      p {
+        margin-bottom: 1em;
       }
+
+      label {
+        display: inline-block;
+        margin: $baseline/2;
+        padding: $baseline/4;
+        min-width: 50px;
+        background-color: #ccc;
+        text-size: 1.5em;
+      }
+
+      input[type=radio]:checked + label {
+        background: #666;
+        color: white;
+      }
+
+      input[class='grade-selection'] {
+        display: none;
+      }
+    }
   }
 
-  div.prompt{
-    background-color:white;
+  div.prompt {
+    background-color: white;
   }
 
-  h4{
-    padding-top: 10px;
-    border-top: 1px solid;
+  h4 {
+    padding-top: $baseline/2;
     border-color: lightgray;
+    border-top: 1px solid;
   }
 }
