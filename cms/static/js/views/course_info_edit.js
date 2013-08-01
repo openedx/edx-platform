@@ -101,9 +101,13 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
             title: gettext('Saving') + '&hellip;'
         });
         saving.show();
+        var ele = this.modelDom(event);
         targetModel.save({}, {
             success: function() {
                 saving.hide();
+            },
+            error: function() {
+                ele.remove();
             }
         });
         this.closeEditor(this);
