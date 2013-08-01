@@ -80,7 +80,7 @@
 		        "transcript_analyzer": {
 		            "type": "custom",
 		            "tokenizer": "standard",
-		            "filter": ["asciifolding", "custom_word_delimiter", "lowercase", "custom_stemmer", "shingle",
+		            "filter": ["asciifolding", "word_delimiter", "lowercase", "custom_stemmer", "shingle",
 		            		    "custom_phonetic"]
 		        },
 
@@ -93,7 +93,7 @@
 		        "depth_analyzer": {
 		        	"type": "custom",
 		        	"tokenizer": "standard",
-		        	"filter": ["custom_word_delimiter", "lowercase", "shingle", "custom_phonetic"]
+		        	"filter": ["word_delimiter", "lowercase", "shingle", "custom_phonetic"]
 		        },
 
 		        "breadth_analyzer": {

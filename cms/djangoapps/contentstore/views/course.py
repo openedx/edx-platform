@@ -91,7 +91,7 @@ def course_index(request, org, course, name):
         'upload_asset_callback_url': upload_asset_callback_url,
         'new_unit_category': 'vertical',
         'category': 'vertical',
-        "type_id": type_id
+        "type_id": type_id,
     })
 
 
