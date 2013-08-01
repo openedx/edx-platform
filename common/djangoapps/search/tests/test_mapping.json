@@ -1,6 +1,6 @@
 {
 	"mappings": {
-		"test-string": {
+		"searchable_text": {
 			"type": "string",
 			"store": "yes",
 			"index": "analyzed",

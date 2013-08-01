@@ -1,4 +1,4 @@
-from ..es_requests import MongoIndexer
+from search.es_requests import MongoIndexer
 from django.test import TestCase
 from pymongo import MongoClient
 import random
@@ -6,12 +6,15 @@ import string
 
 
 def random_files(file_ending, test_files=10, filename_sizes=20,
-                 valid_chars=string.lowercase+string.uppercase+string.digits):
-    new_string = lambda: "".join(random.choice(valid_chars) for i in range(filename_sizes))+file_ending
+                 valid_chars=string.lowercase + string.uppercase + string.digits):
+    new_string = lambda: "".join(random.choice(valid_chars) for i in range(filename_sizes)) + file_ending
     return (new_string() for i in range(test_files))
 
 
 class MongoTest(TestCase):
+    """
+    Test suite for the MongoIndexer class
+    """
 
     def setUp(self, host="localhost", port=27017):
         self.host = host
@@ -31,11 +34,13 @@ class MongoTest(TestCase):
         self.indexer = MongoIndexer(host, port, content_database="test-content", module_database="test-module")
 
     def test_incorrect_collection(self):
-        """Test to make sure that trying to create an indexer on a non-existent collection will error"""
+        """Test to make sure that trying to read from a non-existant collection will error"""
         success = False
+        indexer = MongoIndexer(self.host, self.port, chunk_collection="fake-collection")
+        cursor = indexer.find_chunks_with_type("")
         try:
-            MongoIndexer(self.host, self.port, chunk_collection="fake-collection")
-        except ValueError:
+            cursor.next()
+        except StopIteration:
             success = True
         self.assertTrue(success)
 

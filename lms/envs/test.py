@@ -17,6 +17,11 @@ import os
 from path import path
 from warnings import filterwarnings
 
+
+ES_DATABASE = "http://localhost:9200"
+
+ES_SETTINGS_FILE = "../../common/djangoapps/search/settings.json"
+
 # can't test start dates with this True, but on the other hand,
 # can test everything else :)
 MITX_FEATURES['DISABLE_START_DATES'] = True
