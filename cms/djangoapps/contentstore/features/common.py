@@ -4,10 +4,11 @@
 from lettuce import world, step
 from nose.tools import assert_true
 
-from auth.authz import get_user_by_email
+from auth.authz import get_user_by_email, get_course_groupname_for_role
 
 from selenium.webdriver.common.keys import Keys
 import time
+from django.contrib.auth.models import Group
 
 from logging import getLogger
 logger = getLogger(__name__)
@@ -163,18 +164,19 @@ def log_into_studio(
 
 
 def create_a_course():
-    world.scenario_dict['COURSE'] = world.CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course')
+    course = world.CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course')
+    world.scenario_dict['COURSE'] = course
+
+    user = world.scenario_dict.get("USER")
+    if not user:
+        user = get_user_by_email('robot+studio@edx.org')
 
     # Add the user to the instructor group of the course
     # so they will have the permissions to see it in studio
-
-    course = world.GroupFactory.create(name='instructor_MITx/{}/{}'.format(world.scenario_dict['COURSE'].number,
-                                                                    world.scenario_dict['COURSE'].display_name.replace(" ", "_")))
-    if world.scenario_dict.get('USER') is None:
-        user = world.scenario_dict['USER']
-    else:
-        user = get_user_by_email('robot+studio@edx.org')
-    user.groups.add(course)
+    for role in ("staff", "instructor"):
+        groupname = get_course_groupname_for_role(course.location, role)
+        group, __ = Group.objects.get_or_create(name=groupname)
+        user.groups.add(group)
     user.save()
     world.browser.reload()
 

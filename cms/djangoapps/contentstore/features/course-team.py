@@ -17,13 +17,20 @@ def view_grading_settings(_step, whom):
     world.css_click(link_css)
 
 
-@step(u'the user "([^"]*)" exists( as a course admin)?$')
-def create_other_user(_step, name, course_admin):
-    user = create_studio_user(uname=name, password=PASSWORD, email=(name + EMAIL_EXTENSION))
-    if course_admin:
+@step(u'the user "([^"]*)" exists( as a course (admin|staff member))?$')
+def create_other_user(_step, name, has_extra_perms, role_name):
+    email = name + EMAIL_EXTENSION
+    user = create_studio_user(uname=name, password=PASSWORD, email=email)
+    if has_extra_perms:
         location = world.scenario_dict["COURSE"].location
-        for role in ("staff", "instructor"):
-            group, __ = Group.objects.get_or_create(name=get_course_groupname_for_role(location, role))
+        if role_name == "admin":
+            # admins get staff privileges, as well
+            roles = ("staff", "instructor")
+        else:
+            roles = ("staff",)
+        for role in roles:
+            groupname = get_course_groupname_for_role(location, role)
+            group, __ = Group.objects.get_or_create(name=groupname)
             user.groups.add(group)
         user.save()
 
@@ -47,6 +54,17 @@ def delete_other_user(_step, name):
     to_delete_css = '.user-item .item-actions a.remove-user[data-id="{email}"]'.format(
         email="{0}{1}".format(name, EMAIL_EXTENSION))
     world.css_click(to_delete_css)
+    # confirm prompt
+    world.css_click(".wrapper-prompt-warning .action-primary")
+
+
+@step(u's?he deletes me from the course team')
+def other_delete_self(_step):
+    to_delete_css = '.user-item .item-actions a.remove-user[data-id="{email}"]'.format(
+        email="robot+studio@edx.org")
+    world.css_click(to_delete_css)
+    # confirm prompt
+    world.css_click(".wrapper-prompt-warning .action-primary")
 
 
 @step(u'I make "([^"]*)" a course team admin')
@@ -56,10 +74,14 @@ def make_course_team_admin(_step, name):
     world.css_click(admin_btn_css)
 
 
-@step(u'I remove admin rights from "([^"]*)"')
-def remove_course_team_admin(_step, name):
+@step(u'I remove admin rights from ("([^"]*)"|myself)')
+def remove_course_team_admin(_step, outer_capture, name):
+    if outer_capture == "myself":
+        email = world.scenario_dict["USER"].email
+    else:
+        email = name + EMAIL_EXTENSION
     admin_btn_css = '.user-item[data-email="{email}"] .user-actions .remove-admin-role'.format(
-        email=name+EMAIL_EXTENSION)
+        email=email)
     world.css_click(admin_btn_css)
 
 
@@ -68,8 +90,9 @@ def other_user_login(_step, name):
     log_into_studio(uname=name, password=PASSWORD, email=name + EMAIL_EXTENSION)
 
 
+@step(u'I( do not)? see the course on my page')
 @step(u's?he does( not)? see the course on (his|her) page')
-def see_course(_step, inverted, gender):
+def see_course(_step, inverted, gender='self'):
     class_css = 'span.class-name'
     all_courses = world.css_find(class_css, wait_time=1)
     all_names = [item.html for item in all_courses]
@@ -89,6 +112,12 @@ def marked_as_admin(_step, name, inverted):
         assert world.is_css_present(flag_css)
 
 
+@step(u'I should( not)? be marked as an admin')
+def self_marked_as_admin(_step, inverted):
+    return marked_as_admin(_step, "robot+studio", inverted)
+
+
+@step(u'I can(not)? delete users')
 @step(u's?he can(not)? delete users')
 def can_delete_users(_step, inverted):
     to_delete_css = 'a.remove-user'
@@ -98,6 +127,7 @@ def can_delete_users(_step, inverted):
         assert world.is_css_present(to_delete_css)
 
 
+@step(u'I can(not)? add users')
 @step(u's?he can(not)? add users')
 def can_add_users(_step, inverted):
     add_css = 'a.create-user-button'
@@ -105,3 +135,17 @@ def can_add_users(_step, inverted):
         assert world.is_css_not_present(add_css)
     else:
         assert world.is_css_present(add_css)
+
+
+@step(u'I can(not)? make ("([^"]*)"|myself) a course team admin')
+@step(u's?he can(not)? make ("([^"]*)"|me) a course team admin')
+def can_make_course_admin(_step, inverted, outer_capture, name):
+    if outer_capture == "myself":
+        email = world.scenario_dict["USER"].email
+    else:
+        email = name + EMAIL_EXTENSION
+    add_button_css = '.user-item[data-email="{email}"] .add-admin-role'.format(email=email)
+    if inverted:
+        assert world.is_css_not_present(add_button_css)
+    else:
+        assert world.is_css_present(add_button_css)

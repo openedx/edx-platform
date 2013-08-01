@@ -57,3 +57,30 @@ Feature: Course Team
         Then "frank" should not be marked as an admin
         And he cannot add users
         And he cannot delete users
+
+    Scenario: Admins should be able to give course ownership to someone else
+        Given I have opened a new course in Studio
+        And the user "gina" exists
+        And I am viewing the course team settings
+        When I add "gina" to the course team
+        And I make "gina" a course team admin
+        And I remove admin rights from myself
+        And "gina" logs in
+        And she selects the new course
+        And she views the course team settings
+        And she deletes me from the course team
+        And I log in
+        Then I do not see the course on my page
+
+    Scenario: Admins should be able to remove their own admin rights
+        Given I have opened a new course in Studio
+        And the user "harry" exists as a course admin
+        And I am viewing the course team settings
+        Then I should be marked as an admin
+        And I can add users
+        And I can delete users
+        When I remove admin rights from myself
+        Then I should not be marked as an admin
+        And I cannot add users
+        And I cannot delete users
+        And I cannot make myself a course team admin
