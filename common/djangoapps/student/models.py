@@ -20,6 +20,7 @@ from random import randint
 
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -30,6 +31,7 @@ from pytz import UTC
 
 
 log = logging.getLogger(__name__)
+AUDIT_LOG = logging.getLogger("audit")
 
 
 class UserProfile(models.Model):
@@ -779,3 +781,20 @@ def update_user_information(sender, instance, created, **kwargs):
         log = logging.getLogger("mitx.discussion")
         log.error(unicode(e))
         log.error("update user info to discussion failed for user with id: " + str(instance.id))
+
+# Define login and logout handlers here in the models file, instead of the views file,
+# so that they are more likely to be loaded when a Studio user brings up the Studio admin
+# page to login.  These are currently the only signals available, so we need to continue
+# identifying and logging failures separately (in views).
+
+
+@receiver(user_logged_in)
+def log_successful_login(sender, request, user, **kwargs):
+    """Handler to log when logins have occurred successfully."""
+    AUDIT_LOG.info(u"Login success - {0} ({1})".format(user.username, user.email))
+
+
+@receiver(user_logged_out)
+def log_successful_logout(sender, request, user, **kwargs):
+    """Handler to log when logouts have occurred successfully."""
+    AUDIT_LOG.info(u"Logout - {0}".format(request.user))
