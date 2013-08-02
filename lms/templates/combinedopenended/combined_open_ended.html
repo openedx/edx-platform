@@ -11,7 +11,7 @@
                 <tr>
                     <td class="problemtype-container">
                         <div class="problemtype">
-                            Open Response Assessment
+                            Open Response
                         </div>
                     </td>
                     <td class="assessments-container">
@@ -27,7 +27,11 @@
         </div>
 
         <div class="item-container">
-            <h4>Prompt <a href="#" class="question-header">(Hide)</a> </h4>
+            <div class="visibility-control visibility-control-prompt">
+                <div class="inner">
+                </div>
+                <a href="" class="question-header">&#x21a5; Hide Prompt</a>
+            </div>
             <div class="problem-container">
             % for item in items:
                 <div class="item">${item['content'] | n}</div>
