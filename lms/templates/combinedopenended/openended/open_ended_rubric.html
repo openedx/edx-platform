@@ -1,5 +1,9 @@
 <form class="rubric-template" id="inputtype_${id}" xmlns="http://www.w3.org/1999/html">
-    <h3>Rubric</h3>
+    <div class="visibility-control visibility-control-rubric">
+        <div class="inner">
+        </div>
+        <span class="section-header section-header-rubric">Rubric</span>
+    </div>
     <p>Select the criteria you feel best represents this submission in each category.</p>
     <div class="rubric">
         % for i in range(len(categories)):
@@ -14,7 +18,7 @@
                         <li class="rubric-list-item">
                     % endif
                     <label class="rubric-label" for="score-${i}-${j}">
-                        <input type="radio" class="score-selection" data-category="${i}" name="score-selection-${i}" id="score-${i}-${j}" value="${option['points']}"/>
+                        <span class="wrapper-score-selection"><input type="radio" class="score-selection" data-category="${i}" name="score-selection-${i}" id="score-${i}-${j}" value="${option['points']}"/></span>
                         <span class="wrappable"> ${option['points']} points : ${option['text']}</span>
                     </label>
                     </li>

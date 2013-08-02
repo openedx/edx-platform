@@ -1,3 +1,6 @@
+// lms - xmodule - combinedopenended
+// ====================
+
 h2 {
   margin-top: 0;
   margin-bottom: 15px;
@@ -16,6 +19,7 @@ h2 {
   }
 }
 
+ // Problem Header
 div.name{
   padding-bottom: 15px;
   
@@ -37,6 +41,7 @@ div.name{
 section.combined-open-ended {
   @include clearfix;
 }
+
 
 div.problemwrapper {
   border: 1px solid lightgray;
@@ -85,29 +90,6 @@ div.problemwrapper {
   .item-container {
     padding-bottom: $baseline/2;
     margin: 15px;
-
-    .visibility-control-prompt {
-      display: block;
-      height: 40px;
-      width: 100%; 
-
-      .inner {
-        float: left;
-        height: 5px;
-        margin-top: 17px;
-        border-top: 1px dotted #ddd;
-        width: 85%; 
-      }
-    }
-
-    a {
-      display: block;
-      text-align: center;
-      width: 15%;
-      float: right;
-      padding-top: $baseline/2;
-      font-size: .9em;
-    }
   }
 
   .result-container {
@@ -163,7 +145,6 @@ section.combined-open-ended-status {
 
  .statusitem-current {
     background-color: #fff;
-    box-shadow: inset 0 1px 1px gray;
     color: #222; 
  }
 
@@ -203,6 +184,63 @@ section.combined-open-ended-status {
   }
 }
 
+ // Problem Section Controls
+
+.visibility-control, .visibility-control-prompt {
+  display: block;
+  height: 40px;
+  width: 100%; 
+
+  .inner {
+    float: left;
+    height: 5px;
+    margin-top: $baseline;
+    border-top: 1px dotted #ddd;
+    width: 85%; 
+  }
+}
+
+.section-header {
+  display: block;
+  text-align: center;
+  width: 15%;
+  float: right;
+  padding-top: $baseline/2;
+  font-size: .9em;
+}
+
+
+// Rubric Styling
+
+.wrapper-score-selection { 
+  display: table-cell;
+  padding: 0 $baseline/2;
+  width: 20px;
+  vertical-align: middle;
+
+}
+
+.wrappable {
+  display: table-cell;
+  padding: $baseline/4 0 ;
+}
+
+.rubric-list-item {
+  margin-bottom: 2px;
+  padding: $baseline/2;
+
+  &:hover {
+    background-color: #eee;
+  }
+}
+
+span.rubric-category {
+  display: block;
+  width: 100%;
+  border-bottom: 1px solid lightgray;
+  font-size: .9em;
+}
+
 div.combined-rubric-container {
   margin: 15px;
   padding-bottom: 5px;
@@ -217,20 +255,8 @@ div.combined-rubric-container {
 
       &.rubric-list-item {
         margin-bottom: 2px;
-        padding: 0px;
+        padding: $baseline/2;
       }
-    }
-
-    .score-selection { 
-      //display: inline-block;
-      //padding-right: $baseline/2;
-      //width: 5%;
-      //vertical-align: center;
-    }
-
-    .wrappable {
-      //display: inline-block;
-      //width: 94%;
     }
   }
   h4 {
