@@ -8,11 +8,7 @@
 
 <%inherit file="../mktg_iframe.html" />
 
-<<<<<<< HEAD
-<%block name="title"><title>${_("About {course_number}").format(course_number=course.display_number_with_default)}</title></%block>
-=======
-<%block name="title"><title>About ${course.display_number_with_default | h}</title></%block>
->>>>>>> add escaping
+<%block name="title"><title>${_("About {course_number}").format(course_number=course.display_number_with_default) | h}</title></%block>
 
 <%block name="bodyclass">view-partial-mktgregister</%block>
 
@@ -56,11 +52,7 @@
             <div class="action is-registered">${_("You Are Registered")}</div>
           %endif
         %elif allow_registration:
-<<<<<<< HEAD
-          <a class="action action-register register" href="#">${_("Register for")} <strong>${course.display_number_with_default}</strong></a>
-=======
-          <a class="action action-register register" href="#">Register for <strong>${course.display_number_with_default | h}</strong></a>
->>>>>>> add escaping
+          <a class="action action-register register" href="#">${_("Register for")} <strong>${course.display_number_with_default | h}</strong></a>
         %else:
           <div class="action registration-closed is-disabled">${_("Registration Is Closed")}</div>
         %endif
