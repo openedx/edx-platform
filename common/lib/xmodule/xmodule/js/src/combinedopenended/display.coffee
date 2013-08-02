@@ -114,6 +114,8 @@ class @CombinedOpenEnded
   grader_status_sel: '.grader-status'
   info_rubric_elements_sel: '.rubric-elements-info'
   rubric_collapse_sel: '.rubric-collapse'
+  next_rubric_sel: '.rubric-next-button'
+  previous_rubric_sel: '.rubric-previous-button'
 
   constructor: (el) ->
     @el=el
@@ -240,6 +242,9 @@ class @CombinedOpenEnded
         @toggle_rubric("")
         @rubric_collapse = @$(@rubric_collapse_sel)
         @rubric_collapse.click @toggle_rubric
+        @hide_rubrics()
+        @$(@previous_rubric_sel).click @previous_rubric
+        @$(@next_rubric_sel).click @next_rubric
 
   show_status_current: () =>
     data = {}
@@ -570,8 +575,36 @@ class @CombinedOpenEnded
     return false
 
   hide_rubrics: () =>
-    @$(combined_rubric_sel + ' > [data-status="hidden"]').hide()
-    @$(combined_rubric_sel + ' > [data-status="shown"]').show()
+    rubrics = @$(@combined_rubric_sel)
+    for rub in rubrics
+      if @$(rub).data('status')=="shown"
+        @$(rub).show()
+      else
+        @$(rub).hide()
+
+  next_rubric: =>
+    @shift_rubric(1)
+    return false
+
+  previous_rubric: =>
+    @shift_rubric(-1)
+    return false
+
+  shift_rubric: (i) =>
+    rubrics = @$(@combined_rubric_sel)
+    number = 0
+    for rub in rubrics
+      if @$(rub).data('status')=="shown"
+        number = @$(rub).data('number')
+      @$(rub).data('status','hidden')
+    if i==1 and number < rubrics.length - 1
+      number = number + i
+
+    if i==-1 and number>0
+      number = number + i
+
+    @$(rubrics[number]).data('status', 'shown')
+    @hide_rubrics()
 
   prompt_show: () =>
     if @prompt_container.is(":hidden")==true

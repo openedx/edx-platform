@@ -344,7 +344,11 @@ class @PeerGradingProblem
     if response.success
       @is_calibrated_check()
       @grading_message.fadeIn()
-      @grading_message.html("<p>Successfully saved your feedback. Fetched the next essay.</p>")
+      message = "<p>Successfully saved your feedback. Fetched the next essay."
+      if response.required_done
+        message = message + " You have completed the required number of gradings."
+      message = message + "</p>"
+      @grading_message.html(message)
     else
       if response.error
         @render_error(response.error)
