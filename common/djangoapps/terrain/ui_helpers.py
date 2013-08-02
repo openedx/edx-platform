@@ -235,6 +235,13 @@ def click_tools():
 def is_mac():
     return platform.mac_ver()[0] is not ''
 
+@world.absorb
+def is_firefox():
+    return world.browser.driver_name is 'Firefox'
+
+@world.absorb
+def trigger_event(css_selector, event='change', index=0):
+    world.browser.execute_script("$('{}:eq({})').trigger('{}')".format(css_selector, index, event))
 
 @world.absorb
 def retry_on_exception(func, max_attempts=5):

@@ -70,7 +70,7 @@ def press_the_notification_button(_step, name):
         confirmation_dismissed = world.is_css_not_present('.is-shown.wrapper-notification-warning')
         error_showing = world.is_css_present('.is-shown.wrapper-notification-error')
         return confirmation_dismissed or error_showing
-    if world.browser.driver_name == 'Firefox':
+    if world.is_firefox():
         world.browser.execute_script("$('{}').click()".format(css))
     else:
         world.css_click(css, success_condition=button_clicked), '%s button not clicked after 5 attempts.' % name
