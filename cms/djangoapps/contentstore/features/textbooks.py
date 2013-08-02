@@ -45,6 +45,8 @@ def click_new_textbook(_step, on):
 def name_textbook(_step, name):
     input_css = ".textbook input[name=textbook-name]"
     world.css_fill(input_css, name)
+    if world.is_firefox():
+        world.trigger_event(input_css)
 
 
 @step(u'I name the (first|second|third) chapter "([^"]*)"')
@@ -52,6 +54,8 @@ def name_chapter(_step, ordinal, name):
     index = ["first", "second", "third"].index(ordinal)
     input_css = ".textbook .chapter{i} input.chapter-name".format(i=index+1)
     world.css_fill(input_css, name)
+    if world.is_firefox():
+        world.trigger_event(input_css)
 
 
 @step(u'I type in "([^"]*)" for the (first|second|third) chapter asset')
@@ -59,6 +63,8 @@ def asset_chapter(_step, name, ordinal):
     index = ["first", "second", "third"].index(ordinal)
     input_css = ".textbook .chapter{i} input.chapter-asset-path".format(i=index+1)
     world.css_fill(input_css, name)
+    if world.is_firefox():
+        world.trigger_event(input_css)
 
 
 @step(u'I click the Upload Asset link for the (first|second|third) chapter')

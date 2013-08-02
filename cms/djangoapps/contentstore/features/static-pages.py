@@ -41,13 +41,9 @@ def change_name(_step, new_name):
     settings_css = '#settings-mode a'
     world.css_click(settings_css)
     input_css = 'input.setting-input'
-    name_input = world.css_find(input_css)
-    if world.is_mac():
-        name_input._element.send_keys(Keys.COMMAND + 'a')
-    else:
-        name_input._element.send_keys(Keys.CONTROL + 'a')
-    name_input._element.send_keys(Keys.DELETE)
-    name_input._element.send_keys(new_name)
+    world.css_fill(input_css, new_name)
+    if world.is_firefox():
+        world.trigger_event(input_css)
     save_button = 'a.save-button'
     world.css_click(save_button)
 

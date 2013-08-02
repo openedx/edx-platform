@@ -42,9 +42,9 @@ def add_other_user(_step, name):
     world.wait(0.5)
 
     email_css = 'input#user-email-input'
-    f = world.css_find(email_css)
-    f._element.send_keys(name, EMAIL_EXTENSION)
-
+    world.css_fill(email_css, name + EMAIL_EXTENSION)
+    world.trigger_event(email_css)
+    from pdb import set_trace;set_trace()
     confirm_css = 'form.create-user button.action-primary'
     world.css_click(confirm_css)
 
