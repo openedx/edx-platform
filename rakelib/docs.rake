@@ -16,11 +16,6 @@ task :builddocs, [:options] do |t, args|
     Dir.chdir(path) do
         sh('make html')
     end
-    path = "docs"
-
-    Dir.chdir(path) do
-        sh('make html')
-    end
 end
 
 desc "Show docs in browser (mac and ubuntu)."

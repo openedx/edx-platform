@@ -44,8 +44,6 @@ task :test_docs do
 (You shouldn't fix rst warnings and errors for this to pass, just get rid of exceptions.)"
     puts (test_message  % ["rake doc"]).colorize( :light_green )
     test_sh('rake builddocs')
-    puts  (test_message  % ["rake doc[pub]"]).colorize( :light_green )
-    test_sh('rake builddocs[pub]')
 end
 
 task :clean_test_files do
