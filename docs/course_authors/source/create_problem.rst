@@ -28,7 +28,7 @@ This course contains several places with more information about creating exercis
 
 • `Writing Exercises <https://edge.edx.org/courses/edX/edX101/How_to_Create_an_edX_Course/courseware/a45de3baa8a9468cbfb1a301fdcd7e86/d15cfeaff0af4dd7be4765cd0988d172/1>`_ has more in-depth discussion about problem types, and some general pedagogical considerations for adapting to the online format and a `Gallery of Response Types <https://edge.edx.org/accounts/login?next=/courses/edX/edX101/How_to_Create_an_edX_Course/courseware/a45de3baa8a9468cbfb1a301fdcd7e86/3ba055e760d04f389150a75edfecb844/1>`_
 
-•  `Appendix E <appendices/e.html>`_  contains XML documentaion for the different problem response types.
+•  `Appendix E <appendices/e.html>`  contains XML documentaion for the different problem response types.
 
 •  The `Discussion Forum <https://edge.edx.org/courses/edX/edX101/How_to_Create_an_edX_Course/discussion/forum">`_  for this class is a good place to ask questions about exercise types, report any errors or oddities that you may encounter, and get technical support.
    
@@ -41,7 +41,7 @@ Studio offers two interfaces for editing problem components.
 
 • The **Simple Editor** allows you to edit problems visually, without having to work with XML.
 
-• The **Advanced Editor** converts the problem to edX's XML standard and allows you to edit that XML directly. For more information about the XML for different problem types, see `Appendix E <appendices/e.html>`_ .
+• The **Advanced Editor** converts the problem to edX's XML standard and allows you to edit that XML directly. For more information about the XML for different problem types, see `Appendix E <appendices/e.html>` .
 
  
 Some of the simpler problem templates, including multiple choice, open in the Simple Editor and allow you to switch to the Advanced Editor. The more complicated problem types, such as Circuit Response, open in the Advanced Editor.
@@ -244,15 +244,15 @@ Create a Problem
 ****************
 
 .. note::
-
-You can also include non-graded exercises throughout your course.
+    
+    You can also include non-graded exercises throughout your course.
 
 
 To add interactive, automatically graded exercises to your course content, use the Problem component. This component allows you to include an explanation
 that the student can see when the student clicks **Show Answer**.
 
  Studio offers several templates that you can use. Alternatively, you can create your own problem type in XML.
- For detailed information about different problem types, see `Appendix E <appendices/e.html>`_.  
+ For detailed information about different problem types, see `Appendix E <appendices/e.html>`.  
    
 
 1. Under **Add New Component**, click **Problem**.

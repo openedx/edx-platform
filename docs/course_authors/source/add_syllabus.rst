@@ -116,7 +116,7 @@ Pages**.
 .. image:: Images/image163.png
   
  
-6. Go to `Appendix B <appendices/b.html>`_ and copy the code for the dynamic
+6. Go to `Appendix B <appendices/b.html>` and copy the code for the dynamic
 schedule template.
   
  
@@ -295,7 +295,7 @@ Add an Announcement or Update
   
  
     The content for this box must be formatted in HTML. For a template that you
-    can use that includes placeholders, see `Appendix A <appendices/a.html>`_.
+    can use that includes placeholders, see `Appendix A <appendices/a.html>`.
   
  
     3. Enter your update formatted as HTML, and then click **Save**.
