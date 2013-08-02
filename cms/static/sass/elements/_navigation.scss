@@ -65,6 +65,7 @@ nav {
     pointer-events: none;
     width: ($baseline*8);
     overflow: hidden;
+    height: 0;
 
 
     // dropped down state
@@ -72,6 +73,7 @@ nav {
       opacity: 1.0;
       pointer-events: auto;
       overflow: visible;
+      height: auto;
     }
   }
 
