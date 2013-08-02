@@ -44,9 +44,10 @@ class TestInstructorDashboardGradeDownloadCSV(LoginEnrollmentTestCase):
         self.activate_user(self.instructor)
 
         def make_instructor(course):
+            """ Create an instructor for the course. """
             group_name = _course_staff_group_name(course.location)
-            g = Group.objects.create(name=group_name)
-            g.user_set.add(User.objects.get(email=self.instructor))
+            group = Group.objects.create(name=group_name)
+            group.user_set.add(User.objects.get(email=self.instructor))
 
         make_instructor(self.toy)
 

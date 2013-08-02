@@ -42,7 +42,7 @@ class TestGradebook(ModuleStoreTestCase):
             metadata={'graded': True, 'format': 'Homework'}
         )
 
-        self.users = [UserFactory() for _ in xrange(USER_COUNT)]
+        self.users = [UserFactory.create() for _ in xrange(USER_COUNT)]
 
         for user in self.users:
             CourseEnrollmentFactory.create(user=user, course_id=self.course.id)

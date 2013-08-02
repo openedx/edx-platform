@@ -769,13 +769,14 @@ def instructor_dashboard(request, course_id):
                'plots': plots,			# psychometrics
                'course_errors': modulestore().get_item_errors(course.location),
                'instructor_tasks': instructor_tasks,
-               'djangopid': os.getpid(),
-               'mitx_version': getattr(settings, 'MITX_VERSION_STRING', ''),
                'offline_grade_log': offline_grades_available(course_id),
                'cohorts_ajax_url': reverse('cohorts', kwargs={'course_id': course_id}),
 
                'analytics_results': analytics_results,
                }
+
+    if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BETA_DASHBOARD'):
+        context['beta_dashboard_url'] = reverse('instructor_dashboard_2', kwargs={'course_id': course_id})
 
     return render_to_response('courseware/instructor_dashboard.html', context)
 

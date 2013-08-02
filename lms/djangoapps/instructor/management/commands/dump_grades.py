@@ -5,7 +5,7 @@
 
 import csv
 
-from instructor.views import get_student_grade_summary_data
+from instructor.views.legacy import get_student_grade_summary_data
 from courseware.courses import get_course_by_id
 from xmodule.modulestore.django import modulestore
 

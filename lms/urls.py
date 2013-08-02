@@ -249,12 +249,14 @@ if settings.COURSEWARE_ENABLED:
 
         # For the instructor
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor$',
-            'instructor.views.instructor_dashboard', name="instructor_dashboard"),
+            'instructor.views.legacy.instructor_dashboard', name="instructor_dashboard"),
+
+        # see ENABLE_INSTRUCTOR_BETA_DASHBOARD section for more urls
 
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/gradebook$',
-            'instructor.views.gradebook', name='gradebook'),
+            'instructor.views.legacy.gradebook', name='gradebook'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/grade_summary$',
-            'instructor.views.grade_summary', name='grade_summary'),
+            'instructor.views.legacy.grade_summary', name='grade_summary'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/staff_grading$',
             'open_ended_grading.views.staff_grading', name='staff_grading'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/staff_grading/get_next$',
@@ -338,6 +340,14 @@ if settings.COURSEWARE_ENABLED:
                 name='submission_history'),
         )
 
+if settings.COURSEWARE_ENABLED and settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BETA_DASHBOARD'):
+    urlpatterns += (
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard$',
+            'instructor.views.instructor_dashboard.instructor_dashboard_2', name="instructor_dashboard_2"),
+
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard/api/',
+            include('instructor.views.api_urls'))
+    )
 
 if settings.ENABLE_JASMINE:
     urlpatterns += (url(r'^_jasmine/', include('django_jasmine.urls')),)

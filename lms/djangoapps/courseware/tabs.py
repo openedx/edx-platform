@@ -305,6 +305,7 @@ def get_course_tabs(user, course, active_page):
         tabs.append(CourseTab('Instructor',
                               reverse('instructor_dashboard', args=[course.id]),
                               active_page == 'instructor'))
+
     return tabs
 
 
