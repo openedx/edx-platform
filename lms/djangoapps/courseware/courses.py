@@ -174,9 +174,9 @@ def get_course_about_section(course, section_key):
     elif section_key == "title":
         return course.display_name_with_default
     elif section_key == "university":
-        return course.location.org
+        return course.display_org_with_default
     elif section_key == "number":
-        return course.number
+        return course.display_number_with_default
 
     raise KeyError("Invalid about key " + str(section_key))
 
