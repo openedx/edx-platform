@@ -266,3 +266,7 @@ try:
     from .private import *      # pylint: disable=F0401
 except ImportError:
     pass
+
+
+########################## QUERYABLE TABLES ########################
+INSTALLED_APPS += ('queryable',)
