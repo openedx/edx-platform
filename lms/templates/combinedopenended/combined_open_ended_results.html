@@ -1,4 +1,19 @@
-<div class="${class_name}">
-    <h4>${task_name}</h4><a class="rubric-collapse" href="#">(Show)</a>
-    ${results | n}
-</div>
+% for (i,result) in enumerate(results):
+    % if 'task_name' in result and 'result' in result:
+        <div class="combined-rubric-container"
+        %if i>0:
+            status="shown">
+        % else:
+            status="hidden">
+        % endif
+            <h4>${result['task_name']} from grader ${i+1} <a class="rubric-collapse" href="#">(Hide)</a></h4>
+            ${result['result'] | n}
+        </div>
+    %endif
+
+% endfor
+% if len(results)>1:
+        <a href="#" class="rubric-previous-button">Previous</a>
+        <a href="#" class="rubric-next-button">Next</a>
+% endif
+

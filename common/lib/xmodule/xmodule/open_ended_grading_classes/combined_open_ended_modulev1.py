@@ -452,7 +452,6 @@ class CombinedOpenEndedV1Module():
 
     def extract_human_name_from_task(self, task_xml):
         tree = etree.fromstring(task_xml)
-        log.info(etree.tostring(tree))
         payload = tree.xpath("/openended/openendedparam/grader_payload")
         if len(payload)==0:
             task_name = "selfassessment"
@@ -503,26 +502,29 @@ class CombinedOpenEndedV1Module():
         """
         all_responses = []
         loop_up_to_task = self.current_task_number + 1
+        contexts = []
         for i in xrange(0, loop_up_to_task):
-            all_responses.append(self.get_last_response(i))
-        rubric_scores = [all_responses[i]['rubric_scores'] for i in xrange(0, len(all_responses)) if
-                         len(all_responses[i]['rubric_scores']) > 0 and all_responses[i]['grader_types'][
-                             0] in HUMAN_GRADER_TYPE.keys()]
-        grader_types = [all_responses[i]['grader_types'] for i in xrange(0, len(all_responses)) if
-                        len(all_responses[i]['grader_types']) > 0 and all_responses[i]['grader_types'][
-                            0] in HUMAN_GRADER_TYPE.keys()]
-        feedback_items = [all_responses[i]['feedback_items'] for i in xrange(0, len(all_responses)) if
-                          len(all_responses[i]['feedback_items']) > 0 and all_responses[i]['grader_types'][
-                              0] in HUMAN_GRADER_TYPE.keys()]
-        rubric_html = self.rubric_renderer.render_combined_rubric(stringify_children(self.static_data['rubric']),
-                                                                  rubric_scores,
-                                                                  grader_types, feedback_items)
+            response = self.get_last_response(i)
+            rubric_scores = None
+            if len(response['rubric_scores']) > 0 and response['grader_types'][0] in HUMAN_GRADER_TYPE.keys():
+                rubric_scores = [response['rubric_scores']]
+            grader_types = None
+            if len(response['grader_types']) > 0 and response['grader_types'][0] in HUMAN_GRADER_TYPE.keys():
+                grader_types = [response['grader_types']]
+            feedback_items = None
+            if len(response['feedback_items']) > 0 and response['grader_types'][0] in HUMAN_GRADER_TYPE.keys():
+                feedback_items = [response['feedback_items']]
+            if feedback_items is not None and grader_types is not None and rubric_scores is not None:
+                rubric_html = self.rubric_renderer.render_combined_rubric(stringify_children(self.static_data['rubric']),
+                                                                      rubric_scores,
+                                                                      grader_types, feedback_items)
+                contexts.append({
+                    'result': rubric_html,
+                    'task_name': 'Scored rubric'
+                })
 
-        response_dict = all_responses[-1]
         context = {
-            'results': rubric_html,
-            'task_name': 'Scored Rubric',
-            'class_name': 'combined-rubric-container'
+            'results': contexts,
         }
         html = self.system.render_template('{0}/combined_open_ended_results.html'.format(self.TEMPLATE_DIR), context)
         return {'html': html, 'success': True}

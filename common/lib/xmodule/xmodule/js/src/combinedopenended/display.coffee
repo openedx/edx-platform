@@ -560,7 +560,7 @@ class @CombinedOpenEnded
   collapse_question: (event) =>
     @prompt_container.slideToggle()
     @prompt_container.toggleClass('open')
-    if @question_header.text() == "(Hide)"
+    if @question_header.text() == "Hide Prompt"
       new_text = "Show Prompt"
       Logger.log 'oe_hide_question', {location: @location}
     else
@@ -622,4 +622,10 @@ class @CombinedOpenEnded
   toggle_rubric: (event) =>
     info_rubric_elements = @$(@info_rubric_elements_sel)
     info_rubric_elements.slideToggle()
+    @rubric_header = @$(@rubric_collapse_sel)
+    if @rubric_header.text() == "(Hide)"
+      new_text = "(Show)"
+    else
+      new_text = "(Hide)"
+    @rubric_header.text(new_text)
     return false
