@@ -50,6 +50,7 @@ from instructor_task.api import (get_running_instructor_tasks,
                                  submit_reset_problem_attempts_for_all_students,
                                  submit_bulk_course_email)
 from instructor_task.views import get_task_completion_info
+from class_dashboard import dashboard_data
 from mitxmako.shortcuts import render_to_response
 from psychometrics import psychoanalyze
 from student.models import CourseEnrollment, CourseEnrollmentAllowed, unique_id_for_user
@@ -810,6 +811,15 @@ def instructor_dashboard(request, course_id):
             analytics_results[analytic_name] = get_analytics_result(analytic_name)
 
     #----------------------------------------
+    # Metrics
+
+    metrics_results = {}
+    if settings.MITX_FEATURES.get('CLASS_DASHBOARD') and idash_mode == 'Metrics':
+        metrics_results['attempts_timestamp'] = dashboard_data.get_last_populate(course_id, "studentmoduleexpand")
+        metrics_results['section_display_name'] = dashboard_data.get_section_display_name(course_id)
+        metrics_results['section_has_problem'] = dashboard_data.get_array_section_has_problem(course_id)
+
+    #----------------------------------------
     # offline grades?
 
     if use_offline:
@@ -858,34 +868,34 @@ def instructor_dashboard(request, course_id):
     #----------------------------------------
     # context for rendering
 
-    context = {
-        'course': course,
-        'staff_access': True,
-        'admin_access': request.user.is_staff,
-        'instructor_access': instructor_access,
-        'forum_admin_access': forum_admin_access,
-        'datatable': datatable,
-        'course_stats': course_stats,
-        'msg': msg,
-        'modeflag': {idash_mode: 'selectedmode'},
-        'studio_url': studio_url,
+    context = {'course': course,
+               'staff_access': True,
+               'admin_access': request.user.is_staff,
+               'instructor_access': instructor_access,
+               'forum_admin_access': forum_admin_access,
+               'datatable': datatable,
+               'course_stats': course_stats,
+               'msg': msg,
+               'modeflag': {idash_mode: 'selectedmode'},
+               'studio_url': studio_url,
 
-        'to_option': email_to_option,      # email
-        'subject': email_subject,          # email
-        'editor': email_editor,            # email
-        'email_msg': email_msg,            # email
-        'show_email_tab': show_email_tab,  # email
+               'to_option': email_to_option,      # email
+               'subject': email_subject,          # email
+               'editor': email_editor,            # email
+               'email_msg': email_msg,            # email
+               'show_email_tab': show_email_tab,  # email
 
-        'problems': problems,		# psychometrics
-        'plots': plots,			# psychometrics
-        'course_errors': modulestore().get_item_errors(course.location),
-        'instructor_tasks': instructor_tasks,
-        'offline_grade_log': offline_grades_available(course_id),
-        'cohorts_ajax_url': reverse('cohorts', kwargs={'course_id': course_id}),
+               'problems': problems,		# psychometrics
+               'plots': plots,			# psychometrics
+               'course_errors': modulestore().get_item_errors(course.location),
+               'instructor_tasks': instructor_tasks,
+               'offline_grade_log': offline_grades_available(course_id),
+               'cohorts_ajax_url': reverse('cohorts', kwargs={'course_id': course_id}),
 
-        'analytics_results': analytics_results,
-        'disable_buttons': disable_buttons
-    }
+               'analytics_results': analytics_results,
+               'disable_buttons': disable_buttons,
+               'metrics_results': metrics_results,
+               }
 
     if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BETA_DASHBOARD'):
         context['beta_dashboard_url'] = reverse('instructor_dashboard_2', kwargs={'course_id': course_id})
