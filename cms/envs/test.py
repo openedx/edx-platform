@@ -15,6 +15,7 @@ sessions. Assumes structure:
 from .common import *
 import os
 from path import path
+from warnings import filterwarnings
 
 # Nose Test Runner
 INSTALLED_APPS += ('django_nose',)
@@ -123,6 +124,9 @@ CACHES = {
         'KEY_FUNCTION': 'util.memcache.safe_key',
     }
 }
+
+# hide ratelimit warnings while running tests
+filterwarnings('ignore', message='No request passed to the backend, unable to rate-limit')
 
 ################################# CELERY ######################################
 
