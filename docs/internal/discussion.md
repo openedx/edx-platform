@@ -60,7 +60,10 @@ In the discussion service, notifications are handled asynchronously using a thir
 
 ## From the edx-platform django app, initialize roles and permissions
 
-To fully test the discussion forum, you might want to act as a moderator or an administrator. Currently, moderators can manage everything in the forum, and administrator can manage everything plus assigning and revoking moderator status of other users.
+To fully test the discussion forum, you might want to act as a moderator or an administrator. Currently, the roles are:
+
+ * moderators can manage everything in the forum, and
+ * administrators can manage everything plus assigning and revoking moderator status of other users.
 
 First make sure that the database is up-to-date:
 
