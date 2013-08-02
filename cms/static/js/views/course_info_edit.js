@@ -97,7 +97,19 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
         var targetModel = this.eventModel(event);
         targetModel.set({ date : this.dateEntry(event).val(), content : this.$codeMirror.getValue() });
         // push change to display, hide the editor, submit the change
-        targetModel.save({});
+        var saving = new CMS.Views.Notification.Mini({
+            title: gettext('Saving') + '&hellip;'
+        });
+        saving.show();
+        var ele = this.modelDom(event);
+        targetModel.save({}, {
+            success: function() {
+                saving.hide();
+            },
+            error: function() {
+                ele.remove();
+            }
+        });
         this.closeEditor(this);
 
         analytics.track('Saved Course Update', {
@@ -140,29 +152,48 @@ CMS.Views.ClassInfoUpdateView = Backbone.View.extend({
     onDelete: function(event) {
         event.preventDefault();
 
-        if (!confirm('Are you sure you want to delete this update? This action cannot be undone.')) {
-            return;
-        }
-
-        analytics.track('Deleted Course Update', {
-            'course': course_location_analytics,
-            'date': this.dateEntry(event).val()
-        });
-
+        var self = this;
         var targetModel = this.eventModel(event);
-        this.modelDom(event).remove();
-        var cacheThis = this;
-        targetModel.destroy({
-            success: function (model, response) {
-                cacheThis.collection.fetch({
-                    success: function() {
-                        cacheThis.render();
-                    },
-                    reset: true
-                });
+        var confirm = new CMS.Views.Prompt.Warning({
+            title: gettext('Are you sure you want to delete this update?'),
+            message: gettext('This action cannot be undone.'),
+            actions: {
+                primary: {
+                    text: gettext('OK'),
+                    click: function () {
+                        analytics.track('Deleted Course Update', {
+                            'course': course_location_analytics,
+                            'date': self.dateEntry(event).val()
+                        });
+                        self.modelDom(event).remove();
+                        var deleting = new CMS.Views.Notification.Mini({
+                            title: gettext('Deleting') + '&hellip;'
+                        });
+                        deleting.show();
+                        targetModel.destroy({
+                            success: function (model, response) {
+                                self.collection.fetch({
+                                    success: function() {
+                                        self.render();
+                                        deleting.hide();
+                                    },
+                                    reset: true
+                                });
+                            }
+                        });
+                        confirm.hide();
+                    }
+                },
+                secondary: {
+                    text: gettext('Cancel'),
+                    click: function() {
+                        confirm.hide();
+                    }
+                }
             }
         });
-    },
+        confirm.show();
+},
 
     closeEditor: function(self, removePost) {
         var targetModel = self.collection.get(self.$currentPost.attr('name'));
@@ -280,7 +311,15 @@ CMS.Views.ClassInfoHandoutsView = Backbone.View.extend({
     onSave: function(event) {
         this.model.set('data', this.$codeMirror.getValue());
         this.render();
-        this.model.save({});
+        var saving = new CMS.Views.Notification.Mini({
+            title: gettext('Saving') + '&hellip;'
+        });
+        saving.show();
+        this.model.save({}, {
+            success: function() {
+                saving.hide();
+            }
+        });
         this.$form.hide();
         this.closeEditor(this);
 
