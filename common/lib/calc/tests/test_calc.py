@@ -536,9 +536,9 @@ class EvaluatorTest(unittest.TestCase):
         """
         variables = {'R1': 2.0, 'R3': 4.0}
 
-        with self.assertRaises(calc.UndefinedVariable):
+        with self.assertRaisesRegexp(calc.UndefinedVariable, 'QWSEKO'):
             calc.evaluator({}, {}, "5+7*QWSEKO")
-        with self.assertRaises(calc.UndefinedVariable):
+        with self.assertRaisesRegexp(calc.UndefinedVariable, 'r2'):
             calc.evaluator({'r1': 5}, {}, "r1+r2")
-        with self.assertRaises(calc.UndefinedVariable):
+        with self.assertRaisesRegexp(calc.UndefinedVariable, 'r1 r3'):
             calc.evaluator(variables, {}, "r1*r3", case_sensitive=True)

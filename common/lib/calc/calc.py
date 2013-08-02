@@ -282,35 +282,22 @@ class ParseAugmenter(object):
         self.variables_used = set()
         self.functions_used = set()
 
-    def make_variable_parse_action(self):
-        """
-        Create a wrapper to store variables as they are parsed.
-        """
         def vpa(tokens):
             """
-            When a variable is recognized, store its correct form in `variables_used`.
+            When a variable is recognized, store it in `variables_used`.
             """
-            if self.case_sensitive:
-                varname = tokens[0][0]
-            else:
-                varname = tokens[0][0].lower()
+            varname = tokens[0][0]
             self.variables_used.add(varname)
-        return vpa
 
-    def make_function_parse_action(self):
-        """
-        Create a wrapper to store functions as they are parsed.
-        """
         def fpa(tokens):
             """
-            When a function is recognized, store its correct form in `variables_used`.
+            When a function is recognized, store it in `functions_used`.
             """
-            if self.case_sensitive:
-                varname = tokens[0][0]
-            else:
-                varname = tokens[0][0].lower()
+            varname = tokens[0][0]
             self.functions_used.add(varname)
-        return fpa
+
+        self.variable_parse_action = vpa
+        self.function_parse_action = fpa
 
     def parse_algebra(self):
         """
@@ -350,11 +337,11 @@ class ParseAugmenter(object):
         # and may contain numbers afterward.
         inner_varname = Word(alphas + "_", alphanums + "_")
         varname = Group(inner_varname)("variable")
-        varname.setParseAction(self.make_variable_parse_action())
+        varname.setParseAction(self.variable_parse_action)
 
         # Same thing for functions.
         function = Group(inner_varname + Suppress("(") + expr + Suppress(")"))("function")
-        function.setParseAction(self.make_function_parse_action())
+        function.setParseAction(self.function_parse_action)
 
         atom = number | function | varname | "(" + expr + ")"
         atom = Group(atom)("atom")
@@ -420,9 +407,16 @@ class ParseAugmenter(object):
 
         Otherwise, raise an UndefinedVariable containing all bad variables.
         """
-        # Test that `used_vars` is a subset of `all_vars`; also do functions.
-        if not (self.variables_used.issubset(valid_variables) and
-                self.functions_used.issubset(valid_functions)):
-            bad_vars = self.variables_used.difference(valid_variables)
-            bad_vars &= self.functions_used.difference(valid_functions)
-            raise UndefinedVariable(' '.join(bad_vars))
+        if self.case_sensitive:
+            casify = lambda x: x
+        else:
+            casify = lambda x: x.lower()  # Lowercase for case insens.
+
+        # Test if casify(X) is valid, but return the actual bad input (i.e. X)
+        bad_vars = set(var for var in self.variables_used
+                       if casify(var) not in valid_variables)
+        bad_vars.update(func for func in self.functions_used
+                        if casify(func) not in valid_functions)
+
+        if bad_vars:
+            raise UndefinedVariable(' '.join(sorted(bad_vars)))
