@@ -4,7 +4,6 @@ Computes the data to display on the Instructor Dashboard
 
 from courseware import models
 from django.db.models import Count
-from queryable_student_module.models import StudentModuleExpand, Log
 
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.django import modulestore
@@ -47,38 +46,6 @@ def get_problem_grade_distribution(course_id):
     return prob_grade_distrib
 
 
-def get_problem_attempt_distrib(course_id, max_attempts=10):
-    """
-    Returns the attempt distribution per problem for the course.
-
-    `course_id` the course ID for the course interested in
-
-    `max_attempts` any students with more attempts than this are grouped together (default 10)
-    Output is a dicts, where the key is the problem `module_id` and the value is an array where the first index is
-    the number of students that only attempted once, second is two times, etc. The last index is all students that
-    attempted more than `max_attempts` times.
-    """
-
-    db_query = StudentModuleExpand.objects.filter(
-        course_id__exact=course_id,
-        attempts__isnull=False,
-        module_type__exact="problem",
-    ).values('module_state_key', 'attempts').annotate(count_attempts=Count('attempts'))
-
-    prob_attempts_distrib = {}
-    for row in db_query:
-        curr_problem = row['module_state_key']
-        if curr_problem not in prob_attempts_distrib:
-            prob_attempts_distrib[curr_problem] = [0] * (max_attempts + 1)
-
-        if row['attempts'] > max_attempts:
-            prob_attempts_distrib[curr_problem][max_attempts] += row['count_attempts']
-        else:
-            prob_attempts_distrib[curr_problem][row['attempts'] - 1] = row['count_attempts']
-
-    return prob_attempts_distrib
-
-
 def get_sequential_open_distrib(course_id):
     """
     Returns the number of students that opened each subsection/sequential of the course
@@ -98,25 +65,6 @@ def get_sequential_open_distrib(course_id):
         sequential_open_distrib[row['module_state_key']] = row['count_sequential']
 
     return sequential_open_distrib
-
-
-def get_last_populate(course_id, script_id):
-    """
-    Returns the timestamp when a script was last run for a course.
-
-    `course_id` the course ID for the course interested in
-
-    `script_id` string identifying the populate script interested in
-
-    Returns None if there is no known time the script was last run for that course.
-    """
-
-    db_query = Log.objects.filter(course_id__exact=course_id, script_id__exact=script_id)
-
-    if len(db_query) > 0:
-        return db_query[0].created  # Model is sorted last first
-    else:
-        return None
 
 
 def get_problem_set_grade_distribution(course_id, problem_set):
@@ -211,69 +159,6 @@ def get_d3_problem_grade_distribution(course_id):
                                 stack_data.append({
                                     'color': percent,
                                     'value': count_grade,
-                                    'tooltip': tooltip,
-                                })
-
-                        problem = {
-                            'xValue': label,
-                            'stackData': stack_data,
-                        }
-                        data.append(problem)
-        curr_section['data'] = data
-
-        d3_data.append(curr_section)
-
-    return d3_data
-
-
-def get_d3_problem_attempt_distribution(course_id, max_attempts=10):
-    """
-    Returns problem attempt distribution information for each section, data already in format for d3 function.
-
-    `course_id` the course ID for the course interested in
-
-    `max_attempts` any students with more attempts than this are grouped together (default: 10)
-
-    Returns an array of dicts in the order of the sections. Each dict has:
-      'display_name' - display name for the section
-      'data' - data for the attempt distribution of problems in this section for d3_stacked_bar_graph
-    """
-
-    prob_attempts_distrib = get_problem_attempt_distrib(course_id, max_attempts)
-
-    d3_data = []
-
-    course = modulestore().get_instance(course_id, CourseDescriptor.id_to_location(course_id), depth=4)
-    for section in course.get_children():
-        curr_section = {}
-        curr_section['display_name'] = own_metadata(section)['display_name']
-        data = []
-        c_subsection = 0
-        for subsection in section.get_children():
-            c_subsection += 1
-            c_unit = 0
-            for unit in subsection.get_children():
-                c_unit += 1
-                c_problem = 0
-                for child in unit.get_children():
-                    if (child.location.category == 'problem'):
-                        c_problem += 1
-                        stack_data = []
-                        label = "P{0}.{1}.{2}".format(c_subsection, c_unit, c_problem)
-
-                        if child.location.url() in prob_attempts_distrib:
-                            attempts_distrib = prob_attempts_distrib[child.location.url()]
-                            problem_name = own_metadata(child)['display_name']
-
-                            for i in range(0, max_attempts + 1):
-                                color = (i + 1 if i != max_attempts else "{0}+".format(max_attempts))
-                                tooltip = "{0} {3} - {1} Student(s) had {2} attempt(s)".format(
-                                    label, attempts_distrib[i], color, problem_name
-                                )
-
-                                stack_data.append({
-                                    'color': color,
-                                    'value': attempts_distrib[i],
                                     'tooltip': tooltip,
                                 })
 

@@ -821,8 +821,9 @@ def instructor_dashboard(request, course_id):
     # Metrics
 
     metrics_results = {}
-    if settings.MITX_FEATURES.get('CLASS_DASHBOARD') and idash_mode == 'Metrics':
-        metrics_results['attempts_timestamp'] = dashboard_data.get_last_populate(course_id, "studentmoduleexpand")
+#    if settings.MITX_FEATURES.get('CLASS_DASHBOARD') and idash_mode == 'Metrics':
+    if idash_mode == 'Metrics':
+#        metrics_results['attempts_timestamp'] = dashboard_data.get_last_populate(course_id, "studentmoduleexpand")
         metrics_results['section_display_name'] = dashboard_data.get_section_display_name(course_id)
         metrics_results['section_has_problem'] = dashboard_data.get_array_section_has_problem(course_id)
 
@@ -874,35 +875,35 @@ def instructor_dashboard(request, course_id):
 
     #----------------------------------------
     # context for rendering
-    context = {
-        'course': course,
-        'staff_access': True,
-        'admin_access': request.user.is_staff,
-        'instructor_access': instructor_access,
-        'forum_admin_access': forum_admin_access,
-        'datatable': datatable,
-        'course_stats': course_stats,
-        'msg': msg,
-        'modeflag': {idash_mode: 'selectedmode'},
-        'studio_url': studio_url,
 
-        'to_option': email_to_option,      # email
-        'subject': email_subject,          # email
-        'editor': email_editor,            # email
-        'email_msg': email_msg,            # email
-        'show_email_tab': show_email_tab,  # email
+    context = {'course': course,
+               'staff_access': True,
+               'admin_access': request.user.is_staff,
+               'instructor_access': instructor_access,
+               'forum_admin_access': forum_admin_access,
+               'datatable': datatable,
+               'course_stats': course_stats,
+               'msg': msg,
+               'modeflag': {idash_mode: 'selectedmode'},
+               'studio_url': studio_url,
 
-        'problems': problems,		# psychometrics
-        'plots': plots,			# psychometrics
-        'course_errors': modulestore().get_item_errors(course.location),
-        'instructor_tasks': instructor_tasks,
-        'offline_grade_log': offline_grades_available(course_id),
-        'cohorts_ajax_url': reverse('cohorts', kwargs={'course_id': course_id}),
+               'to_option': email_to_option,      # email
+               'subject': email_subject,          # email
+               'editor': email_editor,            # email
+               'email_msg': email_msg,            # email
+               'show_email_tab': show_email_tab,  # email
 
-        'analytics_results': analytics_results,
-        'disable_buttons': disable_buttons,
-        'metrics_results': metrics_results,
-    }
+               'problems': problems,		# psychometrics
+               'plots': plots,			# psychometrics
+               'course_errors': modulestore().get_item_errors(course.location),
+               'instructor_tasks': instructor_tasks,
+               'offline_grade_log': offline_grades_available(course_id),
+               'cohorts_ajax_url': reverse('cohorts', kwargs={'course_id': course_id}),
+
+               'analytics_results': analytics_results,
+               'disable_buttons': disable_buttons,
+               'metrics_results': metrics_results,
+               }
 
     if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BETA_DASHBOARD'):
         context['beta_dashboard_url'] = reverse('instructor_dashboard_2', kwargs={'course_id': course_id})

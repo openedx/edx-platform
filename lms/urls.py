@@ -371,8 +371,6 @@ if settings.COURSEWARE_ENABLED and settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR
 if settings.MITX_FEATURES.get('CLASS_DASHBOARD'):
     urlpatterns += (
         # Json request data for metrics for entire course
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/all_problem_attempt_distribution$',
-            'class_dashboard.views.all_problem_attempt_distribution', name="all_problem_attempt_distribution"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/all_sequential_open_distribution$',
             'class_dashboard.views.all_sequential_open_distribution', name="all_sequential_open_distribution"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/all_problem_grade_distribution$',
@@ -382,7 +380,6 @@ if settings.MITX_FEATURES.get('CLASS_DASHBOARD'):
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/problem_grade_distribution/(?P<section>\d+)$',
             'class_dashboard.views.section_problem_grade_distribution', name="section_problem_grade_distribution"),
     )
-
 
 if settings.ENABLE_JASMINE:
     urlpatterns += (url(r'^_jasmine/', include('django_jasmine.urls')),)
