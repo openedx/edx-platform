@@ -1,15 +1,13 @@
-import json
 from uuid import uuid4
 
 from django.core.exceptions import PermissionDenied
-from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.inheritance import own_metadata
 
-from util.json_request import expect_json
+from util.json_request import expect_json, JsonResponse
 from ..utils import get_modulestore
 from .access import has_access
 from .requests import _xmodule_recurse
@@ -19,6 +17,7 @@ __all__ = ['save_item', 'create_item', 'delete_item']
 
 # cdodge: these are categories which should not be parented, they are detached from the hierarchy
 DETACHED_CATEGORIES = ['about', 'static_tab', 'course_info']
+
 
 @login_required
 @expect_json
@@ -80,7 +79,7 @@ def save_item(request):
         # commit to datastore
         store.update_metadata(item_location, own_metadata(existing_item))
 
-    return HttpResponse()
+    return JsonResponse()
 
 
 # [DHM] A hack until we implement a permanent soln. Proposed perm solution is to make namespace fields also top level
@@ -139,13 +138,17 @@ def create_item(request):
     if display_name is not None:
         metadata['display_name'] = display_name
 
-    get_modulestore(category).create_and_save_xmodule(dest_location, definition_data=data,
-        metadata=metadata, system=parent.system)
+    get_modulestore(category).create_and_save_xmodule(
+        dest_location,
+        definition_data=data,
+        metadata=metadata,
+        system=parent.system,
+    )
 
     if category not in DETACHED_CATEGORIES:
         get_modulestore(parent.location).update_children(parent_location, parent.children + [dest_location.url()])
 
-    return HttpResponse(json.dumps({'id': dest_location.url()}))
+    return JsonResponse({'id': dest_location.url()})
 
 
 @login_required
@@ -184,4 +187,4 @@ def delete_item(request):
                 parent.children = children
                 modulestore('direct').update_children(parent.location, parent.children)
 
-    return HttpResponse()
+    return JsonResponse()
