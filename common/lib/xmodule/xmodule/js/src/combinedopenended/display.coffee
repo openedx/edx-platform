@@ -569,6 +569,10 @@ class @CombinedOpenEnded
     @question_header.text(new_text)
     return false
 
+  hide_rubrics: () =>
+    @$(combined_rubric_sel + ' > [data-status="hidden"]').hide()
+    @$(combined_rubric_sel + ' > [data-status="shown"]').show()
+
   prompt_show: () =>
     if @prompt_container.is(":hidden")==true
       @prompt_container.slideToggle()
