@@ -1,248 +1,204 @@
-require(["jquery", "jquery.ui", "gettext", "js/hesitate", "js/views/feedback_notification"],
-         function($, ui, gettext, HesitateEvent, NotificationView) {
-
 $(document).ready(function() {
-    // making the unit list draggable. Note: sortable didn't work b/c it considered
-    // drop points which the user hovered over as destinations and proactively changed
-    // the dom; so, if the user subsequently dropped at an illegal spot, the reversion
-    // point was the last dom change.
-    $('.unit').draggable({
-        axis: 'y',
-        handle: '.drag-handle',
-        zIndex: 999,
-        start: initiateHesitate,
-        // left 2nd arg in as inert selector b/c i was uncertain whether we'd try to get the shove up/down
-        // to work in the future
-        drag: generateCheckHoverState('.collapsed', ''),
-        stop: removeHesitate,
-        revert: "invalid"
-    });
 
-    // Subsection reordering
-    $('.id-holder').draggable({
-        axis: 'y',
-        handle: '.section-item .drag-handle',
-        zIndex: 999,
-        start: initiateHesitate,
-        drag: generateCheckHoverState('.courseware-section.collapsed', ''),
-        stop: removeHesitate,
-        revert: "invalid"
-    });
+    // Section
+    makeDraggable(
+        '.courseware-section',
+        'a.section-drag-handle',
+        '.courseware-overview',
+        'article.courseware-overview'
+    );
+    // Subsection
+    makeDraggable(
+        '.id-holder',
+        'a.subsection-drag-handle',
+        '.subsection-list > ol',
+        '.subsection-list > ol'
+    );
+    // Unit
+    makeDraggable(
+        '.unit',
+        'a.unit-drag-handle',
+        '.sortable-unit-list',
+        'li.branch'
+    );
 
-    // Section reordering
-    $('.courseware-section').draggable({
-        axis: 'y',
-        handle: 'header .drag-handle',
-        stack: '.courseware-section',
-        revert: "invalid"
-    });
-
-
-    $('.sortable-unit-list').droppable({
-        accept : '.unit',
-        greedy: true,
-        tolerance: "pointer",
-        hoverClass: "dropover",
-        drop: onUnitReordered
-    });
-    $('.subsection-list > ol').droppable({
-        // why don't we have a more useful class for subsections than id-holder?
-        accept : '.id-holder', // '.unit, .id-holder',
-        tolerance: "pointer",
-        hoverClass: "dropover",
-        drop: onSubsectionReordered,
-        greedy: true
-    });
-
-    // Section reordering
-    $('.courseware-overview').droppable({
-        accept : '.courseware-section',
-        tolerance: "pointer",
-        drop: onSectionReordered,
-        greedy: true
-    });
-
-    // stop clicks on drag bars from doing their thing w/o stopping drag
-    $('.drag-handle').click(function(e) {e.preventDefault(); });
-
-});
-
-HesitateEvent.toggleXpandHesitation = null;
-function initiateHesitate(event, ui) {
-        HesitateEvent.toggleXpandHesitation = new HesitateEvent(expandSection, 'dragLeave', true);
-        $('.collapsed').on('dragEnter', HesitateEvent.toggleXpandHesitation, HesitateEvent.toggleXpandHesitation.trigger);
-        $('.collapsed, .unit, .id-holder').each(function() {
-                this.proportions = {width : this.offsetWidth, height : this.offsetHeight };
-                // reset b/c these were holding values from aborts
-                this.isover = false;
-        });
-}
-
-function computeIntersection(droppable, uiHelper, y) {
     /*
-     * Test whether y falls within the bounds of the droppable on the Y axis
+     * Make `type` draggable using `handleClass`, and able to be
+     * dropped into `droppableClass`.
      */
-    // NOTE: this only judges y axis intersection b/c that's all we're doing right now
-    //  don't expand the thing being carried
-    if (uiHelper.is(droppable)) {
-        return null;
-    }
-
-    $.extend(droppable, {offset : $(droppable).offset()});
-
-    var t = droppable.offset.top,
-        b = t + droppable.proportions.height;
-
-    if (t === b) {
-        // probably wrong values b/c invisible at the time of caching
-        droppable.proportions = { width : droppable.offsetWidth, height : droppable.offsetHeight };
-        b = t + droppable.proportions.height;
-    }
-    //  equivalent to the intersects test
-    return (t < y && // Bottom Half
-                y  < b ); // Top Half
-}
-
-// NOTE: selectorsToShove is not currently being used but I left this code as it did work but not well
-function generateCheckHoverState(selectorsToOpen, selectorsToShove) {
-    return function(event, ui) {
-        // copied from jquery.ui.droppable.js $.ui.ddmanager.drag & other ui.intersect
-        var draggable = $(this).data("ui-draggable"),
-            centerY = (draggable.positionAbs || draggable.position.absolute).top + (draggable.helperProportions.height / 2);
-        $(selectorsToOpen).each(function() {
-            var intersects = computeIntersection(this, ui.helper, centerY),
-                c = !intersects && this.isover ? "isout" : (intersects && !this.isover ? "isover" : null);
-
-            if(!c) {
-                return;
-            }
-
-            this[c] = true;
-            this[c === "isout" ? "isover" : "isout"] = false;
-            $(this).trigger(c === "isover" ? "dragEnter" : "dragLeave");
-        });
-
-        $(selectorsToShove).each(function() {
-            var intersectsBottom = computeIntersection(this, ui.helper, (draggable.positionAbs || draggable.position.absolute).top);
-
-            if ($(this).hasClass('ui-dragging-pushup')) {
-                if (!intersectsBottom) {
-                     console.log('not up', $(this).data('id'));
-                     $(this).removeClass('ui-dragging-pushup');
-                 }
-            }
-            else if (intersectsBottom) {
-                console.log('up', $(this).data('id'));
-                $(this).addClass('ui-dragging-pushup');
-            }
-
-            var intersectsTop = computeIntersection(this, ui.helper,
-                    (draggable.positionAbs || draggable.position.absolute).top + draggable.helperProportions.height);
-
-            if ($(this).hasClass('ui-dragging-pushdown')) {
-                if (!intersectsTop) {
-                    console.log('not down', $(this).data('id'));
-                    $(this).removeClass('ui-dragging-pushdown');
-                }
-            }
-            else if (intersectsTop) {
-                console.log('down', $(this).data('id'));
-                $(this).addClass('ui-dragging-pushdown');
-            }
-
-        });
-    };
-}
-
-function removeHesitate(event, ui) {
-        $('.collapsed').off('dragEnter', HesitateEvent.toggleXpandHesitation.trigger);
-        $('.ui-dragging-pushdown').removeClass('ui-dragging-pushdown');
-        $('.ui-dragging-pushup').removeClass('ui-dragging-pushup');
-        HesitateEvent.toggleXpandHesitation = null;
-}
-
-function expandSection(event) {
-        $(event.delegateTarget).removeClass('collapsed', 400);
-        // don't descend to icon's on children (which aren't under first child) only to this element's icon
-        $(event.delegateTarget).children().first().find('.expand-collapse-icon').removeClass('expand', 400).addClass('collapse');
-}
-
-function onUnitReordered(event, ui) {
-        // a unit's been dropped on this subsection,
-        //       figure out where it came from and where it slots in.
-        _handleReorder(event, ui, 'subsection-id', 'li:.leaf');
-}
-
-function onSubsectionReordered(event, ui) {
-        // a subsection has been dropped on this section,
-        //       figure out where it came from and where it slots in.
-        _handleReorder(event, ui, 'section-id', 'li:.branch');
-}
-
-function onSectionReordered(event, ui) {
-        // a section moved w/in the overall (cannot change course via this, so no parentage change possible, just order)
-        _handleReorder(event, ui, 'course-id', '.courseware-section');
-}
-
-function _handleReorder(event, ui, parentIdField, childrenSelector) {
-        // figure out where it came from and where it slots in.
-        var subsection_id = $(event.target).data(parentIdField);
-        var _els = $(event.target).children(childrenSelector);
-        var children = _els.map(function(idx, el) { return $(el).data('id'); }).get();
-        // if new to this parent, figure out which parent to remove it from and do so
-        if (!_.contains(children, ui.draggable.data('id'))) {
-                var old_parent = ui.draggable.parent();
-                var old_children = old_parent.children(childrenSelector).map(function(idx, el) { return $(el).data('id'); }).get();
-                old_children = _.without(old_children, ui.draggable.data('id'));
-                $.ajax({
-                        url: "/save_item",
-                        type: "POST",
-                        dataType: "json",
-                        contentType: "application/json",
-                        data:JSON.stringify({ 'id' : old_parent.data(parentIdField), 'children' : old_children})
+    function makeDraggable(type, handleClass, droppableClass, parentLocationSelector) {
+        _.each(
+            $(type),
+            function(ele) {
+                // Remember data necessary to reconstruct the parent-child relationships
+                $(ele).data('droppable-class', droppableClass);
+                $(ele).data('parent-location-selector', parentLocationSelector);
+                $(ele).data('child-selector', type);
+                var draggable = new Draggabilly(ele, {
+                    handle: handleClass,
+                    axis: 'y'
                 });
-        }
-        else {
-                // staying in same parent
-                // remove so that the replacement in the right place doesn't double it
-                children = _.without(children, ui.draggable.data('id'));
-        }
-        // add to this parent (figure out where)
-        for (var i = 0, bump = 0; i < _els.length; i++) {
-            if (ui.draggable.is(_els[i])) {
-                bump = -1; // bump indicates that the draggable was passed in the dom but not children's list b/c
-                // it's not in that list
+                draggable.on('dragStart', onDragStart);
+                draggable.on('dragMove', onDragMove);
+                draggable.on('dragEnd', onDragEnd);
             }
-            else if (ui.offset.top < $(_els[i]).offset().top) {
-                        // insert at i in children and _els
-                        ui.draggable.insertBefore($(_els[i]));
-                        // TODO figure out correct way to have it remove the style: top:n; setting (and similar line below)
-                        ui.draggable.attr("style", "position:relative;");
-                        children.splice(i + bump, 0, ui.draggable.data('id'));
-                        break;
+        );
+    }
+
+    /*
+     * Determine information about where to drop the currently dragged
+     * element. Returns the element to attach to and the method of
+     * attachment ('before', 'after', or 'prepend').
+     */
+    function findDestination(ele) {
+        var eleY = ele.offset().top;
+        var containers = $(ele.data('droppable-class'));
+
+        for(var i = 0; i < containers.length; i++) {
+            var container = $(containers[i]);
+            // Exclude the 'new unit' buttons, and make sure we don't
+            // prepend an element to itself
+            var siblings = container.children().filter(function () {
+                return $(this).data('id') !== undefined && !$(this).is(ele);
+            });
+            // If the list is empty, we should prepend to it
+            if(siblings.length == 0) {
+                if(Math.abs(eleY - container.offset().top) < 50) {
+                    return {
+                        ele: container,
+                        attachMethod: 'prepend'
+                    };
                 }
+            }
+            // Otherwise the list is populated, and we should attach before/after a sibling
+            else {
+                for(var j = 0; j < siblings.length; j++) {
+                    var $sibling = $(siblings[j]);
+                    var siblingHeight = $sibling.height();
+                    var siblingY = $sibling.offset().top;
+
+                    if(Math.abs(eleY - siblingY) < siblingHeight) {
+                        return {
+                            ele: $sibling,
+                            attachMethod: siblingY > eleY ? 'before' : 'after'
+                        };
+                    }
+                }
+            }
         }
-        // see if it goes at end (the above loop didn't insert it)
-        if (!_.contains(children, ui.draggable.data('id'))) {
-                $(event.target).append(ui.draggable);
-                ui.draggable.attr("style", "position:relative;"); // STYLE hack too
-                children.push(ui.draggable.data('id'));
+
+        // Failed drag
+        return {
+            ele: null,
+            attachMethod: ''
+        };
+    }
+
+    // Information about the current drag.
+    var dragState = {};
+
+    function onDragStart(draggie, event, pointer) {
+        var ele = $(draggie.element);
+        dragState = {
+            // Where we started, in case of a failed drag
+            offset: ele.offset(),
+            // Which element will be dropped into/onto on success
+            dropDestination: null
+        };
+    }
+
+    function onDragMove(draggie, event, pointer) {
+        var ele = $(draggie.element);
+        var currentReplacement = findDestination(ele).ele;
+        // Clear out the old destination
+        if(dragState.dropDestination) {
+            dragState.dropDestination.removeClass('drop-destination');
         }
-        var saving = new NotificationView.Mini({
+        // Mark the new destination
+        if(currentReplacement) {
+            currentReplacement.addClass('drop-destination');
+            dragState.dropDestination = currentReplacement;
+        }
+    }
+
+    function onDragEnd(draggie, event, pointer) {
+        var ele = $(draggie.element);
+
+        var intersect = findDestination(ele);
+        var destination = intersect.ele;
+        var method = intersect.attachMethod;
+
+        // If the drag succeeded, rearrange the DOM and send the result.
+        if(destination) {
+            destination[method](ele);
+            handleReorder(ele);
+        }
+
+        // Everything in its right place
+        ele.css({
+            top: 'auto',
+            left: 'auto'
+        });
+
+        // Clear dragging state in preparation for the next event.
+        if(dragState.dropDestination) {
+            dragState.dropDestination.removeClass('drop-destination');
+        }
+        dragState = {};
+    }
+
+    /*
+     * Find all parent-child changes and save them.
+     */
+    function handleReorder(ele) {
+        var itemID = ele.data('id');
+        var parentSelector = ele.data('parent-location-selector');
+        var childrenSelector = ele.data('child-selector');
+        var newParentEle = ele.parents(parentSelector).first();
+        var newParentID = newParentEle.data('id');
+        var oldParentID = ele.data('parent-id');
+        // If the parent has changed, update the children of the old parent.
+        if(oldParentID !== newParentID) {
+            // Find the old parent element.
+            var oldParentEle = $(parentSelector).filter(function() {
+                return $(this).data('id') === oldParentID;
+            });
+            saveItem(oldParentEle, childrenSelector, function() {
+                ele.data('parent-id', newParentID);
+            });
+        }
+        var saving = new CMS.Views.Notification.Mini({
             title: gettext('Saving&hellip;')
         });
         saving.show();
-        $.ajax({
-                url: "/save_item",
-                type: "POST",
-                dataType: "json",
-                contentType: "application/json",
-                data:JSON.stringify({ 'id' : subsection_id, 'children' : children}),
-                success: function() {
-                    saving.hide();
-                }
+        saveItem(newParentEle, childrenSelector, function() {
+            saving.hide();
         });
+    }
 
-}
-
-}); // end define()
+    /*
+     * Actually save the update to the server. Takes the element
+     * representing the parent item to save, a CSS selector to find
+     * its children, and a success callback.
+     */
+    function saveItem(ele, childrenSelector, success) {
+        // Find all current child IDs.
+        var children = _.map(
+            ele.find(childrenSelector),
+            function(child) {
+                return $(child).data('id');
+            }
+        );
+        $.ajax({
+            url: '/save_item',
+            type: 'POST',
+            dataType: 'json',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                id: ele.data('id'),
+                children: children
+            }),
+            success: success
+        });
+    }
+});

@@ -5,13 +5,13 @@
 This def will enumerate through a passed in subsection and list all of the units
 -->
 <%def name="enum_units(subsection, actions=True, selected=None, sortable=True, subsection_units=None)">
-<ol ${'class="sortable-unit-list"' if sortable else ''} data-subsection-id="${subsection.location}">
+<ol ${'class="sortable-unit-list"' if sortable else ''}>
   <%
     if subsection_units is None:
       subsection_units = subsection.get_children()
   %>
   % for unit in subsection_units:
-  <li class="leaf unit" data-id="${unit.location}">
+  <li class="leaf unit" data-id="${unit.location}" data-parent-id="${subsection.location.url()}">
     <%
       unit_state = compute_unit_state(unit)
       if unit.location == selected:
@@ -27,7 +27,7 @@ This def will enumerate through a passed in subsection and list all of the units
       % if actions:
       <div class="item-actions">
 	<a href="#" data-tooltip="Delete this unit" class="delete-button" data-id="${unit.location}"><span class="delete-icon"></span></a>
-	<a href="#" data-tooltip="Drag to sort" class="drag-handle"></a>
+	<a href="#" data-tooltip="Drag to sort" class="drag-handle unit-drag-handle"></a>
       </div>
       % endif
     </div>
