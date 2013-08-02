@@ -808,7 +808,7 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         return Fragment(self.get_html())
 
 
-class DescriptorSystem(object):
+class DescriptorSystem(Runtime):
     def __init__(self, load_item, resources_fs, error_tracker, **kwargs):
         """
         load_item: Takes a Location and returns an XModuleDescriptor
