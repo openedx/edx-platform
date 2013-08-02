@@ -130,13 +130,18 @@ def set_the_weight_to_abc(step, bad_weight):
     world.verify_setting_entry(world.get_setting_entry(PROBLEM_WEIGHT), PROBLEM_WEIGHT, "", True)
     world.save_component_and_reopen(step)
     # But no change was actually ever sent to the model, so on reopen, explicitly_set is False
-    world.verify_setting_entry(world.get_setting_entry(PROBLEM_WEIGHT), PROBLEM_WEIGHT, "", False)
+    if world.is_firefox():
+        world.verify_setting_entry(world.get_setting_entry(PROBLEM_WEIGHT), PROBLEM_WEIGHT, "", True)
+    else:
+        world.verify_setting_entry(world.get_setting_entry(PROBLEM_WEIGHT), PROBLEM_WEIGHT, "", False)
 
 
 @step('if I set the max attempts to "(.*)", it displays initially as "(.*)", and is persisted as "(.*)"')
 def set_the_max_attempts(step, max_attempts_set, max_attempts_displayed, max_attempts_persisted):
     index = world.get_setting_entry_index(MAXIMUM_ATTEMPTS)
     world.css_fill('.wrapper-comp-setting .setting-input', max_attempts_set, index=index)
+    if world.is_firefox():
+        world.trigger_event('.wrapper-comp-setting .setting-input', index=index)
     world.verify_setting_entry(world.get_setting_entry(MAXIMUM_ATTEMPTS), MAXIMUM_ATTEMPTS, max_attempts_displayed, True)
     world.save_component_and_reopen(step)
     world.verify_setting_entry(world.get_setting_entry(MAXIMUM_ATTEMPTS), MAXIMUM_ATTEMPTS, max_attempts_persisted, True)
@@ -222,6 +227,8 @@ def verify_unset_display_name():
 def set_weight(weight):
     index = world.get_setting_entry_index(PROBLEM_WEIGHT)
     world.css_fill('.wrapper-comp-setting .setting-input', weight, index=index)
+    if world.is_firefox():
+        world.trigger_event('.wrapper-comp-setting .setting-input', index=index)
 
 
 def open_high_level_source():
