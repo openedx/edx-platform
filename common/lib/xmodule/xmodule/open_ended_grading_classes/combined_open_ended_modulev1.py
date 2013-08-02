@@ -520,7 +520,7 @@ class CombinedOpenEndedV1Module():
                                                                       grader_types, feedback_items)
                 contexts.append({
                     'result': rubric_html,
-                    'task_name': 'Scored Rubric'
+                    'task_name': 'Scored rubric'
                 })
 
         context = {
