@@ -39,56 +39,74 @@ section.combined-open-ended {
 }
 
 div.problemwrapper {
-  padding: $baseline/4;
-  border: 1px solid;
-  border-color: lightgray;
-  border-radius: 10px;
+  border: 1px solid lightgray;
+  border-radius: $baseline/2;
 
   .status-bar {
-    display: inline-block;
-    float: right;
-    padding: 5px;
-
-    .problemtype{
-      display: inline;
-      float: left;
-      padding: $baseline/2;
-      border-radius: 5px;
-      background-color: #d4d4d4;
-    }
+    background-color: #eee;
+    border-radius: $baseline/2 $baseline/2 0 0;
+    border-bottom: 1px solid lightgray; 
 
     .statustable {
-      width: 750px;
+      width: 100%;
+      padding: $baseline;
     }
 
     .status-container {
-      display: inline-block;
-      padding-bottom: $baseline/4;
+      display: table-cell;
+      text-align: center;
+
+      .status-elements {
+        border-radius: $baseline/4;
+        border: 1px solid lightgray;
+      }
     }
 
     .problemtype-container {
-      width: 40%;
-      padding-top: 12px;
+      padding: $baseline/2;
+      width: 60%;
+    }
+
+    .problemtype{
+      padding: $baseline/2;
     }
 
     .assessments-container {
-      width: 30%;
+      padding: $baseline/2 $baseline $baseline/2 $baseline/2;
+      float: right;
 
       .assessment-text {
         display: inline-block;
+        display: table-cell;
+        padding-right: $baseline/2;
       }
     }
   }
   .item-container {
-    @clearfix
-    padding-bottom: 10px;
-    display: inline-block;
-    margin: 0px 15px 0px 15px;
+    padding-bottom: $baseline/2;
+    margin: 15px;
 
-    h4 {
+    .visibility-control-prompt {
+      display: block;
+      height: 40px;
+      width: 100%; 
+
+      .inner {
+        float: left;
+        height: 5px;
+        margin-top: 17px;
+        border-top: 1px dotted #ddd;
+        width: 85%; 
+      }
+    }
+
+    a {
+      display: block;
+      text-align: center;
+      width: 15%;
+      float: right;
       padding-top: $baseline/2;
-      border-top: 1px solid;
-      border-color: lightgray;
+      font-size: .9em;
     }
   }
 
@@ -101,33 +119,36 @@ div.problemwrapper {
 
 section.legend-container {
   margin: 15px;
+  border-radius: $baseline/4;
 
   .legenditem {
     display: inline;
-    padding: 2px;
+    padding: $baseline/2;
     width: 20%;
-    background-color : #d4d4d4;
+    background-color : #eee;
     font-size: .9em;
   }
 }
 
 section.combined-open-ended-status {
-  padding: $baseline $baseline $baseline 0;
+  vertical-align: center;
 
   .statusitem {
-    display: inline;
+    display: table-cell;
     padding: $baseline/2;
-    width: 20%;
-    background-color : #d4d4d4;
+    width: 30px;
+    background-color: #eee;
     color: #2c2c2c;
     font-size: .9em;
+    border-right: 1px solid lightgray;
 
     &:first-child {
-      border-bottom-left-radius: 10px;
+      border-radius: $baseline/4 0 0 $baseline/4;
     }
 
     &:last-child {
-      border-top-right-radius: 10px;
+      border-radius: 0 $baseline/4 $baseline/4 0;
+      border-right: 0px;
     }
   
     .show-results {
@@ -141,8 +162,9 @@ section.combined-open-ended-status {
   }
 
  .statusitem-current {
-    background-color: #B2B2B2;
-    color: #222;
+    background-color: #fff;
+    box-shadow: inset 0 1px 1px gray;
+    color: #222; 
  }
 
   span {
@@ -187,14 +209,28 @@ div.combined-rubric-container {
   padding-top: 10px;
 
   ul.rubric-list {
-    margin: 4px;
+    margin: 0 $baseline $baseline/2 $baseline;
     padding: 0;
     list-style-type: none;
+    
     li {
+
       &.rubric-list-item {
         margin-bottom: 2px;
         padding: 0px;
       }
+    }
+
+    .score-selection { 
+      //display: inline-block;
+      //padding-right: $baseline/2;
+      //width: 5%;
+      //vertical-align: center;
+    }
+
+    .wrappable {
+      //display: inline-block;
+      //width: 94%;
     }
   }
   h4 {
@@ -204,8 +240,11 @@ div.combined-rubric-container {
   }
 
   span.rubric-category {
-    font-size: .9em;
+    display: block;
+    width: 100%;
+    border-bottom: 1px solid lightgray;
     font-weight: bold;
+    font-size: .9em;
   }
 }
 
@@ -511,6 +550,7 @@ section.open-ended-child {
       @include clearfix;
       overflow-y: auto;
       margin-bottom: 0;
+      padding: $baseline/2;
       height: 200px;
       border: 1px solid #ddd;
       background: #f6f6f6;
@@ -521,8 +561,8 @@ section.open-ended-child {
       margin-bottom: $baseline;
       padding: 9px;
       border: 1px solid #ddd;
-      border-top: 0px;
-      background: #F6F6F6;
+      border-top: 0;
+      background: #f6f6f6;
 
       span {
         display: block;
@@ -742,8 +782,6 @@ section.open-ended-child {
   }
 
   h4 {
-    padding-top: $baseline/2;
-    border-color: lightgray;
-    border-top: 1px solid;
+    padding: $baseline/2 0;
   }
 }
