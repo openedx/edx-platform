@@ -1,4 +1,7 @@
-<div class="${class_name}">
-    <h4>${task_name}</h4><a class="rubric-collapse" href="#">(Show)</a>
-    ${results | n}
-</div>
+
+% for (i,result) in enumerate(results):
+    <div class="${result['class_name']}">
+        <h4>${result['task_name']}<a class="rubric-collapse" href="#">(Hide)</a></h4>
+        ${result['result'] | n}
+    </div>
+% endfor
