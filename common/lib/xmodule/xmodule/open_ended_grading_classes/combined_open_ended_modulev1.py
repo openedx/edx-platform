@@ -452,7 +452,6 @@ class CombinedOpenEndedV1Module():
 
     def extract_human_name_from_task(self, task_xml):
         tree = etree.fromstring(task_xml)
-        log.info(etree.tostring(tree))
         payload = tree.xpath("/openended/openendedparam/grader_payload")
         if len(payload)==0:
             task_name = "selfassessment"
@@ -527,9 +526,6 @@ class CombinedOpenEndedV1Module():
         context = {
             'results': contexts,
         }
-
-        log.info(contexts)
-
         html = self.system.render_template('{0}/combined_open_ended_results.html'.format(self.TEMPLATE_DIR), context)
         return {'html': html, 'success': True}
 
