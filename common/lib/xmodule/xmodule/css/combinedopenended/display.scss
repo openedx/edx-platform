@@ -246,6 +246,20 @@ div.combined-rubric-container {
     font-weight: bold;
     font-size: .9em;
   }
+
+  label.choicegroup_correct {
+    &:before {
+      margin-right: 15px;
+      content: url('../images/correct-icon.png');
+    }
+  }
+
+  label.choicegroup_incorrect {
+    &:before {
+      margin-right: 15px;
+      content: url('../images/incorrect-icon.png');
+    }
+  }
 }
 
 div.result-container {

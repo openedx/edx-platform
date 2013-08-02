@@ -7,18 +7,19 @@
             <% option = category['options'][j] %>
             <li class="rubric-list-item">
                 <div class="rubric-label">
-                    %for grader_type in category['options'][j]['grader_types']:
-                        % if grader_type in grader_type_image_dict:
-                            <% grader_image = grader_type_image_dict[grader_type] %>
-                            % if grader_type in human_grader_types:
-                                <% human_title = human_grader_types[grader_type] %>
-                            % else:
-                                <% human_title = grader_type %>
-                            % endif
-                            <img src="${grader_image}" title="${human_title}"/>
-                        % endif
-                    %endfor
-                    ${option['points']} points : ${option['text']}
+                    %if len(category['options'][j]['grader_types'])>0:
+                       %if correct[i]==1:
+                        <label class="choicegroup_correct">
+                       %else:
+                        <label class="choicegroup_incorrect">
+                       %endif
+                       ${option['points']} points : ${option['text']}
+                        </label>
+                    %else:
+                         <label class="rubric-elements-info">
+                             ${option['points']} points : ${option['text']}
+                         </label>
+                    %endif
                 </div>
             </li>
         % endfor
