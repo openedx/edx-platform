@@ -8,7 +8,7 @@ Because intermediate values of the render contain more data than simply the
 string of latex, store it in a custom class `LatexRendered`.
 """
 
-from calc import ParseAugmenter, add_defaults, SUFFIXES
+from calc import ParseAugmenter, DEFAULT_VARIABLES, DEFAULT_FUNCTIONS, SUFFIXES
 
 
 class LatexRendered(object):
@@ -209,6 +209,9 @@ def render_parallel(children):
     """
     Simply join the child nodes with a double vertical line.
     """
+    if len(children) == 1:
+        return children[0]
+
     children_latex = [k.latex for k in children if k.latex != "||"]
     latex = r"\|".join(children_latex)
     tall = any(k.tall for k in children)
@@ -249,6 +252,9 @@ def render_product(children):
       'a*b/c/d' -> '\frac{a\cdot b}{c\cdot d}'
       'a/b*c/d*e' -> '\frac{a}{b}\cdot \frac{c}{d}\cdot e'
     """
+    if len(children) == 1:
+        return children[0]
+
     position = "numerator"  # or denominator
     fraction_mode_ever = False
     numerator = []
@@ -296,6 +302,9 @@ def render_sum(children):
     """
     Concatenate elements, including the operators.
     """
+    if len(children) == 1:
+        return children[0]
+
     children_latex = [k.latex for k in children]
     latex = "".join(children_latex)
     tall = any(k.tall for k in children)
@@ -314,6 +323,25 @@ def render_atom(children):
         )
     else:
         return children[0]
+
+
+def add_defaults(var, fun, case_sensitive=False):
+    """
+    Create sets with both the default and user-defined variables.
+
+    Compare to calc.add_defaults
+    """
+    var_items = set(DEFAULT_VARIABLES)
+    fun_items = set(DEFAULT_FUNCTIONS)
+
+    var_items.update(var)
+    fun_items.update(fun)
+
+    if not case_sensitive:
+        var_items = set(k.lower() for k in var_items)
+        fun_items = set(k.lower() for k in fun_items)
+
+    return var_items, fun_items
 
 
 def latex_preview(math_expr, variables=(), functions=(), case_sensitive=False):
@@ -341,8 +369,8 @@ def latex_preview(math_expr, variables=(), functions=(), case_sensitive=False):
 
     render_actions = {
         'number': render_number,
-        'variable': variable_closure(set(variables), casify),
-        'function': function_closure(set(functions), casify),
+        'variable': variable_closure(variables, casify),
+        'function': function_closure(functions, casify),
         'atom': render_atom,
         'power': render_power,
         'parallel': render_parallel,

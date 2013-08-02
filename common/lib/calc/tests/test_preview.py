@@ -8,22 +8,7 @@ import preview
 import pyparsing
 
 
-class PreviewTestUtility(unittest.TestCase):
-    """
-    Provide utilities for the preview test cases.
-    """
-    def assert_latex_rendered(self, to_be_tested, tall=False, latex=None, sans_parens=None):
-        """
-        Compare a `LatexRendered` object against the data it should store.
-        """
-        if sans_parens is None:
-            sans_parens = latex
-        self.assertEquals(to_be_tested.sans_parens, sans_parens)
-        self.assertEquals(to_be_tested.latex, latex)
-        self.assertEquals(to_be_tested.tall, tall)
-
-
-class LatexRenderedTest(PreviewTestUtility):
+class LatexRenderedTest(unittest.TestCase):
     """
     Test the initializing code for LatexRendered.
 
@@ -35,19 +20,18 @@ class LatexRenderedTest(PreviewTestUtility):
         """
         math = 'x^2'
         obj = preview.LatexRendered(math, tall=True)
-        self.assert_latex_rendered(obj, tall=True, latex=math)
+        self.assertEquals(obj.latex, math)
+        self.assertEquals(obj.sans_parens, math)
+        self.assertEquals(obj.tall, True)
 
     def _each_parens(self, with_parens, math, parens, tall=False):
         """
         Helper method to test the way parens are wrapped.
         """
         obj = preview.LatexRendered(math, parens=parens, tall=tall)
-        self.assert_latex_rendered(
-            obj,
-            tall=tall,
-            latex=with_parens,
-            sans_parens=math
-        )
+        self.assertEquals(obj.latex, with_parens)
+        self.assertEquals(obj.sans_parens, math)
+        self.assertEquals(obj.tall, tall)
 
     def test_parens(self):
         """ Test curvy parens. """
@@ -79,199 +63,6 @@ class LatexRenderedTest(PreviewTestUtility):
             preview.LatexRendered('x^2', parens='not parens')
 
 
-def _latex_rendered_list(string_children):
-    """
-    Helper method to wrap `LatexRendered` objects around each child.
-    """
-    return [preview.LatexRendered(k) for k in string_children]
-
-
-class RenderMethodsTest(PreviewTestUtility):
-    """
-    Test each of the `render_X` methods.
-
-    They take a list of `LatexRendered`s and, depending on the type of node,
-    combine them all together into one `LatexRendered`.
-    """
-    def test_number_simple(self):
-        """ Simple numbers should pass through `render_number`. """
-        kids = [preview.LatexRendered('3.1415')]
-        out = preview.render_number(kids)
-        self.assert_latex_rendered(out, latex='3.1415')
-
-    def test_number_suffix(self):
-        """ Suffixes should be escaped in `render_number`. """
-        kids = _latex_rendered_list(['1.618', 'k'])
-        out = preview.render_number(kids)
-        self.assert_latex_rendered(out, latex=r'1.618\text{k}')
-
-    def test_number_sci_notation(self):
-        """ Numbers with scientific notation should display nicely """
-        kids = _latex_rendered_list(['6.0221413', 'E', '+', '23'])
-        out = preview.render_number(kids)
-        self.assert_latex_rendered(
-            out,
-            latex=r'6.0221413\!\times\!10^{+23}', tall=True
-        )
-
-        kids = _latex_rendered_list(['-', '6.0221413', 'E', '+', '23'])
-        out = preview.render_number(kids)
-        self.assert_latex_rendered(
-            out,
-            latex=r'-6.0221413\!\times\!10^{+23}', tall=True
-        )
-
-    def test_number_sci_notation_suffix(self):
-        """ Test numbers with both """
-        kids = _latex_rendered_list(['6.0221413', 'E', '+', '23', 'k'])
-        out = preview.render_number(kids)
-        self.assert_latex_rendered(
-            out,
-            latex=r'6.0221413\!\times\!10^{+23}\text{k}', tall=True
-        )
-
-    def test_variable_simple(self):
-        """ Simple valid variables should pass through `render_variable`. """
-        render_variable = preview.variable_closure(['x', 'y'], lambda x: x.lower())
-        kids = [preview.LatexRendered('x')]
-        out = render_variable(kids)
-        self.assert_latex_rendered(out, latex='x')
-
-    def test_variable_unicode(self):
-        """
-        Simple valid unicode variables should pass through as well.
-
-        Note: it isn't supported right now in the rest of the code (esp. the
-        way we have set up pyparsing), but when it is, this should work.
-        """
-        var = u"✖"
-        render_variable = preview.variable_closure([var], lambda x: x.lower())
-        out = render_variable([preview.LatexRendered(var)])
-        self.assert_latex_rendered(out, latex=var)
-
-    def test_greek(self):
-        """ Variable names that are greek should be formatted accordingly. """
-        render_variable = preview.variable_closure(['pi'], lambda x: x.lower())
-        out = render_variable([preview.LatexRendered('pi')])
-        self.assert_latex_rendered(out, latex=r'\pi')
-
-    def test_variable_subscript(self):
-        """ Things like 'epsilon_max' should display nicely """
-        render_variable = preview.variable_closure(['epsilon_max'], lambda x: x.lower())
-        out = render_variable([preview.LatexRendered('epsilon_max')])
-        self.assert_latex_rendered(out, latex=r'\epsilon_{max}')
-
-    def test_function_simple(self):
-        """ Valid function names should be escaped in `render_function`. """
-        render_function = preview.function_closure(['f'], lambda x: x.lower())
-        kids = _latex_rendered_list(['f', 'x'])
-        out = render_function(kids)
-        self.assert_latex_rendered(out, latex=r'\text{f}(x)')
-
-    def test_function_tall(self):
-        r""" Functions surrounding a tall element should have \left, \right """
-        render_function = preview.function_closure(['f'], lambda x: x.lower())
-        out = render_function([
-            preview.LatexRendered('f'),
-            preview.LatexRendered('x^2', tall=True)
-        ])
-        self.assert_latex_rendered(out, latex=r'\text{f}\left(x^2\right)', tall=True)
-
-    def test_function_sqrt(self):
-        """ Sqrt function should be handled specially. """
-        render_function = preview.function_closure(['sqrt'], lambda x: x.lower())
-        kids = _latex_rendered_list(['sqrt', 'x'])
-        out = render_function(kids)
-        self.assert_latex_rendered(out, latex=r'\sqrt{x}')
-
-    def test_function_log10(self):
-        """ log10 function should be handled specially. """
-        render_function = preview.function_closure(['log10'], lambda x: x.lower())
-        kids = _latex_rendered_list(['log10', 'x'])
-        out = render_function(kids)
-        self.assert_latex_rendered(out, latex=r'\log_{10}(x)')
-
-    def test_function_log2(self):
-        """ log2 function should be handled specially. """
-        render_function = preview.function_closure(['log2'], lambda x: x.lower())
-        kids = _latex_rendered_list(['log2', 'x'])
-        out = render_function(kids)
-        self.assert_latex_rendered(out, latex=r'\log_2(x)')
-
-    def test_power_simple(self):
-        """ `render_power` should wrap the elements with braces correctly. """
-        kids = _latex_rendered_list(['x', '^', 'y', '^', '2'])
-        out = preview.render_power(kids)
-        self.assert_latex_rendered(out, latex='x^{y^{2}}', tall=True)
-
-    def test_power_parens(self):
-        """ `render_power` should ignore the parenthesis of the last math. """
-        kids = _latex_rendered_list(['x', '^', 'y', '^'])  # (x+y)
-        kids.append(preview.LatexRendered('x+y', parens='('))
-
-        out = preview.render_power(kids)
-        self.assert_latex_rendered(out, latex='x^{y^{x+y}}', tall=True)
-
-    def test_parallel(self):
-        r""" `render_power` should combine its elements with '\|'. """
-        kids = _latex_rendered_list(['x', '||', 'y'])
-        out = preview.render_parallel(kids)
-        self.assert_latex_rendered(out, latex=r'x\|y')
-
-    def test_product_mult_only(self):
-        r""" `render_product` should combine a product with a '\cdot'. """
-        kids = _latex_rendered_list(['x', '*', 'y'])
-        out = preview.render_product(kids)
-        self.assert_latex_rendered(out, latex=r'x\cdot y')
-
-    def test_product_big_frac(self):
-        """ `render_product` should combine a fraction with '\frac'. """
-        kids = _latex_rendered_list(list('w*x/y/z'))
-        out = preview.render_product(kids)
-        self.assert_latex_rendered(out, latex=r'\frac{w\cdot x}{y\cdot z}', tall=True)
-
-    def test_product_single_frac(self):
-        """ `render_product` should ignore parens if they are extraneous. """
-        out = preview.render_product([
-            preview.LatexRendered('x+1', parens='('),
-            preview.LatexRendered('/'),
-            preview.LatexRendered('y+1', parens='(')
-        ])
-        self.assert_latex_rendered(out, latex=r'\frac{x+1}{y+1}', tall=True)
-
-    def test_product_keep_going(self):
-        """ `render_product` should split into many '\frac's when needed. """
-        kids = _latex_rendered_list(list('p/q*r/s*t'))
-        out = preview.render_product(kids)
-        self.assert_latex_rendered(out, latex=r'\frac{p}{q}\cdot \frac{r}{s}\cdot t', tall=True)
-
-    def test_sum(self):
-        """ `render_sum` should combine its elements. """
-        kids = _latex_rendered_list(list('-a+b-c+d'))
-        out = preview.render_sum(kids)
-        self.assert_latex_rendered(out, latex=r'-a+b-c+d')
-
-    def test_sum_tall(self):
-        """ `render_sum` should pass on `tall`-ness. """
-        out = preview.render_sum([
-            preview.LatexRendered('x'),
-            preview.LatexRendered('+'),
-            preview.LatexRendered('y^2', tall=True)
-        ])
-        self.assert_latex_rendered(out, latex='x+y^2', tall=True)
-
-    def test_atom_simple(self):
-        """ `render_atom` should pass through items without parens. """
-        out = preview.render_atom([preview.LatexRendered('x')])
-        self.assert_latex_rendered(out, latex='x')
-
-    def test_atom_parens(self):
-        """ Items wrapped in parens should have a `sans_parens` value. """
-        kids = _latex_rendered_list(list('(x)'))
-        out = preview.render_atom(kids)
-        self.assert_latex_rendered(out, latex='(x)', sans_parens='x')
-
-
 class LatexPreviewTest(unittest.TestCase):
     """
     Run integrative tests for `latex_preview`.
@@ -287,6 +78,132 @@ class LatexPreviewTest(unittest.TestCase):
         self.assertEquals('', preview.latex_preview('  '))
         self.assertEquals('', preview.latex_preview(' \t '))
 
+    def test_number_simple(self):
+        """ Simple numbers should pass through. """
+        self.assertEquals(preview.latex_preview('3.1415'), '3.1415')
+
+    def test_number_suffix(self):
+        """ Suffixes should be escaped. """
+        self.assertEquals(preview.latex_preview('1.618k'), r'1.618\text{k}')
+
+    def test_number_sci_notation(self):
+        """ Numbers with scientific notation should display nicely """
+        self.assertEquals(
+            preview.latex_preview('6.0221413E+23'),
+            r'6.0221413\!\times\!10^{+23}'
+        )
+        self.assertEquals(
+            preview.latex_preview('-6.0221413E+23'),
+            r'-6.0221413\!\times\!10^{+23}'
+        )
+
+    def test_number_sci_notation_suffix(self):
+        """ Test numbers with both of these. """
+        self.assertEquals(
+            preview.latex_preview('6.0221413E+23k'),
+            r'6.0221413\!\times\!10^{+23}\text{k}'
+        )
+        self.assertEquals(
+            preview.latex_preview('-6.0221413E+23k'),
+            r'-6.0221413\!\times\!10^{+23}\text{k}'
+        )
+
+    def test_variable_simple(self):
+        """ Simple valid variables should pass through. """
+        self.assertEquals(preview.latex_preview('x', variables=['x']), 'x')
+
+    def test_greek(self):
+        """ Variable names that are greek should be formatted accordingly. """
+        self.assertEquals(preview.latex_preview('pi'), r'\pi')
+
+    def test_variable_subscript(self):
+        """ Things like 'epsilon_max' should display nicely """
+        self.assertEquals(
+            preview.latex_preview('epsilon_max', variables=['epsilon_max']),
+            r'\epsilon_{max}'
+        )
+
+    def test_function_simple(self):
+        """ Valid function names should be escaped. """
+        self.assertEquals(
+            preview.latex_preview('f(3)', functions=['f']),
+            r'\text{f}(3)'
+        )
+
+    def test_function_tall(self):
+        r""" Functions surrounding a tall element should have \left, \right """
+        self.assertEquals(
+            preview.latex_preview('f(3^2)', functions=['f']),
+            r'\text{f}\left(3^{2}\right)'
+        )
+
+    def test_function_sqrt(self):
+        """ Sqrt function should be handled specially. """
+        self.assertEquals(preview.latex_preview('sqrt(3)'), r'\sqrt{3}')
+
+    def test_function_log10(self):
+        """ log10 function should be handled specially. """
+        self.assertEquals(preview.latex_preview('log10(3)'), r'\log_{10}(3)')
+
+    def test_function_log2(self):
+        """ log2 function should be handled specially. """
+        self.assertEquals(preview.latex_preview('log2(3)'), r'\log_2(3)')
+
+    def test_power_simple(self):
+        """ Powers should wrap the elements with braces correctly. """
+        self.assertEquals(preview.latex_preview('2^3^4'), '2^{3^{4}}')
+
+    def test_power_parens(self):
+        """ Powers should ignore the parenthesis of the last math. """
+        self.assertEquals(preview.latex_preview('2^3^(4+5)'), '2^{3^{4+5}}')
+
+    def test_parallel(self):
+        r""" Parallel items should combine with '\|'. """
+        self.assertEquals(preview.latex_preview('2||3'), r'2\|3')
+
+    def test_product_mult_only(self):
+        r""" Simple products should combine with a '\cdot'. """
+        self.assertEquals(preview.latex_preview('2*3'), r'2\cdot 3')
+
+    def test_product_big_frac(self):
+        """ Division should combine with '\frac'. """
+        self.assertEquals(
+            preview.latex_preview('2*3/4/5'),
+            r'\frac{2\cdot 3}{4\cdot 5}'
+        )
+
+    def test_product_single_frac(self):
+        """ Division should ignore parens if they are extraneous. """
+        self.assertEquals(
+            preview.latex_preview('(2+3)/(4+5)'),
+            r'\frac{2+3}{4+5}'
+        )
+
+    def test_product_keep_going(self):
+        """
+        Complex products/quotients should split into many '\frac's when needed.
+        """
+        self.assertEquals(
+            preview.latex_preview('2/3*4/5*6'),
+            r'\frac{2}{3}\cdot \frac{4}{5}\cdot 6'
+        )
+
+    def test_sum(self):
+        """ Sums should combine its elements. """
+        # Use 'x' as the first term (instead of, say, '1'), so it can't be
+        # interpreted as a negative number.
+        self.assertEquals(
+            preview.latex_preview('-x+2-3+4', variables=['x']),
+            '-x+2-3+4'
+        )
+
+    def test_sum_tall(self):
+        """ A complicated expression should not hide the tallness. """
+        self.assertEquals(
+            preview.latex_preview('(2+3^2)'),
+            r'\left(2+3^{2}\right)'
+        )
+
     def test_complicated(self):
         """
         Given complicated input, ensure that exactly the correct string is made.
@@ -297,8 +214,10 @@ class LatexPreviewTest(unittest.TestCase):
         )
 
         self.assertEquals(
-            preview.latex_preview('log10(1+3/4/Cos(x^2)*(x+1))', case_sensitive=True),
-            r'\log_{10}\left(1+\frac{3}{4\cdot \text{Cos}\left(x^{2}\right)}\cdot (x+1)\right)'
+            preview.latex_preview('log10(1+3/4/Cos(x^2)*(x+1))',
+                                  case_sensitive=True),
+            (r'\log_{10}\left(1+\frac{3}{4\cdot \text{Cos}\left(x^{2}\right)}'
+             r'\cdot (x+1)\right)')
         )
 
     def test_syntax_errors(self):
