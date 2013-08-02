@@ -11,7 +11,7 @@ from .peer_grading_service import PeerGradingService, MockPeerGradingService
 import controller_query_service
 
 from datetime import datetime
-from django.utils.timezone import UTC
+from pytz import UTC
 
 log = logging.getLogger("mitx.courseware")
 
@@ -126,7 +126,7 @@ class OpenEndedChild(object):
         pass
 
     def closed(self):
-        if self.close_date is not None and datetime.now(UTC()) > self.close_date:
+        if self.close_date is not None and datetime.now(UTC) > self.close_date:
             return True
         return False
 
