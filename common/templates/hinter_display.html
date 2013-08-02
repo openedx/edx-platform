@@ -77,9 +77,9 @@
           <a class="answer-choice" href="javascript: void(0)" value="${answer}">${answer}</a><br />
       % endfor
       % if hints_exist:
-        <!-- A placeholder for the Back button, which is relatively-positioned -->
-        <p> &nbsp </p>
-        <a href="javascript: void(0);" class="wizard-link bottom" dest="p1"> Back </a>
+        <p class="bottom">
+          <a href="javascript: void(0);" class="wizard-link" dest="p1"> Back </a>
+        </p>
       % endif
 
     </div>
@@ -127,8 +127,9 @@ Write your hint here.  Please don't give away the correct answer.
           <a href="http://www.apa.org/education/k12/misconceptions.aspx?item=2" target="_blank">Learn even more</a>
         </p>
       </div>
-      <br />
-      <a href="javascript: void(0);" class="wizard-link" dest="p2"> Back </a>
+      <p class="bottom">
+        <a href="javascript: void(0);" class="wizard-link" dest="p2"> Back </a>
+      </p>
     </div>
   <!-- Close wizard contaner and wizard viewbox. -->
   </div></div>

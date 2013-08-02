@@ -48,7 +48,7 @@ class @Hinter
     else
       @$(target).css('display', 'none')
     # Fix positioning errors with the bottom class.
-    @$('.bottom').removeClass('bottom').addClass('bottom')
+    @set_bottom_links()
 
   vote: (eventObj) =>
     # Make an ajax request with the user's vote.
@@ -86,6 +86,15 @@ class @Hinter
     @answer = @$(eventObj.target).attr('value')
     @$('#blank-answer').html(@answer)
     @go_to('p3')
+
+  set_bottom_links: =>
+    # Makes each .bottom class stick to the bottom of .wizard-viewbox
+    @$('.bottom').css('margin-top', '0px')
+    viewbox_height = parseInt(@$('.wizard-viewbox').css('height'), 10)
+    @$('.bottom').each((index, obj) ->
+      view_height = parseInt($(obj).parent().css('height'), 10)
+      $(obj).css('margin-top', (viewbox_height - view_height) + 'px')
+    )
 
   render: (content) =>
     if content
@@ -127,8 +136,10 @@ class @Hinter
     translate_string = 'translateX(' +id_to_index[view_id] * -1 * parseInt($('#' + view_id).css('width'), 10) + 'px)'
     @$('.wizard-container').css('transform', translate_string)
     @$('.wizard-container').css('-webkit-transform', translate_string)
+    @set_bottom_links()
 
   legacy_go_to: (view_id) ->
     # For older browsers - switch wizard views by changing the screen.
     @$('.wizard-view').css('display', 'none')
     @$('#' + view_id).css('display', 'block')
+    @set_bottom_links()
