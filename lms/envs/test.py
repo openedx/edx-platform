@@ -230,6 +230,9 @@ DATABASES['jabber'] = {
 
 INSTALLED_APPS += ('jabber',)
 
+########################## CLASS DASHBOARD ########################
+MITX_FEATURES['CLASS_DASHBOARD'] = True
+
 ################### Make tests quieter
 
 # OpenID spews messages like this to stderr, we don't need to see them:
@@ -237,3 +240,6 @@ INSTALLED_APPS += ('jabber',)
 
 import openid.oidutil
 openid.oidutil.log = lambda message, level=0: None
+
+### QUERYABLE APP ###
+INSTALLED_APPS += ('queryable_student_module',)
