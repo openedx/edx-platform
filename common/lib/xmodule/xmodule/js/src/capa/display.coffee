@@ -42,7 +42,7 @@ class @Problem
     progress = "(#{detail} points)"
     if status == 'none' and detail? and detail.indexOf('/') > 0
         a = detail.split('/')
-        possible = parseInt(a[1])
+        possible = parseFloat(a[1])
         if possible == 1
             # i18n
             progress = "(#{possible} point possible)"
