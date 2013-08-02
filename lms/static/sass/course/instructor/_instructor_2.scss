@@ -269,6 +269,10 @@ section.instructor-dashboard-content-2 {
 
 
 .instructor-dashboard-wrapper-2 section.idash-section#student_admin > {
+  .action-type-container{
+    margin-bottom: $baseline * 2;
+  }
+
   .progress-link-wrapper {
     margin-top: 0.7em;
   }
