@@ -102,6 +102,10 @@ function goto( mode)
 <section class="container">
 <div class="instructor-dashboard-wrapper">
 
+  %if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BETA_DASHBOARD'):
+    <div class="beta-button-wrapper"><a href="${ beta_dashboard_url }"> Try New Beta Dashboard </a></div>
+  %endif
+
   <section class="instructor-dashboard-content">
     <h1>${_("Instructor Dashboard")}</h1>
 
@@ -119,9 +123,6 @@ function goto( mode)
           %endif
 	  ]
     </h2>
-
-  <div style="text-align:right"><span id="djangopid">${djangopid}</span>
-  | <span id="mitxver">${mitx_version}</span></div>
 
     <form name="idashform" method="POST">
     <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
