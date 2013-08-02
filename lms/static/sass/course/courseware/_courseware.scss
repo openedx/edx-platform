@@ -3,6 +3,14 @@ html {
   max-height: 100%;
 }
 
+html.video-fullscreen{
+  overflow: hidden;
+
+  body{
+    overflow: hidden;
+  }
+}
+
 div.course-wrapper {
 
   section.course-content {

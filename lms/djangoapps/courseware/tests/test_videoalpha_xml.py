@@ -23,7 +23,7 @@ from django.conf import settings
 from xmodule.videoalpha_module import VideoAlphaDescriptor, VideoAlphaModule
 from xmodule.modulestore import Location
 from xmodule.tests import get_test_system
-from xmodule.tests.test_logic import LogicTest
+from xmodule.tests import LogicTest
 
 
 SOURCE_XML = """

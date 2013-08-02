@@ -14,6 +14,16 @@ is enabled.
 Studio: Added improvements to Course Creation: richer error messaging, tip
 text, and fourth field for course run.
 
+Blades: New features for VideoAlpha player:
+1.) Controls are auto hidden after a delay of mouse inactivity - the full video
+becomes visible.
+2.) When captions (CC) button is pressed, captions stick (not auto hidden after
+a delay of mouse inactivity). The video player size does not change - the video
+is down-sized and placed in the middle of the black area.
+3.) All source code of Video Alpha 2 is written in JavaScript. It is not a basic
+conversion from CoffeeScript. The structure of the player has been changed.
+4.) A lot of additional unit tests.
+
 LMS: Added user preferences (arbitrary user/key/value tuples, for which
 which user/key is unique) and a REST API for reading users and
 preferences. Access to the REST API is restricted by use of the
