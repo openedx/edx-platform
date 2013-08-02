@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-02-27 08:56-0500\n"
-"PO-Revision-Date: 2014-02-27 13:57:20.650962\n"
+"POT-Creation-Date: 2014-02-28 13:56-0800\n"
+"PO-Revision-Date: 2014-02-28 21:57:20.936431\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -1257,6 +1257,15 @@ msgstr "Lïst ïtém #"
 msgid "Heading"
 msgstr "Héädïng #"
 
+#: lms/templates/class_dashboard/all_section_metrics.js
+#: lms/templates/class_dashboard/all_section_metrics.js
+msgid "Unable to retrieve data, please try again later."
+msgstr "Ûnäßlé tö rétrïévé dätä, pléäsé trý ägäïn lätér. Ⱡ'σяєм ιρѕυм #"
+
+#: lms/templates/class_dashboard/d3_stacked_bar_graph.js
+msgid "Number of Students"
+msgstr "Nümßér öf Stüdénts Ⱡ'σ#"
+
 #: cms/static/coffee/src/main.js
 msgid ""
 "This may be happening because of an error with our server or your internet "
@@ -1276,6 +1285,7 @@ msgstr "<em>Édïtïng:</em> %s Ⱡ'σ#"
 
 #: cms/static/coffee/src/views/module_edit.js
 #: cms/static/coffee/src/views/tabs.js cms/static/coffee/src/views/unit.js
+#: cms/static/coffee/src/xblock/cms.runtime.v1.js
 #: cms/static/js/models/section.js cms/static/js/views/asset.js
 #: cms/static/js/views/course_info_handout.js
 #: cms/static/js/views/course_info_update.js cms/static/js/views/overview.js

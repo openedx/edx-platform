@@ -1246,6 +1246,11 @@ VERIFY_STUDENT = {
     "DAYS_GOOD_FOR": 365,  # How many days is a verficiation good for?
 }
 
+### This enables the Metrics tab for the Instructor dashboard ###########
+FEATURES['CLASS_DASHBOARD'] = False
+if FEATURES.get('CLASS_DASHBOARD'):
+    INSTALLED_APPS += ('class_dashboard',)
+
 ######################## CAS authentication ###########################
 
 if FEATURES.get('AUTH_USE_CAS'):
