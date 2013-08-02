@@ -521,13 +521,11 @@ class CombinedOpenEndedV1Module():
                                                                       grader_types, feedback_items)
                 contexts.append({
                     'result': rubric_html,
-                    'task_name': 'Scored Rubric',
-                    'class_name': 'combined-rubric-container'
+                    'task_name': 'Scored Rubric'
                 })
 
         context = {
             'results': contexts,
-            'name' : 'name',
         }
 
         log.info(contexts)
