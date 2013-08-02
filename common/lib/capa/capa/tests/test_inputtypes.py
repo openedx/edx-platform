@@ -49,7 +49,7 @@ class OptionInputTest(unittest.TestCase):
                  'status': 'answered'}
         option_input = lookup_tag('optioninput')(test_system(), element, state)
 
-        context = option_input._get_render_context()
+        context = option_input._get_render_context()  # pylint: disable=W0212
 
         expected = {'value': 'Down',
                     'options': [('Up', 'Up'), ('Down', 'Down')],
@@ -96,7 +96,7 @@ class ChoiceGroupTest(unittest.TestCase):
 
         the_input = lookup_tag(tag)(test_system(), element, state)
 
-        context = the_input._get_render_context()
+        context = the_input._get_render_context()  # pylint: disable=W0212
 
         expected = {'id': 'sky_input',
                     'value': 'foil3',
@@ -146,7 +146,7 @@ class JavascriptInputTest(unittest.TestCase):
         state = {'value': '3', }
         the_input = lookup_tag('javascriptinput')(test_system(), element, state)
 
-        context = the_input._get_render_context()
+        context = the_input._get_render_context()  # pylint: disable=W0212
 
         expected = {'id': 'prob_1_2',
                     'status': 'unanswered',
@@ -174,7 +174,7 @@ class TextLineTest(unittest.TestCase):
         state = {'value': 'BumbleBee', }
         the_input = lookup_tag('textline')(test_system(), element, state)
 
-        context = the_input._get_render_context()
+        context = the_input._get_render_context()  # pylint: disable=W0212
 
         expected = {'id': 'prob_1_2',
                     'value': 'BumbleBee',
@@ -202,7 +202,7 @@ class TextLineTest(unittest.TestCase):
         state = {'value': 'BumbleBee', }
         the_input = lookup_tag('textline')(test_system(), element, state)
 
-        context = the_input._get_render_context()
+        context = the_input._get_render_context()  # pylint: disable=W0212
 
         expected = {'id': 'prob_1_2',
                     'value': 'BumbleBee',
@@ -240,7 +240,7 @@ class TextLineTest(unittest.TestCase):
             state = {'value': 'BumbleBee', }
             the_input = lookup_tag('textline')(test_system(), element, state)
 
-            context = the_input._get_render_context()
+            context = the_input._get_render_context()  # pylint: disable=W0212
 
             expected = {'id': 'prob_1_2',
                         'value': 'BumbleBee',
@@ -278,7 +278,7 @@ class FileSubmissionTest(unittest.TestCase):
         input_class = lookup_tag('filesubmission')
         the_input = input_class(test_system(), element, state)
 
-        context = the_input._get_render_context()
+        context = the_input._get_render_context()  # pylint: disable=W0212
 
         expected = {'id': 'prob_1_2',
                     'status': 'queued',
@@ -323,7 +323,7 @@ class CodeInputTest(unittest.TestCase):
         input_class = lookup_tag('codeinput')
         the_input = input_class(test_system(), element, state)
 
-        context = the_input._get_render_context()
+        context = the_input._get_render_context()  # pylint: disable=W0212
 
         expected = {'id': 'prob_1_2',
                     'value': 'print "good evening"',
@@ -373,7 +373,7 @@ class MatlabTest(unittest.TestCase):
         self.the_input = self.input_class(test_system(), elt, state)
 
     def test_rendering(self):
-        context = self.the_input._get_render_context()
+        context = self.the_input._get_render_context()  # pylint: disable=W0212
 
         expected = {'id': 'prob_1_2',
                     'value': 'print "good evening"',
@@ -399,7 +399,7 @@ class MatlabTest(unittest.TestCase):
         elt = etree.fromstring(self.xml)
 
         the_input = self.input_class(test_system(), elt, state)
-        context = the_input._get_render_context()
+        context = the_input._get_render_context()  # pylint: disable=W0212
 
         expected = {'id': 'prob_1_2',
                     'value': 'print "good evening"',
@@ -426,7 +426,7 @@ class MatlabTest(unittest.TestCase):
             elt = etree.fromstring(self.xml)
 
             the_input = self.input_class(test_system(), elt, state)
-            context = the_input._get_render_context()
+            context = the_input._get_render_context()  # pylint: disable=W0212
             expected = {'id': 'prob_1_2',
                         'value': 'print "good evening"',
                         'status': status,
@@ -451,7 +451,7 @@ class MatlabTest(unittest.TestCase):
         elt = etree.fromstring(self.xml)
 
         the_input = self.input_class(test_system(), elt, state)
-        context = the_input._get_render_context()
+        context = the_input._get_render_context()  # pylint: disable=W0212
         expected = {'id': 'prob_1_2',
                     'value': 'print "good evening"',
                     'status': 'queued',
@@ -556,7 +556,7 @@ class SchematicTest(unittest.TestCase):
 
         the_input = lookup_tag('schematic')(test_system(), element, state)
 
-        context = the_input._get_render_context()
+        context = the_input._get_render_context()  # pylint: disable=W0212
 
         expected = {'id': 'prob_1_2',
                     'value': value,
@@ -595,7 +595,7 @@ class ImageInputTest(unittest.TestCase):
 
         the_input = lookup_tag('imageinput')(test_system(), element, state)
 
-        context = the_input._get_render_context()
+        context = the_input._get_render_context()  # pylint: disable=W0212
 
         expected = {'id': 'prob_1_2',
                     'value': value,
@@ -646,7 +646,7 @@ class CrystallographyTest(unittest.TestCase):
 
         the_input = lookup_tag('crystallography')(test_system(), element, state)
 
-        context = the_input._get_render_context()
+        context = the_input._get_render_context()  # pylint: disable=W0212
 
         expected = {'id': 'prob_1_2',
                     'value': value,
@@ -684,7 +684,7 @@ class VseprTest(unittest.TestCase):
 
         the_input = lookup_tag('vsepr_input')(test_system(), element, state)
 
-        context = the_input._get_render_context()
+        context = the_input._get_render_context()  # pylint: disable=W0212
 
         expected = {'id': 'prob_1_2',
                     'value': value,
@@ -713,7 +713,7 @@ class ChemicalEquationTest(unittest.TestCase):
 
     def test_rendering(self):
         ''' Verify that the render context matches the expected render context'''
-        context = self.the_input._get_render_context()
+        context = self.the_input._get_render_context()  # pylint: disable=W0212
 
         expected = {'id': 'prob_1_2',
                     'value': 'H2OYeah',
@@ -751,7 +751,7 @@ class FormulaEquationTest(unittest.TestCase):
         """
         Verify that the render context matches the expected render context
         """
-        context = self.the_input._get_render_context()
+        context = self.the_input._get_render_context()  # pylint: disable=W0212
 
         expected = {'id': 'prob_1_2',
                     'value': 'x^2+1/2',
@@ -877,7 +877,7 @@ class DragAndDropTest(unittest.TestCase):
 
         the_input = lookup_tag('drag_and_drop_input')(test_system(), element, state)
 
-        context = the_input._get_render_context()
+        context = the_input._get_render_context()  # pylint: disable=W0212
         expected = {'id': 'prob_1_2',
                     'value': value,
                     'status': 'unsubmitted',
@@ -926,7 +926,7 @@ class AnnotationInputTest(unittest.TestCase):
 
         the_input = lookup_tag(tag)(test_system(), element, state)
 
-        context = the_input._get_render_context()
+        context = the_input._get_render_context()  # pylint: disable=W0212
 
         expected = {
             'id': 'annotation_input',
@@ -1013,7 +1013,7 @@ class TestChoiceText(unittest.TestCase):
         }
         expected.update(state)
         the_input = lookup_tag(tag)(test_system(), element, state)
-        context = the_input._get_render_context()
+        context = the_input._get_render_context()  # pylint: disable=W0212
         self.assertEqual(context, expected)
 
     def test_radiotextgroup(self):
