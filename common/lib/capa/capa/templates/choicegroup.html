@@ -58,7 +58,7 @@
         <span id="answer_${id}"></span>
     </fieldset>
 
-    % if show_correctness == "never" and (value and status not in ['unsubmitted']):
+    % if show_correctness == "never" and value and status != "unsubmitted":
         <div class="capa_alert">${submitted_message}</div>
     %endif
 </form>
