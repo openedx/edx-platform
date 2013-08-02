@@ -34,7 +34,7 @@
         }
 
         // Show the loading icon.
-        data.$loading.show();
+        data.$loading.css('visibility', 'visible');
     }
 
     function send_request() {
@@ -80,7 +80,7 @@
             */
             if (response.request_start == data.last_sent &&
                 data.timeout_id === null) {
-                data.$loading.hide();  // Disable icon
+                data.$loading.css('visibility', 'hidden');  // Disable icon
             }
 
             if (response.request_start <= data.request_visible) {
@@ -113,7 +113,7 @@
         var prev_id = "#" + this.id + "_preview";
         preview_data[this.id] = {
             $preview: $(prev_id),
-            $loading: $(prev_id + " img.loading").hide(),
+            $loading: $(prev_id + " img.loading"),
             last_sent: 0,  // The time of the one that was last sent
             request_visible: 0,  // The original time of the visible request
             timeout_id: null  // If there is a timeout, store its ID here

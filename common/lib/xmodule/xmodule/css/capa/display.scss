@@ -214,6 +214,16 @@ section.problem {
       clear: both;
       margin-top: 3px;
 
+      .MathJax_Display {
+        display: inline-block;
+        width: auto;
+      }
+
+      img.loading {
+        display: inline-block;
+        padding-left: 10px;
+      }
+
       span {
         margin-bottom: 0;
 
