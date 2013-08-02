@@ -165,7 +165,7 @@ def load_preview_module(request, preview_id, descriptor):
 
 def get_preview_html(request, descriptor, idx):
     module = load_preview_module(request, str(idx), descriptor)
-    return module.get_html()
+    return module.runtime.render(module, None, "studio_view")
 
 
 def get_module_previews(request, descriptor):
