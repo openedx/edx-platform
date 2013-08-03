@@ -1,5 +1,6 @@
 import logging
 import re
+import cgi
 
 from django.conf import settings
 from django.contrib.sites.models import Site
@@ -95,7 +96,7 @@ def course_wiki_redirect(request, course_id):
             root,
             course_slug,
             title=course_slug,
-            content="This is the wiki for **{0}**'s _{1}_.".format(course.org, course.display_name_with_default),
+            content=cgi.escape("This is the wiki for **{0}**'s _{1}_.".format(course.display_org_with_default, course.display_name_with_default)),
             user_message="Course page automatically created.",
             user=None,
             ip_address=None,

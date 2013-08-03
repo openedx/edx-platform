@@ -5,7 +5,7 @@
 <%block name="title">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>${_('{course_number} Textbook').format(course_number=course.number)}</title>
+<title>${_('{course_number} Textbook').format(course_number=course.display_number_with_default) | h}</title>
 </%block>
 
 <%block name="headextra">
