@@ -6,7 +6,6 @@ from path import path  # NOTE (THK): Only used for detecting presence of syllabu
 import requests
 from datetime import datetime
 import dateutil.parser
-import cgi
 
 from xmodule.modulestore import Location
 from xmodule.seq_module import SequenceDescriptor, SequenceModule
@@ -945,7 +944,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         Return a display course number if it has been specified, otherwise return the 'course' that is in the location
         """
         if self.display_coursenumber:
-            return cgi.escape(self.display_coursenumber)
+            return self.display_coursenumber
 
         return self.number
 
@@ -959,6 +958,6 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         Return a display organization if it has been specified, otherwise return the 'org' that is in the location
         """
         if self.display_organization:
-            return cgi.escape(self.display_organization)
+            return self.display_organization
 
         return self.org

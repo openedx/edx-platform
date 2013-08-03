@@ -94,7 +94,7 @@
                     </a>
                 %endif
         %else:
-            <a href="#" class="register">${_("Register for {course.display_number_with_default}").format(course=course)}</a>
+            <a href="#" class="register">${_("Register for {course.display_number_with_default}").format(course=course) | h}</a>
 
             <div id="register_error"></div>
         %endif
