@@ -12,7 +12,14 @@ from auth.authz import _copy_course_group
 #
 # To run from command line: rake cms:clone SOURCE_LOC=MITx/111/Foo1 DEST_LOC=MITx/135/Foo3
 #
+from request_cache.middleware import RequestCache
+from django.core.cache import get_cache
 
+#
+# To run from command line: rake cms:delete_course LOC=MITx/111/Foo1
+#
+
+CACHE = get_cache('mongo_metadata_inheritance')
 
 class Command(BaseCommand):
     """Clone a MongoDB-backed course to another location"""
@@ -21,19 +28,27 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         "Execute the command"
         if len(args) != 2:
-            raise CommandError("clone requires two arguments: <source-location> <dest-location>")
+            raise CommandError("clone requires two arguments: <source-course_id> <dest-course_id>")
 
-        source_location_str = args[0]
-        dest_location_str = args[1]
+        source_course_id = args[0]
+        dest_course_id = args[1]
 
         mstore = modulestore('direct')
         cstore = contentstore()
 
-        print("Cloning course {0} to {1}".format(source_location_str, dest_location_str))
+        mstore.metadata_inheritance_cache_subsystem = CACHE
+        mstore.request_cache = RequestCache.get_request_cache()
+        org, course_num, run = dest_course_id.split("/")
+        mstore.ignore_write_events_on_courses.append('{0}/{1}'.format(org, course_num))
 
-        source_location = CourseDescriptor.id_to_location(source_location_str)
-        dest_location = CourseDescriptor.id_to_location(dest_location_str)
+        print("Cloning course {0} to {1}".format(source_course_id, dest_course_id))
+
+        source_location = CourseDescriptor.id_to_location(source_course_id)
+        dest_location = CourseDescriptor.id_to_location(dest_course_id)
 
         if clone_course(mstore, cstore, source_location, dest_location):
+            # be sure to recompute metadata inheritance after all those updates
+            mstore.refresh_cached_metadata_inheritance_tree(dest_location)
+
             print("copying User permissions...")
             _copy_course_group(source_location, dest_location)
