@@ -270,3 +270,7 @@ except ImportError:
 
 ########################## QUERYABLE TABLES ########################
 INSTALLED_APPS += ('queryable',)
+
+########################## CLASS DASHBOARD ########################
+INSTALLED_APPS += ('class_dashboard',)
+MITX_FEATURES['CLASS_DASHBOARD'] = True
