@@ -815,19 +815,19 @@ class CapaModuleTest(unittest.TestCase):
         module = CapaFactory.create(attempts=attempts + 1, max_attempts=attempts)
         self.assertEqual(module.check_button_name(), "Submit")
 
-        # Otherwise, button name is "Check"
+        # We've got the button name set to "Submit" even if it's not the final attempt
         module = CapaFactory.create(attempts=attempts - 2, max_attempts=attempts)
-        self.assertEqual(module.check_button_name(), "Check")
+        self.assertEqual(module.check_button_name(), "Submit")
 
         module = CapaFactory.create(attempts=attempts - 3, max_attempts=attempts)
-        self.assertEqual(module.check_button_name(), "Check")
+        self.assertEqual(module.check_button_name(), "Submit")
 
-        # If no limit on attempts, then always show "Check"
+        # If no limit on attempts, still show "Submit"
         module = CapaFactory.create(attempts=attempts - 3)
-        self.assertEqual(module.check_button_name(), "Check")
+        self.assertEqual(module.check_button_name(), "Submit")
 
         module = CapaFactory.create(attempts=0)
-        self.assertEqual(module.check_button_name(), "Check")
+        self.assertEqual(module.check_button_name(), "Submit")
 
     def test_should_show_check_button(self):
 
