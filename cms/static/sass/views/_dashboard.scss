@@ -330,9 +330,14 @@ body.dashboard {
 
 		.class-name {
 			display: block;
-			font-size: 19px;
+			font-size: 22px;
 			font-weight: 300;
 		}
+
+        .class-listing-info {
+            color: #989898;
+            margin-right: 15px;
+        }
 
 		.detail {
 			font-size: 14px;

@@ -54,6 +54,9 @@ def index(request):
                 course.location,
                 course_id=course.location.course_id,
             ),
+            course.display_org_with_default,
+            course.display_number_with_default,
+            course.location.name
         )
 
     return render_to_response('index.html', {

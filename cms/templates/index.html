@@ -133,10 +133,13 @@
       %if len(courses) > 0:
       <div class="courses">
         <ul class="list-courses">
-          %for course, url, lms_link in sorted(courses, key=lambda s: s[0].lower() if s[0] is not None else ''):
+          %for course, url, lms_link, org, num, run in sorted(courses, key=lambda s: s[0].lower() if s[0] is not None else ''):
           <li class="course-item">
             <a class="class-link" href="${url}" class="class-name">
               <span class="class-name">${course}</span>
+              <span class="class-listing-info class-org"><label>${_("Organization")}:&nbsp;${org}</label></span>
+              <span class="class-listing-info class-num"><label>${_("Course Number")}:&nbsp;</label>${num}</span>
+              <span class="class-listing-info class-run"><label>${_("Course Run")}:&nbsp;</label>${run}</span>
             </a>
             <a href="${lms_link}" rel="external" class="button view-button view-live-button">${_("View Live")}</a>
           </li>
