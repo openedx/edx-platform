@@ -8,10 +8,10 @@ std_ajax_err = -> window.InstructorDashboard.util.std_ajax_err.apply this, argum
 
 
 class ProfileDistributionWidget
-  constructor: ({@$container, @feature, title, @endpoint}) ->
+  constructor: ({@$container, @feature, @title, @endpoint}) ->
     # render template
     template_params =
-      title: title
+      title: @title
       feature: @feature
       endpoint: @endpoint
     template_html = $("#profile-distribution-widget-template").html()

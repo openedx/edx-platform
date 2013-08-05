@@ -33,10 +33,13 @@ CSS_INSTRUCTOR_NAV = 'instructor-nav'
 # prefix for deep-linking
 HASH_LINK_PREFIX = '#view-'
 
+$active_section = null
 
 # helper class for queueing and fault isolation.
 # Will execute functions marked by waiter.after only after all functions marked by
 # waiter.waitFor have been called.
+# To guarantee this functionality, waitFor and after must be called
+# before the functions passed to waitFor are called.
 class SafeWaiter
   constructor: ->
     @after_handlers = []
@@ -87,8 +90,9 @@ setup_instructor_dashboard = (idash_content) =>
   # clickable section titles
   $links = idash_content.find(".#{CSS_INSTRUCTOR_NAV}").find('a')
 
-  for link in ($ link for link in $links)
-    link.click (e) ->
+  # attach link click handlers
+  $links.each (i, link) ->
+    $(link).click (e) ->
       e.preventDefault()
 
       # deactivate all link & section styles
@@ -97,11 +101,11 @@ setup_instructor_dashboard = (idash_content) =>
 
       # discover section paired to link
       section_name = $(this).data 'section'
-      section = idash_content.find "##{section_name}"
+      $section = idash_content.find "##{section_name}"
 
       # activate link & section styling
       $(this).addClass CSS_ACTIVE_SECTION
-      section.addClass CSS_ACTIVE_SECTION
+      $section.addClass CSS_ACTIVE_SECTION
 
       # tracking
       analytics.pageview "instructor_section:#{section_name}"
@@ -111,7 +115,12 @@ setup_instructor_dashboard = (idash_content) =>
       location.hash = "#{HASH_LINK_PREFIX}#{section_name}"
 
       sections_have_loaded.after ->
-        section.data('wrapper')?.onClickTitle?()
+        $section.data('wrapper')?.onClickTitle?()
+
+      # call onExit handler if exiting a section to a different section.
+      unless $section.is $active_section
+        $active_section?.data('wrapper')?.onExit?()
+      $active_section = $section
 
       # TODO enable onExit handler
 
@@ -137,15 +146,25 @@ setup_instructor_dashboard = (idash_content) =>
 
 # enable sections
 setup_instructor_dashboard_sections = (idash_content) ->
-  # see fault isolation NOTE at top of file.
-  # If an error thrown in one section, it will not stop other sections from exectuing.
-  plantTimeout 0, sections_have_loaded.waitFor ->
-    new window.InstructorDashboard.sections.CourseInfo   idash_content.find ".#{CSS_IDASH_SECTION}#course_info"
-  plantTimeout 0, sections_have_loaded.waitFor ->
-    new window.InstructorDashboard.sections.DataDownload idash_content.find ".#{CSS_IDASH_SECTION}#data_download"
-  plantTimeout 0, sections_have_loaded.waitFor ->
-    new window.InstructorDashboard.sections.Membership   idash_content.find ".#{CSS_IDASH_SECTION}#membership"
-  plantTimeout 0, sections_have_loaded.waitFor ->
-    new window.InstructorDashboard.sections.StudentAdmin idash_content.find ".#{CSS_IDASH_SECTION}#student_admin"
-  plantTimeout 0, sections_have_loaded.waitFor ->
-    new window.InstructorDashboard.sections.Analytics    idash_content.find ".#{CSS_IDASH_SECTION}#analytics"
+  sections_to_initialize = [
+    constructor: window.InstructorDashboard.sections.CourseInfo
+    $element: idash_content.find ".#{CSS_IDASH_SECTION}#course_info"
+  ,
+    constructor: window.InstructorDashboard.sections.DataDownload
+    $element: idash_content.find ".#{CSS_IDASH_SECTION}#data_download"
+  ,
+    constructor: window.InstructorDashboard.sections.Membership
+    $element: idash_content.find ".#{CSS_IDASH_SECTION}#membership"
+  ,
+    constructor: window.InstructorDashboard.sections.StudentAdmin
+    $element: idash_content.find ".#{CSS_IDASH_SECTION}#student_admin"
+  ,
+    constructor: window.InstructorDashboard.sections.Analytics
+    $element: idash_content.find ".#{CSS_IDASH_SECTION}#analytics"
+  ]
+
+  sections_to_initialize.map ({constructor, $element}) ->
+    # See fault isolation NOTE at top of file.
+    # If an error is thrown in one section, it will not stop other sections from exectuing.
+    plantTimeout 0, sections_have_loaded.waitFor ->
+      new constructor $element
