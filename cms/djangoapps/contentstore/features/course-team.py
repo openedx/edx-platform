@@ -43,7 +43,8 @@ def add_other_user(_step, name):
 
     email_css = 'input#user-email-input'
     world.css_fill(email_css, name + EMAIL_EXTENSION)
-    world.trigger_event(email_css)
+    if world.is_firefox():
+        world.trigger_event(email_css)
     confirm_css = 'form.create-user button.action-primary'
     world.css_click(confirm_css)
 
