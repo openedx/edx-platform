@@ -82,8 +82,8 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):
 
     def get_context(self):
         _context = EditingDescriptor.get_context(self)
-        # Add our specific template information (the raw data body)
-
+        # Add some specific HTML rendering context when editing HTML modules where we pass
+        # the root /c4x/ url for assets. This allows client-side substitutions to occur.
         _context.update({'base_asset_url': StaticContent.get_base_url_path_for_course_assets(self.location) + '/'})
         return _context
 
