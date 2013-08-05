@@ -75,13 +75,15 @@ def preview_component(request, location):
 
     component = modulestore().get_item(location)
 
-    # wrap_xmodule expects a function, so make a constant function
-    def get_render():
-        return component.runtime.render(component, None, "studio_view").content
+    component.get_html = wrap_xmodule(
+        component.get_html,
+        component,
+        'xmodule_edit.html'
+    )
 
     return render_to_response('component.html', {
         'preview': get_module_previews(request, component)[0],
-        'editor': wrap_xmodule(get_render, component, 'xmodule_edit.html')(),
+        'editor': component.runtime.render(component, None, 'studio_view').content,
     })
 
 
