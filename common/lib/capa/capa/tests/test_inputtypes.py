@@ -800,13 +800,15 @@ class FormulaEquationTest(unittest.TestCase):
         """
         context = self.the_input._get_render_context()  # pylint: disable=W0212
 
-        expected = {'id': 'prob_1_2',
-                    'value': 'x^2+1/2',
-                    'status': 'unanswered',
-                    'msg': '',
-                    'size': self.size,
-                    'previewer': '/static/js/capa/formula_equation_preview.js',
-                    }
+        expected = {
+            'id': 'prob_1_2',
+            'value': 'x^2+1/2',
+            'status': 'unanswered',
+            'reported_status': '',
+            'msg': '',
+            'size': self.size,
+            'previewer': '/static/js/capa/src/formula_equation_preview.js',
+        }
         self.assertEqual(context, expected)
 
     def test_rendering_reported_status(self):

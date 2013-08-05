@@ -1096,7 +1096,7 @@ class FormulaEquationInput(InputTypeBase):
             reported_status = self.status
 
         return {
-            'previewer': '/static/js/capa/formula_equation_preview.js',
+            'previewer': '/static/js/capa/src/formula_equation_preview.js',
             'reported_status': reported_status
         }
 
