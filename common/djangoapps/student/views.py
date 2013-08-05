@@ -96,8 +96,6 @@ def index(request, extra_context={}, user=None):
 
     context = {'courses': courses}
 
-    context = {'courses': courses, 'news': top_news}
-
     context.update(extra_context)
     return render_to_response('index.html', context)
 
