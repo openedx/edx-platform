@@ -173,7 +173,7 @@ section.problem {
       }
     }
 
-    &.incorrect, &.ui-icon-close {
+    &.incorrect, &.incomplete, &.ui-icon-close {
       p.status {
         @include inline-block();
         background: url('../images/incorrect-icon.png') center center no-repeat;
@@ -275,7 +275,7 @@ section.problem {
         width: 25px;
       }
 
-      &.incorrect, &.ui-icon-close {
+      &.incorrect, &.incomplete, &.ui-icon-close {
         @include inline-block();
         background: url('../images/incorrect-icon.png') center center no-repeat;
         height: 20px;

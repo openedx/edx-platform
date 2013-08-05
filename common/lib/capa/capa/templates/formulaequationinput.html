@@ -1,41 +1,20 @@
 <section id="formulaequationinput_${id}" class="formulaequationinput">
-    <div class="script_placeholder" data-src="${previewer}"/>
+  <div class="${reported_status}" id="status_${id}">
+    <input type="text" name="input_${id}" id="input_${id}"
+	   data-input-id="${id}" value="${value|h}"
+	   % if size:
+	   size="${size}"
+	   % endif
+	   />
 
-    % if status == 'unsubmitted':
-    <div class="unanswered" id="status_${id}">
-    % elif status == 'correct':
-    <div class="correct" id="status_${id}">
-    % elif status == 'incorrect':
-    <div class="incorrect" id="status_${id}">
-    % elif status == 'incomplete':
-    <div class="incorrect" id="status_${id}">
-    % endif
-
-    <input type="text" name="input_${id}" id="input_${id}" data-input-id="${id}" value="${value|h}"
-   % if size:
-   size="${size}"
-   % endif
-   />
-
-      <p class="status">
-        % if status == 'unsubmitted':
-        unanswered
-        % elif status == 'correct':
-        correct
-        % elif status == 'incorrect':
-        incorrect
-        % elif status == 'incomplete':
-        incomplete
-        % endif
-      </p>
+      <p class="status">${reported_status}</p>
 
       <div id="input_${id}_preview" class="equation">
         \[\]
         <img src="/static/images/spinner.gif" class="loading"/>
       </div>
-  <p id="answer_${id}" class="answer"></p>
+    <p id="answer_${id}" class="answer"></p>
+  </div>
 
-% if status in ['unsubmitted', 'correct', 'incorrect', 'incomplete']:
-</div>
-% endif
+  <div class="script_placeholder" data-src="${previewer}"/>
 </section>

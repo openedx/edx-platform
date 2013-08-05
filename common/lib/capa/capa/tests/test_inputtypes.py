@@ -809,6 +809,24 @@ class FormulaEquationTest(unittest.TestCase):
                     }
         self.assertEqual(context, expected)
 
+    def test_rendering_reported_status(self):
+        """
+        Verify that the 'reported status' matches expectations.
+        """
+        test_values = {
+            '': '',  # Default
+            'unsubmitted': 'unanswered',
+            'correct': 'correct',
+            'incorrect': 'incorrect',
+            'incomplete': 'incomplete',
+            'not a status': ''
+        }
+
+        for self_status, reported_status in test_values.iteritems():
+            self.the_input.status = self_status
+            context = self.the_input._get_render_context()  # pylint: disable=W0212
+            self.assertEqual(context['reported_status'], reported_status)
+
     def test_formcalc_ajax_sucess(self):
         """
         Verify that using the correct dispatch and valid data produces a valid response

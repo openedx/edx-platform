@@ -1086,9 +1086,19 @@ class FormulaEquationInput(InputTypeBase):
 
     def _extra_context(self):
         """
-        TODO (vshnayder): Get rid of this once we have a standard way of requiring js to be loaded.
+        TODO (vshnayder): Get rid of 'previewer' once we have a standard way of requiring js to be loaded.
         """
-        return {'previewer': '/static/js/capa/formula_equation_preview.js', }
+        # `reported_status` is basically `status`, except we say 'unanswered'
+        reported_status = ''
+        if self.status == 'unsubmitted':
+            reported_status = 'unanswered'
+        elif self.status in ('correct', 'incorrect', 'incomplete'):
+            reported_status = self.status
+
+        return {
+            'previewer': '/static/js/capa/formula_equation_preview.js',
+            'reported_status': reported_status
+        }
 
     def handle_ajax(self, dispatch, get):
         '''
