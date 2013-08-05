@@ -318,7 +318,14 @@ function (HTML5Video) {
         availablePlaybackRates = this.videoPlayer.player.getAvailablePlaybackRates();
         if ((this.currentPlayerMode === 'html5') && (this.videoType === 'youtube')) {
             if (availablePlaybackRates.length === 1) {
-                restartUsingFlash(this);
+                // This condition is needed in cases when Firefox version is less than 20. In those versions
+                // HTML5 playback could only happen at 1 speed (no speed changing). Therefore, in this case,
+                // we need to switch back to Flash.
+                //
+                // This might also happen in other browsers, therefore when we have 1 speed available, we fall
+                // back to Flash.
+
+                _restartUsingFlash(this);
 
                 return;
             } else if (availablePlaybackRates.length > 1) {
