@@ -1,7 +1,7 @@
 """
 Unit tests for instructor.api methods.
 """
-
+import unittest
 import json
 from urllib import quote
 from django.test import TestCase
@@ -9,6 +9,7 @@ from nose.tools import raises
 from mock import Mock
 from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
+from django.http import HttpRequest, HttpResponse
 
 from django.contrib.auth.models import User
 from courseware.tests.modulestore_config import TEST_DATA_MONGO_MODULESTORE
@@ -21,7 +22,63 @@ from student.models import CourseEnrollment
 from courseware.models import StudentModule
 
 from instructor.access import allow_access
-from instructor.views.api import _split_input_list, _msk_from_problem_urlname
+from instructor.views.api import (
+    _split_input_list, _msk_from_problem_urlname, common_exceptions_400)
+from instructor_task.api_helper import AlreadyRunningError
+
+
+@common_exceptions_400
+def view_success(request):
+    "A dummy view for testing that returns a simple HTTP response"
+    return HttpResponse('success')
+
+
+@common_exceptions_400
+def view_user_doesnotexist(request):
+    "A dummy view that raises a User.DoesNotExist exception"
+    raise User.DoesNotExist()
+
+
+@common_exceptions_400
+def view_alreadyrunningerror(request):
+    "A dummy view that raises an AlreadyRunningError exception"
+    raise AlreadyRunningError()
+
+
+class TestCommonExceptions400(unittest.TestCase):
+    def setUp(self):
+        self.request = Mock(spec=HttpRequest)
+        self.request.META = {}
+
+    def test_happy_path(self):
+        resp = view_success(self.request)
+        self.assertEqual(resp.status_code, 200)
+
+    def test_user_doesnotexist(self):
+        self.request.is_ajax.return_value = False
+        resp = view_user_doesnotexist(self.request)
+        self.assertEqual(resp.status_code, 400)
+        self.assertIn("User does not exist", resp.content)
+
+    def test_user_doesnotexist_ajax(self):
+        self.request.is_ajax.return_value = True
+        resp = view_user_doesnotexist(self.request)
+        self.assertEqual(resp.status_code, 400)
+        result = json.loads(resp.content)
+        self.assertIn("User does not exist", result["error"])
+
+    def test_alreadyrunningerror(self):
+        self.request.is_ajax.return_value = False
+        resp = view_alreadyrunningerror(self.request)
+        self.assertEqual(resp.status_code, 400)
+        self.assertIn("Task is already running", resp.content)
+
+    def test_alreadyrunningerror_ajax(self):
+        self.request.is_ajax.return_value = True
+        resp = view_alreadyrunningerror(self.request)
+        self.assertEqual(resp.status_code, 400)
+        result = json.loads(resp.content)
+        self.assertIn("Task is already running", result["error"])
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
