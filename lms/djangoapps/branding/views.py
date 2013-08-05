@@ -28,10 +28,13 @@ def index(request):
         return redirect(settings.MKTG_URLS.get('ROOT'))
 
     university = branding.get_university(request.META.get('HTTP_HOST'))
-    if university is None:
-        return student.views.index(request, user=request.user)
+    if university == 'edge':
+        return render_to_response('university_profile/edge.html', {})
 
-    return render_to_response('university_profile/edge.html', {})
+    #  we do not expect this case to be reached in cases where
+    #  marketing and edge are enabled
+    return student.views.index(request, user=request.user)
+
 
 
 @ensure_csrf_cookie
@@ -46,7 +49,9 @@ def courses(request):
         return redirect(marketing_link('COURSES'), permanent=True)
 
     university = branding.get_university(request.META.get('HTTP_HOST'))
-    if university is None:
-        return courseware.views.courses(request)
+    if university == 'edge':
+        return render_to_response('university_profile/edge.html', {})
 
-    return render_to_response('university_profile/edge.html', {})
+    #  we do not expect this case to be reached in cases where
+    #  marketing and edge are enabled
+    return courseware.views.courses(request)
