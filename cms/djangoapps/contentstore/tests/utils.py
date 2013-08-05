@@ -5,6 +5,7 @@ Utilities for contentstore tests
 import json
 
 from student.models import Registration
+from student.models import CourseEnrollment
 from django.contrib.auth.models import User
 from django.test.client import Client
 
@@ -25,6 +26,15 @@ def user(email):
 def registration(email):
     """look up registration object by email"""
     return Registration.objects.get(user__email=email)
+
+
+def get_enrollment_count(user, course_id):
+    """
+    Gets the number of enrolled registrants for given course and user=self.user.
+
+    This should always be 0 or 1.
+    """
+    return CourseEnrollment.objects.filter(user=user, course_id=course_id).count()
 
 
 class CourseTestCase(ModuleStoreTestCase):
