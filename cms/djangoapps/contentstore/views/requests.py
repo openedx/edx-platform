@@ -12,7 +12,7 @@ def landing(request, org, course, coursename):
 
 # points to the temporary edge page
 def edge(request):
-    return redirect('/dashboard')
+    return redirect('/')
 
 
 def event(request):
