@@ -48,17 +48,17 @@ def common_exceptions_400(func):
         try:
             return func(request, *args, **kwargs)
         except User.DoesNotExist:
-            message = "User does not exist."
+            message = _("User does not exist.")
             if use_json:
-                return JsonResponse({"error": _(message)}, 400)
+                return JsonResponse({"error": message}, 400)
             else:
-                return HttpResponseBadRequest(_(message))
+                return HttpResponseBadRequest(message)
         except AlreadyRunningError:
-            message = "Task is already running."
+            message = _("Task is already running.")
             if use_json:
-                return JsonResponse({"error": _(message)}, 400)
+                return JsonResponse({"error": message}, 400)
             else:
-                return HttpResponseBadRequest(_(message))
+                return HttpResponseBadRequest(message)
     return wrapped
 
 
