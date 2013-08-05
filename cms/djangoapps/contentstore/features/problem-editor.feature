@@ -44,11 +44,13 @@ Feature: Problem Editor
     When I edit and select Settings
     Then if I set the weight to "abc", it remains unset
 
+  #CHROME ONLY
   Scenario: User cannot type decimal values integer number field
     Given I have created a Blank Common Problem
     When I edit and select Settings
     Then if I set the max attempts to "2.34", it displays initially as "234", and is persisted as "234"
 
+  #CHROME ONLY
   Scenario: User cannot type out of range values in an integer number field
     Given I have created a Blank Common Problem
     When I edit and select Settings
