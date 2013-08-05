@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-
+""" Tests for editing descriptors"""
 import unittest
 import os
 import logging

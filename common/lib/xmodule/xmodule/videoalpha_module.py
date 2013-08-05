@@ -190,7 +190,6 @@ class VideoAlphaModule(VideoAlphaFields, XModule):
 class VideoAlphaDescriptor(VideoAlphaFields, TabsEditingDescriptor):
     """Descriptor for `VideoAlphaModule`."""
     module_class = VideoAlphaModule
-    template_dir_name = "videoalpha"
 
     tabs = [
         {
