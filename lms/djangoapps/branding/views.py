@@ -2,8 +2,10 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.shortcuts import redirect
 from django_future.csrf import ensure_csrf_cookie
+from mitxmako.shortcuts import render_to_response
 
 import student.views
+import branding
 import courseware.views
 from mitxmako.shortcuts import marketing_link
 from util.cache import cache_if_anonymous
@@ -25,7 +27,11 @@ def index(request):
     if settings.MITX_FEATURES.get('ENABLE_MKTG_SITE'):
         return redirect(settings.MKTG_URLS.get('ROOT'))
 
-    return student.views.index(request, user=request.user)
+    university = branding.get_university(request.META.get('HTTP_HOST'))
+    if university is None:
+        return student.views.index(request, user=request.user)
+
+    return render_to_response('university_profile/edge.html', {})
 
 
 @ensure_csrf_cookie
@@ -39,4 +45,8 @@ def courses(request):
     if settings.MITX_FEATURES.get('ENABLE_MKTG_SITE', False):
         return redirect(marketing_link('COURSES'), permanent=True)
 
-    return courseware.views.courses(request)
+    university = branding.get_university(request.META.get('HTTP_HOST'))
+    if university is None:
+        return courseware.views.courses(request)
+
+    return render_to_response('university_profile/edge.html', {})
