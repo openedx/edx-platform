@@ -61,7 +61,7 @@ def find(request, course_id):
                 {
                 "default_field": "searchable_text",
                 "query": query,
-                "analyzer": "standard"
+                "analyzer": "whitespace"
                 }
             }
         }
@@ -82,13 +82,18 @@ def find(request, course_id):
     log.debug(query)
     # full_query_data.update({"from": 0, "size": 10000})
     full_query_data.update(
-        {"suggest":
-            {"searchable_text_suggestions":
-                {"text": query, "term": {"size": "2", "field": "searchable_text", "max_term_freq": "50"}
+        {"suggest": {
+            "text": query,
+            "simple_phrase": {
+                "phrase": {
+                    "field": "searchable_text",
+                    "size": "4",
+                    "max_errors": "2",
+                    "real_word_error_likelihood": "0.99",
                 }
             }
         }
-    )
+    })
     log.debug(full_query_data)
     context = {}
     response = requests.get(base_url, data=json.dumps(full_query_data))
@@ -97,7 +102,8 @@ def find(request, course_id):
     data.filter_and_sort()
     context.update({"results": len(data) > 0})
     correction = spell_check(response.content)
-
+    if correction == query:
+        correction = ""
     context.update({
         "data": data,
         "old_query": query,
@@ -134,6 +140,6 @@ def spell_check(es_response):
     """
     suggestions = json.loads(es_response)["suggest"]["searchable_text_suggestions"]
     hits = json.loads(es_response)["hits"].get("total", 0)
-    correction = [[entry["text"] if entry["freq"] > hits else [] for entry in term["options"]] for term in suggestions]
-    true_correction = [correction[i] or [suggestions[i]["text"]] for i,_ in enumerate(correction)]
+    correction = [[entry["text"] if entry["freq"] > 0.1*hits else [] for entry in term["options"]] for term in suggestions]
+    true_correction = [correction[i] or [suggestions[i]["text"]] for i in xrange(len(correction))]
     return " ".join(attempt[0] for attempt in true_correction)
