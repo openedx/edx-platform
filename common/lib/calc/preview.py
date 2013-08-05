@@ -158,7 +158,7 @@ def function_closure(functions, casify):
         """
         fname = children[0].latex
         if casify(fname) not in functions:
-            pass
+            pass  # TODO turn unknown function red or give some kind of error
 
         # Wrap the input of the function with parens or braces.
         inner = children[1].latex

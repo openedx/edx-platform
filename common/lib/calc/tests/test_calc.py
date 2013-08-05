@@ -50,10 +50,7 @@ class EvaluatorTest(unittest.TestCase):
         """
         Test that things like '4.' will be 4 and not throw an error
         """
-        try:
-            self.assertEqual(4.0, calc.evaluator({}, {}, '4.'))
-        except ParseException:  # pragma: no cover
-            self.fail("'4.' is a valid input, but threw an exception")
+        self.assertEqual(4.0, calc.evaluator({}, {}, '4.'))
 
     def test_exponential_answer(self):
         """
@@ -362,17 +359,14 @@ class EvaluatorTest(unittest.TestCase):
 
         # Of the form ('expr', python value, tolerance (or None for exact))
         default_variables = [
+            ('i', 1j, None),
             ('j', 1j, None),
-            ('e', 2.7183, 1e-3),
-            ('pi', 3.1416, 1e-3),
-            # c = speed of light
-            ('c', 2.998e8, 1e5),
-            # 0 deg C = T Kelvin
-            ('T', 298.15, 0.01),
-            # Note k = scipy.constants.k = 1.3806488e-23
-            ('k', 1.3806488e-23, 1e-26),
-            # Note q = scipy.constants.e = 1.602176565e-19
-            ('q', 1.602176565e-19, 1e-22)
+            ('e', 2.7183, 1e-4),
+            ('pi', 3.1416, 1e-4),
+            ('k', 1.3806488e-23, 1e-26),  # Boltzmann constant (Joules/Kelvin)
+            ('c', 2.998e8, 1e5),  # Light Speed in (m/s)
+            ('T', 298.15, 0.01),  # 0 deg C = T Kelvin
+            ('q', 1.602176565e-19, 1e-22)  # Fund. Charge (Coulombs)
         ]
         for (variable, value, tolerance) in default_variables:
             fail_msg = "Failed on constant '{0}', not within bounds".format(
@@ -382,8 +376,10 @@ class EvaluatorTest(unittest.TestCase):
             if tolerance is None:
                 self.assertEqual(value, result, msg=fail_msg)
             else:
-                self.assertAlmostEqual(value, result,
-                                       delta=tolerance, msg=fail_msg)
+                self.assertAlmostEqual(
+                    value, result,
+                    delta=tolerance, msg=fail_msg
+                )
 
     def test_complex_expression(self):
         """
@@ -514,20 +510,35 @@ class EvaluatorTest(unittest.TestCase):
             -1, delta=1e-3
         )
 
-    def test_function_case_sensitivity(self):
+    def test_function_case_insensitive(self):
         """
-        Test the case sensitivity of functions
-        """
-        functions = {'f': lambda x: x, 'F': lambda x: x + 1}
+        Test case insensitive evaluation
 
-        # Test case insensitive evaluation
-        # Both evaulations should call the same function
-        self.assertEqual(calc.evaluator({}, functions, 'f(6)'),
-                         calc.evaluator({}, functions, 'F(6)'))
-        # Test case sensitive evaluation
-        self.assertNotEqual(
-            calc.evaluator({}, functions, 'f(6)', case_sensitive=True),
-            calc.evaluator({}, functions, 'F(6)', case_sensitive=True)
+        Normal functions with some capitals should be fine
+        """
+        self.assertAlmostEqual(
+            -0.28,
+            calc.evaluator({}, {}, 'SiN(6)', case_sensitive=False),
+            delta=1e-3
+        )
+
+    def test_function_case_sensitive(self):
+        """
+        Test case sensitive evaluation
+
+        Incorrectly capitilized should fail
+        Also, it should pick the correct version of a function.
+        """
+        with self.assertRaisesRegexp(calc.UndefinedVariable, 'SiN'):
+            calc.evaluator({}, {}, 'SiN(6)', case_sensitive=True)
+
+        # With case sensitive turned on, it should pick the right function
+        functions = {'f': lambda x: x, 'F': lambda x: x + 1}
+        self.assertEqual(
+            calc.evaluator({}, functions, 'f(6)', case_sensitive=True), 6
+        )
+        self.assertEqual(
+            calc.evaluator({}, functions, 'F(6)', case_sensitive=True), 7
         )
 
     def test_undefined_vars(self):

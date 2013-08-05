@@ -60,10 +60,10 @@ DEFAULT_VARIABLES = {
     'j': numpy.complex(0, 1),
     'e': numpy.e,
     'pi': numpy.pi,
-    'k': scipy.constants.k,
-    'c': scipy.constants.c,
-    'T': 298.15,
-    'q': scipy.constants.e
+    'k': scipy.constants.k,  # Boltzmann: 1.3806488e-23 (Joules/Kelvin)
+    'c': scipy.constants.c,  # Light Speed: 2.998e8 (m/s)
+    'T': 298.15,  # 0 deg C = T Kelvin
+    'q': scipy.constants.e  # Fund. Charge: 1.602176565e-19 (Coulombs)
 }
 
 # We eliminated the following extreme suffixes:
@@ -126,8 +126,9 @@ def eval_atom(parse_result):
 
     In the case of parenthesis, ignore them.
     """
-    float_children = [k for k in parse_result if isinstance(k, numbers.Number)]
-    return float_children[0]
+    # Find first number in the list
+    result = next(k for k in parse_result if isinstance(k, numbers.Number))
+    return result
 
 
 def eval_power(parse_result):

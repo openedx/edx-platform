@@ -729,9 +729,56 @@ class ChemicalEquationTest(unittest.TestCase):
         data = {'formula': "H"}
         response = self.the_input.handle_ajax("preview_chemcalc", data)
 
-        self.assertTrue('preview' in response)
+        self.assertIn('preview', response)
         self.assertNotEqual(response['preview'], '')
         self.assertEqual(response['error'], "")
+
+    def test_ajax_bad_method(self):
+        """
+        With a bad dispatch, we shouldn't recieve anything
+        """
+        response = self.the_input.handle_ajax("obviously_not_real", {})
+        self.assertEqual(response, {})
+
+    def test_ajax_no_formula(self):
+        """
+        When we ask for a formula rendering, there should be an error if no formula
+        """
+        response = self.the_input.handle_ajax("preview_chemcalc", {})
+        self.assertIn('error', response)
+        self.assertEqual(response['error'], "No formula specified.")
+
+    def test_ajax_parse_err(self):
+        """
+        With parse errors, ChemicalEquationInput should give an error message
+        """
+        # Simulate answering a problem that raises the exception
+        with patch('capa.inputtypes.chemcalc.render_to_html') as mock_render:
+            mock_render.side_effect = ParseException(u"ȧƈƈḗƞŧḗḓ ŧḗẋŧ ƒǿř ŧḗşŧīƞɠ")
+            response = self.the_input.handle_ajax(
+                "preview_chemcalc",
+                {'formula': 'H2O + invalid chemistry'}
+            )
+
+        self.assertIn('error', response)
+        self.assertTrue("Couldn't parse formula" in response['error'])
+
+    @patch('capa.inputtypes.log')
+    def test_ajax_other_err(self, mock_log):
+        """
+        With other errors, test that ChemicalEquationInput also logs it
+        """
+        with patch('capa.inputtypes.chemcalc.render_to_html') as mock_render:
+            mock_render.side_effect = Exception()
+            response = self.the_input.handle_ajax(
+                "preview_chemcalc",
+                {'formula': 'H2O + superterrible chemistry'}
+            )
+        mock_log.warning.assert_called_once_with(
+            "Error while previewing chemical formula", exc_info=True
+        )
+        self.assertIn('error', response)
+        self.assertEqual(response['error'], "Error while rendering preview")
 
 
 class FormulaEquationTest(unittest.TestCase):
@@ -744,7 +791,7 @@ class FormulaEquationTest(unittest.TestCase):
 
         element = etree.fromstring(xml_str)
 
-        state = {'value': 'x^2+1/2', }
+        state = {'value': 'x^2+1/2'}
         self.the_input = lookup_tag('formulaequationinput')(test_system(), element, state)
 
     def test_rendering(self):
@@ -769,7 +816,7 @@ class FormulaEquationTest(unittest.TestCase):
         data = {'formula': "x^2+1/2", 'request_start': 0}
         response = self.the_input.handle_ajax("preview_formcalc", data)
 
-        self.assertTrue('preview' in response)
+        self.assertIn('preview', response)
         self.assertNotEqual(response['preview'], '')
         self.assertEqual(response['error'], "")
         self.assertEqual(response['request_start'], data['request_start'])
@@ -787,9 +834,9 @@ class FormulaEquationTest(unittest.TestCase):
         """
         response = self.the_input.handle_ajax(
             "preview_formcalc",
-            {'formula': None, 'request_start': 1, }
+            {'request_start': 1, }
         )
-        self.assertTrue('error' in response)
+        self.assertIn('error', response)
         self.assertEqual(response['error'], "No formula specified.")
 
     def test_ajax_parse_err(self):
@@ -804,8 +851,9 @@ class FormulaEquationTest(unittest.TestCase):
                 {'formula': 'x^2+1/2', 'request_start': 1, }
             )
 
-        self.assertTrue('error' in response)
-        self.assertTrue("Couldn't parse formula" in response['error'])
+        self.assertIn('error', response)
+        self.assertEqual(response['error'],
+                         u"Couldn't parse formula: ȧƈƈḗƞŧḗḓ ŧḗẋŧ ƒǿř ŧḗşŧīƞɠ")
 
     @patch('capa.inputtypes.log')
     def test_ajax_other_err(self, mock_log):
@@ -821,7 +869,7 @@ class FormulaEquationTest(unittest.TestCase):
         mock_log.warning.assert_called_once_with(
             "Error while previewing formula", exc_info=True
         )
-        self.assertTrue('error' in response)
+        self.assertIn('error', response)
         self.assertEqual(response['error'], "Error while rendering preview")
 
 

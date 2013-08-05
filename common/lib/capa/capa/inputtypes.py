@@ -1040,15 +1040,16 @@ class ChemicalEquationInput(InputTypeBase):
 
         result = {'preview': '',
                   'error': ''}
-        formula = data['formula']
-        if formula is None:
+        try:
+            formula = data['formula']
+        except KeyError:
             result['error'] = "No formula specified."
             return result
 
         try:
             result['preview'] = chemcalc.render_to_html(formula)
         except pyparsing.ParseException as p:
-            result['error'] = "Couldn't parse formula: {0}".format(p)
+            result['error'] = u"Couldn't parse formula: {0}".format(p.msg)
         except Exception:
             # this is unexpected, so log
             log.warning(
@@ -1100,12 +1101,12 @@ class FormulaEquationInput(InputTypeBase):
 
     def preview_formcalc(self, get):
         """
-        Render an html preview of a formula formula or equation.  get should
-        contain a key 'formula' and value 'some formula string'.
+        Render an preview of a formula or equation. `get` should
+        contain a key 'formula' with a math expression.
 
         Returns a json dictionary:
         {
-           'preview' : 'the-preview-html' or ''
+           'preview' : '<some latex>' or ''
            'error' : 'the-error' or ''
            'request_start' : <time sent with request>
         }
@@ -1113,17 +1114,23 @@ class FormulaEquationInput(InputTypeBase):
 
         result = {'preview': '',
                   'error': ''}
-        formula = get['formula']
-        if formula is None:
+
+        try:
+            formula = get['formula']
+        except KeyError:
             result['error'] = "No formula specified."
             return result
 
-        result['request_start'] = int(get['request_start'])
+        result['request_start'] = int(get.get('request_start', 0))
 
         try:
-            result['preview'] = latex_preview(formula)  # TODO add references to variables, etc&
+            # TODO add references to valid variables and functions
+            # At some point, we might want to mark invalid variables as red
+            # or something, and this is where we would need to pass those in.
+            result['preview'] = latex_preview(formula)
         except pyparsing.ParseException as err:
-            result['error'] = u"Couldn't parse formula: {0}".format(err.message)
+            result['error'] = u"Couldn't parse formula: {}".format(err.msg)
+            result['formula'] = formula
         except Exception:
             # this is unexpected, so log
             log.warning(
