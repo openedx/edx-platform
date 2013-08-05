@@ -14,6 +14,7 @@ from xmodule.stringify import stringify_children
 from xmodule.x_module import XModule
 from xmodule.xml_module import XmlDescriptor, name_to_pathname
 import textwrap
+from xmodule.contentstore.content import StaticContent
 
 log = logging.getLogger("mitx.courseware")
 
@@ -78,6 +79,13 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):
             if candidate.endswith('.xml'):
                 nc.append(candidate[:-4] + '.html')
         return candidates + nc
+
+    def get_context(self):
+        _context = EditingDescriptor.get_context(self)
+        # Add our specific template information (the raw data body)
+
+        _context.update({'base_asset_url': StaticContent.get_base_url_path_for_course_assets(self.location) + '/'})
+        return _context
 
     # NOTE: html descriptors are special.  We do not want to parse and
     # export them ourselves, because that can break things (e.g. lxml

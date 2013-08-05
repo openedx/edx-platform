@@ -3,6 +3,7 @@ class @HTMLEditingDescriptor
 
   constructor: (element) ->
     @element = element;
+    @base_asset_url = @element.find("#editor-tab").data('base-asset-url')
 
     @advanced_editor = CodeMirror.fromTextArea($(".edit-box", @element)[0], {
       mode: "text/html"
@@ -95,7 +96,10 @@ class @HTMLEditingDescriptor
   # Show the Advanced (codemirror) Editor. Pulled out as a helper method for unit testing.
   showAdvancedEditor: (visualEditor) ->
     if visualEditor.isDirty()
-      @advanced_editor.setValue(visualEditor.getContent({no_events: 1}))
+      content = visualEditor.getContent({no_events: 1})
+      regex = new RegExp(@base_asset_url, 'g')
+      content = content.replace(regex, '/static/')
+      @advanced_editor.setValue(content)
       @advanced_editor.setCursor(0)
     @advanced_editor.refresh()
     @advanced_editor.focus()
@@ -103,7 +107,6 @@ class @HTMLEditingDescriptor
 
   # Show the Visual (tinyMCE) Editor. Pulled out as a helper method for unit testing.
   showVisualEditor: (visualEditor) ->
-    visualEditor.setContent(@advanced_editor.getValue())
     # In order for isDirty() to return true ONLY if edits have been made after setting the text,
     # both the startContent must be sync'ed up and the dirty flag set to false.
     visualEditor.startContent = visualEditor.getContent({format: "raw", no_events: 1});
@@ -111,6 +114,11 @@ class @HTMLEditingDescriptor
     @showingVisualEditor = true
 
   focusVisualEditor: (visualEditor) =>
+    content = @advanced_editor.getValue()
+    regex = new RegExp('/static/', 'g')
+    content = content.replace(regex, @base_asset_url)
+    visualEditor.setContent(content)
+
     visualEditor.focus()
     # Need to mark editor as not dirty both when it is initially created and when we switch back to it.
     visualEditor.isNotDirty = true
@@ -132,4 +140,6 @@ class @HTMLEditingDescriptor
     visualEditor = @getVisualEditor()
     if @showingVisualEditor and visualEditor.isDirty()
       text = visualEditor.getContent({no_events: 1})
+      regex = new RegExp(@base_asset_url, 'g')
+      text = text.replace(regex, '/static/')
     data: text
