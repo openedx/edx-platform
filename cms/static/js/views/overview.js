@@ -12,7 +12,7 @@ $(document).ready(function() {
         '.id-holder',
         'a.subsection-drag-handle',
         '.subsection-list > ol',
-        '.subsection-list > ol'
+        '.courseware-section'
     );
     // Unit
     makeDraggable(
@@ -23,8 +23,9 @@ $(document).ready(function() {
     );
 
     /*
-     * Make `type` draggable using `handleClass`, and able to be
-     * dropped into `droppableClass`.
+     * Make `type` draggable using `handleClass`, able to be dropped
+     * into `droppableClass`, and with parent type
+     * `parentLocationSelector`.
      */
     function makeDraggable(type, handleClass, droppableClass, parentLocationSelector) {
         _.each(
@@ -61,32 +62,44 @@ $(document).ready(function() {
             var siblings = container.children().filter(function () {
                 return $(this).data('id') !== undefined && !$(this).is(ele);
             });
-            // If the list is empty, we should prepend to it
-            if(siblings.length == 0) {
-                if(Math.abs(eleY - container.offset().top) < 50) {
+            // If the container is collapsed, check to see if the
+            // element is on top of its parent list -- don't check the
+            // position of the container
+            var parentList = container.parents(ele.data('parent-location-selector')).first();
+            if(parentList.hasClass('collapsed')) {
+                if(Math.abs(eleY - parentList.offset().top) < 50) {
+                    return {
+                        ele: container,
+                        attachMethod: 'prepend',
+                        parentList: parentList
+                    };
+                }
+            }
+            // Otherwise, do check the container
+            else {
+                // If the list is empty, we should prepend to it
+                if(siblings.length == 0 &&
+                   Math.abs(eleY - container.offset().top) < 50) {
                     return {
                         ele: container,
                         attachMethod: 'prepend'
                     };
                 }
-            }
-            // Otherwise the list is populated, and we should attach before/after a sibling
-            else {
-                for(var j = 0; j < siblings.length; j++) {
-                    var $sibling = $(siblings[j]);
-                    var siblingHeight = $sibling.height();
-                    var siblingY = $sibling.offset().top;
-
-                    if(Math.abs(eleY - siblingY) < siblingHeight) {
-                        return {
-                            ele: $sibling,
-                            attachMethod: siblingY > eleY ? 'before' : 'after'
-                        };
+                // Otherwise the list is populated, and we should attach before/after a sibling
+                else {
+                    for(var j = 0; j < siblings.length; j++) {
+                        var $sibling = $(siblings[j]);
+                        var siblingY = $sibling.offset().top;
+                        if(Math.abs(eleY - siblingY) < $sibling.height()) {
+                            return {
+                                ele: $sibling,
+                                attachMethod: siblingY > eleY ? 'before' : 'after'
+                            };
+                        }
                     }
                 }
             }
         }
-
         // Failed drag
         return {
             ele: null,
@@ -103,33 +116,56 @@ $(document).ready(function() {
             // Where we started, in case of a failed drag
             offset: ele.offset(),
             // Which element will be dropped into/onto on success
-            dropDestination: null
+            dropDestination: null,
+            // Timer if we're hovering over a collapsed section
+            expandTimer: null,
+            // The list which will be expanded on hover
+            toExpand: null
         };
     }
 
     function onDragMove(draggie, event, pointer) {
         var ele = $(draggie.element);
-        var currentReplacement = findDestination(ele).ele;
+        var destinationInfo = findDestination(ele);
+        var destinationEle = destinationInfo.ele;
+        var parentList = destinationInfo.parentList;
+        // Clear the timer if we're not hovering over any element
+        if(!parentList) {
+            clearTimeout(dragState.expandTimer);
+        }
+        // If we're hovering over a new element, clear the timer and
+        // set a new one
+        else if(!dragState.toExpand || parentList[0] !== dragState.toExpand[0]) {
+            clearTimeout(dragState.expandTimer);
+            dragState.expandTimer = setTimeout(function() {
+                parentList.removeClass('collapsed');
+            }, 1000);
+            dragState.toExpand = parentList;
+        }
         // Clear out the old destination
         if(dragState.dropDestination) {
             dragState.dropDestination.removeClass('drop-destination');
         }
         // Mark the new destination
-        if(currentReplacement) {
-            currentReplacement.addClass('drop-destination');
-            dragState.dropDestination = currentReplacement;
+        if(destinationEle) {
+            destinationEle.addClass('drop-destination');
+            dragState.dropDestination = destinationEle;
         }
     }
 
     function onDragEnd(draggie, event, pointer) {
         var ele = $(draggie.element);
 
-        var intersect = findDestination(ele);
-        var destination = intersect.ele;
-        var method = intersect.attachMethod;
+        var destinationInfo = findDestination(ele);
+        var destination = destinationInfo.ele;
 
         // If the drag succeeded, rearrange the DOM and send the result.
         if(destination) {
+            // Make sure we don't drop into a collapsed element
+            if(destinationInfo.parentList) {
+                destinationInfo.parentList.removeClass('collapsed');
+            }
+            var method = destinationInfo.attachMethod;
             destination[method](ele);
             handleReorder(ele);
         }
@@ -144,6 +180,7 @@ $(document).ready(function() {
         if(dragState.dropDestination) {
             dragState.dropDestination.removeClass('drop-destination');
         }
+        clearTimeout(dragState.expandTimer);
         dragState = {};
     }
 
