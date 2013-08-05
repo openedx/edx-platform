@@ -71,6 +71,8 @@ def press_the_notification_button(_step, name):
         error_showing = world.is_css_present('.is-shown.wrapper-notification-error')
         return confirmation_dismissed or error_showing
     if world.is_firefox():
+        #This is done to explicitly make the changes save on firefox.  It will remove focus from the previously focused element
+        world.trigger_event(css, event='focus')
         world.browser.execute_script("$('{}').click()".format(css))
     else:
         world.css_click(css, success_condition=button_clicked), '%s button not clicked after 5 attempts.' % name
@@ -287,3 +289,5 @@ def type_in_codemirror(index, text):
         g._element.send_keys(Keys.CONTROL + 'a')
     g._element.send_keys(Keys.DELETE)
     g._element.send_keys(text)
+    if world.is_firefox():
+        world.trigger_event('div.CodeMirror', index=index, event='blur')
