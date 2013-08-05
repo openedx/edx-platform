@@ -1,0 +1,24 @@
+<%namespace name='static' file='../../static_content.html'/>
+<%
+  import json
+%>
+
+## js templates
+<script id="metadata-editor-tpl" type="text/template">
+    <%static:include path="js/metadata-editor.underscore" />
+</script>
+
+<script id="metadata-number-entry" type="text/template">
+    <%static:include path="js/metadata-number-entry.underscore" />
+</script>
+
+<script id="metadata-string-entry" type="text/template">
+    <%static:include path="js/metadata-string-entry.underscore" />
+</script>
+
+<script id="metadata-option-entry" type="text/template">
+    <%static:include path="js/metadata-option-entry.underscore" />
+</script>
+
+<div class="wrapper-comp-settings metadata_edit" id="settings-tab" data-metadata='${json.dumps(editable_metadata_fields) | h}'/>
+
