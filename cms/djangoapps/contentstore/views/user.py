@@ -179,7 +179,7 @@ def course_team_user(request, org, course, name, email):
         return JsonResponse()
 
     # all other operations require the requesting user to specify a role
-    if request.META.get("CONTENT_TYPE", "") == "application/json" and request.body:
+    if request.META.get("CONTENT_TYPE", "").startswith("application/json") and request.body:
         try:
             payload = json.loads(request.body)
         except:
