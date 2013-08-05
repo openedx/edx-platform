@@ -262,4 +262,3 @@ When you connect to the LMS, you need to use the public ip.  Use `ifconfig` to f
     If you want an object to be available for the entire scenario, it can be stored in world.scenario_dict.  This object
     is a dictionary that gets refreshed at the beginning on the scenario.  Currently, the current logged in user and the current created course are stored under 'COURSE' and 'USER'.  This will help prevent strings from being hard coded so the
     acceptance tests can become more flexible.
-
