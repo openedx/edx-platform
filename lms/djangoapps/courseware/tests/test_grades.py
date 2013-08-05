@@ -6,12 +6,14 @@ right now.
 from mock import MagicMock
 
 import unittest
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 import courseware.grades as grades
 import courseware.module_render as module_render
 from courseware.model_data import LmsKeyValueStore
 
 from xmodule.graders import Score
-
+from xmodule.modulestore.tests.factories import CourseFactory, XModuleItemFactory
+from xmodule.x_module import XModule 
 
 class FakeChildFactory(object):
     """
@@ -28,6 +30,51 @@ class FakeChildFactory(object):
         out.name = name
         return out
 
+
+class DescriptorWithScoreFactory(XModuleItemFactory):
+    """
+    A fake xmodule descriptory, with scoring functionality.
+    """
+
+    FACTORY_FOR = XModule
+
+    @classmethod
+    def create(cls, **kwargs):
+        """
+        The following kwargs are mandatory:
+        - parent_location
+        - location
+        - template (also a location)
+        - has_score
+
+        If has_score, earned and total must also be kwargs
+        """
+        if kwargs['has_score']:
+            kwargs['get_score'] = lambda: {'score': kwargs['earned'],
+                                           'total': kwargs['total']}
+        return XModuleItemFactory._create(None, kwargs)
+
+
+class TestThing(ModuleStoreTestCase):
+    def test_test_test(self):
+        course = CourseFactory.create(org='test', number='313', display_name='my test')
+        section = ItemFactory.create(
+            parent_location=course.location, 
+            display_name='chapter 1',
+            template='i4x://edx/templates/chapter/Empty'
+        )
+        problem = DescriptorWithScoreFactory.create(
+            parent_location=section.location,
+            display_name='my prob',
+            template='i4x://edx/templates/problem/Blank_Common_Problem',
+            has_score=True,
+            earned=2.0,
+            total=3.0,
+        )
+
+        import nose.tools
+        nose.tools.set_trace()
+        self.assertTrue(False)
 
 class TestGrades(unittest.TestCase):
     """
@@ -98,10 +145,10 @@ class TestGrades(unittest.TestCase):
         request = MagicMock()   # Same as above.
 
         # Monkey patching!
-        def fake_should_grade_section(descriptor, m_d_c, student_id):
+        def fake_should_grade_section(descriptors, m_d_c, student_id):
             """ Always grade :) """
             return True
-        grades.find_should_grade_section = fake_should_grade_section
+        grades.should_grade_section = fake_should_grade_section
 
         def fake_get_module_for_descriptor(student, request, descriptor, m_d_c, course_id):
             """Don't even return anything; this output is not directly used."""
@@ -243,11 +290,11 @@ class TestGrades(unittest.TestCase):
 
 
 
-class TestFindShouldGradeSection(unittest.TestCase):
+class TestShouldGradeSection(unittest.TestCase):
     """
-    Test find_should_grade_section.
+    Test should_grade_section.
 
-    find_should_grade_section should:
+    should_grade_section should:
         return True when at least one problem in the section has been seen in cache
         return True when a module's grades should always be recalculated
         otherwise return False when no problem has been seen in cache
@@ -276,36 +323,36 @@ class TestFindShouldGradeSection(unittest.TestCase):
     def test_not_in_cache(self):
         #Test returning false when not always-recalculating-grades and when no problem has been seen in cache
         fake_xmoduledescriptors = [self.fake_module(False, False) for i in range(5)]
-        result = grades.find_should_grade_section(fake_xmoduledescriptors, self.fake_model_data_cache, 42)
+        result = grades.should_grade_section(fake_xmoduledescriptors, self.fake_model_data_cache, 42)
         self.assertFalse(result)
 
     def test_first_in_cache(self):
         #Test returning true when the first problem has been seen in cache
         fake_xmoduledescriptors = [self.fake_module(True, False)] + [self.fake_module(False, False) for i in range(7)]
-        result = grades.find_should_grade_section(fake_xmoduledescriptors, self.fake_model_data_cache, 42)
+        result = grades.should_grade_section(fake_xmoduledescriptors, self.fake_model_data_cache, 42)
         self.assertTrue(result)
 
     def test_last_in_cache(self):
         #Test returning true when the last problem has been seen in cache
         fake_xmoduledescriptors = [self.fake_module(False, False) for i in range(3)] + [self.fake_module(True, False)]
-        result = grades.find_should_grade_section(fake_xmoduledescriptors, self.fake_model_data_cache, 42)
+        result = grades.should_grade_section(fake_xmoduledescriptors, self.fake_model_data_cache, 42)
         self.assertTrue(result)
 
     def test_all_in_cache(self):
         #Test returning true when all problems have been seen in cache
         fake_xmoduledescriptors = [self.fake_module(True, False) for i in range(9)]
-        result = grades.find_should_grade_section(fake_xmoduledescriptors, self.fake_model_data_cache, 42)
+        result = grades.should_grade_section(fake_xmoduledescriptors, self.fake_model_data_cache, 42)
         self.assertTrue(result)
 
     def test_always_recalculate(self):
         #Test returning true when a module's grades should always be recalculated, even if False otherwise
         fake_xmoduledescriptors = [self.fake_module(False, True) for i in range(2)]
-        result = grades.find_should_grade_section(fake_xmoduledescriptors, self.fake_model_data_cache, 42)
+        result = grades.should_grade_section(fake_xmoduledescriptors, self.fake_model_data_cache, 42)
         self.assertTrue(result)
 
     def test_empty_list(self):
         #Test returning false when the list of xmodule descriptors is empty
-        result = grades.find_should_grade_section([], self.fake_model_data_cache, 42)
+        result = grades.should_grade_section([], self.fake_model_data_cache, 42)
         self.assertFalse(result)
 
 

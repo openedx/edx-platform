@@ -201,19 +201,16 @@ def compute_graded_total(section_descriptor, xmoduledescriptors, student, course
     - model_data_cache: is an output of ModelDataCache(...)
     - request: the original HTTP request; needed to pass into get_module_for_descriptor
 
-    @return a tuple: (graded_total, add_raw_scores)
+    @return a tuple: (graded_total, raw_scores)
         - graded_total: a Score -- either the output of graders.aggregate_scores, or 0/1 if not should_grade_section
-        - add_raw_scores: a list of Score objects to be added to raw_scores within grade()
+        - raw_scores: a list of Score objects to be added to raw_scores within grade()
     """
 
     section_name = section_descriptor.display_name_with_default
 
     raw_scores = []
 
-    #Moved to helper method
-    should_grade_section = find_should_grade_section(xmoduledescriptors, model_data_cache, student.id)
-
-    if should_grade_section:
+    if should_grade_section(xmoduledescriptors, model_data_cache, student.id):
         scores = []
 
         def create_module(descriptor):
@@ -251,14 +248,14 @@ def compute_graded_total(section_descriptor, xmoduledescriptors, student, course
     return graded_total, raw_scores
 
 
-def find_should_grade_section(xmoduledescriptors, model_data_cache, student_id):
+def should_grade_section(xmoduledescriptors, model_data_cache, student_id):
     """
     Determines whether a section should be graded or not.
 
     If the moduledescriptor is found in the model data cache, it should be graded.
     Also, if any moduledescriptor in a section should be graded, the entire section should be.
 
-    - xmoduledescriptors: a list of moduledescriptors
+    - xmoduledescriptors: a list of moduledescriptors in this section.
     - model_data_cache: is an output of ModelDataCache(...)
     - student_id: student.id, where student is a User
 
