@@ -23,7 +23,7 @@ from course_creators.views import (
 
 from .access import has_access
 
-from student.models import CourseEnrollment
+from student.views import enroll_in_course
 
 
 @login_required
@@ -204,7 +204,7 @@ def course_team_user(request, org, course, name, email):
         user.groups.add(groups["instructor"])
         user.save()
         # auto-enroll the course creator in the course so that "View Live" will work.
-        CourseEnrollment.objects.get_or_create(user=user, course_id=location.course_id)
+        enroll_in_course(user, location.course_id)
     elif role == "staff":
         # if we're trying to downgrade a user from "instructor" to "staff",
         # make sure we have at least one other instructor in the course team.
@@ -219,7 +219,7 @@ def course_team_user(request, org, course, name, email):
         user.groups.add(groups["staff"])
         user.save()
         # auto-enroll the course creator in the course so that "View Live" will work.
-        CourseEnrollment.objects.get_or_create(user=user, course_id=location.course_id)
+        enroll_in_course(user, location.course_id)
 
     return JsonResponse()
 

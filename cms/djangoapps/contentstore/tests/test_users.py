@@ -2,10 +2,11 @@
 Tests for contentstore/views/user.py.
 """
 import json
-from .utils import CourseTestCase, get_enrollment_count
+from .utils import CourseTestCase
 from django.contrib.auth.models import User, Group
 from django.core.urlresolvers import reverse
 from auth.authz import get_course_groupname_for_role
+from student.views import is_enrolled_in_course
 
 
 class UsersTestCase(CourseTestCase):
@@ -332,7 +333,7 @@ class UsersTestCase(CourseTestCase):
         # Verify that ext_user is not enrolled in the new course before being added as a staff member.
         self.assert_not_enrolled()
 
-    def test_remove_staff_does_not_enroll(self):
+    def test_remove_staff_does_not_unenroll(self):
         # Add user with staff permissions.
         self.client.post(
             self.detail_url,
@@ -370,14 +371,14 @@ class UsersTestCase(CourseTestCase):
 
     def assert_not_enrolled(self):
         """ Asserts that self.ext_user is not enrolled in self.course. """
-        self.assertEqual(
-            0, get_enrollment_count(self.ext_user, self.course.location.course_id),
+        self.assertFalse(
+            is_enrolled_in_course(self.ext_user, self.course.location.course_id),
             'Did not expect ext_user to be enrolled in course'
         )
 
     def assert_enrolled(self):
         """ Asserts that self.ext_user is enrolled in self.course. """
-        self.assertEqual(
-            1, get_enrollment_count(self.ext_user, self.course.location.course_id),
+        self.assertTrue(
+            is_enrolled_in_course(self.ext_user, self.course.location.course_id),
             'User ext_user should have been enrolled in the course'
         )
