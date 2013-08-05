@@ -66,7 +66,7 @@
   <script src="${static.url('js/course_info.js')}"></script>
 </%block>
 
-<%block name="title"><title>${_("About {course.number}").format(course=course)}</title></%block>
+<%block name="title"><title>${_("About {course.display_number_with_default}").format(course=course) | h}</title></%block>
 
 <section class="course-info">
   <header class="course-profile">
@@ -75,7 +75,7 @@
       <section class="intro">
         <hgroup>
           <h1>
-            ${course.number}: ${get_course_about_section(course, "title")}
+            ${course.display_number_with_default | h}: ${get_course_about_section(course, "title")}
             % if not self.theme_enabled():
               <a href="#">${get_course_about_section(course, "university")}</a>
             % endif
@@ -87,13 +87,15 @@
 	              %if show_courseware_link:
                     <a href="${course_target}">
                 %endif
-                <span class="register disabled">${_("You are registered for this course {course.number}").format(course=course)}</span>
+
+                <span class="register disabled">${_("You are registered for this course {course.display_number_with_default}").format(course=course) | h}</span>
                 %if show_courseware_link:
                     <strong>${_("View Courseware")}</strong>
                     </a>
                 %endif
         %else:
-            <a href="#" class="register">${_("Register for {course.number}").format(course=course)}</a>
+            <a href="#" class="register">${_("Register for {course.display_number_with_default}").format(course=course) | h}</a>
+
             <div id="register_error"></div>
         %endif
         </div>
@@ -162,7 +164,7 @@
         </header>
 
         <ol class="important-dates">
-          <li><div class="icon course-number"></div><p>${_("Course Number")}</p><span class="course-number">${course.number}</span></li>
+          <li><div class="icon course-number"></div><p>${_("Course Number")}</p><span class="course-number">${course.display_number_with_default | h}</span></li>
           <li><div class="icon start"></div><p>${_("Classes Start")}</p><span class="start-date">${course.start_date_text}</span></li>
 
             ## We plan to ditch end_date (which is not stored in course metadata),

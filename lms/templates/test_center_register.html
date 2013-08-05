@@ -95,7 +95,7 @@
   <section class="introduction">
     <header>
       <hgroup>
-        <h2><a href="${reverse('dashboard')}">${get_course_about_section(course, 'university')} ${course.number} ${course.display_name_with_default}</a></h2>
+        <h2><a href="${reverse('dashboard')}">${get_course_about_section(course, 'university')} ${course.display_number_with_default | h} ${course.display_name_with_default | h}</a></h2>
 
         % if registration:
         <h1>${_('Your Pearson VUE Proctored Exam Registration')}</h1>
@@ -442,7 +442,7 @@
    % endif
 
     <div class="details details-course">
-      <h4>${_("About {university} {course_number}").format(university=get_course_about_section(course, 'university'), course_number=course.number)}</h4>
+      <h4>${_("About {university} {course_number}").format(university=get_course_about_section(course, 'university'), course_number=course.course.display_number_with_default) | h}</h4>
       <p>
       % if course.has_ended():
       <span class="label">${_('Course Completed:')}</span> <span class="value">${course.end_date_text}</span>
