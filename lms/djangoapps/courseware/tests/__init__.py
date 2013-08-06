@@ -81,12 +81,16 @@ class BaseTestXmodule(ModuleStoreTestCase):
         # Allow us to assert that the template was called in the same way from
         # different code paths while maintaining the type returned by render_template
         self.runtime.render_template = lambda template, context: u'{!r}, {!r}'.format(template, sorted(context.items()))
+
         model_data = {'location': self.item_descriptor.location}
         model_data.update(self.MODEL_DATA)
 
         self.item_module = self.item_descriptor.module_class(
-            self.runtime, self.item_descriptor, model_data
+            self.runtime,
+            self.item_descriptor,
+            model_data
         )
+
         self.item_url = Location(self.item_module.location).url()
 
         # login all users for acces to Xmodule

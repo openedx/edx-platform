@@ -60,6 +60,12 @@ def edit_component_and_select_settings():
 
 
 @world.absorb
+def edit_component():
+    world.wait_for(lambda _driver: world.css_visible('a.edit-button'))
+    world.css_click('a.edit-button')
+
+
+@world.absorb
 def verify_setting_entry(setting, display_name, value, explicitly_set):
     assert_equal(display_name, setting.find_by_css('.setting-label')[0].value)
     assert_equal(value, setting.find_by_css('.setting-input')[0].value)

@@ -4,6 +4,7 @@
 from . import BaseTestXmodule
 from .test_videoalpha_xml import SOURCE_XML
 from django.conf import settings
+from xmodule.videoalpha_module import _create_youtube_string
 
 
 class TestVideo(BaseTestXmodule):
@@ -14,6 +15,14 @@ class TestVideo(BaseTestXmodule):
     MODEL_DATA = {
         'data': DATA
     }
+
+    def setUp(self):
+        # Since the VideoAlphaDescriptor changes `self._model_data`,
+        # we need to instantiate `self.item_module` through
+        # `self.item_descriptor` rather than directly constructing it
+        super(TestVideo, self).setUp()
+        self.item_module = self.item_descriptor.xmodule(self.runtime)
+        self.item_module.runtime.render_template = lambda template, context: context
 
     def test_handle_ajax_dispatch(self):
         responses = {
@@ -34,22 +43,31 @@ class TestVideo(BaseTestXmodule):
     def test_videoalpha_constructor(self):
         """Make sure that all parameters extracted correclty from xml"""
 
-        fragment = self.runtime.render(self.item_module, None, 'student_view')
+        context = self.item_module.get_html()
+
+        sources = {
+            'main': 'example.mp4',
+            'mp4': 'example.mp4',
+            'webm': 'example.webm',
+            'ogv': 'example.ogv'
+        }
+
         expected_context = {
             'data_dir': getattr(self, 'data_dir', None),
             'caption_asset_path': '/c4x/MITx/999/asset/subs_',
-            'show_captions': self.item_module.show_captions,
-            'display_name': self.item_module.display_name_with_default,
-            'end': self.item_module.end_time,
+            'show_captions': 'true',
+            'display_name': 'A Name',
+            'end': 3610.0,
             'id': self.item_module.location.html_id(),
-            'sources': self.item_module.sources,
-            'start': self.item_module.start_time,
-            'sub': self.item_module.sub,
-            'track': self.item_module.track,
-            'youtube_streams': self.item_module.youtube_streams,
+            'sources': sources,
+            'start': 3603.0,
+            'sub': 'a_sub_file.srt.sjson',
+            'track': '',
+            'youtube_streams': _create_youtube_string(self.item_module),
             'autoplay': settings.MITX_FEATURES.get('AUTOPLAY_VIDEOS', True)
         }
-        self.assertEqual(fragment.content, self.runtime.render_template('videoalpha.html', expected_context))
+
+        self.assertEqual(context, expected_context)
 
 
 class TestVideoNonYouTube(TestVideo):
@@ -57,14 +75,13 @@ class TestVideoNonYouTube(TestVideo):
 
     DATA = """
         <videoalpha show_captions="true"
-        data_dir=""
-        caption_asset_path=""
-        autoplay="true"
+        display_name="A Name"
+        sub="a_sub_file.srt.sjson"
         start_time="01:00:03" end_time="01:00:10"
         >
-            <source src=".../mit-3091x/M-3091X-FA12-L21-3_100.mp4"/>
-            <source src=".../mit-3091x/M-3091X-FA12-L21-3_100.webm"/>
-            <source src=".../mit-3091x/M-3091X-FA12-L21-3_100.ogv"/>
+            <source src="example.mp4"/>
+            <source src="example.webm"/>
+            <source src="example.ogv"/>
         </videoalpha>
     """
     MODEL_DATA = {
@@ -75,20 +92,28 @@ class TestVideoNonYouTube(TestVideo):
         """Make sure that if the 'youtube' attribute is omitted in XML, then
             the template generates an empty string for the YouTube streams.
         """
+        sources = {
+            u'main': u'example.mp4',
+            u'mp4': u'example.mp4',
+            u'webm': u'example.webm',
+            u'ogv': u'example.ogv'
+        }
 
-        fragment = self.runtime.render(self.item_module, None, 'student_view')
+        context = self.item_module.get_html()
+
         expected_context = {
             'data_dir': getattr(self, 'data_dir', None),
             'caption_asset_path': '/c4x/MITx/999/asset/subs_',
-            'show_captions': self.item_module.show_captions,
-            'display_name': self.item_module.display_name_with_default,
-            'end': self.item_module.end_time,
+            'show_captions': 'true',
+            'display_name': 'A Name',
+            'end': 3610.0,
             'id': self.item_module.location.html_id(),
-            'sources': self.item_module.sources,
-            'start': self.item_module.start_time,
-            'sub': self.item_module.sub,
-            'track': self.item_module.track,
-            'youtube_streams': '',
+            'sources': sources,
+            'start': 3603.0,
+            'sub': 'a_sub_file.srt.sjson',
+            'track': '',
+            'youtube_streams': '1.00:OEoXaMPEzfM',
             'autoplay': settings.MITX_FEATURES.get('AUTOPLAY_VIDEOS', True)
         }
-        self.assertEqual(fragment.content, self.runtime.render_template('videoalpha.html', expected_context))
+
+        self.assertEqual(context, expected_context)
