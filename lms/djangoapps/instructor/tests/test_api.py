@@ -8,7 +8,7 @@ from urllib import quote
 from django.conf import settings
 from django.test import TestCase
 from nose.tools import raises
-from mock import Mock
+from mock import Mock, patch
 from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
 from django.http import HttpRequest, HttpResponse
@@ -22,6 +22,9 @@ from student.tests.factories import UserFactory, AdminFactory
 
 from student.models import CourseEnrollment
 from courseware.models import StudentModule
+
+# modules which are mocked in test cases.
+import instructor_task.api
 
 from instructor.access import allow_access
 import instructor.views.api
@@ -572,13 +575,10 @@ class TestInstructorAPIRegradeTask(ModuleStoreTestCase, LoginEnrollmentTestCase)
             0
         )
 
-    def test_reset_student_attempts_all(self):
+    # mock out the function which should be called to execute the action.
+    @patch.object(instructor_task.api, 'submit_reset_problem_attempts_for_all_students')
+    def test_reset_student_attempts_all(self, act):
         """ Test reset all student attempts. """
-        # mock out the function which should be called to execute the action.
-        import instructor_task.api
-        act = Mock(return_value=None)
-        instructor_task.api.submit_reset_problem_attempts_for_all_students = act
-
         url = reverse('reset_student_attempts', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {
             'problem_to_reset': self.problem_urlname,
@@ -629,12 +629,9 @@ class TestInstructorAPIRegradeTask(ModuleStoreTestCase, LoginEnrollmentTestCase)
         print response.content
         self.assertEqual(response.status_code, 400)
 
-    def test_rescore_problem_single(self):
+    @patch.object(instructor_task.api, 'submit_rescore_problem_for_student')
+    def test_rescore_problem_single(self, act):
         """ Test rescoring of a single student. """
-        import instructor_task.api
-        act = Mock(return_value=None)
-        instructor_task.api.submit_rescore_problem_for_student = act
-
         url = reverse('rescore_problem', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {
             'problem_to_reset': self.problem_urlname,
@@ -644,12 +641,9 @@ class TestInstructorAPIRegradeTask(ModuleStoreTestCase, LoginEnrollmentTestCase)
         self.assertEqual(response.status_code, 200)
         self.assertTrue(act.called)
 
-    def test_rescore_problem_all(self):
+    @patch.object(instructor_task.api, 'submit_rescore_problem_for_all_students')
+    def test_rescore_problem_all(self, act):
         """ Test rescoring for all students. """
-        import instructor_task.api
-        act = Mock(return_value=None)
-        instructor_task.api.submit_rescore_problem_for_all_students = act
-
         url = reverse('rescore_problem', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {
             'problem_to_reset': self.problem_urlname,
@@ -699,12 +693,10 @@ class TestInstructorAPITaskLists(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
         self.tasks = [self.FakeTask() for _ in xrange(6)]
 
-    def test_list_instructor_tasks_running(self):
+    @patch.object(instructor_task.api, 'get_running_instructor_tasks')
+    def test_list_instructor_tasks_running(self, act):
         """ Test list of all running tasks. """
-        import instructor_task.api
-        act = Mock(return_value=self.tasks)
-        instructor_task.api.get_running_instructor_tasks = act
-
+        act.return_value = self.tasks
         url = reverse('list_instructor_tasks', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {})
         print response.content
@@ -716,12 +708,10 @@ class TestInstructorAPITaskLists(ModuleStoreTestCase, LoginEnrollmentTestCase):
         expected_res = {'tasks': expected_tasks}
         self.assertEqual(json.loads(response.content), expected_res)
 
-    def test_list_instructor_tasks_problem(self):
+    @patch.object(instructor_task.api, 'get_instructor_task_history')
+    def test_list_instructor_tasks_problem(self, act):
         """ Test list task history for problem. """
-        import instructor_task.api
-        act = Mock(return_value=self.tasks)
-        instructor_task.api.get_instructor_task_history = act
-
+        act.return_value = self.tasks
         url = reverse('list_instructor_tasks', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {
             'problem_urlname': self.problem_urlname,
@@ -735,12 +725,10 @@ class TestInstructorAPITaskLists(ModuleStoreTestCase, LoginEnrollmentTestCase):
         expected_res = {'tasks': expected_tasks}
         self.assertEqual(json.loads(response.content), expected_res)
 
-    def test_list_instructor_tasks_problem_student(self):
+    @patch.object(instructor_task.api, 'get_instructor_task_history')
+    def test_list_instructor_tasks_problem_student(self, act):
         """ Test list task history for problem AND student. """
-        import instructor_task.api
-        act = Mock(return_value=self.tasks)
-        instructor_task.api.get_instructor_task_history = act
-
+        act.return_value = self.tasks
         url = reverse('list_instructor_tasks', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {
             'problem_urlname': self.problem_urlname,
@@ -781,10 +769,10 @@ class TestInstructorAPIAnalyticsProxy(ModuleStoreTestCase, LoginEnrollmentTestCa
         self.course = CourseFactory.create()
         self.client.login(username=self.instructor.username, password='test')
 
-    def test_analytics_proxy_url(self):
+    @patch.object(instructor.views.api.requests, 'get')
+    def test_analytics_proxy_url(self, act):
         """ Test legacy analytics proxy url generation. """
-        act = Mock(return_value=self.FakeProxyResponse())
-        instructor.views.api.requests.get = act
+        act.return_value = self.FakeProxyResponse()
 
         url = reverse('proxy_legacy_analytics', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {
@@ -802,12 +790,12 @@ class TestInstructorAPIAnalyticsProxy(ModuleStoreTestCase, LoginEnrollmentTestCa
         )
         act.assert_called_once_with(expected_url)
 
-    def test_analytics_proxy(self):
+    @patch.object(instructor.views.api.requests, 'get')
+    def test_analytics_proxy(self, act):
         """
-        Test legacy analytics content proxying.
+        Test legacy analytics content proxyin, actg.
         """
-        act = Mock(return_value=self.FakeProxyResponse())
-        instructor.views.api.requests.get = act
+        act.return_value = self.FakeProxyResponse()
 
         url = reverse('proxy_legacy_analytics', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {
@@ -821,10 +809,10 @@ class TestInstructorAPIAnalyticsProxy(ModuleStoreTestCase, LoginEnrollmentTestCa
         expected_res = {'test_content': "robot test content"}
         self.assertEqual(json.loads(response.content), expected_res)
 
-    def test_analytics_proxy_reqfailed(self):
+    @patch.object(instructor.views.api.requests, 'get')
+    def test_analytics_proxy_reqfailed(self, act):
         """ Test proxy when server reponds with failure. """
-        act = Mock(return_value=self.FakeBadProxyResponse())
-        instructor.views.api.requests.get = act
+        act.return_value = self.FakeBadProxyResponse()
 
         url = reverse('proxy_legacy_analytics', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {
@@ -833,10 +821,10 @@ class TestInstructorAPIAnalyticsProxy(ModuleStoreTestCase, LoginEnrollmentTestCa
         print response.content
         self.assertEqual(response.status_code, 500)
 
-    def test_analytics_proxy_missing_param(self):
+    @patch.object(instructor.views.api.requests, 'get')
+    def test_analytics_proxy_missing_param(self, act):
         """ Test proxy when missing the aname query parameter. """
-        act = Mock(return_value=self.FakeProxyResponse())
-        instructor.views.api.requests.get = act
+        act.return_value = self.FakeProxyResponse()
 
         url = reverse('proxy_legacy_analytics', kwargs={'course_id': self.course.id})
         response = self.client.get(url, {})
