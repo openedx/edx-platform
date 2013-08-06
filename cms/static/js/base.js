@@ -259,23 +259,6 @@ function pad2(number) {
     return (number < 10 ? '0' : '') + number;
 }
 
-function getEdxTimeFromDateTimeVals(date_val, time_val) {
-    if (date_val != '') {
-        if (time_val == '') time_val = '00:00';
-
-        return new Date(date_val + " " + time_val + "Z");
-    }
-
-    else return null;
-}
-
-function getEdxTimeFromDateTimeInputs(date_id, time_id) {
-    var input_date = $('#' + date_id).val();
-    var input_time = $('#' + time_id).val();
-
-    return getEdxTimeFromDateTimeVals(input_date, input_time);
-}
-
 function autosaveInput(e) {
     var self = this;
     if (this.saveTimer) {
