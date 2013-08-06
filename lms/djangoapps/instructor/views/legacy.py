@@ -342,7 +342,7 @@ def instructor_dashboard(request, course_id):
                     student_module.delete()
                     msg += "<font color='red'>Deleted student module state for {0}!</font>".format(module_state_key)
                     event = {
-                        "problem": problem_url,
+                        "problem": module_state_key,
                         "student": unique_student_identifier,
                         "course": course_id
                     }
