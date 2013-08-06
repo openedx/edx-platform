@@ -6,14 +6,162 @@ right now.
 from mock import MagicMock
 
 import unittest
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.django import modulestore
 import courseware.grades as grades
 import courseware.module_render as module_render
-from courseware.model_data import LmsKeyValueStore
+from courseware.model_data import LmsKeyValueStore, ModelDataCache
 
 from xmodule.graders import Score
-from xmodule.modulestore.tests.factories import CourseFactory, XModuleItemFactory
-from xmodule.x_module import XModule 
+
+from django.test.utils import override_settings
+from django.test.client import RequestFactory
+
+from courseware.tests.modulestore_config import TEST_DATA_MONGO_MODULESTORE, TEST_DATA_XML_MODULESTORE
+from courseware.tests.tests import LoginEnrollmentTestCase
+from student.tests.factories import UserFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+
+
+class RequestFactoryForModules(RequestFactory):
+    """
+    Makes fake requests good for instantiating modules.
+    """
+    def __new__(self):
+        out = RequestFactory()
+        out.META = MagicMock()
+        out.is_secure = lambda: False
+        out.get_host = lambda: 'fake_host'
+        return out
+
+
+def _flat(thing):
+    """
+    If thing is a list, return thing[0]
+    else, return thing
+    """
+    if type(thing) == list:
+        return thing[0]
+    else:
+        return thing
+
+
+@override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
+class ScoringTestCase(LoginEnrollmentTestCase):
+    """
+    Tests grading on a small sample course, found in
+    common/test/data/score_test.
+
+    This test is designed to detect whether changes to xmodule,
+    modulestore, etc. break grading.  It is not designed to test whether
+    every facet of grading works as advertised - the other tests below
+    do that.
+    """
+    def setUp(self):
+        self.location = ['i4x', 'edX', 'score_test', 'chapter', 'Overview']
+        self.course_id = 'edX/score_test/2012_Fall'
+        self.toy_course = modulestore().get_course(self.course_id)
+
+        self.mock_user = UserFactory()
+        self.mock_user.id = 1
+        self.request_factory = RequestFactoryForModules()
+
+        self.model_data_cache = ModelDataCache(
+            [self.toy_course],
+            self.course_id,
+            self.mock_user,
+        )
+
+        # Set up Mako correctly.
+        from mitxmako.middleware import MakoMiddleware
+        MakoMiddleware()
+
+        # Construct a mock module for the modulestore to return
+        self.mock_module = MagicMock()
+        self.mock_module.id = 1
+        self.dispatch = 'score_update'
+
+        # Answer some problems.  Course structure is as follows:
+        # Pset 1 (ps01.xml)
+        #    1_1 - 2pts - Correct
+        #    1_2 - 3pts - Correct
+        #    1_3 - 4pts - Unanswered
+        #    1_4 - 5pts - Correct
+        # Pset 2 (ps02.xml)
+        #    2_1 - 10pts - Correct
+        #    2_2 - 10pts - Incorrect
+        # Final (exam.xml)
+        #    e_1 - 20pts - Unanswered
+        #    e_2 - 10pts - Correct
+        p1_1 = self._fetch_problem('1_1')
+        self._answer_correctly(p1_1)
+
+        p1_2 = self._fetch_problem('1_2')
+        self._answer_correctly(p1_2)
+
+        p1_4 = self._fetch_problem('1_4')
+        self._answer_correctly(p1_4)
+
+        p2_1 = self._fetch_problem('2_1')
+        self._answer_correctly(p2_1)
+
+        p2_2 = self._fetch_problem('2_2')
+        self._answer_incorrectly(p2_2)
+
+        pe_2 = self._fetch_problem('e_2')
+        self._answer_correctly(pe_2)
+
+    def _fetch_problem(self, problem_name):
+        """
+        Return a problem module, given a problem url-name.
+        """
+        loc = ['i4x', 'edX', 'score_test', 'problem', problem_name]
+        prob_descriptor = modulestore().get_instance(self.course_id, loc)
+        prob = module_render.get_module_for_descriptor_internal(
+            self.mock_user,
+            prob_descriptor,
+            self.model_data_cache,
+            self.course_id,
+            lambda *args: None,
+            'blah',
+        )
+        return prob
+
+    def _answer_correctly(self, problem_module):
+        """
+        Answer all parts of the given problem correctly.
+        Modifies problem_module in-place.
+        """
+        answers = problem_module.lcp.get_question_answers()
+        answers = {'input_' + key: _flat(value) for key, value in answers.iteritems()}
+        problem_module.check_problem(answers)
+
+    def _answer_incorrectly(self, problem_module):
+        """
+        Answer all parts of this problem incorrectly.
+        """
+        answers = problem_module.lcp.get_question_answers()
+        answers = {'input_' + key: 'wrong' for key in answers}
+        problem_module.check_problem(answers)
+
+    def test_course_grading(self):
+        """
+        Run the toy course through the grader, and check what comes out.
+        """
+        grader_out = grades.grade(self.mock_user, self.request_factory, self.toy_course)
+        # Overall score
+        self.assertAlmostEqual(grader_out['percent'], 0.32)
+        breakdown = grader_out['section_breakdown']
+        # Pset 1
+        self.assertAlmostEqual(breakdown[0]['percent'], 0.7142857142857143)
+        # Pset 2
+        self.assertAlmostEqual(breakdown[1]['percent'], 0.5)
+        # Pset 3 (unreleased)
+        self.assertAlmostEqual(breakdown[2]['percent'], 0.0)
+        # Overall problem sets
+        self.assertAlmostEqual(grader_out['grade_breakdown'][0]['percent'], 0.12142857142857144)
+        # Final
+        self.assertAlmostEqual(grader_out['grade_breakdown'][1]['percent'], 0.2)
+
 
 class FakeChildFactory(object):
     """
@@ -30,51 +178,6 @@ class FakeChildFactory(object):
         out.name = name
         return out
 
-
-class DescriptorWithScoreFactory(XModuleItemFactory):
-    """
-    A fake xmodule descriptory, with scoring functionality.
-    """
-
-    FACTORY_FOR = XModule
-
-    @classmethod
-    def create(cls, **kwargs):
-        """
-        The following kwargs are mandatory:
-        - parent_location
-        - location
-        - template (also a location)
-        - has_score
-
-        If has_score, earned and total must also be kwargs
-        """
-        if kwargs['has_score']:
-            kwargs['get_score'] = lambda: {'score': kwargs['earned'],
-                                           'total': kwargs['total']}
-        return XModuleItemFactory._create(None, kwargs)
-
-
-class TestThing(ModuleStoreTestCase):
-    def test_test_test(self):
-        course = CourseFactory.create(org='test', number='313', display_name='my test')
-        section = ItemFactory.create(
-            parent_location=course.location, 
-            display_name='chapter 1',
-            template='i4x://edx/templates/chapter/Empty'
-        )
-        problem = DescriptorWithScoreFactory.create(
-            parent_location=section.location,
-            display_name='my prob',
-            template='i4x://edx/templates/problem/Blank_Common_Problem',
-            has_score=True,
-            earned=2.0,
-            total=3.0,
-        )
-
-        import nose.tools
-        nose.tools.set_trace()
-        self.assertTrue(False)
 
 class TestGrades(unittest.TestCase):
     """

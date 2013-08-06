@@ -1,0 +1,42 @@
+<problemset display_name="Problem Set 1">
+    <sequential>
+          <problem display_name="A simple coding problem" url_name="1_1" weight="2">
+
+
+            <text>
+              <p>
+          What is the magnitude of the field inside the plates? You may assume that both dimensions of the plates are much larger than [mathjaxinline]d[/mathjaxinline]. Express your answer in terms of the [mathjaxinline]\sigma[/mathjaxinline] values. <multiplechoiceresponse><choicegroup direction="vertical"><choice correct="false" name="1"><text> [mathjaxinline]0[/mathjaxinline]</text></choice><choice correct="true" name="2"><text> [mathjaxinline]\frac{\sigma _{\rm free}}{\epsilon _0}[/mathjaxinline]</text></choice><choice correct="false" name="3"><text> [mathjaxinline]\frac{\sigma _{\rm free}}{2\epsilon _0}[/mathjaxinline]</text></choice></choicegroup></multiplechoiceresponse> </p>
+            </text>
+          </problem>
+          <problem url_name="1_2" display_name="Blah" weight="3">
+            <formularesponse type="cs" samples="x,y@1,2:3,4#10" answer="2*x^2*y+5">
+                <responseparam type="tolerance" default="0.00001"/> 
+                <br/><text>E =</text> <textline size="40" math="1" />    
+            </formularesponse>
+          </problem>
+    </sequential>
+    <video name="Lost Video" youtube_id_1_0="TBvX7HzxexQ"/>
+    <sequential format="Lecture Sequence" url_name='test_sequence'>
+        <vertical url_name='test_vertical'>
+            <html url_name='test_html'>
+                Foobar
+            </html>
+        </vertical>
+    </sequential>
+
+    <sequential>
+      <problem display_name="1_3" url_name="1_3" weight="4">
+        <numericalresponse answer="23">
+          <responseparam type="tolerance" default="0.00001"/> 
+          <textline size="20" inline="true" trailing_text="kN"/>
+        </numericalresponse>
+      </problem>
+
+      <problem display_name="1_4" url_name="1_4" weight="5">
+        <numericalresponse answer="28">
+          <responseparam type="tolerance" default="0.00001"/> 
+          <textline size="20" inline="true"/>
+        </numericalresponse>
+      </problem>
+    </sequential>
+</problemset>
