@@ -1,6 +1,7 @@
 """
 Unit tests for instructor.api methods.
 """
+# pylint: disable=E1111
 import unittest
 import json
 from urllib import quote
@@ -28,24 +29,27 @@ from instructor_task.api_helper import AlreadyRunningError
 
 
 @common_exceptions_400
-def view_success(request):
+def view_success(request):  # pylint: disable=W0613
     "A dummy view for testing that returns a simple HTTP response"
     return HttpResponse('success')
 
 
 @common_exceptions_400
-def view_user_doesnotexist(request):
+def view_user_doesnotexist(request):  # pylint: disable=W0613
     "A dummy view that raises a User.DoesNotExist exception"
     raise User.DoesNotExist()
 
 
 @common_exceptions_400
-def view_alreadyrunningerror(request):
+def view_alreadyrunningerror(request):  # pylint: disable=W0613
     "A dummy view that raises an AlreadyRunningError exception"
     raise AlreadyRunningError()
 
 
 class TestCommonExceptions400(unittest.TestCase):
+    """
+    Testing the common_exceptions_400 decorator.
+    """
     def setUp(self):
         self.request = Mock(spec=HttpRequest)
         self.request.META = {}
@@ -747,12 +751,6 @@ class TestInstructorAPITaskLists(ModuleStoreTestCase, LoginEnrollmentTestCase):
         expected_tasks = [ftask.to_dict() for ftask in self.tasks]
         expected_res = {'tasks': expected_tasks}
         self.assertEqual(json.loads(response.content), expected_res)
-
-
-
-    # class TestInstructorAPILevelsForums
-    # # list_forum_members
-    # # update_forum_role_membership
 
 
 class TestInstructorAPIHelpers(TestCase):

@@ -189,7 +189,7 @@ def students_update_enrollment(request, course_id):
             })
         # catch and log any exceptions
         # so that one error doesn't cause a 500.
-        except Exception as exc:
+        except Exception as exc:  # pylint: disable=W0703
             log.exception("Error while #{}ing student")
             log.exception(exc)
             results.append({
@@ -401,10 +401,10 @@ def get_distribution(request, course_id):
     if not feature is None:
         p_dist = analytics.distributions.profile_distribution(course_id, feature)
         response_payload['feature_results'] = {
-            'feature':  p_dist.feature,
-            'feature_display_name':  p_dist.feature_display_name,
-            'data':  p_dist.data,
-            'type':  p_dist.type,
+            'feature': p_dist.feature,
+            'feature_display_name': p_dist.feature_display_name,
+            'data': p_dist.data,
+            'type': p_dist.type,
         }
 
         if p_dist.type == 'EASY_CHOICE':
