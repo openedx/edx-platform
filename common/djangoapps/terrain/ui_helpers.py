@@ -44,8 +44,8 @@ def is_css_not_present(css_selector, wait_time=5):
 
 
 @world.absorb
-def css_has_text(css_selector, text):
-    return world.css_text(css_selector) == text
+def css_has_text(css_selector, text, index=0, max_attempts=5):
+    return world.css_text(css_selector, index=index, max_attempts=max_attempts) == text
 
 
 @world.absorb
