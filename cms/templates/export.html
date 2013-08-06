@@ -6,6 +6,24 @@
 <%block name="title">${_("Course Export")}</%block>
 <%block name="bodyclass">is-signedin course tools export</%block>
 
+<%block name="jsextra">
+  % if err_msg:
+  <script type='text/javascript'>
+    $(document).ready(function() {
+      var defaultTitle = gettext('There has been an error with your export.');
+      var msg = "${err_msg}";
+      dialog = new CMS.Views.Alert.Confirmation({
+          title: defaultTitle,
+          message: msg,
+          intent: "error",
+          closeIcon: false
+      });
+      dialog.show();
+    })
+  </script>
+  %endif
+</%block>
+
 <%block name="content">
 <div class="wrapper-mast wrapper">
   <header class="mast has-subtitle">
@@ -18,6 +36,7 @@
 
 <div class="main-wrapper">
   <div class="inner-wrapper">
+
     <article class="export-overview">
       <div class="description">
         <h2>${_("About Exporting Courses")}</h2>
