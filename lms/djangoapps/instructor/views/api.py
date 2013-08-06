@@ -7,12 +7,13 @@ Many of these GETs may become PUTs in the future.
 """
 
 import re
-import json
 import logging
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
 from django.core.urlresolvers import reverse
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
+from django.utils.translation import ugettext as _
+from django.http import HttpResponseBadRequest, HttpResponseForbidden
+from util.json_request import JsonResponse
 
 from courseware.access import has_access
 from courseware.courses import get_course_with_access, get_course_by_id
@@ -41,13 +42,23 @@ def common_exceptions_400(func):
     Catches common exceptions and renders matching 400 errors.
     (decorator without arguments)
     """
-    def wrapped(*args, **kwargs):  # pylint: disable=C0111
+    def wrapped(request, *args, **kwargs):  # pylint: disable=C0111
+        use_json = (request.is_ajax() or
+                    request.META.get("HTTP_ACCEPT", "").startswith("application/json"))
         try:
-            return func(*args, **kwargs)
+            return func(request, *args, **kwargs)
         except User.DoesNotExist:
-            return HttpResponseBadRequest("User does not exist.")
+            message = _("User does not exist.")
+            if use_json:
+                return JsonResponse({"error": message}, 400)
+            else:
+                return HttpResponseBadRequest(message)
         except AlreadyRunningError:
-            return HttpResponseBadRequest("Task already running.")
+            message = _("Task is already running.")
+            if use_json:
+                return JsonResponse({"error": message}, 400)
+            else:
+                return HttpResponseBadRequest(message)
     return wrapped
 
 
@@ -82,10 +93,7 @@ def require_query_params(*args, **kwargs):
                     error_response_data['info'][param] = extra
 
             if len(error_response_data['parameters']) > 0:
-                return HttpResponseBadRequest(
-                    json.dumps(error_response_data),
-                    mimetype="application/json",
-                )
+                return JsonResponse(error_response_data, status=400)
             else:
                 return func(*args, **kwargs)
         return wrapped
@@ -181,7 +189,7 @@ def students_update_enrollment(request, course_id):
             })
         # catch and log any exceptions
         # so that one error doesn't cause a 500.
-        except Exception as exc:
+        except Exception as exc:  # pylint: disable=W0703
             log.exception("Error while #{}ing student")
             log.exception(exc)
             results.append({
@@ -194,10 +202,7 @@ def students_update_enrollment(request, course_id):
         'results': results,
         'auto_enroll': auto_enroll,
     }
-    response = HttpResponse(
-        json.dumps(response_payload), content_type="application/json"
-    )
-    return response
+    return JsonResponse(response_payload)
 
 
 @ensure_csrf_cookie
@@ -255,10 +260,7 @@ def modify_access(request, course_id):
         'action': action,
         'success': 'yes',
     }
-    response = HttpResponse(
-        json.dumps(response_payload), content_type="application/json"
-    )
-    return response
+    return JsonResponse(response_payload)
 
 
 @ensure_csrf_cookie
@@ -308,10 +310,7 @@ def list_course_role_members(request, course_id):
             course, rolename
         )),
     }
-    response = HttpResponse(
-        json.dumps(response_payload), content_type="application/json"
-    )
-    return response
+    return JsonResponse(response_payload)
 
 
 @ensure_csrf_cookie
@@ -330,10 +329,7 @@ def get_grading_config(request, course_id):
         'course_id': course_id,
         'grading_config_summary': grading_config_summary,
     }
-    response = HttpResponse(
-        json.dumps(response_payload), content_type="application/json"
-    )
-    return response
+    return JsonResponse(response_payload)
 
 
 @ensure_csrf_cookie
@@ -362,10 +358,7 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=W06
             'queried_features': query_features,
             'available_features': available_features,
         }
-        response = HttpResponse(
-            json.dumps(response_payload), content_type="application/json"
-        )
-        return response
+        return JsonResponse(response_payload)
     else:
         header, datarows = analytics.csvs.format_dictlist(student_data, query_features)
         return analytics.csvs.create_csv_response("enrolled_profiles.csv", header, datarows)
@@ -408,19 +401,16 @@ def get_distribution(request, course_id):
     if not feature is None:
         p_dist = analytics.distributions.profile_distribution(course_id, feature)
         response_payload['feature_results'] = {
-            'feature':  p_dist.feature,
-            'feature_display_name':  p_dist.feature_display_name,
-            'data':  p_dist.data,
-            'type':  p_dist.type,
+            'feature': p_dist.feature,
+            'feature_display_name': p_dist.feature_display_name,
+            'data': p_dist.data,
+            'type': p_dist.type,
         }
 
         if p_dist.type == 'EASY_CHOICE':
             response_payload['feature_results']['choices_display_names'] = p_dist.choices_display_names
 
-    response = HttpResponse(
-        json.dumps(response_payload), content_type="application/json"
-    )
-    return response
+    return JsonResponse(response_payload)
 
 
 @ensure_csrf_cookie
@@ -449,10 +439,7 @@ def get_student_progress_url(request, course_id):
         'course_id': course_id,
         'progress_url': progress_url,
     }
-    response = HttpResponse(
-        json.dumps(response_payload), content_type="application/json"
-    )
-    return response
+    return JsonResponse(response_payload)
 
 
 @ensure_csrf_cookie
@@ -521,10 +508,7 @@ def reset_student_attempts(request, course_id):
     else:
         return HttpResponseBadRequest()
 
-    response = HttpResponse(
-        json.dumps(response_payload), content_type="application/json"
-    )
-    return response
+    return JsonResponse(response_payload)
 
 
 @ensure_csrf_cookie
@@ -572,10 +556,7 @@ def rescore_problem(request, course_id):
     else:
         return HttpResponseBadRequest()
 
-    response = HttpResponse(
-        json.dumps(response_payload), content_type="application/json"
-    )
-    return response
+    return JsonResponse(response_payload)
 
 
 @ensure_csrf_cookie
@@ -618,10 +599,7 @@ def list_instructor_tasks(request, course_id):
     response_payload = {
         'tasks': map(extract_task_features, tasks),
     }
-    response = HttpResponse(
-        json.dumps(response_payload), content_type="application/json"
-    )
-    return response
+    return JsonResponse(response_payload)
 
 
 @ensure_csrf_cookie
@@ -680,10 +658,7 @@ def list_forum_members(request, course_id):
         'course_id': course_id,
         rolename: map(extract_user_info, users),
     }
-    response = HttpResponse(
-        json.dumps(response_payload), content_type="application/json"
-    )
-    return response
+    return JsonResponse(response_payload)
 
 
 @ensure_csrf_cookie
@@ -747,10 +722,7 @@ def update_forum_role_membership(request, course_id):
         'course_id': course_id,
         'action': action,
     }
-    response = HttpResponse(
-        json.dumps(response_payload), content_type="application/json"
-    )
-    return response
+    return JsonResponse(response_payload)
 
 
 def _split_input_list(str_list):
@@ -782,6 +754,6 @@ def _msk_from_problem_urlname(course_id, urlname):
 
     urlname = "problem/" + urlname
 
-    (org, course_name, _) = course_id.split("/")
+    (org, course_name, __) = course_id.split("/")
     module_state_key = "i4x://" + org + "/" + course_name + "/" + urlname
     return module_state_key
