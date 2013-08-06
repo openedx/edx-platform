@@ -9,14 +9,16 @@ from path import path
 from xmodule.errortracker import null_error_tracker
 from xmodule.x_module import XModuleDescriptor
 from xmodule.modulestore.locator import BlockUsageLocator, DescriptionLocator, CourseLocator, VersionTree
-from xmodule.modulestore.exceptions import InsufficientSpecificationError, VersionConflictError
-from xmodule.modulestore import inheritance
+from xmodule.modulestore.exceptions import InsufficientSpecificationError, VersionConflictError, InvalidLocationError, \
+    DuplicateItemError
+from xmodule.modulestore import inheritance, Location
 
 from .. import ModuleStoreBase
 from ..exceptions import ItemNotFoundError
 from .definition_lazy_loader import DefinitionLazyLoader
 from .caching_descriptor_system import CachingDescriptorSystem
 from random import randint
+from xmodule.modulestore.mongo import draft
 
 log = logging.getLogger(__name__)
 #==============================================================================
@@ -65,8 +67,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
         self.definitions = self.db[collection + '.definitions']
         self.location_map = self.db[collection + '.location_map']
 
-        # ??? Code review question: those familiar w/ python threading. Should I instead
-        # use django cache? How should I expire entries?
+        # Code review question: How should I expire entries?
         # _add_cache could use a lru mechanism to control the cache size?
         self.thread_cache = threading.local()
 
@@ -1135,7 +1136,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
         which does not have a name in the _id; otherwise, it will return an arbitrary match.
 
         Note: the opposite is not true. That is, it never makes sense to use 2 different CourseLocator.course_id
-        keys to index the same old Locator org/course/.. pattern.
+        keys to index the same old Locator org/course/.. pattern. There's no checking to ensure you don't do this.
 
         NOTE: if there's already an entry w the given course_location, this may either overwrite that entry or
         throw an error depending on how mongo is configured.
@@ -1173,27 +1174,36 @@ class SplitMongoModuleStore(ModuleStoreBase):
             })
 
 
-    def translate_location(self, course_id, location, published=False):
+    def translate_location(self, old_style_course_id, location, published=True, add_entry_if_missing=True):
         """
         Translate the given module location to a Locator. If the mapping has the run id in it, then you
-        should provide course_id with that run id in it to disambiguate the mapping if there exists more
+        should provide old_style_course_id with that run id in it to disambiguate the mapping if there exists more
         than one entry in the mapping table for the org.course.
 
-        :param course_id: the course_id used in old mongo not the new one (optional, will use location)
+        The rationale for auto adding entries was that there should be a reasonable default translation
+        if the code just trips into this w/o creating translations. The downfall is that ambiguous course
+        locations may generate conflicting block_ids.
+
+        :param old_style_course_id: the course_id used in old mongo not the new one (optional, will use location)
         :param location:  a Location pointing to a module
         :param published: a boolean to indicate whether the caller wants the draft or published branch.
+        :param add_entry_if_missing: a boolean as to whether to return None or to create an entry if the course
+        or block is not found in the map.
 
         NOTE: unlike old mongo, draft branches contain the whole course; so, it applies to all category
         of locations including course.
         """
-        location_id = self._interpret_location_course_id(course_id, location)
+        location_id = self._interpret_location_course_id(old_style_course_id, location)
 
         maps = self.location_map.find(location_id)
         if maps.count() == 0:
-            # create a new map
-            course_location = location.replace(category='course', name=location_id['_id.name'])
-            self.create_map_entry(course_location)
-            entry = self.location_map.find_one(location_id)
+            if add_entry_if_missing:
+                # create a new map
+                course_location = location.replace(category='course', name=location_id['_id.name'])
+                self.create_map_entry(course_location)
+                entry = self.location_map.find_one(location_id)
+            else:
+                return None
         elif maps.count() > 1:
             # if more than one, prefer the one w/o a name if that exists. Otherwise, choose the first (arbitrary)
             # a bit odd b/c maps is a cursor and doesn't allow multitraversal w/o requerying db
@@ -1201,29 +1211,202 @@ class SplitMongoModuleStore(ModuleStoreBase):
             for candidate in maps:
                 if entry is None:
                     entry = candidate  # pick off first ele in case we don't find one w/o a name
-                # pylint: disable=W0212
-                if not hasattr(candidate._id, 'name'):
+                if 'name' not in candidate['_id']:
                     entry = candidate
                     break
         else:
             entry = maps[0]
 
         if published:
-            branch = entry.prod_branch
+            branch = entry['prod_branch']
         else:
-            branch = entry.draft_branch
+            branch = entry['draft_branch']
 
-        usage_id = getattr(entry.block_map, location.name, None)
+        usage_id = entry['block_map'].get(location.name)
         if usage_id is None:
-            usage_id = self._add_to_block_map(location, location_id, entry.block_map)
+            if add_entry_if_missing:
+                usage_id = self._add_to_block_map(location, location_id, entry['block_map'])
+            else:
+                return None
         elif isinstance(usage_id, dict):
             # name is not unique, look through for the right category
-            if hasattr(usage_id, location.category):
+            if location.category in usage_id:
                 usage_id = usage_id[location.category]
+            elif add_entry_if_missing:
+                usage_id = self._add_to_block_map(location, location_id, entry['block_map'])
             else:
-                usage_id = self._add_to_block_map(location, location_id, entry.block_map)
+                return None
+        else:
+            raise InvalidLocationError()
 
-        return BlockUsageLocator(course_id=entry.course_id, branch=branch, usage_id=usage_id)
+        return BlockUsageLocator(course_id=entry['course_id'], branch=branch, usage_id=usage_id)
+
+    def translate_locator_to_location(self, locator):
+        """
+        Returns an old style Location for the given Locator if there's an appropriate entry in the
+        mapping collection. Note, it requires that the course was previously mapped (a side effect of
+        translate_location or explicitly via create_map_entry) and
+        the block's usage_id was previously stored in the
+        map (a side effect of translate_location or via add|update_block_location).
+
+        If there are no matches, it returns None.
+
+        If there's more than one location to locator mapping to the same course_id, it looks for the first
+        one with a mapping for the block usage_id and picks that arbitrary course location.
+
+        :param locator: a BlockUsageLocator
+        """
+        # Does not use _lookup_course b/c it doesn't actually require that the course exist in the active_version
+        # only that it has a mapping entry.
+        maps = self.location_map.find({'course_id': locator.course_id})
+        # look for one which maps to this block usage_id
+        if maps.count() == 0:
+            return None
+        for candidate in maps:
+            for old_name, cat_to_usage in candidate['block_map'].iteritems():
+                for category, usage_id in cat_to_usage.iteritems():
+                    if usage_id == locator.usage_id:
+                        # figure out revision
+                        # enforce the draft only if category in [..] logic
+                        if category in draft.DIRECT_ONLY_CATEGORIES:
+                            revision = None
+                        elif locator.branch == candidate['draft_branch']:
+                            revision = draft.DRAFT
+                        else:
+                            revision = None
+                        return Location(
+                            'i4x',
+                            candidate['_id']['org'],
+                            candidate['_id']['course'],
+                            category,
+                            old_name,
+                            revision)
+        return None
+
+
+    def add_block_location_translator(self, location, old_course_id=None, usage_id=None):
+        """
+        Similar to translate_location which adds an entry if none is found, but this cannot create a new
+        course mapping entry, only a block within such a mapping entry. If it finds no existing
+        course maps, it raises ItemNotFoundError.
+
+        In the case that there are more than one mapping record for the course identified by location, this
+        method adds the mapping to all matching records! (translate_location only adds to one)
+
+        It allows the caller to specify
+        the new-style usage_id for the target rather than having the translate concoct its own.
+        If the provided usage_id already exists in one of the found maps for the org/course, this function
+        raises DuplicateItemError unless the old item id == the new one.
+
+        If the caller does not provide a usage_id and there exists an entry in one of the course variants,
+        it will use that entry. If more than one variant uses conflicting entries, it will raise DuplicateItemError.
+
+        Returns the usage_id used in the mapping
+
+        :param location: a fully specified Location
+        :param old_course_id: the old-style org/course or org/course/run string (optional)
+        :param usage_id: the desired new block_id. If left as None, this will generate one as per translate_location
+        """
+        location_id = self._interpret_location_course_id(old_course_id, location)
+
+        maps = self.location_map.find(location_id)
+        if maps.count() == 0:
+            raise ItemNotFoundError()
+
+        # turn maps from cursor to list
+        map_list = [map_entry for map_entry in maps]
+        # check whether there's already a usage_id for this location (and it agrees w/ any passed in or found)
+        for map_entry in map_list:
+            if (location.name in map_entry['block_map'] and
+                    location.category in map_entry['block_map'][location.name]):
+                if usage_id is None:
+                    usage_id = map_entry['block_map'][location.name][location.category]
+                elif usage_id != map_entry['block_map'][location.name][location.category]:
+                    raise DuplicateItemError()
+
+        computed_usage_id = usage_id
+
+        # update the maps (and generate a usage_id if it's not been set yet)
+        for map_entry in map_list:
+            if computed_usage_id is None:
+                computed_usage_id = self._add_to_block_map(location, location_id, map_entry['block_map'])
+            elif (location.name not in map_entry['block_map'] or
+                     location.category not in map_entry['block_map'][location.name]):
+                alt_usage_id = self._verify_uniqueness(computed_usage_id, map_entry['block_map'])
+                if alt_usage_id != computed_usage_id:
+                    if usage_id is not None:
+                        raise DuplicateItemError()
+                    else:
+                        # revise already set ones and add to remaining ones
+                        computed_usage_id = self.update_block_location_translator(
+                            location,
+                            alt_usage_id,
+                            old_course_id,
+                            True
+                        )
+
+                map_entry['block_map'].setdefault(location.name, {})[location.category] = computed_usage_id
+                self.location_map.update({'_id': map_entry['_id']}, {'$set': {'block_map': map_entry['block_map']}})
+
+        return computed_usage_id
+
+
+    def update_block_location_translator(self, location, usage_id, old_course_id=None, autogenerated_usage_id=False):
+        """
+        Update all existing maps from location's block to the new usage_id. Used for changing the usage_id,
+        thus the usage_id is required.
+
+        Returns the usage_id. (which is primarily useful in the case of autogenerated_usage_id)
+
+        :param location: a fully specified Location
+        :param usage_id: the desired new block_id.
+        :param old_course_id: the old-style org/course or org/course/run string (optional)
+        :param autogenerated_usage_id: a flag used mostly for internal calls to indicate that this usage_id
+        was autogenerated and thus can be overridden if it's not unique. If you set this flag, the stored
+        usage_id may not be the one you submitted.
+        """
+        location_id = self._interpret_location_course_id(old_course_id, location)
+
+        maps = self.location_map.find(location_id)
+        for map_entry in maps:
+            # handle noop of renaming to same name
+            if (location.name in map_entry['block_map'] and
+                    map_entry['block_map'][location.name].get(location.category) == usage_id):
+                continue
+            alt_usage_id = self._verify_uniqueness(usage_id, map_entry['block_map'])
+            if alt_usage_id != usage_id:
+                if autogenerated_usage_id:
+                    # revise already set ones and add to remaining ones
+                    usage_id = self.update_block_location_translator(location, alt_usage_id, old_course_id, True)
+                    return usage_id
+                else:
+                    raise DuplicateItemError()
+
+            if location.category in map_entry['block_map'].setdefault(location.name, {}):
+                map_entry['block_map'][location.name][location.category] = usage_id
+                self.location_map.update({'_id': map_entry['_id']}, {'$set': {'block_map': map_entry['block_map']}})
+
+        return usage_id
+
+
+    def delete_block_location_translator(self, location, old_course_id=None):
+        """
+        Remove all existing maps from location's block.
+
+        :param location: a fully specified Location
+        :param old_course_id: the old-style org/course or org/course/run string (optional)
+        """
+        location_id = self._interpret_location_course_id(old_course_id, location)
+
+        maps = self.location_map.find(location_id)
+        for map_entry in maps:
+            if location.category in map_entry['block_map'].setdefault(location.name, {}):
+                if len(map_entry['block_map'][location.name]) == 1:
+                    del map_entry['block_map'][location.name]
+                else:
+                    del map_entry['block_map'][location.name][location.category]
+                self.location_map.update({'_id': map_entry['_id']}, {'$set': {'block_map': map_entry['block_map']}})
+
 
     def _block_matches(self, value, qualifiers):
         '''
@@ -1385,10 +1568,15 @@ class SplitMongoModuleStore(ModuleStoreBase):
             elif targets == name:
                 name += str(randint(0, 9))
                 return SplitMongoModuleStore._verify_uniqueness(name, block_map)
+        return name
 
     def _add_to_block_map(self, location, location_id, block_map):
         '''add the given location to the block_map and persist it'''
         if self._block_id_is_guid(location.name):
+            # I'm having second thoughts about this even though it will make the ids more meaningful.
+            # The downside is that if there's more than one course mapped to from the same org/course root
+            # the block ids will likely be out of sync and collide from an id perspective. HOWEVER,
+            # if there are few == org/course roots or their content is unrelated, this will work well.
             usage_id = self._verify_uniqueness(location.category + location.name[:3], block_map)
         block_map.setdefault(location.name, {})[location.category] = usage_id
         self.location_map.update(location_id, {'$set': {'block_map': block_map}})
