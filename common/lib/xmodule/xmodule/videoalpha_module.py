@@ -21,6 +21,7 @@ from django.conf import settings
 
 from xmodule.x_module import XModule
 from xmodule.editing_module import TabsEditingDescriptor
+from xmodule.raw_module import RawDescriptor
 from xmodule.modulestore.mongo import MongoModuleStore
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.content import StaticContent
@@ -187,7 +188,7 @@ class VideoAlphaModule(VideoAlphaFields, XModule):
         })
 
 
-class VideoAlphaDescriptor(VideoAlphaFields, TabsEditingDescriptor):
+class VideoAlphaDescriptor(VideoAlphaFields, TabsEditingDescriptor, RawDescriptor):
     """Descriptor for `VideoAlphaModule`."""
     module_class = VideoAlphaModule
 
