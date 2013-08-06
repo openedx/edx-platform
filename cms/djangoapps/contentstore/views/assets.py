@@ -3,6 +3,7 @@ import json
 import os
 import tarfile
 import shutil
+import cgi
 from tempfile import mkdtemp
 from path import path
 
@@ -27,7 +28,7 @@ from xmodule.modulestore import Location
 from xmodule.contentstore.content import StaticContent
 from xmodule.util.date_utils import get_default_time_display
 from xmodule.modulestore import InvalidLocationError
-from xmodule.exceptions import NotFoundError
+from xmodule.exceptions import NotFoundError, SerializationError
 
 from .access import get_location_and_verify_access
 from util.json_request import JsonResponse
@@ -336,16 +337,34 @@ def generate_export_course(request, org, course, name):
     the course
     """
     location = get_location_and_verify_access(request, org, course, name)
-
+    course_module = modulestore().get_item(location)
     loc = Location(location)
     export_file = NamedTemporaryFile(prefix=name + '.', suffix=".tar.gz")
 
     root_dir = path(mkdtemp())
 
-    # export out to a tempdir
-    logging.debug('root = {0}'.format(root_dir))
-
-    export_to_xml(modulestore('direct'), contentstore(), loc, root_dir, name, modulestore())
+    try:
+        export_to_xml(modulestore('direct'), contentstore(), loc, root_dir, name, modulestore())
+    except SerializationError, e:
+        failed_item = modulestore().get_item(e.location)
+        parent_locs = modulestore().get_parent_locations(failed_item.location, None)
+        if len(parent_locs) > 0:
+            parent = modulestore().get_item(parent_locs[0])
+            parent_info = "Parent Display Name: {0}<br />Parent Identifier: {1}".format(parent.display_name, parent.location.name)
+        else:
+            parent_info = ''
+        return render_to_response('export.html', {
+            'context_course': course_module,
+            'successful_import_redirect_url': '',
+            'err_msg': "A courseware module has failed to convert to XML. Details: <br />Module Type: {0}<br />Display Name: {1}<br />Identifier: {2}<br />{3}".
+            format(failed_item.location.category, failed_item.display_name, failed_item.location.name, parent_info)
+        })
+    except Exception, e:
+        return render_to_response('export.html', {
+            'context_course': course_module,
+            'successful_import_redirect_url': '',
+            'err_msg': str(e)
+        })
 
     logging.debug('tar file being generated at {0}'.format(export_file.name))
     tar_file = tarfile.open(name=export_file.name, mode='w:gz')
