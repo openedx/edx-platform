@@ -1,7 +1,7 @@
 """
 This is the start of a test for grades.
-It is very incomplete - we're only testing one function
-right now.
+It is incomplete - we do not test answer_distributions or
+progress_summary.
 """
 from mock import MagicMock
 
@@ -227,33 +227,33 @@ class TestGrades(unittest.TestCase):
     def test_compute_graded_total(self):
         """
         Tests grading for a single section.
-        compute_graded_total(section, student, course_id, m_d_c, request)
+        compute_graded_total(section, student, course_id, model_data_cache, request)
         - section['section_descriptor'] returns the descriptor for this section.
         - student needs an id
         - All other paramenters are touched through helper functions only.
 
         Functions to mock:
-        grades.should_grade_section(descriptor, m_d_c, student_id) -> True/False
-        .module_render.get_module_for_descriptor(student, request, descriptor, m_d_c, course_id) -> Xmodule
+        grades.should_grade_section(descriptor, model_data_cache, student_id) -> True/False
+        .module_render.get_module_for_descriptor(student, request, descriptor, model_data_cache, course_id) -> Xmodule
         grades.yield_dynamic_descriptor_descendents(descriptor, create_module) -> iter through descriptors
-        grades.get_score(course_id, student, descriptor, create_module, m_d_c) -> (correct, total)
-        grades.find_attempted(descriptor, m_d_c, student_id) -> True/False
+        grades.get_score(course_id, student, descriptor, create_module, model_data_cache) -> (correct, total)
+        grades.find_attempted(descriptor, model_data_cache, student_id) -> True/False
         """
 
         section = {'section_descriptor': MagicMock(), 'xmoduledescriptors': MagicMock()}
         student = MagicMock()
         student.id = 'my id'
         course_id = 'course id'
-        m_d_c = MagicMock()  # We will never query the mdc directly.
+        model_data_cache = MagicMock()  # We will never query the mdc directly.
         request = MagicMock()   # Same as above.
 
         # Monkey patching!
-        def fake_should_grade_section(descriptors, m_d_c, student_id):
+        def fake_should_grade_section(descriptors, model_data_cache, student_id):
             """ Always grade :) """
             return True
         grades.should_grade_section = fake_should_grade_section
 
-        def fake_get_module_for_descriptor(student, request, descriptor, m_d_c, course_id):
+        def fake_get_module_for_descriptor(student, request, descriptor, model_data_cache, course_id):
             """Don't even return anything; this output is not directly used."""
             return None
         module_render.get_module_for_descriptor = fake_get_module_for_descriptor
@@ -273,7 +273,7 @@ class TestGrades(unittest.TestCase):
                 yield out
         grades.yield_dynamic_descriptor_descendents = fake_yield_dynamic_descriptor_descendents
 
-        def fake_get_score(course_id, student, descriptor, create_module, m_d_c):
+        def fake_get_score(course_id, student, descriptor, create_module, model_data_cache):
             """
             Returns a score, based on the descriptor passed in.
             0: None / None
@@ -294,7 +294,7 @@ class TestGrades(unittest.TestCase):
                 raise Exception('get_score called with unexpected input.')
         grades.get_score = fake_get_score
 
-        def fake_find_attempted(descriptor, m_d_c, student_id):
+        def fake_find_attempted(descriptor, model_data_cache, student_id):
             """Always return True. """
             return True
         grades.find_attempted = fake_find_attempted
@@ -302,7 +302,7 @@ class TestGrades(unittest.TestCase):
         # Actually do the test.
         graded_total, raw_scores = grades.compute_graded_total(
             section['section_descriptor'], section['xmoduledescriptors'],
-            student, course_id, m_d_c, request
+            student, course_id, model_data_cache, request
         )
         # Reset all of the monkey patching.
         # Do this before assertions, because if an assertion fails, the remaining code is not run.
@@ -330,7 +330,7 @@ class TestGrades(unittest.TestCase):
         keep_raw_scores - True/False
 
         Things to mock:
-        compute_graded_total(section, student, course_id, m_d_c, request)
+        compute_graded_total(section, student, course_id, model_data_cache, request)
         grade_for_percentage(cutoffs, percent_summary)
         """
         student = MagicMock()
@@ -351,9 +351,9 @@ class TestGrades(unittest.TestCase):
                 'percent': 64.5,
             }
         course.grader.grade = fake_grade
-        m_d_c = MagicMock()
+        model_data_cache = MagicMock()
 
-        def fake_compute_graded_total(section_descriptor, xmd, student, course_id, m_d_c, request):
+        def fake_compute_graded_total(section_descriptor, xmd, student, course_id, model_data_cache, request):
             """
             A fake compute_graded_total.  Expects a string for section_descriptor,
             instead of a real section descriptor.
@@ -380,7 +380,7 @@ class TestGrades(unittest.TestCase):
             return 'A'
         grades.grade_for_percentage = fake_grade_for_percentage
 
-        grade_summary = grades.grade(student, request, course, model_data_cache=m_d_c, keep_raw_scores=True)
+        grade_summary = grades.grade(student, request, course, model_data_cache=model_data_cache, keep_raw_scores=True)
         reload(grades)
 
         print grade_summary['totaled_scores']
