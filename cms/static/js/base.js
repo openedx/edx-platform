@@ -313,9 +313,18 @@ function saveSubsection() {
         metadata[$(el).data("metadata-name")] = el.value;
     }
 
-    // Piece back together the date/time UI elements into one date/time string
-    metadata['start'] = getEdxTimeFromDateTimeInputs('start_date', 'start_time');
-    metadata['due'] = getEdxTimeFromDateTimeInputs('due_date', 'due_time');
+    // get datetimes for start and due, stick into metadata
+    _(["start", "due"]).each(function(name) {
+        var date, time;
+        date = $("#"+name+"_date").datepicker("getDate");
+        time = $("#"+name+"_time").timepicker("getTime");
+        if (date && time) {
+            metadata[name] = new Date(Date.UTC(
+                date.getFullYear(), date.getMonth(), date.getDate(),
+                time.getHours(), time.getMinutes()
+            ));
+        }
+    });
 
     $.ajax({
         url: "/save_item",
