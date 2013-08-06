@@ -5,6 +5,9 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Studio: Studio course authors (both instructors and staff) will be auto-enrolled
+for their courses so that "View Live" works.
+
 Common: Added ratelimiting to our authentication backend.
 
 Common: Add additional logging to cover login attempts and logouts.

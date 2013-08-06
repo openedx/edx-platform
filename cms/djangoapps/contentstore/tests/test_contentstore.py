@@ -49,7 +49,7 @@ import datetime
 from pytz import UTC
 from uuid import uuid4
 from pymongo import MongoClient
-
+from student.views import is_enrolled_in_course
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['OPTIONS']['db'] = 'test_xcontent_%s' % uuid4().hex
@@ -1041,12 +1041,18 @@ class ContentStoreTest(ModuleStoreTestCase):
         data = parse_json(resp)
         self.assertNotIn('ErrMsg', data)
         self.assertEqual(data['id'], 'i4x://MITx/{0}/course/2013_Spring'.format(test_course_data['number']))
+        # Verify that the creator is now registered in the course.
+        self.assertTrue(is_enrolled_in_course(self.user, self._get_course_id(test_course_data)))
         return test_course_data
 
     def test_create_course_check_forum_seeding(self):
         """Test new course creation and verify forum seeding """
         test_course_data = self.assert_created_course(number_suffix=uuid4().hex)
-        self.assertTrue(are_permissions_roles_seeded('MITx/{0}/2013_Spring'.format(test_course_data['number'])))
+        self.assertTrue(are_permissions_roles_seeded(self._get_course_id(test_course_data)))
+
+    def _get_course_id(self, test_course_data):
+        """Returns the course ID (org/number/run)."""
+        return "{org}/{number}/{run}".format(**test_course_data)
 
     def test_create_course_duplicate_course(self):
         """Test new course creation - error path"""
@@ -1057,10 +1063,15 @@ class ContentStoreTest(ModuleStoreTestCase):
         """
         Checks that the course did not get created
         """
+        course_id = self._get_course_id(self.course_data)
+        initially_enrolled = is_enrolled_in_course(self.user, course_id)
         resp = self.client.post(reverse('create_new_course'), self.course_data)
         self.assertEqual(resp.status_code, 200)
         data = parse_json(resp)
         self.assertEqual(data['ErrMsg'], error_message)
+        # One test case involves trying to create the same course twice. Hence for that course,
+        # the user will be enrolled. In the other cases, initially_enrolled will be False.
+        self.assertEqual(initially_enrolled, is_enrolled_in_course(self.user, course_id))
 
     def test_create_course_duplicate_number(self):
         """Test new course creation - error path"""

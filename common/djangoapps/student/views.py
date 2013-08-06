@@ -378,7 +378,7 @@ def change_enrollment(request):
                                "run:{0}".format(run)])
 
         try:
-            enrollment, _created = CourseEnrollment.objects.get_or_create(user=user, course_id=course.id)
+            enroll_in_course(user, course.id)
         except IntegrityError:
             # If we've already created this enrollment in a separate transaction,
             # then just continue
@@ -401,6 +401,23 @@ def change_enrollment(request):
             return HttpResponseBadRequest(_("You are not enrolled in this course"))
     else:
         return HttpResponseBadRequest(_("Enrollment action is invalid"))
+
+
+def enroll_in_course(user, course_id):
+    """
+    Helper method to enroll a user in a particular class.
+
+    It is expected that this method is called from a method which has already
+    verified the user authentication and access.
+    """
+    CourseEnrollment.objects.get_or_create(user=user, course_id=course_id)
+
+
+def is_enrolled_in_course(user, course_id):
+    """
+    Helper method that returns whether or not the user is enrolled in a particular course.
+    """
+    return CourseEnrollment.objects.filter(user=user, course_id=course_id).count() > 0
 
 
 @ensure_csrf_cookie
