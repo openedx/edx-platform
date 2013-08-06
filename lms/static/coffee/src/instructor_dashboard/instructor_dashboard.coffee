@@ -61,10 +61,8 @@ class SafeWaiter
     =>
       @waitFor_handlers = @waitFor_handlers.filter (g) -> g isnt f
       if @waitFor_handlers.length is 0
-        plantTimeout 0, =>
-          @fired = true
-          for cb in @after_handlers
-            cb()
+        @fired = true
+        @after_handlers.map (cb) -> plantTimeout 0, cb
 
       f.apply this, arguments
 

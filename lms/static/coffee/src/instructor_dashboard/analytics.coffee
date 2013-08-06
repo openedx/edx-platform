@@ -14,7 +14,7 @@ class ProfileDistributionWidget
       title: @title
       feature: @feature
       endpoint: @endpoint
-    template_html = $("#profile-distribution-widget-template").html()
+    template_html = $("#profile-distribution-widget-template").text()
     @$container.html Mustache.render template_html, template_params
 
   reset_display: ->
@@ -93,7 +93,7 @@ class ProfileDistributionWidget
 class GradeDistributionDisplay
   constructor: ({@$container, @endpoint}) ->
     template_params = {}
-    template_html = $('#grade-distributions-widget-template').html()
+    template_html = $('#grade-distributions-widget-template').text()
     @$container.html Mustache.render template_html, template_params
     @$problem_selector = @$container.find '.problem-selector'
 
