@@ -201,7 +201,7 @@ function goto( mode)
     <H2>${_("Course-specific grade adjustment")}</h2>
 
     <p>
-      {_("Specify a particular problem in the course here by its url:")}
+      ${_("Specify a particular problem in the course here by its url:")}
       <input type="text" name="problem_for_all_students" size="60">
     </p>
     <p>
@@ -639,7 +639,7 @@ function goto( mode)
 
 %if instructor_tasks is not None and len(instructor_tasks) > 0:
     <hr width="100%">
-    <h2>$_("Pending Instructor Tasks")}</h2>
+    <h2>${_("Pending Instructor Tasks")}</h2>
     <div id="task-progress-wrapper">
       <table class="stat_table">
         <tr>
