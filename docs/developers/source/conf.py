@@ -3,7 +3,7 @@
 #pylint: disable=W0622
 #pylint: disable=W0212
 #pylint: disable=W0613
-  
+
 import sys, os
 
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
@@ -26,7 +26,7 @@ html_static_path.append('source/_static')
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-#sys.path.insert(0, os.path.abspath('../../..'))
+sys.path.insert(0, os.path.abspath('../../..'))
 root = os.path.abspath('../../..')
 
 sys.path.append(root)
@@ -64,6 +64,45 @@ exclude_patterns = ['build']
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'edXDocs'
 
+# --- Mock modules ------------------------------------------------------------
+
+# Mock all the modules that the readthedocs build can't import
+import mock
+
+class Mock(object):
+    def __init__(self, *args, **kwargs):
+        pass
+
+    def __call__(self, *args, **kwargs):
+        return Mock()
+
+    @classmethod
+    def __getattr__(cls, name):
+        if name in ('__file__', '__path__'):
+            return '/dev/null'
+        elif name[0] == name[0].upper():
+            mockType = type(name, (), {})
+            mockType.__module__ = __name__
+            return mockType
+        else:
+            return Mock()
+
+# The list of modules and submodules that we know give RTD trouble.
+# Make sure you've tried including the relevant package in
+# docs/share/requirements.txt before adding to this list.
+MOCK_MODULES = [
+    'numpy',
+    'matplotlib',
+    'matplotlib.pyplot',
+    'scipy.interpolate',
+    'scipy.constants',
+    'scipy.optimize',
+    ]
+
+for mod_name in MOCK_MODULES:
+    sys.modules[mod_name] = Mock()
+
+# -----------------------------------------------------------------------------
 
 # from http://djangosnippets.org/snippets/2533/
 # autogenerate models definitions
@@ -109,27 +148,7 @@ def strip_tags(html):
     s.feed(html)
     return s.get_data()
 
-class Mock(object):
-    def __init__(self, *args, **kwargs):
-        pass
 
-    def __call__(self, *args, **kwargs):
-        return Mock()
-
-    @classmethod
-    def __getattr__(cls, name):
-        if name in ('__file__', '__path__'):
-            return '/dev/null'
-        elif name[0] == name[0].upper():
-            mockType = type(name, (), {})
-            mockType.__module__ = __name__
-            return mockType
-        else:
-            return Mock()
-
-MOCK_MODULES = ['scipy', 'numpy']
-for mod_name in MOCK_MODULES:
-    sys.modules[mod_name] = Mock()
 
 def process_docstring(app, what, name, obj, options, lines):
     """Autodoc django models"""
