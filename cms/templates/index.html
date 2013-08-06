@@ -133,12 +133,30 @@
       %if len(courses) > 0:
       <div class="courses">
         <ul class="list-courses">
-          %for course, url, lms_link in sorted(courses, key=lambda s: s[0].lower() if s[0] is not None else ''):
+          %for course, url, lms_link, org, num, run in sorted(courses, key=lambda s: s[0].lower() if s[0] is not None else ''):
           <li class="course-item">
-            <a class="class-link" href="${url}" class="class-name">
-              <span class="class-name">${course}</span>
+            <a class="course-link" href="${url}">
+              <h3 class="course-title">${course}</h3>
+
+              <div class="course-metadata">
+                <span class="course-org metadata-item">
+                  <span class="label">${_("Organization:")}</span> <span class="value">${org}</span>
+                </span>
+                <span class="course-num metadata-item">
+                  <span class="label">${_("Course Number:")}</span>
+                  <span class="value">${num}</span>
+                </span>
+                <span class="course-run metadata-item">
+                  <span class="label">${_("Course Run:")}</span> <span class="value">${run}</span>
+                </span>
+              </div>
             </a>
-            <a href="${lms_link}" rel="external" class="button view-button view-live-button">${_("View Live")}</a>
+
+            <ul  class="item-actions course-actions">
+              <li class="action">
+                <a href="${lms_link}" rel="external" class="button view-button view-live-button">${_("View Live")}</a>
+              </li>
+            </ul>
           </li>
           %endfor
         </ul>

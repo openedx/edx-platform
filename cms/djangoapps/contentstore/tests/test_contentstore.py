@@ -1141,7 +1141,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         resp = self.client.get(reverse('index'))
         self.assertContains(
             resp,
-            '<span class="class-name">Robot Super Educational Course</span>',
+            '<h3 class="course-title">Robot Super Educational Course</h3>',
             status_code=200,
             html=True
         )
