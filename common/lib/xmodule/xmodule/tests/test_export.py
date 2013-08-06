@@ -40,6 +40,8 @@ def strip_filenames(descriptor):
     for d in descriptor.get_children():
         strip_filenames(d)
 
+    descriptor.save()
+
 
 class RoundTripTestCase(unittest.TestCase):
     ''' Check that our test courses roundtrip properly.
