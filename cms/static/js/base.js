@@ -605,18 +605,108 @@ function cancelNewSection(e) {
 function addNewCourse(e) {
     e.preventDefault();
     $('.new-course-button').addClass('is-disabled');
+    $('.new-course-save').addClass('is-disabled');
     var $newCourse = $('.wrapper-create-course').addClass('is-shown');
     var $cancelButton = $newCourse.find('.new-course-cancel');
-    $newCourse.find('.new-course-name').focus().select();
-    $newCourse.find('form').bind('submit', saveNewCourse);
+    var $courseName = $('.new-course-name');
+    $courseName.focus().select();
+    $('.new-course-save').on('click', saveNewCourse);
     $cancelButton.bind('click', cancelNewCourse);
     $body.bind('keyup', {
         $cancelButton: $cancelButton
     }, checkForCancel);
+    // Handle validation asynchronously
+    _.each(
+        ['.new-course-org', '.new-course-number', '.new-course-run'],
+        function(ele) {
+            var $ele = $(ele);
+            $ele.on('keyup', function(event) {
+                // Don't bother showing "required field" error when
+                // the user tabs into a new field; this is distracting
+                // and unnecessary
+                if(event.keyCode === 9) {
+                    return;
+                }
+                var error = validateCourseItemEncoding($ele.val());
+                setNewCourseFieldInErr($ele.parent('li'), error);
+                validateTotalCourseItemsLength();
+            });
+        }
+    );
+    var $name = $('.new-course-name');
+    $name.on('keyup', function() {
+        var error = validateCourseName($name.val());
+        setNewCourseFieldInErr($name.parent('li'), error);
+        validateTotalCourseItemsLength();
+    });
+}
+
+function setNewCourseFieldInErr(el, msg) {
+    el.children('.tip-error').remove();
+    if(msg) {
+        el.addClass('error');
+        el.append('<span class="tip tip-error">' + msg + '</span>');
+        $('.new-course-save').addClass('is-disabled');
+    }
+    else {
+        el.removeClass('error');
+        // One "error" div is always present, but hidden or shown
+        if($('.error').length === 1) {
+            $('.new-course-save').removeClass('is-disabled');
+        }
+    }
+};
+
+function validateCourseName(name) {
+    if(name.length === 0) {
+        return gettext('Required field.');
+    }
+    return '';
+}
+
+// Check that a course (org, number, run) doesn't use any special characters
+function validateCourseItemEncoding(item) {
+    if(item === '') {
+        return gettext('Required field.');
+    }
+    if(item !== encodeURIComponent(item)) {
+        return gettext('Please do not use any spaces or special characters in this field.');
+    }
+    return '';
+}
+
+// Ensure that all items are less than 80 characters.
+function validateTotalCourseItemsLength() {
+    var totalLength = _.reduce(
+        ['.new-course-name', '.new-course-org', '.new-course-number', '.new-course-run'],
+        function(sum, ele) {
+            return sum + $(ele).val().length;
+        }, 0
+    );
+    if(totalLength > 80) {
+        $('.wrap-error').addClass('is-shown');
+        $('#course_creation_error').html('<p>' + gettext('Course fields must have a combined length of no more than 80 characters.') + '</p>');
+        $('.new-course-save').addClass('is-disabled');
+    }
+    else {
+        $('.wrap-error').removeClass('is-shown');
+    }
 }
 
 function saveNewCourse(e) {
     e.preventDefault();
+
+    // One final check for empty values
+    var errors = _.reduce(
+        ['.new-course-name', '.new-course-org', '.new-course-number', '.new-course-run'],
+        function(acc, ele) {
+            var $ele = $(ele);
+            var error = $ele.val().length === 0 ? gettext('Required field.') : '';
+            setNewCourseFieldInErr($ele.parent('li'), error);
+            return error ? true : acc;
+        },
+        false
+    );
 
     var $newCourseForm = $(this).closest('#create-course-form');
     var display_name = $newCourseForm.find('.new-course-name').val();
@@ -624,61 +714,9 @@ function saveNewCourse(e) {
     var number = $newCourseForm.find('.new-course-number').val();
     var run = $newCourseForm.find('.new-course-run').val();
 
-    var required_field_text = gettext('Required field');
-
-    var display_name_errMsg = (display_name === '') ? required_field_text : null;
-    var org_errMsg = (org === '') ? required_field_text : null;
-    var number_errMsg = (number === '') ? required_field_text : null;
-    var run_errMsg = (run === '') ? required_field_text : null;
-
-    var bInErr = (display_name_errMsg || org_errMsg || number_errMsg || run_errMsg);
-
-    // check for suitable encoding
-    if (!bInErr) {
-        var encoding_errMsg = gettext('Please do not use any spaces or special characters in this field.');
-
-        if (encodeURIComponent(org) != org)
-            org_errMsg = encoding_errMsg;
-        if (encodeURIComponent(number) != number)
-            number_errMsg = encoding_errMsg;
-        if (encodeURIComponent(run) != run)
-            run_errMsg = encoding_errMsg;
-
-        bInErr = (org_errMsg || number_errMsg || run_errMsg);
-    }
-
-    var header_err_msg = (bInErr) ? gettext('Please correct the fields below.') : null;
-
-    var setNewCourseErrMsgs = function(header_err_msg, display_name_errMsg, org_errMsg, number_errMsg, run_errMsg) {
-        if (header_err_msg) {
-            $('.wrapper-create-course').addClass('has-errors');
-            $('.wrap-error').addClass('is-shown');
-            $('#course_creation_error').html('<p>' + header_err_msg + '</p>');
-        } else {
-            $('.wrap-error').removeClass('is-shown');
-            $('#course_creation_error').html('');
-        }
-
-        var setNewCourseFieldInErr = function(el, msg) {
-            el.children('.tip-error').remove();
-            if (msg !== null && msg !== '') {
-                el.addClass('error');
-                el.append('<span class="tip tip-error">' + msg + '</span>');
-            } else {
-                el.removeClass('error');
-            }
-        };
-
-        setNewCourseFieldInErr($('#field-course-name'), display_name_errMsg);
-        setNewCourseFieldInErr($('#field-organization'), org_errMsg);
-        setNewCourseFieldInErr($('#field-course-number'), number_errMsg);
-        setNewCourseFieldInErr($('#field-course-run'), run_errMsg);
-    };
-
-    setNewCourseErrMsgs(header_err_msg, display_name_errMsg, org_errMsg, number_errMsg, run_errMsg);
-
-    if (bInErr)
+    if(errors) {
         return;
+    }
 
     analytics.track('Created a Course', {
         'org': org,
@@ -698,8 +736,13 @@ function saveNewCourse(e) {
                 window.location = '/' + data.id.replace(/.*:\/\//, '');
             } else if (data.ErrMsg !== undefined) {
                 var orgErrMsg = (data.OrgErrMsg !== undefined) ? data.OrgErrMsg : null;
+                if(orgErrMsg) {
+                    setNewCourseFieldInErr($('.new-course-org').parent('li'), orgErrMsg);
+                }
                 var courseErrMsg = (data.CourseErrMsg !== undefined) ? data.CourseErrMsg : null;
-                setNewCourseErrMsgs(data.ErrMsg, null, orgErrMsg, courseErrMsg, null);
+                if(courseErrMsg) {
+                    setNewCourseFieldInErr($('.new-course-number').parent('li'), orgErrMsg);
+                }
             }
         }
     );

@@ -226,7 +226,6 @@ form[class^="create-"] {
         }
 
         .tip-error {
-          @extend .anim-fadeIn;
           display: block;
           color: $red;
         }
