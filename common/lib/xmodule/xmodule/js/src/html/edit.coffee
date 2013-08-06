@@ -4,6 +4,8 @@ class @HTMLEditingDescriptor
   constructor: (element) ->
     @element = element;
     @base_asset_url = @element.find("#editor-tab").data('base-asset-url')
+    if @base_asset_url == undefined
+      @base_asset_url = null
 
     @advanced_editor = CodeMirror.fromTextArea($(".edit-box", @element)[0], {
       mode: "text/html"
@@ -104,6 +106,9 @@ class @HTMLEditingDescriptor
     @showingVisualEditor = false
 
   rewriteStaticLinks: (content, from, to) ->
+    if from == null || to == null
+      return content
+
     regex = new RegExp(from, 'g')
     return content.replace(regex, to)    
 
