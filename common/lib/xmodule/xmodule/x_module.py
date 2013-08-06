@@ -902,6 +902,8 @@ class ModuleSystem(Runtime):
                  s3_interface=None,
                  cache=None,
                  can_execute_unsafe_code=None,
+                 replace_course_urls=None,
+                 replace_jump_to_id_urls=None
     ):
         '''
         Create a closure around the system environment.
@@ -978,6 +980,8 @@ class ModuleSystem(Runtime):
 
         self.cache = cache or DoNothingCache()
         self.can_execute_unsafe_code = can_execute_unsafe_code or (lambda: False)
+        self.replace_course_urls = replace_course_urls
+        self.replace_jump_to_id_urls = replace_jump_to_id_urls
 
     def get(self, attr):
         '''	provide uniform access to attributes (like etree).'''
