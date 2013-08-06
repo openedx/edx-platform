@@ -368,16 +368,15 @@
           expect(realHeight).toBeCloseTo(shouldBeHeight, 2);
         });
 
-        xit('when CC button is disabled ', function() {
+        it('when CC button is disabled ', function() {
           var realHeight = parseInt($('.subtitles').css('maxHeight'), 10),
               videoWrapperHeight = $('.video-wrapper').height(),
-              controlsHeight = videoControl.el.height(),
               progressSliderHeight = videoControl.sliderEl.height(),
-              shouldBeHeight = videoWrapperHeight - controlsHeight - 0.5 * controlsHeight;
+              shouldBeHeight = videoWrapperHeight - 0.5 * progressSliderHeight;
 
           state.captionsHidden = true;
           videoCaption.setSubtitlesHeight();
-          expect(realHeight).toBeCloseTo($('.video-wrapper').height(shouldBeHeight, 2));
+          expect(realHeight).toBeCloseTo(shouldBeHeight, 2);
         });
       });
 
