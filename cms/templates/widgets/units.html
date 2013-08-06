@@ -19,7 +19,7 @@ This def will enumerate through a passed in subsection and list all of the units
       else:
         selected_class = ''
     %>
-    <div class="section-item ${selected_class}">
+    <div class="section-item unit-drag-handle ${selected_class}">
       <a href="${reverse('edit_unit', args=[unit.location])}" class="${unit_state}-item">
         <span class="${unit.scope_ids.block_type}-icon"></span>
         <span class="unit-name">${unit.display_name_with_default}</span>
@@ -27,7 +27,6 @@ This def will enumerate through a passed in subsection and list all of the units
       % if actions:
       <div class="item-actions">
 	<a href="#" data-tooltip="Delete this unit" class="delete-button" data-id="${unit.location}"><span class="delete-icon"></span></a>
-	<a href="#" data-tooltip="Drag to sort" class="drag-handle unit-drag-handle"></a>
       </div>
       % endif
     </div>

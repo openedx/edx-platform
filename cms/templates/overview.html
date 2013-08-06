@@ -141,7 +141,7 @@ require(["domReady!", "jquery", "js/models/location", "js/models/section", "js/v
       <article class="courseware-overview" data-id="${context_course.location.url()}">
         % for section in sections:
         <section class="courseware-section branch" data-id="${section.location}" data-parent-id="${context_course.location.url()}">
-          <header>
+          <header class="section-drag-handle">
           <a href="#" data-tooltip="${_('Expand/collapse this section')}" class="expand-collapse-icon collapse"></a>
 
             <div class="item-details" data-id="${section.location}">
@@ -169,7 +169,6 @@ require(["domReady!", "jquery", "js/models/location", "js/models/section", "js/v
 
             <div class="item-actions">
               <a href="#" data-tooltip="${_('Delete this section')}" class="delete-button delete-section-button"><span class="delete-icon"></span></a>
-              <a href="#" data-tooltip="${_('Drag to reorder')}" class="drag-handle section-drag-handle"></a>
             </div>
           </header>
           <div class="subsection-list">
@@ -181,7 +180,7 @@ require(["domReady!", "jquery", "js/models/location", "js/models/section", "js/v
             <ol data-id="${section.location.url()}">
               % for subsection in section.get_children():
               <li class="branch collapsed id-holder draggable" data-id="${subsection.location}" data-parent-id="${section.location.url()}">
-                <div class="section-item">
+                <div class="section-item subsection-drag-handle">
                   <div class="details">
                     <a href="#" data-tooltip="${_('Expand/collapse this subsection')}" class="expand-collapse-icon expand"></a>
                     <a href="${reverse('edit_subsection', args=[subsection.location])}">
@@ -195,7 +194,6 @@ require(["domReady!", "jquery", "js/models/location", "js/models/section", "js/v
 
                   <div class="item-actions">
                     <a href="#" data-tooltip="${_('Delete this subsection')}" class="delete-button delete-subsection-button"><span class="delete-icon"></span></a>
-                    <a href="#" data-tooltip="${_('Drag to reorder')}" class="drag-handle subsection-drag-handle"></a>
                   </div>
                 </div>
                 ${units.enum_units(subsection)}

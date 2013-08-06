@@ -3,23 +3,23 @@ $(document).ready(function() {
     // Section
     makeDraggable(
         '.courseware-section',
-        'a.section-drag-handle',
+        '.section-drag-handle',
         '.courseware-overview',
         'article.courseware-overview'
     );
     // Subsection
     makeDraggable(
         '.id-holder',
-        'a.subsection-drag-handle',
+        '.subsection-drag-handle',
         '.subsection-list > ol',
         '.courseware-section'
     );
     // Unit
     makeDraggable(
         '.unit',
-        'a.unit-drag-handle',
-        '.sortable-unit-list',
-        'li.branch'
+        '.unit-drag-handle',
+        'ol.sortable-unit-list',
+        'li.branch, article.subsection-body'
     );
 
     /*
