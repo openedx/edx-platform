@@ -124,3 +124,14 @@ def all_sections_are_collapsed(step):
 def change_grading_status(step):
     world.css_find('a.menu-toggle').click()
     world.css_find('.menu li').first.click()
+
+
+@step(u'I reorder subsections')
+def reorder_subsections(_step):
+    draggable_css = 'a.drag-handle'
+    ele = world.css_find(draggable_css).first
+    ele.action_chains.drag_and_drop_by_offset(
+        ele._element,
+        30,
+        0
+    ).perform()

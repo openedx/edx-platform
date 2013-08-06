@@ -178,10 +178,6 @@ for name, value in ENV_TOKENS.get("CODE_JAIL", {}).items():
 
 COURSES_WITH_UNSAFE_CODE = ENV_TOKENS.get("COURSES_WITH_UNSAFE_CODE", [])
 
-# automatic log in for load testing
-MITX_FEATURES['AUTOMATIC_AUTH_FOR_LOAD_TESTING'] = ENV_TOKENS.get('AUTOMATIC_AUTH_FOR_LOAD_TESTING')
-MITX_FEATURES['MAX_AUTO_AUTH_USERS'] = ENV_TOKENS.get('MAX_AUTO_AUTH_USERS')
-
 ############################## SECURE AUTH ITEMS ###############
 # Secret things: passwords, access keys, etc.
 

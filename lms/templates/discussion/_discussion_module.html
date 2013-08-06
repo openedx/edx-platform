@@ -1,8 +1,7 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%include file="_underscore_templates.html" />
 
 <div class="discussion-module" data-discussion-id="${discussion_id | h}">
     <a class="discussion-show control-button" href="javascript:void(0)" data-discussion-id="${discussion_id | h}"><span class="show-hide-discussion-icon"></span><span class="button-text">Show Discussion</span></a>
-    <a href="#" class="new-post-btn"><span class="icon icon-edit new-post-icon"></span>New Post</a>
-    
-    
+    <a href="#" class="new-post-btn"><span class="icon icon-edit new-post-icon"></span>${_("New Post")}</a>    
 </div>

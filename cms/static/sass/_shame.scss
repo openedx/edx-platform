@@ -23,6 +23,13 @@ body.dashboard {
 }
 
 
+// yes we have no boldness today - need to fix the resets
+body strong,
+body b {
+  font-weight: 700;
+}
+
+// known things to do (paint the fence, sand the floor, wax on/off)
 // ====================
 
 

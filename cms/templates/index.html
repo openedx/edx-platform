@@ -36,36 +36,6 @@
 </script>
 </%block>
 
-<%block name="header_extras">
-  <script type="text/template" id="new-course-template">
-    <section class="new-course">
-      <h3 class="title">${_("Create a New Course:")}</h3>
-      <div class="item-details">
-        <form class="course-info">
-          <div class="row">
-	    <label>${_("Course Name")}</label>
-            <input type="text" class="new-course-name" />
-          </div>
-          <div class="row">
-            <div class="column">
-	      <label>${_("Organization")}</label>
-              <input type="text" class="new-course-org" />
-            </div>
-            <div class="column">
-	      <label>${_("Course Number")}</label>
-              <input type="text" class="new-course-number" />
-            </div>
-          </div>
-          <div class="row">
-            <input type="submit" value="${_('Save')}" class="new-course-save"/>
-            <input type="button" value="${_('Cancel')}" class="new-course-cancel" />
-          </div>
-        </form>
-      </div>
-    </section>
-  </script>
-</%block>
-
 <%block name="content">
 <div class="wrapper-mast wrapper">
   <header class="mast has-actions">
@@ -108,6 +78,57 @@
         </div>
         %endif
       </div>
+
+      % if course_creator_status=='granted':
+      <div class="wrapper-create-element wrapper-create-course">
+        <form class="create-course course-info" id="create-course-form" name="create-course-form">
+          <div class="wrap-error">
+            <div id="course_creation_error" name="course_creation_error" class="message message-status message-status error" role="alert">
+            <p>${_("Please correct the highlighted fields below.")}</p>
+            </div>
+          </div>
+
+          <div class="wrapper-form">
+            <h3 class="title">${_("Create a New Course")}</h3>
+
+            <fieldset>
+              <legend class="sr">${_("Required Information to Create a New Course")}</legend>
+
+              <ol class="list-input">
+                <li class="field field-inline text required" id="field-course-name">
+                  <label for="new-course-name">${_("Course Name")}</label>
+                  <input class="new-course-name" id="new-course-name" type="text" name="new-course-name" aria-required="true" placeholder="${_('e.g. Introduction to Computer Science')}" />
+                  <span class="tip tip-stacked">${_("The public display name for your course.")}</span>
+                </li>
+                <li class="field field-inline text required" id="field-organization">
+                  <label for="new-course-org">${_("Organization")}</label>
+                  <input class="new-course-org" id="new-course-org" type="text" name="new-course-org" aria-required="true" placeholder="${_('e.g. MITX or IMF')}" />
+                  <span class="tip tip-stacked">${_("The name of the organization sponsoring the course")}  - <strong>${_("Note: No spaces or special characters are allowed. This cannot be changed.")}</strong></span>
+                </li>
+
+                <li class="field field-inline text required" id="field-course-number">
+                  <label for="new-course-number">${_("Course Number")}</label>
+                  <input class="new-course-number" id="new-course-number" type="text" name="new-course-number" aria-required="true" placeholder="${_('e.g. CS101')}" />
+                  <span class="tip tip-stacked">${_("The unique number that identifies your course within your organization")} - <strong>${_("Note: No spaces or special characters are allowed. This cannot be changed.")}</strong></span>
+                </li>
+
+                <li class="field field-inline text required" id="field-course-run">
+                  <label for="new-course-run">${_("Course Run")}</label>
+                  <input class="new-course-run" id="new-course-run" type="text" name="new-course-run" aria-required="true"placeholder="${_('e.g. 2013_Spring')}" />
+                  <span class="tip tip-stacked">${_("The term in which your course will run")} - <strong>${_("Note: No spaces or special characters are allowed. This cannot be changed.")}</strong></span>
+                </li>
+              </ol>
+
+            </fieldset>
+          </div>
+
+          <div class="actions">
+            <input type="submit" value="${_('Save')}" class="action action-primary new-course-save" />
+            <input type="button" value="${_('Cancel')}" class="action action-secondary action-cancel new-course-cancel" />
+          </div>
+        </form>
+      </div>
+      % endif
 
       %if len(courses) > 0:
       <div class="courses">

@@ -305,6 +305,7 @@ def get_course_tabs(user, course, active_page):
         tabs.append(CourseTab('Instructor',
                               reverse('instructor_dashboard', args=[course.id]),
                               active_page == 'instructor'))
+
     return tabs
 
 
@@ -386,6 +387,6 @@ def get_static_tab_contents(request, course, tab):
     html = ''
 
     if tab_module is not None:
-        html = tab_module.get_html()
+        html = tab_module.runtime.render(tab_module, None, 'student_view').content
 
     return html

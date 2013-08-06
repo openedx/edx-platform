@@ -20,6 +20,7 @@ from django.http import Http404
 from django.conf import settings
 
 from xmodule.x_module import XModule
+from xmodule.editing_module import TabsEditingDescriptor
 from xmodule.raw_module import RawDescriptor
 from xmodule.modulestore.mongo import MongoModuleStore
 from xmodule.modulestore.django import modulestore
@@ -68,14 +69,19 @@ class VideoAlphaModule(VideoAlphaFields, XModule):
     icon_class = 'video'
 
     js = {
-        'js': [resource_string(__name__, 'js/src/videoalpha/display/html5_video.js')],
-        'coffee':
-        [resource_string(__name__, 'js/src/time.coffee'),
-         resource_string(__name__, 'js/src/videoalpha/display.coffee')] +
-        [resource_string(__name__, 'js/src/videoalpha/display/' + filename)
-         for filename
-         in sorted(resource_listdir(__name__, 'js/src/videoalpha/display'))
-         if filename.endswith('.coffee')]}
+        'js': [
+            resource_string(__name__, 'js/src/videoalpha/01_initialize.js'),
+            resource_string(__name__, 'js/src/videoalpha/02_html5_video.js'),
+            resource_string(__name__, 'js/src/videoalpha/03_video_player.js'),
+            resource_string(__name__, 'js/src/videoalpha/04_video_control.js'),
+            resource_string(__name__, 'js/src/videoalpha/05_video_quality_control.js'),
+            resource_string(__name__, 'js/src/videoalpha/06_video_progress_slider.js'),
+            resource_string(__name__, 'js/src/videoalpha/07_video_volume_control.js'),
+            resource_string(__name__, 'js/src/videoalpha/08_video_speed_control.js'),
+            resource_string(__name__, 'js/src/videoalpha/09_video_caption.js'),
+            resource_string(__name__, 'js/src/videoalpha/10_main.js')
+        ]
+    }
     css = {'scss': [resource_string(__name__, 'css/videoalpha/display.scss')]}
     js_module_name = "VideoAlpha"
 
@@ -87,6 +93,11 @@ class VideoAlphaModule(VideoAlphaFields, XModule):
         self.youtube_streams = xmltree.get('youtube', '')
 
         self.sub = xmltree.get('sub')
+
+        self.autoplay = xmltree.get('autoplay') or ''
+        if self.autoplay.lower() not in ['true', 'false']:
+            self.autoplay = 'true'
+
         self.position = 0
         self.show_captions = xmltree.get('show_captions', 'true')
         self.sources = {
@@ -162,6 +173,7 @@ class VideoAlphaModule(VideoAlphaFields, XModule):
             'youtube_streams': self.youtube_streams,
             'id': self.location.html_id(),
             'sub': self.sub,
+            'autoplay': self.autoplay,
             'sources': self.sources,
             'track': self.track,
             'display_name': self.display_name_with_default,
@@ -176,6 +188,23 @@ class VideoAlphaModule(VideoAlphaFields, XModule):
         })
 
 
-class VideoAlphaDescriptor(VideoAlphaFields, RawDescriptor):
+class VideoAlphaDescriptor(VideoAlphaFields, TabsEditingDescriptor, RawDescriptor):
     """Descriptor for `VideoAlphaModule`."""
     module_class = VideoAlphaModule
+
+    tabs = [
+        {
+            'name': "XML",
+            'template': "videoalpha/codemirror-edit.html",
+            'css': {'scss': [resource_string(__name__, 'css/tabs/codemirror.scss')]},
+            'current': True,
+        },
+        # {
+        #     'name': "Subtitles",
+        #     'template': "videoalpha/subtitles.html",
+        # },
+        {
+            'name': "Settings",
+            'template': "tabs/metadata-edit-tab.html"
+        }
+    ]

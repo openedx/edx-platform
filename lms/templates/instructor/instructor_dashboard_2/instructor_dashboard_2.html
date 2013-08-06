@@ -1,0 +1,56 @@
+<%inherit file="/main.html" />
+<%! from django.core.urlresolvers import reverse %>
+<%namespace name='static' file='/static_content.html'/>
+
+<%block name="headextra">
+  <%static:css group='course'/>
+  <script type="text/javascript" src="${static.url('js/vendor/underscore-min.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/mustache.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.axislabels.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/jquery-jvectormap-1.1.1/jquery-jvectormap-1.1.1.min.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/jquery-jvectormap-1.1.1/jquery-jvectormap-world-mill-en.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/course_groups/cohorts.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/jquery.event.drag-2.2.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/jquery.event.drop-2.2.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/slick.core.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/slick.grid.js')}"></script>
+  <link rel="stylesheet" href="${static.url('css/vendor/slickgrid/smoothness/jquery-ui-1.8.16.custom.css')}">
+  <link rel="stylesheet" href="${static.url('css/vendor/slickgrid/slick.grid.css')}">
+</%block>
+
+## NOTE that instructor is set as the active page so that the instructor button lights up, even though this is the instructor_2 page.
+<%include file="/courseware/course_navigation.html" args="active_page='instructor'" />
+
+<style type="text/css"></style>
+
+<script language="JavaScript" type="text/javascript"></script>
+
+<section class="container">
+<div class="instructor-dashboard-wrapper-2">
+<div class="olddash-button-wrapper"><a href="${ old_dashboard_url }"> Back to Standard Dashboard </a></div>
+<section class="instructor-dashboard-content-2">
+
+  ## <h1>Instructor Dashboard</h1>
+
+  ## links which are tied to idash-sections below.
+  ## the links are acativated and handled in instructor_dashboard.coffee
+  ## when the javascript loads, it clicks on the first section
+  <h2 class="instructor-nav">
+    % for section_data in sections:
+      <a href="" data-section="${ section_data['section_key'] }">${ section_data['section_display_name'] }</a>
+    % endfor
+  </h2>
+
+  ## each section corresponds to a section_data sub-dictionary provided by the view
+  ## to keep this short, sections can be pulled out into their own files
+
+  % for section_data in sections:
+    <section id="${ section_data['section_key'] }" class="idash-section">
+      <%include file="${ section_data['section_key'] }.html" args="section_data=section_data" />
+    </section>
+  % endfor
+
+</section>
+</div>
+</section>

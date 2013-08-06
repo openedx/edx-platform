@@ -1,9 +1,20 @@
-<%! from django.core.urlresolvers import reverse %>
-<%! from xmodule.util.date_utils import get_default_time_display %>
+<%!
+    from django.core.urlresolvers import reverse
+    from xmodule.util.date_utils import get_default_time_display
+    from django.utils.translation import ugettext as _
+%>
 
 <%def name="make_chapter(chapter)">
   <div class="chapter">
-      <h3 ${' class="active"' if 'active' in chapter and chapter['active'] else ''} aria-label="${chapter['display_name']}${', current chapter' if 'active' in chapter and chapter['active'] else ''}">
+      <%
+          if chapter.get('active'):
+              aria_label = _('{chapter}, current chapter').format(chapter=chapter['display_name'])
+              active_class = ' class="active"'
+          else:
+              aria_label = chapter['display_name']
+              active_class = ''
+      %>
+      <h3 ${active_class} aria-label="${aria_label}">
         <a href="#">
           ${chapter['display_name']}
         </a>

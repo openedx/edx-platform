@@ -42,8 +42,8 @@ def i_save_a_new_section_release_date(_step):
     world.browser.click_link_by_text('Save')
 
 
-@step('I see a "saving" notification')
-def i_see_a_saving_notification(step):
+@step('I see a "(saving|deleting)" notification')
+def i_see_a_mini_notification(_step, _type):
     saving_css = '.wrapper-notification-mini'
     assert world.is_css_present(saving_css)
 

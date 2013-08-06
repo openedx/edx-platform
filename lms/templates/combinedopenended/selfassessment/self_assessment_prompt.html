@@ -1,3 +1,4 @@
+<%! from django.utils.translation import ugettext as _ %>
 <section id="self_assessment_${id}" class="open-ended-child" data-ajax-url="${ajax_url}"
          data-id="${id}" data-state="${state}" data-allow_reset="${allow_reset}" data-child-type="${child_type}">
     <div class="error"></div>
@@ -5,7 +6,7 @@
     ${prompt}
     </div>
 
-    <h4>Response</h4>
+    <h4>${_("Response")}</h4>
     <div>
     <textarea name="answer" class="answer short-form-response" cols="70" rows="20">${previous_answer|n}</textarea>
     </div>
@@ -19,5 +20,5 @@
     <div class="message-wrapper"></div>
 
     <div class="file-upload"></div>
-    <input type="button" value="Submit" class="submit-button" name="show"/>
+    <input type="button" value="${_("Submit")}" class="submit-button" name="show"/>
 </section>

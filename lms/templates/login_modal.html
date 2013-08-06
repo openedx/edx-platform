@@ -1,38 +1,40 @@
+<%! from django.utils.translation import ugettext as _ %>
+
 <%! from django.core.urlresolvers import reverse %>
 <%namespace name='static' file='static_content.html'/>
 
 <section id="login-modal" class="modal login-modal">
   <div class="inner-wrapper">
     <header>
-      <h2>Log In</h2>
+      <h2>${_("Log In")}</h2>
       <hr>
     </header>
 
     <form id="login_form" class="login_form" method="post" data-remote="true" action="/login">
-      <label for="login_email">E-mail</label>
+      <label for="login_email">${_("E-mail")}</label>
         <input id="login_email" type="email" name="email" placeholder="e.g. yourname@domain.com" />
       
-      <label for="login_password">Password</label>
+      <label for="login_password">${_("Password")}</label>
         <input id="login_password" type="password" name="password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" />  
       
       <label for="login_remember_me" class="remember-me">
         <input id="login_remember_me" type="checkbox" name="remember" value="true" />
-        Remember me
+        ${_("Remember me")}
       </label>
       
       <div class="submit">
-        <input name="submit" type="submit" value="Access My Courses">
+        <input name="submit" type="submit" value="${_('Access My Courses')}">
       </div>
     </form>
 
     <section class="login-extra">
       <p>
-        <span>Not enrolled? <a href="#signup-modal" class="close-login" rel="leanModal">Sign up.</a></span>
-        <a href="#forgot-password-modal" rel="leanModal" class="pwd-reset">Forgot password?</a>
+        <span>${_('Not enrolled?')} <a href="#signup-modal" class="close-login" rel="leanModal">${_('Sign up.')}</a></span>
+        <a href="#forgot-password-modal" rel="leanModal" class="pwd-reset">${_('Forgot password?')}</a>
       </p>
 % if settings.MITX_FEATURES.get('AUTH_USE_OPENID'):
       <p>
-      <a href="${MITX_ROOT_URL}/openid/login/">login via openid</a>
+      <a href="${MITX_ROOT_URL}/openid/login/">${_('login via openid')}</a>
       </p>
 % endif
     </section>

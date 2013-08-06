@@ -1,195 +1,319 @@
-"""
-Tests for user.py.
-"""
 import json
-import mock
 from .utils import CourseTestCase
+from django.contrib.auth.models import User, Group
 from django.core.urlresolvers import reverse
-from contentstore.views.user import _get_course_creator_status
-from course_creators.views import add_user_with_status_granted
-from course_creators.admin import CourseCreatorAdmin
-from course_creators.models import CourseCreator
-
-from django.http import HttpRequest
-from django.contrib.auth.models import User
-from django.contrib.admin.sites import AdminSite
+from auth.authz import get_course_groupname_for_role
 
 
 class UsersTestCase(CourseTestCase):
     def setUp(self):
         super(UsersTestCase, self).setUp()
-        self.url = reverse("add_user", kwargs={"location": ""})
+        self.ext_user = User.objects.create_user(
+            "joe", "joe@comedycentral.com", "haha")
+        self.ext_user.is_active = True
+        self.ext_user.is_staff = False
+        self.ext_user.save()
+        self.inactive_user = User.objects.create_user(
+            "carl", "carl@comedycentral.com", "haha")
+        self.inactive_user.is_active = False
+        self.inactive_user.is_staff = False
+        self.inactive_user.save()
 
-    def test_empty(self):
-        resp = self.client.post(self.url)
+        self.index_url = reverse("manage_users", kwargs={
+            "org": self.course.location.org,
+            "course": self.course.location.course,
+            "name": self.course.location.name,
+        })
+        self.detail_url = reverse("course_team_user", kwargs={
+            "org": self.course.location.org,
+            "course": self.course.location.course,
+            "name": self.course.location.name,
+            "email": self.ext_user.email,
+        })
+        self.inactive_detail_url = reverse("course_team_user", kwargs={
+            "org": self.course.location.org,
+            "course": self.course.location.course,
+            "name": self.course.location.name,
+            "email": self.inactive_user.email,
+        })
+        self.invalid_detail_url = reverse("course_team_user", kwargs={
+            "org": self.course.location.org,
+            "course": self.course.location.course,
+            "name": self.course.location.name,
+            "email": "nonexistent@user.com",
+        })
+        self.staff_groupname = get_course_groupname_for_role(self.course.location, "staff")
+        self.inst_groupname = get_course_groupname_for_role(self.course.location, "instructor")
+
+    def test_index(self):
+        resp = self.client.get(self.index_url)
+        # ext_user is not currently a member of the course team, and so should
+        # not show up on the page.
+        self.assertNotContains(resp, self.ext_user.email)
+
+    def test_index_member(self):
+        group, _ = Group.objects.get_or_create(name=self.staff_groupname)
+        self.ext_user.groups.add(group)
+        self.ext_user.save()
+
+        resp = self.client.get(self.index_url)
+        self.assertContains(resp, self.ext_user.email)
+
+    def test_detail(self):
+        resp = self.client.get(self.detail_url)
+        self.assertEqual(resp.status_code, 200)
+        result = json.loads(resp.content)
+        self.assertEqual(result["role"], None)
+        self.assertTrue(result["active"])
+
+    def test_detail_inactive(self):
+        resp = self.client.get(self.inactive_detail_url)
+        self.assert2XX(resp.status_code)
+        result = json.loads(resp.content)
+        self.assertFalse(result["active"])
+
+    def test_detail_invalid(self):
+        resp = self.client.get(self.invalid_detail_url)
+        self.assert4XX(resp.status_code)
+        result = json.loads(resp.content)
+        self.assertIn("error", result)
+
+    def test_detail_post(self):
+        resp = self.client.post(
+            self.detail_url,
+            data={"role": None},
+        )
+        self.assert2XX(resp.status_code)
+        # reload user from DB
+        ext_user = User.objects.get(email=self.ext_user.email)
+        groups = [g.name for g in ext_user.groups.all()]
+        # no content: should not be in any roles
+        self.assertNotIn(self.staff_groupname, groups)
+        self.assertNotIn(self.inst_groupname, groups)
+
+    def test_detail_post_staff(self):
+        resp = self.client.post(
+            self.detail_url,
+            data=json.dumps({"role": "staff"}),
+            content_type="application/json",
+            HTTP_ACCEPT="application/json",
+        )
+        self.assert2XX(resp.status_code)
+        # reload user from DB
+        ext_user = User.objects.get(email=self.ext_user.email)
+        groups = [g.name for g in ext_user.groups.all()]
+        self.assertIn(self.staff_groupname, groups)
+        self.assertNotIn(self.inst_groupname, groups)
+
+    def test_detail_post_staff_other_inst(self):
+        inst_group, _ = Group.objects.get_or_create(name=self.inst_groupname)
+        self.user.groups.add(inst_group)
+        self.user.save()
+
+        resp = self.client.post(
+            self.detail_url,
+            data=json.dumps({"role": "staff"}),
+            content_type="application/json",
+            HTTP_ACCEPT="application/json",
+        )
+        self.assert2XX(resp.status_code)
+        # reload user from DB
+        ext_user = User.objects.get(email=self.ext_user.email)
+        groups = [g.name for g in ext_user.groups.all()]
+        self.assertIn(self.staff_groupname, groups)
+        self.assertNotIn(self.inst_groupname, groups)
+        # check that other user is unchanged
+        user = User.objects.get(email=self.user.email)
+        groups = [g.name for g in user.groups.all()]
+        self.assertNotIn(self.staff_groupname, groups)
+        self.assertIn(self.inst_groupname, groups)
+
+    def test_detail_post_instructor(self):
+        resp = self.client.post(
+            self.detail_url,
+            data=json.dumps({"role": "instructor"}),
+            content_type="application/json",
+            HTTP_ACCEPT="application/json",
+        )
+        self.assert2XX(resp.status_code)
+        # reload user from DB
+        ext_user = User.objects.get(email=self.ext_user.email)
+        groups = [g.name for g in ext_user.groups.all()]
+        self.assertNotIn(self.staff_groupname, groups)
+        self.assertIn(self.inst_groupname, groups)
+
+    def test_detail_post_missing_role(self):
+        resp = self.client.post(
+            self.detail_url,
+            data=json.dumps({"toys": "fun"}),
+            content_type="application/json",
+            HTTP_ACCEPT="application/json",
+        )
+        self.assert4XX(resp.status_code)
+        result = json.loads(resp.content)
+        self.assertIn("error", result)
+
+    def test_detail_post_bad_json(self):
+        resp = self.client.post(
+            self.detail_url,
+            data="{foo}",
+            content_type="application/json",
+            HTTP_ACCEPT="application/json",
+        )
+        self.assert4XX(resp.status_code)
+        result = json.loads(resp.content)
+        self.assertIn("error", result)
+
+    def test_detail_post_no_json(self):
+        resp = self.client.post(
+            self.detail_url,
+            data={"role": "staff"},
+            HTTP_ACCEPT="application/json",
+        )
+        self.assert2XX(resp.status_code)
+        # reload user from DB
+        ext_user = User.objects.get(email=self.ext_user.email)
+        groups = [g.name for g in ext_user.groups.all()]
+        self.assertIn(self.staff_groupname, groups)
+        self.assertNotIn(self.inst_groupname, groups)
+
+    def test_detail_delete_staff(self):
+        group, _ = Group.objects.get_or_create(name=self.staff_groupname)
+        self.ext_user.groups.add(group)
+        self.ext_user.save()
+
+        resp = self.client.delete(
+            self.detail_url,
+            HTTP_ACCEPT="application/json",
+        )
+        self.assert2XX(resp.status_code)
+        # reload user from DB
+        ext_user = User.objects.get(email=self.ext_user.email)
+        groups = [g.name for g in ext_user.groups.all()]
+        self.assertNotIn(self.staff_groupname, groups)
+
+    def test_detail_delete_instructor(self):
+        group, _ = Group.objects.get_or_create(name=self.inst_groupname)
+        self.user.groups.add(group)
+        self.ext_user.groups.add(group)
+        self.user.save()
+        self.ext_user.save()
+
+        resp = self.client.delete(
+            self.detail_url,
+            HTTP_ACCEPT="application/json",
+        )
+        self.assert2XX(resp.status_code)
+        # reload user from DB
+        ext_user = User.objects.get(email=self.ext_user.email)
+        groups = [g.name for g in ext_user.groups.all()]
+        self.assertNotIn(self.inst_groupname, groups)
+
+    def test_delete_last_instructor(self):
+        group, _ = Group.objects.get_or_create(name=self.inst_groupname)
+        self.ext_user.groups.add(group)
+        self.ext_user.save()
+
+        resp = self.client.delete(
+            self.detail_url,
+            HTTP_ACCEPT="application/json",
+        )
         self.assertEqual(resp.status_code, 400)
-        content = json.loads(resp.content)
-        self.assertEqual(content["Status"], "Failed")
+        result = json.loads(resp.content)
+        self.assertIn("error", result)
+        # reload user from DB
+        ext_user = User.objects.get(email=self.ext_user.email)
+        groups = [g.name for g in ext_user.groups.all()]
+        self.assertIn(self.inst_groupname, groups)
 
+    def test_post_last_instructor(self):
+        group, _ = Group.objects.get_or_create(name=self.inst_groupname)
+        self.ext_user.groups.add(group)
+        self.ext_user.save()
 
-class IndexCourseCreatorTests(CourseTestCase):
-    """
-    Tests the various permutations of course creator status.
-    """
-    def setUp(self):
-        super(IndexCourseCreatorTests, self).setUp()
+        resp = self.client.post(
+            self.detail_url,
+            data={"role": "staff"},
+            HTTP_ACCEPT="application/json",
+        )
+        self.assertEqual(resp.status_code, 400)
+        result = json.loads(resp.content)
+        self.assertIn("error", result)
+        # reload user from DB
+        ext_user = User.objects.get(email=self.ext_user.email)
+        groups = [g.name for g in ext_user.groups.all()]
+        self.assertIn(self.inst_groupname, groups)
 
-        self.index_url = reverse("index")
-        self.request_access_url = reverse("request_course_creator")
-
-        # Disable course creation takes precedence over enable creator group. I have enabled the
-        # latter to make this clear.
-        self.disable_course_creation = {
-            "DISABLE_COURSE_CREATION": True,
-            "ENABLE_CREATOR_GROUP": True,
-            'STUDIO_REQUEST_EMAIL': 'mark@marky.mark',
-        }
-
-        self.enable_creator_group = {"ENABLE_CREATOR_GROUP": True}
-
-        self.admin = User.objects.create_user('Mark', 'mark+courses@edx.org', 'foo')
-        self.admin.is_staff = True
-
-    def test_get_course_creator_status_disable_creation(self):
-        # DISABLE_COURSE_CREATION is True (this is the case on edx, where we have a marketing site).
-        # Only edx staff can create courses.
-        with mock.patch.dict('django.conf.settings.MITX_FEATURES', self.disable_course_creation):
-            self.assertTrue(self.user.is_staff)
-            self.assertEquals('granted', _get_course_creator_status(self.user))
-            self._set_user_non_staff()
-            self.assertFalse(self.user.is_staff)
-            self.assertEquals('disallowed_for_this_site', _get_course_creator_status(self.user))
-
-    def test_get_course_creator_status_default_cause(self):
-        # Neither ENABLE_CREATOR_GROUP nor DISABLE_COURSE_CREATION are enabled. Anyone can create a course.
-        self.assertEquals('granted', _get_course_creator_status(self.user))
-        self._set_user_non_staff()
-        self.assertEquals('granted', _get_course_creator_status(self.user))
-
-    def test_get_course_creator_status_creator_group(self):
-        # ENABLE_CREATOR_GROUP is True. This is the case on edge.
-        # Only staff members and users who have been granted access can create courses.
-        with mock.patch.dict('django.conf.settings.MITX_FEATURES', self.enable_creator_group):
-            # Staff members can always create courses.
-            self.assertEquals('granted', _get_course_creator_status(self.user))
-            # Non-staff must request access.
-            self._set_user_non_staff()
-            self.assertEquals('unrequested', _get_course_creator_status(self.user))
-            # Staff user requests access.
-            self.client.post(self.request_access_url)
-            self.assertEquals('pending', _get_course_creator_status(self.user))
-
-    def test_get_course_creator_status_creator_group_granted(self):
-        # ENABLE_CREATOR_GROUP is True. This is the case on edge.
-        # Check return value for a non-staff user who has been granted access.
-        with mock.patch.dict('django.conf.settings.MITX_FEATURES', self.enable_creator_group):
-            self._set_user_non_staff()
-            add_user_with_status_granted(self.admin, self.user)
-            self.assertEquals('granted', _get_course_creator_status(self.user))
-
-    def test_get_course_creator_status_creator_group_denied(self):
-        # ENABLE_CREATOR_GROUP is True. This is the case on edge.
-        # Check return value for a non-staff user who has been denied access.
-        with mock.patch.dict('django.conf.settings.MITX_FEATURES', self.enable_creator_group):
-            self._set_user_non_staff()
-            self._set_user_denied()
-            self.assertEquals('denied', _get_course_creator_status(self.user))
-
-    def test_disable_course_creation_enabled_non_staff(self):
-        # Test index page content when DISABLE_COURSE_CREATION is True, non-staff member.
-        with mock.patch.dict('django.conf.settings.MITX_FEATURES', self.disable_course_creation):
-            self._set_user_non_staff()
-            self._assert_cannot_create()
-
-    def test_disable_course_creation_enabled_staff(self):
-        # Test index page content when DISABLE_COURSE_CREATION is True, staff member.
-        with mock.patch.dict('django.conf.settings.MITX_FEATURES', self.disable_course_creation):
-            resp = self._assert_can_create()
-            self.assertFalse('Email staff to create course' in resp.content)
-
-    def test_can_create_by_default(self):
-        # Test index page content with neither ENABLE_CREATOR_GROUP nor DISABLE_COURSE_CREATION enabled.
-        # Anyone can create a course.
-        self._assert_can_create()
-        self._set_user_non_staff()
-        self._assert_can_create()
-
-    def test_course_creator_group_enabled(self):
-        # Test index page content with ENABLE_CREATOR_GROUP True.
-        # Staff can always create a course, others must request access.
-        with mock.patch.dict('django.conf.settings.MITX_FEATURES', self.enable_creator_group):
-            # Staff members can always create courses.
-            self._assert_can_create()
-
-            # Non-staff case.
-            self._set_user_non_staff()
-            resp = self._assert_cannot_create()
-            self.assertTrue(self.request_access_url in resp.content)
-
-            # Now request access.
-            self.client.post(self.request_access_url)
-
-            # Still cannot create a course, but the "request access button" is no longer there.
-            resp = self._assert_cannot_create()
-            self.assertFalse(self.request_access_url in resp.content)
-            self.assertTrue('has-status is-pending' in resp.content)
-
-    def test_course_creator_group_granted(self):
-        # Test index page content with ENABLE_CREATOR_GROUP True, non-staff member with access granted.
-        with mock.patch.dict('django.conf.settings.MITX_FEATURES', self.enable_creator_group):
-            self._set_user_non_staff()
-            add_user_with_status_granted(self.admin, self.user)
-            self._assert_can_create()
-
-    def test_course_creator_group_denied(self):
-        # Test index page content with ENABLE_CREATOR_GROUP True, non-staff member with access denied.
-        with mock.patch.dict('django.conf.settings.MITX_FEATURES', self.enable_creator_group):
-            self._set_user_non_staff()
-            self._set_user_denied()
-            resp = self._assert_cannot_create()
-            self.assertFalse(self.request_access_url in resp.content)
-            self.assertTrue('has-status is-denied' in resp.content)
-
-    def _assert_can_create(self):
-        """
-        Helper method that posts to the index page and checks that the user can create a course.
-
-        Returns the response from the post.
-        """
-        resp = self.client.post(self.index_url)
-        self.assertTrue('new-course-button' in resp.content)
-        self.assertFalse(self.request_access_url in resp.content)
-        self.assertFalse('Email staff to create course' in resp.content)
-        return resp
-
-    def _assert_cannot_create(self):
-        """
-        Helper method that posts to the index page and checks that the user cannot create a course.
-
-        Returns the response from the post.
-        """
-        resp = self.client.post(self.index_url)
-        self.assertFalse('new-course-button' in resp.content)
-        return resp
-
-    def _set_user_non_staff(self):
-        """
-        Sets user as non-staff.
-        """
+    def test_permission_denied_self(self):
+        group, _ = Group.objects.get_or_create(name=self.staff_groupname)
+        self.user.groups.add(group)
         self.user.is_staff = False
         self.user.save()
 
-    def _set_user_denied(self):
-        """
-        Sets course creator status to denied in admin table.
-        """
-        self.table_entry = CourseCreator(user=self.user)
-        self.table_entry.save()
+        self_url = reverse("course_team_user", kwargs={
+            "org": self.course.location.org,
+            "course": self.course.location.course,
+            "name": self.course.location.name,
+            "email": self.user.email,
+        })
 
-        self.deny_request = HttpRequest()
-        self.deny_request.user = self.admin
+        resp = self.client.post(
+            self_url,
+            data={"role": "instructor"},
+            HTTP_ACCEPT="application/json",
+        )
+        self.assert4XX(resp.status_code)
+        result = json.loads(resp.content)
+        self.assertIn("error", result)
 
-        self.creator_admin = CourseCreatorAdmin(self.table_entry, AdminSite())
+    def test_permission_denied_other(self):
+        group, _ = Group.objects.get_or_create(name=self.staff_groupname)
+        self.user.groups.add(group)
+        self.user.is_staff = False
+        self.user.save()
 
-        self.table_entry.state = CourseCreator.DENIED
-        self.creator_admin.save_model(self.deny_request, self.table_entry, None, True)
+        resp = self.client.post(
+            self.detail_url,
+            data={"role": "instructor"},
+            HTTP_ACCEPT="application/json",
+        )
+        self.assert4XX(resp.status_code)
+        result = json.loads(resp.content)
+        self.assertIn("error", result)
+
+    def test_staff_can_delete_self(self):
+        group, _ = Group.objects.get_or_create(name=self.staff_groupname)
+        self.user.groups.add(group)
+        self.user.is_staff = False
+        self.user.save()
+
+        self_url = reverse("course_team_user", kwargs={
+            "org": self.course.location.org,
+            "course": self.course.location.course,
+            "name": self.course.location.name,
+            "email": self.user.email,
+        })
+
+        resp = self.client.delete(self_url)
+        self.assert2XX(resp.status_code)
+        # reload user from DB
+        user = User.objects.get(email=self.user.email)
+        groups = [g.name for g in user.groups.all()]
+        self.assertNotIn(self.staff_groupname, groups)
+
+    def test_staff_cannot_delete_other(self):
+        group, _ = Group.objects.get_or_create(name=self.staff_groupname)
+        self.user.groups.add(group)
+        self.user.is_staff = False
+        self.user.save()
+        self.ext_user.groups.add(group)
+        self.ext_user.save()
+
+        resp = self.client.delete(self.detail_url)
+        self.assert4XX(resp.status_code)
+        result = json.loads(resp.content)
+        self.assertIn("error", result)
+        # reload user from DB
+        ext_user = User.objects.get(email=self.ext_user.email)
+        groups = [g.name for g in ext_user.groups.all()]
+        self.assertIn(self.staff_groupname, groups)

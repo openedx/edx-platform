@@ -1,3 +1,4 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%! from django_comment_client.permissions import has_permission %>
 
 <script type="text/template" id="thread-template">
@@ -8,15 +9,15 @@
             <li class="loading"><div class="loading-animation"></div></li>
         </ol>
         <div class="post-status-closed bottom-post-status" style="display: none">
-          This thread is closed.
+          ${_("This thread is closed.")}
         </div>
         % if course is UNDEFINED or has_permission(user, 'create_comment', course.id):
         <form class="discussion-reply-new" data-id="${'<%- id %>'}">
-            <h4>Post a response:</h4>
+            <h4>${_("Post a response:")}</h4>
             <ul class="discussion-errors"></ul>
             <div class="reply-body" data-id="${'<%- id %>'}"></div>
             <div class="reply-post-control">
-                <a class="discussion-submit-post control-button" href="#">Submit</a>
+                <a class="discussion-submit-post control-button" href="#">${_("Submit")}</a>
             </div>
         </form>
         % endif
@@ -41,24 +42,24 @@
               <span class="timeago" title="${'<%- created_at %>'}">${'<%- created_at %>'}</span>
 
               <span class="post-status-closed top-post-status" style="display: none">
-                &bull; This thread is closed.
+                ${_("&bull; This thread is closed.")}
               </span>
           </p>
       </header>
 
       <div class="post-body">${'<%- body %>'}</div>
       <div class="discussion-flag-abuse notflagged" data-role="thread-flag" data-tooltip="Report Misuse">
-      <i class="icon icon-flag"></i><span class="flag-label">Report Misuse</span></div>
+      <i class="icon icon-flag"></i><span class="flag-label">${_("Report Misuse")}</span></div>
         
         
       % if course and has_permission(user, 'openclose_thread', course.id):
       <div class="admin-pin discussion-pin notpinned" data-role="thread-pin" data-tooltip="pin this thread">
-      <i class="icon icon-pushpin"></i><span class="pin-label">Pin Thread</span></div>
+      <i class="icon icon-pushpin"></i><span class="pin-label">${_("Pin Thread")}</span></div>
 
       %else:
       ${"<% if (pinned) { %>"}
       <div class="discussion-pin notpinned" data-role="thread-pin" data-tooltip="pin this thread">
-      <i class="icon icon-pushpin"></i><span class="pin-label">Pin Thread</span></div>
+      <i class="icon icon-pushpin"></i><span class="pin-label">${_("Pin Thread")}</span></div>
       ${"<% }  %>"}  
       % endif
       
@@ -70,16 +71,16 @@
       ${'<% } %>'}
 
       <ul class="moderator-actions">
-          <li style="display: none"><a class="action-edit" href="javascript:void(0)"><span class="edit-icon"></span> Edit</a></li>
-          <li style="display: none"><a class="action-delete" href="javascript:void(0)"><span class="delete-icon"></span> Delete</a></li>
-          <li style="display: none"><a class="action-openclose" href="javascript:void(0)"><span class="edit-icon"></span> Close</a></li>
+          <li style="display: none"><a class="action-edit" href="javascript:void(0)"><span class="edit-icon"></span> ${_("Edit")}</a></li>
+          <li style="display: none"><a class="action-delete" href="javascript:void(0)"><span class="delete-icon"></span> ${_("Delete")}</a></li>
+          <li style="display: none"><a class="action-openclose" href="javascript:void(0)"><span class="edit-icon"></span> ${_("Close")}</a></li>
       </ul>
   </div>
 </script>
 
 <script type="text/template" id="thread-edit-template">
   <div class="discussion-post edit-post-form">
-    <h1>Editing post</h1>
+    <h1>${_("Editing post")}</h1>
     <ul class="edit-post-form-errors"></ul>
     <div class="form-row">
       <input type="text" class="edit-post-title" name="title" value="${"<%-title %>"}" placeholder="Title">
@@ -92,8 +93,8 @@
     ##<div class="form-row">
     ##  <input type="text" class="edit-post-tags" name="tags" placeholder="Tags" value="${"<%- tags %>"}">
     ##</div>
-    <input type="submit" class="post-update" value="Update post">
-    <a href="#" class="post-cancel">Cancel</a>
+    <input type="submit" class="post-update" value="${_("Update post")}">
+    <a href="#" class="post-cancel">${_("Cancel")}</a>
   </div>
 </script>
 
@@ -107,7 +108,7 @@
                 <div class="comment-body" data-id="${'<%- wmdId %>'}"
                 data-placeholder="Add a comment..."></div>
                 <div class="comment-post-control">
-                    <a class="discussion-submit-comment control-button" href="#">Submit</a>
+                    <a class="discussion-submit-comment control-button" href="#">${_("Submit")}</a>
                 </div>
             </form>
             % endif
@@ -129,21 +130,21 @@
       <i class="icon icon-flag"></i><span class="flag-label">Report Misuse</span></div>
     </div>
     <ul class="moderator-actions response-local">
-        <li style="display: none"><a class="action-edit" href="javascript:void(0)"><span class="edit-icon"></span> Edit</a></li>
-        <li style="display: none"><a class="action-delete" href="javascript:void(0)"><span class="delete-icon"></span> Delete</a></li>
-        <li style="display: none"><a class="action-openclose" href="javascript:void(0)"><span class="edit-icon"></span> Close</a></li>
+        <li style="display: none"><a class="action-edit" href="javascript:void(0)"><span class="edit-icon"></span> ${_("Edit")}</a></li>
+        <li style="display: none"><a class="action-delete" href="javascript:void(0)"><span class="delete-icon"></span> ${_("Delete")}</a></li>
+        <li style="display: none"><a class="action-openclose" href="javascript:void(0)"><span class="edit-icon"></span> ${_("Close")}</a></li>
     </ul>
 </script>
 
 <script type="text/template" id="thread-response-edit-template">
   <div class="edit-post-form">
-    <h1>Editing response</h1>
+    <h1>${_("Editing response")}</h1>
     <ul class="edit-post-form-errors"></ul>
     <div class="form-row">
       <div class="edit-post-body" name="body">${"<%- body %>"}</div>
     </div>
-    <input type="submit" class="post-update" value="Update response">
-    <a href="#" class="post-cancel">Cancel</a>
+    <input type="submit" class="post-update" value="${_("Update response")}">
+    <a href="#" class="post-cancel">${_("Cancel")}</a>
   </div>
 </script>
 

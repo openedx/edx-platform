@@ -1,4 +1,5 @@
+<%! from django.utils.translation import ugettext as _ %>
 <textarea {{ attrs }}>{{ content }}</textarea>
 <p id="hint_id_content" class="help-block">
-  Markdown syntax is allowed. See the <a id="cheatsheetLink" href="#">cheatsheet</a> for help.
+ ${_('Markdown syntax is allowed. See the <a id="cheatsheetLink" href="#">_{("cheatsheet")}</a> for help.')}
 </p>

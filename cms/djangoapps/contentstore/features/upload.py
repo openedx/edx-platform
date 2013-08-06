@@ -58,7 +58,7 @@ def delete_file(_step, file_name):
     world.css_click(delete_css, index=index)
 
     prompt_confirm_css = 'li.nav-item > a.action-primary'
-    world.css_click(prompt_confirm_css)
+    world.css_click(prompt_confirm_css, success_condition=lambda: not world.css_visible(prompt_confirm_css))
 
 
 @step(u'I should see only one "([^"]*)"$')

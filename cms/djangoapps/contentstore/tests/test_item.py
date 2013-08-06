@@ -14,19 +14,26 @@ class DeleteItem(CourseTestCase):
         super(DeleteItem, self).setUp()
         self.course = CourseFactory.create(org='mitX', number='333', display_name='Dummy Course')
 
-    def testDeleteStaticPage(self):
+    def test_delete_static_page(self):
         # Add static tab
         data = json.dumps({
             'parent_location': 'i4x://mitX/333/course/Dummy_Course',
             'category': 'static_tab'
         })
 
-        resp = self.client.post(reverse('create_item'), data,
-            content_type="application/json")
+        resp = self.client.post(
+            reverse('create_item'),
+            data,
+            content_type="application/json"
+        )
         self.assertEqual(resp.status_code, 200)
 
         # Now delete it. There was a bug that the delete was failing (static tabs do not exist in draft modulestore).
-        resp = self.client.post(reverse('delete_item'), resp.content, "application/json")
+        resp = self.client.post(
+            reverse('delete_item'),
+            resp.content,
+            "application/json"
+        )
         self.assertEqual(resp.status_code, 200)
 
 
@@ -122,6 +129,7 @@ class TestCreateItem(CourseTestCase):
         )
         self.assertEqual(resp.status_code, 200)
 
+
 class TestEditItem(CourseTestCase):
     """
     Test contentstore.views.item.save_item
@@ -151,10 +159,10 @@ class TestEditItem(CourseTestCase):
         chap_location = self.response_id(resp)
         resp = self.client.post(
             reverse('create_item'),
-            json.dumps(
-                {'parent_location': chap_location,
-                 'category': 'sequential'
-                }),
+            json.dumps({
+                'parent_location': chap_location,
+                'category': 'sequential',
+            }),
             content_type="application/json"
         )
         self.seq_location = self.response_id(resp)
@@ -162,9 +170,10 @@ class TestEditItem(CourseTestCase):
         template_id = 'multiplechoice.yaml'
         resp = self.client.post(
             reverse('create_item'),
-            json.dumps({'parent_location': self.seq_location,
-             'category': 'problem',
-             'boilerplate': template_id
+            json.dumps({
+                'parent_location': self.seq_location,
+                'category': 'problem',
+                'boilerplate': template_id,
             }),
             content_type="application/json"
         )
@@ -194,7 +203,6 @@ class TestEditItem(CourseTestCase):
         )
         problem = modulestore('draft').get_item(self.problems[0])
         self.assertEqual(problem.rerandomize, 'never')
-
 
     def test_null_field(self):
         """
@@ -240,4 +248,3 @@ class TestEditItem(CourseTestCase):
         sequential = modulestore().get_item(self.seq_location)
         self.assertEqual(sequential.lms.due, datetime.datetime(2010, 11, 22, 4, 0, tzinfo=UTC))
         self.assertEqual(sequential.lms.start, datetime.datetime(2010, 9, 12, 14, 0, tzinfo=UTC))
-

@@ -1,3 +1,4 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
 
 <%
@@ -37,7 +38,7 @@ def url_for_user(user_id): #TODO
   % if notification.get('actor_id', None):
     <a href="${url_for_user(notification['actor_id'])}">${info['actor_username']}</a>
   % else:
-    Anonymous
+    ${_("Anonymous")}
   % endif
 </%def>
 
@@ -48,7 +49,7 @@ def url_for_user(user_id): #TODO
 
 <%def name="render_comment_link(notification)">
   <% info = notification['info'] %>
-  <a href="${url_for_comment(info['commentable_id'], info['thread_id'], info['comment_id'])}">comment</a>
+  <a href="${url_for_comment(info['commentable_id'], info['thread_id'], info['comment_id'])}">${_("comment")}</a>
 </%def>
 
 <%def name="render_discussion_link(notification)">
@@ -59,19 +60,32 @@ def url_for_user(user_id): #TODO
 <%def name="render_notification(notification)">
   <div class="notification">
     % if notification['notification_type'] == 'post_reply':
-      ${render_user_link(notification)} posted a ${render_comment_link(notification)}
-      to the thread ${render_thread_link(notification)} in discussion ${render_discussion_link(notification)}
+    ${_("{user} posted a {comment} to the thread {thread} in discussion {discussion}").format(
+      user=render_user_link(notification),
+      comment=render_comment_link(notification),
+      thread=render_thread_link(notification),
+      discussion=render_discussion_link(notification),
+    )}
     % elif notification['notification_type'] == 'post_topic':
-      ${render_user_link(notification)} posted a new thread ${render_thread_link(notification)}
-      in discussion ${render_discussion_link(notification)}
+    ${_("{user} posted a new thread {thread} in discussion {discussion}").format(
+      user=render_user_link(notification),
+      thread=render_thread_link(notification),
+      discussion=render_discussion_link(notification),
+    )}
     % elif notification['notification_type'] == 'at_user':
-      ${render_user(info)} mentioned you in
       % if notification['info']['content_type'] == 'thread':
-        the thread ${render_thread_link(notification)}
-        in discussion ${render_discussion_link(notification)}
+        ${_("{user} mentioned you in the thread {thread} in disucssion {discussion}").format(
+          user=render_user(info),
+          thread=render_thread_link(notification),
+          discussion=render_discussion_link(notification),
+        )}
       % else:
-        ${render_comment_link(notification)}
-        to the thread ${render_thread_link(notification)} in discussion ${render_discussion_link(notification)}
+        ${_("{user} mentioned you in {comment} to the thread {thread} in discussion {discussion}").format(
+          user=render_user(info),
+          comment=render_comment_link(notification),
+          thread=render_thread_link(notification),
+          discussion=render_discussion_link(notification),
+        )}
       % endif
     % endif
   </div>

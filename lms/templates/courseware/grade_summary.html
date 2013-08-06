@@ -1,3 +1,4 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%inherit file="/main.html" />
 <%! from django.core.urlresolvers import reverse %>
 <%namespace name='static' file='/static_content.html'/>
@@ -7,9 +8,9 @@
 <section class="container">
 <div class="gradebook-summary-wrapper">
   <section class="gradebook-summary-content">
-    <h1>Grade summary</h1>
+    <h1>${_("Grade summary")}</h1>
 
-    <p>Not implemented yet</p>
+    <p>${_("Not implemented yet")}</p>
 
   </section>
 </div>

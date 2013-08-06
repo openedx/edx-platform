@@ -7,4 +7,4 @@ Feature: Video component
 
   Scenario: Autoplay is enabled in the LMS for a VideoAlpha component
   Given the course has a VideoAlpha component
-  Then when I view the video it has autoplay enabled
+  Then when I view the videoalpha it has autoplay enabled

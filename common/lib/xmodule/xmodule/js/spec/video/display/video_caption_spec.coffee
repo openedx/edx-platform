@@ -163,11 +163,11 @@ describe 'VideoCaption', ->
 
     it 'return a correct caption index', ->
       expect(@caption.search(0)).toEqual 0
-      expect(@caption.search(9999)).toEqual 0
-      expect(@caption.search(10000)).toEqual 1
-      expect(@caption.search(15000)).toEqual 1
-      expect(@caption.search(30000)).toEqual 3
-      expect(@caption.search(30001)).toEqual 3
+      expect(@caption.search(9999)).toEqual 2
+      expect(@caption.search(10000)).toEqual 2
+      expect(@caption.search(15000)).toEqual 3
+      expect(@caption.search(30000)).toEqual 7
+      expect(@caption.search(30001)).toEqual 7
 
   describe 'play', ->
     describe 'when the caption was not rendered', ->
@@ -220,7 +220,7 @@ describe 'VideoCaption', ->
         @caption.updatePlayTime 25.000
 
       it 'search the caption based on time', ->
-        expect(@caption.currentIndex).toEqual 2
+        expect(@caption.currentIndex).toEqual 5
 
     describe 'when the video speed is not 1.0x', ->
       beforeEach ->
@@ -228,7 +228,7 @@ describe 'VideoCaption', ->
         @caption.updatePlayTime 25.000
 
       it 'search the caption based on 1.0x speed', ->
-        expect(@caption.currentIndex).toEqual 1
+        expect(@caption.currentIndex).toEqual 3
 
     describe 'when the index is not the same', ->
       beforeEach ->
@@ -240,10 +240,10 @@ describe 'VideoCaption', ->
         expect($('.subtitles li[data-index=1]')).not.toHaveClass 'current'
 
       it 'activate new caption', ->
-        expect($('.subtitles li[data-index=2]')).toHaveClass 'current'
+        expect($('.subtitles li[data-index=5]')).toHaveClass 'current'
 
       it 'save new index', ->
-        expect(@caption.currentIndex).toEqual 2
+        expect(@caption.currentIndex).toEqual 5
 
       it 'scroll caption to new position', ->
         expect($.fn.scrollTo).toHaveBeenCalled()
@@ -251,11 +251,11 @@ describe 'VideoCaption', ->
     describe 'when the index is the same', ->
       beforeEach ->
         @caption.currentIndex = 1
-        $('.subtitles li[data-index=1]').addClass 'current'
+        $('.subtitles li[data-index=3]').addClass 'current'
         @caption.updatePlayTime 15.000
 
       it 'does not change current subtitle', ->
-        expect($('.subtitles li[data-index=1]')).toHaveClass 'current'
+        expect($('.subtitles li[data-index=3]')).toHaveClass 'current'
 
   describe 'resize', ->
 
@@ -322,18 +322,18 @@ describe 'VideoCaption', ->
     describe 'when the video speed is 1.0x', ->
       beforeEach ->
         @caption.currentSpeed = '1.0'
-        $('.subtitles li[data-start="30000"]').trigger('click')
+        $('.subtitles li[data-start="27900"]').trigger('click')
 
       it 'trigger seek event with the correct time', ->
-        expect(@time).toEqual 30.000
+        expect(@time).toEqual 28.000
 
     describe 'when the video speed is not 1.0x', ->
       beforeEach ->
         @caption.currentSpeed = '0.75'
-        $('.subtitles li[data-start="30000"]').trigger('click')
+        $('.subtitles li[data-start="27900"]').trigger('click')
 
       it 'trigger seek event with the correct time', ->
-        expect(@time).toEqual 40.000
+        expect(@time).toEqual 37.000
 
   describe 'toggle', ->
     beforeEach ->

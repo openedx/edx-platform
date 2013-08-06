@@ -1,3 +1,4 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%! import json %>
 
 <%def name="render_dropdown(map)">
@@ -30,20 +31,20 @@
     <ul class="browse-topic-drop-menu">
         <li>
             <a href="#" class="drop-menu-meta-category">
-                <span class="board-name" data-discussion_id='#all'>Show All Discussions</span>
+                <span class="board-name" data-discussion_id='#all'>${_("Show All Discussions")}</span>
             </a>
         </li>
         %if flag_moderator:
         <li>
             <a href="#">
-                <span class="board-name" data-discussion_id='#flagged'><i class="icon-flag" style="padding-right:5px;"></i>Show Flagged Discussions</span>
+                <span class="board-name" data-discussion_id='#flagged'><i class="icon-flag" style="padding-right:5px;"></i>${_("Show Flagged Discussions")}</span>
             </a>
         </li>
         
         %endif
         <li>
             <a href="#" class="drop-menu-meta-category">
-                <span class="board-name" data-discussion_id='#following'><i class="icon-star" style="padding-right:5px;"></i>Posts I&#39;m Following</span>
+                <span class="board-name" data-discussion_id='#following'><i class="icon-star" style="padding-right:5px;"></i>${_("Posts I'm Following")}</span>
             </a>
         </li>
         ${render_dropdown(category_map)}

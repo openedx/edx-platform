@@ -1,21 +1,22 @@
+<%! from django.utils.translation import ugettext as _ %>
 <section class="cohort_manager" data-ajax_url="${cohorts_ajax_url}">
-<h3>Cohort groups</h3>
+<h3>${_("Cohort groups")}</h3>
 
 <div class="controls" style="padding-top:15px">
-  <a href="#" class="button show_cohorts">Show cohorts</a>
+  <a href="#" class="button show_cohorts">${_("Show cohorts")}</a>
 </div>
 
 <ul class="errors">
 </ul>
 
 <div class="summary" style="display:none">
-  <h3>Cohorts in the course</h3>
+  <h3>${_("Cohorts in the course")}</h3>
   <ul class="cohorts">
   </ul>
 
   <p>
   <input class="cohort_name"/>
-  <a href="#" class="button add_cohort">Add cohort</a>
+  <a href="#" class="button add_cohort">${_("Add cohort")}</a>
   </p>
   
 </div>
@@ -27,10 +28,10 @@
   <span class="page_num"></span>
   
   <p>
-  Add users by username or email.  One per line or comma-separated.
+  ${_("Add users by username or email.  One per line or comma-separated.")}
   </p>
   <textarea cols="50" row="30" class="users_area" style="height: 200px"></textarea>
-  <a href="#" class="button add_members">Add cohort members</a>
+  <a href="#" class="button add_members">${_("Add cohort members")}</a>
 
   <ul class="op_results">
   </ul>

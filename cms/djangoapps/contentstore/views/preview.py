@@ -68,6 +68,7 @@ def preview_dispatch(request, preview_id, location, dispatch=None):
 
 @login_required
 def preview_component(request, location):
+    "Return the HTML preview of a component"
     # TODO (vshnayder): change name from id to location in coffee+html as well.
     if not has_access(request.user, location):
         return HttpResponseForbidden()
@@ -91,6 +92,7 @@ def preview_module_system(request, preview_id, descriptor):
     """
 
     def preview_model_data(descriptor):
+        "Helper method to create a DbModel from a descriptor"
         return DbModel(
             SessionKeyValueStore(request, descriptor._model_data),
             descriptor.module_class,
@@ -105,7 +107,7 @@ def preview_module_system(request, preview_id, descriptor):
         # TODO (cpennington): Do we want to track how instructors are using the preview problems?
         track_function=lambda event_type, event: None,
         filestore=descriptor.system.resources_fs,
-        get_module=partial(get_preview_module, request, preview_id),
+        get_module=partial(load_preview_module, request, preview_id),
         render_template=render_from_lms,
         debug=True,
         replace_urls=partial(static_replace.replace_static_urls, data_directory=None, course_namespace=descriptor.location),
@@ -115,28 +117,13 @@ def preview_module_system(request, preview_id, descriptor):
     )
 
 
-def get_preview_module(request, preview_id, descriptor):
-    """
-    Returns a preview XModule at the specified location. The preview_data is chosen arbitrarily
-    from the set of preview data for the descriptor specified by Location
-
-    request: The active django request
-    preview_id (str): An identifier specifying which preview this module is used for
-    location: A Location
-    """
-
-    return load_preview_module(request, preview_id, descriptor)
-
-
 def load_preview_module(request, preview_id, descriptor):
     """
-    Return a preview XModule instantiated from the supplied descriptor, instance_state, and shared_state
+    Return a preview XModule instantiated from the supplied descriptor.
 
     request: The active django request
     preview_id (str): An identifier specifying which preview this module is used for
     descriptor: An XModuleDescriptor
-    instance_state: An instance state string
-    shared_state: A shared state string
     """
     system = preview_module_system(request, preview_id, descriptor)
     try:

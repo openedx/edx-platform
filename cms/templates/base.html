@@ -58,6 +58,18 @@
     <script type="text/javascript" src="//www.youtube.com/player_api"></script>
 
     <script src="${static.url('js/views/feedback.js')}"></script>
+    % if context_course:
+    <script type="text/javascript">
+window.course = new CMS.Models.Course({
+  id: "${context_course.id}",
+  name: "${context_course.display_name_with_default | h}",
+  url_name: "${context_course.location.name | h}",
+  org: "${context_course.location.org | h}",
+  num: "${context_course.location.course | h}",
+  revision: "${context_course.location.revision | h}"
+});
+    </script>
+    % endif
 
     <!-- view -->
     <div class="wrapper wrapper-view">

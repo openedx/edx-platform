@@ -22,14 +22,10 @@ def i_press_the_button_on_the_registration_form(step):
     world.css_click(submit_css)
 
 
-@step('I should see be on the studio home page$')
-def i_should_see_be_on_the_studio_home_page(step):
-    step.given('I should see the message "My Courses"')
-
-
-@step(u'I should see the message "([^"]*)"$')
-def i_should_see_the_message(step, msg):
-    assert world.browser.is_text_present(msg, 5)
+@step('I should see an email verification prompt')
+def i_should_see_an_email_verification_prompt(step):
+    world.css_has_text('h1.page-header', u'My Courses')
+    world.css_has_text('div.msg h3.title', u'We need to verify your email address')
 
 
 @step(u'I fill in and submit the signin form$')

@@ -1,13 +1,15 @@
+<%! from django.utils.translation import ugettext as _ %>
+
 <%inherit file="main.html" />
 
 <section class="container activation">
 
   <section class="message">
-    <h1 class="invalid">E-mail change failed</h1>
+    <h1 class="invalid">${_("E-mail change failed")}</h1>
     <hr class="horizontal-divider">
 
-    <p>An account with the new e-mail address already exists.</p>
+    <p>${_("An account with the new e-mail address already exists.")}</p>
 
-    <p>Go back to the <a href="/">home page</a>.</p>
+    <p>${_("Go back to the {link_start}home page{link_end}.").format(link_start='<a href="/">', link_end='</a>')}</p>
   </section>
 </section>
