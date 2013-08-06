@@ -68,6 +68,7 @@ Feature: Problem Editor
     When I edit and select Settings
     Then Edit High Level Source is visible
 
+  #This feature will work in Firefox only when Firefox is the active window
   Scenario: High Level source is persisted for LaTeX problem (bug STUD-280)
     Given I have created a LaTeX Problem
     When I edit and compile the High Level Source
