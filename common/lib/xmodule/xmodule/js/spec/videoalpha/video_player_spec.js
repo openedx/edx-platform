@@ -34,12 +34,6 @@
     });
 
     describe('constructor', function() {
-      beforeEach(function() {
-        $.fn.qtip.andCallFake(function() {
-          $(this).data('qtip', true);
-        });
-      });
-
       describe('always', function() {
         beforeEach(function() {
           initialize();
@@ -170,10 +164,6 @@
           initialize();
         });
 
-        it('does not add the tooltip to fullscreen button', function() {
-          expect($('.add-fullscreen')).not.toHaveData('qtip');
-        });
-
         it('create video volume control', function() {
           expect(videoVolumeControl).toBeDefined();
           expect(videoVolumeControl.el).toHaveClass('volume');
@@ -185,10 +175,6 @@
 
         beforeEach(function() {
           initialize();
-        });
-
-        it('add the tooltip to fullscreen button', function() {
-          expect($('.add-fullscreen')).toHaveData('qtip');
         });
 
         it('controls are in paused state', function() {

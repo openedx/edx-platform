@@ -368,13 +368,12 @@
           expect(realHeight).toBeCloseTo(shouldBeHeight, 2);
         });
 
-        it('when CC button is disabled ', function() {
+        xit('when CC button is disabled ', function() {
           var realHeight = parseInt($('.subtitles').css('maxHeight'), 10),
               videoWrapperHeight = $('.video-wrapper').height(),
               controlsHeight = videoControl.el.height(),
               progressSliderHeight = videoControl.sliderEl.height(),
-              shouldBeHeight = videoWrapperHeight - controlsHeight \
-                                - 0.5 * controlsHeight;
+              shouldBeHeight = videoWrapperHeight - controlsHeight - 0.5 * controlsHeight;
 
           state.captionsHidden = true;
           videoCaption.setSubtitlesHeight();
