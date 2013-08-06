@@ -253,6 +253,22 @@ function syncReleaseDate(e) {
     $("#start_time").val("");
 }
 
+function getDatetime(datepickerInput, timepickerInput) {
+    // given a pair of inputs (datepicker and timepicker), return a JS Date
+    // object that corresponds to the datetime that they represent. Assume
+    // UTC timezone, NOT the timezone of the user's browser.
+    var date = $(datepickerInput).datepicker("getDate");
+    var time = $(timepickerInput).timepicker("getTime");
+    if(date && time) {
+        return new Date(Date.UTC(
+            date.getFullYear(), date.getMonth(), date.getDate(),
+            time.getHours(), time.getMinutes()
+        ));
+    } else {
+        return null;
+    }
+}
+
 function autosaveInput(e) {
     var self = this;
     if (this.saveTimer) {
@@ -292,14 +308,13 @@ function saveSubsection() {
 
     // get datetimes for start and due, stick into metadata
     _(["start", "due"]).each(function(name) {
-        var date, time;
-        date = $("#"+name+"_date").datepicker("getDate");
-        time = $("#"+name+"_time").timepicker("getTime");
-        if (date && time) {
-            metadata[name] = new Date(Date.UTC(
-                date.getFullYear(), date.getMonth(), date.getDate(),
-                time.getHours(), time.getMinutes()
-            ));
+
+        var datetime = getDatetime(
+            document.getElementById(name+"_date"),
+            document.getElementById(name+"_time")
+        );
+        if (datetime) {
+            metadata[name] = datetime;
         }
     });
 
@@ -764,12 +779,10 @@ function cancelSetSectionScheduleDate(e) {
 function saveSetSectionScheduleDate(e) {
     e.preventDefault();
 
-    var date = $('.edit-subsection-publish-settings .start-date').datepicker("getDate");
-    var time = $('.edit-subsection-publish-settings .start-time').timepicker("getTime");
-    var datetime = new Date(Date.UTC(
-        date.getFullYear(), date.getMonth(), date.getDate(),
-        time.getHours(), time.getMinutes()
-    ));
+    var datetime = getDatetime(
+        $('.edit-subsection-publish-settings .start-date'),
+        $('.edit-subsection-publish-settings .start-time')
+    );
 
     var id = $modal.attr('data-id');
 
