@@ -253,12 +253,6 @@ function syncReleaseDate(e) {
     $("#start_time").val("");
 }
 
-function pad2(number) {
-    // pad a number to two places: useful for formatting months, days, hours, etc
-    // when displaying a date/time
-    return (number < 10 ? '0' : '') + number;
-}
-
 function autosaveInput(e) {
     var self = this;
     if (this.saveTimer) {
@@ -802,6 +796,12 @@ function saveSetSectionScheduleDate(e) {
             }
         })
     }).success(function() {
+        var pad2 = function(number) {
+            // pad a number to two places: useful for formatting months, days, hours, etc
+            // when displaying a date/time
+            return (number < 10 ? '0' : '') + number;
+        };
+
         var $thisSection = $('.courseware-section[data-id="' + id + '"]');
         var html = _.template(
             '<span class="published-status">' +
