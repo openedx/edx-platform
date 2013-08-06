@@ -299,12 +299,15 @@ div.videoalpha {
 
           &.muted {
             &>a {
-              background: url('../images/mute.png') 10px center no-repeat;
+              background-image: url('../images/mute.png');
             }
           }
 
           > a {
-            background: url('../images/volume.png') 10px center no-repeat;
+            background-image: url('../images/volume.png');
+            background-position: 10px center;
+            background-repeat: no-repeat;
+
             border-right: 1px solid #000;
             box-shadow: 1px 0 0 #555, inset 1px 0 0 #555;
             @include clearfix();
