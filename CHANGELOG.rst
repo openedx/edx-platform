@@ -42,6 +42,9 @@ Common: Add a manage.py that knows about edx-platform specific settings and proj
 
 Common: Added *experimental* support for jsinput type.
 
+Studio: Remove XML from HTML5 video component editor. All settings are
+moved to be edited as metadata.
+
 Common: Added setting to specify Celery Broker vhost
 
 Common: Utilize new XBlock bulk save API in LMS and CMS.
