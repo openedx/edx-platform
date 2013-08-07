@@ -116,7 +116,7 @@ def revert_setting_entry(label):
 def get_setting_entry(label):
     settings = world.browser.find_by_css('.wrapper-comp-setting')
     for setting in settings:
-        if setting.find_by_css('.setting-label')[0].value == label:
+        if world.css_value('.wrapper-comp-setting .setting-label') == label:
             return setting
     return None
 
@@ -124,6 +124,6 @@ def get_setting_entry(label):
 def get_setting_entry_index(label):
     settings = world.browser.find_by_css('.wrapper-comp-setting')
     for index, setting in enumerate(settings):
-        if setting.find_by_css('.setting-label')[0].value == label:
+        if world.css_value('.wrapper-comp-setting .setting-label') == label:
             return index
     return None

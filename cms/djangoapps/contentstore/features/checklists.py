@@ -61,16 +61,12 @@ def i_select_a_link_to_the_course_outline(step):
 
 @step('I am brought to the course outline page$')
 def i_am_brought_to_course_outline(step):
-    if world.is_firefox():
-        return
     assert_in('Course Outline', world.css_text('.outline .page-header'))
     assert_equal(1, len(world.browser.windows))
 
 
 @step('I am brought back to the course outline in the correct state$')
 def i_am_brought_back_to_course_outline(step):
-    if world.is_firefox():
-        return
     step.given('I see the four default edX checklists')
     # In a previous step, we selected (1, 0) in order to click the 'Edit Course Outline' link.
     # Make sure the task is still showing as selected (there was a caching bug with the collection).
@@ -79,15 +75,11 @@ def i_am_brought_back_to_course_outline(step):
 
 @step('I select a link to help page$')
 def i_select_a_link_to_the_help_page(step):
-    if world.is_firefox():
-        return
     clickActionLink(2, 0, 'Visit Studio Help')
 
 
 @step('I am brought to the help page in a new window$')
 def i_am_brought_to_help_page_in_new_window(step):
-    if world.is_firefox():
-        return
     step.given('I see the four default edX checklists')
     windows = world.browser.windows
     assert_equal(2, len(windows))
@@ -117,8 +109,6 @@ def toggleTask(checklist, task):
 # TODO: figure out a way to do this in phantom and firefox
 # For now we will mark the scenerios that use this method as skipped
 def clickActionLink(checklist, task, actionText):
-    if world.is_firefox():
-        return
     # toggle checklist item to make sure that the link button is showing
     toggleTask(checklist, task)
     action_link = world.css_find('#course-checklist' + str(checklist) + ' a')[task]

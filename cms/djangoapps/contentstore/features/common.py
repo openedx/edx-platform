@@ -71,7 +71,7 @@ def press_the_notification_button(_step, name):
         error_showing = world.is_css_present('.is-shown.wrapper-notification-error')
         return confirmation_dismissed or error_showing
     if world.is_firefox():
-        #This is done to explicitly make the changes save on firefox.  It will remove focus from the previously focused element
+        # This is done to explicitly make the changes save on firefox.  It will remove focus from the previously focused element
         world.trigger_event(css, event='focus')
         world.browser.execute_script("$('{}').click()".format(css))
     else:

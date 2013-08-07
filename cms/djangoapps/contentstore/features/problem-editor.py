@@ -47,7 +47,7 @@ def i_can_modify_the_display_name(step):
     # (to confirm that we don't throw an error because it is of the wrong type).
     index = world.get_setting_entry_index(DISPLAY_NAME)
     world.css_fill('.wrapper-comp-setting .setting-input', '3.4', index=index)
-    if world.browser.driver_name == 'Firefox':
+    if world.is_firefox():
         world.trigger_event('.wrapper-comp-setting .setting-input', index=index)
     verify_modified_display_name()
 
@@ -140,8 +140,6 @@ def set_the_weight_to_abc(step, bad_weight):
 @step('if I set the max attempts to "(.*)", it displays initially as "(.*)", and is persisted as "(.*)"')
 def set_the_max_attempts(step, max_attempts_set, max_attempts_displayed, max_attempts_persisted):
     #on firefox with selenium, the behaviour is different.  eg 2.34 displays as 2.34 and is persisted as 2
-    if world.is_firefox():
-        return
     index = world.get_setting_entry_index(MAXIMUM_ATTEMPTS)
     world.css_fill('.wrapper-comp-setting .setting-input', max_attempts_set, index=index)
     world.verify_setting_entry(world.get_setting_entry(MAXIMUM_ATTEMPTS), MAXIMUM_ATTEMPTS, max_attempts_displayed, True)
