@@ -46,9 +46,9 @@ function () {
         $.each(state.videoSpeedControl.speeds, function(index, speed) {
 
             //var link = $('<a href="#">' + speed + 'x</a>');
-            var link = '<a href="#">' + speed + 'x</a>';
+            var link = '<a tabindex="-1" href="#">' + speed + 'x</a>';
 
-            state.videoSpeedControl.videoSpeedsEl.prepend($('<li data-speed="' + speed + '">' + link + '</li>'));
+            state.videoSpeedControl.videoSpeedsEl.prepend($('<li tabindex="-1" data-speed="' + speed + '">' + link + '</li>'));
         });
 
         state.videoSpeedControl.setSpeed(state.speed);
@@ -76,6 +76,14 @@ function () {
                 .on('click', function (event) {
                     event.preventDefault();
                     $(this).removeClass('open');
+                });
+
+            state.videoSpeedControl.el.children('a')
+                .on('focus', function () {
+                    $(this).parent().addClass('open');
+                })
+                .on('blur', function () {
+                    $(this).parent().removeClass('open');
                 });
         }
     }
@@ -120,9 +128,9 @@ function () {
             var link, listItem;
 
             //link = $('<a href="#">' + speed + 'x</a>');
-            link = '<a href="#">' + speed + 'x</a>';
+            link = '<a tabindex="-1" href="#">' + speed + 'x</a>';
 
-            listItem = $('<li data-speed="' + speed + '">' + link + '</li>');
+            listItem = $('<li tabindex="-1" data-speed="' + speed + '">' + link + '</li>');
 
             if (speed === params.currentSpeed) {
                 listItem.addClass('active');
