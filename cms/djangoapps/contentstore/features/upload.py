@@ -77,6 +77,9 @@ def check_download(_step, file_name):
         r = get_file(file_name)
         downloaded_text = r.text
         assert cur_text == downloaded_text
+    #resetting the file back to its original state
+    with open(os.path.abspath(path), 'w') as cur_file:
+        cur_file.write("This is an arbitrary file for testing uploads")
 
 
 @step(u'I modify "([^"]*)"$')
