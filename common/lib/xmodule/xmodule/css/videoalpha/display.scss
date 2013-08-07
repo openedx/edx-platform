@@ -421,7 +421,7 @@ div.videoalpha {
 
         a.hide-subtitles {
           background: url('../images/cc.png') center no-repeat;
-          display: block;
+          /* display: block; */
           float: left;
           font-weight: 800;
           line-height: 46px; //height of play pause buttons
@@ -444,9 +444,7 @@ div.videoalpha {
             opacity: 0.7;
           }
 
-          background-color: inherit;
           color: #797979;
-          text-decoration: inherit;
         }
       }
     }
