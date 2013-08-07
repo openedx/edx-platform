@@ -4,7 +4,7 @@ Tests for the ElasticDatabase class in es_requests
 
 from django.test import TestCase
 import requests
-from search.es_requests import ElasticDatabase, PyGrep, EnchantDictionary
+from search.es_requests import ElasticDatabase, PyGrep
 import json
 import time
 import os
@@ -21,7 +21,7 @@ class EsTest(TestCase):
         database_request = requests.get(es_instance)
         self.assertEqual(database_request.status_code, 200)
         self.elastic_search = ElasticDatabase("common/djangoapps/search/tests/test_settings.json")
-        index_request = self.elastic_search.setup_index("test-index");
+        index_request = self.elastic_search.setup_index("test-index")
         self.assertEqual(index_request.status_code, 200)
         type_request = self.elastic_search.setup_type("test-index", "test-type",
                                                       "common/djangoapps/search/tests/test_mapping.json")
@@ -47,7 +47,7 @@ class EsTest(TestCase):
         type_mapping = self.elastic_search.get_type_mapping("test-index", "test-type")
         self.assertTrue("properties" in type_mapping["test-type"].keys())
         self.assertTrue("test-float" in type_mapping["test-type"]["properties"]["mappings"]["properties"].keys())
-        self.assertTrue("test-string" in type_mapping["test-type"]["properties"]["mappings"]["properties"].keys())
+        self.assertTrue("searchable_text" in type_mapping["test-type"]["properties"]["mappings"]["properties"].keys())
 
     def test_directory_search(self):
         relative_paths = ["/testdir/malformed.srt.sjson", "/testdir/transcript.srt.sjson",
@@ -68,8 +68,6 @@ class EsTest(TestCase):
             self.crawler.grab_all_files_with_ending(".fake").next()
         except StopIteration:
             success = True
-        except:
-            success = False
         self.assertTrue(success)
 
     def test_data_indexing(self):
@@ -100,8 +98,6 @@ class EsTest(TestCase):
             self.elastic_search.index_transcript("test-index", "test-type", path)
         except ValueError:
             success = True
-        except:
-            success = False
         self.assertTrue(success)
 
     def test_data_read(self):
@@ -122,19 +118,15 @@ class EsTest(TestCase):
         self.assertEqual(json.loads(bad_object.content)["_source"]["uuid"], "malformed")
         self.assertEqual(json.loads(good_object.content)["_source"]["searchable_text"], "Success!")
 
-    def test_dictionary(self):
-        """
-        Tests the formation of a pyenchant dictionary
-        """
-        action = {"index": {"_index": "dictionary-index", "_value": "test-value"}}
-        test_data = {"searchable_text": "This is a body of searchable text", "test-float": "1.7"}
-        self.es_instance.bulk_index(str(action) + "\n" + str(test_data))
-        dictionary = EnchantDictionary(self.es_instance)
-        dictionary.produce_dictionary("test_dictionary.txt", "dictionary-index")
-        with open("test_dictionary.txt", "rb") as source:
-            self.assertTrue(len(source) > 1)
-            for line in source:
-                self.assertTrue(source in test_data["searchable_text"])
+    def test_bulk_index(self):
+        test_string = ""
+        test_string += json.dumps({"index": {"_index": "test-index", "_type": "test-type", "_id": "10"}})
+        test_string += "\n"
+        test_string += json.dumps({"searchable_text": "some_text", "test-float": "1.0"})
+        test_string += "\n"
+        success = self.elastic_search.bulk_index(test_string)
+        print success.content
+        self.assertEqual(success.status_code, 200)
 
     def tearDown(self):
         self.elastic_search.delete_type("test-index", "test-type")

@@ -9,7 +9,6 @@ import re
 import urllib
 import base64
 import hashlib
-import sys
 import cStringIO
 import StringIO
 import logging
@@ -21,7 +20,7 @@ from pdfminer.converter import TextConverter
 from pdfminer.layout import LAParams
 from pdfminer.pdfparser import PDFSyntaxError
 from wand.image import Image
-from wand.exceptions import DelegateError, MissingDelegateError, CorruptImageError
+from wand.exceptions import DelegateError, MissingDelegateError, CorruptImageError  # pylint: disable=E0611
 from xhtml2pdf import pisa as pisa
 
 log = logging.getLogger("mitx.courseware")
@@ -89,11 +88,6 @@ class ElasticDatabase:
     def has_index(self, index):
         """
         Checks to see if the Elastic Search instance contains the given index,
-
-        There are some potential problems here involved with various Elastic Search configurations
-        that will result in something other than the standard 200 (exists) or 404 (doesn't exist).
-
-        If they are raised we should know about it, and so we explicitly fail.
         """
 
         full_url = "/".join([self.url, index])
@@ -102,9 +96,6 @@ class ElasticDatabase:
             return True
         elif status == 404:
             return False
-        else:
-            log.debug("Got an unexpected reponse code: " + str(status) + " at: " + full_url)
-            raise
 
     def has_type(self, index, type_):
         """
@@ -117,9 +108,6 @@ class ElasticDatabase:
             return True
         elif status == 404:
             return False
-        else:
-            log.debug("Got an unexpected reponse code: " + str(status) + " at: " + full_url)
-            raise
 
     def index_directory_files(
         self, directory, index, type_, silent=False, file_ending=".srt.sjson",
@@ -170,8 +158,8 @@ class ElasticDatabase:
 
         file_uuid = transcript_file.rsplit("/")[-1][:-len(".srt.sjson")]
         searchable_text = self.searchable_text_from_transcript_file(transcript_file, silent)
-        hash = hashlib.sha1(file_uuid).hexdigest()
-        data = {"searchable_text": searchable_text, "uuid": file_uuid, "hash": hash}
+        sha_hash = hashlib.sha1(file_uuid).hexdigest()
+        data = {"searchable_text": searchable_text, "uuid": file_uuid, "hash": sha_hash}
         print type(data)
         print data
         if not id_:
@@ -217,8 +205,7 @@ class ElasticDatabase:
         """
 
         url = self.url + "/_bulk"
-        response = requests.post(url, data=all_data)
-        return response
+        return requests.post(url, data=all_data)
 
     def get_data(self, index, type_, id_):
         """
@@ -336,8 +323,6 @@ class MongoIndexer:
         if isinstance(data, unicode) is False:  # for example videos
             return [""]
         uuid = self.uuid_from_video_module(video_module)
-        if uuid is False:
-            return [""]
         name_pattern = re.compile(".*?" + uuid + ".*?")
         chunk = self.chunk_collection.find_one({"files_id.name": name_pattern})
         if chunk is None:
@@ -386,12 +371,11 @@ class MongoIndexer:
         """
 
         data = mongo_element["definition"]["data"]
-        try:
-            paragraphs = " ".join([text for text in re.findall(r"<p>(.*?)</p>", data) if text is not "Explanation"])
-        except TypeError:
-            paragraphs = ""
+        paragraphs = " ".join([text for text in re.findall(r"<p>(.*?)</p>", data) if text is not "Explanation"])
+        paragraphs += " "
+        paragraphs += " ".join([text for text in re.findall(r"<text>(.*?)</text>", data)])
         cleaned_text = re.sub(r"\\(.*?\\)", "", paragraphs).replace("\\", "")
-        remove_tags = re.sub(r"<[a-zA-Z0-9/\.\= \"_-]+>", "", cleaned_text)
+        remove_tags = re.sub(r"<[a-zA-Z0-9/\.\= \"\'_-]+>", "", cleaned_text)
         remove_repetitions = re.sub(r"(.)\1{4,}", "", remove_tags)
         return remove_repetitions
 
@@ -399,7 +383,6 @@ class MongoIndexer:
         """
         Returns a youtube uuid given the filename of a transcript
         """
-
         if "subs_" in file_name:
             file_name = file_name[5 + file_name.find("subs_"):]
         elif file_name[:2] == "._":
@@ -449,12 +432,7 @@ class MongoIndexer:
         # The colon is kind of a hack to make sure there will always be a second element since
         # some entries don't have anything for the second entry
         speed_map = {(entry + ":").split(":")[0]: (entry + ":").split(":")[1] for entry in uuids}
-        try:
-            uuid = [value for key, value in speed_map.items() if "1.0" in key][0]
-        except IndexError:
-            log.debug(data)
-            log.debug(uuids)
-            log.debug(speed_map)
+        uuid = [value for key, value in speed_map.items() if "1.0" in key][0]
         return uuid
 
     def thumbnail_from_pdf(self, pdf):
@@ -478,36 +456,6 @@ class MongoIndexer:
         pseudo_dest = cStringIO.StringIO()
         pisa.CreatePDF(StringIO.StringIO(html), pseudo_dest)
         return self.thumbnail_from_pdf(pseudo_dest.getvalue())
-
-    def vertical_url_from_mongo_element(self, mongo_element):
-        """
-        Given a mongo element, returns the url after courseware
-        """
-
-        name = lambda x: x["_id"]["name"]
-        element_name = name(mongo_element)
-        vertical = self.module_collection.find_one({"definition.children": re.compile(".*?" + element_name + ".*?")})
-        if vertical:
-            index = next(i for i, entry in enumerate(vertical["definition"]["children"]) if element_name in entry)
-            sequential = self.module_collection.find_one({
-                "definition.children": re.compile(".*?" + name(vertical) + ".*?"),
-                "_id.course": vertical["_id"]["course"]
-            })
-            if sequential and sequential["_id"]:
-                chapter = self.module_collection.find_one({
-                    "definition.children": re.compile(".*?" + name(sequential) + ".*?"),
-                    "_id.course": sequential["_id"]["course"]
-                })
-                if chapter and chapter["_id"]:
-                    return "/".join([name(chapter), name(sequential), str(index + 1)])
-                else:
-                    log.debug("No Chapter for: " + sequential["metadata"]["display_name"])
-                    return None
-            else:
-                log.debug("No Sequential for: " + vertical["metadata"]["display_name"])
-                return None
-        else:
-            return None
 
     def course_name_from_mongo_module(self, mongo_module):
         """

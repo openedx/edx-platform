@@ -1,3 +1,7 @@
+"""
+View functions and interface for search functionality
+"""
+
 import requests
 import logging
 import hashlib
@@ -55,13 +59,9 @@ def find(request, course_id):
     get_content = lambda request, content: content + "-index" if request.GET.get(content, False) else None
     query = request.GET.get("s", "*.*")
     full_query_data.update(
-        {
-        "query":
+        {"query":
             {"query_string":
-                {
-                "default_field": "searchable_text",
-                "query": query,
-                "analyzer": "standard"
+                {"default_field": "searchable_text", "query": query, "analyzer": "standard"
                 }
             }
         }

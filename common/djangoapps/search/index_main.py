@@ -1,3 +1,7 @@
+"""
+Main method for running indexing operations from the command line.
+"""
+
 import sys
 from search.es_requests import MongoIndexer
 from search.es_requests import ElasticDatabase
