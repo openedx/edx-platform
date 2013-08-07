@@ -633,15 +633,21 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         # now loop through all the units in the course and verify that the clone can render them, which
         # means the objects are at least present
-        items = module_store.get_items(Location(['i4x', 'edX', 'toy', 'poll_question', None]))
+        items = module_store.get_items(Location(['i4x', 'edX', 'toy', None, None]))
         self.assertGreater(len(items), 0)
-        clone_items = module_store.get_items(Location(['i4x', 'MITx', '999', 'poll_question', None]))
+        clone_items = module_store.get_items(Location(['i4x', 'MITx', '999', None, None]))
         self.assertGreater(len(clone_items), 0)
+        self.assertEqual(len(items), len(clone_items))
+
         for descriptor in items:
             new_loc = descriptor.location.replace(org='MITx', course='999')
             print "Checking {0} should now also be at {1}".format(descriptor.location.url(), new_loc.url())
-            resp = self.client.get(reverse('edit_unit', kwargs={'location': new_loc.url()}))
-            self.assertEqual(resp.status_code, 200)
+            lookup_item = module_store.get_item(new_loc)
+
+            # we want to assert equality between the objects, but we know the locations
+            # differ, so just make them equal for testing purposes
+            descriptor.location = new_loc
+            self.assertEqual(descriptor, lookup_item)
 
     def test_illegal_draft_crud_ops(self):
         draft_store = modulestore('draft')
