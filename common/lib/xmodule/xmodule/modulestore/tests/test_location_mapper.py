@@ -168,7 +168,7 @@ class TestLocationMapper(unittest.TestCase):
         self.assertEqual(prob_locator.usage_id, 'problem3')
         self.assertEqual(prob_locator.branch, 'draft')
 
-    def translate_location_dwim(self):
+    def test_translate_location_dwim(self):
         """
         Test the location translation mechanisms which try to do-what-i-mean by creating new
         entries for never seen queries.
