@@ -199,15 +199,11 @@ def add_subsection(name='Subsection One'):
 
 def set_date_and_time(date_css, desired_date, time_css, desired_time):
     world.css_fill(date_css, desired_date)
-    if world.is_firefox():
-        world.trigger_event(date_css)
     # hit TAB to get to the time field
     e = world.css_find(date_css).first
     # pylint: disable=W0212
     e._element.send_keys(Keys.TAB)
     world.css_fill(time_css, desired_time)
-    if world.is_firefox():
-        world.trigger_event(time_css)
     e = world.css_find(time_css).first
     e._element.send_keys(Keys.TAB)
     time.sleep(float(1))
