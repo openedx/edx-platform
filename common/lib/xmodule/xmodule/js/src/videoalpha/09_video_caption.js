@@ -109,6 +109,7 @@ function () {
 
         if (this.videoType === 'html5') {
             this.el.on('mousemove', this.videoCaption.autoShowCaptions);
+            this.el.on('keydown', this.videoCaption.autoShowCaptions);
 
             // Moving slider on subtitles is not a mouse move,
             // but captions and controls should be showed.

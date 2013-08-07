@@ -75,6 +75,7 @@ function () {
 
         if (state.videoType === 'html5') {
             state.el.on('mousemove', state.videoControl.showControls);
+            state.el.on('keydown', state.videoControl.showControls);
         }
     }
 
