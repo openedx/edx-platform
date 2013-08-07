@@ -313,9 +313,9 @@ function saveSubsection() {
             document.getElementById(name+"_date"),
             document.getElementById(name+"_time")
         );
-        if (datetime) {
-            metadata[name] = datetime;
-        }
+        // if datetime is null, we want to set that in metadata anyway;
+        // its an indication to the server to clear the datetime in the DB
+        metadata[name] = datetime;
     });
 
     $.ajax({
