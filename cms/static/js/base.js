@@ -253,21 +253,20 @@ function syncReleaseDate(e) {
     $("#start_time").val("");
 }
 
-function getEdxTimeFromDateTimeVals(date_val, time_val) {
-    if (date_val != '') {
-        if (time_val == '') time_val = '00:00';
-
-        return new Date(date_val + " " + time_val + "Z");
+function getDatetime(datepickerInput, timepickerInput) {
+    // given a pair of inputs (datepicker and timepicker), return a JS Date
+    // object that corresponds to the datetime that they represent. Assume
+    // UTC timezone, NOT the timezone of the user's browser.
+    var date = $(datepickerInput).datepicker("getDate");
+    var time = $(timepickerInput).timepicker("getTime");
+    if(date && time) {
+        return new Date(Date.UTC(
+            date.getFullYear(), date.getMonth(), date.getDate(),
+            time.getHours(), time.getMinutes()
+        ));
+    } else {
+        return null;
     }
-
-    else return null;
-}
-
-function getEdxTimeFromDateTimeInputs(date_id, time_id) {
-    var input_date = $('#' + date_id).val();
-    var input_time = $('#' + time_id).val();
-
-    return getEdxTimeFromDateTimeVals(input_date, input_time);
 }
 
 function autosaveInput(e) {
@@ -307,9 +306,17 @@ function saveSubsection() {
         metadata[$(el).data("metadata-name")] = el.value;
     }
 
-    // Piece back together the date/time UI elements into one date/time string
-    metadata['start'] = getEdxTimeFromDateTimeInputs('start_date', 'start_time');
-    metadata['due'] = getEdxTimeFromDateTimeInputs('due_date', 'due_time');
+    // get datetimes for start and due, stick into metadata
+    _(["start", "due"]).each(function(name) {
+
+        var datetime = getDatetime(
+            document.getElementById(name+"_date"),
+            document.getElementById(name+"_time")
+        );
+        // if datetime is null, we want to set that in metadata anyway;
+        // its an indication to the server to clear the datetime in the DB
+        metadata[name] = datetime;
+    });
 
     $.ajax({
         url: "/save_item",
@@ -772,21 +779,21 @@ function cancelSetSectionScheduleDate(e) {
 function saveSetSectionScheduleDate(e) {
     e.preventDefault();
 
-    var input_date = $('.edit-subsection-publish-settings .start-date').val();
-    var input_time = $('.edit-subsection-publish-settings .start-time').val();
-
-    var start = getEdxTimeFromDateTimeVals(input_date, input_time);
+    var datetime = getDatetime(
+        $('.edit-subsection-publish-settings .start-date'),
+        $('.edit-subsection-publish-settings .start-time')
+    );
 
     var id = $modal.attr('data-id');
 
     analytics.track('Edited Section Release Date', {
         'course': course_location_analytics,
         'id': id,
-        'start': start
+        'start': datetime
     });
 
     var saving = new CMS.Views.Notification.Mini({
-        title: gettext("Saving") + "&hellip;",
+        title: gettext("Saving") + "&hellip;"
     });
     saving.show();
     // call into server to commit the new order
@@ -798,20 +805,29 @@ function saveSetSectionScheduleDate(e) {
         data: JSON.stringify({
             'id': id,
             'metadata': {
-                'start': start
+                'start': datetime
             }
         })
     }).success(function() {
+        var pad2 = function(number) {
+            // pad a number to two places: useful for formatting months, days, hours, etc
+            // when displaying a date/time
+            return (number < 10 ? '0' : '') + number;
+        };
+
         var $thisSection = $('.courseware-section[data-id="' + id + '"]');
         var html = _.template(
             '<span class="published-status">' +
                 '<strong>' + gettext("Will Release:") + '&nbsp;</strong>' +
-                gettext("<%= date %> at <%= time %> UTC") +
+                gettext("{month}/{day}/{year} at {hour}:{minute} UTC") +
             '</span>' +
-            '<a href="#" class="edit-button" data-date="<%= date %>" data-time="<%= time %>" data-id="<%= id %>">' +
+            '<a href="#" class="edit-button" data-date="{month}/{day}/{year}" data-time="{hour}:{minute}" data-id="{id}">' +
                 gettext("Edit") +
             '</a>',
-            {date: input_date, time: input_time, id: id});
+            {year: datetime.getUTCFullYear(), month: pad2(datetime.getUTCMonth() + 1), day: pad2(datetime.getUTCDate()),
+             hour: pad2(datetime.getUTCHours()), minute: pad2(datetime.getUTCMinutes()),
+             id: id},
+            {interpolate: /\{(.+?)\}/g});
         $thisSection.find('.section-published-date').html(html);
         hideModal();
         saving.hide();

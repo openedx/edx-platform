@@ -148,7 +148,7 @@ function generateCheckHoverState(selectorsToOpen, selectorsToShove) {
             }
 
         });
-    }
+    };
 }
 
 function removeHesitate(event, ui) {
