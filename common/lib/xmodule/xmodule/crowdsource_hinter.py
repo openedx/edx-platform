@@ -14,6 +14,7 @@ from pkg_resources import resource_string
 from lxml import etree
 
 from xmodule.x_module import XModule
+from xmodule.capa_module import CapaModule
 from xmodule.raw_module import RawDescriptor
 from xblock.core import Scope, String, Integer, Boolean, Dict, List
 from xmodule.modulestore import Location
@@ -23,6 +24,7 @@ from xmodule.modulestore.exceptions import InvalidLocationError
 from capa.responsetypes import FormulaResponse
 
 from django.utils.html import escape
+from django.conf import settings
 
 log = logging.getLogger(__name__)
 
@@ -89,18 +91,17 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
     js_module_name = "Hinter"
 
     def __init__(self, *args, **kwargs):
-        global problem_choices
         XModule.__init__(self, *args, **kwargs)
         self.init_error = None
-        # Set ProblemIdChoices.  (This is for Studio.)
-        # choices_list contains dictionaries of {'display_name': readable name,
-        # 'value': system name}, each representing a choice.
-        choices_dict = []
-        all_problems = modulestore().get_items(Location(course=self.location.course, category='problem'))
-        for problem_descriptor in all_problems:
-            choices_dict.append({'display_name': problem_descriptor.display_name_with_default,
-                                 'value': str(problem_descriptor.location)})
-        problem_choices = choices_dict
+
+        # Determine whether we are in Studio.  In Studio, accessing self.hints raises
+        # an exception.
+        self.in_studio = False
+        try:
+            self.hints
+        except TypeError:
+            self.in_studio = True
+            self.setup_studio()
 
         # Get the problem we are hinting for.
         try:
@@ -152,15 +153,26 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         if self.init_error is not None:
             return self.init_error
 
-        # Determine whether we are in Studio.  In Studio, accessing self.hints raises
-        # an exception.
-        try:
-            self.hints
-        except TypeError:
+        if self.in_studio:
             # We're in studio mode.
+
+            # Take the entire url
+            # - minus the last two segments
+            # - minus the i4x
+            # - append /courseware/hint_manager
+            # - prepend LMS_BASE/courses/
+            # Ex: i4x://Me/19.001/crowdsource_hinter/ec4d140d58114daeabb6f1819547decf@draft
+            # -> localhost:8000/courses/Me/19.001/courseware/hint_manager
+            manager_url = settings.LMS_BASE + '/courses' +\
+                '/'.join(self.location.url().split('/')[1:-2]) + '/courseware/hint_manager'
+            # Note: change this
             return '''This is a crowdsourced hinting module for {name}.  This message is only
-                visible in Studio - your students will see the actual hinting module.'''.format(
-                name=self.problem_module.display_name_with_default)
+                visible in Studio - your students will see the actual hinting module.
+                <br /><br />
+                To add or moderate hints, visit <a href="{manager_url}">{manager_url}</a>'''.format(
+                    name=self.problem_module.display_name_with_default,
+                    manager_url=manager_url,
+                )
         else:
             if self.debug == 'True':
                 # Reset the user vote, for debugging only!
@@ -178,6 +190,36 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
             '" data-child-url = "' + child_url + '"> </section>'
 
         return out
+
+    def setup_studio(self):
+        global problem_choices
+        """
+        Create a list of problems within this section, to offer as choices for the
+        target problem.
+        Updates a global variable; does not return anything.
+        """
+        # problem_choies contains dictionaries of {'display_name': readable name,
+        # 'value': system name}, each representing a choice.
+        # The choices should be all problems in the same section as this hinter
+        # module.
+        problem_choices = []
+        # Find the parent of this module.
+        # This is sort of clunky - we have to loop through all modules.
+        all_modules = modulestore().get_items(Location(course=self.location.course, revision='draft'))
+        parent = None
+        for candidate_parent in all_modules:
+            for child in candidate_parent.get_children():
+                if self.descriptor.location == child.location:
+                    parent = candidate_parent
+                    break
+            if parent is not None:
+                break
+
+        # Add all problems that are children of our parent.
+        for descriptor in parent.get_children():
+            if descriptor.module_class == CapaModule:
+                problem_choices.append({'display_name': descriptor.display_name_with_default,
+                                        'value': str(descriptor.location)})
 
     def numerical_answer_to_str(self, answer):
         """
