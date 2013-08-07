@@ -11,9 +11,9 @@ class AutoAuthEnabledTestCase(UrlResetMixin, TestCase):
     Tests for the Auto auth view that we have for load testing.
     """
 
-    @patch.dict("django.conf.settings.MITX_FEATURES", {"AUTOMATIC_AUTH_FOR_LOAD_TESTING": True})
+    @patch.dict("django.conf.settings.MITX_FEATURES", {"AUTOMATIC_AUTH_FOR_TESTING": True})
     def setUp(self):
-        # Patching the settings.MITX_FEATURES['AUTOMATIC_AUTH_FOR_LOAD_TESTING']
+        # Patching the settings.MITX_FEATURES['AUTOMATIC_AUTH_FOR_TESTING']
         # value affects the contents of urls.py,
         # so we need to call super.setUp() which reloads urls.py (because
         # of the UrlResetMixin)
@@ -102,9 +102,9 @@ class AutoAuthDisabledTestCase(UrlResetMixin, TestCase):
     Test that the page is inaccessible with default settings
     """
 
-    @patch.dict("django.conf.settings.MITX_FEATURES", {"AUTOMATIC_AUTH_FOR_LOAD_TESTING": False})
+    @patch.dict("django.conf.settings.MITX_FEATURES", {"AUTOMATIC_AUTH_FOR_TESTING": False})
     def setUp(self):
-        # Patching the settings.MITX_FEATURES['AUTOMATIC_AUTH_FOR_LOAD_TESTING']
+        # Patching the settings.MITX_FEATURES['AUTOMATIC_AUTH_FOR_TESTING']
         # value affects the contents of urls.py,
         # so we need to call super.setUp() which reloads urls.py (because
         # of the UrlResetMixin)
