@@ -56,10 +56,8 @@ def i_have_opened_a_new_course(_step):
 
 @step('(I select|s?he selects) the new course')
 def select_new_course(_step, whom):
-    course_link_xpath = '//div[contains(@class, "courses")]//a[contains(@class, "class-link")]//span[contains(., "{name}")]/..'.format(
-        name="Robot Super Course")
-    element = world.browser.find_by_xpath(course_link_xpath)
-    element.click()
+    course_link_css = 'a.course-link'
+    world.css_click(course_link_css)
 
 
 @step(u'I press the "([^"]*)" notification button$')
@@ -179,8 +177,7 @@ def create_a_course():
         user.groups.add(group)
     user.save()
     world.browser.reload()
-
-    course_link_css = 'span.class-name'
+    course_link_css = 'a.course-link'
     world.css_click(course_link_css)
     course_title_css = 'span.course-title'
     assert_true(world.is_css_present(course_title_css))
