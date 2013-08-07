@@ -179,8 +179,7 @@ def create_a_course():
         user.groups.add(group)
     user.save()
     world.browser.reload()
-
-    course_link_css = 'span.class-name'
+    course_link_css = 'a.course-link'
     world.css_click(course_link_css)
     course_title_css = 'span.course-title'
     assert_true(world.is_css_present(course_title_css))
