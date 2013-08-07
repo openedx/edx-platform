@@ -144,11 +144,12 @@ $(document).ready(function() {
         }
         // Clear out the old destination
         if(dragState.dropDestination) {
-            dragState.dropDestination.removeClass('drop-destination');
+            dragState.dropDestination.removeClass('drop-target drop-target-prepend'
+                                                  + ' drop-target-before drop-target-after');
         }
         // Mark the new destination
         if(destinationEle) {
-            destinationEle.addClass('drop-destination');
+            destinationEle.addClass('drop-target drop-target-' + destinationInfo.attachMethod);
             dragState.dropDestination = destinationEle;
         }
     }
@@ -178,7 +179,8 @@ $(document).ready(function() {
 
         // Clear dragging state in preparation for the next event.
         if(dragState.dropDestination) {
-            dragState.dropDestination.removeClass('drop-destination');
+            dragState.dropDestination.removeClass('drop-target drop-target-prepend'
+                                                  + ' drop-target-before drop-target-after');
         }
         clearTimeout(dragState.expandTimer);
         dragState = {};
