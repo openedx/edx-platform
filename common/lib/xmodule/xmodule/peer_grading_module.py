@@ -12,7 +12,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from .timeinfo import TimeInfo
 from xblock.core import Dict, String, Scope, Boolean, Integer, Float
-from xmodule.fields import Date
+from xmodule.fields import Date, Timedelta
 
 from xmodule.open_ended_grading_classes.peer_grading_service import PeerGradingService, GradingServiceError, MockPeerGradingService
 from open_ended_grading_classes import combined_open_ended_rubric
@@ -47,9 +47,8 @@ class PeerGradingFields(object):
         help="Due date that should be displayed.",
         default=None,
         scope=Scope.settings)
-    grace_period_string = String(
+    graceperiod = Timedelta(
         help="Amount of grace to give on the due date.",
-        default=None,
         scope=Scope.settings
     )
     student_data_for_location = Dict(
@@ -105,12 +104,12 @@ class PeerGradingModule(PeerGradingFields, XModule):
                 log.error("Linked location {0} for peer grading module {1} does not exist".format(
                     self.link_to_location, self.location))
                 raise
-            due_date = self.linked_problem._model_data.get('due', None)
+            due_date = self.linked_problem.lms.due
             if due_date:
-                self._model_data['due'] = due_date
+                self.lms.due = due_date
 
         try:
-            self.timeinfo = TimeInfo(self.due, self.grace_period_string)
+            self.timeinfo = TimeInfo(self.due, self.graceperiod)
         except Exception:
             log.error("Error parsing due date information in location {0}".format(self.location))
             raise
@@ -533,10 +532,10 @@ class PeerGradingModule(PeerGradingFields, XModule):
             problem_location = problem['location']
             descriptor = _find_corresponding_module_for_location(problem_location)
             if descriptor:
-                problem['due'] = descriptor._model_data.get('due', None)
-                grace_period_string = descriptor._model_data.get('graceperiod', None)
+                problem['due'] = descriptor.lms.due
+                grace_period = descriptor.lms.graceperiod
                 try:
-                    problem_timeinfo = TimeInfo(problem['due'], grace_period_string)
+                    problem_timeinfo = TimeInfo(problem['due'], grace_period)
                 except:
                     log.error("Malformed due date or grace period string for location {0}".format(problem_location))
                     raise
@@ -629,5 +628,5 @@ class PeerGradingDescriptor(PeerGradingFields, RawDescriptor):
     @property
     def non_editable_metadata_fields(self):
         non_editable_fields = super(PeerGradingDescriptor, self).non_editable_metadata_fields
-        non_editable_fields.extend([PeerGradingFields.due, PeerGradingFields.grace_period_string])
+        non_editable_fields.extend([PeerGradingFields.due, PeerGradingFields.graceperiod])
         return non_editable_fields
