@@ -56,10 +56,8 @@ def i_have_opened_a_new_course(_step):
 
 @step('(I select|s?he selects) the new course')
 def select_new_course(_step, whom):
-    course_link_xpath = '//div[contains(@class, "courses")]//a[contains(@class, "class-link")]//span[contains(., "{name}")]/..'.format(
-        name="Robot Super Course")
-    element = world.browser.find_by_xpath(course_link_xpath)
-    element.click()
+    course_link_css = 'a.course-link'
+    world.css_click(course_link_css)
 
 
 @step(u'I press the "([^"]*)" notification button$')

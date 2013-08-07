@@ -93,7 +93,7 @@ def other_user_login(_step, name):
 @step(u'I( do not)? see the course on my page')
 @step(u's?he does( not)? see the course on (his|her) page')
 def see_course(_step, inverted, gender='self'):
-    class_css = 'span.class-name'
+    class_css = 'h3.course-title'
     all_courses = world.css_find(class_css, wait_time=1)
     all_names = [item.html for item in all_courses]
     if inverted:
