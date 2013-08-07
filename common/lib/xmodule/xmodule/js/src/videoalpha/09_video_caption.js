@@ -123,6 +123,10 @@ function () {
 
         this.videoCaption.hideCaptions(this.hide_captions);
 
+        if (!this.youtubeId('1.0')) {
+            return;
+        }
+
         $.ajaxWithPrefix({
             url: _this.videoCaption.captionURL(),
             notifyOnError: false,
