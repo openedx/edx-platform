@@ -5,6 +5,9 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Studio: Email will be sent to admin address when a user requests course creator
+privileges for Studio (edge only).
+
 Studio: Studio course authors (both instructors and staff) will be auto-enrolled
 for their courses so that "View Live" works.
 
