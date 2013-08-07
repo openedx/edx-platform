@@ -222,7 +222,7 @@ section.combined-open-ended-status {
 
 .wrappable {
   display: table-cell;
-  padding: $baseline/4 0 ;
+  padding: $baseline/4;
 }
 
 .rubric-list-item {
@@ -238,7 +238,9 @@ span.rubric-category {
   display: block;
   width: 100%;
   border-bottom: 1px solid lightgray;
-  font-size: .9em;
+  font-size: 1.1em;
+  padding-top: $baseline/2;
+  margin-bottom: $baseline/2;
 }
 
 div.combined-rubric-container {
@@ -591,7 +593,8 @@ section.open-ended-child {
       overflow-y: auto;
       margin-bottom: 0;
       padding: $baseline/2;
-      height: 200px;
+      height: auto;
+      min-height: 20px;
       border: 1px solid #ddd;
       background: #f6f6f6;
     }
@@ -668,6 +671,7 @@ section.open-ended-child {
         &.rubric-list-item {
           margin-bottom: 0;
           padding: 0;
+          border-radius: $baseline/4;
          }
       }
     }

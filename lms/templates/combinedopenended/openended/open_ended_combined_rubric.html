@@ -8,17 +8,18 @@
             <li class="rubric-list-item">
                 <div class="rubric-label">
                     %if len(category['options'][j]['grader_types'])>0:
-                       %if correct[i]==1:
-                        <label class="choicegroup_correct">
-                       %else:
-                        <label class="choicegroup_incorrect">
-                       %endif
-                       ${option['points']} points : ${option['text']}
+                        %if correct[i]==1:
+                            <label class="choicegroup_correct wrapper-score-selection"></label>
+                        %else:
+                            <label class="choicegroup_incorrect wrapper-score-selection"></label>
+                        %endif
+                            <span class="wrappable"> ${option['points']} points : ${option['text']}</span>
                         </label>
                     %else:
-                         <label class="rubric-elements-info">
-                             ${option['points']} points : ${option['text']}
-                         </label>
+                        <label class="rubric-elements-info">
+                            <span class="wrapper-score-selection"> </span>
+                            <span class="wrappable"> ${option['points']} points : ${option['text']}</span>
+                        </label>
                     %endif
                 </div>
             </li>

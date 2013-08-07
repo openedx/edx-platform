@@ -6,7 +6,15 @@
         % else:
             status="hidden">
         % endif
-            <h4>${result['task_name']} from grader ${i+1} <a class="rubric-collapse" href="#">(Hide)</a></h4>
+            <div class="visibility-control visibility-control-rubric">
+                <div class="inner">
+                </div>
+                <span class="section-header section-header-rubric">Submitted Rubric</span>
+            </div>
+            <div class="rubric-header"> 
+                ${result['task_name']} from grader ${i+1} 
+                <button class="rubric-collapse" href="#">Show Score Only</button>
+            </div>
             ${result['result'] | n}
         </div>
     %endif
