@@ -340,15 +340,15 @@ class CapaModule(CapaFields, XModule):
         """
         Determine the name for the "check" button.
 
-        Usually it is just "Check", but if this is the student's
-        final attempt, change the name to "Submit"
+        Usually it is just "Submit", but if this is the student's
+        final attempt, change the name to "Final Submit" so they 
+        know it's their last one.
         """
         if self.max_attempts is not None:
             final_check = (self.attempts >= self.max_attempts - 1)
         else:
             final_check = False
-
-        return "Submit" if final_check else "Check"
+        return "Final Submit" if final_check else "Submit"
 
     def should_show_check_button(self):
         """
