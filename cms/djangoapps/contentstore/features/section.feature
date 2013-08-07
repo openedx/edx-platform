@@ -24,7 +24,7 @@ Feature: Create Section
     Given I have opened a new course in Studio
     And I have added a new section
     When I click the Edit link for the release date
-    And I save a new section release date
+    And I set the section release date to 12/25/2013
     Then the section release date is updated
     And I see a "saving" notification
 
