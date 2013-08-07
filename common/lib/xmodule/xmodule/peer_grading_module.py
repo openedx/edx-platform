@@ -327,6 +327,11 @@ class PeerGradingModule(PeerGradingFields, XModule):
         try:
             response = self.peer_gs.save_grade(location, grader_id, submission_id,
                                                score, feedback, submission_key, rubric_scores, submission_flagged, answer_unknown)
+
+            success, location_data = self.query_data_for_location()
+            response.update({'required_done' : False})
+            if 'count_graded' in location_data and 'count_required' in location_data:
+                response['required_done'] = True
             return response
         except GradingServiceError:
             # This is a dev_facing_error

@@ -2,9 +2,9 @@
     % if 'task_name' in result and 'result' in result:
         <div class="combined-rubric-container"
         %if i>0:
-            status="shown">
+            data-status="hidden" data-number="${i}">
         % else:
-            status="hidden">
+            data-status="shown" data-number="${i}">
         % endif
             <div class="visibility-control visibility-control-rubric">
                 <div class="inner">

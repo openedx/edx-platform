@@ -506,22 +506,20 @@ class CombinedOpenEndedV1Module():
         for i in xrange(0, loop_up_to_task):
             response = self.get_last_response(i)
             rubric_scores = None
-            if len(response['rubric_scores']) > 0 and response['grader_types'][0] in HUMAN_GRADER_TYPE.keys():
-                rubric_scores = [response['rubric_scores']]
-            grader_types = None
-            if len(response['grader_types']) > 0 and response['grader_types'][0] in HUMAN_GRADER_TYPE.keys():
-                grader_types = [response['grader_types']]
-            feedback_items = None
-            if len(response['feedback_items']) > 0 and response['grader_types'][0] in HUMAN_GRADER_TYPE.keys():
-                feedback_items = [response['feedback_items']]
-            if feedback_items is not None and grader_types is not None and rubric_scores is not None:
-                rubric_html = self.rubric_renderer.render_combined_rubric(stringify_children(self.static_data['rubric']),
-                                                                      rubric_scores,
-                                                                      grader_types, feedback_items)
-                contexts.append({
-                    'result': rubric_html,
-                    'task_name': 'Scored rubric'
-                })
+            score_length = len(response['grader_types'])
+            log.info(response)
+            for z in xrange(0,score_length):
+                if response['grader_types'][z] in HUMAN_GRADER_TYPE.keys():
+                    rubric_scores = [[response['rubric_scores'][z]]]
+                    grader_types = [[response['grader_types'][z]]]
+                    feedback_items = [[response['feedback_items'][z]]]
+                    rubric_html = self.rubric_renderer.render_combined_rubric(stringify_children(self.static_data['rubric']),
+                                                                          rubric_scores,
+                                                                          grader_types, feedback_items)
+                    contexts.append({
+                        'result': rubric_html,
+                        'task_name': 'Scored rubric'
+                    })
 
         context = {
             'results': contexts,
