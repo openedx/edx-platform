@@ -62,7 +62,7 @@ def my_display_name_change_is_persisted_on_save(step):
 def i_can_modify_the_display_name_with_special_chars(step):
     index = world.get_setting_entry_index(DISPLAY_NAME)
     world.css_fill('.wrapper-comp-setting .setting-input', "updated ' \" &", index=index)
-    if world.browser.driver_name == 'Firefox':
+    if world.is_firefox():
         world.trigger_event('.wrapper-comp-setting .setting-input', index=index)
     verify_modified_display_name_with_special_chars()
 
