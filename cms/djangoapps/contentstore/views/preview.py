@@ -164,13 +164,16 @@ def load_preview_module(request, preview_id, descriptor):
 
 
 def get_preview_html(request, descriptor, idx):
+    """
+    Returns the HTML for the XModule specified by the descriptor and idx.
+    """
     module = load_preview_module(request, str(idx), descriptor)
     return module.runtime.render(module, None, "student_view").content
 
 
 def get_module_previews(request, descriptor):
     """
-    Returns a list of preview XModule html contents. One preview is returned for each
+    Returns a tuple of preview XModule html contents. One preview is returned for each
     pair of states returned by get_sample_state() for the supplied descriptor.
 
     descriptor: An XModuleDescriptor
