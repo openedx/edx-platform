@@ -21,7 +21,7 @@ from django.conf import settings
 
 from xmodule.x_module import XModule
 from xmodule.editing_module import TabsEditingDescriptor
-from xmodule.raw_module import RawDescriptor
+from xmodule.raw_module import EmptyDataRawDescriptor
 from xmodule.modulestore.mongo import MongoModuleStore
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.content import StaticContent
@@ -188,7 +188,7 @@ class VideoAlphaModule(VideoAlphaFields, XModule):
         })
 
 
-class VideoAlphaDescriptor(VideoAlphaFields, TabsEditingDescriptor, RawDescriptor):
+class VideoAlphaDescriptor(VideoAlphaFields, TabsEditingDescriptor, EmptyDataRawDescriptor):
     """Descriptor for `VideoAlphaModule`."""
     module_class = VideoAlphaModule
 
@@ -225,8 +225,8 @@ class VideoAlphaDescriptor(VideoAlphaFields, TabsEditingDescriptor, RawDescripto
         org and course are optional strings that will be used in the generated modules
             url identifiers
         """
-        model_data = VideoAlphaDescriptor._parse_video_xml(xml_data)
-        video = cls(system, model_data)
+        # Calling from_xml of XmlDescritor, to get right Location, when importing from XML
+        video = super(VideoAlphaDescriptor, cls).from_xml(xml_data, system, org, course)
         return video
 
     def export_to_xml(self, resource_fs):
@@ -303,6 +303,15 @@ class VideoAlphaDescriptor(VideoAlphaFields, TabsEditingDescriptor, RawDescripto
             'to': 'end_time'
         }
 
+        sources = xml.findall('source')
+        if sources:
+            model_data['html5_sources'] = [ele.get('src') for ele in sources]
+            model_data['source'] = model_data['html5_sources'][0]
+
+        track = xml.find('track')
+        if track is not None:
+            model_data['track'] = track.get('src')
+
         for attr, value in xml.items():
             if attr in video_compat:
                 attr = video_compat[attr]
@@ -312,22 +321,14 @@ class VideoAlphaDescriptor(VideoAlphaFields, TabsEditingDescriptor, RawDescripto
                     # should have made these youtube_id_1_00 for
                     # cleanliness, but hindsight doesn't need glasses
                     normalized_speed = speed[:-1] if speed.endswith('0') else speed
-                    if youtube_id != '':
+                    # If the user has specified html5 sources, make sure we don't use the default video
+                    if youtube_id != '' or 'html5_sources' in model_data:
                         model_data['youtube_id_{0}'.format(normalized_speed.replace('.', '_'))] = youtube_id
             else:
                 #  Convert XML attrs into Python values.
                 if attr in conversions:
                     value = conversions[attr](value)
                 model_data[attr] = value
-
-        sources = xml.findall('source')
-        if sources:
-            model_data['html5_sources'] = [ele.get('src') for ele in sources]
-            model_data['source'] = model_data['html5_sources'][0]
-
-        track = xml.find('track')
-        if track is not None:
-            model_data['track'] = track.get('src')
 
         return model_data
 
