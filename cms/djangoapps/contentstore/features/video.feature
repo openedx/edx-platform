@@ -23,6 +23,7 @@ Feature: Video Component
     And I have toggled captions
     Then when I view the video it does show the captions
 
+  #Video Alpha Features will work in Firefox only when Firefox is the active window
   Scenario: Autoplay is disabled in Studio for Video Alpha
     Given I have created a Video Alpha component
     Then when I view the videoalpha it does not have autoplay enabled

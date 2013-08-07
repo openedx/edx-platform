@@ -234,7 +234,7 @@ def i_created_video_alpha(step):
 def i_enabled_the_advanced_module(step, module):
     step.given('I have opened a new course section in Studio')
     world.css_click('.nav-course-settings')
-    world.css_click('.nav-course-settings-advanced')
+    world.css_click('.nav-course-settings-advanced a')
     type_in_codemirror(0, '["%s"]' % module)
     press_the_notification_button(step, 'Save')
 
