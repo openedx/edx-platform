@@ -51,7 +51,7 @@ class ProfileDistributionWidget
             name: 'Count'
           ]
 
-          grid_data = _.map feature_res.data, (value, key) ->
+          grid_data = _.map feature_res.data, (value, key) =>
             datapoint = {}
             datapoint[@feature] = feature_res.choices_display_names[key]
             datapoint['count'] = value
