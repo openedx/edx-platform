@@ -55,6 +55,8 @@ def delete_other_user(_step, name):
         email="{0}{1}".format(name, EMAIL_EXTENSION))
     world.css_click(to_delete_css)
     # confirm prompt
+    # need to wait for the animation to be done, there isn't a good success condition that won't work both on latest chrome and jenkins
+    world.wait(.5)
     world.css_click(".wrapper-prompt-warning .action-primary")
 
 
