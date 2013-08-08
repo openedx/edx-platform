@@ -93,7 +93,6 @@ def peer_grading_notifications(course, user):
         log.info(
             "Problem with getting notifications from peer grading service for course {0} user {1}.".format(course_id,
                                                                                                            student_id))
-
     if pending_grading:
         img_path = "/static/images/grading_notification.png"
 
@@ -166,7 +165,7 @@ def combined_notifications(course, user):
                                                                          last_time_viewed)
         notifications = json.loads(controller_response)
         if notifications['success']:
-            if notifications['overall_need_to_check']:
+            if notifications['staff_needs_to_grade'] or notifications['student_needs_to_peer_grade']:
                 pending_grading = True
     except:
         #Non catastrophic error, so no real action

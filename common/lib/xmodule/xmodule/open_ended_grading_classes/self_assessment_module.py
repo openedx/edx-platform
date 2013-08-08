@@ -267,8 +267,6 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         try:
             rubric_scores = json.loads(latest_post_assessment)
         except:
-            # This is a dev_facing_error
-            log.error("Cannot parse rubric scores in self assessment module from {0}".format(latest_post_assessment))
             rubric_scores = []
         return [rubric_scores]
 

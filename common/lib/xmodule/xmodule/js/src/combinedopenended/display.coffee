@@ -201,10 +201,6 @@ class @CombinedOpenEnded
 
     @rebind()
 
-    if @task_number>1
-      @show_combined_rubric_current()
-      @show_results_current()
-
   show_results_current: () =>
     data = {'task_number' : @task_number-1}
     $.postWithPrefix "#{@ajax_url}/get_results", data, (response) =>
