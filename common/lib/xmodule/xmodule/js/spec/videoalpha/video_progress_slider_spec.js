@@ -54,7 +54,6 @@
 
           // We can't expect $.fn.slider not to have been called,
           // because sliders are used in other parts of VideoAlpha.
-          // expect($.fn.slider).not.toHaveBeenCalled();
         });
       });
     });
@@ -79,28 +78,6 @@
       });
 
       // Currently, the slider is not rebuilt if it does not exist.
-      //
-      // describe('when the slider was not already built', function() {
-      //   beforeEach(function() {
-      //     spyOn($.fn, 'slider').andCallThrough();
-      //     videoProgressSlider.slider = null;
-      //     videoPlayer.play();
-      //   });
-      //
-      //   it('build the slider', function() {
-      //     expect(videoProgressSlider.slider).toBe('.slider');
-      //     expect($.fn.slider).toHaveBeenCalledWith({
-      //       range: 'min',
-      //       change: videoProgressSlider.onChange,
-      //       slide: videoProgressSlider.onSlide,
-      //       stop: videoProgressSlider.onStop
-      //     });
-      //   });
-      //
-      //   it('build the seek handle', function() {
-      //     expect(videoProgressSlider.handle).toBe('.ui-slider-handle');
-      //   });
-      // });
     });
 
     describe('updatePlayTime', function() {
