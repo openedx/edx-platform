@@ -1,5 +1,5 @@
 (function() {
-  describe('VideoCaptionAlpha', function() {
+  xdescribe('VideoCaptionAlpha', function() {
     var state, videoPlayer, videoCaption, videoSpeedControl, oldOTBD;
 
     function initialize() {
