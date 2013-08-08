@@ -28,6 +28,7 @@ class PeerGradingModuleTest(unittest.TestCase, DummyModulestore):
         'feedback': "",
         'rubric_scores[]': [0, 1],
         'submission_flagged': False,
+        'answer_unknown' : False,
     })
 
     def setUp(self):
