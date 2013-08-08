@@ -10,12 +10,12 @@ file and check it in at the same time as your model changes. To do that,
 2. ./manage.py lms schemamigration bulk_email --auto description_of_your_change
 3. Add the migration file created in edx-platform/lms/djangoapps/bulk_email/migrations/
 
-
-ASSUMPTIONS: modules have unique IDs, even across different module_types
-
 """
+import logging
 from django.db import models
 from django.contrib.auth.models import User
+
+log = logging.getLogger(__name__)
 
 
 class Email(models.Model):
@@ -33,6 +33,10 @@ class Email(models.Model):
     class Meta:  # pylint: disable=C0111
         abstract = True
 
+SEND_TO_MYSELF = 'myself'
+SEND_TO_STAFF = 'staff'
+SEND_TO_ALL = 'all'
+
 
 class CourseEmail(Email, models.Model):
     """
@@ -48,12 +52,12 @@ class CourseEmail(Email, models.Model):
     #   (student, staff, or instructor)
     #
     TO_OPTIONS = (
-        ('myself', 'Myself'),
-        ('staff', 'Staff and instructors'),
-        ('all', 'All')
+        (SEND_TO_MYSELF, 'Myself'),
+        (SEND_TO_STAFF, 'Staff and instructors'),
+        (SEND_TO_ALL, 'All')
     )
     course_id = models.CharField(max_length=255, db_index=True)
-    to_option = models.CharField(max_length=64, choices=TO_OPTIONS, default='myself')
+    to_option = models.CharField(max_length=64, choices=TO_OPTIONS, default=SEND_TO_MYSELF)
 
     def __unicode__(self):
         return self.subject
@@ -68,3 +72,82 @@ class Optout(models.Model):
 
     class Meta:  # pylint: disable=C0111
         unique_together = ('user', 'course_id')
+
+
+# Defines the tag that must appear in a template, to indicate
+# the location where the email message body is to be inserted.
+COURSE_EMAIL_MESSAGE_BODY_TAG = '{{message_body}}'
+
+
+class CourseEmailTemplate(models.Model):
+    """
+    Stores templates for all emails to a course to use.
+
+    This is expected to be a singleton, to be shared across all courses.
+    Initialization takes place in a migration that in turn loads a fixture.
+    The admin console interface disables add and delete operations.
+    Validation is handled in the CourseEmailTemplateForm class.
+    """
+    html_template = models.TextField(null=True, blank=True)
+    plain_template = models.TextField(null=True, blank=True)
+
+    @staticmethod
+    def get_template():
+        """
+        Fetch the current template
+
+        If one isn't stored, an exception is thrown.
+        """
+        return CourseEmailTemplate.objects.get()
+
+    @staticmethod
+    def _render(format_string, message_body, context):
+        """
+        Create a text message using a template, message body and context.
+
+        Convert message body (`message_body`) into an email message
+        using the provided template.  The template is a format string,
+        which is rendered using format() with the provided `context`
+        dict.  Output is encoded as UTF-8 by default.
+
+        This doesn't insert user's text into template, until such time we can support
+        proper error handling due to errors in the message body (e.g. due to
+        the use of curly braces).
+
+        Instead, for now, we insert the message body *after* the substitutions
+        have been performed, so that anything in the message body that might
+        interfere will be innocently returned as-is.
+
+        Output is returned as a unicode string.  It is not encoded as utf-8.
+        Such encoding is left to the email code, which will use the value
+        of settings.DEFAULT_CHARSET to encode the message.
+        """
+        # If we wanted to support substitution, we'd call:
+        # format_string = format_string.replace(COURSE_EMAIL_MESSAGE_BODY_TAG, message_body)
+        result = format_string.format(**context)
+        # Note that the body tag in the template will now have been
+        # "formatted", so we need to do the same to the tag being
+        # searched for.
+        message_body_tag = COURSE_EMAIL_MESSAGE_BODY_TAG.format()
+        result = result.replace(message_body_tag, message_body, 1)
+
+        # finally, return the result, without converting to an encoded byte array.
+        return result
+
+    def render_plaintext(self, plaintext, context):
+        """
+        Create plain text message.
+
+        Convert plain text body (`plaintext`) into plaintext email message using the
+        stored plain template and the provided `context` dict.
+        """
+        return CourseEmailTemplate._render(self.plain_template, plaintext, context)
+
+    def render_htmltext(self, htmltext, context):
+        """
+        Create HTML text message.
+
+        Convert HTML text body (`htmltext`) into HTML email message using the
+        stored HTML template and the provided `context` dict.
+        """
+        return CourseEmailTemplate._render(self.html_template, htmltext, context)

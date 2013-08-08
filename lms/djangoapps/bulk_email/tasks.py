@@ -15,11 +15,14 @@ from django.core.mail import EmailMultiAlternatives, get_connection
 from django.http import Http404
 from celery import task, current_task
 from celery.utils.log import get_task_logger
+from django.core.urlresolvers import reverse
 
-from bulk_email.models import CourseEmail, Optout
+from bulk_email.models import (
+    CourseEmail, Optout, CourseEmailTemplate,
+    SEND_TO_MYSELF, SEND_TO_STAFF, SEND_TO_ALL,
+)
 from courseware.access import _course_staff_group_name, _course_instructor_group_name
 from courseware.courses import get_course_by_id
-from mitxmako.shortcuts import render_to_string
 
 log = get_task_logger(__name__)
 
@@ -47,9 +50,9 @@ def delegate_email_batches(email_id, to_option, course_id, course_url, user_id):
         log.warning("Failed to get CourseEmail with id %s, retry %d", email_id, current_task.request.retries)
         raise delegate_email_batches.retry(arg=[email_id, to_option, course_id, course_url, user_id], exc=exc)
 
-    if to_option == "myself":
+    if to_option == SEND_TO_MYSELF:
         recipient_qset = User.objects.filter(id=user_id)
-    elif to_option == "all" or to_option == "staff":
+    elif to_option == SEND_TO_ALL or to_option == SEND_TO_STAFF:
         staff_grpname = _course_staff_group_name(course.location)
         staff_group, _ = Group.objects.get_or_create(name=staff_grpname)
         staff_qset = staff_group.user_set.all()
@@ -58,7 +61,7 @@ def delegate_email_batches(email_id, to_option, course_id, course_url, user_id):
         instructor_qset = instructor_group.user_set.all()
         recipient_qset = staff_qset | instructor_qset
 
-        if to_option == "all":
+        if to_option == SEND_TO_ALL:
             enrollment_qset = User.objects.filter(courseenrollment__course_id=course_id,
                                                   courseenrollment__is_active=True)
             recipient_qset = recipient_qset | enrollment_qset
@@ -72,7 +75,7 @@ def delegate_email_batches(email_id, to_option, course_id, course_url, user_id):
     num_queries = int(math.ceil(float(total_num_emails) / float(settings.EMAILS_PER_QUERY)))
     last_pk = recipient_qset[0].pk - 1
     num_workers = 0
-    for j in range(num_queries):
+    for _ in range(num_queries):
         recipient_sublist = list(recipient_qset.order_by('pk').filter(pk__gt=last_pk)
                                  .values('profile__name', 'email', 'pk')[:settings.EMAILS_PER_QUERY])
         last_pk = recipient_sublist[-1]['pk']
@@ -95,7 +98,6 @@ def course_email(email_id, to_list, course_title, course_url, throttle=False):
     being the only "to".  Emails are sent multipart, in both plain
     text and html.
     """
-
     try:
         msg = CourseEmail.objects.get(id=email_id)
     except CourseEmail.DoesNotExist as exc:
@@ -116,41 +118,43 @@ def course_email(email_id, to_list, course_title, course_url, throttle=False):
     course_title_no_quotes = re.sub(r'"', '', course_title)
     from_addr = '"{0}" Course Staff <{1}>'.format(course_title_no_quotes, settings.DEFAULT_BULK_FROM_EMAIL)
 
+    course_email_template = CourseEmailTemplate.get_template()
+
     try:
         connection = get_connection()
         connection.open()
         num_sent = 0
         num_error = 0
 
+        # define context values to use in all course emails:
         email_context = {
             'name': '',
             'email': '',
             'course_title': course_title,
-            'course_url': course_url
+            'course_url': course_url,
+            'account_settings_url': 'https://{}{}'.format(settings.SITE_NAME, reverse('dashboard')),
+            'platform_name': settings.PLATFORM_NAME,
         }
 
         while to_list:
+            # update context with user-specific values:
             email = to_list[-1]['email']
             email_context['email'] = email
             email_context['name'] = to_list[-1]['profile__name']
 
-            html_footer = render_to_string(
-                'emails/email_footer.html',
-                email_context
-            )
+            # construct message content using templates and context:
+            plaintext_msg = course_email_template.render_plaintext(msg.text_message, email_context)
+            html_msg = course_email_template.render_htmltext(msg.html_message, email_context)
 
-            plain_footer = render_to_string(
-                'emails/email_footer.txt',
-                email_context
-            )
+            # create email:
             email_msg = EmailMultiAlternatives(
                 subject,
-                msg.text_message + plain_footer.encode('utf-8'),
+                plaintext_msg,
                 from_addr,
                 [email],
                 connection=connection
             )
-            email_msg.attach_alternative(msg.html_message + html_footer.encode('utf-8'), 'text/html')
+            email_msg.attach_alternative(html_msg, 'text/html')
 
             # Throttle if we tried a few times and got the rate limiter
             if throttle or current_task.request.retries > 0:
