@@ -59,10 +59,10 @@
       data-rolename="staff"
       data-display-name="Course Staff"
       data-info-text="
-        Course staff can help you manage limited aspects of your course. Staff can
-        enroll and unenroll students, as well as modify their grades and see all
-        course data. Course staff are not given access to Studio will not be able to
-        edit your course."
+        Course staff can help you manage limited aspects of your course. Staff
+        can enroll and unenroll students, as well as modify their grades and
+        see all course data. Course staff are not automatically given access
+        to Studio and will not be able to edit your course."
       data-list-endpoint="${ section_data['list_course_role_members_url'] }"
       data-modify-endpoint="${ section_data['modify_access_url'] }"
       data-add-button-label="Add Staff"
@@ -74,8 +74,7 @@
         data-display-name="Instructors"
         data-info-text="
           Instructors are the core administration of your course. Instructors can
-          add and remove course staff, as well as administer forum access.
-          "
+          add and remove course staff, as well as administer forum access."
         data-list-endpoint="${ section_data['list_course_role_members_url'] }"
         data-modify-endpoint="${ section_data['modify_access_url'] }"
         data-add-button-label="Add Instructor"
@@ -88,7 +87,7 @@
       data-info-text="
         Beta testers can see course content before the rest of the students.
         They can make sure that the content works, but have no additional
-        privelages."
+        privileges."
       data-list-endpoint="${ section_data['list_course_role_members_url'] }"
       data-modify-endpoint="${ section_data['modify_access_url'] }"
       data-add-button-label="Add Beta Tester"
@@ -99,6 +98,9 @@
       <div class="auth-list-container"
         data-rolename="Administrator"
         data-display-name="Forum Admins"
+        data-info-text="
+          Forum admins can moderate the course forums as well as administer
+          other forum roles."
         data-list-endpoint="${ section_data['list_forum_members_url'] }"
         data-modify-endpoint="${ section_data['update_forum_role_membership_url'] }"
         data-add-button-label="Add Forum Admin"
@@ -109,6 +111,9 @@
     <div class="auth-list-container"
       data-rolename="Moderator"
       data-display-name="Forum Moderators"
+      data-info-text="
+        Forum moderators can moderate the course forums. They cannot add other
+        moderators."
       data-list-endpoint="${ section_data['list_forum_members_url'] }"
       data-modify-endpoint="${ section_data['update_forum_role_membership_url'] }"
       data-add-button-label="Add Moderator"
@@ -117,6 +122,9 @@
     <div class="auth-list-container"
       data-rolename="Community TA"
       data-display-name="Forum Community TAs"
+      data-info-text="
+        Community TA's are members of the community whom you deem particularly
+        helpful on the forums."
       data-list-endpoint="${ section_data['list_forum_members_url'] }"
       data-modify-endpoint="${ section_data['update_forum_role_membership_url'] }"
       data-add-button-label="Add Community TA"
