@@ -6,7 +6,7 @@ class @Rubric
   constructor: (el) ->
     @el = el
 
-  initialize: (location) ->
+  initialize: (location) =>
     @$(@rubric_sel).data("location", location)
     @$('input[class="score-selection"]').change @tracking_callback
     # set up the hotkeys
@@ -53,7 +53,7 @@ class @Rubric
       @category = @$(@categories[@category_index])
       @category.prepend('> ')
     
-  tracking_callback: (event) ->
+  tracking_callback: (event) =>
     target_selection = $(event.target).val()
     # chop off the beginning of the name so that we can get the number of the category
     category = $(event.target).data("category")
@@ -76,14 +76,14 @@ class @Rubric
 
     return score_lst
 
-  get_total_score: () ->
+  get_total_score: () =>
     score_lst = @get_score_list()
     tot = 0
     for score in score_lst
       tot += parseInt(score)
     return tot
 
-  check_complete: () ->
+  check_complete: () =>
      # check to see whether or not any categories have not been scored
     num_categories = @$(@rubric_category_sel).length
     for i in [0..(num_categories-1)]
