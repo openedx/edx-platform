@@ -11,6 +11,7 @@ from django.conf import settings
 from django.http import HttpResponseBadRequest, HttpResponse
 from mitxmako.shortcuts import render_to_response
 from django_future.csrf import ensure_csrf_cookie
+from xmodule.modulestore import Location
 
 from courseware.courses import get_course_with_access
 from search.models import SearchResults
