@@ -56,7 +56,7 @@ def click_component_from_menu(category, boilerplate, expected_css):
 def edit_component_and_select_settings():
     world.wait_for(lambda _driver: world.css_visible('a.edit-button'))
     world.css_click('a.edit-button')
-    world.css_click('#settings-mode')
+    world.css_click('#settings-mode a')
 
 
 @world.absorb
@@ -114,8 +114,20 @@ def revert_setting_entry(label):
 
 @world.absorb
 def get_setting_entry(label):
-    settings = world.browser.find_by_css('.wrapper-comp-setting')
-    for setting in settings:
-        if setting.find_by_css('.setting-label')[0].value == label:
-            return setting
-    return None
+    def get_setting():
+        settings = world.css_find('.wrapper-comp-setting')
+        for setting in settings:
+            if setting.find_by_css('.setting-label')[0].value == label:
+                return setting
+        return None
+    return world.retry_on_exception(get_setting)
+
+@world.absorb
+def get_setting_entry_index(label):
+    def get_index():
+        settings = world.css_find('.wrapper-comp-setting')
+        for index, setting in enumerate(settings):
+            if setting.find_by_css('.setting-label')[0].value == label:
+                return index
+        return None
+    return world.retry_on_exception(get_index)

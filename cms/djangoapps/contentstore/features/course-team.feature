@@ -15,6 +15,8 @@ Feature: Course Team
         And I am viewing the course team settings
         When I add "bob" to the course team
         And "bob" logs in
+        And he selects the new course
+        And he views the course team settings
         Then he cannot delete users
         And he cannot add users
 

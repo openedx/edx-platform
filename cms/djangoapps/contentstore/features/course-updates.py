@@ -9,7 +9,7 @@ from common import type_in_codemirror
 @step(u'I go to the course updates page')
 def go_to_updates(_step):
     menu_css = 'li.nav-course-courseware'
-    updates_css = 'li.nav-course-courseware-updates'
+    updates_css = 'li.nav-course-courseware-updates a'
     world.css_click(menu_css)
     world.css_click(updates_css)
 
