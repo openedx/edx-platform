@@ -649,7 +649,6 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
 
         # add new history element with answer and empty score and hint.
         success, data = self.append_image_to_student_answer(data)
-        error_message = ""
         if success:
             success, allowed_to_submit, error_message = self.check_if_student_can_submit()
             if allowed_to_submit:
@@ -698,7 +697,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             score = self.latest_score()
             correct = 'correct' if self.is_submission_correct(score) else 'incorrect'
             if self.child_state == self.ASSESSING:
-                eta_string = self.get_eta()
+                eta_string = ""
         else:
             post_assessment = ""
             correct = ""
