@@ -342,24 +342,42 @@ def generate_export_course(request, org, course, name):
     try:
         export_to_xml(modulestore('direct'), contentstore(), loc, root_dir, name, modulestore())
     except SerializationError, e:
-        failed_item = modulestore().get_item(e.location)
-        parent_locs = modulestore().get_parent_locations(failed_item.location, None)
+        failed_item = modulestore().get_instance(course_module.location.course_id, e.location)
+        parent_locs = modulestore().get_parent_locations(failed_item.location, course_module.location.course_id)
+        unit = None
         if len(parent_locs) > 0:
             parent = modulestore().get_item(parent_locs[0])
-            parent_info = "Parent Display Name: {0}<br />Parent Identifier: {1}".format(parent.display_name, parent.location.name)
-        else:
-            parent_info = ''
+            if parent.location.category == 'vertical':
+                unit = parent
+
         return render_to_response('export.html', {
             'context_course': course_module,
             'successful_import_redirect_url': '',
-            'err_msg': "A courseware module has failed to convert to XML. Details: <br />Module Type: {0}<br />Display Name: {1}<br />Identifier: {2}<br />{3}".
-            format(failed_item.location.category, failed_item.display_name, failed_item.location.name, parent_info)
+            'in_err': True,
+            'raw_err_msg': str(e),
+            'failed_module': failed_item,
+            'unit': unit,
+            'edit_unit_url': reverse('edit_unit', kwargs={
+                'location': parent.location
+            }),
+            'course_home_url': reverse('course_index', kwargs={
+                'org': org,
+                'course': course,
+                'name': name
+            })
         })
     except Exception, e:
         return render_to_response('export.html', {
             'context_course': course_module,
             'successful_import_redirect_url': '',
-            'err_msg': str(e)
+            'in_err': True,
+            'unit': None,
+            'raw_err_msg': str(e),
+            'course_home_url': reverse('course_index', kwargs={
+                'org': org,
+                'course': course,
+                'name': name
+            })
         })
 
     logging.debug('tar file being generated at {0}'.format(export_file.name))
