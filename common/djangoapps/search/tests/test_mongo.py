@@ -195,6 +195,21 @@ class MongoTest(TestCase):
             success = False
         self.assertTrue(success)
 
+    def test_get_searchable_text(self):
+        problem_test_text = "<p>This is a test</p><text>and so is <a href='test.com'></a>this</text>"
+        problem_document = {"definition":{"data": problem_test_text}}
+        problem_test = self.indexer.get_searchable_text(problem_document, "problem")
+        self.assertEquals(problem_test, "This is a test and so is this")
+
+        video_module = dummy_document("definition", ["data"], "ascii", length=200)
+        test_string = '<video youtube=\"0.75:-gKKUBQ2NWA,1.0:dJvsFg10JY,1.25:lm3IKbRE2VA,1.50:Pz0XiZ8wO9o\">'
+        video_module["definition"]["data"] += test_string
+        test_transcript = {"text": random_ascii(length=50)}
+        test_document = {"files_id": {"name": "dJvsFg10JY"}, "data": json.dumps(test_transcript)}
+        self.chunk_collection.insert(test_document)
+        transcript = self.indexer.get_searchable_text(video_module, "transcript").encode("utf-8", "ignore")
+        self.assertEquals(transcript.replace(" ", ""), test_transcript["text"].replace(" ", ""))
+
     def tearDown(self):
         self.test_content.drop_collection("fs.chunks")
         self.test_content.drop_collection("fs.files")

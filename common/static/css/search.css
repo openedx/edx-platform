@@ -2,40 +2,38 @@
 	text-align: center;
 	word-wrap: normal;
 	padding-top: 20px;
+    width: 40em;
 }
 
 .result-container{
     margin: 0 auto;
+    clear: both;
 }
 
 .snippet{
 	color: #666666;
 	font-family: "Open Sans", "Arial";
 	font-weight: 300;
-	height: 230px;
-	width: 300px;
+	margin-left: 10px;
+    width: 30em;
 	text-align: center;
     overflow-y: hidden;
 }
 
-.thumbnail-wrapper{
-    width: 285px;
-    overflow:hidden;
+.result-snippets{
     float: left;
+}
+
+.thumbnail-wrapper{
+    float:left;
+    overflow:hidden;
+    width: 25%;
 }
 
 .result-thumbnail{
-    width: 300px;
-    height: 200px;
+    width: 200px;
     overflow-x: hidden;
-}
-
-.result-container{
-    width: 600px;
-}
-
-.result-snippets{
-    float: left;
+    float:left;
 }
 
 .result-title{
@@ -50,13 +48,18 @@
 .search-icon{
     text-align: right;
 }
+
+.search-container{
+    float: left;
+    margin-left: 30px;
+}
 .text-wrapper{
     border-radius: 3px;
     color: #555;
     display: block;
     text-align: center;
     padding: 10px 13px 12px;
-    font-size: 14px;
+    font-size: 10px;
     font-weight: bold;
     text-decoration: none;
 }
@@ -76,8 +79,72 @@ a.search-bar{
     -webkit-animation-delay: 0s;
     -moz-animation-delay: 0s;
 }
+
 #searchbox{
     -moz-border-radius: 3px;
     -webkit-border-radius: 3px;
     border-radius: 3px;
+}
+
+ #menu-container{
+    background-color: #666666;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    width:20%;
+    float:left;
+    background: #efefef;
+    border-radius: 2px;
+    display: block;
+    padding: 0;
+    margin-top: 30px;
+    margin-left: 20px;
+}
+
+.menu{
+    background: #f7f7f8;
+    border-radius: 2px;
+    border: 1px solid #d8d8d8;
+    padding: 0;
+    margin:3px;
+}
+
+.header-bar{
+    border-bottom: 1px solid #eeeeee;
+    padding-left: 5px;
+    font-weight: bold;
+    list-style-type: none;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    font-family: 'Open Sans', 'Arial';
+}
+
+.body-bar{
+    border-bottom: 1px solid #eeeeee;
+    padding-left: 15px;
+    list-style-type: none;
+    padding-top: 7px;
+    padding-bottom: 7px;
+    font-family: 'Open Sans', 'Arial';
+}
+
+.filter-item{
+    padding-top: 7px;
+    padding-bottom: 7px;
+}
+
+li:hover{
+    cursor: pointer;
+    background: #ffffff;
+}
+
+.count{
+    float:right;
+    padding: 1px 5px;
+    font-size: 13px;
+    font-weight: bold;
+    color: #999999;
+    background: #eeeeee;
+    border-radius: 2px;
+    margin-right: 5px;
 }

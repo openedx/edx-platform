@@ -62,7 +62,7 @@ def find(request, course_id):
         {"query":
             {"query_string":
                 {"default_field": "searchable_text", "query": query, "analyzer": "standard"
-                }
+                 }
             }
         }
     )
