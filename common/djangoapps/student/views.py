@@ -703,7 +703,7 @@ def create_account(request, post_override=None):
     message = render_to_string('emails/activation_email.txt', d)
 
     # dont send email if we are doing load testing or random user generation for some reason
-    if not (settings.MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_LOAD_TESTING')):
+    if not (settings.MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING')):
         try:
             if settings.MITX_FEATURES.get('REROUTE_ACTIVATION_EMAIL'):
                 dest_addr = settings.MITX_FEATURES['REROUTE_ACTIVATION_EMAIL']
@@ -942,31 +942,36 @@ def auto_auth(request):
     """
     Automatically logs the user in with a generated random credentials
     This view is only accessible when
-    settings.MITX_SETTINGS['AUTOMATIC_AUTH_FOR_LOAD_TESTING'] is true.
+    settings.MITX_SETTINGS['AUTOMATIC_AUTH_FOR_TESTING'] is true.
     """
 
-    def get_dummy_post_data(username, password):
+    def get_dummy_post_data(username, password, email, name):
         """
         Return a dictionary suitable for passing to post_vars of _do_create_account or post_override
-        of create_account, with specified username and password.
+        of create_account, with specified values.
         """
-
         return {'username': username,
-                'email': username + "_dummy_test@mitx.mit.edu",
+                'email': email,
                 'password': password,
-                'name': username + " " + username,
+                'name': name,
                 'honor_code': u'true',
                 'terms_of_service': u'true', }
 
-    # generate random user ceredentials from a small name space (determined by settings)
+    # generate random user credentials from a small name space (determined by settings)
     name_base = 'USER_'
     pass_base = 'PASS_'
 
     max_users = settings.MITX_FEATURES.get('MAX_AUTO_AUTH_USERS', 200)
     number = random.randint(1, max_users)
 
-    username = name_base + str(number)
-    password = pass_base + str(number)
+    # Get the params from the request to override default user attributes if specified
+    qdict = request.GET
+
+    # Use the params from the request, otherwise use these defaults
+    username = qdict.get('username', name_base + str(number))
+    password = qdict.get('password', pass_base + str(number))
+    email = qdict.get('email', '%s_dummy_test@mitx.mit.edu' % username)
+    name = qdict.get('name', '%s Test' % username)
 
     # if they already are a user, log in
     try:
@@ -976,7 +981,7 @@ def auto_auth(request):
 
     # else create and activate account info
     except ObjectDoesNotExist:
-        post_override = get_dummy_post_data(username, password)
+        post_override = get_dummy_post_data(username, password, email, name)
         create_account(request, post_override=post_override)
         request.user.is_active = True
         request.user.save()
