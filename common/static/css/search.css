@@ -49,6 +49,18 @@
     text-align: right;
 }
 
+.video-image:before{
+    content: url("/static/images/sequence-nav/video-icon-current.png");
+}
+
+.problem-image:before{
+    content: url("/static/images/sequence-nav/list-icon-normal.png")
+}
+
+.pdf-image:before{
+    content: url("/static/images/sequence-nav/document-icon-current.png");
+}
+
 .search-container{
     float: left;
     margin-left: 30px;
