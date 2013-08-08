@@ -88,13 +88,13 @@ def the_page_title_should_contain(step, title):
 
 @step('I log in$')
 def i_log_in(step):
-    world.log_in('robot', 'test')
+    world.log_in(username='robot', password='test')
 
 
 @step('I am a logged in user$')
 def i_am_logged_in_user(step):
     world.create_user('robot', 'test')
-    world.log_in('robot', 'test')
+    world.log_in(username='robot', password='test')
 
 
 @step('I am not logged in$')
@@ -147,7 +147,7 @@ def should_see_in_the_page(step, doesnt_appear, text):
 @step('I am logged in$')
 def i_am_logged_in(step):
     world.create_user('robot', 'test')
-    world.log_in('robot', 'test')
+    world.log_in(username='robot', password='test')
     world.browser.visit(django_url('/'))
     # You should not see the login link
     assert_equals(world.browser.find_by_css('a#login'), [])

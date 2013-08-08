@@ -42,6 +42,10 @@ def log_in(username='robot', password='test', email='robot@edx.org', name='Robot
           password, name, email)
     world.visit(url)
 
+    # Save the user info in the world scenario_dict for use in the tests
+    user = User.objects.get(username=username)
+    world.scenario_dict['USER'] = user
+
 
 @world.absorb
 def register_by_course_id(course_id, is_staff=False):

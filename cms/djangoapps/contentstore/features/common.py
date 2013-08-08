@@ -144,21 +144,9 @@ def log_into_studio(
         email='robot+studio@edx.org',
         password='test'):
 
-    world.browser.cookies.delete()
+    world.log_in(username=uname, password=password, email=email, name='Robot Studio')
+    # Navigate to the studio dashboard
     world.visit('/')
-
-    signin_css = 'a.action-signin'
-    world.is_css_present(signin_css)
-    world.css_click(signin_css)
-
-    def fill_login_form():
-        login_form = world.browser.find_by_css('form#login_form')
-        login_form.find_by_name('email').fill(email)
-        login_form.find_by_name('password').fill(password)
-        login_form.find_by_name('submit').click()
-    world.retry_on_exception(fill_login_form)
-    assert_true(world.is_css_present('.new-course-button'))
-    world.scenario_dict['USER'] = get_user_by_email(email)
 
 
 def create_a_course():
@@ -176,7 +164,9 @@ def create_a_course():
         group, __ = Group.objects.get_or_create(name=groupname)
         user.groups.add(group)
     user.save()
-    world.browser.reload()
+
+    # Navigate to the studio dashboard
+    world.visit('/')
     course_link_css = 'a.course-link'
     world.css_click(course_link_css)
     course_title_css = 'span.course-title'
