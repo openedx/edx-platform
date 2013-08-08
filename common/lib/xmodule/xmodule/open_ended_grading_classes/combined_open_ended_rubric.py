@@ -224,7 +224,14 @@ class CombinedOpenEndedRubric(object):
                                 actual_scores[i] += [j]
 
         actual_scores = [sum(i)/len(i) for i in actual_scores]
-        correct = [int(a>.66) for a in actual_scores]
+        correct = []
+        for (i,a) in enumerate(actual_scores):
+            if int(a)/max_scores[i]==1:
+                correct.append(1)
+            elif int(a)==0:
+                correct.append(0)
+            else:
+                correct.append(.5)
 
         html = self.system.render_template('{0}/open_ended_combined_rubric.html'.format(self.TEMPLATE_DIR),
                                            {'categories': rubric_categories,

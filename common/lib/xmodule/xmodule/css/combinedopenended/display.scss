@@ -282,6 +282,13 @@ div.combined-rubric-container {
     }
   }
 
+   label.choicegroup_partialcorrect {
+      &:before {
+        margin-right: 15px;
+        content: url('../images/partially-correct-icon.png');
+      }
+    }
+
   label.choicegroup_incorrect {
     &:before {
       margin-right: 15px;
