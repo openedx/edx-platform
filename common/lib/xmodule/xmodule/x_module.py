@@ -587,33 +587,20 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         Creates an instance of this descriptor from the supplied json_data.
         This may be overridden by subclasses
 
-        json_data: A json object with the keys 'definition' and 'metadata',
-            definition: A json object with the keys 'data' and 'children'
-                data: A json value
-                children: A list of edX Location urls
-            metadata: A json object with any keys
-
-        This json_data is transformed to model_data using the following rules:
-            1) The model data contains all of the fields from metadata
-            2) The model data contains the 'children' array
-            3) If 'definition.data' is a json object, model data contains all of its fields
-               Otherwise, it contains the single field 'data'
-            4) Any value later in this list overrides a value earlier in this list
-
         json_data:
         - 'category': the xmodule category (required)
-        - 'metadata': a dict of locally set metadata (not inherited)
-        - 'children': a list of children's usage_ids w/in this course
-        - 'definition':
+        - 'fields': a dict of locally set fields (not inherited)
+        - 'definition': (optional) the db id for the definition record (not the definition content) or a
+        definitionLazyLoader
         - '_id' (optional): the usage_id of this. Will generate one if not given one.
         """
         usage_id = json_data.get('_id', None)
-        if not '_inherited_metadata' in json_data and parent_xblock is not None:
-            json_data['_inherited_metadata'] = parent_xblock.xblock_kvs.get_inherited_metadata().copy()
-            json_metadata = json_data.get('metadata', {})
+        if not '_inherited_settings' in json_data and parent_xblock is not None:
+            json_data['_inherited_settings'] = parent_xblock.xblock_kvs.get_inherited_settings().copy()
+            json_fields = json_data.get('fields', {})
             for field in inheritance.INHERITABLE_METADATA:
-                if field in json_metadata:
-                    json_data['_inherited_metadata'][field] = json_metadata[field]
+                if field in json_fields:
+                    json_data['_inherited_settings'][field] = json_fields[field]
 
         new_block = system.xblock_from_json(cls, usage_id, json_data)
         if parent_xblock is not None:
@@ -735,6 +722,27 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         """
         # We are not allowing editing of xblock tag and name fields at this time (for any component).
         return [XBlock.tags, XBlock.name]
+
+    def get_set_fields_by_scope(self, scope=Scope.content):
+        """
+        Get a dictionary of the fields for the given scope which are set explicitly on this xblock. (Including
+        any set to None.)
+        """
+        if scope == Scope.settings and hasattr(self, '_inherited_metadata'):
+            inherited_metadata = getattr(self, '_inherited_metadata')
+            result = {}
+            for field in self.fields:
+                if (field.scope == scope and
+                        field.name in self._model_data and
+                        field.name not in inherited_metadata):
+                    result[field.name] = getattr(self, field.name)
+            return result
+        else:
+            result = {}
+            for field in self.fields:
+                if (field.scope == scope and field.name in self._model_data):
+                    result[field.name] = getattr(self, field.name)
+            return result
 
     @property
     def editable_metadata_fields(self):

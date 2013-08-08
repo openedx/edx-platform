@@ -16,8 +16,7 @@ class PersistentCourseFactory(factory.Factory):
     * prettyid: defaults to 999
     * display_name
     * user_id
-    * data (optional) the data payload to save in the course item
-    * metadata (optional) the metadata payload. If display_name is in the metadata, that takes
+    * fields (optional) the settings and content payloads. If display_name is in the metadata, that takes
     precedence over any display_name provided directly.
     """
     FACTORY_FOR = CourseDescriptor
@@ -28,7 +27,7 @@ class PersistentCourseFactory(factory.Factory):
     user_id = "test_user"
     data = None
     metadata = None
-    master_version = 'draft'
+    master_branch = 'draft'
 
     # pylint: disable=W0613
     @classmethod
@@ -38,17 +37,14 @@ class PersistentCourseFactory(factory.Factory):
         prettyid = kwargs.get('prettyid')
         display_name = kwargs.get('display_name')
         user_id = kwargs.get('user_id')
-        data = kwargs.get('data')
-        metadata = kwargs.get('metadata', {})
-        if metadata is None:
-            metadata = {}
-        if 'display_name' not in metadata:
-            metadata['display_name'] = display_name
+        fields = kwargs.get('fields', {})
+        if display_name and 'display_name' not in fields:
+            fields['display_name'] = display_name
 
         # Write the data to the mongo datastore
         new_course = modulestore('split').create_course(
-            org, prettyid, user_id, metadata=metadata, course_data=data, id_root=prettyid,
-            master_version=kwargs.get('master_version'))
+            org, prettyid, user_id, fields=fields, id_root=prettyid,
+            master_branch=kwargs.get('master_branch'))
 
         return new_course
 
@@ -70,26 +66,23 @@ class ItemFactory(factory.Factory):
         """
         Uses *kwargs*:
 
-        *parent_location* (required): the location of the course & possibly parent
+        :param parent_location: (required) the location of the course & possibly parent
 
-        *category* (defaults to 'chapter')
+        :param category: (defaults to 'chapter')
 
-        *data* (optional): the data for the item
+        :param fields: (optional) the data for the item
 
-        definition_locator (optional): the DescriptorLocator for the definition this uses or branches
+        :param definition_locator (optional): the DescriptorLocator for the definition this uses or branches
 
-        *display_name* (optional): the display name of the item
-
-        *metadata* (optional): dictionary of metadata attributes (display_name here takes
-        precedence over the above attr)
+        :param display_name (optional): the display name of the item
         """
-        metadata = kwargs.get('metadata', {})
-        if 'display_name' not in metadata and 'display_name' in kwargs:
-            metadata['display_name'] = kwargs['display_name']
+        fields = kwargs.get('fields', {})
+        if 'display_name' not in fields and 'display_name' in kwargs:
+            fields['display_name'] = kwargs['display_name']
 
         return modulestore('split').create_item(kwargs['parent_location'], kwargs['category'],
             kwargs['user_id'], definition_locator=kwargs.get('definition_locator'),
-            new_def_data=kwargs.get('data'), metadata=metadata)
+            fields=fields)
 
     @classmethod
     def _build(cls, target_class, *args, **kwargs):

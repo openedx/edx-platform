@@ -75,7 +75,7 @@ class TemplateTests(unittest.TestCase):
             display_name='fun test course', user_id='testbot')
 
         test_chapter = XModuleDescriptor.load_from_json({'category': 'chapter',
-            'metadata': {'display_name': 'chapter n'}},
+            'fields': {'display_name': 'chapter n'}},
             test_course.system, parent_xblock=test_course)
         self.assertIsInstance(test_chapter, SequenceDescriptor)
         self.assertEqual(test_chapter.display_name, 'chapter n')
@@ -84,7 +84,7 @@ class TemplateTests(unittest.TestCase):
         # test w/ a definition (e.g., a problem)
         test_def_content = '<problem>boo</problem>'
         test_problem = XModuleDescriptor.load_from_json({'category': 'problem',
-            'definition': {'data': test_def_content}},
+            'fields': {'data': test_def_content}},
             test_course.system, parent_xblock=test_chapter)
         self.assertIsInstance(test_problem, CapaDescriptor)
         self.assertEqual(test_problem.data, test_def_content)
@@ -99,11 +99,12 @@ class TemplateTests(unittest.TestCase):
         test_course = persistent_factories.PersistentCourseFactory.create(org='testx', prettyid='tempcourse',
             display_name='fun test course', user_id='testbot')
         test_chapter = XModuleDescriptor.load_from_json({'category': 'chapter',
-            'metadata': {'display_name': 'chapter n'}},
+            'fields': {'display_name': 'chapter n'}},
             test_course.system, parent_xblock=test_course)
         test_def_content = '<problem>boo</problem>'
-        test_problem = XModuleDescriptor.load_from_json({'category': 'problem',
-            'definition': {'data': test_def_content}},
+        # create child
+        _ = XModuleDescriptor.load_from_json({'category': 'problem',
+            'fields': {'data': test_def_content}},
             test_course.system, parent_xblock=test_chapter)
         # better to pass in persisted parent over the subdag so
         # subdag gets the parent pointer (otherwise 2 ops, persist dag, update parent children,
@@ -152,15 +153,24 @@ class TemplateTests(unittest.TestCase):
             parent_location=test_course.location, user_id='testbot')
         sub = persistent_factories.ItemFactory.create(display_name='subsection 1',
             parent_location=chapter.location, user_id='testbot', category='vertical')
-        first_problem = persistent_factories.ItemFactory.create(display_name='problem 1',
-            parent_location=sub.location, user_id='testbot', category='problem', data="<problem></problem>")
+        first_problem = persistent_factories.ItemFactory.create(
+            display_name='problem 1', parent_location=sub.location, user_id='testbot', category='problem',
+            fields={'data':"<problem></problem>"}
+        )
         first_problem.max_attempts = 3
+        first_problem.save()  # decache the above into the kvs
         updated_problem = modulestore('split').update_item(first_problem, 'testbot')
-        updated_loc = modulestore('split').delete_item(updated_problem.location, 'testbot')
+        self.assertIsNotNone(updated_problem.previous_version)
+        self.assertEqual(updated_problem.previous_version, first_problem.update_version)
+        self.assertNotEqual(updated_problem.update_version, first_problem.update_version)
+        updated_loc = modulestore('split').delete_item(updated_problem.location, 'testbot', delete_children=True)
 
-        second_problem = persistent_factories.ItemFactory.create(display_name='problem 2',
+        second_problem = persistent_factories.ItemFactory.create(
+            display_name='problem 2',
             parent_location=BlockUsageLocator(updated_loc, usage_id=sub.location.usage_id),
-            user_id='testbot', category='problem', data="<problem></problem>")
+            user_id='testbot', category='problem',
+            fields={'data':"<problem></problem>"}
+        )
 
         # course root only updated 2x
         version_history = modulestore('split').get_block_generations(test_course.location)
