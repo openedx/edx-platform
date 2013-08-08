@@ -112,7 +112,7 @@ class @CombinedOpenEnded
   sub_id_sel: 'input.submission_id'
   grader_id_sel: 'input.grader_id'
   grader_status_sel: '.grader-status'
-  info_rubric_elements_sel: '.rubric-elements-info'
+  info_rubric_elements_sel: '.rubric-info-item'
   rubric_collapse_sel: '.rubric-collapse'
   next_rubric_sel: '.rubric-next-button'
   previous_rubric_sel: '.rubric-previous-button'

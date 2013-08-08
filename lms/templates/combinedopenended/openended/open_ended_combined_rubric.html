@@ -5,7 +5,11 @@
         <ul class="rubric-list">
         % for j in range(len(category['options'])):
             <% option = category['options'][j] %>
-            <li class="rubric-list-item">
+            %if len(category['options'][j]['grader_types'])>0:
+                <li class="rubric-list-item">
+            %else:
+                <li class="rubric-list-item rubric-info-item">
+            %endif
                 <div class="rubric-label">
                     %if len(category['options'][j]['grader_types'])>0:
                         %if correct[i]==1:
