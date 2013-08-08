@@ -46,7 +46,6 @@ class PeerGradingFields(object):
     )
     due = Date(
         help="Due date that should be displayed.",
-        default=None,
         scope=Scope.settings)
     graceperiod = Timedelta(
         help="Amount of grace to give on the due date.",
@@ -525,10 +524,10 @@ class PeerGradingModule(PeerGradingFields, XModule):
         good_problem_list = []
         for problem in problem_list:
             problem_location = problem['location']
-			try:
-            	descriptor = _find_corresponding_module_for_location(problem_location)
-			except:
-				continue
+            try:
+                descriptor = _find_corresponding_module_for_location(problem_location)
+            except:
+                continue
             if descriptor:
                 problem['due'] = descriptor.lms.due
                 grace_period = descriptor.lms.graceperiod
