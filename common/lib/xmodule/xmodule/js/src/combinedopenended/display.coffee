@@ -326,9 +326,8 @@ class @CombinedOpenEnded
       if @child_type == "openended"
         @submit_button.hide()
         @queueing()
-        if @task_number==1 and @task_count==1
-          @grader_status = @$(@grader_status_sel)
-          @grader_status.html("<p>Response submitted for scoring.</p>")
+        @grader_status = @$(@grader_status_sel)
+        @grader_status.html("<span class='grading'>Your response has been submitted.  Please check back later for your grade.</span> ")
     else if @child_state == 'post_assessment'
       if @child_type=="openended"
         @skip_button.show()
@@ -341,6 +340,8 @@ class @CombinedOpenEnded
       else
         @submit_button.click @message_post
     else if @child_state == 'done'
+      @show_combined_rubric_current()
+      @show_results_current()
       @rubric_wrapper.hide()
       @answer_area.attr("disabled", true)
       @replace_text_inputs()
@@ -351,9 +352,6 @@ class @CombinedOpenEnded
       if @task_number<@task_count
         @next_problem_button.show()
       else
-        if @task_number==1 and @task_count==1
-          @show_combined_rubric_current()
-        @show_results_current()
         @reset_button.show()
 
 

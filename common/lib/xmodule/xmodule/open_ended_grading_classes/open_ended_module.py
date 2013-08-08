@@ -640,6 +640,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         """
         # Once we close the problem, we should not allow students
         # to save answers
+        error_message = ""
         closed, msg = self.check_if_closed()
         if closed:
             return msg
@@ -692,7 +693,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             score = self.latest_score()
             correct = 'correct' if self.is_submission_correct(score) else 'incorrect'
             if self.child_state == self.ASSESSING:
-                eta_string = ""
+                eta_string = "Your response has been submitted.  Please check back later for your grade."
         else:
             post_assessment = ""
             correct = ""

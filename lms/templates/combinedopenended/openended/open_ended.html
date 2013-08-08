@@ -3,11 +3,11 @@
    <div class="prompt">
     ${prompt|n}
    </div>
-  <div class="visibility-control visibility-control-response">
-    <div class="inner">
+    <div class="visibility-control visibility-control-response">
+        <div class="inner">
+        </div>
+        <span class="section-header section-header-response">Response</span>
     </div>
-    <span class="section-header section-header-response">Response</span>
-  </div>
   <textarea rows="${rows}" cols="${cols}" name="answer" class="answer short-form-response" id="input_${id}">${previous_answer|h}</textarea>
 
   <div class="message-wrapper"></div>
@@ -15,7 +15,7 @@
     % if state == 'initial':
       <span class="unanswered" style="display:inline-block;" id="status_${id}">Unanswered</span>
     % elif state == 'assessing':
-      <span class="grading" id="status_${id}">Submitted for grading.
+      <span class="grading" id="status_${id}">
       % if eta_message is not None:
          ${eta_message}
       % endif
