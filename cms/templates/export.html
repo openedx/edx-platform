@@ -12,7 +12,7 @@
     $(document).ready(function() {
 
       %if unit:
-        dialog = new CMS.Views.Prompt({
+        var dialog = new CMS.Views.Prompt({
             title: gettext('There has been an error with your export.'),
             message: gettext("There has been a failure to export to XML at least one component. It is recommended that you go to the edit page and repair the error before attempting another export. Please check that all components on the page are valid and do not display any error messages."),
             intent: "error",
@@ -25,7 +25,7 @@
                     }
                 },
                 secondary: {
-                    text: gettext('cancel'),
+                    text: gettext('Cancel'),
                     click: function(view) {
                         view.hide();
                     }
@@ -33,9 +33,9 @@
             }
         });
       % else:
-        var msg = gettext("<p>There has been a failure to export your course to XML. Unfortunately, we do not have specific enough information to assist you in identifying the failed component. It is recommended that you inspect your courseware to identify any components in error and try again.</p><p>The raw error message is:</p>");
+        var msg = "<p>" + gettext("There has been a failure to export your course to XML. Unfortunately, we do not have specific enough information to assist you in identifying the failed component. It is recommended that you inspect your courseware to identify any components in error and try again.") + "</p><p>" + gettext("The raw error message is:") + "</p>";
         msg = msg + "${raw_err_msg}";
-        dialog = new CMS.Views.Prompt({
+        var dialog = new CMS.Views.Prompt({
             title: gettext('There has been an error with your export.'),
             message: msg,
             intent: "error",
@@ -48,7 +48,7 @@
                     }
                 },
                 secondary: {
-                    text: gettext('cancel'),
+                    text: gettext('Cancel'),
                     click: function(view) {
                         view.hide();
                     }
