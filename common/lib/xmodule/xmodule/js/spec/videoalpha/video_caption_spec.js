@@ -1,5 +1,5 @@
 (function() {
-  xdescribe('VideoCaptionAlpha', function() {
+  describe('VideoCaptionAlpha', function() {
     var state, videoPlayer, videoCaption, videoSpeedControl, oldOTBD;
 
     function initialize() {
@@ -369,14 +369,21 @@
         });
 
         it('when CC button is disabled ', function() {
-          var realHeight = parseInt($('.subtitles').css('maxHeight'), 10),
-              videoWrapperHeight = $('.video-wrapper').height(),
-              progressSliderHeight = videoControl.sliderEl.height(),
-              shouldBeHeight = videoWrapperHeight - 0.5 * progressSliderHeight;
+          var realHeight, videoWrapperHeight, progressSliderHeight,
+            controlHeight, shouldBeHeight;
 
           state.captionsHidden = true;
           videoCaption.setSubtitlesHeight();
-          expect(realHeight).toBeCloseTo(shouldBeHeight, 2);
+
+          realHeight = parseInt($('.subtitles').css('maxHeight'), 10);
+          videoWrapperHeight = $('.video-wrapper').height();
+          progressSliderHeight = videoControl.sliderEl.height();
+          controlHeight = videoControl.el.height();
+          shouldBeHeight = videoWrapperHeight -
+                           0.5 * progressSliderHeight -
+                           controlHeight;
+
+          expect(realHeight).toBe(shouldBeHeight);
         });
       });
 
