@@ -13,7 +13,7 @@ export PYTHONIOENCODING=UTF-8
 
 if [ ! -d /mnt/virtualenvs/"$JOB_NAME" ]; then
     mkdir -p /mnt/virtualenvs/"$JOB_NAME"
-    virtualenv /mnt/virtualenvs/"$JOB_NAME"
+    virtualenv --system-site-packages /mnt/virtualenvs/"$JOB_NAME"
 fi
 
 export PIP_DOWNLOAD_CACHE=/mnt/pip-cache
