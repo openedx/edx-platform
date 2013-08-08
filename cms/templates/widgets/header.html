@@ -1,12 +1,15 @@
-<%! from django.core.urlresolvers import reverse %>
-<%! from django.utils.translation import ugettext as _ %>
+<%namespace name='static' file='../static_content.html'/>
+<%!
+  from django.core.urlresolvers import reverse
+  from django.utils.translation import ugettext as _
+%>
 
 <div class="wrapper-header wrapper" id="view-top">
   <header class="primary" role="banner">
 
     <div class="wrapper wrapper-l">
       ## "edX Studio" should not be translated
-      <h1 class="branding"><a href="/"><img src="/static/img/logo-edx-studio.png" alt="edX Studio" /></a></h1>
+      <h1 class="branding"><a href="/"><img src="${static.url("img/logo-edx-studio.png")}" alt="edX Studio" /></a></h1>
 
       % if context_course:
       <% ctx_loc = context_course.location %>

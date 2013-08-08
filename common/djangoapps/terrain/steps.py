@@ -11,6 +11,7 @@
 # Disable the "unused argument" warning because lettuce uses "step"
 #pylint: disable=W0613
 
+import re
 from lettuce import world, step
 from .course_helpers import *
 from .ui_helpers import *
@@ -21,14 +22,33 @@ from logging import getLogger
 logger = getLogger(__name__)
 
 
-@step(r'I wait (?:for )?"(\d+)" seconds?$')
+@step(r'I wait (?:for )?"(\d+\.?\d*)" seconds?$')
 def wait(step, seconds):
     world.wait(seconds)
+
+REQUIREJS_WAIT = {
+    re.compile('settings-details'): [
+        "jquery", "js/models/course",
+        "js/models/settings/course_details", "js/views/settings/main"],
+    re.compile('settings-advanced'): [
+        "jquery", "js/models/course", "js/models/settings/advanced",
+        "js/views/settings/advanced", "codemirror"],
+    re.compile('edit\/.+vertical'): [
+        "jquery", "js/models/course", "coffee/src/models/module",
+        "coffee/src/views/unit", "jquery.ui"],
+}
 
 
 @step('I reload the page$')
 def reload_the_page(step):
+    world.wait_for_ajax_complete()
     world.browser.reload()
+    requirements = None
+    for test, req in REQUIREJS_WAIT.items():
+        if test.search(world.browser.url):
+            requirements = req
+            break
+    world.wait_for_requirejs(requirements)
 
 
 @step('I press the browser back button$')
@@ -175,6 +195,11 @@ def dialogs_are_closed(step):
 @step(u'visit the url "([^"]*)"')
 def visit_url(step, url):
     world.browser.visit(django_url(url))
+
+
+@step(u'wait for AJAX to (?:finish|complete)')
+def wait_ajax(_step):
+    wait_for_ajax_complete()
 
 
 @step('I will confirm all alerts')

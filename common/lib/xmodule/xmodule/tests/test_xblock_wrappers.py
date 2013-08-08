@@ -73,6 +73,7 @@ class TestXBlockWrapper(object):
             render_template=lambda *args, **kwargs: u'{!r}, {!r}'.format(args, kwargs),
             anonymous_student_id='dummy_anonymous_student_id',
             open_ended_grading_interface={},
+            static_url='/static',
             ajax_url='dummy_ajax_url',
             xmodule_field_data=lambda d: d._field_data,
             get_module=Mock(),

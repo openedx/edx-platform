@@ -16,32 +16,37 @@
 
 <%block name="jsextra">
 <script type="text/javascript">
+window.CMS = window.CMS || {};
+CMS.URL = CMS.URL || {};
 CMS.URL.UPLOAD_ASSET = "${upload_asset_url}"
 CMS.URL.TEXTBOOKS = "${textbook_url}"
 CMS.URL.LMS_BASE = "${settings.LMS_BASE}"
-window.section = new CMS.Models.Section({
-    id: "${course.id}",
-    name: "${course.display_name_with_default | h}",
-    url_name: "${course.location.name | h}",
-    org: "${course.location.org | h}",
-    num: "${course.location.course | h}",
-    revision: "${course.location.revision | h}"
-});
-var textbooks = new CMS.Collections.TextbookSet(${json.dumps(course.pdf_textbooks)}, {parse: true});
-var tbView = new CMS.Views.ListTextbooks({collection: textbooks});
+require(["js/models/section", "js/collections/textbook", "js/views/list_textbooks"],
+        function(Section, TextbookCollection, ListTextbooksView) {
+  window.section = new Section({
+      id: "${course.id}",
+      name: "${course.display_name_with_default | h}",
+      url_name: "${course.location.name | h}",
+      org: "${course.location.org | h}",
+      num: "${course.location.course | h}",
+      revision: "${course.location.revision | h}"
+  });
+  var textbooks = new TextbookCollection(${json.dumps(course.pdf_textbooks)}, {parse: true});
+  var tbView = new ListTextbooksView({collection: textbooks});
 
-$(function() {
-    $(".content-primary").append(tbView.render().el);
-    $(".nav-actions .new-button").click(function(e) {
-        tbView.addOne(e);
-    })
-    $(window).on("beforeunload", function() {
-        var dirty = textbooks.find(function(textbook) { return textbook.isDirty(); });
-        if(dirty) {
-            return gettext("You have unsaved changes. Do you really want to leave this page?");
-        }
-    })
-})
+  $(function() {
+      $(".content-primary").append(tbView.render().el);
+      $(".nav-actions .new-button").click(function(e) {
+          tbView.addOne(e);
+      })
+      $(window).on("beforeunload", function() {
+          var dirty = textbooks.find(function(textbook) { return textbook.isDirty(); });
+          if(dirty) {
+              return gettext("You have unsaved changes. Do you really want to leave this page?");
+          }
+      })
+  })
+});
 </script>
 </%block>
 

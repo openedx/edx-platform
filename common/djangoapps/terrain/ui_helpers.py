@@ -3,10 +3,12 @@
 
 from lettuce import world
 import time
+import json
 import platform
+from textwrap import dedent
 from urllib import quote_plus
-from selenium.common.exceptions import WebDriverException, TimeoutException
-from selenium.common.exceptions import StaleElementReferenceException
+from selenium.common.exceptions import (
+    WebDriverException, TimeoutException, StaleElementReferenceException)
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -19,9 +21,155 @@ def wait(seconds):
     time.sleep(float(seconds))
 
 
+# Selenium's `execute_async_script` function pauses Selenium's execution
+# until the browser calls a specific Javascript callback; in effect,
+# Selenium goes to sleep until the JS callback function wakes it back up again.
+# This callback is passed as the last argument to the script. Any arguments
+# passed to this callback get returned from the `execute_async_script`
+# function, which allows the JS to communicate information back to Python.
+# Ref: https://selenium.googlecode.com/svn/trunk/docs/api/dotnet/html/M_OpenQA_Selenium_IJavaScriptExecutor_ExecuteAsyncScript.htm
+
+
+@world.absorb
+def wait_for_js_variable_truthy(variable):
+    """
+    Using Selenium's `execute_async_script` function, poll the Javascript
+    enviornment until the given variable is defined and truthy. This process
+    guards against page reloads, and seamlessly retries on the next page.
+    """
+    js = """
+        var callback = arguments[arguments.length - 1];
+        var unloadHandler = function() {{
+          callback("unload");
+        }}
+        addEventListener("beforeunload", unloadHandler);
+        addEventListener("unload", unloadHandler);
+        var intervalID = setInterval(function() {{
+          try {{
+            if({variable}) {{
+              clearInterval(intervalID);
+              removeEventListener("beforeunload", unloadHandler);
+              removeEventListener("unload", unloadHandler);
+              callback(true);
+            }}
+          }} catch (e) {{}}
+        }}, 10);
+    """.format(variable=variable)
+    for _ in range(5):  # 5 attempts max
+        result = world.browser.driver.execute_async_script(dedent(js))
+        if result == "unload":
+            # we ran this on the wrong page. Wait a bit, and try again, when the
+            # browser has loaded the next page.
+            world.wait(1)
+            continue
+        else:
+            return result
+
+
+@world.absorb
+def wait_for_xmodule():
+    "Wait until the XModule Javascript has loaded on the page."
+    world.wait_for_js_variable_truthy("XModule")
+
+
+@world.absorb
+def wait_for_mathjax():
+    "Wait until MathJax is loaded and set up on the page."
+    world.wait_for_js_variable_truthy("MathJax.isReady")
+
+
+class RequireJSError(Exception):
+    """
+    An error related to waiting for require.js. If require.js is unable to load
+    a dependency in the `wait_for_requirejs` function, Python will throw
+    this exception to make sure that the failure doesn't pass silently.
+    """
+    pass
+
+
+@world.absorb
+def wait_for_requirejs(dependencies=None):
+    """
+    If requirejs is loaded on the page, this function will pause
+    Selenium until require is finished loading the given dependencies.
+    If requirejs is not loaded on the page, this function will return
+    immediately.
+
+    :param dependencies: a list of strings that identify resources that
+        we should wait for requirejs to load. By default, requirejs will only
+        wait for jquery.
+    """
+    if not dependencies:
+        dependencies = ["jquery"]
+    # stick jquery at the front
+    if dependencies[0] != "jquery":
+        dependencies.insert(0, "jquery")
+
+    js = """
+        var callback = arguments[arguments.length - 1];
+        if(window.require) {{
+          requirejs.onError = callback;
+          var unloadHandler = function() {{
+            callback("unload");
+          }}
+          addEventListener("beforeunload", unloadHandler);
+          addEventListener("unload", unloadHandler);
+          require({deps}, function($) {{
+            setTimeout(function() {{
+              removeEventListener("beforeunload", unloadHandler);
+              removeEventListener("unload", unloadHandler);
+              callback(true);
+            }}, 50);
+          }});
+        }} else {{
+          callback(false);
+        }}
+    """.format(deps=json.dumps(dependencies))
+    for _ in range(5):  # 5 attempts max
+        result = world.browser.driver.execute_async_script(dedent(js))
+        if result == "unload":
+            # we ran this on the wrong page. Wait a bit, and try again, when the
+            # browser has loaded the next page.
+            world.wait(1)
+            continue
+        elif result not in (None, True, False):
+            # we got a require.js error
+            msg = "Error loading dependencies: type={0} modules={1}".format(
+                result['requireType'], result['requireModules'])
+            err = RequireJSError(msg)
+            err.error = result
+            raise err
+        else:
+            return result
+
+
+@world.absorb
+def wait_for_ajax_complete():
+    """
+    Wait until all jQuery AJAX calls have completed. "Complete" means that
+    either the server has sent a response (regardless of whether the response
+    indicates success or failure), or that the AJAX call timed out waiting for
+    a response. For more information about the `jQuery.active` counter that
+    keeps track of this information, go here:
+    http://stackoverflow.com/questions/3148225/jquery-active-function#3148506
+    """
+    js = """
+        var callback = arguments[arguments.length - 1];
+        if(!window.jQuery) {callback(false);}
+        var intervalID = setInterval(function() {
+          if(jQuery.active == 0) {
+            clearInterval(intervalID);
+            callback(true);
+          }
+        }, 100);
+    """
+    world.browser.driver.execute_async_script(dedent(js))
+
+
 @world.absorb
 def visit(url):
     world.browser.visit(django_url(url))
+    wait_for_requirejs()
 
 
 @world.absorb
@@ -44,6 +192,7 @@ def is_css_not_present(css_selector, wait_time=5):
     finally:
         world.browser.driver.implicitly_wait(world.IMPLICIT_WAIT)
 
+
 @world.absorb
 def css_has_text(css_selector, text, index=0):
     return world.css_text(css_selector, index=index) == text
@@ -58,6 +207,7 @@ def wait_for(func, timeout=5):
         ).until(func)
 
 
+@world.absorb
 def wait_for_present(css_selector, timeout=30):
     """
     Waiting for the element to be present in the DOM.

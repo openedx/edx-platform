@@ -18,6 +18,8 @@ def set_show_captions(step, setting):
 
 @step('when I view the video it (.*) show the captions$')
 def shows_captions(_step, show_captions):
+    world.wait_for_js_variable_truthy("Video")
+    world.wait(0.5)
     if show_captions == 'does not':
         assert world.is_css_present('div.video.closed')
     else:
@@ -48,6 +50,6 @@ def correct_video_settings(_step):
 def video_name_persisted(step):
     world.css_click('a.save-button')
     reload_the_page(step)
+    world.wait_for_xmodule()
     world.edit_component()
     world.verify_setting_entry(world.get_setting_entry('Display Name'), 'Display Name', '3.4', True)
-

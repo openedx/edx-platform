@@ -1,3 +1,6 @@
+require(["jquery", "jquery.ui", "gettext", "js/hesitate", "js/views/feedback_notification"],
+         function($, ui, gettext, HesitateEvent, NotificationView) {
+
 $(document).ready(function() {
     // making the unit list draggable. Note: sortable didn't work b/c it considered
     // drop points which the user hovered over as destinations and proactively changed
@@ -64,10 +67,10 @@ $(document).ready(function() {
 
 });
 
-CMS.HesitateEvent.toggleXpandHesitation = null;
+HesitateEvent.toggleXpandHesitation = null;
 function initiateHesitate(event, ui) {
-        CMS.HesitateEvent.toggleXpandHesitation = new CMS.HesitateEvent(expandSection, 'dragLeave', true);
-        $('.collapsed').on('dragEnter', CMS.HesitateEvent.toggleXpandHesitation, CMS.HesitateEvent.toggleXpandHesitation.trigger);
+        HesitateEvent.toggleXpandHesitation = new HesitateEvent(expandSection, 'dragLeave', true);
+        $('.collapsed').on('dragEnter', HesitateEvent.toggleXpandHesitation, HesitateEvent.toggleXpandHesitation.trigger);
         $('.collapsed, .unit, .id-holder').each(function() {
                 this.proportions = {width : this.offsetWidth, height : this.offsetHeight };
                 // reset b/c these were holding values from aborts
@@ -152,10 +155,10 @@ function generateCheckHoverState(selectorsToOpen, selectorsToShove) {
 }
 
 function removeHesitate(event, ui) {
-        $('.collapsed').off('dragEnter', CMS.HesitateEvent.toggleXpandHesitation.trigger);
+        $('.collapsed').off('dragEnter', HesitateEvent.toggleXpandHesitation.trigger);
         $('.ui-dragging-pushdown').removeClass('ui-dragging-pushdown');
         $('.ui-dragging-pushup').removeClass('ui-dragging-pushup');
-        CMS.HesitateEvent.toggleXpandHesitation = null;
+        HesitateEvent.toggleXpandHesitation = null;
 }
 
 function expandSection(event) {
@@ -225,7 +228,7 @@ function _handleReorder(event, ui, parentIdField, childrenSelector) {
                 ui.draggable.attr("style", "position:relative;"); // STYLE hack too
                 children.push(ui.draggable.data('id'));
         }
-        var saving = new CMS.Views.Notification.Mini({
+        var saving = new NotificationView.Mini({
             title: gettext('Saving&hellip;')
         });
         saving.show();
@@ -242,4 +245,4 @@ function _handleReorder(event, ui, parentIdField, childrenSelector) {
 
 }
 
-
+}); // end define()

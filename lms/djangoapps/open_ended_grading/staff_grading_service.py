@@ -70,6 +70,7 @@ class StaffGradingService(GradingService):
 
     def __init__(self, config):
         config['system'] = ModuleSystem(
+            static_url='/static',
             ajax_url=None,
             track_function=None,
             get_module = None,

@@ -126,6 +126,7 @@ def combined_notifications(course, user):
 
     #Define a mock modulesystem
     system = ModuleSystem(
+        static_url="/static",
         ajax_url=None,
         track_function=None,
         get_module = None,

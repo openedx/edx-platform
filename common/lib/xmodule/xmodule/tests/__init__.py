@@ -50,6 +50,7 @@ def get_test_system(course_id=''):
 
     """
     return ModuleSystem(
+        static_url='/static',
         ajax_url='courses/course_id/modx/a_location',
         track_function=Mock(),
         get_module=Mock(),

@@ -162,6 +162,9 @@
 
 <%block name="jsextra">
 <script type="text/javascript">
+require(["jquery", "underscore", "gettext", "js/views/feedback_prompt"],
+    function($, _, gettext, PromptView) {
+
   var staffEmails = ${json.dumps([user.email for user in staff])};
   var tplUserURL = "${reverse('course_team_user', kwargs=dict(
       org=context_course.location.org,
@@ -178,7 +181,7 @@
       e.preventDefault();
       var email = $('#user-email-input').val().trim();
       if(!email) {
-        var msg = new CMS.Views.Prompt.Error({
+        var msg = new PromptView.Error({
           title: gettext("A valid email address is required"),
           message: gettext("You must enter a valid email address in order to add a new team member"),
           actions: {
@@ -195,7 +198,7 @@
         return;
       }
       if(_.contains(staffEmails, email)) {
-        var msg = new CMS.Views.Prompt.Warning({
+        var msg = new PromptView.Warning({
           title: gettext("Already a course team member"),
           message: _.template(gettext("{email} is already on the “{course}” team. If you're trying to add a new member, please double-check the email address you provided."), {email: email, course: course.escape('name')}, {interpolate: /\{(.+?)\}/g}),
           actions: {
@@ -231,7 +234,7 @@
           } catch (e) {
             message = unknownErrorMessage
           }
-          var prompt = new CMS.Views.Prompt.Error({
+          var prompt = new PromptView.Error({
             title: gettext("Error adding user"),
             message: message,
             actions: {
@@ -272,7 +275,7 @@
 
     $('.remove-user').click(function() {
       var email = $(this).data('id');
-      var msg = new CMS.Views.Prompt.Warning({
+      var msg = new PromptView.Warning({
         title: gettext("Are you sure?"),
         message: _.template(gettext("Are you sure you want to delete {email} from the course team for “{course}”?"), {email: email, course: course.get('name')}, {interpolate: /\{(.+?)\}/g}),
         actions: {
@@ -297,7 +300,7 @@
                   } catch (e) {
                     message = unknownErrorMessage;
                   }
-                  var prompt = new CMS.Views.Prompt.Error({
+                  var prompt = new PromptView.Error({
                     title: gettext("Error removing user"),
                     message: message,
                     actions: {
@@ -353,7 +356,7 @@
           } catch (e) {
             message = unknownErrorMessage;
           }
-          var prompt = new CMS.Views.Prompt.Error({
+          var prompt = new PromptView.Error({
             title: gettext("There was an error changing the user's role"),
             message: message,
             actions: {
@@ -371,5 +374,6 @@
     })
 
   });
+});
 </script>
 </%block>

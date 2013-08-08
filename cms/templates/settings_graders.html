@@ -18,30 +18,21 @@
 
 <%block name="jsextra">
   <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
-  <script src="${static.url('js/vendor/timepicker/jquery.timepicker.js')}"></script>
-
-  <script type="text/javascript" src="${static.url('js/models/course_relative.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/views/validating_view.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/models/settings/course_grading_policy.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/views/settings/settings_grading_view.js')}"></script>
-
   <script type="text/javascript">
-    $(document).ready(function(){
-
-      $("form :input").focus(function() {
-        $("label[for='" + this.id + "']").addClass("is-focused");
-      }).blur(function() {
-        $("label").removeClass("is-focused");
-      });
-
-      var editor = new CMS.Views.Settings.Grading({
-          el: $('.settings-grading'),
-          model : new CMS.Models.Settings.CourseGradingPolicy(${course_details|n},{parse:true})
-      });
-
-      editor.render();
+require(["domReady!", "jquery", "js/views/settings/grading", "js/models/settings/course_grading_policy"], function(doc, $, GradingView, CourseGradingPolicyModel) {
+    $("form :input").focus(function() {
+      $("label[for='" + this.id + "']").addClass("is-focused");
+    }).blur(function() {
+      $("label").removeClass("is-focused");
     });
 
+    var editor = new GradingView({
+        el: $('.settings-grading'),
+        model : new CourseGradingPolicyModel(${course_details|n},{parse:true})
+    });
+
+    editor.render();
+});
   </script>
 </%block>
 
