@@ -297,7 +297,7 @@ class SplitModuleItemTests(SplitModuleTest):
         )
 
         # in published course
-        locator = BlockUsageLocator(course_id="wonderful", usage_id="head23456", revision='draft')
+        locator = BlockUsageLocator(course_id="wonderful", usage_id="head23456", branch='draft')
         self.assertTrue(modulestore().has_item(locator.course_id, BlockUsageLocator(course_id=locator.course_id,
                                                                             usage_id=locator.usage_id,
                                                                             revision='published')),
