@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+# pylint: disable=W0212
+
 """Test for VideoAlpha Xmodule functional logic.
 These test data read from xml, not from mongo.
 
@@ -18,9 +20,10 @@ import unittest
 
 from django.conf import settings
 
-from xmodule.videoalpha_module import VideoAlphaDescriptor, _create_youtube_string
+from xmodule.videoalpha_module import (
+    VideoAlphaDescriptor, _create_youtube_string)
 from xmodule.modulestore import Location
-from xmodule.tests import get_test_system
+from xmodule.tests import get_test_system, LogicTest
 
 
 SOURCE_XML = """
@@ -101,3 +104,71 @@ class VideoAlphaModuleUnitTest(unittest.TestCase):
         self.assertDictEqual(
             json.loads(module.get_instance_state()),
             {'position': 0})
+
+
+class VideoAlphaModuleLogicTest(LogicTest):
+    """Tests for logic of VideoAlpha Xmodule."""
+
+    descriptor_class = VideoAlphaDescriptor
+
+    raw_model_data = {
+        'data': '<video />'
+    }
+
+    def test_parse_time(self):
+        """Ensure that times are parsed correctly into seconds."""
+        output = VideoAlphaDescriptor._parse_time('00:04:07')
+        self.assertEqual(output, 247)
+
+    def test_parse_time_none(self):
+        """Check parsing of None."""
+        output = VideoAlphaDescriptor._parse_time(None)
+        self.assertEqual(output, '')
+
+    def test_parse_time_empty(self):
+        """Check parsing of the empty string."""
+        output = VideoAlphaDescriptor._parse_time('')
+        self.assertEqual(output, '')
+
+    def test_parse_youtube(self):
+        """Test parsing old-style Youtube ID strings into a dict."""
+        youtube_str = '0.75:jNCf2gIqpeE,1.00:ZwkTiUPN0mg,1.25:rsq9auxASqI,1.50:kMyNdzVHHgg'
+        output = VideoAlphaDescriptor._parse_youtube(youtube_str)
+        self.assertEqual(output, {'0.75': 'jNCf2gIqpeE',
+                                  '1.00': 'ZwkTiUPN0mg',
+                                  '1.25': 'rsq9auxASqI',
+                                  '1.50': 'kMyNdzVHHgg'})
+
+    def test_parse_youtube_one_video(self):
+        """
+        Ensure that all keys are present and missing speeds map to the
+        empty string.
+        """
+        youtube_str = '0.75:jNCf2gIqpeE'
+        output = VideoAlphaDescriptor._parse_youtube(youtube_str)
+        self.assertEqual(output, {'0.75': 'jNCf2gIqpeE',
+                                  '1.00': '',
+                                  '1.25': '',
+                                  '1.50': ''})
+
+    def test_parse_youtube_key_format(self):
+        """
+        Make sure that inconsistent speed keys are parsed correctly.
+        """
+        youtube_str = '1.00:p2Q6BrNhdh8'
+        youtube_str_hack = '1.0:p2Q6BrNhdh8'
+        self.assertEqual(
+            VideoAlphaDescriptor._parse_youtube(youtube_str),
+            VideoAlphaDescriptor._parse_youtube(youtube_str_hack)
+        )
+
+    def test_parse_youtube_empty(self):
+        """
+        Some courses have empty youtube attributes, so we should handle
+        that well.
+        """
+        self.assertEqual(VideoAlphaDescriptor._parse_youtube(''),
+                         {'0.75': '',
+                          '1.00': '',
+                          '1.25': '',
+                          '1.50': ''})
