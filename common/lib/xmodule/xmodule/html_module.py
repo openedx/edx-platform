@@ -81,6 +81,10 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):
         return candidates + nc
 
     def get_context(self):
+        """
+        an override to add in specific rendering context, in this case we need to
+        add in a base path to our c4x content addressing scheme
+        """
         _context = EditingDescriptor.get_context(self)
         # Add some specific HTML rendering context when editing HTML modules where we pass
         # the root /c4x/ url for assets. This allows client-side substitutions to occur.
