@@ -300,7 +300,7 @@ class SplitModuleItemTests(SplitModuleTest):
         locator = BlockUsageLocator(course_id="wonderful", usage_id="head23456", branch='draft')
         self.assertTrue(modulestore().has_item(locator.course_id, BlockUsageLocator(course_id=locator.course_id,
                                                                             usage_id=locator.usage_id,
-                                                                            revision='published')),
+                                                                            branch='published')),
                         "couldn't find in 23456")
         locator.branch = 'published'
         self.assertTrue(modulestore().has_item(course_id, locator), "couldn't find in 23456")
