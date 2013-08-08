@@ -225,6 +225,8 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
                     non_draft_loc = location.replace(revision=None)
                     metadata_to_inherit = self.cached_metadata.get(non_draft_loc.url(), {})
                     inherit_metadata(module, metadata_to_inherit)
+                # decache any computed pending field settings
+                module.save()
                 return module
             except:
                 log.warning("Failed to load descriptor", exc_info=True)
@@ -630,6 +632,8 @@ class MongoModuleStore(ModuleStoreBase):
                 definition_data = {}
         dbmodel = self._create_new_model_data(location.category, location, definition_data, metadata)
         xmodule = xblock_class(system, dbmodel)
+        # decache any pending field settings from init
+        xmodule.save()
         return xmodule
 
     def save_xmodule(self, xmodule):

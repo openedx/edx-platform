@@ -20,7 +20,7 @@ def parse_url(string):
     with key 'version_guid' and the value,
 
     If it can be parsed as a course_id, returns a dict
-    with keys 'id' and 'revision' (value of 'revision' may be None),
+    with keys 'id' and 'branch' (value of 'branch' may be None),
 
     """
     match = URL_RE.match(string)
@@ -69,14 +69,14 @@ def parse_guid(string):
         return None
 
 
-COURSE_ID_RE = re.compile(r'^(?P<id>(\w+)(\.\w+\w*)*)(;(?P<revision>\w+))?(#(?P<block>\w+))?$', re.IGNORECASE)
+COURSE_ID_RE = re.compile(r'^(?P<id>(\w+)(\.\w+\w*)*)(;(?P<branch>\w+))?(#(?P<block>\w+))?$', re.IGNORECASE)
 
 
 def parse_course_id(string):
     r"""
 
     A course_id has a main id component.
-    There may also be an optional revision (;published or ;draft).
+    There may also be an optional branch (;published or ;draft).
     There may also be an optional block (#HW3 or #Quiz2).
 
     Examples of valid course_ids:
@@ -89,11 +89,11 @@ def parse_course_id(string):
 
     Syntax:
 
-      course_id = main_id [; revision] [# block]
+      course_id = main_id [; branch] [# block]
 
       main_id = name [. name]*
 
-      revision = name
+      branch = name
 
       block = name
 
@@ -104,8 +104,8 @@ def parse_course_id(string):
     and the underscore. (see definition of \w in python regular expressions,
     at http://docs.python.org/dev/library/re.html)
 
-    If string is a course_id, returns a dict with keys 'id', 'revision', and 'block'.
-    Revision is optional: if missing returned_dict['revision'] is None.
+    If string is a course_id, returns a dict with keys 'id', 'branch', and 'block'.
+    Revision is optional: if missing returned_dict['branch'] is None.
     Block is optional: if missing returned_dict['block'] is None.
     Else returns None.
     """

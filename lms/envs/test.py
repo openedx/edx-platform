@@ -15,6 +15,7 @@ sessions. Assumes structure:
 from .common import *
 import os
 from path import path
+from warnings import filterwarnings
 
 # can't test start dates with this True, but on the other hand,
 # can test everything else :)
@@ -28,6 +29,8 @@ MITX_FEATURES['ENABLE_DISCUSSION_SERVICE'] = False
 MITX_FEATURES['ENABLE_SERVICE_STATUS'] = True
 
 MITX_FEATURES['ENABLE_HINTER_INSTRUCTOR_VIEW'] = True
+
+MITX_FEATURES['ENABLE_INSTRUCTOR_BETA_DASHBOARD'] = True
 
 # Need wiki for courseware views to work. TODO (vshnayder): shouldn't need it.
 WIKI_ENABLED = True
@@ -134,6 +137,9 @@ CACHES = {
 
 # Dummy secret key for dev
 SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
+
+# hide ratelimit warnings while running tests
+filterwarnings('ignore', message='No request passed to the backend, unable to rate-limit')
 
 ################################## OPENID #####################################
 MITX_FEATURES['AUTH_USE_OPENID'] = True

@@ -19,5 +19,22 @@ def i_see_the_correct_settings_and_values(step):
 @step('I have set "show captions" to (.*)')
 def set_show_captions(step, setting):
     world.css_click('a.edit-button')
+    world.wait_for(lambda _driver: world.css_visible('a.save-button'))
     world.browser.select('Show Captions', setting)
     world.css_click('a.save-button')
+
+
+@step('I see the correct videoalpha settings and default values$')
+def correct_videoalpha_settings(_step):
+    world.verify_all_setting_entries([['Display Name', 'Video Alpha', False],
+                                      ['Download Track', '', False],
+                                      ['Download Video', '', False],
+                                      ['End Time', '0', False],
+                                      ['HTML5 Subtitles', '', False],
+                                      ['Show Captions', 'True', False],
+                                      ['Start Time', '0', False],
+                                      ['Video Sources', '', False],
+                                      ['Youtube ID', 'OEoXaMPEzfM', False],
+                                      ['Youtube ID for .75x speed', '', False],
+                                      ['Youtube ID for 1.25x speed', '', False],
+                                      ['Youtube ID for 1.5x speed', '', False]])

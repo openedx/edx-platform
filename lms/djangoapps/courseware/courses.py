@@ -163,7 +163,7 @@ def get_course_about_section(course, section_key):
             html = ''
 
             if about_module is not None:
-                html = about_module.get_html()
+                html = about_module.runtime.render(about_module, None, 'student_view').content
 
             return html
 
@@ -174,9 +174,9 @@ def get_course_about_section(course, section_key):
     elif section_key == "title":
         return course.display_name_with_default
     elif section_key == "university":
-        return course.location.org
+        return course.display_org_with_default
     elif section_key == "number":
-        return course.number
+        return course.display_number_with_default
 
     raise KeyError("Invalid about key " + str(section_key))
 
@@ -211,7 +211,7 @@ def get_course_info_section(request, course, section_key):
     html = ''
 
     if info_module is not None:
-        html = info_module.get_html()
+        html = info_module.runtime.render(info_module, None, 'student_view').content
 
     return html
 

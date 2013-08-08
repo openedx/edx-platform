@@ -10,8 +10,9 @@ from pkg_resources import resource_listdir, resource_string, resource_isdir
 from xmodule.modulestore import inheritance, Location
 from xmodule.modulestore.exceptions import ItemNotFoundError, InsufficientSpecificationError, InvalidLocationError
 
-from xblock.core import XBlock, Scope, String, Integer, Float, ModelType
+from xblock.core import XBlock, Scope, String, Integer, Float, List, ModelType
 from xblock.fragment import Fragment
+from xblock.runtime import Runtime
 from xmodule.modulestore.locator import BlockUsageLocator
 
 log = logging.getLogger(__name__)
@@ -537,11 +538,14 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
 
         system: Module system
         """
-        return self.module_class(
+        # save any field changes
+        module = self.module_class(
             system,
             self,
             system.xblock_model_data(self),
         )
+        module.save()
+        return module
 
     def has_dynamic_children(self):
         """
@@ -613,7 +617,13 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
 
         new_block = system.xblock_from_json(cls, usage_id, json_data)
         if parent_xblock is not None:
-            parent_xblock.children.append(new_block)
+            children = parent_xblock.children
+            children.append(new_block)
+            # trigger setter method by using top level field access
+            parent_xblock.children = children
+            # decache pending children field settings (Note, truly persisting at this point would break b/c
+            # persistence assumes children is a list of ids not actual xblocks)
+            parent_xblock.save()
         return new_block
 
     @classmethod
@@ -756,7 +766,7 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
             # 2. Number editors for integers and floats.
             # 3. A generic string editor for anything else (editing JSON representation of the value).
             editor_type = "Generic"
-            values = [] if field.values is None else copy.deepcopy(field.values)
+            values = copy.deepcopy(field.values)
             if isinstance(values, tuple):
                 values = list(values)
             if isinstance(values, list):
@@ -773,17 +783,31 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
                 editor_type = "Integer"
             elif isinstance(field, Float):
                 editor_type = "Float"
+            elif isinstance(field, List):
+                editor_type = "List"
             metadata_fields[field.name] = {'field_name': field.name,
                                            'type': editor_type,
                                            'display_name': field.display_name,
                                            'value': field.to_json(value),
-                                           'options': values,
+                                           'options': [] if values is None else values,
                                            'default_value': field.to_json(default_value),
                                            'inheritable': inheritable,
                                            'explicitly_set': explicitly_set,
                                            'help': field.help}
 
         return metadata_fields
+
+    # ~~~~~~~~~~~~~~~ XBlock API Wrappers ~~~~~~~~~~~~~~~~
+    def studio_view(self, context):
+        """
+        Return a fragment with the html from this XModuleDescriptor's editing view
+
+        Doesn't yet add any of the javascript to the fragment, nor the css.
+        Also doesn't expect any javascript binding, yet.
+
+        Makes no use of the context parameter
+        """
+        return Fragment(self.get_html())
 
 
 class DescriptorSystem(object):
@@ -849,7 +873,7 @@ class XMLParsingSystem(DescriptorSystem):
         self.policy = policy
 
 
-class ModuleSystem(object):
+class ModuleSystem(Runtime):
     '''
     This is an abstraction such that x_modules can function independent
     of the courseware (e.g. import into other types of courseware, LMS,
@@ -880,6 +904,8 @@ class ModuleSystem(object):
                  s3_interface=None,
                  cache=None,
                  can_execute_unsafe_code=None,
+                 replace_course_urls=None,
+                 replace_jump_to_id_urls=None
     ):
         '''
         Create a closure around the system environment.
@@ -956,6 +982,8 @@ class ModuleSystem(object):
 
         self.cache = cache or DoNothingCache()
         self.can_execute_unsafe_code = can_execute_unsafe_code or (lambda: False)
+        self.replace_course_urls = replace_course_urls
+        self.replace_jump_to_id_urls = replace_jump_to_id_urls
 
     def get(self, attr):
         '''	provide uniform access to attributes (like etree).'''

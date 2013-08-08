@@ -1,0 +1,9 @@
+<%! from django.utils.translation import ugettext as _ %>
+
+${_("Your request for course creation rights to edX Studio have been granted. To create your first course, visit:")}
+
+% if is_secure:
+https://${ site }
+% else:
+http://${ site }
+% endif

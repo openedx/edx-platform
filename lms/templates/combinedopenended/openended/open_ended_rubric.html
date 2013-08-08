@@ -1,8 +1,9 @@
+<%! from django.utils.translation import ugettext as _ %>
 <form class="rubric-template" id="inputtype_${id}" xmlns="http://www.w3.org/1999/html">
     <div class="visibility-control visibility-control-rubric">
         <div class="inner">
         </div>
-        <span class="section-header section-header-rubric">Rubric</span>
+        <span class="section-header section-header-rubric">${_("Rubric")}</span>
     </div>
     <p>Select the criteria you feel best represents this submission in each category.</p>
     <div class="rubric">

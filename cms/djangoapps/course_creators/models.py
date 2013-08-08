@@ -10,7 +10,13 @@ from django.utils import timezone
 from django.utils.translation import ugettext as _
 
 # A signal that will be sent when users should be added or removed from the creator group
-update_creator_state = Signal(providing_args=["caller", "user", "add"])
+update_creator_state = Signal(providing_args=["caller", "user", "state"])
+
+# A signal that will be sent when admin should be notified of a pending user request
+send_admin_notification = Signal(providing_args=["user"])
+
+# A signal that will be sent when user should be notified of change in course creator privileges
+send_user_notification = Signal(providing_args=["user", "state"])
 
 
 class CourseCreator(models.Model):
@@ -39,7 +45,7 @@ class CourseCreator(models.Model):
                                                                     "why course creation access was denied)"))
 
     def __unicode__(self):
-        return u'%str | %str [%str] | %str' % (self.user, self.state, self.state_changed, self.note)
+        return u"{0} | {1} [{2}]".format(self.user, self.state, self.state_changed)
 
 
 @receiver(post_init, sender=CourseCreator)
@@ -54,18 +60,40 @@ def post_init_callback(sender, **kwargs):
 @receiver(post_save, sender=CourseCreator)
 def post_save_callback(sender, **kwargs):
     """
-    Extend to update state_changed time and modify the course creator group in authz.py.
+    Extend to update state_changed time and fire event to update course creator group, if appropriate.
     """
     instance = kwargs['instance']
     # We only wish to modify the state_changed time if the state has been modified. We don't wish to
     # modify it for changes to the notes field.
     if instance.state != instance.orig_state:
-        update_creator_state.send(
-            sender=sender,
-            caller=instance.admin,
-            user=instance.user,
-            add=instance.state == CourseCreator.GRANTED
-        )
+        granted_state_change = instance.state == CourseCreator.GRANTED or instance.orig_state == CourseCreator.GRANTED
+        # If either old or new state is 'granted', we must manipulate the course creator
+        # group maintained by authz. That requires staff permissions (stored admin).
+        if granted_state_change:
+            assert hasattr(instance, 'admin'), 'Must have stored staff user to change course creator group'
+            update_creator_state.send(
+                sender=sender,
+                caller=instance.admin,
+                user=instance.user,
+                state=instance.state
+            )
+
+        # If user has been denied access, granted access, or previously granted access has been
+        # revoked, send a notification message to the user.
+        if instance.state == CourseCreator.DENIED or granted_state_change:
+            send_user_notification.send(
+                sender=sender,
+                user=instance.user,
+                state=instance.state
+            )
+
+        # If the user has gone into the 'pending' state, send a notification to interested admin.
+        if instance.state == CourseCreator.PENDING:
+            send_admin_notification.send(
+                sender=sender,
+                user=instance.user
+            )
+
         instance.state_changed = timezone.now()
         instance.orig_state = instance.state
         instance.save()

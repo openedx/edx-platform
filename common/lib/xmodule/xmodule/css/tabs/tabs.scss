@@ -1,0 +1,137 @@
+// styles duped from _unit.scss - Edit Header (Component Name, Mode-Editor, Mode-Settings)
+
+
+.tabs-wrapper{
+  padding-top: 0;
+  position: relative;
+
+  .wrapper-comp-settings {
+    // set visibility to metadata editor
+    display: block;
+  }
+}
+
+.editor-single-tab-name {
+  display: none;
+}
+
+
+.editor-with-tabs {
+  @include clearfix();
+  position: relative;
+
+
+  .edit-header {
+    @include box-sizing(border-box);
+    padding: 18px 0 18px $baseline;
+    top: 0 !important; // ugly override for second level tab override
+    right: 0;
+    background-color: $blue;
+    border-bottom: 1px solid $blue-d2;
+    color: $white;
+
+    //Component Name
+    .component-name {
+      @extend .t-copy-sub1;
+      position: relative;
+      top: 0;
+      left: 0;
+      width: 50%;
+      color: $white;
+      font-weight: 600;
+
+
+
+      em {
+        display: inline-block;
+        margin-right: ($baseline/4);
+        font-weight: 400;
+        color: $white;
+      }
+    }
+
+    //Nav-Edit Modes
+    .editor-tabs {
+      list-style: none;
+      right: 0;
+      top: ($baseline/4);
+      position: absolute;
+      padding: 12px ($baseline*0.75);
+
+      .inner_tab_wrap {
+        display: inline-block;
+        margin-left: 8px;
+
+        a.tab {
+            @include font-size(14);
+            @include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
+            border: 1px solid $blue-d1;
+            border-radius: 3px;
+            padding: ($baseline/4) ($baseline);
+            background-color: $blue;
+            font-weight: bold;
+            color: $white;
+
+          &.current {
+            @include linear-gradient($blue, $blue);
+            color: $blue-d1;
+            box-shadow: inset 0 1px 2px 1px $shadow-l1;
+            background-color: $blue-d4;
+            cursor: default;
+          }
+
+          &:hover {
+            box-shadow: inset 0 1px 2px 1px  $shadow;
+            background-image: linear-gradient(#009FE6, #009FE6) !important;
+          }
+        }
+      }
+    }
+  }
+
+  .is-inactive {
+    display: none;
+  }
+
+  .comp-subtitles-entry {
+    text-align: center;
+
+    .file-upload {
+      display: none;
+    }
+
+    .comp-subtitles-import-list {
+      > li {
+        display: block;
+        margin: $baseline/2 0px $baseline/2 0;
+      }
+
+      .blue-button {
+        font-size: 1em;
+        display: block;
+        width: 70%;
+        margin: 0 auto;
+        text-align: center;
+      }
+    }
+  }
+
+
+}
+
+.component-tab {
+  background: $white;
+  position: relative;
+  border-top: 1px solid #8891a1;
+
+  &#advanced {
+    padding: 0;
+    border: none;
+  }
+
+  .blue-button {
+    @include blue-button;
+  }
+}
+
+

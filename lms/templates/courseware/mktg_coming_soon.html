@@ -1,3 +1,4 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%!
   from django.core.urlresolvers import reverse
   from courseware.courses import course_image_url, get_course_about_section
@@ -7,7 +8,7 @@
 
 <%inherit file="../mktg_iframe.html" />
 
-<%block name="title"><title>About ${course_id}</title></%block>
+<%block name="title"><title>${_("About {course_id}").format(course_id=course_id)}</title></%block>
 
 <%block name="bodyclass">view-partial-mktgregister</%block>
 
@@ -23,7 +24,7 @@
 
   <ul class="list-actions register">
     <li class="item">
-      <a class="action coming-soon" href="">Coming Soon</a>
+      <a class="action coming-soon" href="">${_("Coming Soon")}</a>
     </li>
   </ul>
 

@@ -29,7 +29,6 @@ from xmodule.util.date_utils import get_default_time_display
 from xmodule.modulestore import InvalidLocationError
 from xmodule.exceptions import NotFoundError
 
-from ..utils import get_url_reverse
 from .access import get_location_and_verify_access
 from util.json_request import JsonResponse
 
@@ -106,6 +105,7 @@ def asset_index(request, org, course, name):
 
         asset_location = StaticContent.compute_location(asset_id['org'], asset_id['course'], asset_id['name'])
         display_info['url'] = StaticContent.get_url_path_from_location(asset_location)
+        display_info['portable_url'] = StaticContent.get_static_path_from_location(asset_location)
 
         # note, due to the schema change we may not have a 'thumbnail_location' in the result set
         _thumbnail_location = asset.get('thumbnail_location', None)
@@ -188,12 +188,12 @@ def upload_asset(request, org, course, coursename):
     response_payload = {'displayname': content.name,
                         'uploadDate': get_default_time_display(readback.last_modified_at),
                         'url': StaticContent.get_url_path_from_location(content.location),
+                        'portable_url': StaticContent.get_static_path_from_location(content.location),
                         'thumb_url': StaticContent.get_url_path_from_location(thumbnail_location) if thumbnail_content is not None else None,
                         'msg': 'Upload completed'
                         }
 
     response = JsonResponse(response_payload)
-    response['asset_url'] = StaticContent.get_url_path_from_location(content.location)
     return response
 
 
@@ -284,7 +284,7 @@ def import_course(request, org, course, name):
         tar_file.extractall(course_dir + '/')
 
         # find the 'course.xml' file
-
+        dirpath = None
         for dirpath, _dirnames, filenames in os.walk(course_dir):
             for filename in filenames:
                 if filename == 'course.xml':
@@ -320,7 +320,11 @@ def import_course(request, org, course, name):
 
         return render_to_response('import.html', {
             'context_course': course_module,
-            'successful_import_redirect_url': get_url_reverse('CourseOutline', course_module)
+            'successful_import_redirect_url': reverse('course_index', kwargs={
+                'org': location.org,
+                'course': location.course,
+                'name': location.name,
+            })
         })
 
 

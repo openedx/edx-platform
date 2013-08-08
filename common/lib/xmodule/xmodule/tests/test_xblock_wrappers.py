@@ -53,32 +53,38 @@ CONTAINER_XMODULES = (
     CourseDescriptor,
 )
 
+# These modules are editable in studio yet
+NOT_STUDIO_EDITABLE = (
+    CrowdsourceHinterDescriptor,
+    GraphicalSliderToolDescriptor,
+    PollDescriptor
+)
+
 
 class TestXBlockWrapper(object):
 
     @property
     def leaf_module_runtime(self):
         runtime = Mock()
-        runtime.render_template = lambda *args, **kwargs: unicode((args, kwargs))
-        runtime.anonymous_student_id = 'anonymous_student_id'
+        runtime.render_template = lambda *args, **kwargs: u'{!r}, {!r}'.format(args, kwargs)
+        runtime.anonymous_student_id = 'dummy_anonymous_student_id'
         runtime.open_ended_grading_interface = {}
         runtime.seed = 5
         runtime.get = lambda x: getattr(runtime, x)
-        runtime.position = 2
-        runtime.ajax_url = 'ajax_url'
+        runtime.ajax_url = 'dummy_ajax_url'
         runtime.xblock_model_data = lambda d: d._model_data
         return runtime
 
     @property
     def leaf_descriptor_runtime(self):
         runtime = Mock()
-        runtime.render_template = lambda *args, **kwargs: unicode((args, kwargs))
+        runtime.render_template = lambda *args, **kwargs: u'{!r}, {!r}'.format(args, kwargs)
         return runtime
 
     def leaf_descriptor(self, descriptor_cls):
         return descriptor_cls(
             self.leaf_descriptor_runtime,
-            {'location': 'i4x://org/course/catagory/name'}
+            {'location': 'i4x://org/course/category/name'}
         )
 
     def leaf_module(self, descriptor_cls):
@@ -90,19 +96,20 @@ class TestXBlockWrapper(object):
             runtime.get_module.side_effect = lambda x: self.leaf_module(HtmlDescriptor)
         else:
             runtime.get_module.side_effect = lambda x: self.container_module(VerticalDescriptor, depth-1)
+        runtime.position = 2
         return runtime
 
     @property
     def container_descriptor_runtime(self):
         runtime = Mock()
-        runtime.render_template = lambda *args, **kwargs: unicode((args, kwargs))
+        runtime.render_template = lambda *args, **kwargs: u'{!r}, {!r}'.format(args, kwargs)
         return runtime
 
     def container_descriptor(self, descriptor_cls):
         return descriptor_cls(
             self.container_descriptor_runtime,
             {
-                'location': 'i4x://org/course/catagory/name',
+                'location': 'i4x://org/course/category/name',
                 'children': range(3)
             }
         )
@@ -158,3 +165,62 @@ class TestStudentView(TestXBlockWrapper):
     def check_student_view_container_node_xblocks_only(self, descriptor_cls):
         raise SkipTest("XBlock support in XModules not yet fully implemented")
 
+
+class TestStudioView(TestXBlockWrapper):
+
+    # Test that for all of the Descriptors listed in LEAF_XMODULES,
+    # the studio_view wrapper returns the same thing in its content
+    # as get_html returns
+    def test_studio_view_leaf_node(self):
+        for descriptor_cls in LEAF_XMODULES:
+            yield self.check_studio_view_leaf_node, descriptor_cls
+
+    # Check that when a descriptor is instantiated from descriptor_cls
+    # it generates the same thing from studio_view that it does from get_html
+    def check_studio_view_leaf_node(self, descriptor_cls):
+        if descriptor_cls in NOT_STUDIO_EDITABLE:
+            raise SkipTest(descriptor_cls.__name__ + "is not editable in studio")
+
+        descriptor = self.leaf_descriptor(descriptor_cls)
+        assert_equal(descriptor.get_html(), descriptor.studio_view(None).content)
+
+
+    # Test that for all of the Descriptors listed in CONTAINER_XMODULES
+    # render the same thing using studio_view as they do using get_html, under the following conditions:
+    # a) All of its descendents are xmodules
+    # b) Some of its descendents are xmodules and some are xblocks
+    # c) All of its descendents are xblocks
+    def test_studio_view_container_node(self):
+        for descriptor_cls in CONTAINER_XMODULES:
+            yield self.check_studio_view_container_node_xmodules_only, descriptor_cls
+            yield self.check_studio_view_container_node_mixed, descriptor_cls
+            yield self.check_studio_view_container_node_xblocks_only, descriptor_cls
+
+
+    # Check that when a descriptor is generated from descriptor_cls
+    # with only xmodule children, it generates the same html from studio_view
+    # as it does using get_html
+    def check_studio_view_container_node_xmodules_only(self, descriptor_cls):
+        if descriptor_cls in NOT_STUDIO_EDITABLE:
+            raise SkipTest(descriptor_cls.__name__ + "is not editable in studio")
+
+        descriptor = self.container_descriptor(descriptor_cls)
+        assert_equal(descriptor.get_html(), descriptor.studio_view(None).content)
+
+    # Check that when a descriptor is generated from descriptor_cls
+    # with mixed xmodule and xblock children, it generates the same html from studio_view
+    # as it does using get_html
+    def check_studio_view_container_node_mixed(self, descriptor_cls):
+        if descriptor_cls in NOT_STUDIO_EDITABLE:
+            raise SkipTest(descriptor_cls.__name__ + "is not editable in studio")
+
+        raise SkipTest("XBlock support in XDescriptor not yet fully implemented")
+
+    # Check that when a descriptor is generated from descriptor_cls
+    # with only xblock children, it generates the same html from studio_view
+    # as it does using get_html
+    def check_studio_view_container_node_xblocks_only(self, descriptor_cls):
+        if descriptor_cls in NOT_STUDIO_EDITABLE:
+            raise SkipTest(descriptor_cls.__name__ + "is not editable in studio")
+
+        raise SkipTest("XBlock support in XModules not yet fully implemented")

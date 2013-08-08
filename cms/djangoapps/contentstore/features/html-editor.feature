@@ -11,3 +11,8 @@ Feature: HTML Editor
     And I edit and select Settings
     Then I can modify the display name
     And my display name change is persisted on save
+
+  Scenario: Edit High Level source is available for LaTeX html
+    Given I have created an E-text Written in LaTeX
+    When I edit and select Settings
+    Then Edit High Level Source is visible

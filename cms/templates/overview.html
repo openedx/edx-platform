@@ -1,10 +1,10 @@
-<%! from django.utils.translation import ugettext as _ %>
 <%inherit file="base.html" />
 <%!
-   import logging
-   from xmodule.util import date_utils
+  import logging
+  from xmodule.util import date_utils
+  from django.utils.translation import ugettext as _
+  from django.core.urlresolvers import reverse
 %>
-<%! from django.core.urlresolvers import reverse %>
 <%block name="title">${_("Course Outline")}</%block>
 <%block name="bodyclass">is-signedin course outline</%block>
 

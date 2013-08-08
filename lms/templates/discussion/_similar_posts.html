@@ -1,6 +1,7 @@
+<%! from django.utils.translation import ugettext as _ %>
 % if len(threads) > 0:
   Similar Posts: 
-  <a class="hide-similar-posts" href="javascript:void(0)">Hide</a>
+  <a class="hide-similar-posts" href="javascript:void(0)">${_("Hide")}</a>
   <div class="new-post-similar-posts">
     % for thread in threads:
       <a class="similar-post" href="${thread['permalink'] | h}">${thread['title'] | h}</a>

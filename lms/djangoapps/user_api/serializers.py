@@ -14,8 +14,8 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
         # This list is the minimal set required by the notification service
-        fields = ("id", "email", "name")
-        read_only_fields = ("id", "email")
+        fields = ("id", "email", "name", "username")
+        read_only_fields = ("id", "email", "username")
 
 
 class UserPreferenceSerializer(serializers.HyperlinkedModelSerializer):

@@ -72,50 +72,6 @@ class LMSLinksTestCase(TestCase):
         )
 
 
-class UrlReverseTestCase(ModuleStoreTestCase):
-    """ Tests for get_url_reverse """
-    def test_course_page_names(self):
-        """ Test the defined course pages. """
-        course = CourseFactory.create(org='mitX', number='666', display_name='URL Reverse Course')
-
-        self.assertEquals(
-            '/manage_users/i4x://mitX/666/course/URL_Reverse_Course',
-            utils.get_url_reverse('ManageUsers', course)
-        )
-
-        self.assertEquals(
-            '/mitX/666/settings-details/URL_Reverse_Course',
-            utils.get_url_reverse('SettingsDetails', course)
-        )
-
-        self.assertEquals(
-            '/mitX/666/settings-grading/URL_Reverse_Course',
-            utils.get_url_reverse('SettingsGrading', course)
-        )
-
-        self.assertEquals(
-            '/mitX/666/course/URL_Reverse_Course',
-            utils.get_url_reverse('CourseOutline', course)
-        )
-
-        self.assertEquals(
-            '/mitX/666/checklists/URL_Reverse_Course',
-            utils.get_url_reverse('Checklists', course)
-        )
-
-    def test_unknown_passes_through(self):
-        """ Test that unknown values pass through. """
-        course = CourseFactory.create(org='mitX', number='666', display_name='URL Reverse Course')
-        self.assertEquals(
-            'foobar',
-            utils.get_url_reverse('foobar', course)
-        )
-        self.assertEquals(
-            'https://edge.edx.org/courses/edX/edX101/How_to_Create_an_edX_Course/about',
-            utils.get_url_reverse('https://edge.edx.org/courses/edX/edX101/How_to_Create_an_edX_Course/about', course)
-        )
-
-
 class ExtraPanelTabTestCase(TestCase):
     """ Tests adding and removing extra course tabs. """
 

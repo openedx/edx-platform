@@ -18,8 +18,6 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 
 from models.settings.course_metadata import CourseMetadata
-from xmodule.modulestore.xml_importer import import_from_xml
-from xmodule.modulestore.django import modulestore
 from xmodule.fields import Date
 
 from .utils import CourseTestCase
@@ -167,8 +165,8 @@ class CourseDetailsViewTest(CourseTestCase):
         self.compare_details_with_encoding(json.loads(resp.content), details.__dict__, field + str(val))
 
     @staticmethod
-    def convert_datetime_to_iso(dt):
-        return Date().to_json(dt)
+    def convert_datetime_to_iso(datetime_obj):
+        return Date().to_json(datetime_obj)
 
     def test_update_and_fetch(self):
         loc = self.course.location

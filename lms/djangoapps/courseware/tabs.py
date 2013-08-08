@@ -91,6 +91,13 @@ def _discussion(tab, user, course, active_page):
     return []
 
 
+def _external_discussion(tab, user, course, active_page):
+    """
+    This returns a tab that links to an external discussion service
+    """
+    return [CourseTab('Discussion', tab['link'], active_page == 'discussion')]
+
+
 def _external_link(tab, user, course, active_page):
     # external links are never active
     return [CourseTab(tab['name'], tab['link'], False)]
@@ -148,6 +155,12 @@ def _staff_grading(tab, user, course, active_page):
         tab = [CourseTab(tab_name, link, active_page == "staff_grading", pending_grading, img_path)]
         return tab
     return []
+
+
+def _syllabus(tab, user, course, active_page):
+    """Display the syllabus tab"""
+    link = reverse('syllabus', args=[course.id])
+    return [CourseTab('Syllabus', link, active_page == 'syllabus')]
 
 
 def _peer_grading(tab, user, course, active_page):
@@ -216,6 +229,7 @@ VALID_TAB_TYPES = {
     'course_info': TabImpl(need_name, _course_info),
     'wiki': TabImpl(need_name, _wiki),
     'discussion': TabImpl(need_name, _discussion),
+    'external_discussion': TabImpl(key_checker(['link']), _external_discussion),
     'external_link': TabImpl(key_checker(['name', 'link']), _external_link),
     'textbooks': TabImpl(null_validator, _textbooks),
     'pdf_textbooks': TabImpl(null_validator, _pdf_textbooks),
@@ -225,7 +239,8 @@ VALID_TAB_TYPES = {
     'peer_grading': TabImpl(null_validator, _peer_grading),
     'staff_grading': TabImpl(null_validator, _staff_grading),
     'open_ended': TabImpl(null_validator, _combined_open_ended_grading),
-    'notes': TabImpl(null_validator, _notes_tab)
+    'notes': TabImpl(null_validator, _notes_tab),
+    'syllabus': TabImpl(null_validator, _syllabus)
     }
 
 
@@ -290,6 +305,7 @@ def get_course_tabs(user, course, active_page):
         tabs.append(CourseTab('Instructor',
                               reverse('instructor_dashboard', args=[course.id]),
                               active_page == 'instructor'))
+
     return tabs
 
 
@@ -371,6 +387,6 @@ def get_static_tab_contents(request, course, tab):
     html = ''
 
     if tab_module is not None:
-        html = tab_module.get_html()
+        html = tab_module.runtime.render(tab_module, None, 'student_view').content
 
     return html

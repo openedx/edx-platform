@@ -1,0 +1,15 @@
+// studio - elements - xmodules
+// ====================
+
+// Video Alpha
+.xmodule_VideoAlphaModule {
+
+  // display mode
+  &.xmodule_display {
+
+    // full screen
+    .video-controls .add-fullscreen {
+      display: none !important; // nasty, but needed to override the bad specificity of the xmodule css selectors
+    }
+  }
+}

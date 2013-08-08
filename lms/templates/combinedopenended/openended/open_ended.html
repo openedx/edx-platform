@@ -1,3 +1,4 @@
+<%! from django.utils.translation import ugettext as _ %>
 <section id="openended_${id}" class="open-ended-child" data-state="${state}" data-child-type="${child_type}">
    <div class="error"></div>
    <div class="prompt">
@@ -6,14 +7,14 @@
     <div class="visibility-control visibility-control-response">
         <div class="inner">
         </div>
-        <span class="section-header section-header-response">Response</span>
+        <span class="section-header section-header-response">${_("Response")}</span>
     </div>
   <textarea rows="${rows}" cols="${cols}" name="answer" class="answer short-form-response" id="input_${id}">${previous_answer|h}</textarea>
 
   <div class="message-wrapper"></div>
   <div class="grader-status">
     % if state == 'initial':
-      <span class="unanswered" style="display:inline-block;" id="status_${id}">Unanswered</span>
+      <span class="unanswered" style="display:inline-block;" id="status_${id}">${_("Unanswered")}</span>
     % elif state == 'assessing':
       <span class="grading" id="status_${id}">
       % if eta_message is not None:
@@ -30,8 +31,8 @@
 
   <div class="file-upload"></div>
 
-  <input type="button" value="Submit" class="submit-button" name="show"/>
-  <input name="skip" class="skip-button" type="button" value="Skip Post-Assessment"/>
+  <input type="button" value="${_("Submit")}" class="submit-button" name="show"/>
+  <input name="skip" class="skip-button" type="button" value="${_("Skip Post-Assessment")}"/>
 
   <div class="open-ended-action"></div>
 

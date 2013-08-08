@@ -2,18 +2,19 @@
 {% load compressed %}{% load sekizai_tags i18n %}{% load url from future %}{% load staticfiles %}
 <html>
 <head>
+  {# "edX" should *not* be translated #}
   {% block title %}<title>edX</title>{% endblock %}
-  
+
   <link rel="icon" type="image/x-icon" href="{% static "images/favicon.ico" %}" />
-  
+
   {% compressed_css 'application' %}
   {% block main_vendor_js %}
   {% compressed_js 'main_vendor' %}
   {% endblock %}
   {% block headextra %}{% endblock %}
   {% render_block "css" %}
-  
-  
+
+
   <!--[if lt IE 9]>
   <script src="${static.url('js/html5shiv.js')}"></script>
   <![endif]-->
@@ -30,12 +31,12 @@
     {% block body %}{% endblock %}
     {% block bodyextra %}{% endblock %}
   </section>
-  
+
   {% include "footer.html" %}
-    
+
   {% compressed_js 'application' %}
   {% compressed_js 'module-js' %}
-  
+
   {% render_block "js" %}
 </body>
 </html>
@@ -45,8 +46,8 @@
   other pages inherit. This file should be rewritten to reflect any
   changes in main.html! Files used by {% include %} can be written
   as mako templates.
-  
+
   Inheriting from this file allows us to include apps that use the
   django templating system without rewriting all of their views in
-  mako. 
+  mako.
 {% endcomment %}

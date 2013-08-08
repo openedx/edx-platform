@@ -11,16 +11,9 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
         // TODO enable/disable save based on validation (currently enabled whenever there are changes)
     },
     initialize : function() {
-        var self = this;
-        // instantiates an editor template for each update in the collection
-        window.templateLoader.loadRemoteTemplate("advanced_entry",
-            "/static/client_templates/advanced_entry.html",
-            function (raw_template) {
-                self.template = _.template(raw_template);
-                self.render();
-            }
-        );
+        this.template = _.template($("#advanced_entry-tpl").text());
         this.listenTo(this.model, 'invalid', this.handleValidationError);
+        this.render();
     },
     render: function() {
         // catch potential outside call before template loaded
@@ -56,7 +49,7 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
         CodeMirror.fromTextArea(textarea, {
             mode: "application/json", lineNumbers: false, lineWrapping: false,
             onChange: function(instance, changeobj) {
-                instance.save()
+                instance.save();
                 // this event's being called even when there's no change :-(
                 if (instance.getValue() !== oldValue) {
                     var message = gettext("Your changes will not take effect until you save your progress. Take care with key and value formatting, as validation is not implemented.");
@@ -105,8 +98,7 @@ CMS.Views.Settings.Advanced = CMS.Views.ValidatingView.extend({
         //    call validateKey on each to ensure proper format
         //    check for dupes
         var self = this;
-        this.model.save({},
-            {
+        this.model.save({}, {
             success : function() {
                 self.render();
                 var title = gettext("Your policy changes have been saved.");

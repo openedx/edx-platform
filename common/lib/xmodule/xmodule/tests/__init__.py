@@ -14,10 +14,13 @@ import fs.osfs
 
 import numpy
 
+import json
+
 import calc
 import xmodule
 from xmodule.x_module import ModuleSystem
 from mock import Mock
+
 
 open_ended_grading_interface = {
         'url': 'blah/',
@@ -111,3 +114,36 @@ class ModelsTest(unittest.TestCase):
         except:
             exception_happened = True
         self.assertTrue(exception_happened)
+
+
+class PostData(object):
+    """Class which emulate postdata."""
+    def __init__(self, dict_data):
+        self.dict_data = dict_data
+
+    def getlist(self, key):
+        """Get data by key from `self.dict_data`."""
+        return self.dict_data.get(key)
+
+
+class LogicTest(unittest.TestCase):
+    """Base class for testing xmodule logic."""
+    descriptor_class = None
+    raw_model_data = {}
+
+    def setUp(self):
+        class EmptyClass:
+            """Empty object."""
+            url_name = ''
+            category = 'test'
+
+        self.system = get_test_system()
+        self.descriptor = EmptyClass()
+
+        self.xmodule_class = self.descriptor_class.module_class
+        self.xmodule = self.xmodule_class(
+            self.system, self.descriptor, self.raw_model_data)
+
+    def ajax_request(self, dispatch, data):
+        """Call Xmodule.handle_ajax."""
+        return json.loads(self.xmodule.handle_ajax(dispatch, data))

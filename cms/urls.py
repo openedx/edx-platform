@@ -6,12 +6,13 @@ from django.conf.urls import patterns, include, url
 from . import one_time_startup
 
 # There is a course creators admin table.
-from django.contrib import admin
+from ratelimitbackend import admin
 admin.autodiscover()
 
 urlpatterns = ('',  # nopep8
     url(r'^$', 'contentstore.views.howitworks', name='homepage'),
     url(r'^listing', 'contentstore.views.index', name='index'),
+    url(r'^request_course_creator$', 'contentstore.views.request_course_creator', name='request_course_creator'),
     url(r'^edit/(?P<location>.*?)$', 'contentstore.views.edit_unit', name='edit_unit'),
     url(r'^subsection/(?P<location>.*?)$', 'contentstore.views.edit_subsection', name='edit_subsection'),
     url(r'^preview_component/(?P<location>.*?)$', 'contentstore.views.preview_component', name='preview_component'),
@@ -39,14 +40,12 @@ urlpatterns = ('',  # nopep8
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)/upload_asset$',
         'contentstore.views.upload_asset', name='upload_asset'),
 
+    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/team/(?P<name>[^/]+)$',
+        'contentstore.views.manage_users', name='manage_users'),
+    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/team/(?P<name>[^/]+)/(?P<email>[^/]+)$',
+        'contentstore.views.course_team_user', name='course_team_user'),
 
-    url(r'^manage_users/(?P<location>.*?)$', 'contentstore.views.manage_users', name='manage_users'),
-    url(r'^add_user/(?P<location>.*?)$',
-        'contentstore.views.add_user', name='add_user'),
-    url(r'^remove_user/(?P<location>.*?)$',
-        'contentstore.views.remove_user', name='remove_user'),
-    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<name>[^/]+)/remove_user$',
-        'contentstore.views.remove_user', name='remove_user'),
+
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/info/(?P<name>[^/]+)$',
         'contentstore.views.course_info', name='course_info'),
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/course_info/updates/(?P<provided_id>.*)$',
@@ -138,9 +137,7 @@ urlpatterns += (
 
 
 if settings.ENABLE_JASMINE:
-    # # Jasmine
-    urlpatterns = urlpatterns + (url(r'^_jasmine/', include('django_jasmine.urls')),)
-
+    urlpatterns += (url(r'^_jasmine/', include('django_jasmine.urls')),)
 
 if settings.MITX_FEATURES.get('ENABLE_SERVICE_STATUS'):
     urlpatterns += (
@@ -148,6 +145,19 @@ if settings.MITX_FEATURES.get('ENABLE_SERVICE_STATUS'):
     )
 
 urlpatterns += (url(r'^admin/', include(admin.site.urls)),)
+
+# enable automatic login
+if settings.MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING'):
+    urlpatterns += (
+        url(r'^auto_auth$', 'student.views.auto_auth'),
+    )
+
+if settings.DEBUG:
+    try:
+        from .urls_dev import urlpatterns as dev_urlpatterns
+        urlpatterns += dev_urlpatterns
+    except ImportError:
+        pass
 
 urlpatterns = patterns(*urlpatterns)
 
