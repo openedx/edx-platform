@@ -14,6 +14,7 @@ from xmodule.stringify import stringify_children
 from xmodule.x_module import XModule
 from xmodule.xml_module import XmlDescriptor, name_to_pathname
 import textwrap
+from xmodule.contentstore.content import StaticContent
 
 log = logging.getLogger("mitx.courseware")
 
@@ -78,6 +79,17 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):
             if candidate.endswith('.xml'):
                 nc.append(candidate[:-4] + '.html')
         return candidates + nc
+
+    def get_context(self):
+        """
+        an override to add in specific rendering context, in this case we need to
+        add in a base path to our c4x content addressing scheme
+        """
+        _context = EditingDescriptor.get_context(self)
+        # Add some specific HTML rendering context when editing HTML modules where we pass
+        # the root /c4x/ url for assets. This allows client-side substitutions to occur.
+        _context.update({'base_asset_url': StaticContent.get_base_url_path_for_course_assets(self.location) + '/'})
+        return _context
 
     # NOTE: html descriptors are special.  We do not want to parse and
     # export them ourselves, because that can break things (e.g. lxml
