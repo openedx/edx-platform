@@ -379,7 +379,7 @@ if settings.MITX_FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD'):
 
 # Shopping cart
 urlpatterns += (
-    url(r'^shoppingcarttest/(?P<course_id>[^/]+/[^/]+/[^/]+)/$','shoppingcart.views.test'),
+    url(r'^shoppingcart/', include('shoppingcart.urls')),
 )
 
 

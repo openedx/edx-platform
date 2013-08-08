@@ -1,0 +1,46 @@
+<%! from django.utils.translation import ugettext as _ %>
+
+<%! from django.core.urlresolvers import reverse %>
+
+<%inherit file="../main.html" />
+
+<%block name="title"><title>${_("Your Shopping Cart")}</title></%block>
+
+<section class="container cart-list">
+<table>
+    <thead>
+    <tr><td>Qty</td><td>Description</td><td>Unit Price</td><td>Price</td></tr>
+    </thead>
+    <tbody>
+    % for idx,item in enumerate(shoppingcart_items):
+    <tr><td>${item.qty}</td><td>${item.line_desc}</td><td>${item.unit_cost}</td><td>${item.line_cost}</td>
+        <td><a data-item-idx="${idx}" class='remove_line_item' href='#'>[x]</a></td></tr>
+    % endfor
+    <tr><td></td><td></td><td></td><td>Total Cost</td></tr>
+    <tr><td></td><td></td><td></td><td>${total_cost}</td></tr>
+
+    </tbody>
+</table>
+
+<form action="https://orderpagetest.ic3.com/hop/orderform.jsp" method="post">
+    % for pk, pv in params.iteritems():
+        <input type="hidden" name="${pk}" value="${pv}" />
+    % endfor
+        <input type="submit" value="Check Out" />
+</form>
+</section>
+
+
+<script>
+    $(function() {
+        $('a.remove_line_item').click(function(event) {
+            event.preventDefault();
+            var post_url = "${reverse('shoppingcart.views.remove_item')}";
+            $.post(post_url, {idx:$(this).data('item-idx')})
+                   .always(function(data){
+                        location.reload(true);
+                    });
+        });
+    });
+</script>
+
