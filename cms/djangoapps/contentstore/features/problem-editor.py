@@ -135,7 +135,7 @@ def set_the_weight_to_abc(step, bad_weight):
 
 @step('if I set the max attempts to "(.*)", it will persist as a valid integer$')
 def set_the_max_attempts(step, max_attempts_set):
-    #on firefox with selenium, the behaviour is different.  eg 2.34 displays as 2.34 and is persisted as 2
+    # on firefox with selenium, the behaviour is different.  eg 2.34 displays as 2.34 and is persisted as 2
     index = world.get_setting_entry_index(MAXIMUM_ATTEMPTS)
     world.css_fill('.wrapper-comp-setting .setting-input', max_attempts_set, index=index)
     if world.is_firefox():
