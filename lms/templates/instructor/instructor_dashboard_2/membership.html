@@ -54,6 +54,14 @@
 
   <div class="request-response-error"></div>
 
+  %if not section_data['access']['instructor']:
+    <p>
+      Staff cannot modify staff or beta tester lists. To modify these lists,
+      contact your instructor and ask them to add you as an instructor for staff
+      and beta lists, or a forum admin for forum management.
+    </p>
+  %endif
+
   %if section_data['access']['instructor']:
     <div class="auth-list-container"
       data-rolename="staff"
@@ -68,18 +76,16 @@
       data-add-button-label="Add Staff"
     ></div>
 
-    %if section_data['access']['instructor']:
-      <div class="auth-list-container"
-        data-rolename="instructor"
-        data-display-name="Instructors"
-        data-info-text="
-          Instructors are the core administration of your course. Instructors can
-          add and remove course staff, as well as administer forum access."
-        data-list-endpoint="${ section_data['list_course_role_members_url'] }"
-        data-modify-endpoint="${ section_data['modify_access_url'] }"
-        data-add-button-label="Add Instructor"
-      ></div>
-    %endif
+    <div class="auth-list-container"
+      data-rolename="instructor"
+      data-display-name="Instructors"
+      data-info-text="
+        Instructors are the core administration of your course. Instructors can
+        add and remove course staff, as well as administer forum access."
+      data-list-endpoint="${ section_data['list_course_role_members_url'] }"
+      data-modify-endpoint="${ section_data['modify_access_url'] }"
+      data-add-button-label="Add Instructor"
+    ></div>
 
     <div class="auth-list-container"
       data-rolename="beta"
@@ -92,19 +98,17 @@
       data-modify-endpoint="${ section_data['modify_access_url'] }"
       data-add-button-label="Add Beta Tester"
     ></div>
-  %endif
 
-  %if section_data['access']['instructor']:
-      <div class="auth-list-container"
-        data-rolename="Administrator"
-        data-display-name="Forum Admins"
-        data-info-text="
-          Forum admins can moderate the course forums as well as administer
-          other forum roles."
-        data-list-endpoint="${ section_data['list_forum_members_url'] }"
-        data-modify-endpoint="${ section_data['update_forum_role_membership_url'] }"
-        data-add-button-label="Add Forum Admin"
-      ></div>
+    <div class="auth-list-container"
+      data-rolename="Administrator"
+      data-display-name="Forum Admins"
+      data-info-text="
+        Forum admins can moderate the course forums as well as administer
+        other forum roles."
+      data-list-endpoint="${ section_data['list_forum_members_url'] }"
+      data-modify-endpoint="${ section_data['update_forum_role_membership_url'] }"
+      data-add-button-label="Add Forum Admin"
+    ></div>
   %endif
 
   %if section_data['access']['instructor'] or section_data['access']['forum_admin']:
