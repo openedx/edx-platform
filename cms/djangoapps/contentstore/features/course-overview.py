@@ -128,10 +128,10 @@ def change_grading_status(step):
 
 @step(u'I reorder subsections')
 def reorder_subsections(_step):
-    draggable_css = 'a.drag-handle'
+    draggable_css = '.subsection-drag-handle'
     ele = world.css_find(draggable_css).first
     ele.action_chains.drag_and_drop_by_offset(
         ele._element,
-        30,
-        0
+        0,
+        10
     ).perform()
