@@ -33,7 +33,7 @@ class TabsEditingDescriptorTestCase(unittest.TestCase):
             },
             {
                 'name': "Subtitles",
-                'template': "videoalpha/subtitles.html",
+                'template': "video/subtitles.html",
             },
             {
                 'name': "Settings",

@@ -2,22 +2,22 @@
 """Video xmodule tests in mongo."""
 
 from . import BaseTestXmodule
-from .test_videoalpha_xml import SOURCE_XML
+from .test_video_xml import SOURCE_XML
 from django.conf import settings
-from xmodule.videoalpha_module import _create_youtube_string
+from xmodule.video_module import _create_youtube_string
 
 
 class TestVideo(BaseTestXmodule):
     """Integration tests: web client + mongo."""
 
-    CATEGORY = "videoalpha"
+    CATEGORY = "video"
     DATA = SOURCE_XML
     MODEL_DATA = {
         'data': DATA
     }
 
     def setUp(self):
-        # Since the VideoAlphaDescriptor changes `self._model_data`,
+        # Since the VideoDescriptor changes `self._model_data`,
         # we need to instantiate `self.item_module` through
         # `self.item_descriptor` rather than directly constructing it
         super(TestVideo, self).setUp()
@@ -40,7 +40,7 @@ class TestVideo(BaseTestXmodule):
                 ]).pop(),
             404)
 
-    def test_videoalpha_constructor(self):
+    def test_video_constructor(self):
         """Make sure that all parameters extracted correclty from xml"""
 
         context = self.item_module.get_html()
@@ -74,7 +74,7 @@ class TestVideoNonYouTube(TestVideo):
     """Integration tests: web client + mongo."""
 
     DATA = """
-        <videoalpha show_captions="true"
+        <video show_captions="true"
         display_name="A Name"
         sub="a_sub_file.srt.sjson"
         start_time="01:00:03" end_time="01:00:10"
@@ -82,13 +82,13 @@ class TestVideoNonYouTube(TestVideo):
             <source src="example.mp4"/>
             <source src="example.webm"/>
             <source src="example.ogv"/>
-        </videoalpha>
+        </video>
     """
     MODEL_DATA = {
         'data': DATA
     }
 
-    def test_videoalpha_constructor(self):
+    def test_video_constructor(self):
         """Make sure that if the 'youtube' attribute is omitted in XML, then
             the template generates an empty string for the YouTube streams.
         """

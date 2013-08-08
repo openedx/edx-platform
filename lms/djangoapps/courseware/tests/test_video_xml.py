@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # pylint: disable=W0212
 
-"""Test for VideoAlpha Xmodule functional logic.
+"""Test for Video Xmodule functional logic.
 These test data read from xml, not from mongo.
 
 We have a ModuleStoreTestCase class defined in
@@ -20,14 +20,14 @@ import unittest
 
 from django.conf import settings
 
-from xmodule.videoalpha_module import (
-    VideoAlphaDescriptor, _create_youtube_string)
+from xmodule.video_module import (
+    VideoDescriptor, _create_youtube_string)
 from xmodule.modulestore import Location
 from xmodule.tests import get_test_system, LogicTest
 
 
 SOURCE_XML = """
-    <videoalpha show_captions="true"
+    <video show_captions="true"
     display_name="A Name"
     youtube="0.75:jNCf2gIqpeE,1.0:ZwkTiUPN0mg,1.25:rsq9auxASqI,1.50:kMyNdzVHHgg"
     sub="a_sub_file.srt.sjson"
@@ -36,12 +36,12 @@ SOURCE_XML = """
         <source src="example.mp4"/>
         <source src="example.webm"/>
         <source src="example.ogv"/>
-    </videoalpha>
+    </video>
 """
 
 
-class VideoAlphaFactory(object):
-    """A helper class to create videoalpha modules with various parameters
+class VideoFactory(object):
+    """A helper class to create video modules with various parameters
     for testing.
     """
 
@@ -50,28 +50,28 @@ class VideoAlphaFactory(object):
 
     @staticmethod
     def create():
-        """Method return VideoAlpha Xmodule instance."""
-        location = Location(["i4x", "edX", "videoalpha", "default",
+        """Method return Video Xmodule instance."""
+        location = Location(["i4x", "edX", "video", "default",
                              "SampleProblem1"])
-        model_data = {'data': VideoAlphaFactory.sample_problem_xml_youtube,
+        model_data = {'data': VideoFactory.sample_problem_xml_youtube,
                       'location': location}
 
         system = get_test_system()
         system.render_template = lambda template, context: context
 
-        descriptor = VideoAlphaDescriptor(system, model_data)
+        descriptor = VideoDescriptor(system, model_data)
 
         module = descriptor.xmodule(system)
 
         return module
 
 
-class VideoAlphaModuleUnitTest(unittest.TestCase):
-    """Unit tests for VideoAlpha Xmodule."""
+class VideoModuleUnitTest(unittest.TestCase):
+    """Unit tests for Video Xmodule."""
 
-    def test_videoalpha_get_html(self):
+    def test_video_get_html(self):
         """Make sure that all parameters extracted correclty from xml"""
-        module = VideoAlphaFactory.create()
+        module = VideoFactory.create()
         module.runtime.render_template = lambda template, context: context
 
         sources = {
@@ -98,18 +98,18 @@ class VideoAlphaModuleUnitTest(unittest.TestCase):
 
         self.assertEqual(module.get_html(), expected_context)
 
-    def test_videoalpha_instance_state(self):
-        module = VideoAlphaFactory.create()
+    def test_video_instance_state(self):
+        module = VideoFactory.create()
 
         self.assertDictEqual(
             json.loads(module.get_instance_state()),
             {'position': 0})
 
 
-class VideoAlphaModuleLogicTest(LogicTest):
-    """Tests for logic of VideoAlpha Xmodule."""
+class VideoModuleLogicTest(LogicTest):
+    """Tests for logic of Video Xmodule."""
 
-    descriptor_class = VideoAlphaDescriptor
+    descriptor_class = VideoDescriptor
 
     raw_model_data = {
         'data': '<video />'
@@ -117,23 +117,23 @@ class VideoAlphaModuleLogicTest(LogicTest):
 
     def test_parse_time(self):
         """Ensure that times are parsed correctly into seconds."""
-        output = VideoAlphaDescriptor._parse_time('00:04:07')
+        output = VideoDescriptor._parse_time('00:04:07')
         self.assertEqual(output, 247)
 
     def test_parse_time_none(self):
         """Check parsing of None."""
-        output = VideoAlphaDescriptor._parse_time(None)
+        output = VideoDescriptor._parse_time(None)
         self.assertEqual(output, '')
 
     def test_parse_time_empty(self):
         """Check parsing of the empty string."""
-        output = VideoAlphaDescriptor._parse_time('')
+        output = VideoDescriptor._parse_time('')
         self.assertEqual(output, '')
 
     def test_parse_youtube(self):
         """Test parsing old-style Youtube ID strings into a dict."""
         youtube_str = '0.75:jNCf2gIqpeE,1.00:ZwkTiUPN0mg,1.25:rsq9auxASqI,1.50:kMyNdzVHHgg'
-        output = VideoAlphaDescriptor._parse_youtube(youtube_str)
+        output = VideoDescriptor._parse_youtube(youtube_str)
         self.assertEqual(output, {'0.75': 'jNCf2gIqpeE',
                                   '1.00': 'ZwkTiUPN0mg',
                                   '1.25': 'rsq9auxASqI',
@@ -145,7 +145,7 @@ class VideoAlphaModuleLogicTest(LogicTest):
         empty string.
         """
         youtube_str = '0.75:jNCf2gIqpeE'
-        output = VideoAlphaDescriptor._parse_youtube(youtube_str)
+        output = VideoDescriptor._parse_youtube(youtube_str)
         self.assertEqual(output, {'0.75': 'jNCf2gIqpeE',
                                   '1.00': '',
                                   '1.25': '',
@@ -158,8 +158,8 @@ class VideoAlphaModuleLogicTest(LogicTest):
         youtube_str = '1.00:p2Q6BrNhdh8'
         youtube_str_hack = '1.0:p2Q6BrNhdh8'
         self.assertEqual(
-            VideoAlphaDescriptor._parse_youtube(youtube_str),
-            VideoAlphaDescriptor._parse_youtube(youtube_str_hack)
+            VideoDescriptor._parse_youtube(youtube_str),
+            VideoDescriptor._parse_youtube(youtube_str_hack)
         )
 
     def test_parse_youtube_empty(self):
@@ -167,7 +167,7 @@ class VideoAlphaModuleLogicTest(LogicTest):
         Some courses have empty youtube attributes, so we should handle
         that well.
         """
-        self.assertEqual(VideoAlphaDescriptor._parse_youtube(''),
+        self.assertEqual(VideoDescriptor._parse_youtube(''),
                          {'0.75': '',
                           '1.00': '',
                           '1.25': '',

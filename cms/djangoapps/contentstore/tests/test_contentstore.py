@@ -107,8 +107,8 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         expected_types is the list of elements that should appear on the page.
 
         expected_types and component_types should be similar, but not
-        exactly the same -- for example, 'videoalpha' in
-        component_types should cause 'Video Alpha' to be present.
+        exactly the same -- for example, 'video' in
+        component_types should cause 'Video' to be present.
         """
         store = modulestore('direct')
         import_from_xml(store, 'common/test/data/', ['simple'])
@@ -143,7 +143,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
                                                                  'Peer Grading Interface'])
 
     def test_advanced_components_require_two_clicks(self):
-        self.check_components_on_page(['videoalpha'], ['Video Alpha'])
+        self.check_components_on_page(['video'], ['Video'])
 
     def test_malformed_edit_unit_request(self):
         store = modulestore('direct')
@@ -1624,7 +1624,7 @@ class MetadataSaveTestCase(ModuleStoreTestCase):
         constructor are correctly persisted.
         """
         # We should start with a source field, from the XML's <source/> tag
-        self.assertIn('source', own_metadata(self.descriptor))
+        self.assertIn('html5_sources', own_metadata(self.descriptor))
         attrs_to_strip = {
             'show_captions',
             'youtube_id_1_0',
@@ -1634,6 +1634,7 @@ class MetadataSaveTestCase(ModuleStoreTestCase):
             'start_time',
             'end_time',
             'source',
+            'html5_sources',
             'track'
         }
         # We strip out all metadata fields to reproduce a bug where
@@ -1646,11 +1647,11 @@ class MetadataSaveTestCase(ModuleStoreTestCase):
                 field.delete_from(self.descriptor)
 
         # Assert that we correctly stripped the field
-        self.assertNotIn('source', own_metadata(self.descriptor))
+        self.assertNotIn('html5_sources', own_metadata(self.descriptor))
         get_modulestore(self.descriptor.location).update_metadata(
             self.descriptor.location,
             own_metadata(self.descriptor)
         )
         module = get_modulestore(self.descriptor.location).get_item(self.descriptor.location)
         # Assert that get_item correctly sets the metadata
-        self.assertIn('source', own_metadata(module))
+        self.assertIn('html5_sources', own_metadata(module))

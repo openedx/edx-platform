@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #pylint: disable=W0212
-"""Test for Video Alpha Xmodule functional logic.
+"""Test for Video Xmodule functional logic.
 These test data read from xml, not from mongo.
 
 We have a ModuleStoreTestCase class defined in
@@ -17,37 +17,36 @@ import unittest
 from . import LogicTest
 from .import get_test_system
 from xmodule.modulestore import Location
-from xmodule.videoalpha_module import VideoAlphaDescriptor, _create_youtube_string
-from xmodule.video_module import VideoDescriptor
+from xmodule.video_module import VideoDescriptor, _create_youtube_string
 from .test_import import DummySystem
 
 from textwrap import dedent
 
 
-class VideoAlphaModuleTest(LogicTest):
-    """Logic tests for VideoAlpha Xmodule."""
-    descriptor_class = VideoAlphaDescriptor
+class VideoModuleTest(LogicTest):
+    """Logic tests for Video Xmodule."""
+    descriptor_class = VideoDescriptor
 
     raw_model_data = {
-        'data': '<videoalpha />'
+        'data': '<video />'
     }
 
     def test_parse_time_empty(self):
         """Ensure parse_time returns correctly with None or empty string."""
         expected = ''
-        self.assertEqual(VideoAlphaDescriptor._parse_time(None), expected)
-        self.assertEqual(VideoAlphaDescriptor._parse_time(''), expected)
+        self.assertEqual(VideoDescriptor._parse_time(None), expected)
+        self.assertEqual(VideoDescriptor._parse_time(''), expected)
 
     def test_parse_time(self):
         """Ensure that times are parsed correctly into seconds."""
         expected = 247
-        output = VideoAlphaDescriptor._parse_time('00:04:07')
+        output = VideoDescriptor._parse_time('00:04:07')
         self.assertEqual(output, expected)
 
     def test_parse_youtube(self):
         """Test parsing old-style Youtube ID strings into a dict."""
         youtube_str = '0.75:jNCf2gIqpeE,1.00:ZwkTiUPN0mg,1.25:rsq9auxASqI,1.50:kMyNdzVHHgg'
-        output = VideoAlphaDescriptor._parse_youtube(youtube_str)
+        output = VideoDescriptor._parse_youtube(youtube_str)
         self.assertEqual(output, {'0.75': 'jNCf2gIqpeE',
                                   '1.00': 'ZwkTiUPN0mg',
                                   '1.25': 'rsq9auxASqI',
@@ -59,7 +58,7 @@ class VideoAlphaModuleTest(LogicTest):
         empty string.
         """
         youtube_str = '0.75:jNCf2gIqpeE'
-        output = VideoAlphaDescriptor._parse_youtube(youtube_str)
+        output = VideoDescriptor._parse_youtube(youtube_str)
         self.assertEqual(output, {'0.75': 'jNCf2gIqpeE',
                                   '1.00': '',
                                   '1.25': '',
@@ -72,8 +71,8 @@ class VideoAlphaModuleTest(LogicTest):
         youtube_str = '1.00:p2Q6BrNhdh8'
         youtube_str_hack = '1.0:p2Q6BrNhdh8'
         self.assertEqual(
-            VideoAlphaDescriptor._parse_youtube(youtube_str),
-            VideoAlphaDescriptor._parse_youtube(youtube_str_hack)
+            VideoDescriptor._parse_youtube(youtube_str),
+            VideoDescriptor._parse_youtube(youtube_str_hack)
         )
 
     def test_parse_youtube_empty(self):
@@ -82,7 +81,7 @@ class VideoAlphaModuleTest(LogicTest):
         that well.
         """
         self.assertEqual(
-            VideoAlphaDescriptor._parse_youtube(''),
+            VideoDescriptor._parse_youtube(''),
             {'0.75': '',
              '1.00': '',
              '1.25': '',
@@ -90,12 +89,12 @@ class VideoAlphaModuleTest(LogicTest):
         )
 
 
-class VideoAlphaDescriptorTest(unittest.TestCase):
-    """Test for VideoAlphaDescriptor"""
+class VideoDescriptorTest(unittest.TestCase):
+    """Test for VideoDescriptor"""
 
     def setUp(self):
         system = get_test_system()
-        self.descriptor = VideoAlphaDescriptor(
+        self.descriptor = VideoDescriptor(
             runtime=system,
             model_data={})
 
@@ -117,9 +116,9 @@ class VideoAlphaDescriptorTest(unittest.TestCase):
         back out to XML.
         """
         system = DummySystem(load_error_modules=True)
-        location = Location(["i4x", "edX", "videoalpha", "default", "SampleProblem1"])
+        location = Location(["i4x", "edX", "video", "default", "SampleProblem1"])
         model_data = {'location': location}
-        descriptor = VideoAlphaDescriptor(system, model_data)
+        descriptor = VideoDescriptor(system, model_data)
         descriptor.youtube_id_0_75 = 'izygArpw-Qo'
         descriptor.youtube_id_1_0 = 'p2Q6BrNhdh8'
         descriptor.youtube_id_1_25 = '1EeWXzPdhSA'
@@ -133,9 +132,9 @@ class VideoAlphaDescriptorTest(unittest.TestCase):
         in the output string.
         """
         system = DummySystem(load_error_modules=True)
-        location = Location(["i4x", "edX", "videoalpha", "default", "SampleProblem1"])
+        location = Location(["i4x", "edX", "video", "default", "SampleProblem1"])
         model_data = {'location': location}
-        descriptor = VideoAlphaDescriptor(system, model_data)
+        descriptor = VideoDescriptor(system, model_data)
         descriptor.youtube_id_0_75 = 'izygArpw-Qo'
         descriptor.youtube_id_1_0 = 'p2Q6BrNhdh8'
         descriptor.youtube_id_1_25 = '1EeWXzPdhSA'
@@ -143,9 +142,9 @@ class VideoAlphaDescriptorTest(unittest.TestCase):
         self.assertEqual(_create_youtube_string(descriptor), expected)
 
 
-class VideoAlphaDescriptorImportTestCase(unittest.TestCase):
+class VideoDescriptorImportTestCase(unittest.TestCase):
     """
-    Make sure that VideoAlphaDescriptor can import an old XML-based video correctly.
+    Make sure that VideoDescriptor can import an old XML-based video correctly.
     """
 
     def assert_attributes_equal(self, video, attrs):
@@ -158,7 +157,7 @@ class VideoAlphaDescriptorImportTestCase(unittest.TestCase):
 
     def test_constructor(self):
         sample_xml = '''
-            <videoalpha display_name="Test Video"
+            <video display_name="Test Video"
                    youtube="1.0:p2Q6BrNhdh8,0.75:izygArpw-Qo,1.25:1EeWXzPdhSA,1.5:rABDYkeK0x8"
                    show_captions="false"
                    start_time="00:00:01"
@@ -166,14 +165,14 @@ class VideoAlphaDescriptorImportTestCase(unittest.TestCase):
               <source src="http://www.example.com/source.mp4"/>
               <source src="http://www.example.com/source.ogg"/>
               <track src="http://www.example.com/track"/>
-            </videoalpha>
+            </video>
         '''
-        location = Location(["i4x", "edX", "videoalpha", "default",
+        location = Location(["i4x", "edX", "video", "default",
                              "SampleProblem1"])
         model_data = {'data': sample_xml,
                       'location': location}
         system = DummySystem(load_error_modules=True)
-        descriptor = VideoAlphaDescriptor(system, model_data)
+        descriptor = VideoDescriptor(system, model_data)
         self.assert_attributes_equal(descriptor, {
             'youtube_id_0_75': 'izygArpw-Qo',
             'youtube_id_1_0': 'p2Q6BrNhdh8',
@@ -190,16 +189,16 @@ class VideoAlphaDescriptorImportTestCase(unittest.TestCase):
     def test_from_xml(self):
         module_system = DummySystem(load_error_modules=True)
         xml_data = '''
-            <videoalpha display_name="Test Video"
+            <video display_name="Test Video"
                    youtube="1.0:p2Q6BrNhdh8,0.75:izygArpw-Qo,1.25:1EeWXzPdhSA,1.5:rABDYkeK0x8"
                    show_captions="false"
                    start_time="00:00:01"
                    end_time="00:01:00">
               <source src="http://www.example.com/source.mp4"/>
               <track src="http://www.example.com/track"/>
-            </videoalpha>
+            </video>
         '''
-        output = VideoAlphaDescriptor.from_xml(xml_data, module_system)
+        output = VideoDescriptor.from_xml(xml_data, module_system)
         self.assert_attributes_equal(output, {
             'youtube_id_0_75': 'izygArpw-Qo',
             'youtube_id_1_0': 'p2Q6BrNhdh8',
@@ -221,14 +220,14 @@ class VideoAlphaDescriptorImportTestCase(unittest.TestCase):
         """
         module_system = DummySystem(load_error_modules=True)
         xml_data = '''
-            <videoalpha display_name="Test Video"
+            <video display_name="Test Video"
                    youtube="1.0:p2Q6BrNhdh8,1.25:1EeWXzPdhSA"
                    show_captions="true">
               <source src="http://www.example.com/source.mp4"/>
               <track src="http://www.example.com/track"/>
-            </videoalpha>
+            </video>
         '''
-        output = VideoAlphaDescriptor.from_xml(xml_data, module_system)
+        output = VideoDescriptor.from_xml(xml_data, module_system)
         self.assert_attributes_equal(output, {
             'youtube_id_0_75': '',
             'youtube_id_1_0': 'p2Q6BrNhdh8',
@@ -248,8 +247,8 @@ class VideoAlphaDescriptorImportTestCase(unittest.TestCase):
         Make sure settings are correct if none are explicitly set in XML.
         """
         module_system = DummySystem(load_error_modules=True)
-        xml_data = '<videoalpha></videoalpha>'
-        output = VideoAlphaDescriptor.from_xml(xml_data, module_system)
+        xml_data = '<video></video>'
+        output = VideoDescriptor.from_xml(xml_data, module_system)
         self.assert_attributes_equal(output, {
             'youtube_id_0_75': '',
             'youtube_id_1_0': 'OEoXaMPEzfM',
@@ -270,16 +269,16 @@ class VideoAlphaDescriptorImportTestCase(unittest.TestCase):
         """
         module_system = DummySystem(load_error_modules=True)
         xml_data = """
-            <videoalpha display_name="Test Video"
+            <video display_name="Test Video"
                    youtube="1.0:p2Q6BrNhdh8,0.75:izygArpw-Qo,1.25:1EeWXzPdhSA,1.5:rABDYkeK0x8"
                    show_captions="false"
                    from="00:00:01"
                    to="00:01:00">
               <source src="http://www.example.com/source.mp4"/>
               <track src="http://www.example.com/track"/>
-            </videoalpha>
+            </video>
         """
-        output = VideoAlphaDescriptor.from_xml(xml_data, module_system)
+        output = VideoDescriptor.from_xml(xml_data, module_system)
         self.assert_attributes_equal(output, {
             'youtube_id_0_75': 'izygArpw-Qo',
             'youtube_id_1_0': 'p2Q6BrNhdh8',
@@ -295,7 +294,7 @@ class VideoAlphaDescriptorImportTestCase(unittest.TestCase):
 
     def test_old_video_data(self):
         """
-        Ensure that Video Alpha is able to read VideoModule's model data.
+        Ensure that Video is able to read VideoModule's model data.
         """
         module_system = DummySystem(load_error_modules=True)
         xml_data = """
@@ -309,8 +308,7 @@ class VideoAlphaDescriptorImportTestCase(unittest.TestCase):
             </video>
         """
         video = VideoDescriptor.from_xml(xml_data, module_system)
-        video_alpha = VideoAlphaDescriptor(module_system, video._model_data)
-        self.assert_attributes_equal(video_alpha, {
+        self.assert_attributes_equal(video, {
             'youtube_id_0_75': 'izygArpw-Qo',
             'youtube_id_1_0': 'p2Q6BrNhdh8',
             'youtube_id_1_25': '1EeWXzPdhSA',
@@ -324,17 +322,17 @@ class VideoAlphaDescriptorImportTestCase(unittest.TestCase):
         })
 
 
-class VideoAlphaExportTestCase(unittest.TestCase):
+class VideoExportTestCase(unittest.TestCase):
     """
-    Make sure that VideoAlphaDescriptor can export itself to XML
+    Make sure that VideoDescriptor can export itself to XML
     correctly.
     """
 
     def test_export_to_xml(self):
         """Test that we write the correct XML on export."""
         module_system = DummySystem(load_error_modules=True)
-        location = Location(["i4x", "edX", "videoalpha", "default", "SampleProblem1"])
-        desc = VideoAlphaDescriptor(module_system, {'location': location})
+        location = Location(["i4x", "edX", "video", "default", "SampleProblem1"])
+        desc = VideoDescriptor(module_system, {'location': location})
 
         desc.youtube_id_0_75 = 'izygArpw-Qo'
         desc.youtube_id_1_0 = 'p2Q6BrNhdh8'
@@ -348,11 +346,11 @@ class VideoAlphaExportTestCase(unittest.TestCase):
 
         xml = desc.export_to_xml(None)  # We don't use the `resource_fs` parameter
         expected = dedent('''\
-         <videoalpha display_name="Video Alpha" start_time="0:00:01" youtube="0.75:izygArpw-Qo,1.00:p2Q6BrNhdh8,1.25:1EeWXzPdhSA,1.50:rABDYkeK0x8" show_captions="false" end_time="0:01:00">
+         <video display_name="Video" start_time="0:00:01" youtube="0.75:izygArpw-Qo,1.00:p2Q6BrNhdh8,1.25:1EeWXzPdhSA,1.50:rABDYkeK0x8" show_captions="false" end_time="0:01:00">
            <source src="http://www.example.com/source.mp4"/>
            <source src="http://www.example.com/source.ogg"/>
            <track src="http://www.example.com/track"/>
-         </videoalpha>
+         </video>
         ''')
 
         self.assertEquals(expected, xml)
@@ -360,10 +358,10 @@ class VideoAlphaExportTestCase(unittest.TestCase):
     def test_export_to_xml_empty_parameters(self):
         """Test XML export with defaults."""
         module_system = DummySystem(load_error_modules=True)
-        location = Location(["i4x", "edX", "videoalpha", "default", "SampleProblem1"])
-        desc = VideoAlphaDescriptor(module_system, {'location': location})
+        location = Location(["i4x", "edX", "video", "default", "SampleProblem1"])
+        desc = VideoDescriptor(module_system, {'location': location})
 
         xml = desc.export_to_xml(None)
-        expected = '<videoalpha display_name="Video Alpha" youtube="1.00:OEoXaMPEzfM" show_captions="true"/>\n'
+        expected = '<video display_name="Video" youtube="1.00:OEoXaMPEzfM" show_captions="true"/>\n'
 
         self.assertEquals(expected, xml)
