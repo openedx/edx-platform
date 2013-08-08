@@ -13,7 +13,7 @@ TEST_ROOT = settings.COMMON_TEST_DATA_ROOT
 @step(u'I go to the files and uploads page')
 def go_to_uploads(_step):
     menu_css = 'li.nav-course-courseware'
-    uploads_css = 'li.nav-course-courseware-uploads'
+    uploads_css = 'li.nav-course-courseware-uploads a'
     world.css_click(menu_css)
     world.css_click(uploads_css)
 

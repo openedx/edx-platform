@@ -11,6 +11,7 @@ Feature: Login in as a registered user
     And I submit my credentials on the login form
     Then I should see the login error message "This account has not been activated"
 
+    # CHROME ONLY, firefox will not redirect properly
     Scenario: Login to an activated account
     Given I am an edX user
     And I am an activated user

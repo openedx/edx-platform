@@ -70,8 +70,12 @@ def press_the_notification_button(_step, name):
         confirmation_dismissed = world.is_css_not_present('.is-shown.wrapper-notification-warning')
         error_showing = world.is_css_present('.is-shown.wrapper-notification-error')
         return confirmation_dismissed or error_showing
-
-    world.css_click(css, success_condition=button_clicked), '%s button not clicked after 5 attempts.' % name
+    if world.is_firefox():
+        # This is done to explicitly make the changes save on firefox.  It will remove focus from the previously focused element
+        world.trigger_event(css, event='focus')
+        world.browser.execute_script("$('{}').click()".format(css))
+    else:
+        world.css_click(css, success_condition=button_clicked), '%s button not clicked after 5 attempts.' % name
 
 
 @step('I change the "(.*)" field to "(.*)"$')
@@ -230,7 +234,7 @@ def i_created_video_alpha(step):
 def i_enabled_the_advanced_module(step, module):
     step.given('I have opened a new course section in Studio')
     world.css_click('.nav-course-settings')
-    world.css_click('.nav-course-settings-advanced')
+    world.css_click('.nav-course-settings-advanced a')
     type_in_codemirror(0, '["%s"]' % module)
     press_the_notification_button(step, 'Save')
 
@@ -272,7 +276,7 @@ def i_am_shown_a_notification(step, notification_type):
 
 
 def type_in_codemirror(index, text):
-    world.css_click(".CodeMirror", index=index)
+    world.css_click("div.CodeMirror-lines", index=index)
     world.browser.execute_script("$('div.CodeMirror.CodeMirror-focused > div').css('overflow', '')")
     g = world.css_find("div.CodeMirror.CodeMirror-focused > div > textarea")
     if world.is_mac():
@@ -281,3 +285,5 @@ def type_in_codemirror(index, text):
         g._element.send_keys(Keys.CONTROL + 'a')
     g._element.send_keys(Keys.DELETE)
     g._element.send_keys(text)
+    if world.is_firefox():
+        world.trigger_event('div.CodeMirror', index=index, event='blur')
