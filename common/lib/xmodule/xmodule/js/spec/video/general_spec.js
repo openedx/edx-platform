@@ -1,5 +1,5 @@
 (function () {
-    xdescribe('VideoAlpha', function () {
+    xdescribe('Video', function () {
         var oldOTBD;
 
         beforeEach(function () {
@@ -12,7 +12,7 @@
         });
 
         afterEach(function () {
-            window.OldVideoPlayerAlpha = undefined;
+            window.OldVideoPlayer = undefined;
             window.onYouTubePlayerAPIReady = undefined;
             window.onHTML5PlayerAPIReady = undefined;
             $('source').remove();
@@ -22,13 +22,13 @@
         describe('constructor', function () {
             describe('YT', function () {
                 beforeEach(function () {
-                    loadFixtures('videoalpha.html');
+                    loadFixtures('video.html');
                     $.cookie.andReturn('0.75');
                 });
 
                 describe('by default', function () {
                     beforeEach(function () {
-                        this.state = new window.VideoAlpha('#example');
+                        this.state = new window.Video('#example');
                     });
 
                     it('check videoType', function () {
@@ -36,7 +36,7 @@
                     });
 
                     it('reset the current video player', function () {
-                        expect(window.OldVideoPlayerAlpha).toBeUndefined();
+                        expect(window.OldVideoPlayer).toBeUndefined();
                     });
 
                     it('set the elements', function () {
@@ -64,14 +64,14 @@
                 var state;
 
                 beforeEach(function () {
-                    loadFixtures('videoalpha_html5.html');
-                    this.stubVideoPlayerAlpha = jasmine.createSpy('VideoPlayerAlpha');
+                    loadFixtures('video_html5.html');
+                    this.stubVideoPlayer = jasmine.createSpy('VideoPlayer');
                     $.cookie.andReturn('0.75');
                 });
 
                 describe('by default', function () {
                     beforeEach(function () {
-                        state = new window.VideoAlpha('#example');
+                        state = new window.Video('#example');
                     });
 
                     afterEach(function () {
@@ -83,7 +83,7 @@
                     });
 
                     it('reset the current video player', function () {
-                        expect(window.OldVideoPlayerAlpha).toBeUndefined();
+                        expect(window.OldVideoPlayer).toBeUndefined();
                     });
 
                     it('set the elements', function () {
@@ -104,8 +104,8 @@
                     it('parse the videos if subtitles do not exist', function () {
                         var sub = '';
 
-                        $('#example').find('.videoalpha').data('sub', '');
-                        state = new window.VideoAlpha('#example');
+                        $('#example').find('.video').data('sub', '');
+                        state = new window.Video('#example');
 
                         expect(state.videos).toEqual({
                             '0.75': sub,
@@ -142,7 +142,7 @@
                 // is required.
                 describe('HTML5 API is available', function () {
                     beforeEach(function () {
-                        state = new VideoAlpha('#example');
+                        state = new Video('#example');
                     });
 
                     afterEach(function () {
@@ -158,9 +158,9 @@
 
         describe('youtubeId', function () {
             beforeEach(function () {
-                loadFixtures('videoalpha.html');
+                loadFixtures('video.html');
                 $.cookie.andReturn('1.0');
-                state = new VideoAlpha('#example');
+                state = new Video('#example');
             });
 
             describe('with speed', function () {
@@ -180,8 +180,8 @@
         describe('setSpeed', function () {
             describe('YT', function () {
                 beforeEach(function () {
-                    loadFixtures('videoalpha.html');
-                    state = new VideoAlpha('#example');
+                    loadFixtures('video.html');
+                    state = new Video('#example');
                 });
 
                 describe('when new speed is available', function () {
@@ -214,8 +214,8 @@
 
             describe('HTML5', function () {
                 beforeEach(function () {
-                    loadFixtures('videoalpha_html5.html');
-                    state = new VideoAlpha('#example');
+                    loadFixtures('video_html5.html');
+                    state = new Video('#example');
                 });
 
                 describe('when new speed is available', function () {
@@ -249,8 +249,8 @@
 
         describe('getDuration', function () {
             beforeEach(function () {
-                loadFixtures('videoalpha.html');
-                state = new VideoAlpha('#example');
+                loadFixtures('video.html');
+                state = new Video('#example');
             });
 
             it('return duration for current video', function () {
@@ -260,8 +260,8 @@
 
         describe('log', function () {
             beforeEach(function () {
-                loadFixtures('videoalpha_html5.html');
-                state = new VideoAlpha('#example');
+                loadFixtures('video_html5.html');
+                state = new Video('#example');
                 spyOn(Logger, 'log');
                 state.videoPlayer.log('someEvent', {
                     currentTime: 25,

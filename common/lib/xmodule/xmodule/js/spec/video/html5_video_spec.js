@@ -1,10 +1,10 @@
 (function () {
-    xdescribe('VideoAlpha HTML5Video', function () {
+    xdescribe('Video HTML5Video', function () {
         var state, player, oldOTBD, playbackRates = [0.75, 1.0, 1.25, 1.5];
 
         function initialize() {
-            loadFixtures('videoalpha_html5.html');
-            state = new VideoAlpha('#example');
+            loadFixtures('video_html5.html');
+            state = new Video('#example');
             player = state.videoPlayer.player;
         }
 

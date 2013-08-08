@@ -1,10 +1,10 @@
 (function() {
-  xdescribe('VideoCaptionAlpha', function() {
+  xdescribe('VideoCaption', function() {
     var state, videoPlayer, videoCaption, videoSpeedControl, oldOTBD;
 
     function initialize() {
-      loadFixtures('videoalpha_all.html');
-      state = new VideoAlpha('#example');
+      loadFixtures('video_all.html');
+      state = new Video('#example');
       videoPlayer = state.videoPlayer;
       videoCaption = state.videoCaption;
       videoSpeedControl = state.videoSpeedControl;
@@ -33,11 +33,11 @@
         });
 
         it('create the caption element', function() {
-          expect($('.videoalpha')).toContain('ol.subtitles');
+          expect($('.video')).toContain('ol.subtitles');
         });
 
         it('add caption control to video player', function() {
-          expect($('.videoalpha')).toContain('a.hide-subtitles');
+          expect($('.video')).toContain('a.hide-subtitles');
         });
 
         it('fetch the caption', function() {

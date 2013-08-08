@@ -1,10 +1,10 @@
 (function() {
-  xdescribe('VideoQualityControlAlpha', function() {
+  xdescribe('VideoQualityControl', function() {
     var state, videoControl, videoQualityControl, oldOTBD;
 
     function initialize() {
-      loadFixtures('videoalpha.html');
-      state = new VideoAlpha('#example');
+      loadFixtures('video.html');
+      state = new Video('#example');
       videoControl = state.videoControl;
       videoQualityControl = state.videoQualityControl;
     }

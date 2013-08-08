@@ -1,15 +1,15 @@
 (function() {
-  xdescribe('VideoPlayerAlpha', function() {
+  xdescribe('VideoPlayer', function() {
     var state, videoPlayer, player, videoControl, videoCaption, videoProgressSlider, videoSpeedControl, videoVolumeControl, oldOTBD;
 
     function initialize(fixture) {
       if (typeof fixture === 'undefined') {
-        loadFixtures('videoalpha_all.html');
+        loadFixtures('video_all.html');
       } else {
         loadFixtures(fixture);
       }
 
-      state = new VideoAlpha('#example');
+      state = new Video('#example');
       videoPlayer = state.videoPlayer;
       player = videoPlayer.player;
       videoControl = state.videoControl;
@@ -20,7 +20,7 @@
     }
 
     function initializeYouTube() {
-        initialize('videoalpha.html');
+        initialize('video.html');
     }
 
     beforeEach(function () {
@@ -71,9 +71,9 @@
           expect(videoProgressSlider.el).toHaveClass('slider');
         });
 
-        // All the toHandleWith() expect tests are not necessary for this version of Video Alpha.
+        // All the toHandleWith() expect tests are not necessary for this version of Video.
         // jQuery event system is not used to trigger and invoke methods. This is an artifact from
-        // previous version of Video Alpha.
+        // previous version of Video.
       });
 
       it('create Youtube player', function() {

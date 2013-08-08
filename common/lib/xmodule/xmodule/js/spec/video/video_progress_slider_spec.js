@@ -1,10 +1,10 @@
 (function() {
-  xdescribe('VideoProgressSliderAlpha', function() {
+  xdescribe('VideoProgressSlider', function() {
     var state, videoPlayer, videoProgressSlider, oldOTBD;
 
     function initialize() {
-      loadFixtures('videoalpha_all.html');
-      state = new VideoAlpha('#example');
+      loadFixtures('video_all.html');
+      state = new Video('#example');
       videoPlayer = state.videoPlayer;
       videoProgressSlider = state.videoProgressSlider;
     }
@@ -53,7 +53,7 @@
           expect(videoProgressSlider.slider).toBeUndefined();
 
           // We can't expect $.fn.slider not to have been called,
-          // because sliders are used in other parts of VideoAlpha.
+          // because sliders are used in other parts of Video.
         });
       });
     });

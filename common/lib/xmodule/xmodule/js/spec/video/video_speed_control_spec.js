@@ -1,10 +1,10 @@
 (function() {
-  xdescribe('VideoSpeedControlAlpha', function() {
+  xdescribe('VideoSpeedControl', function() {
     var state, videoPlayer, videoControl, videoSpeedControl;
 
     function initialize() {
-      loadFixtures('videoalpha_all.html');
-      state = new VideoAlpha('#example');
+      loadFixtures('video_all.html');
+      state = new Video('#example');
       videoPlayer = state.videoPlayer;
       videoControl = state.videoControl;
       videoSpeedControl = state.videoSpeedControl;
