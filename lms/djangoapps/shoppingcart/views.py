@@ -5,6 +5,7 @@ import hmac
 import binascii
 from hashlib import sha1
 
+from django.conf import settings
 from collections import OrderedDict
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
@@ -71,10 +72,10 @@ def cybersource_sign(params):
     params needs to be an ordered dict, b/c cybersource documentation states that order is important.
     Reverse engineered from PHP version provided by cybersource
     """
-    shared_secret = "ELIDED"
-    merchant_id = "ELIDED"
-    serial_number = "ELIDED"
-    orderPage_version = "7"
+    shared_secret = settings.CYBERSOURCE.get('SHARED_SECRET','')
+    merchant_id =  settings.CYBERSOURCE.get('MERCHANT_ID','')
+    serial_number = settings.CYBERSOURCE.get('SERIAL_NUMBER','')
+    orderPage_version = settings.CYBERSOURCE.get('ORDERPAGE_VERSION','7')
     params['merchantID'] = merchant_id
     params['orderPage_timestamp'] = int(time.time()*1000)
     params['orderPage_version'] = orderPage_version
