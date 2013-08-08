@@ -111,21 +111,6 @@ jasmine.stubYoutubePlayer = ->
     obj['getAvailablePlaybackRates'] = jasmine.createSpy('getAvailablePlaybackRates').andReturn [0.75, 1.0, 1.25, 1.5]
     obj
 
-jasmine.stubVideoPlayer = (context, enableParts, createPlayer=true) ->
-  enableParts = [enableParts] unless $.isArray(enableParts)
-  suite = context.suite
-  currentPartName = suite.description while suite = suite.parentSuite
-  enableParts.push currentPartName
-
-  loadFixtures 'video.html'
-  jasmine.stubRequests()
-  YT.Player = undefined
-  videosDefinition = '0.75:7tqY6eQzVhE,1.0:cogebirgzzM'
-  context.video = new Video '#example', videosDefinition
-  jasmine.stubYoutubePlayer()
-  if createPlayer
-    return new VideoPlayer(video: context.video)
-
 jasmine.stubVideoPlayerAlpha = (context, enableParts, html5=false) ->
   console.log('stubVideoPlayerAlpha called')
   suite = context.suite

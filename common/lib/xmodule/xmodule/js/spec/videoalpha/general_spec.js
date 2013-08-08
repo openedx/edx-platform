@@ -186,7 +186,7 @@
 
                 describe('when new speed is available', function () {
                     beforeEach(function () {
-                        state.setSpeed('0.75');
+                        state.setSpeed('0.75', true);
                     });
 
                     it('set new speed', function () {
@@ -220,7 +220,7 @@
 
                 describe('when new speed is available', function () {
                     beforeEach(function () {
-                        state.setSpeed('0.75');
+                        state.setSpeed('0.75', true);
                     });
 
                     it('set new speed', function () {
