@@ -17,7 +17,7 @@ from logsettings import get_logger_config
 
 DEBUG = True
 TEMPLATE_DEBUG = True
-
+ES_DATABASE = "http://localhost:9200"
 
 MITX_FEATURES['DISABLE_START_DATES'] = True
 MITX_FEATURES['ENABLE_SQL_TRACKING_LOGS'] = True
