@@ -165,7 +165,8 @@ def load_preview_module(request, preview_id, descriptor):
 
 def get_preview_html(request, descriptor, idx):
     """
-    Returns the HTML for the XModule specified by the descriptor and idx.
+    Returns the HTML returned by the XModule's student_view,
+    specified by the descriptor and idx.
     """
     module = load_preview_module(request, str(idx), descriptor)
     return module.runtime.render(module, None, "student_view").content
