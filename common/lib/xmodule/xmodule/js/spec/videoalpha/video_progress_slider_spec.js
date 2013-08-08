@@ -1,5 +1,5 @@
 (function() {
-  xdescribe('VideoProgressSliderAlpha', function() {
+  describe('VideoProgressSliderAlpha', function() {
     var state, videoPlayer, videoProgressSlider, oldOTBD;
 
     function initialize() {

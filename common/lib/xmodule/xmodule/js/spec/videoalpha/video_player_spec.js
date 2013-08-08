@@ -1,5 +1,5 @@
 (function() {
-  xdescribe('VideoPlayerAlpha', function() {
+  describe('VideoPlayerAlpha', function() {
     var state, videoPlayer, player, videoControl, videoCaption, videoProgressSlider, videoSpeedControl, videoVolumeControl, oldOTBD;
 
     function initialize(fixture) {
@@ -54,7 +54,7 @@
 
         it('create video caption', function() {
           expect(videoCaption).toBeDefined();
-          expect(state.youtubeId()).toEqual('test_name_of_the_subtitles');
+          expect(state.youtubeId()).toEqual('Z5KLxerq05Y');
           expect(state.speed).toEqual('1.0');
           expect(state.config.caption_asset_path).toEqual('/static/subs/');
         });
@@ -98,7 +98,7 @@
             modestbranding: 1,
             html5: 1
           },
-          videoId: 'normalSpeedYoutubeId',
+          videoId: 'cogebirgzzM',
           events: {
             onReady: videoPlayer.onReady,
             onStateChange: videoPlayer.onStateChange,

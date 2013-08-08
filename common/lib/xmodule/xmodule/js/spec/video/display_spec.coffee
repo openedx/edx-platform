@@ -5,14 +5,14 @@ describe 'Video', ->
     loadFixtures 'video.html'
     jasmine.stubRequests()
 
-    @slowerSpeedYoutubeId = 'slowerSpeedYoutubeId'
-    @normalSpeedYoutubeId = 'normalSpeedYoutubeId'
+    @['7tqY6eQzVhE'] = '7tqY6eQzVhE'
+    @['cogebirgzzM'] = 'cogebirgzzM'
     metadata =
-      slowerSpeedYoutubeId:
-        id: @slowerSpeedYoutubeId
+      '7tqY6eQzVhE':
+        id: @['7tqY6eQzVhE']
         duration: 300
-      normalSpeedYoutubeId:
-        id: @normalSpeedYoutubeId
+      'cogebirgzzM':
+        id: @['cogebirgzzM']
         duration: 200
 
   afterEach ->
@@ -38,8 +38,8 @@ describe 'Video', ->
 
       it 'parse the videos', ->
         expect(@video.videos).toEqual
-          '0.75': @slowerSpeedYoutubeId
-          '1.0': @normalSpeedYoutubeId
+          '0.75': @['7tqY6eQzVhE']
+          '1.0': @['cogebirgzzM']
 
       it 'fetch the video metadata', ->
         expect(@video.fetchMetadata).toHaveBeenCalled
@@ -102,12 +102,12 @@ describe 'Video', ->
 
     describe 'with speed', ->
       it 'return the video id for given speed', ->
-        expect(@video.youtubeId('0.75')).toEqual @slowerSpeedYoutubeId
-        expect(@video.youtubeId('1.0')).toEqual @normalSpeedYoutubeId
+        expect(@video.youtubeId('0.75')).toEqual @['7tqY6eQzVhE']
+        expect(@video.youtubeId('1.0')).toEqual @['cogebirgzzM']
 
     describe 'without speed', ->
       it 'return the video id for current speed', ->
-        expect(@video.youtubeId()).toEqual @normalSpeedYoutubeId
+        expect(@video.youtubeId()).toEqual @cogebirgzzM
 
   describe 'setSpeed', ->
     beforeEach ->
@@ -148,6 +148,6 @@ describe 'Video', ->
     it 'call the logger with valid parameters', ->
       expect(Logger.log).toHaveBeenCalledWith 'someEvent',
         id: 'id'
-        code: @normalSpeedYoutubeId
+        code: @cogebirgzzM
         currentTime: 25
         speed: '1.0'
