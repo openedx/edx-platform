@@ -104,8 +104,6 @@
                     it('parse the videos if subtitles do not exist', function () {
                         var sub = '';
 
-                        // !!
-
                         $('#example').find('.videoalpha').data('sub', '');
                         state = new window.VideoAlpha('#example');
 
