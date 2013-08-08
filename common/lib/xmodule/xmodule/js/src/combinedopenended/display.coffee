@@ -297,8 +297,8 @@ class @CombinedOpenEnded
     @submit_button.unbind('click')
     @submit_button.show()
     @reset_button.hide()
-    @next_problem_button.hide()
     @hide_file_upload()
+    @next_problem_button.hide()
     @hint_area.attr('disabled', false)
     if @task_number>1 or @child_state!='initial'
       @show_status_current()
@@ -353,7 +353,7 @@ class @CombinedOpenEnded
       if @child_type=="openended"
         @skip_button.hide()
       if @task_number<@task_count
-        @next_problem()
+        @next_problem_button.show()
       else
         if @task_number==1 and @task_count==1
           @show_combined_rubric_current()

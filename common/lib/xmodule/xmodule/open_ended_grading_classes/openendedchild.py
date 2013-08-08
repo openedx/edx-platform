@@ -433,38 +433,6 @@ class OpenEndedChild(object):
 
         return success, string
 
-    def check_if_student_can_submit(self):
-        location = self.location_string
-
-        student_id = self.system.anonymous_student_id
-        success = False
-        allowed_to_submit = True
-        response = {}
-        # This is a student_facing_error
-        error_string = ("You need to peer grade {0} more in order to make another submission.  "
-                        "You have graded {1}, and {2} are required.  You have made {3} successful peer grading submissions.")
-        try:
-            response = self.peer_gs.get_data_for_location(self.location_string, student_id)
-            count_graded = response['count_graded']
-            count_required = response['count_required']
-            student_sub_count = response['student_sub_count']
-            success = True
-        except:
-            # This is a dev_facing_error
-            log.error("Could not contact external open ended graders for location {0} and student {1}".format(
-                self.location_string, student_id))
-            # This is a student_facing_error
-            error_message = "Could not contact the graders.  Please notify course staff."
-            return success, allowed_to_submit, error_message
-        if count_graded >= count_required:
-            return success, allowed_to_submit, ""
-        else:
-            allowed_to_submit = False
-            # This is a student_facing_error
-            error_message = error_string.format(count_required - count_graded, count_graded, count_required,
-                                                student_sub_count)
-            return success, allowed_to_submit, error_message
-
     def get_eta(self):
         if self.controller_qs:
             response = self.controller_qs.check_for_eta(self.location_string)

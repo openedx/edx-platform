@@ -535,9 +535,13 @@ class PeerGradingModule(PeerGradingFields, XModule):
                 log.error("Problem {0} does not exist in this course".format(location))
                 raise
 
+        good_problem_list = []
         for problem in problem_list:
             problem_location = problem['location']
-            descriptor = _find_corresponding_module_for_location(problem_location)
+            try:
+                descriptor = _find_corresponding_module_for_location(problem_location)
+            except:
+                continue
             if descriptor:
                 problem['due'] = descriptor._model_data.get('due', None)
                 grace_period_string = descriptor._model_data.get('graceperiod', None)
@@ -554,13 +558,14 @@ class PeerGradingModule(PeerGradingFields, XModule):
                 # if we can't find the due date, assume that it doesn't have one
                 problem['due'] = None
                 problem['closed'] = False
+            good_problem_list.append(problem)
 
         ajax_url = self.ajax_url
         html = self.system.render_template('peer_grading/peer_grading.html', {
             'course_id': self.system.course_id,
             'ajax_url': ajax_url,
             'success': success,
-            'problem_list': problem_list,
+            'problem_list': good_problem_list,
             'error_text': error_text,
             # Checked above
             'staff_access': False,

@@ -9,6 +9,7 @@ import self_assessment_module
 import open_ended_module
 from functools import partial
 from .combined_open_ended_rubric import CombinedOpenEndedRubric, GRADER_TYPE_IMAGE_DICT, HUMAN_GRADER_TYPE, LEGEND_LIST
+from peer_grading_service import PeerGradingService, MockPeerGradingService
 
 log = logging.getLogger("mitx.courseware")
 
@@ -116,6 +117,11 @@ class CombinedOpenEndedV1Module():
         self.accept_file_upload = instance_state.get('accept_file_upload', ACCEPT_FILE_UPLOAD) in TRUE_DICT
         self.skip_basic_checks = instance_state.get('skip_spelling_checks', SKIP_BASIC_CHECKS) in TRUE_DICT
 
+        if system.open_ended_grading_interface:
+            self.peer_gs = PeerGradingService(system.open_ended_grading_interface, system)
+        else:
+            self.peer_gs = MockPeerGradingService()
+
         due_date = instance_state.get('due', None)
 
         grace_period_string = instance_state.get('graceperiod', None)
@@ -146,6 +152,8 @@ class CombinedOpenEndedV1Module():
         self.task_xml = definition['task_xml']
         self.location = location
         self.setup_next_task()
+
+
 
     def get_tag_name(self, xml):
         """
@@ -494,6 +502,34 @@ class CombinedOpenEndedV1Module():
             pass
         return return_html
 
+    def check_if_student_has_done_needed_grading(self):
+        student_id = self.system.anonymous_student_id
+        success = False
+        allowed_to_submit = True
+        error_string = ("You need to peer grade {0} more in order to make another submission.  "
+                        "You have graded {1}, and {2} are required.  You have made {3} successful peer grading submissions.")
+        try:
+            response = self.peer_gs.get_data_for_location(self.location, student_id)
+            count_graded = response['count_graded']
+            count_required = response['count_required']
+            student_sub_count = response['student_sub_count']
+            success = True
+        except:
+            # This is a dev_facing_error
+            log.error("Could not contact external open ended graders for location {0} and student {1}".format(
+                self.location, student_id))
+            # This is a student_facing_error
+            error_message = "Could not contact the graders.  Please notify course staff."
+            return success, allowed_to_submit, error_message
+        if count_graded >= count_required:
+            return success, allowed_to_submit, ""
+        else:
+            allowed_to_submit = False
+            # This is a student_facing_error
+            error_message = error_string.format(count_required - count_graded, count_graded, count_required,
+                                                student_sub_count)
+            return success, allowed_to_submit, error_message
+
     def get_rubric(self, _data):
         """
         Gets the results of a given grader via ajax.
@@ -501,6 +537,7 @@ class CombinedOpenEndedV1Module():
         Output: Dictionary to be rendered via ajax that contains the result html.
         """
         all_responses = []
+
         loop_up_to_task = self.current_task_number + 1
         contexts = []
         for i in xrange(0, loop_up_to_task):
@@ -546,6 +583,9 @@ class CombinedOpenEndedV1Module():
         Output: Dictionary to be rendered via ajax that contains the result html.
         """
         self.update_task_states()
+        success, can_see_rubric, error = self.check_if_student_has_done_needed_grading()
+        if not can_see_rubric:
+            return {'html' : error, 'success' : False}
         loop_up_to_task = self.current_task_number + 1
         all_responses = []
         for i in xrange(0, loop_up_to_task):
