@@ -50,17 +50,20 @@ try:
 except ImportError:
     import simplejson as json
 
-config = {"username": "<UserName>",
-"access-key": "<AccessID>"}
+config = {"username": "<USERNAME>",
+"access-key": "<ACCESS_ID>"}
 desired_capabilities =  DesiredCapabilities.CHROME
 desired_capabilities['platform'] = "Linux"
 desired_capabilities['version'] = ""
-desired_capabilities['name'] = "Fail Test"
+desired_capabilities['name'] = "LMS Lettuce Test"
+desired_capabilities['build'] = "Alpha-Beta-123"
 desired_capabilities['passed'] = True
+desired_capabilities['record-video'] = False
 desired_capabilities['video-upload-on-pass'] = False
 desired_capabilities['record-screenshots'] = False
 desired_capabilities['selenium-version'] = "2.33.0"
 desired_capabilities['max-duration'] = 3600
+desired_capabilities['public'] = 'public restricted'
 jobid=''
 
 base64string = base64.encodestring('%s:%s' % (config['username'], config['access-key']))[:-1]

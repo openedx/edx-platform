@@ -1,3 +1,7 @@
+<a href="https://saucelabs.com/u/JonahStanley">
+  <img src="https://saucelabs.com/browser-matrix/JonahStanley.svg" alt="Selenium Tests Status" />
+</a>
+
 This is the main edX platform which consists of LMS and Studio.
 
 See [code.edx.org](http://code.edx.org/) for other parts of the edX code base.
