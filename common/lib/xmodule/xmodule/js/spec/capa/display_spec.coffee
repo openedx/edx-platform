@@ -14,12 +14,11 @@ describe 'Problem', ->
     # this msg is coming from the stubRequests function else clause.
     jasmine.stubRequests()
 
-    # note that the fixturesPath is set in spec/helper.coffee
-    loadFixtures 'problem.html'
+    loadFixtures 'fixtures/problem.html'
 
     spyOn Logger, 'log'
     spyOn($.fn, 'load').andCallFake (url, callback) ->
-      $(@).html readFixtures('problem_content.html')
+      $(@).html readFixtures('fixtures/problem_content.html')
       callback()
 
   describe 'constructor', ->

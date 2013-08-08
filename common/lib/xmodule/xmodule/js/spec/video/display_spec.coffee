@@ -2,7 +2,7 @@ describe 'Video', ->
   metadata = undefined
 
   beforeEach ->
-    loadFixtures 'video.html'
+    loadFixtures 'fixtures/video.html'
     jasmine.stubRequests()
 
     @slowerSpeedYoutubeId = 'slowerSpeedYoutubeId'

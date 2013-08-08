@@ -6,7 +6,7 @@ describe 'HTMLEditingDescriptor', ->
 #     A better test would be a Selenium test to avoid duplicating the
 #     mako template structure in html-edit-formattingbug.html.
 #     However, we currently have no working Selenium tests.
-      loadFixtures 'html-edit-formattingbug.html'
+      loadFixtures 'fixtures/html-edit-formattingbug.html'
       @descriptor = new HTMLEditingDescriptor($('.html-edit'))
       visualEditorStub =
         isDirty: () -> false
@@ -21,7 +21,7 @@ describe 'HTMLEditingDescriptor', ->
                            <div><foo>bar</foo></div>""")
   describe 'Saves HTML', ->
     beforeEach ->
-      loadFixtures 'html-edit.html'
+      loadFixtures 'fixtures/html-edit.html'
       @descriptor = new HTMLEditingDescriptor($('.html-edit'))
     it 'Returns data from Advanced Editor if Visual Editor is not dirty', ->
       visualEditorStub =
@@ -60,7 +60,7 @@ describe 'HTMLEditingDescriptor', ->
       expect(data).toEqual('from visual editor with /static/image.jpg')
   describe 'Can switch to Advanced Editor', ->
     beforeEach ->
-      loadFixtures 'html-edit.html'
+      loadFixtures 'fixtures/html-edit.html'
       @descriptor = new HTMLEditingDescriptor($('.html-edit'))
     it 'Populates from Visual Editor if Advanced Visual is dirty', ->
       expect(@descriptor.showingVisualEditor).toEqual(true)
@@ -80,7 +80,7 @@ describe 'HTMLEditingDescriptor', ->
       expect(@descriptor.advanced_editor.getValue()).toEqual('Advanced Editor Text')
   describe 'Can switch to Visual Editor', ->
     it 'Always populates from the Advanced Editor', ->
-      loadFixtures 'html-edit.html'
+      loadFixtures 'fixtures/html-edit.html'
       @descriptor = new HTMLEditingDescriptor($('.html-edit'))
       @descriptor.showingVisualEditor = false
 
@@ -99,7 +99,7 @@ describe 'HTMLEditingDescriptor', ->
       expect(visualEditorStub.getContent()).toEqual('Advanced Editor Text')
       expect(visualEditorStub.startContent).toEqual('Advanced Editor Text')
     it 'When switching to visual editor links are rewritten to c4x format', ->
-      loadFixtures 'html-edit-with-links.html'
+      loadFixtures 'fixtures/html-edit-with-links.html'
       @descriptor = new HTMLEditingDescriptor($('.html-edit'))
       @descriptor.base_asset_url = '/c4x/foo/bar/asset/'
       @descriptor.showingVisualEditor = false

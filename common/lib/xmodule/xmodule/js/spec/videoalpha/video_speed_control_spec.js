@@ -3,7 +3,7 @@
     var state, videoPlayer, videoControl, videoSpeedControl;
 
     function initialize() {
-      loadFixtures('videoalpha_all.html');
+      loadFixtures('fixtures/videoalpha_all.html');
       state = new VideoAlpha('#example');
       videoPlayer = state.videoPlayer;
       videoControl = state.videoControl;

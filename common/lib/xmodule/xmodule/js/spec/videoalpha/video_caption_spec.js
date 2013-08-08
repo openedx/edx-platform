@@ -3,7 +3,7 @@
     var state, videoPlayer, videoCaption, videoSpeedControl, oldOTBD;
 
     function initialize() {
-      loadFixtures('videoalpha_all.html');
+      loadFixtures('fixtures/videoalpha_all.html');
       state = new VideoAlpha('#example');
       videoPlayer = state.videoPlayer;
       videoCaption = state.videoCaption;
@@ -373,8 +373,7 @@
               videoWrapperHeight = $('.video-wrapper').height(),
               controlsHeight = videoControl.el.height(),
               progressSliderHeight = videoControl.sliderEl.height(),
-              shouldBeHeight = videoWrapperHeight - controlsHeight \
-                                - 0.5 * controlsHeight;
+              shouldBeHeight = videoWrapperHeight - controlsHeight - 0.5 * controlsHeight;
 
           state.captionsHidden = true;
           videoCaption.setSubtitlesHeight();
