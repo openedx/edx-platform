@@ -250,6 +250,9 @@ class @CombinedOpenEnded
         @hide_rubrics()
         @$(@previous_rubric_sel).click @previous_rubric
         @$(@next_rubric_sel).click @next_rubric
+        if response.hide_reset
+          @reset_button.hide()
+
 
   show_status_current: () =>
     data = {}
