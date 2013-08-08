@@ -98,7 +98,7 @@ describe 'HTMLEditingDescriptor', ->
       expect(visualEditorStub.isDirty()).toEqual(false)
       expect(visualEditorStub.getContent()).toEqual('Advanced Editor Text')
       expect(visualEditorStub.startContent).toEqual('Advanced Editor Text')
-    it 'When switching to Advanced Editors links are rewritten to c4x format', ->
+    it 'When switching to visual editor links are rewritten to c4x format', ->
       loadFixtures 'html-edit-with-links.html'
       @descriptor = new HTMLEditingDescriptor($('.html-edit'))
       @descriptor.base_asset_url = '/c4x/foo/bar/asset/'
