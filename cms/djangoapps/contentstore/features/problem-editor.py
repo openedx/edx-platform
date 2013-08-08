@@ -133,14 +133,16 @@ def set_the_weight_to_abc(step, bad_weight):
     world.verify_setting_entry(world.get_setting_entry(PROBLEM_WEIGHT), PROBLEM_WEIGHT, "", False)
 
 
-@step('if I set the max attempts to "(.*)", it displays initially as "(.*)", and is persisted as "(.*)"')
-def set_the_max_attempts(step, max_attempts_set, max_attempts_displayed, max_attempts_persisted):
+@step('if I set the max attempts to "(.*)", it will persist as a valid integer$')
+def set_the_max_attempts(step, max_attempts_set):
     #on firefox with selenium, the behaviour is different.  eg 2.34 displays as 2.34 and is persisted as 2
     index = world.get_setting_entry_index(MAXIMUM_ATTEMPTS)
     world.css_fill('.wrapper-comp-setting .setting-input', max_attempts_set, index=index)
-    world.verify_setting_entry(world.get_setting_entry(MAXIMUM_ATTEMPTS), MAXIMUM_ATTEMPTS, max_attempts_displayed, True)
+    if world.is_firefox():
+        world.trigger_event('.wrapper-comp-setting .setting-input', index=index)
     world.save_component_and_reopen(step)
-    world.verify_setting_entry(world.get_setting_entry(MAXIMUM_ATTEMPTS), MAXIMUM_ATTEMPTS, max_attempts_persisted, True)
+    value =  int(world.css_value('input.setting-input', index=index))
+    assert value >= 0
 
 
 @step('Edit High Level Source is not visible')
