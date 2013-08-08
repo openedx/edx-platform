@@ -69,7 +69,7 @@ newrelic==1.8.0.13
 sphinx==1.1.3
 
 # Used for search
-pyfuzz>-0.1.1
+pyfuzz==0.1.1
 pdfminer==20110515
 wand
 xhtml2pdf==0.0.3

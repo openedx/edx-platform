@@ -29,24 +29,27 @@
         <div id="menu-container">
             <ul class="menu">
             <li class="header-bar">
-                <span class="filter-item">
+                <span class="filter-item"></span>
                 Courseware
                 <span class="count">${ len(data.entries) }</span>
                 </span>
             </li>
             <li class="body-bar">
                 <span class="filter-item">
+                <span class="video-image"></span>
                 Transcripts
                 <div class="count"
                 </span>
             </li>
             <li class="body-bar">
                 <span class="filter-item">
+                <span class="problem-image"></span>
                 Problems
                 </span>
             </li>
             <li class="body-bar">
                 <span class="filter-item">
+                <span class="pdf-image"></span>
                 PDFs
                 </span>
             </li>
@@ -55,7 +58,8 @@
         <div class="search-container">
         % if len(data.entries) > 0:
         	% for datum in data.entries:
-            	<a href="#">
+            <section class="highlighter">
+            	<a href=${datum.url}>
             		<div class="result-container">
             			<div class="result-header">
             				<h1 class="result-title">${datum.data['display_name']}</h1>
@@ -74,6 +78,7 @@
             			</div>
             		</div>
             	</a>
+            </section>
         	% endfor
         % else:
             <h1 class="result-title no-results">"No results found, please try again"</h1>

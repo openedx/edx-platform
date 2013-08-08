@@ -4,7 +4,7 @@ Tests for the ElasticDatabase class in es_requests
 
 from django.test import TestCase
 import requests
-from search.es_requests import ElasticDatabase, PyGrep
+from search.es_requests import ElasticDatabase, PyGrep, flaky_request
 import json
 import time
 import os
@@ -22,6 +22,7 @@ class EsTest(TestCase):
         self.assertEqual(database_request.status_code, 200)
         self.elastic_search = ElasticDatabase("common/djangoapps/search/tests/test_settings.json")
         index_request = self.elastic_search.setup_index("test-index")
+        print index_request.content
         self.assertEqual(index_request.status_code, 200)
         type_request = self.elastic_search.setup_type("test-index", "test-type",
                                                       "common/djangoapps/search/tests/test_mapping.json")
@@ -32,16 +33,16 @@ class EsTest(TestCase):
 
     def test_index_creation(self):
         settings = self.elastic_search.get_index_settings("test-index")["test-index"]["settings"]
-        self.assertTrue(self.elastic_search.has_index("test-index"))
-        self.assertFalse(self.elastic_search.has_index("fake-index"))
+        self.assertTrue(has_index(self.elastic_search.url, "test-index"))
+        self.assertFalse(has_index(self.elastic_search.url, "fake-index"))
         self.assertEqual(settings["index.number_of_replicas"], "1")
         self.assertEqual(settings["index.number_of_shards"], "5")
 
     def test_type_existence(self):
-        self.assertTrue(self.elastic_search.has_type("test-index", "test-type"))
-        self.assertFalse(self.elastic_search.has_type("test-index", "fake-type"))
-        self.assertFalse(self.elastic_search.has_type("fake-index", "test-type"))
-        self.assertFalse(self.elastic_search.has_type("fake-index", "fake-type"))
+        self.assertTrue(has_type(self.elastic_search.url, "test-index", "test-type"))
+        self.assertFalse(has_type(self.elastic_search.url, "test-index", "fake-type"))
+        self.assertFalse(has_type(self.elastic_search.url, "fake-index", "test-type"))
+        self.assertFalse(has_type(self.elastic_search.url, "fake-index", "fake-type"))
 
     def test_type_creation(self):
         type_mapping = self.elastic_search.get_type_mapping("test-index", "test-type")
@@ -82,11 +83,11 @@ class EsTest(TestCase):
             silent=True, file_ending=".srt.sjson",
             conserve_kwargs=True
         )
-        second_versions = [json.loads(response)["_version"] for response in repeated_response]
+        second_versions = [json.loads(response.content)["_version"] for response in repeated_response]
         self.assertTrue(all(version == 2 for version in second_versions))
-        successes = [json.loads(response)["ok"] for response in full_response]
-        correct_indices = [json.loads(response)["_index"] == "test-index" for response in full_response]
-        correct_types = [json.loads(response)["_type"] == "test-type" for response in full_response]
+        successes = [json.loads(response.content)["ok"] for response in full_response]
+        correct_indices = [json.loads(response.content)["_index"] == "test-index" for response in full_response]
+        correct_types = [json.loads(response.content)["_type"] == "test-type" for response in full_response]
         self.assertTrue(all(successes))
         self.assertTrue(all(correct_indices))
         self.assertTrue(all(correct_types))
@@ -108,6 +109,7 @@ class EsTest(TestCase):
         good_response = self.elastic_search.index_transcript("test-index", "test-type",
                                                              self.current_path + relative_paths[1],
                                                              silent=False, id_="2")
+        print bad_response
         self.assertEqual(bad_response.status_code, 201)
         self.assertEqual(good_response.status_code, 201)
         bad_object = self.elastic_search.get_data("test-index", "test-type", "1")
@@ -125,9 +127,32 @@ class EsTest(TestCase):
         test_string += json.dumps({"searchable_text": "some_text", "test-float": "1.0"})
         test_string += "\n"
         success = self.elastic_search.bulk_index(test_string)
-        print success.content
         self.assertEqual(success.status_code, 200)
 
     def tearDown(self):
         self.elastic_search.delete_type("test-index", "test-type")
         self.elastic_search.delete_index("test-index")
+
+def has_index(url, index):
+    """
+    Checks to see if the Elastic Search instance contains the given index,
+    """
+
+    full_url = "/".join([url, index])
+    response = flaky_request("head", full_url)
+    if response:
+        return response.status_code == 200
+    else:
+        return False
+
+def has_type(url, index, type_):
+    """
+    Same as has_index method, but for a given type
+    """
+
+    full_url = "/".join([url, index, type_])
+    response = flaky_request("head", full_url)
+    if response:
+        return response.status_code == 200
+    else:
+        return False

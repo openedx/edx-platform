@@ -7,10 +7,11 @@ import string
 import re
 from collections import Counter
 
+import search.sorting
+from xmodule.modulestore import Location
+
 import nltk
 import nltk.corpus as word_filter
-
-import search.sorting
 
 
 class SearchResults:
@@ -125,10 +126,10 @@ class SearchResult:
 
     def __init__(self, entry, score, query):
         self.data = entry
+        self.url = _jump_to_url(entry)
         self.score = score
         self.thumbnail = "data:image/jpg;base64," + entry["thumbnail"]
         self.snippets = snippet_generator(self.data["searchable_text"], query)
-
 
 def snippet_generator(transcript, query, soft_max=50, word_margin=25, bold=True):
     """
@@ -215,12 +216,8 @@ def _match_highlighter(query, response, tag="b", css_class="highlight", highligh
     return bold_response
 
 
-# def _update_url(request, datum):
-#     url = request.environ.get('HTTP_REFERER', "")
-#     host = request.environ.get("HTTP_HOST", "edx.org")
-#     trigger = "courseware"
-#     if trigger in url:
-#         base = url[:url.find(trigger)+len(trigger)+1]
-#         return base+datum["url"]
-#     else:
-#         return "http://" + host + "/courses/" + datum["course_section"]+"/courseware/" + datum["url"]
+def _jump_to_url(entry):
+    fields = ["tag", "org", "course", "category", "name"]
+    location = Location(*[json.loads(entry["id"])[field] for field in fields])
+    url = '{0}/{1}/jump_to/{2}'.format('/courses', entry["course_id"], location)
+    return url

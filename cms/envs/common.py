@@ -358,7 +358,7 @@ INSTALLED_APPS = (
     'django.contrib.admin',
 
     # for course indexing
-    'search'
+    'search',
 )
 
 ################# EDX MARKETING SITE ##################################

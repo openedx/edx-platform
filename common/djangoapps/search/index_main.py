@@ -3,8 +3,8 @@ Main method for running indexing operations from the command line.
 """
 
 import sys
-from search.es_requests import MongoIndexer
-from search.es_requests import ElasticDatabase
+from es_requests import MongoIndexer
+from es_requests import ElasticDatabase
 
 if sys.argv[1] == "regenerate":
     MONGO = MongoIndexer(content_database="edge-xcontent", module_database="edge-xmodule")

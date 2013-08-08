@@ -1,10 +1,12 @@
 function indexCourses(){
     var course = "";
     var url = window.location.host + "/index";
+    var courseHashId = $("#index-courses").attr("data-hash");
+    console.log(courseHashId)
     $.ajax({
         type: "POST",
-        url: url,
-        data: {"course": type_id},
+        url: "http://localhost:8000/index",
+        data: {"course": courseHashId},
         success: success
     });
 }
