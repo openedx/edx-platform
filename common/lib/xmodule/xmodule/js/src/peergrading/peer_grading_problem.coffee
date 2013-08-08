@@ -309,8 +309,8 @@ class @PeerGradingProblem
 
   construct_data: () ->
     data =
-      rubric_scores: Rubric.get_score_list()
-      score: Rubric.get_total_score()
+      rubric_scores: @rub.get_score_list()
+      score: @rub.get_total_score()
       location: @location
       submission_id: @essay_id_input.val()
       submission_key: @submission_key_input.val()
@@ -398,11 +398,11 @@ class @PeerGradingProblem
   # called after a grade is selected on the interface
   graded_callback: (event) =>
     # check to see whether or not any categories have not been scored
-    if Rubric.check_complete()
+    if @rub.check_complete()
       # show button if we have scores for all categories
       @grading_message.hide()
       @show_submit_button()
-      @grade = Rubric.get_total_score()
+      @grade = @rub.get_total_score()
 
   keydown_handler: (event) =>
     #Previously, responses were submitted when hitting enter.  Add in a modifier that ensures that ctrl+enter is needed.
@@ -507,7 +507,8 @@ class @PeerGradingProblem
     @submit_button.hide()
     @action_button.hide()
     @calibration_feedback_panel.hide()
-    Rubric.initialize(@location,@el)
+    @rub = new Rubric(@el)
+    @rub.initialize(@location)
 
 
   render_calibration_feedback: (response) =>
