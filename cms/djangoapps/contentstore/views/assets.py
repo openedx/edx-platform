@@ -346,13 +346,20 @@ def generate_export_course(request, org, course, name):
     try:
         export_to_xml(modulestore('direct'), contentstore(), loc, root_dir, name, modulestore())
     except SerializationError, e:
-        failed_item = modulestore().get_instance(course_module.location.course_id, e.location)
-        parent_locs = modulestore().get_parent_locations(failed_item.location, course_module.location.course_id)
         unit = None
-        if len(parent_locs) > 0:
-            parent = modulestore().get_item(parent_locs[0])
-            if parent.location.category == 'vertical':
-                unit = parent
+        failed_item = None
+        parent = None
+        try:
+            failed_item = modulestore().get_instance(course_module.location.course_id, e.location)
+            parent_locs = modulestore().get_parent_locations(failed_item.location, course_module.location.course_id)
+
+            if len(parent_locs) > 0:
+                parent = modulestore().get_item(parent_locs[0])
+                if parent.location.category == 'vertical':
+                    unit = parent
+        except:
+            # if we have a nested exception, then we'll show the more generic error message
+            pass
 
         return render_to_response('export.html', {
             'context_course': course_module,
@@ -363,7 +370,7 @@ def generate_export_course(request, org, course, name):
             'unit': unit,
             'edit_unit_url': reverse('edit_unit', kwargs={
                 'location': parent.location
-            }),
+            }) if parent else '',
             'course_home_url': reverse('course_index', kwargs={
                 'org': org,
                 'course': course,
