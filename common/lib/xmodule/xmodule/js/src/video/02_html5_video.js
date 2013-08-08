@@ -14,7 +14,7 @@
 (function (requirejs, require, define) {
 
 define(
-'videoalpha/02_html5_video.js',
+'video/02_html5_video.js',
 [],
 function () {
     var HTML5Video = {};

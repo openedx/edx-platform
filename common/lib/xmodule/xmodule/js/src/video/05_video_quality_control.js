@@ -2,7 +2,7 @@
 
 // VideoQualityControl module.
 define(
-'videoalpha/05_video_quality_control.js',
+'video/05_video_quality_control.js',
 [],
 function () {
 

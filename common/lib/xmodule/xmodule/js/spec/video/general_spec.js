@@ -1,5 +1,5 @@
 (function () {
-    xdescribe('Video', function () {
+    describe('Video', function () {
         var oldOTBD;
 
         beforeEach(function () {

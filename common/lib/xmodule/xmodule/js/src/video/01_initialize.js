@@ -12,8 +12,8 @@
 (function (requirejs, require, define) {
 
 define(
-'videoalpha/01_initialize.js',
-['videoalpha/03_video_player.js'],
+'video/01_initialize.js',
+['video/03_video_player.js'],
 function (VideoPlayer) {
 
     if (typeof(window.gettext) == "undefined") {
@@ -25,8 +25,8 @@ function (VideoPlayer) {
      *
      * Initialize module exports this function.
      *
-     * @param {Object} state A place for all properties, and methods of Video Alpha.
-     * @param {DOM element} element Container of the entire Video Alpha DOM element.
+     * @param {Object} state A place for all properties, and methods of Video.
+     * @param {DOM element} element Container of the entire Video DOM element.
      */
     return function (state, element) {
         _makeFunctionsPublic(state);
@@ -44,7 +44,7 @@ function (VideoPlayer) {
      * Functions which will be accessible via 'state' object. When called, these functions will get the 'state'
      * object as a context.
      *
-     * @param {Object} state A place for all properties, and methods of Video Alpha.
+     * @param {Object} state A place for all properties, and methods of Video.
      */
     function _makeFunctionsPublic(state) {
         state.setSpeed    = _.bind(setSpeed, state);
@@ -70,7 +70,7 @@ function (VideoPlayer) {
         state.isFullScreen = false;
 
         // The parent element of the video, and the ID.
-        state.el = $(element).find('.videoalpha');
+        state.el = $(element).find('.video');
         state.id = state.el.attr('id').replace(/video_/, '');
 
         // We store all settings passed to us by the server in one place. These are "read only", so don't

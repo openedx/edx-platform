@@ -3,13 +3,13 @@
 // Main module.
 require(
 [
-    'videoalpha/01_initialize.js',
-    'videoalpha/04_video_control.js',
-    'videoalpha/05_video_quality_control.js',
-    'videoalpha/06_video_progress_slider.js',
-    'videoalpha/07_video_volume_control.js',
-    'videoalpha/08_video_speed_control.js',
-    'videoalpha/09_video_caption.js'
+    'video/01_initialize.js',
+    'video/04_video_control.js',
+    'video/05_video_quality_control.js',
+    'video/06_video_progress_slider.js',
+    'video/07_video_volume_control.js',
+    'video/08_video_speed_control.js',
+    'video/09_video_caption.js'
 ],
 function (
     Initialize,
@@ -31,7 +31,7 @@ function (
     // afterwards (expecting the DOM elements to be present) must be stopped by hand.
     previousState = null;
 
-    window.VideoAlpha = function (element) {
+    window.Video = function (element) {
         var state;
 
         // Stop bufferization of previous video on sequence change.
@@ -64,7 +64,7 @@ function (
 
         // Because the 'state' object is only available inside this closure, we will also make
         // it available to the caller by returning it. This is necessary so that we can test
-        // VideoAlpha with Jasmine.
+        // Video with Jasmine.
         return state;
     };
 });

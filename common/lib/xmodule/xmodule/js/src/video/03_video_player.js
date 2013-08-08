@@ -2,8 +2,8 @@
 
 // VideoPlayer module.
 define(
-'videoalpha/03_video_player.js',
-['videoalpha/02_html5_video.js'],
+'video/03_video_player.js',
+['video/02_html5_video.js'],
 function (HTML5Video) {
 
     // VideoPlayer() function - what this module "exports".
@@ -359,7 +359,7 @@ function (HTML5Video) {
             this.videoPlayer.player.setPlaybackRate(this.speed);
         }
 
-        if (!onTouchBasedDevice() && $('.videoalpha:first').data('autoplay') === 'True') {
+        if (!onTouchBasedDevice() && $('.video:first').data('autoplay') === 'True') {
             this.videoPlayer.play();
         }
     }

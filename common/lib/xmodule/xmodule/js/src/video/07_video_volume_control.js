@@ -2,7 +2,7 @@
 
 // VideoVolumeControl module.
 define(
-'videoalpha/07_video_volume_control.js',
+'video/07_video_volume_control.js',
 [],
 function () {
 
