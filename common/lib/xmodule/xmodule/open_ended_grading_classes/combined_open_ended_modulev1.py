@@ -537,15 +537,17 @@ class CombinedOpenEndedV1Module():
         Output: Dictionary to be rendered via ajax that contains the result html.
         """
         all_responses = []
+        success, can_see_rubric, error = self.check_if_student_has_done_needed_grading()
+        if not can_see_rubric:
+            return {'html' : error, 'success' : False}
 
         loop_up_to_task = self.current_task_number + 1
         contexts = []
         for i in xrange(0, loop_up_to_task):
             response = self.get_last_response(i)
-            rubric_scores = None
             score_length = len(response['grader_types'])
-            log.info(response)
             for z in xrange(0,score_length):
+                feedback = response['feedback_dicts'][z].get('feedback', '')
                 if response['grader_types'][z] in HUMAN_GRADER_TYPE.keys():
                     rubric_scores = [[response['rubric_scores'][z]]]
                     grader_types = [[response['grader_types'][z]]]
@@ -555,7 +557,8 @@ class CombinedOpenEndedV1Module():
                                                                           grader_types, feedback_items)
                     contexts.append({
                         'result': rubric_html,
-                        'task_name': 'Scored rubric'
+                        'task_name': 'Scored rubric',
+                        'feedback' : feedback
                     })
 
         context = {
