@@ -1,6 +1,6 @@
 describe 'Annotatable', ->
     beforeEach ->
-        loadFixtures 'fixtures/annotatable.html'
+        loadFixtures 'annotatable.html'
     describe 'constructor', ->
         el = $('.xmodule_display.xmodule_AnnotatableModule')
         beforeEach ->

@@ -3,7 +3,7 @@
     var state, videoControl, videoVolumeControl, oldOTBD;
 
     function initialize() {
-      loadFixtures('fixtures/videoalpha_all.html');
+      loadFixtures('videoalpha_all.html');
       state = new VideoAlpha('#example');
       videoControl = state.videoControl;
       videoVolumeControl = state.videoVolumeControl;

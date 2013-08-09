@@ -2,7 +2,7 @@ describe 'CombinedOpenEnded', ->
   beforeEach ->
     spyOn Logger, 'log'
     # load up some fixtures
-    loadFixtures 'fixtures/combined-open-ended.html'
+    loadFixtures 'combined-open-ended.html'
     jasmine.Clock.useMock()
     @element = $('.course-content')
 

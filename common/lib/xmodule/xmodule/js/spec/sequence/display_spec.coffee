@@ -5,8 +5,8 @@ xdescribe 'Sequence', ->
     window.MathJax = { Hub: { Queue: -> } }
     spyOn Logger, 'log'
 
-    loadFixtures 'fixtures/sequence.html'
-    @items = $.parseJSON readFixtures('fixtures/items.json')
+    loadFixtures 'sequence.html'
+    @items = $.parseJSON readFixtures('items.json')
 
   describe 'constructor', ->
     beforeEach ->

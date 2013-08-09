@@ -1,20 +1,20 @@
 describe 'OpenEndedMarkdownEditingDescriptor', ->
   describe 'save stores the correct data', ->
     it 'saves markdown from markdown editor', ->
-      loadFixtures 'fixtures/combinedopenended-with-markdown.html'
+      loadFixtures 'combinedopenended-with-markdown.html'
       @descriptor = new OpenEndedMarkdownEditingDescriptor($('.combinedopenended-editor'))
       saveResult = @descriptor.save()
       expect(saveResult.metadata.markdown).toEqual('markdown')
       expect(saveResult.data).toEqual('<combinedopenended>\nmarkdown\n</combinedopenended>')
     it 'clears markdown when xml editor is selected', ->
-      loadFixtures 'fixtures/combinedopenended-with-markdown.html'
+      loadFixtures 'combinedopenended-with-markdown.html'
       @descriptor = new OpenEndedMarkdownEditingDescriptor($('.combinedopenended-editor'))
       @descriptor.createXMLEditor('replace with markdown')
       saveResult = @descriptor.save()
       expect(saveResult.nullout).toEqual(['markdown'])
       expect(saveResult.data).toEqual('replace with markdown')
     it 'saves xml from the xml editor', ->
-      loadFixtures 'fixtures/combinedopenended-without-markdown.html'
+      loadFixtures 'combinedopenended-without-markdown.html'
       @descriptor = new OpenEndedMarkdownEditingDescriptor($('.combinedopenended-editor'))
       saveResult = @descriptor.save()
       expect(saveResult.nullout).toEqual(['markdown'])

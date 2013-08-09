@@ -14,11 +14,11 @@ describe 'Problem', ->
     # this msg is coming from the stubRequests function else clause.
     jasmine.stubRequests()
 
-    loadFixtures 'fixtures/problem.html'
+    loadFixtures 'problem.html'
 
     spyOn Logger, 'log'
     spyOn($.fn, 'load').andCallFake (url, callback) ->
-      $(@).html readFixtures('fixtures/problem_content.html')
+      $(@).html readFixtures('problem_content.html')
       callback()
 
   describe 'constructor', ->

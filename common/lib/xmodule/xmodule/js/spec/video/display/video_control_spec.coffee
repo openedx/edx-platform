@@ -1,7 +1,7 @@
 describe 'VideoControl', ->
   beforeEach ->
     window.onTouchBasedDevice = jasmine.createSpy('onTouchBasedDevice').andReturn false
-    loadFixtures 'fixtures/video.html'
+    loadFixtures 'video.html'
     $('.video-controls').html ''
 
   describe 'constructor', ->

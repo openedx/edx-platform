@@ -22,7 +22,7 @@
         describe('constructor', function () {
             describe('YT', function () {
                 beforeEach(function () {
-                    loadFixtures('fixtures/videoalpha.html');
+                    loadFixtures('videoalpha.html');
                     $.cookie.andReturn('0.75');
                 });
 
@@ -64,7 +64,7 @@
                 var state;
 
                 beforeEach(function () {
-                    loadFixtures('fixtures/videoalpha_html5.html');
+                    loadFixtures('videoalpha_html5.html');
                     this.stubVideoPlayerAlpha = jasmine.createSpy('VideoPlayerAlpha');
                     $.cookie.andReturn('0.75');
                 });
@@ -158,7 +158,7 @@
 
         describe('youtubeId', function () {
             beforeEach(function () {
-                loadFixtures('fixtures/videoalpha.html');
+                loadFixtures('videoalpha.html');
                 $.cookie.andReturn('1.0');
                 state = new VideoAlpha('#example');
             });
@@ -180,7 +180,7 @@
         describe('setSpeed', function () {
             describe('YT', function () {
                 beforeEach(function () {
-                    loadFixtures('fixtures/videoalpha.html');
+                    loadFixtures('videoalpha.html');
                     state = new VideoAlpha('#example');
                 });
 
@@ -214,7 +214,7 @@
 
             describe('HTML5', function () {
                 beforeEach(function () {
-                    loadFixtures('fixtures/videoalpha_html5.html');
+                    loadFixtures('videoalpha_html5.html');
                     state = new VideoAlpha('#example');
                 });
 
@@ -249,7 +249,7 @@
 
         describe('getDuration', function () {
             beforeEach(function () {
-                loadFixtures('fixtures/videoalpha.html');
+                loadFixtures('videoalpha.html');
                 state = new VideoAlpha('#example');
             });
 
@@ -260,7 +260,7 @@
 
         describe('log', function () {
             beforeEach(function () {
-                loadFixtures('fixtures/videoalpha_html5.html');
+                loadFixtures('videoalpha_html5.html');
                 state = new VideoAlpha('#example');
                 spyOn(Logger, 'log');
                 state.videoPlayer.log('someEvent', {

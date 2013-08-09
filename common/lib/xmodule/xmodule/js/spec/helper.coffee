@@ -57,6 +57,8 @@ window.jQuery.ajaxWithPrefix = (url, settings) ->
 # Time waitsFor() should wait for before failing a test.
 window.WAIT_TIMEOUT = 1000
 
+jasmine.getFixtures().fixturesPath += 'fixtures'
+
 jasmine.stubbedMetadata =
   slowerSpeedYoutubeId:
     id: 'slowerSpeedYoutubeId'
@@ -89,7 +91,7 @@ jasmine.stubRequests = ->
     else if match = settings.url.match /static(\/.*)?\/subs\/(.+)\.srt\.sjson/
       settings.success jasmine.stubbedCaption
     else if settings.url.match /.+\/problem_get$/
-      settings.success html: readFixtures('fixtures/problem_content.html')
+      settings.success html: readFixtures('problem_content.html')
     else if settings.url == '/calculate' ||
       settings.url.match(/.+\/goto_position$/) ||
       settings.url.match(/event$/) ||
@@ -112,7 +114,7 @@ jasmine.stubVideoPlayer = (context, enableParts, createPlayer=true) ->
   currentPartName = suite.description while suite = suite.parentSuite
   enableParts.push currentPartName
 
-  loadFixtures 'fixtures/video.html'
+  loadFixtures 'video.html'
   jasmine.stubRequests()
   YT.Player = undefined
   videosDefinition = '0.75:slowerSpeedYoutubeId,1.0:normalSpeedYoutubeId'
@@ -126,9 +128,9 @@ jasmine.stubVideoPlayerAlpha = (context, enableParts, html5=false) ->
   suite = context.suite
   currentPartName = suite.description while suite = suite.parentSuite
   if html5 == false
-    loadFixtures 'fixtures/videoalpha.html'
+    loadFixtures 'videoalpha.html'
   else
-    loadFixtures 'fixtures/videoalpha_html5.html'
+    loadFixtures 'videoalpha_html5.html'
   jasmine.stubRequests()
   YT.Player = undefined
   window.OldVideoPlayerAlpha = undefined

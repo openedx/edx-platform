@@ -4,9 +4,9 @@
 
     function initialize(fixture) {
       if (typeof fixture === 'undefined') {
-        loadFixtures('fixtures/videoalpha_all.html');
+        loadFixtures('videoalpha_all.html');
       } else {
-        loadFixtures('fixtures/' + fixture);
+        loadFixtures(fixture);
       }
 
       state = new VideoAlpha('#example');
