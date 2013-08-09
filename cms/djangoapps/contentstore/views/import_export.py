@@ -1,3 +1,6 @@
+"""
+These views handle all actions in Studio related to import and exporting of courses
+"""
 import logging
 import json
 import os
