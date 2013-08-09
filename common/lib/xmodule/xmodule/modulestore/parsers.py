@@ -1,5 +1,12 @@
 import re
 
+# Prefix for the branch portion of a locator URL
+BRANCH_PREFIX = "/branch/"
+# Prefix for the block portion of a locator URL
+BLOCK_PREFIX = "/block/"
+# Prefix for when a course URL begins with a version ID
+URL_VERSION_PREFIX = 'version/'
+
 URL_RE = re.compile(r'^edx://(.+)$', re.IGNORECASE)
 
 
@@ -9,10 +16,10 @@ def parse_url(string):
     followed by either a version_guid or a course_id.
 
     Examples:
-        'edx://@0123FFFF'
+        'edx://version/0123FFFF'
         'edx://edu.mit.eecs.6002x'
-        'edx://edu.mit.eecs.6002x;published'
-        'edx://edu.mit.eecs.6002x;published#HW3'
+        'edx://edu.mit.eecs.6002x/branch/published'
+        'edx://edu.mit.eecs.6002x/branch/published/block/HW3'
 
     This returns None if string cannot be parsed.
 
@@ -27,8 +34,8 @@ def parse_url(string):
     if not match:
         return None
     path = match.group(1)
-    if path[0] == '@':
-        return parse_guid(path[1:])
+    if path.startswith(URL_VERSION_PREFIX):
+        return parse_guid(path[len(URL_VERSION_PREFIX):])
     return parse_course_id(path)
 
 
@@ -52,8 +59,7 @@ def parse_block_ref(string):
     return None
 
 
-GUID_RE = re.compile(r'^(?P<version_guid>[A-F0-9]+)(#(?P<block>\w+))?$', re.IGNORECASE)
-
+GUID_RE = re.compile(r'^(?P<version_guid>[A-F0-9]+)(' + BLOCK_PREFIX + '(?P<block>\w+))?$', re.IGNORECASE)
 
 def parse_guid(string):
     """
@@ -69,27 +75,27 @@ def parse_guid(string):
         return None
 
 
-COURSE_ID_RE = re.compile(r'^(?P<id>(\w+)(\.\w+\w*)*)(;(?P<branch>\w+))?(#(?P<block>\w+))?$', re.IGNORECASE)
+COURSE_ID_RE = re.compile(r'^(?P<id>(\w+)(\.\w+\w*)*)('+ BRANCH_PREFIX + '(?P<branch>\w+))?(' + BLOCK_PREFIX + '(?P<block>\w+))?$', re.IGNORECASE)
 
 
 def parse_course_id(string):
     r"""
 
     A course_id has a main id component.
-    There may also be an optional branch (;published or ;draft).
-    There may also be an optional block (#HW3 or #Quiz2).
+    There may also be an optional branch (/branch/published or /branch/draft).
+    There may also be an optional block (/block/HW3 or /block/Quiz2).
 
     Examples of valid course_ids:
 
       'edu.mit.eecs.6002x'
-      'edu.mit.eecs.6002x;published'
-      'edu.mit.eecs.6002x#HW3'
-      'edu.mit.eecs.6002x;published#HW3'
+      'edu.mit.eecs.6002x/branch/published'
+      'edu.mit.eecs.6002x/block/HW3'
+      'edu.mit.eecs.6002x/branch/published/block/HW3'
 
 
     Syntax:
 
-      course_id = main_id [; branch] [# block]
+      course_id = main_id [/branch/ branch] [/block/ block]
 
       main_id = name [. name]*
 

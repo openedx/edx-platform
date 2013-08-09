@@ -1,8 +1,7 @@
 """
-Created on Mar 13, 2013
-
-@author: dmitchell
+Identifier for course resources.
 """
+
 from __future__ import absolute_import
 import logging
 import inspect
@@ -15,6 +14,7 @@ from bson.errors import InvalidId
 from xmodule.modulestore.exceptions import InsufficientSpecificationError, OverSpecificationError
 
 from .parsers import parse_url, parse_course_id, parse_block_ref
+from .parsers import BRANCH_PREFIX, BLOCK_PREFIX, URL_VERSION_PREFIX
 
 log = logging.getLogger(__name__)
 
@@ -36,9 +36,6 @@ class Locator(object):
         complete enough specification to generate a url
         """
         raise InsufficientSpecificationError()
-
-    def quoted_url(self):
-        return quote(self.url(), '@;#')
 
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
@@ -90,11 +87,11 @@ class CourseLocator(Locator):
     Examples of valid CourseLocator specifications:
      CourseLocator(version_guid=ObjectId('519665f6223ebd6980884f2b'))
      CourseLocator(course_id='mit.eecs.6002x')
-     CourseLocator(course_id='mit.eecs.6002x;published')
+     CourseLocator(course_id='mit.eecs.6002x/branch/published')
      CourseLocator(course_id='mit.eecs.6002x', branch='published')
-     CourseLocator(url='edx://@519665f6223ebd6980884f2b')
+     CourseLocator(url='edx://version/519665f6223ebd6980884f2b')
      CourseLocator(url='edx://mit.eecs.6002x')
-     CourseLocator(url='edx://mit.eecs.6002x;published')
+     CourseLocator(url='edx://mit.eecs.6002x/branch/published')
 
     Should have at lease a specific course_id (id for the course as if it were a project w/
     versions) with optional 'branch',
@@ -115,10 +112,10 @@ class CourseLocator(Locator):
         if self.course_id:
             result = self.course_id
             if self.branch:
-                result += ';' + self.branch
+                result += BRANCH_PREFIX + self.branch
             return result
         elif self.version_guid:
-            return '@' + str(self.version_guid)
+            return URL_VERSION_PREFIX + str(self.version_guid)
         else:
             # raise InsufficientSpecificationError("missing course_id or version_guid")
             return '<InsufficientSpecificationError: missing course_id or version_guid>'
@@ -224,7 +221,7 @@ class CourseLocator(Locator):
         """
         url must be a string beginning with 'edx://' and containing
         either a valid version_guid or course_id (with optional branch)
-        If a block ('#HW3') is present, it is ignored.
+        If a block ('/block/HW3') is present, it is ignored.
         """
         if isinstance(url, Locator):
             url = url.url()
@@ -253,14 +250,14 @@ class CourseLocator(Locator):
 
     def init_from_course_id(self, course_id, explicit_branch=None):
         """
-        Course_id is a string like 'mit.eecs.6002x' or 'mit.eecs.6002x;published'.
+        Course_id is a string like 'mit.eecs.6002x' or 'mit.eecs.6002x/branch/published'.
 
         Revision (optional) is a string like 'published'.
         It may be provided explicitly (explicit_branch) or embedded into course_id.
-        If branch is part of course_id ("...;published"), parse it out separately.
+        If branch is part of course_id (".../branch/published"), parse it out separately.
         If branch is provided both ways, that's ok as long as they are the same value.
 
-        If a block ('#HW3') is a part of course_id, it is ignored.
+        If a block ('/block/HW3') is a part of course_id, it is ignored.
 
         """
 
@@ -411,9 +408,9 @@ class BlockUsageLocator(CourseLocator):
         rep = CourseLocator.__unicode__(self)
         if self.usage_id is None:
             # usage_id has not been initialized
-            return rep + '#NONE'
+            return rep + BLOCK_PREFIX + 'NONE'
         else:
-            return rep + '#' + self.usage_id
+            return rep + BLOCK_PREFIX + self.usage_id
 
 
 class DescriptionLocator(Locator):
@@ -427,14 +424,14 @@ class DescriptionLocator(Locator):
     def __unicode__(self):
         '''
         Return a string representing this location.
-        unicode(self) returns something like this: "@519665f6223ebd6980884f2b"
+        unicode(self) returns something like this: "version/519665f6223ebd6980884f2b"
         '''
-        return '@' + str(self.definition_guid)
+        return URL_VERSION_PREFIX + str(self.definition_id)
 
     def url(self):
         """
         Return a string containing the URL for this location.
-        url(self) returns something like this: 'edx://@519665f6223ebd6980884f2b'
+        url(self) returns something like this: 'edx://version/519665f6223ebd6980884f2b'
         """
         return 'edx://' + unicode(self)
 
@@ -442,7 +439,7 @@ class DescriptionLocator(Locator):
         """
         Returns the ObjectId referencing this specific location.
         """
-        return self.definition_guid
+        return self.definition_id
 
 
 class VersionTree(object):
