@@ -112,7 +112,7 @@ def answer_distributions(request, course):
         for capa_module in yield_problems(request, course, student):
             for problem_id in capa_module.lcp.student_answers:
                 # Answer can be a list or some other unhashable element.  Convert to string.
-                answer = str(capa_module.lcp.student_answers[problem_id])
+                answer = unicode(capa_module.lcp.student_answers[problem_id])
                 key = (capa_module.url_name, capa_module.display_name_with_default, problem_id)
                 counts[key][answer] += 1
 
@@ -213,7 +213,7 @@ def grade(student, request, course, model_data_cache=None, keep_raw_scores=False
                 format_scores.append(graded_total)
             else:
                 log.exception("Unable to grade a section with a total possible score of zero. " +
-                              str(section_descriptor.location))
+                              unicode(section_descriptor.location))
 
         totaled_scores[section_format] = format_scores
 
@@ -403,7 +403,7 @@ def get_score(course_id, user, problem_descriptor, module_creator, model_data_ca
     weight = problem_descriptor.weight
     if weight is not None:
         if total == 0:
-            log.exception("Cannot reweight a problem with zero total points. Problem: " + str(student_module))
+            log.exception("Cannot reweight a problem with zero total points. Problem: " + unicode(student_module))
             return (correct, total)
         correct = correct * weight / total
         total = weight
