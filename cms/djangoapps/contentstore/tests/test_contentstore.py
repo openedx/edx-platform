@@ -1451,6 +1451,31 @@ class ContentStoreTest(ModuleStoreTestCase):
                                 json.dumps({'id': del_loc.url()}), "application/json")
         self.assertEqual(200, resp.status_code)
 
+    def test_import_into_new_course_id(self):
+        module_store = modulestore('direct')
+        target_location = Location(['i4x', 'MITx', '999', 'course', '2013_Spring'])
+
+        course_data = {
+            'org': target_location.org,
+            'number': target_location.course,
+            'display_name': 'Robot Super Course',
+            'run': target_location.name
+        }
+
+        resp = self.client.post(reverse('create_new_course'), course_data)
+        self.assertEqual(resp.status_code, 200)
+        data = parse_json(resp)
+        self.assertEqual(data['id'], target_location.url())
+
+        import_from_xml(module_store, 'common/test/data/', ['simple'], target_location_namespace=target_location)
+
+        modules = module_store.get_items(Location([
+            target_location.tag, target_location.org, target_location.course, None, None, None]))
+
+        # we should have a number of modules in there
+        # we can't specify an exact number since it'll always be changing
+        self.assertGreater(len(modules), 10)
+
     def test_import_metadata_with_attempts_empty_string(self):
         module_store = modulestore('direct')
         import_from_xml(module_store, 'common/test/data/', ['simple'])
