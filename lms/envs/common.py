@@ -431,12 +431,16 @@ ZENDESK_URL = None
 ZENDESK_USER = None
 ZENDESK_API_KEY = None
 
-##### CyberSource Payment parameters #####
-CYBERSOURCE = {
-    'SHARED_SECRET': '',
-    'MERCHANT_ID' : '',
-    'SERIAL_NUMBER' : '',
-    'ORDERPAGE_VERSION': '7',
+##### shoppingcart Payment #####
+##### Using cybersource by default #####
+CC_PROCESSOR = {
+    'CyberSource' : {
+        'SHARED_SECRET': '',
+        'MERCHANT_ID' : '',
+        'SERIAL_NUMBER' : '',
+        'ORDERPAGE_VERSION': '7',
+        'PURCHASE_ENDPOINT': '',
+    }
 }
 
 ################################# open ended grading config  #####################
