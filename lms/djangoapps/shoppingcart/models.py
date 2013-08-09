@@ -4,6 +4,7 @@ from datetime  import datetime
 from django.db import models
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User
+from courseware.courses import course_image_url, get_course_about_section
 from student.views import course_from_id
 from student.models import CourseEnrollmentAllowed, CourseEnrollment
 from statsd import statsd
@@ -152,7 +153,7 @@ class PaidCourseRegistration(OrderItem):
         item.qty = 1
         item.unit_cost = cost
         item.line_cost = cost
-        item.line_desc = "Registration for Course {0}".format(course_id)
+        item.line_desc = 'Registration for Course: {0}'.format(get_course_about_section(course, "title"))
         item.currency = currency
         item.save()
         return item
