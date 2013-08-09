@@ -337,7 +337,7 @@ def generate_export_course(request, org, course, name):
     the course
     """
     location = get_location_and_verify_access(request, org, course, name)
-    course_module = modulestore().get_item(location)
+    course_module = modulestore().get_instance(location.course_id, location)
     loc = Location(location)
     export_file = NamedTemporaryFile(prefix=name + '.', suffix=".tar.gz")
 
