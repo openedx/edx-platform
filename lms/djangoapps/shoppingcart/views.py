@@ -34,6 +34,14 @@ def add_course_to_cart(request, course_id):
         return HttpResponseRedirect(reverse('shoppingcart.views.show_cart'))
     return HttpResponse(_("Course added to cart."))
 
+
+@login_required
+def register_for_verified_cert(request, course_id):
+    cart = Order.get_cart_for_user(request.user)
+    enrollment, _completed = CourseEnrollment.objects.get_or_create(user=request.user, course_id=course_id)
+    VerifiedCertificate.add_to_order(cart, course_id, enrollment, 25)
+    return HttpResponse("Added")
+
 @login_required
 def show_cart(request):
     cart = Order.get_cart_for_user(request.user)
