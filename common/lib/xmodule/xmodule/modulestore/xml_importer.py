@@ -128,8 +128,8 @@ def import_from_xml(store, data_dir, course_dirs=None,
                                        {"type": "discussion", "name": "Discussion"},
                                        {"type": "wiki", "name": "Wiki"}]  # note, add 'progress' when we can support it on Edge
 
-                    import_module(module, store, course_data_path, static_content_store, course_location, 
-                                  target_location_namespace if target_location_namespace else course_location)
+                    import_module(module, store, course_data_path, static_content_store, course_location,
+                                  target_location_namespace or course_location)
 
                     course_items.append(module)
 
@@ -161,7 +161,7 @@ def import_from_xml(store, data_dir, course_dirs=None,
             # now import any 'draft' items
             if draft_store is not None:
                 import_course_draft(xml_module_store, store, draft_store, course_data_path,
-                                    static_content_store, course_location, target_location_namespace if target_location_namespace is not None
+                                    static_content_store, course_location, target_location_namespace if target_location_namespace
                                     else course_location)
 
         finally:
@@ -543,4 +543,3 @@ def import_course_from_xml(modulestore, static_content_store, course_data_path, 
                        {"type": "wiki", "name": "Wiki"}]  # note, add 'progress' when we can support it on Edge
 
     import_module_from_xml(modulestore, static_content_store, course_data_path, module, target_location_namespace, verbose=verbose)
-

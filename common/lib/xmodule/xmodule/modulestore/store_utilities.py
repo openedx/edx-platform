@@ -20,7 +20,7 @@ def _prefix_only_url_replace_regex(prefix):
         (?P<prefix>{prefix})      # the prefix
         (?P<rest>.*?)             # everything else in the url
         (?P=quote)                # the first matching closing quote
-        """.format(prefix=prefix)
+        """.format(prefix=re.escape(prefix))
 
 
 def _prefix_and_category_url_replace_regex(prefix):
@@ -37,7 +37,7 @@ def _prefix_and_category_url_replace_regex(prefix):
         (?P<category>[^/]+)/
         (?P<rest>.*?)             # everything else in the url
         (?P=quote)                # the first matching closing quote
-        """.format(prefix=prefix)
+        """.format(prefix=re.escape(prefix))
 
 
 def rewrite_nonportable_content_links(source_course_id, dest_course_id, text):
@@ -54,18 +54,19 @@ def rewrite_nonportable_content_links(source_course_id, dest_course_id, text):
     def portable_asset_link_subtitution(match):
         quote = match.group('quote')
         rest = match.group('rest')
-        return "".join([quote, '/static/'+rest, quote])
+        return quote + '/static/' + rest + quote
 
     def portable_jump_to_link_substitution(match):
         quote = match.group('quote')
         rest = match.group('rest')
-        return "".join([quote, '/jump_to_id/'+rest, quote])
+        return quote + '/jump_to_id/' + rest + quote
 
     def generic_courseware_link_substitution(match):
         quote = match.group('quote')
         rest = match.group('rest')
         dest_generic_courseware_lik_base = '/courses/{org}/{course}/{run}/'.format(
-            org=dest_org, course=dest_course, run=dest_run)
+            org=dest_org, course=dest_course, run=dest_run
+        )
 
         return "".join([quote, dest_generic_courseware_lik_base+rest, quote])
 
@@ -77,18 +78,15 @@ def rewrite_nonportable_content_links(source_course_id, dest_course_id, text):
         c4x_link_base = '{0}/'.format(StaticContent.get_base_url_path_for_course_assets(course_location))
         text = re.sub(_prefix_only_url_replace_regex(c4x_link_base), portable_asset_link_subtitution, text)
     except Exception, e:
-        logging.warning("Error going regex subtituion (0) on text = {1}.\n\nError msg = {2}".format(
-            c4x_link_base, text, str(e)))
-        pass
+        logging.warning("Error going regex subtituion %r on text = %r.\n\nError msg = %s", c4x_link_base, text, str(e))
 
     try:
         jump_to_link_base = '/courses/{org}/{course}/{run}/jump_to/i4x://{org}/{course}/'.format(
-            org=org, course=course, run=run)
+            org=org, course=course, run=run
+        )
         text = re.sub(_prefix_and_category_url_replace_regex(jump_to_link_base), portable_jump_to_link_substitution, text)
     except Exception, e:
-        logging.warning("Error going regex subtituion (0) on text = {1}.\n\nError msg = {2}".format(
-            jump_to_link_base, text, str(e)))
-        pass
+        logging.warning("Error going regex subtituion %r on text = %r.\n\nError msg = %s", jump_to_link_base, text, str(e))
 
     # Also, there commonly is a set of link URL's used in the format:
     # /courses/<org>/<course>/<run> which will be broken if migrated to a different course_id
@@ -99,12 +97,11 @@ def rewrite_nonportable_content_links(source_course_id, dest_course_id, text):
     if source_course_id != dest_course_id:
         try:
             generic_courseware_link_base = '/courses/{org}/{course}/{run}/'.format(
-                org=org, course=course, run=run)
+                org=org, course=course, run=run
+            )
             text = re.sub(_prefix_only_url_replace_regex(generic_courseware_link_base), portable_asset_link_subtitution, text)
         except Exception, e:
-            logging.warning("Error going regex subtituion (0) on text = {1}.\n\nError msg = {2}".format(
-                generic_courseware_link_base, text, str(e)))
-            pass
+            logging.warning("Error going regex subtituion %r on text = %r.\n\nError msg = %s", generic_courseware_link_base, text, str(e))
 
     return text
 
