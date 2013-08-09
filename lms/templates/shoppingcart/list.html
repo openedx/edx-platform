@@ -10,12 +10,13 @@
     % if shoppingcart_items:
         <table>
             <thead>
-            <tr><td>Qty</td><td>Description</td><td>Unit Price</td><td>Price</td></tr>
+            <tr><td>Qty</td><td>Description</td><td>Unit Price</td><td>Price</td><td>Currency</td></tr>
             </thead>
             <tbody>
             % for item in shoppingcart_items:
             <tr><td>${item.qty}</td><td>${item.line_desc}</td>
                 <td>${"{0:0.2f}".format(item.unit_cost)}</td><td>${"{0:0.2f}".format(item.line_cost)}</td>
+                <td>${item.currency.upper()}</td>
                 <td><a data-item-id="${item.id}" class='remove_line_item' href='#'>[x]</a></td></tr>
             % endfor
             <tr><td></td><td></td><td></td><td>Total Amount</td></tr>

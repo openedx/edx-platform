@@ -50,7 +50,7 @@ def show_cart(request):
     params = OrderedDict()
     params['comment'] = 'Stanford OpenEdX Purchase'
     params['amount'] = amount
-    params['currency'] = 'usd'
+    params['currency'] = cart.currency
     params['orderPage_transactionType'] = 'sale'
     params['orderNumber'] = "{0:d}".format(cart.id)
     params['billTo_email'] = request.user.email
