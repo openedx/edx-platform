@@ -3,9 +3,41 @@ from xmodule.contentstore.content import StaticContent
 from xmodule.modulestore import Location
 from xmodule.modulestore.mongo import MongoModuleStore
 from xmodule.modulestore.inheritance import own_metadata
-from static_replace import _url_replace_regex
 
 import logging
+
+
+def _asset_url_replace_regex(prefix):
+    """
+    Match static urls in quotes that don't end in '?raw'.
+
+    To anyone contemplating making this more complicated:
+    http://xkcd.com/1171/
+    """
+    return r"""
+        (?x)                      # flags=re.VERBOSE
+        (?P<quote>\\?['"])        # the opening quotes
+        (?P<prefix>{prefix})      # the prefix
+        (?P<rest>.*?)             # everything else in the url
+        (?P=quote)                # the first matching closing quote
+        """.format(prefix=prefix)
+
+
+def _jump_to_url_replace_regex(prefix):
+    """
+    Match static urls in quotes that don't end in '?raw'.
+
+    To anyone contemplating making this more complicated:
+    http://xkcd.com/1171/
+    """
+    return r"""
+        (?x)                      # flags=re.VERBOSE
+        (?P<quote>\\?['"])        # the opening quotes
+        (?P<prefix>{prefix})      # the prefix
+        (?P<category>[^/]+)/
+        (?P<rest>.*?)             # everything else in the url
+        (?P=quote)                # the first matching closing quote
+        """.format(prefix=prefix)
 
 
 def convert_to_portable_links(source_course_id, text):
@@ -20,11 +52,20 @@ def convert_to_portable_links(source_course_id, text):
         rest = match.group('rest')
         return "".join([quote, '/static/'+rest, quote])
 
+    def portable_jump_to_link_substitution(match):
+        quote = match.group('quote')
+        rest = match.group('rest')
+        return "".join([quote, '/jump_to_id/'+rest, quote])
+
     org, course, run = source_course_id.split("/")
     course_location = Location(['i4x', org, course, 'course', run])
 
     c4x_link_base = '{0}/'.format(StaticContent.get_base_url_path_for_course_assets(course_location))
-    text = re.sub(_url_replace_regex(c4x_link_base), portable_asset_link_subtitution, text)
+    text = re.sub(_asset_url_replace_regex(c4x_link_base), portable_asset_link_subtitution, text)
+
+    jump_to_link_base = '/courses/{org}/{course}/{run}/jump_to/i4x://{org}/{course}/'.format(
+        org=org, course=course, run=run)
+    text = re.sub(_jump_to_url_replace_regex(jump_to_link_base), portable_jump_to_link_substitution, text)
 
     return text
 

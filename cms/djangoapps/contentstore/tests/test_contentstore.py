@@ -777,10 +777,15 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         import_from_xml(module_store, 'common/test/data/', ['toy'], static_content_store=content_store)
 
+        # first check a static asset link
         html_module_location = Location(['i4x', 'edX', 'toy', 'html', 'nonportable'])
         html_module = module_store.get_instance('edX/toy/2012_Fall', html_module_location)
-
         self.assertIn('/static/foo.jpg', html_module.data)
+
+        # then check a intra courseware link
+        html_module_location = Location(['i4x', 'edX', 'toy', 'html', 'nonportable_link'])
+        html_module = module_store.get_instance('edX/toy/2012_Fall', html_module_location)
+        self.assertIn('/jump_to_id/nonportable_link', html_module.data)
 
     def test_delete_course(self):
         """
