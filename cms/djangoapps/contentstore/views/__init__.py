@@ -15,6 +15,7 @@ from .public import *
 from .user import *
 from .tabs import *
 from .requests import *
+from .import_export import *
 try:
     from .dev import *
 except ImportError:
