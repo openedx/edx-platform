@@ -13,9 +13,9 @@
             <tr><td>Qty</td><td>Description</td><td>Unit Price</td><td>Price</td></tr>
             </thead>
             <tbody>
-            % for idx,item in enumerate(shoppingcart_items):
+            % for item in shoppingcart_items:
             <tr><td>${item.qty}</td><td>${item.line_desc}</td><td>${item.unit_cost}</td><td>${item.line_cost}</td>
-                <td><a data-item-idx="${idx}" class='remove_line_item' href='#'>[x]</a></td></tr>
+                <td><a data-item-id="${item.id}" class='remove_line_item' href='#'>[x]</a></td></tr>
             % endfor
             <tr><td></td><td></td><td></td><td>Total Cost</td></tr>
             <tr><td></td><td></td><td></td><td>${total_cost}</td></tr>
@@ -41,7 +41,7 @@
         $('a.remove_line_item').click(function(event) {
             event.preventDefault();
             var post_url = "${reverse('shoppingcart.views.remove_item')}";
-            $.post(post_url, {idx:$(this).data('item-idx')})
+            $.post(post_url, {id:$(this).data('item-id')})
                    .always(function(data){
                         location.reload(true);
                     });
