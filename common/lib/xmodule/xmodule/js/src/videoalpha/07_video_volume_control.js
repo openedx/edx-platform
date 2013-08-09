@@ -61,6 +61,9 @@ function () {
             slide: state.videoVolumeControl.onChange
         });
 
+        // Make sure that we can focus the actual volume slider while Tabing.
+        state.videoVolumeControl.volumeSliderEl.find('a').attr('tabindex', '0');
+
         state.videoVolumeControl.el.toggleClass('muted', state.videoVolumeControl.currentVolume === 0);
     }
 
@@ -74,8 +77,20 @@ function () {
             $(this).addClass('open');
         });
 
+        state.videoVolumeControl.buttonEl.on('focus', function() {
+            $(this).parent().addClass('open');
+        });
+
         state.videoVolumeControl.el.on('mouseleave', function() {
             $(this).removeClass('open');
+        });
+
+        state.videoVolumeControl.buttonEl.on('blur', function() {
+            state.videoVolumeControl.volumeSliderEl.find('a').focus();
+        });
+
+        state.videoVolumeControl.volumeSliderEl.find('a').on('blur', function () {
+            state.videoVolumeControl.el.removeClass('open');
         });
     }
 

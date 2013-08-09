@@ -109,6 +109,7 @@ function () {
 
         if (this.videoType === 'html5') {
             this.el.on('mousemove', this.videoCaption.autoShowCaptions);
+            this.el.on('keydown', this.videoCaption.autoShowCaptions);
 
             // Moving slider on subtitles is not a mouse move,
             // but captions and controls should be showed.
@@ -121,6 +122,10 @@ function () {
         var _this = this;
 
         this.videoCaption.hideCaptions(this.hide_captions);
+
+        if (!this.youtubeId('1.0')) {
+            return;
+        }
 
         $.ajaxWithPrefix({
             url: _this.videoCaption.captionURL(),

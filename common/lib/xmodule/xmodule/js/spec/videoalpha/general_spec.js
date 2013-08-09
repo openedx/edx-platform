@@ -6,9 +6,9 @@
             jasmine.stubRequests();
             oldOTBD = window.onTouchBasedDevice;
             window.onTouchBasedDevice = jasmine.createSpy('onTouchBasedDevice').andReturn(false);
-            this.videosDefinition = '0.75:slowerSpeedYoutubeId,1.0:normalSpeedYoutubeId';
-            this.slowerSpeedYoutubeId = 'slowerSpeedYoutubeId';
-            this.normalSpeedYoutubeId = 'normalSpeedYoutubeId';
+            this.videosDefinition = '0.75:7tqY6eQzVhE,1.0:cogebirgzzM';
+            this['7tqY6eQzVhE'] = '7tqY6eQzVhE';
+            this['cogebirgzzM'] = 'cogebirgzzM';
         });
 
         afterEach(function () {
@@ -45,8 +45,8 @@
 
                     it('parse the videos', function () {
                         expect(this.state.videos).toEqual({
-                            '0.75': this.slowerSpeedYoutubeId,
-                            '1.0': this.normalSpeedYoutubeId
+                            '0.75': this['7tqY6eQzVhE'],
+                            '1.0': this['cogebirgzzM']
                         });
                     });
 
@@ -91,7 +91,7 @@
                     });
 
                     it('parse the videos if subtitles exist', function () {
-                        var sub = 'test_name_of_the_subtitles';
+                        var sub = 'Z5KLxerq05Y';
 
                         expect(state.videos).toEqual({
                             '0.75': sub,
@@ -165,14 +165,14 @@
 
             describe('with speed', function () {
                 it('return the video id for given speed', function () {
-                    expect(state.youtubeId('0.75')).toEqual(this.slowerSpeedYoutubeId);
-                    expect(state.youtubeId('1.0')).toEqual(this.normalSpeedYoutubeId);
+                    expect(state.youtubeId('0.75')).toEqual(this['7tqY6eQzVhE']);
+                    expect(state.youtubeId('1.0')).toEqual(this['cogebirgzzM']);
                 });
             });
 
             describe('without speed', function () {
                 it('return the video id for current speed', function () {
-                    expect(state.youtubeId()).toEqual(this.normalSpeedYoutubeId);
+                    expect(state.youtubeId()).toEqual(this.cogebirgzzM);
                 });
             });
         });

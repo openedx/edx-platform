@@ -32,9 +32,7 @@ function () {
     //     get the 'state' object as a context.
     function _makeFunctionsPublic(state) {
         state.videoProgressSlider.onSlide        = _.bind(onSlide, state);
-        state.videoProgressSlider.onChange       = _.bind(onChange, state);
         state.videoProgressSlider.onStop         = _.bind(onStop, state);
-        state.videoProgressSlider.updateTooltip  = _.bind(updateTooltip, state);
         state.videoProgressSlider.updatePlayTime = _.bind(updatePlayTime, state);
         //Added for tests -- JM
         state.videoProgressSlider.buildSlider = _.bind(buildSlider, state);
@@ -56,22 +54,6 @@ function () {
 
     function _buildHandle(state) {
         state.videoProgressSlider.handle = state.videoProgressSlider.el.find('.ui-slider-handle');
-
-        state.videoProgressSlider.handle.qtip({
-            content: '' + Time.format(state.videoProgressSlider.slider.slider('value')),
-            position: {
-                my: 'bottom center',
-                at: 'top center',
-                container: state.videoProgressSlider.handle
-            },
-            hide: {
-                delay: 700
-            },
-            style: {
-                classes: 'ui-tooltip-slider',
-                widget: true
-            }
-        });
     }
 
     // ***************************************************************
@@ -83,7 +65,6 @@ function () {
     function buildSlider(state) {
         state.videoProgressSlider.slider = state.videoProgressSlider.el.slider({
             range: 'min',
-            change: state.videoProgressSlider.onChange,
             slide: state.videoProgressSlider.onSlide,
             stop: state.videoProgressSlider.onStop
         });
@@ -91,13 +72,8 @@ function () {
 
     function onSlide(event, ui) {
         this.videoProgressSlider.frozen = true;
-        this.videoProgressSlider.updateTooltip(ui.value);
 
         this.trigger('videoPlayer.onSlideSeek', {'type': 'onSlideSeek', 'time': ui.value});
-    }
-
-    function onChange(event, ui) {
-        this.videoProgressSlider.updateTooltip(ui.value);
     }
 
     function onStop(event, ui) {
@@ -110,10 +86,6 @@ function () {
         setTimeout(function() {
             _this.videoProgressSlider.frozen = false;
         }, 200);
-    }
-
-    function updateTooltip(value) {
-        this.videoProgressSlider.handle.qtip('option', 'content.text', '' + Time.format(value));
     }
 
     //Changed for tests -- JM: Check if it is the cause of Chrome Bug Valera noticed
