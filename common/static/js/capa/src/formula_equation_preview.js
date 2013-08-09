@@ -58,8 +58,8 @@ formulaEquationPreview.enable = function () {
         };
 
         $this.on("input", initializeRequest);
-        // send an initial 
-        initializeRequest.call(this);
+        // send an initial
+        MathJax.Hub.Queue(this, initializeRequest);
     }
 
     /**
@@ -139,8 +139,10 @@ formulaEquationPreview.enable = function () {
         }
 
         if (response.error) {
+            inputData.$img.css('visibility', 'visible');
             inputData.errorWaitTimeout = window.setTimeout(function () {
                 display("\\text{" + response.error + "}");
+                inputData.$img.css('visibility', 'hidden');
             }, formulaEquationPreview.errorDelay);
         } else {
             display(response.preview);

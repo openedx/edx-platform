@@ -77,33 +77,37 @@ describe("Formula Equation Preview", function () {
     });
 
     describe('Ajax requests', function () {
-        beforeEach(function () {
-            // This is common to all tests on ajax requests.
+        it('has an initial request with the correct parameters', function () {
             formulaEquationPreview.enable();
+
+	    expect(MathJax.Hub.Queue).toHaveBeenCalled();
+	    // Do what Queue would've done--call the function.
+	    var args = MathJax.Hub.Queue.mostRecentCall.args;
+	    args[1].call(args[0]);
 
             // This part may be asynchronous, so wait.
             waitsFor(function () {
                 return Problem.inputAjax.wasCalled;
             }, "AJAX never called initially", 1000);
-        });
 
-        it('has an initial request with the correct parameters', function () {
-            expect(Problem.inputAjax.callCount).toEqual(1);
+	    runs(function () {
+		expect(Problem.inputAjax.callCount).toEqual(1);
 
-            // Use `.toEqual` rather than `.toHaveBeenCalledWith`
-            // since it supports `jasmine.any`.
-            expect(Problem.inputAjax.mostRecentCall.args).toEqual([
-                "THE_URL",
-                "THE_ID",
-                "preview_formcalc",
-                {formula: "prefilled_value",
-                 request_start: jasmine.any(Number)},
-                jasmine.any(Function)
-            ]);
+		// Use `.toEqual` rather than `.toHaveBeenCalledWith`
+		// since it supports `jasmine.any`.
+		expect(Problem.inputAjax.mostRecentCall.args).toEqual([
+                    "THE_URL",
+                    "THE_ID",
+                    "preview_formcalc",
+                    {formula: "prefilled_value",
+                     request_start: jasmine.any(Number)},
+                    jasmine.any(Function)
+		]);
+	    });
         });
 
         it('makes a request on user input', function () {
-            Problem.inputAjax.reset();
+            formulaEquationPreview.enable();
             $('#input_THE_ID').val('user_input').trigger('input');
 
             // This part is probably asynchronous
@@ -118,7 +122,8 @@ describe("Formula Equation Preview", function () {
         });
 
         it("shouldn't be requested for empty input", function () {
-            Problem.inputAjax.reset();
+            formulaEquationPreview.enable();
+	    MathJax.Hub.Queue.reset();
 
             // When we make an input of '',
             $('#input_THE_ID').val('').trigger('input');
@@ -137,7 +142,9 @@ describe("Formula Equation Preview", function () {
         });
 
         it('should limit the number of requests per second', function () {
-            var minDelay = formulaEquationPreview.minDelay;
+            formulaEquationPreview.enable();
+
+	    var minDelay = formulaEquationPreview.minDelay;
             var end = Date.now() + minDelay * 1.1;
             var step = 10;  // ms
 
@@ -172,35 +179,23 @@ describe("Formula Equation Preview", function () {
 
     describe("Visible results (icon and mathjax)", function () {
         it('should display a loading icon when requests are open', function () {
+            formulaEquationPreview.enable();
             var $img = $("img.loading");
             expect($img.css('visibility')).toEqual('hidden');
-            formulaEquationPreview.enable();
+
+            $("#input_THE_ID").val("different").trigger('input');
             expect($img.css('visibility')).toEqual('visible');
-
-            // This part could be asynchronous
-            waitsFor(function () {
-                return Problem.inputAjax.wasCalled;
-            }, "AJAX never called initially", 1000);
-
-            runs(function () {
-                expect($img.css('visibility')).toEqual('visible');
-
-                // Reset and send another request.
-                $img.css('visibility', 'hidden');
-                $("#input_THE_ID").val("different").trigger('input');
-
-                expect($img.css('visibility')).toEqual('visible');
-            });
 
             // Don't let it fail later.
             waitsFor(function () {
-                var args = Problem.inputAjax.mostRecentCall.args;
-                return args[3].formula == "different";
+		return Problem.inputAjax.wasCalled;
             });
         });
 
         it('should update MathJax and loading icon on callback', function () {
             formulaEquationPreview.enable();
+            $('#input_THE_ID').val('user_input').trigger('input');
+
             waitsFor(function () {
                 return Problem.inputAjax.wasCalled;
             }, "AJAX never called initially", 1000);
@@ -229,7 +224,11 @@ describe("Formula Equation Preview", function () {
         });
 
         it('should display errors from the server well', function () {
+            var $img = $("img.loading");
             formulaEquationPreview.enable();
+	    MathJax.Hub.Queue.reset();
+            $("#input_THE_ID").val("different").trigger('input');
+
             waitsFor(function () {
                 return Problem.inputAjax.wasCalled;
             }, "AJAX never called initially", 1000);
@@ -242,6 +241,7 @@ describe("Formula Equation Preview", function () {
                     request_start: args[3].request_start
                 });
                 expect(MathJax.Hub.Queue).not.toHaveBeenCalled();
+                expect($img.css('visibility')).toEqual('visible');
             });
 
             var errorDelay = formulaEquationPreview.errorDelay * 1.1;
@@ -255,6 +255,7 @@ describe("Formula Equation Preview", function () {
                     ['Text', this.jax, '\\text{OOPSIE}'],
                     ['Reprocess', this.jax]
                 );
+                expect($img.css('visibility')).toEqual('hidden');
             });
         });
     });
@@ -262,14 +263,16 @@ describe("Formula Equation Preview", function () {
     describe('Multiple callbacks', function () {
         beforeEach(function () {
             formulaEquationPreview.enable();
+	    MathJax.Hub.Queue.reset();
+            $('#input_THE_ID').val('different').trigger('input');
 
-            waitsFor(function () {
-                return Problem.inputAjax.wasCalled;
-            });
+	    waitsFor(function () {
+		return Problem.inputAjax.wasCalled;
+	    });
 
-            runs(function () {
-                $('#input_THE_ID').val('different').trigger('input');
-            });
+	    runs(function () {
+		$("#input_THE_ID").val("different2").trigger('input');
+	    });
 
             waitsFor(function () {
                 return Problem.inputAjax.callCount > 1;
