@@ -7,4 +7,5 @@ urlpatterns = patterns('shoppingcart.views',  # nopep8
     url(r'^clear/$','clear_cart'),
     url(r'^remove_item/$', 'remove_item'),
     url(r'^purchased/$', 'purchased'),
+    url(r'^receipt/$', 'receipt'),
 )
