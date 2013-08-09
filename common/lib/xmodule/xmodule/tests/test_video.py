@@ -346,7 +346,7 @@ class VideoExportTestCase(unittest.TestCase):
 
         xml = desc.export_to_xml(None)  # We don't use the `resource_fs` parameter
         expected = dedent('''\
-         <video display_name="Video" start_time="0:00:01" youtube="0.75:izygArpw-Qo,1.00:p2Q6BrNhdh8,1.25:1EeWXzPdhSA,1.50:rABDYkeK0x8" show_captions="false" end_time="0:01:00">
+         <video url_name="SampleProblem1" start_time="0:00:01" youtube="0.75:izygArpw-Qo,1.00:p2Q6BrNhdh8,1.25:1EeWXzPdhSA,1.50:rABDYkeK0x8" show_captions="false" end_time="0:01:00">
            <source src="http://www.example.com/source.mp4"/>
            <source src="http://www.example.com/source.ogg"/>
            <track src="http://www.example.com/track"/>
@@ -362,6 +362,6 @@ class VideoExportTestCase(unittest.TestCase):
         desc = VideoDescriptor(module_system, {'location': location})
 
         xml = desc.export_to_xml(None)
-        expected = '<video display_name="Video" youtube="1.00:OEoXaMPEzfM" show_captions="true"/>\n'
+        expected = '<video url_name="SampleProblem1"/>\n'
 
         self.assertEquals(expected, xml)

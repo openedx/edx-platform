@@ -136,14 +136,13 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
     def test_advanced_components_in_edit_unit(self):
         # This could be made better, but for now let's just assert that we see the advanced modules mentioned in the page
         # response HTML
-        self.check_components_on_page(ADVANCED_COMPONENT_TYPES, ['Video Alpha',
-                                                                 'Word cloud',
+        self.check_components_on_page(ADVANCED_COMPONENT_TYPES, ['Word cloud',
                                                                  'Annotation',
                                                                  'Open Response Assessment',
                                                                  'Peer Grading Interface'])
 
     def test_advanced_components_require_two_clicks(self):
-        self.check_components_on_page(['video'], ['Video'])
+        self.check_components_on_page(['word_cloud'], ['Word cloud'])
 
     def test_malformed_edit_unit_request(self):
         store = modulestore('direct')
@@ -1597,12 +1596,15 @@ class ContentStoreTest(ModuleStoreTestCase):
 
 
 class MetadataSaveTestCase(ModuleStoreTestCase):
-    """
-    Test that metadata is correctly decached.
-    """
+    """Test that metadata is correctly cached and decached."""
 
     def setUp(self):
-        sample_xml = '''
+        CourseFactory.create(
+            org='edX', course='999', display_name='Robot Super Course')
+        course_location = Location(
+            ['i4x', 'edX', '999', 'course', 'Robot_Super_Course', None])
+
+        video_sample_xml = '''
         <video display_name="Test Video"
                 youtube="1.0:p2Q6BrNhdh8,0.75:izygArpw-Qo,1.25:1EeWXzPdhSA,1.5:rABDYkeK0x8"
                 show_captions="false"
@@ -1612,19 +1614,17 @@ class MetadataSaveTestCase(ModuleStoreTestCase):
             <track src="http://www.example.com/track"/>
         </video>
         '''
-        CourseFactory.create(org='edX', course='999', display_name='Robot Super Course')
-        course_location = Location(['i4x', 'edX', '999', 'course', 'Robot_Super_Course', None])
+        self.video_descriptor = ItemFactory.create(
+            parent_location=course_location, category='video',
+            data={'data': video_sample_xml}
+        )
 
-        model_data = {'data': sample_xml}
-        self.descriptor = ItemFactory.create(parent_location=course_location, category='video', data=model_data)
-
-    def test_metadata_persistence(self):
+    def test_metadata_not_persistence(self):
         """
         Test that descriptors which set metadata fields in their
-        constructor are correctly persisted.
+        constructor are correctly deleted.
         """
-        # We should start with a source field, from the XML's <source/> tag
-        self.assertIn('html5_sources', own_metadata(self.descriptor))
+        self.assertIn('html5_sources', own_metadata(self.video_descriptor))
         attrs_to_strip = {
             'show_captions',
             'youtube_id_1_0',
@@ -1637,21 +1637,24 @@ class MetadataSaveTestCase(ModuleStoreTestCase):
             'html5_sources',
             'track'
         }
-        # We strip out all metadata fields to reproduce a bug where
-        # constructors which set their fields (e.g. Video) didn't have
-        # those changes persisted. So in the end we have the XML data
-        # in `descriptor.data`, but not in the individual fields
-        fields = self.descriptor.fields
+
+        fields = self.video_descriptor.fields
+        location = self.video_descriptor.location
+
         for field in fields:
             if field.name in attrs_to_strip:
-                field.delete_from(self.descriptor)
+                field.delete_from(self.video_descriptor)
 
-        # Assert that we correctly stripped the field
-        self.assertNotIn('html5_sources', own_metadata(self.descriptor))
-        get_modulestore(self.descriptor.location).update_metadata(
-            self.descriptor.location,
-            own_metadata(self.descriptor)
+        self.assertNotIn('html5_sources', own_metadata(self.video_descriptor))
+        get_modulestore(location).update_metadata(
+            location,
+            own_metadata(self.video_descriptor)
         )
-        module = get_modulestore(self.descriptor.location).get_item(self.descriptor.location)
-        # Assert that get_item correctly sets the metadata
-        self.assertIn('html5_sources', own_metadata(module))
+        module = get_modulestore(location).get_item(location)
+
+        self.assertNotIn('html5_sources', own_metadata(module))
+
+    def test_metadata_persistence(self):
+        # TODO: create the same test as `test_metadata_not_persistence`,
+        # but check persistence for some other module.
+        pass

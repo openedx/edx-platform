@@ -46,10 +46,10 @@ class TestVideo(BaseTestXmodule):
         context = self.item_module.get_html()
 
         sources = {
-            'main': 'example.mp4',
-            'mp4': 'example.mp4',
-            'webm': 'example.webm',
-            'ogv': 'example.ogv'
+            'main': u'example.mp4',
+            u'mp4': u'example.mp4',
+            u'webm': u'example.webm',
+            u'ogv': u'example.ogv'
         }
 
         expected_context = {
@@ -61,12 +61,13 @@ class TestVideo(BaseTestXmodule):
             'id': self.item_module.location.html_id(),
             'sources': sources,
             'start': 3603.0,
-            'sub': 'a_sub_file.srt.sjson',
+            'sub': u'a_sub_file.srt.sjson',
             'track': '',
             'youtube_streams': _create_youtube_string(self.item_module),
             'autoplay': settings.MITX_FEATURES.get('AUTOPLAY_VIDEOS', True)
         }
 
+        self.maxDiff = None
         self.assertEqual(context, expected_context)
 
 
