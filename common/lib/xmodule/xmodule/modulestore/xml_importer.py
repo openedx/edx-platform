@@ -143,7 +143,6 @@ def import_from_xml(store, data_dir, course_dirs=None,
 
             # finally loop through all the modules
             for module in xml_module_store.modules[course_id].itervalues():
-
                 if module.category == 'course':
                     # we've already saved the course module up at the top of the loop
                     # so just skip over it in the inner loop
@@ -177,6 +176,9 @@ def import_from_xml(store, data_dir, course_dirs=None,
 
 def import_module(module, store, course_data_path, static_content_store,
                   source_course_location, dest_course_location, allow_not_found=False):
+
+    logging.debug('processing import of module {0}...'.format(module.location.url()))
+
     content = {}
     for field in module.fields:
         if field.scope != Scope.content:
