@@ -723,7 +723,7 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         # We are not allowing editing of xblock tag and name fields at this time (for any component).
         return [XBlock.tags, XBlock.name]
 
-    def get_set_fields_by_scope(self, scope=Scope.content):
+    def get_explicitly_set_fields_by_scope(self, scope=Scope.content):
         """
         Get a dictionary of the fields for the given scope which are set explicitly on this xblock. (Including
         any set to None.)
