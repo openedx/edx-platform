@@ -4,6 +4,7 @@ urlpatterns = patterns('shoppingcart.views',  # nopep8
     url(r'^$','show_cart'),
     url(r'^(?P<course_id>[^/]+/[^/]+/[^/]+)/$','test'),
     url(r'^add/course/(?P<course_id>[^/]+/[^/]+/[^/]+)/$','add_course_to_cart'),
+    url(r'^register_verified_course/course/(?P<course_id>[^/]+/[^/]+/[^/]+)/$', 'register_for_verified_cert'),
     url(r'^clear/$','clear_cart'),
     url(r'^remove_item/$', 'remove_item'),
     url(r'^postpay_callback/$', 'postpay_callback'), #Both the ~accept and ~reject callback pages are handled here

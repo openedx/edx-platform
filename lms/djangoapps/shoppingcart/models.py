@@ -217,4 +217,38 @@ class PaidCourseRegistration(OrderItem):
 # PLEASE KEEP THIS LIST UP_TO_DATE WITH THE SUBCLASSES OF OrderItem
 ORDER_ITEM_SUBTYPES = {
     PaidCourseRegistration: 'paidcourseregistration',
+    VerifiedCertificate: 'verifiedcertificate',
 }
+
+
+class VerifiedCertificate(OrderItem):
+    """
+    This is an inventory item for purchasing verified certificates
+    """
+    course_id = models.CharField(max_length=128, db_index=True)
+    course_enrollment = models.ForeignKey(CourseEnrollment)
+
+    @classmethod
+    def add_to_order(cls, order, course_id, course_enrollment, cost, currency='usd'):
+        """
+        Add a VerifiedCertificate item to an order
+        """
+        # TODO: error checking
+        item, _created = cls.objects.get_or_create(
+            order=order,
+            user=order.user,
+            course_id=course_id,
+            course_enrollment=course_enrollment
+        )
+        item.status = order.status
+        item.qty = 1
+        item.unit_cost = cost
+        item.line_cost = cost
+        item.line_desc = "Verified Certificate for Course {0}".format(course_id)
+        item.currency = currency
+        item.save()
+        return item
+
+    def purchased_callback(self):
+        # TODO: add code around putting student in the verified track
+        pass
