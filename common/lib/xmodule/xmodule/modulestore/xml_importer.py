@@ -168,8 +168,9 @@ def import_from_xml(store, data_dir, course_dirs=None,
             # turn back on all write signalling
             if pseudo_course_id in store.ignore_write_events_on_courses:
                 store.ignore_write_events_on_courses.remove(pseudo_course_id)
-                store.refresh_cached_metadata_inheritance_tree(target_location_namespace if
-                                                               target_location_namespace is not None else course_location)
+                store.refresh_cached_metadata_inheritance_tree(
+                    target_location_namespace if target_location_namespace is not None else course_location
+                )
 
     return xml_module_store, course_items
 
