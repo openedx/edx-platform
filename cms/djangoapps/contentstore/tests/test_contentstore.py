@@ -644,6 +644,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         content_store = contentstore()
 
+        # now do the actual cloning
         clone_course(module_store, content_store, source_location, dest_location)
 
         # first assert that all draft content got cloned as well
@@ -692,6 +693,56 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
                     )
                     expected_children.append(child_loc.url())
                 self.assertEqual(expected_children, lookup_item.children)
+
+    def test_portable_link_rewrites_during_clone_course(self):
+        course_data = {
+            'org': 'MITx',
+            'number': '999',
+            'display_name': 'Robot Super Course',
+            'run': '2013_Spring'
+        }
+
+        module_store = modulestore('direct')
+        draft_store = modulestore('draft')
+        content_store = contentstore()
+
+        import_from_xml(module_store, 'common/test/data/', ['toy'])
+
+        source_course_id = 'edX/toy/2012_Fall'
+        dest_course_id = 'MITx/999/2013_Spring'
+        source_location = CourseDescriptor.id_to_location(source_course_id)
+        dest_location = CourseDescriptor.id_to_location(dest_course_id)
+
+        # let's force a non-portable link in the clone source
+        # as a final check, make sure that any non-portable links are rewritten during cloning
+        html_module_location = Location([
+            source_location.tag, source_location.org, source_location.course, 'html', 'nonportable'])
+        html_module = module_store.get_instance(source_location.course_id, html_module_location)
+
+        self.assertTrue(isinstance(html_module.data, basestring))
+        new_data = html_module.data.replace('/static/', '/c4x/{0}/{1}/asset/'.format(
+            source_location.org, source_location.course))
+        module_store.update_item(html_module_location, new_data)
+
+        html_module = module_store.get_instance(source_location.course_id, html_module_location)
+        self.assertEqual(new_data, html_module.data)
+
+        # create the destination course
+
+        resp = self.client.post(reverse('create_new_course'), course_data)
+        self.assertEqual(resp.status_code, 200)
+        data = parse_json(resp)
+        self.assertEqual(data['id'], 'i4x://MITx/999/course/2013_Spring')
+
+        # do the actual cloning
+        clone_course(module_store, content_store, source_location, dest_location)
+
+        # make sure that any non-portable links are rewritten during cloning
+        html_module_location = Location([
+            dest_location.tag, dest_location.org, dest_location.course, 'html', 'nonportable'])
+        html_module = module_store.get_instance(dest_location.course_id, html_module_location)
+
+        self.assertIn('/static/foo.jpg', html_module.data)
 
     def test_illegal_draft_crud_ops(self):
         draft_store = modulestore('draft')

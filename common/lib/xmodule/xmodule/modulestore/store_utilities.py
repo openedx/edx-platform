@@ -29,7 +29,7 @@ def convert_to_portable_links(source_course_id, text):
     return text
 
 
-def _clone_modules(modulestore, modules, dest_location):
+def _clone_modules(modulestore, modules, source_location, dest_location):
     for module in modules:
         original_loc = Location(module.location)
 
@@ -44,7 +44,11 @@ def _clone_modules(modulestore, modules, dest_location):
         print "Cloning module {0} to {1}....".format(original_loc, module.location)
 
         # NOTE: usage of the the internal module.xblock_kvs._data does not include any 'default' values for the fields
-        modulestore.update_item(module.location, module.xblock_kvs._data)
+        data = module.xblock_kvs._data
+        if isinstance(data, basestring):
+            data = convert_to_portable_links(source_location.course_id, data)
+
+        modulestore.update_item(module.location, data)
 
         # repoint children
         if module.has_children:
@@ -96,10 +100,10 @@ def clone_course(modulestore, contentstore, source_location, dest_location, dele
     # Get all modules under this namespace which is (tag, org, course) tuple
 
     modules = modulestore.get_items([source_location.tag, source_location.org, source_location.course, None, None, None])
-    _clone_modules(modulestore, modules, dest_location)
+    _clone_modules(modulestore, modules, source_location, dest_location)
 
     modules = modulestore.get_items([source_location.tag, source_location.org, source_location.course, None, None, 'draft'])
-    _clone_modules(modulestore, modules, dest_location)
+    _clone_modules(modulestore, modules, source_location, dest_location)
 
     # now iterate through all of the assets and clone them
     # first the thumbnails
