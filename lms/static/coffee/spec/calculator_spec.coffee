@@ -1,6 +1,6 @@
 describe 'Calculator', ->
   beforeEach ->
-    loadFixtures 'calculator.html'
+    loadFixtures 'coffee/fixtures/calculator.html'
     @calculator = new Calculator
 
   describe 'bind', ->

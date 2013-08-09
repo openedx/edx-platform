@@ -1,5 +1,3 @@
-jasmine.getFixtures().fixturesPath = "/_jasmine/fixtures/"
-
 jasmine.stubbedMetadata =
   slowerSpeedYoutubeId:
     id: 'slowerSpeedYoutubeId'
@@ -21,7 +19,7 @@ jasmine.stubRequests = ->
     else if match = settings.url.match /static\/subs\/(.+)\.srt\.sjson/
       settings.success jasmine.stubbedCaption
     else if settings.url.match /modx\/.+\/problem_get$/
-      settings.success html: readFixtures('problem_content.html')
+      settings.success html: readFixtures('coffee/fixtures/problem_content.html')
     else if settings.url == '/calculate' ||
       settings.url.match(/modx\/.+\/goto_position$/) ||
       settings.url.match(/event$/) ||
@@ -46,7 +44,7 @@ jasmine.stubVideoPlayer = (context, enableParts, createPlayer=true) ->
     unless $.inArray(part, enableParts) >= 0
       spyOn window, part
 
-  loadFixtures 'video.html'
+  loadFixtures 'coffee/fixtures/video.html'
   jasmine.stubRequests()
   YT.Player = undefined
   context.video = new Video 'example', '.75:slowerSpeedYoutubeId,1.0:normalSpeedYoutubeId'
