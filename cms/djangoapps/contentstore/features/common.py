@@ -146,12 +146,13 @@ def fill_in_course_info(
 def log_into_studio(
         uname='robot',
         email='robot+studio@edx.org',
-        password='test'):
+        password='test',
+        name='Robot Studio'):
 
-    world.log_in(username=uname, password=password, email=email, name='Robot Studio')
+    world.log_in(username=uname, password=password, email=email, name=name)
     # Navigate to the studio dashboard
     world.visit('/')
-
+    world.wait_for(lambda _driver: uname in world.css_find('h2.title')[0].text)
 
 def create_a_course():
     course = world.CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course')
