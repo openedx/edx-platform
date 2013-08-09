@@ -135,7 +135,49 @@ class CombinedOpenEndedV1Module():
 
         self.task_xml = definition['task_xml']
         self.location = location
+        self.fix_invalid_state()
         self.setup_next_task()
+
+    def fix_invalid_state(self):
+        """
+        Sometimes a teacher will change the xml definition of a problem in Studio.
+        This means that the state passed to the module is invalid.
+        If that is the case, delete it.
+        """
+
+        #If we are on a task that is greater than the number of available tasks, it is an invalid state
+        if self.current_task_number>len(self.task_states):
+            self.task_states = []
+            self.current_task_number = 0
+        #If the current task number is greater than the number of tasks we have in the xml definition, our state is invalid.
+        elif self.current_task_number>len(self.task_xml):
+            self.task_states = []
+            self.current_task_number = 0
+        #if the length of the task xml is less than the length of the task states, state is invalid
+        elif len(self.task_xml)<len(self.task_states):
+            self.current_task_number = 0
+            self.task_states = []
+        #Loop through each task state and make sure it matches the xml definition
+        for (i,t) in enumerate(self.task_states):
+            tag_name = self.get_tag_name(self.task_xml[i])
+            children = self.child_modules()
+            task_xml = self.task_xml[i]
+            task_descriptor = children['descriptors'][tag_name](self.system)
+            task_parsed_xml = task_descriptor.definition_from_xml(etree.fromstring(task_xml), self.system)
+            try:
+                task = children['modules'][tag_name](
+                    self.system,
+                    self.location,
+                    task_parsed_xml,
+                    task_descriptor,
+                    self.static_data,
+                    instance_state=t,
+                )
+            except Exception:
+                #If one task doesn't match, the state is invalid.
+                self.current_task_number = 0
+                self.task_states = []
+                break
 
     def get_tag_name(self, xml):
         """
