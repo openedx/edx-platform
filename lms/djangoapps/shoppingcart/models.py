@@ -19,20 +19,29 @@ class Order(models.Model):
     """
     This is the model for an order.  Before purchase, an Order and its related OrderItems are used
     as the shopping cart.
-    THERE SHOULD ONLY EVER BE ZERO OR ONE ORDER WITH STATUS='cart' PER USER.
+    FOR ANY USER, THERE SHOULD ONLY EVER BE ZERO OR ONE ORDER WITH STATUS='cart'.
     """
     user = models.ForeignKey(User, db_index=True)
     status = models.CharField(max_length=32, default='cart', choices=ORDER_STATUSES)
-    # Because we allow an external service to tell us when something is purchased, and our order numbers
-    # are their pk and therefore predicatble, let's protect against
-    # forged/replayed replies with a nonce.
-    nonce = models.CharField(max_length=128)
     purchase_time = models.DateTimeField(null=True, blank=True)
+    # Now we store data needed to generate a reasonable receipt
+    # These fields only make sense after the purchase
+    bill_to_first = models.CharField(max_length=64, null=True, blank=True)
+    bill_to_last = models.CharField(max_length=64, null=True, blank=True)
+    bill_to_street1 = models.CharField(max_length=128, null=True, blank=True)
+    bill_to_street2 = models.CharField(max_length=128, null=True, blank=True)
+    bill_to_city = models.CharField(max_length=64, null=True, blank=True)
+    bill_to_postalcode = models.CharField(max_length=16, null=True, blank=True)
+    bill_to_country = models.CharField(max_length=64, null=True, blank=True)
+    bill_to_ccnum = models.CharField(max_length=8, null=True, blank=True) # last 4 digits
+    bill_to_cardtype = models.CharField(max_length=32, null=True, blank=True)
+    # a JSON dump of the CC processor response, for completeness
+    processor_reply_dump = models.TextField(null=True, blank=True)
 
     @classmethod
     def get_cart_for_user(cls, user):
         """
-        Use this to enforce the property that at most 1 order per user has status = 'cart'
+        Always use this to preserve the property that at most 1 order per user has status = 'cart'
         """
         order, created = cls.objects.get_or_create(user=user, status='cart')
         return order
@@ -40,6 +49,15 @@ class Order(models.Model):
     @property
     def total_cost(self):
         return sum([i.line_cost for i in self.orderitem_set.all()])
+
+    @property
+    def currency(self):
+        """Assumes that all cart items are in the same currency"""
+        items = self.orderitem_set.all()
+        if not items:
+            return 'usd'
+        else:
+            return items[0].currency
 
     def purchase(self):
         """
@@ -72,6 +90,7 @@ class OrderItem(models.Model):
     unit_cost = models.FloatField(default=0.0)
     line_cost = models.FloatField(default=0.0) # qty * unit_cost
     line_desc = models.CharField(default="Misc. Item", max_length=1024)
+    currency = models.CharField(default="usd", max_length=8) # lower case ISO currency codes
 
     def add_to_order(self, *args, **kwargs):
         """
@@ -118,7 +137,7 @@ class PaidCourseRegistration(OrderItem):
     course_id = models.CharField(max_length=128, db_index=True)
 
     @classmethod
-    def add_to_order(cls, order, course_id, cost):
+    def add_to_order(cls, order, course_id, cost, currency='usd'):
         """
         A standardized way to create these objects, with sensible defaults filled in.
         Will update the cost if called on an order that already carries the course.
@@ -134,6 +153,7 @@ class PaidCourseRegistration(OrderItem):
         item.unit_cost = cost
         item.line_cost = cost
         item.line_desc = "Registration for Course {0}".format(course_id)
+        item.currency = currency
         item.save()
         return item
 
