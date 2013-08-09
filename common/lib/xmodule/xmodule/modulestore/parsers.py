@@ -1,22 +1,19 @@
 import re
 
-URL_RE = re.compile(r'^(?:edx://)?(.+)$', re.IGNORECASE)
+URL_RE = re.compile(r'^edx://(.+)$', re.IGNORECASE)
 
 
 def parse_url(string):
     """
-    A url can begin with 'edx://' (case-insensitive match),
+    A url must begin with 'edx://' (case-insensitive match),
     followed by either a version_guid or a course_id.
 
     Examples:
-        '@0123FFFF'
-        'mit.eecs.6002x'
-        'mit.eecs.6002x;published'
-        'mit.eecs.6002x;published#HW3'
         'edx://@0123FFFF'
         'edx://mit.eecs.6002x'
         'edx://mit.eecs.6002x;published'
         'edx://mit.eecs.6002x;published#HW3'
+        'edx://mit.eecs.6002x;published@000eee12345#HW3'
 
     This returns None if string cannot be parsed.
 
