@@ -53,9 +53,6 @@ function () {
 
         if (!onTouchBasedDevice()) {
             state.videoControl.pause();
-
-            state.videoControl.playPauseEl.qtip(state.config.qTipConfig);
-            state.videoControl.fullScreenEl.qtip(state.config.qTipConfig);
         } else {
             state.videoControl.play();
         }
@@ -77,7 +74,8 @@ function () {
         $(document).on('keyup', state.videoControl.exitFullScreen);
 
         if (state.videoType === 'html5') {
-            state.el.on('mousemove', state.videoControl.showControls)
+            state.el.on('mousemove', state.videoControl.showControls);
+            state.el.on('keydown', state.videoControl.showControls);
         }
     }
 

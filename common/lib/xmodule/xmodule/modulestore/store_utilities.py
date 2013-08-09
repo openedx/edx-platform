@@ -1,8 +1,44 @@
 from xmodule.contentstore.content import StaticContent
 from xmodule.modulestore import Location
 from xmodule.modulestore.mongo import MongoModuleStore
+from xmodule.modulestore.inheritance import own_metadata
 
 import logging
+
+
+def _clone_modules(modulestore, modules, dest_location):
+    for module in modules:
+        original_loc = Location(module.location)
+
+        if original_loc.category != 'course':
+            module.location = module.location._replace(
+                tag=dest_location.tag, org=dest_location.org, course=dest_location.course)
+        else:
+            # on the course module we also have to update the module name
+            module.location = module.location._replace(
+                tag=dest_location.tag, org=dest_location.org, course=dest_location.course, name=dest_location.name)
+
+        print "Cloning module {0} to {1}....".format(original_loc, module.location)
+
+        # NOTE: usage of the the internal module.xblock_kvs._data does not include any 'default' values for the fields
+        modulestore.update_item(module.location, module.xblock_kvs._data)
+
+        # repoint children
+        if module.has_children:
+            new_children = []
+            for child_loc_url in module.children:
+                child_loc = Location(child_loc_url)
+                child_loc = child_loc._replace(
+                    tag=dest_location.tag,
+                    org=dest_location.org,
+                    course=dest_location.course
+                )
+                new_children.append(child_loc.url())
+
+            modulestore.update_children(module.location, new_children)
+
+        # save metadata
+        modulestore.update_metadata(module.location, own_metadata(module))
 
 
 def clone_course(modulestore, contentstore, source_location, dest_location, delete_original=False):
@@ -37,38 +73,10 @@ def clone_course(modulestore, contentstore, source_location, dest_location, dele
     # Get all modules under this namespace which is (tag, org, course) tuple
 
     modules = modulestore.get_items([source_location.tag, source_location.org, source_location.course, None, None, None])
+    _clone_modules(modulestore, modules, dest_location)
 
-    for module in modules:
-        original_loc = Location(module.location)
-
-        if original_loc.category != 'course':
-            module.location = module.location._replace(tag=dest_location.tag, org=dest_location.org,
-                                                       course=dest_location.course)
-        else:
-            # on the course module we also have to update the module name
-            module.location = module.location._replace(tag=dest_location.tag, org=dest_location.org,
-                                                       course=dest_location.course, name=dest_location.name)
-
-        print "Cloning module {0} to {1}....".format(original_loc, module.location)
-
-        modulestore.update_item(module.location, module._model_data._kvs._data)
-
-        # repoint children
-        if module.has_children:
-            new_children = []
-            for child_loc_url in module.children:
-                child_loc = Location(child_loc_url)
-                child_loc = child_loc._replace(
-                    tag=dest_location.tag,
-                    org=dest_location.org,
-                    course=dest_location.course
-                )
-                new_children.append(child_loc.url())
-
-            modulestore.update_children(module.location, new_children)
-
-        # save metadata
-        modulestore.update_metadata(module.location, module._model_data._kvs._metadata)
+    modules = modulestore.get_items([source_location.tag, source_location.org, source_location.course, None, None, 'draft'])
+    _clone_modules(modulestore, modules, dest_location)
 
     # now iterate through all of the assets and clone them
     # first the thumbnails

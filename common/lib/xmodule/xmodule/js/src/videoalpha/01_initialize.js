@@ -93,14 +93,7 @@ function (VideoPlayer) {
 
             fadeOutTimeout:     1400,
 
-            availableQualities: ['hd720', 'hd1080', 'highres'],
-
-            qTipConfig: {
-                position: {
-                    my: 'top right',
-                    at: 'top center'
-                }
-            }
+            availableQualities: ['hd720', 'hd1080', 'highres']
         };
 
         if (!(_parseYouTubeIDs(state))) {
