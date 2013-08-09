@@ -5,6 +5,10 @@ JS_TEST_SUITES = {
     'common' => 'common/static/js_test.yml',
 }
 
+JS_TEST_SUITES.each do |key, val|
+    JS_TEST_SUITES[key] = File.join(REPO_ROOT, val)
+end
+
 # Given an environment (a key in `JS_TEST_SUITES`)
 # return the path to the JavaScript test suite description
 # If `env` is nil, return a string containing
