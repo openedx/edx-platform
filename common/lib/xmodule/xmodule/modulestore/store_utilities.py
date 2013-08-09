@@ -40,12 +40,16 @@ def _jump_to_url_replace_regex(prefix):
         """.format(prefix=prefix)
 
 
-def convert_to_portable_links(source_course_id, text):
+def rewrite_nonportable_content_links(source_course_id, dest_course_id, text):
     """
     Does a regex replace on non-portable links:
          /c4x/<org>/<course>/asset/<name> -> /static/<name>
          /jump_to/i4x://<org>/<course>/<category>/<name> -> /jump_to_id/<id>
+
     """
+
+    org, course, run = source_course_id.split("/")
+    dest_org, dest_course, dest_run = dest_course_id.split("/")
 
     def portable_asset_link_subtitution(match):
         quote = match.group('quote')
@@ -57,15 +61,50 @@ def convert_to_portable_links(source_course_id, text):
         rest = match.group('rest')
         return "".join([quote, '/jump_to_id/'+rest, quote])
 
-    org, course, run = source_course_id.split("/")
+    def generic_courseware_link_substitution(match):
+        quote = match.group('quote')
+        rest = match.group('rest')
+        dest_generic_courseware_lik_base = '/courses/{org}/{course}/{run}/'.format(
+            org=dest_org, course=dest_course, run=dest_run)
+
+        return "".join([quote, dest_generic_courseware_lik_base+rest, quote])
+
     course_location = Location(['i4x', org, course, 'course', run])
 
-    c4x_link_base = '{0}/'.format(StaticContent.get_base_url_path_for_course_assets(course_location))
-    text = re.sub(_asset_url_replace_regex(c4x_link_base), portable_asset_link_subtitution, text)
+    # NOTE: ultimately link updating is not a hard requirement, so if something blows up with
+    # the regex subsitution, log the error and continue
+    try:
+        c4x_link_base = '{0}/'.format(StaticContent.get_base_url_path_for_course_assets(course_location))
+        text = re.sub(_asset_url_replace_regex(c4x_link_base), portable_asset_link_subtitution, text)
+    except Exception, e:
+        logging.warning("Error going regex subtituion (0) on text = {1}.\n\nError msg = {2}".format(
+            c4x_link_base, text, str(e)))
+        pass
 
-    jump_to_link_base = '/courses/{org}/{course}/{run}/jump_to/i4x://{org}/{course}/'.format(
-        org=org, course=course, run=run)
-    text = re.sub(_jump_to_url_replace_regex(jump_to_link_base), portable_jump_to_link_substitution, text)
+    try:
+        jump_to_link_base = '/courses/{org}/{course}/{run}/jump_to/i4x://{org}/{course}/'.format(
+            org=org, course=course, run=run)
+        text = re.sub(_jump_to_url_replace_regex(jump_to_link_base), portable_jump_to_link_substitution, text)
+    except Exception, e:
+        logging.warning("Error going regex subtituion (0) on text = {1}.\n\nError msg = {2}".format(
+            jump_to_link_base, text, str(e)))
+        pass
+
+    # Also, there commonly is a set of link URL's used in the format:
+    # /courses/<org>/<course>/<run> which will be broken if migrated to a different course_id
+    # so let's rewrite those, but the target will also be non-portable,
+    #
+    # Note: we only need to do this if we are changing course-id's
+    #
+    if source_course_id != dest_course_id:
+        try:
+            generic_courseware_link_base = '/courses/{org}/{course}/{run}/'.format(
+                org=org, course=course, run=run)
+            text = re.sub(_asset_url_replace_regex(generic_courseware_link_base), portable_asset_link_subtitution, text)
+        except Exception, e:
+            logging.warning("Error going regex subtituion (0) on text = {1}.\n\nError msg = {2}".format(
+                generic_courseware_link_base, text, str(e)))
+            pass
 
     return text
 
@@ -87,7 +126,8 @@ def _clone_modules(modulestore, modules, source_location, dest_location):
         # NOTE: usage of the the internal module.xblock_kvs._data does not include any 'default' values for the fields
         data = module.xblock_kvs._data
         if isinstance(data, basestring):
-            data = convert_to_portable_links(source_location.course_id, data)
+            data = rewrite_nonportable_content_links(
+                source_location.course_id, dest_location.course_id, data)
 
         modulestore.update_item(module.location, data)
 

@@ -10,7 +10,7 @@ from xmodule.modulestore import Location
 from xmodule.contentstore.content import StaticContent
 from .inheritance import own_metadata
 from xmodule.errortracker import make_error_tracker
-from .store_utilities import convert_to_portable_links
+from .store_utilities import rewrite_nonportable_content_links
 
 log = logging.getLogger(__name__)
 
@@ -128,7 +128,8 @@ def import_from_xml(store, data_dir, course_dirs=None,
                                        {"type": "discussion", "name": "Discussion"},
                                        {"type": "wiki", "name": "Wiki"}]  # note, add 'progress' when we can support it on Edge
 
-                    import_module(module, store, course_data_path, static_content_store, course_location)
+                    import_module(module, store, course_data_path, static_content_store, course_location, 
+                                  target_location_namespace if target_location_namespace else course_location)
 
                     course_items.append(module)
 
@@ -155,7 +156,8 @@ def import_from_xml(store, data_dir, course_dirs=None,
                 if verbose:
                     log.debug('importing module location {0}'.format(module.location))
 
-                import_module(module, store, course_data_path, static_content_store, course_location)
+                import_module(module, store, course_data_path, static_content_store, course_location,
+                              target_location_namespace if target_location_namespace else course_location)
 
             # now import any 'draft' items
             if draft_store is not None:
@@ -173,7 +175,8 @@ def import_from_xml(store, data_dir, course_dirs=None,
     return xml_module_store, course_items
 
 
-def import_module(module, store, course_data_path, static_content_store, source_course_location, allow_not_found=False):
+def import_module(module, store, course_data_path, static_content_store,
+                  source_course_location, dest_course_location, allow_not_found=False):
     content = {}
     for field in module.fields:
         if field.scope != Scope.content:
@@ -193,7 +196,8 @@ def import_module(module, store, course_data_path, static_content_store, source_
     if isinstance(module_data, basestring):
         # we want to convert all 'non-portable' links in the module_data (if it is a string) to
         # portable strings (e.g. /static/)
-        module_data = convert_to_portable_links(source_course_location.course_id, module_data)
+        module_data = rewrite_nonportable_content_links(
+            source_course_location.course_id, dest_course_location.course_id, module_data)
 
     if allow_not_found:
         store.update_item(module.location, module_data, allow_not_found=allow_not_found)
@@ -265,7 +269,8 @@ def import_course_draft(xml_module_store, store, draft_store, course_data_path, 
                             del module.xml_attributes['parent_sequential_url']
                             del module.xml_attributes['index_in_children_list']
 
-                        import_module(module, draft_store, course_data_path, static_content_store, source_location_namespace, allow_not_found=True)
+                        import_module(module, draft_store, course_data_path, static_content_store,
+                                      source_location_namespace, target_location_namespace, allow_not_found=True)
                         for child in module.get_children():
                             _import_module(child)
 
