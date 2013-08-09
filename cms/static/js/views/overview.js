@@ -33,9 +33,14 @@ $(document).ready(function() {
             }
             // Otherwise, do check the container
             else {
-                // If the list is empty, we should prepend to it
+                // If the list is empty, we should prepend to it,
+                // unless both elements are at the same location --
+                // this prevents the user from being unable to expand
+                // a section
+                var containerY = container.offset().top;
                 if(siblings.length == 0 &&
-                   Math.abs(eleY - container.offset().top) < 50) {
+                   containerY != eleY &&
+                   Math.abs(eleY - containerY) < 50) {
                     return {
                         ele: container,
                         attachMethod: 'prepend'
