@@ -13,9 +13,11 @@ import textwrap
 
 log = logging.getLogger("mitx.courseware")
 
-V1_SETTINGS_ATTRIBUTES = ["display_name", "max_attempts", "graded", "accept_file_upload",
-                          "skip_spelling_checks", "due", "graceperiod", "weight", "min_to_calibrate",
-                          "max_to_calibrate", "peer_grader_count", "required_peer_grading"]
+V1_SETTINGS_ATTRIBUTES = [
+    "display_name", "max_attempts", "graded", "accept_file_upload",
+    "skip_spelling_checks", "due", "graceperiod", "weight", "min_to_calibrate",
+    "max_to_calibrate", "peer_grader_count", "required_peer_grading",
+]
 
 V1_STUDENT_ATTRIBUTES = ["current_task_number", "task_states", "state",
                          "student_attempts", "ready_to_reset"]
@@ -250,14 +252,14 @@ class CombinedOpenEndedFields(object):
         help="The minimum number of calibration essays each student will need to complete for peer grading.",
         default=3,
         scope=Scope.settings,
-        values={"min" : 1, "step" : "1"}
+        values={"min" : 1, "max" : 20, "step" : "1"}
     )
     max_to_calibrate = Integer(
         display_name="Maximum Peer Grading Calibrations",
         help="The maximum number of calibration essays each student will need to complete for peer grading.",
         default=6,
         scope=Scope.settings,
-        values={"max" : 20, "step" : "1"}
+        values={"min" : 1, "max" : 20, "step" : "1"}
     )
     peer_grader_count = Integer(
         display_name="Peer Graders per Response",
