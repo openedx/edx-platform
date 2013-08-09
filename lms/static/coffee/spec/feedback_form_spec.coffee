@@ -1,6 +1,6 @@
 describe 'FeedbackForm', ->
   beforeEach ->
-    loadFixtures 'coffee/fixtures/feedback_form.html'
+    loadFixtures 'feedback_form.html'
 
   describe 'constructor', ->
     beforeEach ->
