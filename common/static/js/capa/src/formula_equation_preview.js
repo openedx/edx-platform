@@ -12,29 +12,34 @@ formulaEquationPreview.enable = function () {
      * its callback.
      */
     function setupInput() {
+        var $this = $(this); // cache the jQuery object
+
+        var $preview = $("#" + this.id + "_preview");
         var inputData = {
             // These are the mutable values
+
             lastSent: 0,
             isWaitingForRequest: false,
             requestVisible: 0,
-            errorDelayTimeout: null
+            errorDelayTimeout: null,
+
+            // The following don't change
+
+            // Find the URL from the closest parent problems-wrapper.
+            url: $this.closest('.problems-wrapper').data('url'),
+            // Grab the input id from the input.
+            inputId: $this.data('input-id'),
+
+            // Store the DOM/MathJax elements in which visible output occurs.
+            $preview: $preview,
+            // Note: sometimes MathJax hasn't finished loading yet.
+            jax: MathJax.Hub.getAllJax($preview[0])[0],
+            $img: $preview.find("img.loading"),
+
+            requestCallback: null  // Fill it in in a bit.
         };
 
-        // Other elements of `inputData` serve to hold pointers to variables.
-        var $this = $(this); // cache the jQuery object
-
-        // Find the closest parent problems-wrapper and use that url for Ajax.
-        inputData.url = $this.closest('.problems-wrapper').data('url');
-        // Grab the input id from the input.
-        inputData.inputId = $this.data('input-id')
-
-        // Store the DOM/MathJax elements in which visible output occurs.
-        inputData.$preview = $("#" + this.id + "_preview");
-        // Note: sometimes MathJax hasn't finished loading yet.
-        inputData.jax = MathJax.Hub.getAllJax(inputData.$preview[0])[0];
-        inputData.$img = inputData.$preview.find("img.loading");
-
-        // Give the callback access to `inputData` (fill in first parameter).
+        // Give callback access to `inputData` (fill in first parameter).
         inputData.requestCallback = _.partial(updatePage, inputData);
 
         // Limit `sendRequest` and have it show the loading icon.
@@ -48,11 +53,11 @@ formulaEquationPreview.enable = function () {
             // Show the loading icon.
             inputData.$img.css('visibility', 'visible');
 
-	    inputData.isWaitingForRequest = true;
+            inputData.isWaitingForRequest = true;
             throttledRequest(inputData, this.value);
         };
 
-        $this.bind("input", initializeRequest);
+        $this.on("input", initializeRequest);
         // send an initial 
         initializeRequest.call(this);
     }
@@ -68,27 +73,27 @@ formulaEquationPreview.enable = function () {
         // We're sending it.
         inputData.isWaitingForRequest = false;
 
-	if (formula) {
+        if (formula) {
             // Send the request.
             Problem.inputAjax(
-		inputData.url,
-		inputData.inputId,
-		'preview_formcalc',
-		{"formula" : formula, "request_start" : now},
-		inputData.requestCallback
+                inputData.url,
+                inputData.inputId,
+                'preview_formcalc',
+                {"formula" : formula, "request_start" : now},
+                inputData.requestCallback
             );
             // ).fail(function () {
             //     // This is run when ajax call fails.
             //     // Have an error message and other stuff here?
             //     inputData.$img.css('visibility', 'hidden');
             // }); */
-	}
-	else {
+        }
+        else {
             inputData.requestCallback({
                 preview: '',
                 request_start: now
             });
-	}
+        }
     }
 
     /**
