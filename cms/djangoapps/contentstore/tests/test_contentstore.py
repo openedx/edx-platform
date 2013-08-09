@@ -617,7 +617,25 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         }
 
         module_store = modulestore('direct')
+        draft_store = modulestore('draft')
         import_from_xml(module_store, 'common/test/data/', ['toy'])
+
+        source_course_id = 'edX/toy/2012_Fall'
+        dest_course_id = 'MITx/999/2013_Spring'
+        source_location = CourseDescriptor.id_to_location(source_course_id)
+        dest_location = CourseDescriptor.id_to_location(dest_course_id)
+
+        # get a vertical (and components in it) to put into 'draft'
+        # this is to assert that draft content is also cloned over
+        vertical = module_store.get_instance(source_course_id, Location([
+            source_location.tag, source_location.org, source_location.course, 'vertical', 'vertical_test', None]), depth=1)
+
+        draft_store.convert_to_draft(vertical.location)
+        for child in vertical.get_children():
+            draft_store.convert_to_draft(child.location)
+
+        items = module_store.get_items(Location([source_location.tag, source_location.org, source_location.course, None, None, 'draft']))
+        self.assertGreater(len(items), 0)
 
         resp = self.client.post(reverse('create_new_course'), course_data)
         self.assertEqual(resp.status_code, 200)
@@ -626,22 +644,54 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         content_store = contentstore()
 
-        source_location = CourseDescriptor.id_to_location('edX/toy/2012_Fall')
-        dest_location = CourseDescriptor.id_to_location('MITx/999/2013_Spring')
-
         clone_course(module_store, content_store, source_location, dest_location)
+
+        # first assert that all draft content got cloned as well
+        items = module_store.get_items(Location([source_location.tag, source_location.org, source_location.course, None, None, 'draft']))
+        self.assertGreater(len(items), 0)
+        clone_items = module_store.get_items(Location([dest_location.tag, dest_location.org, dest_location.course, None, None, 'draft']))
+        self.assertGreater(len(clone_items), 0)
+        self.assertEqual(len(items), len(clone_items))
 
         # now loop through all the units in the course and verify that the clone can render them, which
         # means the objects are at least present
-        items = module_store.get_items(Location(['i4x', 'edX', 'toy', 'poll_question', None]))
+        items = module_store.get_items(Location([source_location.tag, source_location.org, source_location.course, None, None]))
         self.assertGreater(len(items), 0)
-        clone_items = module_store.get_items(Location(['i4x', 'MITx', '999', 'poll_question', None]))
+        clone_items = module_store.get_items(Location([dest_location.tag, dest_location.org, dest_location.course, None, None]))
         self.assertGreater(len(clone_items), 0)
+
         for descriptor in items:
-            new_loc = descriptor.location.replace(org='MITx', course='999')
+            source_item = module_store.get_instance(source_course_id, descriptor.location)
+            if descriptor.location.category == 'course':
+                new_loc = descriptor.location.replace(org=dest_location.org, course=dest_location.course, name='2013_Spring')
+            else:
+                new_loc = descriptor.location.replace(org=dest_location.org, course=dest_location.course)
             print "Checking {0} should now also be at {1}".format(descriptor.location.url(), new_loc.url())
-            resp = self.client.get(reverse('edit_unit', kwargs={'location': new_loc.url()}))
-            self.assertEqual(resp.status_code, 200)
+            lookup_item = module_store.get_item(new_loc)
+
+            # we want to assert equality between the objects, but we know the locations
+            # differ, so just make them equal for testing purposes
+            source_item.location = new_loc
+            if hasattr(source_item, 'data') and hasattr(lookup_item, 'data'):
+                self.assertEqual(source_item.data, lookup_item.data)
+
+            # also make sure that metadata was cloned over and filtered with own_metadata, i.e. inherited
+            # values were not explicitly set
+            self.assertEqual(own_metadata(source_item), own_metadata(lookup_item))
+
+            # check that the children are as expected
+            self.assertEqual(source_item.has_children, lookup_item.has_children)
+            if source_item.has_children:
+                expected_children = []
+                for child_loc_url in source_item.children:
+                    child_loc = Location(child_loc_url)
+                    child_loc = child_loc._replace(
+                        tag=dest_location.tag,
+                        org=dest_location.org,
+                        course=dest_location.course
+                    )
+                    expected_children.append(child_loc.url())
+                self.assertEqual(expected_children, lookup_item.children)
 
     def test_illegal_draft_crud_ops(self):
         draft_store = modulestore('draft')
