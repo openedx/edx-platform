@@ -506,13 +506,17 @@ class CombinedOpenEndedV1Module():
         student_id = self.system.anonymous_student_id
         success = False
         allowed_to_submit = True
-        error_string = ("You need to peer grade {0} more in order to make another submission.  "
-                        "You have graded {1}, and {2} are required.  You have made {3} successful peer grading submissions.")
+        error_string = ("<h4>Feedback not available yet</h4>"
+                        "<p>You need to peer grade {0} more submissions in order to see your feedback.</p>"
+                        "<p>You have graded responses from {1} students, and {2} students have graded your submissions. </p>"
+                        "<p>You have made {3} submissions.</p>")
         try:
-            response = self.peer_gs.get_data_for_location(self.location, student_id)
+            response = self.peer_gs.get_data_for_location(self.location.url(), student_id)
+            log.info(response)
             count_graded = response['count_graded']
             count_required = response['count_required']
             student_sub_count = response['student_sub_count']
+            count_available = response['count_available']
             success = True
         except:
             # This is a dev_facing_error
@@ -521,7 +525,7 @@ class CombinedOpenEndedV1Module():
             # This is a student_facing_error
             error_message = "Could not contact the graders.  Please notify course staff."
             return success, allowed_to_submit, error_message
-        if count_graded >= count_required:
+        if count_graded >= count_required or count_available==0:
             return success, allowed_to_submit, ""
         else:
             allowed_to_submit = False
@@ -537,15 +541,17 @@ class CombinedOpenEndedV1Module():
         Output: Dictionary to be rendered via ajax that contains the result html.
         """
         all_responses = []
+        success, can_see_rubric, error = self.check_if_student_has_done_needed_grading()
+        if not can_see_rubric:
+            return {'html' : self.system.render_template('{0}/combined_open_ended_hidden_results.html'.format(self.TEMPLATE_DIR), {'error' : error}), 'success' : True, 'hide_reset' : True}
 
         loop_up_to_task = self.current_task_number + 1
         contexts = []
         for i in xrange(0, loop_up_to_task):
             response = self.get_last_response(i)
-            rubric_scores = None
             score_length = len(response['grader_types'])
-            log.info(response)
             for z in xrange(0,score_length):
+                feedback = response['feedback_dicts'][z].get('feedback', '')
                 if response['grader_types'][z] in HUMAN_GRADER_TYPE.keys():
                     rubric_scores = [[response['rubric_scores'][z]]]
                     grader_types = [[response['grader_types'][z]]]
@@ -555,14 +561,15 @@ class CombinedOpenEndedV1Module():
                                                                           grader_types, feedback_items)
                     contexts.append({
                         'result': rubric_html,
-                        'task_name': 'Scored rubric'
+                        'task_name': 'Scored rubric',
+                        'feedback' : feedback
                     })
 
         context = {
             'results': contexts,
         }
         html = self.system.render_template('{0}/combined_open_ended_results.html'.format(self.TEMPLATE_DIR), context)
-        return {'html': html, 'success': True}
+        return {'html': html, 'success': True, 'hide_reset' : False}
 
     def get_legend(self, _data):
         """
@@ -681,7 +688,9 @@ class CombinedOpenEndedV1Module():
         if self.state != self.DONE:
             if not self.ready_to_reset:
                 return self.out_of_sync_error(data)
-
+        success, can_reset, error = self.check_if_student_has_done_needed_grading()
+        if not can_reset:
+            return {'error' : error, 'success' : False}
         if self.student_attempts >= self.max_attempts-1:
             if self.student_attempts==self.max_attempts-1:
                 self.student_attempts +=1

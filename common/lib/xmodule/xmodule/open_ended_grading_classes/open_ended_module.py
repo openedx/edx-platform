@@ -697,7 +697,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         else:
             post_assessment = ""
             correct = ""
-            previous_answer = self.initial_display
+            previous_answer = ""
 
         context = {
             'prompt': self.child_prompt,

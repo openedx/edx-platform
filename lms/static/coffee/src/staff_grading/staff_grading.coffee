@@ -223,12 +223,12 @@ class @StaffGrading
   setup_score_selection: =>
     @score_selection_container.html(@rubric)
     $('input[class="score-selection"]').change => @graded_callback()
-    Rubric.initialize(@location, @el)
-
+    @rub = new Rubric(@el)
+    @rub.initialize(@location)
 
   graded_callback: () =>
    # show button if we have scores for all categories
-    if Rubric.check_complete()
+    if @rub.check_complete()
       @state = state_graded
       @submit_button.show()
 
@@ -236,7 +236,7 @@ class @StaffGrading
     #Previously, responses were submitted when hitting enter.  Add in a modifier that ensures that ctrl+enter is needed.
     if event.which == 17 && @is_ctrl==false
       @is_ctrl=true
-    else if @is_ctrl==true && event.which == 13 && !@list_view && Rubric.check_complete()
+    else if @is_ctrl==true && event.which == 13 && !@list_view && @rub.check_complete()
       @submit_and_get_next()
 
   keyup_handler: (event) =>
@@ -271,8 +271,8 @@ class @StaffGrading
 
   skip_and_get_next: () =>
     data =
-      score: Rubric.get_total_score()
-      rubric_scores: Rubric.get_score_list()
+      score: @rub.get_total_score()
+      rubric_scores: @rub.get_score_list()
       feedback: @feedback_area.val()
       submission_id: @submission_id
       location: @location
@@ -286,8 +286,8 @@ class @StaffGrading
 
   submit_and_get_next: () ->
     data =
-      score: Rubric.get_total_score()
-      rubric_scores: Rubric.get_score_list()
+      score: @rub.get_total_score()
+      rubric_scores: @rub.get_score_list()
       feedback: @feedback_area.val()
       submission_id: @submission_id
       location: @location

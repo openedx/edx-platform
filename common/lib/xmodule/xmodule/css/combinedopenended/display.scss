@@ -286,6 +286,13 @@ div.combined-rubric-container {
     }
   }
 
+   label.choicegroup_partialcorrect {
+      &:before {
+        margin-right: 15px;
+        content: url('../images/partially-correct-icon.png');
+      }
+    }
+
   label.choicegroup_incorrect {
     &:before {
       margin-right: 15px;
@@ -421,6 +428,22 @@ div.result-container {
     margin: 0px;
     display : inline;
   }
+}
+
+div.rubric {
+    ul.rubric-list{
+      margin: 0;
+      padding: 0;
+      list-style-type: none;
+      list-style: none;
+      li {
+        &.rubric-list-item {
+          margin-bottom: 0;
+          padding: 0;
+          border-radius: $baseline/4;
+         }
+      }
+    }
 }
 
 
@@ -663,14 +686,13 @@ section.open-ended-child {
     margin-bottom: lh();
     margin-left: .75em;
     margin-left: .75rem;
-    list-style: disc outside none;
   }
 
     ul.rubric-list{
       margin: 0;
       padding: 0;
       list-style-type: none;
-
+      list-style: none;
       li {
         &.rubric-list-item {
           margin-bottom: 0;

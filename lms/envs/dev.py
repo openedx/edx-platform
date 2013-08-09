@@ -29,6 +29,7 @@ MITX_FEATURES['ENABLE_PSYCHOMETRICS'] = False    # real-time psychometrics (eg i
 MITX_FEATURES['ENABLE_INSTRUCTOR_ANALYTICS'] = True
 MITX_FEATURES['ENABLE_SERVICE_STATUS'] = True
 MITX_FEATURES['ENABLE_HINTER_INSTRUCTOR_VIEW'] = True
+MITX_FEATURES['ENABLE_INSTRUCTOR_BETA_DASHBOARD'] = False
 
 WIKI_ENABLED = True
 
@@ -257,7 +258,7 @@ if SEGMENT_IO_LMS_KEY:
 
 
 ########################## USER API ########################
-EDX_API_KEY = ''
+EDX_API_KEY = None
 
 #####################################################################
 # Lastly, see if the developer has any local overrides.

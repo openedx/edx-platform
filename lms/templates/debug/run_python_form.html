@@ -1,3 +1,4 @@
+<%! from django.utils.translation import ugettext as _ %>
 <html><body>
 <div>
 <p>Python:</p>
@@ -11,7 +12,7 @@
 </div>
 %if results:
 <div>
-    <p>Results:</p>
+    <p>${_("Results:")}</p>
     <pre>
 ${results|h}
 </pre>

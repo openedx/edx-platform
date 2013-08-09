@@ -81,7 +81,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
             version_guid=course_entry_override['_id'],
             usage_id=usage_id,
             course_id=course_entry_override.get('course_id'),
-            revision=course_entry_override.get('revision')
+            branch=course_entry_override.get('branch')
         )
 
         kvs = SplitMongoKVS(
@@ -116,4 +116,6 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         module.previous_version = json_data.get('previous_version')
         module.update_version = json_data.get('update_version')
         module.definition_locator = self.modulestore.definition_locator(definition)
+        # decache any pending field settings
+        module.save()
         return module

@@ -8,8 +8,13 @@ from common import i_am_registered_for_the_course, section_location
 
 
 @step('when I view the video it has autoplay enabled')
-def does_autoplay(_step):
+def does_autoplay_video(_step):
     assert(world.css_find('.video')[0]['data-autoplay'] == 'True')
+
+
+@step('when I view the videoalpha it has autoplay enabled')
+def does_autoplay_videoalpha(_step):
+    assert(world.css_find('.videoalpha')[0]['data-autoplay'] == 'True')
 
 
 @step('the course has a Video component')

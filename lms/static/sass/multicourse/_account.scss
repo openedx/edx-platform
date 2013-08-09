@@ -37,7 +37,7 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0 !important;
-    color: saturate($link-color-d1,15%);
+    color: $m-gray-d2;
   }
 
   .heading-5 {
@@ -390,7 +390,7 @@
     @include clearfix();
 
     button[type="submit"] {
-      @extend .button-primary;
+      @extend .m-btn-primary;
 
       &:disabled, &.is-disabled {
         opacity: 0.3;
@@ -431,7 +431,6 @@
       margin: 0 0 ($baseline/4) 0;
       font-size: em(14);
       font-weight: 600;
-      color: $m-gray-d2 !important;
     }
 
     .message-copy {

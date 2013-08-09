@@ -368,42 +368,6 @@ p, ul, ol, dl {
       color: $gray-d3;
     }
   }
-
-  .introduction {
-    @include box-sizing(border-box);
-    @extend .t-copy-sub1;
-    width: flex-grid(12);
-    margin: 0 0 $baseline 0;
-
-    .copy strong {
-      font-weight: 600;
-    }
-
-    &.has-links {
-      @include clearfix();
-
-      .copy {
-        float: left;
-        width: flex-grid(8,12);
-        margin-right: flex-gutter();
-      }
-
-      .nav-introduction-supplementary {
-        @extend .t-copy-sub2;
-        float: right;
-        width: flex-grid(4,12);
-        display: block;
-        text-align: right;
-
-        .icon {
-          @extend .t-action3;
-          display: inline-block;
-          vertical-align: middle;
-          margin-right: ($baseline/4);
-        }
-      }
-    }
-  }
 }
 
 .content-primary, .content-supplementary {
@@ -479,6 +443,24 @@ p, ul, ol, dl {
 
       &:last-child {
         margin-bottom: 0;
+      }
+    }
+
+    // actions
+    .list-actions {
+      @extend .cont-no-list;
+
+      .action-item {
+        margin-bottom: ($baseline/4);
+        border-bottom: 1px dotted $gray-l4;
+        padding-bottom: ($baseline/4);
+
+
+        &:last-child {
+          margin-bottom: 0;
+          border: none;
+          padding-bottom: 0;
+        }
       }
     }
 

@@ -1,3 +1,5 @@
+import base64
+
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -30,6 +32,9 @@ class UserApiTestCase(TestCase):
             UserPreferenceFactory.create(user=self.users[0], key="key1"),
             UserPreferenceFactory.create(user=self.users[1], key="key0")
         ]
+
+    def basic_auth(self, username, password):
+        return {'HTTP_AUTHORIZATION': 'Basic ' + base64.b64encode('%s:%s' % (username, password))}
 
     def request_with_auth(self, method, *args, **kwargs):
         """Issue a get request to the given URI with the API key header"""
@@ -74,7 +79,7 @@ class UserApiTestCase(TestCase):
 
     def assertUserIsValid(self, user):
         """Assert that the given user result is valid"""
-        self.assertItemsEqual(user.keys(), ["email", "id", "name", "url"])
+        self.assertItemsEqual(user.keys(), ["email", "id", "name", "username", "url"])
         self.assertSelfReferential(user)
 
     def assertPrefIsValid(self, pref):
@@ -121,6 +126,20 @@ class UserViewSetTest(UserApiTestCase):
 
     def test_list_unauthorized(self):
         self.assertHttpForbidden(self.client.get(self.LIST_URI))
+
+    @override_settings(DEBUG=True)
+    @override_settings(EDX_API_KEY=None)
+    def test_debug_auth(self):
+        self.assertHttpOK(self.client.get(self.LIST_URI))
+
+    @override_settings(DEBUG=False)
+    @override_settings(EDX_API_KEY=TEST_API_KEY)
+    def test_basic_auth(self):
+        # ensure that having basic auth headers in the mix does not break anything
+        self.assertHttpOK(
+                self.request_with_auth("get", self.LIST_URI, **self.basic_auth('someuser', 'somepass')))
+        self.assertHttpForbidden(
+                self.client.get(self.LIST_URI, **self.basic_auth('someuser', 'somepass')))
 
     def test_get_list_empty(self):
         User.objects.all().delete()
@@ -191,7 +210,8 @@ class UserViewSetTest(UserApiTestCase):
                 "email": user.email,
                 "id": user.id,
                 "name": user.profile.name,
-                "url": uri,
+                "username": user.username,
+                "url": uri
             }
         )
 
@@ -219,6 +239,11 @@ class UserPreferenceViewSetTest(UserApiTestCase):
 
     def test_list_unauthorized(self):
         self.assertHttpForbidden(self.client.get(self.LIST_URI))
+
+    @override_settings(DEBUG=True)
+    @override_settings(EDX_API_KEY=None)
+    def test_debug_auth(self):
+        self.assertHttpOK(self.client.get(self.LIST_URI))
 
     def test_get_list_empty(self):
         UserPreference.objects.all().delete()
@@ -251,6 +276,26 @@ class UserPreferenceViewSetTest(UserApiTestCase):
         for pref in prefs:
             self.assertPrefIsValid(pref)
             self.assertEqual(pref["key"], "key0")
+
+    def test_get_list_filter_user_empty(self):
+        def test_id(user_id):
+            result = self.get_json(self.LIST_URI, data={"user": user_id})
+            self.assertEqual(result["count"], 0)
+            self.assertEqual(result["results"], [])
+        test_id(self.users[2].id)
+        # TODO: If the given id does not match a user, then the filter is a no-op
+        # test_id(42)
+        # test_id("asdf")
+
+    def test_get_list_filter_user_nonempty(self):
+        user_id = self.users[0].id
+        result = self.get_json(self.LIST_URI, data={"user": user_id})
+        self.assertEqual(result["count"], 2)
+        prefs = result["results"]
+        self.assertEqual(len(prefs), 2)
+        for pref in prefs:
+            self.assertPrefIsValid(pref)
+            self.assertEqual(pref["user"]["id"], user_id)
 
     def test_get_list_pagination(self):
         first_page = self.get_json(self.LIST_URI, data={"page_size": 2})
@@ -304,6 +349,7 @@ class UserPreferenceViewSetTest(UserApiTestCase):
                     "email": pref.user.email,
                     "id": pref.user.id,
                     "name": pref.user.profile.name,
+                    "username": pref.user.username,
                     "url": self.get_uri_for_user(pref.user),
                 },
                 "key": pref.key,

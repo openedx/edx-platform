@@ -445,7 +445,7 @@ class ImportTestCase(BaseCourseTestCase):
         render_string_from_sample_gst_xml = """
         <slider var="a" style="width:400px;float:left;"/>\
 <plot style="margin-top:15px;margin-bottom:15px;"/>""".strip()
-        self.assertEqual(gst_sample.render, render_string_from_sample_gst_xml)
+        self.assertIn(render_string_from_sample_gst_xml, gst_sample.data)
 
     def test_word_cloud_import(self):
         modulestore = XMLModuleStore(DATA_DIR, course_dirs=['word_cloud'])

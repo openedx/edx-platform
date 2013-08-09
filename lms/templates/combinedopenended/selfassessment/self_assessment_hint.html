@@ -1,6 +1,7 @@
+<%! from django.utils.translation import ugettext as _ %>
 <div class="hint">
     <div class="hint-prompt">
-        Please enter a hint below:
+        ${_("Please enter a hint below:")}
     </div>
     <textarea name="post_assessment" class="post_assessment" cols="70" rows="5"
      ${'readonly="true"' if read_only else ''}>${hint}</textarea>

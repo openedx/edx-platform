@@ -1,3 +1,4 @@
+<%! from django.utils.translation import ugettext as _ %>
 <!DOCTYPE html>
 {% load wiki_tags i18n %}{% load compressed %}
 <html>
@@ -28,8 +29,8 @@
 
       {% if revision and revision.deleted %}
         <div class="warning">
-          <strong>This revision has been deleted.</strong> 
-          <p>Restoring to this revision will mark the article as deleted.</p>
+          <strong>${_("This revision has been deleted.")}</strong> 
+          <p>${_("Restoring to this revision will mark the article as deleted.")}</p>
         </div>
       {% else %}
         {% wiki_render article content %}

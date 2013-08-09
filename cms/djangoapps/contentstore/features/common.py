@@ -4,10 +4,11 @@
 from lettuce import world, step
 from nose.tools import assert_true
 
-from auth.authz import get_user_by_email
+from auth.authz import get_user_by_email, get_course_groupname_for_role
 
 from selenium.webdriver.common.keys import Keys
 import time
+from django.contrib.auth.models import Group
 
 from logging import getLogger
 logger = getLogger(__name__)
@@ -53,6 +54,12 @@ def i_have_opened_a_new_course(_step):
     open_new_course()
 
 
+@step('(I select|s?he selects) the new course')
+def select_new_course(_step, whom):
+    course_link_css = 'a.course-link'
+    world.css_click(course_link_css)
+
+
 @step(u'I press the "([^"]*)" notification button$')
 def press_the_notification_button(_step, name):
     css = 'a.action-%s' % name.lower()
@@ -63,8 +70,12 @@ def press_the_notification_button(_step, name):
         confirmation_dismissed = world.is_css_not_present('.is-shown.wrapper-notification-warning')
         error_showing = world.is_css_present('.is-shown.wrapper-notification-error')
         return confirmation_dismissed or error_showing
-
-    world.css_click(css, success_condition=button_clicked), '%s button not clicked after 5 attempts.' % name
+    if world.is_firefox():
+        # This is done to explicitly make the changes save on firefox.  It will remove focus from the previously focused element
+        world.trigger_event(css, event='focus')
+        world.browser.execute_script("$('{}').click()".format(css))
+    else:
+        world.css_click(css, success_condition=button_clicked), '%s button not clicked after 5 attempts.' % name
 
 
 @step('I change the "(.*)" field to "(.*)"$')
@@ -118,14 +129,18 @@ def create_studio_user(
     registration.register(studio_user)
     registration.activate()
 
+    return studio_user
+
 
 def fill_in_course_info(
         name='Robot Super Course',
         org='MITx',
-        num='999'):
+        num='101',
+        run='2013_Spring'):
     world.css_fill('.new-course-name', name)
     world.css_fill('.new-course-org', org)
     world.css_fill('.new-course-number', num)
+    world.css_fill('.new-course-run', run)
 
 
 def log_into_studio(
@@ -133,40 +148,30 @@ def log_into_studio(
         email='robot+studio@edx.org',
         password='test'):
 
-    world.browser.cookies.delete()
+    world.log_in(username=uname, password=password, email=email, name='Robot Studio')
+    # Navigate to the studio dashboard
     world.visit('/')
-
-    signin_css = 'a.action-signin'
-    world.is_css_present(signin_css)
-    world.css_click(signin_css)
-
-    def fill_login_form():
-        login_form = world.browser.find_by_css('form#login_form')
-        login_form.find_by_name('email').fill(email)
-        login_form.find_by_name('password').fill(password)
-        login_form.find_by_name('submit').click()
-    world.retry_on_exception(fill_login_form)
-    assert_true(world.is_css_present('.new-course-button'))
-    world.scenario_dict['USER'] = get_user_by_email(email)
 
 
 def create_a_course():
-    world.scenario_dict['COURSE'] = world.CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course')
+    course = world.CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course')
+    world.scenario_dict['COURSE'] = course
+
+    user = world.scenario_dict.get("USER")
+    if not user:
+        user = get_user_by_email('robot+studio@edx.org')
 
     # Add the user to the instructor group of the course
     # so they will have the permissions to see it in studio
-
-    course = world.GroupFactory.create(name='instructor_MITx/{}/{}'.format(world.scenario_dict['COURSE'].number,
-                                                                    world.scenario_dict['COURSE'].display_name.replace(" ", "_")))
-    if world.scenario_dict.get('USER') is None:
-        user = world.scenario_dict['USER']
-    else:
-        user = get_user_by_email('robot+studio@edx.org')
-    user.groups.add(course)
+    for role in ("staff", "instructor"):
+        groupname = get_course_groupname_for_role(course.location, role)
+        group, __ = Group.objects.get_or_create(name=groupname)
+        user.groups.add(group)
     user.save()
-    world.browser.reload()
 
-    course_link_css = 'span.class-name'
+    # Navigate to the studio dashboard
+    world.visit('/')
+    course_link_css = 'a.course-link'
     world.css_click(course_link_css)
     course_title_css = 'span.course-title'
     assert_true(world.is_css_present(course_title_css))
@@ -214,6 +219,26 @@ def i_created_a_video_component(step):
     )
 
 
+@step('I have created a Video Alpha component$')
+def i_created_video_alpha(step):
+    step.given('I have enabled the videoalpha advanced module')
+    world.css_click('a.course-link')
+    step.given('I have added a new subsection')
+    step.given('I expand the first section')
+    world.css_click('a.new-unit-item')
+    world.css_click('.large-advanced-icon')
+    world.click_component_from_menu('videoalpha', None, '.xmodule_VideoAlphaModule')
+
+
+@step('I have enabled the (.*) advanced module$')
+def i_enabled_the_advanced_module(step, module):
+    step.given('I have opened a new course section in Studio')
+    world.css_click('.nav-course-settings')
+    world.css_click('.nav-course-settings-advanced a')
+    type_in_codemirror(0, '["%s"]' % module)
+    press_the_notification_button(step, 'Save')
+
+
 @step('I have clicked the new unit button')
 def open_new_unit(step):
     step.given('I have opened a new course section in Studio')
@@ -222,14 +247,14 @@ def open_new_unit(step):
     world.css_click('a.new-unit-item')
 
 
-@step('when I view the video it (.*) show the captions')
-def shows_captions(step, show_captions):
+@step('when I view the (video.*) it (.*) show the captions')
+def shows_captions(_step, video_type, show_captions):
     # Prevent cookies from overriding course settings
     world.browser.cookies.delete('hide_captions')
     if show_captions == 'does not':
-        assert world.css_has_class('.video', 'closed')
+        assert world.css_has_class('.%s' % video_type, 'closed')
     else:
-        assert world.is_css_not_present('.video.closed')
+        assert world.is_css_not_present('.%s.closed' % video_type)
 
 
 @step('the save button is disabled$')
@@ -242,7 +267,7 @@ def save_button_disabled(step):
 @step('I confirm the prompt')
 def confirm_the_prompt(step):
     prompt_css = 'a.button.action-primary'
-    world.css_click(prompt_css)
+    world.css_click(prompt_css, success_condition=lambda: not world.css_visible(prompt_css))
 
 
 @step(u'I am shown a (.*)$')
@@ -251,7 +276,8 @@ def i_am_shown_a_notification(step, notification_type):
 
 
 def type_in_codemirror(index, text):
-    world.css_click(".CodeMirror", index=index)
+    world.css_click("div.CodeMirror-lines", index=index)
+    world.browser.execute_script("$('div.CodeMirror.CodeMirror-focused > div').css('overflow', '')")
     g = world.css_find("div.CodeMirror.CodeMirror-focused > div > textarea")
     if world.is_mac():
         g._element.send_keys(Keys.COMMAND + 'a')
@@ -259,3 +285,5 @@ def type_in_codemirror(index, text):
         g._element.send_keys(Keys.CONTROL + 'a')
     g._element.send_keys(Keys.DELETE)
     g._element.send_keys(text)
+    if world.is_firefox():
+        world.trigger_event('div.CodeMirror', index=index, event='blur')

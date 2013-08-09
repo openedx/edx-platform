@@ -362,6 +362,11 @@ class CourseFields(object):
     # Explicit comparison to True because we always want to return a bool.
     hide_progress_tab = Boolean(help="DO NOT USE THIS", scope=Scope.settings)
 
+    display_organization = String(help="An optional display string for the course organization that will get rendered in the LMS",
+                                  scope=Scope.settings)
+
+    display_coursenumber = String(help="An optional display string for the course number that will get rendered in the LMS",
+                                  scope=Scope.settings)
 
 class CourseDescriptor(CourseFields, SequenceDescriptor):
     module_class = SequenceModule
@@ -934,5 +939,25 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         return self.location.course
 
     @property
+    def display_number_with_default(self):
+        """
+        Return a display course number if it has been specified, otherwise return the 'course' that is in the location
+        """
+        if self.display_coursenumber:
+            return self.display_coursenumber
+
+        return self.number
+
+    @property
     def org(self):
         return self.location.org
+
+    @property
+    def display_org_with_default(self):
+        """
+        Return a display organization if it has been specified, otherwise return the 'org' that is in the location
+        """
+        if self.display_organization:
+            return self.display_organization
+
+        return self.org

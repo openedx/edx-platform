@@ -1,10 +1,11 @@
+<%! from django.utils.translation import ugettext as _ %>
 <dl>
 % for license in licenses:
   <dt> ${license.software.name}: </dt>
   % if license.serial:
     <dd> ${license.serial} </dd>
   % else:
-    <dd> None Available </dd>
+  <dd> ${_("None Available")} </dd>
   % endif
 % endfor
 </dl>

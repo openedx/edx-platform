@@ -2,3 +2,7 @@
 # For each of the xmodules subdirectories, add a .gitignore file that
 # will version any *.js file that is specifically written, not compiled.
 *.js
+
+
+# Videoalpha are written in pure JavaScript.
+!videoalpha/*.js

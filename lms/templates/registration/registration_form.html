@@ -1,58 +1,59 @@
+<%! from django.utils.translation import ugettext as _ %>
 {% extends "registration/base.html" %}
 
-{% block title %}Sign up{% endblock %}
+{% block title %}${_("Sign up")}{% endblock %}
 
 {% block content %}
 
   {% if form.errors %}
-  <p class="errors">Please correct the errors below: {{ form.non_field_errors }}</p>
+  <p class="errors">${_("Please correct the errors below: {{ form.non_field_errors }}")}</p>
   {% endif %}
 
-  <h1>Create an account</h1>
-  
+  <h1>${_("Create an account")}</h1>
+
   <form method="post" action="" class="wide">
 {% csrf_token %}
     <p>
-      <label for="id_username">Username:</label>
+      <label for="id_username">${_("Username:")}</label>
       {% if form.username.errors %}
         <p class="errors">{{ form.username.errors.as_text }}</p>
       {% endif %}
       {{ form.username }}
     </p>
     <p>
-      <label for="id_email">Email address:</label>
+      <label for="id_email">${_("Email address:")}</label>
       {% if form.email.errors %}
         <p class="errors">{{ form.email.errors.as_text }}</p>
       {% endif %}
       {{ form.email }}
     </p>
     <p>
-      <label for="id_password1">Password:</label>
+      <label for="id_password1">${_("Password:")}</label>
       {% if form.password1.errors %}
         <p class="errors">{{ form.password1.errors.as_text }}</p>
       {% endif %}
       {{ form.password1 }}
     </p>
     <p>
-      <label for="id_password2">Password (type again to catch typos):</label>
+      <label for="id_password2">${_("Password (type again to catch typos):")}</label>
       {% if form.password2.errors %}
         <p class="errors">{{ form.password2.errors.as_text }}</p>
       {% endif %}
       {{ form.password2 }}
     </p>
-    <p class="submit"><input type="submit" value="Register &rarr;"></p>
+    <p class="submit"><input type="submit" value="${_("Register")} &rarr;"></p>
   </form>
-  
+
 {% endblock %}
 
 {% block content-related %}
-<p>Fill out the form to the left (all fields are required), and your
-account will be created; you'll be sent an email with instructions on how
-to finish your registration.</p>
+<p>${_("Fill out the form to the left (all fields are required), and your "
+"account will be created; you'll be sent an email with instructions on how "
+"to finish your registration.")}</p>
 
-<p>We'll only use your email to send you signup instructions. We hate spam
-as much as you do.</p>
+<p>${_("We'll only use your email to send you signup instructions. We hate spam "
+"as much as you do.")}</p>
 
-<p>This account will let you log into the ticket tracker, claim tickets,
-and be exempt from spam filtering.</p>
+<p>${_("This account will let you log into the ticket tracker, claim tickets, "
+"and be exempt from spam filtering")}.</p>
 {% endblock %}

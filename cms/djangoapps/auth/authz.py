@@ -178,10 +178,12 @@ def _remove_user_from_group(user, group_name):
     user.save()
 
 
-def is_user_in_course_group_role(user, location, role):
+def is_user_in_course_group_role(user, location, role, check_staff=True):
     if user.is_active and user.is_authenticated:
         # all "is_staff" flagged accounts belong to all groups
-        return user.is_staff or user.groups.filter(name=get_course_groupname_for_role(location, role)).count() > 0
+        if check_staff and user.is_staff:
+            return True
+        return user.groups.filter(name=get_course_groupname_for_role(location, role)).count() > 0
 
     return False
 

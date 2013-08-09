@@ -12,7 +12,7 @@ import time
 from django.http import Http404
 
 from xmodule.x_module import XModule
-from xmodule.raw_module import RawDescriptor
+from xmodule.raw_module import EmptyDataRawDescriptor
 from xmodule.editing_module import MetadataOnlyEditingDescriptor
 from xblock.core import Integer, Scope, String, Float, Boolean
 
@@ -97,7 +97,7 @@ class VideoModule(VideoFields, XModule):
 
 class VideoDescriptor(VideoFields,
                       MetadataOnlyEditingDescriptor,
-                      RawDescriptor):
+                      EmptyDataRawDescriptor):
     module_class = VideoModule
 
     def __init__(self, *args, **kwargs):
@@ -130,19 +130,15 @@ class VideoDescriptor(VideoFields,
         _parse_video_xml(video, video.data)
         return video
 
-    def definition_to_xml(self, resource_fs):
-        """
-        Override the base implementation. We don't actually have anything in the 'data' field
-        (it's an empty string), so we just return a simple XML element
-        """
-        return etree.Element('video')
-
 
 def _parse_video_xml(video, xml_data):
     """
     Parse video fields out of xml_data. The fields are set if they are
     present in the XML.
     """
+    if not xml_data:
+        return
+
     xml = etree.fromstring(xml_data)
 
     display_name = xml.get('display_name')

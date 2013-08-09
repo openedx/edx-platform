@@ -158,11 +158,47 @@ class @PeerGradingProblemBackend
     return response
 
 class @PeerGradingProblem
-  constructor: (backend) ->
-    @prompt_wrapper = $('.prompt-wrapper')
+
+  prompt_wrapper_sel: '.prompt-wrapper'
+  peer_grading_container_sel: '.peer-grading-container'
+  submission_container_sel: '.submission-container'
+  prompt_container_sel: '.prompt-container'
+  rubric_container_sel: '.rubric-container'
+  flag_student_container_sel: '.flag-student-container'
+  answer_unknown_container_sel: '.answer-unknown-container'
+  calibration_panel_sel: '.calibration-panel'
+  grading_panel_sel: '.grading-panel'
+  content_panel_sel: '.content-panel'
+  grading_message_sel: '.grading-message'
+  question_header_sel: '.question-header'
+  flag_submission_confirmation_sel: '.flag-submission-confirmation'
+  flag_submission_confirmation_button_sel: '.flag-submission-confirmation-button'
+  flag_submission_removal_button_sel: '.flag-submission-removal-button'
+  grading_wrapper_sel: '.grading-wrapper'
+  calibration_feedback_sel: '.calibration-feedback'
+  interstitial_page_sel: '.interstitial-page'
+  calibration_interstitial_page_sel: '.calibration-interstitial-page'
+  error_container_sel: '.error-container'
+  feedback_area_sel: '.feedback-area'
+  score_selection_container_sel: '.score-selection-container'
+  rubric_selection_container_sel: '.rubric-selection-container'
+  submit_button_sel: '.submit-button'
+  action_button_sel: '.action-button'
+  calibration_feedback_button_sel: '.calibration-feedback-button'
+  interstitial_page_button_sel: '.interstitial-page-button'
+  calibration_interstitial_page_button_sel: '.calibration-interstitial-page-button'
+  flag_checkbox_sel: '.flag-checkbox'
+  answer_unknown_checkbox_sel: '.answer-unknown-checkbox'
+  calibration_text_sel: '.calibration-text'
+  grading_text_sel: '.grading-text'
+  calibration_feedback_wrapper_sel: '.calibration-feedback-wrapper'
+
+  constructor: (backend, el) ->
+    @el = el
+    @prompt_wrapper = $(@prompt_wrapper_sel)
     @backend = backend
     @is_ctrl = false
-    @el = $('.peer-grading-container')
+    @el = $(@peer_grading_container_sel)
 
     # get the location of the problem
     @location = $('.peer-grading').data('location')
@@ -172,51 +208,51 @@ class @PeerGradingProblem
       return
 
     # get the other elements we want to fill in
-    @submission_container = $('.submission-container')
-    @prompt_container = $('.prompt-container')
-    @rubric_container = $('.rubric-container')
-    @flag_student_container = $('.flag-student-container')
-    @answer_unknown_container = $('.answer-unknown-container')
-    @calibration_panel = $('.calibration-panel')
-    @grading_panel = $('.grading-panel')
-    @content_panel = $('.content-panel')
-    @grading_message = $('.grading-message')
+    @submission_container = @$(@submission_container_sel)
+    @prompt_container = @$(@prompt_container_sel)
+    @rubric_container = @$(@rubric_container_sel)
+    @flag_student_container = @$(@flag_student_container_sel)
+    @answer_unknown_container = @$(@answer_unknown_container_sel)
+    @calibration_panel = @$(@calibration_panel_sel)
+    @grading_panel = @$(@grading_panel_sel)
+    @content_panel = @$(@content_panel_sel)
+    @grading_message = @$(@grading_message_sel)
     @grading_message.hide()
-    @question_header = $('.question-header')
+    @question_header = @$(@question_header_sel)
     @question_header.click @collapse_question
-    @flag_submission_confirmation = $('.flag-submission-confirmation')
-    @flag_submission_confirmation_button = $('.flag-submission-confirmation-button')
-    @flag_submission_removal_button = $('.flag-submission-removal-button')
+    @flag_submission_confirmation = @$(@flag_submission_confirmation_sel)
+    @flag_submission_confirmation_button = @$(@flag_submission_confirmation_button_sel)
+    @flag_submission_removal_button = @$(@flag_submission_removal_button_sel)
 
     @flag_submission_confirmation_button.click @close_dialog_box
     @flag_submission_removal_button.click @remove_flag
 
-    @grading_wrapper =$('.grading-wrapper')
-    @calibration_feedback_panel = $('.calibration-feedback')
-    @interstitial_page = $('.interstitial-page')
+    @grading_wrapper = @$(@grading_wrapper_sel)
+    @calibration_feedback_panel = @$(@calibration_feedback_sel)
+    @interstitial_page = @$(@interstitial_page_sel)
     @interstitial_page.hide()
 
-    @calibration_interstitial_page = $('.calibration-interstitial-page')
+    @calibration_interstitial_page = @$(@calibration_interstitial_page_sel)
     @calibration_interstitial_page.hide()
 
-    @error_container = $('.error-container')
+    @error_container = @$(@error_container_sel)
 
     @submission_key_input = $("input[name='submission-key']")
-    @essay_id_input = $("input[name='essay-id']")
-    @feedback_area = $('.feedback-area')
+    @essay_id_input = @$("input[name='essay-id']")
+    @feedback_area = @$(@feedback_area_sel)
 
-    @score_selection_container = $('.score-selection-container')
-    @rubric_selection_container = $('.rubric-selection-container')
+    @score_selection_container = @$(@score_selection_container_sel)
+    @rubric_selection_container = @$(@rubric_selection_container_sel)
     @grade = null
     @calibration = null
 
-    @submit_button = $('.submit-button')
-    @action_button = $('.action-button')
-    @calibration_feedback_button = $('.calibration-feedback-button')
-    @interstitial_page_button = $('.interstitial-page-button')
-    @calibration_interstitial_page_button = $('.calibration-interstitial-page-button')
-    @flag_student_checkbox = $('.flag-checkbox')
-    @answer_unknown_checkbox = $('.answer-unknown-checkbox')
+    @submit_button = @$(@submit_button_sel)
+    @action_button = @$(@action_button_sel)
+    @calibration_feedback_button = @$(@calibration_feedback_button_sel)
+    @interstitial_page_button = @$(@interstitial_page_button_sel)
+    @calibration_interstitial_page_button = @$(@calibration_interstitial_page_button_sel)
+    @flag_student_checkbox = @$(@flag_checkbox_sel)
+    @answer_unknown_checkbox = @$(@answer_unknown_checkbox_sel)
 
     $(window).keydown @keydown_handler
     $(window).keyup @keyup_handler
@@ -251,6 +287,10 @@ class @PeerGradingProblem
 
     @is_calibrated_check()
 
+  # locally scoped jquery.
+  $: (selector) ->
+    $(selector, @el)
+
 
   ##########
   #
@@ -269,8 +309,8 @@ class @PeerGradingProblem
 
   construct_data: () ->
     data =
-      rubric_scores: Rubric.get_score_list()
-      score: Rubric.get_total_score()
+      rubric_scores: @rub.get_score_list()
+      score: @rub.get_total_score()
       location: @location
       submission_id: @essay_id_input.val()
       submission_key: @submission_key_input.val()
@@ -300,11 +340,11 @@ class @PeerGradingProblem
     @close_dialog_box()
 
   close_dialog_box: () =>
-    $( ".flag-submission-confirmation" ).dialog('close')
+    @$(@flag_submission_confirmation_sel).dialog('close')
 
   flag_box_checked: () =>
     if @flag_student_checkbox.is(':checked')
-      $( ".flag-submission-confirmation" ).dialog({ height: 400, width: 400 })
+      @$(@flag_submission_confirmation_sel).dialog({ height: 400, width: 400 })
 
   # called after we perform an is_student_calibrated check
   calibration_check_callback: (response) =>
@@ -358,11 +398,11 @@ class @PeerGradingProblem
   # called after a grade is selected on the interface
   graded_callback: (event) =>
     # check to see whether or not any categories have not been scored
-    if Rubric.check_complete()
+    if @rub.check_complete()
       # show button if we have scores for all categories
       @grading_message.hide()
       @show_submit_button()
-      @grade = Rubric.get_total_score()
+      @grade = @rub.get_total_score()
 
   keydown_handler: (event) =>
     #Previously, responses were submitted when hitting enter.  Add in a modifier that ensures that ctrl+enter is needed.
@@ -399,10 +439,10 @@ class @PeerGradingProblem
       # Display the right text
       # both versions of the text are written into the template itself
       # we only need to show/hide the correct ones at the correct time
-      @calibration_panel.find('.calibration-text').show()
-      @grading_panel.find('.calibration-text').show()
-      @calibration_panel.find('.grading-text').hide()
-      @grading_panel.find('.grading-text').hide()
+      @calibration_panel.find(@calibration_text_sel).show()
+      @grading_panel.find(@calibration_text_sel).show()
+      @calibration_panel.find(@grading_text_sel).hide()
+      @grading_panel.find(@grading_text_sel).hide()
       @flag_student_container.hide()
       @answer_unknown_container.hide()
 
@@ -429,10 +469,10 @@ class @PeerGradingProblem
       # Display the correct text
       # both versions of the text are written into the template itself
       # we only need to show/hide the correct ones at the correct time
-      @calibration_panel.find('.calibration-text').hide()
-      @grading_panel.find('.calibration-text').hide()
-      @calibration_panel.find('.grading-text').show()
-      @grading_panel.find('.grading-text').show()
+      @calibration_panel.find(@calibration_text_sel).hide()
+      @grading_panel.find(@calibration_text_sel).hide()
+      @calibration_panel.find(@grading_text_sel).show()
+      @grading_panel.find(@grading_text_sel).show()
       @flag_student_container.show()
       @answer_unknown_container.show()
       @feedback_area.val("")
@@ -467,13 +507,14 @@ class @PeerGradingProblem
     @submit_button.hide()
     @action_button.hide()
     @calibration_feedback_panel.hide()
-    Rubric.initialize(@location,@el)
+    @rub = new Rubric(@el)
+    @rub.initialize(@location)
 
 
   render_calibration_feedback: (response) =>
     # display correct grade
     @calibration_feedback_panel.slideDown()
-    calibration_wrapper = $('.calibration-feedback-wrapper')
+    calibration_wrapper = @$(@calibration_feedback_wrapper_sel)
     calibration_wrapper.html("<p>The score you gave was: #{@grade}. The actual score is: #{response.actual_score}</p>")
 
     score = parseInt(@grade)
@@ -490,7 +531,7 @@ class @PeerGradingProblem
       calibration_wrapper.append("<div>Instructor Feedback: #{response.actual_feedback}</div>")
 
     # disable score selection and submission from the grading interface
-    $("input[name='score-selection']").attr('disabled', true)
+    @$("input[name='score-selection']").attr('disabled', true)
     @submit_button.hide()
     @calibration_feedback_button.show()
 
@@ -516,7 +557,7 @@ class @PeerGradingProblem
 
   setup_score_selection: (max_score) =>
     # And now hook up an event handler again
-    $("input[class='score-selection']").change @graded_callback
+    @$("input[class='score-selection']").change @graded_callback
 
   gentle_alert: (msg) =>
     @grading_message.fadeIn()

@@ -14,6 +14,8 @@
                     %if len(category['options'][j]['grader_types'])>0:
                         %if correct[i]==1:
                             <label class="choicegroup_correct wrapper-score-selection"></label>
+                        %elif correct[i]==.5:
+                            <label class="choicegroup_partialcorrect wrapper-score-selection"></label>
                         %else:
                             <label class="choicegroup_incorrect wrapper-score-selection"></label>
                         %endif

@@ -91,7 +91,7 @@
 
   }
 
-  &.disabled, &[disabled] {
+  &.disabled, &[disabled], &.is-disabled {
     cursor: default;
     pointer-events: none;
     opacity: 0.5;
@@ -205,7 +205,7 @@
 // extends - UI archetypes - well
 .ui-well {
   box-shadow: inset 0 1px 2px 1px $shadow;
-  padding: ($baseline*0.75);
+  padding: ($baseline*0.75) $baseline;
 }
 
 // ====================

@@ -1,7 +1,10 @@
+<%! from django.utils.translation import ugettext as _ %>
+
 <%namespace name='static' file='static_content.html'/>
 <!DOCTYPE html>
 <html>
 <head>
+  ## "edX" should not be translated
   <%block name="title"><title>edX</title></%block>
 
   <link rel="icon" type="image/x-icon" href="${static.url('images/favicon.ico')}" />

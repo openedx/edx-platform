@@ -1,20 +1,28 @@
 class @Rubric
-  constructor: () ->
 
-  @initialize: (location,el) ->
+  rubric_category_sel: '.rubric-category'
+  rubric_sel: '.rubric'
+
+  constructor: (el) ->
     @el = el
-    $('.rubric',@el).data("location", location)
-    $('input[class="score-selection"]',@el).change @tracking_callback
+
+  initialize: (location) =>
+    @$(@rubric_sel).data("location", location)
+    @$('input[class="score-selection"]').change @tracking_callback
     # set up the hotkeys
     $(window).unbind('keydown', @keypress_callback)
     $(window).keydown @keypress_callback
     # display the 'current' carat
-    @categories = $('.rubric-category',el)
-    @category = $(@categories.first(),el)
+    @categories = @$(@rubric_category_sel)
+    @category = @$(@categories.first())
     @category.prepend('> ')
     @category_index = 0
 
-  @keypress_callback: (event) =>
+  # locally scoped jquery.
+  $: (selector) ->
+    $(selector, @el)
+
+  keypress_callback: (event) =>
     # don't try to do this when user is typing in a text input
     if $(event.target).is('input, textarea')
       return
@@ -31,7 +39,7 @@ class @Rubric
     # if we actually have a current category (not past the end)
     if(@category_index <= @categories.length)
       # find the valid selections for this category
-      inputs = $("input[name='score-selection-#{@category_index}']")
+      inputs = @$("input[name='score-selection-#{@category_index}']")
       max_score = inputs.length - 1
 
       if selected > max_score or selected < 0
@@ -42,44 +50,44 @@ class @Rubric
       old_category_text = @category.html().substring(5)
       @category.html(old_category_text)
       @category_index++
-      @category = $(@categories[@category_index],@el)
+      @category = @$(@categories[@category_index])
       @category.prepend('> ')
     
-  @tracking_callback: (event) ->
+  tracking_callback: (event) =>
     target_selection = $(event.target).val()
     # chop off the beginning of the name so that we can get the number of the category
     category = $(event.target).data("category")
-    location = $('.rubric',@el).data('location')
+    location = @$(@rubric_sel).data('location')
     # probably want the original problem location as well
 
     data = {location: location, selection: target_selection, category: category}
     Logger.log 'rubric_select', data
 
   # finds the scores for each rubric category
-  @get_score_list: () =>
+  get_score_list: () =>
     # find the number of categories:
-    num_categories = $('.rubric-category',@el).length
+    num_categories = @$(@rubric_category_sel).length
 
     score_lst = []
     # get the score for each one
     for i in [0..(num_categories-1)]
-      score = $("input[name='score-selection-#{i}']:checked").val()
+      score = @$("input[name='score-selection-#{i}']:checked").val()
       score_lst.push(score)
 
     return score_lst
 
-  @get_total_score: () ->
+  get_total_score: () =>
     score_lst = @get_score_list()
     tot = 0
     for score in score_lst
       tot += parseInt(score)
     return tot
 
-  @check_complete: () ->
+  check_complete: () =>
      # check to see whether or not any categories have not been scored
-    num_categories = $('.rubric-category',@el).length
+    num_categories = @$(@rubric_category_sel).length
     for i in [0..(num_categories-1)]
-      score = $("input[name='score-selection-#{i}']:checked",@el).val()
+      score = @$("input[name='score-selection-#{i}']:checked").val()
       if score == undefined
         return false
     return true
@@ -143,7 +151,8 @@ class @CombinedOpenEnded
     @location = @coe.data('location')
 
     # set up handlers for click tracking
-    Rubric.initialize(@location,@coe)
+    @rub = new Rubric(@coe)
+    @rub.initialize(@location)
     @is_ctrl = false
     #Setup reset
     @reset_button = @$(@reset_button_sel)
@@ -241,6 +250,9 @@ class @CombinedOpenEnded
         @hide_rubrics()
         @$(@previous_rubric_sel).click @previous_rubric
         @$(@next_rubric_sel).click @next_rubric
+        if response.hide_reset
+          @reset_button.hide()
+
 
   show_status_current: () =>
     data = {}
@@ -390,7 +402,8 @@ class @CombinedOpenEnded
           if response.success
             @rubric_wrapper.html(response.rubric_html)
             @rubric_wrapper.show()
-            Rubric.initialize(@location,@coe)
+            @rub = new Rubric(@coe)
+            @rub.initialize(@location)
             @answer_area.html(response.student_response)
             @child_state = 'assessing'
             @find_assessment_elements()
@@ -408,7 +421,7 @@ class @CombinedOpenEnded
     #Previously, responses were submitted when hitting enter.  Add in a modifier that ensures that ctrl+enter is needed.
     if event.which == 17 && @is_ctrl==false
       @is_ctrl=true
-    else if @is_ctrl==true && event.which == 13 && @child_state == 'assessing' && Rubric.check_complete()
+    else if @is_ctrl==true && event.which == 13 && @child_state == 'assessing' && @rub.check_complete()
       @save_assessment(event)
 
   keyup_handler: (event) =>
@@ -418,9 +431,9 @@ class @CombinedOpenEnded
 
   save_assessment: (event) =>
     event.preventDefault()
-    if @child_state == 'assessing' && Rubric.check_complete()
-      checked_assessment = Rubric.get_total_score()
-      score_list = Rubric.get_score_list()
+    if @child_state == 'assessing' && @rub.check_complete()
+      checked_assessment = @rub.get_total_score()
+      score_list = @rub.get_score_list()
       data = {'assessment' : checked_assessment, 'score_list' : score_list}
       $.postWithPrefix "#{@ajax_url}/save_assessment", data, (response) =>
         if response.success
