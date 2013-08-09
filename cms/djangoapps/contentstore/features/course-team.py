@@ -2,6 +2,7 @@
 #pylint: disable=W0621
 
 from lettuce import world, step
+from lettuce.django import django_url
 from common import create_studio_user
 from django.contrib.auth.models import Group
 from auth.authz import get_course_groupname_for_role, get_user_by_email
@@ -91,7 +92,7 @@ def remove_course_team_admin(_step, outer_capture, name):
 
 @step(u'"([^"]*)" logs in$')
 def other_user_login(_step, name):
-    world.browser.cookies.delete()
+    world.visit(django_url('logout'))
     world.visit('/')
 
     signin_css = 'a.action-signin'

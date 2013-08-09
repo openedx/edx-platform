@@ -99,7 +99,7 @@ def i_am_logged_in_user(step):
 
 @step('I am not logged in$')
 def i_am_not_logged_in(step):
-    world.browser.cookies.delete()
+    world.visit(django_url('logout'))
 
 
 @step('I am staff for course "([^"]*)"$')
@@ -150,7 +150,7 @@ def i_am_logged_in(step):
     world.log_in(username='robot', password='test')
     world.browser.visit(django_url('/'))
     # You should not see the login link
-    assert_equals(world.browser.find_by_css('a#login'), [])
+    world.is_css_not_present('a#login')
 
 
 @step(u'I am an edX user$')

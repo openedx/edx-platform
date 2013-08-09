@@ -83,7 +83,7 @@ def initial_setup(server):
     """
     Launch the browser once before executing the tests.
     """
-    #browser_driver = getattr(settings, 'LETTUCE_BROWSER', 'chrome')
+    # browser_driver = getattr(settings, 'LETTUCE_BROWSER', 'chrome')
 
     # There is an issue with ChromeDriver2 r195627 on Ubuntu
     # in which we sometimes get an invalid browser session.
