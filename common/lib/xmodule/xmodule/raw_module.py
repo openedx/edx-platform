@@ -4,6 +4,7 @@ from xmodule.xml_module import XmlDescriptor
 import logging
 import sys
 from xblock.core import String, Scope
+from exceptions import SerializationError
 
 log = logging.getLogger(__name__)
 
@@ -27,11 +28,11 @@ class RawDescriptor(XmlDescriptor, XMLEditingDescriptor):
             # re-raise
             lines = self.data.split('\n')
             line, offset = err.position
-            msg = ("Unable to create xml for problem {loc}. "
+            msg = ("Unable to create xml for module {loc}. "
                    "Context: '{context}'".format(
                    context=lines[line - 1][offset - 40:offset + 40],
                    loc=self.location))
-            raise Exception, msg, sys.exc_info()[2]
+            raise SerializationError(self.location, msg)
 
 
 class EmptyDataRawDescriptor(XmlDescriptor, XMLEditingDescriptor):
