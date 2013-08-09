@@ -66,6 +66,7 @@ def other_delete_self(_step):
         email="robot+studio@edx.org")
     world.css_click(to_delete_css)
     # confirm prompt
+    world.wait(.5)
     world.css_click(".wrapper-prompt-warning .action-primary")
 
 
@@ -89,7 +90,7 @@ def remove_course_team_admin(_step, outer_capture, name):
 
 @step(u'"([^"]*)" logs in$')
 def other_user_login(_step, name):
-    log_into_studio(uname=name, password=PASSWORD, email=name + EMAIL_EXTENSION)
+    log_into_studio(uname=name, password=PASSWORD, email=name + EMAIL_EXTENSION, name=name)
 
 
 @step(u'I( do not)? see the course on my page')
