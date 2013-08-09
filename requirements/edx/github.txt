@@ -11,3 +11,4 @@
 -e git+https://github.com/edx/XBlock.git@f8c10cb0d16122ba66f7e94a32ec3774c1dee13e#egg=XBlock
 -e git+https://github.com/edx/codejail.git@0a1b468#egg=codejail
 -e git+https://github.com/edx/diff-cover.git@v0.2.0#egg=diff_cover
+-e git+https://github.com/wedaly/js-test-tool.git#egg=js_test_tool
