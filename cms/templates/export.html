@@ -13,19 +13,19 @@
 
       %if unit:
         var dialog = new CMS.Views.Prompt({
-            title: gettext('There has been an error with your export.'),
+            title: gettext('There has been an error while exporting.'),
             message: gettext("There has been a failure to export to XML at least one component. It is recommended that you go to the edit page and repair the error before attempting another export. Please check that all components on the page are valid and do not display any error messages."),
             intent: "error",
             actions: {
                 primary: {
-                    text: gettext('Yes, allow me to fix the failed component'),
+                    text: gettext('Correct failed component'),
                     click: function(view) {
                         view.hide();
                         document.location = "${edit_unit_url}"
                     }
                 },
                 secondary: {
-                    text: gettext('Cancel'),
+                    text: gettext('Return to Export'),
                     click: function(view) {
                         view.hide();
                     }
@@ -54,7 +54,7 @@
                     }
                 }
             }
-        });     
+        });
       %endif
       dialog.show();
     })
