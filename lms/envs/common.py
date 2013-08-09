@@ -774,6 +774,9 @@ INSTALLED_APPS = (
 
     # Different Course Modes
     'course_modes'
+
+    # Student Identity Verification
+    'verify_student',
 )
 
 ######################### MARKETING SITE ###############################
