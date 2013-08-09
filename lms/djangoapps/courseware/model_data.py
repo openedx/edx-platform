@@ -353,8 +353,7 @@ class LmsKeyValueStore(KeyValueStore):
         for field in kv_dict:
             # Check field for validity
             if field.field_name in self._descriptor_model_data:
-                if field.field_name not in ["due","graceperiod"]:
-                    raise InvalidWriteError("Not allowed to overwrite descriptor model data", field.field_name)
+                raise InvalidWriteError("Not allowed to overwrite descriptor model data", field.field_name)
 
             if field.scope not in self._allowed_scopes:
                 raise InvalidScopeError(field.scope)
