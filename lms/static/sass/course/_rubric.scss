@@ -1,8 +1,14 @@
 .rubric-header {
-  padding: $baseline/2 0; 
+  background-color: #fafafa;
+  border-radius: 5px;
+
   .rubric-collapse {
-    float: right;
+    margin-right: $baseline/2;
   }
+}
+
+.button {
+  display: inline-block;
 }
 
 .rubric {

@@ -37,11 +37,17 @@
                 <div class="item">${item['content'] | n}</div>
             % endfor
             </div>
-            <input type="button" value="${_('Reset')}" class="reset-button" name="reset"/>
-            <input type="button" value="${_('Next Step')}" class="next-step-button" name="reset"/>
+            <div class="oe-tools response-tools">
+                <span class="oe-tools-label">Response: </span>
+                <input type="button" value="${_('Reset')}" class="reset-button" name="reset"/>
+            </div>
         </div>
 
         <div class="combined-rubric-container">
+        </div>
+        <div class="oe-tools problem-tools">
+                <!--<span class="oe-tools-label">Once you have completed this form of assessment, you may continue.  </span>-->
+                <input type="button" value="${_('Next Step')}" class="next-step-button" name="reset"/>
         </div>
 
         <section class="legend-container">

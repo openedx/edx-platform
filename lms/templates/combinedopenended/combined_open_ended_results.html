@@ -11,7 +11,9 @@
                 </div>
                 <span class="section-header section-header-rubric">Submitted Rubric</span>
             </div>
-            <div class="rubric-header">
+            <div class="oe-tools rubric-header">
+                <span class="oe-tools-label">Assessment Tools: </span>
+                <button class="rubric-collapse" href="#">Show Score Only</button>
                 % if len(results)>1:
                     <a href="#" class="rubric-previous-button">Previous</a>
                 % endif 
@@ -19,7 +21,6 @@
                 % if len(results)>1:
                     <a href="#" class="rubric-next-button">Next</a> 
                 % endif
-                <button class="rubric-collapse" href="#">Show Score Only</button>
             </div>
             ${result['result'] | n}
             <div class="written-feedback">
@@ -29,8 +30,4 @@
     %endif
 
 % endfor
-% if len(results)>1:
-        <a href="#" class="rubric-previous-button">Previous</a>
-        <a href="#" class="rubric-next-button">Next</a>
-% endif
 

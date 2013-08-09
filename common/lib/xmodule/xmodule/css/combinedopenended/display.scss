@@ -855,3 +855,23 @@ section.open-ended-child {
     padding: $baseline/2 0;
   }
 }
+
+//OE Tool Area Styling
+
+.oe-tools {
+  display: inline-block;
+  width: 100%;
+  border-radius: 5px;
+
+  .oe-tools-label {
+    font-size: 0.8em;
+    display: inline-block;
+    vertical-align: middle;
+    padding: 10px;
+  }
+
+  .reset-button {
+    vertical-align: middle; 
+  }
+}
+
