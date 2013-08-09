@@ -14,11 +14,12 @@
             </thead>
             <tbody>
             % for item in shoppingcart_items:
-            <tr><td>${item.qty}</td><td>${item.line_desc}</td><td>${item.unit_cost}</td><td>${item.line_cost}</td>
+            <tr><td>${item.qty}</td><td>${item.line_desc}</td>
+                <td>${"{0:0.2f}".format(item.unit_cost)}</td><td>${"{0:0.2f}".format(item.line_cost)}</td>
                 <td><a data-item-id="${item.id}" class='remove_line_item' href='#'>[x]</a></td></tr>
             % endfor
-            <tr><td></td><td></td><td></td><td>Total Cost</td></tr>
-            <tr><td></td><td></td><td></td><td>${total_cost}</td></tr>
+            <tr><td></td><td></td><td></td><td>Total Amount</td></tr>
+            <tr><td></td><td></td><td></td><td>${amount}</td></tr>
 
             </tbody>
         </table>
