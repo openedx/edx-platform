@@ -1,5 +1,5 @@
 (function () {
-    describe('Video HTML5Video', function () {
+    xdescribe('Video HTML5Video', function () {
         var state, player, oldOTBD, playbackRates = [0.75, 1.0, 1.25, 1.5];
 
         function initialize() {

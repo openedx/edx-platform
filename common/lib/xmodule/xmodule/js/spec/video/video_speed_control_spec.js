@@ -1,5 +1,5 @@
 (function() {
-  describe('VideoSpeedControl', function() {
+  xdescribe('VideoSpeedControl', function() {
     var state, videoPlayer, videoControl, videoSpeedControl;
 
     function initialize() {

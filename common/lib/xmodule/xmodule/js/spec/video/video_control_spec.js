@@ -1,5 +1,5 @@
 (function() {
-  describe('VideoControl', function() {
+  xdescribe('VideoControl', function() {
     var state, videoControl, oldOTBD;
 
     function initialize() {
