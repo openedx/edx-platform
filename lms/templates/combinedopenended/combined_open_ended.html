@@ -29,14 +29,13 @@
             <div class="visibility-control visibility-control-prompt">
                 <div class="inner">
                 </div>
-                <a href="" class="question-header">Hide Prompt</a>
+                <a href="" class="section-header section-header-prompt question-header">Hide Prompt</a>
             </div>
             <div class="problem-container">
             % for item in items:
                 <div class="item">${item['content'] | n}</div>
             % endfor
             </div>
-
             <input type="button" value="Reset" class="reset-button" name="reset"/>
             <input type="button" value="Next Step" class="next-step-button" name="reset"/>
         </div>
