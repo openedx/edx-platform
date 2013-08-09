@@ -7,7 +7,7 @@ from xmodule.modulestore.inheritance import own_metadata
 import logging
 
 
-def _asset_url_replace_regex(prefix):
+def _prefix_only_url_replace_regex(prefix):
     """
     Match static urls in quotes that don't end in '?raw'.
 
@@ -23,7 +23,7 @@ def _asset_url_replace_regex(prefix):
         """.format(prefix=prefix)
 
 
-def _jump_to_url_replace_regex(prefix):
+def _prefix_and_category_url_replace_regex(prefix):
     """
     Match static urls in quotes that don't end in '?raw'.
 
@@ -75,7 +75,7 @@ def rewrite_nonportable_content_links(source_course_id, dest_course_id, text):
     # the regex subsitution, log the error and continue
     try:
         c4x_link_base = '{0}/'.format(StaticContent.get_base_url_path_for_course_assets(course_location))
-        text = re.sub(_asset_url_replace_regex(c4x_link_base), portable_asset_link_subtitution, text)
+        text = re.sub(_prefix_only_url_replace_regex(c4x_link_base), portable_asset_link_subtitution, text)
     except Exception, e:
         logging.warning("Error going regex subtituion (0) on text = {1}.\n\nError msg = {2}".format(
             c4x_link_base, text, str(e)))
@@ -84,7 +84,7 @@ def rewrite_nonportable_content_links(source_course_id, dest_course_id, text):
     try:
         jump_to_link_base = '/courses/{org}/{course}/{run}/jump_to/i4x://{org}/{course}/'.format(
             org=org, course=course, run=run)
-        text = re.sub(_jump_to_url_replace_regex(jump_to_link_base), portable_jump_to_link_substitution, text)
+        text = re.sub(_prefix_and_category_url_replace_regex(jump_to_link_base), portable_jump_to_link_substitution, text)
     except Exception, e:
         logging.warning("Error going regex subtituion (0) on text = {1}.\n\nError msg = {2}".format(
             jump_to_link_base, text, str(e)))
@@ -100,7 +100,7 @@ def rewrite_nonportable_content_links(source_course_id, dest_course_id, text):
         try:
             generic_courseware_link_base = '/courses/{org}/{course}/{run}/'.format(
                 org=org, course=course, run=run)
-            text = re.sub(_asset_url_replace_regex(generic_courseware_link_base), portable_asset_link_subtitution, text)
+            text = re.sub(_prefix_only_url_replace_regex(generic_courseware_link_base), portable_asset_link_subtitution, text)
         except Exception, e:
             logging.warning("Error going regex subtituion (0) on text = {1}.\n\nError msg = {2}".format(
                 generic_courseware_link_base, text, str(e)))
