@@ -145,18 +145,17 @@ class CombinedOpenEndedV1Module():
         If that is the case, delete it.
         """
 
+        info_message = "Combined open ended user state for user {0} in location {1} was invalid.  Reset it.".format(self.system.anonymous_student_id, self.location.url())
         #If we are on a task that is greater than the number of available tasks, it is an invalid state
-        if self.current_task_number>len(self.task_states):
-            self.task_states = []
-            self.current_task_number = 0
         #If the current task number is greater than the number of tasks we have in the xml definition, our state is invalid.
-        elif self.current_task_number>len(self.task_xml):
-            self.task_states = []
-            self.current_task_number = 0
-        #if the length of the task xml is less than the length of the task states, state is invalid
+        if self.current_task_number>len(self.task_states) or self.current_task_number>len(self.task_xml):
+            self.current_task_number = min([len(self.task_states),len(self.task_xml)])
+            log.info(info_message)
+        #If the length of the task xml is less than the length of the task states, state is invalid
         elif len(self.task_xml)<len(self.task_states):
             self.current_task_number = 0
-            self.task_states = []
+            self.task_states = self.task_states[:len(self.task_xml)]
+            log.info(info_message)
         #Loop through each task state and make sure it matches the xml definition
         for (i,t) in enumerate(self.task_states):
             tag_name = self.get_tag_name(self.task_xml[i])
@@ -173,10 +172,21 @@ class CombinedOpenEndedV1Module():
                     self.static_data,
                     instance_state=t,
                 )
+                if tag_name == "openended" and 'post_assessment' in task.child_history and not 'submission_id' and isinstance(task.child_history['post_assessment'], list):
+                    self.current_task_number = 0
+                    self.task_states = []
+                    log.info(info_message)
+                    break
+                elif tag_name == "selfassessment" and 'post_assessment' in task.child_history and not 'submission_id' and not isinstance(task.child_history['post_assessment'], list):
+                    self.current_task_number = 0
+                    self.task_states = []
+                    log.info(info_message)
+                    break
             except Exception:
                 #If one task doesn't match, the state is invalid.
                 self.current_task_number = 0
                 self.task_states = []
+                log.info(info_message)
                 break
 
     def get_tag_name(self, xml):
