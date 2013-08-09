@@ -720,6 +720,17 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         resp = self.client.get('http://localhost:8001/c4x/CDX/123123/asset/&images_circuits_Lab7Solution2.png')
         self.assertEqual(resp.status_code, 400)
 
+    def test_rewrite_nonportable_links_on_import(self):
+        module_store = modulestore('direct')
+        content_store = contentstore()
+
+        import_from_xml(module_store, 'common/test/data/', ['toy'], static_content_store=content_store)
+
+        html_module_location = Location(['i4x', 'edX', 'toy', 'html', 'nonportable'])
+        html_module = module_store.get_instance('edX/toy/2012_Fall', html_module_location)
+
+        self.assertIn('/static/foo.jpg', html_module.data)
+
     def test_delete_course(self):
         """
         This test will import a course, make a draft item, and delete it. This will also assert that the

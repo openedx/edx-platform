@@ -1,9 +1,32 @@
+import re
 from xmodule.contentstore.content import StaticContent
 from xmodule.modulestore import Location
 from xmodule.modulestore.mongo import MongoModuleStore
 from xmodule.modulestore.inheritance import own_metadata
+from static_replace import _url_replace_regex
 
 import logging
+
+
+def convert_to_portable_links(source_course_id, text):
+    """
+    Does a regex replace on non-portable links:
+         /c4x/<org>/<course>/asset/<name> -> /static/<name>
+         /jump_to/i4x://<org>/<course>/<category>/<name> -> /jump_to_id/<id>
+    """
+
+    def portable_asset_link_subtitution(match):
+        quote = match.group('quote')
+        rest = match.group('rest')
+        return "".join([quote, '/static/'+rest, quote])
+
+    org, course, run = source_course_id.split("/")
+    course_location = Location(['i4x', org, course, 'course', run])
+
+    c4x_link_base = '{0}/'.format(StaticContent.get_base_url_path_for_course_assets(course_location))
+    text = re.sub(_url_replace_regex(c4x_link_base), portable_asset_link_subtitution, text)
+
+    return text
 
 
 def _clone_modules(modulestore, modules, dest_location):
