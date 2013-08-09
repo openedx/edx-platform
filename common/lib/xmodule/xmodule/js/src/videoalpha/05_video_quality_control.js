@@ -43,10 +43,6 @@ function () {
 
         state.videoQualityControl.el.show();
         state.videoQualityControl.quality = null;
-
-        if (!onTouchBasedDevice()) {
-            state.videoQualityControl.el.qtip(state.config.qTipConfig);
-        }
     }
 
     // function _bindHandlers(state)
