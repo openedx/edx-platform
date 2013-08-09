@@ -627,8 +627,8 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         # get a vertical (and components in it) to put into 'draft'
         # this is to assert that draft content is also cloned over
-        vertical = module_store.get_item(Location(['i4x', 'edX', 'toy',
-                                         'vertical', 'vertical_test', None]), depth=1)
+        vertical = module_store.get_instance(source_course_id, Location([
+            source_location.tag, source_location.org, source_location.course, 'vertical', 'vertical_test', None]), depth=1)
 
         draft_store.convert_to_draft(vertical.location)
         for child in vertical.get_children():
@@ -649,24 +649,23 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         # first assert that all draft content got cloned as well
         items = module_store.get_items(Location([source_location.tag, source_location.org, source_location.course, None, None, 'draft']))
         self.assertGreater(len(items), 0)
-        clone_items = module_store.get_items(Location([source_location.tag, source_location.org, source_location.course, None, None, 'draft']))
+        clone_items = module_store.get_items(Location([dest_location.tag, dest_location.org, dest_location.course, None, None, 'draft']))
         self.assertGreater(len(clone_items), 0)
         self.assertEqual(len(items), len(clone_items))
 
         # now loop through all the units in the course and verify that the clone can render them, which
         # means the objects are at least present
-        items = module_store.get_items(Location(['i4x', 'edX', 'toy', None, None]))
+        items = module_store.get_items(Location([source_location.tag, source_location.org, source_location.course, None, None]))
         self.assertGreater(len(items), 0)
-        clone_items = module_store.get_items(Location(['i4x', 'MITx', '999', None, None]))
+        clone_items = module_store.get_items(Location([dest_location.tag, dest_location.org, dest_location.course, None, None]))
         self.assertGreater(len(clone_items), 0)
-        #self.assertEqual(len(items), len(clone_items))
 
         for descriptor in items:
             source_item = module_store.get_instance(source_course_id, descriptor.location)
             if descriptor.location.category == 'course':
-                new_loc = descriptor.location.replace(org='MITx', course='999', name='2013_Spring')
+                new_loc = descriptor.location.replace(org=dest_location.org, course=dest_location.course, name='2013_Spring')
             else:
-                new_loc = descriptor.location.replace(org='MITx', course='999')
+                new_loc = descriptor.location.replace(org=dest_location.org, course=dest_location.course)
             print "Checking {0} should now also be at {1}".format(descriptor.location.url(), new_loc.url())
             lookup_item = module_store.get_item(new_loc)
 

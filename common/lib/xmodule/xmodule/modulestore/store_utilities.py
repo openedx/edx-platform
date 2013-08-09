@@ -11,16 +11,17 @@ def _clone_modules(modulestore, modules, dest_location):
         original_loc = Location(module.location)
 
         if original_loc.category != 'course':
-            module.location = module.location._replace(tag=dest_location.tag, org=dest_location.org,
-                                                       course=dest_location.course)
+            module.location = module.location._replace(
+                tag=dest_location.tag, org=dest_location.org, course=dest_location.course)
         else:
             # on the course module we also have to update the module name
-            module.location = module.location._replace(tag=dest_location.tag, org=dest_location.org,
-                                                       course=dest_location.course, name=dest_location.name)
+            module.location = module.location._replace(
+                tag=dest_location.tag, org=dest_location.org, course=dest_location.course, name=dest_location.name)
 
         print "Cloning module {0} to {1}....".format(original_loc, module.location)
 
-        modulestore.update_item(module.location, module._model_data._kvs._data)
+        # NOTE: usage of the the internal module.xblock_kvs._data does not include any 'default' values for the fields
+        modulestore.update_item(module.location, module.xblock_kvs._data)
 
         # repoint children
         if module.has_children:
