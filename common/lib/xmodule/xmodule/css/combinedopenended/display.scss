@@ -132,6 +132,10 @@ section.combined-open-ended-status {
       border-radius: 0 $baseline/4 $baseline/4 0;
       border-right: 0px;
     }
+
+    &:only-child {
+      border-radius: $baseline/4;
+    }
   
     .show-results {
       margin-top: .3em;

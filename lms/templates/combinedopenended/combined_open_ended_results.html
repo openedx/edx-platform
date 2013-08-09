@@ -11,8 +11,14 @@
                 </div>
                 <span class="section-header section-header-rubric">Submitted Rubric</span>
             </div>
-            <div class="rubric-header"> 
-                ${result['task_name']} from grader ${i+1} 
+            <div class="rubric-header">
+                % if len(results)>1:
+                    <a href="#" class="rubric-previous-button">Previous</a>
+                % endif 
+                ${result['task_name']} from grader ${i+1}
+                % if len(results)>1:
+                    <a href="#" class="rubric-next-button">Next</a> 
+                % endif
                 <button class="rubric-collapse" href="#">Show Score Only</button>
             </div>
             ${result['result'] | n}
