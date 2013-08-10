@@ -67,8 +67,7 @@ def rewrite_nonportable_content_links(source_course_id, dest_course_id, text):
         dest_generic_courseware_lik_base = '/courses/{org}/{course}/{run}/'.format(
             org=dest_org, course=dest_course, run=dest_run
         )
-
-        return "".join([quote, dest_generic_courseware_lik_base+rest, quote])
+        return quote + dest_generic_courseware_lik_base + rest + quote
 
     course_location = Location(['i4x', org, course, 'course', run])
 
