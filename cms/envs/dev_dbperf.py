@@ -1,6 +1,11 @@
 """
 This configuration is to turn on the Django Toolbar stats for DB access stats, for performance analysis
 """
+
+# We intentionally define lots of variables that aren't used, and
+# want to import all variables from base settings files
+# pylint: disable=W0401, W0614
+
 from .dev import *
 
 DEBUG_TOOLBAR_PANELS = (
