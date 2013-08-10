@@ -1,13 +1,19 @@
 ### Implementation of support for the Cybersource Credit card processor
 ### The name of this file should be used as the key of the dict in the CC_PROCESSOR setting
+### Implementes interface as specified by __init__.py
 
 import time
 import hmac
 import binascii
-from collections import OrderedDict
+import re
+import json
+from collections import OrderedDict, defaultdict
 from hashlib import sha1
 from django.conf import settings
+from django.utils.translation import ugettext as _
 from mitxmako.shortcuts import render_to_string
+from shoppingcart.models import Order
+from .exceptions import CCProcessorDataException, CCProcessorWrongAmountException
 
 shared_secret = settings.CC_PROCESSOR['CyberSource'].get('SHARED_SECRET','')
 merchant_id = settings.CC_PROCESSOR['CyberSource'].get('MERCHANT_ID','')
@@ -41,6 +47,7 @@ def sign(params):
 
     return params
 
+
 def verify(params):
     """
     Verify the signatures accompanying the POST back from Cybersource Hosted Order Page
@@ -54,7 +61,11 @@ def verify(params):
         return False
     return hash(data) == returned_sig
 
+
 def render_purchase_form_html(cart, user):
+    """
+    Renders the HTML of the hidden POST form that must be used to initiate a purchase with CyberSource
+    """
     total_cost = cart.total_cost
     amount = "{0:0.2f}".format(total_cost)
     cart_items = cart.orderitem_set.all()
@@ -64,7 +75,6 @@ def render_purchase_form_html(cart, user):
     params['currency'] = cart.currency
     params['orderPage_transactionType'] = 'sale'
     params['orderNumber'] = "{0:d}".format(cart.id)
-    params['billTo_email'] = user.email
     idx=1
     for item in cart_items:
         prefix = "item_{0:d}_".format(idx)
@@ -79,3 +89,99 @@ def render_purchase_form_html(cart, user):
         'action': purchase_endpoint,
         'params': signed_param_dict,
     })
+
+
+def payment_accepted(params):
+    """
+    Check that cybersource has accepted the payment
+    """
+    #make sure required keys are present and convert their values to the right type
+    valid_params = {}
+    for key, type in [('orderNumber', int),
+                      ('ccAuthReply_amount', float),
+                      ('orderCurrency', str),
+                      ('decision', str)]:
+        if key not in params:
+            raise CCProcessorDataException(
+                _("The payment processor did not return a required parameter: {0}".format(key))
+            )
+        try:
+            valid_params[key] = type(params[key])
+        except ValueError:
+            raise CCProcessorDataException(
+                _("The payment processor returned a badly-typed value {0} for param {1}.".format(params[key], key))
+            )
+
+    try:
+        order = Order.objects.get(id=valid_params['orderNumber'])
+    except Order.DoesNotExist:
+        raise CCProcessorDataException(_("The payment processor accepted an order whose number is not in our system."))
+
+    if valid_params['decision'] == 'ACCEPT':
+        if valid_params['ccAuthReply_amount'] == order.total_cost and valid_params['orderCurrency'] == order.currency:
+            return {'accepted': True,
+                    'amt_charged': valid_params['ccAuthReply_amount'],
+                    'currency': valid_params['orderCurrency'],
+                    'order': order}
+        else:
+            raise CCProcessorWrongAmountException(
+                _("The amount charged by the processor {0} {1} is different than the total cost of the order {2} {3}."\
+                    .format(valid_params['ccAuthReply_amount'], valid_params['orderCurrency'],
+                            order.total_cost, order.currency))
+            )
+    else:
+        return {'accepted': False,
+                'amt_charged': 0,
+                'currency': 'usd',
+                'order': None}
+
+
+def record_purchase(params, order):
+    """
+    Record the purchase and run purchased_callbacks
+    """
+    ccnum_str = params.get('card_accountNumber', '')
+    m = re.search("\d", ccnum_str)
+    if m:
+        ccnum = ccnum_str[m.start():]
+    else:
+        ccnum = "####"
+
+    order.purchase(
+        first=params.get('billTo_firstName', ''),
+        last=params.get('billTo_lastName', ''),
+        street1=params.get('billTo_street1', ''),
+        street2=params.get('billTo_street2', ''),
+        city=params.get('billTo_city', ''),
+        state=params.get('billTo_state', ''),
+        country=params.get('billTo_country', ''),
+        postalcode=params.get('billTo_postalCode',''),
+        ccnum=ccnum,
+        cardtype=CARDTYPE_MAP[params.get('card_cardType', 'UNKNOWN')],
+        processor_reply_dump=json.dumps(params)
+    )
+
+
+CARDTYPE_MAP = defaultdict(lambda:"UNKNOWN")
+CARDTYPE_MAP.update(
+    {
+        '001': 'Visa',
+        '002': 'MasterCard',
+        '003': 'American Express',
+        '004': 'Discover',
+        '005': 'Diners Club',
+        '006': 'Carte Blanche',
+        '007': 'JCB',
+        '014': 'EnRoute',
+        '021': 'JAL',
+        '024': 'Maestro',
+        '031': 'Delta',
+        '033': 'Visa Electron',
+        '034': 'Dankort',
+        '035': 'Laser',
+        '036': 'Carte Bleue',
+        '037': 'Carta Si',
+        '042': 'Maestro',
+        '043': 'GE Money UK card'
+    }
+)

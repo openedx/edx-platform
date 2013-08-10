@@ -7,10 +7,11 @@
 <%block name="title"><title>${_("Your Shopping Cart")}</title></%block>
 
 <section class="container cart-list">
+    <h2>${_("Your selected items:")}</h2>
     % if shoppingcart_items:
         <table>
             <thead>
-            <tr><td>Qty</td><td>Description</td><td>Unit Price</td><td>Price</td><td>Currency</td></tr>
+            <tr>${_("<td>Quantity</td><td>Description</td><td>Unit Price</td><td>Price</td><td>Currency</td>")}</tr>
             </thead>
             <tbody>
             % for item in shoppingcart_items:
@@ -19,7 +20,7 @@
                 <td>${item.currency.upper()}</td>
                 <td><a data-item-id="${item.id}" class='remove_line_item' href='#'>[x]</a></td></tr>
             % endfor
-            <tr><td></td><td></td><td></td><td>Total Amount</td></tr>
+            <tr><td></td><td></td><td></td><td>${_("Total Amount")}</td></tr>
             <tr><td></td><td></td><td></td><td>${amount}</td></tr>
 
             </tbody>
@@ -27,7 +28,7 @@
 
         ${form_html}
     % else:
-        <p>You have selected no items for purchase.</p>
+        <p>${_("You have selected no items for purchase.")}</p>
     % endif
 
 </section>
