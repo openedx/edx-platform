@@ -32,6 +32,7 @@ class Order(models.Model):
     bill_to_street1 = models.CharField(max_length=128, null=True, blank=True)
     bill_to_street2 = models.CharField(max_length=128, null=True, blank=True)
     bill_to_city = models.CharField(max_length=64, null=True, blank=True)
+    bill_to_state = models.CharField(max_length=8, null=True, blank=True)
     bill_to_postalcode = models.CharField(max_length=16, null=True, blank=True)
     bill_to_country = models.CharField(max_length=64, null=True, blank=True)
     bill_to_ccnum = models.CharField(max_length=8, null=True, blank=True) # last 4 digits
@@ -49,7 +50,7 @@ class Order(models.Model):
 
     @property
     def total_cost(self):
-        return sum([i.line_cost for i in self.orderitem_set.all()])
+        return sum([i.line_cost for i in self.orderitem_set.filter(status=self.status)])
 
     @property
     def currency(self):
@@ -60,13 +61,25 @@ class Order(models.Model):
         else:
             return items[0].currency
 
-    def purchase(self):
+    def purchase(self, first='', last='', street1='', street2='', city='', state='', postalcode='',
+                 country='', ccnum='', cardtype='', processor_reply_dump=''):
         """
         Call to mark this order as purchased.  Iterates through its OrderItems and calls
         their purchased_callback
         """
         self.status = 'purchased'
         self.purchase_time = datetime.now(pytz.utc)
+        self.bill_to_first = first
+        self.bill_to_last = last
+        self.bill_to_street1 = street1
+        self.bill_to_street2 = street2
+        self.bill_to_city = city
+        self.bill_to_state = state
+        self.bill_to_postalcode = postalcode
+        self.bill_to_country = country
+        self.bill_to_ccnum = ccnum
+        self.bill_to_cardtype = cardtype
+        self.processor_reply_dump = processor_reply_dump
         self.save()
         for item in self.orderitem_set.all():
             item.status = 'purchased'

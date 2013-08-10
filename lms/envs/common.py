@@ -432,6 +432,7 @@ ZENDESK_USER = None
 ZENDESK_API_KEY = None
 
 ##### shoppingcart Payment #####
+PAYMENT_SUPPORT_EMAIL = 'payment@edx.org'
 ##### Using cybersource by default #####
 CC_PROCESSOR = {
     'CyberSource' : {

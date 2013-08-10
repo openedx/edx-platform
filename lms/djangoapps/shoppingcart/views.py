@@ -1,11 +1,13 @@
 import logging
 
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, Http404
+from django.core.urlresolvers import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from mitxmako.shortcuts import render_to_response
 from .models import *
-from .processors import verify, render_purchase_form_html
+from .processors import verify, payment_accepted, render_purchase_form_html, record_purchase
+from .processors.exceptions import CCProcessorDataException, CCProcessorWrongAmountException
 
 log = logging.getLogger("shoppingcart")
 
@@ -60,13 +62,52 @@ def remove_item(request):
     return HttpResponse('OK')
 
 @csrf_exempt
-def receipt(request):
+def postpay_accept_callback(request):
     """
     Receives the POST-back from processor and performs the validation and displays a receipt
     and does some other stuff
-    """
-    if verify(request.POST.dict()):
-        return HttpResponse("Validated")
-    else:
-        return HttpResponse("Not Validated")
 
+    HANDLES THE ACCEPT AND REVIEW CASES
+    """
+    # TODO: Templates and logic for all error cases and the REVIEW CASE
+    params = request.POST.dict()
+    if verify(params):
+        try:
+            result = payment_accepted(params)
+            if result['accepted']:
+                # ACCEPTED CASE first
+                record_purchase(params, result['order'])
+                #render_receipt
+                return HttpResponseRedirect(reverse('shoppingcart.views.show_receipt', args=[result['order'].id]))
+            else:
+                return HttpResponse("CC Processor has not accepted the payment.")
+        except CCProcessorWrongAmountException:
+            return HttpResponse("Charged the wrong amount, contact our user support")
+        except CCProcessorDataException:
+            return HttpResponse("Exception: the processor returned invalid data")
+    else:
+        return HttpResponse("There has been a communication problem blah blah. Not Validated")
+
+def show_receipt(request, ordernum):
+    """
+    Displays a receipt for a particular order.
+    404 if order is not yet purchased or request.user != order.user
+    """
+    try:
+        order = Order.objects.get(id=ordernum)
+    except Order.DoesNotExist:
+        raise Http404('Order not found!')
+
+    if order.user != request.user or order.status != 'purchased':
+        raise Http404('Order not found!')
+
+    order_items = order.orderitem_set.all()
+    any_refunds = "refunded" in [i.status for i in order_items]
+    return render_to_response('shoppingcart/receipt.html', {'order': order,
+                                                            'order_items': order_items,
+                                                            'any_refunds': any_refunds})
+
+def show_orders(request):
+    """
+    Displays all orders of a user
+    """
