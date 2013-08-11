@@ -10,6 +10,7 @@ from xmodule.modulestore import Location
 from xmodule.contentstore.content import StaticContent
 from .inheritance import own_metadata
 from xmodule.errortracker import make_error_tracker
+from .store_utilities import rewrite_nonportable_content_links
 
 log = logging.getLogger(__name__)
 
@@ -58,54 +59,6 @@ def import_static_content(modules, course_loc, course_data_path, static_content_
                 raise
 
     return remap_dict
-
-
-def import_module_from_xml(modulestore, static_content_store, course_data_path, module, target_location_namespace=None, verbose=False):
-    # remap module to the new namespace
-    if target_location_namespace is not None:
-        # This looks a bit wonky as we need to also change the 'name' of the imported course to be what
-        # the caller passed in
-        if module.location.category != 'course':
-            module.location = module.location._replace(tag=target_location_namespace.tag, org=target_location_namespace.org,
-                                                       course=target_location_namespace.course)
-        else:
-            module.location = module.location._replace(tag=target_location_namespace.tag, org=target_location_namespace.org,
-                                                       course=target_location_namespace.course, name=target_location_namespace.name)
-
-        # then remap children pointers since they too will be re-namespaced
-        if module.has_children:
-            children_locs = module.children
-            new_locs = []
-            for child in children_locs:
-                child_loc = Location(child)
-                new_child_loc = child_loc._replace(tag=target_location_namespace.tag, org=target_location_namespace.org,
-                                                   course=target_location_namespace.course)
-
-                new_locs.append(new_child_loc.url())
-
-            module.children = new_locs
-
-    if hasattr(module, 'data'):
-        modulestore.update_item(module.location, module.data)
-
-    if module.has_children:
-        modulestore.update_children(module.location, module.children)
-
-    modulestore.update_metadata(module.location, own_metadata(module))
-
-
-def import_course_from_xml(modulestore, static_content_store, course_data_path, module, target_location_namespace=None, verbose=False):
-    # cdodge: more hacks (what else). Seems like we have a problem when importing a course (like 6.002) which
-    # does not have any tabs defined in the policy file. The import goes fine and then displays fine in LMS,
-    # but if someone tries to add a new tab in the CMS, then the LMS barfs because it expects that -
-    # if there is *any* tabs - then there at least needs to be some predefined ones
-    if module.tabs is None or len(module.tabs) == 0:
-        module.tabs = [{"type": "courseware"},
-                       {"type": "course_info", "name": "Course Info"},
-                       {"type": "discussion", "name": "Discussion"},
-                       {"type": "wiki", "name": "Wiki"}]  # note, add 'progress' when we can support it on Edge
-
-    import_module_from_xml(modulestore, static_content_store, course_data_path, module, target_location_namespace, verbose=verbose)
 
 
 def import_from_xml(store, data_dir, course_dirs=None,
@@ -175,7 +128,8 @@ def import_from_xml(store, data_dir, course_dirs=None,
                                        {"type": "discussion", "name": "Discussion"},
                                        {"type": "wiki", "name": "Wiki"}]  # note, add 'progress' when we can support it on Edge
 
-                    import_module(module, store, course_data_path, static_content_store)
+                    import_module(module, store, course_data_path, static_content_store, course_location,
+                                  target_location_namespace or course_location)
 
                     course_items.append(module)
 
@@ -189,7 +143,6 @@ def import_from_xml(store, data_dir, course_dirs=None,
 
             # finally loop through all the modules
             for module in xml_module_store.modules[course_id].itervalues():
-
                 if module.category == 'course':
                     # we've already saved the course module up at the top of the loop
                     # so just skip over it in the inner loop
@@ -202,25 +155,31 @@ def import_from_xml(store, data_dir, course_dirs=None,
                 if verbose:
                     log.debug('importing module location {0}'.format(module.location))
 
-                import_module(module, store, course_data_path, static_content_store)
+                import_module(module, store, course_data_path, static_content_store, course_location,
+                              target_location_namespace if target_location_namespace else course_location)
 
             # now import any 'draft' items
             if draft_store is not None:
                 import_course_draft(xml_module_store, store, draft_store, course_data_path,
-                                    static_content_store, target_location_namespace if target_location_namespace is not None
+                                    static_content_store, course_location, target_location_namespace if target_location_namespace
                                     else course_location)
 
         finally:
             # turn back on all write signalling
             if pseudo_course_id in store.ignore_write_events_on_courses:
                 store.ignore_write_events_on_courses.remove(pseudo_course_id)
-                store.refresh_cached_metadata_inheritance_tree(target_location_namespace if
-                                                               target_location_namespace is not None else course_location)
+                store.refresh_cached_metadata_inheritance_tree(
+                    target_location_namespace if target_location_namespace is not None else course_location
+                )
 
     return xml_module_store, course_items
 
 
-def import_module(module, store, course_data_path, static_content_store, allow_not_found=False):
+def import_module(module, store, course_data_path, static_content_store,
+                  source_course_location, dest_course_location, allow_not_found=False):
+
+    logging.debug('processing import of module {0}...'.format(module.location.url()))
+
     content = {}
     for field in module.fields:
         if field.scope != Scope.content:
@@ -237,6 +196,12 @@ def import_module(module, store, course_data_path, static_content_store, allow_n
     else:
         module_data = content
 
+    if isinstance(module_data, basestring):
+        # we want to convert all 'non-portable' links in the module_data (if it is a string) to
+        # portable strings (e.g. /static/)
+        module_data = rewrite_nonportable_content_links(
+            source_course_location.course_id, dest_course_location.course_id, module_data)
+
     if allow_not_found:
         store.update_item(module.location, module_data, allow_not_found=allow_not_found)
     else:
@@ -250,7 +215,7 @@ def import_module(module, store, course_data_path, static_content_store, allow_n
     store.update_metadata(module.location, dict(own_metadata(module)))
 
 
-def import_course_draft(xml_module_store, store, draft_store, course_data_path, static_content_store, target_location_namespace):
+def import_course_draft(xml_module_store, store, draft_store, course_data_path, static_content_store, source_location_namespace, target_location_namespace):
     '''
     This will import all the content inside of the 'drafts' folder, if it exists
     NOTE: This is not a full course import, basically in our current application only verticals (and downwards)
@@ -307,7 +272,8 @@ def import_course_draft(xml_module_store, store, draft_store, course_data_path, 
                             del module.xml_attributes['parent_sequential_url']
                             del module.xml_attributes['index_in_children_list']
 
-                        import_module(module, draft_store, course_data_path, static_content_store, allow_not_found=True)
+                        import_module(module, draft_store, course_data_path, static_content_store,
+                                      source_location_namespace, target_location_namespace, allow_not_found=True)
                         for child in module.get_children():
                             _import_module(child)
 
@@ -524,3 +490,57 @@ def perform_xlint(data_dir, course_dirs,
         print "This course can be imported successfully."
 
     return err_cnt
+
+
+#
+# UNSURE IF THIS IS UNUSED CODE - IF SO NEEDS TO BE PRUNED. TO BE INVESTIGATED.
+#
+def import_module_from_xml(modulestore, static_content_store, course_data_path, module, target_location_namespace=None, verbose=False):
+    # remap module to the new namespace
+    if target_location_namespace is not None:
+        # This looks a bit wonky as we need to also change the 'name' of the imported course to be what
+        # the caller passed in
+        if module.location.category != 'course':
+            module.location = module.location._replace(tag=target_location_namespace.tag, org=target_location_namespace.org,
+                                                       course=target_location_namespace.course)
+        else:
+            module.location = module.location._replace(tag=target_location_namespace.tag, org=target_location_namespace.org,
+                                                       course=target_location_namespace.course, name=target_location_namespace.name)
+
+        # then remap children pointers since they too will be re-namespaced
+        if module.has_children:
+            children_locs = module.children
+            new_locs = []
+            for child in children_locs:
+                child_loc = Location(child)
+                new_child_loc = child_loc._replace(tag=target_location_namespace.tag, org=target_location_namespace.org,
+                                                   course=target_location_namespace.course)
+
+                new_locs.append(new_child_loc.url())
+
+            module.children = new_locs
+
+    if hasattr(module, 'data'):
+        modulestore.update_item(module.location, module.data)
+
+    if module.has_children:
+        modulestore.update_children(module.location, module.children)
+
+    modulestore.update_metadata(module.location, own_metadata(module))
+
+
+def import_course_from_xml(modulestore, static_content_store, course_data_path, module, target_location_namespace=None, verbose=False):
+    # CDODGE: Is this unused code (along with import_module_from_xml)? I can't find any references to it. If so, then
+    # we need to delete this apparently duplicate code.
+
+    # cdodge: more hacks (what else). Seems like we have a problem when importing a course (like 6.002) which
+    # does not have any tabs defined in the policy file. The import goes fine and then displays fine in LMS,
+    # but if someone tries to add a new tab in the CMS, then the LMS barfs because it expects that -
+    # if there is *any* tabs - then there at least needs to be some predefined ones
+    if module.tabs is None or len(module.tabs) == 0:
+        module.tabs = [{"type": "courseware"},
+                       {"type": "course_info", "name": "Course Info"},
+                       {"type": "discussion", "name": "Discussion"},
+                       {"type": "wiki", "name": "Wiki"}]  # note, add 'progress' when we can support it on Edge
+
+    import_module_from_xml(modulestore, static_content_store, course_data_path, module, target_location_namespace, verbose=verbose)
