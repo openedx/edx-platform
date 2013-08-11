@@ -13,6 +13,7 @@ from django.core.context_processors import csrf
 
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import Location
+from xmodule.error_module import ErrorDescriptor
 from contentstore.utils import get_lms_link_for_item
 from util.json_request import JsonResponse
 from auth.authz import (
@@ -62,7 +63,7 @@ def index(request):
         )
 
     return render_to_response('index.html', {
-        'courses': [format_course_for_view(c) for c in courses],
+        'courses': [format_course_for_view(c) for c in courses if not isinstance(c, ErrorDescriptor)],
         'user': request.user,
         'request_course_creator_url': reverse('request_course_creator'),
         'course_creator_status': _get_course_creator_status(request.user),
