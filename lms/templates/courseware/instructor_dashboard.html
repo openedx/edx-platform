@@ -158,7 +158,7 @@ function goto( mode)
              | <a href="#" onclick="goto('Analytics');" class="${modeflag.get('Analytics')}">Analytics</a> 
           %endif
           %if settings.MITX_FEATURES.get('CLASS_DASHBOARD'):
-             | <a href="#" onclick="goto('Metrics');" class="${modeflag.get('Metrics')}">${_("Metrics")}</a>
+             | <a href="#" onclick="goto('Metrics');" class="${modeflag.get('Metrics')}">Metrics</a>
           %endif
 	  ]
     </h2>
@@ -601,7 +601,7 @@ function goto( mode)
 
 %if modeflag.get('Metrics'):
   %if not any (metrics_results.values()):
-    <p>${_("There is no data available to display at this time.")}</p>
+    <p>There is no data available to display at this time.</p>
   %else:
     <%namespace name="d3_stacked_bar_graph" file="/class_dashboard/d3_stacked_bar_graph.js"/>
     <%namespace name="all_section_metrics" file="/class_dashboard/all_section_metrics.js"/>
@@ -622,13 +622,13 @@ function goto( mode)
         <div class="metrics-right" id="metric_grade_${i}">
           <h3>Grade Distribution per Problem</h3>
           %if not metrics_results['section_has_problem'][i]:
-            <p>${_("There are no problems in this section.")}</p>
+            <p>There are no problems in this section.</p>
           %endif
         </div>
         <div class="metrics-right" id="metric_attempts_${i}">
           <h3>Attempt Distribution per Problem (Last update: ${metrics_results['attempts_timestamp']})</h3>
           %if not metrics_results['section_has_problem'][i]:
-            <p>${_("There are no problems in this section.")}</p>
+            <p>There are no problems in this section.</p>
           %endif
         </div>
       </div>
