@@ -3,20 +3,27 @@ import datetime
 from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
+from django.db.utils import DatabaseError
 
 
 class Migration(SchemaMigration):
+    """
+    Remove an unwanted index from environments that have it.
+    This is a one-way migration in that backwards is a no-op and will not undo the removal.
+    This migration is only relevant to dev environments that existed before a migration rewrite
+      which removed the creation of this index.
+    """
 
     def forwards(self, orm):
-        # Adding field 'CourseEnrollmentAllowed.auto_enroll'
-        db.add_column('student_courseenrollmentallowed', 'auto_enroll',
-                      self.gf('django.db.models.fields.BooleanField')(default=False),
-                      keep_default=False)
+        try:
+            # Removing index on 'TestCenterRegistration', fields ['accommodation_request']
+            db.delete_index('student_testcenterregistration', ['accommodation_request'])
+        except DatabaseError:
+            print "-- skipping delete_index of student_testcenterregistration.accommodation_request (index does not exist)"
 
 
     def backwards(self, orm):
-        # Deleting field 'CourseEnrollmentAllowed.auto_enroll'
-        db.delete_column('student_courseenrollmentallowed', 'auto_enroll')
+        pass
 
 
     models = {
@@ -94,7 +101,7 @@ class Migration(SchemaMigration):
         'student.testcenterregistration': {
             'Meta': {'object_name': 'TestCenterRegistration'},
             'accommodation_code': ('django.db.models.fields.CharField', [], {'max_length': '64', 'blank': 'True'}),
-            'accommodation_request': ('django.db.models.fields.CharField', [], {'db_index': 'False', 'max_length': '1024', 'blank': 'True'}),
+            'accommodation_request': ('django.db.models.fields.CharField', [], {'max_length': '1024', 'blank': 'True'}),
             'authorization_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'db_index': 'True'}),
             'client_authorization_id': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '20', 'db_index': 'True'}),
             'confirmed_at': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'db_index': 'True'}),
