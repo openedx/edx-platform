@@ -370,7 +370,7 @@ class TestCenterRegistration(models.Model):
     accommodation_code = models.CharField(max_length=64, blank=True)
 
     # store the original text of the accommodation request.
-    accommodation_request = models.CharField(max_length=1024, blank=True, db_index=True)
+    accommodation_request = models.CharField(max_length=1024, blank=True, db_index=False)
 
     # time at which edX sent the registration to the test center
     uploaded_at = models.DateTimeField(null=True, db_index=True)
