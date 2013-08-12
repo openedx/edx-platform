@@ -1,0 +1,196 @@
+<%inherit file="/main.html" />
+<%! from django.core.urlresolvers import reverse %>
+<%namespace name='static' file='/static_content.html'/>
+
+<%block name="headextra">
+  <%static:css group='course'/>
+  <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.axislabels.js')}"></script>
+</%block>
+
+<style type="text/css">
+table.stat_table {
+	font-family: verdana,arial,sans-serif;
+	font-size:11px;
+	color:#333333;
+	border-width: 1px;
+	border-color: #666666;
+	border-collapse: collapse;
+}
+table.stat_table th {
+	border-width: 1px;
+	padding: 8px;
+	border-style: solid;
+	border-color: #666666;
+	background-color: #dedede;
+}
+table.stat_table td {
+	border-width: 1px;
+	padding: 8px;
+	border-style: solid;
+	border-color: #666666;
+	background-color: #ffffff;
+}
+
+a.selectedmode { background-color: yellow; }
+
+textarea {
+  height: 200px;
+}
+</style>
+
+<script language="JavaScript" type="text/javascript">
+function goto( mode)
+{
+  document.dashform.dash_mode.value = mode;
+  document.dashform.submit() ;
+}
+</script>
+
+<section class="container">
+<div class="sysadmin-dashboard-wrapper">
+
+  <section class="sysadmin-dashboard-content" style="margin-left:10pt;margin-top:10pt;margin-right:10pt;margin-bottom:20pt"
+>
+    <h1>Sysadmin Dashboard</h1>
+
+    <h2>[ <a href="#" onclick="goto('Status');" class="${modeflag.get('Status')}">Status</a> |
+          <a href="#" onclick="goto('Courses');" class="${modeflag.get('Courses')}">Courses</a> |
+          <a href="#" onclick="goto('Enrollment');" class="${modeflag.get('Enrollment')}">Enrollment</a> |
+          <a href="#" onclick="goto('Staffing');" class="${modeflag.get('Staffing')}">Staffing</a> |
+          <a href="/gitlogs">GitLogs</a>
+           ]
+    </h2>
+
+  <div style="text-align:right"><span id="djangopid">${djangopid}</span>
+  | <span id="mitxver">${mitx_version}</span></div>
+
+    <form name="dashform" method="POST">
+    <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
+    <input type="hidden" name="dash_mode" value="">
+
+##----------------------------------------------------------------------------- 
+%if modeflag.get('Status'):
+
+    <p>
+    Email or username: <input type="text" name="student_uname" size=40 >
+    <input type="submit" name="action" value="Delete user">
+    </p>
+
+    <p>
+    Full Name: <input type="text" name="student_fullname" size=40 >
+    <input type="submit" name="action" value="Create user">
+    </p>
+
+    <p>
+    <input type="submit" name="action" value="Download list of all users (csv file)">
+    </p>
+
+    <p>
+    <input type="submit" name="action" value="Check and repair external Auth Map">
+    </p>
+
+    <hr width="40%" style="align:left">
+ %endif
+
+##----------------------------------------------------------------------------- 
+%if modeflag.get('Enrollment'):
+
+<p>Go to each individual course's Instructor dashboard to manage
+course enrollment.</p>
+
+%endif
+
+##----------------------------------------------------------------------------- 
+%if modeflag.get('Staffing'):
+
+<h3>Manage course staff and instructors</h3><br/>
+
+    <p>
+    <input type="submit" name="action" value="Download staff and instructor list (csv file)">
+    </p>
+<!--
+    <p>You may upload a list of staff/instructors for all the courses.
+    The safest approach is to download the list, modify it, then upload.</p>
+    <p><font color="red">Careful!  The uploaded file <b>overwrites</b>
+    existing list, globally covering all courses!</font></p>
+    <p>
+    Staff and instructor list (CSV file): <input type="file" name="staff_file" >
+    <input type="submit" name="action" value="Upload staff and instructor list">
+    </p>
+-->
+
+%endif
+
+##----------------------------------------------------------------------------- 
+%if modeflag.get('Courses'):
+    <h3>Administer Courses</h3><br/>
+
+    <p>
+    Repo location (ssh): <input type="text" name="repo_location" size=60 >
+    <input type="submit" name="action" value="Load new course from github">
+    </p>
+    <p>
+    Course ID or dir: <input type="text" name="course_id" size=60 >
+    <input type="submit" name="action" value="Delete course from site">
+    </p>
+%endif
+
+##----------------------------------------------------------------------------- 
+    </form>
+
+%if msg:
+    <p></p><p>${msg}</p>
+%endif
+##----------------------------------------------------------------------------- 
+##----------------------------------------------------------------------------- 
+
+%if datatable:
+
+    <br/>
+    <br/>
+    <p>
+      <hr width="100%">
+      <h2>${datatable['title']}</h2>
+      <table class="stat_table">
+        <tr>
+	%for hname in datatable['header']:
+	  <th>${hname}</th>
+	%endfor
+	</tr>
+        %for row in datatable['data']:
+          <tr>
+	    %for value in row:
+	      <td>${value}</td>
+	    %endfor
+	  </tr>
+        %endfor
+      </table>
+    </p>
+%endif
+
+##-----------------------------------------------------------------------------  
+%if plots:
+
+    %for plot in plots:
+      <br/>
+      <h3>${plot['title']}</h3>
+      <br/>
+      <p>${plot['info']}</p>
+      <br/>
+      <div id="plot_${plot['id']}" style="width:600px;height:300px;"></div>
+      <script type="text/javascript">
+          $(function () {
+              ${plot['data']}
+              $.plot($("#plot_${plot['id']}"), ${plot['cmd']}  );
+          });
+      </script>
+      <br/>
+      <br/>
+    %endfor
+
+%endif
+
+  </section>
+</div>
+</section>
