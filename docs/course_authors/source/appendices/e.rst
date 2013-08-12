@@ -329,10 +329,10 @@ The expected answer can be specified explicitly or precomputed by a Python
 script.
 
 Accepted input types include ``<formulaequationinput />`` and ``<textline />``.
-However, the math display on textline uses a different parser and has different
-capabilities than the response type--this may lead to student confusion. For
-this reason, we strongly urge the use of formulaequationinput, and the examples
-below show its use.
+However, the math display on ``<textline math="1" />`` uses a different parser
+and has different capabilities than the response type--this may lead to student
+confusion. For this reason, we strongly urge using ``<formulaequationinput />``
+only, and the examples below show its use.
 
 Sample Problem:
 
@@ -356,7 +356,7 @@ Sample Problem:
     <p>What is the value of the standard gravity constant <i>g</i>, measured in m/s<sup>2</sup>? Give your answer to at least two decimal places.
     <numericalresponse answer="9.80665">
       <responseparam type="tolerance" default="0.01" />
-      <formulaequationinput size="20"/>
+      <formulaequationinput />
     </numericalresponse>
   </p>
 
@@ -491,10 +491,10 @@ Attribute                  Description                  Notes
 ========= ============================================= =====
 size      (optional) defines the size (i.e. the width)
           of the input box displayed to students for
-	  typing their math expression.
+          typing their math expression.
 ========= ============================================= =====
 
-<textline> (see note above, we encourage <formulaequationinput>)
+<textline> (While <textline /> is supported, its use is extremely discouraged. We urge usage of <formulaequationinput />. See the opening paragraphs of the Numerical Response section for more information.)
 
   .. image:: ../Images/numericalresponse5.png
 
@@ -518,10 +518,10 @@ Accepted number types:
 - With no integer part: '.98'
 - Scientific notation: '1.2e-2' (=0.012)
 - More s.n.: '-4.4e+5' = '-4.4e5' (=-440,000)
-- Appending SI prefixes (??): '2.25k' (=2,250). The full list:
+- Appending SI suffixes: '2.25k' (=2,250). The full list:
 
   ====== ========== ===============
-  Prefix Stands for One of these is
+  Suffix Stands for One of these is
   ====== ========== ===============
   %      percent    0.01 = 1e-2
   k      kilo       1000 = 1e3
@@ -536,8 +536,9 @@ Accepted number types:
   ====== ========== ===============
 
 The largest possible number handled currently is exactly the largest float
-possible. This number is 1.7977e+308. Any expression containing larger values
-will have some problems, so it's best to avoid this situation.
+possible (in the Python language). This number is 1.7977e+308. Any expression
+containing larger values will not evaluate correctly, so it's best to avoid
+this situation.
 
 Default Constants
 ~~~~~~~~~~~~~~~~~
@@ -558,12 +559,15 @@ Operators and Functions
 
 As expected, the normal operators apply (with normal order of operations): 
 ``+ - * / ^``. Also provided is a special "parallel resistors" operator given
-by ``||``. For example, an input of ``1 || 2`` would give the resistance of two
-parallel resistors (of resistance 1 and 2), evaluating to 2/3.
+by ``||``. For example, an input of ``1 || 2`` would represent the resistance
+of a pair of parallel resistors (of resistance 1 and 2 ohms), evaluating to 2/3
+(ohms).
 
-At the time of writing, factorials written in the form '3!' are invalid, but there is a workaround, see below for a note.
+At the time of writing, factorials written in the form '3!' are invalid, but there is a workaround. Students can specify ``fact(3)`` or ``factorial(3)`` to
+access the factorial function.
 
 The default included functions are the following:
+
 - Trig functions: sin, cos, tan, sec, csc, cot
 - Their inverses: arcsin, arccos, arctan, arcsec, arccsc, arccot
 - Other common functions: sqrt, log10, log2, ln, exp, abs
@@ -585,6 +589,13 @@ mathematical expression from the student and evaluates the input for equivalence
 to a mathematical expression provided by the grader. Correctness is based on
 numerical sampling of the symbolic expressions.
 
+The syntax of the problem is shared with that of the Numerical Response,
+including default variables and functions. The difference between the two
+response types is that the Formula Response grader may specify unknown
+variables. The student's response is compared against the instructor's
+response, with the unknown variable(s) sampled at random values, as specified
+by the problem author.
+
 The answer is correct if both the student-provided response and the grader's
 mathematical expression are equivalent to specified numerical tolerance, over a
 specified range of values for each variable.
@@ -594,11 +605,7 @@ an extra burden on the problem author to specify the allowed variables in the
 expression and the numerical ranges over which the variables must be sampled in
 order to test for correctness.
 
-The syntax of the problem is shared with that of the Numerical Response,
-including default variables and functions, the difference being that the grader
-may specify additional variables, as above.
-
-A further note about the variables: when the following greek letters are typed
+A further note about the variables: when the following Greek letters are typed
 out, an appropriate character is substituted:
 
   ``alpha beta gamma delta epsilon varepsilon zeta eta theta vartheta iota
@@ -630,19 +637,25 @@ Sample Problem:
   <script type="loncapa/python">
   VoVi = "(R_1*R_2)/R_3"
   </script>
-  <formularesponse type="cs" samples="m,c@1,2:3,4#10" answer="m*c^2">
+    <formularesponse type="cs" samples="m,c@1,2:3,4#10" answer="m*c^2">
       <responseparam type="tolerance" default="0.00001"/> 
-    <text><i>E</i> =</text> <formulaequationinput />
-  </formularesponse>
+      <text><i>E</i> =</text> <formulaequationinput size="40"/>
+    </formularesponse>
 
     <p>Let <i>x</i> be a variable, and let <i>n</i> be an arbitrary constant. What is the derivative of <i>x<sup>n</sup></i>?</p>
   <script type="loncapa/python">
   derivative = "n*x^(n-1)"
   </script>
-  <formularesponse type="ci" samples="x,n@1,2:3,4#10" answer="$derivative">
-    <responseparam type="tolerance" default="0.00001"/> 
-    <formulaequationinput size="40" />
-  </formularesponse>
+    <formularesponse type="ci" samples="x,n@1,2:3,4#10" answer="$derivative">
+      <responseparam type="tolerance" default="0.00001"/> 
+      <formulaequationinput size="40" />
+    </formularesponse>
+
+    <!-- Example problem specifying only one variable -->
+    <formularesponse type="ci" samples="x@1,9#10" answer="x**2 - x + 4">
+      <responseparam type="tolerance" default="0.00001"/> 
+      <formulaequationinput size="40" />
+    </formularesponse>
 
     <solution>
       <div class="detailed-solution">
@@ -653,24 +666,6 @@ Sample Problem:
       </div>
     </solution>
   </problem>
-  Template
-  <problem>
-
-  <script type="loncapa/python">
-  answer_value = "n*x^(n-1)"
-  </script>
-  <formularesponse type="ci" samples="x,n@1,2:3,4#10" answer="$answer_value">
-    <responseparam type="tolerance" default="0.00001"/> 
-    <textline size="40" math="1" />    
-  </formularesponse>
-
-    <solution>
-      <div class="detailed-solution">
-
-      </div>
-    </solution>
-  </problem>
-
 
 XML Attribute Information
 
@@ -687,6 +682,10 @@ XML Attribute Information
 
 Children may include ``<formulaequationinput/>``.
 
+If you do not need to specify any samples, you should look into the use of the
+Numerical Response input type, as it provides all the capabilities of Formula
+Response without the need to specify any unknown variables.
+
 <responseparam>
 
 
@@ -699,7 +698,7 @@ Attribute                  Description                  Notes
 ========= ============================================= =====
 size      (optional) defines the size (i.e. the width)
           of the input box displayed to students for
-	  typing their math expression.
+          typing their math expression.
 ========= ============================================= =====
 
 .. raw:: latex

@@ -1139,7 +1139,7 @@ class FormulaEquationInput(InputTypeBase):
             # or something, and this is where we would need to pass those in.
             result['preview'] = latex_preview(formula)
         except pyparsing.ParseException as err:
-            result['error'] = u"Couldn't parse formula: {}".format(err.msg)
+            result['error'] = u"Sorry, couldn't parse formula"
             result['formula'] = formula
         except Exception:
             # this is unexpected, so log

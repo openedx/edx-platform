@@ -128,7 +128,12 @@ formulaEquationPreview.enable = function () {
         function display(latex) {
             // Load jax if it failed before.
             if (!inputData.jax) {
-                inputData.jax = MathJax.Hub.getAllJax(inputData.$preview[0])[0];
+                results = MathJax.Hub.getAllJax(inputData.$preview[0]);
+                if (!results.length) {
+                    console.log("Unable to find MathJax to display");
+                    return;
+                }
+                inputData.jax = results[0];
             }
 
             // Set the text as the latex code, and then update the MathJax.
