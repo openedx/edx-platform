@@ -86,8 +86,6 @@ MITX_FEATURES = {
 
     'DISABLE_LOGIN_BUTTON': False,  # used in systems where login is automatic, eg MIT SSL
 
-    'STUB_VIDEO_FOR_TESTING': False,  # do not display video when running automated acceptance tests
-
     # extrernal access methods
     'ACCESS_REQUIRE_STAFF_FOR_COURSE': False,
     'AUTH_USE_OPENID': False,

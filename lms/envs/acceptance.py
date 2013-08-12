@@ -75,10 +75,6 @@ XQUEUE_INTERFACE = {
     "basic_auth": ('anant', 'agarwal'),
 }
 
-# Do not display the YouTube videos in the browser while running the
-# acceptance tests. This makes them faster and more reliable
-MITX_FEATURES['STUB_VIDEO_FOR_TESTING'] = True
-
 # Forums are disabled in test.py to speed up unit tests, but we do not have
 # per-test control for acceptance tests
 MITX_FEATURES['ENABLE_DISCUSSION_SERVICE'] = True
