@@ -43,6 +43,8 @@ class TestLocationMapper(unittest.TestCase):
         self.assertEqual(entry['prod_branch'], 'published')
         self.assertEqual(entry['block_map'], {})
 
+        # ensure create_entry does the right thing when not given a course (creates org/course
+        # rather than org/course/run course_id)
         loc_mapper().create_map_entry(Location('i4x', org, course, 'vertical', 'baz_vert'))
         entry = loc_mapper().location_map.find_one({
             '_id': {'org': org, 'course': course}

@@ -64,8 +64,9 @@ class LocMapperStore(object):
         throw an error depending on how mongo is configured.
 
         :param course_location: a Location preferably whose category is 'course'. Unlike the other
-        map methods, this one doesn't take the old-style course_id because it's assumed to be called with
-        a course location not a block location.
+        map methods, this one doesn't take the old-style course_id.  It should be called with
+        a course location not a block location; however, if called w/ a non-course Location, it creates
+        a "default" map for the org/course pair to a new course_id.
         :param course_id: the CourseLocator style course_id
         :param draft_branch: the branch name to assign for drafts. This is hardcoded because old mongo had
         a fixed notion that there was 2 and only 2 versions for modules: draft and production. The old mongo
