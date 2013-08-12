@@ -25,7 +25,7 @@ Longer TODO:
 
 import sys
 import lms.envs.common
-from lms.envs.common import USE_TZ
+from lms.envs.common import USE_TZ, TECH_SUPPORT_EMAIL
 from path import path
 
 ############################ FEATURE CONFIGURATION #############################
@@ -184,7 +184,6 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'registration@edx.org'
 DEFAULT_FEEDBACK_EMAIL = 'feedback@edx.org'
 SERVER_EMAIL = 'devops@edx.org'
-TECH_SUPPORT_EMAIL = 'technical@edx.org'
 ADMINS = ()
 MANAGERS = ADMINS
 
