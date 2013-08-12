@@ -15,6 +15,10 @@ privileges for Studio (edge only).
 Studio: Studio course authors (both instructors and staff) will be auto-enrolled
 for their courses so that "View Live" works.
 
+Common: Add a new input type ``<formulaequationinput />`` for Formula/Numerical
+Responses. It periodically makes AJAX calls to preview and validate the
+student's input.
+
 Common: Added ratelimiting to our authentication backend.
 
 Common: Add additional logging to cover login attempts and logouts.
