@@ -1,5 +1,8 @@
-<%! from django.utils.translation import ugettext as _ %>
+{% load i18n %}
 <textarea {{ attrs }}>{{ content }}</textarea>
 <p id="hint_id_content" class="help-block">
- ${_('Markdown syntax is allowed. See the <a id="cheatsheetLink" href="#">_{("cheatsheet")}</a> for help.')}
+	{% comment %}
+		Translators: Do not translate 'cheatsheetLink'
+	{% endcomment %}
+	{% trans "Markdown syntax is allowed. See the <a id='cheatsheetLink' href='#'>cheatsheet</a> for help." %}
 </p>
