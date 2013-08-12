@@ -239,7 +239,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
           } else {
             string = '<numericalresponse answer="' + floatValue + '">\n';
           }
-          string += '  <textline />\n';
+          string += '  <formulaequationinput />\n';
           string += '</numericalresponse>\n\n';
         } else {
           string = '<stringresponse answer="' + p + '" type="ci">\n  <textline size="20"/>\n</stringresponse>\n\n';
