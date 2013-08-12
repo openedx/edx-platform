@@ -1,13 +1,12 @@
-$(document).ready(function() {
-
-    var droppableClasses = 'drop-target drop-target-prepend drop-target-before drop-target-after';
+CMS.Views.Draggabilly = {
+    droppableClasses: 'drop-target drop-target-prepend drop-target-before drop-target-after',
 
     /*
      * Determine information about where to drop the currently dragged
      * element. Returns the element to attach to and the method of
      * attachment ('before', 'after', or 'prepend').
      */
-    var findDestination = function(ele) {
+    findDestination: function(ele) {
         var eleY = ele.offset().top;
         var containers = $(ele.data('droppable-class'));
 
@@ -55,7 +54,7 @@ $(document).ready(function() {
                         // element is actually on top of the sibling,
                         // rather than next to it. This prevents
                         // saving when expanding/collapsing a list.
-                        if(Math.abs(eleY - siblingY) < $sibling.height() - 1) {
+                        if(Math.abs(eleY - siblingY) < ele.height() - 1) {
                             return {
                                 ele: $sibling,
                                 attachMethod: siblingY > eleY ? 'before' : 'after'
@@ -69,15 +68,15 @@ $(document).ready(function() {
         return {
             ele: null,
             attachMethod: ''
-        };
-    };
+        }
+    },
 
     // Information about the current drag.
-    var dragState = {};
+    dragState: {},
 
-    var onDragStart = function(draggie, event, pointer) {
+    onDragStart: function(draggie, event, pointer) {
         var ele = $(draggie.element);
-        dragState = {
+        this.dragState = {
             // Where we started, in case of a failed drag
             offset: ele.offset(),
             // Which element will be dropped into/onto on success
@@ -87,42 +86,42 @@ $(document).ready(function() {
             // The list which will be expanded on hover
             toExpand: null
         };
-    };
+    },
 
-    var onDragMove = function(draggie, event, pointer) {
+    onDragMove: function(draggie, event, pointer) {
         var ele = $(draggie.element);
-        var destinationInfo = findDestination(ele);
+        var destinationInfo = this.findDestination(ele);
         var destinationEle = destinationInfo.ele;
         var parentList = destinationInfo.parentList;
         // Clear the timer if we're not hovering over any element
         if(!parentList) {
-            clearTimeout(dragState.expandTimer);
+            clearTimeout(this.dragState.expandTimer);
         }
         // If we're hovering over a new element, clear the timer and
         // set a new one
-        else if(!dragState.toExpand || parentList[0] !== dragState.toExpand[0]) {
-            clearTimeout(dragState.expandTimer);
-            dragState.expandTimer = setTimeout(function() {
+        else if(!this.dragState.toExpand || parentList[0] !== this.dragState.toExpand[0]) {
+            clearTimeout(this.dragState.expandTimer);
+            this.dragState.expandTimer = setTimeout(function() {
                 parentList.removeClass('collapsed');
                 parentList.find('.expand-collapse-icon').removeClass('expand').addClass('collapse');
             }, 400);
-            dragState.toExpand = parentList;
+            this.dragState.toExpand = parentList;
         }
         // Clear out the old destination
-        if(dragState.dropDestination) {
-            dragState.dropDestination.removeClass(droppableClasses);
+        if(this.dragState.dropDestination) {
+            this.dragState.dropDestination.removeClass(this.droppableClasses);
         }
         // Mark the new destination
         if(destinationEle) {
             destinationEle.addClass('drop-target drop-target-' + destinationInfo.attachMethod);
-            dragState.dropDestination = destinationEle;
+            this.dragState.dropDestination = destinationEle;
         }
-    };
+    },
 
-    var onDragEnd = function(draggie, event, pointer) {
+    onDragEnd: function(draggie, event, pointer) {
         var ele = $(draggie.element);
 
-        var destinationInfo = findDestination(ele);
+        var destinationInfo = this.findDestination(ele);
         var destination = destinationInfo.ele;
 
         // If the drag succeeded, rearrange the DOM and send the result.
@@ -134,7 +133,7 @@ $(document).ready(function() {
             }
             var method = destinationInfo.attachMethod;
             destination[method](ele);
-            handleReorder(ele);
+            this.handleReorder(ele);
         }
 
         // Everything in its right place
@@ -144,17 +143,17 @@ $(document).ready(function() {
         });
 
         // Clear dragging state in preparation for the next event.
-        if(dragState.dropDestination) {
-            dragState.dropDestination.removeClass(droppableClasses);
+        if(this.dragState.dropDestination) {
+            this.dragState.dropDestination.removeClass(this.droppableClasses);
         }
-        clearTimeout(dragState.expandTimer);
-        dragState = {};
-    };
+        clearTimeout(this.dragState.expandTimer);
+        this.dragState = {};
+    },
 
     /*
      * Find all parent-child changes and save them.
      */
-    var handleReorder = function(ele) {
+    handleReorder: function(ele) {
         var parentSelector = ele.data('parent-location-selector');
         var childrenSelector = ele.data('child-selector');
         var newParentEle = ele.parents(parentSelector).first();
@@ -166,7 +165,7 @@ $(document).ready(function() {
             var oldParentEle = $(parentSelector).filter(function() {
                 return $(this).data('id') === oldParentID;
             });
-            saveItem(oldParentEle, childrenSelector, function() {
+            this.saveItem(oldParentEle, childrenSelector, function() {
                 ele.data('parent-id', newParentID);
             });
         }
@@ -174,17 +173,17 @@ $(document).ready(function() {
             title: gettext('Saving&hellip;')
         });
         saving.show();
-        saveItem(newParentEle, childrenSelector, function() {
+        this.saveItem(newParentEle, childrenSelector, function() {
             saving.hide();
         });
-    };
+    },
 
     /*
      * Actually save the update to the server. Takes the element
      * representing the parent item to save, a CSS selector to find
      * its children, and a success callback.
      */
-    var saveItem = function(ele, childrenSelector, success) {
+    saveItem: function(ele, childrenSelector, success) {
         // Find all current child IDs.
         var children = _.map(
             ele.find(childrenSelector),
@@ -203,14 +202,14 @@ $(document).ready(function() {
             }),
             success: success
         });
-    };
+    },
 
     /*
      * Make `type` draggable using `handleClass`, able to be dropped
      * into `droppableClass`, and with parent type
      * `parentLocationSelector`.
      */
-    var makeDraggable = function(type, handleClass, droppableClass, parentLocationSelector) {
+    makeDraggable: function(type, handleClass, droppableClass, parentLocationSelector) {
         _.each(
             $(type),
             function(ele) {
@@ -222,29 +221,31 @@ $(document).ready(function() {
                     handle: handleClass,
                     axis: 'y'
                 });
-                draggable.on('dragStart', onDragStart);
-                draggable.on('dragMove', onDragMove);
-                draggable.on('dragEnd', onDragEnd);
+                draggable.on('dragStart', _.bind(CMS.Views.Draggabilly.onDragStart, CMS.Views.Draggabilly));
+                draggable.on('dragMove', _.bind(CMS.Views.Draggabilly.onDragMove, CMS.Views.Draggabilly));
+                draggable.on('dragEnd', _.bind(CMS.Views.Draggabilly.onDragEnd, CMS.Views.Draggabilly));
             }
         );
-    };
+    }
+};
 
+$(document).ready(function() {
     // Section
-    makeDraggable(
+    CMS.Views.Draggabilly.makeDraggable(
         '.courseware-section',
         '.section-drag-handle',
         '.courseware-overview',
         'article.courseware-overview'
     );
     // Subsection
-    makeDraggable(
+    CMS.Views.Draggabilly.makeDraggable(
         '.id-holder',
         '.subsection-drag-handle',
         '.subsection-list > ol',
         '.courseware-section'
     );
     // Unit
-    makeDraggable(
+    CMS.Views.Draggabilly.makeDraggable(
         '.unit',
         '.unit-drag-handle',
         'ol.sortable-unit-list',
