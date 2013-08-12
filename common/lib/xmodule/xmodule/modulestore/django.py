@@ -8,6 +8,7 @@ from __future__ import absolute_import
 from importlib import import_module
 
 from django.conf import settings
+from xmodule.modulestore.loc_mapper_store import LocMapperStore
 
 _MODULESTORES = {}
 
@@ -46,3 +47,18 @@ def modulestore(name='default'):
 #     # Initialize the modulestores immediately
 #     for store_name in settings.MODULESTORE:
 #         modulestore(store_name)
+
+_loc_singleton = None
+def loc_mapper():
+    """
+    Get the loc mapper which bidirectionally maps Locations to Locators. Used like modulestore() as
+    a singleton accessor.
+    """
+    # pylint: disable=W0603
+    global _loc_singleton
+    # pylint: disable=W0212
+    if _loc_singleton is None:
+        # instantiate
+        _loc_singleton = LocMapperStore(settings.modulestore_options)
+    return _loc_singleton
+
