@@ -210,27 +210,6 @@ def set_date_and_time(date_css, desired_date, time_css, desired_time):
     time.sleep(float(1))
 
 
-@step('I have created a Video component$')
-def i_created_a_video_component(step):
-    world.create_component_instance(
-        step, '.large-video-icon',
-        'video',
-        '.xmodule_VideoModule',
-        has_multiple_templates=False
-    )
-
-
-@step('I have created a Video Alpha component$')
-def i_created_video_alpha(step):
-    step.given('I have enabled the videoalpha advanced module')
-    world.css_click('a.course-link')
-    step.given('I have added a new subsection')
-    step.given('I expand the first section')
-    world.css_click('a.new-unit-item')
-    world.css_click('.large-advanced-icon')
-    world.click_component_from_menu('videoalpha', None, '.xmodule_VideoAlphaModule')
-
-
 @step('I have enabled the (.*) advanced module$')
 def i_enabled_the_advanced_module(step, module):
     step.given('I have opened a new course section in Studio')
@@ -246,16 +225,6 @@ def open_new_unit(step):
     step.given('I have added a new subsection')
     step.given('I expand the first section')
     world.css_click('a.new-unit-item')
-
-
-@step('when I view the (video.*) it (.*) show the captions')
-def shows_captions(_step, video_type, show_captions):
-    # Prevent cookies from overriding course settings
-    world.browser.cookies.delete('hide_captions')
-    if show_captions == 'does not':
-        assert world.css_has_class('.%s' % video_type, 'closed')
-    else:
-        assert world.is_css_not_present('.%s.closed' % video_type)
 
 
 @step('the save button is disabled$')
