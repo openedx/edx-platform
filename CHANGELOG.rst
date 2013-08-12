@@ -5,6 +5,12 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Studio: Email will be sent to admin address when a user requests course creator
+privileges for Studio (edge only).
+
+Studio: Studio course authors (both instructors and staff) will be auto-enrolled
+for their courses so that "View Live" works.
+
 Common: Added ratelimiting to our authentication backend.
 
 Common: Add additional logging to cover login attempts and logouts.
@@ -41,6 +47,9 @@ this allows instructors to hand off management of a course to someone else.
 Common: Add a manage.py that knows about edx-platform specific settings and projects
 
 Common: Added *experimental* support for jsinput type.
+
+Studio: Remove XML from HTML5 video component editor. All settings are
+moved to be edited as metadata.
 
 Common: Added setting to specify Celery Broker vhost
 

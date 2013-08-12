@@ -173,7 +173,7 @@ class CourseDetails(object):
         # the right thing
         result = None
         if video_key:
-            result = '<iframe width="560" height="315" src="http://www.youtube.com/embed/' + \
+            result = '<iframe width="560" height="315" src="//www.youtube.com/embed/' + \
                 video_key + '?autoplay=1&rel=0" frameborder="0" allowfullscreen=""></iframe>'
         return result
 

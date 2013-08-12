@@ -9,13 +9,11 @@ import random
 import os
 
 TEST_ROOT = settings.COMMON_TEST_DATA_ROOT
-HTTP_PREFIX = "http://localhost:%s" % settings.LETTUCE_SERVER_PORT
-
 
 @step(u'I go to the files and uploads page')
 def go_to_uploads(_step):
     menu_css = 'li.nav-course-courseware'
-    uploads_css = 'li.nav-course-courseware-uploads'
+    uploads_css = 'li.nav-course-courseware-uploads a'
     world.css_click(menu_css)
     world.css_click(uploads_css)
 
@@ -24,13 +22,10 @@ def go_to_uploads(_step):
 def upload_file(_step, file_name):
     upload_css = 'a.upload-button'
     world.css_click(upload_css)
-
-    file_css = 'input.file-input'
-    upload = world.css_find(file_css)
     #uploading the file itself
     path = os.path.join(TEST_ROOT, 'uploads/', file_name)
-    upload._element.send_keys(os.path.abspath(path))
-
+    world.browser.execute_script("$('input.file-input').css('display', 'block')")
+    world.browser.attach_file('file', os.path.abspath(path))
     close_css = 'a.close-button'
     world.css_click(close_css)
 
@@ -80,6 +75,9 @@ def check_download(_step, file_name):
         r = get_file(file_name)
         downloaded_text = r.text
         assert cur_text == downloaded_text
+    #resetting the file back to its original state
+    with open(os.path.abspath(path), 'w') as cur_file:
+        cur_file.write("This is an arbitrary file for testing uploads")
 
 
 @step(u'I modify "([^"]*)"$')
@@ -109,6 +107,8 @@ def get_file(file_name):
     index = get_index(file_name)
     assert index != -1
 
-    url_css = 'input.embeddable-xml-input'
-    url = world.css_find(url_css)[index].value
-    return requests.get(HTTP_PREFIX + url)
+    url_css = 'a.filename'
+    def get_url():
+        return world.css_find(url_css)[index]._element.get_attribute('href')
+    url = world.retry_on_exception(get_url)
+    return requests.get(url)

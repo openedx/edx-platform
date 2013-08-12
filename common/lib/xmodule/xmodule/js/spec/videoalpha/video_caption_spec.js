@@ -130,7 +130,6 @@
 
     describe('mouse movement', function() {
       beforeEach(function() {
-        //initialize();
         window.setTimeout.andReturn(100);
         spyOn(window, 'clearTimeout');
       });
@@ -221,10 +220,6 @@
     });
 
     describe('search', function() {
-      beforeEach(function() {
-        //initialize();
-      });
-
       it('return a correct caption index', function() {
         expect(videoCaption.search(0)).toEqual(0);
         expect(videoCaption.search(3120)).toEqual(1);
@@ -277,7 +272,6 @@
 
     describe('pause', function() {
       beforeEach(function() {
-        //initialize();
         videoCaption.playing = true;
         videoCaption.pause();
       });
@@ -288,10 +282,6 @@
     });
 
     describe('updatePlayTime', function() {
-      /*beforeEach(function() {
-        initialize();
-      });*/
-
       describe('when the video speed is 1.0x', function() {
         beforeEach(function() {
           videoSpeedControl.currentSpeed = '1.0';
@@ -369,16 +359,21 @@
         });
 
         it('when CC button is disabled ', function() {
-          var realHeight = parseInt($('.subtitles').css('maxHeight'), 10),
-              videoWrapperHeight = $('.video-wrapper').height(),
-              controlsHeight = videoControl.el.height(),
-              progressSliderHeight = videoControl.sliderEl.height(),
-              shouldBeHeight = videoWrapperHeight - controlsHeight \
-                                - 0.5 * controlsHeight;
+          var realHeight, videoWrapperHeight, progressSliderHeight,
+            controlHeight, shouldBeHeight;
 
           state.captionsHidden = true;
           videoCaption.setSubtitlesHeight();
-          expect(realHeight).toBeCloseTo($('.video-wrapper').height(shouldBeHeight, 2));
+
+          realHeight = parseInt($('.subtitles').css('maxHeight'), 10);
+          videoWrapperHeight = $('.video-wrapper').height();
+          progressSliderHeight = videoControl.sliderEl.height();
+          controlHeight = videoControl.el.height();
+          shouldBeHeight = videoWrapperHeight -
+                           0.5 * progressSliderHeight -
+                           controlHeight;
+
+          expect(realHeight).toBe(shouldBeHeight);
         });
       });
 
@@ -434,17 +429,6 @@
           });
 
           it('scroll to current caption', function() {
-            // Check for calledWith(parameters) for some reason fails...
-            //
-            // var offset = -0.5 * ($('.video-wrapper').height() - $('.subtitles .current:first').height());
-            //
-            // expect($.fn.scrollTo).toHaveBeenCalledWith(
-            //   $('.subtitles .current:first', videoCaption.el),
-            //   {
-            //     offset: offset
-            //   }
-            // );
-
             expect($.fn.scrollTo).toHaveBeenCalled();
           });
         });
@@ -454,7 +438,6 @@
     describe('seekPlayer', function() {
       describe('when the video speed is 1.0x', function() {
         beforeEach(function() {
-          //initialize();
           videoSpeedControl.currentSpeed = '1.0';
           $('.subtitles li[data-start="14910"]').trigger('click');
         });

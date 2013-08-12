@@ -439,7 +439,7 @@ if settings.MITX_FEATURES.get('ENABLE_HINTER_INSTRUCTOR_VIEW'):
     )
 
 # enable automatic login
-if settings.MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_LOAD_TESTING'):
+if settings.MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING'):
     urlpatterns += (
         url(r'^auto_auth$', 'student.views.auto_auth'),
     )

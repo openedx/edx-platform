@@ -25,6 +25,10 @@
     <%static:include path="js/metadata-option-entry.underscore" />
 </script>
 
+<script id="metadata-list-entry" type="text/template">
+    <%static:include path="js/metadata-list-entry.underscore" />
+</script>
+
 <% showHighLevelSource='source_code' in editable_metadata_fields and editable_metadata_fields['source_code']['explicitly_set'] %>
 <% metadata_field_copy = copy.copy(editable_metadata_fields) %>
 ## Delete 'source_code' field (if it exists) so metadata editor view does not attempt to render it.

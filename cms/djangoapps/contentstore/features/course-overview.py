@@ -52,7 +52,7 @@ def have_a_course_with_two_sections(step):
 def navigate_to_the_course_overview_page(step):
     create_studio_user(is_staff=True)
     log_into_studio()
-    course_locator = '.class-name'
+    course_locator = 'a.course-link'
     world.css_click(course_locator)
 
 

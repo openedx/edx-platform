@@ -35,10 +35,15 @@ def i_click_the_edit_link_for_the_release_date(_step):
     world.css_click(button_css)
 
 
-@step('I save a new section release date$')
-def i_save_a_new_section_release_date(_step):
-    set_date_and_time('input.start-date.date.hasDatepicker', '12/25/2013',
-        'input.start-time.time.ui-timepicker-input', '00:00')
+@step('I set the section release date to ([0-9/-]+)( [0-9:]+)?')
+def set_section_release_date(_step, datestring, timestring):
+    if hasattr(timestring, "strip"):
+        timestring = timestring.strip()
+    if not timestring:
+        timestring = "00:00"
+    set_date_and_time(
+        'input.start-date.date.hasDatepicker', datestring,
+        'input.start-time.time.ui-timepicker-input', timestring)
     world.browser.click_link_by_text('Save')
 
 

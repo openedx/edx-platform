@@ -1,6 +1,6 @@
 <%page args="section_data"/>
 
-<div class="student-specific-container">
+<div class="student-specific-container action-type-container">
   <H2>Student-specific grade adjustment</h2>
   <div class="request-response-error"></div>
 
@@ -47,12 +47,11 @@
     <input type="button" name="task-history-single" value="Show Background Task History for Student" data-endpoint="${ section_data['list_instructor_tasks_url'] }">
     <div class="task-history-single-table"></div>
   %endif
+  <hr>
 </div>
 
 %if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS') and section_data['access']['instructor']:
-  <hr>
-
-  <div class="course-specific-container">
+  <div class="course-specific-container action-type-container">
     <H2>Course-specific grade adjustment</h2>
     <div class="request-response-error"></div>
 
@@ -81,9 +80,9 @@
     </p>
   </div>
 
-  <hr>
 
-  <div class="running-tasks-container">
+  <div class="running-tasks-container action-type-container">
+    <hr>
     <h2> Pending Instructor Tasks </h2>
     <div class="running-tasks-table" data-endpoint="${ section_data['list_instructor_tasks_url'] }"></div>
   </div>

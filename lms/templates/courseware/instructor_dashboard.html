@@ -201,7 +201,7 @@ function goto( mode)
     <H2>${_("Course-specific grade adjustment")}</h2>
 
     <p>
-      {_("Specify a particular problem in the course here by its url:")}
+      ${_("Specify a particular problem in the course here by its url:")}
       <input type="text" name="problem_for_all_students" size="60">
     </p>
     <p>
@@ -385,7 +385,7 @@ function goto( mode)
   <input type="checkbox" name="email_students"> ${_("Notify students by email")}
   <p>
   <input type="checkbox" name="auto_enroll"> ${_("Auto-enroll students when they activate")}
-  <input type="submit" name="action" value="$_("Enroll multiple students")}">
+  <input type="submit" name="action" value="${_("Enroll multiple students")}">
   <p>
   <input type="submit" name="action" value="${_("Unenroll multiple students")}">
 
@@ -639,7 +639,7 @@ function goto( mode)
 
 %if instructor_tasks is not None and len(instructor_tasks) > 0:
     <hr width="100%">
-    <h2>$_("Pending Instructor Tasks")}</h2>
+    <h2>${_("Pending Instructor Tasks")}</h2>
     <div id="task-progress-wrapper">
       <table class="stat_table">
         <tr>

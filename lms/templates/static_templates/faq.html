@@ -21,7 +21,7 @@
         <h2>${_("Organization")}</h2>
         <article class="response">
           <h3>${_("What is {edX}?").format(edX="edX")}</h3>
-          <p>${_('{edX} is a not-for-profit enterprise of its founding partners, the {MIT_long} ({MIT}) and {harvard_u} that offers online learning to on-campus students and to millions of people around the world. To do so, {edX} is building an open-source online learning platform and hosts an online web portal at <a href=\"http://www.edx.org\">www.edx.org</a> for online education.').format(edX="edX", MIT_long="Massachusetts Institute of Technology", MIT="MIT", harvard_u="Harvard University")}</p>
+          <p>${_('{EdX} is a not-for-profit enterprise of its founding partners, the {MIT_long} ({MIT}) and {harvard_u} that offers online learning to on-campus students and to millions of people around the world. To do so, {edX} is building an open-source online learning platform and hosts an online web portal at <a href=\"http://www.edx.org\">www.edx.org</a> for online education.').format(EdX="EdX", edX="edX", MIT_long="Massachusetts Institute of Technology", MIT="MIT", harvard_u="Harvard University")}</p>
           <p>${_("{EdX} currently offers {HarvardX}, {MITx} and {BerkeleyX} classes online for free. Beginning in fall 2013, {edX} will offer {WellesleyX} , {GeorgetownX} and the {UTexas} classes online for free. The {UT} System includes nine universities and six health institutions. In 2014, {edX} will further expand its consortium, including several international schools, when it begins offering courses from {EPFL}, {McGill}, {Toronto}, {ANU}, {Delft}, and {Rice}.  The {edX} institutions aim to extend their collective reach to build a global community of online students. Along with offering online courses, the three universities undertake research on how students learn and how technology can transform learning both on-campus and online throughout the world.").format(
               EdX="EdX",
               edX="edX",
@@ -32,7 +32,7 @@
               GeorgetownX="GeorgetownX",
               UTexas="University of Texas System",
               UT="UT",
-              EPFL="École Polytechnique Fédérale de Lausanne",
+              EPFL=u"École Polytechnique Fédérale de Lausanne",
               McGill="McGill University",
               Toronto="University of Toronto",
               ANU="Australian National University",
@@ -44,12 +44,12 @@
 
         <article class="response">
           <h3>${_("Will {edX} be adding additional X Universities?").format(edX="edX")}</h3>
-          <p>${_("More than 200 institutions from around the world have expressed interest in collaborating with {edX} since {Harvard} and {MIT} announced its creation in May. {EdX} is focused above all on quality and developing the best not-for-profit model for online education. In addition to providing online courses on the {edX} platform, the {x_consortium} will be a forum in which members can share experiences around online learning. {Harvard}, {MIT}, {Berkeley}, the {UTexas} and the other {consortium} members will work collaboratively to establish the {\"X_University\" Consortium}, whose membership will expand to include additional \"{X_Universities}.\"  As noted above, {edX}'s newest {consortium} members include {Wellesley}, {Georgetown}, {EPFL}, {McGill}, {Toronto}, {ANU}, {Delft}, and {Rice}. Each member of the {consortium} will offer courses on the {edX} platform as an \"{X_University}\". The gathering of many universities' educational content together on one site will enable learners worldwide to access the offered course content of any participating university from a single website, and to use a set of online educational tools shared by all participating universities.").format(
+          <p>${_("More than 200 institutions from around the world have expressed interest in collaborating with {edX} since {Harvard} and {MIT} announced its creation in May. {EdX} is focused above all on quality and developing the best not-for-profit model for online education. In addition to providing online courses on the {edX} platform, the {x_consortium} will be a forum in which members can share experiences around online learning. {Harvard}, {MIT}, {Berkeley}, the {UTexas} and the other {consortium} members will work collaboratively to establish the {x_consortium}, whose membership will expand to include additional \"{X_Universities}.\"  As noted above, {edX}'s newest {consortium} members include {Wellesley}, {Georgetown}, {EPFL}, {McGill}, {Toronto}, {ANU}, {Delft}, and {Rice}. Each member of the {consortium} will offer courses on the {edX} platform as an \"{X_University}\". The gathering of many universities' educational content together on one site will enable learners worldwide to access the offered course content of any participating university from a single website, and to use a set of online educational tools shared by all participating universities.").format(
               EdX="EdX",
               edX="edX",
               Harvard="Harvard",
               MIT="MIT",
-              x_consortium="\"X_University\" Consortium",
+              x_consortium="\"X University\" Consortium",
               consortium="consortium",
               X_Universities="X Universities",
               X_University="X University",
@@ -57,14 +57,14 @@
               Wellesley="Wellesley",
               Georgetown="Georgetown",
               UTexas="University of Texas System",
-              EPFL="École Polytechnique Fédérale de Lausanne",
+              EPFL=u"École Polytechnique Fédérale de Lausanne",
               McGill="McGill University",
               Toronto="University of Toronto",
               ANU="Australian National University",
               Delft="Delft University of Technology",
               Rice="Rice University",            
             )}</p>
-          <p>${_("{edX} will actively explore the addition of other institutions from around the world to the {edX} platform, and looks forward to adding more \"{X Universities}\".").format(edX="edX", X_Universities="X Universities")}
+          <p>${_("{EdX} will actively explore the addition of other institutions from around the world to the {edX} platform, and looks forward to adding more \"{X_Universities}\".").format(EdX="EdX", edX="edX", X_Universities="X Universities")}
           </p>
         </article>
       </section>
@@ -79,7 +79,7 @@
           <h3>${_("Will certificates be awarded?")}</h3>
           <p>${_("Yes. Online learners who demonstrate mastery of subjects can earn a certificate "
                  "of mastery. Certificates will be issued at the discretion of {edX} and the underlying "
-                 "{X_University} that offered the course under the name of the underlying \"{X_University}\" from where the course originated, i.e. {HarvardX}, {MITx} or {BerkeleyX}. "
+                 "\"{X_University}\" that offered the course under the name of the underlying \"{X_University}\" from where the course originated, i.e. {HarvardX}, {MITx} or {BerkeleyX}. "
                  "For the courses in Fall 2012, those certificates will be free. There is a plan to "
                  "charge a modest fee for certificates in the future. Note: At this time, {edX} is "
                  "holding certificates for learners connected with Cuba, Iran, Syria and Sudan "
@@ -102,7 +102,7 @@
           <p>${_("{EdX} institutions have assembled faculty members who will collect and analyze data to assess results and the impact {edX} is having on learning.").format(EdX="EdX", edX="edX")}</p>
         </article>
         <article class="response">
-          <h3>${_("How may I apply to study with {edX}?")}</h3>
+          <h3>${_("How may I apply to study with {edX}?").format(edX="edX")}</h3>
           <p>${_('Simply complete the online {link_start}signup form{link_end}.  Enrolling will create your unique student record in the {edX} database, allow you to register for classes, and to receive a certificate on successful completion.').format(link_start='<a href="#signup-modal" rel="leanModal">', link_end='</a>', edX="edX")}</p>
         </article>
         <article class="response">

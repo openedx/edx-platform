@@ -47,12 +47,12 @@ Feature: Problem Editor
   Scenario: User cannot type decimal values integer number field
     Given I have created a Blank Common Problem
     When I edit and select Settings
-    Then if I set the max attempts to "2.34", it displays initially as "234", and is persisted as "234"
+    Then if I set the max attempts to "2.34", it will persist as a valid integer
 
   Scenario: User cannot type out of range values in an integer number field
     Given I have created a Blank Common Problem
     When I edit and select Settings
-    Then if I set the max attempts to "-3", it displays initially as "-3", and is persisted as "0"
+    Then if I set the max attempts to "-3", it will persist as a valid integer
 
   Scenario: Settings changes are not saved on Cancel
     Given I have created a Blank Common Problem
@@ -66,6 +66,7 @@ Feature: Problem Editor
     When I edit and select Settings
     Then Edit High Level Source is visible
 
+  # This feature will work in Firefox only when Firefox is the active window
   Scenario: High Level source is persisted for LaTeX problem (bug STUD-280)
     Given I have created a LaTeX Problem
     When I edit and compile the High Level Source

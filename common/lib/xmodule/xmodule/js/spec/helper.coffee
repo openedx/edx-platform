@@ -12,6 +12,9 @@ window.STATUS = window.YT.PlayerState
 
 oldAjaxWithPrefix = window.jQuery.ajaxWithPrefix
 
+window.onTouchBasedDevice = ->
+    navigator.userAgent.match /iPhone|iPod|iPad/i
+
 jasmine.stubbedCaption =
       end: [3120, 6270, 8490, 21620, 24920, 25750, 27900, 34380, 35550, 40250]
       start: [1180, 3120, 6270, 14910, 21620, 24920, 25750, 27900, 34380, 35550]
@@ -36,7 +39,7 @@ jasmine.stubbedCaption =
 #
 # We will replace it with a function that does:
 #
-#     1.) Return a hard coded captions object if the file name contains 'test_name_of_the_subtitles'.
+#     1.) Return a hard coded captions object if the file name contains 'Z5KLxerq05Y'.
 #     2.) Behaves the same a as the origianl in all other cases.
 
 window.jQuery.ajaxWithPrefix = (url, settings) ->
@@ -46,7 +49,7 @@ window.jQuery.ajaxWithPrefix = (url, settings) ->
       success = settings.success
       data = settings.data
 
-  if url.match(/test_name_of_the_subtitles/g) isnt null or url.match(/slowerSpeedYoutubeId/g) isnt null or url.match(/normalSpeedYoutubeId/g) isnt null
+  if url.match(/Z5KLxerq05Y/g) isnt null or url.match(/7tqY6eQzVhE/g) isnt null or url.match(/cogebirgzzM/g) isnt null
     if window.jQuery.isFunction(success) is true
       success jasmine.stubbedCaption
     else if window.jQuery.isFunction(data) is true
@@ -60,11 +63,11 @@ window.WAIT_TIMEOUT = 1000
 jasmine.getFixtures().fixturesPath = 'xmodule/js/fixtures'
 
 jasmine.stubbedMetadata =
-  slowerSpeedYoutubeId:
-    id: 'slowerSpeedYoutubeId'
+  '7tqY6eQzVhE':
+    id: '7tqY6eQzVhE'
     duration: 300
-  normalSpeedYoutubeId:
-    id: 'normalSpeedYoutubeId'
+  'cogebirgzzM':
+    id: 'cogebirgzzM'
     duration: 200
   bogus:
     duration: 100
@@ -117,7 +120,7 @@ jasmine.stubVideoPlayer = (context, enableParts, createPlayer=true) ->
   loadFixtures 'video.html'
   jasmine.stubRequests()
   YT.Player = undefined
-  videosDefinition = '0.75:slowerSpeedYoutubeId,1.0:normalSpeedYoutubeId'
+  videosDefinition = '0.75:7tqY6eQzVhE,1.0:cogebirgzzM'
   context.video = new Video '#example', videosDefinition
   jasmine.stubYoutubePlayer()
   if createPlayer
@@ -135,7 +138,7 @@ jasmine.stubVideoPlayerAlpha = (context, enableParts, html5=false) ->
   YT.Player = undefined
   window.OldVideoPlayerAlpha = undefined
   jasmine.stubYoutubePlayer()
-  return new VideoAlpha '#example', '.75:slowerSpeedYoutubeId,1.0:normalSpeedYoutubeId'
+  return new VideoAlpha '#example', '.75:7tqY6eQzVhE,1.0:cogebirgzzM'
 
 
 # Stub jQuery.cookie

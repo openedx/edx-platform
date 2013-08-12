@@ -15,6 +15,8 @@ Feature: Course Team
         And I am viewing the course team settings
         When I add "bob" to the course team
         And "bob" logs in
+        And he selects the new course
+        And he views the course team settings
         Then he cannot delete users
         And he cannot add users
 
@@ -69,7 +71,7 @@ Feature: Course Team
         And she selects the new course
         And she views the course team settings
         And she deletes me from the course team
-        And I log in
+        And I am logged into studio
         Then I do not see the course on my page
 
     Scenario: Admins should be able to remove their own admin rights

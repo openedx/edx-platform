@@ -45,7 +45,10 @@ def i_see_five_settings_with_values(step):
 def i_can_modify_the_display_name(step):
     # Verifying that the display name can be a string containing a floating point value
     # (to confirm that we don't throw an error because it is of the wrong type).
-    world.get_setting_entry(DISPLAY_NAME).find_by_css('.setting-input')[0].fill('3.4')
+    index = world.get_setting_entry_index(DISPLAY_NAME)
+    world.css_fill('.wrapper-comp-setting .setting-input', '3.4', index=index)
+    if world.is_firefox():
+        world.trigger_event('.wrapper-comp-setting .setting-input', index=index)
     verify_modified_display_name()
 
 
@@ -57,7 +60,10 @@ def my_display_name_change_is_persisted_on_save(step):
 
 @step('I can specify special characters in the display name')
 def i_can_modify_the_display_name_with_special_chars(step):
-    world.get_setting_entry(DISPLAY_NAME).find_by_css('.setting-input')[0].fill("updated ' \" &")
+    index = world.get_setting_entry_index(DISPLAY_NAME)
+    world.css_fill('.wrapper-comp-setting .setting-input', "updated ' \" &", index=index)
+    if world.is_firefox():
+        world.trigger_event('.wrapper-comp-setting .setting-input', index=index)
     verify_modified_display_name_with_special_chars()
 
 
@@ -127,12 +133,16 @@ def set_the_weight_to_abc(step, bad_weight):
     world.verify_setting_entry(world.get_setting_entry(PROBLEM_WEIGHT), PROBLEM_WEIGHT, "", False)
 
 
-@step('if I set the max attempts to "(.*)", it displays initially as "(.*)", and is persisted as "(.*)"')
-def set_the_max_attempts(step, max_attempts_set, max_attempts_displayed, max_attempts_persisted):
-    world.get_setting_entry(MAXIMUM_ATTEMPTS).find_by_css('.setting-input')[0].fill(max_attempts_set)
-    world.verify_setting_entry(world.get_setting_entry(MAXIMUM_ATTEMPTS), MAXIMUM_ATTEMPTS, max_attempts_displayed, True)
+@step('if I set the max attempts to "(.*)", it will persist as a valid integer$')
+def set_the_max_attempts(step, max_attempts_set):
+    # on firefox with selenium, the behaviour is different.  eg 2.34 displays as 2.34 and is persisted as 2
+    index = world.get_setting_entry_index(MAXIMUM_ATTEMPTS)
+    world.css_fill('.wrapper-comp-setting .setting-input', max_attempts_set, index=index)
+    if world.is_firefox():
+        world.trigger_event('.wrapper-comp-setting .setting-input', index=index)
     world.save_component_and_reopen(step)
-    world.verify_setting_entry(world.get_setting_entry(MAXIMUM_ATTEMPTS), MAXIMUM_ATTEMPTS, max_attempts_persisted, True)
+    value =  int(world.css_value('input.setting-input', index=index))
+    assert value >= 0
 
 
 @step('Edit High Level Source is not visible')
@@ -213,7 +223,11 @@ def verify_unset_display_name():
 
 
 def set_weight(weight):
-    world.get_setting_entry(PROBLEM_WEIGHT).find_by_css('.setting-input')[0].fill(weight)
+    index = world.get_setting_entry_index(PROBLEM_WEIGHT)
+    world.css_fill('.wrapper-comp-setting .setting-input', weight, index=index)
+    if world.is_firefox():
+        world.trigger_event('.wrapper-comp-setting .setting-input', index=index, event='blur')
+        world.trigger_event('a.save-button', event='focus')
 
 
 def open_high_level_source():
