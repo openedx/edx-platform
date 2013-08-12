@@ -11,8 +11,6 @@ import search.sorting
 from xmodule.modulestore import Location
 
 import nltk
-import nltk.corpus as word_filter
-
 
 class SearchResults:
     """
@@ -126,10 +124,11 @@ class SearchResult:
 
     def __init__(self, entry, score, query):
         self.data = entry
-        self.url = _jump_to_url(entry)
+        self.url = _return_jump_to_url(entry)
         self.score = score
         self.thumbnail = "data:image/jpg;base64," + entry["thumbnail"]
         self.snippets = snippet_generator(self.data["searchable_text"], query)
+
 
 def snippet_generator(transcript, query, soft_max=50, word_margin=25, bold=True):
     """
@@ -153,9 +152,8 @@ def snippet_generator(transcript, query, soft_max=50, word_margin=25, bold=True)
     """
 
     punkt = nltk.data.load('tokenizers/punkt/english.pickle')
-    stop_words = word_filter.stopwords.words("english")
     sentences = punkt.tokenize(transcript)
-    substrings = _query_reduction(query, stop_words)
+    substrings = [word.lower() for word in query.split()]
     query_container = lambda sentence: any(substring in sentence.lower() for substring in substrings)
     tripped = False
     response = ""
@@ -195,18 +193,16 @@ def _match(words):
     near_size = lambda words: abs(len(words[0]) - len(words[1])) < (len(words[0]) + len(words[1])) / 6
     return contained(words) and near_size(words)
 
-
-def _query_reduction(query, stopwords):
-    return [word.lower() for word in query.split() if word not in stopwords]
-
-
 def _match_highlighter(query, response, tag="b", css_class="highlight", highlight_stopwords=True):
+    """
+    Highlights all direct matches within given snippet
+    """
+
     wrapping = ("<" + tag + " class=" + css_class + ">", "</" + tag + ">")
     punctuation_map = dict((ord(char), None) for char in string.punctuation)
     depunctuation = lambda word: word.translate(punctuation_map)
     wrap = lambda text: wrapping[0] + text + wrapping[1]
-    stop_words = word_filter.stopwords.words("english") * (not highlight_stopwords)
-    query_set = set(_query_reduction(query, stop_words))
+    query_set = set(word.lower() for word in query.split())
     bold_response = ""
     for word in response.split():
         if any(_match((query_word, depunctuation(word.lower()))) for query_word in query_set):
@@ -216,7 +212,11 @@ def _match_highlighter(query, response, tag="b", css_class="highlight", highligh
     return bold_response
 
 
-def _jump_to_url(entry):
+def _return_jump_to_url(entry):
+    """
+    Generates the proper jump_to url for a given entry
+    """
+
     fields = ["tag", "org", "course", "category", "name"]
     location = Location(*[json.loads(entry["id"])[field] for field in fields])
     url = '{0}/{1}/jump_to/{2}'.format('/courses', entry["course_id"], location)

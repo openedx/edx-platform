@@ -2,6 +2,7 @@
 A series of sorting functions to help sort search results
 """
 
+
 def sort(data_list, sorting):
     """
     General sort handler, used by SearchResults model for search sorting

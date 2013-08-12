@@ -6,27 +6,13 @@ from search.es_requests import MongoIndexer
 from django.test import TestCase
 from pymongo import MongoClient
 import random
-import re
 import string
 from pyfuzz.generator import random_item, random_ascii
 import json
-from pyPdf import PdfFileWriter, PdfFileReader
 from StringIO import StringIO
-import os
 import ho.pisa as pisa
 import urllib
 import base64
-
-
-def random_files(
-    file_ending, test_files=10, filename_sizes=20,
-    valid_chars=string.lowercase + string.uppercase + string.digits):
-    """
-    Generates a number of random files with a given file ending
-    """
-
-    new_string = lambda: "".join(random.choice(valid_chars) for i in range(filename_sizes)) + file_ending
-    return (new_string() for i in range(test_files))
 
 
 def dummy_document(key, values, data_type, **kwargs):
@@ -37,8 +23,9 @@ def dummy_document(key, values, data_type, **kwargs):
     """
 
     dummy_data = {}
-    dummy_data[key] = { value: random_item(data_type, **kwargs) for value in values}
+    dummy_data[key] = {value: random_item(data_type, **kwargs) for value in values}
     return dummy_data
+
 
 class MongoTest(TestCase):
     """
@@ -61,49 +48,6 @@ class MongoTest(TestCase):
         self.module_collection = self.test_module["modulestore"]
         self.module_collection.insert(dummy)
         self.indexer = MongoIndexer(self.host, self.port, content_database="test-content", module_database="test-module")
-
-    def test_incorrect_collection(self):
-        """Test to make sure that trying to read from a non-existant collection will error"""
-        success = False
-        indexer = MongoIndexer(self.host, self.port, chunk_collection="fake-collection")
-        cursor = indexer.find_chunks_with_type("")
-        try:
-            cursor.next()
-        except StopIteration:
-            success = True
-        self.assertTrue(success)
-
-    def test_find_files(self):
-        file_ending = ".test"
-        filenames = set(random_files(file_ending))
-        for filename in filenames:
-            self.file_collection.insert({"filename": filename})
-        found = set(element["filename"] for element in self.indexer.find_files_with_type(file_ending))
-        self.assertTrue(found == filenames)
-
-    def test_find_chunks(self):
-        file_ending = ".test"
-        filenames = set(random_files(file_ending))
-        for filename in filenames:
-            self.chunk_collection.insert({"files_id": {"name": filename}})
-        found = set(element["files_id"]["name"] for element in self.indexer.find_chunks_with_type(file_ending))
-        self.assertTrue(found == filenames)
-
-    def test_find_modules(self):
-        category = "category"
-        content_strings = set(random_files(""))
-        for content_string in content_strings:
-            self.module_collection.insert({"_id": {"category": category, "content": content_string}})
-        found = set(element["_id"]["content"] for element in self.indexer.find_modules_by_category(category))
-        self.assertTrue(found == content_strings)
-
-    def test_find_category_regex(self):
-        id_ = dummy_document("_id", ["tag", "org", "course", "category", "name"], "ascii", length=20)
-        definition = dummy_document("definition", ["data"], "ascii", length=20)
-        id_.update(definition)
-        self.module_collection.insert(id_)
-        cursor = self.indexer.find_categories_with_regex(id_["_id"]["category"], re.compile(r".*"))
-        self.assertEquals(cursor.next()["_id"], id_["_id"])
 
     def test_find_asset_name(self):
         file_id = dummy_document("files_id", ["name", "test_field"], "ascii", length=20)
@@ -130,10 +74,6 @@ class MongoTest(TestCase):
 
         test_bad_transcript = {"definition": {"data": 10}}
         self.assertEquals(self.indexer.find_transcript_for_video_module(test_bad_transcript), [""])
-
-    def test_uuid_filename(self):
-        self.assertEquals(self.indexer.uuid_from_file_name("subs_testing."), "testing")
-        self.assertEquals(self.indexer.uuid_from_file_name("._testing."), "testing")
 
     def test_pdf_to_text(self):
         pseudo_file = StringIO()
@@ -180,7 +120,7 @@ class MongoTest(TestCase):
     def test_pdf_thumbnail(self):
         bad_pseduo_file = StringIO()
         bad_pdf = random_item("bytes", length=200)
-
+        bad_pseduo_file.write(bad_pdf)
         try:
             self.indexer.thumbnail_from_pdf({"data": bad_pseduo_file.getvalue()})
         except:
@@ -188,7 +128,7 @@ class MongoTest(TestCase):
         self.assertFalse(success)
 
     def test_html_thumbnail(self):
-        success = True 
+        success = True
         try:
             self.indexer.thumbnail_from_html("<p>Test</p>")
         except:
@@ -197,7 +137,7 @@ class MongoTest(TestCase):
 
     def test_get_searchable_text(self):
         problem_test_text = "<p>This is a test</p><text>and so is <a href='test.com'></a>this</text>"
-        problem_document = {"definition":{"data": problem_test_text}}
+        problem_document = {"definition": {"data": problem_test_text}}
         problem_test = self.indexer.get_searchable_text(problem_document, "problem")
         self.assertEquals(problem_test, "This is a test and so is this")
 

@@ -29,6 +29,7 @@ from xhtml2pdf.w3c.cssParser import CSSParseError
 log = logging.getLogger("edx.search")
 MONGO_COURSE_CACHE = {}
 
+
 def flaky_request(method, url, **kwargs):
     """
     General exception handling for requests
@@ -104,67 +105,6 @@ class ElasticDatabase:
             dictionary = json.load(source)
         return flaky_request("post", full_url, data=json.dumps(dictionary))
 
-    def index_directory_files(
-        self, directory, index, type_, silent=False, file_ending=".srt.sjson",
-        callback=None, conserve_kwargs=False, **kwargs
-    ):
-        """
-        Starts a pygrep instance and indexes all files in the given directory.
-
-        Available kwargs are file_ending, callback, and conserve_kwargs.
-        Respectively these allow you to choose the file ending to be indexed, the
-        callback used to do the indexing, and whether or not you would like to pass
-        your kwargs to the callback function
-        """
-
-        # Needs to be lazily evaluatedy
-        if callback is None:
-            callback = self.index_transcript
-        all_files = grab_all_files_with_ending(directory, file_ending)
-        responses = []
-        for file_list in all_files:
-            for file_ in file_list:
-                callback_kwargs = kwargs if conserve_kwargs else {}
-                responses.append(callback(index, type_, file_, silent, **callback_kwargs))
-        return responses
-
-    def searchable_text_from_transcript_file(self, transcript_file, silent=False):
-        """
-        Returns human-readable text string from raw transcript file
-        """
-
-        transcript = open(transcript_file, 'rb')
-        try:
-            searchable_text = " ".join(filter(None, json.load(transcript)["text"])).replace("\n", " ")
-        except ValueError:
-            if silent:
-                searchable_text = transcript.read()
-            else:
-                raise
-        return searchable_text
-
-    def index_transcript(self, index, type_, transcript_file, silent=False, id_=None):
-        """
-        Indexes the given transcript file at the given index, type, and id
-        """
-
-        file_uuid = os.path.basename(transcript_file)[:-len(".srt.sjson")]
-        searchable_text = self.searchable_text_from_transcript_file(transcript_file, silent)
-        sha_hash = hashlib.sha1(file_uuid).hexdigest()
-        data = {"searchable_text": searchable_text, "uuid": file_uuid, "hash": sha_hash}
-        if not id_:
-            return self.index_data(index, data, type_)
-        else:
-            return self.index_data(index, data, type_, id_=id_)
-
-    def setup_index(self, index):
-        """
-        Creates a new elasticsearch index, returns the response it gets
-        """
-
-        full_url = "/".join([self.url, index]) + "/"
-        return flaky_request("put", full_url, data=json.dumps(self.index_settings))
-
     def index_data(self, index, data, type_=None, id_=None):
         """
         Actually indexes given data at the indicated type and id.
@@ -177,9 +117,15 @@ class ElasticDatabase:
         """
 
         if id_ is None:
-            id_ = data["hash"]
+            try:
+                id_ = data["hash"]
+            except KeyError:
+                return None
         if type_ is None:
-            type_ = data["type_hash"]
+            try:
+                type_ = data["type_hash"]
+            except KeyError:
+                return None
         full_url = "/".join([self.url, index, type_, id_])
         return flaky_request("post", full_url, data=json.dumps(data))
 
@@ -190,31 +136,12 @@ class ElasticDatabase:
         {"index": {"_index": "transcript-index", "_type": "course_hash", "_id": "id_hash"}}
         {"field1": "value1"...}
 
-        Important: Bulk indexing is newline delimited, make sure the newlines are properly used
+        Important: Bulk indexing is newline delimited, make sure newlines are only
+        between action (line starting with index) and data (line starting with field1)
         """
 
         url = self.url + "/_bulk"
         return flaky_request("post", url, data=all_data)
-
-    def get_data(self, index, type_, id_):
-        """
-        Returns the data located at a specific index, type and id within the elasticsearch instance
-        """
-
-        full_url = "/".join([self.url, index, type_, id_])
-        return flaky_request("get", full_url)
-
-    def get_index_settings(self, index):
-        """
-        Returns the current settings of a given index
-        """
-
-        full_url = "/".join([self.url, index, "_settings"])
-        response = flaky_request("get", full_url)
-        if response:
-            return json.loads(response.content)
-        else:
-            return False
 
     def delete_index(self, index):
         """
@@ -224,33 +151,13 @@ class ElasticDatabase:
         full_url = "/".join([self.url, index])
         return flaky_request("delete", full_url)
 
-    def delete_type(self, index, type_):
-        """
-        Same as delete_index, but for types
-        """
-
-        full_url = "/".join([self.url, index, type_])
-        return flaky_request("delete", full_url)
-
-    def get_type_mapping(self, index, type_):
-        """
-        Return the mapping of the indicated type
-        """
-
-        full_url = "/".join([self.url, index, type_, "_mapping"])
-        response = flaky_request("get", full_url)
-        if response:
-            return json.loads(response.content)
-        else:
-            return False
-
 class MongoIndexer:
     """
     This class is the connection point between Mongo and ElasticSearch.
     """
 
     def __init__(
-        self, host='localhost', port=27017, content_database='xcontent', file_collection="fs.files",
+        self, host, port, content_database='xcontent', file_collection="fs.files",
         chunk_collection="fs.chunks", module_database='xmodule', module_collection='modulestore',
         es_instance=ElasticDatabase()
     ):
@@ -263,34 +170,6 @@ class MongoIndexer:
         self.chunk_collection = self.content_db[chunk_collection]
         self.module_collection = self.module_db[module_collection]
         self.es_instance = es_instance
-
-    def find_files_with_type(self, file_ending):
-        """
-        Returns a cursor for content files matching given type
-        """
-
-        return self.file_collection.find({"filename": re.compile(".*?" + re.escape(file_ending))}, timeout=False)
-
-    def find_chunks_with_type(self, file_ending):
-        """
-        Returns a chunk cursor for content files matching given type
-        """
-
-        return self.chunk_collection.find({"files_id.name": re.compile(".*?" + re.escape(file_ending))}, timeout=False)
-
-    def find_modules_by_category(self, category):
-        """
-        Returns a cursor for all xmodules matching given category
-        """
-
-        return self.module_collection.find({"_id.category": category}, timeout=False)
-
-    def find_categories_with_regex(self, category, regex):
-        """
-        Returns a cursor matching all items in mongo where the category matches the given regex
-        """
-
-        return self.module_collection.find({"_id.category": category, "definition.data": regex}, timeout=False)
 
     def find_asset_with_name(self, name):
         """
@@ -377,16 +256,6 @@ class MongoIndexer:
         remove_tags = re.sub(r"<[a-zA-Z0-9/\.\= \"\'_-]+>", "", cleaned_text)
         remove_repetitions = re.sub(r"(.)\1{4,}", "", remove_tags)
         return remove_repetitions
-
-    def uuid_from_file_name(self, file_name):
-        """
-        Returns a youtube uuid given the filename of a transcript
-        """
-        if "subs_" in file_name:
-            file_name = file_name[5 + file_name.find("subs_"):]
-        elif file_name[:2] == "._":
-            file_name = file_name[2:]
-        return file_name[:file_name.find(".")]
 
     def thumbnail_from_video_module(self, video_module):
         """
@@ -542,75 +411,16 @@ class MongoIndexer:
         return thumbnail
 
     def bulk_index_item(self, index, data):
+        """
+        Returns a string representing the next indexing action for bulk index
+        """
+
         return_string = ""
         return_string += json.dumps({"index": {"_index": index, "_type": data["type_hash"], "_id": data["hash"]}})
         return_string += "\n"
         return_string += json.dumps(data)
         return_string = "\n"
         return return_string
-
-    def index_all_pdfs(self, index, bulk_chunk=5):
-        """
-        Indexes all pdfs.
-
-        For some reason pdfs are currently represented as html modules with references to pdfs,
-        as such this might seem a little hacky, but it's largely an artefact of the underlying data.
-        """
-        cursor = self.find_categories_with_regex("html", re.compile(r".*?/asset/.*?\.pdf.*?"))
-        bulk_string = ""
-        for i in range(cursor.count()):
-            item = cursor.next()
-            data = self.basic_dict(item, "pdf")
-            bulk_string += self.bulk_index_item(index, data)
-            if i % bulk_chunk == 0:
-                log.debug(i)
-                self.es_instance.bulk_index(bulk_string)
-                bulk_string = ""
-        self.es_instance.bulk_index(bulk_string)
-
-    def index_all_problems(self, index, bulk_chunk=100):
-        """
-        Similar to index_all_pdfs, but our storage of problems is more sensical.
-        """
-        cursor = self.find_modules_by_category("problem")
-        bulk_string = ""
-        for i in range(cursor.count()):
-            item = cursor.next()
-            print i
-            try:
-                data = self.basic_dict(item, "problem")
-            except IOError:  # In case the connection is refused for whatever reason, try again
-                data = self.basic_dict(item, "problem")
-            bulk_string += self.bulk_index_item(index, data)
-            if i % bulk_chunk == 0:
-                log.debug(i)
-                self.es_instance.bulk_index(bulk_string)
-                bulk_string = ""
-        self.es_instance.bulk_index(bulk_string)
-
-    def index_all_transcripts(self, index, bulk_chunk=100):
-        """
-        Similar to two the other two index_all methods.
-
-        This is arguably the hackiest of all since our storage of transcripts as separate static files
-        that aren't directly linked to the video is both different from how everything else is stored,
-        and not very advantageous seeing as transcripts are tiny.
-        """
-
-        cursor = self.find_modules_by_category("video")
-        bulk_string = ""
-        for i in range(cursor.count()):
-            item = cursor.next()
-            try:
-                data = self.basic_dict(item, "transcript")
-            except IOError:  # In case the connection is refused for whatever reason, try again
-                data = self.basic_dict(item, "transcript")
-            bulk_string += self.bulk_index_item(index, data)
-            if i % bulk_chunk == 0:
-                log.debug(i)
-                self.es_instance.bulk_index(bulk_string).content
-                bulk_string = ""
-        self.es_instance.bulk_index(bulk_string).content
 
     def index_course(self, course):
         """
@@ -639,24 +449,4 @@ class MongoIndexer:
             else:
                 continue
             if filter(None, data.values()) == data.values():
-                print self.es_instance.index_data(index, item["_id"]["course"], data, data["hash"]).content
-
-def grab_all_files_with_ending(directory, file_ending):
-    """
-    Will return absolute paths to all files with given file ending in self.directory
-    """
-
-    walk_results = os.walk(directory)
-    file_check = lambda walk: len(walk[2]) > 0
-    ending_prelim = lambda walk: file_ending in " ".join(walk[2])
-    relevant_results = (entry for entry in walk_results if file_check(entry) and ending_prelim(entry))
-    return (_grab_files_from_os_walk(result, file_ending) for result in relevant_results)
-
-def _grab_files_from_os_walk(directory, os_walk_tuple, file_ending):
-    """
-    Returns the actual files from os.walk results.
-    """
-
-    format_check = lambda file_name: file_ending in file_name
-    directory, _, file_paths = os_walk_tuple
-    return [os.path.join(directory, file_path) for file_path in file_paths if format_check(file_path)]
+                log.debug(self.es_instance.index_data(index, item["_id"]["course"], data, data["hash"]).content)
