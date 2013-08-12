@@ -4,7 +4,9 @@ import re
 BRANCH_PREFIX = "/branch/"
 # Prefix for the block portion of a locator URL
 BLOCK_PREFIX = "/block/"
-# Prefix for when a course URL begins with a version ID
+# Prefix for the version portion of a locator URL, when it is preceded by a course ID
+VERSION_PREFIX = "/version/"
+# Prefix for version when it begins the URL (no course ID).
 URL_VERSION_PREFIX = 'version/'
 
 URL_RE = re.compile(r'^edx://(.+)$', re.IGNORECASE)
@@ -19,15 +21,16 @@ def parse_url(string):
         'edx://version/0123FFFF'
         'edx://edu.mit.eecs.6002x'
         'edx://edu.mit.eecs.6002x/branch/published'
+        'edx://edu.mit.eecs.6002x/branch/published/version/519665f6223ebd6980884f2b/block/HW3'
         'edx://edu.mit.eecs.6002x/branch/published/block/HW3'
 
     This returns None if string cannot be parsed.
 
-    If it can be parsed as a version_guid, returns a dict
+    If it can be parsed as a version_guid with no preceding course_id, returns a dict
     with key 'version_guid' and the value,
 
     If it can be parsed as a course_id, returns a dict
-    with keys 'id' and 'branch' (value of 'branch' may be None),
+    with key 'id' and optional keys 'branch' and 'version_guid'.
 
     """
     match = URL_RE.match(string)
@@ -61,6 +64,7 @@ def parse_block_ref(string):
 
 GUID_RE = re.compile(r'^(?P<version_guid>[A-F0-9]+)(' + BLOCK_PREFIX + '(?P<block>\w+))?$', re.IGNORECASE)
 
+
 def parse_guid(string):
     """
     A version_guid is a string of hex digits (0-F).
@@ -75,7 +79,12 @@ def parse_guid(string):
         return None
 
 
-COURSE_ID_RE = re.compile(r'^(?P<id>(\w+)(\.\w+\w*)*)('+ BRANCH_PREFIX + '(?P<branch>\w+))?(' + BLOCK_PREFIX + '(?P<block>\w+))?$', re.IGNORECASE)
+COURSE_ID_RE = re.compile(
+    r'^(?P<id>(\w+)(\.\w+\w*)*)(' +
+    BRANCH_PREFIX + '(?P<branch>\w+))?(' +
+    VERSION_PREFIX + '(?P<version_guid>[A-F0-9]+))?(' +
+    BLOCK_PREFIX + '(?P<block>\w+))?$', re.IGNORECASE
+)
 
 
 def parse_course_id(string):
@@ -83,6 +92,7 @@ def parse_course_id(string):
 
     A course_id has a main id component.
     There may also be an optional branch (/branch/published or /branch/draft).
+    There may also be an optional version (/version/519665f6223ebd6980884f2b).
     There may also be an optional block (/block/HW3 or /block/Quiz2).
 
     Examples of valid course_ids:
@@ -91,11 +101,12 @@ def parse_course_id(string):
       'edu.mit.eecs.6002x/branch/published'
       'edu.mit.eecs.6002x/block/HW3'
       'edu.mit.eecs.6002x/branch/published/block/HW3'
+      'edu.mit.eecs.6002x/branch/published/version/519665f6223ebd6980884f2b/block/HW3'
 
 
     Syntax:
 
-      course_id = main_id [/branch/ branch] [/block/ block]
+      course_id = main_id [/branch/ branch] [/version/ version ] [/block/ block]
 
       main_id = name [. name]*
 

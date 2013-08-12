@@ -92,6 +92,7 @@ class CourseLocator(Locator):
      CourseLocator(url='edx://version/519665f6223ebd6980884f2b')
      CourseLocator(url='edx://mit.eecs.6002x')
      CourseLocator(url='edx://mit.eecs.6002x/branch/published')
+     CourseLocator(url='edx://mit.eecs.6002x/branch/published/version/519665f6223ebd6980884f2b')
 
     Should have at lease a specific course_id (id for the course as if it were a project w/
     versions) with optional 'branch',
@@ -220,21 +221,18 @@ class CourseLocator(Locator):
     def init_from_url(self, url):
         """
         url must be a string beginning with 'edx://' and containing
-        either a valid version_guid or course_id (with optional branch)
-        If a block ('/block/HW3') is present, it is ignored.
+        either a valid version_guid or course_id (with optional branch), or both.
         """
         if isinstance(url, Locator):
             url = url.url()
-        assert isinstance(url, basestring), \
-            '%s is not an instance of basestring' % url
+        assert isinstance(url, basestring), '%s is not an instance of basestring' % url
         parse = parse_url(url)
         assert parse, 'Could not parse "%s" as a url' % url
-        if 'version_guid' in parse:
-            new_guid = parse['version_guid']
-            self.set_version_guid(self.as_object_id(new_guid))
-        else:
-            self.set_course_id(parse['id'])
-            self.set_branch(parse['branch'])
+        self._set_value(
+            parse, 'version_guid', lambda (new_guid): self.set_version_guid(self.as_object_id(new_guid))
+        )
+        self._set_value(parse, 'id', lambda (new_id): self.set_course_id(new_id))
+        self._set_value(parse, 'branch', lambda (new_branch): self.set_branch(new_branch))
 
     def init_from_version_guid(self, version_guid):
         """
@@ -291,6 +289,16 @@ class CourseLocator(Locator):
         (e.g., I'm assuming periods are fine).
         """
         return self.course_id
+
+    def _set_value(self, parse, key, setter):
+        """
+        Helper method that gets a value out of the dict returned by parse,
+        and then sets the corresponding bit of information in this locator
+        (via the supplied lambda 'setter'), unless the value is None.
+        """
+        value = parse.get(key, None)
+        if value:
+            setter(value)
 
 
 class BlockUsageLocator(CourseLocator):
@@ -387,9 +395,7 @@ class BlockUsageLocator(CourseLocator):
             url = url.url()
         parse = parse_url(url)
         assert parse, 'Could not parse "%s" as a url' % url
-        block = parse.get('block', None)
-        if block:
-            self.set_usage_id(block)
+        self._set_value(parse, 'block', lambda(new_block): self.set_usage_id(new_block))
 
     def init_block_ref_from_course_id(self, course_id):
         if isinstance(course_id, CourseLocator):
@@ -397,9 +403,7 @@ class BlockUsageLocator(CourseLocator):
             assert course_id, "%s does not have a valid course_id"
         parse = parse_course_id(course_id)
         assert parse, 'Could not parse "%s" as a course_id' % course_id
-        block = parse.get('block', None)
-        if block:
-            self.set_usage_id(block)
+        self._set_value(parse, 'block', lambda(new_block): self.set_usage_id(new_block))
 
     def __unicode__(self):
         """
@@ -415,7 +419,7 @@ class BlockUsageLocator(CourseLocator):
 
 class DescriptionLocator(Locator):
     """
-    Container for how to locate a description
+    Container for how to locate a description (the course-independent content).
     """
 
     def __init__(self, definition_id):
