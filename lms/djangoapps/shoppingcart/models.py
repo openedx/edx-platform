@@ -229,11 +229,13 @@ class VerifiedCertificate(OrderItem):
     course_enrollment = models.ForeignKey(CourseEnrollment)
 
     @classmethod
-    def add_to_order(cls, order, course_id, course_enrollment, cost, currency='usd'):
+    def add_to_order(cls, order, course_id, cost, currency='usd'):
         """
         Add a VerifiedCertificate item to an order
         """
+        # TODO: add the basic enrollment
         # TODO: error checking
+        course_enrollment = CourseEnrollment.create_enrollment(order.user, course_id, mode="verified")
         item, _created = cls.objects.get_or_create(
             order=order,
             user=order.user,
