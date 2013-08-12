@@ -5,6 +5,10 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+LMS: Enable beta instructor dashboard. The beta dashboard is a rearchitecture
+of the existing instructor dashboard and is available by clicking a link at
+the top right of the existing dashboard.
+
 Studio: Email will be sent to admin address when a user requests course creator
 privileges for Studio (edge only).
 
