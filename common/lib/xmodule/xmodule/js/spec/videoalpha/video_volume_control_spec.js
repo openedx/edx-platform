@@ -39,7 +39,6 @@
           range: "min",
           min: 0,
           max: 100,
-          /* value: 100, */
           value: videoVolumeControl.currentVolume,
           change: videoVolumeControl.onChange,
           slide: videoVolumeControl.onChange

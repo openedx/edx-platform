@@ -133,7 +133,6 @@ div.videoalpha {
             line-height: 46px;
             padding: 0 lh(.75);
             text-indent: -9999px;
-            @include transition(background-color 0.75s linear 0s, opacity 0.75s linear 0s);
             width: 14px;
             background: url('../images/vcr.png') 15px 15px no-repeat;
             outline: 0;
@@ -150,7 +149,7 @@ div.videoalpha {
             &.play {
               background-position: 17px -114px;
 
-              &:hover {
+              &:hover, &:focus {
                 background-color: #444;
               }
             }
@@ -158,7 +157,7 @@ div.videoalpha {
             &.pause {
               background-position: 16px -50px;
 
-              &:hover {
+              &:hover, &:focus {
                 background-color: #444;
               }
             }
@@ -300,12 +299,15 @@ div.videoalpha {
 
           &.muted {
             &>a {
-              background: url('../images/mute.png') 10px center no-repeat;
+              background-image: url('../images/mute.png');
             }
           }
 
           > a {
-            background: url('../images/volume.png') 10px center no-repeat;
+            background-image: url('../images/volume.png');
+            background-position: 10px center;
+            background-repeat: no-repeat;
+
             border-right: 1px solid #000;
             box-shadow: 1px 0 0 #555, inset 1px 0 0 #555;
             @include clearfix();
@@ -382,7 +384,7 @@ div.videoalpha {
           @include transition(none);
           width: 30px;
 
-          &:hover {
+          &:hover, &:active, &:focus {
             background-color: #444;
             color: #fff;
             text-decoration: none;
@@ -403,7 +405,7 @@ div.videoalpha {
           @include transition(none);
           width: 30px;
 
-          &:hover {
+          &:hover, &:focus {
             background-color: #444;
             color: #fff;
             text-decoration: none;
@@ -419,7 +421,6 @@ div.videoalpha {
 
         a.hide-subtitles {
           background: url('../images/cc.png') center no-repeat;
-          display: block;
           float: left;
           font-weight: 800;
           line-height: 46px; //height of play pause buttons
@@ -432,7 +433,7 @@ div.videoalpha {
           -webkit-font-smoothing: antialiased;
           width: 30px;
 
-          &:hover {
+          &:hover, &:focus {
             background-color: #444;
             color: #fff;
             text-decoration: none;
@@ -442,9 +443,7 @@ div.videoalpha {
             opacity: 0.7;
           }
 
-          background-color: #444;
-          color: #fff;
-          text-decoration: none;
+          color: #797979;
         }
       }
     }
@@ -511,12 +510,6 @@ div.videoalpha {
       right: 0px;
       position: absolute;
       z-index: 1;
-    }
-
-    article.video-wrapper section.video-controls div.secondary-controls a.hide-subtitles {
-        background-color: inherit;
-        color: #797979;
-        text-decoration: inherit;
     }
 
     article.video-wrapper div.video-player-pre, article.video-wrapper div.video-player-post {

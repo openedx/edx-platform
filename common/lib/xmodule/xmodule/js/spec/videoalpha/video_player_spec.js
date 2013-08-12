@@ -34,12 +34,6 @@
     });
 
     describe('constructor', function() {
-      beforeEach(function() {
-        $.fn.qtip.andCallFake(function() {
-          $(this).data('qtip', true);
-        });
-      });
-
       describe('always', function() {
         beforeEach(function() {
           initialize();
@@ -60,7 +54,7 @@
 
         it('create video caption', function() {
           expect(videoCaption).toBeDefined();
-          expect(state.youtubeId()).toEqual('test_name_of_the_subtitles');
+          expect(state.youtubeId()).toEqual('Z5KLxerq05Y');
           expect(state.speed).toEqual('1.0');
           expect(state.config.caption_asset_path).toEqual('/static/subs/');
         });
@@ -80,38 +74,6 @@
         // All the toHandleWith() expect tests are not necessary for this version of Video Alpha.
         // jQuery event system is not used to trigger and invoke methods. This is an artifact from
         // previous version of Video Alpha.
-        //
-        // xit('bind to video control play event', function() {
-        //   expect($(videoControl)).toHandleWith('play', player.play);
-        // });
-        //
-        // xit('bind to video control pause event', function() {
-        //   expect($(videoControl)).toHandleWith('pause', player.pause);
-        // });
-        //
-        // xit('bind to video caption seek event', function() {
-        //   expect($(videoCaption)).toHandleWith('caption_seek', player.onSeek);
-        // });
-        //
-        // xit('bind to video speed control speedChange event', function() {
-        //   expect($(videoSpeedControl)).toHandleWith('speedChange', player.onSpeedChange);
-        // });
-        //
-        // xit('bind to video progress slider seek event', function() {
-        //   expect($(videoProgressSlider)).toHandleWith('slide_seek', player.onSeek);
-        // });
-        //
-        // xit('bind to video volume control volumeChange event', function() {
-        //   expect($(videoVolumeControl)).toHandleWith('volumeChange', player.onVolumeChange);
-        // });
-        //
-        // xit('bind to key press', function() {
-        //   expect($(document.documentElement)).toHandleWith('keyup', player.bindExitFullScreen);
-        // });
-        //
-        // xit('bind to fullscreen switching button', function() {
-        //   expect($('.add-fullscreen')).toHandleWith('click', player.toggleFullScreen);
-        // });
       });
 
       it('create Youtube player', function() {
@@ -136,7 +98,7 @@
             modestbranding: 1,
             html5: 1
           },
-          videoId: 'normalSpeedYoutubeId',
+          videoId: 'cogebirgzzM',
           events: {
             onReady: videoPlayer.onReady,
             onStateChange: videoPlayer.onStateChange,
@@ -149,29 +111,11 @@
 
       // We can't test the invocation of HTML5Video because it is not available
       // globally. It is defined within the scope of Require JS.
-      //
-      // xit('create HTML5 player', function() {
-      //   spyOn(state.HTML5Video, 'Player').andCallThrough();
-      //   initialize();
-      //
-      //   expect(window.HTML5Video.Player).toHaveBeenCalledWith(this.video.el, {
-      //     playerVars: playerVars,
-      //     videoSources: this.video.html5Sources,
-      //     events: {
-      //       onReady: player.onReady,
-      //       onStateChange: player.onStateChange
-      //     }
-      //   });
-      // });
 
       describe('when not on a touch based device', function() {
         beforeEach(function() {
           window.onTouchBasedDevice.andReturn(true);
           initialize();
-        });
-
-        it('does not add the tooltip to fullscreen button', function() {
-          expect($('.add-fullscreen')).not.toHaveData('qtip');
         });
 
         it('create video volume control', function() {
@@ -185,10 +129,6 @@
 
         beforeEach(function() {
           initialize();
-        });
-
-        it('add the tooltip to fullscreen button', function() {
-          expect($('.add-fullscreen')).toHaveData('qtip');
         });
 
         it('controls are in paused state', function() {
@@ -433,11 +373,9 @@
           expect(state.setSpeed).toHaveBeenCalledWith('0.75', false);
         });
 
-        // Not relevant any more.
+        // Not relevant any more:
         //
-        // it('tell video caption that the speed has changed', function() {
-        //   expect(this.player.caption.currentSpeed).toEqual('0.75');
-        // });
+        //     expect( "tell video caption that the speed has changed" ) ...
       });
 
       describe('when the video is playing', function() {
@@ -548,8 +486,9 @@
             expect(true).toBe(false);
           }
 
-          // The below test has been replaced by above trickery.
-          // expect($('.vidtime')).toHaveHtml('1:00 / 1:01');
+          // The below test has been replaced by above trickery:
+          //
+          //     expect($('.vidtime')).toHaveHtml('1:00 / 1:01');
         });
       });
 

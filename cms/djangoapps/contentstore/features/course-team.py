@@ -2,9 +2,10 @@
 #pylint: disable=W0621
 
 from lettuce import world, step
-from common import create_studio_user, log_into_studio
+from common import create_studio_user
 from django.contrib.auth.models import Group
-from auth.authz import get_course_groupname_for_role
+from auth.authz import get_course_groupname_for_role, get_user_by_email
+from nose.tools import assert_true
 
 PASSWORD = 'test'
 EMAIL_EXTENSION = '@edx.org'
@@ -42,9 +43,9 @@ def add_other_user(_step, name):
     world.wait(0.5)
 
     email_css = 'input#user-email-input'
-    f = world.css_find(email_css)
-    f._element.send_keys(name, EMAIL_EXTENSION)
-
+    world.css_fill(email_css, name + EMAIL_EXTENSION)
+    if world.is_firefox():
+        world.trigger_event(email_css)
     confirm_css = 'form.create-user button.action-primary'
     world.css_click(confirm_css)
 
@@ -66,6 +67,7 @@ def other_delete_self(_step):
         email="robot+studio@edx.org")
     world.css_click(to_delete_css)
     # confirm prompt
+    world.wait(.5)
     world.css_click(".wrapper-prompt-warning .action-primary")
 
 
@@ -89,7 +91,21 @@ def remove_course_team_admin(_step, outer_capture, name):
 
 @step(u'"([^"]*)" logs in$')
 def other_user_login(_step, name):
-    log_into_studio(uname=name, password=PASSWORD, email=name + EMAIL_EXTENSION)
+    world.browser.cookies.delete()
+    world.visit('/')
+
+    signin_css = 'a.action-signin'
+    world.is_css_present(signin_css)
+    world.css_click(signin_css)
+
+    def fill_login_form():
+        login_form = world.browser.find_by_css('form#login_form')
+        login_form.find_by_name('email').fill(name + EMAIL_EXTENSION)
+        login_form.find_by_name('password').fill(PASSWORD)
+        login_form.find_by_name('submit').click()
+    world.retry_on_exception(fill_login_form)
+    assert_true(world.is_css_present('.new-course-button'))
+    world.scenario_dict['USER'] = get_user_by_email(name + EMAIL_EXTENSION)
 
 
 @step(u'I( do not)? see the course on my page')

@@ -35,7 +35,7 @@ describe 'VideoPlayer', ->
         expect(window.VideoCaption.prototype.initialize).toHaveBeenCalled()
         expect(@player.caption).toBeDefined()
         expect(@player.caption.el).toBe @player.el
-        expect(@player.caption.youtubeId).toEqual 'normalSpeedYoutubeId'
+        expect(@player.caption.youtubeId).toEqual 'cogebirgzzM'
         expect(@player.caption.currentSpeed).toEqual '1.0'
         expect(@player.caption.captionAssetPath).toEqual '/static/subs/'
 
@@ -60,7 +60,7 @@ describe 'VideoPlayer', ->
             showinfo: 0
             enablejsapi: 1
             modestbranding: 1
-          videoId: 'normalSpeedYoutubeId'
+          videoId: 'cogebirgzzM'
           events:
             onReady: @player.onReady
             onStateChange: @player.onStateChange
@@ -290,7 +290,7 @@ describe 'VideoPlayer', ->
         @player.onSpeedChange {}, '0.75'
 
       it 'load the video', ->
-        expect(@player.player.loadVideoById).toHaveBeenCalledWith 'slowerSpeedYoutubeId', '80.000'
+        expect(@player.player.loadVideoById).toHaveBeenCalledWith '7tqY6eQzVhE', '80.000'
 
       it 'trigger updatePlayTime event', ->
         expect(@player.updatePlayTime).toHaveBeenCalledWith '80.000'
@@ -301,7 +301,7 @@ describe 'VideoPlayer', ->
         @player.onSpeedChange {}, '0.75'
 
       it 'cue the video', ->
-        expect(@player.player.cueVideoById).toHaveBeenCalledWith 'slowerSpeedYoutubeId', '80.000'
+        expect(@player.player.cueVideoById).toHaveBeenCalledWith '7tqY6eQzVhE', '80.000'
 
       it 'trigger updatePlayTime event', ->
         expect(@player.updatePlayTime).toHaveBeenCalledWith '80.000'
