@@ -127,10 +127,10 @@ class SearchResult:
         self.url = _return_jump_to_url(entry)
         self.score = score
         self.thumbnail = "data:image/jpg;base64," + entry["thumbnail"]
-        self.snippets = snippet_generator(self.data["searchable_text"], query)
+        self.snippets = _snippet_generator(self.data["searchable_text"], query)
 
 
-def snippet_generator(transcript, query, soft_max=50, word_margin=25, bold=True):
+def _snippet_generator(transcript, query, soft_max=50, word_margin=25, bold=True):
     """
     This returns a relevant snippet from a given search item with direct matches highlighted.
 
@@ -199,8 +199,7 @@ def _match_highlighter(query, response, tag="b", css_class="highlight", highligh
     """
 
     wrapping = ("<" + tag + " class=" + css_class + ">", "</" + tag + ">")
-    punctuation_map = dict((ord(char), None) for char in string.punctuation)
-    depunctuation = lambda word: word.translate(punctuation_map)
+    depunctuation = lambda word: word.translate(None, string.punctuation)
     wrap = lambda text: wrapping[0] + text + wrapping[1]
     query_set = set(word.lower() for word in query.split())
     bold_response = ""
