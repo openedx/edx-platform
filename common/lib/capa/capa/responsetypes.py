@@ -822,7 +822,7 @@ class NumericalResponse(LoncapaResponse):
 
     response_tag = 'numericalresponse'
     hint_tag = 'numericalhint'
-    allowed_inputfields = ['textline']
+    allowed_inputfields = ['textline', 'formulaequationinput']
     required_attributes = ['answer']
     max_inputfields = 1
 
@@ -837,11 +837,6 @@ class NumericalResponse(LoncapaResponse):
             self.tolerance = contextualize_text(self.tolerance_xml, context)
         except IndexError:  # xpath found an empty list, so (...)[0] is the error
             self.tolerance = '0'
-        try:
-            self.answer_id = xml.xpath('//*[@id=$id]//textline/@id',
-                                       id=xml.get('id'))[0]
-        except IndexError:  # Same as above
-            self.answer_id = None
 
     def get_score(self, student_answers):
         '''Grade a numeric response '''
@@ -936,7 +931,7 @@ class CustomResponse(LoncapaResponse):
                            'chemicalequationinput', 'vsepr_input',
                            'drag_and_drop_input', 'editamoleculeinput',
                            'designprotein2dinput', 'editageneinput',
-                           'annotationinput', 'jsinput']
+                           'annotationinput', 'jsinput', 'formulaequationinput']
 
     def setup_response(self):
         xml = self.xml
@@ -1692,7 +1687,7 @@ class FormulaResponse(LoncapaResponse):
 
     response_tag = 'formularesponse'
     hint_tag = 'formulahint'
-    allowed_inputfields = ['textline']
+    allowed_inputfields = ['textline', 'formulaequationinput']
     required_attributes = ['answer', 'samples']
     max_inputfields = 1
 
@@ -1737,7 +1732,7 @@ class FormulaResponse(LoncapaResponse):
                            samples.split('@')[1].split('#')[0].split(':')))
 
         ranges = dict(zip(variables, sranges))
-        for i in range(numsamples):
+        for _ in range(numsamples):
             instructor_variables = self.strip_dict(dict(self.context))
             student_variables = dict()
             # ranges give numerical ranges for testing
@@ -1767,27 +1762,39 @@ class FormulaResponse(LoncapaResponse):
                 )
             except UndefinedVariable as uv:
                 log.debug(
-                    'formularesponse: undefined variable in given=%s' % given)
+                    'formularesponse: undefined variable in given=%s',
+                    given
+                )
                 raise StudentInputError(
-                    "Invalid input: " + uv.message + " not permitted in answer")
+                    "Invalid input: " + uv.message + " not permitted in answer"
+                )
             except ValueError as ve:
                 if 'factorial' in ve.message:
                     # This is thrown when fact() or factorial() is used in a formularesponse answer
                     #   that tests on negative and/or non-integer inputs
-                    # ve.message will be: `factorial() only accepts integral values` or `factorial() not defined for negative values`
+                    # ve.message will be: `factorial() only accepts integral values` or
+                    # `factorial() not defined for negative values`
                     log.debug(
-                        'formularesponse: factorial function used in response that tests negative and/or non-integer inputs. given={0}'.format(given))
+                        ('formularesponse: factorial function used in response '
+                         'that tests negative and/or non-integer inputs. '
+                         'given={0}').format(given)
+                    )
                     raise StudentInputError(
-                        "factorial function not permitted in answer for this problem. Provided answer was: {0}".format(given))
+                        ("factorial function not permitted in answer "
+                         "for this problem. Provided answer was: "
+                         "{0}").format(cgi.escape(given))
+                    )
                 # If non-factorial related ValueError thrown, handle it the same as any other Exception
                 log.debug('formularesponse: error {0} in formula'.format(ve))
                 raise StudentInputError("Invalid input: Could not parse '%s' as a formula" %
                                         cgi.escape(given))
             except Exception as err:
                 # traceback.print_exc()
-                log.debug('formularesponse: error %s in formula' % err)
+                log.debug('formularesponse: error %s in formula', err)
                 raise StudentInputError("Invalid input: Could not parse '%s' as a formula" %
                                         cgi.escape(given))
+
+            # No errors in student's response--actually test for correctness
             if not compare_with_tolerance(student_result, instructor_result, self.tolerance):
                 return "incorrect"
         return "correct"

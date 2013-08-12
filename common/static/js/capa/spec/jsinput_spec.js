@@ -1,4 +1,4 @@
-describe("A jsinput has:", function () {
+xdescribe("A jsinput has:", function () {
 
     beforeEach(function () {
         $('#fixture').remove();
