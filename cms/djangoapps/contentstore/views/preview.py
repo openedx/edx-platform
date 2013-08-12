@@ -75,9 +75,15 @@ def preview_component(request, location):
 
     component = modulestore().get_item(location)
 
+    component.get_html = wrap_xmodule(
+        component.get_html,
+        component,
+        'xmodule_edit.html'
+    )
+
     return render_to_response('component.html', {
         'preview': get_preview_html(request, component, 0),
-        'editor': wrap_xmodule(component.get_html, component, 'xmodule_edit.html')(),
+        'editor': component.runtime.render(component, None, 'studio_view').content,
     })
 
 
