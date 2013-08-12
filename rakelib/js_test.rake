@@ -5,6 +5,7 @@ JS_TEST_SUITES = {
     'common' => 'common/static/js_test.yml',
 }
 
+# Turn relative paths to absolute paths from the repo root.
 JS_TEST_SUITES.each do |key, val|
     JS_TEST_SUITES[key] = File.join(REPO_ROOT, val)
 end
@@ -36,6 +37,8 @@ def js_test_tool(env, command, do_coverage)
     sh(cmd)
 end
 
+# Print a list of js_test commands for
+# all available environments
 def print_js_test_cmds(mode)
     JS_TEST_SUITES.each do |key, val|
         puts "    rake js_test:#{mode}[#{key}]"
@@ -68,3 +71,6 @@ namespace :js_test do
         js_test_tool(nil, 'run', true)
     end
 end
+
+# Add the JS tests to the main test command
+task :test => :'js_test:coverage'
