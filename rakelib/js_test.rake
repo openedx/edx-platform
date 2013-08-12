@@ -72,5 +72,9 @@ namespace :js_test do
     end
 end
 
+# Default js_test is js_test:run
+desc "Run all JavaScript tests and print results the the console"
+task :js_test => :'js_test:run'
+
 # Add the JS tests to the main test command
 task :test => :'js_test:coverage'
