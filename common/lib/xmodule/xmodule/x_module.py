@@ -657,6 +657,17 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
             )
         )
 
+    def iterfields(self):
+        """
+        A generator for iterate over the fields of this xblock (including the ones in namespaces).
+        Example usage: [field.name for field in module.iterfields()]
+        """
+        for field in self.fields:
+            yield field
+        for namespace in self.namespaces:
+            for field in getattr(self, namespace).fields:
+                yield field
+
     @property
     def non_editable_metadata_fields(self):
         """
@@ -675,17 +686,17 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         if scope == Scope.settings and hasattr(self, '_inherited_metadata'):
             inherited_metadata = getattr(self, '_inherited_metadata')
             result = {}
-            for field in self.fields:
+            for field in self.iterfields():
                 if (field.scope == scope and
                         field.name in self._model_data and
                         field.name not in inherited_metadata):
-                    result[field.name] = getattr(self, field.name)
+                    result[field.name] = self._model_data[field.name]
             return result
         else:
             result = {}
-            for field in self.fields:
+            for field in self.iterfields():
                 if (field.scope == scope and field.name in self._model_data):
-                    result[field.name] = getattr(self, field.name)
+                    result[field.name] = self._model_data[field.name]
             return result
 
     @property
