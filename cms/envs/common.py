@@ -25,7 +25,7 @@ Longer TODO:
 
 import sys
 import lms.envs.common
-from lms.envs.common import USE_TZ
+from lms.envs.common import USE_TZ, TECH_SUPPORT_EMAIL
 from path import path
 
 ############################ FEATURE CONFIGURATION #############################
