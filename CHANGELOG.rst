@@ -222,6 +222,10 @@ XModules: Added "randomize" XModule to list of XModule types.
 
 XModules: Show errors with full descriptors.
 
+Studio: Add feedback to end user if there is a problem exporting a course
+
+Studio: Improve link re-writing on imports into a different course-id
+
 XQueue: Fixed (hopefully) worker crash when the connection to RabbitMQ is
 dropped suddenly.
 
