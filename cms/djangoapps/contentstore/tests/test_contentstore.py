@@ -107,8 +107,8 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         expected_types is the list of elements that should appear on the page.
 
         expected_types and component_types should be similar, but not
-        exactly the same -- for example, 'videoalpha' in
-        component_types should cause 'Video Alpha' to be present.
+        exactly the same -- for example, 'video' in
+        component_types should cause 'Video' to be present.
         """
         store = modulestore('direct')
         import_from_xml(store, 'common/test/data/', ['simple'])
@@ -136,14 +136,13 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
     def test_advanced_components_in_edit_unit(self):
         # This could be made better, but for now let's just assert that we see the advanced modules mentioned in the page
         # response HTML
-        self.check_components_on_page(ADVANCED_COMPONENT_TYPES, ['Video Alpha',
-                                                                 'Word cloud',
+        self.check_components_on_page(ADVANCED_COMPONENT_TYPES, ['Word cloud',
                                                                  'Annotation',
                                                                  'Open Response Assessment',
                                                                  'Peer Grading Interface'])
 
     def test_advanced_components_require_two_clicks(self):
-        self.check_components_on_page(['videoalpha'], ['Video Alpha'])
+        self.check_components_on_page(['word_cloud'], ['Word cloud'])
 
     def test_malformed_edit_unit_request(self):
         store = modulestore('direct')
@@ -1354,7 +1353,7 @@ class ContentStoreTest(ModuleStoreTestCase):
                                                'course': loc.course,
                                                'name': loc.name}))
 
-        self.assertEqual(200, resp.status_code)
+        self.assert2XX(resp.status_code)
         self.assertContains(resp, 'Chapter 2')
 
         # go to various pages
@@ -1364,92 +1363,92 @@ class ContentStoreTest(ModuleStoreTestCase):
                                        kwargs={'org': loc.org,
                                                'course': loc.course,
                                                'name': loc.name}))
-        self.assertEqual(200, resp.status_code)
+        self.assert2XX(resp.status_code)
 
         # export page
         resp = self.client.get(reverse('export_course',
                                        kwargs={'org': loc.org,
                                                'course': loc.course,
                                                'name': loc.name}))
-        self.assertEqual(200, resp.status_code)
+        self.assert2XX(resp.status_code)
 
         # manage users
         resp = self.client.get(reverse('manage_users',
                                        kwargs={'org': loc.org,
                                                'course': loc.course,
                                                'name': loc.name}))
-        self.assertEqual(200, resp.status_code)
+        self.assert2XX(resp.status_code)
 
         # course info
         resp = self.client.get(reverse('course_info',
                                        kwargs={'org': loc.org,
                                                'course': loc.course,
                                                'name': loc.name}))
-        self.assertEqual(200, resp.status_code)
+        self.assert2XX(resp.status_code)
 
         # settings_details
         resp = self.client.get(reverse('settings_details',
                                        kwargs={'org': loc.org,
                                                'course': loc.course,
                                                'name': loc.name}))
-        self.assertEqual(200, resp.status_code)
+        self.assert2XX(resp.status_code)
 
         # settings_details
         resp = self.client.get(reverse('settings_grading',
                                        kwargs={'org': loc.org,
                                                'course': loc.course,
                                                'name': loc.name}))
-        self.assertEqual(200, resp.status_code)
+        self.assert2XX(resp.status_code)
 
         # static_pages
         resp = self.client.get(reverse('static_pages',
                                        kwargs={'org': loc.org,
                                                'course': loc.course,
                                                'coursename': loc.name}))
-        self.assertEqual(200, resp.status_code)
+        self.assert2XX(resp.status_code)
 
         # static_pages
         resp = self.client.get(reverse('asset_index',
                                        kwargs={'org': loc.org,
                                                'course': loc.course,
                                                'name': loc.name}))
-        self.assertEqual(200, resp.status_code)
+        self.assert2XX(resp.status_code)
 
         # go look at a subsection page
         subsection_location = loc.replace(category='sequential', name='test_sequence')
         resp = self.client.get(reverse('edit_subsection',
                                        kwargs={'location': subsection_location.url()}))
-        self.assertEqual(200, resp.status_code)
+        self.assert2XX(resp.status_code)
 
         # go look at the Edit page
         unit_location = loc.replace(category='vertical', name='test_vertical')
         resp = self.client.get(reverse('edit_unit',
                                        kwargs={'location': unit_location.url()}))
-        self.assertEqual(200, resp.status_code)
+        self.assert2XX(resp.status_code)
 
         # delete a component
         del_loc = loc.replace(category='html', name='test_html')
         resp = self.client.post(reverse('delete_item'),
                                 json.dumps({'id': del_loc.url()}), "application/json")
-        self.assertEqual(200, resp.status_code)
+        self.assert2XX(resp.status_code)
 
         # delete a unit
         del_loc = loc.replace(category='vertical', name='test_vertical')
         resp = self.client.post(reverse('delete_item'),
                                 json.dumps({'id': del_loc.url()}), "application/json")
-        self.assertEqual(200, resp.status_code)
+        self.assert2XX(resp.status_code)
 
         # delete a unit
         del_loc = loc.replace(category='sequential', name='test_sequence')
         resp = self.client.post(reverse('delete_item'),
                                 json.dumps({'id': del_loc.url()}), "application/json")
-        self.assertEqual(200, resp.status_code)
+        self.assert2XX(resp.status_code)
 
         # delete a chapter
         del_loc = loc.replace(category='chapter', name='chapter_2')
         resp = self.client.post(reverse('delete_item'),
                                 json.dumps({'id': del_loc.url()}), "application/json")
-        self.assertEqual(200, resp.status_code)
+        self.assert2XX(resp.status_code)
 
     def test_import_into_new_course_id(self):
         module_store = modulestore('direct')
@@ -1597,12 +1596,15 @@ class ContentStoreTest(ModuleStoreTestCase):
 
 
 class MetadataSaveTestCase(ModuleStoreTestCase):
-    """
-    Test that metadata is correctly decached.
-    """
+    """Test that metadata is correctly cached and decached."""
 
     def setUp(self):
-        sample_xml = '''
+        CourseFactory.create(
+            org='edX', course='999', display_name='Robot Super Course')
+        course_location = Location(
+            ['i4x', 'edX', '999', 'course', 'Robot_Super_Course', None])
+
+        video_sample_xml = '''
         <video display_name="Test Video"
                 youtube="1.0:p2Q6BrNhdh8,0.75:izygArpw-Qo,1.25:1EeWXzPdhSA,1.5:rABDYkeK0x8"
                 show_captions="false"
@@ -1612,19 +1614,17 @@ class MetadataSaveTestCase(ModuleStoreTestCase):
             <track src="http://www.example.com/track"/>
         </video>
         '''
-        CourseFactory.create(org='edX', course='999', display_name='Robot Super Course')
-        course_location = Location(['i4x', 'edX', '999', 'course', 'Robot_Super_Course', None])
+        self.video_descriptor = ItemFactory.create(
+            parent_location=course_location, category='video',
+            data={'data': video_sample_xml}
+        )
 
-        model_data = {'data': sample_xml}
-        self.descriptor = ItemFactory.create(parent_location=course_location, category='video', data=model_data)
-
-    def test_metadata_persistence(self):
+    def test_metadata_not_persistence(self):
         """
         Test that descriptors which set metadata fields in their
-        constructor are correctly persisted.
+        constructor are correctly deleted.
         """
-        # We should start with a source field, from the XML's <source/> tag
-        self.assertIn('source', own_metadata(self.descriptor))
+        self.assertIn('html5_sources', own_metadata(self.video_descriptor))
         attrs_to_strip = {
             'show_captions',
             'youtube_id_1_0',
@@ -1634,23 +1634,27 @@ class MetadataSaveTestCase(ModuleStoreTestCase):
             'start_time',
             'end_time',
             'source',
+            'html5_sources',
             'track'
         }
-        # We strip out all metadata fields to reproduce a bug where
-        # constructors which set their fields (e.g. Video) didn't have
-        # those changes persisted. So in the end we have the XML data
-        # in `descriptor.data`, but not in the individual fields
-        fields = self.descriptor.fields
+
+        fields = self.video_descriptor.fields
+        location = self.video_descriptor.location
+
         for field in fields:
             if field.name in attrs_to_strip:
-                field.delete_from(self.descriptor)
+                field.delete_from(self.video_descriptor)
 
-        # Assert that we correctly stripped the field
-        self.assertNotIn('source', own_metadata(self.descriptor))
-        get_modulestore(self.descriptor.location).update_metadata(
-            self.descriptor.location,
-            own_metadata(self.descriptor)
+        self.assertNotIn('html5_sources', own_metadata(self.video_descriptor))
+        get_modulestore(location).update_metadata(
+            location,
+            own_metadata(self.video_descriptor)
         )
-        module = get_modulestore(self.descriptor.location).get_item(self.descriptor.location)
-        # Assert that get_item correctly sets the metadata
-        self.assertIn('source', own_metadata(module))
+        module = get_modulestore(location).get_item(location)
+
+        self.assertNotIn('html5_sources', own_metadata(module))
+
+    def test_metadata_persistence(self):
+        # TODO: create the same test as `test_metadata_not_persistence`,
+        # but check persistence for some other module.
+        pass

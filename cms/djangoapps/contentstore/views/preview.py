@@ -82,7 +82,7 @@ def preview_component(request, location):
     )
 
     return render_to_response('component.html', {
-        'preview': get_module_previews(request, component)[0],
+        'preview': get_preview_html(request, component, 0),
         'editor': component.runtime.render(component, None, 'studio_view').content,
     })
 
@@ -169,15 +169,10 @@ def load_preview_module(request, preview_id, descriptor):
     return module
 
 
-def get_module_previews(request, descriptor):
+def get_preview_html(request, descriptor, idx):
     """
-    Returns a list of preview XModule html contents. One preview is returned for each
-    pair of states returned by get_sample_state() for the supplied descriptor.
-
-    descriptor: An XModuleDescriptor
+    Returns the HTML returned by the XModule's student_view,
+    specified by the descriptor and idx.
     """
-    preview_html = []
-    for idx, (_instance_state, _shared_state) in enumerate(descriptor.get_sample_state()):
-        module = load_preview_module(request, str(idx), descriptor)
-        preview_html.append(module.get_html())
-    return preview_html
+    module = load_preview_module(request, str(idx), descriptor)
+    return module.runtime.render(module, None, "student_view").content

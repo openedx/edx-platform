@@ -121,6 +121,7 @@ end
 
 static_js_dirs = Dir["common/lib/*"].select{|lib| File.directory?(lib)}
 static_js_dirs << 'common/static/coffee'
+static_js_dirs << 'common/static/js'
 static_js_dirs.select!{|lib| !Dir["#{lib}/**/spec"].empty?}
 
 static_js_dirs.each do |dir|

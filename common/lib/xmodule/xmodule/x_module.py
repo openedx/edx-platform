@@ -711,20 +711,20 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
 
     # =============================== BUILTIN METHODS ==========================
     def __eq__(self, other):
-        eq = (self.__class__ == other.__class__ and
+        return (self.__class__ == other.__class__ and
                 all(getattr(self, attr, None) == getattr(other, attr, None)
                     for attr in self.equality_attributes))
 
-        return eq
-
     def __repr__(self):
-        return ("{class_}({system!r}, location={location!r},"
-                " model_data={model_data!r})".format(
-            class_=self.__class__.__name__,
-            system=self.system,
-            location=self.location,
-            model_data=self._model_data,
-        ))
+        return (
+            "{class_}({system!r}, location={location!r},"
+            " model_data={model_data!r})".format(
+                class_=self.__class__.__name__,
+                system=self.system,
+                location=self.location,
+                model_data=self._model_data,
+            )
+        )
 
     @property
     def non_editable_metadata_fields(self):
@@ -785,15 +785,17 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
                 editor_type = "Float"
             elif isinstance(field, List):
                 editor_type = "List"
-            metadata_fields[field.name] = {'field_name': field.name,
-                                           'type': editor_type,
-                                           'display_name': field.display_name,
-                                           'value': field.to_json(value),
-                                           'options': [] if values is None else values,
-                                           'default_value': field.to_json(default_value),
-                                           'inheritable': inheritable,
-                                           'explicitly_set': explicitly_set,
-                                           'help': field.help}
+            metadata_fields[field.name] = {
+               'field_name': field.name,
+               'type': editor_type,
+               'display_name': field.display_name,
+               'value': field.to_json(value),
+               'options': [] if values is None else values,
+               'default_value': field.to_json(default_value),
+               'inheritable': inheritable,
+               'explicitly_set': explicitly_set,
+               'help': field.help,
+            }
 
         return metadata_fields
 
@@ -885,28 +887,14 @@ class ModuleSystem(Runtime):
     Note that these functions can be closures over e.g. a django request
     and user, or other environment-specific info.
     '''
-    def __init__(self,
-                 ajax_url,
-                 track_function,
-                 get_module,
-                 render_template,
-                 replace_urls,
-                 xblock_model_data,
-                 user=None,
-                 filestore=None,
-                 debug=False,
-                 xqueue=None,
-                 publish=None,
-                 node_path="",
-                 anonymous_student_id='',
-                 course_id=None,
-                 open_ended_grading_interface=None,
-                 s3_interface=None,
-                 cache=None,
-                 can_execute_unsafe_code=None,
-                 replace_course_urls=None,
-                 replace_jump_to_id_urls=None
-    ):
+    def __init__(
+            self, ajax_url, track_function, get_module, render_template,
+            replace_urls, xblock_model_data, user=None, filestore=None,
+            debug=False, xqueue=None, publish=None, node_path="",
+            anonymous_student_id='', course_id=None,
+            open_ended_grading_interface=None, s3_interface=None,
+            cache=None, can_execute_unsafe_code=None, replace_course_urls=None,
+            replace_jump_to_id_urls=None):
         '''
         Create a closure around the system environment.
 
