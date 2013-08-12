@@ -746,6 +746,16 @@ function cancelNewCourse(e) {
     e.preventDefault();
     $('.new-course-button').removeClass('is-disabled');
     $('.wrapper-create-course').removeClass('is-shown');
+    // Clear out existing fields and errors
+    _.each(
+        ['.new-course-name', '.new-course-org', '.new-course-number', '.new-course-run'],
+        function(field) {
+            $(field).val('');
+        }
+    );
+    $('#course_creation_error').html('');
+    $('.wrap-error').removeClass('is-shown');
+    $('.new-course-save').off('click');
 }
 
 function addNewSubsection(e) {
