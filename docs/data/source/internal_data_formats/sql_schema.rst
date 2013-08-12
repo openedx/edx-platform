@@ -347,7 +347,7 @@ There is an important split in demographic data gathered for the students who si
 
 `student_courseenrollment`
 ==========================
-A row in this table represents a student's enrollment for a particular course run. If they decide to unenroll in the course, we delete their entry in this table, but we still leave all their state in `courseware_studentmodule` untouched.
+A row in this table represents a student's enrollment for a particular course run. If they decide to unenroll in the course, we set `is_active` to `False`. We still leave all their state in `courseware_studentmodule` untouched, so they will not lose courseware state if they unenroll and reenroll.
 
 `id`
 ----
@@ -365,6 +365,13 @@ A row in this table represents a student's enrollment for a particular course ru
 ---------
   Datetime of enrollment, UTC.
 
+`is_active`
+-----------
+  Boolean indicating whether this enrollment is active. If an enrollment is not active, a student is not enrolled in that course. This lets us unenroll students without losing a record of what courses they were enrolled in previously. This was introduced in the 2013-08-20 release. Before this release, unenrolling a student simply deleted the row in `student_courseenrollment`.
+
+`mode`
+------
+  String indicating what kind of enrollment this was. The default is "honor" (honor certificate) and all enrollments prior to 2013-08-20 will be of that type. Other types being considered are "audit" and "verified_id".
 
 
 *******************

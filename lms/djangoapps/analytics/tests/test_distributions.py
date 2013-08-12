@@ -19,10 +19,8 @@ class TestAnalyticsDistributions(TestCase):
             profile__year_of_birth=i + 1930
         ) for i in xrange(30)]
 
-        self.ces = [CourseEnrollment.objects.create(
-            course_id=self.course_id,
-            user=user
-        ) for user in self.users]
+        self.ces = [CourseEnrollment.enroll(user, self.course_id)
+                    for user in self.users]
 
     @raises(ValueError)
     def test_profile_distribution_bad_feature(self):
@@ -68,7 +66,8 @@ class TestAnalyticsDistributionsNoData(TestCase):
 
         self.users += self.nodata_users
 
-        self.ces = tuple(CourseEnrollment.objects.create(course_id=self.course_id, user=user) for user in self.users)
+        self.ces = tuple(CourseEnrollment.enroll(user, self.course_id)
+                         for user in self.users)
 
     def test_profile_distribution_easy_choice_nodata(self):
         feature = 'gender'

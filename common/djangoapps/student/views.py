@@ -254,13 +254,12 @@ def register_user(request, extra_context=None):
 @ensure_csrf_cookie
 def dashboard(request):
     user = request.user
-    enrollments = CourseEnrollment.objects.filter(user=user)
 
     # Build our courses list for the user, but ignore any courses that no longer
     # exist (because the course IDs have changed). Still, we don't delete those
     # enrollments, because it could have been a data push snafu.
     courses = []
-    for enrollment in enrollments:
+    for enrollment in CourseEnrollment.enrollments_for_user(user):
         try:
             courses.append(course_from_id(enrollment.course_id))
         except ItemNotFoundError:
@@ -377,18 +376,13 @@ def change_enrollment(request):
                                "course:{0}".format(course_num),
                                "run:{0}".format(run)])
 
-        try:
-            enroll_in_course(user, course.id)
-        except IntegrityError:
-            # If we've already created this enrollment in a separate transaction,
-            # then just continue
-            pass
+        CourseEnrollment.enroll(user, course.id)
+
         return HttpResponse()
 
     elif action == "unenroll":
         try:
-            enrollment = CourseEnrollment.objects.get(user=user, course_id=course_id)
-            enrollment.delete()
+            CourseEnrollment.unenroll(user, course_id)
 
             org, course_num, run = course_id.split("/")
             statsd.increment("common.student.unenrollment",
@@ -402,29 +396,9 @@ def change_enrollment(request):
     else:
         return HttpResponseBadRequest(_("Enrollment action is invalid"))
 
-
-def enroll_in_course(user, course_id):
-    """
-    Helper method to enroll a user in a particular class.
-
-    It is expected that this method is called from a method which has already
-    verified the user authentication and access.
-    """
-    CourseEnrollment.objects.get_or_create(user=user, course_id=course_id)
-
-
-def is_enrolled_in_course(user, course_id):
-    """
-    Helper method that returns whether or not the user is enrolled in a particular course.
-    """
-    return CourseEnrollment.objects.filter(user=user, course_id=course_id).count() > 0
-
-
 @ensure_csrf_cookie
 def accounts_login(request, error=""):
-
     return render_to_response('login.html', {'error': error})
-
 
 # Need different levels of logging
 @ensure_csrf_cookie
@@ -1008,13 +982,21 @@ def activate_account(request, key):
             ceas = CourseEnrollmentAllowed.objects.filter(email=student[0].email)
             for cea in ceas:
                 if cea.auto_enroll:
-                    course_id = cea.course_id
-                    _enrollment, _created = CourseEnrollment.objects.get_or_create(user_id=student[0].id, course_id=course_id)
+                    CourseEnrollment.enroll(student[0], cea.course_id)
 
-        resp = render_to_response("registration/activation_complete.html", {'user_logged_in': user_logged_in, 'already_active': already_active})
+        resp = render_to_response(
+            "registration/activation_complete.html",
+            {
+                'user_logged_in': user_logged_in,
+                'already_active': already_active
+            }
+        )
         return resp
     if len(r) == 0:
-        return render_to_response("registration/activation_invalid.html", {'csrf': csrf(request)['csrf_token']})
+        return render_to_response(
+            "registration/activation_invalid.html",
+            {'csrf': csrf(request)['csrf_token']}
+        )
     return HttpResponse(_("Unknown error. Please e-mail us to let us know how it happened."))
 
 
