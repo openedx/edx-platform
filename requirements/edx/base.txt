@@ -30,6 +30,7 @@ glob2==0.3
 lxml==3.0.1
 mako==0.7.3
 Markdown==2.2.1
+mongoengine==0.8.3
 networkx==1.7
 nltk==2.0.4
 paramiko==1.9.0
