@@ -55,7 +55,7 @@ VIRTUALENV_DIR="/mnt/virtualenvs/${JOB_NAME}${WORKSPACE_SUFFIX}"
 
 if [ ! -d "$VIRTUALENV_DIR" ]; then
     mkdir -p "$VIRTUALENV_DIR"
-    virtualenv "$VIRTUALENV_DIR"
+    virtualenv --system-site-packages "$VIRTUALENV_DIR"
 fi
 
 export PIP_DOWNLOAD_CACHE=/mnt/pip-cache
