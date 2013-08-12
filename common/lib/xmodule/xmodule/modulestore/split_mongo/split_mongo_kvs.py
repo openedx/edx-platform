@@ -44,6 +44,7 @@ class SplitMongoKVS(KeyValueStore):
 
         # parent undefined in editing runtime (I think)
         if key.scope == Scope.parent:
+            # see STUD-624. Right now copies MongoKeyValueStore.get's behavior of returning None
             return None
         if key.scope == Scope.children:
             # didn't find children in _fields; so, see if there's a default
@@ -86,12 +87,12 @@ class SplitMongoKVS(KeyValueStore):
         # set the field
         self._fields[key.field_name] = value
 
-        # handle any side effects
+        # handle any side effects -- story STUD-624
         # if key.scope == Scope.children:
-            # TODO remove inheritance from any exchildren
-            # TODO add inheritance to any new children
+            # STUD-624 remove inheritance from any exchildren
+            # STUD-624 add inheritance to any new children
         # if key.scope == Scope.settings:
-            # TODO if inheritable, push down to children
+            # STUD-624 if inheritable, push down to children
 
     def delete(self, key):
         # handle any special cases
@@ -112,11 +113,14 @@ class SplitMongoKVS(KeyValueStore):
 
         # handle any side effects
         # if key.scope == Scope.children:
-            # TODO remove inheritance from any exchildren
+            # STUD-624 remove inheritance from any exchildren
         # if key.scope == Scope.settings:
-            # TODO if inheritable, push down _inherited_settings value to children
+            # STUD-624 if inheritable, push down _inherited_settings value to children
 
     def has(self, key):
+        """
+        Is the given field explicitly set in this kvs (not inherited nor default)
+        """
         # handle any special cases
         if key.scope == Scope.content:
             if key.field_name == 'location':
@@ -152,6 +156,7 @@ class SplitMongoKVS(KeyValueStore):
                     return PROVENANCE_DEFAULT
         elif key_scope == Scope.parent:
             return PROVENANCE_DEFAULT
+        # catch the locally set state
         elif key_name in self._fields:
             return PROVENANCE_LOCAL
         elif key_scope == Scope.settings and key_name in self._inherited_settings:
