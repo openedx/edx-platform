@@ -1,3 +1,11 @@
+verifyInputType = (input, expectedType) ->
+    # Some browsers (e.g. FireFox) do not support the "number"
+    # input type.  We can accept a "text" input instead
+    # and still get acceptable behavior in the UI.
+    if expectedType == 'number' and input.type != 'number'
+        expectedType = 'text'
+    expect(input.type).toBe(expectedType)
+
 describe "Test Metadata Editor", ->
     editorTemplate = readFixtures('metadata-editor.underscore')
     numberEntryTemplate = readFixtures('metadata-number-entry.underscore')
@@ -113,14 +121,7 @@ describe "Test Metadata Editor", ->
 
             verifyEntry = (index, display_name, type) ->
                 expect(childModels[index].get('display_name')).toBe(display_name)
-
-                # Some browsers (e.g. FireFox) do not support the "number"
-                # input type.  We can accept a "text" input instead
-                # and still get acceptable behavior in the UI.
-                if type == 'number' and childViews[index].type != 'number'
-                    type = 'text'
-
-                expect(childViews[index].type).toBe(type)
+                verifyInputType(childViews[index], type)
 
             verifyEntry(0, 'Display Name', 'text')
             verifyEntry(1, 'Inputs', 'number')
@@ -171,14 +172,7 @@ describe "Test Metadata Editor", ->
     assertInputType = (view, expectedType) ->
         input = view.$el.find('.setting-input')
         expect(input.length).toEqual(1)
-
-        # Some browsers (e.g. FireFox) do not support the "number"
-        # input type.  We can accept a "text" input instead
-        # and still get acceptable behavior in the UI.
-        if expectedType == 'number' and input[0].type != 'number'
-            expectedType = 'text'
-
-        expect(input[0].type).toEqual(expectedType)
+        verifyInputType(input[0], expectedType)
 
     assertValueInView = (view, expectedValue) ->
         expect(view.getValueFromEditor()).toEqual(expectedValue)
