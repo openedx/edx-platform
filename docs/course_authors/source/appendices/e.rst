@@ -589,7 +589,7 @@ mathematical expression from the student and evaluates the input for equivalence
 to a mathematical expression provided by the grader. Correctness is based on
 numerical sampling of the symbolic expressions.
 
-The syntax of the problem is shared with that of the Numerical Response,
+The syntax of the answers is shared with that of the Numerical Response,
 including default variables and functions. The difference between the two
 response types is that the Formula Response grader may specify unknown
 variables. The student's response is compared against the instructor's
@@ -611,7 +611,7 @@ out, an appropriate character is substituted:
   ``alpha beta gamma delta epsilon varepsilon zeta eta theta vartheta iota
   kappa lambda mu nu xi pi rho sigma tau upsilon phi varphi chi psi omega``
 
-``epsilon`` is the lunate version, whereas ``varepsilon`` looks like a
+Note: ``epsilon`` is the lunate version, whereas ``varepsilon`` looks like a
 backward 3.
 
 Sample Problem:
