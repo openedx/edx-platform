@@ -348,6 +348,7 @@ def get_module_for_descriptor_internal(user, descriptor, model_data_cache, cours
             static_replace.replace_static_urls,
             data_directory=getattr(descriptor, 'data_dir', None),
             course_namespace=descriptor.location._replace(category=None, name=None),
+            static_asset_path=descriptor.lms.static_asset_path,
         ),
         replace_course_urls=partial(
             static_replace.replace_course_urls,
@@ -405,7 +406,8 @@ def get_module_for_descriptor_internal(user, descriptor, model_data_cache, cours
     module.get_html = replace_static_urls(
         _get_html,
         getattr(descriptor, 'data_dir', None),
-        course_namespace=module.location._replace(category=None, name=None)
+        course_namespace=module.location._replace(category=None, name=None),
+        static_asset_path=descriptor.lms.static_asset_path
     )
 
     # Allow URLs of the form '/course/' refer to the root of multicourse directory
