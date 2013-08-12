@@ -38,7 +38,7 @@ def export_to_xml(modulestore, contentstore, course_location, root_dir, course_d
     Export all modules from `modulestore` and content from `contentstore` as xml to `root_dir`.
 
     `modulestore`: A `ModuleStore` object that is the source of the modules to export
-    `contentstore`: A `ContentStore` object that is the source of the content to export
+    `contentstore`: A `ContentStore` object that is the source of the content to export, can be None
     `course_location`: The `Location` of the `CourseModuleDescriptor` to export
     `root_dir`: The directory to write the exported xml to
     `course_dir`: The name of the directory inside `root_dir` to write the course content to
@@ -46,7 +46,12 @@ def export_to_xml(modulestore, contentstore, course_location, root_dir, course_d
         alongside the public content in the course.
     """
 
-    course = modulestore.get_item(course_location)
+    # we use get_instance instead of get_item to support modulestores
+    # that can't guarantee that definitions are unique
+    course = modulestore.get_instance(
+        course_location.course_id,
+        course_location
+    )
 
     fs = OSFS(root_dir)
     export_fs = fs.makeopendir(course_dir)
@@ -56,7 +61,8 @@ def export_to_xml(modulestore, contentstore, course_location, root_dir, course_d
         course_xml.write(xml)
 
     # export the static assets
-    contentstore.export_all_for_course(course_location, root_dir + '/' + course_dir + '/static/')
+    if contentstore:
+        contentstore.export_all_for_course(course_location, root_dir + '/' + course_dir + '/static/')
 
     # export the static tabs
     export_extra_content(export_fs, modulestore, course_location, 'static_tab', 'tabs', '.html')
