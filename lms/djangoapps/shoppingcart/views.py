@@ -38,8 +38,7 @@ def add_course_to_cart(request, course_id):
 @login_required
 def register_for_verified_cert(request, course_id):
     cart = Order.get_cart_for_user(request.user)
-    enrollment, _completed = CourseEnrollment.objects.get_or_create(user=request.user, course_id=course_id)
-    VerifiedCertificate.add_to_order(cart, course_id, enrollment, 25)
+    VerifiedCertificate.add_to_order(cart, course_id, 30)
     return HttpResponse("Added")
 
 @login_required
