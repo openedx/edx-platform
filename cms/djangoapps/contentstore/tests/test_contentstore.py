@@ -1273,6 +1273,47 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         # export out to a tempdir
         export_to_xml(module_store, content_store, location, root_dir, 'test_export')
 
+    def test_export_course_without_content_store(self):
+        module_store = modulestore('direct')
+        content_store = contentstore()
+
+        # Create toy course
+
+        import_from_xml(module_store, 'common/test/data/', ['toy'])
+        location = CourseDescriptor.id_to_location('edX/toy/2012_Fall')
+
+        # Add a sequence
+
+        stub_location = Location(['i4x', 'edX', 'toy', 'sequential', 'vertical_sequential'])
+        sequential = module_store.get_item(stub_location)
+        module_store.update_children(sequential.location, sequential.children)
+
+        # Get course and export it without a content_store
+
+        course = module_store.get_item(location)
+        course.save()
+
+        root_dir = path(mkdtemp_clean())
+
+        print 'Exporting to tempdir = {0}'.format(root_dir)
+        export_to_xml(module_store, None, location, root_dir, 'test_export_no_content_store')
+
+        # Delete the course from module store and reimport it
+
+        delete_course(module_store, content_store, location, commit=True)
+
+        import_from_xml(
+            module_store, root_dir, ['test_export_no_content_store'],
+            draft_store=None,
+            static_content_store=None,
+            target_location_namespace=course.location
+        )
+
+        # Verify reimported course
+
+        items = module_store.get_items(stub_location)
+        self.assertEqual(len(items), 1)
+
 
 @override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE, MODULESTORE=TEST_MODULESTORE)
 class ContentStoreTest(ModuleStoreTestCase):
