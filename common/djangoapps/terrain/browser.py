@@ -56,6 +56,7 @@ config = {"username": settings.MITX_FEATURES.get('SAUCE_USERNAME'),
 desired_capabilities =  settings.MITX_FEATURES.get('SAUCE_BROWSER', DesiredCapabilities.CHROME)
 desired_capabilities['platform'] = settings.MITX_FEATURES.get('SAUCE_PLATFORM', 'Linux')
 desired_capabilities['version'] = settings.MITX_FEATURES.get('SAUCE_VERSION', '')
+desired_capabilities['device-type'] = settings.MITX_FEATURES.get('SAUCE_DEVICE', '')
 desired_capabilities['name'] = "Lettuce Test"
 desired_capabilities['build'] = settings.MITX_FEATURES.get('SAUCE_BUILD', 'edX Plaform')
 desired_capabilities['tags'] = settings.MITX_FEATURES.get('SAUCE_TAGS', '')
