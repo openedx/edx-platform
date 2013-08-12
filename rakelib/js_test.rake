@@ -36,17 +36,31 @@ def js_test_tool(env, command, do_coverage)
     sh(cmd)
 end
 
+def print_js_test_cmds(mode)
+    JS_TEST_SUITES.each do |key, val|
+        puts "    rake js_test:#{mode}[#{key}]"
+    end
+end
 
 namespace :js_test do
 
     desc "Run the JavaScript tests and print results to the console"
     task :run, [:env] => [:'assets:coffee'] do |t, args|
+        if args[:env].nil?
+            puts "Running all test suites.  To run a specific test suite, try:"
+            print_js_test_cmds('run')
+        end
         js_test_tool(args[:env], 'run', false)
     end
 
     desc "Run the JavaScript tests in your default browser"
-    task :dev, [:env] => [:'assets:coffee'] do
-        js_test_tool(args[:env], 'dev', false)
+    task :dev, [:env] => [:'assets:coffee'] do |t, args|
+        if args[:env].nil?
+            puts "Error: No test suite specified.  Try one of these instead:"
+            print_js_test_cmds('dev')
+        else
+            js_test_tool(args[:env], 'dev', false)
+        end
     end
 
     desc "Run all JavaScript tests and collect coverage information"
