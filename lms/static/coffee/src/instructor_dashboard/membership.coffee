@@ -463,6 +463,8 @@ class Membership
         text: auth_list.$container.data 'display-name'
         data:
           auth_list: auth_list
+    if @auth_lists.length is 0
+      @$list_selector.hide()
 
     @$list_selector.change =>
       $opt = @$list_selector.children('option:selected')
