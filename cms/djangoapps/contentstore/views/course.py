@@ -4,6 +4,7 @@ Views related to operations on course objects
 import json
 import random
 from django.utils.translation import ugettext as _
+import hashlib
 import string  # pylint: disable=W0402
 
 from django.contrib.auth.decorators import login_required
@@ -75,6 +76,7 @@ def course_index(request, org, course, name):
         'coursename': name
     })
 
+    course_id_hash = hashlib.sha1("/".join([org, course, name])).hexdigest()
     course = modulestore().get_item(location, depth=3)
     sections = course.get_children()
 
@@ -88,7 +90,8 @@ def course_index(request, org, course, name):
         'new_subsection_category': 'sequential',
         'upload_asset_callback_url': upload_asset_callback_url,
         'new_unit_category': 'vertical',
-        'category': 'vertical'
+        'category': 'vertical',
+        "course_id_hash": course_id_hash,
     })
 
 

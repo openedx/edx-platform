@@ -1,4 +1,10 @@
 ## mako
+<%! from django.utils.translation import ugettext as _ %>
+<%namespace name='static' file='../static_content.html'/>
+
+<script type="text/javascript" src="${static.url('js/search.js')}"></script>
+<link rel="stylesheet" type="text/css" href="${static.url('css/vendor/animate-custom.css')}"></link>
+<link rel="stylesheet" type="text/css" href="${static.url('css/search.css')}"></link>
 <%page args="active_page=None" />
 
 <%
@@ -12,8 +18,6 @@ def url_class(is_active):
   return ""
 %>
 <%! from courseware.tabs import get_course_tabs %>
-<%! from django.utils.translation import ugettext as _ %>
-
 <nav class="${active_page} course-material">
   <div class="inner-wrapper">
     <ol class="course-tabs">
@@ -30,12 +34,17 @@ def url_class(is_active):
              </a>
           </li>
       % endfor
-    <%block name="extratabs" />
+        <%block name="extratabs" />
         % if masquerade is not UNDEFINED:
           % if staff_access and masquerade is not None:
           <li style="float:right"><a href="#" id="staffstatus">${_("Staff view")}</a></li>
           % endif
         % endif
+        <li style="float:right">
+            <div class="search-icon">
+              <a class="search-bar">${_("Search this Course")}</a>
+            </div>
+        </li>
     </ol>
   </div>
 </nav>
@@ -70,3 +79,11 @@ masq = (function(){
 </script>
   % endif
 % endif
+
+<%def name="js_link(path)">
+    <script type="text/javascript" src="${path|h}"></script>
+</%def>
+
+<%def name="css_link(path, media='')">
+    <link rel="stylesheet" type="text/css" href="${path|h}" media="${media}"></link>
+</%def>

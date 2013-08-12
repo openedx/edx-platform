@@ -1,0 +1,96 @@
+<%inherit file="/main.html" />
+<%block name="bodyclass">${course.css_class}</%block>
+<%include file="/courseware/course_navigation.html" args="active_page='search'" />
+<%namespace name='static' file='/static_content.html'/>
+<%block name="headextra">
+  <%static:css group='course'/>
+</%block>
+
+<head>
+    <script type="text/javascript">
+        var old_query = "${ old_query }";
+    </script>
+    <%namespace name='static' file='/static_content.html'/>
+    <script type="text/javascript" src="${static.url('js/search.js')}"></script>
+    <link href="${static.url('css/search.css')}" rel="stylesheet" type="text/css"></link>
+</head>
+
+<div class="container">
+    % if spelling_correction:
+    <div class="correction_div">
+    	<p class="search_correction">
+    		<span>Did you mean </span>
+    		<a onclick="correctionLink(event, '${spelling_correction}')">${spelling_correction}</a>
+    		<span>?</span>
+    	</p>
+    </div>
+    % endif
+    <div class="search-results">
+        <div id="menu-container">
+            <ul class="menu">
+            <li class="header-bar">
+                <span class="filter-item"></span>
+                Courseware
+                <span class="count">${ len(data.entries) }</span>
+                </span>
+            </li>
+            <li class="body-bar">
+                <span class="filter-item">
+                <span class="video-image"></span>
+                Transcripts
+                <div class="count"
+                </span>
+            </li>
+            <li class="body-bar">
+                <span class="filter-item">
+                <span class="problem-image"></span>
+                Problems
+                </span>
+            </li>
+            <li class="body-bar">
+                <span class="filter-item">
+                <span class="pdf-image"></span>
+                PDFs
+                </span>
+            </li>
+            </ul>
+        </div>
+        <div class="search-container">
+        % if len(data.entries) > 0:
+        	% for datum in data.entries:
+            <section class="highlighter">
+            	<a href=${datum.url}>
+            		<div class="result-container">
+            			<div class="result-header">
+            				<h1 class="result-title">${datum.data['display_name']}</h1>
+                        </div>
+            			<div class="result-body">
+                            <div class="thumbnail-wrapper">
+            				    <div class="result-thumbnail">
+            					   <img class="thumbnail" src="${datum.thumbnail}" alt="${datum.data['display_name']}"></img>
+            				    </div>
+                            </div>
+                            <div class="result-snippets">
+            					<div class="snippet">
+            						${datum.snippets}
+            					</div>
+            				</div>
+            			</div>
+            		</div>
+            	</a>
+            </section>
+        	% endfor
+        % else:
+            <h1 class="result-title no-results">"No results found, please try again"</h1>
+        % endif
+        </div>
+    </div>
+</div>
+
+<%def name="css_link(path, media='')">
+	<link rel="stylesheet" type="text/css" href="${path|h}" media="${media}"></link>
+</%def>
+
+<%def name="js_link(path)">
+	<script type="text/javascript" src="${path|h}"></script>
+</%def>
