@@ -1,0 +1,122 @@
+#!/usr/bin/env python
+#
+# python script to pull a git repo and import into cms / edge mongodb content database.
+#
+# usage:
+#
+#    python cms_git_add_course <git-ssh-url> [<directory>]
+#
+# argument is git ssh url, like: git@github.com:mitocw/edx4edx_lite.git
+# if the directory is given, that is used and presumed to contain the git repo
+# 
+
+import os, sys, string, re
+import datetime
+import mongoengine		# used to store import log 
+
+DIR = "/mnt/data_import"
+
+#-----------------------------------------------------------------------------
+# pull from git
+
+repo = sys.argv[1]
+m = re.match('git@[^ ]+\.git', repo)
+if not m:
+    print "Oops, not a git ssh url?"
+    print "Expecting something like git@github.com:mitocw/edx4edx_lite.git"
+    sys.exit(-1)
+
+if len(sys.argv)>2:
+    rdir = sys.argv[2]
+    rdir = os.path.basename(rdir)
+else:
+    rdir = repo.rsplit('/',1)[-1].rsplit('.git',1)[0]
+print "rdir = %s" % rdir
+
+rdirp = '%s/%s' % (DIR, rdir)
+if os.path.exists(rdirp):
+    print "directory already exists, doing a git pull instead of git clone"
+    cmd = 'cd %s/%s; git pull' % (DIR, rdir)
+else:
+    cmd = 'cd %s; git clone "%s"' % (DIR, repo)
+
+print cmd
+ret_git = os.popen(cmd).read()
+print ret_git
+
+if not os.path.exists('%s/%s' % (DIR, rdir)):
+    print "git clone failed!"
+    sys.exit(-1)
+
+# get commit id
+commit_id = os.popen('cd %s; git log -n 1 | head -1' % rdirp).read().strip().split(' ')[1]
+
+ret_git += "\nCommit ID: %s" % commit_id
+
+# get branch
+branch = ''
+for k in os.popen('cd %s; git branch' % rdirp).readlines():
+    if k[0]=='*':
+        branch = k[2:].strip()
+
+ret_git += "   \nBranch: %s" % branch
+
+#-----------------------------------------------------------------------------
+# import
+
+#cmd = "./DJANGO-ADMIN-CMS import %s %s" % (DIR, rdir)
+cmd = "./DJANGO-ADMIN-CMS import --nostatic %s %s" % (DIR, rdir)
+print cmd
+ret_import = os.popen(cmd).read()
+print ret_import
+
+course_id = "unknown"
+location = "unknown"
+
+# extract course ID from output of import-command-run and make symlink
+# this is needed in order for custom course scripts to work
+m = re.search('(?ms)===> IMPORTING course to location ([^ \n]+)', ret_import)
+if m:
+    location = m.group(1).strip()
+    print "location = %s" % location
+    course_id = location.replace('i4x://','').replace('/course/','/').split('\n')[0].strip()
+    
+    cdir = "%s/%s" % (DIR, course_id.split('/')[1])
+    print "Studio course dir = %s" % cdir
+    
+    if os.path.exists(cdir) and not os.path.islink(cdir):
+        print "   -> exists, but is not symlink"
+        print os.popen('ls -l %s' % cdir).read()
+        print os.popen('rmdir %s' % cdir).read()
+
+    if not os.path.exists(cdir):
+        print "   -> creating symlink"
+        print os.popen('ln -s %s %s' % (rdirp, cdir)).read()
+        print os.popen('ls -l %s' % cdir).read()
+        
+#-----------------------------------------------------------------------------
+# store import-command-run output in mongo
+
+class CourseImportLog(mongoengine.Document):
+    course_id = mongoengine.StringField(max_length=128)
+    location = mongoengine.StringField(max_length=168)
+    import_log = mongoengine.StringField(max_length=20*65535)
+    git_log = mongoengine.StringField(max_length=65535)
+    repo_dir = mongoengine.StringField(max_length=128)
+    created = mongoengine.DateTimeField()
+    meta = { 'indexes': ['course_id', 'created'],
+             'allow_inheritance': False, }
+
+DBNAME = "xlog"
+
+mdb = mongoengine.connect(DBNAME)
+
+cil = CourseImportLog(course_id=course_id,
+                      location=location,
+                      repo_dir=rdir,
+                      created=datetime.datetime.now(),
+                      import_log=ret_import,
+                      git_log=ret_git)
+cil.save()
+
+print "saved CourseImportLog for %s" % cil.course_id

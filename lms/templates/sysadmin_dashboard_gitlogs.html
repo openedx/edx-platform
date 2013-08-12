@@ -1,0 +1,92 @@
+<%inherit file="/main.html" />
+<%! from django.core.urlresolvers import reverse %>
+<%namespace name='static' file='/static_content.html'/>
+
+<%block name="headextra">
+  <%static:css group='course'/>
+  <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.axislabels.js')}"></script>
+</%block>
+
+<style type="text/css">
+table.stat_table {
+	font-family: verdana,arial,sans-serif;
+	font-size:11px;
+	color:#333333;
+	border-width: 1px;
+	border-color: #666666;
+	border-collapse: collapse;
+}
+table.stat_table th {
+	border-width: 1px;
+	padding: 8px;
+	border-style: solid;
+	border-color: #666666;
+	background-color: #dedede;
+}
+table.stat_table td {
+	border-width: 1px;
+	padding: 8px;
+	border-style: solid;
+	border-color: #666666;
+	background-color: #ffffff;
+}
+
+a.selectedmode { background-color: yellow; }
+
+textarea {
+  height: 200px;
+}
+</style>
+
+<section class="container">
+<div class="sysadmin-dashboard-wrapper">
+
+  <section class="sysadmin-dashboard-content" style="margin-left:10pt;margin-top:10pt;margin-right:10pt;margin-bottom:20pt">
+    <h1>git logs</h1>
+
+% if course_id is None:
+
+    <table class="stat_table">
+    <tr><th>Date</th><th>Course ID</th><th>git action</th></tr>
+
+    % for cil in cilset[:10]:
+
+        <tr>
+	    <td>${cil.created}</td>
+	    <td><a href="/gitlogs/${cil.course_id}">${cil.course_id}</a></td>
+	    <td>${cil.git_log}</td>
+	</tr>
+
+    % endfor
+    
+    </table>
+
+% else:
+
+    <h2>Recent git load activity for ${course_id}</h2>
+
+    <table class="stat_table">
+    <tr><th>Date</th><th>Course ID</th><th>git action</th></tr>
+
+    % for cil in cilset[:2]:
+
+        <tr>
+	    <td>${cil.created}</td>
+	    <td><a href="/gitlogs/${cil.course_id}">${cil.course_id}</a></td>
+	    <td>${cil.git_log}</td>
+	</tr>
+	
+	<tr><td colspan="3">
+	    <pre>${cil.import_log}</pre>
+	</td></tr>
+
+    % endfor
+    
+    </table>
+
+% endif
+
+  </section>
+</div>
+</section>
