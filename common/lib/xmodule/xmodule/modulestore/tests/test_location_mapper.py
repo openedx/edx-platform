@@ -8,7 +8,7 @@ import uuid
 from xmodule.modulestore import Location
 from xmodule.modulestore.locator import BlockUsageLocator
 from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateItemError
-from xmodule.modulestore.LocMapperStore import LocMapperStore
+from xmodule.modulestore.loc_mapper_store import LocMapperStore
 
 
 class TestLocationMapper(unittest.TestCase):

@@ -1,27 +1,14 @@
 '''
 Method for converting among our differing Location/Locator whatever reprs
 '''
-from __future__ import absolute_import
 from random import randint
 import re
 import pymongo
-from django.conf import settings
 
 from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError, DuplicateItemError
 from xmodule.modulestore.locator import BlockUsageLocator
 from xmodule.modulestore.mongo import draft
 from xmodule.modulestore import Location
-
-def loc_mapper():
-    """
-    Get the loc mapper which bidirectionally maps Locations to Locators. Used like modulestore() as
-    a singleton accessor.
-    """
-    # pylint: disable=W0212
-    if LocMapperStore._singleton is None:
-        # instantiate
-        LocMapperStore(settings.modulestore_options)
-    return LocMapperStore._singleton
 
 class LocMapperStore(object):
     '''
@@ -38,8 +25,6 @@ class LocMapperStore(object):
     or dominant store, but that's not a requirement. This store creates its own connection.
     '''
 
-    _singleton = None
-
     def __init__(self, host, db, collection, port=27017, user=None, password=None, **kwargs):
         '''
         Constructor
@@ -55,7 +40,6 @@ class LocMapperStore(object):
 
         self.location_map = self.db[collection + '.location_map']
         self.location_map.write_concern = {'w': 1}
-        LocMapperStore._singleton = self
 
 
     # location_map functions
