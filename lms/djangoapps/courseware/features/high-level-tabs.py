@@ -8,4 +8,5 @@ def i_click_on_the_tab_and_check(step):
         tab_text = tab_title['TabName']
         title = tab_title['PageTitle']
         world.click_link(tab_text)
+        world.wait_for(lambda _driver:title in world.browser.title)
         assert(title in world.browser.title)

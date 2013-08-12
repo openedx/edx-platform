@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.conf.urls import patterns, include, url
-from django.contrib import admin
+from ratelimitbackend import admin
 from django.conf.urls.static import static
 
 # Not used, the work is done in the imported module.
@@ -439,7 +439,7 @@ if settings.MITX_FEATURES.get('ENABLE_HINTER_INSTRUCTOR_VIEW'):
     )
 
 # enable automatic login
-if settings.MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_LOAD_TESTING'):
+if settings.MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING'):
     urlpatterns += (
         url(r'^auto_auth$', 'student.views.auto_auth'),
     )

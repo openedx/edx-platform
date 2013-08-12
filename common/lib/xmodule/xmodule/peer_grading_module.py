@@ -12,7 +12,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from .timeinfo import TimeInfo
 from xblock.core import Dict, String, Scope, Boolean, Integer, Float
-from xmodule.fields import Date
+from xmodule.fields import Date, Timedelta
 
 from xmodule.open_ended_grading_classes.peer_grading_service import PeerGradingService, GradingServiceError, MockPeerGradingService
 from open_ended_grading_classes import combined_open_ended_rubric
@@ -22,6 +22,7 @@ log = logging.getLogger(__name__)
 
 
 EXTERNAL_GRADER_NO_CONTACT_ERROR = "Failed to contact external graders.  Please notify course staff."
+
 
 class PeerGradingFields(object):
     use_for_single_location = Boolean(
@@ -47,9 +48,8 @@ class PeerGradingFields(object):
         help="Due date that should be displayed.",
         default=None,
         scope=Scope.settings)
-    grace_period_string = String(
+    graceperiod = Timedelta(
         help="Amount of grace to give on the due date.",
-        default=None,
         scope=Scope.settings
     )
     student_data_for_location = Dict(
@@ -68,9 +68,11 @@ class PeerGradingFields(object):
         scope=Scope.settings,
         default="Peer Grading Interface"
     )
-    data = String(help="Html contents to display for this module",
+    data = String(
+        help="Html contents to display for this module",
         default='<peergrading></peergrading>',
-        scope=Scope.content)
+        scope=Scope.content
+    )
 
 
 class PeerGradingModule(PeerGradingFields, XModule):
@@ -79,11 +81,14 @@ class PeerGradingModule(PeerGradingFields, XModule):
     """
     _VERSION = 1
 
-    js = {'coffee': [resource_string(__name__, 'js/src/peergrading/peer_grading.coffee'),
-                     resource_string(__name__, 'js/src/peergrading/peer_grading_problem.coffee'),
-                     resource_string(__name__, 'js/src/collapsible.coffee'),
-                     resource_string(__name__, 'js/src/javascript_loader.coffee'),
-    ]}
+    js = {
+        'coffee': [
+            resource_string(__name__, 'js/src/peergrading/peer_grading.coffee'),
+            resource_string(__name__, 'js/src/peergrading/peer_grading_problem.coffee'),
+            resource_string(__name__, 'js/src/collapsible.coffee'),
+            resource_string(__name__, 'js/src/javascript_loader.coffee'),
+        ]
+    }
     js_module_name = "PeerGrading"
 
     css = {'scss': [resource_string(__name__, 'css/combinedopenended/display.scss')]}
@@ -105,12 +110,12 @@ class PeerGradingModule(PeerGradingFields, XModule):
                 log.error("Linked location {0} for peer grading module {1} does not exist".format(
                     self.link_to_location, self.location))
                 raise
-            due_date = self.linked_problem._model_data.get('due', None)
+            due_date = self.linked_problem.lms.due
             if due_date:
-                self._model_data['due'] = due_date
+                self.lms.due = due_date
 
         try:
-            self.timeinfo = TimeInfo(self.due, self.grace_period_string)
+            self.timeinfo = TimeInfo(self.due, self.graceperiod)
         except Exception:
             log.error("Error parsing due date information in location {0}".format(self.location))
             raise
@@ -133,7 +138,6 @@ class PeerGradingModule(PeerGradingFields, XModule):
         if timeinfo.close_date is not None and datetime.now(UTC()) > timeinfo.close_date:
             return True
         return False
-
 
     def _err_response(self, msg):
         """
@@ -308,31 +312,22 @@ class PeerGradingModule(PeerGradingFields, XModule):
             error: if there was an error in the submission, this is the error message
         """
 
-        required = set(['location', 'submission_id', 'submission_key', 'score', 'feedback', 'rubric_scores[]',
-                        'submission_flagged'])
+        required = set(['location', 'submission_id', 'submission_key', 'score', 'feedback', 'rubric_scores[]', 'submission_flagged', 'answer_unknown'])
         success, message = self._check_required(data, required)
         if not success:
             return self._err_response(message)
-        grader_id = self.system.anonymous_student_id
 
-        location = data.get('location')
-        submission_id = data.get('submission_id')
-        score = data.get('score')
-        feedback = data.get('feedback')
-        submission_key = data.get('submission_key')
-        rubric_scores = data.getlist('rubric_scores[]')
-        submission_flagged = data.get('submission_flagged')
+        data_dict = {k:data.get(k) for k in required}
+        data_dict['rubric_scores'] = data.getlist('rubric_scores[]')
+        data_dict['grader_id'] = self.system.anonymous_student_id
 
         try:
-            response = self.peer_gs.save_grade(location, grader_id, submission_id,
-                                               score, feedback, submission_key, rubric_scores, submission_flagged)
+            response = self.peer_gs.save_grade(**data_dict)
             return response
         except GradingServiceError:
             # This is a dev_facing_error
-            log.exception("""Error saving grade to open ended grading service.  server url: {0}, location: {1}, submission_id:{2},
-                            submission_key: {3}, score: {4}"""
-            .format(self.peer_gs.url,
-                    location, submission_id, submission_key, score)
+            log.exception("""Error saving grade to open ended grading service.  server url: {0}"""
+            .format(self.peer_gs.url)
             )
             # This is a student_facing_error
             return {
@@ -451,27 +446,21 @@ class PeerGradingModule(PeerGradingFields, XModule):
         success, message = self._check_required(data, required)
         if not success:
             return self._err_response(message)
-        grader_id = self.system.anonymous_student_id
 
-        location = data.get('location')
-        calibration_essay_id = data.get('submission_id')
-        submission_key = data.get('submission_key')
-        score = data.get('score')
-        feedback = data.get('feedback')
-        rubric_scores = data.getlist('rubric_scores[]')
+        data_dict = {k:data.get(k) for k in required}
+        data_dict['rubric_scores'] = data.getlist('rubric_scores[]')
+        data_dict['student_id'] = self.system.anonymous_student_id
+        data_dict['calibration_essay_id'] = data_dict['submission_id']
 
         try:
-            response = self.peer_gs.save_calibration_essay(location, grader_id, calibration_essay_id,
-                                                           submission_key, score, feedback, rubric_scores)
+            response = self.peer_gs.save_calibration_essay(**data_dict)
             if 'actual_rubric' in response:
                 rubric_renderer = combined_open_ended_rubric.CombinedOpenEndedRubric(self.system, True)
                 response['actual_rubric'] = rubric_renderer.render_rubric(response['actual_rubric'])['html']
             return response
         except GradingServiceError:
             # This is a dev_facing_error
-            log.exception(
-                "Error saving calibration grade, location: {0}, submission_key: {1}, grader_id: {2}".format(
-                    location, submission_key, grader_id))
+            log.exception("Error saving calibration grade")
             # This is a student_facing_error
             return self._err_response('There was an error saving your score.  Please notify course staff.')
 
@@ -533,10 +522,10 @@ class PeerGradingModule(PeerGradingFields, XModule):
             problem_location = problem['location']
             descriptor = _find_corresponding_module_for_location(problem_location)
             if descriptor:
-                problem['due'] = descriptor._model_data.get('due', None)
-                grace_period_string = descriptor._model_data.get('graceperiod', None)
+                problem['due'] = descriptor.lms.due
+                grace_period = descriptor.lms.graceperiod
                 try:
-                    problem_timeinfo = TimeInfo(problem['due'], grace_period_string)
+                    problem_timeinfo = TimeInfo(problem['due'], grace_period)
                 except:
                     log.error("Malformed due date or grace period string for location {0}".format(problem_location))
                     raise
@@ -629,5 +618,5 @@ class PeerGradingDescriptor(PeerGradingFields, RawDescriptor):
     @property
     def non_editable_metadata_fields(self):
         non_editable_fields = super(PeerGradingDescriptor, self).non_editable_metadata_fields
-        non_editable_fields.extend([PeerGradingFields.due, PeerGradingFields.grace_period_string])
+        non_editable_fields.extend([PeerGradingFields.due, PeerGradingFields.graceperiod])
         return non_editable_fields

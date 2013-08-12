@@ -10,7 +10,13 @@ from django.utils import timezone
 from django.utils.translation import ugettext as _
 
 # A signal that will be sent when users should be added or removed from the creator group
-update_creator_state = Signal(providing_args=["caller", "user", "add"])
+update_creator_state = Signal(providing_args=["caller", "user", "state"])
+
+# A signal that will be sent when admin should be notified of a pending user request
+send_admin_notification = Signal(providing_args=["user"])
+
+# A signal that will be sent when user should be notified of change in course creator privileges
+send_user_notification = Signal(providing_args=["user", "state"])
 
 
 class CourseCreator(models.Model):
@@ -60,15 +66,32 @@ def post_save_callback(sender, **kwargs):
     # We only wish to modify the state_changed time if the state has been modified. We don't wish to
     # modify it for changes to the notes field.
     if instance.state != instance.orig_state:
+        granted_state_change = instance.state == CourseCreator.GRANTED or instance.orig_state == CourseCreator.GRANTED
         # If either old or new state is 'granted', we must manipulate the course creator
         # group maintained by authz. That requires staff permissions (stored admin).
-        if instance.state == CourseCreator.GRANTED or instance.orig_state == CourseCreator.GRANTED:
+        if granted_state_change:
             assert hasattr(instance, 'admin'), 'Must have stored staff user to change course creator group'
             update_creator_state.send(
                 sender=sender,
                 caller=instance.admin,
                 user=instance.user,
                 state=instance.state
+            )
+
+        # If user has been denied access, granted access, or previously granted access has been
+        # revoked, send a notification message to the user.
+        if instance.state == CourseCreator.DENIED or granted_state_change:
+            send_user_notification.send(
+                sender=sender,
+                user=instance.user,
+                state=instance.state
+            )
+
+        # If the user has gone into the 'pending' state, send a notification to interested admin.
+        if instance.state == CourseCreator.PENDING:
+            send_admin_notification.send(
+                sender=sender,
+                user=instance.user
             )
 
         instance.state_changed = timezone.now()

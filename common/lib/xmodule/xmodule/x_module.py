@@ -10,7 +10,7 @@ from pkg_resources import resource_listdir, resource_string, resource_isdir
 from xmodule.modulestore import inheritance, Location
 from xmodule.modulestore.exceptions import ItemNotFoundError, InsufficientSpecificationError, InvalidLocationError
 
-from xblock.core import XBlock, Scope, String, Integer, Float, ModelType
+from xblock.core import XBlock, Scope, String, Integer, Float, List, ModelType
 from xblock.fragment import Fragment
 from xblock.runtime import Runtime
 from xmodule.modulestore.locator import BlockUsageLocator
@@ -766,7 +766,7 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
             # 2. Number editors for integers and floats.
             # 3. A generic string editor for anything else (editing JSON representation of the value).
             editor_type = "Generic"
-            values = [] if field.values is None else copy.deepcopy(field.values)
+            values = copy.deepcopy(field.values)
             if isinstance(values, tuple):
                 values = list(values)
             if isinstance(values, list):
@@ -783,11 +783,13 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
                 editor_type = "Integer"
             elif isinstance(field, Float):
                 editor_type = "Float"
+            elif isinstance(field, List):
+                editor_type = "List"
             metadata_fields[field.name] = {'field_name': field.name,
                                            'type': editor_type,
                                            'display_name': field.display_name,
                                            'value': field.to_json(value),
-                                           'options': values,
+                                           'options': [] if values is None else values,
                                            'default_value': field.to_json(default_value),
                                            'inheritable': inheritable,
                                            'explicitly_set': explicitly_set,
@@ -902,6 +904,8 @@ class ModuleSystem(Runtime):
                  s3_interface=None,
                  cache=None,
                  can_execute_unsafe_code=None,
+                 replace_course_urls=None,
+                 replace_jump_to_id_urls=None
     ):
         '''
         Create a closure around the system environment.
@@ -978,6 +982,8 @@ class ModuleSystem(Runtime):
 
         self.cache = cache or DoNothingCache()
         self.can_execute_unsafe_code = can_execute_unsafe_code or (lambda: False)
+        self.replace_course_urls = replace_course_urls
+        self.replace_jump_to_id_urls = replace_jump_to_id_urls
 
     def get(self, attr):
         '''	provide uniform access to attributes (like etree).'''

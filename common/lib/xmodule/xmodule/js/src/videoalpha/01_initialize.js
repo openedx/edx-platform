@@ -93,14 +93,7 @@ function (VideoPlayer) {
 
             fadeOutTimeout:     1400,
 
-            availableQualities: ['hd720', 'hd1080', 'highres'],
-
-            qTipConfig: {
-                position: {
-                    my: 'top right',
-                    at: 'top center'
-                }
-            }
+            availableQualities: ['hd720', 'hd1080', 'highres']
         };
 
         if (!(_parseYouTubeIDs(state))) {
@@ -148,7 +141,7 @@ function (VideoPlayer) {
     //     Option
     //         this.config.show_captions = true | false
     //
-    //     defines whether to turn off/on the captions altogether. User will not have the ability to turn them on/off.
+    //     Defines whether or not captions are shown on first viewing.
     //
     //     Option
     //          this.hide_captions = true | false

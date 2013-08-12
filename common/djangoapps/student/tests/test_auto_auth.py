@@ -11,9 +11,9 @@ class AutoAuthEnabledTestCase(UrlResetMixin, TestCase):
     Tests for the Auto auth view that we have for load testing.
     """
 
-    @patch.dict("django.conf.settings.MITX_FEATURES", {"AUTOMATIC_AUTH_FOR_LOAD_TESTING": True})
+    @patch.dict("django.conf.settings.MITX_FEATURES", {"AUTOMATIC_AUTH_FOR_TESTING": True})
     def setUp(self):
-        # Patching the settings.MITX_FEATURES['AUTOMATIC_AUTH_FOR_LOAD_TESTING']
+        # Patching the settings.MITX_FEATURES['AUTOMATIC_AUTH_FOR_TESTING']
         # value affects the contents of urls.py,
         # so we need to call super.setUp() which reloads urls.py (because
         # of the UrlResetMixin)
@@ -37,6 +37,26 @@ class AutoAuthEnabledTestCase(UrlResetMixin, TestCase):
         user = qset[0]
         assert user.is_active
 
+    def test_create_defined_user(self):
+        """
+        Test that the user gets created with the correct attributes
+        when they are passed as parameters on the auto-auth page.
+        """
+
+        self.client.get(
+            self.url,
+            {'username': 'robot', 'password': 'test', 'email': 'robot@edx.org'}
+        )
+
+        qset = User.objects.all()
+
+        # assert user was created with the correct username and password
+        self.assertEqual(qset.count(), 1)
+        user = qset[0]
+        self.assertEqual(user.username, 'robot')
+        self.assertTrue(user.check_password('test'))
+        self.assertEqual(user.email, 'robot@edx.org')
+
     @patch('student.views.random.randint')
     def test_create_multiple_users(self, randint):
         """
@@ -50,8 +70,13 @@ class AutoAuthEnabledTestCase(UrlResetMixin, TestCase):
 
         qset = User.objects.all()
 
-        # make sure that USER_1 and USER_2 were created
+        # make sure that USER_1 and USER_2 were created correctly
         self.assertEqual(qset.count(), 2)
+        user1 = qset[0]
+        self.assertEqual(user1.username, 'USER_1')
+        self.assertTrue(user1.check_password('PASS_1'))
+        self.assertEqual(user1.email, 'USER_1_dummy_test@mitx.mit.edu')
+        self.assertEqual(qset[1].username, 'USER_2')
 
     @patch.dict("django.conf.settings.MITX_FEATURES", {"MAX_AUTO_AUTH_USERS": 1})
     def test_login_already_created_user(self):
@@ -77,9 +102,9 @@ class AutoAuthDisabledTestCase(UrlResetMixin, TestCase):
     Test that the page is inaccessible with default settings
     """
 
-    @patch.dict("django.conf.settings.MITX_FEATURES", {"AUTOMATIC_AUTH_FOR_LOAD_TESTING": False})
+    @patch.dict("django.conf.settings.MITX_FEATURES", {"AUTOMATIC_AUTH_FOR_TESTING": False})
     def setUp(self):
-        # Patching the settings.MITX_FEATURES['AUTOMATIC_AUTH_FOR_LOAD_TESTING']
+        # Patching the settings.MITX_FEATURES['AUTOMATIC_AUTH_FOR_TESTING']
         # value affects the contents of urls.py,
         # so we need to call super.setUp() which reloads urls.py (because
         # of the UrlResetMixin)

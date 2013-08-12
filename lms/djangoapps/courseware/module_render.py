@@ -349,6 +349,15 @@ def get_module_for_descriptor_internal(user, descriptor, model_data_cache, cours
             data_directory=getattr(descriptor, 'data_dir', None),
             course_namespace=descriptor.location._replace(category=None, name=None),
         ),
+        replace_course_urls=partial(
+            static_replace.replace_course_urls,
+            course_id=course_id
+        ),
+        replace_jump_to_id_urls=partial(
+            static_replace.replace_jump_to_id_urls,
+            course_id=course_id,
+            jump_to_id_base_url=reverse('jump_to_id', kwargs={'course_id': course_id, 'module_id': ''})
+        ),
         node_path=settings.NODE_PATH,
         xblock_model_data=xblock_model_data,
         publish=publish,

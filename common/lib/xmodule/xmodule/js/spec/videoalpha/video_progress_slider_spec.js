@@ -39,21 +39,6 @@
 
         it('build the seek handle', function() {
           expect(videoProgressSlider.handle).toBe('.slider .ui-slider-handle');
-          expect($.fn.qtip).toHaveBeenCalledWith({
-            content: "0:00",
-            position: {
-              my: 'bottom center',
-              at: 'top center',
-              container: videoProgressSlider.handle
-            },
-            hide: {
-              delay: 700
-            },
-            style: {
-              classes: 'ui-tooltip-slider',
-              widget: true
-            }
-          });
         });
       });
 
@@ -69,7 +54,6 @@
 
           // We can't expect $.fn.slider not to have been called,
           // because sliders are used in other parts of VideoAlpha.
-          // expect($.fn.slider).not.toHaveBeenCalled();
         });
       });
     });
@@ -94,43 +78,6 @@
       });
 
       // Currently, the slider is not rebuilt if it does not exist.
-      //
-      // describe('when the slider was not already built', function() {
-      //   beforeEach(function() {
-      //     spyOn($.fn, 'slider').andCallThrough();
-      //     videoProgressSlider.slider = null;
-      //     videoPlayer.play();
-      //   });
-      //
-      //   it('build the slider', function() {
-      //     expect(videoProgressSlider.slider).toBe('.slider');
-      //     expect($.fn.slider).toHaveBeenCalledWith({
-      //       range: 'min',
-      //       change: videoProgressSlider.onChange,
-      //       slide: videoProgressSlider.onSlide,
-      //       stop: videoProgressSlider.onStop
-      //     });
-      //   });
-      //
-      //   it('build the seek handle', function() {
-      //     expect(videoProgressSlider.handle).toBe('.ui-slider-handle');
-      //     expect($.fn.qtip).toHaveBeenCalledWith({
-      //       content: "0:00",
-      //       position: {
-      //         my: 'bottom center',
-      //         at: 'top center',
-      //         container: videoProgressSlider.handle
-      //       },
-      //       hide: {
-      //         delay: 700
-      //       },
-      //       style: {
-      //         classes: 'ui-tooltip-slider',
-      //         widget: true
-      //       }
-      //     });
-      //   });
-      // });
     });
 
     describe('updatePlayTime', function() {
@@ -181,10 +128,6 @@
         expect(videoProgressSlider.frozen).toBeTruthy();
       });
 
-      it('update the tooltip', function() {
-        expect($.fn.qtip).toHaveBeenCalled();
-      });
-
       it('trigger seek event', function() {
         expect(videoPlayer.onSlideSeek).toHaveBeenCalled();
         expect(videoPlayer.currentTime).toEqual(20);
@@ -198,9 +141,6 @@
         videoProgressSlider.onChange({}, {
           value: 20
         });
-      });
-      it('update the tooltip', function() {
-        expect($.fn.qtip).toHaveBeenCalled();
       });
     });
 
@@ -226,18 +166,6 @@
         expect(window.setTimeout).toHaveBeenCalledWith(jasmine.any(Function), 200);
         window.setTimeout.mostRecentCall.args[0]();
         expect(videoProgressSlider.frozen).toBeFalsy();
-      });
-    });
-
-    describe('updateTooltip', function() {
-      beforeEach(function() {
-        initialize();
-        spyOn($.fn, 'slider').andCallThrough();
-        videoProgressSlider.updateTooltip(90);
-      });
-
-      it('set the tooltip value', function() {
-        expect($.fn.qtip).toHaveBeenCalledWith('option', 'content.text', '1:30');
       });
     });
   });

@@ -30,4 +30,6 @@ urlpatterns = patterns('',  # nopep8
         'instructor.views.api.list_forum_members', name="list_forum_members"),
     url(r'^update_forum_role_membership$',
         'instructor.views.api.update_forum_role_membership', name="update_forum_role_membership"),
+    url(r'^proxy_legacy_analytics$',
+        'instructor.views.api.proxy_legacy_analytics', name="proxy_legacy_analytics"),
 )

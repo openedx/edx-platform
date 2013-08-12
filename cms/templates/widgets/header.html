@@ -13,7 +13,7 @@
       <h2 class="info-course">
         <span class="sr">${_("Current Course:")}</span>
         <a class="course-link" href="${reverse('course_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">
-          <span class="course-org">${ctx_loc.org}</span><span class="course-number">${ctx_loc.course}</span>
+          <span class="course-org">${context_course.display_org_with_default | h}</span><span class="course-number">${context_course.display_number_with_default | h}</span>
           <span class="course-title" title="${context_course.display_name_with_default}">${context_course.display_name_with_default}</span>
         </a>
       </h2>

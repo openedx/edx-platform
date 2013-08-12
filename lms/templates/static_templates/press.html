@@ -18,7 +18,9 @@
     % for article in articles:
       <article class="press-story">
         <div class="article-cover">
-          <a href="${article.url}" target="_blank"/>${"<img src='%s' />" % static.url('images/press/' + article.image)}</a>
+          <a href="${article.url}" target="_blank"/>
+            <img src="${static.url('images/press/' + article.image)}" />
+          </a>
         </div>
         <div class="press-info">
           <header>

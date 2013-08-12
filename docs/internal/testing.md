@@ -196,7 +196,11 @@ To run all the acceptance tests:
 
 To test only a specific feature:
 
-    rake test_acceptance_lms[lms/djangoapps/courseware/features/problems.feature]
+    rake test_acceptance_lms["lms/djangoapps/courseware/features/problems.feature"]
+
+To test only a specific scenario
+
+    rake test_acceptance_lms["lms/djangoapps/courseware/features/problems.feature -s 3"]
 
 To start the debugger on failure, add the `--pdb` option:
 

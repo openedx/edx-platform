@@ -55,7 +55,7 @@ def i_am_registered_for_the_course(step, course):
     # TODO: change to factory
     CourseEnrollment.objects.get_or_create(user=u, course_id=course_id(course))
 
-    world.log_in('robot', 'test')
+    world.log_in(username='robot', password='test')
 
 
 @step(u'The course "([^"]*)" has extra tab "([^"]*)"$')

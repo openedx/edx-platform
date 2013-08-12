@@ -28,6 +28,8 @@ from django.utils.http import cookie_date
 from django.utils.http import base36_to_int
 from django.utils.translation import ugettext as _
 
+from ratelimitbackend.exceptions import RateLimitException
+
 from mitxmako.shortcuts import render_to_response, render_to_string
 from bs4 import BeautifulSoup
 
@@ -376,7 +378,7 @@ def change_enrollment(request):
                                "run:{0}".format(run)])
 
         try:
-            enrollment, _created = CourseEnrollment.objects.get_or_create(user=user, course_id=course.id)
+            enroll_in_course(user, course.id)
         except IntegrityError:
             # If we've already created this enrollment in a separate transaction,
             # then just continue
@@ -401,6 +403,23 @@ def change_enrollment(request):
         return HttpResponseBadRequest(_("Enrollment action is invalid"))
 
 
+def enroll_in_course(user, course_id):
+    """
+    Helper method to enroll a user in a particular class.
+
+    It is expected that this method is called from a method which has already
+    verified the user authentication and access.
+    """
+    CourseEnrollment.objects.get_or_create(user=user, course_id=course_id)
+
+
+def is_enrolled_in_course(user, course_id):
+    """
+    Helper method that returns whether or not the user is enrolled in a particular course.
+    """
+    return CourseEnrollment.objects.filter(user=user, course_id=course_id).count() > 0
+
+
 @ensure_csrf_cookie
 def accounts_login(request, error=""):
 
@@ -421,13 +440,23 @@ def login_user(request, error=""):
         user = User.objects.get(email=email)
     except User.DoesNotExist:
         AUDIT_LOG.warning(u"Login failed - Unknown user email: {0}".format(email))
-        return HttpResponse(json.dumps({'success': False,
-                                        'value': _('Email or password is incorrect.')}))  # TODO: User error message
+        user = None
 
-    username = user.username
-    user = authenticate(username=username, password=password)
+    # if the user doesn't exist, we want to set the username to an invalid
+    # username so that authentication is guaranteed to fail and we can take
+    # advantage of the ratelimited backend
+    username = user.username if user else ""
+    try:
+        user = authenticate(username=username, password=password, request=request)
+    # this occurs when there are too many attempts from the same IP address
+    except RateLimitException:
+        return HttpResponse(json.dumps({'success': False,
+                                        'value': _('Too many failed login attempts. Try again later.')}))
     if user is None:
-        AUDIT_LOG.warning(u"Login failed - password for {0} is invalid".format(email))
+        # if we didn't find this username earlier, the account for this email
+        # doesn't exist, and doesn't have a corresponding password
+        if username != "":
+            AUDIT_LOG.warning(u"Login failed - password for {0} is invalid".format(email))
         return HttpResponse(json.dumps({'success': False,
                                         'value': _('Email or password is incorrect.')}))
 
@@ -674,7 +703,7 @@ def create_account(request, post_override=None):
     message = render_to_string('emails/activation_email.txt', d)
 
     # dont send email if we are doing load testing or random user generation for some reason
-    if not (settings.MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_LOAD_TESTING')):
+    if not (settings.MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING')):
         try:
             if settings.MITX_FEATURES.get('REROUTE_ACTIVATION_EMAIL'):
                 dest_addr = settings.MITX_FEATURES['REROUTE_ACTIVATION_EMAIL']
@@ -913,41 +942,46 @@ def auto_auth(request):
     """
     Automatically logs the user in with a generated random credentials
     This view is only accessible when
-    settings.MITX_SETTINGS['AUTOMATIC_AUTH_FOR_LOAD_TESTING'] is true.
+    settings.MITX_SETTINGS['AUTOMATIC_AUTH_FOR_TESTING'] is true.
     """
 
-    def get_dummy_post_data(username, password):
+    def get_dummy_post_data(username, password, email, name):
         """
         Return a dictionary suitable for passing to post_vars of _do_create_account or post_override
-        of create_account, with specified username and password.
+        of create_account, with specified values.
         """
-
         return {'username': username,
-                'email': username + "_dummy_test@mitx.mit.edu",
+                'email': email,
                 'password': password,
-                'name': username + " " + username,
+                'name': name,
                 'honor_code': u'true',
                 'terms_of_service': u'true', }
 
-    # generate random user ceredentials from a small name space (determined by settings)
+    # generate random user credentials from a small name space (determined by settings)
     name_base = 'USER_'
     pass_base = 'PASS_'
 
     max_users = settings.MITX_FEATURES.get('MAX_AUTO_AUTH_USERS', 200)
     number = random.randint(1, max_users)
 
-    username = name_base + str(number)
-    password = pass_base + str(number)
+    # Get the params from the request to override default user attributes if specified
+    qdict = request.GET
+
+    # Use the params from the request, otherwise use these defaults
+    username = qdict.get('username', name_base + str(number))
+    password = qdict.get('password', pass_base + str(number))
+    email = qdict.get('email', '%s_dummy_test@mitx.mit.edu' % username)
+    name = qdict.get('name', '%s Test' % username)
 
     # if they already are a user, log in
     try:
         user = User.objects.get(username=username)
-        user = authenticate(username=username, password=password)
+        user = authenticate(username=username, password=password, request=request)
         login(request, user)
 
     # else create and activate account info
     except ObjectDoesNotExist:
-        post_override = get_dummy_post_data(username, password)
+        post_override = get_dummy_post_data(username, password, email, name)
         create_account(request, post_override=post_override)
         request.user.is_active = True
         request.user.save()

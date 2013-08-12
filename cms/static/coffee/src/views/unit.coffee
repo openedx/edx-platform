@@ -120,6 +120,7 @@ class CMS.Views.UnitEdit extends Backbone.View
     @model.save()
 
   deleteComponent: (event) =>
+    event.preventDefault()
     msg = new CMS.Views.Prompt.Warning(
       title: gettext('Delete this component?'),
       message: gettext('Deleting this component is permanent and cannot be undone.'),

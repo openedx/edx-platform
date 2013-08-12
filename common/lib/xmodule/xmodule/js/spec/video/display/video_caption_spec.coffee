@@ -19,7 +19,7 @@ describe 'VideoCaption', ->
         @caption = @player.caption
 
       it 'set the youtube id', ->
-        expect(@caption.youtubeId).toEqual 'normalSpeedYoutubeId'
+        expect(@caption.youtubeId).toEqual 'cogebirgzzM'
 
       it 'create the caption element', ->
         expect($('.video')).toContain 'ol.subtitles'

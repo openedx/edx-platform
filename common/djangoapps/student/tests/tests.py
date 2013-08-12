@@ -23,6 +23,7 @@ from textwrap import dedent
 
 from student.models import unique_id_for_user
 from student.views import process_survey_link, _cert_info, password_reset, password_reset_confirm_wrapper
+from student.views import enroll_in_course, is_enrolled_in_course
 from student.tests.factories import UserFactory
 from student.tests.test_email import mock_render_to_string
 COURSE_1 = 'edX/toy/2012_Fall'
@@ -205,3 +206,15 @@ class CourseEndingTest(TestCase):
                           'show_survey_button': False,
                           'grade': '67'
                           })
+
+
+class EnrollInCourseTest(TestCase):
+    """ Tests the helper method for enrolling a user in a class """
+
+    def test_enroll_in_course(self):
+        user = User.objects.create_user("joe", "joe@joe.com", "password")
+        user.save()
+        course_id = "course_id"
+        self.assertFalse(is_enrolled_in_course(user, course_id))
+        enroll_in_course(user, course_id)
+        self.assertTrue(is_enrolled_in_course(user, course_id))
