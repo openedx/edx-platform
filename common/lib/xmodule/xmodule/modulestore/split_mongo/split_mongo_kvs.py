@@ -46,12 +46,14 @@ class SplitMongoKVS(KeyValueStore):
         if key.scope == Scope.parent:
             return None
         if key.scope == Scope.children:
+            # didn't find children in _fields; so, see if there's a default
             raise KeyError()
         elif key.scope == Scope.settings:
-            # get from inheritance since not locally set
+            # didn't find in _fields; so, get from inheritance since not locally set
             if key.field_name in self._inherited_settings:
                 return self._inherited_settings[key.field_name]
             else:
+                # or get default
                 raise KeyError()
         elif key.scope == Scope.content:
             if key.field_name == 'location':
@@ -76,7 +78,7 @@ class SplitMongoKVS(KeyValueStore):
                 self._location = value  # is changing this legal?
                 return
             elif key.field_name == 'category':
-                # TODO should this raise an exception? that is, should xblock types be mungable?
+                # TODO should this raise an exception? category is not changeable.
                 return
             else:
                 self._load_definition()
@@ -99,7 +101,7 @@ class SplitMongoKVS(KeyValueStore):
             if key.field_name == 'location':
                 return  # noop
             elif key.field_name == 'category':
-                # TODO should this raise an exception? that is, should xblock types be mungable?
+                # TODO should this raise an exception? category is not deleteable.
                 return  # noop
             else:
                 self._load_definition()
@@ -159,7 +161,7 @@ class SplitMongoKVS(KeyValueStore):
 
     def get_inherited_settings(self):
         """
-        Get the metadata set by the ancestors (which own metadata may override or not)
+        Get the settings set by the ancestors (which locally set fields may override or not)
         """
         return self._inherited_settings
 
