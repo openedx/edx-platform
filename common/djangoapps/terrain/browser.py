@@ -50,13 +50,15 @@ try:
 except ImportError:
     import simplejson as json
 
-config = {"username": "<USERNAME>",
-"access-key": "<ACCESS_ID>"}
-desired_capabilities =  DesiredCapabilities.CHROME
-desired_capabilities['platform'] = "Linux"
-desired_capabilities['version'] = ""
-desired_capabilities['name'] = "CMS Lettuce Test"
-desired_capabilities['build'] = "Branch Test"
+config = {"username": settings.MITX_FEATURES.get('SAUCE_USERNAME'),
+"access-key": settings.MITX_FEATURES.get('SAUCE_ACCESS_ID')}
+
+desired_capabilities =  settings.MITX_FEATURES.get('SAUCE_BROWSER', DesiredCapabilities.CHROME)
+desired_capabilities['platform'] = settings.MITX_FEATURES.get('SAUCE_PLATFORM', 'Linux')
+desired_capabilities['version'] = settings.MITX_FEATURES.get('SAUCE_VERSION', '')
+desired_capabilities['name'] = "Lettuce Test"
+desired_capabilities['build'] = settings.MITX_FEATURES.get('SAUCE_BUILD', 'edX Plaform')
+desired_capabilities['tags'] = settings.MITX_FEATURES.get('SAUCE_TAGS', '')
 desired_capabilities['video-upload-on-pass'] = False
 desired_capabilities['sauce-advisor'] = False
 desired_capabilities['record-screenshots'] = False

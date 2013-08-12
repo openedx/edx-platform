@@ -8,6 +8,7 @@ so that we can run the lettuce acceptance tests.
 # pylint: disable=W0401, W0614
 
 from .test import *
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 # You need to start the server in debug mode,
 # otherwise the browser will not render the pages correctly
@@ -82,6 +83,14 @@ MITX_FEATURES['AUTOMATIC_AUTH_FOR_TESTING'] = True
 USE_I18N = True
 
 MITX_FEATURES['USE_SAUCE'] = False
+MITX_FEATURES['SAUCE_USERNAME'] = '<USERNAME>'
+MITX_FEATURES['SAUCE_ACCESS_ID'] = '<ACCESS_ID>'
+MITX_FEATURES['SAUCE_BROWSER'] = DesiredCapabilities.CHROME
+MITX_FEATURES['SAUCE_PLATFORM'] = 'Linux'
+MITX_FEATURES['SAUCE_VERSION'] = ''
+MITX_FEATURES['SAUCE_BUILD'] = 'Feature Test'
+MITX_FEATURES['SAUCE_TAGS'] = ''
+
 
 # Include the lettuce app for acceptance testing, including the 'harvest' django-admin command
 INSTALLED_APPS += ('lettuce.django',)
