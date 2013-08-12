@@ -20,8 +20,6 @@ from lms import one_time_startup        # pylint: disable=W0611
 from cms import one_time_startup        # pylint: disable=W0611
 from pymongo import MongoClient
 import xmodule.modulestore.django
-import datetime
-from pytz import UTC
 from xmodule.contentstore.django import _CONTENTSTORE
 
 # There is an import issue when using django-staticfiles with lettuce
@@ -58,8 +56,7 @@ desired_capabilities =  DesiredCapabilities.CHROME
 desired_capabilities['platform'] = "Linux"
 desired_capabilities['version'] = ""
 desired_capabilities['name'] = "CMS Lettuce Test"
-desired_capabilities['build'] = datetime.datetime.now(UTC).isoformat(' ')
-desired_capabilities['passed'] = True
+desired_capabilities['build'] = "Branch Test"
 desired_capabilities['video-upload-on-pass'] = False
 desired_capabilities['sauce-advisor'] = False
 desired_capabilities['record-screenshots'] = False
