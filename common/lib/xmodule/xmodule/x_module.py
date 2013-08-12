@@ -7,7 +7,7 @@ from lxml import etree
 from collections import namedtuple
 from pkg_resources import resource_listdir, resource_string, resource_isdir
 
-from xmodule.modulestore import inheritance, Location
+from xmodule.modulestore import Location
 from xmodule.modulestore.exceptions import ItemNotFoundError, InsufficientSpecificationError, InvalidLocationError
 
 from xblock.core import XBlock, Scope, String, Integer, Float, List, ModelType
@@ -556,62 +556,6 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         children that the module will return for any student.
         """
         return False
-
-    # ================================= JSON PARSING ===========================
-    @staticmethod
-    def load_from_json(json_data, system, default_class=None, parent_xblock=None):
-        """
-        This method instantiates the correct subclass of XModuleDescriptor based
-        on the contents of json_data. It does not persist it and can create one which
-        has no usage id.
-
-        parent_xblock is used to compute inherited metadata as well as to append the new xblock.
-
-        json_data:
-        - 'location' : must have this field
-        - 'category': the xmodule category (required or location must be a Location)
-        - 'metadata': a dict of locally set metadata (not inherited)
-        - 'children': a list of children's usage_ids w/in this course
-        - 'definition':
-        - '_id' (optional): the usage_id of this. Will generate one if not given one.
-        """
-        class_ = XModuleDescriptor.load_class(
-            json_data.get('category', json_data.get('location', {}).get('category')),
-            default_class
-        )
-        return class_.from_json(json_data, system, parent_xblock)
-
-    @classmethod
-    def from_json(cls, json_data, system, parent_xblock=None):
-        """
-        Creates an instance of this descriptor from the supplied json_data.
-        This may be overridden by subclasses
-
-        json_data:
-        - 'category': the xmodule category (required)
-        - 'fields': a dict of locally set fields (not inherited)
-        - 'definition': (optional) the db id for the definition record (not the definition content) or a
-        definitionLazyLoader
-        - '_id' (optional): the usage_id of this. Will generate one if not given one.
-        """
-        usage_id = json_data.get('_id', None)
-        if not '_inherited_settings' in json_data and parent_xblock is not None:
-            json_data['_inherited_settings'] = parent_xblock.xblock_kvs.get_inherited_settings().copy()
-            json_fields = json_data.get('fields', {})
-            for field in inheritance.INHERITABLE_METADATA:
-                if field in json_fields:
-                    json_data['_inherited_settings'][field] = json_fields[field]
-
-        new_block = system.xblock_from_json(cls, usage_id, json_data)
-        if parent_xblock is not None:
-            children = parent_xblock.children
-            children.append(new_block)
-            # trigger setter method by using top level field access
-            parent_xblock.children = children
-            # decache pending children field settings (Note, truly persisting at this point would break b/c
-            # persistence assumes children is a list of ids not actual xblocks)
-            parent_xblock.save()
-        return new_block
 
     @classmethod
     def _translate(cls, key):

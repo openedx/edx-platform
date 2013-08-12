@@ -1,19 +1,15 @@
-'''
-Created on May 7, 2013
-
-@author: dmitchell
-'''
 import unittest
 from xmodule import templates
 from xmodule.modulestore.tests import persistent_factories
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule.seq_module import SequenceDescriptor
-from xmodule.x_module import XModuleDescriptor
 from xmodule.capa_module import CapaDescriptor
 from xmodule.modulestore.locator import CourseLocator, BlockUsageLocator
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.html_module import HtmlDescriptor
+from xmodule.modulestore import inheritance
+from xmodule.x_module import XModuleDescriptor
 
 
 class TemplateTests(unittest.TestCase):
@@ -74,7 +70,7 @@ class TemplateTests(unittest.TestCase):
         test_course = persistent_factories.PersistentCourseFactory.create(org='testx', prettyid='tempcourse',
             display_name='fun test course', user_id='testbot')
 
-        test_chapter = XModuleDescriptor.load_from_json({'category': 'chapter',
+        test_chapter = self.load_from_json({'category': 'chapter',
             'fields': {'display_name': 'chapter n'}},
             test_course.system, parent_xblock=test_course)
         self.assertIsInstance(test_chapter, SequenceDescriptor)
@@ -83,7 +79,7 @@ class TemplateTests(unittest.TestCase):
 
         # test w/ a definition (e.g., a problem)
         test_def_content = '<problem>boo</problem>'
-        test_problem = XModuleDescriptor.load_from_json({'category': 'problem',
+        test_problem = self.load_from_json({'category': 'problem',
             'fields': {'data': test_def_content}},
             test_course.system, parent_xblock=test_chapter)
         self.assertIsInstance(test_problem, CapaDescriptor)
@@ -98,12 +94,12 @@ class TemplateTests(unittest.TestCase):
         """
         test_course = persistent_factories.PersistentCourseFactory.create(org='testx', prettyid='tempcourse',
             display_name='fun test course', user_id='testbot')
-        test_chapter = XModuleDescriptor.load_from_json({'category': 'chapter',
+        test_chapter = self.load_from_json({'category': 'chapter',
             'fields': {'display_name': 'chapter n'}},
             test_course.system, parent_xblock=test_course)
         test_def_content = '<problem>boo</problem>'
         # create child
-        _ = XModuleDescriptor.load_from_json({'category': 'problem',
+        _ = self.load_from_json({'category': 'problem',
             'fields': {'data': test_def_content}},
             test_course.system, parent_xblock=test_chapter)
         # better to pass in persisted parent over the subdag so
@@ -194,3 +190,48 @@ class TemplateTests(unittest.TestCase):
 
         version_history = modulestore('split').get_block_generations(second_problem.location)
         self.assertNotEqual(version_history.locator.version_guid, first_problem.location.version_guid)
+
+    # ================================= JSON PARSING ===========================
+    # These are example methods for creating xmodules in memory w/o persisting them.
+    # They were in x_module but since xblock is not planning to support them but will
+    # allow apps to use this type of thing, I put it here.
+    @staticmethod
+    def load_from_json(json_data, system, default_class=None, parent_xblock=None):
+        """
+        This method instantiates the correct subclass of XModuleDescriptor based
+        on the contents of json_data. It does not persist it and can create one which
+        has no usage id.
+
+        parent_xblock is used to compute inherited metadata as well as to append the new xblock.
+
+        json_data:
+        - 'location' : must have this field
+        - 'category': the xmodule category (required or location must be a Location)
+        - 'metadata': a dict of locally set metadata (not inherited)
+        - 'children': a list of children's usage_ids w/in this course
+        - 'definition':
+        - '_id' (optional): the usage_id of this. Will generate one if not given one.
+        """
+        class_ = XModuleDescriptor.load_class(
+            json_data.get('category', json_data.get('location', {}).get('category')),
+            default_class
+        )
+        usage_id = json_data.get('_id', None)
+        if not '_inherited_settings' in json_data and parent_xblock is not None:
+            json_data['_inherited_settings'] = parent_xblock.xblock_kvs.get_inherited_settings().copy()
+            json_fields = json_data.get('fields', {})
+            for field in inheritance.INHERITABLE_METADATA:
+                if field in json_fields:
+                    json_data['_inherited_settings'][field] = json_fields[field]
+
+        new_block = system.xblock_from_json(class_, usage_id, json_data)
+        if parent_xblock is not None:
+            children = parent_xblock.children
+            children.append(new_block)
+            # trigger setter method by using top level field access
+            parent_xblock.children = children
+            # decache pending children field settings (Note, truly persisting at this point would break b/c
+            # persistence assumes children is a list of ids not actual xblocks)
+            parent_xblock.save()
+        return new_block
+
