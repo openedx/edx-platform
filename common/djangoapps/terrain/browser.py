@@ -50,10 +50,12 @@ try:
 except ImportError:
     import simplejson as json
 
-config = {"username": settings.MITX_FEATURES.get('SAUCE_USERNAME'),
-"access-key": settings.MITX_FEATURES.get('SAUCE_ACCESS_ID')}
 
 SAUCE = settings.MITX_FEATURES.get('SAUCE', {})
+
+config = {"username": SAUCE.get('USERNAME'),
+"access-key": SAUCE.get('ACCESS_ID')}
+
 desired_capabilities =  SAUCE.get('BROWSER', DesiredCapabilities.CHROME)
 desired_capabilities['platform'] = SAUCE.get('PLATFORM', 'Linux')
 desired_capabilities['version'] = SAUCE.get('VERSION', '')

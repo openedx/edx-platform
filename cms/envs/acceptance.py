@@ -81,6 +81,7 @@ MITX_FEATURES['AUTOMATIC_AUTH_FOR_TESTING'] = True
 # We do not yet understand why this occurs. Setting this to true is a stopgap measure
 USE_I18N = True
 
+# Information needed to utilize Sauce Labs.
 MITX_FEATURES['SAUCE'] = {
     'USE' : False,
     'USERNAME' : '<USERNAME>',
