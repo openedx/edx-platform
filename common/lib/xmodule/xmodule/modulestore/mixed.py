@@ -129,7 +129,7 @@ class MixedModuleStore(ModuleStoreBase):
 
     def get_modulestore_type(self, course_id):
         """
-        Returns a type which identifies which modulestore is servicing the given 
+        Returns a type which identifies which modulestore is servicing the given
         course_id. The return can be either "xml" (for XML based courses) or "mongo" for MongoDB backed courses
         """
         return self._get_modulestore_for_courseid(course_id).get_modulestore_type(course_id)
@@ -142,3 +142,4 @@ class MixedModuleStore(ModuleStoreBase):
         errs = {}
         for store in self.modulestores.values():
             errs.update(store.get_errored_courses())
+        return errs
