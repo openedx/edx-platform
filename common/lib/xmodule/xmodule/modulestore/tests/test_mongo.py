@@ -1,18 +1,18 @@
-import pymongo
+from pprint import pprint
 
 from nose.tools import assert_equals, assert_raises, assert_not_equals, assert_false
-from pprint import pprint
+import pymongo
+from uuid import uuid4
 
 from xblock.core import Scope
 from xblock.runtime import KeyValueStore, InvalidScopeError
 
+from xmodule.tests import DATA_DIR
 from xmodule.modulestore import Location
 from xmodule.modulestore.mongo import MongoModuleStore, MongoKeyValueStore
 from xmodule.modulestore.xml_importer import import_from_xml
 
-from .test_modulestore import check_path_to_location
-from . import DATA_DIR
-from uuid import uuid4
+from xmodule.modulestore.tests.test_modulestore import check_path_to_location
 
 
 HOST = 'localhost'
