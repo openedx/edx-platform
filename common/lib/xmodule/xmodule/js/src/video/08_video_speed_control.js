@@ -58,65 +58,115 @@ function () {
                 );
         });
 
-        state.videoSpeedControl.videoSpeedsEl.find('a:first').addClass('first_speed_el');
-
         state.videoSpeedControl.setSpeed(state.speed);
     }
 
-    // function _bindHandlers(state)
-    //
-    //     Bind any necessary function callbacks to DOM events (click,
-    //     mousemove, etc.).
+    /**
+     * @desc Bind any necessary function callbacks to DOM events (click,
+     *     mousemove, etc.).
+     *
+     * @type {function}
+     * @access private
+     *
+     * @param {object} state The object containg the state of the video player.
+     *     All other modules, their parameters, public variables, etc. are
+     *     available via this object.
+     *
+     * @this {object} The global window object.
+     *
+     * @returns {undefined}
+     */
     function _bindHandlers(state) {
         state.videoSpeedControl.videoSpeedsEl.find('a')
             .on('click', state.videoSpeedControl.changeVideoSpeed);
 
         if (onTouchBasedDevice()) {
             state.videoSpeedControl.el.on('click', function(event) {
+                // So that you can't highlight this control via a drag
+                // operation, we disable the default browser actions on a
+                // click event.
                 event.preventDefault();
-                $(this).toggleClass('open');
+
+                state.videoSpeedControl.el.toggleClass('open');
             });
         } else {
             state.videoSpeedControl.el
                 .on('mouseenter', function () {
-                    $(this).addClass('open');
+                    state.videoSpeedControl.el.addClass('open');
                 })
                 .on('mouseleave', function () {
-                    $(this).removeClass('open');
+                    state.videoSpeedControl.el.removeClass('open');
                 })
                 .on('click', function (event) {
+                    // So that you can't highlight this control via a drag
+                    // operation, we disable the default browser actions on a
+                    // click event.
                     event.preventDefault();
-                    $(this).removeClass('open');
+
+                    state.videoSpeedControl.el.removeClass('open');
                 });
 
+            // ******************************
+            // Attach 'focus', and 'blur' events to the speed button which
+            // either brings up the speed dialog with individual speed entries,
+            // or closes it.
             state.videoSpeedControl.el.children('a')
                 .on('focus', function () {
+                    // If the focus is comming from the first speed entry, this
+                    // means we are tabbing backwards. In this case we have to
+                    // hide the speed entries which will allow us to change the
+                    // focus further backwards.
                     if (state.firstSpeedBlur === true) {
-                        $(this).parent().removeClass('open');
+                        state.videoSpeedControl.el.removeClass('open');
 
                         state.firstSpeedBlur = false;
-                    } else {
-                        $(this).parent().addClass('open');
+                    }
+
+                    // If the focus is comming from some other element, show
+                    // the drop down with the speed entries.
+                    else {
+                        state.videoSpeedControl.el.addClass('open');
                     }
                 })
                 .on('blur', function () {
+                    // When the focus leaves this element, if the speed entries
+                    // dialog is shown (tabbing forwards), then we will set
+                    // focus to the first speed entry.
+                    //
+                    // If the selector does not select anything, then this
+                    // means that the speed entries dialog is closed, and we
+                    // are tabbing backwads. The browser will select the
+                    // previous element to tab to by itself.
                     state.videoSpeedControl.videoSpeedsEl
                         .find('a.speed_link:first')
                         .focus();
                 });
 
+
+            // ******************************
+            // Attach 'focus', and 'blur' events to elements which represent
+            // individual speed entries.
             state.videoSpeedControl.videoSpeedsEl.find('a.speed_link:last')
                 .on('blur', function () {
+                    // If we have reached the last speed enrty, and the focus
+                    // changes to the next element, we need to hide the speeds
+                    // control drop-down.
                     state.videoSpeedControl.el.removeClass('open');
                 });
-
             state.videoSpeedControl.videoSpeedsEl.find('a.speed_link:first')
                 .on('blur', function () {
+                    // This flag will indicate that the focus to the next
+                    // element that will receive it is comming from the first
+                    // speed entry.
+                    //
+                    // This flag will be used to correctly handle scenario of
+                    // tabbing backwards.
                     state.firstSpeedBlur = true;
                 });
-
             state.videoSpeedControl.videoSpeedsEl.find('a.speed_link')
                 .on('focus', function () {
+                    // Clear the flag which is only set when we are un-focusing
+                    // (the blur event) from the first speed entry.
                     state.firstSpeedBlur = false;
                 });
         }
@@ -180,10 +230,8 @@ function () {
             _this.videoSpeedControl.videoSpeedsEl.prepend(listItem);
         });
 
-        this.videoSpeedControl.videoSpeedsEl
-            .find('a:first')
-            .addClass('first_speed_el');
-
+        // Re-attach all events with their appropriate callbacks to the
+        // newly generated elements.
         _bindHandlers(this);
     }
 

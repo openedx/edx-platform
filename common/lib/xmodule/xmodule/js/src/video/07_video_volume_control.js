@@ -67,36 +67,68 @@ function () {
         state.videoVolumeControl.el.toggleClass('muted', state.videoVolumeControl.currentVolume === 0);
     }
 
-    // function _bindHandlers(state)
-    //
-    //     Bind any necessary function callbacks to DOM events (click, mousemove, etc.).
+    /**
+     * @desc Bind any necessary function callbacks to DOM events (click,
+     *     mousemove, etc.).
+     *
+     * @type {function}
+     * @access private
+     *
+     * @param {object} state The object containg the state of the video player.
+     *     All other modules, their parameters, public variables, etc. are
+     *     available via this object.
+     *
+     * @this {object} The global window object.
+     *
+     * @returns {undefined}
+     */
     function _bindHandlers(state) {
-        state.videoVolumeControl.buttonEl.on('click', state.videoVolumeControl.toggleMute);
+        state.videoVolumeControl.buttonEl
+            .on('click', state.videoVolumeControl.toggleMute);
 
         state.videoVolumeControl.el.on('mouseenter', function() {
-            $(this).addClass('open');
+            state.videoVolumeControl.el.addClass('open');
         });
 
         state.videoVolumeControl.el.on('mouseleave', function() {
-            $(this).removeClass('open');
+            state.videoVolumeControl.el.removeClass('open');
         });
 
+        // Attach a focus event to the volume button.
         state.videoVolumeControl.buttonEl.on('blur', function() {
-            if (state.volumeBlur !== true) {
+            // If the focus is being trasnfered from the volume slider, then we
+            // don't do anything except for unsetting the special flag.
+            if (state.volumeBlur === true) {
+                state.volumeBlur = false;
+            }
+
+            //If the focus is comming from elsewhere, then we must show the
+            // volume slider and set focus to it.
+            else {
                 state.videoVolumeControl.el.addClass('open');
                 state.videoVolumeControl.volumeSliderEl.find('a').focus();
-            } else {
-                state.volumeBlur = false;
             }
         });
 
-        state.videoVolumeControl.volumeSliderEl.find('a').on('blur', function () {
-            state.videoVolumeControl.el.removeClass('open');
+        // Attach a blur event handler (loss of focus) to the volume slider
+        // element. More specifically, we are attaching to the handle on
+        // the slider with which you can change the volume.
+        state.videoVolumeControl.volumeSliderEl.find('a')
+            .on('blur', function () {
+                // Hide the volume slider. This is done so that we can
+                // contrinue to the next (or previous) element by tabbing.
+                // Otherwise, after next tab we would come back to the volume
+                // slider because it is the next element sisible element that
+                // we can tab to after the volume button.
+                state.videoVolumeControl.el.removeClass('open');
 
-            state.videoVolumeControl.buttonEl.focus();
+                // Set focus to the volume button.
+                state.videoVolumeControl.buttonEl.focus();
 
-            state.volumeBlur = true;
-        });
+                // We store the fact that previous element that lost focus was
+                // the volume clontrol.
+                state.volumeBlur = true;
+            });
     }
 
     // ***************************************************************
