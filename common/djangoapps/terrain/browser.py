@@ -57,7 +57,7 @@ desired_capabilities =  settings.MITX_FEATURES.get('SAUCE_BROWSER', DesiredCapab
 desired_capabilities['platform'] = settings.MITX_FEATURES.get('SAUCE_PLATFORM', 'Linux')
 desired_capabilities['version'] = settings.MITX_FEATURES.get('SAUCE_VERSION', '')
 desired_capabilities['device-type'] = settings.MITX_FEATURES.get('SAUCE_DEVICE', '')
-desired_capabilities['name'] = "Lettuce Test"
+desired_capabilities['name'] = settings.MITX_FEATURES.get('SAUCE_SESSION', 'Lettuce Tests')
 desired_capabilities['build'] = settings.MITX_FEATURES.get('SAUCE_BUILD', 'edX Plaform')
 desired_capabilities['tags'] = settings.MITX_FEATURES.get('SAUCE_TAGS', '')
 desired_capabilities['video-upload-on-pass'] = False
@@ -178,8 +178,5 @@ def teardown_browser(total):
     Quit the browser after executing the tests.
     """
     if settings.MITX_FEATURES.get('USE_SAUCE'):
-        if total.scenarios_ran != total.scenarios_passed:
-            set_job_status(jobid, False)
-        else:
-            set_job_status(jobid, True)
+            set_job_status(jobid, total.scenarios_ran == total.scenarios_passed)
     world.browser.quit()
