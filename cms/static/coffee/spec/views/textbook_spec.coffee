@@ -301,7 +301,7 @@ describe "CMS.Views.EditChapter", ->
         @view.render().$(".action-upload").click()
         ctorOptions = uploadSpies.constructor.mostRecentCall.args[0]
         expect(ctorOptions.model.get('title')).toMatch(/abcde/)
-        expect(ctorOptions.chapter).toBe(@model)
+        expect(typeof ctorOptions.onSuccess).toBe('function')
         expect(uploadSpies.show).toHaveBeenCalled()
 
     it "saves content when opening upload dialog", ->
@@ -323,7 +323,15 @@ describe "CMS.Views.UploadDialog", ->
 
         @model = new CMS.Models.FileUpload()
         @chapter = new CMS.Models.Chapter()
-        @view = new CMS.Views.UploadDialog({model: @model, chapter: @chapter})
+        @view = new CMS.Views.UploadDialog(
+          model: @model
+          onSuccess: (response) =>
+            options = {}
+            if !@chapter.get('name')
+              options.name = response.displayname
+            options.asset_path = response.url
+            @chapter.set(options)
+        )
         spyOn(@view, 'remove').andCallThrough()
 
         # create mock file input, so that we aren't subject to browser restrictions
