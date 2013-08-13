@@ -226,6 +226,8 @@ Studio: Add feedback to end user if there is a problem exporting a course
 
 Studio: Improve link re-writing on imports into a different course-id
 
+Studio: Allow for intracourse linking in Capa Problems
+
 Blades: Videoalpha.
 
 XModules: Added partial credit for foldit module.
