@@ -63,7 +63,7 @@
             );
 
             spyOn(messenger, 'initialize');
-            spyOn(messenger, 'render');
+            spyOn(messenger, 'render').andReturn(messenger);
             spyOn(messenger, 'showError');
             spyOn(messenger, 'hideError');
             spyOn(utils, 'command').andCallThrough();

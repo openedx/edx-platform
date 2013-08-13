@@ -30,7 +30,8 @@
             this.fileUploader = new Transcripts.FileUploader({
                 el: this.$el,
                 messenger: this,
-                component_id: this.component_id
+                component_id: this.component_id,
+                videoListObject: this.options.parent
             });
         },
 
@@ -56,8 +57,6 @@
                     }
                 ),
                 html5List = (params) ? params.html5_local : [],
-                isYoutubeMode = params && params.is_youtube_mode,
-                // isYoutubeMode = false,
                 template;
 
             if (!tplHtml) {
@@ -74,7 +73,6 @@
                     component_id: encodeURIComponent(this.component_id),
                     html5_list: html5List,
                     grouped_list: groupedList,
-                    isYoutubeMode: isYoutubeMode,
                     subs_id: (params) ? params.subs: ''
                 }));
 

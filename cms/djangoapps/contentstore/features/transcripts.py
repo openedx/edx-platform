@@ -52,6 +52,9 @@ def clear_fields(_step):
 def clear_field(_step, index):
     index = int(index) - 1
     world.css_fill(SELECTORS['url_inputs'], '', index)
+    # In some reason chromeDriver doesn't trigger 'input' event after filling
+    # field by an empty value. That's why we trigger it manually via jQuery.
+    world.browser.execute_script("$('{0}').eq({1}).trigger('input')".format(SELECTORS['url_inputs'], index))
 
 
 @step('I expect (.+) inputs are disabled$')
@@ -126,7 +129,7 @@ def click_button(_step, button_type):
 
 
 @step('I click (.*)button number (\d+)$')
-def click_button(_step, button_type, index):
+def click_button_index(_step, button_type, index):
     world.wait(DELAY)
     button = button_type.strip()
     index = int(index.strip()) - 1
@@ -134,6 +137,14 @@ def click_button(_step, button_type, index):
         world.css_click(BUTTONS[button][0], index)
     else:
         assert False  # not implemented
+
+
+@step('I run ipdb')
+def run_ipdb(_step):
+    """Run ipdb as step for easy debugging"""
+    import ipdb
+    ipdb.set_trace()
+    assert True
 
 
 @step('I remove (.*)transcripts id from store')
@@ -173,10 +184,12 @@ def upload_file(_step, file_name):
     path = os.path.join(TEST_ROOT, 'uploads/', file_name.strip())
     world.browser.execute_script("$('form.file-chooser').show()")
     world.browser.attach_file('file', os.path.abspath(path))
+    world.wait(DELAY)
 
 
 @step('I see "([^"]*)" value in the "([^"]*)" field$')
 def check_transcripts_field(_step, values, field_name):
+    world.wait(DELAY)
     world.click_link_by_text('Advanced')
     field_id = '#' + world.browser.find_by_xpath('//label[text()="%s"]' % field_name.strip())[0]['for']
     values_list = [i.strip() == world.css_value(field_id) for i in values.split('|')]

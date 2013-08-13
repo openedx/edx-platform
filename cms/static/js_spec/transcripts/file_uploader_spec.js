@@ -27,6 +27,10 @@
                     'Transcripts.MessageManager',
                     ['render', 'showError', 'hideError']
                 ),
+                videoListObject = jasmine.createSpyObj(
+                    'CMS.Views.Metadata.VideoList',
+                    ['render', 'getVideoObjectsList']
+                ),
                 $container = $('.transcripts-status');
 
             $container
@@ -38,6 +42,7 @@
             view = new Transcripts.FileUploader({
                 el: $container,
                 messenger: messenger,
+                videoListObject: videoListObject,
                 component_id: 'component_id'
             });
         });
@@ -199,7 +204,7 @@
 
                 expect(view.$progress).toHaveClass('is-invisible');
                 expect(view.options.messenger.render.mostRecentCall.args[0])
-                                            .toBe('uploaded');
+                                            .toEqual('uploaded');
                 expect(Transcripts.Utils.Storage.set)
                                             .toHaveBeenCalledWith('sub', 'test');
             });
@@ -216,7 +221,7 @@
                 expect(Transcripts.Utils.Storage.set)
                                             .not
                                             .toHaveBeenCalledWith('sub', 'test');
-            }
+            };
 
             it('Ajax transport Error', function () {
                 var xhr = {

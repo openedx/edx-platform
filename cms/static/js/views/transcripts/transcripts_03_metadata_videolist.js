@@ -62,6 +62,17 @@
 
             this.$extraVideosBar = this.$el.find('.videolist-extra-videos');
 
+            if (videoList.length === 0) {
+                this.messenger
+                    .render('not_found')
+                    .showError(
+                        'No sources',
+                        true // hide buttons
+                    );
+
+                return void(0);
+            }
+
             // Check current state of Timed Transcripts.
             utils.command('check', component_id, videoList)
                 .done(function (resp) {
@@ -121,7 +132,6 @@
                 }
             ).filter(_.identity);
         },
-
 
         /**
         * @function

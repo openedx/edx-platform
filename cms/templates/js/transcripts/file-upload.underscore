@@ -6,4 +6,5 @@
   <input type="file" class="file-input" name="file"
     accept="<%= _.map(ext, function(val){ return '.' + val; }).join(', ') %>">
   <input type="hidden" name="id" value="<%= component_id %>">
+  <input type="hidden" name="video_list" value='<%= JSON.stringify(video_list) %>'>
 </form>

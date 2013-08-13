@@ -80,7 +80,7 @@ Feature: Video Component Editor
         And I see import button
         And I click import button
         Then I see found status message
-        And I don't see upload_new_timed_transcripts button
+        And I see upload_new_timed_transcripts button
         And I see download_to_edit button
         And I see "t__eq_exist" value in the "HTML5 Timed Transcript" field
 
@@ -168,17 +168,17 @@ Feature: Video Component Editor
         And I enter a http://youtu.be/t__eq_exist source to field number 1
         Then I see not found status message
         And I see import button
-        And I don't see upload_new_timed_transcripts button
+        And I see upload_new_timed_transcripts button
 
         And I enter a t_not_exist.mp4 source to field number 2
         Then I see not found status message
         And I see import button
-        And I don't see upload_new_timed_transcripts button
+        And I see upload_new_timed_transcripts button
 
         And I enter a t_not_exist.webm source to field number 3
         Then I see not found status message
         And I see import button
-        And I don't see upload_new_timed_transcripts button
+        And I see upload_new_timed_transcripts button
 
     #12
     Scenario: Entering youtube (no importing), and 2 html5 sources without transcripts - "Not Found"
@@ -187,15 +187,15 @@ Feature: Video Component Editor
         And I enter a http://youtu.be/t_not_exist source to field number 1
         Then I see not found status message
         And I see disabled_download_to_edit button
-        And I don't see upload_new_timed_transcripts button
+        And I see upload_new_timed_transcripts button
         And I enter a t_not_exist.mp4 source to field number 2
         Then I see not found status message
-        And I don't see upload_new_timed_transcripts button
+        And I see upload_new_timed_transcripts button
         And I see disabled_download_to_edit button
         And I enter a t_not_exist.webm source to field number 3
         Then I see not found status message
         And I see disabled_download_to_edit button
-        And I don't see upload_new_timed_transcripts button
+        And I see upload_new_timed_transcripts button
 
     #13
     Scenario: Entering youtube with imported transcripts, and 2 html5 sources without transcripts - "Found"
@@ -207,17 +207,17 @@ Feature: Video Component Editor
         And I see import button
         And I click import button
         Then I see found status message
-        And I don't see upload_new_timed_transcripts button
+        And I see upload_new_timed_transcripts button
 
         And I enter a t_not_exist.mp4 source to field number 2
         Then I see found status message
         And I see download_to_edit button
-        And I don't see upload_new_timed_transcripts button
+        And I see upload_new_timed_transcripts button
 
         And I enter a t_not_exist.webm source to field number 3
         Then I see found status message
         And I see download_to_edit button
-        And I don't see upload_new_timed_transcripts button
+        And I see upload_new_timed_transcripts button
 
     #14
     Scenario: Entering youtube w/o transcripts - html5 w/o transcripts - html5 with transcripts
@@ -227,17 +227,17 @@ Feature: Video Component Editor
         And I enter a http://youtu.be/t_not_exist source to field number 1
         Then I see not found status message
         And I see disabled_download_to_edit button
-        And I don't see upload_new_timed_transcripts button
+        And I see upload_new_timed_transcripts button
 
         And I enter a t_not_exist.mp4 source to field number 2
         Then I see not found status message
         And I see disabled_download_to_edit button
-        And I don't see upload_new_timed_transcripts button
+        And I see upload_new_timed_transcripts button
 
         And I enter a t_neq_exist.webm source to field number 3
         Then I see found status message
         And I see download_to_edit button
-        And I don't see upload_new_timed_transcripts button
+        And I see upload_new_timed_transcripts button
 
     #15
     Scenario: Entering youtube w/o imported transcripts - html5 w/o transcripts w/o import - html5 with transcripts
@@ -247,17 +247,17 @@ Feature: Video Component Editor
         And I enter a http://youtu.be/t__eq_exist source to field number 1
         Then I see not found status message
         And I see import button
-        And I don't see upload_new_timed_transcripts button
+        And I see upload_new_timed_transcripts button
 
         And I enter a t_not_exist.mp4 source to field number 2
         Then I see not found status message
         And I see import button
-        And I don't see upload_new_timed_transcripts button
+        And I see upload_new_timed_transcripts button
 
         And I enter a t_neq_exist.webm source to field number 3
         Then I see not found status message
         And I see import button
-        And I don't see upload_new_timed_transcripts button
+        And I see upload_new_timed_transcripts button
 
     #16
     Scenario: Entering youtube w/o imported transcripts - html5 with transcripts - html5 w/o transcripts w/o import
@@ -267,17 +267,17 @@ Feature: Video Component Editor
         And I enter a http://youtu.be/t__eq_exist source to field number 1
         Then I see not found status message
         And I see import button
-        And I don't see upload_new_timed_transcripts button
+        And I see upload_new_timed_transcripts button
 
         And I enter a t_neq_exist.mp4 source to field number 2
         Then I see not found status message
         And I see import button
-        And I don't see upload_new_timed_transcripts button
+        And I see upload_new_timed_transcripts button
 
         And I enter a t_not_exist.webm source to field number 3
         Then I see not found status message
         And I see import button
-        And I don't see upload_new_timed_transcripts button
+        And I see upload_new_timed_transcripts button
 
     #17
     Scenario: Entering youtube with imported transcripts - html5 with transcripts - html5 w/o transcripts
@@ -289,17 +289,17 @@ Feature: Video Component Editor
         And I see import button
         And I click import button
         Then I see found status message
-        And I don't see upload_new_timed_transcripts button
+        And I see upload_new_timed_transcripts button
 
         And I enter a t_neq_exist.mp4 source to field number 2
         Then I see found status message
         And I see download_to_edit button
-        And I don't see upload_new_timed_transcripts button
+        And I see upload_new_timed_transcripts button
 
         And I enter a t_not_exist.webm source to field number 3
         Then I see found status message
         And I see download_to_edit button
-        And I don't see upload_new_timed_transcripts button
+        And I see upload_new_timed_transcripts button
 
     #18
     Scenario: Entering youtube with imported transcripts - html5 w/o transcripts - html5 with transcripts
@@ -311,17 +311,17 @@ Feature: Video Component Editor
         And I see import button
         And I click import button
         Then I see found status message
-        And I don't see upload_new_timed_transcripts button
+        And I see upload_new_timed_transcripts button
 
         And I enter a t_not_exist.mp4 source to field number 2
         Then I see found status message
         And I see download_to_edit button
-        And I don't see upload_new_timed_transcripts button
+        And I see upload_new_timed_transcripts button
 
         And I enter a t_neq_exist.webm source to field number 3
         Then I see found status message
         And I see download_to_edit button
-        And I don't see upload_new_timed_transcripts button
+        And I see upload_new_timed_transcripts button
 
     #19
     Scenario: Entering html5 with transcripts - upload - youtube w/o transcripts
@@ -336,14 +336,14 @@ Feature: Video Component Editor
         Then I see uploaded_successfully status message
         And I see download_to_edit button
         And I see upload_new_timed_transcripts button
-        And I see "test_transcripts" value in the "HTML5 Timed Transcript" field
+        And I see "t__eq_exist" value in the "HTML5 Timed Transcript" field
 
         And I enter a http://youtu.be/t_not_exist source to field number 2
         Then I see found status message
         And I see download_to_edit button
-        And I don't see upload_new_timed_transcripts button
+        And I see upload_new_timed_transcripts button
 
-        And I enter a test_transcripts.mp4 source to field number 3
+        And I enter a test_transcripts.webm source to field number 3
         Then I see found status message
 
     #20
@@ -365,7 +365,7 @@ Feature: Video Component Editor
         And I see choose button test_transcripts.mp4 number 1
         And I see choose button t_not_exist.webm number 2
         And I click choose button number 2
-        And I see "t_not_exist" value in the "HTML5 Timed Transcript" field
+        And I see "test_transcripts|t_not_exist" value in the "HTML5 Timed Transcript" field
 
     #21
     Scenario: Work with 1 field only: Enter HTML5 source with transcripts - save - > change it to another one HTML5 source w/o transcripts - click on use existing - >  change it to another one HTML5 source w/o transcripts - click on use existing
@@ -446,20 +446,19 @@ Feature: Video Component Editor
         And I click use_existing button
         And I see "video_name_2|video_name_3" value in the "HTML5 Timed Transcript" field
 
-    #24 Uploading bug
-    #Scenario: File name and name of subs are different
-    #    Given I have created a Video component
-    #    And I edit the component
-
-    #    And I enter a video_name_1.mp4 source to field number 1
-    #    And I upload the transcripts file "test_transcripts.srt"
-    #    And I see "test_transcripts" value in the "HTML5 Timed Transcript" field
-
-    #    And I save changes
-    #    Then when I view the video it does show the captions
-    #    And I edit the component
-
-    #    Then I see found status message
+    #24 Uploading subtitles with different file name than file
+    Scenario: File name and name of subs are different
+        Given I have created a Video component
+        And I edit the component
+        And I enter a video_name_1.mp4 source to field number 1
+        And I see not found status message
+        And I upload the transcripts file "test_transcripts.srt"
+        Then I see uploaded_successfully status message
+        And I see "video_name_1" value in the "HTML5 Timed Transcript" field
+        And I save changes
+        Then when I view the video it does show the captions
+        And I edit the component
+        Then I see found status message
 
     #25
     # Video can have filled item.sub, but doesn't have subs file.
@@ -471,4 +470,62 @@ Feature: Video Component Editor
 
         And I enter a video_name_1.mp4 source to field number 1
         Then I see not found status message
+
+    #26
+    Scenario: Subtitles are copied for every html5 video source
+        Given I have created a Video component
+        And I edit the component
+
+        And I enter a video_name_1.mp4 source to field number 1
+        And I see not found status message
+
+        And I enter a video_name_2.webm source to field number 2
+        And I see not found status message
+        And I upload the transcripts file "test_transcripts.srt"
+        Then I see uploaded_successfully status message
+        And I see "video_name_1" value in the "HTML5 Timed Transcript" field
+
+        And I clear field number 1
+        Then I see found status message
+        And I see "video_name_2" value in the "HTML5 Timed Transcript" field
+
+    #27
+    Scenario: Upload button for single youtube id.
+        Given I have created a Video component
+        And I edit the component
+
+        And I enter a http://youtu.be/t_not_exist source to field number 1
+        Then I see not found status message
+        And I see upload_new_timed_transcripts button
+        And I upload the transcripts file "test_transcripts.srt"
+        Then I see uploaded_successfully status message
+
+        And I save changes
+        Then when I view the video it does show the captions
+
+        And I edit the component
+        Then I see found status message
+
+    # 28
+    Scenario: Upload button for youtube id with html5 ids.
+        Given I have created a Video component
+        And I edit the component
+        And I enter a http://youtu.be/t_not_exist source to field number 1
+        Then I see not found status message
+        And I see upload_new_timed_transcripts button
+
+        And I enter a video_name_1.mp4 source to field number 2
+        Then I see not found status message
+        And I see upload_new_timed_transcripts button
+
+        And I upload the transcripts file "test_transcripts.srt"
+        Then I see uploaded_successfully status message
+        And I clear field number 1
+        Then I see found status message
+        And I see "video_name_1" value in the "HTML5 Timed Transcript" field
+
+        And I save changes
+        Then when I view the video it does show the captions
+        And I edit the component
+        Then I see found status message
 

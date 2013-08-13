@@ -9,7 +9,6 @@ import json
 hlskey = hashlib.md5(module.location.url()).hexdigest()
 from os import listdir
 from os.path import isfile, join
-
 from django.conf import settings
 
 path = join(settings.PROJECT_ROOT, 'static/js/views/transcripts/')

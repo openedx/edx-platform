@@ -54,7 +54,8 @@
             expect(fileUploader.initialize).toHaveBeenCalledWith({
                 el: view.$el,
                 messenger: view,
-                component_id: view.component_id
+                component_id: view.component_id,
+                videoListObject: view.options.parent
             });
         });
 

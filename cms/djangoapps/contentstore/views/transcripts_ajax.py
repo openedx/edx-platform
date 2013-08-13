@@ -70,6 +70,12 @@ def upload_transcripts(request):
         log.error('POST data without "file" form data.')
         return JsonResponse(response)
 
+    video_list = request.POST.get('video_list')
+    if not video_list:
+        log.error('POST data without video names.')
+        return JsonResponse(response)
+
+    video_list = json.loads(video_list)
     source_subs_filedata = request.FILES['file'].read()
     source_subs_filename = request.FILES['file'].name
 
@@ -96,22 +102,32 @@ def upload_transcripts(request):
         return JsonResponse(response)
 
     # Allow upload only if any video link is presented
-    if item.youtube_id_1_0 or any(item.html5_sources):
+    if video_list:
         sub_attr = source_subs_name
 
         # Assuming we uploaded subs for speed = 1.0
-        # Generate subs and save
+        # Generate subs and save for all videos names to storage
         status, __ = generate_subs_from_source(
             {1: sub_attr},
             source_subs_ext,
             source_subs_filedata,
             item)
+        if status:
+            statuses = {}
+            for video_dict in video_list:
+                video_name = video_dict['video']
+                # creating transcripts for every video source
+                # in case that some of them would be deleted
+                statuses[video_name] = _rename_transcript(video_name, sub_attr, item)
 
-        if status:  # saving generated subtitles
-            item.sub = sub_attr
-            item = save_module(item)
-            response['subs'] = item.sub
-            response['status'] = 'Success'
+            # name to write to sub field
+            selected_name = video_list[0]['video']
+
+            if statuses[selected_name]:  # write names to sub attribute files
+                item.sub = selected_name
+                item = save_module(item)
+                response['subs'] = item.sub
+                response['status'] = 'Success'
 
     else:
         log.error('Empty video sources.')
@@ -194,6 +210,7 @@ def check_transcripts(request):
     """
     transcripts_presence = {
         'html5_local': [],
+        'html5_equal': False,
         'is_youtube_mode': False,
         'youtube_local': False,
         'youtube_server': False,
@@ -247,15 +264,18 @@ def check_transcripts(request):
                     transcripts_presence['youtube_diff'] = False
 
     # Check for html5 local transcripts presence
+    html5_subs = []
     for html5_id in videos['html5']:
         filename = 'subs_{0}.srt.sjson'.format(html5_id)
         content_location = StaticContent.compute_location(
             item.location.org, item.location.course, filename)
         try:
-            contentstore().find(content_location)
+            html5_subs.append(contentstore().find(content_location).data)
             transcripts_presence['html5_local'].append(html5_id)
         except NotFoundError:
             log.debug("Can't find transcripts in storage for non-youtube video_id: {}".format(html5_id))
+        if len(html5_subs) == 2:  # check html5 transcripts for equality
+            transcripts_presence['html5_equal'] = json.loads(html5_subs[0]) == json.loads(html5_subs[1])
 
     command, subs_to_use = transcripts_logic(transcripts_presence, videos)
     transcripts_presence.update({
@@ -299,8 +319,8 @@ def transcripts_logic(transcripts_presence, videos):
     elif transcripts_presence['youtube_server']:  # only youtube server exist
         command = 'import'
     else:  # html5 part
-        if transcripts_presence['html5_local']:
-            if len(transcripts_presence['html5_local']) == 1:
+        if transcripts_presence['html5_local']:  # can be 1 or 2 html5 videos
+            if len(transcripts_presence['html5_local']) == 1 or transcripts_presence['html5_equal']:
                 command = 'found'
                 subs = transcripts_presence['html5_local'][0]
             else:
@@ -418,6 +438,27 @@ def validate_transcripts_data(request):
     return True, data, videos, item
 
 
+def _rename_transcript(new_name, old_name, item, delete_old=False):
+    """
+    Renames old_name to new_name transcripts files in storage.
+    """
+    filename = 'subs_{0}.srt.sjson'.format(old_name)
+    content_location = StaticContent.compute_location(
+        item.location.org, item.location.course, filename)
+    try:
+        transcripts = contentstore().find(content_location).data
+        save_subs_to_store(json.loads(transcripts), new_name, item)
+        item.sub = new_name
+        item = save_module(item)
+    except NotFoundError:
+        log.debug("Can't find transcripts in storage for id: {}".format(old_name))
+        return False
+    else:
+        if delete_old:
+            remove_subs_from_store(old_name, item)
+        return True
+
+
 def rename_transcripts(request):
     """
     Renames html5 subtitles
@@ -434,23 +475,14 @@ def rename_transcripts(request):
 
     old_name = item.sub
 
-    new_name = videos['html5'].keys()[0]
-    filename = 'subs_{0}.srt.sjson'.format(old_name)
-    content_location = StaticContent.compute_location(
-        item.location.org, item.location.course, filename)
-    try:
-        transcripts = contentstore().find(content_location).data
-        save_subs_to_store(json.loads(transcripts), new_name, item)
+    statuses = {}
 
-        item.sub = new_name
-        item = save_module(item)
+    # copy subtitles for every html5 source
+    for new_name in videos['html5'].keys():
+        statuses[new_name] = _rename_transcript(new_name, old_name, item)
+
+    if any(statuses):
         response['status'] = 'Success'
         response['subs'] = item.sub
         log.debug("Updated item.sub to {}".format(item.sub))
-    except NotFoundError:
-        log.debug("Can't find transcripts in storage for id: {}".format(old_name))
-    else:
-        pass
-        #remove_subs_from_store(old_name, item)
-    finally:
-        return JsonResponse(response)
+    return JsonResponse(response)

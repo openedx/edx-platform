@@ -69,7 +69,7 @@
                     argName: 'both',
                     list: [undefined, undefined]
                 }
-            ]
+            ];
 
             $.each(wrongArgumentLists, function (index, element) {
                 it(element.argName + ' argument(s) is/are absent', function () {

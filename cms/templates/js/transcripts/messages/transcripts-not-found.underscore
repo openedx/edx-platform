@@ -7,11 +7,9 @@
 <%= gettext("Error.") %>
 </p>
 <div class="wrapper-transcripts-buttons">
-    <% if (!isYoutubeMode){ %>
     <button class="action setting-upload" type="button" name="setting-upload" value="<%= gettext("Upload New Timed Transcripts") %>" data-tooltip="<%= gettext("Upload New Timed Transcripts") %>">
         <%= gettext("Upload New Timed Transcripts") %>
     </button>
-    <% } %>
     <a class="action setting-download is-disabled" href="javascropt: void(0);" data-tooltip="<%= gettext("Download to Edit") %>">
         <%= gettext("Download to Edit") %>
     </a>

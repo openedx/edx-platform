@@ -8,7 +8,6 @@ import copy
 from pymongo import MongoClient
 
 from django.core.urlresolvers import reverse
-from django.template.defaultfilters import slugify
 from django.test.utils import override_settings
 from django.conf import settings
 
@@ -131,11 +130,19 @@ At the left we can see...
         modulestore().update_item(self.item_location, data)
 
         link = reverse('process_transcripts', args=('upload',))
-        resp = self.client.post(link, {'id': self.item_location, 'file': self.good_srt_file})
+        filename = os.path.splitext(os.path.basename(self.good_srt_file.name))[0]
+        resp = self.client.post(link, {
+            'id': self.item_location,
+            'file': self.good_srt_file,
+            'video_list': json.dumps([{
+                'type': 'html5',
+                'video': filename,
+                'mode': 'mp4',
+            }])
+        })
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(json.loads(resp.content).get('status'), 'Success')
 
-        filename = os.path.splitext(os.path.basename(self.good_srt_file.name))[0]
         item = modulestore().get_item(self.item_location)
         self.assertEqual(item.sub, filename)
 
@@ -513,7 +520,8 @@ class TestChecktranscripts(Basetranscripts):
                 u'command': u'found',
                 u'current_item_subs': unicode(subs_id),
                 u'youtube_diff': True,
-                u'html5_local': [unicode(subs_id)]
+                u'html5_local': [unicode(subs_id)],
+                u'html5_equal': False,
             }
         )
 
@@ -555,7 +563,8 @@ class TestChecktranscripts(Basetranscripts):
                 u'command': u'found',
                 u'current_item_subs': None,
                 u'youtube_diff': True,
-                u'html5_local': []
+                u'html5_local': [],
+                u'html5_equal': False,
             }
         )
 

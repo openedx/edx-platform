@@ -21,7 +21,8 @@
 
         render: function () {
             var tpl = $(this.uploadTpl).text(),
-                tplContainer = this.$el.find('.transcripts-file-uploader');
+                tplContainer = this.$el.find('.transcripts-file-uploader'),
+                videoList = this.options.videoListObject.getVideoObjectsList();
 
             if (tplContainer.length) {
                 if (!tpl) {
@@ -33,7 +34,8 @@
 
                 tplContainer.html(this.template({
                     ext: this.validFileExtensions,
-                    component_id: this.options.component_id
+                    component_id: this.options.component_id,
+                    video_list: videoList
                 }));
 
                 this.$form = this.$el.find('.file-chooser');
