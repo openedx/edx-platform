@@ -25,7 +25,7 @@ Longer TODO:
 
 import sys
 import lms.envs.common
-from lms.envs.common import USE_TZ
+from lms.envs.common import USE_TZ, TECH_SUPPORT_EMAIL, PLATFORM_NAME, BUGS_EMAIL
 from path import path
 
 ############################ FEATURE CONFIGURATION #############################
@@ -38,9 +38,6 @@ MITX_FEATURES = {
     'ENABLE_DISCUSSION_SERVICE': False,
 
     'AUTH_USE_MIT_CERTIFICATES': False,
-
-    # do not display video when running automated acceptance tests
-    'STUB_VIDEO_FOR_TESTING': False,
 
     # email address for studio staff (eg to request course creation)
     'STUDIO_REQUEST_EMAIL': '',

@@ -534,8 +534,16 @@ class CapaModule(CapaFields, XModule):
                 id=self.location.html_id(), ajax_url=self.system.ajax_url
             ) + html + "</div>"
 
-        # now do the substitutions which are filesystem based, e.g. '/static/' prefixes
-        return self.system.replace_urls(html)
+        # now do all the substitutions which the LMS module_render normally does, but
+        # we need to do here explicitly since we can get called for our HTML via AJAX
+        html = self.system.replace_urls(html)
+        if self.system.replace_course_urls:
+            html = self.system.replace_course_urls(html)
+
+        if self.system.replace_jump_to_id_urls:
+            html = self.system.replace_jump_to_id_urls(html)
+
+        return html
 
     def handle_ajax(self, dispatch, data):
         """

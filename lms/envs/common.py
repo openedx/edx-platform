@@ -86,8 +86,6 @@ MITX_FEATURES = {
 
     'DISABLE_LOGIN_BUTTON': False,  # used in systems where login is automatic, eg MIT SSL
 
-    'STUB_VIDEO_FOR_TESTING': False,  # do not display video when running automated acceptance tests
-
     # extrernal access methods
     'ACCESS_REQUIRE_STAFF_FOR_COURSE': False,
     'AUTH_USE_OPENID': False,
@@ -145,13 +143,13 @@ MITX_FEATURES = {
     'ENABLE_INSTRUCTOR_BACKGROUND_TASKS': True,
 
     # Enable instructor dash beta version link
-    'ENABLE_INSTRUCTOR_BETA_DASHBOARD': False,
+    'ENABLE_INSTRUCTOR_BETA_DASHBOARD': True,
 
     # Allow use of the hint managment instructor view.
     'ENABLE_HINTER_INSTRUCTOR_VIEW': False,
 
     # for load testing
-    'AUTOMATIC_AUTH_FOR_LOAD_TESTING': False,
+    'AUTOMATIC_AUTH_FOR_TESTING': False,
 
     # Toggle to enable chat availability (configured on a per-course
     # basis in Studio)

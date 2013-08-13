@@ -34,33 +34,17 @@ def create_user(uname, password):
 
 
 @world.absorb
-def log_in(username, password):
+def log_in(username='robot', password='test', email='robot@edx.org', name='Robot'):
     """
-    Log the user in programatically.
-    This will delete any existing cookies to ensure that the user
-    logs in to the correct session.
+    Use the auto_auth feature to programmatically log the user in
     """
+    url = '/auto_auth?username=%s&password=%s&name=%s&email=%s' % (username,
+          password, name, email)
+    world.visit(url)
 
-    # Authenticate the user
-    world.scenario_dict['USER'] = authenticate(username=username, password=password)
-    assert(world.scenario_dict['USER'] is not None and world.scenario_dict['USER'].is_active)
-
-    # Send a fake HttpRequest to log the user in
-    # We need to process the request using
-    # Session middleware and Authentication middleware
-    # to ensure that session state can be stored
-    request = HttpRequest()
-    SessionMiddleware().process_request(request)
-    AuthenticationMiddleware().process_request(request)
-    login(request, world.scenario_dict['USER'])
-
-    # Save the session
-    request.session.save()
-
-    # Retrieve the sessionid and add it to the browser's cookies
-    cookie_dict = {settings.SESSION_COOKIE_NAME: request.session.session_key}
-    world.browser.cookies.delete()
-    world.browser.cookies.add(cookie_dict)
+    # Save the user info in the world scenario_dict for use in the tests
+    user = User.objects.get(username=username)
+    world.scenario_dict['USER'] = user
 
 
 @world.absorb

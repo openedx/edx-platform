@@ -148,6 +148,14 @@ body.course.textbooks {
         padding: ($baseline*0.75) $baseline;
         background: $gray-l6;
 
+        .action {
+          margin-right: ($baseline/4);
+
+          &:last-child {
+            margin-right: 0;
+          }
+        }
+
         // add a chapter is below with chapters styling
 
         .action-primary {

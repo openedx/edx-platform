@@ -291,7 +291,7 @@ body.dashboard {
 
 	// ====================
 
-	// course listings
+  // ELEM: course listings
 	.courses {
 	  margin: $baseline 0;
 	}
@@ -304,60 +304,109 @@ body.dashboard {
 		box-shadow: 0 1px 2px $shadow-l1;
 
 		.course-item {
+      @include box-sizing(border-box);
+      width: flex-grid(9, 9);
 			position: relative;
 			border-bottom: 1px solid $gray-l1;
+      padding: $baseline;
 
-			&:last-child {
-				border-bottom: none;
-			}
+      // STATE: hover/focus
+      &:hover {
+        background: $paleYellow;
 
-			.class-link {
-				z-index: 100;
-				display: block;
-				padding: 20px 25px;
-				line-height: 1.3;
+        .course-actions .view-live-button {
+          opacity: 1.0;
+          pointer-events: auto;
+        }
 
-				&:hover {
-					background: $paleYellow;
+        .course-title {
+          color: $orange-d1;
+        }
 
-					+ .view-live-button {
-						opacity: 1.0;
-						pointer-events: auto;
-					}
-				}
-			}
-		}
+        .course-metadata {
+          opacity: 1.0;
+        }
+      }
 
-		.class-name {
-			display: block;
-			font-size: 19px;
-			font-weight: 300;
-		}
+      .course-link, .course-actions {
+        @include box-sizing(border-box);
+        display: inline-block;
+        vertical-align: middle;
+      }
 
-		.detail {
-			font-size: 14px;
-			font-weight: 400;
-			margin-right: 20px;
-			color: #3c3c3c;
-		}
+      // encompassing course link
+      .course-link {
+        @extend .ui-depth2;
+        width: flex-grid(7, 9);
+        margin-right: flex-gutter();
+      }
 
-		// view live button
-		.view-live-button {
-			z-index: 10000;
-			position: absolute;
-			top: ($baseline*0.75);
-			right: $baseline;
-			padding: ($baseline/4) ($baseline/2);
-			opacity: 0.0;
-			pointer-events: none;
+      // course title
+      .course-title {
+        @extend .t-title4;
+        margin: 0 ($baseline*2) ($baseline/4) 0;
+        font-weight: 300;
+      }
 
-			&:hover {
-				opacity: 1.0;
-				pointer-events: auto;
-			}
+      // course metadata
+      .course-metadata {
+        @extend .t-copy-sub1;
+        @include transition(opacity $tmg-f1 ease-in-out 0);
+        color: $gray;
+        opacity: 0.75;
+
+        .metadata-item {
+          display: inline-block;
+
+          &:after {
+            content: "/";
+            margin-left: ($baseline/10);
+            margin-right: ($baseline/10);
+            color: $gray-l4;
+          }
+
+          &:last-child {
+
+            &:after {
+              content: "";
+              margin-left: 0;
+              margin-right: 0;
+            }
+          }
+
+          .label {
+            @extend .cont-text-sr;
+          }
+        }
+      }
+
+      .course-actions {
+        @extend .ui-depth3;
+        position: static;
+        width: flex-grid(2, 9);
+        text-align: right;
+
+        // view live button
+        .view-live-button {
+          @extend .ui-depth3;
+          @include transition(opacity $tmg-f2 ease-in-out 0);
+          @include box-sizing(border-box);
+          padding: ($baseline/2);
+          opacity: 0.0;
+          pointer-events: none;
+
+          &:hover {
+            opacity: 1.0;
+            pointer-events: auto;
+          }
+        }
+
+        &:last-child {
+          border-bottom: none;
+        }
+      }
 		}
 	}
-
 
   // ELEM: new user form
   .wrapper-create-course {

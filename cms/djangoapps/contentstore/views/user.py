@@ -13,6 +13,7 @@ from django.core.context_processors import csrf
 
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import Location
+from xmodule.error_module import ErrorDescriptor
 from contentstore.utils import get_lms_link_for_item
 from util.json_request import JsonResponse
 from auth.authz import (
@@ -22,6 +23,8 @@ from course_creators.views import (
     user_requested_access)
 
 from .access import has_access
+
+from student.views import enroll_in_course
 
 
 @login_required
@@ -54,10 +57,13 @@ def index(request):
                 course.location,
                 course_id=course.location.course_id,
             ),
+            course.display_org_with_default,
+            course.display_number_with_default,
+            course.location.name
         )
 
     return render_to_response('index.html', {
-        'courses': [format_course_for_view(c) for c in courses],
+        'courses': [format_course_for_view(c) for c in courses if not isinstance(c, ErrorDescriptor)],
         'user': request.user,
         'request_course_creator_url': reverse('request_course_creator'),
         'course_creator_status': _get_course_creator_status(request.user),
@@ -201,6 +207,8 @@ def course_team_user(request, org, course, name, email):
             return JsonResponse(msg, 400)
         user.groups.add(groups["instructor"])
         user.save()
+        # auto-enroll the course creator in the course so that "View Live" will work.
+        enroll_in_course(user, location.course_id)
     elif role == "staff":
         # if we're trying to downgrade a user from "instructor" to "staff",
         # make sure we have at least one other instructor in the course team.
@@ -214,6 +222,9 @@ def course_team_user(request, org, course, name, email):
             user.groups.remove(groups["instructor"])
         user.groups.add(groups["staff"])
         user.save()
+        # auto-enroll the course creator in the course so that "View Live" will work.
+        enroll_in_course(user, location.course_id)
+
     return JsonResponse()
 
 

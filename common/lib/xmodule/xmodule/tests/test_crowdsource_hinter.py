@@ -28,7 +28,7 @@ class CHModuleFactory(object):
           <p>The answer is correct if it is within a specified numerical tolerance of the expected answer.</p>
           <p>Enter the number of fingers on a human hand:</p>
           <numericalresponse answer="5">
-            <textline/>
+            <formulaequationinput/>
           </numericalresponse>
           <solution>
             <div class="detailed-solution">
@@ -114,7 +114,7 @@ class VerticalWithModulesFactory(object):
             <problem display_name="Numerical Input" markdown=" " rerandomize="never" showanswer="finished">
               <p>Test numerical problem.</p>
               <numericalresponse answer="5">
-                <textline/>
+                <formulaequationinput/>
               </numericalresponse>
               <solution>
                 <div class="detailed-solution">
@@ -129,7 +129,7 @@ class VerticalWithModulesFactory(object):
             <problem display_name="Numerical Input" markdown=" " rerandomize="never" showanswer="finished">
               <p>Another test numerical problem.</p>
               <numericalresponse answer="5">
-                <textline/>
+                <formulaequationinput/>
               </numericalresponse>
               <solution>
                 <div class="detailed-solution">

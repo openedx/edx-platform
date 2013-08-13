@@ -205,7 +205,9 @@ class TestPeerGradingService(LoginEnrollmentTestCase):
             'submission_key': 'fake key',
             'score': 2,
             'feedback': 'feedback',
-            'submission_flagged': 'false'
+            'submission_flagged': 'false',
+            'answer_unknown': 'false',
+            'rubric_scores_complete' : 'true'
         }
 
         qdict = MagicMock()
