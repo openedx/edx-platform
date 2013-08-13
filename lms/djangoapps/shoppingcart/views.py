@@ -1,13 +1,14 @@
 import logging
-
-from django.http import HttpResponse, HttpResponseRedirect, Http404
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound, HttpResponseForbidden, Http404
+from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
+from student.models import CourseEnrollment
+from xmodule.modulestore.exceptions import ItemNotFoundError
 from mitxmako.shortcuts import render_to_response
 from .models import *
-from .processors import verify, payment_accepted, render_purchase_form_html, record_purchase
-from .processors.exceptions import CCProcessorDataException, CCProcessorWrongAmountException
+from .processors import process_postpay_callback, render_purchase_form_html
 
 log = logging.getLogger("shoppingcart")
 
@@ -16,20 +17,22 @@ def test(request, course_id):
     item1.purchased_callback(request.user.id)
     return HttpResponse('OK')
 
-@login_required
-def purchased(request):
-    #verify() -- signatures, total cost match up, etc.  Need error handling code (
-    # If verify fails probaly need to display a contact email/number)
-    cart = Order.get_cart_for_user(request.user)
-    cart.purchase()
-    return HttpResponseRedirect('/')
 
-@login_required
 def add_course_to_cart(request, course_id):
+    if not request.user.is_authenticated():
+        return HttpResponseForbidden(_('You must be logged-in to add to a shopping cart'))
     cart = Order.get_cart_for_user(request.user)
-    # TODO: Catch 500 here for course that does not exist, period
-    PaidCourseRegistration.add_to_order(cart, course_id, 200)
-    return HttpResponse("Added")
+    if PaidCourseRegistration.part_of_order(cart, course_id):
+        return HttpResponseNotFound(_('The course {0} is already in your cart.'.format(course_id)))
+    if CourseEnrollment.objects.filter(user=request.user, course_id=course_id).exists():
+        return HttpResponseNotFound(_('You are already registered in course {0}.'.format(course_id)))
+    try:
+        PaidCourseRegistration.add_to_order(cart, course_id)
+    except ItemNotFoundError:
+        return HttpResponseNotFound(_('The course you requested does not exist.'))
+    if request.method == 'GET':
+        return HttpResponseRedirect(reverse('shoppingcart.views.show_cart'))
+    return HttpResponse(_("Course added to cart."))
 
 @login_required
 def show_cart(request):
@@ -62,31 +65,23 @@ def remove_item(request):
     return HttpResponse('OK')
 
 @csrf_exempt
-def postpay_accept_callback(request):
+def postpay_callback(request):
     """
-    Receives the POST-back from processor and performs the validation and displays a receipt
-    and does some other stuff
-
-    HANDLES THE ACCEPT AND REVIEW CASES
+    Receives the POST-back from processor.
+    Mainly this calls the processor-specific code to check if the payment was accepted, and to record the order
+    if it was, and to generate an error page.
+    If successful this function should have the side effect of changing the "cart" into a full "order" in the DB.
+    The cart can then render a success page which links to receipt pages.
+    If unsuccessful the order will be left untouched and HTML messages giving more detailed error info will be
+    returned.
     """
-    # TODO: Templates and logic for all error cases and the REVIEW CASE
-    params = request.POST.dict()
-    if verify(params):
-        try:
-            result = payment_accepted(params)
-            if result['accepted']:
-                # ACCEPTED CASE first
-                record_purchase(params, result['order'])
-                #render_receipt
-                return HttpResponseRedirect(reverse('shoppingcart.views.show_receipt', args=[result['order'].id]))
-            else:
-                return HttpResponse("CC Processor has not accepted the payment.")
-        except CCProcessorWrongAmountException:
-            return HttpResponse("Charged the wrong amount, contact our user support")
-        except CCProcessorDataException:
-            return HttpResponse("Exception: the processor returned invalid data")
+    result = process_postpay_callback(request)
+    if result['success']:
+        return HttpResponseRedirect(reverse('shoppingcart.views.show_receipt', args=[result['order'].id]))
     else:
-        return HttpResponse("There has been a communication problem blah blah. Not Validated")
+        return render_to_response('shoppingcart.processor_error.html', {'order':result['order'],
+                                                                        'error_html': result['error_html']})
+
 
 def show_receipt(request, ordernum):
     """
@@ -107,7 +102,7 @@ def show_receipt(request, ordernum):
                                                             'order_items': order_items,
                                                             'any_refunds': any_refunds})
 
-def show_orders(request):
+#def show_orders(request):
     """
     Displays all orders of a user
     """

@@ -7,5 +7,5 @@ class CCProcessorException(PaymentException):
 class CCProcessorDataException(CCProcessorException):
     pass
 
-class CCProcessorWrongAmountException(PaymentException):
+class CCProcessorWrongAmountException(CCProcessorException):
     pass

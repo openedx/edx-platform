@@ -123,11 +123,13 @@ class OrderItem(models.Model):
 
         Unfortunately the QuerySet used determines the class to be OrderItem, and not its most specific
         subclasses.  That means this parent class implementation of purchased_callback needs to act as
-        a dispatcher to call the callback the proper subclasses, and as such it needs to know about all subclasses.
-        So please add
+        a dispatcher to call the callback the proper subclasses, and as such it needs to know about all
+        possible subclasses.
+        So keep ORDER_ITEM_SUBTYPES up-to-date
         """
-        for classname, lc_classname in ORDER_ITEM_SUBTYPES:
+        for cls, lc_classname in ORDER_ITEM_SUBTYPES.iteritems():
             try:
+                #Uses https://docs.djangoproject.com/en/1.4/topics/db/models/#multi-table-inheritance to test subclass
                 sub_instance = getattr(self,lc_classname)
                 sub_instance.purchased_callback()
             except (ObjectDoesNotExist, AttributeError):
@@ -135,13 +137,18 @@ class OrderItem(models.Model):
                               .format(lc_classname))
                 pass
 
-# Each entry is a tuple of ('ModelName', 'lower_case_model_name')
-# See https://docs.djangoproject.com/en/1.4/topics/db/models/#multi-table-inheritance for
-# PLEASE KEEP THIS LIST UP_TO_DATE WITH THE SUBCLASSES OF OrderItem
-ORDER_ITEM_SUBTYPES = [
-    ('PaidCourseRegistration', 'paidcourseregistration')
-]
-
+    def is_of_subtype(self, cls):
+        """
+        Checks if self is also a type of cls, in addition to being an OrderItem
+        Uses https://docs.djangoproject.com/en/1.4/topics/db/models/#multi-table-inheritance to test for subclass
+        """
+        if cls not in ORDER_ITEM_SUBTYPES:
+            return False
+        try:
+            getattr(self, ORDER_ITEM_SUBTYPES[cls])
+            return True
+        except (ObjectDoesNotExist, AttributeError):
+            return False
 
 
 class PaidCourseRegistration(OrderItem):
@@ -151,7 +158,16 @@ class PaidCourseRegistration(OrderItem):
     course_id = models.CharField(max_length=128, db_index=True)
 
     @classmethod
-    def add_to_order(cls, order, course_id, cost, currency='usd'):
+    def part_of_order(cls, order, course_id):
+        """
+        Is the course defined by course_id in the order?
+        """
+        return course_id in [item.paidcourseregistration.course_id
+                             for item in order.orderitem_set.all()
+                             if item.is_of_subtype(PaidCourseRegistration)]
+
+    @classmethod
+    def add_to_order(cls, order, course_id, cost=None, currency=None):
         """
         A standardized way to create these objects, with sensible defaults filled in.
         Will update the cost if called on an order that already carries the course.
@@ -164,6 +180,10 @@ class PaidCourseRegistration(OrderItem):
         item, created = cls.objects.get_or_create(order=order, user=order.user, course_id=course_id)
         item.status = order.status
         item.qty = 1
+        if cost is None:
+            cost = course.enrollment_cost['cost']
+        if currency is None:
+            currency = course.enrollment_cost['currency']
         item.unit_cost = cost
         item.line_cost = cost
         item.line_desc = 'Registration for Course: {0}'.format(get_course_about_section(course, "title"))
@@ -182,9 +202,6 @@ class PaidCourseRegistration(OrderItem):
                                                  # throw errors if it doesn't
         # use get_or_create here to gracefully handle case where the user is already enrolled in the course, for
         # whatever reason.
-        # Don't really need to create CourseEnrollmentAllowed object, but doing it for bookkeeping and consistency
-        # with rest of codebase.
-        CourseEnrollmentAllowed.objects.get_or_create(email=self.user.email, course_id=self.course_id, auto_enroll=True)
         CourseEnrollment.objects.get_or_create(user=self.user, course_id=self.course_id)
 
         log.info("Enrolled {0} in paid course {1}, paid ${2}".format(self.user.email, self.course_id, self.line_cost))
@@ -193,3 +210,11 @@ class PaidCourseRegistration(OrderItem):
                          tags=["org:{0}".format(org),
                                "course:{0}".format(course_num),
                                "run:{0}".format(run)])
+
+
+# Each entry is a dictionary of ModelName: 'lower_case_model_name'
+# See https://docs.djangoproject.com/en/1.4/topics/db/models/#multi-table-inheritance for
+# PLEASE KEEP THIS LIST UP_TO_DATE WITH THE SUBCLASSES OF OrderItem
+ORDER_ITEM_SUBTYPES = {
+    PaidCourseRegistration: 'paidcourseregistration',
+}

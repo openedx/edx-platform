@@ -6,7 +6,11 @@
 
 <%block name="title"><title>${_("Receipt for Order")} ${order.id}</title></%block>
 
-
+% if notification is not UNDEFINED:
+<section class="notification">
+    ${notification}
+</section>
+% endif
 
 <section class="container cart-list">
     <p><h1>${_(settings.PLATFORM_NAME + " (" + settings.SITE_NAME + ")" + " Electronic Receipt")}</h1></p>

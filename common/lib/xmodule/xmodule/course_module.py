@@ -338,6 +338,7 @@ class CourseFields(object):
     show_timezone = Boolean(help="True if timezones should be shown on dates in the courseware", scope=Scope.settings, default=True)
     enrollment_domain = String(help="External login method associated with user accounts allowed to register in course",
                         scope=Scope.settings)
+    enrollment_cost = Dict(scope=Scope.settings, default={'currency':'usd', 'cost':0})
 
     # An extra property is used rather than the wiki_slug/number because
     # there are courses that change the number for different runs. This allows
