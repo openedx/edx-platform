@@ -30,7 +30,11 @@ def coffee_cmd(watch=false, debug=false)
 
         end
     end
-    "node_modules/.bin/coffee --compile #{watch ? '--watch' : ''} ."
+    if watch
+        "node_modules/.bin/coffee --compile --watch . "
+    else
+        "node_modules/.bin/coffee --compile `find . -name *.coffee` "
+    end
 end
 
 def sass_cmd(watch=false, debug=false)

@@ -1,16 +1,16 @@
 Feature: Video Component Editor
   As a course author, I want to be able to create video components.
 
-  Scenario: User can view metadata
+  Scenario: User can view Video metadata
     Given I have created a Video component
-    And I edit and select Settings
-    Then I see the correct settings and default values
+    And I edit the component
+    Then I see the correct video settings and default values
 
-  Scenario: User can modify display name
+  Scenario: User can modify Video display name
     Given I have created a Video component
-    And I edit and select Settings
+    And I edit the component
     Then I can modify the display name
-    And my display name change is persisted on save
+    And my video display name change is persisted on save
 
   Scenario: Captions are hidden when "show captions" is false
     Given I have created a Video component

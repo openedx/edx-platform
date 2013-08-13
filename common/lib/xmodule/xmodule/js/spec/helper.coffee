@@ -111,34 +111,18 @@ jasmine.stubYoutubePlayer = ->
     obj['getAvailablePlaybackRates'] = jasmine.createSpy('getAvailablePlaybackRates').andReturn [0.75, 1.0, 1.25, 1.5]
     obj
 
-jasmine.stubVideoPlayer = (context, enableParts, createPlayer=true) ->
-  enableParts = [enableParts] unless $.isArray(enableParts)
-  suite = context.suite
-  currentPartName = suite.description while suite = suite.parentSuite
-  enableParts.push currentPartName
-
-  loadFixtures 'video.html'
-  jasmine.stubRequests()
-  YT.Player = undefined
-  videosDefinition = '0.75:7tqY6eQzVhE,1.0:cogebirgzzM'
-  context.video = new Video '#example', videosDefinition
-  jasmine.stubYoutubePlayer()
-  if createPlayer
-    return new VideoPlayer(video: context.video)
-
-jasmine.stubVideoPlayerAlpha = (context, enableParts, html5=false) ->
-  console.log('stubVideoPlayerAlpha called')
+jasmine.stubVideoPlayer = (context, enableParts, html5=false) ->
   suite = context.suite
   currentPartName = suite.description while suite = suite.parentSuite
   if html5 == false
-    loadFixtures 'videoalpha.html'
+    loadFixtures 'video.html'
   else
-    loadFixtures 'videoalpha_html5.html'
+    loadFixtures 'video_html5.html'
   jasmine.stubRequests()
   YT.Player = undefined
-  window.OldVideoPlayerAlpha = undefined
+  window.OldVideoPlayer = undefined
   jasmine.stubYoutubePlayer()
-  return new VideoAlpha '#example', '.75:7tqY6eQzVhE,1.0:cogebirgzzM'
+  return new Video '#example', '.75:7tqY6eQzVhE,1.0:cogebirgzzM'
 
 
 # Stub jQuery.cookie
