@@ -225,8 +225,15 @@ form[class^="create-"] {
           color: $red;
         }
 
+        .is-showing {
+            @extend .anim-fadeIn;
+        }
+
+        .is-hiding {
+            @extend .anim-fadeOut;
+        }
+
         .tip-error {
-          @extend .anim-fadeIn;
           display: block;
           color: $red;
         }
