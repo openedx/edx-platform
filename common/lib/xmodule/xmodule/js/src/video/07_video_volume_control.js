@@ -77,20 +77,25 @@ function () {
             $(this).addClass('open');
         });
 
-        state.videoVolumeControl.buttonEl.on('focus', function() {
-            $(this).parent().addClass('open');
-        });
-
         state.videoVolumeControl.el.on('mouseleave', function() {
             $(this).removeClass('open');
         });
 
         state.videoVolumeControl.buttonEl.on('blur', function() {
-            state.videoVolumeControl.volumeSliderEl.find('a').focus();
+            if (state.volumeBlur !== true) {
+                state.videoVolumeControl.el.addClass('open');
+                state.videoVolumeControl.volumeSliderEl.find('a').focus();
+            } else {
+                state.volumeBlur = false;
+            }
         });
 
         state.videoVolumeControl.volumeSliderEl.find('a').on('blur', function () {
             state.videoVolumeControl.el.removeClass('open');
+
+            state.videoVolumeControl.buttonEl.focus();
+
+            state.volumeBlur = true;
         });
     }
 

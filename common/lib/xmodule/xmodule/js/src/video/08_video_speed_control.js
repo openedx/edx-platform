@@ -58,6 +58,8 @@ function () {
                 );
         });
 
+        state.videoSpeedControl.videoSpeedsEl.find('a:first').addClass('first_speed_el');
+
         state.videoSpeedControl.setSpeed(state.speed);
     }
 
@@ -89,7 +91,13 @@ function () {
 
             state.videoSpeedControl.el.children('a')
                 .on('focus', function () {
-                    $(this).parent().addClass('open');
+                    if (state.firstSpeedBlur === true) {
+                        $(this).parent().removeClass('open');
+
+                        state.firstSpeedBlur = false;
+                    } else {
+                        $(this).parent().addClass('open');
+                    }
                 })
                 .on('blur', function () {
                     state.videoSpeedControl.videoSpeedsEl
@@ -100,6 +108,16 @@ function () {
             state.videoSpeedControl.videoSpeedsEl.find('a.speed_link:last')
                 .on('blur', function () {
                     state.videoSpeedControl.el.removeClass('open');
+                });
+
+            state.videoSpeedControl.videoSpeedsEl.find('a.speed_link:first')
+                .on('blur', function () {
+                    state.firstSpeedBlur = true;
+                });
+
+            state.videoSpeedControl.videoSpeedsEl.find('a.speed_link')
+                .on('focus', function () {
+                    state.firstSpeedBlur = false;
                 });
         }
     }
@@ -161,6 +179,10 @@ function () {
 
             _this.videoSpeedControl.videoSpeedsEl.prepend(listItem);
         });
+
+        this.videoSpeedControl.videoSpeedsEl
+            .find('a:first')
+            .addClass('first_speed_el');
 
         _bindHandlers(this);
     }
