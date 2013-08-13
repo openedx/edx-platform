@@ -151,7 +151,7 @@ function () {
         $.each(this.videoSpeedControl.speeds, function(index, speed) {
             var link, listItem;
 
-            link = '<a href="#">' + speed + 'x</a>';
+            link = '<a class="speed_link" href="#">' + speed + 'x</a>';
 
             listItem = $('<li data-speed="' + speed + '">' + link + '</li>');
 
@@ -162,11 +162,7 @@ function () {
             _this.videoSpeedControl.videoSpeedsEl.prepend(listItem);
         });
 
-        this.videoSpeedControl.videoSpeedsEl.find('a')
-            .on('click', this.videoSpeedControl.changeVideoSpeed);
-
-        // TODO: After the control was re-rendered, we should attach 'focus'
-        // and 'blur' events once more.
+        _bindHandlers(this);
     }
 
 });
