@@ -17,9 +17,11 @@ from lxml import etree
 from pkg_resources import resource_string
 import datetime
 import time
+import copy
 
 from django.http import Http404
 from django.conf import settings
+from django.utils.translation import ugettext as _
 
 from xmodule.x_module import XModule
 from xmodule.editing_module import TabsEditingDescriptor
@@ -30,7 +32,6 @@ from xblock.fields import Scope, String, Boolean, Float, List, Integer, ScopeIds
 
 from xmodule.modulestore.inheritance import InheritanceKeyValueStore
 from xblock.runtime import DbModel
-
 log = logging.getLogger(__name__)
 
 
@@ -48,7 +49,7 @@ class VideoFields(object):
     )
     show_captions = Boolean(
         help="This controls whether or not captions are shown by default.",
-        display_name="Show Captions",
+        display_name="Show Transcript",
         scope=Scope.settings,
         default=True
     )
@@ -103,13 +104,13 @@ class VideoFields(object):
     )
     track = String(
         help="The external URL to download the timed transcript track. This appears as a link beneath the video.",
-        display_name="Download Track",
+        display_name="Download Transcript",
         scope=Scope.settings,
         default=""
     )
     sub = String(
         help="The name of the timed transcript track (for non-Youtube videos).",
-        display_name="HTML5 Timed Transcript",
+        display_name="HTML5 Transcript",
         scope=Scope.settings,
         default=""
     )
@@ -196,14 +197,14 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
     module_class = VideoModule
 
     tabs = [
-        # {
-        #     'name': "Subtitles",
-        #     'template': "video/subtitles.html",
-        # },
         {
-            'name': "Settings",
-            'template': "tabs/metadata-edit-tab.html",
+            'name': "Basic",
+            'template': "video/transcripts.html",
             'current': True
+        },
+        {
+            'name': "Advanced",
+            'template': "tabs/metadata-edit-tab.html"
         }
     ]
 
@@ -285,6 +286,45 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
             ele.set('src', self.track)
             xml.append(ele)
         return xml
+
+    def get_context(self):
+        """
+        Extend context by data for transcripts basic tab.
+        """
+        _context = super(VideoDescriptor, self).get_context()
+
+        metadata_fields = copy.deepcopy(self.editable_metadata_fields)
+
+        display_name = metadata_fields['display_name']
+        video_url = metadata_fields['html5_sources']
+        youtube_id_1_0 = metadata_fields['youtube_id_1_0']
+
+        def get_youtube_link(video_id):
+            if video_id:
+                return 'http://youtu.be/{0}'.format(video_id)
+            else:
+                return ''
+
+        video_url.update({
+            'help': _('A YouTube URL or a link to a file hosted anywhere on the web.'),
+            'display_name': 'Video URL',
+            'field_name': 'video_url',
+            'type': 'VideoList',
+            'default_value': [get_youtube_link(youtube_id_1_0['default_value'])]
+        })
+
+        youtube_id_1_0_value = get_youtube_link(youtube_id_1_0['value'])
+
+        if youtube_id_1_0_value:
+            video_url['value'].insert(0, youtube_id_1_0_value)
+
+        metadata = {
+            'display_name': display_name,
+            'video_url': video_url
+        }
+
+        _context.update({'transcripts_basic_tab_metadata': metadata})
+        return _context
 
     @classmethod
     def _parse_youtube(cls, data):

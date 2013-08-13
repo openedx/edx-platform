@@ -141,9 +141,13 @@ class VideoDescriptorTest(unittest.TestCase):
         """"test get_context"""
         correct_tabs = [
             {
-                'name': "Settings",
-                'template': "tabs/metadata-edit-tab.html",
+                'name': "Basic",
+                'template': "video/transcripts.html",
                 'current': True
+            },
+            {
+                'name': 'Advanced',
+                'template': 'tabs/metadata-edit-tab.html'
             }
         ]
         rendered_context = self.descriptor.get_context()

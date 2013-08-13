@@ -21,6 +21,15 @@ urlpatterns = patterns('',  # nopep8
     url(r'^save_item$', 'contentstore.views.save_item', name='save_item'),
     url(r'^delete_item$', 'contentstore.views.delete_item', name='delete_item'),
     url(r'^create_item$', 'contentstore.views.create_item', name='create_item'),
+
+    url(r'^transcripts/upload$', 'contentstore.views.upload_transcripts', name='upload_transcripts'),
+    url(r'^transcripts/download$', 'contentstore.views.download_transcripts', name='download_transcripts'),
+    url(r'^transcripts/check$', 'contentstore.views.check_transcripts', name='check_transcripts'),
+    url(r'^transcripts/choose$', 'contentstore.views.choose_transcripts', name='choose_transcripts'),
+    url(r'^transcripts/replace$', 'contentstore.views.replace_transcripts', name='replace_transcripts'),
+    url(r'^transcripts/rename$', 'contentstore.views.rename_transcripts', name='rename_transcripts'),
+    url(r'^transcripts/save$', 'contentstore.views.save_transcripts', name='save_transcripts'),
+
     url(r'^create_draft$', 'contentstore.views.create_draft', name='create_draft'),
     url(r'^publish_draft$', 'contentstore.views.publish_draft', name='publish_draft'),
     url(r'^unpublish_unit$', 'contentstore.views.unpublish_unit', name='unpublish_unit'),

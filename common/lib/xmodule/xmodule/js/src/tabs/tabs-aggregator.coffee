@@ -65,6 +65,15 @@ class @TabsEditingDescriptor
     current_tab = @$tabs.filter('.current').html()
     data: TabsEditingDescriptor.Model.getValue(@html_id, current_tab)
 
+  setMetadataEditor : (metadataEditor) ->
+    TabsEditingDescriptor.setMetadataEditor.apply(TabsEditingDescriptor, arguments)
+
+  getStorage : () ->
+    TabsEditingDescriptor.getStorage()
+
+  addToStorage : (id, data) ->
+    TabsEditingDescriptor.addToStorage.apply(TabsEditingDescriptor, arguments)
+
   @Model :
     addModelUpdate : (id, tabName, modelUpdateFunction) ->
       ###
@@ -115,6 +124,7 @@ class @TabsEditingDescriptor
     # html_id's of descriptors will be stored in modules variable as
     # containers for callbacks.
     modules: {}
+    Storage: {}
 
     initialize : (id) ->
       ###
@@ -123,3 +133,13 @@ class @TabsEditingDescriptor
       @modules[id] = @modules[id] or {}
       @modules[id].tabSwitch = @modules[id]['tabSwitch'] or {}
       @modules[id].modelUpdate = @modules[id]['modelUpdate'] or {}
+
+  @setMetadataEditor : (metadataEditor) ->
+    TabsEditingDescriptor.Model.Storage['MetadataEditor'] = metadataEditor
+
+  @addToStorage : (id, data) ->
+    TabsEditingDescriptor.Model.Storage[id] = data
+
+  @getStorage : () ->
+    TabsEditingDescriptor.Model.Storage
+
