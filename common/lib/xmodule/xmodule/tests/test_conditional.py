@@ -1,21 +1,20 @@
 
+from ast import literal_eval
 import json
 import unittest
+
 from fs.memoryfs import MemoryFS
-from ast import literal_eval
 from mock import Mock, patch
 
 from xmodule.error_module import NonStaffErrorDescriptor
 from xmodule.modulestore import Location
 from xmodule.modulestore.xml import ImportSystem, XMLModuleStore
 from xmodule.conditional_module import ConditionalModule
+from xmodule.tests import DATA_DIR, get_test_system
 
-from xmodule.tests.test_export import DATA_DIR
 
 ORG = 'test_org'
 COURSE = 'conditional'      # name of directory with course data
-
-from . import get_test_system
 
 
 class DummySystem(ImportSystem):

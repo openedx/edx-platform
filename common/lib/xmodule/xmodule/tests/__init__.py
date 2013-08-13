@@ -7,19 +7,24 @@ Run like this:
 
 """
 
-import unittest
+import json
 import os
+import unittest
+
 import fs
 import fs.osfs
-
 import numpy
-
-import json
+from mock import Mock
+from path import path
 
 import calc
-import xmodule
-from xmodule.x_module import ModuleSystem
-from mock import Mock
+from xmodule.x_module import ModuleSystem, XModuleDescriptor
+
+
+# Location of common test DATA directory
+# '../../../../edx-platform/common/test/data/'
+MODULE_DIR = path(__file__).dirname()
+DATA_DIR = path.joinpath(*MODULE_DIR.splitall()[:-4]) / 'test/data/'
 
 
 open_ended_grading_interface = {
@@ -67,7 +72,7 @@ class ModelsTest(unittest.TestCase):
         pass
 
     def test_load_class(self):
-        vc = xmodule.x_module.XModuleDescriptor.load_class('video')
+        vc = XModuleDescriptor.load_class('video')
         vc_str = "<class 'xmodule.video_module.VideoDescriptor'>"
         self.assertEqual(str(vc), vc_str)
 

@@ -1,31 +1,3 @@
-import json
-from mock import Mock, MagicMock, ANY
-import unittest
-
-from test_util_open_ended import MockQueryDict, DummyModulestore
-
-from xmodule.open_ended_grading_classes.openendedchild import OpenEndedChild
-from xmodule.open_ended_grading_classes.open_ended_module import OpenEndedModule
-from xmodule.open_ended_grading_classes.combined_open_ended_modulev1 import CombinedOpenEndedV1Module
-from xmodule.open_ended_grading_classes.grading_service_module import GradingServiceError
-from xmodule.combined_open_ended_module import CombinedOpenEndedModule
-from xmodule.modulestore import Location
-
-from lxml import etree
-import capa.xqueue_interface as xqueue_interface
-from datetime import datetime
-from pytz import UTC
-import logging
-
-log = logging.getLogger(__name__)
-
-from . import get_test_system
-
-ORG = 'edX'
-COURSE = 'open_ended'      # name of directory with course data
-
-import test_util_open_ended
-
 """
 Tests for the various pieces of the CombinedOpenEndedGrading system
 
@@ -33,6 +5,31 @@ OpenEndedChild
 OpenEndedModule
 
 """
+
+from datetime import datetime
+import json
+import logging
+import unittest
+
+from lxml import etree
+from mock import Mock, MagicMock, ANY
+from pytz import UTC
+
+from xmodule.open_ended_grading_classes.openendedchild import OpenEndedChild
+from xmodule.open_ended_grading_classes.open_ended_module import OpenEndedModule
+from xmodule.open_ended_grading_classes.combined_open_ended_modulev1 import CombinedOpenEndedV1Module
+from xmodule.open_ended_grading_classes.grading_service_module import GradingServiceError
+from xmodule.combined_open_ended_module import CombinedOpenEndedModule
+from xmodule.modulestore import Location
+from xmodule.tests import get_test_system, test_util_open_ended
+from xmodule.tests.test_util_open_ended import MockQueryDict, DummyModulestore
+import capa.xqueue_interface as xqueue_interface
+
+
+log = logging.getLogger(__name__)
+
+ORG = 'edX'
+COURSE = 'open_ended'      # name of directory with course data
 
 
 class OpenEndedChildTest(unittest.TestCase):
