@@ -270,8 +270,7 @@ class MongoModuleStore(ModuleStoreBase):
     def __init__(self, host, db, collection, fs_root, render_template,
                  port=27017, default_class=None,
                  error_tracker=null_error_tracker,
-                 user=None, password=None, request_cache=None,
-                 metadata_inheritance_cache_subsystem=None, **kwargs):
+                 user=None, password=None, **kwargs):
 
         super(MongoModuleStore, self).__init__()
 
@@ -303,8 +302,6 @@ class MongoModuleStore(ModuleStoreBase):
         self.error_tracker = error_tracker
         self.render_template = render_template
         self.ignore_write_events_on_courses = []
-        self.request_cache = request_cache
-        self.metadata_inheritance_cache_subsystem = metadata_inheritance_cache_subsystem
 
     def compute_metadata_inheritance_tree(self, location):
         '''

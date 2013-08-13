@@ -410,8 +410,7 @@ class ModuleStoreBase(ModuleStore):
         Set up the error-tracking logic.
         '''
         self._location_errors = {}  # location -> ErrorLog
-        self.metadata_inheritance_cache = None
-        self.request_cache = None
+        self.modulestore_configuration = {}
         self.modulestore_update_signal = None  # can be set by runtime to route notifications of datastore changes
 
     def _get_errorlog(self, location):
@@ -456,13 +455,20 @@ class ModuleStoreBase(ModuleStore):
                 return c
         return None
 
+    @property
+    def metadata_inheritance_cache_subsystem(self):
+        return self.modulestore_configuration.get('metadata_inheritance_cache_subsystem', None)
+
+    @property
+    def request_cache(self):
+        return self.modulestore_configuration.get('request_cache', None)
+
     def set_modulestore_configuration(self, config_dict):
         """
         This is the base implementation of the interface, all we need to do is store
         two possible configurations as attributes on the class
         """
-        self.metadata_inheritance_cache = config_dict.get('metadata_inheritance_cache_subsystem', None)
-        self.request_cache = config_dict.get('request_cache', None)
+        self.modulestore_configuration = config_dict
 
 
 def namedtuple_to_son(namedtuple, prefix=''):
