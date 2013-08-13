@@ -222,6 +222,10 @@ LMS: Fixed failing numeric response (decimal but no trailing digits).
 
 LMS: XML Error module no longer shows students a stack trace.
 
+Studio: Add feedback to end user if there is a problem exporting a course
+
+Studio: Improve link re-writing on imports into a different course-id
+
 Blades: Videoalpha.
 
 XModules: Added partial credit for foldit module.
