@@ -62,7 +62,7 @@ desired_capabilities['version'] = SAUCE.get('VERSION', '')
 desired_capabilities['device-type'] = SAUCE.get('DEVICE', '')
 desired_capabilities['name'] = SAUCE.get('SESSION', 'Lettuce Tests')
 desired_capabilities['build'] = SAUCE.get('BUILD', 'edX Plaform')
-desired_capabilities['tags'] = SAUCE.get('TAGS', '')
+desired_capabilities['custom-data'] = SAUCE.get('CUSTOM_TAGS', '')
 desired_capabilities['video-upload-on-pass'] = False
 desired_capabilities['sauce-advisor'] = False
 desired_capabilities['record-screenshots'] = False
@@ -104,12 +104,13 @@ def initial_setup(server):
                 url="http://{}:{}@ondemand.saucelabs.com:80/wd/hub".format(config['username'],config['access-key']),
                 **desired_capabilities
             )
+            global jobid
+            jobid = world.browser.driver.session_id
         else:
             world.browser = Browser(browser_driver)
 
         world.browser.driver.implicitly_wait(30)
-        global jobid
-        jobid = world.browser.driver.session_id
+
         # Try to visit the main page
         # If the browser session is invalid, this will
         # raise a WebDriverException
