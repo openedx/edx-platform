@@ -5,6 +5,8 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Blades: Took videoalpha out of alpha, replacing the old video player
+
 LMS: Enable beta instructor dashboard. The beta dashboard is a rearchitecture
 of the existing instructor dashboard and is available by clicking a link at
 the top right of the existing dashboard.
