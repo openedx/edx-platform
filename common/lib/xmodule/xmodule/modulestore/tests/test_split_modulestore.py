@@ -107,7 +107,7 @@ class SplitModuleCourseTests(SplitModuleTest):
     '''
 
     def test_get_courses(self):
-        courses = modulestore().get_courses('draft')
+        courses = modulestore().get_courses(branch='draft')
         # should have gotten 3 draft courses
         self.assertEqual(len(courses), 3, "Wrong number of courses")
         # check metadata -- NOTE no promised order
@@ -138,35 +138,40 @@ class SplitModuleCourseTests(SplitModuleTest):
 
     def test_branch_requests(self):
         # query w/ branch qualifier (both draft and published)
-        courses_published = modulestore().get_courses('published')
-        self.assertEqual(len(courses_published), 1, len(courses_published))
-        course = self.findByIdInResult(courses_published, "head23456")
-        self.assertIsNotNone(course, "published courses")
-        self.assertEqual(course.location.course_id, "wonderful")
-        self.assertEqual(str(course.location.version_guid), self.GUID_P,
-                         course.location.version_guid)
-        self.assertEqual(course.category, 'course', 'wrong category')
-        self.assertEqual(len(course.tabs), 4, "wrong number of tabs")
-        self.assertEqual(course.display_name, "The most wonderful course",
-                         course.display_name)
-        self.assertIsNone(course.advertised_start)
-        self.assertEqual(len(course.children), 0,
-                         "children")
+        def _verify_published_course(courses_published):
+            """ Helper function for verifying published course. """
+            self.assertEqual(len(courses_published), 1, len(courses_published))
+            course = self.findByIdInResult(courses_published, "head23456")
+            self.assertIsNotNone(course, "published courses")
+            self.assertEqual(course.location.course_id, "wonderful")
+            self.assertEqual(str(course.location.version_guid), self.GUID_P,
+                             course.location.version_guid)
+            self.assertEqual(course.category, 'course', 'wrong category')
+            self.assertEqual(len(course.tabs), 4, "wrong number of tabs")
+            self.assertEqual(course.display_name, "The most wonderful course",
+                             course.display_name)
+            self.assertIsNone(course.advertised_start)
+            self.assertEqual(len(course.children), 0,
+                             "children")
+
+        _verify_published_course(modulestore().get_courses(branch='published'))
+        # default for branch is 'published'.
+        _verify_published_course(modulestore().get_courses())
 
     def test_search_qualifiers(self):
         # query w/ search criteria
-        courses = modulestore().get_courses('draft', qualifiers={'org': 'testx'})
+        courses = modulestore().get_courses(branch='draft', qualifiers={'org': 'testx'})
         self.assertEqual(len(courses), 2)
         self.assertIsNotNone(self.findByIdInResult(courses, "head12345"))
         self.assertIsNotNone(self.findByIdInResult(courses, "head23456"))
 
         courses = modulestore().get_courses(
-            'draft',
+            branch='draft',
             qualifiers={'edited_on': {"$lt": datetime.datetime(2013, 3, 28, 15)}})
         self.assertEqual(len(courses), 2)
 
         courses = modulestore().get_courses(
-            'draft',
+            branch='draft',
             qualifiers={'org': 'testx', "prettyid": "test_course"})
         self.assertEqual(len(courses), 1)
         self.assertIsNotNone(self.findByIdInResult(courses, "head12345"))
@@ -415,14 +420,17 @@ class SplitModuleItemTests(SplitModuleTest):
         '''
         locator = CourseLocator(version_guid=self.GUID_D0)
         # get all modules
-        matches = modulestore().get_items(locator, {})
+        matches = modulestore().get_items(locator)
         self.assertEqual(len(matches), 6)
-        matches = modulestore().get_items(locator, {'category': 'chapter'})
+        matches = modulestore().get_items(locator, qualifiers={})
+        self.assertEqual(len(matches), 6)
+        matches = modulestore().get_items(locator, qualifiers={'category': 'chapter'})
         self.assertEqual(len(matches), 3)
-        matches = modulestore().get_items(locator, {'category': 'garbage'})
+        matches = modulestore().get_items(locator, qualifiers={'category': 'garbage'})
         self.assertEqual(len(matches), 0)
         matches = modulestore().get_items(
             locator,
+            qualifiers=
             {
                 'category': 'chapter',
                 'metadata': {'display_name': {'$regex': 'Hera'}}
@@ -430,7 +438,7 @@ class SplitModuleItemTests(SplitModuleTest):
         )
         self.assertEqual(len(matches), 2)
 
-        matches = modulestore().get_items(locator, {'children': 'chapter2'})
+        matches = modulestore().get_items(locator, qualifiers={'children': 'chapter2'})
         self.assertEqual(len(matches), 1)
         self.assertEqual(matches[0].location.usage_id, 'head12345')
 
@@ -438,8 +446,8 @@ class SplitModuleItemTests(SplitModuleTest):
         '''
         get_parent_locations(locator, [usage_id], [branch]): [BlockUsageLocator]
         '''
-        locator = CourseLocator(course_id="GreekHero", branch='draft')
-        parents = modulestore().get_parent_locations(locator, usage_id='chapter1')
+        locator = BlockUsageLocator(course_id="GreekHero", branch='draft', usage_id='chapter1')
+        parents = modulestore().get_parent_locations(locator)
         self.assertEqual(len(parents), 1)
         self.assertEqual(parents[0].usage_id, 'head12345')
         self.assertEqual(parents[0].course_id, "GreekHero")
@@ -447,7 +455,8 @@ class SplitModuleItemTests(SplitModuleTest):
         parents = modulestore().get_parent_locations(locator)
         self.assertEqual(len(parents), 1)
         self.assertEqual(parents[0].usage_id, 'head12345')
-        parents = modulestore().get_parent_locations(locator, usage_id='nosuchblock')
+        locator.usage_id='nosuchblock'
+        parents = modulestore().get_parent_locations(locator)
         self.assertEqual(len(parents), 0)
 
     def test_get_children(self):

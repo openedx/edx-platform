@@ -841,13 +841,6 @@ class MongoModuleStore(ModuleStoreBase):
                                      {'_id': True})
         return [i['_id'] for i in items]
 
-    def get_errored_courses(self):
-        """
-        This function doesn't make sense for the mongo modulestore, as courses
-        are loaded on demand, rather than up front
-        """
-        return {}
-
     def _create_new_model_data(self, category, location, definition_data, metadata):
         """
         To instantiate a new xmodule which will be saved latter, set up the dbModel and kvs

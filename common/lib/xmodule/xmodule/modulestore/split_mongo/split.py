@@ -226,7 +226,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
             entry['branch'] = course_locator.branch
         return entry
 
-    def get_courses(self, branch, qualifiers=None):
+    def get_courses(self, branch='published', qualifiers=None):
         '''
         Returns a list of course descriptors matching any given qualifiers.
 
@@ -235,6 +235,9 @@ class SplitMongoModuleStore(ModuleStoreBase):
 
         Note, this is to find the current head of the named branch type
         (e.g., 'draft'). To get specific versions via guid use get_course.
+
+        :param branch: the branch for which to return courses. Default value is 'published'.
+        :param qualifiers: a optional dict restricting which elements should match
         '''
         if qualifiers is None:
             qualifiers = {}
@@ -272,13 +275,6 @@ class SplitMongoModuleStore(ModuleStoreBase):
         result = self._load_items(course_entry, [root], 0, lazy=True)
         return result[0]
 
-    def get_course_for_item(self, location):
-        '''
-        Provided for backward compatibility. Is equivalent to calling get_course
-        :param location:
-        '''
-        return self.get_course(location)
-
     def has_item(self, block_location):
         """
         Returns True if location exists in its course. Returns false if
@@ -313,9 +309,8 @@ class SplitMongoModuleStore(ModuleStoreBase):
             raise ItemNotFoundError(location)
         return items[0]
 
-    # TODO refactor this and get_courses to use a constructed query
-    def get_items(self, locator, qualifiers):
-        '''
+    def get_items(self, locator, course_id=None, depth=0, qualifiers=None):
+        """
         Get all of the modules in the given course matching the qualifiers. The
         qualifiers should only be fields in the structures collection (sorry).
         There will be a separate search method for searching through
@@ -331,9 +326,14 @@ class SplitMongoModuleStore(ModuleStoreBase):
         try arbitrary queries.
 
         :param locator: CourseLocator or BlockUsageLocator restricting search scope
+        :param course_id: ignored. Only included for API compatibility.
+        :param depth: ignored. Only included for API compatibility.
         :param qualifiers: a dict restricting which elements should match
-        '''
+
+        """
         # TODO extend to only search a subdag of the course?
+        if qualifiers is None:
+            qualifiers = {}
         course = self._lookup_course(locator)
         items = []
         for usage_id, value in course['blocks'].iteritems():
@@ -345,23 +345,22 @@ class SplitMongoModuleStore(ModuleStoreBase):
         else:
             return []
 
-    # What's the use case for usage_id being separate?
     def get_parent_locations(self, locator, usage_id=None):
         '''
         Return the locations (Locators w/ usage_ids) for the parents of this location in this
         course. Could use get_items(location, {'children': usage_id}) but this is slightly faster.
-        NOTE: does not actually ensure usage_id exists
-        If usage_id is None, then the locator must specify the usage_id
+        NOTE: the locator must contain the usage_id, and this code does not actually ensure usage_id exists
+
+        :param locator: BlockUsageLocator restricting search scope
+        :param usage_id: ignored. Only included for API compatibility. Specify the usage_id within the locator.
         '''
-        if usage_id is None:
-            usage_id = locator.usage_id
+
         course = self._lookup_course(locator)
         items = []
         for parent_id, value in course['blocks'].iteritems():
             for child_id in value['children']:
-                if usage_id == child_id:
-                    locator = locator.as_course_locator()
-                    items.append(BlockUsageLocator(url=locator, usage_id=parent_id))
+                if locator.usage_id == child_id:
+                    items.append(BlockUsageLocator(url=locator.as_course_locator(), usage_id=parent_id))
         return items
 
     def get_course_index_info(self, course_locator):
@@ -1049,14 +1048,6 @@ class SplitMongoModuleStore(ModuleStoreBase):
             raise ItemNotFoundError(course_id)
         # this is the only real delete in the system. should it do something else?
         self.course_index.remove(index['_id'])
-
-    # TODO remove all callers and then this
-    def get_errored_courses(self):
-        """
-        This function doesn't make sense for the mongo modulestore, as structures
-        are loaded on demand, rather than up front
-        """
-        return {}
 
     def inherit_metadata(self, block_map, block, inheriting_metadata=None):
         """
