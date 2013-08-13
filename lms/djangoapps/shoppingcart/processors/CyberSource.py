@@ -13,13 +13,49 @@ from django.conf import settings
 from django.utils.translation import ugettext as _
 from mitxmako.shortcuts import render_to_string
 from shoppingcart.models import Order
-from .exceptions import CCProcessorDataException, CCProcessorWrongAmountException
+from .exceptions import CCProcessorException, CCProcessorDataException, CCProcessorWrongAmountException
 
 shared_secret = settings.CC_PROCESSOR['CyberSource'].get('SHARED_SECRET','')
 merchant_id = settings.CC_PROCESSOR['CyberSource'].get('MERCHANT_ID','')
 serial_number = settings.CC_PROCESSOR['CyberSource'].get('SERIAL_NUMBER','')
 orderPage_version = settings.CC_PROCESSOR['CyberSource'].get('ORDERPAGE_VERSION','7')
 purchase_endpoint = settings.CC_PROCESSOR['CyberSource'].get('PURCHASE_ENDPOINT','')
+
+def process_postpay_callback(request):
+    """
+    The top level call to this module, basically
+    This function is handed the callback request after the customer has entered the CC info and clicked "buy"
+    on the external Hosted Order Page.
+    It is expected to verify the callback and determine if the payment was successful.
+    It returns {'success':bool, 'order':Order, 'error_html':str}
+    If successful this function must have the side effect of marking the order purchased and calling the
+    purchased_callbacks of the cart items.
+    If unsuccessful this function should not have those side effects but should try to figure out why and
+    return a helpful-enough error message in error_html.
+    """
+    params = request.POST.dict()
+    if verify_signatures(params):
+        try:
+            result = payment_accepted(params)
+            if result['accepted']:
+                # SUCCESS CASE first, rest are some sort of oddity
+                record_purchase(params, result['order'])
+                return {'success': True,
+                        'order': result['order'],
+                        'error_html': ''}
+            else:
+                return {'success': False,
+                        'order': result['order'],
+                        'error_html': get_processor_error_html(params)}
+        except CCProcessorException as e:
+            return {'success': False,
+                    'order': None, #due to exception we may not have the order
+                    'error_html': get_exception_html(params, e)}
+    else:
+        return {'success': False,
+                'order': None,
+                'error_html': get_signature_error_html(params)}
+
 
 def hash(value):
     """
@@ -48,7 +84,7 @@ def sign(params):
     return params
 
 
-def verify(params):
+def verify_signatures(params):
     """
     Verify the signatures accompanying the POST back from Cybersource Hosted Order Page
     """
@@ -160,6 +196,18 @@ def record_purchase(params, order):
         cardtype=CARDTYPE_MAP[params.get('card_cardType', 'UNKNOWN')],
         processor_reply_dump=json.dumps(params)
     )
+
+def get_processor_error_html(params):
+    """Have to parse through the error codes for all the other cases"""
+    return "<p>ERROR!</p>"
+
+def get_exception_html(params, exp):
+    """Return error HTML associated with exception"""
+    return "<p>EXCEPTION!</p>"
+
+def get_signature_error_html(params):
+    """Return error HTML associated with signature failure"""
+    return "<p>EXCEPTION!</p>"
 
 
 CARDTYPE_MAP = defaultdict(lambda:"UNKNOWN")
