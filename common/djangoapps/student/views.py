@@ -1037,7 +1037,11 @@ def password_reset(request):
                                         'error': _('Invalid e-mail or user')}))
 
 
-def password_reset_confirm_wrapper(request, uidb36=None, token=None):
+def password_reset_confirm_wrapper(
+    request,
+    uidb36=None,
+    token=None,
+):
     ''' A wrapper around django.contrib.auth.views.password_reset_confirm.
         Needed because we want to set the user as active at this step.
     '''
@@ -1049,7 +1053,12 @@ def password_reset_confirm_wrapper(request, uidb36=None, token=None):
         user.save()
     except (ValueError, User.DoesNotExist):
         pass
-    return password_reset_confirm(request, uidb36=uidb36, token=token)
+    # we also want to pass settings.PLATFORM_NAME in as extra_context
+
+    extra_context = {"platform_name": settings.PLATFORM_NAME}
+    return password_reset_confirm(
+        request, uidb36=uidb36, token=token, extra_context=extra_context
+    )
 
 
 def reactivation_email_for_user(user):
