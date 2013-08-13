@@ -193,7 +193,7 @@ discussion_link = get_discussion_link(course) if course else None
 % if settings.FEEDBACK_SUBMISSION_EMAIL:
             htmlStr += " " + _.template(
               gettext("Please {link_start}send us e-mail{link_end}."),
-              {link_start: '<a href="#" id="feedback_email">', link_end='</a>'},
+              {link_start: '<a href="#" id="feedback_email">', link_end: '</a>'},
               {interpolate: /\{(.+?)\}/g})
 % else:
             // If no email is configured, we can't do much other than
