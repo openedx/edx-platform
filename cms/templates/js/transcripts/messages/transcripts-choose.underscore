@@ -1,0 +1,36 @@
+<div class="transcripts-message-status status-error">
+    <i class="icon-remove"></i>
+    <%= gettext("Timed Transcripts Conflict") %>
+</div>
+
+<p class="transcripts-message">
+    <%= gettext("The timed transcripts file for the first HTML5 source does not appear to be the same as the timed transcripts file for the second HTML5 source .") %>
+    <strong>
+        <%= gettext("Which one would you like to use?") %>
+    </strong>
+</p>
+
+<p class="transcripts-error-message is-invisible">
+    <%= gettext("Error.") %>
+</p>
+
+<div class="wrapper-transcripts-buttons">
+    <% _.each(html5_list, function(value, index) {
+        var type = grouped_list[value][0].type,
+            file_name = value + ((type) ? ('.' + type) : ''),
+            message = gettext("Timed Transcripts from ") + file_name;
+    %>
+        <button
+            class="action setting-choose"
+            type="button"
+            name="setting-choose"
+            data-video-id="<%= value %>"
+            value="<%= message %>"
+            data-tooltip="<%= message %>"
+        >
+            <span>
+                <%= message %>
+            </span>
+        </button>
+    <% }) %>
+</div>

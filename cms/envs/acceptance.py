@@ -113,3 +113,13 @@ if LETTUCE_SELENIUM_CLIENT == 'saucelabs':
     LETTUCE_SERVER_PORT = choice(PORTS)
 else:
     LETTUCE_SERVER_PORT = randint(1024, 65535)
+
+
+# Set up Video information so that the cms will send
+# requests to a mock Youtube server running locally
+if LETTUCE_SELENIUM_CLIENT == 'saucelabs':
+    VIDEO_PORT = choice(PORTS)
+    PORTS.remove(VIDEO_PORT)
+else:
+    VIDEO_PORT = randint(1024, 65535)
+

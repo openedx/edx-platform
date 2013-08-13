@@ -1,20 +1,25 @@
 #pylint: disable=E1103, E1101
 
-from django.conf import settings
-from xmodule.modulestore import Location
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.contentstore.content import StaticContent
-from xmodule.contentstore.django import contentstore
+from __future__ import division
+
 import copy
 import logging
 import re
-from xmodule.modulestore.draft import DIRECT_ONLY_CATEGORIES
+
+from django.conf import settings
 from django.utils.translation import ugettext as _
+
+from xmodule.contentstore.content import StaticContent
+from xmodule.contentstore.django import contentstore
+from xmodule.modulestore import Location
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import ItemNotFoundError
 from django_comment_common.utils import unseed_permissions_roles
 from auth.authz import _delete_course_group
 from xmodule.modulestore.store_utilities import delete_course
 from xmodule.course_module import CourseDescriptor
+from xmodule.modulestore.draft import DIRECT_ONLY_CATEGORIES
+
 
 log = logging.getLogger(__name__)
 

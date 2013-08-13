@@ -1,3 +1,5 @@
+"""Views for items (modules)."""
+
 import logging
 from uuid import uuid4
 
@@ -8,19 +10,33 @@ from django.http import HttpResponseBadRequest
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.inheritance import own_metadata
+from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
 
 from util.json_request import expect_json, JsonResponse
+
+from .transcripts_ajax import (
+    upload_transcripts,
+    download_transcripts,
+    check_transcripts,
+    choose_transcripts,
+    replace_transcripts,
+)
+
 from ..utils import get_modulestore
+
 from .access import has_access
 from .requests import _xmodule_recurse
 from xmodule.x_module import XModuleDescriptor
 
-__all__ = ['save_item', 'create_item', 'delete_item']
+__all__ = ['save_item', 'create_item', 'delete_item', 'process_transcripts']
+
+log = logging.getLogger(__name__)
 
 # cdodge: these are categories which should not be parented, they are detached from the hierarchy
 DETACHED_CATEGORIES = ['about', 'static_tab', 'course_info']
 
 log = logging.getLogger(__name__)
+
 
 @login_required
 @expect_json
@@ -54,6 +70,12 @@ def save_item(request):
         )
         return HttpResponseBadRequest()
 
+
+    try:
+        old_item = modulestore().get_item(item_location)
+    except (ItemNotFoundError, InvalidLocationError):
+        log.error("Can't find item by location.")
+        return JsonResponse()
 
     # check permissions for this user within this course
     if not has_access(request.user, item_location):
@@ -101,12 +123,19 @@ def save_item(request):
         # commit to datastore
         store.update_metadata(item_location, own_metadata(existing_item))
 
+    try:
+        new_item = modulestore().get_item(item_location)
+    except (ItemNotFoundError, InvalidLocationError):
+        log.error("Can't find item by location.")
+        return JsonResponse()
+
     return JsonResponse()
 
 
 @login_required
 @expect_json
 def create_item(request):
+    """View for create items."""
     parent_location = Location(request.POST['parent_location'])
     category = request.POST['category']
 
@@ -149,6 +178,7 @@ def create_item(request):
 @login_required
 @expect_json
 def delete_item(request):
+    """View for removing items."""
     item_location = request.POST['id']
     item_location = Location(item_location)
 
@@ -183,3 +213,18 @@ def delete_item(request):
                 modulestore('direct').update_children(parent.location, parent.children)
 
     return JsonResponse()
+
+
+@login_required
+def process_transcripts(request, action):
+    """
+    Dispatcher for trascripts actions.
+    """
+    allowed_actions = {
+        'upload': upload_transcripts,
+        'download': download_transcripts,
+        'check': check_transcripts,
+        'choose': choose_transcripts,
+        'replace': replace_transcripts,
+    }
+    return allowed_actions.get(action, lambda x: JsonResponse())(request)

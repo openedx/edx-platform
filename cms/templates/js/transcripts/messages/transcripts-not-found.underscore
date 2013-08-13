@@ -1,0 +1,18 @@
+<div class="transcripts-message-status status-error"><i class="icon-remove"></i><%= gettext("No Timed Transcripts") %></div>
+<p class="transcripts-message">
+<%= gettext("We don\'t have a timed transcripts for this video. Please upload a .srt file:") %>
+</p>
+<div class="transcripts-file-uploader"></div>
+<p class="transcripts-error-message is-invisible">
+<%= gettext("Error.") %>
+</p>
+<div class="wrapper-transcripts-buttons">
+    <% if (!isYoutubeMode){ %>
+    <button class="action setting-upload" type="button" name="setting-upload" value="<%= gettext("Upload New Timed Transcripts") %>" data-tooltip="<%= gettext("Upload New Timed Transcripts") %>">
+        <%= gettext("Upload New Timed Transcripts") %>
+    </button>
+    <% } %>
+    <a class="action setting-download is-disabled" href="javascropt: void(0);" data-tooltip="<%= gettext("Download to Edit") %>">
+        <%= gettext("Download to Edit") %>
+    </a>
+</div>

@@ -1,0 +1,29 @@
+<div class="transcripts-message-status status-error">
+    <i class="icon-remove"></i>
+    <%= gettext("Timed Transcripts Conflict") %>
+</div>
+
+<p class="transcripts-message">
+    <%= gettext("The timed transcripts file on YouTube does not appear to be the same as the timed transcripts file on edX.") %>
+    <strong>
+        <%= gettext("Would you like to replace the edX timed transcripts with the ones from YouTube?") %>
+    </strong>
+</p>
+
+<p class="transcripts-error-message is-invisible">
+    <%= gettext("Error.") %>
+</p>
+
+<div class="wrapper-transcripts-buttons">
+    <button
+        class="action setting-replace"
+        type="button"
+        name="setting-replace"
+        value="<%= gettext("Yes, Replace EdX Timed Transcripts with YouTube Timed Transcripts") %>"
+        data-tooltip="<%= gettext("Yes, Replace EdX Timed Transcripts with YouTube Timed Transcripts") %>"
+    >
+        <span>
+            <%= gettext("Yes, Replace EdX Timed Transcripts with YouTube Timed Transcripts") %>
+        </span>
+    </button>
+</div>

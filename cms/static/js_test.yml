@@ -64,6 +64,7 @@ src_paths:
 spec_paths:
     - coffee/spec/main.js
     - coffee/spec
+    - js_spec
 
 # Paths to fixture files (optional)
 # The fixture path will be set automatically when using jasmine-jquery.
@@ -80,6 +81,14 @@ fixture_paths:
 requirejs:
   paths:
     main: coffee/spec/main
+# Regular expressions used to exclude *.js files from
+# appearing in the test runner page.
+# Files are included by default, which means that they
+# are loaded using a <script> tag in the test runner page.
+# When loading many files, this can be slow, so
+# exclude any files you don't need.
+#exclude_from_page:
+#    - path/to/lib/exclude/*
 
 # Because require.js is responsible for loading all dependencies, we exclude
 # all files from being included in <script> tags

@@ -1,0 +1,18 @@
+<div class="transcripts-message-status"><i class="icon-ok"></i><%= gettext("Timed Transcripts Found") %></div>
+<p class="transcripts-message">
+<%= gettext("We have timed transcripts on edX for this video. You can upload a new .srt file to replace it or download to edit.") %>
+</p>
+<div class="transcripts-file-uploader"></div>
+<p class="transcripts-error-message is-invisible">
+<%= gettext("Error.") %>
+</p>
+<div class="wrapper-transcripts-buttons">
+    <% if (!isYoutubeMode){ %>
+    <button class="action setting-upload" type="button" name="setting-upload" value="<%= gettext("Upload New Timed Transcripts") %>" data-tooltip="<%= gettext("Upload New Timed Transcripts") %>">
+        <span><%= gettext("Upload New Timed Transcripts") %></span>
+    </button>
+    <% } %>
+    <a class="action setting-download" href="/transcripts/download?id=<%= component_id %>" data-tooltip="<%= gettext("Download to Edit") %>">
+        <span><%= gettext("Download to Edit") %></span>
+    </a>
+</div>

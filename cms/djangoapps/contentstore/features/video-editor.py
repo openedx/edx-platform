@@ -12,6 +12,7 @@ def set_show_captions(step, setting):
 
     world.css_click('a.edit-button')
     world.wait_for(lambda _driver: world.css_visible('a.save-button'))
+    world.click_link_by_text('Advanced')
     world.browser.select('Show Captions', setting)
     world.css_click('a.save-button')
 
@@ -33,6 +34,11 @@ def shows_captions(_step, show_captions):
 @step('I see the correct video settings and default values$')
 def correct_video_settings(_step):
     expected_entries = [
+        # basic
+        ['Display Name', 'Video', False],
+        ['Video URL', 'http://youtu.be/OEoXaMPEzfM, , ', False],
+
+        # advanced
         ['Display Name', 'Video', False],
         ['Download Track', '', False],
         ['Download Video', '', False],

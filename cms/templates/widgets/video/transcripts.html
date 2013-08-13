@@ -1,0 +1,130 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%namespace name='static' file='../../static_content.html'/>
+<%page args="tabName"/>
+
+<%
+import hashlib
+import copy
+import json
+hlskey = hashlib.md5(module.location.url()).hexdigest()
+from os import listdir
+from os.path import isfile, join
+try:
+  path = 'cms/static/js/views/transcripts/'
+  files = [ f for f in listdir(path) if isfile(join(path,f)) and f.endswith('.js') ]
+except:
+  files = []
+%>
+
+%for file in files:
+<script type="text/javascript" src="${static.url('js/views/transcripts/{0}'.format(file))}"></script>
+%endfor
+
+## js templates
+
+<script id="metadata-videolist-entry" type="text/template">
+    <%static:include path="js/transcripts/metadata-videolist-entry.underscore" />
+</script>
+
+<script id="transcripts-file-upload" type="text/template">
+    <%static:include path="js/transcripts/file-upload.underscore" />
+</script>
+
+<script id="transcripts-found" type="text/template">
+    <%static:include path="js/transcripts/messages/transcripts-found.underscore" />
+</script>
+
+<script id="transcripts-uploaded" type="text/template">
+    <%static:include path="js/transcripts/messages/transcripts-uploaded.underscore" />
+</script>
+
+<script id="transcripts-use-existing" type="text/template">
+    <%static:include path="js/transcripts/messages/transcripts-use-existing.underscore" />
+</script>
+
+<script id="transcripts-not-found" type="text/template">
+    <%static:include path="js/transcripts/messages/transcripts-not-found.underscore" />
+</script>
+
+<script id="transcripts-replace" type="text/template">
+    <%static:include path="js/transcripts/messages/transcripts-replace.underscore" />
+</script>
+
+<script id="transcripts-import" type="text/template">
+    <%static:include path="js/transcripts/messages/transcripts-import.underscore" />
+</script>
+
+<script id="transcripts-choose" type="text/template">
+    <%static:include path="js/transcripts/messages/transcripts-choose.underscore" />
+</script>
+
+<% metadata_fields = copy.deepcopy(editable_metadata_fields) %>
+<%
+    display_name = metadata_fields['display_name']
+    video_url = metadata_fields['html5_sources']
+    youtube_id_1_0 = metadata_fields['youtube_id_1_0']
+
+    def get_youtube_link(video_id):
+      if video_id:
+        return 'http://youtu.be/{0}'.format(video_id)
+      else:
+        return False
+
+    video_url.update({
+        'help': _('A YouTube URL or a link to a file hosted anywhere on the web.'),
+        'display_name': 'Video URL',
+        'field_name': 'video_url',
+        'type': 'VideoList',
+        'default_value': [
+          get_youtube_link(youtube_id_1_0['default_value'])
+        ]
+    })
+
+    youtube_id_1_0_value = get_youtube_link(youtube_id_1_0['value'])
+
+    if youtube_id_1_0_value:
+        video_url['value'].insert(
+          0,
+          youtube_id_1_0_value
+        )
+
+    metadata = {
+        'display_name': display_name,
+        'video_url': video_url
+    }
+ %>
+
+<div class="wrapper-comp-settings basic_metadata_edit" data-metadata='${json.dumps(metadata) | h}'></div>
+
+<script type="text/javascript">
+    var transcripts = new Transcripts.Editor({
+            el: $('#editor-tab-${html_id}').find('.basic_metadata_edit')
+        }),
+        storage = TabsEditingDescriptor.getStorage();
+
+    TabsEditingDescriptor.Model.addModelUpdate(
+        '${html_id}',
+        '${tabName}',
+        function () {
+            // Advanced, Save
+            metadataEditor = storage.MetadataEditor;
+
+            if (metadataEditor) {
+                transcripts.syncAdvancedTab(metadataEditor.collection);
+            }
+        }
+    );
+
+    TabsEditingDescriptor.Model.addOnSwitch(
+        '${html_id}',
+        '${tabName}',
+        function () {
+            // Basic
+            metadataEditor = storage.MetadataEditor;
+
+            if (metadataEditor) {
+                transcripts.syncBasicTab(metadataEditor.collection);
+            }
+        }
+    );
+</script>

@@ -26,13 +26,15 @@ from xmodule.editing_module import TabsEditingDescriptor
 from xmodule.raw_module import EmptyDataRawDescriptor
 from xmodule.xml_module import is_pointer_tag, name_to_pathname, deserialize_field
 from xmodule.modulestore import Location
+from xmodule.exceptions import NotFoundError
+from xmodule.contentstore.django import contentstore
+from xmodule.contentstore.content import StaticContent
 from xblock.fields import Scope, String, Boolean, Float, List, Integer, ScopeIds
 
 from xblock.field_data import DictFieldData
 
 from xmodule.modulestore.inheritance import InheritanceKeyValueStore
 from xblock.runtime import DbModel
-
 log = logging.getLogger(__name__)
 
 
@@ -197,14 +199,14 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
     module_class = VideoModule
 
     tabs = [
-        # {
-        #     'name': "Subtitles",
-        #     'template': "video/subtitles.html",
-        # },
         {
-            'name': "Settings",
-            'template': "tabs/metadata-edit-tab.html",
+            'name': "Basic",
+            'template': "video/transcripts.html",
             'current': True
+        },
+        {
+            'name': "Advanced",
+            'template': "tabs/metadata-edit-tab.html"
         }
     ]
 
@@ -286,6 +288,29 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
             ele.set('src', self.track)
             xml.append(ele)
         return xml
+
+    def get_context(self):
+        """Extend context and add additional flag:
+
+        This context variables we use for CMS subtitles feature, where
+        we try to understand, must we show some buttons or not.
+        """
+        _context = super(VideoDescriptor, self).get_context()
+        content = None
+
+        if self.sub:
+            filename = 'subs_{0}.srt.sjson'.format(self.sub)
+            content_location = StaticContent.compute_location(
+                self.location.org, self.location.course, filename)
+            try:
+                content = contentstore().find(content_location)
+            except NotFoundError:
+                pass
+
+        _context.update({
+            'has_subs_content': bool(content)
+        })
+        return _context
 
     @classmethod
     def _parse_youtube(cls, data):

@@ -61,3 +61,4 @@ class CourseTestCase(ModuleStoreTestCase):
             number='999',
             display_name='Robot Super Course',
         )
+        self.course_location = self.course.location

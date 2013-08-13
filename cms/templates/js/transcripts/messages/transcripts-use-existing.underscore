@@ -1,0 +1,41 @@
+<div class="transcripts-message-status status-error">
+    <i class="icon-remove"></i>
+    <%= gettext("Timed Transcripts Not Updated") %>
+</div>
+
+<p class="transcripts-message">
+    <%= gettext("You changed a video source, but did not update the timed transcripts file. Do youwant to upload new timed transcripts?") %>
+</p>
+
+<div class="transcripts-file-uploader"></div>
+
+<p class="transcripts-error-message is-invisible">
+    <%= gettext("Error.") %>
+</p>
+
+<div class="wrapper-transcripts-buttons">
+    <button
+        class="action setting-use-existing"
+        type="button"
+        name="setting-use-existing"
+        value="<%= gettext("Use Existing Timed Transcripts") %>"
+        data-tooltip="<%= gettext("Use Existing Timed Transcripts") %>"
+    >
+        <span>
+            <%= gettext("Use Existing Timed Transcripts") %>
+        </span>
+    </button>
+    <% if (!isYoutubeMode){ %>
+    <button
+        class="action setting-upload"
+        type="button"
+        name="setting-upload"
+        value="<%= gettext("Upload New Timed Transcripts") %>"
+        data-tooltip="<%= gettext("Upload New Timed Transcripts") %>"
+    >
+        <span>
+            <%= gettext("Upload New Timed Transcripts") %>
+        </span>
+    </button>
+    <% } %>
+</div>
