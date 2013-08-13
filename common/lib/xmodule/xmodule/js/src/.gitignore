@@ -4,5 +4,5 @@
 *.js
 
 
-# Videoalpha are written in pure JavaScript.
-!videoalpha/*.js
+# Video are written in pure JavaScript.
+!video/*.js

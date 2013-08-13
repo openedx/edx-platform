@@ -1,34 +1,35 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%page args="section_data"/>
 
 <h2>Course Information</h2>
 
 <div class="basic-data">
-  Course Name:
+  ${_("Course Name")}:
   ${ section_data['course_display_name'] }
 </div>
 
 <div class="basic-data">
-  Course ID:
+  ${_("Course ID")}:
   ${ section_data['course_id'] }
 </div>
 
 <div class="basic-data">
-  Students Enrolled:
+  ${_("Students Enrolled")}:
   ${ section_data['enrollment_count'] }
 </div>
 
 <div class="basic-data">
-  Started:
+  ${_("Started")}:
   ${ section_data['has_started'] }
 </div>
 
 <div class="basic-data">
-  Ended:
+  ${_("Ended")}:
   ${ section_data['has_ended'] }
 </div>
 
 <div class="basic-data">
-  Grade Cutoffs:
+  ${_("Grade Cutoffs")}:
   ${ section_data['grade_cutoffs'] }
 </div>
 
@@ -40,7 +41,7 @@
 %if len(section_data['course_errors']):
   <div class="course-errors-wrapper">
     <div class="toggle-wrapper">
-      <h2 class="title">Course Warnings:</h2>
+      <h2 class="title">${_("Course Warnings")}:</h2>
       <div class="triangle"></div>
     </div>
     <div class="course-errors-visibility-wrapper">

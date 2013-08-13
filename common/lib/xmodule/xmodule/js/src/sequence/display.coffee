@@ -88,7 +88,7 @@ class @Sequence
         $.postWithPrefix modx_full_url, position: new_position
 
       # On Sequence change, fire custom event "sequence:change" on element.
-      # Added for aborting video bufferization, see ../videoalpha/10_main.js
+      # Added for aborting video bufferization, see ../video/10_main.js
       @el.trigger "sequence:change"
       @mark_active new_position
       @$('#seq_content').html @contents.eq(new_position - 1).text()
