@@ -282,10 +282,9 @@ section.problem {
 
     .grader-status {
       @include clearfix;
-      margin-bottom: $baseline;
-      padding: 9px;
-      border: 1px solid #ddd;
-      border-top: 0;
+      margin: $baseline/2 0;
+      padding: $baseline/2;
+      border-radius: 5px;
       background: #F6F6F6;
 
       span {
@@ -311,11 +310,11 @@ section.problem {
       }
 
       &.file {
-        background: #fff;
         margin-top: $baseline;
         padding: $baseline 0 0 0;
         border: 0;
         border-top: 1px solid #eee;
+        background: #fff;
 
         p.debug {
           display: none;
@@ -335,8 +334,8 @@ section.problem {
 
 
     .feedback-on-feedback {
-      height: 100px;
       margin-right: $baseline;
+      height: 100px;
     }
 
     .evaluation-response {

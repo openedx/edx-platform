@@ -23,8 +23,8 @@ h2 {
 div.name{
   padding-bottom: 15px;
   
-  h2{
-      display: inline;
+  h2 {
+    display: inline;
   }
 
   .progress-container {
@@ -77,8 +77,8 @@ div.problemwrapper {
     }
 
     .assessments-container {
-      padding: $baseline/2 $baseline $baseline/2 $baseline/2;
       float: right;
+      padding: $baseline/2 $baseline $baseline/2 $baseline/2;
 
       .assessment-text {
         display: inline-block;
@@ -93,9 +93,9 @@ div.problemwrapper {
   }
 
   .result-container {
-    float:left;
+    float: left;
     width: 100%;
-    position:relative;
+    position: relative;
   }
 }
 
@@ -107,7 +107,7 @@ section.legend-container {
     display: inline;
     padding: $baseline/2;
     width: 20%;
-    background-color : #eee;
+    background-color: #eee;
     font-size: .9em;
   }
 }
@@ -119,18 +119,18 @@ section.combined-open-ended-status {
     display: table-cell;
     padding: $baseline/2;
     width: 30px;
+    border-right: 1px solid lightgray;
     background-color: #eee;
     color: #2c2c2c;
     font-size: .9em;
-    border-right: 1px solid lightgray;
 
     &:first-child {
       border-radius: $baseline/4 0 0 $baseline/4;
     }
 
     &:last-child {
-      border-radius: 0 $baseline/4 $baseline/4 0;
       border-right: 0px;
+      border-radius: 0 $baseline/4 $baseline/4 0;
     }
 
     &:only-child {
@@ -183,36 +183,35 @@ section.combined-open-ended-status {
 
   .icon-caret-right {
     display: inline-block;
-    vertical-align: baseline;
     margin-right: ($baseline/4);
+    vertical-align: baseline;
   }
 }
 
- // Problem Section Controls
+// Problem Section Controls
 
 .visibility-control, .visibility-control-prompt {
   display: block;
-  height: 40px;
-  width: 100%; 
+  width: 100%;
+  height: 40px; 
 
   .inner {
     float: left;
-    height: 5px;
     margin-top: $baseline;
-    border-top: 1px dotted #ddd;
-    width: 85%; 
+    width: 85%;
+    height: 5px;
+    border-top: 1px dotted #ddd; 
   }
 }
 
 .section-header {
   display: block;
-  text-align: center;
-  width: 15%;
   float: right;
   padding-top: $baseline/2;
+  width: 15%;
+  text-align: center;
   font-size: .9em;
 }
-
 
 // Rubric Styling
 
@@ -221,7 +220,6 @@ section.combined-open-ended-status {
   padding: 0 $baseline/2;
   width: 20px;
   vertical-align: middle;
-
 }
 
 .wrappable {
@@ -240,17 +238,17 @@ section.combined-open-ended-status {
 
 span.rubric-category {
   display: block;
+  margin-bottom: $baseline/2;
+  padding-top: $baseline/2;
   width: 100%;
   border-bottom: 1px solid lightgray;
   font-size: 1.1em;
-  padding-top: $baseline/2;
-  margin-bottom: $baseline/2;
 }
 
 div.combined-rubric-container {
   margin: 15px;
-  padding-bottom: 5px;
-  padding-top: 10px;
+  padding-top: $baseline/2;
+  padding-bottom: $baseline/4;
 
   ul.rubric-list {
     margin: 0 $baseline $baseline/2 $baseline;
@@ -265,10 +263,11 @@ div.combined-rubric-container {
       }
     }
   }
+
   h4 {
-    padding-top: 10px;
-    border-top: 1px solid;
+    padding-top: $baseline/2;
     border-color: lightgray;
+    border-top: 1px solid;
   }
 
   span.rubric-category {
@@ -286,12 +285,12 @@ div.combined-rubric-container {
     }
   }
 
-   label.choicegroup_partialcorrect {
-      &:before {
-        margin-right: 15px;
-        content: url('../images/partially-correct-icon.png');
-      }
+  label.choicegroup_partialcorrect {
+    &:before {
+      margin-right: 15px;
+      content: url('../images/partially-correct-icon.png');
     }
+  }
 
   label.choicegroup_incorrect {
     &:before {
@@ -300,150 +299,184 @@ div.combined-rubric-container {
     }
   }
 }
-
+  
 div.result-container {
-  padding-top: 10px;
-  padding-bottom: 5px;
- .evaluation {
+  padding-top: $baseline/2;
+  padding-bottom: $baseline/4;
 
-        p {
-            margin-bottom: 1px;
+  .evaluation {
+    p {
+      margin-bottom: 1px;
+    }
+  }
+
+  .feedback-on-feedback {
+    height: 100px;
+    margin-right: 0;
+  }
+
+  .evaluation-response {
+    margin-bottom: 2px;
+    
+    header {
+      a {
+        font-size: .85em;
+      }
+    }
+  }
+
+  .evaluation-scoring {
+    .scoring-list {
+      margin-left: 3px;
+      list-style-type: none;
+
+      li {
+        display:inline;
+        margin-left: 0;
+
+        &:first-child {
+          margin-left: 0;
         }
-    }
 
-    .feedback-on-feedback {
-        height: 100px;
-        margin-right: 0px;
-    }
-
-    .evaluation-response {
-        margin-bottom: 2px;
-        header {
-            a {
-                font-size: .85em;
-            }
+        label {
+          font-size: .9em;
         }
+      }
     }
-    .evaluation-scoring {
-        .scoring-list {
-            list-style-type: none;
-            margin-left: 3px;
+  }
 
-            li {
-                &:first-child {
-                    margin-left: 0px;
-                }
-                display:inline;
-                margin-left: 0px;
+  .submit-message-container {
+    margin: $baseline/2 0;
+  }
 
-                label {
-                    font-size: .9em;
-                }
-            }
+  .external-grader-message {
+    margin-bottom: $baseline/4;
+
+    section {
+      padding-left: $baseline;
+      background-color: #fafafa;
+      color: #2c2c2c;
+      font-family: monospace;
+      font-size: 1em;
+      padding-top: $baseline/2;
+      padding-bottom:30px;
+
+      header {
+        font-size: 1.4em;
+      }
+
+      .shortform {
+        font-weight: bold;
+      }
+
+      .longform {
+        padding: 0;
+        margin: 0;
+
+        .result-errors {
+          margin: $baseline/4;
+          padding: $baseline/2 $baseline/2 $baseline/2 $baseline*2;
+          background: url('../images/incorrect-icon.png') center left no-repeat;
+          
+          li {
+            color: #B00;
+          }
         }
-    }
-    .submit-message-container {
-        margin: 10px 0px ;
-    }
 
-     .external-grader-message {
-         margin-bottom: 5px;
-        section {
-          padding-left: 20px;
-          background-color: #FAFAFA;
-          color: #2C2C2C;
-          font-family: monospace;
-          font-size: 1em;
-          padding-top: 10px;
-          padding-bottom:30px;
-          header {
-              font-size: 1.4em;
+        .result-output {
+          margin: $baseline/4;
+          padding: $baseline 0 15px 50px;
+          border-top: 1px solid #ddd;
+          border-left: 20px solid #fafafa;
+
+          h4 {
+            font-size: 1em;
+            font-family: monospace;
           }
 
-          .shortform {
-            font-weight: bold;
+          dl {
+            margin: 0;
           }
 
-          .longform {
-            padding: 0px;
-            margin: 0px;
+          dt {
+            margin-top: $baseline;
+          }
 
-            .result-errors {
-              margin: 5px;
-              padding: 10px 10px 10px 40px;
-              background: url('../images/incorrect-icon.png') center left no-repeat;
-              li {
-                color: #B00;
-                }
-            }
+          dd {
+            margin-left: 24pt;
+          }
+        }
 
-            .result-output {
-              margin: 5px;
-              padding: 20px 0px 15px 50px;
-              border-top: 1px solid #DDD;
-              border-left: 20px solid #FAFAFA;
+        .markup-text{
+          margin: $baseline/4;
+          padding: $baseline 0 15px 50px;
+          border-top: 1px solid #ddd;
+          border-left: 20px solid #fafafa;
 
-              h4 {
-                font-family: monospace;
-                font-size: 1em;
-              }
+          bs {
+            color: #bb0000;
+          }
 
-              dl {
-                margin: 0px;
-              }
-
-              dt {
-                margin-top: 20px;
-              }
-
-              dd {
-                margin-left: 24pt;
-              }
-            }
-
-            .markup-text{
-              margin: 5px;
-              padding: 20px 0px 15px 50px;
-              border-top: 1px solid #DDD;
-              border-left: 20px solid #FAFAFA;
-
-              bs {
-                color: #BB0000;
-              }
-
-              bg {
-                color: #BDA046;
-              }
-            }
+          bg {
+            color: #bda046;
           }
         }
       }
+    }
+  }
+
   .rubric-result-container {
+    padding: 2px;
+    margin: 0px;
+    display : inline;
+
     .rubric-result {
       font-size: .9em;
       padding: 2px;
       display: inline-table;
     }
-    padding: 2px;
-    margin: 0px;
-    display : inline;
   }
 }
 
 div.rubric {
-    ul.rubric-list{
-      margin: 0;
-      padding: 0;
-      list-style-type: none;
-      list-style: none;
-      li {
-        &.rubric-list-item {
-          margin-bottom: 0;
-          padding: 0;
-          border-radius: $baseline/4;
-         }
+  ul.rubric-list{
+    margin: 0 $baseline $baseline/2 $baseline;
+    padding: 0;
+    list-style: none;
+    list-style-type: none;
+
+    li {
+      &.rubric-list-item {
+        margin-bottom: 2px;
+        padding: $baseline/2;
+        border-radius: $baseline/4;
+
+        &:hover {
+          background-color: #eee;
+        }
+
+        .wrapper-score-selection { 
+          display: table-cell;
+          padding: 0 $baseline/2;
+          width: 20px;
+          vertical-align: middle;
+        }
+
+        .wrappable {
+          display: table-cell;
+          padding: $baseline/4;
+        }
       }
     }
+  }
+
+  span.rubric-category {
+    display: block;
+    width: 100%;
+    border-bottom: 1px solid lightgray;
+    font-weight: bold;
+    font-size: .9em;
+  }
 }
 
 
@@ -490,188 +523,186 @@ section.open-ended-child {
     }
   }
 
-    p {
-      &.answer {
-        margin-top: -2px;
-      }
-      &.status {
-        margin: 8px 0 0 $baseline/2;
-        text-indent: -9999px;
-      }
+  p {
+    &.answer {
+      margin-top: -2px;
     }
-
-    div.unanswered {
-      p.status {
-        @include inline-block();
-        background: url('../images/unanswered-icon.png') center center no-repeat;
-        height: 14px;
-        width: 14px;
-      }
+    &.status {
+      margin: 8px 0 0 $baseline/2;
+      text-indent: -9999px;
     }
+  }
 
-    div.correct, div.ui-icon-check {
-      p.status {
-        @include inline-block();
-        width: 25px;
-        height: 20px;
-        background: url('../images/correct-icon.png') center center no-repeat;
-      }
-
-      input {
-        border-color: green;
-      }
-    }
-
-    div.processing {
-      p.status {
-        @include inline-block();
-        width: 20px;
-        height: 20px;
-        background: url('../images/spinner.gif') center center no-repeat;
-      }
-
-      input {
-        border-color: #aaa;
-      }
-    }
-
-    div.incorrect, div.ui-icon-close {
-      p.status {
-        @include inline-block();
-        width: 20px;
-        height: 20px;
-        background: url('../images/incorrect-icon.png') center center no-repeat;
-        text-indent: -9999px;
-      }
-
-      input {
-        border-color: red;
-      }
-    }
-
-    > span {
-      display: block;
-      margin-bottom: lh(.5);
-    }
-
-    p.answer {
+  div.unanswered {
+    p.status {
       @include inline-block();
-      margin-bottom: 0;
-      margin-left: 10px;
+      width: 14px;
+      height: 14px;
+      background: url('../images/unanswered-icon.png') center center no-repeat;
+    }
+  }
 
+  div.correct, div.ui-icon-check {
+    p.status {
+      @include inline-block();
+      width: 25px;
+      height: 20px;
+      background: url('../images/correct-icon.png') center center no-repeat;
+    }
+
+    input {
+      border-color: green;
+    }
+  }
+
+  div.processing {
+    p.status {
+      @include inline-block();
+      width: 20px;
+      height: 20px;
+      background: url('../images/spinner.gif') center center no-repeat;
+    }
+
+    input {
+      border-color: #aaa;
+    }
+  }
+
+  div.incorrect, div.ui-icon-close {
+    p.status {
+      @include inline-block();
+      width: 20px;
+      height: 20px;
+      background: url('../images/incorrect-icon.png') center center no-repeat;
+      text-indent: -9999px;
+    }
+
+    input {
+      border-color: red;
+    }
+  }
+
+  > span {
+    display: block;
+    margin-bottom: lh(.5);
+  }
+
+  p.answer {
+    @include inline-block();
+    margin-bottom: 0;
+    margin-left: $baseline/2;
+
+    &:before {
+      content: "Answer: ";
+      font-weight: bold;
+      display: inline;
+
+    }
+    &:empty {
       &:before {
-        content: "Answer: ";
-        font-weight: bold;
-        display: inline;
-
-      }
-      &:empty {
-        &:before {
-          display: none;
-        }
+        display: none;
       }
     }
+  }
+
+  span {
+    &.unanswered, &.ui-icon-bullet {
+      @include inline-block();
+      position: relative;
+      top: 4px;
+      width: 14px;
+      height: 14px;
+      background: url('../images/unanswered-icon.png') center center no-repeat;
+    }
+
+    &.processing, &.ui-icon-processing {
+      @include inline-block();
+      position: relative;
+      top: 6px;
+      width: 25px;
+      height: 20px;
+      background: url('../images/spinner.gif') center center no-repeat;
+    }
+
+    &.correct, &.ui-icon-check {
+      @include inline-block();
+      position: relative;
+      top: 6px;
+      width: 25px;
+      height: 20px;
+      background: url('../images/correct-icon.png') center center no-repeat;
+    }
+
+    &.incorrect, &.ui-icon-close {
+      @include inline-block();
+      position: relative;
+      top: 6px;
+      width: 20px;
+      height: 20px;
+      background: url('../images/incorrect-icon.png') center center no-repeat;
+    }
+  }
+
+  .reload {
+    float:right;
+    margin: $baseline/2;
+  }
+
+  div.short-form-response {
+    @include clearfix;
+    overflow-y: auto;
+    margin-bottom: 0;
+    padding: $baseline/2;
+    min-height: 20px;
+    height: auto;
+    border: 1px solid #ddd;
+    background: #f6f6f6;
+  }
+
+  .grader-status {
+    @include clearfix;
+    margin: $baseline/2 0;
+    padding: $baseline/2;
+    border-radius: 5px;
+    background: #f6f6f6;
 
     span {
-      &.unanswered, &.ui-icon-bullet {
-        @include inline-block();
-        position: relative;
-        top: 4px;
-        width: 14px;
-        height: 14px;
-        background: url('../images/unanswered-icon.png') center center no-repeat;
-      }
-
-      &.processing, &.ui-icon-processing {
-        @include inline-block();
-        position: relative;
-        top: 6px;
-        width: 25px;
-        height: 20px;
-        background: url('../images/spinner.gif') center center no-repeat;
-      }
-
-      &.correct, &.ui-icon-check {
-        @include inline-block();
-        position: relative;
-        top: 6px;
-        width: 25px;
-        height: 20px;
-        background: url('../images/correct-icon.png') center center no-repeat;
-      }
-
-      &.incorrect, &.ui-icon-close {
-        @include inline-block();
-        position: relative;
-        top: 6px;
-        width: 20px;
-        height: 20px;
-        background: url('../images/incorrect-icon.png') center center no-repeat;
-      }
+      display: block;
+      float: left;
+      overflow: hidden;
+      margin: -7px 7px 0 0;
+      text-indent: -9999px;
     }
 
-    .reload {
-      float:right;
-      margin: 10px;
+    .grading {
+      margin: 0 7px 0 0;
+      padding-left: 25px;
+      background: url('../images/info-icon.png') left center no-repeat;
+      text-indent: 0;
     }
 
-    div.short-form-response {
-      @include clearfix;
-      overflow-y: auto;
+    p {
+      float: left;
       margin-bottom: 0;
-      padding: $baseline/2;
-      height: auto;
-      min-height: 20px;
-      border: 1px solid #ddd;
-      background: #f6f6f6;
+      line-height: 20px;
     }
 
-    .grader-status {
-      @include clearfix;
-      margin-bottom: $baseline;
-      padding: 9px;
-      border: 1px solid #ddd;
-      border-top: 0;
-      background: #f6f6f6;
+    &.file {
+      margin-top: $baseline;
+      padding: $baseline 0 0 0;
+      border: 0;
+      border-top: 1px solid #eee;
+      background: #fff;
 
-      span {
-        display: block;
+      p.debug {
+        display: none;
+      }
+
+      input {
         float: left;
-        overflow: hidden;
-        margin: -7px 7px 0 0;
-        text-indent: -9999px;
       }
-
-      .grading {
-        margin: 0 7px 0 0;
-        padding-left: 25px;
-        background: url('../images/info-icon.png') left center no-repeat;
-        text-indent: 0;
-      }
-
-      p {
-        float: left;
-        margin-bottom: 0;
-        line-height: 20px;
-      }
-
-      &.file {
-        margin-top: $baseline;
-        padding: $baseline 0 0 0;
-        border: 0;
-        border-top: 1px solid #eee;
-        background: #fff;
-
-        p.debug {
-          display: none;
-        }
-
-        input {
-          float: left;
-        }
-      }
-
     }
+  }
 
   form.option-input {
     margin: -$baseline/2 0 $baseline;
@@ -688,19 +719,20 @@ section.open-ended-child {
     margin-left: .75rem;
   }
 
-    ul.rubric-list{
-      margin: 0;
-      padding: 0;
-      list-style-type: none;
-      list-style: none;
-      li {
-        &.rubric-list-item {
-          margin-bottom: 0;
-          padding: 0;
-          border-radius: $baseline/4;
-         }
+  ul.rubric-list{
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    list-style: none;
+
+    li {
+      &.rubric-list-item {
+        margin-bottom: 0;
+        padding: 0;
+        border-radius: $baseline/4;
       }
     }
+  }
 
   ol {
     margin-bottom: lh();
@@ -860,18 +892,49 @@ section.open-ended-child {
 
 .oe-tools {
   display: inline-block;
+  padding-left: $baseline;
   width: 100%;
   border-radius: 5px;
 
   .oe-tools-label {
-    font-size: 0.8em;
     display: inline-block;
+    padding: $baseline/2;
     vertical-align: middle;
-    padding: 10px;
+    font-size: 0.8em;
   }
 
+  .next-step-button {
+    margin: $baseline/2;
+  }
   .reset-button {
     vertical-align: middle; 
   }
 }
 
+// Staff Grading
+.problem-list-container {
+  margin: $baseline/2;
+
+  .instructions {
+    padding-bottom: $baseline/2;
+  }
+}
+
+.staff-grading {
+
+  .breadcrumbs { 
+    padding: $baseline/10;
+    background-color: #f6f6f6;
+    border-radius: 5px;
+    margin-bottom: $baseline/2;
+  }
+
+  .prompt-wrapper {
+    padding-top: $baseline/2;
+
+    .meta-info-wrapper {
+      padding: $baseline/2;
+      border-radius: $baseline/4;
+    }
+  }
+}
