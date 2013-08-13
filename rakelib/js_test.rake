@@ -10,6 +10,10 @@ JS_TEST_SUITES.each do |key, val|
     JS_TEST_SUITES[key] = File.join(REPO_ROOT, val)
 end
 
+# Define the directory for coverage reports
+JS_REPORT_DIR = report_dir_path('javascript')
+directory JS_REPORT_DIR
+
 # Given an environment (a key in `JS_TEST_SUITES`)
 # return the path to the JavaScript test suite description
 # If `env` is nil, return a string containing
@@ -30,7 +34,7 @@ def js_test_tool(env, command, do_coverage)
     cmd = "js-test-tool #{command} #{suite} --use-firefox "
 
     if do_coverage
-        report_dir = report_dir_path('js_coverage.xml')
+        report_dir = File.join(JS_REPORT_DIR, 'coverage.xml')
         cmd += "--coverage-xml #{report_dir}"
     end
 
@@ -45,10 +49,11 @@ def print_js_test_cmds(mode)
     end
 end
 
+
 namespace :js_test do
 
     desc "Run the JavaScript tests and print results to the console"
-    task :run, [:env] => [:'assets:coffee'] do |t, args|
+    task :run, [:env] => [:clean_test_files, :'assets:coffee'] do |t, args|
         if args[:env].nil?
             puts "Running all test suites.  To run a specific test suite, try:"
             print_js_test_cmds('run')
@@ -57,7 +62,7 @@ namespace :js_test do
     end
 
     desc "Run the JavaScript tests in your default browser"
-    task :dev, [:env] => [:'assets:coffee'] do |t, args|
+    task :dev, [:env] => [:clean_test_files, :'assets:coffee'] do |t, args|
         if args[:env].nil?
             puts "Error: No test suite specified.  Try one of these instead:"
             print_js_test_cmds('dev')
@@ -67,7 +72,7 @@ namespace :js_test do
     end
 
     desc "Run all JavaScript tests and collect coverage information"
-    task :coverage => [:'assets:coffee', REPORT_DIR] do
+    task :coverage => [:clean_test_files, :'assets:coffee', JS_REPORT_DIR] do
         js_test_tool(nil, 'run', true)
     end
 end
