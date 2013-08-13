@@ -60,10 +60,10 @@ def user_track(request):
         "session": scookie,
         "ip": request.META['REMOTE_ADDR'],
         "event_source": "browser",
-        "event_type": request.REQUEST['event_type'],
-        "event": request.REQUEST['event'],
+        "event_type": request.REQUEST.get('event_type','unknown'),
+        "event": request.REQUEST.get('event','unknown'),
         "agent": agent,
-        "page": request.REQUEST['page'],
+        "page": request.REQUEST.get('page', 'unknown'),
         "time": datetime.datetime.now(UTC).isoformat(),
         "host": request.META['SERVER_NAME'],
     }
