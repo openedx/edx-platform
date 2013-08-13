@@ -1119,13 +1119,14 @@ def _do_enroll_students(course, course_id, students, overload=False, auto_enroll
         ceaset.delete()
 
     if email_students:
-        registration_url = 'https://' + settings.SITE_NAME + reverse('student.views.register_user')
+        stripped_site_name = _remove_preview(settings.SITE_NAME)
+        registration_url = 'https://' + stripped_site_name + reverse('student.views.register_user')
         #Composition of email
-        d = {'site_name': settings.SITE_NAME,
+        d = {'site_name': stripped_site_name,
              'registration_url': registration_url,
              'course_id': course_id,
              'auto_enroll': auto_enroll,
-             'course_url': 'https://' + settings.SITE_NAME + '/courses/' + course_id,
+             'course_url': 'https://' + stripped_site_name + '/courses/' + course_id,
              }
 
     for student in new_students:
@@ -1209,9 +1210,10 @@ def _do_unenroll_students(course_id, students, email_students=False):
     old_students, _ = get_and_clean_student_list(students)
     status = dict([x, 'unprocessed'] for x in old_students)
 
+    stripped_site_name = _remove_preview(settings.SITE_NAME)
     if email_students:
         #Composition of email
-        d = {'site_name': settings.SITE_NAME,
+        d = {'site_name': stripped_site_name,
              'course_id': course_id}
 
     for student in old_students:
@@ -1299,6 +1301,12 @@ def send_mail_to_student(student, param_dict):
         return True
     else:
         return False
+
+
+def _remove_preview(site_name):
+    if site_name[:8] == "preview.":
+        return site_name[8:]
+    return site_name
 
 
 def get_and_clean_student_list(students):
