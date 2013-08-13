@@ -975,8 +975,8 @@ class TestInheritance(SplitModuleTest):
 # This mocks the django.modulestore() function and is intended purely to disentangle
 # the tests from django
 def modulestore():
-    def load_function(path):
-        module_path, _, name = path.rpartition('.')
+    def load_function(engine_path):
+        module_path, _, name = engine_path.rpartition('.')
         return getattr(import_module(module_path), name)
 
     if SplitModuleTest.modulestore is None:

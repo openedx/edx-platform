@@ -10,9 +10,10 @@ def parse_url(string):
 
     Examples:
         'edx://@0123FFFF'
-        'edx://edu.mit.eecs.6002x'
-        'edx://edu.mit.eecs.6002x;published'
-        'edx://edu.mit.eecs.6002x;published#HW3'
+        'edx://mit.eecs.6002x'
+        'edx://mit.eecs.6002x;published'
+        'edx://mit.eecs.6002x;published#HW3'
+        'edx://mit.eecs.6002x;published@000eee12345#HW3'
 
     This returns None if string cannot be parsed.
 
@@ -81,10 +82,10 @@ def parse_course_id(string):
 
     Examples of valid course_ids:
 
-      'edu.mit.eecs.6002x'
-      'edu.mit.eecs.6002x;published'
-      'edu.mit.eecs.6002x#HW3'
-      'edu.mit.eecs.6002x;published#HW3'
+      'mit.eecs.6002x'
+      'mit.eecs.6002x;published'
+      'mit.eecs.6002x#HW3'
+      'mit.eecs.6002x;published#HW3'
 
 
     Syntax:
