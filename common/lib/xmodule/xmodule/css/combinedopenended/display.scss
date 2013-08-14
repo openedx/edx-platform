@@ -896,11 +896,23 @@ section.open-ended-child {
   width: 100%;
   border-radius: 5px;
 
-  .oe-tools-label {
+  .oe-tools-label, .oe-tools-scores-label {
     display: inline-block;
     padding: $baseline/2;
     vertical-align: middle;
     font-size: 0.8em;
+  }
+
+  .rubric-button {
+    padding: 8px $baseline/4;
+  }
+
+  .rubric-previous-button {
+    margin-right: $baseline/4;
+  }
+  
+  .rubric-next-button {
+    margin-left: $baseline/4;
   }
 
   .next-step-button {

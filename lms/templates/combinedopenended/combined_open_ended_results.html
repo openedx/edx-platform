@@ -12,15 +12,18 @@
                 <span class="section-header section-header-rubric">Submitted Rubric</span>
             </div>
             <div class="oe-tools rubric-header">
-                <span class="oe-tools-label"></span>
+                <span class="oe-tools-label">Rubric: </span>
                 <button class="rubric-collapse" href="#">Show Score Only</button>
-                % if len(results)>1:
-                    <a href="#" class="rubric-previous-button">Previous</a>
-                % endif 
-                ${result['task_name']} from grader ${i+1}
-                % if len(results)>1:
-                    <a href="#" class="rubric-next-button">Next</a> 
-                % endif
+                <span class="oe-tools-scores">
+                    <span class="oe-tools-scores-label">Scores:</span>
+                    % if len(results)>1:
+                        <button href="#" alt="Previous" class="rubric-button rubric-previous-button"><i class="icon-chevron-left"></i></button>
+                    % endif 
+                    ${result['task_name']} from grader ${i+1}
+                    % if len(results)>1:
+                        <button href="#" alt="Next" class="rubric-button rubric-next-button">i class="icon-chevron-right"></i></button> 
+                    % endif
+                </span>
             </div>
             ${result['result'] | n}
             <div class="written-feedback">
