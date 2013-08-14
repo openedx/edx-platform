@@ -293,7 +293,10 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
             pieces = video.split(':')
             try:
                 speed = '%.2f' % float(pieces[0])  # normalize speed
-                youtube_id = pieces[1]
+                # Handle the fact that youtube IDs got double-quoted for a period of time.
+                # Note: we pass in "VideoFields.youtube_id_1_0" so we deserialize as a String--
+                # it doesn't matter what the actual speed is for the purposes of deserializing.
+                youtube_id = VideoDescriptor._deserialize(VideoFields.youtube_id_1_0.name, pieces[1])
                 ret[speed] = youtube_id
             except (ValueError, IndexError):
                 log.warning('Invalid YouTube ID: %s' % video)
@@ -310,7 +313,6 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
         model_data = {}
 
         conversions = {
-            'show_captions': json.loads,
             'start_time': VideoDescriptor._parse_time,
             'end_time': VideoDescriptor._parse_time
         }
@@ -349,6 +351,11 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
                 #  Convert XML attrs into Python values.
                 if attr in conversions:
                     value = conversions[attr](value)
+                else:
+                     # We export values with json.dumps (well, except for Strings, but
+                     # for about a month we did it for Strings also).
+                    value = VideoDescriptor._deserialize(attr, value)
+
                 model_data[attr] = value
 
         return model_data
@@ -367,6 +374,12 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
                 seconds=obj_time.tm_sec
             ).total_seconds()
 
+    @staticmethod
+    def _deserialize(attr, value):
+        """
+        Handles deserializing values that may have been encoded with json.dumps.
+        """
+        return VideoDescriptor.get_map_for_field(VideoDescriptor, attr).from_xml(value)
 
 def _create_youtube_string(module):
     """
