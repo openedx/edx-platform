@@ -53,13 +53,14 @@ except ImportError:
 config = {"username": settings.MITX_FEATURES.get('SAUCE_USERNAME'),
 "access-key": settings.MITX_FEATURES.get('SAUCE_ACCESS_ID')}
 
-desired_capabilities =  settings.MITX_FEATURES.get('SAUCE_BROWSER', DesiredCapabilities.CHROME)
-desired_capabilities['platform'] = settings.MITX_FEATURES.get('SAUCE_PLATFORM', 'Linux')
-desired_capabilities['version'] = settings.MITX_FEATURES.get('SAUCE_VERSION', '')
-desired_capabilities['device-type'] = settings.MITX_FEATURES.get('SAUCE_DEVICE', '')
-desired_capabilities['name'] = settings.MITX_FEATURES.get('SAUCE_SESSION', 'Lettuce Tests')
-desired_capabilities['build'] = settings.MITX_FEATURES.get('SAUCE_BUILD', 'edX Plaform')
-desired_capabilities['tags'] = settings.MITX_FEATURES.get('SAUCE_TAGS', '')
+SAUCE = settings.MITX_FEATURES.get('SAUCE', {})
+desired_capabilities =  SAUCE.get('BROWSER', DesiredCapabilities.CHROME)
+desired_capabilities['platform'] = SAUCE.get('PLATFORM', 'Linux')
+desired_capabilities['version'] = SAUCE.get('VERSION', '')
+desired_capabilities['device-type'] = SAUCE.get('DEVICE', '')
+desired_capabilities['name'] = SAUCE.get('SESSION', 'Lettuce Tests')
+desired_capabilities['build'] = SAUCE.get('BUILD', 'edX Plaform')
+desired_capabilities['tags'] = SAUCE.get('TAGS', '')
 desired_capabilities['video-upload-on-pass'] = False
 desired_capabilities['sauce-advisor'] = False
 desired_capabilities['record-screenshots'] = False
@@ -95,7 +96,7 @@ def initial_setup(server):
     while (not success) and num_attempts < MAX_VALID_BROWSER_ATTEMPTS:
 
         # Get a browser session
-        if settings.MITX_FEATURES.get('USE_SAUCE'):
+        if SAUCE.get('USE'):
             world.browser = Browser(
                 'remote',
                 url="http://{}:{}@ondemand.saucelabs.com:80/wd/hub".format(config['username'],config['access-key']),
@@ -126,7 +127,7 @@ def initial_setup(server):
         raise IOError("Could not acquire valid {driver} browser session.".format(driver='remote'))
 
     # Set the browser size to 1280x1024
-    if not settings.MITX_FEATURES.get('USE_SAUCE'):
+    if not SAUCE.get('USE'):
         world.browser.driver.set_window_size(1280, 1024)
 
 
@@ -177,6 +178,6 @@ def teardown_browser(total):
     """
     Quit the browser after executing the tests.
     """
-    if settings.MITX_FEATURES.get('USE_SAUCE'):
+    if SAUCE.get('USE'):
             set_job_status(jobid, total.scenarios_ran == total.scenarios_passed)
     world.browser.quit()

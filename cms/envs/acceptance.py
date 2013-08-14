@@ -76,23 +76,23 @@ DATABASES = {
 # Use the auto_auth workflow for creating users and logging them in
 MITX_FEATURES['AUTOMATIC_AUTH_FOR_TESTING'] = True
 
-
 # HACK
 # Setting this flag to false causes imports to not load correctly in the lettuce python files
 # We do not yet understand why this occurs. Setting this to true is a stopgap measure
 USE_I18N = True
 
-MITX_FEATURES['USE_SAUCE'] = False
-MITX_FEATURES['SAUCE_USERNAME'] = '<USERNAME>'
-MITX_FEATURES['SAUCE_ACCESS_ID'] = '<ACCESS_ID>'
-MITX_FEATURES['SAUCE_BROWSER'] = DesiredCapabilities.CHROME
-MITX_FEATURES['SAUCE_PLATFORM'] = 'Linux'
-MITX_FEATURES['SAUCE_VERSION'] = ''
-MITX_FEATURES['SAUCE_DEVICE'] = ''
-MITX_FEATURES['SAUCE_SESSION'] = 'Lettuce Tests'
-MITX_FEATURES['SAUCE_BUILD'] = 'CMS TESTS'
-MITX_FEATURES['SAUCE_TAGS'] = ''
-
+MITX_FEATURES['SAUCE'] = {
+    'USE' : False,
+    'USERNAME' : '<USERNAME>',
+    'ACCESS_ID' : '<ACCESS_ID>',
+    'BROWSER' : DesiredCapabilities.CHROME,
+    'PLATFORM' : 'Linux',
+    'VERSION' : '',
+    'DEVICE' : '',
+    'SESSION' : 'Lettuce Tests',
+    'BUILD' : 'CMS TESTS',
+    'TAGS' : ''
+}
 
 # Include the lettuce app for acceptance testing, including the 'harvest' django-admin command
 INSTALLED_APPS += ('lettuce.django',)
