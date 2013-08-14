@@ -101,7 +101,7 @@ MITX_FEATURES['SAUCE'] = {
     'ENABLED' : os.environ.get('ENABLED'),
     'USERNAME' : os.environ.get('SAUCE_USER_NAME'),
     'ACCESS_ID' : os.environ.get('SAUCE_API_KEY'),
-    'BROWSER' : DESIRED_CAPABILITIES.get(os.environ.get('SAUCE_BROWSER')),
+    'BROWSER' : DESIRED_CAPABILITIES.get(os.environ.get('SAUCE_BROWSER', 'chrome')),
     'PLATFORM' : os.environ.get('SAUCE_PLATFORM'),
     'VERSION' : os.environ.get('SAUCE_VERSION'),
     'DEVICE' : os.environ.get('SAUCE_DEVICE'),
@@ -114,4 +114,4 @@ MITX_FEATURES['SAUCE'] = {
 INSTALLED_APPS += ('lettuce.django',)
 LETTUCE_APPS = ('contentstore',)
 LETTUCE_SERVER_PORT = choice(PORTS)
-LETTUCE_BROWSER = 'chrome'
+LETTUCE_BROWSER = os.environ.get('LETTUCE_BROWSER', 'chrome')
