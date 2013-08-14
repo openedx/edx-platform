@@ -77,6 +77,8 @@ function () {
      * @returns {undefined}
      */
     function _bindHandlers(state) {
+        var speedLinks;
+
         state.videoSpeedControl.videoSpeedsEl.find('a')
             .on('click', state.videoSpeedControl.changeVideoSpeed);
 
@@ -146,29 +148,29 @@ function () {
             // ******************************
             // Attach 'focus', and 'blur' events to elements which represent
             // individual speed entries.
-            state.videoSpeedControl.videoSpeedsEl.find('a.speed_link:last')
-                .on('blur', function () {
-                    // If we have reached the last speed entry, and the focus
-                    // changes to the next element, we need to hide the speeds
-                    // control drop-down.
-                    state.videoSpeedControl.el.removeClass('open');
-                });
-            state.videoSpeedControl.videoSpeedsEl.find('a.speed_link:first')
-                .on('blur', function () {
-                    // This flag will indicate that the focus to the next
-                    // element that will receive it is comming from the first
-                    // speed entry.
-                    //
-                    // This flag will be used to correctly handle scenario of
-                    // tabbing backwards.
-                    state.firstSpeedBlur = true;
-                });
-            state.videoSpeedControl.videoSpeedsEl.find('a.speed_link')
-                .on('focus', function () {
-                    // Clear the flag which is only set when we are un-focusing
-                    // (the blur event) from the first speed entry.
-                    state.firstSpeedBlur = false;
-                });
+            speedLinks = state.videoSpeedControl.videoSpeedsEl
+                .find('a.speed_link');
+
+            speedLinks.last().on('blur', function () {
+                // If we have reached the last speed entry, and the focus
+                // changes to the next element, we need to hide the speeds
+                // control drop-down.
+                state.videoSpeedControl.el.removeClass('open');
+            });
+            speedLinks.first().on('blur', function () {
+                // This flag will indicate that the focus to the next
+                // element that will receive it is comming from the first
+                // speed entry.
+                //
+                // This flag will be used to correctly handle scenario of
+                // tabbing backwards.
+                state.firstSpeedBlur = true;
+            });
+            speedLinks.on('focus', function () {
+                // Clear the flag which is only set when we are un-focusing
+                // (the blur event) from the first speed entry.
+                state.firstSpeedBlur = false;
+            });
         }
     }
 
