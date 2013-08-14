@@ -11,11 +11,11 @@ file and check it in at the same time as your model changes. To do that,
 3. Add the migration file created in edx-platform/common/djangoapps/student/migrations/
 """
 from datetime import datetime
+from random import randint
 import hashlib
 import json
 import logging
 import uuid
-from random import randint
 
 
 from django.conf import settings
@@ -645,16 +645,223 @@ class PendingEmailChange(models.Model):
 
 
 class CourseEnrollment(models.Model):
+    """
+    Represents a Student's Enrollment record for a single Course. You should
+    generally not manipulate CourseEnrollment objects directly, but use the
+    classmethods provided to enroll, unenroll, or check on the enrollment status
+    of a given student.
+
+    We're starting to consolidate course enrollment logic in this class, but
+    more should be brought in (such as checking against CourseEnrollmentAllowed,
+    checking course dates, user permissions, etc.) This logic is currently
+    scattered across our views.
+    """
     user = models.ForeignKey(User)
     course_id = models.CharField(max_length=255, db_index=True)
-
     created = models.DateTimeField(auto_now_add=True, null=True, db_index=True)
+
+    # If is_active is False, then the student is not considered to be enrolled
+    # in the course (is_enrolled() will return False)
+    is_active = models.BooleanField(default=True)
+
+    # Represents the modes that are possible. We'll update this later with a
+    # list of possible values.
+    mode = models.CharField(default="honor", max_length=100)
+
 
     class Meta:
         unique_together = (('user', 'course_id'),)
+        ordering = ('user', 'course_id')
 
     def __unicode__(self):
-        return "[CourseEnrollment] %s: %s (%s)" % (self.user, self.course_id, self.created)
+        return (
+            "[CourseEnrollment] {}: {} ({}); active: ({})"
+        ).format(self.user, self.course_id, self.created, self.is_active)
+
+    @classmethod
+    def create_enrollment(cls, user, course_id, mode="honor", is_active=False):
+        """
+        Create an enrollment for a user in a class. By default *this enrollment
+        is not active*. This is useful for when an enrollment needs to go
+        through some sort of approval process before being activated. If you
+        don't need this functionality, just call `enroll()` instead.
+
+        Returns a CoursewareEnrollment object.
+
+        `user` is a Django User object. If it hasn't been saved yet (no `.id`
+               attribute), this method will automatically save it before
+               adding an enrollment for it.
+
+        `course_id` is our usual course_id string (e.g. "edX/Test101/2013_Fall)
+
+        `mode` is a string specifying what kind of enrollment this is. The
+               default is "honor", meaning honor certificate. Future options
+               may include "audit", "verified_id", etc. Please don't use it
+               until we have these mapped out.
+
+        `is_active` is a boolean. If the CourseEnrollment object has
+                    `is_active=False`, then calling
+                    `CourseEnrollment.is_enrolled()` for that user/course_id
+                    will return False.
+
+        It is expected that this method is called from a method which has already
+        verified the user authentication and access.
+        """
+        # If we're passing in a newly constructed (i.e. not yet persisted) User,
+        # save it to the database so that it can have an ID that we can throw
+        # into our CourseEnrollment object. Otherwise, we'll get an
+        # IntegrityError for having a null user_id.
+        if user.id is None:
+            user.save()
+
+        enrollment, _ = CourseEnrollment.objects.get_or_create(
+            user=user,
+            course_id=course_id,
+        )
+        # In case we're reactivating a deactivated enrollment, or changing the
+        # enrollment mode.
+        if enrollment.mode != mode or enrollment.is_active != is_active:
+            enrollment.mode = mode
+            enrollment.is_active = is_active
+            enrollment.save()
+
+        return enrollment
+
+    @classmethod
+    def enroll(cls, user, course_id, mode="honor"):
+        """
+        Enroll a user in a course. This saves immediately.
+
+        Returns a CoursewareEnrollment object.
+
+        `user` is a Django User object. If it hasn't been saved yet (no `.id`
+               attribute), this method will automatically save it before
+               adding an enrollment for it.
+
+        `course_id` is our usual course_id string (e.g. "edX/Test101/2013_Fall)
+
+        `mode` is a string specifying what kind of enrollment this is. The
+               default is "honor", meaning honor certificate. Future options
+               may include "audit", "verified_id", etc. Please don't use it
+               until we have these mapped out.
+
+        It is expected that this method is called from a method which has already
+        verified the user authentication and access.
+        """
+        return cls.create_enrollment(user, course_id, mode, is_active=True)
+
+    @classmethod
+    def enroll_by_email(cls, email, course_id, mode="honor", ignore_errors=True):
+        """
+        Enroll a user in a course given their email. This saves immediately.
+
+        Note that  enrolling by email is generally done in big batches and the
+        error rate is high. For that reason, we supress User lookup errors by
+        default.
+
+        Returns a CoursewareEnrollment object. If the User does not exist and
+        `ignore_errors` is set to `True`, it will return None.
+
+        `email` Email address of the User to add to enroll in the course.
+
+        `course_id` is our usual course_id string (e.g. "edX/Test101/2013_Fall)
+
+        `mode` is a string specifying what kind of enrollment this is. The
+               default is "honor", meaning honor certificate. Future options
+               may include "audit", "verified_id", etc. Please don't use it
+               until we have these mapped out.
+
+        `ignore_errors` is a boolean indicating whether we should suppress
+                        `User.DoesNotExist` errors (returning None) or let it
+                        bubble up.
+
+        It is expected that this method is called from a method which has already
+        verified the user authentication and access.
+        """
+        try:
+            user = User.objects.get(email=email)
+            return cls.enroll(user, course_id, mode)
+        except User.DoesNotExist:
+            err_msg = u"Tried to enroll email {} into course {}, but user not found"
+            log.error(err_msg.format(email, course_id))
+            if ignore_errors:
+                return None
+            raise
+
+    @classmethod
+    def unenroll(cls, user, course_id):
+        """
+        Remove the user from a given course. If the relevant `CourseEnrollment`
+        object doesn't exist, we log an error but don't throw an exception.
+
+        `user` is a Django User object. If it hasn't been saved yet (no `.id`
+               attribute), this method will automatically save it before
+               adding an enrollment for it.
+
+        `course_id` is our usual course_id string (e.g. "edX/Test101/2013_Fall)
+        """
+        try:
+            record = CourseEnrollment.objects.get(user=user, course_id=course_id)
+            record.is_active = False
+            record.save()
+        except cls.DoesNotExist:
+            log.error("Tried to unenroll student {} from {} but they were not enrolled")
+
+    @classmethod
+    def unenroll_by_email(cls, email, course_id):
+        """
+        Unenroll a user from a course given their email. This saves immediately.
+        User lookup errors are logged but will not throw an exception.
+
+        `email` Email address of the User to unenroll from the course.
+
+        `course_id` is our usual course_id string (e.g. "edX/Test101/2013_Fall)
+        """
+        try:
+            user = User.objects.get(email=email)
+            return cls.unenroll(user, course_id)
+        except User.DoesNotExist:
+            err_msg = u"Tried to unenroll email {} from course {}, but user not found"
+            log.error(err_msg.format(email, course_id))
+
+    @classmethod
+    def is_enrolled(cls, user, course_id):
+        """
+        Remove the user from a given course. If the relevant `CourseEnrollment`
+        object doesn't exist, we log an error but don't throw an exception.
+
+        Returns True if the user is enrolled in the course (the entry must exist
+        and it must have `is_active=True`). Otherwise, returns False.
+
+        `user` is a Django User object. If it hasn't been saved yet (no `.id`
+               attribute), this method will automatically save it before
+               adding an enrollment for it.
+
+        `course_id` is our usual course_id string (e.g. "edX/Test101/2013_Fall)
+        """
+        try:
+            record = CourseEnrollment.objects.get(user=user, course_id=course_id)
+            return record.is_active
+        except cls.DoesNotExist:
+            return False
+
+    @classmethod
+    def enrollments_for_user(cls, user):
+        return CourseEnrollment.objects.filter(user=user, is_active=1)
+
+    def activate(self):
+        """Makes this `CourseEnrollment` record active. Saves immediately."""
+        if not self.is_active:
+            self.is_active = True
+            self.save()
+
+    def deactivate(self):
+        """Makes this `CourseEnrollment` record inactive. Saves immediately. An
+        inactive record means that the student is not enrolled in this course.
+        """
+        if self.is_active:
+            self.is_active = False
+            self.save()
 
 
 class CourseEnrollmentAllowed(models.Model):

@@ -54,7 +54,7 @@ def register_by_course_id(course_id, is_staff=False):
     if is_staff:
         u.is_staff = True
         u.save()
-    CourseEnrollment.objects.get_or_create(user=u, course_id=course_id)
+    CourseEnrollment.enroll(u, course_id)
 
 
 @world.absorb

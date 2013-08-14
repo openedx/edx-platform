@@ -431,12 +431,12 @@ class ShibSPTest(ModuleStoreTestCase):
                 # If course is not limited or student has correct shib extauth then enrollment should be allowed
                 if course is open_enroll_course or student is shib_student:
                     self.assertEqual(response.status_code, 200)
-                    self.assertEqual(CourseEnrollment.objects.filter(user=student, course_id=course.id).count(), 1)
+                    self.assertTrue(CourseEnrollment.is_enrolled(student, course.id))
                     # Clean up
-                    CourseEnrollment.objects.filter(user=student, course_id=course.id).delete()
+                    CourseEnrollment.unenroll(student, course.id)
                 else:
                     self.assertEqual(response.status_code, 400)
-                    self.assertEqual(CourseEnrollment.objects.filter(user=student, course_id=course.id).count(), 0)
+                    self.assertFalse(CourseEnrollment.is_enrolled(student, course.id))
 
     @unittest.skipUnless(settings.MITX_FEATURES.get('AUTH_USE_SHIB'), True)
     def test_shib_login_enrollment(self):
@@ -462,7 +462,7 @@ class ShibSPTest(ModuleStoreTestCase):
 
         # use django test client for sessions and url processing
         # no enrollment before trying
-        self.assertEqual(CourseEnrollment.objects.filter(user=student, course_id=course.id).count(), 0)
+        self.assertFalse(CourseEnrollment.is_enrolled(student, course.id))
         self.client.logout()
         request_kwargs = {'path': '/shib-login/',
                           'data': {'enrollment_action': 'enroll', 'course_id': course.id},
@@ -474,4 +474,4 @@ class ShibSPTest(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['location'], 'http://testserver/')
         # now there is enrollment
-        self.assertEqual(CourseEnrollment.objects.filter(user=student, course_id=course.id).count(), 1)
+        self.assertTrue(CourseEnrollment.is_enrolled(student, course.id))
