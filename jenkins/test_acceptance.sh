@@ -33,10 +33,10 @@ export DISPLAY=:1
 SKIP_TESTS=""
 
 if [ ! -z ${LETTUCE_BROWSER+x} ]; then
-	SKIP_TESTS="--tag -$(tr '[:lower:]' '[:upper:]' <<< ${LETTUCE_BROWSER:0:1})${LETTUCE_BROWSER:1}"
+	SKIP_TESTS="--tag -skip_$LETTUCE_BROWSER"
 fi
 if [ ! -z ${SAUCE_ENABLED+x} ]; then
-	SKIP_TESTS="--tag -Sauce --tag -$(tr '[:lower:]' '[:upper:]' <<< ${SAUCE_BROWSER:0:1})${SAUCE_BROWSER:1}"
+	SKIP_TESTS="--tag -skip_sauce --tag -skip_$SAUCE_BROWSER"
 fi
 
 # Run the lms and cms acceptance tests

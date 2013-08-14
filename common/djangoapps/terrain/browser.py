@@ -56,13 +56,13 @@ SAUCE = settings.MITX_FEATURES.get('SAUCE', {})
 config = {"username": SAUCE.get('USERNAME'),
 "access-key": SAUCE.get('ACCESS_ID')}
 
+world.absorb(SAUCE.get('SAUCE_ENABLED'),'SAUCE_ENABLED')
 desired_capabilities =  SAUCE.get('BROWSER', DesiredCapabilities.CHROME)
-desired_capabilities['platform'] = SAUCE.get('PLATFORM', 'Linux')
-desired_capabilities['version'] = SAUCE.get('VERSION', '')
-desired_capabilities['device-type'] = SAUCE.get('DEVICE', '')
-desired_capabilities['name'] = SAUCE.get('SESSION', 'Lettuce Tests')
-desired_capabilities['build'] = SAUCE.get('BUILD', 'edX Plaform')
-desired_capabilities['custom-data'] = SAUCE.get('CUSTOM_TAGS', '')
+desired_capabilities['platform'] = SAUCE.get('PLATFORM')
+desired_capabilities['version'] = SAUCE.get('VERSION')
+desired_capabilities['device-type'] = SAUCE.get('DEVICE')
+desired_capabilities['name'] = SAUCE.get('SESSION')
+desired_capabilities['build'] = SAUCE.get('BUILD')
 desired_capabilities['video-upload-on-pass'] = False
 desired_capabilities['sauce-advisor'] = False
 desired_capabilities['record-screenshots'] = False
@@ -71,7 +71,7 @@ desired_capabilities['max-duration'] = 3600
 desired_capabilities['public'] = 'public restricted'
 jobid=''
 
-base64string = base64.encodestring('%s:%s' % (config['username'], config['access-key']))[:-1]
+base64string = base64.encodestring('{}:{}'.format(config['username'], config['access-key']))[:-1]
 
 def set_job_status(jobid, passed=True):
     body_content = json.dumps({"passed": passed})
@@ -98,7 +98,7 @@ def initial_setup(server):
     while (not success) and num_attempts < MAX_VALID_BROWSER_ATTEMPTS:
 
         # Get a browser session
-        if SAUCE.get('ENABLED'):
+        if world.SAUCE_ENABLED:
             world.browser = Browser(
                 'remote',
                 url="http://{}:{}@ondemand.saucelabs.com:80/wd/hub".format(config['username'],config['access-key']),
@@ -130,7 +130,7 @@ def initial_setup(server):
         raise IOError("Could not acquire valid {driver} browser session.".format(driver='remote'))
 
     # Set the browser size to 1280x1024
-    if not SAUCE.get('ENABLED'):
+    if not world.SAUCE_ENABLED:
         world.browser.driver.set_window_size(1280, 1024)
 
 
@@ -181,6 +181,6 @@ def teardown_browser(total):
     """
     Quit the browser after executing the tests.
     """
-    if SAUCE.get('ENABLED'):
+    if world.SAUCE_ENABLED:
             set_job_status(jobid, total.scenarios_ran == total.scenarios_passed)
     world.browser.quit()

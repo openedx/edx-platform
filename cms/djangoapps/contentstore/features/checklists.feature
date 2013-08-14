@@ -11,7 +11,7 @@ Feature: Course checklists
     And They are correctly selected after reloading the page
 
   # CHROME ONLY, due to issues getting link to be active in firefox
-  @Firefox
+  @skip_firefox
   Scenario: A task can link to a location within Studio
     Given I have opened Checklists
     When I select a link to the course outline
@@ -20,7 +20,7 @@ Feature: Course checklists
     Then I am brought back to the course outline in the correct state
 
   # CHROME ONLY, due to issues getting link to be active in firefox
-  @Firefox
+  @skip_firefox
   Scenario: A task can link to a location outside Studio
     Given I have opened Checklists
     When I select a link to help page
