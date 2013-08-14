@@ -25,6 +25,16 @@ PORTS = [80, 443, 888, 2000, 2001, 2020, 2109, 2222, 2310, 3000, 3001,
         7777, 8000, 8001, 8003, 8031, 8080, 8081, 8765, 8888, 9000, 9001,
         9080, 9090, 9876, 9999, 49221, 55001]
 
+DESIRED_CAPABILITIES={
+    'chrome': DesiredCapabilities.CHROME,
+    'internet explorer': DesiredCapabilities.INTERNETEXPLORER,
+    'firefox': DesiredCapabilities.FIREFOX,
+    'opera': DesiredCapabilities.OPERA,
+    'iphone': DesiredCapabilities.IPHONE,
+    'ipad': DesiredCapabilities.IPAD,
+    'safari': DesiredCapabilities.SAFARI,
+    'android': DesiredCapabilities.ANDROID
+}
 
 def seed():
     return os.getppid()
@@ -88,15 +98,15 @@ USE_I18N = True
 
 # Information needed to utilize Sauce Labs.
 MITX_FEATURES['SAUCE'] = {
-    'USE' : False,
-    'USERNAME' : '<USERNAME>',
-    'ACCESS_ID' : '<ACCESS_ID>',
-    'BROWSER' : DesiredCapabilities.CHROME,
-    'PLATFORM' : 'Linux',
-    'VERSION' : '',
-    'DEVICE' : '',
-    'SESSION' : 'Lettuce Tests',
-    'BUILD' : 'CMS TESTS',
+    'ENABLED' : os.environ.get('ENABLED'),
+    'USERNAME' : os.environ.get('SAUCE_USER_NAME'),
+    'ACCESS_ID' : os.environ.get('SAUCE_API_KEY'),
+    'BROWSER' : DESIRED_CAPABILITIES.get(os.environ.get('SAUCE_BROWSER')),
+    'PLATFORM' : os.environ.get('SAUCE_PLATFORM'),
+    'VERSION' : os.environ.get('SAUCE_VERSION'),
+    'DEVICE' : os.environ.get('SAUCE_DEVICE'),
+    'SESSION' : 'Jenkins Acceptance Tests',
+    'BUILD' : os.environ.get('JOB_NAME'),
     'CUSTOM_TAGS' : {}
 }
 

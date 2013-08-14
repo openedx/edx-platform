@@ -98,7 +98,7 @@ def initial_setup(server):
     while (not success) and num_attempts < MAX_VALID_BROWSER_ATTEMPTS:
 
         # Get a browser session
-        if SAUCE.get('USE'):
+        if SAUCE.get('ENABLED'):
             world.browser = Browser(
                 'remote',
                 url="http://{}:{}@ondemand.saucelabs.com:80/wd/hub".format(config['username'],config['access-key']),
@@ -130,7 +130,7 @@ def initial_setup(server):
         raise IOError("Could not acquire valid {driver} browser session.".format(driver='remote'))
 
     # Set the browser size to 1280x1024
-    if not SAUCE.get('USE'):
+    if not SAUCE.get('ENABLED'):
         world.browser.driver.set_window_size(1280, 1024)
 
 
@@ -181,6 +181,6 @@ def teardown_browser(total):
     """
     Quit the browser after executing the tests.
     """
-    if SAUCE.get('USE'):
+    if SAUCE.get('ENABLED'):
             set_job_status(jobid, total.scenarios_ran == total.scenarios_passed)
     world.browser.quit()
