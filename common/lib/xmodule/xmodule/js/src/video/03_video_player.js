@@ -315,7 +315,21 @@ function (HTML5Video) {
 
         this.videoPlayer.log('load_video');
 
-        availablePlaybackRates = this.videoPlayer.player.getAvailablePlaybackRates();
+        availablePlaybackRates = this.videoPlayer.player
+                                    .getAvailablePlaybackRates();
+
+        // Because of problems with muting sound outside of range 0.25 and
+        // 5.0, we should filter our available playback rates.
+        // Issues:
+        //   https://code.google.com/p/chromium/issues/detail?id=264341
+        //   https://bugzilla.mozilla.org/show_bug.cgi?id=840745
+        //   https://developer.mozilla.org/en-US/docs/DOM/HTMLMediaElement
+
+        availablePlaybackRates = _.filter(availablePlaybackRates, function(item){
+            var speed = Number(item);
+            return  speed > 0.25 && speed <= 5;
+        });
+
         if ((this.currentPlayerMode === 'html5') && (this.videoType === 'youtube')) {
             if (availablePlaybackRates.length === 1) {
                 // This condition is needed in cases when Firefox version is less than 20. In those versions
