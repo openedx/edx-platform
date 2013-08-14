@@ -41,8 +41,7 @@ class Command(BaseCommand):
                     metavar='COURSE_ID',
                     dest='course',
                     default=False,
-                    help='Grade and generate certificates for a specific '
-                         'course'),
+                    help='Course ID for grade distribution'),
         make_option('-o', '--output',
                     metavar='FILE',
                     dest='output',
