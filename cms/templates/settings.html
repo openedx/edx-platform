@@ -2,7 +2,7 @@
 
 <%inherit file="base.html" />
 <%block name="title">${_("Schedule &amp; Details Settings")}</%block>
-<%block name="bodyclass">is-signedin course schedule settings</%block>
+<%block name="bodyclass">is-signedin course schedule settings file-upload-dialog</%block>
 
 <%namespace name='static' file='static_content.html'/>
 <%!
@@ -21,6 +21,10 @@ from contentstore import utils
   <script type="text/javascript" src="${static.url('js/views/validating_view.js')}"></script>
   <script type="text/javascript" src="${static.url('js/views/settings/main_settings_view.js')}"></script>
   <script type="text/javascript" src="${static.url('js/models/settings/course_details.js')}"></script>
+
+  <script type="text/template" id="upload-dialog-tpl">
+    <%static:include path="js/upload-dialog.underscore" />
+  </script>
 
   <script type="text/javascript">
     $(document).ready(function(){
@@ -43,6 +47,8 @@ from contentstore import utils
         },
         reset: true
       });
+
+    CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
     });
 
   </script>
@@ -206,6 +212,21 @@ from contentstore import utils
                     text = _("Introductions, prerequisites, FAQs that are used on %s (formatted in HTML)") % a_link
                     %>${text}</%def>
                   <span class="tip tip-stacked">${overview_text()}</span>
+                </li>
+
+                <li class="field image" id="field-course-image">
+                  <label>${_("Course Image")}</label>
+                  <div class="current current-course-image">
+                    % if context_course.course_image:
+                    <img id="course-image" width="200" src="${utils.course_image_url(context_course)}" alt="${_('Course Image')}"/>
+                    % endif
+                    <button type="button" class="action action-upload-image">${_("Upload Course Image")}</button>
+                  </div>
+
+                  <div class="input">
+                    <input type="text" class="long new-course-image-url" id="course-image-url" value="" placeholder="Your course image URL" autocomplete="off" />
+                    <span class="tip tip-stacked">${_("Enter your course image's filename.")}</span>
+                  </div>
                 </li>
 
                 <li class="field video" id="field-course-introduction-video">

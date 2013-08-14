@@ -432,6 +432,20 @@ body.course.settings {
       }
     }
 
+    // specific fields - course image
+    #field-course-image {
+        .current-course-image {
+            position: relative;
+
+            .action-upload-image {
+                @extend .ui-btn-flat-outline;
+                position: absolute;
+                bottom: 3px;
+                right: 0;
+            }
+        }
+    }
+
     // specific fields - requirements
     &.requirements {
 

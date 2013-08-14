@@ -338,6 +338,12 @@ class CourseFields(object):
     show_timezone = Boolean(help="True if timezones should be shown on dates in the courseware", scope=Scope.settings, default=True)
     enrollment_domain = String(help="External login method associated with user accounts allowed to register in course",
                         scope=Scope.settings)
+    course_image = String(
+        help="Filename of the course image",
+        scope=Scope.settings,
+        # Ensure that courses imported from XML keep their image
+        default="images_course_image.jpg"
+    )
 
     # An extra property is used rather than the wiki_slug/number because
     # there are courses that change the number for different runs. This allows
