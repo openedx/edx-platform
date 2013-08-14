@@ -28,7 +28,7 @@ TESTS_FAILED=0
 # and is capturing display :1
 # The command for this is:
 # /usr/bin/Xvfb :1 -screen 0 1024x268x24
-# This allows us to run Chrome without a display
+# This allows us to run Chrome or Firefox without a display
 export DISPLAY=:1
 
 # Run the lms and cms acceptance tests
