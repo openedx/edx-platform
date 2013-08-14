@@ -39,8 +39,9 @@ from util.json_request import JsonResponse
 __all__ = ['asset_index', 'upload_asset', 'import_course',
         'generate_export_course', 'export_course']
 
-MAX_UP_LENGTH = 20000352
+MAX_UP_LENGTH = 20000352 # Max chunk size
 
+# Regex to capture Content-Range header ranges.
 CONTENT_RE = re.compile(r"(?P<start>\d{1,11})-(?P<stop>\d{1,11})/(?P<end>\d{1,11})")
 
 def assets_to_json_dict(assets):
@@ -282,9 +283,10 @@ def import_course(request, org, course, name):
 
         filename = request.FILES['course-data'].name
         if not filename.endswith('.tar.gz'):
-            return HttpResponse(json.dumps({
-                'ErrMsg': 'We only support uploading a .tar.gz file.'
-            }))
+            return JsonResponse(
+                { 'ErrMsg': 'We only support uploading a .tar.gz file.' },
+                status=415
+            )
         temp_filepath = course_dir / filename
 
         if not course_dir.isdir():
@@ -293,18 +295,21 @@ def import_course(request, org, course, name):
         logging.debug('importing course to {0}'.format(temp_filepath))
 
         # Get upload chunks byte ranges
-        matches = CONTENT_RE.search(request.META["HTTP_CONTENT_RANGE"])
-        content_range = matches.groupdict()
+        try:
+            matches = CONTENT_RE.search(request.META["HTTP_CONTENT_RANGE"])
+            content_range = matches.groupdict()
+        except KeyError:
+            content_range = {'start': 0, 'stop': 9, 'end': 10}
 
         # stream out the uploaded files in chunks to disk
         if int(content_range['start']) == 0:
-            temp_file = open(temp_filepath, 'wb+')
+            mode = "wb+"
         else:
-            temp_file = open(temp_filepath, 'ab+')
+            mode = "ab+"
 
-        for chunk in request.FILES['course-data'].chunks():
-            temp_file.write(chunk)
-        temp_file.close()
+        with open(temp_filepath, mode) as temp_file:
+            for chunk in request.FILES['course-data'].chunks():
+                temp_file.write(chunk)
 
         size = os.path.getsize(temp_filepath)
 
@@ -341,17 +346,17 @@ def import_course(request, org, course, name):
 
             # find the 'course.xml' file
             dirpath = None
-            for dirpath, _dirnames, filenames in os.walk(course_dir):
-                for fname in filenames:
-                    if fname == 'course.xml':
-                        break
-                if fname == 'course.xml':
-                    break
 
-            if fname != 'course.xml':
-                return HttpResponse(json.dumps({
-                    'ErrMsg': 'Could not find the course.xml file in the package.'
-                }))
+            coursexmls = ((d, f) for d, _, f in os.walk(course_dir) 
+                                if f.count('course.xml') > 0)
+
+            try:
+                (dirpath, fname) = coursexmls.next()
+            except StopIteration:
+                return JsonResponse(
+                    {'ErrMsg': 'Could not find the course.xml file in the package.' },
+                    status=415
+                )
 
             logging.debug('found course.xml at {0}'.format(dirpath))
 
@@ -382,7 +387,7 @@ def import_course(request, org, course, name):
 
             os.remove(lock_filepath)
 
-            return HttpResponse(json.dumps({'Status': 'OK'}))
+            return JsonResponse({'Status': 'OK'})
     else:
         course_module = modulestore().get_item(location)
 
