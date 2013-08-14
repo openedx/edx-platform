@@ -83,7 +83,6 @@ $('#fileupload').fileupload({
     },
     done: function(e, data){
         bar.hide();
-        percent.html("Unpacking files...");
         alert('${_("Your import was successful.")}');
         window.location = '${successful_import_redirect_url}';
     },
