@@ -16,6 +16,8 @@
 
 test_runner: jasmine
 
+prepend_path: common/static
+
 # Paths to library JavaScript files (optional)
 lib_paths:
     - coffee/src/ajax_prefix.js

@@ -16,6 +16,8 @@
 
 test_runner: jasmine
 
+prepend_path: common/lib/xmodule/xmodule/js
+
 # Paths to source JavaScript files
 src_paths:
     - src/xmodule.js
