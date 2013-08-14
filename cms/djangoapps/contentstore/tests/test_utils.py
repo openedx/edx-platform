@@ -5,8 +5,6 @@ import collections
 import copy
 from django.test import TestCase
 from django.test.utils import override_settings
-from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
 class LMSLinksTestCase(TestCase):
@@ -77,6 +75,7 @@ class LMSLinksTestCase(TestCase):
             link,
             "//localhost:8000/courses/mitX/101/test/jump_to/i4x://mitX/101/course/test"
         )
+
 
 class ExtraPanelTabTestCase(TestCase):
     """ Tests adding and removing extra course tabs. """
@@ -151,4 +150,3 @@ class ExtraPanelTabTestCase(TestCase):
                 changed, actual_tabs = utils.remove_extra_panel_tab(tab_type, course)
                 self.assertFalse(changed)
                 self.assertEqual(actual_tabs, expected_tabs)
-

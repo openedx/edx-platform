@@ -332,9 +332,6 @@ class SplitModuleItemTests(SplitModuleTest):
 
         def verify_greek_hero(block):
             self.assertEqual(block.location.course_id, "GreekHero")
-
-
-            # look at this one in detail
             self.assertEqual(len(block.tabs), 6, "wrong number of tabs")
             self.assertEqual(block.display_name, "The Ancient Greek Hero")
             self.assertEqual(block.advertised_start, "Fall 2013")
@@ -463,7 +460,7 @@ class SplitModuleItemTests(SplitModuleTest):
         parents = modulestore().get_parent_locations(locator)
         self.assertEqual(len(parents), 1)
         self.assertEqual(parents[0].usage_id, 'head12345')
-        locator.usage_id='nosuchblock'
+        locator.usage_id = 'nosuchblock'
         parents = modulestore().get_parent_locations(locator)
         self.assertEqual(len(parents), 0)
 
