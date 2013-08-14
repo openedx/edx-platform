@@ -4,6 +4,7 @@ import os
 import tarfile
 import shutil
 import cgi
+import re
 from functools import partial
 from tempfile import mkdtemp
 from path import path
@@ -38,6 +39,9 @@ from util.json_request import JsonResponse
 __all__ = ['asset_index', 'upload_asset', 'import_course',
         'generate_export_course', 'export_course']
 
+MAX_UP_LENGTH = 20000352
+
+CONTENT_RE = re.compile(r"(?P<start>\d{1,11})-(?P<stop>\d{1,11})/(?P<end>\d{1,11})")
 
 def assets_to_json_dict(assets):
     """
@@ -265,70 +269,120 @@ def remove_asset(request, org, course, name):
 @login_required
 def import_course(request, org, course, name):
     """
-    This method will handle a POST request to upload and import a .tar.gz file into a specified course
+    This method will handle a POST request to upload and import a .tar.gz file
+    into a specified course
     """
     location = get_location_and_verify_access(request, org, course, name)
 
-    if request.method in ('POST', 'PUT'):
-        filename = request.FILES['course-data'].name
-
-        if not filename.endswith('.tar.gz'):
-            return HttpResponse(json.dumps({'ErrMsg': 'We only support uploading a .tar.gz file.'}))
+    if request.method == 'POST':
 
         data_root = path(settings.GITHUB_REPO_ROOT)
-
         course_subdir = "{0}-{1}-{2}".format(org, course, name)
         course_dir = data_root / course_subdir
+
+        filename = request.FILES['course-data'].name
+        if not filename.endswith('.tar.gz'):
+            return HttpResponse(json.dumps({
+                'ErrMsg': 'We only support uploading a .tar.gz file.'
+            }))
+        temp_filepath = course_dir / filename
+
         if not course_dir.isdir():
             os.mkdir(course_dir)
 
-        temp_filepath = course_dir / filename
-
         logging.debug('importing course to {0}'.format(temp_filepath))
 
+        # Get upload chunks byte ranges
+        matches = CONTENT_RE.search(request.META["HTTP_CONTENT_RANGE"])
+        content_range = matches.groupdict()
+
         # stream out the uploaded files in chunks to disk
-        temp_file = open(temp_filepath, 'wb+')
+        if int(content_range['start']) == 0:
+            temp_file = open(temp_filepath, 'wb+')
+        else:
+            temp_file = open(temp_filepath, 'ab+')
+
         for chunk in request.FILES['course-data'].chunks():
             temp_file.write(chunk)
         temp_file.close()
 
-        tar_file = tarfile.open(temp_filepath)
-        tar_file.extractall(course_dir + '/')
+        size = os.path.getsize(temp_filepath)
 
-        # find the 'course.xml' file
-        dirpath = None
-        for dirpath, _dirnames, filenames in os.walk(course_dir):
-            for filename in filenames:
-                if filename == 'course.xml':
+        if int(content_range['stop']) != int(content_range['end']) - 1:
+            # More chunks coming
+            return JsonResponse({
+                    "files": [{
+                        "name": filename,
+                        "size": size,
+                        "deleteUrl": "",
+                        "deleteType": "",
+                        "url": reverse('import_course', kwargs={
+                            'org': location.org,
+                            'course': location.course,
+                            'name': location.name
+                        }),
+                        "thumbnailUrl": ""
+                        }]
+                    })
+
+        else:   #This was the last chunk.
+
+            # 'Lock' with status info.
+            lock_filepath = data_root / (filename + ".lock")
+
+            with open(lock_filepath, 'w+') as lf:
+                lf.write("Extracting")
+
+            tar_file = tarfile.open(temp_filepath)
+            tar_file.extractall(course_dir + '/')
+
+            with open(lock_filepath, 'w+') as lf:
+                lf.write("Verifying")
+
+            # find the 'course.xml' file
+            dirpath = None
+            for dirpath, _dirnames, filenames in os.walk(course_dir):
+                for fname in filenames:
+                    if fname == 'course.xml':
+                        break
+                if fname == 'course.xml':
                     break
-            if filename == 'course.xml':
-                break
 
-        if filename != 'course.xml':
-            return HttpResponse(json.dumps({'ErrMsg': 'Could not find the course.xml file in the package.'}))
+            if fname != 'course.xml':
+                return HttpResponse(json.dumps({
+                    'ErrMsg': 'Could not find the course.xml file in the package.'
+                }))
 
-        logging.debug('found course.xml at {0}'.format(dirpath))
+            logging.debug('found course.xml at {0}'.format(dirpath))
 
-        if dirpath != course_dir:
-            for fname in os.listdir(dirpath):
-                shutil.move(dirpath / fname, course_dir)
+            if dirpath != course_dir:
+                for fname in os.listdir(dirpath):
+                    shutil.move(dirpath / fname, course_dir)
 
-        _module_store, course_items = import_from_xml(modulestore('direct'), settings.GITHUB_REPO_ROOT,
-                                                      [course_subdir], load_error_modules=False,
-                                                      static_content_store=contentstore(),
-                                                      target_location_namespace=location,
-                                                      draft_store=modulestore())
+            _module_store, course_items = import_from_xml(
+                    modulestore('direct'),
+                    settings.GITHUB_REPO_ROOT,
+                    [course_subdir],
+                    load_error_modules=False,
+                    static_content_store=contentstore(),
+                    target_location_namespace=location,
+                    draft_store=modulestore()
+            )
 
-        # we can blow this away when we're done importing.
-        shutil.rmtree(course_dir)
+            # we can blow this away when we're done importing.
+            shutil.rmtree(course_dir)
 
-        logging.debug('new course at {0}'.format(course_items[0].location))
+            logging.debug('new course at {0}'.format(course_items[0].location))
 
-        create_all_course_groups(request.user, course_items[0].location)
+            with open(lock_filepath, 'w') as lf:
+                lf.write("Updating course")
 
-        logging.debug('created all course groups at {0}'.format(course_items[0].location))
+            create_all_course_groups(request.user, course_items[0].location)
+            logging.debug('created all course groups at {0}'.format(course_items[0].location))
 
-        return HttpResponse(json.dumps({'Status': 'OK'}))
+            os.remove(lock_filepath)
+
+            return HttpResponse(json.dumps({'Status': 'OK'}))
     else:
         course_module = modulestore().get_item(location)
 
@@ -346,8 +400,8 @@ def import_course(request, org, course, name):
 @login_required
 def generate_export_course(request, org, course, name):
     """
-    This method will serialize out a course to a .tar.gz file which contains a XML-based representation of
-    the course
+    This method will serialize out a course to a .tar.gz file which contains a
+    XML-based representation of the course
     """
     location = get_location_and_verify_access(request, org, course, name)
     course_module = modulestore().get_instance(location.course_id, location)
