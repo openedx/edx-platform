@@ -32,6 +32,7 @@ from xmodule.exceptions import NotFoundError
 from .access import get_location_and_verify_access
 from util.json_request import JsonResponse
 
+from django.utils.translation import ugettext as _
 
 __all__ = ['asset_index', 'upload_asset', 'import_course', 'generate_export_course', 'export_course']
 
@@ -188,7 +189,7 @@ def upload_asset(request, org, course, coursename):
                         'uploadDate': get_default_time_display(readback.last_modified_at),
                         'url': StaticContent.get_url_path_from_location(content.location),
                         'thumb_url': StaticContent.get_url_path_from_location(thumbnail_location) if thumbnail_content is not None else None,
-                        'msg': 'Upload completed'
+                        'msg': _('Upload completed')
                         }
 
     response = JsonResponse(response_payload)
