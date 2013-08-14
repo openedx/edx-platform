@@ -71,7 +71,14 @@ $('#fileupload').fileupload({
     add: function(e, data) {
         submitBtn.show().click(function(e){ 
             e.preventDefault();
-            data.submit();
+            data.submit().complete(function(result, textStatus, xhr) {
+                if (result.status != 200) {
+                    alert('${_("Your import has failed.")}\n\n' + 
+                        JSON.parse(result.responseText)["ErrMsg"]);
+                    submitBtn.show();
+                    bar.hide();
+                }
+            });
         });
     },
 
@@ -85,9 +92,6 @@ $('#fileupload').fileupload({
         bar.hide();
         alert('${_("Your import was successful.")}');
         window.location = '${successful_import_redirect_url}';
-    },
-    fail: function(e, data) {
-        alert('${_("Your import has failed.")}\n\n');
     },
 
 
