@@ -20,6 +20,8 @@ from lms import one_time_startup        # pylint: disable=W0611
 from cms import one_time_startup        # pylint: disable=W0611
 from pymongo import MongoClient
 import xmodule.modulestore.django
+import datetime
+from pytz import UTC
 from xmodule.contentstore.django import _CONTENTSTORE
 
 # There is an import issue when using django-staticfiles with lettuce
@@ -55,11 +57,11 @@ config = {"username": "<USERNAME>",
 desired_capabilities =  DesiredCapabilities.CHROME
 desired_capabilities['platform'] = "Linux"
 desired_capabilities['version'] = ""
-desired_capabilities['name'] = "LMS Lettuce Test"
-desired_capabilities['build'] = "Alpha-Beta-123"
+desired_capabilities['name'] = "CMS Lettuce Test"
+desired_capabilities['build'] = datetime.datetime.now(UTC).isoformat(' ')
 desired_capabilities['passed'] = True
-desired_capabilities['record-video'] = False
 desired_capabilities['video-upload-on-pass'] = False
+desired_capabilities['sauce-advisor'] = False
 desired_capabilities['record-screenshots'] = False
 desired_capabilities['selenium-version'] = "2.33.0"
 desired_capabilities['max-duration'] = 3600
@@ -83,7 +85,7 @@ def initial_setup(server):
     """
     Launch the browser once before executing the tests.
     """
-    # browser_driver = getattr(settings, 'LETTUCE_BROWSER', 'chrome')
+    browser_driver = getattr(settings, 'LETTUCE_BROWSER', 'chrome')
 
     # There is an issue with ChromeDriver2 r195627 on Ubuntu
     # in which we sometimes get an invalid browser session.
@@ -93,12 +95,15 @@ def initial_setup(server):
     while (not success) and num_attempts < MAX_VALID_BROWSER_ATTEMPTS:
 
         # Get a browser session
-        # world.browser = Browser(browser_driver)
-        world.browser = Browser(
-            'remote',
-            url="http://{}:{}@ondemand.saucelabs.com:80/wd/hub".format(config['username'],config['access-key']),
-            **desired_capabilities
-        )
+        if settings.MITX_FEATURES.get('USE_SAUCE'):
+            world.browser = Browser(
+                'remote',
+                url="http://{}:{}@ondemand.saucelabs.com:80/wd/hub".format(config['username'],config['access-key']),
+                **desired_capabilities
+            )
+        else:
+            world.browser = Browser(browser_driver)
+
         world.browser.driver.implicitly_wait(30)
         global jobid
         jobid = world.browser.driver.session_id
@@ -121,7 +126,8 @@ def initial_setup(server):
         raise IOError("Could not acquire valid {driver} browser session.".format(driver='remote'))
 
     # Set the browser size to 1280x1024
-    # world.browser.driver.set_window_size(1280, 1024)
+    if not settings.MITX_FEATURES.get('USE_SAUCE'):
+        world.browser.driver.set_window_size(1280, 1024)
 
 
 @before.each_scenario
@@ -171,6 +177,6 @@ def teardown_browser(total):
     """
     Quit the browser after executing the tests.
     """
-    if total.scenarios_ran != total.scenarios_passed:
+    if settings.MITX_FEATURES.get('USE_SAUCE') and total.scenarios_ran != total.scenarios_passed:
         set_job_status(jobid, False)
     world.browser.quit()

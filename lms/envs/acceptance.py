@@ -90,6 +90,8 @@ USE_I18N = True
 MITX_FEATURES['ENABLE_FEEDBACK_SUBMISSION'] = True
 FEEDBACK_SUBMISSION_EMAIL = 'dummy@example.com'
 
+MITX_FEATURES['USE_SAUCE'] = False
+
 # Include the lettuce app for acceptance testing, including the 'harvest' django-admin command
 INSTALLED_APPS += ('lettuce.django',)
 LETTUCE_APPS = ('courseware',)
