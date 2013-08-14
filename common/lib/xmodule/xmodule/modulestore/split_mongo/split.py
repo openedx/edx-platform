@@ -345,6 +345,19 @@ class SplitMongoModuleStore(ModuleStoreBase):
         else:
             return []
 
+    def get_instance(self, course_id, location, depth=0):
+        """
+        Get an instance of this location.
+
+        For now, just delegate to get_item and ignore course policy.
+
+        depth (int): An argument that some module stores may use to prefetch
+            descendants of the queried modules for more efficient results later
+            in the request. The depth is counted in the number of
+            calls to get_children() to cache. None indicates to cache all descendants.
+        """
+        return self.get_item(location, depth=depth)
+
     def get_parent_locations(self, locator, usage_id=None):
         '''
         Return the locations (Locators w/ usage_ids) for the parents of this location in this

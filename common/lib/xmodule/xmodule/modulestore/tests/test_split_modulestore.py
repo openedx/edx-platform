@@ -327,21 +327,29 @@ class SplitModuleItemTests(SplitModuleTest):
         locator = BlockUsageLocator(version_guid=self.GUID_D1, usage_id='head12345')
         block = modulestore().get_item(locator)
         self.assertIsInstance(block, CourseDescriptor)
+        # get_instance just redirects to get_item, ignores course_id
+        self.assertIsInstance(modulestore().get_instance("course_id", locator), CourseDescriptor)
+
+        def verify_greek_hero(block):
+            self.assertEqual(block.location.course_id, "GreekHero")
+
+
+            # look at this one in detail
+            self.assertEqual(len(block.tabs), 6, "wrong number of tabs")
+            self.assertEqual(block.display_name, "The Ancient Greek Hero")
+            self.assertEqual(block.advertised_start, "Fall 2013")
+            self.assertEqual(len(block.children), 3)
+            self.assertEqual(block.definition_locator.definition_id, "head12345_12")
+            # check dates and graders--forces loading of descriptor
+            self.assertEqual(block.edited_by, "testassist@edx.org")
+            self.assertDictEqual(
+                block.grade_cutoffs, {"Pass": 0.45},
+            )
 
         locator = BlockUsageLocator(course_id='GreekHero', usage_id='head12345', branch='draft')
-        block = modulestore().get_item(locator)
-        self.assertEqual(block.location.course_id, "GreekHero")
-        # look at this one in detail
-        self.assertEqual(len(block.tabs), 6, "wrong number of tabs")
-        self.assertEqual(block.display_name, "The Ancient Greek Hero")
-        self.assertEqual(block.advertised_start, "Fall 2013")
-        self.assertEqual(len(block.children), 3)
-        self.assertEqual(block.definition_locator.definition_id, "head12345_12")
-        # check dates and graders--forces loading of descriptor
-        self.assertEqual(block.edited_by, "testassist@edx.org")
-        self.assertDictEqual(
-            block.grade_cutoffs, {"Pass": 0.45},
-        )
+        verify_greek_hero(modulestore().get_item(locator))
+        # get_instance just redirects to get_item, ignores course_id
+        verify_greek_hero(modulestore().get_instance("course_id", locator))
 
         # try to look up other branches
         self.assertRaises(ItemNotFoundError,
