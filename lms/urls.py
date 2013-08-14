@@ -3,9 +3,6 @@ from django.conf.urls import patterns, include, url
 from ratelimitbackend import admin
 from django.conf.urls.static import static
 
-# Not used, the work is done in the imported module.
-from . import one_time_startup      # pylint: disable=W0611
-
 import django.contrib.auth.views
 
 # Uncomment the next two lines to enable the admin:
