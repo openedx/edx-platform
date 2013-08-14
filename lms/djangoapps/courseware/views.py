@@ -25,6 +25,7 @@ from courseware.masquerade import setup_masquerade
 from courseware.model_data import ModelDataCache
 from .module_render import toc_for_course, get_module_for_descriptor, get_module
 from courseware.models import StudentModule, StudentModuleHistory
+from course_modes.models import CourseMode
 
 from django_comment_client.utils import get_discussion_title
 
@@ -600,9 +601,14 @@ def course_about(request, course_id):
                                'registered': registered,
                                'course_target': course_target,
                                'show_courseware_link': show_courseware_link})
+
+
 @ensure_csrf_cookie
 @cache_if_anonymous
 def mktg_course_about(request, course_id):
+    """
+    This is the button that gets put into an iframe on the Drupal site
+    """
 
     try:
         course = get_course_with_access(request.user, course_id, 'see_exists')
@@ -610,7 +616,7 @@ def mktg_course_about(request, course_id):
         # if a course does not exist yet, display a coming
         # soon button
         return render_to_response('courseware/mktg_coming_soon.html',
-                              {'course_id': course_id})
+                                  {'course_id': course_id})
 
     registered = registered_for_course(course, request.user)
 
@@ -623,13 +629,17 @@ def mktg_course_about(request, course_id):
 
     show_courseware_link = (has_access(request.user, course, 'load') or
                             settings.MITX_FEATURES.get('ENABLE_LMS_MIGRATION'))
+    course_modes = CourseMode.modes_for_course(course.id)
 
     return render_to_response('courseware/mktg_course_about.html',
-                              {'course': course,
-                               'registered': registered,
-                               'allow_registration': allow_registration,
-                               'course_target': course_target,
-                               'show_courseware_link': show_courseware_link})
+                              {
+                                  'course': course,
+                                  'registered': registered,
+                                  'allow_registration': allow_registration,
+                                  'course_target': course_target,
+                                  'show_courseware_link': show_courseware_link,
+                                  'course_modes': course_modes,
+                              })
 
 
 def render_notifications(request, course, notifications):
