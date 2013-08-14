@@ -12,7 +12,7 @@ def create(n, course_id):
     for i in range(n):
         (user, user_profile, _) = _do_create_account(get_random_post_override())
         if course_id is not None:
-            CourseEnrollment.objects.create(user=user, course_id=course_id)
+            CourseEnrollment.enroll(user, course_id)
 
 
 class Command(BaseCommand):
