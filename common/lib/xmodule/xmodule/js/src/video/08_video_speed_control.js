@@ -148,7 +148,7 @@ function () {
             // individual speed entries.
             state.videoSpeedControl.videoSpeedsEl.find('a.speed_link:last')
                 .on('blur', function () {
-                    // If we have reached the last speed enrty, and the focus
+                    // If we have reached the last speed entry, and the focus
                     // changes to the next element, we need to hide the speeds
                     // control drop-down.
                     state.videoSpeedControl.el.removeClass('open');

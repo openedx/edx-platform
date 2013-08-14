@@ -116,9 +116,9 @@ function () {
         state.videoVolumeControl.volumeSliderEl.find('a')
             .on('blur', function () {
                 // Hide the volume slider. This is done so that we can
-                // contrinue to the next (or previous) element by tabbing.
+                // continue to the next (or previous) element by tabbing.
                 // Otherwise, after next tab we would come back to the volume
-                // slider because it is the next element sisible element that
+                // slider because it is the next element visible element that
                 // we can tab to after the volume button.
                 state.videoVolumeControl.el.removeClass('open');
 
