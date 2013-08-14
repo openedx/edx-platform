@@ -5,7 +5,7 @@ from django.db import models
 from collections import namedtuple
 from django.utils.translation import ugettext as _
 
-Mode = namedtuple('Mode', ['slug', 'name', 'min_price', 'suggested_prices'])
+Mode = namedtuple('Mode', ['slug', 'name', 'min_price', 'suggested_prices', 'currency'])
 
 
 class CourseMode(models.Model):
@@ -29,7 +29,10 @@ class CourseMode(models.Model):
     # the suggested prices for this mode
     suggested_prices = models.CommaSeparatedIntegerField(max_length=255, blank=True, default='')
 
-    DEFAULT_MODE = Mode('honor', _('Honor Code Certificate'), 0, '')
+    # the currency these prices are in, using lower case ISO currency codes
+    currency = models.CharField(default="usd", max_length=8)
+
+    DEFAULT_MODE = Mode('honor', _('Honor Code Certificate'), 0, '', 'usd')
 
     @classmethod
     def modes_for_course(cls, course_id):
@@ -39,7 +42,7 @@ class CourseMode(models.Model):
         If no modes have been set in the table, returns the default mode
         """
         found_course_modes = cls.objects.filter(course_id=course_id)
-        modes = ([Mode(mode.mode_slug, mode.mode_display_name, mode.min_price, mode.suggested_prices)
+        modes = ([Mode(mode.mode_slug, mode.mode_display_name, mode.min_price, mode.suggested_prices, mode.currency)
                   for mode in found_course_modes])
         if not modes:
             modes = [cls.DEFAULT_MODE]
