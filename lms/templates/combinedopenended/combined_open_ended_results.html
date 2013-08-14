@@ -9,13 +9,13 @@
             <div class="visibility-control visibility-control-rubric">
                 <div class="inner">
                 </div>
-                <span class="section-header section-header-rubric">Submitted Rubric</span>
+                <span class="section-header section-header-rubric">${_("Submitted Rubric")}</span>
             </div>
             <div class="oe-tools rubric-header">
-                <span class="oe-tools-label">Rubric: </span>
-                <button class="rubric-collapse" href="#">Show Score Only</button>
+                <span class="oe-tools-label">${_("Rubric: ")}</span>
+                <button class="rubric-collapse" href="#">${_("Show Score Only:")}</button>
                 <span class="oe-tools-scores">
-                    <span class="oe-tools-scores-label">Scores:</span>
+                    <span class="oe-tools-scores-label">${_("Scores:")}</span>
                     % if len(results)>1:
                         <button href="#" alt="Previous" class="rubric-button rubric-previous-button"><i class="icon-chevron-left"></i></button>
                     % endif 

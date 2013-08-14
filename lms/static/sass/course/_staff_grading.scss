@@ -1,7 +1,6 @@
 div.staff-grading,
 div.peer-grading{
-    padding: $baseline;
-    border: none;
+    border: 1px solid lightgray;
     
     textarea.feedback-area {
         margin: 0;
@@ -37,7 +36,8 @@ div.peer-grading{
         &.submission-container{
             @include clearfix;
             overflow-y: auto;
-            height: 150px;
+            height: auto;
+            max-height: 300px;
             border: 1px solid #ddd;
             background: #F6F6F6;
         }
@@ -133,12 +133,14 @@ div.peer-grading{
 
     .instructions-panel {
         @include clearfix;
-        margin-right:2px;
+        padding: $baseline/2;
+        background-color: #eee;
+        font-size: .8em;
         
         > div {
             margin-bottom: 5px;
-            padding: 2px;
-            width: 47.6%;
+            padding: $baseline/2;
+            width: 49%;
             background: #eee;
 
             h3 {
@@ -152,18 +154,19 @@ div.peer-grading{
             }
         }
         .calibration-panel {
-            float: left;
+            display: inline-block;
+            width: 20%;
+            border-radius: 3px;
         }
 
         .grading-panel {
-            float: right;
+            display: inline-block;
+            width: 20%;
+            border-radius: 3px;
         }
         .current-state {
-            background: #1d9dd9;
+            background: #fff;
             
-            h3, p {
-                color: white;
-            }
         }
     }
 
@@ -184,5 +187,22 @@ div.peer-grading{
             margin-top: $baseline;
         }
     }
+}
+
+div.peer-grading {
+    border-radius: $baseline/2;
+    padding: 0;
+
+    .prompt-wrapper {
+        padding: $baseline;
+    }
+
+    .grading-wrapper {
+        padding: $baseline;
+    }
+}
+
+div.staff-grading {
+    padding: $baseline;
 }
 

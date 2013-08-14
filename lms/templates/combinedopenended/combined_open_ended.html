@@ -11,12 +11,12 @@
                 <tr>
                     <td class="problemtype-container">
                         <div class="problemtype">
-                            Open Response
+                            ${_("Open Response")}
                         </div>
                     </td>
                     <td class="assessments-container">
                         <div class="assessment-text">
-                            Assessments:
+                            ${_("Assessments:")}
                         </div>
                         <div class="status-container">
                             ${status|n}
@@ -30,7 +30,7 @@
             <div class="visibility-control visibility-control-prompt">
                 <div class="inner">
                 </div>
-                <a href="" class="section-header section-header-prompt question-header">Hide Prompt</a>
+                <a href="" class="section-header section-header-prompt question-header">${_("Hide Prompt")}</a>
             </div>
             <div class="problem-container">
             % for item in items:
@@ -38,7 +38,7 @@
             % endfor
             </div>
             <div class="oe-tools response-tools">
-                <span class="oe-tools-label">Response: </span>
+                <span class="oe-tools-label">${_("Response: ")}</span>
                 <input type="button" value="${_('Reset')}" class="reset-button" name="reset"/>
             </div>
         </div>
