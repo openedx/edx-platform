@@ -72,7 +72,7 @@ namespace :js_test do
     end
 
     desc "Run all JavaScript tests and collect coverage information"
-    task :coverage => [:clean_test_files, :'assets:coffee', JS_REPORT_DIR] do
+    task :coverage => [:clean_reports_dir, :clean_test_files, :'assets:coffee', JS_REPORT_DIR] do
         js_test_tool(nil, 'run', true)
     end
 end
