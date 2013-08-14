@@ -30,10 +30,18 @@ TESTS_FAILED=0
 # /usr/bin/Xvfb :1 -screen 0 1024x268x24
 # This allows us to run Chrome without a display
 export DISPLAY=:1
+SKIP_TESTS=""
+
+if [ ! -z ${LETTUCE_BROWSER+x} ]; then
+	SKIP_TESTS="--tag -$(tr '[:lower:]' '[:upper:]' <<< ${LETTUCE_BROWSER:0:1})${LETTUCE_BROWSER:1}"
+fi
+if [ ! -z ${SAUCE_ENABLED+x} ]; then
+	SKIP_TESTS="--tag -Sauce --tag -$(tr '[:lower:]' '[:upper:]' <<< ${SAUCE_BROWSER:0:1})${SAUCE_BROWSER:1}"
+fi
 
 # Run the lms and cms acceptance tests
 # (the -v flag turns off color in the output)
-rake test_acceptance_lms["-v 3"] || TESTS_FAILED=1
-rake test_acceptance_cms["-v 3"] || TESTS_FAILED=1
+rake test_acceptance_lms["-v 3 $SKIP_TESTS"] || TESTS_FAILED=1
+rake test_acceptance_cms["-v 3 $SKIP_TESTS"] || TESTS_FAILED=1
 
 [ $TESTS_FAILED == '0' ]
