@@ -7,7 +7,7 @@ from xmodule.modulestore.xml import XMLModuleStore
 from xmodule.modulestore import XML_MODULESTORE_TYPE
 
 from .test_modulestore import check_path_to_location
-from . import DATA_DIR
+from xmodule.tests import DATA_DIR
 
 
 class TestXMLModuleStore(object):
