@@ -93,7 +93,7 @@ def instructor_dashboard(request, course_id):
         datatable = {'header': ['Statistic', 'Value'],
                      'title': 'Course Statistics At A Glance',
                      }
-        data = [['# Enrolled', CourseEnrollment.objects.filter(course_id=course_id).count()]]
+        data = [['# Enrolled', CourseEnrollment.objects.filter(course_id=course_id, is_active=1).count()]]
         data += [['Date', timezone.now().isoformat()]]
         data += compute_course_stats(course).items()
         if request.user.is_staff:
@@ -530,7 +530,10 @@ def instructor_dashboard(request, course_id):
     # DataDump
 
     elif 'Download CSV of all student profile data' in action:
-        enrolled_students = User.objects.filter(courseenrollment__course_id=course_id).order_by('username').select_related("profile")
+        enrolled_students = User.objects.filter(
+            courseenrollment__course_id=course_id,
+            courseenrollment__is_active=1,
+        ).order_by('username').select_related("profile")
         profkeys = ['name', 'language', 'location', 'year_of_birth', 'gender', 'level_of_education',
                     'mailing_address', 'goals']
         datatable = {'header': ['username', 'email'] + profkeys}
@@ -1002,7 +1005,10 @@ def get_student_grade_summary_data(request, course, course_id, get_grades=True, 
     If get_raw_scores=True, then instead of grade summaries, the raw grades for all graded modules are returned.
 
     '''
-    enrolled_students = User.objects.filter(courseenrollment__course_id=course_id).prefetch_related("groups").order_by('username')
+    enrolled_students = User.objects.filter(
+        courseenrollment__course_id=course_id,
+        courseenrollment__is_active=1,
+    ).prefetch_related("groups").order_by('username')
 
     header = ['ID', 'Username', 'Full Name', 'edX email', 'External email']
     assignments = []
@@ -1053,7 +1059,10 @@ def gradebook(request, course_id):
     """
     course = get_course_with_access(request.user, course_id, 'staff', depth=None)
 
-    enrolled_students = User.objects.filter(courseenrollment__course_id=course_id).order_by('username').select_related("profile")
+    enrolled_students = User.objects.filter(
+        courseenrollment__course_id=course_id,
+        courseenrollment__is_active=1
+    ).order_by('username').select_related("profile")
 
     # TODO (vshnayder): implement pagination.
     enrolled_students = enrolled_students[:1000]   # HACK!
@@ -1110,7 +1119,7 @@ def _do_enroll_students(course, course_id, students, overload=False, auto_enroll
         for ce in todelete:
             if not has_access(ce.user, course, 'staff') and ce.user.email.lower() not in new_students_lc:
                 status[ce.user.email] = 'deleted'
-                ce.delete()
+                ce.deactivate()
             else:
                 status[ce.user.email] = 'is staff'
         ceaset = CourseEnrollmentAllowed.objects.filter(course_id=course_id)
@@ -1162,14 +1171,13 @@ def _do_enroll_students(course, course_id, students, overload=False, auto_enroll
             continue
 
         #Student has already registered
-        if CourseEnrollment.objects.filter(user=user, course_id=course_id):
+        if CourseEnrollment.is_enrolled(user, course_id):
             status[student] = 'already enrolled'
             continue
 
         try:
             #Not enrolled yet
-            ce = CourseEnrollment(user=user, course_id=course_id)
-            ce.save()
+            ce = CourseEnrollment.enroll(user, course_id)
             status[student] = 'added'
 
             if email_students:
@@ -1239,11 +1247,10 @@ def _do_unenroll_students(course_id, students, email_students=False):
 
             continue
 
-        ce = CourseEnrollment.objects.filter(user=user, course_id=course_id)
         #Will be 0 or 1 records as there is a unique key on user + course_id
-        if ce:
+        if CourseEnrollment.is_enrolled(user, course_id):
             try:
-                ce[0].delete()
+                CourseEnrollment.unenroll(user, course_id)
                 status[student] = "un-enrolled"
                 if email_students:
                     #User was enrolled
