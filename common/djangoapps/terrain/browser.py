@@ -174,6 +174,9 @@ def teardown_browser(total):
     """
     Quit the browser after executing the tests.
     """
-    if settings.MITX_FEATURES.get('USE_SAUCE') and total.scenarios_ran != total.scenarios_passed:
-        set_job_status(jobid, False)
+    if settings.MITX_FEATURES.get('USE_SAUCE'):
+        if total.scenarios_ran != total.scenarios_passed:
+            set_job_status(jobid, False)
+        else:
+            set_job_status(jobid, True)
     world.browser.quit()
