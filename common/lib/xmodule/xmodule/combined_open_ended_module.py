@@ -8,7 +8,7 @@ from .x_module import XModule
 from xblock.core import Integer, Scope, String, List, Float, Boolean
 from xmodule.open_ended_grading_classes.combined_open_ended_modulev1 import CombinedOpenEndedV1Module, CombinedOpenEndedV1Descriptor
 from collections import namedtuple
-from .fields import Date
+from .fields import Date, Timedelta
 import textwrap
 
 log = logging.getLogger("mitx.courseware")
@@ -229,7 +229,7 @@ class CombinedOpenEndedFields(object):
         default=None,
         scope=Scope.settings
     )
-    graceperiod = String(
+    graceperiod = Timedelta(
         help="Amount of time after the due date that submissions will be accepted",
         default=None,
         scope=Scope.settings
