@@ -33,6 +33,8 @@ MITX_FEATURES['ENABLE_INSTRUCTOR_BETA_DASHBOARD'] = True
 
 FEEDBACK_SUBMISSION_EMAIL = "dummy@dummy.org"
 
+FEEDBACK_SUBMISSION_EMAIL = "dummy@example.com"
+
 WIKI_ENABLED = True
 
 LOGGING = get_logger_config(ENV_ROOT / "log",
