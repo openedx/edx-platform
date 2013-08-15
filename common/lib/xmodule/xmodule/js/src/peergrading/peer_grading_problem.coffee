@@ -266,7 +266,7 @@ class @PeerGradingProblem
     @calibration_feedback_button.click =>
       @calibration_feedback_panel.hide()
       @grading_wrapper.show()
-      @gentle_alert "Calibration essay saved.  Fetched the next essay."
+      @gentle_alert "Calibration essay saved.  Fetching the next essay."
       @is_calibrated_check()
 
     @interstitial_page_button.click =>
@@ -384,7 +384,7 @@ class @PeerGradingProblem
     if response.success
       @is_calibrated_check()
       @grading_message.fadeIn()
-      message = "<p>Successfully saved your feedback. Fetched the next essay."
+      message = "<p>Successfully saved your feedback. Fetching the next essay."
       if response.required_done
         message = message + " You have completed the required number of gradings."
       message = message + "</p>"
