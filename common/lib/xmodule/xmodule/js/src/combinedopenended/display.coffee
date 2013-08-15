@@ -375,6 +375,7 @@ class @CombinedOpenEnded
 
   save_answer: (event) =>
     event.preventDefault()
+    @submit_button.hide()
     max_filesize = 2*1000*1000 #2MB
     pre_can_upload_files = @can_upload_files
     if @child_state == 'initial'

@@ -182,7 +182,7 @@ class OpenEndedChild(object):
                               whitelist_tags=set(['embed', 'iframe', 'a', 'img']))
             clean_html = cleaner.clean_html(answer)
             clean_html = re.sub(r'</p>$', '', re.sub(r'^<p>', '', clean_html))
-        except:
+        except Exception:
             clean_html = answer
         return clean_html
 
