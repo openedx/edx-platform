@@ -14,7 +14,7 @@
             </div>
             <div class="oe-tools rubric-header">
                 <span class="oe-tools-label">${_("Rubric: ")}</span>
-                <button class="rubric-collapse" href="#">${_("Show Score Only:")}</button>
+                <button class="rubric-collapse" href="#">${_("Toggle Rubric")}</button>
                 <span class="oe-tools-scores">
                     <span class="oe-tools-scores-label">${_("Scores:")}</span>
                     % if len(results)>1:
@@ -22,7 +22,7 @@
                     % endif 
                     ${result['task_name']} from grader ${i+1}
                     % if len(results)>1:
-                        <button href="#" alt="Next" class="rubric-button rubric-next-button">i class="icon-chevron-right"></i></button> 
+                        <button href="#" alt="Next" class="rubric-button rubric-next-button"><i class="icon-chevron-right"></i></button>
                     % endif
                 </span>
             </div>

@@ -667,10 +667,4 @@ class @CombinedOpenEnded
   toggle_rubric: (event) =>
     info_rubric_elements = @$(@info_rubric_elements_sel)
     info_rubric_elements.slideToggle()
-    @rubric_header = @$(@rubric_collapse_sel)
-    if @rubric_header.text() == "Show Score Only"
-      new_text = "Show Full Rubric"
-    else
-      new_text = "Show Score Only"
-    @rubric_header.text(new_text)
     return false
