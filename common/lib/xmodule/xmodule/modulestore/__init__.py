@@ -235,8 +235,15 @@ class Location(_LocationBase):
 
     @property
     def course_id(self):
-        """Return the ID of the Course that this item belongs to by looking
-        at the location URL hierachy"""
+        """
+        Return the ID of the Course that this item belongs to by looking
+        at the location URL hierachy.
+
+        Throws an InvalidLocationError is this location does not represent a course.
+        """
+        if self.category != 'course':
+            raise InvalidLocationError('Cannot call course_id for {0} because it is not of category course'.format(self))
+
         return "/".join([self.org, self.course, self.name])
 
     def replace(self, **kwargs):
@@ -370,20 +377,12 @@ class ModuleStore(object):
         '''
         raise NotImplementedError
 
-    def get_containing_courses(self, location):
-        '''
-        Returns the list of courses that contains the specified location
-
-        TODO (cpennington): This should really take a module instance id,
-        rather than a location
-        '''
-        courses = [
-            course
-            for course in self.get_courses()
-            if course.location.org == location.org and course.location.course == location.course
-        ]
-
-        return courses
+    def get_errored_courses(self):
+        """
+        Return a dictionary of course_dir -> [(msg, exception_str)], for each
+        course_dir where course loading failed.
+        """
+        raise NotImplementedError
 
 
 class ModuleStoreBase(ModuleStore):
@@ -423,6 +422,15 @@ class ModuleStoreBase(ModuleStore):
 
         errorlog = self._get_errorlog(location)
         return errorlog.errors
+
+    def get_errored_courses(self):
+        """
+        Returns an empty dict.
+
+        It is up to subclasses to extend this method if the concept
+        of errored courses makes sense for their implementation.
+        """
+        return {}
 
     def get_course(self, course_id):
         """Default impl--linear search through course list"""

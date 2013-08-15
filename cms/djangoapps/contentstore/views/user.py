@@ -54,8 +54,7 @@ def index(request):
                 'name': course.location.name,
             }),
             get_lms_link_for_item(
-                course.location,
-                course_id=course.location.course_id,
+                course.location
             ),
             course.display_org_with_default,
             course.display_number_with_default,
