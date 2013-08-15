@@ -457,10 +457,16 @@ class ModuleStoreBase(ModuleStore):
 
     @property
     def metadata_inheritance_cache_subsystem(self):
+        """
+        Exposes an accessor to the runtime configuration for the metadata inheritance cache
+        """
         return self.modulestore_configuration.get('metadata_inheritance_cache_subsystem', None)
 
     @property
     def request_cache(self):
+        """
+        Exposes an accessor to the runtime configuration for the request cache
+        """
         return self.modulestore_configuration.get('request_cache', None)
 
     def set_modulestore_configuration(self, config_dict):

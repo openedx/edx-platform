@@ -102,7 +102,11 @@ class StaticContent(object):
 
     @staticmethod
     def convert_legacy_static_url_with_course_id(path, course_id):
-        org, course_num, run = course_id.split("/")
+        """
+        Returns a path to a piece of static content when we are provided with a filepath and
+        a course_id
+        """
+        org, course_num, __ = course_id.split("/")
         loc = StaticContent.compute_location(org, course_num, path)
         return StaticContent.get_url_path_from_location(loc)
 
