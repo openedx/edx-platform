@@ -240,7 +240,7 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
         video = cls(system, model_data)
         return video
 
-    def export_to_xml(self, resource_fs):
+    def definition_to_xml(self, resource_fs):
         """
         Returns an xml string representing this module.
         """
@@ -277,7 +277,8 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
             ele = etree.Element('track')
             ele.set('src', self.track)
             xml.append(ele)
-        return etree.tostring(xml, pretty_print=True)
+        return xml
+        #return etree.tostring(xml, pretty_print=True)
 
     @staticmethod
     def _parse_youtube(data):
