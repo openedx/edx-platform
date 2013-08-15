@@ -636,7 +636,7 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
         self.assertTrue(isinstance(legend, basestring))
 
         #Get all results
-        module.handle_ajax("get_results", {})
+        module.handle_ajax("get_combined_rubric", {})
 
         #reset the problem
         module.handle_ajax("reset", {})

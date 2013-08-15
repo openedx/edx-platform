@@ -93,7 +93,6 @@ class @CombinedOpenEnded
   coe_sel: 'section.combined-open-ended'
   reset_button_sel: '.reset-button'
   next_step_sel: '.next-step-button'
-  show_results_sel: '.show-results-button'
   question_header_sel: '.question-header'
   submit_evaluation_sel: '.submit-evaluation-button'
   result_container_sel: 'div.result-container'
@@ -159,10 +158,6 @@ class @CombinedOpenEnded
     #Setup next problem
     @next_problem_button = @$(@next_step_sel)
     @next_problem_button.click @next_problem
-
-    #setup show results
-    @show_results_button=@$(@show_results_sel)
-    @show_results_button.click @show_results
 
     @question_header = @$(@question_header_sel)
     @question_header.click @collapse_question
