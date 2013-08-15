@@ -1,7 +1,9 @@
+import logging
 from uuid import uuid4
 
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseBadRequest
 
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
@@ -18,6 +20,7 @@ __all__ = ['save_item', 'create_item', 'delete_item']
 # cdodge: these are categories which should not be parented, they are detached from the hierarchy
 DETACHED_CATEGORIES = ['about', 'static_tab', 'course_info']
 
+log = logging.getLogger(__name__)
 
 @login_required
 @expect_json
@@ -32,7 +35,25 @@ def save_item(request):
     """
     # The nullout is a bit of a temporary copout until we can make module_edit.coffee and the metadata editors a
     # little smarter and able to pass something more akin to {unset: [field, field]}
-    item_location = request.POST['id']
+
+    try:
+        item_location = request.POST['id']
+    except KeyError:
+        import inspect
+
+        log.exception(
+            '''Request missing required attribute 'id'.
+                Request info:
+                %s
+                Caller:
+                Function %s in file %s
+            ''',
+            request.META,
+            inspect.currentframe().f_back.f_code.co_name,
+            inspect.currentframe().f_back.f_code.co_filename
+        )
+        return HttpResponseBadRequest()
+
 
     # check permissions for this user within this course
     if not has_access(request.user, item_location):
