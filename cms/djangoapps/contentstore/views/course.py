@@ -94,6 +94,7 @@ def course_index(request, org, course, name):
 
 @login_required
 @expect_json
+@ensure_csrf_cookie
 def create_new_course(request):
     """
     Create a new course
