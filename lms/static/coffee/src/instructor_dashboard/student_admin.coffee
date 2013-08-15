@@ -6,6 +6,8 @@
 plantTimeout = -> window.InstructorDashboard.util.plantTimeout.apply this, arguments
 plantInterval = -> window.InstructorDashboard.util.plantInterval.apply this, arguments
 std_ajax_err = -> window.InstructorDashboard.util.std_ajax_err.apply this, arguments
+load_IntervalManager = -> window.InstructorDashboard.util.IntervalManager
+
 
 # wrap window.confirm
 # display `msg`
@@ -102,8 +104,13 @@ class StudentAdmin
     @$request_response_error_all    = @$section.find ".course-specific-container .request-response-error"
 
     # start polling for task list
+    # if the list is in the DOM
     if @$table_running_tasks.length > 0
-      @start_refresh_running_task_poll_loop()
+      # reload every 20 seconds.
+      TASK_LIST_POLL_INTERVAL = 20000
+      @reload_running_tasks_list()
+      @task_poller = new (load_IntervalManager()) TASK_LIST_POLL_INTERVAL, =>
+        @reload_running_tasks_list()
 
     # attach click handlers
 
@@ -255,7 +262,6 @@ class StudentAdmin
           create_task_list_table @$table_task_history_all, data.tasks
         error: std_ajax_err => @$request_response_error_all.text "Error listing task history for this student and problem."
 
-
   reload_running_tasks_list: =>
     list_endpoint = @$table_running_tasks.data 'endpoint'
     $.ajax
@@ -263,12 +269,6 @@ class StudentAdmin
       url: list_endpoint
       success: (data) => create_task_list_table @$table_running_tasks, data.tasks
       error: std_ajax_err => console.warn "error listing all instructor tasks"
-
-  start_refresh_running_task_poll_loop: ->
-    @reload_running_tasks_list()
-    if @$section.hasClass 'active-section'
-      # poll every 20 seconds
-      plantTimeout 20000, => @start_refresh_running_task_poll_loop()
 
   # wraps a function, but first clear the error displays
   clear_errors_then: (cb) ->
@@ -278,14 +278,10 @@ class StudentAdmin
       cb?.apply this, arguments
 
   # handler for when the section title is clicked.
-  onClickTitle: ->
-    if @$table_running_tasks.length > 0
-      @start_refresh_running_task_poll_loop()
+  onClickTitle: -> @task_poller?.start()
 
   # handler for when the section is closed
-  # not working yet.
-  # onExit: ->
-  #   clearInterval @reload_running_task_list_slot
+  onExit: -> @task_poller?.stop()
 
 
 # export for use

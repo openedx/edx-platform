@@ -568,12 +568,12 @@ def syllabus(request, course_id):
 
 def registered_for_course(course, user):
     """
-    Return CourseEnrollment if user is registered for course, else False
+    Return True if user is registered for course, else False
     """
     if user is None:
         return False
     if user.is_authenticated():
-        return CourseEnrollment.objects.filter(user=user, course_id=course.id).exists()
+        return CourseEnrollment.is_enrolled(user, course.id)
     else:
         return False
 

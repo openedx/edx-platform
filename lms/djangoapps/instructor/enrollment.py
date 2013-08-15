@@ -14,7 +14,11 @@ class EmailEnrollmentState(object):
     """ Store the complete enrollment state of an email in a class """
     def __init__(self, course_id, email):
         exists_user = User.objects.filter(email=email).exists()
-        exists_ce = CourseEnrollment.objects.filter(course_id=course_id, user__email=email).exists()
+        if exists_user:
+            user = User.objects.get(email=email)
+            exists_ce = CourseEnrollment.is_enrolled(user, course_id)
+        else:
+            exists_ce = False
         ceas = CourseEnrollmentAllowed.objects.filter(course_id=course_id, email=email).all()
         exists_allowed = len(ceas) > 0
         state_auto_enroll = exists_allowed and ceas[0].auto_enroll
@@ -66,8 +70,7 @@ def enroll_email(course_id, student_email, auto_enroll=False):
     previous_state = EmailEnrollmentState(course_id, student_email)
 
     if previous_state.user:
-        user = User.objects.get(email=student_email)
-        CourseEnrollment.objects.get_or_create(course_id=course_id, user=user)
+        CourseEnrollment.enroll_by_email(student_email, course_id)
     else:
         cea, _ = CourseEnrollmentAllowed.objects.get_or_create(course_id=course_id, email=student_email)
         cea.auto_enroll = auto_enroll
@@ -91,7 +94,7 @@ def unenroll_email(course_id, student_email):
     previous_state = EmailEnrollmentState(course_id, student_email)
 
     if previous_state.enrollment:
-        CourseEnrollment.objects.get(course_id=course_id, user__email=student_email).delete()
+        CourseEnrollment.unenroll_by_email(student_email, course_id)
 
     if previous_state.allowed:
         CourseEnrollmentAllowed.objects.get(course_id=course_id, email=student_email).delete()

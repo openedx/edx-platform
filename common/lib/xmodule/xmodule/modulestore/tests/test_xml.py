@@ -1,12 +1,12 @@
 import os.path
 
+from nose.tools import assert_raises
+
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.xml import XMLModuleStore
 
-from nose.tools import assert_raises
-
-from .test_modulestore import check_path_to_location
-from . import DATA_DIR
+from xmodule.tests import DATA_DIR
+from xmodule.modulestore.tests.test_modulestore import check_path_to_location
 
 
 class TestXMLModuleStore(object):

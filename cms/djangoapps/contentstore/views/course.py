@@ -44,7 +44,7 @@ from .component import (
 
 from django_comment_common.utils import seed_permissions_roles
 
-from student.views import enroll_in_course
+from student.models import CourseEnrollment
 
 from xmodule.html_module import AboutDescriptor
 __all__ = ['course_index', 'create_new_course', 'course_info',
@@ -165,7 +165,7 @@ def create_new_course(request):
     seed_permissions_roles(new_course.location.course_id)
 
     # auto-enroll the course creator in the course so that "View Live" will work.
-    enroll_in_course(request.user, new_course.location.course_id)
+    CourseEnrollment.enroll(request.user, new_course.location.course_id)
 
     return JsonResponse({'id': new_course.location.url()})
 

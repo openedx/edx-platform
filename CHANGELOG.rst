@@ -5,11 +5,30 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Blades: Took videoalpha out of alpha, replacing the old video player
+
+LMS: Enable beta instructor dashboard. The beta dashboard is a rearchitecture
+of the existing instructor dashboard and is available by clicking a link at
+the top right of the existing dashboard.
+
+Common: CourseEnrollment has new fields `is_active` and `mode`. The mode will be
+used to differentiate different kinds of enrollments (currently, all enrollments
+are honor certificate enrollments). The `is_active` flag will be used to
+deactivate enrollments without deleting them, so that we know what course you
+*were* enrolled in. Because of the latter change, enrollment and unenrollment
+logic has been consolidated into the model -- you should use new class methods
+to `enroll()`, `unenroll()`, and to check `is_enrolled()`, instead of creating
+CourseEnrollment objects or querying them directly.
+
 Studio: Email will be sent to admin address when a user requests course creator
 privileges for Studio (edge only).
 
 Studio: Studio course authors (both instructors and staff) will be auto-enrolled
 for their courses so that "View Live" works.
+
+Common: Add a new input type ``<formulaequationinput />`` for Formula/Numerical
+Responses. It periodically makes AJAX calls to preview and validate the
+student's input.
 
 Common: Added ratelimiting to our authentication backend.
 
@@ -214,6 +233,12 @@ LMS: Fixed failing numeric response (decimal but no trailing digits).
 
 LMS: XML Error module no longer shows students a stack trace.
 
+Studio: Add feedback to end user if there is a problem exporting a course
+
+Studio: Improve link re-writing on imports into a different course-id
+
+Studio: Allow for intracourse linking in Capa Problems
+
 Blades: Videoalpha.
 
 XModules: Added partial credit for foldit module.
@@ -221,6 +246,10 @@ XModules: Added partial credit for foldit module.
 XModules: Added "randomize" XModule to list of XModule types.
 
 XModules: Show errors with full descriptors.
+
+Studio: Add feedback to end user if there is a problem exporting a course
+
+Studio: Improve link re-writing on imports into a different course-id
 
 XQueue: Fixed (hopefully) worker crash when the connection to RabbitMQ is
 dropped suddenly.

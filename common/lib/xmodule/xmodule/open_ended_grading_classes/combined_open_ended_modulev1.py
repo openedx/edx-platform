@@ -122,6 +122,11 @@ class CombinedOpenEndedV1Module():
         else:
             self.peer_gs = MockPeerGradingService()
 
+        self.required_peer_grading = instance_state.get('required_peer_grading', 3)
+        self.peer_grader_count = instance_state.get('peer_grader_count', 3)
+        self.min_to_calibrate = instance_state.get('min_to_calibrate', 3)
+        self.max_to_calibrate = instance_state.get('max_to_calibrate', 6)
+
         due_date = instance_state.get('due', None)
 
         grace_period_string = instance_state.get('graceperiod', None)
@@ -147,13 +152,17 @@ class CombinedOpenEndedV1Module():
             'close_date': self.timeinfo.close_date,
             's3_interface': self.system.s3_interface,
             'skip_basic_checks': self.skip_basic_checks,
+            'control': {
+                'required_peer_grading': self.required_peer_grading,
+                'peer_grader_count': self.peer_grader_count,
+                'min_to_calibrate': self.min_to_calibrate,
+                'max_to_calibrate': self.max_to_calibrate,
+            }
         }
 
         self.task_xml = definition['task_xml']
         self.location = location
         self.setup_next_task()
-
-
 
     def get_tag_name(self, xml):
         """

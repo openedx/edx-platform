@@ -16,10 +16,9 @@ from xmodule.gst_module import GraphicalSliderToolDescriptor
 from xmodule.html_module import HtmlDescriptor
 from xmodule.peer_grading_module import PeerGradingDescriptor
 from xmodule.poll_module import PollDescriptor
-from xmodule.video_module import VideoDescriptor
 from xmodule.word_cloud_module import WordCloudDescriptor
 from xmodule.crowdsource_hinter import CrowdsourceHinterDescriptor
-from xmodule.videoalpha_module import VideoAlphaDescriptor
+from xmodule.video_module import VideoDescriptor
 from xmodule.seq_module import SequenceDescriptor
 from xmodule.conditional_module import ConditionalDescriptor
 from xmodule.randomize_module import RandomizeDescriptor
@@ -35,9 +34,8 @@ LEAF_XMODULES = (
     HtmlDescriptor,
     PeerGradingDescriptor,
     PollDescriptor,
-    VideoDescriptor,
     # This is being excluded because it has dependencies on django
-    #VideoAlphaDescriptor,
+    #VideoDescriptor,
     WordCloudDescriptor,
 )
 

@@ -315,6 +315,8 @@ def import_course(request, org, course, name):
 
         create_all_course_groups(request.user, course_items[0].location)
 
+        logging.debug('created all course groups at {0}'.format(course_items[0].location))
+
         return HttpResponse(json.dumps({'Status': 'OK'}))
     else:
         course_module = modulestore().get_item(location)

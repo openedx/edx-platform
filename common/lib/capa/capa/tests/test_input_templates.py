@@ -448,6 +448,32 @@ class TextlineTemplateTest(TemplateTestCase):
         self.assert_has_text(xml, xpath, self.context['msg'])
 
 
+class FormulaEquationInputTemplateTest(TemplateTestCase):
+    """
+    Test make template for `<formulaequationinput>`s.
+    """
+    TEMPLATE_NAME = 'formulaequationinput.html'
+
+    def setUp(self):
+        self.context = {
+            'id': 2,
+            'value': 'PREFILLED_VALUE',
+            'status': 'unsubmitted',
+            'previewer': 'file.js',
+            'reported_status': 'REPORTED_STATUS',
+        }
+        super(FormulaEquationInputTemplateTest, self).setUp()
+
+    def test_no_size(self):
+        xml = self.render_to_xml(self.context)
+        self.assert_no_xpath(xml, "//input[@size]", self.context)
+
+    def test_size(self):
+        self.context['size'] = '40'
+        xml = self.render_to_xml(self.context)
+
+        self.assert_has_xpath(xml, "//input[@size='40']", self.context)
+
 class AnnotationInputTemplateTest(TemplateTestCase):
     """
     Test mako template for `<annotationinput>` input.

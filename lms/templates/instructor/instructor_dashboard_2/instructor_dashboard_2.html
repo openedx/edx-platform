@@ -1,3 +1,4 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%inherit file="/main.html" />
 <%! from django.core.urlresolvers import reverse %>
 <%namespace name='static' file='/static_content.html'/>
@@ -38,7 +39,7 @@
   ## when the javascript loads, it clicks on the first section
   <h2 class="instructor-nav">
     % for section_data in sections:
-      <a href="" data-section="${ section_data['section_key'] }">${ section_data['section_display_name'] }</a>
+      <a href="" data-section="${ section_data['section_key'] }">${_(section_data['section_display_name'])}</a>
     % endfor
   </h2>
 
