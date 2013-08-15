@@ -154,6 +154,9 @@ MITX_FEATURES = {
     # Toggle to enable chat availability (configured on a per-course
     # basis in Studio)
     'ENABLE_CHAT': False,
+
+    # Allow users to enroll with methods other than just honor code certificates
+    'MULTIPLE_ENROLLMENT_ROLES' : False
 }
 
 # Used for A/B testing
@@ -774,7 +777,7 @@ INSTALLED_APPS = (
     'notification_prefs',
 
     # Different Course Modes
-    'course_modes'
+    'course_modes',
 
     # Student Identity Verification
     'verify_student',
