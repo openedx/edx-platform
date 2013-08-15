@@ -36,10 +36,10 @@ div.peer-grading{
         &.submission-container{
             @include clearfix;
             overflow-y: auto;
-            height: auto;
             max-height: 300px;
+            height: auto;
             border: 1px solid #ddd;
-            background: #F6F6F6;
+            background: #f6f6f6;
         }
     }
 
@@ -47,7 +47,6 @@ div.peer-grading{
         margin: 0;
         padding: 2px;
         min-width: 50px;
-        background-color: white;
         text-size: 1.5em;
     }
     
@@ -63,7 +62,7 @@ div.peer-grading{
     }
 
     .problem-list {
-        width:100%;
+        width: 100%;
         table-layout: auto;
         text-align: center;
         
@@ -192,6 +191,20 @@ div.peer-grading{
 div.peer-grading {
     border-radius: $baseline/2;
     padding: 0;
+
+    .peer-grading-tools {
+        padding: $baseline;
+    }
+
+    .error-container {
+        margin: $baseline;
+        border-radius: $baseline/4;
+        padding: $baseline/2;
+    }
+
+    .interstitial-page, .calibration -feedback, .calibration-interstitial-page {
+        padding: $baseline;
+    }
 
     .prompt-wrapper {
         padding: $baseline;

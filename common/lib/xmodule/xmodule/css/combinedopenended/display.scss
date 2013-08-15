@@ -266,8 +266,6 @@ div.combined-rubric-container {
 
   h4 {
     padding-top: $baseline/2;
-    border-color: lightgray;
-    border-top: 1px solid;
   }
 
   span.rubric-category {
@@ -892,7 +890,6 @@ section.open-ended-child {
 
 .oe-tools {
   display: inline-block;
-  padding-left: $baseline;
   width: 100%;
   border-radius: 5px;
 
@@ -910,7 +907,7 @@ section.open-ended-child {
   .rubric-previous-button {
     margin-right: $baseline/4;
   }
-  
+
   .rubric-next-button {
     margin-left: $baseline/4;
   }
