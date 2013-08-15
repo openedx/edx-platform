@@ -526,7 +526,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
                 feedback = "".join(feedback_items)
             else:
                 feedback = feedback_items
-            score = int(median(score_result['score']))
+            score = int(round(median(score_result['score'])))
         else:
             # This is for instructor and ML grading
             feedback, rubric_score = self._format_feedback(score_result, system)
