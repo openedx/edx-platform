@@ -43,7 +43,7 @@ LOGGER.info("Loading the lettuce acceptance testing terrain file...")
 MAX_VALID_BROWSER_ATTEMPTS = 20
 
 # https://gist.github.com/santiycr/1644439
-import httplib
+import requests
 import base64
 try:
     import json
@@ -75,12 +75,10 @@ base64string = base64.encodestring('{}:{}'.format(config['username'], config['ac
 
 def set_job_status(jobid, passed=True):
     body_content = json.dumps({"passed": passed})
-    connection = httplib.HTTPConnection("saucelabs.com")
-    connection.request('PUT', '/rest/v1/%s/jobs/%s' % (config['username'], jobid),
-    body_content,
-    headers={"Authorization": "Basic %s" % base64string})
-    result = connection.getresponse()
-    return result.status == 200
+    result=requests.put('http://saucelabs.com/rest/v1/{}/jobs/{}'.format(config['username'], jobid),
+        data=body_content,
+        headers={"Authorization": "Basic {}".format(base64string)})
+    return result.status_code == 200
 
 
 @before.harvest

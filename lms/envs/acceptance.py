@@ -109,13 +109,14 @@ MITX_FEATURES['SAUCE'] = {
     'SAUCE_ENABLED' : os.environ.get('SAUCE_ENABLED'),
     'USERNAME' : os.environ.get('SAUCE_USER_NAME'),
     'ACCESS_ID' : os.environ.get('SAUCE_API_KEY'),
-    'BROWSER' : DESIRED_CAPABILITIES.get(os.environ.get('SAUCE_BROWSER', 'chrome'), DesiredCapabilities.CHROME),
+    'BROWSER' : DESIRED_CAPABILITIES.get(os.environ.get('SAUCE_BROWSER', 'chrome').lower(), DesiredCapabilities.CHROME),
     'PLATFORM' : os.environ.get('SAUCE_PLATFORM', 'Linux'),
     'VERSION' : os.environ.get('SAUCE_VERSION', ''),
     'DEVICE' : os.environ.get('SAUCE_DEVICE', ''),
     'SESSION' : 'Jenkins Acceptance Tests',
     'BUILD' : os.environ.get('JOB_NAME', 'LMS TESTS'),
 }
+
 
 # Include the lettuce app for acceptance testing, including the 'harvest' django-admin command
 INSTALLED_APPS += ('lettuce.django',)
