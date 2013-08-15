@@ -119,9 +119,8 @@ data: |
         <p>
           <p style="display:inline">Energy saved = </p>
           <numericalresponse inline="1" answer="0.52">
-            <textline inline="1">
-              <responseparam description="Numerical Tolerance" type="tolerance" default="0.02" name="tol"/>
-            </textline>
+            <responseparam description="Numerical Tolerance" type="tolerance" default="0.02" name="tol"/>
+            <formulaequationinput/>
           </numericalresponse>
           <p style="display:inline">&#xA0;EJ/year</p>
         </p>

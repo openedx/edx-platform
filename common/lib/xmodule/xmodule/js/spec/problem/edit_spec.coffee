@@ -121,18 +121,18 @@ describe 'MarkdownEditingDescriptor', ->
         <p>Enter the numerical value of Pi:</p>
         <numericalresponse answer="3.14159">
           <responseparam type="tolerance" default=".02" />
-          <textline />
+          <formulaequationinput />
         </numericalresponse>
         
         <p>Enter the approximate value of 502*9:</p>
         <numericalresponse answer="4518">
           <responseparam type="tolerance" default="15%" />
-          <textline />
+          <formulaequationinput />
         </numericalresponse>
         
         <p>Enter the number of fingers on a human hand:</p>
         <numericalresponse answer="5">
-          <textline />
+          <formulaequationinput />
         </numericalresponse>
         
         <solution>
@@ -157,7 +157,7 @@ describe 'MarkdownEditingDescriptor', ->
         <p>Enter 0 with a tolerance:</p>
         <numericalresponse answer="0">
           <responseparam type="tolerance" default=".02" />
-          <textline />
+          <formulaequationinput />
         </numericalresponse>
 
 

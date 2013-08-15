@@ -75,7 +75,7 @@ CMS.Models.Settings.CourseDetails = Backbone.Model.extend({
         return this.videosourceSample();
     },
     videosourceSample : function() {
-        if (this.has('intro_video')) return "http://www.youtube.com/embed/" + this.get('intro_video');
+        if (this.has('intro_video')) return "//www.youtube.com/embed/" + this.get('intro_video');
         else return "";
     }
 });
