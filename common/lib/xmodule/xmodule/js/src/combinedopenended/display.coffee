@@ -15,7 +15,6 @@ class @Rubric
     # display the 'current' carat
     @categories = @$(@rubric_category_sel)
     @category = @$(@categories.first())
-    @category.prepend('> ')
     @category_index = 0
 
   # locally scoped jquery.
@@ -46,12 +45,8 @@ class @Rubric
         return
       inputs.filter("input[value=#{selected}]").click()
 
-      # move to the next category
-      old_category_text = @category.html().substring(5)
-      @category.html(old_category_text)
       @category_index++
       @category = @$(@categories[@category_index])
-      @category.prepend('> ')
     
   tracking_callback: (event) =>
     target_selection = $(event.target).val()
@@ -98,7 +93,6 @@ class @CombinedOpenEnded
   coe_sel: 'section.combined-open-ended'
   reset_button_sel: '.reset-button'
   next_step_sel: '.next-step-button'
-  status_container_sel: '.status-elements'
   show_results_sel: '.show-results-button'
   question_header_sel: '.question-header'
   submit_evaluation_sel: '.submit-evaluation-button'
@@ -137,15 +131,18 @@ class @CombinedOpenEnded
   $: (selector) ->
     $(selector, @el)
 
-  reinitialize: (element) ->
+  reinitialize: () ->
     @has_been_reset = false
     @wrapper=@$(@wrapper_sel)
+    @coe = @$(@coe_sel)
+
+    @ajax_url = @coe.data('ajax-url')
+    @get_html()
     @coe = @$(@coe_sel)
 
     #Get data from combinedopenended
     @allow_reset = @coe.data('allow_reset')
     @id = @coe.data('id')
-    @ajax_url = @coe.data('ajax-url')
     @state = @coe.data('state')
     @task_count = @coe.data('task-count')
     @task_number = @coe.data('task-number')
@@ -162,8 +159,6 @@ class @CombinedOpenEnded
     #Setup next problem
     @next_problem_button = @$(@next_step_sel)
     @next_problem_button.click @next_problem
-
-    @status_container = @$(@status_container_sel)
 
     #setup show results
     @show_results_button=@$(@show_results_sel)
@@ -183,6 +178,7 @@ class @CombinedOpenEnded
 
     # Where to put the rubric once we load it
     @oe = @$(@open_ended_child_sel)
+
     @errors_area = @$(@oe).find(@error_sel)
     @answer_area = @$(@oe).find(@answer_area_sel)
     @prompt_container = @$(@oe).find(@prompt_sel)
@@ -212,33 +208,18 @@ class @CombinedOpenEnded
 
     @rebind()
 
-  show_results_current: () =>
-    data = {'task_number' : @task_number-1}
-    $.postWithPrefix "#{@ajax_url}/get_results", data, (response) =>
-      if response.success
-        if (results_container?)
-          @results_container.after(response.html).remove()
-        @results_container = @$(@result_container_sel)
-        @submit_evaluation_button = @$(@submit_evaluation_sel)
-        @submit_evaluation_button.click @message_post
-        Collapsible.setCollapsibles(@results_container)
-        # make sure we still have click tracking
-        $('.evaluation-response a').click @log_feedback_click
-        $('input[name="evaluation-score"]').change @log_feedback_selection
+  get_html_callback: (response) =>
+    @coe.replaceWith(response.html)
 
-  show_results: (event) =>
-    status_item = $(event.target).parent()
-    status_number = status_item.data('status-number')
-    data = {'task_number' : status_number}
-    $.postWithPrefix "#{@ajax_url}/get_results", data, (response) =>
-      if response.success
-        @results_container.after(response.html).remove()
-        @results_container = @$(@result_container_sel)
-        @submit_evaluation_button = @$(@submit_evaluation_sel)
-        @submit_evaluation_button.click @message_post
-        Collapsible.setCollapsibles(@results_container)
-      else
-        @gentle_alert response.error
+  get_html: () =>
+    url = "#{@ajax_url}/get_html"
+    $.ajaxWithPrefix({
+                   type: 'POST',
+                   url: url,
+                   data: {},
+                   success: @get_html_callback,
+                   async:false
+                   });
 
   show_combined_rubric_current: () =>
     data = {}
@@ -254,36 +235,6 @@ class @CombinedOpenEnded
         @$(@next_rubric_sel).click @next_rubric
         if response.hide_reset
           @reset_button.hide()
-
-  get_last_response: () =>
-    @submit_button.hide()
-    @answer_area.attr("disabled", true)
-    data = {}
-    $.postWithPrefix "#{@ajax_url}/get_last_response", data, (response) =>
-      if response.success && response.response != ""
-        @answer_area.html(response.response)
-        if response.state!='initial'
-          @submit_button.hide()
-          @answer_area.attr("disabled", true)
-        if @has_been_reset
-          @submit_button.show()
-          @answer_area.attr("disabled", false)
-          @gentle_alert "Here is your previous answer to this qu
-                        estion."
-        else if @allow_reset=="True"
-          @reset_button.show()
-          @gentle_alert "You may reset and answer this question again."
-      else
-        @submit_button.show()
-        @answer_area.attr("disabled", false)
-        @$(@oe_alert_sel).animate(opacity: 0, 700)
-
-  show_status_current: () =>
-    data = {}
-    $.postWithPrefix "#{@ajax_url}/get_status", data, (response) =>
-      if response.success
-        @status_container.after(response.html).remove()
-        @status_container= $(@status_container_sel)
 
   message_post: (event)=>
     external_grader_message=$(event.target).parent().parent().parent()
@@ -319,7 +270,6 @@ class @CombinedOpenEnded
 
 
   rebind: () =>
-    @get_last_response()
     # rebind to the appropriate function for the current state
     @submit_button.unbind('click')
     @submit_button.show()
@@ -328,9 +278,6 @@ class @CombinedOpenEnded
     @next_problem_button.hide()
     @hint_area.attr('disabled', false)
 
-    if @task_number>1 or @child_state!='initial'
-      @show_status_current()
-
     if @task_number==1 and @child_state=='assessing'
       @prompt_hide()
     if @child_state == 'done'
@@ -338,7 +285,7 @@ class @CombinedOpenEnded
     if @child_type=="openended"
       @skip_button.hide()
     if @allow_reset=="True"
-      @show_results_current
+      @show_combined_rubric_current()
       @reset_button.show()
       @submit_button.hide()
       @answer_area.attr("disabled", true)
@@ -375,7 +322,6 @@ class @CombinedOpenEnded
         @submit_button.click @message_post
     else if @child_state == 'done'
       @show_combined_rubric_current()
-      @show_results_current()
       @rubric_wrapper.hide()
       @answer_area.attr("disabled", true)
       @replace_text_inputs()
@@ -539,7 +485,7 @@ class @CombinedOpenEnded
             @gentle_alert "Moved to next step."
           else
             @gentle_alert "Your score did not meet the criteria to move to the next step."
-            @show_results_current()
+            @show_combined_rubric_current()
         else
           @errors_area.html(response.error)
     else
@@ -591,7 +537,7 @@ class @CombinedOpenEnded
 
   # wrap this so that it can be mocked
   reload: ->
-    location.reload()
+    @reinitialize()
 
   collapse_question: (event) =>
     @prompt_container.slideToggle()

@@ -67,7 +67,6 @@ class CombinedOpenEndedV1Module():
     ajax actions implemented by combined open ended module are:
         'reset' -- resets the whole combined open ended module and returns to the first child moduleresource_string
         'next_problem' -- moves to the next child module
-        'get_results' -- gets results from a given child module
 
     Types of children. Task is synonymous with child module, so each combined open ended module
     incorporates multiple children (tasks):
@@ -351,6 +350,9 @@ class CombinedOpenEndedV1Module():
         self.update_task_states()
         return self.current_task.get_html(self.system)
 
+    def get_html_ajax(self, data):
+        return {'html' : self.get_html()}
+
     def get_current_attributes(self, task_number):
         """
         Gets the min and max score to attempt attributes of the specified task.
@@ -592,53 +594,6 @@ class CombinedOpenEndedV1Module():
         html = self.system.render_template('{0}/combined_open_ended_legend.html'.format(self.TEMPLATE_DIR), context)
         return {'html': html, 'success': True}
 
-    def get_results(self, _data):
-        """
-        Gets the results of a given grader via ajax.
-        Input: AJAX data dictionary
-        Output: Dictionary to be rendered via ajax that contains the result html.
-        """
-        self.update_task_states()
-        success, can_see_rubric, error = self.check_if_student_has_done_needed_grading()
-        if not can_see_rubric:
-            return {'html' : error, 'success' : False}
-        loop_up_to_task = self.current_task_number + 1
-        all_responses = []
-        for i in xrange(0, loop_up_to_task):
-            all_responses.append(self.get_last_response(i))
-        context_list = []
-        for ri in all_responses:
-            for i in xrange(0, len(ri['rubric_scores'])):
-                feedback = ri['feedback_dicts'][i].get('feedback', '')
-                rubric_data = self.rubric_renderer.render_rubric(stringify_children(self.static_data['rubric']),
-                                                                 ri['rubric_scores'][i])
-                if rubric_data['success']:
-                    rubric_html = rubric_data['html']
-                else:
-                    rubric_html = ''
-                context = {
-                    'rubric_html': rubric_html,
-                    'grader_type': ri['grader_type'],
-                    'feedback': feedback,
-                    'grader_id': ri['grader_ids'][i],
-                    'submission_id': ri['submission_ids'][i],
-                }
-                context_list.append(context)
-        feedback_table = self.system.render_template('{0}/open_ended_result_table.html'.format(self.TEMPLATE_DIR), {
-            'context_list': context_list,
-            'grader_type_image_dict': GRADER_TYPE_IMAGE_DICT,
-            'human_grader_types': HUMAN_GRADER_TYPE,
-            'rows': 50,
-            'cols': 50,
-        })
-        context = {
-            'results': feedback_table,
-            'task_name': "Feedback",
-            'class_name': "result-container",
-        }
-        html = self.system.render_template('{0}/combined_open_ended_results.html'.format(self.TEMPLATE_DIR), context)
-        return {'html': html, 'success': True}
-
     def get_status_ajax(self, _data):
         """
         Gets the results of a given grader via ajax.
@@ -662,11 +617,12 @@ class CombinedOpenEndedV1Module():
         handlers = {
             'next_problem': self.next_problem,
             'reset': self.reset,
-            'get_results': self.get_results,
             'get_combined_rubric': self.get_rubric,
             'get_status': self.get_status_ajax,
             'get_legend': self.get_legend,
             'get_last_response': self.get_last_response_ajax,
+            'get_current_state': self.get_current_state,
+            'get_html': self.get_html_ajax,
         }
 
         if dispatch not in handlers:
@@ -675,6 +631,9 @@ class CombinedOpenEndedV1Module():
 
         d = handlers[dispatch](data)
         return json.dumps(d, cls=ComplexEncoder)
+
+    def get_current_state(self, data):
+        return self.get_context()
 
     def get_last_response_ajax(self,data):
         return self.get_last_response(self.current_task_number)
