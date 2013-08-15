@@ -291,19 +291,19 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
         XML-based courses.
         """
         ret = {'0.75': '', '1.00': '', '1.25': '', '1.50': ''}
-        if data == '':
-            return ret
+
         videos = data.split(',')
         for video in videos:
             pieces = video.split(':')
-            # HACK
-            # To elaborate somewhat: in many LMS tests, the keys for
-            # Youtube IDs are inconsistent. Sometimes a particular
-            # speed isn't present, and formatting is also inconsistent
-            # ('1.0' versus '1.00'). So it's necessary to either do
-            # something like this or update all the tests to work
-            # properly.
-            ret['%.2f' % float(pieces[0])] = pieces[1]
+            try:
+                speed = '%.2f' % float(pieces[0])  # normalize speed
+                # Handle the fact that youtube IDs got double-quoted for a period of time.
+                # Note: we pass in "VideoFields.youtube_id_1_0" so we deserialize as a String--
+                # it doesn't matter what the actual speed is for the purposes of deserializing.
+                youtube_id = VideoDescriptor._deserialize(VideoFields.youtube_id_1_0.name, pieces[1])
+                ret[speed] = youtube_id
+            except (ValueError, IndexError):
+                log.warning('Invalid YouTube ID: %s' % video)
         return ret
 
     @staticmethod
@@ -316,7 +316,6 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
         model_data = {}
 
         conversions = {
-            'show_captions': json.loads,
             'start_time': VideoDescriptor._parse_time,
             'end_time': VideoDescriptor._parse_time
         }
@@ -355,9 +354,20 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
                 #  Convert XML attrs into Python values.
                 if attr in conversions:
                     value = conversions[attr](value)
+                else:
+                # We export values with json.dumps (well, except for Strings, but
+                # for about a month we did it for Strings also).
+                    value = VideoDescriptor._deserialize(attr, value)
                 model_data[attr] = value
 
         return model_data
+
+    @classmethod
+    def _deserialize(cls, attr, value):
+        """
+        Handles deserializing values that may have been encoded with json.dumps.
+        """
+        return cls.get_map_for_field(attr).from_xml(value)
 
     @staticmethod
     def _parse_time(str_time):
