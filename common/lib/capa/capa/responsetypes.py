@@ -1812,7 +1812,7 @@ class FormulaResponse(LoncapaResponse):
                     var_dict,
                     dict(),
                     answer,
-                    cs=self.case_sensitive,
+                    case_sensitive=self.case_sensitive,
                 ))
             except UndefinedVariable as uv:
                 log.debug(
