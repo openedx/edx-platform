@@ -55,10 +55,11 @@ def set_job_status(jobid, passed=True):
     body_content = json.dumps({"passed": passed})
     config = get_username_and_key()
     base64string = base64.encodestring('{}:{}'.format(config['username'], config['access-key']))[:-1]
-    result=requests.put('http://saucelabs.com/rest/v1/{}/jobs/{}'.format(config['username'], world.jobid),
+    result = requests.put('http://saucelabs.com/rest/v1/{}/jobs/{}'.format(config['username'], world.jobid),
         data=body_content,
         headers={"Authorization": "Basic {}".format(base64string)})
     return result.status_code == 200
+
 
 def make_desired_capabilities():
     desired_capabilities =  settings.SAUCE.get('BROWSER', DesiredCapabilities.CHROME)
@@ -75,8 +76,9 @@ def make_desired_capabilities():
     desired_capabilities['public'] = 'public restricted'
     return desired_capabilities
 
+
 def get_username_and_key():
-    return {"username": settings.SAUCE.get('USERNAME'),"access-key": settings.SAUCE.get('ACCESS_ID')}
+    return {"username": settings.SAUCE.get('USERNAME'), "access-key": settings.SAUCE.get('ACCESS_ID')}
 
 
 @before.harvest
@@ -99,7 +101,7 @@ def initial_setup(server):
             config = get_username_and_key()
             world.browser = Browser(
                 'remote',
-                url="http://{}:{}@ondemand.saucelabs.com:80/wd/hub".format(config['username'],config['access-key']),
+                url="http://{}:{}@ondemand.saucelabs.com:80/wd/hub".format(config['username'], config['access-key']),
                 **make_desired_capabilities()
             )
             world.absorb(world.browser.driver.session_id, 'jobid')
@@ -147,7 +149,6 @@ def clear_data(scenario):
     world.spew('scenario_dict')
 
 
-
 @after.each_scenario
 def reset_databases(scenario):
     '''
@@ -179,5 +180,5 @@ def teardown_browser(total):
     Quit the browser after executing the tests.
     """
     if world.SAUCE_ENABLED:
-            set_job_status(world.jobid, total.scenarios_ran == total.scenarios_passed)
+        set_job_status(world.jobid, total.scenarios_ran == total.scenarios_passed)
     world.browser.quit()
