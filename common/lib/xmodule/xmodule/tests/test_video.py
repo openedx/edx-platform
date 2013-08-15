@@ -64,6 +64,32 @@ class VideoModuleTest(LogicTest):
                                   '1.25': '',
                                   '1.50': ''})
 
+    def test_parse_youtube_invalid(self):
+        """Ensure that ids that are invalid return an empty dict"""
+
+        # invalid id
+        youtube_str = 'thisisaninvalidid'
+        output = VideoDescriptor._parse_youtube(youtube_str)
+        self.assertEqual(output, {'0.75': '',
+                                  '1.00': '',
+                                  '1.25': '',
+                                  '1.50': ''})
+        # another invalid id
+        youtube_str = ',::,:,,'
+        output = VideoDescriptor._parse_youtube(youtube_str)
+        self.assertEqual(output, {'0.75': '',
+                                  '1.00': '',
+                                  '1.25': '',
+                                  '1.50': ''})
+
+        # and another one, partially invalid
+        youtube_str = '0.75_BAD!!!,1.0:AXdE34_U,1.25:KLHF9K_Y,1.5:VO3SxfeD,'
+        output = VideoDescriptor._parse_youtube(youtube_str)
+        self.assertEqual(output, {'0.75': '',
+                                  '1.00': 'AXdE34_U',
+                                  '1.25': 'KLHF9K_Y',
+                                  '1.50': 'VO3SxfeD'})
+
     def test_parse_youtube_key_format(self):
         """
         Make sure that inconsistent speed keys are parsed correctly.
