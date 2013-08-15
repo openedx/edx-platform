@@ -278,7 +278,6 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
             ele.set('src', self.track)
             xml.append(ele)
         return xml
-        #return etree.tostring(xml, pretty_print=True)
 
     @staticmethod
     def _parse_youtube(data):
