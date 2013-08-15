@@ -215,10 +215,6 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
             self._model_data.update(model_data)
             del self.data
 
-        # I'm not sure how, but in some lifecycles we can loose the .category attribute
-        # this needs to be investigated
-        self.category = 'video'
-
     @classmethod
     def from_xml(cls, xml_data, system, org=None, course=None):
         """

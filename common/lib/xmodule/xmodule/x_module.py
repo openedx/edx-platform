@@ -467,11 +467,11 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         self.system = self.runtime
         if isinstance(self.location, Location):
             self.url_name = self.location.name
-            if not hasattr(self, 'category'):
+            if getattr(self, 'category', None) is None:
                 self.category = self.location.category
         elif isinstance(self.location, BlockUsageLocator):
             self.url_name = self.location.usage_id
-            if not hasattr(self, 'category'):
+            if getattr(self, 'category', None) is None:
                 raise InsufficientSpecificationError()
         else:
             raise InsufficientSpecificationError()
