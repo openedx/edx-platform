@@ -557,7 +557,10 @@ class CombinedOpenEndedV1Module():
             return {'html' : self.system.render_template('{0}/combined_open_ended_hidden_results.html'.format(self.TEMPLATE_DIR), {'error' : error}), 'success' : True, 'hide_reset' : True}
 
         contexts = []
-        response = self.get_last_response(self.current_task_number + 1)
+        rubric_number = self.current_task_number
+        if self.ready_to_reset:
+            rubric_number+=1
+        response = self.get_last_response(rubric_number)
         score_length = len(response['grader_types'])
         for z in xrange(0,score_length):
             feedback = response['feedback_dicts'][z].get('feedback', '')
