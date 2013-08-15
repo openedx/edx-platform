@@ -124,6 +124,7 @@ class @CombinedOpenEnded
   rubric_collapse_sel: '.rubric-collapse'
   next_rubric_sel: '.rubric-next-button'
   previous_rubric_sel: '.rubric-previous-button'
+  oe_alert_sel: '.open-ended-alert'
 
   constructor: (el) ->
     @el=el
@@ -137,6 +138,7 @@ class @CombinedOpenEnded
     $(selector, @el)
 
   reinitialize: (element) ->
+    @has_been_reset = false
     @wrapper=@$(@wrapper_sel)
     @coe = @$(@coe_sel)
 
@@ -253,6 +255,30 @@ class @CombinedOpenEnded
         if response.hide_reset
           @reset_button.hide()
 
+  get_last_response: () =>
+    @submit_button.hide()
+    @answer_area.attr("disabled", true)
+    data = {}
+    $.postWithPrefix "#{@ajax_url}/get_last_response", data, (response) =>
+      if response.success && response.response != ""
+        @answer_area.html(response.response)
+        if response.state!='initial'
+          @submit_button.hide()
+          @answer_area.attr("disabled", true)
+        if @has_been_reset
+          @submit_button.show()
+          @answer_area.attr("disabled", false)
+          @gentle_alert "Here is your previous answer to this qu
+                        estion."
+        else if @allow_reset=="True"
+          @reset_button.show()
+          @gentle_alert "You may reset and answer this question again."
+        else
+          @gentle_alert "You have answered this question."
+      else
+        @submit_button.show()
+        @answer_area.attr("disabled", false)
+        @$(@oe_alert_sel).animate(opacity: 0, 700)
 
   show_status_current: () =>
     data = {}
@@ -260,12 +286,6 @@ class @CombinedOpenEnded
       if response.success
         @status_container.after(response.html).remove()
         @status_container= $(@status_container_sel)
-
-  get_last_response: () =>
-    data = {}
-    $.postWithPrefix "#{@ajax_url}/get_last_response", data, (response) =>
-      if response.success
-        console.log(response.response)
 
   message_post: (event)=>
     external_grader_message=$(event.target).parent().parent().parent()
@@ -301,6 +321,7 @@ class @CombinedOpenEnded
 
 
   rebind: () =>
+    @get_last_response()
     # rebind to the appropriate function for the current state
     @submit_button.unbind('click')
     @submit_button.show()
@@ -308,6 +329,7 @@ class @CombinedOpenEnded
     @hide_file_upload()
     @next_problem_button.hide()
     @hint_area.attr('disabled', false)
+
     if @task_number>1 or @child_state!='initial'
       @show_status_current()
 
@@ -376,6 +398,7 @@ class @CombinedOpenEnded
   save_answer: (event) =>
     event.preventDefault()
     @submit_button.hide()
+    @answer_area.attr("disabled", true)
     max_filesize = 2*1000*1000 #2MB
     pre_can_upload_files = @can_upload_files
     if @child_state == 'initial'
@@ -414,7 +437,6 @@ class @CombinedOpenEnded
             @gentle_alert response.error
 
       $.ajaxWithPrefix("#{@ajax_url}/save_answer",settings)
-
     else
       @errors_area.html(@out_of_sync_message)
 
@@ -492,6 +514,7 @@ class @CombinedOpenEnded
           @coe.after(response.html).remove()
           @allow_reset="False"
           @reinitialize(@element)
+          @has_been_reset = true
           @rebind()
           @reset_button.hide()
         else
@@ -523,11 +546,11 @@ class @CombinedOpenEnded
       @errors_area.html(@out_of_sync_message)
 
   gentle_alert: (msg) =>
-    if @$el.find('.open-ended-alert').length
-      @$el.find('.open-ended-alert').remove()
+    if @$el.find(@oe_alert_sel).length
+      @$el.find(@oe_alert_sel).remove()
     alert_elem = "<div class='open-ended-alert'>" + msg + "</div>"
     @$el.find('.open-ended-action').after(alert_elem)
-    @$el.find('.open-ended-alert').css(opacity: 0).animate(opacity: 1, 700)
+    @$el.find(@oe_alert_sel).css(opacity: 0).animate(opacity: 1, 700)
 
   queueing: =>
     if @child_state=="assessing" and @child_type=="openended"
