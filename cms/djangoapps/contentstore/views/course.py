@@ -123,14 +123,14 @@ def create_new_course(request):
         pass
     if existing_course is not None:
         return JsonResponse({
-                'ErrMsg': _(('There is already a course defined with the same '
+                'ErrMsg': _('There is already a course defined with the same '
                     'organization, course number, and course run. Please '
                     'change either organization or course number to be '
-                    'unique.')),
-                'OrgErrMsg': _(('Please change either the organization or '
-                    'course number so that it is unique.')),
-                'CourseErrMsg': _(('Please change either the organization or '
-                    'course number so that it is unique.')),
+                    'unique.'),
+                'OrgErrMsg': _('Please change either the organization or '
+                    'course number so that it is unique.'),
+                'CourseErrMsg': _('Please change either the organization or '
+                    'course number so that it is unique.'),
         })
 
     course_search_location = ['i4x', dest_location.org, dest_location.course,
@@ -139,13 +139,13 @@ def create_new_course(request):
     courses = modulestore().get_items(course_search_location)
     if len(courses) > 0:
         return JsonResponse({
-                'ErrMsg': _(('There is already a course defined with the same '
+                'ErrMsg': _('There is already a course defined with the same '
                     'organization and course number. Please '
-                    'change at least one field to be unique.')),
-                'OrgErrMsg': _(('Please change either the organization or '
-                    'course number so that it is unique.')),
-                'CourseErrMsg': _(('Please change either the organization or '
-                    'course number so that it is unique.')),
+                    'change at least one field to be unique.'),
+                'OrgErrMsg': _('Please change either the organization or '
+                    'course number so that it is unique.'),
+                'CourseErrMsg': _('Please change either the organization or '
+                    'course number so that it is unique.'),
         })
 
     # instantiate the CourseDescriptor and then persist it
@@ -206,9 +206,7 @@ def course_info(request, org, course, name, provided_id=None):
         'context_course': course_module,
         'url_base': "/" + org + "/" + course + "/",
         'course_updates': json.dumps(get_course_updates(location)),
-        'handouts_location': Location(['i4x', org, course, 'course_info',
-            'handouts']).url()
-    })
+        'handouts_location': Location(['i4x', org, course, 'course_info', 'handouts']).url() })
 
 
 @expect_json
@@ -227,9 +225,6 @@ def course_info_updates(request, org, course, provided_id=None):
     # get current updates
     location = ['i4x', org, course, 'course_info', "updates"]
 
-    # Hmmm, provided_id is coming as empty string on create whereas I believe
-    # it used to be None :-( Possibly due to my removing the seemingly
-    # redundant pattern in urls.py
     if provided_id == '':
         provided_id = None
 
@@ -241,22 +236,21 @@ def course_info_updates(request, org, course, provided_id=None):
         return JsonResponse(get_course_updates(location))
     elif request.method == 'DELETE':
         try:
-            return JsonResponse(delete_course_update(location, request.POST,
-                provided_id
-            ))
+            return JsonResponse(delete_course_update(location, request.POST, provided_id))
         except:
-            return HttpResponseBadRequest("Failed to delete",
-                                          content_type="text/plain")
-    elif request.method in ('POST', 'PUT'):  # can be either and sometimes
-                                             # django is rewriting one to the
-                                             # other
+            return HttpResponseBadRequest(
+                "Failed to delete",
+                content_type="text/plain"
+            )
+    # can be either and sometimes django is rewriting one to the other:
+    elif request.method in ('POST', 'PUT'): 
         try:
-            return JsonResponse(update_course_updates(location, request.POST,
-                provided_id
-            ))
+            return JsonResponse(update_course_updates(location, request.POST, provided_id))
         except:
-            return HttpResponseBadRequest("Failed to save",
-                                          content_type="text/plain")
+            return HttpResponseBadRequest(
+                "Failed to save",
+                content_type="text/plain"
+            )
 
 
 @login_required
@@ -563,8 +557,8 @@ def textbook_index(request, org, course, name):
     if request.is_ajax():
         if request.method == 'GET':
             return JsonResponse(course_module.pdf_textbooks)
-        elif request.method in ('POST', 'PUT'):  # can be either and sometimes
-                                        # django is rewriting one to the other
+        # can be either and sometimes django is rewriting one to the other:
+        elif request.method in ('POST', 'PUT'):
             try:
                 textbooks = validate_textbooks_json(request.body)
             except TextbookValidationError as err:

@@ -2,14 +2,15 @@ import json
 import logging
 from collections import defaultdict
 
-from django.http import HttpResponse, HttpResponseBadRequest, \
-        HttpResponseForbidden
+from django.http import ( HttpResponse, HttpResponseBadRequest, 
+        HttpResponseForbidden )
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 from django.core.exceptions import PermissionDenied
 from django_future.csrf import ensure_csrf_cookie
 from django.conf import settings
-from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
+from xmodule.modulestore.exceptions import ( ItemNotFoundError, 
+        InvalidLocationError )
 from mitxmako.shortcuts import render_to_response
 
 from xmodule.modulestore import Location
@@ -20,8 +21,8 @@ from xblock.core import Scope
 from util.json_request import expect_json, JsonResponse
 
 from contentstore.module_info_model import get_module_info, set_module_info
-from contentstore.utils import get_modulestore, get_lms_link_for_item, \
-    compute_unit_state, UnitState, get_course_for_item
+from contentstore.utils import ( get_modulestore, get_lms_link_for_item, 
+    compute_unit_state, UnitState, get_course_for_item )
 
 from models.settings.course_grading import CourseGradingModel
 
@@ -90,7 +91,8 @@ def edit_subsection(request, location):
     # we're for now assuming a single parent
     if len(parent_locs) != 1:
         logging.error(
-                'Multiple (or none) parents have been found for' + location
+                'Multiple (or none) parents have been found for %', 
+                location
         )
 
     # this should blow up if we don't find any parents, which would be erroneous
@@ -209,7 +211,8 @@ def edit_unit(request, location):
                     pass
     else:
         log.error(
-            "Improper format for course advanced keys!" + course_advanced_keys
+            "Improper format for course advanced keys! %",
+            course_advanced_keys
         )
 
     components = [
@@ -293,11 +296,12 @@ def assignment_type_update(request, org, course, category, name):
         return HttpResponseForbidden()
 
     if request.method == 'GET':
-        return JsonResponse(CourseGradingModel.get_section_grader_type(location))
+        rsp = CourseGradingModel.get_section_grader_type(location)
     elif request.method in ('POST', 'PUT'):  # post or put, doesn't matter.
-        return JsonResponse(CourseGradingModel.update_section_grader_type(
+        rsp = CourseGradingModel.update_section_grader_type(
                     location, request.POST
-        ))
+        )
+    return JsonResponse(rsp)
 
 
 @login_required
@@ -368,7 +372,7 @@ def module_info(request, module_location):
 
     rewrite_static_links = request.GET.get('rewrite_url_links', 'True') in ['True', 'true']
     logging.debug('rewrite_static_links = {0} {1}'.format(
-        request.GET.get('rewrite_url_links', 'False'),
+        request.GET.get('rewrite_url_links', False),
         rewrite_static_links)
     )
 
@@ -377,13 +381,14 @@ def module_info(request, module_location):
         raise PermissionDenied()
 
     if request.method == 'GET':
-        return JsonResponse(get_module_info(
+        rsp = get_module_info(
             get_modulestore(location),
             location,
             rewrite_static_links=rewrite_static_links
-        ))
+        )
     elif request.method in ("POST", "PUT"):
-        return JsonResponse(set_module_info(
+        rsp = set_module_info(
             get_modulestore(location),
             location, request.POST
-        ))
+        )
+    return JsonResponse(rsp)
