@@ -51,34 +51,32 @@ except ImportError:
     import simplejson as json
 
 
-SAUCE = settings.MITX_FEATURES.get('SAUCE', {})
-
-config = {"username": SAUCE.get('USERNAME'),
-"access-key": SAUCE.get('ACCESS_ID')}
-
-world.absorb(SAUCE.get('SAUCE_ENABLED'),'SAUCE_ENABLED')
-desired_capabilities =  SAUCE.get('BROWSER', DesiredCapabilities.CHROME)
-desired_capabilities['platform'] = SAUCE.get('PLATFORM')
-desired_capabilities['version'] = SAUCE.get('VERSION')
-desired_capabilities['device-type'] = SAUCE.get('DEVICE')
-desired_capabilities['name'] = SAUCE.get('SESSION')
-desired_capabilities['build'] = SAUCE.get('BUILD')
-desired_capabilities['video-upload-on-pass'] = False
-desired_capabilities['sauce-advisor'] = False
-desired_capabilities['record-screenshots'] = False
-desired_capabilities['selenium-version'] = "2.34.0"
-desired_capabilities['max-duration'] = 3600
-desired_capabilities['public'] = 'public restricted'
-jobid=''
-
-base64string = base64.encodestring('{}:{}'.format(config['username'], config['access-key']))[:-1]
-
 def set_job_status(jobid, passed=True):
     body_content = json.dumps({"passed": passed})
-    result=requests.put('http://saucelabs.com/rest/v1/{}/jobs/{}'.format(config['username'], jobid),
+    config = get_username_and_key()
+    base64string = base64.encodestring('{}:{}'.format(config['username'], config['access-key']))[:-1]
+    result=requests.put('http://saucelabs.com/rest/v1/{}/jobs/{}'.format(config['username'], world.jobid),
         data=body_content,
         headers={"Authorization": "Basic {}".format(base64string)})
     return result.status_code == 200
+
+def make_desired_capabilities():
+    desired_capabilities =  settings.SAUCE.get('BROWSER', DesiredCapabilities.CHROME)
+    desired_capabilities['platform'] = settings.SAUCE.get('PLATFORM')
+    desired_capabilities['version'] = settings.SAUCE.get('VERSION')
+    desired_capabilities['device-type'] = settings.SAUCE.get('DEVICE')
+    desired_capabilities['name'] = settings.SAUCE.get('SESSION')
+    desired_capabilities['build'] = settings.SAUCE.get('BUILD')
+    desired_capabilities['video-upload-on-pass'] = False
+    desired_capabilities['sauce-advisor'] = False
+    desired_capabilities['record-screenshots'] = False
+    desired_capabilities['selenium-version'] = "2.34.0"
+    desired_capabilities['max-duration'] = 3600
+    desired_capabilities['public'] = 'public restricted'
+    return desired_capabilities
+
+def get_username_and_key():
+    return {"username": settings.SAUCE.get('USERNAME'),"access-key": settings.SAUCE.get('ACCESS_ID')}
 
 
 @before.harvest
@@ -86,6 +84,7 @@ def initial_setup(server):
     """
     Launch the browser once before executing the tests.
     """
+    world.absorb(settings.SAUCE.get('SAUCE_ENABLED'),'SAUCE_ENABLED')
     browser_driver = getattr(settings, 'LETTUCE_BROWSER', 'chrome')
 
     # There is an issue with ChromeDriver2 r195627 on Ubuntu
@@ -97,13 +96,13 @@ def initial_setup(server):
 
         # Get a browser session
         if world.SAUCE_ENABLED:
+            config = get_username_and_key()
             world.browser = Browser(
                 'remote',
                 url="http://{}:{}@ondemand.saucelabs.com:80/wd/hub".format(config['username'],config['access-key']),
-                **desired_capabilities
+                **make_desired_capabilities()
             )
-            global jobid
-            jobid = world.browser.driver.session_id
+            world.absorb(world.browser.driver.session_id, 'jobid')
         else:
             world.browser = Browser(browser_driver)
 
@@ -180,5 +179,5 @@ def teardown_browser(total):
     Quit the browser after executing the tests.
     """
     if world.SAUCE_ENABLED:
-            set_job_status(jobid, total.scenarios_ran == total.scenarios_passed)
+            set_job_status(world.jobid, total.scenarios_ran == total.scenarios_passed)
     world.browser.quit()

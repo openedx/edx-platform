@@ -97,7 +97,7 @@ MITX_FEATURES['AUTOMATIC_AUTH_FOR_TESTING'] = True
 USE_I18N = True
 
 # Information needed to utilize Sauce Labs.
-MITX_FEATURES['SAUCE'] = {
+SAUCE = {
     'SAUCE_ENABLED' : os.environ.get('SAUCE_ENABLED'),
     'USERNAME' : os.environ.get('SAUCE_USER_NAME'),
     'ACCESS_ID' : os.environ.get('SAUCE_API_KEY'),
