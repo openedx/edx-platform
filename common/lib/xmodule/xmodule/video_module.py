@@ -374,12 +374,12 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
                 seconds=obj_time.tm_sec
             ).total_seconds()
 
-    @staticmethod
-    def _deserialize(attr, value):
+    @classmethod
+    def _deserialize(cls, attr, value):
         """
         Handles deserializing values that may have been encoded with json.dumps.
         """
-        return VideoDescriptor.get_map_for_field(VideoDescriptor, attr).from_xml(value)
+        return cls.get_map_for_field(attr).from_xml(value)
 
 def _create_youtube_string(module):
     """

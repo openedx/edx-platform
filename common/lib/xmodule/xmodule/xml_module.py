@@ -165,7 +165,7 @@ class XmlDescriptor(XModuleDescriptor):
 
     metadata_to_export_to_policy = ('discussion_topics')
 
-    @staticmethod
+    @classmethod
     def get_map_for_field(cls, attr):
         """
         Returns a serialize/deserialize AttrMap for the given field of a class.
@@ -285,7 +285,7 @@ class XmlDescriptor(XModuleDescriptor):
                     # don't load these
                     continue
 
-                attr_map = XmlDescriptor.get_map_for_field(cls, attr)
+                attr_map = cls.get_map_for_field(attr)
                 metadata[attr] = attr_map.from_xml(val)
         return metadata
 
@@ -296,7 +296,7 @@ class XmlDescriptor(XModuleDescriptor):
         through the attrmap.  Updates the metadata dict in place.
         """
         for attr in policy:
-            attr_map = XmlDescriptor.get_map_for_field(cls, attr)
+            attr_map = cls.get_map_for_field(attr)
             metadata[cls._translate(attr)] = attr_map.from_xml(policy[attr])
 
     @classmethod
@@ -412,7 +412,7 @@ class XmlDescriptor(XModuleDescriptor):
             """Get the value for this attribute that we want to store.
             (Possible format conversion through an AttrMap).
              """
-            attr_map = XmlDescriptor.get_map_for_field(self, attr)
+            attr_map = self.get_map_for_field(attr)
             return attr_map.to_xml(self._model_data[attr])
 
         # Add the non-inherited metadata
