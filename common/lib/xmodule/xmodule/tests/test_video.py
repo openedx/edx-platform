@@ -264,6 +264,62 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
             'data': ''
         })
 
+    def test_from_xml_double_quotes(self):
+        """
+        Make sure we can handle the double-quoted string format (which was used for exporting for
+        a few weeks).
+        """
+        module_system = DummySystem(load_error_modules=True)
+        xml_data ='''
+            <video display_name="&quot;display_name&quot;"
+                html5_sources="[&quot;source_1&quot;, &quot;source_2&quot;]"
+                show_captions="false"
+                source="&quot;http://download_video&quot;"
+                sub="&quot;html5_subtitles&quot;"
+                track="&quot;http://download_track&quot;"
+                youtube_id_0_75="&quot;OEoXaMPEzf65&quot;"
+                youtube_id_1_25="&quot;OEoXaMPEzf125&quot;"
+                youtube_id_1_5="&quot;OEoXaMPEzf15&quot;"
+                youtube_id_1_0="&quot;OEoXaMPEzf10&quot;"
+                />
+        '''
+        output = VideoDescriptor.from_xml(xml_data, module_system)
+        self.assert_attributes_equal(output, {
+            'youtube_id_0_75': 'OEoXaMPEzf65',
+            'youtube_id_1_0': 'OEoXaMPEzf10',
+            'youtube_id_1_25': 'OEoXaMPEzf125',
+            'youtube_id_1_5': 'OEoXaMPEzf15',
+            'show_captions': False,
+            'start_time': 0.0,
+            'end_time': 0.0,
+            'track': 'http://download_track',
+            'source': 'http://download_video',
+            'html5_sources': ["source_1", "source_2"],
+            'data': ''
+        })
+
+    def test_from_xml_double_quote_concatenated_youtube(self):
+        module_system = DummySystem(load_error_modules=True)
+        xml_data = '''
+            <video display_name="Test Video"
+                   youtube="1.0:&quot;p2Q6BrNhdh8&quot;,1.25:&quot;1EeWXzPdhSA&quot;">
+            </video>
+        '''
+        output = VideoDescriptor.from_xml(xml_data, module_system)
+        self.assert_attributes_equal(output, {
+            'youtube_id_0_75': '',
+            'youtube_id_1_0': 'p2Q6BrNhdh8',
+            'youtube_id_1_25': '1EeWXzPdhSA',
+            'youtube_id_1_5': '',
+            'show_captions': True,
+            'start_time': 0.0,
+            'end_time': 0.0,
+            'track': '',
+            'source': '',
+            'html5_sources': [],
+            'data': ''
+        })
+
     def test_old_video_format(self):
         """
         Test backwards compatibility with VideoModule's XML format.
