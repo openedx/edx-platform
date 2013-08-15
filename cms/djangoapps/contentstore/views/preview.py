@@ -160,7 +160,7 @@ def load_preview_module(request, preview_id, descriptor):
     module.get_html = replace_static_urls(
         module.get_html,
         getattr(module, 'data_dir', module.location.course),
-        course_id=module.location.org+'/'+module.location.course+'/BOGUS_RUN_REPLACE_WHEN_AVAILABLE'
+        course_id=module.location.org + '/' + module.location.course + '/BOGUS_RUN_REPLACE_WHEN_AVAILABLE'
     )
 
     module.get_html = save_module(
