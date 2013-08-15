@@ -29,6 +29,13 @@ class Command(BaseCommand):
     Generate a list of grades for all students
     that are enrolled in a course.
 
+    CSV will include the following:
+      - username
+      - email
+      - grade in the certificate table if it exists
+      - computed grade
+      - grade breakdown
+
     Outputs grades to a csv file.
 
     Example:
