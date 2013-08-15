@@ -312,7 +312,7 @@ function () {
         var newIndex;
 
         if (this.videoCaption.loaded) {
-            time = Math.round(Time.convert(time, this.speed, '1.0') * 1000 + 250);
+            time = Math.round(parseInt(time, 10) * 1000);
             newIndex = this.videoCaption.search(time);
 
             if (newIndex !== void 0 && this.videoCaption.currentIndex !== newIndex) {
@@ -333,7 +333,7 @@ function () {
         var time;
 
         event.preventDefault();
-        time = Math.round(Time.convert($(event.target).data('start'), '1.0', this.speed) / 1000);
+        time = parseInt($(event.target).data('start'), 10)/1000;
 
         this.trigger('videoPlayer.onCaptionSeek', {'type': 'onCaptionSeek', 'time': time});
     }
