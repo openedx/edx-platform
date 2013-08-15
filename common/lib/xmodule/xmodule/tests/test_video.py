@@ -15,6 +15,7 @@ the course, section, subsection, unit, etc.
 
 import unittest
 from . import LogicTest
+from lxml import etree
 from .import get_test_system
 from xmodule.modulestore import Location
 from xmodule.video_module import VideoDescriptor, _create_youtube_string
@@ -344,7 +345,7 @@ class VideoExportTestCase(unittest.TestCase):
         desc.track = 'http://www.example.com/track'
         desc.html5_sources = ['http://www.example.com/source.mp4', 'http://www.example.com/source.ogg']
 
-        xml = desc.export_to_xml(None)  # We don't use the `resource_fs` parameter
+        xml = desc.definition_to_xml(None)  # We don't use the `resource_fs` parameter
         expected = dedent('''\
          <video url_name="SampleProblem1" start_time="0:00:01" youtube="0.75:izygArpw-Qo,1.00:p2Q6BrNhdh8,1.25:1EeWXzPdhSA,1.50:rABDYkeK0x8" show_captions="false" end_time="0:01:00">
            <source src="http://www.example.com/source.mp4"/>
@@ -353,7 +354,7 @@ class VideoExportTestCase(unittest.TestCase):
          </video>
         ''')
 
-        self.assertEquals(expected, xml)
+        self.assertEquals(expected, etree.tostring(xml, pretty_print=True))
 
     def test_export_to_xml_empty_parameters(self):
         """Test XML export with defaults."""
@@ -361,7 +362,7 @@ class VideoExportTestCase(unittest.TestCase):
         location = Location(["i4x", "edX", "video", "default", "SampleProblem1"])
         desc = VideoDescriptor(module_system, {'location': location})
 
-        xml = desc.export_to_xml(None)
+        xml = desc.definition_to_xml(None)
         expected = '<video url_name="SampleProblem1"/>\n'
 
-        self.assertEquals(expected, xml)
+        self.assertEquals(expected, etree.tostring(xml, pretty_print=True))
