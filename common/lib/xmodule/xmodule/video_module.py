@@ -266,7 +266,7 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
             if key in fields and fields[key].default == getattr(self, key):
                 continue
             if value:
-                xml.set(key, str(value))
+                xml.set(key, unicode(value))
 
         for source in self.html5_sources:
             ele = etree.Element('source')
