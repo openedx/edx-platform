@@ -298,7 +298,7 @@ def import_course(request, org, course, name):
         try:
             matches = CONTENT_RE.search(request.META["HTTP_CONTENT_RANGE"])
             content_range = matches.groupdict()
-        except KeyError:
+        except KeyError:    # Single chunk - no Content-Range header
             content_range = {'start': 0, 'stop': 9, 'end': 10}
 
         # stream out the uploaded files in chunks to disk
@@ -306,6 +306,21 @@ def import_course(request, org, course, name):
             mode = "wb+"
         else:
             mode = "ab+"
+            size = os.path.getsize(temp_filepath)
+            # Check to make sure we haven't missed a chunk
+            # This shouldn't happen, even if different instances are handling
+            # the same session, but it's always better to catch errors earlier.
+            if size != int(content_range['start']):
+                log.warning(
+                    "Reported range %s does not match size downloaded so far %s",
+                    size,
+                    content_range['start']
+                )
+                return JsonResponse(
+                    { 'ErrMsg': 'File upload corrupted. Please try again' },
+                    status=409
+                )
+
 
         with open(temp_filepath, mode) as temp_file:
             for chunk in request.FILES['course-data'].chunks():
@@ -347,7 +362,7 @@ def import_course(request, org, course, name):
             # find the 'course.xml' file
             dirpath = None
 
-            coursexmls = ((d, f) for d, _, f in os.walk(course_dir) 
+            coursexmls = ((d, f) for d, _, f in os.walk(course_dir)
                                 if f.count('course.xml') > 0)
 
             try:
