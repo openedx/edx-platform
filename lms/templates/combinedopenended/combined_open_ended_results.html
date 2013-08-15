@@ -1,3 +1,4 @@
+<%! from django.utils.translation import ugettext as _ %>
 % for (i,result) in enumerate(results):
     % if 'task_name' in result and 'result' in result:
         <div class="combined-rubric-container"
