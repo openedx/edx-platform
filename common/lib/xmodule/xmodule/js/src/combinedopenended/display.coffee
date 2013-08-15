@@ -286,6 +286,8 @@ class @CombinedOpenEnded
       @answer_area.attr("disabled", true)
       @replace_text_inputs()
       @hint_area.attr('disabled', true)
+      if @task_number<@task_count
+        @gentle_alert "Your score did not meet the criteria to move to the next step."
     else if @child_state == 'initial'
       @answer_area.attr("disabled", false)
       @submit_button.prop('value', 'Submit')

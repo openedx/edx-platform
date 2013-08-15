@@ -556,25 +556,23 @@ class CombinedOpenEndedV1Module():
         if not can_see_rubric:
             return {'html' : self.system.render_template('{0}/combined_open_ended_hidden_results.html'.format(self.TEMPLATE_DIR), {'error' : error}), 'success' : True, 'hide_reset' : True}
 
-        loop_up_to_task = self.current_task_number + 1
         contexts = []
-        for i in xrange(0, loop_up_to_task):
-            response = self.get_last_response(i)
-            score_length = len(response['grader_types'])
-            for z in xrange(0,score_length):
-                feedback = response['feedback_dicts'][z].get('feedback', '')
-                if response['grader_types'][z] in HUMAN_GRADER_TYPE.keys():
-                    rubric_scores = [[response['rubric_scores'][z]]]
-                    grader_types = [[response['grader_types'][z]]]
-                    feedback_items = [[response['feedback_items'][z]]]
-                    rubric_html = self.rubric_renderer.render_combined_rubric(stringify_children(self.static_data['rubric']),
-                                                                          rubric_scores,
-                                                                          grader_types, feedback_items)
-                    contexts.append({
-                        'result': rubric_html,
-                        'task_name': 'Scored rubric',
-                        'feedback' : feedback
-                    })
+        response = self.get_last_response(self.current_task_number + 1)
+        score_length = len(response['grader_types'])
+        for z in xrange(0,score_length):
+            feedback = response['feedback_dicts'][z].get('feedback', '')
+            if response['grader_types'][z] in HUMAN_GRADER_TYPE.keys():
+                rubric_scores = [[response['rubric_scores'][z]]]
+                grader_types = [[response['grader_types'][z]]]
+                feedback_items = [[response['feedback_items'][z]]]
+                rubric_html = self.rubric_renderer.render_combined_rubric(stringify_children(self.static_data['rubric']),
+                                                                      rubric_scores,
+                                                                      grader_types, feedback_items)
+                contexts.append({
+                    'result': rubric_html,
+                    'task_name': 'Scored rubric',
+                    'feedback' : feedback
+                })
 
         context = {
             'results': contexts,
@@ -594,15 +592,6 @@ class CombinedOpenEndedV1Module():
         html = self.system.render_template('{0}/combined_open_ended_legend.html'.format(self.TEMPLATE_DIR), context)
         return {'html': html, 'success': True}
 
-    def get_status_ajax(self, _data):
-        """
-        Gets the results of a given grader via ajax.
-        Input: AJAX data dictionary
-        Output: Dictionary to be rendered via ajax that contains the result html.
-        """
-        html = self.get_status(True)
-        return {'html': html, 'success': True}
-
     def handle_ajax(self, dispatch, data):
         """
         This is called by courseware.module_render, to handle an AJAX call.
@@ -618,7 +607,6 @@ class CombinedOpenEndedV1Module():
             'next_problem': self.next_problem,
             'reset': self.reset,
             'get_combined_rubric': self.get_rubric,
-            'get_status': self.get_status_ajax,
             'get_legend': self.get_legend,
             'get_last_response': self.get_last_response_ajax,
             'get_current_state': self.get_current_state,
