@@ -39,8 +39,6 @@ WIKI_ENABLED = True
 SOUTH_TESTS_MIGRATE = False   # To disable migrations and use syncdb instead
 
 # Nose Test Runner
-INSTALLED_APPS += ('django_nose',)
-
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
 # Local Directories

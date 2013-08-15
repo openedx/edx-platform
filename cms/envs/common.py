@@ -332,6 +332,9 @@ INSTALLED_APPS = (
     # Monitor the status of services
     'service_status',
 
+    # Testing
+    'django_nose',
+
     # For CMS
     'contentstore',
     'auth',
@@ -339,7 +342,7 @@ INSTALLED_APPS = (
     'student',  # misleading name due to sharing with lms
     'course_groups',  # not used in cms (yet), but tests run
 
-    # tracking
+    # Tracking
     'track',
 
     # For asset pipelining
