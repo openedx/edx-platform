@@ -273,8 +273,6 @@ class @CombinedOpenEnded
         else if @allow_reset=="True"
           @reset_button.show()
           @gentle_alert "You may reset and answer this question again."
-        else
-          @gentle_alert "You have answered this question."
       else
         @submit_button.show()
         @answer_area.attr("disabled", false)
@@ -362,6 +360,8 @@ class @CombinedOpenEnded
         @queueing()
         @grader_status = @$(@grader_status_sel)
         @grader_status.html("<span class='grading'>Your response has been submitted.  Please check back later for your grade.</span> ")
+      else if @child_type == "selfassessment"
+        @setup_score_selection()
     else if @child_state == 'post_assessment'
       if @child_type=="openended"
         @skip_button.show()
@@ -691,3 +691,10 @@ class @CombinedOpenEnded
     info_rubric_elements = @$(@info_rubric_elements_sel)
     info_rubric_elements.slideToggle()
     return false
+
+  setup_score_selection: () =>
+    @$("input[class='score-selection']").change @graded_callback
+
+  graded_callback: () =>
+    if @rub.check_complete()
+      @submit_button.show()
