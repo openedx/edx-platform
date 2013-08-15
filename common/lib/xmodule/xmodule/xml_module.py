@@ -167,6 +167,11 @@ class XmlDescriptor(XModuleDescriptor):
 
     @classmethod
     def get_map_for_field(cls, attr):
+        """
+        Returns a serialize/deserialize AttrMap for the given field of a class.
+
+        Searches through fields defined by cls to find one named attr.
+        """
         for field in set(cls.fields + cls.lms.fields):
             if field.name == attr:
                 from_xml = lambda val: deserialize_field(field, val)
