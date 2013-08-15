@@ -1,4 +1,5 @@
 from courseware import grades, courses
+from certificates.models import GeneratedCertificate
 from django.test.client import RequestFactory
 from django.core.management.base import BaseCommand, CommandError
 import os
@@ -84,12 +85,19 @@ class Command(BaseCommand):
                 start = datetime.datetime.now()
             request.user = student
             grade = grades.grade(student, request, course)
+            try:
+                cert = GeneratedCertificate.objects.get(user=student, course_id=course_id)
+            except GeneratedCertificate.DoesNotExist:
+                cert = None
             if not header:
                 header = [section['label'] for section in grade[u'section_breakdown']]
-                rows.append(["email", "username"] + header)
+                rows.append(["email", "username", "certificate-grade", "grade"] + header)
             percents = {section['label']: section['percent'] for section in grade[u'section_breakdown']}
             row_percents = [percents[label] for label in header]
-            rows.append([student.email, student.username] + row_percents)
+            if cert:
+                rows.append([student.email, student.username, cert.grade, grade['percent']] + row_percents)
+            else:
+                rows.append([student.email, student.username, "N/A", grade['percent']] + row_percents)
         with open(options['output'], 'wb') as f:
             writer = csv.writer(f)
             writer.writerows(rows)
