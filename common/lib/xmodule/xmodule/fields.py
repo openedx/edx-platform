@@ -82,6 +82,9 @@ TIMEDELTA_REGEX = re.compile(r'^((?P<days>\d+?) day(?:s?))?(\s)?((?P<hours>\d+?)
 
 
 class Timedelta(ModelType):
+    # Timedeltas are immutable, see http://docs.python.org/2/library/datetime.html#available-types
+    MUTABLE = False
+
     def from_json(self, time_str):
         """
         time_str: A string with the following components:
