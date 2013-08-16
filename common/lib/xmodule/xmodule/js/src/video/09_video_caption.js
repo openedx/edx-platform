@@ -312,15 +312,34 @@ function () {
         var newIndex;
 
         if (this.videoCaption.loaded) {
-            time = Math.round(parseInt(time, 10) * 1000);
+            // Current mode === 'flash' can only be for YouTube videos. So, we
+            // don't have to also check for videoType === 'youtube'.
+            if (this.currentPlayerMode === 'flash') {
+                // Total play time changes with speed change. Also there is
+                // a 250 ms delay we have to take into account.
+                time = Math.round(
+                    Time.convert(time, this.speed, '1.0') * 1000 + 250
+                );
+            } else {
+                // Total play time remains constant when speed changes.
+                time = Math.round(parseInt(time, 10) * 1000);
+            }
+
             newIndex = this.videoCaption.search(time);
 
-            if (newIndex !== void 0 && this.videoCaption.currentIndex !== newIndex) {
+            if (
+                newIndex !== void 0 &&
+                this.videoCaption.currentIndex !== newIndex
+            ) {
                 if (this.videoCaption.currentIndex) {
-                    this.videoCaption.subtitlesEl.find('li.current').removeClass('current');
+                    this.videoCaption.subtitlesEl
+                        .find('li.current')
+                        .removeClass('current');
                 }
 
-                this.videoCaption.subtitlesEl.find("li[data-index='" + newIndex + "']").addClass('current');
+                this.videoCaption.subtitlesEl
+                    .find("li[data-index='" + newIndex + "']")
+                    .addClass('current');
 
                 this.videoCaption.currentIndex = newIndex;
 
@@ -333,9 +352,29 @@ function () {
         var time;
 
         event.preventDefault();
-        time = parseInt($(event.target).data('start'), 10)/1000;
 
-        this.trigger('videoPlayer.onCaptionSeek', {'type': 'onCaptionSeek', 'time': time});
+        // Current mode === 'flash' can only be for YouTube videos. So, we
+        // don't have to also check for videoType === 'youtube'.
+        if (this.currentPlayerMode === 'flash') {
+            // Total play time changes with speed change. Also there is
+            // a 250 ms delay we have to take into account.
+            time = Math.round(
+                Time.convert(
+                    $(event.target).data('start'), '1.0', this.speed
+                ) / 1000
+            );
+        } else {
+            // Total play time remains constant when speed changes.
+            time = parseInt($(event.target).data('start'), 10)/1000;
+        }
+
+        this.trigger(
+            'videoPlayer.onCaptionSeek',
+            {
+                'type': 'onCaptionSeek',
+                'time': time
+            }
+        );
     }
 
     function calculateOffset(element) {
