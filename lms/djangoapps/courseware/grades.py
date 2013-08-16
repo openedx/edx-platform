@@ -358,6 +358,8 @@ def get_score(course_id, user, problem_descriptor, module_creator, model_data_ca
     # with the LMS, so they need to always be scored. (E.g. foldit.)
     if problem_descriptor.always_recalculate_grades:
         problem = module_creator(problem_descriptor)
+        if problem is None:
+            return (None, None)
         score = problem.get_score()
         if score is not None:
             return (score['score'], score['total'])
