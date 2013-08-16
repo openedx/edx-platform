@@ -36,13 +36,6 @@ def see_confirmation(step):
     assert world.browser.evaluate_script("$('input[value=\"Submit\"]').attr('disabled')") == 'disabled'
 
 
-@step(u'I am in a course')
-def go_into_course(step):
-    step.given('I am registered for the course "6.002x"')
-    step.given('And I am logged in')
-    step.given('And I click on View Courseware')
-
-
 def fill_field(name, info):
     def fill_info():
         form_css = 'form.feedback_form'
