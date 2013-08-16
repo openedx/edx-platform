@@ -121,7 +121,7 @@ class LocMapperStore(object):
         """
         location_id = self._interpret_location_course_id(old_style_course_id, location)
 
-        maps = self.location_map.find(location_id)
+        maps = self.location_map.find(location_id).sort('_id.name', pymongo.ASCENDING)
         if maps.count() == 0:
             if add_entry_if_missing:
                 # create a new map
@@ -131,15 +131,8 @@ class LocMapperStore(object):
             else:
                 raise ItemNotFoundError()
         elif maps.count() > 1:
-            # if more than one, prefer the one w/o a name if that exists. Otherwise, choose the first (arbitrary)
-            # a bit odd b/c maps is a cursor and doesn't allow multitraversal w/o requerying db
-            entry = None
-            for candidate in maps:
-                if entry is None:
-                    entry = candidate  # pick off first ele in case we don't find one w/o a name
-                if 'name' not in candidate['_id']:
-                    entry = candidate
-                    break
+            # if more than one, prefer the one w/o a name if that exists. Otherwise, choose the first (alphabetically)
+            entry = maps[0]
         else:
             entry = maps[0]
 
@@ -240,7 +233,7 @@ class LocMapperStore(object):
             raise ItemNotFoundError()
 
         # turn maps from cursor to list
-        map_list = [map_entry for map_entry in maps]
+        map_list = list(maps)
         # check whether there's already a usage_id for this location (and it agrees w/ any passed in or found)
         for map_entry in map_list:
             if (location.name in map_entry['block_map'] and
@@ -336,7 +329,7 @@ class LocMapperStore(object):
     def _add_to_block_map(self, location, location_id, block_map):
         '''add the given location to the block_map and persist it'''
         if self._block_id_is_guid(location.name):
-            # I'm having second thoughts about this even though it will make the ids more meaningful.
+            # This makes the ids more meaningful with a small probability of name collision.
             # The downside is that if there's more than one course mapped to from the same org/course root
             # the block ids will likely be out of sync and collide from an id perspective. HOWEVER,
             # if there are few == org/course roots or their content is unrelated, this will work well.
