@@ -116,7 +116,7 @@ def preview_module_system(request, preview_id, descriptor):
         get_module=partial(load_preview_module, request, preview_id),
         render_template=render_from_lms,
         debug=True,
-        replace_urls=partial(static_replace.replace_static_urls, data_directory=None, course_namespace=descriptor.location),
+        replace_urls=partial(static_replace.replace_static_urls, data_directory=None, course_id=course_id),
         user=request.user,
         xblock_model_data=preview_model_data,
         can_execute_unsafe_code=(lambda: can_execute_unsafe_code(course_id)),
@@ -155,10 +155,12 @@ def load_preview_module(request, preview_id, descriptor):
             "xmodule_display.html",
         )
 
+    # we pass a partially bogus course_id as we don't have the RUN information passed yet
+    # through the CMS. Also the contentstore is also not RUN-aware at this point in time.
     module.get_html = replace_static_urls(
         module.get_html,
         getattr(module, 'data_dir', module.location.course),
-        course_namespace=Location([module.location.tag, module.location.org, module.location.course, None, None])
+        course_id=module.location.org + '/' + module.location.course + '/BOGUS_RUN_REPLACE_WHEN_AVAILABLE'
     )
 
     module.get_html = save_module(
