@@ -117,6 +117,19 @@ def i_see_the_assignment_type(_step, name):
       assert name in types
 
 
+@step(u'I change the highest grade range to "(.*)"$')
+def change_grade_range(_step, range_name):
+    range_css = 'span.letter-grade'
+    grade = world.css_find(range_css).first
+    grade.value = range_name
+
+
+@step(u'I see the highest grade range is "(.*)"$')
+def i_see_highest_grade_range(_step, range_name):
+    range_css = 'span.letter-grade'
+    grade = world.css_find(range_css).first
+    assert grade.value == range_name
+
 def get_type_index(name):
     name_id = '#course-grading-assignment-name'
     all_types = world.css_find(name_id)
