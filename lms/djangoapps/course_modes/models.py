@@ -34,6 +34,10 @@ class CourseMode(models.Model):
 
     DEFAULT_MODE = Mode('honor', _('Honor Code Certificate'), 0, '', 'usd')
 
+    class Meta:
+        """ meta attributes of this model """
+        unique_together = ('course_id', 'mode_slug', 'currency')
+
     @classmethod
     def modes_for_course(cls, course_id):
         """
