@@ -45,12 +45,12 @@ end
 # all available environments
 def print_js_test_cmds(mode)
     JS_TEST_SUITES.each do |key, val|
-        puts "    rake js_test:#{mode}[#{key}]"
+        puts "    rake test:js:#{mode}[#{key}]"
     end
 end
 
 
-namespace :js_test do
+namespace :'test:js' do
 
     desc "Run the JavaScript tests and print results to the console"
     task :run, [:env] => [:clean_test_files, :'assets:coffee'] do |t, args|
@@ -79,7 +79,7 @@ end
 
 # Default js_test is js_test:run
 desc "Run all JavaScript tests and print results the the console"
-task :js_test => :'js_test:run'
+task :'test:js' => :'test:js:run'
 
 # Add the JS tests to the main test command
-task :test => :'js_test:coverage'
+task :test => :'test:js:coverage'
