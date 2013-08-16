@@ -14,6 +14,8 @@ from bson.son import SON
 
 log = logging.getLogger('mitx.' + 'modulestore')
 
+MONGO_MODULESTORE_TYPE = 'mongo'
+XML_MODULESTORE_TYPE = 'xml'
 
 URL_RE = re.compile("""
     (?P<tag>[^:]+)://?
@@ -258,7 +260,7 @@ class ModuleStore(object):
     An abstract interface for a database backend that stores XModuleDescriptor
     instances
     """
-    def has_item(self, location):
+    def has_item(self, course_id, location):
         """
         Returns True if location exists in this ModuleStore.
         """
@@ -384,6 +386,20 @@ class ModuleStore(object):
         """
         raise NotImplementedError
 
+    def set_modulestore_configuration(self, config_dict):
+        '''
+        Allows for runtime configuration of the modulestore. In particular this is how the
+        application (LMS/CMS) can pass down Django related configuration information, e.g. caches, etc.
+        '''
+        raise NotImplementedError
+
+    def get_modulestore_type(self, course_id):
+        """
+        Returns a type which identifies which modulestore is servicing the given
+        course_id. The return can be either "xml" (for XML based courses) or "mongo" for MongoDB backed courses
+        """
+        raise NotImplementedError
+
 
 class ModuleStoreBase(ModuleStore):
     '''
@@ -394,7 +410,7 @@ class ModuleStoreBase(ModuleStore):
         Set up the error-tracking logic.
         '''
         self._location_errors = {}  # location -> ErrorLog
-        self.metadata_inheritance_cache = None
+        self.modulestore_configuration = {}
         self.modulestore_update_signal = None  # can be set by runtime to route notifications of datastore changes
 
     def _get_errorlog(self, location):
@@ -438,6 +454,27 @@ class ModuleStoreBase(ModuleStore):
             if c.id == course_id:
                 return c
         return None
+
+    @property
+    def metadata_inheritance_cache_subsystem(self):
+        """
+        Exposes an accessor to the runtime configuration for the metadata inheritance cache
+        """
+        return self.modulestore_configuration.get('metadata_inheritance_cache_subsystem', None)
+
+    @property
+    def request_cache(self):
+        """
+        Exposes an accessor to the runtime configuration for the request cache
+        """
+        return self.modulestore_configuration.get('request_cache', None)
+
+    def set_modulestore_configuration(self, config_dict):
+        """
+        This is the base implementation of the interface, all we need to do is store
+        two possible configurations as attributes on the class
+        """
+        self.modulestore_configuration = config_dict
 
 
 def namedtuple_to_son(namedtuple, prefix=''):

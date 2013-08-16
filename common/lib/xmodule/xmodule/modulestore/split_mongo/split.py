@@ -279,7 +279,14 @@ class SplitMongoModuleStore(ModuleStoreBase):
         result = self._load_items(course_entry, [root], 0, lazy=True)
         return result[0]
 
-    def has_item(self, block_location):
+    def get_course_for_item(self, location):
+        '''
+        Provided for backward compatibility. Is equivalent to calling get_course
+        :param location:
+        '''
+        return self.get_course(location)
+
+    def has_item(self, course_id, block_location):
         """
         Returns True if location exists in its course. Returns false if
         the course or the block w/in the course do not exist for the given version.

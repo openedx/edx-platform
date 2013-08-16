@@ -36,8 +36,11 @@ class Command(BaseCommand):
         ms = modulestore('direct')
         cs = contentstore()
 
-        ms.metadata_inheritance_cache_subsystem = CACHE
-        ms.request_cache = RequestCache.get_request_cache()
+        ms.set_modulestore_configuration({
+            'metadata_inheritance_cache_subsystem': CACHE,
+            'request_cache': RequestCache.get_request_cache()
+        })
+
         org, course_num, run = course_id.split("/")
         ms.ignore_write_events_on_courses.append('{0}/{1}'.format(org, course_num))
 
