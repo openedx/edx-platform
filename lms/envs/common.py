@@ -758,6 +758,7 @@ INSTALLED_APPS = (
 
     # For testing
     'django.contrib.admin',  # only used in DEBUG mode
+    'django_nose',
     'debug',
 
     # Discussion forums
@@ -816,4 +817,3 @@ def enable_theme(theme_name):
     # avoid collisions with default edX static files
     STATICFILES_DIRS.append((u'themes/%s' % theme_name,
                              theme_root / 'static'))
-
