@@ -234,6 +234,9 @@ section.combined-open-ended-status {
   &:hover {
     background-color: #eee;
   }
+  .rubric-label-selected{
+    border: 2px solid #666;
+  }
 }
 
 span.rubric-category {
@@ -951,4 +954,12 @@ section.open-ended-child {
       border-radius: $baseline/4;
     }
   }
+}
+
+section.peer-grading-container{
+    div.peer-grading{
+        section.calibration-feedback {
+            padding: 20px;
+        }
+    }
 }

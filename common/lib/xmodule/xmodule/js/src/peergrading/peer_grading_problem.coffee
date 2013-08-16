@@ -338,13 +338,15 @@ class @PeerGradingProblem
   remove_flag: () =>
     @flag_student_checkbox.removeAttr("checked")
     @close_dialog_box()
+    @submit_button.attr('disabled', true)
 
   close_dialog_box: () =>
-    @$(@flag_submission_confirmation_sel).dialog('close')
+    $(@flag_submission_confirmation_sel).dialog('close')
 
   flag_box_checked: () =>
     if @flag_student_checkbox.is(':checked')
       @$(@flag_submission_confirmation_sel).dialog({ height: 400, width: 400 })
+      @submit_button.attr('disabled', false)
 
   # called after we perform an is_student_calibrated check
   calibration_check_callback: (response) =>
@@ -397,6 +399,10 @@ class @PeerGradingProblem
 
   # called after a grade is selected on the interface
   graded_callback: (event) =>
+    ev = @$(event.target).parent().parent()
+    ul = ev.parent().parent()
+    ul.find(".rubric-label-selected").removeClass('rubric-label-selected')
+    ev.addClass('rubric-label-selected')
     # check to see whether or not any categories have not been scored
     if @rub.check_complete()
       # show button if we have scores for all categories
@@ -479,6 +485,7 @@ class @PeerGradingProblem
       @answer_unknown_container.show()
       @feedback_area.val("")
 
+      @flag_student_checkbox.removeAttr("checked")
       @submit_button.show()
       @submit_button.unbind('click')
       @submit_button.click @submit_grade

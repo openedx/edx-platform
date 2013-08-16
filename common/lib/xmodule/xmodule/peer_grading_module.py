@@ -310,13 +310,16 @@ class PeerGradingModule(PeerGradingFields, XModule):
             error: if there was an error in the submission, this is the error message
         """
 
-        required = set(['location', 'submission_id', 'submission_key', 'score', 'feedback', 'rubric_scores[]', 'submission_flagged', 'answer_unknown'])
-        success, message = self._check_required(data, required)
+        required = ['location', 'submission_id', 'submission_key', 'score', 'feedback', 'submission_flagged', 'answer_unknown']
+        if 'submission_flagged' not in data or data['submission_flagged'] in ["false", False, "False"]:
+            required.append("rubric_scores[]")
+        success, message = self._check_required(data, set(required))
         if not success:
             return self._err_response(message)
 
         data_dict = {k:data.get(k) for k in required}
-        data_dict['rubric_scores'] = data.getlist('rubric_scores[]')
+        if 'rubric_scores[]' in required:
+            data_dict['rubric_scores'] = data.getlist('rubric_scores[]')
         data_dict['grader_id'] = self.system.anonymous_student_id
 
         try:
