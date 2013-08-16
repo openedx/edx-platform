@@ -6,23 +6,13 @@ Feature: The help module should work
 
   Scenario: I can submit a problem when I am not logged in
     Given I visit the homepage
-    When I click the help modal
+    When I open the help form
     And I report a "problem"
-    And I fill "name" with "Robot"
-    And I fill "email" with "Robot@edx.org"
-    And I fill "subject" with "Test Issue"
-    And I fill "details" with "I am having a problem"
-    And I submit the issue
-    Then The submit button should be disabled
+    Then I should see confirmation that the problem was received
 
   Scenario: I can submit a problem when I am logged in
-    Given I am registered for the course "6.002x"
-    And I am logged in
-    And I click on View Courseware
-    When I click the help modal
-    And I report a "problem"
-    And I fill "subject" with "Test Issue"
-    And I fill "details" with "I am having a problem"
-    And I submit the issue
-    Then The submit button should be disabled
+    Given I am in a course
+    When I open the help form
+    And I report a "problem" without saying who I am
+    Then I should see confirmation that the problem was received
 

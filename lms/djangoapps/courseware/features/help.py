@@ -3,31 +3,47 @@
 
 from lettuce import world, step
 
-@step(u'I click the help modal')
+@step(u'I open the help form')
 def open_help_modal(step):
-	help_css = 'div.help-tab'
-	world.css_click(help_css)
+    help_css = 'div.help-tab'
+    world.css_click(help_css)
 
 
 @step(u'I report a "([^"]*)"$')
-def select_problem_type(step, submission_type):
-	type_css = '#feedback_link_{}'.format(submission_type)
-	world.css_click(type_css)
+def submit_problem_type(step, submission_type):
+    type_css = '#feedback_link_{}'.format(submission_type)
+    world.css_click(type_css)
+    fill_field('name', 'Robot')
+    fill_field('email', 'robot@edx.org')
+    fill_field('subject', 'Test Issue')
+    fill_field('details', 'I am having a problem')
+    submit_css = 'div.submit'
+    world.css_click(submit_css)
 
 
-@step(u'I fill "([^"]*)" with "([^"]*)"$')
-def fill_field(step, name, info):
-	form_css = 'form.feedback_form'
-	form = world.css_find(form_css)
-	form.find_by_name(name).fill(info)
+@step(u'I report a "([^"]*)" without saying who I am$')
+def submit_partial_problem_type(step, submission_type):
+    type_css = '#feedback_link_{}'.format(submission_type)
+    world.css_click(type_css)
+    fill_field('subject', 'Test Issue')
+    fill_field('details', 'I am having a problem')
+    submit_css = 'div.submit'
+    world.css_click(submit_css)
 
 
-@step(u'I submit the issue')
-def submit_issue(step):
-	submit_css = 'div.submit'
-	world.css_click(submit_css)
-
-
-@step(u'The submit button should be disabled')
+@step(u'I should see confirmation that the problem was received')
 def see_confirmation(step):
-	assert world.browser.evaluate_script("$('input[value=\"Submit\"]').attr('disabled')") == 'disabled'
+    assert world.browser.evaluate_script("$('input[value=\"Submit\"]').attr('disabled')") == 'disabled'
+
+
+@step(u'I am in a course')
+def go_into_course(step):
+    step.given('I am registered for the course "6.002x"')
+    step.given('And I am logged in')
+    step.given('And I click on View Courseware')
+
+
+def fill_field(name, info):
+    form_css = 'form.feedback_form'
+    form = world.css_find(form_css)
+    form.find_by_name(name).fill(info)
