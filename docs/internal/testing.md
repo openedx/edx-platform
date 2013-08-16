@@ -144,21 +144,21 @@ Very handy: if you uncomment the `pdb=1` line in `setup.cfg`, it will drop you i
 
 We use Jasmine to run JavaScript unit tests.  To run all the JavaScript tests:
 
-    rake js_test
+    rake test:js
 
 To run a specific set of JavaScript tests and print the results to the console:
 
-    rake js_test:run[lms]
-    rake js_test:run[cms]
-    rake js_test:run[xmodule]
-    rake js_test:run[common]
+    rake test:js:run[lms]
+    rake test:js:run[cms]
+    rake test:js:run[xmodule]
+    rake test:js:run[common]
 
 To run JavaScript tests in your default browser:
 
-    rake js_test:dev[lms]
-    rake js_test:dev[cms]
-    rake js_test:dev[xmodule]
-    rake js_test:dev[common]
+    rake test:js:dev[lms]
+    rake test:js:dev[cms]
+    rake test:js:dev[xmodule]
+    rake test:js:dev[common]
 
 These rake commands call through to a custom test runner.  For more info, see [js-test-tool](https://github.com/edx/js-test-tool).
 
