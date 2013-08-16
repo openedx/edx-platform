@@ -54,8 +54,9 @@
         %elif allow_registration:
         <a class="action action-register register" href="#">${_("Register for")} <strong>${course.display_number_with_default | h}</strong>
             %if len(course_modes) > 1:
-            <br />
+            <span class="track">
             and choose your student track
+            </span>
             %endif
         </a>
         %else:

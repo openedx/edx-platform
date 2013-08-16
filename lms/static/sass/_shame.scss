@@ -156,6 +156,19 @@
     &.action-register, &.access-courseware {
       @extend .m-btn-primary;
       display: block;
+
+      .track {
+        @include transition(all 0.25s ease-in-out);
+        color: #fff;
+        display: block;
+        font-size: 13px;
+        line-height: 2;
+        opacity: .6;
+      }
+
+      &:hover .track {
+        opacity: 1;
+      }
     }
 
     // already registered but course not started or registration is closed
