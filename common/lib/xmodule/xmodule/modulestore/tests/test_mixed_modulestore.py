@@ -66,8 +66,7 @@ class TestMixedModuleStore(object):
 
     @classmethod
     def teardownClass(cls):
-        cls.connection = pymongo.connection.Connection(HOST, PORT)
-        cls.connection.drop_database(DB)
+        cls.destroy_db(cls.connection)
 
     @staticmethod
     def initdb():
