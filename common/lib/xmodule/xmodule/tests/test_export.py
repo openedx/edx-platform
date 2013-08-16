@@ -22,7 +22,8 @@ def strip_filenames(descriptor):
     Recursively strips 'filename' from all children's definitions.
     """
     print("strip filename from {desc}".format(desc=descriptor.location.url()))
-    descriptor._model_data.pop('filename', None)
+    if descriptor._model_data.has('filename'):
+        descriptor._model_data.delete('filename')
 
     if hasattr(descriptor, 'xml_attributes'):
         if 'filename' in descriptor.xml_attributes:

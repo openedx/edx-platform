@@ -6,6 +6,7 @@ import logging
 from mock import Mock
 from pkg_resources import resource_string
 from xmodule.editing_module import TabsEditingDescriptor
+from xblock.test.test_core import DictModel
 
 from .import get_test_system
 
@@ -44,7 +45,7 @@ class TabsEditingDescriptorTestCase(unittest.TestCase):
         TabsEditingDescriptor.tabs = self.tabs
         self.descriptor = TabsEditingDescriptor(
             runtime=system,
-            model_data={})
+            model_data=DictModel({}))
 
     def test_get_css(self):
         """test get_css"""

@@ -13,6 +13,7 @@ from django.test.client import Client
 
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
+from xblock.test.test_core import DictModel
 from xmodule.tests import get_test_system
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
@@ -87,7 +88,7 @@ class BaseTestXmodule(ModuleStoreTestCase):
         self.item_module = self.item_descriptor.module_class(
             self.runtime,
             self.item_descriptor,
-            model_data
+            DictModel(model_data),
         )
 
         self.item_url = Location(self.item_module.location).url()

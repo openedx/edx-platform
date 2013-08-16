@@ -27,6 +27,7 @@ log = logging.getLogger(__name__)
 from django.test.utils import override_settings
 
 from xmodule.tests import test_util_open_ended
+from xblock.test.test_core import DictModel
 
 from courseware.tests import factories
 from courseware.tests.modulestore_config import TEST_DATA_XML_MODULESTORE
@@ -161,7 +162,7 @@ class TestPeerGradingService(LoginEnrollmentTestCase):
         self.course_id = "edX/toy/2012_Fall"
         self.toy = modulestore().get_course(self.course_id)
         location = "i4x://edX/toy/peergrading/init"
-        model_data = {'data': "<peergrading/>", 'location': location, 'category':'peergrading'}
+        model_data = DictModel({'data': "<peergrading/>", 'location': location, 'category':'peergrading'})
         self.mock_service = peer_grading_service.MockPeerGradingService()
         self.system = ModuleSystem(
             ajax_url=location,
@@ -169,7 +170,7 @@ class TestPeerGradingService(LoginEnrollmentTestCase):
             get_module=None,
             render_template=render_to_string,
             replace_urls=None,
-            xblock_model_data={},
+            xblock_model_data=lambda d: d._model_data,
             s3_interface=test_util_open_ended.S3_INTERFACE,
             open_ended_grading_interface=test_util_open_ended.OPEN_ENDED_GRADING_INTERFACE
         )

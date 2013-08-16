@@ -20,6 +20,7 @@ from xmodule.modulestore import Location
 from django.test import TestCase
 from django.db import DatabaseError
 from xblock.core import KeyValueMultiSaveError
+from xblock.test.test_core import DictModel
 
 
 def mock_field(scope, name):
@@ -59,7 +60,7 @@ class TestDescriptorFallback(TestCase):
             'field_a': 'content',
             'field_b': 'settings',
         }
-        self.kvs = LmsKeyValueStore(self.desc_md, None)
+        self.kvs = LmsKeyValueStore(DictModel(self.desc_md), None)
 
     def test_get_from_descriptor(self):
         self.assertEquals('content', self.kvs.get(content_key('field_a')))
@@ -87,7 +88,7 @@ class TestInvalidScopes(TestCase):
         self.desc_md = {}
         self.user = UserFactory.create(username='user')
         self.mdc = ModelDataCache([mock_descriptor([mock_field(Scope.user_state, 'a_field')])], course_id, self.user)
-        self.kvs = LmsKeyValueStore(self.desc_md, self.mdc)
+        self.kvs = LmsKeyValueStore(DictModel(self.desc_md), self.mdc)
 
     def test_invalid_scopes(self):
         for scope in (Scope(user=True, block=BlockScope.DEFINITION),
@@ -109,7 +110,7 @@ class TestStudentModuleStorage(TestCase):
         student_module = StudentModuleFactory(state=json.dumps({'a_field': 'a_value', 'b_field': 'b_value'}))
         self.user = student_module.student
         self.mdc = ModelDataCache([mock_descriptor([mock_field(Scope.user_state, 'a_field')])], course_id, self.user)
-        self.kvs = LmsKeyValueStore(self.desc_md, self.mdc)
+        self.kvs = LmsKeyValueStore(DictModel(self.desc_md), self.mdc)
 
     def test_get_existing_field(self):
         "Test that getting an existing field in an existing StudentModule works"
@@ -186,7 +187,7 @@ class TestMissingStudentModule(TestCase):
         self.user = UserFactory.create(username='user')
         self.desc_md = {}
         self.mdc = ModelDataCache([mock_descriptor()], course_id, self.user)
-        self.kvs = LmsKeyValueStore(self.desc_md, self.mdc)
+        self.kvs = LmsKeyValueStore(DictModel(self.desc_md), self.mdc)
 
     def test_get_field_from_missing_student_module(self):
         "Test that getting a field from a missing StudentModule raises a KeyError"
@@ -242,7 +243,7 @@ class StorageTestBase(object):
             mock_field(self.scope, 'existing_field'),
             mock_field(self.scope, 'other_existing_field')])
         self.mdc = ModelDataCache([self.mock_descriptor], course_id, self.user)
-        self.kvs = LmsKeyValueStore(self.desc_md, self.mdc)
+        self.kvs = LmsKeyValueStore(DictModel(self.desc_md), self.mdc)
 
     def test_set_and_get_existing_field(self):
         self.kvs.set(self.key_factory('existing_field'), 'test_value')

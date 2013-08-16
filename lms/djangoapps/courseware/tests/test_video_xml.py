@@ -23,6 +23,7 @@ from django.conf import settings
 from xmodule.video_module import VideoDescriptor, _create_youtube_string
 from xmodule.modulestore import Location
 from xmodule.tests import get_test_system, LogicTest
+from xblock.test.test_core import DictModel
 
 
 SOURCE_XML = """
@@ -58,7 +59,7 @@ class VideoFactory(object):
         system = get_test_system()
         system.render_template = lambda template, context: context
 
-        descriptor = VideoDescriptor(system, model_data)
+        descriptor = VideoDescriptor(system, DictModel(model_data))
 
         module = descriptor.xmodule(system)
 

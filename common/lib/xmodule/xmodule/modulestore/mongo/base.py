@@ -216,8 +216,8 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
                 )
 
                 model_data = DbModel(kvs, class_, None, MongoUsage(self.course_id, location))
-                model_data['category'] = category
-                model_data['location'] = location
+                model_data.set('category', category)
+                model_data.set('location', location)
                 module = class_(self, model_data)
                 if self.cached_metadata is not None:
                     # parent container pointers don't differentiate between draft and non-draft
@@ -862,6 +862,6 @@ class MongoModuleStore(ModuleStoreBase):
             self.default_class
         )
         model_data = DbModel(kvs, class_, None, MongoUsage(None, location))
-        model_data['category'] = category
-        model_data['location'] = location
+        model_data.set('category', category)
+        model_data.set('location', location)
         return model_data

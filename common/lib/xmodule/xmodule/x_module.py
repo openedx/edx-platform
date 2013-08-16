@@ -424,10 +424,6 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
     # (like a practice problem).
     has_score = False
 
-    # A list of descriptor attributes that must be equal for the descriptors to
-    # be equal
-    equality_attributes = ('_model_data', 'location')
-
     # Class level variable
 
     # True if this descriptor always requires recalculation of grades, for
@@ -642,9 +638,11 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
 
     # =============================== BUILTIN METHODS ==========================
     def __eq__(self, other):
+        print [(getattr(self, field.name), getattr(other, field.name))
+                    for field in self.fields if getattr(self, field.name) != getattr(other, field.name)]
         return (self.__class__ == other.__class__ and
-                all(getattr(self, attr, None) == getattr(other, attr, None)
-                    for attr in self.equality_attributes))
+                all(getattr(self, field.name) == getattr(other, field.name)
+                    for field in self.fields))
 
     def __repr__(self):
         return (
@@ -717,7 +715,7 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
             inheritable = False
             value = getattr(self, field.name)
             default_value = field.default
-            explicitly_set = field.name in self._model_data
+            explicitly_set = self._model_data.has(field.name)
             if field.name in inheritable_metadata:
                 inheritable = True
                 default_value = field.from_json(inheritable_metadata.get(field.name))

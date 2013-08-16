@@ -15,6 +15,9 @@ from xmodule.errortracker import exc_info_to_str
 from xmodule.modulestore import Location
 from xblock.core import String, Scope
 
+# TODO: Don't do this - cpennington
+from xblock.test.test_core import DictModel
+
 
 log = logging.getLogger(__name__)
 
@@ -93,13 +96,13 @@ class ErrorDescriptor(ErrorFields, JSONEditingDescriptor):
             )
 
         # real metadata stays in the content, but add a display name
-        model_data = {
+        model_data = DictModel({
             'error_msg': str(error_msg),
             'contents': contents,
             'display_name': 'Error: ' + location.url(),
             'location': location,
             'category': 'error'
-        }
+        })
         return cls(
             system,
             model_data,
