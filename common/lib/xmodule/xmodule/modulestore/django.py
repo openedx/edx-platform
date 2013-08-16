@@ -35,7 +35,7 @@ def create_modulestore_instance(engine, options):
     _options.update(options)
 
     for key in FUNCTION_KEYS:
-        if key in _options:
+        if key in _options and isinstance(_options[key], basestring):
             _options[key] = load_function(_options[key])
 
     return class_(
