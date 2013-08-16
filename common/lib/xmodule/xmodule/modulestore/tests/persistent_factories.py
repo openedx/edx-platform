@@ -25,8 +25,6 @@ class PersistentCourseFactory(factory.Factory):
     prettyid = '999'
     display_name = 'Robot Super Course'
     user_id = "test_user"
-    data = None
-    metadata = None
     master_branch = 'draft'
 
     # pylint: disable=W0613
