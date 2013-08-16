@@ -188,9 +188,8 @@ class PeerGradingModule(PeerGradingFields, XModule):
 
         return json.dumps(d, cls=ComplexEncoder)
 
-    def query_data_for_location(self):
+    def query_data_for_location(self, location):
         student_id = self.system.anonymous_student_id
-        location = self.link_to_location
         success = False
         response = {}
 
@@ -322,7 +321,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
 
         try:
             response = self.peer_gs.save_grade(**data_dict)
-            success, location_data = self.query_data_for_location()
+            success, location_data = self.query_data_for_location(data_dict['location'])
             response.update({'required_done' : False})
             if 'count_graded' in location_data and 'count_required' in location_data and int(location_data['count_graded'])>=int(location_data['count_required']):
                 response['required_done'] = True
