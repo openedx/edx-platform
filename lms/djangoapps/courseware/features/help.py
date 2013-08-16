@@ -44,6 +44,8 @@ def go_into_course(step):
 
 
 def fill_field(name, info):
-    form_css = 'form.feedback_form'
-    form = world.css_find(form_css)
-    form.find_by_name(name).fill(info)
+    def fill_info():
+        form_css = 'form.feedback_form'
+        form = world.css_find(form_css)
+        form.find_by_name(name).fill(info)
+    world.retry_on_exception(fill_info)
