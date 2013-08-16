@@ -97,7 +97,7 @@ def course_email(hash_for_msg, to_list, course_title, course_url, throttle=False
     (plaintext, err_from_stderr) = process.communicate(input=msg.html_message.encode('utf-8'))  # use lynx to get plaintext
 
     course_title_no_quotes = re.sub(r'"', '', course_title)
-    from_addr = '"%s" Course Staff <%s>' % (course_title_no_quotes, settings.DEFAULT_BULK_FROM_EMAIL)
+    from_addr = '"{0}" Course Staff <{1}>'.format(course_title_no_quotes, settings.DEFAULT_BULK_FROM_EMAIL)
 
     if err_from_stderr:
         log.info(err_from_stderr)
