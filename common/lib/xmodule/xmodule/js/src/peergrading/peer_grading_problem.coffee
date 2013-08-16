@@ -450,7 +450,7 @@ class @PeerGradingProblem
 
       @submit_button.unbind('click')
       @submit_button.click @submit_calibration_essay
-
+      @scroll_to_top()
     else if response.error
       @render_error(response.error)
     else
@@ -479,6 +479,7 @@ class @PeerGradingProblem
 
       @submit_button.unbind('click')
       @submit_button.click @submit_grade
+      @scroll_to_top()
     else if response.error
       @render_error(response.error)
     else
@@ -573,3 +574,8 @@ class @PeerGradingProblem
       Logger.log 'peer_grading_show_question', {location: @location}
       new_text = "(Hide)"
     @question_header.text(new_text)
+
+  scroll_to_top: () =>
+    $('html, body').animate({
+                            scrollTop: $(".peer-grading").offset().top
+                            }, 200)

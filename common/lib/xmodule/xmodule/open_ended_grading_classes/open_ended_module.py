@@ -663,7 +663,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         return {
             'success': success,
             'error': error_message,
-            'student_response': data['student_answer']
+            'student_response': data['student_answer'].replace("\n","<br/>")
         }
 
     def update_score(self, data, system):

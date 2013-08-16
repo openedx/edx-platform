@@ -253,7 +253,7 @@ class @StaffGrading
     # always clear out errors and messages on transition.
     @error_msg = ''
     @message = ''
-    
+
     if response.success
       if response.problem_list
         @problems = response.problem_list
@@ -265,6 +265,7 @@ class @StaffGrading
       @error(response.error)
 
     @render_view()
+    @scroll_to_top()
        
   get_next_submission: (location) ->
     @location = location
@@ -473,6 +474,11 @@ class @StaffGrading
       Logger.log 'staff_grading_show_question', {location: @location}
       new_text = "(Hide)"
     @question_header.text(new_text)
+
+  scroll_to_top: () =>
+    $('html, body').animate({
+                            scrollTop: $(".staff-grading").offset().top
+                            }, 200)
 
 
 

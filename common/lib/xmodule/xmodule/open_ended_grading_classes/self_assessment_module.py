@@ -196,7 +196,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
             'success': success,
             'rubric_html': self.get_rubric_html(system),
             'error': error_message,
-            'student_response': data['student_answer'],
+            'student_response': data['student_answer'].replace("\n","<br/>")
         }
 
     def save_assessment(self, data, _system):

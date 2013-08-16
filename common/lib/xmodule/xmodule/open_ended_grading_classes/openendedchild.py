@@ -179,9 +179,10 @@ class OpenEndedChild(object):
             answer = autolink_html(answer)
             cleaner = Cleaner(style=True, links=True, add_nofollow=False, page_structure=True, safe_attrs_only=True,
                               host_whitelist=open_ended_image_submission.TRUSTED_IMAGE_DOMAINS,
-                              whitelist_tags=set(['embed', 'iframe', 'a', 'img']))
+                              whitelist_tags=set(['embed', 'iframe', 'a', 'img', 'br']))
             clean_html = cleaner.clean_html(answer)
             clean_html = re.sub(r'</p>$', '', re.sub(r'^<p>', '', clean_html))
+            clean_html = re.sub("\n","<br/>", clean_html)
         except Exception:
             clean_html = answer
         return clean_html

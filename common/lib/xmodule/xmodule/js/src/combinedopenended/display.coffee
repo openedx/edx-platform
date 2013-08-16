@@ -100,6 +100,7 @@ class @CombinedOpenEnded
   open_ended_child_sel: 'section.open-ended-child'
   error_sel: '.error'
   answer_area_sel: 'textarea.answer'
+  answer_area_div_sel : 'div.answer'
   prompt_sel: '.prompt'
   rubric_wrapper_sel: '.rubric-wrapper'
   hint_wrapper_sel: '.hint-wrapper'
@@ -339,6 +340,21 @@ class @CombinedOpenEnded
   find_hint_elements: ->
     @hint_area = @$('textarea.post_assessment')
 
+  replace_answer: (response) =>
+    if response.success
+      @rubric_wrapper.html(response.rubric_html)
+      @rubric_wrapper.show()
+      @rub = new Rubric(@coe)
+      @rub.initialize(@location)
+      @child_state = 'assessing'
+      @find_assessment_elements()
+      @rebind()
+      answer_area_div = @$(@answer_area_div_sel)
+      answer_area_div.html(response.student_response)
+    else
+      @can_upload_files = pre_can_upload_files
+      @gentle_alert response.error
+
   save_answer: (event) =>
     @submit_button.attr("disabled",true)
     event.preventDefault()
@@ -367,19 +383,9 @@ class @CombinedOpenEnded
         data: fd
         processData: false
         contentType: false
+        async: false
         success: (response) =>
-          if response.success
-            @rubric_wrapper.html(response.rubric_html)
-            @rubric_wrapper.show()
-            @rub = new Rubric(@coe)
-            @rub.initialize(@location)
-            @answer_area.html(response.student_response)
-            @child_state = 'assessing'
-            @find_assessment_elements()
-            @rebind()
-          else
-            @can_upload_files = pre_can_upload_files
-            @gentle_alert response.error
+          @replace_answer(response)
 
       $.ajaxWithPrefix("#{@ajax_url}/save_answer",settings)
     else
