@@ -11,44 +11,24 @@ class PersistentCourseFactory(factory.Factory):
     """
     Create a new course (not a new version of a course, but a whole new index entry).
 
-    keywords:
+    keywords: any xblock field plus (note, the below are filtered out; so, if they
+    become legitimate xblock fields, they won't be settable via this factory)
     * org: defaults to textX
     * prettyid: defaults to 999
-    * display_name
-    * user_id
-    * data (optional) the data payload to save in the course item
-    * metadata (optional) the metadata payload. If display_name is in the metadata, that takes
-    precedence over any display_name provided directly.
+    * master_branch: (optional) defaults to 'draft'
+    * user_id: (optional) defaults to 'test_user'
+    * display_name (xblock field): will default to 'Robot Super Course' unless provided
     """
     FACTORY_FOR = CourseDescriptor
 
-    org = 'testX'
-    prettyid = '999'
-    display_name = 'Robot Super Course'
-    user_id = "test_user"
-    data = None
-    metadata = None
-    master_version = 'draft'
-
     # pylint: disable=W0613
     @classmethod
-    def _create(cls, target_class, *args, **kwargs):
-
-        org = kwargs.get('org')
-        prettyid = kwargs.get('prettyid')
-        display_name = kwargs.get('display_name')
-        user_id = kwargs.get('user_id')
-        data = kwargs.get('data')
-        metadata = kwargs.get('metadata', {})
-        if metadata is None:
-            metadata = {}
-        if 'display_name' not in metadata:
-            metadata['display_name'] = display_name
+    def _create(cls, target_class, org='testX', prettyid='999', user_id='test_user', master_branch='draft', **kwargs):
 
         # Write the data to the mongo datastore
         new_course = modulestore('split').create_course(
-            org, prettyid, user_id, metadata=metadata, course_data=data, id_root=prettyid,
-            master_version=kwargs.get('master_version'))
+            org, prettyid, user_id, fields=kwargs, id_root=prettyid,
+            master_branch=master_branch)
 
         return new_course
 
@@ -60,36 +40,24 @@ class PersistentCourseFactory(factory.Factory):
 class ItemFactory(factory.Factory):
     FACTORY_FOR = XModuleDescriptor
 
-    category = 'chapter'
-    user_id = 'test_user'
     display_name = factory.LazyAttributeSequence(lambda o, n: "{} {}".format(o.category, n))
 
     # pylint: disable=W0613
     @classmethod
-    def _create(cls, target_class, *args, **kwargs):
+    def _create(cls, target_class, parent_location, category='chapter',
+        user_id='test_user', definition_locator=None, **kwargs):
         """
-        Uses *kwargs*:
+        passes *kwargs* as the new item's field values:
 
-        *parent_location* (required): the location of the course & possibly parent
+        :param parent_location: (required) the location of the course & possibly parent
 
-        *category* (defaults to 'chapter')
+        :param category: (defaults to 'chapter')
 
-        *data* (optional): the data for the item
-
-        definition_locator (optional): the DescriptorLocator for the definition this uses or branches
-
-        *display_name* (optional): the display name of the item
-
-        *metadata* (optional): dictionary of metadata attributes (display_name here takes
-        precedence over the above attr)
+        :param definition_locator (optional): the DescriptorLocator for the definition this uses or branches
         """
-        metadata = kwargs.get('metadata', {})
-        if 'display_name' not in metadata and 'display_name' in kwargs:
-            metadata['display_name'] = kwargs['display_name']
-
-        return modulestore('split').create_item(kwargs['parent_location'], kwargs['category'],
-            kwargs['user_id'], definition_locator=kwargs.get('definition_locator'),
-            new_def_data=kwargs.get('data'), metadata=metadata)
+        return modulestore('split').create_item(
+            parent_location, category, user_id, definition_locator, fields=kwargs
+        )
 
     @classmethod
     def _build(cls, target_class, *args, **kwargs):
