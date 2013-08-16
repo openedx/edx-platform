@@ -83,6 +83,7 @@ def instructor_dashboard(request, course_id):
     forum_admin_access = has_forum_access(request.user, course_id, FORUM_ROLE_ADMINISTRATOR)
 
     msg = ''
+    email_msg = ''
     to_option = None
     subject = None
     html_message = ''
@@ -717,10 +718,9 @@ def instructor_dashboard(request, course_id):
         tasks.delegate_email_batches.delay(email.hash, email.to, course_id, course_url, request.user.id)
 
         if to_option == "all":
-            msg = "<font color='green'>Your email was successfully queued for sending. Please note that for large public classe\
-s (~10k), it may take 1-2 hours to send all emails.</font>"
+            email_msg = '<div class="msg msg-confirm"><p class="copy">Your email was successfully queued for sending. Please note that for large public classes (~10k), it may take 1-2 hours to send all emails.</p></div>'
         else:
-            msg = "<font color='green'>Your email was successfully queued for sending.</font>"
+            email_msg = '<div class="msg msg-confirm"><p class="copy">Your email was successfully queued for sending.</p></div>'
 
     #----------------------------------------
     # psychometrics
@@ -809,6 +809,7 @@ s (~10k), it may take 1-2 hours to send all emails.</font>"
                'datatable': datatable,
                'course_stats': course_stats,
                'msg': msg,
+               'email_msg': email_msg,
                'modeflag': {idash_mode: 'selectedmode'},
                'to_option': to_option,  # email
                'subject': subject,      # email

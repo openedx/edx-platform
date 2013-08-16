@@ -306,7 +306,7 @@
               % endif
             % endif
             <a href="#unenroll-modal" class="unenroll" rel="leanModal" data-course-id="${course.id}" data-course-number="${course.number}">${_('Unregister')}</a>
-            <a href="#email-settings-modal" class="email-settings" rel="leanModal" data-course-id="${course.id}" data-course-number="${course.number}" data-optout="${course.id in course_optouts}">Email Settings</a>
+            <a href="#email-settings-modal" class="email-settings" rel="leanModal" data-course-id="${course.id}" data-course-number="${course.number}" data-optout="${course.id in course_optouts}">${_('Email Settings')}</a>
           </section>
         </article>
 
@@ -343,13 +343,13 @@
 <section id="email-settings-modal" class="modal">
   <div class="inner-wrapper">
     <header>
-      <h2>Email Settings for <span id="email_settings_course_number"></span></h2>
+      <h2>${_('Email Settings for {course_number}').format(course_number='<span id="email_settings_course_number"></span>')}</h2>
       <hr/>
     </header>
 
     <form id="email_settings_form" method="post">
       <input name="course_id" id="email_settings_course_id" type="hidden" />
-      <label>Receive course emails <input type="checkbox" id="receive_emails" name="receive_emails" /></label>
+      <label>${_("Receive course emails")} <input type="checkbox" id="receive_emails" name="receive_emails" /></label>
       <div class="submit">
         <input type="submit" id="submit" value="Save Settings" />
       </div>

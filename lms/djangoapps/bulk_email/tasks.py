@@ -31,7 +31,7 @@ def delegate_email_batches(hash_for_msg, to_option, course_id, course_url, user_
     get the mail, chopping up into batches of settings.EMAILS_PER_TASK size,
     and queueing up worker jobs.
 
-    `to_option` is {'students', 'staff', or 'all'}
+    `to_option` is {'myself', 'staff', or 'all'}
 
     Returns the number of batches (workers) kicked off.
     """
@@ -49,7 +49,8 @@ def delegate_email_batches(hash_for_msg, to_option, course_id, course_url, user_
 
     if to_option == "myself":
         recipient_qset = User.objects.filter(id=user_id).values('profile__name', 'email')
-    else:
+
+    elif to_option == "all" or to_option == "staff":
         staff_grpname = _course_staff_group_name(course.location)
         staff_group, _ = Group.objects.get_or_create(name=staff_grpname)
         staff_qset = staff_group.user_set.values('profile__name', 'email')
@@ -66,8 +67,12 @@ def delegate_email_batches(hash_for_msg, to_option, course_id, course_url, user_
             recipient_qset = recipient_qset | enrollment_qset
         recipient_qset = recipient_qset.distinct()
 
+    else:
+        log.error("Unexpected bulk email TO_OPTION found: %s", to_option)
+        raise Exception("Unexpected bulk email TO_OPTION found: {0}".format(to_option))
+
     recipient_list = list(recipient_qset)
-    total_num_emails = recipient_qset.count()
+    total_num_emails = len(recipient_list)
     num_workers = int(math.ceil(float(total_num_emails) / float(settings.EMAILS_PER_TASK)))
     chunk = int(math.ceil(float(total_num_emails) / float(num_workers)))
 
@@ -97,7 +102,7 @@ def course_email(hash_for_msg, to_list, course_title, course_url, throttle=False
     (plaintext, err_from_stderr) = process.communicate(input=msg.html_message.encode('utf-8'))  # use lynx to get plaintext
 
     course_title_no_quotes = re.sub(r'"', '', course_title)
-    from_addr = '"%s" Course Staff <%s>' % (course_title_no_quotes, settings.DEFAULT_BULK_FROM_EMAIL)
+    from_addr = '"{0}" Course Staff <{1}>'.format(course_title_no_quotes, settings.DEFAULT_BULK_FROM_EMAIL)
 
     if err_from_stderr:
         log.info(err_from_stderr)
@@ -108,20 +113,33 @@ def course_email(hash_for_msg, to_list, course_title, course_url, throttle=False
         num_sent = 0
         num_error = 0
 
+        email_context = {
+            'name': '',
+            'email': '',
+            'course_title': course_title,
+            'course_url': course_url
+        }
         while to_list:
             (name, email) = to_list[-1].values()
-            html_footer = render_to_string('emails/email_footer.html',
-                                           {'name': name,
-                                            'email': email,
-                                            'course_title': course_title,
-                                            'course_url': course_url})
-            plain_footer = render_to_string('emails/email_footer.txt',
-                                            {'name': name,
-                                             'email': email,
-                                             'course_title': course_title,
-                                             'course_url': course_url})
+            email_context['name'] = name
+            email_context['email'] = email
 
-            email_msg = EmailMultiAlternatives(subject, plaintext + plain_footer.encode('utf-8'), from_addr, [email], connection=connection)
+            html_footer = render_to_string(
+                'emails/email_footer.html',
+                email_context
+            )
+            plain_footer = render_to_string(
+                'emails/email_footer.txt',
+                email_context
+            )
+
+            email_msg = EmailMultiAlternatives(
+                subject,
+                plaintext + plain_footer.encode('utf-8'),
+                from_addr,
+                [email],
+                connection=connection
+            )
             email_msg.attach_alternative(msg.html_message + html_footer.encode('utf-8'), 'text/html')
 
             if throttle or current_task.request.retries > 0:  # throttle if we tried a few times and got the rate limiter
@@ -132,11 +150,12 @@ def course_email(hash_for_msg, to_list, course_title, course_url, throttle=False
                 log.info('Email with hash ' + hash_for_msg + ' sent to ' + email)
                 num_sent += 1
             except SMTPDataError as exc:
-                #According to SMTP spec, we'll retry error codes in the 4xx range.  5xx range indicates hard failure
+                # According to SMTP spec, we'll retry error codes in the 4xx range.  5xx range indicates hard failure
                 if exc.smtp_code >= 400 and exc.smtp_code < 500:
-                    raise exc  # this will cause the outer handler to catch the exception and retry the entire task
+                    # This will cause the outer handler to catch the exception and retry the entire task
+                    raise exc
                 else:
-                    #this will fall through and not retry the message, since it will be popped
+                    # This will fall through and not retry the message, since it will be popped
                     log.warning('Email with hash ' + hash_for_msg + ' not delivered to ' + email + ' due to error: ' + exc.smtp_error)
                     num_error += 1
 
@@ -146,8 +165,18 @@ def course_email(hash_for_msg, to_list, course_title, course_url, throttle=False
         return course_email_result(num_sent, num_error)
 
     except (SMTPDataError, SMTPConnectError, SMTPServerDisconnected) as exc:
-        #error caught here cause the email to be retried.  The entire task is actually retried without popping the list
-        raise course_email.retry(arg=[hash_for_msg, to_list, course_title, course_url, current_task.request.retries > 0], exc=exc, countdown=(2 ** current_task.request.retries) * 15)
+        # Error caught here cause the email to be retried.  The entire task is actually retried without popping the list
+        raise course_email.retry(
+            arg=[
+                hash_for_msg,
+                to_list,
+                course_title,
+                course_url,
+                current_task.request.retries > 0
+             ],
+            exc=exc,
+            countdown=(2 ** current_task.request.retries) * 15
+        )
 
 
 # This string format code is wrapped in this function to allow mocking for a unit test
