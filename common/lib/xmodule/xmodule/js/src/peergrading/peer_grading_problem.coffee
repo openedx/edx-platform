@@ -257,8 +257,6 @@ class @PeerGradingProblem
     $(window).keydown @keydown_handler
     $(window).keyup @keyup_handler
 
-    @collapse_question()
-
     Collapsible.setCollapsibles(@content_panel)
 
     # Set up the click event handlers
@@ -571,16 +569,17 @@ class @PeerGradingProblem
     @grading_message.fadeIn()
     @grading_message.html("<p>" + msg + "</p>")
 
-  collapse_question: () =>
+  collapse_question: (event) =>
     @prompt_container.slideToggle()
     @prompt_container.toggleClass('open')
-    if @question_header.text() == "(Hide)"
-      Logger.log 'peer_grading_hide_question', {location: @location}
-      new_text = "(Show)"
+    if @question_header.text() == "Hide Prompt"
+      new_text = "Show Prompt"
+      Logger.log 'oe_hide_question', {location: @location}
     else
-      Logger.log 'peer_grading_show_question', {location: @location}
-      new_text = "(Hide)"
+      Logger.log 'oe_show_question', {location: @location}
+      new_text = "Hide Prompt"
     @question_header.text(new_text)
+    return false
 
   scroll_to_top: () =>
     $('html, body').animate({
