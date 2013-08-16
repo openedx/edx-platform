@@ -359,6 +359,8 @@ def generate_export_course(request, org, course, name):
     try:
         export_to_xml(modulestore('direct'), contentstore(), loc, root_dir, name, modulestore())
     except SerializationError, e:
+        logging.exception('There was an error exporting course {0}. {1}'.format(course_module.location, unicode(e)))
+
         unit = None
         failed_item = None
         parent = None
@@ -391,6 +393,7 @@ def generate_export_course(request, org, course, name):
             })
         })
     except Exception, e:
+        logging.exception('There was an error exporting course {0}. {1}'.format(course_module.location, unicode(e)))
         return render_to_response('export.html', {
             'context_course': course_module,
             'successful_import_redirect_url': '',
