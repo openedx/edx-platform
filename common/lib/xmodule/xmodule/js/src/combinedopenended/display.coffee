@@ -300,7 +300,7 @@ class @CombinedOpenEnded
       @hide_file_upload()
       @submit_button.prop('value', 'Submit assessment')
       @submit_button.click @save_assessment
-      @submit_button.attr("disabled",false)
+      @submit_button.attr("disabled",true)
       if @child_type == "openended"
         @submit_button.hide()
         @queueing()

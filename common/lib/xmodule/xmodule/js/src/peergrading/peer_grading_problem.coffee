@@ -453,6 +453,7 @@ class @PeerGradingProblem
       @submit_button.show()
       @submit_button.unbind('click')
       @submit_button.click @submit_calibration_essay
+      @submit_button.attr('disabled', true)
       @scroll_to_top()
     else if response.error
       @render_error(response.error)
@@ -479,10 +480,11 @@ class @PeerGradingProblem
       @flag_student_container.show()
       @answer_unknown_container.show()
       @feedback_area.val("")
-      
+
       @submit_button.show()
       @submit_button.unbind('click')
       @submit_button.click @submit_grade
+      @submit_button.attr('disabled', true)
       @scroll_to_top()
     else if response.error
       @render_error(response.error)
@@ -558,6 +560,7 @@ class @PeerGradingProblem
       @action_button.show()
 
   show_submit_button: () =>
+    @submit_button.attr('disabled', false)
     @submit_button.show()
 
   setup_score_selection: (max_score) =>
