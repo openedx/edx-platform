@@ -1,0 +1,42 @@
+<%inherit file="base.html" />
+
+<%block name="content">
+  <article>
+    % if action=="delete":
+      <font color="red">Really delete ${course_id}?</font>
+      <a href="/sysadmin">No (Cancel)</a>
+      <a style="float:right" href="/sysadmin?action=delete&course_id=${course_id}&really=1">Yes&nbsp;&nbsp;</a>
+    % endif
+
+    <pre>
+     ${msg}
+    </pre>
+    <hr width="50%"/>
+    <table border="1">
+    % for cid in sorted(ctab.iterkeys()):
+        <%
+	    id = idtab[cid]
+	    org = id.get('org','')
+	    name = id.get('name','')
+	    nameurl = name.replace(' ','_')
+	%>
+        <tr>
+	    <td><a href="/${org}/${cid}/course/${nameurl}">GO</a>&nbsp;| </td>
+	    <td><a href="/${org}/${cid}/generate_export/${nameurl}">tar.gz export</a>&nbsp; |</td>
+	    <td><a href="/sysadmin?action=dump&course_id=${cid}">db dump</a>&nbsp; |</td>
+	    <td><a href="/sysadmin?action=delete&course_id=${cid}">delete</a>&nbsp; |</td>
+	    <td>${cid}</td>
+	    <td>${name}</td>
+	</tr>
+    % endfor
+    </table>
+    
+    <br/>
+    <hr width="75%" />
+    <form name="sysadminform" method="POST" action="/sysadmin">
+    <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
+        git ssh url: <input size="60" name="giturl" />
+	<input type="submit" name="action" value="Add Course"/>
+    </form>
+  </article>
+</%block>
