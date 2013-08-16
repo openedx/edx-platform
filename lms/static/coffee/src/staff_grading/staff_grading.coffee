@@ -146,6 +146,8 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
 
 
 class @StaffGrading
+  grading_message_sel: '.grading-message'
+
   constructor: (backend) ->
     AjaxPrefix.addAjaxPrefix(jQuery, -> "")
     @backend = backend
@@ -278,6 +280,7 @@ class @StaffGrading
       location: @location
       skipped: true
       submission_flagged: false
+    @gentle_alert "Skipped the submission."
     @backend.post('save_grade', data, @ajax_callback)
 
   get_problem_list: () ->
@@ -292,8 +295,14 @@ class @StaffGrading
       submission_id: @submission_id
       location: @location
       submission_flagged: @flag_submission_checkbox.is(':checked')
-    
+    @gentle_alert "Grades saved.  Fetching the next submission to grade."
     @backend.post('save_grade', data, @ajax_callback)
+
+  gentle_alert: (msg) =>
+    @grading_message = $(@grading_message_sel)
+    @grading_message.html("")
+    @grading_message.fadeIn()
+    @grading_message.html("<p>" + msg + "</p>")
 
   error: (msg) ->
     @error_msg = msg

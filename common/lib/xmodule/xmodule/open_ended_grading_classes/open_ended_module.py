@@ -699,7 +699,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             post_assessment = ""
             correct = ""
             previous_answer = ""
-
+        previous_answer = previous_answer.replace("\n","<br/>")
         context = {
             'prompt': self.child_prompt,
             'previous_answer': previous_answer,

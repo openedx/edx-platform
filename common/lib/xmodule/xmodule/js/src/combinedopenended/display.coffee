@@ -23,7 +23,7 @@ class @Rubric
 
   keypress_callback: (event) =>
     # don't try to do this when user is typing in a text input
-    if $(event.target).is('input, textarea')
+    if @$(event.target).is('input, textarea')
       return
     # for when we select via top row
     if event.which >= 48 and event.which <= 57
@@ -49,9 +49,9 @@ class @Rubric
       @category = @$(@categories[@category_index])
     
   tracking_callback: (event) =>
-    target_selection = $(event.target).val()
+    target_selection = @$(event.target).val()
     # chop off the beginning of the name so that we can get the number of the category
-    category = $(event.target).data("category")
+    category = @$(event.target).data("category")
     location = @$(@rubric_sel).data('location')
     # probably want the original problem location as well
 
@@ -187,9 +187,9 @@ class @CombinedOpenEnded
       @skip_button = @$(@oe).find(@skip_button_sel)
       @skip_button.click @skip_post_assessment
 
-    @file_upload_area = $(@oe).find(@file_upload_sel)
+    @file_upload_area = @$(@oe).find(@file_upload_sel)
     @can_upload_files = false
-    @open_ended_child= $(@oe).find(@open_ended_child_sel)
+    @open_ended_child= @$(@oe).find(@open_ended_child_sel)
 
     @out_of_sync_message = 'The problem state got out of sync.  Try reloading the page.'
 
@@ -257,7 +257,7 @@ class @CombinedOpenEnded
       contentType: false
       success: (response) =>
         @gentle_alert response.msg
-        $('section.evaluation').slideToggle()
+        @$('section.evaluation').slideToggle()
         @message_wrapper.html(response.message_html)
 
 
@@ -299,6 +299,7 @@ class @CombinedOpenEnded
       @hide_file_upload()
       @submit_button.prop('value', 'Submit assessment')
       @submit_button.click @save_assessment
+      @submit_button.attr("disabled",false)
       if @child_type == "openended"
         @submit_button.hide()
         @queueing()
@@ -339,6 +340,7 @@ class @CombinedOpenEnded
     @hint_area = @$('textarea.post_assessment')
 
   save_answer: (event) =>
+    @submit_button.attr("disabled",true)
     event.preventDefault()
     @submit_button.hide()
     @answer_area.attr("disabled", true)
@@ -640,4 +642,5 @@ class @CombinedOpenEnded
 
   graded_callback: () =>
     if @rub.check_complete()
+      @submit_button.attr("disabled",false)
       @submit_button.show()

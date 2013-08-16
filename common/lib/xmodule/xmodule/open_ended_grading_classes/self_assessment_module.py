@@ -61,6 +61,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         else:
             previous_answer = ''
 
+        previous_answer = previous_answer.replace("\n","<br/>")
         context = {
             'prompt': self.child_prompt,
             'previous_answer': previous_answer,
