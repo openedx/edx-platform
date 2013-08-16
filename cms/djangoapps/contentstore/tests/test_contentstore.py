@@ -49,7 +49,7 @@ import datetime
 from pytz import UTC
 from uuid import uuid4
 from pymongo import MongoClient
-from student.views import is_enrolled_in_course
+from student.models import CourseEnrollment
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['OPTIONS']['db'] = 'test_xcontent_%s' % uuid4().hex
@@ -1168,7 +1168,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         self.assertNotIn('ErrMsg', data)
         self.assertEqual(data['id'], 'i4x://MITx/{0}/course/2013_Spring'.format(test_course_data['number']))
         # Verify that the creator is now registered in the course.
-        self.assertTrue(is_enrolled_in_course(self.user, self._get_course_id(test_course_data)))
+        self.assertTrue(CourseEnrollment.is_enrolled(self.user, self._get_course_id(test_course_data)))
         return test_course_data
 
     def test_create_course_check_forum_seeding(self):
@@ -1190,14 +1190,14 @@ class ContentStoreTest(ModuleStoreTestCase):
         Checks that the course did not get created
         """
         course_id = self._get_course_id(self.course_data)
-        initially_enrolled = is_enrolled_in_course(self.user, course_id)
+        initially_enrolled = CourseEnrollment.is_enrolled(self.user, course_id)
         resp = self.client.post(reverse('create_new_course'), self.course_data)
         self.assertEqual(resp.status_code, 200)
         data = parse_json(resp)
         self.assertEqual(data['ErrMsg'], error_message)
         # One test case involves trying to create the same course twice. Hence for that course,
         # the user will be enrolled. In the other cases, initially_enrolled will be False.
-        self.assertEqual(initially_enrolled, is_enrolled_in_course(self.user, course_id))
+        self.assertEqual(initially_enrolled, CourseEnrollment.is_enrolled(self.user, course_id))
 
     def test_create_course_duplicate_number(self):
         """Test new course creation - error path"""
@@ -1353,7 +1353,7 @@ class ContentStoreTest(ModuleStoreTestCase):
                                                'course': loc.course,
                                                'name': loc.name}))
 
-        self.assertEqual(200, resp.status_code)
+        self.assert2XX(resp.status_code)
         self.assertContains(resp, 'Chapter 2')
 
         # go to various pages
@@ -1363,92 +1363,92 @@ class ContentStoreTest(ModuleStoreTestCase):
                                        kwargs={'org': loc.org,
                                                'course': loc.course,
                                                'name': loc.name}))
-        self.assertEqual(200, resp.status_code)
+        self.assert2XX(resp.status_code)
 
         # export page
         resp = self.client.get(reverse('export_course',
                                        kwargs={'org': loc.org,
                                                'course': loc.course,
                                                'name': loc.name}))
-        self.assertEqual(200, resp.status_code)
+        self.assert2XX(resp.status_code)
 
         # manage users
         resp = self.client.get(reverse('manage_users',
                                        kwargs={'org': loc.org,
                                                'course': loc.course,
                                                'name': loc.name}))
-        self.assertEqual(200, resp.status_code)
+        self.assert2XX(resp.status_code)
 
         # course info
         resp = self.client.get(reverse('course_info',
                                        kwargs={'org': loc.org,
                                                'course': loc.course,
                                                'name': loc.name}))
-        self.assertEqual(200, resp.status_code)
+        self.assert2XX(resp.status_code)
 
         # settings_details
         resp = self.client.get(reverse('settings_details',
                                        kwargs={'org': loc.org,
                                                'course': loc.course,
                                                'name': loc.name}))
-        self.assertEqual(200, resp.status_code)
+        self.assert2XX(resp.status_code)
 
         # settings_details
         resp = self.client.get(reverse('settings_grading',
                                        kwargs={'org': loc.org,
                                                'course': loc.course,
                                                'name': loc.name}))
-        self.assertEqual(200, resp.status_code)
+        self.assert2XX(resp.status_code)
 
         # static_pages
         resp = self.client.get(reverse('static_pages',
                                        kwargs={'org': loc.org,
                                                'course': loc.course,
                                                'coursename': loc.name}))
-        self.assertEqual(200, resp.status_code)
+        self.assert2XX(resp.status_code)
 
         # static_pages
         resp = self.client.get(reverse('asset_index',
                                        kwargs={'org': loc.org,
                                                'course': loc.course,
                                                'name': loc.name}))
-        self.assertEqual(200, resp.status_code)
+        self.assert2XX(resp.status_code)
 
         # go look at a subsection page
         subsection_location = loc.replace(category='sequential', name='test_sequence')
         resp = self.client.get(reverse('edit_subsection',
                                        kwargs={'location': subsection_location.url()}))
-        self.assertEqual(200, resp.status_code)
+        self.assert2XX(resp.status_code)
 
         # go look at the Edit page
         unit_location = loc.replace(category='vertical', name='test_vertical')
         resp = self.client.get(reverse('edit_unit',
                                        kwargs={'location': unit_location.url()}))
-        self.assertEqual(200, resp.status_code)
+        self.assert2XX(resp.status_code)
 
         # delete a component
         del_loc = loc.replace(category='html', name='test_html')
         resp = self.client.post(reverse('delete_item'),
                                 json.dumps({'id': del_loc.url()}), "application/json")
-        self.assertEqual(200, resp.status_code)
+        self.assert2XX(resp.status_code)
 
         # delete a unit
         del_loc = loc.replace(category='vertical', name='test_vertical')
         resp = self.client.post(reverse('delete_item'),
                                 json.dumps({'id': del_loc.url()}), "application/json")
-        self.assertEqual(200, resp.status_code)
+        self.assert2XX(resp.status_code)
 
         # delete a unit
         del_loc = loc.replace(category='sequential', name='test_sequence')
         resp = self.client.post(reverse('delete_item'),
                                 json.dumps({'id': del_loc.url()}), "application/json")
-        self.assertEqual(200, resp.status_code)
+        self.assert2XX(resp.status_code)
 
         # delete a chapter
         del_loc = loc.replace(category='chapter', name='chapter_2')
         resp = self.client.post(reverse('delete_item'),
                                 json.dumps({'id': del_loc.url()}), "application/json")
-        self.assertEqual(200, resp.status_code)
+        self.assert2XX(resp.status_code)
 
     def test_import_into_new_course_id(self):
         module_store = modulestore('direct')

@@ -681,7 +681,7 @@ class MongoModuleStore(ModuleStoreBase):
         # we should remove this once we can break this reference from the course to static tabs
         # TODO move this special casing to app tier (similar to attaching new element to parent)
         if location.category == 'static_tab':
-            course = self.get_course_for_item(location)
+            course = self._get_course_for_item(location)
             existing_tabs = course.tabs or []
             existing_tabs.append({
                 'type': 'static_tab',
@@ -701,7 +701,7 @@ class MongoModuleStore(ModuleStoreBase):
             self.modulestore_update_signal.send(self, modulestore=self, course_id=course_id,
                                                 location=location)
 
-    def get_course_for_item(self, location, depth=0):
+    def _get_course_for_item(self, location, depth=0):
         '''
         VS[compat]
         cdodge: for a given Xmodule, return the course that it belongs to
@@ -790,7 +790,7 @@ class MongoModuleStore(ModuleStoreBase):
         # we should remove this once we can break this reference from the course to static tabs
         loc = Location(location)
         if loc.category == 'static_tab':
-            course = self.get_course_for_item(loc)
+            course = self._get_course_for_item(loc)
             existing_tabs = course.tabs or []
             for tab in existing_tabs:
                 if tab.get('url_slug') == loc.name:
@@ -818,7 +818,7 @@ class MongoModuleStore(ModuleStoreBase):
         # we should remove this once we can break this reference from the course to static tabs
         if location.category == 'static_tab':
             item = self.get_item(location)
-            course = self.get_course_for_item(item.location)
+            course = self._get_course_for_item(item.location)
             existing_tabs = course.tabs or []
             course.tabs = [tab for tab in existing_tabs if tab.get('url_slug') != location.name]
             # Save the updates to the course to the MongoKeyValueStore
@@ -840,13 +840,6 @@ class MongoModuleStore(ModuleStoreBase):
         items = self.collection.find({'definition.children': location.url()},
                                      {'_id': True})
         return [i['_id'] for i in items]
-
-    def get_errored_courses(self):
-        """
-        This function doesn't make sense for the mongo modulestore, as courses
-        are loaded on demand, rather than up front
-        """
-        return {}
 
     def _create_new_model_data(self, category, location, definition_data, metadata):
         """

@@ -48,4 +48,7 @@ class Command(BaseCommand):
                     print 'removing User permissions from course....'
                     # in the django layer, we need to remove all the user permissions groups associated with this course
                     if commit:
-                        _delete_course_group(loc)
+                        try:
+                            _delete_course_group(loc)
+                        except Exception as err:
+                            print("Error in deleting course groups for {0}: {1}".format(loc, err))

@@ -7,6 +7,12 @@ import numpy
 import calc
 from pyparsing import ParseException
 
+# numpy's default behavior when it evaluates a function outside its domain
+# is to raise a warning (not an exception) which is then printed to STDOUT.
+# To prevent this from polluting the output of the tests, configure numpy to
+# ignore it instead.
+# See http://docs.scipy.org/doc/numpy/reference/generated/numpy.seterr.html
+numpy.seterr(all='ignore')  # Also: 'ignore', 'warn' (default), 'raise'
 
 class EvaluatorTest(unittest.TestCase):
     """
@@ -186,17 +192,16 @@ class EvaluatorTest(unittest.TestCase):
         arcsin_inputs = ['-0.707', '0', '0.5', '0.588', '1.298 + 0.635*j']
         arcsin_angles = [-0.785, 0, 0.524, 0.629, 1 + 1j]
         self.assert_function_values('arcsin', arcsin_inputs, arcsin_angles)
-        # Rather than throwing an exception, numpy.arcsin gives nan
-        # self.assertTrue(numpy.isnan(calc.evaluator({}, {}, 'arcsin(-1.1)')))
-        # self.assertTrue(numpy.isnan(calc.evaluator({}, {}, 'arcsin(1.1)')))
-        # Disabled for now because they are giving a runtime warning... :-/
+        # Rather than a complex number, numpy.arcsin gives nan
+        self.assertTrue(numpy.isnan(calc.evaluator({}, {}, 'arcsin(-1.1)')))
+        self.assertTrue(numpy.isnan(calc.evaluator({}, {}, 'arcsin(1.1)')))
 
         # Include those where the real part is between 0 and pi
         arccos_inputs = ['1', '0.866', '0.809', '0.834-0.989*j']
         arccos_angles = [0, 0.524, 0.628, 1 + 1j]
         self.assert_function_values('arccos', arccos_inputs, arccos_angles)
-        # self.assertTrue(numpy.isnan(calc.evaluator({}, {}, 'arccos(-1.1)')))
-        # self.assertTrue(numpy.isnan(calc.evaluator({}, {}, 'arccos(1.1)')))
+        self.assertTrue(numpy.isnan(calc.evaluator({}, {}, 'arccos(-1.1)')))
+        self.assertTrue(numpy.isnan(calc.evaluator({}, {}, 'arccos(1.1)')))
 
         # Has the same range as arcsin
         arctan_inputs = ['-1', '0', '0.577', '0.727', '0.272 + 1.084*j']
@@ -535,10 +540,10 @@ class EvaluatorTest(unittest.TestCase):
         # With case sensitive turned on, it should pick the right function
         functions = {'f': lambda x: x, 'F': lambda x: x + 1}
         self.assertEqual(
-            calc.evaluator({}, functions, 'f(6)', case_sensitive=True), 6
+            6, calc.evaluator({}, functions, 'f(6)', case_sensitive=True)
         )
         self.assertEqual(
-            calc.evaluator({}, functions, 'F(6)', case_sensitive=True), 7
+            7, calc.evaluator({}, functions, 'F(6)', case_sensitive=True)
         )
 
     def test_undefined_vars(self):

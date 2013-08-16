@@ -771,6 +771,9 @@ INSTALLED_APPS = (
 
     # Notification preferences setting
     'notification_prefs',
+
+    # Different Course Modes
+    'course_modes'
 )
 
 ######################### MARKETING SITE ###############################
