@@ -151,7 +151,7 @@ class TemplateTests(unittest.TestCase):
             parent_location=chapter.location, user_id='testbot', category='vertical')
         first_problem = persistent_factories.ItemFactory.create(
             display_name='problem 1', parent_location=sub.location, user_id='testbot', category='problem',
-            fields={'data':"<problem></problem>"}
+            data="<problem></problem>"
         )
         first_problem.max_attempts = 3
         first_problem.save()  # decache the above into the kvs
@@ -165,7 +165,7 @@ class TemplateTests(unittest.TestCase):
             display_name='problem 2',
             parent_location=BlockUsageLocator(updated_loc, usage_id=sub.location.usage_id),
             user_id='testbot', category='problem',
-            fields={'data':"<problem></problem>"}
+            data="<problem></problem>"
         )
 
         # course root only updated 2x

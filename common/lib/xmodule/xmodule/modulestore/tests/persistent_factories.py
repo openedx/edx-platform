@@ -11,38 +11,24 @@ class PersistentCourseFactory(factory.Factory):
     """
     Create a new course (not a new version of a course, but a whole new index entry).
 
-    keywords:
+    keywords: any xblock field plus (note, the below are filtered out; so, if they
+    become legitimate xblock fields, they won't be settable via this factory)
     * org: defaults to textX
     * prettyid: defaults to 999
-    * display_name
-    * user_id
-    * fields (optional) the settings and content payloads. If display_name is in the metadata, that takes
-    precedence over any display_name provided directly.
+    * master_branch: (optional) defaults to 'draft'
+    * user_id: (optional) defaults to 'test_user'
+    * display_name (xblock field): will default to 'Robot Super Course' unless provided
     """
     FACTORY_FOR = CourseDescriptor
 
-    org = 'testX'
-    prettyid = '999'
-    display_name = 'Robot Super Course'
-    user_id = "test_user"
-    master_branch = 'draft'
-
     # pylint: disable=W0613
     @classmethod
-    def _create(cls, target_class, *args, **kwargs):
-
-        org = kwargs.get('org')
-        prettyid = kwargs.get('prettyid')
-        display_name = kwargs.get('display_name')
-        user_id = kwargs.get('user_id')
-        fields = kwargs.get('fields', {})
-        if display_name and 'display_name' not in fields:
-            fields['display_name'] = display_name
+    def _create(cls, target_class, org='testX', prettyid='999', user_id='test_user', master_branch='draft', **kwargs):
 
         # Write the data to the mongo datastore
         new_course = modulestore('split').create_course(
-            org, prettyid, user_id, fields=fields, id_root=prettyid,
-            master_branch=kwargs.get('master_branch'))
+            org, prettyid, user_id, fields=kwargs, id_root=prettyid,
+            master_branch=master_branch)
 
         return new_course
 
@@ -54,33 +40,24 @@ class PersistentCourseFactory(factory.Factory):
 class ItemFactory(factory.Factory):
     FACTORY_FOR = XModuleDescriptor
 
-    category = 'chapter'
-    user_id = 'test_user'
     display_name = factory.LazyAttributeSequence(lambda o, n: "{} {}".format(o.category, n))
 
     # pylint: disable=W0613
     @classmethod
-    def _create(cls, target_class, *args, **kwargs):
+    def _create(cls, target_class, parent_location, category='chapter',
+        user_id='test_user', definition_locator=None, **kwargs):
         """
-        Uses *kwargs*:
+        passes *kwargs* as the new item's field values:
 
         :param parent_location: (required) the location of the course & possibly parent
 
         :param category: (defaults to 'chapter')
 
-        :param fields: (optional) the data for the item
-
         :param definition_locator (optional): the DescriptorLocator for the definition this uses or branches
-
-        :param display_name (optional): the display name of the item
         """
-        fields = kwargs.get('fields', {})
-        if 'display_name' not in fields and 'display_name' in kwargs:
-            fields['display_name'] = kwargs['display_name']
-
-        return modulestore('split').create_item(kwargs['parent_location'], kwargs['category'],
-            kwargs['user_id'], definition_locator=kwargs.get('definition_locator'),
-            fields=fields)
+        return modulestore('split').create_item(
+            parent_location, category, user_id, definition_locator, fields=kwargs
+        )
 
     @classmethod
     def _build(cls, target_class, *args, **kwargs):
