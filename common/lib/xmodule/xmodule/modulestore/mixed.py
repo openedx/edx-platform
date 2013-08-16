@@ -103,7 +103,20 @@ class MixedModuleStore(ModuleStoreBase):
         '''
         courses = []
         for key in self.modulestores:
-            courses = courses + (self.modulestores[key].get_courses())
+            store_courses = self.modulestores[key].get_courses()
+            # If the store has not been labeled as 'default' then we should
+            # only surface courses that have a mapping entry, for example the XMLModuleStore will
+            # slurp up anything that is on disk, however, we don't want to surface those to
+            # consumers *unless* there is an explicit mapping in the configuration
+            if key != 'default':
+                for course in store_courses:
+                    # make sure that the courseId is mapped to the store in question
+                    if key == self.mappings.get(course.location.course_id, 'default'):
+                        courses = courses + ([course])
+            else:
+                # if we're the 'default' store provider, then we surface all courses hosted in
+                # that store provider
+                courses = courses + (store_courses)
 
         return courses
 

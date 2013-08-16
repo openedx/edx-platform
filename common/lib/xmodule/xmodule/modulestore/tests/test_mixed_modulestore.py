@@ -187,6 +187,7 @@ class TestMixedModuleStore(object):
     def test_get_courses(self):
         # we should have 3 total courses aggregated
         courses = self.store.get_courses()
+        assert_equals(len(courses), 3)
         course_ids = []
         for course in courses:
             course_ids.append(course.location.course_id)
