@@ -31,7 +31,7 @@ def submit_partial_problem_type(step, submission_type):
     world.css_click(submit_css)
 
 
-@step(u'I should see confirmation that the problem was received')
+@step(u'I should see confirmation that the issue was received')
 def see_confirmation(step):
     assert world.browser.evaluate_script("$('input[value=\"Submit\"]').attr('disabled')") == 'disabled'
 
