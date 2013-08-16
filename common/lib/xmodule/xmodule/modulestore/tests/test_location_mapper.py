@@ -78,12 +78,12 @@ class TestLocationMapper(unittest.TestCase):
         org = 'foo_org'
         course = 'bar_course'
         old_style_course_id = '{}/{}/{}'.format(org, course, 'baz_run')
-        prob_locator = loc_mapper().translate_location(
-            old_style_course_id,
-            Location('i4x', org, course, 'problem', 'abc123'),
-            add_entry_if_missing=False
-        )
-        self.assertIsNone(prob_locator, 'found entry in empty map table')
+        with self.assertRaises(ItemNotFoundError):
+            _ = loc_mapper().translate_location(
+                old_style_course_id,
+                Location('i4x', org, course, 'problem', 'abc123'),
+                add_entry_if_missing=False
+            )
 
         new_style_course_id = '{}.geek_dept.{}.baz_run'.format(org, course)
         block_map = {'abc123': {'problem': 'problem2'}}
@@ -109,12 +109,12 @@ class TestLocationMapper(unittest.TestCase):
         )
         self.assertEqual(prob_locator.course_id, new_style_course_id)
         # look for non-existent problem
-        prob_locator = loc_mapper().translate_location(
-            None,
-            Location('i4x', org, course, 'problem', '1def23'),
-            add_entry_if_missing=False
-        )
-        self.assertIsNone(prob_locator, "Found non-existent problem")
+        with self.assertRaises(ItemNotFoundError):
+            prob_locator = loc_mapper().translate_location(
+                None,
+                Location('i4x', org, course, 'problem', '1def23'),
+                add_entry_if_missing=False
+            )
 
         # add a distractor course
         block_map = {'abc123': {'problem': 'problem3'}}
@@ -477,11 +477,12 @@ class TestLocationMapper(unittest.TestCase):
         # delete from one course
         location = location.replace(name='abc123')
         loc_mapper().delete_block_location_translator(location, '{}/{}/{}'.format(org, course, 'baz_run'))
-        self.assertIsNone(loc_mapper().translate_location(
-            '{}/{}/{}'.format(org, course, 'baz_run'),
-            location,
-            add_entry_if_missing=False
-        ))
+        with self.assertRaises(ItemNotFoundError):
+            loc_mapper().translate_location(
+                '{}/{}/{}'.format(org, course, 'baz_run'),
+                location,
+                add_entry_if_missing=False
+            )
         locator = loc_mapper().translate_location(
             '{}/{}/{}'.format(org, course, 'delta_run'),
             location,

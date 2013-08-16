@@ -107,10 +107,13 @@ class LocMapperStore(object):
         if the code just trips into this w/o creating translations. The downfall is that ambiguous course
         locations may generate conflicting block_ids.
 
+        Will raise ItemNotFoundError if there's no mapping and add_entry_if_missing is False.
+
         :param old_style_course_id: the course_id used in old mongo not the new one (optional, will use location)
         :param location:  a Location pointing to a module
         :param published: a boolean to indicate whether the caller wants the draft or published branch.
-        :param add_entry_if_missing: a boolean as to whether to return None or to create an entry if the course
+        :param add_entry_if_missing: a boolean as to whether to raise ItemNotFoundError or to create an entry if
+        the course
         or block is not found in the map.
 
         NOTE: unlike old mongo, draft branches contain the whole course; so, it applies to all category
@@ -126,7 +129,7 @@ class LocMapperStore(object):
                 self.create_map_entry(course_location)
                 entry = self.location_map.find_one(location_id)
             else:
-                return None
+                raise ItemNotFoundError()
         elif maps.count() > 1:
             # if more than one, prefer the one w/o a name if that exists. Otherwise, choose the first (arbitrary)
             # a bit odd b/c maps is a cursor and doesn't allow multitraversal w/o requerying db
@@ -150,7 +153,7 @@ class LocMapperStore(object):
             if add_entry_if_missing:
                 usage_id = self._add_to_block_map(location, location_id, entry['block_map'])
             else:
-                return None
+                raise ItemNotFoundError()
         elif isinstance(usage_id, dict):
             # name is not unique, look through for the right category
             if location.category in usage_id:
@@ -158,7 +161,7 @@ class LocMapperStore(object):
             elif add_entry_if_missing:
                 usage_id = self._add_to_block_map(location, location_id, entry['block_map'])
             else:
-                return None
+                raise ItemNotFoundError()
         else:
             raise InvalidLocationError()
 
@@ -179,7 +182,7 @@ class LocMapperStore(object):
 
         :param locator: a BlockUsageLocator
         """
-        # Does not use _lookup_course b/c it doesn't actually require that the course exist in the active_version
+        # This does not require that the course exist in any modulestore
         # only that it has a mapping entry.
         maps = self.location_map.find({'course_id': locator.course_id})
         # look for one which maps to this block usage_id
