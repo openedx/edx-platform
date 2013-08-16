@@ -400,6 +400,20 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
 
+    def test_video_module_caption_asset_path(self):
+        '''
+        This verifies that a video caption url is as we expect it to be
+        '''
+        direct_store = modulestore('direct')
+        import_from_xml(direct_store, 'common/test/data/', ['toy'])
+
+        # also try a custom response which will trigger the 'is this course in whitelist' logic
+        video_module_location = Location(['i4x', 'edX', 'toy', 'video', 'sample_video', None])
+        url = reverse('preview_component', kwargs={'location': video_module_location.url()})
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, 'data-caption-asset-path="/c4x/edX/toy/asset/subs_"')
+
     def test_delete(self):
         direct_store = modulestore('direct')
         CourseFactory.create(org='edX', course='999', display_name='Robot Super Course')
