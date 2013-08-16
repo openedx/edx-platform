@@ -357,8 +357,8 @@ class @CombinedOpenEnded
 
   save_answer: (event) =>
     @submit_button.attr("disabled",true)
-    event.preventDefault()
     @submit_button.hide()
+    event.preventDefault()
     @answer_area.attr("disabled", true)
     max_filesize = 2*1000*1000 #2MB
     pre_can_upload_files = @can_upload_files
@@ -404,6 +404,8 @@ class @CombinedOpenEnded
       @is_ctrl=false
 
   save_assessment: (event) =>
+    @submit_button.attr("disabled",true)
+    @submit_button.hide()
     event.preventDefault()
     if @child_state == 'assessing' && @rub.check_complete()
       checked_assessment = @rub.get_total_score()

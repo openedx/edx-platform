@@ -322,10 +322,12 @@ class @PeerGradingProblem
 
   submit_calibration_essay: ()=>
     data = @construct_data()
+    @submit_button.hide()
     @backend.post('save_calibration_essay', data, @calibration_callback)
 
   submit_grade: () =>
     data = @construct_data()
+    @submit_button.hide()
     @backend.post('save_grade', data, @submission_callback)
 
 
@@ -448,6 +450,7 @@ class @PeerGradingProblem
 
       @feedback_area.val("")
 
+      @submit_button.show()
       @submit_button.unbind('click')
       @submit_button.click @submit_calibration_essay
       @scroll_to_top()
@@ -476,7 +479,8 @@ class @PeerGradingProblem
       @flag_student_container.show()
       @answer_unknown_container.show()
       @feedback_area.val("")
-
+      
+      @submit_button.show()
       @submit_button.unbind('click')
       @submit_button.click @submit_grade
       @scroll_to_top()
