@@ -119,7 +119,15 @@ def replace_static_urls(text, data_directory, course_id=None):
         elif course_id and modulestore().get_modulestore_type(course_id) != XML_MODULESTORE_TYPE:
             # first look in the static file pipeline and see if we are trying to reference
             # a piece of static content which is in the mitx repo (e.g. JS associated with an xmodule)
-            if staticfiles_storage.exists(rest):
+
+            exists_in_staticfiles_storage = False
+            try:
+                exists_in_staticfiles_storage = staticfiles_storage.exists(rest)
+            except Exception as err:
+                log.warning("staticfiles_storage couldn't find path {0}: {1}".format(
+                    rest, str(err)))
+
+            if exists_in_staticfiles_storage:
                 url = staticfiles_storage.url(rest)
             else:
                 # if not, then assume it's courseware specific content and then look in the
@@ -141,6 +149,7 @@ def replace_static_urls(text, data_directory, course_id=None):
                 url = "".join([prefix, course_path])
 
         return "".join([quote, url, quote])
+
 
     return re.sub(
         _url_replace_regex('/static/(?!{data_dir})'.format(data_dir=data_directory)),
