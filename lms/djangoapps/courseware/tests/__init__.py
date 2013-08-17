@@ -50,8 +50,7 @@ class BaseTestXmodule(ModuleStoreTestCase):
         self.course = CourseFactory.create(data=self.COURSE_DATA)
 
         # Turn off cache.
-        modulestore().request_cache = None
-        modulestore().metadata_inheritance_cache_subsystem = None
+        modulestore().set_modulestore_configuration({})
 
         chapter = ItemFactory.create(
             parent_location=self.course.location,
