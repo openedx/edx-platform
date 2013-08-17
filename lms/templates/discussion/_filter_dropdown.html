@@ -2,7 +2,6 @@
 <%! import json %>
 
 <%def name="render_dropdown(map)">
-    ${map["children"].sort()}
     % for child in map["children"]:
         % if child in map["entries"]:
             ${render_entry(map["entries"], child)}
