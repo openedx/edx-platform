@@ -2,9 +2,9 @@
 // ====================
 
 body.course.import {
-
+  
   .import-overview {
-    @extend .ui-window;
+    @extend .window;
     @include clearfix;
     padding: 30px 40px;
   }

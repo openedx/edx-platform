@@ -14,7 +14,7 @@ body.course.checklists {
 
   // checklists - general
   .course-checklist {
-    @extend .ui-window;
+    @extend .window;
     margin: 0 0 ($baseline*2) 0;
 
     &:last-child {
@@ -23,7 +23,7 @@ body.course.checklists {
 
     // visual status
     .viz-checklist-status {
-      @extend .cont-text-hide;
+      @extend .text-hide;
       @include size(100%,($baseline/4));
       position: relative;
       display: block;
@@ -40,7 +40,7 @@ body.course.checklists {
         background: $green;
 
         .int {
-          @extend .cont-text-sr;
+          @extend .text-sr;
         }
       }
     }

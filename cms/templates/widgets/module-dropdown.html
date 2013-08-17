@@ -1,6 +1,8 @@
+<%! from django.utils.translation import ugettext as _ %>
+
 <li class="create-module wip">
   <a href="#" class="new-module">
-    + Add new module
+    + ${_("Add new module")}
   </a>
 
   <div class="hidden">
@@ -11,16 +13,16 @@
         </li>
         <li>
           <select>
-            <option>Use template</option>
-            <option>Lecture Sequence</option>
-            <option>Use template</option>
+            <option>${_("Use template")}</option>
+            <option>${_("Lecture Sequence")}</option>
+            <option>${_("Use template")}</option>
           </select>
         </li>
         <li>
           <input type="submit" value="Create & Edit Module" />
           <div>
-            <a href="#">Save without edit</a>
-            <a href="#">Cancel</a>
+            <a href="#">${_("Save without edit")}</a>
+            <a href="#">${_("Cancel")}</a>
           </div>
         </li>
       </ul>

@@ -17,7 +17,7 @@ import logging
 import uuid
 from random import randint
 
-
+from django.utils.translation import ugettext as _
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
@@ -72,7 +72,7 @@ class UserProfile(models.Model):
     this_year = datetime.now().year
     VALID_YEARS = range(this_year, this_year - 120, -1)
     year_of_birth = models.IntegerField(blank=True, null=True, db_index=True)
-    GENDER_CHOICES = (('m', 'Male'), ('f', 'Female'), ('o', 'Other'))
+    GENDER_CHOICES = (('m', _('Male')), ('f', _('Female')), ('o', _('Other')))
     gender = models.CharField(blank=True, null=True, max_length=6, db_index=True,
                               choices=GENDER_CHOICES)
 
@@ -80,15 +80,15 @@ class UserProfile(models.Model):
     # p_se and p_oth in the existing data in db.
     # ('p_se', 'Doctorate in science or engineering'),
     # ('p_oth', 'Doctorate in another field'),
-    LEVEL_OF_EDUCATION_CHOICES = (('p', 'Doctorate'),
-                                  ('m', "Master's or professional degree"),
-                                  ('b', "Bachelor's degree"),
-                                  ('a', "Associate's degree"),
-                                  ('hs', "Secondary/high school"),
-                                  ('jhs', "Junior secondary/junior high/middle school"),
-                                  ('el', "Elementary/primary school"),
-                                  ('none', "None"),
-                                  ('other', "Other"))
+    LEVEL_OF_EDUCATION_CHOICES = (('p', _('Doctorate')),
+                                  ('m', _("Master's or professional degree")),
+                                  ('b', _("Bachelor's degree")),
+                                  ('a', _("Associate's degree")),
+                                  ('hs', _("Secondary/high school")),
+                                  ('jhs', _("Junior secondary/junior high/middle school")),
+                                  ('el', _("Elementary/primary school")),
+                                  ('none', _("None")),
+                                  ('other', _("Other")))
     level_of_education = models.CharField(
                             blank=True, null=True, max_length=6, db_index=True,
                             choices=LEVEL_OF_EDUCATION_CHOICES

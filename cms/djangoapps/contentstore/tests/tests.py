@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django.test.client import Client
 from django.core.urlresolvers import reverse
 
@@ -7,6 +8,7 @@ from contentstore.tests.test_course_settings import CourseTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 import datetime
 from pytz import UTC
+from django.utils.translation import ugettext as _
 
 
 class ContentStoreTestCase(ModuleStoreTestCase):
@@ -126,7 +128,8 @@ class AuthTestCase(ContentStoreTestCase):
 
         # check the the HTML has links to the right login page. Note that this is merely a content
         # check and thus could be fragile should the wording change on this page
-        expected = 'You can now <a href="' + reverse('login') + '">login</a>.'
+        # expected = 'Ngay bây giờ bạn có thể <a href="' + reverse('login') + '">đăng nhập</a>.'.decode('utf-8')
+        expected = _("You can now {link_start}log in{link_end}.").format(link_start='<a href="{url}">'.format(url=reverse('login')), link_end='</a>')
         self.assertIn(expected, resp.content)
 
     def test_private_pages_auth(self):

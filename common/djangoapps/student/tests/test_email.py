@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import json
 import django.db
 
@@ -142,12 +143,12 @@ class EmailChangeRequestTests(TestCase):
 
     def test_invalid_password(self):
         self.request.POST['password'] = 'wrong'
-        self.assertFailedRequest(self.run_request(), 'Invalid password')
+        self.assertFailedRequest(self.run_request(), 'Mật khẩu không hợp lệ')
 
     def test_invalid_emails(self):
         for email in ('bad_email', 'bad_email@', '@bad_email'):
             self.request.POST['new_email'] = email
-            self.assertFailedRequest(self.run_request(), 'Valid e-mail address required.')
+            self.assertFailedRequest(self.run_request(), 'Địa chỉ email yêu cầu hợp lệ.')
 
     def check_duplicate_email(self, email):
         """Test that a request to change a users email to `email` fails"""
@@ -156,7 +157,7 @@ class EmailChangeRequestTests(TestCase):
             'password': 'test',
         })
         request.user = self.user
-        self.assertFailedRequest(self.run_request(request), 'An account with this e-mail already exists.')
+        self.assertFailedRequest(self.run_request(request), 'Một tài khoản với e-mail này đã tồn tại.')
 
     def test_duplicate_email(self):
         UserFactory.create(email=self.new_email)

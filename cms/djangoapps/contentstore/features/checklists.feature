@@ -10,7 +10,6 @@ Feature: Course checklists
     Then I can check and uncheck tasks in a checklist
     And They are correctly selected after I reload the page
 
-  @skip
   Scenario: A task can link to a location within Studio
     Given I have opened Checklists
     When I select a link to the course outline

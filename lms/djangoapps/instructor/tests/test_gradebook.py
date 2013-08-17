@@ -34,11 +34,11 @@ class TestGradebook(ModuleStoreTestCase):
         self.course = CourseFactory.create(**kwargs)
         chapter = ItemFactory.create(
             parent_location=self.course.location,
-            category="sequential",
+            template="i4x://edx/templates/sequential/Empty",
         )
         section = ItemFactory.create(
             parent_location=chapter.location,
-            category="sequential",
+            template="i4x://edx/templates/sequential/Empty",
             metadata={'graded': True, 'format': 'Homework'}
         )
 
@@ -47,11 +47,11 @@ class TestGradebook(ModuleStoreTestCase):
         for user in self.users:
             CourseEnrollmentFactory.create(user=user, course_id=self.course.id)
 
-        for i in xrange(USER_COUNT - 1):
-            category = "problem"
+        for i in xrange(USER_COUNT-1):
+            template_name = "i4x://edx/templates/problem/Blank_Common_Problem"
             item = ItemFactory.create(
                 parent_location=section.location,
-                category=category,
+                template=template_name,
                 data=StringResponseXMLFactory().build_xml(answer='foo'),
                 metadata={'rerandomize': 'always'}
             )

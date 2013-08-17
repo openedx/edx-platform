@@ -1,3 +1,6 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%! from django.utils import translation    %>
+<%!translation.activate('vi')%>
 <%namespace name='static' file='static_content.html'/>
 <%! from django.utils import html %>
 
@@ -14,11 +17,12 @@
 </%def>
 
 <!DOCTYPE html>
+
 <html>
 <head>
   <%block name="title">
     % if stanford_theme_enabled():
-      <title>Home | class.stanford.edu</title>
+      <title>${_("Home | class.stanford.edu")}</title>
     % else:
       <title>edX</title>
       

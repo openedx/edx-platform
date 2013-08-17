@@ -1,6 +1,10 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%! from django.utils import translation    %>
+
+
 <%inherit file="main.html" />
 <%namespace name='static' file='static_content.html'/>
-<%block name="title"><title>${course.number} Textbook</title></%block>
+<%block name="title"><title>${course.number} ${_("Textbook")}</title></%block>
 
 <%block name="headextra">
 <%static:css group='course'/>
@@ -68,7 +72,7 @@ $("#open_close_accordion a").click(function(){
 
     <section aria-label="Textbook Navigation" class="book-sidebar">
       <header id="open_close_accordion">
-        <a href="#">close</a>
+        <a href="#">${_("close")}</a>
       </header>
 
       <ul id="booknav" class="treeview-booknav">
@@ -109,10 +113,10 @@ $("#open_close_accordion a").click(function(){
         <nav>
           <ul>
             <li class="last">
-              <a href="javascript:prev_page()">Previous page</a>
+              <a href="javascript:prev_page()">${_("Previous page")}</a>
             </li>
             <li class="next">
-              <a href="javascript:next_page()">Next page</a>
+              <a href="javascript:next_page()">${_("Next page")}</a>
             </li>
           </ul>
         </nav>

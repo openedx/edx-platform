@@ -33,10 +33,6 @@ MODULESTORE = {
     'direct': {
         'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
         'OPTIONS': modulestore_options
-    },
-    'split': {
-        'ENGINE': 'xmodule.modulestore.split_mongo.SplitMongoModuleStore',
-        'OPTIONS': modulestore_options
     }
 }
 
@@ -64,8 +60,8 @@ DATABASES = {
     }
 }
 
-LMS_BASE = "localhost:8000"
-MITX_FEATURES['PREVIEW_LMS_BASE'] = "localhost:8000"
+LMS_BASE = "203.113.166.221:8000"
+MITX_FEATURES['PREVIEW_LMS_BASE'] = "203.113.166.221:8000"
 
 REPOS = {
     'edx4edx': {

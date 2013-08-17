@@ -8,11 +8,6 @@ PREFERRED_METHOD = PHANTOMJS_PATH.nil? ? 'browser' : 'phantomjs'
 if PHANTOMJS_PATH.nil?
     puts("phantomjs not found on path. Set $PHANTOMJS_PATH. Using browser for jasmine tests".blue)
 end
-LOGDIR = 'logs/jasmine'
-
-CLOBBER.include(LOGDIR)
-
-directory LOGDIR
 
 def django_for_jasmine(system, django_reload)
     if !django_reload
@@ -22,7 +17,7 @@ def django_for_jasmine(system, django_reload)
     port = 10000 + rand(40000)
     jasmine_url = "http://localhost:#{port}/_jasmine/"
 
-    background_process(django_admin(system, 'jasmine', 'runserver', '-v', '0', port.to_s, reload_arg).split(' '), "#{LOGDIR}/django.log")
+    background_process(*django_admin(system, 'jasmine', 'runserver', '-v', '0', port.to_s, reload_arg).split(' '))
 
     up = false
     start_time = Time.now
@@ -85,7 +80,7 @@ end
     namespace :jasmine do
         namespace system do
             desc "Open jasmine tests for #{system} in your default browser"
-            task :browser => [:clean_reports_dir, LOGDIR] do
+            task :browser => [:clean_reports_dir] do
                 Rake::Task[:assets].invoke(system, 'jasmine')
                 django_for_jasmine(system, true) do |jasmine_url|
                     jasmine_browser(jasmine_url)
@@ -93,7 +88,7 @@ end
             end
 
             desc "Open jasmine tests for #{system} in your default browser, and dynamically recompile coffeescript"
-            task :'browser:watch' => [:clean_reports_dir, :'assets:coffee:_watch', LOGDIR] do
+            task :'browser:watch' => [:clean_reports_dir, :'assets:coffee:_watch'] do
                 django_for_jasmine(system, true) do |jasmine_url|
                     jasmine_browser(jasmine_url, jitter=0, wait=0)
                 end
@@ -102,7 +97,7 @@ end
             end
 
             desc "Use phantomjs to run jasmine tests for #{system} from the console"
-            task :phantomjs => [:clean_reports_dir, LOGDIR] do
+            task :phantomjs => [:clean_reports_dir] do
                 Rake::Task[:assets].invoke(system, 'jasmine')
                 phantomjs = ENV['PHANTOMJS_PATH'] || 'phantomjs'
                 django_for_jasmine(system, false) do |jasmine_url|

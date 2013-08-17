@@ -1,5 +1,7 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%! from django.utils import translation    %>
 <html>
-<h1>Tracking Log</h1>
+<h1>${_("Tracking Log")}</h1>
 <table border="1"><tr><th>datetime</th><th>username</th><th>ipaddr</th><th>source</th><th>type</th></tr>
 % for rec in records:
     <tr>

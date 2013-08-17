@@ -1,20 +1,22 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%! from django.utils import translation    %>
 <div class="modal hide fade" id="cheatsheetModal">
 	<a href="#" class="close-btn">×</a>
 	<div id="cheatsheet-body" class="modal-body">
 		<div class="left-column">
 			<section>
-				<h2>Wiki Syntax Help</h2>
-				<p>This wiki uses <strong>Markdown</strong> for styling. There are several useful guides online. See any of the links below for in-depth details:</p>
+				<h2>${_("Wiki Syntax Help")}</h2>
+				<p>${_("This wiki uses <strong>Markdown</strong> for styling. There are several useful guides online. See any of the links below for in-depth details:")}</p>
 				<ul>
-					<li><a href="http://daringfireball.net/projects/markdown/basics" target="_blank">Markdown: Basics</a></li>
-					<li><a href="http://greg.vario.us/doc/markdown.txt" target="_blank">Quick Markdown Syntax Guide</a></li>
-					<li><a href="http://www.lowendtalk.com/discussion/6/miniature-markdown-guide" target="_blank">Miniature Markdown Guide</a></li>
+					<li><a href="http://daringfireball.net/projects/markdown/basics" target="_blank">${_("Markdown: Basics")}</a></li>
+					<li><a href="http://greg.vario.us/doc/markdown.txt" target="_blank">${_("Quick Markdown Syntax Guide")}</a></li>
+					<li><a href="http://www.lowendtalk.com/discussion/6/miniature-markdown-guide" target="_blank">${_("Miniature Markdown Guide")}</a></li>
 				</ul>
-				<p>To create a new wiki article, create a link to it. Clicking the link gives you the creation page.</p>
+				<p>${_("To create a new wiki article, create a link to it. Clicking the link gives you the creation page.")}</p>
 				<pre>[Article Name](wiki:ArticleName)</pre>
 			</section>
 			<section>
-				<h3>edX Additions:</h3>
+				<h3>${_("edX Additions")}:</h3>
 				<pre>
 circuit-schematic:</pre>
 				<pre>

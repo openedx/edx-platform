@@ -1,3 +1,6 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%! from django.utils import translation    %>
+
 <%!
   from django.core.urlresolvers import reverse
   from courseware.courses import course_image_url, get_course_about_section
@@ -8,7 +11,7 @@
 
 <%namespace name='static' file='static_content.html'/>
 
-<%block name="title"><title>Dashboard</title></%block>
+<%block name="title"><title>${_("Dashboard")}</title></%block>
 
 <%block name="js_extra">
   <script type="text/javascript">
@@ -135,7 +138,7 @@
     <section class="user-info">
       <ul>
         <li>
-          <span class="title"><div class="icon name-icon"></div>Full Name (<a href="#apply_name_change" rel="leanModal" class="edit-name">edit</a>)</span> <span class="data">${ user.profile.name | h }</span>
+          <span class="title"><div class="icon name-icon"></div>${_("Full Name")} (<a href="#apply_name_change" rel="leanModal" class="edit-name">${_("edit")}</a>)</span> <span class="data">${ user.profile.name | h }</span>
         </li>
         <li>
           <span class="title"><div class="icon email-icon"></div>Email
@@ -147,7 +150,7 @@
 
         % if external_auth_map is None or 'shib' not in external_auth_map.external_domain:
         <li>
-          <span class="title"><a href="#password_reset_complete" rel="leanModal" id="pwd_reset_button">Reset Password</a></span>
+          <span class="title"><a href="#password_reset_complete" rel="leanModal" id="pwd_reset_button">${_("Reset Password")}</a></span>
           <form id="password_reset_form" method="post" data-remote="true" action="${reverse('password_reset')}">
             <input id="id_email" type="hidden" name="email" maxlength="75" value="${user.email}" />
             <!-- <input type="submit" id="pwd_reset_button" value="Reset Password" /> -->
@@ -163,7 +166,7 @@
     %if news:
     <article class="news-carousel">
       <header>
-        <h4>edX News</h4>
+        <h4>${_("edX News")}</h4>
         <nav class="page-dots">
           <ol>
             <li><a href="#" class="page-dot current"></a></li>
@@ -185,7 +188,7 @@
             %if entry.summary:
             <p>${entry.summary}</p>
             %endif
-            <p><a href="${entry.link}">Learn More ›</a></p>
+            <p><a href="${entry.link}">${_("Learn More")} ›</a></p>
           </div>
         </section>
         %endfor
@@ -196,7 +199,7 @@
 
   <section class="my-courses">
     <header>
-      <h2>Current Courses</h2>
+      <h2>${_("Current Courses")}</h2>
     </header>
 
     % if len(courses) > 0:
@@ -249,27 +252,27 @@
 
                 % if registration is None and testcenter_exam_info.is_registering():
                 <div class="message message-status is-shown exam-register">
-                  <a href="${testcenter_register_target}" class="button exam-button" id="exam_register_button">Register for Pearson exam</a>
-                  <p class="message-copy">Registration for the Pearson exam is now open and will close on <strong>${testcenter_exam_info.registration_end_date_text}</strong></p>
+                  <a href="${testcenter_register_target}" class="button exam-button" id="exam_register_button">${_("Register for Pearson exam")}</a>
+                  <p class="message-copy">${_("Registration for the Pearson exam is now open and will close on")} <strong>${testcenter_exam_info.registration_end_date_text}</strong></p>
                 </div>
                 % endif
                 <!-- display a registration for a current exam, even if the registration period is over -->
                 % if registration is not None:
                     % if registration.is_accepted:
                 <div class="message message-status is-shown exam-schedule">
-                   <a href="${registration.registration_signup_url}" class="button exam-button">Schedule Pearson exam</a>
-                   <p class="exam-registration-number"><a href="${testcenter_register_target}" id="exam_register_link">Registration</a> number: <strong>${registration.client_candidate_id}</strong></p>
-                   <p class="message-copy">Write this down! You’ll need it to schedule your exam.</p>
+                   <a href="${registration.registration_signup_url}" class="button exam-button">${_("Schedule Pearson exam")}</a>
+                   <p class="exam-registration-number"><a href="${testcenter_register_target}" id="exam_register_link">${_("Registration")}</a> ${_("number:")} <strong>${registration.client_candidate_id}</strong></p>
+                   <p class="message-copy">${_("Write this down! You will need it to schedule your exam.")}</p>
                 </div>
                     % endif
                     % if  registration.is_rejected:
                 <div class="message message-status is-shown exam-schedule">
-                  <p class="message-copy"><strong>Your registration for the Pearson exam has been rejected. Please <a href="${testcenter_register_target}" id="exam_register_link">see your registration status details</a></strong>. Otherwise <a class="contact-link" href="mailto:exam-help@edx.org?subject=Pearson VUE Exam - ${get_course_about_section(course, 'university')} ${course.number}">contact edX at exam-help@edx.org</a> for further help.</p>
+                  <p class="message-copy"><strong>${_("Your registration for the Pearson exam has been rejected. Please")} <a href="${testcenter_register_target}" id="exam_register_link">${_("see your registration status details")}</a></strong>. ${_("Otherwise")} <a class="contact-link" href="mailto:exam-help@edx.org?subject=Pearson VUE Exam - ${get_course_about_section(course, 'university')} ${course.number}">${_("contact edX at exam-help@edx.org")}</a> ${_("for further help.")}</p>
                 </div>
                     % endif
                    	% if not registration.is_accepted and not registration.is_rejected:
 	            <div class="message message-status is-shown">
-    	              <p class="message-copy"><strong>Your <a href="${testcenter_register_target}" id="exam_register_link">registration for the Pearson exam</a> is pending</strong>. Within a few days, you should see a confirmation number here, which can be used to schedule your exam.</p>
+    	              <p class="message-copy"><strong>${_("Your")} <a href="${testcenter_register_target}" id="exam_register_link">${_("registration for the Pearson exam")}</a> ${_("is pending")}</strong>. ${_("Within a few days, you should see a confirmation number here, which can be used to schedule your exam.")}</p>
                 </div>
                     % endif
                 % endif
@@ -292,17 +295,16 @@
                 <div class="message message-status ${status_css_class} is-shown">
 
                 % if cert_status['status'] == 'processing':
-                      <p class="message-copy">Final course details are being wrapped up at
-                      this time. Your final standing will be available shortly.</p>
+                      <p class="message-copy">${_("Final course details are being wrapped up at this time. Your final standing will be available shortly.")}</p>
                 % elif cert_status['status'] in ('generating', 'ready', 'notpassing', 'restricted'):
-                      <p class="message-copy">Your final grade:
+                      <p class="message-copy">${_("Your final grade:")}
                       <span class="grade-value">${"{0:.0f}%".format(float(cert_status['grade'])*100)}</span>.
                       % if cert_status['status'] == 'notpassing':
                          Grade required for a certificate: <span class="grade-value">
                            ${"{0:.0f}%".format(float(course.lowest_passing_grade)*100)}</span>.
                       % elif cert_status['status'] == 'restricted':
                           <p class="message-copy">
-                          Your certificate is being held pending confirmation that the issuance of your certificate is in compliance with strict U.S. embargoes on Iran, Cuba, Syria and Sudan. If you think our system has mistakenly identified you as being connected with one of those countries, please let us know by contacting <a class="contact-link" href="mailto:${settings.CONTACT_EMAIL}">${settings.CONTACT_EMAIL}</a>.
+                          ${_("Your certificate is being held pending confirmation that the issuance of your certificate is in compliance with strict U.S. embargoes on Iran, Cuba, Syria and Sudan. If you think our system has mistakenly identified you as being connected with one of those countries, please let us know by contacting")} <a class="contact-link" href="mailto:${settings.CONTACT_EMAIL}">${settings.CONTACT_EMAIL}</a>.
                           </p>
                       % endif
                       </p>
@@ -312,17 +314,17 @@
                   <ul class="actions">
                     % if cert_status['show_disabled_download_button']:
                       <li class="action"><span class="disabled">
-                          Your Certificate is Generating</span></li>
+                          ${_("Your Certificate is Generating")}</span></li>
                     % elif cert_status['show_download_url']:
                       <li class="action">
                       <a class="btn" href="${cert_status['download_url']}"
                          title="This link will open/download a PDF document">
-                         Download Your PDF Certificate</a></li>
+                         ${_("Download Your PDF Certificate")}</a></li>
                     % endif
 
                     % if cert_status['show_survey_button']:
                       <li class="action"><a class="cta" href="${cert_status['survey_url']}">
-                             Complete our course feedback survey</a></li>
+                             ${_("Complete our course feedback survey")}</a></li>
                     % endif
                   </ul>
                 % endif
@@ -332,12 +334,12 @@
 
             % if course.id in show_courseware_links_for:
               % if course.has_ended():
-                <a href="${course_target}" class="enter-course archived">View Archived Course</a>
+                <a href="${course_target}" class="enter-course archived">${_("View Archived Course")}</a>
               % else:
-                <a href="${course_target}" class="enter-course">View Course</a>
+                <a href="${course_target}" class="enter-course">${_("View Course")}</a>
               % endif
             % endif
-            <a href="#unenroll-modal" class="unenroll" rel="leanModal" data-course-id="${course.id}" data-course-number="${course.number}">Unregister</a>
+            <a href="#unenroll-modal" class="unenroll" rel="leanModal" data-course-id="${course.id}" data-course-number="${course.number}">${_("Unregister")}</a>
           </section>
         </article>
 
@@ -346,16 +348,16 @@
       % endfor
     % else:
       <section class="empty-dashboard-message">
-        <p>Looks like you haven't registered for any courses yet.</p>
+        <p>${_("Looks like you haven't registered for any courses yet.")}</p>
         <a href="${marketing_link('COURSES')}">
-            Find courses now!
+            ${_("Find courses now!")}
         </a>
       </section>
     % endif
 
     % if staff_access and len(errored_courses) > 0:
       <div id="course-errors">
-        <h2>Course-loading errors</h2>
+        <h2>${_("Course-loading errors")}</h2>
 
       % for course_dir, errors in errored_courses.items():
          <h3>${course_dir | h}</h3>
@@ -374,7 +376,7 @@
 <section id="unenroll-modal" class="modal unenroll-modal">
   <div class="inner-wrapper">
     <header>
-      <h2>Are you sure you want to unregister from <span id="unenroll_course_number"></span>?</h2>
+      <h2>${_("Are you sure you want to unregister from")} <span id="unenroll_course_number"></span>?</h2>
       <hr/>
     </header>
 
@@ -399,13 +401,13 @@
 <section id="password_reset_complete" class="modal">
   <div class="inner-wrapper">
     <header>
-      <h2>Password Reset Email Sent</h2>
+      <h2>${_("Password Reset Email Sent")}</h2>
       <hr/>
     </header>
     <div>
       <form> <!-- Here for styling reasons -->
         <section>
-          <p>An email has been sent to ${user.email}. Follow the link in the email to change your password.</p>
+          <p>${_("An email has been sent to")} ${user.email}. ${_("Follow the link in the email to change your password.")}</p>
         </section>
       </form>
     </div>
@@ -420,7 +422,7 @@
 <section id="change_email" class="modal">
   <div class="inner-wrapper">
     <header>
-      <h2><span id="change_email_title">Change Email</span></h2>
+      <h2><span id="change_email_title">${_("Change Email")}</span></h2>
       <hr/>
     </header>
     <div id="change_email_body">
@@ -428,13 +430,13 @@
         <div id="change_email_error" class="modal-form-error"> </div>
         <fieldset>
           <div class="input-group">
-            <label>Please enter your new email address:</label>
+            <label>${_("Please enter your new email address:")}</label>
             <input id="new_email_field" type="email" value="" />
-            <label>Please confirm your password:</label>
+            <label>${_("Please confirm your password:")}</label>
             <input id="new_email_password" value="" type="password" />
           </div>
           <section>
-            <p>We will send a confirmation to both ${user.email} and your new email as part of the process.</p>
+            <p>${_("We will send a confirmation to both")} ${user.email} ${_("and your new email as part of the process.")}</p>
           </section>
           <div class="submit">
             <input type="submit" id="submit_email_change" value="Change Email"/>
@@ -453,23 +455,23 @@
 <section id="apply_name_change" class="modal">
   <div class="inner-wrapper">
     <header>
-      <h2>Change your name</h2>
+      <h2>${_("Change your name")}</h2>
       <hr/>
     </header>
     <div id="change_name_body">
       <form id="change_name_form">
         <div id="change_name_error" class="modal-form-error"> </div>
-        <p>To uphold the credibility of ${settings.PLATFORM_NAME} certificates, all name changes will be logged and recorded.</p>
+        <p>${_("To uphold the credibility of")} ${settings.PLATFORM_NAME} ${_("certificates, all name changes will be logged and recorded.")}</p>
         <br/>
         <fieldset>
           <div class="input-group">
-            <label>Enter your desired full name, as it will appear on the ${settings.PLATFORM_NAME} certificates: </label>
+            <label>${_("Enter your desired full name, as it will appear on the")} ${settings.PLATFORM_NAME} ${_("certificates:")} </label>
             <input id="new_name_field" value="" type="text" />
-            <label>Reason for name change:</label>
+            <label>${_("Reason for name change:")}</label>
             <textarea id="name_rationale_field" value=""></textarea>
           </div>
           <div class="submit">
-            <input type="submit" id="submit" value="Change My Name">
+            <input type="submit" id="submit" value=${_("Change My Name")}>
           </div>
         </fieldset>
       </form>

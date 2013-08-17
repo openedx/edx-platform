@@ -1,0 +1,33 @@
+---
+metadata:
+      display_name: Announcement
+
+data: |
+      <h1>Heading of document</h1>
+      <h2>First subheading</h2>
+      <p>This is a paragraph. It will take care of line breaks for you.</p><p>HTML only parses the location
+      
+      of tags for inserting line breaks into your doc, not 
+      line
+      breaks
+      you
+      add
+      yourself.
+      </p>
+      <h2>Links</h2>
+      <p>You can refer to other parts of the internet with a <a href="http://www.wikipedia.org/"> link</a>, to other parts of your course by prepending your link with <a href="/course/Week_0">/course/</a></p>
+      <p>Now a list:</p>
+      <ul>
+      <li>An item</li>
+      <li>Another item</li>
+      <li>And yet another</li>
+      </ul>
+      <p>This list has an ordering </p>
+      <ol>
+      <li>An item</li>
+      <li>Another item</li>
+      <li>Yet another item</li>
+      </ol>
+      <p> Note, we have a lot of standard edX styles, so please try to avoid any custom styling, and make sure that you make a note of any custom styling that you do yourself so that we can incorporate it into 
+      tools that other people can use. </p>
+children: []

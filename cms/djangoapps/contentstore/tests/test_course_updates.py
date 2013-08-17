@@ -36,11 +36,8 @@ class CourseUpdateTest(CourseTestCase):
                                            'provided_id': payload['id']})
         content += '<div>div <p>p<br/></p></div>'
         payload['content'] = content
-        # POST requests were coming in w/ these header values causing an error; so, repro error here
         resp = self.client.post(first_update_url, json.dumps(payload),
-                                "application/json",
-                                HTTP_X_HTTP_METHOD_OVERRIDE="PUT",
-                                REQUEST_METHOD="POST")
+                                "application/json")
 
         self.assertHTMLEqual(content, json.loads(resp.content)['content'],
                              "iframe w/ div")

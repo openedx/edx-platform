@@ -1,4 +1,6 @@
 <%! from django.utils.translation import ugettext as _ %>
+
+
 <%inherit file="base.html" />
 <%block name="title">${_("Grading Settings")}</%block>
 <%block name="bodyclass">is-signedin course grading settings</%block>
@@ -55,7 +57,7 @@ from contentstore import utils
         <section class="group-settings grade-range">
           <header>
             <h2 class="title-2">${_("Overall Grade Range")}</h2>
-            <span class="tip">${_("Your overall grading scale for student final grades")}</span>
+            <span class="tip">${_("Your overall grading scale for student final gradesz")}</span>
           </header>
 
           <ol class="list-input">

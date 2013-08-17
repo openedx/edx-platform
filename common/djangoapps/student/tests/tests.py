@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 This file demonstrates writing tests using the unittest module. These will pass
 when you run "manage.py test".
@@ -55,7 +56,7 @@ class ResetPasswordTests(TestCase):
         bad_pwd_resp = password_reset(bad_pwd_req)
         self.assertEquals(bad_pwd_resp.status_code, 200)
         self.assertEquals(bad_pwd_resp.content, json.dumps({'success': False,
-                                                            'error': 'Invalid e-mail or user'}))
+                                                            'error': 'E-mail hoặc người dùng không hợp lệ'}))
 
     def test_nonexist_email_password_reset(self):
         """Now test the exception cases with of reset_password called with invalid email."""
@@ -64,7 +65,7 @@ class ResetPasswordTests(TestCase):
         bad_email_resp = password_reset(bad_email_req)
         self.assertEquals(bad_email_resp.status_code, 200)
         self.assertEquals(bad_email_resp.content, json.dumps({'success': False,
-                                                              'error': 'Invalid e-mail or user'}))
+                                                              'error': 'E-mail hoặc người dùng không hợp lệ'}))
 
     @unittest.skipUnless(not settings.MITX_FEATURES.get('DISABLE_PASSWORD_RESET_EMAIL_TEST', False),
                          dedent("""Skipping Test because CMS has not provided necessary templates for password reset.
@@ -83,7 +84,7 @@ class ResetPasswordTests(TestCase):
 
         ((subject, msg, from_addr, to_addrs), sm_kwargs) = send_email.call_args
         self.assertIn("Password reset", subject)
-        self.assertIn("You're receiving this e-mail because you requested a password reset", msg)
+        self.assertIn("Bạn nhận được e-mail này vì bạn yêu cầu thiết lập lại mật khẩu", msg)
         self.assertEquals(from_addr, settings.DEFAULT_FROM_EMAIL)
         self.assertEquals(len(to_addrs), 1)
         self.assertIn(self.user.email, to_addrs)

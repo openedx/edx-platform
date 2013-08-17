@@ -1,11 +1,12 @@
 <%! from django.core.urlresolvers import reverse %>
 <%! from django.utils.translation import ugettext as _ %>
 
+
+
 <div class="wrapper-header wrapper" id="view-top">
   <header class="primary" role="banner">
 
     <div class="wrapper wrapper-l">
-      ## "edX Studio" should not be translated
       <h1 class="branding"><a href="/"><img src="/static/img/logo-edx-studio.png" alt="edX Studio" /></a></h1>
 
       % if context_course:
@@ -19,7 +20,7 @@
       </h2>
 
       <nav class="nav-course nav-dd ui-left">
-        <h2 class="sr">${_("{course_name}'s Navigation:").format(course_name=context_course.display_name_with_default)}</h2>
+        <h2 class="sr">${_("{}'s Navigation:".format(context_course.display_name_with_default))}</h2>
         <ol>
           <li class="nav-item nav-course-courseware">
             <h3 class="title"><span class="label"><span class="label-prefix sr">${_("Course")} </span>${_("Content")}</span> <i class="icon-caret-down ui-toggle-dd"></i></h3>
@@ -107,13 +108,13 @@
               <div class="nav-sub">
                 <ul>
                   <li class="nav-item nav-help-documentation">
-                    <a href="http://files.edx.org/Getting_Started_with_Studio.pdf" title="${_("This is a PDF Document")}">${_("Studio Documentation")}</a>
+                    <a href="http://files.edx.org/Getting_Started_with_Studio.pdf" title="This is a PDF Document">${_("Studio Documentation")}</a>
                   </li>
                   <li class="nav-item nav-help-helpcenter">
                     <a href="http://help.edge.edx.org/" rel="external">${_("Studio Help Center")}</a>
                   </li>
                   <li class="nav-item nav-help-feedback">
-                    <a href="http://help.edge.edx.org/discussion/new" class="show-tender" title="${_("Use our feedback tool, Tender, to share your feedback")}">${_("Contact Us")}</a>
+                    <a href="http://help.edge.edx.org/discussion/new" class="show-tender" title="Use our feedback tool, Tender, to share your feedback">${_("Contact Us")}</a>
                   </li>
                 </ul>
               </div>
@@ -121,7 +122,7 @@
           </li>
 
           <li class="nav-item nav-account-user">
-            <h3 class="title"><span class="label"><span class="label-prefix sr">${_("Currently signed in as:")}</span><span class="account-username" title="${ user.username }">${ user.username }</span></span> <i class="icon-caret-down ui-toggle-dd"></i></h3>
+            <h3 class="title"><span class="label"><span class="label-prefix sr">${_("Currently signed in as")}:</span><span class="account-username" title="${ user.username }">${ user.username }</span></span> <i class="icon-caret-down ui-toggle-dd"></i></h3>
 
             <div class="wrapper wrapper-nav-sub">
               <div class="nav-sub">

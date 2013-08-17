@@ -7,7 +7,7 @@ from . import BaseTestXmodule
 class TestVideo(BaseTestXmodule):
     """Integration tests: web client + mongo."""
 
-    TEMPLATE_NAME = "video"
+    TEMPLATE_NAME = "i4x://edx/templates/video/default"
     DATA = '<video  youtube="0.75:JMD_ifUUfsU,1.0:OEoXaMPEzfM,1.25:AKqURZnYqpk,1.50:DYpADpL7jAY"/>'
 
     def test_handle_ajax_dispatch(self):

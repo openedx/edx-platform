@@ -1,5 +1,8 @@
-/<%! from django.utils.translation import ugettext as _ %>
+<%! from django.utils.translation import ugettext as _ %>
+
+
 <%inherit file="base.html" />
+
 <%!
    import logging
    from xmodule.util import date_utils
@@ -12,7 +15,7 @@
 <%namespace name="units" file="widgets/units.html" />
 
 <%block name="jsextra">
-<link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
+  <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
   <script src="${static.url('js/vendor/timepicker/jquery.timepicker.js')}"></script>
   <script src="${static.url('js/vendor/timepicker/datepair.js')}"></script>
   <script src="${static.url('js/vendor/date.js')}"></script>
@@ -61,13 +64,12 @@
   <script type="text/template" id="new-section-template">
     <section class="courseware-section branch new-section">
       <header>
-      <a href="#"  data-tooltip="${_('Collapse/expand this section')}" class="expand-collapse-icon collapse"></a>
+        <a href="#"  data-tooltip="Collapse/expand this section" class="expand-collapse-icon collapse"></a>
         <div class="item-details">
           <h3 class="section-name">
           <form class="section-name-form">
             <input type="text" value="${_('New Section Name')}" class="new-section-name" />
-            <input type="submit" class="new-section-name-save" data-parent="${parent_location}"
-                   data-category="${new_section_category}" value="${_('Save')}" />
+            <input type="submit" class="new-section-name-save" data-parent="${parent_location}" data-template="${new_section_template}" value="${_('Save')}" />
             <input type="button" class="new-section-name-cancel" value="${_('Cancel')}" /></h3>
           </form>
         </div>
@@ -78,20 +80,19 @@
   <script type="text/template" id="blank-slate-template">
     <section class="courseware-section branch new-section">
       <header>
-      <a href="#"  data-tooltip="${_('Collapse/expand this section')}" class="expand-collapse-icon collapse"></a>
+        <a href="#"  data-tooltip="Collapse/expand this section" class="expand-collapse-icon collapse"></a>
         <div class="item-details">
           <h3 class="section-name">
-          <span class="section-name-span">Click here to set the section name</span>
+          <span class="section-name-span">${_("Click here to set the section name")}</span>
           <form class="section-name-form">
             <input type="text" value="${_('New Section Name')}" class="new-section-name" />
-            <input type="submit" class="new-section-name-save" data-parent="${parent_location}"
-                   data-category="${new_section_category}" value="${_('Save')}" />
-            <input type="button" class="new-section-name-cancel" value="$(_('Cancel')}" /></h3>
+            <input type="submit" class="new-section-name-save" data-parent="${parent_location}" data-template="${new_section_template}" value="${_('Save')}" />
+            <input type="button" class="new-section-name-cancel" value="${_('Cancel')}" /></h3>
           </form>
         </div>
         <div class="item-actions">
-          <a href="#" data-tooltip="${_('Delete this section')}" class="delete-button delete-section-button"><span class="delete-icon"></span></a>
-          <a href="#" data-tooltip="${_('Drag to re-order')}" class="drag-handle"></a>
+          <a href="#" data-tooltip="Delete this section" class="delete-button delete-section-button"><span class="delete-icon"></span></a>
+          <a href="#" data-tooltip="Drag to re-order" class="drag-handle"></a>
         </div>
       </header>
     </section>
@@ -112,7 +113,7 @@
       <ol>
         <li>
           <a href="unit.html" class="new-unit-item">
-            <span class="new-unit-icon"></span>${_('New Unit')}
+            <span class="new-unit-icon"></span>${_("New Unit")}
           </a>
         </li>
       </ol>
@@ -121,6 +122,7 @@
 </%block>
 
 <%block name="content">
+
   <div class="wrapper-mast wrapper">
     <header class="mast has-actions has-subtitle">
       <h1 class="page-header">
@@ -151,7 +153,7 @@
         % for section in sections:
         <section class="courseware-section branch" data-id="${section.location}">
           <header>
-          <a href="#" data-tooltip="${_('Expand/collapse this section')}" class="expand-collapse-icon collapse"></a>
+            <a href="#" data-tooltip="Expand/collapse this section" class="expand-collapse-icon collapse"></a>
 
             <div class="item-details" data-id="${section.location}">
               <h3 class="section-name" data-name="${section.display_name_with_default | h}"></h3>
@@ -177,13 +179,13 @@
             </div>
 
             <div class="item-actions">
-              <a href="#" data-tooltip="${_('Delete this section')}" class="delete-button delete-section-button"><span class="delete-icon"></span></a>
-              <a href="#" data-tooltip="${_('Drag to reorder')}" class="drag-handle"></a>
+              <a href="#" data-tooltip="Delete this section" class="delete-button delete-section-button"><span class="delete-icon"></span></a>
+              <a href="#" data-tooltip="Drag to reorder" class="drag-handle"></a>
             </div>
           </header>
           <div class="subsection-list">
             <div class="list-header">
-              <a href="#" class="new-subsection-item" data-category="${new_subsection_category}">
+              <a href="#" class="new-subsection-item" data-template="${new_subsection_template}">
                 <span class="new-folder-icon"></span>${_("New Subsection")}
               </a>
             </div>
@@ -192,21 +194,22 @@
               <li class="branch collapsed id-holder" data-id="${subsection.location}">
                 <div class="section-item">
                   <div class="details">
-                    <a href="#" data-tooltip="${_('Expand/collapse this subsection')}" class="expand-collapse-icon expand"></a>
+                    <a href="#" data-tooltip="Expand/collapse this subsection" class="expand-collapse-icon expand"></a>
                     <a href="${reverse('edit_subsection', args=[subsection.location])}">
                       <span class="folder-icon"></span>
                       <span class="subsection-name"><span class="subsection-name-value">${subsection.display_name_with_default}</span></span>
                     </a>
                   </div>
 
-                  <div class="gradable-status" data-initial-status="${subsection.lms.format if subsection.lms.format is not None else _('Not Graded')}">
+                  <div class="gradable-status" data-initial-status="${subsection.lms.format if subsection.lms.format is not None else 'Not Graded'}">
                   </div>
 
                   <div class="item-actions">
-                    <a href="#" data-tooltip="${_('Delete this subsection')}" class="delete-button delete-subsection-button"><span class="delete-icon"></span></a>
-                    <a href="#" data-tooltip="${_('Drag to reorder')}" class="drag-handle"></a>
+                    <a href="#" data-tooltip="Delete this subsection" class="delete-button delete-subsection-button"><span class="delete-icon"></span></a>
+                    <a href="#" data-tooltip="Drag to reorder" class="drag-handle"></a>
                   </div>
                 </div>
+
                 ${units.enum_units(subsection)}
               </li>
               % endfor
@@ -228,12 +231,12 @@
           <input class="start-date date" type="text" name="start_date" value="" placeholder="MM/DD/YYYY" class="date" size='15' autocomplete="off"/>
         </div>
         <div class="field field-start-time">
-          <label for="">${_("Release Time")} (<abbr title="${_("Coordinated Universal Time")}">UTC</abbr>)</label>
+          <label for="">${_("Release Time")} (<abbr title="Coordinated Universal Time">UTC</abbr>)</label>
           <input class="start-time time" type="text" name="start_time" value="" placeholder="HH:MM" class="time" size='10' autocomplete="off"/>
         </div>
 
         <div class="description">
-          <p>${_('On the date set above, this section - {name} - will be released to students. Any units marked private will only be visible to admins.').format(name='<strong class="section-name"></strong>')}</p>
+          <p>${_("On the date set above, this section")} – <strong class="section-name"></strong> – ${_("will be released to students. Any units marked private will only be visible to admins.")}</p>
         </div>
       </div>
       <a href="#" class="save-button">${_("Save")}</a><a href="#" class="cancel-button">${_("Cancel")}</a>

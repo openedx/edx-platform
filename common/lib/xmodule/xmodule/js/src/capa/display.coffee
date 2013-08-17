@@ -22,6 +22,7 @@ class @Problem
 
     @$('section.action input:button').click @refreshAnswers
     @$('section.action input.check').click @check_fd
+    #@$('section.action input.check').click @check
     @$('section.action input.reset').click @reset
     @$('section.action button.show').click @show
     @$('section.action input.save').click @save
@@ -35,34 +36,15 @@ class @Problem
       @$('input.math').each (index, element) =>
         MathJax.Hub.Queue [@refreshMath, null, element]
 
-  renderProgressState: =>
-    detail = @el.data('progress_detail')
-    status = @el.data('progress_status')
-    # i18n
-    progress = "(#{detail} points)"
-    if status == 'none' and detail? and detail.indexOf('/') > 0
-        a = detail.split('/')
-        possible = parseInt(a[1])
-        if possible == 1
-            # i18n
-            progress = "(#{possible} point possible)"
-        else
-            # i18n
-            progress = "(#{possible} points possible)"
-    @$('.problem-progress').html(progress)
-
   updateProgress: (response) =>
     if response.progress_changed
-        @el.data('progress_status', response.progress_status)
-        @el.data('progress_detail', response.progress_detail)
+        @el.attr progress: response.progress_status
         @el.trigger('progressChanged')
-    @renderProgressState()
 
   forceUpdate: (response) =>
-    @el.data('progress_status', response.progress_status)
-    @el.data('progress_detail', response.progress_detail)
+    @el.attr progress: response.progress_status
     @el.trigger('progressChanged')
-    @renderProgressState()
+
 
   queueing: =>
     @queued_items = @$(".xqueue")
@@ -132,7 +114,7 @@ class @Problem
           @setupInputTypes()
           @bind()
           @queueing()
-          @forceUpdate response
+
 
   # TODO add hooks for problem types here by inspecting response.html and doing
   # stuff if a div w a class is found
@@ -180,6 +162,9 @@ class @Problem
   #       maybe preferable to consolidate all dispatches to use FormData
   ###
   check_fd: =>
+    # Calling check from check_fd will result in firing the 'problem_check' event twice, since it is also called in the check function.
+    #Logger.log 'problem_check', @answers
+
     # If there are no file inputs in the problem, we can fall back on @check
     if $('input:file').length == 0
       @check()
@@ -254,12 +239,6 @@ class @Problem
   check: =>
     @check_waitfor()
     Logger.log 'problem_check', @answers
-
-    # Segment.io
-    analytics.track "Problem Checked",
-      problem_id: @id
-      answers: @answers
-
     $.postWithPrefix "#{@url}/problem_check", @answers, (response) =>
       switch response.success
         when 'incorrect', 'correct'
@@ -422,14 +401,6 @@ class @Problem
       answer = JSON.parse(answers[answer_id])
       display.showAnswer(answer)
 
-    choicetextgroup: (element, display, answers) =>
-      element = $(element)
-
-      input_id = element.attr('id').replace(/inputtype_/,'')
-      answer = answers[input_id]
-      for choice in answer
-        element.find("section#forinput#{choice}").addClass 'choicetextgroup_show_correct'
-
   inputtypeHideAnswerMethods:
     choicegroup: (element, display) =>
       element = $(element)
@@ -437,7 +408,3 @@ class @Problem
 
     javascriptinput: (element, display) =>
       display.hideAnswer()
-
-    choicetextgroup: (element, display) =>
-      element = $(element)
-      element.find("section[id^='forinput']").removeClass('choicetextgroup_show_correct')

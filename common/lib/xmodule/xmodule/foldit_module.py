@@ -91,18 +91,15 @@ class FolditModule(FolditFields, XModule):
             PuzzleComplete.completed_puzzles(self.system.anonymous_student_id),
             key=lambda d: (d['set'], d['subset']))
 
-    def puzzle_leaders(self, n=10, courses=None):
+    def puzzle_leaders(self, n=10):
         """
         Returns a list of n pairs (user, score) corresponding to the top
         scores; the pairs are in descending order of score.
         """
         from foldit.models import Score
 
-        if courses is None:
-            courses = [self.location.course_id]
-
-        leaders = [(leader['username'], leader['score']) for leader in Score.get_tops_n(10, course_list=courses)]
-        leaders.sort(key=lambda x: -x[1])
+        leaders = [(e['username'], e['score']) for e in Score.get_tops_n(10)]
+        leaders.sort(key=lambda x:-x[1])
 
         return leaders
 
@@ -187,6 +184,7 @@ class FolditDescriptor(FolditFields, XmlDescriptor, EditingDescriptor):
     filename_extension = "xml"
 
     has_score = True
+    template_dir_name = "foldit"
 
     js = {'coffee': [resource_string(__name__, 'js/src/html/edit.coffee')]}
     js_module_name = "HTMLEditingDescriptor"

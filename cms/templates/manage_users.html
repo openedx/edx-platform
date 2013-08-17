@@ -1,4 +1,6 @@
 <%! from django.utils.translation import ugettext as _ %>
+<%! from django.utils import translation    %>
+
 <%inherit file="base.html" />
 <%block name="title">${_("Course Team Settings")}</%block>
 <%block name="bodyclass">is-signedin course users settings team</%block>
@@ -17,7 +19,7 @@
       <ul>
         %if allow_actions:
         <li class="nav-item">
-          <a href="#" class="button new-button new-user-button"><i class="icon-plus"></i> ${_("New User")}</a>
+          <a href="#" class="button new-button new-user-button"><i class="icon-plus"></i>${_("New User")}</a>
         </li>
         %endif
       </ul>
@@ -38,8 +40,8 @@
         <div id="result"></div>
         <div class="form-elements">
           <label>email: </label><input type="text" id="email" class="email-input" autocomplete="off" placeholder="email@example.com">
-          <input type="submit" value="Add User" id="add_user" class="add-button" />
-          <input type="button" value="Cancel" class="cancel-button" />
+          <input type="submit" value="${_('Add User')}" id="add_user" class="add-button" />
+          <input type="button" value="${_('Cancel')}" class="cancel-button" />
         </div>
       </form>
       %endif
@@ -68,8 +70,6 @@
 <%block name="jsextra">
 <script type="text/javascript">
   var $newUserForm;
-  var addUserPostbackUrl = "${add_user_postback_url}";
-  var removeUserPostbackUrl = "${remove_user_postback_url}";
 
   function showNewUserForm(e) {
     e.preventDefault();
@@ -94,19 +94,16 @@
     e.preventDefault();
 
     $.ajax({
-      url: addUserPostbackUrl,
+      url: '${add_user_postback_url}',
       type: 'POST',
       dataType: 'json',
       contentType: 'application/json',
-      data: JSON.stringify({ 'email': $('#email').val()}),
-      success: function(data) {
-        location.reload();
-      },
-      notifyOnError: false,
-      error: function(jqXHR, textStatus, errorThrown) {
-        data = JSON.parse(jqXHR.responseText);
+      data:JSON.stringify({ 'email': $('#email').val()}),
+    }).done(function(data) {
+      if (data.ErrMsg != undefined)
         $('#result').show().empty().append(data.ErrMsg);
-      }
+      else
+        location.reload();
     });
   }
 
@@ -121,7 +118,7 @@
 
     $('.remove-user').click(function() {
       $.ajax({
-        url: removeUserPostbackUrl,
+        url: '${remove_user_postback_url}',
         type: 'POST',
         dataType: 'json',
         contentType: 'application/json',

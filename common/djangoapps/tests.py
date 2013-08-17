@@ -23,15 +23,15 @@ class TestXmoduleModfiers(ModuleStoreTestCase):
             number='313', display_name='histogram test')
         section = ItemFactory.create(
             parent_location=course.location, display_name='chapter hist',
-            category='chapter')
+            template='i4x://edx/templates/chapter/Empty')
         problem = ItemFactory.create(
             parent_location=section.location, display_name='problem hist 1',
-            category='problem')
+            template='i4x://edx/templates/problem/Blank_Common_Problem')
         problem.has_score = False  # don't trip trying to retrieve db data
 
         late_problem = ItemFactory.create(
             parent_location=section.location, display_name='problem hist 2',
-            category='problem')
+            template='i4x://edx/templates/problem/Blank_Common_Problem')
         late_problem.lms.start = datetime.datetime.now(UTC) + datetime.timedelta(days=32)
         late_problem.has_score = False
 

@@ -730,6 +730,7 @@ class OpenEndedDescriptor():
     filename_extension = "xml"
 
     has_score = True
+    template_dir_name = "openended"
 
     def __init__(self, system):
         self.system = system

@@ -13,21 +13,12 @@ from xmodule.html_checker import check_html
 from xmodule.stringify import stringify_children
 from xmodule.x_module import XModule
 from xmodule.xml_module import XmlDescriptor, name_to_pathname
-import textwrap
 
 log = logging.getLogger("mitx.courseware")
 
 
 class HtmlFields(object):
-    display_name = String(
-        display_name="Display Name",
-        help="This name appears in the horizontal navigation at the top of the page.",
-        scope=Scope.settings,
-        # it'd be nice to have a useful default but it screws up other things; so,
-        # use display_name_with_default for those
-        default="Blank HTML Page"
-    )
-    data = String(help="Html contents to display for this module", default="", scope=Scope.content)
+    data = String(help="Html contents to display for this module", scope=Scope.content)
     source_code = String(help="Source code for LaTeX documents. This feature is not well-supported.", scope=Scope.settings)
 
 
@@ -41,7 +32,7 @@ class HtmlModule(HtmlFields, XModule):
     css = {'scss': [resource_string(__name__, 'css/html/display.scss')]}
 
     def get_html(self):
-        if self.system.anonymous_student_id:
+        if self.system.anonymous_student_id: 
             return self.data.replace("%%USER_ID%%", self.system.anonymous_student_id)
         return self.data
 
@@ -167,9 +158,9 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):
                                                     pathname=pathname)
 
         resource_fs.makedir(os.path.dirname(filepath), recursive=True, allow_recreate=True)
-        with resource_fs.open(filepath, 'w') as filestream:
+        with resource_fs.open(filepath, 'w') as file:
             html_data = self.data.encode('utf-8')
-            filestream.write(html_data)
+            file.write(html_data)
 
         # write out the relative name
         relname = path(pathname).basename()
@@ -178,88 +169,26 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):
         elt.set("filename", relname)
         return elt
 
-class AboutFields(object):
-    display_name = String(
-        help="Display name for this module",
-        scope=Scope.settings,
-        default="overview",
-    )
-    data = String(
-        help="Html contents to display for this module",
-        default="",
-        scope=Scope.content
-    )
 
-class AboutModule(AboutFields, HtmlModule):
-    """
-    Overriding defaults but otherwise treated as HtmlModule.
-    """
-    pass
-
-class AboutDescriptor(AboutFields, HtmlDescriptor):
+class AboutDescriptor(HtmlDescriptor):
     """
     These pieces of course content are treated as HtmlModules but we need to overload where the templates are located
     in order to be able to create new ones
     """
     template_dir_name = "about"
-    module_class = AboutModule
-
-class StaticTabFields(object):
-    """
-    The overrides for Static Tabs
-    """
-    display_name = String(
-        display_name="Display Name",
-        help="This name appears in the horizontal navigation at the top of the page.",
-        scope=Scope.settings,
-        default="Empty",
-    )
-    data = String(
-        default=textwrap.dedent("""\
-            <p>This is where you can add additional pages to your courseware. Click the 'edit' button to begin editing.</p>
-        """),
-        scope=Scope.content,
-        help="HTML for the additional pages"
-    )
 
 
-class StaticTabModule(StaticTabFields, HtmlModule):
-    """
-    Supports the field overrides
-    """
-    pass
-
-class StaticTabDescriptor(StaticTabFields, HtmlDescriptor):
+class StaticTabDescriptor(HtmlDescriptor):
     """
     These pieces of course content are treated as HtmlModules but we need to overload where the templates are located
     in order to be able to create new ones
     """
-    template_dir_name = None
-    module_class = StaticTabModule
+    template_dir_name = "statictab"
 
 
-class CourseInfoFields(object):
-    """
-    Field overrides
-    """
-    data = String(
-        help="Html contents to display for this module",
-        default="<ol></ol>",
-        scope=Scope.content
-    )
-
-
-class CourseInfoModule(CourseInfoFields, HtmlModule):
-    """
-    Just to support xblock field overrides
-    """
-    pass
-
-
-class CourseInfoDescriptor(CourseInfoFields, HtmlDescriptor):
+class CourseInfoDescriptor(HtmlDescriptor):
     """
     These pieces of course content are treated as HtmlModules but we need to overload where the templates are located
     in order to be able to create new ones
     """
-    template_dir_name = None
-    module_class = CourseInfoModule
+    template_dir_name = "courseinfo"

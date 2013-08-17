@@ -2,6 +2,12 @@
 // ====================
 
 body.course.updates {
+	
+	h2 {
+		margin-bottom: 24px;
+		font-size: 22px;
+		font-weight: 300;
+	}
 
 	.course-info-wrapper {
 		display: table;
@@ -174,10 +180,9 @@ body.course.updates {
 	border-left: none;
 	background: $lightGrey;
 
-	.title {
-		margin-bottom: 24px;
-		font-size: 22px;
-		font-weight: 300;
+	h2 {
+		font-size: 18px;
+		font-weight: 700;
 	}
 
 	.edit-button {

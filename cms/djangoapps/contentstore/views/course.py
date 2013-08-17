@@ -1,9 +1,13 @@
 """
 Views related to operations on course objects
 """
+#pylint: disable=W0402
 import json
 import random
-import string  # pylint: disable=W0402
+import string
+import sys
+reload(sys)
+sys.setdefaultencoding("utf-8")
 
 from django.contrib.auth.decorators import login_required
 from django_future.csrf import ensure_csrf_cookie
@@ -42,8 +46,8 @@ from .component import (
     ADVANCED_COMPONENT_POLICY_KEY)
 
 from django_comment_common.utils import seed_permissions_roles
-
-from xmodule.html_module import AboutDescriptor
+import datetime
+from django.utils.timezone import UTC
 __all__ = ['course_index', 'create_new_course', 'course_info',
            'course_info_updates', 'get_course_settings',
            'course_config_graders_page',
@@ -81,11 +85,10 @@ def course_index(request, org, course, name):
         'sections': sections,
         'course_graders': json.dumps(CourseGradingModel.fetch(course.location).graders),
         'parent_location': course.location,
-        'new_section_category': 'chapter',
-        'new_subsection_category': 'sequential',
+        'new_section_template': Location('i4x', 'edx', 'templates', 'chapter', 'Empty'),
+        'new_subsection_template': Location('i4x', 'edx', 'templates', 'sequential', 'Empty'),  # for now they are the same, but the could be different at some point...
         'upload_asset_callback_url': upload_asset_callback_url,
-        'new_unit_category': 'vertical',
-        'category': 'vertical'
+        'create_new_unit_template': Location('i4x', 'edx', 'templates', 'vertical', 'Empty')
     })
 
 
@@ -98,10 +101,17 @@ def create_new_course(request):
     if not is_user_in_creator_group(request.user):
         raise PermissionDenied()
 
+    # This logic is repeated in xmodule/modulestore/tests/factories.py
+    # so if you change anything here, you need to also change it there.
+    # TODO: write a test that creates two courses, one with the factory and
+    # the other with this method, then compare them to make sure they are
+    # equivalent.
+    template = Location(request.POST['template'])
     org = request.POST.get('org')
     number = request.POST.get('number')
     display_name = request.POST.get('display_name')
-
+    display_name=display_name.decode('utf-8')
+    org=org.decode('utf-8')
     try:
         dest_location = Location('i4x', org, number, 'course', Location.clean(display_name))
     except InvalidLocationError as error:
@@ -115,31 +125,29 @@ def create_new_course(request):
         existing_course = modulestore('direct').get_item(dest_location)
     except ItemNotFoundError:
         pass
+
     if existing_course is not None:
         return JsonResponse({'ErrMsg': 'There is already a course defined with this name.'})
 
     course_search_location = ['i4x', dest_location.org, dest_location.course, 'course', None]
     courses = modulestore().get_items(course_search_location)
+
     if len(courses) > 0:
         return JsonResponse({'ErrMsg': 'There is already a course defined with the same organization and course number.'})
 
-    # instantiate the CourseDescriptor and then persist it
-    # note: no system to pass
-    if display_name is None:
-        metadata = {}
-    else:
-        metadata = {'display_name': display_name}
-    modulestore('direct').create_and_save_xmodule(dest_location, metadata=metadata)
-    new_course = modulestore('direct').get_item(dest_location)
+    new_course = modulestore('direct').clone_item(template, dest_location)
 
-    # clone a default 'about' overview module as well
-    dest_about_location = dest_location.replace(category='about', name='overview')
-    overview_template = AboutDescriptor.get_template('overview.yaml')
-    modulestore('direct').create_and_save_xmodule(
-        dest_about_location,
-        system=new_course.system,
-        definition_data=overview_template.get('data')
-    )
+    # clone a default 'about' module as well
+
+    about_template_location = Location(['i4x', 'edx', 'templates', 'about', 'overview'])
+    dest_about_location = dest_location._replace(category='about', name='overview')
+    modulestore('direct').clone_item(about_template_location, dest_about_location)
+
+    if display_name is not None:
+        new_course.display_name = display_name
+
+    # set a default start date to now
+    new_course.start = datetime.datetime.now(UTC())
 
     initialize_course_tabs(new_course)
 
@@ -175,7 +183,6 @@ def course_info(request, org, course, name, provided_id=None):
 
 
 @expect_json
-@require_http_methods(("GET", "POST", "PUT", "DELETE"))
 @login_required
 @ensure_csrf_cookie
 def course_info_updates(request, org, course, provided_id=None):
@@ -206,7 +213,7 @@ def course_info_updates(request, org, course, provided_id=None):
         except:
             return HttpResponseBadRequest("Failed to delete",
                                           content_type="text/plain")
-    elif request.method in ('POST', 'PUT'):  # can be either and sometimes django is rewriting one to the other
+    elif request.method == 'POST':
         try:
             return JsonResponse(update_course_updates(location, request.POST, provided_id))
         except:
@@ -300,7 +307,7 @@ def course_settings_updates(request, org, course, name, section):
     if request.method == 'GET':
         # Cannot just do a get w/o knowing the course name :-(
         return JsonResponse(manager.fetch(Location(['i4x', org, course, 'course', name])), encoder=CourseSettingsEncoder)
-    elif request.method in ('POST', 'PUT'):  # post or put, doesn't matter.
+    elif request.method == 'POST':  # post or put, doesn't matter.
         return JsonResponse(manager.update_from_json(request.POST), encoder=CourseSettingsEncoder)
 
 
@@ -479,7 +486,7 @@ def textbook_index(request, org, course, name):
     if request.is_ajax():
         if request.method == 'GET':
             return JsonResponse(course_module.pdf_textbooks)
-        elif request.method in ('POST', 'PUT'):  # can be either and sometimes django is rewriting one to the other
+        elif request.method == 'POST':
             try:
                 textbooks = validate_textbooks_json(request.body)
             except TextbookValidationError as err:
@@ -495,9 +502,6 @@ def textbook_index(request, org, course, name):
             if not any(tab['type'] == 'pdf_textbooks' for tab in course_module.tabs):
                 course_module.tabs.append({"type": "pdf_textbooks"})
             course_module.pdf_textbooks = textbooks
-            # Save the data that we've just changed to the underlying
-            # MongoKeyValueStore before we update the mongo datastore.
-            course_module.save()
             store.update_metadata(course_module.location, own_metadata(course_module))
             return JsonResponse(course_module.pdf_textbooks)
     else:
@@ -544,9 +548,6 @@ def create_textbook(request, org, course, name):
         tabs = course_module.tabs
         tabs.append({"type": "pdf_textbooks"})
         course_module.tabs = tabs
-    # Save the data that we've just changed to the underlying
-    # MongoKeyValueStore before we update the mongo datastore.
-    course_module.save()
     store.update_metadata(course_module.location, own_metadata(course_module))
     resp = JsonResponse(textbook, status=201)
     resp["Location"] = reverse("textbook_by_id", kwargs={
@@ -580,7 +581,7 @@ def textbook_by_id(request, org, course, name, tid):
         if not textbook:
             return JsonResponse(status=404)
         return JsonResponse(textbook)
-    elif request.method in ('POST', 'PUT'):  # can be either and sometimes django is rewriting one to the other
+    elif request.method in ('POST', 'PUT'):
         try:
             new_textbook = validate_textbook_json(request.body)
         except TextbookValidationError as err:
@@ -590,13 +591,10 @@ def textbook_by_id(request, org, course, name, tid):
             i = course_module.pdf_textbooks.index(textbook)
             new_textbooks = course_module.pdf_textbooks[0:i]
             new_textbooks.append(new_textbook)
-            new_textbooks.extend(course_module.pdf_textbooks[i + 1:])
+            new_textbooks.extend(course_module.pdf_textbooks[i+1:])
             course_module.pdf_textbooks = new_textbooks
         else:
             course_module.pdf_textbooks.append(new_textbook)
-        # Save the data that we've just changed to the underlying
-        # MongoKeyValueStore before we update the mongo datastore.
-        course_module.save()
         store.update_metadata(course_module.location, own_metadata(course_module))
         return JsonResponse(new_textbook, status=201)
     elif request.method == 'DELETE':
@@ -604,8 +602,7 @@ def textbook_by_id(request, org, course, name, tid):
             return JsonResponse(status=404)
         i = course_module.pdf_textbooks.index(textbook)
         new_textbooks = course_module.pdf_textbooks[0:i]
-        new_textbooks.extend(course_module.pdf_textbooks[i + 1:])
+        new_textbooks.extend(course_module.pdf_textbooks[i+1:])
         course_module.pdf_textbooks = new_textbooks
-        course_module.save()
         store.update_metadata(course_module.location, own_metadata(course_module))
         return JsonResponse()

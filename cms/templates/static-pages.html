@@ -1,18 +1,20 @@
 <%! from django.utils.translation import ugettext as _ %>
+
+
 <%inherit file="base.html" />
 <%! from django.core.urlresolvers import reverse %>
-<%block name="title">${_("Static Pages")}</%block>
+<%block name="title">Static Pages</%block>
 <%block name="bodyclass">static-pages</%block>
 
 <%block name="content">
 <div class="main-wrapper">
   <div class="inner-wrapper">
-    <h1>Static Pages</h1>
+    <h1>${_("Static Pages")}</h1>
     <div class="page-actions">
       
     </div>
     <article class="static-page-overview">
-    <a href="#" class="new-static-page-button wip-box"><span class="plus-icon"></span> ${_("New Static Page")}</a>
+      <a href="#" class="new-static-page-button wip-box"><span class="plus-icon"></span> ${_("New Static Page")}</a>
       <ul class="static-page-list">
         <li class="static-page-item">
           <a href="#" class="page-name">${_("Course Info")}</a>

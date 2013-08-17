@@ -1,6 +1,6 @@
 from access import has_access
 from util.json_request import expect_json
-
+from django.utils.translation import ugettext as _
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
@@ -28,10 +28,10 @@ def initialize_course_tabs(course):
     # This logic is repeated in xmodule/modulestore/tests/factories.py
     # so if you change anything here, you need to also change it there.
     course.tabs = [{"type": "courseware"},
-                   {"type": "course_info", "name": "Course Info"},
-                   {"type": "discussion", "name": "Discussion"},
+                   {"type": "course_info", "name": _("Course Info")},
+                   {"type": "discussion", "name": _("Discussion")},
                    {"type": "wiki", "name": "Wiki"},
-                   {"type": "progress", "name": "Progress"}]
+                   {"type": "progress", "name": _("Progress")}]
 
     modulestore('direct').update_metadata(course.location.url(), own_metadata(course))
 
@@ -76,9 +76,6 @@ def reorder_static_tabs(request):
 
     # OK, re-assemble the static tabs in the new order
     course.tabs = reordered_tabs
-    # Save the data that we've just changed to the underlying
-    # MongoKeyValueStore before we update the mongo datastore.
-    course.save()
     modulestore('direct').update_metadata(course.location, own_metadata(course))
     return HttpResponse()
 

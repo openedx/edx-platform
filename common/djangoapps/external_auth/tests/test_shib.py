@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Tests for Shibboleth Authentication
 @jbau
@@ -159,7 +160,7 @@ class ShibSPTest(ModuleStoreTestCase):
                     self.assertIn("You have already created an account using an external login", response.content)
                 else:
                     self.assertEqual(response.status_code, 200)
-                    self.assertContains(response, "<title>Register for")
+                    self.assertContains(response, "<title>Đăng ký")
 
     @unittest.skipUnless(settings.MITX_FEATURES.get('AUTH_USE_SHIB'), True)
     def test_registration_form(self):

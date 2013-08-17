@@ -1,7 +1,10 @@
 <%! from django.utils.translation import ugettext as _ %>
+
+
+
 <%inherit file="base.html" />
 <%! from django.core.urlresolvers import reverse %>
-<%block name="title">Course Checklists</%block>
+<%block name="title">${_("Course Checklists")}</%block>
 <%block name="bodyclass">is-signedin course uxdesign checklists</%block>
 
 <%namespace name='static' file='static_content.html'/>
@@ -57,7 +60,7 @@
       </div>
 
       <div class="bit">
-        <h3 class="title title-3">Studio checklists</h3>
+        <h3 class="title title-3">${_("Studio checklists")}</h3>
         <nav class="nav-page checklists-current">
           <ol>
             % for checklist in checklists:

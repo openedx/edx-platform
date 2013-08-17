@@ -9,7 +9,7 @@ from django.conf import settings
 class TestVideo(BaseTestXmodule):
     """Integration tests: web client + mongo."""
 
-    CATEGORY = "videoalpha"
+    TEMPLATE_NAME = "i4x://edx/templates/videoalpha/Video_Alpha"
     DATA = SOURCE_XML
     MODEL_DATA = {
         'data': DATA

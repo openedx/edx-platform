@@ -1,7 +1,9 @@
-<%inherit file="base.html" />
 <%! from django.utils.translation import ugettext as _ %>
+
+
+<%inherit file="base.html" />
 <%! from django.core.urlresolvers import reverse %>
-<%block name="title">Static Pages</%block>
+<%block name="title">${_("Static Pages")}</%block>
 <%block name="bodyclass">is-signedin course pages static-pages</%block>
 
 <%block name="jsextra">
@@ -28,7 +30,7 @@
       <h3 class="sr">${_("Page Actions")}</h3>
       <ul>
         <li class="nav-item">
-        <a href="#" class="button new-button new-tab"><i class="icon-plus"></i> ${_("New Page")}</a>
+          <a href="#" class="button new-button new-tab"><i class="icon-plus"></i> ${_("New Page")}</a>
         </li>
       </ul>
     </nav>
@@ -42,7 +44,7 @@
       <nav class="nav-introduction-supplementary">
         <ul>
           <li class="nav-item">
-          <a rel="modal" href="#preview-lms-staticpages"><i class="icon-question-sign"></i>${_("How do Static Pages look to students in my course?")}</a>
+            <a rel="modal" href="#preview-lms-staticpages"><i class="icon-question-sign"></i>${_("How do Static Pages look to students in my course?")}</a>
           </li>
         </ul>
       </nav>
@@ -72,7 +74,7 @@
 <div class="content-modal" id="preview-lms-staticpages">
   <h3 class="title">${_("How Static Pages are Used in Your Course")}</h3>
   <figure>
-    <img src="/static/img/preview-lms-staticpages.png" alt="${_('Preview of how Static Pages are used in your course')}" />
+    <img src="/static/img/preview-lms-staticpages.png" alt="Preview of how Static Pages are used in your course" />
     <figcaption class="description">${_("These pages will be presented in your course's main navigation alongside Courseware, Course Info, Discussion, etc.")}</figcaption>
   </figure>
 

@@ -25,6 +25,7 @@ Longer TODO:
 
 import sys
 import os
+# import cms.devs.common
 
 from path import path
 
@@ -33,18 +34,81 @@ from .discussionsettings import *
 ################################### FEATURES ###################################
 # The display name of the platform to be used in templates/emails/etc.
 PLATFORM_NAME = "edX"
+############################# SET PATH INFORMATION #############################
+PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /mitx/cms
+REPO_ROOT = PROJECT_ROOT.dirname()
+COMMON_ROOT = REPO_ROOT / "common"
+ENV_ROOT = REPO_ROOT.dirname()  # virtualenv dir /mitx is in
 
+GITHUB_REPO_ROOT = ENV_ROOT / "data"
+
+sys.path.append(REPO_ROOT)
+sys.path.append(PROJECT_ROOT / 'djangoapps')
+sys.path.append(PROJECT_ROOT / 'lib')
+sys.path.append(COMMON_ROOT / 'djangoapps')
+sys.path.append(COMMON_ROOT / 'lib')
 COURSEWARE_ENABLED = True
 ENABLE_JASMINE = False
 
 GENERATE_RANDOM_USER_CREDENTIALS = False
 PERFSTATS = False
+STATICFILES_FINDERS = (
+    'staticfiles.finders.FileSystemFinder',
+    'staticfiles.finders.AppDirectoriesFinder',
+)
 
+# List of callables that know how to import templates from various sources.
+TEMPLATE_LOADERS = (
+    'django.template.loaders.filesystem.Loader',
+    'django.template.loaders.app_directories.Loader',
+)
+
+MIDDLEWARE_CLASSES = (
+    'contentserver.middleware.StaticContentServer',
+    'request_cache.middleware.RequestCache',
+    'django.middleware.cache.UpdateCacheMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'method_override.middleware.MethodOverrideMiddleware',
+
+    # Instead of AuthenticationMiddleware, we use a cache-backed version
+    'cache_toolbox.middleware.CacheBackedAuthenticationMiddleware',
+
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'track.middleware.TrackMiddleware',
+    'mitxmako.middleware.MakoMiddleware',
+
+    # Detects user-requested locale from 'accept-language' header in http request
+    'django.middleware.locale.LocaleMiddleware',
+
+    'django.middleware.transaction.TransactionMiddleware'
+)
 DISCUSSION_SETTINGS = {
     'MAX_COMMENT_DEPTH': 2,
 }
 
+# Locale/Internationalization
+# TIME_ZONE = 'America/New_York'
+TIME_ZONE = 'Asia/Ho_Chi_Minh'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
+# LANGUAGE_CODE = 'en'
+LANGUAGE_CODE = 'vi'  # http://www.i18nguy.com/unicode/language-identifiers.html
 
+USE_I18N = True
+USE_L10N = True
+
+# Localization strings (e.g. django.po) are under this directory
+LOCALE_PATHS = (REPO_ROOT + '/conf/locale',)  # mitx/conf/locale/
+
+# Tracking
+TRACK_MAX_EVENT = 10000
+
+# Messages
+MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
+
+############################### Pipeline #######################################
+
+STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
 # Features
 MITX_FEATURES = {
     'SAMPLE': False,
@@ -144,10 +208,6 @@ MITX_FEATURES = {
 
     # Allow use of the hint managment instructor view.
     'ENABLE_HINTER_INSTRUCTOR_VIEW': False,
-
-    # Toggle to enable chat availability (configured on a per-course
-    # basis in Studio)
-    'ENABLE_CHAT': False
 }
 
 # Used for A/B testing
@@ -312,8 +372,6 @@ CODE_JAIL = {
     'limits': {
         # How many CPU seconds can jailed code use?
         'CPU': 1,
-        # How large a file can jailed code write?
-        'FSIZE': 50000,
     },
 }
 
@@ -370,8 +428,9 @@ STATICFILES_DIRS = [
 FAVICON_PATH = 'images/favicon.ico'
 
 # Locale/Internationalization
-TIME_ZONE = 'America/New_York'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
-LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
+# TIME_ZONE = 'America/New_York'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
+TIME_ZONE = 'Asia/Ho_Chi_Minh'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
+LANGUAGE_CODE = 'vi'  # http://www.i18nguy.com/unicode/language-identifiers.html
 USE_I18N = True
 USE_L10N = True
 

@@ -1,12 +1,15 @@
 <%! from django.core.urlresolvers import reverse %>
+<%! from django.utils.translation import ugettext as _ %>
+<%! from django.utils import translation    %>
+
 <%inherit file="main.html" />
 
 <section class="container activation">
 
   <section class="message">
-    <h1 class="invalid">E-mail change successful!</h1>
+    <h1 class="invalid">${_("E-mail change successful")}!</h1>
     <hr class="horizontal-divider">
 
-    <p>You should see your new email in your <a href="${reverse('dashboard')}">dashboard</a>.</p>
+    <p>${_("You should see your new email in your")} <a href="${reverse('dashboard')}">${_("dashboard")}</a>.</p>
   </section>
 </section>

@@ -123,8 +123,9 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
         }
     else
        {
-          data: @xml_editor.getValue()
-          nullout: ['markdown']
+            data: @xml_editor.getValue()
+            metadata:
+               markdown: null
        }
 
   @insertMultipleChoice: (selectedText) ->

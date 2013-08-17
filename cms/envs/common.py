@@ -25,8 +25,13 @@ Longer TODO:
 
 import sys
 import lms.envs.common
+
+
 from lms.envs.common import USE_TZ
 from path import path
+
+
+
 
 ############################ FEATURE CONFIGURATION #############################
 
@@ -156,6 +161,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.locale.LocaleMiddleware',
 
     'django.middleware.transaction.TransactionMiddleware'
+
 )
 
 ############################ SIGNAL HANDLERS ################################
@@ -198,8 +204,10 @@ STATICFILES_DIRS = [
 ]
 
 # Locale/Internationalization
-TIME_ZONE = 'America/New_York'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
-LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
+# TIME_ZONE = 'America/New_York'
+TIME_ZONE = 'Asia/Ho_Chi_Minh'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
+# LANGUAGE_CODE = 'en'
+LANGUAGE_CODE = 'vi'  # http://www.i18nguy.com/unicode/language-identifiers.html
 
 USE_I18N = True
 USE_L10N = True

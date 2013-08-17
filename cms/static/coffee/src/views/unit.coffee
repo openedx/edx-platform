@@ -89,9 +89,9 @@ class CMS.Views.UnitEdit extends Backbone.View
 
     @$newComponentItem.before(editor.$el)
 
-    editor.createItem(
+    editor.cloneTemplate(
       @$el.data('id'),
-      $(event.currentTarget).data()
+      $(event.currentTarget).data('location')
     )
 
     analytics.track "Added a Component",

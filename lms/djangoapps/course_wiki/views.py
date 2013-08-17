@@ -9,6 +9,10 @@ from wiki.core.exceptions import NoRootURL
 from wiki.models import URLPath, Article
 
 from courseware.courses import get_course_by_id
+import sys
+reload(sys)
+sys.setdefaultencoding("utf-8")
+
 
 log = logging.getLogger(__name__)
 

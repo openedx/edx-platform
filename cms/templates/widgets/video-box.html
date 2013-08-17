@@ -1,9 +1,11 @@
+<%! from django.utils.translation import ugettext as _ %>
+
 <li class="video-box">
   <div class="thumb"></div>
 
   <div class="meta">
-    <strong>video-name</strong> 236mb
-    <p>Uploaded 6 hours ago by <em>Anant Agrawal</em></p>
+    <strong>${_("video-name")}</strong> 236mb
+    <p>${_("Uploaded 6 hours ago by ")}<em>Anant Agrawal</em></p>
     <p>
     <ul class="speed-list">
       Speed

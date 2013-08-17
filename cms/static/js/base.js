@@ -253,13 +253,17 @@ function syncReleaseDate(e) {
 }
 
 function getEdxTimeFromDateTimeVals(date_val, time_val) {
+    var edxTimeStr = null;
+
     if (date_val != '') {
         if (time_val == '') time_val = '00:00';
 
-        return new Date(date_val + " " + time_val + "Z");
+        // Note, we are using date.js utility which has better parsing abilities than the built in JS date parsing
+        var date = Date.parse(date_val + " " + time_val);
+        edxTimeStr = date.toString('yyyy-MM-ddTHH:mm');
     }
 
-    else return null;
+    return edxTimeStr;
 }
 
 function getEdxTimeFromDateTimeInputs(date_id, time_id) {
@@ -334,7 +338,7 @@ function createNewUnit(e) {
     e.preventDefault();
 
     var parent = $(this).data('parent');
-    var category = $(this).data('category');
+    var template = $(this).data('template');
 
     analytics.track('Created a Unit', {
         'course': course_location_analytics,
@@ -342,9 +346,9 @@ function createNewUnit(e) {
     });
 
 
-    $.post('/create_item', {
+    $.post('/clone_item', {
         'parent_location': parent,
-        'category': category,
+        'template': template,
         'display_name': 'New Unit'
     },
 
@@ -547,7 +551,7 @@ function saveNewSection(e) {
 
     var $saveButton = $(this).find('.new-section-name-save');
     var parent = $saveButton.data('parent');
-    var category = $saveButton.data('category');
+    var template = $saveButton.data('template');
     var display_name = $(this).find('.new-section-name').val();
 
     analytics.track('Created a Section', {
@@ -555,9 +559,9 @@ function saveNewSection(e) {
         'display_name': display_name
     });
 
-    $.post('/create_item', {
+    $.post('/clone_item', {
         'parent_location': parent,
-        'category': category,
+        'template': template,
         'display_name': display_name,
     },
 
@@ -591,6 +595,7 @@ function saveNewCourse(e) {
     e.preventDefault();
 
     var $newCourse = $(this).closest('.new-course');
+    var template = $(this).find('.new-course-save').data('template');
     var org = $newCourse.find('.new-course-org').val();
     var number = $newCourse.find('.new-course-number').val();
     var display_name = $newCourse.find('.new-course-name').val();
@@ -607,6 +612,7 @@ function saveNewCourse(e) {
     });
 
     $.post('/create_new_course', {
+        'template': template,
         'org': org,
         'number': number,
         'display_name': display_name
@@ -640,7 +646,7 @@ function addNewSubsection(e) {
     var parent = $(this).parents("section.branch").data("id");
 
     $saveButton.data('parent', parent);
-    $saveButton.data('category', $(this).data('category'));
+    $saveButton.data('template', $(this).data('template'));
 
     $newSubsection.find('.new-subsection-form').bind('submit', saveNewSubsection);
     $cancelButton.bind('click', cancelNewSubsection);
@@ -653,7 +659,7 @@ function saveNewSubsection(e) {
     e.preventDefault();
 
     var parent = $(this).find('.new-subsection-name-save').data('parent');
-    var category = $(this).find('.new-subsection-name-save').data('category');
+    var template = $(this).find('.new-subsection-name-save').data('template');
     var display_name = $(this).find('.new-subsection-name-input').val();
 
     analytics.track('Created a Subsection', {
@@ -662,9 +668,9 @@ function saveNewSubsection(e) {
     });
 
 
-    $.post('/create_item', {
+    $.post('/clone_item', {
         'parent_location': parent,
-        'category': category,
+        'template': template,
         'display_name': display_name
     },
 
@@ -728,7 +734,7 @@ function saveSetSectionScheduleDate(e) {
         var $thisSection = $('.courseware-section[data-id="' + id + '"]');
         var html = _.template(
             '<span class="published-status">' +
-                '<strong>' + gettext("Will Release: ") + '</strong>' +
+                '<strong>' + gettext("Will Release:") + '</strong>' +
                 gettext("<%= date %> at <%= time %> UTC") +
             '</span>' +
             '<a href="#" class="edit-button" data-date="<%= date %>" data-time="<%= time %>" data-id="<%= id %>">' +

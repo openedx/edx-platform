@@ -1,3 +1,7 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%! from django.utils import translation    %>
+
+
 <%! from django.core.urlresolvers import reverse %>
 <%! from time import strftime %>
 <%inherit file="main.html" />
@@ -9,23 +13,23 @@
       <div class="title">
         <hgroup>
           % if self.stanford_theme_enabled():
-            <h1>Free courses from <strong>Stanford</strong></h1>
+            <h1>${_("Free courses from <strong>Stanford</strong>")}</h1>
           % else:
-            <h1>The Future of Online Education</h1>
+            <h1>${_("The Future of Online Education")}</h1>
           % endif
-          <h2>For anyone, anywhere, anytime</h2>
+          <h2>${_("For anyone, anywhere, anytime")}</h2>
         </hgroup>
 
         ## Disable social buttons for non-edX sites
         % if not self.theme_enabled():
           <section class="actions">
             <div class="main-cta">
-              <a href="#signup-modal" id="signup_action" class="find-courses" rel="leanModal">Sign Up</a>
+              <a href="#signup-modal" id="signup_action" class="find-courses" rel="leanModal">${_("Sign Up")}</a>
             </div>
 
             <div class="secondary-actions">
               <div class="social-sharing">
-                <div class="sharing-message">Stay up to date with all edX has to offer!</div>
+                <div class="sharing-message">${_("Stay up to date with all edX has to offer!")}</div>
                 <a href="https://twitter.com/edXOnline" class="share">
                   <img src="${static.url('images/social/twitter-sharing.png')}">
                 </a>
@@ -54,7 +58,7 @@
     <section class="highlighted-courses">
       ## Disable university partner logos and sites for non-edX sites
       % if not self.theme_enabled():
-        <h2>Explore free courses from <span class="edx">edX</span> universities</h2>
+        <h2>${_("Explore free courses from")} <span class="edx">edX</span> ${_("universities")}</h2>
 
         <section class="university-partners university-partners2x6">
           <ol class="partners">
@@ -131,7 +135,7 @@
               <a href="${reverse('university_profile', args=['TorontoX'])}">
                 <img src="${static.url('images/university/toronto/toronto.png')}" />
                 <div class="name">
-                  <span>University of TorontoX</span>
+                  <span>${_("University of TorontoX")}</span>
                 </div>
               </a>
             </li>
@@ -180,7 +184,7 @@
     <section class="container">
       <section class="more-info">
         <header>
-          <h2><span class="edx">edX</span> News &amp; Announcements</h2>
+          <h2><span class="edx">edX</span>${_("News &amp; Announcements")}</h2>
           <a class="action action-mediakit" href="${reverse('media-kit')}"> <span class="org-name">edX</span> MEDIA KIT</a>
         </header>
         <section class="news">

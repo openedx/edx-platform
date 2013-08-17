@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Unit tests for masquerade
 
@@ -65,7 +66,7 @@ class TestStaffMasqueradeAsStudent(LoginEnrollmentTestCase):
 
     def test_staff_debug_for_staff(self):
         resp = self.get_cw_section()
-        sdebug = '<div><a href="#i4x_edX_graded_problem_H1P1_debug" id="i4x_edX_graded_problem_H1P1_trig">Staff Debug Info</a></div>'
+        sdebug = '<div><a href="#i4x_edX_graded_problem_H1P1_debug" id="i4x_edX_graded_problem_H1P1_trig">Thông tin Nhân viên gỡ lỗi</a></div>'
 
         self.assertTrue(sdebug in resp.content)
 
@@ -84,7 +85,7 @@ class TestStaffMasqueradeAsStudent(LoginEnrollmentTestCase):
         self.assertEqual(togresp.content, '{"status": "student"}', '')
 
         resp = self.get_cw_section()
-        sdebug = '<div><a href="#i4x_edX_graded_problem_H1P1_debug" id="i4x_edX_graded_problem_H1P1_trig">Staff Debug Info</a></div>'
+        sdebug = '<div><a href="#i4x_edX_graded_problem_H1P1_debug" id="i4x_edX_graded_problem_H1P1_trig">Thông tin Nhân viên gỡ lỗi</a></div>'
 
         self.assertFalse(sdebug in resp.content)
 
@@ -106,7 +107,7 @@ class TestStaffMasqueradeAsStudent(LoginEnrollmentTestCase):
         resp = self.get_problem()
         html = json.loads(resp.content)['html']
         print html
-        sabut = '<button class="show"><span class="show-label">Show Answer(s)</span> <span class="sr">(for question(s) above - adjacent to each field)</span></button>'
+        sabut = '<button class="show"><span class="show-label">Hiện trả lời(s)</span> <span class="sr">(đối với câu hỏi (s) ở trên - tiếp giáp với từng lĩnh vực)</span></button>'
         self.assertTrue(sabut in html)
 
     def test_no_showanswer_for_student(self):
@@ -117,5 +118,5 @@ class TestStaffMasqueradeAsStudent(LoginEnrollmentTestCase):
         resp = self.get_problem()
         html = json.loads(resp.content)['html']
         print html
-        sabut = '<button class="show"><span class="show-label">Show Answer(s)</span> <span class="sr">(for question(s) above - adjacent to each field)</span></button>'
+        sabut = '<button class="show"><span class="show-label">Hiện trả lời(s)</span> <span class="sr">(đối với câu hỏi (s) ở trên - tiếp giáp với từng lĩnh vực)</span></button>'
         self.assertFalse(sabut in html)

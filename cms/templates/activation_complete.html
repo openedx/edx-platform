@@ -1,4 +1,7 @@
 <%! from django.utils.translation import ugettext as _ %>
+<%! from django.utils import translation    %>
+
+
 <%inherit file="base.html" />
 
 <%block name="content">
@@ -6,7 +9,7 @@
 <section class="tos">
 <div>
   <h1>${_("Activation Complete!")}</h1>
-  <p>${_('Thanks for activating your account.')}<a href="/signin">${_("Log in here.")}</a></p>
+  <p>${_("Thanks for activating your account.")} <a href="/signin">${_("Log in here")}</a>.</p>
 </div>
 </section>
 

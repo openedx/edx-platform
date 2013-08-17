@@ -141,6 +141,7 @@ class GraphicalSliderToolModule(GraphicalSliderToolFields, XModule):
 
 class GraphicalSliderToolDescriptor(GraphicalSliderToolFields, MakoModuleDescriptor, XmlDescriptor):
     module_class = GraphicalSliderToolModule
+    template_dir_name = 'graphical_slider_tool'
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):

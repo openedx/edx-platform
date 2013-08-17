@@ -43,13 +43,14 @@ def view_videoalpha(step):
 
 
 def add_video_to_course(course):
+    template_name = 'i4x://edx/templates/video/default'
     world.ItemFactory.create(parent_location=section_location(course),
-                             category='video',
+                             template=template_name,
                              display_name='Video')
 
 
 def add_videoalpha_to_course(course):
-    category = 'videoalpha'
+    template_name = 'i4x://edx/templates/videoalpha/Video_Alpha'
     world.ItemFactory.create(parent_location=section_location(course),
-                             category=category,
+                             template=template_name,
                              display_name='Video Alpha')

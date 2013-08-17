@@ -9,7 +9,6 @@ from .capa_module import ComplexEncoder
 from .x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError
 from .timeinfo import TimeInfo
 from xblock.core import Dict, String, Scope, Boolean, Integer, Float
 from xmodule.fields import Date
@@ -20,37 +19,36 @@ from django.utils.timezone import UTC
 
 log = logging.getLogger(__name__)
 
+USE_FOR_SINGLE_LOCATION = False
+LINK_TO_LOCATION = ""
+MAX_SCORE = 1
+IS_GRADED = False
 
 EXTERNAL_GRADER_NO_CONTACT_ERROR = "Failed to contact external graders.  Please notify course staff."
+
 
 class PeerGradingFields(object):
     use_for_single_location = Boolean(
         display_name="Show Single Problem",
         help='When True, only the single problem specified by "Link to Problem Location" is shown. '
              'When False, a panel is displayed with all problems available for peer grading.',
-        default=False,
-        scope=Scope.settings
+        default=USE_FOR_SINGLE_LOCATION, scope=Scope.settings
     )
     link_to_location = String(
         display_name="Link to Problem Location",
         help='The location of the problem being graded. Only used when "Show Single Problem" is True.',
-        default="",
-        scope=Scope.settings
+        default=LINK_TO_LOCATION, scope=Scope.settings
     )
-    graded = Boolean(
+    is_graded = Boolean(
         display_name="Graded",
         help='Defines whether the student gets credit for grading this problem. Only used when "Show Single Problem" is True.',
-        default=False,
-        scope=Scope.settings
+        default=IS_GRADED, scope=Scope.settings
     )
-    due = Date(
-        help="Due date that should be displayed.",
-        default=None,
-        scope=Scope.settings)
-    grace_period_string = String(
-        help="Amount of grace to give on the due date.",
-        default=None,
-        scope=Scope.settings
+    due_date = Date(help="Due date that should be displayed.", default=None, scope=Scope.settings)
+    grace_period_string = String(help="Amount of grace to give on the due date.", default=None, scope=Scope.settings)
+    max_grade = Integer(
+        help="The maximum grade that a student can receive for this problem.", default=MAX_SCORE,
+        scope=Scope.settings, values={"min": 0}
     )
     student_data_for_location = Dict(
         help="Student data for a given peer grading problem.",
@@ -59,18 +57,8 @@ class PeerGradingFields(object):
     weight = Float(
         display_name="Problem Weight",
         help="Defines the number of points each problem is worth. If the value is not set, each problem is worth one point.",
-        scope=Scope.settings, values={"min": 0, "step": ".1"},
-        default=1
+        scope=Scope.settings, values={"min": 0, "step": ".1"}
     )
-    display_name = String(
-        display_name="Display Name",
-        help="Display name for this module",
-        scope=Scope.settings,
-        default="Peer Grading Interface"
-    )
-    data = String(help="Html contents to display for this module",
-        default='<peergrading></peergrading>',
-        scope=Scope.content)
 
 
 class PeerGradingModule(PeerGradingFields, XModule):
@@ -101,30 +89,34 @@ class PeerGradingModule(PeerGradingFields, XModule):
         if self.use_for_single_location:
             try:
                 self.linked_problem = modulestore().get_instance(self.system.course_id, self.link_to_location)
-            except ItemNotFoundError:
+            except:
                 log.error("Linked location {0} for peer grading module {1} does not exist".format(
                     self.link_to_location, self.location))
                 raise
-            due_date = self.linked_problem._model_data.get('due', None)
+            due_date = self.linked_problem._model_data.get('peer_grading_due', None)
             if due_date:
                 self._model_data['due'] = due_date
 
         try:
-            self.timeinfo = TimeInfo(self.due, self.grace_period_string)
-        except Exception:
-            log.error("Error parsing due date information in location {0}".format(self.location))
+            self.timeinfo = TimeInfo(self.due_date, self.grace_period_string)
+        except:
+            log.error("Error parsing due date information in location {0}".format(location))
             raise
 
         self.display_due_date = self.timeinfo.display_due_date
 
         try:
             self.student_data_for_location = json.loads(self.student_data_for_location)
-        except Exception:
+        except:
             pass
 
         self.ajax_url = self.system.ajax_url
         if not self.ajax_url.endswith("/"):
             self.ajax_url = self.ajax_url + "/"
+
+        # Integer could return None, so keep this check.
+        if not isinstance(self.max_grade, int):
+            raise TypeError("max_grade needs to be an integer.")
 
     def closed(self):
         return self._closed(self.timeinfo)
@@ -209,16 +201,11 @@ class PeerGradingModule(PeerGradingFields, XModule):
     def get_score(self):
         max_score = None
         score = None
-        weight = self.weight
-
-        #The old default was None, so set to 1 if it is the old default weight
-        if weight is None:
-            weight = 1
         score_dict = {
             'score': score,
             'total': max_score,
         }
-        if not self.use_for_single_location or not self.graded:
+        if not self.use_for_single_location or not self.is_graded:
             return score_dict
 
         try:
@@ -238,10 +225,11 @@ class PeerGradingModule(PeerGradingFields, XModule):
                 # Ensures that once a student receives a final score for peer grading, that it does not change.
                 self.student_data_for_location = response
 
-        score = int(count_graded >= count_required and count_graded > 0) * float(weight)
-        total = float(weight)
-        score_dict['score'] = score
-        score_dict['total'] = total
+        if self.weight is not None:
+            score = int(count_graded >= count_required and count_graded > 0) * float(self.weight)
+            total = self.max_grade * float(self.weight)
+            score_dict['score'] = score
+            score_dict['total'] = total
 
         return score_dict
 
@@ -252,8 +240,8 @@ class PeerGradingModule(PeerGradingFields, XModule):
               randomization, and 5/7 on another
         '''
         max_grade = None
-        if self.use_for_single_location and self.graded:
-            max_grade = self.weight
+        if self.use_for_single_location and self.is_graded:
+            max_grade = self.max_grade
         return max_grade
 
     def get_next_submission(self, data):
@@ -533,7 +521,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
             problem_location = problem['location']
             descriptor = _find_corresponding_module_for_location(problem_location)
             if descriptor:
-                problem['due'] = descriptor._model_data.get('due', None)
+                problem['due'] = descriptor._model_data.get('peer_grading_due', None)
                 grace_period_string = descriptor._model_data.get('graceperiod', None)
                 try:
                     problem_timeinfo = TimeInfo(problem['due'], grace_period_string)
@@ -616,18 +604,14 @@ class PeerGradingDescriptor(PeerGradingFields, RawDescriptor):
 
     has_score = True
     always_recalculate_grades = True
+    template_dir_name = "peer_grading"
 
     #Specify whether or not to pass in open ended interface
     needs_open_ended_interface = True
 
-    metadata_translations = {
-        'is_graded': 'graded',
-        'attempts': 'max_attempts',
-        'due_data' : 'due'
-        }
-
     @property
     def non_editable_metadata_fields(self):
         non_editable_fields = super(PeerGradingDescriptor, self).non_editable_metadata_fields
-        non_editable_fields.extend([PeerGradingFields.due, PeerGradingFields.grace_period_string])
+        non_editable_fields.extend([PeerGradingFields.due_date, PeerGradingFields.grace_period_string,
+                                    PeerGradingFields.max_grade])
         return non_editable_fields

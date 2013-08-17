@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 {% load compressed %}{% load sekizai_tags i18n %}{% load url from future %}{% load staticfiles %}
 <html>
 <head>
@@ -7,9 +8,7 @@
   <link rel="icon" type="image/x-icon" href="{% static "images/favicon.ico" %}" />
   
   {% compressed_css 'application' %}
-  {% block main_vendor_js %}
   {% compressed_js 'main_vendor' %}
-  {% endblock %}
   {% block headextra %}{% endblock %}
   {% render_block "css" %}
   

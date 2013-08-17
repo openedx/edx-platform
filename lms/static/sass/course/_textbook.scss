@@ -1,44 +1,11 @@
 div.book-wrapper {
-  max-width: 1150px;
-  margin: 0 auto;
-  width: 100%;
-  background-color: $white;
+  display: table;
+  table-layout:  fixed;
+  padding: 1em 8em;
 
-  #toolbarViewer {
-    padding: 0 ($baseline/2);
-
-    #toolbarViewerLeft {
-      display: inline-block;
-    }
-
-    .outerCenter {
-      display: inline-block;
-      position: absolute;
-      right: ($baseline/2);
-
-      .innerCenter {
-        right: auto;
-      }
-
-      .dropdownToolbarButton {
-        margin: 3px 2px 4px 0;
-      }
-    }
-
-
-  }
 
   #open_close_accordion {
     display: none;
-  }
-
-  .pdfbook-wrap {
-    display: table;
-    width: 100%;
-  }
-
-  .pdfbook-wrap-inner {
-    display: table-row;
   }
 
   section.book-sidebar {
@@ -77,17 +44,14 @@ div.book-wrapper {
       li {
         background: none;
         border-bottom: 0;
-        padding-left: ($baseline/2);
+        padding-left: lh();
 
         a {
-          @include clearfix;
           padding: 0;
-          color: $link-color;
-          cursor: pointer;
+          @include clearfix;
 
           &:hover {
             background-color: transparent;
-            color: $link-hover;
 
             .page-number {
               opacity: 1.0;
@@ -120,7 +84,7 @@ div.book-wrapper {
 
       > li {
         padding: 5px 6px;
-        margin: ($baseline/4) ($baseline/2);
+        margin: 0 16px 5px 25px;
       }
     }
   }
@@ -194,18 +158,16 @@ div.book-wrapper {
     }
 
     section.page {
-      border-left: 1px solid $border-color;
+      border: 1px solid $border-color;
       background-color: #fff;
       position: relative;
       text-align: center;
+      padding: lh();
+      margin-right:10%;
       border-radius: 0 3px 3px 0;
 
       img {
         max-width: 100%;
-      }
-
-      #viewer {
-        padding: $baseline;
       }
 
       div {
@@ -252,6 +214,3 @@ div.book-wrapper {
     }
   }
 }
-
-
-

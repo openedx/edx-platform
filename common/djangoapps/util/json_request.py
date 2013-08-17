@@ -5,7 +5,9 @@ from django.core.serializers import serialize
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models.query import QuerySet
 from django.http import HttpResponse
-
+import sys
+reload(sys)
+sys.setdefaultencoding("utf-8")
 
 def expect_json(view_function):
     """
@@ -19,6 +21,7 @@ def expect_json(view_function):
         # e.g. 'charset', so we can't do a direct string compare
         if request.META.get('CONTENT_TYPE', '').lower().startswith("application/json"):
             cloned_request = copy.copy(request)
+            print(cloned_request)
             cloned_request.POST = json.loads(request.body)
             return view_function(cloned_request, *args, **kwargs)
         else:

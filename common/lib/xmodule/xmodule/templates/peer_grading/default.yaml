@@ -1,0 +1,9 @@
+---
+metadata:
+    display_name: Peer Grading Interface
+    max_grade: 1
+data: |
+  <peergrading>
+  </peergrading>
+
+children: []

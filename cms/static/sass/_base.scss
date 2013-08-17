@@ -576,7 +576,7 @@ p, ul, ol, dl {
 
 // misc
 hr.divide {
-  @extend .cont-text-sr;
+  @extend .text-sr;
 }
 
 .item-details {
@@ -824,7 +824,7 @@ hr.divide {
 
 // basic utility
 .sr {
-  @extend .cont-text-sr;
+  @extend .text-sr;
 }
 
 .fake-link {
@@ -877,7 +877,7 @@ body.js {
       text-align: center;
 
       .label {
-        @extend .cont-text-sr;
+        @extend .text-sr;
       }
 
       [class^="icon-"] {

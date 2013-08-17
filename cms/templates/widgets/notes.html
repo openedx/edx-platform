@@ -1,10 +1,13 @@
+<%! from django.utils.translation import ugettext as _ %>
+
+
 <section class="notes wip">
-  <h2>Notes</h2>
+  <h2>${_("Notes")}</h2>
 
   <ul>
     <li>
-      <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.</p>
-      <p class="author">Anant Agarwal</p>
+      <p>${_("Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.")}</p>
+      <p class="author">${_("Anant Agarwal")}</p>
     </li>
     <li>
       <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.</p>
@@ -13,7 +16,7 @@
   </ul>
 
   <form>
-    <h2>Add a note</h2>
+    <h2>${_("Add a note")}</h2>
     <textarea name="" id= rows="8" cols="40"></textarea>
     <input type="submit" name="" id="" value="Post" />
   </form>

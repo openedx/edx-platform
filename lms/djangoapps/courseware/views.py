@@ -40,6 +40,7 @@ log = logging.getLogger("mitx.courseware")
 
 template_imports = {'urllib': urllib}
 
+
 def user_groups(user):
     """
     TODO (vshnayder): This is not used. When we have a new plan for groups, adjust appropriately.
@@ -166,8 +167,6 @@ def save_child_position(seq_module, child_name):
             # Only save if position changed
             if position != seq_module.position:
                 seq_module.position = position
-    # Save this new position to the underlying KeyValueStore
-    seq_module.save()
 
 
 def check_for_active_timelimit_module(request, course_id, course):
@@ -235,36 +234,6 @@ def update_timelimit_module(user, course_id, model_data_cache, timelimit_descrip
     return context
 
 
-def chat_settings(course, user):
-    """
-    Returns a dict containing the settings required to connect to a
-    Jabber chat server and room.
-    """
-    domain = getattr(settings, "JABBER_DOMAIN", None)
-    if domain is None:
-        log.warning('You must set JABBER_DOMAIN in the settings to '
-                    'enable the chat widget')
-        return None
-
-    return {
-        'domain': domain,
-
-        # Jabber doesn't like slashes, so replace with dashes
-        'room': "{ID}_class".format(ID=course.id.replace('/', '-')),
-
-        'username': "{USER}@{DOMAIN}".format(
-            USER=user.username, DOMAIN=domain
-        ),
-
-        # TODO: clearly this needs to be something other than the username
-        #       should also be something that's not necessarily tied to a
-        #       particular course
-        'password': "{USER}@{DOMAIN}".format(
-            USER=user.username, DOMAIN=domain
-        ),
-    }
-
-
 @login_required
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
@@ -328,18 +297,6 @@ def index(request, course_id, chapter=None, section=None,
             'masquerade': masq,
             'xqa_server': settings.MITX_FEATURES.get('USE_XQA_SERVER', 'http://xqa:server@content-qa.mitx.mit.edu/xqa')
             }
-
-        # Only show the chat if it's enabled by the course and in the
-        # settings.
-        show_chat = course.show_chat and settings.MITX_FEATURES['ENABLE_CHAT']
-        if show_chat:
-            context['chat'] = chat_settings(course, user)
-            # If we couldn't load the chat settings, then don't show
-            # the widget in the courseware.
-            if context['chat'] is None:
-                show_chat = False
-
-        context['show_chat'] = show_chat
 
         chapter_descriptor = course.get_child_by(lambda m: m.url_name == chapter)
         if chapter_descriptor is not None:

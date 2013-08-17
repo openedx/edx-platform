@@ -85,7 +85,6 @@ metadata:
         can contain equations: $\alpha = \frac{2}{\sqrt{1+\gamma}}$ }
         
         This is some text after the showhide example.
-    markdown: !!null
 
 data: |
     <?xml version="1.0"?>
@@ -215,3 +214,4 @@ data: |
         </p>
       </text>
     </problem>
+children: []

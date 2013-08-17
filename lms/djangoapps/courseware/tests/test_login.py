@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 '''
 Tests for student activation and login
 '''
@@ -47,12 +48,12 @@ class LoginTest(TestCase):
     def test_login_fail_no_user_exists(self):
         response = self._login_response('not_a_user@edx.org', 'test_password')
         self._assert_response(response, success=False,
-                              value='Email or password is incorrect')
+                              value='Email hoặc mật khẩu không đúng.')
 
     def test_login_fail_wrong_password(self):
         response = self._login_response('test@edx.org', 'wrong_password')
         self._assert_response(response, success=False,
-                              value='Email or password is incorrect')
+                              value='Email hoặc mật khẩu không đúng.')
 
     def test_login_not_activated(self):
         # De-activate the user
@@ -62,7 +63,7 @@ class LoginTest(TestCase):
         # Should now be unable to login
         response = self._login_response('test@edx.org', 'test_password')
         self._assert_response(response, success=False,
-                              value="This account has not been activated")
+                              value="Tài khoản này đã không được kích hoạt")
 
     def test_login_unicode_email(self):
         unicode_email = u'test@edx.org' + unichr(40960)
