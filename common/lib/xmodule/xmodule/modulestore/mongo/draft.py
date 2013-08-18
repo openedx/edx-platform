@@ -143,6 +143,7 @@ class DraftModuleStore(MongoModuleStore):
         :param source: the location of the source (its revision must be None)
         """
         original = self.collection.find_one(location_to_query(source_location))
+        self._increment_read_perf_counter()
         draft_location = as_draft(source_location)
         if draft_location.category in DIRECT_ONLY_CATEGORIES:
             raise InvalidVersionError(source_location)
@@ -278,6 +279,7 @@ class DraftModuleStore(MongoModuleStore):
             '_id': {'$in': [namedtuple_to_son(as_draft(Location(item))) for item in items]}
         }
         to_process_drafts = list(self.collection.find(query))
+        self._increment_read_perf_counter()
 
         # now we have to go through all drafts and replace the non-draft
         # with the draft. This is because the semantics of the DraftStore is to

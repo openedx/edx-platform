@@ -295,6 +295,13 @@ class MongoModuleStore(ModuleStoreBase):
         self.render_template = render_template
         self.ignore_write_events_on_courses = []
 
+    def _increment_read_perf_counter(self):
+        """
+        Ticks a performance counter, if available
+        """
+        if self.perf_tracker:
+            self.perf_tracker.increment_perf_tracker_counter('query_db_call')
+
     def compute_metadata_inheritance_tree(self, location):
         '''
         TODO (cdodge) This method can be deleted when the 'split module store' work has been completed
@@ -317,6 +324,7 @@ class MongoModuleStore(ModuleStoreBase):
 
         # call out to the DB
         resultset = self.collection.find(query, record_filter)
+        self._increment_read_perf_counter()
 
         results_by_url = {}
         root = None
@@ -428,6 +436,7 @@ class MongoModuleStore(ModuleStoreBase):
         query = {
             '_id': {'$in': [namedtuple_to_son(Location(item)) for item in items]}
         }
+        self._increment_read_perf_counter()
         return list(self.collection.find(query))
 
     def _cache_children(self, items, depth=0):
@@ -531,6 +540,7 @@ class MongoModuleStore(ModuleStoreBase):
             location_to_query(location, wildcard=False),
             sort=[('revision', pymongo.ASCENDING)],
         )
+        self._increment_read_perf_counter()
         if item is None:
             raise ItemNotFoundError(location)
         return item
@@ -583,7 +593,7 @@ class MongoModuleStore(ModuleStoreBase):
             location_to_query(location),
             sort=[('revision', pymongo.ASCENDING)],
         )
-
+        self._increment_read_perf_counter()
         modules = self._load_items(list(items), depth)
         return modules
 
@@ -834,6 +844,7 @@ class MongoModuleStore(ModuleStoreBase):
         location = Location.ensure_fully_specified(location)
         items = self.collection.find({'definition.children': location.url()},
                                      {'_id': True})
+        self._increment_read_perf_counter()
         return [i['_id'] for i in items]
 
     def get_modulestore_type(self, course_id):
