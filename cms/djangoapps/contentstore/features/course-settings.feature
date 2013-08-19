@@ -76,6 +76,7 @@ Feature: Course Settings
   Scenario: User can upload course image
     Given I have opened a new course in Studio
     When I select Schedule and Details
+    And I click the "Upload Course Image" button
     And I upload a new course image
     Then I should see the new course image
     And the image URL should be present in the field

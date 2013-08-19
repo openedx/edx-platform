@@ -4,9 +4,8 @@
 from lettuce import world, step
 from terrain.steps import reload_the_page
 from selenium.webdriver.common.keys import Keys
-from common import type_in_codemirror
+from common import type_in_codemirror, upload_file
 from django.conf import settings
-import os
 
 from nose.tools import assert_true, assert_false, assert_equal
 
@@ -150,16 +149,15 @@ def test_change_course_overview(_step):
     type_in_codemirror(0, "<h1>Overview</h1>")
 
 
+@step('I click the "Upload Course Image" button')
+def click_upload_button(_step):
+    button_css = '.action-upload-image'
+    world.css_click(button_css)
+
+
 @step('I upload a new course image$')
 def upload_new_course_image(_step):
-    upload_css = '.action-upload-image'
-    world.css_click(upload_css)
-    file_css = '.upload-dialog input[type=file]'
-    upload = world.css_find(file_css)
-    path = os.path.join(TEST_ROOT, 'image.jpg')
-    upload._element.send_keys(os.path.abspath(path))
-    button_css = '.upload-dialog .action-upload'
-    world.css_click(button_css)
+    upload_file('image.jpg')
 
 
 @step('I should see the new course image$')
