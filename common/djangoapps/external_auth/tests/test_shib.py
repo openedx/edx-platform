@@ -16,9 +16,9 @@ from django.utils.importlib import import_module
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.inheritance import own_metadata
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import editable_modulestore
 
-from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
+from courseware.tests.tests import TEST_DATA_MIXED_MODULESTORE
 
 from external_auth.models import ExternalAuthMap
 from external_auth.views import shib_login, course_specific_login, course_specific_register
@@ -64,7 +64,7 @@ def gen_all_identities():
                 yield _build_identity_dict(mail, given_name, surname)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE, SESSION_ENGINE='django.contrib.sessions.backends.cache')
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE, SESSION_ENGINE='django.contrib.sessions.backends.cache')
 class ShibSPTest(ModuleStoreTestCase):
     """
     Tests for the Shibboleth SP, which communicates via request.META
@@ -73,7 +73,7 @@ class ShibSPTest(ModuleStoreTestCase):
     request_factory = RequestFactory()
 
     def setUp(self):
-        self.store = modulestore()
+        self.store = editable_modulestore()
 
     @unittest.skipUnless(settings.MITX_FEATURES.get('AUTH_USE_SHIB'), True)
     def test_exception_shib_login(self):

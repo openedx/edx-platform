@@ -7,9 +7,9 @@ import courseware.tabs as tabs
 from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
 
-from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 
 
 class ProgressTestCase(TestCase):
@@ -261,7 +261,7 @@ class ValidateTabsTestCase(TestCase):
         self.assertRaises(tabs.InvalidTabsException, tabs.validate_tabs, self.courses[4])
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class DiscussionLinkTestCase(ModuleStoreTestCase):
 
     def setUp(self):

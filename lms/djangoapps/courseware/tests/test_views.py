@@ -17,22 +17,20 @@ from xmodule.modulestore.django import modulestore
 import courseware.views as views
 from xmodule.modulestore import Location
 from pytz import UTC
-from modulestore_config import TEST_DATA_XML_MODULESTORE
+from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 
 
-class Stub():
-    pass
-
-
-@override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class TestJumpTo(TestCase):
-    """Check the jumpto link for a course"""
-    def setUp(self):
-        self._MODULESTORES = {}
+    """
+        Check the jumpto link for a course.
+    """
 
-        # Toy courses should be loaded
+    def setUp(self):
+
+        # Load toy course from XML
         self.course_name = 'edX/toy/2012_Fall'
-        self.toy_course = modulestore().get_course('edX/toy/2012_Fall')
+        self.toy_course = modulestore().get_course(self.course_name)
 
     def test_jumpto_invalid_location(self):
         location = Location('i4x', 'edX', 'toy', 'NoSuchPlace', None)
@@ -71,7 +69,7 @@ class ViewsTestCase(TestCase):
         self.enrollment.created = self.date
         self.enrollment.save()
         self.location = ['tag', 'org', 'course', 'category', 'name']
-        self._MODULESTORES = {}
+
         # This is a CourseDescriptor object
         self.toy_course = modulestore().get_course('edX/toy/2012_Fall')
         self.request_factory = RequestFactory()
@@ -85,7 +83,7 @@ class ViewsTestCase(TestCase):
         self.assertEquals(views.user_groups(mock_user), [])
 
     def test_get_current_child(self):
-        self.assertIsNone(views.get_current_child(Stub()))
+        self.assertIsNone(views.get_current_child(MagicMock()))
         mock_xmodule = MagicMock()
         mock_xmodule.position = -1
         mock_xmodule.get_display_items.return_value = ['one', 'two']

@@ -1,9 +1,11 @@
-import copy
+"""
+eoduleStore configuration for test cases.
+"""
+
 from uuid import uuid4
 from django.test import TestCase
-
-from django.conf import settings
-from xmodule.modulestore.django import modulestore, clear_existing_modulestores
+from xmodule.modulestore.django import editable_modulestore, \
+        editable_modulestore, clear_existing_modulestores
 from unittest.util import safe_repr
 
 
@@ -112,8 +114,24 @@ def xml_store_config(data_dir):
 class ModuleStoreTestCase(TestCase):
     """
     Subclass for any test case that uses a ModuleStore.
-
     Ensures that the ModuleStore is cleaned before/after each test.
+
+    Usage:
+
+        1. Create a subclass of `ModuleStoreTestCase`
+        2. Use Django's @override_settings decorator to use
+           the desired modulestore configuration.
+
+           For example:
+
+               MIXED_CONFIG = mixed_store_config(data_dir, mappings)
+
+               @override_settings(MODULESTORE=MIXED_CONFIG)
+               class FooTest(ModuleStoreTestCase):
+                   # ...
+
+        3. Use factories (e.g. `CourseFactory`, `ItemFactory`) to populate
+           the modulestore with test data.
     """
 
     @staticmethod
@@ -127,7 +145,7 @@ class ModuleStoreTestCase(TestCase):
 
         'data' is a dictionary with an entry for each CourseField we want to update.
         """
-        store = modulestore()
+        store = editable_modulestore('direct')
         store.update_metadata(course.location, data)
         updated_course = store.get_instance(course.id, course.location)
         return updated_course
@@ -137,7 +155,10 @@ class ModuleStoreTestCase(TestCase):
         """
         If using a Mongo-backed modulestore, drop the collection.
         """
-        store = modulestore()
+
+        # This will return the mongo-backed modulestore 
+        # even if we're using a mixed modulestore
+        store = editable_modulestore()
 
         if hasattr(store, 'collection'):
             store.collection.drop()
@@ -145,36 +166,30 @@ class ModuleStoreTestCase(TestCase):
     @classmethod
     def setUpClass(cls):
         """
-        Flush the ModuleStore.
+        Delete the existing modulestores, causing them to be reloaded.
         """
-
-        # Use a uuid to differentiate
-        # the mongo collections on jenkins.
-        cls.orig_modulestore = copy.deepcopy(settings.MODULESTORE)
-        if 'direct' not in settings.MODULESTORE:
-            settings.MODULESTORE['direct'] = settings.MODULESTORE['default']
-
-        settings.MODULESTORE['default']['OPTIONS']['collection'] = 'modulestore_%s' % uuid4().hex
-        settings.MODULESTORE['direct']['OPTIONS']['collection'] = 'modulestore_%s' % uuid4().hex
+        # Clear out any existing modulestores,
+        # which will cause them to be re-created
+        # the next time they are accessed.
         clear_existing_modulestores()
-
-        print settings.MODULESTORE
-
         TestCase.setUpClass()
 
     @classmethod
     def tearDownClass(cls):
         """
-        Revert to the old modulestore settings.
+        Drop the existing modulestores, causing them to be reloaded.
+        Clean up any data stored in Mongo.
         """
-
-        # Clean up by dropping the collection
+        # Clean up by flushing the Mongo modulestore
         cls.drop_mongo_collection()
 
+        # Clear out the existing modulestores,
+        # which will cause them to be re-created
+        # the next time they are accessed.
+        # We do this at *both* setup and teardown just to be safe.
         clear_existing_modulestores()
 
-        # Restore the original modulestore settings
-        settings.MODULESTORE = cls.orig_modulestore
+        TestCase.tearDownClass()
 
     def _pre_setup(self):
         """

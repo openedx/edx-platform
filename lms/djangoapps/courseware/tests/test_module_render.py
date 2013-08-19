@@ -15,22 +15,17 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 import courseware.module_render as render
-from courseware.tests.tests import LoginEnrollmentTestCase, TEST_DATA_MONGO_MODULESTORE
+from courseware.tests.tests import LoginEnrollmentTestCase
 from courseware.model_data import ModelDataCache
-from modulestore_config import TEST_DATA_XML_MODULESTORE
+from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 
 from courseware.courses import get_course_with_access
 
 from .factories import UserFactory
 
 
-class Stub:
-    def __init__(self):
-        pass
-
-
-@override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
-class ModuleRenderTestCase(LoginEnrollmentTestCase):
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
     def setUp(self):
         self.location = ['i4x', 'edX', 'toy', 'chapter', 'Overview']
         self.course_id = 'edX/toy/2012_Fall'
@@ -96,7 +91,7 @@ class ModuleRenderTestCase(LoginEnrollmentTestCase):
                                       settings.MAX_FILEUPLOADS_PER_INPUT}))
         mock_request_2 = MagicMock()
         mock_request_2.FILES.keys.return_value = ['file_id']
-        inputfile = Stub()
+        inputfile = MagicMock()
         inputfile.size = 1 + settings.STUDENT_FILEUPLOAD_MAX_SIZE
         inputfile.name = 'name'
         filelist = [inputfile]
@@ -109,7 +104,7 @@ class ModuleRenderTestCase(LoginEnrollmentTestCase):
         mock_request_3.POST.copy.return_value = {'position': 1}
         mock_request_3.FILES = False
         mock_request_3.user = self.mock_user
-        inputfile_2 = Stub()
+        inputfile_2 = MagicMock()
         inputfile_2.size = 1
         inputfile_2.name = 'name'
         self.assertIsInstance(render.modx_dispatch(mock_request_3, 'goto_position',
@@ -200,7 +195,7 @@ class ModuleRenderTestCase(LoginEnrollmentTestCase):
         self.assertEquals(403, response.status_code)
 
 
-@override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class TestTOC(TestCase):
     """Check the Table of Contents for a course"""
     def setUp(self):
@@ -266,7 +261,7 @@ class TestTOC(TestCase):
             self.assertIn(toc_section, actual)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class TestHtmlModifiers(ModuleStoreTestCase):
     """
     Tests to verify that standard modifications to the output of XModule/XBlock

@@ -17,12 +17,12 @@ from django.core.urlresolvers import reverse
 
 from courseware.access import _course_staff_group_name
 from courseware.tests.helpers import LoginEnrollmentTestCase
-from courseware.tests.modulestore_config import TEST_DATA_XML_MODULESTORE
+from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from xmodule.modulestore.django import modulestore
 import xmodule.modulestore.django
 
 
-@override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class TestInstructorDashboardGradeDownloadCSV(LoginEnrollmentTestCase):
     '''
     Check for download of csv
@@ -31,7 +31,6 @@ class TestInstructorDashboardGradeDownloadCSV(LoginEnrollmentTestCase):
     def setUp(self):
         xmodule.modulestore.django._MODULESTORES = {}
 
-        self.full = modulestore().get_course("edX/full/6.002_Spring_2012")
         self.toy = modulestore().get_course("edX/toy/2012_Fall")
 
         # Create two accounts
