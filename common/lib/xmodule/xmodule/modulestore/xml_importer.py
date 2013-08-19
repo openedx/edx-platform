@@ -80,7 +80,7 @@ def import_from_xml(store, data_dir, course_dirs=None,
     after import off disk. We do this remapping as a post-processing step because there's logic in the importing which
     expects a 'url_name' as an identifier to where things are on disk e.g. ../policies/<url_name>/policy.json as well as metadata keys in
     the policy.json. so we need to keep the original url_name during import
-    
+
     do_import_static: if False, then static files are not imported into the static content store.  This can be employed for courses which
                       have substantial unchanging static content, which is to inefficient to import every time the course is loaded.
                       Static content for some courses may also be served directly by nginx, instead of going through django.
@@ -162,7 +162,7 @@ def import_from_xml(store, data_dir, course_dirs=None,
                 log.debug('Skipping import of static content, since do_import_static={0}'.format(do_import_static))
 
             # no matter what do_import_static is, import "static_import" directory
-            #
+
             # This is needed because the "about" pages (eg "overview") are loaded via load_extra_content, and
             # do not inherit the lms metadata from the course module, and thus do not get "static_content_store"
             # properly defined.   Static content referenced in those extra pages thus need to come through the
