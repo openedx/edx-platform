@@ -5,7 +5,7 @@ from lettuce import world, step
 from terrain.steps import reload_the_page
 
 
-@step('I have set "show captions" to (.*)')
+@step('I have set "show captions" to (.*)$')
 def set_show_captions(step, setting):
     world.css_click('a.edit-button')
     world.wait_for(lambda _driver: world.css_visible('a.save-button'))
@@ -13,7 +13,7 @@ def set_show_captions(step, setting):
     world.css_click('a.save-button')
 
 
-@step('when I view the (video.*) it (.*) show the captions')
+@step('when I view the (video.*) it (.*) show the captions$')
 def shows_captions(_step, video_type, show_captions):
     # Prevent cookies from overriding course settings
     world.browser.cookies.delete('hide_captions')
@@ -39,7 +39,7 @@ def correct_video_settings(_step):
                                       ['Youtube ID for 1.5x speed', '', False]])
 
 
-@step('my video display name change is persisted on save')
+@step('my video display name change is persisted on save$')
 def video_name_persisted(step):
     world.css_click('a.save-button')
     reload_the_page(step)
