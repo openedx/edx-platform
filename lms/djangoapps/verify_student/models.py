@@ -1,22 +1,30 @@
-# -*- coding: utf-8 -*- 
+# -*- coding: utf-8 -*-
 """
 Models for Student Identity Verification
 
-Currently the only model is `PhotoVerificationAttempt`, but this is where we
-would put any models relating to establishing the real-life identity of a
-student over a period of time.
+This is where we put any models relating to establishing the real-life identity
+of a student over a period of time. Right now, the only models are the abstract
+`PhotoVerificationAttempt`, and its one concrete implementation
+`SoftwareSecurePhotoVerificationAttempt`. The hope is to keep as much of the
+photo verification process as generic as possible.
 """
 from datetime import datetime
+from hashlib import md5
+import base64
 import functools
 import logging
 import uuid
 
 import pytz
+
 from django.db import models
 from django.contrib.auth.models import User
-
 from model_utils.models import StatusModel
 from model_utils import Choices
+
+from verify_student.ssencrypt import (
+    random_aes_key, decode_and_decrypt, encrypt_and_encode
+)
 
 log = logging.getLogger(__name__)
 
@@ -25,16 +33,9 @@ class VerificationException(Exception):
     pass
 
 
-class IdVerifiedCourses(models.Model):
-    """
-    A table holding all the courses that are eligible for ID Verification.
-    """
-    course_id = models.CharField(blank=False, max_length=100)
-
-
 def status_before_must_be(*valid_start_statuses):
     """
-    Decorator with arguments to make sure that an object with a `status`
+    Helper decorator with arguments to make sure that an object with a `status`
     attribute is in one of a list of acceptable status states before a method
     is called. You could use it in a class definition like:
 
@@ -68,7 +69,7 @@ class PhotoVerificationAttempt(StatusModel):
     their identity by uploading a photo of themselves and a picture ID. An
     attempt actually has a number of fields that need to be filled out at
     different steps of the approval process. While it's useful as a Django Model
-    for the querying facilities, **you should only create and edit a 
+    for the querying facilities, **you should only create and edit a
     `PhotoVerificationAttempt` object through the methods provided**. Do not
     just construct one and start setting fields unless you really know what
     you're doing.
@@ -89,12 +90,12 @@ class PhotoVerificationAttempt(StatusModel):
         photo ID match up, and that the photo ID's name matches the user's.
     `denied`
         The request has been denied. See `error_msg` for details on why. An
-        admin might later override this and change to `approved`, but the 
+        admin might later override this and change to `approved`, but the
         student cannot re-open this attempt -- they have to create another
         attempt and submit it instead.
 
     Because this Model inherits from StatusModel, we can also do things like::
-      
+
         attempt.status == PhotoVerificationAttempt.STATUS.created
         attempt.status == "created"
         pending_requests = PhotoVerificationAttempt.submitted.all()
@@ -126,10 +127,8 @@ class PhotoVerificationAttempt(StatusModel):
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
 
-
     ######################## Fields Set When Submitting ########################
     submitted_at = models.DateTimeField(null=True, db_index=True)
-
 
     #################### Fields Set During Approval/Denial #####################
     # If the review was done by an internal staff member, mark who it was.
@@ -153,6 +152,8 @@ class PhotoVerificationAttempt(StatusModel):
     # capturing it so that we can later query for the common problems.
     error_code = models.CharField(blank=True, max_length=50)
 
+    class Meta:
+        abstract = True
 
     ##### Methods listed in the order you'd typically call them
     @classmethod
@@ -161,7 +162,6 @@ class PhotoVerificationAttempt(StatusModel):
         identity. Depending on the policy, this can expire after some period of
         time, so a user might have to renew periodically."""
         raise NotImplementedError
-
 
     @classmethod
     def active_for_user(cls, user_id):
@@ -173,16 +173,13 @@ class PhotoVerificationAttempt(StatusModel):
         """
         raise NotImplementedError
 
-
     @status_before_must_be("created")
     def upload_face_image(self, img):
         raise NotImplementedError
 
-
     @status_before_must_be("created")
     def upload_photo_id_image(self, img):
         raise NotImplementedError
-
 
     @status_before_must_be("created")
     def mark_ready(self):
@@ -215,14 +212,13 @@ class PhotoVerificationAttempt(StatusModel):
             raise VerificationException("No face image was uploaded.")
         if not self.photo_id_image_url:
             raise VerificationException("No photo ID image was uploaded.")
-        
+
         # At any point prior to this, they can change their names via their
         # student dashboard. But at this point, we lock the value into the
         # attempt.
         self.name = self.user.profile.name
         self.status = "ready"
         self.save()
-
 
     @status_before_must_be("ready", "submit")
     def submit(self, reviewing_service=None):
@@ -234,7 +230,6 @@ class PhotoVerificationAttempt(StatusModel):
         self.submitted_at = datetime.now(pytz.UTC)
         self.status = "submitted"
         self.save()
-
 
     @status_before_must_be("submitted", "approved", "denied")
     def approve(self, user_id=None, service=""):
@@ -268,14 +263,13 @@ class PhotoVerificationAttempt(StatusModel):
         # If someone approves an outdated version of this, the first one wins
         if self.status == "approved":
             return
-        
+
         self.error_msg = ""  # reset, in case this attempt was denied before
-        self.error_code = "" # reset, in case this attempt was denied before
+        self.error_code = ""  # reset, in case this attempt was denied before
         self.reviewing_user = user_id
         self.reviewing_service = service
         self.status = "approved"
         self.save()
-
 
     @status_before_must_be("submitted", "approved", "denied")
     def deny(self,
@@ -292,7 +286,8 @@ class PhotoVerificationAttempt(StatusModel):
         Status after method completes: `denied`
 
         Other fields that will be set by this method:
-            `reviewed_by_user_id`, `reviewed_by_service`, `error_msg`, `error_code`
+            `reviewed_by_user_id`, `reviewed_by_service`, `error_msg`,
+            `error_code`
 
         State Transitions:
 
@@ -319,4 +314,58 @@ class PhotoVerificationAttempt(StatusModel):
         self.status = "denied"
         self.save()
 
+
+class SoftwareSecurePhotoVerificationAttempt(PhotoVerificationAttempt):
+    """
+    Model to verify identity using a service provided by Software Secure. Much
+    of the logic is inherited from `PhotoVerificationAttempt`, but this class
+    encrypts the photos.
+
+    Software Secure (http://www.softwaresecure.com/) is a remote proctoring
+    service that also does identity verification. A student uses their webcam
+    to upload two images: one of their face, one of a photo ID. Due to the
+    sensitive nature of the data, the following security precautions are taken:
+
+    1. The snapshot of their face is encrypted using AES-256 in CBC mode. All
+       face photos are encypted with the same key, and this key is known to
+       both Software Secure and edx-platform.
+
+    2. The snapshot of a user's photo ID is also encrypted using AES-256, but
+       the key is randomly generated using pycrypto's Random. Every verification
+       attempt has a new key. The AES key is then encrypted using a public key
+       provided by Software Secure. We store only the RSA-encryped AES key.
+       Since edx-platform does not have Software Secure's private RSA key, it
+       means that we can no longer even read photo ID.
+
+    3. The encrypted photos are base64 encoded and stored in an S3 bucket that
+       edx-platform does not have read access to.
+    """
+    # This is a base64.urlsafe_encode(rsa_encrypt(photo_id_aes_key), ss_pub_key)
+    # So first we generate a random AES-256 key to encrypt our photo ID with.
+    # Then we RSA encrypt it with Software Secure's public key. Then we base64
+    # encode that. The result is saved here. Actual expected length is 344.
+    photo_id_key = models.TextField(max_length=1024)
+
+    @status_before_must_be("created")
+    def upload_face_image(self, img_data):
+        aes_key_str = settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["FACE_IMAGE_AES_KEY"]
+        aes_key = aes_key_str.decode("hex")
+        encrypted_img_data = self._encrypt_image_data(img_data, aes_key)
+        b64_encoded_img_data = base64.encodestring(encrypted_img_data)
+
+        # Upload it to S3
+
+    @status_before_must_be("created")
+    def upload_photo_id_image(self, img_data):
+        aes_key = random_aes_key()
+        encrypted_img_data = self._encrypt_image_data(img_data, aes_key)
+        b64_encoded_img_data = base64.encodestring(encrypted_img_data)
+
+        # Upload this to S3
+
+        rsa_key = RSA.importKey(
+            settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["RSA_PUBLIC_KEY"]
+        )
+        rsa_cipher = PKCS1_OAEP.new(key)
+        rsa_encrypted_aes_key = rsa_cipher.encrypt(aes_key)
 
