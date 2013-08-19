@@ -1,6 +1,6 @@
 $(document).ready(function() {
     $('.uploads .upload-button').bind('click', showUploadModal);
-    $('.upload-modal .close-button').bind('click', hideModal);
+    $('.upload-modal .close-button').bind('click', resetUploadModal);
     $('.upload-modal .choose-file-button').bind('click', showFileSelectionMenu);
     $('.remove-asset-button').bind('click', removeAsset);
 });
@@ -52,9 +52,45 @@ function removeAsset(e){
 
 function showUploadModal(e) {
     e.preventDefault();
+    resetUploadBar();
     $modal = $('.upload-modal').show();
+    $('.upload-modal .file-chooser').fileupload({
+        dataType: 'json',
+        type: 'POST',
+        maxChunkSize: 100 * 1000 * 1000,      // 100 MB
+        autoUpload: true,
+        progressall: function(e, data) {
+            var percentComplete = parseInt(data.loaded / data.total * 100, 10);
+            showUploadFeedback(e, percentComplete);
+        },
+        maxFileSize: 10 * 1000 * 1000,   // 100 MB
+        maxNumberofFiles: 30,
+        add: function(e, data) {
+            // Uncomment this line to get html template on load
+            // var html = assetUploadTemplate(data.files);
+            data.process().done(function () {
+                data.submit();
+            });
+        },
+        done: function(e, data) {
+            displayFinishedUpload(data.result);
+        }
+
+    });
     $('.file-input').bind('change', startUpload);
     $modalCover.show();
+}
+
+function assetUploadTemplate(files) {
+    var compiled = _.template('<tr class="modal-asset>' +
+               '<td><span class="modal-asset new"></span></td>' +
+                '<td><p class="modal-asset name"> <%= file.name %></td>' +
+                '</tr>');
+    var html = '';
+    for (var i=0; i < files.length; i++) {
+        html += compiled({ file: files[i]});
+    }
+    return html;
 }
 
 function showFileSelectionMenu(e) {
@@ -69,11 +105,6 @@ function startUpload(e) {
 
     $('.upload-modal h1').html(gettext('Uploading…'));
     $('.upload-modal .file-name').html(files[0].name);
-    $('.upload-modal .file-chooser').ajaxSubmit({
-        beforeSend: resetUploadBar,
-        uploadProgress: showUploadFeedback,
-        complete: displayFinishedUpload
-    });
     $('.upload-modal .choose-file-button').hide();
     $('.upload-modal .progress-bar').removeClass('loaded').show();
 }
@@ -84,18 +115,27 @@ function resetUploadBar() {
     $('.upload-modal .progress-fill').html(percentVal);
 }
 
-function showUploadFeedback(event, position, total, percentComplete) {
+function resetUploadModal() {
+    resetUploadBar();
+    $('.upload-modal .file-name').html('');
+    $('.upload-modal h1').html(gettext('Upload New File'));
+    $('.upload-modal .choose-file-button').html(gettext('Choose File'));
+    $('.upload-modal .embeddable-xml-input').val('');
+    $('.upload-modal .embeddable').hide();
+    hideModal();
+}
+
+function showUploadFeedback(event, percentComplete) {
     var percentVal = percentComplete + '%';
     $('.upload-modal .progress-fill').width(percentVal);
     $('.upload-modal .progress-fill').html(percentVal);
 }
 
-function displayFinishedUpload(xhr) {
-    if (xhr.status == 200) {
+function displayFinishedUpload(resp) {
+    if (resp.status == 200) {
         markAsLoaded();
     }
 
-    var resp = JSON.parse(xhr.responseText);
     $('.upload-modal .embeddable-xml-input').val(resp.portable_url);
     $('.upload-modal .embeddable').show();
     $('.upload-modal .file-name').hide();
