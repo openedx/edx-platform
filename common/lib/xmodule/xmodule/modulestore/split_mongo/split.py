@@ -10,9 +10,8 @@ from xmodule.errortracker import null_error_tracker
 from xmodule.x_module import XModuleDescriptor
 from xmodule.modulestore.locator import BlockUsageLocator, DescriptionLocator, CourseLocator, VersionTree
 from xmodule.modulestore.exceptions import InsufficientSpecificationError, VersionConflictError
-from xmodule.modulestore import inheritance
+from xmodule.modulestore import inheritance, ModuleStoreBase
 
-from .. import ModuleStoreBase
 from ..exceptions import ItemNotFoundError
 from .definition_lazy_loader import DefinitionLazyLoader
 from .caching_descriptor_system import CachingDescriptorSystem
@@ -62,14 +61,11 @@ class SplitMongoModuleStore(ModuleStoreBase):
             **kwargs
         ), db)
 
-        # TODO add caching of structures to thread_cache to prevent repeated fetches (but not index b/c
-        # it changes w/o having a change in id)
         self.course_index = self.db[collection + '.active_versions']
         self.structures = self.db[collection + '.structures']
         self.definitions = self.db[collection + '.definitions']
 
-        # ??? Code review question: those familiar w/ python threading. Should I instead
-        # use django cache? How should I expire entries?
+        # Code review question: How should I expire entries?
         # _add_cache could use a lru mechanism to control the cache size?
         self.thread_cache = threading.local()
 
@@ -1177,6 +1173,7 @@ class SplitMongoModuleStore(ModuleStoreBase):
             return None
         else:
             return DescriptionLocator(definition['_id'])
+
 
     def _block_matches(self, value, qualifiers):
         '''
