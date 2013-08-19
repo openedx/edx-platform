@@ -66,6 +66,13 @@ def add_tab_to_course(_step, course, extra_tab_name):
         display_name=str(extra_tab_name))
 
 
+@step(u'I am in a course$')
+def go_into_course(step):
+    step.given('I am registered for the course "6.002x"')
+    step.given('And I am logged in')
+    step.given('And I click on View Courseware')
+
+
 def course_id(course_num):
     return "%s/%s/%s" % (world.scenario_dict['COURSE'].org, course_num,
                          world.scenario_dict['COURSE'].display_name.replace(" ", "_"))
