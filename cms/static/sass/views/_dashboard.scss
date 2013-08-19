@@ -269,12 +269,9 @@
       }
     }
 
-
-    // CASE: status is denied
-    &.is-denied {
-      .status-update {
-        .value {
-          background: $red-l1;
+        .course-actions .action-view .view {
+          opacity: 1.0;
+          pointer-events: auto;
         }
 
         .status-indicator {
@@ -315,16 +312,12 @@
     }
   }
 
-  // ELEM: course listings
-  .courses-tab,
-  .archived-courses-tab,
-  .libraries-tab {
-    display: none;
-
-    &.active {
-      display: block;
-    }
-  }
+      // encompassing course link
+      .course-link {
+        @extend %ui-depth2;
+        width: flex-grid(6, 9);
+        margin-right: flex-gutter();
+      }
 
   .courses,
   .libraries,
@@ -442,60 +435,53 @@
     }
   }
 
-  // UI: individual course listings
-  .course-item {
-    box-sizing: border-box;
-    width: flex-grid(9, 9);
-    position: relative;
-    border-bottom: 1px solid $gray-l2;
-    padding: $baseline;
+      .course-actions {
+        @extend %ui-depth3;
+        position: static;
+        width: flex-grid(3, 9);
+        text-align: right;
 
-    // STATE: hover/focus
-    &:hover {
-      background: $paleYellow;
-    }
-
-    .course-link,
-    .course-actions {
-      box-sizing: border-box;
-      display: inline-block;
-      vertical-align: middle;
-    }
-
-    // encompassing course link
-    .course-link {
-      @extend %ui-depth2;
-
-      width: flex-grid(6, 9);
-
-      @include margin-right(flex-gutter());
-    }
-
-    // course title
-    .course-title {
-      @extend %t-title4;
-
-      @include margin(0, ($baseline*2), ($baseline/4), 0);
-
-      font-weight: 300;
-    }
-
-    // course metadata
-    .course-metadata {
-      @extend %t-copy-sub1;
-
-      @include transition(opacity $tmg-f1 ease-in-out 0);
-
-      color: $gray-d2;
-
-      .metadata-item {
-        display: inline-block;
-
-        & + .metadata-item::before {
-          content: "/";
-          margin-left: ($baseline/4);
+        .action {
+          display: inline-block;
+          vertical-align: middle;
           margin-right: ($baseline/4);
-          color: $gray-l4;
+
+          &:last-child {
+            margin-right: 0;
+          }
+        }
+
+        // delete course
+        .action-delete {
+
+          // STATE: disabled
+          &.is-disabled {
+            opacity: 0.0;
+            visibility: hidden;
+            pointer-events: none;
+          }
+
+          .delete {
+            @extend .ui-btn-non;
+          }
+        }
+
+        // view live button
+        .action-view {
+
+          .view {
+            @extend %ui-depth3;
+            @include transition(opacity $tmg-f2 ease-in-out 0);
+            @include box-sizing(border-box);
+            padding: ($baseline/2);
+            opacity: 0.0;
+            pointer-events: none;
+
+            &:hover {
+              opacity: 1.0;
+              pointer-events: auto;
+            }
+          }
         }
 
         .label {

@@ -248,67 +248,17 @@ from openedx.core.djangolib.js_utils import (
                 </dl>
               </div>
 
-              <div class="status-message">
-                <p class="copy">${Text(_('The new course will be added to your course list in 5-10 minutes. Return to this page or {link_start}refresh it{link_end} to update the course list. The new course will need some manual configuration.')).format(
-                    link_start=HTML('<a href="#" class="action-reload">'),
-                    link_end=HTML('</a>'),
-                  )}</p>
-              </div>
-            </li>
-            %endif
-
-            <!-- - - - -->
-
-            <!-- STATE: re-run has error -->
-            %if course_info['is_failed']:
-            <li class="wrapper-course has-status" data-course-key="${course_info['course_key']}">
-              <div class="course-item course-rerun has-error">
-                <div class="course-details" href="#">
-                  <h3 class="course-title">${course_info['display_name']}</h3>
-
-                  <div class="course-metadata">
-                    <span class="course-org metadata-item">
-                      <span class="label">${_("Organization:")}</span> <span class="value">${course_info['org']}</span>
-                    </span>
-                    <span class="course-num metadata-item">
-                      <span class="label">${_("Course Number:")}</span>
-                      <span class="value">${course_info['number']}</span>
-                    </span>
-                    <span class="course-run metadata-item">
-                      <span class="label">${_("Course Run:")}</span> <span class="value">${course_info['run']}</span>
-                    </span>
-                  </div>
-                </div>
-
-                <dl class="course-status">
-                  ## Translators: This is a status message for the course re-runs feature.
-                  ## When a course admin indicates that a course should be re-run, the system
-                  ## needs to process the request and prepare the new course. The status of
-                  ## the process will follow this text.
-                  <dt class="label sr">${_("This re-run processing status:")}</dt>
-                  <dd class="value">
-                    <span class="icon fa fa-warning" aria-hidden="true"></span>
-                    <span class="copy">${_("Configuration Error")}</span>
-                  </dd>
-                </dl>
-              </div>
-
-              <div class="status-message has-actions">
-                <p class="copy">${_("A system error occurred while your course was being processed. Please go to the original course to try the re-run again, or contact your PM for assistance.")}</p>
-
-                <ul  class="status-actions">
-                  <li class="action action-dismiss">
-                    <a href="#" class="button dismiss-button" data-dismiss-link="${course_info['dismiss_link']}">
-                      <span class="icon fa fa-times-circle" aria-hidden="true"></span>
-                      <span class="button-copy">${_("Dismiss")}</span>
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            </li>
-            %endif
-            %endfor
-          </ul>
+            <ul  class="item-actions course-actions">
+              <li class="action action-view">
+                <a href="${lms_link}" rel="external" class="view button view-button view-live-button">${_("View Live")}</a>
+              </li>
+              <li class="action action-delete">
+                  <a href="#" class="delete remove-course action-icon"><i class="icon-trash"></i><span class="sr">${_("Delete this course")}</span></a>
+              </li>
+            </ul>
+          </li>
+          %endfor
+        </ul>
       </div>
       %endif
 
