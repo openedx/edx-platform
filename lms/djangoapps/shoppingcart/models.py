@@ -180,10 +180,6 @@ class PaidCourseRegistration(OrderItem):
         item, created = cls.objects.get_or_create(order=order, user=order.user, course_id=course_id)
         item.status = order.status
         item.qty = 1
-        if cost is None:
-            cost = course.enrollment_cost['cost']
-        if currency is None:
-            currency = course.enrollment_cost['currency']
         item.unit_cost = cost
         item.line_cost = cost
         item.line_desc = 'Registration for Course: {0}'.format(get_course_about_section(course, "title"))
