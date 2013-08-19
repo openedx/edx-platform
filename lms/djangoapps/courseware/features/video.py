@@ -12,12 +12,12 @@ HTML5_SOURCES = [
     'https://s3.amazonaws.com/edx-course-videos/edx-intro/edX-FA12-cware-1_100.ogv'
 ]
 
-@step('when I view the (.*) it has autoplay enabled')
+@step('when I view the (.*) it has autoplay enabled$')
 def does_autoplay_video(_step, video_type):
     assert(world.css_find('.%s' % video_type)[0]['data-autoplay'] == 'True')
 
 
-@step('the course has a Video component in (.*) mode')
+@step('the course has a Video component in (.*) mode$')
 def view_video(_step, player_mode):
     coursenum = 'test_course'
     i_am_registered_for_the_course(step, coursenum)
@@ -55,7 +55,7 @@ def add_video_to_course(course, player_mode):
     world.ItemFactory.create(**kwargs)
 
 
-@step('when I view the video it has rendered in (.*) mode')
+@step('when I view the video it has rendered in (.*) mode$')
 def video_is_rendered(_step, mode):
     modes = {
         'html5': 'video',
@@ -64,7 +64,7 @@ def video_is_rendered(_step, mode):
     html_tag = modes[mode.lower()]
     assert world.css_find('.video {0}'.format(html_tag)).first
 
-@step('all sources are correct')
+@step('all sources are correct$')
 def all_sources_are_correct(_step):
     sources = world.css_find('.video video source')
     assert set(source['src'] for source in sources) == set(HTML5_SOURCES)
