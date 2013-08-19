@@ -169,7 +169,8 @@ def forum_form_discussion(request, course_id):
     """
     Renders the main Discussion page, potentially filtered by a search query
     """
-    if not CourseEnrollment.is_enrolled(request.user, course_id):
+    if not CourseEnrollment.is_enrolled(request.user, course_id) and \
+       not has_access(request.user, course_id, 'staff'):
         access_violation_msg = "Unenrolled user {} tried to access forum for {}"
         log.warning(access_violation_msg.format(request.user, course_id))
         raise Http404
