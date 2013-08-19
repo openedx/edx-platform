@@ -61,6 +61,12 @@ class Order(models.Model):
         else:
             return items[0].currency
 
+    def clear(self):
+        """
+        Clear out all the items in the cart
+        """
+        self.orderitem_set.all().delete()
+
     def purchase(self, first='', last='', street1='', street2='', city='', state='', postalcode='',
                  country='', ccnum='', cardtype='', processor_reply_dump=''):
         """
@@ -208,15 +214,6 @@ class PaidCourseRegistration(OrderItem):
                                "run:{0}".format(run)])
 
 
-# Each entry is a dictionary of ModelName: 'lower_case_model_name'
-# See https://docs.djangoproject.com/en/1.4/topics/db/models/#multi-table-inheritance for
-# PLEASE KEEP THIS LIST UP_TO_DATE WITH THE SUBCLASSES OF OrderItem
-ORDER_ITEM_SUBTYPES = {
-    PaidCourseRegistration: 'paidcourseregistration',
-    VerifiedCertificate: 'verifiedcertificate',
-}
-
-
 class VerifiedCertificate(OrderItem):
     """
     This is an inventory item for purchasing verified certificates
@@ -229,8 +226,6 @@ class VerifiedCertificate(OrderItem):
         """
         Add a VerifiedCertificate item to an order
         """
-        # TODO: add the basic enrollment
-        # TODO: error checking
         course_enrollment = CourseEnrollment.create_enrollment(order.user, course_id, mode="verified")
         item, _created = cls.objects.get_or_create(
             order=order,
@@ -248,5 +243,16 @@ class VerifiedCertificate(OrderItem):
         return item
 
     def purchased_callback(self):
-        # TODO: add code around putting student in the verified track
-        pass
+        """
+        When purchase goes through, activate the course enrollment
+        """
+        self.course_enrollment.activate()
+
+
+# Each entry is a dictionary of ModelName: 'lower_case_model_name'
+# See https://docs.djangoproject.com/en/1.4/topics/db/models/#multi-table-inheritance for
+# PLEASE KEEP THIS LIST UP_TO_DATE WITH THE SUBCLASSES OF OrderItem
+ORDER_ITEM_SUBTYPES = {
+    PaidCourseRegistration: 'paidcourseregistration',
+    VerifiedCertificate: 'verifiedcertificate',
+}
