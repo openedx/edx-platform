@@ -5,6 +5,9 @@ from xmodule.course_module import CourseDescriptor
 
 from request_cache.middleware import RequestCache
 
+from django.core.cache import get_cache
+
+CACHE = get_cache('mongo_metadata_inheritance')
 
 class Command(BaseCommand):
     help = '''Enumerates through the course and find common errors'''
@@ -19,7 +22,10 @@ class Command(BaseCommand):
         store = modulestore()
 
         # setup a request cache so we don't throttle the DB with all the metadata inheritance requests
-        store.request_cache = RequestCache.get_request_cache()
+        store.set_modulestore_configuration({
+            'metadata_inheritance_cache_subsystem': CACHE,
+            'request_cache': RequestCache.get_request_cache()
+        })
 
         course = store.get_item(loc, depth=3)
 

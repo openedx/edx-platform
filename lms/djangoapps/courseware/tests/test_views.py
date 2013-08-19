@@ -67,9 +67,9 @@ class ViewsTestCase(TestCase):
                                         email='test@mit.edu')
         self.date = datetime.datetime(2013, 1, 22, tzinfo=UTC)
         self.course_id = 'edX/toy/2012_Fall'
-        self.enrollment = CourseEnrollment.objects.get_or_create(user=self.user,
-                                                                 course_id=self.course_id,
-                                                                 created=self.date)[0]
+        self.enrollment = CourseEnrollment.enroll(self.user, self.course_id)
+        self.enrollment.created = self.date
+        self.enrollment.save()
         self.location = ['tag', 'org', 'course', 'category', 'name']
         self._MODULESTORES = {}
         # This is a CourseDescriptor object

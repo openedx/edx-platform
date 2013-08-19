@@ -1,18 +1,18 @@
-import pymongo
+from pprint import pprint
 
 from nose.tools import assert_equals, assert_raises, assert_not_equals, assert_false
-from pprint import pprint
+import pymongo
+from uuid import uuid4
 
 from xblock.core import Scope
 from xblock.runtime import KeyValueStore, InvalidScopeError
 
+from xmodule.tests import DATA_DIR
 from xmodule.modulestore import Location
 from xmodule.modulestore.mongo import MongoModuleStore, MongoKeyValueStore
 from xmodule.modulestore.xml_importer import import_from_xml
 
-from .test_modulestore import check_path_to_location
-from . import DATA_DIR
-from uuid import uuid4
+from xmodule.modulestore.tests.test_modulestore import check_path_to_location
 
 
 HOST = 'localhost'
@@ -45,8 +45,7 @@ class TestMongoModuleStore(object):
     @staticmethod
     def initdb():
         # connect to the db
-        store = MongoModuleStore(HOST, DB, COLLECTION, FS_ROOT, RENDER_TEMPLATE,
-            default_class=DEFAULT_CLASS)
+        store = MongoModuleStore(HOST, DB, COLLECTION, FS_ROOT, RENDER_TEMPLATE, default_class=DEFAULT_CLASS)
         # Explicitly list the courses to load (don't want the big one)
         courses = ['toy', 'simple']
         import_from_xml(store, DATA_DIR, courses)
@@ -70,6 +69,10 @@ class TestMongoModuleStore(object):
         ids = list(self.connection[DB][COLLECTION].find({}, {'_id': True}))
 
         pprint([Location(i['_id']).url() for i in ids])
+
+    def test_mongo_modulestore_type(self):
+        store = MongoModuleStore(HOST, DB, COLLECTION, FS_ROOT, RENDER_TEMPLATE, default_class=DEFAULT_CLASS)
+        assert_equals(store.get_modulestore_type('foo/bar/baz'), 'mongo')
 
     def test_get_courses(self):
         '''Make sure the course objects loaded properly'''
@@ -116,6 +119,7 @@ class TestMongoModuleStore(object):
                 course.location.org == 'edx' and course.location.course == 'templates',
                 '{0} is a template course'.format(course)
             )
+
 
 class TestMongoKeyValueStore(object):
 

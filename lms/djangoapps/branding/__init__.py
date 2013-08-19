@@ -1,4 +1,3 @@
-
 from xmodule.modulestore.django import modulestore
 from xmodule.course_module import CourseDescriptor
 from django.conf import settings
@@ -15,7 +14,9 @@ def get_visible_courses(domain=None):
     """
     Return the set of CourseDescriptors that should be visible in this branded instance
     """
-    courses = [c for c in modulestore().get_courses()
+    _courses = modulestore().get_courses()
+
+    courses = [c for c in _courses
                if isinstance(c, CourseDescriptor)]
     courses = sorted(courses, key=lambda course: course.number)
 
