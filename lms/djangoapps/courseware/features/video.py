@@ -61,10 +61,8 @@ def video_is_rendered(_step, mode):
         'html5': 'video',
         'youtube': 'iframe'
     }
-    if mode.lower() in modes:
-        assert world.css_find('.video {0}'.format(modes[mode.lower()])).first
-    else:
-        assert False
+    html_tag = modes[mode.lower()]
+    assert world.css_find('.video {0}'.format(html_tag)).first
 
 @step('all sources are correct')
 def all_sources_are_correct(_step):
