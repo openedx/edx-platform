@@ -218,14 +218,27 @@ from contentstore import utils
                   <label>${_("Course Image")}</label>
                   <div class="current current-course-image">
                     % if context_course.course_image:
-                    <img id="course-image" width="200" src="${utils.course_image_url(context_course)}" alt="${_('Course Image')}"/>
+                    <span class="wrapper-course-image">
+                      <img class="course-image" id="course-image" src="${utils.course_image_url(context_course)}" alt="${_('Course Image')}"/>
+                    </span>
+
+                    <% ctx_loc = context_course.location %>
+                    <span class="msg msg-help">${_("You can manage this image along with all of your other")} <a href="${reverse('asset_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">${_("files &amp; uploads")}</a></span>
+
+                    % else:
+                    <span class="wrapper-course-image">
+                      <img class="course-image placeholder" id="course-image" src="${utils.course_image_url(context_course)}" alt="${_('Course Image')}"/>
+                    </span>
+                    <span class="msg msg-empty">${_("Your course currently does not have an image. Please upload one (.jpg format and mimimum suggested dimensions are 375px wide by 200px tall)")}</span>
                     % endif
-                    <button type="button" class="action action-upload-image">${_("Upload Course Image")}</button>
                   </div>
 
-                  <div class="input">
-                    <input type="text" class="long new-course-image-url" id="course-image-url" value="" placeholder="Your course image URL" autocomplete="off" />
-                    <span class="tip tip-stacked">${_("Enter your course image's filename.")}</span>
+                  <div class="wrapper-input">
+                    <div class="input">
+                      <input type="text" class="long new-course-image-url" id="course-image-url" value="" placeholder="Your course image URL" autocomplete="off" />
+                      <span class="tip tip-stacked">${_("please provide a valid path and name to your course image (Note: only .jpg format supported)")}</span>
+                    </div>
+                    <button type="button" class="action action-upload-image">${_("Upload Course Image")}</button>
                   </div>
                 </li>
 
