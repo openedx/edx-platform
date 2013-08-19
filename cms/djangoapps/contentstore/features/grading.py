@@ -112,10 +112,10 @@ def changes_not_persisted(step):
 
 @step(u'I see the assignment type "(.*)"$')
 def i_see_the_assignment_type(_step, name):
-      assignment_css = '#course-grading-assignment-name'
-      assignments = world.css_find(assignment_css)
-      types = [ele['value'] for ele in assignments]
-      assert name in types
+    assignment_css = '#course-grading-assignment-name'
+    assignments = world.css_find(assignment_css)
+    types = [ele['value'] for ele in assignments]
+    assert name in types
 
 
 @step(u'I change the highest grade range to "(.*)"$')
@@ -142,6 +142,7 @@ def cannot_edit_fail(_step):
         assert False, "Should not be able to edit failing range"
     except InvalidElementStateException:
         pass  # We should get this exception on failing to edit the element
+
 
 
 @step(u'I change the grace period to "(.*)"$')

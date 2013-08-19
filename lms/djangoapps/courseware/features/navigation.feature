@@ -13,6 +13,8 @@ Feature: Navigate Course
         When I click on subsection "2"
         Then I should see the content of subsection "2"
 
+    # Clicking on the sequence link doesn't work on opera through sauce
+    @skip_opera
     Scenario: I can navigate to sequences
         Given I am viewing a section with multiple sequences
         When I click on sequence "2"
