@@ -26,12 +26,16 @@ def has_access(user, location, role=STAFF_ROLE_NAME):
     There is a super-admin permissions if user.is_staff is set
     Also, since we're unifying the user database between LMS and CAS,
     I'm presuming that the course instructor (formally known as admin)
-    will not be in both INSTRUCTOR and STAFF groups, so we have to cascade our queries here as INSTRUCTOR
-    has all the rights that STAFF do
+    will not be in both INSTRUCTOR and STAFF groups, so we have to cascade our
+    queries here as INSTRUCTOR has all the rights that STAFF do
     '''
     course_location = get_course_location_for_item(location)
     _has_access = is_user_in_course_group_role(user, course_location, role)
     # if we're not in STAFF, perhaps we're in INSTRUCTOR groups
     if not _has_access and role == STAFF_ROLE_NAME:
-        _has_access = is_user_in_course_group_role(user, course_location, INSTRUCTOR_ROLE_NAME)
+        _has_access = is_user_in_course_group_role(
+                user,
+                course_location,
+                INSTRUCTOR_ROLE_NAME
+        )
     return _has_access

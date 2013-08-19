@@ -34,7 +34,7 @@ class DeleteItem(CourseTestCase):
             resp.content,
             "application/json"
         )
-        self.assertEqual(resp.status_code, 200)
+        self.assert2XX(resp.status_code)
 
 
 class TestCreateItem(CourseTestCase):

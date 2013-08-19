@@ -7,7 +7,7 @@ from lxml import etree
 from collections import namedtuple
 from pkg_resources import resource_listdir, resource_string, resource_isdir
 
-from xmodule.modulestore import inheritance, Location
+from xmodule.modulestore import Location
 from xmodule.modulestore.exceptions import ItemNotFoundError, InsufficientSpecificationError, InvalidLocationError
 
 from xblock.core import XBlock, Scope, String, Integer, Float, List, ModelType
@@ -557,75 +557,6 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         """
         return False
 
-    # ================================= JSON PARSING ===========================
-    @staticmethod
-    def load_from_json(json_data, system, default_class=None, parent_xblock=None):
-        """
-        This method instantiates the correct subclass of XModuleDescriptor based
-        on the contents of json_data. It does not persist it and can create one which
-        has no usage id.
-
-        parent_xblock is used to compute inherited metadata as well as to append the new xblock.
-
-        json_data:
-        - 'location' : must have this field
-        - 'category': the xmodule category (required or location must be a Location)
-        - 'metadata': a dict of locally set metadata (not inherited)
-        - 'children': a list of children's usage_ids w/in this course
-        - 'definition':
-        - '_id' (optional): the usage_id of this. Will generate one if not given one.
-        """
-        class_ = XModuleDescriptor.load_class(
-            json_data.get('category', json_data.get('location', {}).get('category')),
-            default_class
-        )
-        return class_.from_json(json_data, system, parent_xblock)
-
-    @classmethod
-    def from_json(cls, json_data, system, parent_xblock=None):
-        """
-        Creates an instance of this descriptor from the supplied json_data.
-        This may be overridden by subclasses
-
-        json_data: A json object with the keys 'definition' and 'metadata',
-            definition: A json object with the keys 'data' and 'children'
-                data: A json value
-                children: A list of edX Location urls
-            metadata: A json object with any keys
-
-        This json_data is transformed to model_data using the following rules:
-            1) The model data contains all of the fields from metadata
-            2) The model data contains the 'children' array
-            3) If 'definition.data' is a json object, model data contains all of its fields
-               Otherwise, it contains the single field 'data'
-            4) Any value later in this list overrides a value earlier in this list
-
-        json_data:
-        - 'category': the xmodule category (required)
-        - 'metadata': a dict of locally set metadata (not inherited)
-        - 'children': a list of children's usage_ids w/in this course
-        - 'definition':
-        - '_id' (optional): the usage_id of this. Will generate one if not given one.
-        """
-        usage_id = json_data.get('_id', None)
-        if not '_inherited_metadata' in json_data and parent_xblock is not None:
-            json_data['_inherited_metadata'] = parent_xblock.xblock_kvs.get_inherited_metadata().copy()
-            json_metadata = json_data.get('metadata', {})
-            for field in inheritance.INHERITABLE_METADATA:
-                if field in json_metadata:
-                    json_data['_inherited_metadata'][field] = json_metadata[field]
-
-        new_block = system.xblock_from_json(cls, usage_id, json_data)
-        if parent_xblock is not None:
-            children = parent_xblock.children
-            children.append(new_block)
-            # trigger setter method by using top level field access
-            parent_xblock.children = children
-            # decache pending children field settings (Note, truly persisting at this point would break b/c
-            # persistence assumes children is a list of ids not actual xblocks)
-            parent_xblock.save()
-        return new_block
-
     @classmethod
     def _translate(cls, key):
         'VS[compat]'
@@ -711,20 +642,31 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
 
     # =============================== BUILTIN METHODS ==========================
     def __eq__(self, other):
-        eq = (self.__class__ == other.__class__ and
+        return (self.__class__ == other.__class__ and
                 all(getattr(self, attr, None) == getattr(other, attr, None)
                     for attr in self.equality_attributes))
 
-        return eq
-
     def __repr__(self):
-        return ("{class_}({system!r}, location={location!r},"
-                " model_data={model_data!r})".format(
-            class_=self.__class__.__name__,
-            system=self.system,
-            location=self.location,
-            model_data=self._model_data,
-        ))
+        return (
+            "{class_}({system!r}, location={location!r},"
+            " model_data={model_data!r})".format(
+                class_=self.__class__.__name__,
+                system=self.system,
+                location=self.location,
+                model_data=self._model_data,
+            )
+        )
+
+    def iterfields(self):
+        """
+        A generator for iterate over the fields of this xblock (including the ones in namespaces).
+        Example usage: [field.name for field in module.iterfields()]
+        """
+        for field in self.fields:
+            yield field
+        for namespace in self.namespaces:
+            for field in getattr(self, namespace).fields:
+                yield field
 
     @property
     def non_editable_metadata_fields(self):
@@ -735,6 +677,27 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         """
         # We are not allowing editing of xblock tag and name fields at this time (for any component).
         return [XBlock.tags, XBlock.name]
+
+    def get_explicitly_set_fields_by_scope(self, scope=Scope.content):
+        """
+        Get a dictionary of the fields for the given scope which are set explicitly on this xblock. (Including
+        any set to None.)
+        """
+        if scope == Scope.settings and hasattr(self, '_inherited_metadata'):
+            inherited_metadata = getattr(self, '_inherited_metadata')
+            result = {}
+            for field in self.iterfields():
+                if (field.scope == scope and
+                        field.name in self._model_data and
+                        field.name not in inherited_metadata):
+                    result[field.name] = self._model_data[field.name]
+            return result
+        else:
+            result = {}
+            for field in self.iterfields():
+                if (field.scope == scope and field.name in self._model_data):
+                    result[field.name] = self._model_data[field.name]
+            return result
 
     @property
     def editable_metadata_fields(self):
@@ -785,15 +748,17 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
                 editor_type = "Float"
             elif isinstance(field, List):
                 editor_type = "List"
-            metadata_fields[field.name] = {'field_name': field.name,
-                                           'type': editor_type,
-                                           'display_name': field.display_name,
-                                           'value': field.to_json(value),
-                                           'options': [] if values is None else values,
-                                           'default_value': field.to_json(default_value),
-                                           'inheritable': inheritable,
-                                           'explicitly_set': explicitly_set,
-                                           'help': field.help}
+            metadata_fields[field.name] = {
+               'field_name': field.name,
+               'type': editor_type,
+               'display_name': field.display_name,
+               'value': field.to_json(value),
+               'options': [] if values is None else values,
+               'default_value': field.to_json(default_value),
+               'inheritable': inheritable,
+               'explicitly_set': explicitly_set,
+               'help': field.help,
+            }
 
         return metadata_fields
 
@@ -810,7 +775,7 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         return Fragment(self.get_html())
 
 
-class DescriptorSystem(object):
+class DescriptorSystem(Runtime):
     def __init__(self, load_item, resources_fs, error_tracker, **kwargs):
         """
         load_item: Takes a Location and returns an XModuleDescriptor
@@ -885,28 +850,14 @@ class ModuleSystem(Runtime):
     Note that these functions can be closures over e.g. a django request
     and user, or other environment-specific info.
     '''
-    def __init__(self,
-                 ajax_url,
-                 track_function,
-                 get_module,
-                 render_template,
-                 replace_urls,
-                 xblock_model_data,
-                 user=None,
-                 filestore=None,
-                 debug=False,
-                 xqueue=None,
-                 publish=None,
-                 node_path="",
-                 anonymous_student_id='',
-                 course_id=None,
-                 open_ended_grading_interface=None,
-                 s3_interface=None,
-                 cache=None,
-                 can_execute_unsafe_code=None,
-                 replace_course_urls=None,
-                 replace_jump_to_id_urls=None
-    ):
+    def __init__(
+            self, ajax_url, track_function, get_module, render_template,
+            replace_urls, xblock_model_data, user=None, filestore=None,
+            debug=False, xqueue=None, publish=None, node_path="",
+            anonymous_student_id='', course_id=None,
+            open_ended_grading_interface=None, s3_interface=None,
+            cache=None, can_execute_unsafe_code=None, replace_course_urls=None,
+            replace_jump_to_id_urls=None):
         '''
         Create a closure around the system environment.
 

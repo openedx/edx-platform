@@ -9,8 +9,11 @@ from django.core.cache import get_cache
 CACHE = get_cache('mongo_metadata_inheritance')
 for store_name in settings.MODULESTORE:
     store = modulestore(store_name)
-    store.metadata_inheritance_cache_subsystem = CACHE
-    store.request_cache = RequestCache.get_request_cache()
+
+    store.set_modulestore_configuration({
+        'metadata_inheritance_cache_subsystem': CACHE,
+        'request_cache': RequestCache.get_request_cache()
+    })
 
     modulestore_update_signal = Signal(providing_args=['modulestore', 'course_id', 'location'])
     store.modulestore_update_signal = modulestore_update_signal
