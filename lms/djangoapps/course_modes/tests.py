@@ -18,7 +18,7 @@ class CourseModeModelTest(TestCase):
         self.course_id = 'TestCourse'
         CourseMode.objects.all().delete()
 
-    def create_mode(self, mode_slug, mode_name, min_price=0, suggested_prices=''):
+    def create_mode(self, mode_slug, mode_name, min_price=0, suggested_prices='', currency='usd'):
         """
         Create a new course mode
         """
@@ -27,7 +27,8 @@ class CourseModeModelTest(TestCase):
             mode_display_name=mode_name,
             mode_slug=mode_slug,
             min_price=min_price,
-            suggested_prices=suggested_prices
+            suggested_prices=suggested_prices,
+            currency=currency
         )
 
     def test_modes_for_course_empty(self):
@@ -45,14 +46,14 @@ class CourseModeModelTest(TestCase):
 
         self.create_mode('verified', 'Verified Certificate')
         modes = CourseMode.modes_for_course(self.course_id)
-        self.assertEqual([Mode(u'verified', u'Verified Certificate', 0, '')], modes)
+        self.assertEqual([Mode(u'verified', u'Verified Certificate', 0, '', 'usd')], modes)
 
     def test_modes_for_course_multiple(self):
         """
         Finding the modes when there's multiple modes
         """
-        mode1 = Mode(u'honor', u'Honor Code Certificate', 0, '')
-        mode2 = Mode(u'verified', u'Verified Certificate', 0, '')
+        mode1 = Mode(u'honor', u'Honor Code Certificate', 0, '', 'usd')
+        mode2 = Mode(u'verified', u'Verified Certificate', 0, '', 'usd')
         set_modes = [mode1, mode2]
         for mode in set_modes:
             self.create_mode(mode.slug, mode.name, mode.min_price, mode.suggested_prices)
