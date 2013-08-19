@@ -18,7 +18,7 @@ DEBUG = True
 import logging
 logging.disable(logging.ERROR)
 import os
-from random import choice
+from random import choice, randint
 
 
 def seed():
@@ -66,7 +66,7 @@ DATABASES = {
 
 # Set up XQueue information so that the lms will send
 # requests to a mock XQueue server running locally
-XQUEUE_PORT = choice(PORTS)
+XQUEUE_PORT = choice(PORTS) if SAUCE.get('SAUCE_ENABLED') else randint(1024, 65535)
 XQUEUE_INTERFACE = {
     "url": "http://127.0.0.1:%d" % XQUEUE_PORT,
     "django_auth": {
@@ -91,5 +91,5 @@ USE_I18N = True
 # Include the lettuce app for acceptance testing, including the 'harvest' django-admin command
 INSTALLED_APPS += ('lettuce.django',)
 LETTUCE_APPS = ('courseware',)
-LETTUCE_SERVER_PORT = choice(PORTS)
+LETTUCE_SERVER_PORT = choice(PORTS) if SAUCE.get('SAUCE_ENABLED') else randint(1024, 65535)
 LETTUCE_BROWSER = os.environ.get('LETTUCE_BROWSER', 'chrome')
