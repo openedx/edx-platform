@@ -38,8 +38,6 @@ from util.json_request import JsonResponse
 
 __all__ = ['asset_index', 'upload_asset']
 
-# Regex to capture Content-Range header ranges.
-CONTENT_RE = re.compile(r"(?P<start>\d{1,11})-(?P<stop>\d{1,11})/(?P<end>\d{1,11})")
 
 def assets_to_json_dict(assets):
     """
@@ -152,14 +150,14 @@ def upload_asset(request, org, course, coursename):
         logging.error('Could not find course' + location)
         return HttpResponseBadRequest()
 
-    if 'file' not in request.FILES:
+    if 'files[]' not in request.FILES:
         return HttpResponseBadRequest()
 
     # compute a 'filename' which is similar to the location formatting, we're
     # using the 'filename' nomenclature since we're using a FileSystem paradigm
     # here. We're just imposing the Location string formatting expectations to
     # keep things a bit more consistent
-    upload_file = request.FILES['file']
+    upload_file = request.FILES['files[]']
     filename = upload_file.name
     mime_type = upload_file.content_type
 
@@ -170,6 +168,9 @@ def upload_asset(request, org, course, coursename):
     if chunked:
         content = sc_partial(upload_file.chunks())
         temp_filepath = upload_file.temporary_file_path()
+        with open(tempfile_path, "wb+") as f:
+            for c in content:
+                f.write(c)
     else:
         content = sc_partial(upload_file.read())
         tempfile_path = None
