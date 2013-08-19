@@ -479,6 +479,7 @@ class XMLModuleStore(ModuleStoreBase):
                             if tab.get('url_slug') == slug:
                                 module.display_name = tab['name']
                     module.data_dir = course_dir
+                    module.save()
                     self.modules[course_descriptor.id][module.location] = module
                 except Exception, e:
                     logging.exception("Failed to load {0}. Skipping... Exception: {1}".format(filepath, str(e)))
