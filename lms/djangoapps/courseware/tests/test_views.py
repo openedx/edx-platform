@@ -12,12 +12,14 @@ from django.core.urlresolvers import reverse
 
 from student.models import CourseEnrollment
 from student.tests.factories import AdminFactory
+
 from xmodule.modulestore.django import modulestore
 
 import courseware.views as views
 from xmodule.modulestore import Location
 from pytz import UTC
 from modulestore_config import TEST_DATA_XML_MODULESTORE
+from course_modes.models import CourseMode
 
 
 class Stub():
@@ -163,6 +165,36 @@ class ViewsTestCase(TestCase):
         # TODO: this needs to be changed once we figure out how to
         #       generate/store a real password.
         self.assertEquals(chat_settings['password'], "johndoe@%s" % domain)
+
+    def test_course_mktg_about_coming_soon(self):
+        # we should not be able to find this course
+        url = reverse('mktg_about_course', kwargs={'course_id': 'no/course/here'})
+        response = self.client.get(url)
+        self.assertIn('Coming Soon', response.content)
+
+    def test_course_mktg_register(self):
+        admin = AdminFactory()
+        self.client.login(username=admin.username, password='test')
+        url = reverse('mktg_about_course', kwargs={'course_id': self.course_id})
+        response = self.client.get(url)
+        self.assertIn('Register for', response.content)
+        self.assertNotIn('and choose your student track', response.content)
+
+    def test_course_mktg_register_multiple_modes(self):
+        admin = AdminFactory()
+        CourseMode.objects.get_or_create(mode_slug='honor',
+                                         mode_display_name='Honor Code Certificate',
+                                         course_id=self.course_id)
+        CourseMode.objects.get_or_create(mode_slug='verified',
+                                         mode_display_name='Verified Certificate',
+                                         course_id=self.course_id)
+        self.client.login(username=admin.username, password='test')
+        url = reverse('mktg_about_course', kwargs={'course_id': self.course_id})
+        response = self.client.get(url)
+        self.assertIn('Register for', response.content)
+        self.assertIn('and choose your student track', response.content)
+        # clean up course modes
+        CourseMode.objects.all().delete()
 
     def test_submission_history_xss(self):
         # log into a staff account
