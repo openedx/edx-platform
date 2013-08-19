@@ -154,6 +154,9 @@ MITX_FEATURES = {
     # Toggle to enable chat availability (configured on a per-course
     # basis in Studio)
     'ENABLE_CHAT': False,
+
+    # Toggle the availability of the shopping cart page
+    'ENABLE_SHOPPING_CART': False
 }
 
 # Used for A/B testing
