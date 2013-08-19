@@ -49,6 +49,12 @@ class SelfAssessmentTest(unittest.TestCase):
             's3_interface': test_util_open_ended.S3_INTERFACE,
             'open_ended_grading_interface': test_util_open_ended.OPEN_ENDED_GRADING_INTERFACE,
             'skip_basic_checks': False,
+            'control': {
+                'required_peer_grading': 1,
+                'peer_grader_count': 1,
+                'min_to_calibrate': 3,
+                'max_to_calibrate': 6,
+                }
         }
 
         self.module = SelfAssessmentModule(get_test_system(), self.location,

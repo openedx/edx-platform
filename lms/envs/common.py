@@ -378,7 +378,7 @@ FAVICON_PATH = 'images/favicon.ico'
 # Locale/Internationalization
 TIME_ZONE = 'America/New_York'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
-USE_I18N = True
+USE_I18N = False
 USE_L10N = True
 
 # Localization strings (e.g. django.po) are under this directory
@@ -758,6 +758,7 @@ INSTALLED_APPS = (
 
     # For testing
     'django.contrib.admin',  # only used in DEBUG mode
+    'django_nose',
     'debug',
 
     # Discussion forums
@@ -771,6 +772,9 @@ INSTALLED_APPS = (
 
     # Notification preferences setting
     'notification_prefs',
+
+    # Different Course Modes
+    'course_modes'
 )
 
 ######################### MARKETING SITE ###############################
@@ -813,4 +817,3 @@ def enable_theme(theme_name):
     # avoid collisions with default edX static files
     STATICFILES_DIRS.append((u'themes/%s' % theme_name,
                              theme_root / 'static'))
-

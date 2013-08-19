@@ -98,7 +98,7 @@ class TestInstructorAPIDenyLevels(ModuleStoreTestCase, LoginEnrollmentTestCase):
     def setUp(self):
         self.user = UserFactory.create()
         self.course = CourseFactory.create()
-        CourseEnrollment.objects.create(user=self.user, course_id=self.course.id)
+        CourseEnrollment.enroll(self.user, self.course.id)
         self.client.login(username=self.user.username, password='test')
 
     def test_deny_students_update_enrollment(self):
@@ -161,9 +161,9 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.client.login(username=self.instructor.username, password='test')
 
         self.enrolled_student = UserFactory()
-        CourseEnrollment.objects.create(
-            user=self.enrolled_student,
-            course_id=self.course.id
+        CourseEnrollment.enroll(
+            self.enrolled_student,
+            self.course.id
         )
         self.notenrolled_student = UserFactory()
 
@@ -237,7 +237,8 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
         self.assertEqual(
             self.enrolled_student.courseenrollment_set.filter(
-                course_id=self.course.id
+                course_id=self.course.id,
+                is_active=1,
             ).count(),
             0
         )
@@ -425,7 +426,7 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
 
         self.students = [UserFactory() for _ in xrange(6)]
         for student in self.students:
-            CourseEnrollment.objects.create(user=student, course_id=self.course.id)
+            CourseEnrollment.enroll(student, self.course.id)
 
     def test_get_students_features(self):
         """
@@ -535,7 +536,7 @@ class TestInstructorAPIRegradeTask(ModuleStoreTestCase, LoginEnrollmentTestCase)
         self.client.login(username=self.instructor.username, password='test')
 
         self.student = UserFactory()
-        CourseEnrollment.objects.create(course_id=self.course.id, user=self.student)
+        CourseEnrollment.enroll(self.student, self.course.id)
 
         self.problem_urlname = 'robot-some-problem-urlname'
         self.module_to_reset = StudentModule.objects.create(
@@ -678,7 +679,7 @@ class TestInstructorAPITaskLists(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.client.login(username=self.instructor.username, password='test')
 
         self.student = UserFactory()
-        CourseEnrollment.objects.create(course_id=self.course.id, user=self.student)
+        CourseEnrollment.enroll(self.student, self.course.id)
 
         self.problem_urlname = 'robot-some-problem-urlname'
         self.module = StudentModule.objects.create(

@@ -51,7 +51,13 @@ class TestInstructorEnrollsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
 
         # Run the Un-enroll students command
         url = reverse('instructor_dashboard', kwargs={'course_id': course.id})
-        response = self.client.post(url, {'action': 'Unenroll multiple students', 'multiple_students': 'student0@test.com student1@test.com'})
+        response = self.client.post(
+            url,
+            {
+                'action': 'Unenroll multiple students',
+                'multiple_students': 'student0@test.com student1@test.com'
+            }
+        )
 
         # Check the page output
         self.assertContains(response, '<td>student0@test.com</td>')
@@ -60,12 +66,10 @@ class TestInstructorEnrollsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
 
         # Check the enrollment table
         user = User.objects.get(email='student0@test.com')
-        ce = CourseEnrollment.objects.filter(course_id=course.id, user=user)
-        self.assertEqual(0, len(ce))
+        self.assertFalse(CourseEnrollment.is_enrolled(user, course.id))
 
         user = User.objects.get(email='student1@test.com')
-        ce = CourseEnrollment.objects.filter(course_id=course.id, user=user)
-        self.assertEqual(0, len(ce))
+        self.assertFalse(CourseEnrollment.is_enrolled(user, course.id))
 
         # Check the outbox
         self.assertEqual(len(mail.outbox), 0)
@@ -96,7 +100,7 @@ class TestInstructorEnrollsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
         self.assertEqual(1, cea[0].auto_enroll)
 
         # Check there is no enrollment db entry other than for the other students
-        ce = CourseEnrollment.objects.filter(course_id=course.id)
+        ce = CourseEnrollment.objects.filter(course_id=course.id, is_active=1)
         self.assertEqual(4, len(ce))
 
         # Create and activate student accounts with same email
@@ -111,12 +115,10 @@ class TestInstructorEnrollsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
 
         # Check students are enrolled
         user = User.objects.get(email='student1_1@test.com')
-        ce = CourseEnrollment.objects.filter(course_id=course.id, user=user)
-        self.assertEqual(1, len(ce))
+        self.assertTrue(CourseEnrollment.is_enrolled(user, course.id))
 
         user = User.objects.get(email='student1_2@test.com')
-        ce = CourseEnrollment.objects.filter(course_id=course.id, user=user)
-        self.assertEqual(1, len(ce))
+        self.assertTrue(CourseEnrollment.is_enrolled(user, course.id))
 
     def test_repeat_enroll(self):
         """
@@ -156,7 +158,7 @@ class TestInstructorEnrollsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
         self.assertEqual(0, cea[0].auto_enroll)
 
         # Check there is no enrollment db entry other than for the setup instructor and students
-        ce = CourseEnrollment.objects.filter(course_id=course.id)
+        ce = CourseEnrollment.objects.filter(course_id=course.id, is_active=1)
         self.assertEqual(4, len(ce))
 
         # Create and activate student accounts with same email
@@ -171,11 +173,10 @@ class TestInstructorEnrollsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
 
         # Check students are not enrolled
         user = User.objects.get(email='student2_1@test.com')
-        ce = CourseEnrollment.objects.filter(course_id=course.id, user=user)
-        self.assertEqual(0, len(ce))
+        self.assertFalse(CourseEnrollment.is_enrolled(user, course.id))
+
         user = User.objects.get(email='student2_2@test.com')
-        ce = CourseEnrollment.objects.filter(course_id=course.id, user=user)
-        self.assertEqual(0, len(ce))
+        self.assertFalse(CourseEnrollment.is_enrolled(user, course.id))
 
     def test_get_and_clean_student_list(self):
         """

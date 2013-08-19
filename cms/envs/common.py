@@ -25,7 +25,7 @@ Longer TODO:
 
 import sys
 import lms.envs.common
-from lms.envs.common import USE_TZ, TECH_SUPPORT_EMAIL
+from lms.envs.common import USE_TZ, TECH_SUPPORT_EMAIL, PLATFORM_NAME, BUGS_EMAIL
 from path import path
 
 ############################ FEATURE CONFIGURATION #############################
@@ -201,7 +201,7 @@ STATICFILES_DIRS = [
 TIME_ZONE = 'America/New_York'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
 
-USE_I18N = True
+USE_I18N = False
 USE_L10N = True
 
 # Localization strings (e.g. django.po) are under this directory
@@ -332,6 +332,9 @@ INSTALLED_APPS = (
     # Monitor the status of services
     'service_status',
 
+    # Testing
+    'django_nose',
+
     # For CMS
     'contentstore',
     'auth',
@@ -339,7 +342,7 @@ INSTALLED_APPS = (
     'student',  # misleading name due to sharing with lms
     'course_groups',  # not used in cms (yet), but tests run
 
-    # tracking
+    # Tracking
     'track',
 
     # For asset pipelining

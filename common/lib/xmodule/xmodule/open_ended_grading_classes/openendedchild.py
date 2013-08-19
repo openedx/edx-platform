@@ -92,6 +92,7 @@ class OpenEndedChild(object):
         self.s3_interface = static_data['s3_interface']
         self.skip_basic_checks = static_data['skip_basic_checks']
         self._max_score = static_data['max_score']
+        self.control = static_data['control']
 
         # Used for progress / grading.  Currently get credit just for
         # completion (doesn't matter if you self-assessed correct/incorrect).

@@ -353,10 +353,7 @@ class SettableEnrollmentState(EmailEnrollmentState):
             user = UserFactory()
             email = user.email
             if self.enrollment:
-                cenr = CourseEnrollment.objects.create(
-                    user=user,
-                    course_id=course_id
-                )
+                cenr = CourseEnrollment.enroll(user, course_id)
                 return EnrollmentObjects(email, user, cenr, None)
             else:
                 return EnrollmentObjects(email, user, None, None)
