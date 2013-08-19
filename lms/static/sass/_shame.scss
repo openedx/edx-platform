@@ -159,15 +159,15 @@
 
       .track {
         @include transition(all 0.25s ease-in-out);
-        color: #fff;
+        color: $white;
         display: block;
         font-size: 13px;
-        line-height: 2;
-        opacity: .6;
+        line-height: 2em;
+        opacity: 0.6;
       }
 
       &:hover .track {
-        opacity: 1;
+        opacity: 1.0;
       }
     }
 
