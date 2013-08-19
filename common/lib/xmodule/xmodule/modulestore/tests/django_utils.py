@@ -110,10 +110,11 @@ def xml_store_config(data_dir):
 
 
 class ModuleStoreTestCase(TestCase):
-    """ Subclass for any test case that uses the mongodb
-    module store. This populates a uniquely named modulestore
-    collection with templates before running the TestCase
-    and drops it they are finished. """
+    """
+    Subclass for any test case that uses a ModuleStore.
+
+    Ensures that the ModuleStore is cleaned before/after each test.
+    """
 
     @staticmethod
     def update_course(course, data):
@@ -132,24 +133,19 @@ class ModuleStoreTestCase(TestCase):
         return updated_course
 
     @staticmethod
-    def flush_mongo_except_templates():
+    def drop_mongo_collection():
         """
-        Delete everything in the module store except templates.
+        If using a Mongo-backed modulestore, drop the collection.
         """
         store = modulestore()
 
-        # This query means: every item in the collection
-        # that is not a template
-        query = {"_id.course": {"$ne": "templates"}}
-
-        # Remove everything except templates
-        store.collection.remove(query)
-        store.collection.drop()
+        if hasattr(store, 'collection'):
+            store.collection.drop()
 
     @classmethod
     def setUpClass(cls):
         """
-        Flush the mongo store and set up templates.
+        Flush the ModuleStore.
         """
 
         # Use a uuid to differentiate
@@ -173,8 +169,7 @@ class ModuleStoreTestCase(TestCase):
         """
 
         # Clean up by dropping the collection
-        store = modulestore()
-        store.collection.drop()
+        cls.drop_mongo_collection()
 
         clear_existing_modulestores()
 
@@ -183,21 +178,20 @@ class ModuleStoreTestCase(TestCase):
 
     def _pre_setup(self):
         """
-        Remove everything but the templates before each test.
+        Flush the ModuleStore before each test.
         """
 
-        # Flush anything that is not a template
-        ModuleStoreTestCase.flush_mongo_except_templates()
+        # Flush the Mongo modulestore
+        ModuleStoreTestCase.drop_mongo_collection()
 
         # Call superclass implementation
         super(ModuleStoreTestCase, self)._pre_setup()
 
     def _post_teardown(self):
         """
-        Flush everything we created except the templates.
+        Flush the ModuleStore after each test.
         """
-        # Flush anything that is not a template
-        ModuleStoreTestCase.flush_mongo_except_templates()
+        ModuleStoreTestCase.drop_mongo_collection()
 
         # Call superclass implementation
         super(ModuleStoreTestCase, self)._post_teardown()
