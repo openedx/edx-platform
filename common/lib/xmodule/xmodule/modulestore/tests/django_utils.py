@@ -1,4 +1,3 @@
-
 import copy
 from uuid import uuid4
 from django.test import TestCase
@@ -6,6 +5,41 @@ from django.test import TestCase
 from django.conf import settings
 import xmodule.modulestore.django
 from unittest.util import safe_repr
+
+
+def mixed_store_config(data_dir, mappings):
+    """
+    Return a `MixedModuleStore` configuration, which provides
+    access to both Mongo- and XML-backed courses.
+
+    `data_dir` is the directory from which to load XML-backed courses.
+    `mappings` is a dictionary mapping course IDs to modulestores, for example:
+
+        {
+            'MITx/2.01x/2013_Spring': 'xml',
+            'edx/999/2013_Spring': 'default'
+        }
+
+    where 'xml' and 'default' are the two options provided by this configuration,
+    mapping (respectively) to XML-backed and Mongo-backed modulestores..
+    """
+    mongo_config = mongo_store_config(data_dir)
+    xml_config = xml_store_config(data_dir)
+
+    store = {
+        'default': {
+            'ENGINE': 'xmodule.modulestore.mixed.MixedModuleStore',
+            'OPTIONS': {
+                'mappings': mappings,
+                'stores': {
+                    'default': mongo_config['default'],
+                    'xml': xml_config['default']
+                }
+            }
+        }
+    }
+    store['direct'] = store['default']
+    return store
 
 
 def mongo_store_config(data_dir):
@@ -27,6 +61,7 @@ def mongo_store_config(data_dir):
             }
         }
     }
+
     store['direct'] = store['default']
     return store
 
@@ -45,23 +80,22 @@ def draft_mongo_store_config(data_dir):
         'render_template': 'mitxmako.shortcuts.render_to_string'
     }
 
-    return {
+    store = {
         'default': {
             'ENGINE': 'xmodule.modulestore.mongo.draft.DraftModuleStore',
             'OPTIONS': modulestore_options
-        },
-        'direct': {
-            'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
-            'OPTIONS': modulestore_options
         }
     }
+
+    store['direct'] = store['default']
+    return store
 
 
 def xml_store_config(data_dir):
     """
     Defines default module store using XMLModuleStore.
     """
-    return {
+    store = {
         'default': {
             'ENGINE': 'xmodule.modulestore.xml.XMLModuleStore',
             'OPTIONS': {
@@ -70,6 +104,9 @@ def xml_store_config(data_dir):
             }
         }
     }
+
+    store['direct'] = store['default']
+    return store
 
 
 class ModuleStoreTestCase(TestCase):
