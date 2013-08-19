@@ -49,7 +49,7 @@ class LocMapperStore(object):
 
     # location_map functions
     def create_map_entry(self, course_location, course_id=None, draft_branch='draft', prod_branch='published',
-            block_map=None):
+                         block_map=None):
         """
         Add a new entry to map this course_location to the new style CourseLocator.course_id. If course_id is not
         provided, it creates the default map of using org.course.name from the location (just like course_id) if
