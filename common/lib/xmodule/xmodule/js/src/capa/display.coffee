@@ -247,6 +247,7 @@ class @Problem
             @updateProgress response
           else
             @gentle_alert response.success
+        Logger.log 'problem_graded', [@answers, response.contents], @url
 
     if not abort_submission
       $.ajaxWithPrefix("#{@url}/problem_check", settings)

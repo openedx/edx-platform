@@ -7,6 +7,7 @@ Currently experimental - not for instructor use, yet.
 import logging
 import json
 import random
+import copy
 
 from pkg_resources import resource_string
 
@@ -82,17 +83,17 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
             log.exception('Unable to find a capa problem child.')
             return
 
-        self.is_formula = (type(responder) == FormulaResponse)
+        self.is_formula = isinstance(self, FormulaResponse)
         if self.is_formula:
             self.answer_to_str = self.formula_answer_to_str
         else:
             self.answer_to_str = self.numerical_answer_to_str
         # compare_answer is expected to return whether its two inputs are close enough
         # to be equal, or raise a StudentInputError if one of the inputs is malformatted.
-        try:
+        if hasattr(responder, 'compare_answer') and hasattr(responder, 'validate_answer'):
             self.compare_answer = responder.compare_answer
             self.validate_answer = responder.validate_answer
-        except AttributeError:
+        else:
             # This response type is not supported!
             log.exception('Response type not supported for hinting: ' + str(responder))
 
@@ -199,43 +200,43 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         if answer not in self.user_submissions:
             self.user_submissions += [answer]
 
-        # Next, find all of the hints that could possibly go with this answer.
-        # Make a local copy of self.hints - this means we only need to do one json unpacking.
-        # (This is because xblocks storage makes the following command a deep copy.)
-        local_hints = self.hints
         # For all answers similar enough to our own, accumulate all hints together.
         # Also track the original answer of each hint.
         matching_answers = self.get_matching_answers(answer)
         matching_hints = {}
         for matching_answer in matching_answers:
-            temp_dict = local_hints[matching_answer]
+            temp_dict = copy.deepcopy(self.hints[matching_answer])
             for key, value in temp_dict.items():
                 # Each value now has hint, votes, matching_answer.
                 temp_dict[key] = value + [matching_answer]
-            matching_hints.update(local_hints[matching_answer])
+            matching_hints.update(temp_dict)
         # matching_hints now maps pk's to lists of [hint, votes, matching_answer]
 
         # Finally, randomly choose a subset of matching_hints to actually show.
-        if len(matching_hints) == 0:
+        if not matching_hints:
             # No hints to give.  Return.
             return
         # Get the top hint, plus two random hints.
         n_hints = len(matching_hints)
         hints = []
-        best_hint_index = max(matching_hints, key=lambda key: matching_hints[key][1])
+        # max(dict) returns the maximum key in dict.
+        # The key function takes each pk, and returns the number of votes for the
+        # hint with that pk.
+        best_hint_index = max(matching_hints, key=lambda pk: matching_hints[pk][1])
         hints.append(matching_hints[best_hint_index][0])
         best_hint_answer = matching_hints[best_hint_index][2]
         # The brackets surrounding the index are for backwards compatability purposes.
         # (It used to be that each answer was paired with multiple hints in a list.)
         self.previous_answers += [[best_hint_answer, [best_hint_index]]]
-        for i in xrange(min(2, n_hints-1)):
+        for i in xrange(min(2, n_hints - 1)):
             # Keep making random hints until we hit a target, or run out.
-            go_on = False
-            while not go_on:
+            while True:
+                # random.choice randomly chooses an element from its input list.
+                # (We then unpack the item, in this case data for a hint.)
                 (hint_index, (rand_hint, votes, hint_answer)) =\
                     random.choice(matching_hints.items())
-                if not rand_hint in hints:
-                    go_on = True
+                if rand_hint not in hints:
+                    break
             hints.append(rand_hint)
             self.previous_answers += [[hint_answer, [hint_index]]]
         return {'hints': hints,
@@ -297,7 +298,7 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         ans = data['answer']
         if not self.validate_answer(ans):
             # Uh oh.  Invalid answer.
-            log.exception('Failure in hinter tally_vote: Unable to parse answer: ' + ans)
+            log.exception('Failure in hinter tally_vote: Unable to parse answer: {ans}'.format(ans=ans))
             return {'error': 'Failure in voting!'}
         hint_pk = str(data['hint'])
         # We use temp_dict because we need to do a direct write for the database to update.
@@ -305,8 +306,8 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         try:
             temp_dict[ans][hint_pk][1] += 1
         except KeyError:
-            log.exception('Failure in hinter tally_vote: User voted for non-existant hint: Answer=' +
-                          ans + ' pk=' + hint_pk)
+            log.exception('''Failure in hinter tally_vote: User voted for non-existant hint:
+                             Answer={ans} pk={hint_pk}'''.format(ans=ans, hint_pk=hint_pk))
             return {'error': 'Failure in voting!'}
         self.hints = temp_dict
         # Don't let the user vote again!
@@ -317,13 +318,13 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         hint_and_votes = []
         for answer, vote_pk in pk_list:
             if not self.validate_answer(answer):
-                log.exception('In hinter tally_vote, couldn\'t parse ' + answer)
+                log.exception('In hinter tally_vote, couldn\'t parse {ans}'.format(ans=answer))
                 continue
             try:
                 hint_and_votes.append(temp_dict[answer][str(vote_pk)])
             except KeyError:
-                log.exception('In hinter tally_vote, couldn\'t find: '
-                              + answer + ', ' + str(vote_pk))
+                log.exception('In hinter tally_vote, couldn\'t find: {ans}, {vote_pk}'.format(
+                              ans=answer, vote_pk=str(vote_pk)))
 
         hint_and_votes.sort(key=lambda pair: pair[1], reverse=True)
         # Reset self.previous_answers and user_submissions.
@@ -345,7 +346,8 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         hint = escape(data['hint'])
         answer = data['answer']
         if not self.validate_answer(answer):
-            log.exception('Failure in hinter submit_hint: Unable to parse answer: ' + answer)
+            log.exception('Failure in hinter submit_hint: Unable to parse answer: {ans}'.format(
+                          ans=answer))
             return {'error': 'Could not submit answer'}
         # Only allow a student to vote or submit a hint once.
         if self.user_voted:
