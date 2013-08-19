@@ -2,12 +2,7 @@
 Unit tests for the asset upload endpoint.
 """
 
-import os
 import json
-import shutil
-import tarfile
-import tempfile
-from subprocess import call
 from datetime import datetime
 from io import BytesIO
 from pytz import UTC

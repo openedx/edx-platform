@@ -38,8 +38,6 @@ from util.json_request import JsonResponse
 
 __all__ = ['asset_index', 'upload_asset']
 
-MAX_UP_LENGTH = 20000352 # Max chunk size
-
 # Regex to capture Content-Range header ranges.
 CONTENT_RE = re.compile(r"(?P<start>\d{1,11})-(?P<stop>\d{1,11})/(?P<end>\d{1,11})")
 

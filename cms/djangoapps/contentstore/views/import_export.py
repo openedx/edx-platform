@@ -63,7 +63,7 @@ def import_course(request, org, course, name):
         filename = request.FILES['course-data'].name
         if not filename.endswith('.tar.gz'):
             return JsonResponse(
-                { 'ErrMsg': 'We only support uploading a .tar.gz file.' },
+                {'ErrMsg': 'We only support uploading a .tar.gz file.'},
                 status=415
             )
         temp_filepath = course_dir / filename
@@ -96,10 +96,9 @@ def import_course(request, org, course, name):
                     content_range['start']
                 )
                 return JsonResponse(
-                    { 'ErrMsg': 'File upload corrupted. Please try again' },
+                    {'ErrMsg': 'File upload corrupted. Please try again'},
                     status=409
                 )
-
 
         with open(temp_filepath, mode) as temp_file:
             for chunk in request.FILES['course-data'].chunks():
@@ -121,8 +120,8 @@ def import_course(request, org, course, name):
                             'name': location.name
                         }),
                         "thumbnailUrl": ""
-                        }]
-                    })
+                    }]
+            })
 
         else:   # This was the last chunk.
 
@@ -167,7 +166,7 @@ def import_course(request, org, course, name):
 
             if not dirpath:
                 return JsonResponse(
-                    {'ErrMsg': 'Could not find the course.xml file in the package.' },
+                    {'ErrMsg': 'Could not find the course.xml file in the package.'},
                     status=415
                 )
 
@@ -178,13 +177,13 @@ def import_course(request, org, course, name):
                     shutil.move(dirpath / fname, course_dir)
 
             _module_store, course_items = import_from_xml(
-                    modulestore('direct'),
-                    settings.GITHUB_REPO_ROOT,
-                    [course_subdir],
-                    load_error_modules=False,
-                    static_content_store=contentstore(),
-                    target_location_namespace=location,
-                    draft_store=modulestore()
+                modulestore('direct'),
+                settings.GITHUB_REPO_ROOT,
+                [course_subdir],
+                load_error_modules=False,
+                static_content_store=contentstore(),
+                target_location_namespace=location,
+                draft_store=modulestore()
             )
 
             # we can blow this away when we're done importing.
