@@ -3,7 +3,7 @@ from uuid import uuid4
 from django.test import TestCase
 
 from django.conf import settings
-import xmodule.modulestore.django
+from xmodule.modulestore.django import modulestore, clear_existing_modulestores
 from unittest.util import safe_repr
 
 
@@ -126,7 +126,7 @@ class ModuleStoreTestCase(TestCase):
 
         'data' is a dictionary with an entry for each CourseField we want to update.
         """
-        store = xmodule.modulestore.django.modulestore()
+        store = modulestore()
         store.update_metadata(course.location, data)
         updated_course = store.get_instance(course.id, course.location)
         return updated_course
@@ -136,15 +136,15 @@ class ModuleStoreTestCase(TestCase):
         """
         Delete everything in the module store except templates.
         """
-        modulestore = xmodule.modulestore.django.modulestore()
+        store = modulestore()
 
         # This query means: every item in the collection
         # that is not a template
         query = {"_id.course": {"$ne": "templates"}}
 
         # Remove everything except templates
-        modulestore.collection.remove(query)
-        modulestore.collection.drop()
+        store.collection.remove(query)
+        store.collection.drop()
 
     @classmethod
     def setUpClass(cls):
@@ -160,7 +160,7 @@ class ModuleStoreTestCase(TestCase):
 
         settings.MODULESTORE['default']['OPTIONS']['collection'] = 'modulestore_%s' % uuid4().hex
         settings.MODULESTORE['direct']['OPTIONS']['collection'] = 'modulestore_%s' % uuid4().hex
-        xmodule.modulestore.django._MODULESTORES.clear()
+        clear_existing_modulestores()
 
         print settings.MODULESTORE
 
@@ -173,10 +173,10 @@ class ModuleStoreTestCase(TestCase):
         """
 
         # Clean up by dropping the collection
-        modulestore = xmodule.modulestore.django.modulestore()
-        modulestore.collection.drop()
+        store = modulestore()
+        store.collection.drop()
 
-        xmodule.modulestore.django._MODULESTORES.clear()
+        clear_existing_modulestores()
 
         # Restore the original modulestore settings
         settings.MODULESTORE = cls.orig_modulestore

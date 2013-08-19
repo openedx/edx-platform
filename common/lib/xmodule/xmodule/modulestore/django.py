@@ -53,3 +53,12 @@ def modulestore(name='default'):
                                                           settings.MODULESTORE[name]['OPTIONS'])
 
     return _MODULESTORES[name]
+
+def clear_existing_modulestores():
+    """
+    Clear the existing modulestore instances, causing
+    them to be re-created when accessed again.
+
+    This is useful for flushing state between unit tests.
+    """
+    _MODULESTORES.clear()
