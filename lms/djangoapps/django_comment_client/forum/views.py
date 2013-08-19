@@ -12,6 +12,7 @@ from courseware.courses import get_course_with_access
 from course_groups.cohorts import (is_course_cohorted, get_cohort_id, is_commentable_cohorted,
                                    get_cohorted_commentables, get_course_cohorts, get_cohort_by_id)
 from courseware.access import has_access
+from student.models import CourseEnrollment
 
 from django_comment_client.permissions import cached_has_permission
 from django_comment_client.utils import (merge_dict, extract, strip_none, get_courseware_context)
@@ -168,6 +169,11 @@ def forum_form_discussion(request, course_id):
     """
     Renders the main Discussion page, potentially filtered by a search query
     """
+    if not CourseEnrollment.is_enrolled(request.user, course_id):
+        access_violation_msg = "Unenrolled user {} tried to access forum for {}"
+        log.warning(access_violation_msg.format(request.user, course_id))
+        raise Http404
+
     course = get_course_with_access(request.user, course_id, 'load')
     category_map = utils.get_discussion_category_map(course)
 
