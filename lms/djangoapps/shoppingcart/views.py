@@ -57,7 +57,7 @@ def show_cart(request):
 @login_required
 def clear_cart(request):
     cart = Order.get_cart_for_user(request.user)
-    cart.orderitem_set.all().delete()
+    cart.clear()
     return HttpResponse('Cleared')
 
 @login_required
@@ -89,7 +89,7 @@ def postpay_callback(request):
         return render_to_response('shoppingcart.processor_error.html', {'order':result['order'],
                                                                         'error_html': result['error_html']})
 
-
+@login_required
 def show_receipt(request, ordernum):
     """
     Displays a receipt for a particular order.
@@ -108,8 +108,3 @@ def show_receipt(request, ordernum):
     return render_to_response('shoppingcart/receipt.html', {'order': order,
                                                             'order_items': order_items,
                                                             'any_refunds': any_refunds})
-
-#def show_orders(request):
-    """
-    Displays all orders of a user
-    """
