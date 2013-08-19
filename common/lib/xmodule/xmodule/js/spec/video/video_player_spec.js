@@ -79,6 +79,8 @@
       it('create Youtube player', function() {
         var oldYT = window.YT;
 
+        jasmine.stubRequests();
+
         window.YT = {
             Player: function () { },
             PlayerState: oldYT.PlayerState

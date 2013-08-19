@@ -30,8 +30,7 @@ function (VideoPlayer) {
      */
     return function (state, element) {
         _makeFunctionsPublic(state);
-        _initialize(state, element);
-        _renderElements(state);
+        state.initialize(element);
     };
 
     // ***************************************************************
@@ -56,59 +55,12 @@ function (VideoPlayer) {
         // Old private functions. Now also public so that can be
         // tested by Jasmine.
 
+        state.initialize = _.bind(initialize, state);
         state.parseSpeed = _.bind(parseSpeed, state);
         state.fetchMetadata = _.bind(fetchMetadata, state);
         state.parseYoutubeStreams = _.bind(parseYoutubeStreams, state);
         state.parseVideoSources = _.bind(parseVideoSources, state);
-    }
-
-    // function _initialize(element)
-    // The function set initial configuration and preparation.
-
-    function _initialize(state, element) {
-        // This is used in places where we instead would have to check if an element has a CSS class 'fullscreen'.
-        state.isFullScreen = false;
-
-        // The parent element of the video, and the ID.
-        state.el = $(element).find('.video');
-        state.id = state.el.attr('id').replace(/video_/, '');
-
-        // We store all settings passed to us by the server in one place. These are "read only", so don't
-        // modify them. All variable content lives in 'state' object.
-        state.config = {
-            element: element,
-
-            start:              state.el.data('start'),
-            end:                state.el.data('end'),
-
-            caption_data_dir:   state.el.data('caption-data-dir'),
-            caption_asset_path: state.el.data('caption-asset-path'),
-            show_captions:      (state.el.data('show-captions').toString().toLowerCase() === 'true'),
-            youtubeStreams:     state.el.data('streams'),
-
-            sub:                state.el.data('sub'),
-            mp4Source:          state.el.data('mp4-source'),
-            webmSource:         state.el.data('webm-source'),
-            oggSource:          state.el.data('ogg-source'),
-
-            fadeOutTimeout:     1400,
-
-            availableQualities: ['hd720', 'hd1080', 'highres']
-        };
-
-        if (!(_parseYouTubeIDs(state))) {
-            // If we do not have YouTube ID's, try parsing HTML5 video sources.
-            _prepareHTML5Video(state);
-        }
-
-        _configureCaptions(state);
-        _setPlayerMode(state);
-
-        // Possible value are: 'visible', 'hiding', and 'invisible'.
-        state.controlState = 'visible';
-        state.controlHideTimeout = null;
-        state.captionState = 'visible';
-        state.captionHideTimeout = null;
+        state.getVideoMetadata = _.bind(getVideoMetadata, state);
     }
 
     // function _renderElements(state)
@@ -228,11 +180,82 @@ function (VideoPlayer) {
         state.setSpeed($.cookie('video_speed'));
     }
 
+    function _setConfigurations(state) {
+        _configureCaptions(state);
+        _setPlayerMode(state);
+
+        // Possible value are: 'visible', 'hiding', and 'invisible'.
+        state.controlState = 'visible';
+        state.controlHideTimeout = null;
+        state.captionState = 'visible';
+        state.captionHideTimeout = null;
+    }
+
     // ***************************************************************
     // Public functions start here.
     // These are available via the 'state' object. Their context ('this' keyword) is the 'state' object.
     // The magic private function that makes them available and sets up their context is makeFunctionsPublic().
     // ***************************************************************
+
+    // function initialize(element)
+    // The function set initial configuration and preparation.
+
+    function initialize(element) {
+        var state = this;
+        // This is used in places where we instead would have to check if an element has a CSS class 'fullscreen'.
+        state.isFullScreen = false;
+
+        // The parent element of the video, and the ID.
+        state.el = $(element).find('.video');
+        state.id = state.el.attr('id').replace(/video_/, '');
+
+        // We store all settings passed to us by the server in one place. These are "read only", so don't
+        // modify them. All variable content lives in 'state' object.
+        state.config = {
+            element: element,
+
+            start:              state.el.data('start'),
+            end:                state.el.data('end'),
+
+            caption_data_dir:   state.el.data('caption-data-dir'),
+            caption_asset_path: state.el.data('caption-asset-path'),
+            show_captions:      (state.el.data('show-captions').toString().toLowerCase() === 'true'),
+            youtubeStreams:     state.el.data('streams'),
+
+            sub:                state.el.data('sub'),
+            mp4Source:          state.el.data('mp4-source'),
+            webmSource:         state.el.data('webm-source'),
+            oggSource:          state.el.data('ogg-source'),
+
+            fadeOutTimeout:     1400,
+
+            availableQualities: ['hd720', 'hd1080', 'highres']
+        };
+
+        if (!(_parseYouTubeIDs(state))) {
+            // If we do not have YouTube ID's, try parsing HTML5 video sources.
+            _prepareHTML5Video(state);
+            _setConfigurations(state);
+            _renderElements(state);
+        } else {
+            state.getVideoMetadata()
+                .always(function(json, status) {
+                    var err = $.isPlainObject(json.error) ||
+                                (status !== "success" && status !== "notmodified");
+
+                    if (err){
+                        // When the youtube link doesn't work for any reason
+                        // (for example, the great firewall in china) any
+                        // alternate sources should automatically play.
+                        _prepareHTML5Video(state);
+                        state.el.find('a.quality_control').hide();
+                    }
+
+                    _setConfigurations(state);
+                    _renderElements(state);
+                });
+        }
+    }
 
     // function parseYoutubeStreams(state, youtubeStreams)
     //
@@ -297,9 +320,9 @@ function (VideoPlayer) {
         this.metadata = {};
 
         $.each(this.videos, function (speed, url) {
-            $.get('https://gdata.youtube.com/feeds/api/videos/' + url + '?v=2&alt=jsonc', (function(data) {
+            _this.getVideoMetadata(url, function(data) {
                 _this.metadata[data.data.id] = data.data;
-            }), 'jsonp');
+            });
         });
     }
 
@@ -327,6 +350,24 @@ function (VideoPlayer) {
                 path: '/'
             });
         }
+    }
+
+    function getVideoMetadata(url, callback) {
+        var successHandler, xhr;
+
+        if (typeof url !== 'string') {
+            url = this.videos['1.0'] || '';
+        }
+
+        successHandler = ($.isFunction(callback)) ? callback : null;
+        xhr = $.ajax({
+            url: 'https://gdata.youtube.com/feeds/api/videos/' + url + '?v=2&alt=jsonc',
+            timeout: 500,
+            dataType: 'jsonp',
+            success: successHandler
+        });
+
+        return xhr;
     }
 
     function stopBuffering() {
