@@ -3,6 +3,7 @@
 
 from lettuce import world, step
 
+
 @step(u'I open the help form')
 def open_help_modal(step):
     help_css = 'div.help-tab'
