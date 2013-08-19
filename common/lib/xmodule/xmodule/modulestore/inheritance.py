@@ -10,7 +10,7 @@ INHERITABLE_METADATA = (
     # elements.  Can be a float.
     'days_early_for_beta',
     'giturl',  # for git edit link
-    'static_asset_path',	# for static assets placed outside xcontent contentstore
+    'static_asset_path',       # for static assets placed outside xcontent contentstore
 )
 
 
