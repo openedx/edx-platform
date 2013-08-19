@@ -2,14 +2,14 @@ import json
 import logging
 from collections import defaultdict
 
-from django.http import ( HttpResponse, HttpResponseBadRequest, 
+from django.http import ( HttpResponse, HttpResponseBadRequest,
         HttpResponseForbidden )
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 from django.core.exceptions import PermissionDenied
 from django_future.csrf import ensure_csrf_cookie
 from django.conf import settings
-from xmodule.modulestore.exceptions import ( ItemNotFoundError, 
+from xmodule.modulestore.exceptions import ( ItemNotFoundError,
         InvalidLocationError )
 from mitxmako.shortcuts import render_to_response
 
@@ -21,7 +21,7 @@ from xblock.core import Scope
 from util.json_request import expect_json, JsonResponse
 
 from contentstore.module_info_model import get_module_info, set_module_info
-from contentstore.utils import ( get_modulestore, get_lms_link_for_item, 
+from contentstore.utils import ( get_modulestore, get_lms_link_for_item,
     compute_unit_state, UnitState, get_course_for_item )
 
 from models.settings.course_grading import CourseGradingModel
@@ -51,7 +51,8 @@ NOTE_COMPONENT_TYPES = ['notes']
 ADVANCED_COMPONENT_TYPES = [
     'annotatable',
     'word_cloud',
-    'graphical_slider_tool'
+    'graphical_slider_tool',
+    'lti'
 ] + OPEN_ENDED_COMPONENT_TYPES + NOTE_COMPONENT_TYPES
 ADVANCED_COMPONENT_CATEGORY = 'advanced'
 ADVANCED_COMPONENT_POLICY_KEY = 'advanced_modules'
@@ -91,7 +92,7 @@ def edit_subsection(request, location):
     # we're for now assuming a single parent
     if len(parent_locs) != 1:
         logging.error(
-                'Multiple (or none) parents have been found for %', 
+                'Multiple (or none) parents have been found for %',
                 location
         )
 
