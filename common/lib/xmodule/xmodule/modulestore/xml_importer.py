@@ -54,7 +54,7 @@ def import_static_content(modules, course_loc, course_data_path, static_content_
                 try:
                     static_content_store.save(content)
                 except Exception as err:
-                    log.exception('Error importing {0}'.format(fullname_with_subpath))
+                    log.exception('Error importing {0}, error={1}'.format(fullname_with_subpath, err))
 
                 #store the remapping information which will be needed to subsitute in the module data
                 remap_dict[fullname_with_subpath] = content_loc.name
