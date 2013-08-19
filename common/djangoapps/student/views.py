@@ -27,6 +27,7 @@ from django_future.csrf import ensure_csrf_cookie
 from django.utils.http import cookie_date
 from django.utils.http import base36_to_int
 from django.utils.translation import ugettext as _
+from django.views.decorators.http import require_POST
 
 from ratelimitbackend.exceptions import RateLimitException
 
@@ -1281,15 +1282,12 @@ def accept_name_change(request):
     return accept_name_change_by_id(int(request.POST['id']))
 
 
+@require_POST
+@login_required
 @ensure_csrf_cookie
 def change_email_settings(request):
     """Modify logged-in user's setting for receiving emails from a course."""
-    if request.method != "POST":
-        return HttpResponseNotAllowed(["POST"])
-
     user = request.user
-    if not user.is_authenticated():
-        return HttpResponseForbidden()
 
     course_id = request.POST.get("course_id")
     receive_emails = request.POST.get("receive_emails")

@@ -717,8 +717,7 @@ def instructor_dashboard(request, course_id):
         tasks.delegate_email_batches.delay(email.hash, email.to, course_id, course_url, request.user.id)
 
         if to_option == "all":
-            msg = "<font color='green'>Your email was successfully queued for sending. Please note that for large public classe\
-s (~10k), it may take 1-2 hours to send all emails.</font>"
+            msg = "<font color='green'>Your email was successfully queued for sending. Please note that for large public classes (~10k), it may take 1-2 hours to send all emails.</font>"
         else:
             msg = "<font color='green'>Your email was successfully queued for sending.</font>"
 

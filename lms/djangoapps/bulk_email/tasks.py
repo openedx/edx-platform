@@ -31,7 +31,7 @@ def delegate_email_batches(hash_for_msg, to_option, course_id, course_url, user_
     get the mail, chopping up into batches of settings.EMAILS_PER_TASK size,
     and queueing up worker jobs.
 
-    `to_option` is {'students', 'staff', or 'all'}
+    `to_option` is {'myself', 'staff', or 'all'}
 
     Returns the number of batches (workers) kicked off.
     """
