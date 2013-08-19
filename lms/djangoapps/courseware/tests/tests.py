@@ -64,7 +64,7 @@ class PageLoaderTestCase(LoginEnrollmentTestCase):
         location_query = Location(course_loc.tag, course_loc.org,
                                   course_loc.course, None, None, None)
 
-        items = module_store.get_items(location_query)
+        items = module_store.get_items(location_query, course_id=course_id)
 
         if len(items) < 1:
             self.fail('Could not retrieve any items from course')
