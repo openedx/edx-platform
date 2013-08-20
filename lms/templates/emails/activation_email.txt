@@ -1,7 +1,7 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%namespace file="../main.html" import="stanford_theme_enabled" />
 
-${_("Thank you for signing up for %s! To activate your account, please copy and paste this address into your web browser's address bar:") % (settings.PLATFORM_NAME)}
+${_("Thank you for signing up for {0}! To activate your account, please copy and paste this address into your web browser's address bar:").format(settings.PLATFORM_NAME)}
 
 % if is_secure:
   https://${ site }/activate/${ key }
@@ -11,7 +11,7 @@ ${_("Thank you for signing up for %s! To activate your account, please copy and 
 
 ## Temporary hack until we develop a better way to adjust language
 % if stanford_theme_enabled():
-  ${_("If you didn't request this, you don't need to do anything; you won't receive any more email from us. Please do not reply to this e-mail; if you require assistance, check the about section of the %s Courses web site.") % (settings.PLATFORM_NAME)}
+  ${_("If you didn't request this, you don't need to do anything; you won't receive any more email from us. Please do not reply to this e-mail; if you require assistance, check the about section of the {0} Courses web site.").format(settings.PLATFORM_NAME)}
 % else:
-  ${_("If you didn't request this, you don't need to do anything; you won't receive any more email from us. Please do not reply to this e-mail; if you require assistance, check the help section of the %s web site.") % (settings.PLATFORM_NAME)}
+  ${_("If you didn't request this, you don't need to do anything; you won't receive any more email from us. Please do not reply to this e-mail; if you require assistance, check the help section of the {0} web site.").format(settings.PLATFORM_NAME)}
 % endif
