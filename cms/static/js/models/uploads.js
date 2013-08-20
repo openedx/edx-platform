@@ -7,7 +7,7 @@ CMS.Models.FileUpload = Backbone.Model.extend({
         "uploadedBytes": 0,
         "totalBytes": 0,
         "finished": false,
-        "mimeTypes": ["application/pdf"]
+        "mimeTypes": []
     },
     validate: function(attrs, options) {
         if(attrs.selectedFile && !_.contains(this.attributes.mimeTypes, attrs.selectedFile.type)) {
@@ -35,7 +35,7 @@ CMS.Models.FileUpload = Backbone.Model.extend({
         if(this.attributes.mimeTypes.length === 1) {
             return {
                 fileTypes: this.fileTypes()[0],
-                fileExtensions: this.fileTypes()[0].toLowerCase()
+                fileExtensions: '.' + this.fileTypes()[0].toLowerCase()
             };
         }
         var or = gettext('or');

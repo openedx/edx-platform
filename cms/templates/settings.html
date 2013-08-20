@@ -229,14 +229,14 @@ from contentstore import utils
                     <span class="wrapper-course-image">
                       <img class="course-image placeholder" id="course-image" src="${utils.course_image_url(context_course)}" alt="${_('Course Image')}"/>
                     </span>
-                    <span class="msg msg-empty">${_("Your course currently does not have an image. Please upload one (.jpg format and mimimum suggested dimensions are 375px wide by 200px tall)")}</span>
+                    <span class="msg msg-empty">${_("Your course currently does not have an image. Please upload one (JPEG or PNG format, and minimum suggested dimensions are 375px wide by 200px tall)")}</span>
                     % endif
                   </div>
 
                   <div class="wrapper-input">
                     <div class="input">
                       <input type="text" class="long new-course-image-url" id="course-image-url" value="" placeholder="Your course image URL" autocomplete="off" />
-                      <span class="tip tip-stacked">${_("please provide a valid path and name to your course image (Note: only .jpg format supported)")}</span>
+                      <span class="tip tip-stacked">${_("Please provide a valid path and name to your course image (Note: only JPEG or PNG format supported)")}</span>
                     </div>
                     <button type="button" class="action action-upload-image">${_("Upload Course Image")}</button>
                   </div>

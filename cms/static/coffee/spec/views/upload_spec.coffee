@@ -8,10 +8,12 @@ describe "CMS.Views.UploadDialog", ->
         appendSetFixtures($("<script>", {id: "system-feedback-tpl", type: "text/template"}).text(feedbackTpl))
         CMS.URL.UPLOAD_ASSET = "/upload"
 
-        @model = new CMS.Models.FileUpload()
+        @model = new CMS.Models.FileUpload(
+          mimeTypes: ['application/pdf']
+        )
         @chapter = new CMS.Models.Chapter()
         @view = new CMS.Views.UploadDialog(
-          model: @model
+          model: @model,
           onSuccess: (response) =>
             options = {}
             if !@chapter.get('name')

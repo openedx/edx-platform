@@ -243,7 +243,8 @@ CMS.Views.EditChapter = Backbone.View.extend({
         var msg = new CMS.Models.FileUpload({
             title: _.template(gettext("Upload a new PDF to “<%= name %>”"),
                 {name: section.escape('name')}),
-            message: "Files must be in PDF format."
+            message: "Files must be in PDF format.",
+            mimeTypes: ['application/pdf']
         });
         var that = this;
         var view = new CMS.Views.UploadDialog({
