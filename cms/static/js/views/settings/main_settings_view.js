@@ -239,8 +239,7 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
         var upload = new CMS.Models.FileUpload({
             title: gettext("Upload your course image."),
             message: gettext("Files must be in JPG format."),
-            mimeType: "image/jpeg",
-            fileType: "JPG"
+            mimeTypes: ['image/jpeg', 'image/png']
         });
         var self = this;
         var modal = new CMS.Views.UploadDialog({

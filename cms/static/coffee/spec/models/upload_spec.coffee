@@ -28,6 +28,6 @@ describe "CMS.Models.FileUpload", ->
 
     it "can accept non-PDF files when explicitly set", ->
         file = {"type": "image/png"}
-        @model.set("mimeType": "image/png")
+        @model.set("mimeTypes": ["image/png"])
         @model.set("selectedFile", file)
         expect(@model.isValid()).toBeTruthy()
