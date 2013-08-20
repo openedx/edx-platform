@@ -253,7 +253,7 @@ def import_course_draft(xml_module_store, store, draft_store, course_data_path, 
 
                     try:
                         xml = data.decode('utf-8')
-                    except UnicodeDecodeError, e:
+                    except UnicodeDecodeError, err:
                         # seems like on OSX localdev, the OS is making quarantine files
                         # in the unzip directory when importing courses
                         # so if we blindly try to enumerate through the directory, we'll try
@@ -271,7 +271,7 @@ def import_course_draft(xml_module_store, store, draft_store, course_data_path, 
                         if filename.startswith('._'):
                             continue
                         # Not a 'hidden file', then re-raise exception
-                        raise e
+                        raise err
 
                     descriptor = system.process_xml(xml)
 
