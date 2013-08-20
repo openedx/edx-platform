@@ -119,7 +119,7 @@ def initial_setup(server):
         # If we were unable to get a valid session within the limit of attempts,
         # then we cannot run the tests.
         if not success:
-            raise IOError("Could not acquire valid {driver} browser session.".format(driver='remote'))
+            raise IOError("Could not acquire valid {driver} browser session.".format(driver=browser_driver))
 
         world.browser.driver.set_window_size(1280, 1024)
 

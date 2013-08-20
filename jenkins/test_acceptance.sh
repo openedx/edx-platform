@@ -32,11 +32,15 @@ TESTS_FAILED=0
 export DISPLAY=:1
 SKIP_TESTS=""
 
+# Testing for the existance of these environment variables
 if [ ! -z ${LETTUCE_BROWSER+x} ]; then
 	SKIP_TESTS="--tag -skip_$LETTUCE_BROWSER"
 fi
 if [ ! -z ${SAUCE_ENABLED+x} ]; then
-	SKIP_TESTS="--tag -skip_sauce --tag -skip_$SAUCE_BROWSER"
+	# SAUCE_INFO is a - seperated string PLATFORM-BROWSER-VERSION-DEVICE
+	# Error checking is done in the setting up of the browser
+	IFS='-' read -a SAUCE <<< "${SAUCE_INFO}"
+	SKIP_TESTS="--tag -skip_sauce --tag -skip_${SAUCE[1]}"
 fi
 
 # Run the lms and cms acceptance tests

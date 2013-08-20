@@ -6,6 +6,8 @@ Feature: Video Component Editor
     And I edit the component
     Then I see the correct video settings and default values
 
+  # Safari has trouble saving values on Sauce
+  @skip_safari
   Scenario: User can modify Video display name
     Given I have created a Video component
     And I edit the component

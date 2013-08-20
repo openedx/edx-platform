@@ -12,6 +12,8 @@ Feature: Course checklists
 
   # There are issues getting link to be active in browsers other than chrome
   @skip_firefox
+  @skip_internetexplorer
+  @skip_safari
   Scenario: A task can link to a location within Studio
     Given I have opened Checklists
     When I select a link to the course outline
@@ -21,6 +23,8 @@ Feature: Course checklists
 
   # There are issues getting link to be active in browsers other than chrome
   @skip_firefox
+  @skip_internetexplorer
+  @skip_safari
   Scenario: A task can link to a location outside Studio
     Given I have opened Checklists
     When I select a link to help page

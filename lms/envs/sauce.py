@@ -27,6 +27,8 @@ DESIRED_CAPABILITIES = {
     'android': DesiredCapabilities.ANDROID
 }
 
+# All keys must be URL and JSON encodable
+# PLATFORM-BROWSER-VERSION_NUM-DEVICE
 ALL_CONFIG = {
     'Linux-chrome--': ['Linux', 'chrome', '', ''],
     'Windows 8-chrome--': ['Windows 8', 'chrome', '', ''],
@@ -45,15 +47,7 @@ ALL_CONFIG = {
     'Windows 8-internetexplorer-10-': ['Windows 8', 'internetexplorer', '10', ''],
 }
 
-#HACK
-#This needs to be done because Jenkins needs to satisfy URLs, JSON, BASH, SAUCE, and PYTHON
-#This is the simplest way to adhere to all of these requirements and still be readable
-# PLATFORM-BROWSER-VERSION_NUM-DEVICE
-DEFAULT_CONFIG = 'Linux-chrome--'
-
-SAUCE_CONFIG = os.environ.get('SAUCE_INFO', DEFAULT_CONFIG)
-
-SAUCE_INFO = ALL_CONFIG[SAUCE_CONFIG]
+SAUCE_INFO = ALL_CONFIG.get(os.environ.get('SAUCE_INFO', 'Linux-chrome--'))
 
 # Information needed to utilize Sauce Labs.
 SAUCE = {
