@@ -96,7 +96,7 @@ class @Hinter
       $(obj).css('margin-top', (viewbox_height - view_height) + 'px')
     )
 
-  render: (content) =>
+  render: (content) ->
     if content
       # Trim leading and trailing whitespace
       content = content.replace /^\s+|\s+$/g, ""

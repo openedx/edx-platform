@@ -125,8 +125,9 @@ describe 'Problem', ->
         expect(@problem.bind).toHaveBeenCalled()
 
   describe 'check_fd', ->
-    xit 'should have specs written for this functionality', ->
+    xit 'should have more specs written for this functionality', ->
       expect(false)
+
 
   describe 'check', ->
     beforeEach ->
@@ -136,6 +137,15 @@ describe 'Problem', ->
     it 'log the problem_check event', ->
       @problem.check()
       expect(Logger.log).toHaveBeenCalledWith 'problem_check', 'foo=1&bar=2'
+
+    it 'log the problem_graded event, after the problem is done grading.', ->
+      spyOn($, 'postWithPrefix').andCallFake (url, answers, callback) ->
+        response = 
+          success: 'correct'
+          contents: 'mock grader response'
+        callback(response)
+      @problem.check()
+      expect(Logger.log).toHaveBeenCalledWith 'problem_graded', ['foo=1&bar=2', 'mock grader response'], @problem.url
 
     it 'submit the answer for check', ->
       spyOn $, 'postWithPrefix'
