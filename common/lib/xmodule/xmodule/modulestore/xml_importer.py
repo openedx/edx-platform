@@ -246,7 +246,7 @@ def import_course_draft(xml_module_store, store, draft_store, course_data_path, 
                 try:
                     # note, on local dev it seems like OSX will put some extra files in
                     # the directory with "quarantine" information. These files are
-                    # binary files and will throw execptions when we try to parse
+                    # binary files and will throw exceptions when we try to parse
                     # the file as an XML string. Let's make sure we're
                     # dealing with a string before ingesting
                     data = f.read()
@@ -268,7 +268,7 @@ def import_course_draft(xml_module_store, store, draft_store, course_data_path, 
                         # Better yet would be a way to figure out if this is a binary file, but I
                         # haven't found a good way to do this yet.
                         #
-                        if filename.startswith('.'):
+                        if filename.startswith('._'):
                             continue
                         # Not a 'hidden file', then re-raise exception
                         raise e
