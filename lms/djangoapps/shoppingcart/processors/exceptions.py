@@ -1,5 +1,4 @@
-class PaymentException(Exception):
-    pass
+from shoppingcart.exceptions import PaymentException
 
 class CCProcessorException(PaymentException):
     pass

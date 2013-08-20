@@ -270,6 +270,10 @@ CC_PROCESSOR['CyberSource']['PURCHASE_ENDPOINT'] = os.environ.get('CYBERSOURCE_P
 ########################## USER API ########################
 EDX_API_KEY = None
 
+
+####################### Shoppingcart ###########################
+MITX_FEATURES['ENABLE_SHOPPING_CART'] = True
+
 #####################################################################
 # Lastly, see if the developer has any local overrides.
 try:

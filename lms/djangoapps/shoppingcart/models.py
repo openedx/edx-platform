@@ -6,10 +6,17 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
 from model_utils.managers import InheritanceManager
-from courseware.courses import get_course_about_section
+from courseware.courses import course_image_url, get_course_about_section
+
+from xmodule.modulestore.django import modulestore
+from xmodule.course_module import CourseDescriptor
+
+from course_modes.models import CourseMode
 from student.views import course_from_id
 from student.models import CourseEnrollment
 from statsd import statsd
+from .exceptions import *
+
 log = logging.getLogger("shoppingcart")
 
 class InvalidCartItem(Exception):
@@ -157,7 +164,7 @@ class PaidCourseRegistration(OrderItem):
                              if item.is_of_subtype(PaidCourseRegistration)]
 
     @classmethod
-    def add_to_order(cls, order, course_id, cost=None, currency=None):
+    def add_to_order(cls, order, course_id, mode_slug=None, cost=None, currency=None):
         """
         A standardized way to create these objects, with sensible defaults filled in.
         Will update the cost if called on an order that already carries the course.
@@ -171,10 +178,21 @@ class PaidCourseRegistration(OrderItem):
                                             # throw errors if it doesn't
         item, created = cls.objects.get_or_create(order=order, user=order.user, course_id=course_id)
         item.status = order.status
+        if not mode_slug:
+            mode_slug = CourseMode.DEFAULT_MODE.slug
+        ### Get this course_mode
+        course_mode = CourseMode.mode_for_course(course_id, mode_slug)
+        if not course_mode:
+            course_mode = CourseMode.DEFAULT_MODE
+        if not cost:
+            cost = course_mode.min_price
+        if not currency:
+            currency = course_mode.currency
         item.qty = 1
         item.unit_cost = cost
         item.line_cost = cost
-        item.line_desc = 'Registration for Course: {0}'.format(get_course_about_section(course, "title"))
+        item.line_desc = 'Registration for Course: {0}. Mode: {1}'.format(get_course_about_section(course, "title"),
+                                                                          course_mode.name)
         item.currency = currency
         order.currency = currency
         order.save()
@@ -188,11 +206,12 @@ class PaidCourseRegistration(OrderItem):
         CourseEnrollmentAllowed will the user be allowed to enroll.  Otherwise requiring payment
         would in fact be quite silly since there's a clear back door.
         """
-        course = course_from_id(self.course_id)  # actually fetch the course to make sure it exists, use this to
-                                                 # throw errors if it doesn't
-        # use get_or_create here to gracefully handle case where the user is already enrolled in the course, for
-        # whatever reason.
-        CourseEnrollment.objects.get_or_create(user=self.user, course_id=self.course_id)
+        course_loc = CourseDescriptor.id_to_location(self.course_id)
+        course_exists = modulestore().has_item(self.course_id, course_loc)
+        if not course_exists:
+            raise PurchasedCallbackException(
+                "The customer purchased Course {0}, but that course doesn't exist!".format(self.course_id))
+        CourseEnrollment.enroll(user=self.user, course_id=self.course_id)
 
         log.info("Enrolled {0} in paid course {1}, paid ${2}".format(self.user.email, self.course_id, self.line_cost))
         org, course_num, run = self.course_id.split("/")
