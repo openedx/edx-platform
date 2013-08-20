@@ -27,24 +27,41 @@ DESIRED_CAPABILITIES = {
     'android': DesiredCapabilities.ANDROID
 }
 
-PLATFORMS = ['Linux', 'OS X 10.8', 'OS X 10.6', 'Windows 8', 'Windows 7', 'Windows XP']
+ALL_CONFIG = {
+    'Linux-chrome--': ['Linux', 'chrome', '', ''],
+    'Windows 8-chrome--': ['Windows 8', 'chrome', '', ''],
+    'Windows 7-chrome--': ['Windows 7', 'chrome', '', ''],
+    'Windows XP-chrome--': ['Windows XP', 'chrome', '', ''],
+    'OS X 10.8-chrome--': ['OS X 10.8', 'chrome', '', ''],
+    'OS X 10.6-chrome--': ['OS X 10.6', 'chrome', '', ''],
+
+    'Linux-firefox-23-': ['Linux', 'firefox', '23', ''],
+    'Windows 8-firefox-23-': ['Windows 8', 'firefox', '23', ''],
+    'Windows 7-firefox-23-': ['Windows 7', 'firefox', '23', ''],
+    'Windows XP-firefox-23-': ['Windows XP', 'firefox', '23', ''],
+
+    'OS X 10.8-safari-6-': ['OS X 10.8', 'safari', '6', ''],
+
+    'Windows 8-internetexplorer-10-': ['Windows 8', 'internetexplorer', '10', ''],
+}
 
 #HACK
 #This needs to be done because Jenkins needs to satisfy URLs, JSON, BASH, SAUCE, and PYTHON
 #This is the simplest way to adhere to all of these requirements and still be readable
+# PLATFORM-BROWSER-VERSION_NUM-DEVICE
 DEFAULT_CONFIG = 'Linux-chrome--'
 
-SAUCE_INFO = os.environ.get('SAUCE_INFO', DEFAULT_CONFIG).split('-')
-if len(SAUCE_INFO) != 4:
-    SAUCE_INFO = DEFAULT_CONFIG.split('-')
+SAUCE_CONFIG = os.environ.get('SAUCE_INFO', DEFAULT_CONFIG)
+
+SAUCE_INFO = ALL_CONFIG[SAUCE_CONFIG]
 
 # Information needed to utilize Sauce Labs.
 SAUCE = {
     'SAUCE_ENABLED': os.environ.get('SAUCE_ENABLED'),
     'USERNAME': os.environ.get('SAUCE_USER_NAME'),
     'ACCESS_ID': os.environ.get('SAUCE_API_KEY'),
-    'PLATFORM': SAUCE_INFO[0] if SAUCE_INFO[0] in PLATFORMS else 'Linux',
-    'BROWSER': DESIRED_CAPABILITIES.get(SAUCE_INFO[1].lower(), DesiredCapabilities.CHROME),
+    'PLATFORM': SAUCE_INFO[0],
+    'BROWSER': DESIRED_CAPABILITIES.get(SAUCE_INFO[1]),
     'VERSION': SAUCE_INFO[2],
     'DEVICE': SAUCE_INFO[3],
     'SESSION': 'Jenkins Acceptance Tests',
