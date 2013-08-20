@@ -438,10 +438,10 @@ ZENDESK_API_KEY = None
 PAYMENT_SUPPORT_EMAIL = 'payment@edx.org'
 ##### Using cybersource by default #####
 CC_PROCESSOR = {
-    'CyberSource' : {
+    'CyberSource': {
         'SHARED_SECRET': '',
-        'MERCHANT_ID' : '',
-        'SERIAL_NUMBER' : '',
+        'MERCHANT_ID': '',
+        'SERIAL_NUMBER': '',
         'ORDERPAGE_VERSION': '7',
         'PURCHASE_ENDPOINT': '',
     }

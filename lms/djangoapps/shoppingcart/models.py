@@ -1,20 +1,26 @@
 import pytz
 import logging
-from datetime  import datetime
+from datetime import datetime
 from django.db import models
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User
-from courseware.courses import course_image_url, get_course_about_section
+from django.utils.translation import ugettext as _
+from model_utils.managers import InheritanceManager
+from courseware.courses import get_course_about_section
 from student.views import course_from_id
-from student.models import CourseEnrollmentAllowed, CourseEnrollment
+from student.models import CourseEnrollment
 from statsd import statsd
 log = logging.getLogger("shoppingcart")
+
+class InvalidCartItem(Exception):
+    pass
 
 ORDER_STATUSES = (
     ('cart', 'cart'),
     ('purchased', 'purchased'),
     ('refunded', 'refunded'),  # Not used for now
 )
+
 
 class Order(models.Model):
     """
@@ -23,43 +29,40 @@ class Order(models.Model):
     FOR ANY USER, THERE SHOULD ONLY EVER BE ZERO OR ONE ORDER WITH STATUS='cart'.
     """
     user = models.ForeignKey(User, db_index=True)
+    currency = models.CharField(default="usd", max_length=8)  # lower case ISO currency codes
     status = models.CharField(max_length=32, default='cart', choices=ORDER_STATUSES)
     purchase_time = models.DateTimeField(null=True, blank=True)
     # Now we store data needed to generate a reasonable receipt
     # These fields only make sense after the purchase
-    bill_to_first = models.CharField(max_length=64, null=True, blank=True)
-    bill_to_last = models.CharField(max_length=64, null=True, blank=True)
-    bill_to_street1 = models.CharField(max_length=128, null=True, blank=True)
-    bill_to_street2 = models.CharField(max_length=128, null=True, blank=True)
-    bill_to_city = models.CharField(max_length=64, null=True, blank=True)
-    bill_to_state = models.CharField(max_length=8, null=True, blank=True)
-    bill_to_postalcode = models.CharField(max_length=16, null=True, blank=True)
-    bill_to_country = models.CharField(max_length=64, null=True, blank=True)
-    bill_to_ccnum = models.CharField(max_length=8, null=True, blank=True) # last 4 digits
-    bill_to_cardtype = models.CharField(max_length=32, null=True, blank=True)
+    bill_to_first = models.CharField(max_length=64, blank=True)
+    bill_to_last = models.CharField(max_length=64, blank=True)
+    bill_to_street1 = models.CharField(max_length=128, blank=True)
+    bill_to_street2 = models.CharField(max_length=128, blank=True)
+    bill_to_city = models.CharField(max_length=64, blank=True)
+    bill_to_state = models.CharField(max_length=8, blank=True)
+    bill_to_postalcode = models.CharField(max_length=16, blank=True)
+    bill_to_country = models.CharField(max_length=64, blank=True)
+    bill_to_ccnum = models.CharField(max_length=8, blank=True)  # last 4 digits
+    bill_to_cardtype = models.CharField(max_length=32, blank=True)
     # a JSON dump of the CC processor response, for completeness
-    processor_reply_dump = models.TextField(null=True, blank=True)
+    processor_reply_dump = models.TextField(blank=True)
 
     @classmethod
     def get_cart_for_user(cls, user):
         """
         Always use this to preserve the property that at most 1 order per user has status = 'cart'
         """
-        order, created = cls.objects.get_or_create(user=user, status='cart')
-        return order
+        # find the newest element in the db
+        try:
+            cart_order = cls.objects.filter(user=user, status='cart').order_by('-id')[:1].get()
+        except ObjectDoesNotExist:
+            # if nothing exists in the database, create a new cart
+            cart_order, _created = cls.objects.get_or_create(user=user, status='cart')
+        return cart_order
 
     @property
     def total_cost(self):
-        return sum([i.line_cost for i in self.orderitem_set.filter(status=self.status)])
-
-    @property
-    def currency(self):
-        """Assumes that all cart items are in the same currency"""
-        items = self.orderitem_set.all()
-        if not items:
-            return 'usd'
-        else:
-            return items[0].currency
+        return sum(i.line_cost for i in self.orderitem_set.filter(status=self.status))
 
     def clear(self):
         """
@@ -87,7 +90,10 @@ class Order(models.Model):
         self.bill_to_cardtype = cardtype
         self.processor_reply_dump = processor_reply_dump
         self.save()
-        for item in self.orderitem_set.all():
+        # this should return all of the objects with the correct types of the
+        # subclasses
+        orderitems = OrderItem.objects.filter(order=self).select_subclasses()
+        for item in orderitems:
             item.status = 'purchased'
             item.purchased_callback()
             item.save()
@@ -101,60 +107,38 @@ class OrderItem(models.Model):
     Each implementation of OrderItem should provide its own purchased_callback as
     a method.
     """
+    objects = InheritanceManager()
     order = models.ForeignKey(Order, db_index=True)
     # this is denormalized, but convenient for SQL queries for reports, etc. user should always be = order.user
     user = models.ForeignKey(User, db_index=True)
     # this is denormalized, but convenient for SQL queries for reports, etc. status should always be = order.status
     status = models.CharField(max_length=32, default='cart', choices=ORDER_STATUSES)
     qty = models.IntegerField(default=1)
-    unit_cost = models.FloatField(default=0.0)
-    line_cost = models.FloatField(default=0.0) # qty * unit_cost
+    unit_cost = models.DecimalField(default=0.0, decimal_places=2, max_digits=30)
+    line_cost = models.DecimalField(default=0.0, decimal_places=2, max_digits=30)  # qty * unit_cost
     line_desc = models.CharField(default="Misc. Item", max_length=1024)
-    currency = models.CharField(default="usd", max_length=8) # lower case ISO currency codes
+    currency = models.CharField(default="usd", max_length=8)  # lower case ISO currency codes
 
-    def add_to_order(self, *args, **kwargs):
+    @classmethod
+    def add_to_order(cls, *args, **kwargs):
         """
         A suggested convenience function for subclasses.
         """
-        raise NotImplementedError
+        # this is a validation step to verify that the currency of the item we
+        # are adding is the same as the currency of the order we are adding it
+        # to
+        if isinstance(args[0], Order):
+            currency = kwargs['currency'] if 'currency' in kwargs else 'usd'
+            order = args[0]
+            if order.currency != currency and order.orderitem_set.count() > 0:
+                raise InvalidCartItem(_("Trying to add a different currency into the cart"))
 
     def purchased_callback(self):
         """
         This is called on each inventory item in the shopping cart when the
         purchase goes through.
-
-        NOTE: We want to provide facilities for doing something like
-        for item in OrderItem.objects.filter(order_id=order_id):
-            item.purchased_callback()
-
-        Unfortunately the QuerySet used determines the class to be OrderItem, and not its most specific
-        subclasses.  That means this parent class implementation of purchased_callback needs to act as
-        a dispatcher to call the callback the proper subclasses, and as such it needs to know about all
-        possible subclasses.
-        So keep ORDER_ITEM_SUBTYPES up-to-date
         """
-        for cls, lc_classname in ORDER_ITEM_SUBTYPES.iteritems():
-            try:
-                #Uses https://docs.djangoproject.com/en/1.4/topics/db/models/#multi-table-inheritance to test subclass
-                sub_instance = getattr(self,lc_classname)
-                sub_instance.purchased_callback()
-            except (ObjectDoesNotExist, AttributeError):
-                log.exception('Cannot call purchase_callback on non-existent subclass attribute {0} of OrderItem'\
-                              .format(lc_classname))
-                pass
-
-    def is_of_subtype(self, cls):
-        """
-        Checks if self is also a type of cls, in addition to being an OrderItem
-        Uses https://docs.djangoproject.com/en/1.4/topics/db/models/#multi-table-inheritance to test for subclass
-        """
-        if cls not in ORDER_ITEM_SUBTYPES:
-            return False
-        try:
-            getattr(self, ORDER_ITEM_SUBTYPES[cls])
-            return True
-        except (ObjectDoesNotExist, AttributeError):
-            return False
+        raise NotImplementedError
 
 
 class PaidCourseRegistration(OrderItem):
@@ -180,6 +164,8 @@ class PaidCourseRegistration(OrderItem):
 
         Returns the order item
         """
+        super(PaidCourseRegistration, cls).add_to_order(order, course_id, cost, currency=currency)
+
         # TODO: Possibly add checking for whether student is already enrolled in course
         course = course_from_id(course_id)  # actually fetch the course to make sure it exists, use this to
                                             # throw errors if it doesn't
@@ -190,6 +176,8 @@ class PaidCourseRegistration(OrderItem):
         item.line_cost = cost
         item.line_desc = 'Registration for Course: {0}'.format(get_course_about_section(course, "title"))
         item.currency = currency
+        order.currency = currency
+        order.save()
         item.save()
         return item
 
@@ -214,45 +202,61 @@ class PaidCourseRegistration(OrderItem):
                                "run:{0}".format(run)])
 
 
-class VerifiedCertificate(OrderItem):
+class CertificateItem(OrderItem):
     """
-    This is an inventory item for purchasing verified certificates
+    This is an inventory item for purchasing certificates
     """
     course_id = models.CharField(max_length=128, db_index=True)
     course_enrollment = models.ForeignKey(CourseEnrollment)
+    mode = models.SlugField()
 
     @classmethod
-    def add_to_order(cls, order, course_id, cost, currency='usd'):
+    def add_to_order(cls, order, course_id, cost, mode, currency='usd'):
         """
-        Add a VerifiedCertificate item to an order
+        Add a CertificateItem to an order
+
+        Returns the CertificateItem object after saving
+
+        `order` - an order that this item should be added to, generally the cart order
+        `course_id` - the course that we would like to purchase as a CertificateItem
+        `cost` - the amount the user will be paying for this CertificateItem
+        `mode` - the course mode that this certificate is going to be issued for
+
+        This item also creates a new enrollment if none exists for this user and this course.
+
+        Example Usage:
+            cart = Order.get_cart_for_user(user)
+            CertificateItem.add_to_order(cart, 'edX/Test101/2013_Fall', 30, 'verified')
+
         """
-        course_enrollment = CourseEnrollment.create_enrollment(order.user, course_id, mode="verified")
+        super(CertificateItem, cls).add_to_order(order, course_id, cost, currency=currency)
+        try:
+            course_enrollment = CourseEnrollment.objects.get(user=order.user, course_id=course_id)
+        except ObjectDoesNotExist:
+            course_enrollment = CourseEnrollment.create_enrollment(order.user, course_id, mode=mode)
         item, _created = cls.objects.get_or_create(
             order=order,
             user=order.user,
             course_id=course_id,
-            course_enrollment=course_enrollment
+            course_enrollment=course_enrollment,
+            mode=mode
         )
         item.status = order.status
         item.qty = 1
         item.unit_cost = cost
         item.line_cost = cost
-        item.line_desc = "Verified Certificate for Course {0}".format(course_id)
+        item.line_desc = "{mode} certificate for course {course_id}".format(mode=item.mode,
+                                                                            course_id=course_id)
         item.currency = currency
+        order.currency = currency
+        order.save()
         item.save()
         return item
 
     def purchased_callback(self):
         """
-        When purchase goes through, activate the course enrollment
+        When purchase goes through, activate and update the course enrollment for the correct mode
         """
+        self.course_enrollment.mode = self.mode
+        self.course_enrollment.save()
         self.course_enrollment.activate()
-
-
-# Each entry is a dictionary of ModelName: 'lower_case_model_name'
-# See https://docs.djangoproject.com/en/1.4/topics/db/models/#multi-table-inheritance for
-# PLEASE KEEP THIS LIST UP_TO_DATE WITH THE SUBCLASSES OF OrderItem
-ORDER_ITEM_SUBTYPES = {
-    PaidCourseRegistration: 'paidcourseregistration',
-    VerifiedCertificate: 'verifiedcertificate',
-}
