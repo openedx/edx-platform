@@ -4,12 +4,16 @@ Unit tests for student optouts from course email
 import json
 
 from django.core import mail
-from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
+from django.conf import settings
+from django.test.utils import override_settings
+
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
+from student.tests.factories import UserFactory, AdminFactory, CourseEnrollmentFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from student.tests.factories import UserFactory, AdminFactory, CourseEnrollmentFactory
+
+from mock import patch
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
@@ -27,6 +31,24 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
 
         self.client.login(username=self.student.username, password="test")
 
+    def navigate_to_email_view(self):
+        """Navigate to the instructor dash's email view"""
+        # Pull up email view on instructor dashboard
+        url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id})
+        response = self.client.get(url)
+        email_link = '<a href="#" onclick="goto(\'Email\')" class="None">Email</a>'
+        # If this fails, it is likely because ENABLE_INSTRUCTOR_EMAIL is set to False
+        self.assertTrue(email_link in response.content)
+
+        # Select the Email view of the instructor dash
+        session = self.client.session
+        session['idash_mode'] = 'Email'
+        session.save()
+        response = self.client.get(url)
+        selected_email_link = '<a href="#" onclick="goto(\'Email\')" class="selectedmode">Email</a>'
+        self.assertTrue(selected_email_link in response.content)
+
+    @patch.dict(settings.MITX_FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True})
     def test_optout_course(self):
         """
         Make sure student does not receive course email after opting out.
@@ -36,15 +58,24 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
         self.assertEquals(json.loads(response.content), {'success': True})
 
         self.client.logout()
+
         self.client.login(username=self.instructor.username, password="test")
+        self.navigate_to_email_view()
 
         url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id})
-        response = self.client.post(url, {'action': 'Send email', 'to_option': 'all', 'subject': 'test subject for all', 'message': 'test message for all'})
+        test_email = {
+            'action': 'Send email',
+            'to_option': 'all',
+            'subject': 'test subject for all',
+            'message': 'test message for all'
+        }
+        response = self.client.post(url, test_email)
         self.assertContains(response, "Your email was successfully queued for sending.")
 
-        #assert that self.student.email not in mail.to, outbox should be empty
+        # Assert that self.student.email not in mail.to, outbox should be empty
         self.assertEqual(len(mail.outbox), 0)
 
+    @patch.dict(settings.MITX_FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True})
     def test_optin_course(self):
         """
         Make sure student receives course email after opting in.
@@ -54,13 +85,22 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
         self.assertEquals(json.loads(response.content), {'success': True})
 
         self.client.logout()
+
         self.client.login(username=self.instructor.username, password="test")
+        self.navigate_to_email_view()
 
         url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id})
-        response = self.client.post(url, {'action': 'Send email', 'to_option': 'all', 'subject': 'test subject for all', 'message': 'test message for all'})
+        test_email = {
+            'action': 'Send email',
+            'to_option': 'all',
+            'subject': 'test subject for all',
+            'message': 'test message for all'
+        }
+        response = self.client.post(url, test_email)
+
         self.assertContains(response, "Your email was successfully queued for sending.")
 
-        #assert that self.student.email in mail.to
+        # Assert that self.student.email in mail.to
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(len(mail.outbox[0].to), 1)
         self.assertEquals(mail.outbox[0].to[0], self.student.email)
