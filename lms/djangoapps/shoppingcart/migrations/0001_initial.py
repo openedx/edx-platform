@@ -12,9 +12,20 @@ class Migration(SchemaMigration):
         db.create_table('shoppingcart_order', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
+            ('currency', self.gf('django.db.models.fields.CharField')(default='usd', max_length=8)),
             ('status', self.gf('django.db.models.fields.CharField')(default='cart', max_length=32)),
-            ('nonce', self.gf('django.db.models.fields.CharField')(max_length=128)),
             ('purchase_time', self.gf('django.db.models.fields.DateTimeField')(null=True, blank=True)),
+            ('bill_to_first', self.gf('django.db.models.fields.CharField')(max_length=64, blank=True)),
+            ('bill_to_last', self.gf('django.db.models.fields.CharField')(max_length=64, blank=True)),
+            ('bill_to_street1', self.gf('django.db.models.fields.CharField')(max_length=128, blank=True)),
+            ('bill_to_street2', self.gf('django.db.models.fields.CharField')(max_length=128, blank=True)),
+            ('bill_to_city', self.gf('django.db.models.fields.CharField')(max_length=64, blank=True)),
+            ('bill_to_state', self.gf('django.db.models.fields.CharField')(max_length=8, blank=True)),
+            ('bill_to_postalcode', self.gf('django.db.models.fields.CharField')(max_length=16, blank=True)),
+            ('bill_to_country', self.gf('django.db.models.fields.CharField')(max_length=64, blank=True)),
+            ('bill_to_ccnum', self.gf('django.db.models.fields.CharField')(max_length=8, blank=True)),
+            ('bill_to_cardtype', self.gf('django.db.models.fields.CharField')(max_length=32, blank=True)),
+            ('processor_reply_dump', self.gf('django.db.models.fields.TextField')(blank=True)),
         ))
         db.send_create_signal('shoppingcart', ['Order'])
 
@@ -25,9 +36,10 @@ class Migration(SchemaMigration):
             ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
             ('status', self.gf('django.db.models.fields.CharField')(default='cart', max_length=32)),
             ('qty', self.gf('django.db.models.fields.IntegerField')(default=1)),
-            ('unit_cost', self.gf('django.db.models.fields.FloatField')(default=0.0)),
-            ('line_cost', self.gf('django.db.models.fields.FloatField')(default=0.0)),
+            ('unit_cost', self.gf('django.db.models.fields.DecimalField')(default=0.0, max_digits=30, decimal_places=2)),
+            ('line_cost', self.gf('django.db.models.fields.DecimalField')(default=0.0, max_digits=30, decimal_places=2)),
             ('line_desc', self.gf('django.db.models.fields.CharField')(default='Misc. Item', max_length=1024)),
+            ('currency', self.gf('django.db.models.fields.CharField')(default='usd', max_length=8)),
         ))
         db.send_create_signal('shoppingcart', ['OrderItem'])
 
@@ -37,6 +49,15 @@ class Migration(SchemaMigration):
             ('course_id', self.gf('django.db.models.fields.CharField')(max_length=128, db_index=True)),
         ))
         db.send_create_signal('shoppingcart', ['PaidCourseRegistration'])
+
+        # Adding model 'CertificateItem'
+        db.create_table('shoppingcart_certificateitem', (
+            ('orderitem_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['shoppingcart.OrderItem'], unique=True, primary_key=True)),
+            ('course_id', self.gf('django.db.models.fields.CharField')(max_length=128, db_index=True)),
+            ('course_enrollment', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['student.CourseEnrollment'])),
+            ('mode', self.gf('django.db.models.fields.SlugField')(max_length=50)),
+        ))
+        db.send_create_signal('shoppingcart', ['CertificateItem'])
 
 
     def backwards(self, orm):
@@ -48,6 +69,9 @@ class Migration(SchemaMigration):
 
         # Deleting model 'PaidCourseRegistration'
         db.delete_table('shoppingcart_paidcourseregistration')
+
+        # Deleting model 'CertificateItem'
+        db.delete_table('shoppingcart_certificateitem')
 
 
     models = {
@@ -87,29 +111,57 @@ class Migration(SchemaMigration):
             'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
+        'shoppingcart.certificateitem': {
+            'Meta': {'object_name': 'CertificateItem', '_ormbases': ['shoppingcart.OrderItem']},
+            'course_enrollment': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['student.CourseEnrollment']"}),
+            'course_id': ('django.db.models.fields.CharField', [], {'max_length': '128', 'db_index': 'True'}),
+            'mode': ('django.db.models.fields.SlugField', [], {'max_length': '50'}),
+            'orderitem_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['shoppingcart.OrderItem']", 'unique': 'True', 'primary_key': 'True'})
+        },
         'shoppingcart.order': {
             'Meta': {'object_name': 'Order'},
+            'bill_to_cardtype': ('django.db.models.fields.CharField', [], {'max_length': '32', 'blank': 'True'}),
+            'bill_to_ccnum': ('django.db.models.fields.CharField', [], {'max_length': '8', 'blank': 'True'}),
+            'bill_to_city': ('django.db.models.fields.CharField', [], {'max_length': '64', 'blank': 'True'}),
+            'bill_to_country': ('django.db.models.fields.CharField', [], {'max_length': '64', 'blank': 'True'}),
+            'bill_to_first': ('django.db.models.fields.CharField', [], {'max_length': '64', 'blank': 'True'}),
+            'bill_to_last': ('django.db.models.fields.CharField', [], {'max_length': '64', 'blank': 'True'}),
+            'bill_to_postalcode': ('django.db.models.fields.CharField', [], {'max_length': '16', 'blank': 'True'}),
+            'bill_to_state': ('django.db.models.fields.CharField', [], {'max_length': '8', 'blank': 'True'}),
+            'bill_to_street1': ('django.db.models.fields.CharField', [], {'max_length': '128', 'blank': 'True'}),
+            'bill_to_street2': ('django.db.models.fields.CharField', [], {'max_length': '128', 'blank': 'True'}),
+            'currency': ('django.db.models.fields.CharField', [], {'default': "'usd'", 'max_length': '8'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'nonce': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
+            'processor_reply_dump': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'purchase_time': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             'status': ('django.db.models.fields.CharField', [], {'default': "'cart'", 'max_length': '32'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"})
         },
         'shoppingcart.orderitem': {
             'Meta': {'object_name': 'OrderItem'},
+            'currency': ('django.db.models.fields.CharField', [], {'default': "'usd'", 'max_length': '8'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'line_cost': ('django.db.models.fields.FloatField', [], {'default': '0.0'}),
+            'line_cost': ('django.db.models.fields.DecimalField', [], {'default': '0.0', 'max_digits': '30', 'decimal_places': '2'}),
             'line_desc': ('django.db.models.fields.CharField', [], {'default': "'Misc. Item'", 'max_length': '1024'}),
             'order': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['shoppingcart.Order']"}),
             'qty': ('django.db.models.fields.IntegerField', [], {'default': '1'}),
             'status': ('django.db.models.fields.CharField', [], {'default': "'cart'", 'max_length': '32'}),
-            'unit_cost': ('django.db.models.fields.FloatField', [], {'default': '0.0'}),
+            'unit_cost': ('django.db.models.fields.DecimalField', [], {'default': '0.0', 'max_digits': '30', 'decimal_places': '2'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"})
         },
         'shoppingcart.paidcourseregistration': {
             'Meta': {'object_name': 'PaidCourseRegistration', '_ormbases': ['shoppingcart.OrderItem']},
             'course_id': ('django.db.models.fields.CharField', [], {'max_length': '128', 'db_index': 'True'}),
             'orderitem_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['shoppingcart.OrderItem']", 'unique': 'True', 'primary_key': 'True'})
+        },
+        'student.courseenrollment': {
+            'Meta': {'ordering': "('user', 'course_id')", 'unique_together': "(('user', 'course_id'),)", 'object_name': 'CourseEnrollment'},
+            'course_id': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'}),
+            'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'null': 'True', 'db_index': 'True', 'blank': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'is_active': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
+            'mode': ('django.db.models.fields.CharField', [], {'default': "'honor'", 'max_length': '100'}),
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"})
         }
     }
 
