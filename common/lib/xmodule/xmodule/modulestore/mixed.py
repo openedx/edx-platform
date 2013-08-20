@@ -7,7 +7,7 @@ IMPORTANT: This modulestore only supports READONLY applications, e.g. LMS
 """
 
 from . import ModuleStoreBase
-from django import create_modulestore_instance
+from xmodule.modulestore.django import create_modulestore_instance
 import logging
 
 log = logging.getLogger(__name__)
