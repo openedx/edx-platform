@@ -1,6 +1,14 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
 <%inherit file="../main.html" />
+<%block name="bodyclass">register verification</%block>
+
+<%block name="js_extra">
+  <script type="text/javascript">
+
+  </script>
+</%block>
+
 
 <%block name="content">
 <div class="container">
@@ -12,19 +20,19 @@
   <section class="progress">
   <h3 class="sr">Your Progress</h3>
   <ol>
-    <li class="progress-step1"><span class="current">Current: </span>Step 1 Take Your Photo</li>
-    <li class="progress-step2">Step 2 ID Photo</li>
-    <li class="progress-step3">Step 3 Review</li>
-    <li class="progress-step4">Step 4 Payment</li>
-    <li class="progress-step5">Finished Confirmation</li>
+    <li class="progress-step" id="progress-step1"><span class="current">Current: </span>Step 1 Take Your Photo</li>
+    <li class="progress-step" id="progress-step2">Step 2 ID Photo</li>
+    <li class="progress-step" id="progress-step3">Step 3 Review</li>
+    <li class="progress-step" id="progress-step4">Step 4 Payment</li>
+    <li class="progress-step" id="progress-step5">Finished Confirmation</li>
   </ol>
   </section>
 
 
 
   <section id="wrapper">
-    <div id="wrapper-facephoto">
-      <h3>Take Your Photo</h3>
+    <div id="wrapper-facephoto block-photo">
+      <h3 class="title">Take Your Photo</h3>
       <p>Use your webcam to take a picture of your face so we can match it with the picture on your ID.</p>
 
       <div id="facecam">
@@ -97,8 +105,8 @@
 
 
 
-    <div id="wrapper-idphoto">
-      <h3>Take Your Photo</h3>
+    <div id="wrapper-idphoto block-photo">
+      <h3 class="title">Take Your Photo</h3>
       <p>Use your webcam to take a picture of your face so we can match it with the picture on your ID.</p>
 
       <div id="idcam">
@@ -153,40 +161,14 @@
 
 
 
-    <div id="wrapper-review">
-      <h3>Verify Your Submission</h3>
+    <div id="wrapper-review block-photo">
+      <h3 class="title">Verify Your Submission</h3>
       <p>Make sure we can verify your identity with the photos and information below.</p>
 
       <div class="review-name">
         <h3>Check Your Name</h3>
         <p>Make sure your full name on your edX account, [User Name], matches your ID. We will also use this as the name on your certificate.</p>
         <p><a href="#">Edit my name</a></p>
-
-        <section id="edit-name" class="modal">
-        <header>
-          <h4>${_("Edit Your Full Name")}</h4>
-        </header>
-          <form id="course-checklists" class="course-checklists" method="post" action="">
-            <div role="alert" class="status message submission-error" tabindex="-1">
-              <p class="message-title">${_("The following error occured while editing your name:")}
-                <span class="message-copy"> </span>
-              </p>
-            </div>
-            <p>
-              <label for="name">${_('Full Name')}</label>
-              <input id="name" type="text" name="name" value="" placeholder="${_('example: Jane Doe')}" required aria-required="true" />
-            </p>
-
-            <div class="actions">
-              <button class="action action-primary" type="submit">${_("Save")}</button>
-              <button class="action action-secondary action-cancel">${_("Cancel")}</button>
-            </div>
-          </form>
-          <a href="#" rel="view" class="action action-close action-editname-close">
-            <i class="icon-remove-sign"></i>
-            <span class="label">close</span>
-          </a>
-        </section>
       </div>
 
       <div id="review-facephoto">
@@ -247,5 +229,33 @@
 
   <!--<a href="${reverse('verify_student/photo_id_upload')}">Upload Photo ID</a>-->
 </div>
+
+
+
+<section id="edit-name" class="modal">
+<header>
+  <h4>${_("Edit Your Full Name")}</h4>
+</header>
+  <form id="course-checklists" class="course-checklists" method="post" action="">
+    <div role="alert" class="status message submission-error" tabindex="-1">
+      <p class="message-title">${_("The following error occured while editing your name:")}
+        <span class="message-copy"> </span>
+      </p>
+    </div>
+    <p>
+      <label for="name">${_('Full Name')}</label>
+      <input id="name" type="text" name="name" value="" placeholder="${_('example: Jane Doe')}" required aria-required="true" />
+    </p>
+
+    <div class="actions">
+      <button class="action action-primary" type="submit">${_("Save")}</button>
+      <button class="action action-secondary action-cancel">${_("Cancel")}</button>
+    </div>
+  </form>
+  <a href="#" rel="view" class="action action-close action-editname-close">
+    <i class="icon-remove-sign"></i>
+    <span class="label">close</span>
+  </a>
+</section>
 
 </%block>

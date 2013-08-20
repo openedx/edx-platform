@@ -1,3 +1,6 @@
+// lms - utilities - mixins and extends
+// ====================
+
 // mixins - font sizing
 @mixin font-size($sizeValue: 16){
   font-size: $sizeValue + px;
@@ -42,6 +45,9 @@
 @function lh($amount: 1) {
   @return $body-line-height * $amount;
 }
+
+
+
 
 
 //-----------------
