@@ -245,7 +245,8 @@ PIPELINE_JS = {
              'js/models/section.js', 'js/views/section.js',
              'js/models/metadata_model.js', 'js/views/metadata_editor_view.js',
              'js/models/textbook.js', 'js/views/textbook.js',
-             'js/views/assets.js', 'js/utility.js'],
+             'js/views/assets.js', 'js/utility.js',
+             'js/models/settings/course_grading_policy.js'],
         'output_filename': 'js/cms-application.js',
         'test_order': 0
     },

@@ -143,6 +143,21 @@ def cannot_edit_fail(_step):
     except InvalidElementStateException:
         pass  # We should get this exception on failing to edit the element
 
+
+@step(u'I change the grace period to "(.*)"$')
+def i_change_grace_period(_step, grace_period):
+    grace_period_css = '#course-grading-graceperiod'
+    ele = world.css_find(grace_period_css).first
+    ele.value = grace_period
+
+
+@step(u'I see the grace period is "(.*)"$')
+def the_grace_period_is(_step, grace_period):
+    grace_period_css = '#course-grading-graceperiod'
+    ele = world.css_find(grace_period_css).first
+    assert ele.value == grace_period
+
+
 def get_type_index(name):
     name_id = '#course-grading-assignment-name'
     all_types = world.css_find(name_id)
