@@ -642,22 +642,39 @@ def create_account(request, post_override=None):
     # this is a good idea
     # TODO: Check password is sane
 
-    required_post_vars = ['email', 'password', 'lastname', 'firstname', 'middlename', 'year_of_birth',
-        'level_of_education', 'education_place', 'education_year',
-        'work_type', 'work_number', 'work_name', 'work_login', 'work_location',
-        'work_occupation', 'work_teaching_experience', 'work_qualification_category', 'work_qualification_category_year',
-        'contact_phone', 'terms_of_service', 'honor_code']
+    required_post_vars = ["email", "password", "lastname", "firstname", "middlename", "year_of_birth",
+        "level_of_education", "education_place", "education_year",
+        "work_type", "work_number", "work_name", "work_login", "work_location",
+        "work_occupation", "work_teaching_experience", "work_qualification_category", "work_qualification_category_year",
+        "contact_phone", "terms_of_service", "honor_code"]
     if tos_not_required:
         required_post_vars = ['username', 'email', 'name', 'password', 'honor_code']
 
     for a in required_post_vars:
-        if len(post_vars[a]) < 2:
+        if len(post_vars[a]) < 1:
             error_str = {'username': 'Username must be minimum of two characters long.',
                          'email': 'A properly formatted e-mail is required.',
                          'name': 'Your legal name must be a minimum of two characters long.',
                          'password': 'A valid password is required.',
                          'terms_of_service': 'Accepting Terms of Service is required.',
-                         'honor_code': 'Agreeing to the Honor Code is required.'}
+                         'honor_code': 'Agreeing to the Honor Code is required.',
+                         'lastname': 'Aht',
+                         'firstname': '',
+                         'middlename': '',
+                         'year_of_birth': '',
+                         'level_of_education': '',
+                         'education_place': '',
+                         'education_year': '',
+                         'work_type': '',
+                         'work_number': '',
+                         'work_name': '',
+                         'work_login': '',
+                         'work_location': '',
+                         'work_occupation': '',
+                         'work_teaching_experience': '',
+                         'work_qualification_category': '',
+                         'work_qualification_category_year': '',
+                         'contact_phone': ''}
             js['value'] = error_str[a]
             js['field'] = a
             return HttpResponse(json.dumps(js))

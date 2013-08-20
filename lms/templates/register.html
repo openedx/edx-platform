@@ -197,8 +197,12 @@
                 %endfor
               </select>
             </li>
+          <li class="field required text" id="field-education-place">
+            <label for="education-place">${_('Place where Education Completed')}</label>
+            <input id="education-place" type="text" name="education_place" value="" required aria-required="true" />
+          </li>
         	<li class="field required select" id="field-education-year">
-              <label for="education-year">${_("Year of Birth")}</label>
+              <label for="education-year">${_("Year when education was Completed")}</label>
               <select id="education-year" name="education_year">
                 <option value="">--</option>
                 %for year in UserProfile.VALID_YEARS:
@@ -280,9 +284,9 @@
 					%endfor
 				</select>
         	</li>
-        	<li class="field text" id="field-work-qualification-category">
-        		<label for="work-qualification-category">${_('Qualification category year')}</label>
-        		<input id="work-qualification-category" type="text" name="work_qualification_category" value="" required aria-required="true" />
+        	<li class="field text" id="field-work-qualification-category-year">
+        		<label for="work-qualification-category-year">${_('Qualification category year')}</label>
+        		<input id="work-qualification-category-year" type="text" name="work_qualification_category_year" value="" required aria-required="true" />
         	</li>
         	<li class="field text" id="field-contact-phone">
         		<label for="contact-phone">${_('Contact phone')}</label>
