@@ -196,6 +196,8 @@ def get_course_info_section(request, course, section_key):
 
     loc = Location(course.location.tag, course.location.org, course.location.course, 'course_info', section_key)
 
+    log.debug("in get_course_info, static_asset_path=%s" % course.lms.static_asset_path)
+
     # Use an empty cache
     model_data_cache = ModelDataCache([], course.id, request.user)
     info_module = get_module(
@@ -204,7 +206,8 @@ def get_course_info_section(request, course, section_key):
         loc,
         model_data_cache,
         course.id,
-        wrap_xmodule_display=False
+        wrap_xmodule_display=False,
+        static_asset_path=course.lms.static_asset_path
     )
 
     html = ''
