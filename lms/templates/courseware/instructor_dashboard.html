@@ -443,38 +443,51 @@ function goto( mode)
 ##-----------------------------------------------------------------------------
 
 %if modeflag.get('Email'):
-    <p>
-    <label for="id_to">${_("Send to:")}</label>
-    <select id="id_to" name="to_option">
-      <option value="myself">${_("Myself")}</option>
-      %if to_option == "staff":
-        <option value="staff" selected="selected">${_("Staff and instructors")}</option>
-      %else:
-	<option value="staff">${_("Staff and instructors")}</option>
-      %endif
-      %if to_option == "all":
-        <option value="all" selected="selected">${_("All (students, staff and instructors)")}</option>
-      %else:
-	<option value="all">${_("All (students, staff and instructors)")}</option>
-      %endif
-    </select>
-    <label for="id_subject">${_("Subject: ")}</label>
-    %if subject:
-      <input type="text" id="id_subject" name="subject" maxlength="100" size="75" value="${subject}">
-    %else:
-      <input type="text" id="id_subject" name="subject" maxlength="100" size="75">
+    %if email_msg:
+        <p></p><p>${email_msg}</p>
     %endif
-    <label>Message:</label>
-    <div class="email-editor">
-      ${editor}
-    </div>
-    <input type="hidden" name="message" value="">
-    </p>
+
+    <ul class="list-fields">
+      <li class="field">
+        <label for="id_to">${_("Send to:")}</label>
+        <select id="id_to" name="to_option">
+          <option value="myself">${_("Myself")}</option>
+          %if to_option == "staff":
+          <option value="staff" selected="selected">${_("Staff and instructors")}</option>
+          %else:
+          <option value="staff">${_("Staff and instructors")}</option>
+              %endif
+              %if to_option == "all":
+                <option value="all" selected="selected">${_("All (students, staff and instructors)")}</option>
+              %else:
+          <option value="all">${_("All (students, staff and instructors)")}</option>
+          %endif
+        </select>
+      </li>
+
+      <li class="field">
+        <label for="id_subject">${_("Subject: ")}</label>
+        %if subject:
+          <input type="text" id="id_subject" name="subject" maxlength="100" size="75" value="${subject}">
+        %else:
+          <input type="text" id="id_subject" name="subject" maxlength="100" size="75">
+        %endif
+      </li>
+
+      <li class="field">
+        <label>Message:</label>
+        <div class="email-editor">
+          ${editor}
+        </div>
+        <input type="hidden" name="message" value="">
+      </li>
+    </ul>
+
     <div class="submit-email-action">
       ${_("Please try not to email students more than once a day. Important things to consider before sending:")}
-      <ul>
-        <li>${_("Have you read over the email to make sure it says everything you want to say?")}</li>
-        <li>${_("Have you sent the email to yourself first to make sure you're happy with how it's displayed?")}</li>
+      <ul class="list-advice">
+        <li class="item">${_("Have you read over the email to make sure it says everything you want to say?")}</li>
+        <li class="item">${_("Have you sent the email to yourself first to make sure you're happy with how it's displayed?")}</li>
       </ul>
       <input type="submit" name="action" value="Send email">
     </div>
@@ -520,7 +533,7 @@ function goto( mode)
 
   %if analytics_results.get("StudentsDropoffPerDay"):
     <p>
-      ${_("Student activity day by day")} 
+      ${_("Student activity day by day")}
       (${analytics_results["StudentsDropoffPerDay"]['time']})
     </p>
     <div>
