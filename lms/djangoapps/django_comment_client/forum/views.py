@@ -109,7 +109,7 @@ def inline_discussion(request, course_id, discussion_id):
     """
     Renders JSON for DiscussionModules
     """
-    course = get_course_with_access(request.user, course_id, 'load')
+    course = get_course_with_access(request.user, course_id, 'load_forum')
 
     try:
         threads, query_params = get_threads(request, course_id, discussion_id, per_page=INLINE_THREADS_PER_PAGE)
@@ -169,13 +169,8 @@ def forum_form_discussion(request, course_id):
     """
     Renders the main Discussion page, potentially filtered by a search query
     """
-    if not CourseEnrollment.is_enrolled(request.user, course_id) and \
-       not has_access(request.user, course_id, 'staff'):
-        access_violation_msg = "Unenrolled user {} tried to access forum for {}"
-        log.warning(access_violation_msg.format(request.user, course_id))
-        raise Http404
 
-    course = get_course_with_access(request.user, course_id, 'load')
+    course = get_course_with_access(request.user, course_id, 'load_forum')
     category_map = utils.get_discussion_category_map(course)
 
     try:
@@ -245,7 +240,7 @@ def forum_form_discussion(request, course_id):
 
 @login_required
 def single_thread(request, course_id, discussion_id, thread_id):
-    course = get_course_with_access(request.user, course_id, 'load')
+    course = get_course_with_access(request.user, course_id, 'load_forum')
     cc_user = cc.User.from_django_user(request.user)
     user_info = cc_user.to_dict()
 
@@ -280,7 +275,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
             log.error("Error loading single thread.")
             raise Http404
 
-        course = get_course_with_access(request.user, course_id, 'load')
+        course = get_course_with_access(request.user, course_id, 'load_forum')
 
         for thread in threads:
             courseware_context = get_courseware_context(thread, course)
@@ -340,7 +335,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
 @login_required
 def user_profile(request, course_id, user_id):
     #TODO: Allow sorting?
-    course = get_course_with_access(request.user, course_id, 'load')
+    course = get_course_with_access(request.user, course_id, 'load_forum')
     try:
         profiled_user = cc.User(id=user_id, course_id=course_id)
 
@@ -381,7 +376,7 @@ def user_profile(request, course_id, user_id):
 
 
 def followed_threads(request, course_id, user_id):
-    course = get_course_with_access(request.user, course_id, 'load')
+    course = get_course_with_access(request.user, course_id, 'load_forum')
     try:
         profiled_user = cc.User(id=user_id, course_id=course_id)
 
