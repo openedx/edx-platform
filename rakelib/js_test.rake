@@ -31,11 +31,11 @@ end
 # command line arguments
 def js_test_tool(env, command, do_coverage)
     suite = suite_for_env(env)
-    cmd = "js-test-tool #{command} #{suite} --use-firefox "
+    cmd = "js-test-tool #{command} #{suite} --use-firefox --timeout-sec 600"
 
     if do_coverage
         report_dir = File.join(JS_REPORT_DIR, 'coverage.xml')
-        cmd += "--coverage-xml #{report_dir}"
+        cmd += " --coverage-xml #{report_dir}"
     end
 
     sh(cmd)

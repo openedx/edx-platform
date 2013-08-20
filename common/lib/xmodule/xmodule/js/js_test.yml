@@ -14,6 +14,8 @@
 #   js-test-tool dev TEST_SUITE
 #
 
+test_suite_name: xmodule
+
 test_runner: jasmine
 
 prepend_path: common/lib/xmodule/xmodule/js

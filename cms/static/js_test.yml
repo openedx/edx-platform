@@ -14,6 +14,8 @@
 #   js-test-tool dev TEST_SUITE
 #
 
+test_suite_name: cms
+
 test_runner: jasmine
 
 prepend_path: cms/static

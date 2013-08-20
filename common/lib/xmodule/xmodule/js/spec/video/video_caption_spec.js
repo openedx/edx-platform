@@ -1,5 +1,5 @@
 (function() {
-  xdescribe('VideoCaption', function() {
+  describe('VideoCaption', function() {
     var state, videoPlayer, videoCaption, videoSpeedControl, oldOTBD;
 
     function initialize() {
@@ -130,6 +130,7 @@
 
     describe('mouse movement', function() {
       beforeEach(function() {
+        window.setTimeout = jasmine.createSpy().andCallFake(function(callback, timeout) { return 5; })
         window.setTimeout.andReturn(100);
         spyOn(window, 'clearTimeout');
       });
