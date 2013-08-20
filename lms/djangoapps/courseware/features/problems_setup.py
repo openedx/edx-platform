@@ -19,7 +19,6 @@ from capa.tests.response_xml_factory import OptionResponseXMLFactory, \
     StringResponseXMLFactory, NumericalResponseXMLFactory, \
     FormulaResponseXMLFactory, CustomResponseXMLFactory, \
     CodeResponseXMLFactory, ChoiceTextResponseXMLFactory
-from nose.tools import assert_true
 
 
 # Factories from capa.tests.response_xml_factory that we will use

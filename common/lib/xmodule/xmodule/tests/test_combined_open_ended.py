@@ -729,7 +729,6 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
         #Mock a student submitting an assessment
         assessment_dict = MockQueryDict()
         assessment_dict.update({'assessment': sum(assessment), 'score_list[]': assessment})
-        #from nose.tools import set_trace; set_trace()
         module.handle_ajax("save_assessment", assessment_dict)
         task_one_json = json.loads(module.task_states[0])
         self.assertEqual(json.loads(task_one_json['child_history'][0]['post_assessment']), assessment)
