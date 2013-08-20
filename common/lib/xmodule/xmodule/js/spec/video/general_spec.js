@@ -4,8 +4,6 @@
 
         beforeEach(function () {
             jasmine.stubRequests();
-            oldOTBD = window.onTouchBasedDevice;
-            window.onTouchBasedDevice = jasmine.createSpy('onTouchBasedDevice').andReturn(false);
             this.videosDefinition = '0.75:7tqY6eQzVhE,1.0:cogebirgzzM';
             this['7tqY6eQzVhE'] = '7tqY6eQzVhE';
             this['cogebirgzzM'] = 'cogebirgzzM';
@@ -16,7 +14,6 @@
             window.onYouTubePlayerAPIReady = undefined;
             window.onHTML5PlayerAPIReady = undefined;
             $('source').remove();
-            window.onTouchBasedDevice = oldOTBD;
         });
 
         describe('constructor', function () {
