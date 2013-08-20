@@ -25,6 +25,8 @@ class @Problem
     @$('section.action button.show').click @show
     @$('section.action input.save').click @save
 
+    @bindResetCorrectness()
+
     # Collapsibles
     Collapsible.setCollapsibles(@el)
 
@@ -369,6 +371,59 @@ class @Problem
     @$(".CodeMirror").each (index, element) ->
       element.CodeMirror.save() if element.CodeMirror.save
     @answers = @inputs.serialize()
+
+  bindResetCorrectness: ->
+    # Loop through all input types
+    # Bind the reset functions at that scope.
+    $inputtypes = @el.find(".capa_inputtype").add(@el.find(".inputtype"))
+    $inputtypes.each (index, inputtype) =>
+      classes = $(inputtype).attr('class').split(' ')
+      for cls in classes
+        bindMethod = @bindResetCorrectnessByInputtype[cls]
+        # For debugging! Remove later
+        console.log $(inputtype).attr('id'), cls, typeof bindMethod
+        if bindMethod?
+          bindMethod(inputtype)
+
+  # Find all places where each input type displays its correct-ness
+  # Replace them with their original state--'unanswered'.
+  bindResetCorrectnessByInputtype:
+    # These are run at the scope of the capa inputtype
+    # They should set handlers on each <input> to reset the whole.
+    formulaequationinput: (element) ->
+      $(element).find('input').on 'input', ->
+        $p = $(element).find('p.status')
+        $p.text "unanswered"
+        $p.parent().removeClass().addClass "unanswered"
+
+    choicegroup: (element) ->
+      $element = $(element)
+      id = ($element.attr('id').match /^inputtype_(.*)$/)[1]
+      $element.find('input').on 'change', ->
+        $status = $("#status_#{id}")
+        if $status[0]  # We found a status icon.
+          $status.removeClass().addClass "unanswered"
+          $status.empty().css 'display', 'inline-block'
+        else
+          # Recreate the unanswered dot on left.
+          $element.find('div.indicator_container').append "<span class='unanswered' style='display:inline-block;' id='status_#{id}'></span>"
+
+        $element.find("label").removeClass()
+          .find('span').remove()
+
+    'option-input': (element) ->
+      $select = $(element).find('select')
+      id = ($select.attr('id').match /^input_(.*)$/)[1]
+      $select.on 'change', ->
+        $status = $("#status_#{id}")
+          .removeClass().addClass("unanswered")
+          .find('span').text('Status: unsubmitted')
+
+    textline: (element) ->
+      $(element).find('input').on 'input', ->
+        $p = $(element).find('p.status')
+        $p.text "unanswered"
+        $p.parent().removeClass().addClass "unanswered"
 
   inputtypeSetupMethods:
 

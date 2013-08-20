@@ -15,11 +15,14 @@ describe("Formula Equation Preview", function () {
         var $fixture = this.$fixture = $('\
 <section class="problems-wrapper" data-url="THE_URL">\
   <section class="formulaequationinput">\
-    <input type="text" id="input_THE_ID" data-input-id="THE_ID"\
-        value="prefilled_value"/>\
-    <div id="input_THE_ID_preview" class="equation">\
-      \[\]\
-      <img class="loading" style="visibility:hidden"/>\
+    <div class="INITIAL_STATUS" id="status_THE_ID">\
+      <input type="text" id="input_THE_ID" data-input-id="THE_ID"\
+          value="PREFILLED_VALUE"/>\
+      <p class="status">INITIAL_STATUS</p>\
+      <div id="input_THE_ID_preview" class="equation">\
+        \[\]\
+        <img class="loading" style="visibility:hidden"/>\
+      </div>\
     </div>\
   </section>\
 </section>');
@@ -62,10 +65,10 @@ describe("Formula Equation Preview", function () {
         MathJax.Hub.Queue = jasmine.createSpy('MathJax.Hub.Queue');
     });
 
-    it('(the test) should be able to swap out the behavior of $', function () {
+    it('(the test) is able to swap out the behavior of $', function () {
         // This was a pain to write, make sure it doesn't get screwed up.
 
-        // Find the DOM element using DOM methods.
+        // Find the element using DOM methods.
         var legitInput = this.$fixture[0].getElementsByTagName("input")[0];
 
         // Use the (modified) jQuery.
@@ -96,7 +99,7 @@ describe("Formula Equation Preview", function () {
                 "THE_URL",
                 "THE_ID",
                 "preview_formcalc",
-                {formula: "prefilled_value",
+                {formula: "PREFILLED_VALUE",
                  request_start: jasmine.any(Number)},
                 jasmine.any(Function)
             ]);
@@ -117,7 +120,7 @@ describe("Formula Equation Preview", function () {
             });
         });
 
-        it("shouldn't be requested for empty input", function () {
+        it("isn't requested for empty input", function () {
             Problem.inputAjax.reset();
 
             // When we make an input of '',
@@ -136,7 +139,7 @@ describe("Formula Equation Preview", function () {
             });
         });
 
-        it('should limit the number of requests per second', function () {
+        it('limits the number of requests per second', function () {
             var minDelay = formulaEquationPreview.minDelay;
             var end = Date.now() + minDelay * 1.1;
             var step = 10;  // ms
@@ -171,7 +174,7 @@ describe("Formula Equation Preview", function () {
     });
 
     describe("Visible results (icon and mathjax)", function () {
-        it('should display a loading icon when requests are open', function () {
+        it('displays a loading icon when requests are open', function () {
             var $img = $("img.loading");
             expect($img.css('visibility')).toEqual('hidden');
             formulaEquationPreview.enable();
@@ -199,7 +202,7 @@ describe("Formula Equation Preview", function () {
             });
         });
 
-        it('should update MathJax and loading icon on callback', function () {
+        it('updates MathJax and loading icon on callback', function () {
             formulaEquationPreview.enable();
             waitsFor(function () {
                 return Problem.inputAjax.wasCalled;
@@ -217,7 +220,7 @@ describe("Formula Equation Preview", function () {
                 expect($("img.loading").css('visibility')).toEqual('hidden');
 
                 // We should look in the preview div for the MathJax.
-                var previewDiv = $("div")[0];
+                var previewDiv = $("#input_THE_ID_preview")[0];
                 expect(MathJax.Hub.getAllJax).toHaveBeenCalledWith(previewDiv);
 
                 // Refresh the MathJax.
@@ -242,7 +245,7 @@ describe("Formula Equation Preview", function () {
 
                 // Cannot find MathJax.
                 MathJax.Hub.getAllJax.andReturn([]);
-                spyOn(console, 'error');
+                spyOn(console, 'warn');
 
                 callback({
                     preview: 'THE_FORMULA',
@@ -250,10 +253,10 @@ describe("Formula Equation Preview", function () {
                 });
 
                 // Tests.
-                expect(console.error).toHaveBeenCalled();
+                expect(console.warn).toHaveBeenCalled();
 
                 // We should look in the preview div for the MathJax.
-                var previewElement = $("div")[0];
+                var previewElement = $("#input_THE_ID_preview")[0];
                 expect(previewElement.firstChild.data).toEqual("\\[THE_FORMULA\\]");
 
                 // Refresh the MathJax.
@@ -263,7 +266,7 @@ describe("Formula Equation Preview", function () {
             });
         });
 
-        it('should display errors from the server well', function () {
+        it('displays errors from the server well', function () {
             var $img = $("img.loading");
             formulaEquationPreview.enable();
             waitsFor(function () {
@@ -329,7 +332,7 @@ describe("Formula Equation Preview", function () {
             });
         });
 
-        it('should update requests sequentially', function () {
+        it('updates requests sequentially', function () {
             var $img = $("img.loading");
 
             expect($img.css('visibility')).toEqual('visible');
@@ -349,7 +352,7 @@ describe("Formula Equation Preview", function () {
             expect($img.css('visibility')).toEqual('hidden')
         });
 
-        it("shouldn't display outdated information", function () {
+        it("doesn't display outdated information", function () {
             var $img = $("img.loading");
 
             expect($img.css('visibility')).toEqual('visible');
@@ -368,7 +371,7 @@ describe("Formula Equation Preview", function () {
             expect($img.css('visibility')).toEqual('hidden')
         });
 
-        it("shouldn't show an error if the responses are close together",
+        it("doesn't show an error if the responses are close together",
            function () {
                this.callbacks[0]({
                    error: 'OOPSIE',
