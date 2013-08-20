@@ -3,3 +3,6 @@ class PaymentException(Exception):
 
 class PurchasedCallbackException(PaymentException):
     pass
+
+class InvalidCartItem(PaymentException):
+    pass

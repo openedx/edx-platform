@@ -33,6 +33,7 @@ class CourseMode(models.Model):
     currency = models.CharField(default="usd", max_length=8)
 
     DEFAULT_MODE = Mode('honor', _('Honor Code Certificate'), 0, '', 'usd')
+    DEFAULT_MODE_SLUG = 'honor'
 
     class Meta:
         """ meta attributes of this model """

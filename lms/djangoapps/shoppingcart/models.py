@@ -19,9 +19,6 @@ from .exceptions import *
 
 log = logging.getLogger("shoppingcart")
 
-class InvalidCartItem(Exception):
-    pass
-
 ORDER_STATUSES = (
     ('cart', 'cart'),
     ('purchased', 'purchased'),
@@ -153,6 +150,7 @@ class PaidCourseRegistration(OrderItem):
     This is an inventory item for paying for a course registration
     """
     course_id = models.CharField(max_length=128, db_index=True)
+    mode = models.SlugField(default=CourseMode.DEFAULT_MODE_SLUG)
 
     @classmethod
     def part_of_order(cls, order, course_id):
@@ -164,7 +162,7 @@ class PaidCourseRegistration(OrderItem):
                              if item.is_of_subtype(PaidCourseRegistration)]
 
     @classmethod
-    def add_to_order(cls, order, course_id, mode_slug=None, cost=None, currency=None):
+    def add_to_order(cls, order, course_id, mode_slug=CourseMode.DEFAULT_MODE_SLUG, cost=None, currency=None):
         """
         A standardized way to create these objects, with sensible defaults filled in.
         Will update the cost if called on an order that already carries the course.
@@ -178,16 +176,18 @@ class PaidCourseRegistration(OrderItem):
                                             # throw errors if it doesn't
         item, created = cls.objects.get_or_create(order=order, user=order.user, course_id=course_id)
         item.status = order.status
-        if not mode_slug:
-            mode_slug = CourseMode.DEFAULT_MODE.slug
+
         ### Get this course_mode
         course_mode = CourseMode.mode_for_course(course_id, mode_slug)
         if not course_mode:
+            # user could have specified a mode that's not set, in that case return the DEFAULT_MODE
             course_mode = CourseMode.DEFAULT_MODE
         if not cost:
             cost = course_mode.min_price
         if not currency:
             currency = course_mode.currency
+
+        item.mode = course_mode.slug
         item.qty = 1
         item.unit_cost = cost
         item.line_cost = cost
@@ -202,8 +202,8 @@ class PaidCourseRegistration(OrderItem):
     def purchased_callback(self):
         """
         When purchased, this should enroll the user in the course.  We are assuming that
-        course settings for enrollment date are configured such that only if the (user.email, course_id) pair is found in
-        CourseEnrollmentAllowed will the user be allowed to enroll.  Otherwise requiring payment
+        course settings for enrollment date are configured such that only if the (user.email, course_id) pair is found
+        in CourseEnrollmentAllowed will the user be allowed to enroll.  Otherwise requiring payment
         would in fact be quite silly since there's a clear back door.
         """
         course_loc = CourseDescriptor.id_to_location(self.course_id)
@@ -211,7 +211,7 @@ class PaidCourseRegistration(OrderItem):
         if not course_exists:
             raise PurchasedCallbackException(
                 "The customer purchased Course {0}, but that course doesn't exist!".format(self.course_id))
-        CourseEnrollment.enroll(user=self.user, course_id=self.course_id)
+        CourseEnrollment.enroll(user=self.user, course_id=self.course_id, mode=self.mode)
 
         log.info("Enrolled {0} in paid course {1}, paid ${2}".format(self.user.email, self.course_id, self.line_cost))
         org, course_num, run = self.course_id.split("/")
