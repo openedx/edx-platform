@@ -51,3 +51,18 @@ class CourseMode(models.Model):
         if not modes:
             modes = [cls.DEFAULT_MODE]
         return modes
+
+    @classmethod
+    def mode_for_course(cls, course_id, mode_slug):
+        """
+        Returns the mode for the course corresponding to mode_slug.
+
+        If this particular mode is not set for the course, returns None
+        """
+        modes = cls.modes_for_course(course_id)
+
+        matched = filter(lambda m: m.slug == mode_slug, modes)
+        if matched:
+            return matched[0]
+        else:
+            return None
