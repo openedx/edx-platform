@@ -53,9 +53,9 @@ def i_am_registered_for_the_course(step, course):
 
     # If the user is not already enrolled, enroll the user.
     # TODO: change to factory
-    CourseEnrollment.objects.get_or_create(user=u, course_id=course_id(course))
+    CourseEnrollment.enroll(u, course_id(course))
 
-    world.log_in('robot', 'test')
+    world.log_in(username='robot', password='test')
 
 
 @step(u'The course "([^"]*)" has extra tab "([^"]*)"$')
@@ -64,6 +64,13 @@ def add_tab_to_course(_step, course, extra_tab_name):
         parent_location=course_location(course),
         category="static_tab",
         display_name=str(extra_tab_name))
+
+
+@step(u'I am in a course$')
+def go_into_course(step):
+    step.given('I am registered for the course "6.002x"')
+    step.given('And I am logged in')
+    step.given('And I click on View Courseware')
 
 
 def course_id(course_num):

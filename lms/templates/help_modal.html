@@ -31,7 +31,13 @@ discussion_link = get_discussion_link(course) if course else None
     </p>
 % endif
 
-    <p>${_('Have <strong>general questions about {platform_name}</strong>? You can find lots of helpful information in the {platform_name} {link_start}FAQ{link_end}.').format(link_start='<a href="/help" target="_blank">', link_end='</a>', platform_name=settings.PLATFORM_NAME)}</p>
+    <p>${_('Have <strong>general questions about {platform_name}</strong>? You can find lots of helpful information in the {platform_name} {link_start}FAQ{link_end}.').format(
+        link_start='<a href="{url}" target="_blank">'.format(
+          url=marketing_link('FAQ')
+        ),
+        link_end='</a>',
+        platform_name=settings.PLATFORM_NAME)}
+      </p>
 
     <p>${_('Have a <strong>question about something specific</strong>? You can contact the {platform_name} general support team directly:').format(platform_name=settings.PLATFORM_NAME)}</p>
     <hr>
@@ -106,7 +112,7 @@ discussion_link = get_discussion_link(course) if course else None
     ).format(
         open_time=open_time,
         close_time=close_time,
-        link_start='<a href="/help" target="_blank">',
+        link_start='<a href="{}" target="_blank">'.format(marketing_link('FAQ')),
         link_end='</a>'
     )}
     </p>
@@ -193,7 +199,7 @@ discussion_link = get_discussion_link(course) if course else None
 % if settings.FEEDBACK_SUBMISSION_EMAIL:
             htmlStr += " " + _.template(
               gettext("Please {link_start}send us e-mail{link_end}."),
-              {link_start: '<a href="#" id="feedback_email">', link_end='</a>'},
+              {link_start: '<a href="#" id="feedback_email">', link_end: '</a>'},
               {interpolate: /\{(.+?)\}/g})
 % else:
             // If no email is configured, we can't do much other than

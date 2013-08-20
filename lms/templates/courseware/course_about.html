@@ -42,9 +42,9 @@
         ).css("display", "block");
       }
     });
-   
+
     %else:
-   
+
     $('#class_enroll_form').on('ajax:complete', function(event, xhr) {
       if(xhr.status == 200) {
         location.href = "${reverse('dashboard')}";
@@ -58,8 +58,8 @@
     });
 
     %endif
-   
-   
+
+
   })(this)
   </script>
 
@@ -222,7 +222,7 @@
         <input name="enrollment_action" type="hidden" value="enroll">
       </fieldset>
       <div class="submit">
-        <input name="submit" type="submit" value="${_("enroll")}">
+        <input name="submit" type="submit" value="enroll">
       </div>
     </form>
   </div>

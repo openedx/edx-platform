@@ -149,9 +149,9 @@ def create_user_and_visit_course():
     world.create_user('robot', 'test')
     u = User.objects.get(username='robot')
 
-    CourseEnrollment.objects.get_or_create(user=u, course_id=course_id(world.scenario_dict['COURSE'].number))
+    CourseEnrollment.enroll(u, course_id(world.scenario_dict['COURSE'].number))
 
-    world.log_in('robot', 'test')
+    world.log_in(username='robot', password='test')
     chapter_name = (TEST_SECTION_NAME + "1").replace(" ", "_")
     section_name = (TEST_SUBSECTION_NAME + "1").replace(" ", "_")
     url = django_url('/courses/edx/model_course/Test_Course/courseware/%s/%s' %

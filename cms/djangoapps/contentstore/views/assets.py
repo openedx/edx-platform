@@ -3,6 +3,8 @@ import json
 import os
 import tarfile
 import shutil
+import cgi
+from functools import partial
 from tempfile import mkdtemp
 from path import path
 
@@ -27,14 +29,15 @@ from xmodule.modulestore import Location
 from xmodule.contentstore.content import StaticContent
 from xmodule.util.date_utils import get_default_time_display
 from xmodule.modulestore import InvalidLocationError
-from xmodule.exceptions import NotFoundError
+from xmodule.exceptions import NotFoundError, SerializationError
 
 from .access import get_location_and_verify_access
 from util.json_request import JsonResponse
 
 from django.utils.translation import ugettext as _
 
-__all__ = ['asset_index', 'upload_asset', 'import_course', 'generate_export_course', 'export_course']
+__all__ = ['asset_index', 'upload_asset', 'import_course',
+        'generate_export_course', 'export_course']
 
 
 def assets_to_json_dict(assets):
@@ -58,13 +61,14 @@ def assets_to_json_dict(assets):
             obj["thumbnail"] = thumbnail
         id_info = asset.get("_id")
         if id_info:
-            obj["id"] = "/{tag}/{org}/{course}/{revision}/{category}/{name}".format(
-                org=id_info.get("org", ""),
-                course=id_info.get("course", ""),
-                revision=id_info.get("revision", ""),
-                tag=id_info.get("tag", ""),
-                category=id_info.get("category", ""),
-                name=id_info.get("name", ""),
+            obj["id"] = "/{tag}/{org}/{course}/{revision}/{category}/{name}" \
+                .format(
+                    org=id_info.get("org", ""),
+                    course=id_info.get("course", ""),
+                    revision=id_info.get("revision", ""),
+                    tag=id_info.get("tag", ""),
+                    category=id_info.get("category", ""),
+                    name=id_info.get("name", ""),
             )
         ret.append(obj)
     return ret
@@ -106,6 +110,7 @@ def asset_index(request, org, course, name):
 
         asset_location = StaticContent.compute_location(asset_id['org'], asset_id['course'], asset_id['name'])
         display_info['url'] = StaticContent.get_url_path_from_location(asset_location)
+        display_info['portable_url'] = StaticContent.get_static_path_from_location(asset_location)
 
         # note, due to the schema change we may not have a 'thumbnail_location' in the result set
         _thumbnail_location = asset.get('thumbnail_location', None)
@@ -131,14 +136,14 @@ def asset_index(request, org, course, name):
 @login_required
 def upload_asset(request, org, course, coursename):
     '''
-    This method allows for POST uploading of files into the course asset library, which will
-    be supported by GridFS in MongoDB.
+    This method allows for POST uploading of files into the course asset
+    library, which will be supported by GridFS in MongoDB.
     '''
     # construct a location from the passed in path
     location = get_location_and_verify_access(request, org, course, coursename)
 
-    # Does the course actually exist?!? Get anything from it to prove its existance
-
+    # Does the course actually exist?!? Get anything from it to prove its
+    # existence
     try:
         modulestore().get_item(location)
     except:
@@ -149,9 +154,10 @@ def upload_asset(request, org, course, coursename):
     if 'file' not in request.FILES:
         return HttpResponseBadRequest()
 
-    # compute a 'filename' which is similar to the location formatting, we're using the 'filename'
-    # nomenclature since we're using a FileSystem paradigm here. We're just imposing
-    # the Location string formatting expectations to keep things a bit more consistent
+    # compute a 'filename' which is similar to the location formatting, we're
+    # using the 'filename' nomenclature since we're using a FileSystem paradigm
+    # here. We're just imposing the Location string formatting expectations to
+    # keep things a bit more consistent
     upload_file = request.FILES['file']
     filename = upload_file.name
     mime_type = upload_file.content_type
@@ -159,20 +165,25 @@ def upload_asset(request, org, course, coursename):
     content_loc = StaticContent.compute_location(org, course, filename)
 
     chunked = upload_file.multiple_chunks()
+    sc_partial = partial(StaticContent, content_loc, filename, mime_type)
     if chunked:
-        content = StaticContent(content_loc, filename, mime_type, upload_file.chunks())
+        content = sc_partial(upload_file.chunks())
+        temp_filepath = upload_file.temporary_file_path()
     else:
-        content = StaticContent(content_loc, filename, mime_type, upload_file.read())
+        content = sc_partial(upload_file.read())
+        tempfile_path = None
 
     thumbnail_content = None
     thumbnail_location = None
 
     # first let's see if a thumbnail can be created
-    (thumbnail_content, thumbnail_location) = contentstore().generate_thumbnail(content,
-                                                                                tempfile_path=None if not chunked else
-                                                                                upload_file.temporary_file_path())
+    (thumbnail_content, thumbnail_location) = contentstore().generate_thumbnail(
+            content,
+            tempfile_path=tempfile_path
+    )
 
-    # delete cached thumbnail even if one couldn't be created this time (else the old thumbnail will continue to show)
+    # delete cached thumbnail even if one couldn't be created this time (else
+    # the old thumbnail will continue to show)
     del_cached_content(thumbnail_location)
     # now store thumbnail location only if we could create it
     if thumbnail_content is not None:
@@ -185,15 +196,17 @@ def upload_asset(request, org, course, coursename):
     # readback the saved content - we need the database timestamp
     readback = contentstore().find(content.location)
 
-    response_payload = {'displayname': content.name,
-                        'uploadDate': get_default_time_display(readback.last_modified_at),
-                        'url': StaticContent.get_url_path_from_location(content.location),
-                        'thumb_url': StaticContent.get_url_path_from_location(thumbnail_location) if thumbnail_content is not None else None,
-                        'msg': _('Upload completed')
-                        }
+    response_payload = {
+            'displayname': content.name,
+            'uploadDate': get_default_time_display(readback.last_modified_at),
+            'url': StaticContent.get_url_path_from_location(content.location),
+            'portable_url': StaticContent.get_static_path_from_location(content.location),
+            'thumb_url': StaticContent.get_url_path_from_location(thumbnail_location)
+                if thumbnail_content is not None else None,
+            'msg': 'Upload completed'
+    }
 
     response = JsonResponse(response_payload)
-    response['asset_url'] = StaticContent.get_url_path_from_location(content.location)
     return response
 
 
@@ -201,8 +214,8 @@ def upload_asset(request, org, course, coursename):
 @login_required
 def remove_asset(request, org, course, name):
     '''
-    This method will perform a 'soft-delete' of an asset, which is basically to copy the asset from
-    the main GridFS collection and into a Trashcan
+    This method will perform a 'soft-delete' of an asset, which is basically to
+    copy the asset from the main GridFS collection and into a Trashcan
     '''
     get_location_and_verify_access(request, org, course, name)
 
@@ -314,6 +327,8 @@ def import_course(request, org, course, name):
 
         create_all_course_groups(request.user, course_items[0].location)
 
+        logging.debug('created all course groups at {0}'.format(course_items[0].location))
+
         return HttpResponse(json.dumps({'Status': 'OK'}))
     else:
         course_module = modulestore().get_item(location)
@@ -336,16 +351,62 @@ def generate_export_course(request, org, course, name):
     the course
     """
     location = get_location_and_verify_access(request, org, course, name)
-
+    course_module = modulestore().get_instance(location.course_id, location)
     loc = Location(location)
     export_file = NamedTemporaryFile(prefix=name + '.', suffix=".tar.gz")
 
     root_dir = path(mkdtemp())
 
-    # export out to a tempdir
-    logging.debug('root = {0}'.format(root_dir))
+    try:
+        export_to_xml(modulestore('direct'), contentstore(), loc, root_dir, name, modulestore())
+    except SerializationError, e:
+        logging.exception('There was an error exporting course {0}. {1}'.format(course_module.location, unicode(e)))
 
-    export_to_xml(modulestore('direct'), contentstore(), loc, root_dir, name, modulestore())
+        unit = None
+        failed_item = None
+        parent = None
+        try:
+            failed_item = modulestore().get_instance(course_module.location.course_id, e.location)
+            parent_locs = modulestore().get_parent_locations(failed_item.location, course_module.location.course_id)
+
+            if len(parent_locs) > 0:
+                parent = modulestore().get_item(parent_locs[0])
+                if parent.location.category == 'vertical':
+                    unit = parent
+        except:
+            # if we have a nested exception, then we'll show the more generic error message
+            pass
+
+        return render_to_response('export.html', {
+            'context_course': course_module,
+            'successful_import_redirect_url': '',
+            'in_err': True,
+            'raw_err_msg': str(e),
+            'failed_module': failed_item,
+            'unit': unit,
+            'edit_unit_url': reverse('edit_unit', kwargs={
+                'location': parent.location
+            }) if parent else '',
+            'course_home_url': reverse('course_index', kwargs={
+                'org': org,
+                'course': course,
+                'name': name
+            })
+        })
+    except Exception, e:
+        logging.exception('There was an error exporting course {0}. {1}'.format(course_module.location, unicode(e)))
+        return render_to_response('export.html', {
+            'context_course': course_module,
+            'successful_import_redirect_url': '',
+            'in_err': True,
+            'unit': None,
+            'raw_err_msg': str(e),
+            'course_home_url': reverse('course_index', kwargs={
+                'org': org,
+                'course': course,
+                'name': name
+            })
+        })
 
     logging.debug('tar file being generated at {0}'.format(export_file.name))
     tar_file = tarfile.open(name=export_file.name, mode='w:gz')

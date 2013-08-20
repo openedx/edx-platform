@@ -47,7 +47,7 @@ def dashboard(request):
     results["scalars"]["Activated Usernames"]=User.objects.filter(is_active=1).count()
     
     # count how many enrollments we have
-    results["scalars"]["Total Enrollments Across All Courses"]=CourseEnrollment.objects.count()
+    results["scalars"]["Total Enrollments Across All Courses"] = CourseEnrollment.objects.filter(is_active=1).count()
 
     # establish a direct connection to the database (for executing raw SQL)
     cursor = connection.cursor()
@@ -56,20 +56,22 @@ def dashboard(request):
     # table queries need not take the form of raw SQL, but do in this case since
     # the MySQL backend for django isn't very friendly with group by or distinct
     table_queries = {}
-    table_queries["course enrollments"]= \
-        "select "+ \
-        "course_id as Course, "+ \
-        "count(user_id) as Students " + \
-        "from student_courseenrollment "+ \
-        "group by course_id "+ \
-        "order by students desc;"
-    table_queries["number of students in each number of classes"]= \
-        "select registrations as 'Registered for __ Classes' , "+ \
-        "count(registrations) as Users "+ \
-        "from (select count(user_id) as registrations "+ \
-               "from student_courseenrollment "+ \
-               "group by user_id) as registrations_per_user "+ \
-        "group by registrations;"
+    table_queries["course enrollments"] = """
+        select
+        course_id as Course,
+        count(user_id) as Students
+        from student_courseenrollment
+        where is_active=1
+        group by course_id
+        order by students desc;"""
+    table_queries["number of students in each number of classes"] = """
+        select registrations as 'Registered for __ Classes' ,
+        count(registrations) as Users
+        from (select count(user_id) as registrations
+               from student_courseenrollment
+               where is_active=1
+               group by user_id) as registrations_per_user
+        group by registrations;"""
 
     # add the result for each of the table_queries to the results object
     for query in table_queries.keys():

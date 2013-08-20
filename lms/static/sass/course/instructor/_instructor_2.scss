@@ -36,6 +36,11 @@ section.instructor-dashboard-content-2 {
     color: $error-red;
   }
 
+  .display-errors {
+    line-height: 3em;
+    color: $error-red;
+  }
+
   .slickgrid {
     margin-left: 1px;
     color:#333333;
@@ -269,6 +274,10 @@ section.instructor-dashboard-content-2 {
 
 
 .instructor-dashboard-wrapper-2 section.idash-section#student_admin > {
+  .action-type-container{
+    margin-bottom: $baseline * 2;
+  }
+
   .progress-link-wrapper {
     margin-top: 0.7em;
   }
@@ -316,25 +325,40 @@ section.instructor-dashboard-content-2 {
 }
 
 
-.instructor-dashboard-wrapper-2 section.idash-section#analytics {
-  .distribution-display {
-    margin-top: 1.2em;
+.profile-distribution-widget {
+  margin-bottom: $baseline * 2;
 
-    .distribution-display-graph {
-      .year-of-birth {
-        width: 750px;
-        height: 250px;
-      }
-    }
+  .display-text {}
 
-    .distribution-display-table {
-      .slickgrid {
-        height: 400px;
-      }
+  .display-graph .graph-placeholder {
+    width: 750px;
+    height: 250px;
+  }
+
+  .display-table {
+    .slickgrid {
+      height: 250px;
     }
   }
 }
 
+.grade-distributions-widget {
+  margin-bottom: $baseline * 2;
+
+  .last-updated {
+    line-height: 2.2em;
+    font-size: 10pt;
+  }
+
+  .display-graph .graph-placeholder {
+    width: 750px;
+    height: 200px;
+  }
+
+  .display-text {
+    line-height: 2em;
+  }
+}
 
 .member-list-widget {
   $width: 20 * $baseline;

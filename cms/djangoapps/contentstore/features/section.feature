@@ -3,7 +3,6 @@ Feature: Create Section
   As a course author
   I want to create and edit sections
 
-  @skip
   Scenario: Add a new section to a course
     Given I have opened a new course in Studio
     When I click the New Section link

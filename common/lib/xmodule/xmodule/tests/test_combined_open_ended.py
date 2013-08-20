@@ -1,31 +1,3 @@
-import json
-from mock import Mock, MagicMock, ANY
-import unittest
-
-from test_util_open_ended import MockQueryDict, DummyModulestore
-
-from xmodule.open_ended_grading_classes.openendedchild import OpenEndedChild
-from xmodule.open_ended_grading_classes.open_ended_module import OpenEndedModule
-from xmodule.open_ended_grading_classes.combined_open_ended_modulev1 import CombinedOpenEndedV1Module
-from xmodule.open_ended_grading_classes.grading_service_module import GradingServiceError
-from xmodule.combined_open_ended_module import CombinedOpenEndedModule
-from xmodule.modulestore import Location
-
-from lxml import etree
-import capa.xqueue_interface as xqueue_interface
-from datetime import datetime
-from pytz import UTC
-import logging
-
-log = logging.getLogger(__name__)
-
-from . import get_test_system
-
-ORG = 'edX'
-COURSE = 'open_ended'      # name of directory with course data
-
-import test_util_open_ended
-
 """
 Tests for the various pieces of the CombinedOpenEndedGrading system
 
@@ -33,6 +5,31 @@ OpenEndedChild
 OpenEndedModule
 
 """
+
+from datetime import datetime
+import json
+import logging
+import unittest
+
+from lxml import etree
+from mock import Mock, MagicMock, ANY
+from pytz import UTC
+
+from xmodule.open_ended_grading_classes.openendedchild import OpenEndedChild
+from xmodule.open_ended_grading_classes.open_ended_module import OpenEndedModule
+from xmodule.open_ended_grading_classes.combined_open_ended_modulev1 import CombinedOpenEndedV1Module
+from xmodule.open_ended_grading_classes.grading_service_module import GradingServiceError
+from xmodule.combined_open_ended_module import CombinedOpenEndedModule
+from xmodule.modulestore import Location
+from xmodule.tests import get_test_system, test_util_open_ended
+from xmodule.tests.test_util_open_ended import MockQueryDict, DummyModulestore
+import capa.xqueue_interface as xqueue_interface
+
+
+log = logging.getLogger(__name__)
+
+ORG = 'edX'
+COURSE = 'open_ended'      # name of directory with course data
 
 
 class OpenEndedChildTest(unittest.TestCase):
@@ -64,6 +61,12 @@ class OpenEndedChildTest(unittest.TestCase):
         's3_interface': "",
         'open_ended_grading_interface': {},
         'skip_basic_checks': False,
+        'control': {
+            'required_peer_grading': 1,
+            'peer_grader_count': 1,
+            'min_to_calibrate': 3,
+            'max_to_calibrate': 6,
+            }
     }
     definition = Mock()
     descriptor = Mock()
@@ -180,6 +183,12 @@ class OpenEndedModuleTest(unittest.TestCase):
         's3_interface': test_util_open_ended.S3_INTERFACE,
         'open_ended_grading_interface': test_util_open_ended.OPEN_ENDED_GRADING_INTERFACE,
         'skip_basic_checks': False,
+        'control': {
+            'required_peer_grading': 1,
+            'peer_grader_count': 1,
+            'min_to_calibrate': 3,
+            'max_to_calibrate': 6,
+            }
     }
 
     oeparam = etree.XML('''
@@ -282,6 +291,30 @@ class OpenEndedModuleTest(unittest.TestCase):
                'xqueue_body': json.dumps(score_msg)}
         self.openendedmodule.update_score(get, self.test_system)
 
+    def update_score_multiple(self):
+        self.openendedmodule.new_history_entry("New Entry")
+        feedback = {
+            "success": True,
+            "feedback": "Grader Feedback"
+        }
+        score_msg = {
+            'correct': True,
+            'score': [0, 1],
+            'msg': 'Grader Message',
+            'feedback': [json.dumps(feedback), json.dumps(feedback)],
+            'grader_type': 'PE',
+            'grader_id': ['1', '2'],
+            'submission_id': '1',
+            'success': True,
+            'rubric_scores': [[0], [0]],
+            'rubric_scores_complete': [True, True],
+            'rubric_xml': [etree.tostring(self.rubric), etree.tostring(self.rubric)]
+        }
+        get = {'queuekey': "abcd",
+               'xqueue_body': json.dumps(score_msg)}
+        self.openendedmodule.update_score(get, self.test_system)
+
+
     def test_latest_post_assessment(self):
         self.update_score_single()
         assessment = self.openendedmodule.latest_post_assessment(self.test_system)
@@ -289,10 +322,18 @@ class OpenEndedModuleTest(unittest.TestCase):
         # check for errors
         self.assertFalse('errors' in assessment)
 
-    def test_update_score(self):
+    def test_update_score_single(self):
         self.update_score_single()
         score = self.openendedmodule.latest_score()
         self.assertEqual(score, 4)
+
+    def test_update_score_multiple(self):
+        """
+        Tests that a score of [0, 1] gets aggregated to 1.  A change in behavior added by @jbau
+        """
+        self.update_score_multiple()
+        score = self.openendedmodule.latest_score()
+        self.assertEquals(score, 1)
 
 
 class CombinedOpenEndedModuleTest(unittest.TestCase):

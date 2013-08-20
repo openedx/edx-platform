@@ -1,20 +1,21 @@
 # -*- coding: utf-8 -*-
 
+import datetime
 import unittest
-from fs.memoryfs import MemoryFS
 
+from fs.memoryfs import MemoryFS
 from lxml import etree
 from mock import Mock, patch
+
+from django.utils.timezone import UTC
 
 from xmodule.xml_module import is_pointer_tag
 from xmodule.modulestore import Location
 from xmodule.modulestore.xml import ImportSystem, XMLModuleStore
 from xmodule.modulestore.inheritance import compute_inherited_metadata
 from xmodule.fields import Date
+from xmodule.tests import DATA_DIR
 
-from .test_export import DATA_DIR
-import datetime
-from django.utils.timezone import UTC
 
 ORG = 'test_org'
 COURSE = 'test_course'

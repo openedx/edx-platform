@@ -52,7 +52,13 @@
             <div class="action is-registered">${_("You Are Registered")}</div>
           %endif
         %elif allow_registration:
-          <a class="action action-register register" href="#">${_("Register for")} <strong>${course.display_number_with_default | h}</strong></a>
+        <a class="action action-register register" href="#">${_("Register for")} <strong>${course.display_number_with_default | h}</strong>
+            %if len(course_modes) > 1:
+            <span class="track">
+            and choose your student track
+            </span>
+            %endif
+        </a>
         %else:
           <div class="action registration-closed is-disabled">${_("Registration Is Closed")}</div>
         %endif

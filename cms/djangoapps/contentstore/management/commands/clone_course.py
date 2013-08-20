@@ -15,10 +15,6 @@ from auth.authz import _copy_course_group
 from request_cache.middleware import RequestCache
 from django.core.cache import get_cache
 
-#
-# To run from command line: rake cms:delete_course LOC=MITx/111/Foo1
-#
-
 CACHE = get_cache('mongo_metadata_inheritance')
 
 class Command(BaseCommand):
@@ -36,8 +32,11 @@ class Command(BaseCommand):
         mstore = modulestore('direct')
         cstore = contentstore()
 
-        mstore.metadata_inheritance_cache_subsystem = CACHE
-        mstore.request_cache = RequestCache.get_request_cache()
+        mstore.set_modulestore_configuration({
+            'metadata_inheritance_cache_subsystem': CACHE,
+            'request_cache': RequestCache.get_request_cache()
+        })
+
         org, course_num, run = dest_course_id.split("/")
         mstore.ignore_write_events_on_courses.append('{0}/{1}'.format(org, course_num))
 

@@ -9,13 +9,11 @@ import random
 import os
 
 TEST_ROOT = settings.COMMON_TEST_DATA_ROOT
-HTTP_PREFIX = "http://localhost:%s" % settings.LETTUCE_SERVER_PORT
-
 
 @step(u'I go to the files and uploads page')
 def go_to_uploads(_step):
     menu_css = 'li.nav-course-courseware'
-    uploads_css = 'li.nav-course-courseware-uploads'
+    uploads_css = 'li.nav-course-courseware-uploads a'
     world.css_click(menu_css)
     world.css_click(uploads_css)
 
@@ -109,6 +107,8 @@ def get_file(file_name):
     index = get_index(file_name)
     assert index != -1
 
-    url_css = 'input.embeddable-xml-input'
-    url = world.css_find(url_css)[index].value
-    return requests.get(HTTP_PREFIX + url)
+    url_css = 'a.filename'
+    def get_url():
+        return world.css_find(url_css)[index]._element.get_attribute('href')
+    url = world.retry_on_exception(get_url)
+    return requests.get(url)
