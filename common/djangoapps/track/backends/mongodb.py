@@ -15,15 +15,13 @@ class MongoBackend(BaseBackend):
         super(MongoBackend, self).__init__(**options)
 
         uri = self._make_uri(options)
+        db_name = options.pop('database', 'track')
+        collection_name = options.pop('database', 'events')
 
         # By default disable write acknoledgements
         write_concern = options.pop('w', 0)
 
-        db_name = options.pop('database', 'track')
-        collection_name = options.pop('database', 'events')
-
         self.client = pymongo.MongoClient(host=uri, w=write_concern, **options)
-
         self.collection = self.client[db_name][collection_name]
 
         self.create_indexes()
@@ -44,10 +42,8 @@ class MongoBackend(BaseBackend):
         return uri
 
     def create_indexes(self):
-        self.collection.create_index([
-            ('time', pymongo.DESCENDING),
-            ('event_type',),
-        ])
+        self.collection.create_index('event_type')
+        self.collection.create_index([('time', pymongo.DESCENDING)])
 
     def send(self, event):
         self.collection.insert(event)
