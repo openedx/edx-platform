@@ -4,8 +4,8 @@ Models for Student Identity Verification
 
 This is where we put any models relating to establishing the real-life identity
 of a student over a period of time. Right now, the only models are the abstract
-`PhotoVerificationAttempt`, and its one concrete implementation
-`SoftwareSecurePhotoVerificationAttempt`. The hope is to keep as much of the
+`PhotoVerification`, and its one concrete implementation
+`SoftwareSecurePhotoVerification`. The hope is to keep as much of the
 photo verification process as generic as possible.
 """
 from datetime import datetime
@@ -63,14 +63,14 @@ def status_before_must_be(*valid_start_statuses):
     return decorator_func
 
 
-class PhotoVerificationAttempt(StatusModel):
+class PhotoVerification(StatusModel):
     """
-    Each PhotoVerificationAttempt represents a Student's attempt to establish
+    Each PhotoVerification represents a Student's attempt to establish
     their identity by uploading a photo of themselves and a picture ID. An
     attempt actually has a number of fields that need to be filled out at
     different steps of the approval process. While it's useful as a Django Model
     for the querying facilities, **you should only create and edit a
-    `PhotoVerificationAttempt` object through the methods provided**. Do not
+    `PhotoVerification` object through the methods provided**. Do not
     just construct one and start setting fields unless you really know what
     you're doing.
 
@@ -96,9 +96,9 @@ class PhotoVerificationAttempt(StatusModel):
 
     Because this Model inherits from StatusModel, we can also do things like::
 
-        attempt.status == PhotoVerificationAttempt.STATUS.created
+        attempt.status == PhotoVerification.STATUS.created
         attempt.status == "created"
-        pending_requests = PhotoVerificationAttempt.submitted.all()
+        pending_requests = PhotoVerification.submitted.all()
     """
     ######################## Fields Set During Creation ########################
     # See class docstring for description of status states
@@ -154,24 +154,33 @@ class PhotoVerificationAttempt(StatusModel):
 
     class Meta:
         abstract = True
+        ordering = ['-created_at']
 
     ##### Methods listed in the order you'd typically call them
     @classmethod
-    def user_is_verified(cls, user_id):
-        """Returns whether or not a user has satisfactorily proved their
+    def user_is_verified(cls, user):
+        """
+        Returns whether or not a user has satisfactorily proved their
         identity. Depending on the policy, this can expire after some period of
         time, so a user might have to renew periodically."""
         raise NotImplementedError
 
     @classmethod
-    def active_for_user(cls, user_id):
-        """Return all PhotoVerificationAttempts that are still active (i.e. not
+    def active_for_user(cls, user):
+        """
+        Return all PhotoVerifications that are still active (i.e. not
         approved or denied).
 
         Should there only be one active at any given time for a user? Enforced
         at the DB level?
         """
-        raise NotImplementedError
+        # This should only be one at the most, but just in case we create more
+        # by mistake, we'll grab the most recently created one.
+        active_attempts = cls.objects.filter(user=user, status='created')
+        if active_attempts:
+            return active_attempts[0]
+        else:
+            return None
 
     @status_before_must_be("created")
     def upload_face_image(self, img):
@@ -315,10 +324,10 @@ class PhotoVerificationAttempt(StatusModel):
         self.save()
 
 
-class SoftwareSecurePhotoVerificationAttempt(PhotoVerificationAttempt):
+class SoftwareSecurePhotoVerification(PhotoVerification):
     """
     Model to verify identity using a service provided by Software Secure. Much
-    of the logic is inherited from `PhotoVerificationAttempt`, but this class
+    of the logic is inherited from `PhotoVerification`, but this class
     encrypts the photos.
 
     Software Secure (http://www.softwaresecure.com/) is a remote proctoring
@@ -368,4 +377,3 @@ class SoftwareSecurePhotoVerificationAttempt(PhotoVerificationAttempt):
         )
         rsa_cipher = PKCS1_OAEP.new(key)
         rsa_encrypted_aes_key = rsa_cipher.encrypt(aes_key)
-

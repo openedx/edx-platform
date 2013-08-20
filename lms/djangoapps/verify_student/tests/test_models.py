@@ -1,12 +1,13 @@
-# -*- coding: utf-8 -*- 
-from nose.tools import assert_in, assert_is_none, assert_equals, \
-                       assert_raises, assert_not_equals
+# -*- coding: utf-8 -*-
+from nose.tools import (
+    assert_in, assert_is_none, assert_equals, assert_raises, assert_not_equals
+)
 from django.test import TestCase
 from student.tests.factories import UserFactory
-from verify_student.models import PhotoVerificationAttempt, VerificationException
+from verify_student.models import SoftwareSecurePhotoVerification, VerificationException
 
 
-class TestPhotoVerificationAttempt(object):
+class TestPhotoVerification(object):
 
     def test_state_transitions(self):
         """Make sure we can't make unexpected status transitions.
@@ -14,12 +15,12 @@ class TestPhotoVerificationAttempt(object):
         The status transitions we expect are::
 
             created → ready → submitted → approved
-                                            ↑ ↓ 
+                                            ↑ ↓
                                         →  denied
         """
         user = UserFactory.create()
-        attempt = PhotoVerificationAttempt(user=user)
-        assert_equals(attempt.status, PhotoVerificationAttempt.STATUS.created)
+        attempt = SoftwareSecurePhotoVerification(user=user)
+        assert_equals(attempt.status, SoftwareSecurePhotoVerification.STATUS.created)
         assert_equals(attempt.status, "created")
 
         # This should fail because we don't have the necessary fields filled out
@@ -38,7 +39,7 @@ class TestPhotoVerificationAttempt(object):
         assert_equals(attempt.status, "ready")
 
         # Once again, state transitions should fail here. We can't approve or
-        # deny anything until it's been placed into the submitted state -- i.e. 
+        # deny anything until it's been placed into the submitted state -- i.e.
         # the user has clicked on whatever agreements, or given payment, or done
         # whatever the application requires before it agrees to process their
         # attempt.

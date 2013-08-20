@@ -25,4 +25,19 @@ urlpatterns = patterns(
         views.final_verification,
         name="verify_student/final_verification"
     ),
+
+    # The above are what we did for the design mockups, but what we're really
+    # looking at now is:
+    url(
+        r'^show_verification_page',
+        views.show_verification_page,
+        name="verify_student/show_verification_page"
+    ),
+
+    url(
+        r'^start_or_resume_attempt',
+        views.start_or_resume_attempt,
+        name="verify_student/start_or_resume_attempt"
+    )
+
 )
