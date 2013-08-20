@@ -207,9 +207,6 @@ USE_L10N = True
 # Localization strings (e.g. django.po) are under this directory
 LOCALE_PATHS = (REPO_ROOT + '/conf/locale',)  # mitx/conf/locale/
 
-# Tracking
-TRACK_MAX_EVENT = 10000
-
 # Messages
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
@@ -379,3 +376,13 @@ MKTG_URL_LINK_MAP = {
 }
 
 COURSES_WITH_UNSAFE_CODE = []
+
+############################## EVENT TRACKING #################################
+
+TRACK_MAX_EVENT = 10000
+
+EVENT_TRACKERS = {
+    'logger': {
+        'ENGINE': 'track.backends.logger.LoggerBackend'
+    }
+}

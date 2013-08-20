@@ -260,10 +260,6 @@ RSS_TIMEOUT = 600
 STATIC_GRAB = False
 DEV_CONTENT = True
 
-# FIXME: Should we be doing this truncation?
-TRACK_MAX_EVENT = 10000
-DEBUG_TRACK_LOG = False
-
 MITX_ROOT_URL = ''
 
 LOGIN_REDIRECT_URL = MITX_ROOT_URL + '/accounts/login'
@@ -292,6 +288,27 @@ COURSE_SETTINGS = {'6.002x_Fall_2012': {'number': '6.002x',
 # IP addresses that are allowed to reload the course, etc.
 # TODO (vshnayder): Will probably need to change as we get real access control in.
 LMS_MIGRATION_ALLOWED_IPS = []
+
+
+############################## EVENT TRACKING #################################
+
+# FIXME: Should we be doing this truncation?
+TRACK_MAX_EVENT = 10000
+
+DEBUG_TRACK_LOG = False
+
+EVENT_TRACKERS = {
+    'logger': {
+        'ENGINE': 'track.backends.logger.LoggerBackend'
+    }
+}
+
+if MITX_FEATURES.get('ENABLE_SQL_TRACKING_LOGS'):
+    EVENT_TRACKERS.update({
+        'sql': {
+            'ENGINE': 'track.backends.django.DjangoBackend'
+        }
+    })
 
 ######################## subdomain specific settings ###########################
 COURSE_LISTINGS = {}
