@@ -12,7 +12,6 @@
 <%! from student.models import UserProfile %>
 <%! from datetime import date %>
 <%! import calendar %>
-
 <%block name="title"><title>${_("Register for {platform_name}").format(platform_name=settings.PLATFORM_NAME)}</title></%block>
 
 <%block name="js_extra">
@@ -123,16 +122,6 @@
             <label for="password">${_('Password')}</label>
             <input id="password" type="password" name="password" value="" required aria-required="true" />
           </li>
-          <li class="field required text" id="field-username">
-            <label for="username">${_('Public Username')}</label>
-            <input id="username" type="text" name="username" value="" placeholder="${_('example: JaneDoe')}" required aria-required="true" />
-            <span class="tip tip-input">${_('Will be shown in any discussions or forums you participate in')}</span>
-          </li>
-          <li class="field required text" id="field-name">
-            <label for="name">${_('Full Name')}</label>
-            <input id="name" type="text" name="name" value="" placeholder="${_('example: Jane Doe')}" required aria-required="true" />
-            <span class="tip tip-input">${_("Needed for any certificates you may earn <strong>(cannot be changed later)</strong>")}</span>
-          </li>
         </ol>
 
         % else:
@@ -175,31 +164,22 @@
       </fieldset>
 
       <fieldset class="group group-form group-form-secondary group-form-personalinformation">
-        <legend class="sr">${_("Optional Personal Information")}</legend>
+        <legend class="sr">${_("Personal Information")}</legend>
 
-        <ol class="list-input">
-          <li class="field-group">
-            <div class="field select" id="field-education-level">
-              <label for="education-level">${_("Highest Level of Education Completed")}</label>
-              <select id="education-level" name="level_of_education">
-                <option value="">--</option>
-                %for code, ed_level in UserProfile.LEVEL_OF_EDUCATION_CHOICES:
-                <option value="${code}">${ed_level}</option>
-                %endfor
-              </select>
-            </div>
-
-            <div class="field select" id="field-gender">
-              <label for="gender">${_("Gender")}</label>
-              <select id="gender" name="gender">
-                <option value="">--</option>
-                %for code, gender in UserProfile.GENDER_CHOICES:
-                <option value="${code}">${gender}</option>
-                %endfor
-              </select>
-            </div>
-
-            <div class="field select" id="field-yob">
+		<ol class="list-input"> 
+        	<li class="field required text" id="field-lastname">
+        		<label for="lastname">${_('Lastname')}</label>
+        		<input id="lastname" type="text" name="lastname" value="" required aria-required="true" />
+        	</li>
+          	<li class="field required text" id="field-firstname">
+        		<label for="firstname">${_('Firstname')}</label>
+        		<input id="firstname" type="text" name="firstname" value="" required aria-required="true" />
+        	</li>
+        	<li class="field required text" id="field-middlename">
+        		<label for="middlename">${_('Middlename')}</label>
+        		<input id="middlename" type="text" name="middlename" value="" required aria-required="true" />
+        	</li>
+        	<li class="field required select" id="field-yob">
               <label for="yob">${_("Year of Birth")}</label>
               <select id="yob" name="year_of_birth">
                 <option value="">--</option>
@@ -207,24 +187,107 @@
                 <option value="${year}">${year}</option>
                 %endfor
               </select>
-            </div>
-          </li>
-        </ol>
-      </fieldset>
-
-      <fieldset class="group group-form group-form-personalinformation2">
-        <legend class="sr">${_("Optional Personal Information")}</legend>
-
-        <ol class="list-input">
-          <li class="field text" id="field-address-mailing">
-            <label for="address-mailing">${_("Mailing Address")}</label>
-            <textarea id="address-mailing" name="mailing_address" value=""></textarea>
-          </li>
-
-          <li class="field text" id="field-goals">
-            <label for="goals">${_("Please share with us your reasons for registering with {platform_name}").format(platform_name=settings.PLATFORM_NAME)}</label>
-            <textarea id="goals" name="goals" value=""></textarea>
-          </li>
+            </li>
+        	<li class="field required select" id="field-education-level">
+              <label for="education-level">${_("Highest Level of Education Completed")}</label>
+              <select id="education-level" name="level_of_education">
+                <option value="">--</option>
+                %for code, ed_level in UserProfile.LEVEL_OF_EDUCATION_CHOICES:
+                <option value="${code}">${_(ed_level)}</option>
+                %endfor
+              </select>
+            </li>
+        	<li class="field required select" id="field-education-year">
+              <label for="education-year">${_("Year of Birth")}</label>
+              <select id="education-year" name="education_year">
+                <option value="">--</option>
+                %for year in UserProfile.VALID_YEARS:
+                <option value="${year}">${year}</option>
+                %endfor
+              </select>
+            </li>
+        	
+        	<li class="field text" id="field-education-qualification">
+        		<label for="education-qualification">${_('Diploma qualification')}</label>
+        		<input id="education-qualification" type="text" name="education_qualification" value="" required aria-required="true" />
+        	</li>
+        	<li class="field text" id="field-education-specialty">
+        		<label for="education-specialty">${_('Diploma specialty')}</label>
+        		<input id="education-specialty" type="text" name="education_specialty" value="" required aria-required="true" />
+        	</li>
+        	<li class="field required select" id="field-work-type">
+        		<label for="work-type">${_("Type of educational institution")}</label>
+				<select id="work-type" name="work_type">
+					<option value="">--</option>
+					%for code, wo_type in UserProfile.WORK_TYPE_CHOICES:
+					<option value="${code}">${_(wo_type)}</option>
+					%endfor
+				</select>
+        	</li>
+        	<li class="field required text" id="field-work-number">
+        		<label for="work-number">${_('Number of educational institution')}</label>
+        		<input id="work-number" type="text" name="work_number" value="" required aria-required="true" />
+        	</li>
+        	<li class="field required text" id="field-work-name">
+        		<label for="work-name">${_('Name of educational institution')}</label>
+        		<input id="work-name" type="text" name="work_name" value="" required aria-required="true" />
+        	</li>
+        	<li class="field required text" id="field-work-login">
+        		<label for="work-login">${_('StatGrad login of educational institution')}</label>
+        		<input id="work-login" type="text" name="work_login" value="" required aria-required="true" />
+        	</li>
+        	<li class="field required select" id="field-work-location">
+				<label for="work-location">${_("Okrug of educational institution")}</label>
+				<select id="work-location" name="work_location">
+					<option value="">--</option>
+					%for code, wo_loc in UserProfile.WORK_LOCATION_CHOICES:
+					<option value="${code}">${_(wo_loc)}</option>
+					%endfor
+				</select>
+        	</li>
+        	<li class="field required select" id="field-work-occupation">
+				<label for="work-occupation">${_("Occupation at educational institution")}</label>
+				<select id="work-occupation" name="work_occupation">
+					<option value="">--</option>
+					%for code, wo_occ in UserProfile.WORK_OCCUPATION_CHOICES:
+					<option value="${code}">${_(wo_occ)}</option>
+					%endfor
+				</select>
+        	</li>
+        	<li class="field select" id="field-work-occupation-other">
+				<label for="work-occupation-other">${_("Another occupation at educational institution")}</label>
+				<select id="work-occupation-other" name="work_occupation_other">
+					<option value="">--</option>
+					%for code, wo_occ in UserProfile.WORK_OCCUPATION_CHOICES:
+					<option value="${code}">${_(wo_occ)}</option>
+					%endfor
+				</select>
+        	</li>
+        	<li class="field required text" id="field-work-teaching-experience">
+        		<label for="work-work_teaching_experience">${_('Educational experience at educational institution')}</label>
+        		<input id="work-work_teaching_experience" type="text" name="work_teaching_experience" value="" required aria-required="true" />
+        	</li>
+        	<li class="field text" id="field-work-managing-experience">
+        		<label for="work-managing-experience">${_('Managing experience at educational institution')}</label>
+        		<input id="work-managing-experience" type="text" name="work-managing-experience" value="" required aria-required="true" />
+        	</li>
+        	<li class="field select" id="field-work-qualification-category">
+				<label for="work-qualification-category">${_("Qualification category")}</label>
+				<select id="work-qualification-category" name="work_qualification_category">
+					<option value="">--</option>
+					%for code, wo_qua in UserProfile.WORK_QUALIFICATION_CATEGORY_CHOICES:
+					<option value="${code}">${_(wo_qua)}</option>
+					%endfor
+				</select>
+        	</li>
+        	<li class="field text" id="field-work-qualification-category">
+        		<label for="work-qualification-category">${_('Qualification category year')}</label>
+        		<input id="work-qualification-category" type="text" name="work_qualification_category" value="" required aria-required="true" />
+        	</li>
+        	<li class="field text" id="field-contact-phone">
+        		<label for="contact-phone">${_('Contact phone')}</label>
+        		<input id="contact-phone" type="text" name="contact_phone" value="" required aria-required="true" />
+        	</li>
         </ol>
       </fieldset>
 
