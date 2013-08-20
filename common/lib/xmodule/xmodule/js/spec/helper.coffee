@@ -91,6 +91,7 @@ jasmine.stubRequests = ->
   spyOn($, 'ajax').andCallFake (settings) ->
     if match = settings.url.match /youtube\.com\/.+\/videos\/(.+)\?v=2&alt=jsonc/
       if settings.success
+        # match[1] - it's video ID
         settings.success data: jasmine.stubbedMetadata[match[1]]
       else {
           always: (callback) ->

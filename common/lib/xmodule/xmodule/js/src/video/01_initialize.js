@@ -201,44 +201,44 @@ function (VideoPlayer) {
     // The function set initial configuration and preparation.
 
     function initialize(element) {
-        var state = this;
+        var _this = this;
         // This is used in places where we instead would have to check if an element has a CSS class 'fullscreen'.
-        state.isFullScreen = false;
+        this.isFullScreen = false;
 
         // The parent element of the video, and the ID.
-        state.el = $(element).find('.video');
-        state.id = state.el.attr('id').replace(/video_/, '');
+        this.el = $(element).find('.video');
+        this.id = this.el.attr('id').replace(/video_/, '');
 
         // We store all settings passed to us by the server in one place. These are "read only", so don't
         // modify them. All variable content lives in 'state' object.
-        state.config = {
+        this.config = {
             element: element,
 
-            start:              state.el.data('start'),
-            end:                state.el.data('end'),
+            start:              this.el.data('start'),
+            end:                this.el.data('end'),
 
-            caption_data_dir:   state.el.data('caption-data-dir'),
-            caption_asset_path: state.el.data('caption-asset-path'),
-            show_captions:      (state.el.data('show-captions').toString().toLowerCase() === 'true'),
-            youtubeStreams:     state.el.data('streams'),
+            caption_data_dir:   this.el.data('caption-data-dir'),
+            caption_asset_path: this.el.data('caption-asset-path'),
+            show_captions:      (this.el.data('show-captions').toString().toLowerCase() === 'true'),
+            youtubeStreams:     this.el.data('streams'),
 
-            sub:                state.el.data('sub'),
-            mp4Source:          state.el.data('mp4-source'),
-            webmSource:         state.el.data('webm-source'),
-            oggSource:          state.el.data('ogg-source'),
+            sub:                this.el.data('sub'),
+            mp4Source:          this.el.data('mp4-source'),
+            webmSource:         this.el.data('webm-source'),
+            oggSource:          this.el.data('ogg-source'),
 
             fadeOutTimeout:     1400,
 
             availableQualities: ['hd720', 'hd1080', 'highres']
         };
 
-        if (!(_parseYouTubeIDs(state))) {
+        if (!(_parseYouTubeIDs(this))) {
             // If we do not have YouTube ID's, try parsing HTML5 video sources.
-            _prepareHTML5Video(state);
-            _setConfigurations(state);
-            _renderElements(state);
+            _prepareHTML5Video(this);
+            _setConfigurations(this);
+            _renderElements(this);
         } else {
-            state.getVideoMetadata()
+            this.getVideoMetadata()
                 .always(function(json, status) {
                     var err = $.isPlainObject(json.error) ||
                                 (status !== "success" && status !== "notmodified");
@@ -247,12 +247,12 @@ function (VideoPlayer) {
                         // When the youtube link doesn't work for any reason
                         // (for example, the great firewall in china) any
                         // alternate sources should automatically play.
-                        _prepareHTML5Video(state);
-                        state.el.find('a.quality_control').hide();
+                        _prepareHTML5Video(_this);
+                        _this.el.find('a.quality_control').hide();
                     }
 
-                    _setConfigurations(state);
-                    _renderElements(state);
+                    _setConfigurations(_this);
+                    _renderElements(_this);
                 });
         }
     }

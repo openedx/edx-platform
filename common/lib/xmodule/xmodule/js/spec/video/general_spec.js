@@ -61,12 +61,12 @@
 
                 describe('Check Youtube link existence', function () {
                     var statusList = {
-                        'error': 'html5',
-                        'timeout': 'html5',
-                        'abort': 'html5',
-                        'parsererror': 'html5',
-                        'success': 'youtube',
-                        'notmodified': 'youtube'
+                        error: 'html5',
+                        timeout: 'html5',
+                        abort: 'html5',
+                        parsererror: 'html5',
+                        success: 'youtube',
+                        notmodified: 'youtube'
                     };
 
                     function stubDeffered(data, status) {
