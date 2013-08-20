@@ -25,6 +25,7 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.forms import ModelForm, forms
+from django.utils.translation import ugettext_lazy as _
 
 import comment_client as cc
 from pytz import UTC
@@ -82,6 +83,13 @@ class UserProfile(models.Model):
     # This is not visible to other users, but could introduce holes later
     user = models.OneToOneField(User, unique=True, db_index=True, related_name='profile')
     name = models.CharField(blank=True, max_length=255, db_index=True)
+    
+    lastname = models.CharField(blank=False, null=True, max_length=30, db_index=True)
+    firstname = models.CharField(blank=False, null=True, max_length=30, db_index=True)
+    middlename = models.CharField(blank=False, null=True, max_length=30, db_index=True)
+    
+    
+
 
     meta = models.TextField(blank=True)  # JSON dictionary for future expansion
     courseware = models.CharField(blank=True, max_length=255, default='course.xml')
@@ -95,6 +103,7 @@ class UserProfile(models.Model):
     this_year = datetime.now(UTC).year
     VALID_YEARS = range(this_year, this_year - 120, -1)
     year_of_birth = models.IntegerField(blank=True, null=True, db_index=True)
+    
     GENDER_CHOICES = (('m', 'Male'), ('f', 'Female'), ('o', 'Other'))
     gender = models.CharField(
         blank=True, null=True, max_length=6, db_index=True, choices=GENDER_CHOICES
@@ -105,20 +114,108 @@ class UserProfile(models.Model):
     # ('p_se', 'Doctorate in science or engineering'),
     # ('p_oth', 'Doctorate in another field'),
     LEVEL_OF_EDUCATION_CHOICES = (
-        ('p', 'Doctorate'),
-        ('m', "Master's or professional degree"),
-        ('b', "Bachelor's degree"),
-        ('a', "Associate's degree"),
-        ('hs', "Secondary/high school"),
-        ('jhs', "Junior secondary/junior high/middle school"),
-        ('el', "Elementary/primary school"),
-        ('none', "None"),
-        ('other', "Other")
+        ('p', _("Doctorate")),
+        ('m', _("Master's or professional degree")),
+        ('b', _("Bachelor's degree")),
+        ('a', _("Associate's degree")),
+        ('hs', _("Secondary/high school")),
+        ('jhs', _("Junior secondary/junior high/middle school")),
+        ('el', _("Elementary/primary school")),
+        ('none', _("None")),
+        ('other', _("Other"))
     )
     level_of_education = models.CharField(
         blank=True, null=True, max_length=6, db_index=True,
         choices=LEVEL_OF_EDUCATION_CHOICES
     )
+    
+    education_place = models.CharField(blank=False, null=True, max_length=255, db_index=False)
+    education_year = models.IntegerField(blank=False, null=True, db_index=True)
+    education_qualification = models.CharField(blank=True, null=True, max_length=30)
+    education_specialty = models.CharField(blank=True, null=True, max_length=30)
+    
+    
+    WORK_TYPE_CHOICES = (
+        ('sch', _("School")),
+        ('lyc', _("Lyceum")),
+        ('edc', _('Education Center')),
+        ('gymn', _('Gymnasium')),
+        ('edu', _('Educational complex')),
+        ('kind', _('Kindergarten')),
+        ('npe', _('Non-profit educational institution')),
+        ('coll', _('College')),
+        ('none', _('None')),
+        ('other', _('Other'))
+    )
+    work_type = models.CharField(blank=False, null=True, max_length=6, choices=WORK_TYPE_CHOICES)
+    work_number = models.IntegerField(blank=False, null=True, db_index=True)
+    work_name = models.CharField(blank=False, null=True, max_length=255, db_index=False)
+    work_login = models.CharField(blank=False, null=True, max_length=10, db_index=False)
+    WORK_LOCATION_CHOICES = (
+        ('CAO', 'Central Administrative Okrug'),
+        ('EAO', 'Eastern Administrative Okrug'),
+        ('WAO', 'Western Administrative Okrug'),
+        ('NAO', 'Northern Administrative Okrug'),
+        ('NEAO', 'North-Eastern Administrative Okrug'),
+        ('NWAO', 'North-Western Administrative Okrug'),
+        ('SWAO', 'South-Western Administrative Okrug'),
+        ('SEAO', 'South-Eastern Administrative Okrug'),
+        ('SAO', 'Southern Administrative Okrug'),
+        ('zel', 'Zelenogradsky Administrative Okrug'),
+        ('troi', 'Troitsky Administrative Okrug'),
+        ('novo', 'Novomoskovsky Administrative Okrug'),
+        ('city', 'Territorial units with special status'),
+        ('non', 'None'),
+        ('other', 'Other')
+    )
+    work_location = models.CharField(blank=False, null=True, max_length=6, db_index=False, choices=WORK_LOCATION_CHOICES)
+    WORK_OCCUPATION_CHOICES = (
+        ('tchr', _('Teacher')),
+        ('tchrorg', _('Teacher and organizer')),
+        ('scltchr', _('Social teacher')),
+        ('edupsy', _('Educational Psychologist')),
+        ('care', _('Caregiver (including older)')),
+        ('mng', _('Manager (Director, Head of) the educational institution')),
+        ('vcmng', _('Vice manager (director, head of) the educational institution')),
+        ('smstr', _('Senior master')),
+        ('intr', _('Instructor')),
+        ('tchrsp', _('Teacher-pathologists, speech therapists (speech therapist)')),
+        ('tutor', _('Tutor')),
+        ('tchrlib', _('Teacher-librarian')),
+        ('slead', _('Senior leader')),
+        ('tchredu', _('Teacher of additional education (including older)')),
+        ('mushead', _('Musical head')),
+        ('conc', _('Concertmaster')),
+        ('mstrphy', _('Master of Physical Education')),
+        ('instphy', _('Instructor of Physical Education')),
+        ('meth', _('The Methodist (including older)')),
+        ('instlab', _('Instructor for Labour')),
+        ('instorg', _('Instructor-organizer life safety')),
+        ('coach', _('Coach and teacher (including older)')),
+        ('mstrind', _('Master of of industrial training')),
+        ('dtreg', _('The duty on the regime (including older)')),
+        ('lead', _('Leader')),
+        ('ascare', _('Assistant caregiver')),
+        ('juncare', _('Junior caregiver')),
+        ('secr', _('Secretary of teaching department')),
+        ('disp', _('Dispatcher of the educational institution')),
+        ('other', _('Other'))
+    )
+    work_occupation = models.CharField(blank=False, null=True, max_length=10, db_index=False, choices=WORK_OCCUPATION_CHOICES)
+    work_occupation_other = models.CharField(blank=True, max_length=10, db_index=False, choices=WORK_OCCUPATION_CHOICES)
+    work_teaching_experience = models.IntegerField(blank=True, null=True, db_index=True)
+    work_managing_experience = models.IntegerField(blank=False, null=True, db_index=True)
+    WORK_QUALIFICATION_CATEGORY_CHOICES = (
+        ('none', _("None")),
+        ('high', _("High")),
+        ('first', _("First")),
+        ('second', _("Second"))
+    )
+    work_qualification_category = models.CharField(blank=False, null=True, max_length=10, db_index=False, choices=WORK_QUALIFICATION_CATEGORY_CHOICES) 
+    work_qualification_category_year = models.IntegerField(blank=False, null=True, db_index=True)
+    
+    contact_phone = models.CharField(blank=False, null=True, max_length=10, db_index=False)
+    
     mailing_address = models.TextField(blank=True, null=True)
     goals = models.TextField(blank=True, null=True)
     allow_certificate = models.BooleanField(default=1)

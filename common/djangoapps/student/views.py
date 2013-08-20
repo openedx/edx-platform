@@ -709,7 +709,7 @@ def _do_create_account(post_vars):
 
     Note: this function is also used for creating test users.
     """
-    user = User(username=post_vars['username'],
+    user = User(username=post_vars['email'],
                 email=post_vars['email'],
                 is_active=False)
     user.set_password(post_vars['password'])
@@ -721,11 +721,6 @@ def _do_create_account(post_vars):
     except IntegrityError:
         js = {'success': False}
         # Figure out the cause of the integrity error
-        if len(User.objects.filter(username=post_vars['username'])) > 0:
-            js['value'] = _("An account with the Public Username '{username}' already exists.").format(username=post_vars['username'])
-            js['field'] = 'username'
-            return HttpResponse(json.dumps(js))
-
         if len(User.objects.filter(email=post_vars['email'])) > 0:
             js['value'] = _("An account with the Email '{email}' already exists.").format(email=post_vars['email'])
             js['field'] = 'email'
@@ -736,18 +731,34 @@ def _do_create_account(post_vars):
     registration.register(user)
 
     profile = UserProfile(user=user)
-    profile.name = post_vars['name']
+    profile.lastname = post_vars.get('lastname')
+    profile.firstname = post_vars.get('firstname')
+    profile.middlename = post_vars.get('middlename')
+    profile.year_of_birth = post_vars.get('year_of_birth')
     profile.level_of_education = post_vars.get('level_of_education')
-    profile.gender = post_vars.get('gender')
-    profile.mailing_address = post_vars.get('mailing_address')
-    profile.goals = post_vars.get('goals')
+    profile.education_place = post_vars.get('education_place')
+    profile.education_year = post_vars.get('education_year')
+    profile.education_qualification = post_vars.get('education_qualification')
+    profile.education_specialty = post_vars.get('education_specialty')
+    profile.work_type = post_vars.get('work_type')
+    profile.work_number = post_vars.get('work_number')
+    profile.work_name = post_vars.get('work_name')
+    profile.work_login = post_vars.get('work_login')
+    profile.work_location = post_vars.get('work_location')
+    profile.work_occupation = post_vars.get('work_occupation')
+    profile.work_occupation_other = post_vars.get('work_occupation_other')
+    profile.work_teaching_experience = post_vars.get('work_teaching_experience')
+    profile.work_managing_experience = post_vars.get('work_managing_experience')
+    profile.work_qualification_category = post_vars.get('work_qualification_category')
+    profile.work_qualification_category_year = post_vars.get('work_qualification_category_year')
+    profile.contact_phone = post_vars.get('contact_phone')
 
-    try:
-        profile.year_of_birth = int(post_vars['year_of_birth'])
-    except (ValueError, KeyError):
-        # If they give us garbage, just ignore it instead
-        # of asking them to put an integer.
-        profile.year_of_birth = None
+    # try:
+    #     profile.year_of_birth = int(post_vars['year_of_birth'])
+    # except (ValueError, KeyError):
+    #     # If they give us garbage, just ignore it instead
+    #     # of asking them to put an integer.
+    #     profile.year_of_birth = None
     try:
         profile.save()
     except Exception:
@@ -786,7 +797,7 @@ def create_account(request, post_override=None):
         log.debug(u'In create_account with external_auth: user = %s, email=%s', name, email)
 
     # Confirm we have a properly formed request
-    for a in ['username', 'email', 'password', 'name']:
+    for a in ['email', 'password']:
         if a not in post_vars:
             js['value'] = _("Error (401 {field}). E-mail us.").format(field=a)
             js['field'] = a
@@ -815,7 +826,11 @@ def create_account(request, post_override=None):
     # this is a good idea
     # TODO: Check password is sane
 
-    required_post_vars = ['username', 'email', 'name', 'password', 'terms_of_service', 'honor_code']
+    required_post_vars = ['email', 'password', 'lastname', 'firstname', 'middlename', 'year_of_birth',
+        'level_of_education', 'education_place', 'education_year',
+        'work_type', 'work_number', 'work_name', 'work_login', 'work_location',
+        'work_occupation', 'work_teaching_experience', 'work_qualification_category', 'work_qualification_category_year',
+        'contact_phone', 'terms_of_service', 'honor_code']
     if tos_not_required:
         required_post_vars = ['username', 'email', 'name', 'password', 'honor_code']
 
@@ -838,12 +853,12 @@ def create_account(request, post_override=None):
         js['field'] = 'email'
         return HttpResponse(json.dumps(js))
 
-    try:
-        validate_slug(post_vars['username'])
-    except ValidationError:
-        js['value'] = _("Username should only consist of A-Z and 0-9, with no spaces.").format(field=a)
-        js['field'] = 'username'
-        return HttpResponse(json.dumps(js))
+    # try:
+    #     validate_slug(post_vars['username'])
+    # except ValidationError:
+    #     js['value'] = _("Username should only consist of A-Z and 0-9, with no spaces.").format(field=a)
+    #     js['field'] = 'username'
+    #     return HttpResponse(json.dumps(js))
 
     # Ok, looks like everything is legit.  Create the account.
     ret = _do_create_account(post_vars)
@@ -851,7 +866,7 @@ def create_account(request, post_override=None):
         return ret
     (user, profile, registration) = ret
 
-    d = {'name': post_vars['name'],
+    d = {'name': post_vars['lastname'],
          'key': registration.activation_key,
          }
 
@@ -879,7 +894,7 @@ def create_account(request, post_override=None):
     # Immediately after a user creates an account, we log them in. They are only
     # logged in until they close the browser. They can't log in again until they click
     # the activation link from the email.
-    login_user = authenticate(username=post_vars['username'], password=post_vars['password'])
+    login_user = authenticate(username=post_vars['email'], password=post_vars['password'])
     login(request, login_user)
     request.session.set_expiry(0)
 
@@ -892,8 +907,8 @@ def create_account(request, post_override=None):
         eamap.user = login_user
         eamap.dtsignup = datetime.datetime.now(UTC)
         eamap.save()
-        AUDIT_LOG.info("User registered with external_auth %s", post_vars['username'])
-        AUDIT_LOG.info('Updated ExternalAuthMap for %s to be %s', post_vars['username'], eamap)
+        AUDIT_LOG.info("User registered with external_auth %s", post_vars['email'])
+        AUDIT_LOG.info('Updated ExternalAuthMap for %s to be %s', post_vars['email'], eamap)
 
         if settings.MITX_FEATURES.get('BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH'):
             log.info('bypassing activation email')
