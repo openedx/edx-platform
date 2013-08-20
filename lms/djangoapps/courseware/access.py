@@ -134,7 +134,7 @@ def _has_access_course_desc(user, course, action):
         Can this user access the forums in this course?
         """
         return (CourseEnrollment.is_enrolled(request.user, course_id) or \
-            _has_staff_access_to_descriptor(user, course)
+            _has_staff_access_to_descriptor(user, course))
 
     def can_enroll():
         """
