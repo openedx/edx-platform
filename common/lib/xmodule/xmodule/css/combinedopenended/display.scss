@@ -129,7 +129,7 @@ section.combined-open-ended-status {
     }
 
     &:last-child {
-      border-right: 0px;
+      border-right: 0;
       border-radius: 0 $baseline/4 $baseline/4 0;
     }
 
@@ -235,7 +235,8 @@ section.combined-open-ended-status {
     background-color: #eee;
   }
   .rubric-label-selected{
-    border: 2px solid #666;
+    border-radius: $baseline/4;
+    background-color: #eee;
   }
 }
 
@@ -365,7 +366,7 @@ div.result-container {
       font-family: monospace;
       font-size: 1em;
       padding-top: $baseline/2;
-      padding-bottom:30px;
+      padding-bottom: 30px;
 
       header {
         font-size: 1.4em;
@@ -433,8 +434,8 @@ div.result-container {
 
   .rubric-result-container {
     padding: 2px;
-    margin: 0px;
-    display : inline;
+    margin: 0;
+    display: inline;
 
     .rubric-result {
       font-size: .9em;

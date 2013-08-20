@@ -914,7 +914,7 @@ section.problem {
 
         .tag {
           display: inline-block;
-          margin-left: $baseline;
+          margin-left: $baseline*2;
           border: 1px solid rgb(102,102,102);
           cursor: pointer;
 
