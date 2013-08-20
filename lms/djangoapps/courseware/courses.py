@@ -156,7 +156,8 @@ def get_course_about_section(course, section_key):
                 model_data_cache,
                 course.id,
                 not_found_ok=True,
-                wrap_xmodule_display=False
+                wrap_xmodule_display=False,
+                static_asset_path=course.lms.static_asset_path
             )
 
             html = ''
@@ -245,7 +246,8 @@ def get_course_syllabus_section(course, section_key):
                 return replace_static_urls(
                     htmlFile.read().decode('utf-8'),
                     getattr(course, 'data_dir', None),
-                    course_id=course.location.course_id
+                    course_id=course.location.course_id,
+                    static_asset_path=course.lms.static_asset_path,
                 )
         except ResourceNotFoundError:
             log.exception("Missing syllabus section {key} in course {url}".format(
