@@ -67,29 +67,18 @@ $('#fileupload').fileupload({
 
     autoUpload: false,
 
-    options: {
-        acceptFileTypes: /(\.|\/)tar\.gz$/i ,
-        processQueue: [{
-            action: 'validate',
-            acceptFileTypes: '@'
-        }]
-    },
-
     add: function(e, data) {
+        submitBtn.unbind('click');
         var file = data.files[0];
         if (file.type == "application/x-gzip") {
             submitBtn.click(function(e){
                 e.preventDefault();
+                submitBtn.hide();
                 data.submit().complete(function(result, textStatus, xhr) {
                     if (result.status != 200) {
-                        alert('${_("Your import has failed.")}\n\n' +
-                            JSON.parse(result.responseText)["ErrMsg"]);
+                        alert('${_("Your import has failed.")}\n\n' + JSON.parse(result.responseText)["ErrMsg"]);
                         submitBtn.show();
                         bar.hide();
-                    } else {
-                        bar.hide()
-                        alert('${_("Your import was successful.")}');
-                        window.location = '${successful_import_redirect_url}';
                     }
                 });
             });
@@ -109,19 +98,7 @@ $('#fileupload').fileupload({
         alert('${_("Your import was successful.")}');
         window.location = '${successful_import_redirect_url}';
     },
-    processActions: {
-        validate: function(data, options) {
-            var dfdata = $.Deferred(),
-                file = data.files[data.index];
-            if (!options.acceptFileTypes.test(file.type)) {
-                file.error = 'Invalid file type: must be a tar.gz file!';
-                dfdata.rejectWith(this, [data]);
-            } else {
-                dfdata.resolveWith(this, [data]);
-            }
-            return dfdata.promise();
-        }
-    }
+    sequentialUploads: true
 
 
 
