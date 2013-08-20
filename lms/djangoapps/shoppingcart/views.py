@@ -24,7 +24,7 @@ def add_course_to_cart(request, course_id):
     cart = Order.get_cart_for_user(request.user)
     if PaidCourseRegistration.part_of_order(cart, course_id):
         return HttpResponseNotFound(_('The course {0} is already in your cart.'.format(course_id)))
-    if CourseEnrollment.objects.filter(user=request.user, course_id=course_id).exists():
+    if CourseEnrollment.is_enrolled(user=request.user, course_id=course_id):
         return HttpResponseNotFound(_('You are already registered in course {0}.'.format(course_id)))
     try:
         PaidCourseRegistration.add_to_order(cart, course_id)
