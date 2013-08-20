@@ -93,3 +93,9 @@ Feature: Course Grading
         And I press the "Save" notification button
         And I reload the page
         Then I see the highest grade range is "Good"
+
+    Scenario: User cannot edit failing grade range name
+        Given I have opened a new course in Studio
+        And I have populated the course
+        And I am viewing the grading settings
+        Then I cannot edit the "Fail" grade range
