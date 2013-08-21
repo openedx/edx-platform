@@ -1,13 +1,14 @@
 import logging
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound, HttpResponseForbidden, Http404
 from django.utils.translation import ugettext as _
+from django.views.decorators.http import require_POST
 from django.core.urlresolvers import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from student.models import CourseEnrollment
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from mitxmako.shortcuts import render_to_response
-from .models import *
+from .models import Order, PaidCourseRegistration, CertificateItem, OrderItem
 from .processors import process_postpay_callback, render_purchase_form_html
 
 log = logging.getLogger("shoppingcart")
@@ -38,6 +39,9 @@ def add_course_to_cart(request, course_id):
 
 @login_required
 def register_for_verified_cert(request, course_id):
+    """
+    Add a CertificateItem to the cart
+    """
     cart = Order.get_cart_for_user(request.user)
     CertificateItem.add_to_order(cart, course_id, 30, 'verified')
     return HttpResponse("Added")
@@ -77,6 +81,7 @@ def remove_item(request):
 
 
 @csrf_exempt
+@require_POST
 def postpay_callback(request):
     """
     Receives the POST-back from processor.
@@ -111,7 +116,7 @@ def show_receipt(request, ordernum):
         raise Http404('Order not found!')
 
     order_items = order.orderitem_set.all()
-    any_refunds = "refunded" in [i.status for i in order_items]
+    any_refunds = any(i.status == "refunded" for i in order_items)
     return render_to_response('shoppingcart/receipt.html', {'order': order,
                                                             'order_items': order_items,
                                                             'any_refunds': any_refunds})

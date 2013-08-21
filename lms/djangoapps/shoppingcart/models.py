@@ -6,7 +6,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
 from model_utils.managers import InheritanceManager
-from courseware.courses import course_image_url, get_course_about_section
+from courseware.courses import get_course_about_section
 
 from xmodule.modulestore.django import modulestore
 from xmodule.course_module import CourseDescriptor
@@ -66,6 +66,7 @@ class Order(models.Model):
 
     @property
     def total_cost(self):
+        """ Return the total cost of the order """
         return sum(i.line_cost for i in self.orderitem_set.filter(status=self.status))
 
     def clear(self):
@@ -79,6 +80,19 @@ class Order(models.Model):
         """
         Call to mark this order as purchased.  Iterates through its OrderItems and calls
         their purchased_callback
+
+        `first` - first name of person billed (e.g. John)
+        `last` - last name of person billed (e.g. Smith)
+        `street1` - first line of a street address of the billing address (e.g. 11 Cambridge Center)
+        `street2` - second line of a street address of the billing address (e.g. Suite 101)
+        `city` - city of the billing address (e.g. Cambridge)
+        `state` - code of the state, province, or territory of the billing address (e.g. MA)
+        `postalcode` - postal code of the billing address (e.g. 02142)
+        `country` - country code of the billing address (e.g. US)
+        `ccnum` - last 4 digits of the credit card number of the credit card billed (e.g. 1111)
+        `cardtype` - 3-digit code representing the card type used (e.g. 001)
+        `processor_reply_dump` - all the parameters returned by the processor
+
         """
         self.status = 'purchased'
         self.purchase_time = datetime.now(pytz.utc)
