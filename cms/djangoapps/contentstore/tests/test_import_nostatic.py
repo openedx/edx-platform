@@ -1,27 +1,21 @@
 #pylint: disable=E1101
+'''
+Tests for importing with no static 
+'''
 
-import json
-import shutil
-import sys
-import mock
 from django.test.client import Client
 from django.test.utils import override_settings
 from django.conf import settings
-from django.core.urlresolvers import reverse
 from path import path
 import copy
-from json import loads
 
 from django.contrib.auth.models import User
 
-from auth.authz import add_user_to_creator_group
-
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
-from xmodule.modulestore import Location, mongo
+from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
-from xmodule.contentstore.django import contentstore, _CONTENTSTORE
+from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.xml_importer import import_from_xml
 from xmodule.contentstore.content import StaticContent
 
@@ -36,11 +30,20 @@ TEST_DATA_CONTENTSTORE['OPTIONS']['db'] = 'test_xcontent_%s' % uuid4().hex
 
 
 class MongoCollectionFindWrapper(object):
+    '''
+    MongoCollectionFindWrapper for testing.
+    '''
     def __init__(self, original):
+        """
+        intit func
+        """
         self.original = original
         self.counter = 0
 
     def find(self, query, *args, **kwargs):
+        """
+        find func
+        """
         self.counter = self.counter + 1
         return self.original(query, *args, **kwargs)
 
@@ -76,7 +79,7 @@ class ContentStoreImportNoStaticTest(ModuleStoreTestCase):
 
     def load_test_import_course(self):
         '''
-        Load the standard course used to test imports (for do_import_static=False behavior).  
+        Load the standard course used to test imports (for do_import_static=False behavior).
         '''
         content_store = contentstore()
         module_store = modulestore('direct')
@@ -87,12 +90,11 @@ class ContentStoreImportNoStaticTest(ModuleStoreTestCase):
 
         return module_store, content_store, course, course_location
 
-
     def test_static_import(self):
         '''
         Stuff in static_import should always be imported into contentstore
         '''
-        module_store, content_store, course, course_location = self.load_test_import_course()
+        _, content_store, course, course_location = self.load_test_import_course()
 
         # make sure we have ONE asset in our contentstore ("should_be_imported.html")
         all_assets = content_store.get_all_content_for_course(course_location)
@@ -107,11 +109,10 @@ class ContentStoreImportNoStaticTest(ModuleStoreTestCase):
             pass
 
         self.assertIsNotNone(content)
-        
+
         # make sure course.lms.static_asset_path is correct
         print "static_asset_path = {0}".format(course.lms.static_asset_path)
         self.assertEqual(course.lms.static_asset_path, 'test_import_course')
-
 
     def test_asset_import_nostatic(self):
         '''
@@ -123,13 +124,12 @@ class ContentStoreImportNoStaticTest(ModuleStoreTestCase):
         import_from_xml(module_store, 'common/test/data/', ['toy'], static_content_store=content_store, do_import_static=False, verbose=True)
 
         course_location = CourseDescriptor.id_to_location('edX/toy/2012_Fall')
-        course = module_store.get_item(course_location)
+        module_store.get_item(course_location)
 
         # make sure we have NO assets in our contentstore
         all_assets = content_store.get_all_content_for_course(course_location)
         print "len(all_assets)=%d" % len(all_assets)
         self.assertEqual(len(all_assets), 0)
-
 
     def test_no_static_link_rewrites_on_import(self):
         module_store = modulestore('direct')
@@ -140,4 +140,3 @@ class ContentStoreImportNoStaticTest(ModuleStoreTestCase):
 
         handouts = module_store.get_item(Location(['i4x', 'edX', 'toy', 'html', 'toyhtml', None]))
         self.assertIn('/static/', handouts.data)
-

@@ -174,7 +174,6 @@ def import_from_xml(store, data_dir, course_dirs=None,
 
                 import_static_content(xml_module_store.modules[course_id], course_location, course_data_path, static_content_store,
                                       _namespace_rename, subpath=simport, verbose=verbose)
-                
 
             # finally loop through all the modules
             for module in xml_module_store.modules[course_id].itervalues():

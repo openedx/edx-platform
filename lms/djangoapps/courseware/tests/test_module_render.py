@@ -83,7 +83,7 @@ class ModuleRenderTestCase(LoginEnrollmentTestCase):
 
         # See if the url got rewritten to the target link
         # note if the URL mapping changes then this assertion will break
-        self.assertIn('/courses/'+self.course_id+'/jump_to_id/vertical_test', html)
+        self.assertIn('/courses/' + self.course_id + '/jump_to_id/vertical_test', html)
 
     def test_modx_dispatch(self):
         self.assertRaises(Http404, render.modx_dispatch, 'dummy', 'dummy',
@@ -139,7 +139,6 @@ class ModuleRenderTestCase(LoginEnrollmentTestCase):
             self.course_id
         )
 
-    
     def test_xqueue_callback_success(self):
         """
         Test for happy-path xqueue_callback
@@ -356,10 +355,9 @@ class TestHtmlModifiers(ModuleStoreTestCase):
             result_fragment.content
         )
 
-
     def test_static_asset_path_use(self):
         '''
-        when a course is loaded with do_import_static=False (see xml_importer.py), then 
+        when a course is loaded with do_import_static=False (see xml_importer.py), then
         static_asset_path is set as an lms kv in course.  That should make static paths
         not be mangled (ie not changed to c4x://).
         '''
@@ -374,7 +372,6 @@ class TestHtmlModifiers(ModuleStoreTestCase):
         result_fragment = module.runtime.render(module, None, 'student_view')
         self.assertIn('href="/static/toy_course_dir', result_fragment.content)
 
-
     def test_course_image(self):
         url = course_image_url(self.course)
         self.assertTrue(url.startswith('/c4x/'))
@@ -384,13 +381,11 @@ class TestHtmlModifiers(ModuleStoreTestCase):
         self.assertTrue(url.startswith('/static/toy_course_dir/'))
         self.course.lms.static_asset_path = ""
 
-
     def test_get_course_info_section(self):
         self.course.lms.static_asset_path = "toy_course_dir"
-        handouts = get_course_info_section(self.request, self.course, "handouts")
+        get_course_info_section(self.request, self.course, "handouts")
         # TODO: check handouts output...right now test course seems to have no such content
         # at least this makes sure get_course_info_section returns without exception
-
 
     def test_course_link_rewrite(self):
         module = render.get_module(
