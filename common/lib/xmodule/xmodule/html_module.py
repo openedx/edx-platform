@@ -33,11 +33,13 @@ class HtmlFields(object):
 
 
 class HtmlModule(HtmlFields, XModule):
-    js = {'coffee': [resource_string(__name__, 'js/src/javascript_loader.coffee'),
-                     resource_string(__name__, 'js/src/collapsible.coffee'),
-                     resource_string(__name__, 'js/src/html/display.coffee')
-                    ]
-         }
+    js = {
+        'coffee': [
+            resource_string(__name__, 'js/src/javascript_loader.coffee'),
+            resource_string(__name__, 'js/src/collapsible.coffee'),
+            resource_string(__name__, 'js/src/html/display.coffee')
+        ]
+    }
     js_module_name = "HTMLModule"
     css = {'scss': [resource_string(__name__, 'css/html/display.scss')]}
 
@@ -118,8 +120,10 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):
             # from .html
             # 'filename' in html pointers is a relative path
             # (not same as 'html/blah.html' when the pointer is in a directory itself)
-            pointer_path = "{category}/{url_path}".format(category='html',
-                                                  url_path=name_to_pathname(location.name))
+            pointer_path = "{category}/{url_path}".format(
+                category='html',
+                url_path=name_to_pathname(location.name)
+            )
             base = path(pointer_path).dirname()
             # log.debug("base = {0}, base.dirname={1}, filename={2}".format(base, base.dirname(), filename))
             filepath = "{base}/{name}.html".format(base=base, name=filename)
@@ -168,10 +172,12 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):
         string to filename.html.
         '''
 
-        # Not proper format.  Write html to file, return an empty tag
+        # Write html to file, return an empty tag
         pathname = name_to_pathname(self.url_name)
-        filepath = u'{category}/{pathname}.html'.format(category=self.category,
-                                                    pathname=pathname)
+        filepath = u'{category}/{pathname}.html'.format(
+            category=self.category,
+            pathname=pathname
+        )
 
         resource_fs.makedir(os.path.dirname(filepath), recursive=True, allow_recreate=True)
         with resource_fs.open(filepath, 'w') as filestream:
@@ -185,6 +191,7 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):
         elt.set("filename", relname)
         return elt
 
+
 class AboutFields(object):
     display_name = String(
         help="Display name for this module",
@@ -197,11 +204,13 @@ class AboutFields(object):
         scope=Scope.content
     )
 
+
 class AboutModule(AboutFields, HtmlModule):
     """
     Overriding defaults but otherwise treated as HtmlModule.
     """
     pass
+
 
 class AboutDescriptor(AboutFields, HtmlDescriptor):
     """
@@ -210,6 +219,7 @@ class AboutDescriptor(AboutFields, HtmlDescriptor):
     """
     template_dir_name = "about"
     module_class = AboutModule
+
 
 class StaticTabFields(object):
     """
@@ -235,6 +245,7 @@ class StaticTabModule(StaticTabFields, HtmlModule):
     Supports the field overrides
     """
     pass
+
 
 class StaticTabDescriptor(StaticTabFields, HtmlDescriptor):
     """
