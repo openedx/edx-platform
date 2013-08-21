@@ -84,7 +84,7 @@ def course_image_url(course):
     if modulestore().get_modulestore_type(course.location.course_id) == XML_MODULESTORE_TYPE:
         return '/static/' + course.data_dir + "/images/course_image.jpg"
     else:
-        loc = course.location._replace(tag='c4x', category='asset', name='images_course_image.jpg')
+        loc = course.location._replace(tag='c4x', category='asset', name=course.course_image)
         _path = StaticContent.get_url_path_from_location(loc)
         return _path
 

@@ -57,6 +57,7 @@ Feature: Course Settings
     | Course Start Time         | 11:00             |
     | Course Introduction Video | 4r7wHMg5Yjg       |
     | Course Effort             | 200:00            |
+    | Course Image URL          | image.jpg         |
 
   # Special case because we have to type in code mirror
   Scenario: Changes in Course Overview show a confirmation
@@ -71,3 +72,11 @@ Feature: Course Settings
     When I select Schedule and Details
     And I change the "Course Start Date" field to ""
     Then the save button is disabled
+
+  Scenario: User can upload course image
+    Given I have opened a new course in Studio
+    When I select Schedule and Details
+    And I click the "Upload Course Image" button
+    And I upload a new course image
+    Then I should see the new course image
+    And the image URL should be present in the field
