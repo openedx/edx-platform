@@ -81,7 +81,7 @@ def get_opt_course_with_access(user, course_id, action):
 def course_image_url(course):
     """Try to look up the image url for the course.  If it's not found,
     log an error and return the dead link"""
-    if modulestore().get_modulestore_type(course.location.course_id) == XML_MODULESTORE_TYPE:
+    if course.lms.static_asset_path or modulestore().get_modulestore_type(course.location.course_id) == XML_MODULESTORE_TYPE:
         return '/static/' + (course.lms.static_asset_path or getattr(course, 'data_dir', '')) + "/images/course_image.jpg"
     else:
         loc = course.location._replace(tag='c4x', category='asset', name='images_course_image.jpg')
