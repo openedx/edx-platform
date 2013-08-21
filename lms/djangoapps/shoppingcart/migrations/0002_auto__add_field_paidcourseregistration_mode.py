@@ -13,11 +13,9 @@ class Migration(SchemaMigration):
                       self.gf('django.db.models.fields.SlugField')(default='honor', max_length=50),
                       keep_default=False)
 
-
     def backwards(self, orm):
         # Deleting field 'PaidCourseRegistration.mode'
         db.delete_column('shoppingcart_paidcourseregistration', 'mode')
-
 
     models = {
         'auth.group': {

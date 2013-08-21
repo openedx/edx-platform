@@ -62,7 +62,7 @@ class CourseMode(models.Model):
         """
         modes = cls.modes_for_course(course_id)
 
-        matched = filter(lambda m: m.slug == mode_slug, modes)
+        matched = [m for m in modes if m.slug == mode_slug]
         if matched:
             return matched[0]
         else:

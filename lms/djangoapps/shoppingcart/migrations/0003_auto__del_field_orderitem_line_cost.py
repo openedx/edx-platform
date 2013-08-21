@@ -11,13 +11,11 @@ class Migration(SchemaMigration):
         # Deleting field 'OrderItem.line_cost'
         db.delete_column('shoppingcart_orderitem', 'line_cost')
 
-
     def backwards(self, orm):
         # Adding field 'OrderItem.line_cost'
         db.add_column('shoppingcart_orderitem', 'line_cost',
                       self.gf('django.db.models.fields.DecimalField')(default=0.0, max_digits=30, decimal_places=2),
                       keep_default=False)
-
 
     models = {
         'auth.group': {
