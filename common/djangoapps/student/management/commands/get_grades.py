@@ -76,9 +76,10 @@ class Command(BaseCommand):
         start = datetime.datetime.now()
         rows = []
         header = None
-        certs = GeneratedCertificate.objects.filter(course_id=course_id)
         print "Fetching certificate data"
-        cert_grades = { cert.user.username: cert.grade for cert in list(GeneratedCertificate.objects.filter(course_id=course_id).prefetch_related('user')) }
+        cert_grades = {cert.user.username: cert.grade
+                       for cert in list(GeneratedCertificate.objects.filter(
+                       course_id=course_id).prefetch_related('user'))}
         print "Grading students"
         for count, student in enumerate(enrolled_students):
             count += 1
