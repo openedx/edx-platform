@@ -108,14 +108,14 @@ class Order(models.Model):
         self.bill_to_ccnum = ccnum
         self.bill_to_cardtype = cardtype
         self.processor_reply_dump = processor_reply_dump
+        # save these changes on the order, then we can tell when we are in an
+        # inconsistent state
         self.save()
         # this should return all of the objects with the correct types of the
         # subclasses
         orderitems = OrderItem.objects.filter(order=self).select_subclasses()
         for item in orderitems:
-            item.status = 'purchased'
-            item.save()
-            item.purchased_callback()
+            item.purchase_item()
 
 
 class OrderItem(models.Model):
@@ -136,6 +136,7 @@ class OrderItem(models.Model):
     unit_cost = models.DecimalField(default=0.0, decimal_places=2, max_digits=30)
     line_desc = models.CharField(default="Misc. Item", max_length=1024)
     currency = models.CharField(default="usd", max_length=8)  # lower case ISO currency codes
+    fulfilled_time = models.DateTimeField(null=True)
 
     @property
     def line_cost(self):
@@ -156,6 +157,17 @@ class OrderItem(models.Model):
         currency = kwargs.get('currency', 'usd')
         if order.currency != currency and order.orderitem_set.exists():
             raise InvalidCartItem(_("Trying to add a different currency into the cart"))
+
+    @transaction.commit_on_success
+    def purchase_item(self):
+        """
+        This is basically a wrapper around purchased_callback that handles
+        modifying the OrderItem itself
+        """
+        self.purchased_callback()
+        self.status = 'purchased'
+        self.fulfilled_time = datetime.now(pytz.utc)
+        self.save()
 
     def purchased_callback(self):
         """
