@@ -41,13 +41,9 @@ body.register.verification {
     }
   }
 
-
-  #wrapper {
-    overflow: hidden;
-  }
-
   .block-photo {
     @include clearfix();
+    background-color: $white;
 
     .title {
       font-weight: bold;

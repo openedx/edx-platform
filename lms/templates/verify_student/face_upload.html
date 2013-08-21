@@ -4,8 +4,16 @@
 <%block name="bodyclass">register verification</%block>
 
 <%block name="js_extra">
+<!-- please move link to js/vendor/responsive-carousel/responsive-carousel.js from main.html to here -->
   <script type="text/javascript">
 
+$(document).ready(function() {
+
+  $( ".carousel-nav" ).addClass('sr');
+
+
+
+});
   </script>
 </%block>
 
@@ -30,7 +38,7 @@
 
 
 
-  <section id="wrapper">
+  <section class="wrapper carousel"  data-transition="slide">
     <div id="wrapper-facephoto" class="block-photo">
       <h3 class="title">Take Your Photo</h3>
       <p>Use your webcam to take a picture of your face so we can match it with the picture on your ID.</p>
@@ -98,7 +106,7 @@
         <div class="actions">
           <ul>
             <li class="action action-next">
-              <a href="#">Go to Step 2: Take ID Photo</a>
+              <a class="next" href="#next" aria-hidden="true" title="Next">Go to Step 2: Take ID Photo</a>
               <p class="tips">Once you verify your photo looks good, you can move on to step 2.</p>
             </li>
           </ul>
@@ -180,7 +188,7 @@
         <div class="actions">
           <ul>
             <li class="action action-next">
-              <a href="#">Go to Step 3: Review Your Info</a>
+              <a class="next" href="#next" aria-hidden="true" title="Next">Go to Step 3: Review Your Info</a>
               <p class="tips">Once you verify your ID photo looks good, you can move on to step 3.</p>
             </li>
           </ul>
