@@ -210,32 +210,3 @@ class ModuleStoreTestCase(TestCase):
 
         # Call superclass implementation
         super(ModuleStoreTestCase, self)._post_teardown()
-
-
-    def assert2XX(self, status_code, msg=None):
-        """
-        Assert that the given value is a success status (between 200 and 299)
-        """
-        msg = self._formatMessage(msg, "%s is not a success status" % safe_repr(status_code))
-        self.assertTrue(status_code >= 200 and status_code < 300, msg=msg)
-
-    def assert3XX(self, status_code, msg=None):
-        """
-        Assert that the given value is a redirection status (between 300 and 399)
-        """
-        msg = self._formatMessage(msg, "%s is not a redirection status" % safe_repr(status_code))
-        self.assertTrue(status_code >= 300 and status_code < 400, msg=msg)
-
-    def assert4XX(self, status_code, msg=None):
-        """
-        Assert that the given value is a client error status (between 400 and 499)
-        """
-        msg = self._formatMessage(msg, "%s is not a client error status" % safe_repr(status_code))
-        self.assertTrue(status_code >= 400 and status_code < 500, msg=msg)
-
-    def assert5XX(self, status_code, msg=None):
-        """
-        Assert that the given value is a server error status (between 500 and 599)
-        """
-        msg = self._formatMessage(msg, "%s is not a server error status" % safe_repr(status_code))
-        self.assertTrue(status_code >= 500 and status_code < 600, msg=msg)
