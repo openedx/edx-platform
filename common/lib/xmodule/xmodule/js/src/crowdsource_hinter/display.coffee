@@ -28,10 +28,6 @@ class @Hinter
   $: (selector) ->
     $(selector, @el)
 
-  jq_escape: (string) =>
-    # Escape a string for jquery selector use.
-    return string.replace(/[!"#$%&'()*+,.\/:;<=>?@\[\\\]^`{|}~]/g, '\\$&')
-
   bind: =>
     @$('input.vote').click @vote
     @$('input.submit-hint').click @submit_hint
@@ -99,7 +95,7 @@ class @Hinter
   render: (content) ->
     if content
       # Trim leading and trailing whitespace
-      content = content.replace /^\s+|\s+$/g, ""
+      content = content.trim()
 
     if content
       @el.html(content)
