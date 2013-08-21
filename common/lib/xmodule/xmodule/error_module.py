@@ -9,8 +9,7 @@ import json
 import sys
 
 from lxml import etree
-from xmodule.x_module import XModule
-from xmodule.editing_module import JSONEditingDescriptor
+from xmodule.x_module import XModule, XModuleDescriptor
 from xmodule.errortracker import exc_info_to_str
 from xmodule.modulestore import Location
 from xblock.core import String, Scope
@@ -70,11 +69,14 @@ class NonStaffErrorModule(ErrorFields, XModule):
         })
 
 
-class ErrorDescriptor(ErrorFields, JSONEditingDescriptor):
+class ErrorDescriptor(ErrorFields, XModuleDescriptor):
     """
     Module that provides a raw editing view of broken xml.
     """
     module_class = ErrorModule
+
+    def get_html(self):
+        return ''
 
     @classmethod
     def _construct(cls, system, contents, error_msg, location):
