@@ -37,11 +37,11 @@ LEAF_XMODULES = (
     # This is being excluded because it has dependencies on django
     #VideoDescriptor,
     WordCloudDescriptor,
+    CrowdsourceHinterDescriptor,
 )
 
 
 CONTAINER_XMODULES = (
-    CrowdsourceHinterDescriptor,
     CourseDescriptor,
     SequenceDescriptor,
     ConditionalDescriptor,
@@ -53,7 +53,6 @@ CONTAINER_XMODULES = (
 
 # These modules are editable in studio yet
 NOT_STUDIO_EDITABLE = (
-    CrowdsourceHinterDescriptor,
     GraphicalSliderToolDescriptor,
     PollDescriptor
 )
@@ -128,6 +127,8 @@ class TestStudentView(TestXBlockWrapper):
     # it generates the same thing from student_view that it does from get_html
     def check_student_view_leaf_node(self, descriptor_cls):
         xmodule = self.leaf_module(descriptor_cls)
+        print xmodule.get_html()
+        print xmodule.student_view(None).content
         assert_equal(xmodule.get_html(), xmodule.student_view(None).content)
 
 

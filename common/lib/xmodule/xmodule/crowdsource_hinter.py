@@ -151,7 +151,7 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         # Display any errors generated in __init__.  This is mostly for instructors to
         # see in Studio.
         if self.init_error is not None:
-            return self.init_error
+            return unicode(self.init_error)
 
         if self.in_studio:
             # We're in studio mode.
@@ -165,7 +165,6 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
             # -> localhost:8000/courses/Me/19.001/courseware/hint_manager
             manager_url = settings.LMS_BASE + '/courses' +\
                 '/'.join(self.location.url().split('/')[1:-2]) + '/courseware/hint_manager'
-            # Note: change this
             return '''This is a crowdsourced hinting module for {name}.  This message is only
                 visible in Studio - your students will see the actual hinting module.
                 <br /><br />
