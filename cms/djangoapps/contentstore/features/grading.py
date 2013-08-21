@@ -4,6 +4,7 @@
 from lettuce import world, step
 from common import *
 from terrain.steps import reload_the_page
+from selenium.common.exceptions import InvalidElementStateException
 
 
 @step(u'I am viewing the grading settings')
@@ -129,6 +130,33 @@ def i_see_highest_grade_range(_step, range_name):
     range_css = 'span.letter-grade'
     grade = world.css_find(range_css).first
     assert grade.value == range_name
+
+
+@step(u'I cannot edit the "Fail" grade range$')
+def cannot_edit_fail(_step):
+    range_css = 'span.letter-grade'
+    ranges = world.css_find(range_css)
+    assert len(ranges) == 2
+    try:
+        ranges.last.value = 'Failure'
+        assert False, "Should not be able to edit failing range"
+    except InvalidElementStateException:
+        pass  # We should get this exception on failing to edit the element
+
+
+@step(u'I change the grace period to "(.*)"$')
+def i_change_grace_period(_step, grace_period):
+    grace_period_css = '#course-grading-graceperiod'
+    ele = world.css_find(grace_period_css).first
+    ele.value = grace_period
+
+
+@step(u'I see the grace period is "(.*)"$')
+def the_grace_period_is(_step, grace_period):
+    grace_period_css = '#course-grading-graceperiod'
+    ele = world.css_find(grace_period_css).first
+    assert ele.value == grace_period
+
 
 def get_type_index(name):
     name_id = '#course-grading-assignment-name'

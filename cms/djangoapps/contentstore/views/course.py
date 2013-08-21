@@ -276,7 +276,12 @@ def get_course_settings(request, org, course, name):
                                        "section": "details"}),
         'about_page_editable': not settings.MITX_FEATURES.get(
             'ENABLE_MKTG_SITE', False
-        )
+        ),
+        'upload_asset_url': reverse('upload_asset', kwargs={
+            'org': org,
+            'course': course,
+            'coursename': name,
+        })
     })
 
 

@@ -3,7 +3,7 @@
 
 from lettuce import world, step
 from django.conf import settings
-import os
+from common import upload_file
 
 TEST_ROOT = settings.COMMON_TEST_DATA_ROOT
 
@@ -24,14 +24,8 @@ def assert_create_new_textbook_msg(_step):
 
 
 @step(u'I upload the textbook "([^"]*)"$')
-def upload_file(_step, file_name):
-    file_css = '.upload-dialog input[type=file]'
-    upload = world.css_find(file_css)
-    # uploading the file itself
-    path = os.path.join(TEST_ROOT, 'uploads', file_name)
-    upload._element.send_keys(os.path.abspath(path))
-    button_css = ".upload-dialog .action-upload"
-    world.css_click(button_css)
+def upload_textbook(_step, file_name):
+    upload_file(file_name)
 
 
 @step(u'I click (on )?the New Textbook button')

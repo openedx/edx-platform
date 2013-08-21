@@ -11,7 +11,7 @@
   <h2 class="title"><%= title %></h2>
   <% if(error) {%>
     <div id="upload_error" class="message message-status message-status error is-shown" name="upload_error">
-      <p><%= gettext(error.message) %></p>
+      <p><%= error.message %></p>
     </div>
   <% } %>
   <p id="dialog-assetupload-description" class="message"><%= message %></p>

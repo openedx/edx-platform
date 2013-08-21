@@ -2,7 +2,7 @@
 
 <%inherit file="base.html" />
 <%block name="title">${_("Schedule &amp; Details Settings")}</%block>
-<%block name="bodyclass">is-signedin course schedule settings</%block>
+<%block name="bodyclass">is-signedin course schedule settings feature-upload</%block>
 
 <%namespace name='static' file='static_content.html'/>
 <%!
@@ -21,6 +21,10 @@ from contentstore import utils
   <script type="text/javascript" src="${static.url('js/views/validating_view.js')}"></script>
   <script type="text/javascript" src="${static.url('js/views/settings/main_settings_view.js')}"></script>
   <script type="text/javascript" src="${static.url('js/models/settings/course_details.js')}"></script>
+
+  <script type="text/template" id="upload-dialog-tpl">
+    <%static:include path="js/upload-dialog.underscore" />
+  </script>
 
   <script type="text/javascript">
     $(document).ready(function(){
@@ -43,6 +47,8 @@ from contentstore import utils
         },
         reset: true
       });
+
+      CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
     });
 
   </script>
@@ -206,6 +212,34 @@ from contentstore import utils
                     text = _("Introductions, prerequisites, FAQs that are used on %s (formatted in HTML)") % a_link
                     %>${text}</%def>
                   <span class="tip tip-stacked">${overview_text()}</span>
+                </li>
+
+                <li class="field image" id="field-course-image">
+                  <label>${_("Course Image")}</label>
+                  <div class="current current-course-image">
+                    % if context_course.course_image:
+                    <span class="wrapper-course-image">
+                      <img class="course-image" id="course-image" src="${utils.course_image_url(context_course)}" alt="${_('Course Image')}"/>
+                    </span>
+
+                    <% ctx_loc = context_course.location %>
+                    <span class="msg msg-help">${_("You can manage this image along with all of your other")} <a href="${reverse('asset_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">${_("files &amp; uploads")}</a></span>
+
+                    % else:
+                    <span class="wrapper-course-image">
+                      <img class="course-image placeholder" id="course-image" src="${utils.course_image_url(context_course)}" alt="${_('Course Image')}"/>
+                    </span>
+                    <span class="msg msg-empty">${_("Your course currently does not have an image. Please upload one (JPEG or PNG format, and minimum suggested dimensions are 375px wide by 200px tall)")}</span>
+                    % endif
+                  </div>
+
+                  <div class="wrapper-input">
+                    <div class="input">
+                      <input type="text" class="long new-course-image-url" id="course-image-url" value="" placeholder="Your course image URL" autocomplete="off" />
+                      <span class="tip tip-stacked">${_("Please provide a valid path and name to your course image (Note: only JPEG or PNG format supported)")}</span>
+                    </div>
+                    <button type="button" class="action action-upload-image">${_("Upload Course Image")}</button>
+                  </div>
                 </li>
 
                 <li class="field video" id="field-course-introduction-video">

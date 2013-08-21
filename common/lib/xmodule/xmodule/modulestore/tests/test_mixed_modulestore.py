@@ -13,7 +13,7 @@ HOST = 'localhost'
 PORT = 27017
 DB = 'test_mongo_%s' % uuid4().hex
 COLLECTION = 'modulestore'
-FS_ROOT = DATA_DIR  # TODO (vshnayder): will need a real fs_root for testing load_item
+FS_ROOT = DATA_DIR
 DEFAULT_CLASS = 'xmodule.raw_module.RawDescriptor'
 RENDER_TEMPLATE = lambda t_n, d, ctx = None, nsp = 'main': ''
 
@@ -54,6 +54,9 @@ class TestMixedModuleStore(object):
     '''Tests!'''
     @classmethod
     def setupClass(cls):
+        """
+        Set up the database for testing
+        """
         cls.connection = pymongo.connection.Connection(HOST, PORT)
         cls.connection.drop_database(DB)
         cls.fake_location = Location(['i4x', 'foo', 'bar', 'vertical', 'baz'])
@@ -66,10 +69,16 @@ class TestMixedModuleStore(object):
 
     @classmethod
     def teardownClass(cls):
+        """
+        Clear out database after test has completed
+        """
         cls.destroy_db(cls.connection)
 
     @staticmethod
     def initdb():
+        """
+        Initialize the database and import one test course into it
+        """
         # connect to the db
         _options = {}
         _options.update(OPTIONS)
@@ -92,7 +101,9 @@ class TestMixedModuleStore(object):
 
     @staticmethod
     def destroy_db(connection):
-        # Destroy the test db.
+        """
+        Destroy the test db.
+        """
         connection.drop_database(DB)
 
     def setUp(self):
@@ -204,6 +215,7 @@ class TestMixedModuleStore(object):
         module = self.store.get_course(XML_COURSEID2)
         assert_equals(module.location.course, 'simple')
 
+    # pylint: disable=E1101
     def test_get_parent_locations(self):
         parents = self.store.get_parent_locations(
             Location(['i4x', self.import_org, self.import_course, 'chapter', 'Overview']),
@@ -223,6 +235,7 @@ class TestMixedModuleStore(object):
         assert_equals(Location(parents[0]).course, 'toy')
         assert_equals(Location(parents[0]).name, '2012_Fall')
 
+    # pylint: disable=W0212
     def test_set_modulestore_configuration(self):
         config = {'foo': 'bar'}
         self.store.set_modulestore_configuration(config)

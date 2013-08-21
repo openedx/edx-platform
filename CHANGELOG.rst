@@ -5,7 +5,14 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Studio: Allow course authors to set their course image on the schedule
+and details page, with support for JPEG and PNG images.
+
 Blades: Took videoalpha out of alpha, replacing the old video player
+
+Common: Allow instructors to input complicated expressions as answers to
+`NumericalResponse`s. Prior to the change only numbers were allowed, now any
+answer from '1/3' to 'sqrt(12)*(1-1/3^2+1/5/3^2)' are valid.
 
 LMS: Enable beta instructor dashboard. The beta dashboard is a rearchitecture
 of the existing instructor dashboard and is available by clicking a link at

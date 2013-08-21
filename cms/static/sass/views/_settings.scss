@@ -131,7 +131,7 @@ body.course.settings {
       list-style: none;
 
       .field {
-        margin: 0 0 $baseline 0;
+        margin: 0 0 ($baseline*2) 0;
 
         &:last-child {
           margin-bottom: 0;
@@ -432,6 +432,61 @@ body.course.settings {
       }
     }
 
+    // specific fields - course image
+    #field-course-image {
+
+      .current-course-image {
+        margin-bottom: ($baseline/2);
+        padding: ($baseline/2) $baseline;
+        background: $gray-l5;
+        text-align: center;
+
+        .wrapper-course-image {
+          display: block;
+          width: 375px;
+          height: 200px;
+          overflow: hidden;
+          margin: 0 auto;
+          border: 1px solid $gray-l4;
+          box-shadow: 0 1px 1px $shadow-l1;
+          padding: ($baseline/2);
+          background: $white;
+        }
+
+        .course-image {
+          display: block;
+          width: 100%;
+          min-height: 100%;
+        }
+
+        .msg {
+          @extend .t-copy-sub2;
+          display: block;
+          margin-top: ($baseline/2);
+          color: $gray-l3;
+        }
+      }
+
+      .wrapper-input {
+        @include clearfix();
+        width: flex-grid(9,9);
+
+        .input {
+          float: left;
+          width: flex-grid(6,9);
+          margin-right: flex-gutter();
+        }
+
+        .action-upload-image {
+          @extend .ui-btn-flat-outline;
+          float: right;
+          width: flex-grid(2,9);
+          margin-top: ($baseline/4);
+          padding: ($baseline/2) $baseline;
+        }
+      }
+    }
+
     // specific fields - requirements
     &.requirements {
 
@@ -445,7 +500,7 @@ body.course.settings {
       margin-bottom: ($baseline*3);
 
       .grade-controls {
-        @include clearfix;
+        @include clearfix();
         width: flex-grid(9,9);
       }
 

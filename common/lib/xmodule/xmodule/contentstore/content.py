@@ -59,6 +59,23 @@ class StaticContent(object):
             return None
 
     @staticmethod
+    def is_c4x_path(path_string):
+        """
+        Returns a boolean if a path is believed to be a c4x link based on the leading element
+        """
+        return path_string.startswith('/{0}/'.format(XASSET_LOCATION_TAG))
+
+    @staticmethod
+    def renamespace_c4x_path(path_string, target_location):
+        """
+        Returns an updated string which incorporates a new org/course in order to remap an asset path
+        to a new namespace
+        """
+        location = StaticContent.get_location_from_path(path_string)
+        location = location.replace(org=target_location.org, course=target_location.course)
+        return StaticContent.get_url_path_from_location(location)
+
+    @staticmethod
     def get_static_path_from_location(location):
         """
         This utility static method will take a location identifier and create a 'durable' /static/.. URL representation of it.
