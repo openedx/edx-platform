@@ -25,6 +25,7 @@ from django.utils import timezone
 
 from xmodule_modifiers import wrap_xmodule
 import xmodule.graders as xmgraders
+from xmodule.modulestore import MONGO_MODULESTORE_TYPE
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.html_module import HtmlDescriptor
@@ -794,6 +795,12 @@ def instructor_dashboard(request, course_id):
     else:
         editor = None
 
+    # Flag for what backing store this course is (Mongo vs. XML)
+    if modulestore().get_modulestore_type(course_id) == MONGO_MODULESTORE_TYPE:
+        is_mongo_modulestore_type = True
+    else:
+        is_mongo_modulestore_type = False
+
     # display course stats only if there is no other table to display:
     course_stats = None
     if not datatable:
@@ -809,11 +816,11 @@ def instructor_dashboard(request, course_id):
                'datatable': datatable,
                'course_stats': course_stats,
                'msg': msg,
-               'email_msg': email_msg,
                'modeflag': {idash_mode: 'selectedmode'},
-               'to_option': to_option,  # email
-               'subject': subject,      # email
-               'editor': editor,        # email
+               'to_option': to_option,          # email
+               'subject': subject,              # email
+               'editor': editor,                # email
+               'email_msg': email_msg,          # email
                'problems': problems,		# psychometrics
                'plots': plots,			# psychometrics
                'course_errors': modulestore().get_item_errors(course.location),
@@ -822,6 +829,7 @@ def instructor_dashboard(request, course_id):
                'cohorts_ajax_url': reverse('cohorts', kwargs={'course_id': course_id}),
 
                'analytics_results': analytics_results,
+               'is_mongo_modulestore_type': is_mongo_modulestore_type,
                }
 
     if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BETA_DASHBOARD'):
