@@ -14,12 +14,6 @@ from .processors import process_postpay_callback, render_purchase_form_html
 log = logging.getLogger("shoppingcart")
 
 
-def test(request, course_id):
-    item1 = PaidCourseRegistration(course_id, 200)
-    item1.purchased_callback(request.user.id)
-    return HttpResponse('OK')
-
-
 def add_course_to_cart(request, course_id):
     if not request.user.is_authenticated():
         return HttpResponseForbidden(_('You must be logged-in to add to a shopping cart'))

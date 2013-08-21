@@ -1,5 +1,5 @@
 """
-Tests for the Shopping Cart
+Tests for the Shopping Cart Models
 """
 
 from factory import DjangoModelFactory
@@ -12,7 +12,7 @@ from shoppingcart.models import Order, OrderItem, CertificateItem, InvalidCartIt
 from student.tests.factories import UserFactory
 from student.models import CourseEnrollment
 from course_modes.models import CourseMode
-from .exceptions import PurchasedCallbackException
+from ..exceptions import PurchasedCallbackException
 
 
 class OrderTest(TestCase):
