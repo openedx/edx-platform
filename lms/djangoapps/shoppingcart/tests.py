@@ -87,6 +87,7 @@ class OrderItemTest(TestCase):
         with self.assertRaises(NotImplementedError):
             item.purchased_callback()
 
+
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class PaidCourseRegistrationTest(ModuleStoreTestCase):
     def setUp(self):
@@ -111,7 +112,7 @@ class PaidCourseRegistrationTest(ModuleStoreTestCase):
         self.assertEqual(reg1.user, self.user)
         self.assertEqual(reg1.status, "cart")
         self.assertTrue(PaidCourseRegistration.part_of_order(self.cart, self.course_id))
-        self.assertFalse(PaidCourseRegistration.part_of_order(self.cart, self.course_id+"abcd"))
+        self.assertFalse(PaidCourseRegistration.part_of_order(self.cart, self.course_id + "abcd"))
         self.assertEqual(self.cart.total_cost, self.cost)
 
     def test_add_with_default_mode(self):
@@ -133,7 +134,7 @@ class PaidCourseRegistrationTest(ModuleStoreTestCase):
         reg1 = PaidCourseRegistration.add_to_order(self.cart, self.course_id)
         self.cart.purchase()
         self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course_id))
-        reg1 = PaidCourseRegistration.objects.get(id=reg1.id) # reload from DB to get side-effect
+        reg1 = PaidCourseRegistration.objects.get(id=reg1.id)  # reload from DB to get side-effect
         self.assertEqual(reg1.status, "purchased")
 
     def test_purchased_callback_exception(self):

@@ -133,14 +133,19 @@ class OrderItem(models.Model):
     status = models.CharField(max_length=32, default='cart', choices=ORDER_STATUSES)
     qty = models.IntegerField(default=1)
     unit_cost = models.DecimalField(default=0.0, decimal_places=2, max_digits=30)
-    line_cost = models.DecimalField(default=0.0, decimal_places=2, max_digits=30)  # qty * unit_cost
     line_desc = models.CharField(default="Misc. Item", max_length=1024)
     currency = models.CharField(default="usd", max_length=8)  # lower case ISO currency codes
+
+    @property
+    def line_cost(self):
+        return self.qty * self.unit_cost
 
     @classmethod
     def add_to_order(cls, *args, **kwargs):
         """
         A suggested convenience function for subclasses.
+
+        NOTE: This does not add anything items to the cart. That is left up to the subclasses
         """
         # this is a validation step to verify that the currency of the item we
         # are adding is the same as the currency of the order we are adding it
@@ -204,7 +209,6 @@ class PaidCourseRegistration(OrderItem):
         item.mode = course_mode.slug
         item.qty = 1
         item.unit_cost = cost
-        item.line_cost = cost
         item.line_desc = 'Registration for Course: {0}. Mode: {1}'.format(get_course_about_section(course, "title"),
                                                                           course_mode.name)
         item.currency = currency
@@ -283,7 +287,6 @@ class CertificateItem(OrderItem):
         item.status = order.status
         item.qty = 1
         item.unit_cost = cost
-        item.line_cost = cost
         item.line_desc = "{mode} certificate for course {course_id}".format(mode=item.mode,
                                                                             course_id=course_id)
         item.currency = currency
