@@ -25,6 +25,14 @@ CMS.Views.Settings.Details = CMS.Views.ValidatingView.extend({
         this.$el.find("#course-number").val(this.model.get('location').get('course'));
         this.$el.find('.set-date').datepicker({ 'dateFormat': 'm/d/yy' });
 
+        // Avoid showing broken image on mistyped/nonexistent image
+        this.$el.find('img.course-image').error(function() {
+            $(this).hide();
+        });
+        this.$el.find('img.course-image').load(function() {
+            $(this).show();
+        });
+
         var dateIntrospect = new Date();
         this.$el.find('#timezone').html("(" + dateIntrospect.getTimezone() + ")");
 

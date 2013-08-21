@@ -42,6 +42,7 @@
 @import 'elements/system-help'; // help UI
 @import 'elements/modal'; // interstitial UI, dialogs, modal windows
 @import 'elements/vendor'; // overrides to vendor-provided styling
+@import 'elements/uploads';
 
 // base - specific views
 @import 'views/account';
@@ -59,7 +60,6 @@
 @import 'views/users';
 @import 'views/checklists';
 @import 'views/textbooks';
-@import 'views/uploads';
 
 // temp - inherited
 @import 'assets/content-types';
