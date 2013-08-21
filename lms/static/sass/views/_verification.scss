@@ -2,27 +2,120 @@
 // ====================
 
 body.register.verification {
+    font-family: 'Open Sans', sans-serif;
+
+    h1, h2, h3, h4, h5, h6, p {
+      font-family: 'Open Sans', sans-serif;
+    }
+
 
   .page-header {
-    @extend .t-title3;
-
-
 
     .title {
-
+      @extend .t-title5;
     }
   }
 
   .progress {
 
+    .progress-step {
+      border: 1px solid #eee;
+      display: inline-block;
+      padding: ($baseline/2) $baseline;
+    }
+  }
+
+
+  // for dev placement only
+  .placeholder-cam,
+  .placeholder-photo  {
+    height: 300px;
+    background-color: #eee;
+    position: relative;
+
+    p {
+      position: absolute;
+      top: 40%;
+      left: 40%;
+      color: #ccc;
+    }
+  }
+
+
+  #wrapper {
+    overflow: hidden;
   }
 
   .block-photo {
+    @include clearfix();
+
+    .title {
+      font-weight: bold;
+    }
+
+    .wrapper-up,
+    .wrapper-down {
+      @include clearfix();
+    }
+
+    .cam {
+      width: 45%;
+      float: left;
+      padding-right: $baseline;
+    }
+
+    .photo-controls {
+      background-color: #ddd;
+
+      .controls-list {
+        margin: 0;
+        padding: 0;
+        list-style-type: none;
+
+        .control {
+          display: inline-block;
+        }
+      }
+    }
+
+    .faq {
+      width: 45%;
+      float: left;
+      padding-right: $baseline;
+
+      dt {
+        font-weight: bold;
+        padding: 0 0 ($baseline/2) 0;
+      }
+
+      dd {
+        margin: 0;
+        padding: 0 0 $baseline 0;
+      }
+    }
+
 
 
   }
 
+  .photo-tips {
+    width: 45%;
+    float: left;
+  }
 
+  .actions {
+    width: 45%;
+    float: right;
+  }
+
+  .review-photo {
+    width: 45%;
+    float: left;
+  }
+
+  #review-facephoto {
+    margin-right: $baseline;
+  }
 
 
 }

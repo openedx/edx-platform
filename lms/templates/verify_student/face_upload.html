@@ -20,7 +20,7 @@
   <section class="progress">
   <h3 class="sr">Your Progress</h3>
   <ol>
-    <li class="progress-step" id="progress-step1"><span class="current">Current: </span>Step 1 Take Your Photo</li>
+    <li class="progress-step current" id="progress-step1"><span class="sr">Current: </span>Step 1 Take Your Photo</li>
     <li class="progress-step" id="progress-step2">Step 2 ID Photo</li>
     <li class="progress-step" id="progress-step3">Step 3 Review</li>
     <li class="progress-step" id="progress-step4">Step 4 Payment</li>
@@ -31,137 +31,167 @@
 
 
   <section id="wrapper">
-    <div id="wrapper-facephoto block-photo">
+    <div id="wrapper-facephoto" class="block-photo">
       <h3 class="title">Take Your Photo</h3>
       <p>Use your webcam to take a picture of your face so we can match it with the picture on your ID.</p>
 
-      <div id="facecam">
+      <div class="wrapper-up">
 
-        <div class="placeholder-cam">
-        <!-- cam image -->
+        <div id="facecam" class="cam">
+          <div class="placeholder-cam">
+          <!-- cam image -->
+          <p>cam image</p>
+          </div>
+
+          <div class="controls photo-controls">
+            <ul class="controls-list">
+              <li class="control control-do">
+                <a class="action action-do" href="">Take photo</a>
+              </li>
+            </ul>
+
+            <ul class="controls-list">
+              <li class="control control-redo">
+                <a class="action action-redo" href="">Retake</a>
+              </li>
+              <li class="control control-approve">
+                <a class="action action-approve" href="">Looks good</a>
+              </li>
+            </ul>
+
+            <ul class="controls-list">
+              <li class="control control-redo">
+                <a class="action action-redo"  href="">Retake</a>
+              </li>
+              <li class="control-approve is-approved">
+                <a class="action action-approve" href="">Looks good</a>
+              </li>
+            </ul>
+          </div>
         </div>
 
-        <div class="controls photo-controls">
+        <div class="photo-tips facetips">
+          <h4>Tips on taking a successful photo</h4>
           <ul>
-            <li class="ctrl-do">
-              <a class="action action-do" href="">Take photo</a>
-            </li>
+            <li>Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor.</li>
+            <li>Maecenas faucibus mollis interdum.</li>
+            <li>Nullam id dolor id nibh ultricies vehicula ut id elit.</li>
+            <li>Cras mattis consectetur purus sit amet fermentum.</li>
           </ul>
+        </div>
+      </div>
 
-          <ul>
-            <li class="ctrl-redo">
-              <a class="action action-redo" href="">Retake</a>
-            </li>
-            <li class="ctrl-approve">
-              <a class="action action-approve" href="">Looks good</a>
-            </li>
-          </ul>
+      <div class="wrapper-down">
+        <div class="faq facefaq">
+          <h4 class="sr">Common Questions</h4>
+          <dl>
+            <dt>Cras justo odio, dapibus ac facilisis in, egestas eget quam.</dt>
+              <dd>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</dd>
+            <dt>Vestibulum id ligula porta felis euismod semper.</dt>
+            <dt>Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit.</dt>
+              <dd>Aenean eu leo quam.</dd>
+            <dt>Pellentesque ornare sem lacinia quam venenatis vestibulum.</dt>
+              <dd>Maecenas faucibus mollis interdum.</dd>
+          </dl>
+        </div>
 
+        <div class="actions">
           <ul>
-            <li class="ctrl-redo">
-              <a class="action action-redo"  href="">Retake</a>
-            </li>
-            <li class="ctrl-approve is-approved">
-              <a class="action action-approve" href="">Looks good</a>
+            <li class="action action-next">
+              <a href="#">Go to Step 2: Take ID Photo</a>
+              <p class="tips">Once you verify your photo looks good, you can move on to step 2.</p>
             </li>
           </ul>
         </div>
-
-      </div>
-
-      <div class="tips facetips">
-        <h4>Tips on taking a successful photo</h4>
-        <ul>
-          <li>Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor.</li>
-          <li>Maecenas faucibus mollis interdum.</li>
-          <li>Nullam id dolor id nibh ultricies vehicula ut id elit.</li>
-          <li>Cras mattis consectetur purus sit amet fermentum.</li>
-        </ul>
-      </div>
-
-      <div class="faq facefaq">
-        <h4 class="sr">Common Questions</h4>
-        <dl>
-          <dt>Cras justo odio, dapibus ac facilisis in, egestas eget quam.</dt>
-            <dd>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</dd>
-          <dt>Vestibulum id ligula porta felis euismod semper.</dt>
-          <dt>Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit.</dt>
-            <dd>Aenean eu leo quam.</dd>
-          <dt>Pellentesque ornare sem lacinia quam venenatis vestibulum.</dt>
-            <dd>Maecenas faucibus mollis interdum.</dd>
-        </dl>
-      </div>
-
-      <div class="actions">
-        <ul>
-          <li class="action action-next">
-            <a href="#">Go to Step 2: Take ID Photo</a>
-            <p class="tips">Once you verify your photo looks good, you can move on to step 2.</p>
-          </li>
-        </ul>
       </div>
     </div>
 
 
 
 
-    <div id="wrapper-idphoto block-photo">
+    <div id="wrapper-idphoto" class="block-photo">
       <h3 class="title">Take Your Photo</h3>
       <p>Use your webcam to take a picture of your face so we can match it with the picture on your ID.</p>
 
-      <div id="idcam">
+      <div class="wrapper-up">
 
-        <div class="placeholder-cam">
-        <!-- cam image -->
+        <div id="idcam" class="cam">
+
+          <div class="placeholder-cam">
+          <!-- cam image -->
+          <p>cam image</p>
+          </div>
+
+          <div class="controls photo-controls">
+            <ul class="controls-list">
+              <li class="control control-do">
+                <a class="action action-do" href="">Take photo</a>
+              </li>
+            </ul>
+
+            <ul class="controls-list">
+              <li class="control control-redo">
+                <a class="action action-redo" href="">Retake</a>
+              </li>
+              <li class="control control-approve">
+                <a class="action action-approve" href="">Looks good</a>
+              </li>
+            </ul>
+
+            <ul class="controls-list">
+              <li class="control control-redo">
+                <a class="action action-redo"  href="">Retake</a>
+              </li>
+              <li class="control control-approve is-approved">
+                <a class="action action-approve" href="">Looks good</a>
+              </li>
+            </ul>
+          </div>
+
         </div>
 
-        <div class="controls photo-controls">
-          <a href="">Take photo</a>
-
-          <a href="">Retake</a>
-          <a class="" href="">Looks good</a>
-
-          <a class="clicked" href="">Looks good</a>
+        <div class="photo-tips idtips">
+          <h4>Tips on taking a successful photo</h4>
+          <ul>
+            <li>Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor.</li>
+            <li>Maecenas faucibus mollis interdum.</li>
+            <li>Nullam id dolor id nibh ultricies vehicula ut id elit.</li>
+            <li>Cras mattis consectetur purus sit amet fermentum.</li>
+          </ul>
         </div>
 
       </div>
 
-      <div class="tips idtips">
-        <h4>Tips on taking a successful photo</h4>
-        <ul>
-          <li>Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor.</li>
-          <li>Maecenas faucibus mollis interdum.</li>
-          <li>Nullam id dolor id nibh ultricies vehicula ut id elit.</li>
-          <li>Cras mattis consectetur purus sit amet fermentum.</li>
-        </ul>
+      <div class="wrapper-down">
+
+        <div class="faq idfaq">
+          <h4 class="sr">Common Questions</h4>
+          <dl>
+            <dt>Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit.</dt>
+              <dd>Aenean eu leo quam.</dd>
+            <dt>Pellentesque ornare sem lacinia quam venenatis vestibulum.</dt>
+              <dd>Maecenas faucibus mollis interdum.</dd>
+            <dt>Cras justo odio, dapibus ac facilisis in, egestas eget quam.</dt>
+              <dd>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</dd>
+            <dt>Vestibulum id ligula porta felis euismod semper.</dt>
+          </dl>
+        </div>
+
+        <div class="actions">
+          <ul>
+            <li class="action action-next">
+              <a href="#">Go to Step 3: Review Your Info</a>
+              <p class="tips">Once you verify your ID photo looks good, you can move on to step 3.</p>
+            </li>
+          </ul>
+        </div>
       </div>
 
-      <div class="faq idfaq">
-        <h4 class="sr">Common Questions</h4>
-        <dl>
-          <dt>Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit.</dt>
-            <dd>Aenean eu leo quam.</dd>
-          <dt>Pellentesque ornare sem lacinia quam venenatis vestibulum.</dt>
-            <dd>Maecenas faucibus mollis interdum.</dd>
-          <dt>Cras justo odio, dapibus ac facilisis in, egestas eget quam.</dt>
-            <dd>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</dd>
-          <dt>Vestibulum id ligula porta felis euismod semper.</dt>
-        </dl>
-      </div>
-
-      <div class="actions">
-        <ul>
-          <li class="action action-next">
-            <a href="#">Go to Step 3: Review Your Info</a>
-            <p class="tips">Once you verify your ID photo looks good, you can move on to step 3.</p>
-          </li>
-        </ul>
-      </div>
     </div>
 
 
 
-    <div id="wrapper-review block-photo">
+    <div id="wrapper-review" class="block-photo">
       <h3 class="title">Verify Your Submission</h3>
       <p>Make sure we can verify your identity with the photos and information below.</p>
 
@@ -171,30 +201,32 @@
         <p><a href="#">Edit my name</a></p>
       </div>
 
-      <div id="review-facephoto">
-        <div class="placeholder-photo">
-        <!-- photo image -->
+      <div class="wrapper-up">
+        <div id="review-facephoto" class="review-photo">
+          <div class="placeholder-photo">
+          <!-- photo image -->
+          </div>
+
+          <h4>The photo above needs to meet the following requirements:</h4>
+          <ul>
+            <li>Be well lit</li>
+            <li>Show your whole face</li>
+            <li>Match your ID</li>
+          </ul>
         </div>
 
-        <h4>The photo above needs to meet the following requirements:</h4>
-        <ul>
-          <li>Be well lit</li>
-          <li>Show your whole face</li>
-          <li>Match your ID</li>
-        </ul>
-      </div>
+        <div id="review-idphoto" class="review-photo">
+          <div class="placeholder-photo">
+          <!-- photo image -->
+          </div>
 
-      <div id="review-facephoto">
-        <div class="placeholder-photo">
-        <!-- photo image -->
+          <h4>The photo above needs to meet the following requirements:</h4>
+          <ul>
+            <li>Be readable (not too far away, no glare)</li>
+            <li>Show your name</li>
+            <li>Match the photo of your face and your name above</li>
+          </ul>
         </div>
-
-        <h4>The photo above needs to meet the following requirements:</h4>
-        <ul>
-          <li>Be readable (not too far away, no glare)</li>
-          <li>Show your name</li>
-          <li>Match the photo of your face and your name above</li>
-        </ul>
       </div>
 
 
