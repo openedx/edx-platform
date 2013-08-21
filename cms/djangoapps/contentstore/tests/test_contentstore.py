@@ -1625,6 +1625,29 @@ class ContentStoreTest(ModuleStoreTestCase):
         # is this test too strict? i.e., it requires the dicts to be ==
         self.assertEqual(course.checklists, fetched_course.checklists)
 
+    def test_image_import(self):
+        """Test backwards compatibilty of course image."""
+        module_store = modulestore('direct')
+
+        content_store = contentstore()
+
+        # Use conditional_and_poll, as it's got an image already
+        import_from_xml(
+            module_store,
+            'common/test/data/',
+            ['conditional_and_poll'],
+            static_content_store=content_store
+        )
+
+        course = module_store.get_courses()[0]
+
+        # Make sure the course image is set to the right place
+        self.assertEqual(course.course_image, 'images_course_image.jpg')
+
+        # Ensure that the imported course image is present -- this shouldn't raise an exception
+        location = course.location._replace(tag='c4x', category='asset', name=course.course_image)
+        content_store.find(location)
+
 
 class MetadataSaveTestCase(ModuleStoreTestCase):
     """Test that metadata is correctly cached and decached."""
