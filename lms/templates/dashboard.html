@@ -140,11 +140,11 @@
 
           % if course.id in show_courseware_links_for:
             <a href="${course_target}" class="cover">
-              <img src="${course_image_url(course)}" alt="${_('{course_number} {course_name} Cover Image').format(course_number='${course.number}', course_name='${course.display_name_with_default}') |h}" />
+              <img src="${course_image_url(course)}" alt="${_('{course_number} {course_name} Cover Image').format(course_number=course.number, course_name=course.display_name_with_default) |h}" />
             </a>
           % else:
             <div class="cover">
-              <img src="${course_image_url(course)}" alt="${_('{course_number} {course_name} Cover Image').format(course_number='${course.number}', course_name='${course.display_name_with_default}')}" />
+              <img src="${course_image_url(course)}" alt="${_('{course_number} {course_name} Cover Image').format(course_number=course.number, course_name=course.display_name_with_default) | h}" />
             </div>
           % endif
 

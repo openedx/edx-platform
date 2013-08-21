@@ -1,4 +1,4 @@
-# -*- coding: utf8 -*-
+# -*- coding: utf-8 -*-
 """Dump username,unique_id_for_user pairs as CSV.
 
 Give instructors easy access to the mapping from anonymized IDs to user IDs

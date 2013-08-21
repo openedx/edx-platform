@@ -7,6 +7,10 @@ the top.  Include a label indicating the component affected.
 
 Blades: Took videoalpha out of alpha, replacing the old video player
 
+Common: Allow instructors to input complicated expressions as answers to
+`NumericalResponse`s. Prior to the change only numbers were allowed, now any
+answer from '1/3' to 'sqrt(12)*(1-1/3^2+1/5/3^2)' are valid.
+
 LMS: Enable beta instructor dashboard. The beta dashboard is a rearchitecture
 of the existing instructor dashboard and is available by clicking a link at
 the top right of the existing dashboard.
@@ -95,6 +99,8 @@ Blades: User answer now preserved (and changeable) after clicking "show answer" 
 LMS: Removed press releases
 
 Common: Updated Sass and Bourbon libraries, added Neat library
+
+LMS: Add a MixedModuleStore to aggregate the XMLModuleStore and MongoMonduleStore
 
 LMS: Users are no longer auto-activated if they click "reset password"
 This is now done when they click on the link in the reset password

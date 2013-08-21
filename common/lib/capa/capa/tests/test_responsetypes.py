@@ -5,12 +5,14 @@ Tests of responsetypes
 from datetime import datetime
 import json
 import os
+import pyparsing
 import random
 import unittest
 import textwrap
 import mock
 
 from . import new_loncapa_problem, test_system
+import calc
 
 from capa.responsetypes import LoncapaProblemError, \
     StudentInputError, ResponseError
@@ -22,7 +24,7 @@ from pytz import UTC
 
 
 class ResponseTest(unittest.TestCase):
-    """ Base class for tests of capa responses."""
+    """Base class for tests of capa responses."""
 
     xml_factory_class = None
 
@@ -442,91 +444,6 @@ class FormulaResponseTest(ResponseTest):
         self.assert_grade(problem, '2*x', 'correct')
         self.assert_grade(problem, '3*x', 'incorrect')
 
-    def test_parallel_resistors(self):
-        """
-        Test parallel resistors
-        """
-        sample_dict = {'R1': (10, 10), 'R2': (2, 2), 'R3': (5, 5), 'R4': (1, 1)}
-
-        # Test problem
-        problem = self.build_problem(sample_dict=sample_dict,
-                                     num_samples=10,
-                                     tolerance=0.01,
-                                     answer="R1||R2")
-        # Expect answer to be marked correct
-        input_formula = "R1||R2"
-        self.assert_grade(problem, input_formula, "correct")
-
-        # Expect random number to be marked incorrect
-        input_formula = "13"
-        self.assert_grade(problem, input_formula, "incorrect")
-
-        # Expect incorrect answer marked incorrect
-        input_formula = "R3||R4"
-        self.assert_grade(problem, input_formula, "incorrect")
-
-    def test_default_variables(self):
-        """
-        Test the default variables provided in calc.py
-
-        which are: j (complex number), e, pi, k, c, T, q
-        """
-
-        # Sample x in the range [-10,10]
-        sample_dict = {'x': (-10, 10)}
-        default_variables = [('j', 2, 3), ('e', 2, 3), ('pi', 2, 3), ('c', 2, 3), ('T', 2, 3),
-                             ('k', 2 * 10 ** 23, 3 * 10 ** 23),   # note k = scipy.constants.k = 1.3806488e-23
-                             ('q', 2 * 10 ** 19, 3 * 10 ** 19)]   # note k = scipy.constants.e = 1.602176565e-19
-        for (var, cscalar, iscalar) in default_variables:
-            # The expected solution is numerically equivalent to cscalar*var
-            correct = '{0}*x*{1}'.format(cscalar, var)
-            incorrect = '{0}*x*{1}'.format(iscalar, var)
-            problem = self.build_problem(sample_dict=sample_dict,
-                                         num_samples=10,
-                                         tolerance=0.01,
-                                         answer=correct)
-
-            # Expect that the inputs are graded correctly
-            self.assert_grade(problem, correct, 'correct',
-                              msg="Failed on variable {0}; the given, correct answer was {1} but graded 'incorrect'".format(var, correct))
-            self.assert_grade(problem, incorrect, 'incorrect',
-                              msg="Failed on variable {0}; the given, incorrect answer was {1} but graded 'correct'".format(var, incorrect))
-
-    def test_default_functions(self):
-        """
-        Test the default functions provided in common/lib/capa/capa/calc.py
-
-        which are:
-          sin, cos, tan, sqrt, log10, log2, ln,
-          arccos, arcsin, arctan, abs,
-          fact, factorial
-        """
-        w = random.randint(3, 10)
-        sample_dict = {'x': (-10, 10),  # Sample x in the range [-10,10]
-                       'y': (1, 10),    # Sample y in the range [1,10] - logs, arccos need positive inputs
-                       'z': (-1, 1),    # Sample z in the range [1,10] - for arcsin, arctan
-                       'w': (w, w)}     # Sample w is a random, positive integer - factorial needs a positive, integer input,
-                                        # and the way formularesponse is defined, we can only specify a float range
-
-        default_functions = [('sin', 2, 3, 'x'), ('cos', 2, 3, 'x'), ('tan', 2, 3, 'x'), ('sqrt', 2, 3, 'y'), ('log10', 2, 3, 'y'),
-                             ('log2', 2, 3, 'y'), ('ln', 2, 3, 'y'), ('arccos', 2, 3, 'z'), ('arcsin', 2, 3, 'z'), ('arctan', 2, 3, 'x'),
-                             ('abs', 2, 3, 'x'), ('fact', 2, 3, 'w'), ('factorial', 2, 3, 'w')]
-        for (func, cscalar, iscalar, var) in default_functions:
-            print 'func is: {0}'.format(func)
-            # The expected solution is numerically equivalent to cscalar*func(var)
-            correct = '{0}*{1}({2})'.format(cscalar, func, var)
-            incorrect = '{0}*{1}({2})'.format(iscalar, func, var)
-            problem = self.build_problem(sample_dict=sample_dict,
-                                         num_samples=10,
-                                         tolerance=0.01,
-                                         answer=correct)
-
-            # Expect that the inputs are graded correctly
-            self.assert_grade(problem, correct, 'correct',
-                              msg="Failed on function {0}; the given, correct answer was {1} but graded 'incorrect'".format(func, correct))
-            self.assert_grade(problem, incorrect, 'incorrect',
-                              msg="Failed on function {0}; the given, incorrect answer was {1} but graded 'correct'".format(func, incorrect))
-
     def test_grade_infinity(self):
         """
         Test that a large input on a problem with relative tolerance isn't
@@ -885,92 +802,118 @@ class NumericalResponseTest(ResponseTest):
     from capa.tests.response_xml_factory import NumericalResponseXMLFactory
     xml_factory_class = NumericalResponseXMLFactory
 
+    # We blend the line between integration (using evaluator) and exclusively
+    # unit testing the NumericalResponse (mocking out the evaluator)
+    # For simple things its not worth the effort.
     def test_grade_exact(self):
-        problem = self.build_problem(question_text="What is 2 + 2?",
-                                     explanation="The answer is 4",
-                                     answer=4)
+        problem = self.build_problem(answer=4)
         correct_responses = ["4", "4.0", "4.00"]
         incorrect_responses = ["", "3.9", "4.1", "0"]
         self.assert_multiple_grade(problem, correct_responses, incorrect_responses)
 
     def test_grade_decimal_tolerance(self):
-        problem = self.build_problem(question_text="What is 2 + 2 approximately?",
-                                     explanation="The answer is 4",
-                                     answer=4,
-                                     tolerance=0.1)
+        problem = self.build_problem(answer=4, tolerance=0.1)
         correct_responses = ["4.0", "4.00", "4.09", "3.91"]
         incorrect_responses = ["", "4.11", "3.89", "0"]
         self.assert_multiple_grade(problem, correct_responses, incorrect_responses)
 
     def test_grade_percent_tolerance(self):
-        problem = self.build_problem(question_text="What is 2 + 2 approximately?",
-                                     explanation="The answer is 4",
-                                     answer=4,
-                                     tolerance="10%")
+        problem = self.build_problem(answer=4, tolerance="10%")
         correct_responses = ["4.0", "4.3", "3.7", "4.30", "3.70"]
         incorrect_responses = ["", "4.5", "3.5", "0"]
         self.assert_multiple_grade(problem, correct_responses, incorrect_responses)
 
-    def test_grade_infinity(self):
-        # This resolves a bug where a problem with relative tolerance would
-        # pass with any arbitrarily large student answer.
-        problem = self.build_problem(question_text="What is 2 + 2 approximately?",
-                                     explanation="The answer is 4",
-                                     answer=4,
-                                     tolerance="10%")
-        correct_responses = []
-        incorrect_responses = ["1e999", "-1e999"]
-        self.assert_multiple_grade(problem, correct_responses, incorrect_responses)
-
-    def test_grade_nan(self):
-        # Attempt to produce a value which causes the student's answer to be
-        # evaluated to nan. See if this is resolved correctly.
-        problem = self.build_problem(question_text="What is 2 + 2 approximately?",
-                                     explanation="The answer is 4",
-                                     answer=4,
-                                     tolerance="10%")
-        correct_responses = []
-        # Right now these evaluate to `nan`
-        # `4 + nan` should be incorrect
-        incorrect_responses = ["0*1e999", "4 + 0*1e999"]
-        self.assert_multiple_grade(problem, correct_responses, incorrect_responses)
-
     def test_grade_with_script(self):
         script_text = "computed_response = math.sqrt(4)"
-        problem = self.build_problem(question_text="What is sqrt(4)?",
-                                     explanation="The answer is 2",
-                                     answer="$computed_response",
-                                     script=script_text)
+        problem = self.build_problem(answer="$computed_response", script=script_text)
         correct_responses = ["2", "2.0"]
         incorrect_responses = ["", "2.01", "1.99", "0"]
         self.assert_multiple_grade(problem, correct_responses, incorrect_responses)
 
-    def test_grade_with_script_and_tolerance(self):
-        script_text = "computed_response = math.sqrt(4)"
-        problem = self.build_problem(question_text="What is sqrt(4)?",
-                                     explanation="The answer is 2",
-                                     answer="$computed_response",
-                                     tolerance="0.1",
-                                     script=script_text)
-        correct_responses = ["2", "2.0", "2.05", "1.95"]
-        incorrect_responses = ["", "2.11", "1.89", "0"]
-        self.assert_multiple_grade(problem, correct_responses, incorrect_responses)
-
-    def test_exponential_answer(self):
-        problem = self.build_problem(question_text="What 5 * 10?",
-                                     explanation="The answer is 50",
-                                     answer="5e+1")
-        correct_responses = ["50", "50.0", "5e1", "5e+1", "50e0", "500e-1"]
-        incorrect_responses = ["", "3.9", "4.1", "0", "5.01e1"]
-        self.assert_multiple_grade(problem, correct_responses, incorrect_responses)
-
     def test_raises_zero_division_err(self):
-        """See if division by zero is handled correctly"""
-        problem = self.build_problem(question_text="What 5 * 10?",
-                                     explanation="The answer is 50",
-                                     answer="5e+1")  # Answer doesn't matter
+        """See if division by zero is handled correctly."""
+        problem = self.build_problem(answer="1")  # Answer doesn't matter
         input_dict = {'1_2_1': '1/0'}
-        self.assertRaises(StudentInputError, problem.grade_answers, input_dict)
+        with self.assertRaises(StudentInputError):
+            problem.grade_answers(input_dict)
+
+    def test_staff_inputs_expressions(self):
+        """Test that staff may enter in an expression as the answer."""
+        problem = self.build_problem(answer="1/3", tolerance=1e-3)
+        correct_responses = ["1/3", "0.333333"]
+        incorrect_responses = []
+        self.assert_multiple_grade(problem, correct_responses, incorrect_responses)
+
+    def test_staff_inputs_expressions_legacy(self):
+        """Test that staff may enter in a complex number as the answer."""
+        problem = self.build_problem(answer="1+1j", tolerance=1e-3)
+        self.assert_grade(problem, '1+j', 'correct')
+
+    @mock.patch('capa.responsetypes.log')
+    def test_staff_inputs_bad_syntax(self, mock_log):
+        """Test that staff may enter in a complex number as the answer."""
+        staff_ans = "clearly bad syntax )[+1e"
+        problem = self.build_problem(answer=staff_ans, tolerance=1e-3)
+
+        msg = "There was a problem with the staff answer to this problem"
+        with self.assertRaisesRegexp(StudentInputError, msg):
+            self.assert_grade(problem, '1+j', 'correct')
+
+        mock_log.debug.assert_called_once_with(
+            "Content error--answer '%s' is not a valid number", staff_ans
+        )
+
+    def test_grade_infinity(self):
+        """
+        Check that infinity doesn't automatically get marked correct.
+
+        This resolves a bug where a problem with relative tolerance would
+        pass with any arbitrarily large student answer.
+        """
+        mapping = {
+            'some big input': float('inf'),
+            'some neg input': -float('inf'),
+            'weird NaN input': float('nan'),
+            '4': 4
+        }
+
+        def evaluator_side_effect(_, __, math_string):
+            """Look up the given response for `math_string`."""
+            return mapping[math_string]
+
+        problem = self.build_problem(answer=4, tolerance='10%')
+
+        with mock.patch('capa.responsetypes.evaluator') as mock_eval:
+            mock_eval.side_effect = evaluator_side_effect
+            self.assert_grade(problem, 'some big input', 'incorrect')
+            self.assert_grade(problem, 'some neg input', 'incorrect')
+            self.assert_grade(problem, 'weird NaN input', 'incorrect')
+
+    def test_err_handling(self):
+        """
+        See that `StudentInputError`s are raised when things go wrong.
+        """
+        problem = self.build_problem(answer=4)
+
+        errors = [  # (exception raised, message to student)
+            (calc.UndefinedVariable("x"), r"You may not use variables \(x\) in numerical problems"),
+            (ValueError("factorial() mess-up"), "factorial function evaluated outside its domain"),
+            (ValueError(), "Could not interpret '.*' as a number"),
+            (pyparsing.ParseException("oopsie"), "Invalid math syntax"),
+            (ZeroDivisionError(), "Could not interpret '.*' as a number")
+        ]
+
+        with mock.patch('capa.responsetypes.evaluator') as mock_eval:
+            for err, msg_regex in errors:
+
+                def evaluator_side_effect(_, __, math_string):
+                    """Raise an error only for the student input."""
+                    if math_string != '4':
+                        raise err
+                mock_eval.side_effect = evaluator_side_effect
+
+                with self.assertRaisesRegexp(StudentInputError, msg_regex):
+                    problem.grade_answers({'1_2_1': 'foobar'})
 
 
 class CustomResponseTest(ResponseTest):

@@ -280,10 +280,11 @@ class TestHtmlModifiers(ModuleStoreTestCase):
         self.course = CourseFactory.create()
         self.content_string = '<p>This is the content<p>'
         self.rewrite_link = '<a href="/static/foo/content">Test rewrite</a>'
+        self.rewrite_bad_link = '<img src="/static//file.jpg" />'
         self.course_link = '<a href="/course/bar/content">Test course rewrite</a>'
         self.descriptor = ItemFactory.create(
             category='html',
-            data=self.content_string + self.rewrite_link + self.course_link
+            data=self.content_string + self.rewrite_link + self.rewrite_bad_link + self.course_link
         )
         self.location = self.descriptor.location
         self.model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
@@ -330,6 +331,24 @@ class TestHtmlModifiers(ModuleStoreTestCase):
 
         self.assertIn(
             '/c4x/{org}/{course}/asset/foo_content'.format(
+                org=self.course.location.org,
+                course=self.course.location.course,
+            ),
+            result_fragment.content
+        )
+
+    def test_static_badlink_rewrite(self):
+        module = render.get_module(
+            self.user,
+            self.request,
+            self.location,
+            self.model_data_cache,
+            self.course.id,
+        )
+        result_fragment = module.runtime.render(module, None, 'student_view')
+
+        self.assertIn(
+            '/c4x/{org}/{course}/asset/_file.jpg'.format(
                 org=self.course.location.org,
                 course=self.course.location.course,
             ),

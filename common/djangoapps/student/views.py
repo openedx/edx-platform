@@ -95,6 +95,7 @@ def index(request, extra_context={}, user=None):
     courses = sort_by_announcement(courses)
 
     context = {'courses': courses}
+
     context.update(extra_context)
     return render_to_response('index.html', context)
 

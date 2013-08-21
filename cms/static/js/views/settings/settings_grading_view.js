@@ -8,7 +8,7 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
         // Leaving change in as fallback for older browsers
         "change input" : "updateModel",
         "change textarea" : "updateModel",
-        "change span[contenteditable=true]" : "updateDesignation",
+        "input span[contenteditable]" : "updateDesignation",
         "click .settings-extra header" : "showSettingsExtras",
         "click .new-grade-button" : "addNewGrade",
         "click .remove-button" : "removeGrade",

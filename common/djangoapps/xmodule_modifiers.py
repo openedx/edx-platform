@@ -76,7 +76,7 @@ def replace_course_urls(get_html, course_id):
     return _get_html
 
 
-def replace_static_urls(get_html, data_dir, course_namespace=None):
+def replace_static_urls(get_html, data_dir, course_id=None):
     """
     Updates the supplied module with a new get_html function that wraps
     the old get_html function and substitutes urls of the form /static/...
@@ -85,7 +85,7 @@ def replace_static_urls(get_html, data_dir, course_namespace=None):
 
     @wraps(get_html)
     def _get_html():
-        return static_replace.replace_static_urls(get_html(), data_dir, course_namespace)
+        return static_replace.replace_static_urls(get_html(), data_dir, course_id)
     return _get_html
 
 

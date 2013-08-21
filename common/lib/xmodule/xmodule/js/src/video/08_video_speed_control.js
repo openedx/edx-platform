@@ -10,6 +10,12 @@ function () {
     return function (state) {
         state.videoSpeedControl = {};
 
+        if (state.videoType === 'html5' && !(_checkPlaybackRates())) {
+            _hideSpeedControl(state);
+
+            return;
+        }
+
         _makeFunctionsPublic(state);
         _renderElements(state);
         _bindHandlers(state);
@@ -59,6 +65,35 @@ function () {
         });
 
         state.videoSpeedControl.setSpeed(state.speed);
+    }
+
+    /**
+    * @desc Check if playbackRate supports by browser.
+    *
+    * @type {function}
+    * @access private
+    *
+    * @param {object} state The object containg the state of the video player.
+    *     All other modules, their parameters, public variables, etc. are
+    *     available via this object.
+    *
+    * @this {object} The global window object.
+    *
+    * @returns {Boolean}
+    *       true: Browser support playbackRate functionality.
+    *       false: Browser doesn't support playbackRate functionality.
+    */
+    function _checkPlaybackRates() {
+        var video = document.createElement('video');
+
+        // If browser supports, 1.0 should be returned by playbackRate property.
+        // In this case, function return True. Otherwise, False will be returned.
+        return Boolean(video.playbackRate);
+    }
+
+    // Hide speed control.
+    function _hideSpeedControl(state) {
+        state.el.find('div.speeds').hide();
     }
 
     /**
