@@ -28,9 +28,6 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
 
         this.setupCutoffs();
 
-        // Instrument grace period
-        this.$el.find('#course-grading-graceperiod').timepicker();
-
         // instantiates an editor template for each update in the collection
         // Because this calls render, put it after everything which render may depend upon to prevent race condition.
         window.templateLoader.loadRemoteTemplate("course_grade_policy",
@@ -50,6 +47,10 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
     render: function() {
         // prevent bootstrap race condition by event dispatch
         if (!this.template) return;
+
+        this.clearValidationErrors();
+
+        this.renderGracePeriod();
 
         // Create and render the grading type subs
         var self = this;
@@ -87,13 +88,6 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
         // render the grade cutoffs
         this.renderCutoffBar();
 
-        var graceEle = this.$el.find('#course-grading-graceperiod');
-        graceEle.timepicker({'timeFormat' : 'H:i'}); // init doesn't take setTime
-        if (this.model.has('grace_period')) graceEle.timepicker('setTime', this.model.gracePeriodToDate());
-        // remove any existing listeners to keep them from piling on b/c render gets called frequently
-        graceEle.off('change', this.setGracePeriod);
-        graceEle.on('change', this, this.setGracePeriod);
-
         return this;
     },
     addAssignmentType : function(e) {
@@ -103,17 +97,26 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
     fieldToSelectorMap : {
         'grace_period' : 'course-grading-graceperiod'
     },
+    renderGracePeriod: function() {
+        var format = function(time) {
+            return time >= 10 ? time.toString() : '0' + time;
+        };
+        var grace_period = this.model.get('grace_period');
+        this.$el.find('#course-grading-graceperiod').val(
+            format(grace_period.hours) + ':' + format(grace_period.minutes)
+        );
+    },
     setGracePeriod : function(event) {
-        var self = event.data;
-        self.clearValidationErrors();
-        var newVal = self.model.dateToGracePeriod($(event.currentTarget).timepicker('getTime'));
-        self.model.set('grace_period', newVal, {validate: true});
+        this.clearValidationErrors();
+        var newVal = this.model.parseGracePeriod($(event.currentTarget).val());
+        this.model.set('grace_period', newVal, {validate: true});
     },
     updateModel : function(event) {
         if (!this.selectorToField[event.currentTarget.id]) return;
 
         switch (this.selectorToField[event.currentTarget.id]) {
-        case 'grace_period': // handled above
+        case 'grace_period':
+            this.setGracePeriod(event);
             break;
 
         default:
