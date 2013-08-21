@@ -19,12 +19,11 @@ installation process.
    Vagrant.  If this is still a problem, you can
    install 4.2.12 from http://download.virtualbox.org/virtualbox/4.2.12/).
 4. Install Vagrant: http://www.vagrantup.com/ (Vagrant 1.2.2 or later)
-5. Open a terminal
+5. (Windows only) Run the commands to
+   [deal with line endings and symlinks under Windows](https://github.com/edx/edx-platform/wiki/Simplified-install-with-vagrant#dealing-with-line-endings-and-symlinks-under-windows) and run the next steps inside Cygwin.
 6. Download the project: `git clone https://github.com/edx/edx-platform.git`
 7. Enter the project directory: `cd edx-platform/`
-8. (Windows only) Run the commands to
-   [deal with line endings and symlinks under Windows](https://github.com/edx/edx-platform/wiki/Simplified-install-with-vagrant#dealing-with-line-endings-and-symlinks-under-windows)
-9. Create the development environment and start it: `vagrant up`
+8. Create the development environment and start it: `vagrant up`
 
 The initial `vagrant up` will download a Linux image, then boot and ask for your
 host machine's administrator password to setup file sharing between your computer and the VM.
@@ -53,7 +52,7 @@ $ vagrant ssh
 
 Note: This won't work from Windows. Instead, install PuTTY from
 http://www.chiark.greenend.org.uk/%7Esgtatham/putty/download.html. Then
-connect to 192.168.20.40, port 2222, using vagrant/vagrant as a user/password.
+connect to 192.168.20.40, port 22, using vagrant/vagrant as a user/password.
 
 
 Using edX
@@ -65,10 +64,12 @@ Your host computer contains the edx-project development code and repository.
 Your VM runs edx-platform code mounted from your host, so
 you can develop by editing on your host.
 
-After logging into your VM with `vagrant ssh`,
-start the _Studio_ and
+After logging into your VM with `vagrant ssh`, you need to install a dependencies:
+`sudo apt-get install -y phantomjs`
+
+Now you can start the _Studio_ and
 _Learning management system (LMS)_
-servers (run these from `/opt/edx/edx-platform`):
+servers (run these from `/opt/edx/edx-platform` and note that there is no whitespace after the comma):
 
 Learning management system (LMS):
 
