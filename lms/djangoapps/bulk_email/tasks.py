@@ -128,6 +128,7 @@ def course_email(hash_for_msg, to_list, course_title, course_url, throttle=False
                 'emails/email_footer.html',
                 email_context
             )
+
             plain_footer = render_to_string(
                 'emails/email_footer.txt',
                 email_context
@@ -173,7 +174,7 @@ def course_email(hash_for_msg, to_list, course_title, course_url, throttle=False
                 course_title,
                 course_url,
                 current_task.request.retries > 0
-             ],
+            ],
             exc=exc,
             countdown=(2 ** current_task.request.retries) * 15
         )

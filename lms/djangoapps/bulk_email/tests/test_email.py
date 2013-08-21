@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Unit tests for sending course email
 """
@@ -82,7 +83,10 @@ class TestEmailSendFromDashboard(ModuleStoreTestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(len(mail.outbox[0].to), 1)
         self.assertEquals(mail.outbox[0].to[0], self.instructor.email)
-        self.assertEquals(mail.outbox[0].subject, '[' + self.course.display_name + ']' + ' test subject for myself')
+        self.assertEquals(
+            mail.outbox[0].subject,
+            '[' + self.course.display_name + ']' + ' test subject for myself'
+        )
 
     def test_send_to_staff(self):
         """
@@ -101,7 +105,10 @@ class TestEmailSendFromDashboard(ModuleStoreTestCase):
         self.assertContains(response, "Your email was successfully queued for sending.")
 
         self.assertEquals(len(mail.outbox), 1 + len(self.staff))
-        self.assertItemsEqual([e.to[0] for e in mail.outbox], [self.instructor.email] + [s.email for s in self.staff])
+        self.assertItemsEqual(
+            [e.to[0] for e in mail.outbox],
+            [self.instructor.email] + [s.email for s in self.staff]
+        )
 
     def test_send_to_all(self):
         """
@@ -121,7 +128,94 @@ class TestEmailSendFromDashboard(ModuleStoreTestCase):
         self.assertContains(response, "Your email was successfully queued for sending.")
 
         self.assertEquals(len(mail.outbox), 1 + len(self.staff) + len(self.students))
-        self.assertItemsEqual([e.to[0] for e in mail.outbox], [self.instructor.email] + [s.email for s in self.staff] + [s.email for s in self.students])
+        self.assertItemsEqual(
+            [e.to[0] for e in mail.outbox],
+            [self.instructor.email] + [s.email for s in self.staff] + [s.email for s in self.students]
+        )
+
+    def test_unicode_subject_send_to_all(self):
+        """
+        Make sure email (with Unicode characters) send to all goes there.
+        """
+        # Now we know we have pulled up the instructor dash's email view
+        # (in the setUp method), we can test sending an email.
+
+        test_email = {
+            'action': 'Send email',
+            'to_option': 'all',
+            'subject': u'téśt śúbjéćt főŕ áĺĺ',
+            'message': 'test message for all'
+        }
+        response = self.client.post(self.url, test_email)
+
+        self.assertContains(response, "Your email was successfully queued for sending.")
+
+        self.assertEquals(len(mail.outbox), 1 + len(self.staff) + len(self.students))
+        self.assertItemsEqual(
+            [e.to[0] for e in mail.outbox],
+            [self.instructor.email] + [s.email for s in self.staff] + [s.email for s in self.students]
+        )
+        self.assertEquals(
+            mail.outbox[0].subject,
+            '[' + self.course.display_name + ']' + u' téśt śúbjéćt főŕ áĺĺ'
+        )
+
+    def test_unicode_message_send_to_all(self):
+        """
+        Make sure email (with Unicode characters) send to all goes there.
+        """
+        # Now we know we have pulled up the instructor dash's email view
+        # (in the setUp method), we can test sending an email.
+
+        test_email = {
+            'action': 'Send email',
+            'to_option': 'all',
+            'subject': 'test subject for all',
+            'message': u'ẗëṡẗ ṁëṡṡäġë ḟöṛ äḷḷ ｲ乇丂ｲ ﾶ乇丂丂ﾑg乇 ｷo尺 ﾑﾚﾚ тэѕт мэѕѕаБэ fоѓ аll'
+        }
+        response = self.client.post(self.url, test_email)
+
+        self.assertContains(response, "Your email was successfully queued for sending.")
+
+        self.assertEquals(len(mail.outbox), 1 + len(self.staff) + len(self.students))
+        self.assertItemsEqual(
+            [e.to[0] for e in mail.outbox],
+            [self.instructor.email] + [s.email for s in self.staff] + [s.email for s in self.students]
+        )
+
+        self.assertIn(
+            u'ẗëṡẗ ṁëṡṡäġë ḟöṛ äḷḷ ｲ乇丂ｲ ﾶ乇丂丂ﾑg乇 ｷo尺 ﾑﾚﾚ тэѕт мэѕѕаБэ fоѓ аll',
+            mail.outbox[0].body.decode('utf-8')
+        )
+
+    def test_unicode_students_send_to_all(self):
+        """
+        Make sure email (with Unicode characters) send to all goes there.
+        """
+        # Now we know we have pulled up the instructor dash's email view
+        # (in the setUp method), we can test sending an email.
+
+        # Create a student with Unicode in their first & last names
+        unicode_user = UserFactory(first_name=u'Ⓡⓞⓑⓞⓣ', last_name=u'ՇﻉรՇ')
+        CourseEnrollmentFactory.create(user=unicode_user, course_id=self.course.id)
+        self.students.append(unicode_user)
+
+        test_email = {
+            'action': 'Send email',
+            'to_option': 'all',
+            'subject': 'test subject for all',
+            'message': 'test message for all'
+        }
+        response = self.client.post(self.url, test_email)
+
+        self.assertContains(response, "Your email was successfully queued for sending.")
+
+        self.assertEquals(len(mail.outbox), 1 + len(self.staff) + len(self.students))
+
+        self.assertItemsEqual(
+            [e.to[0] for e in mail.outbox],
+            [self.instructor.email] + [s.email for s in self.staff] + [s.email for s in self.students]
+        )
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
