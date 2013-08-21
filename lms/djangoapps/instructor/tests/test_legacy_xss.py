@@ -14,6 +14,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 from instructor.views import legacy
 
+
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class TestXss(ModuleStoreTestCase):
     def setUp(self):

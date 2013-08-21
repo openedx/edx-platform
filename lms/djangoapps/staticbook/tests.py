@@ -36,6 +36,7 @@ HTML_BOOK = {
     ],
 }
 
+
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class StaticBookTest(ModuleStoreTestCase):
     """

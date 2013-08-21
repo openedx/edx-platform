@@ -103,10 +103,9 @@ def editable_modulestore(name='default'):
         store = store.modulestores['default']
 
     # At this point, we either have the ability to create
-    # items in the store, or we do not.  
+    # items in the store, or we do not.
     if hasattr(store, 'create_xmodule'):
         return store
 
     else:
         return None
-

@@ -64,9 +64,9 @@ class PageLoaderTestCase(LoginEnrollmentTestCase):
         )
 
         items = store.get_items(
-                location_query,
-                course_id=course_id,
-                depth=2
+            location_query,
+            course_id=course_id,
+            depth=2
         )
 
         if len(items) < 1:

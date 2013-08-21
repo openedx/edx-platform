@@ -18,7 +18,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.django import editable_modulestore
 
-from courseware.tests.tests import TEST_DATA_MIXED_MODULESTORE
+from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 
 from external_auth.models import ExternalAuthMap
 from external_auth.views import shib_login, course_specific_login, course_specific_register

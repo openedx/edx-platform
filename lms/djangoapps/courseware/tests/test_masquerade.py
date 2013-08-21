@@ -16,17 +16,22 @@ from django.contrib.auth.models import Group, User
 from courseware.access import _course_staff_group_name
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.django import modulestore, clear_existing_modulestores
 import json
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
-class TestStaffMasqueradeAsStudent(LoginEnrollmentTestCase):
+class TestStaffMasqueradeAsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Check for staff being able to masquerade as student.
     """
 
     def setUp(self):
+
+        # Clear out the modulestores, causing them to reload
+        clear_existing_modulestores()
+
         self.graded_course = modulestore().get_course("edX/graded/2012_Fall")
 
         # Create staff account

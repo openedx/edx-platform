@@ -85,6 +85,7 @@ class TestInstructorAccessAllow(ModuleStoreTestCase):
         group = Group.objects.get(name=get_access_group_name(self.course, 'staff'))
         self.assertIn(user, group.user_set.all())
 
+
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class TestInstructorAccessRevoke(ModuleStoreTestCase):
     """ Test access revoke. """

@@ -1,6 +1,10 @@
+"""
+Define test configuration for modulestores.
+"""
+
 from xmodule.modulestore.tests.django_utils import xml_store_config, \
-        mongo_store_config, draft_mongo_store_config,\
-        mixed_store_config
+    mongo_store_config, draft_mongo_store_config,\
+    mixed_store_config
 
 from django.conf import settings
 

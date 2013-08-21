@@ -5,8 +5,7 @@ Modulestore configuration for test cases.
 from uuid import uuid4
 from django.test import TestCase
 from xmodule.modulestore.django import editable_modulestore, \
-        editable_modulestore, clear_existing_modulestores
-from unittest.util import safe_repr
+    clear_existing_modulestores
 
 
 def mixed_store_config(data_dir, mappings):
