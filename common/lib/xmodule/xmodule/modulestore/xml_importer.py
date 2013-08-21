@@ -212,6 +212,15 @@ def import_module(module, store, course_data_path, static_content_store,
 
     # NOTE: It's important to use own_metadata here to avoid writing
     # inherited metadata everywhere.
+
+    # remove any export/import only xml_attributes which are used to wire together draft imports
+    if 'parent_sequential_url' in module.xml_attributes:
+        del module.xml_attributes['parent_sequential_url']
+
+    if 'index_in_children_list' in module.xml_attributes:
+        del module.xml_attributes['index_in_children_list']
+    module.save()
+
     store.update_metadata(module.location, dict(own_metadata(module)))
 
 
@@ -281,7 +290,7 @@ def import_course_draft(xml_module_store, store, draft_store, course_data_path, 
                         # this is to make sure private only verticals show up in the list of children since
                         # they would have been filtered out from the non-draft store export
                         if module.location.category == 'vertical':
-                            module.location = module.location._replace(revision=None)
+                            non_draft_location = module.location._replace(revision=None)
                             sequential_url = module.xml_attributes['parent_sequential_url']
                             index = int(module.xml_attributes['index_in_children_list'])
 
@@ -291,14 +300,11 @@ def import_course_draft(xml_module_store, store, draft_store, course_data_path, 
                             seq_location = seq_location._replace(org=target_location_namespace.org,
                                                                  course=target_location_namespace.course
                                                                  )
-                            sequential = store.get_item(seq_location)
+                            sequential = store.get_item(seq_location, depth=0)
 
-                            if module.location.url() not in sequential.children:
-                                sequential.children.insert(index, module.location.url())
+                            if non_draft_location.url() not in sequential.children:
+                                sequential.children.insert(index, non_draft_location.url())
                                 store.update_children(sequential.location, sequential.children)
-
-                            del module.xml_attributes['parent_sequential_url']
-                            del module.xml_attributes['index_in_children_list']
 
                         import_module(module, draft_store, course_data_path, static_content_store,
                                       source_location_namespace, target_location_namespace, allow_not_found=True)
