@@ -3,10 +3,11 @@ Unit tests for the asset upload endpoint.
 """
 
 import json
+import os
 from datetime import datetime
 from io import BytesIO
 from pytz import UTC
-from unittest import TestCase, skip
+from unittest import TestCase, skipIf
 from .utils import CourseTestCase
 from django.core.urlresolvers import reverse
 from contentstore.views import assets
@@ -55,10 +56,20 @@ class UploadTestCase(CourseTestCase):
             'coursename': self.course.location.name,
         })
 
-    @skip("CorruptGridFile error on continuous integration server")
+    skipOnJenkins = lambda x: skipIf(os.getenv("JENKINS_URL"), x)
+
+    @skipOnJenkins("CorruptGridFile error on continuous integration server")
     def test_happy_path(self):
         f = BytesIO("sample content")
         f.name = "sample.txt"
+        resp = self.client.post(self.url, {"name": "my-name", "file": f})
+        self.assert2XX(resp.status_code)
+
+    @skipOnJenkins("CorruptGridFile error on continuous integration server")
+    def test_large(self):
+        f = BytesIO("some content")
+        f.truncate(20 * 1024 * 1024)
+        f.name = "sample2.txt"
         resp = self.client.post(self.url, {"name": "my-name", "file": f})
         self.assert2XX(resp.status_code)
 
