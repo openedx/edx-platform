@@ -65,7 +65,7 @@ body.register.verification {
 
       .controls-list {
         margin: 0;
-        padding: 0;
+        padding: ($baseline*.25) ($baseline*.75);
         list-style-type: none;
 
         .control {
