@@ -1082,6 +1082,13 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         )
         self.assertIn('<p style="font:italic bold 72px/30px Georgia, serif; color: red; ">', html_module.data)
 
+        # get the sample HTML with just a simple <img> tag information
+        html_module = module_store.get_instance(
+            'edX/toy/2012_Fall',
+            Location(['i4x', 'edX', 'toy', 'html', 'just_img'])
+        )
+        self.assertIn('<img src="/static/foo_bar.jpg" />', html_module.data)
+
     def test_course_handouts_rewrites(self):
         module_store = modulestore('direct')
 
