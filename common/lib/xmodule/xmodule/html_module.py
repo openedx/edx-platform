@@ -164,14 +164,9 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):
     # TODO (vshnayder): make export put things in the right places.
 
     def definition_to_xml(self, resource_fs):
-        '''If the contents are valid xml, write them to filename.xml.  Otherwise,
-        write just <html filename="" [meta-attrs="..."]> to filename.xml, and the html
+        ''' Write <html filename="" [meta-attrs="..."]> to filename.xml, and the html
         string to filename.html.
         '''
-        try:
-            return etree.fromstring(self.data)
-        except etree.XMLSyntaxError:
-            pass
 
         # Not proper format.  Write html to file, return an empty tag
         pathname = name_to_pathname(self.url_name)
