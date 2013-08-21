@@ -12,6 +12,7 @@ from .processors import process_postpay_callback, render_purchase_form_html
 
 log = logging.getLogger("shoppingcart")
 
+
 def test(request, course_id):
     item1 = PaidCourseRegistration(course_id, 200)
     item1.purchased_callback(request.user.id)
@@ -41,6 +42,7 @@ def register_for_verified_cert(request, course_id):
     CertificateItem.add_to_order(cart, course_id, 30, 'verified')
     return HttpResponse("Added")
 
+
 @login_required
 def show_cart(request):
     cart = Order.get_cart_for_user(request.user)
@@ -54,11 +56,13 @@ def show_cart(request):
                                'form_html': form_html,
                                })
 
+
 @login_required
 def clear_cart(request):
     cart = Order.get_cart_for_user(request.user)
     cart.clear()
     return HttpResponse('Cleared')
+
 
 @login_required
 def remove_item(request):
@@ -70,6 +74,7 @@ def remove_item(request):
     except OrderItem.DoesNotExist:
         log.exception('Cannot remove cart OrderItem id={0}. DoesNotExist or item is already purchased'.format(item_id))
     return HttpResponse('OK')
+
 
 @csrf_exempt
 def postpay_callback(request):
@@ -87,8 +92,9 @@ def postpay_callback(request):
     if result['success']:
         return HttpResponseRedirect(reverse('shoppingcart.views.show_receipt', args=[result['order'].id]))
     else:
-        return render_to_response('shoppingcart/error.html', {'order':result['order'],
+        return render_to_response('shoppingcart/error.html', {'order': result['order'],
                                                               'error_html': result['error_html']})
+
 
 @login_required
 def show_receipt(request, ordernum):

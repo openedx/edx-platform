@@ -7,6 +7,7 @@ module = __import__('shoppingcart.processors.' + processor_name,
                               'process_postpay_callback',
                               ])
 
+
 def render_purchase_form_html(*args, **kwargs):
     """
     The top level call to this module to begin the purchase.
@@ -15,6 +16,7 @@ def render_purchase_form_html(*args, **kwargs):
     Returns the HTML as a string
     """
     return module.render_purchase_form_html(*args, **kwargs)
+
 
 def process_postpay_callback(*args, **kwargs):
     """
@@ -29,4 +31,3 @@ def process_postpay_callback(*args, **kwargs):
     return a helpful-enough error message in error_html.
     """
     return module.process_postpay_callback(*args, **kwargs)
-

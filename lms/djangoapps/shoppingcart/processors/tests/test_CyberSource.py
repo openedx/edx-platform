@@ -13,14 +13,15 @@ from mock import patch, Mock
 
 
 TEST_CC_PROCESSOR = {
-    'CyberSource' : {
+    'CyberSource': {
         'SHARED_SECRET': 'secret',
-        'MERCHANT_ID' : 'edx_test',
-        'SERIAL_NUMBER' : '12345',
+        'MERCHANT_ID': 'edx_test',
+        'SERIAL_NUMBER': '12345',
         'ORDERPAGE_VERSION': '7',
         'PURCHASE_ENDPOINT': '',
     }
 }
+
 
 @override_settings(CC_PROCESSOR=TEST_CC_PROCESSOR)
 class CyberSourceTests(TestCase):
@@ -36,8 +37,8 @@ class CyberSourceTests(TestCase):
         """
         Tests the hash function.  Basically just hardcodes the answer.
         """
-        self.assertEqual(hash('test'), 'GqNJWF7X7L07nEhqMAZ+OVyks1Y=')
-        self.assertEqual(hash('edx '), '/KowheysqM2PFYuxVKg0P8Flfk4=')
+        self.assertEqual(processor_hash('test'), 'GqNJWF7X7L07nEhqMAZ+OVyks1Y=')
+        self.assertEqual(processor_hash('edx '), '/KowheysqM2PFYuxVKg0P8Flfk4=')
 
     def test_sign_then_verify(self):
         """
@@ -76,7 +77,7 @@ class CyberSourceTests(TestCase):
         """
         DECISION = 'REJECT'
         for code, reason in REASONCODE_MAP.iteritems():
-            params={
+            params = {
                 'decision': DECISION,
                 'reasonCode': code,
             }
@@ -109,8 +110,8 @@ class CyberSourceTests(TestCase):
         student1.save()
         student2 = UserFactory()
         student2.save()
-        params_cc = {'card_accountNumber':'1234', 'card_cardType':'001', 'billTo_firstName':student1.first_name}
-        params_nocc =  {'card_accountNumber':'', 'card_cardType':'002', 'billTo_firstName':student2.first_name}
+        params_cc = {'card_accountNumber': '1234', 'card_cardType': '001', 'billTo_firstName': student1.first_name}
+        params_nocc = {'card_accountNumber': '', 'card_cardType': '002', 'billTo_firstName': student2.first_name}
         order1 = Order.get_cart_for_user(student1)
         order2 = Order.get_cart_for_user(student2)
         record_purchase(params_cc, order1)
@@ -173,7 +174,7 @@ class CyberSourceTests(TestCase):
 
         # tests for an order number that doesn't match up
         params_bad_ordernum = params.copy()
-        params_bad_ordernum['orderNumber'] = str(order1.id+10)
+        params_bad_ordernum['orderNumber'] = str(order1.id + 10)
         with self.assertRaises(CCProcessorDataException):
             payment_accepted(params_bad_ordernum)
 
@@ -215,7 +216,7 @@ class CyberSourceTests(TestCase):
         self.assertDictContainsSubset({'amount': '1.00',
                                        'currency': 'usd',
                                        'orderPage_transactionType': 'sale',
-                                       'orderNumber':str(order1.id)},
+                                       'orderNumber': str(order1.id)},
                                       context['params'])
 
     def test_process_postpay_exception(self):
@@ -257,7 +258,7 @@ class CyberSourceTests(TestCase):
         result = process_postpay_callback(params)
         self.assertTrue(result['success'])
         self.assertEqual(result['order'], order1)
-        order1 = Order.objects.get(id=order1.id) # reload from DB to capture side-effect of process_postpay_callback
+        order1 = Order.objects.get(id=order1.id)  # reload from DB to capture side-effect of process_postpay_callback
         self.assertEqual(order1.status, 'purchased')
         self.assertFalse(result['error_html'])
 
