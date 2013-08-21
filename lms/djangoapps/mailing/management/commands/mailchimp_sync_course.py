@@ -139,7 +139,8 @@ def get_student_data(students, exclude=None):
 
 def get_enrolled_students(course_id):
     objects = UserProfile.objects
-    students = objects.filter(user__courseenrollment__course_id=course_id)
+    students = objects.filter(user__courseenrollment__course_id=course_id) \
+                      .filter(user__courseenrollment__is_active=True)
     return students
 
 
