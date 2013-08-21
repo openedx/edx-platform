@@ -8,7 +8,7 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
         // Leaving change in as fallback for older browsers
         "change input" : "updateModel",
         "change textarea" : "updateModel",
-        "input span[contenteditable]" : "updateDesignation",
+        "input span[contenteditable=true]" : "updateDesignation",
         "click .settings-extra header" : "showSettingsExtras",
         "click .new-grade-button" : "addNewGrade",
         "click .remove-button" : "removeGrade",
@@ -20,7 +20,7 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
     initialize : function() {
         //  load template for grading view
         var self = this;
-        this.gradeCutoffTemplate = _.template('<li class="grade-specific-bar" style="width:<%= width %>%"><span class="letter-grade" contenteditable>' +
+        this.gradeCutoffTemplate = _.template('<li class="grade-specific-bar" style="width:<%= width %>%"><span class="letter-grade" contenteditable="true">' +
                 '<%= descriptor %>' +
                 '</span><span class="range"></span>' +
                 '<% if (removable) {%><a href="#" class="remove-button">remove</a><% ;} %>' +
@@ -168,9 +168,12 @@ CMS.Views.Settings.Grading = CMS.Views.ValidatingView.extend({
         },
         this);
         // add fail which is not in data
-        var failBar = this.gradeCutoffTemplate({ descriptor : this.failLabel(),
-            width : nextWidth, removable : false});
-        $(failBar).find("span[contenteditable=true]").attr("contenteditable", false);
+        var failBar = $(this.gradeCutoffTemplate({
+            descriptor : this.failLabel(),
+            width : nextWidth,
+            removable : false
+        }));
+        failBar.find("span[contenteditable=true]").attr("contenteditable", false);
         gradelist.append(failBar);
         gradelist.children().last().resizable({
             handles: "e",

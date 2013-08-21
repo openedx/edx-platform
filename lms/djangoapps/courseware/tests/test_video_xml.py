@@ -20,8 +20,7 @@ import unittest
 
 from django.conf import settings
 
-from xmodule.video_module import (
-    VideoDescriptor, _create_youtube_string)
+from xmodule.video_module import VideoDescriptor, _create_youtube_string
 from xmodule.modulestore import Location
 from xmodule.tests import get_test_system, LogicTest
 

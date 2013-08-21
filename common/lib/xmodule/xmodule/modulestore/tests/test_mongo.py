@@ -120,8 +120,30 @@ class TestMongoModuleStore(object):
                 '{0} is a template course'.format(course)
             )
 
+    def test_static_tab_names(self):
+        courses = self.store.get_courses()
+
+        def get_tab_name(index):
+            """
+            Helper function for pulling out the name of a given static tab.
+
+            Assumes the information is desired for courses[1] ('toy' course).
+            """
+            return courses[1].tabs[index]['name']
+
+        # There was a bug where model.save was not getting called after the static tab name
+        # was set set for tabs that have a URL slug. 'Syllabus' and 'Resources' fall into that
+        # category, but for completeness, I'm also testing 'Course Info' and 'Discussion' (no url slug).
+        assert_equals('Course Info', get_tab_name(1))
+        assert_equals('Syllabus', get_tab_name(2))
+        assert_equals('Resources', get_tab_name(3))
+        assert_equals('Discussion', get_tab_name(4))
+
 
 class TestMongoKeyValueStore(object):
+    """
+    Tests for MongoKeyValueStore.
+    """
 
     def setUp(self):
         self.data = {'foo': 'foo_value'}
@@ -131,6 +153,9 @@ class TestMongoKeyValueStore(object):
         self.kvs = MongoKeyValueStore(self.data, self.children, self.metadata, self.location, 'category')
 
     def _check_read(self, key, expected_value):
+        """
+        Asserts the get and has methods.
+        """
         assert_equals(expected_value, self.kvs.get(key))
         assert self.kvs.has(key)
 

@@ -42,7 +42,7 @@ class HintManagerTest(ModuleStoreTestCase):
                               value=5)
         # Mock out location_to_problem_name, which ordinarily accesses the modulestore.
         # (I can't figure out how to get fake structures into the modulestore.)
-        view.location_to_problem_name = lambda loc: "Test problem"
+        view.location_to_problem_name = lambda course_id, loc: "Test problem"
 
     def test_student_block(self):
         """

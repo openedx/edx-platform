@@ -3,7 +3,7 @@
 #pylint: disable=W0622
 #pylint: disable=W0212
 #pylint: disable=W0613
-  
+
 import sys, os
 
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
@@ -26,7 +26,7 @@ html_static_path.append('source/_static')
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-#sys.path.insert(0, os.path.abspath('../../..'))
+sys.path.insert(0, os.path.abspath('../../..'))
 root = os.path.abspath('../../..')
 
 sys.path.append(root)
@@ -53,8 +53,9 @@ else:
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = [
-    'sphinx.ext.autodoc', 'sphinx.ext.doctest', 'sphinx.ext.intersphinx', 'sphinx.ext.todo', 'sphinx.ext.coverage',
-    'sphinx.ext.pngmath', 'sphinx.ext.mathjax', 'sphinx.ext.viewcode']
+    'sphinx.ext.autodoc', 'sphinx.ext.doctest', 'sphinx.ext.intersphinx',
+    'sphinx.ext.todo', 'sphinx.ext.coverage', 'sphinx.ext.pngmath',
+    'sphinx.ext.mathjax', 'sphinx.ext.viewcode']
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -64,6 +65,46 @@ exclude_patterns = ['build']
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'edXDocs'
 
+# --- Mock modules ------------------------------------------------------------
+
+# Mock all the modules that the readthedocs build can't import
+import mock
+
+class Mock(object):
+    def __init__(self, *args, **kwargs):
+        pass
+
+    def __call__(self, *args, **kwargs):
+        return Mock()
+
+    @classmethod
+    def __getattr__(cls, name):
+        if name in ('__file__', '__path__'):
+            return '/dev/null'
+        elif name[0] == name[0].upper():
+            mockType = type(name, (), {})
+            mockType.__module__ = __name__
+            return mockType
+        else:
+            return Mock()
+
+# The list of modules and submodules that we know give RTD trouble.
+# Make sure you've tried including the relevant package in
+# docs/share/requirements.txt before adding to this list.
+MOCK_MODULES = [
+    'numpy',
+    'matplotlib',
+    'matplotlib.pyplot',
+    'scipy.interpolate',
+    'scipy.constants',
+    'scipy.optimize',
+    ]
+
+if on_rtd:
+    for mod_name in MOCK_MODULES:
+        sys.modules[mod_name] = Mock()
+
+# -----------------------------------------------------------------------------
 
 # from http://djangosnippets.org/snippets/2533/
 # autogenerate models definitions
@@ -109,27 +150,7 @@ def strip_tags(html):
     s.feed(html)
     return s.get_data()
 
-class Mock(object):
-    def __init__(self, *args, **kwargs):
-        pass
 
-    def __call__(self, *args, **kwargs):
-        return Mock()
-
-    @classmethod
-    def __getattr__(cls, name):
-        if name in ('__file__', '__path__'):
-            return '/dev/null'
-        elif name[0] == name[0].upper():
-            mockType = type(name, (), {})
-            mockType.__module__ = __name__
-            return mockType
-        else:
-            return Mock()
-
-MOCK_MODULES = ['scipy', 'numpy']
-for mod_name in MOCK_MODULES:
-    sys.modules[mod_name] = Mock()
 
 def process_docstring(app, what, name, obj, options, lines):
     """Autodoc django models"""
@@ -165,34 +186,6 @@ def process_docstring(app, what, name, obj, options, lines):
 
             # Add the field's type to the docstring
             lines.append(u':type %s: %s' % (field.attname, type(field).__name__))
-        # Only look at objects that inherit from Django's base FORM class
-    # elif (inspect.isclass(obj) and issubclass(obj, forms.ModelForm) or issubclass(obj, forms.ModelForm) or issubclass(obj, BaseInlineFormSet)):
-    #     pass
-        # # Grab the field list from the meta class
-        # import ipdb; ipdb.set_trace()
-        # fields = obj._meta._fields()
-        # import ipdb; ipdb.set_trace()
-        # for field in fields:
-        #     import ipdb; ipdb.set_trace()
-        #     # Decode and strip any html out of the field's help text
-        #     help_text = strip_tags(force_unicode(field.help_text))
-
-        #     # Decode and capitalize the verbose name, for use if there isn't
-        #     # any help text
-        #     verbose_name = force_unicode(field.verbose_name).capitalize()
-
-        #     if help_text:
-        #         # Add the model field to the end of the docstring as a param
-        #         # using the help text as the description
-        #         lines.append(u':param %s: %s' % (field.attname, help_text))
-        #     else:
-        #         # Add the model field to the end of the docstring as a param
-        #         # using the verbose name as the description
-        #         lines.append(u':param %s: %s' % (field.attname, verbose_name))
-
-        #     # Add the field's type to the docstring
-        #     lines.append(u':type %s: %s' % (field.attname, type(field).__name__))
-    # Return the extended docstring
     return lines
 
 
