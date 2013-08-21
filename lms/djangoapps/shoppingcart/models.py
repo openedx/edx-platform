@@ -220,11 +220,17 @@ class PaidCourseRegistration(OrderItem):
         in CourseEnrollmentAllowed will the user be allowed to enroll.  Otherwise requiring payment
         would in fact be quite silly since there's a clear back door.
         """
-        course_loc = CourseDescriptor.id_to_location(self.course_id)
-        course_exists = modulestore().has_item(self.course_id, course_loc)
+        try:
+            course_loc = CourseDescriptor.id_to_location(self.course_id)
+            course_exists = modulestore().has_item(self.course_id, course_loc)
+        except ValueError:
+            raise PurchasedCallbackException(
+                "The customer purchased Course {0}, but that course doesn't exist!".format(self.course_id))
+
         if not course_exists:
             raise PurchasedCallbackException(
                 "The customer purchased Course {0}, but that course doesn't exist!".format(self.course_id))
+
         CourseEnrollment.enroll(user=self.user, course_id=self.course_id, mode=self.mode)
 
         log.info("Enrolled {0} in paid course {1}, paid ${2}".format(self.user.email, self.course_id, self.line_cost))
