@@ -9,16 +9,10 @@ from django.test.utils import override_settings
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from path import path
-from tempdir import mkdtemp_clean
-from fs.osfs import OSFS
 import copy
 from json import loads
-from datetime import timedelta
 
 from django.contrib.auth.models import User
-from django.dispatch import Signal
-from contentstore.utils import get_modulestore
-from contentstore.tests.utils import parse_json
 
 from auth.authz import add_user_to_creator_group
 
@@ -26,31 +20,16 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from xmodule.modulestore import Location, mongo
-from xmodule.modulestore.store_utilities import clone_course
-from xmodule.modulestore.store_utilities import delete_course
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.django import contentstore, _CONTENTSTORE
-from xmodule.modulestore.xml_exporter import export_to_xml
-from xmodule.modulestore.xml_importer import import_from_xml, perform_xlint
-from xmodule.modulestore.inheritance import own_metadata
+from xmodule.modulestore.xml_importer import import_from_xml
 from xmodule.contentstore.content import StaticContent
-from xmodule.contentstore.utils import restore_asset_from_trashcan, empty_asset_trashcan
 
-from xmodule.capa_module import CapaDescriptor
 from xmodule.course_module import CourseDescriptor
-from xmodule.seq_module import SequenceDescriptor
-from xmodule.modulestore.exceptions import ItemNotFoundError
 
-from contentstore.views.component import ADVANCED_COMPONENT_TYPES
 from xmodule.exceptions import NotFoundError
-
-from django_comment_common.utils import are_permissions_roles_seeded
-from xmodule.exceptions import InvalidVersionError
-import datetime
-from pytz import UTC
 from uuid import uuid4
-from pymongo import MongoClient
-from student.models import CourseEnrollment
+
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['OPTIONS']['db'] = 'test_xcontent_%s' % uuid4().hex
