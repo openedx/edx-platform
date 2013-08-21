@@ -24,7 +24,7 @@ orderPage_version = settings.CC_PROCESSOR['CyberSource'].get('ORDERPAGE_VERSION'
 purchase_endpoint = settings.CC_PROCESSOR['CyberSource'].get('PURCHASE_ENDPOINT','')
 payment_support_email = settings.PAYMENT_SUPPORT_EMAIL
 
-def process_postpay_callback(request):
+def process_postpay_callback(params):
     """
     The top level call to this module, basically
     This function is handed the callback request after the customer has entered the CC info and clicked "buy"
@@ -36,7 +36,6 @@ def process_postpay_callback(request):
     If unsuccessful this function should not have those side effects but should try to figure out why and
     return a helpful-enough error message in error_html.
     """
-    params = request.POST.dict()
     try:
         verify_signatures(params)
         result = payment_accepted(params)
@@ -164,17 +163,18 @@ def payment_accepted(params):
 
     if valid_params['decision'] == 'ACCEPT':
         try:
-            # Moved reading of charged_amount from the valid_params loop above because
+            # Moved reading of charged_amount here from the valid_params loop above because
             # only 'ACCEPT' messages have a 'ccAuthReply_amount' parameter
             charged_amt = Decimal(params['ccAuthReply_amount'])
         except InvalidOperation:
             raise CCProcessorDataException(
-                _("The payment processor returned a badly-typed value {0} for param {1}.".format(params[key], key))
+                _("The payment processor returned a badly-typed value {0} for param {1}.".format(
+                    params['ccAuthReply_amount'], 'ccAuthReply_amount'))
             )
 
         if charged_amt == order.total_cost and valid_params['orderCurrency'] == order.currency:
             return {'accepted': True,
-                    'amt_charged': valid_params['ccAuthReply_amount'],
+                    'amt_charged': charged_amt,
                     'currency': valid_params['orderCurrency'],
                     'order': order}
         else:
@@ -275,7 +275,8 @@ def get_processor_exception_html(params, exception):
     return '<p class="error_msg">EXCEPTION!</p>'
 
 
-CARDTYPE_MAP = defaultdict(lambda:"UNKNOWN").update(
+CARDTYPE_MAP = defaultdict(lambda:"UNKNOWN")
+CARDTYPE_MAP.update(
     {
         '001': 'Visa',
         '002': 'MasterCard',

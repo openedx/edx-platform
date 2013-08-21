@@ -158,8 +158,7 @@ class PaidCourseRegistration(OrderItem):
         Is the course defined by course_id in the order?
         """
         return course_id in [item.paidcourseregistration.course_id
-                             for item in order.orderitem_set.all()
-                             if item.is_of_subtype(PaidCourseRegistration)]
+                             for item in order.orderitem_set.all().select_subclasses("paidcourseregistration")]
 
     @classmethod
     def add_to_order(cls, order, course_id, mode_slug=CourseMode.DEFAULT_MODE_SLUG, cost=None, currency=None):
@@ -169,15 +168,11 @@ class PaidCourseRegistration(OrderItem):
 
         Returns the order item
         """
-        super(PaidCourseRegistration, cls).add_to_order(order, course_id, cost, currency=currency)
-
         # TODO: Possibly add checking for whether student is already enrolled in course
         course = course_from_id(course_id)  # actually fetch the course to make sure it exists, use this to
                                             # throw errors if it doesn't
-        item, created = cls.objects.get_or_create(order=order, user=order.user, course_id=course_id)
-        item.status = order.status
 
-        ### Get this course_mode
+        ### handle default arguments for mode_slug, cost, currency
         course_mode = CourseMode.mode_for_course(course_id, mode_slug)
         if not course_mode:
             # user could have specified a mode that's not set, in that case return the DEFAULT_MODE
@@ -186,6 +181,11 @@ class PaidCourseRegistration(OrderItem):
             cost = course_mode.min_price
         if not currency:
             currency = course_mode.currency
+
+        super(PaidCourseRegistration, cls).add_to_order(order, course_id, cost, currency=currency)
+
+        item, created = cls.objects.get_or_create(order=order, user=order.user, course_id=course_id)
+        item.status = order.status
 
         item.mode = course_mode.slug
         item.qty = 1
