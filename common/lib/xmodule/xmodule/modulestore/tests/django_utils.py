@@ -1,5 +1,5 @@
 """
-eoduleStore configuration for test cases.
+Modulestore configuration for test cases.
 """
 
 from uuid import uuid4
