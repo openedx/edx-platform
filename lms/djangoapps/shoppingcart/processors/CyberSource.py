@@ -8,18 +8,21 @@ import binascii
 import re
 import json
 from collections import OrderedDict, defaultdict
+from decimal import Decimal, InvalidOperation
 from hashlib import sha1
+from textwrap import dedent
 from django.conf import settings
 from django.utils.translation import ugettext as _
 from mitxmako.shortcuts import render_to_string
 from shoppingcart.models import Order
-from .exceptions import CCProcessorException, CCProcessorDataException, CCProcessorWrongAmountException
+from .exceptions import *
 
 shared_secret = settings.CC_PROCESSOR['CyberSource'].get('SHARED_SECRET','')
 merchant_id = settings.CC_PROCESSOR['CyberSource'].get('MERCHANT_ID','')
 serial_number = settings.CC_PROCESSOR['CyberSource'].get('SERIAL_NUMBER','')
 orderPage_version = settings.CC_PROCESSOR['CyberSource'].get('ORDERPAGE_VERSION','7')
 purchase_endpoint = settings.CC_PROCESSOR['CyberSource'].get('PURCHASE_ENDPOINT','')
+payment_support_email = settings.PAYMENT_SUPPORT_EMAIL
 
 def process_postpay_callback(request):
     """
@@ -34,27 +37,23 @@ def process_postpay_callback(request):
     return a helpful-enough error message in error_html.
     """
     params = request.POST.dict()
-    if verify_signatures(params):
-        try:
-            result = payment_accepted(params)
-            if result['accepted']:
-                # SUCCESS CASE first, rest are some sort of oddity
-                record_purchase(params, result['order'])
-                return {'success': True,
-                        'order': result['order'],
-                        'error_html': ''}
-            else:
-                return {'success': False,
-                        'order': result['order'],
-                        'error_html': get_processor_error_html(params)}
-        except CCProcessorException as e:
+    try:
+        verify_signatures(params)
+        result = payment_accepted(params)
+        if result['accepted']:
+            # SUCCESS CASE first, rest are some sort of oddity
+            record_purchase(params, result['order'])
+            return {'success': True,
+                    'order': result['order'],
+                    'error_html': ''}
+        else:
             return {'success': False,
-                    'order': None, #due to exception we may not have the order
-                    'error_html': get_exception_html(params, e)}
-    else:
+                    'order': result['order'],
+                    'error_html': get_processor_decline_html(params)}
+    except CCProcessorException as e:
         return {'success': False,
-                'order': None,
-                'error_html': get_signature_error_html(params)}
+                'order': None, #due to exception we may not have the order
+                'error_html': get_processor_exception_html(params, e)}
 
 
 def hash(value):
@@ -87,15 +86,18 @@ def sign(params):
 def verify_signatures(params):
     """
     Verify the signatures accompanying the POST back from Cybersource Hosted Order Page
+
+    returns silently if verified
+
+    raises CCProcessorSignatureException if not verified
     """
     signed_fields = params.get('signedFields', '').split(',')
     data = ",".join(["{0}={1}".format(k, params.get(k, '')) for k in signed_fields])
     signed_fields_sig = hash(params.get('signedFields', ''))
     data += ",signedFieldsPublicSignature=" + signed_fields_sig
     returned_sig = params.get('signedDataPublicSignature','')
-    if not returned_sig:
-        return False
-    return hash(data) == returned_sig
+    if hash(data) != returned_sig:
+        raise CCProcessorSignatureException()
 
 
 def render_purchase_form_html(cart, user):
@@ -130,11 +132,18 @@ def render_purchase_form_html(cart, user):
 def payment_accepted(params):
     """
     Check that cybersource has accepted the payment
+    params: a dictionary of POST parameters returned by CyberSource in their post-payment callback
+
+    returns: true if the payment was correctly accepted, for the right amount
+             false if the payment was not accepted
+
+    raises: CCProcessorDataException if the returned message did not provide required parameters
+            CCProcessorWrongAmountException if the amount charged is different than the order amount
+
     """
     #make sure required keys are present and convert their values to the right type
     valid_params = {}
     for key, type in [('orderNumber', int),
-                      ('ccAuthReply_amount', float),
                       ('orderCurrency', str),
                       ('decision', str)]:
         if key not in params:
@@ -154,7 +163,16 @@ def payment_accepted(params):
         raise CCProcessorDataException(_("The payment processor accepted an order whose number is not in our system."))
 
     if valid_params['decision'] == 'ACCEPT':
-        if valid_params['ccAuthReply_amount'] == order.total_cost and valid_params['orderCurrency'] == order.currency:
+        try:
+            # Moved reading of charged_amount from the valid_params loop above because
+            # only 'ACCEPT' messages have a 'ccAuthReply_amount' parameter
+            charged_amt = Decimal(params['ccAuthReply_amount'])
+        except InvalidOperation:
+            raise CCProcessorDataException(
+                _("The payment processor returned a badly-typed value {0} for param {1}.".format(params[key], key))
+            )
+
+        if charged_amt == order.total_cost and valid_params['orderCurrency'] == order.currency:
             return {'accepted': True,
                     'amt_charged': valid_params['ccAuthReply_amount'],
                     'currency': valid_params['orderCurrency'],
@@ -197,21 +215,67 @@ def record_purchase(params, order):
         processor_reply_dump=json.dumps(params)
     )
 
-def get_processor_error_html(params):
-    """Have to parse through the error codes for all the other cases"""
-    return "<p>ERROR!</p>"
+def get_processor_decline_html(params):
+    """Have to parse through the error codes to return a helpful message"""
+    msg = _(dedent(
+    """
+    <p class="error_msg">
+    Sorry! Our payment processor did not accept your payment.
+    The decision in they returned was <span class="decision">{decision}</span>,
+    and the reason was <span class="reason">{reason_code}:{reason_msg}</span>.
+    You were not charged. Please try a different form of payment.
+    Contact us with payment-specific questions at {email}.
+    </p>
+    """))
 
-def get_exception_html(params, exp):
+    return msg.format(
+        decision=params['decision'],
+        reason_code=params['reasonCode'],
+        reason_msg=REASONCODE_MAP[params['reasonCode']],
+        email=payment_support_email)
+
+
+def get_processor_exception_html(params, exception):
     """Return error HTML associated with exception"""
-    return "<p>EXCEPTION!</p>"
 
-def get_signature_error_html(params):
-    """Return error HTML associated with signature failure"""
-    return "<p>EXCEPTION!</p>"
+    if isinstance(exception, CCProcessorDataException):
+        msg = _(dedent(
+        """
+        <p class="error_msg">
+        Sorry! Our payment processor sent us back a payment confirmation that had inconsistent data!
+        We apologize that we cannot verify whether the charge went through and take further action on your order.
+        The specific error message is: <span class="exception_msg">{msg}</span>.
+        Your credit card may possibly have been charged.  Contact us with payment-specific questions at {email}.
+        </p>
+        """.format(msg=exception.message, email=payment_support_email)))
+        return msg
+    elif isinstance(exception, CCProcessorWrongAmountException):
+        msg = _(dedent(
+        """
+        <p class="error_msg">
+        Sorry! Due to an error your purchase was charged for a different amount than the order total!
+        The specific error message is: <span class="exception_msg">{msg}</span>.
+        Your credit card has probably been charged. Contact us with payment-specific questions at {email}.
+        </p>
+        """.format(msg=exception.message, email=payment_support_email)))
+        return msg
+    elif isinstance(exception, CCProcessorSignatureException):
+        msg = _(dedent(
+        """
+        <p class="error_msg">
+        Sorry! Our payment processor sent us back a corrupted message regarding your charge, so we are
+        unable to validate that the message actually came from the payment processor.
+        We apologize that we cannot verify whether the charge went through and take further action on your order.
+        Your credit card may possibly have been charged.  Contact us with payment-specific questions at {email}.
+        </p>
+        """.format(email=payment_support_email)))
+        return msg
+
+    # fallthrough case, which basically never happens
+    return '<p class="error_msg">EXCEPTION!</p>'
 
 
-CARDTYPE_MAP = defaultdict(lambda:"UNKNOWN")
-CARDTYPE_MAP.update(
+CARDTYPE_MAP = defaultdict(lambda:"UNKNOWN").update(
     {
         '001': 'Visa',
         '002': 'MasterCard',
@@ -231,5 +295,113 @@ CARDTYPE_MAP.update(
         '037': 'Carta Si',
         '042': 'Maestro',
         '043': 'GE Money UK card'
+    }
+)
+
+REASONCODE_MAP = defaultdict(lambda:"UNKNOWN REASON")
+REASONCODE_MAP.update(
+    {
+        '100' : _('Successful transaction.'),
+        '101' : _('The request is missing one or more required fields.'),
+        '102' : _('One or more fields in the request contains invalid data.'),
+        '104' : _(dedent(
+            """
+            The merchantReferenceCode sent with this authorization request matches the
+            merchantReferenceCode of another authorization request that you sent in the last 15 minutes.
+            Possible fix: retry the payment after 15 minutes.
+            """)),
+        '150' : _('Error: General system failure. Possible fix: retry the payment after a few minutes.'),
+        '151' : _(dedent(
+            """
+            Error: The request was received but there was a server timeout.
+            This error does not include timeouts between the client and the server.
+            Possible fix: retry the payment after some time.
+            """)),
+        '152' : _(dedent(
+            """
+            Error: The request was received, but a service did not finish running in time
+            Possible fix: retry the payment after some time.
+            """)),
+        '201' : _('The issuing bank has questions about the request. Possible fix: retry with another form of payment'),
+        '202' : _(dedent(
+            """
+            Expired card. You might also receive this if the expiration date you
+            provided does not match the date the issuing bank has on file.
+            Possible fix: retry with another form of payment
+            """)),
+        '203' : _(dedent(
+            """
+            General decline of the card. No other information provided by the issuing bank.
+            Possible fix: retry with another form of payment
+            """)),
+        '204' : _('Insufficient funds in the account. Possible fix: retry with another form of payment'),
+        # 205 was Stolen or lost card.  Might as well not show this message to the person using such a card.
+        '205' : _('Unknown reason'),
+        '207' : _('Issuing bank unavailable. Possible fix: retry again after a few minutes'),
+        '208' : _(dedent(
+            """
+            Inactive card or card not authorized for card-not-present transactions.
+            Possible fix: retry with another form of payment
+            """)),
+        '210' : _('The card has reached the credit limit. Possible fix: retry with another form of payment'),
+        '211' : _('Invalid card verification number. Possible fix: retry with another form of payment'),
+        # 221 was The customer matched an entry on the processor's negative file.
+        # Might as well not show this message to the person using such a card.
+        '221' : _('Unknown reason'),
+        '231' : _('Invalid account number. Possible fix: retry with another form of payment'),
+        '232' : _(dedent(
+            """
+            The card type is not accepted by the payment processor.
+            Possible fix: retry with another form of payment
+            """)),
+        '233' : _('General decline by the processor.  Possible fix: retry with another form of payment'),
+        '234' : _(dedent(
+            """
+            There is a problem with our CyberSource merchant configuration.  Please let us know at {0}
+            """.format(payment_support_email))),
+        # reason code 235 only applies if we are processing a capture through the API. so we should never see it
+        '235' : _('The requested amount exceeds the originally authorized amount.'),
+        '236' : _('Processor Failure.  Possible fix: retry the payment'),
+        # reason code 238 only applies if we are processing a capture through the API. so we should never see it
+        '238' : _('The authorization has already been captured'),
+        # reason code 239 only applies if we are processing a capture or credit through the API,
+        # so we should never see it
+        '239' : _('The requested transaction amount must match the previous transaction amount.'),
+        '240' : _(dedent(
+            """
+            The card type sent is invalid or does not correlate with the credit card number.
+            Possible fix: retry with the same card or another form of payment
+            """)),
+        # reason code 241 only applies when we are processing a capture or credit through the API,
+        # so we should never see it
+        '241' : _('The request ID is invalid.'),
+        # reason code 242 occurs if there was not a previously successful authorization request or
+        # if the previously successful authorization has already been used by another capture request.
+        # This reason code only applies when we are processing a capture through the API
+        # so we should never see it
+        '242' : _(dedent(
+            """
+            You requested a capture through the API, but there is no corresponding, unused authorization record.
+            """)),
+        # we should never see 243
+        '243' : _('The transaction has already been settled or reversed.'),
+        # reason code 246 applies only if we are processing a void through the API. so we should never see it
+        '246' : _(dedent(
+            """
+            The capture or credit is not voidable because the capture or credit information has already been
+            submitted to your processor. Or, you requested a void for a type of transaction that cannot be voided.
+            """)),
+        # reason code 247 applies only if we are processing a void through the API. so we should never see it
+        '247' : _('You requested a credit for a capture that was previously voided'),
+        '250' : _(dedent(
+            """
+            Error: The request was received, but there was a timeout at the payment processor.
+            Possible fix: retry the payment.
+            """)),
+        '520' : _(dedent(
+            """
+            The authorization request was approved by the issuing bank but declined by CyberSource.'
+            Possible fix: retry with a different form of payment.
+            """)),
     }
 )
