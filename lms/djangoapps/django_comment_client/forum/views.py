@@ -12,7 +12,6 @@ from courseware.courses import get_course_with_access
 from course_groups.cohorts import (is_course_cohorted, get_cohort_id, is_commentable_cohorted,
                                    get_cohorted_commentables, get_course_cohorts, get_cohort_by_id)
 from courseware.access import has_access
-from student.models import CourseEnrollment
 
 from django_comment_client.permissions import cached_has_permission
 from django_comment_client.utils import (merge_dict, extract, strip_none, get_courseware_context)
