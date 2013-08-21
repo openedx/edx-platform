@@ -17,13 +17,6 @@ from mitxmako.shortcuts import render_to_string
 from shoppingcart.models import Order
 from .exceptions import *
 
-shared_secret = settings.CC_PROCESSOR['CyberSource'].get('SHARED_SECRET','')
-merchant_id = settings.CC_PROCESSOR['CyberSource'].get('MERCHANT_ID','')
-serial_number = settings.CC_PROCESSOR['CyberSource'].get('SERIAL_NUMBER','')
-orderPage_version = settings.CC_PROCESSOR['CyberSource'].get('ORDERPAGE_VERSION','7')
-purchase_endpoint = settings.CC_PROCESSOR['CyberSource'].get('PURCHASE_ENDPOINT','')
-payment_support_email = settings.PAYMENT_SUPPORT_EMAIL
-
 def process_postpay_callback(params):
     """
     The top level call to this module, basically
@@ -59,6 +52,7 @@ def hash(value):
     """
     Performs the base64(HMAC_SHA1(key, value)) used by CyberSource Hosted Order Page
     """
+    shared_secret = settings.CC_PROCESSOR['CyberSource'].get('SHARED_SECRET','')
     hash_obj = hmac.new(shared_secret, value, sha1)
     return binascii.b2a_base64(hash_obj.digest())[:-1] # last character is a '\n', which we don't want
 
@@ -68,6 +62,10 @@ def sign(params):
     params needs to be an ordered dict, b/c cybersource documentation states that order is important.
     Reverse engineered from PHP version provided by cybersource
     """
+    merchant_id = settings.CC_PROCESSOR['CyberSource'].get('MERCHANT_ID','')
+    orderPage_version = settings.CC_PROCESSOR['CyberSource'].get('ORDERPAGE_VERSION','7')
+    serial_number = settings.CC_PROCESSOR['CyberSource'].get('SERIAL_NUMBER','')
+
     params['merchantID'] = merchant_id
     params['orderPage_timestamp'] = int(time.time()*1000)
     params['orderPage_version'] = orderPage_version
@@ -82,7 +80,7 @@ def sign(params):
     return params
 
 
-def verify_signatures(params):
+def verify_signatures(params, signed_fields_key='signedFields', full_sig_key='signedDataPublicSignature'):
     """
     Verify the signatures accompanying the POST back from Cybersource Hosted Order Page
 
@@ -90,11 +88,11 @@ def verify_signatures(params):
 
     raises CCProcessorSignatureException if not verified
     """
-    signed_fields = params.get('signedFields', '').split(',')
+    signed_fields = params.get(signed_fields_key, '').split(',')
     data = ",".join(["{0}={1}".format(k, params.get(k, '')) for k in signed_fields])
-    signed_fields_sig = hash(params.get('signedFields', ''))
+    signed_fields_sig = hash(params.get(signed_fields_key, ''))
     data += ",signedFieldsPublicSignature=" + signed_fields_sig
-    returned_sig = params.get('signedDataPublicSignature','')
+    returned_sig = params.get(full_sig_key, '')
     if hash(data) != returned_sig:
         raise CCProcessorSignatureException()
 
@@ -103,11 +101,12 @@ def render_purchase_form_html(cart, user):
     """
     Renders the HTML of the hidden POST form that must be used to initiate a purchase with CyberSource
     """
+    purchase_endpoint = settings.CC_PROCESSOR['CyberSource'].get('PURCHASE_ENDPOINT','')
+
     total_cost = cart.total_cost
     amount = "{0:0.2f}".format(total_cost)
     cart_items = cart.orderitem_set.all()
     params = OrderedDict()
-    params['comment'] = 'Stanford OpenEdX Purchase'
     params['amount'] = amount
     params['currency'] = cart.currency
     params['orderPage_transactionType'] = 'sale'
@@ -217,6 +216,8 @@ def record_purchase(params, order):
 
 def get_processor_decline_html(params):
     """Have to parse through the error codes to return a helpful message"""
+    payment_support_email = settings.PAYMENT_SUPPORT_EMAIL
+
     msg = _(dedent(
     """
     <p class="error_msg">
@@ -238,6 +239,7 @@ def get_processor_decline_html(params):
 def get_processor_exception_html(params, exception):
     """Return error HTML associated with exception"""
 
+    payment_support_email = settings.PAYMENT_SUPPORT_EMAIL
     if isinstance(exception, CCProcessorDataException):
         msg = _(dedent(
         """
@@ -359,7 +361,7 @@ REASONCODE_MAP.update(
         '234' : _(dedent(
             """
             There is a problem with our CyberSource merchant configuration.  Please let us know at {0}
-            """.format(payment_support_email))),
+            """.format(settings.PAYMENT_SUPPORT_EMAIL))),
         # reason code 235 only applies if we are processing a capture through the API. so we should never see it
         '235' : _('The requested amount exceeds the originally authorized amount.'),
         '236' : _('Processor Failure.  Possible fix: retry the payment'),
