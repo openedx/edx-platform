@@ -131,8 +131,10 @@ class PaidCourseRegistrationTest(ModuleStoreTestCase):
 
     def test_purchased_callback(self):
         reg1 = PaidCourseRegistration.add_to_order(self.cart, self.course_id)
-        reg1.purchased_callback()
+        self.cart.purchase()
         self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course_id))
+        reg1 = PaidCourseRegistration.objects.get(id=reg1.id) # reload from DB to get side-effect
+        self.assertEqual(reg1.status, "purchased")
 
     def test_purchased_callback_exception(self):
         reg1 = PaidCourseRegistration.add_to_order(self.cart, self.course_id)
