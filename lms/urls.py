@@ -65,7 +65,10 @@ urlpatterns = ('',  # nopep8
 )
 
 if settings.MITX_FEATURES.get("MULTIPLE_ENROLLMENT_ROLES"):
-    urlpatterns += (url(r'^verify_student/', include('verify_student.urls')),)
+    urlpatterns += (
+        url(r'^verify_student/', include('verify_student.urls')),
+        url(r'^course_modes/', include('course_modes.urls')),
+    )
 
 
 js_info_dict = {

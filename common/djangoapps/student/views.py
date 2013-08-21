@@ -27,18 +27,19 @@ from django_future.csrf import ensure_csrf_cookie
 from django.utils.http import cookie_date
 from django.utils.http import base36_to_int
 from django.utils.translation import ugettext as _
+from django.views.decorators.http import require_POST
 
 from ratelimitbackend.exceptions import RateLimitException
 
 from mitxmako.shortcuts import render_to_response, render_to_string
 from bs4 import BeautifulSoup
 
+from course_modes.models import CourseMode
 from student.models import (Registration, UserProfile, TestCenterUser, TestCenterUserForm,
                             TestCenterRegistration, TestCenterRegistrationForm,
                             PendingNameChange, PendingEmailChange,
                             CourseEnrollment, unique_id_for_user,
                             get_testcenter_registration, CourseEnrollmentAllowed)
-
 from student.forms import PasswordResetFormNoActive
 
 from certificates.models import CertificateStatuses, certificate_status_for_student
@@ -328,7 +329,8 @@ def try_change_enrollment(request):
         except Exception, e:
             log.exception("Exception automatically enrolling after login: {0}".format(str(e)))
 
-
+@login_required
+@require_POST
 def change_enrollment(request):
     """
     Modify the enrollment status for the logged-in user.
@@ -346,12 +348,7 @@ def change_enrollment(request):
     as a post-login/registration helper, so the error messages in the responses
     should never actually be user-visible.
     """
-    if request.method != "POST":
-        return HttpResponseNotAllowed(["POST"])
-
     user = request.user
-    if not user.is_authenticated():
-        return HttpResponseForbidden()
 
     action = request.POST.get("enrollment_action")
     course_id = request.POST.get("course_id")
@@ -370,6 +367,12 @@ def change_enrollment(request):
 
         if not has_access(user, course, 'enroll'):
             return HttpResponseBadRequest(_("Enrollment is closed"))
+
+        # If this course is available in multiple modes, redirect them to a page
+        # where they can choose which mode they want.
+        available_modes = CourseMode.modes_for_course(course_id)
+        if len(available_modes) > 1:
+            return HttpResponse(reverse("course_modes.views.choose"))
 
         org, course_num, run = course_id.split("/")
         statsd.increment("common.student.enrollment",

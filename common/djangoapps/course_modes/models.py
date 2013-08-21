@@ -51,3 +51,8 @@ class CourseMode(models.Model):
         if not modes:
             modes = [cls.DEFAULT_MODE]
         return modes
+
+    def __unicode__(self):
+        return u"{} : {}, min={}, prices={}".format(
+            self.course_id, self.mode_slug, self.min_price, self.suggested_prices
+        )

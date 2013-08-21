@@ -4,7 +4,7 @@ from nose.tools import assert_equals
 
 from verify_student.ssencrypt import (
     aes_decrypt, aes_encrypt, encrypt_and_encode, decode_and_decrypt,
-    rsa_decrypt, rsa_encrypt
+    rsa_decrypt, rsa_encrypt, random_aes_key
 )
 
 def test_aes():
@@ -76,8 +76,3 @@ l8N6+LEIVTMAytPk+/bImHvGHKZkCz5rEMSuYJWOmqKI92rUtI6fz5DUb3XSbrwT
     # Even though our AES key is only 32 bytes, RSA encryption will make it 256
     # bytes, and base64 encoding will blow that up to 344
     assert_equals(len(base64.urlsafe_b64encode(encrypted_aes_key)), 344)
-
-    # Software Secure would decrypt our photo_id image by doing:
-    #rsa_encrypted_aes_key = base64.urlsafe_b64decode(encoded_photo_id_key)
-    #photo_id_aes_key = rsa_decrypt(rsa_encrypted_aes_key, priv_key_str)
-

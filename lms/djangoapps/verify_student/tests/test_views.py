@@ -31,7 +31,8 @@ class StartView(TestCase):
         user = UserFactory.create(username="rusty", password="test")
         self.client.login(username="rusty", password="test")
 
+
+
     def must_be_logged_in(self):
         self.assertHttpForbidden(self.client.get(self.start_url()))
 
-    

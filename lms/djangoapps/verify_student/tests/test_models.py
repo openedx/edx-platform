@@ -7,7 +7,7 @@ from student.tests.factories import UserFactory
 from verify_student.models import SoftwareSecurePhotoVerification, VerificationException
 
 
-class TestPhotoVerification(object):
+class TestPhotoVerification(TestCase):
 
     def test_state_transitions(self):
         """Make sure we can't make unexpected status transitions.
