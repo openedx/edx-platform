@@ -17,6 +17,7 @@ from student.models import CourseEnrollmentAllowed
 from external_auth.models import ExternalAuthMap
 from courseware.masquerade import is_masquerading_as_student
 from django.utils.timezone import UTC
+from student.models import CourseEnrollment
 
 DEBUG_ACCESS = False
 
@@ -133,7 +134,7 @@ def _has_access_course_desc(user, course, action):
         """
         Can this user access the forums in this course?
         """
-        return (CourseEnrollment.is_enrolled(request.user, course_id) or \
+        return (CourseEnrollment.is_enrolled(user, course.id) or \
             _has_staff_access_to_descriptor(user, course))
 
     def can_enroll():
