@@ -11,7 +11,14 @@ function () {
         state.videoCaption = {};
 
         _makeFunctionsPublic(state);
-        state.videoCaption.renderElements();
+
+        // Depending on whether captions file could be loaded, the following
+        // function invocation can succeed or fail. If it fails, we do not
+        // go on with binding handlers to events.
+        if (!state.videoCaption.renderElements()) {
+            return;
+        }
+
         state.videoCaption.bindHandlers();
     };
 
@@ -71,7 +78,16 @@ function () {
         this.el.find('.video-wrapper').after(this.videoCaption.subtitlesEl);
         this.el.find('.video-controls .secondary-controls').append(this.videoCaption.hideSubtitlesEl);
 
-        this.videoCaption.fetchCaption();
+        // Fetch the captions file. If no file was specified, then we hide
+        // the "CC" button, and exit from this module. No further caption
+        // initialization will happen.
+        if (!this.videoCaption.fetchCaption()) {
+            this.videoCaption.hideSubtitlesEl.hide();
+
+            // Abandon all further operations with captions panel.
+            return false;
+        }
+
         this.videoCaption.setSubtitlesHeight();
 
         if (this.videoType === 'html5') {
@@ -80,6 +96,8 @@ function () {
             this.videoCaption.subtitlesEl.addClass('html5');
             this.captionHideTimeout = setTimeout(this.videoCaption.autoHideCaptions, this.videoCaption.fadeOutTimeout);
         }
+
+        return true;
     }
 
     // function bindHandlers()
@@ -123,8 +141,12 @@ function () {
 
         this.videoCaption.hideCaptions(this.hide_captions);
 
+        // Check whether the captions file was specified. This is the point
+        // where we either stop with the caption panel (so that a white empty
+        // panel to the right of the video will not be shown), or carry on
+        // further.
         if (!this.youtubeId('1.0')) {
-            return;
+            return false;
         }
 
         $.ajaxWithPrefix({
@@ -137,13 +159,18 @@ function () {
 
                 if (onTouchBasedDevice()) {
                     _this.videoCaption.subtitlesEl.find('li').html(
-                        gettext('Caption will be displayed when you start playing the video.')
+                        gettext(
+                            'Caption will be displayed when ' +
+                            'you start playing the video.'
+                        )
                     );
                 } else {
                     _this.videoCaption.renderCaption();
                 }
             }
         });
+
+        return true;
     }
 
     function captionURL() {
