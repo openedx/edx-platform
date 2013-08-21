@@ -45,7 +45,7 @@ def process_postpay_callback(params):
     except CCProcessorException as e:
         return {'success': False,
                 'order': None, #due to exception we may not have the order
-                'error_html': get_processor_exception_html(params, e)}
+                'error_html': get_processor_exception_html(e)}
 
 
 def hash(value):
@@ -57,7 +57,7 @@ def hash(value):
     return binascii.b2a_base64(hash_obj.digest())[:-1] # last character is a '\n', which we don't want
 
 
-def sign(params):
+def sign(params, signed_fields_key='orderPage_signedFields', full_sig_key='orderPage_signaturePublic'):
     """
     params needs to be an ordered dict, b/c cybersource documentation states that order is important.
     Reverse engineered from PHP version provided by cybersource
@@ -74,8 +74,8 @@ def sign(params):
     values = ",".join(["{0}={1}".format(i,params[i]) for i in params.keys()])
     fields_sig = hash(fields)
     values += ",signedFieldsPublicSignature=" + fields_sig
-    params['orderPage_signaturePublic'] = hash(values)
-    params['orderPage_signedFields'] = fields
+    params[full_sig_key] = hash(values)
+    params[signed_fields_key] = fields
 
     return params
 
@@ -97,7 +97,7 @@ def verify_signatures(params, signed_fields_key='signedFields', full_sig_key='si
         raise CCProcessorSignatureException()
 
 
-def render_purchase_form_html(cart, user):
+def render_purchase_form_html(cart):
     """
     Renders the HTML of the hidden POST form that must be used to initiate a purchase with CyberSource
     """
@@ -111,14 +111,6 @@ def render_purchase_form_html(cart, user):
     params['currency'] = cart.currency
     params['orderPage_transactionType'] = 'sale'
     params['orderNumber'] = "{0:d}".format(cart.id)
-    idx=1
-    for item in cart_items:
-        prefix = "item_{0:d}_".format(idx)
-        params[prefix+'productSKU'] = "{0:d}".format(item.id)
-        params[prefix+'quantity'] = item.qty
-        params[prefix+'productName'] = item.line_desc
-        params[prefix+'unitPrice'] = item.unit_cost
-        params[prefix+'taxAmount'] = "0.00"
     signed_param_dict = sign(params)
 
     return render_to_string('shoppingcart/cybersource_form.html', {
@@ -179,14 +171,14 @@ def payment_accepted(params):
         else:
             raise CCProcessorWrongAmountException(
                 _("The amount charged by the processor {0} {1} is different than the total cost of the order {2} {3}."\
-                    .format(valid_params['ccAuthReply_amount'], valid_params['orderCurrency'],
+                    .format(charged_amt, valid_params['orderCurrency'],
                             order.total_cost, order.currency))
             )
     else:
         return {'accepted': False,
                 'amt_charged': 0,
                 'currency': 'usd',
-                'order': None}
+                'order': order}
 
 
 def record_purchase(params, order):
@@ -236,7 +228,7 @@ def get_processor_decline_html(params):
         email=payment_support_email)
 
 
-def get_processor_exception_html(params, exception):
+def get_processor_exception_html(exception):
     """Return error HTML associated with exception"""
 
     payment_support_email = settings.PAYMENT_SUPPORT_EMAIL
@@ -267,10 +259,11 @@ def get_processor_exception_html(params, exception):
         <p class="error_msg">
         Sorry! Our payment processor sent us back a corrupted message regarding your charge, so we are
         unable to validate that the message actually came from the payment processor.
+        The specific error message is: <span class="exception_msg">{msg}</span>.
         We apologize that we cannot verify whether the charge went through and take further action on your order.
         Your credit card may possibly have been charged.  Contact us with payment-specific questions at {email}.
         </p>
-        """.format(email=payment_support_email)))
+        """.format(msg=exception.message, email=payment_support_email)))
         return msg
 
     # fallthrough case, which basically never happens

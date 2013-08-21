@@ -47,7 +47,7 @@ def show_cart(request):
     total_cost = cart.total_cost
     amount = "{0:0.2f}".format(total_cost)
     cart_items = cart.orderitem_set.all()
-    form_html = render_purchase_form_html(cart, request.user)
+    form_html = render_purchase_form_html(cart)
     return render_to_response("shoppingcart/list.html",
                               {'shoppingcart_items': cart_items,
                                'amount': amount,
