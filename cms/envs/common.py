@@ -355,7 +355,10 @@ INSTALLED_APPS = (
     'django_comment_common',
 
     # for course creator table
-    'django.contrib.admin'
+    'django.contrib.admin',
+
+    # for managing course modes
+    'course_modes'
 )
 
 ################# EDX MARKETING SITE ##################################
