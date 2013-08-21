@@ -86,8 +86,8 @@ def postpay_callback(request):
     if result['success']:
         return HttpResponseRedirect(reverse('shoppingcart.views.show_receipt', args=[result['order'].id]))
     else:
-        return render_to_response('shoppingcart.processor_error.html', {'order':result['order'],
-                                                                        'error_html': result['error_html']})
+        return render_to_response('shoppingcart/error.html', {'order':result['order'],
+                                                              'error_html': result['error_html']})
 
 @login_required
 def show_receipt(request, ordernum):
