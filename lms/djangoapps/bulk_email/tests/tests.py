@@ -11,7 +11,6 @@ from student.tests.factories import AdminFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore import XML_MODULESTORE_TYPE
-from xmodule.modulestore.django import modulestore
 
 from mock import patch
 
@@ -58,7 +57,7 @@ class TestInstructorDashboardEmailView(ModuleStoreTestCase):
         self.assertFalse(self.email_link in response.content)
 
     @patch.dict(settings.MITX_FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True})
-    def test_email_flag_true_XML_store(self):
+    def test_email_flag_true_xml_store(self):
         # If the enable email setting is enabled, but this is an XML backed course,
         # the email view shouldn't be available on the instructor dashboard.
 
@@ -67,8 +66,8 @@ class TestInstructorDashboardEmailView(ModuleStoreTestCase):
         # This is OK; we're simply testing that the `is_mongo_modulestore_type` flag
         # in `instructor/views/legacy.py` is doing the correct thing.
 
-        with patch('xmodule.modulestore.mongo.base.MongoModuleStore.get_modulestore_type') as MockClass:
-            MockClass.return_value = XML_MODULESTORE_TYPE
+        with patch('xmodule.modulestore.mongo.base.MongoModuleStore.get_modulestore_type') as mock_modulestore:
+            mock_modulestore.return_value = XML_MODULESTORE_TYPE
 
             # Assert that the URL for the email view is not in the response
             response = self.client.get(self.url)
