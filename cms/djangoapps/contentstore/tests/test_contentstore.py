@@ -1475,12 +1475,14 @@ class ContentStoreTest(ModuleStoreTestCase):
             'run': target_location.name
         }
 
+        target_course_id = '{0}/{1}/{2}'.format(target_location.org, target_location.course, target_location.name)
+
         resp = self.client.post(reverse('create_new_course'), course_data)
         self.assertEqual(resp.status_code, 200)
         data = parse_json(resp)
         self.assertEqual(data['id'], target_location.url())
 
-        import_from_xml(module_store, 'common/test/data/', ['simple'], target_location_namespace=target_location)
+        import_from_xml(module_store, 'common/test/data/', ['toy'], target_location_namespace=target_location)
 
         modules = module_store.get_items(Location([
             target_location.tag, target_location.org, target_location.course, None, None, None]))
@@ -1488,6 +1490,21 @@ class ContentStoreTest(ModuleStoreTestCase):
         # we should have a number of modules in there
         # we can't specify an exact number since it'll always be changing
         self.assertGreater(len(modules), 10)
+
+        #
+        # test various re-namespacing elements
+        #
+
+        # first check PDF textbooks, to make sure the url paths got updated
+        course_module = module_store.get_instance(target_course_id, target_location)
+
+        self.assertEquals(len(course_module.pdf_textbooks), 1)
+        self.assertEquals(len(course_module.pdf_textbooks[0]["chapters"]), 2)
+        self.assertEquals(course_module.pdf_textbooks[0]["chapters"][0]["url"], '/c4x/MITx/999/asset/Chapter1.pdf')
+        self.assertEquals(course_module.pdf_textbooks[0]["chapters"][1]["url"], '/c4x/MITx/999/asset/Chapter2.pdf')
+
+        # check that URL slug got updated to new course slug
+        self.assertEquals(course_module.wiki_slug, '999')
 
     def test_import_metadata_with_attempts_empty_string(self):
         module_store = modulestore('direct')

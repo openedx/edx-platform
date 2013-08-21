@@ -329,8 +329,28 @@ def remap_namespace(module, target_location_namespace):
         module.location = module.location._replace(tag=target_location_namespace.tag, org=target_location_namespace.org,
                                                    course=target_location_namespace.course)
     else:
+        original_location = module.location
+        #
+        # module is a course module
+        #
         module.location = module.location._replace(tag=target_location_namespace.tag, org=target_location_namespace.org,
                                                    course=target_location_namespace.course, name=target_location_namespace.name)
+        #
+        # There is more re-namespacing work we have to do when importing course modules
+        #
+
+        # remap pdf_textbook urls
+        for entry in module.pdf_textbooks:
+            for chapter in entry.get('chapters', []):
+                if StaticContent.is_c4x_path(chapter.get('url', '')):
+                    chapter['url'] = StaticContent.renamespace_c4x_path(chapter['url'], target_location_namespace)
+
+        # if there is a wiki_slug which is the same as the original location (aka default value),
+        # then remap that so the wiki doesn't point to the old Wiki.
+        if module.wiki_slug == original_location.course:
+            module.wiki_slug = target_location_namespace.course
+
+        module.save()
 
     # then remap children pointers since they too will be re-namespaced
     if hasattr(module, 'children'):
