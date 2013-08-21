@@ -279,9 +279,37 @@ def import_course_draft(xml_module_store, store, draft_store, course_data_path, 
     for dirname, dirnames, filenames in os.walk(draft_dir + "/vertical"):
         for filename in filenames:
             module_path = os.path.join(dirname, filename)
-            with open(module_path) as f:
+            with open(module_path, 'r') as f:
                 try:
-                    xml = f.read().decode('utf-8')
+                    # note, on local dev it seems like OSX will put some extra files in
+                    # the directory with "quarantine" information. These files are
+                    # binary files and will throw exceptions when we try to parse
+                    # the file as an XML string. Let's make sure we're
+                    # dealing with a string before ingesting
+                    data = f.read()
+
+                    try:
+                        xml = data.decode('utf-8')
+                    except UnicodeDecodeError, err:
+                        # seems like on OSX localdev, the OS is making quarantine files
+                        # in the unzip directory when importing courses
+                        # so if we blindly try to enumerate through the directory, we'll try
+                        # to process a bunch of binary quarantine files (which are prefixed with a '._' character
+                        # which will dump a bunch of exceptions to the output, although they are harmless.
+                        #
+                        # Reading online docs there doesn't seem to be a good means to detect a 'hidden'
+                        # file that works well across all OS environments. So for now, I'm using
+                        # OSX's utilization of a leading '.' in the filename to indicate a system hidden
+                        # file.
+                        #
+                        # Better yet would be a way to figure out if this is a binary file, but I
+                        # haven't found a good way to do this yet.
+                        #
+                        if filename.startswith('._'):
+                            continue
+                        # Not a 'hidden file', then re-raise exception
+                        raise err
+
                     descriptor = system.process_xml(xml)
 
                     def _import_module(module):

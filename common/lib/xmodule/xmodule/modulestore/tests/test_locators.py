@@ -252,12 +252,18 @@ class LocatorTest(TestCase):
 
     def check_course_locn_fields(self, testobj, msg, version_guid=None,
                                  course_id=None, branch=None):
+        """
+        Checks the version, course_id, and branch in testobj
+        """
         self.assertEqual(testobj.version_guid, version_guid, msg)
         self.assertEqual(testobj.course_id, course_id, msg)
         self.assertEqual(testobj.branch, branch, msg)
 
     def check_block_locn_fields(self, testobj, msg, version_guid=None,
                                 course_id=None, branch=None, block=None):
+        """
+        Does adds a block id check over and above the check_course_locn_fields tests
+        """
         self.check_course_locn_fields(testobj, msg, version_guid, course_id,
                                       branch)
         self.assertEqual(testobj.usage_id, block)

@@ -87,6 +87,9 @@ MITX_FEATURES['AUTOMATIC_AUTH_FOR_TESTING'] = True
 # We do not yet understand why this occurs. Setting this to true is a stopgap measure
 USE_I18N = True
 
+MITX_FEATURES['ENABLE_FEEDBACK_SUBMISSION'] = True
+FEEDBACK_SUBMISSION_EMAIL = 'dummy@example.com'
+
 # Include the lettuce app for acceptance testing, including the 'harvest' django-admin command
 INSTALLED_APPS += ('lettuce.django',)
 LETTUCE_APPS = ('courseware',)
