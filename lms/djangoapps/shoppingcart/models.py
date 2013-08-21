@@ -5,6 +5,7 @@ from django.db import models
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
+from django.db import transaction
 from model_utils.managers import InheritanceManager
 from courseware.courses import get_course_about_section
 
@@ -113,8 +114,8 @@ class Order(models.Model):
         orderitems = OrderItem.objects.filter(order=self).select_subclasses()
         for item in orderitems:
             item.status = 'purchased'
-            item.purchased_callback()
             item.save()
+            item.purchased_callback()
 
 
 class OrderItem(models.Model):
@@ -138,23 +139,23 @@ class OrderItem(models.Model):
 
     @property
     def line_cost(self):
+        """ Return the total cost of this OrderItem """
         return self.qty * self.unit_cost
 
     @classmethod
-    def add_to_order(cls, *args, **kwargs):
+    def add_to_order(cls, order, *args, **kwargs):
         """
         A suggested convenience function for subclasses.
 
-        NOTE: This does not add anything items to the cart. That is left up to the subclasses
+        NOTE: This does not add anything to the cart. That is left up to the
+        subclasses to implement for themselves
         """
         # this is a validation step to verify that the currency of the item we
         # are adding is the same as the currency of the order we are adding it
         # to
-        if isinstance(args[0], Order):
-            currency = kwargs['currency'] if 'currency' in kwargs else 'usd'
-            order = args[0]
-            if order.currency != currency and order.orderitem_set.count() > 0:
-                raise InvalidCartItem(_("Trying to add a different currency into the cart"))
+        currency = kwargs.get('currency', 'usd')
+        if order.currency != currency and order.orderitem_set.exists():
+            raise InvalidCartItem(_("Trying to add a different currency into the cart"))
 
     def purchased_callback(self):
         """
@@ -180,6 +181,7 @@ class PaidCourseRegistration(OrderItem):
                              for item in order.orderitem_set.all().select_subclasses("paidcourseregistration")]
 
     @classmethod
+    @transaction.commit_on_success
     def add_to_order(cls, order, course_id, mode_slug=CourseMode.DEFAULT_MODE_SLUG, cost=None, currency=None):
         """
         A standardized way to create these objects, with sensible defaults filled in.
@@ -254,6 +256,7 @@ class CertificateItem(OrderItem):
     mode = models.SlugField()
 
     @classmethod
+    @transaction.commit_on_success
     def add_to_order(cls, order, course_id, cost, mode, currency='usd'):
         """
         Add a CertificateItem to an order

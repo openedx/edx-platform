@@ -59,7 +59,6 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('shoppingcart', ['CertificateItem'])
 
-
     def backwards(self, orm):
         # Deleting model 'Order'
         db.delete_table('shoppingcart_order')
@@ -72,7 +71,6 @@ class Migration(SchemaMigration):
 
         # Deleting model 'CertificateItem'
         db.delete_table('shoppingcart_certificateitem')
-
 
     models = {
         'auth.group': {
