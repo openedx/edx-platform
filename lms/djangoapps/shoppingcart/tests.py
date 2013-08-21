@@ -4,9 +4,15 @@ Tests for the Shopping Cart
 
 from factory import DjangoModelFactory
 from django.test import TestCase
-from shoppingcart.models import Order, CertificateItem, InvalidCartItem
+from django.test.utils import override_settings
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
+from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
+from shoppingcart.models import Order, OrderItem, CertificateItem, InvalidCartItem, PaidCourseRegistration
 from student.tests.factories import UserFactory
 from student.models import CourseEnrollment
+from course_modes.models import CourseMode
+from .exceptions import PurchasedCallbackException
 
 
 class OrderTest(TestCase):
@@ -67,6 +73,80 @@ class OrderTest(TestCase):
         self.assertFalse(CourseEnrollment.is_enrolled(self.user, self.course_id))
         cart.purchase()
         self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course_id))
+
+
+class OrderItemTest(TestCase):
+    def setUp(self):
+        self.user = UserFactory.create()
+
+    def test_orderItem_purchased_callback(self):
+        """
+        This tests that calling purchased_callback on the base OrderItem class raises NotImplementedError
+        """
+        item = OrderItem(user=self.user, order=Order.get_cart_for_user(self.user))
+        with self.assertRaises(NotImplementedError):
+            item.purchased_callback()
+
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+class PaidCourseRegistrationTest(ModuleStoreTestCase):
+    def setUp(self):
+        self.user = UserFactory.create()
+        self.course_id = "MITx/999/Robot_Super_Course"
+        self.cost = 40
+        self.course = CourseFactory.create(org='MITx', number='999', display_name='Robot Super Course')
+        self.course_mode = CourseMode(course_id=self.course_id,
+                                      mode_slug="honor",
+                                      mode_display_name="honor cert",
+                                      min_price=self.cost)
+        self.course_mode.save()
+        self.cart = Order.get_cart_for_user(self.user)
+
+    def test_add_to_order(self):
+        reg1 = PaidCourseRegistration.add_to_order(self.cart, self.course_id)
+
+        self.assertEqual(reg1.unit_cost, self.cost)
+        self.assertEqual(reg1.line_cost, self.cost)
+        self.assertEqual(reg1.unit_cost, self.course_mode.min_price)
+        self.assertEqual(reg1.mode, "honor")
+        self.assertEqual(reg1.user, self.user)
+        self.assertEqual(reg1.status, "cart")
+        self.assertTrue(PaidCourseRegistration.part_of_order(self.cart, self.course_id))
+        self.assertFalse(PaidCourseRegistration.part_of_order(self.cart, self.course_id+"abcd"))
+        self.assertEqual(self.cart.total_cost, self.cost)
+
+    def test_add_with_default_mode(self):
+        """
+        Tests add_to_cart where the mode specified in the argument is NOT in the database
+        and NOT the default "honor".  In this case it just adds the user in the CourseMode.DEFAULT_MODE, 0 price
+        """
+        reg1 = PaidCourseRegistration.add_to_order(self.cart, self.course_id, mode_slug="DNE")
+
+        self.assertEqual(reg1.unit_cost, 0)
+        self.assertEqual(reg1.line_cost, 0)
+        self.assertEqual(reg1.mode, "honor")
+        self.assertEqual(reg1.user, self.user)
+        self.assertEqual(reg1.status, "cart")
+        self.assertEqual(self.cart.total_cost, 0)
+        self.assertTrue(PaidCourseRegistration.part_of_order(self.cart, self.course_id))
+
+    def test_purchased_callback(self):
+        reg1 = PaidCourseRegistration.add_to_order(self.cart, self.course_id)
+        reg1.purchased_callback()
+        self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course_id))
+
+    def test_purchased_callback_exception(self):
+        reg1 = PaidCourseRegistration.add_to_order(self.cart, self.course_id)
+        reg1.course_id = "changedforsomereason"
+        reg1.save()
+        with self.assertRaises(PurchasedCallbackException):
+            reg1.purchased_callback()
+        self.assertFalse(CourseEnrollment.is_enrolled(self.user, self.course_id))
+
+        reg1.course_id = "abc/efg/hij"
+        reg1.save()
+        with self.assertRaises(PurchasedCallbackException):
+            reg1.purchased_callback()
+        self.assertFalse(CourseEnrollment.is_enrolled(self.user, self.course_id))
 
 
 class CertificateItemTest(TestCase):
