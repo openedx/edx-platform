@@ -51,12 +51,11 @@ def register_for_verified_cert(request, course_id):
 def show_cart(request):
     cart = Order.get_cart_for_user(request.user)
     total_cost = cart.total_cost
-    amount = "{0:0.2f}".format(total_cost)
     cart_items = cart.orderitem_set.all()
     form_html = render_purchase_form_html(cart)
     return render_to_response("shoppingcart/list.html",
                               {'shoppingcart_items': cart_items,
-                               'amount': amount,
+                               'amount': total_cost,
                                'form_html': form_html,
                                })
 
