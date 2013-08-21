@@ -17,6 +17,7 @@ from student.models import CourseEnrollmentAllowed
 from external_auth.models import ExternalAuthMap
 from courseware.masquerade import is_masquerading_as_student
 from django.utils.timezone import UTC
+from student.models import CourseEnrollment
 
 DEBUG_ACCESS = False
 
@@ -114,6 +115,7 @@ def _has_access_course_desc(user, course, action):
     Valid actions:
 
     'load' -- load the courseware, see inside the course
+    'load_forum' -- can load and contribute to the forums (one access level for now)
     'enroll' -- enroll.  Checks for enrollment window,
                   ACCESS_REQUIRE_STAFF_FOR_COURSE,
     'see_exists' -- can see that the course exists.
@@ -127,6 +129,15 @@ def _has_access_course_desc(user, course, action):
         """
         # delegate to generic descriptor check to check start dates
         return _has_access_descriptor(user, course, 'load')
+
+    def can_load_forum():
+        """
+        Can this user access the forums in this course?
+        """
+        return (can_load() and \
+            (CourseEnrollment.is_enrolled(user, course.id) or \
+                _has_staff_access_to_descriptor(user, course)
+            ))
 
     def can_enroll():
         """
@@ -193,6 +204,7 @@ def _has_access_course_desc(user, course, action):
 
     checkers = {
         'load': can_load,
+        'load_forum': can_load_forum,
         'enroll': can_enroll,
         'see_exists': see_exists,
         'staff': lambda: _has_staff_access_to_descriptor(user, course),
