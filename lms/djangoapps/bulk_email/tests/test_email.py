@@ -146,10 +146,11 @@ class TestEmailSendFromDashboard(ModuleStoreTestCase):
         # Now we know we have pulled up the instructor dash's email view
         # (in the setUp method), we can test sending an email.
 
+        uni_subject = u'téśt śúbjéćt főŕ áĺĺ'
         test_email = {
             'action': 'Send email',
             'to_option': 'all',
-            'subject': u'téśt śúbjéćt főŕ áĺĺ',
+            'subject': uni_subject,
             'message': 'test message for all'
         }
         response = self.client.post(self.url, test_email)
@@ -163,7 +164,7 @@ class TestEmailSendFromDashboard(ModuleStoreTestCase):
         )
         self.assertEquals(
             mail.outbox[0].subject,
-            '[' + self.course.display_name + ']' + u' téśt śúbjéćt főŕ áĺĺ'
+            '[' + self.course.display_name + '] ' + uni_subject
         )
 
     def test_unicode_message_send_to_all(self):
@@ -173,11 +174,12 @@ class TestEmailSendFromDashboard(ModuleStoreTestCase):
         # Now we know we have pulled up the instructor dash's email view
         # (in the setUp method), we can test sending an email.
 
+        uni_message = u'ẗëṡẗ ṁëṡṡäġë ḟöṛ äḷḷ ｲ乇丂ｲ ﾶ乇丂丂ﾑg乇 ｷo尺 ﾑﾚﾚ тэѕт мэѕѕаБэ fоѓ аll'
         test_email = {
             'action': 'Send email',
             'to_option': 'all',
             'subject': 'test subject for all',
-            'message': u'ẗëṡẗ ṁëṡṡäġë ḟöṛ äḷḷ ｲ乇丂ｲ ﾶ乇丂丂ﾑg乇 ｷo尺 ﾑﾚﾚ тэѕт мэѕѕаБэ fоѓ аll'
+            'message': uni_message
         }
         response = self.client.post(self.url, test_email)
 
@@ -190,7 +192,7 @@ class TestEmailSendFromDashboard(ModuleStoreTestCase):
         )
 
         self.assertIn(
-            u'ẗëṡẗ ṁëṡṡäġë ḟöṛ äḷḷ ｲ乇丂ｲ ﾶ乇丂丂ﾑg乇 ｷo尺 ﾑﾚﾚ тэѕт мэѕѕаБэ fоѓ аll',
+            uni_message,
             mail.outbox[0].body
         )
 
@@ -238,4 +240,4 @@ class TestEmailSendExceptions(ModuleStoreTestCase):
     def test_no_course_email_obj(self):
         # Make sure course_email handles CourseEmail.DoesNotExist exception.
         with self.assertRaises(CourseEmail.DoesNotExist):
-            course_email("dummy hash", [], "_", "_", False)
+            course_email(101, [], "_", "_", False)

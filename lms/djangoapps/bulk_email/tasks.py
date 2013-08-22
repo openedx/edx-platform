@@ -24,7 +24,7 @@ log = logging.getLogger(__name__)
 
 
 @task(default_retry_delay=10, max_retries=5)  # pylint: disable=E1102
-def delegate_email_batches(hash_for_msg, to_option, course_id, course_url, user_id):
+def delegate_email_batches(email_id, to_option, course_id, course_url, user_id):
     """
     Delegates emails by querying for the list of recipients who should
     get the mail, chopping up into batches of settings.EMAILS_PER_TASK size,
@@ -37,14 +37,14 @@ def delegate_email_batches(hash_for_msg, to_option, course_id, course_url, user_
     try:
         course = get_course_by_id(course_id)
     except Http404 as exc:
-        log.error("get_course_by_id failed: " + exc.args[0])
+        log.error("get_course_by_id failed: %s", exc.args[0])
         raise Exception("get_course_by_id failed: " + exc.args[0])
 
     try:
-        CourseEmail.objects.get(hash=hash_for_msg)
+        CourseEmail.objects.get(id=email_id)
     except CourseEmail.DoesNotExist as exc:
-        log.warning("Failed to get CourseEmail with hash %s, retry %d", hash_for_msg, current_task.request.retries)
-        raise delegate_email_batches.retry(arg=[hash_for_msg, to_option, course_id, course_url, user_id], exc=exc)
+        log.warning("Failed to get CourseEmail with id %s, retry %d", email_id, current_task.request.retries)
+        raise delegate_email_batches.retry(arg=[email_id, to_option, course_id, course_url, user_id], exc=exc)
 
     if to_option == "myself":
         recipient_qset = User.objects.filter(id=user_id).values('profile__name', 'email')
@@ -77,12 +77,12 @@ def delegate_email_batches(hash_for_msg, to_option, course_id, course_url, user_
 
     for i in range(num_workers):
         to_list = recipient_list[i * chunk:i * chunk + chunk]
-        course_email.delay(hash_for_msg, to_list, course.display_name, course_url, False)
+        course_email.delay(email_id, to_list, course.display_name, course_url, False)
     return num_workers
 
 
 @task(default_retry_delay=15, max_retries=5)  # pylint: disable=E1102
-def course_email(hash_for_msg, to_list, course_title, course_url, throttle=False):
+def course_email(email_id, to_list, course_title, course_url, throttle=False):
     """
     Takes a subject and an html formatted email and sends it from
     sender to all addresses in the to_list, with each recipient
@@ -90,7 +90,7 @@ def course_email(hash_for_msg, to_list, course_title, course_url, throttle=False
     text and html.
     """
     try:
-        msg = CourseEmail.objects.get(hash=hash_for_msg)
+        msg = CourseEmail.objects.get(id=email_id)
     except CourseEmail.DoesNotExist as exc:
         log.exception(exc.args[0])
         raise exc
@@ -112,6 +112,7 @@ def course_email(hash_for_msg, to_list, course_title, course_url, throttle=False
             'course_title': course_title,
             'course_url': course_url
         }
+
         while to_list:
             (name, email) = to_list[-1].values()
             email_context['name'] = name
@@ -126,7 +127,6 @@ def course_email(hash_for_msg, to_list, course_title, course_url, throttle=False
                 'emails/email_footer.txt',
                 email_context
             )
-
             email_msg = EmailMultiAlternatives(
                 subject,
                 msg.text_message + plain_footer.encode('utf-8'),
@@ -142,7 +142,7 @@ def course_email(hash_for_msg, to_list, course_title, course_url, throttle=False
 
             try:
                 connection.send_messages([email_msg])
-                log.info('Email with hash ' + hash_for_msg + ' sent to ' + email)
+                log.info('Email with id %s sent to %s', email_id, email)
                 num_sent += 1
             except SMTPDataError as exc:
                 # According to SMTP spec, we'll retry error codes in the 4xx range.  5xx range indicates hard failure
@@ -151,7 +151,7 @@ def course_email(hash_for_msg, to_list, course_title, course_url, throttle=False
                     raise exc
                 else:
                     # This will fall through and not retry the message, since it will be popped
-                    log.warning('Email with hash ' + hash_for_msg + ' not delivered to ' + email + ' due to error: ' + exc.smtp_error)
+                    log.warning('Email with id %s not delivered to %s due to error %s', email_id, email, exc.smtp_error)
                     num_error += 1
 
             to_list.pop()
@@ -163,7 +163,7 @@ def course_email(hash_for_msg, to_list, course_title, course_url, throttle=False
         # Error caught here cause the email to be retried.  The entire task is actually retried without popping the list
         raise course_email.retry(
             arg=[
-                hash_for_msg,
+                email_id,
                 to_list,
                 course_title,
                 course_url,

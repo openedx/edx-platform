@@ -1,5 +1,8 @@
 """Provides a function to convert html to plaintext."""
+import logging
 from subprocess import Popen, PIPE
+
+log = logging.getLogger(__name__)
 
 def html_to_text(html_message):
     """

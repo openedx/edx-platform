@@ -124,7 +124,7 @@ function goto( mode)
           <a href="#" onclick="goto('Enrollment');" class="${modeflag.get('Enrollment')}">${_("Enrollment")}</a> |
           <a href="#" onclick="goto('Data');" class="${modeflag.get('Data')}">${_("DataDump")}</a> |
           <a href="#" onclick="goto('Manage Groups');" class="${modeflag.get('Manage Groups')}">${_("Manage Groups")}</a>
-          %if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_EMAIL') and is_mongo_modulestore_type:
+          %if show_email_tab:
              | <a href="#" onclick="goto('Email')" class="${modeflag.get('Email')}">Email</a>
           %endif
           %if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_ANALYTICS'):

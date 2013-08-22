@@ -57,7 +57,6 @@ from mitxmako.shortcuts import render_to_string
 from bulk_email.models import CourseEmail
 from html_to_text import html_to_text
 import datetime
-from hashlib import md5
 from bulk_email import tasks
 
 log = logging.getLogger(__name__)
@@ -89,6 +88,7 @@ def instructor_dashboard(request, course_id):
     to_option = None
     subject = None
     html_message = ''
+    show_email_tab = False
     problems = []
     plots = []
     datatable = {}
@@ -711,15 +711,16 @@ def instructor_dashboard(request, course_id):
 
         email = CourseEmail(course_id=course_id,
                             sender=request.user,
-                            to=to_option,
+                            to_option=to_option,
                             subject=subject,
                             html_message=html_message,
-                            text_message=text_message,
-                            hash=md5((html_message + subject + datetime.datetime.isoformat(datetime.datetime.now())).encode('utf-8')).hexdigest())
+                            text_message=text_message)
+
         email.save()
 
         course_url = request.build_absolute_uri(reverse('course_root', kwargs={'course_id': course_id}))
-        tasks.delegate_email_batches.delay(email.hash, email.to, course_id, course_url, request.user.id)
+        tasks.delegate_email_batches.delay(email.id, email.to_option, course_id, course_url, request.user.id)
+
 
         if to_option == "all":
             email_msg = '<div class="msg msg-confirm"><p class="copy">Your email was successfully queued for sending. Please note that for large public classes (~10k), it may take 1-2 hours to send all emails.</p></div>'
@@ -798,11 +799,11 @@ def instructor_dashboard(request, course_id):
     else:
         editor = None
 
-    # Flag for what backing store this course is (Mongo vs. XML)
-    if modulestore().get_modulestore_type(course_id) == MONGO_MODULESTORE_TYPE:
-        is_mongo_modulestore_type = True
-    else:
-        is_mongo_modulestore_type = False
+    # Flag for whether or not we display the email tab (depending upon
+    # what backing store this course using (Mongo vs. XML))
+    if settings.MITX_FEATURES['ENABLE_INSTRUCTOR_EMAIL'] and \
+       modulestore().get_modulestore_type(course_id) == MONGO_MODULESTORE_TYPE:
+        show_email_tab = True
 
     # display course stats only if there is no other table to display:
     course_stats = None
@@ -820,10 +821,11 @@ def instructor_dashboard(request, course_id):
                'course_stats': course_stats,
                'msg': msg,
                'modeflag': {idash_mode: 'selectedmode'},
-               'to_option': to_option,          # email
-               'subject': subject,              # email
-               'editor': editor,                # email
-               'email_msg': email_msg,          # email
+               'to_option': to_option,            # email
+               'subject': subject,                # email
+               'editor': editor,                  # email
+               'email_msg': email_msg,            # email
+               'show_email_tab': show_email_tab,  # email
                'problems': problems,		# psychometrics
                'plots': plots,			# psychometrics
                'course_errors': modulestore().get_item_errors(course.location),
@@ -832,7 +834,6 @@ def instructor_dashboard(request, course_id):
                'cohorts_ajax_url': reverse('cohorts', kwargs={'course_id': course_id}),
 
                'analytics_results': analytics_results,
-               'is_mongo_modulestore_type': is_mongo_modulestore_type,
                }
 
     if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BETA_DASHBOARD'):
