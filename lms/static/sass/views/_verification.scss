@@ -50,8 +50,6 @@ body.register.verification {
 
 
 
-
-
   .progress {
 
     .progress-step {
@@ -162,5 +160,10 @@ body.register.verification {
     margin-right: $baseline;
   }
 
+
+  video {
+    width: 512px;
+    height: 384px;
+  }
 
 }
