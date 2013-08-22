@@ -238,7 +238,7 @@ class ImportTestCase(BaseCourseTestCase):
         descriptor = system.process_xml(start_xml)
         child = descriptor.get_children()[0]
         # pylint: disable=W0212
-        child._model_data['due'] = child_due
+        child._model_data.set('due', child_due)
         compute_inherited_metadata(descriptor)
 
         self.assertEqual(descriptor.lms.due, ImportTestCase.date.from_json(course_due))
@@ -283,7 +283,7 @@ class ImportTestCase(BaseCourseTestCase):
         def check_for_key(key, node):
             "recursive check for presence of key"
             print("Checking {0}".format(node.location.url()))
-            self.assertTrue(key in node._model_data)
+            self.assertTrue(node._model_data.has(key))
             for c in node.get_children():
                 check_for_key(key, c)
 

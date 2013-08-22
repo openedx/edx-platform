@@ -8,6 +8,7 @@ import copy
 
 from xmodule.crowdsource_hinter import CrowdsourceHinterModule
 from xmodule.vertical_module import VerticalModule, VerticalDescriptor
+from xblock.test.test_core import DictModel
 
 from . import get_test_system
 
@@ -96,7 +97,7 @@ class CHModuleFactory(object):
 
         descriptor = Mock(weight="1")
         system = get_test_system()
-        module = CrowdsourceHinterModule(system, descriptor, model_data)
+        module = CrowdsourceHinterModule(system, descriptor, DictModel(model_data))
 
         return module
 

@@ -7,6 +7,8 @@ from nose.tools import assert_equal
 from unittest.case import SkipTest
 from mock import Mock
 
+from xblock.test.test_core import DictModel
+
 from xmodule.annotatable_module import AnnotatableDescriptor
 from xmodule.capa_module import CapaDescriptor
 from xmodule.course_module import CourseDescriptor
@@ -82,7 +84,7 @@ class TestXBlockWrapper(object):
     def leaf_descriptor(self, descriptor_cls):
         return descriptor_cls(
             self.leaf_descriptor_runtime,
-            {'location': 'i4x://org/course/category/name'}
+            DictModel({'location': 'i4x://org/course/category/name'})
         )
 
     def leaf_module(self, descriptor_cls):
@@ -106,10 +108,10 @@ class TestXBlockWrapper(object):
     def container_descriptor(self, descriptor_cls):
         return descriptor_cls(
             self.container_descriptor_runtime,
-            {
+            DictModel({
                 'location': 'i4x://org/course/category/name',
                 'children': range(3)
-            }
+            })
         )
 
     def container_module(self, descriptor_cls, depth):

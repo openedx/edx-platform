@@ -64,11 +64,11 @@ def set_module_info(store, location, post_data):
 
             if posted_metadata[metadata_key] is None:
                 # remove both from passed in collection as well as the collection read in from the modulestore
-                if metadata_key in module._model_data:
-                    del module._model_data[metadata_key]
+                if module._model_data.has(metadata_key):
+                    module._model_data.delete(metadata_key)
                 del posted_metadata[metadata_key]
             else:
-                module._model_data[metadata_key] = value
+                module._model_data.set(metadata_key, value)
 
         # commit to datastore
         # TODO (cpennington): This really shouldn't have to do this much reaching in to get the metadata

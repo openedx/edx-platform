@@ -3,6 +3,7 @@
 
 from xmodule.x_module import XModuleFields
 from xblock.core import Scope, String, Dict, Boolean, Integer, Float, Any, List
+from xblock.test.test_core import DictModel
 from xmodule.fields import Date, Timedelta
 from xmodule.xml_module import XmlDescriptor, serialize_field, deserialize_field
 import unittest
@@ -44,7 +45,7 @@ class TestFields(object):
 
 class EditableMetadataFieldsTest(unittest.TestCase):
     def test_display_name_field(self):
-        editable_fields = self.get_xml_editable_fields({})
+        editable_fields = self.get_xml_editable_fields(DictModel({}))
         # Tests that the xblock fields (currently tags and name) get filtered out.
         # Also tests that xml_attributes is filtered out of XmlDescriptor.
         self.assertEqual(1, len(editable_fields), "Expected only 1 editable field for xml descriptor.")
@@ -55,14 +56,14 @@ class EditableMetadataFieldsTest(unittest.TestCase):
 
     def test_override_default(self):
         # Tests that explicitly_set is correct when a value overrides the default (not inheritable).
-        editable_fields = self.get_xml_editable_fields({'display_name': 'foo'})
+        editable_fields = self.get_xml_editable_fields(DictModel({'display_name': 'foo'}))
         self.assert_field_values(
             editable_fields, 'display_name', XModuleFields.display_name,
             explicitly_set=True, inheritable=False, value='foo', default_value=None
         )
 
     def test_integer_field(self):
-        descriptor = self.get_descriptor({'max_attempts': '7'})
+        descriptor = self.get_descriptor(DictModel({'max_attempts': '7'}))
         editable_fields = descriptor.editable_metadata_fields
         self.assertEqual(7, len(editable_fields))
         self.assert_field_values(
@@ -75,7 +76,7 @@ class EditableMetadataFieldsTest(unittest.TestCase):
             explicitly_set=False, inheritable=False, value='local default', default_value='local default'
         )
 
-        editable_fields = self.get_descriptor({}).editable_metadata_fields
+        editable_fields = self.get_descriptor(DictModel({})).editable_metadata_fields
         self.assert_field_values(
             editable_fields, 'max_attempts', TestFields.max_attempts,
             explicitly_set=False, inheritable=False, value=1000, default_value=1000, type='Integer',
@@ -84,7 +85,7 @@ class EditableMetadataFieldsTest(unittest.TestCase):
 
     def test_inherited_field(self):
         model_val = {'display_name': 'inherited'}
-        descriptor = self.get_descriptor(model_val)
+        descriptor = self.get_descriptor(DictModel(model_val))
         # Mimic an inherited value for display_name (inherited and inheritable are the same in this case).
         descriptor._inherited_metadata = model_val
         descriptor._inheritable_metadata = model_val
@@ -94,7 +95,7 @@ class EditableMetadataFieldsTest(unittest.TestCase):
             explicitly_set=False, inheritable=True, value='inherited', default_value='inherited'
         )
 
-        descriptor = self.get_descriptor({'display_name': 'explicit'})
+        descriptor = self.get_descriptor(DictModel({'display_name': 'explicit'}))
         # Mimic the case where display_name WOULD have been inherited, except we explicitly set it.
         descriptor._inheritable_metadata = {'display_name': 'inheritable value'}
         descriptor._inherited_metadata = {}
@@ -108,7 +109,7 @@ class EditableMetadataFieldsTest(unittest.TestCase):
         # test_display_name_field verifies that a String field is of type "Generic".
         # test_integer_field verifies that a Integer field is of type "Integer".
 
-        descriptor = self.get_descriptor({})
+        descriptor = self.get_descriptor(DictModel({}))
         editable_fields = descriptor.editable_metadata_fields
 
         # Tests for select
@@ -148,7 +149,7 @@ class EditableMetadataFieldsTest(unittest.TestCase):
     def get_xml_editable_fields(self, model_data):
         system = get_test_system()
         system.render_template = Mock(return_value="<div>Test Template HTML</div>")
-        model_data['category'] = 'test'
+        model_data.set('category', 'test')
         return XmlDescriptor(runtime=system, model_data=model_data).editable_metadata_fields
 
     def get_descriptor(self, model_data):

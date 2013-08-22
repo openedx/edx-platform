@@ -315,8 +315,8 @@ class LmsKeyValueStore(KeyValueStore):
         self._model_data_cache = model_data_cache
 
     def get(self, key):
-        if key.field_name in self._descriptor_model_data:
-            return self._descriptor_model_data[key.field_name]
+        if self._descriptor_model_data.has(key.field_name):
+            return self._descriptor_model_data.get(key.field_name)
 
         if key.scope == Scope.parent:
             return None
@@ -352,7 +352,7 @@ class LmsKeyValueStore(KeyValueStore):
         field_objects = dict()
         for field in kv_dict:
             # Check field for validity
-            if field.field_name in self._descriptor_model_data:
+            if self._descriptor_model_data.has(field.field_name):
                 raise InvalidWriteError("Not allowed to overwrite descriptor model data", field.field_name)
 
             if field.scope not in self._allowed_scopes:
@@ -387,7 +387,7 @@ class LmsKeyValueStore(KeyValueStore):
                 raise KeyValueMultiSaveError(saved_fields)
 
     def delete(self, key):
-        if key.field_name in self._descriptor_model_data:
+        if self._descriptor_model_data.has(key.field_name):
             raise InvalidWriteError("Not allowed to deleted descriptor model data", key.field_name)
 
         if key.scope not in self._allowed_scopes:
@@ -406,8 +406,8 @@ class LmsKeyValueStore(KeyValueStore):
             field_object.delete()
 
     def has(self, key):
-        if key.field_name in self._descriptor_model_data:
-            return key.field_name in self._descriptor_model_data
+        if self._descriptor_model_data.has(key.field_name):
+            return True
 
         if key.scope == Scope.parent:
             return True

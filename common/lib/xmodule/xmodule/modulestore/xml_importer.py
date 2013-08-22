@@ -221,7 +221,7 @@ def import_module(module, store, course_data_path, static_content_store,
         if field.scope != Scope.content:
             continue
         try:
-            content[field.name] = module._model_data[field.name]
+            content[field.name] = module._model_data.get(field.name)
         except KeyError:
             # Ignore any missing keys in _model_data
             pass
@@ -501,10 +501,10 @@ def validate_course_policy(module_store, course_id):
     warn_cnt = 0
     for module in module_store.modules[course_id].itervalues():
         if module.location.category == 'course':
-            if not 'rerandomize' in module._model_data:
+            if not module._model_data.has('rerandomize'):
                 warn_cnt += 1
                 print 'WARN: course policy does not specify value for "rerandomize" whose default is now "never". The behavior of your course may change.'
-            if not 'showanswer' in module._model_data:
+            if not module._model_data.has('showanswer'):
                 warn_cnt += 1
                 print 'WARN: course policy does not specify value for "showanswer" whose default is now "finished". The behavior of your course may change.'
     return warn_cnt

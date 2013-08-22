@@ -18,6 +18,7 @@ from capa.responsetypes import (StudentInputError, LoncapaProblemError,
                                 ResponseError)
 from xmodule.capa_module import CapaModule, ComplexEncoder
 from xmodule.modulestore import Location
+from xblock.test.test_core import DictModel
 
 from django.http import QueryDict
 
@@ -122,7 +123,7 @@ class CapaFactory(object):
 
         system = get_test_system()
         system.render_template = Mock(return_value="<div>Test Template HTML</div>")
-        module = CapaModule(system, descriptor, model_data)
+        module = CapaModule(system, descriptor, DictModel(model_data))
 
         if correct:
             # TODO: probably better to actually set the internal state properly, but...

@@ -12,6 +12,9 @@ from xmodule.modulestore import Location
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.xml_exporter import EdxJSONEncoder
 
+# TODO: Don't do this - cpennington
+from xblock.test.test_core import DictModel
+
 log = logging.getLogger(__name__)
 
 # assume all XML files are persisted as utf-8.
@@ -367,7 +370,7 @@ class XmlDescriptor(XModuleDescriptor):
 
         return cls(
             system,
-            model_data,
+            DictModel(model_data),
         )
 
     @classmethod
@@ -413,7 +416,7 @@ class XmlDescriptor(XModuleDescriptor):
             (Possible format conversion through an AttrMap).
              """
             attr_map = self.get_map_for_field(attr)
-            return attr_map.to_xml(self._model_data[attr])
+            return attr_map.to_xml(self._model_data.get(attr))
 
         # Add the non-inherited metadata
         for attr in sorted(own_metadata(self)):

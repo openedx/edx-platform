@@ -118,6 +118,15 @@ class Textbook(object):
 
         return table_of_contents
 
+    def __eq__(self, other):
+        return (self.title == other.title and
+                self.book_url == other.book_url and
+                self.start_page == other.start_page and
+                self.end_page == other.end_page)
+
+    def __ne__(self, other):
+        return not self == other
+
 
 class TextbookList(List):
     def from_json(self, values):

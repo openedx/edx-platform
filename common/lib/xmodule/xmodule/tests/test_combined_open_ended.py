@@ -23,6 +23,7 @@ from xmodule.combined_open_ended_module import CombinedOpenEndedModule
 from xmodule.modulestore import Location
 from xmodule.tests import get_test_system, test_util_open_ended
 from xmodule.tests.test_util_open_ended import MockQueryDict, DummyModulestore
+from xblock.test.test_core import DictModel
 import capa.xqueue_interface as xqueue_interface
 
 
@@ -415,11 +416,11 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
     combinedoe_container = CombinedOpenEndedModule(
         test_system,
         descriptor,
-        model_data={
+        model_data=DictModel({
             'data': full_definition,
             'weight': '1',
             'location': location
-        }
+        })
     )
 
     def setUp(self):
