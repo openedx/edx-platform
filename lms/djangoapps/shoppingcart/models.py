@@ -67,7 +67,10 @@ class Order(models.Model):
 
     @property
     def total_cost(self):
-        """ Return the total cost of the order """
+        """
+        Return the total cost of the cart.  If the order has been purchased, returns total of
+        all purchased and not refunded items.
+        """
         return sum(i.line_cost for i in self.orderitem_set.filter(status=self.status))
 
     def clear(self):
