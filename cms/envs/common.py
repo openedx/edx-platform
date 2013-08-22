@@ -363,6 +363,7 @@ INSTALLED_APPS = (
     'course_modes'
 )
 
+
 ################# EDX MARKETING SITE ##################################
 
 EDXMKTG_COOKIE_NAME = 'edxloggedin'

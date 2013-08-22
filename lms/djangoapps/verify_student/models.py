@@ -8,7 +8,7 @@ of a student over a period of time. Right now, the only models are the abstract
 `SoftwareSecurePhotoVerification`. The hope is to keep as much of the
 photo verification process as generic as possible.
 """
-from datetime import datetime
+from datetime import datetime, timedelta
 from hashlib import md5
 import base64
 import functools
@@ -17,6 +17,7 @@ import uuid
 
 import pytz
 
+from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import User
 from model_utils.models import StatusModel
@@ -69,10 +70,10 @@ class PhotoVerification(StatusModel):
     their identity by uploading a photo of themselves and a picture ID. An
     attempt actually has a number of fields that need to be filled out at
     different steps of the approval process. While it's useful as a Django Model
-    for the querying facilities, **you should only create and edit a
-    `PhotoVerification` object through the methods provided**. Do not
-    just construct one and start setting fields unless you really know what
-    you're doing.
+    for the querying facilities, **you should only edit a `PhotoVerification`
+    object through the methods provided**. Initialize them with a user:
+
+    attempt = PhotoVerification(user=user)
 
     We track this attempt through various states:
 
@@ -100,6 +101,9 @@ class PhotoVerification(StatusModel):
         attempt.status == "created"
         pending_requests = PhotoVerification.submitted.all()
     """
+    # We can make this configurable later...
+    DAYS_GOOD_FOR = settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
+
     ######################## Fields Set During Creation ########################
     # See class docstring for description of status states
     STATUS = Choices('created', 'ready', 'submitted', 'approved', 'denied')
@@ -158,12 +162,37 @@ class PhotoVerification(StatusModel):
 
     ##### Methods listed in the order you'd typically call them
     @classmethod
-    def user_is_verified(cls, user):
+    def user_is_verified(cls, user, earliest_allowed_date=None):
         """
         Returns whether or not a user has satisfactorily proved their
         identity. Depending on the policy, this can expire after some period of
-        time, so a user might have to renew periodically."""
-        raise NotImplementedError
+        time, so a user might have to renew periodically.
+        """
+        earliest_allowed_date = (
+            earliest_allowed_date or
+            datetime.now(pytz.UTC) - timedelta(days=cls.DAYS_GOOD_FOR)
+        )
+        return cls.objects.filter(
+            user=user,
+            status="approved",
+            created_at__lte=earliest_allowed_date
+        ).exists()
+
+    @classmethod
+    def user_has_valid_or_pending(cls, user, earliest_allowed_date=None):
+        """
+        TODO: eliminate duplication with user_is_verified
+        """
+        valid_statuses = ['ready', 'submitted', 'approved']
+        earliest_allowed_date = (
+            earliest_allowed_date or
+            datetime.now(pytz.UTC) - timedelta(days=cls.DAYS_GOOD_FOR)
+        )
+        return cls.objects.filter(
+            user=user,
+            status__in=valid_statuses,
+            created_at__lte=earliest_allowed_date
+        ).exists()
 
     @classmethod
     def active_for_user(cls, user):

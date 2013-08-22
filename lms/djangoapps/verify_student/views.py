@@ -4,28 +4,36 @@
 """
 from mitxmako.shortcuts import render_to_response
 
-from verify_student.models import SoftwareSecurePhotoVerification
+from django.conf import settings
+from django.core.urlresolvers import reverse
+from django.shortcuts import redirect
+from django.views.generic.base import View
 
 from course_modes.models import CourseMode
+from verify_student.models import SoftwareSecurePhotoVerification
 
-# @login_required
-def start_or_resume_attempt(request, course_id):
-    """
-    If they've already started a PhotoVerificationAttempt, we move to wherever
-    they are in that process. If they've completed one, then we skip straight
-    to payment.
-    """
-    # If the user has already been verified within the given time period,
-    # redirect straight to the payment -- no need to verify again.
-    if SoftwareSecurePhotoVerification.user_is_verified(user):
-        pass
+class VerifyView(View):
 
-    attempt = SoftwareSecurePhotoVerification.active_for_user(request.user)
-    if not attempt:
-        # Redirect to show requirements
-        pass
+    def get(self, request):
+        """
+        """
+        # If the user has already been verified within the given time period,
+        # redirect straight to the payment -- no need to verify again.
+        if SoftwareSecurePhotoVerification.user_has_valid_or_pending(request.user):
+            progress_state = "payment"
+        else:
+            # If they haven't completed a verification attempt, we have to
+            # restart with a new one. We can't reuse an older one because we
+            # won't be able to show them their encrypted photo_id -- it's easier
+            # bookkeeping-wise just to start over.
+            progress_state = "start"
 
-    # if attempt.
+        return render_to_response('verify_student/face_upload.html')
+
+
+    def post(request):
+        attempt = SoftwareSecurePhotoVerification(user=request.user)
+
 
 def show_requirements(request):
     """This might just be a plain template without a view."""

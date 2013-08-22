@@ -35,9 +35,9 @@ urlpatterns = patterns(
     ),
 
     url(
-        r'^start_or_resume_attempt',
-        views.start_or_resume_attempt,
-        name="verify_student/start_or_resume_attempt"
+        r'^verify',
+        views.VerifyView.as_view(),
+        name="verify_student_verify"
     )
 
 )

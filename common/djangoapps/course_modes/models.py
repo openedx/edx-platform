@@ -52,6 +52,10 @@ class CourseMode(models.Model):
             modes = [cls.DEFAULT_MODE]
         return modes
 
+    @classmethod
+    def modes_for_course_dict(cls, course_id):
+        return { mode.slug : mode for mode in cls.modes_for_course(course_id) }
+
     def __unicode__(self):
         return u"{} : {}, min={}, prices={}".format(
             self.course_id, self.mode_slug, self.min_price, self.suggested_prices

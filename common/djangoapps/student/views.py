@@ -24,8 +24,7 @@ from django.db import IntegrityError, transaction
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotAllowed, Http404
 from django.shortcuts import redirect
 from django_future.csrf import ensure_csrf_cookie
-from django.utils.http import cookie_date
-from django.utils.http import base36_to_int
+from django.utils.http import cookie_date, base36_to_int, urlencode
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST
 
@@ -372,7 +371,12 @@ def change_enrollment(request):
         # where they can choose which mode they want.
         available_modes = CourseMode.modes_for_course(course_id)
         if len(available_modes) > 1:
-            return HttpResponse(reverse("course_modes.views.choose"))
+            return HttpResponse(
+                "{}?{}".format(
+                    reverse("course_modes_choose"),
+                    urlencode(dict(course_id=course_id))
+                )
+            )
 
         org, course_num, run = course_id.split("/")
         statsd.increment("common.student.enrollment",
