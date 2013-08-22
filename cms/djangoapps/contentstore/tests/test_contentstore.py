@@ -3,6 +3,9 @@
 import json
 import shutil
 import mock
+
+from textwrap import dedent
+
 from django.test.client import Client
 from django.test.utils import override_settings
 from django.conf import settings
@@ -314,7 +317,11 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
     @mock.patch('xmodule.course_module.requests.get')
     def test_import_textbook_as_content_element(self, mock_get):
-        mock_get.return_value.text = u'<?xml version="1.0"?>\n<table_of_contents>\n  <entry page="5" page_label="ii" name="Table of Contents"/></table_of_contents>\n'
+        mock_get.return_value.text = dedent("""
+            <?xml version="1.0"?><table_of_contents>
+            <entry page="5" page_label="ii" name="Table of Contents"/>
+            </table_of_contents>
+        """).strip()
 
         module_store = modulestore('direct')
         import_from_xml(module_store, 'common/test/data/', ['toy'])
@@ -850,7 +857,11 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
     @mock.patch('xmodule.course_module.requests.get')
     def test_export_course(self, mock_get):
-        mock_get.return_value.text = u'<?xml version="1.0"?>\n<table_of_contents>\n  <entry page="5" page_label="ii" name="Table of Contents"/></table_of_contents>\n'
+        mock_get.return_value.text = dedent("""
+            <?xml version="1.0"?><table_of_contents>
+            <entry page="5" page_label="ii" name="Table of Contents"/>
+            </table_of_contents>
+        """).strip()
 
         module_store = modulestore('direct')
         draft_store = modulestore('draft')
