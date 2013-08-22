@@ -58,6 +58,16 @@ class TestMongoModuleStore(object):
         # Explicitly list the courses to load (don't want the big one)
         courses = ['toy', 'simple', 'simple_with_draft']
         import_from_xml(store, DATA_DIR, courses, draft_store=draft_store, static_content_store=content_store)
+
+        # also test a course with no importing of static content
+        import_from_xml(
+            store,
+            DATA_DIR,
+            ['test_import_course'],
+            static_content_store=content_store,
+            do_import_static=False
+        )
+
         return store, content_store, draft_store
 
     @staticmethod
@@ -86,11 +96,12 @@ class TestMongoModuleStore(object):
     def test_get_courses(self):
         '''Make sure the course objects loaded properly'''
         courses = self.store.get_courses()
-        assert_equals(len(courses), 3)
+        assert_equals(len(courses), 4)
         courses.sort(key=lambda c: c.id)
         assert_equals(courses[0].id, 'edX/simple/2012_Fall')
         assert_equals(courses[1].id, 'edX/simple_with_draft/2012_Fall')
-        assert_equals(courses[2].id, 'edX/toy/2012_Fall')
+        assert_equals(courses[2].id, 'edX/test_import_course/2012_Fall')
+        assert_equals(courses[3].id, 'edX/toy/2012_Fall')
 
     def test_loads(self):
         assert_not_equals(
