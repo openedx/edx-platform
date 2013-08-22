@@ -316,9 +316,11 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         module_store = modulestore('direct')
         import_from_xml(module_store, 'common/test/data/', ['toy'])
 
-        course = module_store.get_item(Location(['i4x', 'edX', 'toy', 'course', '2012_Fall', None]))
+        with mock.patch('xmodule.course_module.requests.get') as mock_get:
+            mock_get.return_value.text = u'<?xml version="1.0"?>\n<table_of_contents>\n  <entry page="5" page_label="ii" name="Table of Contents"/></table_of_contents>\n'
+            course = module_store.get_item(Location(['i4x', 'edX', 'toy', 'course', '2012_Fall', None]))
 
-        self.assertGreater(len(course.textbooks), 0)
+            self.assertGreater(len(course.textbooks), 0)
 
     def test_default_tabs_on_create_course(self):
         module_store = modulestore('direct')
@@ -846,126 +848,129 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             self.assertTrue(filesystem.exists(item.location.name + filename_suffix))
 
     def test_export_course(self):
-        module_store = modulestore('direct')
-        draft_store = modulestore('draft')
-        content_store = contentstore()
+        with mock.patch('xmodule.course_module.requests.get') as mock_get:
+            mock_get.return_value.text = u'<?xml version="1.0"?>\n<table_of_contents>\n  <entry page="5" page_label="ii" name="Table of Contents"/></table_of_contents>\n'
 
-        import_from_xml(module_store, 'common/test/data/', ['toy'])
-        location = CourseDescriptor.id_to_location('edX/toy/2012_Fall')
+            module_store = modulestore('direct')
+            draft_store = modulestore('draft')
+            content_store = contentstore()
 
-        # get a vertical (and components in it) to copy into an orphan sub dag
-        vertical = module_store.get_item(
-            Location(['i4x', 'edX', 'toy', 'vertical', 'vertical_test', None]),
-            depth=1
-        )
-        # We had a bug where orphaned draft nodes caused export to fail. This is here to cover that case.
-        vertical.location = mongo.draft.as_draft(vertical.location.replace(name='no_references'))
-        draft_store.save_xmodule(vertical)
-        orphan_vertical = draft_store.get_item(vertical.location)
-        self.assertEqual(orphan_vertical.location.name, 'no_references')
+            import_from_xml(module_store, 'common/test/data/', ['toy'])
+            location = CourseDescriptor.id_to_location('edX/toy/2012_Fall')
 
-        # get the original vertical (and components in it) to put into 'draft'
-        vertical = module_store.get_item(
-            Location(['i4x', 'edX', 'toy', 'vertical', 'vertical_test', None]),
-            depth=1)
-        self.assertEqual(len(orphan_vertical.children), len(vertical.children))
-        draft_store.convert_to_draft(vertical.location)
-        for child in vertical.get_children():
-            draft_store.convert_to_draft(child.location)
+            # get a vertical (and components in it) to copy into an orphan sub dag
+            vertical = module_store.get_item(
+                Location(['i4x', 'edX', 'toy', 'vertical', 'vertical_test', None]),
+                depth=1
+            )
+            # We had a bug where orphaned draft nodes caused export to fail. This is here to cover that case.
+            vertical.location = mongo.draft.as_draft(vertical.location.replace(name='no_references'))
+            draft_store.save_xmodule(vertical)
+            orphan_vertical = draft_store.get_item(vertical.location)
+            self.assertEqual(orphan_vertical.location.name, 'no_references')
 
-        root_dir = path(mkdtemp_clean())
+            # get the original vertical (and components in it) to put into 'draft'
+            vertical = module_store.get_item(
+                Location(['i4x', 'edX', 'toy', 'vertical', 'vertical_test', None]),
+                depth=1)
+            self.assertEqual(len(orphan_vertical.children), len(vertical.children))
+            draft_store.convert_to_draft(vertical.location)
+            for child in vertical.get_children():
+                draft_store.convert_to_draft(child.location)
 
-        # now create a new/different private (draft only) vertical
-        vertical.location = mongo.draft.as_draft(Location(['i4x', 'edX', 'toy', 'vertical', 'a_private_vertical', None]))
-        draft_store.save_xmodule(vertical)
-        private_vertical = draft_store.get_item(vertical.location)
-        vertical = None  # blank out b/c i destructively manipulated its location 2 lines above
+            root_dir = path(mkdtemp_clean())
 
-        # add the new private to list of children
-        sequential = module_store.get_item(Location(['i4x', 'edX', 'toy',
-                                           'sequential', 'vertical_sequential', None]))
-        private_location_no_draft = private_vertical.location.replace(revision=None)
-        module_store.update_children(sequential.location, sequential.children +
-                                     [private_location_no_draft.url()])
+            # now create a new/different private (draft only) vertical
+            vertical.location = mongo.draft.as_draft(Location(['i4x', 'edX', 'toy', 'vertical', 'a_private_vertical', None]))
+            draft_store.save_xmodule(vertical)
+            private_vertical = draft_store.get_item(vertical.location)
+            vertical = None  # blank out b/c i destructively manipulated its location 2 lines above
 
-        # read back the sequential, to make sure we have a pointer to
-        sequential = module_store.get_item(Location(['i4x', 'edX', 'toy',
-                                                     'sequential', 'vertical_sequential', None]))
+            # add the new private to list of children
+            sequential = module_store.get_item(Location(['i4x', 'edX', 'toy',
+                                               'sequential', 'vertical_sequential', None]))
+            private_location_no_draft = private_vertical.location.replace(revision=None)
+            module_store.update_children(sequential.location, sequential.children +
+                                         [private_location_no_draft.url()])
 
-        self.assertIn(private_location_no_draft.url(), sequential.children)
+            # read back the sequential, to make sure we have a pointer to
+            sequential = module_store.get_item(Location(['i4x', 'edX', 'toy',
+                                                         'sequential', 'vertical_sequential', None]))
 
-        print 'Exporting to tempdir = {0}'.format(root_dir)
+            self.assertIn(private_location_no_draft.url(), sequential.children)
 
-        # export out to a tempdir
-        export_to_xml(module_store, content_store, location, root_dir, 'test_export', draft_modulestore=draft_store)
+            print 'Exporting to tempdir = {0}'.format(root_dir)
 
-        # check for static tabs
-        self.verify_content_existence(module_store, root_dir, location, 'tabs', 'static_tab', '.html')
+            # export out to a tempdir
+            export_to_xml(module_store, content_store, location, root_dir, 'test_export', draft_modulestore=draft_store)
 
-        # check for about content
-        self.verify_content_existence(module_store, root_dir, location, 'about', 'about', '.html')
+            # check for static tabs
+            self.verify_content_existence(module_store, root_dir, location, 'tabs', 'static_tab', '.html')
 
-        # check for graiding_policy.json
-        filesystem = OSFS(root_dir / 'test_export/policies/2012_Fall')
-        self.assertTrue(filesystem.exists('grading_policy.json'))
+            # check for about content
+            self.verify_content_existence(module_store, root_dir, location, 'about', 'about', '.html')
 
-        course = module_store.get_item(location)
-        # compare what's on disk compared to what we have in our course
-        with filesystem.open('grading_policy.json', 'r') as grading_policy:
-            on_disk = loads(grading_policy.read())
-            self.assertEqual(on_disk, course.grading_policy)
+            # check for graiding_policy.json
+            filesystem = OSFS(root_dir / 'test_export/policies/2012_Fall')
+            self.assertTrue(filesystem.exists('grading_policy.json'))
 
-        # check for policy.json
-        self.assertTrue(filesystem.exists('policy.json'))
+            course = module_store.get_item(location)
+            # compare what's on disk compared to what we have in our course
+            with filesystem.open('grading_policy.json', 'r') as grading_policy:
+                on_disk = loads(grading_policy.read())
+                self.assertEqual(on_disk, course.grading_policy)
 
-        # compare what's on disk to what we have in the course module
-        with filesystem.open('policy.json', 'r') as course_policy:
-            on_disk = loads(course_policy.read())
-            self.assertIn('course/2012_Fall', on_disk)
-            self.assertEqual(on_disk['course/2012_Fall'], own_metadata(course))
+            # check for policy.json
+            self.assertTrue(filesystem.exists('policy.json'))
 
-        # remove old course
-        delete_course(module_store, content_store, location)
+            # compare what's on disk to what we have in the course module
+            with filesystem.open('policy.json', 'r') as course_policy:
+                on_disk = loads(course_policy.read())
+                self.assertIn('course/2012_Fall', on_disk)
+                self.assertEqual(on_disk['course/2012_Fall'], own_metadata(course))
 
-        # reimport
-        import_from_xml(module_store, root_dir, ['test_export'], draft_store=draft_store)
+            # remove old course
+            delete_course(module_store, content_store, location)
 
-        items = module_store.get_items(Location(['i4x', 'edX', 'toy', 'vertical', None]))
-        self.assertGreater(len(items), 0)
-        for descriptor in items:
-            # don't try to look at private verticals. Right now we're running
-            # the service in non-draft aware
-            if getattr(descriptor, 'is_draft', False):
-                print "Checking {0}....".format(descriptor.location.url())
-                resp = self.client.get(reverse('edit_unit', kwargs={'location': descriptor.location.url()}))
-                self.assertEqual(resp.status_code, 200)
+            # reimport
+            import_from_xml(module_store, root_dir, ['test_export'], draft_store=draft_store)
 
-        # verify that we have the content in the draft store as well
-        vertical = draft_store.get_item(Location(['i4x', 'edX', 'toy',
-                                                  'vertical', 'vertical_test', None]), depth=1)
+            items = module_store.get_items(Location(['i4x', 'edX', 'toy', 'vertical', None]))
+            self.assertGreater(len(items), 0)
+            for descriptor in items:
+                # don't try to look at private verticals. Right now we're running
+                # the service in non-draft aware
+                if getattr(descriptor, 'is_draft', False):
+                    print "Checking {0}....".format(descriptor.location.url())
+                    resp = self.client.get(reverse('edit_unit', kwargs={'location': descriptor.location.url()}))
+                    self.assertEqual(resp.status_code, 200)
 
-        self.assertTrue(getattr(vertical, 'is_draft', False))
-        for child in vertical.get_children():
-            self.assertTrue(getattr(child, 'is_draft', False))
+            # verify that we have the content in the draft store as well
+            vertical = draft_store.get_item(Location(['i4x', 'edX', 'toy',
+                                                      'vertical', 'vertical_test', None]), depth=1)
 
-        # make sure that we don't have a sequential that is in draft mode
-        sequential = draft_store.get_item(Location(['i4x', 'edX', 'toy',
-                                                    'sequential', 'vertical_sequential', None]))
+            self.assertTrue(getattr(vertical, 'is_draft', False))
+            for child in vertical.get_children():
+                self.assertTrue(getattr(child, 'is_draft', False))
 
-        self.assertFalse(getattr(sequential, 'is_draft', False))
+            # make sure that we don't have a sequential that is in draft mode
+            sequential = draft_store.get_item(Location(['i4x', 'edX', 'toy',
+                                                        'sequential', 'vertical_sequential', None]))
 
-        # verify that we have the private vertical
-        test_private_vertical = draft_store.get_item(Location(['i4x', 'edX', 'toy',
-                                                               'vertical', 'a_private_vertical', None]))
+            self.assertFalse(getattr(sequential, 'is_draft', False))
 
-        self.assertTrue(getattr(test_private_vertical, 'is_draft', False))
+            # verify that we have the private vertical
+            test_private_vertical = draft_store.get_item(Location(['i4x', 'edX', 'toy',
+                                                                   'vertical', 'a_private_vertical', None]))
 
-        # make sure the textbook survived the export/import
-        course = module_store.get_item(Location(['i4x', 'edX', 'toy', 'course', '2012_Fall', None]))
+            self.assertTrue(getattr(test_private_vertical, 'is_draft', False))
 
-        self.assertGreater(len(course.textbooks), 0)
+            # make sure the textbook survived the export/import
+            course = module_store.get_item(Location(['i4x', 'edX', 'toy', 'course', '2012_Fall', None]))
 
-        shutil.rmtree(root_dir)
+            self.assertGreater(len(course.textbooks), 0)
+
+            shutil.rmtree(root_dir)
 
     def test_export_course_with_metadata_only_video(self):
         module_store = modulestore('direct')
