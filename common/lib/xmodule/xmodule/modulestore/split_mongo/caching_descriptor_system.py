@@ -11,18 +11,17 @@ from .split_mongo_kvs import SplitMongoKVS, SplitMongoKVSid
 
 log = logging.getLogger(__name__)
 
-# TODO should this be here or w/ x_module or ???
 class CachingDescriptorSystem(MakoDescriptorSystem):
     """
     A system that has a cache of a course version's json that it will use to load modules
     from, with a backup of calling to the underlying modulestore for more data.
 
-    Computes the metadata inheritance upon creation.
+    Computes the settings (nee 'metadata') inheritance upon creation.
     """
     def __init__(self, modulestore, course_entry, module_data, lazy,
         default_class, error_tracker, render_template):
         """
-        Computes the metadata inheritance and sets up the cache.
+        Computes the settings inheritance and sets up the cache.
 
         modulestore: the module store that can be used to retrieve additional
         modules
@@ -50,9 +49,10 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         self.default_class = default_class
         # TODO see if self.course_id is needed: is already in course_entry but could be > 1 value
         # Compute inheritance
-        modulestore.inherit_metadata(course_entry.get('blocks', {}),
-            course_entry.get('blocks', {})
-            .get(course_entry.get('root')))
+        modulestore.inherit_settings(
+            course_entry.get('blocks', {}),
+            course_entry.get('blocks', {}).get(course_entry.get('root'))
+        )
 
     def _load_item(self, usage_id, course_entry_override=None):
         # TODO ensure all callers of system.load_item pass just the id
@@ -73,9 +73,8 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
     def xblock_from_json(self, class_, usage_id, json_data, course_entry_override=None):
         if course_entry_override is None:
             course_entry_override = self.course_entry
-        # most likely a lazy loader but not the id directly
+        # most likely a lazy loader or the id directly
         definition = json_data.get('definition', {})
-        metadata = json_data.get('metadata', {})
 
         block_locator = BlockUsageLocator(
             version_guid=course_entry_override['_id'],
@@ -86,9 +85,8 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
 
         kvs = SplitMongoKVS(
             definition,
-            json_data.get('children', []),
-            metadata,
-            json_data.get('_inherited_metadata'),
+            json_data.get('fields', {}),
+            json_data.get('_inherited_settings'),
             block_locator,
             json_data.get('category'))
         model_data = DbModel(kvs, class_, None,
@@ -111,10 +109,11 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
                 error_msg=exc_info_to_str(sys.exc_info())
             )
 
-        module.edited_by = json_data.get('edited_by')
-        module.edited_on = json_data.get('edited_on')
-        module.previous_version = json_data.get('previous_version')
-        module.update_version = json_data.get('update_version')
+        edit_info = json_data.get('edit_info', {})
+        module.edited_by = edit_info.get('edited_by')
+        module.edited_on = edit_info.get('edited_on')
+        module.previous_version = edit_info.get('previous_version')
+        module.update_version = edit_info.get('update_version')
         module.definition_locator = self.modulestore.definition_locator(definition)
         # decache any pending field settings
         module.save()

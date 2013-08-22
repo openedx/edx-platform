@@ -30,7 +30,8 @@ def get_checklists(request, org, course, name):
     modulestore = get_modulestore(location)
     course_module = modulestore.get_item(location)
 
-    # If course was created before checklists were introduced, copy them over from the template.
+    # If course was created before checklists were introduced, copy them over
+    # from the template.
     copied = False
     if not course_module.checklists:
         course_module.checklists = CourseDescriptor.checklists.default
@@ -68,7 +69,8 @@ def update_checklist(request, org, course, name, checklist_index=None):
         if checklist_index is not None and 0 <= int(checklist_index) < len(course_module.checklists):
             index = int(checklist_index)
             course_module.checklists[index] = json.loads(request.body)
-            # seeming noop which triggers kvs to record that the metadata is not default
+            # seeming noop which triggers kvs to record that the metadata is
+            # not default
             course_module.checklists = course_module.checklists
             checklists, _ = expand_checklist_action_urls(course_module)
             course_module.save()
@@ -76,10 +78,13 @@ def update_checklist(request, org, course, name, checklist_index=None):
             return JsonResponse(checklists[index])
         else:
             return HttpResponseBadRequest(
-                "Could not save checklist state because the checklist index was out of range or unspecified.",
-                content_type="text/plain")
+                ( "Could not save checklist state because the checklist index "
+                "was out of range or unspecified."),
+                content_type="text/plain"
+            )
     elif request.method == 'GET':
-        # In the JavaScript view initialize method, we do a fetch to get all the checklists.
+        # In the JavaScript view initialize method, we do a fetch to get all
+        # the checklists.
         checklists, modified = expand_checklist_action_urls(course_module)
         if modified:
             course_module.save()

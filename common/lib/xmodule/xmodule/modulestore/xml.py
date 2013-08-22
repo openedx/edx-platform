@@ -21,7 +21,7 @@ from xmodule.x_module import XModuleDescriptor, XMLParsingSystem
 
 from xmodule.html_module import HtmlDescriptor
 
-from . import ModuleStoreBase, Location
+from . import ModuleStoreBase, Location, XML_MODULESTORE_TYPE
 from .exceptions import ItemNotFoundError
 from .inheritance import compute_inherited_metadata
 
@@ -479,6 +479,7 @@ class XMLModuleStore(ModuleStoreBase):
                             if tab.get('url_slug') == slug:
                                 module.display_name = tab['name']
                     module.data_dir = course_dir
+                    module.save()
                     self.modules[course_descriptor.id][module.location] = module
                 except Exception, e:
                     logging.exception("Failed to load {0}. Skipping... Exception: {1}".format(filepath, str(e)))
@@ -505,12 +506,12 @@ class XMLModuleStore(ModuleStoreBase):
         except KeyError:
             raise ItemNotFoundError(location)
 
-    def has_item(self, location):
+    def has_item(self, course_id, location):
         """
         Returns True if location exists in this ModuleStore.
         """
         location = Location(location)
-        return any(location in course_modules for course_modules in self.modules.values())
+        return location in self.modules[course_id]
 
     def get_item(self, location, depth=0):
         """
@@ -601,3 +602,10 @@ class XMLModuleStore(ModuleStoreBase):
             raise ItemNotFoundError("{0} not in {1}".format(location, course_id))
 
         return self.parent_trackers[course_id].parents(location)
+
+    def get_modulestore_type(self, course_id):
+        """
+        Returns a type which identifies which modulestore is servicing the given
+        course_id. The return can be either "xml" (for XML based courses) or "mongo" for MongoDB backed courses
+        """
+        return XML_MODULESTORE_TYPE

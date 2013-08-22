@@ -1,18 +1,20 @@
-import pymongo
+from pprint import pprint
 
 from nose.tools import assert_equals, assert_raises, assert_not_equals, assert_false
-from pprint import pprint
+import pymongo
+from uuid import uuid4
 
 from xblock.core import Scope
 from xblock.runtime import KeyValueStore, InvalidScopeError
 
+from xmodule.tests import DATA_DIR
 from xmodule.modulestore import Location
 from xmodule.modulestore.mongo import MongoModuleStore, MongoKeyValueStore
-from xmodule.modulestore.xml_importer import import_from_xml
+from xmodule.modulestore.draft import DraftModuleStore
+from xmodule.modulestore.xml_importer import import_from_xml, perform_xlint
+from xmodule.contentstore.mongo import MongoContentStore
 
-from .test_modulestore import check_path_to_location
-from . import DATA_DIR
-from uuid import uuid4
+from xmodule.modulestore.tests.test_modulestore import check_path_to_location
 
 
 HOST = 'localhost'
@@ -35,7 +37,7 @@ class TestMongoModuleStore(object):
         # is ok only as long as none of the tests modify the db.
         # If (when!) that changes, need to either reload the db, or load
         # once and copy over to a tmp db for each test.
-        cls.store = cls.initdb()
+        cls.store, cls.content_store, cls.draft_store = cls.initdb()
 
     @classmethod
     def teardownClass(cls):
@@ -45,12 +47,29 @@ class TestMongoModuleStore(object):
     @staticmethod
     def initdb():
         # connect to the db
-        store = MongoModuleStore(HOST, DB, COLLECTION, FS_ROOT, RENDER_TEMPLATE,
-            default_class=DEFAULT_CLASS)
+        store = MongoModuleStore(HOST, DB, COLLECTION, FS_ROOT, RENDER_TEMPLATE, default_class=DEFAULT_CLASS)
+        # since MongoModuleStore and MongoContentStore are basically assumed to be together, create this class
+        # as well
+        content_store = MongoContentStore(HOST, DB)
+        #
+        # Also test draft store imports
+        #
+        draft_store = DraftModuleStore(HOST, DB, COLLECTION, FS_ROOT, RENDER_TEMPLATE, default_class=DEFAULT_CLASS)
         # Explicitly list the courses to load (don't want the big one)
-        courses = ['toy', 'simple']
-        import_from_xml(store, DATA_DIR, courses)
-        return store
+        courses = ['toy', 'simple', 'simple_with_draft']
+        import_from_xml(store, DATA_DIR, courses, draft_store=draft_store, static_content_store=content_store)
+
+        # also test a course with no importing of static content
+        import_from_xml(
+            store,
+            DATA_DIR,
+            ['test_import_course'],
+            static_content_store=content_store,
+            do_import_static=False,
+            verbose=True
+        )
+
+        return store, content_store, draft_store
 
     @staticmethod
     def destroy_db(connection):
@@ -71,13 +90,19 @@ class TestMongoModuleStore(object):
 
         pprint([Location(i['_id']).url() for i in ids])
 
+    def test_mongo_modulestore_type(self):
+        store = MongoModuleStore(HOST, DB, COLLECTION, FS_ROOT, RENDER_TEMPLATE, default_class=DEFAULT_CLASS)
+        assert_equals(store.get_modulestore_type('foo/bar/baz'), 'mongo')
+
     def test_get_courses(self):
         '''Make sure the course objects loaded properly'''
         courses = self.store.get_courses()
-        assert_equals(len(courses), 2)
+        assert_equals(len(courses), 4)
         courses.sort(key=lambda c: c.id)
         assert_equals(courses[0].id, 'edX/simple/2012_Fall')
-        assert_equals(courses[1].id, 'edX/toy/2012_Fall')
+        assert_equals(courses[1].id, 'edX/simple_with_draft/2012_Fall')
+        assert_equals(courses[2].id, 'edX/test_import_course/2012_Fall')
+        assert_equals(courses[3].id, 'edX/toy/2012_Fall')
 
     def test_loads(self):
         assert_not_equals(
@@ -109,6 +134,13 @@ class TestMongoModuleStore(object):
         '''Make sure that path_to_location works'''
         check_path_to_location(self.store)
 
+    def test_xlinter(self):
+        '''
+        Run through the xlinter, we know the 'toy' course has violations, but the
+        number will continue to grow over time, so just check > 0
+        '''
+        assert_not_equals(perform_xlint(DATA_DIR, ['toy']), 0)
+
     def test_get_courses_has_no_templates(self):
         courses = self.store.get_courses()
         for course in courses:
@@ -117,7 +149,30 @@ class TestMongoModuleStore(object):
                 '{0} is a template course'.format(course)
             )
 
+    def test_static_tab_names(self):
+        courses = self.store.get_courses()
+
+        def get_tab_name(index):
+            """
+            Helper function for pulling out the name of a given static tab.
+
+            Assumes the information is desired for courses[1] ('toy' course).
+            """
+            return courses[2].tabs[index]['name']
+
+        # There was a bug where model.save was not getting called after the static tab name
+        # was set set for tabs that have a URL slug. 'Syllabus' and 'Resources' fall into that
+        # category, but for completeness, I'm also testing 'Course Info' and 'Discussion' (no url slug).
+        assert_equals('Course Info', get_tab_name(1))
+        assert_equals('Syllabus', get_tab_name(2))
+        assert_equals('Resources', get_tab_name(3))
+        assert_equals('Discussion', get_tab_name(4))
+
+
 class TestMongoKeyValueStore(object):
+    """
+    Tests for MongoKeyValueStore.
+    """
 
     def setUp(self):
         self.data = {'foo': 'foo_value'}
@@ -127,6 +182,9 @@ class TestMongoKeyValueStore(object):
         self.kvs = MongoKeyValueStore(self.data, self.children, self.metadata, self.location, 'category')
 
     def _check_read(self, key, expected_value):
+        """
+        Asserts the get and has methods.
+        """
         assert_equals(expected_value, self.kvs.get(key))
         assert self.kvs.has(key)
 

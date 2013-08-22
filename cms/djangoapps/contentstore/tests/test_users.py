@@ -6,7 +6,7 @@ from .utils import CourseTestCase
 from django.contrib.auth.models import User, Group
 from django.core.urlresolvers import reverse
 from auth.authz import get_course_groupname_for_role
-from student.views import is_enrolled_in_course
+from student.models import CourseEnrollment
 
 
 class UsersTestCase(CourseTestCase):
@@ -372,13 +372,13 @@ class UsersTestCase(CourseTestCase):
     def assert_not_enrolled(self):
         """ Asserts that self.ext_user is not enrolled in self.course. """
         self.assertFalse(
-            is_enrolled_in_course(self.ext_user, self.course.location.course_id),
+            CourseEnrollment.is_enrolled(self.ext_user, self.course.location.course_id),
             'Did not expect ext_user to be enrolled in course'
         )
 
     def assert_enrolled(self):
         """ Asserts that self.ext_user is enrolled in self.course. """
         self.assertTrue(
-            is_enrolled_in_course(self.ext_user, self.course.location.course_id),
+            CourseEnrollment.is_enrolled(self.ext_user, self.course.location.course_id),
             'User ext_user should have been enrolled in the course'
         )

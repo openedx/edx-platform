@@ -25,7 +25,8 @@ class TestGradebook(ModuleStoreTestCase):
         instructor = AdminFactory.create()
         self.client.login(username=instructor.username, password='test')
 
-        modulestore().request_cache = modulestore().metadata_inheritance_cache_subsystem = None
+        # remove the caches
+        modulestore().set_modulestore_configuration({})
 
         kwargs = {}
         if self.grading_policy is not None:

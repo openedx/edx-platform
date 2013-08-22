@@ -18,7 +18,6 @@ from path import path
 from warnings import filterwarnings
 
 # Nose Test Runner
-INSTALLED_APPS += ('django_nose',)
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
 TEST_ROOT = path('test_root')

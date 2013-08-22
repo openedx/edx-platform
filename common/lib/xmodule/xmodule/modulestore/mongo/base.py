@@ -32,7 +32,7 @@ from xmodule.error_module import ErrorDescriptor
 from xblock.runtime import DbModel, KeyValueStore, InvalidScopeError
 from xblock.core import Scope
 
-from xmodule.modulestore import ModuleStoreBase, Location, namedtuple_to_son
+from xmodule.modulestore import ModuleStoreBase, Location, namedtuple_to_son, MONGO_MODULESTORE_TYPE
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.inheritance import own_metadata, INHERITABLE_METADATA, inherit_metadata
 
@@ -270,8 +270,7 @@ class MongoModuleStore(ModuleStoreBase):
     def __init__(self, host, db, collection, fs_root, render_template,
                  port=27017, default_class=None,
                  error_tracker=null_error_tracker,
-                 user=None, password=None, request_cache=None,
-                 metadata_inheritance_cache_subsystem=None, **kwargs):
+                 user=None, password=None, **kwargs):
 
         super(MongoModuleStore, self).__init__()
 
@@ -303,8 +302,6 @@ class MongoModuleStore(ModuleStoreBase):
         self.error_tracker = error_tracker
         self.render_template = render_template
         self.ignore_write_events_on_courses = []
-        self.request_cache = request_cache
-        self.metadata_inheritance_cache_subsystem = metadata_inheritance_cache_subsystem
 
     def compute_metadata_inheritance_tree(self, location):
         '''
@@ -547,7 +544,7 @@ class MongoModuleStore(ModuleStoreBase):
             raise ItemNotFoundError(location)
         return item
 
-    def has_item(self, location):
+    def has_item(self, course_id, location):
         """
         Returns True if location exists in this ModuleStore.
         """
@@ -681,7 +678,7 @@ class MongoModuleStore(ModuleStoreBase):
         # we should remove this once we can break this reference from the course to static tabs
         # TODO move this special casing to app tier (similar to attaching new element to parent)
         if location.category == 'static_tab':
-            course = self.get_course_for_item(location)
+            course = self._get_course_for_item(location)
             existing_tabs = course.tabs or []
             existing_tabs.append({
                 'type': 'static_tab',
@@ -701,7 +698,7 @@ class MongoModuleStore(ModuleStoreBase):
             self.modulestore_update_signal.send(self, modulestore=self, course_id=course_id,
                                                 location=location)
 
-    def get_course_for_item(self, location, depth=0):
+    def _get_course_for_item(self, location, depth=0):
         '''
         VS[compat]
         cdodge: for a given Xmodule, return the course that it belongs to
@@ -790,7 +787,7 @@ class MongoModuleStore(ModuleStoreBase):
         # we should remove this once we can break this reference from the course to static tabs
         loc = Location(location)
         if loc.category == 'static_tab':
-            course = self.get_course_for_item(loc)
+            course = self._get_course_for_item(loc)
             existing_tabs = course.tabs or []
             for tab in existing_tabs:
                 if tab.get('url_slug') == loc.name:
@@ -818,7 +815,7 @@ class MongoModuleStore(ModuleStoreBase):
         # we should remove this once we can break this reference from the course to static tabs
         if location.category == 'static_tab':
             item = self.get_item(location)
-            course = self.get_course_for_item(item.location)
+            course = self._get_course_for_item(item.location)
             existing_tabs = course.tabs or []
             course.tabs = [tab for tab in existing_tabs if tab.get('url_slug') != location.name]
             # Save the updates to the course to the MongoKeyValueStore
@@ -841,12 +838,12 @@ class MongoModuleStore(ModuleStoreBase):
                                      {'_id': True})
         return [i['_id'] for i in items]
 
-    def get_errored_courses(self):
+    def get_modulestore_type(self, course_id):
         """
-        This function doesn't make sense for the mongo modulestore, as courses
-        are loaded on demand, rather than up front
+        Returns a type which identifies which modulestore is servicing the given
+        course_id. The return can be either "xml" (for XML based courses) or "mongo" for MongoDB backed courses
         """
-        return {}
+        return MONGO_MODULESTORE_TYPE
 
     def _create_new_model_data(self, category, location, definition_data, metadata):
         """
@@ -861,9 +858,9 @@ class MongoModuleStore(ModuleStoreBase):
         )
 
         class_ = XModuleDescriptor.load_class(
-                    category,
-                    self.default_class
-                )
+            category,
+            self.default_class
+        )
         model_data = DbModel(kvs, class_, None, MongoUsage(None, location))
         model_data['category'] = category
         model_data['location'] = location

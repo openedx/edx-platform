@@ -19,7 +19,7 @@ class Command(BaseCommand):
             raise CommandError("This Command takes no arguments")
 
         print "Updated roles for ",
-        for i, enrollment in enumerate(CourseEnrollment.objects.all(), start=1):
+        for i, enrollment in enumerate(CourseEnrollment.objects.filter(is_active=1), start=1):
             assign_default_role(None, enrollment)
             if i % 1000 == 0:
                 print "{0}...".format(i),

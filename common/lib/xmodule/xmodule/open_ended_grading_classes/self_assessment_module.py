@@ -61,6 +61,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         else:
             previous_answer = ''
 
+        previous_answer = previous_answer.replace("\n","<br/>")
         context = {
             'prompt': self.child_prompt,
             'previous_answer': previous_answer,
@@ -184,14 +185,9 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         # add new history element with answer and empty score and hint.
         success, data = self.append_image_to_student_answer(data)
         if success:
-            success, allowed_to_submit, error_message = self.check_if_student_can_submit()
-            if allowed_to_submit:
-                data['student_answer'] = SelfAssessmentModule.sanitize_html(data['student_answer'])
-                self.new_history_entry(data['student_answer'])
-                self.change_state(self.ASSESSING)
-            else:
-                # Error message already defined
-                success = False
+            data['student_answer'] = SelfAssessmentModule.sanitize_html(data['student_answer'])
+            self.new_history_entry(data['student_answer'])
+            self.change_state(self.ASSESSING)
         else:
             # This is a student_facing_error
             error_message = "There was a problem saving the image in your submission.  Please try a different image, or try pasting a link to an image into the answer box."
@@ -200,7 +196,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
             'success': success,
             'rubric_html': self.get_rubric_html(system),
             'error': error_message,
-            'student_response': data['student_answer'],
+            'student_response': data['student_answer'].replace("\n","<br/>")
         }
 
     def save_assessment(self, data, _system):
@@ -272,8 +268,6 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         try:
             rubric_scores = json.loads(latest_post_assessment)
         except:
-            # This is a dev_facing_error
-            log.error("Cannot parse rubric scores in self assessment module from {0}".format(latest_post_assessment))
             rubric_scores = []
         return [rubric_scores]
 

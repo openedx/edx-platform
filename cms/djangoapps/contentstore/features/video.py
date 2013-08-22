@@ -9,20 +9,35 @@ from contentstore.utils import get_modulestore
 ############### ACTIONS ####################
 
 
-@step('when I view the (.*) it does not have autoplay enabled')
+@step('I have created a Video component$')
+def i_created_a_video_component(step):
+    world.create_component_instance(
+        step, '.large-video-icon',
+        'video',
+        '.xmodule_VideoModule',
+        has_multiple_templates=False
+    )
+
+
+@step('when I view the (.*) it does not have autoplay enabled$')
 def does_not_autoplay(_step, video_type):
     assert world.css_find('.%s' % video_type)[0]['data-autoplay'] == 'False'
     assert world.css_has_class('.video_control', 'play')
 
 
-@step('creating a video takes a single click')
+@step('creating a video takes a single click$')
 def video_takes_a_single_click(_step):
     assert(not world.is_css_present('.xmodule_VideoModule'))
     world.css_click("a[data-category='video']")
     assert(world.is_css_present('.xmodule_VideoModule'))
 
 
-@step('I have (hidden|toggled) captions')
+@step('I edit the component$')
+def i_edit_the_component(_step):
+    world.edit_component()
+
+
+@step('I have (hidden|toggled) captions$')
 def hide_or_show_captions(step, shown):
     button_css = 'a.hide-subtitles'
     if shown == 'hidden':
@@ -38,20 +53,8 @@ def hide_or_show_captions(step, shown):
             button.mouse_out()
         world.css_click(button_css)
 
-@step('I edit the component')
-def i_edit_the_component(_step):
-    world.edit_component()
 
-
-@step('my videoalpha display name change is persisted on save')
-def videoalpha_name_persisted(step):
-    world.css_click('a.save-button')
-    reload_the_page(step)
-    world.edit_component()
-    world.verify_setting_entry(world.get_setting_entry('Display Name'), 'Display Name', '3.4', True)
-
-
-@step('I have created a video with only XML data')
+@step('I have created a video with only XML data$')
 def xml_only_video(step):
     # Create a new video *without* metadata. This requires a certain
     # amount of rummaging to make sure all the correct data is present
@@ -81,7 +84,8 @@ def xml_only_video(step):
     reload_the_page(step)
 
 
-@step('The correct Youtube video is shown')
+@step('The correct Youtube video is shown$')
 def the_youtube_video_is_shown(_step):
     ele = world.css_find('.video').first
-    assert ele['data-youtube-id-1-0'] == world.scenario_dict['YOUTUBE_ID']
+    assert ele['data-streams'].split(':')[1] == world.scenario_dict['YOUTUBE_ID']
+

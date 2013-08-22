@@ -4,6 +4,7 @@ from django.conf import settings
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.contentstore.content import StaticContent
 from django.core.urlresolvers import reverse
 import copy
 import logging
@@ -89,8 +90,17 @@ def get_course_for_item(location):
 
 
 def get_lms_link_for_item(location, preview=False, course_id=None):
+    """
+    Returns an LMS link to the course with a jump_to to the provided location.
+
+    :param location: the location to jump to
+    :param preview: True if the preview version of LMS should be returned. Default value is false.
+    :param course_id: the course_id within which the location lives. If not specified, the course_id is obtained
+           by calling Location(location).course_id; note that this only works for locations representing courses
+           instead of elements within courses.
+    """
     if course_id is None:
-        course_id = get_course_id(location)
+        course_id = Location(location).course_id
 
     if settings.LMS_BASE is not None:
         if preview:
@@ -136,7 +146,7 @@ def get_lms_link_for_about_page(location):
     if about_base is not None:
         lms_link = "//{about_base_url}/courses/{course_id}/about".format(
             about_base_url=about_base,
-            course_id=get_course_id(location)
+            course_id=Location(location).course_id
         )
     else:
         lms_link = None
@@ -144,12 +154,11 @@ def get_lms_link_for_about_page(location):
     return lms_link
 
 
-def get_course_id(location):
-    """
-    Returns the course_id from a given the location tuple.
-    """
-    # TODO: These will need to be changed to point to the particular instance of this problem in the particular course
-    return modulestore().get_containing_courses(Location(location))[0].id
+def course_image_url(course):
+    """Returns the image url for the course."""
+    loc = course.location._replace(tag='c4x', category='asset', name=course.course_image)
+    path = StaticContent.get_url_path_from_location(loc)
+    return path
 
 
 class UnitState(object):

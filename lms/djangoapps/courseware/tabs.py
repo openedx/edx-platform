@@ -380,7 +380,8 @@ def get_static_tab_contents(request, course, tab):
     loc = Location(course.location.tag, course.location.org, course.location.course, 'static_tab', tab['url_slug'])
     model_data_cache = ModelDataCache.cache_for_descriptor_descendents(course.id,
         request.user, modulestore().get_instance(course.id, loc), depth=0)
-    tab_module = get_module(request.user, request, loc, model_data_cache, course.id)
+    tab_module = get_module(request.user, request, loc, model_data_cache, course.id,
+                            static_asset_path=course.lms.static_asset_path)
 
     logging.debug('course_module = {0}'.format(tab_module))
 

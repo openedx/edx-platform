@@ -24,6 +24,14 @@ CMS.Models.Settings.CourseGradingPolicy = Backbone.Model.extend({
             }
             attributes.graders = graderCollection;
         }
+        // If grace period is unset or equal to 00:00 on the server,
+        // it's received as null
+        if (attributes['grace_period'] === null) {
+            attributes.grace_period = {
+                hours: 0,
+                minutes: 0
+            }
+        }
         return attributes;
     },
     url : function() {
@@ -44,8 +52,25 @@ CMS.Models.Settings.CourseGradingPolicy = Backbone.Model.extend({
 
         return newDate;
     },
-    dateToGracePeriod : function(date) {
-        return {hours : date.getHours(), minutes : date.getMinutes(), seconds : date.getSeconds() };
+    parseGracePeriod : function(grace_period) {
+        // Enforce hours:minutes format
+        if(!/^\d{2,3}:\d{2}$/.test(grace_period)) {
+            return null;
+        }
+        var pieces = grace_period.split(/:/);
+        return {
+            hours: parseInt(pieces[0], 10),
+            minutes: parseInt(pieces[1], 10)
+        }
+    },
+    validate : function(attrs) {
+        if(_.has(attrs, 'grace_period')) {
+            if(attrs['grace_period'] === null) {
+                return {
+                    'grace_period': gettext('Grace period must be specified in HH:MM format.')
+                }
+            }
+        }
     }
 });
 
