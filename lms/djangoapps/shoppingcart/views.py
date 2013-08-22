@@ -26,7 +26,7 @@ def add_course_to_cart(request, course_id):
         PaidCourseRegistration.add_to_order(cart, course_id)
     except ItemNotFoundError:
         return HttpResponseNotFound(_('The course you requested does not exist.'))
-    if request.method == 'GET': ### This is temporary for testing purposes and will go away before we pull
+    if request.method == 'GET':  # This is temporary for testing purposes and will go away before we pull
         return HttpResponseRedirect(reverse('shoppingcart.views.show_cart'))
     return HttpResponse(_("Course added to cart."))
 
