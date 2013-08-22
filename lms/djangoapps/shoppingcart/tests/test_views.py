@@ -85,12 +85,6 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertTrue(PaidCourseRegistration.part_of_order(self.cart, self.course_id))
 
-    def test_register_for_verified_cert(self):
-        self.login_user()
-        resp = self.client.post(reverse('shoppingcart.views.register_for_verified_cert', args=[self.course_id]))
-        self.assertEqual(resp.status_code, 200)
-        self.assertIn(self.course_id, [ci.course_id for ci in
-                                       self.cart.orderitem_set.all().select_subclasses('certificateitem')])
 
     @patch('shoppingcart.views.render_purchase_form_html', form_mock)
     @patch('shoppingcart.views.render_to_response', render_mock)
