@@ -312,10 +312,11 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         handouts = module_store.get_item(Location(['i4x', 'edX', 'toy', 'html', 'toyhtml', None]))
         self.assertIn('/static/', handouts.data)
 
-    def test_import_textbook_as_content_element(self):
+    @mock.patch('xmodule.course_module.requests.get')
+    def test_import_textbook_as_content_element(self, mock_get):
+        mock_get.return_value.text = u'<?xml version="1.0"?>\n<table_of_contents>\n  <entry page="5" page_label="ii" name="Table of Contents"/></table_of_contents>\n'
         module_store = modulestore('direct')
         import_from_xml(module_store, 'common/test/data/', ['toy'])
-
         course = module_store.get_item(Location(['i4x', 'edX', 'toy', 'course', '2012_Fall', None]))
 
         self.assertGreater(len(course.textbooks), 0)
@@ -845,7 +846,10 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             filesystem = OSFS(root_dir / ('test_export/' + dirname))
             self.assertTrue(filesystem.exists(item.location.name + filename_suffix))
 
-    def test_export_course(self):
+    @mock.patch('xmodule.course_module.requests.get')
+    def test_export_course(self, mock_get):
+        mock_get.return_value.text = u'<?xml version="1.0"?>\n<table_of_contents>\n  <entry page="5" page_label="ii" name="Table of Contents"/></table_of_contents>\n'
+
         module_store = modulestore('direct')
         draft_store = modulestore('draft')
         content_store = contentstore()
@@ -1475,14 +1479,12 @@ class ContentStoreTest(ModuleStoreTestCase):
             'run': target_location.name
         }
 
-        target_course_id = '{0}/{1}/{2}'.format(target_location.org, target_location.course, target_location.name)
-
         resp = self.client.post(reverse('create_new_course'), course_data)
         self.assertEqual(resp.status_code, 200)
         data = parse_json(resp)
         self.assertEqual(data['id'], target_location.url())
 
-        import_from_xml(module_store, 'common/test/data/', ['toy'], target_location_namespace=target_location)
+        import_from_xml(module_store, 'common/test/data/', ['simple'], target_location_namespace=target_location)
 
         modules = module_store.get_items(Location([
             target_location.tag, target_location.org, target_location.course, None, None, None]))
@@ -1490,21 +1492,6 @@ class ContentStoreTest(ModuleStoreTestCase):
         # we should have a number of modules in there
         # we can't specify an exact number since it'll always be changing
         self.assertGreater(len(modules), 10)
-
-        #
-        # test various re-namespacing elements
-        #
-
-        # first check PDF textbooks, to make sure the url paths got updated
-        course_module = module_store.get_instance(target_course_id, target_location)
-
-        self.assertEquals(len(course_module.pdf_textbooks), 1)
-        self.assertEquals(len(course_module.pdf_textbooks[0]["chapters"]), 2)
-        self.assertEquals(course_module.pdf_textbooks[0]["chapters"][0]["url"], '/c4x/MITx/999/asset/Chapter1.pdf')
-        self.assertEquals(course_module.pdf_textbooks[0]["chapters"][1]["url"], '/c4x/MITx/999/asset/Chapter2.pdf')
-
-        # check that URL slug got updated to new course slug
-        self.assertEquals(course_module.wiki_slug, '999')
 
     def test_import_metadata_with_attempts_empty_string(self):
         module_store = modulestore('direct')
@@ -1624,29 +1611,6 @@ class ContentStoreTest(ModuleStoreTestCase):
         self.assertEqual(course.textbooks, fetched_course.textbooks)
         # is this test too strict? i.e., it requires the dicts to be ==
         self.assertEqual(course.checklists, fetched_course.checklists)
-
-    def test_image_import(self):
-        """Test backwards compatibilty of course image."""
-        module_store = modulestore('direct')
-
-        content_store = contentstore()
-
-        # Use conditional_and_poll, as it's got an image already
-        import_from_xml(
-            module_store,
-            'common/test/data/',
-            ['conditional_and_poll'],
-            static_content_store=content_store
-        )
-
-        course = module_store.get_courses()[0]
-
-        # Make sure the course image is set to the right place
-        self.assertEqual(course.course_image, 'images_course_image.jpg')
-
-        # Ensure that the imported course image is present -- this shouldn't raise an exception
-        location = course.location._replace(tag='c4x', category='asset', name=course.course_image)
-        content_store.find(location)
 
 
 class MetadataSaveTestCase(ModuleStoreTestCase):
