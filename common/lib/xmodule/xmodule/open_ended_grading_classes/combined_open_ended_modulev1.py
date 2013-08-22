@@ -103,6 +103,8 @@ class CombinedOpenEndedV1Module():
         self.current_task_number = instance_state.get('current_task_number', 0)
         # This loads the states of the individual children
         self.task_states = instance_state.get('task_states', [])
+        #This gets any old task states that have been persisted after the instructor changed the tasks.
+        self.old_task_states = instance_state.get('old_task_states', [])
         # Overall state of the combined open ended module
         self.state = instance_state.get('state', self.INITIAL)
 
@@ -168,22 +170,19 @@ class CombinedOpenEndedV1Module():
         """
         Sometimes a teacher will change the xml definition of a problem in Studio.
         This means that the state passed to the module is invalid.
-        If that is the case, delete it.
+        If that is the case, moved it to old_task_states and delete task_states.
         """
 
-        info_message = "Combined open ended user state for user {0} in location {1} was invalid.  Reset it.".format(self.system.anonymous_student_id, self.location.url())
         #If we are on a task that is greater than the number of available tasks, it is an invalid state
         #If the current task number is greater than the number of tasks we have in the xml definition, our state is invalid.
-        if self.current_task_number>len(self.task_states) or self.current_task_number>len(self.task_xml):
-            self.current_task_number = min([len(self.task_states),len(self.task_xml)])
-            log.info(info_message)
+        if self.current_task_number > len(self.task_states) or self.current_task_number > len(self.task_xml):
+            self.current_task_number = min([len(self.task_states), len(self.task_xml)]) - 1
         #If the length of the task xml is less than the length of the task states, state is invalid
-        elif len(self.task_xml)<len(self.task_states):
+        elif len(self.task_xml) < len(self.task_states):
             self.current_task_number = 0
             self.task_states = self.task_states[:len(self.task_xml)]
-            log.info(info_message)
         #Loop through each task state and make sure it matches the xml definition
-        for (i,t) in enumerate(self.task_states):
+        for (i, t) in enumerate(self.task_states):
             tag_name = self.get_tag_name(self.task_xml[i])
             children = self.child_modules()
             task_xml = self.task_xml[i]
@@ -198,22 +197,32 @@ class CombinedOpenEndedV1Module():
                     self.static_data,
                     instance_state=t,
                 )
-                if tag_name == "openended" and 'post_assessment' in task.child_history and not 'submission_id' and isinstance(task.child_history['post_assessment'], list):
-                    self.current_task_number = 0
-                    self.task_states = []
-                    log.info(info_message)
-                    break
-                elif tag_name == "selfassessment" and 'post_assessment' in task.child_history and not 'submission_id' and not isinstance(task.child_history['post_assessment'], list):
-                    self.current_task_number = 0
-                    self.task_states = []
-                    log.info(info_message)
-                    break
-            except Exception:
+                for att in task.child_history:
+                    if "post_assessment" not in att:
+                        continue
+                    pa = att['post_assessment']
+                    try:
+                        pa = json.loads(pa)
+                    except ValueError:
+                        #This is okay, the value may or may not be json encoded.
+                        pass
+                    if tag_name == "openended" and isinstance(pa, list):
+                        self.reset_task_state("Type is open ended and post assessment is a list.")
+                        break
+                    elif tag_name == "selfassessment" and not isinstance(pa, list):
+                        self.reset_task_state("Type is self assessment and post assessment is not a list.")
+                        break
+            except Exception as err:
                 #If one task doesn't match, the state is invalid.
-                self.current_task_number = 0
-                self.task_states = []
-                log.info(info_message)
+                self.reset_task_state("Could not parse task. {0}".format(err))
                 break
+
+    def reset_task_state(self, message=""):
+        info_message = "Combined open ended user state for user {0} in location {1} was invalid.  Reset it. {2}".format(self.system.anonymous_student_id, self.location.url(), message)
+        self.current_task_number = 0
+        self.old_task_states.append(self.task_states)
+        self.task_states = []
+        log.info(info_message)
 
     def get_tag_name(self, xml):
         """

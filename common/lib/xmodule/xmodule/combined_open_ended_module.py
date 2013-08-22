@@ -20,7 +20,7 @@ V1_SETTINGS_ATTRIBUTES = [
 ]
 
 V1_STUDENT_ATTRIBUTES = ["current_task_number", "task_states", "state",
-                         "student_attempts", "ready_to_reset"]
+                         "student_attempts", "ready_to_reset", "old_task_states"]
 
 V1_ATTRIBUTES = V1_SETTINGS_ATTRIBUTES + V1_STUDENT_ATTRIBUTES
 
@@ -182,6 +182,13 @@ class CombinedOpenEndedFields(object):
         help="Current task that the student is on.",
         default=0,
         scope=Scope.user_state
+    )
+    old_task_states = List(
+        help=("A list of lists of state dictionaries for student states that are saved."
+               "This field is only populated if the instructor changes tasks after"
+               "the module is created and students have attempted it (ie changes a self assessed problem to "
+               "self and peer assessed."),
+        scope = Scope.user_state
     )
     task_states = List(
         help="List of state dictionaries of each task within this module.",
@@ -379,6 +386,9 @@ class CombinedOpenEndedModule(CombinedOpenEndedFields, XModule):
 
         if self.task_states is None:
             self.task_states = []
+
+        if self.old_task_states is None:
+            self.old_task_states = []
 
         version_tuple = VERSION_TUPLES[self.version]
 
