@@ -18,3 +18,13 @@ window.isExternal = function (url) {
         return true;
     return false;
 };
+
+// Utility method for replacing a portion of a string.
+window.rewriteStaticLinks = function(content, from, to) {
+    if (from === null || to === null) {
+        return content
+    }
+
+    var regex = new RegExp(from, 'g');
+    return content.replace(regex, to)
+};

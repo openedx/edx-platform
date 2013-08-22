@@ -38,6 +38,16 @@ def modify_update(_step, text):
     change_text(text)
 
 
+@step(u'I change the update from "([^"]*)" to "([^"]*)"$')
+def change_existing_update(_step, before, after):
+    verify_text_in_editor_and_update('div.post-preview a.edit-button', before, after)
+
+
+@step(u'I change the handout from "([^"]*)" to "([^"]*)"$')
+def change_existing_handout(_step, before, after):
+    verify_text_in_editor_and_update('div.course-handouts a.edit-button', before, after)
+
+
 @step(u'I delete the update$')
 def click_button(_step):
     button_css = 'div.post-preview a.delete-button'
@@ -80,3 +90,10 @@ def change_text(text):
     type_in_codemirror(0, text)
     save_css = 'a.save-button'
     world.css_click(save_css)
+
+
+def verify_text_in_editor_and_update(button_css, before, after):
+    world.css_click(button_css)
+    text = world.css_find(".cm-string").html
+    assert before in text
+    change_text(after)
