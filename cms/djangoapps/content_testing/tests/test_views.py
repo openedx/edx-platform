@@ -16,7 +16,7 @@ from django.http import Http404
 # disable sillly pylint violations
 # pylint: disable=W0212
 # pylint: disable=W0201
-class TestProblemViewTestCase (CourseTestCase):
+class ContentTestViewTestCase (CourseTestCase):
     """
     Tests for the views involved in the automated content testing
     """
@@ -39,7 +39,7 @@ class TestProblemViewTestCase (CourseTestCase):
         override parent setUp to put a problem in that course
         """
 
-        super(TestProblemViewTestCase, self).setUp()
+        super(ContentTestViewTestCase, self).setUp()
 
         #change the script if 1
         problem_xml = CustomResponseXMLFactory().build_xml(
@@ -102,6 +102,15 @@ class TestProblemViewTestCase (CourseTestCase):
 
         descriptor = modulestore().get_item(self.problem.location)
         self.assertEqual(len(descriptor.tests), 1)
+
+        # also, chack that it was saved "fully", with all the data that gets
+        # calculated on instantiation (necessary for future rematching)
+        for test in descriptor.tests:
+            assert 'responses' in test
+
+
+
+class ContentTestDispatchTestCase(ContentTestViewTestCase):
 
     def test_no_tests(self):
         """
@@ -167,10 +176,10 @@ class TestProblemViewTestCase (CourseTestCase):
 
         self.create_model()
 
-        # run the test
+        # run the test, and see that result is persistant
         response1 = self.client.post(self.url, {'location': self.loc, 'run': 'yup'})
         response2 = self.client.get(self.url, {'location': self.loc})
-        print response2.content
+
         assert ContentTest.PASS.lower() in response2.content.lower()
         self.assertEqual(response1.status_code, 200)
 
@@ -183,7 +192,7 @@ class TestProblemViewTestCase (CourseTestCase):
         self.assertEqual(response.status_code, 404)
 
 
-class HelpFuncTestCase(TestProblemViewTestCase):
+class HelpFuncTestCase(ContentTestViewTestCase):
 
     def test_getprompt_parent(self):
 
@@ -239,14 +248,20 @@ class HelpFuncTestCase(TestProblemViewTestCase):
         Test the function for incrementing id's.
         """
         self.create_model()
-        add_contenttest_to_descriptor(self.problem, self.pass_correct.todict())
 
-        # refetch probem form database to see changes
+        # add a few tests
+        num_tests = 5
+        for i in range(num_tests-1):
+            add_contenttest_to_descriptor(self.problem, self.pass_correct.todict())
+
+        # refetch problem form database to see changes
         problem = modulestore().get_item(self.problem.location)
 
-        # asserts that there are two, and each has different ids
-        self.assertEqual(len(problem.tests), 2)
-        self.assertNotEqual(problem.tests[0]['id'], problem.tests[1]['id'])
+        test_ids = [test['id'] for test in problem.tests]
+
+        # asserts that there are `num_tests`, and each has different ids
+        self.assertEqual(len(problem.tests), num_tests)
+        assert len(test_ids) == len(set(test_ids))
 
     def test_delete_contenttest(self):
         """
@@ -254,13 +269,18 @@ class HelpFuncTestCase(TestProblemViewTestCase):
         """
         self.create_model()
 
+        # add a few tests
+        num_tests = 5
+        for i in range(num_tests-1):
+            add_contenttest_to_descriptor(self.problem, self.pass_correct.todict())
+
         # delete the test
         delete_contenttest(self.problem, self.problem.tests[0]['id'])
 
         # re-fetch descriptor
         self.problem = modulestore().get_item(self.problem.location)
 
-        self.assertEqual(len(self.problem.tests), 0)
+        self.assertEqual(len(self.problem.tests), num_tests-1)
 
     def test_delete_404_no_tests(self):
         """

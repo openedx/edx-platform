@@ -3,9 +3,8 @@ Views for using the atuomated content testing feature.  These views should be co
 a mockup for using the models
 """
 
-from django.http import HttpResponse, HttpResponseRedirect, Http404
+from django.http import HttpResponse, Http404
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore import Location
 from content_testing.models import ContentTest
 
 #csrf utilities because mako :_ (
@@ -15,12 +14,13 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from contentstore.views.access import has_access
 
-from mitxmako.shortcuts import render_to_response, render_to_string
+from mitxmako.shortcuts import render_to_string
 from lxml import etree
 from copy import deepcopy
 
 # supported response types
 RESPONSE_TYPES = ['customresponse']
+
 
 def dict_slice(data, string):
     """
@@ -71,7 +71,6 @@ def problem_test(request):
     descriptor = modulestore().get_item(location)
 
     if request.method == 'GET':
-
         html = testing_summary(request, descriptor)
         return HttpResponse('{"html": '+html+'}')
 
@@ -146,11 +145,14 @@ def add_contenttest_to_descriptor(descriptor, test_dict):
     # give it an ID one more than the previous one, if there are
     # previou tests
     if tests:
-        new_id = tests[0]['id']+1
+        new_id = tests[-1]['id']+1
     else:
         new_id = 0
 
     test_dict['id'] = new_id
+
+    # we need to instantiate before saving so rematching will work
+    test_dict = ContentTest(**test_dict).todict()
 
     # add it to the descriptor
     tests.append(test_dict)
@@ -178,7 +180,6 @@ def testing_summary(request, descriptor):
     Render the testing summary for this descriptor
     """
     tests = instantiate_tests(descriptor)
-
     # sort tests by should_be value.
     # The dictionary contains a key for every available `should_be`, and tests are just
     # appended to the value of that key.
