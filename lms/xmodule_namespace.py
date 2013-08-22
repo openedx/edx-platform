@@ -56,3 +56,4 @@ class LmsNamespace(Namespace):
         default=None,
         scope=Scope.settings
     )
+    static_asset_path = String(help="Path to use for static assets - overrides Studio c4x://", scope=Scope.settings, default='')
