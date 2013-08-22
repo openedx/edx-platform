@@ -89,6 +89,7 @@ def instructor_dashboard(request, course_id):
     to_option = None
     subject = None
     html_message = ''
+    show_email_tab = False
     problems = []
     plots = []
     datatable = {}
@@ -798,11 +799,11 @@ def instructor_dashboard(request, course_id):
     else:
         editor = None
 
-    # Flag for what backing store this course is (Mongo vs. XML)
-    if modulestore().get_modulestore_type(course_id) == MONGO_MODULESTORE_TYPE:
-        is_mongo_modulestore_type = True
-    else:
-        is_mongo_modulestore_type = False
+    # Flag for whether or not we display the email tab (depending upon
+    # what backing store this course using (Mongo vs. XML))
+    if settings.MITX_FEATURES['ENABLE_INSTRUCTOR_EMAIL'] and \
+       modulestore().get_modulestore_type(course_id) == MONGO_MODULESTORE_TYPE:
+        show_email_tab = True
 
     # display course stats only if there is no other table to display:
     course_stats = None
@@ -820,10 +821,11 @@ def instructor_dashboard(request, course_id):
                'course_stats': course_stats,
                'msg': msg,
                'modeflag': {idash_mode: 'selectedmode'},
-               'to_option': to_option,          # email
-               'subject': subject,              # email
-               'editor': editor,                # email
-               'email_msg': email_msg,          # email
+               'to_option': to_option,            # email
+               'subject': subject,                # email
+               'editor': editor,                  # email
+               'email_msg': email_msg,            # email
+               'show_email_tab': show_email_tab,  # email
                'problems': problems,		# psychometrics
                'plots': plots,			# psychometrics
                'course_errors': modulestore().get_item_errors(course.location),
@@ -832,7 +834,6 @@ def instructor_dashboard(request, course_id):
                'cohorts_ajax_url': reverse('cohorts', kwargs={'course_id': course_id}),
 
                'analytics_results': analytics_results,
-               'is_mongo_modulestore_type': is_mongo_modulestore_type,
                }
 
     if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BETA_DASHBOARD'):
