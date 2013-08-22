@@ -9,6 +9,7 @@ from fs.osfs import OSFS
 from json import dumps
 import json
 import datetime
+import copy
 
 
 class EdxJSONEncoder(json.JSONEncoder):
@@ -76,9 +77,16 @@ def export_to_xml(modulestore, contentstore, course_location, root_dir, course_d
     with course_run_policy_dir.open('grading_policy.json', 'w') as grading_policy:
         grading_policy.write(dumps(course.grading_policy, cls=EdxJSONEncoder))
 
+    # Checklists contain non-portable links, don't export them
+    course_metadata = copy.copy(own_metadata(course))
+    stripped_metadata = ('checklists',)
+    for key in stripped_metadata:
+        if key in course_metadata:
+            del course_metadata[key]
+
     # export all of the course metadata in policy.json
     with course_run_policy_dir.open('policy.json', 'w') as course_policy:
-        policy = {'course/' + course.location.name: own_metadata(course)}
+        policy = {'course/' + course.location.name: course_metadata}
         course_policy.write(dumps(policy, cls=EdxJSONEncoder))
 
     # export draft content
