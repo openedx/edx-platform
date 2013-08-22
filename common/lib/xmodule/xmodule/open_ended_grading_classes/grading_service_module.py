@@ -62,7 +62,6 @@ class GradingService(object):
         """
         Make a get request to the grading controller
         """
-        log.debug(params)
         op = lambda: self.session.get(url,
                                       allow_redirects=allow_redirects,
                                       params=params)

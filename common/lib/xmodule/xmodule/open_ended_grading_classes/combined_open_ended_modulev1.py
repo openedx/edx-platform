@@ -9,7 +9,7 @@ import self_assessment_module
 import open_ended_module
 from functools import partial
 from .combined_open_ended_rubric import CombinedOpenEndedRubric, GRADER_TYPE_IMAGE_DICT, HUMAN_GRADER_TYPE, LEGEND_LIST
-from peer_grading_service import PeerGradingService, MockPeerGradingService
+from peer_grading_service import PeerGradingService, MockPeerGradingService, GradingServiceError
 
 log = logging.getLogger("mitx.courseware")
 
@@ -40,10 +40,10 @@ HUMAN_TASK_TYPE = {
 }
 
 HUMAN_STATES = {
-    'intitial' : "Not started.",
-    'assessing' : "Being scored.",
-    'intermediate_done' : "Scoring finished.",
-    'done' : "Complete."
+    'intitial': "Not started.",
+    'assessing': "Being scored.",
+    'intermediate_done': "Scoring finished.",
+    'done': "Complete.",
 }
 
 # Default value that controls whether or not to skip basic spelling checks in the controller
@@ -438,6 +438,7 @@ class CombinedOpenEndedV1Module():
             grader_type = grader_types[0]
         else:
             grader_type = "IN"
+            grader_types = ["IN"]
 
         if grader_type in HUMAN_GRADER_TYPE:
             human_grader_name = HUMAN_GRADER_TYPE[grader_type]
@@ -514,33 +515,46 @@ class CombinedOpenEndedV1Module():
         return return_html
 
     def check_if_student_has_done_needed_grading(self):
+        """
+        Checks with the ORA server to see if the student has completed the needed peer grading to be shown their grade.
+        For example, if a student submits one response, and three peers grade their response, the student
+        cannot see their grades and feedback unless they reciprocate.
+        Output:
+        success - boolean indicator of success
+        allowed_to_submit - boolean indicator of whether student has done their needed grading or not
+        error_message - If not success, explains why
+        """
         student_id = self.system.anonymous_student_id
         success = False
         allowed_to_submit = True
-        error_string = ("<h4>Feedback not available yet</h4>"
-                        "<p>You need to peer grade {0} more submissions in order to see your feedback.</p>"
-                        "<p>You have graded responses from {1} students, and {2} students have graded your submissions. </p>"
-                        "<p>You have made {3} submissions.</p>")
         try:
             response = self.peer_gs.get_data_for_location(self.location.url(), student_id)
-            log.info(response)
             count_graded = response['count_graded']
             count_required = response['count_required']
             student_sub_count = response['student_sub_count']
             count_available = response['count_available']
             success = True
-        except:
+        except GradingServiceError:
             # This is a dev_facing_error
             log.error("Could not contact external open ended graders for location {0} and student {1}".format(
                 self.location, student_id))
             # This is a student_facing_error
             error_message = "Could not contact the graders.  Please notify course staff."
             return success, allowed_to_submit, error_message
+        except KeyError:
+            log.error("Invalid response from grading server for location {0} and student {1}".format(self.location, student_id))
+            error_message = "Received invalid response from the graders.  Please notify course staff."
+            return success, allowed_to_submit, error_message
         if count_graded >= count_required or count_available==0:
-            return success, allowed_to_submit, ""
+            error_message = ""
+            return success, allowed_to_submit, error_message
         else:
             allowed_to_submit = False
             # This is a student_facing_error
+            error_string = ("<h4>Feedback not available yet</h4>"
+                            "<p>You need to peer grade {0} more submissions in order to see your feedback.</p>"
+                            "<p>You have graded responses from {1} students, and {2} students have graded your submissions. </p>"
+                            "<p>You have made {3} submissions.</p>")
             error_message = error_string.format(count_required - count_graded, count_graded, count_required,
                                                 student_sub_count)
             return success, allowed_to_submit, error_message
@@ -562,9 +576,12 @@ class CombinedOpenEndedV1Module():
             rubric_number+=1
         response = self.get_last_response(rubric_number)
         score_length = len(response['grader_types'])
-        for z in xrange(0,score_length):
-            feedback = response['feedback_dicts'][z].get('feedback', '')
-            if response['grader_types'][z] in HUMAN_GRADER_TYPE.keys():
+        for z in xrange(score_length):
+            if response['grader_types'][z] in HUMAN_GRADER_TYPE:
+                try:
+                    feedback = response['feedback_dicts'][z].get('feedback', '')
+                except TypeError:
+                    return {'success' : False}
                 rubric_scores = [[response['rubric_scores'][z]]]
                 grader_types = [[response['grader_types'][z]]]
                 feedback_items = [[response['feedback_items'][z]]]
@@ -664,7 +681,7 @@ class CombinedOpenEndedV1Module():
         self.student_attempts +=1
         self.state = self.INITIAL
         self.ready_to_reset = False
-        for i in xrange(0, len(self.task_xml)):
+        for i in xrange(len(self.task_xml)):
             self.current_task_number = i
             self.setup_next_task(reset=True)
             self.current_task.reset(self.system)

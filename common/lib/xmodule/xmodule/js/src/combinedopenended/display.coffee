@@ -171,7 +171,6 @@ class @CombinedOpenEnded
     @results_container = @$(@result_container_sel)
     @combined_rubric_container = @$(@combined_rubric_sel)
 
-
     # Where to put the rubric once we load it
     @oe = @$(@open_ended_child_sel)
 

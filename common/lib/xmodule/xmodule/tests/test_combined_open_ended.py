@@ -73,6 +73,7 @@ class OpenEndedChildTest(unittest.TestCase):
 
     def setUp(self):
         self.test_system = get_test_system()
+        self.test_system.open_ended_grading_interface = None
         self.openendedchild = OpenEndedChild(self.test_system, self.location,
                                              self.definition, self.descriptor, self.static_data, self.metadata)
 
@@ -203,7 +204,7 @@ class OpenEndedModuleTest(unittest.TestCase):
 
     def setUp(self):
         self.test_system = get_test_system()
-
+        self.test_system.open_ended_grading_interface = None
         self.test_system.location = self.location
         self.mock_xqueue = MagicMock()
         self.mock_xqueue.send_to_queue.return_value = (None, "Message")
@@ -378,6 +379,7 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
     full_definition = definition_template.format(prompt=prompt, rubric=rubric, task1=task_xml1, task2=task_xml2)
     descriptor = Mock(data=full_definition)
     test_system = get_test_system()
+    test_system.open_ended_grading_interface = None
     combinedoe_container = CombinedOpenEndedModule(
         test_system,
         descriptor,
@@ -504,6 +506,7 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
 
     def setUp(self):
         self.test_system = get_test_system()
+        self.test_system.open_ended_grading_interface = None
         self.test_system.xqueue['interface'] = Mock(
             send_to_queue=Mock(side_effect=[1, "queued"])
         )
@@ -537,9 +540,9 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
         module = self.get_module_from_location(self.problem_location, COURSE)
 
         #Simulate a student saving an answer
-        module.handle_ajax("save_answer", {"student_answer": self.answer})
-        status = module.handle_ajax("get_status", {})
-        self.assertTrue(isinstance(status, basestring))
+        html = module.handle_ajax("get_html", {})
+        module.handle_ajax("save_answer", {"student_answer": self.answer, "can_upload_files" : False, "student_file" : None})
+        html = module.handle_ajax("get_html", {})
 
         #Mock a student submitting an assessment
         assessment_dict = MockQueryDict()
@@ -547,8 +550,7 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
         module.handle_ajax("save_assessment", assessment_dict)
         task_one_json = json.loads(module.task_states[0])
         self.assertEqual(json.loads(task_one_json['child_history'][0]['post_assessment']), assessment)
-        status = module.handle_ajax("get_status", {})
-        self.assertTrue(isinstance(status, basestring))
+        rubric = module.handle_ajax("get_combined_rubric", {})
 
         #Move to the next step in the problem
         module.handle_ajax("next_problem", {})
@@ -585,7 +587,6 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
         module.handle_ajax("save_assessment", assessment_dict)
         task_one_json = json.loads(module.task_states[0])
         self.assertEqual(json.loads(task_one_json['child_history'][0]['post_assessment']), assessment)
-        module.handle_ajax("get_status", {})
 
         #Move to the next step in the problem
         try:
@@ -628,12 +629,8 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
 
         #Get html and other data client will request
         module.get_html()
-        legend = module.handle_ajax("get_legend", {})
-        self.assertTrue(isinstance(legend, basestring))
 
-        module.handle_ajax("get_status", {})
         module.handle_ajax("skip_post_assessment", {})
-        self.assertTrue(isinstance(legend, basestring))
 
         #Get all results
         module.handle_ajax("get_combined_rubric", {})
@@ -654,6 +651,7 @@ class OpenEndedModuleXmlAttemptTest(unittest.TestCase, DummyModulestore):
 
     def setUp(self):
         self.test_system = get_test_system()
+        self.test_system.open_ended_grading_interface = None
         self.test_system.xqueue['interface'] = Mock(
             send_to_queue=Mock(side_effect=[1, "queued"])
         )
@@ -670,8 +668,6 @@ class OpenEndedModuleXmlAttemptTest(unittest.TestCase, DummyModulestore):
 
         #Simulate a student saving an answer
         module.handle_ajax("save_answer", {"student_answer": self.answer})
-        status = module.handle_ajax("get_status", {})
-        self.assertTrue(isinstance(status, basestring))
 
         #Mock a student submitting an assessment
         assessment_dict = MockQueryDict()
@@ -679,8 +675,6 @@ class OpenEndedModuleXmlAttemptTest(unittest.TestCase, DummyModulestore):
         module.handle_ajax("save_assessment", assessment_dict)
         task_one_json = json.loads(module.task_states[0])
         self.assertEqual(json.loads(task_one_json['child_history'][0]['post_assessment']), assessment)
-        status = module.handle_ajax("get_status", {})
-        self.assertTrue(isinstance(status, basestring))
 
         #Move to the next step in the problem
         module.handle_ajax("next_problem", {})

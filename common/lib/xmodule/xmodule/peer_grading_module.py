@@ -227,7 +227,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
             count_graded = self.student_data_for_location['count_graded']
             count_required = self.student_data_for_location['count_required']
         except:
-            success, response = self.query_data_for_location()
+            success, response = self.query_data_for_location(self.location)
             if not success:
                 log.exception(
                     "No instance data found and could not get data from controller for loc {0} student {1}".format(
@@ -311,7 +311,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
         """
 
         required = ['location', 'submission_id', 'submission_key', 'score', 'feedback', 'submission_flagged', 'answer_unknown']
-        if 'submission_flagged' not in data or data['submission_flagged'] in ["false", False, "False"]:
+        if data.get("submission_flagged", False) in ["false", False, "False", "FALSE"]:
             required.append("rubric_scores[]")
         success, message = self._check_required(data, set(required))
         if not success:
@@ -325,6 +325,8 @@ class PeerGradingModule(PeerGradingFields, XModule):
         try:
             response = self.peer_gs.save_grade(**data_dict)
             success, location_data = self.query_data_for_location(data_dict['location'])
+            #Don't check for success above because the response = statement will raise the same Exception as the one
+            #that will cause success to be false.
             response.update({'required_done' : False})
             if 'count_graded' in location_data and 'count_required' in location_data and int(location_data['count_graded'])>=int(location_data['count_required']):
                 response['required_done'] = True
@@ -507,7 +509,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
             error_text = "Could not get list of problems to peer grade.  Please notify course staff."
             log.error(error_text)
             success = False
-        except:
+        except Exception:
             log.exception("Could not contact peer grading service.")
             success = False
 
@@ -518,7 +520,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
             '''
             try:
                 return modulestore().get_instance(self.system.course_id, location)
-            except:
+            except Exception:
                 # the linked problem doesn't exist
                 log.error("Problem {0} does not exist in this course".format(location))
                 raise
@@ -528,14 +530,14 @@ class PeerGradingModule(PeerGradingFields, XModule):
             problem_location = problem['location']
             try:
                 descriptor = _find_corresponding_module_for_location(problem_location)
-            except:
+            except Exception:
                 continue
             if descriptor:
                 problem['due'] = descriptor.lms.due
                 grace_period = descriptor.lms.graceperiod
                 try:
                     problem_timeinfo = TimeInfo(problem['due'], grace_period)
-                except:
+                except Exception:
                     log.error("Malformed due date or grace period string for location {0}".format(problem_location))
                     raise
                 if self._closed(problem_timeinfo):
