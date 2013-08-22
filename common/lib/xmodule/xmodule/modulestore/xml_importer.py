@@ -250,10 +250,10 @@ def import_module(module, store, course_data_path, static_content_store,
     # inherited metadata everywhere.
 
     # remove any export/import only xml_attributes which are used to wire together draft imports
-    if 'parent_sequential_url' in module.xml_attributes:
+    if hasattr(module, 'xml_attributes') and 'parent_sequential_url' in module.xml_attributes:
         del module.xml_attributes['parent_sequential_url']
 
-    if 'index_in_children_list' in module.xml_attributes:
+    if hasattr(module, 'xml_attributes') and 'index_in_children_list' in module.xml_attributes:
         del module.xml_attributes['index_in_children_list']
     module.save()
 
