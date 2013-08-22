@@ -10,6 +10,7 @@ from xblock.runtime import KeyValueStore, InvalidScopeError
 from xmodule.tests import DATA_DIR
 from xmodule.modulestore import Location
 from xmodule.modulestore.mongo import MongoModuleStore, MongoKeyValueStore
+from xmodule.modulestore.draft import DraftModuleStore
 from xmodule.modulestore.xml_importer import import_from_xml
 from xmodule.contentstore.mongo import MongoContentStore
 
@@ -36,7 +37,7 @@ class TestMongoModuleStore(object):
         # is ok only as long as none of the tests modify the db.
         # If (when!) that changes, need to either reload the db, or load
         # once and copy over to a tmp db for each test.
-        cls.store = cls.initdb()
+        cls.store, cls.content_store, cls.draft_store = cls.initdb()
 
     @classmethod
     def teardownClass(cls):
@@ -50,10 +51,14 @@ class TestMongoModuleStore(object):
         # since MongoModuleStore and MongoContentStore are basically assumed to be together, create this class
         # as well
         content_store = MongoContentStore(HOST, DB)
+        #
+        # Also test draft store imports
+        #
+        draft_store = DraftModuleStore(HOST, DB, COLLECTION, FS_ROOT, RENDER_TEMPLATE, default_class=DEFAULT_CLASS)
         # Explicitly list the courses to load (don't want the big one)
-        courses = ['toy', 'simple']
-        import_from_xml(store, DATA_DIR, courses, static_content_store=content_store)
-        return store
+        courses = ['toy', 'simple', 'simple_with_draft']
+        import_from_xml(store, DATA_DIR, courses, draft_store=draft_store, static_content_store=content_store)
+        return store, content_store, draft_store
 
     @staticmethod
     def destroy_db(connection):
@@ -81,10 +86,11 @@ class TestMongoModuleStore(object):
     def test_get_courses(self):
         '''Make sure the course objects loaded properly'''
         courses = self.store.get_courses()
-        assert_equals(len(courses), 2)
+        assert_equals(len(courses), 3)
         courses.sort(key=lambda c: c.id)
         assert_equals(courses[0].id, 'edX/simple/2012_Fall')
-        assert_equals(courses[1].id, 'edX/toy/2012_Fall')
+        assert_equals(courses[1].id, 'edX/simple_with_draft/2012_Fall')
+        assert_equals(courses[2].id, 'edX/toy/2012_Fall')
 
     def test_loads(self):
         assert_not_equals(
@@ -133,7 +139,7 @@ class TestMongoModuleStore(object):
 
             Assumes the information is desired for courses[1] ('toy' course).
             """
-            return courses[1].tabs[index]['name']
+            return courses[2].tabs[index]['name']
 
         # There was a bug where model.save was not getting called after the static tab name
         # was set set for tabs that have a URL slug. 'Syllabus' and 'Resources' fall into that
