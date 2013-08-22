@@ -63,14 +63,14 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         PaidCourseRegistration.add_to_order(self.cart, self.course_id)
         self.login_user()
         resp = self.client.post(reverse('shoppingcart.views.add_course_to_cart', args=[self.course_id]))
-        self.assertEqual(resp.status_code, 404)
+        self.assertEqual(resp.status_code, 400)
         self.assertIn(_('The course {0} is already in your cart.'.format(self.course_id)), resp.content)
 
     def test_add_course_to_cart_already_registered(self):
         CourseEnrollment.enroll(self.user, self.course_id)
         self.login_user()
         resp = self.client.post(reverse('shoppingcart.views.add_course_to_cart', args=[self.course_id]))
-        self.assertEqual(resp.status_code, 404)
+        self.assertEqual(resp.status_code, 400)
         self.assertIn(_('You are already registered in course {0}.'.format(self.course_id)), resp.content)
 
     def test_add_nonexistent_course_to_cart(self):
