@@ -13,17 +13,17 @@ from django.test.utils import override_settings
 from courseware import grades
 from courseware.model_data import ModelDataCache
 
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import modulestore, editable_modulestore
 
 #import factories and parent testcase modules
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from capa.tests.response_xml_factory import OptionResponseXMLFactory, CustomResponseXMLFactory, SchematicResponseXMLFactory
 from courseware.tests.helpers import LoginEnrollmentTestCase
-from courseware.tests.modulestore_config import TEST_DATA_MONGO_MODULESTORE
+from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
         Check that a course gets graded properly.
@@ -217,7 +217,8 @@ class TestCourseGrader(TestSubmittingProblems):
         """
 
         course_data = {'grading_policy': grading_policy}
-        modulestore().update_item(self.course.location, course_data)
+        store = editable_modulestore('direct')
+        store.update_item(self.course.location, course_data)
         self.refresh_course()
 
     def get_grade_summary(self):
