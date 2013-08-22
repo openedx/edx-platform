@@ -57,7 +57,6 @@ from mitxmako.shortcuts import render_to_string
 from bulk_email.models import CourseEmail
 from html_to_text import html_to_text
 import datetime
-from hashlib import md5
 from bulk_email import tasks
 
 log = logging.getLogger(__name__)
@@ -715,12 +714,13 @@ def instructor_dashboard(request, course_id):
                             to_option=to_option,
                             subject=subject,
                             html_message=html_message,
-                            text_message=text_message,
-                            hash=md5((html_message + subject + datetime.datetime.isoformat(datetime.datetime.now())).encode('utf-8')).hexdigest())
+                            text_message=text_message)
+
         email.save()
 
         course_url = request.build_absolute_uri(reverse('course_root', kwargs={'course_id': course_id}))
-        tasks.delegate_email_batches.delay(email.hash, email.to_option, course_id, course_url, request.user.id)
+        tasks.delegate_email_batches.delay(email.id, email.to_option, course_id, course_url, request.user.id)
+
 
         if to_option == "all":
             email_msg = '<div class="msg msg-confirm"><p class="copy">Your email was successfully queued for sending. Please note that for large public classes (~10k), it may take 1-2 hours to send all emails.</p></div>'

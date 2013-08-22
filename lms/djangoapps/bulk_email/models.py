@@ -23,8 +23,7 @@ class Email(models.Model):
     Abstract base class for common information for an email.
     """
     sender = models.ForeignKey(User, default=1, blank=True, null=True)
-    # The unique hash for this email. Used to quickly look up an email (see `tasks.py`)
-    hash = models.CharField(max_length=128, db_index=True)
+    slug = models.CharField(max_length=128, db_index=True)
     subject = models.CharField(max_length=128, blank=True)
     html_message = models.TextField(null=True, blank=True)
     text_message = models.TextField(null=True, blank=True)

@@ -240,4 +240,4 @@ class TestEmailSendExceptions(ModuleStoreTestCase):
     def test_no_course_email_obj(self):
         # Make sure course_email handles CourseEmail.DoesNotExist exception.
         with self.assertRaises(CourseEmail.DoesNotExist):
-            course_email("dummy hash", [], "_", "_", False)
+            course_email(101, [], "_", "_", False)
