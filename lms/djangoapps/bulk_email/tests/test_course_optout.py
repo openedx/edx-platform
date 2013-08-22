@@ -31,6 +31,12 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
 
         self.client.login(username=self.student.username, password="test")
 
+    def tearDown(self):
+        """
+        Undo all patches.
+        """
+        patch.stopall()
+
     def navigate_to_email_view(self):
         """Navigate to the instructor dash's email view"""
         # Pull up email view on instructor dashboard
@@ -54,6 +60,8 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
         Make sure student does not receive course email after opting out.
         """
         url = reverse('change_email_settings')
+        # This is a checkbox, so on the post of opting out (that is, an Un-check of the box),
+        # the Post that is sent will not contain 'receive_emails'
         response = self.client.post(url, {'course_id': self.course.id})
         self.assertEquals(json.loads(response.content), {'success': True})
 

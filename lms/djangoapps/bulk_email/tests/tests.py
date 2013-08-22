@@ -32,6 +32,12 @@ class TestInstructorDashboardEmailView(ModuleStoreTestCase):
         # URL for email view
         self.email_link = '<a href="#" onclick="goto(\'Email\')" class="None">Email</a>'
 
+    def tearDown(self):
+        """
+        Undo all patches.
+        """
+        patch.stopall()
+
     @patch.dict(settings.MITX_FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True})
     def test_email_flag_true(self):
         # Assert that the URL for the email view is in the response

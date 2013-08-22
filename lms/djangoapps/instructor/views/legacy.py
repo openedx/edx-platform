@@ -55,6 +55,7 @@ from mitxmako.shortcuts import render_to_string
 
 
 from bulk_email.models import CourseEmail
+from html_to_text import html_to_text
 import datetime
 from hashlib import md5
 from bulk_email import tasks
@@ -706,12 +707,14 @@ def instructor_dashboard(request, course_id):
         to_option = request.POST.get("to_option")
         subject = request.POST.get("subject")
         html_message = request.POST.get("message")
+        text_message = html_to_text(html_message)
 
         email = CourseEmail(course_id=course_id,
                             sender=request.user,
                             to=to_option,
                             subject=subject,
                             html_message=html_message,
+                            text_message=text_message,
                             hash=md5((html_message + subject + datetime.datetime.isoformat(datetime.datetime.now())).encode('utf-8')).hexdigest())
         email.save()
 
