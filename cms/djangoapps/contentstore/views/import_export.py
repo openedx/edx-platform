@@ -89,16 +89,20 @@ def import_course(request, org, course, name):
             # Check to make sure we haven't missed a chunk
             # This shouldn't happen, even if different instances are handling
             # the same session, but it's always better to catch errors earlier.
-            if size != int(content_range['start']):
+            if size < int(content_range['start']):
                 log.warning(
                     "Reported range %s does not match size downloaded so far %s",
-                    size,
-                    content_range['start']
+                    content_range['start'],
+                    size
                 )
                 return JsonResponse(
                     {'ErrMsg': 'File upload corrupted. Please try again'},
                     status=409
                 )
+            # The last request sometimes comes twice. This happens because
+            # nginx sends a 499 error code when the response takes too long.
+            elif size > int(content_range['stop']) and size == int(content_range['end']):
+                return JsonResponse({'ImportStatus': 1})
 
         with open(temp_filepath, mode) as temp_file:
             for chunk in request.FILES['course-data'].chunks():

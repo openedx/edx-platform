@@ -34,6 +34,7 @@
         <input type="file" name="course-data" class="file-input" >
         <input type="submit" value="${_('Replace my course with the one above')}" class="submit-button" >
         <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}">
+        <p class="status-block">Unpacking...</p>
         <div class="progress-bar">
           <div class="progress-fill"></div>
           <div class="percent">0%</div>
@@ -55,6 +56,7 @@ var bar = $('.progress-bar');
 var fill = $('.progress-fill');
 var percent = $('.percent');
 var status = $('#status');
+var statusBlock = $('.status-block');
 var submitBtn = $('.submit-button');
 
 
@@ -79,6 +81,11 @@ $('#fileupload').fileupload({
                         alert('${_("Your import has failed.")}\n\n' + JSON.parse(result.responseText)["ErrMsg"]);
                         submitBtn.show();
                         bar.hide();
+                    } else {
+                        if (result.responseText["ImportStatus"] == 1) {
+                            bar.hide();
+                            statusBlock.show();
+                        }
                     }
                 });
             });
