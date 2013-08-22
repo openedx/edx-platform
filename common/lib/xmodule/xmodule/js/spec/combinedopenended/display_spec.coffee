@@ -1,3 +1,30 @@
+describe 'Rubric', ->
+  beforeEach ->
+    spyOn Logger, 'log'
+    # load up some fixtures
+    loadFixtures 'rubric.html'
+    jasmine.Clock.useMock()
+    @element = $('.combined-open-ended')
+    @location = @element.data('location')
+
+  describe 'constructor', ->
+    beforeEach ->
+      @rub = new Rubric @element
+
+    it 'rubric should properly grab the element', ->
+      expect(@rub.el).toEqual @element
+
+  describe 'initialize', ->
+    beforeEach ->
+      @rub = new Rubric @element
+      @rub.initialize @location
+
+    it 'rubric correctly sets location', ->
+      expect($(@rub.rubric_sel).data('location')).toEqual @location
+
+    it 'rubric correctly read', ->
+      expect(@rub.categories.length).toEqual 5
+
 describe 'CombinedOpenEnded', ->
   beforeEach ->
     spyOn Logger, 'log'
@@ -13,7 +40,7 @@ describe 'CombinedOpenEnded', ->
       @combined = new CombinedOpenEnded @element
 
     it 'set the element', ->
-      expect(@combined.element).toEqual @element
+      expect(@combined.el).toEqual @element
 
     it 'get the correct values from data fields', ->
       expect(@combined.ajax_url).toEqual '/courses/MITx/6.002x/2012_Fall/modx/i4x://MITx/6.002x/combinedopenended/CombinedOE'
@@ -77,7 +104,7 @@ describe 'CombinedOpenEnded', ->
       @combined.child_state = 'done'
       @combined.rebind()
       expect(@combined.answer_area.attr("disabled")).toBe("disabled")
-      expect(@combined.next_problem).toHaveBeenCalled()
+      expect(@combined.next_problem_button).toBe(":visible")
 
   describe 'next_problem', ->
     beforeEach ->
@@ -106,6 +133,8 @@ describe 'CombinedOpenEnded', ->
       spyOn($, 'postWithPrefix').andCallFake (url, val, callback) -> callback(fakeResponse)
       @combined.next_problem()
       expect(@combined.errors_area.html()).toBe(fakeResponse.error)
+
+
 
 
 
