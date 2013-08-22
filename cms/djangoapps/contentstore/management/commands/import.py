@@ -18,7 +18,7 @@ class Command(BaseCommand):
         make_option('--nostatic',
                     action='store_true',
                     help='Skip import of static content'),
-        )
+    )
 
     def handle(self, *args, **options):
         "Execute the command"

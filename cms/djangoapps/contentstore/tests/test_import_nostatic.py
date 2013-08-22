@@ -1,6 +1,6 @@
 #pylint: disable=E1101
 '''
-Tests for importing with no static 
+Tests for importing with no static
 '''
 
 from django.test.client import Client
