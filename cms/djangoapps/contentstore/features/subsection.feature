@@ -25,6 +25,8 @@ Feature: Create Subsection
     And I reload the page
     Then I see it marked as Homework
 
+  # Safari has trouble saving the date in Sauce
+  @skip_safari
   Scenario: Set a due date in a different year (bug #256)
     Given I have opened a new subsection in Studio
     And I set the subsection release date to 12/25/2011 03:00
