@@ -333,7 +333,7 @@ class OpenEndedChild(object):
         try:
             image_data.seek(0)
             image_ok = open_ended_image_submission.run_image_tests(image_data)
-        except:
+        except Exception:
             log.exception("Could not create image and check it.")
 
         if image_ok:
@@ -346,7 +346,7 @@ class OpenEndedChild(object):
                 success, s3_public_url = open_ended_image_submission.upload_to_s3(
                     image_data, image_key, self.s3_interface
                 )
-            except:
+            except Exception:
                 log.exception("Could not upload image to S3.")
 
         return success, image_ok, s3_public_url

@@ -351,7 +351,12 @@ class CombinedOpenEndedV1Module():
         return self.current_task.get_html(self.system)
 
     def get_html_ajax(self, data):
-        return {'html' : self.get_html()}
+        """
+        Get HTML in AJAX callback
+        data - Needed to preserve AJAX structure
+        Output: Dictionary with html attribute
+        """
+        return {'html': self.get_html()}
 
     def get_current_attributes(self, task_number):
         """
@@ -643,7 +648,12 @@ class CombinedOpenEndedV1Module():
     def get_current_state(self, data):
         return self.get_context()
 
-    def get_last_response_ajax(self,data):
+    def get_last_response_ajax(self, data):
+        """
+        Get the last response via ajax callback
+        data - Needed to preserve ajax callback structure
+        Output: Last response dictionary
+        """
         return self.get_last_response(self.current_task_number)
 
     def next_problem(self, _data):
@@ -666,10 +676,10 @@ class CombinedOpenEndedV1Module():
                 return self.out_of_sync_error(data)
         success, can_reset, error = self.check_if_student_has_done_needed_grading()
         if not can_reset:
-            return {'error' : error, 'success' : False}
-        if self.student_attempts >= self.max_attempts-1:
-            if self.student_attempts==self.max_attempts-1:
-                self.student_attempts +=1
+            return {'error': error, 'success': False}
+        if self.student_attempts >= self.max_attempts - 1:
+            if self.student_attempts == self.max_attempts - 1:
+                self.student_attempts += 1
             return {
                 'success': False,
                 # This is a student_facing_error

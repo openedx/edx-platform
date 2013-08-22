@@ -11,6 +11,9 @@ log = logging.getLogger(__name__)
 
 
 class GradingServiceError(Exception):
+    """
+    Exception for grading service.  Shown when Open Response Assessment servers cannot be reached.
+    """
     pass
 
 

@@ -214,7 +214,7 @@ class CombinedOpenEndedRubric(object):
         #Get the highest possible score across all categories
         max_score = max(max_scores)
         #Loop through each category
-        for i,category in enumerate(rubric_categories):
+        for i, category in enumerate(rubric_categories):
             #Loop through each option in the category
             for j in xrange(len(category['options'])):
                 #Intialize empty grader types list
@@ -234,10 +234,10 @@ class CombinedOpenEndedRubric(object):
                                 #If a list in the list of lists for this position exists, append to it
                                 actual_scores[i] += [j]
 
-        actual_scores = [sum(i)/len(i) for i in actual_scores]
+        actual_scores = [sum(i) / len(i) for i in actual_scores]
         correct = []
         #Define if the student is "correct" (1) "incorrect" (0) or "partially correct" (.5)
-        for (i,a) in enumerate(actual_scores):
+        for (i, a) in enumerate(actual_scores):
             if int(a) == max_scores[i]:
                 correct.append(1)
             elif int(a)==0:
