@@ -27,7 +27,12 @@
 
     $('#class_enroll_form').on('ajax:complete', function(event, xhr) {
       if(xhr.status == 200) {
-        window.top.location.href = "${reverse('dashboard')}";
+        if (xhr.responseText != "") {
+          window.top.location.href = xhr.responseText;
+        }
+        else {
+          window.top.location.href = "${reverse('dashboard')}";
+        }
       } else if (xhr.status == 403) {
         window.top.location.href = "${reverse('register_user')}?course_id=${course.id}&enrollment_action=enroll";
       } else {
