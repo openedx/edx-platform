@@ -64,6 +64,12 @@ class TestEmailSendFromDashboard(ModuleStoreTestCase):
         selected_email_link = '<a href="#" onclick="goto(\'Email\')" class="selectedmode">Email</a>'
         self.assertTrue(selected_email_link in response.content)
 
+    def tearDown(self):
+        """
+        Undo all patches.
+        """
+        patch.stopall()
+
     def test_send_to_self(self):
         """
         Make sure email send to myself goes to myself.
@@ -185,7 +191,7 @@ class TestEmailSendFromDashboard(ModuleStoreTestCase):
 
         self.assertIn(
             u'ẗëṡẗ ṁëṡṡäġë ḟöṛ äḷḷ ｲ乇丂ｲ ﾶ乇丂丂ﾑg乇 ｷo尺 ﾑﾚﾚ тэѕт мэѕѕаБэ fоѓ аll',
-            mail.outbox[0].body.decode('utf-8')
+            mail.outbox[0].body
         )
 
     def test_unicode_students_send_to_all(self):

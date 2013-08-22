@@ -8,7 +8,6 @@ import re
 import time
 
 from smtplib import SMTPServerDisconnected, SMTPDataError, SMTPConnectError
-from subprocess import Popen, PIPE
 
 from django.conf import settings
 from django.contrib.auth.models import User, Group
@@ -98,14 +97,8 @@ def course_email(hash_for_msg, to_list, course_title, course_url, throttle=False
 
     subject = "[" + course_title + "] " + msg.subject
 
-    process = Popen(['lynx', '-stdin', '-display_charset=UTF-8', '-assume_charset=UTF-8', '-dump'], stdin=PIPE, stdout=PIPE)
-    (plaintext, err_from_stderr) = process.communicate(input=msg.html_message.encode('utf-8'))  # use lynx to get plaintext
-
     course_title_no_quotes = re.sub(r'"', '', course_title)
     from_addr = '"{0}" Course Staff <{1}>'.format(course_title_no_quotes, settings.DEFAULT_BULK_FROM_EMAIL)
-
-    if err_from_stderr:
-        log.info(err_from_stderr)
 
     try:
         connection = get_connection()
@@ -136,14 +129,15 @@ def course_email(hash_for_msg, to_list, course_title, course_url, throttle=False
 
             email_msg = EmailMultiAlternatives(
                 subject,
-                plaintext + plain_footer.encode('utf-8'),
+                msg.text_message + plain_footer.encode('utf-8'),
                 from_addr,
                 [email],
                 connection=connection
             )
             email_msg.attach_alternative(msg.html_message + html_footer.encode('utf-8'), 'text/html')
 
-            if throttle or current_task.request.retries > 0:  # throttle if we tried a few times and got the rate limiter
+            # Throttle if we tried a few times and got the rate limiter
+            if throttle or current_task.request.retries > 0:
                 time.sleep(0.2)
 
             try:
