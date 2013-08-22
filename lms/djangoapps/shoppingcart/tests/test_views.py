@@ -34,7 +34,7 @@ render_mock = Mock(side_effect=mock_render_to_response)
 
 postpay_mock = Mock()
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE, DEBUG=True)
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class ShoppingCartViewsTests(ModuleStoreTestCase):
     def setUp(self):
         self.user = UserFactory.create()
