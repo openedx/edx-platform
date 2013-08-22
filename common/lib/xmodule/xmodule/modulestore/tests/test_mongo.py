@@ -11,6 +11,7 @@ from xmodule.tests import DATA_DIR
 from xmodule.modulestore import Location
 from xmodule.modulestore.mongo import MongoModuleStore, MongoKeyValueStore
 from xmodule.modulestore.xml_importer import import_from_xml
+from xmodule.contentstore.mongo import MongoContentStore
 
 from xmodule.modulestore.tests.test_modulestore import check_path_to_location
 
@@ -46,9 +47,12 @@ class TestMongoModuleStore(object):
     def initdb():
         # connect to the db
         store = MongoModuleStore(HOST, DB, COLLECTION, FS_ROOT, RENDER_TEMPLATE, default_class=DEFAULT_CLASS)
+        # since MongoModuleStore and MongoContentStore are basically assumed to be together, create this class
+        # as well
+        content_store = MongoContentStore(HOST, DB)
         # Explicitly list the courses to load (don't want the big one)
         courses = ['toy', 'simple']
-        import_from_xml(store, DATA_DIR, courses)
+        import_from_xml(store, DATA_DIR, courses, static_content_store=content_store)
         return store
 
     @staticmethod
