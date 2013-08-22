@@ -18,7 +18,7 @@ PORTS = [2000, 2001, 2020, 2109, 2222, 2310, 3000, 3001,
 
 DESIRED_CAPABILITIES = {
     'chrome': DesiredCapabilities.CHROME,
-    'internet explorer': DesiredCapabilities.INTERNETEXPLORER,
+    'internetexplorer': DesiredCapabilities.INTERNETEXPLORER,
     'firefox': DesiredCapabilities.FIREFOX,
     'opera': DesiredCapabilities.OPERA,
     'iphone': DesiredCapabilities.IPHONE,
