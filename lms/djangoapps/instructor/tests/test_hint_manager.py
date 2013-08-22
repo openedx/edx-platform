@@ -5,7 +5,7 @@ from django.test.utils import override_settings
 
 from courseware.models import XModuleContentField
 from courseware.tests.factories import ContentFactory
-from courseware.tests.tests import TEST_DATA_MIXED_MODULESTORE
+from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 import instructor.hint_manager as view
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

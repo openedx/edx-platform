@@ -14,11 +14,9 @@ from django.contrib.auth.models import AnonymousUser, User
 from django.utils.importlib import import_module
 
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.django import editable_modulestore
-
-from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 
 from external_auth.models import ExternalAuthMap
 from external_auth.views import shib_login, course_specific_login, course_specific_register
@@ -26,6 +24,8 @@ from external_auth.views import shib_login, course_specific_login, course_specif
 from student.views import create_account, change_enrollment
 from student.models import UserProfile, Registration, CourseEnrollment
 from student.tests.factories import UserFactory
+
+TEST_DATA_MIXED_MODULESTORE = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {})
 
 # Shib is supposed to provide 'REMOTE_USER', 'givenName', 'sn', 'mail', 'Shib-Identity-Provider'
 # attributes via request.META.  We can count on 'Shib-Identity-Provider', and 'REMOTE_USER' being present
