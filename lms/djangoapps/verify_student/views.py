@@ -2,15 +2,21 @@
 
 
 """
+import json
+
 from mitxmako.shortcuts import render_to_response
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.views.generic.base import View
 
 from course_modes.models import CourseMode
+from student.models import CourseEnrollment
 from student.views import course_from_id
+from shoppingcart.models import Order, CertificateItem
+from shoppingcart.processors.CyberSource import get_signed_purchase_params
 from verify_student.models import SoftwareSecurePhotoVerification
 
 class VerifyView(View):
@@ -29,21 +35,32 @@ class VerifyView(View):
             # bookkeeping-wise just to start over.
             progress_state = "start"
 
+        course_id = request.GET['course_id']
         context = {
             "progress_state" : progress_state,
             "user_full_name" : request.user.profile.name,
-            "course_name" : course_from_id(request.GET['course_id']).display_name
+            "course_id" : course_id,
+            "course_name" : course_from_id(course_id).display_name
         }
 
         return render_to_response('verify_student/photo_verification.html', context)
 
 
-    def post(request):
-        attempt = SoftwareSecurePhotoVerification(user=request.user)
-        attempt.status = "pending"
-        attempt.save()
+def create_order(request):
+    attempt = SoftwareSecurePhotoVerification(user=request.user)
+    attempt.status = "pending"
+    attempt.save()
 
+    course_id = request.POST['course_id']
 
+    # I know, we should check this is valid. All kinds of stuff missing here
+    # enrollment = CourseEnrollment.create_enrollment(request.user, course_id)
+    cart = Order.get_cart_for_user(request.user)
+    CertificateItem.add_to_order(cart, course_id, 30, 'verified')
+
+    params = get_signed_purchase_params(cart)
+
+    return HttpResponse(json.dumps(params), content_type="text/json")
 
 
 def show_requirements(request):

@@ -264,9 +264,10 @@
       <div class="actions">
         <ul>
           <li class="action action-next">
-            <form method="post">
+            <form method="post" action="create_order">
               <!-- <a href="#">Go to Step 4: Secure Payment</a> -->
-
+              <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
+              <input type="hidden" name="course_id" value="${course_id | h}" />
               <input type="submit" value="Go to Step 4" name="payment">
             </form>
             <p class="tips">Once you verify your details match the requirements, you can move on to step 4, payment on our secure server.</p>

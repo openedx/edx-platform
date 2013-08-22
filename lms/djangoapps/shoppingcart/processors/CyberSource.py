@@ -102,6 +102,15 @@ def render_purchase_form_html(cart):
     """
     Renders the HTML of the hidden POST form that must be used to initiate a purchase with CyberSource
     """
+    return render_to_string('shoppingcart/cybersource_form.html', {
+        'action': purchase_endpoint,
+        'params': get_signed_purchase_params(params),
+    })
+
+def get_signed_purchase_params(cart):
+    return sign(get_purchase_params(cart))
+
+def get_purchase_params(cart):
     purchase_endpoint = settings.CC_PROCESSOR['CyberSource'].get('PURCHASE_ENDPOINT', '')
 
     total_cost = cart.total_cost
@@ -112,12 +121,8 @@ def render_purchase_form_html(cart):
     params['currency'] = cart.currency
     params['orderPage_transactionType'] = 'sale'
     params['orderNumber'] = "{0:d}".format(cart.id)
-    signed_param_dict = sign(params)
 
-    return render_to_string('shoppingcart/cybersource_form.html', {
-        'action': purchase_endpoint,
-        'params': signed_param_dict,
-    })
+    return params
 
 
 def payment_accepted(params):
