@@ -11,7 +11,7 @@ from xmodule.tests import DATA_DIR
 from xmodule.modulestore import Location
 from xmodule.modulestore.mongo import MongoModuleStore, MongoKeyValueStore
 from xmodule.modulestore.draft import DraftModuleStore
-from xmodule.modulestore.xml_importer import import_from_xml
+from xmodule.modulestore.xml_importer import import_from_xml, perform_xlint
 from xmodule.contentstore.mongo import MongoContentStore
 
 from xmodule.modulestore.tests.test_modulestore import check_path_to_location
@@ -65,7 +65,8 @@ class TestMongoModuleStore(object):
             DATA_DIR,
             ['test_import_course'],
             static_content_store=content_store,
-            do_import_static=False
+            do_import_static=False,
+            verbose=True
         )
 
         return store, content_store, draft_store
@@ -132,6 +133,13 @@ class TestMongoModuleStore(object):
     def test_path_to_location(self):
         '''Make sure that path_to_location works'''
         check_path_to_location(self.store)
+
+    def test_xlinter(self):
+        '''
+        Run through the xlinter, we know the 'toy' course has violations, but the
+        number will continue to grow over time, so just check > 0
+        '''
+        assert_not_equals(perform_xlint(DATA_DIR, ['toy']), 0)
 
     def test_get_courses_has_no_templates(self):
         courses = self.store.get_courses()
