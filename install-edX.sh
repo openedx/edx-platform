@@ -20,10 +20,10 @@
 ####
 
 # Make sure package management system is up to date (comment this out if you like, the edX script does the update also, not 100% sure if it does the upgrade. Definitely intended for installation on a clean system)
-#sudo apt-get update && sudo apt-get upgrade
+sudo apt-get update && sudo apt-get upgrade
 
 # Install prerequisite packages (some of these -- denyhosts, psad -- are not required persay but are good for system security)
-#sudo apt-get install linux-headers-`uname -r` build-essential npm denyhosts screen psad nfs-kernel-server nfs-common rake locate git python-software-properties libgl1-mesa-glx libpython2.7 libqt4-network libqt4-opengl libqtcore4 libqtgui4 libsdl1.2debian libxcursor1 libxinerama1
+sudo apt-get install linux-headers-`uname -r` build-essential npm denyhosts screen psad nfs-kernel-server nfs-common rake locate git python-software-properties libgl1-mesa-glx libpython2.7 libqt4-network libqt4-opengl libqtcore4 libqtgui4 libsdl1.2debian libxcursor1 libxinerama1
 
 # Run the edX (awesome) setup script
 ~/edx-platform/scripts/create-dev-env.sh
