@@ -1,7 +1,6 @@
 """
 Test for LMS courseware app.
 """
-from django.test import TestCase
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 
@@ -167,7 +166,7 @@ class TestMongoCoursesLoad(ModuleStoreTestCase, PageLoaderTestCase):
 
 
 @override_settings(MODULESTORE=TEST_DATA_DRAFT_MONGO_MODULESTORE)
-class TestDraftModuleStore(ModuleStoreTestCase, TestCase):
+class TestDraftModuleStore(ModuleStoreTestCase):
     def test_get_items_with_course_items(self):
         store = modulestore()
 
