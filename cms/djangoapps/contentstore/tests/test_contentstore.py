@@ -312,7 +312,10 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         handouts = module_store.get_item(Location(['i4x', 'edX', 'toy', 'html', 'toyhtml', None]))
         self.assertIn('/static/', handouts.data)
 
-    def test_import_textbook_as_content_element(self):
+    @mock.patch('xmodule.course_module.requests.get')
+    def test_import_textbook_as_content_element(self, mock_get):
+        mock_get.return_value.text = u'<?xml version="1.0"?>\n<table_of_contents>\n  <entry page="5" page_label="ii" name="Table of Contents"/></table_of_contents>\n'
+
         module_store = modulestore('direct')
         import_from_xml(module_store, 'common/test/data/', ['toy'])
 
@@ -845,7 +848,10 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             filesystem = OSFS(root_dir / ('test_export/' + dirname))
             self.assertTrue(filesystem.exists(item.location.name + filename_suffix))
 
-    def test_export_course(self):
+    @mock.patch('xmodule.course_module.requests.get')
+    def test_export_course(self, mock_get):
+        mock_get.return_value.text = u'<?xml version="1.0"?>\n<table_of_contents>\n  <entry page="5" page_label="ii" name="Table of Contents"/></table_of_contents>\n'
+
         module_store = modulestore('direct')
         draft_store = modulestore('draft')
         content_store = contentstore()

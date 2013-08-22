@@ -2,6 +2,7 @@
 Test for lms courseware app
 '''
 import random
+import mock
 
 from django.test import TestCase
 from django.core.urlresolvers import reverse
@@ -162,7 +163,9 @@ class TestCoursesLoadTestCase_MongoModulestore(PageLoaderTestCase):
         import_from_xml(module_store, TEST_DATA_DIR, ['toy'])
         self.check_random_page_loads(module_store)
 
-    def test_toy_textbooks_loads(self):
+    @mock.patch('xmodule.course_module.requests.get')
+    def test_toy_textbooks_loads(self, mock_get):
+        mock_get.return_value.text = u'<?xml version="1.0"?>\n<table_of_contents>\n  <entry page="5" page_label="ii" name="Table of Contents"/></table_of_contents>\n'
         module_store = modulestore()
         import_from_xml(module_store, TEST_DATA_DIR, ['toy'])
 
