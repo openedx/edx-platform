@@ -52,7 +52,7 @@ class MongoCollectionFindWrapper(object):
 class ContentStoreImportNoStaticTest(ModuleStoreTestCase):
     """
     Tests that rely on the toy and test_import_course courses.
-    TODO: refactor using CourseFactory so they do not.
+    NOTE: refactor using CourseFactory so they do not.
     """
     def setUp(self):
 
