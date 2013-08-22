@@ -4,9 +4,9 @@ Unit tests for the asset upload endpoint.
 
 import json
 from datetime import datetime
-from io import BytesIO
+from tempfile import TemporaryFile
 from pytz import UTC
-from unittest import TestCase, skip
+from unittest import TestCase
 from .utils import CourseTestCase
 from django.core.urlresolvers import reverse
 from contentstore.views import assets
@@ -55,12 +55,18 @@ class UploadTestCase(CourseTestCase):
             'coursename': self.course.location.name,
         })
 
-    @skip("CorruptGridFile error on continuous integration server")
     def test_happy_path(self):
-        f = BytesIO("sample content")
-        f.name = "sample.txt"
-        resp = self.client.post(self.url, {"name": "my-name", "file": f})
-        self.assert2XX(resp.status_code)
+        with TemporaryFile() as temp:
+            temp.write('This is a test')
+            resp = self.client.post(self.url, {"name": "my-name", "file": temp})
+            self.assert2XX(resp.status_code)
+
+    def test_large(self):
+        with TemporaryFile() as f:
+            f.write('Some Content')
+            f.truncate(20 * 1024 * 1024)
+            resp = self.client.post(self.url, {"name": "my-name", "file": f})
+            self.assert2XX(resp.status_code)
 
     def test_no_file(self):
         resp = self.client.post(self.url, {"name": "file.txt"})
