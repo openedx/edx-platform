@@ -5,13 +5,21 @@ import os
 import shutil
 import tarfile
 import tempfile
+import copy
+from uuid import uuid4
+from pymongo import MongoClient
+
 from .utils import CourseTestCase
 from django.core.urlresolvers import reverse
+from django.test.utils import override_settings
+from django.conf import settings
 
-from xmodule.modulestore import Location
-from contentstore.views import import_export
+from xmodule.contentstore.django import _CONTENTSTORE
 
+TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
+TEST_DATA_CONTENTSTORE['OPTIONS']['db'] = 'test_xcontent_%s' % uuid4().hex
 
+@override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
 class ImportTestCase(CourseTestCase):
     """
     Unit tests for importing a course
@@ -54,6 +62,8 @@ class ImportTestCase(CourseTestCase):
 
     def tearDown(self):
         shutil.rmtree(self.content_dir)
+        MongoClient().drop_database(TEST_DATA_CONTENTSTORE['OPTIONS']['db'])
+        _CONTENTSTORE.clear()
 
     def test_no_coursexml(self):
         """
