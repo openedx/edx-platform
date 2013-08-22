@@ -32,16 +32,6 @@ def add_course_to_cart(request, course_id):
 
 
 @login_required
-def register_for_verified_cert(request, course_id):
-    """
-    Add a CertificateItem to the cart
-    """
-    cart = Order.get_cart_for_user(request.user)
-    CertificateItem.add_to_order(cart, course_id, 30, 'verified')
-    return HttpResponse("Added")
-
-
-@login_required
 def show_cart(request):
     cart = Order.get_cart_for_user(request.user)
     total_cost = cart.total_cost
