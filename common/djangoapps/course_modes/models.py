@@ -33,6 +33,7 @@ class CourseMode(models.Model):
     currency = models.CharField(default="usd", max_length=8)
 
     DEFAULT_MODE = Mode('honor', _('Honor Code Certificate'), 0, '', 'usd')
+    DEFAULT_MODE_SLUG = 'honor'
 
     class Meta:
         """ meta attributes of this model """
@@ -60,3 +61,18 @@ class CourseMode(models.Model):
         return u"{} : {}, min={}, prices={}".format(
             self.course_id, self.mode_slug, self.min_price, self.suggested_prices
         )
+
+    @classmethod
+    def mode_for_course(cls, course_id, mode_slug):
+        """
+        Returns the mode for the course corresponding to mode_slug.
+
+        If this particular mode is not set for the course, returns None
+        """
+        modes = cls.modes_for_course(course_id)
+
+        matched = [m for m in modes if m.slug == mode_slug]
+        if matched:
+            return matched[0]
+        else:
+            return None

@@ -157,6 +157,9 @@ MITX_FEATURES = {
 
     # Allow users to enroll with methods other than just honor code certificates
     'MULTIPLE_ENROLLMENT_ROLES' : False
+
+    # Toggle the availability of the shopping cart page
+    'ENABLE_SHOPPING_CART': False
 }
 
 # Used for A/B testing
@@ -433,6 +436,19 @@ FEEDBACK_SUBMISSION_EMAIL = None
 ZENDESK_URL = None
 ZENDESK_USER = None
 ZENDESK_API_KEY = None
+
+##### shoppingcart Payment #####
+PAYMENT_SUPPORT_EMAIL = 'payment@edx.org'
+##### Using cybersource by default #####
+CC_PROCESSOR = {
+    'CyberSource': {
+        'SHARED_SECRET': '',
+        'MERCHANT_ID': '',
+        'SERIAL_NUMBER': '',
+        'ORDERPAGE_VERSION': '7',
+        'PURCHASE_ENDPOINT': '',
+    }
+}
 
 ################################# open ended grading config  #####################
 
@@ -772,6 +788,9 @@ INSTALLED_APPS = (
     # User API
     'rest_framework',
     'user_api',
+
+    # shopping cart
+    'shoppingcart',
 
     # Notification preferences setting
     'notification_prefs',
