@@ -946,11 +946,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         self.assertTrue(getattr(vertical, 'is_draft', False))
         self.assertNotIn('index_in_children_list', child.xml_attributes)
-        if hasattr(vertical, 'data'):
-            self.assertNotIn('index_in_children_list', vertical.data)
         self.assertNotIn('parent_sequential_url', vertical.xml_attributes)
-        if hasattr(vertical, 'data'):
-            self.assertNotIn('parent_sequential_url', vertical.data)
                 
         for child in vertical.get_children():
             self.assertTrue(getattr(child, 'is_draft', False))
@@ -960,8 +956,6 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             self.assertNotIn('parent_sequential_url', child.xml_attributes)
             if hasattr(child, 'data'):
                 self.assertNotIn('parent_sequential_url', child.data)
-
-
 
         # make sure that we don't have a sequential that is in draft mode
         sequential = draft_store.get_item(Location(['i4x', 'edX', 'toy',
