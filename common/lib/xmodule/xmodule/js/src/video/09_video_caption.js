@@ -6,7 +6,20 @@ define(
 [],
 function () {
 
-    // VideoCaption() function - what this module "exports".
+    /**
+     * @desc VideoCaption module exports a function.
+     *
+     * @type {function}
+     * @access public
+     *
+     * @param {object} state - The object containg the state of the video
+     *     player. All other modules, their parameters, public variables, etc.
+     *     are available via this object.
+     *
+     * @this {object} The global window object.
+     *
+     * @returns {undefined}
+     */
     return function (state) {
         state.videoCaption = {};
 
@@ -64,11 +77,25 @@ function () {
     // The magic private function that makes them available and sets up their context is makeFunctionsPublic().
     // ***************************************************************
 
-    // function renderElements()
-    //
-    //     Create any necessary DOM elements, attach them, and set their initial configuration. Also
-    //     make the created DOM elements available via the 'state' object. Much easier to work this
-    //     way - you don't have to do repeated jQuery element selects.
+    /**
+     * @desc Create any necessary DOM elements, attach them, and set their
+     *     initial configuration. Also make the created DOM elements available
+     *     via the 'state' object. Much easier to work this way - you don't
+     *     have to do repeated jQuery element selects.
+     *
+     * @type {function}
+     * @access public
+     *
+     * @this {object} - The object containg the state of the video
+     *     player. All other modules, their parameters, public variables, etc.
+     *     are available via this object.
+     *
+     * @returns {boolean}
+     *     true: The function fethched captions successfully, and compltely
+     *         rendered everything related to captions.
+     *     false: The captions were not fetched. Nothing will be rendered,
+     *         and the CC button will be hidden.
+     */
     function renderElements() {
         this.videoCaption.loaded = false;
 
@@ -79,12 +106,10 @@ function () {
         this.el.find('.video-controls .secondary-controls').append(this.videoCaption.hideSubtitlesEl);
 
         // Fetch the captions file. If no file was specified, then we hide
-        // the "CC" button, and exit from this module. No further caption
-        // initialization will happen.
+        // the "CC" button, and return.
         if (!this.videoCaption.fetchCaption()) {
             this.videoCaption.hideSubtitlesEl.hide();
 
-            // Abandon all further operations with captions panel.
             return false;
         }
 
@@ -136,6 +161,25 @@ function () {
         }
     }
 
+    /**
+     * @desc Fetch the caption file specified by the user. Upn successful
+     *     receival of the file, the captions will be rendered.
+     *
+     * @type {function}
+     * @access public
+     *
+     * @this {object} - The object containg the state of the video
+     *     player. All other modules, their parameters, public variables, etc.
+     *     are available via this object.
+     *
+     * @returns {boolean}
+     *     true: The user specified a caption file. NOTE: if an error happens
+     *         while the specified file is being retrieved (for example the
+     *         file is missing on the server), this function will still return
+     *         true.
+     *     false: No caption file was specified, or an empty string was
+     *         specified.
+     */
     function fetchCaption() {
         var _this = this;
 
