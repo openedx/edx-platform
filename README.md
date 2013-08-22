@@ -6,10 +6,8 @@ Installation - The first time
 =============================
 
 If you already have a machine (bare metal or virutal ready to go -- clean install of Ubuntu 12.04) the following will get you up and running:
-sudo apt-get install git
-git clone https://github.com/zenfactory/edx-platform.git
-cd edx-platform
-./install-edX.sh
+
+sudo apt-get install git; git clone https://github.com/zenfactory/edx-platform.git; cd edx-platform; ./install-edX.sh
 
 This will install and start both the LMS and the CMS. Additionally it will setup a rule to forward the LMS (edX) to the standard port 80 if you have access to do so.
 
