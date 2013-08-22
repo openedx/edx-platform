@@ -3,8 +3,10 @@ Tests for the Shopping Cart Models
 """
 
 from factory import DjangoModelFactory
+from mock import patch
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.db import DatabaseError
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
@@ -12,7 +14,7 @@ from shoppingcart.models import Order, OrderItem, CertificateItem, InvalidCartIt
 from student.tests.factories import UserFactory
 from student.models import CourseEnrollment
 from course_modes.models import CourseMode
-from ..exceptions import PurchasedCallbackException
+from shoppingcart.exceptions import PurchasedCallbackException
 
 
 class OrderTest(TestCase):
@@ -73,6 +75,17 @@ class OrderTest(TestCase):
         self.assertFalse(CourseEnrollment.is_enrolled(self.user, self.course_id))
         cart.purchase()
         self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course_id))
+
+    def test_purchase_item_failure(self):
+        # once again, we're testing against the specific implementation of
+        # CertificateItem
+        cart = Order.get_cart_for_user(user=self.user)
+        CertificateItem.add_to_order(cart, self.course_id, self.cost, 'verified')
+        with patch('shoppingcart.models.CertificateItem.save', side_effect=DatabaseError):
+            with self.assertRaises(DatabaseError):
+                cart.purchase()
+                # verify that we rolled back the entire transaction
+                self.assertFalse(CourseEnrollment.is_enrolled(self.user, self.course_id))
 
 
 class OrderItemTest(TestCase):

@@ -22,6 +22,7 @@ from mitxmako.shortcuts import render_to_response
 from shoppingcart.processors import render_purchase_form_html, process_postpay_callback
 from mock import patch, Mock
 
+
 def mock_render_purchase_form_html(*args, **kwargs):
     return render_purchase_form_html(*args, **kwargs)
 
@@ -33,6 +34,7 @@ def mock_render_to_response(*args, **kwargs):
 render_mock = Mock(side_effect=mock_render_to_response)
 
 postpay_mock = Mock()
+
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class ShoppingCartViewsTests(ModuleStoreTestCase):
@@ -52,7 +54,6 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
 
     def login_user(self):
         self.client.login(username=self.user.username, password="password")
-
 
     def test_add_course_to_cart_anon(self):
         resp = self.client.post(reverse('shoppingcart.views.add_course_to_cart', args=[self.course_id]))
@@ -141,7 +142,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
             'Cannot remove cart OrderItem id={0}. DoesNotExist or item is already purchased'.format(cert_item.id))
 
         resp3 = self.client.post(reverse('shoppingcart.views.remove_item', args=[]),
-                                {'id': -1})
+                                 {'id': -1})
         self.assertEqual(resp3.status_code, 200)
         exception_log.assert_called_with(
             'Cannot remove cart OrderItem id={0}. DoesNotExist or item is already purchased'.format(-1))
@@ -158,7 +159,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
     @patch('shoppingcart.views.process_postpay_callback', postpay_mock)
     @patch('shoppingcart.views.render_to_response', render_mock)
     def test_postpay_callback_failure(self):
-        postpay_mock.return_value = {'success': False, 'order': self.cart, 'error_html':'ERROR_TEST!!!'}
+        postpay_mock.return_value = {'success': False, 'order': self.cart, 'error_html': 'ERROR_TEST!!!'}
         self.login_user()
         resp = self.client.post(reverse('shoppingcart.views.postpay_callback', args=[]))
         self.assertEqual(resp.status_code, 200)
