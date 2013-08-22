@@ -10,6 +10,7 @@ from django.shortcuts import redirect
 from django.views.generic.base import View
 
 from course_modes.models import CourseMode
+from student.views import course_from_id
 from verify_student.models import SoftwareSecurePhotoVerification
 
 class VerifyView(View):
@@ -28,11 +29,21 @@ class VerifyView(View):
             # bookkeeping-wise just to start over.
             progress_state = "start"
 
-        return render_to_response('verify_student/face_upload.html')
+        context = {
+            "progress_state" : progress_state,
+            "user_full_name" : request.user.profile.name,
+            "course_name" : course_from_id(request.GET['course_id']).display_name
+        }
+
+        return render_to_response('verify_student/photo_verification.html', context)
 
 
     def post(request):
         attempt = SoftwareSecurePhotoVerification(user=request.user)
+        attempt.status = "pending"
+        attempt.save()
+
+
 
 
 def show_requirements(request):

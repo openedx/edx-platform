@@ -20,7 +20,8 @@ class ChooseModeView(View):
         course_id = request.GET.get("course_id")
         context = {
             "course_id" : course_id,
-            "modes" : CourseMode.modes_for_course_dict(course_id)
+            "modes" : CourseMode.modes_for_course_dict(course_id),
+            "course_name" : course_from_id(course_id).display_name
         }
         return render_to_response("course_modes/choose.html", context)
 
