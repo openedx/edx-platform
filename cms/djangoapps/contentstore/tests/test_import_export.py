@@ -32,10 +32,10 @@ class ImportTestCase(CourseTestCase):
                 os.utime(name, None)
 
         # Create tar test files -----------------------------------------------
-        # OK course: 
+        # OK course:
         good_dir = tempfile.mkdtemp(dir=self.content_dir)
         os.makedirs(os.path.join(good_dir, "course"))
-        with open(os.path.join(good_dir, "course.xml") , "w+") as f:
+        with open(os.path.join(good_dir, "course.xml"), "w+") as f:
             f.write('<course url_name="2013_Spring" org="EDx" course="0.00x"/>')
 
         with open(os.path.join(good_dir, "course", "2013_Spring.xml"), "w+") as f:
@@ -44,7 +44,7 @@ class ImportTestCase(CourseTestCase):
         self.good_tar = os.path.join(self.content_dir, "good.tar.gz")
         with tarfile.open(self.good_tar, "w:gz") as gtar:
             gtar.add(good_dir)
-           
+
         # Bad course (no 'course.xml' file):
         bad_dir = tempfile.mkdtemp(dir=self.content_dir)
         touch(os.path.join(bad_dir, "bad.xml"))
@@ -62,11 +62,11 @@ class ImportTestCase(CourseTestCase):
         """
         with open(self.bad_tar) as btar:
             resp = self.client.post(
-                    self.url,
-                    {
-                        "name": self.bad_tar,
-                        "course-data": [btar]
-                    })
+                self.url,
+                {
+                    "name": self.bad_tar,
+                    "course-data": [btar]
+                })
         self.assertEquals(resp.status_code, 415)
 
     def test_with_coursexml(self):
@@ -82,4 +82,3 @@ class ImportTestCase(CourseTestCase):
                         "course-data": [gtar]
                     })
         self.assert2XX(resp.status_code)
-

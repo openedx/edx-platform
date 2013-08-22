@@ -19,7 +19,6 @@ from django.core.files.temp import NamedTemporaryFile
 from django.views.decorators.http import require_http_methods
 
 from mitxmako.shortcuts import render_to_response
-from cache_toolbox.core import del_cached_content
 from auth.authz import create_all_course_groups
 
 from xmodule.modulestore.xml_importer import import_from_xml
@@ -38,7 +37,7 @@ __all__ = ['import_course', 'generate_export_course', 'export_course']
 log = logging.getLogger(__name__)
 
 
-MAX_UP_LENGTH = 20000352 # Max chunk size for uploads
+MAX_UP_LENGTH = 20000352  # Max chunk size for uploads
 
 # Regex to capture Content-Range header ranges.
 CONTENT_RE = re.compile(r"(?P<start>\d{1,11})-(?P<stop>\d{1,11})/(?P<end>\d{1,11})")
@@ -113,18 +112,18 @@ def import_course(request, org, course, name):
         if int(content_range['stop']) != int(content_range['end']) - 1:
             # More chunks coming
             return JsonResponse({
-                    "files": [{
-                        "name": filename,
-                        "size": size,
-                        "deleteUrl": "",
-                        "deleteType": "",
-                        "url": reverse('import_course', kwargs={
-                            'org': location.org,
-                            'course': location.course,
-                            'name': location.name
-                        }),
-                        "thumbnailUrl": ""
-                    }]
+                "files": [{
+                    "name": filename,
+                    "size": size,
+                    "deleteUrl": "",
+                    "deleteType": "",
+                    "url": reverse('import_course', kwargs={
+                        'org': location.org,
+                        'course': location.course,
+                        'name': location.name
+                    }),
+                    "thumbnailUrl": ""
+                }]
             })
 
         else:   # This was the last chunk.
@@ -147,7 +146,7 @@ def import_course(request, org, course, name):
             def get_all_files(directory):
                 """
                 For each file in the directory, yield a 2-tuple of (file-name,
-                directory-path) 
+                directory-path)
                 """
                 for dirpath, _dirnames, filenames in os.walk(directory):
                     for filename in filenames:
