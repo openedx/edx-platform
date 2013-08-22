@@ -241,3 +241,6 @@ BROKER_URL = "{0}://{1}:{2}@{3}/{4}".format(CELERY_BROKER_TRANSPORT,
                                             CELERY_BROKER_PASSWORD,
                                             CELERY_BROKER_HOSTNAME,
                                             CELERY_BROKER_VHOST)
+
+# Event tracking
+EVENT_TRACKERS.update(AUTH_TOKENS.get("EVENT_TRACKERS", {}))
