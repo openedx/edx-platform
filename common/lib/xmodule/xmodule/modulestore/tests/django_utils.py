@@ -131,6 +131,22 @@ class ModuleStoreTestCase(TestCase):
 
         3. Use factories (e.g. `CourseFactory`, `ItemFactory`) to populate
            the modulestore with test data.
+
+    NOTE:
+        * For Mongo-backed courses (created with `CourseFactory`),
+          the state of the course will be reset before/after each
+          test method executes.
+
+        * For XML-backed courses, the course state will NOT
+          reset between test methods (although it will reset
+          between test classes)
+
+          The reason is: XML courses are not editable, so to reset
+          a course you have to reload it from disk, which is slow.
+
+          If you do need to reset an XML course, use
+          `clear_existing_modulestores()` directly in
+          your `setUp()` method.
     """
 
     @staticmethod
