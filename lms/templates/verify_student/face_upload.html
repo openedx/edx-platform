@@ -1,7 +1,7 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
 <%inherit file="../main.html" />
-<%block name="bodyclass">register verification</%block>
+<%block name="bodyclass">register verification photos</%block>
 
 <%block name="js_extra">
 <!-- please move link to js/vendor/responsive-carousel/responsive-carousel.js from main.html to here -->
@@ -54,16 +54,17 @@ $(document).ready(function() {
           <div class="controls photo-controls">
             <ul class="controls-list">
               <li class="control control-do">
-                <a class="action action-do" href="">Take photo</a>
+                <a class="action action-do" href=""><i class="icon-camera"></i> <span class="sr">Take photo</span></a>
               </li>
               <li class="control control-redo">
-                <a class="action action-redo" href="">Retake</a>
+                <a class="action action-redo" href=""><i class="icon-undo"></i> <span class="sr">Retake</span></a>
               </li>
               <li class="control control-approve">
-                <a class="action action-approve" href="">Looks good</a>
+                <a class="action action-approve" href=""><i class="icon-ok"></i> <span class="sr">Looks good</span></a>
               </li>
             </ul>
           </div>
+
         </div>
 
         <div class="photo-tips facetips">
@@ -121,13 +122,13 @@ $(document).ready(function() {
           <div class="controls photo-controls">
             <ul class="controls-list">
               <li class="control control-do">
-                <a class="action action-do" href="">Take photo</a>
+                <a class="action action-do" href=""><i class="icon-camera"></i> <span class="sr">Take photo</span></a>
               </li>
               <li class="control control-redo">
-                <a class="action action-redo" href="">Retake</a>
+                <a class="action action-redo" href=""><i class="icon-undo"></i> <span class="sr">Retake</span></a>
               </li>
               <li class="control control-approve">
-                <a class="action action-approve" href="">Looks good</a>
+                <a class="action action-approve" href=""><i class="icon-ok"></i> <span class="sr">Looks good</span></a>
               </li>
             </ul>
           </div>
@@ -268,7 +269,7 @@ $(document).ready(function() {
       <button class="action action-secondary action-cancel">${_("Cancel")}</button>
     </div>
   </form>
-  <a href="#" rel="view" class="action action-close action-editname-close">
+  <a href="#" data-dismiss="modal" rel="view" class="action action-close action-editname-close">
     <i class="icon-remove-sign"></i>
     <span class="label">close</span>
   </a>

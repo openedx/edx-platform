@@ -13,8 +13,44 @@ body.register.verification {
 
     .title {
       @extend .t-title5;
+      margin-bottom: $baseline;
+      font-weight: bold;
     }
   }
+
+  .title {
+    @extend .t-title9;
+    margin-bottom: ($baseline/2);
+    font-weight: bold;
+  }
+
+  .select {
+    @include clearfix();
+
+
+    .block {
+      float: left;
+      margin: 0 $baseline $baseline 0;
+      background-color: #eee;
+      padding: $baseline;
+      width: 60%;
+
+      .title {
+        @extend .t-title7;
+      }
+
+    }
+
+    .tips {
+      float: right;
+      width: 32%;
+    }
+
+  }
+
+
+
+
 
   .progress {
 
@@ -70,6 +106,19 @@ body.register.verification {
 
         .control {
           display: inline-block;
+
+          .action {
+            @extend .button-primary;
+            display: block;
+            background-color: $blue;
+            color: $white;
+            padding: ($baseline*.25) ($baseline*.5);
+            border: none;
+
+            &:hover {
+
+            }
+          }
         }
       }
     }
