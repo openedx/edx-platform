@@ -1,5 +1,18 @@
 """
 Models for bulk email
+
+WE'RE USING MIGRATIONS!
+
+If you make changes to this model, be sure to create an appropriate migration
+file and check it in at the same time as your model changes. To do that,
+
+1. Go to the edx-platform dir
+2. ./manage.py schemamigration courseware --auto description_of_your_change
+3. Add the migration file created in edx-platform/lms/djangoapps/bulk_email/migrations/
+
+
+ASSUMPTIONS: modules have unique IDs, even across different module_types
+
 """
 from django.db import models
 from django.contrib.auth.models import User
@@ -41,7 +54,7 @@ class CourseEmail(Email, models.Model):
         ('all', 'All')
     )
     course_id = models.CharField(max_length=255, db_index=True)
-    to = models.CharField(max_length=64, choices=TO_OPTIONS, default='myself')
+    to_option = models.CharField(max_length=64, choices=TO_OPTIONS, default='myself')
 
     def __unicode__(self):
         return self.subject
