@@ -2,6 +2,7 @@ Feature: Advanced (manual) course policy
   In order to specify course policy settings for which no custom user interface exists
   I want to be able to manually enter JSON key /value pairs
 
+
   Scenario: A course author sees default advanced settings
     Given I have opened a new course in Studio
     When I select the Advanced Settings
@@ -11,6 +12,8 @@ Feature: Advanced (manual) course policy
     Given I am on the Advanced Course Settings page in Studio
     Then the settings are alphabetized
 
+  # Sauce labs does not play nicely with CodeMirror
+  @skip_sauce
   Scenario: Test cancel editing key value
     Given I am on the Advanced Course Settings page in Studio
     When I edit the value of a policy key
@@ -19,6 +22,8 @@ Feature: Advanced (manual) course policy
     And I reload the page
     Then the policy key value is unchanged
 
+  # Sauce labs does not play nicely with CodeMirror
+  @skip_sauce
   Scenario: Test editing key value
     Given I am on the Advanced Course Settings page in Studio
     When I edit the value of a policy key and save
@@ -26,6 +31,8 @@ Feature: Advanced (manual) course policy
     And I reload the page
     Then the policy key value is changed
 
+  # Sauce labs does not play nicely with CodeMirror
+  @skip_sauce
   Scenario: Test how multi-line input appears
     Given I am on the Advanced Course Settings page in Studio
     When I create a JSON object as a value for "discussion_topics"
@@ -33,6 +40,8 @@ Feature: Advanced (manual) course policy
     And I reload the page
     Then it is displayed as formatted
 
+  # Sauce labs does not play nicely with CodeMirror
+  @skip_sauce
   Scenario: Test error if value supplied is of the wrong type
     Given I am on the Advanced Course Settings page in Studio
     When I create a JSON object as a value for "display_name"
@@ -41,6 +50,8 @@ Feature: Advanced (manual) course policy
     Then the policy key value is unchanged
 
   # This feature will work in Firefox only when Firefox is the active window
+  # Sauce labs does not play nicely with CodeMirror
+  @skip_sauce
   Scenario: Test automatic quoting of non-JSON values
     Given I am on the Advanced Course Settings page in Studio
     When I create a non-JSON value not in quotes
@@ -48,6 +59,8 @@ Feature: Advanced (manual) course policy
     And I reload the page
     Then it is displayed as a string
 
+  # Sauce labs does not play nicely with CodeMirror
+  @skip_sauce
   Scenario: Confirmation is shown on save
     Given I am on the Advanced Course Settings page in Studio
     When I edit the value of a policy key

@@ -1,6 +1,8 @@
 Feature: Course updates
     As a course author, I want to be able to provide updates to my students
 
+    # Internet explorer can't select all so the update appears weirdly
+    @skip_internetexplorer
     Scenario: Users can add updates
         Given I have opened a new course in Studio
         And I go to the course updates page
@@ -8,6 +10,8 @@ Feature: Course updates
         Then I should see the update "Hello"
         And I see a "saving" notification
 
+    # Internet explorer can't select all so the update appears weirdly
+    @skip_internetexplorer
     Scenario: Users can edit updates
         Given I have opened a new course in Studio
         And I go to the course updates page
@@ -33,6 +37,8 @@ Feature: Course updates
         Then I should see the date "June 1, 2013"
         And I see a "saving" notification
 
+    # Internet explorer can't select all so the update appears weirdly
+    @skip_internetexplorer
     Scenario: Users can change handouts
         Given I have opened a new course in Studio
         And I go to the course updates page
