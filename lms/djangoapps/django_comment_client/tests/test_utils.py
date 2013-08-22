@@ -2,6 +2,7 @@ from django.test import TestCase
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from django_comment_common.models import Role, Permission
 from factories import RoleFactory
+from copy import deepcopy
 import django_comment_client.utils as utils
 
 
@@ -27,6 +28,124 @@ class DictionaryTestCase(TestCase):
         d2 = {'lions': 'roar', 'ducks': 'quack'}
         expected = {'cats': 'meow', 'dogs': 'woof', 'lions': 'roar', 'ducks': 'quack'}
         self.assertEqual(utils.merge_dict(d1, d2), expected)
+
+    def test_sort(self):
+        d1 = {
+            'entries': {
+                u'General': {
+                    'sort_key': u'General'
+                }
+            },
+            'subcategories': {
+                u'Tests': {
+                    'sort_key': u'Tests',
+                    'subcategories': {},
+                    'entries': {
+                        u'Quizzes': {
+                            'sort_key': None
+                        }, u'All': {
+                            'sort_key': None
+                        }, u'Final Exam': {
+                            'sort_key': None
+                        },
+                    }
+                },
+                u'Assignments': {
+                    'sort_key': u'Assignments',
+                    'subcategories': {},
+                    'entries': {
+                        u'Homework': {
+                            'sort_key': None
+                        },
+                        u'All': {
+                            'sort_key': None
+                        },
+                    }
+                }
+            }
+        }
+        
+        expected_1 = {
+            'entries': {
+                u'General': {
+                    'sort_key': u'General'
+                }
+            },
+            'children': [u'Assignments', u'General', u'Tests'],
+            'subcategories': {
+                u'Tests': {
+                    'sort_key': u'Tests',
+                    'subcategories': {},
+                    'children': [u'All', u'Final Exam', u'Quizzes'],
+                    'entries': {
+                        u'All': {
+                            'sort_key': 'All'
+                        }, u'Final Exam': {
+                            'sort_key': 'Final Exam'
+                        }, u'Quizzes': {
+                            'sort_key': 'Quizzes'
+                        }
+                    }
+                },
+                u'Assignments': {
+                    'sort_key': u'Assignments',
+                    'subcategories': {},
+                    'children': [u'All', u'Homework'],
+                    'entries': {
+                        u'Homework': {
+                            'sort_key': 'Homework'
+                        },
+                        u'All': {
+                            'sort_key': 'All'
+                        },
+                    }
+                }
+            }
+        }
+        
+        expected_2 = {
+            'entries': {
+                u'General': {
+                    'sort_key': u'General'
+                }
+            },
+            'children': [u'Assignments', u'General', u'Tests'],
+            'subcategories': {
+                u'Tests': {
+                    'sort_key': u'Tests',
+                    'subcategories': {},
+                    'children': [u'Quizzes', u'All', u'Final Exam'],
+                    'entries': {
+                        u'Quizzes': {
+                            'sort_key': None
+                        }, u'All': {
+                            'sort_key': None
+                        }, u'Final Exam': {
+                            'sort_key': None
+                        },
+                    }
+                },
+                u'Assignments': {
+                    'sort_key': u'Assignments',
+                    'subcategories': {},
+                    'children': [u'All', u'Homework'],
+                    'entries': {
+                        u'Homework': {
+                            'sort_key': None
+                        },
+                        u'All': {
+                            'sort_key': None
+                        },
+                    }
+                }
+            }
+        }
+        
+        d2 = deepcopy(d1)
+        utils.sort_map_entries(d1, True)
+        utils.sort_map_entries(d2, False)
+        self.assertEqual(d1, expected_1)
+        self.assertEqual(d2, expected_2)
 
 
 class AccessUtilsTestCase(TestCase):
