@@ -156,10 +156,10 @@ MITX_FEATURES = {
     'ENABLE_CHAT': False,
 
     # Allow users to enroll with methods other than just honor code certificates
-    'MULTIPLE_ENROLLMENT_ROLES' : False
+    'MULTIPLE_ENROLLMENT_ROLES' : False,
 
     # Toggle the availability of the shopping cart page
-    'ENABLE_SHOPPING_CART': False
+    'ENABLE_SHOPPING_CART': False,
 }
 
 # Used for A/B testing
