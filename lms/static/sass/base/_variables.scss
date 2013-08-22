@@ -9,6 +9,7 @@ $fg-max-columns: 12;
 $fg-max-width: 1400px;
 $fg-min-width: 810px;
 
+// fonts
 $sans-serif: 'Open Sans', $verdana;
 $monospace: Monaco, 'Bitstream Vera Sans Mono', 'Lucida Console', monospace;
 $body-font-family: $sans-serif;
@@ -198,3 +199,13 @@ $login-banner-image: url(../images/bg-banner-login.png);
 $register-banner-image: url(../images/bg-banner-register.png);
 
 $video-thumb-url: '../images/courses/video-thumb.jpg';
+
+//-----------------
+//  Newer variables ported from Studio
+//-----------------
+
+// fonts
+$f-serif: 'Bree Serif', Georgia, Cambria, 'Times New Roman', Times, serif;
+$f-sans-serif: 'Open Sans','Helvetica Neue', Helvetica, Arial, sans-serif;
+$f-monospace: 'Bitstream Vera Sans Mono', Consolas, Courier, monospace;
+

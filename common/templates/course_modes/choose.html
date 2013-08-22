@@ -1,0 +1,23 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%! from django.core.urlresolvers import reverse %>
+<%inherit file="../main.html" />
+
+<%block name="content">
+
+<form method="post" name="enrollment_mode_form" id="enrollment_mode_form">
+    % if "audit" in modes:
+    <div>
+        <input type="submit" name="mode" value="Select Audit" />
+    </div>
+    <br/>
+    % endif
+
+    % if "verified" in modes:
+    <div>
+        <input type="submit" name="mode" value="Select Certificate" />
+    </div>
+    % endif
+    <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
+</form>
+
+</%block>

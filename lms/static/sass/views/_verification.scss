@@ -1,0 +1,166 @@
+// lms - views - verification flow
+// ====================
+
+body.register.verification {
+    font-family: 'Open Sans', sans-serif;
+
+    h1, h2, h3, h4, h5, h6, p {
+      font-family: 'Open Sans', sans-serif;
+    }
+
+
+  .page-header {
+
+    .title {
+      @extend .t-title5;
+      margin-bottom: $baseline;
+      font-weight: bold;
+    }
+  }
+
+  .title {
+    @extend .t-title9;
+    margin-bottom: ($baseline/2);
+    font-weight: bold;
+  }
+
+  .select {
+    @include clearfix();
+
+
+    .block {
+      float: left;
+      margin: 0 $baseline $baseline 0;
+      background-color: #eee;
+      padding: $baseline;
+      width: 60%;
+
+      .title {
+        @extend .t-title7;
+      }
+
+    }
+
+    .tips {
+      float: right;
+      width: 32%;
+    }
+
+  }
+
+
+
+
+
+  .progress {
+
+    .progress-step {
+      border: 1px solid #eee;
+      display: inline-block;
+      padding: ($baseline/2) $baseline;
+    }
+  }
+
+
+  // for dev placement only
+  .placeholder-cam,
+  .placeholder-photo  {
+    height: 300px;
+    background-color: #eee;
+    position: relative;
+
+    p {
+      position: absolute;
+      top: 40%;
+      left: 40%;
+      color: #ccc;
+    }
+  }
+
+  .block-photo {
+    @include clearfix();
+    background-color: $white;
+
+    .title {
+      font-weight: bold;
+    }
+
+    .wrapper-up,
+    .wrapper-down {
+      @include clearfix();
+    }
+
+    .cam {
+      width: 45%;
+      float: left;
+      padding-right: $baseline;
+    }
+
+    .photo-controls {
+      background-color: #ddd;
+
+      .controls-list {
+        margin: 0;
+        padding: ($baseline*.25) ($baseline*.75);
+        list-style-type: none;
+
+        .control {
+          display: inline-block;
+
+          .action {
+            @extend .button-primary;
+            display: block;
+            background-color: $blue;
+            color: $white;
+            padding: ($baseline*.25) ($baseline*.5);
+            border: none;
+
+            &:hover {
+
+            }
+          }
+        }
+      }
+    }
+
+    .faq {
+      width: 45%;
+      float: left;
+      padding-right: $baseline;
+
+      dt {
+        font-weight: bold;
+        padding: 0 0 ($baseline/2) 0;
+      }
+
+      dd {
+        margin: 0;
+        padding: 0 0 $baseline 0;
+      }
+    }
+
+
+
+  }
+
+  .photo-tips {
+    width: 45%;
+    float: left;
+  }
+
+  .actions {
+    width: 45%;
+    float: right;
+  }
+
+  .review-photo {
+    width: 45%;
+    float: left;
+  }
+
+  #review-facephoto {
+    margin-right: $baseline;
+  }
+
+
+}
