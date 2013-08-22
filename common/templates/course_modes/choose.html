@@ -2,22 +2,98 @@
 <%! from django.core.urlresolvers import reverse %>
 <%inherit file="../main.html" />
 
-<%block name="content">
+<%block name="bodyclass">register verification select</%block>
 
-<form method="post" name="enrollment_mode_form" id="enrollment_mode_form">
+<%block name="content">
+<div class="container">
+  <section class="wrapper">
+
+  <header class="page-header">
+    <h2 class="title">You are registering for [coursename] (ID Verified)</h2>
+  </header>
+
+    <h3 class="title">Select your track:</h3>
+
+    <form method="post" name="enrollment_mode_form" id="enrollment_mode_form">
+
     % if "audit" in modes:
-    <div>
-        <input type="submit" name="mode" value="Select Audit" />
-    </div>
-    <br/>
+      <div class="select">
+        <div class="block block-audit">
+          <h4 class="title">Audit</h4>
+          <p>Sign up to audit this course for free and track your own progress.</p>
+
+          <input type="submit" name="mode" value="Select Audit" />
+          <!-- Design original:
+          <p class="btn">
+            <a href="">Select Audit</a>
+          </p>
+          -->
+        </div>
+      </div>
     % endif
 
     % if "verified" in modes:
-    <div>
-        <input type="submit" name="mode" value="Select Certificate" />
-    </div>
+      <div class="select">
+        <div class="block block-cert">
+          <h4 class="title">Certificate of Achievement</h4>
+          <p>Sign up as a verified student and work toward a Certificate of Achievement.</p>
+          <dl>
+            <dt>
+              Select your contribution for this course (in USD):
+            </dt>
+            <dd>
+              <ul>
+                <li>
+                  <input type="radio" name="contribution-25" id="contribution"> <label for="contribution-25">$25</label>
+                </li>
+                <li>
+                  <input type="radio" name="contribution-50" id="contribution"> <label for="contribution-50">$50</label>
+                </li>
+                <li>
+                  <input type="radio" name="contribution-100" id="contribution"> <label for="contribution-100">$100</label>
+                </li>
+                <li>
+                  <input type="radio" name="contribution-other" id="contribution"> <label for="contribution-other">Other</label>
+                </li>
+                <li>
+                  <label for="contribution-other-amt">Other Amount</label> <input type="text" name="contribution-other" id="contribution-other-amt">
+                </li>
+              </ul>
+            </dd>
+          </dl>
+
+          <a href="">Why do I have to pay? What if I don't meet all the requirements?</a>
+
+          <img src="" />
+
+          <p>
+            <a href="">What is an ID Verified Certificate?</a>
+          </p>
+          <!--
+          <p class="btn">
+            <a href="${reverse('verify_student/show_requirements')}">Select Certificate</a>
+          </p>
+          -->
+          <input type="submit" name="mode" value="Select Certificate" />
+        </div>
+
+        <div class="tips">
+          <p>
+            To register for a Verified Certificate of Achievement option, you will need a webcam, a credit or debit card, and an ID. <a href="">View requirements</a>
+          </p>
+        </div>
+      </div>
     % endif
-    <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
-</form>
+
+      <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
+    </form>
+
+
+<p><i class="icon-question-sign"></i> Have questions? <a href="">Check out our FAQs.</a></p>
+<p>Not the course you wanted? <a href="">Return to our course listings</a>.</p>
+
+
+</section>
+</div>
 
 </%block>
