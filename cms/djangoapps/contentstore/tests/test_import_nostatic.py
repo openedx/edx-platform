@@ -29,25 +29,6 @@ TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['OPTIONS']['db'] = 'test_xcontent_%s' % uuid4().hex
 
 
-class MongoCollectionFindWrapper(object):
-    '''
-    MongoCollectionFindWrapper for testing.
-    '''
-    def __init__(self, original):
-        """
-        intit func
-        """
-        self.original = original
-        self.counter = 0
-
-    def find(self, query, *args, **kwargs):
-        """
-        find func
-        """
-        self.counter = self.counter + 1
-        return self.original(query, *args, **kwargs)
-
-
 @override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
 class ContentStoreImportNoStaticTest(ModuleStoreTestCase):
     """
