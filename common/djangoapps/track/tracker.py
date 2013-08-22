@@ -7,11 +7,13 @@ below:
 
 
   EVENT_TRACKERS = {
-      'name': {
+      'tracker_name': {
           'ENGINE': 'class.name.for.backend',
-          'PARAMETER_ONE': 'VALUE_ONE',
-          'PARAMETER_TWO': 'VALUE_TWO',
-          ...
+          'OPTIONS': {
+              'host': ... ,
+              'port': ... ,
+              ...
+          }
       }
   }
 
@@ -75,6 +77,9 @@ def _instantiate_backend_from_name(name, options):
 
 
 def send(event):
+    """
+    Send an event object to all the initialized backends.
+    """
     for backend in _backends.itervalues():
         backend.send(event)
 

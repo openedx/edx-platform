@@ -11,6 +11,7 @@ log = logging.getLogger('track.backends.mongo')
 
 
 class MongoBackend(BaseBackend):
+
     def __init__(self, **options):
         super(MongoBackend, self).__init__(**options)
 
@@ -24,10 +25,10 @@ class MongoBackend(BaseBackend):
         self.client = pymongo.MongoClient(host=uri, w=write_concern, **options)
         self.collection = self.client[db_name][collection_name]
 
-        self.create_indexes()
+        self._create_indexes()
 
     def _make_uri(self, options):
-        # Make a MongoDB URI from options
+        """Make a MongoDB URI from options"""
 
         host = options.pop('host', 'localhost')
         port = options.pop('port', 27017)
@@ -41,7 +42,7 @@ class MongoBackend(BaseBackend):
 
         return uri
 
-    def create_indexes(self):
+    def _create_indexes(self):
         self.collection.create_index('event_type')
         self.collection.create_index([('time', pymongo.DESCENDING)])
 
