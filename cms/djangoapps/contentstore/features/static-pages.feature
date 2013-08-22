@@ -15,6 +15,8 @@ Feature: Static Pages
         And I "delete" the "Empty" page
         Then I should not see a "Empty" static page
 
+    # Safari won't update the name properly
+    @skip_safari
     Scenario: Users can edit static pages
         Given I have opened a new course in Studio
         And I go to the static pages page
