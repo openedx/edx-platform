@@ -1,3 +1,6 @@
+"""
+Student Views
+"""
 import datetime
 import feedparser
 import json
