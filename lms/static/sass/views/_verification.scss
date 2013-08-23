@@ -8,6 +8,16 @@ body.register.verification {
     font-family: 'Open Sans', sans-serif;
   }
 
+
+  dt {
+    margin-bottom: ($baseline*.75);
+  }
+
+  dd {
+    margin: 0;
+  }
+
+
   .content-wrapper {
     background: none repeat scroll 0 0 #F7F7F7;
   }
@@ -79,49 +89,6 @@ body.register.verification {
 
       &.block-cert {
         border-top: 5px solid #008801;
-
-        ul {
-          list-style-type: none;
-          margin: 0;
-          padding: 0;
-
-          li {
-            display: inline-block;
-            background-color: $light-gray;
-            padding: ($baseline/2) ($baseline*.75);
-            margin-right: ($baseline/4);
-            vertical-align: middle;
-
-            label {
-              font-style: normal;
-              font-family: 'Open Sans', sans-serif;
-              font-weight: 400;
-              vertical-align: middle;
-            }
-
-            &.other1 {
-              margin-right: -($baseline/4);
-              padding-right: ($baseline/4);
-            }
-            &.other2 {
-              padding: ($baseline/4) ($baseline*.75) ($baseline/4) 0;
-            }
-
-            input {
-              vertical-align: middle;
-            }
-          }
-
-        }
-
-        dt {
-          margin-bottom: ($baseline*.75);
-        }
-
-        dd {
-          margin: 0;
-        }
-
       }
 
 
@@ -160,9 +127,42 @@ body.register.verification {
         font-size: 14px;
       }
     }
-
   }
 
+
+  .pay-options {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+
+    li {
+      display: inline-block;
+      background-color: $light-gray;
+      padding: ($baseline/2) ($baseline*.75);
+      margin-right: ($baseline/4);
+      vertical-align: middle;
+
+      label {
+        font-style: normal;
+        font-family: 'Open Sans', sans-serif;
+        font-weight: 400;
+        vertical-align: middle;
+      }
+
+      &.other1 {
+        margin-right: -($baseline/4);
+        padding-right: ($baseline/4);
+      }
+      &.other2 {
+        padding: ($baseline/4) ($baseline*.75) ($baseline/4) 0;
+      }
+
+      input {
+        vertical-align: middle;
+      }
+    }
+
+  }
 
  .m-btn-primary {
 
