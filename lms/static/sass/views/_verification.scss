@@ -20,7 +20,7 @@ body.register.verification {
     font-weight: 400;
   }
 
-  dl.faq {
+  .faq {
     font-size: 12px;
 
     label {
@@ -214,6 +214,17 @@ body.register.verification {
       }
     }
 
+    &.disabled, &[disabled], &.is-disabled {
+      background-color: #A0B6CD;
+      box-shadow: none;
+      pointer-events: none;
+
+      &:hover {
+        background: $action-primary-disabled-bg !important; // needed for IE currently
+      }
+
+    }
+
     &.green {
       box-shadow: 0 2px 1px rgba(2,100,2,1);
       background-color: rgba(0,136,1,1);
@@ -228,9 +239,11 @@ body.register.verification {
 
 
   .progress {
-
+ /*         background: transparent url('../images/vcert-steps.png') no-repeat 0 0;
+    height: 50px;
+    text-indent: -9999px;
+*/
     .progress-step {
-      border: 1px solid #eee;
       display: inline-block;
       padding: ($baseline/2) $baseline;
     }
@@ -275,6 +288,8 @@ body.register.verification {
       background-color: #ddd;
 
       .controls-list {
+        @include clearfix();
+        position: relative;
         margin: 0;
         padding: ($baseline*.25) ($baseline*.75);
         list-style-type: none;
@@ -293,6 +308,36 @@ body.register.verification {
             &:hover {
 
             }
+
+          }
+
+
+          &.is-hidden {
+            visibility: hidden;
+          }
+
+          &.is-shown {
+            visibility: visible;
+          }
+
+
+          &.control-do {
+            position: relative;
+            left: 45%;
+          }
+
+          &.control-redo {
+            position: absolute;
+            left: ($baseline/2);
+          }
+
+          &.control-approve {
+            position: absolute;
+            right: ($baseline/2);
+          }
+
+          &.approved a {
+            background-color: $green;
           }
         }
       }
@@ -314,6 +359,16 @@ body.register.verification {
   .actions {
     width: 45%;
     float: right;
+
+    ul {
+      padding: 0;
+      margin: 0;
+      list-style-type: none;
+    }
+  }
+
+  .support {
+    margin-top: ($baseline*2);
   }
 
   .review-photo {

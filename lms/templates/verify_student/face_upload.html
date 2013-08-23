@@ -11,6 +11,39 @@ $(document).ready(function() {
 
   $( ".carousel-nav" ).addClass('sr');
 
+  $('.block-photo .control-redo').addClass('is-hidden');
+  $('.block-photo .control-approve').addClass('is-hidden');
+  $('.block-photo .m-btn-primary').addClass('disabled');
+
+
+  $( "#wrapper-facephoto .control-do" ).click(function(e) {
+      e.preventDefault();
+      $(this).toggleClass('is-hidden');
+      $('#wrapper-facephoto .control-redo').toggleClass('is-shown');
+      $('#wrapper-facephoto .control-approve').toggleClass('is-shown');
+  });
+
+  $( "#wrapper-facephoto .control-approve" ).click(function(e) {
+      e.preventDefault();
+      $(this).addClass('approved');
+      $('#wrapper-facephoto .m-btn-primary').removeClass('disabled');
+  });
+
+
+  $( "#wrapper-idphoto .control-do" ).click(function(e) {
+      e.preventDefault();
+      $(this).toggleClass('is-hidden');
+      $('#wrapper-idphoto .control-redo').toggleClass('is-shown');
+      $('#wrapper-idphoto .control-approve').toggleClass('is-shown');
+  });
+
+  $( "#wrapper-idphoto .control-approve" ).click(function(e) {
+      e.preventDefault();
+      $(this).addClass('approved');
+      $('#wrapper-idphoto .m-btn-primary').removeClass('disabled');
+  });
+
+
 });
   </script>
 </%block>
@@ -51,11 +84,11 @@ $(document).ready(function() {
 
           <div class="controls photo-controls">
             <ul class="controls-list">
-              <li class="control control-do">
-                <a class="action action-do" href=""><i class="icon-camera"></i> <span class="sr">Take photo</span></a>
-              </li>
               <li class="control control-redo">
                 <a class="action action-redo" href=""><i class="icon-undo"></i> <span class="sr">Retake</span></a>
+              </li>
+              <li class="control control-do">
+                <a class="action action-do" href=""><i class="icon-camera"></i> <span class="sr">Take photo</span></a>
               </li>
               <li class="control control-approve">
                 <a class="action action-approve" href=""><i class="icon-ok"></i> <span class="sr">Looks good</span></a>
@@ -79,15 +112,13 @@ $(document).ready(function() {
       <div class="wrapper-down">
         <div class="faq facefaq">
           <h4 class="sr">Common Questions</h4>
-          <dl>
-            <dt>Cras justo odio, dapibus ac facilisis in, egestas eget quam.</dt>
-              <dd>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</dd>
-            <dt>Vestibulum id ligula porta felis euismod semper.</dt>
-            <dt>Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit.</dt>
-              <dd>Aenean eu leo quam.</dd>
-            <dt>Pellentesque ornare sem lacinia quam venenatis vestibulum.</dt>
-              <dd>Maecenas faucibus mollis interdum.</dd>
-          </dl>
+            <dl>
+              <dt>Why do you need my photo?</dt>
+                <dd>We need your photo to confirm that you are you.</dd>
+
+              <dt>What do you do with this picture?</dt>
+                <dd>We only use it to verify your identity.  It is not displayed anywhere.</dd>
+            </dl>
         </div>
 
         <div class="actions">
@@ -96,7 +127,7 @@ $(document).ready(function() {
               <p class="m-btn-primary">
                 <a class="next" href="#next" aria-hidden="true" title="Next">Go to Step 2: Take ID Photo</a>
               </p>
-              <p class="tips">Once you verify your photo looks good, you can move on to step 2.</p>
+              <p class="tip">Once you verify your photo looks good, you can move on to step 2.</p>
             </li>
           </ul>
         </div>
@@ -121,11 +152,11 @@ $(document).ready(function() {
 
           <div class="controls photo-controls">
             <ul class="controls-list">
-              <li class="control control-do">
-                <a class="action action-do" href=""><i class="icon-camera"></i> <span class="sr">Take photo</span></a>
-              </li>
               <li class="control control-redo">
                 <a class="action action-redo" href=""><i class="icon-undo"></i> <span class="sr">Retake</span></a>
+              </li>
+              <li class="control control-do">
+                <a class="action action-do" href=""><i class="icon-camera"></i> <span class="sr">Take photo</span></a>
               </li>
               <li class="control control-approve">
                 <a class="action action-approve" href=""><i class="icon-ok"></i> <span class="sr">Looks good</span></a>
@@ -151,7 +182,7 @@ $(document).ready(function() {
 
         <div class="faq idfaq">
           <h4 class="sr">Common Questions</h4>
-          <dl>
+          <dl class="faq">
             <dt>Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit.</dt>
               <dd>Aenean eu leo quam.</dd>
             <dt>Pellentesque ornare sem lacinia quam venenatis vestibulum.</dt>
@@ -168,7 +199,7 @@ $(document).ready(function() {
               <p class="m-btn-primary">
                 <a class="next" href="#next" aria-hidden="true" title="Next">Go to Step 3: Review Your Info</a>
               </p>
-              <p class="tips">Once you verify your ID photo looks good, you can move on to step 3.</p>
+              <p class="tip">Once you verify your ID photo looks good, you can move on to step 3.</p>
             </li>
           </ul>
         </div>
@@ -259,7 +290,7 @@ $(document).ready(function() {
         <ul>
           <li class="action action-next">
             <p  class="m-btn-primary"><a href="#">Go to Step 4: Secure Payment</a></p>
-            <p class="tips">Once you verify your details match the requirements, you can move on to step 4, payment on our secure server.</p>
+            <p class="tip">Once you verify your details match the requirements, you can move on to step 4, payment on our secure server.</p>
           </li>
         </ul>
       </div>
