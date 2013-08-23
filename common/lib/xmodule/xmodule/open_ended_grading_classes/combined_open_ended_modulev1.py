@@ -839,7 +839,6 @@ class CombinedOpenEndedV1Module():
             for i in xrange(0, len(self.task_states)):
                 # For each task, extract all student scores on that task (each attempt for each task)
                 last_response = self.get_last_response(i)
-                max_score = last_response.get('max_score', None)
                 score = last_response.get('all_scores', None)
                 if score is not None:
                     # Convert none scores and weight scores properly
@@ -858,9 +857,9 @@ class CombinedOpenEndedV1Module():
             else:
                 score = 0
 
-            if max_score is not None:
+            if self._max_score is not None:
                 # Weight the max score if it is not None
-                max_score *= float(weight)
+                max_score = self._max_score * float(weight)
             else:
                 # Without a max_score, we cannot have a score!
                 score = None
@@ -880,8 +879,7 @@ class CombinedOpenEndedV1Module():
         '''
         max_score = None
         if self.check_if_done_and_scored():
-            last_response = self.get_last_response(self.current_task_number)
-            max_score = last_response['max_score']
+            max_score = self._max_score
         return max_score
 
     def get_progress(self):
