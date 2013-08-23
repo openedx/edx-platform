@@ -18,12 +18,13 @@ from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.xml_importer import import_from_xml
 from xmodule.contentstore.content import StaticContent
+from xmodule.contentstore.django import _CONTENTSTORE
 
 from xmodule.course_module import CourseDescriptor
 
 from xmodule.exceptions import NotFoundError
 from uuid import uuid4
-
+from pymongo import MongoClient
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['OPTIONS']['db'] = 'test_xcontent_%s' % uuid4().hex
@@ -57,6 +58,10 @@ class ContentStoreImportNoStaticTest(ModuleStoreTestCase):
 
         self.client = Client()
         self.client.login(username=uname, password=password)
+
+    def tearDown(self):
+        MongoClient().drop_database(TEST_DATA_CONTENTSTORE['OPTIONS']['db'])
+        _CONTENTSTORE.clear()
 
     def load_test_import_course(self):
         '''
