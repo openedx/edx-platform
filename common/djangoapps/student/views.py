@@ -271,7 +271,7 @@ def dashboard(request):
             log.error("User {0} enrolled in non-existent course {1}"
                       .format(user.username, enrollment.course_id))
 
-    course_optouts = Optout.objects.filter(email=user.email).values_list('course_id', flat=True)
+    course_optouts = Optout.objects.filter(user=user).values_list('course_id', flat=True)
 
     message = ""
     if not user.is_active:
@@ -1289,13 +1289,13 @@ def change_email_settings(request):
     course_id = request.POST.get("course_id")
     receive_emails = request.POST.get("receive_emails")
     if receive_emails:
-        optout_object = Optout.objects.filter(email=user.email, course_id=course_id)
+        optout_object = Optout.objects.filter(user=user, course_id=course_id)
         if optout_object:
             optout_object.delete()
-        log.info(u"User {0} ({1}) opted to receive emails from course {2}".format(user.username, user.email, course_id))
+        log.info(u"User {0} ({1}) opted in to receive emails from course {2}".format(user.username, user.email, course_id))
         track.views.server_track(request, "change-email-settings", {"receive_emails": "yes", "course": course_id}, page='dashboard')
     else:
-        Optout.objects.get_or_create(email=request.user.email, course_id=course_id)
+        Optout.objects.get_or_create(user=user, course_id=course_id)
         log.info(u"User {0} ({1}) opted out of receiving emails from course {2}".format(user.username, user.email, course_id))
         track.views.server_track(request, "change-email-settings", {"receive_emails": "no", "course": course_id}, page='dashboard')
 
