@@ -27,7 +27,6 @@ import sys
 import lms.envs.common
 from lms.envs.common import USE_TZ, TECH_SUPPORT_EMAIL, PLATFORM_NAME, BUGS_EMAIL
 from path import path
-
 ############################ FEATURE CONFIGURATION #############################
 
 MITX_FEATURES = {
@@ -55,7 +54,10 @@ MITX_FEATURES = {
 
     # If set to True, new Studio users won't be able to author courses unless
     # edX has explicitly added them to the course creator group.
-    'ENABLE_CREATOR_GROUP': False
+    'ENABLE_CREATOR_GROUP': False,
+
+    # disable content testing which is in development
+    'CONTENT_TESTING': False,
 }
 ENABLE_JASMINE = False
 
@@ -360,7 +362,10 @@ INSTALLED_APPS = (
     'django.contrib.admin',
 
     # for managing course modes
-    'course_modes'
+    'course_modes',
+
+    #automated content testing for custom response
+    'content_testing',
 )
 
 ################# EDX MARKETING SITE ##################################

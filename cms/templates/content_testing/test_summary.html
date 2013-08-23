@@ -1,0 +1,42 @@
+## <%inherit file="../base.html" />
+## <%namespace name='static' file='../static_content.html'/>
+
+## <!-- TODO decode course # from context_course into title -->
+## <%block name="title">Test Summary</%block>
+
+## <%block name='content'>
+## <div class="main-wrapper">
+## <div class="inner-wrapper">
+## <div class="main-column">
+## <h1> Testing Summary </h1><br>
+% if tests:
+  % for test in tests:
+    ${test.get_html_summary()}
+    <form method="post" action="/test_problem/delete/">
+        <input type="hidden" name="csrfmiddlewaretoken" value=${csrf}>
+        <input type="submit" value="Delete">
+        <input type="hidden" name="location" value=${location}>
+    </form>
+    <form method="get" action="/test_problem/edit/">
+        <input type="submit" value="Edit">
+        <input type="hidden" name="location" value=${location}>
+    </form>
+    <hr>
+  % endfor
+<form method="get" action="/test_problem/run/">
+    ## <input type="hidden" name="csrfmiddlewaretoken" value=${csrf}>
+    <input type="hidden" name="location" value=${location}>
+    <input type="submit" name="submit" value="Run Tests">
+</form>
+%else:
+  <h1>No Tests</h1>
+%endif
+  <form method="get" action="/test_problem/new/">
+    ## <input type="hidden" name="csrfmiddlewaretoken" value=${csrf}>
+    <input type="hidden" name="location" value=${location}>
+    <input type="submit" name="submit" value="Create a New Test" id="create_new_button">
+  </form>
+</div>
+</div>
+</div>
+</%block>
