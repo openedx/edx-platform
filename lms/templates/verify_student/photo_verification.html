@@ -52,27 +52,45 @@
     .fail(function() { alert("error"); });
   }
 
-  function initFaceSnapshotHandler() {
-    var video = $('#face_video');
-    var canvas = $('#face_canvas');
+  function initSnapshotHandler(name) {
+    var video = $('#' + name + '_video');
+    var canvas = $('#' + name + '_canvas');
+    var image = $('#' + name + "_image");
+    var captureButton = $("#" + name + "_capture_button");
+    var resetButton = $("#" + name + "_reset_button");
+    var approveButton = $("#" + name + "_approve_button");
+
     var ctx = canvas[0].getContext('2d');
     var localMediaStream = null;
 
     function snapshot() {
       if (localMediaStream) {
         ctx.drawImage(video[0], 0, 0);
-        $('#face_image').src = canvas[0].toDataURL('image/webp');
+        image[0].src = canvas[0].toDataURL('image/png');
       }
+      video[0].pause();
+      return false;
+    }
+
+    function reset() {
+      $('#face_image')[0].src = "";
+      video[0].play();
+      return false;
+    }
+
+    function approve() {
+      return false;
     }
 
     video.click(snapshot);
-    $("#face_capture_button").click(snapshot);
+    captureButton.click(snapshot);
+    resetButton.click(reset);
+    approveButton.click(approve);
 
     navigator.getUserMedia({video: true}, function(stream) {
-      video.src = window.URL.createObjectURL(stream);
+      video[0].src = window.URL.createObjectURL(stream);
       localMediaStream = stream;
     }, onVideoFail);
-
   }
 
   $(document).ready(function() {
@@ -80,8 +98,8 @@
     $("#pay_button").click(submitToPaymentProcessing);
 
     initVideoCapture();
-    initFaceSnapshotHandler();
-
+    initSnapshotHandler("face");
+    initSnapshotHandler("photo_id");
   });
 
 </script>
@@ -117,22 +135,20 @@
 
         <div id="facecam" class="cam">
           <div class="placeholder-cam">
-            <video id="face_video" autoplay></video><br/>
-            <img id="face_image" src=""/><br/>
-            <canvas id="face_canvas" style="display:none;"></canvas>
-            <button id="face_capture_button" type="button">Take Picture</button>
+            <video id="face_video" width="400" height="300" autoplay></video><br/>
+            <canvas id="face_canvas" style="display:none;" width="640" height="480"></canvas>
           </div>
 
           <div class="controls photo-controls">
             <ul class="controls-list">
               <li class="control control-do">
-                <a class="action action-do" href=""><i class="icon-camera"></i> <span class="sr">Take photo</span></a>
+                <a class="action action-do" id="face_capture_button" href=""><i class="icon-camera"></i> <span class="sr">Take photo</span></a>
               </li>
               <li class="control control-redo">
-                <a class="action action-redo" href=""><i class="icon-undo"></i> <span class="sr">Retake</span></a>
+                <a class="action action-redo" id="face_reset_button" href=""><i class="icon-undo"></i> <span class="sr">Retake</span></a>
               </li>
               <li class="control control-approve">
-                <a class="action action-approve" href=""><i class="icon-ok"></i> <span class="sr">Looks good</span></a>
+                <a class="action action-approve" id="face_approve_button" href=""><i class="icon-ok"></i> <span class="sr">Looks good</span></a>
               </li>
             </ul>
           </div>
@@ -187,19 +203,20 @@
         <div id="idcam" class="cam">
 
           <div class="placeholder-cam">
-            <video autoplay></video>
+            <video id="photo_id_video" width="400" height="300" autoplay></video><br/>
+            <canvas id="photo_id_canvas" style="display:none;" width="640" height="480"></canvas>
           </div>
 
           <div class="controls photo-controls">
             <ul class="controls-list">
               <li class="control control-do">
-                <a class="action action-do" href=""><i class="icon-camera"></i> <span class="sr">Take photo</span></a>
+                <a class="action action-do" id="photo_id_capture_button" href=""><i class="icon-camera"></i> <span class="sr">Take photo</span></a>
               </li>
               <li class="control control-redo">
-                <a class="action action-redo" href=""><i class="icon-undo"></i> <span class="sr">Retake</span></a>
+                <a class="action action-redo" id="photo_id_reset_button" href=""><i class="icon-undo"></i> <span class="sr">Retake</span></a>
               </li>
               <li class="control control-approve">
-                <a class="action action-approve" href=""><i class="icon-ok"></i> <span class="sr">Looks good</span></a>
+                <a class="action action-approve" id="photo_id_approve_button" href=""><i class="icon-ok"></i> <span class="sr">Looks good</span></a>
               </li>
             </ul>
           </div>
@@ -260,7 +277,7 @@
       <div class="wrapper-up">
         <div id="review-facephoto" class="review-photo">
           <div class="placeholder-photo">
-           <video autoplay></video>
+            <img id="face_image" width="512" height="384" src=""/>
           </div>
 
           <h4>The photo above needs to meet the following requirements:</h4>
@@ -273,7 +290,7 @@
 
         <div id="review-idphoto" class="review-photo">
           <div class="placeholder-photo">
-            <video autoplay></video>
+            <img id="photo_id_image" width="512" height="384" src=""/>
           </div>
 
           <h4>The photo above needs to meet the following requirements:</h4>
@@ -290,7 +307,7 @@
 
       <div class="next">
 
-        <p>Photos don't meet the requirements? <a href="">Retake the photos</a>.</p>
+        <p>Photos don't meet the requirements? <a href="#start">Retake the photos</a>.</p>
 
 
         <input type="checkbox" name="match" /> <label for="match">Yes! My details all match.</label>
