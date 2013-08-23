@@ -182,9 +182,10 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         Args:
         `data` -- must be interpretable by answer_to_str.
         Output keys:
-            - 'best_hint' is the hint text with the most votes.
-            - 'rand_hint_1' and 'rand_hint_2' are two random hints to the answer in `data`.
+            - 'hints' is a list of hint strings to show to the user.
             - 'answer' is the parsed answer that was submitted.
+        Will record the user's wrong answer in user_submissions, and the hints shown
+        in previous_answers.
         """
         # First, validate our inputs.
         try:
@@ -251,6 +252,8 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         Output keys:
             - 'answer_to_hints': a nested dictionary.
               answer_to_hints[answer][hint_pk] returns the text of the hint.
+            - 'user_submissions': the same thing as self.user_submissions.  A list of
+              the answers that the user previously submitted.
         """
         # The student got it right.
         # Did he submit at least one wrong answer?

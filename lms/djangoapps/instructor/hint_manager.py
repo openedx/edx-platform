@@ -1,8 +1,10 @@
 """
 Views for hint management.
 
-Along with the crowdsource_hinter xmodule, this code is still
-experimental, and should not be used in new courses, yet.
+Get to these views through courseurl/hint_manager.
+For example: https://courses.edx.org/courses/MITx/2.01x/2013_Spring/hint_manager
+
+These views will only be visible if MITX_FEATURES['ENABLE_HINTER_INSTRUCTOR_VIEW'] = True
 """
 
 import json
@@ -23,6 +25,9 @@ from xmodule.modulestore.django import modulestore
 
 @ensure_csrf_cookie
 def hint_manager(request, course_id):
+    """
+    The URL landing function for all calls to the hint manager, both POST and GET.
+    """
     try:
         get_course_with_access(request.user, course_id, 'staff', depth=None)
     except Http404:
@@ -172,7 +177,13 @@ def change_votes(request, course_id, field):
     Updates the number of votes.
 
     The numbered fields of `request.POST` contain [problem_id, answer, pk, new_votes] tuples.
-    - Very similar to `delete_hints`.  Is there a way to merge them?  Nah, too complicated.
+    See `delete_hints`.
+
+    Example `request.POST`:
+    {'op': 'delete_hints',
+     'field': 'mod_queue',
+      1: ['problem_whatever', '42.0', '3', 42],
+      2: ['problem_whatever', '32.5', '12', 9001]}
     """
 
     for key in request.POST:
@@ -233,6 +244,8 @@ def approve(request, course_id, field):
     hint list.  POST:
     op, field
     (some number) -> [problem, answer, pk]
+
+    The numbered fields are analogous to those in `delete_hints` and `change_votes`.
     """
 
     for key in request.POST:
