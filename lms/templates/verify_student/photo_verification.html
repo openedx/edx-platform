@@ -32,22 +32,50 @@
   }, onFailSoHard);
   */
 
-  $(document).ready(function() {
-    $( ".carousel-nav" ).addClass('sr');
-
+  function initVideoCapture() {
     window.URL = window.URL || window.webkitURL;
     navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia ||
                               navigator.mozGetUserMedia || navigator.msGetUserMedia;
 
-    var video = document.querySelector('video');
+    $('video').each(function(i, video) {
+      if (navigator.getUserMedia) {
+        navigator.getUserMedia({video: true}, function(stream) {
+          video.src = window.URL.createObjectURL(stream);
+        }, onFailSoHard);
+      } else {
+        video.src = 'somevideo.webm'; // fallback.
+      }
+    });
+  }
 
-    if (navigator.getUserMedia) {
-      navigator.getUserMedia({audio: true, video: true}, function(stream) {
-        video.src = window.URL.createObjectURL(stream);
-      }, onFailSoHard);
-    } else {
-      video.src = 'somevideo.webm'; // fallback.
-    }
+  $(document).ready(function() {
+    $(".carousel-nav").addClass('sr');
+
+    initVideoCapture();
+
+    $("#pay_button").click(function(){
+        // $("#pay_form")
+        var xhr = $.post(
+          "create_order",
+          {
+            "course_id" : "${course_id|u}"
+          },
+          function(data) {
+            for (prop in data) {
+              $('<input>').attr({
+                  type: 'hidden',
+                  name: prop,
+                  value: data[prop]
+              }).appendTo('#pay_form');
+            }
+            $("#pay_form").submit()
+          }
+        )
+        .done(function(data) {
+          alert(data);
+        })
+        .fail(function() { alert("error"); });
+    });
 
   });
 
@@ -84,8 +112,7 @@
 
         <div id="facecam" class="cam">
           <div class="placeholder-cam">
-          <!-- cam image -->
-          <p>cam image</p>
+            <video autoplay></video>
           </div>
 
           <div class="controls photo-controls">
@@ -153,7 +180,6 @@
 
           <div class="placeholder-cam">
             <video autoplay></video>
-          <p>cam image</p>
           </div>
 
           <div class="controls photo-controls">
@@ -264,11 +290,11 @@
       <div class="actions">
         <ul>
           <li class="action action-next">
-            <form method="post" action="create_order">
+            <form id="pay_form" method="post" action="${purchase_endpoint}">
               <!-- <a href="#">Go to Step 4: Secure Payment</a> -->
-              <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
+              <!-- <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }"> -->
               <input type="hidden" name="course_id" value="${course_id | h}" />
-              <input type="submit" value="Go to Step 4" name="payment">
+              <input type="button" id="pay_button" value="Go to Step 4" name="payment">
             </form>
             <p class="tips">Once you verify your details match the requirements, you can move on to step 4, payment on our secure server.</p>
           </li>

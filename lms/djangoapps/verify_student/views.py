@@ -3,6 +3,7 @@
 
 """
 import json
+import logging
 
 from mitxmako.shortcuts import render_to_response
 
@@ -16,8 +17,12 @@ from course_modes.models import CourseMode
 from student.models import CourseEnrollment
 from student.views import course_from_id
 from shoppingcart.models import Order, CertificateItem
-from shoppingcart.processors.CyberSource import get_signed_purchase_params
+from shoppingcart.processors.CyberSource import (
+    get_signed_purchase_params, get_purchase_endpoint
+)
 from verify_student.models import SoftwareSecurePhotoVerification
+
+log = logging.getLogger(__name__)
 
 class VerifyView(View):
 
@@ -40,7 +45,8 @@ class VerifyView(View):
             "progress_state" : progress_state,
             "user_full_name" : request.user.profile.name,
             "course_id" : course_id,
-            "course_name" : course_from_id(course_id).display_name
+            "course_name" : course_from_id(course_id).display_name,
+            "purchase_endpoint" : get_purchase_endpoint(),
         }
 
         return render_to_response('verify_student/photo_verification.html', context)
@@ -52,6 +58,7 @@ def create_order(request):
     attempt.save()
 
     course_id = request.POST['course_id']
+    log.critical(course_id)
 
     # I know, we should check this is valid. All kinds of stuff missing here
     # enrollment = CourseEnrollment.create_enrollment(request.user, course_id)
