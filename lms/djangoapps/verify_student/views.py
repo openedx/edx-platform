@@ -58,7 +58,6 @@ def create_order(request):
     attempt.save()
 
     course_id = request.POST['course_id']
-    log.critical(course_id)
 
     # I know, we should check this is valid. All kinds of stuff missing here
     # enrollment = CourseEnrollment.create_enrollment(request.user, course_id)

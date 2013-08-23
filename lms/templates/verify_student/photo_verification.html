@@ -34,7 +34,7 @@
     var xhr = $.post(
       "create_order",
       {
-        "course_id" : "${course_id|u}"
+        "course_id" : "${course_id}"
       },
       function(data) {
         for (prop in data) {
