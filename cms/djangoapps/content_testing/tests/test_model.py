@@ -3,20 +3,28 @@ Unit tests on the models that make up automated content testing
 """
 
 from django.test import TestCase
-from textwrap import dedent
+from django.test.utils import override_settings
+from django.conf import settings
+
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mongo_store_config
 from xmodule.modulestore.django import modulestore
 from content_testing.models import ContentTest, ResponseTest, hash_xml, hash_xml_structure, \
                                     condense_attributes, remove_xml_wrapper, condense_dict
+
 from capa.tests.response_xml_factory import CustomResponseXMLFactory
+
 from lxml import etree
 from mock import patch
-
+from textwrap import dedent
 
 # disable sillly pylint violations
 # pylint: disable=W0212
 # pylint: disable=W0201
+MONGO_CONFIG = mongo_store_config(settings.COMMON_TEST_DATA_ROOT)
+
+
+@override_settings(MODULESTORE=MONGO_CONFIG)
 class ContentTestTestCase(ModuleStoreTestCase):
     """
     set up a content test to test
@@ -441,7 +449,7 @@ class RematchingTestCase(ContentTestTestCase):
         modulestore().update_item(self.problem.location, new_xml_string)
 
         # this gets rid of the _draft nonsense, which makes hard-coded dicts easier.
-        modulestore().publish(self.problem.location, 0)
+        # modulestore().publish(self.problem.location, 0)
 
         # force ContentTest to refetch module
         # If we just set .module=None, then we force the ContentTest object
@@ -650,33 +658,6 @@ class RematchingTestCase(ContentTestTestCase):
         self.test_model.rematch_if_necessary()
         self.assertEqual(two_responses_dict, self.test_model.response_dict)
 
-    def test_change_ids(self):
-        """
-        While getting rid of the _draft nonsense made it easier to write
-        the tests, we still need to make sure that that doesn't break things
-        """
-
-        # store the old dict
-        old_dict = self.pass_correct.response_dict
-
-        # update the problem with same xml that it already has
-        # This should make all the id's contain _draft
-        xml = self.problem.data
-        modulestore().update_item(self.problem.location, xml)
-
-        new_model = ContentTest(**self.pass_correct.todict())
-        new_model.run()
-
-        # assert that the values haven't changed
-        self.assertItemsEqual(old_dict.values(), new_model.response_dict.values())
-
-        # assert that the dicts themselves are different, since if they are the
-        # same, than this test is not testing what it means to.
-        self.assertNotEqual(old_dict, new_model.response_dict)
-
-        # assert that it still passes
-        self.assertEqual(self.VERDICT_PASS, new_model.verdict)
-
 
 class HelperFunctionsTestCase(TestCase):
     """
@@ -864,25 +845,25 @@ class ValidateDictTestCase(ContentTestTestCase):
         test_dict = self.valid_resptest_dict()
         test_dict.pop('string_id')
 
-        assert not(ResponseTest.is_valid_dict({}))
+        assert not(ResponseTest.is_valid_dict(test_dict))
 
     def test_lacking_xml_ResponseTest(self):
 
         test_dict = self.valid_resptest_dict()
         test_dict.pop('xml_string')
 
-        assert not(ResponseTest.is_valid_dict({}))
+        assert not(ResponseTest.is_valid_dict(test_dict))
 
     def test_broken_xml_ResponseTest(self):
 
         test_dict = self.valid_resptest_dict()
         test_dict['xml_string'] = '<bad><xml/>'
 
-        assert not(ResponseTest.is_valid_dict({}))
+        assert not(ResponseTest.is_valid_dict(test_dict))
 
     def test_bad_type_ResponseTest(self):
 
         test_dict = self.valid_resptest_dict()
         test_dict['inputs'] = [1, 2, 3]
 
-        assert not(ResponseTest.is_valid_dict({}))
+        assert not(ResponseTest.is_valid_dict(test_dict))

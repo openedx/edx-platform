@@ -144,7 +144,7 @@ def delete_contenttest(descriptor, id_to_delete):
 
 def add_contenttest_to_descriptor(descriptor, test_dict):
     """
-    Adds the test to the descriptor, and creates an id for the test
+    Adds the test to the descriptor, and creates an id for the test.
     """
 
     tests = descriptor.tests
@@ -171,6 +171,8 @@ def add_contenttest_to_descriptor(descriptor, test_dict):
 def instantiate_tests(descriptor):
     """
     Instantiate the tests of the descriptor such that no db access is needed per test.
+
+    TODO: Validate the elements of test_dicts with ContentTest.is_valid_dict(dict)
     """
 
     test_dicts = descriptor.tests
@@ -307,7 +309,8 @@ def response_summary(response_test, msg):
         context = {
             'msg': msg,
             'answers': answers,
-            'id': response_test.content_test.id
+            'id': response_test.content_test.id,
+            'location': response_test.content_test.location
         }
 
         return etree.XML(render_to_string('content_testing/response_summary.html', context))
