@@ -9,7 +9,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from django.test.utils import override_settings
-from courseware.tests.modulestore_config import TEST_DATA_MONGO_MODULESTORE
+from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 
 from courseware.access import get_access_group_name
 from django_comment_common.models import (Role,
@@ -20,7 +20,7 @@ from instructor.access import (allow_access,
                                update_forum_role_membership)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class TestInstructorAccessList(ModuleStoreTestCase):
     """ Test access listings. """
     def setUp(self):
@@ -42,7 +42,7 @@ class TestInstructorAccessList(ModuleStoreTestCase):
         self.assertEqual(set(beta_testers), set(self.beta_testers))
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class TestInstructorAccessAllow(ModuleStoreTestCase):
     """ Test access allow. """
     def setUp(self):
@@ -85,7 +85,8 @@ class TestInstructorAccessAllow(ModuleStoreTestCase):
         group = Group.objects.get(name=get_access_group_name(self.course, 'staff'))
         self.assertIn(user, group.user_set.all())
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class TestInstructorAccessRevoke(ModuleStoreTestCase):
     """ Test access revoke. """
     def setUp(self):
@@ -129,7 +130,7 @@ class TestInstructorAccessRevoke(ModuleStoreTestCase):
         self.assertNotIn(user, group.user_set.all())
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class TestInstructorAccessForum(ModuleStoreTestCase):
     """
     Test forum access control.

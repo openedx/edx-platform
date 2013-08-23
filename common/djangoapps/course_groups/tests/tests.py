@@ -8,19 +8,20 @@ from course_groups.models import CourseUserGroup
 from course_groups.cohorts import (get_cohort, get_course_cohorts,
                                    is_commentable_cohorted, get_cohort_by_name)
 
-from xmodule.modulestore.django import modulestore, _MODULESTORES
+from xmodule.modulestore.django import modulestore, clear_existing_modulestores
 
-from xmodule.modulestore.tests.django_utils import xml_store_config
+from xmodule.modulestore.tests.django_utils import mixed_store_config
 
 # NOTE: running this with the lms.envs.test config works without
 # manually overriding the modulestore.  However, running with
 # cms.envs.test doesn't.
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
-TEST_DATA_XML_MODULESTORE = xml_store_config(TEST_DATA_DIR)
+TEST_MAPPING = {'edX/toy/2012_Fall': 'xml'}
+TEST_DATA_MIXED_MODULESTORE = mixed_store_config(TEST_DATA_DIR, TEST_MAPPING)
 
 
-@override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class TestCohorts(django.test.TestCase):
 
     @staticmethod
@@ -82,9 +83,7 @@ class TestCohorts(django.test.TestCase):
         """
         Make sure that course is reloaded every time--clear out the modulestore.
         """
-        # don't like this, but don't know a better way to undo all changes made
-        # to course.  We don't have a course.clone() method.
-        _MODULESTORES.clear()
+        clear_existing_modulestores()
 
     def test_get_cohort(self):
         """
