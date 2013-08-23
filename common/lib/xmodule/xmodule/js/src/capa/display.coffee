@@ -380,8 +380,6 @@ class @Problem
       classes = $(inputtype).attr('class').split(' ')
       for cls in classes
         bindMethod = @bindResetCorrectnessByInputtype[cls]
-        # For debugging! Remove later
-        console.log $(inputtype).attr('id'), cls, typeof bindMethod
         if bindMethod?
           bindMethod(inputtype)
 
@@ -393,7 +391,7 @@ class @Problem
     formulaequationinput: (element) ->
       $(element).find('input').on 'input', ->
         $p = $(element).find('p.status')
-        $p.text "unanswered"
+        $p.text gettext("unanswered")
         $p.parent().removeClass().addClass "unanswered"
 
     choicegroup: (element) ->
@@ -406,10 +404,9 @@ class @Problem
           $status.empty().css 'display', 'inline-block'
         else
           # Recreate the unanswered dot on left.
-          $element.find('div.indicator_container').append "<span class='unanswered' style='display:inline-block;' id='status_#{id}'></span>"
+          $("<span>", {"class": "unanswered", "style": "display: inline-block;", "id": "status_#{id}"})
 
         $element.find("label").removeClass()
-          .find('span').remove()
 
     'option-input': (element) ->
       $select = $(element).find('select')
@@ -417,7 +414,7 @@ class @Problem
       $select.on 'change', ->
         $status = $("#status_#{id}")
           .removeClass().addClass("unanswered")
-          .find('span').text('Status: unsubmitted')
+          .find('span').text(gettext('Status: unsubmitted'))
 
     textline: (element) ->
       $(element).find('input').on 'input', ->
