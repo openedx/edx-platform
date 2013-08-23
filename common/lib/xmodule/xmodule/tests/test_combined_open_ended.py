@@ -22,7 +22,8 @@ from xmodule.open_ended_grading_classes.grading_service_module import GradingSer
 from xmodule.combined_open_ended_module import CombinedOpenEndedModule
 from xmodule.modulestore import Location
 from xmodule.tests import get_test_system, test_util_open_ended
-from xmodule.tests.test_util_open_ended import MockQueryDict, DummyModulestore, TEST_STATE_SA_IN, MOCK_INSTANCE_STATE, TEST_STATE_SA
+from xmodule.tests.test_util_open_ended import (MockQueryDict, DummyModulestore, TEST_STATE_SA_IN,
+    MOCK_INSTANCE_STATE, TEST_STATE_SA, TEST_STATE_AI, TEST_STATE_AI2, TEST_STATE_AI2_INVALID)
 import capa.xqueue_interface as xqueue_interface
 
 
@@ -542,6 +543,51 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
         self.assertEqual(score_dict['score'], 15.0)
         self.assertEqual(score_dict['total'], 15.0)
 
+    def ai_state(self, task_state, task_number, task_xml):
+        definition = {'prompt': etree.XML(self.prompt), 'rubric': etree.XML(self.rubric),
+                      'task_xml': task_xml}
+        descriptor = Mock(data=definition)
+        instance_state = {'task_states' : task_state, 'graded' : True}
+        if task_number is not None:
+            instance_state.update({'current_task_number' : task_number})
+        combinedoe = CombinedOpenEndedV1Module(self.test_system,
+                                               self.location,
+                                               definition,
+                                               descriptor,
+                                               static_data=self.static_data,
+                                               metadata=self.metadata,
+                                               instance_state=instance_state)
+        return combinedoe
+
+    def ai_state_reset(self, task_state, task_number=None):
+        combinedoe = self.ai_state(task_state, task_number, [self.task_xml2])
+        html = combinedoe.get_html()
+        self.assertIsInstance(html, basestring)
+
+    def ai_state_success(self, task_state, task_number=None):
+        combinedoe = self.ai_state(task_state, task_number, [self.task_xml1, self.task_xml2])
+        html = combinedoe.get_html()
+        self.assertIsInstance(html, basestring)
+        score = combinedoe.get_score()
+        self.assertEqual(int(score['score']),2)
+
+    def test_ai_state_reset(self):
+        self.ai_state_reset(TEST_STATE_AI)
+
+    def test_ai_state2_reset(self):
+        self.ai_state_reset(TEST_STATE_AI2)
+
+    def test_ai_invalid_state(self):
+        self.ai_state_reset(TEST_STATE_AI2_INVALID)
+
+    def test_ai_state_rest_task_number(self):
+        self.ai_state_reset(TEST_STATE_AI, task_number=2)
+        self.ai_state_reset(TEST_STATE_AI, task_number=5)
+        self.ai_state_reset(TEST_STATE_AI, task_number=1)
+        self.ai_state_reset(TEST_STATE_AI, task_number=0)
+
+    def test_ai_state_success(self):
+        self.ai_state_success(TEST_STATE_AI)
 
 class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
     """

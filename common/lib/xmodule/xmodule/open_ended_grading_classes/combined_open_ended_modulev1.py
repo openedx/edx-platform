@@ -178,7 +178,7 @@ class CombinedOpenEndedV1Module():
         if self.current_task_number > len(self.task_states) or self.current_task_number > len(self.task_xml):
             self.current_task_number = min([len(self.task_states), len(self.task_xml)]) - 1
         #If the length of the task xml is less than the length of the task states, state is invalid
-        elif len(self.task_xml) < len(self.task_states):
+        if len(self.task_xml) < len(self.task_states):
             self.current_task_number = 0
             self.task_states = self.task_states[:len(self.task_xml)]
         #Loop through each task state and make sure it matches the xml definition
@@ -197,6 +197,7 @@ class CombinedOpenEndedV1Module():
                     self.static_data,
                     instance_state=t,
                 )
+                #Loop through each attempt of the task and see if it is valid.
                 for att in task.child_history:
                     if "post_assessment" not in att:
                         continue
@@ -212,6 +213,8 @@ class CombinedOpenEndedV1Module():
                     elif tag_name == "selfassessment" and not isinstance(pa, list):
                         self.reset_task_state("Type is self assessment and post assessment is not a list.")
                         break
+                #See if we can properly render the task.  Will go into the exception clause below if not.
+                task.get_html(self.system)
             except Exception as err:
                 #If one task doesn't match, the state is invalid.
                 self.reset_task_state("Could not parse task. {0}".format(err))
