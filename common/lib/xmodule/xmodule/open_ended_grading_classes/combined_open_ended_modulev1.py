@@ -35,8 +35,8 @@ TRUE_DICT = ["True", True, "TRUE", "true"]
 HUMAN_TASK_TYPE = {
     'selfassessment': "Self",
     'openended': "edX",
-    'ml_grading.conf' : "AI",
-    'peer_grading.conf' : "Peer",
+    'ml_grading.conf': "AI",
+    'peer_grading.conf': "Peer",
 }
 
 HUMAN_STATES = {
@@ -379,7 +379,7 @@ class CombinedOpenEndedV1Module():
             'accept_file_upload': self.accept_file_upload,
             'location': self.location,
             'legend_list': LEGEND_LIST,
-            'human_state': HUMAN_STATES.get(self.state,"Not started.")
+            'human_state': HUMAN_STATES.get(self.state, "Not started.")
         }
 
         return context
@@ -535,14 +535,14 @@ class CombinedOpenEndedV1Module():
             'feedback_dicts': feedback_dicts,
             'grader_ids': grader_ids,
             'submission_ids': submission_ids,
-            'success' : True
+            'success': True
         }
         return last_response_dict
 
     def extract_human_name_from_task(self, task_xml):
         tree = etree.fromstring(task_xml)
         payload = tree.xpath("/openended/openendedparam/grader_payload")
-        if len(payload)==0:
+        if len(payload) == 0:
             task_name = "selfassessment"
         else:
             inner_payload = json.loads(payload[0].text)

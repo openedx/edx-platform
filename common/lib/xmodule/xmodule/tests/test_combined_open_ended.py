@@ -23,7 +23,8 @@ from xmodule.combined_open_ended_module import CombinedOpenEndedModule
 from xmodule.modulestore import Location
 from xmodule.tests import get_test_system, test_util_open_ended
 from xmodule.tests.test_util_open_ended import (MockQueryDict, DummyModulestore, TEST_STATE_SA_IN,
-    MOCK_INSTANCE_STATE, TEST_STATE_SA, TEST_STATE_AI, TEST_STATE_AI2, TEST_STATE_AI2_INVALID)
+    MOCK_INSTANCE_STATE, TEST_STATE_SA, TEST_STATE_AI, TEST_STATE_AI2, TEST_STATE_AI2_INVALID,
+    TEST_STATE_SINGLE, TEST_STATE_PE_SINGLE)
 import capa.xqueue_interface as xqueue_interface
 
 
@@ -424,8 +425,6 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
     )
 
     def setUp(self):
-        # TODO: this constructor call is definitely wrong, but neither branch
-        # of the merge matches the module constructor.  Someone (Vik?) should fix this.
         self.combinedoe = CombinedOpenEndedV1Module(self.test_system,
                                                     self.location,
                                                     self.definition,
@@ -435,16 +434,25 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
                                                     instance_state=self.static_data)
 
     def test_get_tag_name(self):
+        """
+        Test to see if the xml tag name is correct
+        """
         name = self.combinedoe.get_tag_name("<t>Tag</t>")
         self.assertEqual(name, "t")
 
     def test_get_last_response(self):
+        """
+        See if we can parse the last response
+        """
         response_dict = self.combinedoe.get_last_response(0)
         self.assertEqual(response_dict['type'], "selfassessment")
         self.assertEqual(response_dict['max_score'], self.max_score)
         self.assertEqual(response_dict['state'], CombinedOpenEndedV1Module.INITIAL)
 
     def test_update_task_states(self):
+        """
+        See if we can update the task states properly
+        """
         changed = self.combinedoe.update_task_states()
         self.assertFalse(changed)
 
@@ -455,6 +463,9 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
         self.assertTrue(changed)
 
     def test_get_max_score(self):
+        """
+        Try to get the max score of the problem
+        """
         self.combinedoe.update_task_states()
         self.combinedoe.state = "done"
         self.combinedoe.is_scored = True
@@ -462,24 +473,39 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
         self.assertEqual(max_score, 1)
 
     def test_container_get_max_score(self):
+        """
+        See if we can get the max score from the actual xmodule
+        """
         #The progress view requires that this function be exposed
         max_score = self.combinedoe_container.max_score()
         self.assertEqual(max_score, None)
 
     def test_container_weight(self):
+        """
+        Check the problem weight in the container
+        """
         weight = self.combinedoe_container.weight
         self.assertEqual(weight, 1)
 
     def test_container_child_weight(self):
+        """
+        Test the class to see if it picks up the right weight
+        """
         weight = self.combinedoe_container.child_module.weight
         self.assertEqual(weight, 1)
 
     def test_get_score(self):
+        """
+        See if scoring works
+        """
         score_dict = self.combinedoe.get_score()
         self.assertEqual(score_dict['score'], 0)
         self.assertEqual(score_dict['total'], 1)
 
     def test_alternate_orderings(self):
+        """
+        Try multiple ordering of definitions to see if the problem renders different steps correctly.
+        """
         t1 = self.task_xml1
         t2 = self.task_xml2
         xml_to_test = [[t1], [t2], [t1, t1], [t1, t2], [t2, t2], [t2, t1], [t1, t2, t1]]
@@ -515,6 +541,9 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
 
 
     def test_get_score_realistic(self):
+        """
+        Try to parse the correct score from a json instance state
+        """
         instance_state = json.loads(MOCK_INSTANCE_STATE)
         rubric = """
         <rubric>
@@ -544,10 +573,13 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
         self.assertEqual(score_dict['total'], 15.0)
 
     def ai_state(self, task_state, task_number, task_xml):
+        """
+        See if state is properly reset or left unchanged
+        """
         definition = {'prompt': etree.XML(self.prompt), 'rubric': etree.XML(self.rubric),
                       'task_xml': task_xml}
         descriptor = Mock(data=definition)
-        instance_state = {'task_states' : task_state, 'graded' : True}
+        instance_state = {'task_states': task_state, 'graded': True}
         if task_number is not None:
             instance_state.update({'current_task_number' : task_number})
         combinedoe = CombinedOpenEndedV1Module(self.test_system,
@@ -560,16 +592,24 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
         return combinedoe
 
     def ai_state_reset(self, task_state, task_number=None):
+        """
+        See if state is properly reset
+        """
         combinedoe = self.ai_state(task_state, task_number, [self.task_xml2])
         html = combinedoe.get_html()
         self.assertIsInstance(html, basestring)
 
-    def ai_state_success(self, task_state, task_number=None):
-        combinedoe = self.ai_state(task_state, task_number, [self.task_xml1, self.task_xml2])
+    def ai_state_success(self, task_state, task_number=None, iscore=2, tasks=None):
+        """
+        See if state stays the same
+        """
+        if tasks is None:
+            tasks = [self.task_xml1, self.task_xml2]
+        combinedoe = self.ai_state(task_state, task_number, tasks)
         html = combinedoe.get_html()
         self.assertIsInstance(html, basestring)
         score = combinedoe.get_score()
-        self.assertEqual(int(score['score']),2)
+        self.assertEqual(int(score['score']), iscore)
 
     def test_ai_state_reset(self):
         self.ai_state_reset(TEST_STATE_AI)
@@ -588,6 +628,12 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
 
     def test_ai_state_success(self):
         self.ai_state_success(TEST_STATE_AI)
+
+    def test_state_single(self):
+        self.ai_state_success(TEST_STATE_SINGLE, iscore=12)
+
+    def test_state_pe_single(self):
+        self.ai_state_success(TEST_STATE_PE_SINGLE, iscore=0, tasks=[self.task_xml2])
 
 class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
     """
