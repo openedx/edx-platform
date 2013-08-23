@@ -7,7 +7,7 @@ If you make changes to this model, be sure to create an appropriate migration
 file and check it in at the same time as your model changes. To do that,
 
 1. Go to the edx-platform dir
-2. ./manage.py schemamigration courseware --auto description_of_your_change
+2. ./manage.py lms schemamigration bulk_email --auto description_of_your_change
 3. Add the migration file created in edx-platform/lms/djangoapps/bulk_email/migrations/
 
 
