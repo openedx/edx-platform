@@ -1,12 +1,87 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
 <%inherit file="../main.html" />
+<%block name="bodyclass">register verification select</%block>
 
 <%block name="content">
+<div class="container">
+  <section class="wrapper">
 
-<h1>Requirements Page!</h1>
+  <header class="page-header header-white">
+    <h2 class="title header-white-title">You are registering for [coursename] (ID Verified)</h2>
+  </header>
 
-<a href="${reverse('verify_student/face_upload')}">Upload Face</a>
+  <section class="progress">
+  <h3 class="sr">Your Progress</h3>
+  <ol>
+    <li class="progress-step current" id="progress-step1"><span class="sr">Current: </span>Step 1 Take Photo</li>
+    <li class="progress-step" id="progress-step2">Step 2 Take ID Photo</li>
+    <li class="progress-step" id="progress-step3">Step 3 Confirm Submission</li>
+    <li class="progress-step" id="progress-step4">Step 4 Make Payment</li>
+    <li class="progress-step" id="progress-step5">Finished Confirmation</li>
+  </ol>
+  </section>
+
+    <h3 class="title">What You Will Need to Register</h3>
+
+<p>There are a few things you will need to register as an ID verified student :</p>
+
+<dl>
+  <dt>Identification</dt>
+    <dd>An identification document like a drivers license, passport, student ID, or whatever is acceptable.</dd>
+
+  <dt>Webcam</dt>
+    <dd>A webcam that connects to your computer, a modern browser, and whatever these</dd>
+
+  <dt>credit or debit card</dt>
+    <dd>A credit or debit card that is Mastercard or Visa or whatever the requirements are goes here.</dd>
+</dl>
 
 
+<p class="tip">Missing something? You can always take the Audit track.</p>
+
+<hr />
+
+<h3>Steps to get Verified</h3>
+
+<p class="m-btn-primary"><a href="${reverse('verify_student/face_upload')}">Go to Step 1: Take my Photo</a></p>
+
+<h4>Step 1: Take Your Photo</h4>
+<p>To verify your identity, we need a clear and well-lit photo of your face to match it with your ID.</p>
+
+<h4>Step 2: Take a photo of your ID</h4>
+<p>To verify your identity, we need a clear and well-lit photo of your ID to match it with your face.</p>
+
+<h4>Step 3: Verify your submissions</h4>
+<p>Review your photos to verify they are correct.</p>
+
+<h4>Step 4:  Submit payment</h4>
+<p>Pay for your course using a major credit of debit cards.</p>
+<ul>
+  <li>Cards accepted:</li>
+  <li>Visa</li>
+  <li>Master Card</li>
+  <li>Maestro</li>
+  <li>Amex</li>
+  <li>Discover</li>
+  <li>JCB (provided it has the Discover logo on the card)</li>
+  <li>Diners Club</li>
+  <li>...need to list several more once firm</li>
+</ul>
+
+<h4>You're Ready to Start Learning</h4>
+
+<p>You are now verified. You can sign up for more courses, or get started on your course once it starts. While you will need to re-verify in the course prior to exams or expercises, you may also have to re-verify if we feel your photo we have on file may be out of date.</p>
+
+
+<p class="m-btn-primary"><a href="${reverse('verify_student/face_upload')}">Go to Step 1: Take my Photo</a></p>
+
+</section>
+
+  <section class="support">
+    <p>More questions? <a rel="external" href="">Check out our FAQs.</a></p>
+    <p>Change your mind? <a href="">You can always Audit the course for free without verifying.</a></p>
+  </section>
+
+</div>
 </%block>

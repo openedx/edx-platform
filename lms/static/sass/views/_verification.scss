@@ -143,27 +143,8 @@ body.register.verification {
         position: absolute;
         bottom: ($baseline*1.5);
         right: ($baseline*1.5);
-
-        a {
-          color: $very-light-text;
-
-          &:hover {
-            text-decoration: none;
-            border: none;
-          }
-        }
-
-        &.green {
-          box-shadow: 0 2px 1px rgba(2,100,2,1);
-          background-color: rgba(0,136,1,1);
-
-          &:hover {
-            box-shadow: 0 2px 1px rgba(2,100,2,1);
-            background-color: #029D03;
-          }
-
-        }
       }
+
 
     }
 
@@ -183,7 +164,28 @@ body.register.verification {
   }
 
 
+ .m-btn-primary {
 
+    a {
+      color: $very-light-text;
+
+      &:hover {
+        text-decoration: none;
+        border: none;
+      }
+    }
+
+    &.green {
+      box-shadow: 0 2px 1px rgba(2,100,2,1);
+      background-color: rgba(0,136,1,1);
+
+      &:hover {
+        box-shadow: 0 2px 1px rgba(2,100,2,1);
+        background-color: #029D03;
+      }
+
+    }
+  }
 
 
   .progress {
