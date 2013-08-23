@@ -2,7 +2,6 @@ from django.test import TestCase
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from django_comment_common.models import Role, Permission
 from factories import RoleFactory
-from copy import deepcopy
 import django_comment_client.utils as utils
 
 
@@ -29,8 +28,10 @@ class DictionaryTestCase(TestCase):
         expected = {'cats': 'meow', 'dogs': 'woof', 'lions': 'roar', 'ducks': 'quack'}
         self.assertEqual(utils.merge_dict(d1, d2), expected)
 
-    def test_sort(self):
-        d1 = {
+
+class CategorySortTestCase(TestCase):
+    def setUp(self):
+        self.category_map = {
             'entries': {
                 u'General': {
                     'sort_key': u'General'
@@ -64,8 +65,9 @@ class DictionaryTestCase(TestCase):
                 }
             }
         }
-        
-        expected_1 = {
+
+    def test_alpha_sort_true(self):
+        expected_true = {
             'entries': {
                 u'General': {
                     'sort_key': u'General'
@@ -103,7 +105,11 @@ class DictionaryTestCase(TestCase):
             }
         }
         
-        expected_2 = {
+        utils.sort_map_entries(self.category_map, True)
+        self.assertEqual(self.category_map, expected_true)
+
+    def test_alpha_sort_false(self):
+        expected_false = {
             'entries': {
                 u'General': {
                     'sort_key': u'General'
@@ -141,11 +147,8 @@ class DictionaryTestCase(TestCase):
             }
         }
         
-        d2 = deepcopy(d1)
-        utils.sort_map_entries(d1, True)
-        utils.sort_map_entries(d2, False)
-        self.assertEqual(d1, expected_1)
-        self.assertEqual(d2, expected_2)
+        utils.sort_map_entries(self.category_map, False)
+        self.assertEqual(self.category_map, expected_false)
 
 
 class AccessUtilsTestCase(TestCase):
