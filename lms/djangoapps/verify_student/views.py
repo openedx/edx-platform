@@ -87,11 +87,8 @@ def final_verification(request):
     context = { "course_id" : "edX/Certs101/2013_Test" }
     return render_to_response("verify_student/final_verification.html", context)
 
-#
-
 def show_verification_page(request):
     pass
-
 
 
 def enroll(user, course_id, mode_slug):

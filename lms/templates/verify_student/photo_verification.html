@@ -8,74 +8,79 @@
 <!-- please move link to js/vendor/responsive-carousel/responsive-carousel.js from main.html to here -->
 <script type="text/javascript">
 
-  function hasGetUserMedia() {
-    // Note: Opera is unprefixed.
-    return !!(navigator.getUserMedia || navigator.webkitGetUserMedia ||
-              navigator.mozGetUserMedia || navigator.msGetUserMedia);
-  }
-
-  var onFailSoHard = function(e) {
+  var onVideoFail = function(e) {
     console.log('Failed to get camera access!', e);
   };
-
-  /*
-  // Not showing vendor prefixes.
-  navigator.getUserMedia({video: true }, function(localMediaStream) {
-    var video = document.querySelector('video');
-    video.src = window.URL.createObjectURL(localMediaStream);
-
-    // Note: onloadedmetadata doesn't fire in Chrome when using it with getUserMedia.
-    // See crbug.com/110938.
-    video.onloadedmetadata = function(e) {
-      // Ready to go. Do some stuff.
-    };
-  }, onFailSoHard);
-  */
 
   function initVideoCapture() {
     window.URL = window.URL || window.webkitURL;
     navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia ||
                               navigator.mozGetUserMedia || navigator.msGetUserMedia;
 
-    $('video').each(function(i, video) {
-      if (navigator.getUserMedia) {
-        navigator.getUserMedia({video: true}, function(stream) {
-          video.src = window.URL.createObjectURL(stream);
-        }, onFailSoHard);
-      } else {
-        video.src = 'somevideo.webm'; // fallback.
+    // // Make all the video pieces active
+    // $('video').each(function(i, video) {
+    //   if (navigator.getUserMedia) {
+    //     navigator.getUserMedia({video: true}, function(stream) {
+    //       video.src = window.URL.createObjectURL(stream);
+    //     }, onVideoFail);
+    //   } else {
+    //     video.src = 'somevideo.webm'; // fallback.
+    //   }
+    // });
+  }
+
+  var submitToPaymentProcessing = function() {
+    // $("#pay_form")
+    var xhr = $.post(
+      "create_order",
+      {
+        "course_id" : "${course_id|u}"
+      },
+      function(data) {
+        for (prop in data) {
+          $('<input>').attr({
+              type: 'hidden',
+              name: prop,
+              value: data[prop]
+          }).appendTo('#pay_form');
+        }
       }
-    });
+    )
+    .done(function(data) {
+      $("#pay_form").submit();
+    })
+    .fail(function() { alert("error"); });
+  }
+
+  function initFaceSnapshotHandler() {
+    var video = $('#face_video');
+    var canvas = $('#face_canvas');
+    var ctx = canvas[0].getContext('2d');
+    var localMediaStream = null;
+
+    function snapshot() {
+      if (localMediaStream) {
+        ctx.drawImage(video[0], 0, 0);
+        $('#face_image').src = canvas[0].toDataURL('image/webp');
+      }
+    }
+
+    video.click(snapshot);
+    $("#face_capture_button").click(snapshot);
+
+    navigator.getUserMedia({video: true}, function(stream) {
+      video.src = window.URL.createObjectURL(stream);
+      localMediaStream = stream;
+    }, onVideoFail);
+
   }
 
   $(document).ready(function() {
     $(".carousel-nav").addClass('sr');
+    $("#pay_button").click(submitToPaymentProcessing);
 
     initVideoCapture();
-
-    $("#pay_button").click(function(){
-        // $("#pay_form")
-        var xhr = $.post(
-          "create_order",
-          {
-            "course_id" : "${course_id|u}"
-          },
-          function(data) {
-            for (prop in data) {
-              $('<input>').attr({
-                  type: 'hidden',
-                  name: prop,
-                  value: data[prop]
-              }).appendTo('#pay_form');
-            }
-            $("#pay_form").submit()
-          }
-        )
-        .done(function(data) {
-          alert(data);
-        })
-        .fail(function() { alert("error"); });
-    });
+    initFaceSnapshotHandler();
 
   });
 
@@ -112,7 +117,10 @@
 
         <div id="facecam" class="cam">
           <div class="placeholder-cam">
-            <video autoplay></video>
+            <video id="face_video" autoplay></video><br/>
+            <img id="face_image" src=""/><br/>
+            <canvas id="face_canvas" style="display:none;"></canvas>
+            <button id="face_capture_button" type="button">Take Picture</button>
           </div>
 
           <div class="controls photo-controls">
