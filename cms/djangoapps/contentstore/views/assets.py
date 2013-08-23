@@ -38,9 +38,6 @@ from util.json_request import JsonResponse
 
 __all__ = ['asset_index', 'upload_asset']
 
-# Regex to capture Content-Range header ranges.
-CONTENT_RE = re.compile(r"(?P<start>\d{1,11})-(?P<stop>\d{1,11})/(?P<end>\d{1,11})")
-
 def assets_to_json_dict(assets):
     """
     Transform the results of a contentstore query into something appropriate
