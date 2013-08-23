@@ -58,11 +58,16 @@ def create_order(request):
     attempt.save()
 
     course_id = request.POST['course_id']
+    donation_for_course = request.session.get("donation_for_course", {})
+
+    # FIXME: When this isn't available we do...?
+    amount = donation_for_course.get(course_id)
 
     # I know, we should check this is valid. All kinds of stuff missing here
     # enrollment = CourseEnrollment.create_enrollment(request.user, course_id)
     cart = Order.get_cart_for_user(request.user)
-    CertificateItem.add_to_order(cart, course_id, 30, 'verified')
+    cart.clear()
+    CertificateItem.add_to_order(cart, course_id, amount, 'verified')
 
     params = get_signed_purchase_params(cart)
 

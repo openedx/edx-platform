@@ -39,24 +39,19 @@
           <p>Sign up as a verified student and work toward a Certificate of Achievement.</p>
           <dl>
             <dt>
-              Select your contribution for this course (in USD):
+              Select your contribution for this course (in ${modes["verified"].currency.upper()|h}):
             </dt>
             <dd>
               <ul>
+                % for price in modes["verified"].suggested_prices.split(","):
                 <li>
-                  <input type="radio" name="contribution-25" id="contribution"> <label for="contribution-25">$25</label>
+                  <input type="radio" name="contribution" value="${price|h}"><label for="contribution-${price|h}">$${price}</label>
                 </li>
+                % endfor
                 <li>
-                  <input type="radio" name="contribution-50" id="contribution"> <label for="contribution-50">$50</label>
-                </li>
-                <li>
-                  <input type="radio" name="contribution-100" id="contribution"> <label for="contribution-100">$100</label>
-                </li>
-                <li>
-                  <input type="radio" name="contribution-other" id="contribution"> <label for="contribution-other">Other</label>
-                </li>
-                <li>
-                  <label for="contribution-other-amt">Other Amount</label> <input type="text" name="contribution-other" id="contribution-other-amt">
+                  <input type="radio" name="contribution" value=""/>
+                  <label for="contribution-other-amt">Other Amount</label>
+                  $<input type="text" name="contribution-other-amt" id="contribution-other-amt" />
                 </li>
               </ul>
             </dd>

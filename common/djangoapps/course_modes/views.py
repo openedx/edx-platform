@@ -47,6 +47,14 @@ class ChooseModeView(View):
             return redirect('dashboard')
 
         if requested_mode == "verified":
+            amount = request.POST.get("contribution") or \
+                     request.POST.get("contribution-other-amt") or \
+                     requested_mode.min_price
+
+            donation_for_course = request.session.get("donation_for_course", {})
+            donation_for_course[course_id] = float(amount)
+            request.session["donation_for_course"] = donation_for_course
+
             return redirect(
                 "{}?{}".format(
                     reverse('verify_student_verify'),
