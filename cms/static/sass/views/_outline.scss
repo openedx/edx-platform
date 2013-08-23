@@ -675,35 +675,36 @@
       color: $darkGrey;
   }
 
-  // sort/drag and drop
-  .ui-droppable {
-      @include transition (padding 0.5s ease-in-out 0s);
-      min-height: 20px;
-      padding: 0;
+  // ====================
 
-      &.dropover {
-          padding: 15px 0;
-      }
+  // UI: drag handles
+  .section-drag-handle, .draggable {
+
+    &:hover, &:focus {
+      cursor: move;
+    }
   }
 
-  .ui-draggable-dragging {
-      box-shadow: 0 1px 2px rgba(0, 0, 0, .3);
-      border: 1px solid $darkGrey;
-      opacity : 0.2;
-      &:hover {
-          opacity : 1.0;
-          .section-item {
-              background: $yellow !important;
-          }
-      }
-
-      // hiding unit button - temporary fix until this semantically corrected
-      .new-unit-item {
-        display: none;
-      }
+  // UI: drag states
+  .is-dragging {
+    @extend .ui-depth4;
+    box-shadow: 0 1px 2px 0 $blue-t2;
+    cursor: move;
+    opacity: 0.80;
+    border-color: $blue;
   }
 
-  ol.ui-droppable .branch:first-child .section-item {
-      border-top: none;
+  // UI: drag target
+  .drop-target {
+    background: $blue-t0 !important;
+
+
+    &.drop-target-before {
+      border-top: ($baseline/5) solid $blue;
+    }
+
+    &.drop-target-after {
+      border-bottom: ($baseline/5) solid $blue;
+    }
   }
 }

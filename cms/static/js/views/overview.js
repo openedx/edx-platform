@@ -77,14 +77,16 @@ CMS.Views.Draggabilly = {
     onDragStart: function(draggie, event, pointer) {
         var ele = $(draggie.element);
         this.dragState = {
-            // Where we started, in case of a failed drag
-            offset: ele.offset(),
             // Which element will be dropped into/onto on success
             dropDestination: null,
             // Timer if we're hovering over a collapsed section
             expandTimer: null,
             // The list which will be expanded on hover
-            toExpand: null
+            toExpand: null,
+            // How we attach to the destination: 'before', 'after', 'prepend'
+            attachMethod: '',
+            // If dragging to an empty section, the parent section
+            parentList: null
         };
     },
 
@@ -92,7 +94,7 @@ CMS.Views.Draggabilly = {
         var ele = $(draggie.element);
         var destinationInfo = this.findDestination(ele);
         var destinationEle = destinationInfo.ele;
-        var parentList = destinationInfo.parentList;
+        var parentList = this.dragState.parentList = destinationInfo.parentList;
         // Clear the timer if we're not hovering over any element
         if(!parentList) {
             clearTimeout(this.dragState.expandTimer);
@@ -113,27 +115,33 @@ CMS.Views.Draggabilly = {
         }
         // Mark the new destination
         if(destinationEle) {
+            ele.addClass('valid-drop');
             destinationEle.addClass('drop-target drop-target-' + destinationInfo.attachMethod);
+            this.dragState.attachMethod = destinationInfo.attachMethod;
             this.dragState.dropDestination = destinationEle;
         }
     },
 
     onDragEnd: function(draggie, event, pointer) {
         var ele = $(draggie.element);
-
-        var destinationInfo = this.findDestination(ele);
-        var destination = destinationInfo.ele;
+        var destination = this.dragState.dropDestination;
 
         // If the drag succeeded, rearrange the DOM and send the result.
         if(destination && pointer.x >= ele.offset().left
            && pointer.x < ele.offset().left + ele.width()) {
             // Make sure we don't drop into a collapsed element
-            if(destinationInfo.parentList) {
-                destinationInfo.parentList.removeClass('collapsed');
+            if(this.dragState.parentList) {
+                this.dragState.parentList.removeClass('collapsed');
             }
-            var method = destinationInfo.attachMethod;
+            var method = this.dragState.attachMethod;
             destination[method](ele);
             this.handleReorder(ele);
+            ele.removeClass('valid-drop');
+        }
+        // If the drag failed, send it back
+        else {
+            $('.was-dragging').removeClass('was-dragging');
+            ele.addClass('was-dragging');
         }
 
         // Everything in its right place

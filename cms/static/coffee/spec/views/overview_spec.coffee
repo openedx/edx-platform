@@ -167,10 +167,11 @@ describe "Course Overview", ->
           null
         )
         expect(CMS.Views.Draggabilly.dragState).toEqual(
-          offset: $('#unit-1').offset()
           dropDestination: null,
           expandTimer: null,
-          toExpand: null
+          toExpand: null,
+          attachMethod: '',
+          parentList: null
         )
 
     describe "onDragMove", ->
