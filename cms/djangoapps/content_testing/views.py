@@ -1,13 +1,16 @@
 """
 Views for using the atuomated content testing feature.  These views should be considered
-a mockup for using the models
+a mockup for demonstrating the usage of the ContentTest objects.
 """
 
 from django.http import HttpResponse, Http404
 from xmodule.modulestore.django import modulestore
 from content_testing.models import ContentTest
 
-#csrf utilities because mako :_ (
+# csrf utilities because mako.
+# Any form submitted with the post methodh should have a hidden input where
+# name="csrfmiddlewaretoken" and value = csrf(request)['csrf_token']
+# This is not necesary if the form is only used to populate the data of an AJAX call.
 from django_future.csrf import ensure_csrf_cookie
 from django.core.context_processors import csrf
 from django.contrib.auth.decorators import login_required
@@ -24,14 +27,13 @@ RESPONSE_TYPES = ['customresponse']
 
 def dict_slice(data, string):
     """
-    returns dict of that keys that start with "string" (and removing "string" from the keys)
+    Returns dict of that keys that start with "string" (and removing "string" from the keys)
 
-    TODO: REMOVE.  USE cAPAmODULE TO DO THIS PROCESSING.
+    This function is used to pull a valid response_dict out of POST data.
     """
 
+    # this can be done beautifully in one line, but pylint complains :(
     d_slice = {}
-    # commented out since it breaks pylint
-    # return {k.replace(s, ''): v for k, v in d.iteritems() if k.startswith(s)}
     for key, value in data.iteritems():
         if key.startswith(string):
             d_slice.update([(key.replace(string, ''), value)])
@@ -48,9 +50,14 @@ def problem_test(request):
     method == GET       -- Returns summary of tests for this problem, grouped by
         `should_be` values.
 
-    method == POST      --   If `run` is present, it runs the tests. Else, it adds
-        test to list of tests.  If an index is amung the post data, it replaces the
-        test at that index instead of creating a new one.
+    method == POST      --   If `run` is a key in the post data that maps to anything (including
+        the empty string), it runs the tests and saves the result.
+
+        Else, it assumes that we are creating a new test, and assumes that the requisite data
+        for creating a ContentTest is in the POST datatest to list of tests.
+
+        If an index is amung the post data, it replaces the test at that index instead
+        of creating a new one.
 
     method == DELETE    -- Removes test at index from the list of tests. Index is given in
         in the DELETE data.
@@ -75,22 +82,22 @@ def problem_test(request):
         return HttpResponse('{"html": '+html+'}')
 
     elif request.method == "POST":
-        post = request.POST
-        run = post.get('run', None)
+        run = request.POST.get('run', None)
         if run is not None:
 
             # instantiate
             tests = instantiate_tests(descriptor)
 
             # run the tests
-            [(lambda x: x.run())(test) for test in tests]
+            for test in tests:
+                test.run()
 
             # update database
             modulestore().update_metadata(location, {'tests': [test.todict() for test in tests]})
 
         else:
-            response_dict = dict_slice(post, 'input_')
-            should_be = post['should_be']
+            response_dict = dict_slice(request.POST, 'input_')
+            should_be = request.POST['should_be']
 
             # don't save a blank test
             if any(response_dict.values()):
@@ -119,7 +126,7 @@ def problem_test(request):
 
 def delete_contenttest(descriptor, id_to_delete):
     """
-    Deletes any content test with id `id` from the descriptor.  If one
+    Deletes any content test with id `id_to_delete` from the descriptor.  If one
     with that id is not found, raises 404.
     """
 
@@ -163,13 +170,13 @@ def add_contenttest_to_descriptor(descriptor, test_dict):
 
 def instantiate_tests(descriptor):
     """
-    Instantiate the tests of the descriptor such that no db access is needed
+    Instantiate the tests of the descriptor such that no db access is needed per test.
     """
 
     test_dicts = descriptor.tests
 
     # instantiate preview module (so each test doesn't need to indevidually)
-    module = ContentTest.construct_preview_module(descriptor.location, descriptor)
+    module = ContentTest.construct_preview_module(descriptor.location)
     tests = [ContentTest(**dict(test_dict, module=module)) for test_dict in test_dicts]
 
     return tests
@@ -208,13 +215,13 @@ def testing_summary(request, descriptor):
 
 def render_test_group(request, descriptor, tests, should_be):
     """
-    render the problem with sections left for the test summaries
+    Render the problem with sections left for the test summaries
     """
 
     HTML_SIG = '_test_summary'
 
     # make the lcp
-    lcp = ContentTest.construct_preview_module(descriptor.location, descriptor).lcp
+    lcp = ContentTest.construct_preview_module(descriptor.location).lcp
 
     # generate the summaries for each response
     response_summaries = {}
@@ -252,7 +259,7 @@ def render_test_group(request, descriptor, tests, should_be):
 
 def getprompt(xml):
     """
-    given an xml object, try to get the xml that looks like it came before
+    Given an xml object, try to get the xml that looks like it came directly before.
     """
 
     # try just getting the previous
@@ -289,7 +296,8 @@ def aggregate_response_summaries(response_id, tests):
 
 def response_summary(response_test, msg):
     """
-    turn the response test (child of ContentTest) into a xml summary
+    Given response test (child of ContentTest) and overall message of the test,
+    returns xml summary
     """
 
     # sorted list of answers
@@ -307,7 +315,9 @@ def response_summary(response_test, msg):
 
 def creation_form(request, location, should_be):
     """
-    retruns xml form object for creating a new test
+    Retruns xml form object for creating a new test
+    (this needs to be wrapped around the actual rendering of the 
+    responder object)
     """
 
     context = {

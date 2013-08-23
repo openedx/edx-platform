@@ -7,7 +7,8 @@ from textwrap import dedent
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.django import modulestore
-from content_testing.models import ContentTest, hash_xml, hash_xml_structure, condense_attributes, remove_xml_wrapper, condense_dict
+from content_testing.models import ContentTest, ResponseTest, hash_xml, hash_xml_structure, \
+                                    condense_attributes, remove_xml_wrapper, condense_dict
 from capa.tests.response_xml_factory import CustomResponseXMLFactory
 from lxml import etree
 from mock import patch
@@ -90,7 +91,7 @@ class ContentTestTestCase(ModuleStoreTestCase):
             data=problem_xml,
             category='problem')
 
-        # sigh
+        # convert urls to ids
         self.input_id_base = self.problem.id.replace('://', '-').replace('/', '-')
 
         # saved responses for making tests
@@ -152,7 +153,9 @@ class WhiteBoxTestCase(ContentTestTestCase):
     """
 
     def test_make_capa(self):
-        '''test that the capa instantiation happens properly'''
+        """
+        test that the capa instantiation happens properly
+        """
         test_model = ContentTest(
             location=self.problem.location,
             should_be='Correct')
@@ -163,7 +166,9 @@ class WhiteBoxTestCase(ContentTestTestCase):
         assert self.SCRIPT in capa.problem_text
 
     def test_create_children(self):
-        '''test that the ContentTest is created with the right structure'''
+        """
+        test that the ContentTest is created with the right structure
+        """
 
         test_model = ContentTest(
             location=str(self.problem.location),
@@ -272,7 +277,9 @@ class BlackBoxTestCase(ContentTestTestCase):
     """
 
     def test_pass_correct(self):
-        '''test that it passes with correct answers when it should'''
+        """
+        test that it passes with correct answers when it should
+        """
 
         # run the test
         self.pass_correct.run()
@@ -281,7 +288,9 @@ class BlackBoxTestCase(ContentTestTestCase):
         self.assertEqual(self.VERDICT_PASS, self.pass_correct.verdict)
 
     def test_fail_incorrect(self):
-        '''test that it fails with incorrect answers'''
+        """
+        test that it fails with incorrect answers
+        """
 
         # run the testcase
         self.fail_incorrect.run()
@@ -291,7 +300,7 @@ class BlackBoxTestCase(ContentTestTestCase):
         assert 'incorrect' in self.fail_incorrect.message
 
     def test_pass_incorrect(self):
-        '''test that it passes with incorrect'''
+        """test that it passes with incorrect"""
 
         # run the test
         self.pass_incorrect.run()
@@ -300,7 +309,7 @@ class BlackBoxTestCase(ContentTestTestCase):
         self.assertEqual(self.VERDICT_PASS, self.pass_incorrect.verdict)
 
     def test_fail_correct(self):
-        '''test that it fails with correct answers'''
+        """test that it fails with correct answers"""
 
         # run the testcase
         self.fail_correct.run()
@@ -330,7 +339,7 @@ class BlackBoxTestCase(ContentTestTestCase):
         self.assertEqual(self.VERDICT_ERROR, test_model.verdict)
 
     def test_reset_verdict(self):
-        '''test that changing things resets the verdict'''
+        """test that changing things resets the verdict"""
 
         test_model = self.pass_correct
 
@@ -345,7 +354,7 @@ class BlackBoxTestCase(ContentTestTestCase):
         self.assertEqual(self.VERDICT_NONE, test_model.verdict)
 
     def test_change_dict(self):
-        '''test that the verdict changes with the new dictionary on new run'''
+        """test that the verdict changes with the new dictionary on new run"""
 
         test_model = self.pass_correct
 
@@ -363,7 +372,6 @@ class BlackBoxTestCase(ContentTestTestCase):
         """
         tests that we get the same object after instantiating from dict
         """
-        self.maxDiff = None
         test_dict = self.pass_correct.todict()
         new_test = ContentTest(**test_dict)
 
@@ -382,7 +390,6 @@ class BlackBoxTestCase(ContentTestTestCase):
         new_test = ContentTest(**test_dict)
 
         assert not (new_test.capa_problem.called)
-
 
     def test_partial_dict(self):
         """
@@ -439,7 +446,7 @@ class RematchingTestCase(ContentTestTestCase):
         # force ContentTest to refetch module
         # If we just set .module=None, then we force the ContentTest object
         # to refetch, and thus effectively test the rematching capabilities.
-        # Hoerver, this only tests for when the COntentTest isn't being reloaded
+        # Hoerver, this only tests for when the ContentTest isn't being reloaded
         # from the database, which would be most of the time.  Thus, we test with
         # both.
         self.test_model2 = ContentTest(**self.test_model.todict())
@@ -762,3 +769,120 @@ class HelperFunctionsTestCase(TestCase):
         squashed = 'all in green went my love riding'
 
         self.assertEqual(condense_dict(to_squash), squashed)
+
+
+class ValidateDictTestCase(ContentTestTestCase):
+    """
+    Test the validate dictionary methods of the ContentTest and ResponseTest objects
+    """
+
+    def test_todict_is_valid(self):
+        """
+        Tests that the class method for checking valid dicts returns True
+        on the todict()
+        """
+        test_dict = self.pass_correct.todict()
+        assert ContentTest.is_valid_dict(test_dict)
+
+    def test_blank_ContentTest(self):
+        """
+        Tests that blank dicts evaluate as invalid
+        """
+
+        assert not(ContentTest.is_valid_dict({}))
+
+    def test_missing_loc_ContentTest(self):
+        """
+        All good, but missing location
+        """
+
+        test_dict = self.pass_correct.todict()
+        test_dict.pop('location')
+
+        assert not(ContentTest.is_valid_dict(test_dict))
+
+    def test_bad_location_ContentTest(self):
+        """
+        Assert that it fails on a bad location
+        """
+
+        test_dict = self.pass_correct.todict()
+        test_dict['location'] = 'trolololol'
+
+        assert not(ContentTest.is_valid_dict(test_dict))
+
+    def test_extra_kwarg_ContentTest(self):
+        """
+        Assert that it fails on a bad location
+        """
+
+        test_dict = self.pass_correct.todict()
+        test_dict['new_field'] = 'trolololol'
+
+        assert not(ContentTest.is_valid_dict(test_dict))
+
+    def test_bad_type_ContentTest(self):
+        """
+        Assert that wrong types makes for invalid dicts
+        """
+
+        test_dict = self.pass_correct.todict()
+        test_dict['should_be'] = 3
+
+        assert not(ContentTest.is_valid_dict(test_dict))
+
+    def test_bad_response_subdicts_ContentTest(self):
+        """
+        Assert that bad responseTest dicts cause it to fail
+        """
+
+        test_dict = self.pass_correct.todict()
+        test_dict['responses'][0] = {}
+
+        assert not(ContentTest.is_valid_dict(test_dict))
+
+    def valid_resptest_dict(self):
+        """
+        return a valid dict for ResponseTests
+        """
+
+        return {
+            'string_id': 'this is an id :)',
+            'xml_string': '<valid><xml/></valid>',
+            'inputs': {'1': {'id': 'id_string', 'answer': '42'}}
+        }
+
+    def test_empty_dict_ResponsTest(self):
+        """
+        Assert that empty dicts are invalid
+        """
+
+        assert not(ResponseTest.is_valid_dict({}))
+
+    def test_lacking_id_ResponseTest(self):
+
+        test_dict = self.valid_resptest_dict()
+        test_dict.pop('string_id')
+
+        assert not(ResponseTest.is_valid_dict({}))
+
+    def test_lacking_xml_ResponseTest(self):
+
+        test_dict = self.valid_resptest_dict()
+        test_dict.pop('xml_string')
+
+        assert not(ResponseTest.is_valid_dict({}))
+
+    def test_broken_xml_ResponseTest(self):
+
+        test_dict = self.valid_resptest_dict()
+        test_dict['xml_string'] = '<bad><xml/>'
+
+        assert not(ResponseTest.is_valid_dict({}))
+
+    def test_bad_type_ResponseTest(self):
+
+        test_dict = self.valid_resptest_dict()
+        test_dict['inputs'] = [1, 2, 3]
+
+        assert not(ResponseTest.is_valid_dict({}))

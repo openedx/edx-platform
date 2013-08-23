@@ -7,6 +7,10 @@ from contentstore.views.preview import load_preview_module
 from lxml import etree
 from copy import deepcopy
 from difflib import SequenceMatcher
+
+# dear god why do I need to do this?
+from xmodule.modulestore.mongo.draft import as_draft
+
 # pylint: disable=E1101
 
 
@@ -128,7 +132,10 @@ def closeness(model, responder):
     seq = SequenceMatcher(None, model_string, responder_string)
     ratio = seq.ratio()
 
-    # favor matches that are in the same location (this might need tweaking!!)
+    # favor matches that are in the same location so that if two
+    # are identically close, it will choose not to move things. The
+    # way it does this is designed to have a much greater effect
+    # (proportionally) when the match is close.
     if model.string_id == responder.id:
         ratio = 1.01 * (1 - (1 - ratio) ** (1.2))
     return ratio
@@ -171,14 +178,15 @@ class ContentTest(object):
         - message           -- message about test (error message, etc)
         - override_state    -- dictionary of values to define the state of the lcp (seed, etc)
         - module            -- CapaModule
-        - id                -- unique number within the descriptor
+        - id                -- 'unique' number within the descriptor.
+                                uniqueness requires using the view function `add_test_to_
         """
         self.location = location
         self.should_be = should_be
         self.response_dict = response_dict or {}
         self.verdict = verdict
         self.message = message
-        self.override_state = override_state or {}
+        self.override_state = override_state or {'seed': 1}
         self.module = module
         self.id = id
 
@@ -192,17 +200,79 @@ class ContentTest(object):
         self.rematch_if_necessary()
 
     @classmethod
-    def construct_preview_module(cls, location, descriptor=None):
+    def construct_preview_module(cls, location):
         """
         construct a new preview capa module
         """
-        # create a preview of the capa_module()
-        if descriptor is None:
-            descriptor = modulestore().get_item(Location(location))
+        # For some reasone, it sometimes comes out as draft, and other times not.
+        # This is an issue if the form to create a test was generated with a different
+        # revision than what comes up the first time the ContentTest is instantiated (if
+        # revision changes after that, rematching will take care of things, but it needs
+        # to be instantiated once for anything to work), because the id's in the response_dict
+        # will not match anything in the CapaProblem.
 
-        preview_module = load_preview_module(0, descriptor)
+        # This next line solves the issue outlined above as far as I can tell.
+        # For some reasone, it also appears to be unecessary.  However, I am leaving it
+        # commented in for safety.  Historically, one could optionally pass in a descriptor to
+        # this function, and than no call would be made to modulestore().get_item.  This was
+        # purely for the purpose of minimizing database access.  However, the descriptor loaded
+        # by preview.py would never result in a module with @draft.
+        # location = as_draft(location)
+
+        # if descriptor is None:
+        descriptor = modulestore().get_item(Location(location))
+
+        preview_module = load_preview_module(str(0), descriptor)
 
         return preview_module
+
+    @classmethod
+    def is_valid_dict(cls, test_dict):
+        """
+        Returnes true if the dict `test_dict` is a valid dict to instantiate
+        a ContentTest from.
+        """
+        keys = test_dict.keys()
+
+        ATTRS = {
+            'location': object,
+            'should_be': basestring,
+            'response_dict': dict,
+            'verdict': basestring,
+            'message': basestring,
+            'override_state': dict,
+            'id': int,
+            'responses': list
+        }
+
+        # we know there needs to be some information
+        if len(keys) < 1:
+            return False
+
+        # it always needs location
+        if 'location' not in keys:
+            return False
+
+        # make sure it is a valid location
+        try:
+            Location(test_dict['location'])
+        except:
+            return False
+
+        # make sure optional attributes are of the right type
+        for key in keys:
+            if key not in ATTRS:
+                return False
+
+            if not isinstance(test_dict[key], ATTRS[key]):
+                return False
+
+            if key == 'responses':
+                for resp_dict in test_dict[key]:
+                    if not ResponseTest.is_valid_dict(resp_dict):
+                        return False
+
+        return True
 
     def capa_problem(self):
         """
@@ -457,6 +527,45 @@ class ResponseTest(object):
     """
     Object that corresponds to the <_____response> fields
     """
+
+    @classmethod
+    def is_valid_dict(cls, test_dict):
+        """
+        Returnes true if the dict `resp_test_dict` is a valid dict to instantiate
+        a ResponseTest from.
+        """
+
+        keys = test_dict.keys()
+
+        ATTRS = {
+            'string_id': basestring,
+            'xml_string': basestring,
+            'inputs': dict
+        }
+
+        # we know there needs to be some information
+        if len(keys) < 2:
+            return False
+
+        # it always needs string_id and xml_string
+        if 'string_id' not in keys or 'xml_string' not in keys:
+            return False
+
+        # ensure valid xml
+        try:
+            etree.XML(test_dict['xml_string'])
+        except:
+            return False
+
+        # make sure optional attributes are of the right type
+        for key in keys:
+            if key not in ATTRS:
+                return False
+
+            if not isinstance(test_dict[key], ATTRS[key]):
+                return False
+
+        return True
 
     def __init__(self, content_test, string_id, xml_string, response_dict={}, inputs=None):
         """
