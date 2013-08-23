@@ -4,6 +4,7 @@ from subprocess import Popen, PIPE
 
 log = logging.getLogger(__name__)
 
+
 def html_to_text(html_message):
     """
     Converts an html message to plaintext.

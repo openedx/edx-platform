@@ -40,7 +40,6 @@ class TestEmailErrors(ModuleStoreTestCase):
 
         self.url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id})
 
-
     def tearDown(self):
         self.smtp_server_thread.stop()
         patch.stopall()
