@@ -6,6 +6,8 @@ Feature: Discussion Component Editor
     And I edit and select Settings
     Then I see three alphabetized settings and their expected values
 
+  # Safari doesn't save the name properly
+  @skip_safari
   Scenario: User can modify display name
     Given I have created a Discussion Tag
     And I edit and select Settings
