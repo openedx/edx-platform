@@ -125,14 +125,16 @@ def filter_unstarted_categories(category_map):
 
     return result_map
 
-
-def sort_map_entries(category_map):
+    
+def sort_map_entries(category_map, sort_alpha):
     things = []
     for title, entry in category_map["entries"].items():
+        if entry["sort_key"] == None and sort_alpha:
+            entry["sort_key"] = title
         things.append((title, entry))
     for title, category in category_map["subcategories"].items():
         things.append((title, category))
-        sort_map_entries(category_map["subcategories"][title])
+        sort_map_entries(category_map["subcategories"][title], sort_alpha)
     category_map["children"] = [x[0] for x in sorted(things, key=lambda x: x[1]["sort_key"])]
 
 
@@ -211,7 +213,8 @@ def initialize_discussion_info(course):
         category_map['entries'][topic] = {"id": entry["id"],
                                           "sort_key": entry.get("sort_key", topic),
                                           "start_date": datetime.now(UTC())}
-    sort_map_entries(category_map)
+
+    sort_map_entries(category_map, course.discussion_sort_alpha)
 
     _DISCUSSIONINFO[course.id]['id_map'] = discussion_id_map
     _DISCUSSIONINFO[course.id]['category_map'] = category_map
