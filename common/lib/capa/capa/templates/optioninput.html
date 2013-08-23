@@ -29,4 +29,9 @@
     <span class="sr">Status: incomplete</span>
   </span>
   % endif
+
+  % if msg:
+      <span class="message">${msg|n}</span>
+  % endif
+
 </form>

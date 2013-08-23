@@ -19,10 +19,10 @@ def parse_url(string):
 
     Examples:
         'edx://version/0123FFFF'
-        'edx://edu.mit.eecs.6002x'
-        'edx://edu.mit.eecs.6002x/branch/published'
-        'edx://edu.mit.eecs.6002x/branch/published/version/519665f6223ebd6980884f2b/block/HW3'
-        'edx://edu.mit.eecs.6002x/branch/published/block/HW3'
+        'edx://mit.eecs.6002x'
+        'edx://mit.eecs.6002x;published'
+        'edx://mit.eecs.6002x;published/block/HW3'
+        'edx://mit.eecs.6002x;published/version/000eee12345/block/HW3'
 
     This returns None if string cannot be parsed.
 
@@ -97,11 +97,11 @@ def parse_course_id(string):
 
     Examples of valid course_ids:
 
-      'edu.mit.eecs.6002x'
-      'edu.mit.eecs.6002x/branch/published'
-      'edu.mit.eecs.6002x/block/HW3'
-      'edu.mit.eecs.6002x/branch/published/block/HW3'
-      'edu.mit.eecs.6002x/branch/published/version/519665f6223ebd6980884f2b/block/HW3'
+      'mit.eecs.6002x'
+      'mit.eecs.6002x/branch/published'
+      'mit.eecs.6002x/block/HW3'
+      'mit.eecs.6002x/branch/published/block/HW3'
+      'mit.eecs.6002x/branch/published/version/519665f6223ebd6980884f2b/block/HW3'
 
 
     Syntax:

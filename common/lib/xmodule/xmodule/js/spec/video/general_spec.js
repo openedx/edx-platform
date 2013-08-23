@@ -4,8 +4,6 @@
 
         beforeEach(function () {
             jasmine.stubRequests();
-            oldOTBD = window.onTouchBasedDevice;
-            window.onTouchBasedDevice = jasmine.createSpy('onTouchBasedDevice').andReturn(false);
             this.videosDefinition = '0.75:7tqY6eQzVhE,1.0:cogebirgzzM';
             this['7tqY6eQzVhE'] = '7tqY6eQzVhE';
             this['cogebirgzzM'] = 'cogebirgzzM';
@@ -16,7 +14,6 @@
             window.onYouTubePlayerAPIReady = undefined;
             window.onHTML5PlayerAPIReady = undefined;
             $('source').remove();
-            window.onTouchBasedDevice = oldOTBD;
         });
 
         describe('constructor', function () {
@@ -58,6 +55,46 @@
                         expect(this.state.speed).toEqual('0.75');
                     });
                 });
+
+                describe('Check Youtube link existence', function () {
+                    var statusList = {
+                        error: 'html5',
+                        timeout: 'html5',
+                        abort: 'html5',
+                        parsererror: 'html5',
+                        success: 'youtube',
+                        notmodified: 'youtube'
+                    };
+
+                    function stubDeffered(data, status) {
+                        return {
+                            always: function(callback) {
+                                callback.call(window, data, status);
+                            }
+                        }
+                    }
+
+                    function checkPlayer(videoType, data, status) {
+                        this.state = new window.Video('#example');
+                        spyOn(this.state , 'getVideoMetadata')
+                            .andReturn(stubDeffered(data, status));
+                        this.state.initialize('#example');
+
+                        expect(this.state.videoType).toEqual(videoType);
+                    }
+
+                    it('if video id is incorrect', function () {
+                        checkPlayer('html5', { error: {} }, 'success');
+                    });
+
+                    $.each(statusList, function(status, mode){
+                        it('Status:' + status + ', mode:' + mode, function () {
+                            checkPlayer(mode, {}, status);
+                        });
+                    });
+
+                });
+
             });
 
             describe('HTML5', function () {

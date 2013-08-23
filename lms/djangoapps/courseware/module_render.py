@@ -124,7 +124,8 @@ def toc_for_course(user, request, course, active_chapter, active_section, model_
 
 def get_module(user, request, location, model_data_cache, course_id,
                position=None, not_found_ok=False, wrap_xmodule_display=True,
-               grade_bucket_type=None, depth=0):
+               grade_bucket_type=None, depth=0,
+               static_asset_path=''):
     """
     Get an instance of the xmodule class identified by location,
     setting the state based on an existing StudentModule, or creating one if none
@@ -141,6 +142,10 @@ def get_module(user, request, location, model_data_cache, course_id,
                                 position within module
       - depth                 : number of levels of descendents to cache when loading this module.
                                 None means cache all descendents
+      - static_asset_path     : static asset path to use (overrides descriptor's value); needed
+                                by get_course_info_section, because info section modules
+                                do not have a course as the parent module, and thus do not
+                                inherit this lms key value.
 
     Returns: xmodule instance, or None if the user does not have access to the
     module.  If there's an error, will try to return an instance of ErrorModule
@@ -152,7 +157,8 @@ def get_module(user, request, location, model_data_cache, course_id,
         return get_module_for_descriptor(user, request, descriptor, model_data_cache, course_id,
                                          position=position,
                                          wrap_xmodule_display=wrap_xmodule_display,
-                                         grade_bucket_type=grade_bucket_type)
+                                         grade_bucket_type=grade_bucket_type,
+                                         static_asset_path=static_asset_path)
     except ItemNotFoundError:
         if not not_found_ok:
             log.exception("Error in get_module")
@@ -179,7 +185,8 @@ def get_xqueue_callback_url_prefix(request):
 
 
 def get_module_for_descriptor(user, request, descriptor, model_data_cache, course_id,
-                              position=None, wrap_xmodule_display=True, grade_bucket_type=None):
+                              position=None, wrap_xmodule_display=True, grade_bucket_type=None,
+                              static_asset_path=''):
     """
     Implements get_module, extracting out the request-specific functionality.
 
@@ -194,12 +201,14 @@ def get_module_for_descriptor(user, request, descriptor, model_data_cache, cours
 
     return get_module_for_descriptor_internal(user, descriptor, model_data_cache, course_id,
                                               track_function, xqueue_callback_url_prefix,
-                                              position, wrap_xmodule_display, grade_bucket_type)
+                                              position, wrap_xmodule_display, grade_bucket_type,
+                                              static_asset_path)
 
 
 def get_module_for_descriptor_internal(user, descriptor, model_data_cache, course_id,
                                        track_function, xqueue_callback_url_prefix,
-                                       position=None, wrap_xmodule_display=True, grade_bucket_type=None):
+                                       position=None, wrap_xmodule_display=True, grade_bucket_type=None,
+                                       static_asset_path=''):
     """
     Actually implement get_module, without requiring a request.
 
@@ -282,7 +291,8 @@ def get_module_for_descriptor_internal(user, descriptor, model_data_cache, cours
         # inner_get_module, not the parent's callback.  Add it as an argument....
         return get_module_for_descriptor_internal(user, descriptor, model_data_cache, course_id,
                                                   track_function, make_xqueue_callback,
-                                                  position, wrap_xmodule_display, grade_bucket_type)
+                                                  position, wrap_xmodule_display, grade_bucket_type,
+                                                  static_asset_path)
 
     def xblock_model_data(descriptor):
         return DbModel(
@@ -332,6 +342,7 @@ def get_module_for_descriptor_internal(user, descriptor, model_data_cache, cours
     # TODO (cpennington): When modules are shared between courses, the static
     # prefix is going to have to be specific to the module, not the directory
     # that the xml was loaded from
+
     system = ModuleSystem(
         track_function=track_function,
         render_template=render_to_string,
@@ -347,7 +358,8 @@ def get_module_for_descriptor_internal(user, descriptor, model_data_cache, cours
         replace_urls=partial(
             static_replace.replace_static_urls,
             data_directory=getattr(descriptor, 'data_dir', None),
-            course_namespace=descriptor.location._replace(category=None, name=None),
+            course_id=course_id,
+            static_asset_path=static_asset_path or descriptor.lms.static_asset_path,
         ),
         replace_course_urls=partial(
             static_replace.replace_course_urls,
@@ -368,6 +380,7 @@ def get_module_for_descriptor_internal(user, descriptor, model_data_cache, cours
         cache=cache,
         can_execute_unsafe_code=(lambda: can_execute_unsafe_code(course_id)),
     )
+
     # pass position specified in URL to module through ModuleSystem
     system.set('position', position)
     system.set('DEBUG', settings.DEBUG)
@@ -405,7 +418,8 @@ def get_module_for_descriptor_internal(user, descriptor, model_data_cache, cours
     module.get_html = replace_static_urls(
         _get_html,
         getattr(descriptor, 'data_dir', None),
-        course_namespace=module.location._replace(category=None, name=None)
+        course_id=course_id,
+        static_asset_path=static_asset_path or descriptor.lms.static_asset_path
     )
 
     # Allow URLs of the form '/course/' refer to the root of multicourse directory

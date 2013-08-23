@@ -40,12 +40,10 @@ end
 desc "Run documentation tests"
 task :test_docs do
     # Be sure that sphinx can build docs w/o exceptions.
-    test_message = "If test fails, you shoud run %s and look at whole output and fix exceptions.
+    test_message = "If test fails, you shoud run '%s' and look at whole output and fix exceptions.
 (You shouldn't fix rst warnings and errors for this to pass, just get rid of exceptions.)"
-    puts (test_message  % ["rake doc"]).colorize( :light_green )
+    puts (test_message  % ["rake doc[docs,verbose]"]).colorize( :light_green )
     test_sh('rake builddocs')
-    puts  (test_message  % ["rake doc[pub]"]).colorize( :light_green )
-    test_sh('rake builddocs[pub]')
 end
 
 task :clean_test_files do

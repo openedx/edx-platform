@@ -90,7 +90,13 @@ jasmine.stubbedHtml5Speeds = ['0.75', '1.0', '1.25', '1.50']
 jasmine.stubRequests = ->
   spyOn($, 'ajax').andCallFake (settings) ->
     if match = settings.url.match /youtube\.com\/.+\/videos\/(.+)\?v=2&alt=jsonc/
-      settings.success data: jasmine.stubbedMetadata[match[1]]
+      if settings.success
+        # match[1] - it's video ID
+        settings.success data: jasmine.stubbedMetadata[match[1]]
+      else {
+          always: (callback) ->
+            callback.call(window, {}, 'success');
+        }
     else if match = settings.url.match /static(\/.*)?\/subs\/(.+)\.srt\.sjson/
       settings.success jasmine.stubbedCaption
     else if settings.url.match /.+\/problem_get$/

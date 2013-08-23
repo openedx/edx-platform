@@ -2,7 +2,7 @@
     {
         "_id":"head12345_12",
         "category":"course",
-        "data":{
+        "fields":{
             "textbooks":[
                 
             ],
@@ -43,15 +43,17 @@
             },
             "wiki_slug":null
         },
-        "edited_by":"testassist@edx.org",
-        "edited_on":{"$date" : 1364481713238},
-        "previous_version":"head12345_11",
-        "original_version":"head12345_10"
+        "edit_info": {
+            "edited_by":"testassist@edx.org",
+            "edited_on":{"$date" : 1364481713238},
+            "previous_version":"head12345_11",
+            "original_version":"head12345_10"
+        }
     },
     {
         "_id":"head12345_11",
         "category":"course",
-        "data":{
+        "fields":{
             "textbooks":[
                 
             ],
@@ -92,15 +94,17 @@
             },
             "wiki_slug":null
         },
-        "edited_by":"testassist@edx.org",
-        "edited_on":{"$date" : 1364481713238},
-        "previous_version":"head12345_10",
-        "original_version":"head12345_10"
+        "edit_info": {
+            "edited_by":"testassist@edx.org",
+            "edited_on":{"$date" : 1364481713238},
+            "previous_version":"head12345_10",
+            "original_version":"head12345_10"
+        }
     },
     {
         "_id":"head12345_10",
         "category":"course",
-        "data":{
+        "fields":{
             "textbooks":[
                 
             ],
@@ -141,15 +145,17 @@
             },
             "wiki_slug":null
         },
-        "edited_by":"test@edx.org",
-        "edited_on":{"$date": 1364473713238},
-        "previous_version":null,
-        "original_version":"head12345_10"
+        "edit_info": {
+            "edited_by":"test@edx.org",
+            "edited_on":{"$date": 1364473713238},
+            "previous_version":null,
+            "original_version":"head12345_10"
+        }
     },
     {
         "_id":"head23456_1",
         "category":"course",
-        "data":{
+        "fields":{
             "textbooks":[
                 
             ],
@@ -190,15 +196,17 @@
             },
             "wiki_slug":null
         },
-        "edited_by":"test@edx.org",
-        "edited_on":{"$date": 1364481313238},
-        "previous_version":"head23456_0",
-        "original_version":"head23456_0"
+        "edit_info": {
+            "edited_by":"test@edx.org",
+            "edited_on":{"$date": 1364481313238},
+            "previous_version":"head23456_0",
+            "original_version":"head23456_0"
+        }
     },
     {
         "_id":"head23456_0",
         "category":"course",
-        "data":{
+        "fields":{
             "textbooks":[
                 
             ],
@@ -239,15 +247,17 @@
             },
             "wiki_slug":null
         },
-        "edited_by":"test@edx.org",
-        "edited_on":{"$date" : 1364481313238},
-        "previous_version":null,
-        "original_version":"head23456_0"
+        "edit_info": {
+            "edited_by":"test@edx.org",
+            "edited_on":{"$date" : 1364481313238},
+            "previous_version":null,
+            "original_version":"head23456_0"
+        }
     },
     {
         "_id":"head345679_1",
         "category":"course",
-        "data":{
+        "fields":{
             "textbooks":[
                 
             ],
@@ -281,54 +291,66 @@
             },
             "wiki_slug":null
         },
-        "edited_by":"test@edx.org",
-        "edited_on":{"$date" : 1364481313238},
-        "previous_version":null,
-        "original_version":"head23456_0"
+        "edit_info": {
+            "edited_by":"test@edx.org",
+            "edited_on":{"$date" : 1364481313238},
+            "previous_version":null,
+            "original_version":"head23456_0"
+        }
     },
     {
         "_id":"chapter12345_1",
         "category":"chapter",
-        "data":null,
-        "edited_by":"testassist@edx.org",
-        "edited_on":{"$date" : 1364483713238},
-        "previous_version":null,
-        "original_version":"chapter12345_1"
+        "fields":{},
+        "edit_info": {
+            "edited_by":"testassist@edx.org",
+            "edited_on":{"$date" : 1364483713238},
+            "previous_version":null,
+            "original_version":"chapter12345_1"
+        }
     },
     {
         "_id":"chapter12345_2",
         "category":"chapter",
-        "data":null,
-        "edited_by":"testassist@edx.org",
-        "edited_on":{"$date" : 1364483713238},
-        "previous_version":null,
-        "original_version":"chapter12345_2"
+        "fields":{},
+        "edit_info": {
+            "edited_by":"testassist@edx.org",
+            "edited_on":{"$date" : 1364483713238},
+            "previous_version":null,
+            "original_version":"chapter12345_2"
+        }
     },
     {
         "_id":"chapter12345_3",
         "category":"chapter",
-        "data":null,
-        "edited_by":"testassist@edx.org",
-        "edited_on":{"$date" : 1364483713238},
-        "previous_version":null,
-        "original_version":"chapter12345_3"
+        "fields":{},
+        "edit_info": {
+            "edited_by":"testassist@edx.org",
+            "edited_on":{"$date" : 1364483713238},
+            "previous_version":null,
+            "original_version":"chapter12345_3"
+        }
     },
     {
         "_id":"problem12345_3_1",
         "category":"problem",
-        "data":"",
-        "edited_by":"testassist@edx.org",
-        "edited_on":{"$date" : 1364483713238},
-        "previous_version":null,
-        "original_version":"problem12345_3_1"
+        "fields": {"data": ""},
+        "edit_info": {
+            "edited_by":"testassist@edx.org",
+            "edited_on":{"$date" : 1364483713238},
+            "previous_version":null,
+            "original_version":"problem12345_3_1"
+        }
     },
     {
         "_id":"problem12345_3_2",
         "category":"problem",
-        "data":"",
-        "edited_by":"testassist@edx.org",
-        "edited_on":{"$date" : 1364483713238},
-        "previous_version":null,
-        "original_version":"problem12345_3_2"
+        "fields": {"data": ""},
+        "edit_info": {
+            "edited_by":"testassist@edx.org",
+            "edited_on":{"$date" : 1364483713238},
+            "previous_version":null,
+            "original_version":"problem12345_3_2"
+        }
     }
 ]

@@ -11,11 +11,6 @@ import numpy
 import scipy.constants
 import calcfunctions
 
-# Have numpy ignore errors on functions outside its domain.
-# See http://docs.scipy.org/doc/numpy/reference/generated/numpy.seterr.html
-# TODO worry about thread safety/changing a global setting
-numpy.seterr(all='ignore')  # Also: 'ignore', 'warn' (default), 'raise'
-
 from pyparsing import (
     Word, Literal, CaselessLiteral, ZeroOrMore, MatchFirst, Optional, Forward,
     Group, ParseResults, stringEnd, Suppress, Combine, alphas, nums, alphanums

@@ -8,13 +8,16 @@ from .x_module import XModule
 from xblock.core import Integer, Scope, String, List, Float, Boolean
 from xmodule.open_ended_grading_classes.combined_open_ended_modulev1 import CombinedOpenEndedV1Module, CombinedOpenEndedV1Descriptor
 from collections import namedtuple
-from .fields import Date
+from .fields import Date, Timedelta
 import textwrap
 
 log = logging.getLogger("mitx.courseware")
 
-V1_SETTINGS_ATTRIBUTES = ["display_name", "max_attempts", "graded", "accept_file_upload",
-                          "skip_spelling_checks", "due", "graceperiod", "weight"]
+V1_SETTINGS_ATTRIBUTES = [
+    "display_name", "max_attempts", "graded", "accept_file_upload",
+    "skip_spelling_checks", "due", "graceperiod", "weight", "min_to_calibrate",
+    "max_to_calibrate", "peer_grader_count", "required_peer_grading",
+]
 
 V1_STUDENT_ATTRIBUTES = ["current_task_number", "task_states", "state",
                          "student_attempts", "ready_to_reset"]
@@ -37,7 +40,7 @@ DEFAULT_DATA = textwrap.dedent("""\
         </p>
 
         <p>
-        Write a persuasive essay to a newspaper reflecting your vies on censorship in libraries. Do you believe that certain materials, such as books, music, movies, magazines, etc., should be removed from the shelves if they are found offensive? Support your position with convincing arguments from your own experience, observations, and/or reading.
+        Write a persuasive essay to a newspaper reflecting your views on censorship in libraries. Do you believe that certain materials, such as books, music, movies, magazines, etc., should be removed from the shelves if they are found offensive? Support your position with convincing arguments from your own experience, observations, and/or reading.
         </p>
 
     </prompt>
@@ -210,7 +213,7 @@ class CombinedOpenEndedFields(object):
         help="The number of times the student can try to answer this problem.",
         default=1,
         scope=Scope.settings,
-        values={"min" : 1 }
+        values={"min": 1 }
     )
     accept_file_upload = Boolean(
         display_name="Allow File Uploads",
@@ -226,12 +229,10 @@ class CombinedOpenEndedFields(object):
     )
     due = Date(
         help="Date that this problem is due by",
-        default=None,
         scope=Scope.settings
     )
-    graceperiod = String(
+    graceperiod = Timedelta(
         help="Amount of time after the due date that submissions will be accepted",
-        default=None,
         scope=Scope.settings
     )
     version = VersionInteger(help="Current version number", default=DEFAULT_VERSION, scope=Scope.settings)
@@ -241,8 +242,36 @@ class CombinedOpenEndedFields(object):
         display_name="Problem Weight",
         help="Defines the number of points each problem is worth. If the value is not set, each problem is worth one point.",
         scope=Scope.settings,
-        values={"min" : 0 , "step": ".1"},
+        values={"min": 0, "step": ".1"},
         default=1
+    )
+    min_to_calibrate = Integer(
+        display_name="Minimum Peer Grading Calibrations",
+        help="The minimum number of calibration essays each student will need to complete for peer grading.",
+        default=3,
+        scope=Scope.settings,
+        values={"min": 1, "max": 20, "step": "1"}
+    )
+    max_to_calibrate = Integer(
+        display_name="Maximum Peer Grading Calibrations",
+        help="The maximum number of calibration essays each student will need to complete for peer grading.",
+        default=6,
+        scope=Scope.settings,
+        values={"min": 1, "max": 20, "step": "1"}
+    )
+    peer_grader_count = Integer(
+        display_name="Peer Graders per Response",
+        help="The number of peers who will grade each submission.",
+        default=3,
+        scope=Scope.settings,
+        values={"min": 1, "step": "1", "max": 5}
+    )
+    required_peer_grading = Integer(
+        display_name="Required Peer Grading",
+        help="The number of other students each student making a submission will have to grade.",
+        default=3,
+        scope=Scope.settings,
+        values={"min": 1, "step": "1", "max": 5}
     )
     markdown = String(
         help="Markdown source of this module",

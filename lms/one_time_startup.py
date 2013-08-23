@@ -8,8 +8,10 @@ from django.core.cache import get_cache
 cache = get_cache('mongo_metadata_inheritance')
 for store_name in settings.MODULESTORE:
     store = modulestore(store_name)
-    store.metadata_inheritance_cache_subsystem = cache
-    store.request_cache = RequestCache.get_request_cache()
+    store.set_modulestore_configuration({
+        'metadata_inheritance_cache_subsystem': cache,
+        'request_cache': RequestCache.get_request_cache()
+    })
 
 if hasattr(settings, 'DATADOG_API'):
     dog_http_api.api_key = settings.DATADOG_API

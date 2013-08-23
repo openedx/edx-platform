@@ -6,7 +6,6 @@ import copy
 from django.test import TestCase
 from django.test.utils import override_settings
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
 class LMSLinksTestCase(TestCase):
@@ -56,19 +55,26 @@ class LMSLinksTestCase(TestCase):
     def get_about_page_link(self):
         """ create mock course and return the about page link """
         location = 'i4x', 'mitX', '101', 'course', 'test'
-        utils.get_course_id = mock.Mock(return_value="mitX/101/test")
         return utils.get_lms_link_for_about_page(location)
 
     def lms_link_test(self):
         """ Tests get_lms_link_for_item. """
         location = 'i4x', 'mitX', '101', 'vertical', 'contacting_us'
-        utils.get_course_id = mock.Mock(return_value="mitX/101/test")
-        link = utils.get_lms_link_for_item(location, False)
+        link = utils.get_lms_link_for_item(location, False, "mitX/101/test")
         self.assertEquals(link, "//localhost:8000/courses/mitX/101/test/jump_to/i4x://mitX/101/vertical/contacting_us")
-        link = utils.get_lms_link_for_item(location, True)
+        link = utils.get_lms_link_for_item(location, True, "mitX/101/test")
         self.assertEquals(
             link,
             "//preview/courses/mitX/101/test/jump_to/i4x://mitX/101/vertical/contacting_us"
+        )
+
+        # If no course_id is passed in, it is obtained from the location. This is the case for
+        # Studio dashboard.
+        location = 'i4x', 'mitX', '101', 'course', 'test'
+        link = utils.get_lms_link_for_item(location)
+        self.assertEquals(
+            link,
+            "//localhost:8000/courses/mitX/101/test/jump_to/i4x://mitX/101/course/test"
         )
 
 
@@ -146,3 +152,12 @@ class ExtraPanelTabTestCase(TestCase):
                 self.assertFalse(changed)
                 self.assertEqual(actual_tabs, expected_tabs)
 
+
+class CourseImageTestCase(TestCase):
+    """Tests for course image URLs."""
+
+    def test_get_image_url(self):
+        """Test image URL formatting."""
+        course = CourseFactory.create(org='edX', course='999')
+        url = utils.course_image_url(course)
+        self.assertEquals(url, '/c4x/edX/999/asset/{0}'.format(course.course_image))

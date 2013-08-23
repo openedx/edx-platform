@@ -444,7 +444,7 @@
         });
 
         it('trigger seek event with the correct time', function() {
-          expect(videoPlayer.currentTime).toEqual(15);
+          expect(videoPlayer.currentTime).toEqual(14.91);
         });
       });
 
@@ -456,7 +456,20 @@
         });
 
         it('trigger seek event with the correct time', function() {
-          expect(videoPlayer.currentTime).toEqual(15);
+          expect(videoPlayer.currentTime).toEqual(14.91);
+        });
+      });
+
+      describe('when the player type is Flash at speed 0.75x', function () {
+        beforeEach(function () {
+            initialize();
+            videoSpeedControl.currentSpeed = '0.75';
+            state.currentPlayerMode = 'flash';
+            $('.subtitles li[data-start="14910"]').trigger('click');
+        });
+
+        it('trigger seek event with the correct time', function () {
+            expect(videoPlayer.currentTime).toEqual(15);
         });
       });
     });

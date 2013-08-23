@@ -36,8 +36,11 @@ class Command(BaseCommand):
         ms = modulestore('direct')
         cs = contentstore()
 
-        ms.metadata_inheritance_cache_subsystem = CACHE
-        ms.request_cache = RequestCache.get_request_cache()
+        ms.set_modulestore_configuration({
+            'metadata_inheritance_cache_subsystem': CACHE,
+            'request_cache': RequestCache.get_request_cache()
+        })
+
         org, course_num, run = course_id.split("/")
         ms.ignore_write_events_on_courses.append('{0}/{1}'.format(org, course_num))
 
@@ -48,4 +51,7 @@ class Command(BaseCommand):
                     print 'removing User permissions from course....'
                     # in the django layer, we need to remove all the user permissions groups associated with this course
                     if commit:
-                        _delete_course_group(loc)
+                        try:
+                            _delete_course_group(loc)
+                        except Exception as err:
+                            print("Error in deleting course groups for {0}: {1}".format(loc, err))

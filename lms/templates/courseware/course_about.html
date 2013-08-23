@@ -42,9 +42,9 @@
         ).css("display", "block");
       }
     });
-   
+
     %else:
-   
+
     $('#class_enroll_form').on('ajax:complete', function(event, xhr) {
       if(xhr.status == 200) {
         location.href = "${reverse('dashboard')}";
@@ -58,8 +58,7 @@
     });
 
     %endif
-   
-   
+
   })(this)
   </script>
 
@@ -93,6 +92,7 @@
                     <strong>${_("View Courseware")}</strong>
                     </a>
                 %endif
+
         %else:
             <a href="#" class="register">${_("Register for {course.display_number_with_default}").format(course=course) | h}</a>
 
@@ -219,10 +219,10 @@
     <form id="class_enroll_form" method="post" data-remote="true" action="${reverse('change_enrollment')}">
       <fieldset class="enroll_fieldset">
         <input name="course_id" type="hidden" value="${course.id}">
-        <input name="enrollment_action" type="hidden" value="${_("enroll")}">
+        <input name="enrollment_action" type="hidden" value="enroll">
       </fieldset>
       <div class="submit">
-        <input name="submit" type="submit" value="${_("enroll")}">
+        <input name="submit" type="submit" value="enroll">
       </div>
     </form>
   </div>
