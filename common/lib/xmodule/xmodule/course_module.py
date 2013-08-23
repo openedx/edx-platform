@@ -198,10 +198,8 @@ class CourseFields(object):
     tabs = List(help="List of tabs to enable in this course", scope=Scope.settings)
     end_of_course_survey_url = String(help="Url for the end-of-course survey", scope=Scope.settings)
     discussion_blackouts = List(help="List of pairs of start/end dates for discussion blackouts", scope=Scope.settings)
-    discussion_topics = Dict(
-        help="Map of topics names to ids",
-        scope=Scope.settings
-    )
+    discussion_topics = Dict(help="Map of topics names to ids", scope=Scope.settings)
+    discussion_sort_alpha = Boolean(scope=Scope.settings, default=False, help="Sort forum categories and subcategories alphabetically.")
     testcenter_info = Dict(help="Dictionary of Test Center info", scope=Scope.settings)
     announcement = Date(help="Date this course is announced", scope=Scope.settings)
     cohort_config = Dict(help="Dictionary defining cohort configuration", scope=Scope.settings)
