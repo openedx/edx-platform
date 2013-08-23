@@ -1,7 +1,5 @@
 """
 Adds crowdsourced hinting functionality to lon-capa numerical response problems.
-
-Currently experimental - not for instructor use, yet.
 """
 
 import logging
@@ -33,6 +31,9 @@ problem_choices = []
 
 
 def get_problem_choices():
+    """
+    Used by studio to get all the problems on the same page as the hinter.
+    """
     global problem_choices
     return problem_choices
 
@@ -72,13 +73,13 @@ class CrowdsourceHinterFields(object):
 class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
     """
     An Xmodule that makes crowdsourced hints.
-    Currently, only works on capa problems with exactly one numerical response,
-    and no other parts.
+    Currently, only works on capa problems with exactly one numerical or formula response.
 
     Example usage:
-    <crowdsource_hinter target_problem="i4x://my/problem/location">
-        <problem blah blah />
-    </crowdsource_hinter>
+    <crowdsource_hinter target_problem="i4x://my/problem/location" />
+
+    The target_problem should be on the same page as the hinter.  (Otherwise, the hinter would
+    be kind of useless!)
 
     XML attributes:
     -moderate="True" will not display hints until staff approve them in the hint manager.
@@ -91,6 +92,11 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
     js_module_name = "Hinter"
 
     def __init__(self, *args, **kwargs):
+        """
+        Sets up the hinting module.  Saves any errors into self.init_error, so that the errors
+        can be displayed in html.  (Instructors will want to see the errors as they are making
+        their courses.)
+        """
         XModule.__init__(self, *args, **kwargs)
         self.init_error = None
 
@@ -144,9 +150,10 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
 
     def get_html(self):
         """
-        Puts a wrapper around the problem html.  This wrapper includes ajax urls of the
-        hinter and of the problem.
-        - Dependent on lon-capa problem.
+        In student views - loads a little stub of HTML where hints will go.
+
+        In studio - shows any errors in the configuration of this hinting module, or
+        a little blurb if there are no errors.
         """
         # Display any errors generated in __init__.  This is mostly for instructors to
         # see in Studio.
@@ -159,12 +166,12 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
             # Take the entire url
             # - minus the last two segments
             # - minus the i4x
-            # - append /courseware/hint_manager
+            # - append /hint_manager
             # - prepend LMS_BASE/courses/
             # Ex: i4x://Me/19.001/crowdsource_hinter/ec4d140d58114daeabb6f1819547decf@draft
-            # -> localhost:8000/courses/Me/19.001/courseware/hint_manager
+            # -> localhost:8000/courses/Me/19.001/hint_manager
             manager_url = settings.LMS_BASE + '/courses' +\
-                '/'.join(self.location.url().split('/')[1:-2]) + '/courseware/hint_manager'
+                '/'.join(self.location.url().split('/')[1:-2]) + '/hint_manager'
             return '''This is a crowdsourced hinting module for {name}.  This message is only
                 visible in Studio - your students will see the actual hinting module.
                 <br /><br />
@@ -201,7 +208,8 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         # 'value': system name}, each representing a choice.
         # The choices should be all problems in the same section as this hinter
         # module.
-        problem_choices = []
+        problem_choices = [{'display_name': 'None selected',
+                            'value': ''}]
         # Find the parent of this module.
         # This is sort of clunky - we have to loop through all modules.
         all_modules = modulestore().get_items(Location(course=self.location.course, revision='draft'))
@@ -213,6 +221,9 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
                     break
             if parent is not None:
                 break
+        if parent is None:
+            # Weird... not supposed to happen.  Just get out.
+            return
 
         # Add all problems that are children of our parent.
         for descriptor in parent.get_children():

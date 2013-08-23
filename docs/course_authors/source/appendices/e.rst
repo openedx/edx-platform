@@ -1033,3 +1033,57 @@ Sample Problem:
             </div>
         </solution>
     </problem>
+
+
+Crowdsourced Hinting
+====================
+
+With the crowdsourced hinting module, you can add answer-specific, student-generated hints to a formula or numerical response problem.
+
+When a student gets a problem wrong, he/she will see hints written by other students who got the same wrong answer.  When he/she figures out the problem, he/she will be asked to write hints for his/her previous wrong answers, or to vote which hint was the best.  If students have submitted multiple hints for the same answer, we will show the hint with the most votes, plus two other random hints.
+
+As an instructor, you can moderate hints, which means that you have to explicitly approve each hint before students see it.  (You may turn moderation off, allowing all hints to been seen as soon as they are submitted.)  You can also add your own hints.
+
+**Example usage**
+
+A student gets the problem wrong, and is offered a hint.
+
+.. image:: ../Images/hinter1.png
+
+He/she then gets the problem right, and is asked to evaluate the hint that he/she saw. or write his/her own.
+
+.. image:: ../Images/hinter2.png
+
+Picking an answer for which to write a hint.
+
+.. image:: ../Images/hinter3.png
+
+Writing a hint.
+
+.. image:: ../Images/hinter4.png
+
+**Adding crowdsourced hinting to your course**
+
+Crowdsourced hinting is available as an advanced module in Studio.  To enable it, go into Settings -> Advanced Settings, and add "crowdsource_hinter" to the "advanced_modules" section.  So, if the crowdsourced hinter is the only advanced module you have, the "advanced_modules" section should look like ["crowdsource_hinter"] .
+
+Now, you can add a crowdsourced hinter from the advanced component menu.  You should probably put the crowdsourced hinting module directly beneath the problem for which you want hints.  After you add the hinting module, edit it, go into Settings, and choose the target problem.  (See screenshot below.)
+
+.. image:: ../Images/hinter5.png
+
+**Managing your hints**
+
+To manage hints as an instructor, click on the link in Studio after you set up your target problem, or go to your_course_url/hint_manager.  For example: https://courses.edx.org/courses/MITx/2.01x/2013_Spring/hint_manager
+
+.. image:: ../Images/hinter6.png
+
+You can switch between viewing approved hints and hints awaiting moderation.  To approve or delete hints, check the hints you want, then click the appropriate button at the bottom.  To change vote counts, type in your new vote count in the blank, then click "Update votes".  To add a new hint, enter the answer you want, as a student would enter it, type your hint, and click "Submit".
+
+When your course is running with a moderated hinting module, make sure you approve hints on a regular basis!  Otherwise, your students will not see the most recent hints. 
+
+**Additional notes**
+
+The hinting module knows how to compare formula responses for equality.  For example, if student A submits a hint for x*y, and student B enters y*x, student B can see student A's hint.  Likewise, the hinting module understands that rounding errors are possible in numerical responses, and will compensate.
+
+There is a debug option in Studio.  When it is enabled, one user can submit many hints, for testing purposes.  When debug is enabled, reloading the page will allow you to resubmit hints.  Make sure you disable debug before releasing the problem!
+
+The hinting module can only work with one response blank within a problem.  If a problem has multiple response blanks, the hinting module will hook onto the first blank only.
