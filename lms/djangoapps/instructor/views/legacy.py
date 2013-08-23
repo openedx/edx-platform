@@ -56,7 +56,6 @@ from mitxmako.shortcuts import render_to_string
 
 from bulk_email.models import CourseEmail
 from html_to_text import html_to_text
-import datetime
 from bulk_email import tasks
 
 log = logging.getLogger(__name__)
@@ -66,11 +65,11 @@ FORUM_ROLE_ADD = 'add'
 FORUM_ROLE_REMOVE = 'remove'
 
 
-def split_by_comma_and_whitespace(s):
+def split_by_comma_and_whitespace(a_str):
     """
-    Return string s, split by , or whitespace
+    Return string a_str, split by , or whitespace
     """
-    return re.split(r'[\s,]', s)
+    return re.split(r'[\s,]', a_str)
 
 
 @ensure_csrf_cookie
@@ -124,13 +123,13 @@ def instructor_dashboard(request, course_id):
         datatable['data'] = data
         return datatable
 
-    def return_csv(fn, datatable, fp=None):
+    def return_csv(func, datatable, file_pointer=None):
         """Outputs a CSV file from the contents of a datatable."""
-        if fp is None:
+        if file_pointer is None:
             response = HttpResponse(mimetype='text/csv')
-            response['Content-Disposition'] = 'attachment; filename={0}'.format(fn)
+            response['Content-Disposition'] = 'attachment; filename={0}'.format(func)
         else:
-            response = fp
+            response = file_pointer
         writer = csv.writer(response, dialect='excel', quotechar='"', quoting=csv.QUOTE_ALL)
         writer.writerow(datatable['header'])
         for datarow in datatable['data']:
@@ -279,11 +278,11 @@ def instructor_dashboard(request, course_id):
                 msg += '<font color="red">Failed to create a background task for rescoring "{0}".</font>'.format(problem_url)
             else:
                 track.views.server_track(request, "rescore-all-submissions", {"problem": problem_url, "course": course_id}, page="idashboard")
-        except ItemNotFoundError as e:
+        except ItemNotFoundError as err:
             msg += '<font color="red">Failed to create a background task for rescoring "{0}": problem not found.</font>'.format(problem_url)
-        except Exception as e:
-            log.error("Encountered exception from rescore: {0}".format(e))
-            msg += '<font color="red">Failed to create a background task for rescoring "{0}": {1}.</font>'.format(problem_url, e.message)
+        except Exception as err:
+            log.error("Encountered exception from rescore: {0}".format(err))
+            msg += '<font color="red">Failed to create a background task for rescoring "{0}": {1}.</font>'.format(problem_url, err.message)
 
     elif "Reset ALL students' attempts" in action:
         problem_urlname = request.POST.get('problem_for_all_students', '')
@@ -294,12 +293,12 @@ def instructor_dashboard(request, course_id):
                 msg += '<font color="red">Failed to create a background task for resetting "{0}".</font>'.format(problem_url)
             else:
                 track.views.server_track(request, "reset-all-attempts", {"problem": problem_url, "course": course_id}, page="idashboard")
-        except ItemNotFoundError as e:
-            log.error('Failure to reset: unknown problem "{0}"'.format(e))
+        except ItemNotFoundError as err:
+            log.error('Failure to reset: unknown problem "{0}"'.format(err))
             msg += '<font color="red">Failed to create a background task for resetting "{0}": problem not found.</font>'.format(problem_url)
-        except Exception as e:
-            log.error("Encountered exception from reset: {0}".format(e))
-            msg += '<font color="red">Failed to create a background task for resetting "{0}": {1}.</font>'.format(problem_url, e.message)
+        except Exception as err:
+            log.error("Encountered exception from reset: {0}".format(err))
+            msg += '<font color="red">Failed to create a background task for resetting "{0}": {1}.</font>'.format(problem_url, err.message)
 
     elif "Show Background Task History for Student" in action:
         # put this before the non-student case, since the use of "in" will cause this to be missed
@@ -475,10 +474,10 @@ def instructor_dashboard(request, course_id):
                     return return_csv('grades %s.csv' % aname, datatable)
 
                 elif 'remote gradebook' in action:
-                    fp = StringIO()
-                    return_csv('', datatable, fp=fp)
-                    fp.seek(0)
-                    files = {'datafile': fp}
+                    file_pointer = StringIO()
+                    return_csv('', datatable, file_pointer=file_pointer)
+                    file_pointer.seek(0)
+                    files = {'datafile': file_pointer}
                     msg2, _ = _do_remote_gradebook(request.user, course, 'post-grades', files=files)
                     msg += msg2
 

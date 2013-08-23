@@ -13,7 +13,7 @@ class CourseEmailAdmin(admin.ModelAdmin):
 
 class OptoutAdmin(admin.ModelAdmin):
     """Admin for optouts."""
-    list_display = ('email', 'course_id')
+    list_display = ('user', 'course_id')
 
 
 admin.site.register(CourseEmail, CourseEmailAdmin)

@@ -2,7 +2,6 @@
 """
 Unit tests for sending course email
 """
-
 from django.test.utils import override_settings
 from django.conf import settings
 from django.core import mail
@@ -14,12 +13,29 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from bulk_email.tasks import delegate_email_batches, course_email
-from bulk_email.models import CourseEmail
+from bulk_email.models import CourseEmail, Optout
 
 from mock import patch
 
 STAFF_COUNT = 3
 STUDENT_COUNT = 10
+LARGE_NUM_EMAILS = 137
+
+
+class MockCourseEmailResult(object):
+    """
+    A small closure-like class to keep count of emails sent over all tasks, recorded
+    by mock object side effects
+    """
+    emails_sent = 0
+
+    def get_mock_course_email_result(self):
+        """Wrapper for mock email function."""
+        def mock_course_email_result(sent, failed, output, **kwargs):  # pylint: disable=W0613
+            """Increments count of number of emails sent."""
+            self.emails_sent += sent
+            return True
+        return mock_course_email_result
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
@@ -110,6 +126,7 @@ class TestEmailSendFromDashboard(ModuleStoreTestCase):
 
         self.assertContains(response, "Your email was successfully queued for sending.")
 
+        # the 1 is for the instructor in this test and others
         self.assertEquals(len(mail.outbox), 1 + len(self.staff))
         self.assertItemsEqual(
             [e.to[0] for e in mail.outbox],
@@ -223,6 +240,43 @@ class TestEmailSendFromDashboard(ModuleStoreTestCase):
         self.assertItemsEqual(
             [e.to[0] for e in mail.outbox],
             [self.instructor.email] + [s.email for s in self.staff] + [s.email for s in self.students]
+        )
+
+    @override_settings(EMAILS_PER_TASK=3, EMAILS_PER_QUERY=7)
+    @patch('bulk_email.tasks.course_email_result')
+    def test_chunked_queries_send_numerous_emails(self, email_mock):
+        """
+        Test sending a large number of emails, to test the chunked querying
+        """
+        mock_factory = MockCourseEmailResult()
+        email_mock.side_effect = mock_factory.get_mock_course_email_result()
+        added_users = []
+        for _ in xrange(LARGE_NUM_EMAILS):
+            user = UserFactory()
+            added_users.append(user)
+            CourseEnrollmentFactory.create(user=user, course_id=self.course.id)
+
+        optouts = []
+        for i in [1, 3, 9, 10, 18]:  # 5 random optouts
+            user = added_users[i]
+            optouts.append(user)
+            optout = Optout(user=user, course_id=self.course.id)
+            optout.save()
+
+        test_email = {
+            'action': 'Send email',
+            'to_option': 'all',
+            'subject': 'test subject for all',
+            'message': 'test message for all'
+        }
+        response = self.client.post(self.url, test_email)
+        self.assertContains(response, "Your email was successfully queued for sending.")
+        self.assertEquals(mock_factory.emails_sent,
+                          1 + len(self.staff) + len(self.students) + LARGE_NUM_EMAILS - len(optouts))
+        self.assertItemsEqual(
+            [e.to[0] for e in mail.outbox],
+            [self.instructor.email] + [s.email for s in self.staff] + [s.email for s in self.students] +
+            [s.email for s in added_users if s not in optouts]
         )
 
 
