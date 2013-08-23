@@ -129,9 +129,9 @@
     </header>
 
     % if len(courses) > 0:
-      % for course in courses:
+      % for course, enrollment in courses:
 
-        <article class="my-course">
+      <article class="my-course ${enrollment.mode}">
           <%
             course_target = reverse('info', args=[course.id])
           %>

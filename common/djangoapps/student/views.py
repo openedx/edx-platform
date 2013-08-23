@@ -1,5 +1,4 @@
 import datetime
-import feedparser
 import json
 import logging
 import random
@@ -31,7 +30,6 @@ from django.views.decorators.http import require_POST
 from ratelimitbackend.exceptions import RateLimitException
 
 from mitxmako.shortcuts import render_to_response, render_to_string
-from bs4 import BeautifulSoup
 
 from course_modes.models import CourseMode
 from student.models import (Registration, UserProfile, TestCenterUser, TestCenterUserForm,
@@ -262,7 +260,7 @@ def dashboard(request):
     courses = []
     for enrollment in CourseEnrollment.enrollments_for_user(user):
         try:
-            courses.append(course_from_id(enrollment.course_id))
+            courses.append((course_from_id(enrollment.course_id), enrollment))
         except ItemNotFoundError:
             log.error("User {0} enrolled in non-existent course {1}"
                       .format(user.username, enrollment.course_id))
@@ -279,12 +277,12 @@ def dashboard(request):
         staff_access = True
         errored_courses = modulestore().get_errored_courses()
 
-    show_courseware_links_for = frozenset(course.id for course in courses
+    show_courseware_links_for = frozenset(course.id for course, _enrollment in courses
                                           if has_access(request.user, course, 'load'))
 
-    cert_statuses = {course.id: cert_info(request.user, course) for course in courses}
+    cert_statuses = {course.id: cert_info(request.user, course) for course, _enrollment in courses}
 
-    exam_registrations = {course.id: exam_registration_info(request.user, course) for course in courses}
+    exam_registrations = {course.id: exam_registration_info(request.user, course) for course, _enrollment in courses}
 
     # get info w.r.t ExternalAuthMap
     external_auth_map = None
