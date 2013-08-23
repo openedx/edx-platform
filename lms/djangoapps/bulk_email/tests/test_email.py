@@ -2,10 +2,11 @@
 """
 Unit tests for sending course email
 """
-from django.test.utils import override_settings
 from django.conf import settings
 from django.core import mail
 from django.core.urlresolvers import reverse
+from django.core.management import call_command
+from django.test.utils import override_settings
 
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from student.tests.factories import UserFactory, GroupFactory, CourseEnrollmentFactory
@@ -62,6 +63,9 @@ class TestEmailSendFromDashboard(ModuleStoreTestCase):
         self.students = [UserFactory() for _ in xrange(STUDENT_COUNT)]
         for student in self.students:
             CourseEnrollmentFactory.create(user=student, course_id=self.course.id)
+
+        # load initial content (since we don't run migrations as part of tests):
+        call_command("loaddata", "course_email_template.json")
 
         self.client.login(username=self.instructor.username, password="test")
 
@@ -208,10 +212,8 @@ class TestEmailSendFromDashboard(ModuleStoreTestCase):
             [self.instructor.email] + [s.email for s in self.staff] + [s.email for s in self.students]
         )
 
-        self.assertIn(
-            uni_message,
-            mail.outbox[0].body
-        )
+        message_body = mail.outbox[0].body
+        self.assertIn(uni_message, message_body)
 
     def test_unicode_students_send_to_all(self):
         """

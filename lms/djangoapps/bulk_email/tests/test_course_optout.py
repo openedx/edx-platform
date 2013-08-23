@@ -4,6 +4,7 @@ Unit tests for student optouts from course email
 import json
 
 from django.core import mail
+from django.core.management import call_command
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.test.utils import override_settings
@@ -29,6 +30,9 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
         self.instructor = AdminFactory.create()
         self.student = UserFactory.create()
         CourseEnrollmentFactory.create(user=self.student, course_id=self.course.id)
+
+        # load initial content (since we don't run migrations as part of tests):
+        call_command("loaddata", "course_email_template.json")
 
         self.client.login(username=self.student.username, password="test")
 

@@ -4,6 +4,7 @@ Unit tests for handling email sending errors
 
 from django.test.utils import override_settings
 from django.conf import settings
+from django.core.management import call_command
 from django.core.urlresolvers import reverse
 
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
@@ -34,6 +35,9 @@ class TestEmailErrors(ModuleStoreTestCase):
         self.course = CourseFactory.create()
         instructor = AdminFactory.create()
         self.client.login(username=instructor.username, password="test")
+
+        # load initial content (since we don't run migrations as part of tests):
+        call_command("loaddata", "course_email_template.json")
 
         self.smtp_server_thread = FakeSMTPServerThread('localhost', TEST_SMTP_PORT)
         self.smtp_server_thread.start()
