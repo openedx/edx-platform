@@ -3,6 +3,9 @@
 import json
 import shutil
 import mock
+
+from textwrap import dedent
+
 from django.test.client import Client
 from django.test.utils import override_settings
 from django.conf import settings
@@ -312,7 +315,14 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         handouts = module_store.get_item(Location(['i4x', 'edX', 'toy', 'html', 'toyhtml', None]))
         self.assertIn('/static/', handouts.data)
 
-    def test_import_textbook_as_content_element(self):
+    @mock.patch('xmodule.course_module.requests.get')
+    def test_import_textbook_as_content_element(self, mock_get):
+        mock_get.return_value.text = dedent("""
+            <?xml version="1.0"?><table_of_contents>
+            <entry page="5" page_label="ii" name="Table of Contents"/>
+            </table_of_contents>
+        """).strip()
+
         module_store = modulestore('direct')
         import_from_xml(module_store, 'common/test/data/', ['toy'])
 
@@ -845,7 +855,14 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             filesystem = OSFS(root_dir / ('test_export/' + dirname))
             self.assertTrue(filesystem.exists(item.location.name + filename_suffix))
 
-    def test_export_course(self):
+    @mock.patch('xmodule.course_module.requests.get')
+    def test_export_course(self, mock_get):
+        mock_get.return_value.text = dedent("""
+            <?xml version="1.0"?><table_of_contents>
+            <entry page="5" page_label="ii" name="Table of Contents"/>
+            </table_of_contents>
+        """).strip()
+
         module_store = modulestore('direct')
         draft_store = modulestore('draft')
         content_store = contentstore()

@@ -1,8 +1,11 @@
 """
 Test for LMS courseware app.
 """
+import mock
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
+
+from textwrap import dedent
 
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
@@ -156,10 +159,14 @@ class TestMongoCoursesLoad(ModuleStoreTestCase, PageLoaderTestCase):
         self.store = modulestore()
         import_from_xml(self.store, TEST_DATA_DIR, ['toy'])
 
-    def test_toy_course_loads(self):
-        self.check_all_pages_load('edX/toy/2012_Fall')
+    @mock.patch('xmodule.course_module.requests.get')
+    def test_toy_textbooks_loads(self, mock_get):
+        mock_get.return_value.text = dedent("""
+            <?xml version="1.0"?><table_of_contents>
+            <entry page="5" page_label="ii" name="Table of Contents"/>
+            </table_of_contents>
+        """).strip()
 
-    def test_toy_textbooks_loads(self):
         location = Location(['i4x', 'edX', 'toy', 'course', '2012_Fall', None])
         course = self.store.get_item(location)
         self.assertGreater(len(course.textbooks), 0)
