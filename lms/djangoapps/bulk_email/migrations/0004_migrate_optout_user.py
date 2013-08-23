@@ -1,31 +1,33 @@
 # -*- coding: utf-8 -*-
 from south.db import db
-from south.v2 import SchemaMigration
+from south.v2 import DataMigration
+from django.core.exceptions import ObjectDoesNotExist
 
 
-class Migration(SchemaMigration):
+class Migration(DataMigration):
 
     def forwards(self, orm):
-        # Renaming field 'CourseEmail.to'
-        db.rename_column('bulk_email_courseemail', 'to', 'to_option')
 
-        # Renaming field 'CourseEmail.hash'
-        db.rename_column('bulk_email_courseemail', 'hash', 'slug')
-
-        # Adding field 'CourseEmail.text_message'
-        db.add_column('bulk_email_courseemail', 'text_message',
-                      self.gf('django.db.models.fields.TextField')(null=True, blank=True),
-                      keep_default=False)
+        # forwards data migration to copy over existing emails to associated ids
+        if not db.dry_run:
+            for optout in orm.Optout.objects.all():
+                try:
+                    user = orm['auth.User'].objects.get(email=optout.email)
+                    optout.user = user
+                    optout.save()
+                except ObjectDoesNotExist:
+                    # if user is not found (because they have already changed their email)
+                    # then delete the optout, as it's no longer useful.
+                    optout.delete()
 
     def backwards(self, orm):
-        # Renaming field 'CourseEmail.to_option'
-        db.rename_column('bulk_email_courseemail', 'to_option', 'to')
 
-        # Renaming field 'CourseEmail.slug'
-        db.rename_column('bulk_email_courseemail', 'slug', 'hash')
-
-        # Deleting field 'CourseEmail.text_message'
-        db.delete_column('bulk_email_courseemail', 'text_message')
+        # backwards data migration to copy over emails of students to old email slot
+        if not db.dry_run:
+            for optout in orm.Optout.objects.all():
+                if optout.user is not None:
+                    optout.email = optout.user.email
+                    optout.save()
 
     models = {
         'auth.group': {
@@ -71,10 +73,11 @@ class Migration(SchemaMigration):
             'to_option': ('django.db.models.fields.CharField', [], {'default': "'myself'", 'max_length': '64'})
         },
         'bulk_email.optout': {
-            'Meta': {'unique_together': "(('email', 'course_id'),)", 'object_name': 'Optout'},
+            'Meta': {'unique_together': "(('user', 'course_id'),)", 'object_name': 'Optout'},
             'course_id': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'}),
             'email': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']", 'null': 'True'})
         },
         'contenttypes.contenttype': {
             'Meta': {'ordering': "('name',)", 'unique_together': "(('app_label', 'model'),)", 'object_name': 'ContentType', 'db_table': "'django_content_type'"},

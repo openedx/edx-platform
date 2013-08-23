@@ -40,7 +40,6 @@ class TestEmailErrors(ModuleStoreTestCase):
 
         self.url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id})
 
-
     def tearDown(self):
         self.smtp_server_thread.stop()
         patch.stopall()
@@ -95,7 +94,8 @@ class TestEmailErrors(ModuleStoreTestCase):
         # We shouldn't retry when hitting a 5xx error
         self.assertFalse(retry.called)
         # Test that after the rejected email, the rest still successfully send
-        ((sent, fail), _) = result.call_args
+        ((sent, fail, optouts), _) = result.call_args
+        self.assertEquals(optouts, 0)
         self.assertEquals(fail, 1)
         self.assertEquals(sent, settings.EMAILS_PER_TASK - 1)
 
