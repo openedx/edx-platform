@@ -1,20 +1,21 @@
 # -*- coding: utf-8 -*-
 
+import datetime
 import unittest
-from fs.memoryfs import MemoryFS
 
+from fs.memoryfs import MemoryFS
 from lxml import etree
 from mock import Mock, patch
+
+from django.utils.timezone import UTC
 
 from xmodule.xml_module import is_pointer_tag
 from xmodule.modulestore import Location
 from xmodule.modulestore.xml import ImportSystem, XMLModuleStore
 from xmodule.modulestore.inheritance import compute_inherited_metadata
 from xmodule.fields import Date
+from xmodule.tests import DATA_DIR
 
-from .test_export import DATA_DIR
-import datetime
-from django.utils.timezone import UTC
 
 ORG = 'test_org'
 COURSE = 'test_course'
@@ -445,7 +446,7 @@ class ImportTestCase(BaseCourseTestCase):
         render_string_from_sample_gst_xml = """
         <slider var="a" style="width:400px;float:left;"/>\
 <plot style="margin-top:15px;margin-bottom:15px;"/>""".strip()
-        self.assertEqual(gst_sample.render, render_string_from_sample_gst_xml)
+        self.assertIn(render_string_from_sample_gst_xml, gst_sample.data)
 
     def test_word_cloud_import(self):
         modulestore = XMLModuleStore(DATA_DIR, course_dirs=['word_cloud'])

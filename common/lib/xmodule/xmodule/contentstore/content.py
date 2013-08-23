@@ -59,6 +59,20 @@ class StaticContent(object):
             return None
 
     @staticmethod
+    def get_static_path_from_location(location):
+        """
+        This utility static method will take a location identifier and create a 'durable' /static/.. URL representation of it.
+        This link is 'durable' as it can maintain integrity across cloning of courseware across course-ids, e.g. reruns of
+        courses.
+        In the LMS/CMS, we have runtime link-rewriting, so at render time, this /static/... format will get translated into
+        the actual /c4x/... path which the client needs to reference static content
+        """
+        if location is not None:
+            return "/static/{name}".format(**location.dict())
+        else:
+            return None
+
+    @staticmethod
     def get_base_url_path_for_course_assets(loc):
         if loc is not None:
             return "/c4x/{org}/{course}/asset".format(**loc.dict())
@@ -84,6 +98,16 @@ class StaticContent(object):
     @staticmethod
     def convert_legacy_static_url(path, course_namespace):
         loc = StaticContent.compute_location(course_namespace.org, course_namespace.course, path)
+        return StaticContent.get_url_path_from_location(loc)
+
+    @staticmethod
+    def convert_legacy_static_url_with_course_id(path, course_id):
+        """
+        Returns a path to a piece of static content when we are provided with a filepath and
+        a course_id
+        """
+        org, course_num, __ = course_id.split("/")
+        loc = StaticContent.compute_location(org, course_num, path)
         return StaticContent.get_url_path_from_location(loc)
 
     def stream_data(self):

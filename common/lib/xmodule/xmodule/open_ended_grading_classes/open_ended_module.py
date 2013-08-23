@@ -118,6 +118,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             'answer': self.answer,
             'problem_id': self.display_name,
             'skip_basic_checks': self.skip_basic_checks,
+            'control': json.dumps(self.control),
         })
         updated_grader_payload = json.dumps(parsed_grader_payload)
 

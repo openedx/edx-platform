@@ -39,7 +39,8 @@ class TestFields(object):
     float_non_select = Float(scope=Scope.settings, default=.999, values={'min': 0, 'step': .3})
     # Used for testing that Booleans get mapped to select type
     boolean_select = Boolean(scope=Scope.settings)
-
+    # Used for testing Lists
+    list_field = List(scope=Scope.settings, default=[])
 
 class EditableMetadataFieldsTest(unittest.TestCase):
     def test_display_name_field(self):
@@ -63,7 +64,7 @@ class EditableMetadataFieldsTest(unittest.TestCase):
     def test_integer_field(self):
         descriptor = self.get_descriptor({'max_attempts': '7'})
         editable_fields = descriptor.editable_metadata_fields
-        self.assertEqual(6, len(editable_fields))
+        self.assertEqual(7, len(editable_fields))
         self.assert_field_values(
             editable_fields, 'max_attempts', TestFields.max_attempts,
             explicitly_set=True, inheritable=False, value=7, default_value=1000, type='Integer',
@@ -135,6 +136,12 @@ class EditableMetadataFieldsTest(unittest.TestCase):
             editable_fields, 'float_non_select', TestFields.float_non_select,
             explicitly_set=False, inheritable=False, value=.999, default_value=.999,
             type='Float', options={'min': 0, 'step': .3}
+        )
+
+        self.assert_field_values(
+            editable_fields, 'list_field', TestFields.list_field,
+            explicitly_set=False, inheritable=False, value=[], default_value=[],
+            type='List'
         )
 
     # Start of helper methods

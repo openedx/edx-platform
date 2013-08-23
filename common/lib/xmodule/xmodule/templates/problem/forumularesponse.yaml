@@ -24,15 +24,15 @@ data: |
   </script>
   <p>Give an equation for the relativistic energy of an object with mass m.  Explicitly indicate multiplication with a <tt>*</tt> symbol.</p>
   <formularesponse type="cs" samples="m,c@1,2:3,4#10" answer="m*c^2">
-      <responseparam type="tolerance" default="0.00001"/> 
-      <br/><text>E =</text> <textline size="40" math="1" />    
+      <responseparam type="tolerance" default="0.00001"/>
+      <br/><text>E =</text> <formulaequationinput size="40" />
   </formularesponse>
 
   <p>The answer to this question is (R_1*R_2)/R_3. </p>
 
   <formularesponse type="ci" samples="R_1,R_2,R_3@1,2,3:3,4,5#10" answer="$VoVi">
       <responseparam type="tolerance" default="0.00001"/> 
-      <textline size="40" math="1" />    
+      <formulaequationinput size="40" />    
   </formularesponse>
       <solution>
           <div class="detailed-solution">

@@ -21,7 +21,7 @@ from django.utils.http import int_to_base36
 from mock import Mock, patch
 from textwrap import dedent
 
-from student.models import unique_id_for_user
+from student.models import unique_id_for_user, CourseEnrollment
 from student.views import process_survey_link, _cert_info, password_reset, password_reset_confirm_wrapper
 from student.tests.factories import UserFactory
 from student.tests.test_email import mock_render_to_string
@@ -205,3 +205,130 @@ class CourseEndingTest(TestCase):
                           'show_survey_button': False,
                           'grade': '67'
                           })
+
+
+class EnrollInCourseTest(TestCase):
+    """Tests enrolling and unenrolling in courses."""
+
+    def test_enrollment(self):
+        user = User.objects.create_user("joe", "joe@joe.com", "password")
+        course_id = "edX/Test101/2013"
+
+        # Test basic enrollment
+        self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
+        CourseEnrollment.enroll(user, course_id)
+        self.assertTrue(CourseEnrollment.is_enrolled(user, course_id))
+
+        # Enrolling them again should be harmless
+        CourseEnrollment.enroll(user, course_id)
+        self.assertTrue(CourseEnrollment.is_enrolled(user, course_id))
+
+        # Now unenroll the user
+        CourseEnrollment.unenroll(user, course_id)
+        self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
+
+        # Unenrolling them again should also be harmless
+        CourseEnrollment.unenroll(user, course_id)
+        self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
+
+        # The enrollment record should still exist, just be inactive
+        enrollment_record = CourseEnrollment.objects.get(
+            user=user,
+            course_id=course_id
+        )
+        self.assertFalse(enrollment_record.is_active)
+
+    def test_enrollment_non_existent_user(self):
+        # Testing enrollment of newly unsaved user (i.e. no database entry)
+        user = User(username="rusty", email="rusty@fake.edx.org")
+        course_id = "edX/Test101/2013"
+
+        self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
+
+        # Unenroll does nothing
+        CourseEnrollment.unenroll(user, course_id)
+
+        # Implicit save() happens on new User object when enrolling, so this
+        # should still work
+        CourseEnrollment.enroll(user, course_id)
+        self.assertTrue(CourseEnrollment.is_enrolled(user, course_id))
+
+    def test_enrollment_by_email(self):
+        user = User.objects.create(username="jack", email="jack@fake.edx.org")
+        course_id = "edX/Test101/2013"
+
+        CourseEnrollment.enroll_by_email("jack@fake.edx.org", course_id)
+        self.assertTrue(CourseEnrollment.is_enrolled(user, course_id))
+
+        # This won't throw an exception, even though the user is not found
+        self.assertIsNone(
+            CourseEnrollment.enroll_by_email("not_jack@fake.edx.org", course_id)
+        )
+
+        self.assertRaises(
+            User.DoesNotExist,
+            CourseEnrollment.enroll_by_email,
+            "not_jack@fake.edx.org",
+            course_id,
+            ignore_errors=False
+        )
+
+        # Now unenroll them by email
+        CourseEnrollment.unenroll_by_email("jack@fake.edx.org", course_id)
+        self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
+
+        # Harmless second unenroll
+        CourseEnrollment.unenroll_by_email("jack@fake.edx.org", course_id)
+        self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
+
+        # Unenroll on non-existent user shouldn't throw an error
+        CourseEnrollment.unenroll_by_email("not_jack@fake.edx.org", course_id)
+
+    def test_enrollment_multiple_classes(self):
+        user = User(username="rusty", email="rusty@fake.edx.org")
+        course_id1 = "edX/Test101/2013"
+        course_id2 = "MITx/6.003z/2012"
+
+        CourseEnrollment.enroll(user, course_id1)
+        CourseEnrollment.enroll(user, course_id2)
+        self.assertTrue(CourseEnrollment.is_enrolled(user, course_id1))
+        self.assertTrue(CourseEnrollment.is_enrolled(user, course_id2))
+
+        CourseEnrollment.unenroll(user, course_id1)
+        self.assertFalse(CourseEnrollment.is_enrolled(user, course_id1))
+        self.assertTrue(CourseEnrollment.is_enrolled(user, course_id2))
+
+        CourseEnrollment.unenroll(user, course_id2)
+        self.assertFalse(CourseEnrollment.is_enrolled(user, course_id1))
+        self.assertFalse(CourseEnrollment.is_enrolled(user, course_id2))
+
+    def test_activation(self):
+        user = User.objects.create(username="jack", email="jack@fake.edx.org")
+        course_id = "edX/Test101/2013"
+        self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
+
+        # Creating an enrollment doesn't actually enroll a student
+        # (calling CourseEnrollment.enroll() would have)
+        enrollment = CourseEnrollment.create_enrollment(user, course_id)
+        self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
+
+        # Until you explicitly activate it
+        enrollment.activate()
+        self.assertTrue(CourseEnrollment.is_enrolled(user, course_id))
+
+        # Activating something that's already active does nothing
+        enrollment.activate()
+        self.assertTrue(CourseEnrollment.is_enrolled(user, course_id))
+
+        # Now deactive
+        enrollment.deactivate()
+        self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
+
+        # Deactivating something that's already inactive does nothing
+        enrollment.deactivate()
+        self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
+
+        # A deactivated enrollment should be activated if enroll() is called
+        # for that user/course_id combination
+        CourseEnrollment.enroll(user, course_id)
+        self.assertTrue(CourseEnrollment.is_enrolled(user, course_id))

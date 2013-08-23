@@ -11,7 +11,7 @@ from .peer_grading_service import PeerGradingService, MockPeerGradingService
 import controller_query_service
 
 from datetime import datetime
-from django.utils.timezone import UTC
+from pytz import UTC
 
 log = logging.getLogger("mitx.courseware")
 
@@ -92,6 +92,7 @@ class OpenEndedChild(object):
         self.s3_interface = static_data['s3_interface']
         self.skip_basic_checks = static_data['skip_basic_checks']
         self._max_score = static_data['max_score']
+        self.control = static_data['control']
 
         # Used for progress / grading.  Currently get credit just for
         # completion (doesn't matter if you self-assessed correct/incorrect).
@@ -126,7 +127,7 @@ class OpenEndedChild(object):
         pass
 
     def closed(self):
-        if self.close_date is not None and datetime.now(UTC()) > self.close_date:
+        if self.close_date is not None and datetime.now(UTC) > self.close_date:
             return True
         return False
 

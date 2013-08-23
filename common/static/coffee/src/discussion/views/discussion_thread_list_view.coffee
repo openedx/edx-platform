@@ -2,6 +2,7 @@ if Backbone?
   class @DiscussionThreadListView extends Backbone.View
     events:
       "click .search": "showSearch"
+      "click .home": "goHome"
       "click .browse": "toggleTopicDrop"
       "keydown .post-search-field": "performSearch"
       "click .sort-bar a": "sortThreads"
@@ -42,6 +43,7 @@ if Backbone?
       current_el.replaceWith(content)
       if active
         @setActiveThread(thread_id)
+
 
     #TODO fix this entire chain of events
     addAndSelectThread: (thread) =>
@@ -191,6 +193,25 @@ if Backbone?
       @$(".browse").removeClass('is-open')
       setTimeout (-> @$(".post-search-field").focus()), 200
 
+    goHome: ->
+      @template = _.template($("#discussion-home").html())
+      $(".discussion-column").html(@template)
+      $(".post-list a").removeClass("active")
+      $("input.email-setting").bind "click", @updateEmailNotifications
+      url = DiscussionUtil.urlFor("notifications_status",window.user.get("id"))
+      DiscussionUtil.safeAjax
+          url: url
+          type: "GET"
+          success: (response, textStatus) =>
+            if response.status
+              $('input.email-setting').attr('checked','checked')
+            else
+              $('input.email-setting').removeAttr('checked')
+      thread_id = null
+      @trigger("thread:removed")  
+      #select all threads
+
+
     toggleTopicDrop: (event) =>
       event.preventDefault()
       event.stopPropagation()
@@ -312,6 +333,7 @@ if Backbone?
           if callback?
             callback()
 
+    
     retrieveDiscussions: (discussion_ids) ->
       @discussionIds = discussion_ids.join(',')
       @mode = 'commentables'
@@ -418,3 +440,19 @@ if Backbone?
     retrieveFollowed: (event)=>
       @mode = 'followed'
       @retrieveFirstPage(event)
+
+    updateEmailNotifications: () =>
+      if $('input.email-setting').attr('checked')
+        DiscussionUtil.safeAjax
+          url: DiscussionUtil.urlFor("enable_notifications")
+          type: "POST"
+          error: () =>
+            $('input.email-setting').removeAttr('checked')
+      else
+        DiscussionUtil.safeAjax
+          url: DiscussionUtil.urlFor("disable_notifications")
+          type: "POST"
+          error: () =>
+            $('input.email-setting').attr('checked','checked')
+
+          

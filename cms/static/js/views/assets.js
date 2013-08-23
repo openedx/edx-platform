@@ -96,7 +96,7 @@ function displayFinishedUpload(xhr) {
     }
 
     var resp = JSON.parse(xhr.responseText);
-    $('.upload-modal .embeddable-xml-input').val(xhr.getResponseHeader('asset_url'));
+    $('.upload-modal .embeddable-xml-input').val(resp.portable_url);
     $('.upload-modal .embeddable').show();
     $('.upload-modal .file-name').hide();
     $('.upload-modal .progress-fill').html(resp.msg);

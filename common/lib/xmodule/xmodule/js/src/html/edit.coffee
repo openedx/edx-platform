@@ -3,6 +3,9 @@ class @HTMLEditingDescriptor
 
   constructor: (element) ->
     @element = element;
+    @base_asset_url = @element.find("#editor-tab").data('base-asset-url')
+    if @base_asset_url == undefined
+      @base_asset_url = null
 
     @advanced_editor = CodeMirror.fromTextArea($(".edit-box", @element)[0], {
       mode: "text/html"
@@ -25,6 +28,9 @@ class @HTMLEditingDescriptor
       convert_urls : false,
       # TODO: we should share this CSS with studio (and LMS)
       content_css : "/static/css/tiny-mce.css",
+      # The default popup_css path uses an absolute path referencing page in which tinyMCE is being hosted.
+      # Supply the correct relative path instead.
+      popup_css: '/static/js/vendor/tiny_mce/themes/advanced/skins/default/dialog.css',
       formats : {
         # Disable h4, h5, and h6 styles as we don't have CSS for them.
         h4: {},
@@ -47,7 +53,7 @@ class @HTMLEditingDescriptor
       setup : @setupTinyMCE,
       # Cannot get access to tinyMCE Editor instance (for focusing) until after it is rendered.
       # The tinyMCE callback passes in the editor as a paramter.
-      init_instance_callback: @focusVisualEditor
+      init_instance_callback: @initInstanceCallback
     })
 
     @showingVisualEditor = true
@@ -95,20 +101,33 @@ class @HTMLEditingDescriptor
   # Show the Advanced (codemirror) Editor. Pulled out as a helper method for unit testing.
   showAdvancedEditor: (visualEditor) ->
     if visualEditor.isDirty()
-      @advanced_editor.setValue(visualEditor.getContent({no_events: 1}))
+      content = @rewriteStaticLinks(visualEditor.getContent({no_events: 1}), @base_asset_url, '/static/')
+      @advanced_editor.setValue(content)
       @advanced_editor.setCursor(0)
     @advanced_editor.refresh()
     @advanced_editor.focus()
     @showingVisualEditor = false
 
+  rewriteStaticLinks: (content, from, to) ->
+    if from == null || to == null
+      return content
+
+    regex = new RegExp(from, 'g')
+    return content.replace(regex, to)    
+
   # Show the Visual (tinyMCE) Editor. Pulled out as a helper method for unit testing.
   showVisualEditor: (visualEditor) ->
-    visualEditor.setContent(@advanced_editor.getValue())
     # In order for isDirty() to return true ONLY if edits have been made after setting the text,
     # both the startContent must be sync'ed up and the dirty flag set to false.
-    visualEditor.startContent = visualEditor.getContent({format: "raw", no_events: 1});
+    content = @rewriteStaticLinks(@advanced_editor.getValue(), '/static/', @base_asset_url)
+    visualEditor.setContent(content)
+    visualEditor.startContent = content
     @focusVisualEditor(visualEditor)
     @showingVisualEditor = true
+
+  initInstanceCallback: (visualEditor) =>
+    visualEditor.setContent(@rewriteStaticLinks(@advanced_editor.getValue(), '/static/', @base_asset_url))
+    @focusVisualEditor(visualEditor)
 
   focusVisualEditor: (visualEditor) =>
     visualEditor.focus()
@@ -131,5 +150,5 @@ class @HTMLEditingDescriptor
     text = @advanced_editor.getValue()
     visualEditor = @getVisualEditor()
     if @showingVisualEditor and visualEditor.isDirty()
-      text = visualEditor.getContent({no_events: 1})
+      text = @rewriteStaticLinks(visualEditor.getContent({no_events: 1}), @base_asset_url, '/static/')
     data: text

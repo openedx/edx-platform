@@ -1,3 +1,4 @@
+<%! from django.utils.translation import ugettext as _ %>
 <section id="combined-open-ended" class="combined-open-ended" data-location="${location}" data-ajax-url="${ajax_url}" data-allow_reset="${allow_reset}" data-state="${state}" data-task-count="${task_count}" data-task-number="${task_number}" data-accept-file-upload = "${accept_file_upload}">
     <div class="status-container">
         ${status|n}
@@ -12,8 +13,8 @@
         % endfor
         </div>
 
-        <input type="button" value="Reset" class="reset-button" name="reset"/>
-        <input type="button" value="Next Step" class="next-step-button" name="reset"/>
+        <input type="button" value="${_("Reset")}" class="reset-button" name="reset"/>
+        <input type="button" value="${_("Next Step")}" class="next-step-button" name="reset"/>
     </div>
 
     <section class="legend-container">

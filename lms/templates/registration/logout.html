@@ -1,8 +1,9 @@
+<%! from django.utils.translation import ugettext as _ %>
 {% extends "registration/base.html" %}
 
-{% block title %}Logged out{% endblock %}
+{% block title %}${_("Logged out")}{% endblock %/}
 
 {% block content %}
-<h1>You've been logged out.</h1>
-<p>Thanks for stopping by; when you come back, don't forget to <a href="/accounts/login/">log in</a> again.</p>
+<h1>${_("You've been logged out.")}</h1>
+<p>${_("Thanks for stopping by; when you come back, don't forget to {link_start}log in{link_end} again.").format(link_start='<a href="/accounts/login">', link_end='</a>')}</p>
 {% endblock %}

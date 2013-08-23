@@ -84,3 +84,12 @@ Feature: Course Grading
         And I am viewing the grading settings
         When I change assignment type "Homework" to ""
         Then the save button is disabled
+
+    Scenario: User can edit grading range names
+        Given I have opened a new course in Studio
+        And I have populated the course
+        And I am viewing the grading settings
+        When I change the highest grade range to "Good"
+        And I press the "Save" notification button
+        And I reload the page
+        Then I see the highest grade range is "Good"

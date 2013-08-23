@@ -27,6 +27,9 @@ CMS.Views.Metadata.Editor = Backbone.View.extend({
                     model.getType() === CMS.Models.Metadata.FLOAT_TYPE) {
                     new CMS.Views.Metadata.Number(data);
                 }
+                else if(model.getType() === CMS.Models.Metadata.LIST_TYPE) {
+                    new CMS.Views.Metadata.List(data);
+                }
                 else {
                     // Everything else is treated as GENERIC_TYPE, which uses String editor.
                     new CMS.Views.Metadata.String(data);
@@ -308,5 +311,61 @@ CMS.Views.Metadata.Option = CMS.Views.Metadata.AbstractEditor.extend({
         this.$el.find('#' + this.uniqueId + " option").filter(function() {
             return $(this).text() === value;
         }).prop('selected', true);
+    }
+});
+
+CMS.Views.Metadata.List = CMS.Views.Metadata.AbstractEditor.extend({
+
+    events : {
+        "click .setting-clear" : "clear",
+        "keypress .setting-input" : "showClearButton",
+        "change input" : "updateModel",
+        "input input" : "enableAdd",
+        "click .create-setting" : "addEntry",
+        "click .remove-setting" : "removeEntry"
+    },
+
+    templateName: "metadata-list-entry",
+
+    getValueFromEditor: function () {
+        return _.map(
+            this.$el.find('li input'),
+            function (ele) { return ele.value.trim(); }
+        ).filter(_.identity);
+    },
+
+    setValueInEditor: function (value) {
+        var list = this.$el.find('ol');
+        list.empty();
+        _.each(value, function(ele, index) {
+            var template = _.template(
+                '<li class="list-settings-item">' +
+                    '<input type="text" class="input" value="<%= ele %>">' +
+                    '<a href="#" class="remove-action remove-setting" data-index="<%= index %>"><i class="icon-remove-sign"></i><span class="sr">Remove</span></a>' +
+                '</li>'
+            );
+            list.append($(template({'ele': ele, 'index': index})));
+        });
+    },
+
+    addEntry: function(event) {
+        event.preventDefault();
+        // We don't call updateModel here since it's bound to the
+        // change event
+        var list = this.model.get('value') || [];
+        this.setValueInEditor(list.concat(['']))
+        this.$el.find('.create-setting').addClass('is-disabled');
+    },
+
+    removeEntry: function(event) {
+        event.preventDefault();
+        var entry = $(event.currentTarget).siblings().val();
+        this.setValueInEditor(_.without(this.model.get('value'), entry));
+        this.updateModel();
+        this.$el.find('.create-setting').removeClass('is-disabled');
+    },
+
+    enableAdd: function() {
+        this.$el.find('.create-setting').removeClass('is-disabled');
     }
 });

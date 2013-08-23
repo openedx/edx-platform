@@ -1,3 +1,4 @@
+<%! from django.utils.translation import ugettext as _ %>
 <article class="new-post-article">
     <div class="inner-wrapper">
       <div class="new-post-form-errors">
@@ -5,25 +6,25 @@
         <form class="new-post-form">
             <div class="left-column">
                 <div class="options">
-                    <input type="checkbox" name="follow" class="discussion-follow" class="discussion-follow" id="new-post-follow" checked><label for="new-post-follow">follow this post</label>
+                    <input type="checkbox" name="follow" class="discussion-follow" class="discussion-follow" id="new-post-follow" checked><label for="new-post-follow">${_("follow this post")}</label>
                     <br>
                     % if course.allow_anonymous:
-                        <input type="checkbox" name="anonymous" class="discussion-anonymous" id="new-post-anonymous"><label for="new-post-anonymous">post anonymously</label>
+                        <input type="checkbox" name="anonymous" class="discussion-anonymous" id="new-post-anonymous"><label for="new-post-anonymous">${_("post anonymously")}</label>
                     %elif course.allow_anonymous_to_peers:
-                        <input type="checkbox" name="anonymous_to_peers" class="discussion-anonymous-to-peers" id="new-post-anonymous-to-peers"><label for="new-post-anonymous-to-peers">post anonymously to classmates</label>
+                        <input type="checkbox" name="anonymous_to_peers" class="discussion-anonymous-to-peers" id="new-post-anonymous-to-peers"><label for="new-post-anonymous-to-peers">${_("post anonymously to classmates")}</label>
                     %endif
                     %if is_course_cohorted:
                     <div class="form-group-label choose-cohort">
-                        Make visible to:
+                        ${_("Make visible to:")}
                         <select class="group-filter-select new-post-group" name = "group_id">
-                            <option value="">All Groups</option>
+                            <option value="">${_("All Groups")}</option>
                             %if is_moderator:
                               %for c in cohorts:
                                 <option value="${c.id}">${c.name}</option>
                               %endfor
                             %else:
                                 %if user_cohort:
-                                    <option value="${user_cohort}">My Cohort</option>
+                                    <option value="${user_cohort}">${_("My Cohort")}</option>
                                 %endif
                             %endif
 
@@ -44,8 +45,8 @@
                 ##<div class="form-row">
                 ##    <input type="text" class="new-post-tags" name="tags" placeholder="Tags">
                 ##</div>
-                <input type="submit" class="submit" value="Add post">
-                <a href="#" class="new-post-cancel">Cancel</a>
+                <input type="submit" class="submit" value="${_("Add post")}">
+                <a href="#" class="new-post-cancel">${_("Cancel")}</a>
             </div>
         </form>
     </div>

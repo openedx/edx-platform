@@ -28,6 +28,8 @@ from django.utils.http import cookie_date
 from django.utils.http import base36_to_int
 from django.utils.translation import ugettext as _
 
+from ratelimitbackend.exceptions import RateLimitException
+
 from mitxmako.shortcuts import render_to_response, render_to_string
 from bs4 import BeautifulSoup
 
@@ -60,6 +62,8 @@ from statsd import statsd
 from pytz import UTC
 
 log = logging.getLogger("mitx.student")
+AUDIT_LOG = logging.getLogger("audit")
+
 Article = namedtuple('Article', 'title url author image deck publication publish_date')
 
 
@@ -94,10 +98,8 @@ def index(request, extra_context={}, user=None):
     courses = get_courses(None, domain=domain)
     courses = sort_by_announcement(courses)
 
-    # Get the 3 most recent news
-    top_news = _get_news(top=3)
+    context = {'courses': courses}
 
-    context = {'courses': courses, 'news': top_news}
     context.update(extra_context)
     return render_to_response('index.html', context)
 
@@ -111,8 +113,7 @@ day_pattern = re.compile(r'\s\d+,\s')
 multimonth_pattern = re.compile(r'\s?\-\s?\S+\s')
 
 
-def get_date_for_press(publish_date):
-    import datetime
+def _get_date_for_press(publish_date):
     # strip off extra months, and just use the first:
     date = re.sub(multimonth_pattern, ", ", publish_date)
     if re.search(day_pattern, date):
@@ -133,7 +134,7 @@ def press(request):
             json_articles = json.loads(content)
         cache.set("student_press_json_articles", json_articles)
     articles = [Article(**article) for article in json_articles]
-    articles.sort(key=lambda item: get_date_for_press(item.publish_date), reverse=True)
+    articles.sort(key=lambda item: _get_date_for_press(item.publish_date), reverse=True)
     return render_to_response('static_templates/press.html', {'articles': articles})
 
 
@@ -237,7 +238,7 @@ def signin_user(request):
 
 
 @ensure_csrf_cookie
-def register_user(request, extra_context={}):
+def register_user(request, extra_context=None):
     """
     This view will display the non-modal registration form
     """
@@ -248,7 +249,8 @@ def register_user(request, extra_context={}):
         'course_id': request.GET.get('course_id'),
         'enrollment_action': request.GET.get('enrollment_action')
     }
-    context.update(extra_context)
+    if extra_context is not None:
+        context.update(extra_context)
 
     return render_to_response('register.html', context)
 
@@ -257,13 +259,12 @@ def register_user(request, extra_context={}):
 @ensure_csrf_cookie
 def dashboard(request):
     user = request.user
-    enrollments = CourseEnrollment.objects.filter(user=user)
 
     # Build our courses list for the user, but ignore any courses that no longer
     # exist (because the course IDs have changed). Still, we don't delete those
     # enrollments, because it could have been a data push snafu.
     courses = []
-    for enrollment in enrollments:
+    for enrollment in CourseEnrollment.enrollments_for_user(user):
         try:
             courses.append(course_from_id(enrollment.course_id))
         except ItemNotFoundError:
@@ -291,9 +292,6 @@ def dashboard(request):
 
     exam_registrations = {course.id: exam_registration_info(request.user, course) for course in courses}
 
-    # Get the 3 most recent news
-    top_news = _get_news(top=3) if not settings.MITX_FEATURES.get('ENABLE_MKTG_SITE', False) else None
-
     # get info w.r.t ExternalAuthMap
     external_auth_map = None
     try:
@@ -309,7 +307,6 @@ def dashboard(request):
                'errored_courses': errored_courses,
                'show_courseware_links_for': show_courseware_links_for,
                'cert_statuses': cert_statuses,
-               'news': top_news,
                'exam_registrations': exam_registrations,
                }
 
@@ -387,18 +384,13 @@ def change_enrollment(request):
                                "course:{0}".format(course_num),
                                "run:{0}".format(run)])
 
-        try:
-            enrollment, created = CourseEnrollment.objects.get_or_create(user=user, course_id=course.id)
-        except IntegrityError:
-            # If we've already created this enrollment in a separate transaction,
-            # then just continue
-            pass
+        CourseEnrollment.enroll(user, course.id)
+
         return HttpResponse()
 
     elif action == "unenroll":
         try:
-            enrollment = CourseEnrollment.objects.get(user=user, course_id=course_id)
-            enrollment.delete()
+            CourseEnrollment.unenroll(user, course_id)
 
             org, course_num, run = course_id.split("/")
             statsd.increment("common.student.unenrollment",
@@ -412,12 +404,9 @@ def change_enrollment(request):
     else:
         return HttpResponseBadRequest(_("Enrollment action is invalid"))
 
-
 @ensure_csrf_cookie
 def accounts_login(request, error=""):
-
     return render_to_response('login.html', {'error': error})
-
 
 # Need different levels of logging
 @ensure_csrf_cookie
@@ -432,19 +421,31 @@ def login_user(request, error=""):
     try:
         user = User.objects.get(email=email)
     except User.DoesNotExist:
-        log.warning(u"Login failed - Unknown user email: {0}".format(email))
-        return HttpResponse(json.dumps({'success': False,
-                                        'value': _('Email or password is incorrect.')}))  # TODO: User error message
+        AUDIT_LOG.warning(u"Login failed - Unknown user email: {0}".format(email))
+        user = None
 
-    username = user.username
-    user = authenticate(username=username, password=password)
+    # if the user doesn't exist, we want to set the username to an invalid
+    # username so that authentication is guaranteed to fail and we can take
+    # advantage of the ratelimited backend
+    username = user.username if user else ""
+    try:
+        user = authenticate(username=username, password=password, request=request)
+    # this occurs when there are too many attempts from the same IP address
+    except RateLimitException:
+        return HttpResponse(json.dumps({'success': False,
+                                        'value': _('Too many failed login attempts. Try again later.')}))
     if user is None:
-        log.warning(u"Login failed - password for {0} is invalid".format(email))
+        # if we didn't find this username earlier, the account for this email
+        # doesn't exist, and doesn't have a corresponding password
+        if username != "":
+            AUDIT_LOG.warning(u"Login failed - password for {0} is invalid".format(email))
         return HttpResponse(json.dumps({'success': False,
                                         'value': _('Email or password is incorrect.')}))
 
     if user is not None and user.is_active:
         try:
+            # We do not log here, because we have a handler registered
+            # to perform logging on successful logins.
             login(request, user)
             if request.POST.get('remember') == 'true':
                 request.session.set_expiry(604800)
@@ -452,14 +453,14 @@ def login_user(request, error=""):
             else:
                 request.session.set_expiry(0)
         except Exception as e:
+            AUDIT_LOG.critical("Login failed - Could not create session. Is memcached running?")
             log.critical("Login failed - Could not create session. Is memcached running?")
             log.exception(e)
-
-        log.info(u"Login success - {0} ({1})".format(username, email))
+            raise
 
         try_change_enrollment(request)
 
-        statsd.increment(_("common.student.successful_login"))
+        statsd.increment("common.student.successful_login")
         response = HttpResponse(json.dumps({'success': True}))
 
         # set the login cookie for the edx marketing site
@@ -483,7 +484,7 @@ def login_user(request, error=""):
 
         return response
 
-    log.warning(u"Login failed - Account not active for user {0}, resending activation".format(username))
+    AUDIT_LOG.warning(u"Login failed - Account not active for user {0}, resending activation".format(username))
 
     reactivation_email_for_user(user)
     not_activated_msg = _("This account has not been activated. We have sent another activation message. Please check your e-mail for the activation instructions.")
@@ -498,7 +499,8 @@ def logout_user(request):
     Deletes both the CSRF and sessionid cookies so the marketing
     site can determine the logged in state of the user
     '''
-
+    # We do not log here, because we have a handler registered
+    # to perform logging on successful logouts.
     logout(request)
     response = redirect('/')
     response.delete_cookie(settings.EDXMKTG_COOKIE_NAME,
@@ -605,7 +607,7 @@ def create_account(request, post_override=None):
         password = eamap.internal_password
         post_vars = dict(post_vars.items())
         post_vars.update(dict(email=email, name=name, password=password))
-        log.info('In create_account with external_auth: post_vars = %s' % post_vars)
+        log.debug(u'In create_account with external_auth: user = %s, email=%s', name, email)
 
     # Confirm we have a properly formed request
     for a in ['username', 'email', 'password', 'name']:
@@ -683,7 +685,7 @@ def create_account(request, post_override=None):
     message = render_to_string('emails/activation_email.txt', d)
 
     # dont send email if we are doing load testing or random user generation for some reason
-    if not (settings.MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_LOAD_TESTING')):
+    if not (settings.MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING')):
         try:
             if settings.MITX_FEATURES.get('REROUTE_ACTIVATION_EMAIL'):
                 dest_addr = settings.MITX_FEATURES['REROUTE_ACTIVATION_EMAIL']
@@ -691,7 +693,7 @@ def create_account(request, post_override=None):
                            '-' * 80 + '\n\n' + message)
                 send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [dest_addr], fail_silently=False)
             else:
-                res = user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
+                _res = user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
         except:
             log.warning('Unable to send activation email to user', exc_info=True)
             js['value'] = _('Could not send activation e-mail.')
@@ -704,17 +706,23 @@ def create_account(request, post_override=None):
     login(request, login_user)
     request.session.set_expiry(0)
 
+    # TODO: there is no error checking here to see that the user actually logged in successfully,
+    # and is not yet an active user.
+    if login_user is not None:
+        AUDIT_LOG.info(u"Login success on new account creation - {0}".format(login_user.username))
+
     if DoExternalAuth:
         eamap.user = login_user
         eamap.dtsignup = datetime.datetime.now(UTC)
         eamap.save()
-        log.info("User registered with external_auth %s" % post_vars['username'])
-        log.info('Updated ExternalAuthMap for %s to be %s' % (post_vars['username'], eamap))
+        AUDIT_LOG.info("User registered with external_auth %s", post_vars['username'])
+        AUDIT_LOG.info('Updated ExternalAuthMap for %s to be %s', post_vars['username'], eamap)
 
         if settings.MITX_FEATURES.get('BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH'):
             log.info('bypassing activation email')
             login_user.is_active = True
             login_user.save()
+            AUDIT_LOG.info(u"Login activated on extauth account - {0} ({1})".format(login_user.username, login_user.email))
 
     try_change_enrollment(request)
 
@@ -916,41 +924,46 @@ def auto_auth(request):
     """
     Automatically logs the user in with a generated random credentials
     This view is only accessible when
-    settings.MITX_SETTINGS['AUTOMATIC_AUTH_FOR_LOAD_TESTING'] is true.
+    settings.MITX_SETTINGS['AUTOMATIC_AUTH_FOR_TESTING'] is true.
     """
 
-    def get_dummy_post_data(username, password):
+    def get_dummy_post_data(username, password, email, name):
         """
         Return a dictionary suitable for passing to post_vars of _do_create_account or post_override
-        of create_account, with specified username and password.
+        of create_account, with specified values.
         """
-
         return {'username': username,
-                'email': username + "_dummy_test@mitx.mit.edu",
+                'email': email,
                 'password': password,
-                'name': username + " " + username,
+                'name': name,
                 'honor_code': u'true',
                 'terms_of_service': u'true', }
 
-    # generate random user ceredentials from a small name space (determined by settings)
+    # generate random user credentials from a small name space (determined by settings)
     name_base = 'USER_'
     pass_base = 'PASS_'
 
     max_users = settings.MITX_FEATURES.get('MAX_AUTO_AUTH_USERS', 200)
     number = random.randint(1, max_users)
 
-    username = name_base + str(number)
-    password = pass_base + str(number)
+    # Get the params from the request to override default user attributes if specified
+    qdict = request.GET
+
+    # Use the params from the request, otherwise use these defaults
+    username = qdict.get('username', name_base + str(number))
+    password = qdict.get('password', pass_base + str(number))
+    email = qdict.get('email', '%s_dummy_test@mitx.mit.edu' % username)
+    name = qdict.get('name', '%s Test' % username)
 
     # if they already are a user, log in
     try:
         user = User.objects.get(username=username)
-        user = authenticate(username=username, password=password)
+        user = authenticate(username=username, password=password, request=request)
         login(request, user)
 
     # else create and activate account info
     except ObjectDoesNotExist:
-        post_override = get_dummy_post_data(username, password)
+        post_override = get_dummy_post_data(username, password, email, name)
         create_account(request, post_override=post_override)
         request.user.is_active = True
         request.user.save()
@@ -971,19 +984,27 @@ def activate_account(request, key):
             r[0].activate()
             already_active = False
 
-        #Enroll student in any pending courses he/she may have if auto_enroll flag is set
+        # Enroll student in any pending courses he/she may have if auto_enroll flag is set
         student = User.objects.filter(id=r[0].user_id)
         if student:
             ceas = CourseEnrollmentAllowed.objects.filter(email=student[0].email)
             for cea in ceas:
                 if cea.auto_enroll:
-                    course_id = cea.course_id
-                    enrollment, created = CourseEnrollment.objects.get_or_create(user_id=student[0].id, course_id=course_id)
+                    CourseEnrollment.enroll(student[0], cea.course_id)
 
-        resp = render_to_response("registration/activation_complete.html", {'user_logged_in': user_logged_in, 'already_active': already_active})
+        resp = render_to_response(
+            "registration/activation_complete.html",
+            {
+                'user_logged_in': user_logged_in,
+                'already_active': already_active
+            }
+        )
         return resp
     if len(r) == 0:
-        return render_to_response("registration/activation_invalid.html", {'csrf': csrf(request)['csrf_token']})
+        return render_to_response(
+            "registration/activation_invalid.html",
+            {'csrf': csrf(request)['csrf_token']}
+        )
     return HttpResponse(_("Unknown error. Please e-mail us to let us know how it happened."))
 
 
@@ -1006,11 +1027,15 @@ def password_reset(request):
                                         'error': _('Invalid e-mail or user')}))
 
 
-def password_reset_confirm_wrapper(request, uidb36=None, token=None):
+def password_reset_confirm_wrapper(
+    request,
+    uidb36=None,
+    token=None,
+):
     ''' A wrapper around django.contrib.auth.views.password_reset_confirm.
         Needed because we want to set the user as active at this step.
     '''
-    #cribbed from django.contrib.auth.views.password_reset_confirm
+    # cribbed from django.contrib.auth.views.password_reset_confirm
     try:
         uid_int = base36_to_int(uidb36)
         user = User.objects.get(id=uid_int)
@@ -1018,7 +1043,12 @@ def password_reset_confirm_wrapper(request, uidb36=None, token=None):
         user.save()
     except (ValueError, User.DoesNotExist):
         pass
-    return password_reset_confirm(request, uidb36=uidb36, token=token)
+    # we also want to pass settings.PLATFORM_NAME in as extra_context
+
+    extra_context = {"platform_name": settings.PLATFORM_NAME}
+    return password_reset_confirm(
+        request, uidb36=uidb36, token=token, extra_context=extra_context
+    )
 
 
 def reactivation_email_for_user(user):
@@ -1036,7 +1066,7 @@ def reactivation_email_for_user(user):
     message = render_to_string('emails/activation_email.txt', d)
 
     try:
-        res = user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
+        _res = user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
     except:
         log.warning('Unable to send reactivation email', exc_info=True)
         return HttpResponse(json.dumps({'success': False, 'error': _('Unable to send reactivation email')}))
@@ -1094,7 +1124,7 @@ def change_email_request(request):
     subject = ''.join(subject.splitlines())
     message = render_to_string('emails/email_change.txt', d)
 
-    res = send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [pec.new_email])
+    _res = send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [pec.new_email])
 
     return HttpResponse(json.dumps({'success': True}))
 

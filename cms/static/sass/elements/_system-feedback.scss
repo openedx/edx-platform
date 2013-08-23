@@ -1,4 +1,46 @@
 // studio - elements - system feedback
+// ====================
+
+// messages
+.message {
+  @extend .t-copy-sub1;
+  display: block;
+}
+
+.message-status {
+  display: none;
+  @include border-top-radius(2px);
+  @include box-sizing(border-box);
+  border-bottom: 2px solid $yellow-d2;
+  margin: 0 0 $baseline 0;
+  padding: ($baseline/2) $baseline;
+  font-weight: 500;
+  background: $yellow-d1;
+  color: $white;
+
+  [class^="icon-"] {
+    position: relative;
+    top: 1px;
+    @include font-size(16);
+    display: inline-block;
+    margin-right: ($baseline/2);
+  }
+
+  .text {
+    display: inline-block;
+  }
+
+  &.error {
+    border-color: $red-d3;
+    background: $red-l1;
+  }
+
+  &.is-shown {
+    display: block;
+  }
+}
+
+
 // alerts, notifications, prompts, and status communication
 // ====================
 

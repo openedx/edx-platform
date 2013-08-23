@@ -1,7 +1,6 @@
-from .import get_test_system
 from xmodule.modulestore import Location
 from xmodule.modulestore.xml import XMLModuleStore
-from xmodule.tests.test_export import DATA_DIR
+from xmodule.tests import DATA_DIR, get_test_system
 
 OPEN_ENDED_GRADING_INTERFACE = {
     'url': 'blah/',
@@ -42,7 +41,7 @@ class DummyModulestore(object):
     def setup_modulestore(self, name):
         self.modulestore = XMLModuleStore(DATA_DIR, course_dirs=[name])
 
-    def get_course(self, name):
+    def get_course(self, _):
         """Get a test course by directory name.  If there's more than one, error."""
         courses = self.modulestore.get_courses()
         return courses[0]

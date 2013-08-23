@@ -75,13 +75,17 @@ XQUEUE_INTERFACE = {
     "basic_auth": ('anant', 'agarwal'),
 }
 
-# Do not display the YouTube videos in the browser while running the
-# acceptance tests. This makes them faster and more reliable
-MITX_FEATURES['STUB_VIDEO_FOR_TESTING'] = True
-
 # Forums are disabled in test.py to speed up unit tests, but we do not have
 # per-test control for acceptance tests
 MITX_FEATURES['ENABLE_DISCUSSION_SERVICE'] = True
+
+# Use the auto_auth workflow for creating users and logging them in
+MITX_FEATURES['AUTOMATIC_AUTH_FOR_TESTING'] = True
+
+# HACK
+# Setting this flag to false causes imports to not load correctly in the lettuce python files
+# We do not yet understand why this occurs. Setting this to true is a stopgap measure
+USE_I18N = True
 
 # Include the lettuce app for acceptance testing, including the 'harvest' django-admin command
 INSTALLED_APPS += ('lettuce.django',)

@@ -8,6 +8,52 @@ the top.  Include a label indicating the component affected.
 LMS: Added bulk email for course feature, with option to optout of individual
 course emails.
 
+Blades: Took videoalpha out of alpha, replacing the old video player
+
+LMS: Enable beta instructor dashboard. The beta dashboard is a rearchitecture
+of the existing instructor dashboard and is available by clicking a link at
+the top right of the existing dashboard.
+
+Common: CourseEnrollment has new fields `is_active` and `mode`. The mode will be
+used to differentiate different kinds of enrollments (currently, all enrollments
+are honor certificate enrollments). The `is_active` flag will be used to
+deactivate enrollments without deleting them, so that we know what course you
+*were* enrolled in. Because of the latter change, enrollment and unenrollment
+logic has been consolidated into the model -- you should use new class methods
+to `enroll()`, `unenroll()`, and to check `is_enrolled()`, instead of creating
+CourseEnrollment objects or querying them directly.
+
+Studio: Email will be sent to admin address when a user requests course creator
+privileges for Studio (edge only).
+
+Studio: Studio course authors (both instructors and staff) will be auto-enrolled
+for their courses so that "View Live" works.
+
+Common: Add a new input type ``<formulaequationinput />`` for Formula/Numerical
+Responses. It periodically makes AJAX calls to preview and validate the
+student's input.
+
+Common: Added ratelimiting to our authentication backend.
+
+Common: Add additional logging to cover login attempts and logouts.
+
+Studio: Send e-mails to new Studio users (on edge only) when their course creator
+status has changed. This will not be in use until the course creator table
+is enabled.
+
+Studio: Added improvements to Course Creation: richer error messaging, tip
+text, and fourth field for course run.
+
+Blades: New features for VideoAlpha player:
+1.) Controls are auto hidden after a delay of mouse inactivity - the full video
+becomes visible.
+2.) When captions (CC) button is pressed, captions stick (not auto hidden after
+a delay of mouse inactivity). The video player size does not change - the video
+is down-sized and placed in the middle of the black area.
+3.) All source code of Video Alpha 2 is written in JavaScript. It is not a basic
+conversion from CoffeeScript. The structure of the player has been changed.
+4.) A lot of additional unit tests.
+
 LMS: Added user preferences (arbitrary user/key/value tuples, for which
 which user/key is unique) and a REST API for reading users and
 preferences. Access to the REST API is restricted by use of the
@@ -17,9 +63,15 @@ the setting is not present, the API is disabled).
 LMS: Added endpoints for AJAX requests to enable/disable notifications
 (which are not yet implemented) and a one-click unsubscribe page.
 
+Studio: Allow instructors of a course to designate other staff as instructors;
+this allows instructors to hand off management of a course to someone else.
+
 Common: Add a manage.py that knows about edx-platform specific settings and projects
 
 Common: Added *experimental* support for jsinput type.
+
+Studio: Remove XML from HTML5 video component editor. All settings are
+moved to be edited as metadata.
 
 Common: Added setting to specify Celery Broker vhost
 
@@ -46,6 +98,8 @@ Blades: User answer now preserved (and changeable) after clicking "show answer" 
 LMS: Removed press releases
 
 Common: Updated Sass and Bourbon libraries, added Neat library
+
+LMS: Add a MixedModuleStore to aggregate the XMLModuleStore and MongoMonduleStore
 
 LMS: Users are no longer auto-activated if they click "reset password"
 This is now done when they click on the link in the reset password
@@ -184,6 +238,12 @@ LMS: Fixed failing numeric response (decimal but no trailing digits).
 
 LMS: XML Error module no longer shows students a stack trace.
 
+Studio: Add feedback to end user if there is a problem exporting a course
+
+Studio: Improve link re-writing on imports into a different course-id
+
+Studio: Allow for intracourse linking in Capa Problems
+
 Blades: Videoalpha.
 
 XModules: Added partial credit for foldit module.
@@ -191,6 +251,10 @@ XModules: Added partial credit for foldit module.
 XModules: Added "randomize" XModule to list of XModule types.
 
 XModules: Show errors with full descriptors.
+
+Studio: Add feedback to end user if there is a problem exporting a course
+
+Studio: Improve link re-writing on imports into a different course-id
 
 XQueue: Fixed (hopefully) worker crash when the connection to RabbitMQ is
 dropped suddenly.

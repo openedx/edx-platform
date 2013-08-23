@@ -25,6 +25,7 @@ from courseware.masquerade import setup_masquerade
 from courseware.model_data import ModelDataCache
 from .module_render import toc_for_course, get_module_for_descriptor, get_module
 from courseware.models import StudentModule, StudentModuleHistory
+from course_modes.models import CourseMode
 
 from django_comment_client.utils import get_discussion_title
 
@@ -400,7 +401,7 @@ def index(request, course_id, chapter=None, section=None,
                 # add in the appropriate timer information to the rendering context:
                 context.update(check_for_active_timelimit_module(request, course_id, course))
 
-            context['content'] = section_module.get_html()
+            context['content'] = section_module.runtime.render(section_module, None, 'student_view').content
         else:
             # section is none, so display a message
             prev_section = get_current_child(chapter_module)
@@ -568,12 +569,12 @@ def syllabus(request, course_id):
 
 def registered_for_course(course, user):
     """
-    Return CourseEnrollment if user is registered for course, else False
+    Return True if user is registered for course, else False
     """
     if user is None:
         return False
     if user.is_authenticated():
-        return CourseEnrollment.objects.filter(user=user, course_id=course.id).exists()
+        return CourseEnrollment.is_enrolled(user, course.id)
     else:
         return False
 
@@ -600,9 +601,14 @@ def course_about(request, course_id):
                                'registered': registered,
                                'course_target': course_target,
                                'show_courseware_link': show_courseware_link})
+
+
 @ensure_csrf_cookie
 @cache_if_anonymous
 def mktg_course_about(request, course_id):
+    """
+    This is the button that gets put into an iframe on the Drupal site
+    """
 
     try:
         course = get_course_with_access(request.user, course_id, 'see_exists')
@@ -610,7 +616,7 @@ def mktg_course_about(request, course_id):
         # if a course does not exist yet, display a coming
         # soon button
         return render_to_response('courseware/mktg_coming_soon.html',
-                              {'course_id': course_id})
+                                  {'course_id': course_id})
 
     registered = registered_for_course(course, request.user)
 
@@ -623,64 +629,17 @@ def mktg_course_about(request, course_id):
 
     show_courseware_link = (has_access(request.user, course, 'load') or
                             settings.MITX_FEATURES.get('ENABLE_LMS_MIGRATION'))
+    course_modes = CourseMode.modes_for_course(course.id)
 
     return render_to_response('courseware/mktg_course_about.html',
-                              {'course': course,
-                               'registered': registered,
-                               'allow_registration': allow_registration,
-                               'course_target': course_target,
-                               'show_courseware_link': show_courseware_link})
-
-
-
-@ensure_csrf_cookie
-@cache_if_anonymous
-def static_university_profile(request, org_id):
-    """
-    Return the profile for the particular org_id that does not have any courses.
-    """
-    # Redirect to the properly capitalized org_id
-    last_path = request.path.split('/')[-1]
-    if last_path != org_id:
-        return redirect('static_university_profile', org_id=org_id)
-
-    # Render template
-    template_file = "university_profile/{0}.html".format(org_id).lower()
-    context = dict(courses=[], org_id=org_id)
-    return render_to_response(template_file, context)
-
-
-@ensure_csrf_cookie
-@cache_if_anonymous
-def university_profile(request, org_id):
-    """
-    Return the profile for the particular org_id.  404 if it's not valid.
-    """
-    virtual_orgs_ids = settings.VIRTUAL_UNIVERSITIES
-    meta_orgs = getattr(settings, 'META_UNIVERSITIES', {})
-
-    # Get all the ids associated with this organization
-    all_courses = modulestore().get_courses()
-    valid_orgs_ids = set(c.org for c in all_courses)
-    valid_orgs_ids.update(virtual_orgs_ids + meta_orgs.keys())
-
-    if org_id not in valid_orgs_ids:
-        raise Http404("University Profile not found for {0}".format(org_id))
-
-    # Grab all courses for this organization(s)
-    org_ids = set([org_id] + meta_orgs.get(org_id, []))
-    org_courses = []
-    domain = request.META.get('HTTP_HOST')
-    for key in org_ids:
-        cs = get_courses_by_university(request.user, domain=domain)[key]
-        org_courses.extend(cs)
-
-    org_courses = sort_by_announcement(org_courses)
-
-    context = dict(courses=org_courses, org_id=org_id)
-    template_file = "university_profile/{0}.html".format(org_id).lower()
-
-    return render_to_response(template_file, context)
+                              {
+                                  'course': course,
+                                  'registered': registered,
+                                  'allow_registration': allow_registration,
+                                  'course_target': course_target,
+                                  'show_courseware_link': show_courseware_link,
+                                  'course_modes': course_modes,
+                              })
 
 
 def render_notifications(request, course, notifications):
@@ -779,12 +738,16 @@ def submission_history(request, course_id, student_username, location):
     except StudentModule.DoesNotExist:
         return HttpResponse(escape("{0} has never accessed problem {1}".format(student_username, location)))
 
-    history_entries = StudentModuleHistory.objects.filter(student_module=student_module).order_by('-id')
+    history_entries = StudentModuleHistory.objects.filter(
+        student_module=student_module
+    ).order_by('-id')
 
     # If no history records exist, let's force a save to get history started.
     if not history_entries:
         student_module.save()
-        history_entries = StudentModuleHistory.objects.filter(student_module=student_module).order_by('-id')
+        history_entries = StudentModuleHistory.objects.filter(
+            student_module=student_module
+        ).order_by('-id')
 
     context = {
         'history_entries': history_entries,

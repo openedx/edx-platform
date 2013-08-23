@@ -1,22 +1,19 @@
 describe "Course Overview", ->
 
     beforeEach ->
-        appendSetFixtures """
-            <script src="/static/js/vendor/date.js"></script>
-        """
-
-        appendSetFixtures """
-            <script type="text/javascript" src="/jsi18n/"></script>
-        """
+        _.each ["/static/js/vendor/date.js", "/static/js/vendor/timepicker/jquery.timepicker.js", "/jsi18n/"], (path) ->
+          appendSetFixtures """
+            <script type="text/javascript" src="#{path}"></script>
+          """
 
         appendSetFixtures """
             <div class="section-published-date">
               <span class="published-status">
                 <strong>Will Release:</strong> 06/12/2013 at 04:00 UTC
               </span>
-              <a href="#" class="edit-button" "="" data-date="06/12/2013" data-time="04:00" data-id="i4x://pfogg/42/chapter/d6b47f7b084f49debcaf67fe5436c8e2">Edit</a>
+              <a href="#" class="edit-button" data-date="06/12/2013" data-time="04:00" data-id="i4x://pfogg/42/chapter/d6b47f7b084f49debcaf67fe5436c8e2">Edit</a>
            </div>
-        """#"
+        """
 
         appendSetFixtures """
           <div class="edit-subsection-publish-settings">
@@ -38,7 +35,7 @@ describe "Course Overview", ->
             <a href="#" class="save-button">Save</a><a href="#" class="cancel-button">Cancel</a>
           </div>
         </div>
-        """#"
+        """
 
         appendSetFixtures """
           <section class="courseware-section branch" data-id="a-location-goes-here">
@@ -46,12 +43,13 @@ describe "Course Overview", ->
               <a href="#" class="delete-section-button"></a>
             </li>
           </section>
-        """#"
+        """
 
         spyOn(window, 'saveSetSectionScheduleDate').andCallThrough()
         # Have to do this here, as it normally gets bound in document.ready()
         $('a.save-button').click(saveSetSectionScheduleDate)
         $('a.delete-section-button').click(deleteSection)
+        $(".edit-subsection-publish-settings .start-date").datepicker()
 
         @notificationSpy = spyOn(CMS.Views.Notification.Mini.prototype, 'show').andCallThrough()
         window.analytics = jasmine.createSpyObj('analytics', ['track'])

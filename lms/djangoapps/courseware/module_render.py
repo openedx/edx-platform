@@ -1,6 +1,5 @@
 import json
 import logging
-import re
 import sys
 from functools import partial
 
@@ -13,7 +12,6 @@ from django.http import Http404
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
-import pyparsing
 from requests.auth import HTTPBasicAuth
 from statsd import statsd
 
@@ -334,6 +332,7 @@ def get_module_for_descriptor_internal(user, descriptor, model_data_cache, cours
     # TODO (cpennington): When modules are shared between courses, the static
     # prefix is going to have to be specific to the module, not the directory
     # that the xml was loaded from
+
     system = ModuleSystem(
         track_function=track_function,
         render_template=render_to_string,
@@ -349,7 +348,16 @@ def get_module_for_descriptor_internal(user, descriptor, model_data_cache, cours
         replace_urls=partial(
             static_replace.replace_static_urls,
             data_directory=getattr(descriptor, 'data_dir', None),
-            course_namespace=descriptor.location._replace(category=None, name=None),
+            course_id=course_id,
+        ),
+        replace_course_urls=partial(
+            static_replace.replace_course_urls,
+            course_id=course_id
+        ),
+        replace_jump_to_id_urls=partial(
+            static_replace.replace_jump_to_id_urls,
+            course_id=course_id,
+            jump_to_id_base_url=reverse('jump_to_id', kwargs={'course_id': course_id, 'module_id': ''})
         ),
         node_path=settings.NODE_PATH,
         xblock_model_data=xblock_model_data,
@@ -361,6 +369,7 @@ def get_module_for_descriptor_internal(user, descriptor, model_data_cache, cours
         cache=cache,
         can_execute_unsafe_code=(lambda: can_execute_unsafe_code(course_id)),
     )
+
     # pass position specified in URL to module through ModuleSystem
     system.set('position', position)
     system.set('DEBUG', settings.DEBUG)
@@ -398,7 +407,7 @@ def get_module_for_descriptor_internal(user, descriptor, model_data_cache, cours
     module.get_html = replace_static_urls(
         _get_html,
         getattr(descriptor, 'data_dir', None),
-        course_namespace=module.location._replace(category=None, name=None)
+        course_id=course_id
     )
 
     # Allow URLs of the form '/course/' refer to the root of multicourse directory
@@ -599,14 +608,14 @@ def _check_files_limits(files):
 
         # Check number of files submitted
         if len(inputfiles) > settings.MAX_FILEUPLOADS_PER_INPUT:
-            msg = 'Submission aborted! Maximum %d files may be submitted at once' %\
+            msg = 'Submission aborted! Maximum %d files may be submitted at once' % \
                   settings.MAX_FILEUPLOADS_PER_INPUT
             return msg
 
         # Check file sizes
         for inputfile in inputfiles:
-            if inputfile.size > settings.STUDENT_FILEUPLOAD_MAX_SIZE:   # Bytes
-                msg = 'Submission aborted! Your file "%s" is too large (max size: %d MB)' %\
+            if inputfile.size > settings.STUDENT_FILEUPLOAD_MAX_SIZE:  # Bytes
+                msg = 'Submission aborted! Your file "%s" is too large (max size: %d MB)' % \
                       (inputfile.name, settings.STUDENT_FILEUPLOAD_MAX_SIZE / (1000 ** 2))
                 return msg
 

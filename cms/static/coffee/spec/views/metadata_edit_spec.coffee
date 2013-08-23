@@ -1,14 +1,24 @@
+verifyInputType = (input, expectedType) ->
+    # Some browsers (e.g. FireFox) do not support the "number"
+    # input type.  We can accept a "text" input instead
+    # and still get acceptable behavior in the UI.
+    if expectedType == 'number' and input.type != 'number'
+        expectedType = 'text'
+    expect(input.type).toBe(expectedType)
+
 describe "Test Metadata Editor", ->
     editorTemplate = readFixtures('metadata-editor.underscore')
     numberEntryTemplate = readFixtures('metadata-number-entry.underscore')
     stringEntryTemplate = readFixtures('metadata-string-entry.underscore')
     optionEntryTemplate = readFixtures('metadata-option-entry.underscore')
+    listEntryTemplate = readFixtures('metadata-list-entry.underscore')
 
     beforeEach ->
         setFixtures($("<script>", {id: "metadata-editor-tpl", type: "text/template"}).text(editorTemplate))
         appendSetFixtures($("<script>", {id: "metadata-number-entry", type: "text/template"}).text(numberEntryTemplate))
         appendSetFixtures($("<script>", {id: "metadata-string-entry", type: "text/template"}).text(stringEntryTemplate))
         appendSetFixtures($("<script>", {id: "metadata-option-entry", type: "text/template"}).text(optionEntryTemplate))
+        appendSetFixtures($("<script>", {id: "metadata-list-entry", type: "text/template"}).text(listEntryTemplate))
 
     genericEntry = {
         default_value: 'default value',
@@ -62,6 +72,18 @@ describe "Test Metadata Editor", ->
         value: 10.2
     }
 
+    listEntry = {
+        default_value: ["a thing", "another thing"],
+        display_name: "List",
+        explicitly_set: false,
+        field_name: "list",
+        help: "A list of things.",
+        inheritable: false,
+        options: [],
+        type: CMS.Models.Metadata.LIST_TYPE,
+        value: ["the first display value", "the second"]
+    }
+
     # Test for the editor that creates the individual views.
     describe "CMS.Views.Metadata.Editor creates editors for each field", ->
         beforeEach ->
@@ -84,26 +106,29 @@ describe "Test Metadata Editor", ->
                             {"display_name": "Never", "value": "never"}],
                         type: "unknown type",
                         value: null
-                    }
+                    },
+                    listEntry
                 ]
             )
 
         it "creates child views on initialize, and sorts them alphabetically", ->
             view = new CMS.Views.Metadata.Editor({collection: @model})
             childModels = view.collection.models
-            expect(childModels.length).toBe(5)
-            childViews = view.$el.find('.setting-input')
-            expect(childViews.length).toBe(5)
+            expect(childModels.length).toBe(6)
+            # Be sure to check list view as well as other input types
+            childViews = view.$el.find('.setting-input, .list-settings')
+            expect(childViews.length).toBe(6)
 
             verifyEntry = (index, display_name, type) ->
                 expect(childModels[index].get('display_name')).toBe(display_name)
-                expect(childViews[index].type).toBe(type)
+                verifyInputType(childViews[index], type)
 
             verifyEntry(0, 'Display Name', 'text')
             verifyEntry(1, 'Inputs', 'number')
-            verifyEntry(2, 'Show Answer', 'select-one')
-            verifyEntry(3, 'Unknown', 'text')
-            verifyEntry(4, 'Weight', 'number')
+            verifyEntry(2, 'List', '')
+            verifyEntry(3, 'Show Answer', 'select-one')
+            verifyEntry(4, 'Unknown', 'text')
+            verifyEntry(5, 'Weight', 'number')
 
         it "returns its display name", ->
             view = new CMS.Views.Metadata.Editor({collection: @model})
@@ -146,27 +171,27 @@ describe "Test Metadata Editor", ->
     # Tests for individual views.
     assertInputType = (view, expectedType) ->
         input = view.$el.find('.setting-input')
-        expect(input.length).toBe(1)
-        expect(input[0].type).toBe(expectedType)
+        expect(input.length).toEqual(1)
+        verifyInputType(input[0], expectedType)
 
     assertValueInView = (view, expectedValue) ->
-        expect(view.getValueFromEditor()).toBe(expectedValue)
+        expect(view.getValueFromEditor()).toEqual(expectedValue)
 
     assertCanUpdateView = (view, newValue) ->
         view.setValueInEditor(newValue)
-        expect(view.getValueFromEditor()).toBe(newValue)
+        expect(view.getValueFromEditor()).toEqual(newValue)
 
     assertClear = (view, modelValue, editorValue=modelValue) ->
         view.clear()
         expect(view.model.getValue()).toBe(null)
-        expect(view.model.getDisplayValue()).toBe(modelValue)
-        expect(view.getValueFromEditor()).toBe(editorValue)
+        expect(view.model.getDisplayValue()).toEqual(modelValue)
+        expect(view.getValueFromEditor()).toEqual(editorValue)
 
     assertUpdateModel = (view, originalValue, newValue) ->
         view.setValueInEditor(newValue)
-        expect(view.model.getValue()).toBe(originalValue)
+        expect(view.model.getValue()).toEqual(originalValue)
         view.updateModel()
-        expect(view.model.getValue()).toBe(newValue)
+        expect(view.model.getValue()).toEqual(newValue)
 
     describe "CMS.Views.Metadata.String is a basic string input with clear functionality", ->
         beforeEach ->
@@ -298,3 +323,45 @@ describe "Test Metadata Editor", ->
 
             verifyDisallowedChars(@integerView)
             verifyDisallowedChars(@floatView)
+
+    describe "CMS.Views.Metadata.List allows the user to enter an ordered list of strings", ->
+      beforeEach ->
+        listModel = new CMS.Models.Metadata(listEntry)
+        @listView = new CMS.Views.Metadata.List({model: listModel})
+        @el = @listView.$el
+
+      it "returns the initial value upon initialization", ->
+        assertValueInView(@listView, ['the first display value', 'the second'])
+
+      it "updates its value correctly", ->
+        assertCanUpdateView(@listView, ['a new item', 'another new item', 'a third'])
+
+      it "has a clear method to revert to the model default", ->
+        assertClear(@listView, ['a thing', 'another thing'])
+
+      it "has an update model method", ->
+        assertUpdateModel(@listView, null, ['a new value'])
+
+      it "can add an entry", ->
+        expect(@listView.model.get('value').length).toEqual(2)
+        @el.find('.create-setting').click()
+        expect(@el.find('input.input').length).toEqual(3)
+
+      it "can remove an entry", ->
+        expect(@listView.model.get('value').length).toEqual(2)
+        @el.find('.remove-setting').first().click()
+        expect(@listView.model.get('value').length).toEqual(1)
+
+      it "only allows one blank entry at a time", ->
+        expect(@el.find('input').length).toEqual(2)
+        @el.find('.create-setting').click()
+        @el.find('.create-setting').click()
+        expect(@el.find('input').length).toEqual(3)
+
+      it "re-enables the add setting button after entering a new value", ->
+        expect(@el.find('input').length).toEqual(2)
+        @el.find('.create-setting').click()
+        expect(@el.find('.create-setting')).toHaveClass('is-disabled')
+        @el.find('input').last().val('third setting')
+        @el.find('input').last().trigger('input')
+        expect(@el.find('.create-setting')).not.toHaveClass('is-disabled')
