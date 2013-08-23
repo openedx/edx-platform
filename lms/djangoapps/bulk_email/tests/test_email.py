@@ -15,10 +15,11 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from bulk_email.tasks import delegate_email_batches, course_email
 from bulk_email.models import CourseEmail, Optout
 
-from mock import Mock, patch, sentinel
+from mock import patch
 
 STAFF_COUNT = 3
 STUDENT_COUNT = 10
+LARGE_NUM_EMAILS = 137
 
 
 class MockCourseEmailResult(object):
@@ -29,7 +30,9 @@ class MockCourseEmailResult(object):
     emails_sent = 0
 
     def get_mock_course_email_result(self):
-        def mock_course_email_result(sent, failed, output, **kwargs):
+        """Wrapper for mock email function."""
+        def mock_course_email_result(sent, failed, output, **kwargs):  # pylint: disable=W0613
+            """Increments count of number of emails sent."""
             self.emails_sent += sent
             return True
         return mock_course_email_result
@@ -245,21 +248,20 @@ class TestEmailSendFromDashboard(ModuleStoreTestCase):
         """
         Test sending a large number of emails, to test the chunked querying
         """
-        LARGE_NUM_EMAILS = 137
         mock_factory = MockCourseEmailResult()
         email_mock.side_effect = mock_factory.get_mock_course_email_result()
         added_users = []
-        for i in xrange(LARGE_NUM_EMAILS):
+        for _ in xrange(LARGE_NUM_EMAILS):
             user = UserFactory()
             added_users.append(user)
             CourseEnrollmentFactory.create(user=user, course_id=self.course.id)
 
         optouts = []
         for i in [1, 3, 9, 10, 18]:  # 5 random optouts
-            u = added_users[i]
-            optouts.append(u)
-            o = Optout(user=u, course_id=self.course.id)
-            o.save()
+            user = added_users[i]
+            optouts.append(user)
+            optout = Optout(user=user, course_id=self.course.id)
+            optout.save()
 
         test_email = {
             'action': 'Send email',
