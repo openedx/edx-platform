@@ -6,26 +6,16 @@ from south.v2 import SchemaMigration
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Renaming field 'CourseEmail.to'
-        db.rename_column('bulk_email_courseemail', 'to', 'to_option')
 
-        # Renaming field 'CourseEmail.hash'
-        db.rename_column('bulk_email_courseemail', 'hash', 'slug')
-
-        # Adding field 'CourseEmail.text_message'
-        db.add_column('bulk_email_courseemail', 'text_message',
-                      self.gf('django.db.models.fields.TextField')(null=True, blank=True),
-                      keep_default=False)
+        # Deleting field 'Optout.email'
+        db.delete_column('bulk_email_optout', 'email')
 
     def backwards(self, orm):
-        # Renaming field 'CourseEmail.to_option'
-        db.rename_column('bulk_email_courseemail', 'to_option', 'to')
 
-        # Renaming field 'CourseEmail.slug'
-        db.rename_column('bulk_email_courseemail', 'slug', 'hash')
-
-        # Deleting field 'CourseEmail.text_message'
-        db.delete_column('bulk_email_courseemail', 'text_message')
+        # Adding field 'Optout.email'
+        db.add_column('bulk_email_optout', 'email',
+                      self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True),
+                      keep_default=False)
 
     models = {
         'auth.group': {
@@ -71,10 +61,10 @@ class Migration(SchemaMigration):
             'to_option': ('django.db.models.fields.CharField', [], {'default': "'myself'", 'max_length': '64'})
         },
         'bulk_email.optout': {
-            'Meta': {'unique_together': "(('email', 'course_id'),)", 'object_name': 'Optout'},
+            'Meta': {'unique_together': "(('user', 'course_id'),)", 'object_name': 'Optout'},
             'course_id': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'}),
-            'email': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']", 'null': 'True'})
         },
         'contenttypes.contenttype': {
             'Meta': {'ordering': "('name',)", 'unique_together': "(('app_label', 'model'),)", 'object_name': 'ContentType', 'db_table': "'django_content_type'"},

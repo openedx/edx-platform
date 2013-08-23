@@ -2,10 +2,10 @@
 This module contains celery task functions for handling the sending of bulk email
 to a course.
 """
-import logging
 import math
 import re
 import time
+import gc
 
 from smtplib import SMTPServerDisconnected, SMTPDataError, SMTPConnectError
 
@@ -14,13 +14,14 @@ from django.contrib.auth.models import User, Group
 from django.core.mail import EmailMultiAlternatives, get_connection
 from django.http import Http404
 from celery import task, current_task
+from celery.utils.log import get_task_logger
 
 from bulk_email.models import CourseEmail, Optout
 from courseware.access import _course_staff_group_name, _course_instructor_group_name
 from courseware.courses import get_course_by_id
 from mitxmako.shortcuts import render_to_string
 
-log = logging.getLogger(__name__)
+log = get_task_logger(__name__)
 
 
 @task(default_retry_delay=10, max_retries=5)  # pylint: disable=E1102
@@ -47,37 +48,42 @@ def delegate_email_batches(email_id, to_option, course_id, course_url, user_id):
         raise delegate_email_batches.retry(arg=[email_id, to_option, course_id, course_url, user_id], exc=exc)
 
     if to_option == "myself":
-        recipient_qset = User.objects.filter(id=user_id).values('profile__name', 'email')
-
+        recipient_qset = User.objects.filter(id=user_id)
     elif to_option == "all" or to_option == "staff":
         staff_grpname = _course_staff_group_name(course.location)
         staff_group, _ = Group.objects.get_or_create(name=staff_grpname)
-        staff_qset = staff_group.user_set.values('profile__name', 'email')
+        staff_qset = staff_group.user_set.all()
         instructor_grpname = _course_instructor_group_name(course.location)
         instructor_group, _ = Group.objects.get_or_create(name=instructor_grpname)
-        instructor_qset = instructor_group.user_set.values('profile__name', 'email')
+        instructor_qset = instructor_group.user_set.all()
         recipient_qset = staff_qset | instructor_qset
 
         if to_option == "all":
-            # Two queries are executed per performance considerations for MySQL.
-            # See https://docs.djangoproject.com/en/1.2/ref/models/querysets/#in.
-            course_optouts = Optout.objects.filter(course_id=course_id).values_list('email', flat=True)
-            enrollment_qset = User.objects.filter(courseenrollment__course_id=course_id).exclude(email__in=list(course_optouts)).values('profile__name', 'email')
+            enrollment_qset = User.objects.filter(courseenrollment__course_id=course_id,
+                                                  courseenrollment__is_active=True)
             recipient_qset = recipient_qset | enrollment_qset
         recipient_qset = recipient_qset.distinct()
-
     else:
         log.error("Unexpected bulk email TO_OPTION found: %s", to_option)
         raise Exception("Unexpected bulk email TO_OPTION found: {0}".format(to_option))
 
-    recipient_list = list(recipient_qset)
-    total_num_emails = len(recipient_list)
-    num_workers = int(math.ceil(float(total_num_emails) / float(settings.EMAILS_PER_TASK)))
-    chunk = int(math.ceil(float(total_num_emails) / float(num_workers)))
-
-    for i in range(num_workers):
-        to_list = recipient_list[i * chunk:i * chunk + chunk]
-        course_email.delay(email_id, to_list, course.display_name, course_url, False)
+    recipient_qset = recipient_qset.order_by('pk')
+    total_num_emails = recipient_qset.count()
+    num_queries = int(math.ceil(float(total_num_emails) / float(settings.EMAILS_PER_QUERY)))
+    last_pk = recipient_qset[0].pk - 1
+    num_workers = 0
+    for j in range(num_queries):
+        recipient_sublist = list(recipient_qset.order_by('pk').filter(pk__gt=last_pk)
+                                 .values('profile__name', 'email', 'pk')[:settings.EMAILS_PER_QUERY])
+        last_pk = recipient_sublist[-1]['pk']
+        num_emails_this_query = len(recipient_sublist)
+        num_tasks_this_query = int(math.ceil(float(num_emails_this_query) / float(settings.EMAILS_PER_TASK)))
+        chunk = int(math.ceil(float(num_emails_this_query) / float(num_tasks_this_query)))
+        for i in range(num_tasks_this_query):
+            to_list = recipient_sublist[i * chunk:i * chunk + chunk]
+            course_email.delay(email_id, to_list, course.display_name, course_url, False)
+        num_workers += num_tasks_this_query
+        gc.collect()
     return num_workers
 
 
@@ -89,11 +95,21 @@ def course_email(email_id, to_list, course_title, course_url, throttle=False):
     being the only "to".  Emails are sent multipart, in both plain
     text and html.
     """
+
     try:
         msg = CourseEmail.objects.get(id=email_id)
     except CourseEmail.DoesNotExist as exc:
         log.exception(exc.args[0])
         raise exc
+
+    # exclude optouts
+    optouts = Optout.objects.filter(course_id=msg.course_id,
+                                    user__email__in=[i['email'] for i in to_list])\
+                            .values_list('user__email', flat=True)
+
+    num_optout = len(optouts)
+
+    to_list = filter(lambda x: x['email'] not in optouts, to_list)
 
     subject = "[" + course_title + "] " + msg.subject
 
@@ -114,9 +130,9 @@ def course_email(email_id, to_list, course_title, course_url, throttle=False):
         }
 
         while to_list:
-            (name, email) = to_list[-1].values()
-            email_context['name'] = name
+            email = to_list[-1]['email']
             email_context['email'] = email
+            email_context['name'] = to_list[-1]['profile__name']
 
             html_footer = render_to_string(
                 'emails/email_footer.html',
@@ -157,7 +173,7 @@ def course_email(email_id, to_list, course_title, course_url, throttle=False):
             to_list.pop()
 
         connection.close()
-        return course_email_result(num_sent, num_error)
+        return course_email_result(num_sent, num_error, num_optout)
 
     except (SMTPDataError, SMTPConnectError, SMTPServerDisconnected) as exc:
         # Error caught here cause the email to be retried.  The entire task is actually retried without popping the list
@@ -175,6 +191,6 @@ def course_email(email_id, to_list, course_title, course_url, throttle=False):
 
 
 # This string format code is wrapped in this function to allow mocking for a unit test
-def course_email_result(num_sent, num_error):
+def course_email_result(num_sent, num_error, num_optout):
     """Return the formatted result of course_email sending."""
-    return "Sent {0}, Fail {1}".format(num_sent, num_error)
+    return "Sent {0}, Fail {1}, Optout {2}".format(num_sent, num_error, num_optout)

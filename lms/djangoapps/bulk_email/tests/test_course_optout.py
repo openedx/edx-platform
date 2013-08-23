@@ -10,6 +10,7 @@ from django.test.utils import override_settings
 
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from student.tests.factories import UserFactory, AdminFactory, CourseEnrollmentFactory
+from student.models import CourseEnrollment
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -93,6 +94,8 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
         self.assertEquals(json.loads(response.content), {'success': True})
 
         self.client.logout()
+
+        self.assertTrue(CourseEnrollment.is_enrolled(self.student, self.course.id))
 
         self.client.login(username=self.instructor.username, password="test")
         self.navigate_to_email_view()

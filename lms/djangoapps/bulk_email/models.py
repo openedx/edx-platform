@@ -61,10 +61,10 @@ class CourseEmail(Email, models.Model):
 
 class Optout(models.Model):
     """
-    Stores emails that have opted out of receiving emails from a course.
+    Stores users that have opted out of receiving emails from a course.
     """
-    email = models.CharField(max_length=255, db_index=True)
+    user = models.ForeignKey(User, db_index=True, null=True)
     course_id = models.CharField(max_length=255, db_index=True)
 
     class Meta:
-        unique_together = ('email', 'course_id')
+        unique_together = ('user', 'course_id')
