@@ -24,7 +24,7 @@ class Migration(SchemaMigration):
         db.delete_unique('bulk_email_optout', ['course_id', 'user_id'])
 
         # Deleting field 'Optout.email'
-        db.delete_column('bulk_email_optout', 'user')
+        db.delete_column('bulk_email_optout', 'user_id')
 
         # Creating unique constraint on 'Optout', fields ['course_id', 'email']
         db.create_unique('bulk_email_optout', ['course_id', 'email'])
