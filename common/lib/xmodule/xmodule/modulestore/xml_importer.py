@@ -51,7 +51,10 @@ def import_static_content(modules, course_loc, course_data_path, static_content_
                     content.thumbnail_location = thumbnail_location
 
                 #then commit the content
-                static_content_store.save(content)
+                try:
+                    static_content_store.save(content)
+                except Exception as err:
+                    log.exception('Error importing {0}, error={1}'.format(fullname_with_subpath, err))
 
                 #store the remapping information which will be needed to subsitute in the module data
                 remap_dict[fullname_with_subpath] = content_loc.name
@@ -64,7 +67,8 @@ def import_static_content(modules, course_loc, course_data_path, static_content_
 def import_from_xml(store, data_dir, course_dirs=None,
                     default_class='xmodule.raw_module.RawDescriptor',
                     load_error_modules=True, static_content_store=None, target_location_namespace=None,
-                    verbose=False, draft_store=None):
+                    verbose=False, draft_store=None,
+                    do_import_static=True):
     """
     Import the specified xml data_dir into the "store" modulestore,
     using org and course as the location org and course.
@@ -76,6 +80,10 @@ def import_from_xml(store, data_dir, course_dirs=None,
     after import off disk. We do this remapping as a post-processing step because there's logic in the importing which
     expects a 'url_name' as an identifier to where things are on disk e.g. ../policies/<url_name>/policy.json as well as metadata keys in
     the policy.json. so we need to keep the original url_name during import
+
+    do_import_static: if False, then static files are not imported into the static content store.  This can be employed for courses which
+                      have substantial unchanging static content, which is to inefficient to import every time the course is loaded.
+                      Static content for some courses may also be served directly by nginx, instead of going through django.
 
     """
 
@@ -116,7 +124,16 @@ def import_from_xml(store, data_dir, course_dirs=None,
                     course_data_path = path(data_dir) / module.data_dir
                     course_location = module.location
 
+                    log.debug('======> IMPORTING course to location {0}'.format(course_location))
+
                     module = remap_namespace(module, target_location_namespace)
+
+                    if not do_import_static:
+                        module.lms.static_asset_path = module.data_dir			# for old-style xblock where this was actually linked to kvs
+                        module._model_data['static_asset_path'] = module.data_dir
+                        log.debug('course static_asset_path={0}'.format(module.lms.static_asset_path))
+
+                    log.debug('course data_dir={0}'.format(module.data_dir))
 
                     # cdodge: more hacks (what else). Seems like we have a problem when importing a course (like 6.002) which
                     # does not have any tabs defined in the policy file. The import goes fine and then displays fine in LMS,
@@ -129,17 +146,34 @@ def import_from_xml(store, data_dir, course_dirs=None,
                                        {"type": "wiki", "name": "Wiki"}]  # note, add 'progress' when we can support it on Edge
 
                     import_module(module, store, course_data_path, static_content_store, course_location,
-                                  target_location_namespace or course_location)
+                                  target_location_namespace or course_location, do_import_static=do_import_static)
 
                     course_items.append(module)
 
             # then import all the static content
-            if static_content_store is not None:
+            if static_content_store is not None and do_import_static:
                 _namespace_rename = target_location_namespace if target_location_namespace is not None else course_location
 
                 # first pass to find everything in /static/
                 import_static_content(xml_module_store.modules[course_id], course_location, course_data_path, static_content_store,
                                       _namespace_rename, subpath='static', verbose=verbose)
+
+            elif verbose and not do_import_static:
+                log.debug('Skipping import of static content, since do_import_static={0}'.format(do_import_static))
+
+            # no matter what do_import_static is, import "static_import" directory
+
+            # This is needed because the "about" pages (eg "overview") are loaded via load_extra_content, and
+            # do not inherit the lms metadata from the course module, and thus do not get "static_content_store"
+            # properly defined.   Static content referenced in those extra pages thus need to come through the
+            # c4x:// contentstore, unfortunately.  Tell users to copy that content into the "static_import" subdir.
+
+            simport = 'static_import'
+            if os.path.exists(course_data_path / simport):
+                _namespace_rename = target_location_namespace if target_location_namespace is not None else course_location
+
+                import_static_content(xml_module_store.modules[course_id], course_location, course_data_path, static_content_store,
+                                      _namespace_rename, subpath=simport, verbose=verbose)
 
             # finally loop through all the modules
             for module in xml_module_store.modules[course_id].itervalues():
@@ -156,7 +190,8 @@ def import_from_xml(store, data_dir, course_dirs=None,
                     log.debug('importing module location {0}'.format(module.location))
 
                 import_module(module, store, course_data_path, static_content_store, course_location,
-                              target_location_namespace if target_location_namespace else course_location)
+                              target_location_namespace if target_location_namespace else course_location,
+                              do_import_static=do_import_static)
 
             # now import any 'draft' items
             if draft_store is not None:
@@ -176,7 +211,8 @@ def import_from_xml(store, data_dir, course_dirs=None,
 
 
 def import_module(module, store, course_data_path, static_content_store,
-                  source_course_location, dest_course_location, allow_not_found=False):
+                  source_course_location, dest_course_location, allow_not_found=False,
+                  do_import_static=True):
 
     logging.debug('processing import of module {0}...'.format(module.location.url()))
 
@@ -196,7 +232,7 @@ def import_module(module, store, course_data_path, static_content_store,
     else:
         module_data = content
 
-    if isinstance(module_data, basestring):
+    if isinstance(module_data, basestring) and do_import_static:
         # we want to convert all 'non-portable' links in the module_data (if it is a string) to
         # portable strings (e.g. /static/)
         module_data = rewrite_nonportable_content_links(
@@ -212,6 +248,15 @@ def import_module(module, store, course_data_path, static_content_store,
 
     # NOTE: It's important to use own_metadata here to avoid writing
     # inherited metadata everywhere.
+
+    # remove any export/import only xml_attributes which are used to wire together draft imports
+    if hasattr(module, 'xml_attributes') and 'parent_sequential_url' in module.xml_attributes:
+        del module.xml_attributes['parent_sequential_url']
+
+    if hasattr(module, 'xml_attributes') and 'index_in_children_list' in module.xml_attributes:
+        del module.xml_attributes['index_in_children_list']
+    module.save()
+
     store.update_metadata(module.location, dict(own_metadata(module)))
 
 
@@ -281,7 +326,7 @@ def import_course_draft(xml_module_store, store, draft_store, course_data_path, 
                         # this is to make sure private only verticals show up in the list of children since
                         # they would have been filtered out from the non-draft store export
                         if module.location.category == 'vertical':
-                            module.location = module.location._replace(revision=None)
+                            non_draft_location = module.location._replace(revision=None)
                             sequential_url = module.xml_attributes['parent_sequential_url']
                             index = int(module.xml_attributes['index_in_children_list'])
 
@@ -291,14 +336,11 @@ def import_course_draft(xml_module_store, store, draft_store, course_data_path, 
                             seq_location = seq_location._replace(org=target_location_namespace.org,
                                                                  course=target_location_namespace.course
                                                                  )
-                            sequential = store.get_item(seq_location)
+                            sequential = store.get_item(seq_location, depth=0)
 
-                            if module.location.url() not in sequential.children:
-                                sequential.children.insert(index, module.location.url())
+                            if non_draft_location.url() not in sequential.children:
+                                sequential.children.insert(index, non_draft_location.url())
                                 store.update_children(sequential.location, sequential.children)
-
-                            del module.xml_attributes['parent_sequential_url']
-                            del module.xml_attributes['index_in_children_list']
 
                         import_module(module, draft_store, course_data_path, static_content_store,
                                       source_location_namespace, target_location_namespace, allow_not_found=True)

@@ -3,7 +3,8 @@ Feature: Sign in
   As a new user
   I want to signup for a student account
 
-  # CHROME ONLY, firefox will not redirect properly
+  # firefox will not redirect properly
+  @skip_firefox
   Scenario: Sign up from the homepage
     Given I visit the homepage
     When I click the link with the text "Register Now"

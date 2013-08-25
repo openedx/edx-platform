@@ -8,6 +8,7 @@ so that we can run the lettuce acceptance tests.
 # pylint: disable=W0401, W0614
 
 from .test import *
+from .sauce import *
 
 # You need to start the server in debug mode,
 # otherwise the browser will not render the pages correctly
@@ -17,7 +18,7 @@ DEBUG = True
 import logging
 logging.disable(logging.ERROR)
 import os
-import random
+from random import choice, randint
 
 
 def seed():
@@ -35,14 +36,20 @@ modulestore_options = {
 
 MODULESTORE = {
     'default': {
-        'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
-        'OPTIONS': modulestore_options
-    },
-    'direct': {
-        'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
-        'OPTIONS': modulestore_options
+        'ENGINE': 'xmodule.modulestore.mixed.MixedModuleStore',
+        'OPTIONS': {
+            'mappings': {},
+            'stores': {
+                'default': {
+                    'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
+                    'OPTIONS': modulestore_options
+                }
+            }
+        }
     }
 }
+
+MODULESTORE['direct'] = MODULESTORE['default']
 
 CONTENTSTORE = {
     'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
@@ -65,7 +72,7 @@ DATABASES = {
 
 # Set up XQueue information so that the lms will send
 # requests to a mock XQueue server running locally
-XQUEUE_PORT = random.randint(1024, 65535)
+XQUEUE_PORT = choice(PORTS) if SAUCE.get('SAUCE_ENABLED') else randint(1024, 65535)
 XQUEUE_INTERFACE = {
     "url": "http://127.0.0.1:%d" % XQUEUE_PORT,
     "django_auth": {
@@ -93,5 +100,5 @@ FEEDBACK_SUBMISSION_EMAIL = 'dummy@example.com'
 # Include the lettuce app for acceptance testing, including the 'harvest' django-admin command
 INSTALLED_APPS += ('lettuce.django',)
 LETTUCE_APPS = ('courseware',)
-LETTUCE_SERVER_PORT = random.randint(1024, 65535)
-LETTUCE_BROWSER = 'chrome'
+LETTUCE_SERVER_PORT = choice(PORTS) if SAUCE.get('SAUCE_ENABLED') else randint(1024, 65535)
+LETTUCE_BROWSER = os.environ.get('LETTUCE_BROWSER', 'chrome')

@@ -1,11 +1,46 @@
+"""
+Modulestore configuration for test cases.
+"""
 
-import copy
 from uuid import uuid4
 from django.test import TestCase
+from xmodule.modulestore.django import editable_modulestore, \
+    clear_existing_modulestores
 
-from django.conf import settings
-import xmodule.modulestore.django
-from unittest.util import safe_repr
+
+def mixed_store_config(data_dir, mappings):
+    """
+    Return a `MixedModuleStore` configuration, which provides
+    access to both Mongo- and XML-backed courses.
+
+    `data_dir` is the directory from which to load XML-backed courses.
+    `mappings` is a dictionary mapping course IDs to modulestores, for example:
+
+        {
+            'MITx/2.01x/2013_Spring': 'xml',
+            'edx/999/2013_Spring': 'default'
+        }
+
+    where 'xml' and 'default' are the two options provided by this configuration,
+    mapping (respectively) to XML-backed and Mongo-backed modulestores..
+    """
+    mongo_config = mongo_store_config(data_dir)
+    xml_config = xml_store_config(data_dir)
+
+    store = {
+        'default': {
+            'ENGINE': 'xmodule.modulestore.mixed.MixedModuleStore',
+            'OPTIONS': {
+                'mappings': mappings,
+                'stores': {
+                    'default': mongo_config['default'],
+                    'xml': xml_config['default']
+                }
+            }
+        }
+    }
+    store['direct'] = store['default']
+    return store
 
 
 def mongo_store_config(data_dir):
@@ -27,6 +62,7 @@ def mongo_store_config(data_dir):
             }
         }
     }
+
     store['direct'] = store['default']
     return store
 
@@ -45,23 +81,22 @@ def draft_mongo_store_config(data_dir):
         'render_template': 'mitxmako.shortcuts.render_to_string'
     }
 
-    return {
+    store = {
         'default': {
             'ENGINE': 'xmodule.modulestore.mongo.draft.DraftModuleStore',
             'OPTIONS': modulestore_options
-        },
-        'direct': {
-            'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
-            'OPTIONS': modulestore_options
         }
     }
+
+    store['direct'] = store['default']
+    return store
 
 
 def xml_store_config(data_dir):
     """
     Defines default module store using XMLModuleStore.
     """
-    return {
+    store = {
         'default': {
             'ENGINE': 'xmodule.modulestore.xml.XMLModuleStore',
             'OPTIONS': {
@@ -71,12 +106,48 @@ def xml_store_config(data_dir):
         }
     }
 
+    store['direct'] = store['default']
+    return store
+
 
 class ModuleStoreTestCase(TestCase):
-    """ Subclass for any test case that uses the mongodb
-    module store. This populates a uniquely named modulestore
-    collection with templates before running the TestCase
-    and drops it they are finished. """
+    """
+    Subclass for any test case that uses a ModuleStore.
+    Ensures that the ModuleStore is cleaned before/after each test.
+
+    Usage:
+
+        1. Create a subclass of `ModuleStoreTestCase`
+        2. Use Django's @override_settings decorator to use
+           the desired modulestore configuration.
+
+           For example:
+
+               MIXED_CONFIG = mixed_store_config(data_dir, mappings)
+
+               @override_settings(MODULESTORE=MIXED_CONFIG)
+               class FooTest(ModuleStoreTestCase):
+                   # ...
+
+        3. Use factories (e.g. `CourseFactory`, `ItemFactory`) to populate
+           the modulestore with test data.
+
+    NOTE:
+        * For Mongo-backed courses (created with `CourseFactory`),
+          the state of the course will be reset before/after each
+          test method executes.
+
+        * For XML-backed courses, the course state will NOT
+          reset between test methods (although it will reset
+          between test classes)
+
+          The reason is: XML courses are not editable, so to reset
+          a course you have to reload it from disk, which is slow.
+
+          If you do need to reset an XML course, use
+          `clear_existing_modulestores()` directly in
+          your `setUp()` method.
+    """
 
     @staticmethod
     def update_course(course, data):
@@ -89,107 +160,68 @@ class ModuleStoreTestCase(TestCase):
 
         'data' is a dictionary with an entry for each CourseField we want to update.
         """
-        store = xmodule.modulestore.django.modulestore()
+        store = editable_modulestore('direct')
         store.update_metadata(course.location, data)
         updated_course = store.get_instance(course.id, course.location)
         return updated_course
 
     @staticmethod
-    def flush_mongo_except_templates():
+    def drop_mongo_collection():
         """
-        Delete everything in the module store except templates.
+        If using a Mongo-backed modulestore, drop the collection.
         """
-        modulestore = xmodule.modulestore.django.modulestore()
 
-        # This query means: every item in the collection
-        # that is not a template
-        query = {"_id.course": {"$ne": "templates"}}
+        # This will return the mongo-backed modulestore 
+        # even if we're using a mixed modulestore
+        store = editable_modulestore()
 
-        # Remove everything except templates
-        modulestore.collection.remove(query)
-        modulestore.collection.drop()
+        if hasattr(store, 'collection'):
+            store.collection.drop()
 
     @classmethod
     def setUpClass(cls):
         """
-        Flush the mongo store and set up templates.
+        Delete the existing modulestores, causing them to be reloaded.
         """
-
-        # Use a uuid to differentiate
-        # the mongo collections on jenkins.
-        cls.orig_modulestore = copy.deepcopy(settings.MODULESTORE)
-        if 'direct' not in settings.MODULESTORE:
-            settings.MODULESTORE['direct'] = settings.MODULESTORE['default']
-
-        settings.MODULESTORE['default']['OPTIONS']['collection'] = 'modulestore_%s' % uuid4().hex
-        settings.MODULESTORE['direct']['OPTIONS']['collection'] = 'modulestore_%s' % uuid4().hex
-        xmodule.modulestore.django._MODULESTORES.clear()
-
-        print settings.MODULESTORE
-
+        # Clear out any existing modulestores,
+        # which will cause them to be re-created
+        # the next time they are accessed.
+        clear_existing_modulestores()
         TestCase.setUpClass()
 
     @classmethod
     def tearDownClass(cls):
         """
-        Revert to the old modulestore settings.
+        Drop the existing modulestores, causing them to be reloaded.
+        Clean up any data stored in Mongo.
         """
+        # Clean up by flushing the Mongo modulestore
+        cls.drop_mongo_collection()
 
-        # Clean up by dropping the collection
-        modulestore = xmodule.modulestore.django.modulestore()
-        modulestore.collection.drop()
+        # Clear out the existing modulestores,
+        # which will cause them to be re-created
+        # the next time they are accessed.
+        # We do this at *both* setup and teardown just to be safe.
+        clear_existing_modulestores()
 
-        xmodule.modulestore.django._MODULESTORES.clear()
-
-        # Restore the original modulestore settings
-        settings.MODULESTORE = cls.orig_modulestore
+        TestCase.tearDownClass()
 
     def _pre_setup(self):
         """
-        Remove everything but the templates before each test.
+        Flush the ModuleStore before each test.
         """
 
-        # Flush anything that is not a template
-        ModuleStoreTestCase.flush_mongo_except_templates()
+        # Flush the Mongo modulestore
+        ModuleStoreTestCase.drop_mongo_collection()
 
         # Call superclass implementation
         super(ModuleStoreTestCase, self)._pre_setup()
 
     def _post_teardown(self):
         """
-        Flush everything we created except the templates.
+        Flush the ModuleStore after each test.
         """
-        # Flush anything that is not a template
-        ModuleStoreTestCase.flush_mongo_except_templates()
+        ModuleStoreTestCase.drop_mongo_collection()
 
         # Call superclass implementation
         super(ModuleStoreTestCase, self)._post_teardown()
-
-
-    def assert2XX(self, status_code, msg=None):
-        """
-        Assert that the given value is a success status (between 200 and 299)
-        """
-        msg = self._formatMessage(msg, "%s is not a success status" % safe_repr(status_code))
-        self.assertTrue(status_code >= 200 and status_code < 300, msg=msg)
-
-    def assert3XX(self, status_code, msg=None):
-        """
-        Assert that the given value is a redirection status (between 300 and 399)
-        """
-        msg = self._formatMessage(msg, "%s is not a redirection status" % safe_repr(status_code))
-        self.assertTrue(status_code >= 300 and status_code < 400, msg=msg)
-
-    def assert4XX(self, status_code, msg=None):
-        """
-        Assert that the given value is a client error status (between 400 and 499)
-        """
-        msg = self._formatMessage(msg, "%s is not a client error status" % safe_repr(status_code))
-        self.assertTrue(status_code >= 400 and status_code < 500, msg=msg)
-
-    def assert5XX(self, status_code, msg=None):
-        """
-        Assert that the given value is a server error status (between 500 and 599)
-        """
-        msg = self._formatMessage(msg, "%s is not a server error status" % safe_repr(status_code))
-        self.assertTrue(status_code >= 500 and status_code < 600, msg=msg)

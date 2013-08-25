@@ -9,7 +9,8 @@ INHERITABLE_METADATA = (
     # intended to be set per-course, but can be overridden in for specific
     # elements.  Can be a float.
     'days_early_for_beta',
-    'giturl'  # for git edit link
+    'giturl',  # for git edit link
+    'static_asset_path',       # for static assets placed outside xcontent contentstore
 )
 
 
