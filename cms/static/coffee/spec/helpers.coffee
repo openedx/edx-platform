@@ -1,4 +1,4 @@
-jasmine.getFixtures().fixturesPath = 'fixtures'
+jasmine.getFixtures().fixturesPath += 'coffee/fixtures'
 
 # Stub jQuery.cookie
 @stubCookies =
