@@ -805,7 +805,8 @@ class CourseEnrollment(models.Model):
             record.is_active = False
             record.save()
         except cls.DoesNotExist:
-            log.error("Tried to unenroll student {} from {} but they were not enrolled")
+            err_msg = u"Tried to unenroll student {} from {} but they were not enrolled"
+            log.error(err_msg.format(user, course_id))
 
     @classmethod
     def unenroll_by_email(cls, email, course_id):
