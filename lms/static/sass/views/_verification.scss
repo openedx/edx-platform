@@ -2,19 +2,81 @@
 // ====================
 
 body.register.verification {
+  font-family: 'Open Sans', sans-serif;
+
+// some nasty resets and standard styles
+  h1, h2, h3, h4, h5, h6, p, input {
     font-family: 'Open Sans', sans-serif;
+  }
 
-    h1, h2, h3, h4, h5, h6, p {
-      font-family: 'Open Sans', sans-serif;
+  p {
+    margin-bottom: ($baseline*.75);
+  }
+
+  input {
+    font-style: normal;
+    font-weight: 400;
+  }
+
+
+  label {
+    font-style: normal;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 400;
+  }
+
+  .faq {
+    font-size: 12px;
+
+    label {
+      font-size: 12px;
+      font-weight: bold;
     }
+  }
 
+  dt {
+    margin: 0 0 .5em 0;
+    font-weight: bold;
+  }
+
+  dd {
+    margin: 0 0 1em 0;
+  }
+
+  dl dl {
+    margin: ($baseline/4) 0 0 ($baseline/2);
+  }
+
+
+// basic reusable bits
+  .content-wrapper {
+    background: none repeat scroll 0 0 #F7F7F7;
+    padding-bottom: 0;
+  }
+
+  .container {
+    background-color: #fff;
+    padding: ($baseline*1.5) ($baseline*1.5) ($baseline*2) ($baseline*1.5);
+  }
+
+  .tip {
+    @include transition(color 0.15s ease-in-out 0s);
+    display: block;
+    margin-top: ($baseline/4);
+    color: $lighter-base-font-color;
+    font-size: em(13);
+  }
 
   .page-header {
 
     .title {
-      @extend .t-title5;
+      @include font-size(18);
       margin-bottom: $baseline;
-      font-weight: bold;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 20px;
+      color: #2F73BC;
+      font-weight: 300;
+      text-transform: uppercase;
     }
   }
 
@@ -24,141 +86,343 @@ body.register.verification {
     font-weight: bold;
   }
 
-  .select {
-    @include clearfix();
 
 
-    .block {
-      float: left;
-      margin: 0 $baseline $baseline 0;
-      background-color: #eee;
-      padding: $baseline;
-      width: 60%;
+  .pay-options {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
 
-      .title {
-        @extend .t-title7;
+    li {
+      display: inline-block;
+      background-color: $light-gray;
+      padding: ($baseline/2) ($baseline*.75);
+      margin-right: ($baseline/4);
+      vertical-align: middle;
+
+      &.other1 {
+        margin-right: -($baseline/4);
+        padding-right: ($baseline/4);
+        min-height: 25px;
+      }
+      &.other2 {
+        padding: ($baseline/4) ($baseline*.75) ($baseline/4) 0;
       }
 
-    }
+      label {
+        vertical-align: middle;
+      }
 
-    .tips {
-      float: right;
-      width: 32%;
+      input {
+        vertical-align: middle;
+      }
     }
 
   }
 
+ .m-btn-primary {
+    margin-bottom: 0;
+    padding: 0;
+
+    a {
+      color: $very-light-text;
+      display: block;
+      padding: ($baseline*.75) $baseline;
+
+      &:hover {
+        text-decoration: none;
+        border: none;
+      }
+    }
+
+    &.disabled, &[disabled], &.is-disabled {
+      background-color: #ccc;
+      box-shadow: none;
+      pointer-events: none;
+
+      &:hover {
+        background: $action-primary-disabled-bg !important; // needed for IE currently
+      }
+
+    }
+
+    &.green {
+      box-shadow: 0 2px 1px rgba(2,100,2,1);
+      background-color: rgba(0,136,1,1);
+
+      &:hover {
+        box-shadow: 0 2px 1px rgba(2,100,2,1);
+        background-color: #029D03;
+      }
+
+    }
+  }
 
 
   .progress {
-
+ /*         background: transparent url('../images/vcert-steps.png') no-repeat 0 0;
+    height: 50px;
+    text-indent: -9999px;
+*/
     .progress-step {
-      border: 1px solid #eee;
       display: inline-block;
       padding: ($baseline/2) $baseline;
     }
   }
 
 
-  // for dev placement only
-  .placeholder-cam,
-  .placeholder-photo  {
-    height: 300px;
-    background-color: #eee;
-    position: relative;
 
-    p {
-      position: absolute;
-      top: 40%;
-      left: 40%;
-      color: #ccc;
+
+
+
+// select a track page
+  &.select-track {
+
+    .select {
+      @include clearfix();
+
+      .divider {
+        display: block;
+        clear: both;
+        width: 60%;
+        margin: $baseline $baseline 0 $baseline;
+        border-top: 2px solid #ddd;
+
+        p {
+          position: relative;
+          top: -$baseline;
+          width: 40px;
+          margin: 0 auto;
+          padding: 0 $baseline;
+          background-color: #fff;
+          font-size: 24px;
+          color: #aaa;
+          text-align: center;
+        }
+      }
+
+      .block {
+        position: relative;
+        float: left;
+        margin: 0 $baseline ($baseline*1.5) 0;
+        border-top: 5px solid #32A5D9;
+        background-color: #eee;
+        padding: $baseline ($baseline*1.5) ($baseline*2) ($baseline*1.5);
+        width: 60%;
+
+
+        &.block-cert {
+          border-top: 5px solid #008801;
+
+          .ribbon {
+            background: transparent url('../images/vcert-ribbon-s.png') no-repeat 0 0;
+            position: absolute;
+            top: -($baseline*1.5);
+            right: $baseline;
+            display: block;
+            width: ($baseline*3);
+            height: ($baseline*4);
+          }
+        }
+
+
+        p, li, dl {
+          color: $lighter-base-font-color;
+        }
+
+        .wrap-copy {
+          width: 60%;
+          display: inline-block;
+          vertical-align: middle;
+        }
+
+        .title {
+          @extend .t-title7;
+        }
+
+        .m-btn-primary {
+          position: absolute;
+          bottom: ($baseline*1.5);
+          right: ($baseline*1.5);
+        }
+
+
+      }
+
+      hr {
+        margin: 1em 0 2em 0;
+      }
+
+      .more {
+        margin-top: ($baseline/2);
+        border-top: 1px solid #ccc;
+      }
+
+      .tips {
+        float: right;
+        width: 32%;
+
+        p {
+          font-size: 14px;
+        }
+      }
     }
   }
 
-  .block-photo {
-    @include clearfix();
-    background-color: $white;
-
-    .title {
-      font-weight: bold;
+// requirements page
+  &.requirements {
+    .req {
+      width: 30%;
+      display: inline-block;
+      margin-right: $baseline;
+      text-align: center;
+      vertical-align: top;
     }
 
-    .wrapper-up,
-    .wrapper-down {
+    .next-step {
+      float: right;
+    }
+
+  }
+
+// take and review photos page
+  &.photos {
+    // for dev placement only
+    .placeholder-cam,
+    .placeholder-photo  {
+      height: 300px;
+      background-color: #eee;
+      position: relative;
+
+      p {
+        position: absolute;
+        top: 40%;
+        left: 40%;
+        color: #ccc;
+      }
+    }
+
+    .block-photo {
       @include clearfix();
-    }
+      background-color: $white;
 
-    .cam {
-      width: 45%;
-      float: left;
-      padding-right: $baseline;
-    }
+      .title {
+        font-weight: bold;
+      }
 
-    .photo-controls {
-      background-color: #ddd;
+      .wrapper-up,
+      .wrapper-down {
+        @include clearfix();
+      }
 
-      .controls-list {
-        margin: 0;
-        padding: ($baseline*.25) ($baseline*.75);
-        list-style-type: none;
+      .cam {
+        width: 45%;
+        float: left;
+        padding-right: $baseline;
+      }
 
-        .control {
-          display: inline-block;
+      .photo-controls {
+        background-color: #ddd;
 
-          .action {
-            @extend .button-primary;
-            display: block;
-            background-color: $blue;
-            color: $white;
-            padding: ($baseline*.25) ($baseline*.5);
-            border: none;
+        .controls-list {
+          @include clearfix();
+          position: relative;
+          margin: 0;
+          padding: ($baseline*.25) ($baseline*.75);
+          list-style-type: none;
 
-            &:hover {
+          .control {
+            display: inline-block;
 
+            .action {
+              @extend .button-primary;
+              display: block;
+              background-color: $blue;
+              color: $white;
+              padding: ($baseline*.25) ($baseline*.5);
+              border: none;
+
+              &:hover {
+
+              }
+
+            }
+
+
+            &.is-hidden {
+              visibility: hidden;
+            }
+
+            &.is-shown {
+              visibility: visible;
+            }
+
+
+            &.control-do {
+              position: relative;
+              left: 45%;
+            }
+
+            &.control-redo {
+              position: absolute;
+              left: ($baseline/2);
+            }
+
+            &.control-approve {
+              position: absolute;
+              right: ($baseline/2);
+            }
+
+            &.approved a {
+              background-color: $green;
             }
           }
         }
       }
+
+      .faq {
+        width: 45%;
+        float: left;
+        padding-right: $baseline;
+      }
+
     }
 
-    .faq {
+    .photo-tips {
       width: 45%;
       float: left;
-      padding-right: $baseline;
 
-      dt {
-        font-weight: bold;
-        padding: 0 0 ($baseline/2) 0;
-      }
+        ul {
+          margin: 0;
+          padding: 0;
+          list-style-type: none;
+        }
 
-      dd {
-        margin: 0;
-        padding: 0 0 $baseline 0;
-      }
+        li {
+          margin-bottom: $baseline;
+        }
+
+
+
     }
 
+    .next-step {
+      width: 45%;
+      float: right;
+    }
 
+    .support {
+      margin-top: ($baseline*2);
+    }
 
+    .review-photo {
+      width: 45%;
+      float: left;
+    }
+
+    #review-facephoto {
+      margin-right: $baseline;
+    }
   }
-
-  .photo-tips {
-    width: 45%;
-    float: left;
-  }
-
-  .actions {
-    width: 45%;
-    float: right;
-  }
-
-  .review-photo {
-    width: 45%;
-    float: left;
-  }
-
-  #review-facephoto {
-    margin-right: $baseline;
-  }
-
 
 }
