@@ -9,6 +9,7 @@ import pyparsing
 import random
 import unittest
 import textwrap
+import requests
 import mock
 
 from . import new_loncapa_problem, test_system
@@ -199,9 +200,8 @@ class SymbolicResponseTest(ResponseTest):
     from capa.tests.response_xml_factory import SymbolicResponseXMLFactory
     xml_factory_class = SymbolicResponseXMLFactory
 
-    def test_grade_single_input(self):
-        problem = self.build_problem(math_display=True,
-                                     expect="2*x+3*y")
+    def test_grade_single_input_correct(self):
+        problem = self.build_problem(math_display=True, expect="2*x+3*y")
 
         # Correct answers
         correct_inputs = [
@@ -209,17 +209,27 @@ class SymbolicResponseTest(ResponseTest):
                 <math xmlns="http://www.w3.org/1998/Math/MathML">
                     <mstyle displaystyle="true">
                     <mn>2</mn><mo>*</mo><mi>x</mi><mo>+</mo><mn>3</mn><mo>*</mo><mi>y</mi>
-                    </mstyle></math>""")),
+                    </mstyle></math>"""),
+             'snuggletex_2x+3y.xml'),
 
             ('x+x+3y', textwrap.dedent("""
                 <math xmlns="http://www.w3.org/1998/Math/MathML">
                     <mstyle displaystyle="true">
                     <mi>x</mi><mo>+</mo><mi>x</mi><mo>+</mo><mn>3</mn><mo>*</mo><mi>y</mi>
-                    </mstyle></math>""")),
+                    </mstyle></math>"""),
+             'snuggletex_x+x+3y.xml'),
         ]
 
-        for (input_str, input_mathml) in correct_inputs:
-            self._assert_symbolic_grade(problem, input_str, input_mathml, 'correct')
+        for (input_str, input_mathml, server_fixture) in correct_inputs:
+            print "Testing input: {0}".format(input_str)
+            server_resp = self._load_fixture(server_fixture)
+            self._assert_symbolic_grade(
+                problem, input_str, input_mathml,
+                'correct', snuggletex_resp=server_resp
+            )
+
+    def test_grade_single_input_incorrect(self):
+        problem = self.build_problem(math_display=True, expect="2*x+3*y")
 
         # Incorrect answers
         incorrect_inputs = [
@@ -234,112 +244,86 @@ class SymbolicResponseTest(ResponseTest):
         for (input_str, input_mathml) in incorrect_inputs:
             self._assert_symbolic_grade(problem, input_str, input_mathml, 'incorrect')
 
-    def test_complex_number_grade(self):
+    def test_complex_number_grade_correct(self):
+        problem = self.build_problem(
+            math_display=True,
+            expect="[[cos(theta),i*sin(theta)],[i*sin(theta),cos(theta)]]",
+            options=["matrix", "imaginary"]
+        )
+
+        correct_snuggletex = self._load_fixture('snuggletex_correct.html')
+        dynamath_input = self._load_fixture('dynamath_input.txt')
+        student_response = "cos(theta)*[[1,0],[0,1]] + i*sin(theta)*[[0,1],[1,0]]"
+
+        self._assert_symbolic_grade(
+            problem, student_response, dynamath_input,
+            'correct',
+            snuggletex_resp=correct_snuggletex
+        )
+
+    def test_complex_number_grade_incorrect(self):
+
         problem = self.build_problem(math_display=True,
                                      expect="[[cos(theta),i*sin(theta)],[i*sin(theta),cos(theta)]]",
                                      options=["matrix", "imaginary"])
 
-        # For LaTeX-style inputs, symmath_check() will try to contact
-        # a server to convert the input to MathML.
-        # We mock out the server, simulating the response that it would give
-        # for this input.
-        import requests
-        dirpath = os.path.dirname(__file__)
-        correct_snuggletex_response = open(os.path.join(dirpath, "test_files/snuggletex_correct.html")).read().decode('utf8')
-        wrong_snuggletex_response = open(os.path.join(dirpath, "test_files/snuggletex_wrong.html")).read().decode('utf8')
+        wrong_snuggletex = self._load_fixture('snuggletex_wrong.html')
+        dynamath_input = textwrap.dedent("""
+            <math xmlns="http://www.w3.org/1998/Math/MathML">
+              <mstyle displaystyle="true"><mn>2</mn></mstyle>
+            </math>
+        """)
 
-        # Correct answer
-        with mock.patch.object(requests, 'post') as mock_post:
-
-            # Simulate what the LaTeX-to-MathML server would
-            # send for the correct response input
-            mock_post.return_value.text = correct_snuggletex_response
-
-            self._assert_symbolic_grade(problem,
-                "cos(theta)*[[1,0],[0,1]] + i*sin(theta)*[[0,1],[1,0]]",
-                textwrap.dedent("""
-                <math xmlns="http://www.w3.org/1998/Math/MathML">
-                  <mstyle displaystyle="true">
-                    <mrow>
-                      <mi>cos</mi>
-                      <mrow><mo>(</mo><mi>&#x3B8;</mi><mo>)</mo></mrow>
-                    </mrow>
-                    <mo>&#x22C5;</mo>
-                    <mrow>
-                      <mo>[</mo>
-                      <mtable>
-                        <mtr>
-                          <mtd><mn>1</mn></mtd><mtd><mn>0</mn></mtd>
-                        </mtr>
-                        <mtr>
-                          <mtd><mn>0</mn></mtd><mtd><mn>1</mn></mtd>
-                        </mtr>
-                      </mtable>
-                      <mo>]</mo>
-                    </mrow>
-                    <mo>+</mo>
-                    <mi>i</mi>
-                    <mo>&#x22C5;</mo>
-                    <mrow>
-                      <mi>sin</mi>
-                      <mrow>
-                        <mo>(</mo><mi>&#x3B8;</mi><mo>)</mo>
-                      </mrow>
-                    </mrow>
-                    <mo>&#x22C5;</mo>
-                    <mrow>
-                      <mo>[</mo>
-                      <mtable>
-                        <mtr>
-                          <mtd><mn>0</mn></mtd><mtd><mn>1</mn></mtd>
-                        </mtr>
-                        <mtr>
-                          <mtd><mn>1</mn></mtd><mtd><mn>0</mn></mtd>
-                        </mtr>
-                      </mtable>
-                      <mo>]</mo>
-                    </mrow>
-                  </mstyle>
-                </math>
-                """),
-                'correct')
-
-        # Incorrect answer
-        with mock.patch.object(requests, 'post') as mock_post:
-
-            # Simulate what the LaTeX-to-MathML server would
-            # send for the incorrect response input
-            mock_post.return_value.text = wrong_snuggletex_response
-
-            self._assert_symbolic_grade(problem, "2",
-                    textwrap.dedent("""
-                    <math xmlns="http://www.w3.org/1998/Math/MathML">
-                      <mstyle displaystyle="true"><mn>2</mn></mstyle>
-                    </math>
-                    """),
-                'incorrect')
+        self._assert_symbolic_grade(
+            problem, "2", dynamath_input,
+            'incorrect',
+            snuggletex_resp=wrong_snuggletex,
+        )
 
     def test_multiple_inputs_exception(self):
 
         # Should not allow multiple inputs, since we specify
         # only one "expect" value
         with self.assertRaises(Exception):
-            self.build_problem(math_display=True,
-                               expect="2*x+3*y",
-                               num_inputs=3)
+            self.build_problem(math_display=True, expect="2*x+3*y", num_inputs=3)
 
-    def _assert_symbolic_grade(self, problem,
-                               student_input,
-                               dynamath_input,
-                               expected_correctness):
+    def _assert_symbolic_grade(
+        self, problem, student_input, dynamath_input, expected_correctness,
+        snuggletex_resp=""
+    ):
+        """
+        Assert that the symbolic response has a certain grade.
+
+        `problem` is the capa problem containing the symbolic response.
+        `student_input` is the text the student entered.
+        `dynamath_input` is the JavaScript rendered MathML from the page.
+        `expected_correctness` is either "correct" or "incorrect"
+        `snuggletex_resp` is the simulated response from the Snuggletex server
+        """
         input_dict = {'1_2_1': str(student_input),
                       '1_2_1_dynamath': str(dynamath_input)}
 
-        correct_map = problem.grade_answers(input_dict)
+        # Simulate what the Snuggletex server would respond
+        with mock.patch.object(requests, 'post') as mock_post:
+            mock_post.return_value.text = snuggletex_resp
 
-        self.assertEqual(
-            correct_map.get_correctness('1_2_1'), expected_correctness
-        )
+            correct_map = problem.grade_answers(input_dict)
+
+            self.assertEqual(
+                correct_map.get_correctness('1_2_1'), expected_correctness
+            )
+
+    @staticmethod
+    def _load_fixture(relpath):
+        """
+        Return a `unicode` object representing the contents
+        of the fixture file at `relpath` (relative to the test files dir)
+        """
+        abspath = os.path.join(os.path.dirname(__file__), 'test_files', relpath)
+        with open(abspath) as fixture_file:
+            contents = fixture_file.read()
+
+        return contents.decode('utf8')
 
 
 class OptionResponseTest(ResponseTest):
