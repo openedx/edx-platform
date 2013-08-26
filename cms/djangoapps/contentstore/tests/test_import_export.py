@@ -91,4 +91,4 @@ class ImportTestCase(CourseTestCase):
                         "name": self.good_tar,
                         "course-data": [gtar]
                     })
-        self.assert2XX(resp.status_code)
+        self.assertEquals(resp.status_code, 200)
