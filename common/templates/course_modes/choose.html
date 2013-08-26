@@ -2,13 +2,13 @@
 <%! from django.core.urlresolvers import reverse %>
 <%inherit file="../main.html" />
 
-<%block name="bodyclass">register verification select-track</%block>
+<%block name="bodyclass">register verification-process step-select-track</%block>
 
 <%block name="js_extra">
   <script type="text/javascript">
 
   $(document).ready(function() {
-    $( ".more" ).slideUp();
+    $( ".more" ).hide();
     $( ".expand" ).click(function(e) {
         e.preventDefault();
         $(this).next().slideToggle();

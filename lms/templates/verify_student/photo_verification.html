@@ -2,7 +2,7 @@
 <%! from django.core.urlresolvers import reverse %>
 <%inherit file="../main.html" />
 
-<%block name="bodyclass">register verification photos</%block>
+<%block name="bodyclass">register verification-process step-photos</%block>
 
 <%block name="js_extra">
 <!-- please move link to js/vendor/responsive-carousel/responsive-carousel.js from main.html to here -->
@@ -166,27 +166,25 @@
 
 <%block name="content">
 <div class="container">
-
   <header class="page-header">
     <h2 class="title">You are registering for ${course_name} (ID Verified)</h2>
   </header>
 
-
   <section class="progress">
-  <header class="section-head">
-    <h3 class="sr">Your Progress</h3>
-  </header>
-  <!--<span class="progress-line"></span><span class="progress-line-done"></span>-->
-  <ol>
-    <li class="progress-step done" id="progress-step0"><span class="mini number"></span> Intro</li>
-    <li class="progress-step current" id="progress-step1"><span class="sr">Current Step: </span> <span class="number">1</span> Take Photo</li>
-    <li class="progress-step" id="progress-step2"> <span class="number">2</span> Take ID Photo</li>
-    <li class="progress-step" id="progress-step3"> <span class="number">3</span> Confirm Submission</li>
-    <li class="progress-step" id="progress-step4"> <span class="number">4</span> Make Payment</li>
-    <li class="progress-step" id="progress-step5"><span class="number"><i class="icon-ok"></i></span> Confirmation</li>
-  </ol>
-  </section>
+    <header class="section-head">
+      <h3 class="sr title">Your Progress</h3>
+    </header>
 
+    <!--<span class="progress-status"></span><span class="progress-status-value"></span>-->
+    <ol class="progress-steps">
+      <li class="progress-step done" id="progress-step0"><span class="mini number"></span> Intro</li>
+      <li class="progress-step current" id="progress-step1"><span class="sr">Current Step: </span> <span class="number">1</span> Take Photo</li>
+      <li class="progress-step" id="progress-step2"> <span class="number">2</span> Take ID Photo</li>
+      <li class="progress-step" id="progress-step3"> <span class="number">3</span> Confirm Submission</li>
+      <li class="progress-step" id="progress-step4"> <span class="number">4</span> Make Payment</li>
+      <li class="progress-step" id="progress-step5"><span class="number"><i class="icon-ok"></i></span> Confirmation</li>
+    </ol>
+  </section>
 
   <section class="wrapper carousel"  data-transition="slide">
     <div id="wrapper-facephoto" class="block-photo">
@@ -217,7 +215,7 @@
 
         </div>
 
-        <div class="photo-tips facetips">
+        <div class="help photo-tips facetips">
           <h4>Tips on taking a successful photo</h4>
           <ul>
             <li>Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor.</li>
@@ -230,7 +228,7 @@
 
       <div class="wrapper-down">
         <div class="faq facefaq">
-          <h4 class="sr">Common Questions</h4>
+          <h4 class="sr title">Common Questions</h4>
             <dl>
               <dt>Why do you need my photo?</dt>
                 <dd>We need your photo to confirm that you are you.</dd>
