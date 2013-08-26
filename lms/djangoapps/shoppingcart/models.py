@@ -1,5 +1,6 @@
 import pytz
 import logging
+import smtplib
 from datetime import datetime
 from django.db import models
 from django.conf import settings
@@ -9,7 +10,9 @@ from django.utils.translation import ugettext as _
 from django.db import transaction
 from model_utils.managers import InheritanceManager
 from courseware.courses import get_course_about_section
+from django.core.mail import send_mail
 
+from mitxmako.shortcuts import render_to_string
 from xmodule.modulestore.django import modulestore
 from xmodule.course_module import CourseDescriptor
 
@@ -121,6 +124,17 @@ class Order(models.Model):
         orderitems = OrderItem.objects.filter(order=self).select_subclasses()
         for item in orderitems:
             item.purchase_item()
+        # send confirmation e-mail
+        subject = _("Order Payment Confirmation")
+        message = render_to_string('emails/order_confirmation_email.txt', {
+            'order': self,
+            'order_items': orderitems
+        })
+        try:
+            send_mail(subject, message,
+                      settings.DEFAULT_FROM_EMAIL, [self.user.email])
+        except smtplib.SMTPException:
+            log.error('Failed sending confirmation e-mail for order %d', self.id)
 
 
 class OrderItem(models.Model):
@@ -307,8 +321,8 @@ class CertificateItem(OrderItem):
         item.status = order.status
         item.qty = 1
         item.unit_cost = cost
-        item.line_desc = "{mode} certificate for course {course_id}".format(mode=item.mode,
-                                                                            course_id=course_id)
+        item.line_desc = _("{mode} certificate for course {course_id}").format(mode=item.mode,
+                                                                               course_id=course_id)
         item.currency = currency
         order.currency = currency
         order.save()

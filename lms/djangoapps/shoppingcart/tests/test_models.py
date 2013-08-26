@@ -6,6 +6,7 @@ from factory import DjangoModelFactory
 from mock import patch
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.core import mail
 from django.conf import settings
 from django.db import DatabaseError
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -77,6 +78,12 @@ class OrderTest(TestCase):
         cart.purchase()
         self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course_id))
 
+        # test e-mail sending
+        self.assertEquals(len(mail.outbox), 1)
+        self.assertEquals('Order Payment Confirmation', mail.outbox[0].subject)
+        self.assertIn(settings.PAYMENT_SUPPORT_EMAIL, mail.outbox[0].body)
+        self.assertIn(unicode(cart.total_cost), mail.outbox[0].body)
+
     def test_purchase_item_failure(self):
         # once again, we're testing against the specific implementation of
         # CertificateItem
@@ -87,6 +94,8 @@ class OrderTest(TestCase):
                 cart.purchase()
                 # verify that we rolled back the entire transaction
                 self.assertFalse(CourseEnrollment.is_enrolled(self.user, self.course_id))
+                # verify that e-mail wasn't sent
+                self.assertEquals(len(mail.outbox), 0)
 
     def purchase_with_data(self, cart):
         """ purchase a cart with billing information """
