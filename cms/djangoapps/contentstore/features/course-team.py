@@ -91,7 +91,7 @@ def remove_course_team_admin(_step, outer_capture, name):
 
 @step(u'"([^"]*)" logs in$')
 def other_user_login(_step, name):
-    world.browser.cookies.delete()
+    world.visit('logout')
     world.visit('/')
 
     signin_css = 'a.action-signin'

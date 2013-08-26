@@ -1,6 +1,8 @@
 Feature: Course Settings
   As a course author, I want to be able to configure my course settings.
 
+  # Safari has trouble keeps dates on refresh
+  @skip_safari
   Scenario: User can set course dates
     Given I have opened a new course in Studio
     When I select Schedule and Details
@@ -8,12 +10,16 @@ Feature: Course Settings
     And I press the "Save" notification button
     Then I see the set dates on refresh
 
+    # IE has trouble with saving information
+    @skip_internetexplorer
   Scenario: User can clear previously set course dates (except start date)
     Given I have set course dates
     And I clear all the dates except start
     And I press the "Save" notification button
     Then I see cleared dates on refresh
 
+    # IE has trouble with saving information
+    @skip_internetexplorer
   Scenario: User cannot clear the course start date
     Given I have set course dates
     And I press the "Save" notification button
@@ -21,6 +27,10 @@ Feature: Course Settings
     Then I receive a warning about course start date
     And The previously set start date is shown on refresh
 
+    # IE has trouble with saving information
+    # Safari gets CSRF token errors
+    @skip_internetexplorer
+    @skip_safari
   Scenario: User can correct the course start date warning
     Given I have tried to clear the course start
     And I have entered a new course start date
@@ -28,12 +38,16 @@ Feature: Course Settings
     Then The warning about course start date goes away
     And My new course start date is shown on refresh
 
+  # Safari does not save + refresh properly through sauce labs
+  @skip_safari
   Scenario: Settings are only persisted when saved
     Given I have set course dates
     And I press the "Save" notification button
     When I change fields
     Then I do not see the new changes persisted on refresh
 
+  # Safari does not save + refresh properly through sauce labs
+  @skip_safari
   Scenario: Settings are reset on cancel
     Given I have set course dates
     And I press the "Save" notification button
@@ -41,6 +55,8 @@ Feature: Course Settings
     And I press the "Cancel" notification button
     Then I do not see the changes
 
+  # Safari gets CSRF token errors
+  @skip_safari
   Scenario: Confirmation is shown on save
     Given I have opened a new course in Studio
     When I select Schedule and Details

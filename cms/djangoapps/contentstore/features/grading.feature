@@ -13,7 +13,7 @@ Feature: Course Grading
         When I add "6" new grades
         Then I see I now have "5" grades
 
-    #Cannot reliably make the delete button appear so using javascript instead
+    # Cannot reliably make the delete button appear so using javascript instead
     Scenario: Users can delete grading ranges
         Given I have opened a new course in Studio
         And I am viewing the grading settings
@@ -21,6 +21,9 @@ Feature: Course Grading
         And I delete a grade
         Then I see I now have "2" grades
 
+    # IE and Safari cannot reliably drag and drop through selenium
+    @skip_internetexplorer
+    @skip_safari
     Scenario: Users can move grading ranges
         Given I have opened a new course in Studio
         And I am viewing the grading settings
@@ -85,6 +88,9 @@ Feature: Course Grading
         When I change assignment type "Homework" to ""
         Then the save button is disabled
 
+    # IE and Safari cannot type in grade range name
+    @skip_internetexplorer
+    @skip_safari
     Scenario: User can edit grading range names
         Given I have opened a new course in Studio
         And I have populated the course

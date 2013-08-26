@@ -60,3 +60,6 @@ class CourseModeModelTest(TestCase):
 
         modes = CourseMode.modes_for_course(self.course_id)
         self.assertEqual(modes, set_modes)
+        self.assertEqual(mode1, CourseMode.mode_for_course(self.course_id, u'honor'))
+        self.assertEqual(mode2, CourseMode.mode_for_course(self.course_id, u'verified'))
+        self.assertIsNone(CourseMode.mode_for_course(self.course_id, 'DNE'))

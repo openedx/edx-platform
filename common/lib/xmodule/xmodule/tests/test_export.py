@@ -89,12 +89,6 @@ class RoundTripTestCase(unittest.TestCase):
         print("Checking module equality")
         for location in initial_import.modules[course_id].keys():
             print("Checking", location)
-            if location.category == 'html':
-                print(
-                    "Skipping html modules--they can't import in"
-                    " final form without writing files..."
-                )
-                continue
             self.assertEquals(initial_import.modules[course_id][location],
                               second_import.modules[course_id][location])
 

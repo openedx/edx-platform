@@ -206,20 +206,49 @@ class CombinedOpenEndedRubric(object):
     def render_combined_rubric(self, rubric_xml, scores, score_types, feedback_types):
         success, score_tuples = CombinedOpenEndedRubric.reformat_scores_for_rendering(scores, score_types,
                                                                                       feedback_types)
+        #Get all the categories in the rubric
         rubric_categories = self.extract_categories(rubric_xml)
+        #Get a list of max scores, each entry belonging to a rubric category
         max_scores = map((lambda cat: cat['options'][-1]['points']), rubric_categories)
+        actual_scores = []
+        #Get the highest possible score across all categories
         max_score = max(max_scores)
-        for i in xrange(0, len(rubric_categories)):
-            category = rubric_categories[i]
-            for j in xrange(0, len(category['options'])):
+        #Loop through each category
+        for i, category in enumerate(rubric_categories):
+            #Loop through each option in the category
+            for j in xrange(len(category['options'])):
+                #Intialize empty grader types list
                 rubric_categories[i]['options'][j]['grader_types'] = []
-                for tuple in score_tuples:
-                    if tuple[1] == i and tuple[2] == j:
-                        for grader_type in tuple[3]:
+                #Score tuples are a flat data structure with (category, option, grader_type_list) for selected graders
+                for tup in score_tuples:
+                    if tup[1] == i and tup[2] == j:
+                        for grader_type in tup[3]:
+                            #Set the rubric grader type to the tuple grader types
                             rubric_categories[i]['options'][j]['grader_types'].append(grader_type)
+                            #Grab the score and add it to the actual scores.  J will be the score for the selected
+                            #grader type
+                            if len(actual_scores)<=i:
+                                #Initialize a new list in the list of lists
+                                actual_scores.append([j])
+                            else:
+                                #If a list in the list of lists for this position exists, append to it
+                                actual_scores[i] += [j]
+
+        actual_scores = [sum(i) / len(i) for i in actual_scores]
+        correct = []
+        #Define if the student is "correct" (1) "incorrect" (0) or "partially correct" (.5)
+        for (i, a) in enumerate(actual_scores):
+            if int(a) == max_scores[i]:
+                correct.append(1)
+            elif int(a)==0:
+                correct.append(0)
+            else:
+                correct.append(.5)
 
         html = self.system.render_template('{0}/open_ended_combined_rubric.html'.format(self.TEMPLATE_DIR),
                                            {'categories': rubric_categories,
+                                            'max_scores': max_scores,
+                                            'correct' : correct,
                                             'has_score': True,
                                             'view_only': True,
                                             'max_score': max_score,

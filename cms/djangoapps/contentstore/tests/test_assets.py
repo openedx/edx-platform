@@ -60,11 +60,11 @@ class UploadTestCase(CourseTestCase):
         f = BytesIO("sample content")
         f.name = "sample.txt"
         resp = self.client.post(self.url, {"name": "my-name", "file": f})
-        self.assert2XX(resp.status_code)
+        self.assertEquals(resp.status_code, 200)
 
     def test_no_file(self):
         resp = self.client.post(self.url, {"name": "file.txt"})
-        self.assert4XX(resp.status_code)
+        self.assertEquals(resp.status_code, 400)
 
     def test_get(self):
         resp = self.client.get(self.url)

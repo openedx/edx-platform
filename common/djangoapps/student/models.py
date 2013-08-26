@@ -924,9 +924,6 @@ class CourseEnrollment(models.Model):
     @classmethod
     def is_enrolled(cls, user, course_id):
         """
-        Remove the user from a given course. If the relevant `CourseEnrollment`
-        object doesn't exist, we log an error but don't throw an exception.
-
         Returns True if the user is enrolled in the course (the entry must exist
         and it must have `is_active=True`). Otherwise, returns False.
 

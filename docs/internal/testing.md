@@ -136,6 +136,25 @@ To run a single nose test:
 
     nosetests common/lib/xmodule/xmodule/tests/test_stringify.py:test_stringify
 
+To run a single test and get stdout, with proper env config:
+
+    python manage.py cms --settings test test contentstore.tests.test_import_nostatic -s
+
+To run a single test and get stdout and get coverage:
+
+    python -m coverage run --rcfile=./common/lib/xmodule/.coveragerc which ./manage.py cms --settings test test --traceback --logging-clear-handlers --liveserver=localhost:8000-9000 contentstore.tests.test_import_nostatic -s # cms example 
+    python -m coverage run --rcfile=./lms/.coveragerc which ./manage.py lms --settings test test --traceback --logging-clear-handlers --liveserver=localhost:8000-9000  courseware.tests.test_module_render -s # lms example
+
+generate coverage report:
+
+    coverage report --rcfile=./common/lib/xmodule/.coveragerc 
+
+or to get html report:
+
+    coverage html --rcfile=./common/lib/xmodule/.coveragerc
+    
+then browse reports/common/lib/xmodule/cover/index.html    
+
 
 Very handy: if you uncomment the `pdb=1` line in `setup.cfg`, it will drop you into pdb on error.  This lets you go up and down the stack and see what the values of the variables are.  Check out [the pdb documentation](http://docs.python.org/library/pdb.html)
 

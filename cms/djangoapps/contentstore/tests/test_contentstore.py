@@ -3,6 +3,9 @@
 import json
 import shutil
 import mock
+
+from textwrap import dedent
+
 from django.test.client import Client
 from django.test.utils import override_settings
 from django.conf import settings
@@ -312,7 +315,14 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         handouts = module_store.get_item(Location(['i4x', 'edX', 'toy', 'html', 'toyhtml', None]))
         self.assertIn('/static/', handouts.data)
 
-    def test_import_textbook_as_content_element(self):
+    @mock.patch('xmodule.course_module.requests.get')
+    def test_import_textbook_as_content_element(self, mock_get):
+        mock_get.return_value.text = dedent("""
+            <?xml version="1.0"?><table_of_contents>
+            <entry page="5" page_label="ii" name="Table of Contents"/>
+            </table_of_contents>
+        """).strip()
+
         module_store = modulestore('direct')
         import_from_xml(module_store, 'common/test/data/', ['toy'])
 
@@ -476,7 +486,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         content_store = contentstore()
 
         module_store = modulestore('direct')
-        import_from_xml(module_store, 'common/test/data/', ['toy'], static_content_store=content_store)
+        import_from_xml(module_store, 'common/test/data/', ['toy'], static_content_store=content_store, verbose=True)
 
         course_location = CourseDescriptor.id_to_location('edX/toy/2012_Fall')
         course = module_store.get_item(course_location)
@@ -845,7 +855,14 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             filesystem = OSFS(root_dir / ('test_export/' + dirname))
             self.assertTrue(filesystem.exists(item.location.name + filename_suffix))
 
-    def test_export_course(self):
+    @mock.patch('xmodule.course_module.requests.get')
+    def test_export_course(self, mock_get):
+        mock_get.return_value.text = dedent("""
+            <?xml version="1.0"?><table_of_contents>
+            <entry page="5" page_label="ii" name="Table of Contents"/>
+            </table_of_contents>
+        """).strip()
+
         module_store = modulestore('direct')
         draft_store = modulestore('draft')
         content_store = contentstore()
@@ -945,8 +962,17 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
                                                   'vertical', 'vertical_test', None]), depth=1)
 
         self.assertTrue(getattr(vertical, 'is_draft', False))
+        self.assertNotIn('index_in_children_list', child.xml_attributes)
+        self.assertNotIn('parent_sequential_url', vertical.xml_attributes)
+                
         for child in vertical.get_children():
             self.assertTrue(getattr(child, 'is_draft', False))
+            self.assertNotIn('index_in_children_list', child.xml_attributes)
+            if hasattr(child, 'data'):
+                self.assertNotIn('index_in_children_list', child.data)
+            self.assertNotIn('parent_sequential_url', child.xml_attributes)
+            if hasattr(child, 'data'):
+                self.assertNotIn('parent_sequential_url', child.data)
 
         # make sure that we don't have a sequential that is in draft mode
         sequential = draft_store.get_item(Location(['i4x', 'edX', 'toy',
@@ -1056,6 +1082,38 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         # It should now contain empty data
         self.assertEquals(imported_word_cloud.data, '')
+
+    def test_html_export_roundtrip(self):
+        """
+        Test that a course which has HTML that has style formatting is preserved in export/import
+        """
+        module_store = modulestore('direct')
+        content_store = contentstore()
+
+        import_from_xml(module_store, 'common/test/data/', ['toy'])
+
+        location = CourseDescriptor.id_to_location('edX/toy/2012_Fall')
+
+        # Export the course
+        root_dir = path(mkdtemp_clean())
+        export_to_xml(module_store, content_store, location, root_dir, 'test_roundtrip')
+
+        # Reimport and get the video back
+        import_from_xml(module_store, root_dir)
+
+        # get the sample HTML with styling information
+        html_module = module_store.get_instance(
+            'edX/toy/2012_Fall',
+            Location(['i4x', 'edX', 'toy', 'html', 'with_styling'])
+        )
+        self.assertIn('<p style="font:italic bold 72px/30px Georgia, serif; color: red; ">', html_module.data)
+
+        # get the sample HTML with just a simple <img> tag information
+        html_module = module_store.get_instance(
+            'edX/toy/2012_Fall',
+            Location(['i4x', 'edX', 'toy', 'html', 'just_img'])
+        )
+        self.assertIn('<img src="/static/foo_bar.jpg" />', html_module.data)
 
     def test_course_handouts_rewrites(self):
         module_store = modulestore('direct')
@@ -1367,7 +1425,7 @@ class ContentStoreTest(ModuleStoreTestCase):
                                                'course': loc.course,
                                                'name': loc.name}))
 
-        self.assert2XX(resp.status_code)
+        self.assertEqual(resp.status_code, 200)
         self.assertContains(resp, 'Chapter 2')
 
         # go to various pages
@@ -1377,92 +1435,92 @@ class ContentStoreTest(ModuleStoreTestCase):
                                        kwargs={'org': loc.org,
                                                'course': loc.course,
                                                'name': loc.name}))
-        self.assert2XX(resp.status_code)
+        self.assertEqual(resp.status_code, 200)
 
         # export page
         resp = self.client.get(reverse('export_course',
                                        kwargs={'org': loc.org,
                                                'course': loc.course,
                                                'name': loc.name}))
-        self.assert2XX(resp.status_code)
+        self.assertEqual(resp.status_code, 200)
 
         # manage users
         resp = self.client.get(reverse('manage_users',
                                        kwargs={'org': loc.org,
                                                'course': loc.course,
                                                'name': loc.name}))
-        self.assert2XX(resp.status_code)
+        self.assertEqual(resp.status_code, 200)
 
         # course info
         resp = self.client.get(reverse('course_info',
                                        kwargs={'org': loc.org,
                                                'course': loc.course,
                                                'name': loc.name}))
-        self.assert2XX(resp.status_code)
+        self.assertEqual(resp.status_code, 200)
 
         # settings_details
         resp = self.client.get(reverse('settings_details',
                                        kwargs={'org': loc.org,
                                                'course': loc.course,
                                                'name': loc.name}))
-        self.assert2XX(resp.status_code)
+        self.assertEqual(resp.status_code, 200)
 
         # settings_details
         resp = self.client.get(reverse('settings_grading',
                                        kwargs={'org': loc.org,
                                                'course': loc.course,
                                                'name': loc.name}))
-        self.assert2XX(resp.status_code)
+        self.assertEqual(resp.status_code, 200)
 
         # static_pages
         resp = self.client.get(reverse('static_pages',
                                        kwargs={'org': loc.org,
                                                'course': loc.course,
                                                'coursename': loc.name}))
-        self.assert2XX(resp.status_code)
+        self.assertEqual(resp.status_code, 200)
 
         # static_pages
         resp = self.client.get(reverse('asset_index',
                                        kwargs={'org': loc.org,
                                                'course': loc.course,
                                                'name': loc.name}))
-        self.assert2XX(resp.status_code)
+        self.assertEqual(resp.status_code, 200)
 
         # go look at a subsection page
         subsection_location = loc.replace(category='sequential', name='test_sequence')
         resp = self.client.get(reverse('edit_subsection',
                                        kwargs={'location': subsection_location.url()}))
-        self.assert2XX(resp.status_code)
+        self.assertEqual(resp.status_code, 200)
 
         # go look at the Edit page
         unit_location = loc.replace(category='vertical', name='test_vertical')
         resp = self.client.get(reverse('edit_unit',
                                        kwargs={'location': unit_location.url()}))
-        self.assert2XX(resp.status_code)
+        self.assertEqual(resp.status_code, 200)
 
         # delete a component
         del_loc = loc.replace(category='html', name='test_html')
         resp = self.client.post(reverse('delete_item'),
                                 json.dumps({'id': del_loc.url()}), "application/json")
-        self.assert2XX(resp.status_code)
+        self.assertEqual(resp.status_code, 204)
 
         # delete a unit
         del_loc = loc.replace(category='vertical', name='test_vertical')
         resp = self.client.post(reverse('delete_item'),
                                 json.dumps({'id': del_loc.url()}), "application/json")
-        self.assert2XX(resp.status_code)
+        self.assertEqual(resp.status_code, 204)
 
         # delete a unit
         del_loc = loc.replace(category='sequential', name='test_sequence')
         resp = self.client.post(reverse('delete_item'),
                                 json.dumps({'id': del_loc.url()}), "application/json")
-        self.assert2XX(resp.status_code)
+        self.assertEqual(resp.status_code, 204)
 
         # delete a chapter
         del_loc = loc.replace(category='chapter', name='chapter_2')
         resp = self.client.post(reverse('delete_item'),
                                 json.dumps({'id': del_loc.url()}), "application/json")
-        self.assert2XX(resp.status_code)
+        self.assertEqual(resp.status_code, 204)
 
     def test_import_into_new_course_id(self):
         module_store = modulestore('direct')
