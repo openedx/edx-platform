@@ -173,13 +173,14 @@ class CombinedOpenEndedV1Module():
         If that is the case, moved it to old_task_states and delete task_states.
         """
 
-        #If we are on a task that is greater than the number of available tasks, it is an invalid state
-        #If the current task number is greater than the number of tasks we have in the xml definition, our state is invalid.
+        # If we are on a task that is greater than the number of available tasks,
+        # it is an invalid state. If the current task number is greater than the number of tasks
+        # we have in the definition, our state is invalid.
         if self.current_task_number > len(self.task_states) or self.current_task_number > len(self.task_xml):
-            self.current_task_number = min([len(self.task_states), len(self.task_xml)]) - 1
+            self.current_task_number = max(min(len(self.task_states), len(self.task_xml)) - 1, 0)
         #If the length of the task xml is less than the length of the task states, state is invalid
         if len(self.task_xml) < len(self.task_states):
-            self.current_task_number = 0
+            self.current_task_number = len(self.task_xml) - 1
             self.task_states = self.task_states[:len(self.task_xml)]
         #Loop through each task state and make sure it matches the xml definition
         for (i, t) in enumerate(self.task_states):
@@ -221,8 +222,14 @@ class CombinedOpenEndedV1Module():
                 break
 
     def reset_task_state(self, message=""):
-        info_message = "Combined open ended user state for user {0} in location {1} was invalid.  Reset it. {2}".format(self.system.anonymous_student_id, self.location.url(), message)
+        """
+        Resets the task states.  Moves current task state to an old_state variable, and then makes the task number 0.
+        :param message: A message to put in the log.
+        :return: None
+        """
+        info_message = "Combined open ended user state for user {0} in location {1} was invalid.  It has been reset, and you now have a new attempt. {2}".format(self.system.anonymous_student_id, self.location.url(), message)
         self.current_task_number = 0
+        self.student_attempts = 0
         self.old_task_states.append(self.task_states)
         self.task_states = []
         log.info(info_message)

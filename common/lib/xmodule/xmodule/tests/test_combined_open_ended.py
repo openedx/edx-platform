@@ -572,9 +572,9 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
         self.assertEqual(score_dict['score'], 15.0)
         self.assertEqual(score_dict['total'], 15.0)
 
-    def ai_state(self, task_state, task_number, task_xml):
+    def generate_oe_module(self, task_state, task_number, task_xml):
         """
-        See if state is properly reset or left unchanged
+        Return a combined open ended module with the specified parameters
         """
         definition = {'prompt': etree.XML(self.prompt), 'rubric': etree.XML(self.rubric),
                       'task_xml': task_xml}
@@ -595,9 +595,15 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
         """
         See if state is properly reset
         """
-        combinedoe = self.ai_state(task_state, task_number, [self.task_xml2])
+        combinedoe = self.generate_oe_module(task_state, task_number, [self.task_xml2])
         html = combinedoe.get_html()
         self.assertIsInstance(html, basestring)
+
+        score = combinedoe.get_score()
+        if combinedoe.is_scored:
+            self.assertEqual(score['score'], 0)
+        else:
+            self.assertEqual(score['score'], None)
 
     def ai_state_success(self, task_state, task_number=None, iscore=2, tasks=None):
         """
@@ -605,7 +611,7 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
         """
         if tasks is None:
             tasks = [self.task_xml1, self.task_xml2]
-        combinedoe = self.ai_state(task_state, task_number, tasks)
+        combinedoe = self.generate_oe_module(task_state, task_number, tasks)
         html = combinedoe.get_html()
         self.assertIsInstance(html, basestring)
         score = combinedoe.get_score()
