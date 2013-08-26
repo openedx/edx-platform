@@ -2,6 +2,7 @@ import pytz
 import logging
 from datetime import datetime
 from django.db import models
+from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
@@ -102,15 +103,16 @@ class Order(models.Model):
         self.purchase_time = datetime.now(pytz.utc)
         self.bill_to_first = first
         self.bill_to_last = last
-        self.bill_to_street1 = street1
-        self.bill_to_street2 = street2
         self.bill_to_city = city
         self.bill_to_state = state
-        self.bill_to_postalcode = postalcode
         self.bill_to_country = country
-        self.bill_to_ccnum = ccnum
-        self.bill_to_cardtype = cardtype
-        self.processor_reply_dump = processor_reply_dump
+        self.bill_to_postalcode = postalcode
+        if settings.MITX_FEATURES['STORE_BILLING_INFO']:
+            self.bill_to_street1 = street1
+            self.bill_to_street2 = street2
+            self.bill_to_ccnum = ccnum
+            self.bill_to_cardtype = cardtype
+            self.processor_reply_dump = processor_reply_dump
         # save these changes on the order, then we can tell when we are in an
         # inconsistent state
         self.save()
