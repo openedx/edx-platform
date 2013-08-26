@@ -459,7 +459,7 @@ STATICFILES_DIRS = [
 FAVICON_PATH = 'images/favicon.ico'
 
 # Locale/Internationalization
-TIME_ZONE = 'America/New_York'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
+TIME_ZONE = 'Europe/Moscow'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
 LANGUAGES = ()
 
@@ -468,7 +468,7 @@ LANGUAGES = ()
 # localization files, if the user's browser is set to a language other than us-en,
 # strings like "login" and "password" will be translated and the rest of the page will be
 # in English, which is confusing.
-USE_I18N = False
+USE_I18N = True
 USE_L10N = True
 
 # Localization strings (e.g. django.po) are under this directory
