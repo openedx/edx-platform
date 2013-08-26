@@ -147,11 +147,11 @@
     $("#pay_button").click(submitToPaymentProcessing);
     $("#confirm_pics_good").click(function() {
       if (this.checked) {
-        $("#pay_button").removeClass('disabled');
+        $("#pay_button_frame").removeClass('disabled');
       }
     });
 
-    $("#pay_button").addClass('disabled');
+    $("#pay_button_frame").addClass('disabled');
 
     initPhotoBlocks();
     initVideoCapture();
@@ -384,11 +384,19 @@
       <div class="next-step">
 
         <p>Photos don't meet the requirements? <a href="">Retake the photos</a>.</p>
-        <input type="checkbox" name="match" id="confirm_pics_good" /> <label for="match">Yes! My details all match.</label>
+        <form id="pay_form" method="post" action="${purchase_endpoint}">
+          <!-- <a href="#">Go to Step 4: Secure Payment</a> -->
+          <!-- <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }"> -->
 
-            <p  class="m-btn-primary" id="pay_button"><a href="#">Go to Step 4: Secure Payment</a></p>
-            <p class="tip">Once you verify your details match the requirements, you can move on to step 4, payment on our secure server.</p>
+          <input type="checkbox" name="match" id="confirm_pics_good" /> <label for="match">Yes! My details all match.</label>
 
+          <input type="hidden" name="course_id" value="${course_id | h}" />
+          <p class="m-btn-primary" id="pay_button_frame">
+            <input type="button" id="pay_button" value="Go to Step 4: Secure Payment" name="payment">
+          </p>
+        </form>
+        <p class="tip">Once you verify your details match the requirements, you can move on to step 4, payment on our secure server.</p>
+      </div>
     </div>
   </section>
 
