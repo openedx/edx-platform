@@ -13,7 +13,7 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2013-08-26 16:13+0400\n"
+"PO-Revision-Date: 2013-08-26 16:28+0400\n"
 "Last-Translator: Pavel Yushchenko <pavelyushchenko@gmail.com>\n"
 "Language-Team: Select LTD\n"
 "Language: ru\n"
@@ -267,7 +267,7 @@ msgstr ""
 
 #: cms/static/js/base.js:676
 msgid "Required field."
-msgstr ""
+msgstr "Обязательное поле."
 
 #: cms/static/js/base.js:868 cms/templates/overview.html:171
 msgid "Will Release:"
@@ -2326,33 +2326,32 @@ msgstr "Необходимая информация для регистраци�
 
 #: cms/templates/signup.html:40 lms/templates/register.html:171
 msgid "Lastname"
-msgstr ""
+msgstr "Фамилия"
 
 #: cms/templates/signup.html:44 lms/templates/register.html:175
 msgid "Firstname"
-msgstr ""
+msgstr "Имя"
 
 #: cms/templates/signup.html:48 lms/templates/register.html:179
 msgid "Middlename"
-msgstr ""
+msgstr "Отчество"
 
 #: cms/templates/signup.html:52 lms/templates/register.html:183
 #: lms/templates/instructor/instructor_dashboard_2/analytics.html:40
 msgid "Year of Birth"
-msgstr ""
+msgstr "Год рождения"
 
 #: cms/templates/signup.html:61 lms/templates/register.html:192
 msgid "Highest Level of Education Completed"
-msgstr ""
+msgstr "Образование"
 
 #: cms/templates/signup.html:70 lms/templates/register.html:201
 msgid "Place where Education Completed"
-msgstr ""
+msgstr "Какое учебное заведение окончил(а)"
 
 #: cms/templates/signup.html:74 lms/templates/register.html:205
-#, fuzzy
 msgid "Year when education was Completed"
-msgstr "Активация вашей учетной записи завершена!"
+msgstr "Год окончания учебного заведения"
 
 #: cms/templates/signup.html:84 lms/templates/register.html:215
 msgid "Diploma qualification"
@@ -2407,7 +2406,6 @@ msgid "Qualification category year"
 msgstr "Год присвоения категории"
 
 #: cms/templates/signup.html:161 lms/templates/register.html:292
-#, fuzzy
 msgid "Contact phone"
 msgstr "Контактный телефон"
 
@@ -3772,7 +3770,7 @@ msgstr ""
 #: lms/templates/static_templates/faq.html:14
 #: lms/templates/static_templates/press.html:14
 msgid "Contact"
-msgstr ""
+msgstr "Контакты"
 
 #: lms/templates/contact.html:20
 #: lms/templates/static_templates/contact.html:22
@@ -4614,7 +4612,7 @@ msgstr ""
 msgid ""
 "Required fields are noted by <strong class=\"indicator\">bold text and an "
 "asterisk (*)</strong>."
-msgstr ""
+msgstr "Обязательные поля выделены жирным и отмечены (*)"
 
 #: lms/templates/register.html:119 lms/templates/register.html:140
 msgid "example: username@domain.com"
@@ -5110,7 +5108,7 @@ msgstr ""
 
 #: lms/templates/test_center_register.html:246
 msgid "Contact &amp; Other Information"
-msgstr ""
+msgstr "Контакты и другая информация"
 
 #: lms/templates/test_center_register.html:251
 msgid "Phone Number"
@@ -7061,7 +7059,7 @@ msgstr ""
 
 #: lms/templates/static_templates/contact.html:7
 msgid "Contact {platform_name}"
-msgstr ""
+msgstr "Контакты {platform_name}"
 
 #: lms/templates/static_templates/contact.html:26
 msgid ""
